@@ -1,0 +1,76 @@
+<div class="flex justify-center items-center page-size">
+  <div
+    class="card card-side bg-base-100 shadow-xl min-h-[300px] max-h-[600px] w-3/4"
+  >
+    <figure class="card-image !hidden md:!flex">
+      <img
+        src="favicon/web-app-manifest-512x512.png"
+        alt="Grandprod Logo"
+      />
+    </figure>
+
+    <div class="card-body flex flex-col justify-around items-center relative">
+      <div class="flex-1 card-title text-center">
+        <span class="title text-4xl">Grandprod</span>
+      </div>
+
+      <p class="flex-3 flex items-center max-w-[600px]">
+        Be gay, do crime.
+      </p>
+
+      <div class="flex-3 card-actions flex flex-col gap-2 w-1/2 max-w-[300px]">
+        <button
+          class="btn btn-primary btn-block"
+          (click)="newGame()"
+          appAnalyticsClick="Meta:Play:New"
+          appSfx="ui-click"
+          [sfxOffset]="0"
+          [sfxTrigger]="['click']"
+        >
+          New Game
+        </button>
+
+        @if (hasStartedGame()) {
+          <button
+            class="btn btn-primary btn-block"
+            (click)="resumeGame()"
+            appAnalyticsClick="Meta:Play:Resume"
+            appSfx="ui-click"
+            [sfxOffset]="1"
+            [sfxTrigger]="['hover', 'click']"
+          >
+            Resume Game
+          </button>
+        }
+
+        <app-button-settings></app-button-settings>
+
+        <app-button-quit></app-button-quit>
+      </div>
+
+      <div class="min-h-[48px]"></div>
+
+      <div class="card-actions absolute bottom-0 left-0 right-0 p-2">
+        <app-connect-buttons></app-connect-buttons>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="fixed bottom-0 left-0 right-0 bg-base-100 h-8 flex justify-center items-center text-sm"
+>
+  <span>Version {{ meta.versionString() }}</span>
+
+  <app-button-update></app-button-update>
+</div>
+
+<swal
+  #newGameSwal
+  title="Reset your game?"
+  icon="warning"
+  confirmButtonText="Yes, reset game"
+  cancelButtonText="No, cancel"
+></swal>
+
+<ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

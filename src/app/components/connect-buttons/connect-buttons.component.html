@@ -1,0 +1,38 @@
+@for (ext of externalLinks; track $index) {
+  <a
+    class="btn btn-ghost btn-untextured social-icon"
+    [tp]="ext.name"
+    [href]="ext.link"
+    target="_blank"
+    rel="nofollow"
+    [style.--social-color]="ext.color"
+    (mouseenter)="ext.currentColor = ext.color"
+    (mouseleave)="ext.currentColor = '#ccc'"
+    [appAnalyticsClick]="'Meta:External:' + ext.name"
+    appSfx="ui-click"
+    [sfxOffset]="$index"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <ng-icon [name]="ext.icon" [color]="ext.currentColor || '#ccc'"></ng-icon>
+  </a>
+}
+
+<app-modal-changelog></app-modal-changelog>
+
+<!--
+<a
+  class="btn btn-ghost btn-untextured social-icon animate-pulse"
+  [tp]="'Download Grandprod!'"
+  [href]="'https://seiyria.itch.io/grandprod'"
+  target="_blank"
+  rel="nofollow"
+  [style.--social-color]="'#fa5c5c'"
+  [appAnalyticsClick]="'Meta:External:Download'"
+  appSfx="ui-click"
+  [sfxOffset]="5"
+  [sfxTrigger]="['click', 'hover']"
+  appHideInElectron
+>
+  <ng-icon [name]="'tablerDownload'" [color]="'#fa5c5c'"></ng-icon>
+</a>
+-->

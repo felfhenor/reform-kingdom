@@ -1,0 +1,30 @@
+<div
+  class="w-full flex justify-center card-page-container pointer-events-auto size-{{
+    heightProfile()
+  }}"
+>
+  <div
+    class="card bg-base-100 shadow-xl page-card"
+    [class.my-4]="!isEmbeddedInModal()"
+  >
+    <div class="card-body h-full">
+      <h1 class="card-title flex justify-between relative min-h-8">
+        <div
+          class="absolute flex justify-center w-full text-xl pointer-events-none"
+        >
+          <ng-content select="[header]"></ng-content>
+        </div>
+
+        <div></div>
+
+        <div>
+          <ng-content select="[pageactions]"></ng-content>
+        </div>
+      </h1>
+
+      <div class="card-content h-full">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+</div>

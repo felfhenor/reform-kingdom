@@ -1,0 +1,14 @@
+- id: c952c464-3da8-412d-a28e-29482837e454
+  name: Blue Slime
+  description: It's colorblind
+
+  sprite: '0000'
+  frames: 4
+
+  itemIds:
+    - Ice Cube
+
+  baseStats: {}
+
+  statsPerLevel:
+    Shield: 2

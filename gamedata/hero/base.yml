@@ -1,0 +1,33 @@
+- id: d055d3c0-0fa1-4caf-97ca-d8f83528caaf
+  name: Gobbledygook
+  description: A mischievous creature known for its playful antics and love of shiny objects.
+
+  sprite: '0000'
+  frames: 4
+
+  baseStats:
+    Health: 50
+    Damage: 2
+
+  statsPerLevel:
+    Luck: 1
+
+  startingWeaponIds:
+    - Sword
+
+- id: 8960bc38-da35-403d-8846-f071f2637bbe
+  name: Onion
+  description: He has layers.
+
+  sprite: '0004'
+  frames: 4
+
+  baseStats:
+    Health: 100
+    Knockback: 5
+
+  statsPerLevel:
+    Knockback: 1
+
+  startingWeaponIds:
+    - Club

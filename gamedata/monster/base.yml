@@ -1,0 +1,55 @@
+- id: 46aac966-48c0-4b4c-84ed-a371bb65acba
+  name: Goblin
+
+  sprite: '0004'
+  frames: 4
+
+  baseStats:
+    Health: 3
+    Damage: 1
+
+  statsPerLevel:
+    Health: 0.2
+    Damage: 0.05
+
+- id: 3557a467-d17b-4ef1-a7ee-4eb51ae98759
+  name: Kobold
+
+  sprite: '0000'
+  frames: 4
+
+  baseStats:
+    Health: 7
+    Damage: 2
+
+  statsPerLevel:
+    Health: 0.5
+    Damage: 0.1
+
+- id: d7b75e59-3309-44e0-a293-cf5f9303658a
+  name: Hobgoblin
+
+  sprite: '0008'
+  frames: 4
+
+  baseStats:
+    Health: 15
+    Damage: 3
+
+  statsPerLevel:
+    Health: 1
+    Damage: 0.15
+
+- id: 5b4508dc-b7ac-4089-8d30-95fd94f8824e
+  name: Ogre
+
+  sprite: '0012'
+  frames: 4
+
+  baseStats:
+    Health: 100
+    Damage: 10
+
+  statsPerLevel:
+    Health: 2
+    Damage: 1

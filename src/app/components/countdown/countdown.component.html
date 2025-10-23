@@ -1,0 +1,19 @@
+<span>
+  @if (label(); as label) {
+    <span>{{ label }}</span>
+  }
+
+  <span class="ml-1">
+    @if (parenthesize()) {
+      &lpar;
+    }
+
+    <span>{{ minutesUntilReset() }}m</span>
+
+    <span class="ml-1">{{ secondsUntilReset() }}s</span>
+
+    @if (parenthesize()) {
+      &rpar;
+    }
+  </span>
+</span>

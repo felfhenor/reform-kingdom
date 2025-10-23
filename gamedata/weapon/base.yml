@@ -1,0 +1,33 @@
+- id: 198f9bbc-a2bc-4c15-9956-13de1ccd79f7
+  name: Sword
+  description: The classic
+
+  sprite: '0000'
+
+  baseStats:
+    Damage: 5.0
+    ProjectileCount: 1.0
+    AttackSpeed: 1.0
+
+  upgradeableStats:
+    - Damage
+    - ProjectileCount
+    - AttackSpeed
+
+- id: 353685e4-4388-4227-bd82-303590b7330b
+  name: Club
+  description: Meat tenderizer
+
+  sprite: '0001'
+
+  baseStats:
+    Damage: 3.0
+    ProjectileCount: 1.0
+    ProjectileBounces: 2.0
+    AttackSpeed: 1.0
+    Knockback: 2.0
+
+  upgradeableStats:
+    - Damage
+    - Knockback
+    - AttackSpeed

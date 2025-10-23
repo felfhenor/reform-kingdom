@@ -1,0 +1,21 @@
+- id: 14c6bbbd-e1ae-41d3-824f-b72cc3b2d209
+  name: Kobold Tail
+  description: Looks suspiciously meaty
+  sprite: '0000'
+
+  baseStats:
+    Luck: 3.0
+
+  upgradeableStats:
+    - Luck
+
+- id: eb109400-f869-4c73-970e-da6883eb61ae
+  name: Thorned Barb
+  description: A tiny lil spike
+  sprite: '0001'
+
+  baseStats:
+    Damage: 3.0
+
+  upgradeableStats:
+    - Damage

@@ -1,0 +1,59 @@
+- id: a48a78f9-f52f-4285-a868-4f60a732640d
+  name: Bubble
+
+  sprite: '0002'
+
+  baseStats: {}
+
+  statsPerLevel:
+    Shield: 5
+
+- id: be777f27-b8bc-4492-b9b9-08b4f345a3f9
+  name: Quiver
+
+  sprite: '0003'
+
+  baseStats: {}
+
+  statsPerLevel:
+    ProjectileCount: 1
+
+- id: 53086c5a-2886-443b-bbed-13ec04669b9f
+  name: Book of Reading
+
+  sprite: '0000'
+
+  baseStats: {}
+
+  statsPerLevel:
+    Difficulty: 5
+
+- id: e4efe665-bac4-4c13-aab4-be4b9bc7fae5
+  name: Gloves of Speed
+
+  sprite: '0001'
+
+  baseStats: {}
+
+  statsPerLevel:
+    AttackSpeed: 1
+
+- id: 3f491e1f-4ce1-4fc3-94d2-26e747ed26bc
+  name: Ice Cube
+
+  sprite: '0005'
+
+  baseStats: {}
+
+  statsPerLevel:
+    FreezeChance: 5
+
+- id: de33e06e-212b-4eaa-9651-33c7460bce74
+  name: Poison Dart
+
+  sprite: '0004'
+
+  baseStats: {}
+
+  statsPerLevel:
+    PoisonChance: 15

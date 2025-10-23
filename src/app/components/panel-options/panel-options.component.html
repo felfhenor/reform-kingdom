@@ -1,0 +1,43 @@
+@let currentTab = activeTab();
+
+<app-card-page [isEmbeddedInModal]="true">
+  <span header>Settings</span>
+
+  <div pageactions class="flex items-center gap-2">
+    <app-connect-buttons></app-connect-buttons>
+
+    <app-button-close (click)="closeMenu()"></app-button-close>
+  </div>
+
+  <div role="tablist" class="tabs tabs-boxed">
+    @for (tab of tabs; track $index) {
+      <button
+        role="tab"
+        class="tab"
+        [class.tab-active]="currentTab === tab.link"
+        (click)="changeActiveTab(tab.link)"
+        (keydown)="changeActiveTab(tab.link)"
+        [appAnalyticsClick]="'Options:Navigate:' + tab.name"
+        [class.hidden]="!tab.showIf()"
+      >
+        {{ tab.name }}
+      </button>
+    }
+  </div>
+
+  <div class="p-3 max-h-[500px] min-h-[500px] overflow-y-auto">
+    @switch (currentTab) {
+      @case ('UI') {
+        <app-panel-options-ui></app-panel-options-ui>
+      }
+
+      @case ('Debug') {
+        <app-panel-options-debug></app-panel-options-debug>
+      }
+
+      @case ('Savefile') {
+        <app-panel-options-savefile></app-panel-options-savefile>
+      }
+    }
+  </div>
+</app-card-page>

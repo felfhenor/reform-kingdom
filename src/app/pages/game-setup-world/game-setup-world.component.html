@@ -1,0 +1,50 @@
+<div class="flex justify-center items-center h-full p-2 flex-col gap-2">
+  <div class="w-full lg:max-w-[800px]">
+    <div class="card bg-base-100">
+      <div class="card-body items-center justify-between">
+        <div class="card-title text-center flex flex-col">Choose a Hero</div>
+
+        <div class="card-actions pt-3 flex flex-row gap-2">
+          <div class="flex flex-row justify-center gap-2 flex-wrap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full lg:max-w-[800px]">
+    <div class="card bg-base-100">
+      <div class="card-body items-center justify-between">
+        <div class="card-title text-center flex flex-col">World Seed</div>
+
+        <div
+          class="text-center flex flex-row justify-center gap-2 italic px-[15%]"
+        >
+          The world seed is used to generate the world. You can use a custom
+          seed or leave it empty to let the game generate one for you.
+        </div>
+
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          placeholder="Enter world seed..."
+          [(ngModel)]="worldSeed"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full lg:max-w-[800px]">
+    <div class="card bg-base-100">
+      <div class="card-body items-center justify-between">
+        <button
+          class="btn btn-primary btn-block"
+          (click)="createWorld()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Start Game
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

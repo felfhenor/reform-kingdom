@@ -1,0 +1,80 @@
+@use 'tailwindcss';
+@reference 'tailwindcss';
+
+:root {
+  --color-white: #ffffff;
+  --color-green-400: #4ade80;
+  --color-blue-400: #60a5fa;
+  --color-purple-400: #c084fc;
+  --color-yellow-400: #facc15;
+}
+
+.text-Common {
+  @apply text-white;
+}
+
+.text-Uncommon {
+  @apply text-green-400;
+}
+
+.text-Rare {
+  @apply text-blue-400;
+}
+
+.text-Mystical {
+  @apply text-purple-400;
+}
+
+.text-Legendary {
+  @apply text-yellow-400;
+}
+
+.outline-Common {
+  @apply outline-white;
+}
+
+.outline-Uncommon {
+  @apply outline-green-400;
+}
+
+.outline-Rare {
+  @apply outline-blue-400;
+}
+
+.outline-Mystical {
+  @apply outline-purple-400;
+}
+
+.outline-Legendary {
+  @apply outline-yellow-400;
+}
+
+.bg-Common {
+  @apply text-black;
+  --bg-color: var(--color-white) !important;
+  --btn-color: var(--color-white) !important;
+}
+
+.bg-Uncommon {
+  @apply text-black;
+  --bg-color: var(--color-green-400) !important;
+  --btn-color: var(--color-green-400) !important;
+}
+
+.bg-Rare {
+  @apply text-black;
+  --bg-color: var(--color-blue-400) !important;
+  --btn-color: var(--color-blue-400) !important;
+}
+
+.bg-Mystical {
+  @apply text-black;
+  --bg-color: var(--color-purple-400) !important;
+  --btn-color: var(--color-purple-400) !important;
+}
+
+.bg-Legendary {
+  @apply text-black;
+  --bg-color: var(--color-yellow-400) !important;
+  --btn-color: var(--color-yellow-400) !important;
+}

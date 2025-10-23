@@ -1,0 +1,62 @@
+@let skillData = skill();
+
+<app-icon-blank-slot class="absolute"></app-icon-blank-slot>
+
+<div
+  class="h-[64px] w-[64px] outline outline-2 z-0 absolute outline-{{
+    skillData.rarity
+  }}"
+></div>
+
+<app-atlas-animation
+  class="z-10 absolute"
+  [assetName]="skillData.sprite"
+  [spritesheet]="'skill'"
+  [frames]="skillData.frames"
+  [tp]="itemInfo"
+  [tpMaxWidth]="800"
+></app-atlas-animation>
+
+<div
+  class="z-20 absolute bottom-0 left-[2px] text-xs font-bold italic text-black text-shadow-white"
+>
+  Lv. {{ skillData.dropLevel }}
+</div>
+
+@if (showEnchantLevel() && skillEnchantLevel() > 0) {
+  <div
+    class="z-20 absolute top-0 right-[2px] text-xs font-bold italic text-black text-shadow-white"
+  >
+    +{{ skillEnchantLevel() }}
+  </div>
+}
+
+@if (skillData.isFavorite) {
+  <div class="z-30 absolute top-[2px] left-[2px]">
+    <app-icon name="gameSevenPointedStar" size="16px" color="gold"></app-icon>
+  </div>
+}
+
+<app-marker-symmetry
+  class="absolute bottom-[-6px] right-[10px] z-30"
+  orientation="vertical"
+  [level]="symmetryLevel()"
+></app-marker-symmetry>
+
+<ng-template #itemInfo let-hide>
+  @if (compareSkill(); as compareWith) {
+    <app-stats-skill-compare
+      [skill]="skillData"
+      [compareWith]="compareWith"
+      [equippingHero]="equippingHero()"
+    ></app-stats-skill-compare>
+  } @else {
+    <div class="min-w-[300px]">
+      <app-stats-skill
+        [skill]="skillData"
+        [equippingHero]="equippingHero()"
+        [showEquippedBy]="showEquippedBy()"
+      ></app-stats-skill>
+    </div>
+  }
+</ng-template>

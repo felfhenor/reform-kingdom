@@ -1,0 +1,71 @@
+.page-container {
+  height: 100vh;
+  max-height: 100vh;
+
+  @apply overflow-y-auto overflow-x-hidden;
+
+  &.playing {
+    @apply overflow-hidden;
+  }
+}
+
+.page-size {
+  height: calc(100vh - 64px);
+}
+
+.page-card {
+  @apply overflow-hidden;
+}
+
+.game-container {
+  @media (max-width: 1399px) {
+    .panel-layer {
+      padding: 1rem !important;
+    }
+  }
+
+  @media (max-width: 1199px) {
+    .panel-layer {
+      padding: 0.75rem !important;
+    }
+  }
+
+  .panel-layer {
+    transform-origin: top center;
+
+    @media (max-width: 1599px) and (min-width: 1400px) {
+      transform: scale(0.95);
+    }
+
+    @media (max-width: 1399px) and (min-width: 1366px) {
+      transform: scale(0.9);
+    }
+
+    @media (max-width: 1365px) and (min-width: 1200px) {
+      transform: scale(0.85);
+    }
+
+    @media (max-width: 1199px) {
+      transform: scale(0.8);
+    }
+  }
+}
+
+@media (max-width: 1365px) {
+  .card-page-container {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 1199px) {
+  .card-page-container {
+    font-size: 0.9rem;
+  }
+}
+
+.has-help {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+
+  @apply cursor-help;
+}
