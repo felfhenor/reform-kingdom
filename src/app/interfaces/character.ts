@@ -1,9 +1,13 @@
+import type { Branded } from '@interfaces/identifiable';
 import type { JobId } from '@interfaces/content-job';
 import type { TraitId } from '@interfaces/content-trait';
 import type { EquipmentBlock } from '@interfaces/equipment';
 import type { StatBlock } from '@interfaces/stat';
 
+export type CharacterId = Branded<string, 'CharacterId'>;
+
 export type Character = {
+  id: CharacterId;
   name: string;
   level: number;
   xp: {

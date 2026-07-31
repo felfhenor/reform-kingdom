@@ -1,5 +1,6 @@
 import type { Signal } from '@angular/core';
 import { signal } from '@angular/core';
+import { gamestate } from '@helpers/state-game';
 import type { GameStateWorld } from '@interfaces';
 import { Subject } from 'rxjs';
 
@@ -18,6 +19,7 @@ export async function worldgenGenerateWorld(): Promise<
 > {
   //
   return {
+    ...gamestate().world,
     didFinish: true,
   };
 }

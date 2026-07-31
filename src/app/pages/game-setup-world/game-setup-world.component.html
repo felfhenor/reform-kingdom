@@ -2,10 +2,44 @@
   <div class="w-full lg:max-w-[800px]">
     <div class="card bg-base-100">
       <div class="card-body items-center justify-between">
-        <div class="card-title text-center flex flex-col">Choose a Hero</div>
+        <div class="card-title text-center flex flex-col">
+          Choose Your Party
+        </div>
 
-        <div class="card-actions pt-3 flex flex-row gap-2">
-          <div class="flex flex-row justify-center gap-2 flex-wrap"></div>
+        <div class="card-actions pt-3 flex flex-col gap-6 w-full">
+          @for (heroField of partyForm; track $index) {
+            <div class="flex flex-row gap-2 items-center w-full">
+              <app-atlas-animation
+                [spritesheet]="'job'"
+                [assetName]="jobFor(heroField.jobId().value())?.sprite ?? ''"
+                [frames]="jobFor(heroField.jobId().value())?.frames ?? 4"
+              ></app-atlas-animation>
+
+              <div class="flex flex-col gap-2 flex-1">
+                <div class="flex flex-row gap-2">
+                  <input
+                    type="text"
+                    class="input input-bordered flex-1"
+                    [formField]="heroField.name"
+                    placeholder="Hero name"
+                  />
+
+                  <ng-select
+                    class="flex-1"
+                    [items]="unlockedJobs()"
+                    bindLabel="name"
+                    bindValue="id"
+                    [clearable]="false"
+                    [formField]="heroField.jobId"
+                  ></ng-select>
+                </div>
+
+                <div class="text-sm opacity-70">
+                  {{ jobFor(heroField.jobId().value())?.description }}
+                </div>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -16,6 +50,7 @@
       <div class="card-body items-center justify-between">
         <button
           class="btn btn-primary btn-block"
+          [disabled]="partyForm().invalid()"
           (click)="createWorld()"
           appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"

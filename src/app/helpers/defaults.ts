@@ -1,5 +1,5 @@
 import { rngUuid } from '@helpers/rng';
-import type { GameId, GameState, StatBlock } from '@interfaces';
+import type { EquipmentBlock, GameId, GameState, StatBlock } from '@interfaces';
 
 export function defaultGameState(): GameState {
   return {
@@ -14,7 +14,9 @@ export function defaultGameState(): GameState {
       numTicks: 0,
       lastSaveTick: 0,
     },
-    world: {},
+    world: {
+      party: [],
+    },
   };
 }
 
@@ -28,5 +30,18 @@ export function defaultStats(): StatBlock {
     Resistance: 0,
     Strength: 0,
     Vitality: 0,
+  };
+}
+
+export function defaultEquipment(): EquipmentBlock {
+  return {
+    Armor: undefined,
+    Helmet: undefined,
+    Weapon: undefined,
+    Offhand: undefined,
+    Ring: undefined,
+    Necklace: undefined,
+    Artifact: undefined,
+    Ammo: undefined,
   };
 }

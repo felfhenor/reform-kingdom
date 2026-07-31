@@ -11,9 +11,4 @@ export type HasAnimation = HasSprite & {
 };
 
 export type AtlasedImage =
-  | 'hero'
-  | 'item'
-  | 'monster'
-  | 'pet'
-  | 'trinket'
-  | 'weapon';
+  'collectible' | 'equipment' | 'item' | 'job' | 'monster';
