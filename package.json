@@ -34,21 +34,21 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "21",
-    "@angular/common": "^21.2.19",
-    "@angular/compiler": "^21.2.19",
-    "@angular/core": "^21.2.19",
-    "@angular/forms": "^21.2.19",
-    "@angular/platform-browser": "^21.2.19",
-    "@angular/router": "^21.2.19",
+    "@angular/cdk": "^22.1.0",
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/router": "^22.1.0",
     "@ng-icons/core": "^34.0.0",
-    "@ng-icons/game-icons": "^32.5.0",
-    "@ng-icons/tabler-icons": "^32.4.0",
-    "@ng-select/ng-select": "^21.8.2",
-    "@ngneat/helipopper": "^11.1.4",
+    "@ng-icons/game-icons": "^34.0.0",
+    "@ng-icons/tabler-icons": "^34.0.0",
+    "@ng-select/ng-select": "^23.5.1",
+    "@ngneat/helipopper": "^13.1.2",
     "@ngneat/hotkeys": "^4.1.0",
     "@sweetalert2/ngx-sweetalert2": "^15.0.0",
-    "@taiga-ui/event-plugins": "^4.7.0",
+    "@taiga-ui/event-plugins": "^5.0.0",
     "@tailwindcss/postcss": "^4.3.3",
     "console-log-colors": "^0.5.0",
     "es-toolkit": "^1.50.0",
@@ -56,9 +56,9 @@
     "jimp": "^1.6.1",
     "logger-timer": "^1.0.7",
     "marked": "^18.0.7",
-    "ngx-drag-drop": "^21.0.6",
-    "ngx-toastr": "^19.1.0",
-    "ngxtension": "^5.2.0",
+    "ngx-drag-drop": "^22.0.0",
+    "ngx-toastr": "^20.0.5",
+    "ngxtension": "^7.2.0",
     "rollbar": "^3.1.0",
     "rxjs": "^7.8.2",
     "seedrandom": "^3.0.5",
@@ -68,14 +68,14 @@
     "uuid": "^11.1.1"
   },
   "devDependencies": {
-    "@angular-eslint/builder": "^21.3.1",
-    "@angular-eslint/eslint-plugin": "20.1.1",
-    "@angular-eslint/eslint-plugin-template": "20.1.1",
-    "@angular-eslint/schematics": "20.1.1",
-    "@angular-eslint/template-parser": "20.1.1",
-    "@angular/build": "^21.2.19",
-    "@angular/cli": "^21.2.19",
-    "@angular/compiler-cli": "^21.2.19",
+    "@angular-eslint/builder": "^22.1.0",
+    "@angular-eslint/eslint-plugin": "^22.1.0",
+    "@angular-eslint/eslint-plugin-template": "^22.1.0",
+    "@angular-eslint/schematics": "^22.1.0",
+    "@angular-eslint/template-parser": "^22.1.0",
+    "@angular/build": "^22.1.2",
+    "@angular/cli": "^22.1.2",
+    "@angular/compiler-cli": "^22.1.0",
     "@types/fs-extra": "^11.0.4",
     "@types/howler": "^2.2.13",
     "@types/js-yaml": "^4.0.9",
@@ -91,7 +91,7 @@
     "concurrently": "^10.0.4",
     "conventional-changelog": "^6.0.0",
     "conventional-changelog-cli": "^5.0.0",
-    "cpy-cli": "^5.0.0",
+    "cpy-cli": "^7.0.0",
     "daisyui": "^5.7.9",
     "eslint": "8.57.0",
     "eslint-plugin-typescript-paths": "^0.0.33",
@@ -99,14 +99,14 @@
     "git-describe": "^4.1.1",
     "imagemin": "^7.0.1",
     "imagemin-webp": "^6.1.0",
-    "js-yaml": "^4.3.0",
+    "js-yaml": "^5.2.2",
     "jsdom": "^30.0.1",
     "postcss": "^8.5.25",
     "prettier": "^3.9.6",
     "recursive-readdir": "^2.2.3",
-    "tailwindcss": "^4.1.11",
+    "tailwindcss": "^4.3.3",
     "ts-node": "^10.9.2",
-    "typescript": "5.9.3",
+    "typescript": "6.0",
     "typescript-json-schema": "^0.65.1",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10",
@@ -114,8 +114,21 @@
   },
   "overrides": {
     "@sweetalert2/ngx-sweetalert2": {
-      "@angular/common": "21",
-      "@angular/core": "21"
+      "@angular/common": "22",
+      "@angular/core": "22"
+    },
+    "@angular-eslint/builder": {
+      "eslint": "8.57.0"
+    },
+    "@angular-eslint/eslint-plugin": {
+      "eslint": "8.57.0"
+    },
+    "@angular-eslint/eslint-plugin-template": {
+      "eslint": "8.57.0"
+    },
+    "ngx-toastr": {
+      "@angular/common": "22",
+      "@angular/core": "22"
     }
   }
 }
