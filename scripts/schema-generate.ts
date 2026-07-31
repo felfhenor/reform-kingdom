@@ -313,6 +313,10 @@ const contentTypeMap = {
   trait: 'TraitContent',
 };
 
+// Content types whose schema generated successfully - used to populate
+// `.vscode/settings.json` -> `yaml.schemas` below.
+const generatedContentTypes: string[] = [];
+
 // Generate schemas for each content type
 for (const [contentType, typeName] of Object.entries(contentTypeMap)) {
   try {
@@ -346,6 +350,8 @@ for (const [contentType, typeName] of Object.entries(contentTypeMap)) {
     const schemaPath = path.join(schemasDir, `${contentType}.schema.json`);
     fs.writeJsonSync(schemaPath, arraySchema, { spaces: 2 });
     console.log(`✓ Generated schema: ${schemaPath}`);
+
+    generatedContentTypes.push(contentType);
   } catch (error: any) {
     console.error(
       `Error generating schema for ${contentType}:`,
@@ -354,5 +360,43 @@ for (const [contentType, typeName] of Object.entries(contentTypeMap)) {
     console.error(error.stack);
   }
 }
+
+// Point VSCode's YAML validation at the schemas we just generated, one entry
+// per content type, keyed by the schema path so it stays in sync with
+// whatever's actually on disk instead of requiring a manual settings edit.
+//
+// This patches the `"yaml.schemas": { ... }` block in place via string
+// surgery rather than parsing+re-serializing the whole file - a full
+// JSON.stringify round-trip reformats unrelated keys elsewhere in the file
+// (e.g. re-wrapping single-line arrays/objects), which would show up as
+// unrelated diff noise every time schemas are regenerated.
+function updateVscodeSettings(): void {
+  const settingsPath = path.resolve(__dirname, '../.vscode/settings.json');
+
+  if (!fs.existsSync(settingsPath)) {
+    console.warn(`Could not find ${settingsPath}, skipping settings update.`);
+    return;
+  }
+
+  const raw: string = fs.readFileSync(settingsPath, 'utf-8');
+
+  const schemaEntries = generatedContentTypes
+    .map(
+      (contentType) =>
+        `    "./schemas/${contentType}.schema.json": "gamedata/${contentType}/*.yml"`,
+    )
+    .join(',\n');
+  const newBlock = `"yaml.schemas": {\n${schemaEntries}\n  }`;
+
+  const blockPattern = /"yaml\.schemas":\s*\{[^{}]*\}/;
+  const updated = blockPattern.test(raw)
+    ? raw.replace(blockPattern, newBlock)
+    : raw.replace(/}\s*$/, (match) => `,\n  ${newBlock}\n${match.trim()}`);
+
+  fs.writeFileSync(settingsPath, updated);
+  console.log(`✓ Updated yaml.schemas in ${settingsPath}`);
+}
+
+updateVscodeSettings();
 
 console.log('TypeScript-based schema generation complete!');
