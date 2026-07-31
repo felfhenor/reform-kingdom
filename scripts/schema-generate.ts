@@ -90,6 +90,114 @@ function fixSchema(schema: any): any {
   return processSchema(schema);
 }
 
+// `__type` is injected by the content loader at runtime (`ContentService`) and
+// is never present in the authored YAML, so it must not be required/allowed
+// in the schema used to validate those YAML files.
+function stripInjectedFields(schema: any): any {
+  if (!schema) return schema;
+
+  function traverse(obj: any): any {
+    if (typeof obj !== 'object' || obj === null) return obj;
+
+    if (Array.isArray(obj)) {
+      return obj.map(traverse).filter((item) => {
+        if (item && typeof item === 'object' && item.type === 'object') {
+          const hasProps =
+            item.properties && Object.keys(item.properties).length > 0;
+          return hasProps;
+        }
+        return true;
+      });
+    }
+
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === 'properties' && value && typeof value === 'object') {
+        const props = { ...(value as any) };
+        delete props.__type;
+        result[key] = traverse(props);
+        continue;
+      }
+
+      if (key === 'required' && Array.isArray(value)) {
+        const filtered = value.filter((prop) => prop !== '__type');
+        if (filtered.length > 0) result[key] = filtered;
+        continue;
+      }
+
+      result[key] = traverse(value);
+    }
+
+    return result;
+  }
+
+  return traverse(schema);
+}
+
+// Top-level content properties (id, name, description, baseStats itself, etc.)
+// are mandatory. But sub-object internals - the fields *inside* a nested
+// object/array-item schema like `baseStats`, `damageScaling`, or a
+// `techniques` entry - are meant to be authored as partials (see
+// `ensure*`/`ensureStats` in content-initializers.ts), so their `required`
+// arrays must be stripped. Only the outermost facet-level `required` arrays
+// (which list which top-level properties are mandatory) are preserved.
+function relaxSubObjectRequired(schema: any): any {
+  if (!schema) return schema;
+
+  // Strips every `required` found within a schema node and its descendants,
+  // without exception - used once we've descended past the top-level facet.
+  function stripAllRequired(node: any): any {
+    if (typeof node !== 'object' || node === null) return node;
+
+    if (Array.isArray(node)) {
+      return node.map(stripAllRequired);
+    }
+
+    const result: any = {};
+    for (const [key, value] of Object.entries(node)) {
+      if (key === 'required') continue;
+      result[key] = stripAllRequired(value);
+    }
+
+    return result;
+  }
+
+  // Walks the top-level facets (the `allOf` entries of the content item),
+  // keeping their own `required` array intact but relaxing everything found
+  // one level deeper - i.e. inside each property's own schema.
+  function relaxFacet(facet: any): any {
+    if (typeof facet !== 'object' || facet === null) return facet;
+
+    if (Array.isArray(facet)) {
+      return facet.map(relaxFacet);
+    }
+
+    const result: any = { ...facet };
+
+    if (result.properties) {
+      const newProps: Record<string, any> = {};
+      for (const [key, propSchema] of Object.entries(result.properties)) {
+        newProps[key] = stripAllRequired(propSchema);
+      }
+      result.properties = newProps;
+    }
+
+    return result;
+  }
+
+  const result = { ...schema };
+  if (result.items && Array.isArray(result.items.allOf)) {
+    result.items = {
+      ...result.items,
+      allOf: result.items.allOf.map(relaxFacet),
+    };
+  } else if (result.items) {
+    result.items = relaxFacet(result.items);
+  }
+
+  return result;
+}
+
 // Additional post-processing function to fix complex nested ID arrays
 function postProcessIdArrays(schema: any): any {
   if (!schema) return schema;
@@ -165,19 +273,14 @@ const settings = {
 // Create a program from the actual interface files
 const program = TJS.getProgramFromFiles(
   [
+    path.resolve(__dirname, '../src/app/interfaces/content-collectible.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-equipment.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-item.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-job.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-monster.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-skill.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-talent.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-statuseffect.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-currency.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-guardian.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-festival.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-talenttree.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-locationupgrade.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-townupgrade.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-trait-equipment.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-trait-location.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-worldconfig.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-trait.ts'),
   ],
   {
     strictNullChecks: false, // Disabled to handle complex types
@@ -198,77 +301,19 @@ const program = TJS.getProgramFromFiles(
   },
 );
 
-// Content type mappings to actual TypeScript interface names
-// Equipment types (armor, accessory, trinket, weapon) all use the same EquipmentItemContent interface
+// Content type mappings to actual TypeScript interface names.
+// Keys must match the gamedata folder names (and `ContentType` union).
 const contentTypeMap = {
-  // Individual content types with their specific interfaces
+  collectible: 'CollectibleContent',
+  equipment: 'EquipmentContent',
+  item: 'ItemContent',
+  job: 'JobContent',
+  monster: 'MonsterContent',
   skill: 'EquipmentSkillContent',
-  talent: 'TalentContent',
-  statuseffect: 'StatusEffectContent',
-  currency: 'CurrencyContent',
-  guardian: 'GuardianContent',
-  festival: 'FestivalContent',
-  talenttree: 'TalentTreeContent',
-  townupgrade: 'TownUpgradeContent',
-  locationupgrade: 'LocationUpgradeContent',
-  traitequipment: 'TraitEquipmentContent',
-  traitlocation: 'TraitLocationContent',
-  worldconfig: 'WorldConfigContent',
+  trait: 'TraitContent',
 };
 
-// Equipment types that all use the same schema
-const equipmentTypes = ['accessory', 'armor', 'trinket', 'weapon'];
-
-// Generate schemas for equipment types (all use the same interface)
-console.log(
-  'Generating equipment schema from EquipmentItemContent interface...',
-);
-try {
-  let equipmentSchema = TJS.generateSchema(
-    program,
-    'EquipmentItemContent',
-    settings,
-  );
-
-  if (equipmentSchema) {
-    // Fix schema issues
-    equipmentSchema = postProcessIdArrays(fixSchema(equipmentSchema));
-
-    // Convert single item schema to array schema for YAML content files
-    const arraySchema = {
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'Equipment content schema',
-      description:
-        'JSON schema for equipment YAML content files (armor, accessory, trinket, weapon), automatically generated from TypeScript interfaces',
-      type: 'array',
-      items: equipmentSchema,
-    };
-
-    // Generate the same schema for all equipment types
-    for (const equipmentType of equipmentTypes) {
-      const customSchema = {
-        ...arraySchema,
-        title: `${equipmentType.charAt(0).toUpperCase() + equipmentType.slice(1)} content schema`,
-        description: `JSON schema for ${equipmentType} YAML content files, automatically generated from TypeScript interfaces`,
-      };
-
-      const schemaPath = path.join(schemasDir, `${equipmentType}.schema.json`);
-      fs.writeJsonSync(schemaPath, customSchema, { spaces: 2 });
-      console.log(`✓ Generated schema: ${schemaPath}`);
-    }
-  } else {
-    console.warn(
-      'Could not generate equipment schema from EquipmentItemContent',
-    );
-  }
-} catch (error: any) {
-  console.error(
-    'Error generating equipment schema:',
-    error?.message || 'Unknown error',
-  );
-}
-
-// Generate schemas for other content types
+// Generate schemas for each content type
 for (const [contentType, typeName] of Object.entries(contentTypeMap)) {
   try {
     console.log(
@@ -285,16 +330,18 @@ for (const [contentType, typeName] of Object.entries(contentTypeMap)) {
     }
 
     // Fix schema issues
-    schema = postProcessIdArrays(fixSchema(schema));
+    schema = stripInjectedFields(postProcessIdArrays(fixSchema(schema)));
 
     // For single content items, wrap in array for YAML content files
-    const arraySchema = {
+    let arraySchema: any = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: `${contentType.charAt(0).toUpperCase() + contentType.slice(1)} content schema`,
       description: `JSON schema for ${contentType} YAML content files, automatically generated from TypeScript interfaces`,
       type: 'array',
       items: schema,
     };
+
+    arraySchema = relaxSubObjectRequired(arraySchema);
 
     const schemaPath = path.join(schemasDir, `${contentType}.schema.json`);
     fs.writeJsonSync(schemaPath, arraySchema, { spaces: 2 });

@@ -2,3 +2,9 @@
   name: Cloak of Adventuring
   description: A cloak that is worn by beginning adventurers.
   sprite: '0000'
+
+  baseStats:
+    Defense: 1
+    Agility: 1
+
+  statsPerLevel: {}

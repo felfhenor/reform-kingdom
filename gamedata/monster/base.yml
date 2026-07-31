@@ -1,5 +1,6 @@
 - id: 46aac966-48c0-4b4c-84ed-a371bb65acba
   name: Goblin
+  description: The most common monster. It's mischevious and likes to steal things from adventurers.
 
   sprite: '0000'
   frames: 4
