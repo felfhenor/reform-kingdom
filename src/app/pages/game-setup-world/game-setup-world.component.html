@@ -14,28 +14,6 @@
   <div class="w-full lg:max-w-[800px]">
     <div class="card bg-base-100">
       <div class="card-body items-center justify-between">
-        <div class="card-title text-center flex flex-col">World Seed</div>
-
-        <div
-          class="text-center flex flex-row justify-center gap-2 italic px-[15%]"
-        >
-          The world seed is used to generate the world. You can use a custom
-          seed or leave it empty to let the game generate one for you.
-        </div>
-
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          placeholder="Enter world seed..."
-          [(ngModel)]="worldSeed"
-        />
-      </div>
-    </div>
-  </div>
-
-  <div class="w-full lg:max-w-[800px]">
-    <div class="card bg-base-100">
-      <div class="card-body items-center justify-between">
         <button
           class="btn btn-primary btn-block"
           (click)="createWorld()"

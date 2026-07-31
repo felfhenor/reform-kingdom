@@ -1,6 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SFXDirective } from '@directives/sfx.directive';
 import { discordSetStatus, gameReset, setWorldSeed } from '@helpers';
@@ -8,14 +7,12 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-game-setup-world',
-  imports: [SweetAlert2Module, SFXDirective, FormsModule],
+  imports: [SweetAlert2Module, SFXDirective],
   templateUrl: './game-setup-world.component.html',
   styleUrl: './game-setup-world.component.scss',
 })
 export class GameSetupWorldComponent implements OnInit {
   private router = inject(Router);
-
-  public worldSeed = signal<string | undefined>(undefined);
 
   ngOnInit() {
     discordSetStatus({
@@ -25,7 +22,7 @@ export class GameSetupWorldComponent implements OnInit {
 
   public async createWorld() {
     gameReset();
-    setWorldSeed(this.worldSeed());
+    setWorldSeed(undefined);
 
     await this.router.navigate(['/setup', 'generate']);
   }
