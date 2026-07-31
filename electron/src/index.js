@@ -143,7 +143,7 @@ const handleRPC = () => {
           details: result.details,
           smallImageKey: result.smmallImageKey,
           smallImageText: result.smallImageText,
-          largeImageKey: result.largeImageKey || 'grandprod',
+          largeImageKey: result.largeImageKey || 'reformkingdom',
           largeImageText: result.largeImageText,
         });
       });

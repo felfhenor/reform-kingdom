@@ -6,7 +6,7 @@ export const environment = {
     secret: '',
   },
   rollbar: {
-    accessToken: '',
+    accessToken: 'c2e6762edfaa47d1ac28de92f66b0529',
     captureUncaught: true,
     captureUnhandledRejections: true,
     payload: {

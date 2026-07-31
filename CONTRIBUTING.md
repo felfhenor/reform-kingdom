@@ -1,4 +1,4 @@
-# Contributing to Grandprod
+# Contributing to re:Form Kingdom
 
 Welcome, and thanks for taking a peek at this project and guide. I'd love to have more help from the community to make this game better for players. There's always a lot to do, and I'm only one person.
 

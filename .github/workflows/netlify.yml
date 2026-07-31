@@ -3,7 +3,7 @@ name: Automatic Deploy
 on:
   push:
     branches:
-      - main
+      - master
 
   workflow_dispatch: {}
 
@@ -36,10 +36,10 @@ jobs:
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: './dist/grandprod/browser'
-          production-branch: main
+          publish-dir: "./dist/blunderdark/browser"
+          production-branch: master
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: 'Deploy from GitHub Actions'
+          deploy-message: "Deploy from GitHub Actions"
           enable-pull-request-comment: false
           enable-commit-comment: false
           enable-commit-status: true
@@ -54,7 +54,7 @@ jobs:
       - name: Notify deploy to Rollbar
         uses: rollbar/github-deploy-action@2.1.2
         with:
-          environment: 'production'
+          environment: "production"
           version: ${{ github.sha }}
         env:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}

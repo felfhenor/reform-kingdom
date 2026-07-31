@@ -44,7 +44,7 @@ export class ConnectButtonsComponent {
     },
     {
       name: 'GitHub',
-      link: 'https://github.com/felfhenor/grandprod',
+      link: 'https://github.com/felfhenor/reform-kingdom',
       color: '#fff',
       currentColor: '#ccc',
       icon: 'tablerBrandGithub',

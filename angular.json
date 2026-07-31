@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "grandprod": {
+    "reformkingdom": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -39,7 +39,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/grandprod",
+            "outputPath": "dist/reformkingdom",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [],
@@ -97,10 +97,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "grandprod:build:production"
+              "buildTarget": "reformkingdom:build:production"
             },
             "development": {
-              "buildTarget": "grandprod:build:development"
+              "buildTarget": "reformkingdom:build:development"
             }
           },
           "defaultConfiguration": "development"

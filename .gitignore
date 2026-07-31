@@ -56,3 +56,5 @@ electron/out
 
 # Generated schemas
 /schemas
+
+.claude

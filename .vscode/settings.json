@@ -5,7 +5,7 @@
     "/src/app/helpers"
   ],
   "files.exclude": {
-    "dist\\grandprod": true,
+    "dist\\reformkingdom": true,
     "dist": true
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",

@@ -17,7 +17,7 @@ const header = `---
 title: Version Updates - ${packageJSON.version}
 date: ${year}-${month}-${day} ${hours}:${minutes}:${seconds}
 categories: [New Version]
-tags: [grandprod, version-notes]
+tags: [reformkingdom, version-notes]
 ---
 `;
 
@@ -27,7 +27,7 @@ const content = `${header}
 
 ${changelog}
 
-> Play the latest update [online](https://play.grandprod.com).
+> Play the latest update [online](https://reformkingdom.felfhenor.com).
 {: .prompt-info }
 `;
 

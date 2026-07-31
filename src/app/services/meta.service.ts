@@ -115,7 +115,7 @@ export class MetaService {
 
     try {
       const liveVersionFile = await fetch(
-        'https://play.grandprod.com/version.json',
+        'https://reformkingdom.felfhenor.com/version.json',
       );
       const liveVersionData = await liveVersionFile.json();
       liveVersion.set(liveVersionData);
@@ -138,7 +138,7 @@ export class MetaService {
       return;
     }
 
-    window.open('https://seiyria.itch.io/grandprod');
+    window.open('https://seiyria.itch.io/reformkingdom');
   }
 
   public quit() {

@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
     paths-ignore:
-      - '**/*.md'
+      - "**/*.md"
 
   pull_request_target:
     branches:
-      - main
+      - master
     types:
       - synchronize
       - opened

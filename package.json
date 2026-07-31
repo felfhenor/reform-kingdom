@@ -1,5 +1,5 @@
 {
-  "name": "grandprod",
+  "name": "reformkingdom",
   "version": "0.0.1",
   "scripts": {
     "start": "concurrently \"npm run start:app\" \"npm run gamedata:watch\"",
@@ -8,7 +8,7 @@
     "lint": "ng lint",
     "test": "vitest run",
     "test:watch": "vitest --ui --api 9899",
-    "build:copychangelog": "cpy CHANGELOG.md CHANGELOG-current.md dist/grandprod/browser",
+    "build:copychangelog": "cpy CHANGELOG.md CHANGELOG-current.md dist/reformkingdom/browser",
     "build:syncversion": "ts-node scripts/build-syncversion",
     "build:versioninfo": "ts-node scripts/build-versioninfo",
     "build:blogpost": "ts-node scripts/build-blogpost",

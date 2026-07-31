@@ -110,16 +110,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./electron/out/make/squirrel.windows/x64/grandprod.exe
-          asset_name: grandprod.exe
+          file: ./electron/out/make/squirrel.windows/x64/blunderdark.exe
+          asset_name: blunderdark.exe
           tag: ${{ github.ref }}
           overwrite: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: grandprod.exe
-          path: ./electron/out/make/squirrel.windows/x64/grandprod.exe
+          name: blunderdark.exe
+          path: ./electron/out/make/squirrel.windows/x64/blunderdark.exe
   #
   #  publish-linux:
   #    needs: [build]
@@ -195,13 +195,13 @@ jobs:
   #    - name: Load Windows Binary
   #      uses: actions/download-artifact@v4
   #      with:
-  #        name: grandprod.exe
+  #        name: blunderdark.exe
 
   #    - uses: manleydev/butler-publish-itchio-action@master
   #      env:
   #        BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_API_KEY }}
   #        CHANNEL: windows
-  #        ITCH_GAME: grandprod
+  #        ITCH_GAME: blunderdark
   #        ITCH_USER: seiyria
-  #        PACKAGE: ./grandprod.exe
+  #        PACKAGE: ./blunderdark.exe
   #        VERSION: ${{ steps.loadTagName.outputs.tag }}
