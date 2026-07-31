@@ -2,7 +2,11 @@ export type BaseStat =
   | 'Intelligence'
   | 'Strength'
   | 'Vitality'
-  | 'Resistance' | 'Agility' | 'Health' | 'Energy' | 'Luck';
+  | 'Resistance'
+  | 'Agility'
+  | 'Health'
+  | 'Energy'
+  | 'Luck';
 
 export type GameStat = BaseStat;
 

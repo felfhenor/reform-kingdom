@@ -2,7 +2,6 @@ export * from './artable';
 export * from './character';
 export * from './content-collectible';
 export * from './content-equipment';
-export * from './content-hero';
 export * from './content-item';
 export * from './content-job';
 export * from './content-monster';
@@ -21,4 +20,3 @@ export * from './stat';
 export * from './state-game';
 export * from './state-options';
 export * from './traits';
-

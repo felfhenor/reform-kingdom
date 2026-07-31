@@ -7,8 +7,6 @@ import type {
   EquipmentId,
   EquipmentSkillContent,
   EquipmentSkillId,
-  HeroContent,
-  HeroId,
   IsContentItem,
   ItemContent,
   ItemId,
@@ -26,7 +24,6 @@ import type {
 const initializers: Record<ContentType, (entry: any) => any> = {
   collectible: ensureCollectible,
   equipment: ensureEquipment,
-  hero: ensureHero,
   item: ensureItem,
   job: ensureJob,
   monster: ensureMonster,
@@ -40,20 +37,6 @@ function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
 
 export function ensureContent<T extends IsContentItem>(content: T): T {
   return initializers[content.__type](content) satisfies T;
-}
-
-function ensureHero(hero: Partial<HeroContent>): Required<HeroContent> {
-  return {
-    id: hero.id ?? ('UNKNOWN' as HeroId),
-    name: hero.name ?? 'UNKNOWN',
-    description: hero.description ?? 'UNKNOWN',
-    __type: 'hero',
-    sprite: hero.sprite ?? 'UNKNOWN',
-    frames: hero.frames ?? 4,
-    baseStats: ensureStats(hero.baseStats),
-    statsPerLevel: ensureStats(hero.statsPerLevel),
-    startingWeaponIds: hero.startingWeaponIds ?? [],
-  };
 }
 
 function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
@@ -89,6 +72,7 @@ function ensureCollectible(
     name: collectible.name ?? 'UNKNOWN',
     __type: 'collectible',
     description: collectible.description ?? 'UNKNOWN',
+    sprite: collectible.sprite ?? 'UNKNOWN',
   };
 }
 
@@ -102,6 +86,7 @@ function ensureEquipment(
     description: equipment.description ?? 'UNKNOWN',
     baseStats: ensureStats(equipment.baseStats),
     statsPerLevel: ensureStats(equipment.statsPerLevel),
+    sprite: equipment.sprite ?? 'UNKNOWN',
   };
 }
 
@@ -113,6 +98,8 @@ function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     description: job.description ?? 'UNKNOWN',
     baseStats: ensureStats(job.baseStats),
     statsPerLevel: ensureStats(job.statsPerLevel),
+    sprite: job.sprite ?? 'UNKNOWN',
+    frames: job.frames ?? 4,
   };
 }
 

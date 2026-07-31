@@ -1,0 +1,25 @@
+- id: e9f0b3f5-8d11-4a4f-8997-29bab6f4cee3
+  name: Explorer
+  description: A person who seeks out new lands and experiences.
+  sprite: '0000'
+  frames: 4
+
+  baseStats:
+    Health: 100
+    Energy: 25
+    Luck: 5
+    Intelligence: 5
+    Strength: 5
+    Vitality: 5
+    Resistance: 5
+    Agility: 10
+
+  statsPerLevel:
+    Health: 10
+    Energy: 5
+    Luck: 0.01
+    Intelligence: 0.2
+    Strength: 0.5
+    Vitality: 0.3
+    Resistance: 0.4
+    Agility: 0.7

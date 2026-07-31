@@ -1,0 +1,6 @@
+- id: 1cb47f34-81b9-48ac-9b54-56de16f74b90
+  name: Intelligent
+  description: This individual is slightly more intelligent than the average Goblin. +5 INT.
+
+  baseStats:
+    Intelligence: 5
