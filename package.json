@@ -70,24 +70,19 @@
     "uuid": "^11.1.1"
   },
   "devDependencies": {
-    "@angular-eslint/builder": "^22.1.0",
-    "@angular-eslint/eslint-plugin": "^22.1.0",
-    "@angular-eslint/eslint-plugin-template": "^22.1.0",
-    "@angular-eslint/schematics": "^22.1.0",
-    "@angular-eslint/template-parser": "^22.1.0",
     "@angular/build": "^22.1.2",
     "@angular/cli": "^22.1.2",
     "@angular/compiler-cli": "^22.1.0",
+    "@eslint/js": "^9.39.5",
     "@types/fs-extra": "^11.0.4",
     "@types/howler": "^2.2.13",
     "@types/js-yaml": "^4.0.9",
     "@types/mustache": "^4.2.6",
     "@types/node": "^26.1.2",
     "@types/seedrandom": "^3.0.8",
-    "@typescript-eslint/eslint-plugin": "7.11.0",
-    "@typescript-eslint/parser": "7.11.0",
     "@vitest/coverage-v8": "^4.1.10",
     "@vitest/ui": "^4.1.10",
+    "angular-eslint": "^22.1.0",
     "autoprefixer": "^10.5.4",
     "chokidar": "4.0.3",
     "concurrently": "^10.0.4",
@@ -95,7 +90,7 @@
     "conventional-changelog-cli": "^5.0.0",
     "cpy-cli": "^7.0.0",
     "daisyui": "^5.7.9",
-    "eslint": "8.57.0",
+    "eslint": "^9.39.5",
     "eslint-plugin-typescript-paths": "^0.0.33",
     "fs-extra": "^11.4.0",
     "git-describe": "^4.1.1",
@@ -109,6 +104,7 @@
     "tailwindcss": "^4.3.3",
     "ts-node": "^10.9.2",
     "typescript": "6.0",
+    "typescript-eslint": "^8.62.1",
     "typescript-json-schema": "^0.65.1",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10",
@@ -118,15 +114,6 @@
     "@sweetalert2/ngx-sweetalert2": {
       "@angular/common": "22",
       "@angular/core": "22"
-    },
-    "@angular-eslint/builder": {
-      "eslint": "8.57.0"
-    },
-    "@angular-eslint/eslint-plugin": {
-      "eslint": "8.57.0"
-    },
-    "@angular-eslint/eslint-plugin-template": {
-      "eslint": "8.57.0"
     },
     "ngx-toastr": {
       "@angular/common": "22",

@@ -1,7 +1,7 @@
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
-import { HasAnimation } from './artable';
+import type { HasAnimation } from '@interfaces/artable';
 
 export type JobId = Branded<string, 'JobId'>;
 

@@ -2,7 +2,7 @@ import type { Branded } from '@interfaces/identifiable';
 
 export type GameId = Branded<string, 'GameId'>;
 
-export interface GameStateWorld {}
+export type GameStateWorld = object;
 
 export interface GameStateClock {
   numTicks: number;
