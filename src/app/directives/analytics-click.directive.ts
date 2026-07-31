@@ -10,7 +10,7 @@ export class AnalyticsClickDirective {
   public appAnalyticsClick = input.required<string>();
   public appAnalyticsClickValue = input<number>(1);
 
-  @HostListener('click', ['$event'])
+  @HostListener('click')
   click() {
     this.analyticsService.sendDesignEvent(
       this.appAnalyticsClick(),

@@ -17,7 +17,6 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "baseUrl": ".",
     "paths": {
       "@environments/*": ["./src/environments/*"],
       "@components/*": ["./src/app/components/*"],
@@ -32,7 +31,8 @@
       "@helpers": ["./src/app/helpers/index.ts"],
       "@interfaces": ["./src/app/interfaces/index.ts"],
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["node"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
