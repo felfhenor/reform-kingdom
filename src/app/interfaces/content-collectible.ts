@@ -1,9 +1,9 @@
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
-export type StageId = Branded<string, 'StageId'>;
+export type CollectibleId = Branded<string, 'CollectibleId'>;
 
-export type StageContent = IsContentItem &
+export type CollectibleContent = IsContentItem &
   HasDescription & {
-    id: StageId;
+    id: CollectibleId;
   };

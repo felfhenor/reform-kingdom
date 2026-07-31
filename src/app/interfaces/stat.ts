@@ -1,29 +1,9 @@
 export type BaseStat =
-  | 'Damage'
-  | 'Defense'
-  | 'Health'
-  | 'Regen'
-  | 'Shield'
-  | 'Evasion'
-  | 'Lifesteal'
-  | 'Thorns'
-  | 'CritChance'
-  | 'CritDamage'
-  | 'AttackSpeed'
-  | 'ProjectileCount'
-  | 'ProjectileSpeed'
-  | 'ProjectileBounces'
-  | 'Duration'
-  | 'Knockback'
-  | 'MovementSpeed'
-  | 'Luck'
-  | 'Difficulty'
-  | 'ExpGain'
-  | 'GoldGain'
-  | 'FavorGain';
+  | 'Intelligence'
+  | 'Strength'
+  | 'Vitality'
+  | 'Resistance' | 'Agility' | 'Health' | 'Energy' | 'Luck';
 
-export type SubStat = 'FreezeChance' | 'PoisonChance';
-
-export type GameStat = BaseStat | SubStat;
+export type GameStat = BaseStat;
 
 export type StatBlock = Record<GameStat, number>;

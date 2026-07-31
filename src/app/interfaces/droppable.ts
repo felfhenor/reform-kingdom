@@ -1,3 +1,4 @@
+
 export type DropRarity =
   | 'Common'
   | 'Uncommon'
@@ -13,6 +14,13 @@ export const RARITY_PRIORITY: Record<DropRarity, number> = {
   Legendary: 5,
 };
 
-export interface HasRarity {
+export type HasRarity = {
   rarity: DropRarity;
 }
+
+export type Droppable = HasRarity & {
+  preventModification?: boolean;
+  preventDrop?: boolean;
+  dropLevel: number;
+  isFavorite?: boolean;
+};

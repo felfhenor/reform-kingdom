@@ -1,34 +1,37 @@
 import { defaultStats } from '@helpers/defaults';
 import type {
+  CollectibleContent,
+  CollectibleId,
   ContentType,
+  EquipmentContent,
+  EquipmentId,
+  EquipmentSkillContent,
+  EquipmentSkillId,
   HeroContent,
   HeroId,
   IsContentItem,
   ItemContent,
   ItemId,
+  JobContent,
+  JobId,
   MonsterContent,
   MonsterId,
-  PetContent,
-  PetId,
-  StageContent,
-  StageId,
   StatBlock,
-  TrinketContent,
-  TrinketId,
-  WeaponContent,
-  WeaponId,
+  TraitContent,
+  TraitId,
 } from '@interfaces';
 
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
+  collectible: ensureCollectible,
+  equipment: ensureEquipment,
   hero: ensureHero,
   item: ensureItem,
+  job: ensureJob,
   monster: ensureMonster,
-  pet: ensurePet,
-  stage: ensureStage,
-  trinket: ensureTrinket,
-  weapon: ensureWeapon,
+  skill: ensureSkill,
+  trait: ensureTrait,
 };
 
 function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
@@ -60,8 +63,6 @@ function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     __type: 'item',
     description: item.description ?? 'UNKNOWN',
     sprite: item.sprite ?? 'UNKNOWN',
-    baseStats: ensureStats(item.baseStats),
-    statsPerLevel: ensureStats(item.statsPerLevel),
   };
 }
 
@@ -80,51 +81,73 @@ function ensureMonster(
   };
 }
 
-function ensurePet(pet: Partial<PetContent>): Required<PetContent> {
+function ensureCollectible(
+  collectible: Partial<CollectibleContent>,
+): Required<CollectibleContent> {
   return {
-    id: pet.id ?? ('UNKNOWN' as PetId),
-    name: pet.name ?? 'UNKNOWN',
-    __type: 'pet',
-    description: pet.description ?? 'UNKNOWN',
-    sprite: pet.sprite ?? 'UNKNOWN',
-    frames: pet.frames ?? 4,
-    baseStats: ensureStats(pet.baseStats),
-    statsPerLevel: ensureStats(pet.statsPerLevel),
-    itemIds: pet.itemIds ?? [],
+    id: collectible.id ?? ('UNKNOWN' as CollectibleId),
+    name: collectible.name ?? 'UNKNOWN',
+    __type: 'collectible',
+    description: collectible.description ?? 'UNKNOWN',
   };
 }
 
-function ensureStage(stage: Partial<StageContent>): Required<StageContent> {
+function ensureEquipment(
+  equipment: Partial<EquipmentContent>,
+): Required<EquipmentContent> {
   return {
-    id: stage.id ?? ('UNKNOWN' as StageId),
-    name: stage.name ?? 'UNKNOWN',
-    __type: 'stage',
-    description: stage.description ?? 'UNKNOWN',
+    id: equipment.id ?? ('UNKNOWN' as EquipmentId),
+    name: equipment.name ?? 'UNKNOWN',
+    __type: 'equipment',
+    description: equipment.description ?? 'UNKNOWN',
+    baseStats: ensureStats(equipment.baseStats),
+    statsPerLevel: ensureStats(equipment.statsPerLevel),
   };
 }
 
-function ensureTrinket(
-  trinket: Partial<TrinketContent>,
-): Required<TrinketContent> {
+function ensureJob(job: Partial<JobContent>): Required<JobContent> {
   return {
-    id: trinket.id ?? ('UNKNOWN' as TrinketId),
-    name: trinket.name ?? 'UNKNOWN',
-    __type: 'trinket',
-    description: trinket.description ?? 'UNKNOWN',
-    sprite: trinket.sprite ?? 'UNKNOWN',
-    baseStats: ensureStats(trinket.baseStats),
-    upgradeableStats: trinket.upgradeableStats ?? [],
+    id: job.id ?? ('UNKNOWN' as JobId),
+    name: job.name ?? 'UNKNOWN',
+    __type: 'job',
+    description: job.description ?? 'UNKNOWN',
+    baseStats: ensureStats(job.baseStats),
+    statsPerLevel: ensureStats(job.statsPerLevel),
   };
 }
 
-function ensureWeapon(weapon: Partial<WeaponContent>): Required<WeaponContent> {
+function ensureTrait(trait: Partial<TraitContent>): Required<TraitContent> {
   return {
-    id: weapon.id ?? ('UNKNOWN' as WeaponId),
-    name: weapon.name ?? 'UNKNOWN',
-    __type: 'weapon',
-    description: weapon.description ?? 'UNKNOWN',
-    sprite: weapon.sprite ?? 'UNKNOWN',
-    baseStats: ensureStats(weapon.baseStats),
-    upgradeableStats: weapon.upgradeableStats ?? [],
+    id: trait.id ?? ('UNKNOWN' as TraitId),
+    name: trait.name ?? 'UNKNOWN',
+    __type: 'trait',
+    description: trait.description ?? 'UNKNOWN',
+    baseStats: ensureStats(trait.baseStats),
+  };
+}
+
+function ensureSkill(
+  skill: Partial<EquipmentSkillContent>,
+): Required<EquipmentSkillContent> {
+  return {
+    id: skill.id ?? ('UNKNOWN' as EquipmentSkillId),
+    name: skill.name ?? 'UNKNOWN',
+    __type: 'skill',
+    description: skill.description ?? 'UNKNOWN',
+    sprite: skill.sprite ?? 'UNKNOWN',
+    frames: skill.frames ?? 4,
+    rarity: skill.rarity ?? 'Common',
+    dropLevel: skill.dropLevel ?? 0,
+    preventModification: skill.preventModification ?? false,
+    preventDrop: skill.preventDrop ?? false,
+    isFavorite: skill.isFavorite ?? false,
+    disableUpgrades: skill.disableUpgrades ?? false,
+    enchantLevel: skill.enchantLevel ?? 0,
+    techniques: skill.techniques ?? [],
+    usesPerCombat: skill.usesPerCombat ?? -1,
+    numTargets: skill.numTargets ?? 1,
+    damageScaling: ensureStats(skill.damageScaling),
+    statusEffectDurationBoost: skill.statusEffectDurationBoost ?? {},
+    statusEffectChanceBoost: skill.statusEffectChanceBoost ?? {},
   };
 }
