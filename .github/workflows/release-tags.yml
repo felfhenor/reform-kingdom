@@ -110,16 +110,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./electron/out/make/squirrel.windows/x64/blunderdark.exe
-          asset_name: blunderdark.exe
+          file: ./electron/out/make/squirrel.windows/x64/reformkingdom.exe
+          asset_name: reformkingdom.exe
           tag: ${{ github.ref }}
           overwrite: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: blunderdark.exe
-          path: ./electron/out/make/squirrel.windows/x64/blunderdark.exe
+          name: reformkingdom.exe
+          path: ./electron/out/make/squirrel.windows/x64/reformkingdom.exe
   #
   #  publish-linux:
   #    needs: [build]
@@ -195,13 +195,13 @@ jobs:
   #    - name: Load Windows Binary
   #      uses: actions/download-artifact@v4
   #      with:
-  #        name: blunderdark.exe
+  #        name: reformkingdom.exe
 
   #    - uses: manleydev/butler-publish-itchio-action@master
   #      env:
   #        BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_API_KEY }}
   #        CHANNEL: windows
-  #        ITCH_GAME: blunderdark
+  #        ITCH_GAME: reformkingdom
   #        ITCH_USER: seiyria
-  #        PACKAGE: ./blunderdark.exe
+  #        PACKAGE: ./reformkingdom.exe
   #        VERSION: ${{ steps.loadTagName.outputs.tag }}
