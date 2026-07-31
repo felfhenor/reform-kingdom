@@ -23,3 +23,107 @@
     Vitality: 0.3
     Resistance: 0.4
     Agility: 0.7
+
+- id: 8e172a46-fa01-468a-9b4f-feac5c9e219c
+  name: Magician
+  description: A person who uses magic to achieve their goals.
+  sprite: '0004'
+  frames: 4
+
+  baseStats:
+    Health: 50
+    Energy: 100
+    Luck: 1
+    Intelligence: 10
+    Strength: 2
+    Vitality: 3
+    Resistance: 7
+    Agility: 5
+
+  statsPerLevel:
+    Health: 5
+    Energy: 10
+    Luck: 0
+    Intelligence: 0.7
+    Strength: 0.2
+    Vitality: 0.3
+    Resistance: 0.5
+    Agility: 0.4
+
+- id: ccbc6c69-7e7e-4c4d-8b55-90aa69094e7b
+  name: Warrior
+  description: A person who fights for their goals.
+  sprite: '0008'
+  frames: 4
+
+  baseStats:
+    Health: 150
+    Energy: 50
+    Luck: 1
+    Intelligence: 3
+    Strength: 15
+    Vitality: 10
+    Resistance: 2
+    Agility: 7
+
+  statsPerLevel:
+    Health: 15
+    Energy: 5
+    Luck: 0
+    Intelligence: 0.2
+    Strength: 0.6
+    Vitality: 0.4
+    Resistance: 0.1
+    Agility: 0.3
+
+- id: 87b8e644-6984-4533-bd72-68190943466d
+  name: Healer
+  description: A person who heals others and themselves.
+  sprite: '0012'
+  frames: 4
+
+  baseStats:
+    Health: 100
+    Energy: 75
+    Luck: 1
+    Intelligence: 6
+    Strength: 5
+    Vitality: 8
+    Resistance: 5
+    Agility: 2
+
+  statsPerLevel:
+    Health: 5
+    Energy: 5
+    Luck: 0
+    Intelligence: 0.5
+    Strength: 0.4
+    Vitality: 0.6
+    Resistance: 0.4
+    Agility: 0.5
+
+- id: 359069e6-e133-4984-9b8f-78d524d762e5
+  name: Ranger
+  description: A person who hunts and tracks their prey.
+  sprite: '0016'
+  frames: 4
+
+  baseStats:
+    Health: 50
+    Energy: 50
+    Luck: 1
+    Intelligence: 4
+    Strength: 7
+    Vitality: 3
+    Resistance: 8
+    Agility: 9
+
+  statsPerLevel:
+    Health: 10
+    Energy: 10
+    Luck: 0
+    Intelligence: 0.3
+    Strength: 0.5
+    Vitality: 0.4
+    Resistance: 0.6
+    Agility: 0.8
