@@ -7,8 +7,9 @@ import {
   ensureContent,
   setAllContentById,
   setAllIdsByName,
+  setAllMaps,
 } from '@helpers';
-import type { ContentType, IsContentItem } from '@interfaces';
+import type { ContentType, GameMap, IsContentItem } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { lastValueFrom } from 'rxjs';
@@ -31,17 +32,22 @@ export class ContentService {
   private hasLoadedArt = computed(() => this.artSignals.every((s) => s()));
   private hasLoadedAtlases = signal<boolean>(false);
   private hasLoadedData = signal<boolean>(false);
+  private hasLoadedMaps = signal<boolean>(false);
 
   public artAtlases = signal<ArtAtlases>({});
 
   public hasLoaded = computed(
     () =>
-      this.hasLoadedArt() && this.hasLoadedData() && this.hasLoadedAtlases(),
+      this.hasLoadedArt() &&
+      this.hasLoadedData() &&
+      this.hasLoadedAtlases() &&
+      this.hasLoadedMaps(),
   );
 
   async init() {
     this.loadJSON();
     this.loadArt();
+    this.loadMaps();
   }
 
   private toCacheBustURL(url: string): string {
@@ -95,6 +101,29 @@ export class ContentService {
       `Content loaded: ${Object.keys(assets).join(', ')}`,
     );
     this.hasLoadedData.set(true);
+  }
+
+  private async loadMaps() {
+    const namesReq = this.http.get<string[]>(
+      this.toCacheBustURL(`./json/maps.json`),
+    );
+
+    const mapNames = await lastValueFrom(namesReq);
+
+    const maps = new Map<string, GameMap>();
+
+    await Promise.all(
+      mapNames.map(async (name) => {
+        const mapReq = this.http.get(this.toCacheBustURL(`./maps/${name}.json`));
+        const data = await lastValueFrom(mapReq);
+        maps.set(name, { name, data });
+      }),
+    );
+
+    setAllMaps(maps);
+
+    this.logger.info('Content:LoadMaps', `Maps loaded: ${mapNames.join(', ')}`);
+    this.hasLoadedMaps.set(true);
   }
 
   private unfurlAssets(assets: Record<string, IsContentItem[]>) {

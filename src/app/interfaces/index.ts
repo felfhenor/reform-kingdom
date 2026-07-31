@@ -14,6 +14,7 @@ export * from './droppable';
 export * from './element';
 export * from './equipment';
 export * from './identifiable';
+export * from './map';
 export * from './meta';
 export * from './sfx';
 export * from './stat';

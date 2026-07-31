@@ -9,6 +9,7 @@ export * from './game-init';
 export * from './gameloop';
 export * from './icons';
 export * from './logging';
+export * from './maps';
 export * from './migrate';
 export * from './notify';
 export * from './rng';

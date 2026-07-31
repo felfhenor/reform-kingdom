@@ -15,7 +15,7 @@ jobs:
       matrix:
         # os: [macos-latest, ubuntu-latest, windows-latest]
         os: [ubuntu-latest]
-        node-version: [20]
+        node-version: [26]
 
     steps:
       - uses: actions/checkout@v2
@@ -83,7 +83,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        node-version: [20]
+        node-version: [26]
 
     steps:
       - uses: actions/checkout@v2
@@ -130,7 +130,7 @@ jobs:
   #    strategy:
   #      matrix:
   #        os: [ubuntu-latest]
-  #        node-version: [18.15.x]
+  #        node-version: [26]
   #
   #    steps:
   #      - name: Load Release URL File from release job
@@ -186,7 +186,7 @@ jobs:
   #  strategy:
   #    matrix:
   #      os: [ubuntu-latest]
-  #      node-version: [20]
+  #      node-version: [26]
 
   #  steps:
   #    - uses: little-core-labs/get-git-tag@v3.0.1
