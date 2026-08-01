@@ -1,5 +1,12 @@
 import { rngUuid } from '@helpers/rng';
-import type { EquipmentBlock, GameId, GameState, StatBlock } from '@interfaces';
+import type {
+  CombatantCombatStats,
+  ElementBlock,
+  EquipmentBlock,
+  GameId,
+  GameState,
+  StatBlock,
+} from '@interfaces';
 
 export function defaultGameState(): GameState {
   return {
@@ -17,6 +24,8 @@ export function defaultGameState(): GameState {
     world: {
       party: [],
     },
+    materials: {},
+    globalEffects: [],
   };
 }
 
@@ -30,6 +39,30 @@ export function defaultStats(): StatBlock {
     Resistance: 0,
     Strength: 0,
     Vitality: 0,
+  };
+}
+
+export function defaultAffinities(): ElementBlock {
+  return {
+    Fire: 0,
+    Water: 0,
+    Earth: 0,
+    Air: 0,
+  };
+}
+
+export function defaultCombatStats(): CombatantCombatStats {
+  return {
+    repeatActionChance: defaultAffinities(),
+    skillStrikeAgainChance: defaultAffinities(),
+    skillAdditionalUseChance: defaultAffinities(),
+    skillAdditionalUseCount: defaultAffinities(),
+    redirectionChance: defaultAffinities(),
+    missChance: defaultAffinities(),
+    debuffIgnoreChance: defaultAffinities(),
+    damageReflectPercent: defaultAffinities(),
+    healingIgnorePercent: defaultAffinities(),
+    reviveChance: 0,
   };
 }
 

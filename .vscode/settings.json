@@ -16,10 +16,12 @@
   "yaml.schemas": {
     "./schemas/collectible.schema.json": "gamedata/collectible/*.yml",
     "./schemas/equipment.schema.json": "gamedata/equipment/*.yml",
+    "./schemas/globaleffect.schema.json": "gamedata/globaleffect/*.yml",
     "./schemas/item.schema.json": "gamedata/item/*.yml",
     "./schemas/job.schema.json": "gamedata/job/*.yml",
     "./schemas/monster.schema.json": "gamedata/monster/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/*.yml",
+    "./schemas/statuseffect.schema.json": "gamedata/statuseffect/*.yml",
     "./schemas/trait.schema.json": "gamedata/trait/*.yml"
   }
 }

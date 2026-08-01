@@ -17,6 +17,7 @@ export type Character = {
 
   jobId: JobId;
 
+  hp: number;
   stats: StatBlock;
 
   equipment: EquipmentBlock;

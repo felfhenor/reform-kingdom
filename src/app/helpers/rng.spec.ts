@@ -1,7 +1,6 @@
 import {
   rngChoice,
   rngChoiceIdentifiable,
-  rngGame,
   rngNumber,
   rngNumberRange,
   rngSeeded,
@@ -16,11 +15,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Mock uuid
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mock-uuid'),
-}));
-
-// Mock worldGameId
-vi.mock('@helpers/world', () => ({
-  worldGameId: vi.fn(() => 'game-uuid'),
 }));
 
 describe('RNG Helper Functions', () => {
@@ -47,13 +41,6 @@ describe('RNG Helper Functions', () => {
       const rng2 = rngSeeded('test-seed-2');
 
       expect(rng1()).not.toBe(rng2());
-    });
-  });
-
-  describe('gamerng', () => {
-    it('should use game id as seed', () => {
-      const rng = rngGame();
-      expect(rng).toBeInstanceOf(Function);
     });
   });
 

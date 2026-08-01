@@ -58,6 +58,7 @@
     "jimp": "^1.6.1",
     "logger-timer": "^1.0.7",
     "marked": "^18.0.7",
+    "mustache": "^4.2.0",
     "ngx-drag-drop": "^22.0.0",
     "ngx-toastr": "^20.0.5",
     "ngxtension": "^7.2.0",

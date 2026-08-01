@@ -34,7 +34,6 @@ export type EquipmentSkillTargetType = 'Allies' | 'Enemies' | 'Self' | 'All';
 export type EquipmentSkillId = Branded<string, 'EquipmentSkillId'>;
 
 export type EquipmentSkillContentModifiable = {
-  enchantLevel: number;
   techniques: EquipmentSkillContentTechnique[];
   usesPerCombat: -1 | number;
   numTargets: number;
@@ -74,8 +73,6 @@ export type EquipmentSkillContent = IsContentItem &
   HasDescription & {
     __type: 'skill';
     id: EquipmentSkillId;
-
-    disableUpgrades: boolean;
   };
 
 export type EquipmentSkill = EquipmentSkillContent & {

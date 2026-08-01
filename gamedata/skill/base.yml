@@ -1,2 +1,29 @@
-- id: ec749afc-f829-4ceb-bc1d-6a3beaa7d9c5
-  name: Dummy
+- id: 43282cd2-96e8-4590-b539-ff02f6db7ebf
+  name: Attack
+
+  preventDrop: true
+
+  rarity: Common
+  dropLevel: 1
+
+  sprite: '0000'
+  frames: 14
+
+  usesPerCombat: -1
+  numTargets: 1
+  damageScaling:
+    Strength: 1
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** attacks **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -1,5 +1,13 @@
 export type ContentType =
-  'collectible' | 'equipment' | 'item' | 'job' | 'monster' | 'skill' | 'trait';
+  | 'collectible'
+  | 'equipment'
+  | 'globaleffect'
+  | 'item'
+  | 'job'
+  | 'monster'
+  | 'skill'
+  | 'statuseffect'
+  | 'trait';
 
 export interface Identifiable {
   id: string;

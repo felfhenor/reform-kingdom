@@ -5,10 +5,32 @@
   sprite: '0000'
   frames: 4
 
+  targettingType: Random
+
+  xpMin: 3
+  xpMax: 5
+
+  droppedItems:
+    - itemId: Gold Coin
+      min: 3
+      max: 10
+
   baseStats:
-    Health: 3
-    Damage: 1
+    Health: 20
+    Energy: 5
+    Luck: 1
+    Intelligence: 1
+    Strength: 3
+    Vitality: 2
+    Resistance: 1
+    Agility: 5
 
   statsPerLevel:
-    Health: 0.2
-    Damage: 0.05
+    Health: 2
+    Energy: 0.5
+    Luck: 0.05
+    Intelligence: 0.1
+    Strength: 0.3
+    Vitality: 0.2
+    Resistance: 0.1
+    Agility: 0.3

@@ -1,11 +1,21 @@
 import type { Character } from '@interfaces/character';
+import type { Combat } from '@interfaces/combat';
+import type { GlobalEffect } from '@interfaces/content-globaleffect';
+import type { ItemId } from '@interfaces/content-item';
 import type { Branded } from '@interfaces/identifiable';
 
 export type GameId = Branded<string, 'GameId'>;
 
 export interface GameStateWorld {
   party: Character[];
+  combat?: Combat;
 }
+
+export type MaterialId = ItemId;
+
+export type GameStateMaterials = {
+  [key: MaterialId]: { quantity: number };
+};
 
 export interface GameStateClock {
   numTicks: number;
@@ -24,4 +34,6 @@ export interface GameState {
   gameId: GameId;
   clock: GameStateClock;
   world: GameStateWorld;
+  materials: GameStateMaterials;
+  globalEffects: GlobalEffect[];
 }

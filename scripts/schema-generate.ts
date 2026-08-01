@@ -306,10 +306,12 @@ const program = TJS.getProgramFromFiles(
 const contentTypeMap = {
   collectible: 'CollectibleContent',
   equipment: 'EquipmentContent',
+  globaleffect: 'GlobalEffectContent',
   item: 'ItemContent',
   job: 'JobContent',
   monster: 'MonsterContent',
   skill: 'EquipmentSkillContent',
+  statuseffect: 'StatusEffectContent',
   trait: 'TraitContent',
 };
 

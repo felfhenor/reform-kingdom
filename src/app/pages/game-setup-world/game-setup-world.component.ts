@@ -2,7 +2,7 @@ import type { OnInit } from '@angular/core';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { applyEach, FormField, form, required, schema } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
+import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   createCharacter,
@@ -11,7 +11,6 @@ import {
   getEntry,
   getUnlockedJobs,
   setParty,
-  setWorldSeed,
 } from '@helpers';
 import type { JobContent, JobId } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -36,7 +35,7 @@ const heroPickSchema = schema<HeroPick>((hero) => {
   imports: [
     SweetAlert2Module,
     SFXDirective,
-    AtlasAnimationComponent,
+    IconJobComponent,
     NgSelectComponent,
     FormField,
   ],
@@ -93,7 +92,6 @@ export class GameSetupWorldComponent implements OnInit {
     );
 
     gameReset();
-    setWorldSeed(undefined);
     setParty(party);
 
     await this.router.navigate(['/setup', 'generate']);

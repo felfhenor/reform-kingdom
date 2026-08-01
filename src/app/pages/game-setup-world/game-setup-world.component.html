@@ -9,11 +9,9 @@
         <div class="card-actions pt-3 flex flex-col gap-6 w-full">
           @for (heroField of partyForm; track $index) {
             <div class="flex flex-row gap-2 items-center w-full">
-              <app-atlas-animation
-                [spritesheet]="'job'"
-                [assetName]="jobFor(heroField.jobId().value())?.sprite ?? ''"
-                [frames]="jobFor(heroField.jobId().value())?.frames ?? 4"
-              ></app-atlas-animation>
+              <app-icon-job
+                [job]="jobFor(heroField.jobId().value())"
+              ></app-icon-job>
 
               <div class="flex flex-col gap-2 flex-1">
                 <div class="flex flex-row gap-2">

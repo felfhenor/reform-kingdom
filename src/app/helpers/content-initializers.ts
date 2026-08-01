@@ -7,6 +7,8 @@ import type {
   EquipmentId,
   EquipmentSkillContent,
   EquipmentSkillId,
+  GlobalEffectContent,
+  GlobalEffectId,
   IsContentItem,
   ItemContent,
   ItemId,
@@ -15,6 +17,8 @@ import type {
   MonsterContent,
   MonsterId,
   StatBlock,
+  StatusEffectContent,
+  StatusEffectId,
   TraitContent,
   TraitId,
 } from '@interfaces';
@@ -24,10 +28,12 @@ import type {
 const initializers: Record<ContentType, (entry: any) => any> = {
   collectible: ensureCollectible,
   equipment: ensureEquipment,
+  globaleffect: ensureGlobalEffect,
   item: ensureItem,
   job: ensureJob,
   monster: ensureMonster,
   skill: ensureSkill,
+  statuseffect: ensureStatuseffect,
   trait: ensureTrait,
 };
 
@@ -61,6 +67,10 @@ function ensureMonster(
     frames: monster.frames ?? 4,
     baseStats: ensureStats(monster.baseStats),
     statsPerLevel: ensureStats(monster.statsPerLevel),
+    targettingType: monster.targettingType ?? 'Random',
+    xpMin: monster.xpMin ?? 0,
+    xpMax: monster.xpMax ?? 0,
+    droppedItems: monster.droppedItems ?? [],
   };
 }
 
@@ -103,6 +113,35 @@ function ensureJob(job: Partial<JobContent>): Required<JobContent> {
   };
 }
 
+function ensureStatuseffect(
+  effect: Partial<StatusEffectContent>,
+): Required<StatusEffectContent> {
+  return {
+    id: effect.id ?? ('UNKNOWN' as StatusEffectId),
+    name: effect.name ?? 'UNKNOWN',
+    __type: 'statuseffect',
+    effectType: effect.effectType ?? 'Buff',
+    elements: effect.elements ?? [],
+    trigger: effect.trigger ?? 'TurnStart',
+    onApply: effect.onApply ?? [],
+    onTick: effect.onTick ?? [],
+    onUnapply: effect.onUnapply ?? [],
+    statScaling: ensureStats(effect.statScaling),
+    useTargetStats: effect.useTargetStats ?? false,
+  };
+}
+
+function ensureGlobalEffect(
+  effect: Partial<GlobalEffectContent>,
+): Required<GlobalEffectContent> {
+  return {
+    id: effect.id ?? ('UNKNOWN' as GlobalEffectId),
+    name: effect.name ?? 'UNKNOWN',
+    __type: 'globaleffect',
+    description: effect.description ?? 'UNKNOWN',
+  };
+}
+
 function ensureTrait(trait: Partial<TraitContent>): Required<TraitContent> {
   return {
     id: trait.id ?? ('UNKNOWN' as TraitId),
@@ -128,8 +167,6 @@ function ensureSkill(
     preventModification: skill.preventModification ?? false,
     preventDrop: skill.preventDrop ?? false,
     isFavorite: skill.isFavorite ?? false,
-    disableUpgrades: skill.disableUpgrades ?? false,
-    enchantLevel: skill.enchantLevel ?? 0,
     techniques: skill.techniques ?? [],
     usesPerCombat: skill.usesPerCombat ?? -1,
     numTargets: skill.numTargets ?? 1,
