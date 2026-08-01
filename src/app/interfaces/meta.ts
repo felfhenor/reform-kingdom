@@ -1,4 +1,4 @@
-export interface VersionInfo {
+export type VersionInfo = {
   dirty: boolean;
   raw: string;
   hash: string;
@@ -7,4 +7,4 @@ export interface VersionInfo {
   semver: string;
   suffix: string;
   semverString: string;
-}
+};

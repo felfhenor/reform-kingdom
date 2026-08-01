@@ -1,3 +1,3 @@
-export interface HasDescription {
+export type HasDescription = {
   description: string;
-}
+};

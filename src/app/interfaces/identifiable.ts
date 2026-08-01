@@ -9,10 +9,10 @@ export type ContentType =
   | 'statuseffect'
   | 'trait';
 
-export interface Identifiable {
+export type Identifiable = {
   id: string;
   name: string;
-}
+};
 
 export type IsContentItem = Identifiable & {
   __type: ContentType;

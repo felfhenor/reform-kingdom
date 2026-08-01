@@ -1,6 +1,6 @@
 import type { CombatId } from '@interfaces/combat';
 
-export interface CombatLog {
+export type CombatLog = {
   combatId: CombatId;
   messageId: string;
   timestamp: number;
@@ -8,4 +8,4 @@ export interface CombatLog {
   message: string;
   spritesheet?: 'guardian' | 'hero';
   sprite?: string;
-}
+};

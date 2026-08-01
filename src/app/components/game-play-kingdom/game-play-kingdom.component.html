@@ -1,0 +1,117 @@
+@let subview = activeSubview();
+
+@switch (subview) {
+  @case ('storage') {
+    <app-play-kingdom-storage></app-play-kingdom-storage>
+  }
+  @case ('museum') {
+    <app-play-kingdom-museum></app-play-kingdom-museum>
+  }
+  @case ('armory') {
+    <app-play-kingdom-armory></app-play-kingdom-armory>
+  }
+  @case ('astralprojector') {
+    <app-play-kingdom-astralprojector></app-play-kingdom-astralprojector>
+  }
+  @case ('tradeskill-artificing') {
+    <app-play-kingdom-tradeskill-artificing></app-play-kingdom-tradeskill-artificing>
+  }
+  @case ('tradeskill-blacksmithing') {
+    <app-play-kingdom-tradeskill-blacksmithing></app-play-kingdom-tradeskill-blacksmithing>
+  }
+  @case ('tradeskill-jewelcrafting') {
+    <app-play-kingdom-tradeskill-jewelcrafting></app-play-kingdom-tradeskill-jewelcrafting>
+  }
+  @case ('tradeskill-tailoring') {
+    <app-play-kingdom-tradeskill-tailoring></app-play-kingdom-tradeskill-tailoring>
+  }
+  @case ('tradeskill-woodworking') {
+    <app-play-kingdom-tradeskill-woodworking></app-play-kingdom-tradeskill-woodworking>
+  }
+  @case ('achievements') {
+    <app-play-kingdom-achievements></app-play-kingdom-achievements>
+  }
+  @case ('prestige') {
+    <app-play-kingdom-prestige></app-play-kingdom-prestige>
+  }
+  @default {
+    <app-card-page>
+      <span header>Kingdom</span>
+
+      <div class="flex flex-col justify-between gap-6 p-4 h-full overflow-y-auto">
+        <div class="grid grid-cols-2 gap-4">
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('storage')"
+          >
+            <span class="text-base font-bold">Storage</span>
+            <span class="text-xs opacity-70">0 materials stored</span>
+          </button>
+
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('museum')"
+          >
+            <span class="text-base font-bold">Museum</span>
+            <span class="text-xs opacity-70">0/0 collectibles found</span>
+            <span class="text-xs opacity-70">0/0 recipes found</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('armory')"
+          >
+            <span class="text-base font-bold">Armory</span>
+            <span class="text-xs opacity-70">0 items stored</span>
+          </button>
+
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('astralprojector')"
+          >
+            <span class="text-base font-bold">Astral Projector</span>
+            <span class="text-xs opacity-70">0 spells learned</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-5 gap-4">
+          @for (tradeskill of tradeskillButtons; track tradeskill.subview) {
+            <button
+              class="btn btn-secondary h-16 flex flex-col justify-center gap-0"
+              (click)="openSubview(tradeskill.subview)"
+            >
+              <span class="font-bold">{{ tradeskill.label }}</span>
+              <span class="text-xs opacity-70">Lv. 1</span>
+            </button>
+          }
+        </div>
+
+        <div class="flex gap-4">
+          <button
+            class="btn btn-accent btn-sm"
+            disabled
+            [tp]="'Coming soon'"
+          >
+            Reclass Heroes
+          </button>
+
+          <button
+            class="btn btn-accent btn-sm"
+            (click)="openSubview('achievements')"
+          >
+            Achievements
+          </button>
+
+          <button
+            class="btn btn-accent btn-sm"
+            (click)="openSubview('prestige')"
+          >
+            Prestige
+          </button>
+        </div>
+      </div>
+    </app-card-page>
+  }
+}

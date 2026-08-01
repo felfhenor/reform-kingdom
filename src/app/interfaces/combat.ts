@@ -65,7 +65,7 @@ export type Combatant = HasAnimation & {
   sprite?: string;
 };
 
-export interface Combat {
+export type Combat = {
   id: CombatId;
   locationName: string;
   locationPosition: { x: number; y: number };
@@ -74,4 +74,4 @@ export interface Combat {
   guardians: Combatant[];
 
   elementalModifiers: ElementBlock;
-}
+};
