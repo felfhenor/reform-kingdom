@@ -135,14 +135,20 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.map.height,
     );
 
+    // Camera tiles are anchored by their top-left corner, so without this
+    // offset the player's tile sits with its top-left corner at screen
+    // center rather than the tile (and player) itself being centered.
+    const centerOffsetX = -this.map.tilewidth / 2;
+    const centerOffsetY = -this.map.tileheight / 2;
+
     this.mapContainer.position.set(
-      -camera.x * this.map.tilewidth,
-      -camera.y * this.map.tileheight,
+      -camera.x * this.map.tilewidth + centerOffsetX,
+      -camera.y * this.map.tileheight + centerOffsetY,
     );
 
     this.playerIndicatorContainer.position.set(
-      (location.x - camera.x) * this.map.tilewidth,
-      (location.y - camera.y) * this.map.tileheight,
+      (location.x - camera.x) * this.map.tilewidth + centerOffsetX,
+      (location.y - camera.y) * this.map.tileheight + centerOffsetY,
     );
   }
 }
