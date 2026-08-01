@@ -1,0 +1,20 @@
+- id: 32f86770-70c2-468b-8083-5911e96b1e27
+  name: Empowered
+
+  effectType: Buff
+  elements: [Fire]
+
+  trigger: TurnStart
+
+  statScaling:
+    Strength: 0.2
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has been empowered (+{{ damage }} Strength)!'
+      modifyStat: Strength
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has lost their empowerment (-{{ damage }} Strength)!'
+      modifyStat: Strength

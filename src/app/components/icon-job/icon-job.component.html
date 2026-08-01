@@ -1,0 +1,7 @@
+@if (job(); as jobData) {
+  <app-atlas-animation
+    [spritesheet]="'job'"
+    [assetName]="jobData.sprite"
+    [frames]="jobData.frames"
+  ></app-atlas-animation>
+}
