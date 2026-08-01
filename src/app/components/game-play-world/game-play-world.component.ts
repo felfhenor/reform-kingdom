@@ -141,14 +141,19 @@ export class GamePlayWorldComponent implements OnDestroy {
     const centerOffsetX = -this.map.tilewidth / 2;
     const centerOffsetY = -this.map.tileheight / 2;
 
+    // The camera position is fractional (it's derived from viewport size in
+    // tiles, which rarely divides evenly), so without rounding here the map
+    // container sits at a subpixel offset. That misaligns every tile sprite
+    // from the pixel grid by the same fractional amount, which shows up as
+    // hairline tearing between tiles.
     this.mapContainer.position.set(
-      -camera.x * this.map.tilewidth + centerOffsetX,
-      -camera.y * this.map.tileheight + centerOffsetY,
+      Math.round(-camera.x * this.map.tilewidth + centerOffsetX),
+      Math.round(-camera.y * this.map.tileheight + centerOffsetY),
     );
 
     this.playerIndicatorContainer.position.set(
-      (location.x - camera.x) * this.map.tilewidth + centerOffsetX,
-      (location.y - camera.y) * this.map.tileheight + centerOffsetY,
+      Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
+      Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
     );
   }
 }

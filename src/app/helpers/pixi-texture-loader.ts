@@ -10,6 +10,13 @@ export async function pixiTiledTilesetTexturesLoad(
   tileset: TiledTileset,
 ): Promise<Record<number, Texture>> {
   const baseTexture = await Assets.load(tiledTilesetImagePath(tileset));
+
+  // Linear filtering (the default) samples across a tile's frame edge into
+  // its neighbors in the shared atlas image, producing hairline seams
+  // between adjacent tiles. Nearest-neighbor sampling keeps each tile's
+  // pixels self-contained, which also suits this game's pixel art.
+  baseTexture.source.scaleMode = 'nearest';
+
   const textures: Record<number, Texture> = {};
 
   for (let localId = 0; localId < tileset.tilecount; localId++) {

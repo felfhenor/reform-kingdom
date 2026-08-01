@@ -1,12 +1,18 @@
 <div class="game-container relative">
-  @switch (activeGamePlayView()) {
-    @case ('kingdom') {
-      <app-game-play-kingdom class="absolute inset-0"></app-game-play-kingdom>
-    }
-    @default {
-      <app-game-play-world class="absolute inset-0"></app-game-play-world>
-    }
-  }
+  <!--
+    The world view stays mounted (and its Pixi app running) even while the
+    kingdom view is shown, instead of being destroyed/recreated on every
+    switch. `invisible` keeps its layout box - and therefore its correct
+    size for the Pixi canvas - intact while hidden, unlike `hidden`.
+  -->
+  <app-game-play-world
+    class="absolute inset-0"
+    [class.invisible]="activeGamePlayView() !== 'world'"
+  ></app-game-play-world>
+  <app-game-play-kingdom
+    class="absolute inset-0"
+    [class.hidden]="activeGamePlayView() !== 'kingdom'"
+  ></app-game-play-kingdom>
 </div>
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>
