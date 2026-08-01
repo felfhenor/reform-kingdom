@@ -57,6 +57,20 @@
       bottom: 4px;
     }
   }
+
+  &.size-full {
+    transform: none;
+    min-height: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
+    box-sizing: border-box;
+    padding: 1rem;
+
+    .page-card {
+      min-width: 100%;
+      max-width: 100%;
+      margin: 0;
+    }
+  }
 }
 
 .page-card {
