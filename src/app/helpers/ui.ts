@@ -28,6 +28,8 @@ export function kingdomSubviewClear(): void {
   kingdomSubview.set(undefined);
 }
 
+export const showReclassHeroesModal = signal<boolean>(false);
+
 export const isShowingAnyMenu = computed(() => showOptionsMenu());
 
 export function closeAllMenus(smart = false) {

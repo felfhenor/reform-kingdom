@@ -18,6 +18,7 @@ import {
 import { provideHttpClient } from '@angular/common/http';
 
 import { provideNgIconsConfig } from '@ng-icons/core';
+import { NgSelectConfig } from '@ng-select/ng-select';
 import {
   popperVariation,
   provideTippyConfig,
@@ -144,6 +145,13 @@ export const appConfig: ApplicationConfig = {
       provide: ENVIRONMENT_INITIALIZER,
       multi: true,
       useValue: () => inject(BGMService).init(),
+    },
+    {
+      provide: ENVIRONMENT_INITIALIZER,
+      multi: true,
+      useValue: () => {
+        inject(NgSelectConfig).appendTo = 'body';
+      },
     },
   ],
 };

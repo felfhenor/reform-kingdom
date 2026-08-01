@@ -24,3 +24,9 @@ export function isPlayerAtLocation(): boolean {
   const location = currentLocationGet();
   return !!worldNodeAt(location.mapName, location.x, location.y);
 }
+
+export function isPlayerAtKingdom(): boolean {
+  const location = currentLocationGet();
+  const node = worldNodeAt(location.mapName, location.x, location.y);
+  return node?.nodeData.type === 'Kingdom';
+}

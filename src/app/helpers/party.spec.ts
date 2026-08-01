@@ -1,4 +1,10 @@
-import type { Character, GameState, JobContent, JobId } from '@interfaces';
+import type {
+  Character,
+  CharacterId,
+  GameState,
+  JobContent,
+  JobId,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('uuid', () => ({
@@ -10,12 +16,13 @@ vi.mock('@helpers/content', () => ({
 }));
 
 vi.mock('@helpers/state-game', () => ({
+  gamestate: vi.fn(),
   updateGamestate: vi.fn(),
 }));
 
 import { getEntry } from '@helpers/content';
-import { createCharacter, setParty } from '@helpers/party';
-import { updateGamestate } from '@helpers/state-game';
+import { characterReclass, createCharacter, partyGet, setParty } from '@helpers/party';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 
 describe('Party Helper Functions', () => {
   const mockJob: JobContent = {
@@ -114,6 +121,66 @@ describe('Party Helper Functions', () => {
       const result = updateFn(fakeState);
 
       expect(result.world.party).toEqual(party);
+    });
+  });
+
+  describe('partyGet', () => {
+    it('should return the party from state', () => {
+      const party: Character[] = [createCharacterStub('Jala')];
+      vi.mocked(getEntry).mockReturnValue(mockJob);
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party },
+      } as unknown as GameState);
+
+      expect(partyGet()).toBe(party);
+    });
+  });
+
+  describe('characterReclass', () => {
+    const warriorJob: JobContent = {
+      ...mockJob,
+      id: 'job-warrior' as JobId,
+      name: 'Warrior',
+      baseStats: { ...mockJob.baseStats, Health: 150, Strength: 15 },
+    };
+
+    it("should update the character's jobId, recompute stats from the new job, and reset level/xp", () => {
+      vi.mocked(getEntry).mockReturnValue(mockJob);
+      const jala = { ...createCharacterStub('Jala'), level: 10 };
+      jala.xp.current = 50;
+
+      vi.mocked(getEntry).mockReturnValueOnce(warriorJob);
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].jobId).toBe('job-warrior');
+      expect(result.world.party[0].stats).toEqual(warriorJob.baseStats);
+      expect(result.world.party[0].hp).toBe(warriorJob.baseStats.Health);
+      expect(result.world.party[0].level).toBe(1);
+      expect(result.world.party[0].xp).toEqual({ current: 0, maximum: 100 });
+    });
+
+    it('should leave other party members untouched', () => {
+      vi.mocked(getEntry).mockReturnValue(mockJob);
+      const jala = createCharacterStub('Jala');
+      const spoorle = {
+        ...createCharacterStub('Spoorle'),
+        id: 'other-uuid' as CharacterId,
+      };
+
+      vi.mocked(getEntry).mockReturnValueOnce(warriorJob);
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala, spoorle] },
+      } as unknown as GameState);
+
+      expect(result.world.party[1]).toEqual(spoorle);
     });
   });
 

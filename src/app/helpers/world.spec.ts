@@ -13,6 +13,7 @@ vi.mock('@helpers/world-nodes', () => ({
 import {
   currentLocationGet,
   currentLocationSet,
+  isPlayerAtKingdom,
   isPlayerAtLocation,
 } from '@helpers/world';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -78,6 +79,53 @@ describe('World Helper Functions', () => {
       vi.mocked(worldNodeAt).mockReturnValue(undefined);
 
       expect(isPlayerAtLocation()).toBe(false);
+    });
+  });
+
+  describe('isPlayerAtKingdom', () => {
+    it('should report true when the node at the current location is a Kingdom', () => {
+      const location: CurrentLocation = { mapName: 'Carrina', x: 24, y: 24 };
+
+      vi.mocked(gamestate).mockReturnValue({
+        world: { currentLocation: location },
+      } as unknown as GameState);
+      vi.mocked(worldNodeAt).mockReturnValue({
+        mapName: 'Carrina',
+        x: 24,
+        y: 24,
+        nodeName: 'Duchy of Carrina',
+        nodeData: { type: 'Kingdom' } as never,
+      });
+
+      expect(isPlayerAtKingdom()).toBe(true);
+    });
+
+    it('should report false when the node at the current location is not a Kingdom', () => {
+      const location: CurrentLocation = { mapName: 'Carrina', x: 1, y: 24 };
+
+      vi.mocked(gamestate).mockReturnValue({
+        world: { currentLocation: location },
+      } as unknown as GameState);
+      vi.mocked(worldNodeAt).mockReturnValue({
+        mapName: 'Carrina',
+        x: 1,
+        y: 24,
+        nodeName: 'Forest Ruins',
+        nodeData: { type: 'ExploreNode' } as never,
+      });
+
+      expect(isPlayerAtKingdom()).toBe(false);
+    });
+
+    it('should report false when there is no node at the current location', () => {
+      const location: CurrentLocation = { mapName: 'Carrina', x: 1, y: 1 };
+
+      vi.mocked(gamestate).mockReturnValue({
+        world: { currentLocation: location },
+      } as unknown as GameState);
+      vi.mocked(worldNodeAt).mockReturnValue(undefined);
+
+      expect(isPlayerAtKingdom()).toBe(false);
     });
   });
 });

@@ -1,7 +1,7 @@
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { rngUuid } from '@helpers/rng';
-import { updateGamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   Character,
   CharacterId,
@@ -31,9 +31,34 @@ export function createCharacter(name: string, jobId: JobId): Character {
   };
 }
 
+export function partyGet(): Character[] {
+  return gamestate().world.party;
+}
+
 export function setParty(party: Character[]): void {
   updateGamestate((state) => {
     state.world.party = party;
+    return state;
+  });
+}
+
+export function characterReclass(characterId: CharacterId, jobId: JobId): void {
+  const job = getEntry<JobContent>(jobId);
+  const stats = { ...(job?.baseStats ?? defaultStats()) };
+
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((character) =>
+      character.id === characterId
+        ? {
+            ...character,
+            jobId,
+            stats,
+            hp: stats.Health,
+            level: 1,
+            xp: { current: 0, maximum: 100 },
+          }
+        : character,
+    );
     return state;
   });
 }

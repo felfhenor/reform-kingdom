@@ -1,0 +1,54 @@
+<app-modal
+  [visible]="isVisible()"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  (modalClose)="close()"
+>
+  <span title>Reclass Heroes</span>
+
+  <div body class="flex flex-col gap-4">
+    @for (heroField of reclassForm; track $index) {
+      @let character = party()[$index];
+
+      @if (character) {
+        <div class="flex flex-row gap-2 items-center">
+          <app-icon-job [job]="jobFor(character.jobId)"></app-icon-job>
+
+          <div class="flex flex-col flex-1">
+            <span class="font-bold">{{ character.name }}</span>
+            <span class="text-xs opacity-70">
+              {{ jobFor(character.jobId)?.name }} Lv. {{ character.level }}
+            </span>
+          </div>
+
+          <ng-select
+            class="w-48"
+            [items]="unlockedJobs()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            [formField]="heroField.jobId"
+          ></ng-select>
+        </div>
+      }
+    }
+  </div>
+
+  <div actions>
+    <button
+      class="btn btn-primary"
+      [disabled]="!hasChanges()"
+      [swal]="reclassAllSwal"
+    >
+      Reclass All
+    </button>
+  </div>
+</app-modal>
+
+<swal
+  #reclassAllSwal
+  title="Reclass all changed heroes?"
+  text="Any hero whose class you changed will be reclassed and reset to level 1. This cannot be undone."
+  icon="warning"
+  (confirm)="applyReclassAll()"
+></swal>

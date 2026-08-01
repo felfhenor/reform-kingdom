@@ -91,8 +91,13 @@
         <div class="flex gap-4">
           <button
             class="btn btn-accent btn-sm"
-            disabled
-            [tp]="'Coming soon'"
+            [disabled]="!canReclass()"
+            [tp]="
+              canReclass()
+                ? 'Reclass Heroes'
+                : 'You must be in the Kingdom to reclass heroes'
+            "
+            (click)="openReclassModal()"
           >
             Reclass Heroes
           </button>
@@ -115,3 +120,5 @@
     </app-card-page>
   }
 }
+
+<app-play-kingdom-reclass-modal></app-play-kingdom-reclass-modal>
