@@ -6,10 +6,17 @@ import type { Branded } from '@interfaces/identifiable';
 
 export type GameId = Branded<string, 'GameId'>;
 
-export interface GameStateWorld {
+export type CurrentLocation = {
+  mapName: string;
+  x: number;
+  y: number;
+};
+
+export type GameStateWorld = {
   party: Character[];
   combat?: Combat;
-}
+  currentLocation: CurrentLocation;
+};
 
 export type MaterialId = ItemId;
 
@@ -17,23 +24,23 @@ export type GameStateMaterials = {
   [key: MaterialId]: { quantity: number };
 };
 
-export interface GameStateClock {
+export type GameStateClock = {
   numTicks: number;
   lastSaveTick: number;
-}
+};
 
-export interface GameStateMeta {
+export type GameStateMeta = {
   version: number;
   isSetup: boolean;
   isPaused: boolean;
   createdAt: number;
-}
+};
 
-export interface GameState {
+export type GameState = {
   meta: GameStateMeta;
   gameId: GameId;
   clock: GameStateClock;
   world: GameStateWorld;
   materials: GameStateMaterials;
   globalEffects: GlobalEffect[];
-}
+};

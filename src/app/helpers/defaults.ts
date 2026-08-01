@@ -23,6 +23,11 @@ export function defaultGameState(): GameState {
     },
     world: {
       party: [],
+      currentLocation: {
+        mapName: 'Carrina',
+        x: 24,
+        y: 24,
+      },
     },
     materials: {},
     globalEffects: [],

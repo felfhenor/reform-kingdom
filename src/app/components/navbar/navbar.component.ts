@@ -10,14 +10,16 @@ import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   closeAllMenus,
+  gamePlayView,
   getOption,
   isSetup,
   isShowingAnyMenu,
   saveGameState,
+  setGamePlayView,
   setOption,
   showOptionsMenu,
 } from '@helpers';
-import type { Icon } from '@interfaces';
+import type { GamePlayView, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { HotkeysDirective } from '@ngneat/hotkeys';
 import { MetaService } from '@services/meta.service';
@@ -53,6 +55,12 @@ export class NavbarComponent {
   public leaveSwal = viewChild<SwalComponent>('leaveSwal');
 
   public isPaused = computed(() => getOption('gameloopPaused'));
+
+  public activeGamePlayView = computed(() => gamePlayView());
+
+  public changeGamePlayView(view: GamePlayView): void {
+    setGamePlayView(view);
+  }
 
   public readonly panelConfigs: Array<{
     name: string;

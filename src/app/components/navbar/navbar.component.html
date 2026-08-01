@@ -1,7 +1,28 @@
 <div class="navbar bg-base-100 relative flex py-0">
   <div class="navbar-start flex-1">
     <ul class="menu menu-horizontal py-0 px-1">
-      <li class="flex gap-2 flex-row disabled"></li>
+      <li class="flex gap-2 flex-row" appRequireSetup>
+        <button
+          class="btn btn-xs btn-info"
+          [class.btn-outline]="activeGamePlayView() !== 'world'"
+          (click)="changeGamePlayView('world')"
+          appSfx="ui-click"
+          [sfxOffset]="0"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          World
+        </button>
+        <button
+          class="btn btn-xs btn-info"
+          [class.btn-outline]="activeGamePlayView() !== 'kingdom'"
+          (click)="changeGamePlayView('kingdom')"
+          appSfx="ui-click"
+          [sfxOffset]="1"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Kingdom
+        </button>
+      </li>
     </ul>
   </div>
 
