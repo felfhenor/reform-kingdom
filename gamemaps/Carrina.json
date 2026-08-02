@@ -1071,6 +1071,17 @@
                  "height":64,
                  "id":124,
                  "name":"To Craggled Mire",
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"CarrinaToMire"
+                        }, 
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"MireToCarrina"
+                        }],
                  "rotation":0,
                  "type":"TeleportNode",
                  "visible":true,

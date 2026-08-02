@@ -30,7 +30,15 @@ export type WorldNodeType = 'Kingdom' | 'ExploreNode' | 'TeleportNode';
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
 export type ExploreNodeObject = TiledObject & { type: 'ExploreNode' };
-export type TeleportNodeObject = TiledObject & { type: 'TeleportNode' };
+
+export type TeleportNodeProperty =
+  | { name: 'tag'; type: 'string'; value: string }
+  | { name: 'toTag'; type: 'string'; value: string };
+
+export type TeleportNodeObject = TiledObject & {
+  type: 'TeleportNode';
+  properties: TeleportNodeProperty[];
+};
 
 export type WorldNodeObject =
   | KingdomObject
