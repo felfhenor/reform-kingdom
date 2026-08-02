@@ -45,6 +45,8 @@ jobs:
 
       - run: npm run build
 
+      - run: npm run validate
+
       - name: Run Versioning
         run: npm run bump:${{ github.event.inputs.type }} --ignore-scripts -- --force
 

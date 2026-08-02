@@ -33,6 +33,8 @@ jobs:
 
       - run: npm run build
 
+      - run: npm run validate
+
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:

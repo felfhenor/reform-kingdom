@@ -33,6 +33,8 @@ jobs:
 
       - run: npm run build
 
+      - run: npm run validate
+
       - id: loadChangelog
         run: |
           echo 'CHANGELOG<<EOF' >> $GITHUB_ENV
@@ -102,6 +104,8 @@ jobs:
       - run: npm run test
 
       - run: npm run build:electron
+
+      - run: npm run validate
 
       - name: Upload Binary
         id: uploadReleaseAsset

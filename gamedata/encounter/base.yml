@@ -16,3 +16,22 @@
         - monsterId: Goblin
         - monsterId: Goblin
         - monsterId: Goblin
+
+- id: c6e4119c-b365-4de1-a952-5bf86f7ff173
+  name: Forest Ruins
+  description: A crumbling ruin at the edge of the forest, picked over by goblins.
+
+  levelRange:
+    min: 1
+    max: 3
+
+  fights:
+    - monsters:
+        - monsterId: Goblin
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin
