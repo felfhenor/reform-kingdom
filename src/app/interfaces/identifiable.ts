@@ -1,5 +1,6 @@
 export type ContentType =
   | 'collectible'
+  | 'encounter'
   | 'equipment'
   | 'globaleffect'
   | 'item'

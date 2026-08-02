@@ -37,25 +37,32 @@ function didHeroesWin(combat: Combat): boolean {
   return combat.guardians.every((guardian) => combatantIsDead(guardian));
 }
 
-function defeatedMonsters(combat: Combat): MonsterContent[] {
+type DefeatedMonster = { monster: MonsterContent; level: number };
+
+function defeatedMonsters(combat: Combat): DefeatedMonster[] {
   return combat.guardians
-    .map((guardian) =>
-      guardian.monsterId ? getEntry<MonsterContent>(guardian.monsterId) : undefined,
-    )
-    .filter((monster): monster is MonsterContent => !!monster);
+    .map((guardian) => {
+      const monster = guardian.monsterId
+        ? getEntry<MonsterContent>(guardian.monsterId)
+        : undefined;
+      return monster ? { monster, level: guardian.level } : undefined;
+    })
+    .filter((entry): entry is DefeatedMonster => !!entry);
 }
 
 function grantVictoryRewards(combat: Combat): void {
   const monsters = defeatedMonsters(combat);
 
-  const totalXp = sumBy(monsters, (monster) => monsterXpReward(monster));
+  const totalXp = sumBy(monsters, ({ monster, level }) =>
+    monsterXpReward(monster, level),
+  );
   if (totalXp > 0) {
     partyGainXp(totalXp);
     combatMessageLog(combat, `The party gained ${totalXp} XP!`);
   }
 
-  monsters.forEach((monster) => {
-    monsterDroppedItemRewards(monster).forEach(({ itemId, quantity }) => {
+  monsters.forEach(({ monster, level }) => {
+    monsterDroppedItemRewards(monster, level).forEach(({ itemId, quantity }) => {
       addMaterial(itemId, quantity);
 
       const item = getEntry<ItemContent>(itemId);

@@ -7,13 +7,21 @@
 
   targettingType: Random
 
-  xpMin: 3
-  xpMax: 5
+  rarity: Common
+
+  xp:
+    min: 3
+    max: 5
+    multiplierPerLevel: 1
 
   droppedItems:
     - itemId: Gold Coin
       min: 3
       max: 10
+      multiplierPerLevel: 1
+
+  skills:
+    - skillId: Attack
 
   baseStats:
     Health: 20

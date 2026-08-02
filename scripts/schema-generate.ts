@@ -274,6 +274,7 @@ const settings = {
 const program = TJS.getProgramFromFiles(
   [
     path.resolve(__dirname, '../src/app/interfaces/content-collectible.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-encounter.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-equipment.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-item.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-job.ts'),
@@ -305,6 +306,7 @@ const program = TJS.getProgramFromFiles(
 // Keys must match the gamedata folder names (and `ContentType` union).
 const contentTypeMap = {
   collectible: 'CollectibleContent',
+  encounter: 'EncounterContent',
   equipment: 'EquipmentContent',
   globaleffect: 'GlobalEffectContent',
   item: 'ItemContent',

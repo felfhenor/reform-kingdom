@@ -81,7 +81,7 @@ export function combatantFromMonster(
     sprite: monster.sprite,
     frames: monster.frames,
 
-    skillIds: ['Attack' as EquipmentSkillId],
+    skillIds: monster.skills.map((skill) => skill.skillId),
     skillRefs: [],
 
     combatStats: defaultCombatStats(),

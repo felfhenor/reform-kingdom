@@ -3,6 +3,7 @@ export * from './character';
 export * from './combat';
 export * from './combat-log';
 export * from './content-collectible';
+export * from './content-encounter';
 export * from './content-equipment';
 export * from './content-globaleffect';
 export * from './content-item';

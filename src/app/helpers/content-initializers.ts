@@ -3,6 +3,8 @@ import type {
   CollectibleContent,
   CollectibleId,
   ContentType,
+  EncounterContent,
+  EncounterId,
   EquipmentContent,
   EquipmentId,
   EquipmentSkillContent,
@@ -27,6 +29,7 @@ import type {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
   collectible: ensureCollectible,
+  encounter: ensureEncounter,
   equipment: ensureEquipment,
   globaleffect: ensureGlobalEffect,
   item: ensureItem,
@@ -68,9 +71,23 @@ function ensureMonster(
     baseStats: ensureStats(monster.baseStats),
     statsPerLevel: ensureStats(monster.statsPerLevel),
     targettingType: monster.targettingType ?? 'Random',
-    xpMin: monster.xpMin ?? 0,
-    xpMax: monster.xpMax ?? 0,
+    rarity: monster.rarity ?? 'Common',
+    xp: monster.xp ?? { min: 0, max: 0, multiplierPerLevel: 1 },
     droppedItems: monster.droppedItems ?? [],
+    skills: monster.skills ?? [],
+  };
+}
+
+function ensureEncounter(
+  encounter: Partial<EncounterContent>,
+): Required<EncounterContent> {
+  return {
+    id: encounter.id ?? ('UNKNOWN' as EncounterId),
+    name: encounter.name ?? 'UNKNOWN',
+    __type: 'encounter',
+    description: encounter.description ?? 'UNKNOWN',
+    levelRange: encounter.levelRange ?? { min: 1, max: 1 },
+    fights: encounter.fights ?? [],
   };
 }
 
