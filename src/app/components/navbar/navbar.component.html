@@ -4,16 +4,6 @@
       <li class="flex gap-2 flex-row" appRequireSetup>
         <button
           class="btn btn-xs btn-info"
-          [class.btn-outline]="activeGamePlayView() !== 'world'"
-          (click)="changeGamePlayView('world')"
-          appSfx="ui-click"
-          [sfxOffset]="0"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          World
-        </button>
-        <button
-          class="btn btn-xs btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'kingdom'"
           (click)="changeGamePlayView('kingdom')"
           appSfx="ui-click"
@@ -21,6 +11,17 @@
           [sfxTrigger]="['click', 'hover']"
         >
           Kingdom
+        </button>
+
+        <button
+          class="btn btn-xs btn-info"
+          [class.btn-outline]="activeGamePlayView() !== 'world'"
+          (click)="changeGamePlayView('world')"
+          appSfx="ui-click"
+          [sfxOffset]="0"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          World
         </button>
       </li>
     </ul>
