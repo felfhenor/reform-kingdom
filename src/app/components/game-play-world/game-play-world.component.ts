@@ -2,12 +2,17 @@ import type { ElementRef, OnDestroy } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   signal,
   viewChild,
 } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { MapNodePanelComponent } from '@components/map-node-panel/map-node-panel.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import {
+  cameraBoundsCalculate,
+  cameraOffsetFromDrag,
   cameraPositionCalculate,
   currentLocationGet,
   getMap,
@@ -27,16 +32,28 @@ import {
   selectedMapNode,
   worldNodeByName,
 } from '@helpers';
-import type { TiledMap, TiledObject } from '@interfaces';
+import type { CameraPosition, TiledMap, TiledObject } from '@interfaces';
 import type { Application, Container, Graphics } from 'pixi.js';
 
 @Component({
   selector: 'app-game-play-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MapNodePanelComponent],
+  imports: [MapNodePanelComponent, IconComponent, SFXDirective],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
     <app-map-node-panel></app-map-node-panel>
+
+    @if (isPanned()) {
+      <button
+        type="button"
+        class="btn btn-circle btn-primary recenter-button shadow-lg"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+        (click)="recenterCamera()"
+      >
+        <app-icon name="tablerFocus"></app-icon>
+      </button>
+    }
   `,
   styleUrl: './game-play-world.component.scss',
 })
@@ -45,6 +62,12 @@ export class GamePlayWorldComponent implements OnDestroy {
     viewChild<ElementRef<HTMLDivElement>>('pixiContainer');
 
   private isPixiSetup = signal<boolean>(false);
+  private cameraOffset = signal<CameraPosition>({ x: 0, y: 0 });
+
+  public isPanned = computed(() => {
+    const offset = this.cameraOffset();
+    return offset.x !== 0 || offset.y !== 0;
+  });
 
   private app?: Application;
   private map?: TiledMap;
@@ -55,6 +78,11 @@ export class GamePlayWorldComponent implements OnDestroy {
   private nodeSelectionIndicator?: Graphics;
   private resizeObserver?: ResizeObserver;
   private playerIndicatorTicker?: () => void;
+  private canvas?: HTMLCanvasElement;
+  private isDragging = false;
+  private dragMoved = false;
+  private dragPointerId?: number;
+  private lastPointerPosition = { x: 0, y: 0 };
 
   constructor() {
     effect(() => {
@@ -86,6 +114,11 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.app?.ticker.remove(this.playerIndicatorTicker);
     }
 
+    this.canvas?.removeEventListener('pointerdown', this.onPointerDown);
+    this.canvas?.removeEventListener('pointermove', this.onPointerMove);
+    this.canvas?.removeEventListener('pointerup', this.onPointerUp);
+    this.canvas?.removeEventListener('pointercancel', this.onPointerUp);
+
     this.resizeObserver?.disconnect();
     this.mapContainer?.removeChildren();
     this.playerIndicatorContainer?.removeChildren();
@@ -115,9 +148,23 @@ export class GamePlayWorldComponent implements OnDestroy {
     // Clicking a node selects it; clicking anywhere else on the map (the
     // stage background behind everything) deselects it. Node clicks stop
     // propagation before it reaches this handler - see pixi-map-render.ts.
+    // Dragging to pan the map also lands a pointertap here since the pointer
+    // goes down and up over the same stage target; `dragMoved` (set by our
+    // own pointermove handler below, always before this fires) tells the two
+    // apart so panning doesn't also deselect the current node.
     this.app.stage.eventMode = 'static';
     this.app.stage.hitArea = this.app.screen;
-    this.app.stage.on('pointertap', () => mapNodeDeselect());
+    this.app.stage.on('pointertap', () => {
+      if (this.dragMoved) return;
+      mapNodeDeselect();
+    });
+
+    this.canvas = this.app.canvas as HTMLCanvasElement;
+    this.canvas.style.touchAction = 'none';
+    this.canvas.addEventListener('pointerdown', this.onPointerDown);
+    this.canvas.addEventListener('pointermove', this.onPointerMove);
+    this.canvas.addEventListener('pointerup', this.onPointerUp);
+    this.canvas.addEventListener('pointercancel', this.onPointerUp);
 
     this.resizeObserver = pixiResponsiveCanvasSetup(this.app, element, () =>
       this.positionCamera(),
@@ -144,6 +191,83 @@ export class GamePlayWorldComponent implements OnDestroy {
   private onNodeClick(object: TiledObject): void {
     const entry = worldNodeByName(object.name);
     if (entry) mapNodeSelect(entry);
+  }
+
+  private onPointerDown = (event: PointerEvent): void => {
+    if (event.button !== 0) return;
+
+    this.isDragging = true;
+    this.dragMoved = false;
+    this.dragPointerId = event.pointerId;
+    this.lastPointerPosition = { x: event.clientX, y: event.clientY };
+    this.canvas?.setPointerCapture(event.pointerId);
+  };
+
+  private onPointerMove = (event: PointerEvent): void => {
+    if (
+      !this.isDragging ||
+      event.pointerId !== this.dragPointerId ||
+      !this.app ||
+      !this.map
+    )
+      return;
+
+    const dragDeltaX = event.clientX - this.lastPointerPosition.x;
+    const dragDeltaY = event.clientY - this.lastPointerPosition.y;
+    this.lastPointerPosition = { x: event.clientX, y: event.clientY };
+    if (dragDeltaX === 0 && dragDeltaY === 0) return;
+
+    this.dragMoved = true;
+    this.panCamera(dragDeltaX, dragDeltaY);
+  };
+
+  private onPointerUp = (event: PointerEvent): void => {
+    if (event.pointerId !== this.dragPointerId) return;
+
+    this.isDragging = false;
+    this.dragPointerId = undefined;
+  };
+
+  private panCamera(dragDeltaX: number, dragDeltaY: number): void {
+    if (!this.app || !this.map) return;
+
+    const location = currentLocationGet();
+    const viewportWidthTiles = this.app.screen.width / this.map.tilewidth;
+    const viewportHeightTiles = this.app.screen.height / this.map.tileheight;
+
+    const base = cameraPositionCalculate(
+      location.x,
+      location.y,
+      viewportWidthTiles,
+      viewportHeightTiles,
+      this.map.width,
+      this.map.height,
+    );
+    const bounds = cameraBoundsCalculate(
+      viewportWidthTiles,
+      viewportHeightTiles,
+      this.map.width,
+      this.map.height,
+    );
+
+    this.cameraOffset.set(
+      cameraOffsetFromDrag(
+        this.cameraOffset(),
+        dragDeltaX,
+        dragDeltaY,
+        this.map.tilewidth,
+        this.map.tileheight,
+        base,
+        bounds,
+      ),
+    );
+
+    this.positionCamera();
+  }
+
+  public recenterCamera(): void {
+    this.cameraOffset.set({ x: 0, y: 0 });
+    this.positionCamera();
   }
 
   private setupPlayerIndicator(): void {
@@ -179,7 +303,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const viewportWidthTiles = this.app.screen.width / this.map.tilewidth;
     const viewportHeightTiles = this.app.screen.height / this.map.tileheight;
 
-    const camera = cameraPositionCalculate(
+    const base = cameraPositionCalculate(
       location.x,
       location.y,
       viewportWidthTiles,
@@ -187,6 +311,8 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.map.width,
       this.map.height,
     );
+    const offset = this.cameraOffset();
+    const camera = { x: base.x + offset.x, y: base.y + offset.y };
 
     // Camera tiles are anchored by their top-left corner, so without this
     // offset the player's tile sits with its top-left corner at screen

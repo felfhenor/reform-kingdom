@@ -1,6 +1,30 @@
 import { describe, expect, it } from 'vitest';
 
-import { cameraPositionCalculate } from '@helpers/pixi-camera';
+import {
+  cameraBoundsCalculate,
+  cameraOffsetFromDrag,
+  cameraPositionCalculate,
+} from '@helpers/pixi-camera';
+
+describe('cameraBoundsCalculate', () => {
+  it('should extend half a tile past each edge when the map exceeds the viewport', () => {
+    expect(cameraBoundsCalculate(10, 10, 50, 50)).toEqual({
+      minX: -0.5,
+      maxX: 39.5,
+      minY: -0.5,
+      maxY: 39.5,
+    });
+  });
+
+  it('should pin the camera to zero when the map fits entirely in the viewport', () => {
+    expect(cameraBoundsCalculate(20, 20, 10, 10)).toEqual({
+      minX: 0,
+      maxX: 0,
+      minY: 0,
+      maxY: 0,
+    });
+  });
+});
 
 describe('cameraPositionCalculate', () => {
   it('should center the camera on the player away from any edge', () => {
@@ -10,17 +34,17 @@ describe('cameraPositionCalculate', () => {
     });
   });
 
-  it('should clamp to the left/top edge when the player is near the start', () => {
+  it('should clamp half a tile past the left/top edge when the player is near the start', () => {
     expect(cameraPositionCalculate(1, 1, 10, 10, 50, 50)).toEqual({
-      x: 0,
-      y: 0,
+      x: -0.5,
+      y: -0.5,
     });
   });
 
-  it('should clamp to the right/bottom edge when the player is near the end', () => {
+  it('should clamp half a tile past the right/bottom edge when the player is near the end', () => {
     expect(cameraPositionCalculate(49, 49, 10, 10, 50, 50)).toEqual({
-      x: 40,
-      y: 40,
+      x: 39.5,
+      y: 39.5,
     });
   });
 
@@ -29,5 +53,34 @@ describe('cameraPositionCalculate', () => {
       x: 0,
       y: 0,
     });
+  });
+});
+
+describe('cameraOffsetFromDrag', () => {
+  const base = { x: 19, y: 19 };
+  const bounds = { minX: -0.5, maxX: 39.5, minY: -0.5, maxY: 39.5 };
+
+  it('should move the offset opposite the drag direction, in tiles', () => {
+    expect(
+      cameraOffsetFromDrag({ x: 0, y: 0 }, 32, 16, 32, 32, base, bounds),
+    ).toEqual({ x: -1, y: -0.5 });
+  });
+
+  it('should accumulate onto an existing offset', () => {
+    expect(
+      cameraOffsetFromDrag({ x: -1, y: 2 }, -32, 0, 32, 32, base, bounds),
+    ).toEqual({ x: 0, y: 2 });
+  });
+
+  it('should clamp so the base plus offset never exceeds the map bounds', () => {
+    expect(
+      cameraOffsetFromDrag({ x: 0, y: 0 }, -100000, 0, 32, 32, base, bounds),
+    ).toEqual({ x: bounds.maxX - base.x, y: 0 });
+  });
+
+  it('should clamp so the base plus offset never drops below the map bounds', () => {
+    expect(
+      cameraOffsetFromDrag({ x: 0, y: 0 }, 100000, 0, 32, 32, base, bounds),
+    ).toEqual({ x: bounds.minX - base.x, y: 0 });
   });
 });

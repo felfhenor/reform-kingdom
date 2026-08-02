@@ -36,6 +36,7 @@ import {
 import {
   tablerCheck,
   tablerExclamationCircle,
+  tablerFocus,
   tablerPlus,
   tablerSettings,
   tablerX,
@@ -80,4 +81,5 @@ export const ALL_ICONS = {
   tablerX,
   tablerCheck,
   tablerExclamationCircle,
+  tablerFocus,
 };
