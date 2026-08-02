@@ -1,5 +1,16 @@
-import type { TiledLayer, TiledMap, TiledTileset } from '@interfaces';
+import type {
+  TiledLayer,
+  TiledMap,
+  TiledObject,
+  TiledObjectSpriteFrame,
+  TiledTileset,
+} from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
+
+// Tiled's gid flip flags occupy the top 3 bits of the stored gid, so a
+// sprite lookup on a (potentially flipped) object gid needs them masked off
+// first or it will never match a tileset's firstgid range.
+const GID_FLIP_FLAGS_MASK = 0x1fffffff;
 
 export function tiledMapTileLayers(map: TiledMap): TiledLayer[] {
   return map.layers.filter((layer) => layer.type === 'tilelayer');
@@ -44,4 +55,34 @@ export function tiledLayerTileAt(layer: TiledLayer, x: number, y: number): numbe
   if (!layer.data || !layer.width) return 0;
 
   return layer.data[y * layer.width + x] ?? 0;
+}
+
+export function tiledTilesetImagePath(tileset: TiledTileset): string {
+  return tileset.image.replace(/^\.\.\//, '');
+}
+
+export function tiledObjectProperty<T>(
+  object: TiledObject,
+  name: string,
+): T | undefined {
+  return object.properties?.find((property) => property.name === name)
+    ?.value as T | undefined;
+}
+
+export function tiledObjectSpriteFrame(
+  map: TiledMap,
+  object: TiledObject,
+): TiledObjectSpriteFrame | undefined {
+  if (!object.gid) return undefined;
+
+  const gid = object.gid & GID_FLIP_FLAGS_MASK;
+  const tileset = tiledTilesetForGid(map, gid);
+  if (!tileset) return undefined;
+
+  return {
+    imagePath: tiledTilesetImagePath(tileset),
+    imageWidth: tileset.imagewidth,
+    imageHeight: tileset.imageheight,
+    ...tiledTileSourceRect(tileset, gid),
+  };
 }

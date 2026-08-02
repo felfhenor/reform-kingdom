@@ -1,7 +1,10 @@
 import { computed } from '@angular/core';
+import { getEntry } from '@helpers/content';
 import { allMaps } from '@helpers/maps';
 import { tiledMapGetLayer } from '@helpers/tiled-map';
 import type {
+  EncounterContent,
+  EncounterLevelRange,
   GameMap,
   TiledMap,
   TiledObject,
@@ -76,4 +79,30 @@ export function worldNodesOfType(type: WorldNodeType): WorldNodeEntry[] {
   return Object.values(worldNodeLookup().byName).filter(
     (entry) => entry.nodeData.type === type,
   );
+}
+
+export function worldNodeEncounter(
+  entry: WorldNodeEntry,
+): EncounterContent | undefined {
+  return getEntry<EncounterContent>(entry.nodeName);
+}
+
+export function worldNodeLevelRange(
+  entry: WorldNodeEntry,
+): EncounterLevelRange | undefined {
+  return worldNodeEncounter(entry)?.levelRange;
+}
+
+export function worldNodeMonsterCount(entry: WorldNodeEntry): number | undefined {
+  const encounter = worldNodeEncounter(entry);
+  if (!encounter) return undefined;
+
+  return encounter.fights.reduce(
+    (total, fight) => total + fight.monsters.length,
+    0,
+  );
+}
+
+export function worldNodeDescription(entry: WorldNodeEntry): string | undefined {
+  return worldNodeEncounter(entry)?.description;
 }

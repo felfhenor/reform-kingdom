@@ -1,0 +1,26 @@
+@reference 'tailwindcss';
+
+:host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+}
+
+.map-node-panel {
+  width: 22rem;
+  max-width: calc(100% - 2rem);
+}
+
+.node-sprite-frame {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.node-sprite {
+  object-fit: none;
+  image-rendering: pixelated;
+  user-select: none;
+}

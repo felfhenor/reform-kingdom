@@ -42,3 +42,16 @@ export function pixiIndicatorPlayerSpriteCreate(tileSize: number): Graphics {
 
   return graphics;
 }
+
+export function pixiIndicatorNodeSelectionCreate(tileSize: number): Graphics {
+  const graphics = new Graphics().rect(1, 1, tileSize - 2, tileSize - 2).stroke({
+    width: 3,
+    color: 0xfbbf24,
+    alignment: 0.5,
+  });
+
+  graphics.cullable = true;
+  graphics.visible = false;
+
+  return graphics;
+}

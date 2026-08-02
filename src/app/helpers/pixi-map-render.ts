@@ -1,10 +1,12 @@
 import { tiledLayerTileAt } from '@helpers/tiled-map';
 import type {
+  PixiNodeClickHandler,
   TiledLayer,
   TiledMap,
   TiledObject,
   TiledObjectOrientation,
 } from '@interfaces';
+import type { FederatedPointerEvent } from 'pixi.js';
 import { Container, Sprite, type Texture } from 'pixi.js';
 
 /**
@@ -85,6 +87,7 @@ function pixiTiledLayerRender(
 function pixiTiledObjectRender(
   object: TiledObject,
   textures: Record<number, Texture>,
+  onNodeClick?: PixiNodeClickHandler,
 ): Container | undefined {
   if (!object.gid) return undefined;
 
@@ -116,18 +119,33 @@ function pixiTiledObjectRender(
   wrapper.rotation = ((object.rotation ?? 0) * Math.PI) / 180;
   wrapper.cullable = true;
 
+  // Only node objects (Explore Nodes / Other Nodes layers) carry a `type`;
+  // decorative/terrain objects are typeless and should stay unclickable.
+  if (onNodeClick && object.type) {
+    wrapper.eventMode = 'static';
+    wrapper.cursor = 'pointer';
+    wrapper.on('pointertap', (event: FederatedPointerEvent) => {
+      // Stops the tap from also reaching the stage's background handler,
+      // which would otherwise treat this as an empty-map click and
+      // immediately deselect the node this same tap just selected.
+      event.stopPropagation();
+      onNodeClick(object);
+    });
+  }
+
   return wrapper;
 }
 
 function pixiTiledObjectLayerRender(
   layer: TiledLayer,
   textures: Record<number, Texture>,
+  onNodeClick?: PixiNodeClickHandler,
 ): Container {
   const container = new Container();
   container.cullable = true;
 
   (layer.objects ?? []).forEach((object) => {
-    const objectContainer = pixiTiledObjectRender(object, textures);
+    const objectContainer = pixiTiledObjectRender(object, textures, onNodeClick);
     if (objectContainer) container.addChild(objectContainer);
   });
 
@@ -137,6 +155,7 @@ function pixiTiledObjectLayerRender(
 export function pixiTiledMapRender(
   map: TiledMap,
   textures: Record<number, Texture>,
+  onNodeClick?: PixiNodeClickHandler,
 ): Container {
   const container = new Container();
 
@@ -144,7 +163,7 @@ export function pixiTiledMapRender(
     const layerContainer =
       layer.type === 'tilelayer'
         ? pixiTiledLayerRender(layer, textures, map.tilewidth, map.tileheight)
-        : pixiTiledObjectLayerRender(layer, textures);
+        : pixiTiledObjectLayerRender(layer, textures, onNodeClick);
 
     container.addChild(layerContainer);
   });

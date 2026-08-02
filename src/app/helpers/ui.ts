@@ -1,5 +1,5 @@
 import { computed, signal } from '@angular/core';
-import type { GamePlayView, KingdomSubview } from '@interfaces';
+import type { GamePlayView, KingdomSubview, WorldNodeEntry } from '@interfaces';
 
 export function isPageVisible(): boolean {
   return !document.hidden;
@@ -29,6 +29,16 @@ export function kingdomSubviewClear(): void {
 }
 
 export const showReclassHeroesModal = signal<boolean>(false);
+
+export const selectedMapNode = signal<WorldNodeEntry | undefined>(undefined);
+
+export function mapNodeSelect(entry: WorldNodeEntry): void {
+  selectedMapNode.set(entry);
+}
+
+export function mapNodeDeselect(): void {
+  selectedMapNode.set(undefined);
+}
 
 export const isShowingAnyMenu = computed(() => showOptionsMenu());
 

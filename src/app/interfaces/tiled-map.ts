@@ -37,6 +37,16 @@ export type WorldNodeObject =
   | ExploreNodeObject
   | TeleportNodeObject;
 
+export type TiledObjectSpriteFrame = {
+  imagePath: string;
+  imageWidth: number;
+  imageHeight: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type TiledLayer = {
   id: number;
   name: string;
@@ -56,3 +66,5 @@ export type TiledMap = {
   layers: TiledLayer[];
   tilesets: TiledTileset[];
 };
+
+export type PixiNodeClickHandler = (object: TiledObject) => void;

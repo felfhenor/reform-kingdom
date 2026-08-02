@@ -1,7 +1,20 @@
-import type { GameMap, TiledLayer, TiledMap, TiledObject } from '@interfaces';
-import { describe, expect, it } from 'vitest';
+import type {
+  EncounterContent,
+  GameMap,
+  TiledLayer,
+  TiledMap,
+  TiledObject,
+  WorldNodeEntry,
+} from '@interfaces';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { worldNodeMapsBuild } from '@helpers/world-nodes';
+import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import {
+  worldNodeDescription,
+  worldNodeLevelRange,
+  worldNodeMapsBuild,
+  worldNodeMonsterCount,
+} from '@helpers/world-nodes';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {
@@ -120,5 +133,86 @@ describe('worldNodeMapsBuild', () => {
 
     expect(byPosition['Empty']).toBeUndefined();
     expect(byName).toEqual({});
+  });
+});
+
+function buildEntry(nodeData: Partial<TiledObject> = {}): WorldNodeEntry {
+  return {
+    mapName: 'Carrina',
+    x: 24,
+    y: 24,
+    nodeName: 'Forest Ruins',
+    nodeData: buildObject(nodeData),
+  };
+}
+
+function buildEncounter(
+  overrides: Partial<EncounterContent> = {},
+): EncounterContent {
+  return {
+    id: 'encounter-forest-ruins',
+    name: 'Forest Ruins',
+    __type: 'encounter',
+    description: 'A crumbling ruin at the edge of the forest.',
+    levelRange: { min: 1, max: 3 },
+    fights: [],
+    ...overrides,
+  } as EncounterContent;
+}
+
+function seedEncounter(encounter: EncounterContent): void {
+  setAllIdsByName(new Map([[encounter.name, encounter.id]]));
+  setAllContentById(new Map([[encounter.id, encounter]]));
+}
+
+describe('encounter-backed node accessors', () => {
+  beforeEach(() => {
+    setAllIdsByName(new Map());
+    setAllContentById(new Map());
+  });
+
+  describe('worldNodeLevelRange', () => {
+    it("reads the level range from the matching encounter's data", () => {
+      seedEncounter(buildEncounter({ levelRange: { min: 2, max: 5 } }));
+
+      expect(worldNodeLevelRange(buildEntry())).toEqual({ min: 2, max: 5 });
+    });
+
+    it('returns undefined when there is no matching encounter', () => {
+      expect(worldNodeLevelRange(buildEntry())).toBeUndefined();
+    });
+  });
+
+  describe('worldNodeMonsterCount', () => {
+    it('sums the monsters across every fight in the matching encounter', () => {
+      seedEncounter(
+        buildEncounter({
+          fights: [
+            { monsters: [{ monsterId: 'goblin' }] },
+            {
+              monsters: [{ monsterId: 'goblin' }, { monsterId: 'goblin' }],
+            },
+          ],
+        }),
+      );
+
+      expect(worldNodeMonsterCount(buildEntry())).toBe(3);
+    });
+
+    it('returns undefined when there is no matching encounter', () => {
+      expect(worldNodeMonsterCount(buildEntry())).toBeUndefined();
+    });
+  });
+
+  describe('worldNodeDescription', () => {
+    it("reads the description from the matching encounter's data", () => {
+      seedEncounter(buildEncounter({ description: 'Crumbling stones.' }));
+
+      expect(worldNodeDescription(buildEntry())).toBe('Crumbling stones.');
+    });
+
+    it('returns undefined when there is no matching encounter', () => {
+      expect(worldNodeDescription(buildEntry())).toBeUndefined();
+    });
   });
 });

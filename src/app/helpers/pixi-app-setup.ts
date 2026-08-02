@@ -51,15 +51,19 @@ export function pixiResponsiveCanvasSetup(
 export function pixiWorldContainersCreate(app: Application): {
   mapContainer: Container;
   playerIndicatorContainer: Container;
+  nodeSelectionContainer: Container;
 } {
   const mapContainer = new Container();
   const playerIndicatorContainer = new Container();
+  const nodeSelectionContainer = new Container();
 
   app.stage.addChild(mapContainer);
   app.stage.addChild(playerIndicatorContainer);
+  app.stage.addChild(nodeSelectionContainer);
 
   mapContainer.cullable = true;
   playerIndicatorContainer.cullable = false;
+  nodeSelectionContainer.cullable = false;
 
-  return { mapContainer, playerIndicatorContainer };
+  return { mapContainer, playerIndicatorContainer, nodeSelectionContainer };
 }

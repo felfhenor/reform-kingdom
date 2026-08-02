@@ -1,10 +1,6 @@
-import { tiledTileSourceRect } from '@helpers/tiled-map';
+import { tiledTilesetImagePath, tiledTileSourceRect } from '@helpers/tiled-map';
 import type { TiledMap, TiledTileset } from '@interfaces';
 import { Assets, Rectangle, Texture } from 'pixi.js';
-
-function tiledTilesetImagePath(tileset: TiledTileset): string {
-  return tileset.image.replace(/^\.\.\//, '');
-}
 
 export async function pixiTiledTilesetTexturesLoad(
   tileset: TiledTileset,

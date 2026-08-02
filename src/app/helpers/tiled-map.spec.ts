@@ -1,10 +1,12 @@
-import type { TiledLayer, TiledMap, TiledTileset } from '@interfaces';
+import type { TiledLayer, TiledMap, TiledObject, TiledTileset } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 import {
   tiledLayerTileAt,
   tiledMapGetLayer,
   tiledMapTileLayers,
+  tiledObjectProperty,
+  tiledObjectSpriteFrame,
   tiledTilesetForGid,
   tiledTileSourceRect,
 } from '@helpers/tiled-map';
@@ -129,6 +131,107 @@ describe('Tiled Map Helper Functions', () => {
         width: 64,
         height: 64,
       });
+    });
+  });
+
+  describe('tiledObjectProperty', () => {
+    function buildObject(overrides: Partial<TiledObject> = {}): TiledObject {
+      return {
+        id: 1,
+        name: 'Forest Ruins',
+        type: 'ExploreNode',
+        x: 0,
+        y: 0,
+        width: 64,
+        height: 64,
+        visible: true,
+        ...overrides,
+      };
+    }
+
+    it('returns the value of a matching property', () => {
+      const object = buildObject({
+        properties: [{ name: 'level', type: 'int', value: 5 }],
+      });
+
+      expect(tiledObjectProperty<number>(object, 'level')).toBe(5);
+    });
+
+    it('returns undefined when there is no matching property', () => {
+      const object = buildObject({ properties: [] });
+
+      expect(tiledObjectProperty(object, 'level')).toBeUndefined();
+    });
+
+    it('returns undefined when the object has no properties at all', () => {
+      const object = buildObject();
+
+      expect(tiledObjectProperty(object, 'level')).toBeUndefined();
+    });
+  });
+
+  describe('tiledObjectSpriteFrame', () => {
+    it('returns the source rect for the object gid', () => {
+      const tileset = buildTileset();
+      const map = buildMap({ tilesets: [tileset] });
+      const object: TiledObject = {
+        id: 1,
+        name: 'Forest Ruins',
+        type: 'ExploreNode',
+        gid: 26,
+        x: 0,
+        y: 0,
+        width: 64,
+        height: 64,
+        visible: true,
+      };
+
+      expect(tiledObjectSpriteFrame(map, object)).toEqual({
+        imagePath: 'mapdata/maptiles.png',
+        imageWidth: 1600,
+        imageHeight: 1088,
+        x: 0,
+        y: 64,
+        width: 64,
+        height: 64,
+      });
+    });
+
+    it('masks off flip flags before resolving the tileset', () => {
+      const tileset = buildTileset();
+      const map = buildMap({ tilesets: [tileset] });
+      const object: TiledObject = {
+        id: 1,
+        name: 'Forest Ruins',
+        type: 'ExploreNode',
+        gid: 1 | 0x80000000,
+        x: 0,
+        y: 0,
+        width: 64,
+        height: 64,
+        visible: true,
+      };
+
+      expect(tiledObjectSpriteFrame(map, object)).toMatchObject({
+        x: 0,
+        y: 0,
+      });
+    });
+
+    it('returns undefined when the object has no gid', () => {
+      const map = buildMap({ tilesets: [buildTileset()] });
+      const object: TiledObject = {
+        id: 1,
+        name: 'Forest Ruins',
+        type: 'ExploreNode',
+        x: 0,
+        y: 0,
+        width: 64,
+        height: 64,
+        visible: true,
+      };
+
+      expect(tiledObjectSpriteFrame(map, object)).toBeUndefined();
     });
   });
 

@@ -6,28 +6,38 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { MapNodePanelComponent } from '@components/map-node-panel/map-node-panel.component';
 import {
   cameraPositionCalculate,
   currentLocationGet,
   getMap,
   getOption,
   isPlayerAtLocation,
+  mapNodeDeselect,
+  mapNodeSelect,
   pixiAppInitialize,
   pixiGridOverlayCreate,
+  pixiIndicatorNodeSelectionCreate,
   pixiIndicatorPlayerAtLocationCreate,
   pixiIndicatorPlayerSpriteCreate,
   pixiResponsiveCanvasSetup,
   pixiTiledMapRender,
   pixiTiledMapTexturesLoad,
   pixiWorldContainersCreate,
+  selectedMapNode,
+  worldNodeByName,
 } from '@helpers';
-import type { TiledMap } from '@interfaces';
+import type { TiledMap, TiledObject } from '@interfaces';
 import type { Application, Container, Graphics } from 'pixi.js';
 
 @Component({
   selector: 'app-game-play-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<div #pixiContainer class="h-full w-full"></div>`,
+  imports: [MapNodePanelComponent],
+  template: `
+    <div #pixiContainer class="h-full w-full"></div>
+    <app-map-node-panel></app-map-node-panel>
+  `,
   styleUrl: './game-play-world.component.scss',
 })
 export class GamePlayWorldComponent implements OnDestroy {
@@ -41,6 +51,8 @@ export class GamePlayWorldComponent implements OnDestroy {
   private mapContainer?: Container;
   private gridOverlay?: Graphics;
   private playerIndicatorContainer?: Container;
+  private nodeSelectionContainer?: Container;
+  private nodeSelectionIndicator?: Graphics;
   private resizeObserver?: ResizeObserver;
   private playerIndicatorTicker?: () => void;
 
@@ -61,6 +73,12 @@ export class GamePlayWorldComponent implements OnDestroy {
       const showBackdropGrid = getOption('showBackdropGrid');
       if (this.gridOverlay) this.gridOverlay.visible = showBackdropGrid;
     });
+
+    effect(() => {
+      selectedMapNode();
+      if (!this.isPixiSetup()) return;
+      this.positionCamera();
+    });
   }
 
   ngOnDestroy(): void {
@@ -71,6 +89,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.resizeObserver?.disconnect();
     this.mapContainer?.removeChildren();
     this.playerIndicatorContainer?.removeChildren();
+    this.nodeSelectionContainer?.removeChildren();
     this.app?.destroy(true, { children: true, texture: true });
   }
 
@@ -79,6 +98,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!element) return;
 
     this.map = map;
+    mapNodeDeselect();
 
     this.app = await pixiAppInitialize(element, {
       width: element.clientWidth,
@@ -90,20 +110,40 @@ export class GamePlayWorldComponent implements OnDestroy {
     const containers = pixiWorldContainersCreate(this.app);
     this.mapContainer = containers.mapContainer;
     this.playerIndicatorContainer = containers.playerIndicatorContainer;
+    this.nodeSelectionContainer = containers.nodeSelectionContainer;
+
+    // Clicking a node selects it; clicking anywhere else on the map (the
+    // stage background behind everything) deselects it. Node clicks stop
+    // propagation before it reaches this handler - see pixi-map-render.ts.
+    this.app.stage.eventMode = 'static';
+    this.app.stage.hitArea = this.app.screen;
+    this.app.stage.on('pointertap', () => mapNodeDeselect());
 
     this.resizeObserver = pixiResponsiveCanvasSetup(this.app, element, () =>
       this.positionCamera(),
     );
 
     const textures = await pixiTiledMapTexturesLoad(map);
-    this.mapContainer.addChild(pixiTiledMapRender(map, textures));
+    this.mapContainer.addChild(
+      pixiTiledMapRender(map, textures, (object) => this.onNodeClick(object)),
+    );
 
     this.gridOverlay = pixiGridOverlayCreate(map);
     this.gridOverlay.visible = getOption('showBackdropGrid');
     this.mapContainer.addChild(this.gridOverlay);
 
+    this.nodeSelectionIndicator = pixiIndicatorNodeSelectionCreate(
+      map.tilewidth,
+    );
+    this.nodeSelectionContainer.addChild(this.nodeSelectionIndicator);
+
     this.setupPlayerIndicator();
     this.positionCamera();
+  }
+
+  private onNodeClick(object: TiledObject): void {
+    const entry = worldNodeByName(object.name);
+    if (entry) mapNodeSelect(entry);
   }
 
   private setupPlayerIndicator(): void {
@@ -130,6 +170,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       !this.app ||
       !this.mapContainer ||
       !this.playerIndicatorContainer ||
+      !this.nodeSelectionContainer ||
       !this.map
     )
       return;
@@ -166,6 +207,25 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.playerIndicatorContainer.position.set(
       Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
       Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
+    );
+
+    this.positionNodeSelectionIndicator(camera, centerOffsetX, centerOffsetY);
+  }
+
+  private positionNodeSelectionIndicator(
+    camera: { x: number; y: number },
+    centerOffsetX: number,
+    centerOffsetY: number,
+  ): void {
+    if (!this.nodeSelectionIndicator || !this.map) return;
+
+    const selected = selectedMapNode();
+    this.nodeSelectionIndicator.visible = !!selected;
+    if (!selected) return;
+
+    this.nodeSelectionIndicator.position.set(
+      Math.round((selected.x - camera.x) * this.map.tilewidth + centerOffsetX),
+      Math.round((selected.y - camera.y) * this.map.tileheight + centerOffsetY),
     );
   }
 }
