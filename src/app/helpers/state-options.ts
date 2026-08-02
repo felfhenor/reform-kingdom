@@ -22,6 +22,8 @@ export function defaultOptions(): GameOptions {
 
     gameloopPaused: false,
     optionsTab: 'UI',
+
+    showBackdropGrid: false,
   };
 }
 

@@ -10,8 +10,10 @@ import {
   cameraPositionCalculate,
   currentLocationGet,
   getMap,
+  getOption,
   isPlayerAtLocation,
   pixiAppInitialize,
+  pixiGridOverlayCreate,
   pixiIndicatorPlayerAtLocationCreate,
   pixiIndicatorPlayerSpriteCreate,
   pixiResponsiveCanvasSetup,
@@ -20,7 +22,7 @@ import {
   pixiWorldContainersCreate,
 } from '@helpers';
 import type { TiledMap } from '@interfaces';
-import type { Application, Container } from 'pixi.js';
+import type { Application, Container, Graphics } from 'pixi.js';
 
 @Component({
   selector: 'app-game-play-world',
@@ -37,6 +39,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private app?: Application;
   private map?: TiledMap;
   private mapContainer?: Container;
+  private gridOverlay?: Graphics;
   private playerIndicatorContainer?: Container;
   private resizeObserver?: ResizeObserver;
   private playerIndicatorTicker?: () => void;
@@ -52,6 +55,11 @@ export class GamePlayWorldComponent implements OnDestroy {
 
       this.isPixiSetup.set(true);
       void this.initPixi(map);
+    });
+
+    effect(() => {
+      const showBackdropGrid = getOption('showBackdropGrid');
+      if (this.gridOverlay) this.gridOverlay.visible = showBackdropGrid;
     });
   }
 
@@ -89,6 +97,10 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     const textures = await pixiTiledMapTexturesLoad(map);
     this.mapContainer.addChild(pixiTiledMapRender(map, textures));
+
+    this.gridOverlay = pixiGridOverlayCreate(map);
+    this.gridOverlay.visible = getOption('showBackdropGrid');
+    this.mapContainer.addChild(this.gridOverlay);
 
     this.setupPlayerIndicator();
     this.positionCamera();

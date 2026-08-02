@@ -27,6 +27,7 @@ export * from './notify';
 export * from './party';
 export * from './pixi-app-setup';
 export * from './pixi-camera';
+export * from './pixi-grid';
 export * from './pixi-indicators';
 export * from './pixi-map-render';
 export * from './pixi-texture-loader';

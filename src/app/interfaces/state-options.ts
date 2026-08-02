@@ -7,7 +7,8 @@ export type GameOption =
   | 'debugAllowBackgroundOperations'
   | 'sfxPlay'
   | 'bgmPlay'
-  | 'gameloopPaused';
+  | 'gameloopPaused'
+  | 'showBackdropGrid';
 
 export type NotificationCategory = 'Error' | 'Success';
 
