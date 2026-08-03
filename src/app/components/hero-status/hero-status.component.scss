@@ -1,0 +1,107 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block pointer-events-none;
+}
+
+.hero-status {
+  @apply flex gap-2 pointer-events-auto;
+}
+
+.hero-entry {
+  @apply flex flex-col items-center bg-black/60 border border-black/50 rounded;
+  width: 40px;
+  padding: 2px;
+  gap: 2px;
+  transition:
+    width 150ms ease,
+    padding 150ms ease;
+
+  &.dead {
+    filter: grayscale(1);
+    opacity: 0.6;
+  }
+
+  &.expanded {
+    @apply items-stretch;
+    width: 190px;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+}
+
+.hero-top {
+  @apply flex flex-row items-center;
+  gap: 6px;
+}
+
+.hero-sprite {
+  @apply relative overflow-hidden shrink-0;
+  width: 32px;
+  height: 32px;
+
+  app-icon-job {
+    display: block;
+    transform: scale(0.5);
+    transform-origin: top left;
+  }
+}
+
+.hero-entry.expanded .hero-sprite {
+  width: 64px;
+  height: 64px;
+
+  app-icon-job {
+    transform: scale(1);
+  }
+}
+
+.hero-details {
+  @apply flex flex-col justify-center text-white overflow-hidden;
+}
+
+.hero-name {
+  @apply font-semibold truncate text-xs;
+}
+
+.hero-level {
+  @apply opacity-80 truncate;
+  font-size: 0.65rem;
+}
+
+.hero-bars {
+  @apply flex flex-col w-full;
+  gap: 2px;
+}
+
+.bar {
+  @apply relative w-full bg-black/70 rounded-sm overflow-hidden;
+  height: 10px;
+
+  &.small {
+    height: 4px;
+  }
+}
+
+.bar-inner {
+  @apply h-full;
+  transition: width 200ms ease;
+}
+
+.bar-hp .bar-inner {
+  background-color: #dc2626;
+}
+
+.bar-xp .bar-inner {
+  background-color: #16a34a;
+}
+
+.bar-label {
+  @apply absolute inset-0 flex items-center justify-center text-white;
+  font-size: 0.6rem;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
