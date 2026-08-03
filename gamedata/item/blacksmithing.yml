@@ -1,0 +1,11 @@
+- id: f251e6ea-bfc1-4562-b31a-492ec04d3c9f
+  name: Copper Ore
+  description: A weak kind of ore used for basic gear crafting.
+
+  sprite: '0002'
+
+- id: 0d5a25d4-b10b-42bf-aa6d-3c5c856e1fd0
+  name: Copper Ingot
+  description: An ingot of copper, used for basic gear crafting.
+
+  sprite: '0003'
