@@ -1,4 +1,5 @@
 import { computed, signal } from '@angular/core';
+import { localStorageSignal } from '@helpers/signal';
 import type { GamePlayView, KingdomSubview, WorldNodeEntry } from '@interfaces';
 
 export function isPageVisible(): boolean {
@@ -12,13 +13,19 @@ export const showAnySubmenu = signal<boolean>(false);
 
 export const showOptionsMenu = signal<boolean>(false);
 
-export const gamePlayView = signal<GamePlayView>('world');
+export const gamePlayView = localStorageSignal<GamePlayView>(
+  'gamePlayView',
+  'world',
+);
 
 export function setGamePlayView(view: GamePlayView): void {
   gamePlayView.set(view);
 }
 
-export const kingdomSubview = signal<KingdomSubview | undefined>(undefined);
+export const kingdomSubview = localStorageSignal<KingdomSubview | undefined>(
+  'kingdomSubview',
+  undefined,
+);
 
 export function kingdomSubviewShow(subview: KingdomSubview): void {
   kingdomSubview.set(subview);
