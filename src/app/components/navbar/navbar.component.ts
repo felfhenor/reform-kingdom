@@ -26,6 +26,8 @@ import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
+import { ResourceBarComponent } from '@components/resource-bar/resource-bar.component';
+
 @Component({
   selector: 'app-navbar',
   imports: [
@@ -40,8 +42,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ModalComponent,
     ButtonQuitComponent,
     ButtonSettingsComponent,
+    ResourceBarComponent,
   ],
-  providers: [],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
 })
