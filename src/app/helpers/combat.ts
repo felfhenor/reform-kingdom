@@ -85,11 +85,7 @@ function combatantTakeTurn(
 
       combatUnapplyAllStatusEffects(combat, combatant);
     } else {
-      combatMessageLog(
-        combat,
-        `**${combatant.name}** is dead, skipping turn.`,
-        combatant,
-      );
+      combatMessageLog(combat, `**${combatant.name}** is dead, skipping turn.`);
       return {};
     }
   }
@@ -97,16 +93,16 @@ function combatantTakeTurn(
   combatHandleCombatantStatusEffects(combat, combatant, 'TurnStart');
 
   if (combatantIsDead(combatant)) {
-    combatMessageLog(combat, `**${combatant.name}** has died!`, combatant);
+    combatMessageLog(
+      combat,
+      `**${combatant.name}** has been defeated!`,
+      combatant,
+    );
     return {};
   }
 
   if (!combatCanTakeTurn(combatant)) {
-    combatMessageLog(
-      combat,
-      `**${combatant.name}** lost their turn!`,
-      combatant,
-    );
+    combatMessageLog(combat, `**${combatant.name}** lost their turn!`);
     return {};
   }
 
@@ -121,7 +117,6 @@ function combatantTakeTurn(
     combatMessageLog(
       combat,
       `**${combatant.name}** has no skills available, skipping turn.`,
-      combatant,
     );
     return {};
   }
@@ -161,7 +156,6 @@ function combatantTakeTurn(
         combatMessageLog(
           combat,
           `**${chosenSkill.name}** misses **${target.name}**!`,
-          combatant,
         );
         return;
       }
@@ -182,11 +176,7 @@ function combatantTakeTurn(
       );
 
       if (shouldApplyAgain && !combatantIsDead(target)) {
-        combatMessageLog(
-          combat,
-          `**${chosenSkill.name}** strikes again!`,
-          combatant,
-        );
+        combatMessageLog(combat, `**${chosenSkill.name}** strikes again!`);
 
         combatApplySkillToTarget(
           combat,
@@ -203,7 +193,11 @@ function combatantTakeTurn(
   combatHandleCombatantStatusEffects(combat, combatant, 'TurnEnd');
 
   if (combatantIsDead(combatant)) {
-    combatMessageLog(combat, `**${combatant.name}** has died!`, combatant);
+    combatMessageLog(
+      combat,
+      `**${combatant.name}** has been defeated!`,
+      combatant,
+    );
     return {};
   }
 
@@ -240,7 +234,6 @@ export function combatDoCombatIteration(): void {
       combatMessageLog(
         combat,
         `**${char.name}** was blessed by the elements, and gets to go again!`,
-        char,
       );
       combatantTakeTurn(combat, char);
     }

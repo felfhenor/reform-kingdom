@@ -1,6 +1,8 @@
 import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
+import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
+import { globalEffectsProcessTick } from '@helpers/global-effects';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
 import { isSetup } from '@helpers/setup';
@@ -13,6 +15,7 @@ import {
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { timerLastSaveTick, timerTicksElapsed } from '@helpers/timer';
+import { travelProcessTick } from '@helpers/travel';
 import { clamp } from 'es-toolkit/compat';
 
 export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
@@ -39,14 +42,26 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
   timer.startTimer('gameloop');
 
-  // TODO: game logic (lol)
+  // Tick the clock forward one tick at a time (rather than one bulk `+=
+  // numTicks`) so tick-driven systems below - travel progress, global effect
+  // expiry, combat rounds - see an accurate `timerTicksElapsed()` as they
+  // process each tick, instead of all `numTicks` iterations seeing the same
+  // pre-batch clock value.
+  for (let i = 0; i < numTicks; i++) {
+    updateGamestate((state) => {
+      state.clock.numTicks += 1;
+      return state;
+    });
+
+    travelProcessTick();
+    globalEffectsProcessTick();
+
+    if (currentCombat()) {
+      combatDoCombatIteration();
+    }
+  }
 
   timer.dumpTimers((timers) => debug('Gameloop:Timers', timers));
-
-  updateGamestate((state) => {
-    state.clock.numTicks += numTicks;
-    return state;
-  });
 
   gamestateTickEnd();
 

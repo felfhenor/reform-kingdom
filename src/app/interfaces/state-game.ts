@@ -3,6 +3,7 @@ import type { Combat } from '@interfaces/combat';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { Branded } from '@interfaces/identifiable';
+import type { TravelState } from '@interfaces/travel';
 
 export type GameId = Branded<string, 'GameId'>;
 
@@ -16,6 +17,7 @@ export type GameStateWorld = {
   party: Character[];
   combat?: Combat;
   currentLocation: CurrentLocation;
+  travel: TravelState;
 };
 
 export type MaterialId = ItemId;

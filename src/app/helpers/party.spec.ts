@@ -21,7 +21,13 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { getEntry } from '@helpers/content';
-import { characterReclass, createCharacter, partyGet, setParty } from '@helpers/party';
+import {
+  characterReclass,
+  createCharacter,
+  healingTicksForLevel,
+  partyGet,
+  setParty,
+} from '@helpers/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
 describe('Party Helper Functions', () => {
@@ -181,6 +187,18 @@ describe('Party Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.world.party[1]).toEqual(spoorle);
+    });
+  });
+
+  describe('healingTicksForLevel', () => {
+    it('returns a 10 second minimum plus twice the highest member level', () => {
+      expect(
+        healingTicksForLevel([{ level: 3 }, { level: 7 }, { level: 2 }]),
+      ).toBe(24);
+    });
+
+    it('defaults to a minimum level of 1 for an empty party', () => {
+      expect(healingTicksForLevel([])).toBe(12);
     });
   });
 

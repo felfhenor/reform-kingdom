@@ -6,12 +6,18 @@ import {
   inject,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import {
+  canPartyTravel,
   getMap,
   mapNodeDeselect,
   selectedMapNode,
+  TICKS_PER_STEP_MOVE,
   tiledObjectSpriteFrame,
+  travelPathTo,
+  travelStart,
   worldNodeDescription,
+  worldNodeEncounterCount,
   worldNodeLevelRange,
   worldNodeMonsterCount,
 } from '@helpers';
@@ -20,7 +26,7 @@ import type { TiledMap } from '@interfaces';
 @Component({
   selector: 'app-map-node-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonCloseComponent],
+  imports: [ButtonCloseComponent, SFXDirective],
   templateUrl: './map-node-panel.component.html',
   styleUrl: './map-node-panel.component.scss',
   host: {
@@ -52,6 +58,11 @@ export class MapNodePanelComponent {
       : `${levelRange.min}–${levelRange.max}`;
   });
 
+  public encounterCount = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeEncounterCount(entry) : undefined;
+  });
+
   public monsterCount = computed(() => {
     const entry = this.node();
     return entry ? worldNodeMonsterCount(entry) : undefined;
@@ -61,6 +72,36 @@ export class MapNodePanelComponent {
     const entry = this.node();
     return entry ? worldNodeDescription(entry) : undefined;
   });
+
+  private travelPath = computed(() => {
+    const entry = this.node();
+    return entry ? travelPathTo(entry.nodeName) : undefined;
+  });
+
+  public travelSeconds = computed(() => {
+    const path = this.travelPath();
+    if (!path) return undefined;
+
+    return (
+      path.filter((step) => step.kind === 'Move').length * TICKS_PER_STEP_MOVE
+    );
+  });
+
+  public isAtNode = computed(() => this.travelPath()?.length === 0);
+
+  public canTravelHere = computed(() => {
+    const path = this.travelPath();
+    return !!path && path.length > 0 && canPartyTravel();
+  });
+
+  public travel(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    if (travelStart(entry.nodeName)) {
+      this.close();
+    }
+  }
 
   public close(): void {
     mapNodeDeselect();

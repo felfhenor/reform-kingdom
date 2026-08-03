@@ -7,3 +7,28 @@
 .recenter-button {
   @apply absolute bottom-4 right-4;
 }
+
+.fade-overlay {
+  @apply absolute inset-0 pointer-events-none bg-black opacity-0;
+  transition: opacity 300ms ease;
+  z-index: 10;
+
+  &.visible {
+    @apply opacity-100;
+  }
+}
+
+.death-overlay {
+  @apply absolute inset-0 pointer-events-none bg-gray-500 opacity-0;
+  transition: opacity 300ms ease;
+  z-index: 9;
+
+  &.visible {
+    @apply opacity-50;
+  }
+}
+
+.global-effect-bar {
+  @apply absolute top-0 left-0 right-0;
+  z-index: 11;
+}

@@ -1,10 +1,12 @@
+import type { HasSprite } from '@interfaces/artable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
 export type GlobalEffectId = Branded<string, 'GlobalEffectId'>;
 
 export type GlobalEffectContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  HasSprite & {
     id: GlobalEffectId;
     __type: 'globaleffect';
   };

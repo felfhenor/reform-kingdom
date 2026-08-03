@@ -19,7 +19,7 @@
 
 - id: c6e4119c-b365-4de1-a952-5bf86f7ff173
   name: Forest Ruins
-  description: A crumbling ruin at the edge of the forest, picked over by goblins.
+  description: A dilapidated ruin in the forest, home to a small goblin tribe.
 
   levelRange:
     min: 1
@@ -32,6 +32,21 @@
         - monsterId: Goblin
         - monsterId: Goblin
     - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin
+
+- id: a08cd1a5-5f7d-464f-bd95-9a9ca98df86d
+  name: Mired Ruins
+  description: A goblin tribe far stronger than its kin has made this sunken ruin its den.
+
+  levelRange:
+    min: 10
+    max: 10
+
+  fights:
+    - monsters:
+        - monsterId: Goblin
         - monsterId: Goblin
         - monsterId: Goblin
         - monsterId: Goblin

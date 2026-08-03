@@ -1,4 +1,10 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
+import {
+  ApplicationRef,
+  effect,
+  inject,
+  Injectable,
+  signal,
+} from '@angular/core';
 import {
   gameloop,
   gamestate,
@@ -19,6 +25,7 @@ import { interval } from 'rxjs';
 export class GamestateService {
   private logger = inject(LoggerService);
   private contentService = inject(ContentService);
+  private applicationRef = inject(ApplicationRef);
 
   public hasLoaded = signal<boolean>(false);
 
@@ -58,12 +65,22 @@ export class GamestateService {
   private doGameloop() {
     let lastRunTime = 0;
 
-    function runLoop(numTicks: number) {
+    const applicationRef = this.applicationRef;
+
+    // `gameloop` mutates gamestate signals from a background RxJS interval,
+    // outside any Angular-tracked call stack. In this zoneless app nothing
+    // else notices that write happened, so templates/effects reading that
+    // state (health bars, global effect timers, etc.) can silently go stale
+    // until something else happens to trigger change detection. Forcing a
+    // tick here after every gameloop batch is the documented escape hatch
+    // for exactly this "background async work changed signals" case.
+    async function runLoop(numTicks: number) {
       lastRunTime = Date.now();
-      gameloop(numTicks);
+      await gameloop(numTicks);
+      applicationRef.tick();
     }
 
-    runLoop(1);
+    void runLoop(1);
 
     interval(1000).subscribe(() => {
       if (lastRunTime <= 0 || !this.hasLoaded()) return;

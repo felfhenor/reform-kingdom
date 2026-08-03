@@ -79,6 +79,28 @@ export function syncPartyHpFromCombat(heroes: Combatant[]): void {
   });
 }
 
+export function healPartyToFull(): void {
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((character) => ({
+      ...character,
+      hp: character.stats.Health,
+    }));
+
+    return state;
+  });
+}
+
+const HEALING_MINIMUM_SECONDS = 10;
+const HEALING_SECONDS_PER_LEVEL = 2;
+
+// A flat 10-second minimum recovery period, plus ~2 ticks (roughly 2 seconds
+// at 1x speed) of global healing per hero level on top of it. See M1-09 in
+// the roadmap for the eventual per-hero healing-timer design.
+export function healingTicksForLevel(members: { level: number }[]): number {
+  const highestLevel = Math.max(...members.map((member) => member.level), 1);
+  return HEALING_MINIMUM_SECONDS + highestLevel * HEALING_SECONDS_PER_LEVEL;
+}
+
 export function partyGainXp(amount: number): void {
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => ({

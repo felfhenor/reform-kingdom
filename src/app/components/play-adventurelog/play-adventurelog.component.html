@@ -1,0 +1,23 @@
+<app-card-page heightProfile="full">
+  <span header>Adventure Log</span>
+
+  <div class="flex flex-col gap-2 p-4 h-full overflow-y-auto">
+    @for (entry of entries(); track entry.messageId) {
+      <div class="flex gap-2 text-sm">
+        <span
+          class="opacity-60 shrink-0 w-[150px]"
+          [tp]="timestampTooltip(entry.timestamp)"
+        >
+          {{ entry.timestamp | timeago }}
+        </span>
+        <span class="opacity-60 shrink-0">[{{ entry.locationName }}]</span>
+        <span
+          [class]="messageColor(entry)"
+          [innerHTML]="messageHtml(entry.message)"
+        ></span>
+      </div>
+    } @empty {
+      <div class="p-4 italic opacity-70">Nothing has happened yet.</div>
+    }
+  </div>
+</app-card-page>

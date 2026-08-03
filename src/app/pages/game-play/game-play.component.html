@@ -13,6 +13,10 @@
     class="absolute inset-0"
     [class.hidden]="activeGamePlayView() !== 'kingdom'"
   ></app-game-play-kingdom>
+  <app-play-adventurelog
+    class="absolute inset-0"
+    [class.hidden]="activeGamePlayView() !== 'adventurelog'"
+  ></app-play-adventurelog>
 </div>
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

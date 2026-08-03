@@ -178,7 +178,7 @@ export function combatApplySkillToTarget(
 
   if (technique.combatMessage) {
     const message = combatFormatMessage(technique.combatMessage, templateData);
-    combatMessageLog(combat, message, combatant);
+    combatMessageLog(combat, message, target);
   }
 
   if (retaliationDamage > 0) {
@@ -214,10 +214,6 @@ export function combatApplySkillToTarget(
   });
 
   if (combatantIsDead(target)) {
-    combatMessageLog(
-      combat,
-      `**${target.name}** has been defeated!`,
-      combatant,
-    );
+    combatMessageLog(combat, `**${target.name}** has been defeated!`);
   }
 }

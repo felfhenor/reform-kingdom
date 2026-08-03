@@ -1,15 +1,19 @@
+import { pluralize } from '@boringnode/pluralize';
 import { combatReset, currentCombat } from '@helpers/combat';
 import { combatMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
-import { addGlobalEffect } from '@helpers/global-effects';
+import { encounterStartFight } from '@helpers/encounter';
 import { addMaterial } from '@helpers/materials';
 import { monsterDroppedItemRewards, monsterXpReward } from '@helpers/monster';
 import { partyGainXp, syncPartyHpFromCombat } from '@helpers/party';
+import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
   Combat,
   Combatant,
-  GlobalEffectId,
+  EncounterContent,
+  EncounterId,
   ItemContent,
+  ItemId,
   MonsterContent,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
@@ -61,39 +65,72 @@ function grantVictoryRewards(combat: Combat): void {
     combatMessageLog(combat, `The party gained ${totalXp} XP!`);
   }
 
-  monsters.forEach(({ monster, level }) => {
-    monsterDroppedItemRewards(monster, level).forEach(({ itemId, quantity }) => {
-      addMaterial(itemId, quantity);
+  const itemsFound: Record<ItemId, number> = {};
 
-      const item = getEntry<ItemContent>(itemId);
-      combatMessageLog(
-        combat,
-        `The party found ${quantity} ${item?.name ?? 'items'}!`,
-      );
-    });
+  monsters.forEach(({ monster, level }) => {
+    monsterDroppedItemRewards(monster, level).forEach(
+      ({ itemId, quantity }) => {
+        itemsFound[itemId] = (itemsFound[itemId] ?? 0) + quantity;
+      },
+    );
+  });
+
+  Object.keys(itemsFound).forEach((itemId) => {
+    const quantity = itemsFound[itemId as ItemId];
+    if (quantity <= 0) return;
+
+    addMaterial(itemId as ItemId, quantity);
+
+    const item = getEntry<ItemContent>(itemId);
+    const itemName = pluralize(item?.name?.toLowerCase() ?? 'item');
+    combatMessageLog(combat, `The party found ${quantity} ${itemName}!`);
   });
 }
 
-function handleCombatVictory(combat: Combat): void {
+// The fight after this one within the same encounter, if there is one -
+// encounters can chain several escalating fights (see gamedata/encounter).
+function nextFightFor(
+  combat: Combat,
+): { encounterId: EncounterId; fightIndex: number } | undefined {
+  if (combat.encounterId === undefined || combat.fightIndex === undefined) {
+    return undefined;
+  }
+
+  const encounter = getEntry<EncounterContent>(combat.encounterId);
+  if (!encounter) return undefined;
+
+  const fightIndex = combat.fightIndex + 1;
+  if (fightIndex >= encounter.fights.length) return undefined;
+
+  return { encounterId: combat.encounterId, fightIndex };
+}
+
+// Returns true if another fight in the same encounter was started - callers
+// must not reset combat state in that case, since it would immediately wipe
+// out the fight `encounterStartFight` just wrote to `state.world.combat`.
+function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
 
   syncPartyHpFromCombat(combat.heroes);
   grantVictoryRewards(combat);
-}
 
-// ~2 ticks (roughly 2 seconds at 1x speed) of global healing per hero level.
-// See M1-09 in the roadmap for the eventual per-hero healing-timer design.
-function healingTicksForParty(combat: Combat): number {
-  const highestLevel = Math.max(...combat.heroes.map((hero) => hero.level), 1);
-  return highestLevel * 2;
+  const nextFight = nextFightFor(combat);
+  if (!nextFight) return false;
+
+  encounterStartFight(
+    nextFight.encounterId,
+    nextFight.fightIndex,
+    combat.locationName,
+  );
+  return true;
 }
 
 export function combatHandleDefeat(combat: Combat): void {
   combatMessageLog(combat, 'Heroes have lost the combat!');
-  combatMessageLog(combat, 'Heroes have been sent home for recovery!');
+  combatMessageLog(combat, 'The fallen party awaits recall to the kingdom.');
 
   syncPartyHpFromCombat(combat.heroes);
-  addGlobalEffect('Healing' as GlobalEffectId, healingTicksForParty(combat));
+  travelBeginDeathsDoor();
 }
 
 export function combatCheckIfOver(combat: Combat): boolean {
@@ -101,13 +138,16 @@ export function combatCheckIfOver(combat: Combat): boolean {
 
   combatMessageLog(combat, 'Combat is over.');
 
+  let continuingEncounter = false;
   if (didHeroesWin(combat)) {
-    handleCombatVictory(combat);
+    continuingEncounter = handleCombatVictory(combat);
   } else {
     combatHandleDefeat(combat);
   }
 
-  combatReset();
+  if (!continuingEncounter) {
+    combatReset();
+  }
 
   combatMessageLog(combat, '');
 

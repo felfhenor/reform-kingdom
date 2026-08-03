@@ -37,3 +37,34 @@ export async function pixiTiledMapTexturesLoad(
 
   return Object.assign({}, ...textureSets);
 }
+
+// Slices `frameCount` consecutive `frame`-sized frames (left to right, same
+// row) out of a spritesheet image, matching the atlas layout convention
+// `AtlasAnimationComponent` uses for CSS-driven job/hero animations - here
+// used to build an `AnimatedSprite`'s texture frames instead.
+export async function pixiSpriteFrameTexturesLoad(
+  imageUrl: string,
+  frame: { x: number; y: number; width: number; height: number },
+  frameCount: number,
+): Promise<Texture[]> {
+  const baseTexture = await Assets.load(imageUrl);
+  baseTexture.source.scaleMode = 'nearest';
+
+  const textures: Texture[] = [];
+
+  for (let i = 0; i < frameCount; i++) {
+    textures.push(
+      new Texture({
+        source: baseTexture.source,
+        frame: new Rectangle(
+          frame.x + i * frame.width,
+          frame.y,
+          frame.width,
+          frame.height,
+        ),
+      }),
+    );
+  }
+
+  return textures;
+}

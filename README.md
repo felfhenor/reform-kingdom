@@ -20,4 +20,10 @@
 - [ngx-toastr](https://ngx-toastr.vercel.app/) (for notifications)
 - [SweetAlert2](https://github.com/sweetalert2/ngx-sweetalert2) (for alerts)
 
+## Assets
+
+- SpellBook Megapack - global effect icons
+- Admurins Items Mega Pack - item icons
+- Oryx Ultimate Fantasy - sprite sheets for characters and enemies
+
 ## Good-To-Knows

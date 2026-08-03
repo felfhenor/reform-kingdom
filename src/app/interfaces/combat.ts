@@ -1,4 +1,5 @@
 import type { HasAnimation } from '@interfaces/artable';
+import type { EncounterId } from '@interfaces/content-encounter';
 import type {
   EquipmentSkill,
   EquipmentSkillId,
@@ -74,4 +75,7 @@ export type Combat = {
   guardians: Combatant[];
 
   elementalModifiers: ElementBlock;
+
+  encounterId?: EncounterId;
+  fightIndex?: number;
 };

@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { GamePlayKingdomComponent } from '@components/game-play-kingdom/game-play-kingdom.component';
 import { GamePlayWorldComponent } from '@components/game-play-world/game-play-world.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
+import { PlayAdventureLogComponent } from '@components/play-adventurelog/play-adventurelog.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { gamePlayView, getOption } from '@helpers';
 
@@ -14,6 +15,7 @@ import { gamePlayView, getOption } from '@helpers';
     TeleportOutletDirective,
     GamePlayWorldComponent,
     GamePlayKingdomComponent,
+    PlayAdventureLogComponent,
   ],
   templateUrl: './game-play.component.html',
   styleUrl: './game-play.component.scss',

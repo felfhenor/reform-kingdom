@@ -6,6 +6,7 @@ import type {
   GameId,
   GameState,
   StatBlock,
+  TravelState,
 } from '@interfaces';
 
 export function defaultGameState(): GameState {
@@ -28,9 +29,18 @@ export function defaultGameState(): GameState {
         x: 24,
         y: 24,
       },
+      travel: defaultTravelState(),
     },
     materials: {},
     globalEffects: [],
+  };
+}
+
+export function defaultTravelState(): TravelState {
+  return {
+    status: 'Idle',
+    path: [],
+    ticksIntoStep: 0,
   };
 }
 

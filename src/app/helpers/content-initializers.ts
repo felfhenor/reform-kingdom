@@ -155,6 +155,7 @@ function ensureGlobalEffect(
     id: effect.id ?? ('UNKNOWN' as GlobalEffectId),
     name: effect.name ?? 'UNKNOWN',
     __type: 'globaleffect',
+    sprite: effect.sprite ?? 'UNKNOWN',
     description: effect.description ?? 'UNKNOWN',
   };
 }

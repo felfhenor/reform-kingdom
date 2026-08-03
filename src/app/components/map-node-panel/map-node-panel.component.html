@@ -11,7 +11,9 @@
                 class="node-sprite"
                 [style.width.px]="frame.width"
                 [style.height.px]="frame.height"
-                [style.object-position]="'-' + frame.x + 'px -' + frame.y + 'px'"
+                [style.object-position]="
+                  '-' + frame.x + 'px -' + frame.y + 'px'
+                "
                 draggable="false"
               />
             }
@@ -25,14 +27,35 @@
 
       <div class="flex gap-2 text-sm">
         <div class="badge badge-outline">Level {{ levelLabel() }}</div>
-        <div class="badge badge-outline">
-          Monsters {{ monsterCount() ?? '—' }}
-        </div>
+
+        @let encounters = encounterCount();
+        @let monsters = monsterCount();
+
+        @if (encounters) {
+          <div class="badge badge-outline">{{ encounters }} Encounters</div>
+        }
+
+        @if (monsters) {
+          <div class="badge badge-outline">{{ monsters }} Monsters</div>
+        }
       </div>
 
       <p class="text-sm opacity-80">
         {{ description() ?? 'No information available yet.' }}
       </p>
+
+      @if (!isAtNode()) {
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          [disabled]="!canTravelHere()"
+          (click)="travel()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Travel ({{ travelSeconds() ?? '—' }}s)
+        </button>
+      }
     </div>
   </div>
 }

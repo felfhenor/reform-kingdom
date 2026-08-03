@@ -93,7 +93,18 @@ export function worldNodeLevelRange(
   return worldNodeEncounter(entry)?.levelRange;
 }
 
-export function worldNodeMonsterCount(entry: WorldNodeEntry): number | undefined {
+export function worldNodeEncounterCount(
+  entry: WorldNodeEntry,
+): number | undefined {
+  const encounter = worldNodeEncounter(entry);
+  if (!encounter) return undefined;
+
+  return encounter.fights.length;
+}
+
+export function worldNodeMonsterCount(
+  entry: WorldNodeEntry,
+): number | undefined {
   const encounter = worldNodeEncounter(entry);
   if (!encounter) return undefined;
 
@@ -103,6 +114,8 @@ export function worldNodeMonsterCount(entry: WorldNodeEntry): number | undefined
   );
 }
 
-export function worldNodeDescription(entry: WorldNodeEntry): string | undefined {
+export function worldNodeDescription(
+  entry: WorldNodeEntry,
+): string | undefined {
   return worldNodeEncounter(entry)?.description;
 }

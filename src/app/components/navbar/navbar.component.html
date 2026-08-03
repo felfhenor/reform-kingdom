@@ -23,6 +23,17 @@
         >
           World
         </button>
+
+        <button
+          class="btn btn-xs btn-info"
+          [class.btn-outline]="activeGamePlayView() !== 'adventurelog'"
+          (click)="changeGamePlayView('adventurelog')"
+          appSfx="ui-click"
+          [sfxOffset]="2"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Adventure Log
+        </button>
       </li>
     </ul>
   </div>

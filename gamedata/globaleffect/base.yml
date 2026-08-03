@@ -1,3 +1,9 @@
+- id: 86dfce1f-2ef2-4a2c-839f-56e217294892
+  name: Deaths Door
+  sprite: '0000'
+  description: The fallen party is stumbling back toward the kingdom.
+
 - id: 7c1e9c5a-9f3e-4b7d-8f0d-6b6a4a6d0a11
   name: Healing
+  sprite: '0001'
   description: The party is recovering from a difficult battle.

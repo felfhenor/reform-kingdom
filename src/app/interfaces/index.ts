@@ -26,5 +26,6 @@ export * from './state-game';
 export * from './state-options';
 export * from './tiled-map';
 export * from './traits';
+export * from './travel';
 export * from './ui';
 export * from './world-nodes';

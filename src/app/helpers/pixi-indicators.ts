@@ -1,4 +1,5 @@
-import { Graphics } from 'pixi.js';
+import type { Texture } from 'pixi.js';
+import { AnimatedSprite, Graphics } from 'pixi.js';
 
 export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   graphics: Graphics;
@@ -33,22 +34,47 @@ export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   return { graphics, ticker };
 }
 
-export function pixiIndicatorPlayerSpriteCreate(tileSize: number): Graphics {
-  const graphics = new Graphics()
-    .circle(tileSize / 2, tileSize / 2, tileSize / 3)
-    .fill(0x3b82f6);
+// The party's token while it's traveling between locations. Renders the lead
+// hero's job walk-cycle (animates itself via Ticker.shared once playing, no
+// manual ticker needed) - falls back to a plain circle if no sprite frames
+// could be resolved (e.g. content not yet loaded).
+export function pixiIndicatorPlayerSpriteCreate(
+  tileSize: number,
+  frameTextures: Texture[],
+): AnimatedSprite | Graphics {
+  if (frameTextures.length === 0) {
+    const graphics = new Graphics()
+      .circle(tileSize / 2, tileSize / 2, tileSize / 3)
+      .fill(0x3b82f6);
 
-  graphics.cullable = true;
+    graphics.cullable = true;
+    return graphics;
+  }
 
-  return graphics;
+  const sprite = new AnimatedSprite({
+    textures: frameTextures,
+    animationSpeed: 0.2,
+    autoPlay: true,
+  });
+
+  sprite.anchor.set(0.5, 0.5);
+  sprite.x = tileSize / 2;
+  sprite.y = tileSize / 2;
+  sprite.width = tileSize;
+  sprite.height = tileSize;
+  sprite.cullable = true;
+
+  return sprite;
 }
 
 export function pixiIndicatorNodeSelectionCreate(tileSize: number): Graphics {
-  const graphics = new Graphics().rect(1, 1, tileSize - 2, tileSize - 2).stroke({
-    width: 3,
-    color: 0xfbbf24,
-    alignment: 0.5,
-  });
+  const graphics = new Graphics()
+    .rect(1, 1, tileSize - 2, tileSize - 2)
+    .stroke({
+      width: 3,
+      color: 0xfbbf24,
+      alignment: 0.5,
+    });
 
   graphics.cullable = true;
   graphics.visible = false;
