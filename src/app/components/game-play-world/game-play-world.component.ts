@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { GlobalEffectBarComponent } from '@components/global-effect-bar/global-effect-bar.component';
+import { HeroStatusComponent } from '@components/hero-status/hero-status.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { MapNodePanelComponent } from '@components/map-node-panel/map-node-panel.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -67,6 +68,7 @@ const FADE_DURATION_MS = 300;
     IconComponent,
     SFXDirective,
     GlobalEffectBarComponent,
+    HeroStatusComponent,
   ],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
@@ -74,6 +76,8 @@ const FADE_DURATION_MS = 300;
     <div class="death-overlay" [class.visible]="isPartyDead()"></div>
     <app-global-effect-bar class="global-effect-bar"></app-global-effect-bar>
     <app-map-node-panel></app-map-node-panel>
+
+    <app-hero-status class="hero-status-layer"></app-hero-status>
 
     @if (isPanned()) {
       <button
@@ -437,9 +441,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     const job = getEntry<JobContent>(lead.jobId);
     if (!job) return [];
 
-    const frame = this.contentService.artAtlases()['job']?.[
-      `gameassets/job/${job.sprite}.png`
-    ];
+    const frame =
+      this.contentService.artAtlases()['job']?.[
+        `gameassets/job/${job.sprite}.png`
+      ];
     if (!frame) return [];
 
     return pixiSpriteFrameTexturesLoad(JOB_SPRITESHEET_URL, frame, job.frames);

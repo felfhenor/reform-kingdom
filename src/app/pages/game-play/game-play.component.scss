@@ -12,8 +12,3 @@
   width: 100vw;
   height: calc(100vh - 40px);
 }
-
-.hero-status-layer {
-  @apply absolute bottom-4 right-4;
-  z-index: 20;
-}
