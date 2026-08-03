@@ -1,0 +1,22 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+.storage-item-slot {
+  @apply relative w-[64px] h-[64px] cursor-default;
+}
+
+.storage-item-tooltip-image {
+  @apply shrink-0;
+}
+
+.storage-item-count {
+  @apply absolute bottom-0 right-0 px-1 text-[14px] font-semibold text-white leading-none pointer-events-none;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}

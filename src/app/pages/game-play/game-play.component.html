@@ -9,10 +9,12 @@
     class="absolute inset-0"
     [class.invisible]="activeGamePlayView() !== 'world'"
   ></app-game-play-world>
+
   <app-game-play-kingdom
     class="absolute inset-0"
     [class.hidden]="activeGamePlayView() !== 'kingdom'"
   ></app-game-play-kingdom>
+
   <app-play-adventurelog
     class="absolute inset-0"
     [class.hidden]="activeGamePlayView() !== 'adventurelog'"

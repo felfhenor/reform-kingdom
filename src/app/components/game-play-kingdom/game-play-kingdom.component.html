@@ -38,14 +38,20 @@
     <app-card-page heightProfile="full">
       <span header>Kingdom</span>
 
-      <div class="flex flex-col justify-between gap-6 p-4 h-full overflow-y-auto">
+      <div
+        class="flex flex-col justify-between gap-6 p-4 h-full overflow-y-auto"
+      >
         <div class="grid grid-cols-2 gap-4">
           <button
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('storage')"
           >
+            @let count = materialCount();
             <span class="text-base font-bold">Storage</span>
-            <span class="text-xs opacity-70">0 materials stored</span>
+            <span class="text-xs opacity-70">
+              {{ count }}
+              {{ 'material' | pluralize: count > 1 }} stored
+            </span>
           </button>
 
           <button

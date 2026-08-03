@@ -1,0 +1,28 @@
+<div [class]="slotClass()" [tp]="tooltip" [tpPlacement]="'top'">
+  <app-icon-blank-slot>
+    <app-atlas-image spritesheet="item" [assetName]="entry().item.sprite" />
+  </app-icon-blank-slot>
+
+  <span class="storage-item-count">{{ displayQuantity() }}</span>
+</div>
+
+<ng-template #tooltip>
+  <div class="flex gap-2 p-2">
+    <app-atlas-image
+      spritesheet="item"
+      [assetName]="entry().item.sprite"
+      class="storage-item-tooltip-image"
+    />
+    <div>
+      <div class="font-bold mb-2 text-{{ entry().item.rarity }}">
+        {{ entry().item.name }}
+      </div>
+
+      <div class="italic text-sm mb-2">
+        {{ entry().item.description }}
+      </div>
+
+      <div class="text-xs">Quantity: {{ displayQuantity() }}</div>
+    </div>
+  </div>
+</ng-template>

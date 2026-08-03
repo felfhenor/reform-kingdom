@@ -13,6 +13,7 @@ import { PlayKingdomTradeskillJewelcraftingComponent } from '@components/play-ki
 import { PlayKingdomTradeskillTailoringComponent } from '@components/play-kingdom-tradeskill-tailoring/play-kingdom-tradeskill-tailoring.component';
 import { PlayKingdomTradeskillWoodworkingComponent } from '@components/play-kingdom-tradeskill-woodworking/play-kingdom-tradeskill-woodworking.component';
 import {
+  gamestate,
   isPlayerAtKingdom,
   kingdomSubview,
   kingdomSubviewShow,
@@ -20,6 +21,7 @@ import {
 } from '@helpers';
 import type { KingdomSubview } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { PluralizePipe } from '../../pipes/pluralize.pipe';
 
 interface TradeskillButton {
   subview: KingdomSubview;
@@ -32,6 +34,7 @@ interface TradeskillButton {
   imports: [
     CardPageComponent,
     TippyDirective,
+    PluralizePipe,
     PlayKingdomStorageComponent,
     PlayKingdomMuseumComponent,
     PlayKingdomArmoryComponent,
@@ -50,6 +53,10 @@ interface TradeskillButton {
 export class GamePlayKingdomComponent {
   public activeSubview = computed(() => kingdomSubview());
   public canReclass = computed(() => isPlayerAtKingdom());
+
+  public materialCount = computed(
+    () => Object.keys(gamestate().materials).length,
+  );
 
   public readonly tradeskillButtons: TradeskillButton[] = [
     { subview: 'tradeskill-artificing', label: 'Artificing' },

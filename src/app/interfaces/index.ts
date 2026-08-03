@@ -24,6 +24,7 @@ export * from './sfx';
 export * from './stat';
 export * from './state-game';
 export * from './state-options';
+export * from './storage';
 export * from './tiled-map';
 export * from './traits';
 export * from './travel';

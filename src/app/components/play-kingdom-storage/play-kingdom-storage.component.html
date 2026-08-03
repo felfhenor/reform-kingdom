@@ -5,5 +5,45 @@
     <button class="btn btn-sm" (click)="back()">Back</button>
   </div>
 
-  <div class="p-4 italic">Coming soon.</div>
+  <div class="storage-page">
+    <div class="storage-toolbar">
+      <input
+        type="text"
+        placeholder="Search by name or description..."
+        class="input input-sm input-bordered w-full max-w-xs"
+        [value]="searchText()"
+        (input)="onSearchInput($event)"
+      />
+
+      @if (totalPages() > 1) {
+        <div class="storage-pagination">
+          <button
+            class="btn btn-xs"
+            [disabled]="page() === 0"
+            (click)="prevPage()"
+          >
+            «
+          </button>
+          <span>Page {{ page() + 1 }} / {{ totalPages() }}</span>
+          <button
+            class="btn btn-xs"
+            [disabled]="page() >= totalPages() - 1"
+            (click)="nextPage()"
+          >
+            »
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="storage-grid" #gridContainer>
+      @if (pagedMaterials().length === 0) {
+        <div class="storage-empty">No materials found.</div>
+      }
+
+      @for (entry of pagedMaterials(); track entry.item.id) {
+        <app-storage-item-slot [entry]="entry" />
+      }
+    </div>
+  </div>
 </app-card-page>
