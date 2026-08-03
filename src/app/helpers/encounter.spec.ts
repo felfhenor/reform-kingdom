@@ -14,6 +14,7 @@ vi.mock('@helpers/party', () => ({
 
 vi.mock('@helpers/rng', () => ({
   rngNumberRange: vi.fn(),
+  rngUuid: vi.fn(),
 }));
 
 vi.mock('@helpers/state-game', () => ({
