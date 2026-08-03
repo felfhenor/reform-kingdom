@@ -1,0 +1,8 @@
+- id: 3ecb1928-a75f-48c5-ba31-bc07c9426bb2
+  name: Goblin Skull
+  description: A fearsome skull from a goblin warrior.
+  levelRequirement: 3
+  slots: [Artifact]
+  sprite: '0014'
+  baseStats:
+    Intelligence: 2.3

@@ -110,6 +110,8 @@ function ensureEquipment(
     id: equipment.id ?? ('UNKNOWN' as EquipmentId),
     name: equipment.name ?? 'UNKNOWN',
     __type: 'equipment',
+    levelRequirement: equipment.levelRequirement ?? 1,
+    slots: equipment.slots ?? [],
     description: equipment.description ?? 'UNKNOWN',
     baseStats: ensureStats(equipment.baseStats),
     statsPerLevel: ensureStats(equipment.statsPerLevel),

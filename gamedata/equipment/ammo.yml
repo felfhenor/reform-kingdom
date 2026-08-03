@@ -1,0 +1,17 @@
+- id: d627b388-7247-445c-9360-b72c935a6f02
+  name: Wooden Arrow
+  description: A simple wooden arrow, used as ammunition for bows.
+  levelRequirement: 1
+  slots: [Ammo]
+  sprite: '0015'
+  baseStats:
+    Strength: 1
+
+- id: 9634c558-f662-4482-b8e2-fb978646c33a
+  name: Wooden Arrow (Sharp)
+  description: A sharpened wooden arrow, used as ammunition for bows.
+  levelRequirement: 3
+  slots: [Ammo]
+  sprite: '0016'
+  baseStats:
+    Strength: 1.3

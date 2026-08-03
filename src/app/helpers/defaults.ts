@@ -88,7 +88,7 @@ export function defaultEquipment(): EquipmentBlock {
     Weapon: undefined,
     Offhand: undefined,
     Ring: undefined,
-    Necklace: undefined,
+    Accessory: undefined,
     Artifact: undefined,
     Ammo: undefined,
   };

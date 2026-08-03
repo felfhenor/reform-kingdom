@@ -1,0 +1,18 @@
+- id: 33244cfd-375e-493c-ac4a-33a122d75b35
+  name: Copper Ring
+  description: A ring made of copper. It's not much, but it is fashionable.
+  levelRequirement: 1
+  slots: [Ring]
+  sprite: '0006'
+  baseStats:
+    Energy: 3
+
+- id: d6beebf6-956b-4b41-81cf-554f37267bd1
+  name: Copper Bangle
+  description: A bangle made of copper. It's not much, but it is fashionable.
+  levelRequirement: 3
+  slots: [Ring]
+  sprite: '0007'
+  baseStats:
+    Energy: 3
+    Health: 3

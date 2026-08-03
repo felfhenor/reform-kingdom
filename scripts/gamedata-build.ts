@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
 const { isArray, isString, isObject } = require('es-toolkit/compat');
 const yaml = require('js-yaml');
@@ -65,6 +64,7 @@ const rewriteDataIds = () => {
   const getIdForName = (name: string, type: string) => {
     const res = idToName[type][name];
     if (!res) {
+      console.log(new Error().stack);
       console.error(`Name ${name} (${type}) has no corresponding id.`);
       process.exit(1);
     }
