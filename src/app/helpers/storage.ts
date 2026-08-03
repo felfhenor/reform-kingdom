@@ -5,7 +5,7 @@ import type {
   MaterialId,
   StorageMaterialEntry,
 } from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
+import { orderBy } from 'es-toolkit/compat';
 
 export function getStorageMaterials(): StorageMaterialEntry[] {
   const materials = gamestate().materials;
@@ -13,12 +13,14 @@ export function getStorageMaterials(): StorageMaterialEntry[] {
   const entries = Object.keys(materials)
     .map((id) => {
       const item = getEntry<ItemContent>(id);
-      const quantity = materials[id as MaterialId]?.quantity ?? 0;
-      return item && quantity > 0 ? { item, quantity } : undefined;
+      const entry = materials[id as MaterialId];
+      const quantity = entry?.quantity ?? 0;
+      const foundAt = entry?.foundAt ?? 0;
+      return item && quantity > 0 ? { item, quantity, foundAt } : undefined;
     })
     .filter((entry): entry is StorageMaterialEntry => !!entry);
 
-  return sortBy(entries, [(entry) => entry.item.name]);
+  return orderBy(entries, [(entry) => entry.foundAt], ['desc']);
 }
 
 export function filterStorageMaterials(

@@ -23,7 +23,7 @@ export type GameStateWorld = {
 export type MaterialId = ItemId;
 
 export type GameStateMaterials = {
-  [key: MaterialId]: { quantity: number };
+  [key: MaterialId]: { quantity: number; foundAt: number };
 };
 
 export type GameStateClock = {

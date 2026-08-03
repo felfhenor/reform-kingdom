@@ -7,21 +7,26 @@ export function getMaterialQuantity(materialId: MaterialId): number {
 
 export function addMaterial(materialId: MaterialId, quantity: number): void {
   updateGamestate((state) => {
-    const current = state.materials[materialId]?.quantity ?? 0;
-    state.materials[materialId] = { quantity: current + quantity };
+    const existing = state.materials[materialId];
+    const current = existing?.quantity ?? 0;
+    const foundAt = existing?.foundAt ?? Date.now();
+    state.materials[materialId] = { quantity: current + quantity, foundAt };
     return state;
   });
 }
 
 export function removeMaterial(materialId: MaterialId, quantity: number): void {
   updateGamestate((state) => {
-    const current = state.materials[materialId]?.quantity ?? 0;
-    const remaining = Math.max(0, current - quantity);
+    const existing = state.materials[materialId];
+    const remaining = Math.max(0, (existing?.quantity ?? 0) - quantity);
 
     if (remaining === 0) {
       delete state.materials[materialId];
     } else {
-      state.materials[materialId] = { quantity: remaining };
+      state.materials[materialId] = {
+        quantity: remaining,
+        foundAt: existing?.foundAt ?? Date.now(),
+      };
     }
 
     return state;

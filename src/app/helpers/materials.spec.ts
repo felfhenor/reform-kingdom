@@ -23,7 +23,7 @@ describe('Material Helper Functions', () => {
   describe('getMaterialQuantity', () => {
     it('should return the stored quantity for a known material', () => {
       vi.mocked(gamestate).mockReturnValue({
-        materials: { [goldCoinId]: { quantity: 5 } },
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
       } as unknown as GameState);
 
       expect(getMaterialQuantity(goldCoinId)).toBe(5);
@@ -44,32 +44,76 @@ describe('Material Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 5 } },
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
       } as unknown as GameState);
 
-      expect(result.materials[goldCoinId]).toEqual({ quantity: 15 });
+      expect(result.materials[goldCoinId]).toEqual({
+        quantity: 15,
+        foundAt: 1000,
+      });
+    });
+
+    it('should preserve the original foundAt when topping up an existing material', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(9999);
+
+      addMaterial(goldCoinId, 10);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(result.materials[goldCoinId].foundAt).toBe(1000);
+
+      vi.restoreAllMocks();
     });
 
     it('should create the entry when the material is new', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(1234);
+
       addMaterial(goldCoinId, 3);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({ materials: {} } as unknown as GameState);
 
-      expect(result.materials[goldCoinId]).toEqual({ quantity: 3 });
+      expect(result.materials[goldCoinId]).toEqual({
+        quantity: 3,
+        foundAt: 1234,
+      });
+
+      vi.restoreAllMocks();
+    });
+
+    it('should stamp a fresh foundAt when a fully-depleted material is found again', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(5000);
+
+      addMaterial(goldCoinId, 1);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({ materials: {} } as unknown as GameState);
+
+      expect(result.materials[goldCoinId]).toEqual({
+        quantity: 1,
+        foundAt: 5000,
+      });
+
+      vi.restoreAllMocks();
     });
   });
 
   describe('removeMaterial', () => {
-    it('should subtract from the existing quantity', () => {
+    it('should subtract from the existing quantity while preserving foundAt', () => {
       removeMaterial(goldCoinId, 4);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 10 } },
+        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
       } as unknown as GameState);
 
-      expect(result.materials[goldCoinId]).toEqual({ quantity: 6 });
+      expect(result.materials[goldCoinId]).toEqual({
+        quantity: 6,
+        foundAt: 1000,
+      });
     });
 
     it('should remove the entry entirely once it reaches 0', () => {
@@ -77,7 +121,7 @@ describe('Material Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 10 } },
+        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
       } as unknown as GameState);
 
       expect(result.materials[goldCoinId]).toBeUndefined();
@@ -88,7 +132,7 @@ describe('Material Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 10 } },
+        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
       } as unknown as GameState);
 
       expect(result.materials[goldCoinId]).toBeUndefined();
