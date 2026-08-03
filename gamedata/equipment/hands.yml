@@ -2,6 +2,7 @@
   name: Copper Dagger
   description: A dagger made of copper. It is not very powerful, but it is affordable.
   levelRequirement: 1
+  rarity: Common
   slots: [Weapon]
   sprite: '0004'
   baseStats:
@@ -11,6 +12,7 @@
   name: Copper Sword
   description: A sword made of copper. It is not very powerful, but it is affordable.
   levelRequirement: 2
+  rarity: Common
   slots: [Weapon]
   sprite: '0005'
   baseStats:
@@ -20,6 +22,7 @@
   name: Copper Shield
   description: A shield made of copper. It won't put up much of a fight.
   levelRequirement: 2
+  rarity: Common
   slots: [Offhand]
   sprite: '0011'
   baseStats:
@@ -30,6 +33,7 @@
   name: Copper Punch Dagger
   description: A dagger made of copper. It is not very powerful, but it is affordable.
   levelRequirement: 2
+  rarity: Common
   slots: [Offhand]
   sprite: '0012'
   baseStats:
@@ -39,6 +43,7 @@
   name: Copper Spear
   description: A spear tipped with copper. It is not very powerful, but it is affordable.
   levelRequirement: 3
+  rarity: Common
   slots: [Weapon, Offhand]
   sprite: '0013'
   baseStats:

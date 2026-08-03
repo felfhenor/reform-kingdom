@@ -1,4 +1,5 @@
 import type { HasSprite } from '@interfaces/artable';
+import type { HasRarity } from '@interfaces/droppable';
 import type { EquipmentSlot } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
@@ -8,7 +9,8 @@ export type EquipmentId = Branded<string, 'EquipmentId'>;
 
 export type EquipmentContent = IsContentItem &
   HasDescription &
-  HasSprite & {
+  HasSprite &
+  HasRarity & {
     id: EquipmentId;
     levelRequirement: number;
     baseStats: StatBlock;

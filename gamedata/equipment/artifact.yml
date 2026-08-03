@@ -2,6 +2,7 @@
   name: Goblin Skull
   description: A fearsome skull from a goblin warrior.
   levelRequirement: 3
+  rarity: Uncommon
   slots: [Artifact]
   sprite: '0014'
   baseStats:

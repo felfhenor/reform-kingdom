@@ -2,6 +2,7 @@
   name: Copper Ring
   description: A ring made of copper. It's not much, but it is fashionable.
   levelRequirement: 1
+  rarity: Common
   slots: [Ring]
   sprite: '0006'
   baseStats:
@@ -11,6 +12,7 @@
   name: Copper Bangle
   description: A bangle made of copper. It's not much, but it is fashionable.
   levelRequirement: 3
+  rarity: Common
   slots: [Ring]
   sprite: '0007'
   baseStats:

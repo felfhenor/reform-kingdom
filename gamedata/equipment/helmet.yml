@@ -2,6 +2,7 @@
   name: Hat of Adventuring
   description: A hat that is worn by beginning adventurers.
   levelRequirement: 1
+  rarity: Common
   slots: [Helmet]
   sprite: '0002'
   baseStats:
@@ -12,6 +13,7 @@
   name: Linen Hat
   description: A hat crafted from linen. It is not very protective, but it is light and comfortable.
   levelRequirement: 2
+  rarity: Common
   slots: [Helmet]
   sprite: '0003'
   baseStats:

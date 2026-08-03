@@ -1,6 +1,7 @@
 - id: 16422821-5bb0-4f51-8c3a-ff5a798f479b
   name: Leather Bag
   description: A fashionable leather bag.
+  rarity: Uncommon
   levelRequirement: 3
   slots: [Accessory]
   sprite: '0009'
@@ -11,6 +12,7 @@
   name: Copper Gear
   description: A small copper gear that seems strangely interesting.
   levelRequirement: 4
+  rarity: Uncommon
   slots: [Accessory]
   sprite: '0010'
   baseStats:

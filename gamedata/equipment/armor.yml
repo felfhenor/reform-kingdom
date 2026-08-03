@@ -2,6 +2,7 @@
   name: Cloak of Adventuring
   description: A cloak that is worn by beginning adventurers.
   levelRequirement: 1
+  rarity: Common
   slots: [Armor]
   sprite: '0000'
   baseStats:
@@ -12,6 +13,7 @@
   name: Linen Shirt
   description: A simple shirt made of linen. It is not very protective, but it is light and comfortable.
   levelRequirement: 2
+  rarity: Common
   slots: [Armor]
   sprite: '0000'
   baseStats:

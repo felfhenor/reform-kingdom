@@ -53,6 +53,7 @@ function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     id: item.id ?? ('UNKNOWN' as ItemId),
     name: item.name ?? 'UNKNOWN',
     __type: 'item',
+    rarity: item.rarity ?? 'Common',
     description: item.description ?? 'UNKNOWN',
     sprite: item.sprite ?? 'UNKNOWN',
   };
@@ -111,6 +112,7 @@ function ensureEquipment(
     name: equipment.name ?? 'UNKNOWN',
     __type: 'equipment',
     levelRequirement: equipment.levelRequirement ?? 1,
+    rarity: equipment.rarity ?? 'Common',
     slots: equipment.slots ?? [],
     description: equipment.description ?? 'UNKNOWN',
     baseStats: ensureStats(equipment.baseStats),
