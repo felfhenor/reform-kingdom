@@ -212,12 +212,13 @@ describe('Party Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         world: { party: [jala] },
+        armory: [],
       } as unknown as GameState);
 
       const expectedStats = characterStatsForLevel(
         'job-warrior' as JobId,
         1,
-        jala.equipment,
+        defaultEquipment(),
       );
 
       expect(result.world.party[0].jobId).toBe('job-warrior');
@@ -225,6 +226,53 @@ describe('Party Helper Functions', () => {
       expect(result.world.party[0].hp).toBe(expectedStats.Health);
       expect(result.world.party[0].level).toBe(1);
       expect(result.world.party[0].xp).toEqual({ current: 0, maximum: 100 });
+    });
+
+    it('unequips all gear on the character', () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = createCharacterStub('Jala');
+      expect(jala.equipment.Armor).toBeDefined();
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].equipment).toEqual(defaultEquipment());
+    });
+
+    it('sends previously equipped gear to the armory instead of discarding it', () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = createCharacterStub('Jala');
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [],
+      } as unknown as GameState);
+
+      expect(result.armory).toEqual([jala.equipment.Armor]);
+    });
+
+    it('appends to any gear already in the armory', () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = createCharacterStub('Jala');
+      const existingItem = { equipmentId: 'equip-existing' as EquipmentId };
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [existingItem],
+      } as unknown as GameState);
+
+      expect(result.armory).toEqual([existingItem, jala.equipment.Armor]);
     });
 
     it('should leave other party members untouched', () => {
@@ -240,6 +288,7 @@ describe('Party Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         world: { party: [jala, spoorle] },
+        armory: [],
       } as unknown as GameState);
 
       expect(result.world.party[1]).toEqual(spoorle);

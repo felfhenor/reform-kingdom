@@ -1,4 +1,5 @@
 export * from './analytics';
+export * from './armory';
 export * from './clipboard';
 export * from './combat';
 export * from './combat-create';

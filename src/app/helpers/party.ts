@@ -1,6 +1,10 @@
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
-import { canModifyEquipment, equipmentStatTotals } from '@helpers/equipment';
+import {
+  canModifyEquipment,
+  equipmentStatTotals,
+  equippedItems,
+} from '@helpers/equipment';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -96,16 +100,25 @@ export function setParty(party: Character[]): void {
   });
 }
 
+// Reclassing fully unequips the hero; their old gear is routed to the
+// Armory rather than discarded, per M2-03 in the roadmap.
 export function characterReclass(characterId: CharacterId, jobId: JobId): void {
   updateGamestate((state) => {
+    const character = state.world.party.find((c) => c.id === characterId);
+    if (character) {
+      state.armory = [...state.armory, ...equippedItems(character.equipment)];
+    }
+
     state.world.party = state.world.party.map((character) => {
       if (character.id !== characterId) return character;
 
-      const stats = characterStatsForLevel(jobId, 1, character.equipment);
+      const equipment = defaultEquipment();
+      const stats = characterStatsForLevel(jobId, 1, equipment);
 
       return {
         ...character,
         jobId,
+        equipment,
         stats,
         hp: stats.Health,
         level: 1,
