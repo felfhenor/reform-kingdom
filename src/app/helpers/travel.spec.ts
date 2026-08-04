@@ -91,12 +91,13 @@ describe('canPartyTravel', () => {
     expect(canPartyTravel()).toBe(true);
   });
 
-  it('is false while already traveling', () => {
+  it('is true while already traveling, so a redirect can be started', () => {
     vi.mocked(gamestate).mockReturnValue(
       stateWithTravel({ status: 'Traveling', path: [], ticksIntoStep: 0 }),
     );
+    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
 
-    expect(canPartyTravel()).toBe(false);
+    expect(canPartyTravel()).toBe(true);
   });
 
   it('is false while Deaths Door or Healing is active', () => {
@@ -161,6 +162,97 @@ describe('travelStart', () => {
       'The party left for Field Ruins.',
     );
     expect(gatheringStop).toHaveBeenCalled();
+  });
+
+  it('redirects to a new destination while already traveling', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Field Ruins',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+        ticksIntoStep: 2,
+      }),
+    );
+    const path = [{ kind: 'Move' as const, mapName: 'Carrina', x: -1, y: 0 }];
+    vi.mocked(travelPathTo).mockReturnValue(path);
+
+    expect(travelStart('Old Town')).toBe(true);
+
+    const result = applyLastUpdate(stateWithTravel({
+      status: 'Traveling',
+      destinationNodeName: 'Field Ruins',
+      path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+      ticksIntoStep: 2,
+    }));
+    expect(result.world.travel).toEqual({
+      status: 'Traveling',
+      destinationNodeName: 'Old Town',
+      path,
+      ticksIntoStep: 0,
+    });
+    expect(travelMessageLog).toHaveBeenCalledWith(
+      'Carrina',
+      'The party changed course for Old Town.',
+    );
+  });
+
+  it('refuses to redirect to the destination already being traveled to', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Field Ruins',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+        ticksIntoStep: 2,
+      }),
+    );
+
+    expect(travelStart('Field Ruins')).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('settles as arrived when redirecting back to the tile already stood on, mid-travel', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Field Ruins',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+        ticksIntoStep: 1,
+      }),
+    );
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(worldNodeByName).mockReturnValue({
+      mapName: 'Carrina',
+      x: 0,
+      y: 0,
+      nodeName: 'Old Town',
+      nodeData: {} as never,
+    });
+    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
+    vi.mocked(worldNodeGathering).mockReturnValue(undefined);
+
+    expect(travelStart('Old Town')).toBe(true);
+
+    const result = applyLastUpdate(stateWithTravel({
+      status: 'Traveling',
+      path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+      ticksIntoStep: 1,
+    }));
+    expect(result.world.travel).toEqual({
+      status: 'Idle',
+      path: [],
+      ticksIntoStep: 0,
+    });
+    expect(travelMessageLog).toHaveBeenCalledWith(
+      'Carrina',
+      'The party has arrived at Old Town.',
+    );
+  });
+
+  it('still refuses a zero-length path while idle', () => {
+    vi.mocked(travelPathTo).mockReturnValue([]);
+
+    expect(travelStart('Field Ruins')).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
   });
 });
 

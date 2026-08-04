@@ -27,21 +27,48 @@ function ticksPerStepFor(step: TravelStep): number {
   return step.kind === 'Teleport' ? 0 : TICKS_PER_STEP_MOVE;
 }
 
+// Deaths Door/Healing are the only true blockers - being mid-Travel is not,
+// so the party can redirect to a new destination without arriving first.
 export function canPartyTravel(): boolean {
   return (
-    travelGet().status === 'Idle' &&
     !isGlobalEffectActive('Deaths Door' as GlobalEffectId) &&
     !isGlobalEffectActive('Healing' as GlobalEffectId)
   );
 }
 
+// Settles the party as arrived at `destinationNodeName` without moving them -
+// used when a mid-travel redirect targets the tile they're already standing
+// on (e.g. redirecting back to the node they just departed, before its first
+// step has resolved).
+function travelArriveWithoutMoving(destinationNodeName: string): void {
+  const location = currentLocationGet();
+
+  updateGamestate((state) => {
+    state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
+    return state;
+  });
+
+  travelArriveAtNode(destinationNodeName, { kind: 'Move', ...location });
+}
+
 export function travelStart(destinationNodeName: string): boolean {
   if (!canPartyTravel()) return false;
 
+  const travel = travelGet();
+  const wasTraveling = travel.status === 'Traveling';
+  if (wasTraveling && travel.destinationNodeName === destinationNodeName) {
+    return false;
+  }
+
   const path = travelPathTo(destinationNodeName);
-  if (!path || path.length === 0) return false;
+  if (!path || (path.length === 0 && !wasTraveling)) return false;
 
   gatheringStop();
+
+  if (path.length === 0) {
+    travelArriveWithoutMoving(destinationNodeName);
+    return true;
+  }
 
   updateGamestate((state) => {
     state.world.travel = {
@@ -55,7 +82,9 @@ export function travelStart(destinationNodeName: string): boolean {
 
   travelMessageLog(
     currentLocationGet().mapName,
-    `The party left for ${destinationNodeName}.`,
+    wasTraveling
+      ? `The party changed course for ${destinationNodeName}.`
+      : `The party left for ${destinationNodeName}.`,
   );
 
   return true;

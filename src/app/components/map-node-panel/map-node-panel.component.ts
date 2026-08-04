@@ -122,13 +122,24 @@ export class MapNodePanelComponent {
     );
   });
 
-  public isAtNode = computed(() => this.travelPath()?.length === 0);
+  private travelState = computed(() => gamestate().world.travel);
+
+  public isAtNode = computed(
+    () => this.travelPath()?.length === 0 && this.travelState().status === 'Idle',
+  );
 
   public canTravelHere = computed(() => {
+    const entry = this.node();
     const path = this.travelPath();
+    const travel = this.travelState();
+    const isCurrentDestination =
+      travel.status === 'Traveling' &&
+      travel.destinationNodeName === entry?.nodeName;
+
     return (
       !!path &&
-      path.length > 0 &&
+      (path.length > 0 || travel.status === 'Traveling') &&
+      !isCurrentDestination &&
       canPartyTravel() &&
       this.meetsGatherLevelRequirement()
     );
