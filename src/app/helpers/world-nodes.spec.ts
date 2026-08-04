@@ -225,13 +225,13 @@ describe('encounter-backed node accessors', () => {
 
       expect(
         worldNodeLabelInfo(buildEntry({ type: 'ExploreNode' })),
-      ).toEqual({ kind: 'Explore', text: 'Explore Lv.2' });
+      ).toEqual({ kind: 'Explore', text: 'Forest Ruins\nLv.2' });
     });
 
     it('omits the level suffix when there is no matching content', () => {
       expect(worldNodeLabelInfo(buildEntry({ type: 'TeleportNode' }))).toEqual({
         kind: 'Travel',
-        text: 'Travel',
+        text: 'Forest Ruins',
       });
     });
 

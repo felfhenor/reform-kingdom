@@ -14,6 +14,7 @@ export * from './debug';
 export * from './defaults';
 export * from './discord';
 export * from './encounter';
+export * from './equipment';
 export * from './game-init';
 export * from './gameloop';
 export * from './gathering';

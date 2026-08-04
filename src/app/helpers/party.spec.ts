@@ -1,6 +1,9 @@
 import type {
   Character,
   CharacterId,
+  EquipmentBlock,
+  EquipmentContent,
+  EquipmentId,
   GameState,
   JobContent,
   JobId,
@@ -21,10 +24,15 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { getEntry } from '@helpers/content';
+import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
+  CHARACTER_MAX_LEVEL,
   characterReclass,
+  characterStatsForLevel,
+  characterXpForLevel,
   createCharacter,
   healingTicksForLevel,
+  partyGainXp,
   partyGet,
   setParty,
 } from '@helpers/party';
@@ -199,6 +207,155 @@ describe('Party Helper Functions', () => {
 
     it('defaults to a minimum level of 1 for an empty party', () => {
       expect(healingTicksForLevel([])).toBe(12);
+    });
+  });
+
+  describe('characterXpForLevel', () => {
+    it('requires 100 xp to reach level 2 from level 1', () => {
+      expect(characterXpForLevel(1)).toBe(100);
+    });
+
+    it('scales up for higher levels', () => {
+      expect(characterXpForLevel(2)).toBe(283);
+      expect(characterXpForLevel(10)).toBeGreaterThan(characterXpForLevel(2));
+    });
+  });
+
+  describe('characterStatsForLevel', () => {
+    it('returns the job baseStats at level 1 with no equipment', () => {
+      vi.mocked(getEntry).mockReturnValue(mockJob);
+
+      const stats = characterStatsForLevel(
+        'job-explorer' as JobId,
+        1,
+        defaultEquipment(),
+      );
+
+      expect(stats).toEqual(mockJob.baseStats);
+    });
+
+    it('applies job statsPerLevel scaling for higher levels', () => {
+      vi.mocked(getEntry).mockReturnValue(mockJob);
+
+      const stats = characterStatsForLevel(
+        'job-explorer' as JobId,
+        3,
+        defaultEquipment(),
+      );
+
+      expect(stats.Health).toBe(
+        mockJob.baseStats.Health + mockJob.statsPerLevel.Health * 2,
+      );
+      expect(stats.Strength).toBeCloseTo(
+        mockJob.baseStats.Strength + mockJob.statsPerLevel.Strength * 2,
+      );
+    });
+
+    it('adds flat equipment baseStats on top, ignoring equipment statsPerLevel', () => {
+      const sword: EquipmentContent = {
+        id: 'sword' as EquipmentId,
+        name: 'Sword',
+        __type: 'equipment',
+        description: '',
+        sprite: '0000',
+        rarity: 'Common',
+        levelRequirement: 1,
+        baseStats: { ...defaultStats(), Strength: 5 },
+        statsPerLevel: { ...defaultStats(), Strength: 100 },
+        slots: ['Weapon'],
+      };
+
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === 'job-explorer' ? mockJob : sword) as never,
+      );
+
+      const equipment: EquipmentBlock = {
+        ...defaultEquipment(),
+        Weapon: { equipmentId: 'sword' as EquipmentId },
+      };
+
+      const stats = characterStatsForLevel('job-explorer' as JobId, 5, equipment);
+
+      expect(stats.Strength).toBe(
+        mockJob.baseStats.Strength + mockJob.statsPerLevel.Strength * 4 + 5,
+      );
+    });
+  });
+
+  describe('partyGainXp', () => {
+    beforeEach(() => {
+      vi.mocked(getEntry).mockReturnValue(mockJob);
+    });
+
+    it('adds xp without leveling up when below the threshold', () => {
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(30);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].xp).toEqual({ current: 30, maximum: 100 });
+      expect(result.world.party[0].level).toBe(1);
+      expect(result.world.party[0].stats).toEqual(jala.stats);
+    });
+
+    it('levels up and recalculates stats when xp meets the threshold', () => {
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(100);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].level).toBe(2);
+      expect(result.world.party[0].xp).toEqual({
+        current: 0,
+        maximum: characterXpForLevel(2),
+      });
+      expect(result.world.party[0].stats).toEqual(
+        characterStatsForLevel('job-explorer' as JobId, 2, jala.equipment),
+      );
+    });
+
+    it('carries over remainder xp and can grant multiple levels from one large gain', () => {
+      const jala = createCharacterStub('Jala');
+      const totalXp = characterXpForLevel(1) + characterXpForLevel(2) + 15;
+
+      partyGainXp(totalXp);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].level).toBe(3);
+      expect(result.world.party[0].xp.current).toBe(15);
+      expect(result.world.party[0].xp.maximum).toBe(characterXpForLevel(3));
+    });
+
+    it('stops leveling at the max level and clamps xp to the final threshold', () => {
+      const jala = {
+        ...createCharacterStub('Jala'),
+        level: CHARACTER_MAX_LEVEL,
+        xp: { current: 0, maximum: characterXpForLevel(CHARACTER_MAX_LEVEL) },
+      };
+
+      partyGainXp(999999);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].level).toBe(CHARACTER_MAX_LEVEL);
+      expect(result.world.party[0].xp.current).toBe(
+        result.world.party[0].xp.maximum,
+      );
     });
   });
 
