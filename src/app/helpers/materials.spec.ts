@@ -9,6 +9,7 @@ vi.mock('@helpers/state-game', () => ({
 import {
   addMaterial,
   getMaterialQuantity,
+  isMaterialDiscovered,
   removeMaterial,
 } from '@helpers/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -35,6 +36,24 @@ describe('Material Helper Functions', () => {
       } as unknown as GameState);
 
       expect(getMaterialQuantity(goldCoinId)).toBe(0);
+    });
+  });
+
+  describe('isMaterialDiscovered', () => {
+    it('should return true for a material with a foundAt timestamp', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(isMaterialDiscovered(goldCoinId)).toBe(true);
+    });
+
+    it('should return false for a material that has never been found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        materials: {},
+      } as unknown as GameState);
+
+      expect(isMaterialDiscovered(goldCoinId)).toBe(false);
     });
   });
 

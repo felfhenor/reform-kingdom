@@ -5,6 +5,10 @@ export function getMaterialQuantity(materialId: MaterialId): number {
   return gamestate().materials[materialId]?.quantity ?? 0;
 }
 
+export function isMaterialDiscovered(materialId: MaterialId): boolean {
+  return !!gamestate().materials[materialId]?.foundAt;
+}
+
 export function addMaterial(materialId: MaterialId, quantity: number): void {
   updateGamestate((state) => {
     const existing = state.materials[materialId];

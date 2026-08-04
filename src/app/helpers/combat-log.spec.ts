@@ -6,9 +6,11 @@ import {
   combatLogReset,
   combatMessageLog,
   endCombatLogCommits,
+  itemDropHtml,
+  itemNameHtml,
   travelMessageLog,
 } from '@helpers/combat-log';
-import type { Combat, Combatant } from '@interfaces';
+import type { Combat, Combatant, ItemContent } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('combatMessageLog', () => {
@@ -97,6 +99,42 @@ describe('adventureLogMessageHtml', () => {
 
   it('passes plain text through unchanged', () => {
     expect(adventureLogMessageHtml('Combat is over.')).toBe('Combat is over.');
+  });
+});
+
+describe('itemNameHtml', () => {
+  it('wraps the item name in a rarity-colored span', () => {
+    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+
+    expect(itemNameHtml(item)).toBe(
+      '<span class="text-Uncommon font-semibold">Copper Ore</span>',
+    );
+  });
+
+  it('uses the given display name instead of the item name when provided', () => {
+    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+
+    expect(itemNameHtml(item, 'copper ores')).toBe(
+      '<span class="text-Uncommon font-semibold">copper ores</span>',
+    );
+  });
+});
+
+describe('itemDropHtml', () => {
+  it('keeps the singular form for a quantity of 1', () => {
+    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+
+    expect(itemDropHtml(item, 1)).toBe(
+      '1 <span class="text-Uncommon font-semibold">copper ore</span>',
+    );
+  });
+
+  it('pluralizes the name for quantities greater than 1', () => {
+    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+
+    expect(itemDropHtml(item, 3)).toBe(
+      '3 <span class="text-Uncommon font-semibold">copper ores</span>',
+    );
   });
 });
 

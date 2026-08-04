@@ -6,9 +6,13 @@ import {
   inject,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { GatherMaterialSlotComponent } from '@components/gather-material-slot/gather-material-slot.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
+  canEnterGatherNode,
   canPartyTravel,
+  gamestate,
+  gatheringProgressFraction,
   getMap,
   mapNodeDeselect,
   selectedMapNode,
@@ -18,6 +22,8 @@ import {
   travelStart,
   worldNodeDescription,
   worldNodeEncounterCount,
+  worldNodeGatherMaterialIds,
+  worldNodeGatherTime,
   worldNodeLevelRange,
   worldNodeMonsterCount,
 } from '@helpers';
@@ -26,7 +32,7 @@ import type { TiledMap } from '@interfaces';
 @Component({
   selector: 'app-map-node-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonCloseComponent, SFXDirective],
+  imports: [ButtonCloseComponent, GatherMaterialSlotComponent, SFXDirective],
   templateUrl: './map-node-panel.component.html',
   styleUrl: './map-node-panel.component.scss',
   host: {
@@ -73,6 +79,35 @@ export class MapNodePanelComponent {
     return entry ? worldNodeDescription(entry) : undefined;
   });
 
+  public gatherTime = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeGatherTime(entry) : undefined;
+  });
+
+  public gatherMaterialIds = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeGatherMaterialIds(entry) : [];
+  });
+
+  public meetsGatherLevelRequirement = computed(() => {
+    const entry = this.node();
+    return !entry || canEnterGatherNode(entry.nodeName);
+  });
+
+  public isGatheringHere = computed(() => {
+    const entry = this.node();
+    const gathering = gamestate().world.gathering;
+    return (
+      !!entry &&
+      gathering.status === 'Gathering' &&
+      gathering.nodeName === entry.nodeName
+    );
+  });
+
+  public gatherProgressPercent = computed(() =>
+    Math.round(gatheringProgressFraction() * 100),
+  );
+
   private travelPath = computed(() => {
     const entry = this.node();
     return entry ? travelPathTo(entry.nodeName) : undefined;
@@ -91,7 +126,12 @@ export class MapNodePanelComponent {
 
   public canTravelHere = computed(() => {
     const path = this.travelPath();
-    return !!path && path.length > 0 && canPartyTravel();
+    return (
+      !!path &&
+      path.length > 0 &&
+      canPartyTravel() &&
+      this.meetsGatherLevelRequirement()
+    );
   });
 
   public travel(): void {

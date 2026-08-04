@@ -1,6 +1,7 @@
 import {
   rngChoice,
   rngChoiceIdentifiable,
+  rngChoiceWeighted,
   rngNumber,
   rngNumberRange,
   rngSeeded,
@@ -88,6 +89,42 @@ describe('RNG Helper Functions', () => {
     it('should return false when random value exceeds chance', () => {
       const mockRng = () => 0.8; // 80%
       expect(rngSucceedsChance(50, mockRng as PRNG)).toBeFalsy();
+    });
+  });
+
+  describe('rngChoiceWeighted', () => {
+    it('returns undefined for an empty list', () => {
+      expect(rngChoiceWeighted([], () => 1, rngSeeded('test-seed'))).toBeUndefined();
+    });
+
+    it('returns undefined when every weight is zero', () => {
+      const items = ['a', 'b'];
+      expect(
+        rngChoiceWeighted(items, () => 0, rngSeeded('test-seed')),
+      ).toBeUndefined();
+    });
+
+    it('always picks the only item with positive weight', () => {
+      const items = [
+        { key: 'never', weight: 0 },
+        { key: 'always', weight: 5 },
+      ];
+
+      for (const seed of ['seed-1', 'seed-2', 'seed-3']) {
+        const result = rngChoiceWeighted(
+          items,
+          (item) => item.weight,
+          rngSeeded(seed),
+        );
+        expect(result?.key).toBe('always');
+      }
+    });
+
+    it('never selects an item beyond the cumulative weight range', () => {
+      const items = [1, 2, 3];
+      const mockRng = (() => 0.999999) as PRNG;
+      const result = rngChoiceWeighted(items, (item) => item, mockRng);
+      expect(items).toContain(result);
     });
   });
 

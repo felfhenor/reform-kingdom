@@ -2,6 +2,7 @@ import type { Character } from '@interfaces/character';
 import type { Combat } from '@interfaces/combat';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
+import type { GatheringState } from '@interfaces/gathering';
 import type { Branded } from '@interfaces/identifiable';
 import type { TravelState } from '@interfaces/travel';
 
@@ -18,6 +19,7 @@ export type GameStateWorld = {
   combat?: Combat;
   currentLocation: CurrentLocation;
   travel: TravelState;
+  gathering: GatheringState;
 };
 
 export type MaterialId = ItemId;

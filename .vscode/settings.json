@@ -17,6 +17,7 @@
     "./schemas/collectible.schema.json": "gamedata/collectible/*.yml",
     "./schemas/encounter.schema.json": "gamedata/encounter/*.yml",
     "./schemas/equipment.schema.json": "gamedata/equipment/*.yml",
+    "./schemas/gathering.schema.json": "gamedata/gathering/*.yml",
     "./schemas/globaleffect.schema.json": "gamedata/globaleffect/*.yml",
     "./schemas/item.schema.json": "gamedata/item/*.yml",
     "./schemas/job.schema.json": "gamedata/job/*.yml",

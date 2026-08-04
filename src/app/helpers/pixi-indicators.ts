@@ -1,5 +1,5 @@
 import type { Texture } from 'pixi.js';
-import { AnimatedSprite, Graphics } from 'pixi.js';
+import { AnimatedSprite, Container, Graphics } from 'pixi.js';
 
 export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   graphics: Graphics;
@@ -65,6 +65,44 @@ export function pixiIndicatorPlayerSpriteCreate(
   sprite.cullable = true;
 
   return sprite;
+}
+
+// A small bar hovering above the party's tile while gathering, filling left
+// to right as the current gather cycle progresses - full means the next
+// item-chance roll is about to happen. Its screen position is set every
+// frame by the caller (see game-play-world.component.ts); the bar/background
+// graphics carry the "float above the tile" offset in their own transform
+// (not baked into their drawn rect) so scaling the fill for progress doesn't
+// also drag it sideways.
+export function pixiIndicatorGatherProgressCreate(tileSize: number): {
+  container: Container;
+  update: (fraction: number) => void;
+} {
+  const barWidth = tileSize * 0.8;
+  const barHeight = 6;
+  const offsetX = (tileSize - barWidth) / 2;
+  const offsetY = -14;
+
+  const container = new Container();
+  container.cullable = true;
+  container.visible = false;
+
+  const background = new Graphics().rect(0, 0, barWidth, barHeight).fill(0x000000);
+  background.alpha = 0.6;
+  background.x = offsetX;
+  background.y = offsetY;
+
+  const fill = new Graphics().rect(0, 0, barWidth, barHeight).fill(0x4ade80);
+  fill.x = offsetX;
+  fill.y = offsetY;
+
+  container.addChild(background, fill);
+
+  const update = (fraction: number) => {
+    fill.scale.x = Math.max(0, Math.min(1, fraction));
+  };
+
+  return { container, update };
 }
 
 export function pixiIndicatorNodeSelectionCreate(tileSize: number): Graphics {

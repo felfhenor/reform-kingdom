@@ -9,6 +9,8 @@ import type {
   EquipmentId,
   EquipmentSkillContent,
   EquipmentSkillId,
+  GatheringContent,
+  GatheringId,
   GlobalEffectContent,
   GlobalEffectId,
   IsContentItem,
@@ -31,6 +33,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   collectible: ensureCollectible,
   encounter: ensureEncounter,
   equipment: ensureEquipment,
+  gathering: ensureGathering,
   globaleffect: ensureGlobalEffect,
   item: ensureItem,
   job: ensureJob,
@@ -89,6 +92,21 @@ function ensureEncounter(
     description: encounter.description ?? 'UNKNOWN',
     levelRange: encounter.levelRange ?? { min: 1, max: 1 },
     fights: encounter.fights ?? [],
+  };
+}
+
+function ensureGathering(
+  gathering: Partial<GatheringContent>,
+): Required<GatheringContent> {
+  return {
+    id: gathering.id ?? ('UNKNOWN' as GatheringId),
+    name: gathering.name ?? 'UNKNOWN',
+    __type: 'gathering',
+    description: gathering.description ?? 'UNKNOWN',
+    levelRange: gathering.levelRange ?? { min: 1, max: 1 },
+    xpGainedIfInLevelRange: gathering.xpGainedIfInLevelRange ?? 0,
+    gatherTime: gathering.gatherTime ?? 1,
+    gatherResults: gathering.gatherResults ?? [],
   };
 }
 

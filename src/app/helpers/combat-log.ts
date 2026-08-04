@@ -1,6 +1,7 @@
+import { pluralize } from '@boringnode/pluralize';
 import { rngUuid } from '@helpers/rng';
 import { localStorageSignal } from '@helpers/signal';
-import type { Combat, CombatLog, Combatant } from '@interfaces';
+import type { Combat, CombatLog, Combatant, ItemContent } from '@interfaces';
 import { parseInline } from 'marked';
 import mustache from 'mustache';
 
@@ -55,6 +56,34 @@ export function travelMessageLog(locationName: string, message: string): void {
   };
 
   combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
+}
+
+export function gatherMessageLog(locationName: string, message: string): void {
+  const newLog: CombatLog = {
+    kind: 'Gather',
+    messageId: rngUuid(),
+    timestamp: Date.now(),
+    locationName,
+    message,
+  };
+
+  combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
+}
+
+// Colors an item's name by its rarity for adventure log messages (e.g. combat
+// and gather drop announcements) - `adventureLogMessageHtml` renders the log
+// message as markdown-inline, which passes raw HTML like this through as-is.
+export function itemNameHtml(item: ItemContent, displayName = item.name): string {
+  return `<span class="text-${item.rarity} font-semibold">${displayName}</span>`;
+}
+
+// "1 wergen stick" vs "3 wergen sticks" - only pluralize when the quantity
+// actually calls for it, since item names are authored in singular form.
+export function itemDropHtml(item: ItemContent, quantity: number): string {
+  const lowerName = item.name.toLowerCase();
+  const displayName = quantity === 1 ? lowerName : pluralize(lowerName);
+
+  return `${quantity} ${itemNameHtml(item, displayName)}`;
 }
 
 export function miscellaneousMessageLog(message: string): void {

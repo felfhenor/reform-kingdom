@@ -30,6 +30,7 @@
 
         @let encounters = encounterCount();
         @let monsters = monsterCount();
+        @let gatherSeconds = gatherTime();
 
         @if (encounters) {
           <div class="badge badge-outline">{{ encounters }} Encounters</div>
@@ -38,13 +39,41 @@
         @if (monsters) {
           <div class="badge badge-outline">{{ monsters }} Monsters</div>
         }
+
+        @if (gatherSeconds) {
+          <div class="badge badge-outline">Gather Time {{ gatherSeconds }}s</div>
+        }
       </div>
 
       <p class="text-sm opacity-80">
         {{ description() ?? 'No information available yet.' }}
       </p>
 
-      @if (!isAtNode()) {
+      @let materialIds = gatherMaterialIds();
+      @if (materialIds.length > 0) {
+        <div class="flex flex-wrap gap-2">
+          @for (materialId of materialIds; track materialId) {
+            <app-gather-material-slot [itemId]="materialId" />
+          }
+        </div>
+      }
+
+      @if (isGatheringHere()) {
+        <div class="flex flex-col gap-1">
+          <div class="text-xs opacity-70">Gathering... {{ gatherProgressPercent() }}%</div>
+          <progress
+            class="progress progress-primary w-full"
+            [value]="gatherProgressPercent()"
+            max="100"
+          ></progress>
+        </div>
+      } @else if (!isAtNode()) {
+        @if (!meetsGatherLevelRequirement()) {
+          <div class="text-sm text-rose-400">
+            Level {{ levelLabel() }} required.
+          </div>
+        }
+
         <button
           type="button"
           class="btn btn-sm btn-primary"

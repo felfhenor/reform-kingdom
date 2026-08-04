@@ -26,10 +26,15 @@ export type TiledObject = {
   properties?: Array<{ name: string; type: string; value: unknown }>;
 };
 
-export type WorldNodeType = 'Kingdom' | 'ExploreNode' | 'TeleportNode';
+export type WorldNodeType =
+  | 'Kingdom'
+  | 'ExploreNode'
+  | 'GatherNode'
+  | 'TeleportNode';
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
 export type ExploreNodeObject = TiledObject & { type: 'ExploreNode' };
+export type GatherNodeObject = TiledObject & { type: 'GatherNode' };
 
 export type TeleportNodeProperty =
   | { name: 'tag'; type: 'string'; value: string }
@@ -43,6 +48,7 @@ export type TeleportNodeObject = TiledObject & {
 export type WorldNodeObject =
   | KingdomObject
   | ExploreNodeObject
+  | GatherNodeObject
   | TeleportNodeObject;
 
 export type TiledObjectSpriteFrame = {

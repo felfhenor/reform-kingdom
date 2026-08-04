@@ -16,6 +16,7 @@ export * from './discord';
 export * from './encounter';
 export * from './game-init';
 export * from './gameloop';
+export * from './gathering';
 export * from './global-effects';
 export * from './icons';
 export * from './job';

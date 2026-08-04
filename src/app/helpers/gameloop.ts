@@ -2,6 +2,7 @@ import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
 import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
+import { gatheringProcessTick } from '@helpers/gathering';
 import { globalEffectsProcessTick } from '@helpers/global-effects';
 import { debug } from '@helpers/logging';
 import { schedulerYield } from '@helpers/scheduler';
@@ -55,6 +56,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
     travelProcessTick();
     globalEffectsProcessTick();
+    gatheringProcessTick();
 
     if (currentCombat()) {
       combatDoCombatIteration();

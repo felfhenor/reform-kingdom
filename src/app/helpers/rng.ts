@@ -61,6 +61,27 @@ export function rngSucceedsChance(
   return rng() * 100 <= max;
 }
 
+export function rngChoiceWeighted<T>(
+  items: T[],
+  weightFn: (item: T) => number,
+  rng = rngSeeded(rngUuid()),
+): T | undefined {
+  if (items.length === 0) return undefined;
+
+  const totalWeight = sumBy(items, weightFn);
+  if (totalWeight <= 0) return undefined;
+
+  const randomValue = rngNumber(totalWeight, rng);
+  let cumulativeWeight = 0;
+
+  for (const item of items) {
+    cumulativeWeight += weightFn(item);
+    if (randomValue < cumulativeWeight) return item;
+  }
+
+  return undefined;
+}
+
 export function rngChoiceRarity<T extends HasRarity>(
   items: T[],
   rng = rngSeeded(rngUuid()),

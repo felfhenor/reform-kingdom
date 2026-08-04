@@ -1,12 +1,14 @@
 import { addGlobalEffect, isGlobalEffectActive } from '@helpers/global-effects';
 import { encounterStartFight } from '@helpers/encounter';
 import { travelMessageLog } from '@helpers/combat-log';
+import { gatheringStart, gatheringStop } from '@helpers/gathering';
 import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
   worldNodeByName,
   worldNodeEncounter,
+  worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-nodes';
 import type { GlobalEffectId, TravelState, TravelStep } from '@interfaces';
@@ -38,6 +40,8 @@ export function travelStart(destinationNodeName: string): boolean {
 
   const path = travelPathTo(destinationNodeName);
   if (!path || path.length === 0) return false;
+
+  gatheringStop();
 
   updateGamestate((state) => {
     state.world.travel = {
@@ -98,9 +102,15 @@ function travelArriveAtNode(
   if (!node) return;
 
   const encounter = worldNodeEncounter(node);
-  if (!encounter) return;
+  if (encounter) {
+    encounterStartFight(encounter.id, 0, destinationNodeName);
+    return;
+  }
 
-  encounterStartFight(encounter.id, 0, destinationNodeName);
+  const gathering = worldNodeGathering(node);
+  if (gathering) {
+    gatheringStart(destinationNodeName);
+  }
 }
 
 // Completes `completedStep` and either continues on to the next step -

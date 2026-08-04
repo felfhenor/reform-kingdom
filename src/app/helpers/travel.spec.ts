@@ -13,6 +13,11 @@ vi.mock('@helpers/combat-log', () => ({
   travelMessageLog: vi.fn(),
 }));
 
+vi.mock('@helpers/gathering', () => ({
+  gatheringStart: vi.fn(),
+  gatheringStop: vi.fn(),
+}));
+
 vi.mock('@helpers/pathfinding', () => ({
   mapHopsBetween: vi.fn(() => 0),
   travelPathTo: vi.fn(),
@@ -31,12 +36,14 @@ vi.mock('@helpers/world', () => ({
 vi.mock('@helpers/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodeEncounter: vi.fn(),
+  worldNodeGathering: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
 }));
 
 import { addGlobalEffect, isGlobalEffectActive } from '@helpers/global-effects';
 import { encounterStartFight } from '@helpers/encounter';
 import { travelMessageLog } from '@helpers/combat-log';
+import { gatheringStart, gatheringStop } from '@helpers/gathering';
 import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -49,11 +56,13 @@ import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
   worldNodeByName,
   worldNodeEncounter,
+  worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-nodes';
 import type {
   EncounterContent,
   GameState,
+  GatheringContent,
   TravelState,
   WorldNodeEntry,
 } from '@interfaces';
@@ -151,6 +160,7 @@ describe('travelStart', () => {
       'Carrina',
       'The party left for Field Ruins.',
     );
+    expect(gatheringStop).toHaveBeenCalled();
   });
 });
 
@@ -397,5 +407,33 @@ describe('travelProcessTick', () => {
     travelProcessTick();
 
     expect(encounterStartFight).not.toHaveBeenCalled();
+    expect(gatheringStart).not.toHaveBeenCalled();
+  });
+
+  it('on arrival at a node with a gathering site and no encounter, starts gathering', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Wergen Woods',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+        ticksIntoStep: 2,
+      }),
+    );
+    vi.mocked(worldNodeByName).mockReturnValue({
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+      nodeName: 'Wergen Woods',
+      nodeData: {} as never,
+    });
+    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
+    vi.mocked(worldNodeGathering).mockReturnValue(
+      { id: 'gather-1' } as unknown as GatheringContent,
+    );
+
+    travelProcessTick();
+
+    expect(encounterStartFight).not.toHaveBeenCalled();
+    expect(gatheringStart).toHaveBeenCalledWith('Wergen Woods');
   });
 });

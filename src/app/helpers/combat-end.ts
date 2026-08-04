@@ -1,6 +1,5 @@
-import { pluralize } from '@boringnode/pluralize';
 import { combatReset, currentCombat } from '@helpers/combat';
-import { combatMessageLog } from '@helpers/combat-log';
+import { combatMessageLog, itemDropHtml } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { addMaterial } from '@helpers/materials';
@@ -82,8 +81,9 @@ function grantVictoryRewards(combat: Combat): void {
     addMaterial(itemId as ItemId, quantity);
 
     const item = getEntry<ItemContent>(itemId);
-    const itemName = pluralize(item?.name?.toLowerCase() ?? 'item');
-    combatMessageLog(combat, `The party found ${quantity} ${itemName}!`);
+    if (!item) return;
+
+    combatMessageLog(combat, `The party found ${itemDropHtml(item, quantity)}!`);
   });
 }
 

@@ -1,6 +1,10 @@
 import type { CombatId } from '@interfaces/combat';
 
-export type AdventureLogEntryKind = 'Combat' | 'Travel' | 'Miscellaneous';
+export type AdventureLogEntryKind =
+  | 'Combat'
+  | 'Travel'
+  | 'Gather'
+  | 'Miscellaneous';
 
 export type CombatLog = {
   kind: AdventureLogEntryKind;

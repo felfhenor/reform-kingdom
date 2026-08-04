@@ -5,6 +5,7 @@ import type {
   EquipmentBlock,
   GameId,
   GameState,
+  GatheringState,
   StatBlock,
   TravelState,
 } from '@interfaces';
@@ -30,6 +31,7 @@ export function defaultGameState(): GameState {
         y: 24,
       },
       travel: defaultTravelState(),
+      gathering: defaultGatheringState(),
     },
     materials: {},
     globalEffects: [],
@@ -41,6 +43,13 @@ export function defaultTravelState(): TravelState {
     status: 'Idle',
     path: [],
     ticksIntoStep: 0,
+  };
+}
+
+export function defaultGatheringState(): GatheringState {
+  return {
+    status: 'Idle',
+    ticksIntoGather: 0,
   };
 }
 

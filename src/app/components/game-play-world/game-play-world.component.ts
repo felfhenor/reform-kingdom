@@ -18,9 +18,11 @@ import {
   cameraOffsetFromDrag,
   cameraPositionCalculate,
   currentLocationGet,
+  gatheringProgressFraction,
   getEntry,
   getMap,
   getOption,
+  isGathering,
   isGlobalEffectActive,
   isPlayerAtLocation,
   mapNodeDeselect,
@@ -28,6 +30,7 @@ import {
   partyGet,
   pixiAppInitialize,
   pixiGridOverlayCreate,
+  pixiIndicatorGatherProgressCreate,
   pixiIndicatorNodeSelectionCreate,
   pixiIndicatorPlayerAtLocationCreate,
   pixiIndicatorPlayerSpriteCreate,
@@ -118,6 +121,11 @@ export class GamePlayWorldComponent implements OnDestroy {
   private mapContainer?: Container;
   private gridOverlay?: Graphics;
   private playerIndicatorContainer?: Container;
+  private gatherProgressContainer?: Container;
+  private gatherProgressBar?: {
+    container: Container;
+    update: (fraction: number) => void;
+  };
   private nodeSelectionContainer?: Container;
   private nodeSelectionIndicator?: Graphics;
   private resizeObserver?: ResizeObserver;
@@ -259,6 +267,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.resizeObserver?.disconnect();
     this.mapContainer?.removeChildren();
     this.playerIndicatorContainer?.removeChildren();
+    this.gatherProgressContainer?.removeChildren();
     this.nodeSelectionContainer?.removeChildren();
     this.app?.destroy(true, { children: true, texture: true });
 
@@ -267,6 +276,8 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.mapContainer = undefined;
     this.gridOverlay = undefined;
     this.playerIndicatorContainer = undefined;
+    this.gatherProgressContainer = undefined;
+    this.gatherProgressBar = undefined;
     this.nodeSelectionContainer = undefined;
     this.nodeSelectionIndicator = undefined;
     this.resizeObserver = undefined;
@@ -291,6 +302,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const containers = pixiWorldContainersCreate(this.app);
     this.mapContainer = containers.mapContainer;
     this.playerIndicatorContainer = containers.playerIndicatorContainer;
+    this.gatherProgressContainer = containers.gatherProgressContainer;
     this.nodeSelectionContainer = containers.nodeSelectionContainer;
 
     // Clicking a node selects it; clicking anywhere else on the map (the
@@ -332,6 +344,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.nodeSelectionContainer.addChild(this.nodeSelectionIndicator);
 
+    this.gatherProgressBar = pixiIndicatorGatherProgressCreate(map.tilewidth);
+    this.gatherProgressContainer.addChild(this.gatherProgressBar.container);
+
     if (this.partyTokenTextures.length === 0) {
       this.partyTokenTextures = await this.loadPartyTokenTextures();
     }
@@ -345,6 +360,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.checkForDeathsDoorRecall();
       this.updateVisualPosition();
       this.updatePlayerIndicatorIfNeeded();
+      this.updateGatherProgressIndicator();
       this.positionCamera();
     };
     this.app.ticker.add(this.visualPositionTicker);
@@ -477,23 +493,48 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.playerIndicatorContainer.addChild(sprite);
   }
 
+  // True once the eased `visualPosition` has actually caught up to the
+  // tick-driven `currentLocation` - the two fall out of sync for the
+  // duration of a glide (see `visualPosition`'s field doc), so anything that
+  // should only happen once the party has visibly, not just logically,
+  // arrived at a tile needs to check this rather than `isPlayerAtLocation()`
+  // alone.
+  private isVisuallyAtTarget(): boolean {
+    const target = currentLocationGet();
+    return (
+      this.visualPosition.mapName === target.mapName &&
+      Math.abs(this.visualPosition.x - target.x) < 0.001 &&
+      Math.abs(this.visualPosition.y - target.y) < 0.001
+    );
+  }
+
   // The walking token should stay visible for the entire glide, only
   // swapping to the "at location" indicator once the token has visually
   // (not just logically) arrived - otherwise it flips the instant the
   // destination tile is reached at the tick layer, well before the render
   // layer has finished easing into it.
   private updatePlayerIndicatorIfNeeded(): void {
-    const target = currentLocationGet();
-    const visuallyAtTarget =
-      this.visualPosition.mapName === target.mapName &&
-      Math.abs(this.visualPosition.x - target.x) < 0.001 &&
-      Math.abs(this.visualPosition.y - target.y) < 0.001;
-
-    const shouldShowAtLocation = visuallyAtTarget && isPlayerAtLocation();
+    const shouldShowAtLocation = this.isVisuallyAtTarget() && isPlayerAtLocation();
     if (shouldShowAtLocation === this.isShowingAtLocationIndicator) return;
 
     this.isShowingAtLocationIndicator = shouldShowAtLocation;
     this.setupPlayerIndicator();
+  }
+
+  // The gather progress bar hovers above the party's tile while a gather
+  // cycle is running, filling as `gatheringProcessTick` (see helpers/
+  // gathering.ts) counts up toward the node's `gatherTime` - full means the
+  // next item-chance roll is about to happen. Gated on visual arrival (not
+  // just `isGathering()`) so it doesn't pop in while the token is still
+  // mid-glide toward the node - gathering starts the instant the tick layer
+  // resolves the final travel step, which can be well before the walk
+  // animation has finished easing into the tile.
+  private updateGatherProgressIndicator(): void {
+    if (!this.gatherProgressBar) return;
+
+    const active = isGathering() && this.isVisuallyAtTarget();
+    this.gatherProgressBar.container.visible = active;
+    if (active) this.gatherProgressBar.update(gatheringProgressFraction());
   }
 
   // Eases the rendered token position toward the tick-driven, authoritative
@@ -538,6 +579,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       !this.app ||
       !this.mapContainer ||
       !this.playerIndicatorContainer ||
+      !this.gatherProgressContainer ||
       !this.nodeSelectionContainer ||
       !this.map
     )
@@ -591,6 +633,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
 
     this.playerIndicatorContainer.position.set(
+      Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
+      Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
+    );
+
+    this.gatherProgressContainer.position.set(
       Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
       Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
     );

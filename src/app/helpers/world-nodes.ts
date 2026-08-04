@@ -6,6 +6,8 @@ import type {
   EncounterContent,
   EncounterLevelRange,
   GameMap,
+  GatheringContent,
+  ItemId,
   TiledMap,
   TiledObject,
   WorldNodeEntry,
@@ -84,13 +86,21 @@ export function worldNodesOfType(type: WorldNodeType): WorldNodeEntry[] {
 export function worldNodeEncounter(
   entry: WorldNodeEntry,
 ): EncounterContent | undefined {
-  return getEntry<EncounterContent>(entry.nodeName);
+  const content = getEntry<EncounterContent>(entry.nodeName);
+  return content?.__type === 'encounter' ? content : undefined;
+}
+
+export function worldNodeGathering(
+  entry: WorldNodeEntry,
+): GatheringContent | undefined {
+  const content = getEntry<GatheringContent>(entry.nodeName);
+  return content?.__type === 'gathering' ? content : undefined;
 }
 
 export function worldNodeLevelRange(
   entry: WorldNodeEntry,
 ): EncounterLevelRange | undefined {
-  return worldNodeEncounter(entry)?.levelRange;
+  return worldNodeEncounter(entry)?.levelRange ?? worldNodeGathering(entry)?.levelRange;
 }
 
 export function worldNodeEncounterCount(
@@ -114,8 +124,24 @@ export function worldNodeMonsterCount(
   );
 }
 
+export function worldNodeGatherTime(entry: WorldNodeEntry): number | undefined {
+  return worldNodeGathering(entry)?.gatherTime;
+}
+
+export function worldNodeGatherMaterialIds(entry: WorldNodeEntry): ItemId[] {
+  const gathering = worldNodeGathering(entry);
+  if (!gathering) return [];
+
+  const ids = new Set<ItemId>();
+  gathering.gatherResults.forEach((result) => {
+    result.items.forEach((item) => ids.add(item.itemId));
+  });
+
+  return [...ids];
+}
+
 export function worldNodeDescription(
   entry: WorldNodeEntry,
 ): string | undefined {
-  return worldNodeEncounter(entry)?.description;
+  return worldNodeEncounter(entry)?.description ?? worldNodeGathering(entry)?.description;
 }
