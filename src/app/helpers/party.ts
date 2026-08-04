@@ -82,6 +82,7 @@ export function createCharacter(name: string, jobId: JobId): Character {
       maximum: characterXpForLevel(1),
     },
     jobId,
+    jobProgress: {},
     hp: stats.Health,
     stats,
     equipment,
@@ -100,8 +101,30 @@ export function setParty(party: Character[]): void {
   });
 }
 
+// Snapshots the character's current level/xp under their outgoing job, then
+// pulls out any progress previously saved for the incoming job (if the
+// character has held it before), falling back to level 1 otherwise.
+function characterJobProgressSwap(
+  character: Character,
+  jobId: JobId,
+): { jobProgress: Character['jobProgress']; level: number; xp: Character['xp'] } {
+  const jobProgress: Character['jobProgress'] = {
+    ...character.jobProgress,
+    [character.jobId]: { level: character.level, xp: character.xp },
+  };
+
+  const savedProgress = jobProgress[jobId];
+  delete jobProgress[jobId];
+
+  const level = savedProgress?.level ?? 1;
+  const xp = savedProgress?.xp ?? { current: 0, maximum: characterXpForLevel(level) };
+
+  return { jobProgress, level, xp };
+}
+
 // Reclassing fully unequips the hero; their old gear is routed to the
-// Armory rather than discarded, per M2-03 in the roadmap.
+// Armory rather than discarded, per M2-03 in the roadmap. Level/xp for the
+// outgoing job is saved and, if the incoming job was held before, restored.
 export function characterReclass(characterId: CharacterId, jobId: JobId): void {
   updateGamestate((state) => {
     const character = state.world.party.find((c) => c.id === characterId);
@@ -112,17 +135,22 @@ export function characterReclass(characterId: CharacterId, jobId: JobId): void {
     state.world.party = state.world.party.map((character) => {
       if (character.id !== characterId) return character;
 
+      const { jobProgress, level, xp } = characterJobProgressSwap(
+        character,
+        jobId,
+      );
       const equipment = defaultEquipment();
-      const stats = characterStatsForLevel(jobId, 1, equipment);
+      const stats = characterStatsForLevel(jobId, level, equipment);
 
       return {
         ...character,
         jobId,
+        jobProgress,
         equipment,
         stats,
         hp: stats.Health,
-        level: 1,
-        xp: { current: 0, maximum: characterXpForLevel(1) },
+        level,
+        xp,
       };
     });
     return state;

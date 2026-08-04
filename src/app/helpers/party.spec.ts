@@ -275,6 +275,60 @@ describe('Party Helper Functions', () => {
       expect(result.armory).toEqual([existingItem, jala.equipment.Armor]);
     });
 
+    it('saves the outgoing job level/xp on jobProgress before switching', () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = { ...createCharacterStub('Jala'), level: 10 };
+      jala.xp.current = 50;
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].jobProgress['job-explorer' as JobId]).toEqual(
+        { level: 10, xp: { current: 50, maximum: jala.xp.maximum } },
+      );
+    });
+
+    it('restores previously saved level/xp when reclassing back to a held job', () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = { ...createCharacterStub('Jala'), level: 10 };
+      jala.xp.current = 50;
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn1 = vi.mocked(updateGamestate).mock.calls[0][0];
+      const afterFirstReclass = updateFn1({
+        world: { party: [jala] },
+        armory: [],
+      } as unknown as GameState).world.party[0];
+
+      vi.clearAllMocks();
+      mockGetEntry(mockJob, warriorJob);
+      characterReclass(afterFirstReclass.id, 'job-explorer' as JobId);
+
+      const updateFn2 = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn2({
+        world: { party: [afterFirstReclass] },
+        armory: [],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].level).toBe(10);
+      expect(result.world.party[0].xp).toEqual({
+        current: 50,
+        maximum: jala.xp.maximum,
+      });
+      expect(
+        result.world.party[0].jobProgress['job-explorer' as JobId],
+      ).toBeUndefined();
+      expect(
+        result.world.party[0].jobProgress['job-warrior' as JobId],
+      ).toEqual({ level: 1, xp: { current: 0, maximum: 100 } });
+    });
+
     it('should leave other party members untouched', () => {
       mockGetEntry(mockJob, warriorJob);
       const jala = createCharacterStub('Jala');
