@@ -9,8 +9,14 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/combat', () => ({
+  currentCombat: vi.fn(),
+}));
+
+import { currentCombat } from '@helpers/combat';
 import { getEntry } from '@helpers/content';
-import { equipmentStatTotals } from '@helpers/equipment';
+import { canModifyEquipment, equipmentStatTotals } from '@helpers/equipment';
+import type { Combat } from '@interfaces';
 
 describe('Equipment Helper Functions', () => {
   const sword: EquipmentContent = {
@@ -132,6 +138,20 @@ describe('Equipment Helper Functions', () => {
         Resistance: 0,
         Agility: 0,
       });
+    });
+  });
+
+  describe('canModifyEquipment', () => {
+    it('allows equipment changes when there is no active combat', () => {
+      vi.mocked(currentCombat).mockReturnValue(undefined);
+
+      expect(canModifyEquipment()).toBe(true);
+    });
+
+    it('blocks equipment changes while a combat is active', () => {
+      vi.mocked(currentCombat).mockReturnValue({} as Combat);
+
+      expect(canModifyEquipment()).toBe(false);
     });
   });
 });

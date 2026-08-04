@@ -1,6 +1,6 @@
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
-import { equipmentStatTotals } from '@helpers/equipment';
+import { canModifyEquipment, equipmentStatTotals } from '@helpers/equipment';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -8,6 +8,9 @@ import type {
   CharacterId,
   Combatant,
   EquipmentBlock,
+  EquipmentContent,
+  EquipmentId,
+  EquipmentSlot,
   JobContent,
   JobId,
   StatBlock,
@@ -16,6 +19,7 @@ import { clamp } from 'es-toolkit/compat';
 
 export const CHARACTER_MAX_LEVEL = 99;
 const XP_BASE_PER_LEVEL = 100;
+const STARTER_ARMOR_NAME = 'Cloak of Adventuring';
 
 // Tunable XP curve: 100 XP for level 1->2, scaling up by level^1.5 thereafter.
 export function characterXpForLevel(level: number): number {
@@ -50,8 +54,19 @@ export function characterStatsForLevel(
   return stats;
 }
 
-export function createCharacter(name: string, jobId: JobId): Character {
+function starterEquipment(): EquipmentBlock {
   const equipment = defaultEquipment();
+
+  const starterArmor = getEntry<EquipmentContent>(STARTER_ARMOR_NAME);
+  if (starterArmor) {
+    equipment.Armor = { equipmentId: starterArmor.id };
+  }
+
+  return equipment;
+}
+
+export function createCharacter(name: string, jobId: JobId): Character {
+  const equipment = starterEquipment();
   const stats = characterStatsForLevel(jobId, 1, equipment);
 
   return {
@@ -99,6 +114,62 @@ export function characterReclass(characterId: CharacterId, jobId: JobId): void {
     });
     return state;
   });
+}
+
+function applyCharacterEquipment(
+  characterId: CharacterId,
+  equipmentForCharacter: (character: Character) => EquipmentBlock,
+): boolean {
+  if (!canModifyEquipment()) return false;
+
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((character) => {
+      if (character.id !== characterId) return character;
+
+      const equipment = equipmentForCharacter(character);
+      const stats = characterStatsForLevel(
+        character.jobId,
+        character.level,
+        equipment,
+      );
+
+      return {
+        ...character,
+        equipment,
+        stats,
+        hp: clamp(character.hp, 0, stats.Health),
+      };
+    });
+
+    return state;
+  });
+
+  return true;
+}
+
+// Returns false (without changing state) if equipment cannot currently be
+// modified, e.g. while the party is in combat.
+export function characterEquipItem(
+  characterId: CharacterId,
+  slot: EquipmentSlot,
+  equipmentId: EquipmentId,
+): boolean {
+  return applyCharacterEquipment(characterId, (character) => ({
+    ...character.equipment,
+    [slot]: { equipmentId },
+  }));
+}
+
+// Returns false (without changing state) if equipment cannot currently be
+// modified, e.g. while the party is in combat.
+export function characterUnequipItem(
+  characterId: CharacterId,
+  slot: EquipmentSlot,
+): boolean {
+  return applyCharacterEquipment(characterId, (character) => ({
+    ...character.equipment,
+    [slot]: undefined,
+  }));
 }
 
 export function syncPartyHpFromCombat(heroes: Combatant[]): void {
