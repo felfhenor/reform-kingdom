@@ -135,9 +135,60 @@ describe('travelStart', () => {
 
   it('refuses to start when no path exists', () => {
     vi.mocked(travelPathTo).mockReturnValue(undefined);
+    vi.mocked(worldNodesOfType).mockImplementation((type) =>
+      type === 'Kingdom'
+        ? [{ mapName: 'Carrina', x: 5, y: 5 } as unknown as WorldNodeEntry]
+        : [],
+    );
 
     expect(travelStart('Field Ruins')).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('recalls the party to the kingdom and logs the error when pathfinding fails entirely', () => {
+    vi.mocked(travelPathTo).mockReturnValue(undefined);
+    vi.mocked(currentLocationGet).mockReturnValue({
+      mapName: 'CraggledMire',
+      x: 3,
+      y: 7,
+    });
+    vi.mocked(worldNodesOfType).mockImplementation((type) =>
+      type === 'Kingdom'
+        ? [{ mapName: 'Carrina', x: 5, y: 5 } as unknown as WorldNodeEntry]
+        : [],
+    );
+
+    expect(travelStart('Field Ruins')).toBe(false);
+
+    expect(currentLocationSet).toHaveBeenCalledWith({
+      mapName: 'Carrina',
+      x: 5,
+      y: 5,
+    });
+    const result = applyLastUpdate(stateWithTravel({
+      status: 'Traveling',
+      destinationNodeName: 'Field Ruins',
+      path: [{ kind: 'Move', mapName: 'CraggledMire', x: 4, y: 7 }],
+      ticksIntoStep: 1,
+    }));
+    expect(result.world.travel).toEqual({
+      status: 'Idle',
+      path: [],
+      ticksIntoStep: 0,
+    });
+    expect(travelMessageLog).toHaveBeenCalledWith(
+      'CraggledMire',
+      'Pathing error: no route to Field Ruins could be found from CraggledMire (3, 7). The party was recalled to the kingdom.',
+    );
+  });
+
+  it('still resets travel state and logs even when no Kingdom node exists', () => {
+    vi.mocked(travelPathTo).mockReturnValue(undefined);
+    vi.mocked(worldNodesOfType).mockReturnValue([]);
+
+    expect(travelStart('Field Ruins')).toBe(false);
+
+    expect(currentLocationSet).not.toHaveBeenCalled();
+    expect(travelMessageLog).toHaveBeenCalled();
   });
 
   it('sets travel state to Traveling and logs departure', () => {

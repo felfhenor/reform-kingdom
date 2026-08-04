@@ -51,6 +51,31 @@ function travelArriveWithoutMoving(destinationNodeName: string): void {
   travelArriveAtNode(destinationNodeName, { kind: 'Move', ...location });
 }
 
+// Safety net: if pathfinding can't produce a route at all (e.g. the party's
+// current tile got walled off by a map edit), they'd otherwise be stuck on
+// that tile forever with no way to travel anywhere. Recall them to the
+// kingdom and log exactly where it happened so the underlying map issue can
+// be diagnosed.
+function travelRecoverFromPathingFailure(destinationNodeName: string): void {
+  const location = currentLocationGet();
+  const kingdom = worldNodesOfType('Kingdom')[0];
+
+  if (kingdom) {
+    currentLocationSet({ mapName: kingdom.mapName, x: kingdom.x, y: kingdom.y });
+  }
+
+  updateGamestate((state) => {
+    state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
+    return state;
+  });
+
+  travelMessageLog(
+    location.mapName,
+    `Pathing error: no route to ${destinationNodeName} could be found from ` +
+      `${location.mapName} (${location.x}, ${location.y}). The party was recalled to the kingdom.`,
+  );
+}
+
 export function travelStart(destinationNodeName: string): boolean {
   if (!canPartyTravel()) return false;
 
@@ -61,7 +86,11 @@ export function travelStart(destinationNodeName: string): boolean {
   }
 
   const path = travelPathTo(destinationNodeName);
-  if (!path || (path.length === 0 && !wasTraveling)) return false;
+  if (!path) {
+    travelRecoverFromPathingFailure(destinationNodeName);
+    return false;
+  }
+  if (path.length === 0 && !wasTraveling) return false;
 
   gatheringStop();
 
