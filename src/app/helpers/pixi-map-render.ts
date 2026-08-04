@@ -1,6 +1,8 @@
+import { pixiIndicatorNodeLabelCreate } from '@helpers/pixi-indicators';
 import { tiledLayerTileAt } from '@helpers/tiled-map';
 import type {
   PixiNodeClickHandler,
+  PixiNodeLabelResolver,
   TiledLayer,
   TiledMap,
   TiledObject,
@@ -88,6 +90,7 @@ function pixiTiledObjectRender(
   object: TiledObject,
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
+  resolveNodeLabel?: PixiNodeLabelResolver,
 ): Container | undefined {
   if (!object.gid) return undefined;
 
@@ -133,6 +136,16 @@ function pixiTiledObjectRender(
     });
   }
 
+  // Same restriction as the click handler above - only node objects carry a
+  // `type`, so decorative/terrain objects never get a label.
+  const labelInfo = object.type ? resolveNodeLabel?.(object) : undefined;
+  if (labelInfo) {
+    const label = pixiIndicatorNodeLabelCreate(labelInfo.kind, labelInfo.text);
+    label.x = object.width / 2;
+    label.y = -object.height - 4;
+    wrapper.addChild(label);
+  }
+
   return wrapper;
 }
 
@@ -140,12 +153,18 @@ function pixiTiledObjectLayerRender(
   layer: TiledLayer,
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
+  resolveNodeLabel?: PixiNodeLabelResolver,
 ): Container {
   const container = new Container();
   container.cullable = true;
 
   (layer.objects ?? []).forEach((object) => {
-    const objectContainer = pixiTiledObjectRender(object, textures, onNodeClick);
+    const objectContainer = pixiTiledObjectRender(
+      object,
+      textures,
+      onNodeClick,
+      resolveNodeLabel,
+    );
     if (objectContainer) container.addChild(objectContainer);
   });
 
@@ -156,6 +175,7 @@ export function pixiTiledMapRender(
   map: TiledMap,
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
+  resolveNodeLabel?: PixiNodeLabelResolver,
 ): Container {
   const container = new Container();
 
@@ -163,7 +183,7 @@ export function pixiTiledMapRender(
     const layerContainer =
       layer.type === 'tilelayer'
         ? pixiTiledLayerRender(layer, textures, map.tilewidth, map.tileheight)
-        : pixiTiledObjectLayerRender(layer, textures, onNodeClick);
+        : pixiTiledObjectLayerRender(layer, textures, onNodeClick, resolveNodeLabel);
 
     container.addChild(layerContainer);
   });

@@ -11,6 +11,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import {
   worldNodeDescription,
+  worldNodeInteractionKind,
+  worldNodeLabelInfo,
+  worldNodeLevelLabel,
   worldNodeLevelRange,
   worldNodeMapsBuild,
   worldNodeMonsterCount,
@@ -214,5 +217,51 @@ describe('encounter-backed node accessors', () => {
     it('returns undefined when there is no matching encounter', () => {
       expect(worldNodeDescription(buildEntry())).toBeUndefined();
     });
+  });
+
+  describe('worldNodeLabelInfo', () => {
+    it('labels a gather node with its minimum level', () => {
+      seedEncounter(buildEncounter({ levelRange: { min: 2, max: 5 } }));
+
+      expect(
+        worldNodeLabelInfo(buildEntry({ type: 'ExploreNode' })),
+      ).toEqual({ kind: 'Explore', text: 'Explore Lv.2' });
+    });
+
+    it('omits the level suffix when there is no matching content', () => {
+      expect(worldNodeLabelInfo(buildEntry({ type: 'TeleportNode' }))).toEqual({
+        kind: 'Travel',
+        text: 'Travel',
+      });
+    });
+
+    it('returns undefined for non-interactable object types', () => {
+      expect(worldNodeLabelInfo(buildEntry({ type: '' }))).toBeUndefined();
+    });
+  });
+});
+
+describe('worldNodeInteractionKind', () => {
+  it.each([
+    ['GatherNode', 'Gather'],
+    ['ExploreNode', 'Explore'],
+    ['TeleportNode', 'Travel'],
+    ['Kingdom', 'Travel'],
+  ] as const)('maps %s to %s', (type, kind) => {
+    expect(worldNodeInteractionKind(buildEntry({ type }))).toBe(kind);
+  });
+
+  it('returns undefined for unrecognized types', () => {
+    expect(worldNodeInteractionKind(buildEntry({ type: '' }))).toBeUndefined();
+  });
+});
+
+describe('worldNodeLevelLabel', () => {
+  it('renders the minimum level', () => {
+    expect(worldNodeLevelLabel({ min: 3, max: 3 })).toBe('3');
+  });
+
+  it('ignores the maximum level', () => {
+    expect(worldNodeLevelLabel({ min: 2, max: 5 })).toBe('2');
   });
 });

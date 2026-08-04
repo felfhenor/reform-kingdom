@@ -1,5 +1,12 @@
+import type { WorldNodeInteractionKind } from '@interfaces';
 import type { Texture } from 'pixi.js';
-import { AnimatedSprite, Container, Graphics } from 'pixi.js';
+import { AnimatedSprite, Container, Graphics, Text } from 'pixi.js';
+
+const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
+  Gather: 0x4ade80,
+  Explore: 0xfb7185,
+  Travel: 0x60a5fa,
+};
 
 export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   graphics: Graphics;
@@ -87,7 +94,9 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   container.cullable = true;
   container.visible = false;
 
-  const background = new Graphics().rect(0, 0, barWidth, barHeight).fill(0x000000);
+  const background = new Graphics()
+    .rect(0, 0, barWidth, barHeight)
+    .fill(0x000000);
   background.alpha = 0.6;
   background.x = offsetX;
   background.y = offsetY;
@@ -103,6 +112,31 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   };
 
   return { container, update };
+}
+
+// A floating nametag rendered above every interactable node (gather/explore/
+// travel), always visible rather than only on hover or selection, so players
+// can tell at a glance which nodes they can go to and what level they need.
+export function pixiIndicatorNodeLabelCreate(
+  kind: WorldNodeInteractionKind,
+  text: string,
+): Text {
+  const label = new Text({
+    text,
+    style: {
+      fontSize: 11,
+      fontFamily: 'Arial',
+      fontWeight: 'bold',
+      align: 'center',
+      fill: NODE_LABEL_COLOR_BY_KIND[kind],
+      stroke: { color: 0x000000, width: 3 },
+    },
+  });
+
+  label.anchor.set(0.5, 1);
+  label.cullable = true;
+
+  return label;
 }
 
 export function pixiIndicatorNodeSelectionCreate(tileSize: number): Graphics {

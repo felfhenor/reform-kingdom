@@ -24,6 +24,7 @@ import {
   worldNodeEncounterCount,
   worldNodeGatherMaterialIds,
   worldNodeGatherTime,
+  worldNodeLevelLabel,
   worldNodeLevelRange,
   worldNodeMonsterCount,
 } from '@helpers';
@@ -57,11 +58,7 @@ export class MapNodePanelComponent {
   public levelLabel = computed(() => {
     const entry = this.node();
     const levelRange = entry ? worldNodeLevelRange(entry) : undefined;
-    if (!levelRange) return '—';
-
-    return levelRange.min === levelRange.max
-      ? `${levelRange.min}`
-      : `${levelRange.min}–${levelRange.max}`;
+    return levelRange ? worldNodeLevelLabel(levelRange) : '—';
   });
 
   public encounterCount = computed(() => {

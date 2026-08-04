@@ -11,6 +11,8 @@ import type {
   TiledMap,
   TiledObject,
   WorldNodeEntry,
+  WorldNodeInteractionKind,
+  WorldNodeLabelInfo,
   WorldNodeLookup,
   WorldNodeNameMap,
   WorldNodePositionMap,
@@ -100,7 +102,48 @@ export function worldNodeGathering(
 export function worldNodeLevelRange(
   entry: WorldNodeEntry,
 ): EncounterLevelRange | undefined {
-  return worldNodeEncounter(entry)?.levelRange ?? worldNodeGathering(entry)?.levelRange;
+  return (
+    worldNodeEncounter(entry)?.levelRange ??
+    worldNodeGathering(entry)?.levelRange
+  );
+}
+
+export function worldNodeLevelLabel(levelRange: EncounterLevelRange): string {
+  return `${levelRange.min}`;
+}
+
+// Every clickable node type maps to one of three things a player can do at
+// it - this is what the always-on map label (see `pixiIndicatorNodeLabelCreate`)
+// communicates so players can tell interactable nodes apart at a glance
+// without opening each one.
+export function worldNodeInteractionKind(
+  entry: WorldNodeEntry,
+): WorldNodeInteractionKind | undefined {
+  switch (entry.nodeData.type) {
+    case 'GatherNode':
+      return 'Gather';
+    case 'ExploreNode':
+      return 'Explore';
+    case 'TeleportNode':
+    case 'Kingdom':
+      return 'Travel';
+    default:
+      return undefined;
+  }
+}
+
+export function worldNodeLabelInfo(
+  entry: WorldNodeEntry,
+): WorldNodeLabelInfo | undefined {
+  const kind = worldNodeInteractionKind(entry);
+  if (!kind) return undefined;
+
+  const levelRange = worldNodeLevelRange(entry);
+  const text = levelRange
+    ? `${entry.nodeName}\nLv.${worldNodeLevelLabel(levelRange)}`
+    : entry.nodeName;
+
+  return { kind, text };
 }
 
 export function worldNodeEncounterCount(
@@ -143,5 +186,8 @@ export function worldNodeGatherMaterialIds(entry: WorldNodeEntry): ItemId[] {
 export function worldNodeDescription(
   entry: WorldNodeEntry,
 ): string | undefined {
-  return worldNodeEncounter(entry)?.description ?? worldNodeGathering(entry)?.description;
+  return (
+    worldNodeEncounter(entry)?.description ??
+    worldNodeGathering(entry)?.description
+  );
 }

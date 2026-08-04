@@ -43,6 +43,7 @@ import {
   TICKS_PER_STEP_MOVE,
   worldCameraRecenterRequest,
   worldNodeByName,
+  worldNodeLabelInfo,
 } from '@helpers';
 import type {
   CameraPosition,
@@ -51,6 +52,7 @@ import type {
   JobContent,
   TiledMap,
   TiledObject,
+  WorldNodeLabelInfo,
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
 import { clamp } from 'es-toolkit/compat';
@@ -339,7 +341,12 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     const textures = await pixiTiledMapTexturesLoad(map);
     this.mapContainer.addChild(
-      pixiTiledMapRender(map, textures, (object) => this.onNodeClick(object)),
+      pixiTiledMapRender(
+        map,
+        textures,
+        (object) => this.onNodeClick(object),
+        (object) => this.resolveNodeLabel(object),
+      ),
     );
 
     this.gridOverlay = pixiGridOverlayCreate(map);
@@ -378,6 +385,11 @@ export class GamePlayWorldComponent implements OnDestroy {
   private onNodeClick(object: TiledObject): void {
     const entry = worldNodeByName(object.name);
     if (entry) mapNodeSelect(entry);
+  }
+
+  private resolveNodeLabel(object: TiledObject): WorldNodeLabelInfo | undefined {
+    const entry = worldNodeByName(object.name);
+    return entry ? worldNodeLabelInfo(entry) : undefined;
   }
 
   private onPointerDown = (event: PointerEvent): void => {

@@ -19,3 +19,14 @@ export type WorldNodeLookup = {
   byPosition: WorldNodePositionMap;
   byName: WorldNodeNameMap;
 };
+
+export type WorldNodeInteractionKind = 'Gather' | 'Explore' | 'Travel';
+
+export type WorldNodeLabelInfo = {
+  kind: WorldNodeInteractionKind;
+  text: string;
+};
+
+export type PixiNodeLabelResolver = (
+  object: TiledObject,
+) => WorldNodeLabelInfo | undefined;
