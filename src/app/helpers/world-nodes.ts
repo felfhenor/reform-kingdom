@@ -109,7 +109,7 @@ export function worldNodeLevelRange(
 }
 
 export function worldNodeLevelLabel(levelRange: EncounterLevelRange): string {
-  return `${levelRange.min}`;
+  return `${levelRange.min}-${levelRange.max}`;
 }
 
 // Every clickable node type maps to one of three things a player can do at

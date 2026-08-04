@@ -88,7 +88,7 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   const barWidth = tileSize * 0.8;
   const barHeight = 6;
   const offsetX = (tileSize - barWidth) / 2;
-  const offsetY = -14;
+  const offsetY = -40;
 
   const container = new Container();
   container.cullable = true;
