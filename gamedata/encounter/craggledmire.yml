@@ -1,0 +1,25 @@
+- id: a08cd1a5-5f7d-464f-bd95-9a9ca98df86d
+  name: Mired Ruins
+  description: A goblin tribe far stronger than its kin has made this sunken ruin its den.
+
+  levelRange:
+    min: 10
+    max: 10
+
+  fights:
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin
+
+  completionRewards:
+    - itemId: Gold Coin
+      min: 50
+      max: 75
+      chance: 100
+
+    - itemId: Small Goblin Bone
+      min: 1
+      max: 2
+      chance: 50

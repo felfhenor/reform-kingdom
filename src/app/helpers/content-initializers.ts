@@ -92,6 +92,7 @@ function ensureEncounter(
     description: encounter.description ?? 'UNKNOWN',
     levelRange: encounter.levelRange ?? { min: 1, max: 1 },
     fights: encounter.fights ?? [],
+    completionRewards: encounter.completionRewards ?? [],
   };
 }
 
@@ -203,10 +204,6 @@ function ensureSkill(
     sprite: skill.sprite ?? 'UNKNOWN',
     frames: skill.frames ?? 4,
     rarity: skill.rarity ?? 'Common',
-    dropLevel: skill.dropLevel ?? 0,
-    preventModification: skill.preventModification ?? false,
-    preventDrop: skill.preventDrop ?? false,
-    isFavorite: skill.isFavorite ?? false,
     techniques: skill.techniques ?? [],
     usesPerCombat: skill.usesPerCombat ?? -1,
     numTargets: skill.numTargets ?? 1,

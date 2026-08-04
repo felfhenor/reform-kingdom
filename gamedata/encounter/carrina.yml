@@ -17,6 +17,17 @@
         - monsterId: Goblin
         - monsterId: Goblin
 
+  completionRewards:
+    - itemId: Gold Coin
+      min: 25
+      max: 50
+      chance: 100
+
+    - itemId: Small Goblin Bone
+      min: 3
+      max: 5
+      chance: 25
+
 - id: c6e4119c-b365-4de1-a952-5bf86f7ff173
   name: Forest Ruins
   description: A dilapidated ruin in the forest, home to a small goblin tribe.
@@ -36,17 +47,13 @@
         - monsterId: Goblin
         - monsterId: Goblin
 
-- id: a08cd1a5-5f7d-464f-bd95-9a9ca98df86d
-  name: Mired Ruins
-  description: A goblin tribe far stronger than its kin has made this sunken ruin its den.
+  completionRewards:
+    - itemId: Gold Coin
+      min: 25
+      max: 50
+      chance: 100
 
-  levelRange:
-    min: 10
-    max: 10
-
-  fights:
-    - monsters:
-        - monsterId: Goblin
-        - monsterId: Goblin
-        - monsterId: Goblin
-        - monsterId: Goblin
+    - itemId: Small Goblin Bone
+      min: 3
+      max: 5
+      chance: 25

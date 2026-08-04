@@ -1,6 +1,6 @@
 import type { HasAnimation } from '@interfaces/artable';
 import type { StatusEffectId } from '@interfaces/content-statuseffect';
-import type { Droppable } from '@interfaces/droppable';
+import type { HasRarity } from '@interfaces/droppable';
 import type { GameElement } from '@interfaces/element';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
@@ -12,7 +12,6 @@ export type SkillContent = IsContentItem &
   HasDescription & {
     id: SkillId;
   };
-
 
 export type EquipmentSkillTargetBehavior =
   | 'Always'
@@ -67,8 +66,8 @@ export type EquipmentSkillContentTechnique = {
 };
 
 export type EquipmentSkillContent = IsContentItem &
-  Droppable &
   HasAnimation &
+  HasRarity &
   EquipmentSkillContentModifiable &
   HasDescription & {
     __type: 'skill';

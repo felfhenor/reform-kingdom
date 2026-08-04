@@ -1,27 +1,25 @@
 import type { HasAnimation } from '@interfaces/artable';
 import type { CombatantTargettingType } from '@interfaces/combat';
-import type { ItemId } from '@interfaces/content-item';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
-import type { HasRarity } from '@interfaces/droppable';
+import type {
+  DropHasChance,
+  DropHasLevelMultiplier,
+  DropItem,
+  DropRange,
+  HasRarity,
+} from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
 
 export type MonsterId = Branded<string, 'MonsterId'>;
 
-export type MonsterXpReward = {
-  min: number;
-  max: number;
-  multiplierPerLevel: number;
-};
+export type MonsterXpReward = DropRange & DropHasLevelMultiplier;
 
-export type MonsterDroppedItem = {
-  itemId: ItemId;
-  min: number;
-  max: number;
-  multiplierPerLevel: number;
-  chance: number;
-};
+export type MonsterDroppedItem = DropRange &
+  DropHasLevelMultiplier &
+  DropItem &
+  DropHasChance;
 
 export type MonsterSkill = {
   skillId: EquipmentSkillId;
