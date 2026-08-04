@@ -14,10 +14,12 @@ import {
   getOption,
   isSetup,
   isShowingAnyMenu,
+  isWorldCameraPanned,
   saveGameState,
   setGamePlayView,
   setOption,
   showOptionsMenu,
+  worldCameraRecenter,
 } from '@helpers';
 import type { GamePlayView, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -59,6 +61,14 @@ export class NavbarComponent {
   public isPaused = computed(() => getOption('gameloopPaused'));
 
   public activeGamePlayView = computed(() => gamePlayView());
+
+  public showRecenterButton = computed(
+    () => this.activeGamePlayView() === 'world' && isWorldCameraPanned(),
+  );
+
+  public recenterCamera() {
+    worldCameraRecenter();
+  }
 
   public changeGamePlayView(view: GamePlayView): void {
     setGamePlayView(view);

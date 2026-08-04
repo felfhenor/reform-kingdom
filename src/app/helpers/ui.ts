@@ -37,6 +37,19 @@ export function kingdomSubviewClear(): void {
 
 export const showReclassHeroesModal = signal<boolean>(false);
 
+export const isWorldCameraPanned = signal<boolean>(false);
+
+// Incremented to signal a recenter request; the world map component (which
+// owns the actual camera state) watches this via an effect and reacts by
+// resetting its camera offset - the trigger has to live here rather than a
+// direct method call because the recenter button is rendered in the navbar,
+// a component with no reference to the map component.
+export const worldCameraRecenterRequest = signal<number>(0);
+
+export function worldCameraRecenter(): void {
+  worldCameraRecenterRequest.update((count) => count + 1);
+}
+
 export const selectedMapNode = signal<WorldNodeEntry | undefined>(undefined);
 
 export function mapNodeSelect(entry: WorldNodeEntry): void {

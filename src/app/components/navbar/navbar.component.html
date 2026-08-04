@@ -60,6 +60,21 @@
         </li>
       }
 
+      @if (showRecenterButton()) {
+        <li class="action-button" appRequireSetup>
+          <button
+            class="btn btn-xs btn-secondary"
+            tp="Recenter on Hero"
+            (click)="recenterCamera()"
+            appSfx="ui-click"
+            [sfxOffset]="panelConfigs.length + 3"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-icon name="tablerFocus" size="2em" color="#000"></app-icon>
+          </button>
+        </li>
+      }
+
       <li class="action-button" appRequireSetup>
         <button
           class="btn btn-xs btn-info"

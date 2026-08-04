@@ -4,10 +4,6 @@
   @apply block w-full h-full relative;
 }
 
-.recenter-button {
-  @apply absolute bottom-4 left-4;
-}
-
 .fade-overlay {
   @apply absolute inset-0 pointer-events-none bg-black opacity-0;
   transition: opacity 300ms ease;

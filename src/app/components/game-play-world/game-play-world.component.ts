@@ -6,13 +6,12 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { GlobalEffectBarComponent } from '@components/global-effect-bar/global-effect-bar.component';
 import { HeroStatusComponent } from '@components/hero-status/hero-status.component';
-import { IconComponent } from '@components/icon/icon.component';
 import { MapNodePanelComponent } from '@components/map-node-panel/map-node-panel.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
@@ -25,6 +24,7 @@ import {
   isGathering,
   isGlobalEffectActive,
   isPlayerAtLocation,
+  isWorldCameraPanned,
   mapNodeDeselect,
   mapNodeSelect,
   partyGet,
@@ -41,6 +41,7 @@ import {
   pixiWorldContainersCreate,
   selectedMapNode,
   TICKS_PER_STEP_MOVE,
+  worldCameraRecenterRequest,
   worldNodeByName,
 } from '@helpers';
 import type {
@@ -66,13 +67,7 @@ const FADE_DURATION_MS = 300;
 @Component({
   selector: 'app-game-play-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    MapNodePanelComponent,
-    IconComponent,
-    SFXDirective,
-    GlobalEffectBarComponent,
-    HeroStatusComponent,
-  ],
+  imports: [MapNodePanelComponent, GlobalEffectBarComponent, HeroStatusComponent],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
     <div class="fade-overlay" [class.visible]="fadeVisible()"></div>
@@ -81,18 +76,6 @@ const FADE_DURATION_MS = 300;
     <app-map-node-panel></app-map-node-panel>
 
     <app-hero-status class="hero-status-layer"></app-hero-status>
-
-    @if (isPanned()) {
-      <button
-        type="button"
-        class="btn btn-circle btn-primary recenter-button shadow-lg"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
-        (click)="recenterCamera()"
-      >
-        <app-icon name="tablerFocus"></app-icon>
-      </button>
-    }
   `,
   styleUrl: './game-play-world.component.scss',
 })
@@ -170,6 +153,30 @@ export class GamePlayWorldComponent implements OnDestroy {
     effect(() => {
       const showBackdropGrid = getOption('showBackdropGrid');
       if (this.gridOverlay) this.gridOverlay.visible = showBackdropGrid;
+    });
+
+    effect(() => {
+      isWorldCameraPanned.set(this.isPanned());
+    });
+
+    // The recenter button lives in the navbar (so it can sit beside the
+    // pause button), but the camera offset it resets is owned here - this
+    // effect is the bridge between the navbar's click and this component's
+    // state. Skipped on the initial run so mounting the component doesn't
+    // itself count as a recenter request. The call is wrapped in `untracked`
+    // because `recenterCamera` transitively reads `cameraOffset` (via
+    // `positionCamera`) - without it, that read would register as a
+    // dependency of this same effect, so any later drag (which also writes
+    // `cameraOffset`) would re-trigger it and immediately snap the camera
+    // back to center again.
+    let isFirstRecenterCheck = true;
+    effect(() => {
+      worldCameraRecenterRequest();
+      if (isFirstRecenterCheck) {
+        isFirstRecenterCheck = false;
+        return;
+      }
+      untracked(() => this.recenterCamera());
     });
   }
 
