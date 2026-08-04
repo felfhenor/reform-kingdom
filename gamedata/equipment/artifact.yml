@@ -4,6 +4,7 @@
   levelRequirement: 3
   rarity: Uncommon
   slots: [Artifact]
+  requiredJobIds: [Magician]
   sprite: '0014'
   baseStats:
     Intelligence: 2.3

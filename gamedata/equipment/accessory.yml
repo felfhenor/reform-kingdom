@@ -14,6 +14,7 @@
   levelRequirement: 4
   rarity: Uncommon
   slots: [Accessory]
+  requiredJobIds: [Explorer]
   sprite: '0010'
   baseStats:
     Resistance: 1

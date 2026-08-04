@@ -4,6 +4,7 @@
   levelRequirement: 1
   rarity: Common
   slots: [Ammo]
+  requiredJobIds: [Ranger]
   sprite: '0015'
   baseStats:
     Strength: 1
@@ -14,6 +15,7 @@
   levelRequirement: 3
   rarity: Common
   slots: [Ammo]
+  requiredJobIds: [Ranger]
   sprite: '0016'
   baseStats:
     Strength: 1.3
