@@ -1,0 +1,73 @@
+- id: 957c309b-e3f7-4bb4-b017-5a8e983c9fc0
+  name: Wergen Woods
+  description: A dry forest, perfect for gathering wood and leather from the local wildlife.
+
+  levelRange:
+    min: 1
+    max: 5
+
+  xpGainedIfInLevelRange: 3
+  gatherTime: 5
+
+  gatherResults:
+    - chance: 40
+      items:
+        - itemId: Wergen Stick
+          quantity: 1
+
+    - chance: 30
+      items:
+        - itemId: Wergen Wood
+          quantity: 1
+
+    - chance: 10
+      items:
+        - itemId: Wergen Wood
+          quantity: 1
+
+        - itemId: Wergen Stick
+          quantity: 1
+
+    - chance: 30
+      items:
+        - itemId: Tattered Hide
+          quantity: 1
+
+- id: b947fc5a-9e29-413e-b529-b202ab540821
+  name: Fieren Fields
+  description: A tiny field full of flax flowers.
+
+  levelRange:
+    min: 1
+    max: 5
+
+  xpGainedIfInLevelRange: 3
+  gatherTime: 5
+
+  gatherResults:
+    - chance: 1
+      items:
+        - itemId: Flax Flower
+          quantity: 1
+
+- id: 18846107-ec4c-479c-bd81-82c8d986d24e
+  name: Carrina Copper Mines
+  description: A small copper mine, perfect for gathering copper ore.
+
+  levelRange:
+    min: 1
+    max: 5
+
+  xpGainedIfInLevelRange: 3
+  gatherTime: 5
+
+  gatherResults:
+    - chance: 30
+      items:
+        - itemId: Copper Ore
+          quantity: 1
+
+    - chance: 1
+      items:
+        - itemId: Malachite
+          quantity: 1

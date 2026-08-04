@@ -4,3 +4,10 @@
   rarity: Common
 
   sprite: '0001'
+
+- id: 8ff1e698-7070-40f1-8a54-5670bfd97cac
+  name: Wergen Stick
+  description: A fragile stick used for basic gear crafting.
+  rarity: Common
+
+  sprite: '0006'

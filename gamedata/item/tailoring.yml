@@ -1,3 +1,10 @@
+- id: 35bdf2c2-d436-46bc-bc49-46ed2f4e22e3
+  name: Flax Flower
+  description: A tiny flower that can be turned into Linen Thread for crafting.
+  rarity: Common
+
+  sprite: '0007'
+
 - id: 596a45ef-6150-40a4-a902-eb3489029ac0
   name: Linen Thread
   description: A weak kind of fabric used for basic gear crafting.
