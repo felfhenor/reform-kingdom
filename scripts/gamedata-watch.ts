@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 const { execSync } = require('child_process');
 const fs = require('fs-extra');
 const chokidar = require('chokidar');
@@ -36,14 +34,27 @@ const getAllUsedSprites = () => {
 };
 
 const startWatch = async () => {
-  console.info(`[helpers] Watching gamedata changes...`);
+  console.info(`[helpers] Watching gamedata & gamemaps changes...`);
   allUsedSpritesheetKeys = getAllUsedSprites();
+
+  chokidar
+    .watch('gamemaps', {
+      ignored: (file: string, stats?: { isFile: () => boolean }) =>
+        stats?.isFile() && !file.endsWith('.json'),
+    })
+    .on('change', (name: string) => {
+      console.log(name);
+      console.info(`[helpers] ${name} changed. Rebuilding maps...`);
+
+      runCommand('npm run build:maps');
+      console.info('[helpers] Rebuilt maps.');
+    });
 
   chokidar.watch('gamedata').on('change', (name: string) => {
     console.info(`[helpers] ${name} changed. Rebuilding gamedata...`);
 
     runCommand('npm run gamedata:build');
-    console.info('[helpers] Rebuilt.');
+    console.info('[helpers] Rebuilt gamedata.');
 
     const allUsedSprites = getAllUsedSprites();
 
@@ -54,7 +65,7 @@ const startWatch = async () => {
     ) {
       console.info('[helpers] Rebuilding art due to new assets...');
       runCommand('npm run gamedata:art:spritesheets');
-      console.info('[helpers] Rebuilt.');
+      console.info('[helpers] Rebuilt art.');
     }
 
     allUsedSpritesheetKeys = allUsedSprites;
