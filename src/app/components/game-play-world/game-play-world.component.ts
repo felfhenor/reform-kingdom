@@ -130,6 +130,12 @@ export class GamePlayWorldComponent implements OnDestroy {
   private visualPosition: CurrentLocation = { mapName: '', x: 0, y: 0 };
   private lastVisualFrameTime = performance.now();
 
+  // Tracks whether the party was mid-glide as of the last tick, so
+  // `updateVisualPosition` can tell a fresh departure (stationary -> moving)
+  // apart from an ongoing glide - a panned camera only needs recentering at
+  // the moment travel starts, not on every frame of it.
+  private wasMoving = false;
+
   // Whether the "at location" indicator (rather than the walking token) is
   // currently shown - driven by visual arrival (see `updatePlayerIndicator`),
   // not the instant `currentLocation` ticks over, so the walking token stays
@@ -571,12 +577,19 @@ export class GamePlayWorldComponent implements OnDestroy {
     const target = currentLocationGet();
     if (target.mapName !== this.visualPosition.mapName) {
       this.visualPosition = { ...target };
+      this.wasMoving = false;
       return;
     }
 
     const dx = target.x - this.visualPosition.x;
     const dy = target.y - this.visualPosition.y;
     const distance = Math.hypot(dx, dy);
+
+    if (distance > 0 && !this.wasMoving && this.isPanned()) {
+      this.recenterCamera();
+    }
+    this.wasMoving = distance > 0;
+
     if (distance === 0) return;
 
     const speedMultiplier = getOption('debugTickMultiplier');
