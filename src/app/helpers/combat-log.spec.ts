@@ -96,7 +96,9 @@ describe('travelMessageLog', () => {
 
 describe('adventureLogMessageHtml', () => {
   it('renders markdown emphasis inline, without wrapping paragraph tags', () => {
-    expect(adventureLogMessageHtml('**Jala** attacks **Goblin** for 8 damage.')).toBe(
+    expect(
+      adventureLogMessageHtml('**Jala** attacks **Goblin** for 8 damage.'),
+    ).toBe(
       '<strong>Jala</strong> attacks <strong>Goblin</strong> for 8 damage.',
     );
   });
@@ -150,7 +152,10 @@ describe('itemDropHtml', () => {
 
 describe('equipmentNameHtml', () => {
   it('wraps the equipment name in a rarity-colored span', () => {
-    const equipment = { name: 'Goblin Skull', rarity: 'Uncommon' } as EquipmentContent;
+    const equipment = {
+      name: 'Goblin Skull',
+      rarity: 'Uncommon',
+    } as EquipmentContent;
 
     expect(equipmentNameHtml(equipment)).toBe(
       '<span class="text-Uncommon font-semibold">Goblin Skull</span>',
@@ -160,7 +165,10 @@ describe('equipmentNameHtml', () => {
 
 describe('equipmentDropHtml', () => {
   it('renders the same rarity-colored span as equipmentNameHtml, with no quantity', () => {
-    const equipment = { name: 'Goblin Skull', rarity: 'Uncommon' } as EquipmentContent;
+    const equipment = {
+      name: 'Goblin Skull',
+      rarity: 'Uncommon',
+    } as EquipmentContent;
 
     expect(equipmentDropHtml(equipment)).toBe(
       '<span class="text-Uncommon font-semibold">Goblin Skull</span>',
@@ -173,7 +181,7 @@ describe('recipeNameHtml', () => {
     const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
 
     expect(recipeNameHtml(recipe)).toBe(
-      '<span class="font-semibold">Equipment: Bone-Hewn Cloak</span>',
+      '<span class="font-semibold">Recipe - Equipment: Bone-Hewn Cloak</span>',
     );
   });
 });
@@ -183,7 +191,7 @@ describe('recipeDropHtml', () => {
     const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
 
     expect(recipeDropHtml(recipe)).toBe(
-      '<span class="font-semibold">Equipment: Bone-Hewn Cloak</span>',
+      '<span class="font-semibold">Recipe - Equipment: Bone-Hewn Cloak</span>',
     );
   });
 });
