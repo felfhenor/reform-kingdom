@@ -1,0 +1,57 @@
+<app-card-page heightProfile="full">
+  <span header>
+    <ng-content select="[header]" />
+  </span>
+
+  <div pageactions>
+    <button class="btn btn-sm" (click)="back()">Back</button>
+  </div>
+
+  <div class="paged-grid-page">
+    <ng-content select="[before-toolbar]" />
+
+    @if (showToolbar()) {
+      <div class="paged-grid-toolbar">
+        <input
+          type="text"
+          [placeholder]="searchPlaceholder()"
+          class="input input-sm input-bordered w-full max-w-xs"
+          [value]="searchText()"
+          (input)="onSearchInput($event)"
+        />
+
+        @if (totalPages() > 1) {
+          <div class="paged-grid-pagination">
+            <button
+              class="btn btn-xs"
+              [disabled]="page() === 0"
+              (click)="prevPage()"
+            >
+              «
+            </button>
+            <span>Page {{ page() + 1 }} / {{ totalPages() }}</span>
+            <button
+              class="btn btn-xs"
+              [disabled]="page() >= totalPages() - 1"
+              (click)="nextPage()"
+            >
+              »
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="paged-grid-grid" #gridContainer>
+      @if (showGrid()) {
+        @if (pagedEntries().length === 0) {
+          <div class="paged-grid-empty">{{ emptyMessage() }}</div>
+        }
+
+        <ng-content />
+      } @else {
+        <ng-content select="[custom]" />
+      }
+    </div>
+  </div>
+</app-card-page>

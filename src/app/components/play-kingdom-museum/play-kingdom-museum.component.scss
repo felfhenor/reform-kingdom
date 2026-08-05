@@ -4,25 +4,6 @@
   @apply block h-full;
 }
 
-.museum-page {
-  @apply flex flex-col gap-2 h-full;
-}
-
-.museum-toolbar {
-  @apply flex items-center justify-between gap-2;
-}
-
-.museum-pagination {
-  @apply flex items-center gap-2;
-}
-
-.museum-grid {
-  @apply flex-1 grid content-start justify-items-center overflow-hidden;
-  grid-template-columns: repeat(auto-fill, 64px);
-  grid-auto-rows: 64px;
-  gap: 8px;
-}
-
 .museum-empty {
   @apply col-span-full flex items-center justify-center italic opacity-70;
 }
