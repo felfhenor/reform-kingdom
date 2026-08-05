@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { ContentNameComponent } from '@components/content-name/content-name.component';
@@ -7,16 +8,13 @@ import { defaultStats } from '@helpers';
 import type { BaseStat, EquipmentContent, StatBlock } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
-function roundToTenth(value: number): number {
-  return Math.round(value * 10) / 10;
-}
-
 @Component({
   selector: 'app-equipment-item-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
     ContentNameComponent,
+    DecimalPipe,
     IconBlankSlotComponent,
     IconStatComponent,
     TippyDirective,
@@ -49,12 +47,10 @@ export class EquipmentItemCardComponent {
   );
 
   public statValue(stat: BaseStat): number {
-    return roundToTenth(this.equipment().baseStats[stat]);
+    return this.equipment().baseStats[stat];
   }
 
   public statDelta(stat: BaseStat): number {
-    return roundToTenth(
-      this.statValue(stat) - (this.comparisonStats()?.[stat] ?? 0),
-    );
+    return this.statValue(stat) - (this.comparisonStats()?.[stat] ?? 0);
   }
 }

@@ -31,7 +31,11 @@
         <span class="equipment-item-row-stat">
           <app-icon-stat [stat]="stat" />
           <span>{{ statShorthand[stat] }}</span>
-          <span>{{ equipStatValue > 0 ? '+' : '' }}{{ equipStatValue }}</span>
+          <span
+            >{{ equipStatValue > 0 ? '+' : '' }}{{
+              equipStatValue | number: '1.0-1'
+            }}</span
+          >
         </span>
       }
     </span>
@@ -59,16 +63,6 @@
         @let value = statValue(stat);
         @let delta = statDelta(stat);
         @let hasComparison = comparisonStats();
-        @let displayValue =
-          hasComparison
-            ? delta === 0
-              ? '-'
-              : delta > 0
-                ? '+' + delta
-                : '' + delta
-            : value > 0
-              ? '+' + value
-              : '' + value;
 
         <div
           class="flex items-center gap-2 text-sm"
@@ -81,7 +75,17 @@
             {{ statShorthand[stat] }}
           </span>
 
-          <span class="ml-auto">{{ displayValue }}</span>
+          <span class="ml-auto">
+            @if (hasComparison) {
+              @if (delta === 0) {
+                -
+              } @else {
+                {{ delta > 0 ? '+' : '' }}{{ delta | number: '1.0-1' }}
+              }
+            } @else {
+              {{ value > 0 ? '+' : '' }}{{ value | number: '1.0-1' }}
+            }
+          </span>
         </div>
       }
     </div>
