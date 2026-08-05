@@ -30,6 +30,13 @@
   @apply relative z-10;
 }
 
+// Secondary slot for a multi-slot item (e.g. a two-handed weapon also
+// occupying Offhand) - shown faded so it reads as "same item, not empty"
+// rather than a second distinct piece of equipment.
+.equipment-slot-image-secondary {
+  @apply opacity-40;
+}
+
 .equipment-slot-tooltip-image {
   @apply shrink-0;
 }

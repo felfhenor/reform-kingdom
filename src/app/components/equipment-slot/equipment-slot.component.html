@@ -19,6 +19,7 @@
         spritesheet="equipment"
         [assetName]="content.sprite"
         class="equipment-slot-image"
+        [class.equipment-slot-image-secondary]="isSecondarySlot()"
       />
     }
   </app-icon-blank-slot>
@@ -41,6 +42,12 @@
         <div class="text-xs mb-1">
           Lv. {{ content.levelRequirement }} {{ slot() }}
         </div>
+
+        @if (content.slots.length > 1) {
+          <div class="text-xs mb-1 italic opacity-70">
+            Occupies: {{ content.slots.join(' + ') }}
+          </div>
+        }
 
         @if (content.requiredJobIds.length > 0) {
           <div class="text-xs mb-2 flex gap-1">

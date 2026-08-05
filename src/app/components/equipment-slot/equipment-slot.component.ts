@@ -37,6 +37,13 @@ export class EquipmentSlotComponent {
     return id ? getEntry<EquipmentContent>(id) : undefined;
   });
 
+  public isSecondarySlot = computed<boolean>(() => {
+    const content = this.equippedContent();
+    if (!content || content.slots.length <= 1) return false;
+
+    return content.slots[0] !== this.slot();
+  });
+
   public statValue(stat: BaseStat): number {
     return this.equippedContent()?.baseStats[stat] ?? 0;
   }
