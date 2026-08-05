@@ -1,0 +1,6 @@
+- id: 5ba5970c-3edf-4b04-ba98-79ee6aae7918
+  name: Recipe Backdrop
+  description: A backdrop used for the recipe icons
+  rarity: Common
+
+  sprite: '0010'
