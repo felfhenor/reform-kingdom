@@ -2,8 +2,9 @@
 
 <button
   type="button"
-  class="equipment-slot outline-2 outline-offset-[-2px] rounded"
-  [class]="content ? 'outline-' + content.rarity : 'outline-gray-500'"
+  class="equipment-slot outline-2 outline-offset-[-2px] rounded {{
+    content ? 'outline-' + content.rarity : 'outline-gray-500'
+  }}"
   [class.equipment-slot-selected]="isSelected()"
   [tp]="tooltip"
   [tpPlacement]="'top'"
