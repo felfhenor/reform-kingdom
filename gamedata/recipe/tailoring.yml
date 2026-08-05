@@ -12,6 +12,7 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
   tradeskillXP: 1
+  craftTime: 3
 
 - id: 91ab444c-21c5-4979-96a9-3f32896215e4
   name: 'Equipment: Linen Shirt'
@@ -26,6 +27,7 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 4
   tradeskillXP: 1
+  craftTime: 20
 
 - id: 8a5ab06a-1ccf-4e74-aaeb-ff04480f3c3c
   name: 'Equipment: Linen Hat'
@@ -43,6 +45,7 @@
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
   tradeskillXP: 1
+  craftTime: 20
 
 - id: bbcf8a4f-4b7a-4d9e-8607-deab34ac53dd
   name: 'Equipment: Bone-Hewn Cloak'
@@ -63,3 +66,4 @@
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
   tradeskillXP: 1
+  craftTime: 60

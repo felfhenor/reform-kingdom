@@ -14,3 +14,4 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
   tradeskillXP: 2
+  craftTime: 10

@@ -12,6 +12,7 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 2
   tradeskillXP: 1
+  craftTime: 3
 
 - id: cea072ef-6365-4b30-b5d6-fd9f205ab676
   name: 'Equipment: Copper Ring'
@@ -26,6 +27,7 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
   tradeskillXP: 1
+  craftTime: 20
 
 - id: 8a4d4e21-7c89-4dd0-86ae-b41c643c7b99
   name: 'Equipment: Copper Bangle'
@@ -40,3 +42,4 @@
   minTradeskillLevel: 2
   maxTradeskillLevel: 4
   tradeskillXP: 1
+  craftTime: 20

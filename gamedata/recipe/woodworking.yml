@@ -12,6 +12,7 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
   tradeskillXP: 1
+  craftTime: 5
 
 - id: 6436437a-3331-4915-a88d-009eda5baf95
   name: 'Equipment: Wooden Arrow'
@@ -26,6 +27,7 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 4
   tradeskillXP: 2
+  craftTime: 20
 
 - id: 1a9ffc55-456d-4cc8-afab-5710705570e6
   name: 'Equipment: Wooden Arrow (Sharp)'
@@ -42,6 +44,7 @@
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
   tradeskillXP: 3
+  craftTime: 40
 
 - id: 66d36d4b-ca4a-48b1-aad0-d85eca6ecbf4
   name: 'Equipment: Copper Spear'
@@ -59,3 +62,4 @@
   minTradeskillLevel: 3
   maxTradeskillLevel: 6
   tradeskillXP: 1
+  craftTime: 20
