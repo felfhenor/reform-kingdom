@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { ContentNameComponent } from '@components/content-name/content-name.component';
@@ -7,6 +6,7 @@ import { IconStatComponent, STAT_SHORTHAND } from '@components/icon-stat/icon-st
 import { defaultStats } from '@helpers';
 import type { BaseStat, EquipmentContent, StatBlock } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-equipment-item-card',
@@ -14,9 +14,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   imports: [
     AtlasImageComponent,
     ContentNameComponent,
-    DecimalPipe,
     IconBlankSlotComponent,
     IconStatComponent,
+    StatDisplayPipe,
     TippyDirective,
   ],
   templateUrl: './equipment-item-card.component.html',

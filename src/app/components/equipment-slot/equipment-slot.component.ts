@@ -6,6 +6,7 @@ import { IconStatComponent, STAT_SHORTHAND } from '@components/icon-stat/icon-st
 import { defaultStats, getEntry } from '@helpers';
 import type { BaseStat, EquipmentContent, EquipmentId, EquipmentSlot } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-equipment-slot',
@@ -15,6 +16,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     ContentNameComponent,
     IconBlankSlotComponent,
     IconStatComponent,
+    StatDisplayPipe,
     TippyDirective,
   ],
   templateUrl: './equipment-slot.component.html',

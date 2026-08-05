@@ -8,6 +8,7 @@ import {
 import { defaultStats } from '@helpers';
 import type { BaseStat, EquipmentContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-armory-item-slot',
@@ -16,6 +17,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     AtlasImageComponent,
     IconBlankSlotComponent,
     IconStatComponent,
+    StatDisplayPipe,
     TippyDirective,
   ],
   templateUrl: './armory-item-slot.component.html',

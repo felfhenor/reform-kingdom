@@ -31,11 +31,7 @@
         <span class="equipment-item-row-stat">
           <app-icon-stat [stat]="stat" />
           <span>{{ statShorthand[stat] }}</span>
-          <span
-            >{{ equipStatValue > 0 ? '+' : '' }}{{
-              equipStatValue | number: '1.0-1'
-            }}</span
-          >
+          <span>{{ equipStatValue | statDisplay: 1 }}</span>
         </span>
       }
     </span>
@@ -80,10 +76,10 @@
               @if (delta === 0) {
                 -
               } @else {
-                {{ delta > 0 ? '+' : '' }}{{ delta | number: '1.0-1' }}
+                {{ delta | statDisplay: 2 }}
               }
             } @else {
-              {{ value > 0 ? '+' : '' }}{{ value | number: '1.0-1' }}
+              {{ value | statDisplay: 2 }}
             }
           </span>
         </div>
