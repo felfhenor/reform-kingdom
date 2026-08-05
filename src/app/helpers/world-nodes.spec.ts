@@ -332,12 +332,12 @@ describe('encounter-backed node accessors', () => {
   });
 
   describe('worldNodeLabelInfo', () => {
-    it('labels a gather node with its minimum level', () => {
+    it('labels a gather node with its level range', () => {
       seedEncounter(buildEncounter({ levelRange: { min: 2, max: 5 } }));
 
       expect(
         worldNodeLabelInfo(buildEntry({ type: 'ExploreNode' })),
-      ).toEqual({ kind: 'Explore', text: 'Forest Ruins\nLv.2' });
+      ).toEqual({ kind: 'Explore', text: 'Forest Ruins\nLv.2-5' });
     });
 
     it('omits the level suffix when there is no matching content', () => {
@@ -369,11 +369,11 @@ describe('worldNodeInteractionKind', () => {
 });
 
 describe('worldNodeLevelLabel', () => {
-  it('renders the minimum level', () => {
-    expect(worldNodeLevelLabel({ min: 3, max: 3 })).toBe('3');
+  it('renders min-max even when they are equal', () => {
+    expect(worldNodeLevelLabel({ min: 3, max: 3 })).toBe('3-3');
   });
 
-  it('ignores the maximum level', () => {
-    expect(worldNodeLevelLabel({ min: 2, max: 5 })).toBe('2');
+  it('renders the full min-max range', () => {
+    expect(worldNodeLevelLabel({ min: 2, max: 5 })).toBe('2-5');
   });
 });

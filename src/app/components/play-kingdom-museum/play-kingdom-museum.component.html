@@ -1,3 +1,5 @@
+@let tab = activeTab();
+
 <app-card-page heightProfile="full">
   <span header>Museum</span>
 
@@ -5,5 +7,72 @@
     <button class="btn btn-sm" (click)="back()">Back</button>
   </div>
 
-  <div class="p-4 italic">Coming soon.</div>
+  <div class="museum-page">
+    <div role="tablist" class="tabs tabs-boxed">
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        [class.tab-active]="tab === 'collectibles'"
+        (click)="setTab('collectibles')"
+      >
+        Collectibles ({{ discoveredCount() }}/{{ entries().length }})
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        [class.tab-active]="tab === 'recipes'"
+        (click)="setTab('recipes')"
+      >
+        Recipes
+      </button>
+    </div>
+
+    @if (tab === 'collectibles') {
+      <div class="museum-toolbar">
+        <input
+          type="text"
+          placeholder="Search by name, description, or location..."
+          class="input input-sm input-bordered w-full max-w-xs"
+          [value]="searchText()"
+          (input)="onSearchInput($event)"
+        />
+
+        @if (totalPages() > 1) {
+          <div class="museum-pagination">
+            <button
+              class="btn btn-xs"
+              [disabled]="page() === 0"
+              (click)="prevPage()"
+            >
+              «
+            </button>
+            <span>Page {{ page() + 1 }} / {{ totalPages() }}</span>
+            <button
+              class="btn btn-xs"
+              [disabled]="page() >= totalPages() - 1"
+              (click)="nextPage()"
+            >
+              »
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="museum-grid" #gridContainer>
+      @if (tab === 'collectibles') {
+        @if (pagedEntries().length === 0) {
+          <div class="museum-empty">No collectibles found.</div>
+        }
+
+        @for (entry of pagedEntries(); track entry.collectible.id) {
+          <app-museum-collectible-slot [entry]="entry" />
+        }
+      } @else {
+        <div class="museum-empty">Recipes coming soon.</div>
+      }
+    </div>
+  </div>
 </app-card-page>

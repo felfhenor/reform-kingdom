@@ -1,0 +1,64 @@
+@let e = entry();
+
+@if (e.discovered) {
+  <div
+    class="museum-collectible-slot outline-2 outline-offset-[-2px] rounded outline-{{
+      e.collectible.rarity
+    }}"
+    [tp]="tooltip"
+    [tpPlacement]="'top'"
+  >
+    <app-icon-blank-slot>
+      <app-atlas-image
+        spritesheet="collectible"
+        [assetName]="e.collectible.sprite"
+      />
+    </app-icon-blank-slot>
+
+    <span class="museum-collectible-count">{{ displayQuantity() }}</span>
+  </div>
+} @else {
+  <div [tp]="tooltip" [tpPlacement]="'top'">
+    <app-icon-unknown />
+  </div>
+}
+
+<ng-template #tooltip>
+  <div class="flex gap-2 p-2">
+    @if (e.discovered) {
+      <app-atlas-image
+        spritesheet="collectible"
+        [assetName]="e.collectible.sprite"
+        class="museum-collectible-tooltip-image"
+      />
+    }
+
+    <div>
+      @if (e.discovered) {
+        <div class="font-bold mb-1 text-{{ e.collectible.rarity }}">
+          {{ e.collectible.name }}
+        </div>
+
+        <div class="italic text-sm mb-2">
+          {{ e.collectible.description }}
+        </div>
+
+        <div class="text-xs">Found: {{ displayQuantity() }}</div>
+
+        @if (e.foundAtNode) {
+          <div class="text-xs">Location: {{ e.foundAtNode }}</div>
+        }
+      } @else {
+        <div class="font-bold mb-1">???</div>
+
+        @if (e.sourceNodeNames.length > 0) {
+          <div class="text-xs">
+            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
+          </div>
+        } @else {
+          <div class="text-xs italic">Location unknown</div>
+        }
+      }
+    </div>
+  </div>
+</ng-template>

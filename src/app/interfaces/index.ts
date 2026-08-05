@@ -21,6 +21,7 @@ export * from './gathering';
 export * from './identifiable';
 export * from './map';
 export * from './meta';
+export * from './museum';
 export * from './pixi-config';
 export * from './sfx';
 export * from './stat';

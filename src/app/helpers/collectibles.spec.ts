@@ -17,6 +17,7 @@ vi.mock('@helpers/state-game', () => ({
 
 import {
   collectiblesAdd,
+  getCollectibleFoundAtNode,
   getCollectibleQuantity,
   grantFoundingStoneIfMissing,
   isCollectibleDiscovered,
@@ -75,6 +76,30 @@ describe('Collectibles Helper Functions', () => {
     });
   });
 
+  describe('getCollectibleFoundAtNode', () => {
+    it('returns the node the collectible was found in', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        collectibles: {
+          [foundingStone.id]: {
+            quantity: 1,
+            foundAt: 1000,
+            foundAtNode: 'Field Ruins',
+          },
+        },
+      } as unknown as GameState);
+
+      expect(getCollectibleFoundAtNode(foundingStone.id)).toBe('Field Ruins');
+    });
+
+    it('returns undefined when the collectible has never been found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        collectibles: {},
+      } as unknown as GameState);
+
+      expect(getCollectibleFoundAtNode(foundingStone.id)).toBeUndefined();
+    });
+  });
+
   describe('collectiblesAdd', () => {
     it('adds a new collectible entry with the current timestamp', () => {
       collectiblesAdd(foundingStone.id);
@@ -107,6 +132,38 @@ describe('Collectibles Helper Functions', () => {
       collectiblesAdd(foundingStone.id, -1);
 
       expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('records the node it was found in', () => {
+      collectiblesAdd(foundingStone.id, 1, 'Field Ruins');
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        collectibles: {},
+      } as unknown as GameState);
+
+      expect(result.collectibles[foundingStone.id].foundAtNode).toBe(
+        'Field Ruins',
+      );
+    });
+
+    it('preserves the original found-at node on repeat finds', () => {
+      collectiblesAdd(foundingStone.id, 1, 'Craggledmire');
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        collectibles: {
+          [foundingStone.id]: {
+            quantity: 1,
+            foundAt: 1000,
+            foundAtNode: 'Field Ruins',
+          },
+        },
+      } as unknown as GameState);
+
+      expect(result.collectibles[foundingStone.id].foundAtNode).toBe(
+        'Field Ruins',
+      );
     });
   });
 

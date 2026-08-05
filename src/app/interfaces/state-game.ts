@@ -32,7 +32,11 @@ export type GameStateMaterials = {
 };
 
 export type GameStateCollectibles = {
-  [key: CollectibleId]: { quantity: number; foundAt: number };
+  [key: CollectibleId]: {
+    quantity: number;
+    foundAt: number;
+    foundAtNode?: string;
+  };
 };
 
 // Permanent record of every equipment id ever owned - unlike `armory`, this

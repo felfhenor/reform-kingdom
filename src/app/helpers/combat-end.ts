@@ -84,7 +84,7 @@ function grantResolvedDrops(combat: Combat, drops: ResolvedDrop[]): void {
     }
 
     if ('collectibleId' in drop) {
-      collectiblesAdd(drop.collectibleId);
+      collectiblesAdd(drop.collectibleId, 1, combat.locationName);
 
       const collectible = getEntry<CollectibleContent>(drop.collectibleId);
       if (!collectible) return;

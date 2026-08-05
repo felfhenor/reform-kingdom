@@ -184,7 +184,11 @@ describe('combatCheckIfOver', () => {
 
     combatCheckIfOver(combat);
 
-    expect(collectiblesAdd).toHaveBeenCalledWith(collectible.id);
+    expect(collectiblesAdd).toHaveBeenCalledWith(
+      collectible.id,
+      1,
+      'Field Ruins',
+    );
   });
 
   it('resets combat on victory when the combat has no encounter (e.g. a bare fight)', () => {

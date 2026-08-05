@@ -15,6 +15,7 @@ import { PlayKingdomTradeskillWoodworkingComponent } from '@components/play-king
 import {
   armoryGet,
   gamestate,
+  getMuseumCollectibleEntries,
   isPlayerAtKingdom,
   kingdomSubview,
   kingdomSubviewShow,
@@ -60,6 +61,13 @@ export class GamePlayKingdomComponent {
   );
 
   public armoryCount = computed(() => armoryGet().length);
+
+  public museumCollectibleEntries = computed(() => getMuseumCollectibleEntries());
+
+  public museumCollectiblesFound = computed(
+    () => this.museumCollectibleEntries().filter((entry) => entry.discovered)
+      .length,
+  );
 
   public readonly tradeskillButtons: TradeskillButton[] = [
     { subview: 'tradeskill-artificing', label: 'Artificing' },

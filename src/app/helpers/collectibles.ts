@@ -30,9 +30,16 @@ export function isCollectibleDiscovered(collectibleId: CollectibleId): boolean {
   return !!gamestate().collectibles[collectibleId]?.foundAt;
 }
 
+export function getCollectibleFoundAtNode(
+  collectibleId: CollectibleId,
+): string | undefined {
+  return gamestate().collectibles[collectibleId]?.foundAtNode;
+}
+
 export function collectiblesAdd(
   collectibleId: CollectibleId,
   quantity = 1,
+  foundAtNode?: string,
 ): void {
   if (quantity <= 0) return;
 
@@ -43,6 +50,7 @@ export function collectiblesAdd(
     state.collectibles[collectibleId] = {
       quantity: current + quantity,
       foundAt,
+      foundAtNode: existing?.foundAtNode ?? foundAtNode,
     };
     return state;
   });

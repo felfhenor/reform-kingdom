@@ -29,6 +29,7 @@ export * from './maps';
 export * from './materials';
 export * from './migrate';
 export * from './monster';
+export * from './museum';
 export * from './notify';
 export * from './party';
 export * from './pathfinding';
