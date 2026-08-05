@@ -15,7 +15,6 @@ export type EquipmentContent = IsContentItem &
     id: EquipmentId;
     levelRequirement: number;
     baseStats: StatBlock;
-    statsPerLevel: StatBlock;
 
     slots: EquipmentSlot[];
     requiredJobIds: JobId[];

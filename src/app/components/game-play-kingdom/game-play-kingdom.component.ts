@@ -13,6 +13,7 @@ import { PlayKingdomTradeskillJewelcraftingComponent } from '@components/play-ki
 import { PlayKingdomTradeskillTailoringComponent } from '@components/play-kingdom-tradeskill-tailoring/play-kingdom-tradeskill-tailoring.component';
 import { PlayKingdomTradeskillWoodworkingComponent } from '@components/play-kingdom-tradeskill-woodworking/play-kingdom-tradeskill-woodworking.component';
 import {
+  armoryGet,
   gamestate,
   isPlayerAtKingdom,
   kingdomSubview,
@@ -57,6 +58,8 @@ export class GamePlayKingdomComponent {
   public materialCount = computed(
     () => Object.keys(gamestate().materials).length,
   );
+
+  public armoryCount = computed(() => armoryGet().length);
 
   public readonly tradeskillButtons: TradeskillButton[] = [
     { subview: 'tradeskill-artificing', label: 'Artificing' },

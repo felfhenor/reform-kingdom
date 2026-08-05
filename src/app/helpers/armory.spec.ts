@@ -1,3 +1,4 @@
+import { defaultStats } from '@helpers/defaults';
 import type { EquipmentContent, EquipmentId, GameState } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -10,9 +11,37 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { armoryAdd, armoryGet, pruneInvalidArmoryItems } from '@helpers/armory';
+import {
+  armoryAdd,
+  armoryGet,
+  filterArmoryEntries,
+  getArmoryEntries,
+  pruneInvalidArmoryItems,
+} from '@helpers/armory';
 import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+
+const sword: EquipmentContent = {
+  id: 'sword' as EquipmentId,
+  name: 'Sword',
+  __type: 'equipment',
+  description: 'A sharp blade.',
+  sprite: '0000',
+  rarity: 'Common',
+  levelRequirement: 1,
+  baseStats: defaultStats(),
+  slots: ['Weapon'],
+  requiredJobIds: [],
+};
+
+const shield: EquipmentContent = {
+  ...sword,
+  id: 'shield' as EquipmentId,
+  name: 'Shield',
+  description: 'A sturdy protective shield.',
+  rarity: 'Rare',
+  slots: ['Offhand'],
+};
 
 describe('Armory Helper Functions', () => {
   beforeEach(() => {
@@ -95,6 +124,60 @@ describe('Armory Helper Functions', () => {
 
     it('returns an empty array for an empty input', () => {
       expect(pruneInvalidArmoryItems([])).toEqual([]);
+    });
+  });
+
+  describe('getArmoryEntries', () => {
+    it('returns one entry per owned item, without merging duplicates, sorted by rarity then name', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        armory: [
+          { equipmentId: sword.id },
+          { equipmentId: shield.id },
+          { equipmentId: sword.id },
+        ],
+      } as unknown as GameState);
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === sword.id ? sword : shield) as never,
+      );
+
+      expect(getArmoryEntries()).toEqual([shield, sword, sword]);
+    });
+
+    it('excludes entries with no matching content entry', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        armory: [{ equipmentId: sword.id }],
+      } as unknown as GameState);
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      expect(getArmoryEntries()).toEqual([]);
+    });
+
+    it('returns an empty array when the armory is empty', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        armory: [],
+      } as unknown as GameState);
+
+      expect(getArmoryEntries()).toEqual([]);
+    });
+  });
+
+  describe('filterArmoryEntries', () => {
+    const entries = [sword, shield];
+
+    it('returns every entry when the search text is empty', () => {
+      expect(filterArmoryEntries(entries, '   ')).toEqual(entries);
+    });
+
+    it('filters by equipment name, case-insensitively', () => {
+      expect(filterArmoryEntries(entries, 'SWORD')).toEqual([sword]);
+    });
+
+    it('filters by equipment description', () => {
+      expect(filterArmoryEntries(entries, 'protective')).toEqual([shield]);
+    });
+
+    it('returns an empty array when nothing matches', () => {
+      expect(filterArmoryEntries(entries, 'nonexistent')).toEqual([]);
     });
   });
 });

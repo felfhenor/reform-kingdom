@@ -135,7 +135,6 @@ function ensureEquipment(
     slots: equipment.slots ?? [],
     description: equipment.description ?? 'UNKNOWN',
     baseStats: ensureStats(equipment.baseStats),
-    statsPerLevel: ensureStats(equipment.statsPerLevel),
     sprite: equipment.sprite ?? 'UNKNOWN',
     requiredJobIds: equipment.requiredJobIds ?? [],
   };

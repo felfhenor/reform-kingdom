@@ -1,0 +1,13 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+.armory-item-slot {
+  @apply relative w-[64px] h-[64px] cursor-default;
+}
+
+.armory-item-tooltip-image {
+  @apply shrink-0;
+}

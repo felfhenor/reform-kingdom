@@ -30,8 +30,8 @@
     Agility: 0.1
 
 - id: d40e1e92-8f01-417e-97f4-64009555c68d
-  name: Copper Punch Dagger
-  description: A dagger made of copper. It is not very powerful, but it is affordable.
+  name: Copper Dirk
+  description: A dirk made of copper. It is not very powerful, but it is affordable.
   levelRequirement: 2
   rarity: Common
   slots: [Offhand]

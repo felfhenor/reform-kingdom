@@ -69,8 +69,12 @@
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('armory')"
           >
+            @let armoryTotal = armoryCount();
             <span class="text-base font-bold">Armory</span>
-            <span class="text-xs opacity-70">0 items stored</span>
+            <span class="text-xs opacity-70">
+              {{ armoryTotal }}
+              {{ 'item' | pluralize: armoryTotal > 1 }} stored
+            </span>
           </button>
 
           <button

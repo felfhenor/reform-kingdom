@@ -55,16 +55,6 @@ describe('Equipment Helper Functions', () => {
       Resistance: 0,
       Agility: 1,
     },
-    statsPerLevel: {
-      Health: 0,
-      Energy: 0,
-      Luck: 0,
-      Intelligence: 0,
-      Strength: 1,
-      Vitality: 0,
-      Resistance: 0,
-      Agility: 0,
-    },
     slots: ['Weapon'],
   };
 
@@ -132,7 +122,7 @@ describe('Equipment Helper Functions', () => {
       expect(getEntry).not.toHaveBeenCalled();
     });
 
-    it('should sum baseStats across all equipped slots, ignoring statsPerLevel', () => {
+    it('should sum baseStats across all equipped slots', () => {
       vi.mocked(getEntry).mockImplementation((id) =>
         (id === 'sword' ? sword : helmet) as never,
       );

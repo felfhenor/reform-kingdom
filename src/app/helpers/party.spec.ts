@@ -405,7 +405,7 @@ describe('Party Helper Functions', () => {
       );
     });
 
-    it('adds flat equipment baseStats on top, ignoring equipment statsPerLevel', () => {
+    it('adds flat equipment baseStats on top', () => {
       const sword: EquipmentContent = {
         id: 'sword' as EquipmentId,
         name: 'Sword',
@@ -415,7 +415,6 @@ describe('Party Helper Functions', () => {
         rarity: 'Common',
         levelRequirement: 1,
         baseStats: { ...defaultStats(), Strength: 5 },
-        statsPerLevel: { ...defaultStats(), Strength: 100 },
         slots: ['Weapon'],
       };
 
