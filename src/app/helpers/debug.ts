@@ -1,8 +1,11 @@
 import { armoryAdd } from '@helpers/armory';
+import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { addMaterial } from '@helpers/materials';
 import { setOption } from '@helpers/state-options';
 import type {
+  CollectibleContent,
+  CollectibleId,
   EquipmentContent,
   EquipmentId,
   ItemContent,
@@ -45,4 +48,19 @@ export function debugGiveAllEquipment(quantity = 1): void {
   getEntriesByType<EquipmentContent>('equipment').forEach((equipment) => {
     armoryAdd(equipment.id, quantity);
   });
+}
+
+export function debugGiveCollectible(
+  collectibleId: CollectibleId,
+  quantity: number,
+): void {
+  if (quantity <= 0) return;
+
+  const collectible = getEntry<CollectibleContent>(collectibleId);
+  if (!collectible) {
+    console.warn(`Collectible with ID ${collectibleId} not found.`);
+    return;
+  }
+
+  collectiblesAdd(collectible.id, quantity);
 }

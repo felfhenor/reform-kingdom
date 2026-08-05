@@ -14,6 +14,9 @@
         - monsterId: Goblin
 
   completionRewards:
+    - collectibleId: Swamp Clam
+      chance: 50
+
     - itemId: Gold Coin
       min: 50
       max: 75

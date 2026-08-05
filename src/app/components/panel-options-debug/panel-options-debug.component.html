@@ -166,6 +166,31 @@
           >
             Give
           </button>
+
+          <span class="label-text text-right">Collectible</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="debugCollectibles()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Select a collectible..."
+            [(ngModel)]="selectedCollectibleId"
+          ></ng-select>
+          <input
+            type="number"
+            [min]="1"
+            class="input input-bordered debug-give-qty"
+            [(ngModel)]="collectibleQuantity"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:GiveCollectible"
+            (click)="giveCollectible()"
+          >
+            Give
+          </button>
         </div>
       </div>
     </div>

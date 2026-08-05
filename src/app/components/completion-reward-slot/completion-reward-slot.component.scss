@@ -1,0 +1,9 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+.completion-reward-tooltip-image {
+  @apply shrink-0;
+}

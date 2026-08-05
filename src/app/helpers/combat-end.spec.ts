@@ -9,7 +9,12 @@ vi.mock('@helpers/combat', () => ({
   currentCombat: vi.fn(),
 }));
 
+vi.mock('@helpers/collectibles', () => ({
+  collectiblesAdd: vi.fn(),
+}));
+
 vi.mock('@helpers/combat-log', () => ({
+  collectibleDropHtml: vi.fn(),
   combatMessageLog: vi.fn(),
   equipmentDropHtml: vi.fn(),
   itemDropHtml: vi.fn(),
@@ -44,13 +49,17 @@ vi.mock('@helpers/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));
 
+import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset } from '@helpers/combat';
+import { collectibleDropHtml } from '@helpers/combat-log';
 import { combatCheckIfOver } from '@helpers/combat-end';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { rollDroppedRewards } from '@helpers/loot';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
+  CollectibleContent,
+  CollectibleId,
   Combat,
   Combatant,
   EncounterContent,
@@ -148,6 +157,34 @@ describe('combatCheckIfOver', () => {
       encounter.completionRewards,
       1,
     );
+  });
+
+  it('grants a rolled collectible completion reward and logs it', () => {
+    const collectible = {
+      id: 'swamp-clam' as CollectibleId,
+      name: 'Swamp Clam',
+    } as CollectibleContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [{ collectibleId: collectible.id }],
+    } as unknown as EncounterContent;
+
+    vi.mocked(getEntry).mockImplementation((id) =>
+      (id === 'enc-1' ? encounter : collectible) as never,
+    );
+    vi.mocked(rollDroppedRewards).mockReturnValue([
+      { collectibleId: collectible.id },
+    ]);
+    vi.mocked(collectibleDropHtml).mockReturnValue('Swamp Clam');
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(collectiblesAdd).toHaveBeenCalledWith(collectible.id);
   });
 
   it('resets combat on victory when the combat has no encounter (e.g. a bare fight)', () => {

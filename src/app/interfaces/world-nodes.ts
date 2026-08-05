@@ -22,6 +22,11 @@ export type WorldNodeLookup = {
 
 export type WorldNodeInteractionKind = 'Gather' | 'Explore' | 'Travel';
 
+export type WorldNodeCompletionRewardProgress = {
+  obtained: number;
+  total: number;
+};
+
 export type WorldNodeLabelInfo = {
   kind: WorldNodeInteractionKind;
   text: string;

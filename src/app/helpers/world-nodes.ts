@@ -1,15 +1,21 @@
 import { computed } from '@angular/core';
+import { isEquipmentDiscovered } from '@helpers/armory';
+import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
 import { allMaps } from '@helpers/maps';
+import { isMaterialDiscovered } from '@helpers/materials';
 import { tiledMapGetLayer } from '@helpers/tiled-map';
 import type {
+  DroppedReward,
   EncounterContent,
   EncounterLevelRange,
   GameMap,
   GatheringContent,
+  ItemContent,
   ItemId,
   TiledMap,
   TiledObject,
+  WorldNodeCompletionRewardProgress,
   WorldNodeEntry,
   WorldNodeInteractionKind,
   WorldNodeLabelInfo,
@@ -109,7 +115,7 @@ export function worldNodeLevelRange(
 }
 
 export function worldNodeLevelLabel(levelRange: EncounterLevelRange): string {
-  return `${levelRange.min}`;
+  return `${levelRange.min}-${levelRange.max}`;
 }
 
 // Every clickable node type maps to one of three things a player can do at
@@ -190,4 +196,61 @@ export function worldNodeDescription(
     worldNodeEncounter(entry)?.description ??
     worldNodeGathering(entry)?.description
   );
+}
+
+// A stable identity for a reward, used to de-dupe the preview list below -
+// mirrors how `worldNodeGatherMaterialIds` de-dupes by itemId via a `Set`.
+function rewardKey(reward: DroppedReward): string {
+  if ('itemId' in reward) return `item:${reward.itemId}`;
+  if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
+  return `collectible:${reward.collectibleId}`;
+}
+
+function isGoldCoinReward(reward: DroppedReward): boolean {
+  if (!('itemId' in reward)) return false;
+  return reward.itemId === getEntry<ItemContent>('Gold Coin')?.id;
+}
+
+// The distinct completion rewards an encounter can grant, excluding Gold
+// Coin (which isn't tracked as a "reward" for discovery/preview purposes)
+// and de-duplicated by reward identity.
+export function worldNodeCompletionRewards(
+  entry: WorldNodeEntry,
+): DroppedReward[] {
+  const encounter = worldNodeEncounter(entry);
+  if (!encounter) return [];
+
+  const seen = new Set<string>();
+  const rewards: DroppedReward[] = [];
+
+  encounter.completionRewards.forEach((reward) => {
+    if (isGoldCoinReward(reward)) return;
+
+    const key = rewardKey(reward);
+    if (seen.has(key)) return;
+
+    seen.add(key);
+    rewards.push(reward);
+  });
+
+  return rewards;
+}
+
+function isRewardDiscovered(reward: DroppedReward): boolean {
+  if ('itemId' in reward) return isMaterialDiscovered(reward.itemId);
+  if ('equipmentId' in reward) return isEquipmentDiscovered(reward.equipmentId);
+  return isCollectibleDiscovered(reward.collectibleId);
+}
+
+// How many of an encounter's completion rewards the player has ever
+// obtained, out of the total - used for the "X/Y Rewards" info-popup badge.
+export function worldNodeCompletionRewardProgress(
+  entry: WorldNodeEntry,
+): WorldNodeCompletionRewardProgress {
+  const rewards = worldNodeCompletionRewards(entry);
+
+  return {
+    obtained: rewards.filter(isRewardDiscovered).length,
+    total: rewards.length,
+  };
 }

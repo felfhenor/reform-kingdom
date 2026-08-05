@@ -18,6 +18,9 @@
         - monsterId: Goblin
 
   completionRewards:
+    - collectibleId: Goblin Ruby
+      chance: 100
+
     - itemId: Gold Coin
       min: 25
       max: 50
@@ -50,6 +53,9 @@
         - monsterId: Goblin
 
   completionRewards:
+    - collectibleId: Purple Lotus
+      chance: 100
+
     - itemId: Gold Coin
       min: 25
       max: 50

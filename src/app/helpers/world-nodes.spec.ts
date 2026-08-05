@@ -1,6 +1,9 @@
 import type {
+  CollectibleContent,
   EncounterContent,
+  EquipmentContent,
   GameMap,
+  ItemContent,
   TiledLayer,
   TiledMap,
   TiledObject,
@@ -10,6 +13,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import {
+  worldNodeCompletionRewardProgress,
+  worldNodeCompletionRewards,
   worldNodeDescription,
   worldNodeInteractionKind,
   worldNodeLabelInfo,
@@ -168,6 +173,15 @@ function seedEncounter(encounter: EncounterContent): void {
   setAllContentById(new Map([[encounter.id, encounter]]));
 }
 
+function seedContent(
+  entries: Array<{ id: string; name: string } & Record<string, unknown>>,
+): void {
+  setAllIdsByName(new Map(entries.map((entry) => [entry.name, entry.id])));
+  setAllContentById(
+    new Map(entries.map((entry) => [entry.id, entry as never])),
+  );
+}
+
 describe('encounter-backed node accessors', () => {
   beforeEach(() => {
     setAllIdsByName(new Map());
@@ -216,6 +230,104 @@ describe('encounter-backed node accessors', () => {
 
     it('returns undefined when there is no matching encounter', () => {
       expect(worldNodeDescription(buildEntry())).toBeUndefined();
+    });
+  });
+
+  describe('worldNodeCompletionRewards', () => {
+    it('excludes Gold Coin and de-dupes rewards by identity', () => {
+      const goldCoin: ItemContent = {
+        id: 'gold-coin',
+        name: 'Gold Coin',
+        __type: 'item',
+        description: 'Currency.',
+        sprite: '0000',
+        rarity: 'Common',
+      };
+      const bone: ItemContent = {
+        id: 'bone',
+        name: 'Bone',
+        __type: 'item',
+        description: 'A bone.',
+        sprite: '0001',
+        rarity: 'Common',
+      };
+      const clam: CollectibleContent = {
+        id: 'swamp-clam',
+        name: 'Swamp Clam',
+        __type: 'collectible',
+        description: 'A clam.',
+        sprite: '0003',
+        rarity: 'Uncommon',
+      };
+
+      const encounter = buildEncounter({
+        completionRewards: [
+          { itemId: goldCoin.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+          { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+          { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 50 },
+          { collectibleId: clam.id, chance: 50 },
+        ],
+      });
+
+      // seedContent replaces the whole content map, so the encounter must be
+      // seeded together with the items/collectible it references, not via a
+      // separate seedEncounter() call afterward.
+      seedContent([goldCoin, bone, clam, encounter]);
+
+      expect(worldNodeCompletionRewards(buildEntry())).toEqual([
+        { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+        { collectibleId: clam.id, chance: 50 },
+      ]);
+    });
+
+    it('returns an empty array when there is no matching encounter', () => {
+      expect(worldNodeCompletionRewards(buildEntry())).toEqual([]);
+    });
+  });
+
+  describe('worldNodeCompletionRewardProgress', () => {
+    it('reports 0/total when nothing has been discovered yet', () => {
+      const bone: ItemContent = {
+        id: 'bone',
+        name: 'Bone',
+        __type: 'item',
+        description: 'A bone.',
+        sprite: '0001',
+        rarity: 'Common',
+      };
+      const equipment: EquipmentContent = {
+        id: 'goblin-skull',
+        name: 'Goblin Skull',
+        __type: 'equipment',
+        description: 'A skull.',
+        sprite: '0000',
+        rarity: 'Common',
+        levelRequirement: 1,
+        slots: ['Artifact'],
+        baseStats: {} as never,
+        requiredJobIds: [],
+      };
+
+      const encounter = buildEncounter({
+        completionRewards: [
+          { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+          { equipmentId: equipment.id, chance: 10 },
+        ],
+      });
+
+      seedContent([bone, equipment, encounter]);
+
+      expect(worldNodeCompletionRewardProgress(buildEntry())).toEqual({
+        obtained: 0,
+        total: 2,
+      });
+    });
+
+    it('reports 0/0 when there is no matching encounter', () => {
+      expect(worldNodeCompletionRewardProgress(buildEntry())).toEqual({
+        obtained: 0,
+        total: 0,
+      });
     });
   });
 

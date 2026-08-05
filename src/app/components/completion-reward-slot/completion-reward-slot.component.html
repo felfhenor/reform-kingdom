@@ -1,0 +1,34 @@
+@if (isDiscovered() && content(); as reward) {
+  <div
+    class="outline-2 outline-offset-[-2px] rounded outline-{{ reward.rarity }}"
+    [tp]="tooltip"
+    [tpPlacement]="'top'"
+  >
+    <app-icon-blank-slot>
+      <app-atlas-image [spritesheet]="spritesheet()" [assetName]="reward.sprite" />
+    </app-icon-blank-slot>
+  </div>
+
+  <ng-template #tooltip>
+    <div class="flex gap-2 p-2">
+      <app-atlas-image
+        [spritesheet]="spritesheet()"
+        [assetName]="reward.sprite"
+        class="completion-reward-tooltip-image"
+      />
+      <div>
+        <div class="font-bold mb-2 text-{{ reward.rarity }}">
+          {{ reward.name }}
+        </div>
+
+        <div class="italic text-sm">
+          {{ reward.description }}
+        </div>
+      </div>
+    </div>
+  </ng-template>
+} @else {
+  <div [tp]="'A reward yet to be discovered.'" [tpPlacement]="'top'">
+    <app-icon-unknown />
+  </div>
+}

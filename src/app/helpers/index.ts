@@ -1,6 +1,7 @@
 export * from './analytics';
 export * from './armory';
 export * from './clipboard';
+export * from './collectibles';
 export * from './combat';
 export * from './combat-create';
 export * from './combat-damage';

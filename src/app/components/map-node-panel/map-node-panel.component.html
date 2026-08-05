@@ -31,6 +31,7 @@
         @let encounters = encounterCount();
         @let monsters = monsterCount();
         @let gatherSeconds = gatherTime();
+        @let rewards = rewardProgress();
 
         @if (encounters) {
           <div class="badge badge-outline">{{ encounters }} Encounters</div>
@@ -45,6 +46,15 @@
             Gather Time {{ gatherSeconds }}s
           </div>
         }
+
+        @if (rewards.total > 0) {
+          <div
+            class="badge badge-outline"
+            [class.badge-success]="rewards.obtained === rewards.total"
+          >
+            {{ rewards.obtained }}/{{ rewards.total }} Rewards
+          </div>
+        }
       </div>
 
       <p class="text-sm opacity-80">
@@ -56,6 +66,15 @@
         <div class="flex flex-wrap gap-2">
           @for (materialId of materialIds; track materialId) {
             <app-gather-material-slot [itemId]="materialId" />
+          }
+        </div>
+      }
+
+      @let rewardList = completionRewards();
+      @if (rewardList.length > 0) {
+        <div class="flex flex-wrap gap-2">
+          @for (reward of rewardList; track $index) {
+            <app-completion-reward-slot [reward]="reward" />
           }
         </div>
       }

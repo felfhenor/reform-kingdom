@@ -2,8 +2,20 @@ import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
-import { debugGiveEquipment, debugGiveItem, getEntriesByType } from '@helpers';
-import type { EquipmentContent, EquipmentId, ItemContent, ItemId } from '@interfaces';
+import {
+  debugGiveCollectible,
+  debugGiveEquipment,
+  debugGiveItem,
+  getEntriesByType,
+} from '@helpers';
+import type {
+  CollectibleContent,
+  CollectibleId,
+  EquipmentContent,
+  EquipmentId,
+  ItemContent,
+  ItemId,
+} from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -22,11 +34,18 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     sortBy(getEntriesByType<EquipmentContent>('equipment'), (item) => item.name),
   );
 
+  public debugCollectibles = computed(() =>
+    sortBy(getEntriesByType<CollectibleContent>('collectible'), (item) => item.name),
+  );
+
   public selectedItemId = signal<ItemId | undefined>(undefined);
   public itemQuantity = signal<number>(1);
 
   public selectedEquipmentId = signal<EquipmentId | undefined>(undefined);
   public equipmentQuantity = signal<number>(1);
+
+  public selectedCollectibleId = signal<CollectibleId | undefined>(undefined);
+  public collectibleQuantity = signal<number>(1);
 
   public giveItem(): void {
     const itemId = this.selectedItemId();
@@ -40,5 +59,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!equipmentId) return;
 
     debugGiveEquipment(equipmentId, this.equipmentQuantity());
+  }
+
+  public giveCollectible(): void {
+    const collectibleId = this.selectedCollectibleId();
+    if (!collectibleId) return;
+
+    debugGiveCollectible(collectibleId, this.collectibleQuantity());
   }
 }

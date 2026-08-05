@@ -3,6 +3,7 @@ import { rngUuid } from '@helpers/rng';
 import { localStorageSignal } from '@helpers/signal';
 import type {
   Combat,
+  CollectibleContent,
   CombatLog,
   Combatant,
   EquipmentContent,
@@ -101,6 +102,16 @@ export function equipmentNameHtml(equipment: EquipmentContent): string {
 // to handle here - unlike `itemDropHtml`.
 export function equipmentDropHtml(equipment: EquipmentContent): string {
   return equipmentNameHtml(equipment);
+}
+
+// Colors a collectible's name by its rarity, mirroring `equipmentNameHtml`.
+export function collectibleNameHtml(collectible: CollectibleContent): string {
+  return `<span class="text-${collectible.rarity} font-semibold">${collectible.name}</span>`;
+}
+
+// Collectible drops are always a single piece, same as equipment.
+export function collectibleDropHtml(collectible: CollectibleContent): string {
+  return collectibleNameHtml(collectible);
 }
 
 export function miscellaneousMessageLog(message: string): void {

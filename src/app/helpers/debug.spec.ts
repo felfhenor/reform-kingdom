@@ -1,8 +1,19 @@
-import type { EquipmentContent, EquipmentId, ItemContent, ItemId } from '@interfaces';
+import type {
+  CollectibleContent,
+  CollectibleId,
+  EquipmentContent,
+  EquipmentId,
+  ItemContent,
+  ItemId,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/armory', () => ({
   armoryAdd: vi.fn(),
+}));
+
+vi.mock('@helpers/collectibles', () => ({
+  collectiblesAdd: vi.fn(),
 }));
 
 vi.mock('@helpers/content', () => ({
@@ -19,8 +30,14 @@ vi.mock('@helpers/state-options', () => ({
 }));
 
 import { armoryAdd } from '@helpers/armory';
+import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { debugGiveAllEquipment, debugGiveEquipment, debugGiveItem } from '@helpers/debug';
+import {
+  debugGiveAllEquipment,
+  debugGiveCollectible,
+  debugGiveEquipment,
+  debugGiveItem,
+} from '@helpers/debug';
 import { addMaterial } from '@helpers/materials';
 
 describe('Debug Helper Functions', () => {
@@ -109,6 +126,34 @@ describe('Debug Helper Functions', () => {
 
       expect(getEntriesByType).not.toHaveBeenCalled();
       expect(armoryAdd).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('debugGiveCollectible', () => {
+    it('adds the given quantity of the collectible when it resolves to real content', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        id: 'founding-stone',
+      } as CollectibleContent);
+
+      debugGiveCollectible('founding-stone' as CollectibleId, 2);
+
+      expect(collectiblesAdd).toHaveBeenCalledWith('founding-stone', 2);
+    });
+
+    it('does nothing for a zero or negative quantity', () => {
+      debugGiveCollectible('founding-stone' as CollectibleId, 0);
+      debugGiveCollectible('founding-stone' as CollectibleId, -1);
+
+      expect(collectiblesAdd).not.toHaveBeenCalled();
+    });
+
+    it('does nothing and warns when the collectible id does not resolve to real content', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      debugGiveCollectible('unknown-collectible' as CollectibleId, 2);
+
+      expect(collectiblesAdd).not.toHaveBeenCalled();
+      expect(console.warn).toHaveBeenCalled();
     });
   });
 });

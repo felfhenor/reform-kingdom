@@ -34,7 +34,9 @@ export function defaultGameState(): GameState {
       gathering: defaultGatheringState(),
     },
     materials: {},
+    collectibles: {},
     armory: [],
+    discoveredEquipment: {},
     globalEffects: [],
   };
 }

@@ -1,8 +1,19 @@
-import type { EquipmentId, GameState, MaterialId } from '@interfaces';
+import type {
+  CollectibleId,
+  EquipmentId,
+  GameState,
+  MaterialId,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/armory', () => ({
   pruneInvalidArmoryItems: vi.fn((armory) => armory),
+  pruneInvalidDiscoveredEquipment: vi.fn((discovered) => discovered),
+}));
+
+vi.mock('@helpers/collectibles', () => ({
+  grantFoundingStoneIfMissing: vi.fn((collectibles) => collectibles),
+  pruneInvalidCollectibles: vi.fn((collectibles) => collectibles),
 }));
 
 vi.mock('@helpers/materials', () => ({
@@ -13,6 +24,8 @@ vi.mock('@helpers/defaults', () => ({
   defaultGameState: vi.fn(() => ({
     armory: [],
     materials: {},
+    collectibles: {},
+    discoveredEquipment: {},
   })),
 }));
 
@@ -30,7 +43,14 @@ vi.mock('@helpers/state-options', () => ({
   setOptions: vi.fn(),
 }));
 
-import { pruneInvalidArmoryItems } from '@helpers/armory';
+import {
+  pruneInvalidArmoryItems,
+  pruneInvalidDiscoveredEquipment,
+} from '@helpers/armory';
+import {
+  grantFoundingStoneIfMissing,
+  pruneInvalidCollectibles,
+} from '@helpers/collectibles';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
@@ -53,6 +73,8 @@ describe('migrateGameState', () => {
     vi.mocked(gamestate).mockReturnValue({
       armory: staleArmory,
       materials: staleMaterials,
+      collectibles: {},
+      discoveredEquipment: {},
     } as unknown as GameState);
 
     const prunedArmory = [{ equipmentId: 'sword' as EquipmentId }];
@@ -71,5 +93,54 @@ describe('migrateGameState', () => {
     expect(committed.armory).toEqual(prunedArmory);
     expect(committed.materials).toEqual(prunedMaterials);
     expect(saveGameState).toHaveBeenCalled();
+  });
+
+  it('prunes discovered equipment and collectibles, then grants a missing founding stone', () => {
+    const staleDiscovered = {
+      ['sword' as EquipmentId]: { foundAt: 1000 },
+      ['stale-gear' as EquipmentId]: { foundAt: 2000 },
+    };
+    const staleCollectibles = {
+      ['goblin-ruby' as CollectibleId]: { quantity: 1, foundAt: 1000 },
+      ['stale-collectible' as CollectibleId]: { quantity: 1, foundAt: 2000 },
+    };
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: staleCollectibles,
+      discoveredEquipment: staleDiscovered,
+    } as unknown as GameState);
+
+    const prunedDiscovered = { ['sword' as EquipmentId]: { foundAt: 1000 } };
+    const prunedCollectibles = {
+      ['goblin-ruby' as CollectibleId]: { quantity: 1, foundAt: 1000 },
+    };
+    const collectiblesWithFoundingStone = {
+      ...prunedCollectibles,
+      ['founding-stone' as CollectibleId]: { quantity: 1, foundAt: 3000 },
+    };
+
+    vi.mocked(pruneInvalidDiscoveredEquipment).mockReturnValue(
+      prunedDiscovered,
+    );
+    vi.mocked(pruneInvalidCollectibles).mockReturnValue(prunedCollectibles);
+    vi.mocked(grantFoundingStoneIfMissing).mockReturnValue(
+      collectiblesWithFoundingStone,
+    );
+
+    migrateGameState();
+
+    expect(pruneInvalidDiscoveredEquipment).toHaveBeenCalledWith(
+      staleDiscovered,
+    );
+    expect(pruneInvalidCollectibles).toHaveBeenCalledWith(staleCollectibles);
+    expect(grantFoundingStoneIfMissing).toHaveBeenCalledWith(
+      prunedCollectibles,
+    );
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.discoveredEquipment).toEqual(prunedDiscovered);
+    expect(committed.collectibles).toEqual(collectiblesWithFoundingStone);
   });
 });

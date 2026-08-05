@@ -1,4 +1,11 @@
-import { pruneInvalidArmoryItems } from '@helpers/armory';
+import {
+  pruneInvalidArmoryItems,
+  pruneInvalidDiscoveredEquipment,
+} from '@helpers/armory';
+import {
+  grantFoundingStoneIfMissing,
+  pruneInvalidCollectibles,
+} from '@helpers/collectibles';
 import { defaultGameState } from '@helpers/defaults';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import {
@@ -17,6 +24,11 @@ export function migrateGameState() {
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
   newState.materials = pruneInvalidMaterials(newState.materials);
+  newState.discoveredEquipment = pruneInvalidDiscoveredEquipment(
+    newState.discoveredEquipment,
+  );
+  newState.collectibles = pruneInvalidCollectibles(newState.collectibles);
+  newState.collectibles = grantFoundingStoneIfMissing(newState.collectibles);
 
   setGameState(newState);
   gamestateTickStart();

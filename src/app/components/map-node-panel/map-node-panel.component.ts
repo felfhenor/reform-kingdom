@@ -6,6 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { CompletionRewardSlotComponent } from '@components/completion-reward-slot/completion-reward-slot.component';
 import { GatherMaterialSlotComponent } from '@components/gather-material-slot/gather-material-slot.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
@@ -20,6 +21,8 @@ import {
   tiledObjectSpriteFrame,
   travelPathTo,
   travelStart,
+  worldNodeCompletionRewardProgress,
+  worldNodeCompletionRewards,
   worldNodeDescription,
   worldNodeEncounterCount,
   worldNodeGatherMaterialIds,
@@ -33,7 +36,12 @@ import type { TiledMap } from '@interfaces';
 @Component({
   selector: 'app-map-node-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonCloseComponent, GatherMaterialSlotComponent, SFXDirective],
+  imports: [
+    ButtonCloseComponent,
+    CompletionRewardSlotComponent,
+    GatherMaterialSlotComponent,
+    SFXDirective,
+  ],
   templateUrl: './map-node-panel.component.html',
   styleUrl: './map-node-panel.component.scss',
   host: {
@@ -58,7 +66,7 @@ export class MapNodePanelComponent {
   public levelLabel = computed(() => {
     const entry = this.node();
     const levelRange = entry ? worldNodeLevelRange(entry) : undefined;
-    return levelRange ? worldNodeLevelLabel(levelRange) : '—';
+    return levelRange ? worldNodeLevelLabel(levelRange) : '-';
   });
 
   public encounterCount = computed(() => {
@@ -84,6 +92,18 @@ export class MapNodePanelComponent {
   public gatherMaterialIds = computed(() => {
     const entry = this.node();
     return entry ? worldNodeGatherMaterialIds(entry) : [];
+  });
+
+  public completionRewards = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeCompletionRewards(entry) : [];
+  });
+
+  public rewardProgress = computed(() => {
+    const entry = this.node();
+    return entry
+      ? worldNodeCompletionRewardProgress(entry)
+      : { obtained: 0, total: 0 };
   });
 
   public meetsGatherLevelRequirement = computed(() => {
@@ -122,7 +142,8 @@ export class MapNodePanelComponent {
   private travelState = computed(() => gamestate().world.travel);
 
   public isAtNode = computed(
-    () => this.travelPath()?.length === 0 && this.travelState().status === 'Idle',
+    () =>
+      this.travelPath()?.length === 0 && this.travelState().status === 'Idle',
   );
 
   public canTravelHere = computed(() => {

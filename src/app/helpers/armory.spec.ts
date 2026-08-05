@@ -16,7 +16,9 @@ import {
   armoryGet,
   filterArmoryEntries,
   getArmoryEntries,
+  isEquipmentDiscovered,
   pruneInvalidArmoryItems,
+  pruneInvalidDiscoveredEquipment,
 } from '@helpers/armory';
 import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -64,6 +66,7 @@ describe('Armory Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         armory: [{ equipmentId: 'shield' as EquipmentId }],
+        discoveredEquipment: {},
       } as unknown as GameState);
 
       expect(result.armory).toEqual([
@@ -76,7 +79,10 @@ describe('Armory Helper Functions', () => {
       armoryAdd('sword' as EquipmentId, 3);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({ armory: [] } as unknown as GameState);
+      const result = updateFn({
+        armory: [],
+        discoveredEquipment: {},
+      } as unknown as GameState);
 
       expect(result.armory).toEqual([
         { equipmentId: 'sword' },
@@ -90,6 +96,75 @@ describe('Armory Helper Functions', () => {
       armoryAdd('sword' as EquipmentId, -1);
 
       expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('marks the equipment as permanently discovered', () => {
+      armoryAdd('sword' as EquipmentId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        armory: [],
+        discoveredEquipment: {},
+      } as unknown as GameState);
+
+      expect(result.discoveredEquipment['sword'].foundAt).toBeGreaterThan(0);
+    });
+
+    it('preserves the original discovery timestamp on repeat finds', () => {
+      armoryAdd('sword' as EquipmentId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        armory: [],
+        discoveredEquipment: { sword: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(result.discoveredEquipment['sword']).toEqual({ foundAt: 1000 });
+    });
+  });
+
+  describe('isEquipmentDiscovered', () => {
+    it('returns true once the equipment has ever been found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredEquipment: { sword: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(true);
+    });
+
+    it('returns true even if the equipment is no longer in the armory', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        armory: [],
+        discoveredEquipment: { sword: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(true);
+    });
+
+    it('returns false when the equipment has never been found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredEquipment: {},
+      } as unknown as GameState);
+
+      expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(false);
+    });
+  });
+
+  describe('pruneInvalidDiscoveredEquipment', () => {
+    it('keeps entries that resolve to real equipment content', () => {
+      vi.mocked(getEntry).mockReturnValue({ id: 'sword' } as EquipmentContent);
+      const discovered = { ['sword' as EquipmentId]: { foundAt: 1000 } };
+
+      expect(pruneInvalidDiscoveredEquipment(discovered)).toEqual(discovered);
+    });
+
+    it('drops entries whose equipmentId no longer resolves to real content', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+      const discovered = {
+        ['stale-gear' as EquipmentId]: { foundAt: 1000 },
+      };
+
+      expect(pruneInvalidDiscoveredEquipment(discovered)).toEqual({});
     });
   });
 

@@ -12,6 +12,10 @@ function resolveDrop(
     return { equipmentId: drop.equipmentId };
   }
 
+  if ('collectibleId' in drop) {
+    return { collectibleId: drop.collectibleId };
+  }
+
   const levelBonus = drop.multiplierPerLevel * (level - 1);
   const quantity = rngNumberRange(
     drop.min + levelBonus,

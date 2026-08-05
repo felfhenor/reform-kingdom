@@ -1,3 +1,4 @@
+import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
 
@@ -24,6 +25,10 @@ export type DropEquipment = {
   equipmentId: EquipmentId;
 };
 
+export type DropCollectible = {
+  collectibleId: CollectibleId;
+};
+
 export type DropRange = {
   min: number;
   max: number;
@@ -37,17 +42,30 @@ export type DropHasChance = {
   chance: number;
 };
 
-// A single drop-table entry - either an `ItemId` (stackable material) or an
-// `EquipmentId` (gear), told apart by which id field is present. Shared by
-// monster kill drops (`MonsterContent.drops`) and node completion rewards
-// (`EncounterContent.completionRewards`).
-export type DroppedReward = DropRange &
+// A single drop-table entry - an `ItemId` (stackable material, with a rolled
+// quantity range), an `EquipmentId` (gear), or a `CollectibleId` (curio),
+// told apart by which id field is present. Only item rewards roll a
+// quantity - equipment and collectibles are always a flat chance for one.
+// Shared by monster kill drops (`MonsterContent.drops`) and node completion
+// rewards (`EncounterContent.completionRewards`).
+export type DroppedItemReward = DropRange &
   DropHasLevelMultiplier &
   DropHasChance &
-  (DropItem | DropEquipment);
+  DropItem;
+export type DroppedEquipmentReward = DropHasChance & DropEquipment;
+export type DroppedCollectibleReward = DropHasChance & DropCollectible;
 
-// The result of rolling a `DroppedReward` - equipment drops skip quantity
-// entirely since gear isn't stackable.
+export type DroppedReward =
+  | DroppedItemReward
+  | DroppedEquipmentReward
+  | DroppedCollectibleReward;
+
+// The result of rolling a `DroppedReward` - equipment/collectible drops skip
+// quantity entirely since neither is stackable.
 export type ResolvedItemDrop = DropItem & { quantity: number };
 export type ResolvedEquipmentDrop = DropEquipment;
-export type ResolvedDrop = ResolvedItemDrop | ResolvedEquipmentDrop;
+export type ResolvedCollectibleDrop = DropCollectible;
+export type ResolvedDrop =
+  | ResolvedItemDrop
+  | ResolvedEquipmentDrop
+  | ResolvedCollectibleDrop;

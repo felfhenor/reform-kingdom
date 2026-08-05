@@ -1,6 +1,8 @@
 import { armoryAdd } from '@helpers/armory';
+import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset, currentCombat } from '@helpers/combat';
 import {
+  collectibleDropHtml,
   combatMessageLog,
   equipmentDropHtml,
   itemDropHtml,
@@ -13,6 +15,7 @@ import { monsterXpReward } from '@helpers/monster';
 import { partyGainXp, syncPartyHpFromCombat } from '@helpers/party';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
+  CollectibleContent,
   Combat,
   Combatant,
   EncounterContent,
@@ -76,6 +79,19 @@ function grantResolvedDrops(combat: Combat, drops: ResolvedDrop[]): void {
       combatMessageLog(
         combat,
         `The party found ${equipmentDropHtml(equipment)}!`,
+      );
+      return;
+    }
+
+    if ('collectibleId' in drop) {
+      collectiblesAdd(drop.collectibleId);
+
+      const collectible = getEntry<CollectibleContent>(drop.collectibleId);
+      if (!collectible) return;
+
+      combatMessageLog(
+        combat,
+        `The party found ${collectibleDropHtml(collectible)}!`,
       );
       return;
     }

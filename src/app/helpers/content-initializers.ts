@@ -120,6 +120,7 @@ function ensureCollectible(
     __type: 'collectible',
     description: collectible.description ?? 'UNKNOWN',
     sprite: collectible.sprite ?? 'UNKNOWN',
+    rarity: collectible.rarity ?? 'Common',
   };
 }
 

@@ -1,5 +1,7 @@
 import type { Character } from '@interfaces/character';
 import type { Combat } from '@interfaces/combat';
+import type { CollectibleId } from '@interfaces/content-collectible';
+import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { EquipmentItem } from '@interfaces/equipment';
@@ -29,6 +31,17 @@ export type GameStateMaterials = {
   [key: MaterialId]: { quantity: number; foundAt: number };
 };
 
+export type GameStateCollectibles = {
+  [key: CollectibleId]: { quantity: number; foundAt: number };
+};
+
+// Permanent record of every equipment id ever owned - unlike `armory`, this
+// is never pruned when a piece of gear is equipped, sold, or broken down, so
+// it survives as a standing "has this ever been found" flag.
+export type GameStateDiscoveredEquipment = {
+  [key: EquipmentId]: { foundAt: number };
+};
+
 export type GameStateClock = {
   numTicks: number;
   lastSaveTick: number;
@@ -47,6 +60,8 @@ export type GameState = {
   clock: GameStateClock;
   world: GameStateWorld;
   materials: GameStateMaterials;
+  collectibles: GameStateCollectibles;
   armory: EquipmentItem[];
+  discoveredEquipment: GameStateDiscoveredEquipment;
   globalEffects: GlobalEffect[];
 };
