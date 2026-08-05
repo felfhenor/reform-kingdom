@@ -1,6 +1,14 @@
 import type { OnInit } from '@angular/core';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { applyEach, FormField, form, required, schema } from '@angular/forms/signals';
+import {
+  applyEach,
+  form,
+  FormField,
+  maxLength,
+  minLength,
+  required,
+  schema,
+} from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -26,6 +34,8 @@ type HeroPick = {
 };
 
 const heroPickSchema = schema<HeroPick>((hero) => {
+  minLength(hero.name, 1);
+  maxLength(hero.name, 20);
   required(hero.name);
   required(hero.jobId);
 });
