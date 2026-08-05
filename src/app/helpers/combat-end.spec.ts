@@ -18,6 +18,7 @@ vi.mock('@helpers/combat-log', () => ({
   combatMessageLog: vi.fn(),
   equipmentDropHtml: vi.fn(),
   itemDropHtml: vi.fn(),
+  recipeDropHtml: vi.fn(),
 }));
 
 vi.mock('@helpers/content', () => ({
@@ -45,17 +46,22 @@ vi.mock('@helpers/party', () => ({
   syncPartyHpFromCombat: vi.fn(),
 }));
 
+vi.mock('@helpers/recipes', () => ({
+  recipeDiscover: vi.fn(),
+}));
+
 vi.mock('@helpers/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));
 
 import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset } from '@helpers/combat';
-import { collectibleDropHtml } from '@helpers/combat-log';
+import { collectibleDropHtml, recipeDropHtml } from '@helpers/combat-log';
 import { combatCheckIfOver } from '@helpers/combat-end';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { rollDroppedRewards } from '@helpers/loot';
+import { recipeDiscover } from '@helpers/recipes';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
   CollectibleContent,
@@ -64,6 +70,8 @@ import type {
   Combatant,
   EncounterContent,
   EncounterId,
+  RecipeContent,
+  RecipeId,
 } from '@interfaces';
 
 function buildCombatant(overrides: Partial<Combatant>): Combatant {
@@ -189,6 +197,32 @@ describe('combatCheckIfOver', () => {
       1,
       'Field Ruins',
     );
+  });
+
+  it('grants a rolled recipe completion reward and logs it', () => {
+    const recipe = {
+      id: 'equipment-bone-hewn-cloak' as RecipeId,
+      name: 'Equipment: Bone-Hewn Cloak',
+    } as RecipeContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [{ recipeId: recipe.id }],
+    } as unknown as EncounterContent;
+
+    vi.mocked(getEntry).mockImplementation((id) =>
+      (id === 'enc-1' ? encounter : recipe) as never,
+    );
+    vi.mocked(rollDroppedRewards).mockReturnValue([{ recipeId: recipe.id }]);
+    vi.mocked(recipeDropHtml).mockReturnValue('Equipment: Bone-Hewn Cloak');
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(recipeDiscover).toHaveBeenCalledWith(recipe.id, 'Field Ruins');
   });
 
   it('resets combat on victory when the combat has no encounter (e.g. a bare fight)', () => {

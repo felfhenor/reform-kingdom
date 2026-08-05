@@ -39,6 +39,7 @@ export * from './pixi-grid';
 export * from './pixi-indicators';
 export * from './pixi-map-render';
 export * from './pixi-texture-loader';
+export * from './recipes';
 export * from './rng';
 export * from './scheduler';
 export * from './setup';

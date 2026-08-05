@@ -1,0 +1,65 @@
+- id: 76741f9d-a1e8-4604-8526-67e993739c62
+  name: 'Material: Linen Thread'
+  result:
+    itemId: Linen Thread
+    quantity: 1
+
+  requirements:
+    - itemId: Flax Flower
+      quantity: 1
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 3
+  tradeskillXP: 1
+
+- id: 91ab444c-21c5-4979-96a9-3f32896215e4
+  name: 'Equipment: Linen Shirt'
+  result:
+    equipmentId: Linen Shirt
+
+  requirements:
+    - itemId: Linen Thread
+      quantity: 5
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 4
+  tradeskillXP: 1
+
+- id: 8a5ab06a-1ccf-4e74-aaeb-ff04480f3c3c
+  name: 'Equipment: Linen Hat'
+  result:
+    equipmentId: Linen Hat
+
+  requirements:
+    - itemId: Linen Thread
+      quantity: 3
+
+    - itemId: Tattered Hide
+      quantity: 1
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 5
+  tradeskillXP: 1
+
+- id: bbcf8a4f-4b7a-4d9e-8607-deab34ac53dd
+  name: 'Equipment: Bone-Hewn Cloak'
+  result:
+    equipmentId: Bone-Hewn Cloak
+
+  requirements:
+    - itemId: Linen Thread
+      quantity: 5
+
+    - itemId: Tattered Hide
+      quantity: 3
+
+    - itemId: Small Goblin Bone
+      quantity: 3
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 5
+  tradeskillXP: 1

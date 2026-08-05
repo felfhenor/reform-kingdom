@@ -1,0 +1,28 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+.museum-recipe-slot {
+  @apply relative w-[64px] h-[64px] cursor-default;
+}
+
+// Both layers are centered independently (rather than stretched to fill),
+// since the backdrop and result sprites aren't guaranteed to share the same
+// intrinsic size.
+.museum-recipe-icon {
+  @apply relative w-full h-full;
+}
+
+.museum-recipe-icon-backdrop {
+  @apply absolute z-0;
+}
+
+.museum-recipe-icon-result {
+  @apply absolute z-10;
+}
+
+.museum-recipe-tooltip-icon {
+  @apply relative w-[64px] h-[64px] shrink-0;
+}

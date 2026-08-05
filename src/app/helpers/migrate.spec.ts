@@ -3,6 +3,7 @@ import type {
   EquipmentId,
   GameState,
   MaterialId,
+  RecipeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -20,12 +21,17 @@ vi.mock('@helpers/materials', () => ({
   pruneInvalidMaterials: vi.fn((materials) => materials),
 }));
 
+vi.mock('@helpers/recipes', () => ({
+  pruneInvalidDiscoveredRecipes: vi.fn((discovered) => discovered),
+}));
+
 vi.mock('@helpers/defaults', () => ({
   defaultGameState: vi.fn(() => ({
     armory: [],
     materials: {},
     collectibles: {},
     discoveredEquipment: {},
+    discoveredRecipes: {},
   })),
 }));
 
@@ -53,6 +59,7 @@ import {
 } from '@helpers/collectibles';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
+import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
 
 describe('migrateGameState', () => {
@@ -75,6 +82,7 @@ describe('migrateGameState', () => {
       materials: staleMaterials,
       collectibles: {},
       discoveredEquipment: {},
+      discoveredRecipes: {},
     } as unknown as GameState);
 
     const prunedArmory = [{ equipmentId: 'sword' as EquipmentId }];
@@ -105,11 +113,17 @@ describe('migrateGameState', () => {
       ['stale-collectible' as CollectibleId]: { quantity: 1, foundAt: 2000 },
     };
 
+    const staleDiscoveredRecipes = {
+      ['equipment-bone-hewn-cloak' as RecipeId]: { foundAt: 1000 },
+      ['stale-recipe' as RecipeId]: { foundAt: 2000 },
+    };
+
     vi.mocked(gamestate).mockReturnValue({
       armory: [],
       materials: {},
       collectibles: staleCollectibles,
       discoveredEquipment: staleDiscovered,
+      discoveredRecipes: staleDiscoveredRecipes,
     } as unknown as GameState);
 
     const prunedDiscovered = { ['sword' as EquipmentId]: { foundAt: 1000 } };
@@ -121,12 +135,19 @@ describe('migrateGameState', () => {
       ['founding-stone' as CollectibleId]: { quantity: 1, foundAt: 3000 },
     };
 
+    const prunedDiscoveredRecipes = {
+      ['equipment-bone-hewn-cloak' as RecipeId]: { foundAt: 1000 },
+    };
+
     vi.mocked(pruneInvalidDiscoveredEquipment).mockReturnValue(
       prunedDiscovered,
     );
     vi.mocked(pruneInvalidCollectibles).mockReturnValue(prunedCollectibles);
     vi.mocked(grantFoundingStoneIfMissing).mockReturnValue(
       collectiblesWithFoundingStone,
+    );
+    vi.mocked(pruneInvalidDiscoveredRecipes).mockReturnValue(
+      prunedDiscoveredRecipes,
     );
 
     migrateGameState();
@@ -138,9 +159,13 @@ describe('migrateGameState', () => {
     expect(grantFoundingStoneIfMissing).toHaveBeenCalledWith(
       prunedCollectibles,
     );
+    expect(pruneInvalidDiscoveredRecipes).toHaveBeenCalledWith(
+      staleDiscoveredRecipes,
+    );
 
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.discoveredEquipment).toEqual(prunedDiscovered);
     expect(committed.collectibles).toEqual(collectiblesWithFoundingStone);
+    expect(committed.discoveredRecipes).toEqual(prunedDiscoveredRecipes);
   });
 });

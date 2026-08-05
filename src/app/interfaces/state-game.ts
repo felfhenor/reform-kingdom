@@ -4,6 +4,7 @@ import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
+import type { RecipeId } from '@interfaces/content-recipe';
 import type { EquipmentItem } from '@interfaces/equipment';
 import type { GatheringState } from '@interfaces/gathering';
 import type { Branded } from '@interfaces/identifiable';
@@ -46,6 +47,12 @@ export type GameStateDiscoveredEquipment = {
   [key: EquipmentId]: { foundAt: number };
 };
 
+// Permanent record of every world-found recipe - recipes only ever learned
+// by leveling a tradeskill building never appear here (see `recipeDiscover`).
+export type GameStateDiscoveredRecipes = {
+  [key: RecipeId]: { foundAt: number; foundAtNode?: string };
+};
+
 export type GameStateClock = {
   numTicks: number;
   lastSaveTick: number;
@@ -67,5 +74,6 @@ export type GameState = {
   collectibles: GameStateCollectibles;
   armory: EquipmentItem[];
   discoveredEquipment: GameStateDiscoveredEquipment;
+  discoveredRecipes: GameStateDiscoveredRecipes;
   globalEffects: GlobalEffect[];
 };

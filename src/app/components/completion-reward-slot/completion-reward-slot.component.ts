@@ -7,6 +7,9 @@ import {
   isCollectibleDiscovered,
   isEquipmentDiscovered,
   isMaterialDiscovered,
+  isRecipeDiscovered,
+  recipeResultContent,
+  recipeResultSpritesheet,
 } from '@helpers';
 import type {
   CollectibleContent,
@@ -14,6 +17,7 @@ import type {
   DroppedReward,
   EquipmentContent,
   ItemContent,
+  RecipeContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -39,10 +43,22 @@ type RewardContent = {
 export class CompletionRewardSlotComponent {
   public reward = input.required<DroppedReward>();
 
+  // A recipe has no sprite/rarity of its own - it borrows whatever it
+  // crafts, so its spritesheet/content resolve through the recipe's result.
+  private recipeContent = computed<RecipeContent | undefined>(() => {
+    const reward = this.reward();
+    if (!('recipeId' in reward)) return undefined;
+    return getEntry<RecipeContent>(reward.recipeId);
+  });
+
   public spritesheet = computed<'item' | 'equipment' | 'collectible'>(() => {
     const reward = this.reward();
     if ('itemId' in reward) return 'item';
     if ('equipmentId' in reward) return 'equipment';
+    if ('recipeId' in reward) {
+      const recipe = this.recipeContent();
+      return recipe ? recipeResultSpritesheet(recipe) : 'item';
+    }
     return 'collectible';
   });
 
@@ -51,6 +67,10 @@ export class CompletionRewardSlotComponent {
     if ('itemId' in reward) return getEntry<ItemContent>(reward.itemId);
     if ('equipmentId' in reward) {
       return getEntry<EquipmentContent>(reward.equipmentId);
+    }
+    if ('recipeId' in reward) {
+      const recipe = this.recipeContent();
+      return recipe ? recipeResultContent(recipe) : undefined;
     }
     return getEntry<CollectibleContent>(reward.collectibleId);
   });
@@ -61,6 +81,7 @@ export class CompletionRewardSlotComponent {
     if ('equipmentId' in reward) {
       return isEquipmentDiscovered(reward.equipmentId);
     }
+    if ('recipeId' in reward) return isRecipeDiscovered(reward.recipeId);
     return isCollectibleDiscovered(reward.collectibleId);
   });
 }

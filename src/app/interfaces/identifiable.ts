@@ -7,6 +7,7 @@ export type ContentType =
   | 'item'
   | 'job'
   | 'monster'
+  | 'recipe'
   | 'skill'
   | 'statuseffect'
   | 'trait';

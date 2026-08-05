@@ -37,6 +37,7 @@ export function defaultGameState(): GameState {
     collectibles: {},
     armory: [],
     discoveredEquipment: {},
+    discoveredRecipes: {},
     globalEffects: [],
   };
 }

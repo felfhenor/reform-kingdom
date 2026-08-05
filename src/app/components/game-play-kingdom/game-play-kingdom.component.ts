@@ -16,6 +16,7 @@ import {
   armoryGet,
   gamestate,
   getMuseumCollectibleEntries,
+  getMuseumRecipeEntries,
   isPlayerAtKingdom,
   kingdomSubview,
   kingdomSubviewShow,
@@ -62,11 +63,18 @@ export class GamePlayKingdomComponent {
 
   public armoryCount = computed(() => armoryGet().length);
 
-  public museumCollectibleEntries = computed(() => getMuseumCollectibleEntries());
-
+  public museumCollectibleEntries = computed(() =>
+    getMuseumCollectibleEntries(),
+  );
   public museumCollectiblesFound = computed(
-    () => this.museumCollectibleEntries().filter((entry) => entry.discovered)
-      .length,
+    () =>
+      this.museumCollectibleEntries().filter((entry) => entry.discovered)
+        .length,
+  );
+
+  public museumRecipeEntries = computed(() => getMuseumRecipeEntries());
+  public museumRecipesFound = computed(
+    () => this.museumRecipeEntries().filter((entry) => entry.discovered).length,
   );
 
   public readonly tradeskillButtons: TradeskillButton[] = [

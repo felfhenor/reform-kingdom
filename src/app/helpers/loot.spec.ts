@@ -4,6 +4,7 @@ import type {
   DroppedReward,
   EquipmentId,
   ItemId,
+  RecipeId,
 } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -11,6 +12,7 @@ describe('Loot Helper Functions', () => {
   const goldCoinId = 'gold-coin' as ItemId;
   const cloakId = 'cloak' as EquipmentId;
   const swampClamId = 'swamp-clam' as CollectibleId;
+  const boneHewnCloakRecipeId = 'bone-hewn-cloak-recipe' as RecipeId;
 
   describe('rollDroppedRewards', () => {
     it('should roll a quantity within range for an item drop', () => {
@@ -63,11 +65,23 @@ describe('Loot Helper Functions', () => {
       }
     });
 
+    it('should always return a recipe drop with no quantity when chance hits', () => {
+      const rewards: DroppedReward[] = [
+        { recipeId: boneHewnCloakRecipeId, chance: 100 },
+      ];
+
+      for (let i = 0; i < 50; i++) {
+        const drops = rollDroppedRewards(rewards, 5);
+        expect(drops).toEqual([{ recipeId: boneHewnCloakRecipeId }]);
+      }
+    });
+
     it('should never drop when chance is 0', () => {
       const rewards: DroppedReward[] = [
         { itemId: goldCoinId, min: 3, max: 10, multiplierPerLevel: 1, chance: 0 },
         { equipmentId: cloakId, min: 1, max: 1, multiplierPerLevel: 0, chance: 0 },
         { collectibleId: swampClamId, chance: 0 },
+        { recipeId: boneHewnCloakRecipeId, chance: 0 },
       ];
 
       const drops = rollDroppedRewards(rewards, 1);

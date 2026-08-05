@@ -59,12 +59,18 @@
             (click)="openSubview('museum')"
           >
             @let museumEntries = museumCollectibleEntries();
+            @let recipeEntries = museumRecipeEntries();
+
             <span class="text-base font-bold">Museum</span>
             <span class="text-xs opacity-70">
               {{ museumCollectiblesFound() }}/{{ museumEntries.length }}
               collectibles found
             </span>
-            <span class="text-xs opacity-70">0/0 recipes found</span>
+
+            <span class="text-xs opacity-70">
+              {{ museumRecipesFound() }}/{{ recipeEntries.length }} recipes
+              found
+            </span>
           </button>
         </div>
 

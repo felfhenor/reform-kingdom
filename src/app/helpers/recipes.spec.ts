@@ -1,0 +1,223 @@
+import type {
+  EquipmentContent,
+  EquipmentId,
+  GameState,
+  GameStateDiscoveredRecipes,
+  ItemContent,
+  ItemId,
+  RecipeContent,
+  RecipeId,
+} from '@interfaces';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/content', () => ({
+  getEntry: vi.fn(),
+}));
+
+vi.mock('@helpers/state-game', () => ({
+  gamestate: vi.fn(),
+  updateGamestate: vi.fn(),
+}));
+
+import { getEntry } from '@helpers/content';
+import {
+  getRecipeFoundAtNode,
+  isRecipeDiscovered,
+  pruneInvalidDiscoveredRecipes,
+  recipeDiscover,
+  recipeResultContent,
+  recipeResultSpritesheet,
+} from '@helpers/recipes';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+
+const copperIngot: ItemContent = {
+  id: 'copper-ingot' as ItemId,
+  name: 'Copper Ingot',
+  __type: 'item',
+  description: 'A refined copper ingot.',
+  sprite: '0000',
+  rarity: 'Common',
+};
+
+const boneHewnCloak: EquipmentContent = {
+  id: 'bone-hewn-cloak' as EquipmentId,
+  name: 'Bone-Hewn Cloak',
+  __type: 'equipment',
+  description: 'A cloak made of leather and bone.',
+  sprite: '0017',
+  rarity: 'Uncommon',
+  levelRequirement: 4,
+  baseStats: {} as never,
+  slots: ['Armor'],
+  requiredJobIds: [],
+};
+
+const itemRecipe: RecipeContent = {
+  id: 'material-copper-ingot' as RecipeId,
+  name: 'Material: Copper Ingot',
+  __type: 'recipe',
+  result: { itemId: copperIngot.id, quantity: 1 },
+  requirements: [],
+  tradeskill: 'Blacksmithing',
+  minTradeskillLevel: 1,
+  maxTradeskillLevel: 3,
+  tradeskillXP: 1,
+  craftTime: 60,
+};
+
+const equipmentRecipe: RecipeContent = {
+  id: 'equipment-bone-hewn-cloak' as RecipeId,
+  name: 'Equipment: Bone-Hewn Cloak',
+  __type: 'recipe',
+  result: { equipmentId: boneHewnCloak.id },
+  requirements: [],
+  tradeskill: 'Tailoring',
+  minTradeskillLevel: 2,
+  maxTradeskillLevel: 5,
+  tradeskillXP: 1,
+  craftTime: 60,
+};
+
+describe('Recipes Helper Functions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('isRecipeDiscovered', () => {
+    it('returns true when foundAt is set', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(true);
+    });
+
+    it('returns false when the recipe has never been found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(false);
+    });
+  });
+
+  describe('getRecipeFoundAtNode', () => {
+    it('returns the node the recipe was found in', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {
+          [equipmentRecipe.id]: { foundAt: 1000, foundAtNode: 'Carrina' },
+        },
+      } as unknown as GameState);
+
+      expect(getRecipeFoundAtNode(equipmentRecipe.id)).toBe('Carrina');
+    });
+
+    it('returns undefined when the recipe has never been found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(getRecipeFoundAtNode(equipmentRecipe.id)).toBeUndefined();
+    });
+  });
+
+  describe('recipeDiscover', () => {
+    it('adds a new discovery entry with the current timestamp', () => {
+      recipeDiscover(equipmentRecipe.id);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBeGreaterThan(
+        0,
+      );
+    });
+
+    it('preserves the original foundAt on repeat finds', () => {
+      recipeDiscover(equipmentRecipe.id);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBe(1000);
+    });
+
+    it('records the node it was found in', () => {
+      recipeDiscover(equipmentRecipe.id, 'Carrina');
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(result.discoveredRecipes[equipmentRecipe.id].foundAtNode).toBe(
+        'Carrina',
+      );
+    });
+
+    it('preserves the original found-at node on repeat finds', () => {
+      recipeDiscover(equipmentRecipe.id, 'Craggledmire');
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        discoveredRecipes: {
+          [equipmentRecipe.id]: { foundAt: 1000, foundAtNode: 'Carrina' },
+        },
+      } as unknown as GameState);
+
+      expect(result.discoveredRecipes[equipmentRecipe.id].foundAtNode).toBe(
+        'Carrina',
+      );
+    });
+  });
+
+  describe('pruneInvalidDiscoveredRecipes', () => {
+    it('keeps entries that resolve to real recipe content', () => {
+      vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
+      const discovered: GameStateDiscoveredRecipes = {
+        [equipmentRecipe.id]: { foundAt: 1000 },
+      };
+
+      expect(pruneInvalidDiscoveredRecipes(discovered)).toEqual(discovered);
+    });
+
+    it('drops entries whose recipeId no longer resolves to real content', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+      const discovered: GameStateDiscoveredRecipes = {
+        [equipmentRecipe.id]: { foundAt: 1000 },
+      };
+
+      expect(pruneInvalidDiscoveredRecipes(discovered)).toEqual({});
+    });
+  });
+
+  describe('recipeResultSpritesheet', () => {
+    it('returns "item" for a recipe that crafts an item', () => {
+      expect(recipeResultSpritesheet(itemRecipe)).toBe('item');
+    });
+
+    it('returns "equipment" for a recipe that crafts equipment', () => {
+      expect(recipeResultSpritesheet(equipmentRecipe)).toBe('equipment');
+    });
+  });
+
+  describe('recipeResultContent', () => {
+    it('resolves the crafted item for an item recipe', () => {
+      vi.mocked(getEntry).mockReturnValue(copperIngot);
+
+      expect(recipeResultContent(itemRecipe)).toBe(copperIngot);
+      expect(getEntry).toHaveBeenCalledWith(copperIngot.id);
+    });
+
+    it('resolves the crafted equipment for an equipment recipe', () => {
+      vi.mocked(getEntry).mockReturnValue(boneHewnCloak);
+
+      expect(recipeResultContent(equipmentRecipe)).toBe(boneHewnCloak);
+      expect(getEntry).toHaveBeenCalledWith(boneHewnCloak.id);
+    });
+  });
+});

@@ -4,6 +4,9 @@ import type {
   EncounterContent,
   EncounterId,
   MuseumCollectibleEntry,
+  MuseumRecipeEntry,
+  RecipeContent,
+  RecipeId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -17,6 +20,11 @@ vi.mock('@helpers/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
+vi.mock('@helpers/recipes', () => ({
+  getRecipeFoundAtNode: vi.fn(),
+  isRecipeDiscovered: vi.fn(),
+}));
+
 import {
   getCollectibleFoundAtNode,
   getCollectibleQuantity,
@@ -26,8 +34,12 @@ import { getEntriesByType } from '@helpers/content';
 import {
   collectibleSourceNodeNames,
   filterMuseumCollectibleEntries,
+  filterMuseumRecipeEntries,
   getMuseumCollectibleEntries,
+  getMuseumRecipeEntries,
+  recipeSourceNodeNames,
 } from '@helpers/museum';
+import { getRecipeFoundAtNode, isRecipeDiscovered } from '@helpers/recipes';
 
 const foundingStone: CollectibleContent = {
   id: 'founding-stone' as CollectibleId,
@@ -47,6 +59,32 @@ const goblinRuby: CollectibleContent = {
   rarity: 'Uncommon',
 };
 
+const boneHewnCloakRecipe: RecipeContent = {
+  id: 'equipment-bone-hewn-cloak' as RecipeId,
+  name: 'Equipment: Bone-Hewn Cloak',
+  __type: 'recipe',
+  result: { equipmentId: 'bone-hewn-cloak' as never },
+  requirements: [],
+  tradeskill: 'Tailoring',
+  minTradeskillLevel: 2,
+  maxTradeskillLevel: 5,
+  tradeskillXP: 1,
+  craftTime: 60,
+};
+
+const copperIngotRecipe: RecipeContent = {
+  id: 'material-copper-ingot' as RecipeId,
+  name: 'Material: Copper Ingot',
+  __type: 'recipe',
+  result: { itemId: 'copper-ingot' as never, quantity: 1 },
+  requirements: [],
+  tradeskill: 'Blacksmithing',
+  minTradeskillLevel: 1,
+  maxTradeskillLevel: 3,
+  tradeskillXP: 1,
+  craftTime: 60,
+};
+
 const fieldRuinsEncounter: EncounterContent = {
   id: 'field-ruins' as EncounterId,
   name: 'Field Ruins',
@@ -54,7 +92,10 @@ const fieldRuinsEncounter: EncounterContent = {
   description: 'A ruined field.',
   levelRange: { min: 1, max: 5 },
   fights: [],
-  completionRewards: [{ collectibleId: goblinRuby.id, chance: 0.1 }],
+  completionRewards: [
+    { collectibleId: goblinRuby.id, chance: 0.1 },
+    { recipeId: boneHewnCloakRecipe.id, chance: 0.25 },
+  ],
 };
 
 describe('Museum Helper Functions', () => {
@@ -158,6 +199,112 @@ describe('Museum Helper Functions', () => {
       expect(filterMuseumCollectibleEntries(entries, 'nonexistent')).toEqual(
         [],
       );
+    });
+  });
+
+  describe('recipeSourceNodeNames', () => {
+    it('returns the names of encounters that can drop the recipe', () => {
+      vi.mocked(getEntriesByType).mockReturnValue([fieldRuinsEncounter]);
+
+      expect(recipeSourceNodeNames(boneHewnCloakRecipe.id)).toEqual([
+        'Field Ruins',
+      ]);
+    });
+
+    it('excludes encounters whose rewards do not include the recipe', () => {
+      vi.mocked(getEntriesByType).mockReturnValue([fieldRuinsEncounter]);
+
+      expect(recipeSourceNodeNames(copperIngotRecipe.id)).toEqual([]);
+    });
+  });
+
+  describe('getMuseumRecipeEntries', () => {
+    it('includes discovered recipes and undiscovered ones with a source node', () => {
+      vi.mocked(getEntriesByType).mockImplementation((type) =>
+        (type === 'recipe'
+          ? [copperIngotRecipe, boneHewnCloakRecipe]
+          : [fieldRuinsEncounter]) as never,
+      );
+      vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+      vi.mocked(getRecipeFoundAtNode).mockReturnValue(undefined);
+
+      const entries = getMuseumRecipeEntries();
+
+      expect(entries).toEqual([
+        {
+          recipe: boneHewnCloakRecipe,
+          discovered: false,
+          foundAtNode: undefined,
+          sourceNodeNames: ['Field Ruins'],
+        },
+      ]);
+    });
+
+    it('excludes recipes that never drop from a location, even if they resolve', () => {
+      vi.mocked(getEntriesByType).mockImplementation((type) =>
+        (type === 'recipe' ? [copperIngotRecipe] : []) as never,
+      );
+      vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+
+      expect(getMuseumRecipeEntries()).toEqual([]);
+    });
+
+    it('includes a recipe once discovered even though it no longer reports a source node', () => {
+      vi.mocked(getEntriesByType).mockImplementation((type) =>
+        (type === 'recipe' ? [boneHewnCloakRecipe] : []) as never,
+      );
+      vi.mocked(isRecipeDiscovered).mockReturnValue(true);
+      vi.mocked(getRecipeFoundAtNode).mockReturnValue('Carrina');
+
+      expect(getMuseumRecipeEntries()).toEqual([
+        {
+          recipe: boneHewnCloakRecipe,
+          discovered: true,
+          foundAtNode: 'Carrina',
+          sourceNodeNames: [],
+        },
+      ]);
+    });
+  });
+
+  describe('filterMuseumRecipeEntries', () => {
+    const discoveredEntry: MuseumRecipeEntry = {
+      recipe: boneHewnCloakRecipe,
+      discovered: true,
+      foundAtNode: 'Carrina',
+      sourceNodeNames: [],
+    };
+
+    const undiscoveredEntry: MuseumRecipeEntry = {
+      recipe: copperIngotRecipe,
+      discovered: false,
+      sourceNodeNames: ['Field Ruins'],
+    };
+
+    const entries = [discoveredEntry, undiscoveredEntry];
+
+    it('returns every entry when the search text is empty', () => {
+      expect(filterMuseumRecipeEntries(entries, '   ')).toEqual(entries);
+    });
+
+    it('filters discovered entries by name or found-at node', () => {
+      expect(filterMuseumRecipeEntries(entries, 'bone-hewn')).toEqual([
+        discoveredEntry,
+      ]);
+      expect(filterMuseumRecipeEntries(entries, 'carrina')).toEqual([
+        discoveredEntry,
+      ]);
+    });
+
+    it('filters undiscovered entries only by their source node names', () => {
+      expect(filterMuseumRecipeEntries(entries, 'field')).toEqual([
+        undiscoveredEntry,
+      ]);
+      expect(filterMuseumRecipeEntries(entries, 'copper ingot')).toEqual([]);
+    });
+
+    it('returns an empty array when nothing matches', () => {
+      expect(filterMuseumRecipeEntries(entries, 'nonexistent')).toEqual([]);
     });
   });
 });

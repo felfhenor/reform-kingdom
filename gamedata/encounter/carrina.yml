@@ -56,6 +56,9 @@
     - collectibleId: Purple Lotus
       chance: 100
 
+    - recipeId: 'Equipment: Bone-Hewn Cloak'
+      chance: 25
+
     - itemId: Gold Coin
       min: 25
       max: 50

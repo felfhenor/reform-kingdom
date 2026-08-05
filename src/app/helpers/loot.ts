@@ -16,6 +16,10 @@ function resolveDrop(
     return { collectibleId: drop.collectibleId };
   }
 
+  if ('recipeId' in drop) {
+    return { recipeId: drop.recipeId };
+  }
+
   const levelBonus = drop.multiplierPerLevel * (level - 1);
   const quantity = rngNumberRange(
     drop.min + levelBonus,

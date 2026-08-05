@@ -10,9 +10,17 @@ import {
   equipmentNameHtml,
   itemDropHtml,
   itemNameHtml,
+  recipeDropHtml,
+  recipeNameHtml,
   travelMessageLog,
 } from '@helpers/combat-log';
-import type { Combat, Combatant, EquipmentContent, ItemContent } from '@interfaces';
+import type {
+  Combat,
+  Combatant,
+  EquipmentContent,
+  ItemContent,
+  RecipeContent,
+} from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('combatMessageLog', () => {
@@ -156,6 +164,26 @@ describe('equipmentDropHtml', () => {
 
     expect(equipmentDropHtml(equipment)).toBe(
       '<span class="text-Uncommon font-semibold">Goblin Skull</span>',
+    );
+  });
+});
+
+describe('recipeNameHtml', () => {
+  it('wraps the recipe name in a plain span, with no rarity color', () => {
+    const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
+
+    expect(recipeNameHtml(recipe)).toBe(
+      '<span class="font-semibold">Equipment: Bone-Hewn Cloak</span>',
+    );
+  });
+});
+
+describe('recipeDropHtml', () => {
+  it('renders the same span as recipeNameHtml, with no quantity', () => {
+    const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
+
+    expect(recipeDropHtml(recipe)).toBe(
+      '<span class="font-semibold">Equipment: Bone-Hewn Cloak</span>',
     );
   });
 });

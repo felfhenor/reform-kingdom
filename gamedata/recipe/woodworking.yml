@@ -1,0 +1,61 @@
+- id: 196f575e-0535-42d7-afa9-7da24b49620f
+  name: 'Material: Wergen Stick'
+  result:
+    itemId: Wergen Stick
+    quantity: 3
+
+  requirements:
+    - itemId: Wergen Wood
+      quantity: 1
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 3
+  tradeskillXP: 1
+
+- id: 6436437a-3331-4915-a88d-009eda5baf95
+  name: 'Equipment: Wooden Arrow'
+  result:
+    equipmentId: Wooden Arrow
+
+  requirements:
+    - itemId: Wergen Stick
+      quantity: 1
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 4
+  tradeskillXP: 2
+
+- id: 1a9ffc55-456d-4cc8-afab-5710705570e6
+  name: 'Equipment: Wooden Arrow (Sharp)'
+  result:
+    equipmentId: Wooden Arrow (Sharp)
+
+  requirements:
+    - equipmentId: Wooden Arrow
+
+    - itemId: Copper Ingot
+      quantity: 1
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 5
+  tradeskillXP: 3
+
+- id: 66d36d4b-ca4a-48b1-aad0-d85eca6ecbf4
+  name: 'Equipment: Copper Spear'
+  result:
+    equipmentId: Copper Spear
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Wergen Stick
+      quantity: 3
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 6
+  tradeskillXP: 1

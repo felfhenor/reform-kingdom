@@ -4,6 +4,7 @@ import type {
   EquipmentContent,
   GameMap,
   ItemContent,
+  RecipeContent,
   TiledLayer,
   TiledMap,
   TiledObject,
@@ -282,6 +283,31 @@ describe('encounter-backed node accessors', () => {
 
     it('returns an empty array when there is no matching encounter', () => {
       expect(worldNodeCompletionRewards(buildEntry())).toEqual([]);
+    });
+
+    it('includes recipe rewards alongside the other reward types', () => {
+      const recipe: RecipeContent = {
+        id: 'equipment-bone-hewn-cloak',
+        name: 'Equipment: Bone-Hewn Cloak',
+        __type: 'recipe',
+        result: { equipmentId: 'bone-hewn-cloak' as never },
+        requirements: [],
+        tradeskill: 'Tailoring',
+        minTradeskillLevel: 2,
+        maxTradeskillLevel: 5,
+        tradeskillXP: 1,
+        craftTime: 60,
+      };
+
+      const encounter = buildEncounter({
+        completionRewards: [{ recipeId: recipe.id, chance: 25 }],
+      });
+
+      seedContent([recipe, encounter]);
+
+      expect(worldNodeCompletionRewards(buildEntry())).toEqual([
+        { recipeId: recipe.id, chance: 25 },
+      ]);
     });
   });
 

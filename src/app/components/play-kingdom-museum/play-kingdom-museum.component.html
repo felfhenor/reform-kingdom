@@ -1,42 +1,73 @@
 @let tab = activeTab();
 
-<app-paged-grid-page
-  #grid
-  [entries]="entries()"
-  [filterFn]="filterFn"
-  searchPlaceholder="Search by name, description, or location..."
-  emptyMessage="No collectibles found."
-  [showToolbar]="tab === 'collectibles'"
-  [showGrid]="tab === 'collectibles'"
->
-  <span header>Museum</span>
+@if (tab === 'collectibles') {
+  <app-paged-grid-page
+    #collectiblesGrid
+    [entries]="collectibleEntries()"
+    [filterFn]="collectibleFilterFn"
+    searchPlaceholder="Search by name, description, or location..."
+    emptyMessage="No collectibles found."
+  >
+    <span header>Museum</span>
 
-  <div before-toolbar role="tablist" class="tabs tabs-boxed">
-    <button
-      type="button"
-      role="tab"
-      class="tab"
-      [class.tab-active]="tab === 'collectibles'"
-      (click)="setTab('collectibles')"
-    >
-      Collectibles ({{ discoveredCount() }}/{{ entries().length }})
-    </button>
-    <button
-      type="button"
-      role="tab"
-      class="tab"
-      [class.tab-active]="tab === 'recipes'"
-      (click)="setTab('recipes')"
-    >
-      Recipes
-    </button>
-  </div>
+    <div before-toolbar role="tablist" class="tabs tabs-boxed">
+      <button
+        type="button"
+        role="tab"
+        class="tab tab-active"
+        (click)="setTab('collectibles')"
+      >
+        Collectibles ({{ collectibleDiscoveredCount() }}/{{
+          collectibleEntries().length
+        }})
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        (click)="setTab('recipes')"
+      >
+        Recipes ({{ recipeDiscoveredCount() }}/{{ recipeEntries().length }})
+      </button>
+    </div>
 
-  @if (tab === 'collectibles') {
-    @for (entry of grid.pagedEntries(); track entry.collectible.id) {
+    @for (entry of collectiblesGrid.pagedEntries(); track entry.collectible.id) {
       <app-museum-collectible-slot [entry]="entry" />
     }
-  } @else {
-    <div custom class="museum-empty">Recipes coming soon.</div>
-  }
-</app-paged-grid-page>
+  </app-paged-grid-page>
+} @else {
+  <app-paged-grid-page
+    #recipesGrid
+    [entries]="recipeEntries()"
+    [filterFn]="recipeFilterFn"
+    searchPlaceholder="Search by name or location..."
+    emptyMessage="No recipes found."
+  >
+    <span header>Museum</span>
+
+    <div before-toolbar role="tablist" class="tabs tabs-boxed">
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        (click)="setTab('collectibles')"
+      >
+        Collectibles ({{ collectibleDiscoveredCount() }}/{{
+          collectibleEntries().length
+        }})
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="tab tab-active"
+        (click)="setTab('recipes')"
+      >
+        Recipes ({{ recipeDiscoveredCount() }}/{{ recipeEntries().length }})
+      </button>
+    </div>
+
+    @for (entry of recipesGrid.pagedEntries(); track entry.recipe.id) {
+      <app-museum-recipe-slot [entry]="entry" />
+    }
+  </app-paged-grid-page>
+}

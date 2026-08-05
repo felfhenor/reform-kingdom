@@ -1,6 +1,7 @@
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
+import type { RecipeId } from '@interfaces/content-recipe';
 
 export type DropRarity =
   'Common' | 'Uncommon' | 'Rare' | 'Mystical' | 'Legendary';
@@ -29,6 +30,10 @@ export type DropCollectible = {
   collectibleId: CollectibleId;
 };
 
+export type DropRecipe = {
+  recipeId: RecipeId;
+};
+
 export type DropRange = {
   min: number;
   max: number;
@@ -43,29 +48,34 @@ export type DropHasChance = {
 };
 
 // A single drop-table entry - an `ItemId` (stackable material, with a rolled
-// quantity range), an `EquipmentId` (gear), or a `CollectibleId` (curio),
-// told apart by which id field is present. Only item rewards roll a
-// quantity - equipment and collectibles are always a flat chance for one.
-// Shared by monster kill drops (`MonsterContent.drops`) and node completion
-// rewards (`EncounterContent.completionRewards`).
+// quantity range), an `EquipmentId` (gear), a `CollectibleId` (curio), or a
+// `RecipeId` (a world-found recipe), told apart by which id field is
+// present. Only item rewards roll a quantity - equipment, collectibles, and
+// recipes are always a flat chance for one. Shared by monster kill drops
+// (`MonsterContent.drops`) and node completion rewards
+// (`EncounterContent.completionRewards`).
 export type DroppedItemReward = DropRange &
   DropHasLevelMultiplier &
   DropHasChance &
   DropItem;
 export type DroppedEquipmentReward = DropHasChance & DropEquipment;
 export type DroppedCollectibleReward = DropHasChance & DropCollectible;
+export type DroppedRecipeReward = DropHasChance & DropRecipe;
 
 export type DroppedReward =
   | DroppedItemReward
   | DroppedEquipmentReward
-  | DroppedCollectibleReward;
+  | DroppedCollectibleReward
+  | DroppedRecipeReward;
 
-// The result of rolling a `DroppedReward` - equipment/collectible drops skip
-// quantity entirely since neither is stackable.
+// The result of rolling a `DroppedReward` - equipment/collectible/recipe
+// drops skip quantity entirely since none of them are stackable.
 export type ResolvedItemDrop = DropItem & { quantity: number };
 export type ResolvedEquipmentDrop = DropEquipment;
 export type ResolvedCollectibleDrop = DropCollectible;
+export type ResolvedRecipeDrop = DropRecipe;
 export type ResolvedDrop =
   | ResolvedItemDrop
   | ResolvedEquipmentDrop
-  | ResolvedCollectibleDrop;
+  | ResolvedCollectibleDrop
+  | ResolvedRecipeDrop;

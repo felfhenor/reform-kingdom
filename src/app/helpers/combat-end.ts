@@ -6,6 +6,7 @@ import {
   combatMessageLog,
   equipmentDropHtml,
   itemDropHtml,
+  recipeDropHtml,
 } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
@@ -13,6 +14,7 @@ import { rollDroppedRewards } from '@helpers/loot';
 import { addMaterial } from '@helpers/materials';
 import { monsterXpReward } from '@helpers/monster';
 import { partyGainXp, syncPartyHpFromCombat } from '@helpers/party';
+import { recipeDiscover } from '@helpers/recipes';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
   CollectibleContent,
@@ -24,6 +26,7 @@ import type {
   ItemContent,
   ItemId,
   MonsterContent,
+  RecipeContent,
   ResolvedDrop,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
@@ -93,6 +96,16 @@ function grantResolvedDrops(combat: Combat, drops: ResolvedDrop[]): void {
         combat,
         `The party found ${collectibleDropHtml(collectible)}!`,
       );
+      return;
+    }
+
+    if ('recipeId' in drop) {
+      recipeDiscover(drop.recipeId, combat.locationName);
+
+      const recipe = getEntry<RecipeContent>(drop.recipeId);
+      if (!recipe) return;
+
+      combatMessageLog(combat, `The party found ${recipeDropHtml(recipe)}!`);
       return;
     }
 

@@ -8,6 +8,7 @@ import {
 } from '@helpers/collectibles';
 import { defaultGameState } from '@helpers/defaults';
 import { pruneInvalidMaterials } from '@helpers/materials';
+import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import {
   gamestate,
   gamestateTickEnd,
@@ -29,6 +30,9 @@ export function migrateGameState() {
   );
   newState.collectibles = pruneInvalidCollectibles(newState.collectibles);
   newState.collectibles = grantFoundingStoneIfMissing(newState.collectibles);
+  newState.discoveredRecipes = pruneInvalidDiscoveredRecipes(
+    newState.discoveredRecipes,
+  );
 
   setGameState(newState);
   gamestateTickStart();

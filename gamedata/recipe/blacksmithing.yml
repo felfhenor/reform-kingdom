@@ -1,0 +1,75 @@
+- id: 33ec8d52-916e-4402-9321-aea50b98b10c
+  name: 'Material: Copper Ingot'
+  result:
+    itemId: Copper Ingot
+    quantity: 1
+
+  requirements:
+    - itemId: Copper Ore
+      quantity: 1
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 3
+  tradeskillXP: 1
+
+- id: 56654f67-a1c0-4086-9f11-51e94fb74a69
+  name: 'Weapon: Copper Dagger'
+  result:
+    equipmentId: Copper Dagger
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 1
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 3
+  tradeskillXP: 1
+
+- id: 99f675b1-bf00-49f9-997e-cfbbb984ac26
+  name: 'Weapon: Copper Sword'
+  result:
+    equipmentId: Copper Sword
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 3
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 4
+  tradeskillXP: 1
+
+- id: ef512ec9-393d-4944-940a-2b5dffd7ce3a
+  name: 'Weapon: Copper Dirk'
+  result:
+    equipmentId: Copper Dirk
+
+  requirements:
+    - equipmentId: Copper Dagger
+
+    - itemId: Copper Ingot
+      quantity: 1
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 4
+  tradeskillXP: 2
+
+- id: 62f920bf-4086-44d0-8c86-359de5d90481
+  name: 'Equipment: Copper Shield'
+  result:
+    equipmentId: Copper Shield
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 4
+
+    - itemId: Wergen Wood
+      quantity: 3
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 5
+  tradeskillXP: 1

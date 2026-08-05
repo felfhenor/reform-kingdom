@@ -2,12 +2,13 @@ import { pluralize } from '@boringnode/pluralize';
 import { rngUuid } from '@helpers/rng';
 import { localStorageSignal } from '@helpers/signal';
 import type {
-  Combat,
   CollectibleContent,
+  Combat,
   CombatLog,
   Combatant,
   EquipmentContent,
   ItemContent,
+  RecipeContent,
 } from '@interfaces';
 import { parseInline } from 'marked';
 import mustache from 'mustache';
@@ -80,7 +81,10 @@ export function gatherMessageLog(locationName: string, message: string): void {
 // Colors an item's name by its rarity for adventure log messages (e.g. combat
 // and gather drop announcements) - `adventureLogMessageHtml` renders the log
 // message as markdown-inline, which passes raw HTML like this through as-is.
-export function itemNameHtml(item: ItemContent, displayName = item.name): string {
+export function itemNameHtml(
+  item: ItemContent,
+  displayName = item.name,
+): string {
   return `<span class="text-${item.rarity} font-semibold">${displayName}</span>`;
 }
 
@@ -112,6 +116,17 @@ export function collectibleNameHtml(collectible: CollectibleContent): string {
 // Collectible drops are always a single piece, same as equipment.
 export function collectibleDropHtml(collectible: CollectibleContent): string {
   return collectibleNameHtml(collectible);
+}
+
+// Recipes have no rarity of their own (their icon borrows their result's),
+// so the name isn't tinted, unlike the other reward types above.
+export function recipeNameHtml(recipe: RecipeContent): string {
+  return `<span class="font-semibold">Recipe - ${recipe.name}</span>`;
+}
+
+// Recipe drops are always a single piece, same as equipment/collectibles.
+export function recipeDropHtml(recipe: RecipeContent): string {
+  return `${recipeNameHtml(recipe)}`;
 }
 
 export function miscellaneousMessageLog(message: string): void {

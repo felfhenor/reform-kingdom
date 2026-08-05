@@ -1,0 +1,42 @@
+- id: ecf584b5-38a7-4318-b011-1ea7439a961e
+  name: 'Material: Malachite'
+  result:
+    itemId: Malachite
+    chance: 10
+
+  requirements:
+    - itemId: Copper Ore
+      quantity: 1
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 2
+  tradeskillXP: 1
+
+- id: cea072ef-6365-4b30-b5d6-fd9f205ab676
+  name: 'Equipment: Copper Ring'
+  result:
+    equipmentId: Copper Ring
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 1
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 3
+  tradeskillXP: 1
+
+- id: 8a4d4e21-7c89-4dd0-86ae-b41c643c7b99
+  name: 'Equipment: Copper Bangle'
+  result:
+    equipmentId: Copper Bangle
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 2
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 4
+  tradeskillXP: 1

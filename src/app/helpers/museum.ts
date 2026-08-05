@@ -4,11 +4,18 @@ import {
   isCollectibleDiscovered,
 } from '@helpers/collectibles';
 import { getEntriesByType } from '@helpers/content';
+import {
+  getRecipeFoundAtNode,
+  isRecipeDiscovered,
+} from '@helpers/recipes';
 import type {
   CollectibleContent,
   CollectibleId,
   EncounterContent,
   MuseumCollectibleEntry,
+  MuseumRecipeEntry,
+  RecipeContent,
+  RecipeId,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
@@ -82,6 +89,71 @@ export function filterMuseumCollectibleEntries(
     if (entry.collectible.description.toLowerCase().includes(text)) {
       return true;
     }
+    if (entry.foundAtNode?.toLowerCase().includes(text)) return true;
+
+    return false;
+  });
+}
+
+// The nodes an as-yet-undiscovered recipe can drop from, mirroring
+// `collectibleSourceNodeNames` - recipes don't know their own source node
+// until a copy has actually been found.
+export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
+  const encounters = getEntriesByType<EncounterContent>('encounter');
+
+  const names = new Set<string>();
+  encounters.forEach((encounter) => {
+    const dropsHere = encounter.completionRewards.some(
+      (reward) => 'recipeId' in reward && reward.recipeId === recipeId,
+    );
+    if (dropsHere) names.add(encounter.name);
+  });
+
+  return [...names];
+}
+
+// Only recipes that can actually be found as a world drop are museum-worthy
+// - a recipe with no source node (only ever learned by leveling a
+// tradeskill building) is excluded entirely rather than shown as an
+// always-undiscovered silhouette.
+export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
+  const recipes = getEntriesByType<RecipeContent>('recipe');
+
+  const entries = recipes
+    .map((recipe) => {
+      const discovered = isRecipeDiscovered(recipe.id);
+
+      return {
+        recipe,
+        discovered,
+        foundAtNode: getRecipeFoundAtNode(recipe.id),
+        sourceNodeNames: discovered ? [] : recipeSourceNodeNames(recipe.id),
+      };
+    })
+    .filter((entry) => entry.discovered || entry.sourceNodeNames.length > 0);
+
+  return orderBy(
+    entries,
+    [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.recipe.name],
+    ['desc', 'asc'],
+  );
+}
+
+export function filterMuseumRecipeEntries(
+  entries: MuseumRecipeEntry[],
+  searchText: string,
+): MuseumRecipeEntry[] {
+  const text = searchText.trim().toLowerCase();
+  if (text === '') return entries;
+
+  return entries.filter((entry) => {
+    if (!entry.discovered) {
+      return entry.sourceNodeNames.some((name) =>
+        name.toLowerCase().includes(text),
+      );
+    }
+
+    if (entry.recipe.name.toLowerCase().includes(text)) return true;
     if (entry.foundAtNode?.toLowerCase().includes(text)) return true;
 
     return false;

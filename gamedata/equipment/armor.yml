@@ -20,3 +20,15 @@
     Resistance: 0.1
     Agility: 0.25
     Vitality: 0.5
+
+- id: 24c9a991-d792-4296-9900-1b3d89a9af69
+  name: Bone-Hewn Cloak
+  description: A cloak made of leather and bone.
+  levelRequirement: 4
+  rarity: Uncommon
+  slots: [Armor]
+  sprite: '0017'
+  baseStats:
+    Resistance: 1
+    Agility: 1
+    Vitality: 2

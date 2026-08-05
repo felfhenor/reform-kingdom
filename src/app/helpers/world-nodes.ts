@@ -4,6 +4,7 @@ import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
 import { allMaps } from '@helpers/maps';
 import { isMaterialDiscovered } from '@helpers/materials';
+import { isRecipeDiscovered } from '@helpers/recipes';
 import { tiledMapGetLayer } from '@helpers/tiled-map';
 import type {
   DroppedReward,
@@ -203,6 +204,7 @@ export function worldNodeDescription(
 function rewardKey(reward: DroppedReward): string {
   if ('itemId' in reward) return `item:${reward.itemId}`;
   if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
+  if ('recipeId' in reward) return `recipe:${reward.recipeId}`;
   return `collectible:${reward.collectibleId}`;
 }
 
@@ -239,6 +241,7 @@ export function worldNodeCompletionRewards(
 function isRewardDiscovered(reward: DroppedReward): boolean {
   if ('itemId' in reward) return isMaterialDiscovered(reward.itemId);
   if ('equipmentId' in reward) return isEquipmentDiscovered(reward.equipmentId);
+  if ('recipeId' in reward) return isRecipeDiscovered(reward.recipeId);
   return isCollectibleDiscovered(reward.collectibleId);
 }
 

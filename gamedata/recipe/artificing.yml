@@ -1,0 +1,16 @@
+- id: f263a82e-f55b-4127-b8bd-7edec524d66d
+  name: 'Equipment: Copper Gear'
+  result:
+    equipmentId: Copper Gear
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 4
+
+    - itemId: Malachite
+      quantity: 1
+
+  tradeskill: Artificing
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 3
+  tradeskillXP: 2

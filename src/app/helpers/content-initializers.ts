@@ -20,6 +20,8 @@ import type {
   JobId,
   MonsterContent,
   MonsterId,
+  RecipeContent,
+  RecipeId,
   StatBlock,
   StatusEffectContent,
   StatusEffectId,
@@ -38,6 +40,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   item: ensureItem,
   job: ensureJob,
   monster: ensureMonster,
+  recipe: ensureRecipe,
   skill: ensureSkill,
   statuseffect: ensureStatuseffect,
   trait: ensureTrait,
@@ -151,6 +154,21 @@ function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     statsPerLevel: ensureStats(job.statsPerLevel),
     sprite: job.sprite ?? 'UNKNOWN',
     frames: job.frames ?? 4,
+  };
+}
+
+function ensureRecipe(recipe: Partial<RecipeContent>): Required<RecipeContent> {
+  return {
+    id: recipe.id ?? ('UNKNOWN' as RecipeId),
+    name: recipe.name ?? 'UNKNOWN',
+    __type: 'recipe',
+    result: recipe.result ?? { itemId: 'UNKNOWN' as ItemId, quantity: 1 },
+    requirements: recipe.requirements ?? [],
+    tradeskill: recipe.tradeskill ?? 'Blacksmithing',
+    minTradeskillLevel: recipe.minTradeskillLevel ?? 1,
+    maxTradeskillLevel: recipe.maxTradeskillLevel ?? 1,
+    tradeskillXP: recipe.tradeskillXP ?? 0,
+    craftTime: recipe.craftTime ?? 60,
   };
 }
 
