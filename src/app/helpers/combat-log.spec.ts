@@ -6,11 +6,13 @@ import {
   combatLogReset,
   combatMessageLog,
   endCombatLogCommits,
+  equipmentDropHtml,
+  equipmentNameHtml,
   itemDropHtml,
   itemNameHtml,
   travelMessageLog,
 } from '@helpers/combat-log';
-import type { Combat, Combatant, ItemContent } from '@interfaces';
+import type { Combat, Combatant, EquipmentContent, ItemContent } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('combatMessageLog', () => {
@@ -134,6 +136,26 @@ describe('itemDropHtml', () => {
 
     expect(itemDropHtml(item, 3)).toBe(
       '3 <span class="text-Uncommon font-semibold">copper ores</span>',
+    );
+  });
+});
+
+describe('equipmentNameHtml', () => {
+  it('wraps the equipment name in a rarity-colored span', () => {
+    const equipment = { name: 'Goblin Skull', rarity: 'Uncommon' } as EquipmentContent;
+
+    expect(equipmentNameHtml(equipment)).toBe(
+      '<span class="text-Uncommon font-semibold">Goblin Skull</span>',
+    );
+  });
+});
+
+describe('equipmentDropHtml', () => {
+  it('renders the same rarity-colored span as equipmentNameHtml, with no quantity', () => {
+    const equipment = { name: 'Goblin Skull', rarity: 'Uncommon' } as EquipmentContent;
+
+    expect(equipmentDropHtml(equipment)).toBe(
+      '<span class="text-Uncommon font-semibold">Goblin Skull</span>',
     );
   });
 });

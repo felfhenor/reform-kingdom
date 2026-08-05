@@ -1,0 +1,89 @@
+@let content = equipment();
+
+<button
+  type="button"
+  class="equipment-item-row hover:bg-base-300"
+  [tp]="tooltip"
+  [tpPlacement]="'right'"
+  (click)="equip.emit()"
+>
+  <span
+    class="equipment-item-row-icon outline-2 outline-offset-[-2px] rounded outline-{{
+      content.rarity
+    }}"
+  >
+    <app-icon-blank-slot>
+      <app-atlas-image spritesheet="equipment" [assetName]="content.sprite" />
+    </app-icon-blank-slot>
+  </span>
+
+  <span class="equipment-item-row-info">
+    <span class="equipment-item-row-name text-{{ content.rarity }}">
+      {{ content.name }}
+      <span class="equipment-item-row-level"></span>
+      (Lv. {{ content.levelRequirement }})
+    </span>
+
+    <span class="equipment-item-row-stats">
+      @for (stat of rowStatKeys(); track stat) {
+        @let equipStatValue = statValue(stat);
+
+        <span class="equipment-item-row-stat">
+          <app-icon-stat [stat]="stat" />
+          <span>{{ statShorthand[stat] }}</span>
+          <span>{{ equipStatValue > 0 ? '+' : '' }}{{ equipStatValue }}</span>
+        </span>
+      }
+    </span>
+  </span>
+</button>
+
+<ng-template #tooltip>
+  <div class="p-3">
+    <div class="font-bold text-base mb-1 text-{{ content.rarity }}">
+      {{ content.name }}
+    </div>
+    <div class="text-sm mb-2">Lv. {{ content.levelRequirement }}</div>
+
+    @if (content.requiredJobIds.length > 0) {
+      <div class="text-sm mb-2 flex items-center gap-1">
+        Requires:
+        @for (jobId of content.requiredJobIds; track jobId) {
+          <app-content-name [id]="jobId" />
+        }
+      </div>
+    }
+
+    <div class="flex flex-col gap-1">
+      @for (stat of tooltipStatKeys(); track stat) {
+        @let value = statValue(stat);
+        @let delta = statDelta(stat);
+        @let hasComparison = comparisonStats();
+        @let displayValue =
+          hasComparison
+            ? delta === 0
+              ? '-'
+              : delta > 0
+                ? '+' + delta
+                : '' + delta
+            : value > 0
+              ? '+' + value
+              : '' + value;
+
+        <div
+          class="flex items-center gap-2 text-sm"
+          [class.text-green-400]="delta > 0"
+          [class.text-rose-400]="delta < 0"
+        >
+          <app-icon-stat [stat]="stat" />
+
+          <span class="inline-block">
+            {{ statShorthand[stat] }}
+          </span>
+
+          <span class="ml-auto">{{ displayValue }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>

@@ -15,6 +15,11 @@
     [class.hidden]="activeGamePlayView() !== 'kingdom'"
   ></app-game-play-kingdom>
 
+  <app-game-play-heroes
+    class="absolute inset-0"
+    [class.hidden]="activeGamePlayView() !== 'heroes'"
+  ></app-game-play-heroes>
+
   <app-play-adventurelog
     class="absolute inset-0"
     [class.hidden]="activeGamePlayView() !== 'adventurelog'"

@@ -1,7 +1,13 @@
 import { pluralize } from '@boringnode/pluralize';
 import { rngUuid } from '@helpers/rng';
 import { localStorageSignal } from '@helpers/signal';
-import type { Combat, CombatLog, Combatant, ItemContent } from '@interfaces';
+import type {
+  Combat,
+  CombatLog,
+  Combatant,
+  EquipmentContent,
+  ItemContent,
+} from '@interfaces';
 import { parseInline } from 'marked';
 import mustache from 'mustache';
 
@@ -84,6 +90,17 @@ export function itemDropHtml(item: ItemContent, quantity: number): string {
   const displayName = quantity === 1 ? lowerName : pluralize(lowerName);
 
   return `${quantity} ${itemNameHtml(item, displayName)}`;
+}
+
+// Colors an equipment item's name by its rarity, mirroring `itemNameHtml`.
+export function equipmentNameHtml(equipment: EquipmentContent): string {
+  return `<span class="text-${equipment.rarity} font-semibold">${equipment.name}</span>`;
+}
+
+// Equipment drops are always a single piece, so there's no quantity/plural
+// to handle here - unlike `itemDropHtml`.
+export function equipmentDropHtml(equipment: EquipmentContent): string {
+  return equipmentNameHtml(equipment);
 }
 
 export function miscellaneousMessageLog(message: string): void {

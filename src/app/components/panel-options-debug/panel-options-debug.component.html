@@ -111,5 +111,63 @@
     </div>
   </div>
 
-  <div class="flex-1"></div>
+  <div class="flex-1">
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Give Item / Equipment</div>
+
+        <div class="debug-give-grid">
+          <span class="label-text text-right">Item</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="debugItems()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Select an item..."
+            [(ngModel)]="selectedItemId"
+          ></ng-select>
+          <input
+            type="number"
+            [min]="1"
+            class="input input-bordered debug-give-qty"
+            [(ngModel)]="itemQuantity"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:GiveItem"
+            (click)="giveItem()"
+          >
+            Give
+          </button>
+
+          <span class="label-text text-right">Equipment</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="debugEquipment()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Select equipment..."
+            [(ngModel)]="selectedEquipmentId"
+          ></ng-select>
+          <input
+            type="number"
+            [min]="1"
+            class="input input-bordered debug-give-qty"
+            [(ngModel)]="equipmentQuantity"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:GiveEquipment"
+            (click)="giveEquipment()"
+          >
+            Give
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

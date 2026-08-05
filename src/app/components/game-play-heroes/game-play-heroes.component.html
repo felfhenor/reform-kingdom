@@ -1,0 +1,35 @@
+<app-card-page heightProfile="full">
+  <span header>Heroes</span>
+
+  <div class="h-full flex flex-col gap-4">
+    @if (party().length === 0) {
+      <app-blank-slate>No heroes yet.</app-blank-slate>
+    } @else {
+      <div role="tablist" class="tabs tabs-boxed">
+        @for (character of party(); track character.id) {
+          <button
+            type="button"
+            role="tab"
+            class="tab gap-2"
+            [class.tab-active]="character.id === selectedCharacterId()"
+            [class.font-bold]="character.id === selectedCharacterId()"
+            (click)="selectCharacter(character.id)"
+          >
+            <div class="hero-tab-icon">
+              <app-icon-job [job]="jobFor(character.jobId)" />
+            </div>
+            {{ character.name }}
+            <span class="opacity-70">Lv. {{ character.level }}</span>
+          </button>
+        }
+      </div>
+
+      @if (selectedCharacter(); as character) {
+        <app-hero-equipment-panel
+          [character]="character"
+          class="flex-1 min-h-0"
+        />
+      }
+    }
+  </div>
+</app-card-page>

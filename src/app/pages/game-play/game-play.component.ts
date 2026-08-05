@@ -1,6 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { GamePlayHeroesComponent } from '@components/game-play-heroes/game-play-heroes.component';
 import { GamePlayKingdomComponent } from '@components/game-play-kingdom/game-play-kingdom.component';
 import { GamePlayWorldComponent } from '@components/game-play-world/game-play-world.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
@@ -15,6 +16,7 @@ import { gamePlayView, getOption } from '@helpers';
     TeleportOutletDirective,
     GamePlayWorldComponent,
     GamePlayKingdomComponent,
+    GamePlayHeroesComponent,
     PlayAdventureLogComponent,
   ],
   templateUrl: './game-play.component.html',

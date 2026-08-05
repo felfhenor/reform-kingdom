@@ -17,9 +17,11 @@
     - itemId: Gold Coin
       min: 50
       max: 75
+      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Small Goblin Bone
       min: 1
       max: 2
+      multiplierPerLevel: 0
       chance: 50

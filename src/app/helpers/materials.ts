@@ -1,5 +1,22 @@
+import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { MaterialId } from '@interfaces';
+import type { GameStateMaterials, ItemContent, MaterialId } from '@interfaces';
+
+// Drops any storage entries whose id no longer resolves to real content -
+// e.g. after a material is renamed/removed from gamedata.
+export function pruneInvalidMaterials(
+  materials: GameStateMaterials,
+): GameStateMaterials {
+  const pruned: GameStateMaterials = {};
+
+  (Object.keys(materials) as MaterialId[]).forEach((materialId) => {
+    if (getEntry<ItemContent>(materialId)) {
+      pruned[materialId] = materials[materialId];
+    }
+  });
+
+  return pruned;
+}
 
 export function getMaterialQuantity(materialId: MaterialId): number {
   return gamestate().materials[materialId]?.quantity ?? 0;

@@ -1,0 +1,25 @@
+@reference 'tailwindcss';
+
+// Keeps the "Give Item / Equipment" label / select / quantity / button all
+// on one grid so they line up vertically across both rows, with the label
+// column right-aligned per convention.
+.debug-give-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 4.5rem auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.debug-give-select,
+.debug-give-qty,
+.debug-give-btn {
+  height: 2.25rem;
+}
+
+.debug-give-select {
+  width: 100%;
+}
+
+.debug-give-qty {
+  width: 100%;
+}

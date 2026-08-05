@@ -1,0 +1,36 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+// Fixed height so the CDK virtual-scroll viewport (which assumes uniform
+// row sizes for its offset math) can lay these out correctly - keep this in
+// sync with the `itemSize` passed to `cdk-virtual-scroll-viewport`.
+.equipment-item-row {
+  @apply flex items-center gap-3 w-full h-[72px] px-2 text-left cursor-pointer rounded overflow-hidden;
+}
+
+.equipment-item-row-icon {
+  @apply relative shrink-0;
+}
+
+.equipment-item-row-info {
+  @apply flex flex-col gap-1 min-w-0 overflow-hidden;
+}
+
+.equipment-item-row-name {
+  @apply text-base font-semibold whitespace-nowrap overflow-hidden text-ellipsis;
+}
+
+.equipment-item-row-level {
+  @apply text-sm opacity-70 font-normal;
+}
+
+.equipment-item-row-stats {
+  @apply flex flex-wrap gap-2 text-sm max-h-[3em] overflow-hidden;
+}
+
+.equipment-item-row-stat {
+  @apply flex items-center gap-1;
+}

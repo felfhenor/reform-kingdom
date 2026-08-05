@@ -41,7 +41,9 @@
         }
 
         @if (gatherSeconds) {
-          <div class="badge badge-outline">Gather Time {{ gatherSeconds }}s</div>
+          <div class="badge badge-outline">
+            Gather Time {{ gatherSeconds }}s
+          </div>
         }
       </div>
 
@@ -60,7 +62,9 @@
 
       @if (isGatheringHere()) {
         <div class="flex flex-col gap-1">
-          <div class="text-xs opacity-70">Gathering... {{ gatherProgressPercent() }}%</div>
+          <div class="text-xs opacity-70">
+            Gathering... {{ gatherProgressPercent() }}%
+          </div>
           <progress
             class="progress progress-primary w-full"
             [value]="gatherProgressPercent()"
@@ -70,7 +74,7 @@
       } @else if (!isAtNode()) {
         @if (!meetsGatherLevelRequirement()) {
           <div class="text-sm text-rose-400">
-            Level {{ levelLabel() }} required.
+            Lv. {{ levelLabel() }} required.
           </div>
         }
 

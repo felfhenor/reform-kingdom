@@ -1,9 +1,12 @@
+import { armoryGet } from '@helpers/armory';
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
+  canEquipItem,
   canModifyEquipment,
   equipmentStatTotals,
   equippedItems,
+  slotsHoldingEquipment,
 } from '@helpers/equipment';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -14,6 +17,7 @@ import type {
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
+  EquipmentItem,
   EquipmentSlot,
   JobContent,
   JobId,
@@ -211,6 +215,141 @@ export function characterUnequipItem(
     ...character.equipment,
     [slot]: undefined,
   }));
+}
+
+// Equips an armory item onto a hero, occupying every slot the item's
+// content declares (e.g. a two-handed weapon fills both Weapon and Offhand
+// at once). Any item(s) currently occupying those slots are fully displaced
+// - including from any *other* slot they themselves occupy, so partially
+// overwriting one hand of an already-equipped two-hander frees the other
+// hand too - and returned to the armory as whole items, not duplicated per
+// slot. Atomic: a failed check never partially mutates either side. Returns
+// false without changing state if equipment can't currently be modified,
+// the item isn't eligible (level/class), or the item isn't actually in the
+// armory.
+export function characterEquipFromArmory(
+  characterId: CharacterId,
+  equipmentId: EquipmentId,
+): boolean {
+  if (!canModifyEquipment()) return false;
+
+  const character = partyGet().find((c) => c.id === characterId);
+  if (!character) return false;
+
+  const equipmentContent = getEntry<EquipmentContent>(equipmentId);
+  if (!equipmentContent || !canEquipItem(character, equipmentContent)) {
+    return false;
+  }
+
+  const isInArmory = armoryGet().some(
+    (item) => item.equipmentId === equipmentId,
+  );
+  if (!isInArmory) return false;
+
+  const targetSlots = equipmentContent.slots;
+
+  const displacedIds = new Set<EquipmentId>();
+  targetSlots.forEach((slot) => {
+    const existing = character.equipment[slot];
+    if (existing && existing.equipmentId !== equipmentId) {
+      displacedIds.add(existing.equipmentId);
+    }
+  });
+
+  const clearedSlots = new Set<EquipmentSlot>(targetSlots);
+  displacedIds.forEach((displacedId) => {
+    slotsHoldingEquipment(character.equipment, displacedId).forEach((slot) =>
+      clearedSlots.add(slot),
+    );
+  });
+
+  const displacedItems: EquipmentItem[] = Array.from(displacedIds).map(
+    (displacedId) => ({ equipmentId: displacedId }),
+  );
+
+  updateGamestate((state) => {
+    const armoryIndex = state.armory.findIndex(
+      (item) => item.equipmentId === equipmentId,
+    );
+    if (armoryIndex === -1) return state;
+
+    state.armory = [
+      ...state.armory.filter((_, index) => index !== armoryIndex),
+      ...displacedItems,
+    ];
+
+    state.world.party = state.world.party.map((c) => {
+      if (c.id !== characterId) return c;
+
+      const equipment = { ...c.equipment };
+      clearedSlots.forEach((slot) => {
+        equipment[slot] = undefined;
+      });
+      targetSlots.forEach((slot) => {
+        equipment[slot] = { equipmentId };
+      });
+
+      const stats = characterStatsForLevel(c.jobId, c.level, equipment);
+
+      return {
+        ...c,
+        equipment,
+        stats,
+        hp: clamp(c.hp, 0, stats.Health),
+      };
+    });
+
+    return state;
+  });
+
+  return true;
+}
+
+// Moves a hero's currently-equipped item (if any) back into the armory,
+// clearing every slot it occupies (a two-handed weapon frees both hands at
+// once, as a single armory entry, not one per slot). Returns false without
+// changing state if equipment can't currently be modified or the slot is
+// already empty.
+export function characterUnequipToArmory(
+  characterId: CharacterId,
+  slot: EquipmentSlot,
+): boolean {
+  if (!canModifyEquipment()) return false;
+
+  const character = partyGet().find((c) => c.id === characterId);
+  const previousItem = character?.equipment[slot];
+  if (!character || !previousItem) return false;
+
+  const occupiedSlots = slotsHoldingEquipment(
+    character.equipment,
+    previousItem.equipmentId,
+  );
+
+  updateGamestate((state) => {
+    state.armory = [...state.armory, previousItem];
+
+    state.world.party = state.world.party.map((c) => {
+      if (c.id !== characterId) return c;
+
+      const equipment = { ...c.equipment };
+      occupiedSlots.forEach((occupiedSlot) => {
+        equipment[occupiedSlot] = undefined;
+      });
+
+      const stats = characterStatsForLevel(c.jobId, c.level, equipment);
+
+      return {
+        ...c,
+        equipment,
+        stats,
+        hp: clamp(c.hp, 0, stats.Health),
+      };
+    });
+
+    return state;
+  });
+
+  return true;
 }
 
 export function syncPartyHpFromCombat(heroes: Combatant[]): void {

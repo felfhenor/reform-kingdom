@@ -1,9 +1,15 @@
+import { armoryAdd } from '@helpers/armory';
 import { combatReset, currentCombat } from '@helpers/combat';
-import { combatMessageLog, itemDropHtml } from '@helpers/combat-log';
+import {
+  combatMessageLog,
+  equipmentDropHtml,
+  itemDropHtml,
+} from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
+import { rollDroppedRewards } from '@helpers/loot';
 import { addMaterial } from '@helpers/materials';
-import { monsterDroppedItemRewards, monsterXpReward } from '@helpers/monster';
+import { monsterXpReward } from '@helpers/monster';
 import { partyGainXp, syncPartyHpFromCombat } from '@helpers/party';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
@@ -11,9 +17,11 @@ import type {
   Combatant,
   EncounterContent,
   EncounterId,
+  EquipmentContent,
   ItemContent,
   ItemId,
   MonsterContent,
+  ResolvedDrop,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -53,25 +61,26 @@ function defeatedMonsters(combat: Combat): DefeatedMonster[] {
     .filter((entry): entry is DefeatedMonster => !!entry);
 }
 
-function grantVictoryRewards(combat: Combat): void {
-  const monsters = defeatedMonsters(combat);
-
-  const totalXp = sumBy(monsters, ({ monster, level }) =>
-    monsterXpReward(monster, level),
-  );
-  if (totalXp > 0) {
-    partyGainXp(totalXp);
-    combatMessageLog(combat, `The party gained ${totalXp} XP!`);
-  }
-
+// Shared by monster kill drops and encounter completion rewards, both of
+// which now roll from the same `DroppedReward[]` schema (see `loot.ts`).
+function grantResolvedDrops(combat: Combat, drops: ResolvedDrop[]): void {
   const itemsFound: Record<ItemId, number> = {};
 
-  monsters.forEach(({ monster, level }) => {
-    monsterDroppedItemRewards(monster, level).forEach(
-      ({ itemId, quantity }) => {
-        itemsFound[itemId] = (itemsFound[itemId] ?? 0) + quantity;
-      },
-    );
+  drops.forEach((drop) => {
+    if ('equipmentId' in drop) {
+      armoryAdd(drop.equipmentId);
+
+      const equipment = getEntry<EquipmentContent>(drop.equipmentId);
+      if (!equipment) return;
+
+      combatMessageLog(
+        combat,
+        `The party found ${equipmentDropHtml(equipment)}!`,
+      );
+      return;
+    }
+
+    itemsFound[drop.itemId] = (itemsFound[drop.itemId] ?? 0) + drop.quantity;
   });
 
   Object.keys(itemsFound).forEach((itemId) => {
@@ -85,6 +94,39 @@ function grantVictoryRewards(combat: Combat): void {
 
     combatMessageLog(combat, `The party found ${itemDropHtml(item, quantity)}!`);
   });
+}
+
+function grantVictoryRewards(combat: Combat): void {
+  const monsters = defeatedMonsters(combat);
+
+  const totalXp = sumBy(monsters, ({ monster, level }) =>
+    monsterXpReward(monster, level),
+  );
+  if (totalXp > 0) {
+    partyGainXp(totalXp);
+    combatMessageLog(combat, `The party gained ${totalXp} XP!`);
+  }
+
+  const drops = monsters.flatMap(({ monster, level }) =>
+    rollDroppedRewards(monster.drops, level),
+  );
+  grantResolvedDrops(combat, drops);
+}
+
+// Fires once the last fight in an encounter has been won (the node is fully
+// cleared) - rolled fresh every time, so repeat clears can hit the same
+// rewards again, same as per-kill monster drops.
+function grantEncounterCompletionRewards(combat: Combat): void {
+  if (combat.encounterId === undefined) return;
+
+  const encounter = getEntry<EncounterContent>(combat.encounterId);
+  if (!encounter) return;
+
+  // The encounter's level is rolled once and applied to every guardian at
+  // `encounterStartFight` time, so the first guardian's level represents it.
+  const level = combat.guardians[0]?.level ?? 1;
+  const drops = rollDroppedRewards(encounter.completionRewards, level);
+  grantResolvedDrops(combat, drops);
 }
 
 // The fight after this one within the same encounter, if there is one -
@@ -115,7 +157,10 @@ function handleCombatVictory(combat: Combat): boolean {
   grantVictoryRewards(combat);
 
   const nextFight = nextFightFor(combat);
-  if (!nextFight) return false;
+  if (!nextFight) {
+    grantEncounterCompletionRewards(combat);
+    return false;
+  }
 
   encounterStartFight(
     nextFight.encounterId,

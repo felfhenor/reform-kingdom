@@ -1,0 +1,73 @@
+@let content = equippedContent();
+
+<button
+  type="button"
+  class="equipment-slot outline-2 outline-offset-[-2px] rounded"
+  [class]="content ? 'outline-' + content.rarity : 'outline-gray-500'"
+  [class.equipment-slot-selected]="isSelected()"
+  [tp]="tooltip"
+  [tpPlacement]="'top'"
+  (click)="slotClick.emit()"
+>
+  <app-icon-blank-slot>
+    @if (!content) {
+      <span class="equipment-slot-label">{{ slot() }}</span>
+    }
+
+    @if (content) {
+      <app-atlas-image
+        spritesheet="equipment"
+        [assetName]="content.sprite"
+        class="equipment-slot-image"
+      />
+    }
+  </app-icon-blank-slot>
+</button>
+
+<ng-template #tooltip>
+  @if (content) {
+    <div class="flex gap-2 p-2">
+      <app-atlas-image
+        spritesheet="equipment"
+        [assetName]="content.sprite"
+        class="equipment-slot-tooltip-image"
+      />
+
+      <div>
+        <div class="font-bold mb-1 text-{{ content.rarity }}">
+          {{ content.name }}
+        </div>
+
+        <div class="text-xs mb-1">
+          Lv. {{ content.levelRequirement }} {{ slot() }}
+        </div>
+
+        @if (content.requiredJobIds.length > 0) {
+          <div class="text-xs mb-2 flex gap-1">
+            Requires:
+            @for (jobId of content.requiredJobIds; track jobId) {
+              <app-content-name [id]="jobId" />
+            }
+          </div>
+        }
+
+        <div class="flex flex-col gap-1 text-xs">
+          @for (stat of statKeys; track stat) {
+            @let value = statValue(stat);
+            @if (value !== 0) {
+              <div class="flex items-center gap-2">
+                <app-icon-stat [stat]="stat" />
+                <span class="inline-block min-w-[30px]">
+                  {{ statShorthand[stat] }}
+                </span>
+                <span>{{ value > 0 ? '+' : '' }}{{ value }}</span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="p-2 text-xs italic">{{ slot() }} (empty)</div>
+  }
+</ng-template>

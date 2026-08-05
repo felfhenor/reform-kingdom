@@ -1,0 +1,13 @@
+@reference 'tailwindcss';
+
+.hero-tab-icon {
+  @apply relative overflow-hidden shrink-0 inline-block;
+  width: 32px;
+  height: 32px;
+
+  app-icon-job {
+    display: block;
+    transform: scale(0.5);
+    transform-origin: top left;
+  }
+}

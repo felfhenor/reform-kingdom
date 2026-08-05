@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/armory', () => ({
+  armoryAdd: vi.fn(),
+}));
+
 vi.mock('@helpers/combat', () => ({
   combatReset: vi.fn(),
   currentCombat: vi.fn(),
@@ -7,6 +11,8 @@ vi.mock('@helpers/combat', () => ({
 
 vi.mock('@helpers/combat-log', () => ({
   combatMessageLog: vi.fn(),
+  equipmentDropHtml: vi.fn(),
+  itemDropHtml: vi.fn(),
 }));
 
 vi.mock('@helpers/content', () => ({
@@ -17,12 +23,15 @@ vi.mock('@helpers/encounter', () => ({
   encounterStartFight: vi.fn(),
 }));
 
+vi.mock('@helpers/loot', () => ({
+  rollDroppedRewards: vi.fn(() => []),
+}));
+
 vi.mock('@helpers/materials', () => ({
   addMaterial: vi.fn(),
 }));
 
 vi.mock('@helpers/monster', () => ({
-  monsterDroppedItemRewards: vi.fn(() => []),
   monsterXpReward: vi.fn(() => 0),
 }));
 
@@ -39,6 +48,7 @@ import { combatReset } from '@helpers/combat';
 import { combatCheckIfOver } from '@helpers/combat-end';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
+import { rollDroppedRewards } from '@helpers/loot';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
   Combat,
@@ -110,10 +120,16 @@ describe('combatCheckIfOver', () => {
       'Field Ruins',
     );
     expect(combatReset).not.toHaveBeenCalled();
+    // Mid-encounter: no completion rewards roll yet (there are also no
+    // resolvable monsters in this fixture, so no kill-drop roll either).
+    expect(rollDroppedRewards).not.toHaveBeenCalled();
   });
 
   it('resets combat on victory when there is no next fight', () => {
-    const encounter = { fights: [{ monsters: [] }] } as unknown as EncounterContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [{ itemId: 'gold' }],
+    } as unknown as EncounterContent;
     vi.mocked(getEntry).mockReturnValue(encounter as never);
 
     const combat = buildCombat({
@@ -125,6 +141,13 @@ describe('combatCheckIfOver', () => {
 
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(combatReset).toHaveBeenCalled();
+    // The node is fully cleared - completion rewards roll exactly once,
+    // scaled to the concluding fight's guardian level.
+    expect(rollDroppedRewards).toHaveBeenCalledTimes(1);
+    expect(rollDroppedRewards).toHaveBeenCalledWith(
+      encounter.completionRewards,
+      1,
+    );
   });
 
   it('resets combat on victory when the combat has no encounter (e.g. a bare fight)', () => {

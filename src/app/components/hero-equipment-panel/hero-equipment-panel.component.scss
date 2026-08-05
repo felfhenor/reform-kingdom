@@ -1,0 +1,21 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block h-full;
+}
+
+// The CDK viewport needs a real, non-auto height to compute how many rows
+// to render - `flex-1` alone only works because every ancestor up to the
+// card body is already constrained to `h-full`/`min-h-0`.
+.equipment-item-list {
+  height: 100%;
+}
+
+// Native 64px sprite size, unscaled - as a compact top banner this doesn't
+// need to match the enlarged 80px paperdoll slots, and keeping it smaller
+// leaves more of the panel's limited height for the Stats/Equipment columns.
+.hero-summary-icon {
+  @apply relative overflow-hidden shrink-0;
+  width: 64px;
+  height: 64px;
+}

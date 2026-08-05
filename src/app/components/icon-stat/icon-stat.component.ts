@@ -1,25 +1,43 @@
-import { NgClass } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import type { BaseStat, Icon } from '@interfaces';
 
 const icons: Record<BaseStat, Icon> = {
-  Aura: 'gameVibratingShield',
-  Force: 'gameGooeyImpact',
+  Intelligence: 'gameBrain',
+  Strength: 'gameMuscleUp',
+  Vitality: 'gameHeartBeats',
+  Resistance: 'gameVibratingShield',
+  Agility: 'gameRunningNinja',
   Health: 'gameGlassHeart',
-  Speed: 'gameClockwork',
+  Energy: 'gameBolt',
+  Luck: 'gameClover',
 };
 
 const colors: Record<BaseStat, string> = {
-  Aura: 'text-sky-500',
-  Force: 'text-red-600',
-  Health: 'text-amber-700',
-  Speed: 'text-green-500',
+  Intelligence: 'text-sky-400',
+  Strength: 'text-red-500',
+  Vitality: 'text-pink-400',
+  Resistance: 'text-indigo-400',
+  Agility: 'text-green-400',
+  Health: 'text-rose-500',
+  Energy: 'text-yellow-400',
+  Luck: 'text-emerald-400',
+};
+
+export const STAT_SHORTHAND: Record<BaseStat, string> = {
+  Agility: 'AGI',
+  Energy: 'EP',
+  Health: 'HP',
+  Intelligence: 'INT',
+  Luck: 'LUK',
+  Resistance: 'RES',
+  Strength: 'STR',
+  Vitality: 'VIT',
 };
 
 @Component({
   selector: 'app-icon-stat',
-  imports: [IconComponent, NgClass],
+  imports: [IconComponent],
   templateUrl: './icon-stat.component.html',
   styleUrl: './icon-stat.component.scss',
 })
@@ -27,5 +45,5 @@ export class IconStatComponent {
   public stat = input.required<BaseStat>();
 
   public icon = computed(() => icons[this.stat()]);
-  public color = computed(() => `${colors[this.stat()]}`);
+  public color = computed(() => colors[this.stat()]);
 }

@@ -26,6 +26,17 @@
 
         <button
           class="btn btn-xs btn-info"
+          [class.btn-outline]="activeGamePlayView() !== 'heroes'"
+          (click)="changeGamePlayView('heroes')"
+          appSfx="ui-click"
+          [sfxOffset]="3"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Heroes
+        </button>
+
+        <button
+          class="btn btn-xs btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'adventurelog'"
           (click)="changeGamePlayView('adventurelog')"
           appSfx="ui-click"

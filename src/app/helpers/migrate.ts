@@ -1,4 +1,6 @@
+import { pruneInvalidArmoryItems } from '@helpers/armory';
 import { defaultGameState } from '@helpers/defaults';
+import { pruneInvalidMaterials } from '@helpers/materials';
 import {
   gamestate,
   gamestateTickEnd,
@@ -12,6 +14,10 @@ import { merge } from 'es-toolkit/compat';
 export function migrateGameState() {
   const state = gamestate();
   const newState = merge(defaultGameState(), state);
+
+  newState.armory = pruneInvalidArmoryItems(newState.armory);
+  newState.materials = pruneInvalidMaterials(newState.materials);
+
   setGameState(newState);
   gamestateTickStart();
   gamestateTickEnd();

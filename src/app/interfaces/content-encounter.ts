@@ -1,5 +1,5 @@
 import type { MonsterId } from '@interfaces/content-monster';
-import type { DropHasChance, DropItem, DropRange } from '@interfaces/droppable';
+import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
@@ -18,8 +18,6 @@ export type EncounterFight = {
   monsters: EncounterFightMonster[];
 };
 
-export type EncounterFinishReward = DropRange & DropItem & DropHasChance;
-
 export type EncounterContent = IsContentItem &
   HasDescription & {
     id: EncounterId;
@@ -29,5 +27,5 @@ export type EncounterContent = IsContentItem &
 
     fights: EncounterFight[];
 
-    completionRewards: EncounterFinishReward[];
+    completionRewards: DroppedReward[];
   };

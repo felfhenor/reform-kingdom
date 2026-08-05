@@ -21,11 +21,13 @@
     - itemId: Gold Coin
       min: 25
       max: 50
+      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Small Goblin Bone
       min: 3
       max: 5
+      multiplierPerLevel: 0
       chance: 25
 
 - id: c6e4119c-b365-4de1-a952-5bf86f7ff173
@@ -51,9 +53,17 @@
     - itemId: Gold Coin
       min: 25
       max: 50
+      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Small Goblin Bone
       min: 3
       max: 5
+      multiplierPerLevel: 0
       chance: 25
+
+    - equipmentId: Goblin Skull
+      min: 1
+      max: 1
+      multiplierPerLevel: 0
+      chance: 10

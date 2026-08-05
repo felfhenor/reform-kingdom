@@ -1,15 +1,21 @@
-import type { GameState, MaterialId } from '@interfaces';
+import type { GameState, GameStateMaterials, ItemContent, MaterialId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/content', () => ({
+  getEntry: vi.fn(),
+}));
 
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
 }));
 
+import { getEntry } from '@helpers/content';
 import {
   addMaterial,
   getMaterialQuantity,
   isMaterialDiscovered,
+  pruneInvalidMaterials,
   removeMaterial,
 } from '@helpers/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -117,6 +123,45 @@ describe('Material Helper Functions', () => {
       });
 
       vi.restoreAllMocks();
+    });
+  });
+
+  describe('pruneInvalidMaterials', () => {
+    it('keeps entries that resolve to real content', () => {
+      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
+      const materials: GameStateMaterials = {
+        [goldCoinId]: { quantity: 5, foundAt: 1000 },
+      };
+
+      expect(pruneInvalidMaterials(materials)).toEqual(materials);
+    });
+
+    it('drops entries whose id no longer resolves to real content', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+      const materials: GameStateMaterials = {
+        [goldCoinId]: { quantity: 5, foundAt: 1000 },
+      };
+
+      expect(pruneInvalidMaterials(materials)).toEqual({});
+    });
+
+    it('prunes only the invalid entries out of a mixed set', () => {
+      const staleId = 'stale-material' as MaterialId;
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === goldCoinId ? { id: goldCoinId } : undefined) as never,
+      );
+      const materials: GameStateMaterials = {
+        [goldCoinId]: { quantity: 5, foundAt: 1000 },
+        [staleId]: { quantity: 2, foundAt: 2000 },
+      };
+
+      expect(pruneInvalidMaterials(materials)).toEqual({
+        [goldCoinId]: { quantity: 5, foundAt: 1000 },
+      });
+    });
+
+    it('returns an empty object for an empty input', () => {
+      expect(pruneInvalidMaterials({})).toEqual({});
     });
   });
 

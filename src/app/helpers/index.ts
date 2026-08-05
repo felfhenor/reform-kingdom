@@ -23,6 +23,7 @@ export * from './global-effects';
 export * from './icons';
 export * from './job';
 export * from './logging';
+export * from './loot';
 export * from './maps';
 export * from './materials';
 export * from './migrate';

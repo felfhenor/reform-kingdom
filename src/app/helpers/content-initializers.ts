@@ -77,7 +77,7 @@ function ensureMonster(
     targettingType: monster.targettingType ?? 'Random',
     rarity: monster.rarity ?? 'Common',
     xp: monster.xp ?? { min: 0, max: 0, multiplierPerLevel: 1 },
-    droppedItems: monster.droppedItems ?? [],
+    drops: monster.drops ?? [],
     skills: monster.skills ?? [],
   };
 }

@@ -1,4 +1,4 @@
-export type GamePlayView = 'world' | 'kingdom' | 'adventurelog';
+export type GamePlayView = 'world' | 'kingdom' | 'adventurelog' | 'heroes';
 
 export type KingdomSubview =
   | 'storage'

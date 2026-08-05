@@ -1,0 +1,35 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+// Enlarged from the shared 64px blank-slot size via a scale transform
+// (rather than resizing IconBlankSlotComponent itself, which would also
+// affect Storage/Armory) - the child scales symmetrically around its own
+// center, and since the button is flex-centered at exactly the scaled-up
+// size, it lines up with no extra offset.
+.equipment-slot {
+  @apply relative w-[80px] h-[80px] flex items-center justify-center cursor-pointer overflow-hidden;
+
+  app-icon-blank-slot {
+    display: block;
+    transform: scale(1.25);
+  }
+}
+
+.equipment-slot-selected {
+  @apply outline-4;
+}
+
+.equipment-slot-label {
+  @apply absolute inset-0 flex items-center justify-center text-center text-[10px] opacity-40 leading-tight px-1 pointer-events-none;
+}
+
+.equipment-slot-image {
+  @apply relative z-10;
+}
+
+.equipment-slot-tooltip-image {
+  @apply shrink-0;
+}

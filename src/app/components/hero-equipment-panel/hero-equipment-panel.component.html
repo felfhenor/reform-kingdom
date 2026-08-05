@@ -1,0 +1,110 @@
+@let char = character();
+@let selected = selectedSlot();
+@let selectedContent = selectedSlotContent();
+@let items = pickerItems();
+
+<div class="hero-equipment-panel flex flex-col gap-4 h-full min-h-0">
+  <div class="hero-summary flex items-center justify-center gap-3 shrink-0">
+    <div class="hero-summary-icon">
+      <app-icon-job [job]="job()" />
+    </div>
+    <div class="flex flex-col items-start gap-1">
+      <div class="font-semibold text-lg">
+        {{ char.name }}
+        <span class="text-sm opacity-70 font-normal">
+          Lv. {{ char.level }} {{ job()?.name }}
+        </span>
+      </div>
+      <progress
+        class="progress progress-primary w-56"
+        [value]="char.xp.current"
+        [max]="char.xp.maximum"
+      ></progress>
+      <div class="text-xs opacity-60">
+        {{ char.xp.current }} / {{ char.xp.maximum }} XP
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-[320px_320px_1fr] gap-4 flex-1 min-h-0">
+    <div class="flex flex-col gap-2">
+      <div>
+        <span class="font-semibold text-xl">Stats</span>
+      </div>
+
+      @for (stat of statKeys; track stat) {
+        <div class="flex items-center gap-3 py-1">
+          <app-icon-stat [stat]="stat" class="text-2xl" />
+          <span class="text-base">{{ stat }} ({{ statShorthand[stat] }})</span>
+          <span class="ml-auto font-semibold text-lg">
+            {{ statValue(stat) }}
+          </span>
+        </div>
+      }
+    </div>
+
+    <div class="flex flex-col gap-4 items-center overflow-y-auto">
+      <div>
+        <span class="font-semibold text-xl">Equipment</span>
+      </div>
+
+      @for (row of paperdollRows; track $index) {
+        @if (rowHasVisibleSlot(row)) {
+          <div class="flex gap-2">
+            @for (slot of row; track slot) {
+              @if (isSlotVisible(slot)) {
+                <app-equipment-slot
+                  [slot]="slot"
+                  [equippedId]="equippedIdFor(slot)"
+                  [isSelected]="selected === slot"
+                  (slotClick)="selectSlot(slot)"
+                  (contextmenu)="unequip(slot)"
+                />
+              }
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 h-full min-h-0">
+      @if (selected) {
+        <div class="flex justify-between items-center shrink-0">
+          <span class="font-semibold text-xl">{{ selected }}</span>
+          @if (selectedContent) {
+            <button
+              type="button"
+              class="btn btn-xs btn-warning"
+              (click)="unequip(selected)"
+            >
+              Unequip
+            </button>
+          }
+        </div>
+
+        @if (items.length > 0) {
+          <cdk-virtual-scroll-viewport
+            itemSize="72"
+            class="equipment-item-list flex-1 min-h-0"
+          >
+            <div *cdkVirtualFor="let item of items; trackBy: trackByItemId">
+              <app-equipment-item-card
+                [equipment]="item"
+                [comparisonStats]="selectedContent?.baseStats"
+                (equip)="equip(item.id)"
+              />
+            </div>
+          </cdk-virtual-scroll-viewport>
+        } @else {
+          <div class="italic text-sm p-4">
+            No equippable items available for this slot.
+          </div>
+        }
+      } @else {
+        <div class="italic text-sm p-4">
+          Select a slot to see available gear.
+        </div>
+      }
+    </div>
+  </div>
+</div>
