@@ -25,6 +25,7 @@ import type {
   WorldNodePositionMap,
   WorldNodeType,
 } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
 
 const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
 
@@ -168,10 +169,7 @@ export function worldNodeMonsterCount(
   const encounter = worldNodeEncounter(entry);
   if (!encounter) return undefined;
 
-  return encounter.fights.reduce(
-    (total, fight) => total + fight.monsters.length,
-    0,
-  );
+  return sumBy(encounter.fights, (fight) => fight.monsters.length);
 }
 
 export function worldNodeGatherTime(entry: WorldNodeEntry): number | undefined {

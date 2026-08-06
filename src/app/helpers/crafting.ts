@@ -39,7 +39,7 @@ import type {
   TradeskillLevelRequirementContent,
 } from '@interfaces';
 import { ALL_TRADESKILLS, RARITY_PRIORITY } from '@interfaces';
-import { orderBy } from 'es-toolkit/compat';
+import { orderBy, sumBy } from 'es-toolkit/compat';
 
 export const TRADESKILL_MAX_LEVEL = 50;
 const MAX_CRAFTABLE_CAP = 99;
@@ -503,38 +503,36 @@ export function craftProcessTick(): void {
 // Total ticks remaining across a whole queue - the active entry's remainder
 // plus every not-yet-started unit (its own and every queued entry's).
 export function craftQueueTicksRemaining(tradeskill: Tradeskill): number {
-  return tradeskillBuilding(tradeskill).queue.reduce((total, entry) => {
+  return sumBy(tradeskillBuilding(tradeskill).queue, (entry) => {
     const recipe = getEntry<RecipeContent>(entry.recipeId);
-    if (!recipe) return total;
+    if (!recipe) return 0;
 
     const remainingUnits = entry.quantityTotal - entry.quantityCompleted;
     const remainingTicksThisUnit = recipe.craftTime - entry.ticksIntoCraft;
 
-    return (
-      total + remainingTicksThisUnit + (remainingUnits - 1) * recipe.craftTime
-    );
-  }, 0);
+    return remainingTicksThisUnit + (remainingUnits - 1) * recipe.craftTime;
+  });
 }
 
 // Total ticks the whole queue will *ever* take, start to finish - the
 // denominator for an overall queue progress bar (`craftQueueTicksRemaining`
 // is what's left; this minus that is what's already done).
 export function craftQueueTotalTicks(tradeskill: Tradeskill): number {
-  return tradeskillBuilding(tradeskill).queue.reduce((total, entry) => {
+  return sumBy(tradeskillBuilding(tradeskill).queue, (entry) => {
     const recipe = getEntry<RecipeContent>(entry.recipeId);
-    if (!recipe) return total;
+    if (!recipe) return 0;
 
-    return total + recipe.craftTime * entry.quantityTotal;
-  }, 0);
+    return recipe.craftTime * entry.quantityTotal;
+  });
 }
 
 // Total individual units still to be crafted across every queue entry - not
 // the same as `queue.length` (the number of *batches*/slots), since a single
 // slot can be crafting dozens of the same item.
 export function craftQueueUnitsRemaining(tradeskill: Tradeskill): number {
-  return tradeskillBuilding(tradeskill).queue.reduce(
-    (total, entry) => total + (entry.quantityTotal - entry.quantityCompleted),
-    0,
+  return sumBy(
+    tradeskillBuilding(tradeskill).queue,
+    (entry) => entry.quantityTotal - entry.quantityCompleted,
   );
 }
 
