@@ -189,7 +189,7 @@ export function combatApplySkillToTarget(
     );
   }
 
-  technique.statusEffects.forEach((effData) => {
+  (technique.statusEffects || []).forEach((effData) => {
     const effectContent = getEntry<StatusEffectContent>(effData.statusEffectId);
     if (!effectContent) return;
 

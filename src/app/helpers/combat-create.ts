@@ -4,6 +4,7 @@ import {
   defaultCombatStats,
   defaultStats,
 } from '@helpers/defaults';
+import { heroSkillsAtLevel } from '@helpers/job';
 import { rngUuid } from '@helpers/rng';
 import type {
   Character,
@@ -48,7 +49,9 @@ export function combatantFromCharacter(character: Character): Combatant {
     sprite: job?.sprite ?? '',
     frames: job?.frames ?? 4,
 
-    skillIds: ['Attack' as EquipmentSkillId],
+    skillIds: job
+      ? heroSkillsAtLevel(job, character.level)
+      : ['Attack' as EquipmentSkillId],
     skillRefs: [],
 
     combatStats: defaultCombatStats(),

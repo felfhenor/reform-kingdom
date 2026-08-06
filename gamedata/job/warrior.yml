@@ -54,3 +54,6 @@
       levels:
         - level: 4
           skillId: Sweep I
+
+        - level: 9
+          skillId: Sweep II

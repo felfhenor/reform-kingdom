@@ -158,6 +158,7 @@ function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     sprite: job.sprite ?? 'UNKNOWN',
     frames: job.frames ?? 4,
     equippableTypes: job.equippableTypes ?? [],
+    skillPath: job.skillPath ?? [],
   };
 }
 
