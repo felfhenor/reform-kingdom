@@ -3,7 +3,7 @@
 const { isArray, isString, isObject } = require('es-toolkit/compat');
 const yaml = require('js-yaml');
 const fs = require('fs-extra');
-const path = require('path');
+const rec = require('recursive-readdir');
 
 fs.ensureDirSync('./public/json');
 
@@ -12,49 +12,53 @@ const trackedIds: Record<string, boolean> = {};
 const idToName: Record<string, Record<string, string>> = {};
 
 // preload
-const processFiles = () => {
-  fs.readdirSync('gamedata').forEach((folder: string) => {
-    fs.readdirSync(`gamedata/${folder}`).forEach((file: string) => {
-      try {
-        const filename = path.basename(file, '.yml');
-        const doc = yaml.load(
-          fs.readFileSync(`gamedata/${folder}/${filename}.yml`),
-        );
+const processFiles = async () => {
+  const allFiles = fs.readdirSync('gamedata');
 
-        idToName[folder] ??= {};
-        allData[folder] ??= [];
-        allData[folder].push(...doc);
+  await Promise.all(
+    allFiles.map(async (folder: string) => {
+      const allFilesInSubfolder = await rec(`gamedata/${folder}`);
 
-        doc.forEach((entry: any) => {
-          if (!entry.name) {
-            console.error(`Entry "${entry.id}" has no name.`);
-            return;
-          }
+      allFilesInSubfolder.forEach((file: string) => {
+        console.log(file);
+        try {
+          const doc = yaml.load(fs.readFileSync(file));
 
-          if (idToName[folder][entry.name]) {
-            console.error(
-              `Name "${entry.name}" already exists somewhere in the content.`,
-            );
-            process.exit(1);
-          }
+          idToName[folder] ??= {};
+          allData[folder] ??= [];
+          allData[folder].push(...doc);
 
-          if (trackedIds[entry.id]) {
-            console.error(
-              `Id "${entry.id}" already exists somewhere in the content.`,
-            );
-            process.exit(1);
-          }
+          doc.forEach((entry: any) => {
+            if (!entry.name) {
+              console.error(`Entry "${entry.id}" has no name.`);
+              return;
+            }
 
-          trackedIds[entry.id] = true;
-          idToName[folder][entry.name] = entry.id;
-        });
+            if (idToName[folder][entry.name]) {
+              console.error(
+                `Name "${entry.name}" already exists somewhere in the content.`,
+              );
+              process.exit(1);
+            }
 
-        console.log(`Loaded ${folder}/${file} - ${doc.length} entries...`);
-      } catch (e) {
-        console.error(e);
-      }
-    });
-  });
+            if (trackedIds[entry.id]) {
+              console.error(
+                `Id "${entry.id}" already exists somewhere in the content.`,
+              );
+              process.exit(1);
+            }
+
+            trackedIds[entry.id] = true;
+            idToName[folder][entry.name] = entry.id;
+          });
+
+          console.log(`Loaded ${folder}/${file} - ${doc.length} entries...`);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    }),
+  );
 };
 
 const rewriteDataIds = () => {
@@ -142,5 +146,9 @@ const rewriteDataIds = () => {
   fs.writeJsonSync('public/json/all.json', allData);
 };
 
-processFiles();
-rewriteDataIds();
+const run = async () => {
+  await processFiles();
+  rewriteDataIds();
+};
+
+run();

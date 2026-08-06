@@ -1,0 +1,39 @@
+- id: 87b8e644-6984-4533-bd72-68190943466d
+  name: Healer
+  description: A person who heals others and themselves.
+  sprite: '0012'
+  frames: 4
+
+  baseStats:
+    Health: 25
+    Energy: 15
+    Luck: 1
+    Intelligence: 6
+    Strength: 5
+    Vitality: 8
+    Resistance: 5
+    Agility: 2
+
+  statsPerLevel:
+    Health: 3
+    Energy: 3
+    Luck: 0
+    Intelligence: 0.5
+    Strength: 0.4
+    Vitality: 0.6
+    Resistance: 0.4
+    Agility: 0.5
+
+  skillPath:
+    - pathName: Attack
+      levels:
+        - level: 1
+          skillId: Attack
+
+    - pathName: Cure
+      levels:
+        - level: 1
+          skillId: Cure I
+
+        - level: 6
+          skillId: Cure II

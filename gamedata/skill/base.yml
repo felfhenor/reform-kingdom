@@ -1,18 +1,13 @@
 - id: 43282cd2-96e8-4590-b539-ff02f6db7ebf
   name: Attack
-
-  preventDrop: true
+  description: Attack a single enemy, doing strong damage.
 
   rarity: Common
-  dropLevel: 1
-
   sprite: '0000'
-  frames: 14
 
+  epCost: 0
   usesPerCombat: -1
-  numTargets: 1
-  damageScaling:
-    Strength: 1
+
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 

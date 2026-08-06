@@ -1,0 +1,49 @@
+- id: ed8793ef-0182-4522-9190-fbed192079e5
+  name: Double Strike I
+  description: Strike two enemies for a moderate amount of damage.
+
+  rarity: Common
+  sprite: '0001'
+
+  epCost: 3
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.7
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 94483e46-4a41-49f8-a2b2-29270ad0fde4
+  name: Double Strike II
+  description: Strike two enemies for a moderate amount of damage.
+
+  rarity: Uncommon
+  sprite: '0001'
+
+  epCost: 5
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1.0
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

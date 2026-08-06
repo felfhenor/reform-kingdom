@@ -1,0 +1,152 @@
+- id: 46aac966-48c0-4b4c-84ed-a371bb65acba
+  name: Goblin
+  description: The most common monster. It's mischevious and likes to steal things from adventurers.
+
+  sprite: '0000'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 3
+    max: 5
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Gold Coin
+      min: 3
+      max: 10
+      multiplierPerLevel: 1
+      chance: 100
+
+    - itemId: Small Goblin Bone
+      min: 1
+      max: 2
+      multiplierPerLevel: 0
+      chance: 5
+
+    - equipmentId: Leather Bag
+      min: 1
+      max: 1
+      multiplierPerLevel: 0
+      chance: 8
+
+  skills:
+    - skillId: Attack
+
+  baseStats:
+    Health: 30
+    Energy: 5
+    Luck: 1
+    Intelligence: 1
+    Strength: 5
+    Vitality: 2
+    Resistance: 1
+    Agility: 5
+
+  statsPerLevel:
+    Health: 5
+    Energy: 0.5
+    Luck: 0.05
+    Intelligence: 0.1
+    Strength: 0.5
+    Vitality: 0.2
+    Resistance: 0.1
+    Agility: 0.3
+
+- id: b6d08bbb-c860-4205-990e-45937b3e8421
+  name: Goblin Warrior
+  description: An improved goblin. It excels at feats of strength.
+
+  sprite: '0004'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 10
+    max: 15
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Gold Coin
+      min: 5
+      max: 15
+      multiplierPerLevel: 1
+      chance: 50
+
+  skills:
+    - skillId: Attack
+    - skillId: Double Strike I
+    - skillId: Sweep I
+
+  baseStats:
+    Health: 50
+    Energy: 10
+    Luck: 5
+    Intelligence: 5
+    Strength: 10
+    Vitality: 4
+    Resistance: 2
+    Agility: 7
+
+  statsPerLevel:
+    Health: 10
+    Energy: 1
+    Luck: 0.05
+    Intelligence: 0.3
+    Strength: 2
+    Vitality: 0.6
+    Resistance: 0.3
+    Agility: 0.5
+
+- id: 40dd7495-e231-4135-96a3-090085c8c939
+  name: Goblin Magician
+  description: An improved goblin. It excels at feats of magic.
+
+  sprite: '0008'
+  frames: 4
+
+  targettingType: Weakest
+
+  rarity: Common
+
+  xp:
+    min: 10
+    max: 15
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Gold Coin
+      min: 5
+      max: 15
+      multiplierPerLevel: 1
+      chance: 50
+
+  skills:
+    - skillId: Attack
+    - skillId: Fireball I
+
+  baseStats:
+    Health: 25
+    Energy: 15
+    Luck: 5
+    Intelligence: 10
+    Strength: 5
+    Vitality: 2
+    Resistance: 5
+    Agility: 3
+
+  statsPerLevel:
+    Health: 5
+    Energy: 5
+    Luck: 0.05
+    Intelligence: 2
+    Strength: 0.3
+    Vitality: 1
+    Resistance: 0.5
+    Agility: 0.3

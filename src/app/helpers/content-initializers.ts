@@ -238,12 +238,10 @@ function ensureSkill(
     __type: 'skill',
     description: skill.description ?? 'UNKNOWN',
     sprite: skill.sprite ?? 'UNKNOWN',
-    frames: skill.frames ?? 4,
     rarity: skill.rarity ?? 'Common',
     techniques: skill.techniques ?? [],
     usesPerCombat: skill.usesPerCombat ?? -1,
-    numTargets: skill.numTargets ?? 1,
-    damageScaling: ensureStats(skill.damageScaling),
+    epCost: skill.epCost ?? 0,
     statusEffectDurationBoost: skill.statusEffectDurationBoost ?? {},
     statusEffectChanceBoost: skill.statusEffectChanceBoost ?? {},
   };

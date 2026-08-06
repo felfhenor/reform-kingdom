@@ -1,4 +1,4 @@
-import type { HasAnimation } from '@interfaces/artable';
+import type { HasSprite } from '@interfaces/artable';
 import type { StatusEffectId } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
 import type { GameElement } from '@interfaces/element';
@@ -35,8 +35,7 @@ export type EquipmentSkillId = Branded<string, 'EquipmentSkillId'>;
 export type EquipmentSkillContentModifiable = {
   techniques: EquipmentSkillContentTechnique[];
   usesPerCombat: -1 | number;
-  numTargets: number;
-  damageScaling: StatBlock;
+  epCost: number;
   statusEffectDurationBoost: Record<StatusEffectId, number>;
   statusEffectChanceBoost: Record<StatusEffectId, number>;
 };
@@ -66,7 +65,8 @@ export type EquipmentSkillContentTechnique = {
 };
 
 export type EquipmentSkillContent = IsContentItem &
-  HasAnimation &
+  HasSprite &
+  HasDescription &
   HasRarity &
   EquipmentSkillContentModifiable &
   HasDescription & {

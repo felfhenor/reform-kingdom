@@ -1,0 +1,22 @@
+- id: cf8baffe-4366-4f9d-951c-d051adeaccf4
+  name: Weakspot
+
+  type: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Vitality: 0.3
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has their weak spot revealed (-{{ damage }} Vitality)!'
+      modifyStat: Vitality
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has concealed their weak spot (+{{ damage }} Vitality)!'
+      modifyStat: Vitality

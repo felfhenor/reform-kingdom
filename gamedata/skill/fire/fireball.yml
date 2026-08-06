@@ -1,0 +1,55 @@
+- id: 2ca859ea-df62-43b5-9961-4a4644b094a4
+  name: Fireball I
+  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+
+  sprite: '0003'
+
+  rarity: Common
+
+  epCost: 10
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 3
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.3
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: fbd7b6f8-5efe-417b-b45e-efbf715da8d3
+  name: Fireball II
+  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+
+  sprite: '0003'
+
+  rarity: Uncommon
+
+  epCost: 15
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 3
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.5
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 100
+          duration: 4
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

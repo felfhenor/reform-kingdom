@@ -1,0 +1,59 @@
+- id: 6d24b4d1-544a-48e6-90a5-967cee3fe653
+  name: Analyze I
+  description: Analyze the weak spot of an enemy, and do low damage to them.
+
+  sprite: '0006'
+
+  rarity: Common
+
+  epCost: 4
+  usesPerCombat: -1
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 3
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Weakspot
+      damageScaling:
+        Vitality: 0.5
+
+      statusEffects:
+        - statusEffectId: Weakspot
+          chance: 100
+          duration: 2
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: d957cdd4-28c8-4f90-90b5-3a6bf83fad1f
+  name: Analyze II
+  description: Analyze the weak spot of an enemy, and do low damage to them.
+
+  sprite: '0006'
+
+  rarity: Uncommon
+
+  epCost: 6
+  usesPerCombat: -1
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 3
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Weakspot
+      damageScaling:
+        Vitality: 0.7
+
+      statusEffects:
+        - statusEffectId: Weakspot
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

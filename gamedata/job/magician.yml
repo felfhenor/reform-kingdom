@@ -1,0 +1,39 @@
+- id: 8e172a46-fa01-468a-9b4f-feac5c9e219c
+  name: Magician
+  description: A person who uses magic to achieve their goals.
+  sprite: '0004'
+  frames: 4
+
+  baseStats:
+    Health: 20
+    Energy: 30
+    Luck: 1
+    Intelligence: 10
+    Strength: 2
+    Vitality: 3
+    Resistance: 7
+    Agility: 5
+
+  statsPerLevel:
+    Health: 3
+    Energy: 5
+    Luck: 0
+    Intelligence: 0.7
+    Strength: 0.2
+    Vitality: 0.3
+    Resistance: 0.5
+    Agility: 0.4
+
+  skillPath:
+    - pathName: Attack
+      levels:
+        - level: 1
+          skillId: Attack
+
+    - pathName: Fireball
+      levels:
+        - level: 1
+          skillId: Fireball I
+
+        - level: 6
+          skillId: Fireball II

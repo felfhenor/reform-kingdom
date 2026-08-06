@@ -1,0 +1,49 @@
+- id: 69f42616-552c-48d5-bdf2-c563f56304cb
+  name: Snipe I
+  description: Exert a lot of effort to shoot a deadly, accurate shot.
+
+  rarity: Common
+  sprite: '0005'
+
+  epCost: 5
+  usesPerCombat: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 3
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 27939410-0682-4367-983a-d515e282a00f
+  name: Snipe II
+  description: Exert a lot of effort to shoot a deadly, accurate shot.
+
+  rarity: Uncommon
+  sprite: '0005'
+
+  epCost: 9
+  usesPerCombat: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

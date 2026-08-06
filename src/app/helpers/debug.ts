@@ -27,6 +27,14 @@ export function debugGiveItem(itemId: ItemId, quantity: number): void {
   addMaterial(material.id, quantity);
 }
 
+export function debugGiveAllItems(quantity = 1): void {
+  if (quantity <= 0) return;
+
+  getEntriesByType<ItemContent>('item').forEach((item) => {
+    addMaterial(item.id, quantity);
+  });
+}
+
 export function debugGiveEquipment(
   equipmentId: EquipmentId,
   quantity: number,
