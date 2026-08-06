@@ -11,11 +11,11 @@
         - monsterId: Goblin
     - monsters:
         - monsterId: Goblin
-        - monsterId: Goblin
+        - monsterId: Goblin Magician
     - monsters:
         - monsterId: Goblin
-        - monsterId: Goblin
-        - monsterId: Goblin
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Warrior
 
   completionRewards:
     - collectibleId: Goblin Ruby
@@ -44,13 +44,16 @@
   fights:
     - monsters:
         - monsterId: Goblin
+        - monsterId: Goblin Magician
+        - monsterId: Goblin Warrior
     - monsters:
-        - monsterId: Goblin
-        - monsterId: Goblin
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Warrior
     - monsters:
-        - monsterId: Goblin
-        - monsterId: Goblin
-        - monsterId: Goblin
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Magician
+        - monsterId: Goblin Magician
 
   completionRewards:
     - collectibleId: Purple Lotus

@@ -10,8 +10,11 @@
     - monsters:
         - monsterId: Goblin
         - monsterId: Goblin
-        - monsterId: Goblin
-        - monsterId: Goblin
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Magician
+        - monsterId: Goblin Magician
 
   completionRewards:
     - collectibleId: Swamp Clam
