@@ -9,6 +9,9 @@
   epCost: 3
   usesPerCombat: -1
 
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
   techniques:
     - elements: [Water]
       attributes: [BypassDefense, HealsTarget]
@@ -33,6 +36,9 @@
 
   epCost: 5
   usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Water]

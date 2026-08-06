@@ -9,6 +9,9 @@
   epCost: 4
   usesPerCombat: -1
 
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
   techniques:
     - attributes: [DamagesTarget, AllowPlink]
       elements: []
@@ -38,6 +41,9 @@
 
   epCost: 6
   usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink]
