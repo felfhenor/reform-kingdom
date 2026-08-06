@@ -16,7 +16,10 @@ import type {
   StatBlock,
 } from '@interfaces';
 
-function monsterStatsAtLevel(monster: MonsterContent, level: number): StatBlock {
+function monsterStatsAtLevel(
+  monster: MonsterContent,
+  level: number,
+): StatBlock {
   const stats = { ...monster.baseStats };
 
   (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
@@ -116,7 +119,5 @@ export function combatCreateForEncounter(
     rounds: 0,
     heroes,
     guardians,
-
-    elementalModifiers: defaultAffinities(),
   };
 }

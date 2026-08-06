@@ -16,15 +16,15 @@ export type CombatantStatusEffectData = {
 };
 
 export type CombatantCombatStats = {
-  repeatActionChance: ElementBlock;
-  skillStrikeAgainChance: ElementBlock;
-  skillAdditionalUseChance: ElementBlock;
-  skillAdditionalUseCount: ElementBlock;
-  redirectionChance: ElementBlock;
-  missChance: ElementBlock;
-  debuffIgnoreChance: ElementBlock;
-  damageReflectPercent: ElementBlock;
-  healingIgnorePercent: ElementBlock;
+  repeatActionChance: number;
+  skillStrikeAgainChance: number;
+  skillAdditionalUseChance: number;
+  skillAdditionalUseCount: number;
+  redirectionChance: number;
+  missChance: number;
+  debuffIgnoreChance: number;
+  damageReflectPercent: number;
+  healingIgnorePercent: number;
   reviveChance: number;
 };
 
@@ -73,8 +73,6 @@ export type Combat = {
   rounds: number;
   heroes: Combatant[];
   guardians: Combatant[];
-
-  elementalModifiers: ElementBlock;
 
   encounterId?: EncounterId;
   fightIndex?: number;

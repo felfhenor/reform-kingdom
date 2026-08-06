@@ -1,4 +1,4 @@
-import { combatSkillSucceedsElementCombatStatChance } from '@helpers/combat-stats';
+import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat-stats';
 import { getEntry } from '@helpers/content';
 import { skillUses } from '@helpers/skill';
 import type {
@@ -76,8 +76,7 @@ function getBaseCombatantTargetListForSkillTechnique(
   let allies = myType === 'guardian' ? combat.guardians : combat.heroes;
   let enemies = myType === 'guardian' ? combat.heroes : combat.guardians;
 
-  const shouldReverse = combatSkillSucceedsElementCombatStatChance(
-    skill,
+  const shouldReverse = combatCombatantCombatStatSucceedsChance(
     combatant,
     'redirectionChance',
   );

@@ -99,15 +99,15 @@ export function defaultAffinities(): ElementBlock {
 
 export function defaultCombatStats(): CombatantCombatStats {
   return {
-    repeatActionChance: defaultAffinities(),
-    skillStrikeAgainChance: defaultAffinities(),
-    skillAdditionalUseChance: defaultAffinities(),
-    skillAdditionalUseCount: defaultAffinities(),
-    redirectionChance: defaultAffinities(),
-    missChance: defaultAffinities(),
-    debuffIgnoreChance: defaultAffinities(),
-    damageReflectPercent: defaultAffinities(),
-    healingIgnorePercent: defaultAffinities(),
+    repeatActionChance: 0,
+    skillStrikeAgainChance: 0,
+    skillAdditionalUseChance: 0,
+    skillAdditionalUseCount: 0,
+    redirectionChance: 0,
+    missChance: 0,
+    debuffIgnoreChance: 0,
+    damageReflectPercent: 0,
+    healingIgnorePercent: 0,
     reviveChance: 0,
   };
 }

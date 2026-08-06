@@ -1,6 +1,6 @@
 import { combatCombatantTakeDamage } from '@helpers/combat-damage';
 import { combatFormatMessage, combatMessageLog } from '@helpers/combat-log';
-import { combatElementsSucceedsElementCombatStatChance } from '@helpers/combat-stats';
+import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat-stats';
 import type {
   Combat,
   Combatant,
@@ -21,7 +21,7 @@ import type {
   StatusEffectTakeCombatStatNumber,
   StatusEffectTrigger,
 } from '@interfaces/content-statuseffect';
-import type { ElementBlock, GameElement } from '@interfaces/element';
+import type { GameElement } from '@interfaces/element';
 import type { GameStat, StatBlock } from '@interfaces/stat';
 import { isNumber, isObject, sumBy } from 'es-toolkit/compat';
 
@@ -96,8 +96,7 @@ export function combatApplyStatusEffectToTarget(
   );
   if (existingEffect) return;
 
-  const shouldIgnoreDebuff = combatElementsSucceedsElementCombatStatChance(
-    statusEffect.elements,
+  const shouldIgnoreDebuff = combatCombatantCombatStatSucceedsChance(
     combatant,
     'debuffIgnoreChance',
   );
@@ -133,7 +132,7 @@ function combatApplyCombatStatElementDeltaToCombatant(
   const ref = combatant.combatStats[stat];
   if (!ref || !isObject(ref)) return;
 
-  (combatant.combatStats[stat] as ElementBlock)[element] += value;
+  combatant.combatStats[stat] += value;
 }
 
 function combatApplyCombatStatNumberDeltaToCombatant(

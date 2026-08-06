@@ -1,6 +1,6 @@
 import { combatantIsDead } from '@helpers/combat-end';
 import { combatFormatMessage, combatMessageLog } from '@helpers/combat-log';
-import { combatSkillAverageValueByElements } from '@helpers/combat-stats';
+import { combatCombatantCombatStatValue } from '@helpers/combat-stats';
 import {
   combatApplyStatusEffectToTarget,
   combatCreateStatusEffect,
@@ -55,7 +55,7 @@ function getCombatantBaseStatDamageForTechnique(
 
   const affinityElementBoostMultiplier = sumBy(
     technique.elements,
-    (el) => combatant.affinity[el] + combat.elementalModifiers[el],
+    (el) => combatant.affinity[el],
   );
 
   const baseStatWithoutMultiplier = combatant.totalStats[stat];
@@ -130,9 +130,8 @@ export function combatApplySkillToTarget(
         target.totalStats.Health - target.hp,
       );
 
-      const reduction = combatSkillAverageValueByElements(
+      const reduction = combatCombatantCombatStatValue(
         target,
-        technique.elements,
         'healingIgnorePercent',
       );
       effectiveDamage *= 1 - reduction;
@@ -164,9 +163,8 @@ export function combatApplySkillToTarget(
     templateData.damage = effectiveDamage;
     templateData.absdamage = Math.abs(effectiveDamage);
 
-    const damageReflectPercent = combatSkillAverageValueByElements(
+    const damageReflectPercent = combatCombatantCombatStatValue(
       target,
-      technique.elements,
       'damageReflectPercent',
     );
     if (effectiveDamage > 0 && damageReflectPercent > 0) {

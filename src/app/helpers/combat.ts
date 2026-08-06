@@ -26,11 +26,14 @@ import {
 } from '@helpers/combat-targetting';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
-import { sample, sortBy, sumBy } from 'es-toolkit/compat';
+import { sample, sortBy } from 'es-toolkit/compat';
 
-import { combatSkillSucceedsElementCombatStatChance } from '@helpers/combat-stats';
+import {
+  combatCombatantCombatStatSucceedsChance,
+  combatCombatantCombatStatValue,
+} from '@helpers/combat-stats';
 import { rngSucceedsChance } from '@helpers/rng';
-import { skillElements, skillTechniqueNumTargets } from '@helpers/skill';
+import { skillTechniqueNumTargets } from '@helpers/skill';
 import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
 
 type CombatTurnResult = {
@@ -52,17 +55,13 @@ function combatantMarkSkillUse(
   combatant: Combatant,
   skill: EquipmentSkill,
 ): void {
-  const shouldApplyExtraUses = combatSkillSucceedsElementCombatStatChance(
-    skill,
+  const shouldApplyExtraUses = combatCombatantCombatStatSucceedsChance(
     combatant,
     'skillAdditionalUseChance',
   );
 
   const extraUses = shouldApplyExtraUses
-    ? sumBy(
-        skillElements(skill),
-        (el) => combatant.combatStats.skillAdditionalUseCount[el],
-      )
+    ? combatCombatantCombatStatValue(combatant, 'skillAdditionalUseCount')
     : 0;
 
   combatant.skillUses[skill.id] ??= 0;
@@ -146,8 +145,7 @@ function combatantTakeTurn(
       // check for early termination of combat
       if (isCombatOver(combat)) return;
 
-      const shouldMiss = combatSkillSucceedsElementCombatStatChance(
-        chosenSkill,
+      const shouldMiss = combatCombatantCombatStatSucceedsChance(
         combatant,
         'missChance',
       );
@@ -169,8 +167,7 @@ function combatantTakeTurn(
         capturedCreatorStats,
       );
 
-      const shouldApplyAgain = combatSkillSucceedsElementCombatStatChance(
-        chosenSkill,
+      const shouldApplyAgain = combatCombatantCombatStatSucceedsChance(
         combatant,
         'skillStrikeAgainChance',
       );
@@ -201,8 +198,7 @@ function combatantTakeTurn(
     return {};
   }
 
-  const shouldGoAgain = combatSkillSucceedsElementCombatStatChance(
-    chosenSkill,
+  const shouldGoAgain = combatCombatantCombatStatSucceedsChance(
     combatant,
     'repeatActionChance',
   );
