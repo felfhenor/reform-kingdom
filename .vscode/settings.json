@@ -25,6 +25,7 @@
     "./schemas/recipe.schema.json": "gamedata/recipe/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/*.yml",
     "./schemas/statuseffect.schema.json": "gamedata/statuseffect/*.yml",
-    "./schemas/trait.schema.json": "gamedata/trait/*.yml"
+    "./schemas/trait.schema.json": "gamedata/trait/*.yml",
+    "./schemas/tradeskilllevelrequirement.schema.json": "gamedata/tradeskilllevelrequirement/*.yml"
   }
 }

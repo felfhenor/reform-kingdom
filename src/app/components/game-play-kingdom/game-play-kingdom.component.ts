@@ -14,21 +14,30 @@ import { PlayKingdomTradeskillTailoringComponent } from '@components/play-kingdo
 import { PlayKingdomTradeskillWoodworkingComponent } from '@components/play-kingdom-tradeskill-woodworking/play-kingdom-tradeskill-woodworking.component';
 import {
   armoryGet,
+  craftQueueTicksRemaining,
+  craftQueueTotalTicks,
+  craftQueueUnitsRemaining,
+  formatDuration,
   gamestate,
+  getEntry,
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
   isPlayerAtKingdom,
   kingdomSubview,
   kingdomSubviewShow,
   showReclassHeroesModal,
+  tradeskillBuilding,
+  uiClockTick,
 } from '@helpers';
-import type { KingdomSubview } from '@interfaces';
+import type { KingdomSubview, RecipeContent, Tradeskill } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { clamp } from 'es-toolkit/compat';
 import { PluralizePipe } from '../../pipes/pluralize.pipe';
 
 interface TradeskillButton {
   subview: KingdomSubview;
   label: string;
+  tradeskill: Tradeskill;
 }
 
 @Component({
@@ -78,12 +87,59 @@ export class GamePlayKingdomComponent {
   );
 
   public readonly tradeskillButtons: TradeskillButton[] = [
-    { subview: 'tradeskill-artificing', label: 'Artificing' },
-    { subview: 'tradeskill-blacksmithing', label: 'Blacksmithing' },
-    { subview: 'tradeskill-jewelcrafting', label: 'Jewelcrafting' },
-    { subview: 'tradeskill-tailoring', label: 'Tailoring' },
-    { subview: 'tradeskill-woodworking', label: 'Woodworking' },
+    { subview: 'tradeskill-artificing', label: 'Artificing', tradeskill: 'Artificing' },
+    { subview: 'tradeskill-blacksmithing', label: 'Blacksmithing', tradeskill: 'Blacksmithing' },
+    { subview: 'tradeskill-jewelcrafting', label: 'Jewelcrafting', tradeskill: 'Jewelcrafting' },
+    { subview: 'tradeskill-tailoring', label: 'Tailoring', tradeskill: 'Tailoring' },
+    { subview: 'tradeskill-woodworking', label: 'Woodworking', tradeskill: 'Woodworking' },
   ];
+
+  // Recomputes whenever `gamestate()` changes AND once a second regardless
+  // (via `uiClockTick`), so the progress bars never look frozen even if the
+  // gameloop itself is skipping ticks (e.g. tab backgrounded).
+  public tradeskillButtonViewModels = computed(() => {
+    uiClockTick();
+
+    return this.tradeskillButtons.map((button) => {
+      const building = tradeskillBuilding(button.tradeskill);
+      const activeEntry = building.queue[0];
+      const activeRecipe = activeEntry
+        ? getEntry<RecipeContent>(activeEntry.recipeId)
+        : undefined;
+
+      const totalTicks = craftQueueTotalTicks(button.tradeskill);
+      const remainingTicks = craftQueueTicksRemaining(button.tradeskill);
+      const overallPercent =
+        totalTicks > 0
+          ? clamp(Math.round(((totalTicks - remainingTicks) / totalTicks) * 100), 0, 100)
+          : 0;
+      const activePercent =
+        activeEntry && activeRecipe && activeRecipe.craftTime > 0
+          ? clamp(
+              Math.round((activeEntry.ticksIntoCraft / activeRecipe.craftTime) * 100),
+              0,
+              100,
+            )
+          : 0;
+
+      return {
+        ...button,
+        level: building.level,
+        xpCurrent: building.xp.current,
+        xpMaximum: building.xp.maximum,
+        xpPercent:
+          building.xp.maximum > 0
+            ? clamp(Math.round((building.xp.current / building.xp.maximum) * 100), 0, 100)
+            : 0,
+        hasQueue: building.queue.length > 0,
+        queueUnitsRemaining: craftQueueUnitsRemaining(button.tradeskill),
+        overallPercent,
+        activePercent,
+        totalRemainingLabel:
+          building.queue.length > 0 ? formatDuration(remainingTicks) : undefined,
+      };
+    });
+  });
 
   public openSubview(subview: KingdomSubview): void {
     kingdomSubviewShow(subview);

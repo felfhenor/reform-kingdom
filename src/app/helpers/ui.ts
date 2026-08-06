@@ -6,6 +6,15 @@ export function isPageVisible(): boolean {
   return !document.hidden;
 }
 
+// Ticks once a second, independent of the gameloop (which only advances on
+// its own cadence and skips entirely while the tab isn't visible). Purely a
+// change-detection nudge - components that display live countdowns (craft
+// queues, etc.) read this inside a `computed()` so their derived text
+// re-renders every second even when the underlying game state hasn't
+// changed since the last real gameloop tick.
+export const uiClockTick = signal<number>(0);
+setInterval(() => uiClockTick.update((tick) => tick + 1), 1000);
+
 export const windowHeight = signal<number>(window.innerHeight);
 export const windowWidth = signal<number>(window.innerWidth);
 

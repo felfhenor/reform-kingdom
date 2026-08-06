@@ -4,6 +4,7 @@ export type AdventureLogEntryKind =
   | 'Combat'
   | 'Travel'
   | 'Gather'
+  | 'Craft'
   | 'Miscellaneous';
 
 export type CombatLog = {

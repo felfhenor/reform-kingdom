@@ -6,6 +6,7 @@ import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
+import { pruneInvalidCraftQueues } from '@helpers/crafting';
 import { defaultGameState } from '@helpers/defaults';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
@@ -33,6 +34,7 @@ export function migrateGameState() {
   newState.discoveredRecipes = pruneInvalidDiscoveredRecipes(
     newState.discoveredRecipes,
   );
+  newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
 
   setGameState(newState);
   gamestateTickStart();

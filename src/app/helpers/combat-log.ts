@@ -78,6 +78,18 @@ export function gatherMessageLog(locationName: string, message: string): void {
   combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
 }
 
+export function craftMessageLog(locationName: string, message: string): void {
+  const newLog: CombatLog = {
+    kind: 'Craft',
+    messageId: rngUuid(),
+    timestamp: Date.now(),
+    locationName,
+    message,
+  };
+
+  combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
+}
+
 // Colors an item's name by its rarity for adventure log messages (e.g. combat
 // and gather drop announcements) - `adventureLogMessageHtml` renders the log
 // message as markdown-inline, which passes raw HTML like this through as-is.

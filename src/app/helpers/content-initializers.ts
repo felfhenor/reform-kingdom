@@ -25,6 +25,8 @@ import type {
   StatBlock,
   StatusEffectContent,
   StatusEffectId,
+  TradeskillLevelRequirementContent,
+  TradeskillLevelRequirementId,
   TraitContent,
   TraitId,
 } from '@interfaces';
@@ -42,8 +44,9 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   monster: ensureMonster,
   recipe: ensureRecipe,
   skill: ensureSkill,
-  statuseffect: ensureStatuseffect,
+  statuseffect: ensureStatusEffect,
   trait: ensureTrait,
+  tradeskilllevelrequirement: ensureTradeskillLevelRequirement,
 };
 
 function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
@@ -172,7 +175,7 @@ function ensureRecipe(recipe: Partial<RecipeContent>): Required<RecipeContent> {
   };
 }
 
-function ensureStatuseffect(
+function ensureStatusEffect(
   effect: Partial<StatusEffectContent>,
 ): Required<StatusEffectContent> {
   return {
@@ -209,6 +212,20 @@ function ensureTrait(trait: Partial<TraitContent>): Required<TraitContent> {
     __type: 'trait',
     description: trait.description ?? 'UNKNOWN',
     baseStats: ensureStats(trait.baseStats),
+  };
+}
+
+function ensureTradeskillLevelRequirement(
+  requirement: Partial<TradeskillLevelRequirementContent>,
+): Required<TradeskillLevelRequirementContent> {
+  return {
+    id: requirement.id ?? ('UNKNOWN' as TradeskillLevelRequirementId),
+    name: requirement.name ?? 'UNKNOWN',
+    __type: 'tradeskilllevelrequirement',
+    tradeskill: requirement.tradeskill ?? 'Blacksmithing',
+    level: requirement.level ?? 1,
+    requiredCollectibleId:
+      requirement.requiredCollectibleId ?? ('UNKNOWN' as CollectibleId),
   };
 }
 

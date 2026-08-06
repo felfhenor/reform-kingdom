@@ -13,5 +13,23 @@
   tradeskill: Artificing
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
-  tradeskillXP: 2
+  tradeskillXP: 5
   craftTime: 10
+
+- id: 7f0b6be1-138b-415f-91be-3041e423de8d
+  name: 'Collectible: Minor Artificing Effigy'
+  result:
+    collectibleId: Minor Artificing Effigy
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 30
+
+    - itemId: Malachite
+      quantity: 30
+
+  tradeskill: Artificing
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 5
+  tradeskillXP: 25
+  craftTime: 1500

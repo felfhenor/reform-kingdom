@@ -97,14 +97,62 @@
         </div>
 
         <div class="grid grid-cols-5 gap-4">
-          @for (tradeskill of tradeskillButtons; track tradeskill.subview) {
-            <button
-              class="btn btn-secondary h-16 flex flex-col justify-center gap-0"
+          @for (
+            tradeskill of tradeskillButtonViewModels();
+            track tradeskill.subview
+          ) {
+            <div
+              class="btn btn-secondary h-auto py-2 px-2 flex flex-col justify-center gap-1"
+              role="button"
+              tabindex="0"
               (click)="openSubview(tradeskill.subview)"
+              (keydown.enter)="openSubview(tradeskill.subview)"
             >
               <span class="font-bold">{{ tradeskill.label }}</span>
-              <span class="text-xs opacity-70">Lv. 1</span>
-            </button>
+
+              <div
+                class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+              >
+                <div
+                  class="absolute inset-y-0 left-0 bg-primary"
+                  [style.width.%]="tradeskill.xpPercent"
+                ></div>
+                <div
+                  class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
+                >
+                  Lv. {{ tradeskill.level }} · {{ tradeskill.xpCurrent }}/{{
+                    tradeskill.xpMaximum
+                  }}
+                </div>
+              </div>
+
+              @if (tradeskill.hasQueue) {
+                <div
+                  class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+                >
+                  <div
+                    class="absolute inset-y-0 left-0 bg-accent"
+                    [style.width.%]="tradeskill.overallPercent"
+                  ></div>
+                  <div
+                    class="absolute inset-y-0 w-0.5 bg-white"
+                    [style.left.%]="tradeskill.activePercent"
+                  ></div>
+                  <div
+                    class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
+                  >
+                    {{ tradeskill.queueUnitsRemaining }}
+                    {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
+                    ·
+                    {{ tradeskill.totalRemainingLabel }}
+                  </div>
+                </div>
+              } @else {
+                <div class="relative w-full h-4 italic text-xs">
+                  Not currently crafting
+                </div>
+              }
+            </div>
           }
         </div>
 

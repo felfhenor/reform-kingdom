@@ -26,7 +26,7 @@
   tradeskill: Woodworking
   minTradeskillLevel: 1
   maxTradeskillLevel: 4
-  tradeskillXP: 2
+  tradeskillXP: 5
   craftTime: 20
 
 - id: 1a9ffc55-456d-4cc8-afab-5710705570e6
@@ -43,7 +43,7 @@
   tradeskill: Woodworking
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
-  tradeskillXP: 3
+  tradeskillXP: 8
   craftTime: 40
 
 - id: 66d36d4b-ca4a-48b1-aad0-d85eca6ecbf4
@@ -61,5 +61,23 @@
   tradeskill: Woodworking
   minTradeskillLevel: 3
   maxTradeskillLevel: 6
-  tradeskillXP: 1
+  tradeskillXP: 5
   craftTime: 20
+
+- id: 1db4b438-930c-4d4a-af53-904932ab7ef5
+  name: 'Collectible: Minor Woodworking Effigy'
+  result:
+    collectibleId: Minor Woodworking Effigy
+
+  requirements:
+    - itemId: Wergen Wood
+      quantity: 40
+
+    - itemId: Wergen Stick
+      quantity: 30
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 5
+  tradeskillXP: 25
+  craftTime: 1500

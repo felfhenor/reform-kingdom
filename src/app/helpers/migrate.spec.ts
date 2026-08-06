@@ -17,6 +17,10 @@ vi.mock('@helpers/collectibles', () => ({
   pruneInvalidCollectibles: vi.fn((collectibles) => collectibles),
 }));
 
+vi.mock('@helpers/crafting', () => ({
+  pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
+}));
+
 vi.mock('@helpers/materials', () => ({
   pruneInvalidMaterials: vi.fn((materials) => materials),
 }));

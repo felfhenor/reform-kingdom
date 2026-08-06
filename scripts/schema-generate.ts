@@ -319,6 +319,7 @@ const contentTypeMap = {
   skill: 'EquipmentSkillContent',
   statuseffect: 'StatusEffectContent',
   trait: 'TraitContent',
+  tradeskilllevelrequirement: 'TradeskillLevelRequirementContent',
 };
 
 // Content types whose schema generated successfully - used to populate

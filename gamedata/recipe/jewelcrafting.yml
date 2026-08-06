@@ -26,7 +26,7 @@
   tradeskill: Jewelcrafting
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
-  tradeskillXP: 1
+  tradeskillXP: 5
   craftTime: 20
 
 - id: 8a4d4e21-7c89-4dd0-86ae-b41c643c7b99
@@ -41,5 +41,23 @@
   tradeskill: Jewelcrafting
   minTradeskillLevel: 2
   maxTradeskillLevel: 4
-  tradeskillXP: 1
+  tradeskillXP: 5
   craftTime: 20
+
+- id: 6df29d50-54e8-47c3-a3c6-337070993e0d
+  name: 'Collectible: Minor Jewelcrafting Effigy'
+  result:
+    collectibleId: Minor Jewelcrafting Effigy
+
+  requirements:
+    - itemId: Malachite
+      quantity: 50
+
+    - itemId: Gold Coin
+      quantity: 20
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 5
+  tradeskillXP: 25
+  craftTime: 1500

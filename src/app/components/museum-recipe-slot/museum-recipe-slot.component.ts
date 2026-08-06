@@ -7,7 +7,12 @@ import {
   recipeResultContent,
   recipeResultSpritesheet,
 } from '@helpers';
-import type { EquipmentContent, ItemContent, MuseumRecipeEntry } from '@interfaces';
+import type {
+  CollectibleContent,
+  EquipmentContent,
+  ItemContent,
+  MuseumRecipeEntry,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -25,11 +30,11 @@ import { TippyDirective } from '@ngneat/helipopper';
 export class MuseumRecipeSlotComponent {
   public entry = input.required<MuseumRecipeEntry>();
 
-  public resultContent = computed<ItemContent | EquipmentContent | undefined>(
-    () => recipeResultContent(this.entry().recipe),
-  );
+  public resultContent = computed<
+    ItemContent | EquipmentContent | CollectibleContent | undefined
+  >(() => recipeResultContent(this.entry().recipe));
 
-  public resultSpritesheet = computed<'item' | 'equipment'>(() =>
+  public resultSpritesheet = computed<'item' | 'equipment' | 'collectible'>(() =>
     recipeResultSpritesheet(this.entry().recipe),
   );
 

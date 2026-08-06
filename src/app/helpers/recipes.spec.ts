@@ -1,4 +1,6 @@
 import type {
+  CollectibleContent,
+  CollectibleId,
   EquipmentContent,
   EquipmentId,
   GameState,
@@ -76,6 +78,28 @@ const equipmentRecipe: RecipeContent = {
   maxTradeskillLevel: 5,
   tradeskillXP: 1,
   craftTime: 60,
+};
+
+const minorEffigy: CollectibleContent = {
+  id: 'minor-tailoring-effigy' as CollectibleId,
+  name: 'Minor Tailoring Effigy',
+  __type: 'collectible',
+  description: 'A small figurine stitched together from scraps of thread and cloth.',
+  sprite: '0000',
+  rarity: 'Uncommon',
+};
+
+const collectibleRecipe: RecipeContent = {
+  id: 'collectible-minor-tailoring-effigy' as RecipeId,
+  name: 'Collectible: Minor Tailoring Effigy',
+  __type: 'recipe',
+  result: { collectibleId: minorEffigy.id },
+  requirements: [],
+  tradeskill: 'Tailoring',
+  minTradeskillLevel: 5,
+  maxTradeskillLevel: 5,
+  tradeskillXP: 5,
+  craftTime: 1500,
 };
 
 describe('Recipes Helper Functions', () => {
@@ -203,6 +227,10 @@ describe('Recipes Helper Functions', () => {
     it('returns "equipment" for a recipe that crafts equipment', () => {
       expect(recipeResultSpritesheet(equipmentRecipe)).toBe('equipment');
     });
+
+    it('returns "collectible" for a recipe that crafts a collectible', () => {
+      expect(recipeResultSpritesheet(collectibleRecipe)).toBe('collectible');
+    });
   });
 
   describe('recipeResultContent', () => {
@@ -218,6 +246,13 @@ describe('Recipes Helper Functions', () => {
 
       expect(recipeResultContent(equipmentRecipe)).toBe(boneHewnCloak);
       expect(getEntry).toHaveBeenCalledWith(boneHewnCloak.id);
+    });
+
+    it('resolves the crafted collectible for a collectible recipe', () => {
+      vi.mocked(getEntry).mockReturnValue(minorEffigy);
+
+      expect(recipeResultContent(collectibleRecipe)).toBe(minorEffigy);
+      expect(getEntry).toHaveBeenCalledWith(minorEffigy.id);
     });
   });
 });

@@ -26,7 +26,7 @@
   tradeskill: Blacksmithing
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
-  tradeskillXP: 1
+  tradeskillXP: 5
   craftTime: 20
 
 - id: 99f675b1-bf00-49f9-997e-cfbbb984ac26
@@ -41,7 +41,7 @@
   tradeskill: Blacksmithing
   minTradeskillLevel: 2
   maxTradeskillLevel: 4
-  tradeskillXP: 1
+  tradeskillXP: 5
   craftTime: 20
 
 - id: ef512ec9-393d-4944-940a-2b5dffd7ce3a
@@ -58,7 +58,7 @@
   tradeskill: Blacksmithing
   minTradeskillLevel: 2
   maxTradeskillLevel: 4
-  tradeskillXP: 2
+  tradeskillXP: 8
   craftTime: 20
 
 - id: 62f920bf-4086-44d0-8c86-359de5d90481
@@ -76,5 +76,23 @@
   tradeskill: Blacksmithing
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
-  tradeskillXP: 1
+  tradeskillXP: 8
   craftTime: 20
+
+- id: f42a7755-461f-47ec-870c-af4d766e272c
+  name: 'Collectible: Minor Blacksmithing Effigy'
+  result:
+    collectibleId: Minor Blacksmithing Effigy
+
+  requirements:
+    - itemId: Copper Ore
+      quantity: 40
+
+    - itemId: Copper Ingot
+      quantity: 20
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 5
+  tradeskillXP: 25
+  craftTime: 1500

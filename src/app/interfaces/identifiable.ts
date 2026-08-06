@@ -10,7 +10,8 @@ export type ContentType =
   | 'recipe'
   | 'skill'
   | 'statuseffect'
-  | 'trait';
+  | 'trait'
+  | 'tradeskilllevelrequirement';
 
 export type Identifiable = {
   id: string;

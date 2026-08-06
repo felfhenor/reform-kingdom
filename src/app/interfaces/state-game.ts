@@ -5,6 +5,7 @@ import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { RecipeId } from '@interfaces/content-recipe';
+import type { GameStateTradeskills } from '@interfaces/crafting';
 import type { EquipmentItem } from '@interfaces/equipment';
 import type { GatheringState } from '@interfaces/gathering';
 import type { Branded } from '@interfaces/identifiable';
@@ -76,4 +77,5 @@ export type GameState = {
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredRecipes: GameStateDiscoveredRecipes;
   globalEffects: GlobalEffect[];
+  tradeskills: GameStateTradeskills;
 };

@@ -1,0 +1,18 @@
+@use 'tailwindcss';
+@reference 'tailwindcss';
+
+.text-Guaranteed {
+  @apply text-orange-400;
+}
+
+.text-Likely {
+  @apply text-yellow-400;
+}
+
+.text-Possible {
+  @apply text-green-400;
+}
+
+.text-Trivial {
+  @apply text-gray-400;
+}

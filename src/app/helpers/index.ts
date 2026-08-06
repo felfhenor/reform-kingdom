@@ -12,6 +12,7 @@ export * from './combat-statuseffects';
 export * from './combat-targetting';
 export * from './content';
 export * from './content-initializers';
+export * from './crafting';
 export * from './debug';
 export * from './defaults';
 export * from './discord';

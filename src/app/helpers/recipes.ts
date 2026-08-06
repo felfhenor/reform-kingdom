@@ -1,6 +1,7 @@
 import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  CollectibleContent,
   EquipmentContent,
   GameStateDiscoveredRecipes,
   ItemContent,
@@ -51,18 +52,24 @@ export function pruneInvalidDiscoveredRecipes(
 // rendered as its result's sprite over the "Recipe Backdrop" item).
 export function recipeResultSpritesheet(
   recipe: RecipeContent,
-): 'item' | 'equipment' {
-  return 'itemId' in recipe.result ? 'item' : 'equipment';
+): 'item' | 'equipment' | 'collectible' {
+  if ('itemId' in recipe.result) return 'item';
+  if ('equipmentId' in recipe.result) return 'equipment';
+  return 'collectible';
 }
 
 export function recipeResultContent(
   recipe: RecipeContent,
-): ItemContent | EquipmentContent | undefined {
+): ItemContent | EquipmentContent | CollectibleContent | undefined {
   if ('itemId' in recipe.result) {
     return getEntry<ItemContent>(recipe.result.itemId);
   }
 
-  return getEntry<EquipmentContent>(recipe.result.equipmentId);
+  if ('equipmentId' in recipe.result) {
+    return getEntry<EquipmentContent>(recipe.result.equipmentId);
+  }
+
+  return getEntry<CollectibleContent>(recipe.result.collectibleId);
 }
 
 const RECIPE_BACKDROP_ITEM_NAME = 'Recipe Backdrop';

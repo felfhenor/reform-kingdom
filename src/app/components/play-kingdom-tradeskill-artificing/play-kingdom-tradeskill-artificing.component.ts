@@ -1,15 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CardPageComponent } from '@components/card-page/card-page.component';
-import { kingdomSubviewClear } from '@helpers';
+import { PlayKingdomTradeskillPanelComponent } from '@components/play-kingdom-tradeskill-panel/play-kingdom-tradeskill-panel.component';
 
 @Component({
   selector: 'app-play-kingdom-tradeskill-artificing',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CardPageComponent],
-  templateUrl: './play-kingdom-tradeskill-artificing.component.html',
+  imports: [PlayKingdomTradeskillPanelComponent],
+  template: `<app-play-kingdom-tradeskill-panel tradeskill="Artificing" />`,
 })
-export class PlayKingdomTradeskillArtificingComponent {
-  public back(): void {
-    kingdomSubviewClear();
-  }
-}
+export class PlayKingdomTradeskillArtificingComponent {}

@@ -5,10 +5,12 @@ import type {
   EquipmentBlock,
   GameId,
   GameState,
+  GameStateTradeskills,
   GatheringState,
   StatBlock,
   TravelState,
 } from '@interfaces';
+import { ALL_TRADESKILLS } from '@interfaces';
 
 export function defaultGameState(): GameState {
   return {
@@ -39,7 +41,23 @@ export function defaultGameState(): GameState {
     discoveredEquipment: {},
     discoveredRecipes: {},
     globalEffects: [],
+    tradeskills: defaultTradeskills(),
   };
+}
+
+// Every building starts at level 1 with an empty queue - `xp.maximum: 10`
+// matches `tradeskillXpForLevel(1)` in `crafting.ts` (kept as a literal here
+// rather than imported, to avoid a `defaults.ts` <-> `state-game.ts` cycle
+// through `crafting.ts`).
+function defaultTradeskills(): GameStateTradeskills {
+  return ALL_TRADESKILLS.reduce((tradeskills, tradeskill) => {
+    tradeskills[tradeskill] = {
+      level: 1,
+      xp: { current: 0, maximum: 10 },
+      queue: [],
+    };
+    return tradeskills;
+  }, {} as GameStateTradeskills);
 }
 
 export function defaultTravelState(): TravelState {
