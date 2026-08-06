@@ -11,6 +11,10 @@ export function skillUses(skill: EquipmentSkill): number {
   return skill.usesPerCombat + (skill.mods?.usesPerCombat ?? 0);
 }
 
+export function skillEpCost(skill: EquipmentSkill): number {
+  return skill.epCost + (skill.mods?.epCost ?? 0);
+}
+
 export function skillTechniqueNumTargets(
   skill: EquipmentSkill,
   technique: EquipmentSkillContentTechnique,

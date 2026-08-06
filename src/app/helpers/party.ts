@@ -89,6 +89,7 @@ export function createCharacter(name: string, jobId: JobId): Character {
     jobId,
     jobProgress: {},
     hp: stats.Health,
+    ep: stats.Energy,
     stats,
     equipment,
     traitIds: [],
@@ -161,6 +162,7 @@ export function characterReclass(characterId: CharacterId, jobId: JobId): void {
         equipment,
         stats,
         hp: stats.Health,
+        ep: stats.Energy,
         level,
         xp,
       };
@@ -191,6 +193,7 @@ function applyCharacterEquipment(
         equipment,
         stats,
         hp: clamp(character.hp, 0, stats.Health),
+        ep: clamp(character.ep, 0, stats.Energy),
       };
     });
 
@@ -304,6 +307,7 @@ export function characterEquipFromArmory(
         equipment,
         stats,
         hp: clamp(c.hp, 0, stats.Health),
+        ep: clamp(c.ep, 0, stats.Energy),
       };
     });
 
@@ -351,6 +355,7 @@ export function characterUnequipToArmory(
         equipment,
         stats,
         hp: clamp(c.hp, 0, stats.Health),
+        ep: clamp(c.ep, 0, stats.Energy),
       };
     });
 
@@ -369,6 +374,7 @@ export function syncPartyHpFromCombat(heroes: Combatant[]): void {
       return {
         ...character,
         hp: clamp(combatant.hp, 0, character.stats.Health),
+        ep: clamp(combatant.ep, 0, character.stats.Energy),
       };
     });
 
@@ -381,6 +387,7 @@ export function healPartyToFull(): void {
     state.world.party = state.world.party.map((character) => ({
       ...character,
       hp: character.stats.Health,
+      ep: character.stats.Energy,
     }));
 
     return state;

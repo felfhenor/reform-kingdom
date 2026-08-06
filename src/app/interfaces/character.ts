@@ -29,6 +29,7 @@ export type Character = {
   jobProgress: Partial<Record<JobId, JobProgress>>;
 
   hp: number;
+  ep: number;
   stats: StatBlock;
 
   equipment: EquipmentBlock;

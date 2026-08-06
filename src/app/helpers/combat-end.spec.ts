@@ -81,6 +81,7 @@ function buildCombatant(overrides: Partial<Combatant>): Combatant {
     isEnemy: false,
     level: 1,
     hp: 10,
+    ep: 10,
     sprite: '0000',
     frames: 4,
     targettingType: 'Random',

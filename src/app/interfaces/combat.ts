@@ -43,6 +43,7 @@ export type Combatant = HasAnimation & {
 
   level: number;
   hp: number;
+  ep: number;
 
   targettingType: CombatantTargettingType;
 

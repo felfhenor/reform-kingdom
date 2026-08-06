@@ -1,6 +1,6 @@
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat-stats';
 import { getEntry } from '@helpers/content';
-import { skillUses } from '@helpers/skill';
+import { skillEpCost, skillUses } from '@helpers/skill';
 import type {
   Combat,
   Combatant,
@@ -22,8 +22,9 @@ export function combatAvailableSkillsForCombatant(
     ...combatant.skillRefs,
   ].filter(
     (skill) =>
-      skill.usesPerCombat === -1 ||
-      (combatant.skillUses[skill.id] ?? 0) < skillUses(skill),
+      (skill.usesPerCombat === -1 ||
+        (combatant.skillUses[skill.id] ?? 0) < skillUses(skill)) &&
+      combatant.ep >= skillEpCost(skill),
   );
 }
 

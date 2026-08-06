@@ -1,6 +1,7 @@
 import type {
   Character,
   CharacterId,
+  Combatant,
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
@@ -42,9 +43,11 @@ import {
   characterXpForLevel,
   createCharacter,
   healingTicksForLevel,
+  healPartyToFull,
   partyGainXp,
   partyGet,
   setParty,
+  syncPartyHpFromCombat,
 } from '@helpers/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
@@ -227,6 +230,7 @@ describe('Party Helper Functions', () => {
       expect(result.world.party[0].jobId).toBe('job-warrior');
       expect(result.world.party[0].stats).toEqual(expectedStats);
       expect(result.world.party[0].hp).toBe(expectedStats.Health);
+      expect(result.world.party[0].ep).toBe(expectedStats.Energy);
       expect(result.world.party[0].level).toBe(1);
       expect(result.world.party[0].xp).toEqual({ current: 0, maximum: 100 });
     });
@@ -492,6 +496,28 @@ describe('Party Helper Functions', () => {
       const updated = state.world.party[0];
       expect(updated.stats.Health).toBe(mockJob.baseStats.Health - 20);
       expect(updated.hp).toBe(updated.stats.Health);
+    });
+
+    it('clamps current ep down if the new equipment lowers max Energy', () => {
+      const cursedHelmet: EquipmentContent = {
+        ...mockHelmet,
+        id: 'equip-cursed' as EquipmentId,
+        name: 'Cursed Helmet',
+        baseStats: { ...defaultStats(), Energy: -20 },
+      };
+      mockGetEntry(mockJob, cursedHelmet);
+      const jala = { ...createCharacterStub('Jala'), ep: mockJob.baseStats.Energy };
+
+      characterEquipItem(jala.id, 'Helmet', cursedHelmet.id);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const state = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      const updated = state.world.party[0];
+      expect(updated.stats.Energy).toBe(mockJob.baseStats.Energy - 20);
+      expect(updated.ep).toBe(updated.stats.Energy);
     });
 
     it('does nothing and returns false while the party is in combat', () => {
@@ -876,6 +902,60 @@ describe('Party Helper Functions', () => {
       expect(result.world.party[0].xp.current).toBe(
         result.world.party[0].xp.maximum,
       );
+    });
+  });
+
+  describe('syncPartyHpFromCombat', () => {
+    it('syncs hp and ep from the matching combatant, clamped to current max stats', () => {
+      const jala = createCharacterStub('Jala');
+      const combatant = {
+        id: jala.id,
+        hp: jala.stats.Health + 999,
+        ep: jala.stats.Energy + 999,
+      } as unknown as Combatant;
+
+      syncPartyHpFromCombat([combatant]);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].hp).toBe(jala.stats.Health);
+      expect(result.world.party[0].ep).toBe(jala.stats.Energy);
+    });
+
+    it('leaves characters with no matching combatant untouched', () => {
+      const jala = createCharacterStub('Jala');
+
+      syncPartyHpFromCombat([]);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0]).toEqual(jala);
+    });
+  });
+
+  describe('healPartyToFull', () => {
+    it("restores every character's hp and ep to their current maximums", () => {
+      const jala = {
+        ...createCharacterStub('Jala'),
+        hp: 1,
+        ep: 0,
+      };
+
+      healPartyToFull();
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].hp).toBe(jala.stats.Health);
+      expect(result.world.party[0].ep).toBe(jala.stats.Energy);
     });
   });
 

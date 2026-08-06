@@ -26,14 +26,14 @@ import {
 } from '@helpers/combat-targetting';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
-import { sample, sortBy } from 'es-toolkit/compat';
+import { clamp, sample, sortBy } from 'es-toolkit/compat';
 
 import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantCombatStatValue,
 } from '@helpers/combat-stats';
 import { rngSucceedsChance } from '@helpers/rng';
-import { skillTechniqueNumTargets } from '@helpers/skill';
+import { skillEpCost, skillTechniqueNumTargets } from '@helpers/skill';
 import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
 
 type CombatTurnResult = {
@@ -66,6 +66,12 @@ function combatantMarkSkillUse(
 
   combatant.skillUses[skill.id] ??= 0;
   combatant.skillUses[skill.id] += 1 + extraUses;
+
+  combatant.ep = clamp(
+    combatant.ep - skillEpCost(skill),
+    0,
+    combatant.totalStats.Energy,
+  );
 }
 
 function combatantTakeTurn(
