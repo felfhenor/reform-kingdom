@@ -34,6 +34,7 @@ import type {
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { clamp } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-play-kingdom-tradeskill-panel',
@@ -124,9 +125,7 @@ export class PlayKingdomTradeskillPanelComponent {
     maxCraftable: number,
   ): void {
     const value = (event.target as HTMLInputElement).valueAsNumber;
-    const clamped = Number.isFinite(value)
-      ? Math.min(Math.max(1, Math.floor(value)), Math.max(1, maxCraftable))
-      : 1;
+    const clamped = Number.isFinite(value) ? clamp(value, 1, maxCraftable) : 1;
 
     this.quantities.update((quantities) => ({
       ...quantities,
@@ -147,8 +146,9 @@ export class PlayKingdomTradeskillPanelComponent {
   }
 
   public craft(recipeId: RecipeId, maxCraftable: number): void {
-    const quantity = Math.min(
-      Math.max(1, Math.floor(this.quantityFor(recipeId))),
+    const quantity = clamp(
+      1,
+      Math.floor(this.quantityFor(recipeId)),
       maxCraftable,
     );
     craftQueueStart(this.tradeskill(), recipeId, quantity);

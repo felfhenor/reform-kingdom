@@ -39,7 +39,7 @@ import type {
   TradeskillLevelRequirementContent,
 } from '@interfaces';
 import { ALL_TRADESKILLS, RARITY_PRIORITY } from '@interfaces';
-import { orderBy, sumBy } from 'es-toolkit/compat';
+import { clamp, orderBy, sumBy } from 'es-toolkit/compat';
 
 export const TRADESKILL_MAX_LEVEL = 50;
 const MAX_CRAFTABLE_CAP = 99;
@@ -226,21 +226,16 @@ export function craftMaxCraftableQuantity(
     isConsumedRequirement,
   );
 
+  const resourcesConsumed = sumBy(consumedRequirements, (requirement) =>
+    Math.floor(
+      requirementAvailable(requirement) / requirementNeeded(requirement),
+    ),
+  );
+
   const resourceLimit =
     consumedRequirements.length === 0
       ? MAX_CRAFTABLE_CAP
-      : Math.max(
-          0,
-          Math.min(
-            MAX_CRAFTABLE_CAP,
-            ...consumedRequirements.map((requirement) =>
-              Math.floor(
-                requirementAvailable(requirement) /
-                  requirementNeeded(requirement),
-              ),
-            ),
-          ),
-        );
+      : clamp(resourcesConsumed, 0, MAX_CRAFTABLE_CAP);
   const safeResourceLimit = Number.isFinite(resourceLimit) ? resourceLimit : 0;
 
   if (isUniqueCollectibleResultBlocked(recipe, tradeskill)) return 0;
@@ -313,8 +308,9 @@ export function craftQueueStart(
     return false;
   }
 
-  const clampedQuantity = Math.min(
-    Math.max(1, Math.floor(quantity)),
+  const clampedQuantity = clamp(
+    1,
+    Math.floor(quantity),
     craftMaxCraftableQuantity(recipe, tradeskill),
   );
   if (clampedQuantity <= 0) return false;

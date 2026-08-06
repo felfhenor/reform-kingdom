@@ -1,4 +1,5 @@
 import type { WorldNodeInteractionKind } from '@interfaces';
+import { clamp } from 'es-toolkit/compat';
 import type { Texture } from 'pixi.js';
 import { AnimatedSprite, Container, Graphics, Text } from 'pixi.js';
 
@@ -34,7 +35,7 @@ export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
     if (alpha <= 0.4) direction = 1;
     if (alpha >= 0.8) direction = -1;
 
-    alpha = Math.max(0.4, Math.min(0.8, alpha));
+    alpha = clamp(alpha, 0.4, 0.8);
     graphics.alpha = alpha;
   };
 
@@ -108,7 +109,7 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   container.addChild(background, fill);
 
   const update = (fraction: number) => {
-    fill.scale.x = Math.max(0, Math.min(1, fraction));
+    fill.scale.x = clamp(fraction, 0, 1);
   };
 
   return { container, update };
