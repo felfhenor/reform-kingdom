@@ -1,3 +1,6 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
 - id: 94e2b0f8-9c16-40d1-8c14-5253a3c53ab1
   name: Copper Spear
   description: A spear tipped with copper. It is not very powerful, but it is affordable.
@@ -7,3 +10,4 @@
   sprite: '0013'
   baseStats:
     Strength: 0.8
+    Agility: 0.3

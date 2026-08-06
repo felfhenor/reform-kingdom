@@ -32,6 +32,8 @@
     - Dagger
     - Sword
     - Shield
+    - Mace
+    - Staff
 
   skillPath:
     - pathName: Attack

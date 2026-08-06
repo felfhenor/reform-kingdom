@@ -34,6 +34,7 @@
     - Shield
     - Sword
     - Spear
+    - Mace
 
   skillPath:
     - pathName: Attack

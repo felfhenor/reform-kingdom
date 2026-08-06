@@ -14,6 +14,24 @@
   tradeskillXP: 1
   craftTime: 5
 
+- id: 551c54bf-37d0-4a6b-bb5d-a47190c54804
+  name: 'Equipment: Wergen Bow'
+  result:
+    equipmentId: Wergen Bow
+
+  requirements:
+    - itemId: Wergen Stick
+      quantity: 4
+
+    - itemId: Wergen Wood
+      quantity: 2
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 4
+  tradeskillXP: 5
+  craftTime: 30
+
 - id: 6436437a-3331-4915-a88d-009eda5baf95
   name: 'Equipment: Wooden Arrow'
   result:

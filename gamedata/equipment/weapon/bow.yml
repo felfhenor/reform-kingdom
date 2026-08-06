@@ -1,0 +1,13 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 57940423-fe65-4bdc-86a1-1608d9f49f4d
+  name: Wergen Bow
+  description: A simple bow made of wergen wood.
+  levelRequirement: 1
+  rarity: Common
+  type: Bow
+  sprite: '0021'
+  baseStats:
+    Strength: 1.5
+    Agility: 0.8

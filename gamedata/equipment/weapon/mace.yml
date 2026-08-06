@@ -1,0 +1,13 @@
+# Primary Stat: Strength
+# Secondary Stat: Intelligence
+
+- id: 2db40cd8-0c8a-4b6e-9e4f-dd9148e9c461
+  name: Copper Mace
+  description: A magical mace made of copper and wergen wood.
+  levelRequirement: 1
+  rarity: Common
+  type: Mace
+  sprite: '0019'
+  baseStats:
+    Strength: 0.8
+    Intelligence: 0.5

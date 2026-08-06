@@ -1,3 +1,6 @@
+# Primary Stat: Strength
+# Secondary Stat: Vitality
+
 - id: bc27523a-2ccc-4552-b77b-ebc917d76a0f
   name: Copper Sword
   description: A sword made of copper. It is not very powerful, but it is affordable.
@@ -7,3 +10,4 @@
   sprite: '0005'
   baseStats:
     Strength: 0.8
+    Vitality: 0.3

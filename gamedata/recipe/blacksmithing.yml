@@ -79,6 +79,24 @@
   tradeskillXP: 8
   craftTime: 20
 
+- id: 4e099da6-9f4b-4cab-b678-6bb1b2844638
+  name: 'Equipment: Copper Mace'
+  result:
+    equipmentId: Copper Mace
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 3
+
+    - itemId: Wergen Wood
+      quantity: 2
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 5
+  tradeskillXP: 10
+  craftTime: 30
+
 - id: f42a7755-461f-47ec-870c-af4d766e272c
   name: 'Collectible: Minor Blacksmithing Effigy'
   result:

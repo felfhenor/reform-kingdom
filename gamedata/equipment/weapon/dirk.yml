@@ -1,3 +1,6 @@
+# Primary Stat: Agility
+# Secondary Stat: Vitality
+
 - id: d40e1e92-8f01-417e-97f4-64009555c68d
   name: Copper Dirk
   description: A dirk made of copper. It is not very powerful, but it is affordable.
@@ -6,4 +9,6 @@
   type: Dirk
   sprite: '0012'
   baseStats:
-    Strength: 0.5
+    Agility: 0.5
+    Vitality: 0.4
+    Strength: 0.4

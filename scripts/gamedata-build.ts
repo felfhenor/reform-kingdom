@@ -20,7 +20,6 @@ const processFiles = async () => {
       const allFilesInSubfolder = await rec(`gamedata/${folder}`);
 
       allFilesInSubfolder.forEach((file: string) => {
-        console.log(file);
         try {
           const doc = yaml.load(fs.readFileSync(file));
 

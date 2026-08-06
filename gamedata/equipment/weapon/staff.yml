@@ -1,0 +1,13 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Vitality
+
+- id: 8830ffe2-2ac5-4138-8814-a55b8ff16a3c
+  name: Wergen Staff
+  description: A magical staff made of wergen wood.
+  levelRequirement: 1
+  rarity: Common
+  type: Staff
+  sprite: '0018'
+  baseStats:
+    Intelligence: 1.5
+    Vitality: 0.6

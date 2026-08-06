@@ -1,3 +1,45 @@
+- id: 12b22ccb-844f-40ea-a5cf-e5d0c104d1a8
+  name: 'Equipment: Wergen Staff'
+  result:
+    equipmentId: Wergen Staff
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 2
+
+    - itemId: Wergen Wood
+      quantity: 3
+
+    - itemId: Malachite
+      quantity: 1
+
+  tradeskill: Artificing
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 4
+  tradeskillXP: 5
+  craftTime: 20
+
+- id: 7192e104-0ae9-4f5b-904e-7f6ea9ff7aaa
+  name: 'Equipment: Copper Whip'
+  result:
+    equipmentId: Copper Whip
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Wergen Wood
+      quantity: 1
+
+    - itemId: Malachite
+      quantity: 1
+
+  tradeskill: Artificing
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 4
+  tradeskillXP: 5
+  craftTime: 20
+
 - id: f263a82e-f55b-4127-b8bd-7edec524d66d
   name: 'Equipment: Copper Gear'
   result:
@@ -13,7 +55,7 @@
   tradeskill: Artificing
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
-  tradeskillXP: 5
+  tradeskillXP: 8
   craftTime: 10
 
 - id: 7f0b6be1-138b-415f-91be-3041e423de8d

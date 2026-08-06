@@ -32,6 +32,8 @@
     - Ring
     - Dagger
     - Spear
+    - Whip
+    - Staff
 
   skillPath:
     - pathName: Attack

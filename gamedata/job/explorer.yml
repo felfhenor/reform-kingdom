@@ -32,6 +32,7 @@
     - Ring
     - Dagger
     - Dirk
+    - Whip
 
   skillPath:
     - pathName: Attack
