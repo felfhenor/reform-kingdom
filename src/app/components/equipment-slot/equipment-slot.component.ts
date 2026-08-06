@@ -1,10 +1,24 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { ContentNameComponent } from '@components/content-name/content-name.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
-import { IconStatComponent, STAT_SHORTHAND } from '@components/icon-stat/icon-stat.component';
+import {
+  IconStatComponent,
+  STAT_SHORTHAND,
+} from '@components/icon-stat/icon-stat.component';
 import { defaultStats, getEntry } from '@helpers';
-import type { BaseStat, EquipmentContent, EquipmentId, EquipmentSlot } from '@interfaces';
+import {
+  EquipmentTypeToSlot,
+  type BaseStat,
+  type EquipmentContent,
+  type EquipmentId,
+  type EquipmentSlot,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
@@ -13,7 +27,6 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
-    ContentNameComponent,
     IconBlankSlotComponent,
     IconStatComponent,
     StatDisplayPipe,
@@ -32,16 +45,24 @@ export class EquipmentSlotComponent {
   public statKeys = Object.keys(defaultStats()) as BaseStat[];
   public statShorthand = STAT_SHORTHAND;
 
-  public equippedContent = computed<EquipmentContent | undefined>(() => {
+  public equippedContent = computed(() => {
     const id = this.equippedId();
-    return id ? getEntry<EquipmentContent>(id) : undefined;
+    if (!id) return undefined;
+
+    const entry = getEntry<EquipmentContent>(id);
+    return entry
+      ? {
+          ...entry,
+          slots: EquipmentTypeToSlot[entry.type],
+        }
+      : undefined;
   });
 
   public isSecondarySlot = computed<boolean>(() => {
     const content = this.equippedContent();
-    if (!content || content.slots.length <= 1) return false;
+    if (!content || EquipmentTypeToSlot[content.type].length <= 1) return false;
 
-    return content.slots[0] !== this.slot();
+    return EquipmentTypeToSlot[content.type][0] !== this.slot();
   });
 
   public statValue(stat: BaseStat): number {

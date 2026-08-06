@@ -3,8 +3,7 @@
   description: A fearsome skull from a goblin warrior.
   levelRequirement: 3
   rarity: Uncommon
-  slots: [Artifact]
-  requiredJobIds: [Magician]
+  type: Artifact
   sprite: '0014'
   baseStats:
     Intelligence: 2.3

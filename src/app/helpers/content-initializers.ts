@@ -140,11 +140,10 @@ function ensureEquipment(
     __type: 'equipment',
     levelRequirement: equipment.levelRequirement ?? 1,
     rarity: equipment.rarity ?? 'Common',
-    slots: equipment.slots ?? [],
     description: equipment.description ?? 'UNKNOWN',
     baseStats: ensureStats(equipment.baseStats),
     sprite: equipment.sprite ?? 'UNKNOWN',
-    requiredJobIds: equipment.requiredJobIds ?? [],
+    type: equipment.type ?? 'Accessory',
   };
 }
 
@@ -158,6 +157,7 @@ function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     statsPerLevel: ensureStats(job.statsPerLevel),
     sprite: job.sprite ?? 'UNKNOWN',
     frames: job.frames ?? 4,
+    equippableTypes: job.equippableTypes ?? [],
   };
 }
 

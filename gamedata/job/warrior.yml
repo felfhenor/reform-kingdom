@@ -24,6 +24,17 @@
     Resistance: 0.1
     Agility: 0.3
 
+  equippableTypes:
+    - Cloth Armor
+    - Accessory
+    - Hat
+    - Ring
+    - Dagger
+    - Dirk
+    - Shield
+    - Sword
+    - Spear
+
   skillPath:
     - pathName: Attack
       levels:

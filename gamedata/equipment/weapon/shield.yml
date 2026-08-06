@@ -1,0 +1,10 @@
+- id: f9047d17-6d05-4ff2-b4da-188f91e83450
+  name: Copper Shield
+  description: A shield made of copper. It won't put up much of a fight.
+  levelRequirement: 2
+  rarity: Common
+  type: Shield
+  sprite: '0011'
+  baseStats:
+    Vitality: 0.3
+    Agility: 0.1

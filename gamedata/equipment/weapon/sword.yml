@@ -1,0 +1,9 @@
+- id: bc27523a-2ccc-4552-b77b-ebc917d76a0f
+  name: Copper Sword
+  description: A sword made of copper. It is not very powerful, but it is affordable.
+  levelRequirement: 2
+  rarity: Common
+  type: Sword
+  sprite: '0005'
+  baseStats:
+    Strength: 0.8

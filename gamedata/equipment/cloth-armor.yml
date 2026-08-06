@@ -3,7 +3,7 @@
   description: A cloak that is worn by beginning adventurers.
   levelRequirement: 1
   rarity: Common
-  slots: [Armor]
+  type: Cloth Armor
   sprite: '0000'
   baseStats:
     Resistance: 0.2
@@ -14,7 +14,7 @@
   description: A simple shirt made of linen. It is not very protective, but it is light and comfortable.
   levelRequirement: 2
   rarity: Common
-  slots: [Armor]
+  type: Cloth Armor
   sprite: '0000'
   baseStats:
     Resistance: 0.1
@@ -26,7 +26,7 @@
   description: A cloak made of leather and bone.
   levelRequirement: 4
   rarity: Uncommon
-  slots: [Armor]
+  type: Cloth Armor
   sprite: '0017'
   baseStats:
     Resistance: 1

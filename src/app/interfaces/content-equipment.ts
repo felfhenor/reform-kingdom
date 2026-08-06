@@ -1,7 +1,6 @@
 import type { HasSprite } from '@interfaces/artable';
-import type { JobId } from '@interfaces/content-job';
 import type { HasRarity } from '@interfaces/droppable';
-import type { EquipmentSlot } from '@interfaces/equipment';
+import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
@@ -15,7 +14,5 @@ export type EquipmentContent = IsContentItem &
     id: EquipmentId;
     levelRequirement: number;
     baseStats: StatBlock;
-
-    slots: EquipmentSlot[];
-    requiredJobIds: JobId[];
+    type: EquipmentItemType;
   };

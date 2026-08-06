@@ -24,6 +24,14 @@
     Resistance: 0.6
     Agility: 0.8
 
+  equippableTypes:
+    - Cloth Armor
+    - Accessory
+    - Ammo
+    - Hat
+    - Ring
+    - Dagger
+
   skillPath:
     - pathName: Attack
       levels:

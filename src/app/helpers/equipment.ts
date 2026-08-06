@@ -2,16 +2,17 @@ import { armoryGet } from '@helpers/armory';
 import { currentCombat } from '@helpers/combat';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { defaultStats } from '@helpers/defaults';
-import type {
-  Character,
-  EquipmentBlock,
-  EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  EquipmentSlot,
-  JobContent,
-  JobId,
-  StatBlock,
+import {
+  EquipmentTypeToSlot,
+  type Character,
+  type EquipmentBlock,
+  type EquipmentContent,
+  type EquipmentId,
+  type EquipmentItem,
+  type EquipmentSlot,
+  type JobContent,
+  type JobId,
+  type StatBlock,
 } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
@@ -70,10 +71,10 @@ export function canEquipItem(
 ): boolean {
   if (character.level < equipment.levelRequirement) return false;
 
-  return (
-    equipment.requiredJobIds.length === 0 ||
-    equipment.requiredJobIds.includes(character.jobId)
-  );
+  const job = getEntry<JobContent>(character.jobId);
+  if (!job) return false;
+
+  return job.equippableTypes.includes(equipment.type);
 }
 
 // Only equipment actually sitting in the armory can be picked - this is the
@@ -84,7 +85,8 @@ export function equipmentAvailableForSlot(
   const ownedIds = new Set(armoryGet().map((item) => item.equipmentId));
 
   const forSlot = getEntriesByType<EquipmentContent>('equipment').filter(
-    (item) => ownedIds.has(item.id) && item.slots.includes(slot),
+    (item) =>
+      ownedIds.has(item.id) && EquipmentTypeToSlot[item.type].includes(slot),
   );
 
   return orderBy(forSlot, ['levelRequirement'], ['desc']);

@@ -3,7 +3,7 @@
   description: A hat that is worn by beginning adventurers.
   levelRequirement: 1
   rarity: Common
-  slots: [Helmet]
+  type: Hat
   sprite: '0002'
   baseStats:
     Health: 5
@@ -14,7 +14,7 @@
   description: A hat crafted from linen. It is not very protective, but it is light and comfortable.
   levelRequirement: 2
   rarity: Common
-  slots: [Helmet]
+  type: Hat
   sprite: '0003'
   baseStats:
     Health: 7

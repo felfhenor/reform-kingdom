@@ -1,12 +1,18 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
 import {
   IconStatComponent,
   STAT_SHORTHAND,
 } from '@components/icon-stat/icon-stat.component';
-import { defaultStats } from '@helpers';
-import type { BaseStat, EquipmentContent } from '@interfaces';
+import { defaultStats, getEntry, partyGet } from '@helpers';
+import type { JobContent } from '@interfaces';
+import { type BaseStat, type EquipmentContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
@@ -25,6 +31,16 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 })
 export class ArmoryItemSlotComponent {
   public equipment = input.required<EquipmentContent>();
+
+  public equippableHeroes = computed(() =>
+    partyGet()
+      .filter((p) =>
+        getEntry<JobContent>(p.jobId)!.equippableTypes.includes(
+          this.equipment().type,
+        ),
+      )
+      .map((h) => h.name),
+  );
 
   public statKeys = Object.keys(defaultStats()) as BaseStat[];
   public statShorthand = STAT_SHORTHAND;

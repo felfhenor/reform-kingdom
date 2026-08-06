@@ -10,18 +10,19 @@ import {
 } from '@helpers/equipment';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type {
-  Character,
-  CharacterId,
-  Combatant,
-  EquipmentBlock,
-  EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  EquipmentSlot,
-  JobContent,
-  JobId,
-  StatBlock,
+import {
+  EquipmentTypeToSlot,
+  type Character,
+  type CharacterId,
+  type Combatant,
+  type EquipmentBlock,
+  type EquipmentContent,
+  type EquipmentId,
+  type EquipmentItem,
+  type EquipmentSlot,
+  type JobContent,
+  type JobId,
+  type StatBlock,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -111,7 +112,11 @@ export function setParty(party: Character[]): void {
 function characterJobProgressSwap(
   character: Character,
   jobId: JobId,
-): { jobProgress: Character['jobProgress']; level: number; xp: Character['xp'] } {
+): {
+  jobProgress: Character['jobProgress'];
+  level: number;
+  xp: Character['xp'];
+} {
   const jobProgress: Character['jobProgress'] = {
     ...character.jobProgress,
     [character.jobId]: { level: character.level, xp: character.xp },
@@ -121,7 +126,10 @@ function characterJobProgressSwap(
   delete jobProgress[jobId];
 
   const level = savedProgress?.level ?? 1;
-  const xp = savedProgress?.xp ?? { current: 0, maximum: characterXpForLevel(level) };
+  const xp = savedProgress?.xp ?? {
+    current: 0,
+    maximum: characterXpForLevel(level),
+  };
 
   return { jobProgress, level, xp };
 }
@@ -246,7 +254,7 @@ export function characterEquipFromArmory(
   );
   if (!isInArmory) return false;
 
-  const targetSlots = equipmentContent.slots;
+  const targetSlots = EquipmentTypeToSlot[equipmentContent.type];
 
   const displacedIds = new Set<EquipmentId>();
   targetSlots.forEach((slot) => {

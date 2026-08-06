@@ -26,6 +26,15 @@
 
       <div class="text-xs mb-2">Lv. {{ item.levelRequirement }}</div>
 
+      <div class="text-xs mb-2">
+        @let equippable = equippableHeroes();
+        @if (equippable.length > 0) {
+          Equippable by: {{ equippableHeroes().join(', ') }}
+        } @else {
+          <span class="text-warning">None of your heroes can equip this.</span>
+        }
+      </div>
+
       <div class="flex flex-col gap-1 text-xs mb-2">
         @for (stat of statKeys; track stat) {
           @let value = statValue(stat);

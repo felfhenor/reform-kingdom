@@ -1,8 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { ContentNameComponent } from '@components/content-name/content-name.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
-import { IconStatComponent, STAT_SHORTHAND } from '@components/icon-stat/icon-stat.component';
+import {
+  IconStatComponent,
+  STAT_SHORTHAND,
+} from '@components/icon-stat/icon-stat.component';
 import { defaultStats } from '@helpers';
 import type { BaseStat, EquipmentContent, StatBlock } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -13,7 +21,6 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
-    ContentNameComponent,
     IconBlankSlotComponent,
     IconStatComponent,
     StatDisplayPipe,

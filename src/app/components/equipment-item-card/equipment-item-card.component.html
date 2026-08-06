@@ -45,15 +45,6 @@
     </div>
     <div class="text-sm mb-2">Lv. {{ content.levelRequirement }}</div>
 
-    @if (content.requiredJobIds.length > 0) {
-      <div class="text-sm mb-2 flex items-center gap-1">
-        Requires:
-        @for (jobId of content.requiredJobIds; track jobId) {
-          <app-content-name [id]="jobId" />
-        }
-      </div>
-    }
-
     <div class="flex flex-col gap-1">
       @for (stat of tooltipStatKeys(); track stat) {
         @let value = statValue(stat);
