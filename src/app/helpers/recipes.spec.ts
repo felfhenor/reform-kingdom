@@ -50,8 +50,7 @@ const boneHewnCloak: EquipmentContent = {
   rarity: 'Uncommon',
   levelRequirement: 4,
   baseStats: {} as never,
-  slots: ['Armor'],
-  requiredJobIds: [],
+  type: 'Cloth Armor',
 };
 
 const itemRecipe: RecipeContent = {

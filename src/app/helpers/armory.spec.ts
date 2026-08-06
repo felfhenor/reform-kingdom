@@ -32,8 +32,7 @@ const sword: EquipmentContent = {
   rarity: 'Common',
   levelRequirement: 1,
   baseStats: defaultStats(),
-  slots: ['Weapon'],
-  requiredJobIds: [],
+  type: 'Sword',
 };
 
 const shield: EquipmentContent = {
@@ -42,7 +41,7 @@ const shield: EquipmentContent = {
   name: 'Shield',
   description: 'A sturdy protective shield.',
   rarity: 'Rare',
-  slots: ['Offhand'],
+  type: 'Shield',
 };
 
 describe('Armory Helper Functions', () => {

@@ -55,7 +55,7 @@ describe('Equipment Helper Functions', () => {
       Resistance: 0,
       Agility: 1,
     },
-    slots: ['Weapon'],
+    type: 'Sword',
   };
 
   const helmet: EquipmentContent = {
@@ -72,7 +72,7 @@ describe('Equipment Helper Functions', () => {
       Resistance: 1,
       Agility: 0,
     },
-    slots: ['Helmet'],
+    type: 'Hat',
   };
 
   const spear: EquipmentContent = {
@@ -89,7 +89,7 @@ describe('Equipment Helper Functions', () => {
       Resistance: 0,
       Agility: 0,
     },
-    slots: ['Weapon', 'Offhand'],
+    type: 'Spear',
   };
 
   const emptyEquipment: EquipmentBlock = {
@@ -260,27 +260,40 @@ describe('Equipment Helper Functions', () => {
     } as Character;
 
     it('allows equipping when level and job requirements are met', () => {
-      const item = { ...sword, levelRequirement: 5, requiredJobIds: ['ranger' as JobId] };
+      vi.mocked(getEntry).mockReturnValue({
+        equippableTypes: ['Sword'],
+      } as JobContent);
+      const item = { ...sword, levelRequirement: 5 };
       expect(canEquipItem(character, item)).toBe(true);
     });
 
-    it('allows equipping when there is no job requirement at all', () => {
-      const item = { ...sword, levelRequirement: 5, requiredJobIds: [] };
-      expect(canEquipItem(character, item)).toBe(true);
+    it('blocks equipping when the job cannot be found', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+      const item = { ...sword, levelRequirement: 5 };
+      expect(canEquipItem(character, item)).toBe(false);
     });
 
     it('blocks equipping when the hero is under-level', () => {
-      const item = { ...sword, levelRequirement: 6, requiredJobIds: [] };
+      vi.mocked(getEntry).mockReturnValue({
+        equippableTypes: ['Sword'],
+      } as JobContent);
+      const item = { ...sword, levelRequirement: 6 };
       expect(canEquipItem(character, item)).toBe(false);
     });
 
     it('blocks equipping when the hero is the wrong job', () => {
-      const item = { ...sword, levelRequirement: 5, requiredJobIds: ['magician' as JobId] };
+      vi.mocked(getEntry).mockReturnValue({
+        equippableTypes: ['Hat'],
+      } as JobContent);
+      const item = { ...sword, levelRequirement: 5 };
       expect(canEquipItem(character, item)).toBe(false);
     });
 
     it('blocks equipping when both level and job requirements fail', () => {
-      const item = { ...sword, levelRequirement: 99, requiredJobIds: ['magician' as JobId] };
+      vi.mocked(getEntry).mockReturnValue({
+        equippableTypes: ['Hat'],
+      } as JobContent);
+      const item = { ...sword, levelRequirement: 99 };
       expect(canEquipItem(character, item)).toBe(false);
     });
   });

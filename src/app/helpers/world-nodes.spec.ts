@@ -329,9 +329,8 @@ describe('encounter-backed node accessors', () => {
         sprite: '0000',
         rarity: 'Common',
         levelRequirement: 1,
-        slots: ['Artifact'],
+        type: 'Artifact',
         baseStats: {} as never,
-        requiredJobIds: [],
       };
 
       const encounter = buildEncounter({

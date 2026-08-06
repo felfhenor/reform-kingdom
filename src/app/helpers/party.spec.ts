@@ -76,6 +76,7 @@ describe('Party Helper Functions', () => {
       Resistance: 0.4,
       Agility: 0.7,
     },
+    equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
   };
 
   const mockCloak: EquipmentContent = {
@@ -88,8 +89,7 @@ describe('Party Helper Functions', () => {
     levelRequirement: 1,
     baseStats: { ...defaultStats(), Agility: 0.2, Resistance: 0.2 },
     statsPerLevel: defaultStats(),
-    slots: ['Armor'],
-    requiredJobIds: [],
+    type: 'Cloth Armor',
   };
 
   const mockHelmet: EquipmentContent = {
@@ -97,7 +97,7 @@ describe('Party Helper Functions', () => {
     id: 'equip-helmet' as EquipmentId,
     name: 'Helmet',
     baseStats: { ...defaultStats(), Vitality: 3 },
-    slots: ['Helmet'],
+    type: 'Hat',
   };
 
   // Mocks getEntry() so it resolves the starter cloak plus any content items
@@ -415,7 +415,7 @@ describe('Party Helper Functions', () => {
         rarity: 'Common',
         levelRequirement: 1,
         baseStats: { ...defaultStats(), Strength: 5 },
-        slots: ['Weapon'],
+        type: 'Sword',
       };
 
       mockGetEntry(mockJob, sword);
@@ -543,7 +543,7 @@ describe('Party Helper Functions', () => {
       ...mockCloak,
       id: 'equip-spear' as EquipmentId,
       name: 'Copper Spear',
-      slots: ['Weapon', 'Offhand'],
+      type: 'Spear',
     };
 
     it('equips an armory item into its slot and removes it from the armory', () => {
@@ -688,7 +688,7 @@ describe('Party Helper Functions', () => {
         ...mockCloak,
         id: 'equip-shield' as EquipmentId,
         name: 'Shield',
-        slots: ['Offhand'],
+        type: 'Shield',
       };
       mockGetEntry(mockJob, mockCloak, mockSpear, mockOffhandItem);
       const jala = createCharacterStub('Jala');
