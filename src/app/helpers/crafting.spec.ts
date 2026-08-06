@@ -184,17 +184,17 @@ describe('craftXpChance / craftXpChanceTier', () => {
   const recipe = buildRecipe({ minTradeskillLevel: 0, maxTradeskillLevel: 20 });
 
   it('is guaranteed in the first half of the recipe range', () => {
-    expect(craftXpChance(recipe, 5)).toBe(1);
+    expect(craftXpChance(recipe, 5)).toBe(100);
     expect(craftXpChanceTier(recipe, 5)).toBe('Guaranteed');
   });
 
   it('is a coin flip from 50% through 75% of the range', () => {
-    expect(craftXpChance(recipe, 12)).toBe(0.5);
+    expect(craftXpChance(recipe, 12)).toBe(50);
     expect(craftXpChanceTier(recipe, 12)).toBe('Likely');
   });
 
   it('is a long shot in the last 25% of the range', () => {
-    expect(craftXpChance(recipe, 18)).toBe(0.25);
+    expect(craftXpChance(recipe, 18)).toBe(25);
     expect(craftXpChanceTier(recipe, 18)).toBe('Possible');
   });
 
