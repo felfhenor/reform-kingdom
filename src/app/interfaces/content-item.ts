@@ -10,4 +10,6 @@ export type ItemContent = IsContentItem &
   HasSprite &
   HasRarity & {
     id: ItemId;
+
+    unobtainable?: boolean;
   };

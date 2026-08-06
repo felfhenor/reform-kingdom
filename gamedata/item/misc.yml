@@ -4,3 +4,5 @@
   rarity: Common
 
   sprite: '0010'
+
+  unobtainable: true

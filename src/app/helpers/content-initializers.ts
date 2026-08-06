@@ -65,6 +65,7 @@ function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     rarity: item.rarity ?? 'Common',
     description: item.description ?? 'UNKNOWN',
     sprite: item.sprite ?? 'UNKNOWN',
+    unobtainable: item.unobtainable ?? false,
   };
 }
 

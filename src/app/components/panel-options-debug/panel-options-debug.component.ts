@@ -27,15 +27,23 @@ import { sortBy } from 'es-toolkit/compat';
 })
 export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public debugItems = computed(() =>
-    sortBy(getEntriesByType<ItemContent>('item'), (item) => item.name),
+    sortBy(getEntriesByType<ItemContent>('item'), (item) => item.name).filter(
+      (item) => !item.unobtainable,
+    ),
   );
 
   public debugEquipment = computed(() =>
-    sortBy(getEntriesByType<EquipmentContent>('equipment'), (item) => item.name),
+    sortBy(
+      getEntriesByType<EquipmentContent>('equipment'),
+      (item) => item.name,
+    ),
   );
 
   public debugCollectibles = computed(() =>
-    sortBy(getEntriesByType<CollectibleContent>('collectible'), (item) => item.name),
+    sortBy(
+      getEntriesByType<CollectibleContent>('collectible'),
+      (item) => item.name,
+    ),
   );
 
   public selectedItemId = signal<ItemId | undefined>(undefined);

@@ -24,15 +24,22 @@ export function debugGiveItem(itemId: ItemId, quantity: number): void {
     return;
   }
 
+  if (material.unobtainable) {
+    console.warn(`Item with ID ${itemId} not obtainable.`);
+    return;
+  }
+
   addMaterial(material.id, quantity);
 }
 
 export function debugGiveAllItems(quantity = 1): void {
   if (quantity <= 0) return;
 
-  getEntriesByType<ItemContent>('item').forEach((item) => {
-    addMaterial(item.id, quantity);
-  });
+  getEntriesByType<ItemContent>('item')
+    .filter((item) => !item.unobtainable)
+    .forEach((item) => {
+      addMaterial(item.id, quantity);
+    });
 }
 
 export function debugGiveEquipment(
