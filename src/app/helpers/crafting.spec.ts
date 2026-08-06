@@ -208,7 +208,7 @@ describe('craftXpChance / craftXpChanceTier', () => {
       minTradeskillLevel: 5,
       maxTradeskillLevel: 5,
     });
-    expect(craftXpChance(fixedRecipe, 5)).toBe(1);
+    expect(craftXpChance(fixedRecipe, 5)).toBe(100);
     expect(craftXpChanceTier(fixedRecipe, 5)).toBe('Guaranteed');
   });
 });

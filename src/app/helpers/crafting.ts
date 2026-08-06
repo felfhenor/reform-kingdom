@@ -226,11 +226,14 @@ export function craftMaxCraftableQuantity(
     isConsumedRequirement,
   );
 
-  const resourcesConsumed = sumBy(consumedRequirements, (requirement) =>
-    Math.floor(
-      requirementAvailable(requirement) / requirementNeeded(requirement),
-    ),
-  );
+  const resourcesConsumed =
+    Math.min(
+      ...consumedRequirements.map((requirement) =>
+        Math.floor(
+          requirementAvailable(requirement) / requirementNeeded(requirement),
+        ),
+      ),
+    ) ?? 0;
 
   const resourceLimit =
     consumedRequirements.length === 0
@@ -309,8 +312,8 @@ export function craftQueueStart(
   }
 
   const clampedQuantity = clamp(
-    1,
     Math.floor(quantity),
+    1,
     craftMaxCraftableQuantity(recipe, tradeskill),
   );
   if (clampedQuantity <= 0) return false;
