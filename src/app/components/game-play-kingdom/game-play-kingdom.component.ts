@@ -3,6 +3,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { PlayKingdomAchievementsComponent } from '@components/play-kingdom-achievements/play-kingdom-achievements.component';
 import { PlayKingdomArmoryComponent } from '@components/play-kingdom-armory/play-kingdom-armory.component';
 import { PlayKingdomAstralProjectorComponent } from '@components/play-kingdom-astralprojector/play-kingdom-astralprojector.component';
+import { PlayKingdomInfusionComponent } from '@components/play-kingdom-infusion/play-kingdom-infusion.component';
 import { PlayKingdomMuseumComponent } from '@components/play-kingdom-museum/play-kingdom-museum.component';
 import { PlayKingdomPrestigeComponent } from '@components/play-kingdom-prestige/play-kingdom-prestige.component';
 import { PlayKingdomReclassModalComponent } from '@components/play-kingdom-reclass-modal/play-kingdom-reclass-modal.component';
@@ -51,6 +52,7 @@ interface TradeskillButton {
     PlayKingdomMuseumComponent,
     PlayKingdomArmoryComponent,
     PlayKingdomAstralProjectorComponent,
+    PlayKingdomInfusionComponent,
     PlayKingdomTradeskillArtificingComponent,
     PlayKingdomTradeskillBlacksmithingComponent,
     PlayKingdomTradeskillJewelcraftingComponent,

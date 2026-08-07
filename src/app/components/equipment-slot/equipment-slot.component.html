@@ -2,7 +2,7 @@
 
 <button
   type="button"
-  class="equipment-slot outline-2 outline-offset-[-2px] rounded {{
+  class="equipment-slot outline-2 rounded {{
     content ? 'outline-' + content.rarity : 'outline-gray-500'
   }}"
   [class.equipment-slot-selected]="isSelected()"
@@ -44,26 +44,25 @@
           Lv. {{ content.levelRequirement }} {{ slot() }}
         </div>
 
-        @if (content.slots.length > 1) {
+        @if (occupiedPaperdollSlots().length > 1) {
           <div class="text-xs mb-1 italic opacity-70">
-            Occupies: {{ content.slots.join(' + ') }}
+            Occupies: {{ occupiedPaperdollSlots().join(' + ') }}
           </div>
         }
 
-        <div class="flex flex-col gap-1 text-xs">
-          @for (stat of statKeys; track stat) {
-            @let value = statValue(stat);
-            @if (value !== 0) {
-              <div class="flex items-center gap-2">
-                <app-icon-stat [stat]="stat" />
-                <span class="inline-block min-w-[30px]">
-                  {{ statShorthand[stat] }}
-                </span>
-                <span>{{ value | statDisplay: 2 }}</span>
-              </div>
-            }
-          }
-        </div>
+        <app-item-stat-rows
+          [stats]="content.baseStats"
+          [bonusStats]="infusionBonus()"
+        />
+
+        @if (content.slots > 0) {
+          <div class="mt-2">
+            <app-infused-materials-row
+              [infusedItemIds]="equippedItem()!.infusedItemIds"
+              [maxSlots]="content.slots"
+            />
+          </div>
+        }
       </div>
     </div>
   } @else {

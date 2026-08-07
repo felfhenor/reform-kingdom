@@ -1,5 +1,10 @@
 import { defaultStats } from '@helpers/defaults';
-import type { EquipmentContent, EquipmentId, GameState } from '@interfaces';
+import type {
+  EquipmentContent,
+  EquipmentId,
+  EquipmentItemId,
+  GameState,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content', () => ({
@@ -33,6 +38,7 @@ const sword: EquipmentContent = {
   levelRequirement: 1,
   baseStats: defaultStats(),
   type: 'Sword',
+  slots: 1,
 };
 
 const shield: EquipmentContent = {
@@ -70,11 +76,15 @@ describe('Armory Helper Functions', () => {
 
       expect(result.armory).toEqual([
         { equipmentId: 'shield' },
-        { equipmentId: 'sword' },
+        {
+          id: expect.any(String),
+          equipmentId: 'sword',
+          infusedItemIds: [],
+        },
       ]);
     });
 
-    it('appends multiple copies when given a quantity', () => {
+    it('appends multiple copies when given a quantity, each its own instance', () => {
       armoryAdd('sword' as EquipmentId, 3);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
@@ -83,11 +93,17 @@ describe('Armory Helper Functions', () => {
         discoveredEquipment: {},
       } as unknown as GameState);
 
-      expect(result.armory).toEqual([
-        { equipmentId: 'sword' },
-        { equipmentId: 'sword' },
-        { equipmentId: 'sword' },
-      ]);
+      expect(result.armory).toHaveLength(3);
+      result.armory.forEach((item) => {
+        expect(item).toEqual({
+          id: expect.any(String),
+          equipmentId: 'sword',
+          infusedItemIds: [],
+        });
+      });
+
+      const ids = new Set(result.armory.map((item) => item.id));
+      expect(ids.size).toBe(3);
     });
 
     it('does nothing for a zero or negative quantity', () => {
@@ -203,23 +219,27 @@ describe('Armory Helper Functions', () => {
 
   describe('getArmoryEntries', () => {
     it('returns one entry per owned item, without merging duplicates, sorted by rarity then name', () => {
+      const swordItem1 = { id: 'sword-1' as EquipmentItemId, equipmentId: sword.id, infusedItemIds: [] };
+      const shieldItem = { id: 'shield-1' as EquipmentItemId, equipmentId: shield.id, infusedItemIds: [] };
+      const swordItem2 = { id: 'sword-2' as EquipmentItemId, equipmentId: sword.id, infusedItemIds: [] };
+
       vi.mocked(gamestate).mockReturnValue({
-        armory: [
-          { equipmentId: sword.id },
-          { equipmentId: shield.id },
-          { equipmentId: sword.id },
-        ],
+        armory: [swordItem1, shieldItem, swordItem2],
       } as unknown as GameState);
       vi.mocked(getEntry).mockImplementation((id) =>
         (id === sword.id ? sword : shield) as never,
       );
 
-      expect(getArmoryEntries()).toEqual([shield, sword, sword]);
+      expect(getArmoryEntries()).toEqual([
+        { item: shieldItem, content: shield },
+        { item: swordItem1, content: sword },
+        { item: swordItem2, content: sword },
+      ]);
     });
 
     it('excludes entries with no matching content entry', () => {
       vi.mocked(gamestate).mockReturnValue({
-        armory: [{ equipmentId: sword.id }],
+        armory: [{ id: 'sword-1' as EquipmentItemId, equipmentId: sword.id, infusedItemIds: [] }],
       } as unknown as GameState);
       vi.mocked(getEntry).mockReturnValue(undefined);
 
@@ -236,18 +256,26 @@ describe('Armory Helper Functions', () => {
   });
 
   describe('filterArmoryEntries', () => {
-    const entries = [sword, shield];
+    const swordEntry = {
+      item: { id: 'sword-1' as EquipmentItemId, equipmentId: sword.id, infusedItemIds: [] },
+      content: sword,
+    };
+    const shieldEntry = {
+      item: { id: 'shield-1' as EquipmentItemId, equipmentId: shield.id, infusedItemIds: [] },
+      content: shield,
+    };
+    const entries = [swordEntry, shieldEntry];
 
     it('returns every entry when the search text is empty', () => {
       expect(filterArmoryEntries(entries, '   ')).toEqual(entries);
     });
 
     it('filters by equipment name, case-insensitively', () => {
-      expect(filterArmoryEntries(entries, 'SWORD')).toEqual([sword]);
+      expect(filterArmoryEntries(entries, 'SWORD')).toEqual([swordEntry]);
     });
 
     it('filters by equipment description', () => {
-      expect(filterArmoryEntries(entries, 'protective')).toEqual([shield]);
+      expect(filterArmoryEntries(entries, 'protective')).toEqual([shieldEntry]);
     });
 
     it('returns an empty array when nothing matches', () => {

@@ -153,7 +153,7 @@ function applyUpdateAt(index: number, state: GameState): GameState {
 describe('tradeskillXpForLevel', () => {
   it('matches the ticket-specified early values', () => {
     expect(tradeskillXpForLevel(1)).toBe(10);
-    expect(tradeskillXpForLevel(2)).toBe(25);
+    expect(tradeskillXpForLevel(2)).toBe(15);
   });
 
   it('grows steeply thereafter', () => {

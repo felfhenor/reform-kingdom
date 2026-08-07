@@ -8,6 +8,10 @@ import {
 } from '@helpers/collectibles';
 import { pruneInvalidCraftQueues } from '@helpers/crafting';
 import { defaultGameState } from '@helpers/defaults';
+import {
+  backfillEquipmentBlock,
+  backfillEquipmentItem,
+} from '@helpers/equipment';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
@@ -24,6 +28,12 @@ import { merge } from 'es-toolkit/compat';
 export function migrateGameState() {
   const state = gamestate();
   const newState = merge(defaultGameState(), state);
+
+  newState.armory = newState.armory.map(backfillEquipmentItem);
+  newState.world.party = newState.world.party.map((character) => ({
+    ...character,
+    equipment: backfillEquipmentBlock(character.equipment),
+  }));
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
   newState.materials = pruneInvalidMaterials(newState.materials);

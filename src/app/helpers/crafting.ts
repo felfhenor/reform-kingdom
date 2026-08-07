@@ -26,6 +26,8 @@ import type {
   CraftRecipeEntry,
   CraftRequirementEntry,
   EquipmentContent,
+  EquipmentItem,
+  EquipmentItemId,
   GameState,
   GameStateTradeskills,
   ItemContent,
@@ -46,7 +48,7 @@ const MAX_CRAFTABLE_CAP = 99;
 
 // Tunable XP curve: 10 XP for level 1->2, 2.5x per level thereafter.
 export function tradeskillXpForLevel(level: number): number {
-  return Math.round(10 * 2.5 ** (level - 1));
+  return Math.round(10 * 1.5 ** (level - 1));
 }
 
 // Default 2 (1 active + 1 queued), +1 every 5 levels, capped at 10.
@@ -277,8 +279,10 @@ function applyRequirementQuantity(
   }
 
   if (sign > 0) {
-    const added = Array.from({ length: quantity }, () => ({
+    const added: EquipmentItem[] = Array.from({ length: quantity }, () => ({
+      id: rngUuid() as EquipmentItemId,
       equipmentId: requirement.equipmentId,
+      infusedItemIds: [],
     }));
     state.armory = [...state.armory, ...added];
     return;

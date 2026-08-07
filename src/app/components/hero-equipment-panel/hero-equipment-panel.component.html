@@ -55,7 +55,7 @@
               @if (isSlotVisible(slot)) {
                 <app-equipment-slot
                   [slot]="slot"
-                  [equippedId]="equippedIdFor(slot)"
+                  [equippedItem]="equippedItemFor(slot)"
                   [isSelected]="selected === slot"
                   (slotClick)="selectSlot(slot)"
                   (contextmenu)="unequip(slot)"
@@ -87,11 +87,12 @@
             itemSize="72"
             class="equipment-item-list flex-1 min-h-0"
           >
-            <div *cdkVirtualFor="let item of items; trackBy: trackByItemId">
+            <div *cdkVirtualFor="let entry of items; trackBy: trackByItemId">
               <app-equipment-item-card
-                [equipment]="item"
+                [equipment]="entry.content"
+                [equipmentItem]="entry.item"
                 [comparisonStats]="selectedContent?.baseStats"
-                (equip)="equip(item.id)"
+                (equip)="equip(entry.item.id)"
               />
             </div>
           </cdk-virtual-scroll-viewport>

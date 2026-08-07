@@ -1,0 +1,31 @@
+<div
+  class="flex gap-1"
+  [class.flex-col]="layout() === 'column'"
+  [class.flex-row]="layout() === 'row'"
+  [class.flex-wrap]="layout() === 'row'"
+  [class.gap-x-3]="layout() === 'row'"
+>
+  @for (stat of baseRows(); track stat) {
+    @let value = rowValue(stat);
+
+    <div
+      class="flex items-center gap-2 text-xs"
+      [class.text-green-400]="hasComparison() && value > 0"
+      [class.text-rose-400]="hasComparison() && value < 0"
+    >
+      <app-icon-stat [stat]="stat" />
+      <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
+      <span>{{ value | statDisplay: maxDecimals() }}</span>
+    </div>
+  }
+
+  @for (stat of bonusRows(); track stat) {
+    <div class="flex items-center gap-2 text-xs text-green-400">
+      <app-icon-stat [stat]="stat" />
+      <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
+      <span>
+        {{ bonusValue(stat) | statDisplay: maxDecimals() }}
+      </span>
+    </div>
+  }
+</div>

@@ -5,7 +5,7 @@
   levelRequirement: 3
   type: Accessory
   sprite: '0009'
-  slots: 1
+  slots: 2
   baseStats:
     Luck: 0.3
 
@@ -16,7 +16,7 @@
   levelRequirement: 6
   type: Accessory
   sprite: '0037'
-  slots: 1
+  slots: 2
   baseStats:
     Resistance: 0.8
     Vitality: 0.3

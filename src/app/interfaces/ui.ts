@@ -5,6 +5,7 @@ export type KingdomSubview =
   | 'museum'
   | 'armory'
   | 'astralprojector'
+  | 'infusion'
   | 'tradeskill-artificing'
   | 'tradeskill-blacksmithing'
   | 'tradeskill-jewelcrafting'

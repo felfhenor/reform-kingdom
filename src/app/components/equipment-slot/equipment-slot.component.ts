@@ -7,20 +7,16 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
-import {
-  IconStatComponent,
-  STAT_SHORTHAND,
-} from '@components/icon-stat/icon-stat.component';
-import { defaultStats, getEntry } from '@helpers';
+import { InfusedMaterialsRowComponent } from '@components/infused-materials-row/infused-materials-row.component';
+import { ItemStatRowsComponent } from '@components/item-stat-rows/item-stat-rows.component';
+import { equipmentItemInfusionBonus, getEntry } from '@helpers';
 import {
   EquipmentTypeToSlot,
-  type BaseStat,
   type EquipmentContent,
-  type EquipmentId,
+  type EquipmentItem,
   type EquipmentSlot,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-equipment-slot',
@@ -28,8 +24,8 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
   imports: [
     AtlasImageComponent,
     IconBlankSlotComponent,
-    IconStatComponent,
-    StatDisplayPipe,
+    InfusedMaterialsRowComponent,
+    ItemStatRowsComponent,
     TippyDirective,
   ],
   templateUrl: './equipment-slot.component.html',
@@ -37,25 +33,28 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 })
 export class EquipmentSlotComponent {
   public slot = input.required<EquipmentSlot>();
-  public equippedId = input<EquipmentId>();
+  public equippedItem = input<EquipmentItem>();
   public isSelected = input<boolean>(false);
 
   public slotClick = output<void>();
 
-  public statKeys = Object.keys(defaultStats()) as BaseStat[];
-  public statShorthand = STAT_SHORTHAND;
-
   public equippedContent = computed(() => {
-    const id = this.equippedId();
-    if (!id) return undefined;
+    const equipmentId = this.equippedItem()?.equipmentId;
+    if (!equipmentId) return undefined;
 
-    const entry = getEntry<EquipmentContent>(id);
-    return entry
-      ? {
-          ...entry,
-          slots: EquipmentTypeToSlot[entry.type],
-        }
-      : undefined;
+    return getEntry<EquipmentContent>(equipmentId);
+  });
+
+  public infusionBonus = computed(() =>
+    equipmentItemInfusionBonus(this.equippedItem()?.infusedItemIds ?? []),
+  );
+
+  // The paperdoll slots this piece of gear occupies (e.g. a two-handed
+  // weapon occupies both Weapon + Offhand) - distinct from
+  // `EquipmentContent.slots`, which is the *infusion* slot count.
+  public occupiedPaperdollSlots = computed<EquipmentSlot[]>(() => {
+    const content = this.equippedContent();
+    return content ? EquipmentTypeToSlot[content.type] : [];
   });
 
   public isSecondarySlot = computed<boolean>(() => {
@@ -64,8 +63,4 @@ export class EquipmentSlotComponent {
 
     return EquipmentTypeToSlot[content.type][0] !== this.slot();
   });
-
-  public statValue(stat: BaseStat): number {
-    return this.equippedContent()?.baseStats[stat] ?? 0;
-  }
 }

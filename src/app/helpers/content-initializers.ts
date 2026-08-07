@@ -157,6 +157,7 @@ function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     rarity: item.rarity ?? 'Common',
     description: item.description ?? 'UNKNOWN',
     sprite: item.sprite ?? 'UNKNOWN',
+    infusionStats: ensureStats(item.infusionStats),
     unobtainable: item.unobtainable ?? false,
   };
 }
@@ -314,6 +315,10 @@ function ensureEquipment(
     baseStats: ensureStats(equipment.baseStats),
     sprite: equipment.sprite ?? 'UNKNOWN',
     type: equipment.type ?? 'Accessory',
+    // Defaults to 0, not 1 - infusion slots must always be explicitly
+    // opted into at the data level. This fallback only guards against
+    // malformed/legacy entries, it does not grant free slots.
+    slots: equipment.slots ?? 0,
     unobtainable: equipment.unobtainable ?? false,
   };
 }

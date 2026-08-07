@@ -22,6 +22,11 @@ vi.mock('@helpers/crafting', () => ({
   pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
 }));
 
+vi.mock('@helpers/equipment', () => ({
+  backfillEquipmentItem: vi.fn((item) => item),
+  backfillEquipmentBlock: vi.fn((equipment) => equipment),
+}));
+
 vi.mock('@helpers/materials', () => ({
   pruneInvalidMaterials: vi.fn((materials) => materials),
 }));

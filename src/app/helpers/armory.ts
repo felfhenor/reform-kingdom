@@ -1,9 +1,12 @@
 import { getEntry } from '@helpers/content';
+import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  EquipmentArmoryEntry,
   EquipmentContent,
   EquipmentId,
   EquipmentItem,
+  EquipmentItemId,
   GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
@@ -15,29 +18,37 @@ export function armoryGet(): EquipmentItem[] {
 
 // Resolves every owned armory item to its content, one entry per item -
 // duplicate equipment is never merged/counted, each physical item stays
-// its own entry, same as the underlying `armory` state list.
-export function getArmoryEntries(): EquipmentContent[] {
+// its own entry, same as the underlying `armory` state list. Carries the
+// instance alongside its content so callers can show per-instance
+// infusion state, not just the shared content.
+export function getArmoryEntries(): EquipmentArmoryEntry[] {
   const entries = armoryGet()
-    .map((item) => getEntry<EquipmentContent>(item.equipmentId))
-    .filter((entry): entry is EquipmentContent => !!entry);
+    .map((item) => {
+      const content = getEntry<EquipmentContent>(item.equipmentId);
+      return content ? { item, content } : undefined;
+    })
+    .filter((entry): entry is EquipmentArmoryEntry => !!entry);
 
   return orderBy(
     entries,
-    [(entry) => RARITY_PRIORITY[entry.rarity], (entry) => entry.name],
+    [
+      (entry) => RARITY_PRIORITY[entry.content.rarity],
+      (entry) => entry.content.name,
+    ],
     ['desc', 'asc'],
   );
 }
 
 export function filterArmoryEntries(
-  entries: EquipmentContent[],
+  entries: EquipmentArmoryEntry[],
   searchText: string,
-): EquipmentContent[] {
+): EquipmentArmoryEntry[] {
   const text = searchText.trim().toLowerCase();
   if (text === '') return entries;
 
   return entries.filter((entry) => {
-    if (entry.name.toLowerCase().includes(text)) return true;
-    if (entry.description.toLowerCase().includes(text)) return true;
+    if (entry.content.name.toLowerCase().includes(text)) return true;
+    if (entry.content.description.toLowerCase().includes(text)) return true;
 
     return false;
   });
@@ -57,7 +68,11 @@ export function armoryAdd(equipmentId: EquipmentId, quantity = 1): void {
   if (quantity <= 0) return;
 
   updateGamestate((state) => {
-    const newItems = Array.from({ length: quantity }, () => ({ equipmentId }));
+    const newItems: EquipmentItem[] = Array.from({ length: quantity }, () => ({
+      id: rngUuid() as EquipmentItemId,
+      equipmentId,
+      infusedItemIds: [],
+    }));
     state.armory = [...state.armory, ...newItems];
 
     const existing = state.discoveredEquipment[equipmentId];

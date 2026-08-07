@@ -1,5 +1,6 @@
 <div
-  class="h-[64px] w-[64px] bg-gray-400 flex justify-center items-center text-black text-xs"
+  class="h-[64px] w-[64px] flex justify-center items-center text-black text-xs"
+  [class.bg-gray-400]="showBackground()"
 >
   <ng-content></ng-content>
 </div>

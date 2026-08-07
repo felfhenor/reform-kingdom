@@ -15,6 +15,7 @@ export type EquipmentContent = IsContentItem &
     levelRequirement: number;
     baseStats: StatBlock;
     type: EquipmentItemType;
+    slots: number;
 
     unobtainable?: boolean;
   };

@@ -29,8 +29,10 @@ import {
 import type {
   BaseStat,
   Character,
+  EquipmentArmoryEntry,
   EquipmentContent,
-  EquipmentId,
+  EquipmentItem,
+  EquipmentItemId,
   EquipmentItemType,
   EquipmentSkillContent,
   EquipmentSlot,
@@ -81,14 +83,16 @@ export class HeroEquipmentPanelComponent {
   public selectedSlot = signal<EquipmentSlot | undefined>(undefined);
 
   // Only equippable-right-now gear shows up in the picker - ineligible items
-  // are filtered out entirely rather than shown disabled.
-  public pickerItems = computed<EquipmentContent[]>(() => {
+  // are filtered out entirely rather than shown disabled. Returns one entry
+  // per owned instance, not deduped by content id, so distinct physical
+  // copies (e.g. differently-infused swords) stay individually pickable.
+  public pickerItems = computed<EquipmentArmoryEntry[]>(() => {
     const slot = this.selectedSlot();
     if (!slot) return [];
 
     const character = this.character();
-    return equipmentAvailableForSlot(slot).filter((item) =>
-      canEquipItem(character, item),
+    return equipmentAvailableForSlot(slot).filter((entry) =>
+      canEquipItem(character, entry.content),
     );
   });
 
@@ -138,25 +142,28 @@ export class HeroEquipmentPanelComponent {
     return row.some((slot) => this.isSlotVisible(slot));
   }
 
-  public equippedIdFor(slot: EquipmentSlot): EquipmentId | undefined {
-    return this.character().equipment[slot]?.equipmentId;
+  public equippedItemFor(slot: EquipmentSlot): EquipmentItem | undefined {
+    return this.character().equipment[slot];
   }
 
   public equippedContentFor(slot: EquipmentSlot): EquipmentContent | undefined {
-    const equipmentId = this.equippedIdFor(slot);
+    const equipmentId = this.equippedItemFor(slot)?.equipmentId;
     return equipmentId ? getEntry<EquipmentContent>(equipmentId) : undefined;
   }
 
-  public trackByItemId(_index: number, item: EquipmentContent): EquipmentId {
-    return item.id;
+  public trackByItemId(
+    _index: number,
+    entry: EquipmentArmoryEntry,
+  ): EquipmentItemId {
+    return entry.item.id;
   }
 
   public selectSlot(slot: EquipmentSlot): void {
     this.selectedSlot.set(this.selectedSlot() === slot ? undefined : slot);
   }
 
-  public equip(equipmentId: EquipmentId): void {
-    if (characterEquipFromArmory(this.character().id, equipmentId)) {
+  public equip(equipmentItemId: EquipmentItemId): void {
+    if (characterEquipFromArmory(this.character().id, equipmentItemId)) {
       this.selectedSlot.set(undefined);
     }
   }

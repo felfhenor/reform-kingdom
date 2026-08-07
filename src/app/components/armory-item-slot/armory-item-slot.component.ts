@@ -1,20 +1,11 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
-import {
-  IconStatComponent,
-  STAT_SHORTHAND,
-} from '@components/icon-stat/icon-stat.component';
-import { defaultStats, getEntry, partyGet } from '@helpers';
-import type { JobContent } from '@interfaces';
-import { type BaseStat, type EquipmentContent } from '@interfaces';
+import { InfusedMaterialsRowComponent } from '@components/infused-materials-row/infused-materials-row.component';
+import { ItemStatRowsComponent } from '@components/item-stat-rows/item-stat-rows.component';
+import { equipmentItemInfusionBonus, getEntry, partyGet } from '@helpers';
+import type { EquipmentContent, EquipmentItem, JobContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-armory-item-slot',
@@ -22,8 +13,8 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
   imports: [
     AtlasImageComponent,
     IconBlankSlotComponent,
-    IconStatComponent,
-    StatDisplayPipe,
+    InfusedMaterialsRowComponent,
+    ItemStatRowsComponent,
     TippyDirective,
   ],
   templateUrl: './armory-item-slot.component.html',
@@ -31,6 +22,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 })
 export class ArmoryItemSlotComponent {
   public equipment = input.required<EquipmentContent>();
+  public equipmentItem = input.required<EquipmentItem>();
 
   public equippableHeroes = computed(() =>
     partyGet()
@@ -42,10 +34,7 @@ export class ArmoryItemSlotComponent {
       .map((h) => h.name),
   );
 
-  public statKeys = Object.keys(defaultStats()) as BaseStat[];
-  public statShorthand = STAT_SHORTHAND;
-
-  public statValue(stat: BaseStat): number {
-    return this.equipment().baseStats[stat] ?? 0;
-  }
+  public infusionBonus = computed(() =>
+    equipmentItemInfusionBonus(this.equipmentItem().infusedItemIds),
+  );
 }

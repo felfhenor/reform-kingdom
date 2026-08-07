@@ -1,18 +1,19 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
+import { InfusedMaterialsRowComponent } from '@components/infused-materials-row/infused-materials-row.component';
 import {
   IconStatComponent,
   STAT_SHORTHAND,
 } from '@components/icon-stat/icon-stat.component';
-import { defaultStats } from '@helpers';
-import type { BaseStat, EquipmentContent, StatBlock } from '@interfaces';
+import { ItemStatRowsComponent } from '@components/item-stat-rows/item-stat-rows.component';
+import { defaultStats, equipmentItemInfusionBonus } from '@helpers';
+import type {
+  BaseStat,
+  EquipmentContent,
+  EquipmentItem,
+  StatBlock,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
@@ -23,6 +24,8 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
     AtlasImageComponent,
     IconBlankSlotComponent,
     IconStatComponent,
+    InfusedMaterialsRowComponent,
+    ItemStatRowsComponent,
     StatDisplayPipe,
     TippyDirective,
   ],
@@ -31,6 +34,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 })
 export class EquipmentItemCardComponent {
   public equipment = input.required<EquipmentContent>();
+  public equipmentItem = input.required<EquipmentItem>();
   public comparisonStats = input<StatBlock>();
 
   public equip = output<void>();
@@ -39,25 +43,17 @@ export class EquipmentItemCardComponent {
 
   private statKeys = Object.keys(defaultStats()) as BaseStat[];
 
-  // Stats shown on the row itself - only what this item actually boosts.
+  public infusionBonus = computed(() =>
+    equipmentItemInfusionBonus(this.equipmentItem().infusedItemIds),
+  );
+
+  // Stats shown on the row itself - only what this item actually boosts,
+  // baseStats plus any infusion bonus combined into one total.
   public rowStatKeys = computed<BaseStat[]>(() =>
-    this.statKeys.filter((stat) => this.statValue(stat) !== 0),
+    this.statKeys.filter((stat) => this.totalStatValue(stat) !== 0),
   );
 
-  // Stats shown in the compare tooltip - also includes stats this item
-  // doesn't touch but the currently-equipped item does, so a swap that
-  // *loses* a stat still shows up as a negative delta.
-  public tooltipStatKeys = computed<BaseStat[]>(() =>
-    this.statKeys.filter(
-      (stat) => this.statValue(stat) !== 0 || this.statDelta(stat) !== 0,
-    ),
-  );
-
-  public statValue(stat: BaseStat): number {
-    return this.equipment().baseStats[stat];
-  }
-
-  public statDelta(stat: BaseStat): number {
-    return this.statValue(stat) - (this.comparisonStats()?.[stat] ?? 0);
+  public totalStatValue(stat: BaseStat): number {
+    return this.equipment().baseStats[stat] + this.infusionBonus()[stat];
   }
 }

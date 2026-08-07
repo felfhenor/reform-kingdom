@@ -23,6 +23,7 @@ export * from './gameloop';
 export * from './gathering';
 export * from './global-effects';
 export * from './icons';
+export * from './infusion';
 export * from './job';
 export * from './logging';
 export * from './loot';

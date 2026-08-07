@@ -7,7 +7,7 @@
 >
   <span header>Armory</span>
 
-  @for (equipment of grid.pagedEntries(); track $index) {
-    <app-armory-item-slot [equipment]="equipment" />
+  @for (entry of grid.pagedEntries(); track entry.item.id) {
+    <app-armory-item-slot [equipment]="entry.content" [equipmentItem]="entry.item" />
   }
 </app-paged-grid-page>

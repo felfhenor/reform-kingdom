@@ -10,6 +10,11 @@ import {
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
+import {
+  canInfuseEquipmentItem,
+  goldCoinId,
+  infusionMaterialCost,
+} from '@helpers/infusion';
 import { heroSkillsAtLevel } from '@helpers/job';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -22,8 +27,11 @@ import {
   type EquipmentContent,
   type EquipmentId,
   type EquipmentItem,
+  type EquipmentItemId,
   type EquipmentSkillContent,
   type EquipmentSlot,
+  type GameState,
+  type ItemId,
   type JobContent,
   type JobId,
   type StatBlock,
@@ -68,17 +76,25 @@ export function characterStatsForLevel(
   return stats;
 }
 
+function newEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
+  return {
+    id: rngUuid() as EquipmentItemId,
+    equipmentId,
+    infusedItemIds: [],
+  };
+}
+
 function starterEquipment(): EquipmentBlock {
   const equipment = defaultEquipment();
 
   const starterArmor = getEntry<EquipmentContent>(STARTER_ARMOR_NAME);
   if (starterArmor) {
-    equipment.Armor = { equipmentId: starterArmor.id };
+    equipment.Armor = newEquipmentItem(starterArmor.id);
   }
 
   const starterHat = getEntry<EquipmentContent>(STARTER_HAT_NAME);
   if (starterHat) {
-    equipment.Helmet = { equipmentId: starterHat.id };
+    equipment.Helmet = newEquipmentItem(starterHat.id);
   }
 
   return equipment;
@@ -244,7 +260,7 @@ export function characterEquipItem(
 ): boolean {
   return applyCharacterEquipment(characterId, (character) => ({
     ...character.equipment,
-    [slot]: { equipmentId },
+    [slot]: newEquipmentItem(equipmentId),
   }));
 }
 
@@ -272,53 +288,51 @@ export function characterUnequipItem(
 // armory.
 export function characterEquipFromArmory(
   characterId: CharacterId,
-  equipmentId: EquipmentId,
+  equipmentItemId: EquipmentItemId,
 ): boolean {
   if (!canModifyEquipment()) return false;
 
   const character = partyGet().find((c) => c.id === characterId);
   if (!character) return false;
 
-  const equipmentContent = getEntry<EquipmentContent>(equipmentId);
+  const armoryItem = armoryGet().find((item) => item.id === equipmentItemId);
+  if (!armoryItem) return false;
+
+  const equipmentContent = getEntry<EquipmentContent>(armoryItem.equipmentId);
   if (!equipmentContent || !canEquipItem(character, equipmentContent)) {
     return false;
   }
 
-  const isInArmory = armoryGet().some(
-    (item) => item.equipmentId === equipmentId,
-  );
-  if (!isInArmory) return false;
-
   const targetSlots = EquipmentTypeToSlot[equipmentContent.type];
 
-  const displacedIds = new Set<EquipmentId>();
+  // Keyed by instance id (not content id) so the exact displaced physical
+  // item - with whatever it's infused with - is what goes back to the
+  // armory, not a freshly reconstructed bare item.
+  const displacedItems = new Map<EquipmentItemId, EquipmentItem>();
   targetSlots.forEach((slot) => {
     const existing = character.equipment[slot];
-    if (existing && existing.equipmentId !== equipmentId) {
-      displacedIds.add(existing.equipmentId);
+    if (existing && existing.id !== armoryItem.id) {
+      displacedItems.set(existing.id, existing);
     }
   });
 
   const clearedSlots = new Set<EquipmentSlot>(targetSlots);
-  displacedIds.forEach((displacedId) => {
-    slotsHoldingEquipment(character.equipment, displacedId).forEach((slot) =>
-      clearedSlots.add(slot),
-    );
+  displacedItems.forEach((displacedItem) => {
+    slotsHoldingEquipment(
+      character.equipment,
+      displacedItem.equipmentId,
+    ).forEach((slot) => clearedSlots.add(slot));
   });
-
-  const displacedItems: EquipmentItem[] = Array.from(displacedIds).map(
-    (displacedId) => ({ equipmentId: displacedId }),
-  );
 
   updateGamestate((state) => {
     const armoryIndex = state.armory.findIndex(
-      (item) => item.equipmentId === equipmentId,
+      (item) => item.id === equipmentItemId,
     );
     if (armoryIndex === -1) return state;
 
     state.armory = [
       ...state.armory.filter((_, index) => index !== armoryIndex),
-      ...displacedItems,
+      ...Array.from(displacedItems.values()),
     ];
 
     state.world.party = state.world.party.map((c) => {
@@ -329,7 +343,7 @@ export function characterEquipFromArmory(
         equipment[slot] = undefined;
       });
       targetSlots.forEach((slot) => {
-        equipment[slot] = { equipmentId };
+        equipment[slot] = armoryItem;
       });
 
       const stats = characterStatsForLevel(c.jobId, c.level, equipment);
@@ -390,6 +404,90 @@ export function characterUnequipToArmory(
         ep: clamp(c.ep, 0, stats.Energy),
       };
     });
+
+    return state;
+  });
+
+  return true;
+}
+
+// Mutates `state.materials` directly - only ever called from inside a
+// single `updateGamestate` callback (see `characterInfuseEquipment`), so
+// the material/gold deduction lands in the same atomic commit as the
+// equipment change (mirrors `applyRequirementQuantity` in `crafting.ts`).
+function spendMaterial(
+  state: GameState,
+  materialId: ItemId,
+  quantity: number,
+): void {
+  const existing = state.materials[materialId];
+  const remaining = Math.max(0, (existing?.quantity ?? 0) - quantity);
+
+  if (remaining === 0) {
+    delete state.materials[materialId];
+  } else {
+    state.materials[materialId] = {
+      quantity: remaining,
+      foundAt: existing?.foundAt ?? Date.now(),
+    };
+  }
+}
+
+// Permanently infuses a material into one of a hero's equipped item's
+// slots, paid for in Gold Coin. Targets a specific slot index rather than
+// "the next open one" - infusing an already-filled slot is allowed and
+// simply overwrites its bonus, with no refund for what was displaced.
+// Returns false without changing state if equipment can't currently be
+// modified, the item/slot/material combination isn't valid, or the player
+// can't afford it.
+export function characterInfuseEquipment(
+  characterId: CharacterId,
+  equipmentItemId: EquipmentItemId,
+  slotIndex: number,
+  materialItemId: ItemId,
+): boolean {
+  if (!canModifyEquipment()) return false;
+
+  const character = partyGet().find((c) => c.id === characterId);
+  if (!character) return false;
+
+  const occupiedSlots = (
+    Object.keys(character.equipment) as EquipmentSlot[]
+  ).filter((slot) => character.equipment[slot]?.id === equipmentItemId);
+  if (occupiedSlots.length === 0) return false;
+
+  const item = character.equipment[occupiedSlots[0]];
+  if (!item || !canInfuseEquipmentItem(item, slotIndex, materialItemId)) {
+    return false;
+  }
+
+  const infusedItemIds = [...item.infusedItemIds];
+  infusedItemIds[slotIndex] = materialItemId;
+  const infusedItem: EquipmentItem = { ...item, infusedItemIds };
+  const cost = infusionMaterialCost(materialItemId);
+
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((c) => {
+      if (c.id !== characterId) return c;
+
+      const equipment = { ...c.equipment };
+      occupiedSlots.forEach((slot) => {
+        equipment[slot] = infusedItem;
+      });
+
+      const stats = characterStatsForLevel(c.jobId, c.level, equipment);
+
+      return {
+        ...c,
+        equipment,
+        stats,
+        hp: clamp(c.hp, 0, stats.Health),
+        ep: clamp(c.ep, 0, stats.Energy),
+      };
+    });
+
+    spendMaterial(state, materialItemId, 1);
+    spendMaterial(state, goldCoinId(), cost);
 
     return state;
   });

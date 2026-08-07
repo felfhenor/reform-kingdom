@@ -1,0 +1,183 @@
+@let heroes = party();
+@let character = selectedCharacter();
+@let items = selectedCharacterEquippedItems();
+@let item = selectedItem();
+@let content = selectedItemContent();
+@let slotIndex = selectedSlotIndex();
+@let materials = infusionMaterials();
+
+<app-card-page heightProfile="full">
+  <span header>Infusion</span>
+
+  <div pageactions>
+    <button class="btn btn-sm" (click)="back()">Back</button>
+  </div>
+
+  <div class="grid grid-cols-[220px_240px_1fr] gap-4 h-full min-h-0 p-4">
+    <div class="flex flex-col gap-2 overflow-y-auto">
+      <span class="font-semibold text-lg">Heroes</span>
+
+      @for (hero of heroes; track hero.id) {
+        <button
+          type="button"
+          class="btn btn-lg h-auto justify-start gap-3 py-3 text-base"
+          [class.btn-primary]="character?.id === hero.id"
+          (click)="selectCharacter(hero.id)"
+        >
+          <app-icon-job [job]="jobFor(hero)" />
+          {{ hero.name }}
+        </button>
+      } @empty {
+        <div class="italic text-sm p-2">No heroes recruited yet.</div>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 overflow-y-auto">
+      <span class="font-semibold text-lg">Equipped Items</span>
+
+      @if (character) {
+        @if (items.length > 0) {
+          @for (equippedItem of items; track equippedItem.id) {
+            @let equippedContent = equipmentContentFor(equippedItem);
+
+            @if (equippedContent) {
+              <button
+                type="button"
+                class="flex items-center gap-2 p-1 rounded hover:bg-base-300 text-left cursor-pointer"
+                [class.bg-base-300]="item?.id === equippedItem.id"
+                (click)="selectItem(equippedItem.id)"
+              >
+                <app-icon-blank-slot>
+                  <app-atlas-image
+                    spritesheet="equipment"
+                    [assetName]="equippedContent.sprite"
+                  />
+                </app-icon-blank-slot>
+                <span class="text-sm text-{{ equippedContent.rarity }}">
+                  {{ equippedContent.name }}
+                </span>
+              </button>
+            }
+          }
+        } @else {
+          <div class="italic text-sm p-2">This hero has nothing equipped.</div>
+        }
+      } @else {
+        <div class="italic text-sm p-2">Select a hero to see their gear.</div>
+      }
+    </div>
+
+    <div class="flex flex-col gap-4 h-full min-h-0">
+      @if (item && content) {
+        <div class="shrink-0">
+          <div class="font-semibold text-lg text-{{ content.rarity }}">
+            {{ content.name }}
+          </div>
+
+          <app-item-stat-rows
+            [stats]="content.baseStats"
+            [bonusStats]="selectedItemBonus()"
+          />
+        </div>
+
+        @if (content.slots > 0) {
+          <div class="shrink-0">
+            <div class="font-semibold mb-1">Infusion Slots</div>
+            <div class="text-xs opacity-70 mb-2">
+              Click a slot to choose what to infuse into it.
+            </div>
+
+            <app-infused-materials-row
+              [infusedItemIds]="item.infusedItemIds"
+              [maxSlots]="content.slots"
+              [selectedSlotIndex]="slotIndex"
+              (slotClick)="selectSlot($event)"
+            />
+          </div>
+
+          @if (slotIndex !== undefined) {
+            <div class="flex flex-col flex-1 min-h-0">
+              <div class="font-semibold mb-1 shrink-0">
+                Infuse Slot {{ slotIndex + 1 }}
+              </div>
+
+              @if (materials.length > 0) {
+                <div class="flex flex-col gap-1 flex-1 min-h-0 overflow-y-auto">
+                  @for (entry of materials; track entry.item.id) {
+                    @let cost = materialCost(entry.item.id);
+                    @let affordable = canAffordMaterial(entry.item.id);
+
+                    <button
+                      type="button"
+                      class="flex flex-col gap-1 p-1 rounded hover:bg-base-300 text-left disabled:opacity-40 cursor-pointer"
+                      [disabled]="!affordable"
+                      (click)="requestInfuse(entry.item.id)"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div class="zoom-50 shrink-0">
+                          <app-icon-blank-slot>
+                            <app-atlas-image
+                              spritesheet="item"
+                              [assetName]="entry.item.sprite"
+                            />
+                          </app-icon-blank-slot>
+                        </div>
+
+                        <span
+                          class="text-{{
+                            entry.item.rarity
+                          }} font-semibold text-xs"
+                        >
+                          {{ entry.item.name }} (x{{ entry.quantity }})
+                        </span>
+
+                        <span
+                          class="ml-auto mr-3 flex items-center gap-1 shrink-0"
+                        >
+                          <div class="zoom-50">
+                            <app-icon-blank-slot [showBackground]="false">
+                              <app-atlas-image
+                                spritesheet="item"
+                                [assetName]="goldCoinSprite()"
+                              />
+                            </app-icon-blank-slot>
+                          </div>
+                          <span class="text-xs">{{ cost }}</span>
+                        </span>
+                      </div>
+
+                      <app-item-stat-rows
+                        class="pl-11"
+                        [stats]="entry.item.infusionStats!"
+                        [layout]="'row'"
+                        [maxDecimals]="1"
+                      />
+                    </button>
+                  }
+                </div>
+              } @else {
+                <div class="italic text-sm">No infusable materials owned.</div>
+              }
+            </div>
+          }
+        } @else {
+          <div class="italic text-sm">This item has no infusion slots.</div>
+        }
+      } @else {
+        <div class="min-h-[20px]"></div>
+        <div class="italic text-sm p-2">
+          Select an equipped item to infuse it.
+        </div>
+      }
+    </div>
+  </div>
+</app-card-page>
+
+<swal
+  #infuseSwal
+  title="Infuse this slot?"
+  icon="warning"
+  confirmButtonText="Yes, infuse it"
+  cancelButtonText="Cancel"
+  (confirm)="confirmInfuse()"
+></swal>

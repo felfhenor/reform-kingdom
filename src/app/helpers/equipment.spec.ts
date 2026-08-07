@@ -4,6 +4,8 @@ import type {
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
+  EquipmentItem,
+  EquipmentItemId,
   JobContent,
   JobId,
 } from '@interfaces';
@@ -14,7 +16,6 @@ vi.mock('@helpers/armory', () => ({
 }));
 
 vi.mock('@helpers/content', () => ({
-  getEntriesByType: vi.fn(),
   getEntry: vi.fn(),
 }));
 
@@ -24,19 +25,35 @@ vi.mock('@helpers/combat', () => ({
 
 import { armoryGet } from '@helpers/armory';
 import { currentCombat } from '@helpers/combat';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content';
 import {
   canEquipItem,
   canModifyEquipment,
   equipmentAvailableForSlot,
   equipmentStatTotals,
   equippedItems,
+  equippedItemsByPrimarySlot,
   equippedItemTypes,
   isSlotAvailableForJob,
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
 import type { Combat } from '@interfaces';
+
+// A distinct EquipmentItem instance for a given content id - equipped-item
+// dedup is now keyed by instance id, not content id, so every fixture that
+// represents a distinct physical item needs its own id (and a two-handed
+// item occupying two slots must reuse the *same* instance across both).
+function mockEquipmentItem(
+  equipmentId: EquipmentId,
+  id = equipmentId,
+): EquipmentItem {
+  return {
+    id: id as unknown as EquipmentItemId,
+    equipmentId,
+    infusedItemIds: [],
+  };
+}
 
 describe('Equipment Helper Functions', () => {
   const sword: EquipmentContent = {
@@ -58,6 +75,7 @@ describe('Equipment Helper Functions', () => {
       Agility: 1,
     },
     type: 'Sword',
+    slots: 1,
   };
 
   const helmet: EquipmentContent = {
@@ -131,8 +149,8 @@ describe('Equipment Helper Functions', () => {
 
       const totals = equipmentStatTotals({
         ...emptyEquipment,
-        Weapon: { equipmentId: 'sword' as EquipmentId },
-        Helmet: { equipmentId: 'helmet' as EquipmentId },
+        Weapon: mockEquipmentItem(sword.id),
+        Helmet: mockEquipmentItem(helmet.id),
       });
 
       expect(totals).toEqual({
@@ -152,7 +170,7 @@ describe('Equipment Helper Functions', () => {
 
       const totals = equipmentStatTotals({
         ...emptyEquipment,
-        Weapon: { equipmentId: 'missing' as EquipmentId },
+        Weapon: mockEquipmentItem('missing' as EquipmentId),
       });
 
       expect(totals).toEqual({
@@ -169,46 +187,145 @@ describe('Equipment Helper Functions', () => {
 
     it('should count a two-handed item once even though it occupies two slots', () => {
       vi.mocked(getEntry).mockReturnValue(spear);
+      const spearItem = mockEquipmentItem(spear.id);
 
       const totals = equipmentStatTotals({
         ...emptyEquipment,
-        Weapon: { equipmentId: spear.id },
-        Offhand: { equipmentId: spear.id },
+        Weapon: spearItem,
+        Offhand: spearItem,
       });
 
       expect(totals.Strength).toBe(spear.baseStats.Strength);
+    });
+
+    it('adds each equipped item\'s infusion bonus on top of its baseStats', () => {
+      const infusionCrystal = {
+        id: 'crystal' as never,
+        name: 'Crystal',
+        __type: 'item',
+        description: '',
+        sprite: '0000',
+        rarity: 'Common',
+        infusionStats: {
+          Health: 0,
+          Energy: 0,
+          Luck: 0,
+          Intelligence: 0,
+          Strength: 2,
+          Vitality: 0,
+          Resistance: 0,
+          Agility: 0,
+        },
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === 'sword' ? sword : id === 'crystal' ? infusionCrystal : undefined) as never,
+      );
+
+      const totals = equipmentStatTotals({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          infusedItemIds: ['crystal' as never],
+        },
+      });
+
+      expect(totals.Strength).toBe(sword.baseStats.Strength + 2);
     });
   });
 
   describe('equippedItems', () => {
     it('returns one entry per distinct equipped item', () => {
+      const swordItem = mockEquipmentItem(sword.id);
+      const helmetItem = mockEquipmentItem(helmet.id);
+
       const items = equippedItems({
         ...emptyEquipment,
-        Weapon: { equipmentId: sword.id },
-        Helmet: { equipmentId: helmet.id },
+        Weapon: swordItem,
+        Helmet: helmetItem,
       });
 
       expect(items).toHaveLength(2);
-      expect(items).toEqual(
-        expect.arrayContaining([
-          { equipmentId: sword.id },
-          { equipmentId: helmet.id },
-        ]),
-      );
+      expect(items).toEqual(expect.arrayContaining([swordItem, helmetItem]));
     });
 
     it('collapses a two-handed item occupying multiple slots into a single entry', () => {
+      const spearItem = mockEquipmentItem(spear.id);
+
       const items = equippedItems({
         ...emptyEquipment,
-        Weapon: { equipmentId: spear.id },
-        Offhand: { equipmentId: spear.id },
+        Weapon: spearItem,
+        Offhand: spearItem,
       });
 
-      expect(items).toEqual([{ equipmentId: spear.id }]);
+      expect(items).toEqual([spearItem]);
     });
 
     it('returns an empty array when nothing is equipped', () => {
       expect(equippedItems(emptyEquipment)).toEqual([]);
+    });
+  });
+
+  describe('equippedItemsByPrimarySlot', () => {
+    it('returns one entry per distinct equipped item, keyed by slot', () => {
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === sword.id ? sword : helmet) as never,
+      );
+      const swordItem = mockEquipmentItem(sword.id);
+      const helmetItem = mockEquipmentItem(helmet.id);
+
+      const items = equippedItemsByPrimarySlot({
+        ...emptyEquipment,
+        Weapon: swordItem,
+        Helmet: helmetItem,
+      });
+
+      expect(items).toHaveLength(2);
+      expect(items).toEqual(expect.arrayContaining([swordItem, helmetItem]));
+    });
+
+    it('only returns a two-handed item once, from its primary slot', () => {
+      vi.mocked(getEntry).mockReturnValue(spear);
+      const spearItem = mockEquipmentItem(spear.id);
+
+      const items = equippedItemsByPrimarySlot({
+        ...emptyEquipment,
+        Weapon: spearItem,
+        Offhand: spearItem,
+      });
+
+      expect(items).toEqual([spearItem]);
+    });
+
+    // The real-world case this guards against: a legacy save whose
+    // two-handed item was backfilled with a different instance id per slot
+    // (see `backfillEquipmentBlock`) - even though the two slots don't
+    // share an id, primary-slot dedup still only surfaces it once.
+    it('only returns a two-handed item once even if its slots hold different instance ids', () => {
+      vi.mocked(getEntry).mockReturnValue(spear);
+
+      const items = equippedItemsByPrimarySlot({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(spear.id, 'weapon-instance' as EquipmentId),
+        Offhand: mockEquipmentItem(spear.id, 'offhand-instance' as EquipmentId),
+      });
+
+      expect(items).toHaveLength(1);
+      expect(items[0].equipmentId).toBe(spear.id);
+    });
+
+    it('ignores slots whose equipment content cannot be found', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      expect(
+        equippedItemsByPrimarySlot({
+          ...emptyEquipment,
+          Weapon: mockEquipmentItem('missing' as EquipmentId),
+        }),
+      ).toEqual([]);
+    });
+
+    it('returns an empty array when nothing is equipped', () => {
+      expect(equippedItemsByPrimarySlot(emptyEquipment)).toEqual([]);
     });
   });
 
@@ -220,13 +337,11 @@ describe('Equipment Helper Functions', () => {
 
       const types = equippedItemTypes({
         ...emptyEquipment,
-        Weapon: { equipmentId: sword.id },
-        Offhand: { equipmentId: spear.id },
+        Weapon: mockEquipmentItem(sword.id, 'weapon-instance' as EquipmentId),
+        Offhand: mockEquipmentItem(spear.id, 'offhand-instance' as EquipmentId),
       });
 
-      expect(types).toEqual(
-        expect.arrayContaining(['Sword', 'Spear']),
-      );
+      expect(types).toEqual(expect.arrayContaining(['Sword', 'Spear']));
       expect(types).toHaveLength(2);
     });
 
@@ -236,7 +351,7 @@ describe('Equipment Helper Functions', () => {
       expect(
         equippedItemTypes({
           ...emptyEquipment,
-          Weapon: { equipmentId: 'missing' as EquipmentId },
+          Weapon: mockEquipmentItem('missing' as EquipmentId),
         }),
       ).toEqual([]);
     });
@@ -252,7 +367,7 @@ describe('Equipment Helper Functions', () => {
       vi.mocked(getEntry).mockReturnValue(sword);
       const equipment = {
         ...emptyEquipment,
-        Weapon: { equipmentId: sword.id },
+        Weapon: mockEquipmentItem(sword.id),
       };
 
       expect(pruneInvalidEquippedItems(equipment)).toEqual(equipment);
@@ -262,7 +377,7 @@ describe('Equipment Helper Functions', () => {
       vi.mocked(getEntry).mockReturnValue(undefined);
       const equipment = {
         ...emptyEquipment,
-        Weapon: { equipmentId: 'stale-gear' as EquipmentId },
+        Weapon: mockEquipmentItem('stale-gear' as EquipmentId),
       };
 
       expect(pruneInvalidEquippedItems(equipment)).toEqual(emptyEquipment);
@@ -272,15 +387,16 @@ describe('Equipment Helper Functions', () => {
       vi.mocked(getEntry).mockImplementation((id) =>
         (id === sword.id ? sword : undefined) as never,
       );
+      const swordItem = mockEquipmentItem(sword.id);
       const equipment = {
         ...emptyEquipment,
-        Weapon: { equipmentId: sword.id },
-        Helmet: { equipmentId: 'stale-gear' as EquipmentId },
+        Weapon: swordItem,
+        Helmet: mockEquipmentItem('stale-gear' as EquipmentId),
       };
 
       expect(pruneInvalidEquippedItems(equipment)).toEqual({
         ...emptyEquipment,
-        Weapon: { equipmentId: sword.id },
+        Weapon: swordItem,
       });
     });
 
@@ -294,10 +410,11 @@ describe('Equipment Helper Functions', () => {
 
   describe('slotsHoldingEquipment', () => {
     it('returns every slot holding the given equipment id', () => {
+      const spearItem = mockEquipmentItem(spear.id);
       const equipment = {
         ...emptyEquipment,
-        Weapon: { equipmentId: spear.id },
-        Offhand: { equipmentId: spear.id },
+        Weapon: spearItem,
+        Offhand: spearItem,
       };
 
       expect(slotsHoldingEquipment(equipment, spear.id)).toEqual([
@@ -313,7 +430,7 @@ describe('Equipment Helper Functions', () => {
     it('does not match slots holding a different equipment id', () => {
       const equipment = {
         ...emptyEquipment,
-        Weapon: { equipmentId: sword.id },
+        Weapon: mockEquipmentItem(sword.id),
       };
 
       expect(slotsHoldingEquipment(equipment, spear.id)).toEqual([]);
@@ -384,30 +501,43 @@ describe('Equipment Helper Functions', () => {
     it('filters to owned items containing the slot, sorted by level requirement descending', () => {
       const lowHelmet = { ...helmet, id: 'low' as EquipmentId, levelRequirement: 1 };
       const highHelmet = { ...helmet, id: 'high' as EquipmentId, levelRequirement: 10 };
-      vi.mocked(getEntriesByType).mockReturnValue([
-        lowHelmet,
-        sword,
-        highHelmet,
-      ] as never);
+      const lowHelmetItem = mockEquipmentItem(lowHelmet.id);
+      const highHelmetItem = mockEquipmentItem(highHelmet.id);
+      const swordItem = mockEquipmentItem(sword.id);
+
+      vi.mocked(getEntry).mockImplementation((id) => {
+        if (id === lowHelmet.id) return lowHelmet as never;
+        if (id === highHelmet.id) return highHelmet as never;
+        if (id === sword.id) return sword as never;
+        return undefined as never;
+      });
       vi.mocked(armoryGet).mockReturnValue([
-        { equipmentId: lowHelmet.id },
-        { equipmentId: highHelmet.id },
-        { equipmentId: sword.id },
+        lowHelmetItem,
+        highHelmetItem,
+        swordItem,
       ]);
 
       expect(equipmentAvailableForSlot('Helmet')).toEqual([
-        highHelmet,
-        lowHelmet,
+        { item: highHelmetItem, content: highHelmet },
+        { item: lowHelmetItem, content: lowHelmet },
       ]);
     });
 
     it('excludes items not present in the armory', () => {
       const lowHelmet = { ...helmet, id: 'low' as EquipmentId, levelRequirement: 1 };
       const highHelmet = { ...helmet, id: 'high' as EquipmentId, levelRequirement: 10 };
-      vi.mocked(getEntriesByType).mockReturnValue([lowHelmet, highHelmet] as never);
-      vi.mocked(armoryGet).mockReturnValue([{ equipmentId: lowHelmet.id }]);
+      const lowHelmetItem = mockEquipmentItem(lowHelmet.id);
 
-      expect(equipmentAvailableForSlot('Helmet')).toEqual([lowHelmet]);
+      vi.mocked(getEntry).mockImplementation((id) => {
+        if (id === lowHelmet.id) return lowHelmet as never;
+        if (id === highHelmet.id) return highHelmet as never;
+        return undefined as never;
+      });
+      vi.mocked(armoryGet).mockReturnValue([lowHelmetItem]);
+
+      expect(equipmentAvailableForSlot('Helmet')).toEqual([
+        { item: lowHelmetItem, content: lowHelmet },
+      ]);
     });
   });
 

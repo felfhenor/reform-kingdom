@@ -11,6 +11,10 @@
     <app-atlas-image spritesheet="item" [assetName]="item.sprite" />
   </app-icon-blank-slot>
 
+  @if (isInfusable()) {
+    <app-infusable-badge />
+  }
+
   <span class="storage-item-count">{{ displayQuantity() }}</span>
 </div>
 
@@ -29,6 +33,12 @@
       <div class="italic text-sm mb-2">
         {{ item.description }}
       </div>
+
+      @if (isInfusable()) {
+        <div class="mb-2">
+          <app-item-stat-rows [stats]="item.infusionStats!" />
+        </div>
+      }
 
       <div class="text-xs">Quantity: {{ displayQuantity() }}</div>
     </div>
