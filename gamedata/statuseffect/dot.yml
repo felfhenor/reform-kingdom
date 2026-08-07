@@ -1,7 +1,7 @@
 - id: 8257c648-a378-4213-83d1-94f10fdc9258
   name: Burning
 
-  type: Debuff
+  effectType: Debuff
   elements: [Fire]
 
   trigger: TurnEnd

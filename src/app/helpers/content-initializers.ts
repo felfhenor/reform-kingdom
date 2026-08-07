@@ -297,6 +297,7 @@ function ensureCollectible(
     description: collectible.description ?? 'UNKNOWN',
     sprite: collectible.sprite ?? 'UNKNOWN',
     rarity: collectible.rarity ?? 'Common',
+    unobtainable: collectible.unobtainable ?? false,
   };
 }
 
@@ -313,6 +314,7 @@ function ensureEquipment(
     baseStats: ensureStats(equipment.baseStats),
     sprite: equipment.sprite ?? 'UNKNOWN',
     type: equipment.type ?? 'Accessory',
+    unobtainable: equipment.unobtainable ?? false,
   };
 }
 

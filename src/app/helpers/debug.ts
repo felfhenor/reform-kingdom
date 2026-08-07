@@ -54,15 +54,22 @@ export function debugGiveEquipment(
     return;
   }
 
+  if (equipment.unobtainable) {
+    console.warn(`Equipment with ID ${equipmentId} not obtainable.`);
+    return;
+  }
+
   armoryAdd(equipment.id, quantity);
 }
 
 export function debugGiveAllEquipment(quantity = 1): void {
   if (quantity <= 0) return;
 
-  getEntriesByType<EquipmentContent>('equipment').forEach((equipment) => {
-    armoryAdd(equipment.id, quantity);
-  });
+  getEntriesByType<EquipmentContent>('equipment')
+    .filter((equipment) => !equipment.unobtainable)
+    .forEach((equipment) => {
+      armoryAdd(equipment.id, quantity);
+    });
 }
 
 export function debugGiveCollectible(
@@ -74,6 +81,11 @@ export function debugGiveCollectible(
   const collectible = getEntry<CollectibleContent>(collectibleId);
   if (!collectible) {
     console.warn(`Collectible with ID ${collectibleId} not found.`);
+    return;
+  }
+
+  if (collectible.unobtainable) {
+    console.warn(`Collectible with ID ${collectibleId} not obtainable.`);
     return;
   }
 

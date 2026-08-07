@@ -29,6 +29,7 @@ import { clamp } from 'es-toolkit/compat';
 export const CHARACTER_MAX_LEVEL = 99;
 const XP_BASE_PER_LEVEL = 100;
 const STARTER_ARMOR_NAME = 'Cloak of Adventuring';
+const STARTER_HAT_NAME = 'Hat of Adventuring';
 
 // Tunable XP curve: 100 XP for level 1->2, scaling up by level^1.5 thereafter.
 export function characterXpForLevel(level: number): number {
@@ -69,6 +70,11 @@ function starterEquipment(): EquipmentBlock {
   const starterArmor = getEntry<EquipmentContent>(STARTER_ARMOR_NAME);
   if (starterArmor) {
     equipment.Armor = { equipmentId: starterArmor.id };
+  }
+
+  const starterHat = getEntry<EquipmentContent>(STARTER_HAT_NAME);
+  if (starterHat) {
+    equipment.Helmet = { equipmentId: starterHat.id };
   }
 
   return equipment;

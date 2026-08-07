@@ -103,10 +103,19 @@ describe('Party Helper Functions', () => {
     type: 'Hat',
   };
 
-  // Mocks getEntry() so it resolves the starter cloak plus any content items
-  // passed in, matching by either id or name like the real implementation.
+  const mockStarterHat: EquipmentContent = {
+    ...mockCloak,
+    id: 'equip-hat-of-adventuring' as EquipmentId,
+    name: 'Hat of Adventuring',
+    baseStats: defaultStats(),
+    type: 'Hat',
+  };
+
+  // Mocks getEntry() so it resolves the starter cloak/hat plus any content
+  // items passed in, matching by either id or name like the real
+  // implementation.
   function mockGetEntry(...entries: IsContentItem[]): void {
-    const known = [mockCloak, ...entries];
+    const known = [mockCloak, mockStarterHat, ...entries];
     vi.mocked(getEntry).mockImplementation(
       (idOrName) =>
         known.find(
@@ -137,7 +146,7 @@ describe('Party Helper Functions', () => {
       expect(character.traitIds).toEqual([]);
     });
 
-    it('should equip a Cloak of Adventuring in the Armor slot by default', () => {
+    it('should equip a Cloak of Adventuring and Hat of Adventuring by default', () => {
       mockGetEntry(mockJob);
 
       const character = createCharacter('Jala', 'job-explorer' as JobId);
@@ -145,9 +154,12 @@ describe('Party Helper Functions', () => {
       expect(character.equipment.Armor).toEqual({
         equipmentId: mockCloak.id,
       });
+      expect(character.equipment.Helmet).toEqual({
+        equipmentId: mockStarterHat.id,
+      });
       expect(
         Object.entries(character.equipment)
-          .filter(([slot]) => slot !== 'Armor')
+          .filter(([slot]) => slot !== 'Armor' && slot !== 'Helmet')
           .every(([, item]) => item === undefined),
       ).toBe(true);
     });
@@ -263,7 +275,10 @@ describe('Party Helper Functions', () => {
         armory: [],
       } as unknown as GameState);
 
-      expect(result.armory).toEqual([jala.equipment.Armor]);
+      expect(result.armory).toEqual([
+        jala.equipment.Armor,
+        jala.equipment.Helmet,
+      ]);
     });
 
     it('appends to any gear already in the armory', () => {
@@ -279,7 +294,11 @@ describe('Party Helper Functions', () => {
         armory: [existingItem],
       } as unknown as GameState);
 
-      expect(result.armory).toEqual([existingItem, jala.equipment.Armor]);
+      expect(result.armory).toEqual([
+        existingItem,
+        jala.equipment.Armor,
+        jala.equipment.Helmet,
+      ]);
     });
 
     it('saves the outgoing job level/xp on jobProgress before switching', () => {
@@ -590,7 +609,7 @@ describe('Party Helper Functions', () => {
       expect(state.world.party[0].equipment.Helmet).toEqual({
         equipmentId: mockHelmet.id,
       });
-      expect(state.armory).toEqual([]);
+      expect(state.armory).toEqual([{ equipmentId: mockStarterHat.id }]);
     });
 
     it('returns the previously equipped item in that slot back to the armory', () => {
@@ -775,7 +794,7 @@ describe('Party Helper Functions', () => {
         armory: [],
       } as unknown as GameState);
 
-      const result = characterUnequipToArmory(jala.id, 'Helmet');
+      const result = characterUnequipToArmory(jala.id, 'Weapon');
 
       expect(result).toBe(false);
       expect(updateGamestate).not.toHaveBeenCalled();

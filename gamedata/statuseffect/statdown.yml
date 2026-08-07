@@ -1,7 +1,7 @@
 - id: cf8baffe-4366-4f9d-951c-d051adeaccf4
   name: Weakspot
 
-  type: Debuff
+  effectType: Debuff
   elements: [Earth]
 
   trigger: TurnEnd

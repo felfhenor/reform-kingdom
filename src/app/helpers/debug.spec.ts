@@ -96,6 +96,18 @@ describe('Debug Helper Functions', () => {
       expect(armoryAdd).not.toHaveBeenCalled();
       expect(console.warn).toHaveBeenCalled();
     });
+
+    it('does nothing and warns when the equipment is marked unobtainable', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        id: 'sword',
+        unobtainable: true,
+      } as EquipmentContent);
+
+      debugGiveEquipment('sword' as EquipmentId, 3);
+
+      expect(armoryAdd).not.toHaveBeenCalled();
+      expect(console.warn).toHaveBeenCalled();
+    });
   });
 
   describe('debugGiveAllEquipment', () => {
@@ -109,6 +121,17 @@ describe('Debug Helper Functions', () => {
       expect(armoryAdd).toHaveBeenCalledTimes(2);
       expect(armoryAdd).toHaveBeenCalledWith('sword', 1);
       expect(armoryAdd).toHaveBeenCalledWith('shield', 1);
+    });
+
+    it('skips equipment marked unobtainable', () => {
+      const sword = { id: 'sword' } as EquipmentContent;
+      const cursed = { id: 'cursed', unobtainable: true } as EquipmentContent;
+      vi.mocked(getEntriesByType).mockReturnValue([sword, cursed]);
+
+      debugGiveAllEquipment();
+
+      expect(armoryAdd).toHaveBeenCalledTimes(1);
+      expect(armoryAdd).toHaveBeenCalledWith('sword', 1);
     });
 
     it('adds the given quantity of every equipment entry', () => {
@@ -151,6 +174,18 @@ describe('Debug Helper Functions', () => {
       vi.mocked(getEntry).mockReturnValue(undefined);
 
       debugGiveCollectible('unknown-collectible' as CollectibleId, 2);
+
+      expect(collectiblesAdd).not.toHaveBeenCalled();
+      expect(console.warn).toHaveBeenCalled();
+    });
+
+    it('does nothing and warns when the collectible is marked unobtainable', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        id: 'founding-stone',
+        unobtainable: true,
+      } as CollectibleContent);
+
+      debugGiveCollectible('founding-stone' as CollectibleId, 2);
 
       expect(collectiblesAdd).not.toHaveBeenCalled();
       expect(console.warn).toHaveBeenCalled();

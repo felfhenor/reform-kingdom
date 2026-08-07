@@ -8,4 +8,6 @@ export type CollectibleId = Branded<string, 'CollectibleId'>;
 export type CollectibleContent = IsContentItem &
   HasDescription & HasSprite & HasRarity & {
     id: CollectibleId;
+
+    unobtainable?: boolean;
   };
