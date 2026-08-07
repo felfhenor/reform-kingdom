@@ -105,7 +105,7 @@
             track tradeskill.subview
           ) {
             <div
-              class="btn btn-secondary h-auto py-2 px-2 flex flex-col justify-center gap-1"
+              class="btn btn-secondary h-auto py-2 px-2 flex flex-col justify-center gap-2"
               role="button"
               tabindex="0"
               (click)="openSubview(tradeskill.subview)"
@@ -173,7 +173,10 @@
             Reclass Heroes
           </button>
 
-          <button class="btn btn-accent btn-sm" (click)="openSubview('infusion')">
+          <button
+            class="btn btn-accent btn-sm"
+            (click)="openSubview('infusion')"
+          >
             Infusion
           </button>
 

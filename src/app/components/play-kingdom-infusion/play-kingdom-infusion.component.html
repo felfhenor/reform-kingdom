@@ -102,18 +102,18 @@
               </div>
 
               @if (materials.length > 0) {
-                <div class="flex flex-col gap-1 flex-1 min-h-0 overflow-y-auto">
+                <div class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto">
                   @for (entry of materials; track entry.item.id) {
                     @let cost = materialCost(entry.item.id);
                     @let affordable = canAffordMaterial(entry.item.id);
 
                     <button
                       type="button"
-                      class="flex flex-col gap-1 p-1 rounded hover:bg-base-300 text-left disabled:opacity-40 cursor-pointer"
+                      class="flex flex-row gap-2 p-1 rounded hover:bg-base-300 text-left disabled:opacity-40 cursor-pointer"
                       [disabled]="!affordable"
                       (click)="requestInfuse(entry.item.id)"
                     >
-                      <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-2">
                         <div class="zoom-50 shrink-0">
                           <app-icon-blank-slot>
                             <app-atlas-image
@@ -122,7 +122,9 @@
                             />
                           </app-icon-blank-slot>
                         </div>
+                      </div>
 
+                      <div class="pl-4 flex flex-col gap-2">
                         <span
                           class="text-{{
                             entry.item.rarity
@@ -131,8 +133,16 @@
                           {{ entry.item.name }} (x{{ entry.quantity }})
                         </span>
 
+                        <app-item-stat-rows
+                          [stats]="entry.item.infusionStats!"
+                          [layout]="'row'"
+                          [maxDecimals]="1"
+                        />
+                      </div>
+
+                      <div class="flex flex-1 justify-end">
                         <span
-                          class="ml-auto mr-3 flex items-center gap-1 shrink-0"
+                          class="ml-auto mr-3 flex items-center gap-2 shrink-0"
                         >
                           <div class="zoom-50">
                             <app-icon-blank-slot [showBackground]="false">
@@ -145,13 +155,6 @@
                           <span class="text-xs">{{ cost }}</span>
                         </span>
                       </div>
-
-                      <app-item-stat-rows
-                        class="pl-11"
-                        [stats]="entry.item.infusionStats!"
-                        [layout]="'row'"
-                        [maxDecimals]="1"
-                      />
                     </button>
                   }
                 </div>

@@ -15,7 +15,7 @@ import type { ItemContent, ItemId } from '../../interfaces';
   selector: 'app-currency-name',
   imports: [DecimalPipe, AtlasImageComponent, TippyDirective],
   host: {
-    class: 'inline-flex gap-1 align-baseline',
+    class: 'inline-flex gap-2 align-baseline',
   },
   template: `
     <div class="flex" [tp]="label()" [tpPlacement]="'bottom'">

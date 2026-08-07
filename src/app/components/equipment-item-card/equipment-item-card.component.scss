@@ -16,7 +16,7 @@
 }
 
 .equipment-item-row-info {
-  @apply flex flex-col gap-1 min-w-0 overflow-hidden;
+  @apply flex flex-col gap-2 min-w-0 overflow-hidden;
 }
 
 .equipment-item-row-name {
@@ -32,5 +32,5 @@
 }
 
 .equipment-item-row-stat {
-  @apply flex items-center gap-1;
+  @apply flex items-center gap-2;
 }
