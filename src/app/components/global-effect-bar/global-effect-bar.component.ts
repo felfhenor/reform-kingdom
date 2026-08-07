@@ -36,9 +36,11 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
               [assetName]="effect.sprite"
             />
 
-            <div class="duration z-15 text-lg">
-              {{ durationLabel(effect) }}
-            </div>
+            @if (effect.name !== 'Idle') {
+              <div class="duration z-15 text-lg">
+                {{ durationLabel(effect) }}
+              </div>
+            }
           </li>
         }
       </ul>

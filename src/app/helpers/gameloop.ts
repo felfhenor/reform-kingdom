@@ -6,6 +6,7 @@ import { craftProcessTick } from '@helpers/crafting';
 import { gatheringProcessTick } from '@helpers/gathering';
 import { globalEffectsProcessTick } from '@helpers/global-effects';
 import { debug } from '@helpers/logging';
+import { restingProcessTick } from '@helpers/resting';
 import { schedulerYield } from '@helpers/scheduler';
 import { isSetup } from '@helpers/setup';
 import {
@@ -59,6 +60,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     globalEffectsProcessTick();
     gatheringProcessTick();
     craftProcessTick();
+    restingProcessTick();
 
     if (currentCombat()) {
       combatDoCombatIteration();
