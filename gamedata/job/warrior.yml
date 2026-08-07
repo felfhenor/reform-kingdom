@@ -26,6 +26,7 @@
 
   equippableTypes:
     - Cloth Armor
+    - Metal Armor
     - Accessory
     - Hat
     - Ring

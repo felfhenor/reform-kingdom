@@ -8,6 +8,19 @@
   rarity: Common
   type: Bow
   sprite: '0021'
+  slots: 1
   baseStats:
     Strength: 1.5
     Agility: 0.8
+
+- id: 95dbd70d-7649-44a5-99a9-af301226005c
+  name: Wergenslime Bow
+  description: A bow made of wergenslime wood.
+  levelRequirement: 6
+  rarity: Common
+  type: Bow
+  sprite: '0033'
+  slots: 1
+  baseStats:
+    Strength: 3.2
+    Agility: 2.1

@@ -5,9 +5,11 @@
   rarity: Common
   type: Cloth Armor
   sprite: '0000'
+  slots: 1
   baseStats:
     Resistance: 0.2
     Agility: 0.2
+    Health: 3
 
 - id: ef2d43fe-2377-4963-8837-065b16ceb9ca
   name: Linen Shirt
@@ -16,10 +18,12 @@
   rarity: Common
   type: Cloth Armor
   sprite: '0001'
+  slots: 1
   baseStats:
     Resistance: 0.1
     Agility: 0.25
     Vitality: 0.5
+    Health: 5
 
 - id: 24c9a991-d792-4296-9900-1b3d89a9af69
   name: Bone-Hewn Cloak
@@ -28,7 +32,25 @@
   rarity: Uncommon
   type: Cloth Armor
   sprite: '0017'
+  slots: 1
   baseStats:
     Resistance: 1
     Agility: 1
     Vitality: 2
+    Health: 6
+    Energy: 3
+
+- id: 41805abc-dc1c-439d-a6ea-b264d3bb3b24
+  name: Silkslime Shirt
+  description: A shirt made of silkslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Cloth Armor
+  sprite: '0039'
+  slots: 1
+  baseStats:
+    Resistance: 3.6
+    Agility: 2.1
+    Vitality: 1.2
+    Health: 10
+    Energy: 9

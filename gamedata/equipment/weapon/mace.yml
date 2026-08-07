@@ -8,6 +8,19 @@
   rarity: Common
   type: Mace
   sprite: '0019'
+  slots: 1
   baseStats:
     Strength: 0.8
     Intelligence: 0.5
+
+- id: 8b6573b3-251e-435f-ae35-a1d140eab407
+  name: Copperslime Mace
+  description: A magical mace made of copperslime and wergen wood.
+  levelRequirement: 6
+  rarity: Common
+  type: Mace
+  sprite: '0030'
+  slots: 1
+  baseStats:
+    Strength: 2.1
+    Intelligence: 2.3

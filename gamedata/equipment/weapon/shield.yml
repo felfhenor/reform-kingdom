@@ -8,6 +8,19 @@
   rarity: Common
   type: Shield
   sprite: '0011'
+  slots: 1
   baseStats:
     Vitality: 0.3
     Resistance: 0.1
+
+- id: 98a3127c-98fb-42e2-be4c-9734070159e5
+  name: Copperslime Shield
+  description: A shield made of copperslime.
+  levelRequirement: 2
+  rarity: Common
+  type: Shield
+  sprite: '0027'
+  slots: 1
+  baseStats:
+    Vitality: 1.3
+    Resistance: 2.7

@@ -8,6 +8,20 @@
   rarity: Common
   type: Staff
   sprite: '0018'
+  slots: 1
   baseStats:
     Intelligence: 1.5
     Vitality: 0.6
+
+- id: 977a418f-3197-4281-a625-27a97cefd9d2
+  name: Wergenslime Staff
+  description: A magical staff made of wergenslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Staff
+  sprite: '0031'
+  slots: 1
+  baseStats:
+    Intelligence: 3.5
+    Vitality: 1.5
+    Resistance: 1.3

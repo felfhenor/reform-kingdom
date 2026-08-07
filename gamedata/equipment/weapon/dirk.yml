@@ -8,6 +8,7 @@
   rarity: Common
   type: Dirk
   sprite: '0012'
+  slots: 1
   baseStats:
     Agility: 0.5
     Vitality: 0.4

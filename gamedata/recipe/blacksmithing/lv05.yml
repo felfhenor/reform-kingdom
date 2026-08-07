@@ -1,0 +1,92 @@
+- id: 229b59c9-7aa8-40d6-9253-f0d9cdb52e5a
+  name: 'Equipment: Copperslime Breastplate'
+  result:
+    equipmentId: Copperslime Breastplate
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 10
+
+    - itemId: Green Slime Core
+      quantity: 5
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 8
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: d38b786f-67a1-4ea4-ac37-253d48c1bded
+  name: 'Equipment: Copperslime Dagger'
+  result:
+    equipmentId: Copperslime Dagger
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 5
+
+    - itemId: Red Slime Core
+      quantity: 5
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 6
+  maxTradeskillLevel: 9
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: dcc9d33e-079a-4205-a4d8-1b5b4fb0ce74
+  name: 'Equipment: Copperslime Mace'
+  result:
+    equipmentId: Copperslime Mace
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 8
+
+    - itemId: Red Slime Core
+      quantity: 5
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 7
+  maxTradeskillLevel: 10
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: a6b18666-fdb2-4b23-9ff9-2a6bcc373148
+  name: 'Equipment: Copperslime Sword'
+  result:
+    equipmentId: Copperslime Sword
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 10
+
+    - itemId: Red Slime Core
+      quantity: 5
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 8
+  maxTradeskillLevel: 11
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 1593fde0-5aef-4830-aceb-2de345c828cf
+  name: 'Equipment: Copperslime Shield'
+  result:
+    equipmentId: Copperslime Shield
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 10
+
+    - itemId: Green Slime Core
+      quantity: 3
+
+    - itemId: Red Slime Core
+      quantity: 3
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 9
+  maxTradeskillLevel: 12
+  tradeskillXP: 25
+  craftTime: 60

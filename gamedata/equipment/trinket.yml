@@ -5,6 +5,7 @@
   rarity: Uncommon
   type: Trinket
   sprite: '0010'
+  slots: 1
   baseStats:
     Resistance: 1
     Vitality: 1

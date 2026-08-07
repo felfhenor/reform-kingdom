@@ -1,0 +1,77 @@
+- id: 4f9fafae-62b8-4e28-a825-75a714ad8906
+  name: 'Material: Trislime Core'
+  result:
+    itemId: Trislime Core
+
+  requirements:
+    - itemId: Red Slime Core
+      quantity: 3
+
+    - itemId: Green Slime Core
+      quantity: 3
+
+    - itemId: Purple Slime Core
+      quantity: 3
+
+  tradeskill: Artificing
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 8
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 3ac8811e-6614-4c83-9f6c-82e01e31aca9
+  name: 'Equipment: Copperslime Whip'
+  result:
+    equipmentId: Copperslime Whip
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 3
+
+    - itemId: Purple Slime Core
+      quantity: 5
+
+  tradeskill: Artificing
+  minTradeskillLevel: 6
+  maxTradeskillLevel: 9
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 5dd9b7eb-d971-478e-a973-eeb35ce998e8
+  name: 'Equipment: Wergenslime Staff'
+  result:
+    equipmentId: Wergenslime Staff
+
+  requirements:
+    - itemId: Wergen Wood
+      quantity: 3
+
+    - itemId: Purple Slime Core
+      quantity: 5
+
+  tradeskill: Artificing
+  minTradeskillLevel: 7
+  maxTradeskillLevel: 10
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 770e287b-57b1-4b47-8c7f-f9723c73fcbc
+  name: 'Equipment: Copperslime Amulet'
+  result:
+    equipmentId: Copperslime Amulet
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Green Slime Core
+      quantity: 2
+
+    - itemId: Purple Slime Core
+      quantity: 2
+
+  tradeskill: Artificing
+  minTradeskillLevel: 8
+  maxTradeskillLevel: 11
+  tradeskillXP: 15
+  craftTime: 60

@@ -1,0 +1,71 @@
+- id: 2da4ec85-c699-4953-a75f-27fd841a364c
+  name: 'Item: Silk Spool'
+  result:
+    itemId: Silk Spool
+
+  requirements:
+    - itemId: Linen Thread
+      quantity: 1
+
+    - itemId: Weak Spider Silk
+      quantity: 3
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 8
+  tradeskillXP: 5
+  craftTime: 10
+
+- id: 955b9df0-32e2-4c06-a059-7ee228397700
+  name: 'Equipment: Silkslime Shirt'
+  result:
+    equipmentId: Silkslime Shirt
+
+  requirements:
+    - itemId: Silk Spool
+      quantity: 4
+
+    - itemId: Green Slime Core
+      quantity: 3
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 6
+  maxTradeskillLevel: 9
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: ff67ae72-22d1-46c8-8b53-af90d9a8ad99
+  name: 'Equipment: Silkslime Hat'
+  result:
+    equipmentId: Silkslime Hat
+
+  requirements:
+    - itemId: Silk Spool
+      quantity: 2
+
+    - itemId: Green Slime Core
+      quantity: 3
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 7
+  maxTradeskillLevel: 10
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 9e847d23-28e6-46e3-b48b-1ec64989fe7b
+  name: 'Equipment: Silkslime Gloves'
+  result:
+    equipmentId: Silkslime Gloves
+
+  requirements:
+    - itemId: Silk Spool
+      quantity: 4
+
+    - itemId: Green Slime Core
+      quantity: 3
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 8
+  maxTradeskillLevel: 11
+  tradeskillXP: 15
+  craftTime: 60

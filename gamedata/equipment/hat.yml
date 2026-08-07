@@ -5,6 +5,7 @@
   rarity: Common
   type: Hat
   sprite: '0002'
+  slots: 1
   baseStats:
     Health: 5
     Vitality: 0.5
@@ -16,6 +17,20 @@
   rarity: Common
   type: Hat
   sprite: '0003'
+  slots: 1
   baseStats:
     Health: 7
     Vitality: 0.7
+
+- id: 84f8a792-08e9-41ab-a69b-b1cde4d1eac6
+  name: Silkslime Hat
+  description: A hat crafted from silkslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Hat
+  sprite: '0040'
+  slots: 1
+  baseStats:
+    Health: 10
+    Vitality: 1.7
+    Resistance: 1.1

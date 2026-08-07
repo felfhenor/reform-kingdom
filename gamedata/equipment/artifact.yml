@@ -5,5 +5,6 @@
   rarity: Uncommon
   type: Artifact
   sprite: '0014'
+  slots: 1
   baseStats:
     Intelligence: 2.3

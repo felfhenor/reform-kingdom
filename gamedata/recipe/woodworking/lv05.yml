@@ -1,0 +1,77 @@
+- id: e6aa55d6-921e-48b8-b0d5-9abf9dc342c0
+  name: 'Equipment: Wergenslime Bag'
+  result:
+    equipmentId: Wergenslime Bag
+
+  requirements:
+    - itemId: Wergen Stick
+      quantity: 3
+
+    - itemId: Purple Slime Core
+      quantity: 5
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 8
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 87fd5052-e5c0-460f-a0e0-6b8d68135bda
+  name: 'Equipment: Wergenslime Arrow'
+  result:
+    equipmentId: Wergenslime Arrow
+
+  requirements:
+    - itemId: Wergen Wood
+      quantity: 3
+
+    - itemId: Red Slime Core
+      quantity: 5
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 6
+  maxTradeskillLevel: 9
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 9886460b-d58c-4f39-9c0a-6e57b34c9b25
+  name: 'Equipment: Wergenslime Bow'
+  result:
+    equipmentId: Wergenslime Bow
+
+  requirements:
+    - itemId: Wergen Wood
+      quantity: 3
+
+    - itemId: Silk Spool
+      quantity: 3
+
+    - itemId: Red Slime Core
+      quantity: 5
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 7
+  maxTradeskillLevel: 10
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 2c7bd1ab-f493-45ce-b19b-346bfda940ce
+  name: 'Equipment: Wergenslime Spear'
+  result:
+    equipmentId: Wergenslime Spear
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 3
+
+    - itemId: Wergen Wood
+      quantity: 3
+
+    - itemId: Red Slime Core
+      quantity: 5
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 8
+  maxTradeskillLevel: 11
+  tradeskillXP: 15
+  craftTime: 60

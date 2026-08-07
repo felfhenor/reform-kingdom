@@ -1,0 +1,10 @@
+- id: e8950490-3ac6-41de-8245-2abf4bc99d55
+  name: Leaf Charm
+  description: A charm fashioned out of copperslime and nature.
+  rarity: Uncommon
+  levelRequirement: 6
+  type: Charm
+  sprite: '0034'
+  slots: 1
+  baseStats:
+    Intelligence: 3

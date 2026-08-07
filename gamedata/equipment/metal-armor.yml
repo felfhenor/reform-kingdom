@@ -1,0 +1,14 @@
+- id: 7fa997c0-62f0-494a-b91f-ae2aa26c9175
+  name: Copperslime Breastplate
+  description: A breastplate made of copperslime.
+  levelRequirement: 7
+  rarity: Common
+  type: Metal Armor
+  sprite: '0026'
+  slots: 1
+  baseStats:
+    Vitality: 4
+    Resistance: 2
+    Agility: 0.2
+    Health: 14
+    Energy: 3

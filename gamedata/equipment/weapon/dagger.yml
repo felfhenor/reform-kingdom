@@ -8,6 +8,20 @@
   rarity: Common
   type: Dagger
   sprite: '0004'
+  slots: 1
   baseStats:
     Agility: 0.7
     Strength: 0.5
+
+- id: 7136236a-75d8-424a-8769-822d9b9c9038
+  name: Copperslime Dagger
+  description: A dagger made of copperslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Dagger
+  sprite: '0029'
+  slots: 1
+  baseStats:
+    Agility: 2.3
+    Strength: 1.5
+    Luck: 0.3

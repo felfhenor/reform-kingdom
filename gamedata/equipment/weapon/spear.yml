@@ -8,6 +8,19 @@
   rarity: Common
   type: Spear
   sprite: '0013'
+  slots: 1
   baseStats:
     Strength: 0.8
     Agility: 0.3
+
+- id: 94d45b7c-1989-4900-8bb1-362382d87f57
+  name: Wergenslime Spear
+  description: A spear tipped with wergenslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Spear
+  sprite: '0035'
+  slots: 1
+  baseStats:
+    Strength: 2.4
+    Agility: 1.2
