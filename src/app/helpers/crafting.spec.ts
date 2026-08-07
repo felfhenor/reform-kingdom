@@ -35,6 +35,7 @@ vi.mock('@helpers/materials', () => ({
 }));
 
 vi.mock('@helpers/recipes', () => ({
+  isRecipeCraftable: vi.fn(() => true),
   recipeBackdropSprite: vi.fn(() => '0099'),
   recipeResultContent: vi.fn(),
   recipeResultSpritesheet: vi.fn(),
@@ -76,7 +77,11 @@ import {
   tradeskillXpForLevel,
 } from '@helpers/crafting';
 import { addMaterial, getMaterialQuantity } from '@helpers/materials';
-import { recipeResultContent, recipeResultSpritesheet } from '@helpers/recipes';
+import {
+  isRecipeCraftable,
+  recipeResultContent,
+  recipeResultSpritesheet,
+} from '@helpers/recipes';
 import { rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -760,6 +765,7 @@ describe('getCraftableRecipeEntries', () => {
     vi.clearAllMocks();
     vi.mocked(recipeResultSpritesheet).mockReturnValue('item');
     vi.mocked(recipeResultContent).mockReturnValue(undefined);
+    vi.mocked(isRecipeCraftable).mockReturnValue(true);
   });
 
   it('only includes recipes the building has actually reached', () => {
@@ -781,6 +787,22 @@ describe('getCraftableRecipeEntries', () => {
 
     const entries = getCraftableRecipeEntries('Blacksmithing');
     expect(entries.map((entry) => entry.recipe.id)).toEqual(['low']);
+  });
+
+  it('excludes a level-gated recipe that also requires a world drop until discovered', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding({ level: 5 })),
+    } as unknown as GameState);
+    vi.mocked(getEntriesByType).mockReturnValue([
+      buildRecipe({ id: 'undiscovered' as RecipeId, name: 'Undiscovered' }),
+      buildRecipe({ id: 'discovered' as RecipeId, name: 'Discovered' }),
+    ]);
+    vi.mocked(isRecipeCraftable).mockImplementation(
+      (recipeId) => recipeId !== 'undiscovered',
+    );
+
+    const entries = getCraftableRecipeEntries('Blacksmithing');
+    expect(entries.map((entry) => entry.recipe.id)).toEqual(['discovered']);
   });
 
   it('sorts uncraftable entries to the bottom', () => {

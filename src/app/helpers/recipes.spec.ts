@@ -1,6 +1,8 @@
 import type {
   CollectibleContent,
   CollectibleId,
+  EncounterContent,
+  EncounterId,
   EquipmentContent,
   EquipmentId,
   GameState,
@@ -14,6 +16,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -21,10 +24,12 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   getRecipeFoundAtNode,
+  isRecipeCraftable,
   isRecipeDiscovered,
+  isRecipeDropGated,
   pruneInvalidDiscoveredRecipes,
   recipeDiscover,
   recipeResultContent,
@@ -101,6 +106,16 @@ const collectibleRecipe: RecipeContent = {
   craftTime: 1500,
 };
 
+const forestRuinsEncounter: EncounterContent = {
+  id: 'forest-ruins' as EncounterId,
+  name: 'Forest Ruins',
+  __type: 'encounter',
+  description: 'A dilapidated ruin.',
+  levelRange: { min: 1, max: 3 },
+  fights: [],
+  completionRewards: [{ recipeId: equipmentRecipe.id, chance: 0.25 }],
+};
+
 describe('Recipes Helper Functions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -121,6 +136,49 @@ describe('Recipes Helper Functions', () => {
       } as unknown as GameState);
 
       expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(false);
+    });
+  });
+
+  describe('isRecipeDropGated', () => {
+    it('returns true when the recipe appears as a completion reward', () => {
+      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+
+      expect(isRecipeDropGated(equipmentRecipe.id)).toBe(true);
+    });
+
+    it('returns false when the recipe never appears as a completion reward', () => {
+      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+
+      expect(isRecipeDropGated(itemRecipe.id)).toBe(false);
+    });
+  });
+
+  describe('isRecipeCraftable', () => {
+    it('is true once a drop-gated recipe has been discovered', () => {
+      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(isRecipeCraftable(equipmentRecipe.id)).toBe(true);
+    });
+
+    it('is false for a drop-gated recipe that has not been found', () => {
+      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
+    });
+
+    it('is true for a recipe that never drops from a location', () => {
+      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(isRecipeCraftable(itemRecipe.id)).toBe(true);
     });
   });
 

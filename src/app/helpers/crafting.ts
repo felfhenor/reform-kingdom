@@ -12,6 +12,7 @@ import {
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { addMaterial, getMaterialQuantity } from '@helpers/materials';
 import {
+  isRecipeCraftable,
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
@@ -308,6 +309,7 @@ export function craftQueueStart(
 ): boolean {
   const recipe = getEntry<RecipeContent>(recipeId);
   if (!recipe || recipe.tradeskill !== tradeskill) return false;
+  if (!isRecipeCraftable(recipeId)) return false;
 
   const building = tradeskillBuilding(tradeskill);
   if (building.level < recipe.minTradeskillLevel) return false;
@@ -597,10 +599,12 @@ function recipeRequirementEntries(
   );
 }
 
-// Only recipes the building has actually reached are shown at all. Entries
-// that are currently uncraftable (out of resources, or a unique collectible
-// already owned/queued) sort to the bottom rather than disappearing, so the
-// list stays a stable reference of everything unlocked.
+// Only recipes the building has actually reached are shown at all, and only
+// once any world-drop gate on the recipe itself is satisfied (see
+// `isRecipeCraftable`). Entries that are currently uncraftable (out of
+// resources, or a unique collectible already owned/queued) sort to the
+// bottom rather than disappearing, so the list stays a stable reference of
+// everything unlocked.
 export function getCraftableRecipeEntries(
   tradeskill: Tradeskill,
 ): CraftRecipeEntry[] {
@@ -611,7 +615,8 @@ export function getCraftableRecipeEntries(
     .filter(
       (recipe) =>
         recipe.tradeskill === tradeskill &&
-        building.level >= recipe.minTradeskillLevel,
+        building.level >= recipe.minTradeskillLevel &&
+        isRecipeCraftable(recipe.id),
     )
     .map((recipe) => {
       const resultContent = recipeResultContent(recipe);

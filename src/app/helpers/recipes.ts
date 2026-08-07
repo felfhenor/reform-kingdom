@@ -1,7 +1,8 @@
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CollectibleContent,
+  EncounterContent,
   EquipmentContent,
   GameStateDiscoveredRecipes,
   ItemContent,
@@ -14,6 +15,24 @@ import type {
 // this way (see `getMuseumRecipeEntries`).
 export function isRecipeDiscovered(recipeId: RecipeId): boolean {
   return !!gamestate().discoveredRecipes[recipeId]?.foundAt;
+}
+
+// Whether this recipe is gated behind a world drop - i.e. it appears as a
+// `recipeId` completion reward somewhere. Drop-gated recipes should never be
+// craftable until discovered, even once the tradeskill level gate is met.
+export function isRecipeDropGated(recipeId: RecipeId): boolean {
+  return getEntriesByType<EncounterContent>('encounter').some((encounter) =>
+    encounter.completionRewards.some(
+      (reward) => 'recipeId' in reward && reward.recipeId === recipeId,
+    ),
+  );
+}
+
+// A drop-gated recipe can only be crafted once found; every other recipe is
+// available as soon as the tradeskill level gate is met.
+export function isRecipeCraftable(recipeId: RecipeId): boolean {
+  if (isRecipeDiscovered(recipeId)) return true;
+  return !isRecipeDropGated(recipeId);
 }
 
 export function getRecipeFoundAtNode(recipeId: RecipeId): string | undefined {
