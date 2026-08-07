@@ -32,6 +32,7 @@ import {
   equipmentStatTotals,
   equippedItems,
   isSlotAvailableForJob,
+  pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
 import type { Combat } from '@interfaces';
@@ -207,6 +208,51 @@ describe('Equipment Helper Functions', () => {
 
     it('returns an empty array when nothing is equipped', () => {
       expect(equippedItems(emptyEquipment)).toEqual([]);
+    });
+  });
+
+  describe('pruneInvalidEquippedItems', () => {
+    it('leaves slots whose equipment resolves to real content untouched', () => {
+      vi.mocked(getEntry).mockReturnValue(sword);
+      const equipment = {
+        ...emptyEquipment,
+        Weapon: { equipmentId: sword.id },
+      };
+
+      expect(pruneInvalidEquippedItems(equipment)).toEqual(equipment);
+    });
+
+    it('clears slots whose equipmentId no longer resolves to real content', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+      const equipment = {
+        ...emptyEquipment,
+        Weapon: { equipmentId: 'stale-gear' as EquipmentId },
+      };
+
+      expect(pruneInvalidEquippedItems(equipment)).toEqual(emptyEquipment);
+    });
+
+    it('prunes only the invalid slots out of a mix of valid and invalid gear', () => {
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === sword.id ? sword : undefined) as never,
+      );
+      const equipment = {
+        ...emptyEquipment,
+        Weapon: { equipmentId: sword.id },
+        Helmet: { equipmentId: 'stale-gear' as EquipmentId },
+      };
+
+      expect(pruneInvalidEquippedItems(equipment)).toEqual({
+        ...emptyEquipment,
+        Weapon: { equipmentId: sword.id },
+      });
+    });
+
+    it('returns an equivalent block when nothing is equipped', () => {
+      expect(pruneInvalidEquippedItems(emptyEquipment)).toEqual(
+        emptyEquipment,
+      );
+      expect(getEntry).not.toHaveBeenCalled();
     });
   });
 

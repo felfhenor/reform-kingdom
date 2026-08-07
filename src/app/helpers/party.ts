@@ -7,6 +7,7 @@ import {
   canModifyEquipment,
   equipmentStatTotals,
   equippedItems,
+  pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
 import { heroSkillsAtLevel } from '@helpers/job';
@@ -113,6 +114,28 @@ export function setParty(party: Character[]): void {
   updateGamestate((state) => {
     state.world.party = party;
     return state;
+  });
+}
+
+// Clears any equipped gear that no longer resolves to real content (e.g.
+// after a piece of gear is renamed/removed from gamedata) and recalculates
+// stats/hp/ep to match, since pruning can shrink max Health/Energy.
+export function pruneInvalidPartyEquipment(party: Character[]): Character[] {
+  return party.map((character) => {
+    const equipment = pruneInvalidEquippedItems(character.equipment);
+    const stats = characterStatsForLevel(
+      character.jobId,
+      character.level,
+      equipment,
+    );
+
+    return {
+      ...character,
+      equipment,
+      stats,
+      hp: clamp(character.hp, 0, stats.Health),
+      ep: clamp(character.ep, 0, stats.Energy),
+    };
   });
 }
 

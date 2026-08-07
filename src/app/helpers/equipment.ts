@@ -36,6 +36,24 @@ export function equippedItems(equipment: EquipmentBlock): EquipmentItem[] {
   });
 }
 
+// Clears any slot whose equipped item's equipmentId no longer resolves to
+// real content - e.g. after a piece of gear is renamed/removed from
+// gamedata.
+export function pruneInvalidEquippedItems(
+  equipment: EquipmentBlock,
+): EquipmentBlock {
+  const pruned = { ...equipment };
+
+  (Object.keys(pruned) as EquipmentSlot[]).forEach((slot) => {
+    const item = pruned[slot];
+    if (item && !getEntry<EquipmentContent>(item.equipmentId)) {
+      pruned[slot] = undefined;
+    }
+  });
+
+  return pruned;
+}
+
 // Every slot currently holding this exact equipment id - used to find every
 // slot a multi-slot item occupies when it needs to be unequipped/displaced.
 export function slotsHoldingEquipment(

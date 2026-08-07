@@ -9,6 +9,7 @@ import {
 import { pruneInvalidCraftQueues } from '@helpers/crafting';
 import { defaultGameState } from '@helpers/defaults';
 import { pruneInvalidMaterials } from '@helpers/materials';
+import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import {
   gamestate,
@@ -35,6 +36,7 @@ export function migrateGameState() {
     newState.discoveredRecipes,
   );
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
+  newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
 
   setGameState(newState);
   gamestateTickStart();

@@ -1,4 +1,5 @@
 import type {
+  Character,
   CollectibleId,
   EquipmentId,
   GameState,
@@ -25,6 +26,10 @@ vi.mock('@helpers/materials', () => ({
   pruneInvalidMaterials: vi.fn((materials) => materials),
 }));
 
+vi.mock('@helpers/party', () => ({
+  pruneInvalidPartyEquipment: vi.fn((party) => party),
+}));
+
 vi.mock('@helpers/recipes', () => ({
   pruneInvalidDiscoveredRecipes: vi.fn((discovered) => discovered),
 }));
@@ -36,6 +41,7 @@ vi.mock('@helpers/defaults', () => ({
     collectibles: {},
     discoveredEquipment: {},
     discoveredRecipes: {},
+    world: { party: [] },
   })),
 }));
 
@@ -63,6 +69,7 @@ import {
 } from '@helpers/collectibles';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
+import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
 
@@ -87,6 +94,7 @@ describe('migrateGameState', () => {
       collectibles: {},
       discoveredEquipment: {},
       discoveredRecipes: {},
+      world: { party: [] },
     } as unknown as GameState);
 
     const prunedArmory = [{ equipmentId: 'sword' as EquipmentId }];
@@ -128,6 +136,7 @@ describe('migrateGameState', () => {
       collectibles: staleCollectibles,
       discoveredEquipment: staleDiscovered,
       discoveredRecipes: staleDiscoveredRecipes,
+      world: { party: [] },
     } as unknown as GameState);
 
     const prunedDiscovered = { ['sword' as EquipmentId]: { foundAt: 1000 } };
@@ -171,5 +180,28 @@ describe('migrateGameState', () => {
     expect(committed.discoveredEquipment).toEqual(prunedDiscovered);
     expect(committed.collectibles).toEqual(collectiblesWithFoundingStone);
     expect(committed.discoveredRecipes).toEqual(prunedDiscoveredRecipes);
+  });
+
+  it('prunes invalid equipment off party members before committing the migrated state', () => {
+    const staleParty = [{ id: 'jala' } as Character];
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      world: { party: staleParty },
+    } as unknown as GameState);
+
+    const prunedParty = [{ id: 'jala', equipment: {} } as unknown as Character];
+    vi.mocked(pruneInvalidPartyEquipment).mockReturnValue(prunedParty);
+
+    migrateGameState();
+
+    expect(pruneInvalidPartyEquipment).toHaveBeenCalledWith(staleParty);
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.world.party).toEqual(prunedParty);
   });
 });

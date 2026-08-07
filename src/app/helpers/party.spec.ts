@@ -53,6 +53,7 @@ import {
   healPartyToFull,
   partyGainXp,
   partyGet,
+  pruneInvalidPartyEquipment,
   setParty,
   syncPartyHpFromCombat,
 } from '@helpers/party';
@@ -217,6 +218,90 @@ describe('Party Helper Functions', () => {
       } as unknown as GameState);
 
       expect(partyGet()).toBe(party);
+    });
+  });
+
+  describe('pruneInvalidPartyEquipment', () => {
+    it('leaves equipment untouched when everything still resolves to real content', () => {
+      mockGetEntry(mockJob);
+      const jala = createCharacterStub('Jala');
+
+      const [pruned] = pruneInvalidPartyEquipment([jala]);
+
+      expect(pruned.equipment).toEqual(jala.equipment);
+      expect(pruned.stats).toEqual(jala.stats);
+    });
+
+    it('clears slots whose equipmentId no longer resolves to real content', () => {
+      mockGetEntry(mockJob);
+      const jala = createCharacterStub('Jala');
+      const withStaleGear: Character = {
+        ...jala,
+        equipment: {
+          ...jala.equipment,
+          Helmet: { equipmentId: 'stale-helmet' as EquipmentId },
+        },
+      };
+
+      const [pruned] = pruneInvalidPartyEquipment([withStaleGear]);
+
+      expect(pruned.equipment.Helmet).toBeUndefined();
+      expect(pruned.equipment.Armor).toEqual(withStaleGear.equipment.Armor);
+      expect(pruned.stats).toEqual(
+        characterStatsForLevel(
+          'job-explorer' as JobId,
+          withStaleGear.level,
+          pruned.equipment,
+        ),
+      );
+    });
+
+    it('clamps current hp/ep down when pruning lowers max Health/Energy', () => {
+      mockGetEntry(mockJob, mockHelmet);
+      const jala = createCharacterStub('Jala');
+      const equippedJala: Character = {
+        ...jala,
+        equipment: { ...jala.equipment, Ring: { equipmentId: mockHelmet.id } },
+      };
+      const statsWithHelmet = characterStatsForLevel(
+        'job-explorer' as JobId,
+        equippedJala.level,
+        equippedJala.equipment,
+      );
+      const overHealedJala: Character = {
+        ...equippedJala,
+        stats: statsWithHelmet,
+        hp: statsWithHelmet.Health,
+      };
+
+      // simulate the helmet's content being removed from gamedata
+      mockGetEntry(mockJob);
+
+      const [pruned] = pruneInvalidPartyEquipment([overHealedJala]);
+
+      expect(pruned.equipment.Ring).toBeUndefined();
+      expect(pruned.hp).toBe(pruned.stats.Health);
+    });
+
+    it('processes every party member independently', () => {
+      mockGetEntry(mockJob);
+      const jala = createCharacterStub('Jala');
+      const spoorle = {
+        ...createCharacterStub('Spoorle'),
+        id: 'other-uuid' as CharacterId,
+        equipment: {
+          ...createCharacterStub('Spoorle').equipment,
+          Helmet: { equipmentId: 'stale-helmet' as EquipmentId },
+        },
+      };
+
+      const [prunedJala, prunedSpoorle] = pruneInvalidPartyEquipment([
+        jala,
+        spoorle,
+      ]);
+
+      expect(prunedJala.equipment).toEqual(jala.equipment);
+      expect(prunedSpoorle.equipment.Helmet).toBeUndefined();
     });
   });
 
