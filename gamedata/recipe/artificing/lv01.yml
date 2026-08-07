@@ -70,6 +70,9 @@
     - itemId: Malachite
       quantity: 30
 
+    - itemId: Gold Coin
+      quantity: 250
+
   tradeskill: Artificing
   minTradeskillLevel: 5
   maxTradeskillLevel: 5

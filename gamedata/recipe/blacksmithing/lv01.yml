@@ -109,6 +109,9 @@
     - itemId: Copper Ingot
       quantity: 20
 
+    - itemId: Gold Coin
+      quantity: 250
+
   tradeskill: Blacksmithing
   minTradeskillLevel: 5
   maxTradeskillLevel: 5

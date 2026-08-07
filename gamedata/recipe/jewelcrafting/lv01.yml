@@ -54,7 +54,7 @@
       quantity: 50
 
     - itemId: Gold Coin
-      quantity: 20
+      quantity: 250
 
   tradeskill: Jewelcrafting
   minTradeskillLevel: 5
