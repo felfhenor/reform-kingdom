@@ -85,6 +85,7 @@ type Equipment = {
 
 type SkillTechnique = {
   targetType: string;
+  targets: number;
   damageScaling: Partial<StatBlock>;
   elements: string[];
   attributes: string[];
@@ -349,6 +350,7 @@ async function main(): Promise<void> {
     {
       Type: string;
       Elements: string;
+      Targets: number;
       'Min value': number | string;
       'Mid value': number | string;
       'Max value': number | string;
@@ -400,6 +402,7 @@ async function main(): Promise<void> {
         skillTable[label] = {
           Type: type,
           Elements: (technique.elements ?? []).join(', ') || '-',
+          Targets: technique.targets,
           'Min value': isValued
             ? Math.floor(techniqueRawValue(min, technique))
             : '-',
