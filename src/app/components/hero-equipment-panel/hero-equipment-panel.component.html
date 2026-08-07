@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-[320px_320px_1fr] gap-4 flex-1 min-h-0">
+  <div class="grid grid-cols-[320px_320px_1fr_320px] gap-4 flex-1 min-h-0">
     <div class="flex flex-col gap-2">
       <div>
         <span class="font-semibold text-xl">Stats</span>
@@ -104,6 +104,46 @@
         <div class="italic text-sm p-4">
           Select a slot to see available gear.
         </div>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 overflow-y-auto">
+      <div>
+        <span class="font-semibold text-xl">Skills</span>
+      </div>
+
+      @for (skill of heroSkills(); track skill.id) {
+        <button
+          type="button"
+          class="hero-skill-row hover:bg-base-300"
+          [tp]="skillTooltip"
+          [tpPlacement]="'left'"
+        >
+          <span
+            class="hero-skill-row-icon outline-2 outline-offset-[-2px] rounded outline-{{
+              skill.rarity
+            }}"
+          >
+            <app-icon-blank-slot>
+              <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />
+            </app-icon-blank-slot>
+          </span>
+
+          <span class="hero-skill-row-name text-{{ skill.rarity }}">
+            {{ skill.name }}
+          </span>
+        </button>
+
+        <ng-template #skillTooltip>
+          <div class="p-3 max-w-xs">
+            <div class="font-bold text-base mb-1 text-{{ skill.rarity }}">
+              {{ skill.name }}
+            </div>
+            <div class="text-sm">{{ skill.description }}</div>
+          </div>
+        </ng-template>
+      } @empty {
+        <div class="italic text-sm p-4">No skills learned yet.</div>
       }
     </div>
   </div>

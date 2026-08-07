@@ -5,6 +5,8 @@ import type {
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
+  EquipmentSkillContent,
+  EquipmentSkillId,
   GameState,
   IsContentItem,
   JobContent,
@@ -24,12 +26,17 @@ vi.mock('@helpers/combat', () => ({
   currentCombat: vi.fn(),
 }));
 
+vi.mock('@helpers/combat-log', () => ({
+  miscellaneousMessageLog: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
 }));
 
 import { currentCombat } from '@helpers/combat';
+import { miscellaneousMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
@@ -80,6 +87,7 @@ describe('Party Helper Functions', () => {
       Agility: 0.7,
     },
     equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
+    skillPath: [],
   };
 
   const mockCloak: EquipmentContent = {
@@ -921,6 +929,77 @@ describe('Party Helper Functions', () => {
       expect(result.world.party[0].xp.current).toBe(
         result.world.party[0].xp.maximum,
       );
+    });
+
+    it('does not log anything when the character does not level up', () => {
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(30);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      updateFn({ world: { party: [jala] } } as unknown as GameState);
+
+      expect(miscellaneousMessageLog).not.toHaveBeenCalled();
+    });
+
+    it('logs a level-up message when the character levels up', () => {
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(100);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      updateFn({ world: { party: [jala] } } as unknown as GameState);
+
+      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
+        '**Jala** reached level 2!',
+      );
+    });
+
+    it('logs a message for each newly learned skill on level-up', () => {
+      const attackSkill: EquipmentSkillContent = {
+        id: 'skill-attack' as EquipmentSkillId,
+        name: 'Attack',
+        __type: 'skill',
+      } as EquipmentSkillContent;
+
+      const jobWithSkills: JobContent = {
+        ...mockJob,
+        skillPath: [
+          {
+            pathName: 'Attack',
+            levels: [{ level: 2, skillId: attackSkill.id }],
+          },
+        ],
+      };
+
+      mockGetEntry(jobWithSkills, attackSkill);
+
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(100);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      updateFn({ world: { party: [jala] } } as unknown as GameState);
+
+      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
+        '**Jala** learned **Attack**!',
+      );
+    });
+
+    it('does not log a skill when the job cannot be found', () => {
+      mockGetEntry();
+
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(100);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      updateFn({ world: { party: [jala] } } as unknown as GameState);
+
+      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
+        '**Jala** reached level 2!',
+      );
+      expect(miscellaneousMessageLog).toHaveBeenCalledTimes(1);
     });
   });
 

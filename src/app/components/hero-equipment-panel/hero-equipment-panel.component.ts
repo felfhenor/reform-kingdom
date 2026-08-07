@@ -6,8 +6,10 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { EquipmentItemCardComponent } from '@components/equipment-item-card/equipment-item-card.component';
 import { EquipmentSlotComponent } from '@components/equipment-slot/equipment-slot.component';
+import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import {
   IconStatComponent,
@@ -20,6 +22,7 @@ import {
   defaultStats,
   equipmentAvailableForSlot,
   getEntry,
+  heroSkillsAtLevel,
   isSlotAvailableForJob,
 } from '@helpers';
 import type {
@@ -27,9 +30,11 @@ import type {
   Character,
   EquipmentContent,
   EquipmentId,
+  EquipmentSkillContent,
   EquipmentSlot,
   JobContent,
 } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import { clamp } from 'es-toolkit/compat';
 
 const PAPERDOLL_ROWS: EquipmentSlot[][] = [
@@ -43,11 +48,14 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
   selector: 'app-hero-equipment-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AtlasImageComponent,
     EquipmentSlotComponent,
     EquipmentItemCardComponent,
+    IconBlankSlotComponent,
     IconJobComponent,
     IconStatComponent,
     ScrollingModule,
+    TippyDirective,
   ],
   templateUrl: './hero-equipment-panel.component.html',
   styleUrl: './hero-equipment-panel.component.scss',
@@ -81,6 +89,15 @@ export class HeroEquipmentPanelComponent {
   public job = computed<JobContent | undefined>(() =>
     getEntry<JobContent>(this.character().jobId),
   );
+
+  public heroSkills = computed<EquipmentSkillContent[]>(() => {
+    const job = this.job();
+    if (!job) return [];
+
+    return heroSkillsAtLevel(job, this.character().level)
+      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
+      .filter((skill): skill is EquipmentSkillContent => !!skill);
+  });
 
   public xpPercent = computed<number>(() => {
     const xp = this.character().xp;

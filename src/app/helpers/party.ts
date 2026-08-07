@@ -1,4 +1,5 @@
 import { armoryGet } from '@helpers/armory';
+import { miscellaneousMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
@@ -8,6 +9,7 @@ import {
   equippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
+import { heroSkillsAtLevel } from '@helpers/job';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -19,6 +21,7 @@ import {
   type EquipmentContent,
   type EquipmentId,
   type EquipmentItem,
+  type EquipmentSkillContent,
   type EquipmentSlot,
   type JobContent,
   type JobId,
@@ -438,11 +441,38 @@ function characterLeveledUp(character: Character, amount: number): Character {
   };
 }
 
+// Skills are derived from job + level rather than tracked as "known" state
+// (see heroSkillsAtLevel), so diffing the unlocked skill ids before/after
+// also naturally announces within-path rank upgrades (e.g. Double Strike I
+// -> II) as a newly learned skill.
+function logCharacterProgress(before: Character, after: Character): void {
+  if (after.level === before.level) return;
+
+  miscellaneousMessageLog(`**${after.name}** reached level ${after.level}!`);
+
+  const job = getEntry<JobContent>(after.jobId);
+  if (!job) return;
+
+  const previousSkillIds = new Set(heroSkillsAtLevel(job, before.level));
+  const newSkillIds = heroSkillsAtLevel(job, after.level).filter(
+    (skillId) => !previousSkillIds.has(skillId),
+  );
+
+  newSkillIds.forEach((skillId) => {
+    const skill = getEntry<EquipmentSkillContent>(skillId);
+    if (!skill) return;
+
+    miscellaneousMessageLog(`**${after.name}** learned **${skill.name}**!`);
+  });
+}
+
 export function partyGainXp(amount: number): void {
   updateGamestate((state) => {
-    state.world.party = state.world.party.map((character) =>
-      characterLeveledUp(character, amount),
-    );
+    state.world.party = state.world.party.map((character) => {
+      const updated = characterLeveledUp(character, amount);
+      logCharacterProgress(character, updated);
+      return updated;
+    });
 
     return state;
   });
