@@ -1,4 +1,4 @@
-import { skillEpCost } from '@helpers/skill';
+import { skillEpCost, skillIsUsableWithEquippedWeapons } from '@helpers/skill';
 import type { EquipmentSkill } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -15,6 +15,7 @@ function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
     statusEffectDurationBoost: {} as never,
     statusEffectChanceBoost: {} as never,
     techniques: [],
+    requiredWeaponTypes: [],
     ...overrides,
   };
 }
@@ -32,5 +33,34 @@ describe('skillEpCost', () => {
   it('treats a missing mods epCost as zero', () => {
     const skill = buildSkill({ epCost: 5, mods: {} });
     expect(skillEpCost(skill)).toBe(5);
+  });
+});
+
+describe('skillIsUsableWithEquippedWeapons', () => {
+  it('is usable when the skill has no weapon requirement', () => {
+    const skill = buildSkill({ requiredWeaponTypes: [] });
+    expect(skillIsUsableWithEquippedWeapons(skill, [])).toBe(true);
+  });
+
+  it('is usable when one of the equipped weapon types matches', () => {
+    const skill = buildSkill({ requiredWeaponTypes: ['Bow'] });
+    expect(skillIsUsableWithEquippedWeapons(skill, ['Sword', 'Bow'])).toBe(
+      true,
+    );
+  });
+
+  it('is not usable when none of the equipped weapon types match', () => {
+    const skill = buildSkill({ requiredWeaponTypes: ['Bow'] });
+    expect(skillIsUsableWithEquippedWeapons(skill, ['Sword'])).toBe(false);
+  });
+
+  it('is not usable when nothing is equipped and a weapon is required', () => {
+    const skill = buildSkill({ requiredWeaponTypes: ['Bow'] });
+    expect(skillIsUsableWithEquippedWeapons(skill, [])).toBe(false);
+  });
+
+  it('is usable when any one of multiple required weapon types is equipped', () => {
+    const skill = buildSkill({ requiredWeaponTypes: ['Bow', 'Staff'] });
+    expect(skillIsUsableWithEquippedWeapons(skill, ['Staff'])).toBe(true);
   });
 });

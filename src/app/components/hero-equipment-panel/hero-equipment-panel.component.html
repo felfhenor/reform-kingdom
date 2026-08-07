@@ -113,6 +113,8 @@
       </div>
 
       @for (skill of heroSkills(); track skill.id) {
+        @let usable = isSkillUsable(skill);
+
         <button
           type="button"
           class="hero-skill-row hover:bg-base-300"
@@ -140,6 +142,12 @@
               {{ skill.name }}
             </div>
             <div class="text-sm">{{ skill.description }}</div>
+
+            @if (skill.requiredWeaponTypes.length > 0) {
+              <div class="text-xs mt-2" [class.text-error]="!usable">
+                Skill only usable with {{ skill.requiredWeaponTypes.join(', ') }}
+              </div>
+            }
           </div>
         </ng-template>
       } @empty {

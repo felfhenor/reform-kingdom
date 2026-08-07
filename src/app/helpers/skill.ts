@@ -4,8 +4,22 @@ import type {
   EquipmentSkillTechniqueStatusEffectApplication,
 } from '@interfaces/content-skill';
 import type { GameElement } from '@interfaces/element';
+import type { EquipmentItemType } from '@interfaces/equipment';
 import type { GameStat } from '@interfaces/stat';
 import { clamp, intersection, uniq } from 'es-toolkit/compat';
+
+// Heroes need one of a skill's `requiredWeaponTypes` equipped to use it -
+// e.g. Snipe requires a Bow. An empty list means no weapon is required.
+// Monsters never carry equipment, so this check only applies to heroes.
+export function skillIsUsableWithEquippedWeapons(
+  skill: EquipmentSkill,
+  equippedWeaponTypes: EquipmentItemType[],
+): boolean {
+  if (skill.requiredWeaponTypes.length === 0) return true;
+  return skill.requiredWeaponTypes.some((type) =>
+    equippedWeaponTypes.includes(type),
+  );
+}
 
 export function skillUses(skill: EquipmentSkill): number {
   return skill.usesPerCombat + (skill.mods?.usesPerCombat ?? 0);

@@ -9,6 +9,7 @@ import {
   type EquipmentContent,
   type EquipmentId,
   type EquipmentItem,
+  type EquipmentItemType,
   type EquipmentSlot,
   type JobContent,
   type JobId,
@@ -108,6 +109,16 @@ export function equipmentAvailableForSlot(
   );
 
   return orderBy(forSlot, ['levelRequirement'], ['desc']);
+}
+
+// Resolves each distinct equipped item to its content `type` (e.g. `Bow`,
+// `Sword`) - used to check weapon-type requirements for skills.
+export function equippedItemTypes(
+  equipment: EquipmentBlock,
+): EquipmentItemType[] {
+  return equippedItems(equipment)
+    .map((item) => getEntry<EquipmentContent>(item.equipmentId)?.type)
+    .filter((type): type is EquipmentItemType => !!type);
 }
 
 // Sums each distinct equipped item's baseStats once, regardless of how many

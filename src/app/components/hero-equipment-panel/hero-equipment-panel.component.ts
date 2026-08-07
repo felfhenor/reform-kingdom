@@ -21,15 +21,18 @@ import {
   characterUnequipToArmory,
   defaultStats,
   equipmentAvailableForSlot,
+  equippedItemTypes,
   getEntry,
   heroSkillsAtLevel,
   isSlotAvailableForJob,
+  skillIsUsableWithEquippedWeapons,
 } from '@helpers';
 import type {
   BaseStat,
   Character,
   EquipmentContent,
   EquipmentId,
+  EquipmentItemType,
   EquipmentSkillContent,
   EquipmentSlot,
   JobContent,
@@ -99,6 +102,10 @@ export class HeroEquipmentPanelComponent {
       .filter((skill): skill is EquipmentSkillContent => !!skill);
   });
 
+  public equippedWeaponTypes = computed<EquipmentItemType[]>(() =>
+    equippedItemTypes(this.character().equipment),
+  );
+
   public xpPercent = computed<number>(() => {
     const xp = this.character().xp;
     return clamp((xp.current / Math.max(xp.maximum, 1)) * 100, 0, 100);
@@ -106,6 +113,10 @@ export class HeroEquipmentPanelComponent {
 
   public statValue(stat: BaseStat): number {
     return Math.round(this.character().stats[stat] * 10) / 10;
+  }
+
+  public isSkillUsable(skill: EquipmentSkillContent): boolean {
+    return skillIsUsableWithEquippedWeapons(skill, this.equippedWeaponTypes());
   }
 
   public isSlotVisible(slot: EquipmentSlot): boolean {

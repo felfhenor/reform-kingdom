@@ -2,6 +2,7 @@ import type { HasSprite } from '@interfaces/artable';
 import type { StatusEffectId } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
 import type { GameElement } from '@interfaces/element';
+import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
@@ -72,6 +73,11 @@ export type EquipmentSkillContent = IsContentItem &
   HasDescription & {
     __type: 'skill';
     id: EquipmentSkillId;
+
+    // Weapon types a hero must have equipped to use this skill - e.g. Snipe
+    // requires a Bow. Empty means no weapon requirement. Monsters ignore
+    // this entirely (they have no equipment).
+    requiredWeaponTypes: EquipmentItemType[];
   };
 
 export type EquipmentSkill = EquipmentSkillContent & {

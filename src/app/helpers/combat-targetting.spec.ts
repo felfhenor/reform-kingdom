@@ -15,6 +15,7 @@ function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
     statusEffectDurationBoost: {} as never,
     statusEffectChanceBoost: {} as never,
     techniques: [],
+    requiredWeaponTypes: [],
     ...overrides,
   };
 }

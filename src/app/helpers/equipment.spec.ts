@@ -31,6 +31,7 @@ import {
   equipmentAvailableForSlot,
   equipmentStatTotals,
   equippedItems,
+  equippedItemTypes,
   isSlotAvailableForJob,
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
@@ -208,6 +209,41 @@ describe('Equipment Helper Functions', () => {
 
     it('returns an empty array when nothing is equipped', () => {
       expect(equippedItems(emptyEquipment)).toEqual([]);
+    });
+  });
+
+  describe('equippedItemTypes', () => {
+    it('returns the content type of each distinct equipped item', () => {
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === sword.id ? sword : spear) as never,
+      );
+
+      const types = equippedItemTypes({
+        ...emptyEquipment,
+        Weapon: { equipmentId: sword.id },
+        Offhand: { equipmentId: spear.id },
+      });
+
+      expect(types).toEqual(
+        expect.arrayContaining(['Sword', 'Spear']),
+      );
+      expect(types).toHaveLength(2);
+    });
+
+    it('ignores slots whose equipment content cannot be found', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      expect(
+        equippedItemTypes({
+          ...emptyEquipment,
+          Weapon: { equipmentId: 'missing' as EquipmentId },
+        }),
+      ).toEqual([]);
+    });
+
+    it('returns an empty array when nothing is equipped', () => {
+      expect(equippedItemTypes(emptyEquipment)).toEqual([]);
+      expect(getEntry).not.toHaveBeenCalled();
     });
   });
 

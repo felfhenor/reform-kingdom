@@ -8,6 +8,8 @@
   epCost: 5
   usesPerCombat: 1
 
+  requiredWeaponTypes: [Bow]
+
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
@@ -32,6 +34,8 @@
 
   epCost: 9
   usesPerCombat: 1
+
+  requiredWeaponTypes: [Bow]
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}

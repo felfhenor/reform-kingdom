@@ -4,18 +4,35 @@ import {
   defaultCombatStats,
   defaultStats,
 } from '@helpers/defaults';
+import { equippedItemTypes } from '@helpers/equipment';
 import { heroSkillsAtLevel } from '@helpers/job';
 import { rngUuid } from '@helpers/rng';
+import { skillIsUsableWithEquippedWeapons } from '@helpers/skill';
 import type {
   Character,
   Combat,
   Combatant,
   CombatId,
+  EquipmentSkillContent,
   EquipmentSkillId,
   JobContent,
   MonsterContent,
   StatBlock,
 } from '@interfaces';
+
+function heroUsableSkillIds(
+  character: Character,
+  skillIds: EquipmentSkillId[],
+): EquipmentSkillId[] {
+  const equippedWeaponTypes = equippedItemTypes(character.equipment);
+
+  return skillIds.filter((skillId) => {
+    const skill = getEntry<EquipmentSkillContent>(skillId);
+    return (
+      !skill || skillIsUsableWithEquippedWeapons(skill, equippedWeaponTypes)
+    );
+  });
+}
 
 function monsterStatsAtLevel(
   monster: MonsterContent,
@@ -50,7 +67,7 @@ export function combatantFromCharacter(character: Character): Combatant {
     frames: job?.frames ?? 4,
 
     skillIds: job
-      ? heroSkillsAtLevel(job, character.level)
+      ? heroUsableSkillIds(character, heroSkillsAtLevel(job, character.level))
       : ['Attack' as EquipmentSkillId],
     skillRefs: [],
 
