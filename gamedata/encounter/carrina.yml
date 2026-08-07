@@ -108,6 +108,18 @@
     - collectibleId: Slime Chunks
       chance: 100
 
+    - equipmentId: Green Copperslime Ring
+      chance: 20
+
+    - equipmentId: Red Copperslime Ring
+      chance: 20
+
+    - equipmentId: Purple Copperslime Ring
+      chance: 20
+
+    - recipeId: 'Equipment: Refined Copperslime Ring'
+      chance: 10
+
     - itemId: Gold Coin
       min: 100
       max: 125

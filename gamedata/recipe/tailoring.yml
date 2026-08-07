@@ -10,7 +10,7 @@
 
   tradeskill: Tailoring
   minTradeskillLevel: 1
-  maxTradeskillLevel: 3
+  maxTradeskillLevel: 4
   tradeskillXP: 1
   craftTime: 3
 
@@ -24,8 +24,8 @@
       quantity: 5
 
   tradeskill: Tailoring
-  minTradeskillLevel: 1
-  maxTradeskillLevel: 4
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 5
   tradeskillXP: 5
   craftTime: 20
 
@@ -42,8 +42,8 @@
       quantity: 1
 
   tradeskill: Tailoring
-  minTradeskillLevel: 2
-  maxTradeskillLevel: 5
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 6
   tradeskillXP: 5
   craftTime: 20
 
@@ -63,8 +63,8 @@
       quantity: 3
 
   tradeskill: Tailoring
-  minTradeskillLevel: 2
-  maxTradeskillLevel: 5
+  minTradeskillLevel: 4
+  maxTradeskillLevel: 7
   tradeskillXP: 10
   craftTime: 60
 

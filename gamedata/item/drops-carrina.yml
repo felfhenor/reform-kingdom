@@ -67,3 +67,46 @@
   rarity: Common
 
   sprite: '0015'
+
+- id: 1d09e4a6-d3f8-4d5b-b88e-0aa3b9c57120
+  name: Green Slime Crystal
+  description: A crystal refined from green slime cores and fused with a malachite.
+  rarity: Uncommon
+
+  sprite: '0016'
+
+  infusionStats:
+    Vitality: 2
+
+- id: 7bf8d99d-090b-4648-91c6-b915211acf0c
+  name: Purple Slime Crystal
+  description: A crystal refined from purple slime cores and fused with a malachite.
+  rarity: Uncommon
+
+  sprite: '0017'
+
+  infusionStats:
+    Intelligence: 2
+
+- id: 017d6658-2f8e-45aa-a9ec-85d1573d64a1
+  name: Red Slime Crystal
+  description: A crystal refined from red slime cores and fused with a malachite.
+  rarity: Uncommon
+
+  sprite: '0018'
+
+  infusionStats:
+    Strength: 2
+
+- id: bd37836d-6890-4c90-8635-c6db310daf2e
+  name: Trislime Core
+  description: A slime core made of the combined red, green, and purple slime cores.
+  rarity: Rare
+
+  sprite: '0019'
+
+  infusionStats:
+    Strength: 0.8
+    Resistance: 0.8
+    Vitality: 0.8
+    Intelligence: 0.8

@@ -35,8 +35,8 @@
       quantity: 1
 
   tradeskill: Artificing
-  minTradeskillLevel: 1
-  maxTradeskillLevel: 5
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 6
   tradeskillXP: 5
   craftTime: 20
 
@@ -53,8 +53,8 @@
       quantity: 1
 
   tradeskill: Artificing
-  minTradeskillLevel: 1
-  maxTradeskillLevel: 3
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 7
   tradeskillXP: 8
   craftTime: 10
 

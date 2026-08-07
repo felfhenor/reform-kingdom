@@ -24,8 +24,8 @@
       quantity: 1
 
   tradeskill: Blacksmithing
-  minTradeskillLevel: 1
-  maxTradeskillLevel: 3
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 4
   tradeskillXP: 5
   craftTime: 20
 
@@ -39,8 +39,8 @@
       quantity: 3
 
   tradeskill: Blacksmithing
-  minTradeskillLevel: 2
-  maxTradeskillLevel: 4
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 5
   tradeskillXP: 5
   craftTime: 20
 
@@ -56,8 +56,8 @@
       quantity: 1
 
   tradeskill: Blacksmithing
-  minTradeskillLevel: 2
-  maxTradeskillLevel: 4
+  minTradeskillLevel: 4
+  maxTradeskillLevel: 6
   tradeskillXP: 8
   craftTime: 20
 
@@ -74,8 +74,8 @@
       quantity: 3
 
   tradeskill: Blacksmithing
-  minTradeskillLevel: 2
-  maxTradeskillLevel: 5
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 6
   tradeskillXP: 8
   craftTime: 20
 
@@ -92,8 +92,8 @@
       quantity: 2
 
   tradeskill: Blacksmithing
-  minTradeskillLevel: 3
-  maxTradeskillLevel: 5
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 7
   tradeskillXP: 10
   craftTime: 30
 

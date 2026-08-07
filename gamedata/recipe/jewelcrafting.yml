@@ -10,7 +10,7 @@
 
   tradeskill: Jewelcrafting
   minTradeskillLevel: 1
-  maxTradeskillLevel: 2
+  maxTradeskillLevel: 4
   tradeskillXP: 1
   craftTime: 3
 
@@ -24,8 +24,8 @@
       quantity: 1
 
   tradeskill: Jewelcrafting
-  minTradeskillLevel: 1
-  maxTradeskillLevel: 3
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 5
   tradeskillXP: 5
   craftTime: 20
 
@@ -39,8 +39,8 @@
       quantity: 2
 
   tradeskill: Jewelcrafting
-  minTradeskillLevel: 2
-  maxTradeskillLevel: 5
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 6
   tradeskillXP: 5
   craftTime: 20
 
@@ -61,3 +61,138 @@
   maxTradeskillLevel: 5
   tradeskillXP: 25
   craftTime: 1500
+
+- id: 7039c0f1-8f2c-4da8-80eb-993c6baf35f9
+  name: 'Equipment: Green Copperslime Ring'
+  result:
+    equipmentId: Green Copperslime Ring
+
+  requirements:
+    - itemId: Malachite
+      quantity: 3
+
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Green Slime Core
+      quantity: 2
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 8
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 07df2dae-b5b9-4866-97e1-5e238bb29aa7
+  name: 'Material: Green Slime Crystal'
+  result:
+    itemId: Green Slime Crystal
+
+  requirements:
+    - itemId: Malachite
+      quantity: 3
+
+    - itemId: Green Slime Core
+      quantity: 5
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 8
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: 21fd4996-7fe0-44e0-bf63-5e499bb2e2d2
+  name: 'Equipment: Red Copperslime Ring'
+  result:
+    equipmentId: Red Copperslime Ring
+
+  requirements:
+    - itemId: Malachite
+      quantity: 3
+
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Red Slime Core
+      quantity: 2
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 6
+  maxTradeskillLevel: 9
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 5081fc45-26a3-40a4-9bef-c3d226360bb4
+  name: 'Material: Red Slime Crystal'
+  result:
+    itemId: Red Slime Crystal
+
+  requirements:
+    - itemId: Malachite
+      quantity: 3
+
+    - itemId: Red Slime Core
+      quantity: 5
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 6
+  maxTradeskillLevel: 9
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: 461dfeb1-7fbf-44c5-bba4-b4703fe630e6
+  name: 'Equipment: Purple Copperslime Ring'
+  result:
+    equipmentId: Purple Copperslime Ring
+
+  requirements:
+    - itemId: Malachite
+      quantity: 3
+
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Purple Slime Core
+      quantity: 2
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 7
+  maxTradeskillLevel: 10
+  tradeskillXP: 15
+  craftTime: 60
+
+- id: 6f9f1649-c22c-4a75-8efe-dbc6486ce2ef
+  name: 'Material: Purple Slime Crystal'
+  result:
+    itemId: Purple Slime Crystal
+
+  requirements:
+    - itemId: Malachite
+      quantity: 3
+
+    - itemId: Purple Slime Core
+      quantity: 5
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 7
+  maxTradeskillLevel: 10
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: 69bdc98e-bfb4-4840-a3cb-c8e24c19c266
+  name: 'Equipment: Refined Copperslime Ring'
+  result:
+    equipmentId: Refined Copperslime Ring
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 2
+
+    - itemId: Trislime Core
+      quantity: 1
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 8
+  maxTradeskillLevel: 12
+  tradeskillXP: 30
+  craftTime: 180

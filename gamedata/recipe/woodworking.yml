@@ -10,7 +10,7 @@
 
   tradeskill: Woodworking
   minTradeskillLevel: 1
-  maxTradeskillLevel: 3
+  maxTradeskillLevel: 4
   tradeskillXP: 1
   craftTime: 5
 
@@ -27,8 +27,8 @@
       quantity: 2
 
   tradeskill: Woodworking
-  minTradeskillLevel: 1
-  maxTradeskillLevel: 4
+  minTradeskillLevel: 2
+  maxTradeskillLevel: 5
   tradeskillXP: 5
   craftTime: 30
 
@@ -42,8 +42,8 @@
       quantity: 1
 
   tradeskill: Woodworking
-  minTradeskillLevel: 1
-  maxTradeskillLevel: 4
+  minTradeskillLevel: 3
+  maxTradeskillLevel: 6
   tradeskillXP: 5
   craftTime: 20
 
@@ -59,8 +59,8 @@
       quantity: 1
 
   tradeskill: Woodworking
-  minTradeskillLevel: 2
-  maxTradeskillLevel: 5
+  minTradeskillLevel: 4
+  maxTradeskillLevel: 7
   tradeskillXP: 8
   craftTime: 40
 
@@ -77,8 +77,8 @@
       quantity: 3
 
   tradeskill: Woodworking
-  minTradeskillLevel: 3
-  maxTradeskillLevel: 6
+  minTradeskillLevel: 5
+  maxTradeskillLevel: 8
   tradeskillXP: 5
   craftTime: 20
 
