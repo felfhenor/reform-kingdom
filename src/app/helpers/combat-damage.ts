@@ -22,7 +22,21 @@ import type {
   StatBlock,
   StatusEffectContent,
 } from '@interfaces';
-import { clamp, meanBy, sum, sumBy } from 'es-toolkit/compat';
+import { clamp, sum, sumBy } from 'es-toolkit/compat';
+
+const RESISTANCE_SCALING_STATS: GameStat[] = [
+  'Intelligence',
+  'Resistance',
+  'Energy',
+  'Luck',
+];
+
+const VITALITY_SCALING_STATS: GameStat[] = [
+  'Strength',
+  'Vitality',
+  'Health',
+  'Agility',
+];
 
 function techniqueHasAttribute(
   technique: EquipmentSkillContentTechnique,
@@ -31,10 +45,29 @@ function techniqueHasAttribute(
   return technique.attributes?.includes(attribute);
 }
 
-function targetDefenseStat(
+function targetDefenseValue(
+  target: Combatant,
   technique: EquipmentSkillContentTechnique,
-): GameStat {
-  return technique.elements.length > 0 ? 'Resistance' : 'Vitality';
+): number {
+  const resistanceWeight = sumBy(
+    RESISTANCE_SCALING_STATS,
+    (stat) => technique.damageScaling[stat] ?? 0,
+  );
+  const vitalityWeight = sumBy(
+    VITALITY_SCALING_STATS,
+    (stat) => technique.damageScaling[stat] ?? 0,
+  );
+
+  const totalWeight = resistanceWeight + vitalityWeight;
+  if (totalWeight === 0) return 0;
+
+  const resistancePercent = resistanceWeight / totalWeight;
+  const vitalityPercent = vitalityWeight / totalWeight;
+
+  return (
+    resistancePercent * target.totalStats.Resistance +
+    vitalityPercent * target.totalStats.Vitality
+  );
 }
 
 function getCombatantBaseStatDamageForTechnique(
@@ -112,15 +145,7 @@ export function combatApplySkillToTarget(
   let retaliationDamage = 0;
 
   if (baseDamage > 0) {
-    const defenseStat = targetDefenseStat(technique);
-    const baseTargetDefense = target.totalStats[defenseStat];
-    const targetDefense =
-      technique.elements.length === 0
-        ? baseTargetDefense
-        : meanBy(
-            technique.elements,
-            (el) => baseTargetDefense * (1 - target.resistance[el]),
-          );
+    const targetDefense = targetDefenseValue(target, technique);
 
     let effectiveDamage = baseDamage;
 
