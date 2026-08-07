@@ -47,7 +47,7 @@ import { clamp, orderBy, sumBy } from 'es-toolkit/compat';
 export const TRADESKILL_MAX_LEVEL = 50;
 const MAX_CRAFTABLE_CAP = 99;
 
-// Tunable XP curve: 10 XP for level 1->2, 2.5x per level thereafter.
+// Tunable XP curve: 10 XP for level 1->2, 1.5x per level thereafter.
 export function tradeskillXpForLevel(level: number): number {
   return Math.round(10 * 1.5 ** (level - 1));
 }
@@ -377,13 +377,10 @@ export function craftQueueRemove(
   });
 }
 
-// Returns whether anything was actually produced - an item result with a
-// `chance` roll can whiff entirely, in which case no XP is granted either
+// An item result with a `chance` roll can whiff entirely, producing nothing
+// - but the tradeskill still attempted the craft, so XP is granted either way
 // (see `resolveCraftUnit`).
-function grantCraftResult(
-  tradeskill: Tradeskill,
-  recipe: RecipeContent,
-): boolean {
+function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   const { chance } = recipe.result;
 
   if (chance !== undefined && !rngSucceedsChance(chance)) {
@@ -391,7 +388,7 @@ function grantCraftResult(
       tradeskill,
       `${tradeskill} failed to craft ${recipe.name}.`,
     );
-    return false;
+    return;
   }
 
   if ('itemId' in recipe.result) {
@@ -407,7 +404,7 @@ function grantCraftResult(
         `${tradeskill} crafted ${itemDropHtml(item, quantity)}!`,
       );
     }
-    return true;
+    return;
   }
 
   if ('equipmentId' in recipe.result) {
@@ -422,7 +419,7 @@ function grantCraftResult(
         `${tradeskill} crafted ${equipmentDropHtml(equipment)}!`,
       );
     }
-    return true;
+    return;
   }
 
   const { collectibleId } = recipe.result;
@@ -435,12 +432,10 @@ function grantCraftResult(
       `${tradeskill} crafted ${collectibleDropHtml(collectible)}!`,
     );
   }
-  return true;
 }
 
 function resolveCraftUnit(tradeskill: Tradeskill, recipe: RecipeContent): void {
-  const produced = grantCraftResult(tradeskill, recipe);
-  if (!produced) return;
+  grantCraftResult(tradeskill, recipe);
 
   const chance = craftXpChance(recipe, tradeskillBuilding(tradeskill).level);
   if (recipe.tradeskillXP > 0 && rngSucceedsChance(chance)) {

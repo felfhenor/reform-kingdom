@@ -669,7 +669,7 @@ describe('craftProcessTick', () => {
     );
   });
 
-  it('logs a failure and skips XP when an item result chance roll fails', () => {
+  it('logs a failure and produces nothing when an item result chance roll fails', () => {
     const recipe = buildRecipe({
       craftTime: 5,
       result: { itemId: 'malachite' as ItemId, chance: 10 },
@@ -689,8 +689,37 @@ describe('craftProcessTick', () => {
       'Blacksmithing',
       expect.stringContaining('failed to craft'),
     );
-    // Only the queue-advance update fires - no XP grant on a whiffed craft.
+    // No XP roll succeeded either (same mocked false), so only the
+    // queue-advance update fires.
     expect(updateGamestate).toHaveBeenCalledTimes(1);
+  });
+
+  it('still grants XP when the item result chance roll fails but the XP roll succeeds', () => {
+    const recipe = buildRecipe({
+      craftTime: 5,
+      tradeskillXP: 5,
+      result: { itemId: 'malachite' as ItemId, chance: 10 },
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
+      ),
+    } as unknown as GameState);
+    vi.mocked(getEntry).mockReturnValue(recipe);
+    // First roll (craft result) fails, second roll (XP) succeeds.
+    vi.mocked(rngSucceedsChance)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+
+    craftProcessTick();
+
+    expect(addMaterial).not.toHaveBeenCalled();
+    expect(craftMessageLog).toHaveBeenCalledWith(
+      'Blacksmithing',
+      expect.stringContaining('failed to craft'),
+    );
+    // The XP-grant update plus the queue-advance update both fire.
+    expect(updateGamestate).toHaveBeenCalledTimes(2);
   });
 
   it('defaults the result quantity to 1 when the recipe omits it', () => {
