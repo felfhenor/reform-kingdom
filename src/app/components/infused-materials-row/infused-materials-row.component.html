@@ -1,7 +1,7 @@
 <div class="flex flex-wrap gap-1">
   @for (slot of slots(); track slot.index) {
     <div
-      class="relative w-8 h-8 shrink-0"
+      class="relative w-8 h-8 shrink-0 cursor-pointer"
       [class.ring-2]="selectedSlotIndex() === slot.index"
       [class.ring-primary]="selectedSlotIndex() === slot.index"
       [tp]="slotTooltip"
@@ -11,7 +11,10 @@
       <div class="zoom-50">
         <app-icon-blank-slot>
           @if (slot.content) {
-            <app-atlas-image spritesheet="item" [assetName]="slot.content.sprite" />
+            <app-atlas-image
+              spritesheet="item"
+              [assetName]="slot.content.sprite"
+            />
           }
         </app-icon-blank-slot>
       </div>
