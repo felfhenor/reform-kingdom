@@ -75,3 +75,21 @@
   maxTradeskillLevel: 11
   tradeskillXP: 15
   craftTime: 60
+
+- id: 513d14ed-be77-40c9-93fe-e5ebf47a4e9f
+  name: 'Equipment: Leaf Charm'
+  result:
+    equipmentId: Leaf Charm
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Trislime Core
+      quantity: 1
+
+  tradeskill: Artificing
+  minTradeskillLevel: 9
+  maxTradeskillLevel: 12
+  tradeskillXP: 15
+  craftTime: 60
