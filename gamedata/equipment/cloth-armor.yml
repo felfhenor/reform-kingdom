@@ -15,7 +15,7 @@
   levelRequirement: 2
   rarity: Common
   type: Cloth Armor
-  sprite: '0000'
+  sprite: '0001'
   baseStats:
     Resistance: 0.1
     Agility: 0.25

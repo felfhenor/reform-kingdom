@@ -19,7 +19,6 @@ import {
   canEquipItem,
   characterEquipFromArmory,
   characterUnequipToArmory,
-  defaultStats,
   equipmentAvailableForSlot,
   equippedItemTypes,
   getEntry,
@@ -66,7 +65,16 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
 export class HeroEquipmentPanelComponent {
   public character = input.required<Character>();
 
-  public statKeys = Object.keys(defaultStats()) as BaseStat[];
+  public statKeys: BaseStat[] = [
+    'Health',
+    'Energy',
+    'Strength',
+    'Intelligence',
+    'Vitality',
+    'Resistance',
+    'Agility',
+    'Luck',
+  ];
   public statShorthand = STAT_SHORTHAND;
   public paperdollRows = PAPERDOLL_ROWS;
 

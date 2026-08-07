@@ -4,12 +4,12 @@ import type { BaseStat, Icon } from '@interfaces';
 
 const icons: Record<BaseStat, Icon> = {
   Intelligence: 'gameBrain',
-  Strength: 'gameMuscleUp',
+  Strength: 'gameGavel',
   Vitality: 'gameHeartBeats',
   Resistance: 'gameVibratingShield',
-  Agility: 'gameRunningNinja',
+  Agility: 'gameDuration',
   Health: 'gameGlassHeart',
-  Energy: 'gameBolt',
+  Energy: 'gameDrop',
   Luck: 'gameClover',
 };
 
