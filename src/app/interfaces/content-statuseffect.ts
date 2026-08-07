@@ -14,8 +14,6 @@ export type StatusEffectBehaviorType =
   | 'ModifyStatusEffectData'
   | 'AddDamageToStat'
   | 'TakeDamageFromStat'
-  | 'AddCombatStatElement'
-  | 'TakeCombatStatElement'
   | 'AddCombatStatNumber'
   | 'TakeCombatStatNumber'
   | 'HealDamage'
@@ -32,22 +30,6 @@ export type StatusEffectBehaviorDataChange = {
   combatMessage?: string;
   key: keyof CombatantStatusEffectData;
   value: CombatantStatusEffectData[keyof CombatantStatusEffectData];
-};
-
-export type StatusEffectAddCombatStatElement = {
-  type: 'AddCombatStatElement';
-  combatMessage?: string;
-  combatStat: keyof CombatantCombatStats;
-  element: GameElement;
-  value: number;
-};
-
-export type StatusEffectTakeCombatStatElement = {
-  type: 'TakeCombatStatElement';
-  combatMessage?: string;
-  combatStat: keyof CombatantCombatStats;
-  element: GameElement;
-  value: number;
 };
 
 export type StatusEffectAddCombatStatNumber = {
@@ -93,8 +75,6 @@ export type StatusEffectBehavior =
   | StatusEffectBehaviorHealDamage
   | StatusEffectBehaviorAddStat
   | StatusEffectBehaviorTakeStat
-  | StatusEffectAddCombatStatElement
-  | StatusEffectTakeCombatStatElement
   | StatusEffectAddCombatStatNumber
   | StatusEffectTakeCombatStatNumber;
 

@@ -151,9 +151,8 @@ describe('ensureContent', () => {
         elements: ['Fire', 'NotAnElement'],
         onTick: [
           {
-            type: 'AddCombatStatElement',
+            type: 'AddCombatStatNumber',
             combatStat: 'missChance',
-            element: 'Fire',
             value: 5,
           },
           { type: 'TakeDamage' },
@@ -164,10 +163,9 @@ describe('ensureContent', () => {
       expect(result.elements).toEqual(['Fire']);
       expect(result.onTick).toEqual([
         {
-          type: 'AddCombatStatElement',
+          type: 'AddCombatStatNumber',
           combatMessage: undefined,
           combatStat: 'missChance',
-          element: 'Fire',
           value: 5,
         },
         { type: 'TakeDamage', combatMessage: undefined },
@@ -182,9 +180,8 @@ describe('ensureContent', () => {
         name: 'Burning',
         onApply: [
           {
-            type: 'AddCombatStatElement',
+            type: 'AddCombatStatNumber',
             combatStat: 'notARealStat',
-            element: 'NotAnElement',
             value: 5,
           },
         ],
@@ -192,10 +189,9 @@ describe('ensureContent', () => {
 
       expect(result.onApply).toEqual([
         {
-          type: 'AddCombatStatElement',
+          type: 'AddCombatStatNumber',
           combatMessage: undefined,
           combatStat: 'repeatActionChance',
-          element: 'Fire',
           value: 5,
         },
       ]);

@@ -9,7 +9,6 @@ import type {
 import type { EquipmentSkill } from '@interfaces/content-skill';
 import type {
   StatusEffect,
-  StatusEffectAddCombatStatElement,
   StatusEffectAddCombatStatNumber,
   StatusEffectBehavior,
   StatusEffectBehaviorAddStat,
@@ -17,13 +16,11 @@ import type {
   StatusEffectBehaviorTakeStat,
   StatusEffectBehaviorType,
   StatusEffectContent,
-  StatusEffectTakeCombatStatElement,
   StatusEffectTakeCombatStatNumber,
   StatusEffectTrigger,
 } from '@interfaces/content-statuseffect';
-import type { GameElement } from '@interfaces/element';
 import type { GameStat, StatBlock } from '@interfaces/stat';
-import { isNumber, isObject, sumBy } from 'es-toolkit/compat';
+import { isNumber, sumBy } from 'es-toolkit/compat';
 
 export function combatCanTakeTurn(combatant: Combatant): boolean {
   return !combatant.statusEffectData.isFrozen;
@@ -123,18 +120,6 @@ function combatApplyStatDeltaToCombatant(
   combatant.totalStats[stat] += value;
 }
 
-function combatApplyCombatStatElementDeltaToCombatant(
-  combatant: Combatant,
-  stat: keyof CombatantCombatStats,
-  element: GameElement,
-  value: number,
-): void {
-  const ref = combatant.combatStats[stat];
-  if (!ref || !isObject(ref)) return;
-
-  combatant.combatStats[stat] += value;
-}
-
 function combatApplyCombatStatNumberDeltaToCombatant(
   combatant: Combatant,
   stat: keyof CombatantCombatStats,
@@ -202,26 +187,6 @@ function combatHandleStatusEffectBehaviors(
         combatant,
         behaviorData.modifyStat,
         -damage,
-      );
-    },
-    AddCombatStatElement: () => {
-      const behaviorData = behavior as StatusEffectAddCombatStatElement;
-
-      combatApplyCombatStatElementDeltaToCombatant(
-        combatant,
-        behaviorData.combatStat,
-        behaviorData.element,
-        behaviorData.value,
-      );
-    },
-    TakeCombatStatElement: () => {
-      const behaviorData = behavior as StatusEffectTakeCombatStatElement;
-
-      combatApplyCombatStatElementDeltaToCombatant(
-        combatant,
-        behaviorData.combatStat,
-        behaviorData.element,
-        -behaviorData.value,
       );
     },
     AddCombatStatNumber: () => {

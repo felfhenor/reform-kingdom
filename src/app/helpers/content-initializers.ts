@@ -405,24 +405,6 @@ function ensureStatusEffectBehavior(
         ),
       };
 
-    case 'AddCombatStatElement':
-    case 'TakeCombatStatElement':
-      return {
-        type,
-        combatMessage,
-        combatStat: ensureEnumValue(
-          behavior['combatStat'],
-          VALID_COMBAT_STATS,
-          'repeatActionChance',
-        ),
-        element: ensureEnumValue(
-          behavior['element'],
-          VALID_GAME_ELEMENTS,
-          'Fire',
-        ),
-        value: (behavior['value'] as number) ?? 0,
-      };
-
     case 'AddCombatStatNumber':
     case 'TakeCombatStatNumber':
       return {
