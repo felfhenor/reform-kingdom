@@ -37,7 +37,7 @@
     - skillId: Attack
 
   baseStats:
-    Health: 30
+    Health: 25
     Energy: 5
     Luck: 1
     Intelligence: 1
@@ -47,7 +47,7 @@
     Agility: 5
 
   statsPerLevel:
-    Health: 5
+    Health: 3
     Energy: 0.5
     Luck: 0.05
     Intelligence: 0.1
@@ -85,7 +85,7 @@
     - skillId: Sweep I
 
   baseStats:
-    Health: 50
+    Health: 35
     Energy: 10
     Luck: 5
     Intelligence: 5
@@ -95,7 +95,7 @@
     Agility: 7
 
   statsPerLevel:
-    Health: 10
+    Health: 6
     Energy: 1
     Luck: 0.05
     Intelligence: 0.3
@@ -132,7 +132,7 @@
     - skillId: Fireball I
 
   baseStats:
-    Health: 25
+    Health: 15
     Energy: 15
     Luck: 5
     Intelligence: 10
@@ -142,11 +142,297 @@
     Agility: 3
 
   statsPerLevel:
-    Health: 5
-    Energy: 5
+    Health: 3
+    Energy: 3
     Luck: 0.05
     Intelligence: 2
     Strength: 0.3
     Vitality: 1
     Resistance: 0.5
     Agility: 0.3
+
+- id: a013355d-3634-4b65-bd95-bdb4ed331fb8
+  name: Green Slime
+  description: A magically-inclined slime, somehow capable of harnessing the power of storms.
+
+  sprite: '0012'
+  frames: 4
+
+  targettingType: Strongest
+
+  rarity: Common
+
+  xp:
+    min: 20
+    max: 25
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Green Slime Core
+      min: 1
+      max: 1
+      multiplierPerLevel: 0
+      chance: 25
+
+  skills:
+    - skillId: Attack
+    - skillId: Thunderbolt I
+
+  baseStats:
+    Health: 5
+    Energy: 20
+    Luck: 5
+    Intelligence: 5
+    Strength: 3
+    Vitality: 5
+    Resistance: 7
+    Agility: 2
+
+  statsPerLevel:
+    Health: 3
+    Energy: 5
+    Luck: 0.05
+    Intelligence: 2
+    Strength: 0.6
+    Vitality: 2
+    Resistance: 2
+    Agility: 0.1
+
+- id: bbd21a76-b4f6-435d-9313-eedc9d1b0cb4
+  name: Purple Slime
+  description: A debuff-inclined slime, somehow capable of ruining your day.
+
+  sprite: '0016'
+  frames: 4
+
+  targettingType: Strongest
+
+  rarity: Common
+
+  xp:
+    min: 20
+    max: 25
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Purple Slime Core
+      min: 1
+      max: 1
+      multiplierPerLevel: 0
+      chance: 25
+
+  skills:
+    - skillId: Attack
+    - skillId: Slime Toss
+    - skillId: Analyze I
+
+  baseStats:
+    Health: 10
+    Energy: 30
+    Luck: 5
+    Intelligence: 5
+    Strength: 3
+    Vitality: 5
+    Resistance: 7
+    Agility: 2
+
+  statsPerLevel:
+    Health: 5
+    Energy: 3
+    Luck: 0.05
+    Intelligence: 2
+    Strength: 0.6
+    Vitality: 2.5
+    Resistance: 1
+    Agility: 0.1
+
+- id: ced5c546-894c-47b5-8546-ba26d8645997
+  name: Red Slime
+  description: A physically-inclined slime, somehow capable of punching you in the face.
+
+  sprite: '0020'
+  frames: 4
+
+  targettingType: Strongest
+
+  rarity: Common
+
+  xp:
+    min: 20
+    max: 25
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Red Slime Core
+      min: 1
+      max: 1
+      multiplierPerLevel: 0
+      chance: 25
+
+  skills:
+    - skillId: Attack
+    - skillId: Double Strike I
+
+  baseStats:
+    Health: 15
+    Energy: 10
+    Luck: 5
+    Intelligence: 5
+    Strength: 10
+    Vitality: 10
+    Resistance: 7
+    Agility: 2
+
+  statsPerLevel:
+    Health: 5
+    Energy: 2
+    Luck: 0.05
+    Intelligence: 1
+    Strength: 1.5
+    Vitality: 3
+    Resistance: 1
+    Agility: 0.1
+
+- id: 1fa12b10-2274-4952-af26-359e2c89aae5
+  name: Spiderling
+  description: A baby spider. While it is tiny in stature, it's predatory instincts make it vicious.
+
+  sprite: '0024'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 20
+    max: 25
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Weak Spider Silk
+      min: 1
+      max: 2
+      multiplierPerLevel: 0
+      chance: 50
+
+  skills:
+    - skillId: Attack
+    - skillId: Slow Web
+
+  baseStats:
+    Health: 25
+    Energy: 10
+    Luck: 1
+    Intelligence: 3
+    Strength: 6
+    Vitality: 1
+    Resistance: 3
+    Agility: 5
+
+  statsPerLevel:
+    Health: 3
+    Energy: 0.5
+    Luck: 0.05
+    Intelligence: 0.4
+    Strength: 0.6
+    Vitality: 0.1
+    Resistance: 0.3
+    Agility: 0.8
+
+- id: 3852487a-63e2-4c83-aeae-3e59aa1d5115
+  name: Spider
+  description: An adult spider. While it is tiny in stature, it's predatory instincts make it vicious.
+
+  sprite: '0024'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 25
+    max: 30
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Weak Spider Silk
+      min: 2
+      max: 4
+      multiplierPerLevel: 0
+      chance: 50
+
+  skills:
+    - skillId: Attack
+    - skillId: Slow Web
+    - skillId: Venom Bite I
+
+  baseStats:
+    Health: 35
+    Energy: 25
+    Luck: 1
+    Intelligence: 3
+    Strength: 9
+    Vitality: 1
+    Resistance: 3
+    Agility: 10
+
+  statsPerLevel:
+    Health: 4
+    Energy: 2
+    Luck: 0.05
+    Intelligence: 0.4
+    Strength: 0.7
+    Vitality: 0.1
+    Resistance: 0.3
+    Agility: 0.8
+
+- id: 56ab4bfb-cb67-4c24-a9f3-f20b5313587e
+  name: Spider Queen
+  description: The queen of spiders (at least, in this area). A vicious and fearsome predator.
+
+  sprite: '0028'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 100
+    max: 150
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Silk Spool
+      min: 3
+      max: 5
+      multiplierPerLevel: 0
+      chance: 100
+
+  skills:
+    - skillId: Attack
+    - skillId: Stop Web
+    - skillId: Venom Bite II
+    - skillId: Octa Strike I
+
+  baseStats:
+    Health: 100
+    Energy: 40
+    Luck: 1
+    Intelligence: 3
+    Strength: 5
+    Vitality: 3
+    Resistance: 3
+    Agility: 5
+
+  statsPerLevel:
+    Health: 11
+    Energy: 3
+    Luck: 0.05
+    Intelligence: 0.4
+    Strength: 1
+    Vitality: 1
+    Resistance: 0.3
+    Agility: 2

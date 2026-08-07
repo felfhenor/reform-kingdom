@@ -5,8 +5,8 @@
   frames: 4
 
   baseStats:
-    Health: 35
-    Energy: 10
+    Health: 45
+    Energy: 15
     Luck: 1
     Intelligence: 3
     Strength: 15

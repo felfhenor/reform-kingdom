@@ -1,61 +1,51 @@
-- id: 2ca859ea-df62-43b5-9961-4a4644b094a4
-  name: Fireball I
-  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+- id: 2cd2d441-be84-4c0e-bdd7-5ac6742b4359
+  name: Thunderbolt I
+  description: Blast a single enemy with an intense shock.
 
-  sprite: '0003'
+  sprite: '0008'
 
   rarity: Common
 
-  epCost: 4
+  epCost: 5
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
   techniques:
-    - elements: [Fire]
+    - elements: [Air]
       attributes: [DamagesTarget, AllowPlink]
-      targets: 3
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.3
-
-      statusEffects:
-        - statusEffectId: Burning
-          chance: 20
-          duration: 3
+        Intelligence: 2
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-- id: fbd7b6f8-5efe-417b-b45e-efbf715da8d3
-  name: Fireball II
-  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+- id: 072479de-f0e2-4df5-9fe4-b8d5c14d28df
+  name: Thunderbolt II
+  description: Blast a single enemy with an intense shock.
 
-  sprite: '0003'
+  sprite: '0008'
 
   rarity: Uncommon
 
-  epCost: 8
+  epCost: 10
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
   techniques:
-    - elements: [Fire]
+    - elements: [Air]
       attributes: [DamagesTarget, AllowPlink]
-      targets: 3
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.5
-
-      statusEffects:
-        - statusEffectId: Burning
-          chance: 20
-          duration: 4
+        Intelligence: 3.5
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

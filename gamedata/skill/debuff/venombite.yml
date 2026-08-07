@@ -1,61 +1,65 @@
-- id: 2ca859ea-df62-43b5-9961-4a4644b094a4
-  name: Fireball I
-  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+- id: cc65aced-a210-42ac-8248-980361ddedad
+  name: Venom Bite I
+  description: Bite an enemy, inflicting Venom on them.
 
-  sprite: '0003'
+  sprite: '0009'
 
   rarity: Common
 
-  epCost: 4
+  epCost: 5
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
   techniques:
-    - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
-      targets: 3
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Venom I
       damageScaling:
-        Intelligence: 0.3
+        Strength: 0.5
 
       statusEffects:
-        - statusEffectId: Burning
-          chance: 20
-          duration: 3
+        - statusEffectId: Venom I
+          chance: 100
+          duration: 5
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-- id: fbd7b6f8-5efe-417b-b45e-efbf715da8d3
-  name: Fireball II
-  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+- id: a24cef74-932d-4345-bcf9-eadc62e89381
+  name: Venom Bite II
+  description: Bite an enemy, inflicting Venom on them.
 
-  sprite: '0003'
+  sprite: '0009'
 
-  rarity: Uncommon
+  rarity: Common
 
-  epCost: 8
+  epCost: 10
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
   techniques:
-    - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
-      targets: 3
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Venom II
       damageScaling:
-        Intelligence: 0.5
+        Strength: 1
 
       statusEffects:
-        - statusEffectId: Burning
-          chance: 20
-          duration: 4
+        - statusEffectId: Venom II
+          chance: 100
+          duration: 3
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

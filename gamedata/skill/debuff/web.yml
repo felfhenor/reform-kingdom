@@ -1,61 +1,65 @@
-- id: 2ca859ea-df62-43b5-9961-4a4644b094a4
-  name: Fireball I
-  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+- id: 4a2103cb-a704-46b2-8168-7f39b184851f
+  name: Slow Web
+  description: Web an enemy, slowing them down.
 
-  sprite: '0003'
+  sprite: '0010'
 
   rarity: Common
 
-  epCost: 4
+  epCost: 6
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
   techniques:
-    - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
-      targets: 3
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Slowed
       damageScaling:
-        Intelligence: 0.3
+        Strength: 0.5
 
       statusEffects:
-        - statusEffectId: Burning
-          chance: 20
+        - statusEffectId: Slowed
+          chance: 100
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-- id: fbd7b6f8-5efe-417b-b45e-efbf715da8d3
-  name: Fireball II
-  description: Burst 3 enemies with fire damage, with a chance of inflicting Burning.
+- id: 394a4f06-42de-47d5-8d37-812b9d7b96c6
+  name: Stop Web
+  description: Web an enemy, stopping them in place.
 
-  sprite: '0003'
+  sprite: '0010'
 
-  rarity: Uncommon
+  rarity: Common
 
-  epCost: 8
+  epCost: 12
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
   techniques:
-    - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
-      targets: 3
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Stopped
       damageScaling:
-        Intelligence: 0.5
+        Strength: 1
 
       statusEffects:
-        - statusEffectId: Burning
-          chance: 20
-          duration: 4
+        - statusEffectId: Stopped
+          chance: 100
+          duration: 1
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

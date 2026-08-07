@@ -5,21 +5,21 @@
   frames: 4
 
   baseStats:
-    Health: 25
-    Energy: 15
+    Health: 35
+    Energy: 20
     Luck: 1
-    Intelligence: 6
+    Intelligence: 9
     Strength: 5
     Vitality: 8
     Resistance: 5
     Agility: 2
 
   statsPerLevel:
-    Health: 3
+    Health: 4
     Energy: 3
     Luck: 0
-    Intelligence: 0.5
-    Strength: 0.4
+    Intelligence: 0.6
+    Strength: 0.5
     Vitality: 0.6
     Resistance: 0.4
     Agility: 0.5
@@ -48,3 +48,11 @@
 
         - level: 6
           skillId: Cure II
+
+    - pathName: Starshine
+      levels:
+        - level: 7
+          skillId: Starshine I
+
+        - level: 14
+          skillId: Starshine II

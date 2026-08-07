@@ -5,21 +5,21 @@
   frames: 4
 
   baseStats:
-    Health: 20
+    Health: 30
     Energy: 20
     Luck: 1
     Intelligence: 4
-    Strength: 7
+    Strength: 10
     Vitality: 3
     Resistance: 8
     Agility: 9
 
   statsPerLevel:
-    Health: 5
+    Health: 6
     Energy: 4
     Luck: 0
     Intelligence: 0.3
-    Strength: 0.5
+    Strength: 0.7
     Vitality: 0.4
     Resistance: 0.6
     Agility: 0.8

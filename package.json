@@ -32,6 +32,8 @@
     "bump:major": "npm version major -m \"chore(release): Major %s\"",
     "bump:minor": "npm version minor -m \"chore(release): Minor %s\"",
     "bump:patch": "npm version patch -m \"chore(release): Patch %s\"",
+    "analyze:herostats": "ts-node scripts/analyze-herostats",
+    "analyze:monsterstats": "ts-node scripts/analyze-monsterstats",
     "util:changelog:generate": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "util:changelog:generate:current": "conventional-changelog -p angular -o CHANGELOG-current.md -r 2",
     "util:changelog:commit": "git commit CHANGELOG.md CHANGELOG-current.md -m \"Update changelog\" || true",

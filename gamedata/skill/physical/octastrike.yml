@@ -1,0 +1,24 @@
+- id: 37f8f343-c32b-47b0-87c0-d9e8d542c58a
+  name: Octa Strike I
+  description: Strike 8 times for a very low amount of damage.
+
+  rarity: Uncommon
+  sprite: '0011'
+
+  epCost: 5
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink]
+      elements: []
+      targets: 8
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

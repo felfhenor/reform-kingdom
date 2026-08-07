@@ -20,3 +20,88 @@
     - type: AddDamageToStat
       combatMessage: '**{{ combatant.name }}** has concealed their weak spot (+{{ damage }} Vitality)!'
       modifyStat: Vitality
+
+- id: 32678967-cbd0-4b08-9eb3-089254ec9bb9
+  name: Slimed
+
+  effectType: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Resistance: 0.3
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has been slimed (-{{ damage }} Resistance)!'
+      modifyStat: Resistance
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has shaken off the slime (+{{ damage }} Resistance)!'
+      modifyStat: Resistance
+
+- id: b3b9516b-6f93-493a-a42d-b5764d5c0370
+  name: Slowed
+
+  effectType: Debuff
+  elements: [Air]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Agility: 0.4
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has been slowed (-{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: AddCombatStatNumber
+      combatStat: missChance
+      value: 10
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has shaken off the slow (+{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: TakeCombatStatNumber
+      combatStat: missChance
+      value: 10
+
+- id: a469aaf3-5542-4191-a751-dd75d07773c8
+  name: Stopped
+
+  effectType: Debuff
+  elements: [Air]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Agility: 1
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has been stopped (-{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: AddCombatStatNumber
+      combatStat: missChance
+      value: 10
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has shaken off the stop (+{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: TakeCombatStatNumber
+      combatStat: missChance
+      value: 10

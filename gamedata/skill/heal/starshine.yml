@@ -1,0 +1,55 @@
+- id: bd410126-602d-4951-9202-a7e49ba98e0e
+  name: Starshine I
+  description: Heal all living allies for a small amount of HP.
+
+  sprite: '0012'
+
+  rarity: Common
+
+  epCost: 9
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, HealsTarget]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Intelligence: 0.2
+        Vitality: 0.1
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 3e19fc85-32ab-4869-87f2-2aafc274bb69
+  name: Starshine II
+  description: Heal all living allies for a small amount of HP.
+
+  sprite: '0012'
+
+  rarity: Uncommon
+
+  epCost: 14
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, HealsTarget]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Intelligence: 0.35
+        Vitality: 0.2
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

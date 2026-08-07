@@ -7,3 +7,8 @@
   name: Healing
   sprite: '0001'
   description: The party is recovering from a difficult battle.
+
+- id: de91e21b-af6a-4285-872e-3af041fb2f5f
+  name: Idle
+  sprite: '0002'
+  description: The heroes are idle and resting, slowly recovering HP and EP.

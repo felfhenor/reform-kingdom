@@ -76,3 +76,74 @@
 
     - equipmentId: Goblin Skull
       chance: 10
+
+- id: c89e5d32-f802-4398-ae81-ceb0fdc04224
+  name: Slimed Waystation
+  description: A ruined waystation in the forest, guarding the way to a more sinister tower. This place is held together entirely by slime and goo.
+
+  levelRange:
+    min: 5
+    max: 7
+
+  fights:
+    - monsters:
+        - monsterId: Green Slime
+        - monsterId: Green Slime
+    - monsters:
+        - monsterId: Purple Slime
+        - monsterId: Red Slime
+    - monsters:
+        - monsterId: Green Slime
+        - monsterId: Purple Slime
+    - monsters:
+        - monsterId: Purple Slime
+        - monsterId: Red Slime
+        - monsterId: Green Slime
+    - monsters:
+        - monsterId: Purple Slime
+        - monsterId: Red Slime
+        - monsterId: Green Slime
+
+  completionRewards:
+    - collectibleId: Slime Chunks
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 100
+      max: 125
+      multiplierPerLevel: 0
+      chance: 100
+
+- id: def818a1-e9b4-462a-a108-4544d388ba4f
+  name: Spider Tower
+  description: A tower covered in green spiderwebs. It emits a palpable, sinister aura.
+
+  levelRange:
+    min: 7
+    max: 10
+
+  fights:
+    - monsters:
+        - monsterId: Spiderling
+        - monsterId: Spiderling
+        - monsterId: Spider
+    - monsters:
+        - monsterId: Spiderling
+        - monsterId: Spider
+        - monsterId: Spider
+    - monsters:
+        - monsterId: Spiderling
+        - monsterId: Spiderling
+        - monsterId: Spider
+        - monsterId: Spider
+        - monsterId: Spider Queen
+
+  completionRewards:
+    - collectibleId: Venom Orb
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 150
+      max: 200
+      multiplierPerLevel: 0
+      chance: 100

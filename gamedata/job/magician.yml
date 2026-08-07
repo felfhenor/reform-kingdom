@@ -5,20 +5,20 @@
   frames: 4
 
   baseStats:
-    Health: 20
-    Energy: 30
+    Health: 30
+    Energy: 40
     Luck: 1
-    Intelligence: 10
+    Intelligence: 14
     Strength: 2
     Vitality: 3
     Resistance: 7
     Agility: 5
 
   statsPerLevel:
-    Health: 3
-    Energy: 5
+    Health: 4
+    Energy: 7
     Luck: 0
-    Intelligence: 0.7
+    Intelligence: 0.9
     Strength: 0.2
     Vitality: 0.3
     Resistance: 0.5
@@ -48,3 +48,11 @@
 
         - level: 6
           skillId: Fireball II
+
+    - pathName: Thunderbolt
+      levels:
+        - level: 5
+          skillId: Thunderbolt I
+
+        - level: 11
+          skillId: Thunderbolt II

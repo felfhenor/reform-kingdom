@@ -4,3 +4,6 @@
   rarity: Uncommon
 
   sprite: '0008'
+
+  infusionStats:
+    Intelligence: 2

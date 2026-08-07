@@ -5,9 +5,65 @@
 
   sprite: '0004'
 
+  infusionStats:
+    Resistance: 3
+
 - id: 9278a72b-44b8-4a15-b1d5-ef61accfc2d0
   name: Small Goblin Bone
   description: A weak kind of bone taken from the corpse of a goblin.
   rarity: Common
 
   sprite: '0009'
+
+  infusionStats:
+    Vitality: 2
+
+- id: a772f99a-b19f-44c6-af97-823ed8dabc64
+  name: Green Slime Core
+  description: A magical slime core taken from a green slime.
+  rarity: Uncommon
+
+  sprite: '0011'
+
+  infusionStats:
+    Vitality: 2
+    Intelligence: 3
+
+- id: 877798fc-a346-4576-9be5-870299388440
+  name: Red Slime Core
+  description: A magical slime core taken from a red slime.
+  rarity: Uncommon
+
+  sprite: '0012'
+
+  infusionStats:
+    Vitality: 2
+    Strength: 3
+
+- id: a1d7d9e4-c1e1-41ab-95ed-0beebea4cacc
+  name: Purple Slime Core
+  description: A magical slime core taken from a purple slime.
+  rarity: Uncommon
+
+  sprite: '0013'
+
+  infusionStats:
+    Vitality: 3
+    Resistance: 3
+
+- id: e342c641-e459-4a62-a7dd-278e39c0213b
+  name: Weak Spider Silk
+  description: A thread of silk taken from a Carrina spider.
+  rarity: Common
+
+  sprite: '0014'
+
+  infusionStats:
+    Agility: 2
+
+- id: bde4843a-afa9-4c48-a202-9da0a6a33aa7
+  name: Silk Spool
+  description: A spool of silk
+  rarity: Common
+
+  sprite: '0015'

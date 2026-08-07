@@ -15,3 +15,15 @@
   rarity: Common
   description: A lotus found in a pristine clearing near a forest ruin.
   sprite: '0002'
+
+- id: 1f38356d-89b7-4ba7-be26-4d927e307a56
+  name: Slime Chunks
+  rarity: Common
+  description: A rock encased entirely in viscious slime.
+  sprite: '0004'
+
+- id: f534cc92-e391-42fc-86c7-8ffc0fee3d24
+  name: Venom Orb
+  rarity: Common
+  description: An orb protected feverishly by spiders, seemingly powering their venomous abilities.
+  sprite: '0005'

@@ -16,3 +16,45 @@
   onTick:
     - type: TakeDamage
       combatMessage: '**{{ combatant.name }}** is burning for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
+
+- id: 3b675904-61f4-4102-a642-58a7981e6e46
+  name: Venom I
+
+  effectType: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Health: 0.05
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** has been inflicted with venom!'
+
+  onTick:
+    - type: TakeDamage
+      combatMessage: '**{{ combatant.name }}** is suffering from venom for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
+
+- id: 7fa166e2-9fb2-4f00-990b-fdff7aa7a3f1
+  name: Venom II
+
+  effectType: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Health: 0.1
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** has been inflicted with venom!'
+
+  onTick:
+    - type: TakeDamage
+      combatMessage: '**{{ combatant.name }}** is suffering from venom for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
