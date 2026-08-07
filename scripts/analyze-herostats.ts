@@ -21,14 +21,22 @@
  * "Mid" has no in-game meaning - it's a stand-in for "a partially-geared
  * party" as a balance reference point.
  *
+ * Also reports, per unlocked skill, an estimated damage/heal value at each
+ * of the Min/Mid/Max stat tiers above. This is a hero-side-only estimate:
+ * `combatApplySkillToTarget` (src/app/helpers/combat-damage.ts) mitigates
+ * damage against a *target's* Resistance/Vitality (skipped entirely for
+ * `BypassDefense` techniques, which covers every heal) and caps healing to
+ * the target's missing HP - neither of which exists here without a target
+ * to fight. What's reported is the raw, pre-mitigation technique power:
+ * `Σ stat * (1 + damageScaling[stat])` over each stat the technique scales
+ * from (assumes 0 elemental affinity, i.e. no equipped Artifact bonus) -
+ * an upper bound on damage, and the uncapped/unresisted value for healing.
+ *
  * Usage: ts-node scripts/analyze-herostats <level 1-99> [class1,class2,...]
  *
  * The class list is optional and matches `Job.name` case-insensitively
  * (e.g. `warrior,healer`); omit it to report every class.
  */
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -38,6 +46,7 @@ const rec = require('recursive-readdir');
 const ROOT_DIR = path.resolve(__dirname, '..');
 const JOB_DIR = path.join(ROOT_DIR, 'gamedata', 'job');
 const EQUIPMENT_DIR = path.join(ROOT_DIR, 'gamedata', 'equipment');
+const SKILL_DIR = path.join(ROOT_DIR, 'gamedata', 'skill');
 
 const CHARACTER_MAX_LEVEL = 99;
 
@@ -54,11 +63,17 @@ const STATS = [
 type Stat = (typeof STATS)[number];
 type StatBlock = Record<Stat, number>;
 
+type JobSkillPathLevel = {
+  level: number;
+  skillId: string;
+};
+
 type Job = {
   name: string;
   baseStats: StatBlock;
   statsPerLevel: StatBlock;
   equippableTypes: string[];
+  skillPath: { pathName: string; levels: JobSkillPathLevel[] }[];
 };
 
 type Equipment = {
@@ -66,6 +81,19 @@ type Equipment = {
   levelRequirement: number;
   type: string;
   baseStats: Partial<StatBlock>;
+};
+
+type SkillTechnique = {
+  targetType: string;
+  damageScaling: Partial<StatBlock>;
+  elements: string[];
+  attributes: string[];
+  statusEffects: { statusEffectId: string; chance: number; duration: number }[];
+};
+
+type Skill = {
+  name: string;
+  techniques: SkillTechnique[];
 };
 
 // Mirrors `EquipmentTypeToSlot` in src/app/interfaces/equipment.ts - only
@@ -227,6 +255,45 @@ function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+// Mirrors `heroSkillsAtLevel` in src/app/helpers/job.ts: the highest-level
+// entry unlocked so far on each skill path (skillPath entries are yml
+// name-references, per project convention - resolved against `skills` by
+// `Skill.name`, not a real id).
+function heroSkillsAtLevel(job: Job, level: number): string[] {
+  return job.skillPath
+    .map((path) => {
+      const unlocked = path.levels.filter((entry) => entry.level <= level);
+      if (unlocked.length === 0) return undefined;
+      return unlocked.reduce((latest, entry) =>
+        entry.level > latest.level ? entry : latest,
+      ).skillId;
+    })
+    .filter((skillId): skillId is string => !!skillId);
+}
+
+function techniqueType(technique: SkillTechnique): string {
+  const attributes = technique.attributes ?? [];
+  if (attributes.includes('HealsTarget')) return 'Heal';
+  if (attributes.includes('DamagesTarget')) return 'Damage';
+  if (attributes.includes('Buff')) return 'Buff';
+  if (attributes.includes('Debuff')) return 'Debuff';
+  return 'Effect';
+}
+
+// Raw, pre-mitigation technique power at a given stat block - see the
+// file-level comment for what this does and doesn't account for.
+function techniqueRawValue(
+  stats: StatBlock,
+  technique: SkillTechnique,
+): number {
+  const damageScaling = technique.damageScaling ?? {};
+  return STATS.reduce((sum, stat) => {
+    const scaling = damageScaling[stat] ?? 0;
+    if (scaling === 0) return sum;
+    return sum + stats[stat] * (1 + scaling);
+  }, 0);
+}
+
 // Case-insensitive filter by `name` - returns every item if `namesArg` is
 // omitted/empty.
 function filterByNames<T extends { name: string }>(
@@ -261,6 +328,8 @@ async function main(): Promise<void> {
 
   const jobs = await loadYmlArray<Job>(JOB_DIR);
   const equipment = await loadYmlArray<Equipment>(EQUIPMENT_DIR);
+  const skills = await loadYmlArray<Skill>(SKILL_DIR);
+  const skillsByName = new Map(skills.map((skill) => [skill.name, skill]));
 
   const selectedJobs = filterByNames(jobs, classFilterArg);
   if (selectedJobs.length === 0) {
@@ -275,6 +344,17 @@ async function main(): Promise<void> {
   const minTable: Record<string, Record<string, number>> = {};
   const midTable: Record<string, Record<string, number>> = {};
   const maxTable: Record<string, Record<string, number>> = {};
+  const skillTable: Record<
+    string,
+    {
+      Type: string;
+      Elements: string;
+      'Min value': number | string;
+      'Mid value': number | string;
+      'Max value': number | string;
+      'Status effects': string;
+    }
+  > = {};
 
   selectedJobs.forEach((job) => {
     const min = jobStatsAtLevel(job, level);
@@ -288,7 +368,10 @@ async function main(): Promise<void> {
     console.log(
       `\n${job.name} MAX gear: ${
         gearSet
-          .map((item) => `${item.name} (${item.type}, req L${item.levelRequirement})`)
+          .map(
+            (item) =>
+              `${item.name} (${item.type}, req L${item.levelRequirement})`,
+          )
           .join(', ') || '(nothing available to equip at this level)'
       }`,
     );
@@ -296,6 +379,43 @@ async function main(): Promise<void> {
     minTable[job.name] = statRow(min);
     midTable[job.name] = statRow(mid);
     maxTable[job.name] = statRow(max);
+
+    heroSkillsAtLevel(job, level).forEach((skillName) => {
+      const skill = skillsByName.get(skillName);
+      if (!skill) {
+        console.error(
+          `  ! "${job.name}" has unlocked skill "${skillName}" but no matching entry exists under gamedata/skill.`,
+        );
+        return;
+      }
+
+      skill.techniques.forEach((technique, index) => {
+        const type = techniqueType(technique);
+        const isValued = type === 'Damage' || type === 'Heal';
+        const label =
+          skill.techniques.length > 1
+            ? `${job.name} - ${skill.name} (#${index + 1})`
+            : `${job.name} - ${skill.name}`;
+
+        skillTable[label] = {
+          Type: type,
+          Elements: (technique.elements ?? []).join(', ') || '-',
+          'Min value': isValued
+            ? Math.floor(techniqueRawValue(min, technique))
+            : '-',
+          'Mid value': isValued
+            ? Math.floor(techniqueRawValue(mid, technique))
+            : '-',
+          'Max value': isValued
+            ? Math.floor(techniqueRawValue(max, technique))
+            : '-',
+          'Status effects':
+            (technique.statusEffects ?? [])
+              .map((effect) => effect.statusEffectId)
+              .join(', ') || '-',
+        };
+      });
+    });
   });
 
   console.log('\n--- MIN (unequipped) ---');
@@ -306,6 +426,11 @@ async function main(): Promise<void> {
 
   console.log('\n--- MAX (best gear at this level) ---');
   console.table(maxTable);
+
+  console.log(
+    '\n--- Skill damage/healing estimates (raw, pre-mitigation - see file header) ---',
+  );
+  console.table(skillTable);
 }
 
 main();
