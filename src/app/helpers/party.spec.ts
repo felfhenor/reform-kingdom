@@ -60,6 +60,7 @@ import {
   partyGainXp,
   partyGet,
   pruneInvalidPartyEquipment,
+  retrofitPartyXp,
   setParty,
   syncPartyHpFromCombat,
 } from '@helpers/party';
@@ -497,9 +498,77 @@ describe('Party Helper Functions', () => {
       expect(characterXpForLevel(1)).toBe(100);
     });
 
-    it('scales up for higher levels', () => {
-      expect(characterXpForLevel(2)).toBe(283);
+    it('reaches 1000x the starting requirement at the level cap', () => {
+      expect(characterXpForLevel(CHARACTER_MAX_LEVEL)).toBe(100_000);
+    });
+
+    it('eases in gradually rather than jumping hard on the early levels', () => {
+      expect(characterXpForLevel(2)).toBe(200);
       expect(characterXpForLevel(10)).toBeGreaterThan(characterXpForLevel(2));
+    });
+
+    it('rounds every value to the nearest 10', () => {
+      for (let level = 1; level <= CHARACTER_MAX_LEVEL; level += 1) {
+        expect(characterXpForLevel(level) % 10).toBe(0);
+      }
+    });
+
+    it('grows by a larger amount per level as level increases (ease-in curve)', () => {
+      const earlyGap = characterXpForLevel(10) - characterXpForLevel(9);
+      const lateGap = characterXpForLevel(90) - characterXpForLevel(89);
+      expect(lateGap).toBeGreaterThan(earlyGap);
+    });
+  });
+
+  describe('retrofitPartyXp', () => {
+    it("rescales a character's xp.maximum to the current curve for their level", () => {
+      const jala = {
+        ...createCharacterStub('Jala'),
+        level: 2,
+        xp: { current: 50, maximum: 283 },
+      };
+
+      const [retrofitted] = retrofitPartyXp([jala]);
+
+      expect(retrofitted.xp).toEqual({
+        current: 50,
+        maximum: characterXpForLevel(2),
+      });
+    });
+
+    it('clamps current xp down without leveling up when it now exceeds the new maximum', () => {
+      const jala = {
+        ...createCharacterStub('Jala'),
+        level: 2,
+        xp: { current: 283, maximum: 283 },
+      };
+
+      const [retrofitted] = retrofitPartyXp([jala]);
+
+      expect(retrofitted.level).toBe(2);
+      expect(retrofitted.xp).toEqual({
+        current: characterXpForLevel(2),
+        maximum: characterXpForLevel(2),
+      });
+    });
+
+    it('rescales jobProgress entries for held-but-inactive jobs using their own level', () => {
+      const jala = {
+        ...createCharacterStub('Jala'),
+        jobProgress: {
+          'job-warrior': { level: 5, xp: { current: 999999, maximum: 999999 } },
+        },
+      } as unknown as Character;
+
+      const [retrofitted] = retrofitPartyXp([jala]);
+
+      expect(retrofitted.jobProgress['job-warrior' as JobId]).toEqual({
+        level: 5,
+        xp: {
+          current: characterXpForLevel(5),
+          maximum: characterXpForLevel(5),
+        },
+      });
     });
   });
 

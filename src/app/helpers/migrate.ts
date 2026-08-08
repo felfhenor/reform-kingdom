@@ -6,14 +6,17 @@ import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
-import { pruneInvalidCraftQueues } from '@helpers/crafting';
+import {
+  pruneInvalidCraftQueues,
+  retrofitTradeskillXp,
+} from '@helpers/crafting';
 import { defaultGameState } from '@helpers/defaults';
 import {
   backfillEquipmentBlock,
   backfillEquipmentItem,
 } from '@helpers/equipment';
 import { pruneInvalidMaterials } from '@helpers/materials';
-import { pruneInvalidPartyEquipment } from '@helpers/party';
+import { pruneInvalidPartyEquipment, retrofitPartyXp } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import {
   gamestate,
@@ -47,6 +50,9 @@ export function migrateGameState() {
   );
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
   newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
+
+  newState.world.party = retrofitPartyXp(newState.world.party);
+  newState.tradeskills = retrofitTradeskillXp(newState.tradeskills);
 
   setGameState(newState);
   gamestateTickStart();

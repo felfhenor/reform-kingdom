@@ -11,6 +11,7 @@ import {
 } from '@helpers/combat-log';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { addMaterial, getMaterialQuantity } from '@helpers/materials';
+import { roundToNearest10 } from '@helpers/number';
 import {
   isRecipeCraftable,
   recipeBackdropSprite,
@@ -46,10 +47,20 @@ import { clamp, orderBy, sumBy } from 'es-toolkit/compat';
 
 export const TRADESKILL_MAX_LEVEL = 50;
 const MAX_CRAFTABLE_CAP = 99;
+const TRADESKILL_XP_START = 10;
+const TRADESKILL_XP_END = 5000;
+const XP_CURVE_EASE = 1.5;
 
-// Tunable XP curve: 10 XP for level 1->2, 1.5x per level thereafter.
+// Tunable XP curve: eases in from 10 XP at level 1 up to 5,000 XP at the
+// level cap, rounded to the nearest 10 for clean numbers. The
+// `progress ** 1.5` ease keeps the early-level jumps gentle instead of a
+// straight line's constant per-level step dominating a tiny starting value.
 export function tradeskillXpForLevel(level: number): number {
-  return Math.round(10 * 1.5 ** (level - 1));
+  const progress = (level - 1) / (TRADESKILL_MAX_LEVEL - 1);
+  const xp =
+    TRADESKILL_XP_START +
+    (TRADESKILL_XP_END - TRADESKILL_XP_START) * progress ** XP_CURVE_EASE;
+  return roundToNearest10(xp);
 }
 
 // Default 2 (1 active + 1 queued), +1 every 5 levels, capped at 10.
@@ -120,6 +131,29 @@ function tradeskillLeveledUp(
   if (current > maximum) current = maximum;
 
   return { ...building, level, xp: { current, maximum } };
+}
+
+// Rescales every tradeskill's xp.maximum to match the current
+// `tradeskillXpForLevel` curve, clamping `current` down if it now exceeds
+// the new maximum. Never forces a level-up itself - a building sitting
+// exactly at its new maximum simply levels up on its next real XP grant
+// (see `tradeskillLeveledUp`).
+export function retrofitTradeskillXp(
+  tradeskills: GameStateTradeskills,
+): GameStateTradeskills {
+  const retrofitted = { ...tradeskills };
+
+  ALL_TRADESKILLS.forEach((tradeskill) => {
+    const building = retrofitted[tradeskill];
+    const maximum = tradeskillXpForLevel(building.level);
+
+    retrofitted[tradeskill] = {
+      ...building,
+      xp: { current: Math.min(building.xp.current, maximum), maximum },
+    };
+  });
+
+  return retrofitted;
 }
 
 export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {

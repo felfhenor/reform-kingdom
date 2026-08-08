@@ -70,6 +70,7 @@ import {
   craftXpChanceTier,
   getCraftableRecipeEntries,
   pruneInvalidCraftQueues,
+  retrofitTradeskillXp,
   tradeskillActiveGate,
   tradeskillGainXp,
   tradeskillLevelGateSatisfied,
@@ -156,14 +157,72 @@ function applyUpdateAt(index: number, state: GameState): GameState {
 }
 
 describe('tradeskillXpForLevel', () => {
-  it('matches the ticket-specified early values', () => {
+  it('requires 10 xp to reach level 2 from level 1', () => {
     expect(tradeskillXpForLevel(1)).toBe(10);
-    expect(tradeskillXpForLevel(2)).toBe(15);
   });
 
-  it('grows steeply thereafter', () => {
+  it('eases in gradually rather than jumping hard on the early levels', () => {
+    expect(tradeskillXpForLevel(2)).toBe(20);
     expect(tradeskillXpForLevel(3)).toBeGreaterThan(tradeskillXpForLevel(2));
-    expect(tradeskillXpForLevel(4)).toBeGreaterThan(tradeskillXpForLevel(3));
+  });
+
+  it('reaches 5000 xp at the level cap', () => {
+    expect(tradeskillXpForLevel(50)).toBe(5000);
+  });
+
+  it('rounds every value to the nearest 10', () => {
+    for (let level = 1; level <= 50; level += 1) {
+      expect(tradeskillXpForLevel(level) % 10).toBe(0);
+    }
+  });
+
+  it('grows by a larger amount per level as level increases (ease-in curve)', () => {
+    const earlyGap = tradeskillXpForLevel(10) - tradeskillXpForLevel(9);
+    const lateGap = tradeskillXpForLevel(45) - tradeskillXpForLevel(44);
+    expect(lateGap).toBeGreaterThan(earlyGap);
+  });
+});
+
+describe('retrofitTradeskillXp', () => {
+  it("rescales a tradeskill's xp.maximum to the current curve for its level", () => {
+    const tradeskills = buildAllTradeskills(
+      buildBuilding({ level: 2, xp: { current: 5, maximum: 15 } }),
+    );
+
+    const retrofitted = retrofitTradeskillXp(tradeskills);
+
+    expect(retrofitted.Blacksmithing.xp).toEqual({
+      current: 5,
+      maximum: tradeskillXpForLevel(2),
+    });
+  });
+
+  it('clamps current xp down without leveling up when it now exceeds the new maximum', () => {
+    const tradeskills = buildAllTradeskills(
+      buildBuilding({ level: 2, xp: { current: 99999, maximum: 99999 } }),
+    );
+
+    const retrofitted = retrofitTradeskillXp(tradeskills);
+
+    expect(retrofitted.Blacksmithing.level).toBe(2);
+    expect(retrofitted.Blacksmithing.xp).toEqual({
+      current: tradeskillXpForLevel(2),
+      maximum: tradeskillXpForLevel(2),
+    });
+  });
+
+  it('rescales every tradeskill independently', () => {
+    const tradeskills: GameStateTradeskills = {
+      Artificing: buildBuilding({ level: 3, xp: { current: 1, maximum: 20 } }),
+      Blacksmithing: buildBuilding({ level: 1 }),
+      Jewelcrafting: buildBuilding({ level: 1 }),
+      Tailoring: buildBuilding({ level: 1 }),
+      Woodworking: buildBuilding({ level: 1 }),
+    };
+
+    const retrofitted = retrofitTradeskillXp(tradeskills);
+
+    expect(retrofitted.Artificing.xp.maximum).toBe(tradeskillXpForLevel(3));
   });
 });
 

@@ -20,6 +20,7 @@ vi.mock('@helpers/collectibles', () => ({
 
 vi.mock('@helpers/crafting', () => ({
   pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
+  retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
 }));
 
 vi.mock('@helpers/equipment', () => ({
@@ -33,6 +34,7 @@ vi.mock('@helpers/materials', () => ({
 
 vi.mock('@helpers/party', () => ({
   pruneInvalidPartyEquipment: vi.fn((party) => party),
+  retrofitPartyXp: vi.fn((party) => party),
 }));
 
 vi.mock('@helpers/recipes', () => ({
@@ -72,9 +74,10 @@ import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
+import { retrofitTradeskillXp } from '@helpers/crafting';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
-import { pruneInvalidPartyEquipment } from '@helpers/party';
+import { pruneInvalidPartyEquipment, retrofitPartyXp } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
 
@@ -208,5 +211,45 @@ describe('migrateGameState', () => {
 
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.world.party).toEqual(prunedParty);
+  });
+
+  it('retrofits party and tradeskill xp to the current curve before committing', () => {
+    // Earlier tests in this file override `pruneInvalidPartyEquipment` via
+    // `mockReturnValue`, which `vi.clearAllMocks()` in `beforeEach` does not
+    // clear (only `mockReset`/`mockRestore` clear a configured return
+    // value) - reassert the identity implementation so this test isn't
+    // sensitive to run order.
+    vi.mocked(pruneInvalidPartyEquipment).mockImplementation(
+      (party) => party,
+    );
+
+    const staleParty = [{ id: 'jala' } as Character];
+    const staleTradeskills = { Blacksmithing: { level: 1 } };
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      world: { party: staleParty },
+      tradeskills: staleTradeskills,
+    } as unknown as GameState);
+
+    const retrofittedParty = [{ id: 'jala', xp: 'retrofitted' } as never];
+    const retrofittedTradeskills = { Blacksmithing: { level: 1, xp: 'retrofitted' } };
+    vi.mocked(retrofitPartyXp).mockReturnValue(retrofittedParty);
+    vi.mocked(retrofitTradeskillXp).mockReturnValue(
+      retrofittedTradeskills as never,
+    );
+
+    migrateGameState();
+
+    expect(retrofitPartyXp).toHaveBeenCalledWith(staleParty);
+    expect(retrofitTradeskillXp).toHaveBeenCalledWith(staleTradeskills);
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.world.party).toEqual(retrofittedParty);
+    expect(committed.tradeskills).toEqual(retrofittedTradeskills);
   });
 });

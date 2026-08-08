@@ -33,6 +33,7 @@ export * from './migrate';
 export * from './monster';
 export * from './museum';
 export * from './notify';
+export * from './number';
 export * from './party';
 export * from './pathfinding';
 export * from './pixi-app-setup';

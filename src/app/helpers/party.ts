@@ -16,6 +16,7 @@ import {
   infusionMaterialCost,
 } from '@helpers/infusion';
 import { heroSkillsAtLevel } from '@helpers/job';
+import { roundToNearest10 } from '@helpers/number';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -39,13 +40,20 @@ import {
 import { clamp } from 'es-toolkit/compat';
 
 export const CHARACTER_MAX_LEVEL = 99;
-const XP_BASE_PER_LEVEL = 100;
+const XP_START = 100;
+const XP_END = XP_START * 1000;
+const XP_CURVE_EASE = 1.5;
 const STARTER_ARMOR_NAME = 'Cloak of Adventuring';
 const STARTER_HAT_NAME = 'Hat of Adventuring';
 
-// Tunable XP curve: 100 XP for level 1->2, scaling up by level^1.5 thereafter.
+// Tunable XP curve: eases in from 100 XP at level 1 up to 100,000 XP at the
+// level cap (1000x the starting requirement), rounded to the nearest 10.
+// The `progress ** 1.5` ease keeps the early-level jumps gentle instead of a
+// straight line's constant per-level step dominating a tiny starting value.
 export function characterXpForLevel(level: number): number {
-  return Math.round(XP_BASE_PER_LEVEL * level ** 1.5);
+  const progress = (level - 1) / (CHARACTER_MAX_LEVEL - 1);
+  const xp = XP_START + (XP_END - XP_START) * progress ** XP_CURVE_EASE;
+  return roundToNearest10(xp);
 }
 
 function jobStatsAtLevel(jobId: JobId, level: number): StatBlock {
@@ -584,6 +592,38 @@ function logCharacterProgress(before: Character, after: Character): void {
     if (!skill) return;
 
     miscellaneousMessageLog(`**${after.name}** learned **${skill.name}**!`);
+  });
+}
+
+function xpProgressForLevel(level: number, currentXp: number): Character['xp'] {
+  const maximum = characterXpForLevel(level);
+  return { current: Math.min(currentXp, maximum), maximum };
+}
+
+// Rescales every character's xp.maximum (current level and, for jobProgress,
+// each held-but-inactive job) to match the current `characterXpForLevel`
+// curve, clamping `current` down if it now exceeds the new maximum. Never
+// forces a level-up itself - a character sitting exactly at its new maximum
+// simply levels up on its next real XP gain (see `characterLeveledUp`).
+export function retrofitPartyXp(party: Character[]): Character[] {
+  return party.map((character) => {
+    const jobProgress = Object.fromEntries(
+      Object.entries(character.jobProgress ?? {}).map(([jobId, progress]) => [
+        jobId,
+        progress
+          ? {
+              ...progress,
+              xp: xpProgressForLevel(progress.level, progress.xp.current),
+            }
+          : progress,
+      ]),
+    ) as Character['jobProgress'];
+
+    return {
+      ...character,
+      xp: xpProgressForLevel(character.level, character.xp.current),
+      jobProgress,
+    };
   });
 }
 
