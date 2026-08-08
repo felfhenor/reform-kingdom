@@ -7,6 +7,7 @@ import {
   canModifyEquipment,
   equipmentStatTotals,
   equippedItems,
+  planEquipmentOptimization,
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
@@ -24,6 +25,7 @@ import {
   type Character,
   type CharacterId,
   type Combatant,
+  type EquipmentArmoryEntry,
   type EquipmentBlock,
   type EquipmentContent,
   type EquipmentId,
@@ -191,38 +193,72 @@ function characterJobProgressSwap(
   return { jobProgress, level, xp };
 }
 
+// Equips each `planEquipmentOptimization` winner into a freshly-reset
+// equipment block (every slot empty, as after a reclass) and removes it from
+// the armory. No displacement bookkeeping is needed since every target slot
+// starts empty - see `characterReclass`, the only caller.
+function applyOptimizationWinners(
+  armory: EquipmentItem[],
+  winners: EquipmentArmoryEntry[],
+): { equipment: EquipmentBlock; armory: EquipmentItem[] } {
+  const equipment = defaultEquipment();
+  const winnerIds = new Set(winners.map((winner) => winner.item.id));
+
+  winners.forEach((winner) => {
+    EquipmentTypeToSlot[winner.content.type].forEach((slot) => {
+      equipment[slot] = winner.item;
+    });
+  });
+
+  return {
+    equipment,
+    armory: armory.filter((item) => !winnerIds.has(item.id)),
+  };
+}
+
 // Reclassing fully unequips the hero; their old gear is routed to the
 // Armory rather than discarded, per M2-03 in the roadmap. Level/xp for the
 // outgoing job is saved and, if the incoming job was held before, restored.
+// The freshly emptied loadout is then auto-optimized against the incoming
+// job's `statPriority` (see `planEquipmentOptimization`), so a hero reclasses
+// straight into the best gear their armory can already offer.
 export function characterReclass(characterId: CharacterId, jobId: JobId): void {
   updateGamestate((state) => {
     const character = state.world.party.find((c) => c.id === characterId);
-    if (character) {
-      state.armory = [...state.armory, ...equippedItems(character.equipment)];
-    }
+    if (!character) return state;
 
-    state.world.party = state.world.party.map((character) => {
-      if (character.id !== characterId) return character;
+    state.armory = [...state.armory, ...equippedItems(character.equipment)];
 
-      const { jobProgress, level, xp } = characterJobProgressSwap(
-        character,
-        jobId,
-      );
-      const equipment = defaultEquipment();
-      const stats = characterStatsForLevel(jobId, level, equipment);
+    const { jobProgress, level, xp } = characterJobProgressSwap(character, jobId);
+    const job = getEntry<JobContent>(jobId);
+    const winners = job
+      ? planEquipmentOptimization(
+          { ...character, jobId, level, equipment: defaultEquipment() },
+          state.armory,
+          job.statPriority,
+        )
+      : [];
+    const { equipment, armory } = applyOptimizationWinners(state.armory, winners);
+    state.armory = armory;
 
-      return {
-        ...character,
-        jobId,
-        jobProgress,
-        equipment,
-        stats,
-        hp: stats.Health,
-        ep: stats.Energy,
-        level,
-        xp,
-      };
-    });
+    const stats = characterStatsForLevel(jobId, level, equipment);
+
+    state.world.party = state.world.party.map((c) =>
+      c.id === characterId
+        ? {
+            ...c,
+            jobId,
+            jobProgress,
+            equipment,
+            stats,
+            hp: stats.Health,
+            ep: stats.Energy,
+            level,
+            xp,
+          }
+        : c,
+    );
+
     return state;
   });
 }
@@ -417,6 +453,23 @@ export function characterUnequipToArmory(
   });
 
   return true;
+}
+
+// Equips the best armory item for every eligible slot, ranked by the hero's
+// job `statPriority` (see `planEquipmentOptimization`). Slots where nothing
+// in the armory beats what's already equipped are left untouched. Backs the
+// manual "Optimize Equipment" button; reclassing runs its own optimization
+// pass inline instead (see `characterReclass`), since it needs to happen
+// atomically with the job swap rather than against live gamestate.
+export function optimizeCharacterEquipment(characterId: CharacterId): void {
+  const character = partyGet().find((c) => c.id === characterId);
+  if (!character) return;
+
+  const job = getEntry<JobContent>(character.jobId);
+  if (!job) return;
+
+  const winners = planEquipmentOptimization(character, armoryGet(), job.statPriority);
+  winners.forEach((winner) => characterEquipFromArmory(characterId, winner.item.id));
 }
 
 // Mutates `state.materials` directly - only ever called from inside a

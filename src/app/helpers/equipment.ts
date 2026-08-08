@@ -6,6 +6,7 @@ import { equipmentItemInfusionBonus } from '@helpers/infusion';
 import { rngUuid } from '@helpers/rng';
 import {
   EquipmentTypeToSlot,
+  type BaseStat,
   type Character,
   type EquipmentArmoryEntry,
   type EquipmentBlock,
@@ -121,14 +122,15 @@ export function canEquipItem(
   return job.equippableTypes.includes(equipment.type);
 }
 
-// Only equipment actually sitting in the armory can be picked - this is the
-// player's owned gear, not the full game content catalog. Returns one entry
-// per owned *instance*, never deduped by content id, so distinct physical
-// copies (e.g. differently-infused swords) stay individually pickable.
-export function equipmentAvailableForSlot(
+// Resolves the entries of `armory` eligible for `slot` (by content type),
+// sorted by level requirement descending. Takes the armory as a parameter
+// rather than reading `armoryGet()` directly so it can also be used against
+// a draft/in-progress armory (see `planEquipmentOptimization`).
+function equipmentEntriesForSlot(
+  armory: EquipmentItem[],
   slot: EquipmentSlot,
 ): EquipmentArmoryEntry[] {
-  const forSlot = armoryGet()
+  const forSlot = armory
     .map((item) => {
       const content = getEntry<EquipmentContent>(item.equipmentId);
       return content && EquipmentTypeToSlot[content.type].includes(slot)
@@ -138,6 +140,16 @@ export function equipmentAvailableForSlot(
     .filter((entry): entry is EquipmentArmoryEntry => !!entry);
 
   return orderBy(forSlot, [(entry) => entry.content.levelRequirement], ['desc']);
+}
+
+// Only equipment actually sitting in the armory can be picked - this is the
+// player's owned gear, not the full game content catalog. Returns one entry
+// per owned *instance*, never deduped by content id, so distinct physical
+// copies (e.g. differently-infused swords) stay individually pickable.
+export function equipmentAvailableForSlot(
+  slot: EquipmentSlot,
+): EquipmentArmoryEntry[] {
+  return equipmentEntriesForSlot(armoryGet(), slot);
 }
 
 // Resolves each distinct equipped item to its content `type` (e.g. `Bow`,
@@ -191,4 +203,97 @@ export function backfillEquipmentBlock(equipment: EquipmentBlock): EquipmentBloc
   });
 
   return backfilled;
+}
+
+// Two-handed-capable slots are decided first so they claim their secondary
+// slot (e.g. Offhand) before anything is chosen for it - see
+// `planEquipmentOptimization`.
+const SLOT_OPTIMIZATION_ORDER: EquipmentSlot[] = [
+  'Weapon',
+  'Offhand',
+  'Armor',
+  'Helmet',
+  'Ring',
+  'Accessory',
+  'Artifact',
+  'Ammo',
+];
+
+// A candidate's value for one stat, including its infusion bonus - used to
+// rank candidates against a job's statPriority.
+function candidateStatValue(entry: EquipmentArmoryEntry, stat: BaseStat): number {
+  return (
+    entry.content.baseStats[stat] +
+    equipmentItemInfusionBonus(entry.item.infusedItemIds)[stat]
+  );
+}
+
+// Ranks candidates lexicographically by statPriority - a higher-priority
+// stat always outweighs every lower-priority one, however small the
+// difference. Stats past the end of the list (or ties throughout) fall back
+// to `entries`'s existing order, i.e. highest level requirement first (see
+// `equipmentEntriesForSlot`).
+function bestBySlotPriority(
+  entries: EquipmentArmoryEntry[],
+  statPriority: BaseStat[],
+): EquipmentArmoryEntry | undefined {
+  if (entries.length === 0) return undefined;
+  if (statPriority.length === 0) return entries[0];
+
+  const iteratees = statPriority.map(
+    (stat) => (entry: EquipmentArmoryEntry) => candidateStatValue(entry, stat),
+  );
+
+  return orderBy(entries, iteratees, statPriority.map(() => 'desc' as const))[0];
+}
+
+function currentEquipmentEntry(
+  equipment: EquipmentBlock,
+  slot: EquipmentSlot,
+): EquipmentArmoryEntry | undefined {
+  const item = equipment[slot];
+  const content = item && getEntry<EquipmentContent>(item.equipmentId);
+  return item && content ? { item, content } : undefined;
+}
+
+// Picks the best armory replacement for a character's equipment, slot by
+// slot, ranked by their job's `statPriority` (descending). Only returns the
+// slots that should change - a slot is omitted whenever nothing in the
+// armory beats what's already equipped there, so callers never need to
+// "re-equip" an already-optimal item. Each returned item appears once, even
+// if it fills more than one slot (e.g. a two-handed weapon).
+export function planEquipmentOptimization(
+  character: Character,
+  armory: EquipmentItem[],
+  statPriority: BaseStat[],
+): EquipmentArmoryEntry[] {
+  const claimedSlots = new Set<EquipmentSlot>();
+  const usedItemIds = new Set<EquipmentItemId>();
+  const winners: EquipmentArmoryEntry[] = [];
+
+  SLOT_OPTIMIZATION_ORDER.forEach((slot) => {
+    if (claimedSlots.has(slot) || !isSlotAvailableForJob(slot, character.jobId)) {
+      return;
+    }
+
+    const current = currentEquipmentEntry(character.equipment, slot);
+    const candidates = equipmentEntriesForSlot(armory, slot).filter(
+      (entry) =>
+        !usedItemIds.has(entry.item.id) && canEquipItem(character, entry.content),
+    );
+    const winner = bestBySlotPriority(
+      current ? [...candidates, current] : candidates,
+      statPriority,
+    );
+    if (!winner) return;
+
+    EquipmentTypeToSlot[winner.content.type].forEach((s) => claimedSlots.add(s));
+
+    if (winner.item.id !== current?.item.id) {
+      winners.push(winner);
+      usedItemIds.add(winner.item.id);
+    }
+  });
+
+  return winners;
 }

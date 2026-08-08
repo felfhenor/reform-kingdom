@@ -24,6 +24,7 @@ import {
   getEntry,
   heroSkillsAtLevel,
   isSlotAvailableForJob,
+  optimizeCharacterEquipment,
   skillIsUsableWithEquippedWeapons,
 } from '@helpers';
 import type {
@@ -174,5 +175,10 @@ export class HeroEquipmentPanelComponent {
     if (characterUnequipToArmory(this.character().id, slot)) {
       this.selectedSlot.set(undefined);
     }
+  }
+
+  public optimizeEquipment(): void {
+    optimizeCharacterEquipment(this.character().id);
+    this.selectedSlot.set(undefined);
   }
 }

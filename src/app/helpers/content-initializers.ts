@@ -354,6 +354,7 @@ function ensureJob(job: Partial<JobContent>): Required<JobContent> {
       job.equippableTypes,
       VALID_EQUIPMENT_ITEM_TYPES,
     ),
+    statPriority: ensureEnumArray(job.statPriority, VALID_GAME_STATS),
     skillPath: ensureArray(job.skillPath, ensureJobSkillPath),
   };
 }

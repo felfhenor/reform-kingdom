@@ -2,7 +2,7 @@ import type { HasAnimation } from '@interfaces/artable';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
-import type { StatBlock } from '@interfaces/stat';
+import type { BaseStat, StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
 
 export type JobId = Branded<string, 'JobId'>;
@@ -26,6 +26,13 @@ export type JobContent = IsContentItem &
     statsPerLevel: StatBlock;
 
     equippableTypes: EquipmentItemType[];
+
+    // Stats an "Optimize Equipment" pass should favor for this job, highest
+    // priority first - a candidate item always wins on an earlier stat
+    // before a later one is even considered (see `planEquipmentOptimization`
+    // in `equipment.ts`). Stats omitted from the list never influence the
+    // choice; ties fall back to the item's level requirement instead.
+    statPriority: BaseStat[];
 
     skillPath: JobSkillPath[];
   };

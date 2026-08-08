@@ -98,6 +98,7 @@ describe('ensureContent', () => {
         id: 'warrior',
         name: 'Warrior',
         equippableTypes: ['Sword', 'NotAType', 'Shield'],
+        statPriority: ['Strength', 'NotAStat', 'Agility'],
         skillPath: [
           {
             pathName: 'Offense',
@@ -107,6 +108,7 @@ describe('ensureContent', () => {
       } as unknown as JobContent);
 
       expect(result.equippableTypes).toEqual(['Sword', 'Shield']);
+      expect(result.statPriority).toEqual(['Strength', 'Agility']);
       expect(result.skillPath).toEqual([
         {
           pathName: 'Offense',

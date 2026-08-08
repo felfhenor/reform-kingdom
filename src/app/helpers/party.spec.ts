@@ -57,6 +57,7 @@ import {
   createCharacter,
   healingTicksForLevel,
   healPartyToFull,
+  optimizeCharacterEquipment,
   partyGainXp,
   partyGet,
   pruneInvalidPartyEquipment,
@@ -95,6 +96,7 @@ describe('Party Helper Functions', () => {
       Agility: 0.7,
     },
     equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
+    statPriority: [],
     skillPath: [],
   };
 
@@ -319,11 +321,16 @@ describe('Party Helper Functions', () => {
   });
 
   describe('characterReclass', () => {
+    // `equippableTypes: []` keeps the new auto-optimize-on-reclass pass (see
+    // `characterReclass`) from picking up the starter gear these fixtures
+    // always vacate into the armory - these tests are about the job-swap
+    // mechanics, not equipment optimization (covered separately below).
     const warriorJob: JobContent = {
       ...mockJob,
       id: 'job-warrior' as JobId,
       name: 'Warrior',
       baseStats: { ...mockJob.baseStats, Health: 150, Strength: 15 },
+      equippableTypes: [],
     };
 
     it("should update the character's jobId, recompute stats from the new job, and reset level/xp", () => {
@@ -478,6 +485,123 @@ describe('Party Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.world.party[1]).toEqual(spoorle);
+    });
+  });
+
+  describe('characterReclass auto-optimize equipment', () => {
+    const mockSword: EquipmentContent = {
+      ...mockCloak,
+      id: 'equip-sword' as EquipmentId,
+      name: 'Iron Sword',
+      type: 'Sword',
+      baseStats: { ...defaultStats(), Strength: 10 },
+    };
+
+    const mockSpear: EquipmentContent = {
+      ...mockCloak,
+      id: 'equip-spear' as EquipmentId,
+      name: 'Copper Spear',
+      type: 'Spear',
+      baseStats: { ...defaultStats(), Strength: 3 },
+    };
+
+    const optimizingWarriorJob: JobContent = {
+      ...mockJob,
+      id: 'job-warrior' as JobId,
+      name: 'Warrior',
+      equippableTypes: ['Sword', 'Spear'],
+      statPriority: ['Strength'],
+    };
+
+    it('equips the best available armory item into the new job right after reclassing', () => {
+      mockGetEntry(mockJob, optimizingWarriorJob, mockSword);
+      const jala = createCharacterStub('Jala');
+      const armorySword = mockEquipmentItem(mockSword.id);
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [armorySword],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].equipment.Weapon).toEqual(armorySword);
+      expect(result.armory).not.toContainEqual(armorySword);
+    });
+
+    it('recalculates stats to include the newly auto-equipped gear', () => {
+      mockGetEntry(mockJob, optimizingWarriorJob, mockSword);
+      const jala = createCharacterStub('Jala');
+      const armorySword = mockEquipmentItem(mockSword.id);
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [armorySword],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].stats.Strength).toBe(
+        optimizingWarriorJob.baseStats.Strength + mockSword.baseStats.Strength,
+      );
+    });
+
+    it('leaves the armory untouched when nothing in it fits the new job', () => {
+      const noSwordsWarriorJob: JobContent = {
+        ...optimizingWarriorJob,
+        equippableTypes: [],
+      };
+      mockGetEntry(mockJob, noSwordsWarriorJob, mockSword);
+      const jala = createCharacterStub('Jala');
+      const armorySword = mockEquipmentItem(mockSword.id);
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [armorySword],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].equipment.Weapon).toBeUndefined();
+      expect(result.armory).toContainEqual(armorySword);
+    });
+
+    it('equips a two-handed item into every slot it declares at once', () => {
+      mockGetEntry(mockJob, optimizingWarriorJob, mockSpear);
+      const jala = createCharacterStub('Jala');
+      const armorySpear = mockEquipmentItem(mockSpear.id);
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [armorySpear],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].equipment.Weapon).toEqual(armorySpear);
+      expect(result.world.party[0].equipment.Offhand).toEqual(armorySpear);
+      expect(result.armory).not.toContainEqual(armorySpear);
+    });
+
+    it('leaves equipment empty and does not crash when the new job cannot be found', () => {
+      mockGetEntry(mockJob, mockSword);
+      const jala = createCharacterStub('Jala');
+      const armorySword = mockEquipmentItem(mockSword.id);
+
+      characterReclass(jala.id, 'unknown-job' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [armorySword],
+      } as unknown as GameState);
+
+      expect(result.world.party[0].equipment).toEqual(defaultEquipment());
+      expect(result.armory).toContainEqual(armorySword);
     });
   });
 
@@ -1025,6 +1149,82 @@ describe('Party Helper Functions', () => {
       expect(state.world.party[0].equipment.Weapon).toBeUndefined();
       expect(state.world.party[0].equipment.Offhand).toBeUndefined();
       expect(state.armory).toEqual([spearItem]);
+    });
+  });
+
+  describe('optimizeCharacterEquipment', () => {
+    const mockSword: EquipmentContent = {
+      ...mockCloak,
+      id: 'equip-sword' as EquipmentId,
+      name: 'Iron Sword',
+      type: 'Sword',
+      baseStats: { ...defaultStats(), Strength: 10 },
+    };
+
+    const optimizingJob: JobContent = {
+      ...mockJob,
+      equippableTypes: ['Sword'],
+      statPriority: ['Strength'],
+    };
+
+    it('equips the best available armory item for each eligible slot', () => {
+      mockGetEntry(optimizingJob, mockSword);
+      const jala = createCharacterStub('Jala');
+      const armorySword = mockEquipmentItem(mockSword.id);
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [jala] },
+        armory: [armorySword],
+      } as unknown as GameState);
+
+      optimizeCharacterEquipment(jala.id);
+
+      expect(updateGamestate).toHaveBeenCalledTimes(1);
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const state = updateFn({
+        world: { party: [jala] },
+        armory: [armorySword],
+      } as unknown as GameState);
+
+      expect(state.world.party[0].equipment.Weapon).toEqual(armorySword);
+      expect(state.armory).toEqual([]);
+    });
+
+    it('does nothing when nothing in the armory beats what is already equipped', () => {
+      mockGetEntry(optimizingJob);
+      const jala = createCharacterStub('Jala');
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [jala] },
+        armory: [],
+      } as unknown as GameState);
+
+      optimizeCharacterEquipment(jala.id);
+
+      expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when the character cannot be found', () => {
+      mockGetEntry(optimizingJob);
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [] },
+        armory: [],
+      } as unknown as GameState);
+
+      optimizeCharacterEquipment('missing-character' as CharacterId);
+
+      expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when the job cannot be found', () => {
+      mockGetEntry();
+      const jala = createCharacterStub('Jala');
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [jala] },
+        armory: [],
+      } as unknown as GameState);
+
+      optimizeCharacterEquipment(jala.id);
+
+      expect(updateGamestate).not.toHaveBeenCalled();
     });
   });
 

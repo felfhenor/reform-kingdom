@@ -101,6 +101,7 @@ const rangerJob: JobContent = {
   sprite: '0000',
   frames: 4,
   equippableTypes: ['Bow'],
+  statPriority: [],
   skillPath: [
     {
       pathName: 'Attack',

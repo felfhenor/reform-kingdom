@@ -44,8 +44,15 @@
     </div>
 
     <div class="flex flex-col gap-4 items-center overflow-y-auto">
-      <div>
+      <div class="flex items-center justify-between w-full">
         <span class="font-semibold text-xl">Equipment</span>
+        <button
+          type="button"
+          class="btn btn-xs btn-primary"
+          (click)="optimizeEquipment()"
+        >
+          Optimize Equipment
+        </button>
       </div>
 
       @for (row of paperdollRows; track $index) {

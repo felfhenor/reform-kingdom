@@ -24,6 +24,12 @@
     Resistance: 0.5
     Agility: 0.4
 
+  statPriority:
+    - Intelligence
+    - Energy
+    - Resistance
+    - Vitality
+
   equippableTypes:
     - Cloth Armor
     - Accessory

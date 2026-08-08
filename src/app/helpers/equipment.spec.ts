@@ -35,6 +35,7 @@ import {
   equippedItemsByPrimarySlot,
   equippedItemTypes,
   isSlotAvailableForJob,
+  planEquipmentOptimization,
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
@@ -538,6 +539,103 @@ describe('Equipment Helper Functions', () => {
       expect(equipmentAvailableForSlot('Helmet')).toEqual([
         { item: lowHelmetItem, content: lowHelmet },
       ]);
+    });
+  });
+
+  describe('planEquipmentOptimization', () => {
+    const job: JobContent = {
+      name: 'Warrior',
+      equippableTypes: ['Sword', 'Spear', 'Shield', 'Hat'],
+    } as JobContent;
+
+    function buildCharacter(overrides: Partial<Character> = {}): Character {
+      return {
+        id: 'char-1' as CharacterId,
+        level: 5,
+        jobId: 'job-warrior' as JobId,
+        equipment: emptyEquipment,
+        ...overrides,
+      } as Character;
+    }
+
+    function mockContentEntries(...entries: { id: string }[]): void {
+      const known = new Map(entries.map((entry) => [entry.id, entry]));
+      known.set('job-warrior', job);
+      vi.mocked(getEntry).mockImplementation((id) => known.get(id as string) as never);
+    }
+
+    it('prefers the candidate ranked higher by statPriority over one with a higher level requirement', () => {
+      const strongSword = { ...sword, id: 'strong' as EquipmentId, levelRequirement: 1, baseStats: { ...sword.baseStats, Strength: 5 } };
+      const weakHighLevelSword = { ...sword, id: 'weak-high-level' as EquipmentId, levelRequirement: 5, baseStats: { ...sword.baseStats, Strength: 2 } };
+      mockContentEntries(strongSword, weakHighLevelSword);
+      const strongItem = mockEquipmentItem(strongSword.id);
+      const weakItem = mockEquipmentItem(weakHighLevelSword.id);
+
+      const winners = planEquipmentOptimization(buildCharacter(), [strongItem, weakItem], ['Strength']);
+
+      expect(winners).toEqual([{ item: strongItem, content: strongSword }]);
+    });
+
+    it('falls back to the highest level requirement when statPriority is empty', () => {
+      const lowLevel = { ...sword, id: 'low' as EquipmentId, levelRequirement: 1 };
+      const highLevel = { ...sword, id: 'high' as EquipmentId, levelRequirement: 5 };
+      mockContentEntries(lowLevel, highLevel);
+      const lowItem = mockEquipmentItem(lowLevel.id);
+      const highItem = mockEquipmentItem(highLevel.id);
+
+      const winners = planEquipmentOptimization(buildCharacter(), [lowItem, highItem], []);
+
+      expect(winners).toEqual([{ item: highItem, content: highLevel }]);
+    });
+
+    it('leaves a slot untouched when the currently equipped item already beats every armory candidate', () => {
+      const weakSword = { ...sword, id: 'weak' as EquipmentId, baseStats: { ...sword.baseStats, Strength: 2 } };
+      const strongEquipped = { ...sword, id: 'equipped' as EquipmentId, baseStats: { ...sword.baseStats, Strength: 20 } };
+      mockContentEntries(weakSword, strongEquipped);
+      const equippedItem = mockEquipmentItem(strongEquipped.id);
+      const armoryItem = mockEquipmentItem(weakSword.id);
+      const character = buildCharacter({
+        equipment: { ...emptyEquipment, Weapon: equippedItem },
+      });
+
+      const winners = planEquipmentOptimization(character, [armoryItem], ['Strength']);
+
+      expect(winners).toEqual([]);
+    });
+
+    it("claims a two-handed item's secondary slot so nothing separate is chosen for it", () => {
+      const shield = { ...sword, id: 'shield' as EquipmentId, type: 'Shield' as const };
+      mockContentEntries(spear, shield);
+      const spearItem = mockEquipmentItem(spear.id);
+      const shieldItem = mockEquipmentItem(shield.id);
+
+      const winners = planEquipmentOptimization(
+        buildCharacter(),
+        [spearItem, shieldItem],
+        ['Strength'],
+      );
+
+      expect(winners).toEqual([{ item: spearItem, content: spear }]);
+    });
+
+    it('excludes slots unavailable for the character job (e.g. Artifact for a non-Magician)', () => {
+      const artifact = { ...sword, id: 'artifact' as EquipmentId, type: 'Artifact' as const };
+      mockContentEntries(artifact);
+      const artifactItem = mockEquipmentItem(artifact.id);
+
+      const winners = planEquipmentOptimization(buildCharacter(), [artifactItem], []);
+
+      expect(winners).toEqual([]);
+    });
+
+    it('excludes candidates the hero cannot currently equip', () => {
+      const tooHighLevel = { ...sword, id: 'too-high' as EquipmentId, levelRequirement: 99 };
+      mockContentEntries(tooHighLevel);
+      const item = mockEquipmentItem(tooHighLevel.id);
+
+      const winners = planEquipmentOptimization(buildCharacter({ level: 5 }), [item], []);
+
+      expect(winners).toEqual([]);
     });
   });
 

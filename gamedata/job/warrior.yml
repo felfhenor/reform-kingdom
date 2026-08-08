@@ -24,6 +24,12 @@
     Resistance: 0.1
     Agility: 0.3
 
+  statPriority:
+    - Strength
+    - Vitality
+    - Agility
+    - Resistance
+
   equippableTypes:
     - Cloth Armor
     - Metal Armor
