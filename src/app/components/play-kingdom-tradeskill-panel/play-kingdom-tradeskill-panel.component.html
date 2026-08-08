@@ -113,6 +113,14 @@
             <span class="text-xs opacity-70">
               Lv. {{ entry.effectiveLevel }} · Craftable:
               {{ entry.maxCraftable }} · XP: +{{ entry.xp }}
+
+              @if (entry.resultChance !== 100) {
+                <span
+                  [tp]="'This recipe does not have a 100% chance of yielding an item, but it will still yield XP on failure'"
+                >
+                  · {{ entry.resultChance }}% success rate
+                </span>
+              }
             </span>
 
             @if (entry.requirementEntries.length > 0) {
