@@ -633,7 +633,8 @@ function recipeRequirementEntries(
 // `isRecipeCraftable`). Entries that are currently uncraftable (out of
 // resources, or a unique collectible already owned/queued) sort to the
 // bottom rather than disappearing, so the list stays a stable reference of
-// everything unlocked.
+// everything unlocked. Within that, recipes sort by level descending
+// (newest/highest-level first).
 export function getCraftableRecipeEntries(
   tradeskill: Tradeskill,
 ): CraftRecipeEntry[] {
@@ -654,6 +655,7 @@ export function getCraftableRecipeEntries(
         recipe,
         resultContent,
         resultSpritesheet: recipeResultSpritesheet(recipe),
+        resultChance: recipe.result.chance ?? 100,
         backdropSprite,
         effectiveLevel: recipeEffectiveLevel(recipe, resultContent),
         maxCraftable: craftMaxCraftableQuantity(recipe, tradeskill),
@@ -673,7 +675,7 @@ export function getCraftableRecipeEntries(
         entry.resultContent ? RARITY_PRIORITY[entry.resultContent.rarity] : 0,
       (entry) => entry.recipe.name,
     ],
-    ['asc', 'asc', 'asc', 'asc'],
+    ['asc', 'desc', 'asc', 'asc'],
   );
 }
 

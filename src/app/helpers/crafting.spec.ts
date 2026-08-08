@@ -920,6 +920,36 @@ describe('getCraftableRecipeEntries', () => {
     ]);
   });
 
+  it('sorts by level descending', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding({ level: 20 })),
+    } as unknown as GameState);
+    vi.mocked(getEntriesByType).mockReturnValue([
+      buildRecipe({
+        id: 'low' as RecipeId,
+        name: 'Low',
+        minTradeskillLevel: 1,
+      }),
+      buildRecipe({
+        id: 'high' as RecipeId,
+        name: 'High',
+        minTradeskillLevel: 11,
+      }),
+      buildRecipe({
+        id: 'mid' as RecipeId,
+        name: 'Mid',
+        minTradeskillLevel: 5,
+      }),
+    ]);
+
+    const entries = getCraftableRecipeEntries('Blacksmithing');
+    expect(entries.map((entry) => entry.recipe.id)).toEqual([
+      'high',
+      'mid',
+      'low',
+    ]);
+  });
+
   it('orders requirement entries collectible, then equipment, then item', () => {
     vi.mocked(getMaterialQuantity).mockReturnValue(10);
     vi.mocked(isCollectibleDiscovered).mockReturnValue(true);

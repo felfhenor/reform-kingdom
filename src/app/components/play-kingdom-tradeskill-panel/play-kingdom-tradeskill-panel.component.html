@@ -111,8 +111,7 @@
               {{ entry.recipe.name }}
             </span>
             <span class="text-xs opacity-70">
-              Lv. {{ entry.effectiveLevel }} · Craftable:
-              {{ entry.maxCraftable }} · XP: +{{ entry.xp }}
+              Craftable: {{ entry.maxCraftable }}
 
               @if (entry.resultChance !== 100) {
                 <span
@@ -162,6 +161,10 @@
               [tpPlacement]="'top'"
             >
               {{ entry.xpChanceTier }}
+
+              @if (entry.xpChance !== 0) {
+                <span>- XP +{{ entry.xp }}</span>
+              }
             </span>
 
             <div class="flex gap-2 items-center">
