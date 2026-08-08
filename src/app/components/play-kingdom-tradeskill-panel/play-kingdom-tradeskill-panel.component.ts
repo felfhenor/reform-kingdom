@@ -80,6 +80,8 @@ export class PlayKingdomTradeskillPanelComponent {
       : undefined;
   });
 
+  public gateNextLevel = computed(() => this.building().level + 1);
+
   // Recomputes whenever `gamestate()` changes AND once a second regardless
   // (via `uiClockTick`), so the remaining-time text never looks frozen even
   // if the gameloop itself is skipping ticks (e.g. tab backgrounded).

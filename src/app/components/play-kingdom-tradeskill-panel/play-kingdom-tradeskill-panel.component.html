@@ -11,6 +11,16 @@
 
   <div class="flex flex-col gap-4 p-4 h-full min-h-0">
     <div class="flex flex-col gap-2 flex-shrink-0">
+      @if (gateCollectible(); as collectible) {
+        <div class="text-xs font-semibold text-error italic text-center">
+          You will not be able to progress to {{ tradeskill() }} Lv.
+          {{ gateNextLevel() }} unless you acquire
+          <span class="text-{{ collectible.rarity }}">
+            {{ collectible.name }}.
+          </span>
+        </div>
+      }
+
       <div class="relative w-full h-5 rounded overflow-hidden bg-black/30">
         <div
           class="absolute inset-y-0 left-0 bg-primary"
@@ -22,15 +32,6 @@
           {{ buildingData.xp.current }} / {{ buildingData.xp.maximum }} XP
         </div>
       </div>
-
-      @if (gateCollectible(); as collectible) {
-        <div class="text-xs opacity-70">
-          Next level requires:
-          <span class="font-semibold text-{{ collectible.rarity }}">
-            {{ collectible.name }}
-          </span>
-        </div>
-      }
     </div>
 
     <div class="flex gap-2 overflow-x-auto pb-2 flex-shrink-0">
