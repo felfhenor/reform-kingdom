@@ -12,6 +12,11 @@ vi.mock('@helpers/combat-log', () => ({
   ),
 }));
 
+vi.mock('@helpers/luck', () => ({
+  luckRollSucceeds: vi.fn(),
+  partyMaxLuck: vi.fn(),
+}));
+
 vi.mock('@helpers/materials', () => ({
   addMaterial: vi.fn(),
 }));
@@ -35,8 +40,8 @@ vi.mock('@helpers/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
 import { gatherMessageLog } from '@helpers/combat-log';
+import { getEntry } from '@helpers/content';
 import {
   canEnterGatherNode,
   currentGatheringContent,
@@ -48,6 +53,7 @@ import {
   isGathering,
   partyMinLevel,
 } from '@helpers/gathering';
+import { luckRollSucceeds, partyMaxLuck } from '@helpers/luck';
 import { addMaterial } from '@helpers/materials';
 import { partyGainXp, partyGet } from '@helpers/party';
 import { rngChoiceWeighted } from '@helpers/rng';
@@ -77,8 +83,12 @@ function buildGathering(
   } as GatheringContent;
 }
 
-function buildCharacter(level: number): Character {
-  return { id: `char-${level}`, level } as unknown as Character;
+function buildCharacter(level: number, luck = 0): Character {
+  return {
+    id: `char-${level}`,
+    level,
+    stats: { Luck: luck },
+  } as unknown as Character;
 }
 
 function applyLastUpdate(state: GameState): GameState {
@@ -260,7 +270,10 @@ describe('gatheringStart', () => {
   it('starts gathering and logs the start', () => {
     vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
     vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({ id: 'gather-1' as GatheringId, levelRange: { min: 1, max: 5 } }),
+      buildGathering({
+        id: 'gather-1' as GatheringId,
+        levelRange: { min: 1, max: 5 },
+      }),
     );
     vi.mocked(partyGet).mockReturnValue([buildCharacter(1)]);
 
@@ -347,15 +360,19 @@ describe('gatheringProcessTick', () => {
       gatherTime: 5,
       levelRange: { min: 1, max: 5 },
       xpGainedIfInLevelRange: 3,
-      gatherResults: [{ chance: 100, items: [{ itemId: 'wood', quantity: 2 }] }],
+      gatherResults: [
+        { chance: 100, items: [{ itemId: 'wood', quantity: 2 }] },
+      ],
     });
     vi.mocked(getEntry).mockImplementation((id: string) => {
       if (id === 'gather-1') return gathering as never;
-      if (id === 'wood') return { name: 'Wergen Wood', rarity: 'Common' } as never;
+      if (id === 'wood')
+        return { name: 'Wergen Wood', rarity: 'Common' } as never;
       return undefined;
     });
     vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
 
     gatheringProcessTick();
 
@@ -370,6 +387,43 @@ describe('gatheringProcessTick', () => {
       world: { gathering: { ticksIntoGather: 4 } },
     } as unknown as GameState);
     expect(result.world.gathering.ticksIntoGather).toBe(0);
+  });
+
+  it('doubles item quantities on a successful luck roll', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 4,
+        },
+      },
+    } as unknown as GameState);
+
+    const gathering = buildGathering({
+      gatherTime: 5,
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherResults: [
+        { chance: 100, items: [{ itemId: 'wood', quantity: 2 }] },
+      ],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === 'gather-1') return gathering as never;
+      if (id === 'wood')
+        return { name: 'Wergen Wood', rarity: 'Common' } as never;
+      return undefined;
+    });
+    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    vi.mocked(partyMaxLuck).mockReturnValue(50);
+    vi.mocked(luckRollSucceeds).mockReturnValue(true);
+
+    gatheringProcessTick();
+
+    expect(luckRollSucceeds).toHaveBeenCalledWith(50);
+    expect(addMaterial).toHaveBeenCalledWith('wood', 4);
   });
 
   it('does not grant xp when the party has outleveled the node', () => {

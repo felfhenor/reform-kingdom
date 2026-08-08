@@ -25,6 +25,7 @@ export type EquipmentSkillAttribute =
   | 'BypassDefense'
   | 'DamagesTarget'
   | 'AllowPlink'
+  | 'AllowLuckDodge'
   | 'HealsTarget'
   | 'Buff'
   | 'Debuff';

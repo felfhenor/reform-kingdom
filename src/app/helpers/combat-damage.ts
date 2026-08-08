@@ -6,6 +6,7 @@ import {
   combatCreateStatusEffect,
 } from '@helpers/combat-statuseffects';
 import { getEntry } from '@helpers/content';
+import { luckReducedChance, luckRollSucceeds } from '@helpers/luck';
 import { rngSucceedsChance } from '@helpers/rng';
 import {
   skillTechniqueDamageScalingStat,
@@ -120,6 +121,18 @@ export function combatApplySkillToTarget(
   technique: EquipmentSkillContentTechnique,
   capturedCreatorStats?: StatBlock,
 ): void {
+  if (
+    techniqueHasAttribute(technique, 'AllowLuckDodge') &&
+    luckRollSucceeds(target.totalStats.Luck)
+  ) {
+    combatMessageLog(
+      combat,
+      `**${target.name}** dodges **${combatant.name}**'s **${skill.name}**!`,
+      target,
+    );
+    return;
+  }
+
   const baseDamage = sum(
     (Object.keys(technique.damageScaling) as GameStat[]).map((stat) =>
       getCombatantBaseStatDamageForTechnique(
@@ -143,6 +156,11 @@ export function combatApplySkillToTarget(
   };
 
   let retaliationDamage = 0;
+
+  const isCriticalHit =
+    baseDamage > 0 &&
+    techniqueHasAttribute(technique, 'DamagesTarget') &&
+    luckRollSucceeds(combatant.totalStats.Luck);
 
   if (baseDamage > 0) {
     const targetDefense = targetDefenseValue(target, technique);
@@ -170,6 +188,10 @@ export function combatApplySkillToTarget(
 
     if (techniqueHasAttribute(technique, 'AllowPlink')) {
       effectiveDamage = Math.max(baseDamage > 0 ? 1 : 0, effectiveDamage);
+    }
+
+    if (isCriticalHit) {
+      effectiveDamage *= 2;
     }
 
     // Apply deadlock prevention damage multiplier (only for damage, not healing)
@@ -201,7 +223,8 @@ export function combatApplySkillToTarget(
 
   if (technique.combatMessage) {
     const message = combatFormatMessage(technique.combatMessage, templateData);
-    combatMessageLog(combat, message, target);
+    const critSuffix = isCriticalHit ? ' **Critical Hit!**' : '';
+    combatMessageLog(combat, `${message}${critSuffix}`, target);
   }
 
   if (retaliationDamage > 0) {
@@ -219,8 +242,9 @@ export function combatApplySkillToTarget(
     if (!effectContent) return;
 
     const totalChance = skillTechniqueStatusEffectChance(skill, effData);
+    const resistedChance = luckReducedChance(totalChance, target.totalStats.Luck);
 
-    if (!rngSucceedsChance(totalChance)) return;
+    if (!rngSucceedsChance(resistedChance)) return;
 
     const statusEffect = combatCreateStatusEffect(
       effectContent,

@@ -1,16 +1,13 @@
-import { getEntry } from '@helpers/content';
 import { gatherMessageLog, itemDropHtml } from '@helpers/combat-log';
+import { getEntry } from '@helpers/content';
 import { defaultGatheringState } from '@helpers/defaults';
+import { luckRollSucceeds, partyMaxLuck } from '@helpers/luck';
 import { addMaterial } from '@helpers/materials';
 import { partyGainXp, partyGet } from '@helpers/party';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeByName, worldNodeGathering } from '@helpers/world-nodes';
-import type {
-  GatherResult,
-  GatheringContent,
-  ItemContent,
-} from '@interfaces';
+import type { GatherResult, GatheringContent, ItemContent } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
 export function partyMinLevel(): number {
@@ -97,16 +94,21 @@ function grantGatherXpIfInRange(content: GatheringContent): void {
   partyGainXp(content.xpGainedIfInLevelRange);
 }
 
-function grantGatherItems(result: GatherResult, nodeName: string): void {
+function grantGatherItems(
+  result: GatherResult,
+  nodeName: string,
+  yieldMultiplier: number,
+): void {
   const descriptions = result.items
     .filter(({ quantity }) => quantity > 0)
     .map(({ itemId, quantity }) => {
-      addMaterial(itemId, quantity);
+      const grantedQuantity = quantity * yieldMultiplier;
+      addMaterial(itemId, grantedQuantity);
 
       const item = getEntry<ItemContent>(itemId);
       if (!item) return undefined;
 
-      return itemDropHtml(item, quantity);
+      return itemDropHtml(item, grantedQuantity);
     })
     .filter((description): description is string => !!description);
 
@@ -119,7 +121,10 @@ function resolveGatherCycle(content: GatheringContent, nodeName: string): void {
   grantGatherXpIfInRange(content);
 
   const result = gatheringRollResult(content);
-  if (result) grantGatherItems(result, nodeName);
+  if (result) {
+    const yieldMultiplier = luckRollSucceeds(partyMaxLuck()) ? 2 : 1;
+    grantGatherItems(result, nodeName, yieldMultiplier);
+  }
 
   updateGamestate((state) => {
     state.world.gathering.ticksIntoGather = 0;

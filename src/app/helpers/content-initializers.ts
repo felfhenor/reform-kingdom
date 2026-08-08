@@ -108,6 +108,7 @@ const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'BypassDefense',
   'DamagesTarget',
   'AllowPlink',
+  'AllowLuckDodge',
   'HealsTarget',
   'Buff',
   'Debuff',

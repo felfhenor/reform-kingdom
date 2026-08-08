@@ -13,7 +13,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
       targets: 1
       targetType: Enemies
@@ -46,7 +46,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
       targets: 1
       targetType: Enemies

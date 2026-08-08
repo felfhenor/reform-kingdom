@@ -27,6 +27,7 @@ export * from './infusion';
 export * from './job';
 export * from './logging';
 export * from './loot';
+export * from './luck';
 export * from './maps';
 export * from './materials';
 export * from './migrate';
