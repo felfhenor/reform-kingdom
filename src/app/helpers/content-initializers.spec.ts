@@ -31,8 +31,8 @@ describe('ensureContent', () => {
         { itemId: 'UNKNOWN', min: 0, max: 0, multiplierPerLevel: 1, chance: 0 },
       ]);
       expect(result.skills).toEqual([
-        { skillId: 'bite' },
-        { skillId: 'UNKNOWN' },
+        { skillId: 'bite', weight: 1 },
+        { skillId: 'UNKNOWN', weight: 1 },
       ]);
     });
 

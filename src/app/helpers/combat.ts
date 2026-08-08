@@ -26,13 +26,13 @@ import {
 } from '@helpers/combat-targetting';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
-import { clamp, sample, sortBy } from 'es-toolkit/compat';
+import { clamp, sortBy } from 'es-toolkit/compat';
 
 import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantCombatStatValue,
 } from '@helpers/combat-stats';
-import { rngSucceedsChance } from '@helpers/rng';
+import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import { skillEpCost, skillTechniqueNumTargets } from '@helpers/skill';
 import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
 
@@ -117,7 +117,10 @@ function combatantTakeTurn(
       0,
   );
 
-  const chosenSkill = sample(skills);
+  const chosenSkill = rngChoiceWeighted(
+    skills,
+    (skill) => combatant.skillWeights[skill.id] ?? 1,
+  );
   if (!chosenSkill) {
     combatMessageLog(
       combat,

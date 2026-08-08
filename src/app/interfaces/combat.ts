@@ -58,6 +58,7 @@ export type Combatant = HasAnimation & {
 
   skillIds: EquipmentSkillId[];
   skillRefs: EquipmentSkill[];
+  skillWeights: Record<EquipmentSkillId, number>;
 
   skillUses: Record<EquipmentSkillId, number>;
 

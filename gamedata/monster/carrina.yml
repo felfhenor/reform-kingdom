@@ -35,6 +35,7 @@
 
   skills:
     - skillId: Attack
+      weight: 1
 
   baseStats:
     Health: 25
@@ -81,8 +82,11 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Double Strike I
+      weight: 3
     - skillId: Sweep I
+      weight: 2
 
   baseStats:
     Health: 35
@@ -129,7 +133,9 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Fireball I
+      weight: 3
 
   baseStats:
     Health: 15
@@ -176,7 +182,9 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Thunderbolt I
+      weight: 3
 
   baseStats:
     Health: 5
@@ -223,8 +231,11 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Slime Toss
+      weight: 3
     - skillId: Analyze I
+      weight: 3
 
   baseStats:
     Health: 10
@@ -271,7 +282,9 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Double Strike I
+      weight: 3
 
   baseStats:
     Health: 15
@@ -318,7 +331,9 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Slow Web
+      weight: 3
 
   baseStats:
     Health: 25
@@ -365,8 +380,11 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Slow Web
+      weight: 4
     - skillId: Venom Bite I
+      weight: 2
 
   baseStats:
     Health: 35
@@ -413,9 +431,13 @@
 
   skills:
     - skillId: Attack
+      weight: 1
     - skillId: Stop Web
+      weight: 4
     - skillId: Venom Bite II
+      weight: 3
     - skillId: Octa Strike I
+      weight: 2
 
   baseStats:
     Health: 100

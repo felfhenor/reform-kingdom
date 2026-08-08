@@ -174,12 +174,37 @@ describe('combatantFromMonster', () => {
       targettingType: 'Random',
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
-      skills: [{ skillId: snipeSkill.id }],
+      skills: [{ skillId: snipeSkill.id, weight: 1 }],
     } as MonsterContent;
 
     const combatant = combatantFromMonster(monster, 1, 0);
 
     expect(combatant.skillIds).toEqual([snipeSkill.id]);
     expect(getEntry).not.toHaveBeenCalled();
+  });
+
+  it('carries each skill weight into skillWeights', () => {
+    const monster: MonsterContent = {
+      id: 'goblin' as MonsterId,
+      name: 'Goblin',
+      __type: 'monster',
+      description: '',
+      sprite: '0000',
+      frames: 4,
+      targettingType: 'Random',
+      baseStats: zeroStats(),
+      statsPerLevel: zeroStats(),
+      skills: [
+        { skillId: attackSkill.id, weight: 1 },
+        { skillId: snipeSkill.id, weight: 3 },
+      ],
+    } as MonsterContent;
+
+    const combatant = combatantFromMonster(monster, 1, 0);
+
+    expect(combatant.skillWeights).toEqual({
+      [attackSkill.id]: 1,
+      [snipeSkill.id]: 3,
+    });
   });
 });

@@ -38,7 +38,7 @@ describe('Monster Helper Functions', () => {
     drops: [
       { itemId: goldCoinId, min: 3, max: 10, multiplierPerLevel: 1, chance: 100 },
     ],
-    skills: [{ skillId: 'Attack' as EquipmentSkillId }],
+    skills: [{ skillId: 'Attack' as EquipmentSkillId, weight: 1 }],
   };
 
   describe('monsterXpReward', () => {

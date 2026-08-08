@@ -17,6 +17,7 @@ export type MonsterXpReward = DropRange & DropHasLevelMultiplier;
 
 export type MonsterSkill = {
   skillId: EquipmentSkillId;
+  weight: number;
 };
 
 export type MonsterContent = IsContentItem &

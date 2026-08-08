@@ -70,6 +70,7 @@ export function combatantFromCharacter(character: Character): Combatant {
       ? heroUsableSkillIds(character, heroSkillsAtLevel(job, character.level))
       : ['Attack' as EquipmentSkillId],
     skillRefs: [],
+    skillWeights: {},
 
     combatStats: defaultCombatStats(),
 
@@ -108,6 +109,9 @@ export function combatantFromMonster(
 
     skillIds: monster.skills.map((skill) => skill.skillId),
     skillRefs: [],
+    skillWeights: Object.fromEntries(
+      monster.skills.map((skill) => [skill.skillId, skill.weight]),
+    ),
 
     combatStats: defaultCombatStats(),
 

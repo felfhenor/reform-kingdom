@@ -39,6 +39,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     affinity: {} as never,
     skillIds: [],
     skillRefs: [],
+    skillWeights: {},
     skillUses: {},
     statusEffects: [],
     statusEffectData: {},

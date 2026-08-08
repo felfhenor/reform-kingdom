@@ -201,6 +201,7 @@ function ensureDroppedReward(
 function ensureMonsterSkill(skill: Partial<MonsterSkill> = {}): MonsterSkill {
   return {
     skillId: skill.skillId ?? ('UNKNOWN' as EquipmentSkillId),
+    weight: skill.weight ?? 1,
   };
 }
 
