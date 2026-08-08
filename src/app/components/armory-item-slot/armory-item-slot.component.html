@@ -4,8 +4,12 @@
   class="armory-item-slot outline-2 outline-offset-[-2px] rounded outline-{{
     item.rarity
   }}"
+  [class.armory-item-slot-sellable]="sellMode()"
+  [class.armory-item-slot-dimmed]="sellMode() && !selected()"
+  [class.armory-item-slot-selected]="sellMode() && selected()"
   [tp]="tooltip"
   [tpPlacement]="'top'"
+  (click)="onClick()"
 >
   <app-icon-blank-slot>
     <app-atlas-image spritesheet="equipment" [assetName]="item.sprite" />
@@ -44,6 +48,11 @@
 
       <div class="italic text-sm max-w-[300px] mb-2">
         {{ item.description }}
+      </div>
+
+      <div class="text-xs mb-2 flex items-center gap-2">
+        Sell value:
+        <app-currency-cost [type]="goldCoinItemId" [amount]="sellValue()" />
       </div>
 
       @if (item.slots > 0) {

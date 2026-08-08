@@ -1,16 +1,19 @@
 import { getEntry } from '@helpers/content';
+import { equipmentItemInfusionBonus, goldCoinId } from '@helpers/infusion';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  DropRarity,
   EquipmentArmoryEntry,
   EquipmentContent,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
+  GameState,
   GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
-import { orderBy } from 'es-toolkit/compat';
+import { orderBy, sum } from 'es-toolkit/compat';
 
 export function armoryGet(): EquipmentItem[] {
   return gamestate().armory;
@@ -88,6 +91,66 @@ export function armoryAdd(equipmentId: EquipmentId, quantity = 1): void {
 // is permanent and survives equipping, selling, or breaking the gear down.
 export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {
   return !!gamestate().discoveredEquipment[equipmentId]?.foundAt;
+}
+
+// Same gold-per-stat-point rate infusion pricing uses, plus a per-level
+// component so higher-tier drops are worth meaningfully more regardless of
+// how small their stat block is, scaled up further by rarity.
+const SELL_GOLD_PER_STAT_POINT = 20;
+const SELL_GOLD_PER_LEVEL = 10;
+const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
+  Common: 1,
+  Uncommon: 1.25,
+  Rare: 1.75,
+  Mystical: 2.5,
+  Legendary: 4,
+};
+
+// Base stats plus any infusion bonus both count toward stat value - selling
+// an infused item is worth more than an identical bare one, even though the
+// infusion materials themselves are never refunded.
+export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
+  const statTotal =
+    sum(Object.values(entry.content.baseStats)) +
+    sum(Object.values(equipmentItemInfusionBonus(entry.item.infusedItemIds)));
+
+  const base =
+    statTotal * SELL_GOLD_PER_STAT_POINT +
+    entry.content.levelRequirement * SELL_GOLD_PER_LEVEL;
+
+  return Math.max(1, Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity]));
+}
+
+// Mutates `state.materials` directly - only ever called from inside
+// `sellEquipmentItems`'s single `updateGamestate` callback, so the gold gain
+// lands in the same atomic commit as the armory removal (mirrors
+// `spendMaterial` in `party.ts`).
+function creditGold(state: GameState, amount: number): void {
+  const goldId = goldCoinId();
+  const existing = state.materials[goldId];
+  state.materials[goldId] = {
+    quantity: (existing?.quantity ?? 0) + amount,
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+}
+
+// Sells one or more owned armory items for gold in a single atomic commit.
+// Ids no longer present in the armory (stale selection) are silently
+// skipped. Returns the total gold gained.
+export function sellEquipmentItems(equipmentItemIds: EquipmentItemId[]): number {
+  const idsToSell = new Set(equipmentItemIds);
+  const entries = getArmoryEntries().filter((entry) => idsToSell.has(entry.item.id));
+  if (entries.length === 0) return 0;
+
+  const totalGold = sum(entries.map((entry) => equipmentSellValue(entry)));
+
+  updateGamestate((state) => {
+    state.armory = state.armory.filter((item) => !idsToSell.has(item.id));
+    creditGold(state, totalGold);
+    return state;
+  });
+
+  return totalGold;
 }
 
 // Drops any discovery entries whose equipmentId no longer resolves to real

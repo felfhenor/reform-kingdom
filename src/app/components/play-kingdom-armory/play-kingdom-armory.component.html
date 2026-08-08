@@ -7,7 +7,47 @@
 >
   <span header>Armory</span>
 
+  <div toolbar-actions class="flex items-center gap-4">
+    @if (sellMode()) {
+      <span class="text-sm min-w-[80px]">{{ selectedCount() }} selected</span>
+
+      <span class="text-sm flex items-center gap-2 min-w-[100px]">
+        <app-currency-cost
+          [type]="goldCoinItemId"
+          [amount]="selectedGoldTotal()"
+        />
+      </span>
+
+      <button
+        type="button"
+        class="btn btn-sm btn-success"
+        [disabled]="selectedCount() === 0"
+        (click)="confirmSell()"
+      >
+        Confirm Sell
+      </button>
+
+      <button type="button" class="btn btn-sm" (click)="toggleSellMode()">
+        Cancel
+      </button>
+    } @else {
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        (click)="toggleSellMode()"
+      >
+        Enter Sell Mode
+      </button>
+    }
+  </div>
+
   @for (entry of grid.pagedEntries(); track entry.item.id) {
-    <app-armory-item-slot [equipment]="entry.content" [equipmentItem]="entry.item" />
+    <app-armory-item-slot
+      [equipment]="entry.content"
+      [equipmentItem]="entry.item"
+      [sellMode]="sellMode()"
+      [selected]="selectedIds().has(entry.item.id)"
+      (toggleSelect)="toggleSelected(entry.item.id)"
+    />
   }
 </app-paged-grid-page>

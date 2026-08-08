@@ -5,7 +5,22 @@
 }
 
 .armory-item-slot {
-  @apply relative w-[64px] h-[64px] cursor-default;
+  @apply relative w-[64px] h-[64px] cursor-default transition-opacity;
+}
+
+// Sell mode: unselected items dim to read as "not part of this sale," while
+// the selected ones stay full-opacity and pick up a heavier outline so the
+// running total is easy to trace back to which items produced it.
+.armory-item-slot-sellable {
+  @apply cursor-pointer;
+}
+
+.armory-item-slot-dimmed {
+  @apply opacity-40;
+}
+
+.armory-item-slot-selected {
+  @apply outline-4;
 }
 
 .armory-item-tooltip-image {

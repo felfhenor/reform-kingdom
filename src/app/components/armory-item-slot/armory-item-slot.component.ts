@@ -1,9 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
 import { InfusedMaterialsRowComponent } from '@components/infused-materials-row/infused-materials-row.component';
 import { ItemStatRowsComponent } from '@components/item-stat-rows/item-stat-rows.component';
-import { equipmentItemInfusionBonus, getEntry, partyGet } from '@helpers';
+import {
+  equipmentItemInfusionBonus,
+  equipmentSellValue,
+  getEntry,
+  goldCoinId,
+  partyGet,
+} from '@helpers';
 import type { EquipmentContent, EquipmentItem, JobContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -12,6 +19,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
+    CurrencyCostComponent,
     IconBlankSlotComponent,
     InfusedMaterialsRowComponent,
     ItemStatRowsComponent,
@@ -23,6 +31,12 @@ import { TippyDirective } from '@ngneat/helipopper';
 export class ArmoryItemSlotComponent {
   public equipment = input.required<EquipmentContent>();
   public equipmentItem = input.required<EquipmentItem>();
+  public sellMode = input(false);
+  public selected = input(false);
+
+  public toggleSelect = output<void>();
+
+  public goldCoinItemId = goldCoinId();
 
   public equippableHeroes = computed(() =>
     partyGet()
@@ -37,4 +51,13 @@ export class ArmoryItemSlotComponent {
   public infusionBonus = computed(() =>
     equipmentItemInfusionBonus(this.equipmentItem().infusedItemIds),
   );
+
+  public sellValue = computed(() =>
+    equipmentSellValue({ item: this.equipmentItem(), content: this.equipment() }),
+  );
+
+  public onClick(): void {
+    if (!this.sellMode()) return;
+    this.toggleSelect.emit();
+  }
 }

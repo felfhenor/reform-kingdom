@@ -12,6 +12,10 @@
   @apply flex items-center justify-between gap-2;
 }
 
+.paged-grid-toolbar-search {
+  @apply flex items-center gap-2 w-full;
+}
+
 .paged-grid-pagination {
   @apply flex items-center gap-2;
 }

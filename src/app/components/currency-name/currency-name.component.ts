@@ -18,10 +18,10 @@ import type { ItemContent, ItemId } from '../../interfaces';
     class: 'inline-flex gap-2 align-baseline',
   },
   template: `
-    <div class="flex" [tp]="label()" [tpPlacement]="'bottom'">
-      <div class="min-w-[16px] min-h-[16px]">
+    <div class="flex items-center" [tp]="label()" [tpPlacement]="'bottom'">
+      <div class="min-w-[16px] min-h-[16px] mr-2">
         <app-atlas-image
-          class="absolute scale-[0.25] left-[-16px] top-[-18px]"
+          class="zoom-25"
           spritesheet="item"
           [assetName]="icon()"
         />

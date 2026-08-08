@@ -12,13 +12,17 @@
 
     @if (showToolbar()) {
       <div class="paged-grid-toolbar">
-        <input
-          type="text"
-          [placeholder]="searchPlaceholder()"
-          class="input input-sm input-bordered w-full max-w-xs"
-          [value]="searchText()"
-          (input)="onSearchInput($event)"
-        />
+        <div class="paged-grid-toolbar-search">
+          <input
+            type="text"
+            [placeholder]="searchPlaceholder()"
+            class="input input-sm input-bordered w-full max-w-xs"
+            [value]="searchText()"
+            (input)="onSearchInput($event)"
+          />
+
+          <ng-content select="[toolbar-actions]" />
+        </div>
 
         @if (totalPages() > 1) {
           <div class="paged-grid-pagination">
