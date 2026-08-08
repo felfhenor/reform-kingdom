@@ -12,6 +12,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import {
   canEnterGatherNode,
   canPartyTravel,
+  encounterStartFight,
   gamestate,
   gatheringProgressFraction,
   getMap,
@@ -24,6 +25,7 @@ import {
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
   worldNodeDescription,
+  worldNodeEncounter,
   worldNodeEncounterCount,
   worldNodeGatherMaterialIds,
   worldNodeGatherTime,
@@ -146,6 +148,18 @@ export class MapNodePanelComponent {
       this.travelPath()?.length === 0 && this.travelState().status === 'Idle',
   );
 
+  private isInCombat = computed(() => !!gamestate().world.combat);
+
+  public canReExplore = computed(() => {
+    const entry = this.node();
+    return (
+      !!entry &&
+      !!worldNodeEncounter(entry) &&
+      this.isAtNode() &&
+      !this.isInCombat()
+    );
+  });
+
   public canTravelHere = computed(() => {
     const entry = this.node();
     const path = this.travelPath();
@@ -170,6 +184,16 @@ export class MapNodePanelComponent {
     if (travelStart(entry.nodeName)) {
       this.close();
     }
+  }
+
+  public reExplore(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    const encounter = worldNodeEncounter(entry);
+    if (!encounter) return;
+
+    encounterStartFight(encounter.id, 0, entry.nodeName);
   }
 
   public close(): void {

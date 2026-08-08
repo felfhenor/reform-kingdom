@@ -107,6 +107,16 @@
         >
           Travel ({{ travelSeconds() ?? '—' }}s)
         </button>
+      } @else if (canReExplore()) {
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          (click)="reExplore()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Explore Again
+        </button>
       }
     </div>
   </div>
