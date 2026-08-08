@@ -159,3 +159,57 @@
       max: 200
       multiplierPerLevel: 0
       chance: 100
+
+- id: 1c711838-085f-4be3-b1cb-2d672f8b4660
+  name: Jelly Fields
+  description: A majestic field where slimes run free in peaceful harmony.
+
+  levelRange:
+    min: 8
+    max: 12
+
+  fights:
+    - monsters:
+        - monsterId: Green Slime
+        - monsterId: Green Slime
+        - monsterId: Green Slime
+    - monsters:
+        - monsterId: Purple Slime
+        - monsterId: Purple Slime
+        - monsterId: Red Slime
+    - monsters:
+        - monsterId: Green Slime
+        - monsterId: Green Slime
+        - monsterId: Purple Slime
+    - monsters:
+        - monsterId: Purple Slime
+        - monsterId: Red Slime
+        - monsterId: Red Slime
+        - monsterId: Green Slime
+    - monsters:
+        - monsterId: Purple Slime
+        - monsterId: Purple Slime
+        - monsterId: Red Slime
+        - monsterId: Green Slime
+
+  completionRewards:
+    - collectibleId: Jelly Flower
+      chance: 100
+
+    - equipmentId: Green Copperslime Ring
+      chance: 20
+
+    - equipmentId: Red Copperslime Ring
+      chance: 20
+
+    - equipmentId: Purple Copperslime Ring
+      chance: 20
+
+    - recipeId: 'Equipment: Refined Copperslime Ring'
+      chance: 10
+
+    - itemId: Gold Coin
+      min: 150
+      max: 200
+      multiplierPerLevel: 0
+      chance: 100

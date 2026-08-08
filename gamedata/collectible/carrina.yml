@@ -27,3 +27,9 @@
   rarity: Common
   description: An orb protected feverishly by spiders, seemingly powering their venomous abilities.
   sprite: '0005'
+
+- id: 6a67b594-4bf3-4345-a09b-9798a7abc460
+  name: Jelly Flower
+  rarity: Common
+  description: A flower encased entirely in slime jelly.
+  sprite: '0006'
