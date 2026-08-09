@@ -33,7 +33,11 @@
             >
               «
             </button>
-            <span>Page {{ page() + 1 }} / {{ totalPages() }}</span>
+
+            <span class="min-w-[100px]">
+              Page {{ page() + 1 }} / {{ totalPages() }}
+            </span>
+
             <button
               class="btn btn-xs"
               [disabled]="page() >= totalPages() - 1"
