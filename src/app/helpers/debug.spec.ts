@@ -1,10 +1,14 @@
 import type {
+  CharacterId,
+  Character,
   CollectibleContent,
   CollectibleId,
   EquipmentContent,
   EquipmentId,
+  GameState,
   ItemContent,
   ItemId,
+  StatBlock,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -25,6 +29,16 @@ vi.mock('@helpers/materials', () => ({
   addMaterial: vi.fn(),
 }));
 
+vi.mock('@helpers/party', () => ({
+  CHARACTER_MAX_LEVEL: 99,
+  characterStatsForLevel: vi.fn(),
+  characterXpForLevel: vi.fn(),
+}));
+
+vi.mock('@helpers/state-game', () => ({
+  updateGamestate: vi.fn(),
+}));
+
 vi.mock('@helpers/state-options', () => ({
   setOption: vi.fn(),
 }));
@@ -37,8 +51,11 @@ import {
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
+  debugSetCharacterLevel,
 } from '@helpers/debug';
 import { addMaterial } from '@helpers/materials';
+import { characterStatsForLevel, characterXpForLevel } from '@helpers/party';
+import { updateGamestate } from '@helpers/state-game';
 
 describe('Debug Helper Functions', () => {
   beforeEach(() => {
@@ -189,6 +206,92 @@ describe('Debug Helper Functions', () => {
 
       expect(collectiblesAdd).not.toHaveBeenCalled();
       expect(console.warn).toHaveBeenCalled();
+    });
+  });
+
+  describe('debugSetCharacterLevel', () => {
+    function runWithParty(party: Character[]): { party: Character[] } {
+      const captured = { party };
+      vi.mocked(updateGamestate).mockImplementation((func) => {
+        const state = { world: { party: captured.party } } as unknown as GameState;
+        const result = func(state);
+        captured.party = result.world.party;
+        return Promise.resolve();
+      });
+      return captured;
+    }
+
+    function makeCharacter(overrides: Partial<Character> = {}): Character {
+      return {
+        id: 'hero-1' as CharacterId,
+        level: 10,
+        xp: { current: 50, maximum: 200 },
+        hp: 40,
+        ep: 20,
+        stats: { Health: 50, Energy: 25 } as StatBlock,
+        ...overrides,
+      } as Character;
+    }
+
+    it('sets the level, resets xp, and recomputes stats for the matching character', () => {
+      const character = makeCharacter();
+      vi.mocked(characterStatsForLevel).mockReturnValue({
+        Health: 100,
+        Energy: 60,
+      } as StatBlock);
+      vi.mocked(characterXpForLevel).mockReturnValue(500);
+
+      const captured = runWithParty([character]);
+      debugSetCharacterLevel('hero-1' as CharacterId, 20);
+
+      expect(captured.party[0].level).toBe(20);
+      expect(captured.party[0].xp).toEqual({ current: 0, maximum: 500 });
+      expect(captured.party[0].stats).toEqual({ Health: 100, Energy: 60 });
+      expect(captured.party[0].hp).toBe(40);
+      expect(captured.party[0].ep).toBe(20);
+    });
+
+    it('clamps hp/ep down when the new level has lower stats', () => {
+      const character = makeCharacter({ hp: 45, ep: 25 });
+      vi.mocked(characterStatsForLevel).mockReturnValue({
+        Health: 10,
+        Energy: 5,
+      } as StatBlock);
+      vi.mocked(characterXpForLevel).mockReturnValue(20);
+
+      const captured = runWithParty([character]);
+      debugSetCharacterLevel('hero-1' as CharacterId, 1);
+
+      expect(captured.party[0].hp).toBe(10);
+      expect(captured.party[0].ep).toBe(5);
+    });
+
+    it('clamps the requested level to the valid range', () => {
+      const character = makeCharacter();
+      vi.mocked(characterStatsForLevel).mockReturnValue({
+        Health: 100,
+        Energy: 60,
+      } as StatBlock);
+      vi.mocked(characterXpForLevel).mockReturnValue(100);
+
+      const captured = runWithParty([character]);
+      debugSetCharacterLevel('hero-1' as CharacterId, 500);
+
+      expect(captured.party[0].level).toBe(99);
+    });
+
+    it('does not modify characters that do not match the id', () => {
+      const character = makeCharacter();
+      vi.mocked(characterStatsForLevel).mockReturnValue({
+        Health: 100,
+        Energy: 60,
+      } as StatBlock);
+      vi.mocked(characterXpForLevel).mockReturnValue(500);
+
+      const captured = runWithParty([character]);
+      debugSetCharacterLevel('other-hero' as CharacterId, 20);
+
+      expect(captured.party[0]).toEqual(character);
     });
   });
 });

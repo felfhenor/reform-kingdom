@@ -2,8 +2,15 @@ import { armoryAdd } from '@helpers/armory';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { addMaterial } from '@helpers/materials';
+import {
+  CHARACTER_MAX_LEVEL,
+  characterStatsForLevel,
+  characterXpForLevel,
+} from '@helpers/party';
+import { updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import type {
+  CharacterId,
   CollectibleContent,
   CollectibleId,
   EquipmentContent,
@@ -11,6 +18,7 @@ import type {
   ItemContent,
   ItemId,
 } from '@interfaces';
+import { clamp } from 'es-toolkit/compat';
 
 export function debugToggle() {
   setOption('showDebug', true);
@@ -70,6 +78,36 @@ export function debugGiveAllEquipment(quantity = 1): void {
     .forEach((equipment) => {
       armoryAdd(equipment.id, quantity);
     });
+}
+
+export function debugSetCharacterLevel(
+  characterId: CharacterId,
+  level: number,
+): void {
+  const clampedLevel = clamp(Math.round(level), 1, CHARACTER_MAX_LEVEL);
+
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((character) => {
+      if (character.id !== characterId) return character;
+
+      const stats = characterStatsForLevel(
+        character.jobId,
+        clampedLevel,
+        character.equipment,
+      );
+
+      return {
+        ...character,
+        level: clampedLevel,
+        xp: { current: 0, maximum: characterXpForLevel(clampedLevel) },
+        stats,
+        hp: clamp(character.hp, 0, stats.Health),
+        ep: clamp(character.ep, 0, stats.Energy),
+      };
+    });
+
+    return state;
+  });
 }
 
 export function debugGiveCollectible(

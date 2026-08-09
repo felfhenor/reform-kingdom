@@ -3,12 +3,16 @@ import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import {
+  CHARACTER_MAX_LEVEL,
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
+  debugSetCharacterLevel,
   getEntriesByType,
+  partyGet,
 } from '@helpers';
 import type {
+  CharacterId,
   CollectibleContent,
   CollectibleId,
   EquipmentContent,
@@ -55,6 +59,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedCollectibleId = signal<CollectibleId | undefined>(undefined);
   public collectibleQuantity = signal<number>(1);
 
+  public party = computed(() => sortBy(partyGet(), (character) => character.name));
+
+  public characterMaxLevel = CHARACTER_MAX_LEVEL;
+  public selectedCharacterId = signal<CharacterId | undefined>(undefined);
+  public characterLevel = signal<number>(1);
+
   public giveItem(): void {
     const itemId = this.selectedItemId();
     if (!itemId) return;
@@ -74,5 +84,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!collectibleId) return;
 
     debugGiveCollectible(collectibleId, this.collectibleQuantity());
+  }
+
+  public setCharacterLevel(): void {
+    const characterId = this.selectedCharacterId();
+    if (!characterId) return;
+
+    debugSetCharacterLevel(characterId, this.characterLevel());
   }
 }

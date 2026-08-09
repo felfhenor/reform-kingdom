@@ -194,5 +194,39 @@
         </div>
       </div>
     </div>
+
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Set Hero Level</div>
+
+        <div class="debug-give-grid">
+          <span class="label-text text-right">Hero</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="party()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Select a hero..."
+            [(ngModel)]="selectedCharacterId"
+          ></ng-select>
+          <input
+            type="number"
+            [min]="1"
+            [max]="characterMaxLevel"
+            class="input input-bordered debug-give-qty"
+            [(ngModel)]="characterLevel"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:SetCharacterLevel"
+            (click)="setCharacterLevel()"
+          >
+            Set
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
