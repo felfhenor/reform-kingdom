@@ -1,0 +1,8 @@
+@reference 'tailwindcss';
+
+// The CDK viewport needs a real, non-auto height to compute how many rows
+// to render - `flex-1` alone only works because every ancestor up to the
+// card body is already constrained to `h-full`/`min-h-0`.
+.equipment-item-list {
+  height: 100%;
+}

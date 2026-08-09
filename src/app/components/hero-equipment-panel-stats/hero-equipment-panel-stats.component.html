@@ -1,0 +1,13 @@
+<div>
+  <span class="font-semibold text-xl">Stats</span>
+</div>
+
+@for (stat of statKeys; track stat) {
+  <div class="flex items-center gap-3">
+    <app-icon-stat [stat]="stat" class="text-2xl" />
+    <span class="text-base">{{ stat }} ({{ statShorthand[stat] }})</span>
+    <span class="ml-auto font-semibold text-lg">
+      {{ statValue(stat) }}
+    </span>
+  </div>
+}
