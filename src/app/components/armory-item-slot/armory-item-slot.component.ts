@@ -34,7 +34,7 @@ export class ArmoryItemSlotComponent {
   public sellMode = input(false);
   public selected = input(false);
 
-  public toggleSelect = output<void>();
+  public toggleSelect = output<MouseEvent>();
 
   public goldCoinItemId = goldCoinId();
 
@@ -56,8 +56,8 @@ export class ArmoryItemSlotComponent {
     equipmentSellValue({ item: this.equipmentItem(), content: this.equipment() }),
   );
 
-  public onClick(): void {
+  public onClick(event: MouseEvent): void {
     if (!this.sellMode()) return;
-    this.toggleSelect.emit();
+    this.toggleSelect.emit(event);
   }
 }

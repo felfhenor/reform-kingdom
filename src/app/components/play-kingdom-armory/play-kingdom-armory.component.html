@@ -35,7 +35,7 @@
         #sellSwal
         title="Sell items?"
         text="Are you sure you want to sell {{ selectedCount() }} items for {{
-          selectedGoldTotal()
+          selectedGoldTotal() | number
         }} gold?"
         icon="warning"
         (confirm)="confirmSell()"
@@ -57,7 +57,7 @@
       [equipmentItem]="entry.item"
       [sellMode]="sellMode()"
       [selected]="selectedIds().has(entry.item.id)"
-      (toggleSelect)="toggleSelected(entry.item.id)"
+      (toggleSelect)="toggleSelected(entry.item.id, $event)"
     />
   }
 </app-paged-grid-page>

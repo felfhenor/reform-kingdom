@@ -9,7 +9,7 @@
   [class.armory-item-slot-selected]="sellMode() && selected()"
   [tp]="tooltip"
   [tpPlacement]="'top'"
-  (click)="onClick()"
+  (click)="onClick($event)"
 >
   <app-icon-blank-slot>
     <app-atlas-image spritesheet="equipment" [assetName]="item.sprite" />

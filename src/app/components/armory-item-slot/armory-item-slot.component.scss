@@ -12,7 +12,7 @@
 // the selected ones stay full-opacity and pick up a heavier outline so the
 // running total is easy to trace back to which items produced it.
 .armory-item-slot-sellable {
-  @apply cursor-pointer;
+  @apply cursor-pointer select-none;
 }
 
 .armory-item-slot-dimmed {

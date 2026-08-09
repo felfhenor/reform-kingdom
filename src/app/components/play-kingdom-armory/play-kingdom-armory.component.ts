@@ -1,8 +1,10 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   signal,
+  viewChild,
 } from '@angular/core';
 import { ArmoryItemSlotComponent } from '@components/armory-item-slot/armory-item-slot.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
@@ -14,7 +16,7 @@ import {
   goldCoinId,
   sellEquipmentItems,
 } from '@helpers';
-import type { EquipmentItemId } from '@interfaces';
+import type { EquipmentArmoryEntry, EquipmentItemId } from '@interfaces';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sum } from 'es-toolkit/compat';
 
@@ -26,11 +28,15 @@ import { sum } from 'es-toolkit/compat';
     CurrencyCostComponent,
     PagedGridPageComponent,
     SweetAlert2Module,
+    DecimalPipe,
   ],
   templateUrl: './play-kingdom-armory.component.html',
   styleUrl: './play-kingdom-armory.component.scss',
 })
 export class PlayKingdomArmoryComponent {
+  private grid =
+    viewChild<PagedGridPageComponent<EquipmentArmoryEntry>>('grid');
+
   public entries = computed(() => getArmoryEntries());
   public filterFn = filterArmoryEntries;
 
@@ -38,6 +44,7 @@ export class PlayKingdomArmoryComponent {
 
   public sellMode = signal(false);
   public selectedIds = signal<Set<EquipmentItemId>>(new Set());
+  private lastSelectedId = signal<EquipmentItemId | undefined>(undefined);
 
   public selectedCount = computed(() => this.selectedIds().size);
 
@@ -58,16 +65,24 @@ export class PlayKingdomArmoryComponent {
     this.sellMode.set(true);
   }
 
-  public toggleSelected(itemId: EquipmentItemId): void {
-    this.selectedIds.update((current) => {
-      const next = new Set(current);
-      if (next.has(itemId)) {
-        next.delete(itemId);
-      } else {
-        next.add(itemId);
-      }
-      return next;
-    });
+  public toggleSelected(itemId: EquipmentItemId, event: MouseEvent): void {
+    const anchorId = this.lastSelectedId();
+
+    if (event.shiftKey && anchorId !== undefined) {
+      this.selectRange(anchorId, itemId);
+    } else {
+      this.selectedIds.update((current) => {
+        const next = new Set(current);
+        if (next.has(itemId)) {
+          next.delete(itemId);
+        } else {
+          next.add(itemId);
+        }
+        return next;
+      });
+    }
+
+    this.lastSelectedId.set(itemId);
   }
 
   public confirmSell(): void {
@@ -78,5 +93,25 @@ export class PlayKingdomArmoryComponent {
   private exitSellMode(): void {
     this.sellMode.set(false);
     this.selectedIds.set(new Set());
+    this.lastSelectedId.set(undefined);
+  }
+
+  private selectRange(fromId: EquipmentItemId, toId: EquipmentItemId): void {
+    const visible = this.grid()?.pagedEntries() ?? [];
+    const fromIndex = visible.findIndex((entry) => entry.item.id === fromId);
+    const toIndex = visible.findIndex((entry) => entry.item.id === toId);
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const start = Math.min(fromIndex, toIndex);
+    const end = Math.max(fromIndex, toIndex);
+    const rangeIds = visible
+      .slice(start, end + 1)
+      .map((entry) => entry.item.id);
+
+    this.selectedIds.update((current) => {
+      const next = new Set(current);
+      rangeIds.forEach((id) => next.add(id));
+      return next;
+    });
   }
 }
