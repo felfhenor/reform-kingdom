@@ -15,12 +15,13 @@ import {
   type EquipmentItem,
   type EquipmentItemId,
   type EquipmentItemType,
+  type EquipmentSkillId,
   type EquipmentSlot,
   type JobContent,
   type JobId,
   type StatBlock,
 } from '@interfaces';
-import { orderBy } from 'es-toolkit/compat';
+import { orderBy, uniq } from 'es-toolkit/compat';
 
 // Gear can be swapped freely while gathering, but not mid-fight.
 export function canModifyEquipment(): boolean {
@@ -180,6 +181,21 @@ export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
   });
 
   return totals;
+}
+
+// Every skill granted by a distinct equipped item, deduped - see
+// `EquipmentContent.grantedSkillIds`. Merging these into a hero's known
+// skills is handled separately (see `mergeGrantedSkills`/
+// `heroSkillsWithEquipment`), since that needs skill content, not just ids.
+export function equipmentGrantedSkillIds(
+  equipment: EquipmentBlock,
+): EquipmentSkillId[] {
+  return uniq(
+    equippedItems(equipment).flatMap(
+      (item) =>
+        getEntry<EquipmentContent>(item.equipmentId)?.grantedSkillIds ?? [],
+    ),
+  );
 }
 
 // Backfills instance identity for saves predating per-instance infusion

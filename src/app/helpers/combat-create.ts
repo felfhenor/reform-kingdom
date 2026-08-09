@@ -5,7 +5,7 @@ import {
   defaultStats,
 } from '@helpers/defaults';
 import { equippedItemTypes } from '@helpers/equipment';
-import { heroSkillsAtLevel } from '@helpers/job';
+import { heroSkillsWithEquipment } from '@helpers/job';
 import { rngUuid } from '@helpers/rng';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/skill';
 import type {
@@ -67,7 +67,14 @@ export function combatantFromCharacter(character: Character): Combatant {
     frames: job?.frames ?? 4,
 
     skillIds: job
-      ? heroUsableSkillIds(character, heroSkillsAtLevel(job, character.level))
+      ? heroUsableSkillIds(
+          character,
+          heroSkillsWithEquipment(
+            job,
+            character.level,
+            character.equipment,
+          ).map((skill) => skill.id),
+        )
       : ['Attack' as EquipmentSkillId],
     skillRefs: [],
     skillWeights: {},

@@ -30,6 +30,7 @@ import {
   canEquipItem,
   canModifyEquipment,
   equipmentAvailableForSlot,
+  equipmentGrantedSkillIds,
   equipmentStatTotals,
   equippedItems,
   equippedItemsByPrimarySlot,
@@ -231,6 +232,61 @@ describe('Equipment Helper Functions', () => {
       });
 
       expect(totals.Strength).toBe(sword.baseStats.Strength + 2);
+    });
+  });
+
+  describe('equipmentGrantedSkillIds', () => {
+    it('returns the grantedSkillIds of each distinct equipped item', () => {
+      const staff = {
+        ...sword,
+        id: 'staff' as EquipmentId,
+        grantedSkillIds: ['starshine-2'],
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === 'staff' ? staff : undefined) as never,
+      );
+
+      const skillIds = equipmentGrantedSkillIds({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(staff.id),
+      });
+
+      expect(skillIds).toEqual(['starshine-2']);
+    });
+
+    it('dedupes a skill granted by more than one equipped item', () => {
+      const staff = {
+        ...sword,
+        id: 'staff' as EquipmentId,
+        grantedSkillIds: ['starshine-2'],
+      };
+      const ring = {
+        ...sword,
+        id: 'ring' as EquipmentId,
+        grantedSkillIds: ['starshine-2'],
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === 'staff' ? staff : id === 'ring' ? ring : undefined) as never,
+      );
+
+      const skillIds = equipmentGrantedSkillIds({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(staff.id),
+        Ring: mockEquipmentItem(ring.id),
+      });
+
+      expect(skillIds).toEqual(['starshine-2']);
+    });
+
+    it('returns an empty array when no equipped item grants a skill', () => {
+      vi.mocked(getEntry).mockReturnValue(sword);
+
+      const skillIds = equipmentGrantedSkillIds({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(sword.id),
+      });
+
+      expect(skillIds).toEqual([]);
     });
   });
 

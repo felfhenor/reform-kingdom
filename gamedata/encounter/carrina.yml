@@ -154,6 +154,9 @@
     - collectibleId: Venom Orb
       chance: 100
 
+    - equipmentId: Silkstrong Copper Shield
+      chance: 10
+
     - itemId: Gold Coin
       min: 150
       max: 200

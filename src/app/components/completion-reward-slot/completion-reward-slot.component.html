@@ -5,12 +5,15 @@
     [tpPlacement]="'top'"
   >
     <app-icon-blank-slot>
-      <app-atlas-image [spritesheet]="spritesheet()" [assetName]="reward.sprite" />
+      <app-atlas-image
+        [spritesheet]="spritesheet()"
+        [assetName]="reward.sprite"
+      />
     </app-icon-blank-slot>
   </div>
 
   <ng-template #tooltip>
-    <div class="flex gap-2 p-2">
+    <div class="flex gap-2 p-2 max-w-[400px]">
       <app-atlas-image
         [spritesheet]="spritesheet()"
         [assetName]="reward.sprite"

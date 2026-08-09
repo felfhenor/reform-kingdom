@@ -1,0 +1,27 @@
+- id: e64e3114-0fd0-41b8-845e-74c5c377eea0
+  name: Fortify I
+  description: Boost the Vitality of an ally!
+
+  sprite: '0013'
+
+  rarity: Uncommon
+
+  epCost: 5
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Earth]
+      attributes: [Buff]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Invigorated
+
+      statusEffects:
+        - statusEffectId: Invigorated
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'

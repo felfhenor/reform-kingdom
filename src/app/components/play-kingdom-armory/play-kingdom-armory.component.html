@@ -41,7 +41,7 @@
     }
   </div>
 
-  @for (entry of grid.pagedEntries(); track entry.item.id) {
+  @for (entry of grid.pagedEntries(); track $index + ' ' + entry.item.id) {
     <app-armory-item-slot
       [equipment]="entry.content"
       [equipmentItem]="entry.item"

@@ -18,3 +18,24 @@
     - type: TakeDamageFromStat
       combatMessage: '**{{ combatant.name }}** has lost their empowerment (-{{ damage }} Strength)!'
       modifyStat: Strength
+
+- id: ec894e4a-23e7-412f-ab0e-658477e1a685
+  name: Invigorated
+
+  effectType: Buff
+  elements: [Earth]
+
+  trigger: TurnStart
+
+  statScaling:
+    Vitality: 0.2
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has been invigorated (+{{ damage }} Vitality)!'
+      modifyStat: Vitality
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has lost their vigor (-{{ damage }} Vitality)!'
+      modifyStat: Vitality

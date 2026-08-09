@@ -40,3 +40,18 @@
 .equipment-slot-tooltip-image {
   @apply shrink-0;
 }
+
+// Very small inline rendering of a granted skill's icon next to "Teaches" -
+// shrinks the shared 64px icon-blank-slot box down via scale, the same
+// technique `.hero-tab-icon` (game-play-heroes) uses for its 32px variant.
+.equipment-slot-granted-skill-icon {
+  @apply relative overflow-hidden shrink-0 inline-block align-middle;
+  width: 16px;
+  height: 16px;
+
+  app-icon-blank-slot {
+    display: block;
+    transform: scale(0.25);
+    transform-origin: top left;
+  }
+}

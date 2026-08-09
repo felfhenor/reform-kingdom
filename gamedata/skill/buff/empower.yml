@@ -1,0 +1,27 @@
+- id: 2653ab27-8bd6-4feb-85a5-595ab200b921
+  name: Empower I
+  description: Boost the Strength of an ally!
+
+  sprite: '0014'
+
+  rarity: Common
+
+  epCost: 5
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Fire]
+      attributes: [Buff]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Empowered
+
+      statusEffects:
+        - statusEffectId: Empowered
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'

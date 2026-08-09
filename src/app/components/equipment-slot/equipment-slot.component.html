@@ -50,6 +50,18 @@
           </div>
         }
 
+        @for (skill of grantedSkills(); track skill.id) {
+          <div class="text-xs mb-1 italic opacity-70 flex items-center gap-2">
+            Teaches
+            <span class="equipment-slot-granted-skill-icon">
+              <app-icon-blank-slot [showBackground]="false">
+                <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />
+              </app-icon-blank-slot>
+            </span>
+            {{ skill.name }}
+          </div>
+        }
+
         <app-item-stat-rows
           [stats]="content.baseStats"
           [bonusStats]="infusionBonus()"

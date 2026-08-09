@@ -1,5 +1,6 @@
 import type {
   EquipmentSkill,
+  EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   EquipmentSkillTechniqueStatusEffectApplication,
 } from '@interfaces/content-skill';
@@ -94,4 +95,65 @@ export function skillDisplayElement(skill: EquipmentSkill): string {
   if (intersection(elements, ['Air']).length === 1) return 'Air';
 
   return elements.join(', ');
+}
+
+const ROMAN_NUMERAL_TIERS: Record<string, number> = {
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
+  V: 5,
+  VI: 6,
+  VII: 7,
+  VIII: 8,
+  IX: 9,
+  X: 10,
+};
+
+// Splits a skill's display name into its upgrade family and rank, e.g.
+// "Starshine II" -> { family: 'Starshine', tier: 2 } (matching the existing
+// "Double Strike I/II" naming convention job skill paths already use). A
+// name with no recognized numeral suffix is its own family at tier 1, so
+// unrelated skills never compare as upgrades of one another.
+function skillNameTier(name: string): { family: string; tier: number } {
+  const match = name.match(/^(.*) (I{1,3}|IV|V)$/);
+  if (!match) return { family: name, tier: 1 };
+
+  return { family: match[1], tier: ROMAN_NUMERAL_TIERS[match[2]] };
+}
+
+// Slots one equipment-granted skill into a hero's known skill list: it
+// replaces an already-known lower-tier skill of the same family (e.g.
+// Starshine I -> II), is dropped if a same-or-higher tier is already known,
+// and is otherwise appended as a newly learned skill.
+function applyGrantedSkill(
+  skills: EquipmentSkillContent[],
+  granted: EquipmentSkillContent,
+): EquipmentSkillContent[] {
+  const grantedTier = skillNameTier(granted.name);
+  const existingIndex = skills.findIndex(
+    (skill) => skillNameTier(skill.name).family === grantedTier.family,
+  );
+
+  if (existingIndex === -1) return [...skills, granted];
+
+  const existingTier = skillNameTier(skills[existingIndex].name);
+  if (existingTier.tier >= grantedTier.tier) return skills;
+
+  return skills.map((skill, i) => (i === existingIndex ? granted : skill));
+}
+
+// Merges equipment-granted skills into a hero's base (job-path) skills - see
+// `applyGrantedSkill` for the per-skill upgrade/ignore/append rule.
+export function mergeGrantedSkills(
+  baseSkills: EquipmentSkillContent[],
+  grantedSkills: EquipmentSkillContent[],
+): EquipmentSkillContent[] {
+  let merged = baseSkills;
+
+  grantedSkills.forEach((granted) => {
+    merged = applyGrantedSkill(merged, granted);
+  });
+
+  return merged;
 }

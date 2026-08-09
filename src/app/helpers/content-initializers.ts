@@ -321,6 +321,7 @@ function ensureEquipment(
     // opted into at the data level. This fallback only guards against
     // malformed/legacy entries, it does not grant free slots.
     slots: equipment.slots ?? 0,
+    grantedSkillIds: equipment.grantedSkillIds ?? [],
     unobtainable: equipment.unobtainable ?? false,
   };
 }

@@ -14,6 +14,7 @@ import {
   EquipmentTypeToSlot,
   type EquipmentContent,
   type EquipmentItem,
+  type EquipmentSkillContent,
   type EquipmentSlot,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -55,6 +56,15 @@ export class EquipmentSlotComponent {
   public occupiedPaperdollSlots = computed<EquipmentSlot[]>(() => {
     const content = this.equippedContent();
     return content ? EquipmentTypeToSlot[content.type] : [];
+  });
+
+  public grantedSkills = computed<EquipmentSkillContent[]>(() => {
+    const content = this.equippedContent();
+    if (!content) return [];
+
+    return content.grantedSkillIds
+      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
+      .filter((skill): skill is EquipmentSkillContent => !!skill);
   });
 
   public isSecondarySlot = computed<boolean>(() => {

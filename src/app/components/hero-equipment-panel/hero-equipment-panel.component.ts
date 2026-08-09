@@ -22,7 +22,7 @@ import {
   equipmentAvailableForSlot,
   equippedItemTypes,
   getEntry,
-  heroSkillsAtLevel,
+  heroSkillsWithEquipment,
   isSlotAvailableForJob,
   optimizeCharacterEquipment,
   skillIsUsableWithEquippedWeapons,
@@ -110,9 +110,11 @@ export class HeroEquipmentPanelComponent {
     const job = this.job();
     if (!job) return [];
 
-    return heroSkillsAtLevel(job, this.character().level)
-      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
-      .filter((skill): skill is EquipmentSkillContent => !!skill);
+    return heroSkillsWithEquipment(
+      job,
+      this.character().level,
+      this.character().equipment,
+    );
   });
 
   public equippedWeaponTypes = computed<EquipmentItemType[]>(() =>

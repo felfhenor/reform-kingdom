@@ -1,6 +1,8 @@
 @if (isDiscovered() && item(); as material) {
   <div
-    class="outline-2 outline-offset-[-2px] rounded outline-{{ material.rarity }}"
+    class="outline-2 outline-offset-[-2px] rounded outline-{{
+      material.rarity
+    }}"
     [tp]="tooltip"
     [tpPlacement]="'top'"
   >
@@ -10,7 +12,7 @@
   </div>
 
   <ng-template #tooltip>
-    <div class="flex gap-2 p-2">
+    <div class="flex gap-2 p-2 max-w-[400px]">
       <app-atlas-image
         spritesheet="item"
         [assetName]="material.sprite"
