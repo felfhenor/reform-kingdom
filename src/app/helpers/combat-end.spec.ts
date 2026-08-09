@@ -44,6 +44,7 @@ vi.mock('@helpers/materials', () => ({
 
 vi.mock('@helpers/monster', () => ({
   monsterXpReward: vi.fn(() => 0),
+  xpForOverLevel: vi.fn((rawXp: number) => rawXp),
 }));
 
 vi.mock('@helpers/party', () => ({
@@ -70,6 +71,8 @@ import { combatCheckIfOver } from '@helpers/combat-end';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { rollDroppedRewards } from '@helpers/loot';
+import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
+import { partyGainXp } from '@helpers/party';
 import { recipeDiscover } from '@helpers/recipes';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
@@ -79,6 +82,7 @@ import type {
   Combatant,
   EncounterContent,
   EncounterId,
+  MonsterContent,
   RecipeContent,
   RecipeId,
 } from '@interfaces';
@@ -266,6 +270,69 @@ describe('combatCheckIfOver', () => {
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(combatReset).toHaveBeenCalled();
     expect(autoModeRecordClauseFailure).toHaveBeenCalled();
+  });
+
+  it('degrades XP via xpForOverLevel using the encounter max and highest hero level', () => {
+    const monster = { id: 'monster-1' } as MonsterContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [],
+      levelRange: { min: 3, max: 5 },
+    } as unknown as EncounterContent;
+
+    vi.mocked(getEntry).mockImplementation((id) =>
+      (id === 'enc-1' ? encounter : monster) as never,
+    );
+    vi.mocked(monsterXpReward).mockReturnValue(100);
+    vi.mocked(xpForOverLevel).mockReturnValue(50);
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      heroes: [
+        buildCombatant({ id: 'hero-1', level: 4, hp: 10 }),
+        buildCombatant({ id: 'hero-2', level: 7, hp: 10 }),
+      ],
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+          level: 5,
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    // Uses the highest hero level (7) against the node's max (5).
+    expect(xpForOverLevel).toHaveBeenCalledWith(100, 7, 5);
+    expect(partyGainXp).toHaveBeenCalledWith(50);
+  });
+
+  it('does not degrade XP for a bare fight with no encounter', () => {
+    const monster = { id: 'monster-1' } as MonsterContent;
+    vi.mocked(getEntry).mockReturnValue(monster as never);
+    vi.mocked(monsterXpReward).mockReturnValue(100);
+
+    const combat = buildCombat({
+      heroes: [buildCombatant({ id: 'hero-1', level: 20, hp: 10 })],
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+          level: 5,
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(xpForOverLevel).not.toHaveBeenCalled();
+    expect(partyGainXp).toHaveBeenCalledWith(100);
   });
 
   it('returns false when combat is not yet over', () => {

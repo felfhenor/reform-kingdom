@@ -1,4 +1,4 @@
-import { monsterXpReward } from '@helpers/monster';
+import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
 import type { EquipmentSkillId, ItemId, MonsterContent } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -56,6 +56,28 @@ describe('Monster Helper Functions', () => {
         expect(xp).toBeGreaterThanOrEqual(5);
         expect(xp).toBeLessThanOrEqual(7);
       }
+    });
+  });
+
+  describe('xpForOverLevel', () => {
+    it('should return full xp at or below the node max level', () => {
+      expect(xpForOverLevel(100, 4, 5)).toBe(100);
+      expect(xpForOverLevel(100, 5, 5)).toBe(100);
+    });
+
+    it('should degrade xp by 25% per level over the node max', () => {
+      expect(xpForOverLevel(100, 6, 5)).toBe(75);
+      expect(xpForOverLevel(100, 7, 5)).toBe(50);
+      expect(xpForOverLevel(100, 8, 5)).toBe(25);
+    });
+
+    it('should hard-cap xp at 1 once 4+ levels over the node max', () => {
+      expect(xpForOverLevel(100, 9, 5)).toBe(1);
+      expect(xpForOverLevel(100, 20, 5)).toBe(1);
+    });
+
+    it('should never degrade below 1 xp even for small raw amounts', () => {
+      expect(xpForOverLevel(2, 8, 5)).toBe(1);
     });
   });
 });

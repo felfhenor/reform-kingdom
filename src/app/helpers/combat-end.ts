@@ -16,7 +16,7 @@ import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { rollDroppedRewards } from '@helpers/loot';
 import { addMaterial } from '@helpers/materials';
-import { monsterXpReward } from '@helpers/monster';
+import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
 import { partyGainXp, syncPartyHpFromCombat } from '@helpers/party';
 import { recipeDiscover } from '@helpers/recipes';
 import { travelBeginDeathsDoor } from '@helpers/travel';
@@ -129,12 +129,26 @@ function grantResolvedDrops(combat: Combat, drops: ResolvedDrop[]): void {
   });
 }
 
+// The party's highest hero level represents it for over-level XP scaling,
+// same convention as `healingTicksForLevel` - one overleveled hero is enough
+// to mark the node as trivial for the whole party.
+function partyRepresentativeLevel(combat: Combat): number {
+  return Math.max(...combat.heroes.map((hero) => hero.level), 1);
+}
+
 function grantVictoryRewards(combat: Combat): void {
   const monsters = defeatedMonsters(combat);
+  const encounter = combat.encounterId
+    ? getEntry<EncounterContent>(combat.encounterId)
+    : undefined;
+  const partyLevel = partyRepresentativeLevel(combat);
 
-  const totalXp = sumBy(monsters, ({ monster, level }) =>
-    monsterXpReward(monster, level),
-  );
+  const totalXp = sumBy(monsters, ({ monster, level }) => {
+    const rawXp = monsterXpReward(monster, level);
+    return encounter
+      ? xpForOverLevel(rawXp, partyLevel, encounter.levelRange.max)
+      : rawXp;
+  });
   if (totalXp > 0) {
     partyGainXp(totalXp);
     combatMessageLog(combat, `The party gained ${totalXp} XP!`);
