@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/auto-mode', () => ({
+  autoModeIsEnabled: vi.fn(() => false),
+  autoModeToggle: vi.fn(),
+}));
+
 vi.mock('@helpers/global-effects', () => ({
   addGlobalEffect: vi.fn(),
   isGlobalEffectActive: vi.fn(() => false),
@@ -11,6 +16,10 @@ vi.mock('@helpers/encounter', () => ({
 
 vi.mock('@helpers/combat-log', () => ({
   travelMessageLog: vi.fn(),
+}));
+
+vi.mock('@helpers/gather-node-discovery', () => ({
+  gatherNodeDiscover: vi.fn(),
 }));
 
 vi.mock('@helpers/gathering', () => ({
@@ -40,8 +49,10 @@ vi.mock('@helpers/world-nodes', () => ({
   worldNodesOfType: vi.fn(() => []),
 }));
 
+import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';
 import { addGlobalEffect, isGlobalEffectActive } from '@helpers/global-effects';
 import { encounterStartFight } from '@helpers/encounter';
+import { gatherNodeDiscover } from '@helpers/gather-node-discovery';
 import { travelMessageLog } from '@helpers/combat-log';
 import { gatheringStart, gatheringStop } from '@helpers/gathering';
 import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding';
@@ -299,11 +310,62 @@ describe('travelStart', () => {
     );
   });
 
-  it('still refuses a zero-length path while idle', () => {
+  it('still refuses a zero-length path while idle, for a manual travel', () => {
     vi.mocked(travelPathTo).mockReturnValue([]);
 
     expect(travelStart('Field Ruins')).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('re-triggers the node for an auto-mode travel targeting the tile already stood on (regression: the party would otherwise just stop once the nearest eligible node was the one they were already at)', () => {
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(worldNodeByName).mockReturnValue({
+      mapName: 'Carrina',
+      x: 0,
+      y: 0,
+      nodeName: 'Field Ruins',
+      nodeData: {} as never,
+    });
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      id: 'enc-1',
+    } as unknown as EncounterContent);
+
+    expect(travelStart('Field Ruins', true)).toBe(true);
+
+    expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 0, 'Field Ruins');
+  });
+
+  it('turns off Auto Mode when a manual travel is started while it is enabled', () => {
+    vi.mocked(autoModeIsEnabled).mockReturnValue(true);
+    vi.mocked(travelPathTo).mockReturnValue([
+      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+    ]);
+
+    travelStart('Field Ruins');
+
+    expect(autoModeToggle).toHaveBeenCalledWith(false);
+  });
+
+  it('does not touch Auto Mode when the travel is auto-mode-initiated', () => {
+    vi.mocked(autoModeIsEnabled).mockReturnValue(true);
+    vi.mocked(travelPathTo).mockReturnValue([
+      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+    ]);
+
+    travelStart('Field Ruins', true);
+
+    expect(autoModeToggle).not.toHaveBeenCalled();
+  });
+
+  it('does not call Auto Mode toggle when Auto Mode is already off', () => {
+    vi.mocked(autoModeIsEnabled).mockReturnValue(false);
+    vi.mocked(travelPathTo).mockReturnValue([
+      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+    ]);
+
+    travelStart('Field Ruins');
+
+    expect(autoModeToggle).not.toHaveBeenCalled();
   });
 });
 
@@ -578,5 +640,6 @@ describe('travelProcessTick', () => {
 
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(gatheringStart).toHaveBeenCalledWith('Wergen Woods');
+    expect(gatherNodeDiscover).toHaveBeenCalledWith('Wergen Woods');
   });
 });

@@ -4,6 +4,11 @@ vi.mock('@helpers/armory', () => ({
   armoryAdd: vi.fn(),
 }));
 
+vi.mock('@helpers/auto-mode', () => ({
+  autoModeRecordClauseFailure: vi.fn(),
+  autoModeRecordClauseSuccess: vi.fn(),
+}));
+
 vi.mock('@helpers/combat', () => ({
   combatReset: vi.fn(),
   currentCombat: vi.fn(),
@@ -54,6 +59,10 @@ vi.mock('@helpers/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));
 
+import {
+  autoModeRecordClauseFailure,
+  autoModeRecordClauseSuccess,
+} from '@helpers/auto-mode';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset } from '@helpers/combat';
 import { collectibleDropHtml, recipeDropHtml } from '@helpers/combat-log';
@@ -236,6 +245,15 @@ describe('combatCheckIfOver', () => {
     expect(combatReset).toHaveBeenCalled();
   });
 
+  it('records an Auto Mode clause success on victory', () => {
+    const combat = buildCombat({});
+
+    combatCheckIfOver(combat);
+
+    expect(autoModeRecordClauseSuccess).toHaveBeenCalled();
+    expect(autoModeRecordClauseFailure).not.toHaveBeenCalled();
+  });
+
   it('begins Deaths Door and resets combat on defeat', () => {
     const combat = buildCombat({
       heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
@@ -247,6 +265,7 @@ describe('combatCheckIfOver', () => {
     expect(travelBeginDeathsDoor).toHaveBeenCalled();
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(combatReset).toHaveBeenCalled();
+    expect(autoModeRecordClauseFailure).toHaveBeenCalled();
   });
 
   it('returns false when combat is not yet over', () => {

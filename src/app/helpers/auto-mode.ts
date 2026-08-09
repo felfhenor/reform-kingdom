@@ -1,0 +1,247 @@
+import { currentCombat } from '@helpers/combat';
+import { getEntry } from '@helpers/content';
+import {
+  decreeClauses,
+  decreeRiskTolerance,
+  decreeWaitForFullHealthBeforeCombat,
+} from '@helpers/decree';
+import {
+  clauseTargetNode,
+  isClauseBlockedOnlyByHealth,
+  pickNextClause,
+} from '@helpers/decree-evaluation';
+import { gatheringStop, isGathering } from '@helpers/gathering';
+import {
+  addGlobalEffect,
+  isGlobalEffectActive,
+  removeGlobalEffect,
+} from '@helpers/global-effects';
+import { getMaterialQuantity } from '@helpers/materials';
+import { isPartyAtFullHealth } from '@helpers/party';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import { travelStart } from '@helpers/travel';
+import { isPlayerAtKingdom } from '@helpers/world';
+import {
+  worldNodeByName,
+  worldNodeGatherMaterialIds,
+  worldNodesOfType,
+} from '@helpers/world-nodes';
+import type {
+  DecreeClause,
+  DecreeClauseId,
+  GlobalEffectContent,
+  GlobalEffectId,
+  ItemContent,
+} from '@interfaces';
+
+// Long enough that the Auto Mode global effect never expires on its own -
+// it's granted/revoked explicitly by `syncAutoModeGlobalEffect` below, based
+// on `autoMode.enabled`, the same "~1 year" trick `resting.ts` uses for Idle.
+const AUTO_MODE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365;
+
+export function autoModeIsEnabled(): boolean {
+  return gamestate().world.autoMode.enabled;
+}
+
+export function autoModeToggle(enabled: boolean): void {
+  updateGamestate((state) => {
+    state.world.autoMode.enabled = enabled;
+    if (!enabled) state.world.autoMode.activeClauseId = undefined;
+    return state;
+  });
+}
+
+function setActiveClause(clauseId?: DecreeClauseId): void {
+  updateGamestate((state) => {
+    state.world.autoMode.activeClauseId = clauseId;
+    return state;
+  });
+}
+
+export function autoModeRecordClauseFailure(): void {
+  const activeClauseId = gamestate().world.autoMode.activeClauseId;
+  if (!activeClauseId) return;
+
+  updateGamestate((state) => {
+    state.world.autoMode.clauses = state.world.autoMode.clauses.map((clause) =>
+      clause.id === activeClauseId
+        ? { ...clause, failureCount: clause.failureCount + 1 }
+        : clause,
+    );
+    return state;
+  });
+}
+
+// Mirrors `autoModeRecordClauseFailure` - a won fight proves the active
+// clause is working again, so its streak of prior failures shouldn't keep
+// counting against it (and tripping the UI's failure warning) forever.
+export function autoModeRecordClauseSuccess(): void {
+  const activeClauseId = gamestate().world.autoMode.activeClauseId;
+  if (!activeClauseId) return;
+
+  updateGamestate((state) => {
+    state.world.autoMode.clauses = state.world.autoMode.clauses.map((clause) =>
+      clause.id === activeClauseId ? { ...clause, failureCount: 0 } : clause,
+    );
+    return state;
+  });
+}
+
+function clauseStatusLabel(clause: DecreeClause): string {
+  switch (clause.type) {
+    case 'GatherMaterial': {
+      const item = getEntry<ItemContent>(clause.materialId);
+      const current = getMaterialQuantity(clause.materialId);
+      return `Gathering ${item?.name ?? 'materials'} (${current.toLocaleString()}/${clause.targetQuantity.toLocaleString()} in stock)...`;
+    }
+    case 'FinishUnfinishedAreas':
+      return 'Seeking unfinished areas...';
+    case 'LevelUpParty':
+      return `Leveling up (${decreeRiskTolerance()} risk)...`;
+    case 'ReturnToKingdom':
+      return 'Returning to the kingdom...';
+  }
+}
+
+export function autoModeStatusLabel(): string | undefined {
+  const autoMode = gamestate().world.autoMode;
+  if (!autoMode.enabled) return undefined;
+
+  const clause = autoMode.clauses.find(
+    (candidate) => candidate.id === autoMode.activeClauseId,
+  );
+  if (clause) return clauseStatusLabel(clause);
+
+  if (decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth()) {
+    return 'Healing before the next move...';
+  }
+
+  return 'Idle';
+}
+
+function syncAutoModeGlobalEffect(enabled: boolean): void {
+  const isEffectActive = isGlobalEffectActive('Auto Mode' as GlobalEffectId);
+  if (enabled === isEffectActive) return;
+
+  if (enabled) {
+    addGlobalEffect(
+      'Auto Mode' as GlobalEffectId,
+      AUTO_MODE_EFFECT_DURATION_TICKS,
+    );
+    return;
+  }
+
+  const content = getEntry<GlobalEffectContent>('Auto Mode' as GlobalEffectId);
+  if (content) removeGlobalEffect(content.id);
+}
+
+// `activeClauseId` is only ever set by `runClause` below, so a gather
+// session Auto Mode didn't personally start - because it was already in
+// progress the moment Auto Mode was enabled, or the party was already
+// idle-gathering for some other reason - is otherwise invisible to
+// `stopGatherIfTargetReached`, which would then never notice the target was
+// met and let it run forever. This adopts any in-progress gather that
+// matches an enabled GatherMaterial clause, so the stop-check below always
+// has an active clause to work with while gathering is underway.
+function adoptInProgressGatherClause(): void {
+  const autoMode = gamestate().world.autoMode;
+  if (autoMode.activeClauseId) return;
+
+  const gathering = gamestate().world.gathering;
+  if (gathering.status !== 'Gathering' || !gathering.nodeName) return;
+
+  const node = worldNodeByName(gathering.nodeName);
+  if (!node) return;
+
+  const nodeMaterialIds = worldNodeGatherMaterialIds(node);
+  const matchingClause = autoMode.clauses.find(
+    (clause) =>
+      clause.enabled &&
+      clause.type === 'GatherMaterial' &&
+      nodeMaterialIds.includes(clause.materialId),
+  );
+  if (!matchingClause) return;
+
+  setActiveClause(matchingClause.id);
+}
+
+// Once a `GatherMaterial` clause's target is reached, gathering has no
+// natural stop condition of its own (it loops forever) - this is what ends
+// it and hands control back to the next tick's clause re-evaluation.
+function stopGatherIfTargetReached(): void {
+  const autoMode = gamestate().world.autoMode;
+  if (!autoMode.activeClauseId) return;
+  if (gamestate().world.gathering.status !== 'Gathering') return;
+
+  const clause = autoMode.clauses.find(
+    (candidate) => candidate.id === autoMode.activeClauseId,
+  );
+  if (!clause || clause.type !== 'GatherMaterial') return;
+  if (getMaterialQuantity(clause.materialId) < clause.targetQuantity) return;
+
+  gatheringStop();
+  setActiveClause(undefined);
+}
+
+function isPartyIdleForAutoMode(): boolean {
+  return (
+    gamestate().world.travel.status === 'Idle' &&
+    !isGathering() &&
+    !currentCombat()
+  );
+}
+
+function runClause(clause: DecreeClause): void {
+  setActiveClause(clause.id);
+
+  if (clause.type === 'ReturnToKingdom') {
+    const kingdom = worldNodesOfType('Kingdom')[0];
+    if (kingdom) travelStart(kingdom.nodeName, true);
+    return;
+  }
+
+  const target = clauseTargetNode(clause);
+  if (target) travelStart(target.nodeName, true);
+}
+
+// No enabled clause is satisfiable (including an empty Decree) - park at the
+// kingdom rather than leaving the party stuck wherever they last were. Not
+// tracked as an active clause, so it never accrues failures.
+function returnToKingdomFallback(): void {
+  setActiveClause(undefined);
+  if (isPlayerAtKingdom()) return;
+
+  const kingdom = worldNodesOfType('Kingdom')[0];
+  if (kingdom) travelStart(kingdom.nodeName, true);
+}
+
+function advanceToNextClause(): void {
+  const clauses = decreeClauses();
+  const clause = pickNextClause(clauses);
+  if (clause) {
+    runClause(clause);
+    return;
+  }
+
+  // Nothing satisfiable purely because the "wait for full health" gate is
+  // holding it back - stay put and let `restingProcessTick` heal the party
+  // wherever they already are, rather than trekking back to the kingdom.
+  if (clauses.some(isClauseBlockedOnlyByHealth)) {
+    setActiveClause(undefined);
+    return;
+  }
+
+  returnToKingdomFallback();
+}
+
+export function autoModeProcessTick(): void {
+  const enabled = autoModeIsEnabled();
+  syncAutoModeGlobalEffect(enabled);
+  if (!enabled) return;
+
+  adoptInProgressGatherClause();
+  stopGatherIfTargetReached();
+  if (!isPartyIdleForAutoMode()) return;
+
+  advanceToNextClause();
+}

@@ -1,5 +1,6 @@
 import { rngUuid } from '@helpers/rng';
 import type {
+  AutoModeState,
   CombatantCombatStats,
   ElementBlock,
   EquipmentBlock,
@@ -34,12 +35,14 @@ export function defaultGameState(): GameState {
       },
       travel: defaultTravelState(),
       gathering: defaultGatheringState(),
+      autoMode: defaultAutoModeState(),
     },
     materials: {},
     collectibles: {},
     armory: [],
     discoveredEquipment: {},
     discoveredRecipes: {},
+    discoveredGatherNodes: {},
     globalEffects: [],
     tradeskills: defaultTradeskills(),
   };
@@ -72,6 +75,15 @@ export function defaultGatheringState(): GatheringState {
   return {
     status: 'Idle',
     ticksIntoGather: 0,
+  };
+}
+
+export function defaultAutoModeState(): AutoModeState {
+  return {
+    enabled: false,
+    clauses: [],
+    riskTolerance: 'Medium',
+    waitForFullHealthBeforeCombat: false,
   };
 }
 

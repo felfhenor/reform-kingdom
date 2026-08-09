@@ -1,6 +1,7 @@
 import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
+import { autoModeProcessTick } from '@helpers/auto-mode';
 import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
 import { craftProcessTick } from '@helpers/crafting';
 import { gatheringProcessTick } from '@helpers/gathering';
@@ -59,6 +60,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     travelProcessTick();
     globalEffectsProcessTick();
     gatheringProcessTick();
+    autoModeProcessTick();
     craftProcessTick();
     restingProcessTick();
 

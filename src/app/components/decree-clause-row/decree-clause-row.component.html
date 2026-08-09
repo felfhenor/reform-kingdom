@@ -1,0 +1,34 @@
+@if (materialIcon(); as item) {
+  <div class="min-w-[16px] min-h-[16px]" [tp]="item.name" [tpPlacement]="'top'">
+    <app-atlas-image class="zoom-25" spritesheet="item" [assetName]="item.sprite" />
+  </div>
+}
+
+<span class="flex-1 truncate" [class.opacity-50]="!clause().enabled">
+  {{ summary() }}
+</span>
+
+@if (isFailing()) {
+  <span
+    class="badge badge-warning"
+    [tp]="clause().failureCount + ' failures in a row'"
+    [tpPlacement]="'top'"
+  >
+    !
+  </span>
+}
+
+<label class="label cursor-pointer label-checkbox">
+  <input
+    type="checkbox"
+    [checked]="clause().enabled"
+    class="checkbox checkbox-sm checkbox-secondary"
+    (click)="toggleEnabled.emit()"
+  />
+</label>
+
+@if (isEditable()) {
+  <button class="btn btn-xs btn-secondary" (click)="edit.emit()">Edit</button>
+}
+
+<button class="btn btn-xs btn-error" (click)="remove.emit()">Remove</button>

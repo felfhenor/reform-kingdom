@@ -1,5 +1,6 @@
 .ng-select {
   &.ng-select-opened > .ng-select-container,
+  &.ng-select-disabled > .ng-select-container,
   .ng-select-container {
     background-color: var(--color-base-200);
     color: var(--color-base-content);
@@ -8,6 +9,10 @@
     .ng-placeholder {
       color: #fff !important;
     }
+  }
+
+  &.ng-select-disabled > .ng-select-container {
+    opacity: 0.6;
   }
 }
 

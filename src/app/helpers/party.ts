@@ -136,6 +136,10 @@ export function partyGet(): Character[] {
   return gamestate().world.party;
 }
 
+export function isPartyAtFullHealth(): boolean {
+  return partyGet().every((character) => character.hp >= character.stats.Health);
+}
+
 export function setParty(party: Character[]): void {
   updateGamestate((state) => {
     state.world.party = party;

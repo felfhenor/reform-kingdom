@@ -1,6 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { GamePlayDecreeComponent } from '@components/game-play-decree/game-play-decree.component';
 import { GamePlayHeroesComponent } from '@components/game-play-heroes/game-play-heroes.component';
 import { GamePlayKingdomComponent } from '@components/game-play-kingdom/game-play-kingdom.component';
 import { GamePlayWorldComponent } from '@components/game-play-world/game-play-world.component';
@@ -18,6 +19,7 @@ import { gamePlayView, getOption } from '@helpers';
     GamePlayKingdomComponent,
     GamePlayHeroesComponent,
     PlayAdventureLogComponent,
+    GamePlayDecreeComponent,
   ],
   templateUrl: './game-play.component.html',
   styleUrl: './game-play.component.scss',

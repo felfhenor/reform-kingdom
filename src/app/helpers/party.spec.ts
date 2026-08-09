@@ -57,6 +57,7 @@ import {
   createCharacter,
   healingTicksForLevel,
   healPartyToFull,
+  isPartyAtFullHealth,
   optimizeCharacterEquipment,
   partyGainXp,
   partyGet,
@@ -233,6 +234,47 @@ describe('Party Helper Functions', () => {
       } as unknown as GameState);
 
       expect(partyGet()).toBe(party);
+    });
+  });
+
+  describe('isPartyAtFullHealth', () => {
+    function fullHealthCharacter(overrides: Partial<Character> = {}): Character {
+      mockGetEntry(mockJob);
+      return {
+        ...createCharacterStub('Jala'),
+        hp: 100,
+        stats: { ...defaultStats(), Health: 100 },
+        ...overrides,
+      };
+    }
+
+    it('is true when every hero is at or above their max HP', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [fullHealthCharacter(), fullHealthCharacter()] },
+      } as unknown as GameState);
+
+      expect(isPartyAtFullHealth()).toBe(true);
+    });
+
+    it('is false when any hero is below their max HP', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        world: {
+          party: [
+            fullHealthCharacter(),
+            fullHealthCharacter({ hp: 50 }),
+          ],
+        },
+      } as unknown as GameState);
+
+      expect(isPartyAtFullHealth()).toBe(false);
+    });
+
+    it('is true for an empty party', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [] },
+      } as unknown as GameState);
+
+      expect(isPartyAtFullHealth()).toBe(true);
     });
   });
 

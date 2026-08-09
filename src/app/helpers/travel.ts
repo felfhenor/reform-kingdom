@@ -1,5 +1,7 @@
+import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';
 import { addGlobalEffect, isGlobalEffectActive } from '@helpers/global-effects';
 import { encounterStartFight } from '@helpers/encounter';
+import { gatherNodeDiscover } from '@helpers/gather-node-discovery';
 import { travelMessageLog } from '@helpers/combat-log';
 import { gatheringStart, gatheringStop } from '@helpers/gathering';
 import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding';
@@ -76,7 +78,14 @@ function travelRecoverFromPathingFailure(destinationNodeName: string): void {
   );
 }
 
-export function travelStart(destinationNodeName: string): boolean {
+// A manually-initiated travel (isAutoMode = false, the default) always wins
+// over standing orders - it fully disables Auto Mode rather than merely
+// pausing it, per design: the player has taken the wheel back.
+export function travelStart(
+  destinationNodeName: string,
+  isAutoMode = false,
+): boolean {
+  if (!isAutoMode && autoModeIsEnabled()) autoModeToggle(false);
   if (!canPartyTravel()) return false;
 
   const travel = travelGet();
@@ -90,7 +99,13 @@ export function travelStart(destinationNodeName: string): boolean {
     travelRecoverFromPathingFailure(destinationNodeName);
     return false;
   }
-  if (path.length === 0 && !wasTraveling) return false;
+  // A manual click on the tile the party is already standing on is a no-op
+  // (prevents accidental re-triggering from a stray click). Auto Mode
+  // deliberately re-targets the same node this way, though - e.g. the
+  // nearest eligible node for a LevelUpParty/FinishUnfinishedAreas clause is
+  // often the one the party just fought at - so it needs to fall through to
+  // `travelArriveWithoutMoving` below and actually re-trigger the node.
+  if (path.length === 0 && !wasTraveling && !isAutoMode) return false;
 
   gatheringStop();
 
@@ -167,6 +182,7 @@ function travelArriveAtNode(
 
   const gathering = worldNodeGathering(node);
   if (gathering) {
+    gatherNodeDiscover(destinationNodeName);
     gatheringStart(destinationNodeName);
   }
 }

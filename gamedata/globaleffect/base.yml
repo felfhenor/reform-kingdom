@@ -12,3 +12,8 @@
   name: Idle
   sprite: '0002'
   description: The heroes are idle and resting, slowly recovering HP and EP.
+
+- id: 4cd0702a-9c43-4d03-8c09-7ba7050d70cc
+  name: Auto Mode
+  sprite: '0003'
+  description: The party is following standing orders.

@@ -24,6 +24,11 @@
     class="absolute inset-0"
     [class.hidden]="activeGamePlayView() !== 'adventurelog'"
   ></app-play-adventurelog>
+
+  <app-game-play-decree
+    class="absolute inset-0"
+    [class.hidden]="activeGamePlayView() !== 'decree'"
+  ></app-game-play-decree>
 </div>
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

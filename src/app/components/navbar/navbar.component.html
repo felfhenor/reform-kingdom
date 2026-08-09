@@ -45,6 +45,17 @@
         >
           Adventure Log
         </button>
+
+        <button
+          class="btn btn-xs btn-info"
+          [class.btn-outline]="activeGamePlayView() !== 'decree'"
+          (click)="changeGamePlayView('decree')"
+          appSfx="ui-click"
+          [sfxOffset]="4"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Decree
+        </button>
       </li>
     </ul>
   </div>

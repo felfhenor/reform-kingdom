@@ -1,4 +1,8 @@
 import { armoryAdd } from '@helpers/armory';
+import {
+  autoModeRecordClauseFailure,
+  autoModeRecordClauseSuccess,
+} from '@helpers/auto-mode';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset, currentCombat } from '@helpers/combat';
 import {
@@ -183,6 +187,7 @@ function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
 
   syncPartyHpFromCombat(combat.heroes);
+  autoModeRecordClauseSuccess();
   grantVictoryRewards(combat);
 
   const nextFight = nextFightFor(combat);
@@ -204,6 +209,7 @@ export function combatHandleDefeat(combat: Combat): void {
   combatMessageLog(combat, 'The fallen party awaits recall to the kingdom.');
 
   syncPartyHpFromCombat(combat.heroes);
+  autoModeRecordClauseFailure();
   travelBeginDeathsDoor();
 }
 

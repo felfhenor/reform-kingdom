@@ -6,7 +6,11 @@ import {
   untracked,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { activeGlobalEffects, globalEffectDurationLabel } from '@helpers';
+import {
+  activeGlobalEffects,
+  autoModeStatusLabel,
+  globalEffectDurationLabel,
+} from '@helpers';
 import type { GlobalEffect } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -27,7 +31,7 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
             class="global-effect-box tooltip tooltip-bottom"
             [class.entering]="effect.phase === 'entering'"
             [class.leaving]="effect.phase === 'leaving'"
-            [tp]="effect.name + ': ' + effect.description"
+            [tp]="effect.name + ': ' + effectDescription(effect)"
             [tpPlacement]="'bottom'"
           >
             <app-atlas-image
@@ -36,7 +40,7 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
               [assetName]="effect.sprite"
             />
 
-            @if (effect.name !== 'Idle') {
+            @if (effect.name !== 'Idle' && effect.name !== 'Auto Mode') {
               <div class="duration z-15 text-lg">
                 {{ durationLabel(effect) }}
               </div>
@@ -78,6 +82,14 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
 export class GlobalEffectBarComponent {
   public displayedEffects = signal<DisplayedEffect[]>([]);
   public durationLabel = globalEffectDurationLabel;
+
+  // Auto Mode's description is live status ("Gathering Wood...") rather than
+  // the static YAML description - computed at render time instead of stored
+  // in gamestate, since it changes far more often than a normal effect does.
+  public effectDescription(effect: GlobalEffect): string {
+    if (effect.name !== 'Auto Mode') return effect.description;
+    return autoModeStatusLabel() ?? effect.description;
+  }
 
   constructor() {
     // `syncDisplayedEffects` both reads and writes `displayedEffects` - if

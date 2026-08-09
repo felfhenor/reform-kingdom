@@ -1,0 +1,154 @@
+<div class="p-4 flex flex-col gap-4 h-full">
+  <div class="card bg-base-100 foreground shadow-xl">
+    <div class="card-body gap-4">
+      <div class="card-title">Auto Mode</div>
+
+      <div class="form-control">
+        <label class="label cursor-pointer label-checkbox">
+          <input
+            type="checkbox"
+            [checked]="autoModeEnabled()"
+            class="checkbox checkbox-secondary"
+            (click)="toggleAutoMode()"
+          />
+          <span class="label-text">Enable Auto Mode</span>
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label cursor-pointer label-checkbox">
+          <input
+            type="checkbox"
+            [checked]="waitForFullHealthBeforeCombat()"
+            class="checkbox checkbox-secondary"
+            (click)="toggleWaitForFullHealthBeforeCombat()"
+          />
+          <span class="label-text">Wait for Full Health Before Combat</span>
+        </label>
+      </div>
+
+      <div class="flex flex-row items-center gap-2">
+        <span class="label-text">Risk Tolerance</span>
+
+        <ng-select
+          class="w-72"
+          [items]="riskToleranceOptions"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="false"
+          [ngModel]="riskTolerance()"
+          (change)="setRiskTolerance($event)"
+        >
+          <ng-template ng-option-tmp let-item="item">
+            <div class="font-sembold text-sm">{{ item.label }}</div>
+            <div class="text-xs opacity-70 whitespace-normal">
+              {{ item.description }}
+            </div>
+          </ng-template>
+        </ng-select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 foreground shadow-xl">
+    <div class="card-body gap-2">
+      <div class="card-title">
+        {{ isEditing() ? 'Edit Clause' : 'Add Clause' }}
+      </div>
+
+      <div class="flex flex-row flex-wrap items-center gap-2">
+        <ng-select
+          class="w-56"
+          [items]="clauseTypeOptions"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="false"
+          [disabled]="isEditing()"
+          [ngModel]="draftType()"
+          (change)="setDraftType($event)"
+        ></ng-select>
+
+        @if (draftType() === 'GatherMaterial') {
+          <ng-select
+            class="w-56"
+            [items]="materialOptions()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Material"
+            [ngModel]="draftMaterialId()"
+            (change)="setDraftMaterialId($event)"
+          ></ng-select>
+
+          <input
+            type="number"
+            min="1"
+            class="input input-bordered input-sm w-28"
+            [value]="draftTargetQuantity()"
+            (change)="
+              draftTargetQuantity.set($any($event.target).valueAsNumber)
+            "
+          />
+        }
+
+        <button
+          class="btn btn-sm btn-primary"
+          [disabled]="!canAddClause()"
+          (click)="submitClause()"
+        >
+          {{ isEditing() ? 'Save' : 'Add' }}
+        </button>
+
+        @if (isEditing()) {
+          <button class="btn btn-sm btn-ghost" (click)="cancelEditClause()">
+            Cancel
+          </button>
+        }
+
+        @if (isDuplicateDraft()) {
+          <span class="text-xs text-warning">
+            The Decree already has a clause like this.
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="card bg-base-100 foreground shadow-xl flex-1 min-h-0 flex flex-col"
+  >
+    <div class="card-body gap-2 flex-1 min-h-0 flex flex-col">
+      <div class="card-title">Decree</div>
+
+      @if (clauses().length === 0) {
+        <div class="italic opacity-70">
+          No clauses yet - the party will idle at the kingdom until you add one.
+        </div>
+      }
+
+      <ul
+        cdkDropList
+        class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto"
+        (cdkDropListDropped)="onDrop($event)"
+      >
+        @for (clause of clauses(); track clause.id) {
+          <li
+            cdkDrag
+            class="flex flex-row items-center gap-2 p-2 rounded"
+            [class.bg-base-200]="editingClauseId() !== clause.id"
+            [class.bg-base-300]="editingClauseId() === clause.id"
+          >
+            <span cdkDragHandle class="cursor-move opacity-60">::</span>
+
+            <app-decree-clause-row
+              [clause]="clause"
+              (toggleEnabled)="toggleClauseEnabled(clause)"
+              (remove)="removeClause(clause.id)"
+              (edit)="startEditClause(clause)"
+            />
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>

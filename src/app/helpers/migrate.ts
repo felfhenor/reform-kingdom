@@ -15,6 +15,10 @@ import {
   backfillEquipmentBlock,
   backfillEquipmentItem,
 } from '@helpers/equipment';
+import {
+  grandfatherGatherNodeDiscoveries,
+  pruneInvalidGatherNodeDiscoveries,
+} from '@helpers/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { pruneInvalidPartyEquipment, retrofitPartyXp } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
@@ -26,7 +30,29 @@ import {
   setGameState,
 } from '@helpers/state-game';
 import { defaultOptions, options, setOptions } from '@helpers/state-options';
+import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
 import { merge } from 'es-toolkit/compat';
+import type { GameStateDiscoveredGatherNodes, GameStateMaterials } from '@interfaces';
+
+// One-time backfill for saves that predate gather-node discovery tracking:
+// if the player already has material progress but no recorded node visits,
+// treat every GatherNode as found rather than retroactively hiding
+// materials they've legitimately already gathered. A save with neither
+// materials nor discoveries is a genuinely fresh game, which should still
+// start fully ungated.
+function backfillLegacyGatherNodeDiscoveries(
+  discoveredGatherNodes: GameStateDiscoveredGatherNodes,
+  materials: GameStateMaterials,
+): GameStateDiscoveredGatherNodes {
+  const hasNoRecordedVisits = Object.keys(discoveredGatherNodes).length === 0;
+  const hasExistingProgress = Object.keys(materials).length > 0;
+
+  if (!hasNoRecordedVisits || !hasExistingProgress) return discoveredGatherNodes;
+
+  return grandfatherGatherNodeDiscoveries(
+    worldNodesOfType('GatherNode').map((entry) => entry.nodeName),
+  );
+}
 
 export function migrateGameState() {
   const state = gamestate();
@@ -47,6 +73,14 @@ export function migrateGameState() {
   newState.collectibles = grantFoundingStoneIfMissing(newState.collectibles);
   newState.discoveredRecipes = pruneInvalidDiscoveredRecipes(
     newState.discoveredRecipes,
+  );
+  newState.discoveredGatherNodes = pruneInvalidGatherNodeDiscoveries(
+    newState.discoveredGatherNodes,
+    (nodeName) => !!worldNodeByName(nodeName),
+  );
+  newState.discoveredGatherNodes = backfillLegacyGatherNodeDiscoveries(
+    newState.discoveredGatherNodes,
+    newState.materials,
   );
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
   newState.world.party = pruneInvalidPartyEquipment(newState.world.party);

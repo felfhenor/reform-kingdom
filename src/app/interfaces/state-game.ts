@@ -6,6 +6,7 @@ import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { RecipeId } from '@interfaces/content-recipe';
 import type { GameStateTradeskills } from '@interfaces/crafting';
+import type { AutoModeState } from '@interfaces/decree';
 import type { EquipmentItem } from '@interfaces/equipment';
 import type { GatheringState } from '@interfaces/gathering';
 import type { Branded } from '@interfaces/identifiable';
@@ -25,6 +26,7 @@ export type GameStateWorld = {
   currentLocation: CurrentLocation;
   travel: TravelState;
   gathering: GatheringState;
+  autoMode: AutoModeState;
 };
 
 export type MaterialId = ItemId;
@@ -54,6 +56,15 @@ export type GameStateDiscoveredRecipes = {
   [key: RecipeId]: { foundAt: number; foundAtNode?: string };
 };
 
+// Permanent record of every GatherNode the party has physically visited -
+// keyed by the Tiled node's name (there's no branded id for world nodes).
+// Used to scope auto-mode's material picker to materials the player has
+// actually found a source for, rather than every material gatherable
+// anywhere in the world.
+export type GameStateDiscoveredGatherNodes = {
+  [key: string]: { foundAt: number };
+};
+
 export type GameStateClock = {
   numTicks: number;
   lastSaveTick: number;
@@ -76,6 +87,7 @@ export type GameState = {
   armory: EquipmentItem[];
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredRecipes: GameStateDiscoveredRecipes;
+  discoveredGatherNodes: GameStateDiscoveredGatherNodes;
   globalEffects: GlobalEffect[];
   tradeskills: GameStateTradeskills;
 };

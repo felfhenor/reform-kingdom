@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { isEquipmentDiscovered } from '@helpers/armory';
 import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
+import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { allMaps } from '@helpers/maps';
 import { isMaterialDiscovered } from '@helpers/materials';
 import { isRecipeDiscovered } from '@helpers/recipes';
@@ -14,6 +15,7 @@ import type {
   GatheringContent,
   ItemContent,
   ItemId,
+  MaterialId,
   TiledMap,
   TiledObject,
   WorldNodeCompletionRewardProgress,
@@ -184,6 +186,24 @@ export function worldNodeGatherMaterialIds(entry: WorldNodeEntry): ItemId[] {
   gathering.gatherResults.forEach((result) => {
     result.items.forEach((item) => ids.add(item.itemId));
   });
+
+  return [...ids];
+}
+
+// Every material obtainable from a GatherNode the player has actually
+// visited before - the data source for the auto-mode "gather material"
+// clause picker. Deliberately narrower than "every GatherNode in the
+// world": a material that's only reachable from a node the player hasn't
+// found yet (and might otherwise also be craftable) shouldn't be offered as
+// a gather target before they've discovered where it actually comes from.
+export function gatherableMaterialIds(): MaterialId[] {
+  const ids = new Set<MaterialId>();
+
+  worldNodesOfType('GatherNode')
+    .filter((entry) => isGatherNodeDiscovered(entry.nodeName))
+    .forEach((entry) => {
+      worldNodeGatherMaterialIds(entry).forEach((id) => ids.add(id as MaterialId));
+    });
 
   return [...ids];
 }

@@ -48,8 +48,19 @@ vi.mock('@helpers/defaults', () => ({
     collectibles: {},
     discoveredEquipment: {},
     discoveredRecipes: {},
+    discoveredGatherNodes: {},
     world: { party: [] },
   })),
+}));
+
+vi.mock('@helpers/gather-node-discovery', () => ({
+  pruneInvalidGatherNodeDiscoveries: vi.fn((discovered) => discovered),
+  grandfatherGatherNodeDiscoveries: vi.fn(() => ({})),
+}));
+
+vi.mock('@helpers/world-nodes', () => ({
+  worldNodeByName: vi.fn(),
+  worldNodesOfType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -75,11 +86,14 @@ import {
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
 import { retrofitTradeskillXp } from '@helpers/crafting';
+import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { pruneInvalidPartyEquipment, retrofitPartyXp } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
+import { worldNodesOfType } from '@helpers/world-nodes';
+import type { WorldNodeEntry } from '@interfaces';
 
 describe('migrateGameState', () => {
   beforeEach(() => {
@@ -251,5 +265,87 @@ describe('migrateGameState', () => {
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.world.party).toEqual(retrofittedParty);
     expect(committed.tradeskills).toEqual(retrofittedTradeskills);
+  });
+
+  it('grandfathers gather-node discoveries for a save with material progress but no recorded visits', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: { ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 } },
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: {},
+      world: { party: [] },
+    } as unknown as GameState);
+
+    const gatherNodes = [
+      { nodeName: 'Wergen Woods' } as WorldNodeEntry,
+      { nodeName: 'Rocky Outcrop' } as WorldNodeEntry,
+    ];
+    vi.mocked(worldNodesOfType).mockReturnValue(gatherNodes);
+
+    const grandfathered = {
+      'Wergen Woods': { foundAt: 5000 },
+      'Rocky Outcrop': { foundAt: 5000 },
+    };
+    vi.mocked(grandfatherGatherNodeDiscoveries).mockReturnValue(grandfathered);
+
+    migrateGameState();
+
+    expect(grandfatherGatherNodeDiscoveries).toHaveBeenCalledWith([
+      'Wergen Woods',
+      'Rocky Outcrop',
+    ]);
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.discoveredGatherNodes).toEqual(grandfathered);
+  });
+
+  it('does not grandfather a genuinely fresh save with no materials', () => {
+    // An earlier test in this file overrides `pruneInvalidMaterials` via
+    // `mockReturnValue`, which `vi.clearAllMocks()` does not clear -
+    // reassert the identity implementation so this test isn't sensitive to
+    // run order (same caveat noted on the xp-retrofit test above).
+    vi.mocked(pruneInvalidMaterials).mockImplementation(
+      (materials) => materials,
+    );
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: {},
+      world: { party: [] },
+    } as unknown as GameState);
+
+    migrateGameState();
+
+    expect(grandfatherGatherNodeDiscoveries).not.toHaveBeenCalled();
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.discoveredGatherNodes).toEqual({});
+  });
+
+  it('does not re-grandfather a save that already has recorded visits', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: { ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 } },
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
+      world: { party: [] },
+    } as unknown as GameState);
+
+    migrateGameState();
+
+    expect(grandfatherGatherNodeDiscoveries).not.toHaveBeenCalled();
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.discoveredGatherNodes).toEqual({
+      'Wergen Woods': { foundAt: 1000 },
+    });
   });
 });
