@@ -1,6 +1,6 @@
 - id: 69f42616-552c-48d5-bdf2-c563f56304cb
   name: Snipe I
-  description: Exert a lot of effort to shoot a deadly, accurate shot.
+  description: Exert a lot of effort to shoot a deadly, accurate shot for {{value}} damage.
 
   rarity: Common
   sprite: '0005'
@@ -27,7 +27,7 @@
 
 - id: 27939410-0682-4367-983a-d515e282a00f
   name: Snipe II
-  description: Exert a lot of effort to shoot a deadly, accurate shot.
+  description: Exert a lot of effort to shoot a deadly, accurate shot for {{value}} damage.
 
   rarity: Uncommon
   sprite: '0005'

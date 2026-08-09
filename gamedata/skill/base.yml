@@ -1,6 +1,6 @@
 - id: 43282cd2-96e8-4590-b539-ff02f6db7ebf
   name: Attack
-  description: Attack a single enemy, doing strong damage.
+  description: Attack a single enemy, dealing {{value}} damage.
 
   rarity: Common
   sprite: '0000'

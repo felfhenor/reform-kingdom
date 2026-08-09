@@ -57,6 +57,7 @@ export * from './setup';
 export * from './sfx';
 export * from './signal';
 export * from './skill';
+export * from './skill-preview';
 export * from './state-game';
 export * from './state-options';
 export * from './storage';

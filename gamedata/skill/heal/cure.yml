@@ -1,6 +1,6 @@
 - id: ed42f2b8-1722-4af2-b36b-7d40318fa725
   name: Cure I
-  description: Heal a living ally for a small amount of HP.
+  description: Heal a living ally for {{value}} HP.
 
   sprite: '0004'
 
@@ -28,7 +28,7 @@
 
 - id: a97db916-2710-43af-821d-cfffa5306884
   name: Cure II
-  description: Heal a living ally for a small amount of HP.
+  description: Heal a living ally for {{value}} HP.
 
   sprite: '0004'
 

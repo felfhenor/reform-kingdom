@@ -149,7 +149,7 @@
             <div class="font-bold text-base mb-1 text-{{ skill.rarity }}">
               {{ skill.name }}
             </div>
-            <div class="text-sm">{{ skill.description }}</div>
+            <div class="text-sm">{{ skillDescription(skill) }}</div>
 
             @if (skill.requiredWeaponTypes.length > 0) {
               <div class="text-xs mt-2" [class.text-error]="!usable">

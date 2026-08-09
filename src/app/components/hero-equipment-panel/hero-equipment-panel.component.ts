@@ -25,6 +25,7 @@ import {
   heroSkillsWithEquipment,
   isSlotAvailableForJob,
   optimizeCharacterEquipment,
+  skillDescriptionWithPreview,
   skillIsUsableWithEquippedWeapons,
 } from '@helpers';
 import type {
@@ -132,6 +133,10 @@ export class HeroEquipmentPanelComponent {
 
   public isSkillUsable(skill: EquipmentSkillContent): boolean {
     return skillIsUsableWithEquippedWeapons(skill, this.equippedWeaponTypes());
+  }
+
+  public skillDescription(skill: EquipmentSkillContent): string {
+    return skillDescriptionWithPreview(this.character(), skill);
   }
 
   public isSlotVisible(slot: EquipmentSlot): boolean {

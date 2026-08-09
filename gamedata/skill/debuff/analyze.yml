@@ -31,7 +31,7 @@
 
 - id: d957cdd4-28c8-4f90-90b5-3a6bf83fad1f
   name: Analyze II
-  description: Analyze the weak spot of an enemy, and do low damage to them.
+  description: Analyze the weak spot of an enemy, dealing {{value}} damage to them.
 
   sprite: '0006'
 

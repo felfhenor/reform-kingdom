@@ -71,8 +71,7 @@ function targetDefenseValue(
   );
 }
 
-function getCombatantBaseStatDamageForTechnique(
-  combat: Combat,
+export function getCombatantBaseStatDamageForTechnique(
   combatant: Combatant,
   skill: EquipmentSkill,
   technique: EquipmentSkillContentTechnique,
@@ -136,7 +135,6 @@ export function combatApplySkillToTarget(
   const baseDamage = sum(
     (Object.keys(technique.damageScaling) as GameStat[]).map((stat) =>
       getCombatantBaseStatDamageForTechnique(
-        combat,
         combatant,
         skill,
         technique,

@@ -1,6 +1,6 @@
 - id: 4a2103cb-a704-46b2-8168-7f39b184851f
   name: Slow Web I
-  description: Web an enemy, slowing them down.
+  description: Web an enemy for {{value}} damage, slowing them down.
 
   sprite: '0010'
 
@@ -33,7 +33,7 @@
 
 - id: 394a4f06-42de-47d5-8d37-812b9d7b96c6
   name: Slow Web II
-  description: Web an enemy, stopping them in place.
+  description: Web an enemy for {{value}} damage, stopping them in place.
 
   sprite: '0010'
 

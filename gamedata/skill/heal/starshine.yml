@@ -1,6 +1,6 @@
 - id: bd410126-602d-4951-9202-a7e49ba98e0e
   name: Starshine I
-  description: Heal all living allies for a small amount of HP.
+  description: Heal all living allies for {{value}} HP.
 
   sprite: '0012'
 
@@ -28,7 +28,7 @@
 
 - id: 3e19fc85-32ab-4869-87f2-2aafc274bb69
   name: Starshine II
-  description: Heal all living allies for a small amount of HP.
+  description: Heal all living allies for {{value}} HP.
 
   sprite: '0012'
 
