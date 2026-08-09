@@ -1,5 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, effect, signal, untracked } from '@angular/core';
-import { applyEach, FormField, form, required, schema } from '@angular/forms/signals';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  signal,
+  untracked,
+} from '@angular/core';
+import {
+  applyEach,
+  form,
+  FormField,
+  required,
+  schema,
+} from '@angular/forms/signals';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
@@ -9,8 +22,12 @@ import {
   partyGet,
   showReclassHeroesModal,
 } from '@helpers';
-import type { JobContent, JobId } from '@interfaces';
-import { NgSelectComponent } from '@ng-select/ng-select';
+import type { Character, JobContent, JobId } from '@interfaces';
+import {
+  NgLabelTemplateDirective,
+  NgOptionTemplateDirective,
+  NgSelectComponent,
+} from '@ng-select/ng-select';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -29,6 +46,8 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
     ModalComponent,
     IconJobComponent,
     NgSelectComponent,
+    NgOptionTemplateDirective,
+    NgLabelTemplateDirective,
     FormField,
     SweetAlert2Module,
   ],
@@ -84,5 +103,10 @@ export class PlayKingdomReclassModalComponent {
 
   public close(): void {
     showReclassHeroesModal.set(false);
+  }
+
+  public jobLevelForHero(hero: Character, job: JobId): number {
+    if (hero.jobId === job) return hero.level;
+    return hero.jobProgress[job]?.level ?? 1;
   }
 }
