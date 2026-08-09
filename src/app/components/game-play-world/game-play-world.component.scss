@@ -9,7 +9,11 @@
   transition: opacity 300ms ease;
   z-index: 10;
 
-  &.visible {
+  // Not named `.visible` - that collides with Tailwind's own `.visible`
+  // utility (`visibility: visible`), which would override the `invisible`
+  // (visibility: hidden) class the parent applies when the world screen
+  // isn't active, making this overlay bleed through on other screens.
+  &.fade-active {
     @apply opacity-100;
   }
 }
@@ -19,7 +23,7 @@
   transition: opacity 300ms ease;
   z-index: 9;
 
-  &.visible {
+  &.death-active {
     @apply opacity-50;
   }
 }

@@ -72,8 +72,8 @@ const FADE_DURATION_MS = 300;
   imports: [MapNodePanelComponent, GlobalEffectBarComponent, HeroStatusComponent],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
-    <div class="fade-overlay" [class.visible]="fadeVisible()"></div>
-    <div class="death-overlay" [class.visible]="isPartyDead()"></div>
+    <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
+    <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
     <app-global-effect-bar class="global-effect-bar"></app-global-effect-bar>
     <app-map-node-panel></app-map-node-panel>
 
