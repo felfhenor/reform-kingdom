@@ -13,7 +13,7 @@ export class ButtonSavefileExportComponent {
   exportSavefile() {
     const state = gamestate();
 
-    const fileName = `${Date.now()}.grdh`;
+    const fileName = `${Date.now()}.rek`;
     const dataStr =
       'data:text/json;charset=utf-8,' +
       encodeURIComponent(JSON.stringify(state));
