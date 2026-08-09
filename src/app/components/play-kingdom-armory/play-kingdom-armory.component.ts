@@ -15,12 +15,18 @@ import {
   sellEquipmentItems,
 } from '@helpers';
 import type { EquipmentItemId } from '@interfaces';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sum } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-play-kingdom-armory',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ArmoryItemSlotComponent, CurrencyCostComponent, PagedGridPageComponent],
+  imports: [
+    ArmoryItemSlotComponent,
+    CurrencyCostComponent,
+    PagedGridPageComponent,
+    SweetAlert2Module,
+  ],
   templateUrl: './play-kingdom-armory.component.html',
   styleUrl: './play-kingdom-armory.component.scss',
 })

@@ -22,7 +22,7 @@
         type="button"
         class="btn btn-sm btn-success"
         [disabled]="selectedCount() === 0"
-        (click)="confirmSell()"
+        [swal]="sellSwal"
       >
         Confirm Sell
       </button>
@@ -30,6 +30,16 @@
       <button type="button" class="btn btn-sm" (click)="toggleSellMode()">
         Cancel
       </button>
+
+      <swal
+        #sellSwal
+        title="Sell items?"
+        text="Are you sure you want to sell {{ selectedCount() }} items for {{
+          selectedGoldTotal()
+        }} gold?"
+        icon="warning"
+        (confirm)="confirmSell()"
+      ></swal>
     } @else {
       <button
         type="button"
