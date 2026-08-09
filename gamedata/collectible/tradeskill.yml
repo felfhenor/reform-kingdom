@@ -3,32 +3,32 @@
   description: A small jewel set forged with magic energies.
   rarity: Uncommon
 
-  sprite: '0043'
+  sprite: '0008'
 
 - id: 4689e641-6114-414a-ad4d-1f81d98b7c9a
   name: Minor Blacksmithing Effigy
   description: A small set of tiny swords merged together to create an emblem.
   rarity: Uncommon
 
-  sprite: '0042'
+  sprite: '0007'
 
 - id: 1ca5dd27-c8ef-4407-b9a9-0a647df2a852
   name: Minor Jewelcrafting Effigy
   description: A large piece of malachite made from smaller pieces of malachite.
   rarity: Uncommon
 
-  sprite: '0044'
+  sprite: '0009'
 
 - id: 0eb807a5-78ad-4fe0-b40b-d1532f59b1bc
   name: Minor Tailoring Effigy
   description: A small flower stitched together from scraps of thread and cloth.
   rarity: Uncommon
 
-  sprite: '0046'
+  sprite: '0011'
 
 - id: d1d17c88-1947-4330-9e6e-44de14e73590
   name: Minor Woodworking Effigy
   description: A small wooden slab whittled from a single knot of wood.
   rarity: Uncommon
 
-  sprite: '0045'
+  sprite: '0010'

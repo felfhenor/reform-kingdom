@@ -31,7 +31,7 @@
   levelRequirement: 8
   rarity: Rare
   type: Shield
-  sprite: '0047'
+  sprite: '0042'
   slots: 1
   baseStats:
     Vitality: 2.3
