@@ -37,6 +37,7 @@ export * from './notify';
 export * from './number';
 export * from './party';
 export * from './pathfinding';
+export * from './pathfinding-astar';
 export * from './pixi-app-setup';
 export * from './pixi-camera';
 export * from './pixi-grid';

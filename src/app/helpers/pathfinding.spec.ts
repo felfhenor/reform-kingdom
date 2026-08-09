@@ -16,6 +16,8 @@ vi.mock('@helpers/world-nodes', () => ({
 
 import {
   mapHopsBetween,
+  tiledMapMoveCostMatrix,
+  tiledMapPathMatrix,
   tiledMapWalkabilityMatrix,
   travelPathTo,
 } from '@helpers/pathfinding';
@@ -128,6 +130,111 @@ describe('tiledMapWalkabilityMatrix', () => {
       [0, 0],
       [0, 0],
     ]);
+  });
+});
+
+describe('tiledMapPathMatrix', () => {
+  it('marks tiles under a non-zero Path Tiles gid as on-path', () => {
+    const pathTilesLayer: TiledLayer = {
+      id: 1,
+      name: 'Path Tiles',
+      type: 'tilelayer',
+      visible: true,
+      width: 3,
+      height: 3,
+      data: [0, 0, 0, 0, 5, 0, 0, 0, 0],
+    };
+
+    const map: TiledMap = { ...buildOpenMap(3, 3), layers: [pathTilesLayer] };
+
+    expect(tiledMapPathMatrix(map)).toEqual([
+      [false, false, false],
+      [false, true, false],
+      [false, false, false],
+    ]);
+  });
+
+  it('marks every tile covered by a Path Objects bounding box as on-path', () => {
+    const pathObjectsLayer: TiledLayer = {
+      id: 2,
+      name: 'Path Objects',
+      type: 'objectgroup',
+      visible: true,
+      objects: [buildObject({ x: 64, y: 128, width: 128, height: 64 })],
+    };
+
+    const map: TiledMap = { ...buildOpenMap(3, 3), layers: [pathObjectsLayer] };
+
+    expect(tiledMapPathMatrix(map)).toEqual([
+      [false, false, false],
+      [false, true, true],
+      [false, false, false],
+    ]);
+  });
+
+  it('leaves a map with no path layers entirely off-path', () => {
+    expect(tiledMapPathMatrix(buildOpenMap(2, 2))).toEqual([
+      [false, false],
+      [false, false],
+    ]);
+  });
+
+  it('marks the tile a rotated bend object actually renders into, not its unrotated footprint', () => {
+    // A 64x64 corner-bend tile pivoted at (128, 128) and rotated -90deg -
+    // matching how `pixiTiledObjectRender` rotates a tile object around its
+    // own (x, y) origin - lands on tile (1, 1). A rotation-blind bounding
+    // box (the pre-fix bug) would instead compute the unrotated tile (2, 1),
+    // leaving a gap at the real corner and the wrong tile marked as on-path.
+    const pathObjectsLayer: TiledLayer = {
+      id: 2,
+      name: 'Path Objects',
+      type: 'objectgroup',
+      visible: true,
+      objects: [
+        buildObject({ x: 128, y: 128, width: 64, height: 64, rotation: -90 }),
+      ],
+    };
+
+    const map: TiledMap = { ...buildOpenMap(4, 4), layers: [pathObjectsLayer] };
+    const matrix = tiledMapPathMatrix(map);
+
+    expect(matrix[1][1]).toBe(true);
+    expect(matrix[1][2]).toBe(false);
+  });
+});
+
+describe('tiledMapMoveCostMatrix', () => {
+  it('costs blocked tiles as infinite, path tiles cheap, and everything else more expensive', () => {
+    const denseTilesLayer: TiledLayer = {
+      id: 1,
+      name: 'Dense Tiles',
+      type: 'tilelayer',
+      visible: true,
+      width: 3,
+      height: 1,
+      data: [0, 1, 0],
+    };
+    const pathTilesLayer: TiledLayer = {
+      id: 2,
+      name: 'Path Tiles',
+      type: 'tilelayer',
+      visible: true,
+      width: 3,
+      height: 1,
+      data: [5, 0, 0],
+    };
+
+    const map: TiledMap = {
+      ...buildOpenMap(3, 1),
+      layers: [denseTilesLayer, pathTilesLayer],
+    };
+
+    const matrix = tiledMapMoveCostMatrix(map);
+
+    expect(matrix[0][0]).toBe(1);
+    expect(matrix[0][1]).toBe(Number.POSITIVE_INFINITY);
+    expect(matrix[0][2]).toBeGreaterThan(matrix[0][0]);
+    expect(Number.isFinite(matrix[0][2])).toBe(true);
   });
 });
 
@@ -352,6 +459,45 @@ describe('travelPathTo', () => {
 
     expect(path).not.toBeUndefined();
     expect(path?.some((step) => step.x === 1 && step.y === 1)).toBe(false);
+  });
+
+  it('detours onto a longer Path Tiles route instead of the shortest off-road one', () => {
+    // Row 0 is an authored path connecting (0,0) to (4,0) then down to (4,4).
+    // The direct diagonal-ish route (8 Manhattan steps, all off-road) costs
+    // more than the longer on-path route, so travel should prefer the path.
+    const pathTilesLayer: TiledLayer = {
+      id: 1,
+      name: 'Path Tiles',
+      type: 'tilelayer',
+      visible: true,
+      width: 5,
+      height: 5,
+      data: [
+        7, 7, 7, 7, 7,
+        0, 0, 0, 0, 7,
+        0, 0, 0, 0, 7,
+        0, 0, 0, 0, 7,
+        0, 0, 0, 0, 7,
+      ],
+    };
+    const map: TiledMap = { ...buildOpenMap(5, 5), layers: [pathTilesLayer] };
+
+    vi.mocked(currentLocationGet).mockReturnValue({
+      mapName: 'Carrina',
+      x: 0,
+      y: 0,
+    });
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'Carrina', x: 4, y: 4, nodeName: 'Field Ruins' }),
+    );
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([['Carrina', { name: 'Carrina', data: map }]]),
+    );
+
+    const path = travelPathTo('Field Ruins');
+
+    expect(path).not.toBeUndefined();
+    expect(path?.every((step) => step.x === 4 || step.y === 0)).toBe(true);
   });
 });
 

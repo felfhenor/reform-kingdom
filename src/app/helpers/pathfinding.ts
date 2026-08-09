@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { allMaps } from '@helpers/maps';
+import { weightedGridPathFind } from '@helpers/pathfinding-astar';
 import {
   tiledLayerTileAt,
   tiledMapGetLayer,
@@ -18,25 +19,58 @@ import type {
   TravelStep,
   WorldNodeEntry,
 } from '@interfaces';
-import { AStarFinder } from 'astar-typescript';
 
 const DENSE_TILE_LAYER_NAME = 'Dense Tiles';
 const DENSE_OBJECT_LAYER_NAME = 'Dense Objects';
+const PATH_TILE_LAYER_NAME = 'Path Tiles';
+const PATH_OBJECT_LAYER_NAME = 'Path Objects';
 
-function blockTilesForObject(
-  matrix: number[][],
+// Stepping onto a tile marked by the Path Tiles/Path Objects layers is
+// cheaper than stepping onto any other open tile, so pathfinding prefers to
+// hug authored paths without ever treating off-road tiles as impassable.
+const ON_PATH_MOVE_COST = 1;
+const OFF_PATH_MOVE_COST = 4;
+
+// The object's own (x, y) is its rotation pivot - the bottom-left corner of
+// its *unrotated* footprint - matching how `pixiTiledObjectRender` renders
+// it. Rotating the four corners around that pivot (rather than trusting the
+// raw x/y/width/height box) is what makes a rotated bend tile - as used by
+// Path Objects at corners - resolve to the grid cell it's actually drawn
+// into, not the one its unrotated footprint would suggest.
+function objectWorldCorners(object: TiledObject): { x: number; y: number }[] {
+  const angle = ((object.rotation ?? 0) * Math.PI) / 180;
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  return [
+    { x: 0, y: 0 },
+    { x: object.width, y: 0 },
+    { x: 0, y: -object.height },
+    { x: object.width, y: -object.height },
+  ].map(({ x, y }) => ({
+    x: object.x + x * cos - y * sin,
+    y: object.y + x * sin + y * cos,
+  }));
+}
+
+function forEachObjectTile(
   map: TiledMap,
   object: TiledObject,
+  callback: (x: number, y: number) => void,
 ): void {
-  const left = Math.floor(object.x / map.tilewidth);
-  const right = Math.floor((object.x + object.width - 1) / map.tilewidth);
-  const top = Math.floor((object.y - object.height) / map.tileheight);
-  const bottom = Math.floor(object.y / map.tileheight) - 1;
+  const corners = objectWorldCorners(object);
+  const xs = corners.map((corner) => corner.x);
+  const ys = corners.map((corner) => corner.y);
+
+  const left = Math.floor(Math.min(...xs) / map.tilewidth);
+  const right = Math.ceil(Math.max(...xs) / map.tilewidth) - 1;
+  const top = Math.floor(Math.min(...ys) / map.tileheight);
+  const bottom = Math.ceil(Math.max(...ys) / map.tileheight) - 1;
 
   for (let y = top; y <= bottom; y++) {
     for (let x = left; x <= right; x++) {
       if (y < 0 || y >= map.height || x < 0 || x >= map.width) continue;
-      matrix[y][x] = 1;
+      callback(x, y);
     }
   }
 }
@@ -59,30 +93,79 @@ export function tiledMapWalkabilityMatrix(map: TiledMap): number[][] {
 
   const denseObjectLayer = tiledMapGetLayer(map, DENSE_OBJECT_LAYER_NAME);
   (denseObjectLayer?.objects ?? []).forEach((object) => {
-    blockTilesForObject(matrix, map, object);
+    forEachObjectTile(map, object, (x, y) => {
+      matrix[y][x] = 1;
+    });
   });
 
   return matrix;
 }
 
-export const mapWalkabilityMatrices = computed<Map<string, number[][]>>(() => {
+// Marks every tile the Path Tiles/Path Objects layers cover as "on path" -
+// the preferred (but not exclusive) route for in-map pathfinding.
+export function tiledMapPathMatrix(map: TiledMap): boolean[][] {
+  const matrix: boolean[][] = Array.from({ length: map.height }, () =>
+    new Array(map.width).fill(false),
+  );
+
+  const pathTileLayer = tiledMapGetLayer(map, PATH_TILE_LAYER_NAME);
+  if (pathTileLayer) {
+    for (let y = 0; y < map.height; y++) {
+      for (let x = 0; x < map.width; x++) {
+        if (tiledLayerTileAt(pathTileLayer, x, y) !== 0) {
+          matrix[y][x] = true;
+        }
+      }
+    }
+  }
+
+  const pathObjectLayer = tiledMapGetLayer(map, PATH_OBJECT_LAYER_NAME);
+  (pathObjectLayer?.objects ?? []).forEach((object) => {
+    forEachObjectTile(map, object, (x, y) => {
+      matrix[y][x] = true;
+    });
+  });
+
+  return matrix;
+}
+
+// Combines walkability and path preference into a single per-tile move cost:
+// impassable tiles are infinitely expensive, path tiles are cheap, and every
+// other open tile is more expensive - so pathfinding is drawn to paths
+// without off-roading ever being blocked outright.
+export function tiledMapMoveCostMatrix(map: TiledMap): number[][] {
+  const blocked = tiledMapWalkabilityMatrix(map);
+  const onPath = tiledMapPathMatrix(map);
+
+  return blocked.map((row, y) =>
+    row.map((isBlocked, x) =>
+      isBlocked
+        ? Number.POSITIVE_INFINITY
+        : onPath[y][x]
+          ? ON_PATH_MOVE_COST
+          : OFF_PATH_MOVE_COST,
+    ),
+  );
+}
+
+export const mapMoveCostMatrices = computed<Map<string, number[][]>>(() => {
   const matrices = new Map<string, number[][]>();
 
   allMaps().forEach((gameMap, mapName) => {
-    matrices.set(mapName, tiledMapWalkabilityMatrix(gameMap.data as TiledMap));
+    matrices.set(mapName, tiledMapMoveCostMatrix(gameMap.data as TiledMap));
   });
 
   return matrices;
 });
 
-// A query-specific copy of the map's walkability matrix with every node tile
+// A query-specific copy of the map's move cost matrix with every node tile
 // blocked, except the `allowedTiles` (this query's own from/to endpoints) -
 // so a path never cuts through some other, unrelated node along the way.
-function walkabilityMatrixForQuery(
+function moveCostMatrixForQuery(
   mapName: string,
   allowedTiles: { x: number; y: number }[],
 ): number[][] | undefined {
-  const baseMatrix = mapWalkabilityMatrices().get(mapName);
+  const baseMatrix = mapMoveCostMatrices().get(mapName);
   if (!baseMatrix) return undefined;
 
   const matrix = baseMatrix.map((row) => [...row]);
@@ -95,7 +178,7 @@ function walkabilityMatrixForQuery(
       const y = Number(yKey);
       if (allowedTiles.some((tile) => tile.x === x && tile.y === y)) return;
 
-      matrix[y][x] = 1;
+      matrix[y][x] = Number.POSITIVE_INFINITY;
     });
   });
 
@@ -109,22 +192,15 @@ function findInMapPath(
 ): TravelStep[] | undefined {
   if (from.x === to.x && from.y === to.y) return [];
 
-  const matrix = walkabilityMatrixForQuery(mapName, [from, to]);
+  const matrix = moveCostMatrixForQuery(mapName, [from, to]);
   if (!matrix) return undefined;
 
-  const finder = new AStarFinder({
-    grid: { matrix },
-    diagonalAllowed: false,
-    includeStartNode: false,
-    includeEndNode: true,
-  });
+  const rawPath = weightedGridPathFind(matrix, from, to);
+  if (!rawPath) return undefined;
 
-  const rawPath = finder.findPath(from, to);
-  if (rawPath.length === 0) return undefined;
-
-  return rawPath.map(
-    ([x, y]): TravelStep => ({ kind: 'Move', mapName, x, y }),
-  );
+  return rawPath
+    .slice(1)
+    .map(({ x, y }): TravelStep => ({ kind: 'Move', mapName, x, y }));
 }
 
 function teleportNodeProperty(

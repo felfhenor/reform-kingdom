@@ -13,10 +13,10 @@ import { Container, Sprite, type Texture } from 'pixi.js';
 
 /**
  * Carrina-style maps are authored with a fixed layer order that this renderer
- * relies on for correct stacking, bottom to top: World Tiles, Decorative
- * Tiles, Dense Tiles, Dense Objects, Decorative Objects, Explore Nodes, Other
- * Nodes. We render `map.layers` in file order rather than re-sorting by name
- * so that ordering is preserved automatically.
+ * relies on for correct stacking, bottom to top: World Tiles, Dense Tiles,
+ * Decorative Tiles, Path Tiles, Dense Objects, Decorative Objects, Path
+ * Objects, Explore Nodes, Other Nodes. We render `map.layers` in file order
+ * rather than re-sorting by name so that ordering is preserved automatically.
  */
 
 const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
