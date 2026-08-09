@@ -17,6 +17,7 @@ export * from './crafting';
 export * from './debug';
 export * from './decree';
 export * from './decree-evaluation';
+export * from './decree-farm-node';
 export * from './defaults';
 export * from './discord';
 export * from './encounter';

@@ -6,11 +6,18 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { decreeClauseSummary, getEntry } from '@helpers';
-import type { DecreeClause, ItemContent } from '@interfaces';
+import { decreeClauseSummary, getEntry, rewardContentInfo } from '@helpers';
+import type { DecreeClause, ItemContent, RewardContentInfo } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 const FAILURE_WARNING_THRESHOLD = 3;
+
+// Clause types with parameters worth editing in place - the rest have
+// nothing to change (see `isEditable`).
+const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
+  'GatherMaterial',
+  'FarmNode',
+];
 
 @Component({
   selector: 'app-decree-clause-row',
@@ -31,14 +38,24 @@ export class DecreeClauseRowComponent {
     () => this.clause().failureCount >= FAILURE_WARNING_THRESHOLD,
   );
 
-  // Only GatherMaterial has parameters worth editing in place (a material +
-  // a target quantity) - the other clause types have nothing to change.
-  public isEditable = computed(() => this.clause().type === 'GatherMaterial');
+  public isEditable = computed(() =>
+    EDITABLE_CLAUSE_TYPES.includes(this.clause().type),
+  );
 
-  // Only a GatherMaterial clause has a specific item to show an icon for.
-  public materialIcon = computed(() => {
+  // Only GatherMaterial (its material) and FarmNode (its reward) have a
+  // specific icon to show - the other clause types have nothing to display.
+  public icon = computed<RewardContentInfo | undefined>(() => {
     const clause = this.clause();
-    if (clause.type !== 'GatherMaterial') return undefined;
-    return getEntry<ItemContent>(clause.materialId);
+
+    if (clause.type === 'GatherMaterial') {
+      const item = getEntry<ItemContent>(clause.materialId);
+      return item
+        ? { name: item.name, sprite: item.sprite, spritesheet: 'item' }
+        : undefined;
+    }
+
+    if (clause.type === 'FarmNode') return rewardContentInfo(clause.reward);
+
+    return undefined;
   });
 }

@@ -3,21 +3,31 @@ import { isEquipmentDiscovered } from '@helpers/armory';
 import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
-import { allMaps } from '@helpers/maps';
+import { allMaps, getMap } from '@helpers/maps';
 import { isMaterialDiscovered } from '@helpers/materials';
-import { isRecipeDiscovered } from '@helpers/recipes';
-import { tiledMapGetLayer } from '@helpers/tiled-map';
+import {
+  isRecipeDiscovered,
+  recipeResultContent,
+  recipeResultSpritesheet,
+} from '@helpers/recipes';
+import { tiledMapGetLayer, tiledObjectSpriteFrame } from '@helpers/tiled-map';
 import type {
+  CollectibleContent,
   DroppedReward,
   EncounterContent,
   EncounterLevelRange,
+  EquipmentContent,
   GameMap,
   GatheringContent,
   ItemContent,
   ItemId,
   MaterialId,
+  RecipeContent,
+  RewardContentInfo,
+  RewardIdentity,
   TiledMap,
   TiledObject,
+  TiledObjectSpriteFrame,
   WorldNodeCompletionRewardProgress,
   WorldNodeEntry,
   WorldNodeInteractionKind,
@@ -219,11 +229,73 @@ export function worldNodeDescription(
 
 // A stable identity for a reward, used to de-dupe the preview list below -
 // mirrors how `worldNodeGatherMaterialIds` de-dupes by itemId via a `Set`.
-function rewardKey(reward: DroppedReward): string {
+// Takes the bare `RewardIdentity` shape rather than a full `DroppedReward` so
+// it can also key a reward a caller only has an id for (e.g. a Decree
+// clause's stored farm target) - any `DroppedReward` is still accepted,
+// since it's structurally a `RewardIdentity` plus extra odds/quantity fields.
+export function rewardKey(reward: RewardIdentity): string {
   if ('itemId' in reward) return `item:${reward.itemId}`;
   if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
   if ('recipeId' in reward) return `recipe:${reward.recipeId}`;
   return `collectible:${reward.collectibleId}`;
+}
+
+// The map tile this node renders as - the same sprite `map-node-panel` shows
+// for the currently-selected node, resolved here so any UI that lists nodes
+// off-map (e.g. the Farm Node clause's node picker) can show it too.
+export function worldNodeSpriteFrame(
+  entry: WorldNodeEntry,
+): TiledObjectSpriteFrame | undefined {
+  const map = getMap(entry.mapName)?.data as TiledMap | undefined;
+  if (!map) return undefined;
+
+  return tiledObjectSpriteFrame(map, entry.nodeData);
+}
+
+// Resolves a reward down to displayable content - the same fields
+// `CompletionRewardSlotComponent` shows, minus discovery-gating, for UI that
+// needs a reward's icon/name without also needing its drop odds (e.g. the
+// Farm Node clause's reward picker and its row/summary display).
+export function rewardContentInfo(
+  reward: RewardIdentity,
+): RewardContentInfo | undefined {
+  if ('itemId' in reward) {
+    const item = getEntry<ItemContent>(reward.itemId);
+    return item
+      ? { name: item.name, sprite: item.sprite, spritesheet: 'item' }
+      : undefined;
+  }
+
+  if ('equipmentId' in reward) {
+    const equipment = getEntry<EquipmentContent>(reward.equipmentId);
+    return equipment
+      ? { name: equipment.name, sprite: equipment.sprite, spritesheet: 'equipment' }
+      : undefined;
+  }
+
+  if ('collectibleId' in reward) {
+    const collectible = getEntry<CollectibleContent>(reward.collectibleId);
+    return collectible
+      ? { name: collectible.name, sprite: collectible.sprite, spritesheet: 'collectible' }
+      : undefined;
+  }
+
+  const recipe = getEntry<RecipeContent>(reward.recipeId);
+  if (!recipe) return undefined;
+
+  // The recipe's own name (not its crafted result's) - a recipe reward
+  // grants the blueprint, not the item, and recipe names already carry a
+  // "Category: Item" naming convention (e.g. "Equipment: Bone-Hewn Cloak")
+  // that calls this out. Sprite/spritesheet still borrow the result, since a
+  // recipe has no icon of its own.
+  const result = recipeResultContent(recipe);
+  return result
+    ? {
+        name: recipe.name,
+        sprite: result.sprite,
+        spritesheet: recipeResultSpritesheet(recipe),
+      }
+    : undefined;
 }
 
 function isGoldCoinReward(reward: DroppedReward): boolean {

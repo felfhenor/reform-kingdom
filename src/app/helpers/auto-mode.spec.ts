@@ -20,6 +20,10 @@ vi.mock('@helpers/decree-evaluation', () => ({
   pickNextClause: vi.fn(),
 }));
 
+vi.mock('@helpers/decree-farm-node', () => ({
+  farmNodeRewardQuantity: vi.fn(() => 0),
+}));
+
 vi.mock('@helpers/gathering', () => ({
   gatheringStop: vi.fn(),
   isGathering: vi.fn(() => false),
@@ -53,6 +57,7 @@ vi.mock('@helpers/world', () => ({
 }));
 
 vi.mock('@helpers/world-nodes', () => ({
+  rewardContentInfo: vi.fn(),
   worldNodeByName: vi.fn(),
   worldNodeGatherMaterialIds: vi.fn(() => []),
   worldNodesOfType: vi.fn(() => []),
@@ -78,6 +83,7 @@ import {
   isClauseBlockedOnlyByHealth,
   pickNextClause,
 } from '@helpers/decree-evaluation';
+import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
 import { gatheringStop, isGathering } from '@helpers/gathering';
 import {
   addGlobalEffect,
@@ -90,6 +96,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import { travelStart } from '@helpers/travel';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
+  rewardContentInfo,
   worldNodeByName,
   worldNodeGatherMaterialIds,
   worldNodesOfType,
@@ -99,6 +106,7 @@ import type {
   DecreeClauseId,
   GameState,
   ItemContent,
+  ItemId,
   MaterialId,
   WorldNodeEntry,
 } from '@interfaces';
@@ -253,7 +261,7 @@ describe('autoModeStatusLabel', () => {
     vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
     vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
 
-    expect(autoModeStatusLabel()).toBe('Healing before the next move');
+    expect(autoModeStatusLabel()).toBe('Healing before the next move...');
   });
 
   it('still reports Idle once healed even with the wait-for-health setting on', () => {
@@ -277,7 +285,30 @@ describe('autoModeStatusLabel', () => {
       buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
     );
 
-    expect(autoModeStatusLabel()).toBe('Gathering Wood (3/10 in stock)');
+    expect(autoModeStatusLabel()).toBe('Gathering Wood (3/10 in stock)...');
+  });
+
+  it('describes an active FarmNode clause with live reward progress', () => {
+    vi.mocked(rewardContentInfo).mockReturnValue({
+      name: 'Bone',
+      sprite: '0001',
+      spritesheet: 'item',
+    });
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(3);
+    const clause = buildClause({
+      id: 'a' as DecreeClauseId,
+      type: 'FarmNode',
+      nodeName: 'Forest Ruins',
+      reward: { itemId: 'bone' as ItemId },
+      targetQuantity: 10,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
+    );
+
+    expect(autoModeStatusLabel()).toBe(
+      'Farming Forest Ruins for Bone (3/10)...',
+    );
   });
 
   it('describes an active LevelUpParty clause using the global risk tolerance', () => {
@@ -290,7 +321,7 @@ describe('autoModeStatusLabel', () => {
     );
     vi.mocked(decreeRiskTolerance).mockReturnValue('High');
 
-    expect(autoModeStatusLabel()).toBe('Leveling up (High risk)');
+    expect(autoModeStatusLabel()).toBe('Leveling up (High risk)...');
   });
 });
 

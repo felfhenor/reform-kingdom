@@ -2,6 +2,7 @@ import {
   decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
+import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { partyMinLevel } from '@helpers/gathering';
 import { getMaterialQuantity } from '@helpers/materials';
@@ -9,6 +10,7 @@ import { CHARACTER_MAX_LEVEL, isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
+  worldNodeByName,
   worldNodeCompletionRewardProgress,
   worldNodeEncounter,
   worldNodeGatherMaterialIds,
@@ -149,6 +151,11 @@ export function clauseTargetNode(
   switch (clause.type) {
     case 'GatherMaterial':
       return nearestGatherNodeFor(clause.materialId);
+    case 'FarmNode': {
+      const entry = worldNodeByName(clause.nodeName);
+      if (!entry) return undefined;
+      return travelPathTo(entry.nodeName) ? entry : undefined;
+    }
     case 'FinishUnfinishedAreas':
       return nearestUnfinishedExploreNode();
     case 'LevelUpParty':
@@ -159,8 +166,8 @@ export function clauseTargetNode(
 }
 
 // GatherMaterial and ReturnToKingdom never risk combat, so the "wait for
-// full health" setting only ever gates the two clause types that travel to
-// an ExploreNode (and therefore trigger a fight on arrival).
+// full health" setting only ever gates the clause types that travel to an
+// ExploreNode (and therefore trigger a fight on arrival).
 function blockedByHealth(): boolean {
   return decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth();
 }
@@ -172,6 +179,12 @@ export function isClauseSatisfiable(clause: DecreeClause): boolean {
     case 'GatherMaterial':
       return (
         getMaterialQuantity(clause.materialId) < clause.targetQuantity &&
+        !!clauseTargetNode(clause)
+      );
+    case 'FarmNode':
+      return (
+        !blockedByHealth() &&
+        farmNodeRewardQuantity(clause.reward) < clause.targetQuantity &&
         !!clauseTargetNode(clause)
       );
     case 'FinishUnfinishedAreas':
@@ -195,6 +208,11 @@ export function isClauseBlockedOnlyByHealth(clause: DecreeClause): boolean {
   if (!clause.enabled || !blockedByHealth()) return false;
 
   switch (clause.type) {
+    case 'FarmNode':
+      return (
+        farmNodeRewardQuantity(clause.reward) < clause.targetQuantity &&
+        !!clauseTargetNode(clause)
+      );
     case 'FinishUnfinishedAreas':
       return !!clauseTargetNode(clause);
     case 'LevelUpParty':

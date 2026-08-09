@@ -68,6 +68,17 @@ export type DroppedReward =
   | DroppedCollectibleReward
   | DroppedRecipeReward;
 
+// The bare identity of a reward - which content it points to, with none of
+// the drop-table odds/quantity-range fields `DroppedReward` carries. Any
+// `DroppedReward` is structurally assignable here, so this doubles as "just
+// the id part" of one. Used where a reward needs to be stored or compared
+// (e.g. a Decree clause's farm target) without pinning it to a specific roll.
+export type RewardIdentity =
+  | DropItem
+  | DropEquipment
+  | DropCollectible
+  | DropRecipe;
+
 // The result of rolling a `DroppedReward` - equipment/collectible/recipe
 // drops skip quantity entirely since none of them are stackable.
 export type ResolvedItemDrop = DropItem & { quantity: number };

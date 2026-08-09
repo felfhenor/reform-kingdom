@@ -1,3 +1,4 @@
+import type { RewardIdentity } from '@interfaces/droppable';
 import type { MaterialId } from '@interfaces/state-game';
 import type { Branded } from '@interfaces/identifiable';
 
@@ -11,6 +12,12 @@ export type ExploreNodeRiskBand = DecreeRiskLevel | 'TooHigh';
 // ever one place risk is configured.
 export type DecreeClauseAction =
   | { type: 'GatherMaterial'; materialId: MaterialId; targetQuantity: number }
+  | {
+      type: 'FarmNode';
+      nodeName: string;
+      reward: RewardIdentity;
+      targetQuantity: number;
+    }
   | { type: 'FinishUnfinishedAreas' }
   | { type: 'LevelUpParty' }
   | { type: 'ReturnToKingdom' };
@@ -26,8 +33,8 @@ export type AutoModeState = {
   clauses: DecreeClause[];
   activeClauseId?: DecreeClauseId;
   riskTolerance: DecreeRiskLevel;
-  // When true, FinishUnfinishedAreas/LevelUpParty (the two clause types that
-  // can lead to a fight) hold off starting a new trip until the party is
+  // When true, FinishUnfinishedAreas/LevelUpParty/FarmNode (the clause types
+  // that can lead to a fight) hold off starting a new trip until the party is
   // fully healed - GatherMaterial and ReturnToKingdom never risk combat, so
   // they're unaffected.
   waitForFullHealthBeforeCombat: boolean;

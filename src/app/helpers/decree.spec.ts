@@ -13,6 +13,16 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+vi.mock('@helpers/world-nodes', () => ({
+  rewardContentInfo: vi.fn(),
+  rewardKey: vi.fn((reward) => {
+    if ('itemId' in reward) return `item:${reward.itemId}`;
+    if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
+    if ('collectibleId' in reward) return `collectible:${reward.collectibleId}`;
+    return `recipe:${reward.recipeId}`;
+  }),
+}));
+
 import { getEntry } from '@helpers/content';
 import {
   decreeClauseAdd,
@@ -29,11 +39,13 @@ import {
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { rewardContentInfo } from '@helpers/world-nodes';
 import type {
   DecreeClause,
   DecreeClauseId,
   GameState,
   ItemContent,
+  ItemId,
   MaterialId,
 } from '@interfaces';
 
@@ -206,6 +218,75 @@ describe('decreeClauseConflicts', () => {
           type: 'GatherMaterial',
           materialId: 'stone' as MaterialId,
           targetQuantity: 20,
+        },
+        existing,
+      ),
+    ).toBe(false);
+  });
+
+  it('flags two FarmNode clauses for the same node and reward regardless of quantity', () => {
+    const existing = [
+      buildClause({
+        type: 'FarmNode',
+        nodeName: 'Forest Ruins',
+        reward: { itemId: 'bone' as ItemId },
+        targetQuantity: 100,
+      }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        {
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 5,
+        },
+        existing,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not flag FarmNode clauses for the same node but a different reward', () => {
+    const existing = [
+      buildClause({
+        type: 'FarmNode',
+        nodeName: 'Forest Ruins',
+        reward: { itemId: 'bone' as ItemId },
+        targetQuantity: 100,
+      }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        {
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'ash' as ItemId },
+          targetQuantity: 100,
+        },
+        existing,
+      ),
+    ).toBe(false);
+  });
+
+  it('does not flag FarmNode clauses for the same reward at a different node', () => {
+    const existing = [
+      buildClause({
+        type: 'FarmNode',
+        nodeName: 'Forest Ruins',
+        reward: { itemId: 'bone' as ItemId },
+        targetQuantity: 100,
+      }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        {
+          type: 'FarmNode',
+          nodeName: 'Old Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 100,
         },
         existing,
       ),
@@ -485,6 +566,40 @@ describe('decreeClauseSummary', () => {
     );
 
     expect(summary).toBe('Gather materials until 5 in storage');
+  });
+
+  it('describes a FarmNode clause using the reward name', () => {
+    vi.mocked(rewardContentInfo).mockReturnValue({
+      name: 'Bone',
+      sprite: '0001',
+      spritesheet: 'item',
+    });
+
+    const summary = decreeClauseSummary(
+      buildClause({
+        type: 'FarmNode',
+        nodeName: 'Forest Ruins',
+        reward: { itemId: 'bone' as ItemId },
+        targetQuantity: 20,
+      }),
+    );
+
+    expect(summary).toBe('Farm Forest Ruins until 20x Bone obtained');
+  });
+
+  it('falls back to a generic label when the reward has no content entry', () => {
+    vi.mocked(rewardContentInfo).mockReturnValue(undefined);
+
+    const summary = decreeClauseSummary(
+      buildClause({
+        type: 'FarmNode',
+        nodeName: 'Forest Ruins',
+        reward: { itemId: 'unknown' as ItemId },
+        targetQuantity: 5,
+      }),
+    );
+
+    expect(summary).toBe('Farm Forest Ruins until 5x reward obtained');
   });
 
   it('describes FinishUnfinishedAreas', () => {

@@ -8,6 +8,7 @@ import {
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CompletionRewardSlotComponent } from '@components/completion-reward-slot/completion-reward-slot.component';
 import { GatherMaterialSlotComponent } from '@components/gather-material-slot/gather-material-slot.component';
+import { NodeSpriteComponent } from '@components/node-sprite/node-sprite.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   canEnterGatherNode,
@@ -15,11 +16,9 @@ import {
   encounterStartFight,
   gamestate,
   gatheringProgressFraction,
-  getMap,
   mapNodeDeselect,
   selectedMapNode,
   TICKS_PER_STEP_MOVE,
-  tiledObjectSpriteFrame,
   travelPathTo,
   travelStart,
   worldNodeCompletionRewardProgress,
@@ -33,7 +32,6 @@ import {
   worldNodeLevelRange,
   worldNodeMonsterCount,
 } from '@helpers';
-import type { TiledMap } from '@interfaces';
 
 @Component({
   selector: 'app-map-node-panel',
@@ -42,6 +40,7 @@ import type { TiledMap } from '@interfaces';
     ButtonCloseComponent,
     CompletionRewardSlotComponent,
     GatherMaterialSlotComponent,
+    NodeSpriteComponent,
     SFXDirective,
   ],
   templateUrl: './map-node-panel.component.html',
@@ -54,16 +53,6 @@ export class MapNodePanelComponent {
   private elementRef = inject(ElementRef<HTMLElement>);
 
   public node = computed(() => selectedMapNode());
-
-  public spriteFrame = computed(() => {
-    const entry = this.node();
-    if (!entry) return undefined;
-
-    const map = getMap(entry.mapName)?.data as TiledMap | undefined;
-    if (!map) return undefined;
-
-    return tiledObjectSpriteFrame(map, entry.nodeData);
-  });
 
   public levelLabel = computed(() => {
     const entry = this.node();

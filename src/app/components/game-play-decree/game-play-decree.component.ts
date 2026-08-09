@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecreeClauseRowComponent } from '@components/decree-clause-row/decree-clause-row.component';
+import { NodeSpriteComponent } from '@components/node-sprite/node-sprite.component';
+import { RewardOptionComponent } from '@components/reward-option/reward-option.component';
 import {
   autoModeIsEnabled,
   autoModeToggle,
@@ -22,16 +24,20 @@ import {
   decreeSetRiskTolerance,
   decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
+  exploreNodeFarmOptions,
+  farmNodeRewardOptions,
   gatherableMaterialIds,
   getEntry,
   HIGH_RISK_LEVELS_ABOVE_PARTY,
   MEDIUM_RISK_LEVELS_ABOVE_PARTY,
+  rewardKey,
 } from '@helpers';
 import type {
   DecreeClause,
   DecreeClauseAction,
   DecreeClauseId,
   DecreeRiskLevel,
+  FarmNodeRewardOption,
   ItemContent,
   MaterialId,
 } from '@interfaces';
@@ -46,6 +52,7 @@ const CLAUSE_TYPE_OPTIONS: {
   label: string;
 }[] = [
   { value: 'GatherMaterial', label: 'Gather Material' },
+  { value: 'FarmNode', label: 'Farm Node' },
   { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
   { value: 'LevelUpParty', label: 'Level Up Party' },
   { value: 'ReturnToKingdom', label: 'Return to Kingdom' },
@@ -84,6 +91,8 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
     NgOptionTemplateDirective,
     DragDropModule,
     DecreeClauseRowComponent,
+    NodeSpriteComponent,
+    RewardOptionComponent,
   ],
   templateUrl: './game-play-decree.component.html',
 })
@@ -107,21 +116,40 @@ export class GamePlayDecreeComponent {
     ),
   );
 
+  public exploreNodeOptions = computed(() => exploreNodeFarmOptions());
+
   public draftType = signal<DecreeClauseAction['type']>('GatherMaterial');
   public draftMaterialId = signal<MaterialId | undefined>(undefined);
+  public draftNodeName = signal<string | undefined>(undefined);
+  public draftRewardKey = signal<string | undefined>(undefined);
   public draftTargetQuantity = signal<number>(1);
 
-  // Only GatherMaterial clauses have parameters worth editing in place - see
-  // `DecreeClauseRowComponent.isEditable`, which gates the row's Edit button
-  // the same way.
+  // Scoped to the currently-selected node - a FarmNode reward only ever
+  // makes sense in the context of the node it's farmed from.
+  public rewardOptions = computed<FarmNodeRewardOption[]>(() => {
+    const nodeName = this.draftNodeName();
+    return nodeName ? farmNodeRewardOptions(nodeName) : [];
+  });
+
+  // The reward picker is keyed by a stable string (see `FarmNodeRewardOption.key`)
+  // rather than the reward identity object itself, so it can drive a plain
+  // ng-select `bindValue` the same way `draftMaterialId` does for GatherMaterial.
+  public selectedRewardOption = computed(() =>
+    this.rewardOptions().find(
+      (option) => option.key === this.draftRewardKey(),
+    ),
+  );
+
+  // GatherMaterial and FarmNode clauses have parameters worth editing in
+  // place - see `DecreeClauseRowComponent.isEditable`, which gates the row's
+  // Edit button the same way.
   public editingClauseId = signal<DecreeClauseId | undefined>(undefined);
   public isEditing = computed(() => !!this.editingClauseId());
 
   public draftAction = computed<DecreeClauseAction | undefined>(() => {
-    const materialId = this.draftMaterialId();
-
     switch (this.draftType()) {
-      case 'GatherMaterial':
+      case 'GatherMaterial': {
+        const materialId = this.draftMaterialId();
         return materialId
           ? {
               type: 'GatherMaterial',
@@ -129,6 +157,19 @@ export class GamePlayDecreeComponent {
               targetQuantity: this.draftTargetQuantity(),
             }
           : undefined;
+      }
+      case 'FarmNode': {
+        const nodeName = this.draftNodeName();
+        const reward = this.selectedRewardOption()?.reward;
+        return nodeName && reward
+          ? {
+              type: 'FarmNode',
+              nodeName,
+              reward,
+              targetQuantity: this.draftTargetQuantity(),
+            }
+          : undefined;
+      }
       case 'LevelUpParty':
         return { type: 'LevelUpParty' };
       case 'FinishUnfinishedAreas':
@@ -153,7 +194,10 @@ export class GamePlayDecreeComponent {
   public canAddClause = computed(() => {
     const action = this.draftAction();
     if (!action) return false;
-    if (action.type === 'GatherMaterial' && this.draftTargetQuantity() <= 0) {
+    if (
+      (action.type === 'GatherMaterial' || action.type === 'FarmNode') &&
+      this.draftTargetQuantity() <= 0
+    ) {
       return false;
     }
     return !this.isDuplicateDraft();
@@ -185,6 +229,15 @@ export class GamePlayDecreeComponent {
     this.draftMaterialId.set(item ? (item.id as MaterialId) : undefined);
   }
 
+  public setDraftNodeName(option: { nodeName: string } | null): void {
+    this.draftNodeName.set(option ? option.nodeName : undefined);
+    this.draftRewardKey.set(undefined);
+  }
+
+  public setDraftReward(option: FarmNodeRewardOption | null): void {
+    this.draftRewardKey.set(option ? option.key : undefined);
+  }
+
   public toggleClauseEnabled(clause: DecreeClause): void {
     decreeClauseSetEnabled(clause.id, !clause.enabled);
   }
@@ -199,17 +252,28 @@ export class GamePlayDecreeComponent {
   }
 
   public startEditClause(clause: DecreeClause): void {
-    if (clause.type !== 'GatherMaterial') return;
+    if (clause.type === 'GatherMaterial') {
+      this.editingClauseId.set(clause.id);
+      this.draftType.set('GatherMaterial');
+      this.draftMaterialId.set(clause.materialId);
+      this.draftTargetQuantity.set(clause.targetQuantity);
+      return;
+    }
 
-    this.editingClauseId.set(clause.id);
-    this.draftType.set('GatherMaterial');
-    this.draftMaterialId.set(clause.materialId);
-    this.draftTargetQuantity.set(clause.targetQuantity);
+    if (clause.type === 'FarmNode') {
+      this.editingClauseId.set(clause.id);
+      this.draftType.set('FarmNode');
+      this.draftNodeName.set(clause.nodeName);
+      this.draftRewardKey.set(rewardKey(clause.reward));
+      this.draftTargetQuantity.set(clause.targetQuantity);
+    }
   }
 
   public cancelEditClause(): void {
     this.editingClauseId.set(undefined);
     this.draftMaterialId.set(undefined);
+    this.draftNodeName.set(undefined);
+    this.draftRewardKey.set(undefined);
     this.draftTargetQuantity.set(1);
   }
 

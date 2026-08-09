@@ -1,6 +1,7 @@
 import { getEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { rewardContentInfo, rewardKey } from '@helpers/world-nodes';
 import type {
   DecreeClause,
   DecreeClauseAction,
@@ -41,6 +42,12 @@ export function decreeClauseConflicts(
     if (clause.type !== action.type) return false;
     if (action.type === 'GatherMaterial' && clause.type === 'GatherMaterial') {
       return clause.materialId === action.materialId;
+    }
+    if (action.type === 'FarmNode' && clause.type === 'FarmNode') {
+      return (
+        clause.nodeName === action.nodeName &&
+        rewardKey(clause.reward) === rewardKey(action.reward)
+      );
     }
     return true;
   });
@@ -157,6 +164,10 @@ export function decreeClauseSummary(clause: DecreeClause): string {
     case 'GatherMaterial': {
       const item = getEntry<ItemContent>(clause.materialId);
       return `Gather ${item?.name ?? 'materials'} until ${clause.targetQuantity.toLocaleString()} in storage`;
+    }
+    case 'FarmNode': {
+      const reward = rewardContentInfo(clause.reward);
+      return `Farm ${clause.nodeName} until ${clause.targetQuantity.toLocaleString()}x ${reward?.name ?? 'reward'} obtained`;
     }
     case 'FinishUnfinishedAreas':
       return 'Finish unfinished areas';

@@ -13,14 +13,3 @@
   width: 32rem;
   max-width: calc(100% - 2rem);
 }
-
-.node-sprite-frame {
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.node-sprite {
-  object-fit: none;
-  image-rendering: pixelated;
-  user-select: none;
-}

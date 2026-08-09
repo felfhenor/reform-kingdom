@@ -5,6 +5,7 @@ import {
   decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
+import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
 import {
   clauseTargetNode,
   isClauseBlockedOnlyByHealth,
@@ -22,6 +23,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import { travelStart } from '@helpers/travel';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
+  rewardContentInfo,
   worldNodeByName,
   worldNodeGatherMaterialIds,
   worldNodesOfType,
@@ -93,6 +95,11 @@ function clauseStatusLabel(clause: DecreeClause): string {
       const item = getEntry<ItemContent>(clause.materialId);
       const current = getMaterialQuantity(clause.materialId);
       return `Gathering ${item?.name ?? 'materials'} (${current.toLocaleString()}/${clause.targetQuantity.toLocaleString()} in stock)...`;
+    }
+    case 'FarmNode': {
+      const reward = rewardContentInfo(clause.reward);
+      const current = farmNodeRewardQuantity(clause.reward);
+      return `Farming ${clause.nodeName} for ${reward?.name ?? 'reward'} (${current.toLocaleString()}/${clause.targetQuantity.toLocaleString()})...`;
     }
     case 'FinishUnfinishedAreas':
       return 'Seeking unfinished areas...';

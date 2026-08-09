@@ -5,6 +5,10 @@ vi.mock('@helpers/decree', () => ({
   decreeWaitForFullHealthBeforeCombat: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/decree-farm-node', () => ({
+  farmNodeRewardQuantity: vi.fn(() => 0),
+}));
+
 vi.mock('@helpers/gather-node-discovery', () => ({
   isGatherNodeDiscovered: vi.fn(() => true),
 }));
@@ -31,6 +35,7 @@ vi.mock('@helpers/world', () => ({
 }));
 
 vi.mock('@helpers/world-nodes', () => ({
+  worldNodeByName: vi.fn(),
   worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
   worldNodeEncounter: vi.fn(),
   worldNodeGatherMaterialIds: vi.fn(() => []),
@@ -41,8 +46,10 @@ import {
   decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
+import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
 import {
   clauseTargetNode,
+  isClauseBlockedOnlyByHealth,
   isClauseSatisfiable,
   mostChallengingExploreNodeForRisk,
   nearestGatherNodeFor,
@@ -58,6 +65,7 @@ import { isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
+  worldNodeByName,
   worldNodeCompletionRewardProgress,
   worldNodeEncounter,
   worldNodeGatherMaterialIds,
@@ -67,6 +75,7 @@ import type {
   DecreeClause,
   DecreeClauseId,
   EncounterContent,
+  ItemId,
   MaterialId,
   WorldNodeEntry,
 } from '@interfaces';
@@ -96,12 +105,14 @@ beforeEach(() => {
   vi.mocked(partyMinLevel).mockReturnValue(10);
   vi.mocked(decreeRiskTolerance).mockReturnValue('High');
   vi.mocked(worldNodesOfType).mockReturnValue([]);
+  vi.mocked(worldNodeByName).mockReturnValue(undefined);
   vi.mocked(travelPathTo).mockReturnValue(undefined);
   vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
   vi.mocked(getMaterialQuantity).mockReturnValue(0);
   vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
   vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
+  vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
 });
 
 describe('riskLevelOfExploreNode', () => {
@@ -487,5 +498,154 @@ describe('clauseTargetNode', () => {
     expect(
       clauseTargetNode(buildClause({ type: 'ReturnToKingdom' })),
     ).toBeUndefined();
+  });
+
+  it('FarmNode targets its stored node when reachable', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBe(node);
+  });
+
+  it('FarmNode has no target when its node no longer exists', () => {
+    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Gone',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('FarmNode has no target when its node is unreachable', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue(undefined);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBeUndefined();
+  });
+});
+
+describe('isClauseSatisfiable - FarmNode', () => {
+  it('is satisfiable when the reward is short of target and the node is reachable', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(2);
+
+    expect(
+      isClauseSatisfiable(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 5,
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('is unsatisfiable once the target quantity is already met', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(5);
+
+    expect(
+      isClauseSatisfiable(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 5,
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('is blocked while waiting for full health', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+
+    expect(
+      isClauseSatisfiable(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 5,
+        }),
+      ),
+    ).toBe(false);
+  });
+});
+
+describe('isClauseBlockedOnlyByHealth - FarmNode', () => {
+  it('is true when short of target, reachable, and only blocked by health', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+
+    expect(
+      isClauseBlockedOnlyByHealth(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 5,
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('is false once the target quantity is already met', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(5);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+
+    expect(
+      isClauseBlockedOnlyByHealth(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 5,
+        }),
+      ),
+    ).toBe(false);
   });
 });

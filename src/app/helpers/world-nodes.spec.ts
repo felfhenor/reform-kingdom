@@ -1,16 +1,20 @@
 import type {
   CollectibleContent,
+  CollectibleId,
   EncounterContent,
   EquipmentContent,
+  EquipmentId,
   GameMap,
   GatheringContent,
   GatheringId,
   ItemContent,
   ItemId,
   RecipeContent,
+  RecipeId,
   TiledLayer,
   TiledMap,
   TiledObject,
+  TiledTileset,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -24,6 +28,7 @@ import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { setAllMaps } from '@helpers/maps';
 import {
   gatherableMaterialIds,
+  rewardContentInfo,
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
   worldNodeDescription,
@@ -33,6 +38,7 @@ import {
   worldNodeLevelRange,
   worldNodeMapsBuild,
   worldNodeMonsterCount,
+  worldNodeSpriteFrame,
 } from '@helpers/world-nodes';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
@@ -540,5 +546,151 @@ describe('gatherableMaterialIds', () => {
     setAllMaps(new Map());
 
     expect(gatherableMaterialIds()).toEqual([]);
+  });
+});
+
+function buildTileset(overrides: Partial<TiledTileset> = {}): TiledTileset {
+  return {
+    firstgid: 1,
+    name: 'terrain',
+    image: '../mapdata/maptiles.png',
+    imagewidth: 1600,
+    imageheight: 1088,
+    columns: 25,
+    tilewidth: 64,
+    tileheight: 64,
+    margin: 0,
+    spacing: 0,
+    tilecount: 425,
+    ...overrides,
+  };
+}
+
+describe('worldNodeSpriteFrame', () => {
+  it("resolves the entry's map tile via its object gid", () => {
+    const map = buildMap({});
+    map.tilesets = [buildTileset()];
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+
+    expect(worldNodeSpriteFrame(buildEntry({ gid: 26 }))).toEqual({
+      imagePath: 'mapdata/maptiles.png',
+      imageWidth: 1600,
+      imageHeight: 1088,
+      x: 0,
+      y: 64,
+      width: 64,
+      height: 64,
+    });
+  });
+
+  it('returns undefined when the map no longer exists', () => {
+    setAllMaps(new Map());
+
+    expect(worldNodeSpriteFrame(buildEntry({ gid: 26 }))).toBeUndefined();
+  });
+});
+
+describe('rewardContentInfo', () => {
+  beforeEach(() => {
+    setAllIdsByName(new Map());
+    setAllContentById(new Map());
+  });
+
+  it('resolves an item reward', () => {
+    const bone: ItemContent = {
+      id: 'bone' as ItemId,
+      name: 'Bone',
+      __type: 'item',
+      description: 'A bone.',
+      sprite: '0001',
+      rarity: 'Common',
+    };
+    seedContent([bone]);
+
+    expect(rewardContentInfo({ itemId: bone.id })).toEqual({
+      name: 'Bone',
+      sprite: '0001',
+      spritesheet: 'item',
+    });
+  });
+
+  it('resolves an equipment reward', () => {
+    const cloak: EquipmentContent = {
+      id: 'bone-hewn-cloak' as EquipmentId,
+      name: 'Bone-Hewn Cloak',
+      __type: 'equipment',
+      description: 'A cloak.',
+      sprite: '0002',
+      rarity: 'Uncommon',
+      levelRequirement: 3,
+      type: 'Artifact',
+      baseStats: {} as never,
+      slots: 1,
+      grantedSkillIds: [],
+    };
+    seedContent([cloak]);
+
+    expect(rewardContentInfo({ equipmentId: cloak.id })).toEqual({
+      name: 'Bone-Hewn Cloak',
+      sprite: '0002',
+      spritesheet: 'equipment',
+    });
+  });
+
+  it('resolves a collectible reward', () => {
+    const clam: CollectibleContent = {
+      id: 'swamp-clam' as CollectibleId,
+      name: 'Swamp Clam',
+      __type: 'collectible',
+      description: 'A clam.',
+      sprite: '0003',
+      rarity: 'Uncommon',
+    };
+    seedContent([clam]);
+
+    expect(rewardContentInfo({ collectibleId: clam.id })).toEqual({
+      name: 'Swamp Clam',
+      sprite: '0003',
+      spritesheet: 'collectible',
+    });
+  });
+
+  it("resolves a recipe reward using the recipe's own name, but the crafted result's icon", () => {
+    const cloak: EquipmentContent = {
+      id: 'bone-hewn-cloak' as EquipmentId,
+      name: 'Bone-Hewn Cloak',
+      __type: 'equipment',
+      description: 'A cloak.',
+      sprite: '0002',
+      rarity: 'Uncommon',
+      levelRequirement: 3,
+      type: 'Artifact',
+      baseStats: {} as never,
+      slots: 1,
+      grantedSkillIds: [],
+    };
+    const recipe: RecipeContent = {
+      id: 'equipment-bone-hewn-cloak' as RecipeId,
+      name: 'Equipment: Bone-Hewn Cloak',
+      __type: 'recipe',
+      result: { equipmentId: cloak.id },
+      requirements: [],
+      tradeskill: 'Tailoring',
+      minTradeskillLevel: 2,
+      maxTradeskillLevel: 5,
+      tradeskillXP: 1,
+      craftTime: 60,
+    };
+    seedContent([cloak, recipe]);
+
+    expect(rewardContentInfo({ recipeId: recipe.id })).toEqual({
+      name: 'Equipment: Bone-Hewn Cloak',
+      sprite: '0002',
+      spritesheet: 'equipment',
+    });
+  });
+
+  it('returns undefined when the reward has no matching content', () => {
+    expect(rewardContentInfo({ itemId: 'unknown' as ItemId })).toBeUndefined();
   });
 });

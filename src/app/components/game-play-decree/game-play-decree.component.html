@@ -91,6 +91,55 @@
           />
         }
 
+        @if (draftType() === 'FarmNode') {
+          <ng-select
+            class="w-64"
+            [items]="exploreNodeOptions()"
+            bindLabel="nodeName"
+            bindValue="nodeName"
+            [clearable]="false"
+            placeholder="Explore Node"
+            [ngModel]="draftNodeName()"
+            (change)="setDraftNodeName($event)"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <div class="flex items-center gap-2">
+                <app-node-sprite [entry]="item.entry" />
+                <div>
+                  <div class="font-semibold text-sm">{{ item.nodeName }}</div>
+                  <div class="text-xs opacity-70">Lv. {{ item.levelLabel }}</div>
+                </div>
+              </div>
+            </ng-template>
+          </ng-select>
+
+          <ng-select
+            class="w-64"
+            [items]="rewardOptions()"
+            bindLabel="name"
+            bindValue="key"
+            [clearable]="false"
+            [disabled]="!draftNodeName()"
+            placeholder="Reward"
+            [ngModel]="draftRewardKey()"
+            (change)="setDraftReward($event)"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <app-reward-option [reward]="item" />
+            </ng-template>
+          </ng-select>
+
+          <input
+            type="number"
+            min="1"
+            class="input input-bordered input-sm w-28"
+            [value]="draftTargetQuantity()"
+            (change)="
+              draftTargetQuantity.set($any($event.target).valueAsNumber)
+            "
+          />
+        }
+
         <button
           class="btn btn-sm btn-primary"
           [disabled]="!canAddClause()"

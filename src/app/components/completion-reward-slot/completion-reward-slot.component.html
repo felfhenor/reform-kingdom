@@ -5,20 +5,50 @@
     [tpPlacement]="'top'"
   >
     <app-icon-blank-slot>
-      <app-atlas-image
-        [spritesheet]="spritesheet()"
-        [assetName]="reward.sprite"
-      />
+      @if (backdropSprite(); as backdrop) {
+        <div class="completion-reward-icon">
+          <app-atlas-image
+            spritesheet="item"
+            [assetName]="backdrop"
+            class="completion-reward-icon-backdrop"
+          />
+          <app-atlas-image
+            [spritesheet]="spritesheet()"
+            [assetName]="reward.sprite"
+            class="completion-reward-icon-result"
+          />
+        </div>
+      } @else {
+        <app-atlas-image
+          [spritesheet]="spritesheet()"
+          [assetName]="reward.sprite"
+        />
+      }
     </app-icon-blank-slot>
   </div>
 
   <ng-template #tooltip>
     <div class="flex gap-2 p-2 max-w-[400px]">
-      <app-atlas-image
-        [spritesheet]="spritesheet()"
-        [assetName]="reward.sprite"
-        class="completion-reward-tooltip-image"
-      />
+      @if (backdropSprite(); as backdrop) {
+        <div class="completion-reward-tooltip-icon">
+          <app-atlas-image
+            spritesheet="item"
+            [assetName]="backdrop"
+            class="completion-reward-icon-backdrop"
+          />
+          <app-atlas-image
+            [spritesheet]="spritesheet()"
+            [assetName]="reward.sprite"
+            class="completion-reward-icon-result"
+          />
+        </div>
+      } @else {
+        <app-atlas-image
+          [spritesheet]="spritesheet()"
+          [assetName]="reward.sprite"
+          class="completion-reward-tooltip-image"
+        />
+      }
       <div>
         <div class="font-bold mb-2 text-{{ reward.rarity }}">
           {{ reward.name }}

@@ -8,6 +8,7 @@ import {
   isEquipmentDiscovered,
   isMaterialDiscovered,
   isRecipeDiscovered,
+  recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
 } from '@helpers';
@@ -62,6 +63,14 @@ export class CompletionRewardSlotComponent {
     return 'collectible';
   });
 
+  // Composited behind the result sprite for recipe rewards only (see
+  // `MuseumRecipeSlotComponent`, which uses the same backdrop) - the visual
+  // cue that this slot grants a recipe, not the crafted item itself.
+  public backdropSprite = computed<string | undefined>(() => {
+    const reward = this.reward();
+    return 'recipeId' in reward ? recipeBackdropSprite() : undefined;
+  });
+
   public content = computed<RewardContent | undefined>(() => {
     const reward = this.reward();
     if ('itemId' in reward) return getEntry<ItemContent>(reward.itemId);
@@ -70,7 +79,11 @@ export class CompletionRewardSlotComponent {
     }
     if ('recipeId' in reward) {
       const recipe = this.recipeContent();
-      return recipe ? recipeResultContent(recipe) : undefined;
+      const result = recipe ? recipeResultContent(recipe) : undefined;
+      // The recipe's own name (not its crafted result's) - a recipe reward
+      // grants the blueprint, not the item, and recipe names already carry
+      // a "Category: Item" naming convention that calls this out.
+      return recipe && result ? { ...result, name: recipe.name } : undefined;
     }
     return getEntry<CollectibleContent>(reward.collectibleId);
   });
