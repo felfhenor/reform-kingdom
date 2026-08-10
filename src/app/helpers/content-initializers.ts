@@ -47,6 +47,8 @@ import type {
   MonsterContent,
   MonsterId,
   MonsterSkill,
+  NodeOverrideContent,
+  NodeOverrideId,
   RecipeContent,
   RecipeId,
   RecipeRequirement,
@@ -76,6 +78,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   item: ensureItem,
   job: ensureJob,
   monster: ensureMonster,
+  nodeoverride: ensureNodeOverride,
   recipe: ensureRecipe,
   skill: ensureSkill,
   statuseffect: ensureStatusEffect,
@@ -475,6 +478,17 @@ function ensureGlobalEffect(
     __type: 'globaleffect',
     sprite: effect.sprite ?? 'UNKNOWN',
     description: effect.description ?? 'UNKNOWN',
+  };
+}
+
+function ensureNodeOverride(
+  override: Partial<NodeOverrideContent>,
+): Required<NodeOverrideContent> {
+  return {
+    id: override.id ?? ('UNKNOWN' as NodeOverrideId),
+    name: override.name ?? 'UNKNOWN',
+    __type: 'nodeoverride',
+    description: override.description ?? 'UNKNOWN',
   };
 }
 

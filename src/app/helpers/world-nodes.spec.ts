@@ -9,6 +9,8 @@ import type {
   GatheringId,
   ItemContent,
   ItemId,
+  NodeOverrideContent,
+  NodeOverrideId,
   RecipeContent,
   RecipeId,
   TiledLayer,
@@ -38,6 +40,7 @@ import {
   worldNodeLevelRange,
   worldNodeMapsBuild,
   worldNodeMonsterCount,
+  worldNodeOverride,
   worldNodeSpriteFrame,
 } from '@helpers/world-nodes';
 
@@ -199,6 +202,18 @@ function seedContent(
   );
 }
 
+function buildNodeOverride(
+  overrides: Partial<NodeOverrideContent> = {},
+): NodeOverrideContent {
+  return {
+    id: 'override-forest-ruins' as NodeOverrideId,
+    name: 'Forest Ruins',
+    __type: 'nodeoverride',
+    description: 'A hand-authored blurb for this node.',
+    ...overrides,
+  };
+}
+
 describe('encounter-backed node accessors', () => {
   beforeEach(() => {
     setAllIdsByName(new Map());
@@ -238,6 +253,20 @@ describe('encounter-backed node accessors', () => {
     });
   });
 
+  describe('worldNodeOverride', () => {
+    it('reads the matching node override', () => {
+      seedContent([buildNodeOverride({ description: 'A hand-authored blurb.' })]);
+
+      expect(worldNodeOverride(buildEntry())?.description).toBe(
+        'A hand-authored blurb.',
+      );
+    });
+
+    it('returns undefined when there is no matching override', () => {
+      expect(worldNodeOverride(buildEntry())).toBeUndefined();
+    });
+  });
+
   describe('worldNodeDescription', () => {
     it("reads the description from the matching encounter's data", () => {
       seedEncounter(buildEncounter({ description: 'Crumbling stones.' }));
@@ -245,7 +274,13 @@ describe('encounter-backed node accessors', () => {
       expect(worldNodeDescription(buildEntry())).toBe('Crumbling stones.');
     });
 
-    it('returns undefined when there is no matching encounter', () => {
+    it('reads the description from a node override (e.g. a Kingdom node with no encounter/gathering data)', () => {
+      seedContent([buildNodeOverride({ description: 'The town square.' })]);
+
+      expect(worldNodeDescription(buildEntry())).toBe('The town square.');
+    });
+
+    it('returns undefined when there is no matching encounter or override', () => {
       expect(worldNodeDescription(buildEntry())).toBeUndefined();
     });
   });

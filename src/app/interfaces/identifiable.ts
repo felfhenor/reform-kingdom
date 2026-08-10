@@ -7,6 +7,7 @@ export type ContentType =
   | 'item'
   | 'job'
   | 'monster'
+  | 'nodeoverride'
   | 'recipe'
   | 'skill'
   | 'statuseffect'

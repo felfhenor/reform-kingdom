@@ -22,6 +22,7 @@ import type {
   ItemContent,
   ItemId,
   MaterialId,
+  NodeOverrideContent,
   RecipeContent,
   RewardContentInfo,
   RewardIdentity,
@@ -117,6 +118,16 @@ export function worldNodeGathering(
 ): GatheringContent | undefined {
   const content = getEntry<GatheringContent>(entry.nodeName);
   return content?.__type === 'gathering' ? content : undefined;
+}
+
+// A manually-authored override for a node's displayed data - lets a node
+// (e.g. a Kingdom node like the Duchy of Carrina) have text like a
+// description without needing to be backed by an Encounter/Gathering entry.
+export function worldNodeOverride(
+  entry: WorldNodeEntry,
+): NodeOverrideContent | undefined {
+  const content = getEntry<NodeOverrideContent>(entry.nodeName);
+  return content?.__type === 'nodeoverride' ? content : undefined;
 }
 
 export function worldNodeLevelRange(
@@ -222,6 +233,7 @@ export function worldNodeDescription(
   entry: WorldNodeEntry,
 ): string | undefined {
   return (
+    worldNodeOverride(entry)?.description ??
     worldNodeEncounter(entry)?.description ??
     worldNodeGathering(entry)?.description
   );
