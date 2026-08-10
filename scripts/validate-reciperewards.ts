@@ -1,10 +1,11 @@
 /**
  * Validates that every `recipeId` completion reward across every encounter
- * resolves to a real compiled recipe. `scripts/gamedata-build.ts` already
- * enforces this at build time (it halts with "has no corresponding id" for
- * any name that doesn't resolve) - this re-checks the *compiled* output
- * (`public/json/recipe.json`, `public/json/encounter.json`) as a defense in
- * depth against stale/hand-edited artifacts, mirroring
+ * (and random encounter) resolves to a real compiled recipe.
+ * `scripts/gamedata-build.ts` already enforces this at build time (it halts
+ * with "has no corresponding id" for any name that doesn't resolve) - this
+ * re-checks the *compiled* output (`public/json/recipe.json`,
+ * `public/json/encounter.json`, `public/json/encounterrandom.json`) as a
+ * defense in depth against stale/hand-edited artifacts, mirroring
  * `validate-completionrewards.ts`.
  *
  * This must run after `npm run gamedata:build` has produced those files.
@@ -20,6 +21,10 @@ const RECIPE_FILE = path.resolve(__dirname, '../public/json/recipe.json');
 const ENCOUNTER_FILE = path.resolve(
   __dirname,
   '../public/json/encounter.json',
+);
+const ENCOUNTER_RANDOM_FILE = path.resolve(
+  __dirname,
+  '../public/json/encounterrandom.json',
 );
 
 function loadRequiredJson(filePath: string, description: string): any {
@@ -40,7 +45,7 @@ function loadRequiredJson(filePath: string, description: string): any {
 function main(): void {
   console.log('=== validate:reciperewards ===');
   console.log(
-    'Checking that every recipeId completion reward resolves to a real recipe.\n',
+    'Checking that every recipeId completion reward (encounter or random encounter) resolves to a real recipe.\n',
   );
 
   const recipes: Array<{ id: string; name: string }> = loadRequiredJson(
@@ -60,9 +65,19 @@ function main(): void {
   );
   console.log(`  Found ${encounters.length} encounter(s).`);
 
+  const encounterRandoms: Array<{
+    id: string;
+    name: string;
+    completionRewards?: any[];
+  }> = loadRequiredJson(
+    ENCOUNTER_RANDOM_FILE,
+    'compiled random encounter content (public/json/encounterrandom.json)',
+  );
+  console.log(`  Found ${encounterRandoms.length} random encounter(s).`);
+
   const problems: string[] = [];
 
-  encounters.forEach((encounter) => {
+  [...encounters, ...encounterRandoms].forEach((encounter) => {
     (encounter.completionRewards ?? []).forEach((reward: any) => {
       if (!reward.recipeId) return;
 

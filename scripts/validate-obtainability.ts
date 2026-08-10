@@ -1,7 +1,8 @@
 /**
  * Validates that every item, collectible, and equipment entry is actually
  * obtainable in game - dropped by a monster (`MonsterContent.drops`),
- * granted by an encounter's completion (`EncounterContent.completionRewards`),
+ * granted by an encounter's or random encounter's completion
+ * (`EncounterContent.completionRewards`/`EncounterRandomContent.completionRewards`),
  * gathered from a node (`GatheringContent.gatherResults`, items only),
  * produced by crafting a recipe (`RecipeContent.result`), or hardcoded as a
  * guaranteed starting grant (see `GUARANTEED_GRANT_NAMES` below) - unless
@@ -63,8 +64,9 @@ function addIfPresent(set: Set<string>, value: unknown): void {
   if (typeof value === 'string') set.add(value);
 }
 
-// Shared by monster `drops` and encounter `completionRewards` - both are
-// `DroppedReward[]` (see `interfaces/droppable.ts`).
+// Shared by monster `drops` and encounter/random-encounter
+// `completionRewards` - all are `DroppedReward[]` (see
+// `interfaces/droppable.ts`).
 function collectFromDroppedRewards(
   rewards: any[] | undefined,
   itemNames: Set<string>,
@@ -84,22 +86,31 @@ async function main(): Promise<void> {
     'Checking that every item/collectible/equipment is reachable via a drop, reward, gather, or recipe.\n',
   );
 
-  const [items, collectibles, equipment, monsters, encounters, gatherings, recipes] =
-    await Promise.all([
-      loadContentType('item'),
-      loadContentType('collectible'),
-      loadContentType('equipment'),
-      loadContentType('monster'),
-      loadContentType('encounter'),
-      loadContentType('gathering'),
-      loadContentType('recipe'),
-    ]);
+  const [
+    items,
+    collectibles,
+    equipment,
+    monsters,
+    encounters,
+    encounterRandoms,
+    gatherings,
+    recipes,
+  ] = await Promise.all([
+    loadContentType('item'),
+    loadContentType('collectible'),
+    loadContentType('equipment'),
+    loadContentType('monster'),
+    loadContentType('encounter'),
+    loadContentType('encounterrandom'),
+    loadContentType('gathering'),
+    loadContentType('recipe'),
+  ]);
 
   console.log(
     `Loaded ${items.length} item(s), ${collectibles.length} collectible(s), ${equipment.length} equipment(s).`,
   );
   console.log(
-    `Loaded ${monsters.length} monster(s), ${encounters.length} encounter(s), ${gatherings.length} gathering node(s), ${recipes.length} recipe(s) as potential sources.\n`,
+    `Loaded ${monsters.length} monster(s), ${encounters.length} encounter(s), ${encounterRandoms.length} random encounter(s), ${gatherings.length} gathering node(s), ${recipes.length} recipe(s) as potential sources.\n`,
   );
 
   const obtainableItems = new Set<string>();
@@ -115,7 +126,7 @@ async function main(): Promise<void> {
     ),
   );
 
-  encounters.forEach((encounter) =>
+  [...encounters, ...encounterRandoms].forEach((encounter) =>
     collectFromDroppedRewards(
       encounter.completionRewards,
       obtainableItems,

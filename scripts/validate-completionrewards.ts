@@ -1,16 +1,18 @@
 /**
- * Validates that every "explore node" (a Tiled `ExploreNode` object placed on
- * one of the world maps) resolves to an `Encounter` (matched by name -
- * `node.name` === `Encounter.name`) whose `completionRewards` includes at
- * least one collectible drop. Every explorable ruin is meant to guarantee a
- * curio, so a missing `collectibleId` reward is treated the same as a
- * missing/empty `completionRewards` array.
+ * Validates that every "explore node" (a Tiled `ExploreNode` or
+ * `ExploreRandomNode` object placed on one of the world maps) resolves to an
+ * `Encounter` or `EncounterRandom` (matched by name - `node.name` ===
+ * `Encounter.name`/`EncounterRandom.name`) whose `completionRewards`
+ * includes at least one collectible drop. Every explorable ruin is meant to
+ * guarantee a curio, so a missing `collectibleId` reward is treated the same
+ * as a missing/empty `completionRewards` array.
  *
  * This checks the *compiled* JSON output (`public/maps/*.json`,
- * `public/json/maps.json`, `public/json/encounter.json`) rather than the raw
- * `gamemaps/*.json` / `gamedata/encounter/*.yml` sources, so it must run
- * after `npm run build` (or at minimum `npm run build:maps` and
- * `npm run gamedata:build`) has produced those files.
+ * `public/json/maps.json`, `public/json/encounter.json`,
+ * `public/json/encounterrandom.json`) rather than the raw `gamemaps/*.json`
+ * / `gamedata/encounter/*.yml` / `gamedata/encounterrandom/*.yml` sources,
+ * so it must run after `npm run build` (or at minimum `npm run build:maps`
+ * and `npm run gamedata:build`) has produced those files.
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -22,10 +24,14 @@ const path = require('path');
 const MAPS_DIR = path.resolve(__dirname, '../public/maps');
 const MAP_NAMES_FILE = path.resolve(__dirname, '../public/json/maps.json');
 const ENCOUNTER_FILE = path.resolve(__dirname, '../public/json/encounter.json');
+const ENCOUNTER_RANDOM_FILE = path.resolve(
+  __dirname,
+  '../public/json/encounterrandom.json',
+);
 const GAMEMAPS_DIR = path.resolve(__dirname, '../gamemaps');
 
 const EXPLORE_NODE_LAYER_NAME = 'Explore Nodes';
-const EXPLORE_NODE_TYPE = 'ExploreNode';
+const EXPLORE_NODE_TYPES = ['ExploreNode', 'ExploreRandomNode'];
 
 type ExploreNodeRef = {
   mapName: string;
@@ -58,7 +64,7 @@ function hasCollectibleReward(encounter: any): boolean {
 function main(): void {
   console.log('=== validate:completionrewards ===');
   console.log(
-    'Checking that every ExploreNode on every map resolves to an Encounter with at least one collectible completion reward.\n',
+    'Checking that every ExploreNode/ExploreRandomNode on every map resolves to an Encounter/EncounterRandom with at least one collectible completion reward.\n',
   );
 
   console.log(`Loading compiled map list from ${MAP_NAMES_FILE}...`);
@@ -83,6 +89,21 @@ function main(): void {
     }`,
   );
 
+  console.log(`\nLoading compiled random encounters from ${ENCOUNTER_RANDOM_FILE}...`);
+  const encounterRandoms: Array<{ id: string; name: string; completionRewards?: any[] }> =
+    loadRequiredJson(
+      ENCOUNTER_RANDOM_FILE,
+      'compiled random encounter content (public/json/encounterrandom.json)',
+    );
+  const encounterRandomsByName = new Map(
+    encounterRandoms.map((encounterRandom) => [encounterRandom.name, encounterRandom]),
+  );
+  console.log(
+    `  Found ${encounterRandoms.length} random encounter(s): ${
+      [...encounterRandomsByName.keys()].join(', ') || '(none)'
+    }`,
+  );
+
   const allExploreNodes: ExploreNodeRef[] = [];
   const missing: ExploreNodeRef[] = [];
 
@@ -103,8 +124,8 @@ function main(): void {
       return;
     }
 
-    const exploreNodes = (layer.objects ?? []).filter(
-      (object: any) => object.type === EXPLORE_NODE_TYPE,
+    const exploreNodes = (layer.objects ?? []).filter((object: any) =>
+      EXPLORE_NODE_TYPES.includes(object.type),
     );
 
     console.log(`  Found ${exploreNodes.length} explore node(s) on "${mapName}".`);
@@ -118,7 +139,8 @@ function main(): void {
       };
       allExploreNodes.push(ref);
 
-      const encounter = encountersByName.get(node.name);
+      const encounter =
+        encountersByName.get(node.name) ?? encounterRandomsByName.get(node.name);
 
       if (encounter && hasCollectibleReward(encounter)) {
         console.log(
@@ -131,7 +153,7 @@ function main(): void {
         missing.push(ref);
       } else {
         console.log(
-          `  ✗ "${node.name}" @ (${node.x}, ${node.y}) -> NO matching encounter!`,
+          `  ✗ "${node.name}" @ (${node.x}, ${node.y}) -> NO matching encounter or random encounter!`,
         );
         missing.push(ref);
       }
@@ -151,8 +173,8 @@ function main(): void {
     missing.forEach((ref) => {
       const message =
         `Explore node "${ref.nodeName}" on map "${ref.mapName}" (tile x=${ref.x}, y=${ref.y}) ` +
-        `has no Encounter entry named "${ref.nodeName}" with a "collectibleId" completion reward. ` +
-        `Add one to gamedata/encounter/*.yml, then rerun "npm run gamedata:build".`;
+        `has no Encounter or EncounterRandom entry named "${ref.nodeName}" with a "collectibleId" completion reward. ` +
+        `Add one to gamedata/encounter/*.yml or gamedata/encounterrandom/*.yml, then rerun "npm run gamedata:build".`;
 
       console.log(`  - ${message}`);
       console.log(
