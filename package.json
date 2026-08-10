@@ -35,6 +35,7 @@
     "bump:patch": "npm version patch -m \"chore(release): Patch %s\"",
     "analyze:herostats": "ts-node scripts/analyze-herostats",
     "analyze:monsterstats": "ts-node scripts/analyze-monsterstats",
+    "analyze:materialutilization": "ts-node scripts/analyze-materialutilization",
     "util:changelog:generate": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "util:changelog:generate:current": "conventional-changelog -p angular -o CHANGELOG-current.md -r 2",
     "util:changelog:commit": "git commit CHANGELOG.md CHANGELOG-current.md -m \"Update changelog\" || true",
