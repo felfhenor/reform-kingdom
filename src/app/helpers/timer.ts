@@ -16,5 +16,6 @@ export function formatDuration(ticks: number): string {
 
   const pad = (value: number) => value.toString().padStart(2, '0');
 
+  if (totalSeconds < 3600) return `${pad(minutes)}:${pad(seconds)}`;
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }

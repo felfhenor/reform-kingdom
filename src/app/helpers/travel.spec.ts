@@ -45,8 +45,14 @@ vi.mock('@helpers/world', () => ({
 vi.mock('@helpers/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodeEncounter: vi.fn(),
+  worldNodeEncounterRandom: vi.fn(),
+  worldNodeExploreRandomIsAvailable: vi.fn(),
   worldNodeGathering: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/encounter-random-combat', () => ({
+  encounterRandomStartFight: vi.fn(),
 }));
 
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';

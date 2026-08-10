@@ -4,6 +4,7 @@ import { computed } from '@angular/core';
 import { autoModeProcessTick } from '@helpers/auto-mode';
 import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
 import { craftProcessTick } from '@helpers/crafting';
+import { encounterRandomProcessTick } from '@helpers/encounter-random-tick';
 import { gatheringProcessTick } from '@helpers/gathering';
 import { globalEffectsProcessTick } from '@helpers/global-effects';
 import { debug } from '@helpers/logging';
@@ -60,6 +61,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     travelProcessTick();
     globalEffectsProcessTick();
     gatheringProcessTick();
+    encounterRandomProcessTick();
     autoModeProcessTick();
     craftProcessTick();
     restingProcessTick();

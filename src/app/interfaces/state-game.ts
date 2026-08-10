@@ -8,6 +8,7 @@ import type { RecipeId } from '@interfaces/content-recipe';
 import type { GameStateTradeskills } from '@interfaces/crafting';
 import type { AutoModeState } from '@interfaces/decree';
 import type { EquipmentItem } from '@interfaces/equipment';
+import type { GameStateExploreRandom } from '@interfaces/explore-random';
 import type { GatheringState } from '@interfaces/gathering';
 import type { Branded } from '@interfaces/identifiable';
 import type { TravelState } from '@interfaces/travel';
@@ -27,6 +28,7 @@ export type GameStateWorld = {
   travel: TravelState;
   gathering: GatheringState;
   autoMode: AutoModeState;
+  exploreRandom: GameStateExploreRandom;
 };
 
 export type MaterialId = ItemId;

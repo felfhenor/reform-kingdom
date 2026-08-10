@@ -6,6 +6,7 @@ import { AnimatedSprite, Container, Graphics, Text } from 'pixi.js';
 const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
   Gather: 0x4ade80,
   Explore: 0xfb7185,
+  ExploreRandom: 0xc084fc,
   Travel: 0x60a5fa,
 };
 

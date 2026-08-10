@@ -1,6 +1,7 @@
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';
 import { addGlobalEffect, isGlobalEffectActive } from '@helpers/global-effects';
 import { encounterStartFight } from '@helpers/encounter';
+import { encounterRandomStartFight } from '@helpers/encounter-random-combat';
 import { gatherNodeDiscover } from '@helpers/gather-node-discovery';
 import { travelMessageLog } from '@helpers/combat-log';
 import { gatheringStart, gatheringStop } from '@helpers/gathering';
@@ -10,6 +11,8 @@ import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
   worldNodeByName,
   worldNodeEncounter,
+  worldNodeEncounterRandom,
+  worldNodeExploreRandomIsAvailable,
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-nodes';
@@ -177,6 +180,14 @@ function travelArriveAtNode(
   const encounter = worldNodeEncounter(node);
   if (encounter) {
     encounterStartFight(encounter.id, 0, destinationNodeName);
+    return;
+  }
+
+  const encounterRandom = worldNodeEncounterRandom(node);
+  if (encounterRandom) {
+    if (worldNodeExploreRandomIsAvailable(node)) {
+      encounterRandomStartFight(node, 0);
+    }
     return;
   }
 

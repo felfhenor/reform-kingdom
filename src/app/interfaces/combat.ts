@@ -1,5 +1,6 @@
 import type { HasAnimation } from '@interfaces/artable';
 import type { EncounterId } from '@interfaces/content-encounter';
+import type { EncounterRandomId } from '@interfaces/content-encounter-random';
 import type {
   EquipmentSkill,
   EquipmentSkillId,
@@ -77,5 +78,6 @@ export type Combat = {
   guardians: Combatant[];
 
   encounterId?: EncounterId;
+  encounterRandomId?: EncounterRandomId;
   fightIndex?: number;
 };

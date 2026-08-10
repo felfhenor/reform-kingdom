@@ -103,6 +103,10 @@
         >
           Explore Again
         </button>
+      } @else if (isExploreRandomCleared()) {
+        <div class="text-sm opacity-70">
+          No monsters remain. Check back in {{ exploreRandomTimerText() }}.
+        </div>
       }
     </div>
   </div>

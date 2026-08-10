@@ -13,6 +13,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import {
   canEnterGatherNode,
   canPartyTravel,
+  encounterRandomStartFight,
   encounterStartFight,
   gamestate,
   gatheringProgressFraction,
@@ -26,6 +27,9 @@ import {
   worldNodeDescription,
   worldNodeEncounter,
   worldNodeEncounterCount,
+  worldNodeEncounterRandom,
+  worldNodeExploreRandomIsAvailable,
+  worldNodeExploreRandomTimerText,
   worldNodeGatherMaterialIds,
   worldNodeGatherTime,
   worldNodeLevelLabel,
@@ -141,11 +145,26 @@ export class MapNodePanelComponent {
 
   public canReExplore = computed(() => {
     const entry = this.node();
+    if (!entry || !this.isAtNode() || this.isInCombat()) return false;
+
+    if (worldNodeEncounter(entry)) return true;
+
+    return (
+      !!worldNodeEncounterRandom(entry) && worldNodeExploreRandomIsAvailable(entry)
+    );
+  });
+
+  public exploreRandomTimerText = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeExploreRandomTimerText(entry) : undefined;
+  });
+
+  public isExploreRandomCleared = computed(() => {
+    const entry = this.node();
     return (
       !!entry &&
-      !!worldNodeEncounter(entry) &&
-      this.isAtNode() &&
-      !this.isInCombat()
+      !!worldNodeEncounterRandom(entry) &&
+      !worldNodeExploreRandomIsAvailable(entry)
     );
   });
 
@@ -180,9 +199,14 @@ export class MapNodePanelComponent {
     if (!entry) return;
 
     const encounter = worldNodeEncounter(entry);
-    if (!encounter) return;
+    if (encounter) {
+      encounterStartFight(encounter.id, 0, entry.nodeName);
+      return;
+    }
 
-    encounterStartFight(encounter.id, 0, entry.nodeName);
+    if (worldNodeEncounterRandom(entry)) {
+      encounterRandomStartFight(entry, 0);
+    }
   }
 
   public close(): void {

@@ -36,6 +36,7 @@ export function defaultGameState(): GameState {
       travel: defaultTravelState(),
       gathering: defaultGatheringState(),
       autoMode: defaultAutoModeState(),
+      exploreRandom: {},
     },
     materials: {},
     collectibles: {},

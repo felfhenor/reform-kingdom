@@ -1,0 +1,43 @@
+- id: 24ed04dc-cce7-4e2b-8fb6-93c34d3d7093
+  name: Mystical Gobslime Shrine
+  description: A mysterious, ever-changing shrine inhabited by a variety of creatures with seemingly no end.
+
+  resetTime: 3600
+
+  levelRange:
+    min: 15
+    max: 18
+
+  encounterRange:
+    min: 2
+    max: 4
+
+  combatantRange:
+    min: 4
+    max: 7
+
+  creaturePool:
+    - monsterId: Goblin
+      weight: 1
+    - monsterId: Goblin Warrior
+      weight: 3
+    - monsterId: Goblin Magician
+      weight: 3
+    - monsterId: Green Slime
+      weight: 2
+    - monsterId: Red Slime
+      weight: 2
+    - monsterId: Purple Slime
+      weight: 2
+
+  fights: []
+
+  completionRewards:
+    - collectibleId: Gobslime Flower
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 200
+      max: 250
+      multiplierPerLevel: 0
+      chance: 100

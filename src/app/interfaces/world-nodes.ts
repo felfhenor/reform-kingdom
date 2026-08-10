@@ -22,7 +22,11 @@ export type WorldNodeLookup = {
   byName: WorldNodeNameMap;
 };
 
-export type WorldNodeInteractionKind = 'Gather' | 'Explore' | 'Travel';
+export type WorldNodeInteractionKind =
+  | 'Gather'
+  | 'Explore'
+  | 'ExploreRandom'
+  | 'Travel';
 
 export type WorldNodeCompletionRewardProgress = {
   obtained: number;

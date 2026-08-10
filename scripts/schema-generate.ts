@@ -275,6 +275,10 @@ const program = TJS.getProgramFromFiles(
   [
     path.resolve(__dirname, '../src/app/interfaces/content-collectible.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-encounter.ts'),
+    path.resolve(
+      __dirname,
+      '../src/app/interfaces/content-encounter-random.ts',
+    ),
     path.resolve(__dirname, '../src/app/interfaces/content-equipment.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-gathering.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-item.ts'),
@@ -310,6 +314,7 @@ const program = TJS.getProgramFromFiles(
 const contentTypeMap = {
   collectible: 'CollectibleContent',
   encounter: 'EncounterContent',
+  encounterrandom: 'EncounterRandomContent',
   equipment: 'EquipmentContent',
   gathering: 'GatheringContent',
   globaleffect: 'GlobalEffectContent',

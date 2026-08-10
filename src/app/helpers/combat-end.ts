@@ -1,37 +1,24 @@
-import { armoryAdd } from '@helpers/armory';
 import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
 } from '@helpers/auto-mode';
-import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset, currentCombat } from '@helpers/combat';
-import {
-  collectibleDropHtml,
-  combatMessageLog,
-  equipmentDropHtml,
-  itemDropHtml,
-  recipeDropHtml,
-} from '@helpers/combat-log';
+import { combatMessageLog } from '@helpers/combat-log';
+import { grantResolvedDrops } from '@helpers/combat-rewards';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
+import { encounterRandomHandleVictory } from '@helpers/encounter-random-combat';
 import { rollDroppedRewards } from '@helpers/loot';
-import { addMaterial } from '@helpers/materials';
 import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
 import { partyGainXp, syncPartyHpFromCombat } from '@helpers/party';
-import { recipeDiscover } from '@helpers/recipes';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
-  CollectibleContent,
   Combat,
   Combatant,
   EncounterContent,
   EncounterId,
-  EquipmentContent,
-  ItemContent,
-  ItemId,
+  EncounterRandomContent,
   MonsterContent,
-  RecipeContent,
-  ResolvedDrop,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -71,64 +58,6 @@ function defeatedMonsters(combat: Combat): DefeatedMonster[] {
     .filter((entry): entry is DefeatedMonster => !!entry);
 }
 
-// Shared by monster kill drops and encounter completion rewards, both of
-// which now roll from the same `DroppedReward[]` schema (see `loot.ts`).
-function grantResolvedDrops(combat: Combat, drops: ResolvedDrop[]): void {
-  const itemsFound: Record<ItemId, number> = {};
-
-  drops.forEach((drop) => {
-    if ('equipmentId' in drop) {
-      armoryAdd(drop.equipmentId);
-
-      const equipment = getEntry<EquipmentContent>(drop.equipmentId);
-      if (!equipment) return;
-
-      combatMessageLog(
-        combat,
-        `The party found ${equipmentDropHtml(equipment)}!`,
-      );
-      return;
-    }
-
-    if ('collectibleId' in drop) {
-      collectiblesAdd(drop.collectibleId, 1, combat.locationName);
-
-      const collectible = getEntry<CollectibleContent>(drop.collectibleId);
-      if (!collectible) return;
-
-      combatMessageLog(
-        combat,
-        `The party found ${collectibleDropHtml(collectible)}!`,
-      );
-      return;
-    }
-
-    if ('recipeId' in drop) {
-      recipeDiscover(drop.recipeId, combat.locationName);
-
-      const recipe = getEntry<RecipeContent>(drop.recipeId);
-      if (!recipe) return;
-
-      combatMessageLog(combat, `The party found ${recipeDropHtml(recipe)}!`);
-      return;
-    }
-
-    itemsFound[drop.itemId] = (itemsFound[drop.itemId] ?? 0) + drop.quantity;
-  });
-
-  Object.keys(itemsFound).forEach((itemId) => {
-    const quantity = itemsFound[itemId as ItemId];
-    if (quantity <= 0) return;
-
-    addMaterial(itemId as ItemId, quantity);
-
-    const item = getEntry<ItemContent>(itemId);
-    if (!item) return;
-
-    combatMessageLog(combat, `The party found ${itemDropHtml(item, quantity)}!`);
-  });
-}
-
 // The party's highest hero level represents it for over-level XP scaling,
 // same convention as `healingTicksForLevel` - one overleveled hero is enough
 // to mark the node as trivial for the whole party.
@@ -136,17 +65,30 @@ function partyRepresentativeLevel(combat: Combat): number {
   return Math.max(...combat.heroes.map((hero) => hero.level), 1);
 }
 
+// The declared max level for the encounter this combat came from, used to
+// cap over-level XP scaling - works the same for a static `EncounterContent`
+// and a generated `EncounterRandomContent` node, since both declare a
+// `levelRange`.
+function encounterMaxLevel(combat: Combat): number | undefined {
+  if (combat.encounterId) {
+    return getEntry<EncounterContent>(combat.encounterId)?.levelRange?.max;
+  }
+  if (combat.encounterRandomId) {
+    return getEntry<EncounterRandomContent>(combat.encounterRandomId)
+      ?.levelRange?.max;
+  }
+  return undefined;
+}
+
 function grantVictoryRewards(combat: Combat): void {
   const monsters = defeatedMonsters(combat);
-  const encounter = combat.encounterId
-    ? getEntry<EncounterContent>(combat.encounterId)
-    : undefined;
+  const maxLevel = encounterMaxLevel(combat);
   const partyLevel = partyRepresentativeLevel(combat);
 
   const totalXp = sumBy(monsters, ({ monster, level }) => {
     const rawXp = monsterXpReward(monster, level);
-    return encounter
-      ? xpForOverLevel(rawXp, partyLevel, encounter.levelRange.max)
+    return maxLevel !== undefined
+      ? xpForOverLevel(rawXp, partyLevel, maxLevel)
       : rawXp;
   });
   if (totalXp > 0) {
@@ -203,6 +145,10 @@ function handleCombatVictory(combat: Combat): boolean {
   syncPartyHpFromCombat(combat.heroes);
   autoModeRecordClauseSuccess();
   grantVictoryRewards(combat);
+
+  if (combat.encounterRandomId) {
+    return encounterRandomHandleVictory(combat);
+  }
 
   const nextFight = nextFightFor(combat);
   if (!nextFight) {

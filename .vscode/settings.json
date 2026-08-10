@@ -16,6 +16,7 @@
   "yaml.schemas": {
     "./schemas/collectible.schema.json": "gamedata/collectible/*.yml",
     "./schemas/encounter.schema.json": "gamedata/encounter/*.yml",
+    "./schemas/encounterrandom.schema.json": "gamedata/encounterrandom/*.yml",
     "./schemas/equipment.schema.json": "gamedata/equipment/*.yml",
     "./schemas/gathering.schema.json": "gamedata/gathering/*.yml",
     "./schemas/globaleffect.schema.json": "gamedata/globaleffect/*.yml",

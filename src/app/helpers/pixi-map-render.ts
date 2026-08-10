@@ -8,8 +8,17 @@ import type {
   TiledObject,
   TiledObjectOrientation,
 } from '@interfaces';
-import type { FederatedPointerEvent } from 'pixi.js';
+import type { FederatedPointerEvent, Text } from 'pixi.js';
 import { Container, Sprite, type Texture } from 'pixi.js';
+
+export type PixiTiledMapRenderResult = {
+  container: Container;
+  // Node-name -> its always-on nametag `Text`, for callers that need to
+  // live-update a label after the map is built (e.g. an `ExploreRandomNode`'s
+  // countdown timer) - see `resolveNodeLabel`'s per-object result, which is
+  // otherwise only ever read once at render time.
+  nodeLabels: Map<string, Text>;
+};
 
 /**
  * Carrina-style maps are authored with a fixed layer order that this renderer
@@ -86,12 +95,17 @@ function pixiTiledLayerRender(
   return container;
 }
 
+type PixiTiledObjectRenderResult = {
+  wrapper: Container;
+  label?: Text;
+};
+
 function pixiTiledObjectRender(
   object: TiledObject,
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
-): Container | undefined {
+): PixiTiledObjectRenderResult | undefined {
   if (!object.gid) return undefined;
 
   const orientation = tiledGidOrientationRead(object.gid);
@@ -139,14 +153,15 @@ function pixiTiledObjectRender(
   // Same restriction as the click handler above - only node objects carry a
   // `type`, so decorative/terrain objects never get a label.
   const labelInfo = object.type ? resolveNodeLabel?.(object) : undefined;
+  let label: Text | undefined;
   if (labelInfo) {
-    const label = pixiIndicatorNodeLabelCreate(labelInfo.kind, labelInfo.text);
+    label = pixiIndicatorNodeLabelCreate(labelInfo.kind, labelInfo.text);
     label.x = object.width / 2;
     label.y = -object.height - 4;
     wrapper.addChild(label);
   }
 
-  return wrapper;
+  return { wrapper, label };
 }
 
 function pixiTiledObjectLayerRender(
@@ -154,21 +169,25 @@ function pixiTiledObjectLayerRender(
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
-): Container {
+): { container: Container; nodeLabels: Map<string, Text> } {
   const container = new Container();
   container.cullable = true;
+  const nodeLabels = new Map<string, Text>();
 
   (layer.objects ?? []).forEach((object) => {
-    const objectContainer = pixiTiledObjectRender(
+    const rendered = pixiTiledObjectRender(
       object,
       textures,
       onNodeClick,
       resolveNodeLabel,
     );
-    if (objectContainer) container.addChild(objectContainer);
+    if (!rendered) return;
+
+    container.addChild(rendered.wrapper);
+    if (rendered.label) nodeLabels.set(object.name, rendered.label);
   });
 
-  return container;
+  return { container, nodeLabels };
 }
 
 export function pixiTiledMapRender(
@@ -176,17 +195,29 @@ export function pixiTiledMapRender(
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
-): Container {
+): PixiTiledMapRenderResult {
   const container = new Container();
+  const nodeLabels = new Map<string, Text>();
 
   map.layers.forEach((layer) => {
-    const layerContainer =
-      layer.type === 'tilelayer'
-        ? pixiTiledLayerRender(layer, textures, map.tilewidth, map.tileheight)
-        : pixiTiledObjectLayerRender(layer, textures, onNodeClick, resolveNodeLabel);
+    if (layer.type === 'tilelayer') {
+      container.addChild(
+        pixiTiledLayerRender(layer, textures, map.tilewidth, map.tileheight),
+      );
+      return;
+    }
 
-    container.addChild(layerContainer);
+    const rendered = pixiTiledObjectLayerRender(
+      layer,
+      textures,
+      onNodeClick,
+      resolveNodeLabel,
+    );
+    container.addChild(rendered.container);
+    rendered.nodeLabels.forEach((label, nodeName) =>
+      nodeLabels.set(nodeName, label),
+    );
   });
 
-  return container;
+  return { container, nodeLabels };
 }

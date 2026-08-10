@@ -33,3 +33,9 @@
   rarity: Common
   description: A flower encased entirely in slime jelly.
   sprite: '0006'
+
+- id: cfe5aa1b-b5c3-4fa4-892f-946f938d9bf7
+  name: Gobslime Flower
+  rarity: Common
+  description: A flower named after the Gobslime Shrine, the only place it grows.
+  sprite: '0012'

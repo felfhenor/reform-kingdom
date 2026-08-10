@@ -1,6 +1,7 @@
 import { ensureContent } from '@helpers/content-initializers';
 import type {
   EncounterContent,
+  EncounterRandomContent,
   EquipmentSkillContent,
   GatheringContent,
   JobContent,
@@ -65,6 +66,48 @@ describe('ensureContent', () => {
       expect(result.completionRewards).toEqual([
         { collectibleId: 'seed', chance: 1 },
       ]);
+    });
+  });
+
+  describe('encounterrandom', () => {
+    it('validates the creature pool, fights, and completion rewards, defaulting ranges/resetTime', () => {
+      const result = ensureContent({
+        __type: 'encounterrandom',
+        id: 'gobslime-shrine',
+        name: 'Mystical Gobslime Shrine',
+        creaturePool: [{ monsterId: 'goblin', weight: 3 }, {}],
+        completionRewards: [{ collectibleId: 'gobslime-flower', chance: 100 }],
+      } as unknown as EncounterRandomContent);
+
+      expect(result.resetTime).toBe(3600);
+      expect(result.levelRange).toEqual({ min: 1, max: 1 });
+      expect(result.encounterRange).toEqual({ min: 1, max: 1 });
+      expect(result.combatantRange).toEqual({ min: 1, max: 1 });
+      expect(result.creaturePool).toEqual([
+        { monsterId: 'goblin', weight: 3 },
+        { monsterId: 'UNKNOWN', weight: 1 },
+      ]);
+      expect(result.fights).toEqual([]);
+      expect(result.completionRewards).toEqual([
+        { collectibleId: 'gobslime-flower', chance: 100 },
+      ]);
+    });
+
+    it('preserves an authored resetTime and ranges', () => {
+      const result = ensureContent({
+        __type: 'encounterrandom',
+        id: 'gobslime-shrine',
+        name: 'Mystical Gobslime Shrine',
+        resetTime: 1800,
+        levelRange: { min: 15, max: 18 },
+        encounterRange: { min: 2, max: 4 },
+        combatantRange: { min: 4, max: 7 },
+      } as unknown as EncounterRandomContent);
+
+      expect(result.resetTime).toBe(1800);
+      expect(result.levelRange).toEqual({ min: 15, max: 18 });
+      expect(result.encounterRange).toEqual({ min: 2, max: 4 });
+      expect(result.combatantRange).toEqual({ min: 4, max: 7 });
     });
   });
 

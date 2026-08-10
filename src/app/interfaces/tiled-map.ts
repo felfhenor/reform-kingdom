@@ -29,11 +29,15 @@ export type TiledObject = {
 export type WorldNodeType =
   | 'Kingdom'
   | 'ExploreNode'
+  | 'ExploreRandomNode'
   | 'GatherNode'
   | 'TeleportNode';
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
 export type ExploreNodeObject = TiledObject & { type: 'ExploreNode' };
+export type ExploreRandomNodeObject = TiledObject & {
+  type: 'ExploreRandomNode';
+};
 export type GatherNodeObject = TiledObject & { type: 'GatherNode' };
 
 export type TeleportNodeProperty =
@@ -48,6 +52,7 @@ export type TeleportNodeObject = TiledObject & {
 export type WorldNodeObject =
   | KingdomObject
   | ExploreNodeObject
+  | ExploreRandomNodeObject
   | GatherNodeObject
   | TeleportNodeObject;
 

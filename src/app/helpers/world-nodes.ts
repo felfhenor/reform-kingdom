@@ -2,6 +2,11 @@ import { computed } from '@angular/core';
 import { isEquipmentDiscovered } from '@helpers/armory';
 import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
+import {
+  encounterRandomIsAvailable,
+  encounterRandomState,
+  encounterRandomTimerLabel,
+} from '@helpers/encounter-random';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { allMaps, getMap } from '@helpers/maps';
 import { isMaterialDiscovered } from '@helpers/materials';
@@ -16,6 +21,8 @@ import type {
   DroppedReward,
   EncounterContent,
   EncounterLevelRange,
+  EncounterRandomContent,
+  EncounterRandomFight,
   EquipmentContent,
   GameMap,
   GatheringContent,
@@ -120,6 +127,13 @@ export function worldNodeGathering(
   return content?.__type === 'gathering' ? content : undefined;
 }
 
+export function worldNodeEncounterRandom(
+  entry: WorldNodeEntry,
+): EncounterRandomContent | undefined {
+  const content = getEntry<EncounterRandomContent>(entry.nodeName);
+  return content?.__type === 'encounterrandom' ? content : undefined;
+}
+
 // A manually-authored override for a node's displayed data - lets a node
 // (e.g. a Kingdom node like the Duchy of Carrina) have text like a
 // description without needing to be backed by an Encounter/Gathering entry.
@@ -135,7 +149,8 @@ export function worldNodeLevelRange(
 ): EncounterLevelRange | undefined {
   return (
     worldNodeEncounter(entry)?.levelRange ??
-    worldNodeGathering(entry)?.levelRange
+    worldNodeGathering(entry)?.levelRange ??
+    worldNodeEncounterRandom(entry)?.levelRange
   );
 }
 
@@ -155,12 +170,32 @@ export function worldNodeInteractionKind(
       return 'Gather';
     case 'ExploreNode':
       return 'Explore';
+    case 'ExploreRandomNode':
+      return 'ExploreRandom';
     case 'TeleportNode':
     case 'Kingdom':
       return 'Travel';
     default:
       return undefined;
   }
+}
+
+export function worldNodeExploreRandomIsAvailable(
+  entry: WorldNodeEntry,
+): boolean {
+  const content = worldNodeEncounterRandom(entry);
+  if (!content) return false;
+
+  return encounterRandomIsAvailable(content, encounterRandomState(content.id));
+}
+
+export function worldNodeExploreRandomTimerText(
+  entry: WorldNodeEntry,
+): string | undefined {
+  const content = worldNodeEncounterRandom(entry);
+  if (!content) return undefined;
+
+  return encounterRandomTimerLabel(content, encounterRandomState(content.id));
 }
 
 export function worldNodeLabelInfo(
@@ -170,29 +205,46 @@ export function worldNodeLabelInfo(
   if (!kind) return undefined;
 
   const levelRange = worldNodeLevelRange(entry);
-  const text = levelRange
-    ? `${entry.nodeName}\nLv.${worldNodeLevelLabel(levelRange)}`
-    : entry.nodeName;
+  const lines = [entry.nodeName];
+  if (levelRange) lines.push(`Lv.${worldNodeLevelLabel(levelRange)}`);
 
-  return { kind, text };
+  if (kind === 'ExploreRandom') {
+    const timerText = worldNodeExploreRandomTimerText(entry);
+    if (timerText) lines.unshift(timerText);
+  }
+
+  return { kind, text: lines.join('\n') };
+}
+
+// For an `ExploreRandomNode`, the encounter's `fights` are always empty as
+// authored - the real, currently-locked-in fight list lives in generated
+// game state instead (see `encounterRandomState`).
+function worldNodeExploreRandomFights(
+  entry: WorldNodeEntry,
+): EncounterRandomFight[] | undefined {
+  const content = worldNodeEncounterRandom(entry);
+  if (!content) return undefined;
+
+  return encounterRandomState(content.id)?.fights;
 }
 
 export function worldNodeEncounterCount(
   entry: WorldNodeEntry,
 ): number | undefined {
   const encounter = worldNodeEncounter(entry);
-  if (!encounter) return undefined;
+  if (encounter) return encounter.fights.length;
 
-  return encounter.fights.length;
+  return worldNodeExploreRandomFights(entry)?.length;
 }
 
 export function worldNodeMonsterCount(
   entry: WorldNodeEntry,
 ): number | undefined {
   const encounter = worldNodeEncounter(entry);
-  if (!encounter) return undefined;
+  if (encounter) return sumBy(encounter.fights, (fight) => fight.monsters.length);
 
-  return sumBy(encounter.fights, (fight) => fight.monsters.length);
+  const fights = worldNodeExploreRandomFights(entry);
+  return fights ? sumBy(fights, (fight) => fight.monsters.length) : undefined;
 }
 
 export function worldNodeGatherTime(entry: WorldNodeEntry): number | undefined {
@@ -235,7 +287,8 @@ export function worldNodeDescription(
   return (
     worldNodeOverride(entry)?.description ??
     worldNodeEncounter(entry)?.description ??
-    worldNodeGathering(entry)?.description
+    worldNodeGathering(entry)?.description ??
+    worldNodeEncounterRandom(entry)?.description
   );
 }
 
@@ -321,13 +374,15 @@ function isGoldCoinReward(reward: DroppedReward): boolean {
 export function worldNodeCompletionRewards(
   entry: WorldNodeEntry,
 ): DroppedReward[] {
-  const encounter = worldNodeEncounter(entry);
-  if (!encounter) return [];
+  const completionRewards =
+    worldNodeEncounter(entry)?.completionRewards ??
+    worldNodeEncounterRandom(entry)?.completionRewards;
+  if (!completionRewards) return [];
 
   const seen = new Set<string>();
   const rewards: DroppedReward[] = [];
 
-  encounter.completionRewards.forEach((reward) => {
+  completionRewards.forEach((reward) => {
     if (isGoldCoinReward(reward)) return;
 
     const key = rewardKey(reward);

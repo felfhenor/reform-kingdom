@@ -44,6 +44,7 @@ import {
   worldCameraRecenterRequest,
   worldNodeByName,
   worldNodeLabelInfo,
+  worldNodesOfType,
 } from '@helpers';
 import type {
   CameraPosition,
@@ -56,7 +57,7 @@ import type {
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
 import { clamp } from 'es-toolkit/compat';
-import type { Application, Container, Graphics, Texture } from 'pixi.js';
+import type { Application, Container, Graphics, Text, Texture } from 'pixi.js';
 
 const JOB_SPRITESHEET_URL = 'art/spritesheets/job.webp';
 
@@ -120,6 +121,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   };
   private nodeSelectionContainer?: Container;
   private nodeSelectionIndicator?: Graphics;
+  private nodeLabels?: Map<string, Text>;
   private resizeObserver?: ResizeObserver;
   private playerIndicatorTicker?: () => void;
   private visualPositionTicker?: () => void;
@@ -304,6 +306,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.gatherProgressBar = undefined;
     this.nodeSelectionContainer = undefined;
     this.nodeSelectionIndicator = undefined;
+    this.nodeLabels = undefined;
     this.resizeObserver = undefined;
     this.canvas = undefined;
   }
@@ -355,14 +358,14 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
 
     const textures = await pixiTiledMapTexturesLoad(map);
-    this.mapContainer.addChild(
-      pixiTiledMapRender(
-        map,
-        textures,
-        (object) => this.onNodeClick(object),
-        (object) => this.resolveNodeLabel(object),
-      ),
+    const renderedMap = pixiTiledMapRender(
+      map,
+      textures,
+      (object) => this.onNodeClick(object),
+      (object) => this.resolveNodeLabel(object),
     );
+    this.mapContainer.addChild(renderedMap.container);
+    this.nodeLabels = renderedMap.nodeLabels;
 
     this.gridOverlay = pixiGridOverlayCreate(map);
     this.gridOverlay.visible = getOption('showBackdropGrid');
@@ -390,6 +393,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateVisualPosition();
       this.updatePlayerIndicatorIfNeeded();
       this.updateGatherProgressIndicator();
+      this.updateExploreRandomTimers();
       this.positionCamera();
     };
     this.app.ticker.add(this.visualPositionTicker);
@@ -405,6 +409,25 @@ export class GamePlayWorldComponent implements OnDestroy {
   private resolveNodeLabel(object: TiledObject): WorldNodeLabelInfo | undefined {
     const entry = worldNodeByName(object.name);
     return entry ? worldNodeLabelInfo(entry) : undefined;
+  }
+
+  // `ExploreRandomNode` labels carry a countdown that ticks every second, so
+  // (unlike every other node's static nametag, built once in
+  // `resolveNodeLabel`) they need a per-frame refresh - same imperative
+  // "recompute and write" pattern as `updateGatherProgressIndicator`.
+  // PixiJS's `Text.text` setter is a no-op when the string is unchanged, so
+  // recomputing every frame for a value that only changes once a second is
+  // cheap and needs no manual throttling.
+  private updateExploreRandomTimers(): void {
+    if (!this.nodeLabels) return;
+
+    worldNodesOfType('ExploreRandomNode').forEach((entry) => {
+      const label = this.nodeLabels?.get(entry.nodeName);
+      if (!label) return;
+
+      const info = worldNodeLabelInfo(entry);
+      if (info) label.text = info.text;
+    });
   }
 
   private onPointerDown = (event: PointerEvent): void => {
