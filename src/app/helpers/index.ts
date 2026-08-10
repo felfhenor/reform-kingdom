@@ -30,6 +30,7 @@ export * from './global-effects';
 export * from './icons';
 export * from './infusion';
 export * from './job';
+export * from './loading';
 export * from './logging';
 export * from './loot';
 export * from './luck';

@@ -72,6 +72,12 @@ const FADE_DURATION_MS = 300;
   imports: [MapNodePanelComponent, GlobalEffectBarComponent, HeroStatusComponent],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
+    @if (isMapLoading()) {
+      <div class="map-loading-overlay bg-base-100">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <p class="text-sm opacity-70">Loading map...</p>
+      </div>
+    }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
     <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
     <app-global-effect-bar class="global-effect-bar"></app-global-effect-bar>
@@ -90,6 +96,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private cameraOffset = signal<CameraPosition>({ x: 0, y: 0 });
 
   public fadeVisible = signal<boolean>(false);
+  public isMapLoading = signal<boolean>(true);
 
   public isPanned = computed(() => {
     const offset = this.cameraOffset();
@@ -248,7 +255,9 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     await this.initPixi(map);
 
-    if (!isFirstLoad) {
+    if (isFirstLoad) {
+      this.isMapLoading.set(false);
+    } else {
       await this.fadeIn();
     }
   }

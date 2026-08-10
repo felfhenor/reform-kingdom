@@ -24,6 +24,7 @@ export * from './element';
 export * from './equipment';
 export * from './gathering';
 export * from './identifiable';
+export * from './loading';
 export * from './map';
 export * from './meta';
 export * from './museum';

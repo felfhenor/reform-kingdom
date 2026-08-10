@@ -29,10 +29,10 @@ export class ContentService {
 
   private artSignals: Array<WritableSignal<boolean>> = [];
   public artImages = signal<Record<string, HTMLImageElement>>({});
-  private hasLoadedArt = computed(() => this.artSignals.every((s) => s()));
-  private hasLoadedAtlases = signal<boolean>(false);
-  private hasLoadedData = signal<boolean>(false);
-  private hasLoadedMaps = signal<boolean>(false);
+  public hasLoadedArt = computed(() => this.artSignals.every((s) => s()));
+  public hasLoadedAtlases = signal<boolean>(false);
+  public hasLoadedData = signal<boolean>(false);
+  public hasLoadedMaps = signal<boolean>(false);
 
   public artAtlases = signal<ArtAtlases>({});
 
