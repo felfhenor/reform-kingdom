@@ -89,7 +89,7 @@ function grantVictoryRewards(combat: Combat): void {
     const rawXp = monsterXpReward(monster, level);
     return maxLevel !== undefined
       ? xpForOverLevel(rawXp, partyLevel, maxLevel)
-      : rawXp;
+      : 0;
   });
   if (totalXp > 0) {
     partyGainXp(totalXp);
