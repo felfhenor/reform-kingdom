@@ -1,6 +1,6 @@
 - id: 2653ab27-8bd6-4feb-85a5-595ab200b921
   name: Empower I
-  description: Boost the Strength of an ally!
+  description: Empower an ally, increasing their Strength by 20% for 3 turns!
 
   sprite: '0014'
 

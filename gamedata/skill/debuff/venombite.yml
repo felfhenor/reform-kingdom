@@ -1,6 +1,6 @@
 - id: cc65aced-a210-42ac-8248-980361ddedad
   name: Venom Bite I
-  description: Bite an enemy for {{value}} damage, inflicting Venom on them.
+  description: Bite an enemy for {{ value }} damage, inflicting Venom on them.
 
   sprite: '0009'
 
@@ -33,7 +33,7 @@
 
 - id: a24cef74-932d-4345-bcf9-eadc62e89381
   name: Venom Bite II
-  description: Bite an enemy for {{value}} damage, inflicting Venom on them.
+  description: Bite an enemy for {{ value }} damage, inflicting Venom on them.
 
   sprite: '0009'
 

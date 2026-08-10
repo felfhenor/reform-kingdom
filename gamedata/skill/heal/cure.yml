@@ -1,6 +1,6 @@
 - id: ed42f2b8-1722-4af2-b36b-7d40318fa725
   name: Cure I
-  description: Heal a living ally for {{value}} HP.
+  description: Heal a living ally for {{ value }} HP.
 
   sprite: '0004'
 
@@ -21,14 +21,14 @@
         - behavior: NotZeroHealth
         - behavior: NotMaxHealth
       damageScaling:
-        Intelligence: 0.5
-        Vitality: 0.25
+        Intelligence: 1.5
+        Vitality: 0.75
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: a97db916-2710-43af-821d-cfffa5306884
   name: Cure II
-  description: Heal a living ally for {{value}} HP.
+  description: Heal a living ally for {{ value }} HP.
 
   sprite: '0004'
 
@@ -49,7 +49,7 @@
         - behavior: NotZeroHealth
         - behavior: NotMaxHealth
       damageScaling:
-        Intelligence: 0.75
-        Vitality: 0.35
+        Intelligence: 2.5
+        Vitality: 1.25
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

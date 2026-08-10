@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { HeroEquipmentPanelEquipmentComponent } from '@components/hero-equipment-panel-equipment/hero-equipment-panel-equipment.component';
 import { HeroEquipmentPanelSkillsComponent } from '@components/hero-equipment-panel-skills/hero-equipment-panel-skills.component';
 import { HeroEquipmentPanelStatsComponent } from '@components/hero-equipment-panel-stats/hero-equipment-panel-stats.component';
@@ -14,6 +20,7 @@ import type { Character, JobContent } from '@interfaces';
     HeroEquipmentPanelSkillsComponent,
     HeroEquipmentPanelStatsComponent,
     IconJobComponent,
+    DecimalPipe,
   ],
   templateUrl: './hero-equipment-panel.component.html',
   styleUrl: './hero-equipment-panel.component.scss',

@@ -108,8 +108,8 @@ describe('skillTechniquePreviewValue', () => {
       },
     });
 
-    // Intelligence(100) + 100*0.5 = 150; Vitality(40) + 40*0.25 = 50.
-    expect(skillTechniquePreviewValue(character, skill, technique)).toBe(200);
+    // Intelligence(100)*0.5 = 50; Vitality(40)*0.25 = 10.
+    expect(skillTechniquePreviewValue(character, skill, technique)).toBe(60);
   });
 
   it('floors a fractional result', () => {
@@ -139,8 +139,8 @@ describe('skillTechniquePreviewValue', () => {
       },
     });
 
-    // 101 + 101*0.5 = 151.5 -> floored to 151.
-    expect(skillTechniquePreviewValue(character, skill, technique)).toBe(151);
+    // 101*0.5 = 50.5 -> floored to 50.
+    expect(skillTechniquePreviewValue(character, skill, technique)).toBe(50);
   });
 
   it('returns 0 for a technique with no damage scaling', () => {
@@ -153,7 +153,7 @@ describe('skillTechniquePreviewValue', () => {
 });
 
 describe('skillDescriptionWithPreview', () => {
-  it('substitutes {{value}} with the previewed amount', () => {
+  it('substitutes {{ value }} with the previewed amount', () => {
     const character = buildCharacter({
       stats: {
         Agility: 0,
@@ -167,7 +167,7 @@ describe('skillDescriptionWithPreview', () => {
       },
     });
     const skill = buildSkill({
-      description: 'Heal a living ally for {{value}} HP.',
+      description: 'Heal a living ally for {{ value }} HP.',
       techniques: [
         buildTechnique({
           damageScaling: {
@@ -185,7 +185,7 @@ describe('skillDescriptionWithPreview', () => {
     });
 
     expect(skillDescriptionWithPreview(character, skill)).toBe(
-      'Heal a living ally for 150 HP.',
+      'Heal a living ally for 50 HP.',
     );
   });
 

@@ -29,7 +29,7 @@ export function skillTechniquePreviewValue(
   return Math.max(0, Math.floor(total));
 }
 
-// Renders a skill's description, substituting a `{{value}}` placeholder
+// Renders a skill's description, substituting a `{{ value }}` placeholder
 // with its previewed heal/damage - skills currently always have a single
 // technique, so the description maps 1:1 to `techniques[0]`.
 export function skillDescriptionWithPreview(

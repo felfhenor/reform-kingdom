@@ -1,6 +1,6 @@
 - id: bd410126-602d-4951-9202-a7e49ba98e0e
   name: Starshine I
-  description: Heal all living allies for {{value}} HP.
+  description: Heal all living allies for {{ value }} HP.
 
   sprite: '0012'
 
@@ -21,14 +21,14 @@
         - behavior: NotZeroHealth
         - behavior: NotMaxHealth
       damageScaling:
-        Intelligence: 0.2
-        Vitality: 0.1
+        Intelligence: 1
+        Vitality: 0.5
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 3e19fc85-32ab-4869-87f2-2aafc274bb69
   name: Starshine II
-  description: Heal all living allies for {{value}} HP.
+  description: Heal all living allies for {{ value }} HP.
 
   sprite: '0012'
 
@@ -49,7 +49,7 @@
         - behavior: NotZeroHealth
         - behavior: NotMaxHealth
       damageScaling:
-        Intelligence: 0.35
-        Vitality: 0.2
+        Intelligence: 1.5
+        Vitality: 1
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -1,6 +1,6 @@
 - id: 6d24b4d1-544a-48e6-90a5-967cee3fe653
   name: Analyze I
-  description: Analyze the weak spot of an enemy.
+  description: Analyze the weak spot of an enemy, inflicting Weakspot.
 
   sprite: '0006'
 
@@ -31,7 +31,7 @@
 
 - id: d957cdd4-28c8-4f90-90b5-3a6bf83fad1f
   name: Analyze II
-  description: Analyze the weak spot of an enemy, dealing {{value}} damage to them.
+  description: Analyze the weak spot of an enemy, dealing {{ value }} damage to them and inflicting Weakspot.
 
   sprite: '0006'
 
@@ -54,6 +54,7 @@
           statusEffectId: Weakspot
       damageScaling:
         Vitality: 0.7
+        Luck: 2
 
       statusEffects:
         - statusEffectId: Weakspot

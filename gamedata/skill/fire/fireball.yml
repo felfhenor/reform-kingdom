@@ -1,6 +1,6 @@
 - id: 2ca859ea-df62-43b5-9961-4a4644b094a4
   name: Fireball I
-  description: Burst 3 enemies for {{value}} fire damage, with a chance of inflicting Burning.
+  description: Burst 3 enemies for {{ value }} fire damage, with a 20% chance of inflicting Burning.
 
   sprite: '0003'
 
@@ -20,7 +20,7 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.3
+        Intelligence: 0.35
 
       statusEffects:
         - statusEffectId: Burning
@@ -31,7 +31,7 @@
 
 - id: fbd7b6f8-5efe-417b-b45e-efbf715da8d3
   name: Fireball II
-  description: Burst 3 enemies for {{value}} fire damage, with a chance of inflicting Burning.
+  description: Burst 3 enemies for {{ value }} fire damage, with a 30% chance of inflicting Burning.
 
   sprite: '0003'
 
@@ -51,11 +51,11 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.5
+        Intelligence: 0.6
 
       statusEffects:
         - statusEffectId: Burning
-          chance: 20
+          chance: 30
           duration: 4
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

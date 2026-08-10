@@ -158,9 +158,9 @@ describe('combatApplySkillToTarget defense', () => {
       technique,
     );
 
-    // baseDamage = Strength(100) * (1 + 1) = 200; defended purely by
+    // baseDamage = Strength(100) * 1 = 100; defended purely by
     // Vitality (20), never by the target's much larger Resistance (100).
-    expect(target.hp).toBe(1000 - (200 - 20));
+    expect(target.hp).toBe(1000 - (100 - 20));
   });
 
   it('mitigates a purely magical technique using only the target Resistance stat', () => {
@@ -211,9 +211,9 @@ describe('combatApplySkillToTarget defense', () => {
       technique,
     );
 
-    // baseDamage = Intelligence(100) * (1 + 1) = 200; defended purely by
+    // baseDamage = Intelligence(100) * 1 = 100; defended purely by
     // Resistance (20), never by the target's much larger Vitality (100).
-    expect(target.hp).toBe(1000 - (200 - 20));
+    expect(target.hp).toBe(1000 - (100 - 20));
   });
 
   it('splits mitigation between Resistance and Vitality proportional to the damageScaling weights', () => {
@@ -265,7 +265,8 @@ describe('combatApplySkillToTarget defense', () => {
       technique,
     );
 
-    // baseDamage = Strength(100) * 1.75 + Intelligence(100) * 1.25 = 300.
-    expect(target.hp).toBe(100 - (300 - 250));
+    // baseDamage = Strength(100) * 0.75 + Intelligence(100) * 0.25 = 100;
+    // fully absorbed by defense (250), so no damage gets through.
+    expect(target.hp).toBe(100 - Math.max(0, 100 - 250));
   });
 });

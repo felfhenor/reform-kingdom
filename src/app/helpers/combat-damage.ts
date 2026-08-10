@@ -95,9 +95,7 @@ export function getCombatantBaseStatDamageForTechnique(
 
   const totalMultiplier = baseMultiplier + affinityElementBoostMultiplier;
 
-  const multipliedStat = baseStatWithoutMultiplier * totalMultiplier;
-
-  return baseStatWithoutMultiplier + multipliedStat;
+  return baseStatWithoutMultiplier * totalMultiplier;
 }
 
 function getDeadlockPreventionDamageMultiplier(rounds: number): number {

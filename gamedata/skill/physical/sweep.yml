@@ -1,6 +1,6 @@
 - id: 31fc4cfd-27e9-4700-9817-742e5f5bc354
   name: Sweep I
-  description: Strike four enemies for {{value}} damage.
+  description: Strike four enemies for {{ value }} damage.
 
   rarity: Common
   sprite: '0002'
@@ -19,13 +19,13 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 0.2
+        Strength: 0.4
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 7fe3f97b-a5a9-440c-a92e-97b584a27a67
   name: Sweep II
-  description: Strike four enemies for {{value}} damage.
+  description: Strike four enemies for {{ value }} damage.
 
   rarity: Common
   sprite: '0002'
@@ -44,6 +44,6 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 0.3
+        Strength: 0.55
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

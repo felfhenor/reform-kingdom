@@ -1,6 +1,6 @@
 - id: ed8793ef-0182-4522-9190-fbed192079e5
   name: Double Strike I
-  description: Strike two enemies for {{value}} damage.
+  description: Strike two enemies for {{ value }} damage each.
 
   rarity: Common
   sprite: '0001'
@@ -25,7 +25,7 @@
 
 - id: 94483e46-4a41-49f8-a2b2-29270ad0fde4
   name: Double Strike II
-  description: Strike two enemies for {{value}} damage.
+  description: Strike two enemies for {{ value }} damage each.
 
   rarity: Uncommon
   sprite: '0001'
@@ -44,6 +44,6 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 1.0
+        Strength: 1.2
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
