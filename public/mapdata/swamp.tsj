@@ -1,0 +1,14 @@
+{ "columns":5,
+ "image":"swamp.png",
+ "imageheight":256,
+ "imagewidth":320,
+ "margin":0,
+ "name":"swamp",
+ "spacing":0,
+ "tilecount":20,
+ "tiledversion":"1.12.2",
+ "tileheight":64,
+ "tilewidth":64,
+ "type":"tileset",
+ "version":"1.10"
+}

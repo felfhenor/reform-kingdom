@@ -1,3 +1,11 @@
 - id: 803d7a72-ca44-4f66-8105-ffdeb9a54891
   name: Duchy of Carrina
   description: The seat of House Carrina, a modest but proud duchy standing watch over the fields and ruins beyond its walls. Come home any time!
+
+- id: b936d34d-de57-4a54-a52b-095aba6f6589
+  name: Carrina Cave
+  description: A short passageway back to the Duchy of Carrina.
+
+- id: 685c435d-d572-43b7-ab46-3597893787d6
+  name: Craggled Cave
+  description: A short passageway towards the Craggled Mire.

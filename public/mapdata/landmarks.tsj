@@ -1,0 +1,14 @@
+{ "columns":7,
+ "image":"landmarks.png",
+ "imageheight":704,
+ "imagewidth":448,
+ "margin":0,
+ "name":"landmarks",
+ "spacing":0,
+ "tilecount":77,
+ "tiledversion":"1.12.2",
+ "tileheight":64,
+ "tilewidth":64,
+ "type":"tileset",
+ "version":"1.10"
+}
