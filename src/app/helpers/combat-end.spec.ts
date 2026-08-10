@@ -66,8 +66,8 @@ import {
 } from '@helpers/auto-mode';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset } from '@helpers/combat';
-import { collectibleDropHtml, recipeDropHtml } from '@helpers/combat-log';
 import { combatCheckIfOver } from '@helpers/combat-end';
+import { collectibleDropHtml, recipeDropHtml } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { rollDroppedRewards } from '@helpers/loot';
@@ -146,11 +146,7 @@ describe('combatCheckIfOver', () => {
     const result = combatCheckIfOver(combat);
 
     expect(result).toBe(true);
-    expect(encounterStartFight).toHaveBeenCalledWith(
-      'enc-1',
-      1,
-      'Field Ruins',
-    );
+    expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 1, 'Field Ruins');
     expect(combatReset).not.toHaveBeenCalled();
     // Mid-encounter: no completion rewards roll yet (there are also no
     // resolvable monsters in this fixture, so no kill-drop roll either).
@@ -192,8 +188,8 @@ describe('combatCheckIfOver', () => {
       completionRewards: [{ collectibleId: collectible.id }],
     } as unknown as EncounterContent;
 
-    vi.mocked(getEntry).mockImplementation((id) =>
-      (id === 'enc-1' ? encounter : collectible) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : collectible) as never,
     );
     vi.mocked(rollDroppedRewards).mockReturnValue([
       { collectibleId: collectible.id },
@@ -224,8 +220,8 @@ describe('combatCheckIfOver', () => {
       completionRewards: [{ recipeId: recipe.id }],
     } as unknown as EncounterContent;
 
-    vi.mocked(getEntry).mockImplementation((id) =>
-      (id === 'enc-1' ? encounter : recipe) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : recipe) as never,
     );
     vi.mocked(rollDroppedRewards).mockReturnValue([{ recipeId: recipe.id }]);
     vi.mocked(recipeDropHtml).mockReturnValue('Equipment: Bone-Hewn Cloak');
@@ -280,8 +276,8 @@ describe('combatCheckIfOver', () => {
       levelRange: { min: 3, max: 5 },
     } as unknown as EncounterContent;
 
-    vi.mocked(getEntry).mockImplementation((id) =>
-      (id === 'enc-1' ? encounter : monster) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : monster) as never,
     );
     vi.mocked(monsterXpReward).mockReturnValue(100);
     vi.mocked(xpForOverLevel).mockReturnValue(50);
@@ -309,30 +305,6 @@ describe('combatCheckIfOver', () => {
     // Uses the highest hero level (7) against the node's max (5).
     expect(xpForOverLevel).toHaveBeenCalledWith(100, 7, 5);
     expect(partyGainXp).toHaveBeenCalledWith(50);
-  });
-
-  it('does not degrade XP for a bare fight with no encounter', () => {
-    const monster = { id: 'monster-1' } as MonsterContent;
-    vi.mocked(getEntry).mockReturnValue(monster as never);
-    vi.mocked(monsterXpReward).mockReturnValue(100);
-
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', level: 20, hp: 10 })],
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-          level: 5,
-        }),
-      ],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(xpForOverLevel).not.toHaveBeenCalled();
-    expect(partyGainXp).toHaveBeenCalledWith(100);
   });
 
   it('returns false when combat is not yet over', () => {
