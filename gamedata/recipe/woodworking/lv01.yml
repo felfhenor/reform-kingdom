@@ -15,7 +15,7 @@
   craftTime: 5
 
 - id: 551c54bf-37d0-4a6b-bb5d-a47190c54804
-  name: 'Equipment: Wergen Bow'
+  name: 'Weapon: Wergen Bow'
   result:
     equipmentId: Wergen Bow
 
@@ -65,7 +65,7 @@
   craftTime: 40
 
 - id: 66d36d4b-ca4a-48b1-aad0-d85eca6ecbf4
-  name: 'Equipment: Copper Spear'
+  name: 'Weapon: Copper Spear'
   result:
     equipmentId: Copper Spear
 

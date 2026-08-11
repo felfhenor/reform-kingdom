@@ -1,4 +1,4 @@
-# Primary Stat: Agility
+# Primary Stat: Vitality
 # Secondary Stat: Resistance
 
 - id: f9047d17-6d05-4ff2-b4da-188f91e83450
@@ -10,8 +10,23 @@
   sprite: '0011'
   slots: 1
   baseStats:
-    Vitality: 0.3
+    Vitality: 0.8
     Resistance: 0.1
+
+- id: 0fe28377-3c4d-4256-8a12-d4959ed9cc2f
+  name: Pan Board
+  description: A repurposed shield that is used to pan copper.
+  levelRequirement: 4
+  rarity: Common
+  type: Shield
+  sprite: '0011'
+  slots: 1
+  baseStats:
+    Vitality: 1.1
+    Resistance: 0.5
+    Agility: 0.5
+  grantedSkillIds:
+    - Smashing Board I
 
 - id: 98a3127c-98fb-42e2-be4c-9734070159e5
   name: Copperslime Shield

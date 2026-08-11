@@ -1,3 +1,18 @@
+- id: 5fb070f8-c521-4452-8105-3ca3ace2c75b
+  name: Coppersilk Breastplate
+  description: A breastplate made of coppersilk.
+  levelRequirement: 4
+  rarity: Common
+  type: Metal Armor
+  sprite: '0043'
+  slots: 1
+  baseStats:
+    Vitality: 2
+    Resistance: 1
+    Agility: 0.2
+    Health: 5
+    Energy: 1
+
 - id: 7fa997c0-62f0-494a-b91f-ae2aa26c9175
   name: Copperslime Breastplate
   description: A breastplate made of copperslime.

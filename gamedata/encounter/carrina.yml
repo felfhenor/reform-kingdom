@@ -33,6 +33,9 @@
       multiplierPerLevel: 0
       chance: 25
 
+    - equipmentId: Gobskull Charm
+      chance: 10
+
 - id: c6e4119c-b365-4de1-a952-5bf86f7ff173
   name: Forest Ruins
   description: A dilapidated ruin in the forest, home to a small goblin tribe.
@@ -244,6 +247,12 @@
     - collectibleId: Copper Catcher
       chance: 100
 
+    - equipmentId: Pan Board
+      chance: 10
+
+    - recipeId: 'Material: Azurite'
+      chance: 25
+
     - itemId: Small Goblin Bone
       min: 3
       max: 5
@@ -288,6 +297,21 @@
     - collectibleId: Salt Barrel
       chance: 100
 
+    - equipmentId: Antigonus Artifact
+      chance: 10
+
+    - recipeId: 'Material: Azurite'
+      chance: 10
+
+    - recipeId: 'Equipment: Copperspun Chain'
+      chance: 10
+
+    - itemId: Wergen Wood
+      min: 3
+      max: 5
+      multiplierPerLevel: 0
+      chance: 100
+
     - itemId: Gold Coin
       min: 150
       max: 200
@@ -330,6 +354,12 @@
     - collectibleId: Gobweb
       chance: 100
 
+    - recipeId: 'Equipment: Coppersilk Breastplate'
+      chance: 10
+
+    - recipeId: 'Equipment: Coppersilk Robe'
+      chance: 10
+
     - itemId: Gold Coin
       min: 200
       max: 250
@@ -364,6 +394,9 @@
   completionRewards:
     - collectibleId: Copper Pickaxe
       chance: 100
+
+    - recipeId: 'Weapon: Copperbone Mace'
+      chance: 10
 
     - itemId: Gold Coin
       min: 300

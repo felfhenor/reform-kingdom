@@ -54,3 +54,17 @@
     Vitality: 1.2
     Health: 10
     Energy: 9
+
+- id: 39658362-29fc-47fb-8170-69d2229153bc
+  name: Coppersilk Robe
+  description: A robe made of coppersilk.
+  levelRequirement: 7
+  rarity: Common
+  type: Cloth Armor
+  sprite: '0044'
+  slots: 1
+  baseStats:
+    Resistance: 3.9
+    Vitality: 1.4
+    Health: 20
+    Energy: 12

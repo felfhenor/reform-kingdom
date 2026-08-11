@@ -44,8 +44,26 @@
   tradeskillXP: 5
   craftTime: 20
 
+- id: 6db852f8-54b5-40d2-ad87-e3a66ac86653
+  name: 'Equipment: Coppersilk Breastplate'
+  result:
+    equipmentId: Coppersilk Breastplate
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 5
+
+    - itemId: Weak Spider Silk
+      quantity: 5
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 4
+  maxTradeskillLevel: 7
+  tradeskillXP: 12
+  craftTime: 60
+
 - id: ef512ec9-393d-4944-940a-2b5dffd7ce3a
-  name: 'Weapon: Copper Dirk'
+  name: 'Equipment: Copper Dirk'
   result:
     equipmentId: Copper Dirk
 
@@ -80,7 +98,7 @@
   craftTime: 20
 
 - id: 4e099da6-9f4b-4cab-b678-6bb1b2844638
-  name: 'Equipment: Copper Mace'
+  name: 'Weapon: Copper Mace'
   result:
     equipmentId: Copper Mace
 

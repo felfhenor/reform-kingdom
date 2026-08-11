@@ -1,11 +1,23 @@
 - id: d268bda6-93b5-41c1-a491-2217a04ba765
   name: Copper Gear
   description: A small copper gear that seems strangely entrancing.
-  levelRequirement: 4
+  levelRequirement: 2
   rarity: Uncommon
   type: Trinket
   sprite: '0010'
   slots: 1
   baseStats:
-    Resistance: 1
-    Vitality: 1
+    Resistance: 0.5
+    Vitality: 0.5
+
+- id: 4059ebf0-bd38-4d1d-aa26-40d53fe17d31
+  name: Copperspun Chain
+  description: A copper chain spun together of muscle fiber and metal together.
+  levelRequirement: 5
+  rarity: Uncommon
+  type: Trinket
+  sprite: '0047'
+  slots: 1
+  baseStats:
+    Vitality: 1.3
+    Health: 10

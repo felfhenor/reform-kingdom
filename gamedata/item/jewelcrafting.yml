@@ -6,4 +6,14 @@
   sprite: '0008'
 
   infusionStats:
-    Intelligence: 1
+    Intelligence: 0.5
+
+- id: d7b9b61c-2268-403d-b7fe-6e66d240649d
+  name: Azurite
+  description: A small chunk of azurite, separated from copper.
+  rarity: Uncommon
+
+  sprite: '0022'
+
+  infusionStats:
+    Luck: 0.5

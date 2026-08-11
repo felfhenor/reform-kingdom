@@ -20,7 +20,7 @@
   craftTime: 60
 
 - id: 3ac8811e-6614-4c83-9f6c-82e01e31aca9
-  name: 'Equipment: Copperslime Whip'
+  name: 'Weapon: Copperslime Whip'
   result:
     equipmentId: Copperslime Whip
 
@@ -38,7 +38,7 @@
   craftTime: 60
 
 - id: 5dd9b7eb-d971-478e-a973-eeb35ce998e8
-  name: 'Equipment: Wergenslime Staff'
+  name: 'Weapon: Wergenslime Staff'
   result:
     equipmentId: Wergenslime Staff
 

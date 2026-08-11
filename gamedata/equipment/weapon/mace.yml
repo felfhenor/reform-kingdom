@@ -24,3 +24,15 @@
   baseStats:
     Strength: 2.1
     Intelligence: 2.3
+
+- id: 8dba0ff4-6d19-4881-bb4d-a1d5697008f7
+  name: Copperbone Mace
+  description: A mace made of bones infused with copper to create a sturdy, powerful thud.
+  levelRequirement: 9
+  rarity: Common
+  type: Mace
+  sprite: '0046'
+  slots: 1
+  baseStats:
+    Strength: 3.9
+    Intelligence: 3.4

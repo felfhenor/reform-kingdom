@@ -35,7 +35,7 @@
   craftTime: 60
 
 - id: 9886460b-d58c-4f39-9c0a-6e57b34c9b25
-  name: 'Equipment: Wergenslime Bow'
+  name: 'Weapon: Wergenslime Bow'
   result:
     equipmentId: Wergenslime Bow
 
@@ -56,7 +56,7 @@
   craftTime: 60
 
 - id: 2c7bd1ab-f493-45ce-b19b-346bfda940ce
-  name: 'Equipment: Wergenslime Spear'
+  name: 'Weapon: Wergenslime Spear'
   result:
     equipmentId: Wergenslime Spear
 

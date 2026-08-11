@@ -44,6 +44,22 @@
   tradeskillXP: 5
   craftTime: 20
 
+- id: 40473b28-3b17-4eef-b2f7-cc6d4077e3f2
+  name: 'Material: Azurite'
+  result:
+    itemId: Azurite
+    chance: 5
+
+  requirements:
+    - itemId: Copper Ore
+      quantity: 1
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 4
+  maxTradeskillLevel: 7
+  tradeskillXP: 1
+  craftTime: 3
+
 - id: 6df29d50-54e8-47c3-a3c6-337070993e0d
   name: 'Collectible: Minor Jewelcrafting Effigy'
   result:

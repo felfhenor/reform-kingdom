@@ -1,5 +1,5 @@
 - id: 12b22ccb-844f-40ea-a5cf-e5d0c104d1a8
-  name: 'Equipment: Wergen Staff'
+  name: 'Weapon: Wergen Staff'
   result:
     equipmentId: Wergen Staff
 
@@ -20,7 +20,7 @@
   craftTime: 20
 
 - id: 7192e104-0ae9-4f5b-904e-7f6ea9ff7aaa
-  name: 'Equipment: Copper Whip'
+  name: 'Weapon: Copper Whip'
   result:
     equipmentId: Copper Whip
 
@@ -57,6 +57,27 @@
   maxTradeskillLevel: 7
   tradeskillXP: 8
   craftTime: 10
+
+- id: b9553069-af0c-43b6-83fe-38d57779cd5d
+  name: 'Equipment: Copperspun Chain'
+  result:
+    equipmentId: Copperspun Chain
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 4
+
+    - itemId: Weak Spider Silk
+      quantity: 4
+
+    - itemId: Small Asura Tendon
+      quantity: 4
+
+  tradeskill: Artificing
+  minTradeskillLevel: 4
+  maxTradeskillLevel: 7
+  tradeskillXP: 12
+  craftTime: 60
 
 - id: 7f0b6be1-138b-415f-91be-3041e423de8d
   name: 'Collectible: Minor Artificing Effigy'

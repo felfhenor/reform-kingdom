@@ -68,6 +68,27 @@
   tradeskillXP: 10
   craftTime: 60
 
+- id: bb1911ff-2619-4ec1-8380-16aa51323023
+  name: 'Equipment: Coppersilk Robe'
+  result:
+    equipmentId: Coppersilk Robe
+
+  requirements:
+    - itemId: Linen Thread
+      quantity: 5
+
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Weak Spider Silk
+      quantity: 5
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 4
+  maxTradeskillLevel: 7
+  tradeskillXP: 10
+  craftTime: 60
+
 - id: 0318d0cc-f5b3-448c-af06-3991c72ffefc
   name: 'Collectible: Minor Tailoring Effigy'
   result:
