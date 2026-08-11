@@ -26,4 +26,41 @@
 - Admurins Items Mega Pack - item icons
 - Oryx Ultimate Fantasy - sprite sheets for characters and enemies
 
+## Useful Scripts
+
+### Hero Stat Analysis
+
+```
+npm run analyze:herostats <lvl> <class1,class2,class3...>
+```
+
+This will run a check on hero job stats. It will show you their stats at a level, as well as their base damage output at a level for each skill they have at that level.
+
+### Monster Stat Analysis
+
+```
+npm run analyze:monsterstats <lvl> <monster1,monster2,monster3...>
+```
+
+This will run a check on monster stats. It will show you their stats at a level.
+
+### Material Utilization
+
+```
+npm run analyze:materialutilization
+npm run analyze:materialutilization -- --expanded
+```
+
+This will examine all of the materials in the game, showing the least utilized ones (which are candidates for using more of before others). In expanded mode, it will show a lot more information about what is utilized, and how.
+
+### Content Gaps
+
+```
+npm run analyze:contentgaps
+npm run analyze:contentgaps -- --gap=<x>
+npm run analyze:contentgaps -- --expanded
+```
+
+This will examine all content in the game (at the time of writing: items, tradeskills, infusions) and look for excessive gaps in utilization (default of 4)
+
 ## Good-To-Knows
