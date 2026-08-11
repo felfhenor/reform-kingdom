@@ -17,7 +17,6 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -55,9 +54,9 @@ function main(): void {
 
     console.log(`Checking map "${mapName}" (${mapPath})...`);
 
-    const nodes = (map.layers ?? []).filter((layer: any) =>
-      NODE_LAYER_NAMES.includes(layer.name),
-    ).flatMap((layer: any) => layer.objects ?? []);
+    const nodes = (map.layers ?? [])
+      .filter((layer: any) => NODE_LAYER_NAMES.includes(layer.name))
+      .flatMap((layer: any) => layer.objects ?? []);
 
     console.log(`  Found ${nodes.length} node(s) on "${mapName}".`);
 
@@ -96,7 +95,7 @@ function main(): void {
     duplicateNames.forEach((ref) => {
       const owner = nameOwners.get(ref.nodeName)!;
       const message =
-        `Node "${ref.nodeName}" (${ref.nodeType}) on map "${ref.mapName}" (tile x=${ref.x}, y=${ref.y}) ` +
+        `Node "${ref.nodeName}" (${ref.nodeType}) on map "${ref.mapName}" (tile x=${ref.x / 64}, y=${1 + ref.y / 64}) ` +
         `shares its name with "${owner.nodeName}" (${owner.nodeType}) on map "${owner.mapName}". ` +
         `Node names must be unique across every map - rename one of them.`;
 
@@ -115,7 +114,9 @@ function main(): void {
     process.exit(1);
   }
 
-  console.log('\n[validate:nodenames] PASSED: every node name is unique across all maps.');
+  console.log(
+    '\n[validate:nodenames] PASSED: every node name is unique across all maps.',
+  );
 }
 
 main();

@@ -161,7 +161,7 @@
   name: Goblin Asura
   description: A demonic goblin. They focus heavily on physical attacks and are often used to help raid strongholds. They itch for a fight.
 
-  sprite: '0004'
+  sprite: '0036'
   frames: 4
 
   targettingType: Strongest
