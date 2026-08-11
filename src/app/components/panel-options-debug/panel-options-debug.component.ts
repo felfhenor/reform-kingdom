@@ -8,8 +8,10 @@ import {
   debugGiveEquipment,
   debugGiveItem,
   debugSetCharacterLevel,
+  debugSetTradeskillLevel,
   getEntriesByType,
   partyGet,
+  TRADESKILL_MAX_LEVEL,
 } from '@helpers';
 import type {
   CharacterId,
@@ -19,7 +21,9 @@ import type {
   EquipmentId,
   ItemContent,
   ItemId,
+  Tradeskill,
 } from '@interfaces';
+import { ALL_TRADESKILLS } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -65,6 +69,11 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedCharacterId = signal<CharacterId | undefined>(undefined);
   public characterLevel = signal<number>(1);
 
+  public tradeskills = ALL_TRADESKILLS;
+  public tradeskillMaxLevel = TRADESKILL_MAX_LEVEL;
+  public selectedTradeskill = signal<Tradeskill | undefined>(undefined);
+  public tradeskillLevel = signal<number>(1);
+
   public giveItem(): void {
     const itemId = this.selectedItemId();
     if (!itemId) return;
@@ -91,5 +100,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!characterId) return;
 
     debugSetCharacterLevel(characterId, this.characterLevel());
+  }
+
+  public setTradeskillLevel(): void {
+    const tradeskill = this.selectedTradeskill();
+    if (!tradeskill) return;
+
+    debugSetTradeskillLevel(tradeskill, this.tradeskillLevel());
   }
 }

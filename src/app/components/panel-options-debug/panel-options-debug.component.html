@@ -228,5 +228,37 @@
         </div>
       </div>
     </div>
+
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Set Tradeskill Level</div>
+
+        <div class="debug-give-grid">
+          <span class="label-text text-right">Tradeskill</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="tradeskills"
+            [clearable]="false"
+            placeholder="Select a tradeskill..."
+            [(ngModel)]="selectedTradeskill"
+          ></ng-select>
+          <input
+            type="number"
+            [min]="1"
+            [max]="tradeskillMaxLevel"
+            class="input input-bordered debug-give-qty"
+            [(ngModel)]="tradeskillLevel"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:SetTradeskillLevel"
+            (click)="setTradeskillLevel()"
+          >
+            Set
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

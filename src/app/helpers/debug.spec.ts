@@ -9,6 +9,7 @@ import type {
   ItemContent,
   ItemId,
   StatBlock,
+  TradeskillBuildingState,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,6 +24,11 @@ vi.mock('@helpers/collectibles', () => ({
 vi.mock('@helpers/content', () => ({
   getEntriesByType: vi.fn(),
   getEntry: vi.fn(),
+}));
+
+vi.mock('@helpers/crafting', () => ({
+  TRADESKILL_MAX_LEVEL: 50,
+  tradeskillXpForLevel: vi.fn(),
 }));
 
 vi.mock('@helpers/materials', () => ({
@@ -46,12 +52,14 @@ vi.mock('@helpers/state-options', () => ({
 import { armoryAdd } from '@helpers/armory';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
+import { tradeskillXpForLevel } from '@helpers/crafting';
 import {
   debugGiveAllEquipment,
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
   debugSetCharacterLevel,
+  debugSetTradeskillLevel,
 } from '@helpers/debug';
 import { addMaterial } from '@helpers/materials';
 import { characterStatsForLevel, characterXpForLevel } from '@helpers/party';
@@ -292,6 +300,63 @@ describe('Debug Helper Functions', () => {
       debugSetCharacterLevel('other-hero' as CharacterId, 20);
 
       expect(captured.party[0]).toEqual(character);
+    });
+  });
+
+  describe('debugSetTradeskillLevel', () => {
+    function runWithTradeskills(building: TradeskillBuildingState): {
+      building: TradeskillBuildingState;
+    } {
+      const captured = { building };
+      vi.mocked(updateGamestate).mockImplementation((func) => {
+        const state = {
+          tradeskills: { Woodworking: captured.building },
+        } as unknown as GameState;
+        const result = func(state);
+        captured.building = result.tradeskills.Woodworking;
+        return Promise.resolve();
+      });
+      return captured;
+    }
+
+    it('sets the level and resets xp for the tradeskill', () => {
+      vi.mocked(tradeskillXpForLevel).mockReturnValue(500);
+
+      const captured = runWithTradeskills({
+        level: 10,
+        xp: { current: 50, maximum: 200 },
+        queue: [],
+      });
+      debugSetTradeskillLevel('Woodworking', 20);
+
+      expect(captured.building.level).toBe(20);
+      expect(captured.building.xp).toEqual({ current: 0, maximum: 500 });
+    });
+
+    it('clamps the requested level to the valid range', () => {
+      vi.mocked(tradeskillXpForLevel).mockReturnValue(5000);
+
+      const captured = runWithTradeskills({
+        level: 10,
+        xp: { current: 50, maximum: 200 },
+        queue: [],
+      });
+      debugSetTradeskillLevel('Woodworking', 500);
+
+      expect(captured.building.level).toBe(50);
+    });
+
+    it('clamps the requested level up to a minimum of 1', () => {
+      vi.mocked(tradeskillXpForLevel).mockReturnValue(10);
+
+      const captured = runWithTradeskills({
+        level: 10,
+        xp: { current: 50, maximum: 200 },
+        queue: [],
+      });
+      debugSetTradeskillLevel('Woodworking', -5);
+
+      expect(captured.building.level).toBe(1);
     });
   });
 });

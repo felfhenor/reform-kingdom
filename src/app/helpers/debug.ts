@@ -1,6 +1,7 @@
 import { armoryAdd } from '@helpers/armory';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
+import { TRADESKILL_MAX_LEVEL, tradeskillXpForLevel } from '@helpers/crafting';
 import { addMaterial } from '@helpers/materials';
 import {
   CHARACTER_MAX_LEVEL,
@@ -17,6 +18,7 @@ import type {
   EquipmentId,
   ItemContent,
   ItemId,
+  Tradeskill,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -105,6 +107,23 @@ export function debugSetCharacterLevel(
         ep: clamp(character.ep, 0, stats.Energy),
       };
     });
+
+    return state;
+  });
+}
+
+export function debugSetTradeskillLevel(
+  tradeskill: Tradeskill,
+  level: number,
+): void {
+  const clampedLevel = clamp(Math.round(level), 1, TRADESKILL_MAX_LEVEL);
+
+  updateGamestate((state) => {
+    state.tradeskills[tradeskill] = {
+      ...state.tradeskills[tradeskill],
+      level: clampedLevel,
+      xp: { current: 0, maximum: tradeskillXpForLevel(clampedLevel) },
+    };
 
     return state;
   });
