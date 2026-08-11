@@ -1,0 +1,63 @@
+- id: 22228b9e-bf15-465c-b894-f8c39b34e34e
+  name: Earthshake I
+  description: Make the earth tremble, hitting 3 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
+
+  sprite: '0017'
+
+  rarity: Common
+
+  epCost: 5
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 3
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.35
+        Resistance: 1
+
+      statusEffects:
+        - statusEffectId: Trembling
+          chance: 35
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: eb3a5011-8df8-4b72-9587-306e1f173807
+  name: Earthshake II
+  description: Make the earth tremble, hitting 4 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
+
+  sprite: '0017'
+
+  rarity: Uncommon
+
+  epCost: 8
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.7
+        Resistance: 1.5
+
+      statusEffects:
+        - statusEffectId: Trembling
+          chance: 50
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -39,3 +39,27 @@
   rarity: Common
   description: A flower named after the Gobslime Shrine, the only place it grows.
   sprite: '0012'
+
+- id: f1f9898f-9bde-43a3-8645-1e10190d7358
+  name: Copper Catcher
+  rarity: Common
+  description: A crude tool used by goblins to catch copper as it floats by in the river. It doesn't look very effective.
+  sprite: '0013'
+
+- id: 7da75143-2511-46ed-8fd5-79384b50afd5
+  name: Salt Barrel
+  rarity: Common
+  description: A barrel containing an enormous amount of salt.
+  sprite: '0014'
+
+- id: 8c6193c1-760f-466f-b658-12769b937f30
+  name: Gobweb
+  rarity: Common
+  description: A useless web that can no longer serve the purpose of catching food.
+  sprite: '0015'
+
+- id: 1afafc1d-480f-46a7-a565-575bb9c471db
+  name: Copper Pickaxe
+  rarity: Common
+  description: A pickaxe made of copper, for the simple purpose of getting more copper.
+  sprite: '0016'

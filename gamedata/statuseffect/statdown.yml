@@ -44,6 +44,37 @@
       combatMessage: '**{{ combatant.name }}** has shaken off the slime (+{{ damage }} Resistance)!'
       modifyStat: Resistance
 
+- id: 6ea3bc57-6376-4abf-abf6-5d508c68f628
+  name: Chilled
+
+  effectType: Debuff
+  elements: [Water]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Agility: 0.5
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has been slowed (-{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: AddCombatStatNumber
+      combatStat: missChance
+      value: 5
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has shaken off the slow (+{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: TakeCombatStatNumber
+      combatStat: missChance
+      value: 5
+
 - id: b3b9516b-6f93-493a-a42d-b5764d5c0370
   name: Slowed
 
@@ -75,6 +106,46 @@
       combatStat: missChance
       value: 10
 
+- id: 6ef89a56-5348-4368-89eb-a02df02d0c27
+  name: Dazed I
+
+  effectType: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  onApply:
+    - type: AddCombatStatNumber
+      combatStat: stunChance
+      value: 30
+
+  onUnapply:
+    - type: TakeCombatStatNumber
+      combatStat: stunChance
+      value: 30
+
+- id: af210184-83bb-4e84-8060-e614642ace48
+  name: Dazed II
+
+  effectType: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  onApply:
+    - type: AddCombatStatNumber
+      combatStat: stunChance
+      value: 60
+
+  onUnapply:
+    - type: TakeCombatStatNumber
+      combatStat: stunChance
+      value: 60
+
 - id: a469aaf3-5542-4191-a751-dd75d07773c8
   name: Stopped
 
@@ -105,3 +176,27 @@
     - type: TakeCombatStatNumber
       combatStat: missChance
       value: 10
+
+- id: 7392cbab-cf6c-44d7-8ce2-c9a869548504
+  name: Trembling
+
+  type: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is trembling!'
+
+    - type: AddCombatStatNumber
+      combatStat: missChance
+      value: 25
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is no longer trembling!'
+
+    - type: TakeCombatStatNumber
+      combatStat: missChance
+      value: 25

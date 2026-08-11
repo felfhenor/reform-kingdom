@@ -64,3 +64,11 @@
 
         - level: 9
           skillId: Sweep II
+
+    - pathName: Smashing Board
+      levels:
+        - level: 6
+          skillId: Smashing Board I
+
+        - level: 13
+          skillId: Smashing Board II

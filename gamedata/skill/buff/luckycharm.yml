@@ -1,0 +1,55 @@
+- id: ff4006fe-ca7c-49e2-aa9f-68ef90ab56fe
+  name: Lucky Charm I
+  description: Improve the luck of all allies!
+
+  sprite: '0018'
+
+  rarity: Common
+
+  epCost: 5
+  usesPerCombat: -1
+
+  techniques:
+    - elements: []
+      attributes: [Buff]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Lucky I
+
+      statusEffects:
+        - statusEffectId: Lucky I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: cfb50c0b-002a-4fe4-8a94-d43a6192a494
+  name: Lucky Charm II
+  description: Improve the luck of all allies!
+
+  sprite: '0018'
+
+  rarity: Common
+
+  epCost: 5
+  usesPerCombat: -1
+
+  techniques:
+    - elements: []
+      attributes: [Buff]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Lucky II
+
+      statusEffects:
+        - statusEffectId: Lucky II
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'

@@ -1,0 +1,93 @@
+- id: a539673b-138a-4ec3-ae60-1576ef28acb6
+  name: Frostfire Bolt I
+  description: Blast a single enemy with frost and fire, dealing {{ value }} damage with a chance of inflicting Burning and Chilled on the enemy.
+
+  sprite: '0019'
+
+  rarity: Common
+
+  epCost: 7
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 60
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.5
+
+      statusEffects:
+        - statusEffectId: Chilled
+          chance: 60
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: bdac8f1a-bd99-4994-9653-4d449652f3bf
+  name: Frostfire Bolt II
+  description: Blast a single enemy with an intense shock, dealing {{ value }} damage with a chance of inflicting Burning and Chilled on the enemy.
+
+  sprite: '0019'
+
+  rarity: Uncommon
+
+  epCost: 14
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.5
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 70
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.75
+
+      statusEffects:
+        - statusEffectId: Chilled
+          chance: 70
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

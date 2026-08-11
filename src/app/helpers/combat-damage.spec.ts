@@ -53,6 +53,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
       damageReflectPercent: 0,
       healingIgnorePercent: 0,
       reviveChance: 0,
+      stunChance: 0,
     },
     resistance: {} as never,
     affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },

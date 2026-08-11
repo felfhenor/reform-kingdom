@@ -122,6 +122,7 @@ export function defaultCombatStats(): CombatantCombatStats {
     damageReflectPercent: 0,
     healingIgnorePercent: 0,
     reviveChance: 0,
+    stunChance: 0,
   };
 }
 

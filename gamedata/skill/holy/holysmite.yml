@@ -1,0 +1,53 @@
+- id: e5c5299b-2898-4580-8d86-0644b94e6e6f
+  name: Holy Smite I
+  description: Smite a single enemy, dealing {{ value }} damage.
+
+  sprite: '0016'
+
+  rarity: Common
+
+  epCost: 4
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1
+        Vitality: 1
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: c926af2d-893e-4b36-842a-45ce0291860f
+  name: Holy Smite II
+  description: Smite a single enemy, dealing {{ value }} damage.
+
+  sprite: '0016'
+
+  rarity: Uncommon
+
+  epCost: 7
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.5
+        Vitality: 1.5
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

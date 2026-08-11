@@ -49,12 +49,20 @@
         - level: 1
           skillId: Attack
 
-    - pathName: Cure
+    - pathName: Holy Smite
       levels:
         - level: 1
-          skillId: Cure I
+          skillId: Holy Smite I
 
         - level: 6
+          skillId: Holy Smite II
+
+    - pathName: Cure
+      levels:
+        - level: 3
+          skillId: Cure I
+
+        - level: 8
           skillId: Cure II
 
     - pathName: Starshine

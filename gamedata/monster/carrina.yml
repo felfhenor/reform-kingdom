@@ -157,6 +157,61 @@
     Resistance: 0.5
     Agility: 0.3
 
+- id: dab4e7ed-c396-4e7b-a1ec-7d70712215bc
+  name: Goblin Asura
+  description: A demonic goblin. They focus heavily on physical attacks and are often used to help raid strongholds. They itch for a fight.
+
+  sprite: '0004'
+  frames: 4
+
+  targettingType: Strongest
+
+  rarity: Uncommon
+
+  xp:
+    min: 30
+    max: 35
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Gold Coin
+      min: 1
+      max: 5
+      multiplierPerLevel: 1
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Double Strike I
+      weight: 3
+    - skillId: Sweep I
+      weight: 2
+    - skillId: Empower I
+      weight: 2
+    - skillId: Red Slash I
+      weight: 2
+
+  baseStats:
+    Health: 75
+    Energy: 5
+    Luck: 5
+    Intelligence: 1
+    Strength: 15
+    Vitality: 1
+    Resistance: 1
+    Agility: 5
+
+  statsPerLevel:
+    Health: 6
+    Energy: 0.3
+    Luck: 0.02
+    Intelligence: 0.1
+    Strength: 3
+    Vitality: 0.1
+    Resistance: 0.1
+    Agility: 0.8
+
 - id: a013355d-3634-4b65-bd95-bdb4ed331fb8
   name: Green Slime
   description: A magically-inclined slime, somehow capable of harnessing the power of storms.
@@ -458,3 +513,105 @@
     Vitality: 1
     Resistance: 0.3
     Agility: 2
+
+- id: 91dc7608-46e1-45e5-9bae-32b30d3de4db
+  name: Orc Smasher
+  description: A very smashy orc.
+
+  sprite: '0040'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 25
+    max: 30
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Gold Coin
+      min: 10
+      max: 20
+      multiplierPerLevel: 1
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Double Strike I
+      weight: 3
+    - skillId: Earthshake I
+      weight: 2
+
+  baseStats:
+    Health: 60
+    Energy: 10
+    Luck: 1
+    Intelligence: 1
+    Strength: 15
+    Vitality: 8
+    Resistance: 8
+    Agility: 1
+
+  statsPerLevel:
+    Health: 6
+    Energy: 3
+    Luck: 0.05
+    Intelligence: 0.3
+    Strength: 2
+    Vitality: 0.8
+    Resistance: 0.5
+    Agility: 0.1
+
+- id: 9a6f3df3-75cd-48f8-9029-2143d4593872
+  name: Orc Screamchanter
+  description: An orc that screams loudly to do magic.
+
+  sprite: '0044'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 25
+    max: 30
+    multiplierPerLevel: 1
+
+  drops:
+    - itemId: Gold Coin
+      min: 10
+      max: 20
+      multiplierPerLevel: 1
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Cure I
+      weight: 2
+    - skillId: Holy Smite I
+      weight: 3
+
+  baseStats:
+    Health: 45
+    Energy: 30
+    Luck: 1
+    Intelligence: 10
+    Strength: 5
+    Vitality: 8
+    Resistance: 8
+    Agility: 1
+
+  statsPerLevel:
+    Health: 3
+    Energy: 5
+    Luck: 0.05
+    Intelligence: 2
+    Strength: 0.3
+    Vitality: 0.5
+    Resistance: 0.8
+    Agility: 0.1

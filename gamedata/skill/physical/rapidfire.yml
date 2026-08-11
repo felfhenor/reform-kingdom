@@ -1,0 +1,139 @@
+- id: 7a67e039-083a-4e6a-9aea-fffa7bbfdaf4
+  name: Rapidfire I
+  description: Shoot 4 arrows, doing a total of {{ value }} damage.
+
+  rarity: Common
+  sprite: '0021'
+
+  epCost: 7
+  usesPerCombat: 1
+
+  requiredWeaponTypes: [Bow]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.5
+        Agility: 0.5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.45
+        Agility: 0.45
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.4
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.35
+        Agility: 0.35
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: fdf36881-1a88-4a70-9d37-ebbd0e9074e4
+  name: Rapidfire II
+  description: Shoot 5 arrows, doing a total of {{ value }} damage.
+
+  rarity: Uncommon
+  sprite: '0021'
+
+  epCost: 14
+  usesPerCombat: 1
+
+  requiredWeaponTypes: [Bow]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.55
+        Agility: 0.55
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.5
+        Agility: 0.5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.45
+        Agility: 0.45
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.4
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.35
+        Agility: 0.35
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

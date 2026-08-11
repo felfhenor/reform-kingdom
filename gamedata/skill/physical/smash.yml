@@ -1,0 +1,65 @@
+- id: 4ea39a92-61f8-41dc-8e08-190e890c3425
+  name: Smashing Board I
+  description: Smash your shield into an enemy, dealing {{ value }} damage and inflicting Dazed on them.
+
+  rarity: Common
+  sprite: '0022'
+
+  epCost: 5
+  usesPerCombat: -1
+
+  requiredWeaponTypes: [Shield]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.7
+        Vitality: 0.5
+
+      statusEffects:
+        - statusEffectId: Dazed I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 2f1f280a-1e89-4a84-89d0-c1ac547ba3dd
+  name: Smashing Board II
+  description: Smash your shield into an enemy, dealing {{ value }} damage and inflicting Dazed on them.
+
+  rarity: Uncommon
+  sprite: '0022'
+
+  epCost: 8
+  usesPerCombat: -1
+
+  requiredWeaponTypes: [Shield]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1.2
+        Vitality: 0.9
+
+      statusEffects:
+        - statusEffectId: Dazed II
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

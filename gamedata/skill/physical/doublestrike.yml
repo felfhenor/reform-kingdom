@@ -19,7 +19,7 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 0.7
+        Strength: 0.9
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
@@ -44,6 +44,6 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 1.2
+        Strength: 1.9
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

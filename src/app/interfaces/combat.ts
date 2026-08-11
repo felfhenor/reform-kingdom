@@ -27,6 +27,7 @@ export type CombatantCombatStats = {
   damageReflectPercent: number;
   healingIgnorePercent: number;
   reviveChance: number;
+  stunChance: number;
 };
 
 export type CombatantTargettingType = 'Random' | 'Strongest' | 'Weakest';

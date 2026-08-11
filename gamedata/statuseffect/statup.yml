@@ -39,3 +39,45 @@
     - type: TakeDamageFromStat
       combatMessage: '**{{ combatant.name }}** has lost their vigor (-{{ damage }} Vitality)!'
       modifyStat: Vitality
+
+- id: 1d6b4698-c840-46f1-a4d1-e393f8fdaab5
+  name: Lucky I
+
+  effectType: Buff
+  elements: []
+
+  trigger: TurnStart
+
+  statScaling:
+    Luck: 30
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has been given great luck (+{{ damage }} Luck)!'
+      modifyStat: Luck
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has lost their great luck (-{{ damage }} Luck)!'
+      modifyStat: Luck
+
+- id: 22916bb4-62e9-4700-8e8b-437be3635c82
+  name: Lucky II
+
+  effectType: Buff
+  elements: []
+
+  trigger: TurnStart
+
+  statScaling:
+    Luck: 60
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has been given substantial luck (+{{ damage }} Luck)!'
+      modifyStat: Luck
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has lost their substantial luck (-{{ damage }} Luck)!'
+      modifyStat: Luck

@@ -1,0 +1,24 @@
+- id: 793628bf-21e5-469d-8d24-6c5684bee122
+  name: Red Slash I
+  description: Strike all combatants for {{ value }} damage.
+
+  rarity: Uncommon
+  sprite: '0015'
+
+  epCost: 10
+  usesPerCombat: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 25
+      targetType: All
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

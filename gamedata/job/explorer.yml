@@ -53,3 +53,19 @@
 
         - level: 6
           skillId: Analyze II
+
+    - pathName: Earthshake
+      levels:
+        - level: 2
+          skillId: Earthshake I
+
+        - level: 6
+          skillId: Earthshake II
+
+    - pathName: Lucky Charm
+      levels:
+        - level: 5
+          skillId: Lucky Charm I
+
+        - level: 17
+          skillId: Lucky Charm II

@@ -111,6 +111,19 @@ function combatantTakeTurn(
     return {};
   }
 
+  const isStunned = combatCombatantCombatStatSucceedsChance(
+    combatant,
+    'stunChance',
+  );
+
+  if (isStunned) {
+    combatMessageLog(
+      combat,
+      `**${combatant.name}** is stunned and loses their turn!`,
+    );
+    return {};
+  }
+
   const skills = combatAvailableSkillsForCombatant(combatant).filter(
     (s) =>
       combatGetPossibleCombatantTargetsForSkill(combat, combatant, s).length >

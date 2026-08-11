@@ -20,7 +20,7 @@
     Luck: 0
     Intelligence: 0.9
     Strength: 0.2
-    Vitality: 0.3
+    Vitality: 0.2
     Resistance: 0.5
     Agility: 0.4
 
@@ -58,8 +58,16 @@
 
     - pathName: Thunderbolt
       levels:
-        - level: 5
+        - level: 3
           skillId: Thunderbolt I
 
         - level: 11
           skillId: Thunderbolt II
+
+    - pathName: Frostfire Bolt
+      levels:
+        - level: 6
+          skillId: Frostfire Bolt I
+
+        - level: 15
+          skillId: Frostfire Bolt II

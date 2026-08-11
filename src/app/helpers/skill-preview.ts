@@ -7,7 +7,7 @@ import type {
   EquipmentSkillContentTechnique,
   GameStat,
 } from '@interfaces';
-import { sum } from 'es-toolkit/compat';
+import { sum, sumBy } from 'es-toolkit/compat';
 
 // Estimates a technique's outgoing heal/damage from the hero's current
 // stats and equipment - mirrors the live combat formula but skips
@@ -36,10 +36,12 @@ export function skillDescriptionWithPreview(
   character: Character,
   skill: EquipmentSkillContent,
 ): string {
-  const technique = skill.techniques[0];
-  if (!technique) return skill.description;
+  const techniques = skill.techniques;
+  if (techniques.length === 0) return skill.description;
 
-  const value = skillTechniquePreviewValue(character, skill, technique);
+  const value = sumBy(techniques, (technique) =>
+    skillTechniquePreviewValue(character, skill, technique),
+  );
 
   return combatFormatMessage(skill.description, { value });
 }

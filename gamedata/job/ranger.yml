@@ -52,3 +52,19 @@
 
         - level: 6
           skillId: Snipe II
+
+    - pathName: Rapidfire
+      levels:
+        - level: 3
+          skillId: Rapidfire I
+
+        - level: 10
+          skillId: Rapidfire II
+
+    - pathName: Arrow Rain
+      levels:
+        - level: 5
+          skillId: Arrow Rain I
+
+        - level: 15
+          skillId: Arrow Rain II

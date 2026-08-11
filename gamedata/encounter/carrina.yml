@@ -11,10 +11,10 @@
         - monsterId: Goblin
     - monsters:
         - monsterId: Goblin
-        - monsterId: Goblin Magician
+        - monsterId: Goblin
     - monsters:
         - monsterId: Goblin
-        - monsterId: Goblin Warrior
+        - monsterId: Goblin
         - monsterId: Goblin Warrior
 
   completionRewards:
@@ -38,8 +38,8 @@
   description: A dilapidated ruin in the forest, home to a small goblin tribe.
 
   levelRange:
-    min: 1
-    max: 3
+    min: 2
+    max: 5
 
   fights:
     - monsters:
@@ -169,7 +169,7 @@
 
   levelRange:
     min: 8
-    max: 12
+    max: 11
 
   fights:
     - monsters:
@@ -214,5 +214,153 @@
     - itemId: Gold Coin
       min: 150
       max: 200
+      multiplierPerLevel: 0
+      chance: 100
+
+- id: f98cf9b9-2060-4e50-80cf-a5cbc041905a
+  name: Copperpan Cave
+  description: A cave filled with goblins who seek copper to barter.
+
+  levelRange:
+    min: 2
+    max: 4
+
+  fights:
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin Magician
+        - monsterId: Goblin Magician
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Warrior
+
+  completionRewards:
+    - collectibleId: Copper Catcher
+      chance: 100
+
+    - itemId: Small Goblin Bone
+      min: 3
+      max: 5
+      multiplierPerLevel: 0
+      chance: 25
+
+    - itemId: Gold Coin
+      min: 100
+      max: 150
+      multiplierPerLevel: 0
+      chance: 100
+
+- id: be1a482f-5a94-4af9-b820-5a6c782900ff
+  name: S.S. Antigonus
+  description: A sailboat sunken and taken over by a hostile tribe of goblins.
+
+  levelRange:
+    min: 3
+    max: 6
+
+  fights:
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin Asura
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin Magician
+        - monsterId: Goblin Asura
+    - monsters:
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Asura
+        - monsterId: Goblin Asura
+
+  completionRewards:
+    - collectibleId: Salt Barrel
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 150
+      max: 200
+      multiplierPerLevel: 0
+      chance: 100
+
+- id: c405b6a7-bbf2-4b6a-b7cb-d22bd42aea82
+  name: Gobsilk Forest
+  description: A forest inhabited by a tribe of goblins that befriended spiders and learned to use their silk to make clothing.
+
+  levelRange:
+    min: 4
+    max: 7
+
+  fights:
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Spiderling
+        - monsterId: Spiderling
+    - monsters:
+        - monsterId: Goblin Magician
+        - monsterId: Goblin Warrior
+        - monsterId: Spiderling
+        - monsterId: Spiderling
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Goblin Magician
+        - monsterId: Spider
+        - monsterId: Spider
+    - monsters:
+        - monsterId: Goblin Warrior
+        - monsterId: Goblin Warrior
+        - monsterId: Spider
+        - monsterId: Spider
+        - monsterId: Spider
+
+  completionRewards:
+    - collectibleId: Gobweb
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 200
+      max: 250
+      multiplierPerLevel: 0
+      chance: 100
+
+- id: dedfdf96-94ff-4dcc-9f16-b046fe6a0d03
+  name: Copperorc Caves
+  description: A cave in the mountains, home to a tribe of orcs and goblins that use copper to make tools to gather more copper.
+
+  levelRange:
+    min: 9
+    max: 12
+
+  fights:
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Orc Smasher
+        - monsterId: Orc Screamchanter
+    - monsters:
+        - monsterId: Orc Smasher
+        - monsterId: Orc Smasher
+        - monsterId: Orc Smasher
+        - monsterId: Orc Screamchanter
+    - monsters:
+        - monsterId: Goblin
+        - monsterId: Goblin
+        - monsterId: Orc Screamchanter
+        - monsterId: Orc Screamchanter
+
+  completionRewards:
+    - collectibleId: Copper Pickaxe
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 300
+      max: 400
       multiplierPerLevel: 0
       chance: 100

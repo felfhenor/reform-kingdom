@@ -4,7 +4,7 @@
 
   levelRange:
     min: 1
-    max: 5
+    max: 3
 
   xpGainedIfInLevelRange: 3
   gatherTime: 5
@@ -39,7 +39,7 @@
 
   levelRange:
     min: 1
-    max: 5
+    max: 3
 
   xpGainedIfInLevelRange: 3
   gatherTime: 5
@@ -56,7 +56,7 @@
 
   levelRange:
     min: 1
-    max: 5
+    max: 3
 
   xpGainedIfInLevelRange: 3
   gatherTime: 5
