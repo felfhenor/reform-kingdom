@@ -63,4 +63,17 @@ module.exports = defineConfig([
       '@angular-eslint/template/label-has-associated-control': 'off',
     },
   },
+  {
+    // `scripts/**` isn't under any of the `@helpers`/`@interfaces`/etc.
+    // aliased directories, so `typescript-paths/absolute-import` has
+    // nothing valid to suggest for relative imports within it - it
+    // instead proposes a nonexistent path (e.g. rewriting `./types` to
+    // `@helpers/scripts/simulate/types`, which doesn't resolve to any real
+    // file). Disabled here since relative imports within `scripts/` have no
+    // aliasable equivalent to rewrite to.
+    files: ['scripts/**/*.ts'],
+    rules: {
+      'typescript-paths/absolute-import': 'off',
+    },
+  },
 ]);

@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "module": "commonjs",
+    "moduleResolution": "node"
+  },
+  "include": ["scripts/simulate/**/*.ts"]
+}
+

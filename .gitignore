@@ -57,4 +57,7 @@ electron/out
 # Generated schemas
 /schemas
 
+# Headless simulation tool output (scripts/simulate)
+/simulation-logs
+
 .claude
