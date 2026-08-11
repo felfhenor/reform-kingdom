@@ -1,5 +1,7 @@
+import { getEntry } from '@helpers/content';
 import { rngNumberRange } from '@helpers/rng';
-import type { MonsterContent } from '@interfaces';
+import type { EncounterFightMonster, MonsterContent } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 export function monsterXpReward(
   monster: MonsterContent,
@@ -37,4 +39,29 @@ export function xpForOverLevel(
     OVERLEVEL_XP_HARD_CAP_AMOUNT,
     Math.round(rawXp * multiplier),
   );
+}
+
+// De-dupes and resolves the monsters referenced across a node's fights (used
+// by both authored Encounters and generated ExploreRandom fights, which
+// share the same `{ monsters: EncounterFightMonster[] }` shape), sorted
+// alphabetically for display in the map node panel's monster tooltip.
+export function monstersFromFights(
+  fights: Array<{ monsters: EncounterFightMonster[] }>,
+): MonsterContent[] {
+  const seen = new Set<string>();
+  const monsters: MonsterContent[] = [];
+
+  fights.forEach((fight) => {
+    fight.monsters.forEach(({ monsterId }) => {
+      if (seen.has(monsterId)) return;
+
+      const monster = getEntry<MonsterContent>(monsterId);
+      if (!monster) return;
+
+      seen.add(monsterId);
+      monsters.push(monster);
+    });
+  });
+
+  return sortBy(monsters, (monster) => monster.name);
 }

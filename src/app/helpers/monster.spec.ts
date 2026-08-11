@@ -1,4 +1,9 @@
-import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
+import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import {
+  monstersFromFights,
+  monsterXpReward,
+  xpForOverLevel,
+} from '@helpers/monster';
 import type { EquipmentSkillId, ItemId, MonsterContent } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -78,6 +83,59 @@ describe('Monster Helper Functions', () => {
 
     it('should never degrade below 1 xp even for small raw amounts', () => {
       expect(xpForOverLevel(2, 8, 5)).toBe(1);
+    });
+  });
+
+  describe('monstersFromFights', () => {
+    const goblin: MonsterContent = { ...mockMonster, id: 'goblin' as MonsterContent['id'], name: 'Goblin' };
+    const wolf: MonsterContent = { ...mockMonster, id: 'wolf' as MonsterContent['id'], name: 'Wolf' };
+    const ant: MonsterContent = { ...mockMonster, id: 'ant' as MonsterContent['id'], name: 'Ant' };
+
+    it('resolves and sorts the monsters referenced across every fight alphabetically', () => {
+      setAllIdsByName(new Map());
+      setAllContentById(
+        new Map([
+          [goblin.id, goblin],
+          [wolf.id, wolf],
+          [ant.id, ant],
+        ]),
+      );
+
+      const fights = [
+        { monsters: [{ monsterId: wolf.id }, { monsterId: goblin.id }] },
+        { monsters: [{ monsterId: ant.id }] },
+      ];
+
+      expect(monstersFromFights(fights).map((monster) => monster.name)).toEqual([
+        'Ant',
+        'Goblin',
+        'Wolf',
+      ]);
+    });
+
+    it('de-dupes monsters that appear in multiple fights', () => {
+      setAllIdsByName(new Map());
+      setAllContentById(new Map([[goblin.id, goblin]]));
+
+      const fights = [
+        { monsters: [{ monsterId: goblin.id }] },
+        { monsters: [{ monsterId: goblin.id }] },
+      ];
+
+      expect(monstersFromFights(fights)).toEqual([goblin]);
+    });
+
+    it('skips monster ids with no matching content', () => {
+      setAllIdsByName(new Map());
+      setAllContentById(new Map());
+
+      expect(monstersFromFights([{ monsters: [{ monsterId: goblin.id }] }])).toEqual(
+        [],
+      );
+    });
+
+    it('returns an empty array when there are no fights', () => {
+      expect(monstersFromFights([])).toEqual([]);
     });
   });
 });

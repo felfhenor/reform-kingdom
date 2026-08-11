@@ -9,6 +9,7 @@ import type {
   GatheringId,
   ItemContent,
   ItemId,
+  MonsterContent,
   NodeOverrideContent,
   NodeOverrideId,
   RecipeContent,
@@ -40,6 +41,7 @@ import {
   worldNodeLevelRange,
   worldNodeMapsBuild,
   worldNodeMonsterCount,
+  worldNodeMonsters,
   worldNodeOverride,
   worldNodeSpriteFrame,
 } from '@helpers/world-nodes';
@@ -250,6 +252,53 @@ describe('encounter-backed node accessors', () => {
 
     it('returns undefined when there is no matching encounter', () => {
       expect(worldNodeMonsterCount(buildEntry())).toBeUndefined();
+    });
+  });
+
+  describe('worldNodeMonsters', () => {
+    function buildMonster(overrides: Partial<MonsterContent> = {}): MonsterContent {
+      return {
+        id: 'goblin',
+        name: 'Goblin',
+        __type: 'monster',
+        description: '',
+        sprite: '0000',
+        frames: 4,
+        rarity: 'Common',
+        baseStats: {} as never,
+        statsPerLevel: {} as never,
+        targettingType: 'Random',
+        xp: { min: 1, max: 1, multiplierPerLevel: 0 },
+        drops: [],
+        skills: [],
+        ...overrides,
+      } as MonsterContent;
+    }
+
+    it('resolves the distinct monsters across every fight, sorted alphabetically', () => {
+      const wolf = buildMonster({ id: 'wolf' as MonsterContent['id'], name: 'Wolf' });
+      const goblin = buildMonster({
+        id: 'goblin' as MonsterContent['id'],
+        name: 'Goblin',
+      });
+
+      const encounter = buildEncounter({
+        fights: [
+          { monsters: [{ monsterId: wolf.id }] },
+          { monsters: [{ monsterId: goblin.id }, { monsterId: goblin.id }] },
+        ],
+      });
+
+      seedContent([encounter, wolf, goblin]);
+
+      expect(worldNodeMonsters(buildEntry()).map((monster) => monster.name)).toEqual([
+        'Goblin',
+        'Wolf',
+      ]);
+    });
+
+    it('returns an empty array when there is no matching encounter', () => {
+      expect(worldNodeMonsters(buildEntry())).toEqual([]);
     });
   });
 

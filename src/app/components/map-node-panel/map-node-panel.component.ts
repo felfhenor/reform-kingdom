@@ -5,11 +5,13 @@ import {
   ElementRef,
   inject,
 } from '@angular/core';
+import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CompletionRewardSlotComponent } from '@components/completion-reward-slot/completion-reward-slot.component';
 import { GatherMaterialSlotComponent } from '@components/gather-material-slot/gather-material-slot.component';
 import { NodeSpriteComponent } from '@components/node-sprite/node-sprite.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TippyDirective } from '@ngneat/helipopper';
 import {
   canEnterGatherNode,
   canPartyTravel,
@@ -35,17 +37,20 @@ import {
   worldNodeLevelLabel,
   worldNodeLevelRange,
   worldNodeMonsterCount,
+  worldNodeMonsters,
 } from '@helpers';
 
 @Component({
   selector: 'app-map-node-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AtlasAnimationComponent,
     ButtonCloseComponent,
     CompletionRewardSlotComponent,
     GatherMaterialSlotComponent,
     NodeSpriteComponent,
     SFXDirective,
+    TippyDirective,
   ],
   templateUrl: './map-node-panel.component.html',
   styleUrl: './map-node-panel.component.scss',
@@ -72,6 +77,11 @@ export class MapNodePanelComponent {
   public monsterCount = computed(() => {
     const entry = this.node();
     return entry ? worldNodeMonsterCount(entry) : undefined;
+  });
+
+  public monsters = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeMonsters(entry) : [];
   });
 
   public description = computed(() => {

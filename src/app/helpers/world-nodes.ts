@@ -10,6 +10,7 @@ import {
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { allMaps, getMap } from '@helpers/maps';
 import { isMaterialDiscovered } from '@helpers/materials';
+import { monstersFromFights } from '@helpers/monster';
 import {
   isRecipeDiscovered,
   recipeResultContent,
@@ -29,6 +30,7 @@ import type {
   ItemContent,
   ItemId,
   MaterialId,
+  MonsterContent,
   NodeOverrideContent,
   RecipeContent,
   RewardContentInfo,
@@ -245,6 +247,13 @@ export function worldNodeMonsterCount(
 
   const fights = worldNodeExploreRandomFights(entry);
   return fights ? sumBy(fights, (fight) => fight.monsters.length) : undefined;
+}
+
+export function worldNodeMonsters(entry: WorldNodeEntry): MonsterContent[] {
+  const encounter = worldNodeEncounter(entry);
+  const fights = encounter ? encounter.fights : worldNodeExploreRandomFights(entry);
+
+  return fights ? monstersFromFights(fights) : [];
 }
 
 export function worldNodeGatherTime(entry: WorldNodeEntry): number | undefined {

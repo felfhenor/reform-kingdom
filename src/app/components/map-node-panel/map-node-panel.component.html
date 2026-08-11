@@ -15,7 +15,7 @@
         <div class="badge badge-outline">Level {{ levelLabel() }}</div>
 
         @let encounters = encounterCount();
-        @let monsters = monsterCount();
+        @let monsterCountValue = monsterCount();
         @let gatherSeconds = gatherTime();
         @let rewards = rewardProgress();
 
@@ -23,8 +23,14 @@
           <div class="badge badge-outline">{{ encounters }} Encounters</div>
         }
 
-        @if (monsters) {
-          <div class="badge badge-outline">{{ monsters }} Monsters</div>
+        @if (monsterCountValue) {
+          <div
+            class="badge badge-outline"
+            [tp]="monstersTooltip"
+            [tpPlacement]="'top'"
+          >
+            {{ monsterCountValue }} Monsters
+          </div>
         }
 
         @if (gatherSeconds) {
@@ -110,4 +116,22 @@
       }
     </div>
   </div>
+
+  <ng-template #monstersTooltip>
+    <div class="flex flex-col gap-2 p-2">
+      @for (monster of monsters(); track monster.id) {
+        <div class="flex items-center gap-2">
+          <app-atlas-animation
+            spritesheet="monster"
+            [assetName]="monster.sprite"
+            [frames]="monster.frames"
+            class="zoom-75"
+          />
+          <span class="font-bold text-{{ monster.rarity }}">
+            {{ monster.name }}
+          </span>
+        </div>
+      }
+    </div>
+  </ng-template>
 }
