@@ -19,7 +19,7 @@
   levelRequirement: 4
   rarity: Common
   type: Shield
-  sprite: '0011'
+  sprite: '0048'
   slots: 1
   baseStats:
     Vitality: 1.1
