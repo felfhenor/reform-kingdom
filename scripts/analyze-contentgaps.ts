@@ -71,7 +71,6 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -230,16 +229,23 @@ async function main(): Promise<void> {
 
   console.log('=== analyze:contentgaps ===\n');
 
-  const [items, equipment, monsters, encounters, encounterRandoms, gatherings, recipes] =
-    await Promise.all([
-      loadContentType('item'),
-      loadContentType('equipment'),
-      loadContentType('monster'),
-      loadContentType('encounter'),
-      loadContentType('encounterrandom'),
-      loadContentType('gathering'),
-      loadContentType('recipe'),
-    ]);
+  const [
+    items,
+    equipment,
+    monsters,
+    encounters,
+    encounterRandoms,
+    gatherings,
+    recipes,
+  ] = await Promise.all([
+    loadContentType('item'),
+    loadContentType('equipment'),
+    loadContentType('monster'),
+    loadContentType('encounter'),
+    loadContentType('encounterrandom'),
+    loadContentType('gathering'),
+    loadContentType('recipe'),
+  ]);
 
   console.log(
     `Loaded ${items.length} item(s), ${equipment.length} equipment(s), ${monsters.length} monster(s).`,
@@ -249,7 +255,11 @@ async function main(): Promise<void> {
   );
 
   // --- Top content level ---
-  const nodeRanges: LevelRange[] = [...encounters, ...encounterRandoms, ...gatherings]
+  const nodeRanges: LevelRange[] = [
+    ...encounters,
+    ...encounterRandoms,
+    ...gatherings,
+  ]
     .map((n) => n.levelRange)
     .filter(Boolean);
   const maxContentLevel = Math.max(0, ...nodeRanges.map((r) => r.max));
@@ -457,7 +467,8 @@ async function main(): Promise<void> {
   // grants Intelligence, the other Strength) - that's two distinct,
   // legitimate choices, not a sidegrade.
   const infusableItems = items.filter((item) =>
-    ALL_STATS.some((stat) => isInfusionStat(item, stat)));
+    ALL_STATS.some((stat) => isInfusionStat(item, stat)),
+  );
 
   const byStatBlock = new Map<string, string[]>();
   infusableItems.forEach((item) => {
@@ -554,7 +565,6 @@ async function main(): Promise<void> {
   console.log(
     `${equipmentProblems.length} equipment coverage problem(s), ${infusionProblems.length} infusion problem(s), ${recipeProblems.length} tradeskill recipe problem(s) - ${totalProblems} total.`,
   );
-  console.log('(this is an analysis tool, not a CI gate - exiting 0 regardless)');
 }
 
 main();
