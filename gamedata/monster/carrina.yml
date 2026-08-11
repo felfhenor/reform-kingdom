@@ -23,7 +23,7 @@
 
     - itemId: Small Goblin Bone
       min: 1
-      max: 2
+      max: 1
       multiplierPerLevel: 0
       chance: 5
 
@@ -31,7 +31,7 @@
       min: 1
       max: 1
       multiplierPerLevel: 0
-      chance: 8
+      chance: 3
 
   skills:
     - skillId: Attack
@@ -74,6 +74,12 @@
     multiplierPerLevel: 1
 
   drops:
+    - itemId: Small Goblin Bone
+      min: 1
+      max: 2
+      multiplierPerLevel: 0
+      chance: 15
+
     - itemId: Gold Coin
       min: 5
       max: 15
@@ -125,6 +131,12 @@
     multiplierPerLevel: 1
 
   drops:
+    - itemId: Small Goblin Bone
+      min: 1
+      max: 2
+      multiplierPerLevel: 0
+      chance: 10
+
     - itemId: Gold Coin
       min: 5
       max: 15
@@ -174,6 +186,12 @@
     multiplierPerLevel: 1
 
   drops:
+    - itemId: Small Asura Tendon
+      min: 1
+      max: 2
+      multiplierPerLevel: 0
+      chance: 10
+
     - itemId: Gold Coin
       min: 1
       max: 5
@@ -531,6 +549,12 @@
     multiplierPerLevel: 1
 
   drops:
+    - itemId: Orc Bone
+      min: 1
+      max: 2
+      multiplierPerLevel: 0
+      chance: 100
+
     - itemId: Gold Coin
       min: 10
       max: 20
@@ -582,6 +606,12 @@
     multiplierPerLevel: 1
 
   drops:
+    - itemId: Orc Bone
+      min: 1
+      max: 1
+      multiplierPerLevel: 0
+      chance: 100
+
     - itemId: Gold Coin
       min: 10
       max: 20

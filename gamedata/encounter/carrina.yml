@@ -250,6 +250,12 @@
       multiplierPerLevel: 0
       chance: 25
 
+    - itemId: Copper Ore
+      min: 2
+      max: 3
+      multiplierPerLevel: 0
+      chance: 75
+
     - itemId: Gold Coin
       min: 100
       max: 150
@@ -331,7 +337,7 @@
       chance: 100
 
 - id: dedfdf96-94ff-4dcc-9f16-b046fe6a0d03
-  name: Copperorc Caves
+  name: Copperorc Retreat
   description: A cave in the mountains, home to a tribe of orcs and goblins that use copper to make tools to gather more copper.
 
   levelRange:
@@ -364,3 +370,9 @@
       max: 400
       multiplierPerLevel: 0
       chance: 100
+
+    - itemId: Copper Ingot
+      min: 2
+      max: 3
+      multiplierPerLevel: 0
+      chance: 75

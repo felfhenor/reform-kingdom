@@ -18,6 +18,28 @@
   infusionStats:
     Vitality: 1
 
+- id: e2c121b8-a5e3-4945-9208-03b7aa057488
+  name: Small Asura Tendon
+  description: An intact tendon taken from a goblin asura corpse.
+  rarity: Uncommon
+
+  sprite: '0020'
+
+  infusionStats:
+    Vitality: 0.75
+    Strength: 0.75
+
+- id: c4a260f5-267f-46be-929a-b9d81afb59b4
+  name: Orc Bone
+  description: A rigid bone taken from the corpse of an orc.
+  rarity: Uncommon
+
+  sprite: '0021'
+
+  infusionStats:
+    Vitality: 1.5
+    Resistance: 1.5
+
 - id: a772f99a-b19f-44c6-af97-823ed8dabc64
   name: Green Slime Core
   description: A magical slime core taken from a green slime.
@@ -26,8 +48,8 @@
   sprite: '0011'
 
   infusionStats:
-    Vitality: 1
-    Intelligence: 2
+    Vitality: 0.5
+    Intelligence: 1.25
 
 - id: 877798fc-a346-4576-9be5-870299388440
   name: Red Slime Core
@@ -37,8 +59,8 @@
   sprite: '0012'
 
   infusionStats:
-    Vitality: 1
-    Strength: 2
+    Vitality: 0.5
+    Strength: 1.25
 
 - id: a1d7d9e4-c1e1-41ab-95ed-0beebea4cacc
   name: Purple Slime Core
@@ -48,8 +70,8 @@
   sprite: '0013'
 
   infusionStats:
-    Vitality: 2
-    Resistance: 2
+    Vitality: 1.25
+    Resistance: 1.25
 
 - id: e342c641-e459-4a62-a7dd-278e39c0213b
   name: Weak Spider Silk
