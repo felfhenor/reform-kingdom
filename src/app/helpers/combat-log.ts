@@ -37,6 +37,7 @@ export function combatMessageLog(
   combat: Combat,
   message: string,
   actor?: Combatant,
+  colorOverride?: string,
 ): void {
   const newLog: CombatLog = {
     kind: 'Combat',
@@ -49,6 +50,7 @@ export function combatMessageLog(
     sprite: actor?.sprite,
     hp: actor?.hp,
     maxHp: actor?.totalStats.Health,
+    colorOverride,
   };
 
   pendingCombatLogMessages.unshift(newLog);

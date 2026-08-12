@@ -25,6 +25,7 @@ export class PlayAdventureLogComponent {
   public timestampTooltip = adventureLogTimestampTooltip;
 
   public messageColor(entry: CombatLog): string {
+    if (entry.colorOverride) return entry.colorOverride;
     if (entry.hp === undefined || !entry.maxHp) return '';
     return combatLogHealthColor(entry.hp, entry.maxHp);
   }

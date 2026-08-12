@@ -213,7 +213,8 @@ function combatHandleStatusEffectBehaviors(
 
   if (!suppressMessages && behavior.combatMessage) {
     const message = combatFormatMessage(behavior.combatMessage, templateData);
-    combatMessageLog(combat, message, combatant);
+    const color = effect.effectType === 'Buff' ? 'text-buff' : 'text-debuff';
+    combatMessageLog(combat, message, combatant, color);
   }
 }
 

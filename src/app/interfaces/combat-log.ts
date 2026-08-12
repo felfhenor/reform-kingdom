@@ -18,4 +18,5 @@ export type CombatLog = {
   sprite?: string;
   hp?: number;
   maxHp?: number;
+  colorOverride?: string;
 };
