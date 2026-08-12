@@ -669,9 +669,9 @@
     Energy: 25
     Luck: 1
     Intelligence: 10
-    Strength: 15
-    Vitality: 10
-    Resistance: 14
+    Strength: 12
+    Vitality: 7
+    Resistance: 5
     Agility: 19
 
   statsPerLevel:
@@ -679,8 +679,8 @@
     Energy: 3
     Luck: 1
     Intelligence: 0.3
-    Strength: 1.5
-    Vitality: 1
+    Strength: 0.5
+    Vitality: 0.5
     Resistance: 0.75
     Agility: 1.1
 
@@ -719,20 +719,20 @@
     Health: 45
     Energy: 35
     Luck: 1
-    Intelligence: 10
-    Strength: 23
-    Vitality: 20
-    Resistance: 12
+    Intelligence: 5
+    Strength: 10
+    Vitality: 5
+    Resistance: 7
     Agility: 12
 
   statsPerLevel:
     Health: 8
     Energy: 4
-    Luck: 1
-    Intelligence: 0.3
-    Strength: 1.75
-    Vitality: 1.25
-    Resistance: 0.75
+    Luck: 0.5
+    Intelligence: 0.2
+    Strength: 0.75
+    Vitality: 0.45
+    Resistance: 0.25
     Agility: 0.9
 
 - id: 9f3de631-8f5c-4cdd-8ac0-70f1728cd7c6
@@ -761,9 +761,9 @@
   skills:
     - skillId: Attack
       weight: 1
-    - skillId: Starshine II
+    - skillId: Starshine I
       weight: 3
-    - skillId: Thunderbolt II
+    - skillId: Thunderbolt I
       weight: 4
     - skillId: Fortify I
       weight: 2
@@ -772,20 +772,20 @@
     Health: 45
     Energy: 50
     Luck: 1
-    Intelligence: 10
+    Intelligence: 12
     Strength: 5
-    Vitality: 15
-    Resistance: 20
+    Vitality: 5
+    Resistance: 10
     Agility: 10
 
   statsPerLevel:
     Health: 5
     Energy: 3
-    Luck: 1
-    Intelligence: 1
-    Strength: 0.5
-    Vitality: 1.1
-    Resistance: 1.2
+    Luck: 0.5
+    Intelligence: 0.75
+    Strength: 0.25
+    Vitality: 0.35
+    Resistance: 0.55
     Agility: 0.3
 
 - id: 870cb550-2f9b-466f-b95c-183583dca9ab
@@ -817,19 +817,19 @@
     Energy: 5
     Luck: 1
     Intelligence: 10
-    Strength: 35
-    Vitality: 10
-    Resistance: 20
+    Strength: 15
+    Vitality: 5
+    Resistance: 5
     Agility: 20
 
   statsPerLevel:
     Health: 5
     Energy: 3
-    Luck: 2
+    Luck: 0.3
     Intelligence: 1
-    Strength: 2
+    Strength: 1
     Vitality: 1
-    Resistance: 2
+    Resistance: 0.5
     Agility: 2
 
 - id: 2e79261c-528d-43c3-ae4f-1c760bb217d4
@@ -858,11 +858,9 @@
   skills:
     - skillId: Attack
       weight: 1
-    - skillId: Snipe II
+    - skillId: Snipe I
       weight: 3
-    - skillId: Rapidfire I
-      weight: 2
-    - skillId: Sweep II
+    - skillId: Arrow Rain II
       weight: 2
     - skillId: Thunderbolt II
       weight: 2
@@ -871,10 +869,10 @@
     Health: 250
     Energy: 75
     Luck: 1
-    Intelligence: 20
-    Strength: 20
-    Vitality: 20
-    Resistance: 20
+    Intelligence: 15
+    Strength: 15
+    Vitality: 10
+    Resistance: 15
     Agility: 15
 
   statsPerLevel:

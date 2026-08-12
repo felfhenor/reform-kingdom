@@ -175,7 +175,7 @@ function combatantTakeTurn(
       if (shouldMiss) {
         combatMessageLog(
           combat,
-          `**${chosenSkill.name}** misses **${target.name}**!`,
+          `**${combatant.name}**'s **${chosenSkill.name}** misses **${target.name}**!`,
         );
         return;
       }

@@ -24,7 +24,7 @@
         Strength: 0.5
         Agility: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -36,7 +36,7 @@
         Strength: 0.45
         Agility: 0.45
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -48,7 +48,7 @@
         Strength: 0.4
         Agility: 0.4
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -60,7 +60,7 @@
         Strength: 0.35
         Agility: 0.35
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: fdf36881-1a88-4a70-9d37-ebbd0e9074e4
   name: Rapidfire II
@@ -88,7 +88,7 @@
         Strength: 0.55
         Agility: 0.55
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -100,7 +100,7 @@
         Strength: 0.5
         Agility: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -112,7 +112,7 @@
         Strength: 0.45
         Agility: 0.45
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -124,7 +124,7 @@
         Strength: 0.4
         Agility: 0.4
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -136,4 +136,4 @@
         Strength: 0.35
         Agility: 0.35
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -201,7 +201,7 @@ export function combatApplySkillToTarget(
 
   if (technique.combatMessage) {
     const message = combatFormatMessage(technique.combatMessage, templateData);
-    const critSuffix = isCriticalHit ? ' **Critical Hit!**' : '';
+    const critSuffix = isCriticalHit ? ' **Critical hit (2x)!**' : '';
     combatMessageLog(combat, `${message}${critSuffix}`, target);
   }
 

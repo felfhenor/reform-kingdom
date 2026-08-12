@@ -407,16 +407,12 @@
     - monsters:
         - monsterId: Elf Archer
         - monsterId: Hawk
-        - monsterId: Elf Druid
     - monsters:
-        - monsterId: Elf Druid
         - monsterId: Elf Druid
         - monsterId: Elf Archer
         - monsterId: Hawk
     - monsters:
         - monsterId: Elf Druid
-        - monsterId: Elf Druid
-        - monsterId: Elf Archer
         - monsterId: Elf Archer
         - monsterId: Hawk
         - monsterId: Hawk
@@ -446,18 +442,14 @@
 
   fights:
     - monsters:
-        - monsterId: Elf Archer
         - monsterId: Hawk
         - monsterId: Elf Scout
     - monsters:
-        - monsterId: Elf Scout
         - monsterId: Elf Scout
         - monsterId: Elf Archer
         - monsterId: Hawk
     - monsters:
         - monsterId: Elf Scout
-        - monsterId: Elf Scout
-        - monsterId: Elf Archer
         - monsterId: Elf Archer
         - monsterId: Hawk
         - monsterId: Hawk
@@ -478,7 +470,7 @@
       chance: 100
 
 - id: c31d693b-7018-4cae-897c-b7a1435d76b7
-  name: Elven Training Ground
+  name: Elven Training Grounds
   description: A hidden training ground where elves grow into stronger versions of themselves. There are always elves training here.
 
   hidden: true
