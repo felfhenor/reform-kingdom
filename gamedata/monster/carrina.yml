@@ -866,7 +866,7 @@
       weight: 2
 
   baseStats:
-    Health: 250
+    Health: 300
     Energy: 75
     Luck: 1
     Intelligence: 15
