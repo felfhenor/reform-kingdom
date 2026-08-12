@@ -435,3 +435,44 @@
       min: 300
       max: 400
       chance: 100
+
+- id: 0ceb0531-c96d-48b5-b920-1c5556542df4
+  name: Elven River Camp
+  description: A camp by the Carrina river, inhabited by elves. They don't take kindly to non-elves approaching.
+
+  levelRange:
+    min: 13
+    max: 17
+
+  fights:
+    - monsters:
+        - monsterId: Elf Archer
+        - monsterId: Hawk
+        - monsterId: Elf Scout
+    - monsters:
+        - monsterId: Elf Scout
+        - monsterId: Elf Scout
+        - monsterId: Elf Archer
+        - monsterId: Hawk
+    - monsters:
+        - monsterId: Elf Scout
+        - monsterId: Elf Scout
+        - monsterId: Elf Archer
+        - monsterId: Elf Archer
+        - monsterId: Hawk
+        - monsterId: Hawk
+
+  completionRewards:
+    - collectibleId: Elven Dowsing Bangle
+      chance: 100
+
+    - equipmentId: Elvenwood Dagger
+      chance: 10
+
+    - equipmentId: Elvenwood Spear
+      chance: 10
+
+    - itemId: Gold Coin
+      min: 500
+      max: 650
+      chance: 100

@@ -633,6 +633,57 @@
     Resistance: 0.8
     Agility: 0.1
 
+- id: 8645273c-e5ca-4f55-bde6-840b78d5b2e0
+  name: Elf Scout
+  description: A stealthy elven scout that excels in ambushes.
+
+  sprite: '0060'
+  frames: 4
+
+  targettingType: Weakest
+
+  rarity: Common
+
+  xp:
+    min: 25
+    max: 30
+    bonusPerLevel: 5
+
+  drops:
+    - itemId: Gold Coin
+      min: 50
+      max: 65
+      bonusPerLevel: 5
+      chance: 75
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Analyze II
+      weight: 2
+    - skillId: Smashing Board I
+      weight: 2
+
+  baseStats:
+    Health: 35
+    Energy: 25
+    Luck: 1
+    Intelligence: 10
+    Strength: 15
+    Vitality: 10
+    Resistance: 14
+    Agility: 19
+
+  statsPerLevel:
+    Health: 5
+    Energy: 3
+    Luck: 1
+    Intelligence: 0.3
+    Strength: 1.5
+    Vitality: 1
+    Resistance: 0.75
+    Agility: 1.1
+
 - id: a8fe08d0-ee0f-45b2-a9ba-9643b6dd277b
   name: Elf Archer
   description: A very dextrous elf that's very dangerous with bows.

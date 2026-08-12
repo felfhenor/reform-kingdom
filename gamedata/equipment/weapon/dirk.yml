@@ -27,3 +27,16 @@
     Vitality: 1
     Intelligence: 1.2
     Energy: 5
+
+- id: 53105ffc-709e-4f62-9369-dc76eac96d27
+  name: Elvenwood Axe
+  description: A beautifully carved handaxe made of elven wood.
+  levelRequirement: 12
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0057'
+  slots: 1
+  baseStats:
+    Agility: 2.8
+    Vitality: 1.5
+    Energy: 10

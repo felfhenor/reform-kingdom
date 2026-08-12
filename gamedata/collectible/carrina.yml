@@ -69,3 +69,15 @@
   rarity: Common
   description: A leaf emblem held by elves to symbolize their unity with the forest.
   sprite: '0017'
+
+- id: 9945c3ba-0403-4a23-a026-835ddab17f28
+  name: Elven Dowsing Bangle
+  rarity: Common
+  description: A bangle used by elven scouts to help find their way.
+  sprite: '0018'
+
+- id: 65f6ccda-b075-4361-88f6-512a753c6d62
+  name: Hawk Feathers
+  rarity: Uncommon
+  description: Feathers from a hawk trained by elves in their secret training grounds.
+  sprite: '0019'
