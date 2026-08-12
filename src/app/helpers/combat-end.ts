@@ -171,7 +171,6 @@ function handleCombatVictory(combat: Combat): boolean {
 
 export function combatHandleDefeat(combat: Combat): void {
   combatMessageLog(combat, 'Heroes have lost the combat!');
-  combatMessageLog(combat, 'The fallen party awaits recall to the kingdom.');
 
   syncPartyHpFromCombat(combat.heroes);
   autoModeRecordClauseFailure();

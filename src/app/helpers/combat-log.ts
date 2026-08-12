@@ -15,18 +15,35 @@ import mustache from 'mustache';
 
 export const combatLog = localStorageSignal<CombatLog[]>('combatLog', []);
 
-let pendingCombatLogMessages: CombatLog[] = [];
+// While a batch is open (between `beginCombatLogCommits`/`endCombatLogCommits`),
+// every log entry - not just `combatMessageLog` ones - must be deferred into
+// `pendingCombatLogMessages` rather than written straight to the `combatLog`
+// signal. Writing straight through mid-batch (e.g. a `travelMessageLog` call
+// nested inside combat defeat handling) would insert that entry into the
+// signal before the batch's own entries are flushed, displacing it from its
+// true chronological position relative to the rest of the batch.
+let pendingCombatLogMessages: CombatLog[] | null = null;
 
 export function beginCombatLogCommits() {
   pendingCombatLogMessages = [];
 }
 
 export function endCombatLogCommits() {
-  combatLog.update((logs) =>
-    [...pendingCombatLogMessages, ...logs].slice(0, 500),
-  );
+  if (!pendingCombatLogMessages) return;
 
-  pendingCombatLogMessages = [];
+  const batch = pendingCombatLogMessages;
+  pendingCombatLogMessages = null;
+
+  combatLog.update((logs) => [...batch, ...logs].slice(0, 500));
+}
+
+function pushLogEntry(entry: CombatLog): void {
+  if (pendingCombatLogMessages) {
+    pendingCombatLogMessages.unshift(entry);
+    return;
+  }
+
+  combatLog.update((logs) => [entry, ...logs].slice(0, 500));
 }
 
 export function combatFormatMessage(template: string, props: unknown): string {
@@ -39,7 +56,7 @@ export function combatMessageLog(
   actor?: Combatant,
   colorOverride?: string,
 ): void {
-  const newLog: CombatLog = {
+  pushLogEntry({
     kind: 'Combat',
     combatId: combat.id,
     messageId: rngUuid(),
@@ -51,45 +68,37 @@ export function combatMessageLog(
     hp: actor?.hp,
     maxHp: actor?.totalStats.Health,
     colorOverride,
-  };
-
-  pendingCombatLogMessages.unshift(newLog);
+  });
 }
 
 export function travelMessageLog(locationName: string, message: string): void {
-  const newLog: CombatLog = {
+  pushLogEntry({
     kind: 'Travel',
     messageId: rngUuid(),
     timestamp: Date.now(),
     locationName,
     message,
-  };
-
-  combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
+  });
 }
 
 export function gatherMessageLog(locationName: string, message: string): void {
-  const newLog: CombatLog = {
+  pushLogEntry({
     kind: 'Gather',
     messageId: rngUuid(),
     timestamp: Date.now(),
     locationName,
     message,
-  };
-
-  combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
+  });
 }
 
 export function craftMessageLog(locationName: string, message: string): void {
-  const newLog: CombatLog = {
+  pushLogEntry({
     kind: 'Craft',
     messageId: rngUuid(),
     timestamp: Date.now(),
     locationName,
     message,
-  };
-
-  combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
+  });
 }
 
 // Colors an item's name by its rarity for adventure log messages (e.g. combat
@@ -144,20 +153,18 @@ export function recipeDropHtml(recipe: RecipeContent): string {
 }
 
 export function miscellaneousMessageLog(message: string): void {
-  const newLog: CombatLog = {
+  pushLogEntry({
     kind: 'Miscellaneous',
     messageId: rngUuid(),
     timestamp: Date.now(),
     locationName: 'Miscellaneous',
     message,
-  };
-
-  combatLog.update((logs) => [newLog, ...logs].slice(0, 500));
+  });
 }
 
 export function combatLogReset(): void {
   combatLog.set([]);
-  pendingCombatLogMessages = [];
+  pendingCombatLogMessages = null;
 }
 
 export function combatLogHealthColor(
