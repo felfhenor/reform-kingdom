@@ -78,7 +78,11 @@
             placeholder="Material"
             [ngModel]="draftMaterialId()"
             (change)="setDraftMaterialId($event)"
-          ></ng-select>
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <app-reward-option [reward]="item" />
+            </ng-template>
+          </ng-select>
 
           <input
             type="number"
@@ -104,10 +108,12 @@
           >
             <ng-template ng-option-tmp let-item="item">
               <div class="flex items-center gap-2">
-                <app-node-sprite [entry]="item.entry" />
+                <app-node-sprite class="zoom-50" [entry]="item.entry" />
                 <div>
                   <div class="font-semibold text-sm">{{ item.nodeName }}</div>
-                  <div class="text-xs opacity-70">Lv. {{ item.levelLabel }}</div>
+                  <div class="text-xs opacity-70">
+                    Lv. {{ item.levelLabel }}
+                  </div>
                 </div>
               </div>
             </ng-template>

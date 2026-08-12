@@ -40,6 +40,7 @@ import type {
   FarmNodeRewardOption,
   ItemContent,
   MaterialId,
+  RewardContentInfo,
 } from '@interfaces';
 import {
   NgOptionTemplateDirective,
@@ -50,19 +51,27 @@ import { sortBy } from 'es-toolkit/compat';
 const CLAUSE_TYPE_OPTIONS: {
   value: DecreeClauseAction['type'];
   label: string;
-}[] = [
-  { value: 'GatherMaterial', label: 'Gather Material' },
-  { value: 'FarmNode', label: 'Farm Node' },
-  { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
-  { value: 'LevelUpParty', label: 'Level Up Party' },
-  { value: 'ReturnToKingdom', label: 'Return to Kingdom' },
-];
+}[] = sortBy(
+  [
+    { value: 'GatherMaterial', label: 'Gather Material' },
+    { value: 'FarmNode', label: 'Farm Node' },
+    { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
+    { value: 'LevelUpParty', label: 'Level Up Party' },
+    { value: 'ReturnToKingdom', label: 'Return to Kingdom' },
+  ],
+  'label',
+);
 
 type RiskToleranceOption = {
   value: DecreeRiskLevel;
   label: string;
   description: string;
 };
+
+// Reward-shaped view of a gatherable material, so the Gather Material
+// picker's option template can reuse `app-reward-option` instead of
+// duplicating its icon+name row.
+type MaterialOption = RewardContentInfo & { id: MaterialId };
 
 const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   {
@@ -107,11 +116,17 @@ export class GamePlayDecreeComponent {
   public readonly clauseTypeOptions = CLAUSE_TYPE_OPTIONS;
   public readonly riskToleranceOptions = RISK_TOLERANCE_OPTIONS;
 
-  public materialOptions = computed(() =>
+  public materialOptions = computed<MaterialOption[]>(() =>
     sortBy(
       gatherableMaterialIds()
         .map((id) => getEntry<ItemContent>(id))
-        .filter((item): item is ItemContent => !!item),
+        .filter((item): item is ItemContent => !!item)
+        .map((item) => ({
+          id: item.id as MaterialId,
+          name: item.name,
+          sprite: item.sprite,
+          spritesheet: 'item',
+        })),
       (item) => item.name,
     ),
   );
@@ -135,9 +150,7 @@ export class GamePlayDecreeComponent {
   // rather than the reward identity object itself, so it can drive a plain
   // ng-select `bindValue` the same way `draftMaterialId` does for GatherMaterial.
   public selectedRewardOption = computed(() =>
-    this.rewardOptions().find(
-      (option) => option.key === this.draftRewardKey(),
-    ),
+    this.rewardOptions().find((option) => option.key === this.draftRewardKey()),
   );
 
   // GatherMaterial and FarmNode clauses have parameters worth editing in
@@ -225,8 +238,8 @@ export class GamePlayDecreeComponent {
     this.draftType.set(option.value);
   }
 
-  public setDraftMaterialId(item: ItemContent | null): void {
-    this.draftMaterialId.set(item ? (item.id as MaterialId) : undefined);
+  public setDraftMaterialId(option: MaterialOption | null): void {
+    this.draftMaterialId.set(option ? option.id : undefined);
   }
 
   public setDraftNodeName(option: { nodeName: string } | null): void {

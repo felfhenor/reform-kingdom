@@ -13,7 +13,7 @@ import type { RewardContentInfo } from '@interfaces';
   imports: [AtlasImageComponent],
   template: `
     <app-atlas-image
-      class="zoom-25"
+      class="zoom-50"
       [spritesheet]="reward().spritesheet"
       [assetName]="reward().sprite"
     />
