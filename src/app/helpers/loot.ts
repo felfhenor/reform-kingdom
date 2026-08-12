@@ -1,3 +1,4 @@
+import { rangeAtLevel } from '@helpers/leveled-range';
 import { rngNumberRange } from '@helpers/rng';
 import type { DroppedReward, ResolvedDrop } from '@interfaces';
 
@@ -20,11 +21,8 @@ function resolveDrop(
     return { recipeId: drop.recipeId };
   }
 
-  const levelBonus = drop.multiplierPerLevel * (level - 1);
-  const quantity = rngNumberRange(
-    drop.min + levelBonus,
-    drop.max + levelBonus + 1,
-  );
+  const range = rangeAtLevel(drop, level);
+  const quantity = rngNumberRange(range.min, range.max + 1);
   if (quantity <= 0) return undefined;
 
   return { itemId: drop.itemId, quantity };

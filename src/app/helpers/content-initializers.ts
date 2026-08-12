@@ -201,7 +201,7 @@ function ensureDroppedReward(
     itemId: reward.itemId ?? ('UNKNOWN' as ItemId),
     min: reward.min ?? 0,
     max: reward.max ?? 0,
-    multiplierPerLevel: reward.multiplierPerLevel ?? 1,
+    bonusPerLevel: reward.bonusPerLevel,
     chance: reward.chance ?? 0,
   };
 }
@@ -227,7 +227,7 @@ function ensureMonster(
     statsPerLevel: ensureStats(monster.statsPerLevel),
     targettingType: monster.targettingType ?? 'Random',
     rarity: monster.rarity ?? 'Common',
-    xp: monster.xp ?? { min: 0, max: 0, multiplierPerLevel: 1 },
+    xp: monster.xp ?? { min: 0, max: 0 },
     drops: ensureArray(monster.drops, ensureDroppedReward),
     skills: ensureArray(monster.skills, ensureMonsterSkill),
   };

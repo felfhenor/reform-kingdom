@@ -133,7 +133,7 @@ describe('farmNodeRewardOptions', () => {
     const entry = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
-      { itemId: 'bone' as ItemId, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+      { itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
     ]);
     vi.mocked(rewardContentInfo).mockReturnValue({
       name: 'Bone',
@@ -156,7 +156,7 @@ describe('farmNodeRewardOptions', () => {
     const entry = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
-      { itemId: 'unknown' as ItemId, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+      { itemId: 'unknown' as ItemId, min: 1, max: 1, chance: 100 },
     ]);
     vi.mocked(rewardContentInfo).mockReturnValue(undefined);
 
@@ -168,7 +168,7 @@ describe('farmNodeRewardOptions', () => {
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
       { recipeId: 'equipment-cloak' as never, chance: 25 },
-      { itemId: 'bone' as ItemId, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+      { itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
     ]);
     vi.mocked(rewardContentInfo).mockReturnValue({
       name: 'Bone',

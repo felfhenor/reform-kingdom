@@ -4,7 +4,7 @@
 
   levelRange:
     min: 1
-    max: 1
+    max: 2
 
   fights:
     - monsters:
@@ -24,13 +24,11 @@
     - itemId: Gold Coin
       min: 25
       max: 50
-      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Small Goblin Bone
       min: 3
       max: 5
-      multiplierPerLevel: 0
       chance: 25
 
     - equipmentId: Gobskull Charm
@@ -68,13 +66,11 @@
     - itemId: Gold Coin
       min: 25
       max: 50
-      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Small Goblin Bone
       min: 3
       max: 5
-      multiplierPerLevel: 0
       chance: 25
 
     - equipmentId: Goblin Skull
@@ -126,7 +122,6 @@
     - itemId: Gold Coin
       min: 100
       max: 125
-      multiplierPerLevel: 0
       chance: 100
 
 - id: def818a1-e9b4-462a-a108-4544d388ba4f
@@ -163,7 +158,6 @@
     - itemId: Gold Coin
       min: 150
       max: 200
-      multiplierPerLevel: 0
       chance: 100
 
 - id: 1c711838-085f-4be3-b1cb-2d672f8b4660
@@ -217,7 +211,6 @@
     - itemId: Gold Coin
       min: 150
       max: 200
-      multiplierPerLevel: 0
       chance: 100
 
 - id: f98cf9b9-2060-4e50-80cf-a5cbc041905a
@@ -256,19 +249,16 @@
     - itemId: Small Goblin Bone
       min: 3
       max: 5
-      multiplierPerLevel: 0
       chance: 25
 
     - itemId: Copper Ore
       min: 2
       max: 3
-      multiplierPerLevel: 0
       chance: 75
 
     - itemId: Gold Coin
       min: 100
       max: 150
-      multiplierPerLevel: 0
       chance: 100
 
 - id: be1a482f-5a94-4af9-b820-5a6c782900ff
@@ -309,13 +299,11 @@
     - itemId: Wergen Wood
       min: 3
       max: 5
-      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Gold Coin
       min: 150
       max: 200
-      multiplierPerLevel: 0
       chance: 100
 
 - id: c405b6a7-bbf2-4b6a-b7cb-d22bd42aea82
@@ -363,7 +351,6 @@
     - itemId: Gold Coin
       min: 200
       max: 250
-      multiplierPerLevel: 0
       chance: 100
 
 - id: dedfdf96-94ff-4dcc-9f16-b046fe6a0d03
@@ -401,11 +388,9 @@
     - itemId: Gold Coin
       min: 300
       max: 400
-      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Copper Ingot
       min: 2
       max: 3
-      multiplierPerLevel: 0
       chance: 75

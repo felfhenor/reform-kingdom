@@ -39,9 +39,18 @@ export type DropRange = {
   max: number;
 };
 
-export type DropHasLevelMultiplier = {
-  multiplierPerLevel: number;
+export type DropHasBonusPerLevel = {
+  // A flat per-level addition (`level * bonusPerLevel`) folded into both
+  // ends of the range - see `rangeAtLevel`. Omitted entirely for a range
+  // that doesn't scale with level, rather than authored as `bonusPerLevel: 0`.
+  bonusPerLevel?: number;
 };
+
+// A `{min,max}` range that optionally scales by a flat amount per level -
+// shared by anything that rolls a level-scaled range (monster XP rewards,
+// item drop quantities), rather than each having its own specifically-named
+// alias. Resolve it down to a concrete range via `rangeAtLevel`.
+export type LeveledRange = DropRange & DropHasBonusPerLevel;
 
 export type DropHasChance = {
   chance: number;
@@ -54,10 +63,7 @@ export type DropHasChance = {
 // recipes are always a flat chance for one. Shared by monster kill drops
 // (`MonsterContent.drops`) and node completion rewards
 // (`EncounterContent.completionRewards`).
-export type DroppedItemReward = DropRange &
-  DropHasLevelMultiplier &
-  DropHasChance &
-  DropItem;
+export type DroppedItemReward = LeveledRange & DropHasChance & DropItem;
 export type DroppedEquipmentReward = DropHasChance & DropEquipment;
 export type DroppedCollectibleReward = DropHasChance & DropCollectible;
 export type DroppedRecipeReward = DropHasChance & DropRecipe;

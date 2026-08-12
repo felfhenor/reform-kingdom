@@ -19,7 +19,7 @@ describe('ensureContent', () => {
         id: 'goblin',
         name: 'Goblin',
         drops: [
-          { itemId: 'gold', min: 1, max: 5, multiplierPerLevel: 2, chance: 0.5 },
+          { itemId: 'gold', min: 1, max: 5, bonusPerLevel: 2, chance: 0.5 },
           { equipmentId: 'rusty-sword', chance: 0.1 },
           {},
         ],
@@ -27,9 +27,9 @@ describe('ensureContent', () => {
       } as unknown as MonsterContent);
 
       expect(result.drops).toEqual([
-        { itemId: 'gold', min: 1, max: 5, multiplierPerLevel: 2, chance: 0.5 },
+        { itemId: 'gold', min: 1, max: 5, bonusPerLevel: 2, chance: 0.5 },
         { equipmentId: 'rusty-sword', chance: 0.1 },
-        { itemId: 'UNKNOWN', min: 0, max: 0, multiplierPerLevel: 1, chance: 0 },
+        { itemId: 'UNKNOWN', min: 0, max: 0, chance: 0 },
       ]);
       expect(result.skills).toEqual([
         { skillId: 'bite', weight: 1 },

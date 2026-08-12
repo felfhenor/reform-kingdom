@@ -39,5 +39,4 @@
     - itemId: Gold Coin
       min: 200
       max: 250
-      multiplierPerLevel: 0
       chance: 100

@@ -74,13 +74,13 @@ const goblin: MonsterContent = {
     Agility: 0,
   },
   targettingType: 'Random',
-  xp: { min: 3, max: 5, multiplierPerLevel: 1 },
+  xp: { min: 3, max: 5, bonusPerLevel: 1 },
   drops: [
     {
       itemId: 'gold-coin' as ItemId,
       min: 3,
       max: 10,
-      multiplierPerLevel: 1,
+      bonusPerLevel: 1,
       chance: 100,
     },
   ],
@@ -450,46 +450,32 @@ describe('Bestiary Helper Functions', () => {
   });
 
   describe('bestiaryDropQuantityLabel', () => {
-    it('shows a min-max range for an item drop at level 1 (no scaling)', () => {
-      expect(
-        bestiaryDropQuantityLabel(
-          {
-            itemId: 'gold-coin' as ItemId,
-            min: 3,
-            max: 10,
-            multiplierPerLevel: 1,
-            chance: 100,
-          },
-          1,
-        ),
-      ).toBe('3-10');
+    it('shows the raw range when bonusPerLevel is absent, regardless of level', () => {
+      const reward = { itemId: 'gold-coin' as ItemId, min: 3, max: 10, chance: 100 };
+
+      expect(bestiaryDropQuantityLabel(reward, 1)).toBe('3-10');
+      expect(bestiaryDropQuantityLabel(reward, 10)).toBe('3-10');
     });
 
-    it('scales the range up by the multiplier at higher levels', () => {
+    it('scales the range up by level * bonusPerLevel', () => {
       expect(
         bestiaryDropQuantityLabel(
           {
             itemId: 'gold-coin' as ItemId,
             min: 3,
             max: 10,
-            multiplierPerLevel: 2,
+            bonusPerLevel: 2,
             chance: 100,
           },
           4,
         ),
-      ).toBe('9-16');
+      ).toBe('11-18');
     });
 
     it('collapses to a single number when min equals max', () => {
       expect(
         bestiaryDropQuantityLabel(
-          {
-            itemId: 'gold-coin' as ItemId,
-            min: 5,
-            max: 5,
-            multiplierPerLevel: 0,
-            chance: 100,
-          },
+          { itemId: 'gold-coin' as ItemId, min: 5, max: 5, chance: 100 },
           1,
         ),
       ).toBe('5');
@@ -503,19 +489,22 @@ describe('Bestiary Helper Functions', () => {
   });
 
   describe('bestiaryXpLabel', () => {
-    it('shows a min-max range at level 1 (no scaling)', () => {
-      expect(bestiaryXpLabel(goblin, 1)).toBe('3-5');
+    it('shows the raw range when bonusPerLevel is absent, regardless of level', () => {
+      const flatXpMonster: MonsterContent = { ...goblin, xp: { min: 3, max: 5 } };
+
+      expect(bestiaryXpLabel(flatXpMonster, 1)).toBe('3-5');
+      expect(bestiaryXpLabel(flatXpMonster, 10)).toBe('3-5');
     });
 
-    it('scales the range up by the xp multiplier at higher levels', () => {
-      // xp.multiplierPerLevel is 1 on the shared goblin fixture.
-      expect(bestiaryXpLabel(goblin, 3)).toBe('5-7');
+    it('scales the range up by level * bonusPerLevel', () => {
+      // xp.bonusPerLevel is 1 on the shared goblin fixture.
+      expect(bestiaryXpLabel(goblin, 3)).toBe('6-8');
     });
 
     it('collapses to a single number when min equals max', () => {
       const flatXpMonster: MonsterContent = {
         ...goblin,
-        xp: { min: 10, max: 10, multiplierPerLevel: 0 },
+        xp: { min: 10, max: 10 },
       };
 
       expect(bestiaryXpLabel(flatXpMonster, 1)).toBe('10');

@@ -12,25 +12,23 @@
   xp:
     min: 3
     max: 5
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Gold Coin
       min: 3
       max: 10
-      multiplierPerLevel: 1
+      bonusPerLevel: 1
       chance: 100
 
     - itemId: Small Goblin Bone
       min: 1
       max: 1
-      multiplierPerLevel: 0
       chance: 5
 
     - equipmentId: Leather Bag
       min: 1
       max: 1
-      multiplierPerLevel: 0
       chance: 3
 
   skills:
@@ -71,19 +69,18 @@
   xp:
     min: 10
     max: 15
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Small Goblin Bone
       min: 1
       max: 2
-      multiplierPerLevel: 0
       chance: 15
 
     - itemId: Gold Coin
       min: 5
       max: 15
-      multiplierPerLevel: 1
+      bonusPerLevel: 1
       chance: 50
 
   skills:
@@ -128,19 +125,18 @@
   xp:
     min: 10
     max: 15
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Small Goblin Bone
       min: 1
       max: 2
-      multiplierPerLevel: 0
       chance: 10
 
     - itemId: Gold Coin
       min: 5
       max: 15
-      multiplierPerLevel: 1
+      bonusPerLevel: 1
       chance: 50
 
   skills:
@@ -183,19 +179,18 @@
   xp:
     min: 30
     max: 35
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Small Asura Tendon
       min: 1
       max: 2
-      multiplierPerLevel: 0
       chance: 10
 
     - itemId: Gold Coin
       min: 1
       max: 5
-      multiplierPerLevel: 1
+      bonusPerLevel: 1
       chance: 50
 
   skills:
@@ -244,13 +239,12 @@
   xp:
     min: 20
     max: 25
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Green Slime Core
       min: 1
       max: 1
-      multiplierPerLevel: 0
       chance: 25
 
   skills:
@@ -293,13 +287,12 @@
   xp:
     min: 20
     max: 25
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Purple Slime Core
       min: 1
       max: 1
-      multiplierPerLevel: 0
       chance: 25
 
   skills:
@@ -344,13 +337,12 @@
   xp:
     min: 20
     max: 25
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Red Slime Core
       min: 1
       max: 1
-      multiplierPerLevel: 0
       chance: 25
 
   skills:
@@ -393,13 +385,12 @@
   xp:
     min: 20
     max: 25
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Weak Spider Silk
       min: 1
       max: 2
-      multiplierPerLevel: 0
       chance: 50
 
   skills:
@@ -442,13 +433,12 @@
   xp:
     min: 25
     max: 30
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Weak Spider Silk
       min: 2
       max: 4
-      multiplierPerLevel: 0
       chance: 50
 
   skills:
@@ -493,13 +483,12 @@
   xp:
     min: 100
     max: 150
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Silk Spool
       min: 3
       max: 5
-      multiplierPerLevel: 0
       chance: 100
 
   skills:
@@ -546,19 +535,18 @@
   xp:
     min: 25
     max: 30
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Orc Bone
       min: 1
       max: 2
-      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Gold Coin
       min: 10
       max: 20
-      multiplierPerLevel: 1
+      bonusPerLevel: 1
       chance: 50
 
   skills:
@@ -603,19 +591,18 @@
   xp:
     min: 25
     max: 30
-    multiplierPerLevel: 1
+    bonusPerLevel: 1
 
   drops:
     - itemId: Orc Bone
       min: 1
       max: 1
-      multiplierPerLevel: 0
       chance: 100
 
     - itemId: Gold Coin
       min: 10
       max: 20
-      multiplierPerLevel: 1
+      bonusPerLevel: 1
       chance: 50
 
   skills:

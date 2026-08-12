@@ -1,5 +1,5 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { monsterXpRangeAtLevel } from '@helpers/monster';
+import { rangeAtLevel } from '@helpers/leveled-range';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { isRewardDiscovered, rewardContentInfo } from '@helpers/world-nodes';
 import type {
@@ -138,20 +138,17 @@ export function monsterSourceNodeNames(monsterId: MonsterId): string[] {
   return monsterEncounters(monsterId).map((encounter) => encounter.name);
 }
 
-// Item drops roll a quantity range that scales with the kill's level (the
-// same formula `rollDroppedRewards`/`loot.ts` uses to actually grant them);
-// equipment/collectible/recipe drops are always a flat chance for one,
-// regardless of level.
+// Item drops roll a quantity range that scales with the kill's level (via
+// `rangeAtLevel`, the same resolution `rollDroppedRewards`/`loot.ts` uses to
+// actually grant them); equipment/collectible/recipe drops are always a
+// flat chance for one, regardless of level.
 export function bestiaryDropQuantityLabel(
   reward: DroppedReward,
   level: number,
 ): string {
   if (!('itemId' in reward)) return '1';
 
-  const levelBonus = reward.multiplierPerLevel * (level - 1);
-  const min = reward.min + levelBonus;
-  const max = reward.max + levelBonus;
-
+  const { min, max } = rangeAtLevel(reward, level);
   return min === max ? `${min}` : `${min}-${max}`;
 }
 
@@ -161,8 +158,8 @@ export function bestiaryXpLabel(
   monster: MonsterContent,
   level: number,
 ): string {
-  const range = monsterXpRangeAtLevel(monster, level);
-  return range.min === range.max ? `${range.min}` : `${range.min}-${range.max}`;
+  const { min, max } = rangeAtLevel(monster.xp, level);
+  return min === max ? `${min}` : `${min}-${max}`;
 }
 
 // Every monster in the game, killed or not - undiscovered entries are still

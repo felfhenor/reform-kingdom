@@ -268,7 +268,7 @@ describe('encounter-backed node accessors', () => {
         baseStats: {} as never,
         statsPerLevel: {} as never,
         targettingType: 'Random',
-        xp: { min: 1, max: 1, multiplierPerLevel: 0 },
+        xp: { min: 1, max: 1 },
         drops: [],
         skills: [],
         ...overrides,
@@ -363,9 +363,9 @@ describe('encounter-backed node accessors', () => {
 
       const encounter = buildEncounter({
         completionRewards: [
-          { itemId: goldCoin.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
-          { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
-          { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 50 },
+          { itemId: goldCoin.id, min: 1, max: 1, chance: 100 },
+          { itemId: bone.id, min: 1, max: 1, chance: 100 },
+          { itemId: bone.id, min: 1, max: 1, chance: 50 },
           { collectibleId: clam.id, chance: 50 },
         ],
       });
@@ -376,7 +376,7 @@ describe('encounter-backed node accessors', () => {
       seedContent([goldCoin, bone, clam, encounter]);
 
       expect(worldNodeCompletionRewards(buildEntry())).toEqual([
-        { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+        { itemId: bone.id, min: 1, max: 1, chance: 100 },
         { collectibleId: clam.id, chance: 50 },
       ]);
     });
@@ -435,7 +435,7 @@ describe('encounter-backed node accessors', () => {
 
       const encounter = buildEncounter({
         completionRewards: [
-          { itemId: bone.id, min: 1, max: 1, multiplierPerLevel: 0, chance: 100 },
+          { itemId: bone.id, min: 1, max: 1, chance: 100 },
           { equipmentId: equipment.id, chance: 10 },
         ],
       });

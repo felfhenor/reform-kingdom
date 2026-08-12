@@ -2,7 +2,6 @@ import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import {
   monsterStatsAtLevel,
   monstersFromFights,
-  monsterXpRangeAtLevel,
   monsterXpReward,
   xpForOverLevel,
 } from '@helpers/monster';
@@ -41,9 +40,9 @@ describe('Monster Helper Functions', () => {
       Agility: 0,
     },
     targettingType: 'Random',
-    xp: { min: 3, max: 5, multiplierPerLevel: 1 },
+    xp: { min: 3, max: 5, bonusPerLevel: 1 },
     drops: [
-      { itemId: goldCoinId, min: 3, max: 10, multiplierPerLevel: 1, chance: 100 },
+      { itemId: goldCoinId, min: 3, max: 10, bonusPerLevel: 1, chance: 100 },
     ],
     skills: [{ skillId: 'Attack' as EquipmentSkillId, weight: 1 }],
   };
@@ -67,30 +66,22 @@ describe('Monster Helper Functions', () => {
   });
 
   describe('monsterXpReward', () => {
-    it('should return a value within the monster xp range across many rolls', () => {
+    it('should return a value within the level-scaled xp range across many rolls', () => {
+      // bonusPerLevel is 1, so level 1 grants a range of [3+1, 5+1].
       for (let i = 0; i < 50; i++) {
         const xp = monsterXpReward(mockMonster, 1);
-        expect(xp).toBeGreaterThanOrEqual(3);
-        expect(xp).toBeLessThanOrEqual(5);
+        expect(xp).toBeGreaterThanOrEqual(4);
+        expect(xp).toBeLessThanOrEqual(6);
       }
     });
 
-    it('should scale the xp range by the multiplier per level', () => {
+    it('should scale the xp range by level * bonusPerLevel', () => {
+      // bonusPerLevel is 1, so level 3 grants a range of [3+3, 5+3].
       for (let i = 0; i < 50; i++) {
         const xp = monsterXpReward(mockMonster, 3);
-        expect(xp).toBeGreaterThanOrEqual(5);
-        expect(xp).toBeLessThanOrEqual(7);
+        expect(xp).toBeGreaterThanOrEqual(6);
+        expect(xp).toBeLessThanOrEqual(8);
       }
-    });
-  });
-
-  describe('monsterXpRangeAtLevel', () => {
-    it('returns the raw xp range at level 1 (no scaling)', () => {
-      expect(monsterXpRangeAtLevel(mockMonster, 1)).toEqual({ min: 3, max: 5 });
-    });
-
-    it('scales the range by the multiplier per level', () => {
-      expect(monsterXpRangeAtLevel(mockMonster, 3)).toEqual({ min: 5, max: 7 });
     });
   });
 
