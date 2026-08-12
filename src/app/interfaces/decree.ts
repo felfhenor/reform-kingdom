@@ -38,4 +38,10 @@ export type AutoModeState = {
   // fully healed - GatherMaterial and ReturnToKingdom never risk combat, so
   // they're unaffected.
   waitForFullHealthBeforeCombat: boolean;
+  // Per-node combat outcome streak, keyed by `WorldNodeEntry.nodeName`.
+  // Recorded for every fight regardless of which clause started it, but only
+  // `LevelUpParty` reads it back (see `mostChallengingExploreNodeForRisk`) to
+  // steer away from a node that keeps losing toward a comparable one, or a
+  // less challenging tier, instead of grinding the same losing fight forever.
+  nodeFailureCounts: Partial<Record<string, number>>;
 };

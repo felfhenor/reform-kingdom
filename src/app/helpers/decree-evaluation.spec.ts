@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/decree', () => ({
+  decreeNodeFailureCount: vi.fn(() => 0),
   decreeRiskTolerance: vi.fn(() => 'High'),
   decreeWaitForFullHealthBeforeCombat: vi.fn(() => false),
 }));
@@ -14,11 +15,16 @@ vi.mock('@helpers/gather-node-discovery', () => ({
 }));
 
 vi.mock('@helpers/gathering', () => ({
+  partyMaxLevel: vi.fn(() => 10),
   partyMinLevel: vi.fn(() => 10),
 }));
 
 vi.mock('@helpers/materials', () => ({
   getMaterialQuantity: vi.fn(() => 0),
+}));
+
+vi.mock('@helpers/monster', () => ({
+  isXpTrivialAtOverLevel: vi.fn(() => false),
 }));
 
 vi.mock('@helpers/party', () => ({
@@ -43,6 +49,7 @@ vi.mock('@helpers/world-nodes', () => ({
 }));
 
 import {
+  decreeNodeFailureCount,
   decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
@@ -51,6 +58,7 @@ import {
   clauseTargetNode,
   isClauseBlockedOnlyByHealth,
   isClauseSatisfiable,
+  LEVEL_UP_NODE_FAILURE_LIMIT,
   mostChallengingExploreNodeForRisk,
   nearestGatherNodeFor,
   nearestUnfinishedExploreNode,
@@ -59,8 +67,9 @@ import {
   riskLevelSatisfies,
 } from '@helpers/decree-evaluation';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
-import { partyMinLevel } from '@helpers/gathering';
+import { partyMaxLevel, partyMinLevel } from '@helpers/gathering';
 import { getMaterialQuantity } from '@helpers/materials';
+import { isXpTrivialAtOverLevel } from '@helpers/monster';
 import { isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
@@ -103,6 +112,8 @@ function buildClause(overrides: Partial<DecreeClause> = {}): DecreeClause {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(partyMinLevel).mockReturnValue(10);
+  vi.mocked(partyMaxLevel).mockReturnValue(10);
+  vi.mocked(isXpTrivialAtOverLevel).mockReturnValue(false);
   vi.mocked(decreeRiskTolerance).mockReturnValue('High');
   vi.mocked(worldNodesOfType).mockReturnValue([]);
   vi.mocked(worldNodeByName).mockReturnValue(undefined);
@@ -113,6 +124,7 @@ beforeEach(() => {
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
   vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
   vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
+  vi.mocked(decreeNodeFailureCount).mockReturnValue(0);
 });
 
 describe('riskLevelOfExploreNode', () => {
@@ -278,6 +290,93 @@ describe('mostChallengingExploreNodeForRisk', () => {
     );
 
     expect(mostChallengingExploreNodeForRisk()).toBe(near);
+  });
+
+  it('prefers a comparable (same-tier) node with fewer failures over one that keeps losing', () => {
+    const losing = buildNode('Losing');
+    const comparable = buildNode('Comparable');
+    vi.mocked(worldNodesOfType).mockReturnValue([losing, comparable]);
+    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      levelRange: { min: 10, max: 10 },
+    } as EncounterContent);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
+      nodeName === 'Losing' ? 2 : 0,
+    );
+
+    expect(mostChallengingExploreNodeForRisk()).toBe(comparable);
+  });
+
+  it('steps down a tier once every node in it has hit the failure limit', () => {
+    const hard = buildNode('Hard');
+    const easy = buildNode('Easy');
+    vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
+    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
+    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
+      ({
+        Hard: { levelRange: { min: 10, max: 10 } },
+        Easy: { levelRange: { min: 1, max: 1 } },
+      })[entry.nodeName] as EncounterContent,
+    );
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
+      nodeName === 'Hard' ? LEVEL_UP_NODE_FAILURE_LIMIT : 0,
+    );
+
+    expect(mostChallengingExploreNodeForRisk()).toBe(easy);
+  });
+
+  it('falls back to the least-failed node overall once every tier has hit the limit', () => {
+    const hard = buildNode('Hard');
+    const easy = buildNode('Easy');
+    vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
+    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
+    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
+      ({
+        Hard: { levelRange: { min: 10, max: 10 } },
+        Easy: { levelRange: { min: 1, max: 1 } },
+      })[entry.nodeName] as EncounterContent,
+    );
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
+      nodeName === 'Hard'
+        ? LEVEL_UP_NODE_FAILURE_LIMIT + 3
+        : LEVEL_UP_NODE_FAILURE_LIMIT,
+    );
+
+    expect(mostChallengingExploreNodeForRisk()).toBe(easy);
+  });
+
+  it('excludes a node that would only give 1 XP due to over-level', () => {
+    const trivial = buildNode('Trivial');
+    const worthwhile = buildNode('Worthwhile');
+    vi.mocked(worldNodesOfType).mockReturnValue([trivial, worthwhile]);
+    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
+    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
+      ({
+        Trivial: { levelRange: { min: 1, max: 1 } },
+        Worthwhile: { levelRange: { min: 10, max: 10 } },
+      })[entry.nodeName] as EncounterContent,
+    );
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(isXpTrivialAtOverLevel).mockImplementation(
+      (_partyLevel, nodeMaxLevel) => nodeMaxLevel === 1,
+    );
+
+    expect(mostChallengingExploreNodeForRisk()).toBe(worthwhile);
+  });
+
+  it('fails when every reachable node would only give 1 XP', () => {
+    const trivial = buildNode('Trivial');
+    vi.mocked(worldNodesOfType).mockReturnValue([trivial]);
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      levelRange: { min: 1, max: 1 },
+    } as EncounterContent);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(isXpTrivialAtOverLevel).mockReturnValue(true);
+
+    expect(mostChallengingExploreNodeForRisk()).toBeUndefined();
   });
 });
 

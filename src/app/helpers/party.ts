@@ -684,14 +684,23 @@ export function retrofitPartyXp(party: Character[]): Character[] {
   });
 }
 
-export function partyGainXp(amount: number): void {
+// Returns whether any party member leveled up from this gain - callers
+// (e.g. `combat-end.ts`) use it to know when a stronger party might be
+// worth retrying nodes it previously gave up on (see
+// `autoModeResetNodeFailureCounts`).
+export function partyGainXp(amount: number): boolean {
+  let anyLeveledUp = false;
+
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => {
       const updated = characterLeveledUp(character, amount);
+      if (updated.level > character.level) anyLeveledUp = true;
       logCharacterProgress(character, updated);
       return updated;
     });
 
     return state;
   });
+
+  return anyLeveledUp;
 }

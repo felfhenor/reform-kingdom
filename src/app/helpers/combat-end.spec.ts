@@ -7,6 +7,9 @@ vi.mock('@helpers/armory', () => ({
 vi.mock('@helpers/auto-mode', () => ({
   autoModeRecordClauseFailure: vi.fn(),
   autoModeRecordClauseSuccess: vi.fn(),
+  autoModeRecordNodeFailure: vi.fn(),
+  autoModeRecordNodeSuccess: vi.fn(),
+  autoModeResetNodeFailureCounts: vi.fn(),
 }));
 
 vi.mock('@helpers/bestiary', () => ({
@@ -67,6 +70,9 @@ vi.mock('@helpers/travel', () => ({
 import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
+  autoModeRecordNodeFailure,
+  autoModeRecordNodeSuccess,
+  autoModeResetNodeFailureCounts,
 } from '@helpers/auto-mode';
 import { monsterRecordKill } from '@helpers/bestiary';
 import { collectiblesAdd } from '@helpers/collectibles';
@@ -250,13 +256,15 @@ describe('combatCheckIfOver', () => {
     expect(combatReset).toHaveBeenCalled();
   });
 
-  it('records an Auto Mode clause success on victory', () => {
+  it('records an Auto Mode clause and node success on victory', () => {
     const combat = buildCombat({});
 
     combatCheckIfOver(combat);
 
     expect(autoModeRecordClauseSuccess).toHaveBeenCalled();
     expect(autoModeRecordClauseFailure).not.toHaveBeenCalled();
+    expect(autoModeRecordNodeSuccess).toHaveBeenCalledWith('Field Ruins');
+    expect(autoModeRecordNodeFailure).not.toHaveBeenCalled();
   });
 
   it('begins Deaths Door and resets combat on defeat', () => {
@@ -271,6 +279,7 @@ describe('combatCheckIfOver', () => {
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(combatReset).toHaveBeenCalled();
     expect(autoModeRecordClauseFailure).toHaveBeenCalled();
+    expect(autoModeRecordNodeFailure).toHaveBeenCalledWith('Field Ruins');
   });
 
   it('degrades XP via xpForOverLevel using the encounter max and highest hero level', () => {
@@ -310,6 +319,74 @@ describe('combatCheckIfOver', () => {
     // Uses the highest hero level (7) against the node's max (5).
     expect(xpForOverLevel).toHaveBeenCalledWith(100, 7, 5);
     expect(partyGainXp).toHaveBeenCalledWith(50);
+  });
+
+  it('wipes every node failure count when the XP gain levels up the party', () => {
+    const monster = { id: 'monster-1' } as MonsterContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [],
+      levelRange: { min: 1, max: 1 },
+    } as unknown as EncounterContent;
+
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : monster) as never,
+    );
+    vi.mocked(monsterXpReward).mockReturnValue(100);
+    vi.mocked(xpForOverLevel).mockReturnValue(100);
+    vi.mocked(partyGainXp).mockReturnValue(true);
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+          level: 1,
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(autoModeResetNodeFailureCounts).toHaveBeenCalled();
+  });
+
+  it('leaves node failure counts alone when the XP gain does not level up the party', () => {
+    const monster = { id: 'monster-1' } as MonsterContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [],
+      levelRange: { min: 1, max: 1 },
+    } as unknown as EncounterContent;
+
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : monster) as never,
+    );
+    vi.mocked(monsterXpReward).mockReturnValue(100);
+    vi.mocked(xpForOverLevel).mockReturnValue(100);
+    vi.mocked(partyGainXp).mockReturnValue(false);
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+          level: 1,
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(autoModeResetNodeFailureCounts).not.toHaveBeenCalled();
   });
 
   it('records a bestiary kill for each defeated guardian on victory', () => {

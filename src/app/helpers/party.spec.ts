@@ -1416,6 +1416,24 @@ describe('Party Helper Functions', () => {
       );
       expect(miscellaneousMessageLog).toHaveBeenCalledTimes(1);
     });
+
+    it('returns true when the gain levels up at least one character', () => {
+      const jala = createCharacterStub('Jala');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
+
+      expect(partyGainXp(100)).toBe(true);
+    });
+
+    it('returns false when the gain does not level up any character', () => {
+      const jala = createCharacterStub('Jala');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
+
+      expect(partyGainXp(30)).toBe(false);
+    });
   });
 
   describe('syncPartyHpFromCombat', () => {

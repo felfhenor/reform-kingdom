@@ -54,6 +54,17 @@ export function xpForOverLevel(
   );
 }
 
+// True once `xpForOverLevel` would already be sitting at the flat 1 XP
+// floor for this party/node pairing, regardless of a monster's raw XP value
+// - lets a node be judged not worth the trip before any fight happens (see
+// `mostChallengingExploreNodeForRisk`), rather than only after the fact.
+export function isXpTrivialAtOverLevel(
+  partyLevel: number,
+  nodeMaxLevel: number,
+): boolean {
+  return partyLevel - nodeMaxLevel >= OVERLEVEL_XP_HARD_CAP_LEVELS;
+}
+
 // De-dupes and resolves the monsters referenced across a node's fights (used
 // by both authored Encounters and generated ExploreRandom fights, which
 // share the same `{ monsters: EncounterFightMonster[] }` shape), sorted

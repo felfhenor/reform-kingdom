@@ -89,6 +89,45 @@ export function autoModeRecordClauseSuccess(): void {
   });
 }
 
+// Recorded for every lost fight regardless of which clause sent the party
+// there - only `LevelUpParty`'s node picker reads this back (see
+// `mostChallengingExploreNodeForRisk`), but a node that's losing is losing no
+// matter which clause caused the trip.
+export function autoModeRecordNodeFailure(nodeName: string): void {
+  updateGamestate((state) => {
+    const counts = state.world.autoMode.nodeFailureCounts;
+    state.world.autoMode.nodeFailureCounts = {
+      ...counts,
+      [nodeName]: (counts[nodeName] ?? 0) + 1,
+    };
+    return state;
+  });
+}
+
+// Mirrors `autoModeRecordNodeFailure` - a won fight clears the node's losing
+// streak, the same way a clause-level success clears `failureCount`.
+export function autoModeRecordNodeSuccess(nodeName: string): void {
+  updateGamestate((state) => {
+    state.world.autoMode.nodeFailureCounts = {
+      ...state.world.autoMode.nodeFailureCounts,
+      [nodeName]: 0,
+    };
+    return state;
+  });
+}
+
+// Wipes every node's losing streak - called whenever a hero levels up (see
+// `combat-end.ts`'s `partyGainXp` call), since a stronger party may now be
+// able to clear a node `mostChallengingExploreNodeForRisk` had previously
+// written off, and it deserves a fresh try rather than staying avoided
+// forever.
+export function autoModeResetNodeFailureCounts(): void {
+  updateGamestate((state) => {
+    state.world.autoMode.nodeFailureCounts = {};
+    return state;
+  });
+}
+
 function clauseStatusLabel(clause: DecreeClause): string {
   switch (clause.type) {
     case 'GatherMaterial': {

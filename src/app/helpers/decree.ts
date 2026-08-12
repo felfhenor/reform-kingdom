@@ -22,6 +22,12 @@ export function decreeWaitForFullHealthBeforeCombat(): boolean {
   return gamestate().world.autoMode.waitForFullHealthBeforeCombat;
 }
 
+// A node's current losing streak, keyed by `WorldNodeEntry.nodeName` - see
+// `AutoModeState.nodeFailureCounts` for who reads/writes this.
+export function decreeNodeFailureCount(nodeName: string): number {
+  return gamestate().world.autoMode.nodeFailureCounts[nodeName] ?? 0;
+}
+
 export function decreeSetWaitForFullHealthBeforeCombat(value: boolean): void {
   updateGamestate((state) => {
     state.world.autoMode.waitForFullHealthBeforeCombat = value;

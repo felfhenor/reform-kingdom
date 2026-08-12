@@ -1,6 +1,9 @@
 import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
+  autoModeRecordNodeFailure,
+  autoModeRecordNodeSuccess,
+  autoModeResetNodeFailureCounts,
 } from '@helpers/auto-mode';
 import { monsterRecordKill } from '@helpers/bestiary';
 import { combatReset, currentCombat } from '@helpers/combat';
@@ -97,8 +100,9 @@ function grantVictoryRewards(combat: Combat): void {
       : 0;
   });
   if (totalXp > 0) {
-    partyGainXp(totalXp);
+    const leveledUp = partyGainXp(totalXp);
     combatMessageLog(combat, `The party gained ${totalXp} XP!`);
+    if (leveledUp) autoModeResetNodeFailureCounts();
   }
 
   const drops = monsters.flatMap(({ monster, level }) =>
@@ -149,6 +153,7 @@ function handleCombatVictory(combat: Combat): boolean {
 
   syncPartyHpFromCombat(combat.heroes);
   autoModeRecordClauseSuccess();
+  autoModeRecordNodeSuccess(combat.locationName);
   grantVictoryRewards(combat);
 
   if (combat.encounterRandomId) {
@@ -174,6 +179,7 @@ export function combatHandleDefeat(combat: Combat): void {
 
   syncPartyHpFromCombat(combat.heroes);
   autoModeRecordClauseFailure();
+  autoModeRecordNodeFailure(combat.locationName);
   travelBeginDeathsDoor();
 }
 

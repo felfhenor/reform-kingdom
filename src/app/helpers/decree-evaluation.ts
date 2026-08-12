@@ -1,11 +1,13 @@
 import {
+  decreeNodeFailureCount,
   decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
-import { partyMinLevel } from '@helpers/gathering';
+import { partyMaxLevel, partyMinLevel } from '@helpers/gathering';
 import { getMaterialQuantity } from '@helpers/materials';
+import { isXpTrivialAtOverLevel } from '@helpers/monster';
 import { CHARACTER_MAX_LEVEL, isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
@@ -32,6 +34,11 @@ import { sortBy } from 'es-toolkit/compat';
 // real thresholds instead of hardcoding numbers that could drift out of sync.
 export const MEDIUM_RISK_LEVELS_ABOVE_PARTY = 3;
 export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
+
+// Once the least-failed node in a challenge tier has lost this many fights,
+// `mostChallengingExploreNodeForRisk` gives up on that tier and steps down
+// to the next easiest one - see its comment for the full ranking.
+export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 
 const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
   Low: 0,
@@ -109,23 +116,62 @@ function worldNodeChallengeLevel(entry: WorldNodeEntry): number {
   return worldNodeEncounter(entry)?.levelRange.max ?? -Infinity;
 }
 
+// The candidate in `entries` with the shortest current losing streak (see
+// `decreeNodeFailureCount`) - ties keep `entries`' existing order, so a tier
+// with no failure data at all still resolves deterministically.
+function leastFailedNodeIn(
+  entries: WorldNodeEntry[],
+): WorldNodeEntry | undefined {
+  return sortBy(entries, (entry) => decreeNodeFailureCount(entry.nodeName))[0];
+}
+
 // LevelUpParty has no risk setting of its own - it always targets the
 // standing global `riskTolerance` directly (see `decreeRiskTolerance`).
 // Ranked by challenge, not proximity - a trivial node right next to the
 // kingdom does little for leveling up, so the hardest reachable node the
-// tolerance allows wins even if a much easier one is closer. Only settles
-// for something easier once nothing tougher is reachable.
+// tolerance allows wins even if a much easier one is closer.
+//
+// Within the hardest tier still worth trying, nodes that keep losing are
+// passed over in favor of a comparable (same-challenge) node that hasn't
+// been failing as much - see `leastFailedNodeIn`. Once every node in a tier
+// has lost `LEVEL_UP_NODE_FAILURE_LIMIT`+ fights in a row, that tier is
+// written off and the search steps down to the next easiest one, so the
+// party settles somewhere it can actually win and keep growing instead of
+// grinding forever against a fight it can't clear. A node so far below the
+// party's strongest hero that it's already degraded to the flat 1 XP floor
+// (see `isXpTrivialAtOverLevel`) is excluded outright, even if nothing else
+// disqualifies it - clearing it wouldn't grow the party at all.
 export function mostChallengingExploreNodeForRisk(): WorldNodeEntry | undefined {
   const ceiling = decreeRiskTolerance();
+  const partyLevel = partyMaxLevel();
 
-  const byChallenge = sortBy(
-    worldNodesOfType('ExploreNode').filter((entry) =>
-      riskLevelSatisfies(riskLevelOfExploreNode(entry), ceiling),
-    ),
-    (entry) => -worldNodeChallengeLevel(entry),
+  const candidates = worldNodesOfType('ExploreNode')
+    .filter((entry) => riskLevelSatisfies(riskLevelOfExploreNode(entry), ceiling))
+    .filter(
+      (entry) =>
+        !isXpTrivialAtOverLevel(partyLevel, worldNodeChallengeLevel(entry)),
+    )
+    .filter((entry) => !!travelPathTo(entry.nodeName));
+  if (candidates.length === 0) return undefined;
+
+  const challengeTiers = sortBy(
+    [...new Set(candidates.map(worldNodeChallengeLevel))],
+    (level) => -level,
   );
 
-  return byChallenge.find((entry) => !!travelPathTo(entry.nodeName));
+  for (const tier of challengeTiers) {
+    const tierNodes = candidates.filter(
+      (entry) => worldNodeChallengeLevel(entry) === tier,
+    );
+    const best = leastFailedNodeIn(tierNodes);
+    if (best && decreeNodeFailureCount(best.nodeName) < LEVEL_UP_NODE_FAILURE_LIMIT) {
+      return best;
+    }
+  }
+
+  // Every tier has been losing too often - fall back to whatever's failed
+  // least overall rather than stalling entirely.
+  return leastFailedNodeIn(candidates);
 }
 
 // Only considers GatherNodes the player has actually visited before - a

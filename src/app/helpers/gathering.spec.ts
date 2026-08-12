@@ -51,6 +51,7 @@ import {
   gatheringStart,
   gatheringStop,
   isGathering,
+  partyMaxLevel,
   partyMinLevel,
 } from '@helpers/gathering';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/luck';
@@ -116,6 +117,28 @@ describe('partyMinLevel', () => {
     vi.mocked(partyGet).mockReturnValue([]);
 
     expect(partyMinLevel()).toBe(1);
+  });
+});
+
+describe('partyMaxLevel', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns the highest level among party members', () => {
+    vi.mocked(partyGet).mockReturnValue([
+      buildCharacter(5),
+      buildCharacter(2),
+      buildCharacter(9),
+    ]);
+
+    expect(partyMaxLevel()).toBe(9);
+  });
+
+  it('defaults to 1 when the party is empty', () => {
+    vi.mocked(partyGet).mockReturnValue([]);
+
+    expect(partyMaxLevel()).toBe(1);
   });
 });
 

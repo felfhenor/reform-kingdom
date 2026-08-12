@@ -63,6 +63,7 @@ function stateWithAutoMode(
   clauses: DecreeClause[],
   riskTolerance: 'Low' | 'Medium' | 'High' = 'Medium',
   waitForFullHealthBeforeCombat = false,
+  nodeFailureCounts: Partial<Record<string, number>> = {},
 ): GameState {
   return {
     world: {
@@ -71,6 +72,7 @@ function stateWithAutoMode(
         clauses,
         riskTolerance,
         waitForFullHealthBeforeCombat,
+        nodeFailureCounts,
       },
     },
   } as unknown as GameState;

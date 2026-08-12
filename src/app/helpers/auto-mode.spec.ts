@@ -68,6 +68,9 @@ import {
   autoModeProcessTick,
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
+  autoModeRecordNodeFailure,
+  autoModeRecordNodeSuccess,
+  autoModeResetNodeFailureCounts,
   autoModeStatusLabel,
   autoModeToggle,
 } from '@helpers/auto-mode';
@@ -128,6 +131,7 @@ function buildState(overrides: {
   travelStatus?: 'Idle' | 'Traveling';
   gatheringStatus?: 'Idle' | 'Gathering';
   gatheringNodeName?: string;
+  nodeFailureCounts?: Partial<Record<string, number>>;
 }): GameState {
   return {
     world: {
@@ -142,6 +146,7 @@ function buildState(overrides: {
         clauses: overrides.clauses ?? [],
         activeClauseId: overrides.activeClauseId,
         riskTolerance: 'Medium',
+        nodeFailureCounts: overrides.nodeFailureCounts ?? {},
       },
     },
   } as unknown as GameState;
@@ -240,6 +245,53 @@ describe('autoModeRecordClauseSuccess', () => {
     );
     expect(result.world.autoMode.clauses.find((c) => c.id === 'a')?.failureCount).toBe(4);
     expect(result.world.autoMode.clauses.find((c) => c.id === 'b')?.failureCount).toBe(0);
+  });
+});
+
+describe('autoModeRecordNodeFailure', () => {
+  it('increments only the named node, leaving others untouched', () => {
+    const nodeFailureCounts = { A: 1, B: 4 };
+    vi.mocked(gamestate).mockReturnValue(buildState({ nodeFailureCounts }));
+
+    autoModeRecordNodeFailure('A');
+
+    const result = applyLastUpdate(buildState({ nodeFailureCounts }));
+    expect(result.world.autoMode.nodeFailureCounts.A).toBe(2);
+    expect(result.world.autoMode.nodeFailureCounts.B).toBe(4);
+  });
+
+  it('starts a node at 1 the first time it fails', () => {
+    vi.mocked(gamestate).mockReturnValue(buildState({}));
+
+    autoModeRecordNodeFailure('New');
+
+    const result = applyLastUpdate(buildState({}));
+    expect(result.world.autoMode.nodeFailureCounts.New).toBe(1);
+  });
+});
+
+describe('autoModeRecordNodeSuccess', () => {
+  it('resets only the named node back to zero', () => {
+    const nodeFailureCounts = { A: 3, B: 4 };
+    vi.mocked(gamestate).mockReturnValue(buildState({ nodeFailureCounts }));
+
+    autoModeRecordNodeSuccess('A');
+
+    const result = applyLastUpdate(buildState({ nodeFailureCounts }));
+    expect(result.world.autoMode.nodeFailureCounts.A).toBe(0);
+    expect(result.world.autoMode.nodeFailureCounts.B).toBe(4);
+  });
+});
+
+describe('autoModeResetNodeFailureCounts', () => {
+  it('wipes every recorded node failure count', () => {
+    const nodeFailureCounts = { A: 3, B: 4 };
+    vi.mocked(gamestate).mockReturnValue(buildState({ nodeFailureCounts }));
+
+    autoModeResetNodeFailureCounts();
+
+    const result = applyLastUpdate(buildState({ nodeFailureCounts }));
+    expect(result.world.autoMode.nodeFailureCounts).toEqual({});
   });
 });
 

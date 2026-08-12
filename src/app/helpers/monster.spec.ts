@@ -1,5 +1,6 @@
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import {
+  isXpTrivialAtOverLevel,
   monsterStatsAtLevel,
   monstersFromFights,
   monsterXpReward,
@@ -104,6 +105,22 @@ describe('Monster Helper Functions', () => {
 
     it('should never degrade below 1 xp even for small raw amounts', () => {
       expect(xpForOverLevel(2, 8, 5)).toBe(1);
+    });
+  });
+
+  describe('isXpTrivialAtOverLevel', () => {
+    it('is false at or below the node max level', () => {
+      expect(isXpTrivialAtOverLevel(4, 5)).toBe(false);
+      expect(isXpTrivialAtOverLevel(5, 5)).toBe(false);
+    });
+
+    it('is false while still within the degrade range', () => {
+      expect(isXpTrivialAtOverLevel(8, 5)).toBe(false);
+    });
+
+    it('is true once 4+ levels over the node max, matching the xpForOverLevel hard cap', () => {
+      expect(isXpTrivialAtOverLevel(9, 5)).toBe(true);
+      expect(isXpTrivialAtOverLevel(20, 5)).toBe(true);
     });
   });
 
