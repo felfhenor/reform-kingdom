@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 const packageJSON = require('../package.json');
 
 const fs = require('fs-extra');
@@ -14,7 +12,7 @@ const minutes = date.getMinutes().toString().padStart(2, '0');
 const seconds = date.getSeconds().toString().padStart(2, '0');
 
 const header = `---
-title: Version Updates - ${packageJSON.version}
+title: re:Form Kingdom Update - ${packageJSON.version}
 date: ${year}-${month}-${day} ${hours}:${minutes}:${seconds}
 categories: [New Version]
 tags: [reformkingdom, version-notes]
