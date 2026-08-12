@@ -24,17 +24,6 @@ const colors: Record<BaseStat, string> = {
   Luck: 'text-emerald-400',
 };
 
-export const STAT_SHORTHAND: Record<BaseStat, string> = {
-  Agility: 'AGI',
-  Energy: 'EP',
-  Health: 'HP',
-  Intelligence: 'INT',
-  Luck: 'LUK',
-  Resistance: 'RES',
-  Strength: 'STR',
-  Vitality: 'VIT',
-};
-
 @Component({
   selector: 'app-icon-stat',
   imports: [IconComponent],

@@ -23,21 +23,8 @@ import type {
   StatBlock,
   StatusEffectContent,
 } from '@interfaces';
+import { MagicalStats, PhysicalStats } from '@interfaces';
 import { clamp, sum, sumBy } from 'es-toolkit/compat';
-
-const RESISTANCE_SCALING_STATS: GameStat[] = [
-  'Intelligence',
-  'Resistance',
-  'Energy',
-  'Luck',
-];
-
-const VITALITY_SCALING_STATS: GameStat[] = [
-  'Strength',
-  'Vitality',
-  'Health',
-  'Agility',
-];
 
 function techniqueHasAttribute(
   technique: EquipmentSkillContentTechnique,
@@ -51,11 +38,11 @@ function targetDefenseValue(
   technique: EquipmentSkillContentTechnique,
 ): number {
   const resistanceWeight = sumBy(
-    RESISTANCE_SCALING_STATS,
+    MagicalStats,
     (stat) => technique.damageScaling[stat] ?? 0,
   );
   const vitalityWeight = sumBy(
-    VITALITY_SCALING_STATS,
+    PhysicalStats,
     (stat) => technique.damageScaling[stat] ?? 0,
   );
 
@@ -132,12 +119,7 @@ export function combatApplySkillToTarget(
 
   const baseDamage = sum(
     (Object.keys(technique.damageScaling) as GameStat[]).map((stat) =>
-      getCombatantBaseStatDamageForTechnique(
-        combatant,
-        skill,
-        technique,
-        stat,
-      ),
+      getCombatantBaseStatDamageForTechnique(combatant, skill, technique, stat),
     ),
   );
 
@@ -238,7 +220,10 @@ export function combatApplySkillToTarget(
     if (!effectContent) return;
 
     const totalChance = skillTechniqueStatusEffectChance(skill, effData);
-    const resistedChance = luckReducedChance(totalChance, target.totalStats.Luck);
+    const resistedChance = luckReducedChance(
+      totalChance,
+      target.totalStats.Luck,
+    );
 
     if (!rngSucceedsChance(resistedChance)) return;
 

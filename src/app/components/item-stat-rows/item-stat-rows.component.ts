@@ -4,11 +4,13 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import {
-  IconStatComponent,
-  STAT_SHORTHAND,
-} from '@components/icon-stat/icon-stat.component';
-import type { BaseStat, StatBlock } from '@interfaces';
+  StatOrder,
+  StatShorthand,
+  type BaseStat,
+  type StatBlock,
+} from '@interfaces';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
@@ -34,17 +36,8 @@ export class ItemStatRowsComponent {
   // is already known-positive and a leading "+" would just be noise.
   public showSign = input(true);
 
-  public statShorthand = STAT_SHORTHAND;
-  private statKeys: BaseStat[] = [
-    'Health',
-    'Energy',
-    'Strength',
-    'Intelligence',
-    'Vitality',
-    'Resistance',
-    'Agility',
-    'Luck',
-  ];
+  public statShorthand = StatShorthand;
+  private statKeys = StatOrder;
 
   public hasComparison = computed(() => !!this.comparisonStats());
 

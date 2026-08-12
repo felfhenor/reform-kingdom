@@ -1,18 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
+import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { InfusedMaterialsRowComponent } from '@components/infused-materials-row/infused-materials-row.component';
-import {
-  IconStatComponent,
-  STAT_SHORTHAND,
-} from '@components/icon-stat/icon-stat.component';
 import { ItemStatRowsComponent } from '@components/item-stat-rows/item-stat-rows.component';
 import { defaultStats, equipmentItemInfusionBonus } from '@helpers';
-import type {
-  BaseStat,
-  EquipmentContent,
-  EquipmentItem,
-  StatBlock,
+import {
+  StatShorthand,
+  type BaseStat,
+  type EquipmentContent,
+  type EquipmentItem,
+  type StatBlock,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
@@ -39,7 +43,7 @@ export class EquipmentItemCardComponent {
 
   public equip = output<void>();
 
-  public statShorthand = STAT_SHORTHAND;
+  public statShorthand = StatShorthand;
 
   private statKeys = Object.keys(defaultStats()) as BaseStat[];
 

@@ -1,20 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import {
-  IconStatComponent,
-  STAT_SHORTHAND,
-} from '@components/icon-stat/icon-stat.component';
-import type { BaseStat, Character } from '@interfaces';
-
-const STAT_KEYS: BaseStat[] = [
-  'Health',
-  'Energy',
-  'Strength',
-  'Intelligence',
-  'Vitality',
-  'Resistance',
-  'Agility',
-  'Luck',
-];
+  StatOrder,
+  StatShorthand,
+  type BaseStat,
+  type Character,
+} from '@interfaces';
 
 @Component({
   selector: 'app-hero-equipment-panel-stats',
@@ -28,8 +19,8 @@ const STAT_KEYS: BaseStat[] = [
 export class HeroEquipmentPanelStatsComponent {
   public character = input.required<Character>();
 
-  public statKeys = STAT_KEYS;
-  public statShorthand = STAT_SHORTHAND;
+  public statKeys = StatOrder;
+  public statShorthand = StatShorthand;
 
   public statValue(stat: BaseStat): number {
     return Math.round(this.character().stats[stat] * 10) / 10;
