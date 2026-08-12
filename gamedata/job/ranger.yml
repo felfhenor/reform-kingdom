@@ -50,8 +50,11 @@
         - level: 1
           skillId: Snipe I
 
-        - level: 6
+        - level: 7
           skillId: Snipe II
+
+        - level: 17
+          skillId: Snipe III
 
     - pathName: Rapidfire
       levels:

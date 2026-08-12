@@ -57,6 +57,9 @@
         - level: 6
           skillId: Double Strike II
 
+        - level: 15
+          skillId: Double Strike III
+
     - pathName: Sweep
       levels:
         - level: 4
@@ -64,6 +67,9 @@
 
         - level: 9
           skillId: Sweep II
+
+        - level: 18
+          skillId: Sweep III
 
     - pathName: Smashing Board
       levels:

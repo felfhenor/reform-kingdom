@@ -27,7 +27,7 @@
   name: Sweep II
   description: Strike four enemies for {{ value }} damage.
 
-  rarity: Common
+  rarity: Uncommon
   sprite: '0002'
 
   epCost: 7
@@ -44,6 +44,31 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 0.55
+        Strength: 0.75
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: e7ffe0fa-4790-48fa-8257-9d7dbab01dda
+  name: Sweep III
+  description: Strike four enemies for {{ value }} damage.
+
+  rarity: Rare
+  sprite: '0002'
+
+  epCost: 11
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1.1
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

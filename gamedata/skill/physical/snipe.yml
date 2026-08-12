@@ -48,6 +48,33 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
+        Strength: 4
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 2f35b6d3-693c-4af9-8c37-0ea34367f785
+  name: Snipe III
+  description: Exert a lot of effort to shoot a deadly, accurate shot for {{ value }} damage.
+
+  rarity: Rare
+  sprite: '0005'
+
+  epCost: 14
+  usesPerCombat: 1
+
+  requiredWeaponTypes: [Bow]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
         Strength: 5
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

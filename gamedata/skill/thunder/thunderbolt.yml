@@ -6,32 +6,6 @@
 
   rarity: Common
 
-  epCost: 5
-  usesPerCombat: -1
-
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
-
-  techniques:
-    - elements: [Air]
-      attributes: [DamagesTarget, AllowPlink]
-      targets: 1
-      targetType: Enemies
-      targetBehaviors:
-        - behavior: NotZeroHealth
-      damageScaling:
-        Intelligence: 2
-
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
-
-- id: 072479de-f0e2-4df5-9fe4-b8d5c14d28df
-  name: Thunderbolt II
-  description: Blast a single enemy with an intense shock, dealing {{ value }} damage.
-
-  sprite: '0008'
-
-  rarity: Uncommon
-
   epCost: 10
   usesPerCombat: -1
 
@@ -46,6 +20,58 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 3.5
+        Intelligence: 1.5
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 072479de-f0e2-4df5-9fe4-b8d5c14d28df
+  name: Thunderbolt II
+  description: Blast a single enemy with an intense shock, dealing {{ value }} damage.
+
+  sprite: '0008'
+
+  rarity: Uncommon
+
+  epCost: 18
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 67cd2659-bf26-4fee-9a3d-30c4870c4c79
+  name: Thunderbolt III
+  description: Blast a single enemy with an intense shock, dealing {{ value }} damage.
+
+  sprite: '0008'
+
+  rarity: Rare
+
+  epCost: 27
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 4.5
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

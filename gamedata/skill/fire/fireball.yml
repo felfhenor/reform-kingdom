@@ -59,3 +59,34 @@
           duration: 4
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: a939d2e6-74b8-46d0-8e95-dff99a754567
+  name: Fireball III
+  description: Burst 3 enemies for {{ value }} fire damage, with a 40% chance of inflicting Burning.
+
+  sprite: '0003'
+
+  rarity: Rare
+
+  epCost: 12
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 3
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.85
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 40
+          duration: 5
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -46,7 +46,41 @@
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
-      targets: 3
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Weakspot
+      damageScaling:
+        Vitality: 0.7
+        Luck: 2
+
+      statusEffects:
+        - statusEffectId: Weakspot
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 77319f61-ffb4-4524-b066-8aa547631776
+  name: Analyze III
+  description: Analyze the weak spot of an enemy, dealing {{ value }} damage to them and inflicting Weakspot.
+
+  sprite: '0006'
+
+  rarity: Rare
+
+  epCost: 9
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth

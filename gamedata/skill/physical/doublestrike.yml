@@ -47,3 +47,28 @@
         Strength: 1.9
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 2234554d-373b-49b4-a290-37fafcd885c6
+  name: Double Strike III
+  description: Strike two enemies for {{ value }} damage each.
+
+  rarity: Rare
+  sprite: '0001'
+
+  epCost: 10
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 3
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -26,7 +26,7 @@
   rarity: Uncommon
   levelRequirement: 10
   type: Charm
-  sprite: '0056'
+  sprite: '0050'
   slots: 1
   baseStats:
     Intelligence: 5.5

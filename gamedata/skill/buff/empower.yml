@@ -1,6 +1,6 @@
 - id: 2653ab27-8bd6-4feb-85a5-595ab200b921
   name: Empower I
-  description: Empower an ally, increasing their Strength by 20% for 3 turns!
+  description: Empower an ally, increasing their Strength by 40% for 3 turns!
 
   sprite: '0014'
 
@@ -17,10 +17,38 @@
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect
-          statusEffectId: Empowered
+          statusEffectId: Empowered I
 
       statusEffects:
-        - statusEffectId: Empowered
+        - statusEffectId: Empowered I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: 0c98606d-0bbc-45b1-882a-0e89467e1ac3
+  name: Empower II
+  description: Empower an ally, increasing their Strength by 80% for 3 turns!
+
+  sprite: '0014'
+
+  rarity: Common
+
+  epCost: 5
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Fire]
+      attributes: [Buff]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Empowered II
+
+      statusEffects:
+        - statusEffectId: Empowered II
           chance: 100
           duration: 3
 
