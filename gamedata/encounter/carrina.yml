@@ -40,7 +40,7 @@
 
   levelRange:
     min: 2
-    max: 5
+    max: 3
 
   fights:
     - monsters:
@@ -218,8 +218,8 @@
   description: A cave filled with goblins who seek copper to barter.
 
   levelRange:
-    min: 2
-    max: 4
+    min: 3
+    max: 5
 
   fights:
     - monsters:
@@ -266,8 +266,8 @@
   description: A sailboat sunken and taken over by a hostile tribe of goblins.
 
   levelRange:
-    min: 3
-    max: 6
+    min: 5
+    max: 9
 
   fights:
     - monsters:
