@@ -394,3 +394,44 @@
       min: 2
       max: 3
       chance: 75
+
+- id: 6f35047f-8aea-4e79-9513-f90a20971ebf
+  name: Fallen Elven Outpost
+  description: An old elven outpost in the middle of the woods. It used to be their base of operations in the Carrina region before it was destroyed.
+
+  levelRange:
+    min: 10
+    max: 14
+
+  fights:
+    - monsters:
+        - monsterId: Elf Archer
+        - monsterId: Hawk
+        - monsterId: Elf Druid
+    - monsters:
+        - monsterId: Elf Druid
+        - monsterId: Elf Druid
+        - monsterId: Elf Archer
+        - monsterId: Hawk
+    - monsters:
+        - monsterId: Elf Druid
+        - monsterId: Elf Druid
+        - monsterId: Elf Archer
+        - monsterId: Elf Archer
+        - monsterId: Hawk
+        - monsterId: Hawk
+
+  completionRewards:
+    - collectibleId: Elven Leaf
+      chance: 100
+
+    - equipmentId: Elvenwood Bow
+      chance: 10
+
+    - equipmentId: Elvenwood Staff
+      chance: 10
+
+    - itemId: Gold Coin
+      min: 300
+      max: 400
+      chance: 100

@@ -63,3 +63,9 @@
   rarity: Common
   description: A pickaxe made of copper, for the simple purpose of getting more copper.
   sprite: '0016'
+
+- id: 967ae7ce-7b54-4b81-9e8e-3141cb9594fc
+  name: Elven Leaf
+  rarity: Common
+  description: A leaf emblem held by elves to symbolize their unity with the forest.
+  sprite: '0017'

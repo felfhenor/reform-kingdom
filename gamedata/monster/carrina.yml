@@ -632,3 +632,151 @@
     Vitality: 0.5
     Resistance: 0.8
     Agility: 0.1
+
+- id: a8fe08d0-ee0f-45b2-a9ba-9643b6dd277b
+  name: Elf Archer
+  description: A very dextrous elf that's very dangerous with bows.
+
+  sprite: '0052'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 25
+    max: 30
+    bonusPerLevel: 5
+
+  drops:
+    - itemId: Gold Coin
+      min: 25
+      max: 35
+      bonusPerLevel: 10
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Snipe I
+      weight: 2
+    - skillId: Arrow Rain I
+      weight: 2
+
+  baseStats:
+    Health: 45
+    Energy: 35
+    Luck: 1
+    Intelligence: 10
+    Strength: 23
+    Vitality: 20
+    Resistance: 12
+    Agility: 12
+
+  statsPerLevel:
+    Health: 8
+    Energy: 4
+    Luck: 1
+    Intelligence: 0.3
+    Strength: 1.75
+    Vitality: 1.25
+    Resistance: 0.75
+    Agility: 0.9
+
+- id: 9f3de631-8f5c-4cdd-8ac0-70f1728cd7c6
+  name: Elf Druid
+  description: An elf that is highly in tune with nature and the magic of it.
+
+  sprite: '0048'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 25
+    max: 30
+    bonusPerLevel: 5
+
+  drops:
+    - itemId: Gold Coin
+      min: 25
+      max: 35
+      bonusPerLevel: 10
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Starshine II
+      weight: 3
+    - skillId: Thunderbolt II
+      weight: 4
+    - skillId: Fortify I
+      weight: 2
+
+  baseStats:
+    Health: 45
+    Energy: 50
+    Luck: 1
+    Intelligence: 10
+    Strength: 5
+    Vitality: 15
+    Resistance: 20
+    Agility: 10
+
+  statsPerLevel:
+    Health: 5
+    Energy: 3
+    Luck: 1
+    Intelligence: 1
+    Strength: 0.5
+    Vitality: 1.1
+    Resistance: 1.2
+    Agility: 0.3
+
+- id: 870cb550-2f9b-466f-b95c-183583dca9ab
+  name: Hawk
+  description: A hawk that's often found near an elf it designated as it's companion.
+
+  sprite: '0056'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 30
+    max: 35
+    bonusPerLevel: 4
+
+  drops:
+    - equipmentId: Hawk Charm
+      chance: 5
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+  baseStats:
+    Health: 35
+    Energy: 5
+    Luck: 1
+    Intelligence: 10
+    Strength: 35
+    Vitality: 10
+    Resistance: 20
+    Agility: 20
+
+  statsPerLevel:
+    Health: 5
+    Energy: 3
+    Luck: 2
+    Intelligence: 1
+    Strength: 2
+    Vitality: 1
+    Resistance: 2
+    Agility: 2

@@ -73,7 +73,7 @@
         - level: 14
           skillId: Starshine II
 
-    - pathName: Starshine
+    - pathName: Empower
       levels:
         - level: 4
           skillId: Empower I
