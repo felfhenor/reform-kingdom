@@ -108,7 +108,9 @@ export class PlayKingdomInfusionComponent {
     () => getEntry<ItemContent>(goldCoinId())?.sprite ?? '',
   );
 
-  public equipmentContentFor(item: EquipmentItem): EquipmentContent | undefined {
+  public equipmentContentFor(
+    item: EquipmentItem,
+  ): EquipmentContent | undefined {
     return getEntry<EquipmentContent>(item.equipmentId);
   }
 
@@ -162,7 +164,7 @@ export class PlayKingdomInfusionComponent {
     const base = `Infuse ${material?.name ?? 'this material'} for ${cost}g?`;
 
     return this.isOverwritingSelectedSlot()
-      ? `${base} This slot is already infused - doing this will replace it, with no refund for what's there now.`
+      ? `${base} This slot is already infused - doing this will replace it, and the existing items will not be refunded.`
       : base;
   }
 
