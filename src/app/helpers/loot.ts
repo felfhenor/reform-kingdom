@@ -2,6 +2,16 @@ import { rangeAtLevel } from '@helpers/leveled-range';
 import { rngNumberRange } from '@helpers/rng';
 import type { DroppedReward, ResolvedDrop } from '@interfaces';
 
+// Display order for a dropped reward icon: collectibles first (rarest/most
+// novel), then equipment, then recipes, then stackable items. Shared by the
+// node completion reward panel and the bestiary monster drop list.
+export function rewardDisplayOrder(reward: DroppedReward): number {
+  if ('collectibleId' in reward) return 0;
+  if ('equipmentId' in reward) return 1;
+  if ('recipeId' in reward) return 2;
+  return 3;
+}
+
 function resolveDrop(
   drop: DroppedReward,
   level: number,

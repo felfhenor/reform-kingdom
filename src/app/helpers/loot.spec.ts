@@ -1,4 +1,4 @@
-import { rollDroppedRewards } from '@helpers/loot';
+import { rewardDisplayOrder, rollDroppedRewards } from '@helpers/loot';
 import type {
   CollectibleId,
   DroppedReward,
@@ -6,6 +6,7 @@ import type {
   ItemId,
   RecipeId,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 import { describe, expect, it } from 'vitest';
 
 describe('Loot Helper Functions', () => {
@@ -88,6 +89,25 @@ describe('Loot Helper Functions', () => {
 
     it('should return an empty array for an empty reward list', () => {
       expect(rollDroppedRewards([], 1)).toEqual([]);
+    });
+  });
+
+  describe('rewardDisplayOrder', () => {
+    it('should order collectibles before equipment, recipes, then items', () => {
+      const item: DroppedReward = { itemId: goldCoinId, min: 1, max: 1, chance: 100 };
+      const equipment: DroppedReward = { equipmentId: cloakId, chance: 100 };
+      const collectible: DroppedReward = { collectibleId: swampClamId, chance: 100 };
+      const recipe: DroppedReward = {
+        recipeId: boneHewnCloakRecipeId,
+        chance: 100,
+      };
+
+      const sorted = sortBy(
+        [item, equipment, collectible, recipe],
+        [rewardDisplayOrder],
+      );
+
+      expect(sorted).toEqual([collectible, equipment, recipe, item]);
     });
   });
 });

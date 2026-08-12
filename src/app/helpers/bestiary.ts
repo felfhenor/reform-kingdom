@@ -1,5 +1,6 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { rangeLabelAtLevel } from '@helpers/leveled-range';
+import { rewardDisplayOrder } from '@helpers/loot';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { isRewardDiscovered, rewardContentInfo } from '@helpers/world-nodes';
 import type {
@@ -12,7 +13,7 @@ import type {
   MonsterContent,
   MonsterId,
 } from '@interfaces';
-import { orderBy } from 'es-toolkit/compat';
+import { orderBy, sortBy } from 'es-toolkit/compat';
 
 export function isMonsterDiscovered(monsterId: MonsterId): boolean {
   return !!gamestate().bestiary[monsterId]?.foundAt;
@@ -176,7 +177,7 @@ export function getBestiaryEntries(): BestiaryEntry[] {
       levelRange: getMonsterLevelRangeFound(monster.id),
       foundAtNodes: getMonsterFoundAtNodes(monster.id),
       sourceNodeNames: monsterSourceNodeNames(monster.id),
-      drops: monster.drops.map((reward) => ({
+      drops: sortBy(monster.drops, [rewardDisplayOrder]).map((reward) => ({
         reward,
         discovered: isRewardDiscovered(reward),
       })),

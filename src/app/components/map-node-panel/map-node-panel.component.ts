@@ -12,7 +12,6 @@ import { GatherMaterialSlotComponent } from '@components/gather-material-slot/ga
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { NodeSpriteComponent } from '@components/node-sprite/node-sprite.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import type { DroppedReward } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 import {
@@ -24,6 +23,7 @@ import {
   gatheringProgressFraction,
   isMonsterDiscovered,
   mapNodeDeselect,
+  rewardDisplayOrder,
   selectedMapNode,
   TICKS_PER_STEP_MOVE,
   travelPathTo,
@@ -43,15 +43,6 @@ import {
   worldNodeMonsterCount,
   worldNodeMonsters,
 } from '@helpers';
-
-// Display order for a node's completion reward icons: collectibles first
-// (rarest/most novel), then equipment, then recipes, then stackable items.
-function rewardDisplayOrder(reward: DroppedReward): number {
-  if ('collectibleId' in reward) return 0;
-  if ('equipmentId' in reward) return 1;
-  if ('recipeId' in reward) return 2;
-  return 3;
-}
 
 @Component({
   selector: 'app-map-node-panel',
