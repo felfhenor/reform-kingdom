@@ -1,4 +1,8 @@
-import { rangeAtLevel } from '@helpers/leveled-range';
+import {
+  rangeAtLevel,
+  rangeLabel,
+  rangeLabelAtLevel,
+} from '@helpers/leveled-range';
 import { describe, expect, it } from 'vitest';
 
 describe('rangeAtLevel', () => {
@@ -26,5 +30,27 @@ describe('rangeAtLevel', () => {
       min: 3,
       max: 10,
     });
+  });
+});
+
+describe('rangeLabel', () => {
+  it('renders a "min-max" span when min and max differ', () => {
+    expect(rangeLabel({ min: 3, max: 10 })).toBe('3-10');
+  });
+
+  it('collapses to a single number when min equals max', () => {
+    expect(rangeLabel({ min: 5, max: 5 })).toBe('5');
+  });
+});
+
+describe('rangeLabelAtLevel', () => {
+  it('resolves the range at the given level, then formats it', () => {
+    expect(rangeLabelAtLevel({ min: 3, max: 10, bonusPerLevel: 2 }, 4)).toBe(
+      '11-18',
+    );
+  });
+
+  it('collapses to a single number once resolved to an equal min/max', () => {
+    expect(rangeLabelAtLevel({ min: 5, max: 5 }, 1)).toBe('5');
   });
 });

@@ -8,6 +8,7 @@ import {
   encounterRandomTimerLabel,
 } from '@helpers/encounter-random';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
+import { rangeLabel } from '@helpers/leveled-range';
 import { allMaps, getMap } from '@helpers/maps';
 import { isMaterialDiscovered } from '@helpers/materials';
 import { monstersFromFights } from '@helpers/monster';
@@ -157,7 +158,7 @@ export function worldNodeLevelRange(
 }
 
 export function worldNodeLevelLabel(levelRange: EncounterLevelRange): string {
-  return `${levelRange.min}-${levelRange.max}`;
+  return rangeLabel(levelRange);
 }
 
 // Every clickable node type maps to one of three things a player can do at

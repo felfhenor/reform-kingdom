@@ -24,7 +24,7 @@ export function monsterXpReward(
   level: number,
 ): number {
   const range = rangeAtLevel(monster.xp, level);
-  return rngNumberRange(range.min, range.max + 1);
+  return rngNumberRange(range.min, range.max);
 }
 
 // Explore nodes advertise a level range (e.g. "3-5") as their recommended

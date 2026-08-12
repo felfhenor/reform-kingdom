@@ -1,5 +1,5 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { rangeAtLevel } from '@helpers/leveled-range';
+import { rangeLabelAtLevel } from '@helpers/leveled-range';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { isRewardDiscovered, rewardContentInfo } from '@helpers/world-nodes';
 import type {
@@ -148,8 +148,7 @@ export function bestiaryDropQuantityLabel(
 ): string {
   if (!('itemId' in reward)) return '1';
 
-  const { min, max } = rangeAtLevel(reward, level);
-  return min === max ? `${min}` : `${min}-${max}`;
+  return rangeLabelAtLevel(reward, level);
 }
 
 // The XP a kill at this level grants, formatted the same way as
@@ -158,8 +157,7 @@ export function bestiaryXpLabel(
   monster: MonsterContent,
   level: number,
 ): string {
-  const { min, max } = rangeAtLevel(monster.xp, level);
-  return min === max ? `${min}` : `${min}-${max}`;
+  return rangeLabelAtLevel(monster.xp, level);
 }
 
 // Every monster in the game, killed or not - undiscovered entries are still

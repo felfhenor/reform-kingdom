@@ -22,7 +22,7 @@ function resolveDrop(
   }
 
   const range = rangeAtLevel(drop, level);
-  const quantity = rngNumberRange(range.min, range.max + 1);
+  const quantity = rngNumberRange(range.min, range.max);
   if (quantity <= 0) return undefined;
 
   return { itemId: drop.itemId, quantity };

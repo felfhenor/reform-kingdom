@@ -494,8 +494,8 @@ describe('worldNodeInteractionKind', () => {
 });
 
 describe('worldNodeLevelLabel', () => {
-  it('renders min-max even when they are equal', () => {
-    expect(worldNodeLevelLabel({ min: 3, max: 3 })).toBe('3-3');
+  it('collapses to a single number when min equals max', () => {
+    expect(worldNodeLevelLabel({ min: 3, max: 3 })).toBe('3');
   });
 
   it('renders the full min-max range', () => {
