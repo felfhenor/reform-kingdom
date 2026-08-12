@@ -483,7 +483,7 @@
   xp:
     min: 100
     max: 150
-    bonusPerLevel: 5
+    bonusPerLevel: 10
 
   drops:
     - itemId: Silk Spool
@@ -506,7 +506,7 @@
     Energy: 40
     Luck: 1
     Intelligence: 3
-    Strength: 5
+    Strength: 10
     Vitality: 3
     Resistance: 3
     Agility: 5
@@ -831,3 +831,58 @@
     Vitality: 1
     Resistance: 2
     Agility: 2
+
+- id: 2e79261c-528d-43c3-ae4f-1c760bb217d4
+  name: Elf Captain
+  description: An elven captain, in charge of training scouts, rangers, and druids.
+
+  sprite: '0064'
+  frames: 4
+
+  targettingType: Strongest
+
+  rarity: Rare
+
+  xp:
+    min: 250
+    max: 300
+    bonusPerLevel: 10
+
+  drops:
+    - itemId: Gold Coin
+      min: 100
+      max: 120
+      bonusPerLevel: 10
+      chance: 100
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Snipe II
+      weight: 3
+    - skillId: Rapidfire I
+      weight: 2
+    - skillId: Sweep II
+      weight: 2
+    - skillId: Thunderbolt II
+      weight: 2
+
+  baseStats:
+    Health: 250
+    Energy: 75
+    Luck: 1
+    Intelligence: 20
+    Strength: 20
+    Vitality: 20
+    Resistance: 20
+    Agility: 15
+
+  statsPerLevel:
+    Health: 5
+    Energy: 3
+    Luck: 1
+    Intelligence: 1
+    Strength: 1.5
+    Vitality: 1.25
+    Resistance: 0.75
+    Agility: 1

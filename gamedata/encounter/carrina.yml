@@ -476,3 +476,39 @@
       min: 500
       max: 650
       chance: 100
+
+- id: c31d693b-7018-4cae-897c-b7a1435d76b7
+  name: Elven Training Ground
+  description: A hidden training ground where elves grow into stronger versions of themselves. There are always elves training here.
+
+  hidden: true
+
+  levelRange:
+    min: 11
+    max: 15
+
+  fights:
+    - monsters:
+        - monsterId: Elf Archer
+        - monsterId: Hawk
+        - monsterId: Elf Scout
+        - monsterId: Elf Druid
+    - monsters:
+        - monsterId: Hawk
+        - monsterId: Hawk
+        - monsterId: Elf Captain
+
+  completionRewards:
+    - collectibleId: Hawk Feathers
+      chance: 100
+
+    - equipmentId: Elvenwood Sword
+      chance: 10
+
+    - equipmentId: Elvenwood Axe
+      chance: 10
+
+    - itemId: Gold Coin
+      min: 500
+      max: 650
+      chance: 100
