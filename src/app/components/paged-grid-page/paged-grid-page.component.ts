@@ -9,14 +9,14 @@ import {
   viewChild,
 } from '@angular/core';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { kingdomSubviewClear } from '@helpers';
+import { KingdomBackButtonComponent } from '@components/kingdom-back-button/kingdom-back-button.component';
 
 const CELL_FOOTPRINT_PX = 72;
 
 @Component({
   selector: 'app-paged-grid-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CardPageComponent],
+  imports: [CardPageComponent, KingdomBackButtonComponent],
   templateUrl: './paged-grid-page.component.html',
   styleUrl: './paged-grid-page.component.scss',
 })
@@ -63,10 +63,6 @@ export class PagedGridPageComponent<T> implements OnDestroy {
 
   ngOnDestroy(): void {
     this.gridResizeObserver?.disconnect();
-  }
-
-  public back(): void {
-    kingdomSubviewClear();
   }
 
   public resetPage(): void {

@@ -3,7 +3,8 @@ import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-anima
 import { BestiaryMonsterDetailComponent } from '@components/bestiary-monster-detail/bestiary-monster-detail.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { filterBestiaryEntries, getBestiaryEntries, kingdomSubviewClear } from '@helpers';
+import { KingdomBackButtonComponent } from '@components/kingdom-back-button/kingdom-back-button.component';
+import { filterBestiaryEntries, getBestiaryEntries } from '@helpers';
 import type { MonsterId } from '@interfaces';
 
 @Component({
@@ -14,6 +15,7 @@ import type { MonsterId } from '@interfaces';
     BestiaryMonsterDetailComponent,
     CardPageComponent,
     IconUnknownComponent,
+    KingdomBackButtonComponent,
   ],
   templateUrl: './play-kingdom-bestiary.component.html',
   styleUrl: './play-kingdom-bestiary.component.scss',
@@ -39,10 +41,6 @@ export class PlayKingdomBestiaryComponent {
       filtered.find((entry) => entry.monster.id === selectedId) ?? filtered[0]
     );
   });
-
-  public back(): void {
-    kingdomSubviewClear();
-  }
 
   public onSearchInput(event: Event): void {
     this.searchText.set((event.target as HTMLInputElement).value);

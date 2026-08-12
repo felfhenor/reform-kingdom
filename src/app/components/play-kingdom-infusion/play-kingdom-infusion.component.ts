@@ -11,6 +11,7 @@ import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-s
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { InfusedMaterialsRowComponent } from '@components/infused-materials-row/infused-materials-row.component';
 import { ItemStatRowsComponent } from '@components/item-stat-rows/item-stat-rows.component';
+import { KingdomBackButtonComponent } from '@components/kingdom-back-button/kingdom-back-button.component';
 import {
   canInfuseEquipmentItem,
   characterInfuseEquipment,
@@ -21,7 +22,6 @@ import {
   goldCoinId,
   infusionMaterialCost,
   isInfusionMaterial,
-  kingdomSubviewClear,
   partyGet,
 } from '@helpers';
 import type {
@@ -48,6 +48,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     IconJobComponent,
     InfusedMaterialsRowComponent,
     ItemStatRowsComponent,
+    KingdomBackButtonComponent,
     SweetAlert2Module,
   ],
   templateUrl: './play-kingdom-infusion.component.html',
@@ -189,9 +190,5 @@ export class PlayKingdomInfusionComponent {
 
     characterInfuseEquipment(character.id, item.id, slotIndex, materialItemId);
     this.pendingMaterialId.set(undefined);
-  }
-
-  public back(): void {
-    kingdomSubviewClear();
   }
 }

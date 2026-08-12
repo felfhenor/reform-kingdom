@@ -3,9 +3,7 @@
     <ng-content select="[header]" />
   </span>
 
-  <div pageactions>
-    <button class="btn btn-sm" (click)="back()">Back</button>
-  </div>
+  <app-kingdom-back-button pageactions />
 
   <div class="paged-grid-page">
     <ng-content select="[before-toolbar]" />

@@ -9,13 +9,13 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
+import { KingdomBackButtonComponent } from '@components/kingdom-back-button/kingdom-back-button.component';
 import {
   craftQueueRemove,
   craftQueueStart,
   formatDuration,
   getCraftableRecipeEntries,
   getEntry,
-  kingdomSubviewClear,
   recipeResultContent,
   recipeResultSpritesheet,
   tradeskillActiveGate,
@@ -43,6 +43,7 @@ import { clamp } from 'es-toolkit/compat';
     AtlasImageComponent,
     CardPageComponent,
     IconBlankSlotComponent,
+    KingdomBackButtonComponent,
     SweetAlert2Module,
     TippyDirective,
   ],
@@ -109,10 +110,6 @@ export class PlayKingdomTradeskillPanelComponent {
     undefined,
   );
   private quantities = signal<Record<RecipeId, number>>({});
-
-  public back(): void {
-    kingdomSubviewClear();
-  }
 
   public quantityFor(recipeId: RecipeId): number {
     return this.quantities()[recipeId] ?? 1;
