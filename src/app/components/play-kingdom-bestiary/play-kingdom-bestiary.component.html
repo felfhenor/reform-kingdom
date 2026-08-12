@@ -1,0 +1,66 @@
+<app-card-page heightProfile="full">
+  <span header>Bestiary</span>
+
+  <div pageactions>
+    <button class="btn btn-sm" (click)="back()">Back</button>
+  </div>
+
+  <div class="bestiary-layout">
+    <div class="bestiary-list">
+      <input
+        type="text"
+        placeholder="Search by name, drop, or location..."
+        class="input input-sm input-bordered w-full"
+        [value]="searchText()"
+        (input)="onSearchInput($event)"
+      />
+
+      <div class="text-xs text-center opacity-70">
+        {{ discoveredCount() }}/{{ entries().length }} discovered
+      </div>
+
+      <div class="bestiary-list-scroll">
+        @let selected = selectedEntry();
+
+        @for (entry of filteredEntries(); track entry.monster.id) {
+          <button
+            type="button"
+            class="bestiary-list-row btn btn-outline btn-neutral justify-start h-auto py-2"
+            [class.btn-active]="entry.monster.id === selected?.monster.id"
+            (click)="selectMonster(entry.monster.id)"
+          >
+            <div class="zoom-50 shrink-0">
+              @if (entry.discovered) {
+                <app-atlas-animation
+                  spritesheet="monster"
+                  [assetName]="entry.monster.sprite"
+                  [frames]="entry.monster.frames"
+                />
+              } @else {
+                <app-icon-unknown />
+              }
+            </div>
+
+            @if (entry.discovered) {
+              <span class="truncate text-neutral-content">
+                {{ entry.monster.name }}
+              </span>
+            } @else {
+              <span class="truncate text-neutral-content">???</span>
+            }
+          </button>
+        } @empty {
+          <div class="text-sm opacity-70 p-2">No monsters found.</div>
+        }
+      </div>
+    </div>
+
+    <div class="bestiary-detail">
+      @if (selectedEntry(); as entry) {
+        <app-bestiary-monster-detail [entry]="entry" />
+      } @else {
+        <div class="text-sm opacity-70">No monster selected.</div>
+      }
+    </div>
+  </div>
+</app-card-page>

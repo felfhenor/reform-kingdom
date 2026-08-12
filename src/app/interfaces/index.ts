@@ -1,4 +1,5 @@
 export * from './artable';
+export * from './bestiary';
 export * from './chance-tier';
 export * from './character';
 export * from './combat';

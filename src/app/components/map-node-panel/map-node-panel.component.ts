@@ -9,6 +9,7 @@ import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-anima
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CompletionRewardSlotComponent } from '@components/completion-reward-slot/completion-reward-slot.component';
 import { GatherMaterialSlotComponent } from '@components/gather-material-slot/gather-material-slot.component';
+import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { NodeSpriteComponent } from '@components/node-sprite/node-sprite.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import type { DroppedReward } from '@interfaces';
@@ -21,6 +22,7 @@ import {
   encounterStartFight,
   gamestate,
   gatheringProgressFraction,
+  isMonsterDiscovered,
   mapNodeDeselect,
   selectedMapNode,
   TICKS_PER_STEP_MOVE,
@@ -59,6 +61,7 @@ function rewardDisplayOrder(reward: DroppedReward): number {
     ButtonCloseComponent,
     CompletionRewardSlotComponent,
     GatherMaterialSlotComponent,
+    IconUnknownComponent,
     NodeSpriteComponent,
     SFXDirective,
     TippyDirective,
@@ -71,6 +74,8 @@ function rewardDisplayOrder(reward: DroppedReward): number {
 })
 export class MapNodePanelComponent {
   private elementRef = inject(ElementRef<HTMLElement>);
+
+  public isMonsterDiscovered = isMonsterDiscovered;
 
   public node = computed(() => selectedMapNode());
 

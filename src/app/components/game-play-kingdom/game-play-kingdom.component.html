@@ -7,6 +7,9 @@
   @case ('museum') {
     <app-play-kingdom-museum></app-play-kingdom-museum>
   }
+  @case ('bestiary') {
+    <app-play-kingdom-bestiary></app-play-kingdom-bestiary>
+  }
   @case ('armory') {
     <app-play-kingdom-armory></app-play-kingdom-armory>
   }
@@ -44,7 +47,7 @@
       <div
         class="flex flex-col justify-between gap-6 p-4 h-full overflow-y-auto"
       >
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-3 gap-4">
           <button
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('storage')"
@@ -57,27 +60,6 @@
             </span>
           </button>
 
-          <button
-            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
-            (click)="openSubview('museum')"
-          >
-            @let museumEntries = museumCollectibleEntries();
-            @let recipeEntries = museumRecipeEntries();
-
-            <span class="text-base font-bold">Museum</span>
-            <span class="text-xs opacity-70">
-              {{ museumCollectiblesFound() }}/{{ museumEntries.length }}
-              collectibles found
-            </span>
-
-            <span class="text-xs opacity-70">
-              {{ museumRecipesFound() }}/{{ recipeEntries.length }} recipes
-              found
-            </span>
-          </button>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
           <button
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('armory')"
@@ -96,6 +78,40 @@
           >
             <span class="text-base font-bold">Astral Projector</span>
             <span class="text-xs opacity-70">0 spells learned</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('museum')"
+          >
+            @let museumEntries = museumCollectibleEntries();
+            @let recipeEntries = museumRecipeEntries();
+
+            <span class="text-base font-bold">Museum</span>
+            <span class="text-xs opacity-70">
+              {{ museumCollectiblesFound() }}/{{ museumEntries.length }}
+              collectibles found
+            </span>
+
+            <span class="text-xs opacity-70">
+              {{ museumRecipesFound() }}/{{ recipeEntries.length }} recipes
+              found
+            </span>
+          </button>
+
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('bestiary')"
+          >
+            @let bestiaryList = bestiaryEntries();
+
+            <span class="text-base font-bold">Bestiary</span>
+            <span class="text-xs opacity-70">
+              {{ bestiaryDiscoveredCount() }}/{{ bestiaryList.length }}
+              monsters discovered
+            </span>
           </button>
         </div>
 

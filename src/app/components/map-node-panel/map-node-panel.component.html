@@ -121,15 +121,22 @@
     <div class="flex flex-col gap-2 p-2">
       @for (monster of monsters(); track monster.id) {
         <div class="flex items-center gap-2">
-          <app-atlas-animation
-            spritesheet="monster"
-            [assetName]="monster.sprite"
-            [frames]="monster.frames"
-            class="zoom-75"
-          />
-          <span class="font-bold text-{{ monster.rarity }}">
-            {{ monster.name }}
-          </span>
+          @if (isMonsterDiscovered(monster.id)) {
+            <app-atlas-animation
+              spritesheet="monster"
+              [assetName]="monster.sprite"
+              [frames]="monster.frames"
+              class="zoom-75"
+            />
+            <span class="font-bold text-{{ monster.rarity }}">
+              {{ monster.name }}
+            </span>
+          } @else {
+            <div class="zoom-75">
+              <app-icon-unknown />
+            </div>
+            <span class="font-bold opacity-70">???</span>
+          }
         </div>
       }
     </div>

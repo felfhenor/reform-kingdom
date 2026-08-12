@@ -15,7 +15,7 @@
     >
       <app-icon-stat [stat]="stat" />
       <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
-      <span>{{ value | statDisplay: maxDecimals() }}</span>
+      <span>{{ value | statDisplay: maxDecimals() : showSign() }}</span>
     </div>
   }
 

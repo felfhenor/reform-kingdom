@@ -129,6 +129,16 @@ export function debugSetTradeskillLevel(
   });
 }
 
+// Wipes every bestiary discovery/kill record - primarily a recovery tool
+// for a save whose bestiary data was corrupted by a since-fixed bug (e.g.
+// NaN level ranges from before min/max level tracking existed).
+export function debugResetBestiary(): void {
+  updateGamestate((state) => {
+    state.bestiary = {};
+    return state;
+  });
+}
+
 export function debugGiveCollectible(
   collectibleId: CollectibleId,
   quantity: number,

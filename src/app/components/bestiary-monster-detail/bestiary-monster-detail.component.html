@@ -1,0 +1,110 @@
+@let e = entry();
+
+<div class="flex flex-col gap-4">
+  <div class="flex items-center gap-4">
+    @if (e.discovered) {
+      <div class="zoom-150">
+        <app-icon-blank-slot>
+          <app-atlas-animation
+            spritesheet="monster"
+            [assetName]="e.monster.sprite"
+            [frames]="e.monster.frames"
+          />
+        </app-icon-blank-slot>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-3">
+          <span class="text-lg font-bold text-{{ e.monster.rarity }}">
+            {{ e.monster.name }}
+          </span>
+
+          <ng-select
+            class="w-28"
+            [items]="levelOptions()"
+            bindLabel="label"
+            bindValue="value"
+            [clearable]="false"
+            [(ngModel)]="selectedLevel"
+          ></ng-select>
+        </div>
+
+        <span class="text-xs opacity-70">
+          Lv. {{ levelMin() }}-{{ levelMax() }} · {{ e.kills }} killed
+        </span>
+        @if (e.foundAtNodes.length > 0) {
+          <span class="text-xs opacity-70">
+            Found at: {{ e.foundAtNodes.join(', ') }}
+          </span>
+        }
+        <span class="text-xs opacity-70">XP: {{ xpLabel() }}</span>
+      </div>
+    } @else {
+      <div class="zoom-150">
+        <app-icon-unknown />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <span class="text-lg font-bold opacity-70">???</span>
+
+        @if (e.sourceNodeNames.length > 0) {
+          <span class="text-xs opacity-70">
+            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
+          </span>
+        } @else {
+          <span class="text-xs italic opacity-70">Location unknown</span>
+        }
+      </div>
+    }
+  </div>
+
+  @if (e.discovered) {
+    <p class="text-sm italic opacity-80">{{ e.monster.description }}</p>
+
+    <div class="flex gap-4">
+      <div class="flex flex-col gap-2 min-w-[150px]">
+        <span class="text-xs font-semibold opacity-70">
+          Stats at Lv. {{ selectedLevel() }}
+        </span>
+        <app-item-stat-rows [stats]="stats()" [showSign]="false" />
+      </div>
+
+      <div class="flex flex-col gap-2 w-32 shrink-0">
+        <span class="text-xs font-semibold opacity-70">
+          Skills at Lv. {{ selectedLevel() }}
+        </span>
+
+        <div class="flex flex-col gap-2">
+          @for (skill of skills(); track skill.id) {
+            <app-bestiary-skill-row
+              [skill]="skill"
+              [description]="skillDescription(skill)"
+            />
+          } @empty {
+            <span class="text-xs italic opacity-70">No skills.</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (e.drops.length > 0) {
+      <div class="flex flex-col gap-2">
+        <span class="text-xs font-semibold opacity-70">Drops</span>
+
+        <div class="flex flex-col gap-2">
+          @for (drop of e.drops; track $index) {
+            <div class="flex items-center gap-3">
+              <app-completion-reward-slot [reward]="drop.reward" />
+              <span class="text-xs min-w-[150px]">
+                {{ drop.reward.chance }}% chance
+              </span>
+              <span class="text-xs">
+                Qty: {{ dropQuantityLabel(drop.reward) }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

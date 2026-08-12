@@ -8,6 +8,7 @@ export type GamePlayView =
 export type KingdomSubview =
   | 'storage'
   | 'museum'
+  | 'bestiary'
   | 'armory'
   | 'astralprojector'
   | 'infusion'

@@ -1,6 +1,8 @@
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import {
+  monsterStatsAtLevel,
   monstersFromFights,
+  monsterXpRangeAtLevel,
   monsterXpReward,
   xpForOverLevel,
 } from '@helpers/monster';
@@ -46,6 +48,24 @@ describe('Monster Helper Functions', () => {
     skills: [{ skillId: 'Attack' as EquipmentSkillId, weight: 1 }],
   };
 
+  describe('monsterStatsAtLevel', () => {
+    it('returns baseStats unchanged at level 1', () => {
+      expect(monsterStatsAtLevel(mockMonster, 1)).toEqual(mockMonster.baseStats);
+    });
+
+    it('scales stats by statsPerLevel for higher levels', () => {
+      const monster = {
+        ...mockMonster,
+        statsPerLevel: { ...mockMonster.statsPerLevel, Health: 5, Strength: 2 },
+      };
+
+      const stats = monsterStatsAtLevel(monster, 3);
+
+      expect(stats.Health).toBe(mockMonster.baseStats.Health + 5 * 2);
+      expect(stats.Strength).toBe(mockMonster.baseStats.Strength + 2 * 2);
+    });
+  });
+
   describe('monsterXpReward', () => {
     it('should return a value within the monster xp range across many rolls', () => {
       for (let i = 0; i < 50; i++) {
@@ -61,6 +81,16 @@ describe('Monster Helper Functions', () => {
         expect(xp).toBeGreaterThanOrEqual(5);
         expect(xp).toBeLessThanOrEqual(7);
       }
+    });
+  });
+
+  describe('monsterXpRangeAtLevel', () => {
+    it('returns the raw xp range at level 1 (no scaling)', () => {
+      expect(monsterXpRangeAtLevel(mockMonster, 1)).toEqual({ min: 3, max: 5 });
+    });
+
+    it('scales the range by the multiplier per level', () => {
+      expect(monsterXpRangeAtLevel(mockMonster, 3)).toEqual({ min: 5, max: 7 });
     });
   });
 

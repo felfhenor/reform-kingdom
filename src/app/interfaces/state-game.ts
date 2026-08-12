@@ -4,6 +4,7 @@ import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
+import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
 import type { GameStateTradeskills } from '@interfaces/crafting';
 import type { AutoModeState } from '@interfaces/decree';
@@ -67,6 +68,22 @@ export type GameStateDiscoveredGatherNodes = {
   [key: string]: { foundAt: number };
 };
 
+// Permanent record of every monster the party has ever defeated - `kills`
+// keeps counting past the first kill, unlike the other discovery slices,
+// since the bestiary shows a running kill count per monster. `minLevelFound`
+// / `maxLevelFound` track the actual levels it's been fought at (not the
+// theoretical range from its encounter data), and `foundAtNodes` accumulates
+// every distinct location it's been killed at, not just the first.
+export type GameStateBestiary = {
+  [key: MonsterId]: {
+    foundAt: number;
+    kills: number;
+    minLevelFound: number;
+    maxLevelFound: number;
+    foundAtNodes: string[];
+  };
+};
+
 export type GameStateClock = {
   numTicks: number;
   lastSaveTick: number;
@@ -90,6 +107,7 @@ export type GameState = {
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredRecipes: GameStateDiscoveredRecipes;
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;
+  bestiary: GameStateBestiary;
   globalEffects: GlobalEffect[];
   tradeskills: GameStateTradeskills;
 };

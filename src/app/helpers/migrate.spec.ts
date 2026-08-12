@@ -13,6 +13,11 @@ vi.mock('@helpers/armory', () => ({
   pruneInvalidDiscoveredEquipment: vi.fn((discovered) => discovered),
 }));
 
+vi.mock('@helpers/bestiary', () => ({
+  pruneInvalidBestiaryEntries: vi.fn((bestiary) => bestiary),
+  repairInvalidBestiaryLevels: vi.fn((bestiary) => bestiary),
+}));
+
 vi.mock('@helpers/collectibles', () => ({
   grantFoundingStoneIfMissing: vi.fn((collectibles) => collectibles),
   pruneInvalidCollectibles: vi.fn((collectibles) => collectibles),
@@ -49,6 +54,7 @@ vi.mock('@helpers/defaults', () => ({
     discoveredEquipment: {},
     discoveredRecipes: {},
     discoveredGatherNodes: {},
+    bestiary: {},
     world: { party: [] },
   })),
 }));

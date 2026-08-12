@@ -59,7 +59,7 @@
 
 - id: b6d08bbb-c860-4205-990e-45937b3e8421
   name: Goblin Warrior
-  description: An improved goblin. It excels at feats of strength.
+  description: An improved goblin. It excels at feats of strength. Only small ones, though.
 
   sprite: '0004'
   frames: 4
@@ -116,7 +116,7 @@
 
 - id: 40dd7495-e231-4135-96a3-090085c8c939
   name: Goblin Magician
-  description: An improved goblin. It excels at feats of magic.
+  description: An improved goblin. It excels at feats of magic. Only small ones, though.
 
   sprite: '0008'
   frames: 4

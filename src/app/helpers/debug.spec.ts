@@ -58,6 +58,7 @@ import {
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
+  debugResetBestiary,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
 } from '@helpers/debug';
@@ -357,6 +358,19 @@ describe('Debug Helper Functions', () => {
       debugSetTradeskillLevel('Woodworking', -5);
 
       expect(captured.building.level).toBe(1);
+    });
+  });
+
+  describe('debugResetBestiary', () => {
+    it('clears every bestiary entry', () => {
+      debugResetBestiary();
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        bestiary: { goblin: { foundAt: 1, kills: 1 } },
+      } as unknown as GameState);
+
+      expect(result.bestiary).toEqual({});
     });
   });
 });

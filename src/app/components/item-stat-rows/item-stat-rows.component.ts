@@ -1,9 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import {
   IconStatComponent,
   STAT_SHORTHAND,
 } from '@components/icon-stat/icon-stat.component';
-import { defaultStats } from '@helpers';
 import type { BaseStat, StatBlock } from '@interfaces';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
@@ -26,9 +30,21 @@ export class ItemStatRowsComponent {
   // 'column' (default) for tooltips/detail panels; 'row' for compact,
   // space-constrained lists (e.g. a picker row).
   public layout = input<'column' | 'row'>('column');
+  // Off for a plain stat readout (e.g. a bestiary entry) where every value
+  // is already known-positive and a leading "+" would just be noise.
+  public showSign = input(true);
 
   public statShorthand = STAT_SHORTHAND;
-  private statKeys = Object.keys(defaultStats()) as BaseStat[];
+  private statKeys: BaseStat[] = [
+    'Health',
+    'Energy',
+    'Strength',
+    'Intelligence',
+    'Vitality',
+    'Resistance',
+    'Agility',
+    'Luck',
+  ];
 
   public hasComparison = computed(() => !!this.comparisonStats());
 

@@ -9,6 +9,10 @@ vi.mock('@helpers/auto-mode', () => ({
   autoModeRecordClauseSuccess: vi.fn(),
 }));
 
+vi.mock('@helpers/bestiary', () => ({
+  monsterRecordKill: vi.fn(),
+}));
+
 vi.mock('@helpers/combat', () => ({
   combatReset: vi.fn(),
   currentCombat: vi.fn(),
@@ -64,6 +68,7 @@ import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
 } from '@helpers/auto-mode';
+import { monsterRecordKill } from '@helpers/bestiary';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset } from '@helpers/combat';
 import { combatCheckIfOver } from '@helpers/combat-end';
@@ -305,6 +310,49 @@ describe('combatCheckIfOver', () => {
     // Uses the highest hero level (7) against the node's max (5).
     expect(xpForOverLevel).toHaveBeenCalledWith(100, 7, 5);
     expect(partyGainXp).toHaveBeenCalledWith(50);
+  });
+
+  it('records a bestiary kill for each defeated guardian on victory', () => {
+    const monster = { id: 'monster-1' } as MonsterContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [],
+      levelRange: { min: 3, max: 5 },
+    } as unknown as EncounterContent;
+
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : monster) as never,
+    );
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      locationName: 'Field Ruins',
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+          level: 5,
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(monsterRecordKill).toHaveBeenCalledWith('monster-1', 5, 'Field Ruins');
+  });
+
+  it('does not record a bestiary kill on defeat', () => {
+    const combat = buildCombat({
+      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(monsterRecordKill).not.toHaveBeenCalled();
   });
 
   it('returns false when combat is not yet over', () => {

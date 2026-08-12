@@ -1,7 +1,28 @@
 import { getEntry } from '@helpers/content';
 import { rngNumberRange } from '@helpers/rng';
-import type { EncounterFightMonster, MonsterContent } from '@interfaces';
+import type {
+  DropRange,
+  EncounterFightMonster,
+  MonsterContent,
+  StatBlock,
+} from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
+
+// A monster's stats at a given level - `baseStats` is its level-1 block,
+// scaled up by `statsPerLevel` for every level past 1, same convention as
+// `monsterXpReward`.
+export function monsterStatsAtLevel(
+  monster: MonsterContent,
+  level: number,
+): StatBlock {
+  const stats = { ...monster.baseStats };
+
+  (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
+    stats[stat] += monster.statsPerLevel[stat] * (level - 1);
+  });
+
+  return stats;
+}
 
 export function monsterXpReward(
   monster: MonsterContent,
@@ -12,6 +33,20 @@ export function monsterXpReward(
     monster.xp.min + levelBonus,
     monster.xp.max + levelBonus + 1,
   );
+}
+
+// The XP range a kill at this level grants, before `monsterXpReward` rolls
+// a specific value within it - used for a stable preview (e.g. the
+// bestiary), where rolling a fresh value on every render would flicker.
+export function monsterXpRangeAtLevel(
+  monster: MonsterContent,
+  level: number,
+): DropRange {
+  const levelBonus = monster.xp.multiplierPerLevel * (level - 1);
+  return {
+    min: monster.xp.min + levelBonus,
+    max: monster.xp.max + levelBonus,
+  };
 }
 
 // Explore nodes advertise a level range (e.g. "3-5") as their recommended

@@ -3,6 +3,10 @@ import {
   pruneInvalidDiscoveredEquipment,
 } from '@helpers/armory';
 import {
+  pruneInvalidBestiaryEntries,
+  repairInvalidBestiaryLevels,
+} from '@helpers/bestiary';
+import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
@@ -82,6 +86,8 @@ export function migrateGameState() {
     newState.discoveredGatherNodes,
     newState.materials,
   );
+  newState.bestiary = pruneInvalidBestiaryEntries(newState.bestiary);
+  newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
   newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
 

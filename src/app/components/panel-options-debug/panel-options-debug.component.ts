@@ -7,6 +7,7 @@ import {
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
+  debugResetBestiary,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
   getEntriesByType,
@@ -107,5 +108,9 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!tradeskill) return;
 
     debugSetTradeskillLevel(tradeskill, this.tradeskillLevel());
+  }
+
+  public resetBestiary(): void {
+    debugResetBestiary();
   }
 }

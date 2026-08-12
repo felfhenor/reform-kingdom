@@ -3,23 +3,27 @@ import {
   skillTechniquePreviewValue,
 } from '@helpers/skill-preview';
 import type {
-  Character,
+  Combatant,
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
+  StatBlock,
 } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
-function buildCharacter(overrides: Partial<Character> = {}): Character {
+function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
   return {
-    id: 'char-1' as never,
-    name: 'Test Hero',
+    id: 'combatant-1',
+    name: 'Test Combatant',
+    isEnemy: false,
     level: 1,
-    xp: { current: 0, maximum: 100 },
-    jobId: 'job-1' as never,
-    jobProgress: {},
     hp: 100,
     ep: 10,
-    stats: {
+    sprite: '0000',
+    frames: 4,
+    targettingType: 'Random',
+    baseStats: {} as never,
+    statBoosts: {} as never,
+    totalStats: {
       Agility: 0,
       Energy: 0,
       Health: 100,
@@ -28,9 +32,16 @@ function buildCharacter(overrides: Partial<Character> = {}): Character {
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
-    },
-    equipment: {} as never,
-    traitIds: [],
+    } as StatBlock,
+    combatStats: {} as never,
+    resistance: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
+    affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
+    skillIds: [],
+    skillRefs: [],
+    skillWeights: {},
+    skillUses: {},
+    statusEffects: [],
+    statusEffectData: {},
     ...overrides,
   };
 }
@@ -82,8 +93,8 @@ function buildTechnique(
 
 describe('skillTechniquePreviewValue', () => {
   it('sums each scaled stat using the same formula as live combat', () => {
-    const character = buildCharacter({
-      stats: {
+    const combatant = buildCombatant({
+      totalStats: {
         Agility: 0,
         Energy: 0,
         Health: 100,
@@ -109,12 +120,12 @@ describe('skillTechniquePreviewValue', () => {
     });
 
     // Intelligence(100)*0.5 = 50; Vitality(40)*0.25 = 10.
-    expect(skillTechniquePreviewValue(character, skill, technique)).toBe(60);
+    expect(skillTechniquePreviewValue(combatant, skill, technique)).toBe(60);
   });
 
   it('floors a fractional result', () => {
-    const character = buildCharacter({
-      stats: {
+    const combatant = buildCombatant({
+      totalStats: {
         Agility: 0,
         Energy: 0,
         Health: 100,
@@ -140,22 +151,22 @@ describe('skillTechniquePreviewValue', () => {
     });
 
     // 101*0.5 = 50.5 -> floored to 50.
-    expect(skillTechniquePreviewValue(character, skill, technique)).toBe(50);
+    expect(skillTechniquePreviewValue(combatant, skill, technique)).toBe(50);
   });
 
   it('returns 0 for a technique with no damage scaling', () => {
-    const character = buildCharacter();
+    const combatant = buildCombatant();
     const skill = buildSkill();
     const technique = buildTechnique();
 
-    expect(skillTechniquePreviewValue(character, skill, technique)).toBe(0);
+    expect(skillTechniquePreviewValue(combatant, skill, technique)).toBe(0);
   });
 });
 
 describe('skillDescriptionWithPreview', () => {
   it('substitutes {{ value }} with the previewed amount', () => {
-    const character = buildCharacter({
-      stats: {
+    const combatant = buildCombatant({
+      totalStats: {
         Agility: 0,
         Energy: 0,
         Health: 100,
@@ -184,27 +195,27 @@ describe('skillDescriptionWithPreview', () => {
       ],
     });
 
-    expect(skillDescriptionWithPreview(character, skill)).toBe(
+    expect(skillDescriptionWithPreview(combatant, skill)).toBe(
       'Heal a living ally for 50 HP.',
     );
   });
 
   it('leaves a description with no placeholder unchanged', () => {
-    const character = buildCharacter();
+    const combatant = buildCombatant();
     const skill = buildSkill({
       description: 'Boost the Vitality of an ally!',
       techniques: [buildTechnique({ attributes: ['Buff'] })],
     });
 
-    expect(skillDescriptionWithPreview(character, skill)).toBe(
+    expect(skillDescriptionWithPreview(combatant, skill)).toBe(
       'Boost the Vitality of an ally!',
     );
   });
 
   it('returns the raw description when the skill has no techniques', () => {
-    const character = buildCharacter();
+    const combatant = buildCombatant();
     const skill = buildSkill({ description: 'No effect.', techniques: [] });
 
-    expect(skillDescriptionWithPreview(character, skill)).toBe('No effect.');
+    expect(skillDescriptionWithPreview(combatant, skill)).toBe('No effect.');
   });
 });

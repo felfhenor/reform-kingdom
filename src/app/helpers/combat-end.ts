@@ -2,6 +2,7 @@ import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
 } from '@helpers/auto-mode';
+import { monsterRecordKill } from '@helpers/bestiary';
 import { combatReset, currentCombat } from '@helpers/combat';
 import { combatMessageLog } from '@helpers/combat-log';
 import { grantResolvedDrops } from '@helpers/combat-rewards';
@@ -84,6 +85,10 @@ function grantVictoryRewards(combat: Combat): void {
   const monsters = defeatedMonsters(combat);
   const maxLevel = encounterMaxLevel(combat);
   const partyLevel = partyRepresentativeLevel(combat);
+
+  monsters.forEach(({ monster, level }) =>
+    monsterRecordKill(monster.id, level, combat.locationName),
+  );
 
   const totalXp = sumBy(monsters, ({ monster, level }) => {
     const rawXp = monsterXpReward(monster, level);

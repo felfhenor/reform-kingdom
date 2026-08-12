@@ -1,6 +1,7 @@
 export * from './analytics';
 export * from './armory';
 export * from './auto-mode';
+export * from './bestiary';
 export * from './clipboard';
 export * from './collectibles';
 export * from './combat';

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
 import {
+  combatantFromCharacter,
   equippedItemTypes,
   getEntry,
   heroSkillsWithEquipment,
@@ -10,6 +11,7 @@ import {
 } from '@helpers';
 import type {
   Character,
+  Combatant,
   EquipmentItemType,
   EquipmentSkillContent,
   JobContent,
@@ -48,11 +50,15 @@ export class HeroEquipmentPanelSkillsComponent {
     equippedItemTypes(this.character().equipment),
   );
 
+  private combatant = computed<Combatant>(() =>
+    combatantFromCharacter(this.character()),
+  );
+
   public isSkillUsable(skill: EquipmentSkillContent): boolean {
     return skillIsUsableWithEquippedWeapons(skill, this.equippedWeaponTypes());
   }
 
   public skillDescription(skill: EquipmentSkillContent): string {
-    return skillDescriptionWithPreview(this.character(), skill);
+    return skillDescriptionWithPreview(this.combatant(), skill);
   }
 }

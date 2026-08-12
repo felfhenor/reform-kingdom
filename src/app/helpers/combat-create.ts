@@ -6,6 +6,7 @@ import {
 } from '@helpers/defaults';
 import { equippedItemTypes } from '@helpers/equipment';
 import { heroSkillsWithEquipment } from '@helpers/job';
+import { monsterStatsAtLevel } from '@helpers/monster';
 import { rngUuid } from '@helpers/rng';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/skill';
 import type {
@@ -17,7 +18,6 @@ import type {
   EquipmentSkillId,
   JobContent,
   MonsterContent,
-  StatBlock,
 } from '@interfaces';
 
 function heroUsableSkillIds(
@@ -32,19 +32,6 @@ function heroUsableSkillIds(
       !skill || skillIsUsableWithEquippedWeapons(skill, equippedWeaponTypes)
     );
   });
-}
-
-function monsterStatsAtLevel(
-  monster: MonsterContent,
-  level: number,
-): StatBlock {
-  const stats = { ...monster.baseStats };
-
-  (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
-    stats[stat] += monster.statsPerLevel[stat] * (level - 1);
-  });
-
-  return stats;
 }
 
 export function combatantFromCharacter(character: Character): Combatant {

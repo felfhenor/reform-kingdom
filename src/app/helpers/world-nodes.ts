@@ -404,7 +404,7 @@ export function worldNodeCompletionRewards(
   return rewards;
 }
 
-function isRewardDiscovered(reward: DroppedReward): boolean {
+export function isRewardDiscovered(reward: DroppedReward): boolean {
   if ('itemId' in reward) return isMaterialDiscovered(reward.itemId);
   if ('equipmentId' in reward) return isEquipmentDiscovered(reward.equipmentId);
   if ('recipeId' in reward) return isRecipeDiscovered(reward.recipeId);
