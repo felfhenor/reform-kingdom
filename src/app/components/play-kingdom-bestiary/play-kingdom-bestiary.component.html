@@ -27,7 +27,7 @@
             [class.btn-active]="entry.monster.id === selected?.monster.id"
             (click)="selectMonster(entry.monster.id)"
           >
-            <div class="zoom-50 shrink-0">
+            <div class="zoom-row shrink-0">
               @if (entry.discovered) {
                 <app-atlas-animation
                   spritesheet="monster"

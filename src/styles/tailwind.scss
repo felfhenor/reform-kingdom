@@ -64,3 +64,21 @@
 @utility text-lighter {
   opacity: 0.7;
 }
+
+// Icon zoom sizes, named for where they're applied rather than their raw
+// percentage, so usage sites read as intent instead of a magic number.
+@utility zoom-inline {
+  zoom: 25%;
+}
+
+@utility zoom-row {
+  zoom: 50%;
+}
+
+@utility zoom-tooltip {
+  zoom: 75%;
+}
+
+@utility zoom-header {
+  zoom: 150%;
+}

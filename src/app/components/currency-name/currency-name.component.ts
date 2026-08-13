@@ -21,7 +21,7 @@ import type { ItemContent, ItemId } from '../../interfaces';
     <div class="flex items-center" [tp]="label()" [tpPlacement]="'bottom'">
       <div class="min-w-[16px] min-h-[16px] mr-2">
         <app-atlas-image
-          class="zoom-25"
+          class="zoom-inline"
           spritesheet="item"
           [assetName]="icon()"
         />

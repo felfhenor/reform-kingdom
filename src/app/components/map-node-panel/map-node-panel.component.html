@@ -163,13 +163,13 @@
               spritesheet="monster"
               [assetName]="monster.sprite"
               [frames]="monster.frames"
-              class="zoom-75"
+              class="zoom-tooltip"
             />
             <span class="font-bold text-{{ monster.rarity }}">
               {{ monster.name }}
             </span>
           } @else {
-            <div class="zoom-75">
+            <div class="zoom-tooltip">
               <app-icon-unknown />
             </div>
             <span class="font-bold text-lighter">???</span>
