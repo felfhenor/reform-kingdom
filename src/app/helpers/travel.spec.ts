@@ -42,11 +42,14 @@ vi.mock('@helpers/world', () => ({
   currentLocationSet: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node-encounter', () => ({
+  worldNodeExploreRandomIsAvailable: vi.fn(),
+}));
+
 vi.mock('@helpers/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodeEncounter: vi.fn(),
   worldNodeEncounterRandom: vi.fn(),
-  worldNodeExploreRandomIsAvailable: vi.fn(),
   worldNodeGathering: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
 }));

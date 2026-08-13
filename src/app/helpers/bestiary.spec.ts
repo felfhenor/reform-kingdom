@@ -22,9 +22,12 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/world-nodes', () => ({
+vi.mock('@helpers/world-node-rewards', () => ({
   isRewardDiscovered: vi.fn(),
   rewardContentInfo: vi.fn(),
+}));
+
+vi.mock('@helpers/world-nodes', () => ({
   worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
 }));
 
@@ -44,7 +47,7 @@ import {
 } from '@helpers/bestiary';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { isRewardDiscovered, rewardContentInfo } from '@helpers/world-nodes';
+import { isRewardDiscovered, rewardContentInfo } from '@helpers/world-node-rewards';
 
 const goblin: MonsterContent = {
   id: 'goblin' as MonsterId,

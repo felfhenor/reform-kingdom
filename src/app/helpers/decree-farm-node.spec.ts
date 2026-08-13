@@ -16,14 +16,20 @@ vi.mock('@helpers/recipes', () => ({
   isRecipeDiscovered: vi.fn(() => false),
 }));
 
-vi.mock('@helpers/world-nodes', () => ({
-  rewardContentInfo: vi.fn(),
-  rewardKey: vi.fn(),
-  worldNodeByName: vi.fn(),
-  worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
-  worldNodeCompletionRewards: vi.fn(() => []),
+vi.mock('@helpers/world-node-status', () => ({
   worldNodeLevelLabel: vi.fn(),
   worldNodeLevelRange: vi.fn(),
+}));
+
+vi.mock('@helpers/world-node-rewards', () => ({
+  rewardContentInfo: vi.fn(),
+  rewardKey: vi.fn(),
+  worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
+  worldNodeCompletionRewards: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/world-nodes', () => ({
+  worldNodeByName: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
 }));
 
@@ -38,15 +44,16 @@ import {
 import { getMaterialQuantity } from '@helpers/materials';
 import { isRecipeDiscovered } from '@helpers/recipes';
 import {
-  rewardContentInfo,
-  rewardKey,
-  worldNodeByName,
-  worldNodeCompletionRewardProgress,
-  worldNodeCompletionRewards,
   worldNodeLevelLabel,
   worldNodeLevelRange,
-  worldNodesOfType,
-} from '@helpers/world-nodes';
+} from '@helpers/world-node-status';
+import {
+  rewardContentInfo,
+  rewardKey,
+  worldNodeCompletionRewardProgress,
+  worldNodeCompletionRewards,
+} from '@helpers/world-node-rewards';
+import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
 import type {
   EquipmentId,
   EquipmentItem,

@@ -40,12 +40,18 @@ vi.mock('@helpers/world', () => ({
   isPlayerAtKingdom: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/world-node-gathering', () => ({
+  worldNodeGatherMaterialIds: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/world-node-rewards', () => ({
+  worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
+}));
+
 vi.mock('@helpers/world-nodes', () => ({
   isWorldNodeVisible: vi.fn(() => true),
   worldNodeByName: vi.fn(),
-  worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
   worldNodeEncounter: vi.fn(),
-  worldNodeGatherMaterialIds: vi.fn(() => []),
   worldNodesOfType: vi.fn(() => []),
 }));
 
@@ -74,12 +80,12 @@ import { isXpTrivialAtOverLevel } from '@helpers/monster';
 import { isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
+import { worldNodeCompletionRewardProgress } from '@helpers/world-node-rewards';
 import {
   isWorldNodeVisible,
   worldNodeByName,
-  worldNodeCompletionRewardProgress,
   worldNodeEncounter,
-  worldNodeGatherMaterialIds,
   worldNodesOfType,
 } from '@helpers/world-nodes';
 import type {

@@ -19,10 +19,8 @@ import {
 } from '@helpers/state-game';
 import { travelProcessTick } from '@helpers/travel';
 import { isPlayerAtKingdom } from '@helpers/world';
-import {
-  gatherableMaterialIds,
-  worldNodeEncounter,
-} from '@helpers/world-nodes';
+import { gatherableMaterialIds } from '@helpers/world-node-gathering';
+import { worldNodeEncounter } from '@helpers/world-nodes';
 import type { GameState } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 import {

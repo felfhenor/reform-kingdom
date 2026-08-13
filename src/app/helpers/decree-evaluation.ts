@@ -11,12 +11,12 @@ import { isXpTrivialAtOverLevel } from '@helpers/monster';
 import { CHARACTER_MAX_LEVEL, isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
+import { worldNodeCompletionRewardProgress } from '@helpers/world-node-rewards';
 import {
   isWorldNodeVisible,
   worldNodeByName,
-  worldNodeCompletionRewardProgress,
   worldNodeEncounter,
-  worldNodeGatherMaterialIds,
   worldNodesOfType,
 } from '@helpers/world-nodes';
 import type {

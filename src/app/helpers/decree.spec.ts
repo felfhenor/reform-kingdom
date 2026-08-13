@@ -13,7 +13,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/world-nodes', () => ({
+vi.mock('@helpers/world-node-rewards', () => ({
   rewardContentInfo: vi.fn(),
   rewardKey: vi.fn((reward) => {
     if ('itemId' in reward) return `item:${reward.itemId}`;
@@ -39,7 +39,7 @@ import {
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { rewardContentInfo } from '@helpers/world-nodes';
+import { rewardContentInfo } from '@helpers/world-node-rewards';
 import type {
   DecreeClause,
   DecreeClauseId,

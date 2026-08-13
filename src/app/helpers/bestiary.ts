@@ -2,11 +2,8 @@ import { getEntriesByType, getEntry } from '@helpers/content';
 import { rangeLabelAtLevel } from '@helpers/leveled-range';
 import { rewardDisplayOrder } from '@helpers/loot';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import {
-  isRewardDiscovered,
-  rewardContentInfo,
-  worldNodeDisplayName,
-} from '@helpers/world-nodes';
+import { isRewardDiscovered, rewardContentInfo } from '@helpers/world-node-rewards';
+import { worldNodeDisplayName } from '@helpers/world-nodes';
 import type {
   BestiaryEntry,
   DroppedReward,

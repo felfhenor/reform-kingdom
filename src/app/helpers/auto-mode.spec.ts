@@ -56,10 +56,16 @@ vi.mock('@helpers/world', () => ({
   isPlayerAtKingdom: vi.fn(() => false),
 }));
 
-vi.mock('@helpers/world-nodes', () => ({
-  rewardContentInfo: vi.fn(),
-  worldNodeByName: vi.fn(),
+vi.mock('@helpers/world-node-gathering', () => ({
   worldNodeGatherMaterialIds: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/world-node-rewards', () => ({
+  rewardContentInfo: vi.fn(),
+}));
+
+vi.mock('@helpers/world-nodes', () => ({
+  worldNodeByName: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
 }));
 
@@ -98,12 +104,9 @@ import { isPartyAtFullHealth } from '@helpers/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { travelStart } from '@helpers/travel';
 import { isPlayerAtKingdom } from '@helpers/world';
-import {
-  rewardContentInfo,
-  worldNodeByName,
-  worldNodeGatherMaterialIds,
-  worldNodesOfType,
-} from '@helpers/world-nodes';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
+import { rewardContentInfo } from '@helpers/world-node-rewards';
+import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
 import type {
   DecreeClause,
   DecreeClauseId,

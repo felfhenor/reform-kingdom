@@ -1,7 +1,7 @@
 import { getEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { rewardContentInfo, rewardKey } from '@helpers/world-nodes';
+import { rewardContentInfo, rewardKey } from '@helpers/world-node-rewards';
 import type {
   DecreeClause,
   DecreeClauseAction,

@@ -8,11 +8,11 @@ import { gatheringStart, gatheringStop } from '@helpers/gathering';
 import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
+import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node-encounter';
 import {
   worldNodeByName,
   worldNodeEncounter,
   worldNodeEncounterRandom,
-  worldNodeExploreRandomIsAvailable,
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-nodes';
