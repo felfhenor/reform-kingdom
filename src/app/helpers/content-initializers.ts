@@ -153,6 +153,12 @@ function ensureEnumValue<T extends string>(
   return validValues.includes(value as T) ? (value as T) : fallback;
 }
 
+export function hasContentInitializer<T extends IsContentItem>(
+  content: T,
+): boolean {
+  return !!initializers[content.__type];
+}
+
 export function ensureContent<T extends IsContentItem>(content: T): T {
   return initializers[content.__type](content) satisfies T;
 }
@@ -474,8 +480,7 @@ function ensureStatusEffectBehavior(
       return {
         type,
         combatMessage,
-        key:
-          (behavior['key'] as keyof CombatantStatusEffectData) ?? 'isFrozen',
+        key: (behavior['key'] as keyof CombatantStatusEffectData) ?? 'isFrozen',
         value: (behavior['value'] as boolean) ?? false,
       };
 

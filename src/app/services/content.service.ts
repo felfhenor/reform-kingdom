@@ -5,6 +5,7 @@ import {
   allContentById,
   allIdsByName,
   ensureContent,
+  hasContentInitializer,
   setAllContentById,
   setAllIdsByName,
   setAllMaps,
@@ -114,7 +115,9 @@ export class ContentService {
 
     await Promise.all(
       mapNames.map(async (name) => {
-        const mapReq = this.http.get(this.toCacheBustURL(`./maps/${name}.json`));
+        const mapReq = this.http.get(
+          this.toCacheBustURL(`./maps/${name}.json`),
+        );
         const data = await lastValueFrom(mapReq);
         maps.set(name, { name, data });
       }),
@@ -152,6 +155,11 @@ export class ContentService {
             'Content',
             `"${entry.name}/${entry.id}" is a duplicate id to "${dupe.name}/${dupe.id}". Skipping...`,
           );
+          return;
+        }
+
+        if (!hasContentInitializer(entry)) {
+          this.logger.warn(`Content type ${entry.__type} has no initializer`);
           return;
         }
 
