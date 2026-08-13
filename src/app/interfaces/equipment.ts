@@ -25,6 +25,7 @@ export type EquipmentItemType =
   | 'Dagger'
   | 'Dirk'
   | 'Hat'
+  | 'Helm'
   | 'Mace'
   | 'Metal Armor'
   | 'Ring'
@@ -45,6 +46,7 @@ export const EquipmentTypeToSlot: Record<EquipmentItemType, EquipmentSlot[]> = {
   Dagger: ['Weapon'],
   Dirk: ['Offhand'],
   Hat: ['Helmet'],
+  Helm: ['Helmet'],
   Mace: ['Weapon'],
   'Metal Armor': ['Armor'],
   Ring: ['Ring'],

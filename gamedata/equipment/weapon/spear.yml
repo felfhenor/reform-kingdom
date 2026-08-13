@@ -25,6 +25,17 @@
     Strength: 2.4
     Agility: 1.2
 
+- id: d59e9ce7-4012-4454-97ad-be31ad12e543
+  name: Elvenwood Harpoon
+  description: A beautifully carved harpoon made of elven wood.
+  levelRequirement: 9
+  rarity: Uncommon
+  type: Spear
+  sprite: '0073'
+  slots: 1
+  baseStats:
+    Strength: 6.4
+
 - id: 1ca45cc0-343b-431c-bc48-60847d40aab6
   name: Elvenwood Spear
   description: A beautifully carved spear made of elven wood.

@@ -1,0 +1,286 @@
+- id: 3eee6873-1747-4811-a27c-92448d741f9f
+  name: Juke Itos
+  description: Greetings, heroes! I deal in the Duchy's finest armor & defensive materials!
+  category: Carrina
+  level: 3
+
+  trades:
+    # unique to this trader
+    - type: sell
+      value: 3500
+      collectibleId: Blank Playing Card
+      weight: 5
+
+    - type: sell
+      value: 500
+      equipmentId: Copper Helm
+      limit: 2
+      weight: 2
+
+    - type: sell
+      value: 500
+      equipmentId: Copper Breastplate
+      limit: 2
+      weight: 2
+
+    - type: sell
+      value: 500
+      itemId: Pumpkin Gem
+      limit: 5
+      weight: 2
+
+    # base game items
+    - type: sell
+      value: 150
+      equipmentId: Linen Hat
+      limit: 2
+      weight: 1
+
+    - type: buy
+      value: 100
+      itemId: Copper Ingot
+      limit: 100
+      weight: 1
+
+    - type: sell
+      value: 150
+      itemId: Copper Ingot
+      limit: 25
+      weight: 2
+
+    - type: sell
+      value: 50
+      itemId: Tattered Hide
+      limit: 15
+      weight: 3
+
+    - type: buy
+      value: 300
+      itemId: Purple Slime Core
+      limit: 5
+      weight: 2
+
+    - type: sell
+      value: 500
+      itemId: Purple Slime Core
+      limit: 5
+      weight: 2
+
+    - type: buy
+      value: 300
+      itemId: Green Slime Core
+      limit: 5
+      weight: 2
+
+    - type: sell
+      value: 500
+      itemId: Green Slime Core
+      limit: 5
+      weight: 2
+
+- id: a35c9aa4-bd74-4c71-90b9-78d9c4d872c5
+  name: Sedgwick D. Kenny
+  description: Greetings, heroes! I deal in the Duchy's finest weaponry & offensive materials!
+  category: Carrina
+  level: 5
+
+  trades:
+    # unique to this trader
+    - type: sell
+      value: 5000
+      collectibleId: Safety Float
+      weight: 5
+
+    - type: sell
+      value: 500
+      equipmentId: Copper Greatmace
+      limit: 2
+      weight: 2
+
+    - type: sell
+      value: 500
+      equipmentId: Copper Crossbow
+      limit: 2
+      weight: 2
+
+    # base game items
+    - type: buy
+      value: 10
+      itemId: Wergen Stick
+      limit: 100
+      weight: 2
+
+    - type: buy
+      value: 10
+      itemId: Wergen Wood
+      limit: 100
+      weight: 2
+
+    - type: buy
+      value: 300
+      itemId: Red Slime Core
+      limit: 5
+      weight: 2
+
+    - type: sell
+      value: 500
+      itemId: Red Slime Core
+      limit: 5
+      weight: 1
+
+- id: 787b86ba-c0b8-49bb-8c39-4dc0918f4fd8
+  name: Graagnus
+  description: Humans! Buy stuff!
+  category: Goblem
+  level: 3
+
+  trades:
+    # unique to this trader
+    - type: sell
+      value: 2500
+      collectibleId: Crude Treasure Map
+      weight: 5
+
+    - type: sell
+      value: 500
+      equipmentId: Coppergob Dagger
+      limit: 2
+      weight: 2
+
+    - type: sell
+      value: 500
+      equipmentId: Coppergob Dirk
+      limit: 2
+      weight: 2
+
+    # base game items
+    - type: sell
+      value: 50
+      itemId: Copper Ore
+      limit: 100
+      weight: 2
+
+    - type: buy
+      value: 150
+      itemId: Malachite
+      limit: 5
+      weight: 1
+
+- id: 1503d413-a38b-4759-856c-a9b234cec813
+  name: Bart
+  description: Humans! Buy stuff!
+  category: Goblem
+  level: 5
+
+  trades:
+    # unique to this trader
+    - type: sell
+      value: 5000
+      collectibleId: Gobsweet
+      weight: 5
+
+    - type: sell
+      value: 500
+      itemId: Goblin Teeth
+      limit: 5
+      weight: 2
+
+    - type: sell
+      value: 500
+      itemId: Goblin Nail
+      limit: 5
+      weight: 2
+
+    # base game items
+    - type: buy
+      value: 250
+      itemId: Azurite
+      limit: 5
+      weight: 1
+
+- id: 383dbb28-cc21-47ca-afee-bd088dc127e4
+  name: Pondias Albel
+  description: Humans. I have crafting materials that you might find useful. If you want to look, anyway.
+  category: Elfheim
+  level: 5
+
+  trades:
+    # unique to this trader
+    - type: sell
+      value: 15000
+      collectibleId: Elvish Boomerang
+      weight: 5
+
+    - type: sell
+      value: 3500
+      equipmentId: Ace of Spades
+      limit: 1
+      weight: 3
+
+    - type: sell
+      value: 3500
+      equipmentId: Mysterious Die
+      limit: 1
+      weight: 3
+
+    # base game items
+    - type: sell
+      value: 150
+      itemId: Silk Spool
+      limit: 100
+      weight: 2
+
+    - type: sell
+      value: 25
+      itemId: Linen Thread
+      limit: 100
+      weight: 2
+
+    - type: buy
+      value: 10
+      itemId: Linen Thread
+      limit: 100
+      weight: 1
+
+    - type: sell
+      value: 1500
+      itemId: Trislime Core
+      limit: 3
+      weight: 2
+
+- id: 5cd7a8a6-1030-49cc-891e-c67e2f4ac74c
+  name: Renaud Hall
+  description: I deal in elvish equipment. You might find some good items here.
+  category: Elfheim
+  level: 7
+
+  trades:
+    # unique to this trader
+    - type: sell
+      value: 25000
+      collectibleId: Elven Staffrune Book
+      weight: 5
+
+    - type: sell
+      value: 2500
+      equipmentId: Elfsilk Hat
+      limit: 2
+      weight: 3
+
+    - type: sell
+      value: 2500
+      equipmentId: Elfsilk Shirt
+      limit: 2
+      weight: 3
+
+    - type: sell
+      value: 5000
+      equipmentId: Elvenwood Mace
+      limit: 2
+      weight: 3
+
+    - type: sell
+      value: 5000
+      equipmentId: Elvenwood Harpoon
+      limit: 2
+      weight: 3

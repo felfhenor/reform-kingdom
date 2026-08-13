@@ -108,6 +108,7 @@ const EQUIPMENT_TYPES = [
   'Dagger',
   'Dirk',
   'Hat',
+  'Helm',
   'Mace',
   'Ring',
   'Shield',

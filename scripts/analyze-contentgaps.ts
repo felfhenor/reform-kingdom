@@ -91,6 +91,7 @@ const ALL_EQUIPMENT_TYPES = [
   'Dagger',
   'Dirk',
   'Hat',
+  'Helm',
   'Mace',
   'Metal Armor',
   'Ring',

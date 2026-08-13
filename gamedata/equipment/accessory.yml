@@ -13,7 +13,7 @@
   name: Wergenslime Bag
   description: A bag held together entirely by sticks and slime.
   rarity: Common
-  levelRequirement: 6
+  levelRequirement: 5
   type: Accessory
   sprite: '0037'
   slots: 2
@@ -38,12 +38,23 @@
   name: Silkslime Gloves
   description: A pair of gloves made from silkslime.
   rarity: Common
-  levelRequirement: 6
+  levelRequirement: 7
   type: Accessory
   sprite: '0041'
   slots: 1
   baseStats:
     Resistance: 2.5
+
+- id: 49e2b537-0501-4255-9813-bff11afef4d5
+  name: Ace of Spades
+  description: A playing card symboling luck.
+  rarity: Uncommon
+  levelRequirement: 9
+  type: Accessory
+  sprite: '0074'
+  slots: 1
+  baseStats:
+    Luck: 1.5
 
 - id: c26b2b63-43e4-498b-b9f7-31b4fea0bb3d
   name: Elvenwood Broom

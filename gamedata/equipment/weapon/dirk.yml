@@ -14,6 +14,19 @@
     Vitality: 0.4
     Strength: 0.4
 
+- id: 87aa63a9-4bd2-4fa4-8d19-48dc37e70062
+  name: Coppergob Dirk
+  description: A crudely-made dirk, crafted by goblins using primitive forging techinques.
+  levelRequirement: 4
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0072'
+  slots: 1
+  baseStats:
+    Agility: 0.9
+    Vitality: 0.6
+    Strength: 0.9
+
 - id: 2683d850-8bb6-40ef-aa95-29689fe4a4ff
   name: Jelly Dirk
   description: A dirk made of magical jelly.

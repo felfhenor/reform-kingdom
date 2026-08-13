@@ -1,0 +1,29 @@
+- id: 89411847-06a3-4e1f-8082-b6a87478c7c8
+  name: Pumpkin Gem
+  description: A tiny pumpkin gem.
+  rarity: Uncommon
+
+  sprite: '0024'
+
+  infusionStats:
+    Energy: 2
+
+- id: c5750557-d8b8-4034-92d1-cfbacdad726c
+  name: Goblin Teeth
+  description: A small set of goblin teeth.
+  rarity: Uncommon
+
+  sprite: '0025'
+
+  infusionStats:
+    Strength: 0.5
+
+- id: a74034d6-579a-4222-9dec-79be631e67db
+  name: Goblin Nail
+  description: A large nail from a large goblin.
+  rarity: Uncommon
+
+  sprite: '0026'
+
+  infusionStats:
+    Vitality: 0.4

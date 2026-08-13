@@ -26,6 +26,19 @@
     Strength: 1.5
     Luck: 0.3
 
+- id: 7a8a044a-0f3a-47b0-a864-6c685938d481
+  name: Coppergob Dagger
+  description: A crudely-made dagger, crafted by goblins using primitive forging techinques.
+  levelRequirement: 9
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0071'
+  slots: 1
+  baseStats:
+    Agility: 3.1
+    Strength: 2.3
+    Luck: 0.7
+
 - id: 76b4f41c-6ee1-42bc-8d38-bde9b07a00cf
   name: Elvenwood Dagger
   description: A beautifully carved dagger made of elven wood.
@@ -36,5 +49,5 @@
   slots: 1
   baseStats:
     Agility: 4.3
-    Strength: 31.5
+    Strength: 3.5
     Luck: 1

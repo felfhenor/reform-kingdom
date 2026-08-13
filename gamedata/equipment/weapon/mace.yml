@@ -13,6 +13,18 @@
     Strength: 0.8
     Intelligence: 0.5
 
+- id: bee7634d-3f06-40c7-b58d-8aecafebff19
+  name: Copper Greatmace
+  description: A Duchy-made greatmace, composed primarily of copper.
+  levelRequirement: 4
+  rarity: Uncommon
+  type: Mace
+  sprite: '0068'
+  slots: 1
+  baseStats:
+    Strength: 1.4
+    Intelligence: 1.2
+
 - id: 8b6573b3-251e-435f-ae35-a1d140eab407
   name: Copperslime Mace
   description: A magical mace made of copperslime and wergen wood.
@@ -36,3 +48,15 @@
   baseStats:
     Strength: 3.9
     Intelligence: 3.4
+
+- id: 915abf06-ecb7-4bfa-889b-7e83a8d21f9a
+  name: Elvenwood Mace
+  description: A mace made only of finely-carved elven wood.
+  levelRequirement: 12
+  rarity: Uncommon
+  type: Mace
+  sprite: '0069'
+  slots: 1
+  baseStats:
+    Strength: 3.2
+    Intelligence: 4.8

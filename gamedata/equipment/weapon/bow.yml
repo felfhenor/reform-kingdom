@@ -13,10 +13,22 @@
     Strength: 1.5
     Agility: 0.8
 
+- id: 240d379b-0cbb-4758-97ac-e496ea6f4e8e
+  name: Copper Crossbow
+  description: A Duchy-made crossbow made mostly of copper.
+  levelRequirement: 4
+  rarity: Uncommon
+  type: Bow
+  sprite: '0070'
+  slots: 1
+  baseStats:
+    Strength: 2.2
+    Agility: 1.6
+
 - id: 95dbd70d-7649-44a5-99a9-af301226005c
   name: Wergenslime Bow
   description: A bow made of wergenslime wood.
-  levelRequirement: 6
+  levelRequirement: 7
   rarity: Common
   type: Bow
   sprite: '0033'

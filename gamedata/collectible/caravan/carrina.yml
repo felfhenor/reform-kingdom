@@ -1,0 +1,35 @@
+- id: ee3a674f-7043-45ea-958d-f69feed9ac18
+  name: Gobsweet
+  rarity: Rare
+  description: The sweetest candy a goblin can handle.
+  sprite: '0020'
+
+- id: eab7f1b8-8f82-40ec-aac6-87a64ebc8996
+  name: Safety Float
+  rarity: Rare
+  description: A floatation device used by many to swim in the Carrina Rapids.
+  sprite: '0021'
+
+- id: 3f5e6244-3721-475b-83b1-856b32bd29f6
+  name: Elvish Boomerang
+  rarity: Rare
+  description: A rare entertainment tool given to some young elves to practice their dexterity.
+  sprite: '0022'
+
+- id: a2c511ac-e1d8-4e33-bf95-9bc570b5566e
+  name: Elven Staffrune Book
+  rarity: Rare
+  description: A book that teaches the reader to use staves the elven way.
+  sprite: '0023'
+
+- id: 13f09532-3ceb-426c-ae0f-62da7cf2b8da
+  name: Crude Treasure Map
+  rarity: Rare
+  description: A crudely-drawn treasure map that seems to lead... to exactly where you bought it.
+  sprite: '0024'
+
+- id: 9b4d466a-6041-4bb5-9ceb-f61d004113ee
+  name: Blank Playing Card
+  rarity: Rare
+  description: A tricksters best friend - a blank playing card to manipulate those you play games with.
+  sprite: '0025'

@@ -6,7 +6,7 @@
   sprite: '0004'
 
   infusionStats:
-    Resistance: 2
+    Resistance: 1
 
 - id: 9278a72b-44b8-4a15-b1d5-ef61accfc2d0
   name: Small Goblin Bone
