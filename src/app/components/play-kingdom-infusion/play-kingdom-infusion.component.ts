@@ -7,11 +7,11 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
-import { InfusedMaterialsRowComponent } from '@components/infused-materials-row/infused-materials-row.component';
-import { ItemStatRowsComponent } from '@components/item-stat-rows/item-stat-rows.component';
-import { KingdomBackButtonComponent } from '@components/kingdom-back-button/kingdom-back-button.component';
+import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
+import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
+import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import {
   canInfuseEquipmentItem,
   characterInfuseEquipment,
@@ -44,11 +44,11 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   imports: [
     AtlasImageComponent,
     CardPageComponent,
-    IconBlankSlotComponent,
+    SlotIconBlankComponent,
     IconJobComponent,
-    InfusedMaterialsRowComponent,
-    ItemStatRowsComponent,
-    KingdomBackButtonComponent,
+    RowInfusedMaterialsComponent,
+    RowItemStatsComponent,
+    ButtonKingdomBackComponent,
     SweetAlert2Module,
   ],
   templateUrl: './play-kingdom-infusion.component.html',

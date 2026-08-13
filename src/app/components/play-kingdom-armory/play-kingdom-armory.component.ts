@@ -6,9 +6,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ArmoryItemSlotComponent } from '@components/armory-item-slot/armory-item-slot.component';
+import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { PagedGridPageComponent } from '@components/paged-grid-page/paged-grid-page.component';
+import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import {
   equipmentSellValue,
   filterArmoryEntries,
@@ -24,9 +24,9 @@ import { sum } from 'es-toolkit/compat';
   selector: 'app-play-kingdom-armory',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ArmoryItemSlotComponent,
+    SlotArmoryItemComponent,
     CurrencyCostComponent,
-    PagedGridPageComponent,
+    PagePagedGridComponent,
     SweetAlert2Module,
     DecimalPipe,
   ],
@@ -35,7 +35,7 @@ import { sum } from 'es-toolkit/compat';
 })
 export class PlayKingdomArmoryComponent {
   private grid =
-    viewChild<PagedGridPageComponent<EquipmentArmoryEntry>>('grid');
+    viewChild<PagePagedGridComponent<EquipmentArmoryEntry>>('grid');
 
   public entries = computed(() => getArmoryEntries());
   public filterFn = filterArmoryEntries;

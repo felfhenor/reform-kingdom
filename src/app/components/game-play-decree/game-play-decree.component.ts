@@ -7,9 +7,9 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DecreeClauseRowComponent } from '@components/decree-clause-row/decree-clause-row.component';
-import { NodeSpriteComponent } from '@components/node-sprite/node-sprite.component';
-import { RewardOptionComponent } from '@components/reward-option/reward-option.component';
+import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
+import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
+import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import {
   autoModeIsEnabled,
   autoModeToggle,
@@ -69,7 +69,7 @@ type RiskToleranceOption = {
 };
 
 // Reward-shaped view of a gatherable material, so the Gather Material
-// picker's option template can reuse `app-reward-option` instead of
+// picker's option template can reuse `app-option-reward` instead of
 // duplicating its icon+name row.
 type MaterialOption = RewardContentInfo & { id: MaterialId };
 
@@ -99,9 +99,9 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
     NgSelectComponent,
     NgOptionTemplateDirective,
     DragDropModule,
-    DecreeClauseRowComponent,
-    NodeSpriteComponent,
-    RewardOptionComponent,
+    RowDecreeClauseComponent,
+    SpriteNodeComponent,
+    OptionRewardComponent,
   ],
   templateUrl: './game-play-decree.component.html',
 })
@@ -154,7 +154,7 @@ export class GamePlayDecreeComponent {
   );
 
   // GatherMaterial and FarmNode clauses have parameters worth editing in
-  // place - see `DecreeClauseRowComponent.isEditable`, which gates the row's
+  // place - see `RowDecreeClauseComponent.isEditable`, which gates the row's
   // Edit button the same way.
   public editingClauseId = signal<DecreeClauseId | undefined>(undefined);
   public isEditing = computed(() => !!this.editingClauseId());

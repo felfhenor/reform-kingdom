@@ -1,7 +1,7 @@
 <app-card-page heightProfile="full">
   <span header>Bestiary</span>
 
-  <app-kingdom-back-button pageactions />
+  <app-button-kingdom-back pageactions />
 
   <div class="bestiary-layout">
     <div class="bestiary-list">
@@ -55,7 +55,7 @@
 
     <div class="bestiary-detail">
       @if (selectedEntry(); as entry) {
-        <app-bestiary-monster-detail [entry]="entry" />
+        <app-detail-bestiary-monster [entry]="entry" />
       } @else {
         <div class="text-sm text-lighter">No monster selected.</div>
       }

@@ -1,0 +1,86 @@
+@if (node(); as entry) {
+  <div class="map-node-panel card bg-base-100 shadow-xl pointer-events-auto">
+    <div class="card-body gap-2 p-4">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <app-sprite-node [entry]="entry" />
+
+          <h2 class="card-title text-lg">{{ displayName() }}</h2>
+        </div>
+
+        <app-button-close (click)="close()"></app-button-close>
+      </div>
+
+      <div class="flex flex-wrap gap-2 text-sm">
+        <div class="badge badge-outline">Level {{ levelLabel() }}</div>
+
+        @if (isExploreNode()) {
+          <app-panel-map-node-badges-explore [entry]="entry" />
+        } @else if (isGatherNode()) {
+          <app-panel-map-node-badges-gather [entry]="entry" />
+        } @else if (isCaravanNode()) {
+          <app-panel-map-node-badges-caravan [entry]="entry" />
+        }
+      </div>
+
+      <p class="text-sm text-lighter my-4">
+        {{ description() ?? 'No information available yet.' }}
+      </p>
+
+      @let materialIds = gatherMaterialIds();
+      @if (materialIds.length > 0) {
+        <div class="flex flex-wrap gap-2">
+          @for (materialId of materialIds; track materialId) {
+            <app-slot-gather-material [itemId]="materialId" />
+          }
+        </div>
+      }
+
+      @let rewardList = completionRewards();
+      @if (rewardList.length > 0) {
+        <div class="flex flex-wrap gap-2">
+          @for (reward of rewardList; track $index) {
+            <app-slot-completion-reward [reward]="reward" />
+          }
+        </div>
+      }
+
+      @if (isGatheringHere()) {
+        <app-panel-map-node-actions-gather
+          [gatherProgressPercent]="gatherProgressPercent()"
+        />
+      } @else if (!isAtNode()) {
+        @if (!meetsGatherLevelRequirement()) {
+          <div class="text-sm text-rose-400">
+            Lv. {{ levelLabel() }} required.
+          </div>
+        }
+
+        @if (!meetsCaravanAvailability()) {
+          <div class="text-sm text-rose-400">
+            No traders are available for this timeframe. Check back later.
+          </div>
+        }
+
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          [disabled]="!canTravelHere()"
+          (click)="travel()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Travel ({{ travelSeconds() ?? '—' }}s)
+        </button>
+      } @else if (isExploreNode()) {
+        <app-panel-map-node-actions-explore
+          [entry]="entry"
+          [canReExplore]="canReExplore()"
+          (reExplore)="reExplore()"
+        />
+      } @else if (isCaravanNode()) {
+        <app-panel-map-node-actions-caravan (openTrade)="openTrade()" />
+      }
+    </div>
+  </div>
+}

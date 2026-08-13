@@ -1,0 +1,46 @@
+@let item = entry().item;
+
+<div
+  class="storage-item-slot outline-2 outline-offset-[-2px] rounded outline-{{
+    item.rarity
+  }}"
+  [tp]="tooltip"
+  [tpPlacement]="'top'"
+>
+  <app-slot-icon-blank>
+    <app-atlas-image spritesheet="item" [assetName]="item.sprite" />
+  </app-slot-icon-blank>
+
+  @if (isInfusable()) {
+    <app-badge-infusable />
+  }
+
+  <span class="storage-item-count">{{ displayQuantity() }}</span>
+</div>
+
+<ng-template #tooltip>
+  <div class="flex gap-2 p-2 max-w-[400px]">
+    <app-atlas-image
+      spritesheet="item"
+      [assetName]="item.sprite"
+      class="storage-item-tooltip-image"
+    />
+    <div>
+      <div class="font-bold mb-2 text-{{ item.rarity }}">
+        {{ item.name }}
+      </div>
+
+      <div class="italic text-sm mb-2">
+        {{ item.description }}
+      </div>
+
+      @if (isInfusable()) {
+        <div class="mb-2">
+          <app-row-item-stats [stats]="item.infusionStats!" />
+        </div>
+      }
+
+      <div class="text-xs">Quantity: {{ displayQuantity() }}</div>
+    </div>
+  </div>
+</ng-template>

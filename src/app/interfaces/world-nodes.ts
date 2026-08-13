@@ -45,7 +45,7 @@ export type PixiNodeLabelResolver = (
 
 // Display info for a reward, resolved down to its underlying content -
 // used anywhere a reward needs to be shown outside of a full
-// `CompletionRewardSlotComponent` (e.g. a Decree clause's farm target).
+// `SlotCompletionRewardComponent` (e.g. a Decree clause's farm target).
 export type RewardContentInfo = {
   name: string;
   sprite: string;
@@ -54,7 +54,7 @@ export type RewardContentInfo = {
 
 // One option in the Farm Node clause's node picker. Carries the full entry
 // (rather than a precomputed sprite frame) so the picker can render it
-// through the reusable `NodeSpriteComponent`, which resolves the frame
+// through the reusable `SpriteNodeComponent`, which resolves the frame
 // itself.
 export type ExploreNodeFarmOption = {
   nodeName: string;

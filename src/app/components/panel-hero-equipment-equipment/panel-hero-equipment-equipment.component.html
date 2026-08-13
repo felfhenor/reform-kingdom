@@ -1,0 +1,73 @@
+@let selected = selectedSlot();
+@let selectedContent = selectedSlotContent();
+@let items = pickerItems();
+
+<div class="flex flex-col gap-4 items-center overflow-y-auto">
+  <div class="flex items-center justify-between w-full">
+    <span class="font-semibold text-xl">Equipment</span>
+    <button
+      type="button"
+      class="btn btn-xs btn-primary"
+      (click)="optimizeEquipment()"
+    >
+      Optimize Equipment
+    </button>
+  </div>
+
+  @for (row of paperdollRows; track $index) {
+    @if (rowHasVisibleSlot(row)) {
+      <div class="flex gap-2">
+        @for (slot of row; track slot) {
+          @if (isSlotVisible(slot)) {
+            <app-slot-equipment
+              [slot]="slot"
+              [equippedItem]="equippedItemFor(slot)"
+              [isSelected]="selected === slot"
+              (slotClick)="selectSlot(slot)"
+              (contextmenu)="unequip(slot)"
+            />
+          }
+        }
+      </div>
+    }
+  }
+</div>
+
+<div class="flex flex-col gap-2 h-full min-h-0">
+  @if (selected) {
+    <div class="flex justify-between items-center shrink-0">
+      <span class="font-semibold text-xl">{{ selected }}</span>
+      @if (selectedContent) {
+        <button
+          type="button"
+          class="btn btn-xs btn-warning"
+          (click)="unequip(selected)"
+        >
+          Unequip
+        </button>
+      }
+    </div>
+
+    @if (items.length > 0) {
+      <cdk-virtual-scroll-viewport
+        itemSize="72"
+        class="equipment-item-list flex-1 min-h-0"
+      >
+        <div *cdkVirtualFor="let entry of items; trackBy: trackByItemId">
+          <app-card-equipment-item
+            [equipment]="entry.content"
+            [equipmentItem]="entry.item"
+            [comparisonStats]="selectedContent?.baseStats"
+            (equip)="equip(entry.item.id)"
+          />
+        </div>
+      </cdk-virtual-scroll-viewport>
+    } @else {
+      <div class="italic text-sm p-4">
+        No equippable items available for this slot.
+      </div>
+    }
+  } @else {
+    <div class="italic text-sm p-4">Select a slot to see available gear.</div>
+  }
+</div>

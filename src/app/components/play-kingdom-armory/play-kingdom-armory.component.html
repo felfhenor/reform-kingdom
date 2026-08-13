@@ -1,4 +1,4 @@
-<app-paged-grid-page
+<app-page-paged-grid
   #grid
   [entries]="entries()"
   [filterFn]="filterFn"
@@ -52,7 +52,7 @@
   </div>
 
   @for (entry of grid.pagedEntries(); track $index + ' ' + entry.item.id) {
-    <app-armory-item-slot
+    <app-slot-armory-item
       [equipment]="entry.content"
       [equipmentItem]="entry.item"
       [sellMode]="sellMode()"
@@ -60,4 +60,4 @@
       (toggleSelect)="toggleSelected(entry.item.id, $event)"
     />
   }
-</app-paged-grid-page>
+</app-page-paged-grid>

@@ -7,7 +7,7 @@ import { PlayKingdomBestiaryComponent } from '@components/play-kingdom-bestiary/
 import { PlayKingdomInfusionComponent } from '@components/play-kingdom-infusion/play-kingdom-infusion.component';
 import { PlayKingdomMuseumComponent } from '@components/play-kingdom-museum/play-kingdom-museum.component';
 import { PlayKingdomPrestigeComponent } from '@components/play-kingdom-prestige/play-kingdom-prestige.component';
-import { PlayKingdomReclassModalComponent } from '@components/play-kingdom-reclass-modal/play-kingdom-reclass-modal.component';
+import { ModalPlayKingdomReclassComponent } from '@components/modal-play-kingdom-reclass/modal-play-kingdom-reclass.component';
 import { PlayKingdomStorageComponent } from '@components/play-kingdom-storage/play-kingdom-storage.component';
 import { PlayKingdomTradeskillArtificingComponent } from '@components/play-kingdom-tradeskill-artificing/play-kingdom-tradeskill-artificing.component';
 import { PlayKingdomTradeskillBlacksmithingComponent } from '@components/play-kingdom-tradeskill-blacksmithing/play-kingdom-tradeskill-blacksmithing.component';
@@ -63,7 +63,7 @@ interface TradeskillButton {
     PlayKingdomTradeskillWoodworkingComponent,
     PlayKingdomAchievementsComponent,
     PlayKingdomPrestigeComponent,
-    PlayKingdomReclassModalComponent,
+    ModalPlayKingdomReclassComponent,
   ],
   templateUrl: './game-play-kingdom.component.html',
 })

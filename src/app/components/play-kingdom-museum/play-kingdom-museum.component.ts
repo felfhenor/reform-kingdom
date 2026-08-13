@@ -5,9 +5,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MuseumCollectibleSlotComponent } from '@components/museum-collectible-slot/museum-collectible-slot.component';
-import { MuseumRecipeSlotComponent } from '@components/museum-recipe-slot/museum-recipe-slot.component';
-import { PagedGridPageComponent } from '@components/paged-grid-page/paged-grid-page.component';
+import { SlotMuseumCollectibleComponent } from '@components/slot-museum-collectible/slot-museum-collectible.component';
+import { SlotMuseumRecipeComponent } from '@components/slot-museum-recipe/slot-museum-recipe.component';
+import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import {
   filterMuseumCollectibleEntries,
   filterMuseumRecipeEntries,
@@ -24,9 +24,9 @@ import type {
   selector: 'app-play-kingdom-museum',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MuseumCollectibleSlotComponent,
-    MuseumRecipeSlotComponent,
-    PagedGridPageComponent,
+    SlotMuseumCollectibleComponent,
+    SlotMuseumRecipeComponent,
+    PagePagedGridComponent,
   ],
   templateUrl: './play-kingdom-museum.component.html',
   styleUrl: './play-kingdom-museum.component.scss',
@@ -36,11 +36,11 @@ export class PlayKingdomMuseumComponent {
   // type - each tab's slot component expects its own concrete entry shape,
   // and only one grid is ever in the DOM at a time via the tab `@if`/`@else`.
   private collectiblesGrid =
-    viewChild<PagedGridPageComponent<MuseumCollectibleEntry>>(
+    viewChild<PagePagedGridComponent<MuseumCollectibleEntry>>(
       'collectiblesGrid',
     );
   private recipesGrid =
-    viewChild<PagedGridPageComponent<MuseumRecipeEntry>>('recipesGrid');
+    viewChild<PagePagedGridComponent<MuseumRecipeEntry>>('recipesGrid');
 
   public activeTab = signal<MuseumTab>('collectibles');
 

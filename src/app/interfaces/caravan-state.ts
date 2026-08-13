@@ -36,7 +36,7 @@ export type CaravanTradeCounts = {
 };
 
 // One trade slot's worth of pre-computed display state, assembled by
-// `CaravanTradeModalComponent` and handed to `CaravanTradeSlotComponent` -
+// `ModalCaravanTradeComponent` and handed to `SlotCaravanTradeComponent` -
 // keeps the numeric/boolean derivations (helper calls) out of the
 // presentational slot component.
 export type CaravanTradeRow = {

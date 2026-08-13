@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
-import { BestiaryMonsterDetailComponent } from '@components/bestiary-monster-detail/bestiary-monster-detail.component';
+import { DetailBestiaryMonsterComponent } from '@components/detail-bestiary-monster/detail-bestiary-monster.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { KingdomBackButtonComponent } from '@components/kingdom-back-button/kingdom-back-button.component';
+import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { filterBestiaryEntries, getBestiaryEntries } from '@helpers';
 import type { MonsterId } from '@interfaces';
 
@@ -12,10 +12,10 @@ import type { MonsterId } from '@interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasAnimationComponent,
-    BestiaryMonsterDetailComponent,
+    DetailBestiaryMonsterComponent,
     CardPageComponent,
     IconUnknownComponent,
-    KingdomBackButtonComponent,
+    ButtonKingdomBackComponent,
   ],
   templateUrl: './play-kingdom-bestiary.component.html',
   styleUrl: './play-kingdom-bestiary.component.scss',

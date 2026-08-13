@@ -1,0 +1,17 @@
+@let s = skill();
+
+<div class="flex items-center gap-1" [tp]="skillTooltip" [tpPlacement]="'left'">
+  <div class="zoom-row shrink-0">
+    <app-slot-icon-blank>
+      <app-atlas-image spritesheet="skill" [assetName]="s.sprite" />
+    </app-slot-icon-blank>
+  </div>
+  <span class="text-xs truncate text-{{ s.rarity }}">{{ s.name }}</span>
+</div>
+
+<ng-template #skillTooltip>
+  <div class="p-2 max-w-xs">
+    <div class="font-bold mb-1 text-{{ s.rarity }}">{{ s.name }}</div>
+    <div class="text-sm">{{ description() }}</div>
+  </div>
+</ng-template>

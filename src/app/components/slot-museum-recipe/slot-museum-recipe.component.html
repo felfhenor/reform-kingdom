@@ -1,0 +1,83 @@
+@let e = entry();
+@let result = resultContent();
+@let backdrop = backdropSprite();
+
+@if (e.discovered) {
+  <div
+    class="museum-recipe-slot outline-2 outline-offset-[-2px] rounded {{
+      result ? 'outline-' + result.rarity : 'outline-gray-500'
+    }}"
+    [tp]="tooltip"
+    [tpPlacement]="'top'"
+  >
+    <app-slot-icon-blank>
+      <div class="museum-recipe-icon">
+        @if (backdrop) {
+          <app-atlas-image
+            spritesheet="item"
+            [assetName]="backdrop"
+            class="museum-recipe-icon-backdrop"
+          />
+        }
+
+        @if (result) {
+          <app-atlas-image
+            [spritesheet]="resultSpritesheet()"
+            [assetName]="result.sprite"
+            class="museum-recipe-icon-result"
+          />
+        }
+      </div>
+    </app-slot-icon-blank>
+  </div>
+} @else {
+  <div [tp]="tooltip" [tpPlacement]="'top'">
+    <app-icon-unknown />
+  </div>
+}
+
+<ng-template #tooltip>
+  <div class="flex gap-2 p-2">
+    @if (e.discovered) {
+      <div class="museum-recipe-tooltip-icon">
+        @if (backdrop) {
+          <app-atlas-image
+            spritesheet="item"
+            [assetName]="backdrop"
+            class="museum-recipe-icon-backdrop"
+          />
+        }
+
+        @if (result) {
+          <app-atlas-image
+            [spritesheet]="resultSpritesheet()"
+            [assetName]="result.sprite"
+            class="museum-recipe-icon-result"
+          />
+        }
+      </div>
+    }
+
+    <div>
+      @if (e.discovered) {
+        <div class="font-bold mb-1 {{ result ? 'text-' + result.rarity : '' }}">
+          {{ e.recipe.name }}
+        </div>
+
+        @if (e.foundAtNode) {
+          <div class="text-xs">Location: {{ e.foundAtNode }}</div>
+        }
+      } @else {
+        <div class="font-bold mb-1">???</div>
+
+        @if (e.sourceNodeNames.length > 0) {
+          <div class="text-xs">
+            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
+          </div>
+        } @else {
+          <div class="text-xs italic">Location unknown</div>
+        }
+      }
+    </div>
+  </div>
+</ng-template>

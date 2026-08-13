@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LoadingScreenComponent } from '@components/loading-screen/loading-screen.component';
+import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
 import { LoadingService } from '@services/loading.service';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, LoadingScreenComponent],
+  imports: [RouterOutlet, ScreenLoadingComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

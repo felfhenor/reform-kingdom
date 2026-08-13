@@ -9,9 +9,9 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { GlobalEffectBarComponent } from '@components/global-effect-bar/global-effect-bar.component';
-import { HeroStatusComponent } from '@components/hero-status/hero-status.component';
-import { MapNodePanelComponent } from '@components/map-node-panel/map-node-panel.component';
+import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-global-effect.component';
+import { StatusHeroComponent } from '@components/status-hero/status-hero.component';
+import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
 import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
@@ -71,7 +71,7 @@ const FADE_DURATION_MS = 300;
 @Component({
   selector: 'app-game-play-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MapNodePanelComponent, GlobalEffectBarComponent, HeroStatusComponent],
+  imports: [PanelMapNodeComponent, BarGlobalEffectComponent, StatusHeroComponent],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
     @if (isMapLoading()) {
@@ -82,10 +82,10 @@ const FADE_DURATION_MS = 300;
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
     <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
-    <app-global-effect-bar class="global-effect-bar"></app-global-effect-bar>
-    <app-map-node-panel></app-map-node-panel>
+    <app-bar-global-effect class="global-effect-bar"></app-bar-global-effect>
+    <app-panel-map-node></app-panel-map-node>
 
-    <app-hero-status class="hero-status-layer"></app-hero-status>
+    <app-status-hero class="hero-status-layer"></app-status-hero>
   `,
   styleUrl: './game-play-world.component.scss',
 })

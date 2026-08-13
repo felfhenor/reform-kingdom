@@ -1,0 +1,31 @@
+@let char = character();
+
+<div class="hero-equipment-panel flex flex-col gap-4 h-full min-h-0">
+  <div class="hero-summary flex items-center justify-center gap-3 shrink-0">
+    <div class="hero-summary-icon">
+      <app-icon-job [job]="job()" />
+    </div>
+    <div class="flex flex-col items-start gap-2">
+      <div class="font-semibold text-lg">
+        {{ char.name }}
+        <span class="text-sm text-lighter font-normal">
+          Lv. {{ char.level }} {{ job()?.name }}
+        </span>
+      </div>
+      <progress
+        class="progress progress-primary w-56"
+        [value]="char.xp.current"
+        [max]="char.xp.maximum"
+      ></progress>
+      <div class="text-xs text-lighter">
+        {{ char.xp.current | number }} / {{ char.xp.maximum | number }} XP
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-[320px_320px_1fr_320px] gap-4 flex-1 min-h-0">
+    <app-panel-hero-equipment-stats [character]="char" />
+    <app-panel-hero-equipment-equipment [character]="char" />
+    <app-panel-hero-equipment-skills [character]="char" />
+  </div>
+</div>

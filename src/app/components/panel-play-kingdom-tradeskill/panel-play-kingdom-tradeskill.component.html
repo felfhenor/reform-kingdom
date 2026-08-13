@@ -1,0 +1,210 @@
+@let buildingData = building();
+@let entries = recipeEntries();
+@let queue = queueViewModels();
+@let full = isQueueFull();
+
+<app-card-page heightProfile="full">
+  <span header>{{ tradeskill() }} - Lv. {{ buildingData.level }}</span>
+  <app-button-kingdom-back pageactions />
+
+  <div class="flex flex-col gap-4 p-4 h-full min-h-0">
+    <div class="flex flex-col gap-2 flex-shrink-0">
+      @if (gateCollectible(); as collectible) {
+        <div class="text-xs font-semibold text-error italic text-center">
+          You will not be able to progress to {{ tradeskill() }} Lv.
+          {{ gateNextLevel() }} unless you acquire
+          <span class="text-{{ collectible.rarity }}">
+            {{ collectible.name }}.
+          </span>
+        </div>
+      }
+
+      <div class="relative w-full h-5 rounded overflow-hidden bg-black/30">
+        <div
+          class="absolute inset-y-0 left-0 bg-primary"
+          [style.width.%]="xpPercent()"
+        ></div>
+        <div
+          class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black"
+        >
+          {{ buildingData.xp.current }} / {{ buildingData.xp.maximum }} XP
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-2 overflow-x-auto pb-2 flex-shrink-0">
+      @for (_ of queueSize(); track $index) {
+        @let q = queue[$index];
+
+        @if (q) {
+          <div
+            class="relative w-16 h-16 flex-shrink-0 outline-2 outline-offset-[-2px] rounded cursor-pointer {{
+              q.resultContent
+                ? 'outline-' + q.resultContent.rarity
+                : 'outline-gray-500'
+            }}"
+            (contextmenu)="onQueueEntryContextMenu($event, q.entry.id)"
+          >
+            <app-slot-icon-blank>
+              @if (q.resultContent) {
+                <app-atlas-image
+                  [spritesheet]="q.resultSpritesheet"
+                  [assetName]="q.resultContent.sprite"
+                />
+              }
+            </app-slot-icon-blank>
+
+            <div
+              class="absolute top-0 inset-x-0 text-[10px] text-center bg-black/60"
+            >
+              {{ q.remaining }}
+            </div>
+            <div
+              class="absolute bottom-0 inset-x-0 text-[10px] text-center bg-black/60"
+            >
+              {{ q.entry.quantityCompleted }}/{{ q.entry.quantityTotal }}
+            </div>
+          </div>
+        } @else {
+          <div
+            class="relative w-16 h-16 flex-shrink-0 outline-2 outline-offset-[-2px] rounded outline-gray-500"
+          >
+            <app-slot-icon-blank></app-slot-icon-blank>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto">
+      @for (entry of entries; track entry.recipe.id) {
+        @let quantity = quantityFor(entry.recipe.id);
+        @let uncraftable = entry.maxCraftable === 0;
+
+        <div
+          class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-16"
+          [class.opacity-50]="uncraftable"
+        >
+          <div class="w-16 h-16 relative flex-shrink-0 overflow-hidden">
+            @if (entry.backdropSprite) {
+              <app-atlas-image
+                spritesheet="item"
+                [assetName]="entry.backdropSprite"
+                class="absolute inset-0"
+              />
+            }
+            @if (entry.resultContent) {
+              <app-atlas-image
+                [spritesheet]="entry.resultSpritesheet"
+                [assetName]="entry.resultContent.sprite"
+                class="absolute inset-0"
+              />
+            }
+          </div>
+
+          <div class="flex-1 flex flex-col gap-2 min-w-0">
+            <span
+              class="font-semibold truncate {{
+                entry.resultContent ? 'text-' + entry.resultContent.rarity : ''
+              }}"
+            >
+              {{ entry.recipe.name }}
+            </span>
+            <span class="text-xs text-lighter">
+              Craftable: {{ entry.maxCraftable }}
+
+              @if (entry.resultChance !== 100) {
+                <span
+                  [tp]="'This recipe does not have a 100% chance of yielding an item, but it will still yield XP on failure'"
+                >
+                  · {{ entry.resultChance }}% success rate
+                </span>
+              }
+            </span>
+
+            @if (entry.requirementEntries.length > 0) {
+              <div class="flex flex-wrap gap-2 mt-1">
+                @for (req of entry.requirementEntries; track $index) {
+                  <div
+                    class="relative w-8 h-8 shrink-0"
+                    [tp]="requirementTooltip(req)"
+                    [tpPlacement]="'top'"
+                  >
+                    <div class="zoom-row">
+                      <app-slot-icon-blank>
+                        @if (req.content) {
+                          <app-atlas-image
+                            [spritesheet]="req.spritesheet"
+                            [assetName]="req.content.sprite"
+                          />
+                        }
+                      </app-slot-icon-blank>
+                    </div>
+
+                    @if (req.kind === 'item') {
+                      <span
+                        class="absolute bottom-0 right-0 text-[9px] leading-tight bg-black/70 px-0.5 rounded-sm"
+                      >
+                        x{{ req.quantity }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="flex flex-col items-end gap-2 flex-shrink-0">
+            <span
+              class="text-xs font-semibold text-{{ entry.xpChanceTier }}"
+              [tp]="xpChanceTooltip(entry.xpChance)"
+              [tpPlacement]="'top'"
+            >
+              {{ entry.xpChanceTier }}
+
+              @if (entry.xpChance !== 0) {
+                <span>- XP +{{ entry.xp }}</span>
+              }
+            </span>
+
+            <div class="flex gap-2 items-center">
+              <input
+                type="number"
+                class="input input-xs w-16"
+                min="1"
+                [max]="entry.maxCraftable"
+                [value]="quantity"
+                (input)="
+                  onQuantityInput($event, entry.recipe.id, entry.maxCraftable)
+                "
+              />
+
+              <button
+                class="btn btn-xs btn-primary"
+                [disabled]="uncraftable || full"
+                (click)="craft(entry.recipe.id, entry.maxCraftable)"
+              >
+                Craft
+              </button>
+            </div>
+
+            <span class="text-xs text-lighter">
+              {{ formatDuration(entry.recipe.craftTime * quantity) }}
+            </span>
+          </div>
+        </div>
+      } @empty {
+        <div class="text-xs italic text-lighter">No recipes available yet.</div>
+      }
+    </div>
+  </div>
+</app-card-page>
+
+<swal
+  #removeSwal
+  title="Remove from queue?"
+  text="This will remove the item from the queue. Unused materials will be refunded."
+  icon="warning"
+  confirmButtonText="Yes, remove it"
+  cancelButtonText="No, keep it"
+  (confirm)="confirmRemoveQueueEntry()"
+></swal>

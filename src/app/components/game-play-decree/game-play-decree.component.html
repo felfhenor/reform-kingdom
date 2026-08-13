@@ -80,7 +80,7 @@
             (change)="setDraftMaterialId($event)"
           >
             <ng-template ng-option-tmp let-item="item">
-              <app-reward-option [reward]="item" />
+              <app-option-reward [reward]="item" />
             </ng-template>
           </ng-select>
 
@@ -108,7 +108,7 @@
           >
             <ng-template ng-option-tmp let-item="item">
               <div class="flex items-center gap-2">
-                <app-node-sprite class="zoom-row" [entry]="item.entry" />
+                <app-sprite-node class="zoom-row" [entry]="item.entry" />
                 <div>
                   <div class="font-semibold text-sm">{{ item.nodeName }}</div>
                   <div class="text-xs text-lighter">
@@ -131,7 +131,7 @@
             (change)="setDraftReward($event)"
           >
             <ng-template ng-option-tmp let-item="item">
-              <app-reward-option [reward]="item" />
+              <app-option-reward [reward]="item" />
             </ng-template>
           </ng-select>
 
@@ -196,7 +196,7 @@
           >
             <span cdkDragHandle class="cursor-move text-lighter">::</span>
 
-            <app-decree-clause-row
+            <app-row-decree-clause
               [clause]="clause"
               (toggleEnabled)="toggleClauseEnabled(clause)"
               (remove)="removeClause(clause.id)"

@@ -34,7 +34,7 @@ export function rewardKey(reward: RewardIdentity): string {
 }
 
 // Resolves a reward down to displayable content - the same fields
-// `CompletionRewardSlotComponent` shows, minus discovery-gating, for UI that
+// `SlotCompletionRewardComponent` shows, minus discovery-gating, for UI that
 // needs a reward's icon/name without also needing its drop odds (e.g. the
 // Farm Node clause's reward picker and its row/summary display).
 export function rewardContentInfo(

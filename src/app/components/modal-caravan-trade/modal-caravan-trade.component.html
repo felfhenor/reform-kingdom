@@ -1,0 +1,52 @@
+<app-modal
+  [visible]="isVisible()"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  (modalClose)="close()"
+>
+  <span title>{{ trader()?.name ?? 'Trader' }}</span>
+
+  <div body class="flex flex-col gap-4">
+    @if (trader(); as traderContent) {
+      <p class="text-sm text-lighter italic">{{ traderContent.description }}</p>
+    }
+
+    <div class="flex flex-col gap-2">
+      @for (row of trades(); track row.index) {
+        <app-slot-caravan-trade [row]="row" (activate)="requestTrade(row)" />
+      } @empty {
+        <div class="text-sm text-lighter">
+          This trader has nothing in stock right now.
+        </div>
+      }
+    </div>
+
+    @if (timerLabel(); as label) {
+      <div
+        class="text-sm text-center"
+        [class.text-success]="timerUrgency() === 'safe'"
+        [class.text-warning]="timerUrgency() === 'warning'"
+        [class.text-error]="timerUrgency() === 'danger'"
+      >
+        This merchant will be leaving in {{ label }}.
+      </div>
+    }
+  </div>
+</app-modal>
+
+<swal
+  #confirmSwal
+  icon="question"
+  confirmButtonText="Yes"
+  cancelButtonText="Cancel"
+  (confirm)="confirmSingle()"
+></swal>
+
+<swal
+  #quantitySwal
+  icon="question"
+  input="number"
+  confirmButtonText="Confirm"
+  cancelButtonText="Cancel"
+  (confirm)="confirmQuantity($event)"
+></swal>

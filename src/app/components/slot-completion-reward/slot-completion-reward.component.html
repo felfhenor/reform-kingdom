@@ -1,0 +1,67 @@
+@if (isDiscovered() && content(); as reward) {
+  <div
+    class="outline-2 outline-offset-[-2px] rounded outline-{{ reward.rarity }}"
+    [tp]="tooltip"
+    [tpPlacement]="'top'"
+  >
+    <app-slot-icon-blank>
+      @if (backdropSprite(); as backdrop) {
+        <div class="completion-reward-icon">
+          <app-atlas-image
+            spritesheet="item"
+            [assetName]="backdrop"
+            class="completion-reward-icon-backdrop"
+          />
+          <app-atlas-image
+            [spritesheet]="spritesheet()"
+            [assetName]="reward.sprite"
+            class="completion-reward-icon-result"
+          />
+        </div>
+      } @else {
+        <app-atlas-image
+          [spritesheet]="spritesheet()"
+          [assetName]="reward.sprite"
+        />
+      }
+    </app-slot-icon-blank>
+  </div>
+
+  <ng-template #tooltip>
+    <div class="flex gap-2 p-2 max-w-[400px]">
+      @if (backdropSprite(); as backdrop) {
+        <div class="completion-reward-tooltip-icon">
+          <app-atlas-image
+            spritesheet="item"
+            [assetName]="backdrop"
+            class="completion-reward-icon-backdrop"
+          />
+          <app-atlas-image
+            [spritesheet]="spritesheet()"
+            [assetName]="reward.sprite"
+            class="completion-reward-icon-result"
+          />
+        </div>
+      } @else {
+        <app-atlas-image
+          [spritesheet]="spritesheet()"
+          [assetName]="reward.sprite"
+          class="completion-reward-tooltip-image"
+        />
+      }
+      <div>
+        <div class="font-bold mb-2 text-{{ reward.rarity }}">
+          {{ reward.name }}
+        </div>
+
+        <div class="italic text-sm">
+          {{ reward.description }}
+        </div>
+      </div>
+    </div>
+  </ng-template>
+} @else {
+  <div [tp]="'A reward yet to be discovered.'" [tpPlacement]="'top'">
+    <app-icon-unknown />
+  </div>
+}

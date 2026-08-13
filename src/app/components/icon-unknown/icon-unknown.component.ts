@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
-import { IconBlankSlotComponent } from '@components/icon-blank-slot/icon-blank-slot.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 
 @Component({
   selector: 'app-icon-unknown',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconBlankSlotComponent, IconComponent],
+  imports: [SlotIconBlankComponent, IconComponent],
   template: `
-    <app-icon-blank-slot>
+    <app-slot-icon-blank>
       <app-icon name="gameHelp" size="32px" />
-    </app-icon-blank-slot>
+    </app-slot-icon-blank>
   `,
 })
 export class IconUnknownComponent {}

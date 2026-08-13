@@ -1,4 +1,4 @@
-<app-paged-grid-page
+<app-page-paged-grid
   #grid
   [entries]="materials()"
   [filterFn]="filterFn"
@@ -8,6 +8,6 @@
   <span header>Storage</span>
 
   @for (entry of grid.pagedEntries(); track entry.item.id) {
-    <app-storage-item-slot [entry]="entry" />
+    <app-slot-storage-item [entry]="entry" />
   }
-</app-paged-grid-page>
+</app-page-paged-grid>

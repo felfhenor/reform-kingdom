@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
-import { ConnectButtonsComponent } from '@components/connect-buttons/connect-buttons.component';
+import { ButtonConnectComponent } from '@components/button-connect/button-connect.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
@@ -17,7 +17,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-home',
   imports: [
     SweetAlert2Module,
-    ConnectButtonsComponent,
+    ButtonConnectComponent,
     AnalyticsClickDirective,
     SFXDirective,
     ButtonUpdateComponent,

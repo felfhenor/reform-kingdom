@@ -9,7 +9,7 @@
 <app-card-page heightProfile="full">
   <span header>Infusion</span>
 
-  <app-kingdom-back-button pageactions />
+  <app-button-kingdom-back pageactions />
 
   <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0 p-4">
     <div class="flex flex-col gap-2 overflow-y-auto">
@@ -45,12 +45,12 @@
                 [class.btn-active]="item?.id === equippedItem.id"
                 (click)="selectItem(equippedItem.id)"
               >
-                <app-icon-blank-slot>
+                <app-slot-icon-blank>
                   <app-atlas-image
                     spritesheet="equipment"
                     [assetName]="equippedContent.sprite"
                   />
-                </app-icon-blank-slot>
+                </app-slot-icon-blank>
                 <span class="text-sm text-{{ equippedContent.rarity }}">
                   {{ equippedContent.name }}
                 </span>
@@ -68,12 +68,12 @@
     <div class="flex flex-col gap-4 h-full min-h-0">
       @if (item && content) {
         <div class="flex flex-row items-start gap-4">
-          <app-icon-blank-slot class="pt-1">
+          <app-slot-icon-blank class="pt-1">
             <app-atlas-image
               spritesheet="equipment"
               [assetName]="content.sprite"
             />
-          </app-icon-blank-slot>
+          </app-slot-icon-blank>
 
           <div class="flex-1">
             <div class="shrink-0">
@@ -81,7 +81,7 @@
                 {{ content.name }}
               </div>
 
-              <app-item-stat-rows
+              <app-row-item-stats
                 [stats]="content.baseStats"
                 [bonusStats]="selectedItemBonus()"
               />
@@ -96,7 +96,7 @@
               Click a slot to choose what to infuse into it.
             </div>
 
-            <app-infused-materials-row
+            <app-row-infused-materials
               [infusedItemIds]="item.infusedItemIds"
               [maxSlots]="content.slots"
               [selectedSlotIndex]="slotIndex"
@@ -124,12 +124,12 @@
                     >
                       <div class="flex items-center gap-2">
                         <div class="zoom-row shrink-0">
-                          <app-icon-blank-slot>
+                          <app-slot-icon-blank>
                             <app-atlas-image
                               spritesheet="item"
                               [assetName]="entry.item.sprite"
                             />
-                          </app-icon-blank-slot>
+                          </app-slot-icon-blank>
                         </div>
                       </div>
 
@@ -142,7 +142,7 @@
                           {{ entry.item.name }} (x{{ entry.quantity }})
                         </span>
 
-                        <app-item-stat-rows
+                        <app-row-item-stats
                           [stats]="entry.item.infusionStats!"
                           [layout]="'row'"
                           [maxDecimals]="1"
@@ -154,12 +154,12 @@
                           class="ml-auto mr-3 flex items-center gap-2 shrink-0"
                         >
                           <div class="zoom-row">
-                            <app-icon-blank-slot [showBackground]="false">
+                            <app-slot-icon-blank [showBackground]="false">
                               <app-atlas-image
                                 spritesheet="item"
                                 [assetName]="goldCoinSprite()"
                               />
-                            </app-icon-blank-slot>
+                            </app-slot-icon-blank>
                           </div>
                           <span class="text-xs">{{ cost }}</span>
                         </span>

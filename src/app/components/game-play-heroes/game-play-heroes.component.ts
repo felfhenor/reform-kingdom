@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { HeroEquipmentPanelComponent } from '@components/hero-equipment-panel/hero-equipment-panel.component';
+import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/panel-hero-equipment.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { getEntry, partyGet } from '@helpers';
 import type { CharacterId, JobContent, JobId } from '@interfaces';
@@ -12,7 +12,7 @@ import type { CharacterId, JobContent, JobId } from '@interfaces';
   imports: [
     CardPageComponent,
     BlankSlateComponent,
-    HeroEquipmentPanelComponent,
+    PanelHeroEquipmentComponent,
     IconJobComponent,
   ],
   templateUrl: './game-play-heroes.component.html',

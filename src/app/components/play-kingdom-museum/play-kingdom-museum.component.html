@@ -1,7 +1,7 @@
 @let tab = activeTab();
 
 @if (tab === 'collectibles') {
-  <app-paged-grid-page
+  <app-page-paged-grid
     #collectiblesGrid
     [entries]="collectibleEntries()"
     [filterFn]="collectibleFilterFn"
@@ -32,11 +32,11 @@
     </div>
 
     @for (entry of collectiblesGrid.pagedEntries(); track entry.collectible.id) {
-      <app-museum-collectible-slot [entry]="entry" />
+      <app-slot-museum-collectible [entry]="entry" />
     }
-  </app-paged-grid-page>
+  </app-page-paged-grid>
 } @else {
-  <app-paged-grid-page
+  <app-page-paged-grid
     #recipesGrid
     [entries]="recipeEntries()"
     [filterFn]="recipeFilterFn"
@@ -67,7 +67,7 @@
     </div>
 
     @for (entry of recipesGrid.pagedEntries(); track entry.recipe.id) {
-      <app-museum-recipe-slot [entry]="entry" />
+      <app-slot-museum-recipe [entry]="entry" />
     }
-  </app-paged-grid-page>
+  </app-page-paged-grid>
 }

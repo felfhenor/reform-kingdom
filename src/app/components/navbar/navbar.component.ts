@@ -4,7 +4,7 @@ import { ButtonGlowComponent } from '@components/button-glow/button-glow.compone
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
-import { CaravanTradeModalComponent } from '@components/caravan-trade-modal/caravan-trade-modal.component';
+import { ModalCaravanTradeComponent } from '@components/modal-caravan-trade/modal-caravan-trade.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
@@ -36,7 +36,7 @@ import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
-import { ResourceBarComponent } from '@components/resource-bar/resource-bar.component';
+import { BarResourceComponent } from '@components/bar-resource/bar-resource.component';
 
 @Component({
   selector: 'app-navbar',
@@ -53,8 +53,8 @@ import { ResourceBarComponent } from '@components/resource-bar/resource-bar.comp
     ButtonQuitComponent,
     ButtonSettingsComponent,
     ButtonGlowComponent,
-    ResourceBarComponent,
-    CaravanTradeModalComponent,
+    BarResourceComponent,
+    ModalCaravanTradeComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
