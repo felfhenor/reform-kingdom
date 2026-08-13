@@ -70,7 +70,7 @@
         }
       </div>
 
-      <p class="text-sm opacity-80">
+      <p class="text-sm text-lighter">
         {{ description() ?? 'No information available yet.' }}
       </p>
 
@@ -94,7 +94,7 @@
 
       @if (isGatheringHere()) {
         <div class="flex flex-col gap-2">
-          <div class="text-xs opacity-70">
+          <div class="text-xs text-lighter">
             Gathering... {{ gatherProgressPercent() }}%
           </div>
           <progress
@@ -137,7 +137,7 @@
           Explore Again
         </button>
       } @else if (isExploreRandomCleared()) {
-        <div class="text-sm opacity-70">
+        <div class="text-sm text-lighter">
           No monsters remain. Check back in {{ exploreRandomTimerText() }}.
         </div>
       } @else if (isCaravanNode()) {
@@ -172,7 +172,7 @@
             <div class="zoom-75">
               <app-icon-unknown />
             </div>
-            <span class="font-bold opacity-70">???</span>
+            <span class="font-bold text-lighter">???</span>
           }
         </div>
       }

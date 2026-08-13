@@ -41,7 +41,7 @@
         >
           <ng-template ng-option-tmp let-item="item">
             <div class="font-sembold text-sm">{{ item.label }}</div>
-            <div class="text-xs opacity-70 whitespace-normal">
+            <div class="text-xs text-lighter whitespace-normal">
               {{ item.description }}
             </div>
           </ng-template>
@@ -111,7 +111,7 @@
                 <app-node-sprite class="zoom-50" [entry]="item.entry" />
                 <div>
                   <div class="font-semibold text-sm">{{ item.nodeName }}</div>
-                  <div class="text-xs opacity-70">
+                  <div class="text-xs text-lighter">
                     Lv. {{ item.levelLabel }}
                   </div>
                 </div>
@@ -176,7 +176,7 @@
       <div class="card-title">Decree</div>
 
       @if (clauses().length === 0) {
-        <div class="italic opacity-70">
+        <div class="italic text-lighter">
           No clauses yet - the party will idle at the kingdom while in auto mode
           until you add one.
         </div>
@@ -194,7 +194,7 @@
             [class.bg-base-200]="editingClauseId() !== clause.id"
             [class.bg-base-300]="editingClauseId() === clause.id"
           >
-            <span cdkDragHandle class="cursor-move opacity-60">::</span>
+            <span cdkDragHandle class="cursor-move text-lighter">::</span>
 
             <app-decree-clause-row
               [clause]="clause"

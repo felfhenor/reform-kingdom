@@ -23,7 +23,7 @@
 }
 
 .equipment-slot-label {
-  @apply absolute inset-0 flex items-center justify-center text-center text-[10px] opacity-40 leading-tight px-1 pointer-events-none;
+  @apply absolute inset-0 flex items-center justify-center text-center text-[10px] leading-tight px-1 pointer-events-none;
 }
 
 .equipment-slot-image {
@@ -34,7 +34,7 @@
 // occupying Offhand) - shown faded so it reads as "same item, not empty"
 // rather than a second distinct piece of equipment.
 .equipment-slot-image-secondary {
-  @apply opacity-40;
+  @apply opacity-50;
 }
 
 .equipment-slot-tooltip-image {

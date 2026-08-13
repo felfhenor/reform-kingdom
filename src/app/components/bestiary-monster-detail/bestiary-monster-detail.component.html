@@ -29,15 +29,15 @@
           ></ng-select>
         </div>
 
-        <span class="text-xs opacity-70">
+        <span class="text-xs text-lighter">
           Lv. {{ levelMin() }}-{{ levelMax() }} · {{ e.kills }} killed
         </span>
         @if (e.foundAtNodes.length > 0) {
-          <span class="text-xs opacity-70">
+          <span class="text-xs text-lighter">
             Found at: {{ e.foundAtNodes.join(', ') }}
           </span>
         }
-        <span class="text-xs opacity-70">XP: {{ xpLabel() }}</span>
+        <span class="text-xs text-lighter">XP: {{ xpLabel() }}</span>
       </div>
     } @else {
       <div class="zoom-150">
@@ -45,32 +45,32 @@
       </div>
 
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-bold opacity-70">???</span>
+        <span class="text-lg font-bold text-lighter">???</span>
 
         @if (e.sourceNodeNames.length > 0) {
-          <span class="text-xs opacity-70">
+          <span class="text-xs text-lighter">
             Discoverable in: {{ e.sourceNodeNames.join(', ') }}
           </span>
         } @else {
-          <span class="text-xs italic opacity-70">Location unknown</span>
+          <span class="text-xs italic text-lighter">Location unknown</span>
         }
       </div>
     }
   </div>
 
   @if (e.discovered) {
-    <p class="text-sm italic opacity-80">{{ e.monster.description }}</p>
+    <p class="text-sm italic text-lighter">{{ e.monster.description }}</p>
 
     <div class="flex gap-4">
       <div class="flex flex-col gap-2 min-w-[150px]">
-        <span class="text-xs font-semibold opacity-70">
+        <span class="text-xs font-semibold text-lighter">
           Stats at Lv. {{ selectedLevel() }}
         </span>
         <app-item-stat-rows [stats]="stats()" [showSign]="false" />
       </div>
 
       <div class="flex flex-col gap-2 w-32 shrink-0">
-        <span class="text-xs font-semibold opacity-70">
+        <span class="text-xs font-semibold text-lighter">
           Skills at Lv. {{ selectedLevel() }}
         </span>
 
@@ -81,7 +81,7 @@
               [description]="skillDescription(skill)"
             />
           } @empty {
-            <span class="text-xs italic opacity-70">No skills.</span>
+            <span class="text-xs italic text-lighter">No skills.</span>
           }
         </div>
       </div>
@@ -89,7 +89,7 @@
 
     @if (e.drops.length > 0) {
       <div class="flex flex-col gap-2">
-        <span class="text-xs font-semibold opacity-70">Drops</span>
+        <span class="text-xs font-semibold text-lighter">Drops</span>
 
         <div class="flex flex-col gap-2">
           @for (drop of e.drops; track $index) {

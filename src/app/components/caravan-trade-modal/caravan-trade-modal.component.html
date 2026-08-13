@@ -8,14 +8,14 @@
 
   <div body class="flex flex-col gap-4">
     @if (trader(); as traderContent) {
-      <p class="text-sm opacity-80 italic">{{ traderContent.description }}</p>
+      <p class="text-sm text-lighter italic">{{ traderContent.description }}</p>
     }
 
     <div class="flex flex-col gap-2">
       @for (row of trades(); track row.index) {
         <app-caravan-trade-slot [row]="row" (activate)="requestTrade(row)" />
       } @empty {
-        <div class="text-sm opacity-70">
+        <div class="text-sm text-lighter">
           This trader has nothing in stock right now.
         </div>
       }

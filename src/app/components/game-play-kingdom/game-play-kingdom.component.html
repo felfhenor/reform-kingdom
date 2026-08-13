@@ -54,7 +54,7 @@
           >
             @let count = materialCount();
             <span class="text-base font-bold">Storage</span>
-            <span class="text-xs opacity-70">
+            <span class="text-xs text-lighter">
               {{ count }}
               {{ 'material' | pluralize: count > 1 }} stored
             </span>
@@ -66,7 +66,7 @@
           >
             @let armoryTotal = armoryCount();
             <span class="text-base font-bold">Armory</span>
-            <span class="text-xs opacity-70">
+            <span class="text-xs text-lighter">
               {{ armoryTotal }}
               {{ 'item' | pluralize: armoryTotal > 1 }} stored
             </span>
@@ -78,7 +78,7 @@
             (click)="openSubview('astralprojector')"
           >
             <span class="text-base font-bold">Astral Projector</span>
-            <span class="text-xs opacity-70">0 spells learned</span>
+            <span class="text-xs text-lighter">0 spells learned</span>
           </button>
         </div>
 
@@ -91,12 +91,12 @@
             @let recipeEntries = museumRecipeEntries();
 
             <span class="text-base font-bold">Museum</span>
-            <span class="text-xs opacity-70">
+            <span class="text-xs text-lighter">
               {{ museumCollectiblesFound() }}/{{ museumEntries.length }}
               collectibles found
             </span>
 
-            <span class="text-xs opacity-70">
+            <span class="text-xs text-lighter">
               {{ museumRecipesFound() }}/{{ recipeEntries.length }} recipes
               found
             </span>
@@ -109,7 +109,7 @@
             @let bestiaryList = bestiaryEntries();
 
             <span class="text-base font-bold">Bestiary</span>
-            <span class="text-xs opacity-70">
+            <span class="text-xs text-lighter">
               {{ bestiaryDiscoveredCount() }}/{{ bestiaryList.length }}
               monsters discovered
             </span>

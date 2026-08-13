@@ -13,7 +13,7 @@
         (input)="onSearchInput($event)"
       />
 
-      <div class="text-xs text-center opacity-70">
+      <div class="text-xs text-center text-lighter">
         {{ discoveredCount() }}/{{ entries().length }} discovered
       </div>
 
@@ -48,7 +48,7 @@
             }
           </button>
         } @empty {
-          <div class="text-sm opacity-70 p-2">No monsters found.</div>
+          <div class="text-sm text-lighter p-2">No monsters found.</div>
         }
       </div>
     </div>
@@ -57,7 +57,7 @@
       @if (selectedEntry(); as entry) {
         <app-bestiary-monster-detail [entry]="entry" />
       } @else {
-        <div class="text-sm opacity-70">No monster selected.</div>
+        <div class="text-sm text-lighter">No monster selected.</div>
       }
     </div>
   </div>

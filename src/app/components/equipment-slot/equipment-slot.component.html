@@ -12,7 +12,7 @@
 >
   <app-icon-blank-slot>
     @if (!content) {
-      <span class="equipment-slot-label">{{ slot() }}</span>
+      <span class="equipment-slot-label text-lighter">{{ slot() }}</span>
     }
 
     @if (content) {
@@ -45,17 +45,20 @@
         </div>
 
         @if (occupiedPaperdollSlots().length > 1) {
-          <div class="text-xs mb-1 italic opacity-70">
+          <div class="text-xs mb-1 italic text-lighter">
             Occupies: {{ occupiedPaperdollSlots().join(' + ') }}
           </div>
         }
 
         @for (skill of grantedSkills(); track skill.id) {
-          <div class="text-xs mb-1 italic opacity-70 flex items-center gap-2">
+          <div class="text-xs mb-1 italic text-lighter flex items-center gap-2">
             Teaches
             <span class="equipment-slot-granted-skill-icon">
               <app-icon-blank-slot [showBackground]="false">
-                <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />
+                <app-atlas-image
+                  spritesheet="skill"
+                  [assetName]="skill.sprite"
+                />
               </app-icon-blank-slot>
             </span>
             {{ skill.name }}

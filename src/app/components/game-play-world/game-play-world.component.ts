@@ -77,7 +77,7 @@ const FADE_DURATION_MS = 300;
     @if (isMapLoading()) {
       <div class="map-loading-overlay bg-base-100">
         <span class="loading loading-spinner loading-lg text-primary"></span>
-        <p class="text-sm opacity-70">Loading map...</p>
+        <p class="text-sm text-lighter">Loading map...</p>
       </div>
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>

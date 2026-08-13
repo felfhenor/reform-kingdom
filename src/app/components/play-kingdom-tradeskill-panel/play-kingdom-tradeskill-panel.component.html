@@ -109,7 +109,7 @@
             >
               {{ entry.recipe.name }}
             </span>
-            <span class="text-xs opacity-70">
+            <span class="text-xs text-lighter">
               Craftable: {{ entry.maxCraftable }}
 
               @if (entry.resultChance !== 100) {
@@ -187,13 +187,13 @@
               </button>
             </div>
 
-            <span class="text-xs opacity-70">
+            <span class="text-xs text-lighter">
               {{ formatDuration(entry.recipe.craftTime * quantity) }}
             </span>
           </div>
         </div>
       } @empty {
-        <div class="text-xs italic opacity-70">No recipes available yet.</div>
+        <div class="text-xs italic text-lighter">No recipes available yet.</div>
       }
     </div>
   </div>

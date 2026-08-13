@@ -16,7 +16,7 @@ import { LoadingService } from '@services/loading.service';
         [value]="progress.percent"
         max="100"
       ></progress>
-      <p class="text-sm opacity-70">{{ progress.label }}</p>
+      <p class="text-sm text-lighter">{{ progress.label }}</p>
     </div>
   `,
 })
