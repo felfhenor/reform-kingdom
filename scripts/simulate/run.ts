@@ -7,6 +7,8 @@ import { gameReset, gameStart } from '@helpers/game-init';
 import { migrateGameState } from '@helpers/migrate';
 import { createCharacter, setParty } from '@helpers/party';
 import { gamestate } from '@helpers/state-game';
+import { worldNodeDiscover } from '@helpers/world-node-discovery';
+import { isWorldNodeHidden, worldNodeLookup } from '@helpers/world-nodes';
 import type { JobContent, JobId } from '@interfaces';
 import { bootstrapContent } from './bootstrap';
 import { DEFAULT_TICK_BUDGET, DEFAULT_TRIALS } from './constants';
@@ -66,6 +68,17 @@ function resolveJobId(jobName: string): JobId {
   return job.id;
 }
 
+// Real play only reveals a hidden node when the player clicks it - the
+// simulator has no clicking, so a hidden node would otherwise sit permanently
+// excluded from auto-mode targeting (see `decree-evaluation.ts`) and never
+// get exercised by any scenario. Discovering every hidden node up front is a
+// simulation-only shortcut to still get coverage of that content.
+function discoverHiddenNodesForSimulation(): void {
+  Object.values(worldNodeLookup().byName)
+    .filter(isWorldNodeHidden)
+    .forEach((entry) => worldNodeDiscover(entry.nodeName));
+}
+
 // Builds a fresh `GameState` and starts a new game with `comp`'s party -
 // mutators here are called *outside* a `gamestateTickStart`/`End` bracket,
 // so each one is a fire-and-forget `updateGamestate` call; `settle()` lets
@@ -83,6 +96,9 @@ async function setUpNewGame(comp: PartyComp): Promise<void> {
 
   await gameStart();
   await settle();
+  await settle();
+
+  discoverHiddenNodesForSimulation();
   await settle();
 }
 

@@ -68,6 +68,14 @@ export type GameStateDiscoveredGatherNodes = {
   [key: string]: { foundAt: number };
 };
 
+// Permanent record of every `hidden` world node the player has revealed by
+// clicking it - unlike `discoveredGatherNodes` (GatherNodes only, recorded on
+// travel arrival), this covers every node type and is recorded on click, so
+// a hidden node's label/cursor can be gated on it (see `world-node-discovery.ts`).
+export type GameStateWorldDiscoveries = {
+  [key: string]: { foundAt: number };
+};
+
 // Permanent record of every monster the party has ever defeated - `kills`
 // keeps counting past the first kill, unlike the other discovery slices,
 // since the bestiary shows a running kill count per monster. `minLevelFound`
@@ -107,6 +115,7 @@ export type GameState = {
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredRecipes: GameStateDiscoveredRecipes;
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;
+  worldDiscoveries: GameStateWorldDiscoveries;
   bestiary: GameStateBestiary;
   globalEffects: GlobalEffect[];
   tradeskills: GameStateTradeskills;

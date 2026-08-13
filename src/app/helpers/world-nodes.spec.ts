@@ -26,15 +26,24 @@ vi.mock('@helpers/gather-node-discovery', () => ({
   isGatherNodeDiscovered: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/world-node-discovery', () => ({
+  isWorldNodeDiscovered: vi.fn(() => false),
+  worldNodeDiscover: vi.fn(),
+}));
+
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { setAllMaps } from '@helpers/maps';
+import { isWorldNodeDiscovered } from '@helpers/world-node-discovery';
 import {
   gatherableMaterialIds,
+  isWorldNodeHidden,
+  isWorldNodeVisible,
   rewardContentInfo,
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
   worldNodeDescription,
+  worldNodeDisplayName,
   worldNodeInteractionKind,
   worldNodeLabelInfo,
   worldNodeLevelLabel,
@@ -220,6 +229,47 @@ describe('encounter-backed node accessors', () => {
   beforeEach(() => {
     setAllIdsByName(new Map());
     setAllContentById(new Map());
+    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+  });
+
+  describe('isWorldNodeHidden', () => {
+    it('is true when the matching encounter is authored hidden', () => {
+      seedEncounter(buildEncounter({ hidden: true }));
+
+      expect(isWorldNodeHidden(buildEntry())).toBe(true);
+    });
+
+    it('is false when the matching encounter is not hidden', () => {
+      seedEncounter(buildEncounter({ hidden: false }));
+
+      expect(isWorldNodeHidden(buildEntry())).toBe(false);
+    });
+
+    it('is false when there is no matching content', () => {
+      expect(isWorldNodeHidden(buildEntry())).toBe(false);
+    });
+  });
+
+  describe('isWorldNodeVisible', () => {
+    it('is true for a non-hidden node', () => {
+      seedEncounter(buildEncounter({ hidden: false }));
+
+      expect(isWorldNodeVisible(buildEntry())).toBe(true);
+    });
+
+    it('is false for a hidden node that has not been discovered', () => {
+      seedEncounter(buildEncounter({ hidden: true }));
+      vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+
+      expect(isWorldNodeVisible(buildEntry())).toBe(false);
+    });
+
+    it('is true for a hidden node that has been discovered', () => {
+      seedEncounter(buildEncounter({ hidden: true }));
+      vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
+
+      expect(isWorldNodeVisible(buildEntry())).toBe(true);
+    });
   });
 
   describe('worldNodeLevelRange', () => {
@@ -475,6 +525,19 @@ describe('encounter-backed node accessors', () => {
     it('returns undefined for non-interactable object types', () => {
       expect(worldNodeLabelInfo(buildEntry({ type: '' }))).toBeUndefined();
     });
+
+    it('still resolves the real label for a hidden, undiscovered node', () => {
+      // Visibility gating happens at the map-render layer
+      // (`pixi-map-render.ts`/`GamePlayWorldComponent.updateNodeLabels`), not
+      // here - the label needs to exist up front so it can be toggled live
+      // once discovered, without a full map re-render.
+      seedEncounter(buildEncounter({ hidden: true, levelRange: { min: 2, max: 5 } }));
+      vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+
+      expect(
+        worldNodeLabelInfo(buildEntry({ type: 'ExploreNode' })),
+      ).toEqual({ kind: 'Explore', text: 'Forest Ruins\nLv.2-5' });
+    });
   });
 });
 
@@ -630,6 +693,83 @@ describe('gatherableMaterialIds', () => {
     setAllMaps(new Map());
 
     expect(gatherableMaterialIds()).toEqual([]);
+  });
+
+  it('excludes a hidden GatherNode the player has not discovered, even if visited', () => {
+    const gathering = buildGathering({ hidden: true });
+
+    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
+    setAllContentById(new Map([['gather-1', gathering]]));
+
+    const map = buildMap({
+      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
+    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+
+    expect(gatherableMaterialIds()).toEqual([]);
+  });
+
+  it('includes a hidden GatherNode once it has been discovered', () => {
+    const gathering = buildGathering({ hidden: true });
+
+    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
+    setAllContentById(new Map([['gather-1', gathering]]));
+
+    const map = buildMap({
+      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
+    vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
+
+    expect(gatherableMaterialIds()).toEqual(['wood']);
+  });
+});
+
+describe('worldNodeDisplayName', () => {
+  beforeEach(() => {
+    setAllIdsByName(new Map());
+    setAllContentById(new Map());
+  });
+
+  it('returns the real name for a visible node', () => {
+    seedEncounter(buildEncounter({ hidden: false }));
+    const map = buildMap({
+      exploreNodes: [buildObject({ name: 'Forest Ruins', type: 'ExploreNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+
+    expect(worldNodeDisplayName('Forest Ruins')).toBe('Forest Ruins');
+  });
+
+  it('masks a hidden, undiscovered node as "???"', () => {
+    seedEncounter(buildEncounter({ hidden: true }));
+    const map = buildMap({
+      exploreNodes: [buildObject({ name: 'Forest Ruins', type: 'ExploreNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+
+    expect(worldNodeDisplayName('Forest Ruins')).toBe('???');
+  });
+
+  it('returns the real name for a hidden node once discovered', () => {
+    seedEncounter(buildEncounter({ hidden: true }));
+    const map = buildMap({
+      exploreNodes: [buildObject({ name: 'Forest Ruins', type: 'ExploreNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
+
+    expect(worldNodeDisplayName('Forest Ruins')).toBe('Forest Ruins');
+  });
+
+  it('falls back to the raw name when the node no longer resolves', () => {
+    setAllMaps(new Map());
+
+    expect(worldNodeDisplayName('Ghost Node')).toBe('Ghost Node');
   });
 });
 

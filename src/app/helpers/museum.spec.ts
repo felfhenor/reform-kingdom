@@ -25,6 +25,10 @@ vi.mock('@helpers/recipes', () => ({
   isRecipeDiscovered: vi.fn(),
 }));
 
+vi.mock('@helpers/world-nodes', () => ({
+  worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
+}));
+
 import {
   getCollectibleFoundAtNode,
   getCollectibleQuantity,

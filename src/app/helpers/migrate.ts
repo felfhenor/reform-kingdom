@@ -26,6 +26,7 @@ import {
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { pruneInvalidPartyEquipment, retrofitPartyXp } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
+import { pruneInvalidWorldDiscoveries } from '@helpers/world-node-discovery';
 import {
   gamestate,
   gamestateTickEnd,
@@ -85,6 +86,10 @@ export function migrateGameState() {
   newState.discoveredGatherNodes = backfillLegacyGatherNodeDiscoveries(
     newState.discoveredGatherNodes,
     newState.materials,
+  );
+  newState.worldDiscoveries = pruneInvalidWorldDiscoveries(
+    newState.worldDiscoveries,
+    (nodeName) => !!worldNodeByName(nodeName),
   );
   newState.bestiary = pruneInvalidBestiaryEntries(newState.bestiary);
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);

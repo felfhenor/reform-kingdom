@@ -47,4 +47,8 @@ export type EncounterRandomContent = IsContentItem &
     fights: EncounterFight[];
 
     completionRewards: DroppedReward[];
+
+    // When true, the node's name/level label and map cursor stay hidden
+    // until the player discovers it (see `world-node-discovery.ts`).
+    hidden?: boolean;
   };

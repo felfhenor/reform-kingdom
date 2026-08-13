@@ -49,11 +49,17 @@ vi.mock('@helpers/state-options', () => ({
   setOption: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node-discovery', () => ({
+  worldNodeDiscover: vi.fn(),
+  worldNodeUndiscover: vi.fn(),
+}));
+
 import { armoryAdd } from '@helpers/armory';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { tradeskillXpForLevel } from '@helpers/crafting';
 import {
+  debugDiscoverWorldNode,
   debugGiveAllEquipment,
   debugGiveCollectible,
   debugGiveEquipment,
@@ -61,10 +67,16 @@ import {
   debugResetBestiary,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
+  debugUndiscoverWorldNode,
+  debugWipeWorldDiscoveries,
 } from '@helpers/debug';
 import { addMaterial } from '@helpers/materials';
 import { characterStatsForLevel, characterXpForLevel } from '@helpers/party';
 import { updateGamestate } from '@helpers/state-game';
+import {
+  worldNodeDiscover,
+  worldNodeUndiscover,
+} from '@helpers/world-node-discovery';
 
 describe('Debug Helper Functions', () => {
   beforeEach(() => {
@@ -371,6 +383,35 @@ describe('Debug Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.bestiary).toEqual({});
+    });
+  });
+
+  describe('debugDiscoverWorldNode', () => {
+    it('delegates to worldNodeDiscover', () => {
+      debugDiscoverWorldNode('Hidden Grove');
+
+      expect(worldNodeDiscover).toHaveBeenCalledWith('Hidden Grove');
+    });
+  });
+
+  describe('debugUndiscoverWorldNode', () => {
+    it('delegates to worldNodeUndiscover', () => {
+      debugUndiscoverWorldNode('Hidden Grove');
+
+      expect(worldNodeUndiscover).toHaveBeenCalledWith('Hidden Grove');
+    });
+  });
+
+  describe('debugWipeWorldDiscoveries', () => {
+    it('clears every world discovery entry', () => {
+      debugWipeWorldDiscoveries();
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        worldDiscoveries: { 'Hidden Grove': { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(result.worldDiscoveries).toEqual({});
     });
   });
 });

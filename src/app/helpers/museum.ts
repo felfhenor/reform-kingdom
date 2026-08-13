@@ -8,6 +8,7 @@ import {
   getRecipeFoundAtNode,
   isRecipeDiscovered,
 } from '@helpers/recipes';
+import { worldNodeDisplayName } from '@helpers/world-nodes';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -49,14 +50,16 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
   const entries = collectibles.map((collectible) => {
     const discovered = isCollectibleDiscovered(collectible.id);
 
+    const foundAtNode = getCollectibleFoundAtNode(collectible.id);
+
     return {
       collectible,
       discovered,
       quantity: getCollectibleQuantity(collectible.id),
-      foundAtNode: getCollectibleFoundAtNode(collectible.id),
+      foundAtNode: foundAtNode ? worldNodeDisplayName(foundAtNode) : undefined,
       sourceNodeNames: discovered
         ? []
-        : collectibleSourceNodeNames(collectible.id),
+        : collectibleSourceNodeNames(collectible.id).map(worldNodeDisplayName),
     };
   });
 
@@ -122,12 +125,15 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
   const entries = recipes
     .map((recipe) => {
       const discovered = isRecipeDiscovered(recipe.id);
+      const foundAtNode = getRecipeFoundAtNode(recipe.id);
 
       return {
         recipe,
         discovered,
-        foundAtNode: getRecipeFoundAtNode(recipe.id),
-        sourceNodeNames: discovered ? [] : recipeSourceNodeNames(recipe.id),
+        foundAtNode: foundAtNode ? worldNodeDisplayName(foundAtNode) : undefined,
+        sourceNodeNames: discovered
+          ? []
+          : recipeSourceNodeNames(recipe.id).map(worldNodeDisplayName),
       };
     })
     .filter((entry) => entry.discovered || entry.sourceNodeNames.length > 0);

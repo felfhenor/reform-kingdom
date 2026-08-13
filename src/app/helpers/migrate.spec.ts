@@ -54,6 +54,7 @@ vi.mock('@helpers/defaults', () => ({
     discoveredEquipment: {},
     discoveredRecipes: {},
     discoveredGatherNodes: {},
+    worldDiscoveries: {},
     bestiary: {},
     world: { party: [] },
   })),
@@ -67,6 +68,10 @@ vi.mock('@helpers/gather-node-discovery', () => ({
 vi.mock('@helpers/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/world-node-discovery', () => ({
+  pruneInvalidWorldDiscoveries: vi.fn((discovered) => discovered),
 }));
 
 vi.mock('@helpers/state-game', () => ({

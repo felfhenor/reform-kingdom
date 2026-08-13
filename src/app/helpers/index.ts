@@ -75,5 +75,6 @@ export * from './travel';
 export * from './ui';
 export * from './version';
 export * from './world';
+export * from './world-node-discovery';
 export * from './world-nodes';
 export * from './worldgen';

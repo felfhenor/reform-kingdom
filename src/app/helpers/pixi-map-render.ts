@@ -138,9 +138,10 @@ function pixiTiledObjectRender(
 
   // Only node objects (Explore Nodes / Other Nodes layers) carry a `type`;
   // decorative/terrain objects are typeless and should stay unclickable.
+  // The click handler stays wired even for a still-hidden node - clicking is
+  // how a hidden node gets discovered in the first place.
   if (onNodeClick && object.type) {
     wrapper.eventMode = 'static';
-    wrapper.cursor = 'pointer';
     wrapper.on('pointertap', (event: FederatedPointerEvent) => {
       // Stops the tap from also reaching the stage's background handler,
       // which would otherwise treat this as an empty-map click and
@@ -151,13 +152,19 @@ function pixiTiledObjectRender(
   }
 
   // Same restriction as the click handler above - only node objects carry a
-  // `type`, so decorative/terrain objects never get a label.
+  // `type`, so decorative/terrain objects never get a label. The label is
+  // always created (even for a currently-hidden node) so it exists to be
+  // live-updated later without a full map re-render - it starts invisible
+  // with no pointer cursor, and `GamePlayWorldComponent.updateNodeLabels`
+  // (run once immediately after render, then every tick) sets the real
+  // visibility/cursor from current discovery state.
   const labelInfo = object.type ? resolveNodeLabel?.(object) : undefined;
   let label: Text | undefined;
   if (labelInfo) {
     label = pixiIndicatorNodeLabelCreate(labelInfo.kind, labelInfo.text);
     label.x = object.width / 2;
     label.y = -object.height - 4;
+    label.visible = false;
     wrapper.addChild(label);
   }
 

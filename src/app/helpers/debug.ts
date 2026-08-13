@@ -10,6 +10,10 @@ import {
 } from '@helpers/party';
 import { updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
+import {
+  worldNodeDiscover,
+  worldNodeUndiscover,
+} from '@helpers/world-node-discovery';
 import type {
   CharacterId,
   CollectibleContent,
@@ -135,6 +139,23 @@ export function debugSetTradeskillLevel(
 export function debugResetBestiary(): void {
   updateGamestate((state) => {
     state.bestiary = {};
+    return state;
+  });
+}
+
+export function debugDiscoverWorldNode(nodeName: string): void {
+  worldNodeDiscover(nodeName);
+}
+
+export function debugUndiscoverWorldNode(nodeName: string): void {
+  worldNodeUndiscover(nodeName);
+}
+
+// Reverts every hidden node back to undiscovered - a recovery tool for
+// testing hidden-node content without needing to click through each one.
+export function debugWipeWorldDiscoveries(): void {
+  updateGamestate((state) => {
+    state.worldDiscoveries = {};
     return state;
   });
 }

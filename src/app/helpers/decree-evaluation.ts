@@ -12,6 +12,7 @@ import { CHARACTER_MAX_LEVEL, isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
+  isWorldNodeVisible,
   worldNodeByName,
   worldNodeCompletionRewardProgress,
   worldNodeEncounter,
@@ -94,7 +95,9 @@ function nearestReachableExploreNode(
   predicate: (entry: WorldNodeEntry) => boolean,
 ): WorldNodeEntry | undefined {
   return nearestReachableNode(
-    worldNodesOfType('ExploreNode').filter(predicate),
+    worldNodesOfType('ExploreNode')
+      .filter(isWorldNodeVisible)
+      .filter(predicate),
   );
 }
 
@@ -146,6 +149,7 @@ export function mostChallengingExploreNodeForRisk(): WorldNodeEntry | undefined 
   const partyLevel = partyMaxLevel();
 
   const candidates = worldNodesOfType('ExploreNode')
+    .filter((entry) => isWorldNodeVisible(entry))
     .filter((entry) => riskLevelSatisfies(riskLevelOfExploreNode(entry), ceiling))
     .filter(
       (entry) =>
@@ -183,6 +187,7 @@ export function nearestGatherNodeFor(
   const candidates = worldNodesOfType('GatherNode').filter(
     (entry) =>
       isGatherNodeDiscovered(entry.nodeName) &&
+      isWorldNodeVisible(entry) &&
       worldNodeGatherMaterialIds(entry).includes(materialId),
   );
 
@@ -199,7 +204,7 @@ export function clauseTargetNode(
       return nearestGatherNodeFor(clause.materialId);
     case 'FarmNode': {
       const entry = worldNodeByName(clause.nodeName);
-      if (!entry) return undefined;
+      if (!entry || !isWorldNodeVisible(entry)) return undefined;
       return travelPathTo(entry.nodeName) ? entry : undefined;
     }
     case 'FinishUnfinishedAreas':

@@ -263,6 +263,7 @@ function ensureEncounter(
       encounter.completionRewards,
       ensureDroppedReward,
     ),
+    hidden: encounter.hidden ?? false,
   };
 }
 
@@ -296,6 +297,7 @@ function ensureEncounterRandom(
       encounter.completionRewards,
       ensureDroppedReward,
     ),
+    hidden: encounter.hidden ?? false,
   };
 }
 
@@ -327,6 +329,7 @@ function ensureGathering(
     xpGainedIfInLevelRange: gathering.xpGainedIfInLevelRange ?? 0,
     gatherTime: gathering.gatherTime ?? 1,
     gatherResults: ensureArray(gathering.gatherResults, ensureGatherResult),
+    hidden: gathering.hidden ?? false,
   };
 }
 
@@ -526,6 +529,7 @@ function ensureNodeOverride(
     name: override.name ?? 'UNKNOWN',
     __type: 'nodeoverride',
     description: override.description ?? 'UNKNOWN',
+    hidden: override.hidden ?? false,
   };
 }
 

@@ -41,6 +41,7 @@ vi.mock('@helpers/world', () => ({
 }));
 
 vi.mock('@helpers/world-nodes', () => ({
+  isWorldNodeVisible: vi.fn(() => true),
   worldNodeByName: vi.fn(),
   worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
   worldNodeEncounter: vi.fn(),
@@ -74,6 +75,7 @@ import { isPartyAtFullHealth } from '@helpers/party';
 import { travelPathTo } from '@helpers/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
+  isWorldNodeVisible,
   worldNodeByName,
   worldNodeCompletionRewardProgress,
   worldNodeEncounter,
@@ -117,6 +119,7 @@ beforeEach(() => {
   vi.mocked(decreeRiskTolerance).mockReturnValue('High');
   vi.mocked(worldNodesOfType).mockReturnValue([]);
   vi.mocked(worldNodeByName).mockReturnValue(undefined);
+  vi.mocked(isWorldNodeVisible).mockReturnValue(true);
   vi.mocked(travelPathTo).mockReturnValue(undefined);
   vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
   vi.mocked(getMaterialQuantity).mockReturnValue(0);
@@ -225,6 +228,22 @@ describe('nearestUnfinishedExploreNode', () => {
     } as EncounterContent);
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(decreeRiskTolerance).mockReturnValue('High');
+
+    expect(nearestUnfinishedExploreNode()).toBeUndefined();
+  });
+
+  it('excludes a hidden node that has not been discovered', () => {
+    const node = buildNode('Hidden');
+    vi.mocked(worldNodesOfType).mockReturnValue([node]);
+    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
+      obtained: 0,
+      total: 1,
+    });
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      levelRange: { min: 1, max: 1 },
+    } as EncounterContent);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
 
     expect(nearestUnfinishedExploreNode()).toBeUndefined();
   });
@@ -378,6 +397,18 @@ describe('mostChallengingExploreNodeForRisk', () => {
 
     expect(mostChallengingExploreNodeForRisk()).toBeUndefined();
   });
+
+  it('excludes a hidden node that has not been discovered', () => {
+    const node = buildNode('Hidden');
+    vi.mocked(worldNodesOfType).mockReturnValue([node]);
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      levelRange: { min: 5, max: 5 },
+    } as EncounterContent);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
+
+    expect(mostChallengingExploreNodeForRisk()).toBeUndefined();
+  });
 });
 
 describe('nearestGatherNodeFor', () => {
@@ -411,6 +442,19 @@ describe('nearestGatherNodeFor', () => {
     ]);
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(isGatherNodeDiscovered).mockReturnValue(false);
+
+    expect(nearestGatherNodeFor('wood' as MaterialId)).toBeUndefined();
+  });
+
+  it('excludes a hidden node that has not been discovered, even if visited', () => {
+    const node = buildNode('Grove');
+    vi.mocked(worldNodesOfType).mockReturnValue([node]);
+    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
+      'wood' as MaterialId,
+    ]);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
+    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
 
     expect(nearestGatherNodeFor('wood' as MaterialId)).toBeUndefined();
   });
@@ -635,6 +679,24 @@ describe('clauseTargetNode', () => {
     const node = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(node);
     vi.mocked(travelPathTo).mockReturnValue(undefined);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'FarmNode',
+          nodeName: 'Forest Ruins',
+          reward: { itemId: 'bone' as ItemId },
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('FarmNode has no target when its node is hidden and undiscovered', () => {
+    const node = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
 
     expect(
       clauseTargetNode(

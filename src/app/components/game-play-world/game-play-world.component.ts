@@ -25,6 +25,7 @@ import {
   isGlobalEffectActive,
   isPlayerAtLocation,
   isWorldCameraPanned,
+  isWorldNodeVisible,
   mapNodeDeselect,
   mapNodeSelect,
   partyGet,
@@ -43,8 +44,8 @@ import {
   TICKS_PER_STEP_MOVE,
   worldCameraRecenterRequest,
   worldNodeByName,
+  worldNodeDiscoverIfHidden,
   worldNodeLabelInfo,
-  worldNodesOfType,
 } from '@helpers';
 import type {
   CameraPosition,
@@ -366,6 +367,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.mapContainer.addChild(renderedMap.container);
     this.nodeLabels = renderedMap.nodeLabels;
+    this.updateNodeLabels();
 
     this.gridOverlay = pixiGridOverlayCreate(map);
     this.gridOverlay.visible = getOption('showBackdropGrid');
@@ -393,7 +395,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateVisualPosition();
       this.updatePlayerIndicatorIfNeeded();
       this.updateGatherProgressIndicator();
-      this.updateExploreRandomTimers();
+      this.updateNodeLabels();
       this.positionCamera();
     };
     this.app.ticker.add(this.visualPositionTicker);
@@ -403,7 +405,10 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   private onNodeClick(object: TiledObject): void {
     const entry = worldNodeByName(object.name);
-    if (entry) mapNodeSelect(entry);
+    if (!entry) return;
+
+    worldNodeDiscoverIfHidden(entry);
+    mapNodeSelect(entry);
   }
 
   private resolveNodeLabel(object: TiledObject): WorldNodeLabelInfo | undefined {
@@ -411,19 +416,27 @@ export class GamePlayWorldComponent implements OnDestroy {
     return entry ? worldNodeLabelInfo(entry) : undefined;
   }
 
-  // `ExploreRandomNode` labels carry a countdown that ticks every second, so
-  // (unlike every other node's static nametag, built once in
-  // `resolveNodeLabel`) they need a per-frame refresh - same imperative
-  // "recompute and write" pattern as `updateGatherProgressIndicator`.
-  // PixiJS's `Text.text` setter is a no-op when the string is unchanged, so
-  // recomputing every frame for a value that only changes once a second is
-  // cheap and needs no manual throttling.
-  private updateExploreRandomTimers(): void {
+  // Every node's label is created up front (see `pixi-map-render.ts`) but
+  // starts invisible with no pointer cursor, so this is what actually shows
+  // it - run once right after the map renders, then every tick thereafter.
+  // The per-tick refresh covers two live-changing cases: an `ExploreRandomNode`'s
+  // countdown text (ticks every second) and a hidden node's visibility/cursor
+  // flipping the instant it's clicked-discovered, without needing a full map
+  // re-render. PixiJS's `Text.text`/`visible`/`cursor` setters are no-ops
+  // when the value is unchanged, so recomputing every frame for values that
+  // rarely change is cheap and needs no manual throttling - same pattern as
+  // `updateGatherProgressIndicator`.
+  private updateNodeLabels(): void {
     if (!this.nodeLabels) return;
 
-    worldNodesOfType('ExploreRandomNode').forEach((entry) => {
-      const label = this.nodeLabels?.get(entry.nodeName);
-      if (!label) return;
+    this.nodeLabels.forEach((label, nodeName) => {
+      const entry = worldNodeByName(nodeName);
+      if (!entry) return;
+
+      const visible = isWorldNodeVisible(entry);
+      label.visible = visible;
+      if (label.parent) label.parent.cursor = visible ? 'pointer' : 'default';
+      if (!visible) return;
 
       const info = worldNodeLabelInfo(entry);
       if (info) label.text = info.text;

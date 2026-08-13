@@ -25,6 +25,7 @@ vi.mock('@helpers/state-game', () => ({
 vi.mock('@helpers/world-nodes', () => ({
   isRewardDiscovered: vi.fn(),
   rewardContentInfo: vi.fn(),
+  worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
 }));
 
 import {

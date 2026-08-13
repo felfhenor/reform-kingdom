@@ -18,6 +18,10 @@ import {
   recipeResultSpritesheet,
 } from '@helpers/recipes';
 import { tiledMapGetLayer, tiledObjectSpriteFrame } from '@helpers/tiled-map';
+import {
+  isWorldNodeDiscovered,
+  worldNodeDiscover,
+} from '@helpers/world-node-discovery';
 import type {
   CollectibleContent,
   DroppedReward,
@@ -147,6 +151,46 @@ export function worldNodeOverride(
   return content?.__type === 'nodeoverride' ? content : undefined;
 }
 
+// Whether `entry` is authored as hidden - checks whichever content type it
+// actually resolves to (only one of the four ever matches a given node, so
+// this `??` chain is safe).
+export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
+  return (
+    worldNodeEncounter(entry)?.hidden ??
+    worldNodeGathering(entry)?.hidden ??
+    worldNodeEncounterRandom(entry)?.hidden ??
+    worldNodeOverride(entry)?.hidden ??
+    false
+  );
+}
+
+// A hidden node is only visible once the player has clicked/discovered it -
+// every other node is always visible. Gates the map label/cursor (see
+// `worldNodeLabelInfo`, `pixi-map-render.ts`) and auto-mode targeting (see
+// `decree-evaluation.ts`).
+export function isWorldNodeVisible(entry: WorldNodeEntry): boolean {
+  return !isWorldNodeHidden(entry) || isWorldNodeDiscovered(entry.nodeName);
+}
+
+// Reveals `entry` if it's hidden and not yet discovered - the single call
+// site the map click handler uses, so the hidden/already-discovered
+// conditional lives here rather than in the component.
+export function worldNodeDiscoverIfHidden(entry: WorldNodeEntry): void {
+  if (isWorldNodeHidden(entry) && !isWorldNodeDiscovered(entry.nodeName)) {
+    worldNodeDiscover(entry.nodeName);
+  }
+}
+
+// The name to show for `nodeName` anywhere it's surfaced off-map (bestiary,
+// museum, etc.) - masked to '???' if it's a still-undiscovered hidden node,
+// so a location can't leak before the player has actually found it.
+export function worldNodeDisplayName(nodeName: string): string {
+  const entry = worldNodeByName(nodeName);
+  if (!entry) return nodeName;
+
+  return isWorldNodeVisible(entry) ? nodeName : '???';
+}
+
 export function worldNodeLevelRange(
   entry: WorldNodeEntry,
 ): EncounterLevelRange | undefined {
@@ -201,6 +245,11 @@ export function worldNodeExploreRandomTimerText(
   return encounterRandomTimerLabel(content, encounterRandomState(content.id));
 }
 
+// Always resolves the label text/kind regardless of hidden/discovered state
+// - the map renderer (`pixi-map-render.ts`) creates every node's label
+// up front and toggles its visibility live via `isWorldNodeVisible` once
+// discovery state can change without a full map re-render, rather than
+// baking that gating into the text itself.
 export function worldNodeLabelInfo(
   entry: WorldNodeEntry,
 ): WorldNodeLabelInfo | undefined {
@@ -283,7 +332,10 @@ export function gatherableMaterialIds(): MaterialId[] {
   const ids = new Set<MaterialId>();
 
   worldNodesOfType('GatherNode')
-    .filter((entry) => isGatherNodeDiscovered(entry.nodeName))
+    .filter(
+      (entry) =>
+        isGatherNodeDiscovered(entry.nodeName) && isWorldNodeVisible(entry),
+    )
     .forEach((entry) => {
       worldNodeGatherMaterialIds(entry).forEach((id) => ids.add(id as MaterialId));
     });

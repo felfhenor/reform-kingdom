@@ -44,6 +44,7 @@ export function defaultGameState(): GameState {
     discoveredEquipment: {},
     discoveredRecipes: {},
     discoveredGatherNodes: {},
+    worldDiscoveries: {},
     bestiary: {},
     globalEffects: [],
     tradeskills: defaultTradeskills(),
