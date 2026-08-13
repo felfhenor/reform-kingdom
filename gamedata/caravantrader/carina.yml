@@ -296,3 +296,9 @@
       equipmentId: Elvenwood Harpoon
       limit: 2
       weight: 3
+
+    - type: sell
+      value: 7500
+      equipmentId: Elven Aiming Artifact
+      limit: 2
+      weight: 3
