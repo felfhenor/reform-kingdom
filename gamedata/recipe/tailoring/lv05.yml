@@ -69,3 +69,24 @@
   maxTradeskillLevel: 11
   tradeskillXP: 15
   craftTime: 60
+
+- id: 07a04938-a898-4ed6-8316-908a854aaf64
+  name: 'Equipment: Elvenwood Broom'
+  result:
+    equipmentId: Elvenwood Broom
+
+  requirements:
+    - itemId: Elven Wood
+      quantity: 10
+
+    - itemId: Silk Spool
+      quantity: 4
+
+    - itemId: Linen Thread
+      quantity: 20
+
+  tradeskill: Tailoring
+  minTradeskillLevel: 9
+  maxTradeskillLevel: 12
+  tradeskillXP: 25
+  craftTime: 120

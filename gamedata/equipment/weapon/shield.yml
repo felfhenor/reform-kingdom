@@ -53,3 +53,15 @@
     Resistance: 1.2
   grantedSkillIds:
     - Fortify I
+
+- id: 93721a1a-dc56-416d-bfe8-3b4cffe48886
+  name: Elven Shield Copycat
+  description: A shield made of elven wood, but... not quite as well as they would do it.
+  levelRequirement: 11
+  rarity: Common
+  type: Shield
+  sprite: '0042'
+  slots: 1
+  baseStats:
+    Vitality: 4.2
+    Resistance: 0.5

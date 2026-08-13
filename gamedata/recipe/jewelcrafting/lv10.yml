@@ -1,0 +1,17 @@
+- id: af80ad1c-eda6-4e23-ae04-1bb540ffd39a
+  name: 'Equipment: Elvenwood Azurite Ring'
+  result:
+    equipmentId: Elvenwood Azurite Ring
+
+  requirements:
+    - itemId: Elven Wood
+      quantity: 5
+
+    - itemId: Azurite
+      quantity: 5
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 13
+  tradeskillXP: 35
+  craftTime: 240

@@ -1,0 +1,14 @@
+- id: 71be6bc8-6b2a-4e6f-8f7a-4e8122eb49ed
+  name: 'Equipment: Elvenwood Arrow'
+  result:
+    equipmentId: Elvenwood Arrow
+
+  requirements:
+    - itemId: Elven Wood
+      quantity: 6
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 13
+  tradeskillXP: 25
+  craftTime: 120

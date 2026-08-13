@@ -136,3 +136,10 @@
     Resistance: 0.8
     Vitality: 0.8
     Intelligence: 0.8
+
+- id: 028c4780-6c63-46e8-8ce1-ff1abc2ccbfc
+  name: Elven Wood
+  description: A small rod of wood taken from an elven forest. For some reason, they always come off the trees perfectly milled and round.
+  rarity: Uncommon
+
+  sprite: '0023'

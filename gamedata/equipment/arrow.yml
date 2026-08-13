@@ -30,3 +30,16 @@
   slots: 1
   baseStats:
     Strength: 2.1
+
+- id: d9b54850-4cc5-4e98-a9e3-266f3d048304
+  name: Elvenwood Arrow
+  description: A sharpened wooden arrow, carved from elven wood.
+  levelRequirement: 11
+  rarity: Common
+  type: Arrow
+  sprite: '0062'
+  slots: 1
+  baseStats:
+    Strength: 4.1
+    Agility: 1.1
+    Resistance: 0.5

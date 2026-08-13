@@ -1,0 +1,14 @@
+- id: 190d4385-9a73-4e41-8d90-41b1eae21950
+  name: 'Weapon: Elvenwood Whip'
+  result:
+    equipmentId: Elvenwood Whip
+
+  requirements:
+    - itemId: Elven Wood
+      quantity: 12
+
+  tradeskill: Artificing
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 13
+  tradeskillXP: 25
+  craftTime: 120

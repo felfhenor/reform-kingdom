@@ -129,6 +129,24 @@
 
   tradeskill: Jewelcrafting
   minTradeskillLevel: 8
-  maxTradeskillLevel: 12
+  maxTradeskillLevel: 11
   tradeskillXP: 30
   craftTime: 180
+
+- id: 44aff973-9974-4823-b3ca-d6b2e2e6d12f
+  name: 'Equipment: Elvenwood Malachite Ring'
+  result:
+    equipmentId: Elvenwood Malachite Ring
+
+  requirements:
+    - itemId: Elven Wood
+      quantity: 5
+
+    - itemId: Malachite
+      quantity: 5
+
+  tradeskill: Jewelcrafting
+  minTradeskillLevel: 9
+  maxTradeskillLevel: 12
+  tradeskillXP: 35
+  craftTime: 240

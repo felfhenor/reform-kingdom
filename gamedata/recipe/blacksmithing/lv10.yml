@@ -1,0 +1,20 @@
+- id: 93e7bd4f-0ef4-4dfb-bde2-613609773db0
+  name: 'Weapon: Copperbone Mace'
+  result:
+    equipmentId: Copperbone Mace
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 10
+
+    - itemId: Orc Bone
+      quantity: 3
+
+    - itemId: Wergen Wood
+      quantity: 3
+
+  tradeskill: Blacksmithing
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 13
+  tradeskillXP: 25
+  craftTime: 90

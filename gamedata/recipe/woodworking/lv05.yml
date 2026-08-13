@@ -75,3 +75,18 @@
   maxTradeskillLevel: 11
   tradeskillXP: 15
   craftTime: 60
+
+- id: fbf16543-a173-43c8-94ea-5d04b6697b72
+  name: 'Equipment: Elven Shield Copycat'
+  result:
+    equipmentId: Elven Shield Copycat
+
+  requirements:
+    - itemId: Elven Wood
+      quantity: 20
+
+  tradeskill: Woodworking
+  minTradeskillLevel: 9
+  maxTradeskillLevel: 12
+  tradeskillXP: 25
+  craftTime: 120

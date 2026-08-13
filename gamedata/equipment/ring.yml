@@ -71,3 +71,29 @@
     Strength: 1.2
     Energy: 4
     Health: 7
+
+- id: 5df80b1c-4072-4978-a4ea-f0d614a0c528
+  name: Elvenwood Malachite Ring
+  description: A ring carved out of elven wood, and set with malachite.
+  levelRequirement: 10
+  rarity: Uncommon
+  type: Ring
+  sprite: '0061'
+  slots: 1
+  baseStats:
+    Strength: 2.1
+    Vitality: 2.6
+    Health: 10
+
+- id: 5b3b3299-ff6c-464c-ab70-11f46d022e21
+  name: Elvenwood Azurite Ring
+  description: A ring carved out of elven wood, and set with azurite.
+  levelRequirement: 12
+  rarity: Uncommon
+  type: Ring
+  sprite: '0060'
+  slots: 1
+  baseStats:
+    Intelligence: 2.1
+    Resistance: 2.6
+    Energy: 10

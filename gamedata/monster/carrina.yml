@@ -650,6 +650,11 @@
     bonusPerLevel: 5
 
   drops:
+    - itemId: Elven Wood
+      min: 1
+      max: 2
+      chance: 100
+
     - itemId: Gold Coin
       min: 50
       max: 65
@@ -701,6 +706,11 @@
     bonusPerLevel: 5
 
   drops:
+    - itemId: Elven Wood
+      min: 1
+      max: 2
+      chance: 100
+
     - itemId: Gold Coin
       min: 25
       max: 35
@@ -752,6 +762,11 @@
     bonusPerLevel: 5
 
   drops:
+    - itemId: Elven Wood
+      min: 1
+      max: 2
+      chance: 100
+
     - itemId: Gold Coin
       min: 25
       max: 35
@@ -853,6 +868,11 @@
       min: 100
       max: 120
       bonusPerLevel: 10
+      chance: 100
+
+    - itemId: Elven Wood
+      min: 4
+      max: 10
       chance: 100
 
   skills:

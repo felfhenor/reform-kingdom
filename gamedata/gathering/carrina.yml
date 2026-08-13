@@ -71,3 +71,27 @@
       items:
         - itemId: Malachite
           quantity: 1
+
+- id: 42c72ae0-56ba-42f5-ad7f-7b4b155074cf
+  name: Elven Woods
+  description: A mystical glade, prized by elves for the abundance of crafting materials. Here, you can feel the care that goes into gathering resources.
+
+  hidden: true
+
+  levelRange:
+    min: 10
+    max: 12
+
+  xpGainedIfInLevelRange: 10
+  gatherTime: 10
+
+  gatherResults:
+    - chance: 100
+      items:
+        - itemId: Elven Wood
+          quantity: 1
+
+    - chance: 10
+      items:
+        - itemId: Elven Wood
+          quantity: 2
