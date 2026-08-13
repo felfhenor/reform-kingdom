@@ -166,6 +166,12 @@
       limit: 5
       weight: 1
 
+    - type: buy
+      value: 50
+      equipmentId: Pan Board
+      limit: 50
+      weight: 1
+
 - id: 1503d413-a38b-4759-856c-a9b234cec813
   name: Bart
   description: Humans! Buy stuff!
@@ -196,6 +202,12 @@
       value: 250
       itemId: Azurite
       limit: 5
+      weight: 1
+
+    - type: buy
+      value: 500
+      equipmentId: Jelly Dirk
+      limit: 2
       weight: 1
 
 - id: 383dbb28-cc21-47ca-afee-bd088dc127e4
