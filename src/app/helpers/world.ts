@@ -1,6 +1,6 @@
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeAt } from '@helpers/world-nodes';
-import type { CurrentLocation, GameStateWorld } from '@interfaces';
+import type { CurrentLocation, GameStateWorld, WorldNodeEntry } from '@interfaces';
 
 export function setWorld(world: GameStateWorld): void {
   updateGamestate((gs) => {
@@ -20,9 +20,13 @@ export function currentLocationSet(location: CurrentLocation): void {
   });
 }
 
-export function isPlayerAtLocation(): boolean {
+export function worldNodeAtCurrentLocation(): WorldNodeEntry | undefined {
   const location = currentLocationGet();
-  return !!worldNodeAt(location.mapName, location.x, location.y);
+  return worldNodeAt(location.mapName, location.x, location.y);
+}
+
+export function isPlayerAtLocation(): boolean {
+  return !!worldNodeAtCurrentLocation();
 }
 
 export function isPlayerAtKingdom(): boolean {

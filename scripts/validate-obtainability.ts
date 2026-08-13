@@ -14,6 +14,11 @@
  * player's inventory and is either dead content or missing its drop/reward/
  * recipe wiring.
  *
+ * A caravan trader's `sell` trades (`gamedata/caravantrader/*.yml`) also
+ * count as a source - the party can buy that item/equipment/collectible for
+ * gold, same as any drop/reward/gather/recipe. `buy` trades don't count -
+ * the trader taking something *from* the party isn't a way to obtain it.
+ *
  * Runs against the raw `gamedata/**\/*.yml` sources rather than compiled
  * output, matching by the authored `name` field (the same identifier
  * `itemId`/`equipmentId`/`collectibleId` references use pre-build - see
@@ -95,6 +100,7 @@ async function main(): Promise<void> {
     encounterRandoms,
     gatherings,
     recipes,
+    caravanTraders,
   ] = await Promise.all([
     loadContentType('item'),
     loadContentType('collectible'),
@@ -104,13 +110,14 @@ async function main(): Promise<void> {
     loadContentType('encounterrandom'),
     loadContentType('gathering'),
     loadContentType('recipe'),
+    loadContentType('caravantrader'),
   ]);
 
   console.log(
     `Loaded ${items.length} item(s), ${collectibles.length} collectible(s), ${equipment.length} equipment(s).`,
   );
   console.log(
-    `Loaded ${monsters.length} monster(s), ${encounters.length} encounter(s), ${encounterRandoms.length} random encounter(s), ${gatherings.length} gathering node(s), ${recipes.length} recipe(s) as potential sources.\n`,
+    `Loaded ${monsters.length} monster(s), ${encounters.length} encounter(s), ${encounterRandoms.length} random encounter(s), ${gatherings.length} gathering node(s), ${recipes.length} recipe(s), ${caravanTraders.length} caravan trader(s) as potential sources.\n`,
   );
 
   const obtainableItems = new Set<string>();
@@ -148,6 +155,15 @@ async function main(): Promise<void> {
     addIfPresent(obtainableItems, result.itemId);
     addIfPresent(obtainableEquipment, result.equipmentId);
     addIfPresent(obtainableCollectibles, result.collectibleId);
+  });
+
+  caravanTraders.forEach((trader) => {
+    (trader.trades ?? []).forEach((trade: any) => {
+      if (trade.type !== 'sell') return;
+      addIfPresent(obtainableItems, trade.itemId);
+      addIfPresent(obtainableEquipment, trade.equipmentId);
+      addIfPresent(obtainableCollectibles, trade.collectibleId);
+    });
   });
 
   const problems: string[] = [];

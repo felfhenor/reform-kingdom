@@ -82,6 +82,21 @@
         </li>
       }
 
+      @if (showCaravanTradeButton()) {
+        <li class="action-button" appRequireSetup>
+          <button
+            class="btn btn-xs btn-warning"
+            appButtonGlow
+            tp="Trade with the Caravan"
+            (click)="openCaravanTrade()"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-icon name="gameSwapBag" size="2em" color="#000"></app-icon>
+          </button>
+        </li>
+      }
+
       @if (showRecenterButton()) {
         <li class="action-button" appRequireSetup>
           <button
@@ -202,3 +217,5 @@
     <app-button-quit></app-button-quit>
   </div>
 </app-modal>
+
+<app-caravan-trade-modal></app-caravan-trade-modal>

@@ -1,4 +1,6 @@
 export type ContentType =
+  | 'caravan'
+  | 'caravantrader'
   | 'collectible'
   | 'encounter'
   | 'encounterrandom'

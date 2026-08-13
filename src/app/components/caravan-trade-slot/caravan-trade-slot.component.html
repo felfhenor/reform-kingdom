@@ -1,0 +1,104 @@
+@let entry = row();
+@let item = display();
+
+<button
+  type="button"
+  class="caravan-trade-slot btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start"
+  [disabled]="entry.soldOut || entry.maxQuantity === 0"
+  [tp]="item ? tooltip : undefined"
+  [tpPlacement]="'top'"
+  (click)="activate.emit()"
+>
+  @if (item) {
+    <div class="flex flex-col items-center gap-1 shrink-0">
+      <div
+        class="outline-2 outline-offset-[-2px] rounded outline-{{
+          item.rarity
+        }}"
+      >
+        <app-icon-blank-slot>
+          <app-atlas-image
+            [spritesheet]="item.spritesheet"
+            [assetName]="item.sprite"
+          />
+        </app-icon-blank-slot>
+      </div>
+    </div>
+
+    <div class="flex flex-col flex-1 min-w-0 gap-1">
+      <span class="font-bold text-{{ item.rarity }} truncate">
+        {{ item.name }}
+      </span>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        @if (!entry.soldOut) {
+          <span
+            class="badge badge-sm"
+            [class.badge-success]="isPartyBuying()"
+            [class.badge-warning]="!isPartyBuying()"
+          >
+            {{ isPartyBuying() ? 'Buy' : 'Sell' }}
+          </span>
+        }
+
+        @if (entry.ownedQuantity > 0) {
+          <span class="badge badge-sm badge-info">
+            Owned: {{ entry.ownedQuantity }}
+          </span>
+        }
+
+        @let remaining = entry.remaining ?? 0;
+
+        @if (remaining > 0) {
+          <span class="badge badge-sm badge-info">
+            Trades Remaining: {{ remaining }}
+          </span>
+        }
+
+        @if (entry.soldOut) {
+          <span class="badge badge-error badge-sm">Sold out</span>
+        }
+      </div>
+    </div>
+
+    <app-currency-cost
+      [type]="goldCoinItemId"
+      [amount]="entry.price"
+      class="ml-auto mr-2 shrink-0"
+    />
+  }
+</button>
+
+<ng-template #tooltip>
+  @if (item) {
+    <div class="flex gap-2 p-2 max-w-[400px]">
+      <app-atlas-image
+        [spritesheet]="item.spritesheet"
+        [assetName]="item.sprite"
+        class="caravan-trade-tooltip-image"
+      />
+
+      <div>
+        <div class="font-bold mb-1 text-{{ item.rarity }}">
+          {{ item.name }}
+        </div>
+
+        @if (item.levelRequirement !== undefined) {
+          <div class="text-xs mb-2">Lv. {{ item.levelRequirement }}</div>
+        }
+
+        @if (item.stats) {
+          <div class="mb-2">
+            <app-item-stat-rows [stats]="item.stats" />
+          </div>
+        }
+
+        <div class="italic text-sm mb-2 max-w-[300px]">
+          {{ item.description }}
+        </div>
+
+        <div class="text-xs">Owned: {{ entry.ownedQuantity }}</div>
+      </div>
+    </div>
+  }
+</ng-template>

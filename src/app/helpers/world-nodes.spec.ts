@@ -1,4 +1,6 @@
 import type {
+  CaravanContent,
+  CaravanId,
   CollectibleContent,
   CollectibleId,
   EncounterContent,
@@ -22,6 +24,12 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/caravan', () => ({
+  caravanBrandName: vi.fn((nodeName: string) => nodeName.split(' - ')[0]),
+  caravanState: vi.fn(() => undefined),
+  caravanTimerLabel: vi.fn(() => undefined),
+}));
+
 vi.mock('@helpers/gather-node-discovery', () => ({
   isGatherNodeDiscovered: vi.fn(() => false),
 }));
@@ -31,6 +39,7 @@ vi.mock('@helpers/world-node-discovery', () => ({
   worldNodeDiscover: vi.fn(),
 }));
 
+import { caravanTimerLabel } from '@helpers/caravan';
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { setAllMaps } from '@helpers/maps';
@@ -526,6 +535,34 @@ describe('encounter-backed node accessors', () => {
       expect(worldNodeLabelInfo(buildEntry({ type: '' }))).toBeUndefined();
     });
 
+    it('shows only the caravan brand name (dropping the branch suffix and level range) and prefixes the reset timer', () => {
+      const caravan: CaravanContent = {
+        id: 'caravan-1' as CaravanId,
+        name: 'Duchy Trading Caravan - Carrina',
+        __type: 'caravan',
+        description: 'A caravan.',
+        traderResetTime: 3600,
+        level: { min: 2, max: 5 },
+        markupPercentages: { sell: 25, buy: -15 },
+        traderCategories: ['Carrina'],
+      };
+      seedContent([caravan]);
+      vi.mocked(caravanTimerLabel).mockReturnValue('01:00:00');
+
+      expect(
+        worldNodeLabelInfo({
+          mapName: 'Carrina',
+          x: 24,
+          y: 24,
+          nodeName: caravan.name,
+          nodeData: buildObject({ name: caravan.name, type: 'CaravanNode' }),
+        }),
+      ).toEqual({
+        kind: 'Trade',
+        text: '01:00:00\nDuchy Trading Caravan',
+      });
+    });
+
     it('still resolves the real label for a hidden, undiscovered node', () => {
       // Visibility gating happens at the map-render layer
       // (`pixi-map-render.ts`/`GamePlayWorldComponent.updateNodeLabels`), not
@@ -545,6 +582,7 @@ describe('worldNodeInteractionKind', () => {
   it.each([
     ['GatherNode', 'Gather'],
     ['ExploreNode', 'Explore'],
+    ['CaravanNode', 'Trade'],
     ['TeleportNode', 'Travel'],
     ['Kingdom', 'Travel'],
   ] as const)('maps %s to %s', (type, kind) => {

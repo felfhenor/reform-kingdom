@@ -5,7 +5,7 @@
         <div class="flex items-center gap-2">
           <app-node-sprite [entry]="entry" />
 
-          <h2 class="card-title text-lg">{{ entry.nodeName }}</h2>
+          <h2 class="card-title text-lg">{{ displayName() }}</h2>
         </div>
 
         <app-button-close (click)="close()"></app-button-close>
@@ -46,6 +46,27 @@
           >
             {{ rewards.obtained }}/{{ rewards.total }} Rewards
           </div>
+        }
+
+        @if (isCaravanNode()) {
+          @let traderLevel = caravanTraderLevel();
+          @let tradeCounts = caravanTradeCounts();
+
+          @if (traderLevel !== undefined) {
+            <div class="badge badge-outline">Trader Lv. {{ traderLevel }}</div>
+          }
+
+          @if (tradeCounts.buyable > 0) {
+            <div class="badge badge-outline badge-success">
+              {{ tradeCounts.buyable }} Buyable
+            </div>
+          }
+
+          @if (tradeCounts.sellable > 0) {
+            <div class="badge badge-outline badge-warning">
+              {{ tradeCounts.sellable }} Sellable
+            </div>
+          }
         }
       </div>
 
@@ -89,6 +110,12 @@
           </div>
         }
 
+        @if (!meetsCaravanAvailability()) {
+          <div class="text-sm text-rose-400">
+            No traders are available for this timeframe. Check back later.
+          </div>
+        }
+
         <button
           type="button"
           class="btn btn-sm btn-primary"
@@ -113,6 +140,16 @@
         <div class="text-sm opacity-70">
           No monsters remain. Check back in {{ exploreRandomTimerText() }}.
         </div>
+      } @else if (isCaravanNode()) {
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          (click)="openTrade()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Open Trade
+        </button>
       }
     </div>
   </div>

@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 import { isEquipmentDiscovered } from '@helpers/armory';
+import { caravanBrandName, caravanState, caravanTimerLabel } from '@helpers/caravan';
 import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
 import {
@@ -23,6 +24,10 @@ import {
   worldNodeDiscover,
 } from '@helpers/world-node-discovery';
 import type {
+  CaravanContent,
+  CaravanTrade,
+  CaravanTradeCounts,
+  CaravanTraderContent,
   CollectibleContent,
   DroppedReward,
   EncounterContent,
@@ -141,6 +146,13 @@ export function worldNodeEncounterRandom(
   return content?.__type === 'encounterrandom' ? content : undefined;
 }
 
+export function worldNodeCaravan(
+  entry: WorldNodeEntry,
+): CaravanContent | undefined {
+  const content = getEntry<CaravanContent>(entry.nodeName);
+  return content?.__type === 'caravan' ? content : undefined;
+}
+
 // A manually-authored override for a node's displayed data - lets a node
 // (e.g. a Kingdom node like the Duchy of Carrina) have text like a
 // description without needing to be backed by an Encounter/Gathering entry.
@@ -197,7 +209,8 @@ export function worldNodeLevelRange(
   return (
     worldNodeEncounter(entry)?.levelRange ??
     worldNodeGathering(entry)?.levelRange ??
-    worldNodeEncounterRandom(entry)?.levelRange
+    worldNodeEncounterRandom(entry)?.levelRange ??
+    worldNodeCaravan(entry)?.level
   );
 }
 
@@ -219,6 +232,8 @@ export function worldNodeInteractionKind(
       return 'Explore';
     case 'ExploreRandomNode':
       return 'ExploreRandom';
+    case 'CaravanNode':
+      return 'Trade';
     case 'TeleportNode':
     case 'Kingdom':
       return 'Travel';
@@ -245,6 +260,59 @@ export function worldNodeExploreRandomTimerText(
   return encounterRandomTimerLabel(content, encounterRandomState(content.id));
 }
 
+// True once the caravan's regeneration tick has successfully assigned a
+// trader - false for a caravan whose gamedata has no eligible trader at all
+// (see `caravanProcessTick`), which blocks travel to it.
+export function worldNodeCaravanIsAvailable(entry: WorldNodeEntry): boolean {
+  const content = worldNodeCaravan(entry);
+  if (!content) return false;
+
+  return !!caravanState(content.id)?.traderId;
+}
+
+export function worldNodeCaravanTimerText(
+  entry: WorldNodeEntry,
+): string | undefined {
+  const content = worldNodeCaravan(entry);
+  if (!content) return undefined;
+
+  return caravanTimerLabel(content, caravanState(content.id));
+}
+
+function worldNodeCaravanTrader(
+  entry: WorldNodeEntry,
+): CaravanTraderContent | undefined {
+  const content = worldNodeCaravan(entry);
+  const traderId = content ? caravanState(content.id)?.traderId : undefined;
+  return traderId ? getEntry<CaravanTraderContent>(traderId) : undefined;
+}
+
+export function worldNodeCaravanTraderLevel(
+  entry: WorldNodeEntry,
+): number | undefined {
+  return worldNodeCaravanTrader(entry)?.level;
+}
+
+// A preview of the caravan's active stock, shown on the map node panel
+// before the player opens the full trade modal.
+export function worldNodeCaravanTradeCounts(
+  entry: WorldNodeEntry,
+): CaravanTradeCounts {
+  const content = worldNodeCaravan(entry);
+  const trader = worldNodeCaravanTrader(entry);
+  const state = content ? caravanState(content.id) : undefined;
+  if (!trader || !state) return { buyable: 0, sellable: 0 };
+
+  const activeTrades = state.activeTradeIndices
+    .map((index) => trader.trades[index])
+    .filter((trade): trade is CaravanTrade => !!trade);
+
+  return {
+    buyable: activeTrades.filter((trade) => trade.type === 'sell').length,
+    sellable: activeTrades.filter((trade) => trade.type === 'buy').length,
+  };
+}
+
 // Always resolves the label text/kind regardless of hidden/discovered state
 // - the map renderer (`pixi-map-render.ts`) creates every node's label
 // up front and toggles its visibility live via `isWorldNodeVisible` once
@@ -257,11 +325,26 @@ export function worldNodeLabelInfo(
   if (!kind) return undefined;
 
   const levelRange = worldNodeLevelRange(entry);
-  const lines = [entry.nodeName];
-  if (levelRange) lines.push(`Lv.${worldNodeLevelLabel(levelRange)}`);
+  // A caravan's name is authored as "<Brand Name> - <Branch Name>" (e.g.
+  // "Duchy Trading Caravan - Carrina") - the branch is just the map it's on,
+  // so the map label drops it entirely rather than showing the full
+  // hyphenated name.
+  const lines =
+    kind === 'Trade' ? [caravanBrandName(entry.nodeName)] : [entry.nodeName];
+  // A caravan's level range is shown in the map node panel instead (see
+  // `worldNodeCaravanTraderLevel`/`worldNodeCaravanTradeCounts`) - the
+  // floating map label stays focused on name + reset timer.
+  if (levelRange && kind !== 'Trade') {
+    lines.push(`Lv.${worldNodeLevelLabel(levelRange)}`);
+  }
 
   if (kind === 'ExploreRandom') {
     const timerText = worldNodeExploreRandomTimerText(entry);
+    if (timerText) lines.unshift(timerText);
+  }
+
+  if (kind === 'Trade') {
+    const timerText = worldNodeCaravanTimerText(entry);
     if (timerText) lines.unshift(timerText);
   }
 
@@ -350,7 +433,8 @@ export function worldNodeDescription(
     worldNodeOverride(entry)?.description ??
     worldNodeEncounter(entry)?.description ??
     worldNodeGathering(entry)?.description ??
-    worldNodeEncounterRandom(entry)?.description
+    worldNodeEncounterRandom(entry)?.description ??
+    worldNodeCaravan(entry)?.description
   );
 }
 

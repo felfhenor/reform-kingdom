@@ -273,6 +273,8 @@ const settings = {
 // Create a program from the actual interface files
 const program = TJS.getProgramFromFiles(
   [
+    path.resolve(__dirname, '../src/app/interfaces/content-caravan.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-caravan-trader.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-collectible.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-encounter.ts'),
     path.resolve(
@@ -312,6 +314,8 @@ const program = TJS.getProgramFromFiles(
 // Content type mappings to actual TypeScript interface names.
 // Keys must match the gamedata folder names (and `ContentType` union).
 const contentTypeMap = {
+  caravan: 'CaravanContent',
+  caravantrader: 'CaravanTraderContent',
   collectible: 'CollectibleContent',
   encounter: 'EncounterContent',
   encounterrandom: 'EncounterRandomContent',
@@ -396,10 +400,14 @@ function updateVscodeSettings(): void {
 
   const raw: string = fs.readFileSync(settingsPath, 'utf-8');
 
+  // Recursive (`**/*.yml`) rather than a flat `*.yml` - `gamedata-build.ts`
+  // scans every content folder recursively (see `recursive-readdir` there),
+  // so a type authored in a nested subfolder (e.g. `gamedata/collectible/
+  // caravan/*.yml`) still needs schema validation.
   const schemaEntries = generatedContentTypes
     .map(
       (contentType) =>
-        `    "./schemas/${contentType}.schema.json": "gamedata/${contentType}/*.yml"`,
+        `    "./schemas/${contentType}.schema.json": "gamedata/${contentType}/**/*.yml"`,
     )
     .join(',\n');
   const newBlock = `"yaml.schemas": {\n${schemaEntries}\n  }`;

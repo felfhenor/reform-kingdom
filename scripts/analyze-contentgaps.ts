@@ -51,6 +51,12 @@
  *     `levelRange.min`
  *   - gathering node `gatherResults`, using that node's `levelRange.min`
  *   - tradeskill recipe results, using the recipe's `minTradeskillLevel`
+ *   - caravan trader `sell` trades, using the *caravan's* `level.min` (not
+ *     the trader's own `level`) for every caravan the trader is eligible to
+ *     staff (its `category` is one of that caravan's `traderCategories` and
+ *     its `level` falls within the caravan's `level` range) - the caravan's
+ *     level range is what actually gates when a player can reach that node,
+ *     the trader's own level only gates which caravans it can be assigned to
  *
  * The last source is on a different scale than the other three (tradeskill
  * building level, capped far lower than hero/node level - see
@@ -238,6 +244,8 @@ async function main(): Promise<void> {
     encounterRandoms,
     gatherings,
     recipes,
+    caravans,
+    caravanTraders,
   ] = await Promise.all([
     loadContentType('item'),
     loadContentType('equipment'),
@@ -246,13 +254,15 @@ async function main(): Promise<void> {
     loadContentType('encounterrandom'),
     loadContentType('gathering'),
     loadContentType('recipe'),
+    loadContentType('caravan'),
+    loadContentType('caravantrader'),
   ]);
 
   console.log(
     `Loaded ${items.length} item(s), ${equipment.length} equipment(s), ${monsters.length} monster(s).`,
   );
   console.log(
-    `Loaded ${encounters.length} encounter(s), ${encounterRandoms.length} random encounter(s), ${gatherings.length} gathering node(s), ${recipes.length} recipe(s).\n`,
+    `Loaded ${encounters.length} encounter(s), ${encounterRandoms.length} random encounter(s), ${gatherings.length} gathering node(s), ${recipes.length} recipe(s), ${caravans.length} caravan(s), ${caravanTraders.length} caravan trader(s).\n`,
   );
 
   // --- Top content level ---
@@ -357,6 +367,29 @@ async function main(): Promise<void> {
     );
   });
 
+  caravanTraders.forEach((trader) => {
+    const eligibleCaravans = caravans.filter(
+      (caravan: any) =>
+        (caravan.traderCategories ?? []).includes(trader.category) &&
+        trader.level >= caravan.level?.min &&
+        trader.level <= caravan.level?.max,
+    );
+
+    (trader.trades ?? []).forEach((trade: any) => {
+      if (trade.type !== 'sell' || !trade.itemId) return;
+
+      eligibleCaravans.forEach((caravan: any) =>
+        addSource(
+          itemSources,
+          trade.itemId,
+          caravan.level?.min,
+          'caravan trade',
+          `${trader.name} @ ${caravan.name}`,
+        ),
+      );
+    });
+  });
+
   // === Part 1: equipment type coverage ===
   console.log('=== Equipment type coverage ===\n');
 
@@ -434,7 +467,7 @@ async function main(): Promise<void> {
 
     if (unsourced.length > 0) {
       console.log(
-        `      Note: ${unsourced.length} item(s) grant ${stat} but have no derived level (no known drop/reward/gather/recipe source): ${unsourced.map((i) => i.name).join(', ')}`,
+        `      Note: ${unsourced.length} item(s) grant ${stat} but have no derived level (no known drop/reward/gather/recipe/caravan-trade source): ${unsourced.map((i) => i.name).join(', ')}`,
       );
     }
 

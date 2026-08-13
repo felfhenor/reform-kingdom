@@ -9,12 +9,16 @@
  *   - infusion: the item has non-zero `infusionStats`, mirroring
  *     `isInfusionMaterial` in `src/app/helpers/infusion.ts` - any equipment
  *     slot can consume it
+ *   - caravan trading: a caravan trader `buy`s it from the party
+ *     (`gamedata/caravantrader/*.yml` `trades[].type === 'buy'`) - a gold
+ *     sink for the material, same as a recipe consuming it
  *
  * Production (how many ways a material can be obtained - monster drops,
- * encounter completion rewards, gathering nodes, recipe results) is
- * reported alongside for context, since a material with many supply
- * sources but no sinks is the clearest sign of under-utilized content -
- * but it does not count toward the utilization score itself.
+ * encounter completion rewards, gathering nodes, recipe results, and now a
+ * caravan trader `sell`ing it) is reported alongside for context, since a
+ * material with many supply sources but no sinks is the clearest sign of
+ * under-utilized content - but it does not count toward the utilization
+ * score itself.
  *
  * Runs against raw `gamedata/**\/*.yml` sources (matching by the authored
  * `name` field, same as `validate-obtainability.ts`), so it needs no build
@@ -71,6 +75,8 @@ type MaterialStats = {
   monsterDrops: number;
   encounterRewards: number;
   gatherSources: number;
+  caravanBuys: number;
+  caravanSells: number;
 };
 
 function emptyStats(item: any): MaterialStats {
@@ -85,14 +91,19 @@ function emptyStats(item: any): MaterialStats {
     monsterDrops: 0,
     encounterRewards: 0,
     gatherSources: 0,
+    caravanBuys: 0,
+    caravanSells: 0,
   };
 }
 
 // The general-purpose "how many uses does this item have" number - one per
-// recipe that requires it, plus one more if it's infusable (any equipment
-// slot is a valid sink for it).
+// recipe that requires it, one per caravan trader willing to buy it (a gold
+// sink), plus one more if it's infusable (any equipment slot is a valid
+// sink for it).
 function score(stats: MaterialStats): number {
-  return stats.craftedFrom + (stats.infusable ? 1 : 0);
+  return (
+    stats.craftedFrom + stats.caravanBuys + (stats.infusable ? 1 : 0)
+  );
 }
 
 function productionCount(stats: MaterialStats): number {
@@ -100,7 +111,8 @@ function productionCount(stats: MaterialStats): number {
     stats.craftedInto +
     stats.monsterDrops +
     stats.encounterRewards +
-    stats.gatherSources
+    stats.gatherSources +
+    stats.caravanSells
   );
 }
 
@@ -131,13 +143,15 @@ async function main(): Promise<void> {
 
   console.log('=== analyze:materialutilization ===\n');
 
-  const [items, recipes, monsters, encounters, gatherings] = await Promise.all([
-    loadContentType('item'),
-    loadContentType('recipe'),
-    loadContentType('monster'),
-    loadContentType('encounter'),
-    loadContentType('gathering'),
-  ]);
+  const [items, recipes, monsters, encounters, gatherings, caravanTraders] =
+    await Promise.all([
+      loadContentType('item'),
+      loadContentType('recipe'),
+      loadContentType('monster'),
+      loadContentType('encounter'),
+      loadContentType('gathering'),
+      loadContentType('caravantrader'),
+    ]);
 
   const byName = new Map<string, MaterialStats>();
   items
@@ -181,6 +195,16 @@ async function main(): Promise<void> {
     });
   });
 
+  caravanTraders.forEach((trader) => {
+    (trader.trades ?? []).forEach((trade: any) => {
+      if (!trade.itemId) return;
+      const stats = byName.get(trade.itemId);
+      if (!stats) return;
+      if (trade.type === 'buy') stats.caravanBuys += 1;
+      if (trade.type === 'sell') stats.caravanSells += 1;
+    });
+  });
+
   const allStats = [...byName.values()].sort((a, b) => {
     const scoreDiff = score(a) - score(b);
     if (scoreDiff !== 0) return scoreDiff;
@@ -196,10 +220,12 @@ async function main(): Promise<void> {
           'Crafted From (recipes)': stats.craftedFrom,
           'Crafted From (qty)': stats.craftedFromQuantity,
           Infusable: stats.infusable ? 'Yes' : 'No',
+          'Caravan Buys': stats.caravanBuys,
           'Crafted Into': stats.craftedInto,
           'Monster Drops': stats.monsterDrops,
           'Encounter Rewards': stats.encounterRewards,
           'Gather Sources': stats.gatherSources,
+          'Caravan Sells': stats.caravanSells,
           Production: productionCount(stats),
         }
       : {
@@ -227,6 +253,7 @@ async function main(): Promise<void> {
   underUtilized.forEach((stats) => {
     const sinks: string[] = [];
     if (stats.craftedFrom > 0) sinks.push(`${stats.craftedFrom} recipe(s)`);
+    if (stats.caravanBuys > 0) sinks.push(`${stats.caravanBuys} caravan buy(s)`);
     if (stats.infusable) sinks.push('infusable');
     const sinkDescription =
       sinks.length > 0 ? sinks.join(', ') : 'no known sinks';

@@ -26,6 +26,7 @@ export type WorldNodeInteractionKind =
   | 'Gather'
   | 'Explore'
   | 'ExploreRandom'
+  | 'Trade'
   | 'Travel';
 
 export type WorldNodeCompletionRewardProgress = {

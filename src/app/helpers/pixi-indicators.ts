@@ -7,6 +7,7 @@ const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
   Gather: 0x4ade80,
   Explore: 0xfb7185,
   ExploreRandom: 0xc084fc,
+  Trade: 0xfbbf24,
   Travel: 0x60a5fa,
 };
 

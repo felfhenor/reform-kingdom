@@ -1,3 +1,4 @@
+import type { GameStateCaravans } from '@interfaces/caravan-state';
 import type { Character } from '@interfaces/character';
 import type { Combat } from '@interfaces/combat';
 import type { CollectibleId } from '@interfaces/content-collectible';
@@ -30,6 +31,7 @@ export type GameStateWorld = {
   gathering: GatheringState;
   autoMode: AutoModeState;
   exploreRandom: GameStateExploreRandom;
+  caravans: GameStateCaravans;
 };
 
 export type MaterialId = ItemId;

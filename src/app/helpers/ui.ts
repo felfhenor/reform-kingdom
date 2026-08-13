@@ -69,6 +69,20 @@ export function mapNodeDeselect(): void {
   selectedMapNode.set(undefined);
 }
 
+// The caravan node the trade modal is currently open for - set from both the
+// map node panel's "Open Trade" button and the navbar's glowing trade
+// button, so the modal (mounted once in the navbar) can be reached from any
+// screen without needing a direct reference to whichever button opened it.
+export const activeCaravanNode = signal<WorldNodeEntry | undefined>(undefined);
+
+export function caravanTradeOpen(entry: WorldNodeEntry): void {
+  activeCaravanNode.set(entry);
+}
+
+export function caravanTradeClose(): void {
+  activeCaravanNode.set(undefined);
+}
+
 export const isShowingAnyMenu = computed(() => showOptionsMenu());
 
 export function closeAllMenus(smart = false) {

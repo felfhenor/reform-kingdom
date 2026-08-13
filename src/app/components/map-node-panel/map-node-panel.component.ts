@@ -17,6 +17,8 @@ import { sortBy } from 'es-toolkit/compat';
 import {
   canEnterGatherNode,
   canPartyTravel,
+  caravanBrandName,
+  caravanTradeOpen,
   encounterRandomStartFight,
   encounterStartFight,
   gamestate,
@@ -30,6 +32,10 @@ import {
   travelStart,
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
+  worldNodeCaravan,
+  worldNodeCaravanIsAvailable,
+  worldNodeCaravanTradeCounts,
+  worldNodeCaravanTraderLevel,
   worldNodeDescription,
   worldNodeEncounter,
   worldNodeEncounterCount,
@@ -69,6 +75,13 @@ export class MapNodePanelComponent {
   public isMonsterDiscovered = isMonsterDiscovered;
 
   public node = computed(() => selectedMapNode());
+
+  public displayName = computed(() => {
+    const entry = this.node();
+    if (!entry) return '';
+
+    return this.isCaravanNode() ? caravanBrandName(entry.nodeName) : entry.nodeName;
+  });
 
   public levelLabel = computed(() => {
     const entry = this.node();
@@ -123,6 +136,28 @@ export class MapNodePanelComponent {
   public meetsGatherLevelRequirement = computed(() => {
     const entry = this.node();
     return !entry || canEnterGatherNode(entry.nodeName);
+  });
+
+  public isCaravanNode = computed(() => {
+    const entry = this.node();
+    return !!entry && !!worldNodeCaravan(entry);
+  });
+
+  public meetsCaravanAvailability = computed(() => {
+    const entry = this.node();
+    if (!entry || !worldNodeCaravan(entry)) return true;
+
+    return worldNodeCaravanIsAvailable(entry);
+  });
+
+  public caravanTraderLevel = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeCaravanTraderLevel(entry) : undefined;
+  });
+
+  public caravanTradeCounts = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeCaravanTradeCounts(entry) : { buyable: 0, sellable: 0 };
   });
 
   public isGatheringHere = computed(() => {
@@ -200,7 +235,8 @@ export class MapNodePanelComponent {
       (path.length > 0 || travel.status === 'Traveling') &&
       !isCurrentDestination &&
       canPartyTravel() &&
-      this.meetsGatherLevelRequirement()
+      this.meetsGatherLevelRequirement() &&
+      this.meetsCaravanAvailability()
     );
   });
 
@@ -226,6 +262,13 @@ export class MapNodePanelComponent {
     if (worldNodeEncounterRandom(entry)) {
       encounterRandomStartFight(entry, 0);
     }
+  }
+
+  public openTrade(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    caravanTradeOpen(entry);
   }
 
   public close(): void {

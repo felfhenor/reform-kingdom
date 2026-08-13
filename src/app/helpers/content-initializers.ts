@@ -4,6 +4,12 @@ import {
   defaultStats,
 } from '@helpers/defaults';
 import type {
+  CaravanContent,
+  CaravanId,
+  CaravanTrade,
+  CaravanTraderContent,
+  CaravanTraderId,
+  CaravanTradeType,
   CollectibleContent,
   CollectibleId,
   CombatantCombatStats,
@@ -73,6 +79,8 @@ import { EquipmentTypeToSlot } from '@interfaces';
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
+  caravan: ensureCaravan,
+  caravantrader: ensureCaravanTrader,
   collectible: ensureCollectible,
   encounter: ensureEncounter,
   encounterrandom: ensureEncounterRandom,
@@ -111,6 +119,7 @@ const VALID_SKILL_TARGET_BEHAVIORS: EquipmentSkillTargetBehavior[] = [
   'IfStatusEffect',
   'IfNotStatusEffect',
 ];
+const VALID_CARAVAN_TRADE_TYPES: CaravanTradeType[] = ['sell', 'buy'];
 const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'BypassDefense',
   'DamagesTarget',
@@ -350,6 +359,45 @@ function ensureCollectible(
     sprite: collectible.sprite ?? 'UNKNOWN',
     rarity: collectible.rarity ?? 'Common',
     unobtainable: collectible.unobtainable ?? false,
+  };
+}
+
+function ensureCaravanTrade(trade: Partial<CaravanTrade> = {}): CaravanTrade {
+  return {
+    type: ensureEnumValue(trade.type, VALID_CARAVAN_TRADE_TYPES, 'sell'),
+    value: trade.value ?? 0,
+    itemId: trade.itemId,
+    equipmentId: trade.equipmentId,
+    collectibleId: trade.collectibleId,
+    limit: trade.limit,
+    weight: trade.weight ?? 1,
+  };
+}
+
+function ensureCaravan(caravan: Partial<CaravanContent>): Required<CaravanContent> {
+  return {
+    id: caravan.id ?? ('UNKNOWN' as CaravanId),
+    name: caravan.name ?? 'UNKNOWN',
+    __type: 'caravan',
+    description: caravan.description ?? 'UNKNOWN',
+    traderResetTime: caravan.traderResetTime ?? 3600,
+    level: caravan.level ?? { min: 1, max: 1 },
+    markupPercentages: caravan.markupPercentages ?? { sell: 0, buy: 0 },
+    traderCategories: caravan.traderCategories ?? [],
+  };
+}
+
+function ensureCaravanTrader(
+  trader: Partial<CaravanTraderContent>,
+): Required<CaravanTraderContent> {
+  return {
+    id: trader.id ?? ('UNKNOWN' as CaravanTraderId),
+    name: trader.name ?? 'UNKNOWN',
+    __type: 'caravantrader',
+    description: trader.description ?? 'UNKNOWN',
+    category: trader.category ?? 'UNKNOWN',
+    level: trader.level ?? 1,
+    trades: ensureArray(trader.trades, ensureCaravanTrade),
   };
 }
 
