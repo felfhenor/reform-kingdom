@@ -1,0 +1,8 @@
+<div class="flex flex-col gap-2">
+  <div class="text-xs text-lighter">Gathering... {{ gatherProgressPercent() }}%</div>
+  <progress
+    class="progress progress-primary w-full"
+    [value]="gatherProgressPercent()"
+    max="100"
+  ></progress>
+</div>

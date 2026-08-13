@@ -1,0 +1,47 @@
+@let encounters = encounterCount();
+@let monsterCountValue = monsterCount();
+@let rewards = rewardProgress();
+
+@if (encounters) {
+  <div class="badge badge-outline">{{ encounters }} Encounters</div>
+}
+
+@if (monsterCountValue) {
+  <div class="badge badge-outline" [tp]="monstersTooltip" [tpPlacement]="'top'">
+    {{ monsterCountValue }} Monsters
+  </div>
+}
+
+@if (rewards.total > 0) {
+  <div
+    class="badge badge-outline"
+    [class.badge-success]="rewards.obtained === rewards.total"
+  >
+    {{ rewards.obtained }}/{{ rewards.total }} Rewards
+  </div>
+}
+
+<ng-template #monstersTooltip>
+  <div class="flex flex-col gap-2 p-2">
+    @for (monster of monsters(); track monster.id) {
+      <div class="flex items-center gap-2">
+        @if (isMonsterDiscovered(monster.id)) {
+          <app-atlas-animation
+            spritesheet="monster"
+            [assetName]="monster.sprite"
+            [frames]="monster.frames"
+            class="zoom-tooltip"
+          />
+          <span class="font-bold text-{{ monster.rarity }}">
+            {{ monster.name }}
+          </span>
+        } @else {
+          <div class="zoom-tooltip">
+            <app-icon-unknown />
+          </div>
+          <span class="font-bold text-lighter">???</span>
+        }
+      </div>
+    }
+  </div>
+</ng-template>

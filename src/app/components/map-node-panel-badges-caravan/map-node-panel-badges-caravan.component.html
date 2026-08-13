@@ -1,0 +1,13 @@
+@let counts = tradeCounts();
+
+@if (traderLevel(); as level) {
+  <div class="badge badge-outline">Trader Lv. {{ level }}</div>
+}
+
+@if (counts.buyable > 0) {
+  <div class="badge badge-outline badge-success">{{ counts.buyable }} Buyable</div>
+}
+
+@if (counts.sellable > 0) {
+  <div class="badge badge-outline badge-warning">{{ counts.sellable }} Sellable</div>
+}

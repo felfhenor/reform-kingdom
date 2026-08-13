@@ -11,66 +11,19 @@
         <app-button-close (click)="close()"></app-button-close>
       </div>
 
-      <div class="flex gap-2 text-sm">
+      <div class="flex flex-wrap gap-2 text-sm">
         <div class="badge badge-outline">Level {{ levelLabel() }}</div>
 
-        @let encounters = encounterCount();
-        @let monsterCountValue = monsterCount();
-        @let gatherSeconds = gatherTime();
-        @let rewards = rewardProgress();
-
-        @if (encounters) {
-          <div class="badge badge-outline">{{ encounters }} Encounters</div>
-        }
-
-        @if (monsterCountValue) {
-          <div
-            class="badge badge-outline"
-            [tp]="monstersTooltip"
-            [tpPlacement]="'top'"
-          >
-            {{ monsterCountValue }} Monsters
-          </div>
-        }
-
-        @if (gatherSeconds) {
-          <div class="badge badge-outline">
-            Gather Time {{ gatherSeconds }}s
-          </div>
-        }
-
-        @if (rewards.total > 0) {
-          <div
-            class="badge badge-outline"
-            [class.badge-success]="rewards.obtained === rewards.total"
-          >
-            {{ rewards.obtained }}/{{ rewards.total }} Rewards
-          </div>
-        }
-
-        @if (isCaravanNode()) {
-          @let traderLevel = caravanTraderLevel();
-          @let tradeCounts = caravanTradeCounts();
-
-          @if (traderLevel !== undefined) {
-            <div class="badge badge-outline">Trader Lv. {{ traderLevel }}</div>
-          }
-
-          @if (tradeCounts.buyable > 0) {
-            <div class="badge badge-outline badge-success">
-              {{ tradeCounts.buyable }} Buyable
-            </div>
-          }
-
-          @if (tradeCounts.sellable > 0) {
-            <div class="badge badge-outline badge-warning">
-              {{ tradeCounts.sellable }} Sellable
-            </div>
-          }
+        @if (isExploreNode()) {
+          <app-map-node-panel-badges-explore [entry]="entry" />
+        } @else if (isGatherNode()) {
+          <app-map-node-panel-badges-gather [entry]="entry" />
+        } @else if (isCaravanNode()) {
+          <app-map-node-panel-badges-caravan [entry]="entry" />
         }
       </div>
 
-      <p class="text-sm text-lighter">
+      <p class="text-sm text-lighter my-4">
         {{ description() ?? 'No information available yet.' }}
       </p>
 
@@ -93,16 +46,9 @@
       }
 
       @if (isGatheringHere()) {
-        <div class="flex flex-col gap-2">
-          <div class="text-xs text-lighter">
-            Gathering... {{ gatherProgressPercent() }}%
-          </div>
-          <progress
-            class="progress progress-primary w-full"
-            [value]="gatherProgressPercent()"
-            max="100"
-          ></progress>
-        </div>
+        <app-map-node-panel-actions-gather
+          [gatherProgressPercent]="gatherProgressPercent()"
+        />
       } @else if (!isAtNode()) {
         @if (!meetsGatherLevelRequirement()) {
           <div class="text-sm text-rose-400">
@@ -126,56 +72,15 @@
         >
           Travel ({{ travelSeconds() ?? '—' }}s)
         </button>
-      } @else if (canReExplore()) {
-        <button
-          type="button"
-          class="btn btn-sm btn-primary"
-          (click)="reExplore()"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          Explore Again
-        </button>
-      } @else if (isExploreRandomCleared()) {
-        <div class="text-sm text-lighter">
-          No monsters remain. Check back in {{ exploreRandomTimerText() }}.
-        </div>
+      } @else if (isExploreNode()) {
+        <app-map-node-panel-actions-explore
+          [entry]="entry"
+          [canReExplore]="canReExplore()"
+          (reExplore)="reExplore()"
+        />
       } @else if (isCaravanNode()) {
-        <button
-          type="button"
-          class="btn btn-sm btn-primary"
-          (click)="openTrade()"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          Open Trade
-        </button>
+        <app-map-node-panel-actions-caravan (openTrade)="openTrade()" />
       }
     </div>
   </div>
-
-  <ng-template #monstersTooltip>
-    <div class="flex flex-col gap-2 p-2">
-      @for (monster of monsters(); track monster.id) {
-        <div class="flex items-center gap-2">
-          @if (isMonsterDiscovered(monster.id)) {
-            <app-atlas-animation
-              spritesheet="monster"
-              [assetName]="monster.sprite"
-              [frames]="monster.frames"
-              class="zoom-tooltip"
-            />
-            <span class="font-bold text-{{ monster.rarity }}">
-              {{ monster.name }}
-            </span>
-          } @else {
-            <div class="zoom-tooltip">
-              <app-icon-unknown />
-            </div>
-            <span class="font-bold text-lighter">???</span>
-          }
-        </div>
-      }
-    </div>
-  </ng-template>
 }

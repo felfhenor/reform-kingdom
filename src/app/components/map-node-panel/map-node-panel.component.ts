@@ -5,14 +5,17 @@ import {
   ElementRef,
   inject,
 } from '@angular/core';
-import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CompletionRewardSlotComponent } from '@components/completion-reward-slot/completion-reward-slot.component';
 import { GatherMaterialSlotComponent } from '@components/gather-material-slot/gather-material-slot.component';
-import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import { MapNodePanelActionsCaravanComponent } from '@components/map-node-panel-actions-caravan/map-node-panel-actions-caravan.component';
+import { MapNodePanelActionsExploreComponent } from '@components/map-node-panel-actions-explore/map-node-panel-actions-explore.component';
+import { MapNodePanelActionsGatherComponent } from '@components/map-node-panel-actions-gather/map-node-panel-actions-gather.component';
+import { MapNodePanelBadgesCaravanComponent } from '@components/map-node-panel-badges-caravan/map-node-panel-badges-caravan.component';
+import { MapNodePanelBadgesExploreComponent } from '@components/map-node-panel-badges-explore/map-node-panel-badges-explore.component';
+import { MapNodePanelBadgesGatherComponent } from '@components/map-node-panel-badges-gather/map-node-panel-badges-gather.component';
 import { NodeSpriteComponent } from '@components/node-sprite/node-sprite.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 import {
   canEnterGatherNode,
@@ -23,45 +26,40 @@ import {
   encounterStartFight,
   gamestate,
   gatheringProgressFraction,
-  isMonsterDiscovered,
   mapNodeDeselect,
   rewardDisplayOrder,
   selectedMapNode,
   TICKS_PER_STEP_MOVE,
   travelPathTo,
   travelStart,
-  worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
   worldNodeCaravan,
   worldNodeCaravanIsAvailable,
-  worldNodeCaravanTradeCounts,
-  worldNodeCaravanTraderLevel,
   worldNodeDescription,
   worldNodeEncounter,
-  worldNodeEncounterCount,
   worldNodeEncounterRandom,
   worldNodeExploreRandomIsAvailable,
-  worldNodeExploreRandomTimerText,
   worldNodeGatherMaterialIds,
-  worldNodeGatherTime,
+  worldNodeGathering,
   worldNodeLevelLabel,
   worldNodeLevelRange,
-  worldNodeMonsterCount,
-  worldNodeMonsters,
 } from '@helpers';
 
 @Component({
   selector: 'app-map-node-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasAnimationComponent,
     ButtonCloseComponent,
     CompletionRewardSlotComponent,
     GatherMaterialSlotComponent,
-    IconUnknownComponent,
+    MapNodePanelActionsCaravanComponent,
+    MapNodePanelActionsExploreComponent,
+    MapNodePanelActionsGatherComponent,
+    MapNodePanelBadgesCaravanComponent,
+    MapNodePanelBadgesExploreComponent,
+    MapNodePanelBadgesGatherComponent,
     NodeSpriteComponent,
     SFXDirective,
-    TippyDirective,
   ],
   templateUrl: './map-node-panel.component.html',
   styleUrl: './map-node-panel.component.scss',
@@ -71,8 +69,6 @@ import {
 })
 export class MapNodePanelComponent {
   private elementRef = inject(ElementRef<HTMLElement>);
-
-  public isMonsterDiscovered = isMonsterDiscovered;
 
   public node = computed(() => selectedMapNode());
 
@@ -89,29 +85,9 @@ export class MapNodePanelComponent {
     return levelRange ? worldNodeLevelLabel(levelRange) : '-';
   });
 
-  public encounterCount = computed(() => {
-    const entry = this.node();
-    return entry ? worldNodeEncounterCount(entry) : undefined;
-  });
-
-  public monsterCount = computed(() => {
-    const entry = this.node();
-    return entry ? worldNodeMonsterCount(entry) : undefined;
-  });
-
-  public monsters = computed(() => {
-    const entry = this.node();
-    return entry ? worldNodeMonsters(entry) : [];
-  });
-
   public description = computed(() => {
     const entry = this.node();
     return entry ? worldNodeDescription(entry) : undefined;
-  });
-
-  public gatherTime = computed(() => {
-    const entry = this.node();
-    return entry ? worldNodeGatherTime(entry) : undefined;
   });
 
   public gatherMaterialIds = computed(() => {
@@ -126,13 +102,6 @@ export class MapNodePanelComponent {
     return sortBy(worldNodeCompletionRewards(entry), [rewardDisplayOrder]);
   });
 
-  public rewardProgress = computed(() => {
-    const entry = this.node();
-    return entry
-      ? worldNodeCompletionRewardProgress(entry)
-      : { obtained: 0, total: 0 };
-  });
-
   public meetsGatherLevelRequirement = computed(() => {
     const entry = this.node();
     return !entry || canEnterGatherNode(entry.nodeName);
@@ -143,21 +112,24 @@ export class MapNodePanelComponent {
     return !!entry && !!worldNodeCaravan(entry);
   });
 
+  public isGatherNode = computed(() => {
+    const entry = this.node();
+    return !!entry && !!worldNodeGathering(entry);
+  });
+
+  public isExploreNode = computed(() => {
+    const entry = this.node();
+    return (
+      !!entry &&
+      (!!worldNodeEncounter(entry) || !!worldNodeEncounterRandom(entry))
+    );
+  });
+
   public meetsCaravanAvailability = computed(() => {
     const entry = this.node();
     if (!entry || !worldNodeCaravan(entry)) return true;
 
     return worldNodeCaravanIsAvailable(entry);
-  });
-
-  public caravanTraderLevel = computed(() => {
-    const entry = this.node();
-    return entry ? worldNodeCaravanTraderLevel(entry) : undefined;
-  });
-
-  public caravanTradeCounts = computed(() => {
-    const entry = this.node();
-    return entry ? worldNodeCaravanTradeCounts(entry) : { buyable: 0, sellable: 0 };
   });
 
   public isGatheringHere = computed(() => {
@@ -205,20 +177,6 @@ export class MapNodePanelComponent {
 
     return (
       !!worldNodeEncounterRandom(entry) && worldNodeExploreRandomIsAvailable(entry)
-    );
-  });
-
-  public exploreRandomTimerText = computed(() => {
-    const entry = this.node();
-    return entry ? worldNodeExploreRandomTimerText(entry) : undefined;
-  });
-
-  public isExploreRandomCleared = computed(() => {
-    const entry = this.node();
-    return (
-      !!entry &&
-      !!worldNodeEncounterRandom(entry) &&
-      !worldNodeExploreRandomIsAvailable(entry)
     );
   });
 
