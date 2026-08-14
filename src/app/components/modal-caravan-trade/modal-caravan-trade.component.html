@@ -2,6 +2,7 @@
   [visible]="isVisible()"
   [showCloseButton]="true"
   [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
   (modalClose)="close()"
 >
   <span title>{{ trader()?.name ?? 'Trader' }}</span>

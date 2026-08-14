@@ -20,6 +20,7 @@ export class ModalComponent {
   public visible = model<boolean>(false);
 
   public allowEscToClose = input<boolean>(true);
+  public closeOnBackdropClick = input<boolean>(false);
   public showCloseButton = input<boolean>(false);
   public widthClass = input<string>('max-w-3xl');
 
@@ -43,5 +44,12 @@ export class ModalComponent {
     this.modal()?.nativeElement.close();
     this.visible.set(false);
     this.modalClose.emit();
+  }
+
+  public backdropClick(event: MouseEvent) {
+    if (!this.closeOnBackdropClick()) return;
+    if (event.target !== this.modal()?.nativeElement) return;
+
+    this.closeModal();
   }
 }
