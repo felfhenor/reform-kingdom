@@ -1,5 +1,6 @@
 import { computed, inject, Injectable } from '@angular/core';
-import { hasGameStateLoaded, loadingProgressCalculate } from '@helpers';
+import { loadingProgressCalculate } from '@helpers/loading';
+import { hasGameStateLoaded } from '@helpers/state-game';
 import { ContentService } from '@services/content.service';
 import { GamestateService } from '@services/gamestate.service';
 
@@ -12,8 +13,14 @@ export class LoadingService {
 
   public progress = computed(() =>
     loadingProgressCalculate([
-      { label: 'Loading game data...', isDone: this.contentService.hasLoadedData() },
-      { label: 'Loading artwork...', isDone: this.contentService.hasLoadedArt() },
+      {
+        label: 'Loading game data...',
+        isDone: this.contentService.hasLoadedData(),
+      },
+      {
+        label: 'Loading artwork...',
+        isDone: this.contentService.hasLoadedArt(),
+      },
       { label: 'Loading maps...', isDone: this.contentService.hasLoadedMaps() },
       { label: 'Loading your save...', isDone: hasGameStateLoaded() },
       {

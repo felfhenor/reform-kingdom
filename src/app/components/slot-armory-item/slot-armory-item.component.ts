@@ -1,16 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import {
-  equipmentItemInfusionBonus,
-  equipmentSellValue,
-  getEntry,
-  goldCoinId,
-  partyGet,
-} from '@helpers';
+import { equipmentSellValue } from '@helpers/armory';
+import { getEntry } from '@helpers/content';
+import { equipmentItemInfusionBonus } from '@helpers/infusion';
+import { goldCoinId } from '@helpers/materials';
+import { partyGet } from '@helpers/party';
 import type { EquipmentContent, EquipmentItem, JobContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -53,7 +57,10 @@ export class SlotArmoryItemComponent {
   );
 
   public sellValue = computed(() =>
-    equipmentSellValue({ item: this.equipmentItem(), content: this.equipment() }),
+    equipmentSellValue({
+      item: this.equipmentItem(),
+      content: this.equipment(),
+    }),
   );
 
   public onClick(event: MouseEvent): void {

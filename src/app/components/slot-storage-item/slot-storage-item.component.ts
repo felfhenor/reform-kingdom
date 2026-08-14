@@ -8,7 +8,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { BadgeInfusableComponent } from '@components/badge-infusable/badge-infusable.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { isInfusionMaterial } from '@helpers';
+import { isInfusionMaterial } from '@helpers/infusion';
 import type { StorageMaterialEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

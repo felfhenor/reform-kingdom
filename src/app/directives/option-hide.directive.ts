@@ -1,6 +1,6 @@
 import { computed, Directive, input } from '@angular/core';
 import { hostBinding } from 'ngxtension/host-binding';
-import { getOption } from '@helpers';
+import { getOption } from '@helpers/state-options';
 import type { GameOption } from '@interfaces';
 
 @Directive({

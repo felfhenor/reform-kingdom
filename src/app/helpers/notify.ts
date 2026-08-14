@@ -1,4 +1,4 @@
-import { isPageVisible } from '@helpers';
+import { isPageVisible } from '@helpers/ui';
 import type { NotificationCategory } from '@interfaces';
 import { Subject } from 'rxjs';
 

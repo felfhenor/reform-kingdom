@@ -13,14 +13,11 @@ import { SlotCompletionRewardComponent } from '@components/slot-completion-rewar
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import {
-  bestiaryDropQuantityLabel,
-  bestiaryXpLabel,
-  combatantFromMonster,
-  getEntry,
-  monsterStatsAtLevel,
-  skillDescriptionWithPreview,
-} from '@helpers';
+import { bestiaryDropQuantityLabel, bestiaryXpLabel } from '@helpers/bestiary';
+import { combatantFromMonster } from '@helpers/combat-create';
+import { getEntry } from '@helpers/content';
+import { monsterStatsAtLevel } from '@helpers/monster';
+import { skillDescriptionWithPreview } from '@helpers/skill-preview';
 import type {
   BestiaryEntry,
   Combatant,
@@ -95,7 +92,9 @@ export class DetailBestiaryMonsterComponent {
 
   public skills = computed<EquipmentSkillContent[]>(() =>
     this.entry()
-      .monster.skills.map((skill) => getEntry<EquipmentSkillContent>(skill.skillId))
+      .monster.skills.map((skill) =>
+        getEntry<EquipmentSkillContent>(skill.skillId),
+      )
       .filter((skill): skill is EquipmentSkillContent => !!skill),
   );
 

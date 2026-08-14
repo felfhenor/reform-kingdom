@@ -4,12 +4,14 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import {
   allContentById,
   allIdsByName,
-  ensureContent,
-  hasContentInitializer,
   setAllContentById,
   setAllIdsByName,
-  setAllMaps,
-} from '@helpers';
+} from '@helpers/content';
+import {
+  ensureContent,
+  hasContentInitializer,
+} from '@helpers/content-initializers';
+import { setAllMaps } from '@helpers/maps';
 import type { ContentType, GameMap, IsContentItem } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';

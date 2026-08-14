@@ -7,7 +7,7 @@ import {
 import {
   worldNodeCaravanTradeCounts,
   worldNodeCaravanTraderLevel,
-} from '@helpers';
+} from '@helpers/world-node-caravan';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({
@@ -20,7 +20,11 @@ import type { WorldNodeEntry } from '@interfaces';
 export class PanelMapNodeBadgesCaravanComponent {
   public entry = input.required<WorldNodeEntry>();
 
-  public traderLevel = computed(() => worldNodeCaravanTraderLevel(this.entry()));
+  public traderLevel = computed(() =>
+    worldNodeCaravanTraderLevel(this.entry()),
+  );
 
-  public tradeCounts = computed(() => worldNodeCaravanTradeCounts(this.entry()));
+  public tradeCounts = computed(() =>
+    worldNodeCaravanTradeCounts(this.entry()),
+  );
 }

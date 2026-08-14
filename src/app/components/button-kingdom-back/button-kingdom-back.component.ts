@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { kingdomSubviewClear } from '@helpers';
+import { kingdomSubviewClear } from '@helpers/ui';
 
 @Component({
   selector: 'app-button-kingdom-back',

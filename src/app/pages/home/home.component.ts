@@ -8,7 +8,9 @@ import { ButtonConnectComponent } from '@components/button-connect/button-connec
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { discordSetStatus, gameReset, isSetup } from '@helpers';
+import { discordSetStatus } from '@helpers/discord';
+import { gameReset } from '@helpers/game-init';
+import { isSetup } from '@helpers/setup';
 import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';

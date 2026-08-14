@@ -9,7 +9,7 @@ import { PanelHeroEquipmentEquipmentComponent } from '@components/panel-hero-equ
 import { PanelHeroEquipmentSkillsComponent } from '@components/panel-hero-equipment-skills/panel-hero-equipment-skills.component';
 import { PanelHeroEquipmentStatsComponent } from '@components/panel-hero-equipment-stats/panel-hero-equipment-stats.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
-import { getEntry } from '@helpers';
+import { getEntry } from '@helpers/content';
 import type { Character, JobContent } from '@interfaces';
 
 @Component({

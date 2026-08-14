@@ -1,17 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import { isEquipmentDiscovered } from '@helpers/armory';
+import { isCollectibleDiscovered } from '@helpers/collectibles';
+import { getEntry } from '@helpers/content';
+import { isMaterialDiscovered } from '@helpers/materials';
 import {
-  getEntry,
-  isCollectibleDiscovered,
-  isEquipmentDiscovered,
-  isMaterialDiscovered,
   isRecipeDiscovered,
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
-} from '@helpers';
+} from '@helpers/recipes';
 import type {
   CollectibleContent,
   DropRarity,

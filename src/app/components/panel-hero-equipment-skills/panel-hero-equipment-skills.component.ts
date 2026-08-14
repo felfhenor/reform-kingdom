@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import {
-  combatantFromCharacter,
-  equippedItemTypes,
-  getEntry,
-  heroSkillsWithEquipment,
-  skillDescriptionWithPreview,
-  skillIsUsableWithEquippedWeapons,
-} from '@helpers';
+import { combatantFromCharacter } from '@helpers/combat-create';
+import { getEntry } from '@helpers/content';
+import { equippedItemTypes } from '@helpers/equipment';
+import { heroSkillsWithEquipment } from '@helpers/job';
+import { skillIsUsableWithEquippedWeapons } from '@helpers/skill';
+import { skillDescriptionWithPreview } from '@helpers/skill-preview';
 import type {
   Character,
   Combatant,

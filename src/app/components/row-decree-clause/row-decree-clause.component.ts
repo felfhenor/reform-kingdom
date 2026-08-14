@@ -6,7 +6,9 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { decreeClauseSummary, getEntry, rewardContentInfo } from '@helpers';
+import { getEntry } from '@helpers/content';
+import { decreeClauseSummary } from '@helpers/decree';
+import { rewardContentInfo } from '@helpers/world-node-rewards';
 import type { DecreeClause, ItemContent, RewardContentInfo } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

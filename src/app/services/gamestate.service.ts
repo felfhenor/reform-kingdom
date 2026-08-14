@@ -5,16 +5,15 @@ import {
   Injectable,
   signal,
 } from '@angular/core';
+import { gameloop } from '@helpers/gameloop';
+import { migrateGameState, migrateOptionsState } from '@helpers/migrate';
 import {
-  gameloop,
   gamestate,
-  getOption,
   hasGameStateLoaded,
   isGameStateReady,
-  isPageVisible,
-  migrateGameState,
-  migrateOptionsState,
-} from '@helpers';
+} from '@helpers/state-game';
+import { getOption } from '@helpers/state-options';
+import { isPageVisible } from '@helpers/ui';
 import { ContentService } from '@services/content.service';
 import { LoggerService } from '@services/logger.service';
 import { interval } from 'rxjs';

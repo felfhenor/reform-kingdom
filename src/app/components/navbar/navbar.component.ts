@@ -10,25 +10,24 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { isSetup } from '@helpers/setup';
+import { saveGameState } from '@helpers/state-game';
+import { getOption, setOption } from '@helpers/state-options';
 import {
   activeCaravanNode,
   caravanTradeClose,
   caravanTradeOpen,
   closeAllMenus,
   gamePlayView,
-  getOption,
-  isSetup,
   isShowingAnyMenu,
   isWorldCameraPanned,
-  saveGameState,
   setGamePlayView,
-  setOption,
   showOptionsMenu,
   worldCameraRecenter,
-  worldNodeAtCurrentLocation,
-  worldNodeCaravan,
-  worldNodeCaravanIsAvailable,
-} from '@helpers';
+} from '@helpers/ui';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
+import { worldNodeCaravanIsAvailable } from '@helpers/world-node-caravan';
+import { worldNodeCaravan } from '@helpers/world-nodes';
 import type { GamePlayView, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { HotkeysDirective } from '@ngneat/hotkeys';
@@ -82,7 +81,9 @@ export class NavbarComponent {
 
   public showCaravanTradeButton = computed(() => {
     const entry = worldNodeAtCurrentLocation();
-    return !!entry && !!worldNodeCaravan(entry) && worldNodeCaravanIsAvailable(entry);
+    return (
+      !!entry && !!worldNodeCaravan(entry) && worldNodeCaravanIsAvailable(entry)
+    );
   });
 
   public openCaravanTrade(): void {

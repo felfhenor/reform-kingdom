@@ -7,10 +7,10 @@ import {
 } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
-  worldNodeEncounterRandom,
   worldNodeExploreRandomIsAvailable,
   worldNodeExploreRandomTimerText,
-} from '@helpers';
+} from '@helpers/world-node-encounter';
+import { worldNodeEncounterRandom } from '@helpers/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({

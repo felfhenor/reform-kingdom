@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import type { CanActivateFn } from '@angular/router';
 import { Router } from '@angular/router';
-import { isSetup } from '@helpers';
+import { isSetup } from '@helpers/setup';
 import { LoggerService } from '@services/logger.service';
 
 export const requireSetupGuard: CanActivateFn = () => {

@@ -8,7 +8,8 @@ import { GamePlayWorldComponent } from '@components/game-play-world/game-play-wo
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { PlayAdventureLogComponent } from '@components/play-adventurelog/play-adventurelog.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { gamePlayView, getOption } from '@helpers';
+import { getOption } from '@helpers/state-options';
+import { gamePlayView } from '@helpers/ui';
 
 @Component({
   selector: 'app-game-play',

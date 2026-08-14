@@ -1,5 +1,6 @@
 import { effect, Injectable } from '@angular/core';
-import { getOption, windowHeight, windowWidth } from '@helpers';
+import { getOption } from '@helpers/state-options';
+import { windowHeight, windowWidth } from '@helpers/ui';
 
 @Injectable({
   providedIn: 'root',

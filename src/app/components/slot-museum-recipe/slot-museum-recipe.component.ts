@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
@@ -6,7 +11,7 @@ import {
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
-} from '@helpers';
+} from '@helpers/recipes';
 import type {
   CollectibleContent,
   EquipmentContent,
@@ -34,8 +39,8 @@ export class SlotMuseumRecipeComponent {
     ItemContent | EquipmentContent | CollectibleContent | undefined
   >(() => recipeResultContent(this.entry().recipe));
 
-  public resultSpritesheet = computed<'item' | 'equipment' | 'collectible'>(() =>
-    recipeResultSpritesheet(this.entry().recipe),
+  public resultSpritesheet = computed<'item' | 'equipment' | 'collectible'>(
+    () => recipeResultSpritesheet(this.entry().recipe),
   );
 
   public backdropSprite = computed(() => recipeBackdropSprite());

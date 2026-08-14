@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
-import { analyticsEvent$ } from '@helpers';
+import { analyticsEvent$ } from '@helpers/analytics';
 import { MetaService } from '@services/meta.service';
 import gameanalytics from 'gameanalytics';
 

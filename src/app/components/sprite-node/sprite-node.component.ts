@@ -1,5 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { worldNodeSpriteFrame } from '@helpers';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
+import { worldNodeSpriteFrame } from '@helpers/world-node-content';
 import type { WorldNodeEntry } from '@interfaces';
 
 // A node's map tile, cropped from its tileset - shared by anywhere a world
@@ -9,7 +14,9 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-sprite-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'overflow-hidden shrink-0 rounded-box bg-base-200 inline-block' },
+  host: {
+    class: 'overflow-hidden shrink-0 rounded-box bg-base-200 inline-block',
+  },
   template: `
     @if (spriteFrame(); as frame) {
       <img

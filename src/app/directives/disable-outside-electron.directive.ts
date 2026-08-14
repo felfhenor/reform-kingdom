@@ -1,5 +1,5 @@
 import { computed, Directive } from '@angular/core';
-import { isInElectron } from '@helpers';
+import { isInElectron } from '@helpers/discord';
 import { hostBinding } from 'ngxtension/host-binding';
 
 @Directive({

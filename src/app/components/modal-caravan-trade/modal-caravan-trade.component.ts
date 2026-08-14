@@ -1,24 +1,31 @@
-import { ChangeDetectionStrategy, Component, computed, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { SlotCaravanTradeComponent } from '@components/slot-caravan-trade/slot-caravan-trade.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import {
-  activeCaravanNode,
-  caravanExecuteTrade,
-  caravanIsTradeSoldOut,
   caravanState,
   caravanTicksUntilReset,
   caravanTimerLabel,
   caravanTimerUrgency,
-  caravanTradeClose,
+} from '@helpers/caravan';
+import {
+  caravanExecuteTrade,
+  caravanIsTradeSoldOut,
   caravanTradeDisplay,
   caravanTradeMaxQuantity,
   caravanTradeOwnedQuantity,
   caravanTradePrice,
   caravanTradeRemaining,
-  getEntry,
-  notifySuccess,
-  worldNodeCaravan,
-} from '@helpers';
+} from '@helpers/caravan-trade';
+import { getEntry } from '@helpers/content';
+import { notifySuccess } from '@helpers/notify';
+import { activeCaravanNode, caravanTradeClose } from '@helpers/ui';
+import { worldNodeCaravan } from '@helpers/world-nodes';
 import type { CaravanTraderContent, CaravanTradeRow } from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -55,15 +62,28 @@ export class ModalCaravanTradeComponent {
     if (!caravan || !trader || !state) return [];
 
     return state.activeTradeIndices
-      .map((index) => trader.trades[index] && { index, trade: trader.trades[index] })
-      .filter((entry): entry is { index: number; trade: (typeof trader.trades)[number] } => !!entry)
+      .map(
+        (index) =>
+          trader.trades[index] && { index, trade: trader.trades[index] },
+      )
+      .filter(
+        (
+          entry,
+        ): entry is { index: number; trade: (typeof trader.trades)[number] } =>
+          !!entry,
+      )
       .map(({ index, trade }) => ({
         index,
         trade,
         price: caravanTradePrice(caravan, trade),
         remaining: caravanTradeRemaining(trade, state.tradeCounts, index),
         soldOut: caravanIsTradeSoldOut(trade, state.tradeCounts, index),
-        maxQuantity: caravanTradeMaxQuantity(caravan, trade, state.tradeCounts, index),
+        maxQuantity: caravanTradeMaxQuantity(
+          caravan,
+          trade,
+          state.tradeCounts,
+          index,
+        ),
         ownedQuantity: caravanTradeOwnedQuantity(trade),
       }));
   });
@@ -78,7 +98,9 @@ export class ModalCaravanTradeComponent {
     return caravan ? caravanTimerLabel(caravan, this.nodeState()) : undefined;
   });
 
-  public timerUrgency = computed(() => caravanTimerUrgency(this.ticksUntilReset()));
+  public timerUrgency = computed(() =>
+    caravanTimerUrgency(this.ticksUntilReset()),
+  );
 
   private confirmSwal = viewChild<SwalComponent>('confirmSwal');
   private quantitySwal = viewChild<SwalComponent>('quantitySwal');

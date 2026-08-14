@@ -1,8 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { getEntry, isMaterialDiscovered } from '@helpers';
+import { getEntry } from '@helpers/content';
+import { isMaterialDiscovered } from '@helpers/materials';
 import type { ItemContent, ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

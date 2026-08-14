@@ -1,7 +1,8 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import type { Event } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
-import { gameloopShouldRun, getOption } from '@helpers';
+import { gameloopShouldRun } from '@helpers/gameloop';
+import { getOption } from '@helpers/state-options';
 import type { BGM } from '@interfaces/sfx';
 import { SoundService } from '@services/sound.service';
 

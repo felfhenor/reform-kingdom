@@ -2,18 +2,17 @@ import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { getEntriesByType } from '@helpers/content';
+import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting';
 import {
-  CHARACTER_MAX_LEVEL,
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
   debugResetBestiary,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
-  getEntriesByType,
-  partyGet,
-  TRADESKILL_MAX_LEVEL,
-} from '@helpers';
+} from '@helpers/debug';
+import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/party';
 import type {
   CharacterId,
   CollectibleContent,
@@ -64,7 +63,9 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedCollectibleId = signal<CollectibleId | undefined>(undefined);
   public collectibleQuantity = signal<number>(1);
 
-  public party = computed(() => sortBy(partyGet(), (character) => character.name));
+  public party = computed(() =>
+    sortBy(partyGet(), (character) => character.name),
+  );
 
   public characterMaxLevel = CHARACTER_MAX_LEVEL;
   public selectedCharacterId = signal<CharacterId | undefined>(undefined);

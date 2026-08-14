@@ -1,6 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
-import { getEntry, partyGet } from '@helpers';
+import { getEntry } from '@helpers/content';
+import { partyGet } from '@helpers/party';
 import type { Character, JobContent } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 

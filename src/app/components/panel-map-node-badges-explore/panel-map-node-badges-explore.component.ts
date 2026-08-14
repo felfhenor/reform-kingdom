@@ -7,13 +7,13 @@ import {
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { TippyDirective } from '@ngneat/helipopper';
+import { isMonsterDiscovered } from '@helpers/bestiary';
 import {
-  isMonsterDiscovered,
-  worldNodeCompletionRewardProgress,
   worldNodeEncounterCount,
   worldNodeMonsterCount,
   worldNodeMonsters,
-} from '@helpers';
+} from '@helpers/world-node-encounter';
+import { worldNodeCompletionRewardProgress } from '@helpers/world-node-rewards';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({

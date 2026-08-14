@@ -12,14 +12,11 @@ import {
 import { Router } from '@angular/router';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import {
-  createCharacter,
-  discordSetStatus,
-  gameReset,
-  getEntry,
-  getUnlockedJobs,
-  setParty,
-} from '@helpers';
+import { getEntry } from '@helpers/content';
+import { discordSetStatus } from '@helpers/discord';
+import { gameReset } from '@helpers/game-init';
+import { getUnlockedJobs } from '@helpers/job';
+import { createCharacter, setParty } from '@helpers/party';
 import type { JobContent, JobId } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';

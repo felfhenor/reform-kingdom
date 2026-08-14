@@ -12,41 +12,49 @@ import {
 import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-global-effect.component';
 import { StatusHeroComponent } from '@components/status-hero/status-hero.component';
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
+import { getEntry } from '@helpers/content';
+import { gatheringProgressFraction, isGathering } from '@helpers/gathering';
+import { isGlobalEffectActive } from '@helpers/global-effects';
+import { getMap } from '@helpers/maps';
+import { partyGet } from '@helpers/party';
+import {
+  pixiAppInitialize,
+  pixiResponsiveCanvasSetup,
+  pixiWorldContainersCreate,
+} from '@helpers/pixi-app-setup';
 import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
   cameraPositionCalculate,
-  currentLocationGet,
-  gatheringProgressFraction,
-  getEntry,
-  getMap,
-  getOption,
-  isGathering,
-  isGlobalEffectActive,
-  isPlayerAtLocation,
-  isWorldCameraPanned,
-  isWorldNodeVisible,
-  mapNodeDeselect,
-  mapNodeSelect,
-  partyGet,
-  pixiAppInitialize,
-  pixiGridOverlayCreate,
+} from '@helpers/pixi-camera';
+import { pixiGridOverlayCreate } from '@helpers/pixi-grid';
+import {
   pixiIndicatorGatherProgressCreate,
   pixiIndicatorNodeSelectionCreate,
   pixiIndicatorPlayerAtLocationCreate,
   pixiIndicatorPlayerSpriteCreate,
-  pixiResponsiveCanvasSetup,
+} from '@helpers/pixi-indicators';
+import { pixiTiledMapRender } from '@helpers/pixi-map-render';
+import {
   pixiSpriteFrameTexturesLoad,
-  pixiTiledMapRender,
   pixiTiledMapTexturesLoad,
-  pixiWorldContainersCreate,
+} from '@helpers/pixi-texture-loader';
+import { getOption } from '@helpers/state-options';
+import { TICKS_PER_STEP_MOVE } from '@helpers/travel';
+import {
+  isWorldCameraPanned,
+  mapNodeDeselect,
+  mapNodeSelect,
   selectedMapNode,
-  TICKS_PER_STEP_MOVE,
   worldCameraRecenterRequest,
+} from '@helpers/ui';
+import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
+import { worldNodeLabelInfo } from '@helpers/world-node-status';
+import {
+  isWorldNodeVisible,
   worldNodeByName,
   worldNodeDiscoverIfHidden,
-  worldNodeLabelInfo,
-} from '@helpers';
+} from '@helpers/world-nodes';
 import type {
   CameraPosition,
   CurrentLocation,
@@ -71,7 +79,11 @@ const FADE_DURATION_MS = 300;
 @Component({
   selector: 'app-game-play-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PanelMapNodeComponent, BarGlobalEffectComponent, StatusHeroComponent],
+  imports: [
+    PanelMapNodeComponent,
+    BarGlobalEffectComponent,
+    StatusHeroComponent,
+  ],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
     @if (isMapLoading()) {
@@ -411,7 +423,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     mapNodeSelect(entry);
   }
 
-  private resolveNodeLabel(object: TiledObject): WorldNodeLabelInfo | undefined {
+  private resolveNodeLabel(
+    object: TiledObject,
+  ): WorldNodeLabelInfo | undefined {
     const entry = worldNodeByName(object.name);
     return entry ? worldNodeLabelInfo(entry) : undefined;
   }
@@ -584,7 +598,8 @@ export class GamePlayWorldComponent implements OnDestroy {
   // destination tile is reached at the tick layer, well before the render
   // layer has finished easing into it.
   private updatePlayerIndicatorIfNeeded(): void {
-    const shouldShowAtLocation = this.isVisuallyAtTarget() && isPlayerAtLocation();
+    const shouldShowAtLocation =
+      this.isVisuallyAtTarget() && isPlayerAtLocation();
     if (shouldShowAtLocation === this.isShowingAtLocationIndicator) return;
 
     this.isShowingAtLocationIndicator = shouldShowAtLocation;

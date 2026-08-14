@@ -13,9 +13,9 @@ import {
   equipmentSellValue,
   filterArmoryEntries,
   getArmoryEntries,
-  goldCoinId,
   sellEquipmentItems,
-} from '@helpers';
+} from '@helpers/armory';
+import { goldCoinId } from '@helpers/materials';
 import type { EquipmentArmoryEntry, EquipmentItemId } from '@interfaces';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sum } from 'es-toolkit/compat';

@@ -1,11 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotStorageItemComponent } from '@components/slot-storage-item/slot-storage-item.component';
-import { filterStorageMaterials, getStorageMaterials } from '@helpers';
+import { filterStorageMaterials, getStorageMaterials } from '@helpers/storage';
 
 @Component({
   selector: 'app-play-kingdom-storage',

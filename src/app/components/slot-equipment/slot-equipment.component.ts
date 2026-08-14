@@ -9,7 +9,8 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { equipmentItemInfusionBonus, getEntry } from '@helpers';
+import { getEntry } from '@helpers/content';
+import { equipmentItemInfusionBonus } from '@helpers/infusion';
 import {
   EquipmentTypeToSlot,
   type EquipmentContent,

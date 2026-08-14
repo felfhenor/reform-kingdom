@@ -13,7 +13,7 @@ import {
   filterMuseumRecipeEntries,
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
-} from '@helpers';
+} from '@helpers/museum';
 import type {
   MuseumCollectibleEntry,
   MuseumRecipeEntry,

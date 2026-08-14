@@ -1,5 +1,6 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { getOption, sfx$ } from '@helpers';
+import { sfx$ } from '@helpers/sfx';
+import { getOption } from '@helpers/state-options';
 import type { BGM, SFX } from '@interfaces';
 import { zip } from 'es-toolkit/compat';
 

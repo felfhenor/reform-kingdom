@@ -17,33 +17,41 @@ import { PanelMapNodeBadgesGatherComponent } from '@components/panel-map-node-ba
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { sortBy } from 'es-toolkit/compat';
+import { caravanBrandName } from '@helpers/caravan';
+import { encounterStartFight } from '@helpers/encounter';
+import { encounterRandomStartFight } from '@helpers/encounter-random-combat';
 import {
   canEnterGatherNode,
-  canPartyTravel,
-  caravanBrandName,
-  caravanTradeOpen,
-  encounterRandomStartFight,
-  encounterStartFight,
-  gamestate,
   gatheringProgressFraction,
-  mapNodeDeselect,
-  rewardDisplayOrder,
-  selectedMapNode,
+} from '@helpers/gathering';
+import { rewardDisplayOrder } from '@helpers/loot';
+import { travelPathTo } from '@helpers/pathfinding';
+import { gamestate } from '@helpers/state-game';
+import {
+  canPartyTravel,
   TICKS_PER_STEP_MOVE,
-  travelPathTo,
   travelStart,
-  worldNodeCompletionRewards,
-  worldNodeCaravan,
-  worldNodeCaravanIsAvailable,
-  worldNodeDescription,
-  worldNodeEncounter,
-  worldNodeEncounterRandom,
-  worldNodeExploreRandomIsAvailable,
-  worldNodeGatherMaterialIds,
-  worldNodeGathering,
+} from '@helpers/travel';
+import {
+  caravanTradeOpen,
+  mapNodeDeselect,
+  selectedMapNode,
+} from '@helpers/ui';
+import { worldNodeCaravanIsAvailable } from '@helpers/world-node-caravan';
+import { worldNodeDescription } from '@helpers/world-node-content';
+import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node-encounter';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
+import { worldNodeCompletionRewards } from '@helpers/world-node-rewards';
+import {
   worldNodeLevelLabel,
   worldNodeLevelRange,
-} from '@helpers';
+} from '@helpers/world-node-status';
+import {
+  worldNodeCaravan,
+  worldNodeEncounter,
+  worldNodeEncounterRandom,
+  worldNodeGathering,
+} from '@helpers/world-nodes';
 
 @Component({
   selector: 'app-panel-map-node',
@@ -76,7 +84,9 @@ export class PanelMapNodeComponent {
     const entry = this.node();
     if (!entry) return '';
 
-    return this.isCaravanNode() ? caravanBrandName(entry.nodeName) : entry.nodeName;
+    return this.isCaravanNode()
+      ? caravanBrandName(entry.nodeName)
+      : entry.nodeName;
   });
 
   public levelLabel = computed(() => {
@@ -176,7 +186,8 @@ export class PanelMapNodeComponent {
     if (worldNodeEncounter(entry)) return true;
 
     return (
-      !!worldNodeEncounterRandom(entry) && worldNodeExploreRandomIsAvailable(entry)
+      !!worldNodeEncounterRandom(entry) &&
+      worldNodeExploreRandomIsAvailable(entry)
     );
   });
 

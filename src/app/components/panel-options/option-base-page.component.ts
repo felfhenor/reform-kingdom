@@ -1,4 +1,4 @@
-import { getOption, setOption } from '@helpers';
+import { getOption, setOption } from '@helpers/state-options';
 import type { GameOptions } from '@interfaces';
 
 export class OptionsBaseComponent {

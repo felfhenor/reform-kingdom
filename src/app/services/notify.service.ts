@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { notification$ } from '@helpers';
+import { notification$ } from '@helpers/notify';
 import { LoggerService } from '@services/logger.service';
 
 @Injectable({

@@ -8,15 +8,17 @@ import {
 } from '@angular/core';
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
+import { getEntry } from '@helpers/content';
 import {
   canEquipItem,
+  equipmentAvailableForSlot,
+  isSlotAvailableForJob,
+} from '@helpers/equipment';
+import {
   characterEquipFromArmory,
   characterUnequipToArmory,
-  equipmentAvailableForSlot,
-  getEntry,
-  isSlotAvailableForJob,
   optimizeCharacterEquipment,
-} from '@helpers';
+} from '@helpers/party';
 import type {
   Character,
   EquipmentArmoryEntry,
@@ -36,7 +38,11 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
 @Component({
   selector: 'app-panel-hero-equipment-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SlotEquipmentComponent, CardEquipmentItemComponent, ScrollingModule],
+  imports: [
+    SlotEquipmentComponent,
+    CardEquipmentItemComponent,
+    ScrollingModule,
+  ],
   host: {
     class: 'contents',
   },

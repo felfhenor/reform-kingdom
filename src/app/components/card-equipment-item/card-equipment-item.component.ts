@@ -10,7 +10,8 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { defaultStats, equipmentItemInfusionBonus } from '@helpers';
+import { defaultStats } from '@helpers/defaults';
+import { equipmentItemInfusionBonus } from '@helpers/infusion';
 import {
   StatShorthand,
   type BaseStat,

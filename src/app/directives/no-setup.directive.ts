@@ -1,5 +1,5 @@
 import { computed, Directive } from '@angular/core';
-import { isSetup } from '@helpers';
+import { isSetup } from '@helpers/setup';
 import { hostBinding } from 'ngxtension/host-binding';
 
 @Directive({

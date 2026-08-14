@@ -2,15 +2,8 @@
 import type { ErrorHandler } from '@angular/core';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
-import {
-  debug,
-  error,
-  info,
-  localVersion,
-  log,
-  versionInfoToSemver,
-  warn,
-} from '@helpers';
+import { debug, error, info, log, warn } from '@helpers/logging';
+import { localVersion, versionInfoToSemver } from '@helpers/version';
 import Rollbar from 'rollbar';
 
 @Injectable({

@@ -15,13 +15,10 @@ import {
 } from '@angular/forms/signals';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
-import {
-  characterReclass,
-  getEntry,
-  getUnlockedJobs,
-  partyGet,
-  showReclassHeroesModal,
-} from '@helpers';
+import { getEntry } from '@helpers/content';
+import { getUnlockedJobs } from '@helpers/job';
+import { characterReclass, partyGet } from '@helpers/party';
+import { showReclassHeroesModal } from '@helpers/ui';
 import type { Character, JobContent, JobId } from '@interfaces';
 import {
   NgLabelTemplateDirective,

@@ -14,24 +14,28 @@ import { PlayKingdomTradeskillBlacksmithingComponent } from '@components/play-ki
 import { PlayKingdomTradeskillJewelcraftingComponent } from '@components/play-kingdom-tradeskill-jewelcrafting/play-kingdom-tradeskill-jewelcrafting.component';
 import { PlayKingdomTradeskillTailoringComponent } from '@components/play-kingdom-tradeskill-tailoring/play-kingdom-tradeskill-tailoring.component';
 import { PlayKingdomTradeskillWoodworkingComponent } from '@components/play-kingdom-tradeskill-woodworking/play-kingdom-tradeskill-woodworking.component';
+import { armoryGet } from '@helpers/armory';
+import { getBestiaryEntries } from '@helpers/bestiary';
+import { getEntry } from '@helpers/content';
 import {
-  armoryGet,
   craftQueueTicksRemaining,
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
-  formatDuration,
-  gamestate,
-  getBestiaryEntries,
-  getEntry,
+  tradeskillBuilding,
+} from '@helpers/crafting';
+import {
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
-  isPlayerAtKingdom,
+} from '@helpers/museum';
+import { gamestate } from '@helpers/state-game';
+import { formatDuration } from '@helpers/timer';
+import {
   kingdomSubview,
   kingdomSubviewShow,
   showReclassHeroesModal,
-  tradeskillBuilding,
   uiClockTick,
-} from '@helpers';
+} from '@helpers/ui';
+import { isPlayerAtKingdom } from '@helpers/world';
 import type { KingdomSubview, RecipeContent, Tradeskill } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { clamp } from 'es-toolkit/compat';
@@ -97,11 +101,31 @@ export class GamePlayKingdomComponent {
   );
 
   public readonly tradeskillButtons: TradeskillButton[] = [
-    { subview: 'tradeskill-artificing', label: 'Artificing', tradeskill: 'Artificing' },
-    { subview: 'tradeskill-blacksmithing', label: 'Blacksmithing', tradeskill: 'Blacksmithing' },
-    { subview: 'tradeskill-jewelcrafting', label: 'Jewelcrafting', tradeskill: 'Jewelcrafting' },
-    { subview: 'tradeskill-tailoring', label: 'Tailoring', tradeskill: 'Tailoring' },
-    { subview: 'tradeskill-woodworking', label: 'Woodworking', tradeskill: 'Woodworking' },
+    {
+      subview: 'tradeskill-artificing',
+      label: 'Artificing',
+      tradeskill: 'Artificing',
+    },
+    {
+      subview: 'tradeskill-blacksmithing',
+      label: 'Blacksmithing',
+      tradeskill: 'Blacksmithing',
+    },
+    {
+      subview: 'tradeskill-jewelcrafting',
+      label: 'Jewelcrafting',
+      tradeskill: 'Jewelcrafting',
+    },
+    {
+      subview: 'tradeskill-tailoring',
+      label: 'Tailoring',
+      tradeskill: 'Tailoring',
+    },
+    {
+      subview: 'tradeskill-woodworking',
+      label: 'Woodworking',
+      tradeskill: 'Woodworking',
+    },
   ];
 
   // Recomputes whenever `gamestate()` changes AND once a second regardless
@@ -121,12 +145,18 @@ export class GamePlayKingdomComponent {
       const remainingTicks = craftQueueTicksRemaining(button.tradeskill);
       const overallPercent =
         totalTicks > 0
-          ? clamp(Math.round(((totalTicks - remainingTicks) / totalTicks) * 100), 0, 100)
+          ? clamp(
+              Math.round(((totalTicks - remainingTicks) / totalTicks) * 100),
+              0,
+              100,
+            )
           : 0;
       const activePercent =
         activeEntry && activeRecipe && activeRecipe.craftTime > 0
           ? clamp(
-              Math.round((activeEntry.ticksIntoCraft / activeRecipe.craftTime) * 100),
+              Math.round(
+                (activeEntry.ticksIntoCraft / activeRecipe.craftTime) * 100,
+              ),
               0,
               100,
             )
@@ -139,14 +169,20 @@ export class GamePlayKingdomComponent {
         xpMaximum: building.xp.maximum,
         xpPercent:
           building.xp.maximum > 0
-            ? clamp(Math.round((building.xp.current / building.xp.maximum) * 100), 0, 100)
+            ? clamp(
+                Math.round((building.xp.current / building.xp.maximum) * 100),
+                0,
+                100,
+              )
             : 0,
         hasQueue: building.queue.length > 0,
         queueUnitsRemaining: craftQueueUnitsRemaining(button.tradeskill),
         overallPercent,
         activePercent,
         totalRemainingLabel:
-          building.queue.length > 0 ? formatDuration(remainingTicks) : undefined,
+          building.queue.length > 0
+            ? formatDuration(remainingTicks)
+            : undefined,
       };
     });
   });
