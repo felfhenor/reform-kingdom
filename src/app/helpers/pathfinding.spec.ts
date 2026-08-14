@@ -16,6 +16,7 @@ vi.mock('@helpers/world-nodes', () => ({
 
 import {
   mapHopsBetween,
+  repairUnwalkableCurrentLocation,
   tiledMapMoveCostMatrix,
   tiledMapPathMatrix,
   tiledMapWalkabilityMatrix,
@@ -236,6 +237,68 @@ describe('tiledMapMoveCostMatrix', () => {
     expect(matrix[0][1]).toBe(Number.POSITIVE_INFINITY);
     expect(matrix[0][2]).toBeGreaterThan(matrix[0][0]);
     expect(Number.isFinite(matrix[0][2])).toBe(true);
+  });
+});
+
+describe('repairUnwalkableCurrentLocation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('leaves a walkable location untouched', () => {
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([
+        ['Carrina', { name: 'Carrina', data: buildOpenMap(3, 3) }],
+      ]),
+    );
+
+    const location = { mapName: 'Carrina', x: 1, y: 1 };
+
+    expect(repairUnwalkableCurrentLocation(location)).toEqual(location);
+  });
+
+  it('relocates to the kingdom when standing on a blocked tile', () => {
+    const denseTilesLayer: TiledLayer = {
+      id: 1,
+      name: 'Dense Tiles',
+      type: 'tilelayer',
+      visible: true,
+      width: 3,
+      height: 3,
+      data: [0, 0, 0, 0, 5, 0, 0, 0, 0],
+    };
+    const map: TiledMap = { ...buildOpenMap(3, 3), layers: [denseTilesLayer] };
+
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([['Carrina', { name: 'Carrina', data: map }]]),
+    );
+    vi.mocked(worldNodesOfType).mockReturnValue([
+      buildEntry({ mapName: 'Carrina', x: 26, y: 24, nodeName: 'Duchy of Carrina' }),
+    ]);
+
+    expect(
+      repairUnwalkableCurrentLocation({ mapName: 'Carrina', x: 1, y: 1 }),
+    ).toEqual({ mapName: 'Carrina', x: 26, y: 24 });
+  });
+
+  it('relocates to the kingdom when the map is unknown', () => {
+    vi.mocked(allMaps).mockReturnValue(new Map<string, GameMap>());
+    vi.mocked(worldNodesOfType).mockReturnValue([
+      buildEntry({ mapName: 'Carrina', x: 26, y: 24, nodeName: 'Duchy of Carrina' }),
+    ]);
+
+    expect(
+      repairUnwalkableCurrentLocation({ mapName: 'Nowhere', x: 0, y: 0 }),
+    ).toEqual({ mapName: 'Carrina', x: 26, y: 24 });
+  });
+
+  it('leaves the location untouched when blocked and no kingdom node exists', () => {
+    vi.mocked(allMaps).mockReturnValue(new Map<string, GameMap>());
+    vi.mocked(worldNodesOfType).mockReturnValue([]);
+
+    const location = { mapName: 'Nowhere', x: 0, y: 0 };
+
+    expect(repairUnwalkableCurrentLocation(location)).toEqual(location);
   });
 });
 

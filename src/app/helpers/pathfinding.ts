@@ -158,6 +158,24 @@ export const mapMoveCostMatrices = computed<Map<string, number[][]>>(() => {
   return matrices;
 });
 
+// A save can load standing on a tile that's since become unwalkable (a map
+// edit, a bad migration, etc.), which would otherwise strand the party there
+// forever with no route out. Called at load time (see `migrateGameState`) to
+// bounce them back to the kingdom before that can happen.
+export function repairUnwalkableCurrentLocation(
+  location: CurrentLocation,
+): CurrentLocation {
+  const cost =
+    mapMoveCostMatrices().get(location.mapName)?.[location.y]?.[location.x] ??
+    Number.POSITIVE_INFINITY;
+  if (cost !== Number.POSITIVE_INFINITY) return location;
+
+  const kingdom = worldNodesOfType('Kingdom')[0];
+  if (!kingdom) return location;
+
+  return { mapName: kingdom.mapName, x: kingdom.x, y: kingdom.y };
+}
+
 const mapPathMatrices = computed<Map<string, boolean[][]>>(() => {
   const matrices = new Map<string, boolean[][]>();
 

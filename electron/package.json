@@ -3,7 +3,7 @@
   "description": "re:Form Kingdom is a game where you lead a hero to infinite victory.",
   "author": "re:Form Kingdom Team <hi@felfhenor.com>",
   "license": "UNLICENSED",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "main": "src/index.js",
   "scripts": {
     "start": "npm run start:localref",

@@ -22,6 +22,7 @@ import {
   pruneInvalidGatherNodeDiscoveries,
 } from '@helpers/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/materials';
+import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { retrofitTradeskillXp } from '@helpers/tradeskill';
@@ -95,6 +96,9 @@ export function migrateGameState() {
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
   newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
+  newState.world.currentLocation = repairUnwalkableCurrentLocation(
+    newState.world.currentLocation,
+  );
 
   newState.world.party = retrofitPartyXp(newState.world.party);
   newState.tradeskills = retrofitTradeskillXp(newState.tradeskills);

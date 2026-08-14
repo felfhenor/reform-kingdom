@@ -30,7 +30,7 @@ export function defaultGameState(): GameState {
       party: [],
       currentLocation: {
         mapName: 'Carrina',
-        x: 24,
+        x: 26,
         y: 24,
       },
       travel: defaultTravelState(),

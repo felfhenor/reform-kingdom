@@ -40,6 +40,10 @@ vi.mock('@helpers/materials', () => ({
   pruneInvalidMaterials: vi.fn((materials) => materials),
 }));
 
+vi.mock('@helpers/pathfinding', () => ({
+  repairUnwalkableCurrentLocation: vi.fn((location) => location),
+}));
+
 vi.mock('@helpers/party', () => ({
   pruneInvalidPartyEquipment: vi.fn((party) => party),
 }));
@@ -106,6 +110,7 @@ import {
 import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
+import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
@@ -365,5 +370,33 @@ describe('migrateGameState', () => {
     expect(committed.discoveredGatherNodes).toEqual({
       'Wergen Woods': { foundAt: 1000 },
     });
+  });
+
+  it('relocates the party off an unwalkable current location before committing', () => {
+    const staleLocation = { mapName: 'Carrina', x: 1, y: 1 };
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: {},
+      world: { party: [], currentLocation: staleLocation },
+    } as unknown as GameState);
+
+    const repairedLocation = { mapName: 'Carrina', x: 26, y: 24 };
+    vi.mocked(repairUnwalkableCurrentLocation).mockReturnValue(
+      repairedLocation,
+    );
+
+    migrateGameState();
+
+    expect(repairUnwalkableCurrentLocation).toHaveBeenCalledWith(
+      staleLocation,
+    );
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.world.currentLocation).toEqual(repairedLocation);
   });
 });
