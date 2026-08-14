@@ -11,12 +11,9 @@ import {
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/equipment';
-import {
-  canInfuseEquipmentItem,
-  goldCoinId,
-  infusionMaterialCost,
-} from '@helpers/infusion';
+import { canInfuseEquipmentItem, infusionMaterialCost } from '@helpers/infusion';
 import { heroSkillsAtLevel } from '@helpers/job';
+import { applyMaterialDelta, spendGold } from '@helpers/materials';
 import { roundToNearest10 } from '@helpers/number';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -33,7 +30,6 @@ import {
   type EquipmentItemId,
   type EquipmentSkillContent,
   type EquipmentSlot,
-  type GameState,
   type ItemId,
   type JobContent,
   type JobId,
@@ -476,28 +472,6 @@ export function optimizeCharacterEquipment(characterId: CharacterId): void {
   winners.forEach((winner) => characterEquipFromArmory(characterId, winner.item.id));
 }
 
-// Mutates `state.materials` directly - only ever called from inside a
-// single `updateGamestate` callback (see `characterInfuseEquipment`), so
-// the material/gold deduction lands in the same atomic commit as the
-// equipment change (mirrors `applyRequirementQuantity` in `crafting.ts`).
-function spendMaterial(
-  state: GameState,
-  materialId: ItemId,
-  quantity: number,
-): void {
-  const existing = state.materials[materialId];
-  const remaining = Math.max(0, (existing?.quantity ?? 0) - quantity);
-
-  if (remaining === 0) {
-    delete state.materials[materialId];
-  } else {
-    state.materials[materialId] = {
-      quantity: remaining,
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
-  }
-}
-
 // Permanently infuses a material into one of a hero's equipped item's
 // slots, paid for in Gold Coin. Targets a specific slot index rather than
 // "the next open one" - infusing an already-filled slot is allowed and
@@ -551,8 +525,8 @@ export function characterInfuseEquipment(
       };
     });
 
-    spendMaterial(state, materialItemId, 1);
-    spendMaterial(state, goldCoinId(), cost);
+    applyMaterialDelta(state, materialItemId, -1);
+    spendGold(state, cost);
 
     return state;
   });

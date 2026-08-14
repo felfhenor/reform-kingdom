@@ -10,7 +10,11 @@ import {
   itemDropHtml,
 } from '@helpers/combat-log';
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { addMaterial, getMaterialQuantity } from '@helpers/materials';
+import {
+  addMaterial,
+  applyMaterialDelta,
+  getMaterialQuantity,
+} from '@helpers/materials';
 import { roundToNearest10 } from '@helpers/number';
 import {
   isRecipeCraftable,
@@ -296,20 +300,11 @@ function applyRequirementQuantity(
   if ('collectibleId' in requirement) return; // possession gate, never consumed
 
   if ('itemId' in requirement) {
-    const existing = state.materials[requirement.itemId];
-    const next = Math.max(
-      0,
-      (existing?.quantity ?? 0) + sign * requirement.quantity * quantity,
+    applyMaterialDelta(
+      state,
+      requirement.itemId,
+      sign * requirement.quantity * quantity,
     );
-
-    if (next === 0) {
-      delete state.materials[requirement.itemId];
-    } else {
-      state.materials[requirement.itemId] = {
-        quantity: next,
-        foundAt: existing?.foundAt ?? Date.now(),
-      };
-    }
     return;
   }
 

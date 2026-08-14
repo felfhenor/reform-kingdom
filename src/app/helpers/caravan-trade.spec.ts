@@ -1,3 +1,4 @@
+import type * as MaterialsHelper from '@helpers/materials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/armory', () => ({
@@ -17,13 +18,21 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/infusion', () => ({
-  goldCoinId: vi.fn(),
-}));
-
-vi.mock('@helpers/materials', () => ({
-  getMaterialQuantity: vi.fn(),
-}));
+vi.mock('@helpers/materials', async (importOriginal) => {
+  const actual = await importOriginal<typeof MaterialsHelper>();
+  const testGoldCoinId = 'gold-coin' as ItemId;
+  return {
+    ...actual,
+    getMaterialQuantity: vi.fn(),
+    getGoldQuantity: vi.fn(),
+    gainGold: vi.fn((state: GameState, amount: number) =>
+      actual.applyMaterialDelta(state, testGoldCoinId, amount),
+    ),
+    spendGold: vi.fn((state: GameState, amount: number) =>
+      actual.applyMaterialDelta(state, testGoldCoinId, -amount),
+    ),
+  };
+});
 
 vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(),
@@ -50,8 +59,7 @@ import {
 } from '@helpers/caravan-trade';
 import { getCollectibleQuantity, isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
-import { goldCoinId } from '@helpers/infusion';
-import { getMaterialQuantity } from '@helpers/materials';
+import { getGoldQuantity, getMaterialQuantity } from '@helpers/materials';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-nodes';
@@ -217,27 +225,26 @@ describe('caravanTradeOwnedQuantity', () => {
 describe('caravanTradeMaxQuantity', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(goldCoinId).mockReturnValue('gold-coin' as ItemId);
     vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
   });
 
   it('caps a sell trade by what the party can afford, when unlimited', () => {
     const trade: CaravanTrade = { type: 'sell', value: 100, weight: 1 }; // price 125
-    vi.mocked(getMaterialQuantity).mockReturnValue(310);
+    vi.mocked(getGoldQuantity).mockReturnValue(310);
 
     expect(caravanTradeMaxQuantity(caravan, trade, {}, 0)).toBe(2);
   });
 
   it('caps a sell trade by remaining stock when it is lower than affordable', () => {
     const trade: CaravanTrade = { type: 'sell', value: 100, limit: 1, weight: 1 };
-    vi.mocked(getMaterialQuantity).mockReturnValue(10000);
+    vi.mocked(getGoldQuantity).mockReturnValue(10000);
 
     expect(caravanTradeMaxQuantity(caravan, trade, {}, 0)).toBe(1);
   });
 
   it('is 0 for a sell trade the party cannot afford at all', () => {
     const trade: CaravanTrade = { type: 'sell', value: 100, weight: 1 };
-    vi.mocked(getMaterialQuantity).mockReturnValue(0);
+    vi.mocked(getGoldQuantity).mockReturnValue(0);
 
     expect(caravanTradeMaxQuantity(caravan, trade, {}, 0)).toBe(0);
   });
@@ -413,7 +420,6 @@ describe('caravanExecuteTrade', () => {
     vi.clearAllMocks();
     vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
     vi.mocked(getEntry).mockReturnValue(trader);
-    vi.mocked(goldCoinId).mockReturnValue('gold-coin' as ItemId);
     vi.mocked(rngUuid).mockReturnValue('new-item-id');
   });
 
@@ -444,14 +450,14 @@ describe('caravanExecuteTrade', () => {
 
   it('returns false when the party cannot afford a sell trade', () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
-    vi.mocked(getMaterialQuantity).mockReturnValue(0);
+    vi.mocked(getGoldQuantity).mockReturnValue(0);
 
     expect(caravanExecuteTrade(entry, 0)).toBe(false);
   });
 
   it('grants the item and deducts gold on a successful sell trade', () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
-    vi.mocked(getMaterialQuantity).mockReturnValue(1000);
+    vi.mocked(getGoldQuantity).mockReturnValue(1000);
 
     expect(caravanExecuteTrade(entry, 0)).toBe(true);
 
@@ -491,7 +497,7 @@ describe('caravanExecuteTrade', () => {
 
   it('returns false for a quantity of 0 or less', () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
-    vi.mocked(getMaterialQuantity).mockReturnValue(1000);
+    vi.mocked(getGoldQuantity).mockReturnValue(1000);
 
     expect(caravanExecuteTrade(entry, 0, 0)).toBe(false);
     expect(caravanExecuteTrade(entry, 0, -1)).toBe(false);
@@ -501,7 +507,7 @@ describe('caravanExecuteTrade', () => {
   it('returns false when the requested quantity exceeds what is available', () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     // Trade 0 has limit 2 and none bought yet - only 2 are available.
-    vi.mocked(getMaterialQuantity).mockReturnValue(1_000_000);
+    vi.mocked(getGoldQuantity).mockReturnValue(1_000_000);
 
     expect(caravanExecuteTrade(entry, 0, 3)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
@@ -509,7 +515,7 @@ describe('caravanExecuteTrade', () => {
 
   it('buys multiple units in a single atomic commit', () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
-    vi.mocked(getMaterialQuantity).mockReturnValue(1_000_000);
+    vi.mocked(getGoldQuantity).mockReturnValue(1_000_000);
 
     expect(caravanExecuteTrade(entry, 0, 2)).toBe(true);
 

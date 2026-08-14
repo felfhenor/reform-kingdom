@@ -1,4 +1,5 @@
 import { defaultStats } from '@helpers/defaults';
+import type * as MaterialsHelper from '@helpers/materials';
 import type {
   EquipmentContent,
   EquipmentId,
@@ -14,8 +15,18 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/infusion', () => ({
   equipmentItemInfusionBonus: vi.fn(),
-  goldCoinId: vi.fn(),
 }));
+
+vi.mock('@helpers/materials', async (importOriginal) => {
+  const actual = await importOriginal<typeof MaterialsHelper>();
+  const testGoldCoinId = 'gold-coin' as ItemId;
+  return {
+    ...actual,
+    gainGold: vi.fn((state: GameState, amount: number) =>
+      actual.applyMaterialDelta(state, testGoldCoinId, amount),
+    ),
+  };
+});
 
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
@@ -34,7 +45,7 @@ import {
   sellEquipmentItems,
 } from '@helpers/armory';
 import { getEntry } from '@helpers/content';
-import { equipmentItemInfusionBonus, goldCoinId } from '@helpers/infusion';
+import { equipmentItemInfusionBonus } from '@helpers/infusion';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
 const sword: EquipmentContent = {
@@ -343,7 +354,6 @@ describe('Armory Helper Functions', () => {
 
   describe('sellEquipmentItems', () => {
     beforeEach(() => {
-      vi.mocked(goldCoinId).mockReturnValue('gold-coin' as ItemId);
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
     });
 

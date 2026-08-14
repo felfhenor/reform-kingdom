@@ -1,6 +1,6 @@
 import { getEntry } from '@helpers/content';
 import { defaultStats } from '@helpers/defaults';
-import { getMaterialQuantity } from '@helpers/materials';
+import { getGoldQuantity, getMaterialQuantity } from '@helpers/materials';
 import type {
   EquipmentContent,
   EquipmentId,
@@ -11,12 +11,7 @@ import type {
 } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
 
-const GOLD_COIN_NAME = 'Gold Coin';
 const GOLD_PER_STAT_POINT = 30;
-
-export function goldCoinId(): ItemId {
-  return getEntry<ItemContent>(GOLD_COIN_NAME)!.id;
-}
 
 // Sums the `infusionStats` of every non-empty slot into a single bonus
 // block - infusions are tracked by itemId, so the bonus is always resolved
@@ -72,5 +67,5 @@ export function canInfuseEquipmentItem(
 
   if (getMaterialQuantity(materialItemId) < 1) return false;
 
-  return getMaterialQuantity(goldCoinId()) >= infusionMaterialCost(materialItemId);
+  return getGoldQuantity() >= infusionMaterialCost(materialItemId);
 }

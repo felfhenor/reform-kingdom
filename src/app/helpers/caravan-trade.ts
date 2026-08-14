@@ -2,8 +2,13 @@ import { getArmoryEntries } from '@helpers/armory';
 import { caravanState } from '@helpers/caravan';
 import { getCollectibleQuantity, isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
-import { goldCoinId } from '@helpers/infusion';
-import { getMaterialQuantity } from '@helpers/materials';
+import {
+  applyMaterialDelta,
+  gainGold,
+  getGoldQuantity,
+  getMaterialQuantity,
+  spendGold,
+} from '@helpers/materials';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-nodes';
@@ -158,27 +163,12 @@ export function caravanTradeMaxQuantity(
 
   if (trade.type === 'sell') {
     const price = caravanTradePrice(caravan, trade);
-    const affordable = Math.floor(getMaterialQuantity(goldCoinId()) / price);
+    const affordable = Math.floor(getGoldQuantity() / price);
     return remaining === undefined ? affordable : Math.min(remaining, affordable);
   }
 
   const owned = caravanTradeOwnedQuantity(trade);
   return remaining === undefined ? owned : Math.min(remaining, owned);
-}
-
-function adjustGold(state: GameState, amount: number): void {
-  const goldId = goldCoinId();
-  const existing = state.materials[goldId];
-  const remaining = Math.max(0, (existing?.quantity ?? 0) + amount);
-
-  if (remaining === 0) {
-    delete state.materials[goldId];
-  } else {
-    state.materials[goldId] = {
-      quantity: remaining,
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
-  }
 }
 
 // Grants whichever reward type `trade` sells, `quantity` times -
@@ -193,11 +183,7 @@ function grantCaravanReward(
   quantity: number,
 ): void {
   if (trade.itemId) {
-    const existing = state.materials[trade.itemId];
-    state.materials[trade.itemId] = {
-      quantity: (existing?.quantity ?? 0) + quantity,
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
+    applyMaterialDelta(state, trade.itemId, quantity);
     return;
   }
 
@@ -235,17 +221,7 @@ function takeCaravanPayment(
   quantity: number,
 ): void {
   if (trade.itemId) {
-    const existing = state.materials[trade.itemId];
-    const remaining = Math.max(0, (existing?.quantity ?? 0) - quantity);
-
-    if (remaining === 0) {
-      delete state.materials[trade.itemId];
-    } else {
-      state.materials[trade.itemId] = {
-        quantity: remaining,
-        foundAt: existing?.foundAt ?? Date.now(),
-      };
-    }
+    applyMaterialDelta(state, trade.itemId, -quantity);
     return;
   }
 
@@ -300,10 +276,10 @@ export function caravanExecuteTrade(
   updateGamestate((s) => {
     if (trade.type === 'sell') {
       grantCaravanReward(s, trade, trader.name, quantity);
-      adjustGold(s, -totalPrice);
+      spendGold(s, totalPrice);
     } else {
       takeCaravanPayment(s, trade, quantity);
-      adjustGold(s, totalPrice);
+      gainGold(s, totalPrice);
     }
 
     const nodeState = s.world.caravans[caravan.id];

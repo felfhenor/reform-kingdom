@@ -13,10 +13,15 @@ vi.mock('@helpers/state-game', () => ({
 import { getEntry } from '@helpers/content';
 import {
   addMaterial,
+  applyMaterialDelta,
+  gainGold,
+  getGoldQuantity,
   getMaterialQuantity,
+  goldCoinId as resolveGoldCoinId,
   isMaterialDiscovered,
   pruneInvalidMaterials,
   removeMaterial,
+  spendGold,
 } from '@helpers/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
@@ -25,6 +30,104 @@ describe('Material Helper Functions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe('goldCoinId', () => {
+    it("resolves the item id of the 'Gold Coin' content entry", () => {
+      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
+
+      expect(resolveGoldCoinId()).toBe(goldCoinId);
+      expect(getEntry).toHaveBeenCalledWith('Gold Coin');
+    });
+  });
+
+  describe('applyMaterialDelta', () => {
+    it('adds a positive delta to an existing quantity, preserving foundAt', () => {
+      const state = {
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
+      } as unknown as GameState;
+
+      applyMaterialDelta(state, goldCoinId, 10);
+
+      expect(state.materials[goldCoinId]).toEqual({
+        quantity: 15,
+        foundAt: 1000,
+      });
+    });
+
+    it('creates the entry with a fresh foundAt when the material is new', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(1234);
+      const state = { materials: {} } as unknown as GameState;
+
+      applyMaterialDelta(state, goldCoinId, 3);
+
+      expect(state.materials[goldCoinId]).toEqual({
+        quantity: 3,
+        foundAt: 1234,
+      });
+
+      vi.restoreAllMocks();
+    });
+
+    it('subtracts a negative delta, clamping at 0 and dropping the entry', () => {
+      const state = {
+        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
+      } as unknown as GameState;
+
+      applyMaterialDelta(state, goldCoinId, -100);
+
+      expect(state.materials[goldCoinId]).toBeUndefined();
+    });
+
+    it('leaves a remaining positive quantity in place when partially subtracted', () => {
+      const state = {
+        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
+      } as unknown as GameState;
+
+      applyMaterialDelta(state, goldCoinId, -4);
+
+      expect(state.materials[goldCoinId]).toEqual({
+        quantity: 6,
+        foundAt: 1000,
+      });
+    });
+  });
+
+  describe('getGoldQuantity/gainGold/spendGold', () => {
+    beforeEach(() => {
+      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
+    });
+
+    it('getGoldQuantity reads the gold material quantity', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        materials: { [goldCoinId]: { quantity: 42, foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(getGoldQuantity()).toBe(42);
+    });
+
+    it('gainGold adds to the gold quantity in place', () => {
+      const state = {
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
+      } as unknown as GameState;
+
+      gainGold(state, 10);
+
+      expect(state.materials[goldCoinId]).toEqual({
+        quantity: 15,
+        foundAt: 1000,
+      });
+    });
+
+    it('spendGold subtracts from the gold quantity in place, clamping at 0', () => {
+      const state = {
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
+      } as unknown as GameState;
+
+      spendGold(state, 100);
+
+      expect(state.materials[goldCoinId]).toBeUndefined();
+    });
   });
 
   describe('getMaterialQuantity', () => {

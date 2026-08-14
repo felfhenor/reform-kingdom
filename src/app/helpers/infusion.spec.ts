@@ -1,3 +1,4 @@
+import type * as MaterialsHelper from '@helpers/materials';
 import type {
   EquipmentContent,
   EquipmentId,
@@ -12,9 +13,14 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/materials', () => ({
-  getMaterialQuantity: vi.fn(),
-}));
+vi.mock('@helpers/materials', async (importOriginal) => {
+  const actual = await importOriginal<typeof MaterialsHelper>();
+  return {
+    ...actual,
+    getMaterialQuantity: vi.fn(),
+    getGoldQuantity: vi.fn(),
+  };
+});
 
 import { getEntry } from '@helpers/content';
 import {
@@ -24,7 +30,7 @@ import {
   infusionMaterialCost,
   isInfusionMaterial,
 } from '@helpers/infusion';
-import { getMaterialQuantity } from '@helpers/materials';
+import { getGoldQuantity, getMaterialQuantity } from '@helpers/materials';
 
 const crystal: ItemContent = {
   id: 'crystal' as ItemId,
@@ -187,6 +193,7 @@ describe('Infusion Helper Functions', () => {
   describe('canInfuseEquipmentItem', () => {
     beforeEach(() => {
       vi.mocked(getMaterialQuantity).mockReturnValue(1000);
+      vi.mocked(getGoldQuantity).mockReturnValue(1000);
     });
 
     it('allows infusing an empty slot when material and gold are available', () => {
@@ -221,9 +228,7 @@ describe('Infusion Helper Functions', () => {
     });
 
     it('rejects when the player cannot afford the gold cost', () => {
-      vi.mocked(getMaterialQuantity).mockImplementation((id) =>
-        id === goldCoin.id ? 0 : 1000,
-      );
+      vi.mocked(getGoldQuantity).mockReturnValue(0);
       expect(canInfuseEquipmentItem(swordItem, 0, crystal.id)).toBe(false);
     });
   });

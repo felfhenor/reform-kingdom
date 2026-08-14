@@ -18,6 +18,7 @@ import {
   equipmentItemInfusionBonus,
   equippedItemsByPrimarySlot,
   getEntry,
+  getGoldQuantity,
   getStorageMaterials,
   goldCoinId,
   infusionMaterialCost,
@@ -97,12 +98,7 @@ export class PlayKingdomInfusionComponent {
     getStorageMaterials().filter((entry) => isInfusionMaterial(entry.item)),
   );
 
-  public goldCoinQuantity = computed(() => {
-    const goldEntry = getStorageMaterials().find(
-      (entry) => entry.item.id === goldCoinId(),
-    );
-    return goldEntry?.quantity ?? 0;
-  });
+  public goldCoinQuantity = computed(() => getGoldQuantity());
 
   public goldCoinSprite = computed(
     () => getEntry<ItemContent>(goldCoinId())?.sprite ?? '',

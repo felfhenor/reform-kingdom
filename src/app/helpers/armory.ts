@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content';
-import { equipmentItemInfusionBonus, goldCoinId } from '@helpers/infusion';
+import { equipmentItemInfusionBonus } from '@helpers/infusion';
+import { gainGold } from '@helpers/materials';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -9,7 +10,6 @@ import type {
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
-  GameState,
   GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
@@ -121,19 +121,6 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
   return Math.max(1, Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity]));
 }
 
-// Mutates `state.materials` directly - only ever called from inside
-// `sellEquipmentItems`'s single `updateGamestate` callback, so the gold gain
-// lands in the same atomic commit as the armory removal (mirrors
-// `spendMaterial` in `party.ts`).
-function creditGold(state: GameState, amount: number): void {
-  const goldId = goldCoinId();
-  const existing = state.materials[goldId];
-  state.materials[goldId] = {
-    quantity: (existing?.quantity ?? 0) + amount,
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
-}
-
 // Sells one or more owned armory items for gold in a single atomic commit.
 // Ids no longer present in the armory (stale selection) are silently
 // skipped. Returns the total gold gained.
@@ -146,7 +133,7 @@ export function sellEquipmentItems(equipmentItemIds: EquipmentItemId[]): number 
 
   updateGamestate((state) => {
     state.armory = state.armory.filter((item) => !idsToSell.has(item.id));
-    creditGold(state, totalGold);
+    gainGold(state, totalGold);
     return state;
   });
 

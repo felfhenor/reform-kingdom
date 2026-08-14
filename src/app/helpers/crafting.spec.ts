@@ -1,3 +1,4 @@
+import type * as MaterialsHelper from '@helpers/materials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/armory', () => ({
@@ -29,10 +30,14 @@ vi.mock('@helpers/content', () => ({
   getEntriesByType: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/materials', () => ({
-  addMaterial: vi.fn(),
-  getMaterialQuantity: vi.fn(() => 0),
-}));
+vi.mock('@helpers/materials', async (importOriginal) => {
+  const actual = await importOriginal<typeof MaterialsHelper>();
+  return {
+    ...actual,
+    addMaterial: vi.fn(),
+    getMaterialQuantity: vi.fn(() => 0),
+  };
+});
 
 vi.mock('@helpers/recipes', () => ({
   isRecipeCraftable: vi.fn(() => true),
