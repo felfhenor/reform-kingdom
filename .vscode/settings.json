@@ -31,5 +31,9 @@
     "./schemas/statuseffect.schema.json": "gamedata/statuseffect/**/*.yml",
     "./schemas/trait.schema.json": "gamedata/trait/**/*.yml",
     "./schemas/tradeskilllevelrequirement.schema.json": "gamedata/tradeskilllevelrequirement/**/*.yml"
-  }
+  },
+  "exportall.config.relExclusion": [
+    "/src/app/interfaces/index.ts",
+    "/src/app/helpers/index.ts"
+  ]
 }

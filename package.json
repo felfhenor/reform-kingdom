@@ -72,7 +72,7 @@
     "@tailwindcss/postcss": "^4.3.3",
     "console-log-colors": "^0.5.0",
     "es-toolkit": "^1.50.0",
-    "gameanalytics": "^5.0.0",
+    "gameanalytics": "^4.4.7",
     "jimp": "^1.6.1",
     "logger-timer": "^1.0.7",
     "marked": "^18.0.7",
