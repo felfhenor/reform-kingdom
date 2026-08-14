@@ -1,0 +1,28 @@
+# Primary Stat: Agility
+# Secondary Stat: Vitality
+
+- id: d40e1e92-8f01-417e-97f4-64009555c68d
+  name: Copper Dirk
+  description: A dirk made of copper. It is not very powerful, but it is affordable.
+  levelRequirement: 2
+  rarity: Common
+  type: Dirk
+  sprite: '0012'
+  slots: 1
+  baseStats:
+    Agility: 0.5
+    Vitality: 0.4
+    Strength: 0.4
+
+- id: 87aa63a9-4bd2-4fa4-8d19-48dc37e70062
+  name: Coppergob Dirk
+  description: A crudely-made dirk, crafted by goblins using primitive forging techinques.
+  levelRequirement: 4
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0072'
+  slots: 1
+  baseStats:
+    Agility: 0.9
+    Vitality: 0.6
+    Strength: 0.9

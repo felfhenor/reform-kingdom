@@ -1,0 +1,15 @@
+# Primary Stat: Strength
+# Secondary Stat: Vitality
+
+- id: a9b8b3a2-bdaf-4257-983a-1cf965a17906
+  name: Elvenwood Sword
+  description: A beautifully carved sword made of elven wood.
+  levelRequirement: 12
+  rarity: Uncommon
+  type: Sword
+  sprite: '0056'
+  slots: 1
+  baseStats:
+    Strength: 4.1
+    Vitality: 3.6
+    Resistance: 1.2

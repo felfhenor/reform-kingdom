@@ -1,0 +1,15 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 1ca45cc0-343b-431c-bc48-60847d40aab6
+  name: Elvenwood Spear
+  description: A beautifully carved spear made of elven wood.
+  levelRequirement: 12
+  rarity: Uncommon
+  type: Spear
+  sprite: '0055'
+  slots: 1
+  baseStats:
+    Strength: 4.9
+    Agility: 3.1
+    Vitality: 1.1

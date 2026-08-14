@@ -1,0 +1,10 @@
+- id: c4d8024e-9180-4043-b0b7-31697d744055
+  name: Wergenslime Arrow
+  description: A sharpened wooden arrow, coated in slime.
+  levelRequirement: 6
+  rarity: Common
+  type: Arrow
+  sprite: '0036'
+  slots: 1
+  baseStats:
+    Strength: 2.1

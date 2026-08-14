@@ -1,0 +1,15 @@
+# Primary Stat: Agility
+# Secondary Stat: Strength
+
+- id: 76b4f41c-6ee1-42bc-8d38-bde9b07a00cf
+  name: Elvenwood Dagger
+  description: A beautifully carved dagger made of elven wood.
+  levelRequirement: 12
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0054'
+  slots: 1
+  baseStats:
+    Agility: 4.3
+    Strength: 3.5
+    Luck: 1

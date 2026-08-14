@@ -1,0 +1,15 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Resistance
+
+- id: e7ed917f-f215-4ee7-9c34-2b944d7600c1
+  name: Elvenwood Whip
+  description: A whip made of elven wood fibers. It's strangely flexible and powerful.
+  levelRequirement: 11
+  rarity: Common
+  type: Whip
+  sprite: '0059'
+  slots: 1
+  baseStats:
+    Intelligence: 3.1
+    Resistance: 0.5
+    Strength: 2.1

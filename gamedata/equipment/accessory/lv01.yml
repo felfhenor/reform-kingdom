@@ -1,0 +1,10 @@
+- id: 16422821-5bb0-4f51-8c3a-ff5a798f479b
+  name: Leather Bag
+  description: A fashionable leather bag.
+  rarity: Uncommon
+  levelRequirement: 3
+  type: Accessory
+  sprite: '0009'
+  slots: 2
+  baseStats:
+    Luck: 0.3

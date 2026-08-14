@@ -1,0 +1,16 @@
+# Primary Stat: Agility
+# Secondary Stat: Vitality
+
+- id: 2683d850-8bb6-40ef-aa95-29689fe4a4ff
+  name: Jelly Dirk
+  description: A dirk made of magical jelly.
+  levelRequirement: 8
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0049'
+  slots: 1
+  baseStats:
+    Agility: 1.3
+    Vitality: 1
+    Intelligence: 1.2
+    Energy: 5

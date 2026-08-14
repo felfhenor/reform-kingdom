@@ -1,0 +1,28 @@
+# Primary Stat: Vitality
+# Secondary Stat: Resistance
+
+- id: 98a3127c-98fb-42e2-be4c-9734070159e5
+  name: Copperslime Shield
+  description: A shield made of copperslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Shield
+  sprite: '0027'
+  slots: 1
+  baseStats:
+    Vitality: 1.3
+    Resistance: 2.7
+
+- id: a72069c4-107f-4e1b-8ee9-1e06f33ae5af
+  name: Silkstrong Copper Shield
+  description: A shield made of copper, wergen wood, and held together by powerful spiders silk.
+  levelRequirement: 8
+  rarity: Rare
+  type: Shield
+  sprite: '0042'
+  slots: 1
+  baseStats:
+    Vitality: 2.3
+    Resistance: 1.2
+  grantedSkillIds:
+    - Fortify I

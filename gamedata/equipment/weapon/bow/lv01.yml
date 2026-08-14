@@ -1,0 +1,26 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 57940423-fe65-4bdc-86a1-1608d9f49f4d
+  name: Wergen Bow
+  description: A simple bow made of wergen wood.
+  levelRequirement: 1
+  rarity: Common
+  type: Bow
+  sprite: '0021'
+  slots: 1
+  baseStats:
+    Strength: 1.5
+    Agility: 0.8
+
+- id: 240d379b-0cbb-4758-97ac-e496ea6f4e8e
+  name: Copper Crossbow
+  description: A Duchy-made crossbow made mostly of copper.
+  levelRequirement: 4
+  rarity: Uncommon
+  type: Bow
+  sprite: '0070'
+  slots: 1
+  baseStats:
+    Strength: 2.2
+    Agility: 1.6

@@ -1,0 +1,14 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 95dbd70d-7649-44a5-99a9-af301226005c
+  name: Wergenslime Bow
+  description: A bow made of wergenslime wood.
+  levelRequirement: 7
+  rarity: Common
+  type: Bow
+  sprite: '0033'
+  slots: 1
+  baseStats:
+    Strength: 3.2
+    Agility: 2.1

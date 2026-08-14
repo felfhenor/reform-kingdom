@@ -1,0 +1,10 @@
+- id: 4b7457ea-312d-4a37-9d30-8a46bd8dae52
+  name: Hawk Charm
+  description: A charm carried by hawks that have allied themselves with elves.
+  rarity: Uncommon
+  levelRequirement: 10
+  type: Charm
+  sprite: '0050'
+  slots: 1
+  baseStats:
+    Intelligence: 5.5

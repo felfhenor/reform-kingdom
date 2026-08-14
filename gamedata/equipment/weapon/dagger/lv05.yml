@@ -1,0 +1,28 @@
+# Primary Stat: Agility
+# Secondary Stat: Strength
+
+- id: 7136236a-75d8-424a-8769-822d9b9c9038
+  name: Copperslime Dagger
+  description: A dagger made of copperslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Dagger
+  sprite: '0029'
+  slots: 1
+  baseStats:
+    Agility: 2.3
+    Strength: 1.5
+    Luck: 0.3
+
+- id: 7a8a044a-0f3a-47b0-a864-6c685938d481
+  name: Coppergob Dagger
+  description: A crudely-made dagger, crafted by goblins using primitive forging techinques.
+  levelRequirement: 9
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0071'
+  slots: 1
+  baseStats:
+    Agility: 3.1
+    Strength: 2.3
+    Luck: 0.7

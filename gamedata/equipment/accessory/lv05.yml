@@ -1,0 +1,46 @@
+- id: 03613b82-57f3-47bb-8cbd-d855ca9fa2d3
+  name: Wergenslime Bag
+  description: A bag held together entirely by sticks and slime.
+  rarity: Common
+  levelRequirement: 5
+  type: Accessory
+  sprite: '0037'
+  slots: 2
+  baseStats:
+    Resistance: 0.8
+    Vitality: 0.3
+    Health: 5
+
+- id: 1fed3886-8fc9-48f0-8ae2-658fb2b0ee40
+  name: Copperslime Amulet
+  description: An amulet made of copperslime.
+  rarity: Common
+  levelRequirement: 6
+  type: Accessory
+  sprite: '0038'
+  slots: 1
+  baseStats:
+    Intelligence: 1.1
+    Resistance: 0.9
+
+- id: 3b3f794e-32aa-4acc-b916-81254d69b9ea
+  name: Silkslime Gloves
+  description: A pair of gloves made from silkslime.
+  rarity: Common
+  levelRequirement: 7
+  type: Accessory
+  sprite: '0041'
+  slots: 1
+  baseStats:
+    Resistance: 2.5
+
+- id: 49e2b537-0501-4255-9813-bff11afef4d5
+  name: Ace of Spades
+  description: A playing card symboling luck.
+  rarity: Uncommon
+  levelRequirement: 9
+  type: Accessory
+  sprite: '0074'
+  slots: 1
+  baseStats:
+    Luck: 1.5

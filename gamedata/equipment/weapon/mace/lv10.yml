@@ -1,0 +1,14 @@
+# Primary Stat: Strength
+# Secondary Stat: Intelligence
+
+- id: 915abf06-ecb7-4bfa-889b-7e83a8d21f9a
+  name: Elvenwood Mace
+  description: A mace made only of finely-carved elven wood.
+  levelRequirement: 12
+  rarity: Uncommon
+  type: Mace
+  sprite: '0069'
+  slots: 1
+  baseStats:
+    Strength: 3.2
+    Intelligence: 4.8

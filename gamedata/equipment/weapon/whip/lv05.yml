@@ -1,0 +1,14 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Resistance
+
+- id: e216b0ba-83df-43f1-a1b4-e63ac0fcae9a
+  name: Copperslime Whip
+  description: A magical whip made of copperslime and wergen wood.
+  levelRequirement: 6
+  rarity: Common
+  type: Whip
+  sprite: '0032'
+  slots: 1
+  baseStats:
+    Intelligence: 2.3
+    Resistance: 1.3

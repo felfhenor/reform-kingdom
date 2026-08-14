@@ -1,0 +1,14 @@
+# Primary Stat: Agility
+# Secondary Stat: Strength
+
+- id: d63f372b-50bb-4faf-98d3-51ab3413d7f6
+  name: Copper Dagger
+  description: A dagger made of copper. It is not very powerful, but it is affordable.
+  levelRequirement: 1
+  rarity: Common
+  type: Dagger
+  sprite: '0004'
+  slots: 1
+  baseStats:
+    Agility: 0.7
+    Strength: 0.5

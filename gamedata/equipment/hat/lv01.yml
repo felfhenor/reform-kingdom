@@ -1,0 +1,23 @@
+- id: 194e9fc1-1df6-431d-ab53-26ffe6fa8249
+  name: Hat of Adventuring
+  description: A hat that is worn by beginning adventurers.
+  levelRequirement: 1
+  rarity: Common
+  type: Hat
+  sprite: '0002'
+  slots: 1
+  baseStats:
+    Health: 5
+    Vitality: 0.5
+
+- id: ef3e9776-0b2b-4937-814f-1ed7092104ee
+  name: Linen Hat
+  description: A hat crafted from linen. It is not very protective, but it is light and comfortable.
+  levelRequirement: 2
+  rarity: Common
+  type: Hat
+  sprite: '0003'
+  slots: 1
+  baseStats:
+    Health: 7
+    Vitality: 0.7

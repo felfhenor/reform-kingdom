@@ -1,0 +1,13 @@
+- id: e5e2be3a-87e9-4365-a0ec-b9a83fd761ba
+  name: Elfsilk Shirt
+  description: An elegant shirt crated by elves and tailored with specially-refined silk.
+  levelRequirement: 11
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0066'
+  slots: 1
+  baseStats:
+    Resistance: 4.3
+    Agility: 3.6
+    Health: 15
+    Energy: 9

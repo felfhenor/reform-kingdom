@@ -1,0 +1,50 @@
+- id: 2fcace4d-840a-456f-872e-0b434c6215ed
+  name: Green Copperslime Ring
+  description: A ring made of copper, coated in viscous green slime.
+  levelRequirement: 5
+  rarity: Uncommon
+  type: Ring
+  sprite: '0022'
+  slots: 1
+  baseStats:
+    Vitality: 2.4
+    Resistance: 1.1
+    Health: 10
+
+- id: d2a0b4ee-e346-4860-b223-6b3fa8b4af4d
+  name: Purple Copperslime Ring
+  description: A ring made of copper, coated in viscous purple slime.
+  levelRequirement: 5
+  rarity: Uncommon
+  type: Ring
+  sprite: '0023'
+  slots: 1
+  baseStats:
+    Intelligence: 2.5
+    Energy: 5
+
+- id: 2576f193-3816-4d6e-89da-a7e956064ecf
+  name: Red Copperslime Ring
+  description: A ring made of copper, coated in viscous red slime.
+  levelRequirement: 5
+  rarity: Uncommon
+  type: Ring
+  sprite: '0024'
+  slots: 1
+  baseStats:
+    Strength: 2.3
+    Health: 6
+
+- id: f30136ae-a542-44f1-8c46-d8099356dd19
+  name: Refined Copperslime Ring
+  description: A copperslime ring, refined with the finest slime core.
+  levelRequirement: 8
+  rarity: Rare
+  type: Ring
+  sprite: '0025'
+  slots: 1
+  baseStats:
+    Intelligence: 2.5
+    Strength: 1.2
+    Energy: 4
+    Health: 7

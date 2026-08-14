@@ -1,0 +1,14 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Resistance
+
+- id: 31c7cac4-5120-4681-ab60-0cf8e5aa5b05
+  name: Copper Whip
+  description: A magical whip made of copper and wergen wood.
+  levelRequirement: 1
+  rarity: Common
+  type: Whip
+  sprite: '0020'
+  slots: 1
+  baseStats:
+    Intelligence: 0.8
+    Resistance: 0.3

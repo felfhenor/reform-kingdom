@@ -1,0 +1,28 @@
+- id: 39658362-29fc-47fb-8170-69d2229153bc
+  name: Coppersilk Robe
+  description: A robe made of coppersilk.
+  levelRequirement: 6
+  rarity: Common
+  type: Cloth Armor
+  sprite: '0044'
+  slots: 1
+  baseStats:
+    Resistance: 3.9
+    Vitality: 1.4
+    Health: 20
+    Energy: 12
+
+- id: 41805abc-dc1c-439d-a6ea-b264d3bb3b24
+  name: Silkslime Shirt
+  description: A shirt made of silkslime.
+  levelRequirement: 8
+  rarity: Common
+  type: Cloth Armor
+  sprite: '0039'
+  slots: 1
+  baseStats:
+    Resistance: 3.6
+    Agility: 2.1
+    Vitality: 1.2
+    Health: 10
+    Energy: 9

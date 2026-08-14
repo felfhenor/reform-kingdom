@@ -1,0 +1,10 @@
+- id: 9d33ba1e-13cf-4d9a-b318-f3a9de1b68ae
+  name: Gobskull Charm
+  description: A charm crafted with simple chain links and a baby goblin skull.
+  rarity: Common
+  levelRequirement: 1
+  type: Charm
+  sprite: '0008'
+  slots: 1
+  baseStats:
+    Intelligence: 1

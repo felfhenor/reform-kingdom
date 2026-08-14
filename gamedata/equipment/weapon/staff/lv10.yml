@@ -1,0 +1,15 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Vitality
+
+- id: 5db42c67-f619-40a5-a003-3053019aff1a
+  name: Elvenwood Staff
+  description: A beautifully carved magical staff made of elven wood.
+  levelRequirement: 12
+  rarity: Common
+  type: Staff
+  sprite: '0052'
+  slots: 1
+  baseStats:
+    Intelligence: 6
+    Vitality: 3.5
+    Resistance: 2.3

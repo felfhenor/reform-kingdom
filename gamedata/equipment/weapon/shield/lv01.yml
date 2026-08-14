@@ -1,0 +1,29 @@
+# Primary Stat: Vitality
+# Secondary Stat: Resistance
+
+- id: f9047d17-6d05-4ff2-b4da-188f91e83450
+  name: Copper Shield
+  description: A shield made of copper. It won't put up much of a fight.
+  levelRequirement: 2
+  rarity: Common
+  type: Shield
+  sprite: '0011'
+  slots: 1
+  baseStats:
+    Vitality: 0.8
+    Resistance: 0.1
+
+- id: 0fe28377-3c4d-4256-8a12-d4959ed9cc2f
+  name: Pan Board
+  description: A repurposed shield that is used to pan copper.
+  levelRequirement: 4
+  rarity: Common
+  type: Shield
+  sprite: '0048'
+  slots: 1
+  baseStats:
+    Vitality: 1.1
+    Resistance: 0.5
+    Agility: 0.5
+  grantedSkillIds:
+    - Smashing Board I

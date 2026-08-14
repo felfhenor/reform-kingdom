@@ -1,0 +1,15 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: cf201970-47ee-4417-9c64-9b357963cf8f
+  name: Elvenwood Bow
+  description: A beautifully carved bow made of elven wood.
+  levelRequirement: 11
+  rarity: Uncommon
+  type: Bow
+  sprite: '0051'
+  slots: 2
+  baseStats:
+    Strength: 6.9
+    Agility: 5.7
+    Vitality: 1.5

@@ -1,0 +1,25 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 94d45b7c-1989-4900-8bb1-362382d87f57
+  name: Wergenslime Spear
+  description: A spear tipped with wergenslime.
+  levelRequirement: 6
+  rarity: Common
+  type: Spear
+  sprite: '0035'
+  slots: 1
+  baseStats:
+    Strength: 2.4
+    Agility: 1.2
+
+- id: d59e9ce7-4012-4454-97ad-be31ad12e543
+  name: Elvenwood Harpoon
+  description: A beautifully carved harpoon made of elven wood.
+  levelRequirement: 9
+  rarity: Uncommon
+  type: Spear
+  sprite: '0073'
+  slots: 1
+  baseStats:
+    Strength: 6.4

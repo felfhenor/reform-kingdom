@@ -1,0 +1,11 @@
+- id: c26b2b63-43e4-498b-b9f7-31b4fea0bb3d
+  name: Elvenwood Broom
+  description: A broom made of elven wood and linen fibers. It cleans surprisingly well, keeping its user in good health!
+  rarity: Common
+  levelRequirement: 11
+  type: Accessory
+  sprite: '0063'
+  slots: 1
+  baseStats:
+    Health: 20
+    Energy: 5
