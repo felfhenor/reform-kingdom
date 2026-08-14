@@ -10,19 +10,23 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import {
+  modalClose,
+  modalCloseTop,
+  modalHasAnyOpen,
+  modalIsOpen,
+  modalIsTopmost,
+  modalOpen,
+} from '@helpers/modal-stack';
 import { isSetup } from '@helpers/setup';
 import { saveGameState } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
 import {
-  activeCaravanNode,
-  caravanTradeClose,
   caravanTradeOpen,
   closeAllMenus,
   gamePlayView,
-  isShowingAnyMenu,
   isWorldCameraPanned,
   setGamePlayView,
-  showOptionsMenu,
   worldCameraRecenter,
 } from '@helpers/ui';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -62,7 +66,7 @@ export class NavbarComponent {
   public meta = inject(MetaService);
   public router = inject(Router);
 
-  public showPauseMenu = signal<boolean>(false);
+  public showPauseMenu = computed(() => modalIsOpen('pause-menu'));
   private wasPausedBeforeOpeningMenu = signal<boolean>(false);
 
   public leaveSwal = viewChild<SwalComponent>('leaveSwal');
@@ -102,16 +106,6 @@ export class NavbarComponent {
     clickCb: () => void;
   }> = [];
 
-  public toggleOptions() {
-    if (showOptionsMenu()) {
-      showOptionsMenu.set(false);
-      return;
-    }
-
-    closeAllMenus();
-    showOptionsMenu.set(!showOptionsMenu());
-  }
-
   public togglePause() {
     if (this.showPauseMenu()) return;
     setOption('gameloopPaused', !this.isPaused());
@@ -124,7 +118,7 @@ export class NavbarComponent {
   }
 
   public closePauseMenu() {
-    this.showPauseMenu.set(false);
+    modalClose('pause-menu');
     if (!this.wasPausedBeforeOpeningMenu()) {
       setOption('gameloopPaused', false);
     }
@@ -133,7 +127,7 @@ export class NavbarComponent {
   public openPauseMenu() {
     if (!isSetup()) return;
 
-    this.showPauseMenu.set(true);
+    modalOpen('pause-menu');
     if (this.isPaused()) {
       this.wasPausedBeforeOpeningMenu.set(true);
     } else {
@@ -142,27 +136,21 @@ export class NavbarComponent {
     }
   }
 
+  // ESC closes whichever modal is on top of the stack. The pause menu is
+  // the one exception with side effects (resuming the game), so it's
+  // routed through its own close method; everything else can just pop.
+  // With nothing open, ESC opens the pause menu.
   public closeAllMenus() {
-    if (activeCaravanNode()) {
-      caravanTradeClose();
-      return;
-    }
-
-    if (showOptionsMenu()) {
-      showOptionsMenu.set(false);
-      return;
-    }
-
-    if (this.showPauseMenu()) {
+    if (modalIsTopmost('pause-menu')) {
       this.closePauseMenu();
       return;
     }
 
-    if (!isShowingAnyMenu()) {
-      this.openPauseMenu();
+    if (modalHasAnyOpen()) {
+      modalCloseTop();
       return;
     }
 
-    closeAllMenus(true);
+    this.openPauseMenu();
   }
 }

@@ -1,11 +1,6 @@
 @let isInReplacementMode = fullContainer.children.length !== 0;
 
-<dialog
-  #modal
-  class="modal"
-  [open]="visible()"
-  (click)="backdropClick($event)"
->
+<dialog #modal class="modal" (click)="backdropClick($event)">
   <div
     class="modal-box p-0"
     [ngClass]="[widthClass()]"

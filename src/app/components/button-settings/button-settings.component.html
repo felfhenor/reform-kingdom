@@ -1,6 +1,6 @@
 <button
   class="btn btn-secondary btn-block"
-  (click)="showOptions()"
+  appModalOpen="settings"
   appAnalyticsClick="Meta:Settings"
   appSfx="ui-error"
   [sfxTrigger]="['hover', 'click']"
@@ -10,7 +10,7 @@
 
 <div *appTeleportTo="'menu-options'">
   <app-modal
-    [visible]="showSettings()"
+    modalId="settings"
     [allowEscToClose]="true"
     [widthClass]="'max-w-[unset]'"
   >

@@ -22,6 +22,7 @@ import {
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
 } from '@helpers/crafting';
+import { modalOpen } from '@helpers/modal-stack';
 import {
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
@@ -29,12 +30,7 @@ import {
 import { gamestate } from '@helpers/state-game';
 import { formatDuration } from '@helpers/timer';
 import { tradeskillBuilding } from '@helpers/tradeskill';
-import {
-  kingdomSubview,
-  kingdomSubviewShow,
-  showReclassHeroesModal,
-  uiClockTick,
-} from '@helpers/ui';
+import { kingdomSubview, kingdomSubviewShow, uiClockTick } from '@helpers/ui';
 import { isPlayerAtKingdom } from '@helpers/world';
 import type { KingdomSubview, RecipeContent, Tradeskill } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -193,6 +189,6 @@ export class GamePlayKingdomComponent {
 
   public openReclassModal(): void {
     if (!this.canReclass()) return;
-    showReclassHeroesModal.set(true);
+    modalOpen('reclass-heroes');
   }
 }

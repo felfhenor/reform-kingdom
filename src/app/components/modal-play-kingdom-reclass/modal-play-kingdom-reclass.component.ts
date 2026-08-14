@@ -18,8 +18,8 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { characterReclass } from '@helpers/character-reclass';
 import { getEntry } from '@helpers/content';
 import { getUnlockedJobs } from '@helpers/job';
+import { modalIsOpen } from '@helpers/modal-stack';
 import { partyGet } from '@helpers/party';
-import { showReclassHeroesModal } from '@helpers/ui';
 import type { Character, JobContent, JobId } from '@interfaces';
 import {
   NgLabelTemplateDirective,
@@ -52,7 +52,7 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
   templateUrl: './modal-play-kingdom-reclass.component.html',
 })
 export class ModalPlayKingdomReclassComponent {
-  public isVisible = computed(() => showReclassHeroesModal());
+  public isVisible = computed(() => modalIsOpen('reclass-heroes'));
   public party = computed(() => partyGet());
 
   public unlockedJobs = computed(() =>
@@ -97,10 +97,6 @@ export class ModalPlayKingdomReclassComponent {
         characterReclass(character.id, pick.jobId);
       }
     });
-  }
-
-  public close(): void {
-    showReclassHeroesModal.set(false);
   }
 
   public jobLevelForHero(hero: Character, job: JobId): number {

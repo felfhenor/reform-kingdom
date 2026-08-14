@@ -4,7 +4,7 @@
   [style.--social-color]="color"
   (mouseenter)="currentColor = color"
   (mouseleave)="currentColor = '#ccc'"
-  (click)="showChangelog.set(true)"
+  appModalOpen="changelog"
   appSfx="ui-click"
   [sfxOffset]="4"
   [sfxTrigger]="['click', 'hover']"
@@ -12,7 +12,7 @@
   <ng-icon [name]="'tablerPackage'" [color]="currentColor || '#ccc'"></ng-icon>
 </button>
 
-<app-modal [visible]="showChangelog()" [allowEscToClose]="true">
+<app-modal modalId="changelog" [allowEscToClose]="true">
   <span title>Changelog</span>
 
   <div body>
@@ -46,6 +46,6 @@
   </div>
 
   <div actions>
-    <button class="btn" (click)="showChangelog.set(false)">Close</button>
+    <button class="btn" appModalClose>Close</button>
   </div>
 </app-modal>

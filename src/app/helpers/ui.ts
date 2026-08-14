@@ -1,4 +1,5 @@
-import { computed, signal } from '@angular/core';
+import { signal } from '@angular/core';
+import { modalCloseAll, modalOpen } from '@helpers/modal-stack';
 import { localStorageSignal } from '@helpers/signal';
 import type {
   CharacterId,
@@ -25,8 +26,6 @@ export const windowWidth = signal<number>(window.innerWidth);
 
 export const showAnySubmenu = signal<boolean>(false);
 
-export const showOptionsMenu = signal<boolean>(false);
-
 export const gamePlayView = localStorageSignal<GamePlayView>(
   'gamePlayView',
   'world',
@@ -49,20 +48,17 @@ export function kingdomSubviewClear(): void {
   kingdomSubview.set(undefined);
 }
 
-export const showReclassHeroesModal = signal<boolean>(false);
-
-// The hero the Combat Orders modal is currently open for, or undefined if
-// closed - set from the "Combat Orders" button on the hero equipment screen.
+// The hero the Combat Orders modal is currently open for. Not cleared on
+// close, same reasoning as `activeCaravanNode` below - the modal's body
+// content is derived from this signal, and clearing it in the same tick
+// as closing would collapse the DOM mid-transition.
 export const combatOrdersModalCharacterId = signal<CharacterId | undefined>(
   undefined,
 );
 
 export function combatOrdersModalOpen(characterId: CharacterId): void {
   combatOrdersModalCharacterId.set(characterId);
-}
-
-export function combatOrdersModalClose(): void {
-  combatOrdersModalCharacterId.set(undefined);
+  modalOpen('combat-orders');
 }
 
 export const isWorldCameraPanned = signal<boolean>(false);
@@ -92,17 +88,16 @@ export function mapNodeDeselect(): void {
 // map node panel's "Open Trade" button and the navbar's glowing trade
 // button, so the modal (mounted once in the navbar) can be reached from any
 // screen without needing a direct reference to whichever button opened it.
+// Not cleared on close - the trade modal's body content is derived from
+// this same signal, and clearing it in the same tick as closing would
+// collapse the modal's DOM mid-transition (see `ModalComponent`). It's
+// simply overwritten the next time a trade is opened.
 export const activeCaravanNode = signal<WorldNodeEntry | undefined>(undefined);
 
 export function caravanTradeOpen(entry: WorldNodeEntry): void {
   activeCaravanNode.set(entry);
+  modalOpen('caravan-trade');
 }
-
-export function caravanTradeClose(): void {
-  activeCaravanNode.set(undefined);
-}
-
-export const isShowingAnyMenu = computed(() => showOptionsMenu());
 
 export function closeAllMenus(smart = false) {
   if (smart && showAnySubmenu()) {
@@ -111,5 +106,5 @@ export function closeAllMenus(smart = false) {
   }
 
   showAnySubmenu.set(false);
-  showOptionsMenu.set(false);
+  modalCloseAll();
 }

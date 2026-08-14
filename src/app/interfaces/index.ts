@@ -37,6 +37,7 @@ export * from './level-range';
 export * from './loading';
 export * from './map';
 export * from './meta';
+export * from './modal';
 export * from './museum';
 export * from './pixi-config';
 export * from './sfx';

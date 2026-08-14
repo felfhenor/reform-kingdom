@@ -1,14 +1,9 @@
 import { NgClass } from '@angular/common';
 import type { ElementRef } from '@angular/core';
-import {
-  Component,
-  effect,
-  input,
-  model,
-  output,
-  viewChild,
-} from '@angular/core';
+import { Component, computed, effect, input, output, viewChild } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { modalClose, modalIsOpen } from '@helpers/modal-stack';
+import type { ModalId } from '@interfaces';
 
 @Component({
   selector: 'app-modal',
@@ -17,7 +12,7 @@ import { ButtonCloseComponent } from '@components/button-close/button-close.comp
   styleUrl: './modal.component.scss',
 })
 export class ModalComponent {
-  public visible = model<boolean>(false);
+  public modalId = input.required<ModalId>();
 
   public allowEscToClose = input<boolean>(true);
   public closeOnBackdropClick = input<boolean>(false);
@@ -28,11 +23,16 @@ export class ModalComponent {
 
   public modal = viewChild<ElementRef<HTMLDialogElement>>('modal');
 
+  // The stack is the only source of truth for open/closed - content stays
+  // mounted and untouched by this component while it closes, so a
+  // component whose body derives from the same data that drove it open
+  // doesn't tear down its content mid-transition.
+  public isOpen = computed(() => modalIsOpen(this.modalId()));
+
   constructor() {
     effect(() => {
-      const visible = this.visible();
-      if (!visible) {
-        this.closeModal();
+      if (!this.isOpen()) {
+        this.modal()?.nativeElement.close();
         return;
       }
 
@@ -41,8 +41,7 @@ export class ModalComponent {
   }
 
   public closeModal() {
-    this.modal()?.nativeElement.close();
-    this.visible.set(false);
+    modalClose(this.modalId());
     this.modalClose.emit();
   }
 

@@ -24,7 +24,7 @@ import {
 } from '@helpers/caravan-trade';
 import { getEntry } from '@helpers/content';
 import { notifySuccess } from '@helpers/notify';
-import { activeCaravanNode, caravanTradeClose } from '@helpers/ui';
+import { activeCaravanNode } from '@helpers/ui';
 import { worldNodeCaravan } from '@helpers/world-nodes';
 import type { CaravanTraderContent, CaravanTradeRow } from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -38,7 +38,6 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 })
 export class ModalCaravanTradeComponent {
   public entry = computed(() => activeCaravanNode());
-  public isVisible = computed(() => !!this.entry());
 
   public caravan = computed(() => {
     const entry = this.entry();
@@ -167,9 +166,5 @@ export class ModalCaravanTradeComponent {
         ? `You bought ${name}${qtyLabel}!`
         : `You sold ${name}${qtyLabel}!`,
     );
-  }
-
-  public close(): void {
-    caravanTradeClose();
   }
 }

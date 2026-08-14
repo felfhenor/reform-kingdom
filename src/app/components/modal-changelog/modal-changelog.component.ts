@@ -1,6 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ModalComponent } from '@components/modal/modal.component';
+import { ModalCloseDirective } from '@directives/modal-close.directive';
+import { ModalOpenDirective } from '@directives/modal-open.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { tablerPackage } from '@ng-icons/tabler-icons';
@@ -9,7 +11,14 @@ import { MetaService } from '@services/meta.service';
 
 @Component({
   selector: 'app-modal-changelog',
-  imports: [NgIconComponent, TippyDirective, SFXDirective, ModalComponent],
+  imports: [
+    NgIconComponent,
+    TippyDirective,
+    SFXDirective,
+    ModalComponent,
+    ModalOpenDirective,
+    ModalCloseDirective,
+  ],
   providers: [provideIcons({ tablerPackage })],
   templateUrl: './modal-changelog.component.html',
   styleUrl: './modal-changelog.component.scss',
@@ -21,7 +30,6 @@ export class ModalChangelogComponent {
   public readonly color = '#089000';
   public currentColor = '#ccc';
 
-  public showChangelog = signal<boolean>(false);
   public currentView = signal<'all' | 'recent'>('recent');
 
   public text = computed(() =>

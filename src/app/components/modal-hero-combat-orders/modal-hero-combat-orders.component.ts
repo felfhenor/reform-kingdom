@@ -28,10 +28,7 @@ import { getEntry } from '@helpers/content';
 import { equippedItemTypes } from '@helpers/equipment';
 import { heroSkillsAtLevel, heroSkillsWithEquipment } from '@helpers/job';
 import { partyGet } from '@helpers/party';
-import {
-  combatOrdersModalCharacterId,
-  combatOrdersModalClose,
-} from '@helpers/ui';
+import { combatOrdersModalCharacterId } from '@helpers/ui';
 import type {
   Character,
   CombatantTargettingType,
@@ -116,8 +113,6 @@ export class ModalHeroCombatOrdersComponent {
   public readonly healthDirectionOptions = HEALTH_DIRECTION_OPTIONS;
   public readonly targetModeOptions = TARGET_MODE_OPTIONS;
   public readonly alwaysRandomClause = ALWAYS_RANDOM_CLAUSE;
-
-  public isVisible = computed(() => !!combatOrdersModalCharacterId());
 
   public character = computed<Character | undefined>(() =>
     partyGet().find((c) => c.id === combatOrdersModalCharacterId()),
@@ -238,10 +233,6 @@ export class ModalHeroCombatOrdersComponent {
     if (this.atRowCap() && !this.isEditing()) return false;
     return !!this.draftCondition() && !!this.draftAction();
   });
-
-  public close(): void {
-    combatOrdersModalClose();
-  }
 
   public setDraftConditionType(
     option: SelectOption<CombatOrderCondition['type']> | null,

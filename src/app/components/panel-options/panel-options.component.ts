@@ -7,8 +7,8 @@ import { PanelOptionsSavefileComponent } from '@components/panel-options-savefil
 import { PanelOptionsUIComponent } from '@components/panel-options-ui/panel-options-ui.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { ModalCloseDirective } from '@directives/modal-close.directive';
 import { options } from '@helpers/state-options';
-import { showOptionsMenu } from '@helpers/ui';
 import type { OptionsTab, OptionsTabLink } from '@interfaces';
 
 @Component({
@@ -21,6 +21,7 @@ import type { OptionsTab, OptionsTabLink } from '@interfaces';
     PanelOptionsSavefileComponent,
     PanelOptionsUIComponent,
     ButtonCloseComponent,
+    ModalCloseDirective,
   ],
   templateUrl: './panel-options.component.html',
   styleUrl: './panel-options.component.scss',
@@ -45,8 +46,4 @@ export class PanelOptionsComponent extends OptionsBaseComponent {
       showIf: computed(() => options().showDebug),
     },
   ];
-
-  closeMenu() {
-    showOptionsMenu.set(false);
-  }
 }
