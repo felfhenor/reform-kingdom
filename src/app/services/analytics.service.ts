@@ -15,10 +15,10 @@ export class AnalyticsService {
   init() {
     if (environment.gameanalytics.game && environment.gameanalytics.secret) {
       this.analytics = gameanalytics.GameAnalytics;
-      this.analytics.configureBuild(
+      this.analytics?.configureBuild?.(
         `${environment.platform} ${this.metaService.versionString()}`,
       );
-      this.analytics.initialize(
+      this.analytics?.initialize?.(
         environment.gameanalytics.game,
         environment.gameanalytics.secret,
       );
