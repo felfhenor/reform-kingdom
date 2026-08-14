@@ -38,10 +38,10 @@
  * (e.g. `warrior,healer`); omit it to report every class.
  */
 
-const fs = require('fs-extra');
-const path = require('path');
-const yaml = require('js-yaml');
-const rec = require('recursive-readdir');
+import fs from 'fs-extra';
+import path from 'path';
+import * as yaml from 'js-yaml';
+import rec from 'recursive-readdir';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const JOB_DIR = path.join(ROOT_DIR, 'gamedata', 'job');

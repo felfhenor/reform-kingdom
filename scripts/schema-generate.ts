@@ -25,11 +25,10 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
-const TJS = require('typescript-json-schema');
-const fs = require('fs-extra');
-const path = require('path');
+import * as TJS from 'typescript-json-schema';
+import fs from 'fs-extra';
+import path from 'path';
 
 // Ensure the schemas directory exists
 const schemasDir = './schemas';
@@ -283,6 +282,7 @@ const program = TJS.getProgramFromFiles(
     ),
     path.resolve(__dirname, '../src/app/interfaces/content-equipment.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-gathering.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-globaleffect.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-item.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-job.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-monster.ts'),
@@ -291,6 +291,10 @@ const program = TJS.getProgramFromFiles(
     path.resolve(__dirname, '../src/app/interfaces/content-skill.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-statuseffect.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-trait.ts'),
+    path.resolve(
+      __dirname,
+      '../src/app/interfaces/content-tradeskill-level-requirement.ts',
+    ),
   ],
   {
     strictNullChecks: false, // Disabled to handle complex types

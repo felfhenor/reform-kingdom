@@ -29,13 +29,12 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
-const fs = require('fs-extra');
-const path = require('path');
-const yaml = require('js-yaml');
-const rec = require('recursive-readdir');
-const { sortBy } = require('es-toolkit/compat');
+import fs from 'fs-extra';
+import path from 'path';
+import * as yaml from 'js-yaml';
+import rec from 'recursive-readdir';
+import { sortBy } from 'es-toolkit/compat';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const RECIPE_DIR = path.join(ROOT_DIR, 'gamedata', 'recipe');

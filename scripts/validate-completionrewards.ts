@@ -16,10 +16,9 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
-const fs = require('fs-extra');
-const path = require('path');
+import fs from 'fs-extra';
+import path from 'path';
 
 const MAPS_DIR = path.resolve(__dirname, '../public/maps');
 const MAP_NAMES_FILE = path.resolve(__dirname, '../public/json/maps.json');

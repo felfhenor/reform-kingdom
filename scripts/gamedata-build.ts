@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const { isArray, isString, isObject } = require('es-toolkit/compat');
-const yaml = require('js-yaml');
-const fs = require('fs-extra');
-const rec = require('recursive-readdir');
+import { isArray, isString, isObject } from 'es-toolkit/compat';
+import * as yaml from 'js-yaml';
+import fs from 'fs-extra';
+import rec from 'recursive-readdir';
 
 fs.ensureDirSync('./public/json');
 
@@ -21,7 +21,7 @@ const processFiles = async () => {
 
       allFilesInSubfolder.forEach((file: string) => {
         try {
-          const doc = yaml.load(fs.readFileSync(file));
+          const doc = yaml.load(fs.readFileSync(file, 'utf-8')) as any[];
 
           idToName[folder] ??= {};
           allData[folder] ??= [];

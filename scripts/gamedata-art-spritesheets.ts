@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const rec = require('recursive-readdir');
-const fs = require('fs-extra');
-const path = require('path');
-const spritesmith = require('spritesmith');
-const { Jimp } = require('jimp');
-const { maxBy, uniqBy } = require('lodash');
-const imagemin = require('imagemin');
-const webp = require('imagemin-webp');
+import rec from 'recursive-readdir';
+import fs from 'fs-extra';
+import path from 'path';
+import spritesmith from 'spritesmith';
+import { Jimp } from 'jimp';
+import { maxBy, uniqBy } from 'lodash';
+import imagemin from 'imagemin';
+import webp from 'imagemin-webp';
 
 const assetsToCopy: string[] = [];
 

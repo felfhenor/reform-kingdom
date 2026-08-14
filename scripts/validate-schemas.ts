@@ -25,13 +25,12 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
-const fs = require('fs-extra');
-const path = require('path');
-const yaml = require('js-yaml');
-const rec = require('recursive-readdir');
-const Ajv = require('ajv');
+import fs from 'fs-extra';
+import path from 'path';
+import * as yaml from 'js-yaml';
+import rec from 'recursive-readdir';
+import Ajv from 'ajv';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const GAMEDATA_DIR = path.join(ROOT_DIR, 'gamedata');

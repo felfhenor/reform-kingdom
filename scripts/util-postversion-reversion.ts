@@ -1,9 +1,10 @@
-const { promisify } = require('util');
-const child = require('child_process');
+import { promisify } from 'util';
+import child from 'child_process';
+import packageJson from '../package.json';
 
 const exec = promisify(child.exec);
 
-const version = require('../package.json').version;
+const version = packageJson.version;
 
 async function rewriteVersion() {
   await exec(`git tag -d v${version}`);

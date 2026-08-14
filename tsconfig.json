@@ -1,5 +1,6 @@
 {
   "compileOnSave": false,
+  "exclude": ["scripts"],
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
     "strict": true,

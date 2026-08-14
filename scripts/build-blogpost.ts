@@ -1,6 +1,5 @@
-const packageJSON = require('../package.json');
-
-const fs = require('fs-extra');
+import fs from 'fs-extra';
+import packageJSON from '../package.json';
 
 const date = new Date();
 const year = date.getFullYear();

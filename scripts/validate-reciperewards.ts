@@ -12,10 +12,9 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
-const fs = require('fs-extra');
-const path = require('path');
+import fs from 'fs-extra';
+import path from 'path';
 
 const RECIPE_FILE = path.resolve(__dirname, '../public/json/recipe.json');
 const ENCOUNTER_FILE = path.resolve(

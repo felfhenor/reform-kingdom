@@ -1,7 +1,5 @@
-const fs = require('fs-extra');
-const describe = require('git-describe');
-
-const { gitDescribeSync } = describe;
+import fs from 'fs-extra';
+import { gitDescribeSync } from 'git-describe';
 
 let gitRev: unknown = 'UNCOMMITTED';
 try {

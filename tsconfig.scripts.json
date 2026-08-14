@@ -1,11 +1,18 @@
 {
   "extends": "./tsconfig.json",
+  "exclude": [],
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "module": "commonjs",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["scripts/simulate/**/*.ts"]
+  "ts-node": {
+    "files": true
+  },
+  "include": ["scripts/**/*.ts"]
 }
 

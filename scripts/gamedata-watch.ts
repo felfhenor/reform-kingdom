@@ -1,7 +1,7 @@
-const { execSync } = require('child_process');
-const fs = require('fs-extra');
-const chokidar = require('chokidar');
-const { uniq, intersection } = require('es-toolkit/compat');
+import { execSync } from 'child_process';
+import fs from 'fs-extra';
+import chokidar from 'chokidar';
+import { uniq, intersection } from 'es-toolkit/compat';
 
 let allUsedSpritesheetKeys: string[] = [];
 
@@ -40,7 +40,7 @@ const startWatch = async () => {
   chokidar
     .watch('gamemaps', {
       ignored: (file: string, stats?: { isFile: () => boolean }) =>
-        stats?.isFile() && !file.endsWith('.json'),
+        !!(stats?.isFile() && !file.endsWith('.json')),
     })
     .on('change', (name: string) => {
       console.log(name);
