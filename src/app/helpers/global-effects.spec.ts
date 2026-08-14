@@ -1,13 +1,16 @@
 import type { GameState, GlobalEffectContent, GlobalEffectId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/character-progress', () => ({
+  healingTicksForLevel: vi.fn(() => 4),
+  healPartyToFull: vi.fn(),
+}));
+
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
 vi.mock('@helpers/party', () => ({
-  healingTicksForLevel: vi.fn(() => 4),
-  healPartyToFull: vi.fn(),
   partyGet: vi.fn(() => []),
 }));
 
@@ -28,6 +31,7 @@ vi.mock('@helpers/world-nodes', () => ({
   worldNodesOfType: vi.fn(() => []),
 }));
 
+import { healPartyToFull } from '@helpers/character-progress';
 import { getEntry } from '@helpers/content';
 import {
   activeGlobalEffects,
@@ -37,7 +41,6 @@ import {
   isGlobalEffectActive,
   removeGlobalEffect,
 } from '@helpers/global-effects';
-import { healPartyToFull } from '@helpers/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { timerTicksElapsed } from '@helpers/timer';
 import { currentLocationSet } from '@helpers/world';

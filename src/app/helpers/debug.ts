@@ -1,13 +1,13 @@
 import { armoryAdd } from '@helpers/armory';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { TRADESKILL_MAX_LEVEL, tradeskillXpForLevel } from '@helpers/crafting';
 import { addMaterial } from '@helpers/materials';
 import {
   CHARACTER_MAX_LEVEL,
   characterStatsForLevel,
   characterXpForLevel,
 } from '@helpers/party';
+import { TRADESKILL_MAX_LEVEL, tradeskillXpForLevel } from '@helpers/tradeskill';
 import { updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import {

@@ -1,9 +1,10 @@
+import { partyGainXp } from '@helpers/character-progress';
 import { gatherMessageLog, itemDropHtml } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/luck';
 import { addMaterial } from '@helpers/materials';
-import { partyGainXp, partyGet } from '@helpers/party';
+import { partyGet } from '@helpers/party';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeByName, worldNodeGathering } from '@helpers/world-nodes';

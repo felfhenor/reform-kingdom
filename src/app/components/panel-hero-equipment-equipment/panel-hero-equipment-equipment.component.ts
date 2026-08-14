@@ -8,17 +8,17 @@ import {
 } from '@angular/core';
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
+import {
+  characterEquipFromArmory,
+  characterUnequipToArmory,
+  optimizeCharacterEquipment,
+} from '@helpers/character-equipment';
 import { getEntry } from '@helpers/content';
 import {
   canEquipItem,
   equipmentAvailableForSlot,
   isSlotAvailableForJob,
 } from '@helpers/equipment';
-import {
-  characterEquipFromArmory,
-  characterUnequipToArmory,
-  optimizeCharacterEquipment,
-} from '@helpers/party';
 import type {
   Character,
   EquipmentArmoryEntry,

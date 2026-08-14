@@ -1,6 +1,7 @@
+import { healingTicksForLevel, healPartyToFull } from '@helpers/character-progress';
 import { miscellaneousMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
-import { healingTicksForLevel, healPartyToFull, partyGet } from '@helpers/party';
+import { partyGet } from '@helpers/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { timerTicksElapsed } from '@helpers/timer';
 import { currentLocationSet } from '@helpers/world';

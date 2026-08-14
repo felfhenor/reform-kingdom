@@ -6,6 +6,7 @@ import {
   autoModeResetNodeFailureCounts,
 } from '@helpers/auto-mode';
 import { monsterRecordKill } from '@helpers/bestiary';
+import { partyGainXp, syncPartyHpFromCombat } from '@helpers/character-progress';
 import { combatReset, currentCombat } from '@helpers/combat';
 import { combatMessageLog } from '@helpers/combat-log';
 import { grantResolvedDrops } from '@helpers/combat-rewards';
@@ -14,7 +15,6 @@ import { encounterStartFight } from '@helpers/encounter';
 import { encounterRandomHandleVictory } from '@helpers/encounter-random-combat';
 import { rollDroppedRewards } from '@helpers/loot';
 import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
-import { partyGainXp, syncPartyHpFromCombat } from '@helpers/party';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {
   Combat,

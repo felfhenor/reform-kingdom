@@ -1,6 +1,6 @@
 import { autoModeProcessTick } from '@helpers/auto-mode';
 import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
-import { craftProcessTick } from '@helpers/crafting';
+import { craftProcessTick } from '@helpers/crafting-queue';
 import { decreeClauses } from '@helpers/decree';
 import {
   mostChallengingExploreNodeForRisk,

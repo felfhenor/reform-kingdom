@@ -16,6 +16,11 @@ vi.mock('@helpers/bestiary', () => ({
   monsterRecordKill: vi.fn(),
 }));
 
+vi.mock('@helpers/character-progress', () => ({
+  partyGainXp: vi.fn(),
+  syncPartyHpFromCombat: vi.fn(),
+}));
+
 vi.mock('@helpers/combat', () => ({
   combatReset: vi.fn(),
   currentCombat: vi.fn(),
@@ -54,11 +59,6 @@ vi.mock('@helpers/monster', () => ({
   xpForOverLevel: vi.fn((rawXp: number) => rawXp),
 }));
 
-vi.mock('@helpers/party', () => ({
-  partyGainXp: vi.fn(),
-  syncPartyHpFromCombat: vi.fn(),
-}));
-
 vi.mock('@helpers/recipes', () => ({
   recipeDiscover: vi.fn(),
 }));
@@ -75,6 +75,7 @@ import {
   autoModeResetNodeFailureCounts,
 } from '@helpers/auto-mode';
 import { monsterRecordKill } from '@helpers/bestiary';
+import { partyGainXp } from '@helpers/character-progress';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { combatReset } from '@helpers/combat';
 import { combatCheckIfOver } from '@helpers/combat-end';
@@ -83,7 +84,6 @@ import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { rollDroppedRewards } from '@helpers/loot';
 import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
-import { partyGainXp } from '@helpers/party';
 import { recipeDiscover } from '@helpers/recipes';
 import { travelBeginDeathsDoor } from '@helpers/travel';
 import type {

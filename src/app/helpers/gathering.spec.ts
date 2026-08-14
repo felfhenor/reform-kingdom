@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/character-progress', () => ({
+  partyGainXp: vi.fn(),
+}));
+
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
@@ -22,7 +26,6 @@ vi.mock('@helpers/materials', () => ({
 }));
 
 vi.mock('@helpers/party', () => ({
-  partyGainXp: vi.fn(),
   partyGet: vi.fn(),
 }));
 
@@ -40,6 +43,7 @@ vi.mock('@helpers/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
+import { partyGainXp } from '@helpers/character-progress';
 import { gatherMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import {
@@ -56,7 +60,7 @@ import {
 } from '@helpers/gathering';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/luck';
 import { addMaterial } from '@helpers/materials';
-import { partyGainXp, partyGet } from '@helpers/party';
+import { partyGet } from '@helpers/party';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeByName, worldNodeGathering } from '@helpers/world-nodes';

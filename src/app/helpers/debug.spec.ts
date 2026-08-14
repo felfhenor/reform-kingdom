@@ -26,11 +26,6 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/crafting', () => ({
-  TRADESKILL_MAX_LEVEL: 50,
-  tradeskillXpForLevel: vi.fn(),
-}));
-
 vi.mock('@helpers/materials', () => ({
   addMaterial: vi.fn(),
 }));
@@ -39,6 +34,11 @@ vi.mock('@helpers/party', () => ({
   CHARACTER_MAX_LEVEL: 99,
   characterStatsForLevel: vi.fn(),
   characterXpForLevel: vi.fn(),
+}));
+
+vi.mock('@helpers/tradeskill', () => ({
+  TRADESKILL_MAX_LEVEL: 50,
+  tradeskillXpForLevel: vi.fn(),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -57,7 +57,6 @@ vi.mock('@helpers/world-node-discovery', () => ({
 import { armoryAdd } from '@helpers/armory';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { tradeskillXpForLevel } from '@helpers/crafting';
 import {
   debugDiscoverWorldNode,
   debugGiveAllEquipment,
@@ -73,6 +72,7 @@ import {
 import { addMaterial } from '@helpers/materials';
 import { characterStatsForLevel, characterXpForLevel } from '@helpers/party';
 import { updateGamestate } from '@helpers/state-game';
+import { tradeskillXpForLevel } from '@helpers/tradeskill';
 import {
   worldNodeDiscover,
   worldNodeUndiscover,

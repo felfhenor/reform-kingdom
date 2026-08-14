@@ -23,9 +23,12 @@ vi.mock('@helpers/collectibles', () => ({
   pruneInvalidCollectibles: vi.fn((collectibles) => collectibles),
 }));
 
+vi.mock('@helpers/character-progress', () => ({
+  retrofitPartyXp: vi.fn((party) => party),
+}));
+
 vi.mock('@helpers/crafting', () => ({
   pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
-  retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
 }));
 
 vi.mock('@helpers/equipment', () => ({
@@ -39,11 +42,14 @@ vi.mock('@helpers/materials', () => ({
 
 vi.mock('@helpers/party', () => ({
   pruneInvalidPartyEquipment: vi.fn((party) => party),
-  retrofitPartyXp: vi.fn((party) => party),
 }));
 
 vi.mock('@helpers/recipes', () => ({
   pruneInvalidDiscoveredRecipes: vi.fn((discovered) => discovered),
+}));
+
+vi.mock('@helpers/tradeskill', () => ({
+  retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
 }));
 
 vi.mock('@helpers/defaults', () => ({
@@ -92,17 +98,18 @@ import {
   pruneInvalidArmoryItems,
   pruneInvalidDiscoveredEquipment,
 } from '@helpers/armory';
+import { retrofitPartyXp } from '@helpers/character-progress';
 import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
-import { retrofitTradeskillXp } from '@helpers/crafting';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
-import { pruneInvalidPartyEquipment, retrofitPartyXp } from '@helpers/party';
+import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
+import { retrofitTradeskillXp } from '@helpers/tradeskill';
 import { worldNodesOfType } from '@helpers/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
 

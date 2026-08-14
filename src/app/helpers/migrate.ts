@@ -10,10 +10,8 @@ import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
-import {
-  pruneInvalidCraftQueues,
-  retrofitTradeskillXp,
-} from '@helpers/crafting';
+import { retrofitPartyXp } from '@helpers/character-progress';
+import { pruneInvalidCraftQueues } from '@helpers/crafting';
 import { defaultGameState } from '@helpers/defaults';
 import {
   backfillEquipmentBlock,
@@ -24,8 +22,9 @@ import {
   pruneInvalidGatherNodeDiscoveries,
 } from '@helpers/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/materials';
-import { pruneInvalidPartyEquipment, retrofitPartyXp } from '@helpers/party';
+import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
+import { retrofitTradeskillXp } from '@helpers/tradeskill';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node-discovery';
 import {
   gamestate,

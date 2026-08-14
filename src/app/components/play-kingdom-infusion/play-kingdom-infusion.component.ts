@@ -12,6 +12,7 @@ import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
+import { characterInfuseEquipment } from '@helpers/character-equipment';
 import { getEntry } from '@helpers/content';
 import { equippedItemsByPrimarySlot } from '@helpers/equipment';
 import {
@@ -21,7 +22,7 @@ import {
   isInfusionMaterial,
 } from '@helpers/infusion';
 import { getGoldQuantity, goldCoinId } from '@helpers/materials';
-import { characterInfuseEquipment, partyGet } from '@helpers/party';
+import { partyGet } from '@helpers/party';
 import { getStorageMaterials } from '@helpers/storage';
 import type {
   Character,

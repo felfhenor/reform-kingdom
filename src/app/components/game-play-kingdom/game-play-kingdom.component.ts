@@ -21,7 +21,6 @@ import {
   craftQueueTicksRemaining,
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
-  tradeskillBuilding,
 } from '@helpers/crafting';
 import {
   getMuseumCollectibleEntries,
@@ -29,6 +28,7 @@ import {
 } from '@helpers/museum';
 import { gamestate } from '@helpers/state-game';
 import { formatDuration } from '@helpers/timer';
+import { tradeskillBuilding } from '@helpers/tradeskill';
 import {
   kingdomSubview,
   kingdomSubviewShow,
