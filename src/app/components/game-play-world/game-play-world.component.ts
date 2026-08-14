@@ -106,6 +106,15 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   private cameraOffset = signal<CameraPosition>({ x: 0, y: 0 });
 
+  // Captured once when a pan first moves the camera away from center, and
+  // held fixed for as long as the camera stays panned - see `panCamera` and
+  // `positionCamera`. Without this, re-deriving the hero-centered base from
+  // the party's live position every frame (as `positionCamera` otherwise
+  // does) would drag the panned view along with the party as it moves,
+  // which is exactly the "auto follow" behavior panning is meant to escape.
+  // Cleared by `recenterCamera` to resume following.
+  private frozenCameraBase?: CameraPosition;
+
   public fadeVisible = signal<boolean>(false);
   public isMapLoading = signal<boolean>(true);
 
@@ -161,12 +170,6 @@ export class GamePlayWorldComponent implements OnDestroy {
   private stepStartTime = performance.now();
   private stepDurationMs = 0;
   private hasActiveStep = false;
-
-  // Tracks whether the party was mid-glide as of the last frame, so
-  // `updateVisualPosition` can tell a fresh departure (stationary -> moving)
-  // apart from an ongoing glide - a panned camera only needs recentering at
-  // the moment travel starts, not on every step-to-step handoff within it.
-  private wasMoving = false;
 
   // Whether the "at location" indicator (rather than the walking token) is
   // currently shown - driven by visual arrival (see `updatePlayerIndicator`),
@@ -278,6 +281,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     this.loadedMapName = mapName;
     this.cameraOffset.set({ x: 0, y: 0 });
+    this.frozenCameraBase = undefined;
 
     await this.initPixi(map);
 
@@ -506,18 +510,24 @@ export class GamePlayWorldComponent implements OnDestroy {
   private panCamera(dragDeltaX: number, dragDeltaY: number): void {
     if (!this.app || !this.map) return;
 
-    const location = this.visualPosition;
     const viewportWidthTiles = this.app.screen.width / this.map.tilewidth;
     const viewportHeightTiles = this.app.screen.height / this.map.tileheight;
 
-    const base = cameraPositionCalculate(
-      location.x,
-      location.y,
-      viewportWidthTiles,
-      viewportHeightTiles,
-      this.map.width,
-      this.map.height,
-    );
+    // Anchor the pan to wherever the hero-centered camera is right now, but
+    // only the first time this pan gesture moves it off-center - subsequent
+    // drag deltas (and any party movement in between) accumulate against
+    // this same frozen anchor instead of a freshly re-centered one.
+    if (!this.frozenCameraBase) {
+      const location = this.visualPosition;
+      this.frozenCameraBase = cameraPositionCalculate(
+        location.x,
+        location.y,
+        viewportWidthTiles,
+        viewportHeightTiles,
+        this.map.width,
+        this.map.height,
+      );
+    }
     const bounds = cameraBoundsCalculate(
       viewportWidthTiles,
       viewportHeightTiles,
@@ -532,7 +542,7 @@ export class GamePlayWorldComponent implements OnDestroy {
         dragDeltaY,
         this.map.tilewidth,
         this.map.tileheight,
-        base,
+        this.frozenCameraBase,
         bounds,
       ),
     );
@@ -542,6 +552,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   public recenterCamera(): void {
     this.cameraOffset.set({ x: 0, y: 0 });
+    this.frozenCameraBase = undefined;
     this.positionCamera();
   }
 
@@ -658,7 +669,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (location.mapName !== this.visualPosition.mapName) {
       this.visualPosition = { ...location };
       this.hasActiveStep = false;
-      this.wasMoving = false;
       return;
     }
 
@@ -672,7 +682,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!inFlightStep || inFlightStep.kind === 'Teleport') {
       this.visualPosition = { ...location };
       this.hasActiveStep = false;
-      this.wasMoving = false;
       return;
     }
 
@@ -683,12 +692,6 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.stepDestinationTile.y !== inFlightStep.y;
 
     if (destinationChanged) {
-      // Only a genuine stationary -> moving transition (not a step-to-step
-      // handoff within an ongoing glide) should recenter a panned camera.
-      if (!this.hasActiveStep && this.isPanned()) {
-        this.recenterCamera();
-      }
-
       // Origin is wherever the token is *currently rendered* - not the
       // tick-driven `location` - so a handoff from one step to the next
       // never causes a visible snap even if the previous glide hadn't
@@ -721,8 +724,6 @@ export class GamePlayWorldComponent implements OnDestroy {
         this.stepOriginTile.y +
         (this.stepDestinationTile.y - this.stepOriginTile.y) * fraction,
     };
-
-    this.wasMoving = fraction < 1;
   }
 
   private positionCamera(): void {
@@ -740,14 +741,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     const viewportWidthTiles = this.app.screen.width / this.map.tilewidth;
     const viewportHeightTiles = this.app.screen.height / this.map.tileheight;
 
-    const base = cameraPositionCalculate(
-      location.x,
-      location.y,
-      viewportWidthTiles,
-      viewportHeightTiles,
-      this.map.width,
-      this.map.height,
-    );
     const bounds = cameraBoundsCalculate(
       viewportWidthTiles,
       viewportHeightTiles,
@@ -756,12 +749,25 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     const offset = this.cameraOffset();
 
-    // `offset` was clamped relative to `base` back when the drag happened
-    // (see `panCamera`), but `base` shifts as the party moves - if the party
-    // then walks toward the same edge the camera was already panned against,
-    // the stale offset can push `base + offset` past the map edge. Reclamping
-    // the combined position (rather than trusting the offset alone) keeps
-    // the camera pinned at the edge exactly like a fresh pan would.
+    // While panned, stay anchored at `frozenCameraBase` instead of
+    // re-deriving the hero-centered base from the party's live position -
+    // otherwise the party moving would drag the panned view along with it.
+    // Once recentered, `frozenCameraBase` is cleared and this goes back to
+    // tracking the party every frame.
+    const base =
+      this.frozenCameraBase ??
+      cameraPositionCalculate(
+        location.x,
+        location.y,
+        viewportWidthTiles,
+        viewportHeightTiles,
+        this.map.width,
+        this.map.height,
+      );
+
+    // Reclamping the combined position (rather than trusting `offset` alone)
+    // covers cases like a viewport resize while panned shifting the bounds
+    // out from under the frozen base.
     const camera = {
       x: clamp(base.x + offset.x, bounds.minX, bounds.maxX),
       y: clamp(base.y + offset.y, bounds.minY, bounds.maxY),
