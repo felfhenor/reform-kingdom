@@ -11,12 +11,14 @@ import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { defaultStats } from '@helpers/defaults';
+import { getEntry } from '@helpers/content';
 import { equipmentItemInfusionBonus } from '@helpers/infusion';
 import {
   StatShorthand,
   type BaseStat,
   type EquipmentContent,
   type EquipmentItem,
+  type EquipmentSkillContent,
   type StatBlock,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -61,4 +63,12 @@ export class CardEquipmentItemComponent {
   public totalStatValue(stat: BaseStat): number {
     return this.equipment().baseStats[stat] + this.infusionBonus()[stat];
   }
+
+  public grantedSkills = computed<EquipmentSkillContent[]>(() =>
+    this.equipment()
+      .grantedSkillIds.map((skillId) =>
+        getEntry<EquipmentSkillContent>(skillId),
+      )
+      .filter((skill): skill is EquipmentSkillContent => !!skill),
+  );
 }

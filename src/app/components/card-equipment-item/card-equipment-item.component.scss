@@ -34,3 +34,18 @@
 .equipment-item-row-stat {
   @apply flex items-center gap-2;
 }
+
+// Very small inline rendering of a granted skill's icon next to "Teaches" -
+// shrinks the shared 64px icon-blank-slot box down via scale, matching
+// `.equipment-slot-granted-skill-icon` (slot-equipment).
+.equipment-item-row-granted-skill-icon {
+  @apply relative overflow-hidden shrink-0 inline-block align-middle;
+  width: 16px;
+  height: 16px;
+
+  app-icon-blank-slot {
+    display: block;
+    transform: scale(0.25);
+    transform-origin: top left;
+  }
+}
