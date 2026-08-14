@@ -158,6 +158,22 @@ export const mapMoveCostMatrices = computed<Map<string, number[][]>>(() => {
   return matrices;
 });
 
+const mapPathMatrices = computed<Map<string, boolean[][]>>(() => {
+  const matrices = new Map<string, boolean[][]>();
+
+  allMaps().forEach((gameMap, mapName) => {
+    matrices.set(mapName, tiledMapPathMatrix(gameMap.data as TiledMap));
+  });
+
+  return matrices;
+});
+
+// Whether a specific tile is on an authored path - used by `helpers/travel.ts`
+// to charge the faster on-path travel tick cost for that step.
+export function tileIsOnPath(mapName: string, x: number, y: number): boolean {
+  return mapPathMatrices().get(mapName)?.[y]?.[x] ?? false;
+}
+
 // A query-specific copy of the map's move cost matrix with every node tile
 // blocked, except the `allowedTiles` (this query's own from/to endpoints) -
 // so a path never cuts through some other, unrelated node along the way.

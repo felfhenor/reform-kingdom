@@ -19,6 +19,7 @@ import {
   tiledMapMoveCostMatrix,
   tiledMapPathMatrix,
   tiledMapWalkabilityMatrix,
+  tileIsOnPath,
   travelPathTo,
 } from '@helpers/pathfinding';
 import { allMaps } from '@helpers/maps';
@@ -235,6 +236,37 @@ describe('tiledMapMoveCostMatrix', () => {
     expect(matrix[0][1]).toBe(Number.POSITIVE_INFINITY);
     expect(matrix[0][2]).toBeGreaterThan(matrix[0][0]);
     expect(Number.isFinite(matrix[0][2])).toBe(true);
+  });
+});
+
+describe('tileIsOnPath', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('is true for a tile covered by the Path Tiles layer', () => {
+    const pathTilesLayer: TiledLayer = {
+      id: 1,
+      name: 'Path Tiles',
+      type: 'tilelayer',
+      visible: true,
+      width: 3,
+      height: 3,
+      data: [0, 0, 0, 0, 5, 0, 0, 0, 0],
+    };
+    const map: TiledMap = { ...buildOpenMap(3, 3), layers: [pathTilesLayer] };
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([['Carrina', { name: 'Carrina', data: map }]]),
+    );
+
+    expect(tileIsOnPath('Carrina', 1, 1)).toBe(true);
+    expect(tileIsOnPath('Carrina', 0, 0)).toBe(false);
+  });
+
+  it('is false for a map that has not been loaded', () => {
+    vi.mocked(allMaps).mockReturnValue(new Map<string, GameMap>());
+
+    expect(tileIsOnPath('Unknown', 0, 0)).toBe(false);
   });
 });
 

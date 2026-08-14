@@ -39,8 +39,9 @@ import {
   pixiSpriteFrameTexturesLoad,
   pixiTiledMapTexturesLoad,
 } from '@helpers/pixi-texture-loader';
+import { gamestate } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import { TICKS_PER_STEP_MOVE } from '@helpers/travel';
+import { travelStepTicksCost } from '@helpers/travel';
 import {
   isWorldCameraPanned,
   mapNodeDeselect,
@@ -70,10 +71,6 @@ import type { Application, Container, Graphics, Text, Texture } from 'pixi.js';
 
 const JOB_SPRITESHEET_URL = 'art/spritesheets/job.webp';
 
-// Matches the per-tile travel pace at 1x game speed (see
-// `helpers/travel.ts`); scaled by the game speed option below so the visual
-// glide keeps pace with how fast the party is actually moving.
-const BASE_TILES_PER_SECOND = 1 / TICKS_PER_STEP_MOVE;
 const FADE_DURATION_MS = 300;
 
 @Component({
@@ -147,15 +144,28 @@ export class GamePlayWorldComponent implements OnDestroy {
   // The rendered token/camera position, eased toward `currentLocation` in
   // real time rather than snapping to it - see `updateVisualPosition`. Kept
   // separate from `currentLocation` (which is the tick-driven, save-safe
-  // source of truth) so game logic never has to reason about fractional
-  // tile positions.
+  // source of truth, and only jumps once *every* tick of a step has
+  // resolved) so game logic never has to reason about fractional tile
+  // positions.
   private visualPosition: CurrentLocation = { mapName: '', x: 0, y: 0 };
-  private lastVisualFrameTime = performance.now();
 
-  // Tracks whether the party was mid-glide as of the last tick, so
+  // The endpoints and real-time schedule of whichever travel step is
+  // currently being glided toward - captured once when that step first
+  // becomes current (see `updateVisualPosition`), not recomputed per frame,
+  // so the glide's pace stays constant for the step's whole duration instead
+  // of drifting as `visualPosition` moves. `stepOriginTile` starts from
+  // wherever `visualPosition` already was (not the tick-driven origin tile)
+  // so a step-to-step handoff never causes a visible snap.
+  private stepOriginTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
+  private stepDestinationTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
+  private stepStartTime = performance.now();
+  private stepDurationMs = 0;
+  private hasActiveStep = false;
+
+  // Tracks whether the party was mid-glide as of the last frame, so
   // `updateVisualPosition` can tell a fresh departure (stationary -> moving)
   // apart from an ongoing glide - a panned camera only needs recentering at
-  // the moment travel starts, not on every frame of it.
+  // the moment travel starts, not on every step-to-step handoff within it.
   private wasMoving = false;
 
   // Whether the "at location" indicator (rather than the walking token) is
@@ -249,6 +259,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private async snapVisualPositionTo(target: CurrentLocation): Promise<void> {
     await this.fadeOut();
     this.visualPosition = { ...target };
+    this.hasActiveStep = false;
     this.positionCamera();
     await this.fadeIn();
   }
@@ -330,6 +341,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     this.map = map;
     this.visualPosition = { ...currentLocationGet() };
+    this.hasActiveStep = false;
     mapNodeDeselect();
 
     this.app = await pixiAppInitialize(element, {
@@ -400,7 +412,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.isShowingAtLocationIndicator = isPlayerAtLocation();
     this.setupPlayerIndicator();
 
-    this.lastVisualFrameTime = performance.now();
     this.visualPositionTicker = () => {
       this.checkForMapChange(currentLocationGet().mapName);
       this.checkForDeathsDoorRecall();
@@ -623,47 +634,95 @@ export class GamePlayWorldComponent implements OnDestroy {
   }
 
   // Eases the rendered token position toward the tick-driven, authoritative
-  // `currentLocation` at a fixed real-world pace (scaled by game speed)
-  // instead of snapping - see the field doc on `visualPosition`. A map
-  // change is handled separately (with a fade) by `transitionToMap`, so a
-  // mismatched map name here just snaps rather than gliding across maps.
+  // `currentLocation` instead of snapping - see the field doc on
+  // `visualPosition`. Deliberately does *not* wait for a travel step to
+  // fully resolve (i.e. for `currentLocation` to jump) before starting to
+  // glide toward it: a step's ticks only resolve in a single lump once every
+  // `travelStepTicksCost` ticks (see `helpers/travel.ts`), so gliding *after*
+  // that jump instead of *during* it would mean the token sits fully still
+  // for the whole tick-accumulation window and then glides - doubling the
+  // real-world time per tile and, worse, making every path/off-path speed
+  // change look like a dead stop. Instead, the moment a new step becomes
+  // current (`travel.path[0]`), its real-time schedule is captured once (see
+  // `stepOriginTile`/`stepDurationMs`) and the token eases toward it
+  // continuously for that step's whole duration, landing on the destination
+  // tile at (approximately) the same real moment the tick layer resolves it.
+  // A map change is handled separately (with a fade) by `transitionToMap`,
+  // so a mismatched map name here just snaps rather than gliding across maps.
   private updateVisualPosition(): void {
     if (!this.map) return;
 
     const now = performance.now();
-    const deltaSeconds = (now - this.lastVisualFrameTime) / 1000;
-    this.lastVisualFrameTime = now;
 
-    const target = currentLocationGet();
-    if (target.mapName !== this.visualPosition.mapName) {
-      this.visualPosition = { ...target };
+    const location = currentLocationGet();
+    if (location.mapName !== this.visualPosition.mapName) {
+      this.visualPosition = { ...location };
+      this.hasActiveStep = false;
       this.wasMoving = false;
       return;
     }
 
-    const dx = target.x - this.visualPosition.x;
-    const dy = target.y - this.visualPosition.y;
-    const distance = Math.hypot(dx, dy);
+    const travel = gamestate().world.travel;
+    const inFlightStep =
+      travel.status === 'Traveling' ? travel.path[0] : undefined;
 
-    if (distance > 0 && !this.wasMoving && this.isPanned()) {
-      this.recenterCamera();
-    }
-    this.wasMoving = distance > 0;
-
-    if (distance === 0) return;
-
-    const speedMultiplier = getOption('debugTickMultiplier');
-    const maxStep = BASE_TILES_PER_SECOND * speedMultiplier * deltaSeconds;
-
-    if (distance <= maxStep) {
-      this.visualPosition.x = target.x;
-      this.visualPosition.y = target.y;
+    // Idle, or an instant (0-tick) Teleport hop that's about to resolve in
+    // the same tick it became current - nothing to glide toward, so settle
+    // directly onto the authoritative tile.
+    if (!inFlightStep || inFlightStep.kind === 'Teleport') {
+      this.visualPosition = { ...location };
+      this.hasActiveStep = false;
+      this.wasMoving = false;
       return;
     }
 
-    const ratio = maxStep / distance;
-    this.visualPosition.x += dx * ratio;
-    this.visualPosition.y += dy * ratio;
+    const destinationChanged =
+      !this.hasActiveStep ||
+      this.stepDestinationTile.mapName !== inFlightStep.mapName ||
+      this.stepDestinationTile.x !== inFlightStep.x ||
+      this.stepDestinationTile.y !== inFlightStep.y;
+
+    if (destinationChanged) {
+      // Only a genuine stationary -> moving transition (not a step-to-step
+      // handoff within an ongoing glide) should recenter a panned camera.
+      if (!this.hasActiveStep && this.isPanned()) {
+        this.recenterCamera();
+      }
+
+      // Origin is wherever the token is *currently rendered* - not the
+      // tick-driven `location` - so a handoff from one step to the next
+      // never causes a visible snap even if the previous glide hadn't
+      // pixel-perfectly finished yet.
+      this.stepOriginTile = { ...this.visualPosition };
+      this.stepDestinationTile = {
+        mapName: inFlightStep.mapName,
+        x: inFlightStep.x,
+        y: inFlightStep.y,
+      };
+
+      const speedMultiplier = Math.max(getOption('debugTickMultiplier'), 0.001);
+      const stepTicks = travelStepTicksCost(inFlightStep, location);
+      this.stepDurationMs = (stepTicks * 1000) / speedMultiplier;
+      this.stepStartTime = now;
+      this.hasActiveStep = true;
+    }
+
+    const fraction =
+      this.stepDurationMs > 0
+        ? clamp((now - this.stepStartTime) / this.stepDurationMs, 0, 1)
+        : 1;
+
+    this.visualPosition = {
+      mapName: location.mapName,
+      x:
+        this.stepOriginTile.x +
+        (this.stepDestinationTile.x - this.stepOriginTile.x) * fraction,
+      y:
+        this.stepOriginTile.y +
+        (this.stepDestinationTile.y - this.stepOriginTile.y) * fraction,
+    };
+
+    this.wasMoving = fraction < 1;
   }
 
   private positionCamera(): void {

@@ -29,6 +29,7 @@ vi.mock('@helpers/gathering', () => ({
 
 vi.mock('@helpers/pathfinding', () => ({
   mapHopsBetween: vi.fn(() => 0),
+  tileIsOnPath: vi.fn(() => false),
   travelPathTo: vi.fn(),
 }));
 
@@ -47,6 +48,7 @@ vi.mock('@helpers/world-node-encounter', () => ({
 }));
 
 vi.mock('@helpers/world-nodes', () => ({
+  worldNodeAt: vi.fn(() => undefined),
   worldNodeByName: vi.fn(),
   worldNodeEncounter: vi.fn(),
   worldNodeEncounterRandom: vi.fn(),
@@ -64,7 +66,7 @@ import { encounterStartFight } from '@helpers/encounter';
 import { gatherNodeDiscover } from '@helpers/gather-node-discovery';
 import { travelMessageLog } from '@helpers/combat-log';
 import { gatheringStart, gatheringStop } from '@helpers/gathering';
-import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding';
+import { mapHopsBetween, tileIsOnPath, travelPathTo } from '@helpers/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   canPartyTravel,
@@ -74,6 +76,7 @@ import {
 } from '@helpers/travel';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
+  worldNodeAt,
   worldNodeByName,
   worldNodeEncounter,
   worldNodeGathering,
@@ -439,6 +442,8 @@ describe('travelProcessTick', () => {
       x: 0,
       y: 0,
     });
+    vi.mocked(tileIsOnPath).mockReturnValue(false);
+    vi.mocked(worldNodeAt).mockReturnValue(undefined);
   });
 
   it('does nothing when idle', () => {
@@ -452,7 +457,8 @@ describe('travelProcessTick', () => {
     expect(currentLocationSet).not.toHaveBeenCalled();
   });
 
-  it('accumulates ticks without moving until the step cost is reached', () => {
+  it('accumulates ticks without moving until an off-path step cost is reached', () => {
+    vi.mocked(tileIsOnPath).mockReturnValue(false);
     vi.mocked(gamestate).mockReturnValue(
       stateWithTravel({
         status: 'Traveling',
@@ -473,7 +479,8 @@ describe('travelProcessTick', () => {
     expect(result.world.travel.ticksIntoStep).toBe(2);
   });
 
-  it('completes a step at the 3-tick cost, moving to the next tile', () => {
+  it('completes an off-path step at the 3-tick cost, moving to the next tile', () => {
+    vi.mocked(tileIsOnPath).mockReturnValue(false);
     vi.mocked(gamestate).mockReturnValue(
       stateWithTravel({
         status: 'Traveling',
@@ -503,6 +510,129 @@ describe('travelProcessTick', () => {
       path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
       ticksIntoStep: 0,
     });
+  });
+
+  it('completes an on-path step at the 1-tick cost, moving to the next tile', () => {
+    vi.mocked(tileIsOnPath).mockReturnValue(true);
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Field Ruins',
+        path: [
+          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+        ],
+        ticksIntoStep: 0,
+      }),
+    );
+
+    travelProcessTick();
+
+    expect(currentLocationSet).toHaveBeenCalledWith({
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+    });
+    const result = applyLastUpdate(stateWithTravel({
+      status: 'Traveling',
+      path: [],
+      ticksIntoStep: 0,
+    }));
+    expect(result.world.travel).toEqual({
+      status: 'Traveling',
+      path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
+      ticksIntoStep: 0,
+    });
+  });
+
+  it('completes a step onto an off-path node tile at the 1-tick cost, so arrival never stutters', () => {
+    vi.mocked(tileIsOnPath).mockReturnValue(false);
+    vi.mocked(worldNodeAt).mockImplementation((_mapName, x, y) =>
+      x === 1 && y === 0
+        ? ({ nodeName: 'Field Ruins' } as unknown as WorldNodeEntry)
+        : undefined,
+    );
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Field Ruins',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+        ticksIntoStep: 0,
+      }),
+    );
+
+    travelProcessTick();
+
+    expect(currentLocationSet).toHaveBeenCalledWith({
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+    });
+  });
+
+  it('completes a step off of an off-path node tile at the 1-tick cost, so departure never stutters', () => {
+    vi.mocked(tileIsOnPath).mockReturnValue(false);
+    vi.mocked(currentLocationGet).mockReturnValue({
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+    });
+    vi.mocked(worldNodeAt).mockImplementation((_mapName, x, y) =>
+      x === 1 && y === 0
+        ? ({ nodeName: 'Field Ruins' } as unknown as WorldNodeEntry)
+        : undefined,
+    );
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Old Town',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
+        ticksIntoStep: 0,
+      }),
+    );
+
+    travelProcessTick();
+
+    expect(currentLocationSet).toHaveBeenCalledWith({
+      mapName: 'Carrina',
+      x: 2,
+      y: 0,
+    });
+  });
+
+  it('still charges the off-path cost leaving an ordinary (non-node) path tile onto an off-path tile', () => {
+    vi.mocked(currentLocationGet).mockReturnValue({
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+    });
+    // Origin (1,0) is on-path but not a node; destination (2,0) is neither -
+    // the origin's own on-path status must not discount this step, or every
+    // path -> off-path transition would be mispriced as cheap.
+    vi.mocked(tileIsOnPath).mockImplementation(
+      (_mapName, x, y) => x === 1 && y === 0,
+    );
+    vi.mocked(worldNodeAt).mockReturnValue(undefined);
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Field Ruins',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
+        ticksIntoStep: 1,
+      }),
+    );
+
+    travelProcessTick();
+
+    // With the (buggy) 1-tick cost this would already complete at tick 2;
+    // the off-path 3-tick cost means it shouldn't yet.
+    expect(currentLocationSet).not.toHaveBeenCalled();
+    const result = applyLastUpdate(stateWithTravel({
+      status: 'Traveling',
+      path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
+      ticksIntoStep: 1,
+    }));
+    expect(result.world.travel.ticksIntoStep).toBe(2);
   });
 
   it('resolves a Teleport step instantly, in the same tick as the Move step before it', () => {

@@ -16,7 +16,7 @@ import { PanelMapNodeBadgesExploreComponent } from '@components/panel-map-node-b
 import { PanelMapNodeBadgesGatherComponent } from '@components/panel-map-node-badges-gather/panel-map-node-badges-gather.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { sortBy } from 'es-toolkit/compat';
+import { sortBy, sum } from 'es-toolkit/compat';
 import { caravanBrandName } from '@helpers/caravan';
 import { encounterStartFight } from '@helpers/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter-random-combat';
@@ -29,14 +29,15 @@ import { travelPathTo } from '@helpers/pathfinding';
 import { gamestate } from '@helpers/state-game';
 import {
   canPartyTravel,
-  TICKS_PER_STEP_MOVE,
   travelStart,
+  travelStepTicksCost,
 } from '@helpers/travel';
 import {
   caravanTradeOpen,
   mapNodeDeselect,
   selectedMapNode,
 } from '@helpers/ui';
+import { currentLocationGet } from '@helpers/world';
 import { worldNodeCaravanIsAvailable } from '@helpers/world-node-caravan';
 import { worldNodeDescription } from '@helpers/world-node-content';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node-encounter';
@@ -165,9 +166,14 @@ export class PanelMapNodeComponent {
     const path = this.travelPath();
     if (!path) return undefined;
 
-    return (
-      path.filter((step) => step.kind === 'Move').length * TICKS_PER_STEP_MOVE
-    );
+    let origin = currentLocationGet();
+    const costs = path.map((step) => {
+      const cost = travelStepTicksCost(step, origin);
+      origin = step;
+      return cost;
+    });
+
+    return sum(costs);
   });
 
   private travelState = computed(() => gamestate().world.travel);

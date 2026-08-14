@@ -5,20 +5,27 @@ import { encounterRandomStartFight } from '@helpers/encounter-random-combat';
 import { gatherNodeDiscover } from '@helpers/gather-node-discovery';
 import { travelMessageLog } from '@helpers/combat-log';
 import { gatheringStart, gatheringStop } from '@helpers/gathering';
-import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding';
+import { mapHopsBetween, tileIsOnPath, travelPathTo } from '@helpers/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node-encounter';
 import {
+  worldNodeAt,
   worldNodeByName,
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-nodes';
-import type { GlobalEffectId, TravelState, TravelStep } from '@interfaces';
+import type {
+  CurrentLocation,
+  GlobalEffectId,
+  TravelState,
+  TravelStep,
+} from '@interfaces';
 
-export const TICKS_PER_STEP_MOVE = 3;
+export const TICKS_PER_STEP_ON_PATH = 1;
+export const TICKS_PER_STEP_OFF_PATH = 3;
 const DEATHS_DOOR_SECONDS_PER_MAP = 10;
 const DEATHS_DOOR_MINIMUM_SECONDS = 10;
 
@@ -26,10 +33,40 @@ function travelGet(): TravelState {
   return gamestate().world.travel;
 }
 
-// Crossing a TeleportNode is instant (0 ticks) - only plain Move steps pay
-// the per-tile cost.
-function ticksPerStepFor(step: TravelStep): number {
-  return step.kind === 'Teleport' ? 0 : TICKS_PER_STEP_MOVE;
+// A node's own tile counts as "on path" even off the authored path layer -
+// otherwise every node visit pays the off-path tick cost just for standing
+// at the destination, which looks like an odd stutter right at arrival.
+function travelTileCountsAsPath(mapName: string, x: number, y: number): boolean {
+  return tileIsOnPath(mapName, x, y) || !!worldNodeAt(mapName, x, y);
+}
+
+// Crossing a TeleportNode is instant (0 ticks). A plain Move step is cheap
+// when its destination is an authored path tile or a node tile (entering),
+// or when it's leaving a node tile (exiting) - regardless of whether that
+// node tile itself sits on the path layer. Note this is deliberately
+// asymmetric: an ordinary path tile does *not* similarly discount the step
+// leaving it, only a node does - otherwise every path -> off-path transition
+// would be mispriced as cheap too, defeating the point of the off-path cost.
+export function travelStepTicksCost(
+  step: TravelStep,
+  originTile: CurrentLocation,
+): number {
+  if (step.kind === 'Teleport') return 0;
+
+  const enteringPathOrNode = travelTileCountsAsPath(
+    step.mapName,
+    step.x,
+    step.y,
+  );
+  const exitingNode = !!worldNodeAt(
+    originTile.mapName,
+    originTile.x,
+    originTile.y,
+  );
+
+  return enteringPathOrNode || exitingNode
+    ? TICKS_PER_STEP_ON_PATH
+    : TICKS_PER_STEP_OFF_PATH;
 }
 
 // Deaths Door/Healing are the only true blockers - being mid-Travel is not,
@@ -223,7 +260,7 @@ function travelCompleteStep(
   }
 
   const [nextStep, ...restOfPath] = remainingPath;
-  if (ticksPerStepFor(nextStep) === 0) {
+  if (travelStepTicksCost(nextStep, completedStep) === 0) {
     travelCompleteStep(destinationNodeName, nextStep, restOfPath);
     return;
   }
@@ -240,7 +277,7 @@ export function travelProcessTick(): void {
   if (travel.status === 'Idle' || travel.path.length === 0) return;
 
   const [currentStep, ...restOfPath] = travel.path;
-  const stepCost = ticksPerStepFor(currentStep);
+  const stepCost = travelStepTicksCost(currentStep, currentLocationGet());
   const ticksIntoStep = travel.ticksIntoStep + 1;
 
   if (stepCost > 0 && ticksIntoStep < stepCost) {
