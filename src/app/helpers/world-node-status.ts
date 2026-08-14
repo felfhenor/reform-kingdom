@@ -9,7 +9,7 @@ import {
   worldNodeGathering,
 } from '@helpers/world-nodes';
 import type {
-  EncounterLevelRange,
+  LevelRange,
   WorldNodeEntry,
   WorldNodeInteractionKind,
   WorldNodeLabelInfo,
@@ -17,7 +17,7 @@ import type {
 
 export function worldNodeLevelRange(
   entry: WorldNodeEntry,
-): EncounterLevelRange | undefined {
+): LevelRange | undefined {
   return (
     worldNodeEncounter(entry)?.levelRange ??
     worldNodeGathering(entry)?.levelRange ??
@@ -26,7 +26,7 @@ export function worldNodeLevelRange(
   );
 }
 
-export function worldNodeLevelLabel(levelRange: EncounterLevelRange): string {
+export function worldNodeLevelLabel(levelRange: LevelRange): string {
   return rangeLabel(levelRange);
 }
 

@@ -2,14 +2,10 @@ import type { EncounterFight } from '@interfaces/content-encounter';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
 
 export type EncounterRandomId = Branded<string, 'EncounterRandomId'>;
-
-export type EncounterRandomLevelRange = {
-  min: number;
-  max: number;
-};
 
 export type EncounterRandomEncounterRange = {
   min: number;
@@ -34,7 +30,7 @@ export type EncounterRandomContent = IsContentItem &
     // Ticks between regenerations of this node's fights.
     resetTime: number;
 
-    levelRange: EncounterRandomLevelRange;
+    levelRange: LevelRange;
     encounterRange: EncounterRandomEncounterRange;
     combatantRange: EncounterRandomCombatantRange;
 

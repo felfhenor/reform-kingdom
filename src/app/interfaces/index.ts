@@ -31,6 +31,7 @@ export * from './equipment';
 export * from './explore-random';
 export * from './gathering';
 export * from './identifiable';
+export * from './level-range';
 export * from './loading';
 export * from './map';
 export * from './meta';

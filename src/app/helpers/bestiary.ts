@@ -8,9 +8,9 @@ import type {
   BestiaryEntry,
   DroppedReward,
   EncounterContent,
-  EncounterLevelRange,
   EncounterRandomContent,
   GameStateBestiary,
+  LevelRange,
   MonsterContent,
   MonsterId,
 } from '@interfaces';
@@ -32,7 +32,7 @@ export function getMonsterFoundAtNodes(monsterId: MonsterId): string[] {
 // undefined until it's been killed at least once.
 export function getMonsterLevelRangeFound(
   monsterId: MonsterId,
-): EncounterLevelRange | undefined {
+): LevelRange | undefined {
   const entry = gamestate().bestiary[monsterId];
   if (!entry) return undefined;
 

@@ -1,14 +1,10 @@
 import type { MonsterId } from '@interfaces/content-monster';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
 
 export type EncounterId = Branded<string, 'EncounterId'>;
-
-export type EncounterLevelRange = {
-  min: number;
-  max: number;
-};
 
 export type EncounterFightMonster = {
   monsterId: MonsterId;
@@ -23,7 +19,7 @@ export type EncounterContent = IsContentItem &
     id: EncounterId;
     __type: 'encounter';
 
-    levelRange: EncounterLevelRange;
+    levelRange: LevelRange;
 
     fights: EncounterFight[];
 

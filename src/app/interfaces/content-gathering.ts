@@ -1,13 +1,9 @@
 import type { ItemId } from '@interfaces/content-item';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
 
 export type GatheringId = Branded<string, 'GatheringId'>;
-
-export type GatheringLevelRange = {
-  min: number;
-  max: number;
-};
 
 export type GatherResultItem = {
   itemId: ItemId;
@@ -24,7 +20,7 @@ export type GatheringContent = IsContentItem &
     id: GatheringId;
     __type: 'gathering';
 
-    levelRange: GatheringLevelRange;
+    levelRange: LevelRange;
 
     xpGainedIfInLevelRange: number;
     gatherTime: number;
