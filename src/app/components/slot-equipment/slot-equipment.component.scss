@@ -10,12 +10,7 @@
 // center, and since the button is flex-centered at exactly the scaled-up
 // size, it lines up with no extra offset.
 .equipment-slot {
-  @apply relative w-[80px] h-[80px] flex items-center justify-center cursor-pointer overflow-hidden;
-
-  app-icon-blank-slot {
-    display: block;
-    transform: scale(1.25);
-  }
+  @apply relative flex items-center justify-center cursor-pointer overflow-hidden;
 }
 
 .equipment-slot-selected {

@@ -16,7 +16,7 @@
 
   @for (row of paperdollRows; track $index) {
     @if (rowHasVisibleSlot(row)) {
-      <div class="flex gap-2">
+      <div class="flex gap-4">
         @for (slot of row; track slot) {
           @if (isSlotVisible(slot)) {
             <app-slot-equipment
