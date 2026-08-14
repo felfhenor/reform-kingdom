@@ -1,5 +1,6 @@
 - id: 6d24b4d1-544a-48e6-90a5-967cee3fe653
   name: Analyze I
+  family: Analyze
   description: Analyze the weak spot of an enemy, inflicting Weakspot.
 
   sprite: '0006'
@@ -31,6 +32,7 @@
 
 - id: d957cdd4-28c8-4f90-90b5-3a6bf83fad1f
   name: Analyze II
+  family: Analyze
   description: Analyze the weak spot of an enemy, dealing {{ value }} damage to them and inflicting Weakspot.
 
   sprite: '0006'
@@ -65,6 +67,7 @@
 
 - id: 77319f61-ffb4-4524-b066-8aa547631776
   name: Analyze III
+  family: Analyze
   description: Analyze the weak spot of an enemy, dealing {{ value }} damage to them and inflicting Weakspot.
 
   sprite: '0006'

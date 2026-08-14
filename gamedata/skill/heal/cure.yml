@@ -1,5 +1,6 @@
 - id: ed42f2b8-1722-4af2-b36b-7d40318fa725
   name: Cure I
+  family: Cure
   description: Heal a living ally for {{ value }} HP.
 
   sprite: '0004'
@@ -28,6 +29,7 @@
 
 - id: a97db916-2710-43af-821d-cfffa5306884
   name: Cure II
+  family: Cure
   description: Heal a living ally for {{ value }} HP.
 
   sprite: '0004'
@@ -56,6 +58,7 @@
 
 - id: 7b6adafe-df5a-453b-bc17-eecd1503565f
   name: Cure III
+  family: Cure
   description: Heal a living ally for {{ value }} HP.
 
   sprite: '0004'

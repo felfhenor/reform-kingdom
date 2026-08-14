@@ -1,5 +1,6 @@
 - id: 793628bf-21e5-469d-8d24-6c5684bee122
   name: Red Slash I
+  family: Red Slash
   description: Strike all combatants for {{ value }} damage.
 
   rarity: Uncommon

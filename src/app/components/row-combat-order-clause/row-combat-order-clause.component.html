@@ -1,0 +1,43 @@
+<span class="flex-1 truncate" [class.opacity-50]="!clause().enabled">
+  {{ summary() }}
+</span>
+
+@if (!isFamilyKnown()) {
+  <span
+    class="badge badge-error"
+    [tp]="'This hero no longer knows this skill family.'"
+    [tpPlacement]="'top'"
+  >
+    !
+  </span>
+} @else if (!isFamilyUsable()) {
+  <span
+    class="badge badge-warning"
+    [tp]="'Not usable with the currently equipped weapon.'"
+    [tpPlacement]="'top'"
+  >
+    !
+  </span>
+} @else if (isFamilyEquipmentOnly()) {
+  <span
+    class="badge badge-info"
+    [tp]="'Depends on currently equipped gear.'"
+    [tpPlacement]="'top'"
+  >
+    i
+  </span>
+}
+
+@if (!readOnly()) {
+  <label class="label cursor-pointer label-checkbox">
+    <input
+      type="checkbox"
+      [checked]="clause().enabled"
+      class="checkbox checkbox-sm checkbox-secondary"
+      (click)="toggleEnabled.emit()"
+    />
+  </label>
+
+  <button class="btn btn-xs btn-secondary" (click)="edit.emit()">Edit</button>
+  <button class="btn btn-xs btn-error" (click)="remove.emit()">Remove</button>
+}

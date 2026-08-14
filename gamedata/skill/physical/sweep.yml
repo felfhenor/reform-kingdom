@@ -1,5 +1,6 @@
 - id: 31fc4cfd-27e9-4700-9817-742e5f5bc354
   name: Sweep I
+  family: Sweep
   description: Strike four enemies for {{ value }} damage.
 
   rarity: Common
@@ -25,6 +26,7 @@
 
 - id: 7fe3f97b-a5a9-440c-a92e-97b584a27a67
   name: Sweep II
+  family: Sweep
   description: Strike four enemies for {{ value }} damage.
 
   rarity: Uncommon
@@ -50,6 +52,7 @@
 
 - id: e7ffe0fa-4790-48fa-8257-9d7dbab01dda
   name: Sweep III
+  family: Sweep
   description: Strike four enemies for {{ value }} damage.
 
   rarity: Rare

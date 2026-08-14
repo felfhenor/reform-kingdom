@@ -101,6 +101,7 @@ export function createCharacter(name: string, jobId: JobId): Character {
     },
     jobId,
     jobProgress: {},
+    combatOrders: {},
     hp: stats.Health,
     ep: stats.Energy,
     stats,

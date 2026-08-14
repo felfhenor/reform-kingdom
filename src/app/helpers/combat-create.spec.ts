@@ -70,6 +70,7 @@ const attackSkill: EquipmentSkillContent = {
   statusEffectChanceBoost: {},
   techniques: [],
   requiredWeaponTypes: [],
+  family: 'Attack',
 };
 
 const snipeSkill: EquipmentSkillContent = {
@@ -124,6 +125,7 @@ function buildCharacter(overrides: Partial<Character> = {}): Character {
     ep: 10,
     stats: zeroStats(),
     equipment: emptyEquipment,
+    combatOrders: {},
     ...overrides,
   } as Character;
 }

@@ -5,8 +5,7 @@
 @for (skill of heroSkills(); track skill.id) {
   @let usable = isSkillUsable(skill);
 
-  <button
-    type="button"
+  <div
     class="hero-skill-row hover:bg-base-300"
     [tp]="skillTooltip"
     [tpPlacement]="'left'"
@@ -24,7 +23,7 @@
     <span class="hero-skill-row-name text-{{ skill.rarity }}">
       {{ skill.name }}
     </span>
-  </button>
+  </div>
 
   <ng-template #skillTooltip>
     <div class="p-3 max-w-xs">

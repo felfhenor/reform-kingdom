@@ -1,5 +1,6 @@
 - id: 37f8f343-c32b-47b0-87c0-d9e8d542c58a
   name: Octa Strike I
+  family: Octa Strike
   description: Strike 8 times for {{ value }} damage each.
 
   rarity: Uncommon

@@ -1,4 +1,5 @@
 import type { HasAnimation } from '@interfaces/artable';
+import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { EncounterId } from '@interfaces/content-encounter';
 import type { EncounterRandomId } from '@interfaces/content-encounter-random';
 import type {
@@ -48,6 +49,9 @@ export type Combatant = HasAnimation & {
   ep: number;
 
   targettingType: CombatantTargettingType;
+  // Resolved once at Combatant creation from the owning hero's current job
+  // (empty for monsters) - see combatantFromCharacter.
+  combatOrders: CombatOrderClause[];
 
   baseStats: StatBlock;
   statBoosts: StatBlock;

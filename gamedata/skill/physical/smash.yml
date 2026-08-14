@@ -1,5 +1,6 @@
 - id: 4ea39a92-61f8-41dc-8e08-190e890c3425
   name: Smashing Board I
+  family: Smashing Board
   description: Smash your shield into an enemy, dealing {{ value }} damage and inflicting Dazed on them.
 
   rarity: Common
@@ -33,6 +34,7 @@
 
 - id: 2f1f280a-1e89-4a84-89d0-c1ac547ba3dd
   name: Smashing Board II
+  family: Smashing Board
   description: Smash your shield into an enemy, dealing {{ value }} damage and inflicting Dazed on them.
 
   rarity: Uncommon

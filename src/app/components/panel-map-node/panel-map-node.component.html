@@ -70,7 +70,7 @@
           appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"
         >
-          Travel ({{ travelSeconds() ?? '—' }}s)
+          Travel ({{ travelSeconds() ?? '-' }}s)
         </button>
       } @else if (isExploreNode()) {
         <app-panel-map-node-actions-explore

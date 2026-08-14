@@ -1,6 +1,11 @@
 import { computed, signal } from '@angular/core';
 import { localStorageSignal } from '@helpers/signal';
-import type { GamePlayView, KingdomSubview, WorldNodeEntry } from '@interfaces';
+import type {
+  CharacterId,
+  GamePlayView,
+  KingdomSubview,
+  WorldNodeEntry,
+} from '@interfaces';
 
 export function isPageVisible(): boolean {
   return !document.hidden;
@@ -45,6 +50,20 @@ export function kingdomSubviewClear(): void {
 }
 
 export const showReclassHeroesModal = signal<boolean>(false);
+
+// The hero the Combat Orders modal is currently open for, or undefined if
+// closed - set from the "Combat Orders" button on the hero equipment screen.
+export const combatOrdersModalCharacterId = signal<CharacterId | undefined>(
+  undefined,
+);
+
+export function combatOrdersModalOpen(characterId: CharacterId): void {
+  combatOrdersModalCharacterId.set(characterId);
+}
+
+export function combatOrdersModalClose(): void {
+  combatOrdersModalCharacterId.set(undefined);
+}
 
 export const isWorldCameraPanned = signal<boolean>(false);
 

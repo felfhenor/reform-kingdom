@@ -66,6 +66,8 @@ export function combatantFromCharacter(character: Character): Combatant {
     skillRefs: [],
     skillWeights: {},
 
+    combatOrders: character.combatOrders[character.jobId] ?? [],
+
     combatStats: defaultCombatStats(),
 
     affinity: defaultAffinities(),
@@ -106,6 +108,8 @@ export function combatantFromMonster(
     skillWeights: Object.fromEntries(
       monster.skills.map((skill) => [skill.skillId, skill.weight]),
     ),
+
+    combatOrders: [],
 
     combatStats: defaultCombatStats(),
 

@@ -677,5 +677,6 @@ function ensureSkill(
       skill.requiredWeaponTypes,
       VALID_EQUIPMENT_ITEM_TYPES,
     ),
+    family: skill.family ?? 'UNKNOWN',
   };
 }

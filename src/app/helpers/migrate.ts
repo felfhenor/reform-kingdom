@@ -66,6 +66,7 @@ export function migrateGameState() {
   newState.world.party = newState.world.party.map((character) => ({
     ...character,
     equipment: backfillEquipmentBlock(character.equipment),
+    combatOrders: character.combatOrders ?? {},
   }));
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);

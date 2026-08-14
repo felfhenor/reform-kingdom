@@ -1,5 +1,6 @@
 - id: a539673b-138a-4ec3-ae60-1576ef28acb6
   name: Frostfire Bolt I
+  family: Frostfire Bolt
   description: Blast a single enemy with frost and fire, dealing {{ value }} damage with a chance of inflicting Burning and Chilled on the enemy.
 
   sprite: '0019'
@@ -47,6 +48,7 @@
 
 - id: bdac8f1a-bd99-4994-9653-4d449652f3bf
   name: Frostfire Bolt II
+  family: Frostfire Bolt
   description: Blast a single enemy with an intense shock, dealing {{ value }} damage with a chance of inflicting Burning and Chilled on the enemy.
 
   sprite: '0019'

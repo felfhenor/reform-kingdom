@@ -79,6 +79,10 @@ export type EquipmentSkillContent = IsContentItem &
     // requires a Bow. Empty means no weapon requirement. Monsters ignore
     // this entirely (they have no equipment).
     requiredWeaponTypes: EquipmentItemType[];
+
+    // Stable identity across tiers (e.g. "Cure I"/"Cure II"/"Cure III" all
+    // share family "Cure") and across source (job path vs. equipment-granted).
+    family: string;
   };
 
 export type EquipmentSkill = EquipmentSkillContent & {

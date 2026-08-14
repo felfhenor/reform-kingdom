@@ -20,6 +20,7 @@ function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
     statusEffectChanceBoost: {} as never,
     techniques: [],
     requiredWeaponTypes: [],
+    family: 'Test Skill',
     ...overrides,
   };
 }

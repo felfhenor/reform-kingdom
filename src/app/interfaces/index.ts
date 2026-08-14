@@ -6,6 +6,7 @@ export * from './character';
 export * from './collectible-source';
 export * from './combat';
 export * from './combat-log';
+export * from './combat-order';
 export * from './content-caravan';
 export * from './content-caravan-trader';
 export * from './content-collectible';

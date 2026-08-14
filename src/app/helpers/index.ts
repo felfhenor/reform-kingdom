@@ -16,6 +16,8 @@ export * from './combat-create';
 export * from './combat-damage';
 export * from './combat-end';
 export * from './combat-log';
+export * from './combat-order';
+export * from './combat-order-evaluation';
 export * from './combat-rewards';
 export * from './combat-stats';
 export * from './combat-statuseffects';

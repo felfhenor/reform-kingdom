@@ -1,0 +1,241 @@
+<app-modal
+  [visible]="isVisible()"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+  [widthClass]="'max-w-4xl'"
+  (modalClose)="close()"
+>
+  <span title>Combat Orders</span>
+
+  <div body class="flex flex-col gap-4">
+    @if (!character() || !job()) {
+      <div class="italic text-lighter">No hero selected.</div>
+    } @else {
+      <div class="card bg-base-300 border border-primary/30 shadow">
+        <div class="card-body gap-2">
+          <div class="card-title text-sm">
+            {{ isEditing() ? 'Edit Order' : 'Add Order' }}
+          </div>
+
+          <div class="flex flex-row flex-wrap items-center gap-2">
+            <span class="text-xs text-lighter min-w-[50px]">When</span>
+            <ng-select
+              class="w-56"
+              [items]="conditionTypeOptions"
+              bindLabel="label"
+              bindValue="value"
+              [clearable]="false"
+              [ngModel]="draftConditionType()"
+              (change)="setDraftConditionType($event)"
+            ></ng-select>
+
+            @if (
+              draftConditionType() === 'SelfHealthPercent' ||
+              draftConditionType() === 'SelfEnergyPercent'
+            ) {
+              <ng-select
+                class="w-24"
+                [items]="comparatorOptions"
+                bindLabel="label"
+                bindValue="value"
+                [clearable]="false"
+                [ngModel]="draftComparator()"
+                (change)="setDraftComparator($event)"
+              ></ng-select>
+
+              <input
+                type="number"
+                min="0"
+                max="100"
+                class="input input-bordered input-sm w-24"
+                [value]="draftValue()"
+                (change)="draftValue.set($any($event.target).valueAsNumber)"
+              />
+              <span class="text-xs text-lighter">%</span>
+            }
+
+            @if (draftConditionType() === 'AllyCountHealthPercent') {
+              <span class="text-xs text-lighter">allies</span>
+              <ng-select
+                class="w-28"
+                [items]="healthDirectionOptions"
+                bindLabel="label"
+                bindValue="value"
+                [clearable]="false"
+                [ngModel]="draftHealthDirection()"
+                (change)="setDraftHealthDirection($event)"
+              ></ng-select>
+
+              <input
+                type="number"
+                min="0"
+                max="100"
+                class="input input-bordered input-sm w-20"
+                [value]="draftHealthPercent()"
+                (change)="
+                  draftHealthPercent.set($any($event.target).valueAsNumber)
+                "
+              />
+              <span class="text-xs text-lighter">% HP</span>
+
+              <ng-select
+                class="w-24"
+                [items]="comparatorOptions"
+                bindLabel="label"
+                bindValue="value"
+                [clearable]="false"
+                [ngModel]="draftComparator()"
+                (change)="setDraftComparator($event)"
+              ></ng-select>
+
+              <input
+                type="number"
+                min="0"
+                class="input input-bordered input-sm w-20"
+                [value]="draftCount()"
+                (change)="draftCount.set($any($event.target).valueAsNumber)"
+              />
+            }
+
+            @if (draftConditionType() === 'EnemyCount') {
+              <ng-select
+                class="w-24"
+                [items]="comparatorOptions"
+                bindLabel="label"
+                bindValue="value"
+                [clearable]="false"
+                [ngModel]="draftComparator()"
+                (change)="setDraftComparator($event)"
+              ></ng-select>
+
+              <input
+                type="number"
+                min="0"
+                class="input input-bordered input-sm w-20"
+                [value]="draftCount()"
+                (change)="draftCount.set($any($event.target).valueAsNumber)"
+              />
+            }
+          </div>
+
+          <div class="flex flex-row flex-wrap items-center gap-2">
+            <span class="text-xs text-lighter min-w-[50px]">Use</span>
+
+            <ng-select
+              class="w-56"
+              [items]="familyOptions()"
+              bindLabel="label"
+              bindValue="value"
+              [clearable]="false"
+              placeholder="Skill Family"
+              [ngModel]="draftFamily()"
+              (change)="setDraftFamily($event)"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <div class="flex items-center gap-2">
+                  @if (item.sprite) {
+                    <app-atlas-image
+                      class="zoom-row"
+                      spritesheet="skill"
+                      [assetName]="item.sprite"
+                    />
+                  }
+                  {{ item.label }}
+                </div>
+              </ng-template>
+
+              <ng-template ng-label-tmp let-item="item">
+                <div class="flex items-center gap-2">
+                  @if (item.sprite) {
+                    <app-atlas-image
+                      class="zoom-row"
+                      spritesheet="skill"
+                      [assetName]="item.sprite"
+                    />
+                  }
+                  {{ item.label }}
+                </div>
+              </ng-template>
+            </ng-select>
+
+            <ng-select
+              class="w-56"
+              [items]="targetModeOptions"
+              bindLabel="label"
+              bindValue="value"
+              [clearable]="false"
+              [ngModel]="draftTargetMode() ?? ''"
+              (change)="setDraftTargetMode($event)"
+            ></ng-select>
+
+            <button
+              class="btn btn-sm btn-primary"
+              [disabled]="!canSubmit()"
+              (click)="submitClause()"
+            >
+              {{ isEditing() ? 'Save' : 'Add' }}
+            </button>
+
+            @if (isEditing()) {
+              <button class="btn btn-sm btn-ghost" (click)="cancelEditClause()">
+                Cancel
+              </button>
+            }
+
+            @if (atRowCap() && !isEditing()) {
+              <span class="text-xs text-warning">
+                Orders limit reached ({{ rowCap }} max).
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="divider my-0"></div>
+
+      <div class="card bg-base-200 flex-1 min-h-0 flex flex-col">
+        <div class="card-body gap-2 flex-1 min-h-0 flex flex-col py-0">
+          <div class="card-title text-sm">Orders</div>
+
+          <ul
+            cdkDropList
+            class="flex flex-col gap-2 max-h-96 overflow-y-auto"
+            (cdkDropListDropped)="onDrop($event)"
+          >
+            @for (clause of clauses(); track clause.id) {
+              <li
+                cdkDrag
+                class="flex flex-row items-center gap-2 p-2 rounded"
+                [class.bg-base-300]="editingClauseId() !== clause.id"
+                [class.bg-neutral]="editingClauseId() === clause.id"
+              >
+                <span cdkDragHandle class="cursor-move text-lighter">::</span>
+
+                <app-row-combat-order-clause
+                  [clause]="clause"
+                  [isFamilyKnown]="isFamilyKnown(clause)"
+                  [isFamilyUsable]="isFamilyUsable(clause)"
+                  [isFamilyEquipmentOnly]="isFamilyEquipmentOnly(clause)"
+                  (toggleEnabled)="toggleClauseEnabled(clause)"
+                  (remove)="removeClause(clause.id)"
+                  (edit)="startEditClause(clause)"
+                />
+              </li>
+            }
+
+            <li
+              class="flex flex-row items-center gap-2 p-2 rounded bg-base-300"
+            >
+              <span class="w-[6px]"></span>
+              <app-row-combat-order-clause
+                [clause]="alwaysRandomClause"
+                [readOnly]="true"
+              />
+            </li>
+          </ul>
+        </div>
+      </div>
+    }
+  </div>
+</app-modal>

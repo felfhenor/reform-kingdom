@@ -1,5 +1,6 @@
 - id: e5c5299b-2898-4580-8d86-0644b94e6e6f
   name: Holy Smite I
+  family: Holy Smite
   description: Smite a single enemy, dealing {{ value }} damage.
 
   sprite: '0016'
@@ -27,6 +28,7 @@
 
 - id: c926af2d-893e-4b36-842a-45ce0291860f
   name: Holy Smite II
+  family: Holy Smite
   description: Smite a single enemy, dealing {{ value }} damage.
 
   sprite: '0016'
@@ -54,6 +56,7 @@
 
 - id: cef6d552-fcfb-4c93-a41d-52f3278d719b
   name: Holy Smite III
+  family: Holy Smite
   description: Smite a single enemy, dealing {{ value }} damage.
 
   sprite: '0016'

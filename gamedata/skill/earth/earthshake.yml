@@ -1,5 +1,6 @@
 - id: 22228b9e-bf15-465c-b894-f8c39b34e34e
   name: Earthshake I
+  family: Earthshake
   description: Make the earth tremble, hitting 3 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
 
   sprite: '0017'
@@ -32,6 +33,7 @@
 
 - id: eb3a5011-8df8-4b72-9587-306e1f173807
   name: Earthshake II
+  family: Earthshake
   description: Make the earth tremble, hitting 4 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
 
   sprite: '0017'
@@ -64,6 +66,7 @@
 
 - id: efe273da-1fc3-44a8-bee7-46a9aec6a72c
   name: Earthshake III
+  family: Earthshake
   description: Make the earth tremble, hitting 4 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
 
   sprite: '0017'

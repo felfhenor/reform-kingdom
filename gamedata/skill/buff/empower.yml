@@ -1,5 +1,6 @@
 - id: 2653ab27-8bd6-4feb-85a5-595ab200b921
   name: Empower I
+  family: Empower
   description: Empower an ally, increasing their Strength by 40% for 3 turns!
 
   sprite: '0014'
@@ -28,6 +29,7 @@
 
 - id: 0c98606d-0bbc-45b1-882a-0e89467e1ac3
   name: Empower II
+  family: Empower
   description: Empower an ally, increasing their Strength by 80% for 3 turns!
 
   sprite: '0014'

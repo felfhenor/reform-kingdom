@@ -118,6 +118,7 @@ function buildCombatant(overrides: Partial<Combatant>): Combatant {
     skillIds: [],
     skillRefs: [],
     skillWeights: {},
+    combatOrders: [],
     skillUses: {},
     statusEffects: [],
     statusEffectData: {},

@@ -5,6 +5,8 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { ButtonHeroCombatOrdersComponent } from '@components/button-hero-combat-orders/button-hero-combat-orders.component';
+import { ModalHeroCombatOrdersComponent } from '@components/modal-hero-combat-orders/modal-hero-combat-orders.component';
 import { PanelHeroEquipmentEquipmentComponent } from '@components/panel-hero-equipment-equipment/panel-hero-equipment-equipment.component';
 import { PanelHeroEquipmentSkillsComponent } from '@components/panel-hero-equipment-skills/panel-hero-equipment-skills.component';
 import { PanelHeroEquipmentStatsComponent } from '@components/panel-hero-equipment-stats/panel-hero-equipment-stats.component';
@@ -21,6 +23,8 @@ import type { Character, JobContent } from '@interfaces';
     PanelHeroEquipmentStatsComponent,
     IconJobComponent,
     DecimalPipe,
+    ButtonHeroCombatOrdersComponent,
+    ModalHeroCombatOrdersComponent,
   ],
   templateUrl: './panel-hero-equipment.component.html',
   styleUrl: './panel-hero-equipment.component.scss',

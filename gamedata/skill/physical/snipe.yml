@@ -1,5 +1,6 @@
 - id: 69f42616-552c-48d5-bdf2-c563f56304cb
   name: Snipe I
+  family: Snipe
   description: Exert a lot of effort to shoot a deadly, accurate shot for {{ value }} damage.
 
   rarity: Common
@@ -27,6 +28,7 @@
 
 - id: 27939410-0682-4367-983a-d515e282a00f
   name: Snipe II
+  family: Snipe
   description: Exert a lot of effort to shoot a deadly, accurate shot for {{ value }} damage.
 
   rarity: Uncommon
@@ -54,6 +56,7 @@
 
 - id: 2f35b6d3-693c-4af9-8c37-0ea34367f785
   name: Snipe III
+  family: Snipe
   description: Exert a lot of effort to shoot a deadly, accurate shot for {{ value }} damage.
 
   rarity: Rare

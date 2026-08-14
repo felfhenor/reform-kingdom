@@ -18,6 +18,7 @@ import {
   combatHandleCombatantStatusEffects,
   combatUnapplyAllStatusEffects,
 } from '@helpers/combat-statuseffects';
+import { pickSkillFromCombatOrders } from '@helpers/combat-order-evaluation';
 import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
@@ -74,7 +75,7 @@ function combatantMarkSkillUse(
   );
 }
 
-function combatantTakeTurn(
+export function combatantTakeTurn(
   combat: Combat,
   combatant: Combatant,
 ): CombatTurnResult {
@@ -130,10 +131,20 @@ function combatantTakeTurn(
       0,
   );
 
-  const chosenSkill = rngChoiceWeighted(
-    skills,
-    (skill) => combatant.skillWeights[skill.id] ?? 1,
-  );
+  // Combat Orders (see combat-order-evaluation.ts) take priority over the
+  // default weighted-random pick when a hero has any configured for their
+  // current job - a hero with none configured (the common case, and every
+  // enemy) takes the exact same weighted-random branch as before this
+  // existed, so the feature can't change behavior for anyone who hasn't
+  // opted in.
+  const combatOrderPick =
+    !combatant.isEnemy && combatant.combatOrders.length > 0
+      ? pickSkillFromCombatOrders(combat, combatant, skills)
+      : undefined;
+
+  const chosenSkill =
+    combatOrderPick?.skill ??
+    rngChoiceWeighted(skills, (skill) => combatant.skillWeights[skill.id] ?? 1);
   if (!chosenSkill) {
     combatMessageLog(
       combat,
@@ -159,7 +170,7 @@ function combatantTakeTurn(
 
     const targets = combatGetTargetsFromListBasedOnType(
       baseTargetList,
-      combatant.targettingType,
+      combatOrderPick?.targetMode ?? combatant.targettingType,
       numTargets,
     );
 

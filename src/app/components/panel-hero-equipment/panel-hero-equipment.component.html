@@ -21,7 +21,11 @@
         {{ char.xp.current | number }} / {{ char.xp.maximum | number }} XP
       </div>
     </div>
+
+    <app-button-hero-combat-orders [characterId]="char.id" />
   </div>
+
+  <app-modal-hero-combat-orders />
 
   <div class="grid grid-cols-[320px_320px_1fr_320px] gap-4 flex-1 min-h-0">
     <app-panel-hero-equipment-stats [character]="char" />

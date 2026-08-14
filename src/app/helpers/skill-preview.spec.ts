@@ -39,6 +39,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     skillIds: [],
     skillRefs: [],
     skillWeights: {},
+    combatOrders: [],
     skillUses: {},
     statusEffects: [],
     statusEffectData: {},
@@ -62,6 +63,7 @@ function buildSkill(
     statusEffectChanceBoost: {} as never,
     techniques: [],
     requiredWeaponTypes: [],
+    family: 'Test Skill',
     ...overrides,
   };
 }

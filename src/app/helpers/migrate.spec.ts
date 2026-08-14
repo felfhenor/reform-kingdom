@@ -223,7 +223,7 @@ describe('migrateGameState', () => {
   });
 
   it('prunes invalid equipment off party members before committing the migrated state', () => {
-    const staleParty = [{ id: 'jala' } as Character];
+    const staleParty = [{ id: 'jala', combatOrders: {} } as Character];
 
     vi.mocked(gamestate).mockReturnValue({
       armory: [],
@@ -255,7 +255,7 @@ describe('migrateGameState', () => {
       (party) => party,
     );
 
-    const staleParty = [{ id: 'jala' } as Character];
+    const staleParty = [{ id: 'jala', combatOrders: {} } as Character];
     const staleTradeskills = { Blacksmithing: { level: 1 } };
 
     vi.mocked(gamestate).mockReturnValue({

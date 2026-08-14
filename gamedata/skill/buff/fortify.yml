@@ -1,5 +1,6 @@
 - id: e64e3114-0fd0-41b8-845e-74c5c377eea0
   name: Fortify I
+  family: Fortify
   description: Invigorate an ally, increasing their Vitality by 20% for 3 turns!
 
   sprite: '0013'

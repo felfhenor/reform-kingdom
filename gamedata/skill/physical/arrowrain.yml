@@ -1,5 +1,6 @@
 - id: 50e17fdc-4eb6-46f5-b16c-8bfbca419253
   name: Arrow Rain I
+  family: Arrow Rain
   description: Unleash a rain of arrows, doing at most {{ value }} damage per target.
 
   rarity: Common
@@ -40,6 +41,7 @@
 
 - id: 9d674f44-9924-438e-b233-675e10562c05
   name: Arrow Rain II
+  family: Arrow Rain
   description: Unleash a rain of arrows, doing at most {{ value }} damage per target.
 
   rarity: Uncommon

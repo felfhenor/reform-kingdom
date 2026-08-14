@@ -1,5 +1,6 @@
 - id: ff4006fe-ca7c-49e2-aa9f-68ef90ab56fe
   name: Lucky Charm I
+  family: Lucky Charm
   description: Improve the luck of all allies!
 
   sprite: '0018'
@@ -28,6 +29,7 @@
 
 - id: cfb50c0b-002a-4fe4-8a94-d43a6192a494
   name: Lucky Charm II
+  family: Lucky Charm
   description: Improve the luck of all allies!
 
   sprite: '0018'

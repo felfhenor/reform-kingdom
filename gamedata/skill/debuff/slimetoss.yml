@@ -1,5 +1,6 @@
 - id: 95ceab2d-284b-42b9-8534-817fa6396c02
   name: Slime Toss
+  family: Slime Toss
   description: Toss slime at an enemy for {{ value }} damage, lowering their resistance.
 
   sprite: '0007'

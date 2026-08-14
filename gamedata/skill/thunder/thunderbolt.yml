@@ -1,5 +1,6 @@
 - id: 2cd2d441-be84-4c0e-bdd7-5ac6742b4359
   name: Thunderbolt I
+  family: Thunderbolt
   description: Blast a single enemy with an intense shock, dealing {{ value }} damage.
 
   sprite: '0008'
@@ -26,6 +27,7 @@
 
 - id: 072479de-f0e2-4df5-9fe4-b8d5c14d28df
   name: Thunderbolt II
+  family: Thunderbolt
   description: Blast a single enemy with an intense shock, dealing {{ value }} damage.
 
   sprite: '0008'
@@ -52,6 +54,7 @@
 
 - id: 67cd2659-bf26-4fee-9a3d-30c4870c4c79
   name: Thunderbolt III
+  family: Thunderbolt
   description: Blast a single enemy with an intense shock, dealing {{ value }} damage.
 
   sprite: '0008'

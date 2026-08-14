@@ -1,5 +1,6 @@
 - id: ed8793ef-0182-4522-9190-fbed192079e5
   name: Double Strike I
+  family: Double Strike
   description: Strike two enemies for {{ value }} damage each.
 
   rarity: Common
@@ -25,6 +26,7 @@
 
 - id: 94483e46-4a41-49f8-a2b2-29270ad0fde4
   name: Double Strike II
+  family: Double Strike
   description: Strike two enemies for {{ value }} damage each.
 
   rarity: Uncommon
@@ -50,6 +52,7 @@
 
 - id: 2234554d-373b-49b4-a290-37fafcd885c6
   name: Double Strike III
+  family: Double Strike
   description: Strike two enemies for {{ value }} damage each.
 
   rarity: Rare

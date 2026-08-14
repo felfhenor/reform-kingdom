@@ -152,6 +152,7 @@ describe('Job Helper Functions', () => {
         statusEffectChanceBoost: {},
         techniques: [],
         requiredWeaponTypes: [],
+        family: 'Skill',
         ...overrides,
       };
     }

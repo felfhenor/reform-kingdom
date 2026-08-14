@@ -1,5 +1,6 @@
 - id: 7a67e039-083a-4e6a-9aea-fffa7bbfdaf4
   name: Rapidfire I
+  family: Rapidfire
   description: Shoot 4 arrows, doing a total of {{ value }} damage.
 
   rarity: Common
@@ -64,6 +65,7 @@
 
 - id: fdf36881-1a88-4a70-9d37-ebbd0e9074e4
   name: Rapidfire II
+  family: Rapidfire
   description: Shoot 5 arrows, doing a total of {{ value }} damage.
 
   rarity: Uncommon

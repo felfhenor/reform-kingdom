@@ -1,5 +1,6 @@
 - id: 2ca859ea-df62-43b5-9961-4a4644b094a4
   name: Fireball I
+  family: Fireball
   description: Burst 3 enemies for {{ value }} fire damage, with a 20% chance of inflicting Burning.
 
   sprite: '0003'
@@ -31,6 +32,7 @@
 
 - id: fbd7b6f8-5efe-417b-b45e-efbf715da8d3
   name: Fireball II
+  family: Fireball
   description: Burst 3 enemies for {{ value }} fire damage, with a 30% chance of inflicting Burning.
 
   sprite: '0003'
@@ -62,6 +64,7 @@
 
 - id: a939d2e6-74b8-46d0-8e95-dff99a754567
   name: Fireball III
+  family: Fireball
   description: Burst 3 enemies for {{ value }} fire damage, with a 40% chance of inflicting Burning.
 
   sprite: '0003'
