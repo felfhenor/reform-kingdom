@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { armoryAdd, armoryGet } from '@helpers/armory';
 import {
   collectiblesAdd,
@@ -215,6 +216,7 @@ export function craftQueueStart(
     return state;
   });
 
+  analyticsSendDesignEvent('Kingdom:Craft:Queue');
   return true;
 }
 
@@ -306,6 +308,7 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
 
 function resolveCraftUnit(tradeskill: Tradeskill, recipe: RecipeContent): void {
   grantCraftResult(tradeskill, recipe);
+  analyticsSendDesignEvent('Kingdom:Craft:Complete');
 
   const chance = craftXpChance(recipe, tradeskillBuilding(tradeskill).level);
   if (recipe.tradeskillXP > 0 && rngSucceedsChance(chance)) {

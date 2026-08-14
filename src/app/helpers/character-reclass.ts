@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getEntry } from '@helpers/content';
 import { defaultEquipment } from '@helpers/defaults';
 import { equippedItems, planEquipmentOptimization } from '@helpers/equipment';
@@ -72,9 +73,12 @@ function applyOptimizationWinners(
 // job's `statPriority` (see `planEquipmentOptimization`), so a hero reclasses
 // straight into the best gear their armory can already offer.
 export function characterReclass(characterId: CharacterId, jobId: JobId): void {
+  let didReclass = false;
+
   updateGamestate((state) => {
     const character = state.world.party.find((c) => c.id === characterId);
     if (!character) return state;
+    didReclass = true;
 
     state.armory = [...state.armory, ...equippedItems(character.equipment)];
 
@@ -110,4 +114,6 @@ export function characterReclass(characterId: CharacterId, jobId: JobId): void {
 
     return state;
   });
+
+  if (didReclass) analyticsSendDesignEvent('Hero:Reclass:Start');
 }

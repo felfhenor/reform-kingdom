@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { notifySuccess } from '@helpers/notify';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GameStateWorldDiscoveries } from '@interfaces';
@@ -21,6 +22,7 @@ export function worldNodeDiscover(nodeName: string): void {
 
   if (!alreadyDiscovered) {
     notifySuccess(`You discovered ${nodeName}!`);
+    analyticsSendDesignEvent('World:Node:Discover');
   }
 }
 

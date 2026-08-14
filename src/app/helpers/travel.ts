@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';
 import { addGlobalEffect, isGlobalEffectActive } from '@helpers/global-effects';
 import { encounterStartFight } from '@helpers/encounter';
@@ -147,6 +148,7 @@ export function travelStart(
   // `travelArriveWithoutMoving` below and actually re-trigger the node.
   if (path.length === 0 && !wasTraveling && !isAutoMode) return false;
 
+  analyticsSendDesignEvent('World:Travel:Start');
   gatheringStop();
 
   if (path.length === 0) {

@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { currentCombat } from '@helpers/combat';
 import { getEntry } from '@helpers/content';
 import {
@@ -91,14 +92,19 @@ export function autoModeRecordClauseSuccess(): void {
 // `mostChallengingExploreNodeForRisk`), but a node that's losing is losing no
 // matter which clause caused the trip.
 export function autoModeRecordNodeFailure(nodeName: string): void {
+  let newFailureCount = 0;
+
   updateGamestate((state) => {
     const counts = state.world.autoMode.nodeFailureCounts;
+    newFailureCount = (counts[nodeName] ?? 0) + 1;
     state.world.autoMode.nodeFailureCounts = {
       ...counts,
-      [nodeName]: (counts[nodeName] ?? 0) + 1,
+      [nodeName]: newFailureCount,
     };
     return state;
   });
+
+  analyticsSendDesignEvent('World:Node:Fail', newFailureCount);
 }
 
 // Mirrors `autoModeRecordNodeFailure` - a won fight clears the node's losing

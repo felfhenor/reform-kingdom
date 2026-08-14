@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntriesByType } from '@helpers/content';
 import { roundToNearest10 } from '@helpers/number';
@@ -125,14 +126,22 @@ export function retrofitTradeskillXp(
 export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   if (amount <= 0) return;
 
+  const previousLevel = tradeskillBuilding(tradeskill).level;
+  let newLevel = previousLevel;
+
   updateGamestate((state) => {
     state.tradeskills[tradeskill] = tradeskillLeveledUp(
       state.tradeskills[tradeskill],
       tradeskill,
       amount,
     );
+    newLevel = state.tradeskills[tradeskill].level;
     return state;
   });
+
+  if (newLevel > previousLevel) {
+    analyticsSendDesignEvent('Kingdom:Building:LevelUp', newLevel);
+  }
 }
 
 // WoW-style skill-up odds: fresh (< 50% through the recipe's level range) is

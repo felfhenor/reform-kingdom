@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getEntry } from '@helpers/content';
 import { equipmentItemInfusionBonus } from '@helpers/infusion';
 import { gainGold } from '@helpers/materials';
@@ -137,6 +138,7 @@ export function sellEquipmentItems(equipmentItemIds: EquipmentItemId[]): number 
     return state;
   });
 
+  analyticsSendDesignEvent('Kingdom:Armory:MassSell', entries.length);
   return totalGold;
 }
 

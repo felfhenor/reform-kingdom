@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { armoryGet } from '@helpers/armory';
 import { getEntry } from '@helpers/content';
 import {
@@ -166,6 +167,7 @@ export function characterEquipFromArmory(
     return state;
   });
 
+  analyticsSendDesignEvent('Hero:Equip:Item');
   return true;
 }
 
@@ -214,6 +216,7 @@ export function characterUnequipToArmory(
     return state;
   });
 
+  analyticsSendDesignEvent('Hero:Unequip:Item');
   return true;
 }
 
@@ -293,5 +296,6 @@ export function characterInfuseEquipment(
     return state;
   });
 
+  analyticsSendDesignEvent('Hero:Infuse:Item');
   return true;
 }

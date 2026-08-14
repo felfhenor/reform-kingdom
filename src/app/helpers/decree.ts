@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getEntry } from '@helpers/content';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -76,6 +77,7 @@ export function decreeClauseAdd(action: DecreeClauseAction): boolean {
     return state;
   });
 
+  analyticsSendDesignEvent('Decree:Clause:Add');
   return true;
 }
 
@@ -114,7 +116,15 @@ export function decreeClauseUpdate(
 }
 
 export function decreeClauseRemove(clauseId: DecreeClauseId): void {
+  let didRemove = false;
+
   updateGamestate((state) => {
+    const existedBefore = state.world.autoMode.clauses.some(
+      (clause) => clause.id === clauseId,
+    );
+    if (!existedBefore) return state;
+    didRemove = true;
+
     state.world.autoMode.clauses = state.world.autoMode.clauses.filter(
       (clause) => clause.id !== clauseId,
     );
@@ -123,6 +133,8 @@ export function decreeClauseRemove(clauseId: DecreeClauseId): void {
     }
     return state;
   });
+
+  if (didRemove) analyticsSendDesignEvent('Decree:Clause:Remove');
 }
 
 export function decreeClauseSetEnabled(
@@ -159,6 +171,8 @@ export function decreeSetRiskTolerance(riskTolerance: DecreeRiskLevel): void {
     state.world.autoMode.riskTolerance = riskTolerance;
     return state;
   });
+
+  analyticsSendDesignEvent('Decree:Risk:Change');
 }
 
 // A short, stock-independent description of what a clause is set up to do -

@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { combatCreateForEncounter } from '@helpers/combat-create';
 import { combatMessageLog } from '@helpers/combat-log';
 import { grantResolvedDrops } from '@helpers/combat-rewards';
@@ -45,6 +46,7 @@ export function encounterRandomStartFight(
   };
 
   combatMessageLog(combat, `Encountering monster group #${fightIndex + 1}...`);
+  analyticsSendDesignEvent('Combat:Encounter:Random');
 
   updateGamestate((state) => {
     state.world.combat = combat;
@@ -69,6 +71,8 @@ function grantEncounterRandomCompletionRewards(combat: Combat): void {
 
   const content = getEntry<EncounterRandomContent>(combat.encounterRandomId);
   if (!content) return;
+
+  analyticsSendDesignEvent('World:Event:Complete');
 
   // The fight's level is rolled once per generation and applied to every
   // guardian at `encounterRandomStartFight` time, so the first guardian's

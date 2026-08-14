@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getArmoryEntries } from '@helpers/armory';
 import { caravanState } from '@helpers/caravan';
 import { getCollectibleQuantity, isCollectibleDiscovered } from '@helpers/collectibles';
@@ -284,5 +285,6 @@ export function caravanExecuteTrade(
     return s;
   });
 
+  analyticsSendDesignEvent('Kingdom:Caravan:Trade');
   return true;
 }

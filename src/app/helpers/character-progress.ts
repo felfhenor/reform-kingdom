@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { miscellaneousMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { heroSkillsAtLevel } from '@helpers/job';
@@ -149,7 +150,10 @@ export function partyGainXp(amount: number): boolean {
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => {
       const updated = characterLeveledUp(character, amount);
-      if (updated.level > character.level) anyLeveledUp = true;
+      if (updated.level > character.level) {
+        anyLeveledUp = true;
+        analyticsSendDesignEvent('Hero:LevelUp', updated.level);
+      }
       logCharacterProgress(character, updated);
       return updated;
     });

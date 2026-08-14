@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
@@ -120,6 +121,8 @@ function grantEncounterCompletionRewards(combat: Combat): void {
   const encounter = getEntry<EncounterContent>(combat.encounterId);
   if (!encounter) return;
 
+  analyticsSendDesignEvent('World:Node:Complete');
+
   // The encounter's level is rolled once and applied to every guardian at
   // `encounterStartFight` time, so the first guardian's level represents it.
   const level = combat.guardians[0]?.level ?? 1;
@@ -150,6 +153,7 @@ function nextFightFor(
 // out the fight `encounterStartFight` just wrote to `state.world.combat`.
 function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
+  analyticsSendDesignEvent('Combat:Encounter:Win');
 
   syncPartyHpFromCombat(combat.heroes);
   autoModeRecordClauseSuccess();
@@ -176,6 +180,7 @@ function handleCombatVictory(combat: Combat): boolean {
 
 export function combatHandleDefeat(combat: Combat): void {
   combatMessageLog(combat, 'Heroes have lost the combat!');
+  analyticsSendDesignEvent('Combat:Encounter:Loss');
 
   syncPartyHpFromCombat(combat.heroes);
   autoModeRecordClauseFailure();

@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -36,6 +37,8 @@ export function collectiblesAdd(
 ): void {
   if (quantity <= 0) return;
 
+  const alreadyDiscovered = isCollectibleDiscovered(collectibleId);
+
   updateGamestate((state) => {
     const existing = state.collectibles[collectibleId];
     const current = existing?.quantity ?? 0;
@@ -46,6 +49,8 @@ export function collectiblesAdd(
     };
     return state;
   });
+
+  if (!alreadyDiscovered) analyticsSendDesignEvent('Progress:Museum:Unlock');
 }
 
 const FOUNDING_STONE_NAME = 'Founding Stone';

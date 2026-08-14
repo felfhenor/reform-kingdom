@@ -1,3 +1,4 @@
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { rangeLabelAtLevel } from '@helpers/leveled-range';
 import { rewardDisplayOrder } from '@helpers/loot';
@@ -51,6 +52,8 @@ export function monsterRecordKill(
   level: number,
   foundAtNode?: string,
 ): void {
+  const alreadyDiscovered = isMonsterDiscovered(monsterId);
+
   updateGamestate((state) => {
     const existing = state.bestiary[monsterId];
     const foundAtNodes = new Set(existing?.foundAtNodes ?? []);
@@ -72,6 +75,8 @@ export function monsterRecordKill(
     };
     return state;
   });
+
+  if (!alreadyDiscovered) analyticsSendDesignEvent('Progress:Bestiary:Unlock');
 }
 
 // Repairs bestiary entries written before min/max level tracking existed,
