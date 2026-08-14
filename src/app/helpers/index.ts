@@ -9,6 +9,7 @@ export * from './character-equipment';
 export * from './character-progress';
 export * from './character-reclass';
 export * from './clipboard';
+export * from './collectible-source';
 export * from './collectibles';
 export * from './combat';
 export * from './combat-create';

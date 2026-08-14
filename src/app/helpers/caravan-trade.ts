@@ -171,15 +171,11 @@ export function caravanTradeMaxQuantity(
   return remaining === undefined ? owned : Math.min(remaining, owned);
 }
 
-// Grants whichever reward type `trade` sells, `quantity` times -
-// `foundAtNode` is set to the trader's name, which is how a wandering-
-// trader collectible's origin is recorded (there's no dedicated "source"
-// field on `CollectibleContent`). `quantity` is always 1 for a collectible
-// (enforced by `caravanTradeMaxQuantity`).
+// Grants whichever reward type `trade` sells, `quantity` times. `quantity`
+// is always 1 for a collectible (enforced by `caravanTradeMaxQuantity`).
 function grantCaravanReward(
   state: GameState,
   trade: CaravanTrade,
-  traderName: string,
   quantity: number,
 ): void {
   if (trade.itemId) {
@@ -207,7 +203,6 @@ function grantCaravanReward(
     state.collectibles[trade.collectibleId] = {
       quantity: (existing?.quantity ?? 0) + quantity,
       foundAt: existing?.foundAt ?? Date.now(),
-      foundAtNode: existing?.foundAtNode ?? traderName,
     };
   }
 }
@@ -275,7 +270,7 @@ export function caravanExecuteTrade(
 
   updateGamestate((s) => {
     if (trade.type === 'sell') {
-      grantCaravanReward(s, trade, trader.name, quantity);
+      grantCaravanReward(s, trade, quantity);
       spendGold(s, totalPrice);
     } else {
       takeCaravanPayment(s, trade, quantity);

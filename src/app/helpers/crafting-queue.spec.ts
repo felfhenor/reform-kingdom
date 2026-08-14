@@ -473,7 +473,6 @@ describe('craftProcessTick', () => {
     expect(collectiblesAdd).toHaveBeenCalledWith(
       'minor-blacksmithing-effigy',
       1,
-      'Blacksmithing',
     );
     expect(craftMessageLog).toHaveBeenCalledWith(
       'Blacksmithing',

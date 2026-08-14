@@ -1,4 +1,5 @@
 @let e = entry();
+@let source = e.source;
 
 @if (e.discovered) {
   <div
@@ -24,7 +25,7 @@
 }
 
 <ng-template #tooltip>
-  <div class="flex gap-2 p-2">
+  <div class="flex gap-2 p-2 max-w-[400px]">
     @if (e.discovered) {
       <app-atlas-image
         spritesheet="collectible"
@@ -45,18 +46,24 @@
 
         <div class="text-xs">Found: {{ displayQuantity() }}</div>
 
-        @if (e.foundAtNode) {
-          <div class="text-xs">Location: {{ e.foundAtNode }}</div>
+        @if (source?.type === 'crafting') {
+          <div class="text-xs">Source: Crafting</div>
+        } @else if (source?.type === 'trader') {
+          <div class="text-xs">From: {{ source.name }}</div>
+        } @else if (source?.type === 'node') {
+          <div class="text-xs">Location: {{ source.name }}</div>
         }
       } @else {
         <div class="font-bold mb-1">???</div>
 
-        @if (e.sourceNodeNames.length > 0) {
-          <div class="text-xs">
-            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
-          </div>
+        @if (source?.type === 'crafting') {
+          <div class="text-xs">Source: Crafting</div>
+        } @else if (source?.type === 'trader') {
+          <div class="text-xs">From: {{ source.name }}</div>
+        } @else if (source?.type === 'node') {
+          <div class="text-xs">Discoverable in: {{ source.name }}</div>
         } @else {
-          <div class="text-xs italic">Location unknown</div>
+          <div class="text-xs italic">Source unknown</div>
         }
       }
     </div>

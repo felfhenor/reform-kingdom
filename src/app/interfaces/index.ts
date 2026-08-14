@@ -3,6 +3,7 @@ export * from './bestiary';
 export * from './caravan-state';
 export * from './chance-tier';
 export * from './character';
+export * from './collectible-source';
 export * from './combat';
 export * from './combat-log';
 export * from './content-caravan';

@@ -40,11 +40,13 @@ export type GameStateMaterials = {
   [key: MaterialId]: { quantity: number; foundAt: number };
 };
 
+// Where a collectible was found is never stored per-player - the museum
+// derives it fresh from content every render (see
+// `helpers/collectible-source.ts`), so this only needs to track ownership.
 export type GameStateCollectibles = {
   [key: CollectibleId]: {
     quantity: number;
     foundAt: number;
-    foundAtNode?: string;
   };
 };
 

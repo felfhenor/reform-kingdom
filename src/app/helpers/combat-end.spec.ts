@@ -214,11 +214,7 @@ describe('combatCheckIfOver', () => {
 
     combatCheckIfOver(combat);
 
-    expect(collectiblesAdd).toHaveBeenCalledWith(
-      collectible.id,
-      1,
-      'Field Ruins',
-    );
+    expect(collectiblesAdd).toHaveBeenCalledWith(collectible.id, 1);
   });
 
   it('grants a rolled recipe completion reward and logs it', () => {

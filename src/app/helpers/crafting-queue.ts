@@ -293,7 +293,7 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   }
 
   const { collectibleId } = recipe.result;
-  collectiblesAdd(collectibleId, 1, tradeskill);
+  collectiblesAdd(collectibleId, 1);
 
   const collectible = getEntry<CollectibleContent>(collectibleId);
   if (collectible) {

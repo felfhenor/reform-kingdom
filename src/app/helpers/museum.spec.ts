@@ -1,6 +1,7 @@
 import type {
   CollectibleContent,
   CollectibleId,
+  CollectibleSource,
   EncounterContent,
   EncounterId,
   MuseumCollectibleEntry,
@@ -11,9 +12,12 @@ import type {
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/collectibles', () => ({
-  getCollectibleFoundAtNode: vi.fn(),
   getCollectibleQuantity: vi.fn(),
   isCollectibleDiscovered: vi.fn(),
+}));
+
+vi.mock('@helpers/collectible-source', () => ({
+  getCollectibleSource: vi.fn(),
 }));
 
 vi.mock('@helpers/content', () => ({
@@ -29,14 +33,10 @@ vi.mock('@helpers/world-nodes', () => ({
   worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
 }));
 
-import {
-  getCollectibleFoundAtNode,
-  getCollectibleQuantity,
-  isCollectibleDiscovered,
-} from '@helpers/collectibles';
+import { getCollectibleQuantity, isCollectibleDiscovered } from '@helpers/collectibles';
+import { getCollectibleSource } from '@helpers/collectible-source';
 import { getEntriesByType } from '@helpers/content';
 import {
-  collectibleSourceNodeNames,
   filterMuseumCollectibleEntries,
   filterMuseumRecipeEntries,
   getMuseumCollectibleEntries,
@@ -44,6 +44,7 @@ import {
   recipeSourceNodeNames,
 } from '@helpers/museum';
 import { getRecipeFoundAtNode, isRecipeDiscovered } from '@helpers/recipes';
+import { worldNodeDisplayName } from '@helpers/world-nodes';
 
 const foundingStone: CollectibleContent = {
   id: 'founding-stone' as CollectibleId,
@@ -107,28 +108,10 @@ describe('Museum Helper Functions', () => {
     vi.clearAllMocks();
   });
 
-  describe('collectibleSourceNodeNames', () => {
-    it('returns the names of encounters that can drop the collectible', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([fieldRuinsEncounter]);
-
-      expect(collectibleSourceNodeNames(goblinRuby.id)).toEqual([
-        'Field Ruins',
-      ]);
-    });
-
-    it('excludes encounters whose rewards do not include the collectible', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([fieldRuinsEncounter]);
-
-      expect(collectibleSourceNodeNames(foundingStone.id)).toEqual([]);
-    });
-  });
-
   describe('getMuseumCollectibleEntries', () => {
     it('builds an entry for every collectible, discovered or not', () => {
-      vi.mocked(getEntriesByType).mockImplementation((type) =>
-        (type === 'collectible'
-          ? [foundingStone, goblinRuby]
-          : [fieldRuinsEncounter]) as never,
+      vi.mocked(getEntriesByType).mockImplementation(
+        (type) => (type === 'collectible' ? [foundingStone, goblinRuby] : []) as never,
       );
       vi.mocked(isCollectibleDiscovered).mockImplementation(
         (id) => id === foundingStone.id,
@@ -136,7 +119,9 @@ describe('Museum Helper Functions', () => {
       vi.mocked(getCollectibleQuantity).mockImplementation((id) =>
         id === foundingStone.id ? 1 : 0,
       );
-      vi.mocked(getCollectibleFoundAtNode).mockReturnValue(undefined);
+      vi.mocked(getCollectibleSource).mockImplementation((id) =>
+        id === goblinRuby.id ? { type: 'node', name: 'Field Ruins' } : undefined,
+      );
 
       const entries = getMuseumCollectibleEntries();
 
@@ -145,34 +130,67 @@ describe('Museum Helper Functions', () => {
           collectible: foundingStone,
           discovered: true,
           quantity: 1,
-          foundAtNode: undefined,
-          sourceNodeNames: [],
+          source: undefined,
         },
         {
           collectible: goblinRuby,
           discovered: false,
           quantity: 0,
-          foundAtNode: undefined,
-          sourceNodeNames: ['Field Ruins'],
+          source: { type: 'node', name: 'Field Ruins' },
         },
       ]);
+    });
+
+    it('re-masks a node source name through worldNodeDisplayName', () => {
+      vi.mocked(getEntriesByType).mockImplementation(
+        (type) => (type === 'collectible' ? [goblinRuby] : []) as never,
+      );
+      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+      vi.mocked(getCollectibleQuantity).mockReturnValue(0);
+      vi.mocked(getCollectibleSource).mockReturnValue({
+        type: 'node',
+        name: 'Hidden Shrine',
+      });
+      vi.mocked(worldNodeDisplayName).mockReturnValueOnce('???');
+
+      const entries = getMuseumCollectibleEntries();
+
+      expect(entries[0].source).toEqual({ type: 'node', name: '???' });
+    });
+
+    it('passes crafting and trader sources through unchanged', () => {
+      vi.mocked(getEntriesByType).mockImplementation(
+        (type) => (type === 'collectible' ? [goblinRuby] : []) as never,
+      );
+      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+      vi.mocked(getCollectibleQuantity).mockReturnValue(0);
+      vi.mocked(getCollectibleSource).mockReturnValue({ type: 'crafting' });
+
+      expect(getMuseumCollectibleEntries()[0].source).toEqual({
+        type: 'crafting',
+      });
     });
   });
 
   describe('filterMuseumCollectibleEntries', () => {
+    const nodeSource: CollectibleSource = { type: 'node', name: 'Field Ruins' };
+    const traderSource: CollectibleSource = {
+      type: 'trader',
+      name: 'Juke Itos',
+    };
+
     const discoveredEntry: MuseumCollectibleEntry = {
       collectible: foundingStone,
       discovered: true,
       quantity: 1,
-      foundAtNode: 'Kingdom',
-      sourceNodeNames: [],
+      source: nodeSource,
     };
 
     const undiscoveredEntry: MuseumCollectibleEntry = {
       collectible: goblinRuby,
       discovered: false,
       quantity: 0,
-      sourceNodeNames: ['Field Ruins'],
+      source: traderSource,
     };
 
     const entries = [discoveredEntry, undiscoveredEntry];
@@ -181,21 +199,46 @@ describe('Museum Helper Functions', () => {
       expect(filterMuseumCollectibleEntries(entries, '   ')).toEqual(entries);
     });
 
-    it('filters discovered entries by name, description, or found-at node', () => {
+    it('filters discovered entries by name, description, or source', () => {
       expect(filterMuseumCollectibleEntries(entries, 'founding')).toEqual([
         discoveredEntry,
       ]);
-      expect(filterMuseumCollectibleEntries(entries, 'kingdom')).toEqual([
+      expect(filterMuseumCollectibleEntries(entries, 'field ruins')).toEqual([
         discoveredEntry,
       ]);
     });
 
-    it('filters undiscovered entries only by their source node names', () => {
-      expect(filterMuseumCollectibleEntries(entries, 'field')).toEqual([
+    it('filters undiscovered entries only by their source', () => {
+      expect(filterMuseumCollectibleEntries(entries, 'juke')).toEqual([
         undiscoveredEntry,
       ]);
       expect(
         filterMuseumCollectibleEntries(entries, 'goblin ruby'),
+      ).toEqual([]);
+    });
+
+    it('matches a crafting source by the word "crafting"', () => {
+      const craftedEntry: MuseumCollectibleEntry = {
+        collectible: goblinRuby,
+        discovered: false,
+        quantity: 0,
+        source: { type: 'crafting' },
+      };
+
+      expect(
+        filterMuseumCollectibleEntries([craftedEntry], 'crafting'),
+      ).toEqual([craftedEntry]);
+    });
+
+    it('treats an entry with no known source as unmatchable when undiscovered', () => {
+      const unknownEntry: MuseumCollectibleEntry = {
+        collectible: goblinRuby,
+        discovered: false,
+        quantity: 0,
+      };
+
+      expect(
+        filterMuseumCollectibleEntries([unknownEntry], 'goblin'),
       ).toEqual([]);
     });
 

@@ -1,8 +1,5 @@
-import {
-  getCollectibleFoundAtNode,
-  getCollectibleQuantity,
-  isCollectibleDiscovered,
-} from '@helpers/collectibles';
+import { getCollectibleQuantity, isCollectibleDiscovered } from '@helpers/collectibles';
+import { getCollectibleSource } from '@helpers/collectible-source';
 import { getEntriesByType } from '@helpers/content';
 import {
   getRecipeFoundAtNode,
@@ -11,7 +8,7 @@ import {
 import { worldNodeDisplayName } from '@helpers/world-nodes';
 import type {
   CollectibleContent,
-  CollectibleId,
+  CollectibleSource,
   EncounterContent,
   MuseumCollectibleEntry,
   MuseumRecipeEntry,
@@ -21,45 +18,33 @@ import type {
 import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
-// The nodes an as-yet-undiscovered collectible can drop from, derived by
-// reverse-scanning every encounter's completion rewards - collectibles don't
-// know their own source node until a copy has actually been found.
-export function collectibleSourceNodeNames(
-  collectibleId: CollectibleId,
-): string[] {
-  const encounters = getEntriesByType<EncounterContent>('encounter');
-
-  const names = new Set<string>();
-  encounters.forEach((encounter) => {
-    const dropsHere = encounter.completionRewards.some(
-      (reward) =>
-        'collectibleId' in reward && reward.collectibleId === collectibleId,
-    );
-    if (dropsHere) names.add(encounter.name);
-  });
-
-  return [...names];
-}
+const CRAFTING_SOURCE_NAME = 'Crafting';
 
 // Every collectible in the game, discovered or not - undiscovered entries
 // are still returned (with `quantity: 0`) so the museum can render them as
-// silhouettes rather than omitting them entirely.
+// silhouettes rather than omitting them entirely. A collectible's source is
+// derived fresh from content every call (see `getCollectibleSource`), not
+// tracked per-player, so this always reflects the current content even for
+// old saves.
 export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
   const collectibles = getEntriesByType<CollectibleContent>('collectible');
 
   const entries = collectibles.map((collectible) => {
     const discovered = isCollectibleDiscovered(collectible.id);
+    const rawSource = getCollectibleSource(collectible.id);
 
-    const foundAtNode = getCollectibleFoundAtNode(collectible.id);
+    // A node source's name is re-masked through `worldNodeDisplayName` here
+    // (rather than cached) since it depends on live world-discovery state.
+    const source: CollectibleSource | undefined =
+      rawSource?.type === 'node'
+        ? { type: 'node', name: worldNodeDisplayName(rawSource.name) }
+        : rawSource;
 
     return {
       collectible,
       discovered,
       quantity: getCollectibleQuantity(collectible.id),
-      foundAtNode: foundAtNode ? worldNodeDisplayName(foundAtNode) : undefined,
-      sourceNodeNames: discovered
-        ? []
-        : collectibleSourceNodeNames(collectible.id).map(worldNodeDisplayName),
+      source,
     };
   });
 
@@ -74,6 +59,10 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
   );
 }
 
+function collectibleSourceName(source: CollectibleSource): string {
+  return source.type === 'crafting' ? CRAFTING_SOURCE_NAME : source.name;
+}
+
 export function filterMuseumCollectibleEntries(
   entries: MuseumCollectibleEntry[],
   searchText: string,
@@ -83,16 +72,20 @@ export function filterMuseumCollectibleEntries(
 
   return entries.filter((entry) => {
     if (!entry.discovered) {
-      return entry.sourceNodeNames.some((name) =>
-        name.toLowerCase().includes(text),
-      );
+      return !!entry.source &&
+        collectibleSourceName(entry.source).toLowerCase().includes(text);
     }
 
     if (entry.collectible.name.toLowerCase().includes(text)) return true;
     if (entry.collectible.description.toLowerCase().includes(text)) {
       return true;
     }
-    if (entry.foundAtNode?.toLowerCase().includes(text)) return true;
+    if (
+      entry.source &&
+      collectibleSourceName(entry.source).toLowerCase().includes(text)
+    ) {
+      return true;
+    }
 
     return false;
   });
