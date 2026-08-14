@@ -205,7 +205,7 @@ jobs:
   #      env:
   #        BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_API_KEY }}
   #        CHANNEL: windows
-  #        ITCH_GAME: reformkingdom
+  #        ITCH_GAME: reform-kingdom
   #        ITCH_USER: seiyria
   #        PACKAGE: ./reformkingdom.exe
   #        VERSION: ${{ steps.loadTagName.outputs.tag }}
