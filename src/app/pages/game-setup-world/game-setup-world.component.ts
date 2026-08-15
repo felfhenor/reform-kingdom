@@ -18,6 +18,7 @@ import { discordSetStatus } from '@helpers/discord';
 import { gameReset } from '@helpers/game-init';
 import { getUnlockedJobs } from '@helpers/job';
 import { createCharacter, setParty } from '@helpers/party';
+import { rngChoiceIdentifiable } from '@helpers/rng';
 import type { JobContent, JobId } from '@interfaces';
 import { StatOrder, StatShorthand } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -101,6 +102,18 @@ export class GameSetupWorldComponent implements OnInit {
 
   public jobFor(jobId: JobId): JobContent | undefined {
     return getEntry<JobContent>(jobId);
+  }
+
+  public randomizeJobs() {
+    const jobs = this.unlockedJobs();
+    if (jobs.length === 0) return;
+
+    this.heroesModel.update((heroes) =>
+      heroes.map((hero) => ({
+        ...hero,
+        jobId: (rngChoiceIdentifiable(jobs) ?? hero.jobId) as JobId,
+      })),
+    );
   }
 
   public async createWorld() {

@@ -2,8 +2,23 @@
   <div class="w-full lg:max-w-[800px]">
     <div class="card bg-base-100">
       <div class="card-body items-center justify-between">
-        <div class="card-title text-center flex flex-col">
-          Choose Your Party
+        <div class="card-title w-full flex justify-between items-center relative min-h-8">
+          <div
+            class="absolute flex justify-center w-full pointer-events-none"
+          >
+            Choose Your Party
+          </div>
+
+          <div></div>
+
+          <button
+            class="btn btn-sm btn-outline"
+            (click)="randomizeJobs()"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Randomize Jobs
+          </button>
         </div>
 
         <div class="card-actions pt-3 flex flex-col gap-6 w-full">

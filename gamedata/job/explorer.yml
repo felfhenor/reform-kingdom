@@ -1,6 +1,6 @@
 - id: e9f0b3f5-8d11-4a4f-8997-29bab6f4cee3
   name: Explorer
-  description: A job for heroes who seek out new lands and experiences. They focus on debuffing their enemies to better support their allies. They lack in many areas, but unlike other jobs, can grow luckier.
+  description: A job for heroes who seek out new lands and experiences. They focus on debuffing their enemies to better support their allies. They lack in many areas - both offensively and defensively - but unlike other jobs, can grow luckier.
   sprite: '0000'
   frames: 4
 
