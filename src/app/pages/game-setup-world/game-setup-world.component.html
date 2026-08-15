@@ -11,7 +11,7 @@
             @let jobId = heroField.jobId().value();
             @let jobData = jobFor(jobId);
 
-            <div class="flex flex-row gap-2 items-center w-full">
+            <div class="flex flex-row gap-2 w-full">
               <app-icon-job [job]="jobData"></app-icon-job>
 
               <div class="flex flex-col gap-2 flex-1">
@@ -32,6 +32,22 @@
                     [formField]="heroField.jobId"
                   ></ng-select>
                 </div>
+
+                @if (jobData) {
+                  <div class="grid grid-cols-4 md:grid-cols-8 gap-2 my-2">
+                    @for (stat of statOrder; track stat) {
+                      <div class="flex items-center gap-2 text-xs">
+                        <app-icon-stat [stat]="stat" />
+                        <span class="inline-block min-w-[24px]">
+                          {{ statShorthand[stat] }}
+                        </span>
+                        <span>
+                          {{ jobData.baseStats[stat] | statDisplay: 0 : false }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
 
                 <div class="text-sm text-lighter">
                   {{ jobData?.description }}
