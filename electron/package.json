@@ -3,7 +3,7 @@
   "description": "re:Form Kingdom is a game where you lead a hero to infinite victory.",
   "author": "re:Form Kingdom Team <hi@felfhenor.com>",
   "license": "UNLICENSED",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "src/index.js",
   "scripts": {
     "start": "npm run start:localref",
@@ -11,7 +11,7 @@
     "start:localref": "cross-env APP_URL=http://localhost:9866 electron-forge start -- --dev",
     "start:prodref": "cross-env APP_URL=https://reformkingdom.felfhenor.com electron-forge start -- --dev",
     "build": "npm run build:copy && npm run build:replacebasehref && npm run build:replaceimgrefs && npm run build:createicons",
-    "build:createicons": "cpy ../public/favicon/web-app-manifest-512x512.png --rename icon.png ./icons --flat && png2icons ./icons/icon.png icon -allp -hm -i && cpy ./icon.icns ./icons && cpy ./icon.ico ./icons && rimraf icon.icns && rimraf icon.ico",
+    "build:createicons": "node -e \"require('fs').mkdirSync('./icons',{recursive:true})\" && cpy ../public/favicon/web-app-manifest-512x512.png --rename icon.png ./icons --flat && png2icons ./icons/icon.png icon -allp -hm -i && cpy ./icon.icns ./icons && cpy ./icon.ico ./icons && rimraf icon.icns && rimraf icon.ico",
     "build:copy": "cpy ../dist/reformkingdom/browser/ .",
     "build:replacebasehref": "replace-in-file \"\\\"/\\\"\" \"\\\"./\\\"\" browser/index.html",
     "build:replaceimgrefs": "replace-in-file \"/url\\(\\//gm\" \"url(./\" browser/*.css",
