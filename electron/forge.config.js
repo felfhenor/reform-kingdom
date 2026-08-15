@@ -4,7 +4,7 @@ const fs = require('fs');
 module.exports = {
   packagerConfig: {
     executableName: 'reformkingdom',
-    appBundleId: 'com.reformkingdom.game',
+    appBundleId: 'com.felfhenor.reformkingdom',
     appCopyright: 're:Form Kingdom Team',
     appCategoryType: 'public.app-category.games',
     icon: './icons/icon',
