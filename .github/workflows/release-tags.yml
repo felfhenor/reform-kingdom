@@ -181,31 +181,26 @@ jobs:
   #
 
   ## This works, but we need an itch API key - maybe eventually
-  #upload-itch:
-  #  needs: [publish-windows]
-  #  name: Upload to Itch.io
-
-  #  runs-on: ${{ matrix.os }}
-
-  #  strategy:
-  #    matrix:
-  #      os: [ubuntu-latest]
-  #      node-version: [26]
-
-  #  steps:
-  #    - uses: little-core-labs/get-git-tag@v3.0.1
-  #      id: loadTagName
-
-  #    - name: Load Windows Binary
-  #      uses: actions/download-artifact@v4
-  #      with:
-  #        name: reformkingdom.exe
-
-  #    - uses: manleydev/butler-publish-itchio-action@master
-  #      env:
-  #        BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_API_KEY }}
-  #        CHANNEL: windows
-  #        ITCH_GAME: reform-kingdom
-  #        ITCH_USER: seiyria
-  #        PACKAGE: ./reformkingdom.exe
-  #        VERSION: ${{ steps.loadTagName.outputs.tag }}
+  upload-itch:
+    needs: [publish-windows]
+    name: Upload to Itch.io
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [26]
+    steps:
+      - uses: little-core-labs/get-git-tag@v3.0.1
+        id: loadTagName
+      - name: Load Windows Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: reformkingdom.exe
+      - uses: manleydev/butler-publish-itchio-action@master
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_API_KEY }}
+          CHANNEL: windows
+          ITCH_GAME: reform-kingdom
+          ITCH_USER: seiyria
+          PACKAGE: ./reformkingdom.exe
+          VERSION: ${{ steps.loadTagName.outputs.tag }}
