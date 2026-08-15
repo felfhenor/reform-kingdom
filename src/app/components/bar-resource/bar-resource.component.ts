@@ -16,4 +16,8 @@ export class BarResourceComponent {
       { itemRef: goldCoinEntry, total: getMaterialQuantity(goldCoinEntry.id) },
     ];
   });
+
+  public areAnyGreaterThanZero = computed(() => {
+    return this.resources().some((r) => r.total > 0);
+  });
 }
