@@ -1,6 +1,6 @@
 - id: 359069e6-e133-4984-9b8f-78d524d762e5
   name: Ranger
-  description: A person who hunts and tracks their prey.
+  description: A job for heroes who hunt and tracks their prey. They have incredible physical single target damage and can repeatedly hit their foes with physical splash damage. They have very consistent physical strength and agility growth, but lack in all defensive areas.
   sprite: '0016'
   frames: 4
 
@@ -9,7 +9,7 @@
     Energy: 20
     Luck: 1
     Intelligence: 4
-    Strength: 10
+    Strength: 12
     Vitality: 3
     Resistance: 8
     Agility: 9
@@ -20,8 +20,8 @@
     Luck: 0
     Intelligence: 0.3
     Strength: 0.7
-    Vitality: 0.4
-    Resistance: 0.6
+    Vitality: 0.3
+    Resistance: 0.3
     Agility: 0.8
 
   statPriority:

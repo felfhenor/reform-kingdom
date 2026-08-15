@@ -1,24 +1,24 @@
 - id: e9f0b3f5-8d11-4a4f-8997-29bab6f4cee3
   name: Explorer
-  description: A person who seeks out new lands and experiences.
+  description: A job for heroes who seek out new lands and experiences. They focus on debuffing their enemies to better support their allies. They lack in many areas, but unlike other jobs, can grow luckier.
   sprite: '0000'
   frames: 4
 
   baseStats:
-    Health: 25
-    Energy: 10
+    Health: 35
+    Energy: 15
     Luck: 5
-    Intelligence: 5
-    Strength: 5
-    Vitality: 5
-    Resistance: 5
+    Intelligence: 7
+    Strength: 7
+    Vitality: 7
+    Resistance: 7
     Agility: 10
 
   statsPerLevel:
     Health: 5
-    Energy: 2
-    Luck: 0.01
-    Intelligence: 0.2
+    Energy: 3
+    Luck: 0.1
+    Intelligence: 0.3
     Strength: 0.5
     Vitality: 0.3
     Resistance: 0.4

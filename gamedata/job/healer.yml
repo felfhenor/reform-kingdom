@@ -1,6 +1,6 @@
 - id: 87b8e644-6984-4533-bd72-68190943466d
   name: Healer
-  description: A person who heals others and themselves.
+  description: A job for heroes who heal others and themselves. They also have the ability to buff their allies and do some magical damage to their enemies. They have very consistent defensive growth, but often lack offensive capabilities.
   sprite: '0012'
   frames: 4
 
@@ -9,9 +9,9 @@
     Energy: 20
     Luck: 1
     Intelligence: 9
-    Strength: 5
+    Strength: 9
     Vitality: 8
-    Resistance: 5
+    Resistance: 12
     Agility: 2
 
   statsPerLevel:
@@ -20,8 +20,8 @@
     Luck: 0
     Intelligence: 0.6
     Strength: 0.5
-    Vitality: 0.6
-    Resistance: 0.4
+    Vitality: 0.5
+    Resistance: 0.6
     Agility: 0.5
 
   statPriority:

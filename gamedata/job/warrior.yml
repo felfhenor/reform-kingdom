@@ -1,6 +1,6 @@
 - id: ccbc6c69-7e7e-4c4d-8b55-90aa69094e7b
   name: Warrior
-  description: A person who fights for their goals.
+  description: A job for heroes who fights for their friends. They focus on damaging their foes while staying alive. They have the highest growth for health and physical defense, but lack in any magical capabilities.
   sprite: '0008'
   frames: 4
 
@@ -20,7 +20,7 @@
     Luck: 0
     Intelligence: 0.2
     Strength: 0.6
-    Vitality: 0.4
+    Vitality: 0.6
     Resistance: 0.1
     Agility: 0.3
 

@@ -1,6 +1,6 @@
 - id: 8e172a46-fa01-468a-9b4f-feac5c9e219c
   name: Magician
-  description: A person who uses magic to achieve their goals.
+  description: A job for heroes who use magic to decimate their foes. They have incredible magical single target damage and some magical splash damage, but don't have a lot of defense. They have very consistent magical growth - offensively and defensively - but lack in any physical growth.
   sprite: '0004'
   frames: 4
 
@@ -8,7 +8,7 @@
     Health: 30
     Energy: 40
     Luck: 1
-    Intelligence: 14
+    Intelligence: 16
     Strength: 2
     Vitality: 3
     Resistance: 7
@@ -16,7 +16,7 @@
 
   statsPerLevel:
     Health: 4
-    Energy: 7
+    Energy: 5
     Luck: 0
     Intelligence: 0.9
     Strength: 0.2

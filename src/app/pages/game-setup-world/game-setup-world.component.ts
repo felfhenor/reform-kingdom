@@ -22,7 +22,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
 
-const STARTING_JOB_NAME = 'Explorer';
+const STARTING_JOB_NAMES = ['Warrior', 'Magician', 'Healer', 'Ranger'];
 const STARTING_HERO_NAMES = ['Jala', 'Spoorle', 'Jacks', 'Pertil'];
 
 type HeroPick = {
@@ -70,12 +70,16 @@ export class GameSetupWorldComponent implements OnInit {
       const jobs = this.unlockedJobs();
       if (jobs.length === 0) return;
 
-      const startingJobId =
-        jobs.find((job) => job.name === STARTING_JOB_NAME)?.id ?? jobs[0].id;
-
       this.heroesModel.update((heroes) =>
-        heroes.map((hero) =>
-          hero.jobId ? hero : { ...hero, jobId: startingJobId },
+        heroes.map((hero, index) =>
+          hero.jobId
+            ? hero
+            : {
+                ...hero,
+                jobId:
+                  jobs.find((job) => job.name === STARTING_JOB_NAMES[index])
+                    ?.id ?? jobs[0].id,
+              },
         ),
       );
     });
