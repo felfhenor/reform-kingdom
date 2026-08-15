@@ -75,13 +75,13 @@
       }
     </div>
 
-    <div class="flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto">
+    <div class="flex-1 flex flex-col gap-2 overflow-y-auto">
       @for (entry of entries; track entry.recipe.id) {
         @let quantity = quantityFor(entry.recipe.id);
         @let uncraftable = entry.maxCraftable === 0;
 
         <div
-          class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-16"
+          class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-28"
           [class.opacity-50]="uncraftable"
         >
           <div class="w-16 h-16 relative flex-shrink-0 overflow-hidden">
