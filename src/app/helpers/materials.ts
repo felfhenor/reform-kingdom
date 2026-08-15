@@ -91,3 +91,11 @@ export function gainGold(state: GameState, amount: number): void {
 export function spendGold(state: GameState, amount: number): void {
   applyMaterialDelta(state, goldCoinId(), -amount);
 }
+
+const STARTING_GOLD_AMOUNT = 100;
+
+// Grants the new-game starting gold - only called once, from `gameStart`
+// when a fresh world is created, so it never re-applies to an existing save.
+export function grantStartingGold(state: GameState): void {
+  gainGold(state, STARTING_GOLD_AMOUNT);
+}

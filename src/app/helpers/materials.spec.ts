@@ -18,6 +18,7 @@ import {
   getGoldQuantity,
   getMaterialQuantity,
   goldCoinId as resolveGoldCoinId,
+  grantStartingGold,
   isMaterialDiscovered,
   pruneInvalidMaterials,
   removeMaterial,
@@ -127,6 +128,39 @@ describe('Material Helper Functions', () => {
       spendGold(state, 100);
 
       expect(state.materials[goldCoinId]).toBeUndefined();
+    });
+  });
+
+  describe('grantStartingGold', () => {
+    beforeEach(() => {
+      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
+    });
+
+    it('grants 100 gold on a fresh state with no existing gold', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(1234);
+      const state = { materials: {} } as unknown as GameState;
+
+      grantStartingGold(state);
+
+      expect(state.materials[goldCoinId]).toEqual({
+        quantity: 100,
+        foundAt: 1234,
+      });
+
+      vi.restoreAllMocks();
+    });
+
+    it('adds 100 gold on top of any existing gold quantity', () => {
+      const state = {
+        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
+      } as unknown as GameState;
+
+      grantStartingGold(state);
+
+      expect(state.materials[goldCoinId]).toEqual({
+        quantity: 105,
+        foundAt: 1000,
+      });
     });
   });
 

@@ -1,6 +1,7 @@
+import { grantStartingGold } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { setupFinish } from '@helpers/setup';
-import { resetGameState } from '@helpers/state-game';
+import { resetGameState, updateGamestate } from '@helpers/state-game';
 import { setWorld } from '@helpers/world';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
@@ -11,6 +12,10 @@ export async function gameStart(): Promise<void> {
   delete world.didFinish;
 
   setWorld(world);
+  await updateGamestate((state) => {
+    grantStartingGold(state);
+    return state;
+  });
 
   setTimeout(() => {
     setupFinish();
