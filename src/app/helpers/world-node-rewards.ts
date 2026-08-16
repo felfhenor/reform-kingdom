@@ -79,7 +79,7 @@ export function rewardContentInfo(
     : undefined;
 }
 
-function isGoldCoinReward(reward: DroppedReward): boolean {
+export function isGoldCoinReward(reward: DroppedReward): boolean {
   if (!('itemId' in reward)) return false;
   return reward.itemId === getEntry<ItemContent>('Gold Coin')?.id;
 }

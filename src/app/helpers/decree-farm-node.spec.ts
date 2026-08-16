@@ -8,6 +8,10 @@ vi.mock('@helpers/collectibles', () => ({
   getCollectibleQuantity: vi.fn(() => 0),
 }));
 
+vi.mock('@helpers/content', () => ({
+  getEntry: vi.fn(),
+}));
+
 vi.mock('@helpers/materials', () => ({
   getMaterialQuantity: vi.fn(() => 0),
 }));
@@ -22,6 +26,8 @@ vi.mock('@helpers/world-node-status', () => ({
 }));
 
 vi.mock('@helpers/world-node-rewards', () => ({
+  isGoldCoinReward: vi.fn(() => false),
+  isRewardDiscovered: vi.fn(() => false),
   rewardContentInfo: vi.fn(),
   rewardKey: vi.fn(),
   worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
@@ -30,11 +36,14 @@ vi.mock('@helpers/world-node-rewards', () => ({
 
 vi.mock('@helpers/world-nodes', () => ({
   worldNodeByName: vi.fn(),
+  worldNodeEncounter: vi.fn(() => undefined),
+  worldNodeEncounterRandom: vi.fn(() => undefined),
   worldNodesOfType: vi.fn(() => []),
 }));
 
 import { armoryGet } from '@helpers/armory';
 import { getCollectibleQuantity } from '@helpers/collectibles';
+import { getEntry } from '@helpers/content';
 import {
   exploreNodeFarmOptions,
   farmableExploreNodes,
@@ -48,17 +57,28 @@ import {
   worldNodeLevelRange,
 } from '@helpers/world-node-status';
 import {
+  isGoldCoinReward,
+  isRewardDiscovered,
   rewardContentInfo,
   rewardKey,
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
 } from '@helpers/world-node-rewards';
-import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
+import {
+  worldNodeByName,
+  worldNodeEncounter,
+  worldNodeEncounterRandom,
+  worldNodesOfType,
+} from '@helpers/world-nodes';
 import type {
+  EncounterContent,
+  EncounterRandomContent,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
   ItemId,
+  MonsterContent,
+  MonsterId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -76,6 +96,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(armoryGet).mockReturnValue([]);
   vi.mocked(getCollectibleQuantity).mockReturnValue(0);
+  vi.mocked(getEntry).mockReturnValue(undefined);
   vi.mocked(getMaterialQuantity).mockReturnValue(0);
   vi.mocked(isRecipeDiscovered).mockReturnValue(false);
   vi.mocked(worldNodesOfType).mockReturnValue([]);
@@ -85,6 +106,10 @@ beforeEach(() => {
   });
   vi.mocked(worldNodeCompletionRewards).mockReturnValue([]);
   vi.mocked(worldNodeByName).mockReturnValue(undefined);
+  vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
+  vi.mocked(worldNodeEncounterRandom).mockReturnValue(undefined);
+  vi.mocked(isGoldCoinReward).mockReturnValue(false);
+  vi.mocked(isRewardDiscovered).mockReturnValue(false);
   vi.mocked(rewardKey).mockImplementation((reward) => {
     if ('itemId' in reward) return `item:${reward.itemId}`;
     if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
@@ -187,6 +212,107 @@ describe('farmNodeRewardOptions', () => {
 
     expect(options).toHaveLength(1);
     expect(options[0].reward).toEqual({ itemId: 'bone' });
+    expect(rewardContentInfo).toHaveBeenCalledTimes(1);
+  });
+
+  it('includes discovered drops from monsters fought in the node encounter', () => {
+    const entry = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(entry);
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
+    } as EncounterContent);
+    vi.mocked(getEntry).mockReturnValue({
+      drops: [{ itemId: 'fang' as ItemId, min: 1, max: 1, chance: 50 }],
+    } as MonsterContent);
+    vi.mocked(isRewardDiscovered).mockReturnValue(true);
+    vi.mocked(rewardContentInfo).mockReturnValue({
+      name: 'Fang',
+      sprite: '0002',
+      spritesheet: 'item',
+    });
+
+    const options = farmNodeRewardOptions('Forest Ruins');
+
+    expect(options).toHaveLength(1);
+    expect(options[0].reward).toEqual({ itemId: 'fang' });
+  });
+
+  it('excludes undiscovered monster drops', () => {
+    const entry = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(entry);
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
+    } as EncounterContent);
+    vi.mocked(getEntry).mockReturnValue({
+      drops: [{ itemId: 'fang' as ItemId, min: 1, max: 1, chance: 50 }],
+    } as MonsterContent);
+    vi.mocked(isRewardDiscovered).mockReturnValue(false);
+
+    expect(farmNodeRewardOptions('Forest Ruins')).toEqual([]);
+    expect(rewardContentInfo).not.toHaveBeenCalled();
+  });
+
+  it('pulls monsters from the creature pool when the node is an EncounterRandom', () => {
+    const entry = buildNode('Windy Plains');
+    vi.mocked(worldNodeByName).mockReturnValue(entry);
+    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
+    vi.mocked(worldNodeEncounterRandom).mockReturnValue({
+      creaturePool: [{ monsterId: 'hawk' as MonsterId, weight: 1 }],
+    } as EncounterRandomContent);
+    vi.mocked(getEntry).mockReturnValue({
+      drops: [{ itemId: 'feather' as ItemId, min: 1, max: 1, chance: 50 }],
+    } as MonsterContent);
+    vi.mocked(isRewardDiscovered).mockReturnValue(true);
+    vi.mocked(rewardContentInfo).mockReturnValue({
+      name: 'Feather',
+      sprite: '0003',
+      spritesheet: 'item',
+    });
+
+    const options = farmNodeRewardOptions('Windy Plains');
+
+    expect(options).toHaveLength(1);
+    expect(options[0].reward).toEqual({ itemId: 'feather' });
+  });
+
+  it('excludes Gold Coin monster drops, matching completion-reward behavior', () => {
+    const entry = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(entry);
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
+    } as EncounterContent);
+    vi.mocked(getEntry).mockReturnValue({
+      drops: [{ itemId: 'gold-coin' as ItemId, min: 1, max: 1, chance: 100 }],
+    } as MonsterContent);
+    vi.mocked(isRewardDiscovered).mockReturnValue(true);
+    vi.mocked(isGoldCoinReward).mockReturnValue(true);
+
+    expect(farmNodeRewardOptions('Forest Ruins')).toEqual([]);
+    expect(rewardContentInfo).not.toHaveBeenCalled();
+  });
+
+  it('de-dupes a monster drop that matches an existing completion reward', () => {
+    const entry = buildNode('Forest Ruins');
+    vi.mocked(worldNodeByName).mockReturnValue(entry);
+    vi.mocked(worldNodeCompletionRewards).mockReturnValue([
+      { itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
+    ]);
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
+    } as EncounterContent);
+    vi.mocked(getEntry).mockReturnValue({
+      drops: [{ itemId: 'bone' as ItemId, min: 1, max: 1, chance: 50 }],
+    } as MonsterContent);
+    vi.mocked(isRewardDiscovered).mockReturnValue(true);
+    vi.mocked(rewardContentInfo).mockReturnValue({
+      name: 'Bone',
+      sprite: '0001',
+      spritesheet: 'item',
+    });
+
+    const options = farmNodeRewardOptions('Forest Ruins');
+
+    expect(options).toHaveLength(1);
     expect(rewardContentInfo).toHaveBeenCalledTimes(1);
   });
 });
