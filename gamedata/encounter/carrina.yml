@@ -196,6 +196,15 @@
     - collectibleId: Jelly Flower
       chance: 100
 
+    - itemId: Purple Slime Core
+      chance: 20
+
+    - itemId: Red Slime Core
+      chance: 20
+
+    - itemId: Green Slime Core
+      chance: 20
+
     - equipmentId: Green Copperslime Ring
       chance: 20
 

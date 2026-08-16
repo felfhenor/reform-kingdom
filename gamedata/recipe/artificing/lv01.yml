@@ -85,11 +85,8 @@
     collectibleId: Minor Artificing Effigy
 
   requirements:
-    - itemId: Copper Ingot
-      quantity: 30
-
-    - itemId: Malachite
-      quantity: 30
+    - itemId: Trislime Core
+      quantity: 10
 
     - itemId: Gold Coin
       quantity: 250
