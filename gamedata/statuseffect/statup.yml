@@ -70,7 +70,7 @@
   trigger: TurnStart
 
   statScaling:
-    Luck: 30
+    Luck: 0.3
 
   onApply:
     - type: AddDamageToStat
@@ -91,7 +91,7 @@
   trigger: TurnStart
 
   statScaling:
-    Luck: 60
+    Luck: 0.6
 
   onApply:
     - type: AddDamageToStat
