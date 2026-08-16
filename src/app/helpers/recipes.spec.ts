@@ -14,9 +14,29 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/armory', () => ({
+  getArmoryEntries: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/collectibles', () => ({
+  getCollectibleQuantity: vi.fn(() => 0),
+}));
+
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/equipment', () => ({
+  equippedItems: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/materials', () => ({
+  getMaterialQuantity: vi.fn(() => 0),
+}));
+
+vi.mock('@helpers/party', () => ({
+  partyGet: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -24,7 +44,12 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { getArmoryEntries } from '@helpers/armory';
+import { getCollectibleQuantity } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
+import { equippedItems } from '@helpers/equipment';
+import { getMaterialQuantity } from '@helpers/materials';
+import { partyGet } from '@helpers/party';
 import {
   getRecipeFoundAtNode,
   isRecipeCraftable,
@@ -33,6 +58,7 @@ import {
   pruneInvalidDiscoveredRecipes,
   recipeDiscover,
   recipeResultContent,
+  recipeResultOwnedQuantity,
   recipeResultSpritesheet,
 } from '@helpers/recipes';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -310,6 +336,48 @@ describe('Recipes Helper Functions', () => {
 
       expect(recipeResultContent(collectibleRecipe)).toBe(minorEffigy);
       expect(getEntry).toHaveBeenCalledWith(minorEffigy.id);
+    });
+  });
+
+  describe('recipeResultOwnedQuantity', () => {
+    it('returns the material quantity for an item recipe', () => {
+      vi.mocked(getMaterialQuantity).mockReturnValue(12);
+
+      expect(recipeResultOwnedQuantity(itemRecipe)).toBe(12);
+      expect(getMaterialQuantity).toHaveBeenCalledWith(copperIngot.id);
+    });
+
+    it('returns the collectible quantity for a collectible recipe', () => {
+      vi.mocked(getCollectibleQuantity).mockReturnValue(3);
+
+      expect(recipeResultOwnedQuantity(collectibleRecipe)).toBe(3);
+      expect(getCollectibleQuantity).toHaveBeenCalledWith(minorEffigy.id);
+    });
+
+    it('sums armory-stored and equipped copies for an equipment recipe', () => {
+      vi.mocked(getArmoryEntries).mockReturnValue([
+        { content: boneHewnCloak } as never,
+        { content: boneHewnCloak } as never,
+        { content: { ...boneHewnCloak, id: 'other' as EquipmentId } } as never,
+      ]);
+      vi.mocked(partyGet).mockReturnValue([
+        { equipment: {} } as never,
+        { equipment: {} } as never,
+      ]);
+      vi.mocked(equippedItems)
+        .mockReturnValueOnce([
+          { equipmentId: boneHewnCloak.id } as never,
+        ])
+        .mockReturnValueOnce([]);
+
+      expect(recipeResultOwnedQuantity(equipmentRecipe)).toBe(3);
+    });
+
+    it('returns 0 for equipment with none stored or equipped', () => {
+      vi.mocked(getArmoryEntries).mockReturnValue([]);
+      vi.mocked(partyGet).mockReturnValue([]);
+
+      expect(recipeResultOwnedQuantity(equipmentRecipe)).toBe(0);
     });
   });
 });

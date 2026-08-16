@@ -45,6 +45,7 @@ export type CraftRecipeEntry = {
   backdropSprite: string | undefined;
   effectiveLevel: number;
   maxCraftable: number;
+  ownedQuantity: number;
   xp: number;
   xpChance: number;
   xpChanceTier: ChanceTier;

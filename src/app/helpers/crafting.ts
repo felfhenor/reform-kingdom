@@ -4,6 +4,7 @@ import {
   isRecipeCraftable,
   recipeBackdropSprite,
   recipeResultContent,
+  recipeResultOwnedQuantity,
   recipeResultSpritesheet,
 } from '@helpers/recipes';
 import { craftXpChance, craftXpChanceTier, tradeskillBuilding } from '@helpers/tradeskill';
@@ -110,6 +111,7 @@ export function getCraftableRecipeEntries(
         backdropSprite,
         effectiveLevel: recipeEffectiveLevel(recipe, resultContent),
         maxCraftable: craftMaxCraftableQuantity(recipe, tradeskill),
+        ownedQuantity: recipeResultOwnedQuantity(recipe),
         xp: recipe.tradeskillXP,
         xpChance: craftXpChance(recipe, building.level),
         xpChanceTier: craftXpChanceTier(recipe, building.level),

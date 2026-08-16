@@ -1,14 +1,21 @@
+import { getArmoryEntries } from '@helpers/armory';
+import { getCollectibleQuantity } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
+import { equippedItems } from '@helpers/equipment';
+import { getMaterialQuantity } from '@helpers/materials';
+import { partyGet } from '@helpers/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CollectibleContent,
   EncounterContent,
   EquipmentContent,
+  EquipmentId,
   GameStateDiscoveredRecipes,
   ItemContent,
   RecipeContent,
   RecipeId,
 } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
 
 // Whether this recipe has ever been found as a world drop - recipes that are
 // only ever learned by leveling a tradeskill building are never discovered
@@ -89,6 +96,39 @@ export function recipeResultContent(
   }
 
   return getEntry<CollectibleContent>(recipe.result.collectibleId);
+}
+
+// Armory-stored plus currently-equipped (across the whole party) copies of
+// a piece of equipment - the two are mutually exclusive in game state, so
+// this is a plain sum, never a double count.
+function ownedEquipmentQuantity(equipmentId: EquipmentId): number {
+  const stored = getArmoryEntries().filter(
+    (entry) => entry.content.id === equipmentId,
+  ).length;
+  const equipped = sumBy(
+    partyGet(),
+    (character) =>
+      equippedItems(character.equipment).filter(
+        (item) => item.equipmentId === equipmentId,
+      ).length,
+  );
+
+  return stored + equipped;
+}
+
+// How many of a recipe's result the party currently has - inventory
+// quantity for items/collectibles, or armory-stored plus currently-equipped
+// count for equipment. Shown as the "Have" badge in the crafting screen.
+export function recipeResultOwnedQuantity(recipe: RecipeContent): number {
+  if ('itemId' in recipe.result) {
+    return getMaterialQuantity(recipe.result.itemId);
+  }
+
+  if ('equipmentId' in recipe.result) {
+    return ownedEquipmentQuantity(recipe.result.equipmentId);
+  }
+
+  return getCollectibleQuantity(recipe.result.collectibleId);
 }
 
 const RECIPE_BACKDROP_ITEM_NAME = 'Recipe Backdrop';

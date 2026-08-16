@@ -17,6 +17,7 @@ vi.mock('@helpers/recipes', () => ({
   isRecipeCraftable: vi.fn(() => true),
   recipeBackdropSprite: vi.fn(() => '0099'),
   recipeResultContent: vi.fn(),
+  recipeResultOwnedQuantity: vi.fn(() => 0),
   recipeResultSpritesheet: vi.fn(),
 }));
 
