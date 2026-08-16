@@ -86,7 +86,7 @@
 
   requirements:
     - itemId: Trislime Core
-      quantity: 10
+      quantity: 5
 
     - itemId: Gold Coin
       quantity: 250
