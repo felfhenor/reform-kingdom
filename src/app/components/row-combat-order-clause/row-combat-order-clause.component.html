@@ -1,3 +1,9 @@
+@if (icon(); as skill) {
+  <div class="min-w-[16px] min-h-[16px]" [tp]="skill.name" [tpPlacement]="'top'">
+    <app-atlas-image class="zoom-inline" spritesheet="skill" [assetName]="skill.sprite" />
+  </div>
+}
+
 <span class="flex-1 truncate" [class.opacity-50]="!clause().enabled">
   {{ summary() }}
 </span>
