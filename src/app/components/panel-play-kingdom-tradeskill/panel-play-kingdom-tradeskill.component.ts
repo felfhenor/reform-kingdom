@@ -1,15 +1,18 @@
+import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
+  LOCALE_ID,
   signal,
   viewChild,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { getEntry } from '@helpers/content';
 import { getCraftableRecipeEntries } from '@helpers/crafting';
 import { craftQueueRemove, craftQueueStart } from '@helpers/crafting-queue';
@@ -48,6 +51,8 @@ import { clamp } from 'es-toolkit/compat';
   templateUrl: './panel-play-kingdom-tradeskill.component.html',
 })
 export class PanelPlayKingdomTradeskillComponent {
+  private locale = inject(LOCALE_ID);
+
   public tradeskill = input.required<Tradeskill>();
 
   public formatDuration = formatDuration;
@@ -134,8 +139,10 @@ export class PanelPlayKingdomTradeskillComponent {
     const name = entry.content?.name ?? 'Unknown';
 
     if (entry.kind === 'collectible') return `${name} (not consumed)`;
-    if (entry.kind === 'item') return `${name} x${entry.quantity}`;
-    return name;
+
+    const owned = formatNumber(entry.owned, this.locale);
+    const quantity = formatNumber(entry.quantity, this.locale);
+    return `${name} (${owned}/${quantity})`;
   }
 
   public xpChanceTooltip(xpChance: number): string {

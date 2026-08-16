@@ -151,9 +151,13 @@
 
                     @if (req.kind === 'item') {
                       <span
-                        class="absolute bottom-0 right-0 text-[9px] leading-tight bg-black/70 px-0.5 rounded-sm"
+                        class="absolute bottom-0 right-0 text-[10px] leading-tight px-0.5 rounded-sm {{
+                          req.owned < req.quantity
+                            ? 'bg-error text-white'
+                            : 'bg-black/70'
+                        }}"
                       >
-                        x{{ req.quantity }}
+                        {{ req.quantity }}
                       </span>
                     }
                   </div>

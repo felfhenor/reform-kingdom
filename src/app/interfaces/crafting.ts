@@ -32,6 +32,7 @@ export type CraftRequirementEntry = {
   content: CollectibleContent | EquipmentContent | ItemContent | undefined;
   spritesheet: 'collectible' | 'equipment' | 'item';
   quantity: number;
+  owned: number;
 };
 
 // A recipe resolved for display in a tradeskill's craft list - everything

@@ -11,6 +11,7 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/crafting-queue', () => ({
   craftMaxCraftableQuantity: vi.fn(() => 1),
+  requirementAvailable: vi.fn(() => 0),
 }));
 
 vi.mock('@helpers/recipes', () => ({

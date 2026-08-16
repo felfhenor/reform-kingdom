@@ -1,4 +1,8 @@
-import { craftMaxCraftableQuantity } from '@helpers/crafting-queue';
+import {
+  craftMaxCraftableQuantity,
+  requirementAvailable,
+} from '@helpers/crafting-queue';
+import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   isRecipeCraftable,
@@ -43,6 +47,7 @@ function buildRequirementEntry(
       content: getEntry<CollectibleContent>(requirement.collectibleId),
       spritesheet: 'collectible',
       quantity: 1,
+      owned: isCollectibleDiscovered(requirement.collectibleId) ? 1 : 0,
     };
   }
 
@@ -52,6 +57,7 @@ function buildRequirementEntry(
       content: getEntry<EquipmentContent>(requirement.equipmentId),
       spritesheet: 'equipment',
       quantity: 1,
+      owned: requirementAvailable(requirement),
     };
   }
 
@@ -60,6 +66,7 @@ function buildRequirementEntry(
     content: getEntry<ItemContent>(requirement.itemId),
     spritesheet: 'item',
     quantity: requirement.quantity,
+    owned: requirementAvailable(requirement),
   };
 }
 

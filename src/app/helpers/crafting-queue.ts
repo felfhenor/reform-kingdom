@@ -49,7 +49,7 @@ import { clamp } from 'es-toolkit/compat';
 
 const MAX_CRAFTABLE_CAP = 99;
 
-function requirementAvailable(
+export function requirementAvailable(
   requirement: RecipeRequirementItem | RecipeRequirementEquipment,
 ): number {
   if ('itemId' in requirement) return getMaterialQuantity(requirement.itemId);
