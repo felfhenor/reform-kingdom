@@ -1,5 +1,14 @@
+import type * as AnalyticsHelper from '@helpers/analytics';
 import type * as MaterialsHelper from '@helpers/materials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/armory', () => ({
   armoryAdd: vi.fn(),
@@ -52,6 +61,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { armoryAdd, armoryGet } from '@helpers/armory';
 import {
   collectiblesAdd,
@@ -323,6 +333,19 @@ describe('craftQueueStart', () => {
       },
     ]);
   });
+
+  it('sends an analytics event with the recipe name when a craft is queued', () => {
+    vi.mocked(getEntry).mockReturnValue(buildRecipe({ name: 'Copper Ingot' }));
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: { Blacksmithing: buildBuilding({ level: 1 }) },
+    } as unknown as GameState);
+
+    craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1);
+
+    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+      'Kingdom:Craft:Queue:Copper Ingot',
+    );
+  });
 });
 
 describe('craftQueueRemove', () => {
@@ -402,6 +425,9 @@ describe('craftProcessTick', () => {
     expect(craftMessageLog).toHaveBeenCalledWith(
       'Blacksmithing',
       expect.stringContaining('Copper Ingot'),
+    );
+    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+      'Kingdom:Craft:Complete:Material Copper Ingot',
     );
 
     // Call 0: XP grant (rngSucceedsChance mocked true, recipe.tradeskillXP = 1).

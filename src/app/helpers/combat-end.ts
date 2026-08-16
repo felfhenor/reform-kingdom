@@ -1,4 +1,7 @@
-import { analyticsSendDesignEvent } from '@helpers/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/analytics';
 import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
@@ -121,7 +124,9 @@ function grantEncounterCompletionRewards(combat: Combat): void {
   const encounter = getEntry<EncounterContent>(combat.encounterId);
   if (!encounter) return;
 
-  analyticsSendDesignEvent('World:Node:Complete');
+  analyticsSendDesignEvent(
+    `World:Node:Complete:${analyticsSafeSegment(combat.locationName)}`,
+  );
 
   // The encounter's level is rolled once and applied to every guardian at
   // `encounterStartFight` time, so the first guardian's level represents it.

@@ -1,4 +1,13 @@
+import type * as AnalyticsHelper from '@helpers/analytics';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/armory', () => ({
   armoryAdd: vi.fn(),
@@ -67,6 +76,7 @@ vi.mock('@helpers/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));
 
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
@@ -187,6 +197,26 @@ describe('combatCheckIfOver', () => {
     expect(rollDroppedRewards).toHaveBeenCalledWith(
       encounter.completionRewards,
       1,
+    );
+  });
+
+  it('sends a node-completion analytics event with the location name', () => {
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [],
+    } as unknown as EncounterContent;
+    vi.mocked(getEntry).mockReturnValue(encounter as never);
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      locationName: 'Field Ruins',
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+      'World:Node:Complete:Field Ruins',
     );
   });
 

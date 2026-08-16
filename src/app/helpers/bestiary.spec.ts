@@ -1,3 +1,4 @@
+import type * as AnalyticsHelper from '@helpers/analytics';
 import type {
   BestiaryEntry,
   EncounterContent,
@@ -11,6 +12,14 @@ import type {
   MonsterId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/content', () => ({
   getEntriesByType: vi.fn(),
@@ -31,6 +40,7 @@ vi.mock('@helpers/world-nodes', () => ({
   worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
 }));
 
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   bestiaryDropQuantityLabel,
   bestiaryXpLabel,
@@ -346,6 +356,37 @@ describe('Bestiary Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.bestiary[goblin.id].foundAtNodes).toEqual(['Field Ruins']);
+    });
+
+    it('sends an analytics event with the monster name only on the first kill', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        bestiary: {},
+      } as unknown as GameState);
+      vi.mocked(getEntry).mockReturnValue(goblin);
+
+      monsterRecordKill(goblin.id, 3, 'Field Ruins');
+
+      expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+        'Progress:Bestiary:Unlock:Goblin',
+      );
+    });
+
+    it('does not send an analytics event again on repeat kills', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        bestiary: {
+          [goblin.id]: {
+            foundAt: 1000,
+            kills: 1,
+            minLevelFound: 3,
+            maxLevelFound: 3,
+            foundAtNodes: ['Field Ruins'],
+          },
+        },
+      } as unknown as GameState);
+
+      monsterRecordKill(goblin.id, 3, 'Field Ruins');
+
+      expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
     });
   });
 

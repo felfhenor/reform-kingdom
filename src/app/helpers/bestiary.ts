@@ -1,9 +1,15 @@
-import { analyticsSendDesignEvent } from '@helpers/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/analytics';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { rangeLabelAtLevel } from '@helpers/leveled-range';
 import { rewardDisplayOrder } from '@helpers/loot';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { isRewardDiscovered, rewardContentInfo } from '@helpers/world-node-rewards';
+import {
+  isRewardDiscovered,
+  rewardContentInfo,
+} from '@helpers/world-node-rewards';
 import { worldNodeDisplayName } from '@helpers/world-nodes';
 import type {
   BestiaryEntry,
@@ -76,7 +82,14 @@ export function monsterRecordKill(
     return state;
   });
 
-  if (!alreadyDiscovered) analyticsSendDesignEvent('Progress:Bestiary:Unlock');
+  if (!alreadyDiscovered) {
+    const monsterName = getEntry<MonsterContent>(monsterId)?.name;
+    if (monsterName) {
+      analyticsSendDesignEvent(
+        `Progress:Bestiary:Unlock:${analyticsSafeSegment(monsterName)}`,
+      );
+    }
+  }
 }
 
 // Repairs bestiary entries written before min/max level tracking existed,
@@ -181,8 +194,12 @@ export function getBestiaryEntries(): BestiaryEntry[] {
       discovered,
       kills: getMonsterKillCount(monster.id),
       levelRange: getMonsterLevelRangeFound(monster.id),
-      foundAtNodes: getMonsterFoundAtNodes(monster.id).map(worldNodeDisplayName),
-      sourceNodeNames: monsterSourceNodeNames(monster.id).map(worldNodeDisplayName),
+      foundAtNodes: getMonsterFoundAtNodes(monster.id).map(
+        worldNodeDisplayName,
+      ),
+      sourceNodeNames: monsterSourceNodeNames(monster.id).map(
+        worldNodeDisplayName,
+      ),
       drops: sortBy(monster.drops, [rewardDisplayOrder]).map((reward) => ({
         reward,
         discovered: isRewardDiscovered(reward),

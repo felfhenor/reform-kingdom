@@ -1,3 +1,4 @@
+import type * as AnalyticsHelper from '@helpers/analytics';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -5,6 +6,14 @@ import type {
   GameStateCollectibles,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
@@ -15,6 +24,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   collectiblesAdd,
   getCollectibleQuantity,
@@ -107,6 +117,29 @@ describe('Collectibles Helper Functions', () => {
       collectiblesAdd(foundingStone.id, -1);
 
       expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('sends an analytics event with the collectible name only the first time it is found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        collectibles: {},
+      } as unknown as GameState);
+      vi.mocked(getEntry).mockReturnValue(foundingStone);
+
+      collectiblesAdd(foundingStone.id);
+
+      expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+        'Progress:Museum:Unlock:Founding Stone',
+      );
+    });
+
+    it('does not send an analytics event again once already discovered', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        collectibles: { [foundingStone.id]: { quantity: 1, foundAt: 1000 } },
+      } as unknown as GameState);
+
+      collectiblesAdd(foundingStone.id, 2);
+
+      expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
     });
 
   });

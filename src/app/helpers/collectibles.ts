@@ -1,4 +1,7 @@
-import { analyticsSendDesignEvent } from '@helpers/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/analytics';
 import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -50,7 +53,15 @@ export function collectiblesAdd(
     return state;
   });
 
-  if (!alreadyDiscovered) analyticsSendDesignEvent('Progress:Museum:Unlock');
+  if (!alreadyDiscovered) {
+    const collectibleName = getEntry<CollectibleContent>(collectibleId)?.name;
+
+    if (collectibleName) {
+      analyticsSendDesignEvent(
+        `Progress:Museum:Unlock:${analyticsSafeSegment(collectibleName)}`,
+      );
+    }
+  }
 }
 
 const FOUNDING_STONE_NAME = 'Founding Stone';

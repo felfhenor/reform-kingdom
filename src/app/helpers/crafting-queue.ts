@@ -1,4 +1,7 @@
-import { analyticsSendDesignEvent } from '@helpers/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/analytics';
 import { armoryAdd, armoryGet } from '@helpers/armory';
 import {
   collectiblesAdd,
@@ -216,7 +219,9 @@ export function craftQueueStart(
     return state;
   });
 
-  analyticsSendDesignEvent('Kingdom:Craft:Queue');
+  analyticsSendDesignEvent(
+    `Kingdom:Craft:Queue:${analyticsSafeSegment(recipe.name)}`,
+  );
   return true;
 }
 
@@ -308,7 +313,9 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
 
 function resolveCraftUnit(tradeskill: Tradeskill, recipe: RecipeContent): void {
   grantCraftResult(tradeskill, recipe);
-  analyticsSendDesignEvent('Kingdom:Craft:Complete');
+  analyticsSendDesignEvent(
+    `Kingdom:Craft:Complete:${analyticsSafeSegment(recipe.name)}`,
+  );
 
   const chance = craftXpChance(recipe, tradeskillBuilding(tradeskill).level);
   if (recipe.tradeskillXP > 0 && rngSucceedsChance(chance)) {

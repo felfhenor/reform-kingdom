@@ -1,3 +1,4 @@
+import type * as AnalyticsHelper from '@helpers/analytics';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/state-game', () => ({
@@ -5,6 +6,15 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+vi.mock('@helpers/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
+
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import {
   gatherNodeDiscover,
   grandfatherGatherNodeDiscoveries,
@@ -48,6 +58,10 @@ describe('gatherNodeDiscover', () => {
   });
 
   it('records a foundAt timestamp for a newly-visited node', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredGatherNodes: {},
+    } as unknown as GameState);
+
     gatherNodeDiscover('Wergen Woods');
 
     const result = applyLastUpdate({
@@ -60,6 +74,10 @@ describe('gatherNodeDiscover', () => {
   });
 
   it('preserves the original foundAt on repeat visits', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
+    } as unknown as GameState);
+
     gatherNodeDiscover('Wergen Woods');
 
     const result = applyLastUpdate({
@@ -67,6 +85,28 @@ describe('gatherNodeDiscover', () => {
     } as unknown as GameState);
 
     expect(result.discoveredGatherNodes['Wergen Woods'].foundAt).toBe(1000);
+  });
+
+  it('sends an analytics event with the node name only the first time it is visited', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredGatherNodes: {},
+    } as unknown as GameState);
+
+    gatherNodeDiscover('Wergen Woods');
+
+    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+      'World:GatherNode:Discover:Wergen Woods',
+    );
+  });
+
+  it('does not send an analytics event again on repeat visits', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
+    } as unknown as GameState);
+
+    gatherNodeDiscover('Wergen Woods');
+
+    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
   });
 });
 

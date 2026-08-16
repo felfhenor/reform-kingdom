@@ -1,3 +1,7 @@
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/analytics';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GameStateDiscoveredGatherNodes } from '@interfaces';
 
@@ -6,6 +10,8 @@ export function isGatherNodeDiscovered(nodeName: string): boolean {
 }
 
 export function gatherNodeDiscover(nodeName: string): void {
+  const alreadyDiscovered = isGatherNodeDiscovered(nodeName);
+
   updateGamestate((state) => {
     const existing = state.discoveredGatherNodes[nodeName];
     state.discoveredGatherNodes[nodeName] = {
@@ -13,6 +19,12 @@ export function gatherNodeDiscover(nodeName: string): void {
     };
     return state;
   });
+
+  if (!alreadyDiscovered) {
+    analyticsSendDesignEvent(
+      `World:GatherNode:Discover:${analyticsSafeSegment(nodeName)}`,
+    );
+  }
 }
 
 // Drops any discovery entries for nodes that no longer exist on any loaded

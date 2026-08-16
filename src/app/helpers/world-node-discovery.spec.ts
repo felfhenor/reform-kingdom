@@ -1,3 +1,4 @@
+import type * as AnalyticsHelper from '@helpers/analytics';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/state-game', () => ({
@@ -9,6 +10,15 @@ vi.mock('@helpers/notify', () => ({
   notifySuccess: vi.fn(),
 }));
 
+vi.mock('@helpers/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
+
+import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { notifySuccess } from '@helpers/notify';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -100,6 +110,28 @@ describe('worldNodeDiscover', () => {
     worldNodeDiscover('Hidden Grove');
 
     expect(notifySuccess).not.toHaveBeenCalled();
+  });
+
+  it('sends an analytics event with the node name only the first time it is discovered', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      worldDiscoveries: {},
+    } as unknown as GameState);
+
+    worldNodeDiscover('Hidden Grove');
+
+    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+      'World:Node:Discover:Hidden Grove',
+    );
+  });
+
+  it('does not send an analytics event again on repeat discovery', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      worldDiscoveries: { 'Hidden Grove': { foundAt: 1000 } },
+    } as unknown as GameState);
+
+    worldNodeDiscover('Hidden Grove');
+
+    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
   });
 });
 
