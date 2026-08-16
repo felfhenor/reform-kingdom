@@ -23,6 +23,7 @@ vi.mock('@helpers/worldgen', () => ({
 import { gameReset } from '@helpers/game-init';
 import { migrateGameState } from '@helpers/migrate';
 import { resetGameState } from '@helpers/state-game';
+import { getOption, setOption } from '@helpers/state-options';
 
 describe('gameReset', () => {
   it('resets game state and re-runs migration so guaranteed grants still apply', () => {
@@ -30,5 +31,13 @@ describe('gameReset', () => {
 
     expect(resetGameState).toHaveBeenCalled();
     expect(migrateGameState).toHaveBeenCalled();
+  });
+
+  it('unpauses the gameloop, so a paused prior session does not carry over', () => {
+    setOption('gameloopPaused', true);
+
+    gameReset();
+
+    expect(getOption('gameloopPaused')).toBe(false);
   });
 });

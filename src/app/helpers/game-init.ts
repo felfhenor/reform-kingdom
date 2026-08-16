@@ -2,6 +2,7 @@ import { grantStartingGold } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { setupFinish } from '@helpers/setup';
 import { resetGameState, updateGamestate } from '@helpers/state-game';
+import { setOption } from '@helpers/state-options';
 import { setWorld } from '@helpers/world';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
@@ -28,4 +29,8 @@ export async function gameStart(): Promise<void> {
 export function gameReset(): void {
   resetGameState();
   migrateGameState();
+
+  // The pause option lives outside game state (it's a persisted user
+  // option), so a paused prior session would otherwise carry over here.
+  setOption('gameloopPaused', false);
 }
