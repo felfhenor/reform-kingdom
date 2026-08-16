@@ -1,4 +1,16 @@
-import type { DiscordPresenceOpts } from '@interfaces';
+import { caravanBrandName, caravanState } from '@helpers/caravan';
+import { currentCombat } from '@helpers/combat';
+import { getEntry } from '@helpers/content';
+import { partyGet } from '@helpers/party';
+import { gamestate } from '@helpers/state-game';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
+import { worldNodeCaravan } from '@helpers/world-nodes';
+import type {
+  CaravanTraderContent,
+  DiscordPresenceOpts,
+  JobContent,
+  WorldNodeEntry,
+} from '@interfaces';
 
 export function isInElectron() {
   return navigator.userAgent.toLowerCase().includes(' electron/');
@@ -17,11 +29,76 @@ export function discordSetStatus(status: DiscordPresenceOpts) {
   };
 }
 
+function discordCombatState(): string | undefined {
+  const combat = currentCombat();
+  return combat ? `Exploring ${combat.locationName}` : undefined;
+}
+
+function discordTravelState(): string | undefined {
+  const travel = gamestate().world.travel;
+  if (travel.status !== 'Traveling' || !travel.destinationNodeName) {
+    return undefined;
+  }
+
+  return `Traveling to ${travel.destinationNodeName}`;
+}
+
+function discordGatherState(): string | undefined {
+  const gathering = gamestate().world.gathering;
+  if (gathering.status !== 'Gathering' || !gathering.nodeName) {
+    return undefined;
+  }
+
+  return `Gathering in ${gathering.nodeName}`;
+}
+
+function discordCaravanTraderName(entry: WorldNodeEntry): string | undefined {
+  const caravan = worldNodeCaravan(entry);
+  if (!caravan) return undefined;
+
+  const traderId = caravanState(caravan.id)?.traderId;
+  if (!traderId) return undefined;
+
+  return getEntry<CaravanTraderContent>(traderId)?.name;
+}
+
+function discordLocationDisplayName(entry: WorldNodeEntry): string {
+  return entry.nodeData.type === 'CaravanNode'
+    ? caravanBrandName(entry.nodeName)
+    : entry.nodeName;
+}
+
+function discordIdleState(): string {
+  const entry = worldNodeAtCurrentLocation();
+  if (!entry) return 'Traveling';
+
+  const traderName = discordCaravanTraderName(entry);
+  if (traderName) return `Trading with ${traderName}`;
+
+  return `Resting at ${discordLocationDisplayName(entry)}`;
+}
+
+function discordActivityState(): string {
+  return (
+    discordCombatState() ??
+    discordTravelState() ??
+    discordGatherState() ??
+    discordIdleState()
+  );
+}
+
+function discordPartyDetails(): string {
+  return partyGet()
+    .map((character) => {
+      const job = getEntry<JobContent>(character.jobId);
+      return `${job?.name ?? 'Adventurer'} Lv${character.level}`;
+    })
+    .join(', ');
+}
+
 export function discordUpdateStatus() {
   if (!isInElectron()) return;
 
-  discordSetStatus({
-    state: 'In game',
-    details: `Winning the game, slowly...`,
-  });
+  discordSetMainStatus(discordPartyDetails());
+  discordSetStatus({ state: discordActivityState() });
 }

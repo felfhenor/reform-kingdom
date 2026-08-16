@@ -5,6 +5,7 @@ import { autoModeProcessTick } from '@helpers/auto-mode';
 import { caravanProcessTick } from '@helpers/caravan-tick';
 import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
 import { craftProcessTick } from '@helpers/crafting-queue';
+import { discordUpdateStatus } from '@helpers/discord';
 import { encounterRandomProcessTick } from '@helpers/encounter-random-tick';
 import { gatheringProcessTick } from '@helpers/gathering';
 import { globalEffectsProcessTick } from '@helpers/global-effects';
@@ -74,6 +75,8 @@ export async function gameloop(totalTicks: number): Promise<void> {
   }
 
   timer.dumpTimers((timers) => debug('Gameloop:Timers', timers));
+
+  discordUpdateStatus();
 
   gamestateTickEnd();
 

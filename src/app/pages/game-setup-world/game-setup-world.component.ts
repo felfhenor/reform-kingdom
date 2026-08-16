@@ -14,7 +14,7 @@ import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content';
-import { discordSetStatus } from '@helpers/discord';
+import { discordSetMainStatus, discordSetStatus } from '@helpers/discord';
 import { gameReset } from '@helpers/game-init';
 import { getUnlockedJobs } from '@helpers/job';
 import { createCharacter, setParty } from '@helpers/party';
@@ -95,6 +95,7 @@ export class GameSetupWorldComponent implements OnInit {
   }
 
   ngOnInit() {
+    discordSetMainStatus('');
     discordSetStatus({
       state: 'Starting a new game...',
     });
