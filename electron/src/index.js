@@ -110,7 +110,7 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-const DISCORD_CLIENT_ID = '1404253128559296613';
+const DISCORD_CLIENT_ID = '1538621457343455332';
 
 const handleRPC = () => {
   const isRegistered = rpc.register(DISCORD_CLIENT_ID); // only needed if we want spectate / join / ask to join
@@ -143,7 +143,7 @@ const handleRPC = () => {
           details: result.details,
           smallImageKey: result.smmallImageKey,
           smallImageText: result.smallImageText,
-          largeImageKey: result.largeImageKey || 'reformkingdom',
+          largeImageKey: result.largeImageKey || 'defaultimage',
           largeImageText: result.largeImageText,
         });
       });
