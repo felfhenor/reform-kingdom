@@ -240,6 +240,45 @@ function isPartyIdleForAutoMode(): boolean {
   );
 }
 
+// A gather session with no clause behind it (started manually, or its
+// GatherMaterial clause no longer matches, was disabled, etc.) has no
+// natural stop condition of its own - unlike a clause-tracked gather, which
+// `stopGatherIfTargetReached` ends once its target is hit. Left alone it
+// loops forever, so `isPartyIdleForAutoMode` never sees the party as idle
+// and `advanceToNextClause` never runs again - Auto Mode is permanently
+// stuck at that node regardless of health. Ending the gather here hands
+// control straight back to the normal per-tick evaluation below, which
+// decides what happens next.
+//
+// A hurt party waiting on the "wait for full health" gate is a special case
+// of this: `restingProcessTick` also requires `!isGathering()`, so on top of
+// blocking clause evaluation, an orphaned gather silently breaks the
+// "Healing before the next move..." promise `autoModeStatusLabel` shows for
+// that state. Ending the gather alone isn't enough there, though -
+// `advanceToNextClause`'s blocked-only-by-health branch can never fire from
+// this path (it requires the same health-blocked condition this function
+// just found to be false), so a GatherNode would otherwise be treated as
+// "nothing to do" rather than "waiting to heal." Route through the kingdom
+// explicitly instead.
+function stopOrphanedGather(): boolean {
+  const autoMode = gamestate().world.autoMode;
+  if (!isGathering()) return false;
+
+  const activeClause = autoMode.clauses.find(
+    (candidate) => candidate.id === autoMode.activeClauseId,
+  );
+  if (activeClause) return false;
+
+  gatheringStop();
+
+  if (decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth()) {
+    returnToKingdomFallback();
+    return true;
+  }
+
+  return false;
+}
+
 function runClause(clause: DecreeClause): void {
   setActiveClause(clause.id);
 
@@ -290,6 +329,7 @@ export function autoModeProcessTick(): void {
 
   adoptInProgressGatherClause();
   stopGatherIfTargetReached();
+  if (stopOrphanedGather()) return;
   if (!isPartyIdleForAutoMode()) return;
 
   advanceToNextClause();

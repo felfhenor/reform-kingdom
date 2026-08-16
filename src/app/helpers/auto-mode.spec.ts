@@ -558,7 +558,7 @@ describe('autoModeProcessTick', () => {
     expect(result.world.autoMode.activeClauseId).toBe('copper-clause');
   });
 
-  it('does not adopt an in-progress gather with no matching enabled clause', () => {
+  it('stops an in-progress gather with no matching enabled clause instead of leaving it stuck forever', () => {
     const disabledClause = buildClause({
       id: 'copper-clause' as DecreeClauseId,
       type: 'GatherMaterial',
@@ -586,11 +586,146 @@ describe('autoModeProcessTick', () => {
     autoModeProcessTick();
 
     // The disabled clause is never adopted, so there's nothing whose target
-    // could be "reached" - gathering must be left alone either way.
-    expect(gatheringStop).not.toHaveBeenCalled();
+    // could be "reached" via `stopGatherIfTargetReached` - but the gather is
+    // still orphaned (no clause tracking it), so `stopOrphanedGather` ends
+    // it anyway rather than leaving Auto Mode stuck at this node forever.
+    expect(gatheringStop).toHaveBeenCalled();
   });
 
-  it('does not adopt when the gathering node has no matching material at all', () => {
+  it('breaks off an orphaned gather and heads to the kingdom when hurt and waiting for full health', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [],
+        activeClauseId: undefined,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Wergen Woods',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+    vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
+    vi.mocked(worldNodesOfType).mockReturnValue([
+      { nodeName: 'Kingdom' } as WorldNodeEntry,
+    ]);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledWith('Kingdom', true);
+  });
+
+  it('stops an orphaned gather without forcing a kingdom trip when at full health', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [],
+        activeClauseId: undefined,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Wergen Woods',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
+
+    autoModeProcessTick();
+
+    // Full health means there's no reason to route through the kingdom -
+    // but the orphaned gather still gets ended so the normal per-tick
+    // evaluation (falling back to the kingdom here, since the decree is
+    // empty) can take back over instead of gathering forever.
+    expect(gatheringStop).toHaveBeenCalled();
+  });
+
+  it('actually falls through to evaluating the next clause once an orphaned gather is stopped at full health, rather than just canceling it', () => {
+    const clause = buildClause({ type: 'FinishUnfinishedAreas' });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [],
+        activeClauseId: undefined,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Wergen Woods',
+      }),
+    );
+    // `isGathering` is a static mock elsewhere in this file, which can't
+    // observe `gatheringStop()` being called mid-tick - so those tests can
+    // only prove the gather was canceled, not that Auto Mode picked back up
+    // afterward. This one makes the mock reflect that call, so it actually
+    // exercises the `isPartyIdleForAutoMode` -> `advanceToNextClause`
+    // fallthrough the non-health-blocked path depends on.
+    vi.mocked(isGathering).mockImplementation(
+      () => vi.mocked(gatheringStop).mock.calls.length === 0,
+    );
+    vi.mocked(decreeClauses).mockReturnValue([clause]);
+    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Old Ruins',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledWith('Old Ruins', true);
+  });
+
+  it('does not touch a clause-tracked gather that is still short of its target, even when hurt and waiting for full health', () => {
+    const clause = buildClause({
+      id: 'copper-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      targetQuantity: 1000,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [clause],
+        activeClauseId: clause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Carrina Copper Mines',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(getMaterialQuantity).mockReturnValue(2);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).not.toHaveBeenCalled();
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('leaves a clause-tracked gather alone even while hurt and waiting for full health', () => {
+    const clause = buildClause({
+      id: 'copper-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      targetQuantity: 1000,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [clause],
+        activeClauseId: clause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Carrina Copper Mines',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(getMaterialQuantity).mockReturnValue(2);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).not.toHaveBeenCalled();
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('stops gathering when the gathering node has no matching material at all, rather than leaving it orphaned and stuck forever', () => {
     const clause = buildClause({
       id: 'copper-clause' as DecreeClauseId,
       type: 'GatherMaterial',
@@ -616,6 +751,9 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    expect(gatheringStop).not.toHaveBeenCalled();
+    // Nothing adopts this gather (no enabled clause targets its material),
+    // so it's orphaned - `stopOrphanedGather` ends it so Auto Mode can go
+    // back to evaluating clauses instead of sitting here indefinitely.
+    expect(gatheringStop).toHaveBeenCalled();
   });
 });
