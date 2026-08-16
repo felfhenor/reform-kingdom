@@ -15,9 +15,9 @@ import {
   combatOrderClauseAdd,
   combatOrderClauseRemove,
   combatOrderClauseReorder,
+  combatOrderClauses,
   combatOrderClauseSetEnabled,
   combatOrderClauseUpdate,
-  combatOrderClauses,
 } from '@helpers/combat-order';
 import {
   isCombatOrderFamilyEquipmentOnly,
@@ -384,6 +384,10 @@ export class ModalHeroCombatOrdersComponent {
       combatOrderClauseAdd(character.id, job.id, condition, action);
     }
 
+    this.cancelEditClause();
+  }
+
+  public resetProps(): void {
     this.cancelEditClause();
   }
 }
