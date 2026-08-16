@@ -616,6 +616,57 @@ describe('autoModeProcessTick', () => {
     expect(travelStart).toHaveBeenCalledWith('Kingdom', true);
   });
 
+  it('stops a gather whose active clause was disabled mid-session and moves on to the next enabled clause in the same tick, even though it is still tracked as active and short of its target', () => {
+    const disabledClause = buildClause({
+      id: 'copper-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      targetQuantity: 1000,
+      enabled: false,
+    });
+    const farmClause = buildClause({
+      id: 'jelly-clause' as DecreeClauseId,
+      type: 'FarmNode',
+      nodeName: 'Jelly Fields',
+      reward: { itemId: 'jelly' as ItemId },
+      targetQuantity: 10,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [disabledClause, farmClause],
+        activeClauseId: disabledClause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Carrina Copper Mines',
+      }),
+    );
+    // `isGathering` is a static mock elsewhere in this file, which can't
+    // observe `gatheringStop()` being called mid-tick - this makes the mock
+    // reflect that call, so the test can actually exercise the
+    // `isPartyIdleForAutoMode` -> `advanceToNextClause` fallthrough, not
+    // just the stop itself.
+    vi.mocked(isGathering).mockImplementation(
+      () => vi.mocked(gatheringStop).mock.calls.length === 0,
+    );
+    vi.mocked(getMaterialQuantity).mockReturnValue(2);
+    vi.mocked(decreeClauses).mockReturnValue([disabledClause, farmClause]);
+    vi.mocked(pickNextClause).mockReturnValue(farmClause);
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Jelly Fields',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    // `stopGatherIfTargetReached` finds the clause (it's still in the list,
+    // merely disabled) and leaves it alone since the target isn't met - but
+    // a disabled clause should never keep holding the party at its node, so
+    // `stopOrphanedGather` must treat it the same as no active clause at
+    // all, freeing Auto Mode to pick up the next enabled clause instead of
+    // sitting at the gather node forever.
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledWith('Jelly Fields', true);
+  });
+
   it('stops an orphaned gather without forcing a kingdom trip when at full health', () => {
     vi.mocked(gamestate).mockReturnValue(
       buildState({

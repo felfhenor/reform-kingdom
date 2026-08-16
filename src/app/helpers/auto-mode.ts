@@ -267,7 +267,7 @@ function stopOrphanedGather(): boolean {
   const activeClause = autoMode.clauses.find(
     (candidate) => candidate.id === autoMode.activeClauseId,
   );
-  if (activeClause) return false;
+  if (activeClause?.enabled) return false;
 
   gatheringStop();
 
