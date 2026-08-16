@@ -43,6 +43,7 @@ import type {
   JobContent,
 } from '@interfaces';
 import {
+  NgLabelTemplateDirective,
   NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
@@ -102,6 +103,7 @@ const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
     FormsModule,
     NgSelectComponent,
     NgOptionTemplateDirective,
+    NgLabelTemplateDirective,
     AtlasImageComponent,
   ],
   templateUrl: './modal-hero-combat-orders.component.html',

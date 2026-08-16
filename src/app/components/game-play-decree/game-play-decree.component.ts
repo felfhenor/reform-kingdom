@@ -46,6 +46,7 @@ import type {
   RewardContentInfo,
 } from '@interfaces';
 import {
+  NgLabelTemplateDirective,
   NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
@@ -101,6 +102,7 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
     FormsModule,
     NgSelectComponent,
     NgOptionTemplateDirective,
+    NgLabelTemplateDirective,
     DragDropModule,
     RowDecreeClauseComponent,
     SpriteNodeComponent,

@@ -82,6 +82,10 @@
             <ng-template ng-option-tmp let-item="item">
               <app-option-reward [reward]="item" />
             </ng-template>
+
+            <ng-template ng-label-tmp let-item="item">
+              <app-option-reward [reward]="item" />
+            </ng-template>
           </ng-select>
 
           <input
@@ -117,6 +121,13 @@
                 </div>
               </div>
             </ng-template>
+
+            <ng-template ng-label-tmp let-item="item">
+              <div class="flex items-center gap-2">
+                <app-sprite-node class="zoom-row" [entry]="item.entry" />
+                {{ item.nodeName }}
+              </div>
+            </ng-template>
           </ng-select>
 
           <ng-select
@@ -131,6 +142,10 @@
             (change)="setDraftReward($event)"
           >
             <ng-template ng-option-tmp let-item="item">
+              <app-option-reward [reward]="item" />
+            </ng-template>
+
+            <ng-template ng-label-tmp let-item="item">
               <app-option-reward [reward]="item" />
             </ng-template>
           </ng-select>
