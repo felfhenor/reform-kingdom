@@ -94,8 +94,11 @@ export function printSummaryTable(summaries: GroupSummary[]): void {
 export function writeSummaryFiles(
   logDir: string,
   summaries: GroupSummary[],
+  verbose = false,
 ): void {
-  fs.writeJsonSync(path.join(logDir, 'summary.json'), summaries, { spaces: 2 });
+  const jsonPath = path.join(logDir, 'summary.json');
+  fs.writeJsonSync(jsonPath, summaries, { spaces: 2 });
+  if (verbose) console.log(`This file has been written: ${jsonPath}`);
 
   const header =
     '| Comp | Strategy | Trials | Max Level | Tick Budget | Stonewalled | Avg Final Tick | Avg Final Level | Choke Point |\n' +
@@ -107,7 +110,9 @@ export function writeSummaryFiles(
     )
     .join('\n');
 
-  fs.writeFileSync(path.join(logDir, 'summary.md'), header + rows + '\n');
+  const mdPath = path.join(logDir, 'summary.md');
+  fs.writeFileSync(mdPath, header + rows + '\n');
+  if (verbose) console.log(`This file has been written: ${mdPath}`);
 }
 
 // One row per individual (comp x strategy x trial) run - unlike
@@ -173,8 +178,11 @@ export function printLeaderboard(rows: LeaderboardRow[]): void {
 export function writeLeaderboardFiles(
   logDir: string,
   rows: LeaderboardRow[],
+  verbose = false,
 ): void {
-  fs.writeJsonSync(path.join(logDir, 'leaderboard.json'), rows, { spaces: 2 });
+  const jsonPath = path.join(logDir, 'leaderboard.json');
+  fs.writeJsonSync(jsonPath, rows, { spaces: 2 });
+  if (verbose) console.log(`This file has been written: ${jsonPath}`);
 
   const header =
     '| Rank | Comp | Strategy | Trial | Result | Final Tick | Sim Hours | Final Level | Stonewalls |\n' +
@@ -186,5 +194,7 @@ export function writeLeaderboardFiles(
     )
     .join('\n');
 
-  fs.writeFileSync(path.join(logDir, 'leaderboard.md'), header + body + '\n');
+  const mdPath = path.join(logDir, 'leaderboard.md');
+  fs.writeFileSync(mdPath, header + body + '\n');
+  if (verbose) console.log(`This file has been written: ${mdPath}`);
 }

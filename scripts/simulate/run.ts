@@ -4,11 +4,16 @@ import { settle, silenceDebugLogging } from './shims';
 
 import { getEntry } from '@helpers/content';
 import { gameReset, gameStart } from '@helpers/game-init';
+import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
 import { migrateGameState } from '@helpers/migrate';
 import { createCharacter, setParty } from '@helpers/party';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeDiscover } from '@helpers/world-node-discovery';
-import { isWorldNodeHidden, worldNodeLookup } from '@helpers/world-nodes';
+import {
+  isWorldNodeHidden,
+  worldNodeLookup,
+  worldNodesOfType,
+} from '@helpers/world-nodes';
 import type { JobContent, JobId } from '@interfaces';
 import { bootstrapContent } from './bootstrap';
 import { DEFAULT_TICK_BUDGET, DEFAULT_TRIALS } from './constants';
@@ -33,7 +38,7 @@ import type {
   StrategyName,
 } from './types';
 
-const ALL_STRATEGIES: StrategyName[] = ['optimal', 'average', 'suboptimal'];
+const ALL_STRATEGIES: StrategyName[] = ['periodic-craft', 'always-craft'];
 
 function parseArgs(argv: string[]): RunOptions {
   const args = new Map<string, string>();
@@ -79,6 +84,26 @@ function discoverHiddenNodesForSimulation(): void {
     .forEach((entry) => worldNodeDiscover(entry.nodeName));
 }
 
+// A GatherNode is only ever discovered by the player clicking it as an
+// explicit travel destination (`gatherNodeDiscover` in `travel.ts`), and a
+// `GatherMaterial` Decree clause can only target a GatherNode that's already
+// discovered (`nearestGatherNodeFor` in `decree-evaluation.ts`) - a
+// chicken-and-egg problem the simulator has no way through, since it never
+// clicks anything. `grandfatherGatherNodeDiscoveries` already exists for the
+// analogous real-game case (a legacy save with material progress but no
+// recorded visits - see `migrate.ts`), so reuse it here for the same reason
+// `discoverHiddenNodesForSimulation` reuses `worldNodeDiscover`: give the
+// simulator the coverage a human player would get through ordinary
+// exploration, without trying to simulate exploration itself.
+function discoverAllGatherNodesForSimulation(): void {
+  updateGamestate((state) => {
+    state.discoveredGatherNodes = grandfatherGatherNodeDiscoveries(
+      worldNodesOfType('GatherNode').map((entry) => entry.nodeName),
+    );
+    return state;
+  });
+}
+
 // Builds a fresh `GameState` and starts a new game with `comp`'s party -
 // mutators here are called *outside* a `gamestateTickStart`/`End` bracket,
 // so each one is a fire-and-forget `updateGamestate` call; `settle()` lets
@@ -99,19 +124,29 @@ async function setUpNewGame(comp: PartyComp): Promise<void> {
   await settle();
 
   discoverHiddenNodesForSimulation();
+  discoverAllGatherNodesForSimulation();
   await settle();
 }
 
 async function runOneScenario(
   scenario: ScenarioConfig,
   logger: RunLogger,
+  verbose: boolean,
 ): Promise<SimResult> {
+  if (verbose) {
+    console.log(
+      `[${scenario.comp.label} (${scenario.strategy} trial ${scenario.trial})] party starting up...`,
+    );
+  }
+
   await setUpNewGame(scenario.comp);
-  configureStrategyDecree(scenario.strategy);
+  configureStrategyDecree();
   await settle();
 
-  return runScenario(scenario, (event, snapshot) =>
-    logger.logStonewall(scenario, event, snapshot),
+  return runScenario(
+    scenario,
+    (event, snapshot) => logger.logStonewall(scenario, event, snapshot),
+    verbose,
   );
 }
 
@@ -123,7 +158,9 @@ async function runOneScenario(
 // from every scenario.
 function formatConsoleArgs(args: unknown[]): string {
   return args
-    .map((arg) => (arg instanceof Error ? (arg.stack ?? arg.message) : String(arg)))
+    .map((arg) =>
+      arg instanceof Error ? (arg.stack ?? arg.message) : String(arg),
+    )
     .join(' ');
 }
 
@@ -166,7 +203,7 @@ async function main(): Promise<void> {
       : curatedPartyComps();
 
   const runId = new Date().toISOString().replace(/[:.]/g, '-');
-  const logger = createRunLogger(runId);
+  const logger = createRunLogger(runId, options.verbose);
 
   console.log(
     `Running ${comps.length} comp(s) x ${options.strategies.length} strategy(ies) x ${options.trials} trial(s), ` +
@@ -190,7 +227,7 @@ async function main(): Promise<void> {
             scenario,
             logger,
             options.verbose,
-            () => runOneScenario(scenario, logger),
+            () => runOneScenario(scenario, logger, options.verbose),
           );
           results.push(result);
         } catch (error) {
@@ -215,16 +252,18 @@ async function main(): Promise<void> {
   }
 
   if (failedScenarios > 0) {
-    console.log(`\n${failedScenarios} scenario(s) crashed - see runtime-errors.jsonl.`);
+    console.log(
+      `\n${failedScenarios} scenario(s) crashed - see runtime-errors.jsonl.`,
+    );
   }
 
   const summaries = summarizeResults(results);
   printSummaryTable(summaries);
-  writeSummaryFiles(logger.logDir, summaries);
+  writeSummaryFiles(logger.logDir, summaries, options.verbose);
 
   const leaderboard = buildLeaderboard(results);
   printLeaderboard(leaderboard);
-  writeLeaderboardFiles(logger.logDir, leaderboard);
+  writeLeaderboardFiles(logger.logDir, leaderboard, options.verbose);
 
   const chokePoints = summaries.filter((s) => s.isChokePoint);
   console.log(`\nLogs written to ${logger.logDir}`);
@@ -238,7 +277,14 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Explicit exit on success, not just on error - `helpers/ui.ts`'s
+// `uiClockTick` interval (pulled in transitively through `@helpers` imports
+// this script needs) has no `.unref()`, so Node's event loop never empties
+// on its own and the process would otherwise hang forever after printing
+// results, despite `main()` having actually finished.
+main()
+  .then(() => process.exit(0))
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });

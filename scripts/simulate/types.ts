@@ -1,6 +1,6 @@
 import type { JobId } from '@interfaces';
 
-export type StrategyName = 'optimal' | 'average' | 'suboptimal';
+export type StrategyName = 'periodic-craft' | 'always-craft';
 
 export type PartyComp = {
   label: string;

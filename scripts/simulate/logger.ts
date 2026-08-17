@@ -59,8 +59,10 @@ export type RunLogger = {
 // line per stonewall/error, tick-stamped), `runtime-errors.jsonl` (thrown
 // exceptions and captured console.error/warn output, scenario-tagged), and
 // `dumps/` (a full GameState dump alongside every logged event, for
-// debugging). Gitignored - see `.gitignore`.
-export function createRunLogger(runId: string): RunLogger {
+// debugging). Gitignored - see `.gitignore`. `verbose` only controls whether
+// each write is echoed to the console - the files themselves are always
+// written.
+export function createRunLogger(runId: string, verbose = false): RunLogger {
   const logDir = path.resolve(__dirname, '../../simulation-logs', runId);
   const dumpsDir = path.join(logDir, 'dumps');
   fs.ensureDirSync(dumpsDir);
@@ -72,9 +74,19 @@ export function createRunLogger(runId: string): RunLogger {
   return {
     logDir,
     logStonewall(scenario, event, stateSnapshot) {
+      // Re-ensured on every write, not just once at logger creation - a run
+      // can go for hours, and anything that removes `logDir`/`dumpsDir` in
+      // the meantime (a stray `rm -rf simulation-logs`, antivirus/cleanup
+      // tools, etc.) would otherwise turn every write for the rest of the
+      // run into an ENOENT that takes down the scenario loop. `dumpsDir` is
+      // nested under `logDir`, so ensuring it also recreates `logDir`.
+      fs.ensureDirSync(dumpsDir);
+
       const label = sanitizeForFilename(scenarioLabel(scenario));
       const dumpFileName = `${label}-tick${event.tick}.json`;
-      fs.writeJsonSync(path.join(dumpsDir, dumpFileName), stateSnapshot);
+      const dumpFilePath = path.join(dumpsDir, dumpFileName);
+      fs.writeJsonSync(dumpFilePath, stateSnapshot);
+      if (verbose) console.log(`This file has been written: ${dumpFilePath}`);
 
       const entry: ErrorLogEntry = {
         scenarioLabel: scenario.comp.label,
@@ -90,13 +102,17 @@ export function createRunLogger(runId: string): RunLogger {
       fs.appendFileSync(errorsPath, JSON.stringify(entry) + '\n');
     },
     logRuntimeError(scenario, kind, message, stack, stateSnapshot) {
+      fs.ensureDirSync(dumpsDir);
+
       runtimeErrorCount += 1;
       const label = sanitizeForFilename(scenarioLabel(scenario));
 
       let dumpFile: string | undefined;
       if (stateSnapshot) {
         const dumpFileName = `${label}-runtimeerror${runtimeErrorCount}.json`;
-        fs.writeJsonSync(path.join(dumpsDir, dumpFileName), stateSnapshot);
+        const dumpFilePath = path.join(dumpsDir, dumpFileName);
+        fs.writeJsonSync(dumpFilePath, stateSnapshot);
+        if (verbose) console.log(`This file has been written: ${dumpFilePath}`);
         dumpFile = path.join('dumps', dumpFileName);
       }
 
