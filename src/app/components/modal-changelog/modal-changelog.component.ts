@@ -4,6 +4,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { ModalCloseDirective } from '@directives/modal-close.directive';
 import { ModalOpenDirective } from '@directives/modal-open.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TeleportToDirective } from '@directives/teleport.to.directive';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { tablerPackage } from '@ng-icons/tabler-icons';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -18,6 +19,7 @@ import { MetaService } from '@services/meta.service';
     ModalComponent,
     ModalOpenDirective,
     ModalCloseDirective,
+    TeleportToDirective,
   ],
   providers: [provideIcons({ tablerPackage })],
   templateUrl: './modal-changelog.component.html',

@@ -2,3 +2,8 @@
   <app-screen-loading />
 }
 <router-outlet></router-outlet>
+
+<!-- Must stay after router-outlet: modal dialogs use .show(), not .showModal(),
+     so they don't get the top-layer promotion and instead rely on DOM order
+     to paint above routed page content. -->
+<ng-container [appTeleportOutlet]="'changelog-modal'"></ng-container>

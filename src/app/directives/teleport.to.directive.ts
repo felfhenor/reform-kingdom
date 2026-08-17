@@ -19,6 +19,9 @@ export class TeleportToDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.teleportService.finishTeleportation(this.appTeleportTo());
+    this.teleportService.finishTeleportation(
+      this.appTeleportTo(),
+      this.templateRef,
+    );
   }
 }
