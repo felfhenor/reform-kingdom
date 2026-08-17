@@ -274,7 +274,7 @@ export function caravanExecuteTrade(
   if (quantity > maxQuantity) return false;
 
   const totalPrice = caravanTradePrice(caravan, trade) * quantity;
-  if (!hasGold(totalPrice)) return false;
+  if (trade.type === 'sell' && !hasGold(totalPrice)) return false;
 
   updateGamestate((s) => {
     if (trade.type === 'sell') {

@@ -21,10 +21,12 @@ vi.mock('@helpers/content', () => ({
 vi.mock('@helpers/materials', async (importOriginal) => {
   const actual = await importOriginal<typeof MaterialsHelper>();
   const testGoldCoinId = 'gold-coin' as ItemId;
+  const getGoldQuantity = vi.fn();
   return {
     ...actual,
     getMaterialQuantity: vi.fn(),
-    getGoldQuantity: vi.fn(),
+    getGoldQuantity,
+    hasGold: vi.fn((amount: number) => getGoldQuantity() >= amount),
     gainGold: vi.fn((state: GameState, amount: number) =>
       actual.applyMaterialDelta(state, testGoldCoinId, amount),
     ),
@@ -403,6 +405,12 @@ describe('caravanExecuteTrade', () => {
     trades: [
       { type: 'sell', value: 100, itemId: 'ore' as ItemId, limit: 2, weight: 1 },
       { type: 'buy', value: 50, itemId: 'ore' as ItemId, weight: 1 },
+      {
+        type: 'sell',
+        value: 1000,
+        collectibleId: 'trinket' as CollectibleId,
+        weight: 1,
+      },
     ],
   };
 
@@ -493,6 +501,25 @@ describe('caravanExecuteTrade', () => {
     expect(result.materials['ore' as ItemId].quantity).toBe(2);
     expect(result.materials['gold-coin' as ItemId].quantity).toBe(43);
     expect(result.world.caravans[caravan.id].tradeCounts[1]).toBe(1);
+  });
+
+  it('succeeds a buy trade even when the party currently has no gold', () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(getMaterialQuantity).mockReturnValue(3);
+    vi.mocked(getGoldQuantity).mockReturnValue(0);
+
+    expect(caravanExecuteTrade(entry, 1)).toBe(true);
+  });
+
+  it('blocks buying an undiscovered collectible the party cannot afford, even though max quantity ignores gold', () => {
+    vi.mocked(caravanState).mockReturnValue(
+      nodeState({ activeTradeIndices: [0, 1, 2] }),
+    );
+    vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+    vi.mocked(getGoldQuantity).mockReturnValue(0);
+
+    expect(caravanExecuteTrade(entry, 2)).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
   });
 
   it('returns false for a quantity of 0 or less', () => {
