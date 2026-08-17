@@ -2,7 +2,7 @@
   name: 'Material: Malachite'
   result:
     itemId: Malachite
-    chance: 10
+    chance: 25
 
   requirements:
     - itemId: Copper Ore
@@ -48,7 +48,7 @@
   name: 'Material: Azurite'
   result:
     itemId: Azurite
-    chance: 5
+    chance: 15
 
   requirements:
     - itemId: Copper Ore
