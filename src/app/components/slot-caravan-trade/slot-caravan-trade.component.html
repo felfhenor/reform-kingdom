@@ -100,5 +100,13 @@
         <div class="text-xs">Owned: {{ entry.ownedQuantity }}</div>
       </div>
     </div>
+
+    <div class="mt-2 italic text-center">
+      {{
+        isPartyBuying()
+          ? 'This caravan is selling this item to you.'
+          : 'This caravan is buying this item from you.'
+      }}
+    </div>
   }
 </ng-template>
