@@ -4,7 +4,11 @@
 
 @for (stat of statKeys; track stat) {
   <div class="flex items-center gap-3">
-    <app-icon-stat [stat]="stat" class="text-2xl" />
+    <app-icon-stat
+      [stat]="stat"
+      class="text-2xl"
+      [tp]="statInformation[stat]"
+    />
     <span class="text-base">{{ stat }} ({{ statShorthand[stat] }})</span>
     <span class="ml-auto font-semibold text-lg">
       {{ statValue(stat) }}

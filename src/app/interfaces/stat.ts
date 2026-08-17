@@ -34,6 +34,20 @@ export const StatShorthand: Record<BaseStat, string> = {
   Vitality: 'VIT',
 };
 
+export const StatInformation: Record<BaseStat, string> = {
+  Agility:
+    'Agility is used to determine turn order, and contributes to damage scaling for some skills.',
+  Energy:
+    'EP determines how many Energy Points a hero has when going into an encounter.',
+  Health:
+    'HP determines how many Health Points a hero has when going into an encounter.',
+  Intelligence: 'Intelligence is used primarily to scale magical skills.',
+  Luck: 'Luck is used to mitigate incoming debuffs, get critical hits, and rarely contributes to damage scaling for some skills.',
+  Resistance: 'Resistance is used to mitigate incoming magical damage.',
+  Strength: 'Strength is used primarily to scale physical skills.',
+  Vitality: 'Vitality is used to mitigate incoming physical damage.',
+};
+
 export const PhysicalStats: GameStat[] = [
   'Strength',
   'Vitality',
