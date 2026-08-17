@@ -12,3 +12,22 @@
   width: 100vw;
   height: calc(100vh - 40px);
 }
+
+.pause-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgb(0 0 0 / 0.65) 100%
+  );
+  animation: pause-vignette-breathe 3s ease-in-out infinite;
+}
+
+@keyframes pause-vignette-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}

@@ -29,6 +29,18 @@
     class="absolute inset-0"
     [class.hidden]="activeGamePlayView() !== 'decree'"
   ></app-game-play-decree>
+
+  @if (isPaused()) {
+    <div
+      class="pause-vignette absolute inset-0 pointer-events-none flex items-start justify-center pt-8"
+      aria-hidden="true"
+    >
+      <div class="flex items-center gap-2 text-lighter">
+        <app-icon name="gamePauseButton" size="1.5em"></app-icon>
+        <span class="text-lg tracking-wide uppercase">Paused</span>
+      </div>
+    </div>
+  }
 </div>
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>
