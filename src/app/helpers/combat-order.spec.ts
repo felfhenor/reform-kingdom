@@ -91,7 +91,7 @@ describe('combatOrderClauses', () => {
 });
 
 describe('combatOrderClauseAdd', () => {
-  it('appends a new enabled clause and returns true', () => {
+  it('prepends a new enabled clause and returns true', () => {
     vi.mocked(gamestate).mockReturnValue(stateWithParty([buildCharacter()]));
 
     const added = combatOrderClauseAdd(
@@ -114,6 +114,30 @@ describe('combatOrderClauseAdd', () => {
         action: { type: 'RandomSkill' },
       },
     ]);
+  });
+
+  it('places the new clause ahead of existing clauses', () => {
+    const existing = buildClause({ id: 'clause-0' as CombatOrderClauseId });
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithParty([
+        buildCharacter({ combatOrders: { [jobId]: [existing] } }),
+      ]),
+    );
+
+    combatOrderClauseAdd(
+      characterId,
+      jobId,
+      { type: 'Always' },
+      { type: 'RandomSkill' },
+    );
+
+    const result = applyLastUpdate(
+      stateWithParty([
+        buildCharacter({ combatOrders: { [jobId]: [existing] } }),
+      ]),
+    );
+    expect(result.world.party[0].combatOrders[jobId]).toHaveLength(2);
+    expect(result.world.party[0].combatOrders[jobId][1]).toBe(existing);
   });
 
   it('refuses to add past the row cap and returns false', () => {

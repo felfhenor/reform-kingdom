@@ -104,7 +104,7 @@ export function combatOrderClauseAdd(
             ...c,
             combatOrders: {
               ...c.combatOrders,
-              [jobId]: [...(c.combatOrders[jobId] ?? []), clause],
+              [jobId]: [clause, ...(c.combatOrders[jobId] ?? [])],
             },
           }
         : c,

@@ -73,7 +73,7 @@ export function decreeClauseAdd(action: DecreeClauseAction): boolean {
   };
 
   updateGamestate((state) => {
-    state.world.autoMode.clauses = [...state.world.autoMode.clauses, clause];
+    state.world.autoMode.clauses = [clause, ...state.world.autoMode.clauses];
     return state;
   });
 

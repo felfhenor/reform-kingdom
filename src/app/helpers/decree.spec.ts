@@ -131,7 +131,7 @@ describe('decreeClauseAdd', () => {
     vi.clearAllMocks();
   });
 
-  it('appends a new enabled clause with zero failures and returns true', () => {
+  it('prepends a new enabled clause with zero failures and returns true', () => {
     vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([]));
 
     expect(decreeClauseAdd({ type: 'ReturnToKingdom' })).toBe(true);
@@ -155,7 +155,7 @@ describe('decreeClauseAdd', () => {
 
     const result = applyLastUpdate(stateWithAutoMode([existing]));
     expect(result.world.autoMode.clauses).toHaveLength(2);
-    expect(result.world.autoMode.clauses[0]).toBe(existing);
+    expect(result.world.autoMode.clauses[1]).toBe(existing);
   });
 
   it('refuses to add a clause that duplicates an existing one and returns false', () => {
