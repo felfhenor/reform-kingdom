@@ -29,11 +29,10 @@ import type {
 import { sortBy } from 'es-toolkit/compat';
 
 // A node's floor sitting this many levels above the party's weakest hero
-// still counts as Medium/High risk - anything further is excluded outright
-// (see `riskLevelOfExploreNode`), regardless of any risk setting. Exported
-// so UI copy (the Risk Tolerance dropdown's explanations) can quote the
-// real thresholds instead of hardcoding numbers that could drift out of sync.
-export const MEDIUM_RISK_LEVELS_ABOVE_PARTY = 3;
+// still counts as High risk - anything further is excluded outright (see
+// `riskLevelOfExploreNode`), regardless of any risk setting. Exported so UI
+// copy (the Risk Tolerance dropdown's explanations) can quote the real
+// threshold instead of hardcoding a number that could drift out of sync.
 export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
 
 // Once the least-failed node in a challenge tier has lost this many fights,
@@ -47,6 +46,14 @@ const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
   High: 2,
 };
 
+// A node's encounter level is rolled uniformly across its whole levelRange
+// (see `encounterStartFight`), not just its floor - so risk has to be judged
+// against both ends of that range, not merely how far the floor sits above
+// the party. Low means every possible roll is at or below the party's level;
+// Medium means the party can already clear the floor, even though a roll
+// near the ceiling could still be a stretch; anything where the party can't
+// even handle the floor is High (or TooHigh once that gap is too large - see
+// `HIGH_RISK_LEVELS_ABOVE_PARTY`).
 export function riskLevelOfExploreNode(
   entry: WorldNodeEntry,
 ): ExploreNodeRiskBand {
@@ -55,9 +62,9 @@ export function riskLevelOfExploreNode(
 
   const partyLevel = partyMinLevel();
   if (encounter.levelRange.max <= partyLevel) return 'Low';
+  if (encounter.levelRange.min <= partyLevel) return 'Medium';
 
   const levelsAboveParty = encounter.levelRange.min - partyLevel;
-  if (levelsAboveParty <= MEDIUM_RISK_LEVELS_ABOVE_PARTY) return 'Medium';
   if (levelsAboveParty <= HIGH_RISK_LEVELS_ABOVE_PARTY) return 'High';
 
   return 'TooHigh';
@@ -144,13 +151,16 @@ function leastFailedNodeIn(
 // party's strongest hero that it's already degraded to the flat 1 XP floor
 // (see `isXpTrivialAtOverLevel`) is excluded outright, even if nothing else
 // disqualifies it - clearing it wouldn't grow the party at all.
-export function mostChallengingExploreNodeForRisk(): WorldNodeEntry | undefined {
+export function mostChallengingExploreNodeForRisk():
+  WorldNodeEntry | undefined {
   const ceiling = decreeRiskTolerance();
   const partyLevel = partyMaxLevel();
 
   const candidates = worldNodesOfType('ExploreNode')
     .filter((entry) => isWorldNodeVisible(entry))
-    .filter((entry) => riskLevelSatisfies(riskLevelOfExploreNode(entry), ceiling))
+    .filter((entry) =>
+      riskLevelSatisfies(riskLevelOfExploreNode(entry), ceiling),
+    )
     .filter(
       (entry) =>
         !isXpTrivialAtOverLevel(partyLevel, worldNodeChallengeLevel(entry)),
@@ -168,7 +178,10 @@ export function mostChallengingExploreNodeForRisk(): WorldNodeEntry | undefined 
       (entry) => worldNodeChallengeLevel(entry) === tier,
     );
     const best = leastFailedNodeIn(tierNodes);
-    if (best && decreeNodeFailureCount(best.nodeName) < LEVEL_UP_NODE_FAILURE_LIMIT) {
+    if (
+      best &&
+      decreeNodeFailureCount(best.nodeName) < LEVEL_UP_NODE_FAILURE_LIMIT
+    ) {
       return best;
     }
   }

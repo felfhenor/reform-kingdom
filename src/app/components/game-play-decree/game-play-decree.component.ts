@@ -25,10 +25,7 @@ import {
   decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
-import {
-  HIGH_RISK_LEVELS_ABOVE_PARTY,
-  MEDIUM_RISK_LEVELS_ABOVE_PARTY,
-} from '@helpers/decree-evaluation';
+import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/decree-evaluation';
 import {
   exploreNodeFarmOptions,
   farmNodeRewardOptions,
@@ -80,17 +77,19 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   {
     value: 'Low',
     label: 'Low',
-    description: "Only target encounters at or below the party's level.",
+    description:
+      "Only target nodes with a max level at or below the party's level.",
   },
   {
     value: 'Medium',
     label: 'Medium',
-    description: `Also allow encounters up to ${MEDIUM_RISK_LEVELS_ABOVE_PARTY} levels above the party.`,
+    description:
+      "Target nodes with at least a minimum level of the party's level.",
   },
   {
     value: 'High',
     label: 'High',
-    description: `Also allow encounters up to ${HIGH_RISK_LEVELS_ABOVE_PARTY} levels above the party - the riskiest fights Auto Mode will ever pick on its own.`,
+    description: `Attempt encounters up to ${HIGH_RISK_LEVELS_ABOVE_PARTY} levels above the party's weakest hero - the riskiest fights Auto Mode will ever pick on its own.`,
   },
 ];
 

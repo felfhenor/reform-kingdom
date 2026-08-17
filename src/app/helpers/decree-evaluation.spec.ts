@@ -145,17 +145,29 @@ describe('riskLevelOfExploreNode', () => {
     expect(riskLevelOfExploreNode(buildNode('A'))).toBe('Low');
   });
 
-  it('is Medium within 1-3 levels above the party', () => {
+  it('is Medium when the party can already clear the floor but not the ceiling', () => {
     vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 12, max: 14 },
+      levelRange: { min: 8, max: 12 },
     } as EncounterContent);
 
     expect(riskLevelOfExploreNode(buildNode('A'))).toBe('Medium');
   });
 
-  it('is High within 4-7 levels above the party', () => {
+  it('is High when the floor itself is above the party, within the hard cap', () => {
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 16, max: 18 },
+    } as EncounterContent);
+
+    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('High');
+  });
+
+  it('is High rather than Medium when the floor is only slightly above the party', () => {
+    // A node whose fights are randomized across its whole levelRange (see
+    // `encounterStartFight`) can still roll a much tougher fight even when
+    // its floor is close to the party - so a near floor alone isn't enough
+    // for Medium; the party must be able to clear the floor outright.
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      levelRange: { min: 13, max: 16 },
     } as EncounterContent);
 
     expect(riskLevelOfExploreNode(buildNode('A'))).toBe('High');
@@ -285,11 +297,12 @@ describe('mostChallengingExploreNodeForRisk', () => {
     const far = buildNode('Far');
     vi.mocked(worldNodesOfType).mockReturnValue([near, far]);
     vi.mocked(decreeRiskTolerance).mockReturnValue('Medium');
-    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
-      ({
-        Near: { levelRange: { min: 1, max: 1 } },
-        Far: { levelRange: { min: 10, max: 10 } },
-      })[entry.nodeName] as EncounterContent,
+    vi.mocked(worldNodeEncounter).mockImplementation(
+      (entry) =>
+        ({
+          Near: { levelRange: { min: 1, max: 1 } },
+          Far: { levelRange: { min: 10, max: 10 } },
+        })[entry.nodeName] as EncounterContent,
     );
     // Near is one hop away, Far is much further - distance shouldn't matter.
     vi.mocked(travelPathTo).mockImplementation((name) =>
@@ -304,11 +317,12 @@ describe('mostChallengingExploreNodeForRisk', () => {
     const unreachable = buildNode('Unreachable');
     vi.mocked(worldNodesOfType).mockReturnValue([near, unreachable]);
     vi.mocked(decreeRiskTolerance).mockReturnValue('Medium');
-    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
-      ({
-        Near: { levelRange: { min: 1, max: 1 } },
-        Unreachable: { levelRange: { min: 10, max: 10 } },
-      })[entry.nodeName] as EncounterContent,
+    vi.mocked(worldNodeEncounter).mockImplementation(
+      (entry) =>
+        ({
+          Near: { levelRange: { min: 1, max: 1 } },
+          Unreachable: { levelRange: { min: 10, max: 10 } },
+        })[entry.nodeName] as EncounterContent,
     );
     vi.mocked(travelPathTo).mockImplementation((name) =>
       name === 'Near' ? [] : undefined,
@@ -338,11 +352,12 @@ describe('mostChallengingExploreNodeForRisk', () => {
     const easy = buildNode('Easy');
     vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
     vi.mocked(decreeRiskTolerance).mockReturnValue('High');
-    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
-      ({
-        Hard: { levelRange: { min: 10, max: 10 } },
-        Easy: { levelRange: { min: 1, max: 1 } },
-      })[entry.nodeName] as EncounterContent,
+    vi.mocked(worldNodeEncounter).mockImplementation(
+      (entry) =>
+        ({
+          Hard: { levelRange: { min: 10, max: 10 } },
+          Easy: { levelRange: { min: 1, max: 1 } },
+        })[entry.nodeName] as EncounterContent,
     );
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
@@ -357,11 +372,12 @@ describe('mostChallengingExploreNodeForRisk', () => {
     const easy = buildNode('Easy');
     vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
     vi.mocked(decreeRiskTolerance).mockReturnValue('High');
-    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
-      ({
-        Hard: { levelRange: { min: 10, max: 10 } },
-        Easy: { levelRange: { min: 1, max: 1 } },
-      })[entry.nodeName] as EncounterContent,
+    vi.mocked(worldNodeEncounter).mockImplementation(
+      (entry) =>
+        ({
+          Hard: { levelRange: { min: 10, max: 10 } },
+          Easy: { levelRange: { min: 1, max: 1 } },
+        })[entry.nodeName] as EncounterContent,
     );
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
@@ -378,11 +394,12 @@ describe('mostChallengingExploreNodeForRisk', () => {
     const worthwhile = buildNode('Worthwhile');
     vi.mocked(worldNodesOfType).mockReturnValue([trivial, worthwhile]);
     vi.mocked(decreeRiskTolerance).mockReturnValue('High');
-    vi.mocked(worldNodeEncounter).mockImplementation((entry) =>
-      ({
-        Trivial: { levelRange: { min: 1, max: 1 } },
-        Worthwhile: { levelRange: { min: 10, max: 10 } },
-      })[entry.nodeName] as EncounterContent,
+    vi.mocked(worldNodeEncounter).mockImplementation(
+      (entry) =>
+        ({
+          Trivial: { levelRange: { min: 1, max: 1 } },
+          Worthwhile: { levelRange: { min: 10, max: 10 } },
+        })[entry.nodeName] as EncounterContent,
     );
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(isXpTrivialAtOverLevel).mockImplementation(
@@ -518,17 +535,17 @@ describe('isClauseSatisfiable', () => {
     } as EncounterContent);
     vi.mocked(travelPathTo).mockReturnValue([]);
 
-    expect(
-      isClauseSatisfiable(buildClause({ type: 'LevelUpParty' })),
-    ).toBe(false);
+    expect(isClauseSatisfiable(buildClause({ type: 'LevelUpParty' }))).toBe(
+      false,
+    );
   });
 
   it('ReturnToKingdom is unsatisfiable once already at the kingdom', () => {
     vi.mocked(isPlayerAtKingdom).mockReturnValue(true);
 
-    expect(
-      isClauseSatisfiable(buildClause({ type: 'ReturnToKingdom' })),
-    ).toBe(false);
+    expect(isClauseSatisfiable(buildClause({ type: 'ReturnToKingdom' }))).toBe(
+      false,
+    );
   });
 
   it('FinishUnfinishedAreas is blocked while waiting for full health', () => {
@@ -560,9 +577,9 @@ describe('isClauseSatisfiable', () => {
     vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
     vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
 
-    expect(
-      isClauseSatisfiable(buildClause({ type: 'LevelUpParty' })),
-    ).toBe(false);
+    expect(isClauseSatisfiable(buildClause({ type: 'LevelUpParty' }))).toBe(
+      false,
+    );
   });
 
   it('the health wait does not block GatherMaterial or ReturnToKingdom', () => {
@@ -585,9 +602,9 @@ describe('isClauseSatisfiable', () => {
         }),
       ),
     ).toBe(true);
-    expect(
-      isClauseSatisfiable(buildClause({ type: 'ReturnToKingdom' })),
-    ).toBe(true);
+    expect(isClauseSatisfiable(buildClause({ type: 'ReturnToKingdom' }))).toBe(
+      true,
+    );
   });
 
   it('a healthy party is unaffected by the wait-for-health setting', () => {
@@ -635,9 +652,7 @@ describe('pickNextClause', () => {
     vi.mocked(isPlayerAtKingdom).mockReturnValue(true);
 
     expect(
-      pickNextClause([
-        buildClause({ type: 'ReturnToKingdom' }),
-      ]),
+      pickNextClause([buildClause({ type: 'ReturnToKingdom' })]),
     ).toBeUndefined();
   });
 });
