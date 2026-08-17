@@ -7,9 +7,9 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';
 import { getEntry } from '@helpers/content';
 import {
@@ -81,17 +81,17 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   {
     value: 'Low',
     label: 'Low',
-    description: "Only target enemies at or below the party's level.",
+    description: "Only target encounters at or below the party's level.",
   },
   {
     value: 'Medium',
     label: 'Medium',
-    description: `Also allow enemies up to ${MEDIUM_RISK_LEVELS_ABOVE_PARTY} levels above the party.`,
+    description: `Also allow encounters up to ${MEDIUM_RISK_LEVELS_ABOVE_PARTY} levels above the party.`,
   },
   {
     value: 'High',
     label: 'High',
-    description: `Also allow enemies up to ${HIGH_RISK_LEVELS_ABOVE_PARTY} levels above the party - the riskiest fights Auto Mode will ever pick on its own.`,
+    description: `Also allow encounters up to ${HIGH_RISK_LEVELS_ABOVE_PARTY} levels above the party - the riskiest fights Auto Mode will ever pick on its own.`,
   },
 ];
 
