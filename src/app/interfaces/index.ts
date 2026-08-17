@@ -46,6 +46,7 @@ export * from './state-game';
 export * from './state-options';
 export * from './storage';
 export * from './tiled-map';
+export * from './timer';
 export * from './tradeskill';
 export * from './traits';
 export * from './travel';
