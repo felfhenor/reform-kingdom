@@ -48,6 +48,11 @@ export const StatInformation: Record<BaseStat, string> = {
   Vitality: 'Vitality is used to mitigate incoming physical damage.',
 };
 
+export type SkillStatScaling = {
+  stat: GameStat;
+  multiplier: number;
+};
+
 export const PhysicalStats: GameStat[] = [
   'Strength',
   'Vitality',

@@ -6,7 +6,8 @@ import type {
 } from '@interfaces/content-skill';
 import type { GameElement } from '@interfaces/element';
 import type { EquipmentItemType } from '@interfaces/equipment';
-import type { GameStat } from '@interfaces/stat';
+import type { GameStat, SkillStatScaling, StatBlock } from '@interfaces/stat';
+import { StatOrder } from '@interfaces/stat';
 import { clamp, intersection, uniq } from 'es-toolkit/compat';
 
 // Heroes need one of a skill's `requiredWeaponTypes` equipped to use it -
@@ -46,6 +47,29 @@ export function skillTechniqueDamageScalingStat(
   stat: GameStat,
 ): number {
   return technique.damageScaling[stat];
+}
+
+// Which stats a skill's damage/healing scales from, and by how much - e.g.
+// Attack -> [{ stat: 'Strength', multiplier: 1 }], Starshine ->
+// [{ stat: 'Intelligence', multiplier: 1 }, { stat: 'Vitality', multiplier: 0.5 }].
+// Multi-technique skills sum each stat's multiplier across techniques, same
+// as `skillTechniquePreviewValue` sums their damage. Purely derived from
+// content - unlike the damage preview, this needs no combatant.
+export function skillStatScaling(
+  skill: EquipmentSkillContent,
+): SkillStatScaling[] {
+  const totals = {} as StatBlock;
+
+  skill.techniques.forEach((technique) => {
+    (Object.keys(technique.damageScaling) as GameStat[]).forEach((stat) => {
+      totals[stat] = (totals[stat] ?? 0) + technique.damageScaling[stat];
+    });
+  });
+
+  return StatOrder.filter((stat) => totals[stat]).map((stat) => ({
+    stat,
+    multiplier: totals[stat],
+  }));
 }
 
 export function skillTechniqueStatusEffectChance(

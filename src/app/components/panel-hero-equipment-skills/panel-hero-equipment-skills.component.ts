@@ -5,6 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { RowSkillStatScalingComponent } from '@components/row-skill-stat-scaling/row-skill-stat-scaling.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { combatantFromCharacter } from '@helpers/combat-create';
 import { getEntry } from '@helpers/content';
@@ -24,7 +25,12 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-panel-hero-equipment-skills',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasImageComponent, SlotIconBlankComponent, TippyDirective],
+  imports: [
+    AtlasImageComponent,
+    RowSkillStatScalingComponent,
+    SlotIconBlankComponent,
+    TippyDirective,
+  ],
   host: {
     class: 'flex flex-col gap-2 overflow-y-auto',
   },

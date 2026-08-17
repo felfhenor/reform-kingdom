@@ -31,6 +31,7 @@
         {{ skill.name }}
       </div>
       <div class="text-sm">{{ skillDescription(skill) }}</div>
+      <app-row-skill-stat-scaling class="block mt-2" [skill]="skill" />
 
       @if (skill.requiredWeaponTypes.length > 0) {
         <div class="text-xs mt-2" [class.text-error]="!usable">

@@ -13,5 +13,6 @@
   <div class="p-2 max-w-xs">
     <div class="font-bold mb-1 text-{{ s.rarity }}">{{ s.name }}</div>
     <div class="text-sm">{{ description() }}</div>
+    <app-row-skill-stat-scaling class="block mt-2" [skill]="s" />
   </div>
 </ng-template>

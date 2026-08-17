@@ -2,8 +2,14 @@ import {
   mergeGrantedSkills,
   skillEpCost,
   skillIsUsableWithEquippedWeapons,
+  skillStatScaling,
 } from '@helpers/skill';
-import type { EquipmentSkill, EquipmentSkillContent } from '@interfaces';
+import type {
+  EquipmentSkill,
+  EquipmentSkillContent,
+  EquipmentSkillContentTechnique,
+  StatBlock,
+} from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
@@ -29,6 +35,23 @@ function buildSkillContent(
   overrides: Partial<EquipmentSkillContent> = {},
 ): EquipmentSkillContent {
   return buildSkill(overrides) as EquipmentSkillContent;
+}
+
+function buildTechnique(
+  damageScaling: Partial<StatBlock>,
+  overrides: Partial<EquipmentSkillContentTechnique> = {},
+): EquipmentSkillContentTechnique {
+  return {
+    targets: 1,
+    targetType: 'Enemies',
+    targetBehaviors: [],
+    damageScaling: damageScaling as StatBlock,
+    elements: [],
+    attributes: [],
+    statusEffects: [],
+    combatMessage: '',
+    ...overrides,
+  };
 }
 
 describe('skillEpCost', () => {
@@ -131,5 +154,71 @@ describe('mergeGrantedSkills', () => {
     });
 
     expect(mergeGrantedSkills([cure], [fireball])).toEqual([cure, fireball]);
+  });
+});
+
+describe('skillStatScaling', () => {
+  it('returns a single entry for a skill scaling from one stat', () => {
+    const skill = buildSkillContent({
+      techniques: [buildTechnique({ Strength: 1 })],
+    });
+
+    expect(skillStatScaling(skill)).toEqual([
+      { stat: 'Strength', multiplier: 1 },
+    ]);
+  });
+
+  it('returns multiple entries in StatOrder for a skill scaling from several stats', () => {
+    const skill = buildSkillContent({
+      techniques: [buildTechnique({ Vitality: 0.5, Intelligence: 1 })],
+    });
+
+    expect(skillStatScaling(skill)).toEqual([
+      { stat: 'Intelligence', multiplier: 1 },
+      { stat: 'Vitality', multiplier: 0.5 },
+    ]);
+  });
+
+  it('omits stats with a zero multiplier', () => {
+    const skill = buildSkillContent({
+      techniques: [buildTechnique({ Strength: 1, Intelligence: 0 })],
+    });
+
+    expect(skillStatScaling(skill)).toEqual([
+      { stat: 'Strength', multiplier: 1 },
+    ]);
+  });
+
+  it('sums a stat multiplier across multiple techniques', () => {
+    const skill = buildSkillContent({
+      techniques: [
+        buildTechnique({ Strength: 1 }),
+        buildTechnique({ Strength: 0.5, Luck: 2 }),
+      ],
+    });
+
+    expect(skillStatScaling(skill)).toEqual([
+      { stat: 'Strength', multiplier: 1.5 },
+      { stat: 'Luck', multiplier: 2 },
+    ]);
+  });
+
+  it('returns an empty array for a skill with no techniques', () => {
+    const skill = buildSkillContent({ techniques: [] });
+
+    expect(skillStatScaling(skill)).toEqual([]);
+  });
+
+  it('omits a stat whose multipliers cancel to zero across techniques', () => {
+    const skill = buildSkillContent({
+      techniques: [
+        buildTechnique({ Strength: 1, Vitality: 1 }),
+        buildTechnique({ Strength: -1 }),
+      ],
+    });
+
+    expect(skillStatScaling(skill)).toEqual([
+      { stat: 'Vitality', multiplier: 1 },
+    ]);
   });
 });
