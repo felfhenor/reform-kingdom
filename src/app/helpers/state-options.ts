@@ -24,6 +24,8 @@ export function defaultOptions(): GameOptions {
     optionsTab: 'UI',
 
     showBackdropGrid: false,
+
+    analyticsEnabled: true,
   };
 }
 

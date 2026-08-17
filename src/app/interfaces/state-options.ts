@@ -8,14 +8,15 @@ export type GameOption =
   | 'sfxPlay'
   | 'bgmPlay'
   | 'gameloopPaused'
-  | 'showBackdropGrid';
+  | 'showBackdropGrid'
+  | 'analyticsEnabled';
 
 export type NotificationCategory = 'Error' | 'Success';
 
-export type OptionsTab = 'UI' | 'Savefile' | 'Debug';
+export type OptionsTab = 'UI' | 'Savefile' | 'Misc' | 'Debug';
 
 export type OptionsTabLink = {
-  name: 'UI' | 'Savefile' | 'Debug';
+  name: 'UI' | 'Savefile' | 'Misc' | 'Debug';
   link: OptionsTab;
   showIf: Signal<boolean>;
 };

@@ -3,6 +3,7 @@ import { ButtonCloseComponent } from '@components/button-close/button-close.comp
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { ButtonConnectComponent } from '@components/button-connect/button-connect.component';
 import { PanelOptionsDebugComponent } from '@components/panel-options-debug/panel-options-debug.component';
+import { PanelOptionsMiscComponent } from '@components/panel-options-misc/panel-options-misc.component';
 import { PanelOptionsSavefileComponent } from '@components/panel-options-savefile/panel-options-savefile.component';
 import { PanelOptionsUIComponent } from '@components/panel-options-ui/panel-options-ui.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
@@ -18,6 +19,7 @@ import type { OptionsTab, OptionsTabLink } from '@interfaces';
     ButtonConnectComponent,
     AnalyticsClickDirective,
     PanelOptionsDebugComponent,
+    PanelOptionsMiscComponent,
     PanelOptionsSavefileComponent,
     PanelOptionsUIComponent,
     ButtonCloseComponent,
@@ -40,6 +42,7 @@ export class PanelOptionsComponent extends OptionsBaseComponent {
       showIf: computed(() => true),
     },
     { name: 'Savefile', link: 'Savefile', showIf: computed(() => true) },
+    { name: 'Misc', link: 'Misc', showIf: computed(() => true) },
     {
       name: 'Debug',
       link: 'Debug',

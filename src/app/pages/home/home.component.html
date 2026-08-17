@@ -58,6 +58,17 @@
 >
   <span>Version {{ meta.versionString() }}</span>
 
+  <span class="mx-2">&middot;</span>
+
+  <button
+    type="button"
+    class="link link-hover"
+    appAnalyticsClick="Meta:Settings:Analytics"
+    (click)="openAnalyticsSettings()"
+  >
+    Analytics: {{ analyticsEnabled() ? 'On' : 'Off' }}
+  </button>
+
   <app-button-update></app-button-update>
 </div>
 

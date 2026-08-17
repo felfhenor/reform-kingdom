@@ -1,0 +1,30 @@
+<div class="flex flex-row gap-2">
+  <div class="flex-1">
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Miscellaneous</div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox gap-2">
+            <input
+              type="checkbox"
+              [checked]="getOption('analyticsEnabled')"
+              class="checkbox checkbox-secondary"
+              (click)="
+                setOption('analyticsEnabled', !getOption('analyticsEnabled'))
+              "
+            />
+            <span class="label-text">Analytics</span>
+            <app-icon
+              name="gameHelp"
+              size="1em"
+              class="zoom-tooltip text-lighter"
+              [tp]="'Analytics are not tied to your email or any identifying information. What is collected: events related to game progress, discoveries, and in-game actions.'"
+              [tpPlacement]="'top'"
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

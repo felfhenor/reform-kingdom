@@ -10,7 +10,9 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { discordSetMainStatus, discordSetStatus } from '@helpers/discord';
 import { gameReset } from '@helpers/game-init';
+import { modalOpen } from '@helpers/modal-stack';
 import { isSetup } from '@helpers/setup';
+import { getOption, setOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -38,6 +40,13 @@ export class HomeComponent implements OnInit {
   public resetGameSwal = viewChild<SwalComponent>('newGameSwal');
 
   public hasStartedGame = computed(() => isSetup());
+
+  public analyticsEnabled = computed(() => getOption('analyticsEnabled'));
+
+  openAnalyticsSettings(): void {
+    setOption('optionsTab', 'Misc');
+    modalOpen('settings');
+  }
 
   ngOnInit() {
     discordSetMainStatus('');

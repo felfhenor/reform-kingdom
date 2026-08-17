@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import { analyticsBoundEventId, analyticsEvent$ } from '@helpers/analytics';
+import { getOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';
 import gameanalytics from 'gameanalytics';
 import { info } from '../helpers';
@@ -35,6 +36,8 @@ export class AnalyticsService {
   }
 
   sendDesignEvent(eventId: string, value: number = 0) {
+    if (!getOption('analyticsEnabled')) return;
+
     this.analytics?.addDesignEvent(analyticsBoundEventId(eventId), value);
   }
 }
