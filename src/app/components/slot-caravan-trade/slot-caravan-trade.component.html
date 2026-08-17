@@ -4,7 +4,7 @@
 <button
   type="button"
   class="caravan-trade-slot btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start"
-  [disabled]="entry.soldOut || entry.maxQuantity === 0"
+  [disabled]="entry.soldOut || entry.maxQuantity === 0 || hasEnoughGoldToBuy()"
   [tp]="item ? tooltip : undefined"
   [tpPlacement]="'top'"
   (click)="activate.emit()"

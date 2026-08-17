@@ -7,10 +7,10 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { caravanTradeDisplay } from '@helpers/caravan-trade';
-import { goldCoinId } from '@helpers/materials';
+import { goldCoinId, hasGold } from '@helpers/materials';
 import type { CaravanTradeRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -35,6 +35,10 @@ export class SlotCaravanTradeComponent {
   public goldCoinItemId = goldCoinId();
 
   public display = computed(() => caravanTradeDisplay(this.row().trade));
+
+  public hasEnoughGoldToBuy = computed(
+    () => this.isPartyBuying() && !hasGold(this.row().price),
+  );
 
   // `type: 'sell'` is the trader selling to the party (the party buys);
   // `type: 'buy'` is the trader buying from the party (the party sells).

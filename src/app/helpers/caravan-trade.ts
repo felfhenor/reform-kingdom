@@ -1,13 +1,17 @@
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getArmoryEntries } from '@helpers/armory';
 import { caravanState } from '@helpers/caravan';
-import { getCollectibleQuantity, isCollectibleDiscovered } from '@helpers/collectibles';
+import {
+  getCollectibleQuantity,
+  isCollectibleDiscovered,
+} from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
 import {
   applyMaterialDelta,
   gainGold,
   getGoldQuantity,
   getMaterialQuantity,
+  hasGold,
   spendGold,
 } from '@helpers/materials';
 import { rngUuid } from '@helpers/rng';
@@ -165,7 +169,9 @@ export function caravanTradeMaxQuantity(
   if (trade.type === 'sell') {
     const price = caravanTradePrice(caravan, trade);
     const affordable = Math.floor(getGoldQuantity() / price);
-    return remaining === undefined ? affordable : Math.min(remaining, affordable);
+    return remaining === undefined
+      ? affordable
+      : Math.min(remaining, affordable);
   }
 
   const owned = caravanTradeOwnedQuantity(trade);
@@ -268,6 +274,7 @@ export function caravanExecuteTrade(
   if (quantity > maxQuantity) return false;
 
   const totalPrice = caravanTradePrice(caravan, trade) * quantity;
+  if (!hasGold(totalPrice)) return false;
 
   updateGamestate((s) => {
     if (trade.type === 'sell') {

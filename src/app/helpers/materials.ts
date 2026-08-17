@@ -92,6 +92,10 @@ export function spendGold(state: GameState, amount: number): void {
   applyMaterialDelta(state, goldCoinId(), -amount);
 }
 
+export function hasGold(amount: number): boolean {
+  return getGoldQuantity() >= amount;
+}
+
 const STARTING_GOLD_AMOUNT = 100;
 
 // Grants the new-game starting gold - only called once, from `gameStart`
