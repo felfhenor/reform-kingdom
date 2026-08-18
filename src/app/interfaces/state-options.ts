@@ -13,10 +13,10 @@ export type GameOption =
 
 export type NotificationCategory = 'Error' | 'Success';
 
-export type OptionsTab = 'UI' | 'Savefile' | 'Misc' | 'Debug';
+export type OptionsTab = 'UI' | 'Accessibility' | 'Savefile' | 'Misc' | 'Debug';
 
 export type OptionsTabLink = {
-  name: 'UI' | 'Savefile' | 'Misc' | 'Debug';
+  name: 'UI' | 'Accessibility' | 'Savefile' | 'Misc' | 'Debug';
   link: OptionsTab;
   showIf: Signal<boolean>;
 };
@@ -28,4 +28,5 @@ export type GameOptions = Record<GameOption, boolean> & {
   debugTickMultiplier: number;
   debugSaveInterval: number;
   optionsTab: OptionsTab;
+  mapZoom: number;
 };

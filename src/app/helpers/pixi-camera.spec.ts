@@ -4,6 +4,7 @@ import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
   cameraPositionCalculate,
+  viewportTilesCalculate,
 } from '@helpers/pixi-camera';
 
 describe('cameraBoundsCalculate', () => {
@@ -52,6 +53,29 @@ describe('cameraPositionCalculate', () => {
     expect(cameraPositionCalculate(5, 5, 20, 20, 10, 10)).toEqual({
       x: 0,
       y: 0,
+    });
+  });
+});
+
+describe('viewportTilesCalculate', () => {
+  it('should divide screen pixels by tile size when unzoomed', () => {
+    expect(viewportTilesCalculate(320, 320, 1, 32, 32)).toEqual({
+      widthTiles: 10,
+      heightTiles: 10,
+    });
+  });
+
+  it('should shrink the visible tile count as zoom increases', () => {
+    expect(viewportTilesCalculate(320, 320, 2, 32, 32)).toEqual({
+      widthTiles: 5,
+      heightTiles: 5,
+    });
+  });
+
+  it('should support fractional zoom levels', () => {
+    expect(viewportTilesCalculate(400, 200, 1.25, 32, 32)).toEqual({
+      widthTiles: 10,
+      heightTiles: 5,
     });
   });
 });

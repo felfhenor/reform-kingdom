@@ -27,6 +27,7 @@ import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
   cameraPositionCalculate,
+  viewportTilesCalculate,
 } from '@helpers/pixi-camera';
 import { pixiGridOverlayCreate } from '@helpers/pixi-grid';
 import {
@@ -205,6 +206,27 @@ export class GamePlayWorldComponent implements OnDestroy {
     effect(() => {
       const showBackdropGrid = getOption('showBackdropGrid');
       if (this.gridOverlay) this.gridOverlay.visible = showBackdropGrid;
+    });
+
+    // Zooms the map view only - scaling `app.stage` (rather than the UI
+    // around it) leaves every other panel/overlay untouched. This only
+    // handles the option changing *while already in-game* - `this.app` isn't
+    // a signal, so this effect doesn't re-run when `initPixi` creates or
+    // recreates it on map load/transition; `initPixi` applies the current
+    // zoom itself for that case (search "stage.scale.set" there). If
+    // `this.app` isn't set yet (e.g. this effect's first run, before any map
+    // has loaded), there's nothing to scale - it'll pick up the last-set
+    // `mapZoom` once `initPixi` runs. `positionCamera` is re-run so the
+    // viewport-tiles math (which accounts for zoom - see
+    // `viewportTilesCalculate`) re-centers the camera at the new scale
+    // instead of waiting for the next ticker frame. Wrapped in `untracked`
+    // for the same reason as the recenter effect below: `positionCamera`
+    // transitively reads `cameraOffset`, and without `untracked` that read
+    // would make a later drag re-trigger this effect pointlessly.
+    effect(() => {
+      const mapZoom = getOption('mapZoom');
+      if (this.app) this.app.stage.scale.set(mapZoom);
+      untracked(() => this.positionCamera());
     });
 
     effect(() => {
@@ -407,6 +429,11 @@ export class GamePlayWorldComponent implements OnDestroy {
       backgroundAlpha: 0,
       antialias: false,
     });
+    // Applies whatever zoom is currently set - the mapZoom effect above
+    // can't do this itself since `this.app` didn't exist yet when it last
+    // ran (it only reacts to the option changing later, not to this app
+    // being created).
+    this.app.stage.scale.set(getOption('mapZoom'));
 
     const containers = pixiWorldContainersCreate(this.app);
     this.mapContainer = containers.mapContainer;
@@ -572,8 +599,15 @@ export class GamePlayWorldComponent implements OnDestroy {
   private panCamera(dragDeltaX: number, dragDeltaY: number): void {
     if (!this.app || !this.map) return;
 
-    const viewportWidthTiles = this.app.screen.width / this.map.tilewidth;
-    const viewportHeightTiles = this.app.screen.height / this.map.tileheight;
+    const zoom = getOption('mapZoom');
+    const { widthTiles: viewportWidthTiles, heightTiles: viewportHeightTiles } =
+      viewportTilesCalculate(
+        this.app.screen.width,
+        this.app.screen.height,
+        zoom,
+        this.map.tilewidth,
+        this.map.tileheight,
+      );
 
     // Anchor the pan to wherever the hero-centered camera is right now, but
     // only the first time this pan gesture moves it off-center - subsequent
@@ -597,13 +631,18 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.map.height,
     );
 
+    // Drag deltas arrive in real screen pixels, but offset is tracked in
+    // unscaled tile units (matching viewportWidthTiles/bounds above) - so the
+    // tile size used to convert one to the other must include the zoom
+    // factor too, or a drag would move the camera by more tiles than the
+    // cursor visually crossed whenever the map is zoomed in.
     this.cameraOffset.set(
       cameraOffsetFromDrag(
         this.cameraOffset(),
         dragDeltaX,
         dragDeltaY,
-        this.map.tilewidth,
-        this.map.tileheight,
+        this.map.tilewidth * zoom,
+        this.map.tileheight * zoom,
         this.frozenCameraBase,
         bounds,
       ),
@@ -823,8 +862,15 @@ export class GamePlayWorldComponent implements OnDestroy {
       return;
 
     const location = this.visualPosition;
-    const viewportWidthTiles = this.app.screen.width / this.map.tilewidth;
-    const viewportHeightTiles = this.app.screen.height / this.map.tileheight;
+    const zoom = getOption('mapZoom');
+    const { widthTiles: viewportWidthTiles, heightTiles: viewportHeightTiles } =
+      viewportTilesCalculate(
+        this.app.screen.width,
+        this.app.screen.height,
+        zoom,
+        this.map.tilewidth,
+        this.map.tileheight,
+      );
 
     const bounds = cameraBoundsCalculate(
       viewportWidthTiles,

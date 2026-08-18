@@ -26,6 +26,8 @@ export function defaultOptions(): GameOptions {
     showBackdropGrid: false,
 
     analyticsEnabled: true,
+
+    mapZoom: 1,
   };
 }
 

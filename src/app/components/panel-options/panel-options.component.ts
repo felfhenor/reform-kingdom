@@ -2,6 +2,7 @@ import { Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { ButtonConnectComponent } from '@components/button-connect/button-connect.component';
+import { PanelOptionsAccessibilityComponent } from '@components/panel-options-accessibility/panel-options-accessibility.component';
 import { PanelOptionsDebugComponent } from '@components/panel-options-debug/panel-options-debug.component';
 import { PanelOptionsMiscComponent } from '@components/panel-options-misc/panel-options-misc.component';
 import { PanelOptionsSavefileComponent } from '@components/panel-options-savefile/panel-options-savefile.component';
@@ -18,6 +19,7 @@ import type { OptionsTab, OptionsTabLink } from '@interfaces';
     CardPageComponent,
     ButtonConnectComponent,
     AnalyticsClickDirective,
+    PanelOptionsAccessibilityComponent,
     PanelOptionsDebugComponent,
     PanelOptionsMiscComponent,
     PanelOptionsSavefileComponent,
@@ -39,6 +41,11 @@ export class PanelOptionsComponent extends OptionsBaseComponent {
     {
       name: 'UI',
       link: 'UI',
+      showIf: computed(() => true),
+    },
+    {
+      name: 'Accessibility',
+      link: 'Accessibility',
       showIf: computed(() => true),
     },
     { name: 'Savefile', link: 'Savefile', showIf: computed(() => true) },

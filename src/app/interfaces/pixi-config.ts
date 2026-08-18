@@ -17,6 +17,11 @@ export type CameraBounds = {
   maxY: number;
 };
 
+export type ViewportTiles = {
+  widthTiles: number;
+  heightTiles: number;
+};
+
 export type TiledObjectOrientation = {
   gid: number;
   rotation: number;

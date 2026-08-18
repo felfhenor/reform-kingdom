@@ -1,5 +1,23 @@
-import type { CameraBounds, CameraPosition } from '@interfaces';
+import type { CameraBounds, CameraPosition, ViewportTiles } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
+
+// Screen pixels are converted to tile units by dividing out the tile size, as
+// usual - but also the zoom factor first, since the map is rendered at
+// `zoom`x scale (see `GamePlayWorldComponent`'s `app.stage.scale`). A smaller
+// "effective" screen size at zoom > 1 means fewer tiles are visible, which is
+// what makes the map appear zoomed in.
+export function viewportTilesCalculate(
+  screenWidth: number,
+  screenHeight: number,
+  zoom: number,
+  tileWidth: number,
+  tileHeight: number,
+): ViewportTiles {
+  return {
+    widthTiles: screenWidth / zoom / tileWidth,
+    heightTiles: screenHeight / zoom / tileHeight,
+  };
+}
 
 // The map (and everything positioned within it - see positionCamera's
 // `centerOffset`) is rendered shifted half a tile up/left so a hero's
