@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { modalCloseAll, modalOpen } from '@helpers/modal-stack';
+import { modalCloseAll, modalHasAnyOpen, modalOpen } from '@helpers/modal-stack';
 import { localStorageSignal } from '@helpers/signal';
 import type {
   CharacterId,
@@ -82,6 +82,17 @@ export function mapNodeSelect(entry: WorldNodeEntry): void {
 
 export function mapNodeDeselect(): void {
   selectedMapNode.set(undefined);
+}
+
+// Called once per travel arrival (see `travelArriveAtNode`) so whatever the
+// party walked into - combat, gathering, or just a plain node - is visible
+// immediately instead of silently happening behind a panel the player closed
+// when they clicked Travel. Only fires if nothing else is already occupying
+// the screen, so it never yanks focus from a selection or modal the player
+// opened on purpose.
+export function mapNodeAutoShowOnArrival(entry: WorldNodeEntry): void {
+  if (selectedMapNode() || modalHasAnyOpen()) return;
+  selectedMapNode.set(entry);
 }
 
 // The caravan node the trade modal is currently open for - set from both the

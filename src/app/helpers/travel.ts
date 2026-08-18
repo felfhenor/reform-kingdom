@@ -8,6 +8,7 @@ import { travelMessageLog } from '@helpers/combat-log';
 import { gatheringStart, gatheringStop } from '@helpers/gathering';
 import { mapHopsBetween, tileIsOnPath, travelPathTo } from '@helpers/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { mapNodeAutoShowOnArrival } from '@helpers/ui';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node-encounter';
 import {
@@ -215,6 +216,8 @@ function travelArriveAtNode(
 
   const node = worldNodeByName(destinationNodeName);
   if (!node) return;
+
+  mapNodeAutoShowOnArrival(node);
 
   const encounter = worldNodeEncounter(node);
   if (encounter) {

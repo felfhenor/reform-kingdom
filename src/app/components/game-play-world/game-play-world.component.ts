@@ -16,7 +16,6 @@ import { getEntry } from '@helpers/content';
 import { gatheringProgressFraction, isGathering } from '@helpers/gathering';
 import { isGlobalEffectActive } from '@helpers/global-effects';
 import { getMap } from '@helpers/maps';
-import { modalHasAnyOpen } from '@helpers/modal-stack';
 import { partyGet } from '@helpers/party';
 import {
   pixiAppInitialize,
@@ -189,7 +188,6 @@ export class GamePlayWorldComponent implements OnDestroy {
   private partyTokenTextures: Texture[] = [];
   private isTransitioningMap = false;
   private wasPartyDead = false;
-  private lastAutoOpenLocationName?: string;
 
   constructor() {
     // Bootstraps the very first map load - this fires reliably since it's
@@ -252,47 +250,6 @@ export class GamePlayWorldComponent implements OnDestroy {
       }
       untracked(() => this.recenterCamera());
     });
-
-    // Auto-opens the map node panel ("zone box") when the party engages a
-    // new encounter, but only if nothing else is already occupying the
-    // screen - otherwise it would yank focus away from a modal, or re-show a
-    // panel the player just closed on purpose. Keyed off `combat.locationName`
-    // rather than `combat.id` or a plain "was in combat" boolean:
-    //  - Not `combat.id`: an encounter with several chained fights (see
-    //    `encounter.ts`/`encounter-random-combat.ts`) generates a fresh
-    //    `combat.id` for every fight in the chain, so keying on id would
-    //    re-open the panel after every single fight even if the player
-    //    deliberately closed it mid-chain.
-    //  - Not a boolean: the gameloop's tick loop (`gameloop.ts`) runs fully
-    //    synchronously with no `await` between ticks, so this zoneless
-    //    effect only ever observes state *after* the whole batch - it can
-    //    genuinely miss an in-batch `combat -> undefined -> combat` flip
-    //    (e.g. one encounter resolving and an unrelated one starting at a
-    //    different node within the same tick burst). A boolean would read
-    //    "was true, still true" and wrongly stay silent for that second,
-    //    distinct encounter. `locationName` sidesteps this entirely: it's
-    //    stable across a chain's fights (suppressing re-opens mid-chain) but
-    //    differs between genuinely different encounters regardless of
-    //    whether the transient `undefined` in between was ever observed.
-    // Reads `selectedMapNode`/`modalHasAnyOpen` inside `untracked` so this
-    // effect only re-fires on an actual encounter-identity change, not every
-    // time the player opens/closes a panel or modal in between.
-    effect(() => {
-      const locationName = gamestate().world.combat?.locationName;
-      untracked(() => this.autoOpenZoneBoxForCombat(locationName));
-    });
-  }
-
-  private autoOpenZoneBoxForCombat(locationName: string | undefined): void {
-    const previousLocationName = this.lastAutoOpenLocationName;
-    this.lastAutoOpenLocationName = locationName;
-    if (locationName === undefined || locationName === previousLocationName) {
-      return;
-    }
-    if (selectedMapNode() || modalHasAnyOpen()) return;
-
-    const entry = worldNodeByName(locationName);
-    if (entry) mapNodeSelect(entry);
   }
 
   private checkForMapChange(mapName: string): void {

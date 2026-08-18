@@ -60,6 +60,10 @@ vi.mock('@helpers/encounter-random-combat', () => ({
   encounterRandomStartFight: vi.fn(),
 }));
 
+vi.mock('@helpers/ui', () => ({
+  mapNodeAutoShowOnArrival: vi.fn(),
+}));
+
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';
 import { addGlobalEffect, isGlobalEffectActive } from '@helpers/global-effects';
 import { encounterStartFight } from '@helpers/encounter';
@@ -74,6 +78,7 @@ import {
   travelProcessTick,
   travelStart,
 } from '@helpers/travel';
+import { mapNodeAutoShowOnArrival } from '@helpers/ui';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
   worldNodeAt,
@@ -702,13 +707,14 @@ describe('travelProcessTick', () => {
       }),
     );
     const encounter = { id: 'enc-1' } as unknown as EncounterContent;
-    vi.mocked(worldNodeByName).mockReturnValue({
+    const node = {
       mapName: 'Carrina',
       x: 1,
       y: 0,
       nodeName: 'Field Ruins',
       nodeData: {} as never,
-    });
+    };
+    vi.mocked(worldNodeByName).mockReturnValue(node);
     vi.mocked(worldNodeEncounter).mockReturnValue(encounter);
 
     travelProcessTick();
@@ -728,9 +734,17 @@ describe('travelProcessTick', () => {
       'The party has arrived at Field Ruins.',
     );
     expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 0, 'Field Ruins');
+    expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
   });
 
-  it('on arrival at a node with no encounter, does not start a fight', () => {
+  it('on arrival at a node with no encounter, does not start a fight, but still shows the node', () => {
+    const node = {
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+      nodeName: 'Duchy of Carrina',
+      nodeData: {} as never,
+    };
     vi.mocked(gamestate).mockReturnValue(
       stateWithTravel({
         status: 'Traveling',
@@ -739,22 +753,26 @@ describe('travelProcessTick', () => {
         ticksIntoStep: 2,
       }),
     );
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-      nodeName: 'Duchy of Carrina',
-      nodeData: {} as never,
-    });
+    vi.mocked(worldNodeByName).mockReturnValue(node);
     vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
 
     travelProcessTick();
 
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(gatheringStart).not.toHaveBeenCalled();
+    // Arrival always surfaces wherever the party ends up, not just when
+    // something (combat/gathering) kicks off there - see `mapNodeAutoShowOnArrival`.
+    expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
   });
 
-  it('on arrival at a node with a gathering site and no encounter, starts gathering', () => {
+  it('on arrival at a node with a gathering site and no encounter, starts gathering and shows the node', () => {
+    const node = {
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+      nodeName: 'Wergen Woods',
+      nodeData: {} as never,
+    };
     vi.mocked(gamestate).mockReturnValue(
       stateWithTravel({
         status: 'Traveling',
@@ -763,13 +781,7 @@ describe('travelProcessTick', () => {
         ticksIntoStep: 2,
       }),
     );
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-      nodeName: 'Wergen Woods',
-      nodeData: {} as never,
-    });
+    vi.mocked(worldNodeByName).mockReturnValue(node);
     vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
     vi.mocked(worldNodeGathering).mockReturnValue(
       { id: 'gather-1' } as unknown as GatheringContent,
@@ -780,5 +792,6 @@ describe('travelProcessTick', () => {
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(gatheringStart).toHaveBeenCalledWith('Wergen Woods');
     expect(gatherNodeDiscover).toHaveBeenCalledWith('Wergen Woods');
+    expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
   });
 });
