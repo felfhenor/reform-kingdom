@@ -8,10 +8,6 @@
   @apply relative w-[64px] h-[64px] cursor-default;
 }
 
-.storage-item-tooltip-image {
-  @apply shrink-0;
-}
-
 .storage-item-count {
   @apply absolute bottom-0 right-0 px-1 text-[14px] font-semibold text-white leading-none pointer-events-none;
   text-shadow:

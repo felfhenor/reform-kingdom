@@ -4,6 +4,7 @@ import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
 import type { RecipeContent, RecipeId } from '@interfaces/content-recipe';
 import type { Branded } from '@interfaces/identifiable';
+import type { ItemPreviewDisplay } from '@interfaces/item-preview';
 import type { Tradeskill } from '@interfaces/tradeskill';
 
 export type CraftQueueEntryId = Branded<string, 'CraftQueueEntryId'>;
@@ -42,6 +43,7 @@ export type CraftRecipeEntry = {
   resultContent:
     ItemContent | EquipmentContent | CollectibleContent | undefined;
   resultSpritesheet: 'item' | 'equipment' | 'collectible';
+  resultDisplay: ItemPreviewDisplay | undefined;
   resultChance: number;
   backdropSprite: string | undefined;
   maxCraftable: number;

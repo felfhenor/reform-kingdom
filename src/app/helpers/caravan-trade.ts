@@ -6,6 +6,7 @@ import {
   isCollectibleDiscovered,
 } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
+import { itemPreviewDisplay } from '@helpers/item-preview';
 import {
   applyMaterialDelta,
   gainGold,
@@ -22,72 +23,36 @@ import type {
   CaravanTrade,
   CaravanTraderContent,
   CollectibleContent,
-  DropRarity,
   EquipmentContent,
   EquipmentItem,
   EquipmentItemId,
   GameState,
   ItemContent,
-  StatBlock,
+  ItemPreviewDisplay,
   WorldNodeEntry,
 } from '@interfaces';
-
-export type CaravanTradeDisplay = {
-  name: string;
-  description: string;
-  sprite: string;
-  spritesheet: 'item' | 'equipment' | 'collectible';
-  rarity: DropRarity;
-  // Infusion stats for an item, base stats for equipment - undefined for a
-  // collectible, or an item with no infusion stats to show.
-  stats?: StatBlock;
-  // Equipment only.
-  levelRequirement?: number;
-};
 
 // Resolves whichever content type `trade` references down to display info -
 // mirrors `rewardContentInfo` in `world-nodes.ts`, plus the description/
 // rarity/stats the trade modal's tooltip needs that helper doesn't carry.
 export function caravanTradeDisplay(
   trade: CaravanTrade,
-): CaravanTradeDisplay | undefined {
+): ItemPreviewDisplay | undefined {
   if (trade.itemId) {
     const item = getEntry<ItemContent>(trade.itemId);
-    if (!item) return undefined;
-    return {
-      name: item.name,
-      description: item.description,
-      sprite: item.sprite,
-      spritesheet: 'item',
-      rarity: item.rarity,
-      stats: item.infusionStats,
-    };
+    return item ? itemPreviewDisplay(item, 'item') : undefined;
   }
 
   if (trade.equipmentId) {
     const equipment = getEntry<EquipmentContent>(trade.equipmentId);
-    if (!equipment) return undefined;
-    return {
-      name: equipment.name,
-      description: equipment.description,
-      sprite: equipment.sprite,
-      spritesheet: 'equipment',
-      rarity: equipment.rarity,
-      stats: equipment.baseStats,
-      levelRequirement: equipment.levelRequirement,
-    };
+    return equipment ? itemPreviewDisplay(equipment, 'equipment') : undefined;
   }
 
   if (trade.collectibleId) {
     const collectible = getEntry<CollectibleContent>(trade.collectibleId);
-    if (!collectible) return undefined;
-    return {
-      name: collectible.name,
-      description: collectible.description,
-      sprite: collectible.sprite,
-      spritesheet: 'collectible',
-      rarity: collectible.rarity,
-    };
+    return collectible
+      ? itemPreviewDisplay(collectible, 'collectible')
+      : undefined;
   }
 
   return undefined;

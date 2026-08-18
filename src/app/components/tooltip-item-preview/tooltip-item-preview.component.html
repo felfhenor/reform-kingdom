@@ -1,0 +1,32 @@
+<ng-template #tooltipContent>
+  @if (display(); as item) {
+    <div class="flex gap-2 p-2 max-w-[400px]">
+      <app-atlas-image
+        [spritesheet]="item.spritesheet"
+        [assetName]="item.sprite"
+        class="tooltip-item-preview-image shrink-0"
+      />
+      <div>
+        <div class="font-bold mb-1 text-{{ item.rarity }}">
+          {{ item.name }}
+        </div>
+
+        @if (item.levelRequirement !== undefined) {
+          <div class="text-xs mb-2">Lv. {{ item.levelRequirement }}</div>
+        }
+
+        <div class="italic text-sm mb-2">
+          {{ item.description }}
+        </div>
+
+        @if (item.stats) {
+          <app-row-item-stats [stats]="item.stats" />
+        }
+
+        <ng-content></ng-content>
+      </div>
+    </div>
+
+    <ng-content select="[preview-footer]"></ng-content>
+  }
+</ng-template>

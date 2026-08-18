@@ -13,6 +13,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntry } from '@helpers/content';
 import { getCraftableRecipeEntries } from '@helpers/crafting';
 import { craftQueueRemove, craftQueueStart } from '@helpers/crafting-queue';
@@ -52,6 +53,7 @@ import { clamp } from 'es-toolkit/compat';
     ButtonKingdomBackComponent,
     SweetAlert2Module,
     TippyDirective,
+    TooltipItemPreviewComponent,
   ],
   templateUrl: './panel-play-kingdom-tradeskill.component.html',
 })

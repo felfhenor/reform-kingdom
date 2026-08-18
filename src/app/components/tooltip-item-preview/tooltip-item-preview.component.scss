@@ -1,0 +1,12 @@
+@reference 'tailwindcss';
+
+// Headless - this component's own template is only an `ng-template` (never
+// rendered inline), but the host element itself would otherwise still take
+// part in a parent flex/grid layout as an empty item.
+:host {
+  @apply hidden;
+}
+
+.tooltip-item-preview-image {
+  @apply shrink-0;
+}

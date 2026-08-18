@@ -46,6 +46,7 @@ export * from './gathering';
 export * from './global-effects';
 export * from './icons';
 export * from './infusion';
+export * from './item-preview';
 export * from './job';
 export * from './leveled-range';
 export * from './loading';

@@ -4,6 +4,7 @@ import {
 } from '@helpers/crafting-queue';
 import { isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
+import { itemPreviewDisplay } from '@helpers/item-preview';
 import {
   isRecipeCraftable,
   recipeBackdropSprite,
@@ -105,11 +106,15 @@ export function getCraftableRecipeEntries(
     )
     .map((recipe) => {
       const resultContent = recipeResultContent(recipe);
+      const resultSpritesheet = recipeResultSpritesheet(recipe);
 
       return {
         recipe,
         resultContent,
-        resultSpritesheet: recipeResultSpritesheet(recipe),
+        resultSpritesheet,
+        resultDisplay: resultContent
+          ? itemPreviewDisplay(resultContent, resultSpritesheet)
+          : undefined,
         resultChance: recipe.result.chance ?? 100,
         backdropSprite,
         maxCraftable: craftMaxCraftableQuantity(recipe, tradeskill),

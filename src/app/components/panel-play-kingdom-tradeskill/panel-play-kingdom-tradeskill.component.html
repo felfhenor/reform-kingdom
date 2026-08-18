@@ -98,7 +98,12 @@
           class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-28"
           [class.opacity-50]="uncraftable"
         >
-          <div class="w-16 h-16 relative flex-shrink-0 overflow-hidden">
+          <app-tooltip-item-preview #preview [display]="entry.resultDisplay" />
+          <div
+            class="w-16 h-16 relative flex-shrink-0 overflow-hidden"
+            [tp]="entry.resultDisplay ? preview.template() : undefined"
+            [tpPlacement]="'top'"
+          >
             @if (entry.backdropSprite) {
               <app-atlas-image
                 spritesheet="item"

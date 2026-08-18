@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { caravanTradeDisplay } from '@helpers/caravan-trade';
 import { goldCoinId, hasGold } from '@helpers/materials';
 import type { CaravanTradeRow } from '@interfaces';
@@ -21,7 +21,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     AtlasImageComponent,
     CurrencyCostComponent,
     SlotIconBlankComponent,
-    RowItemStatsComponent,
+    TooltipItemPreviewComponent,
     TippyDirective,
   ],
   templateUrl: './slot-caravan-trade.component.html',

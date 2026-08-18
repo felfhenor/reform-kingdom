@@ -1,34 +1,17 @@
 @if (isDiscovered() && item(); as material) {
+  <app-tooltip-item-preview #preview [display]="display()" />
+
   <div
     class="outline-2 outline-offset-[-2px] rounded outline-{{
       material.rarity
     }}"
-    [tp]="tooltip"
+    [tp]="preview.template()"
     [tpPlacement]="'top'"
   >
     <app-slot-icon-blank>
       <app-atlas-image spritesheet="item" [assetName]="material.sprite" />
     </app-slot-icon-blank>
   </div>
-
-  <ng-template #tooltip>
-    <div class="flex gap-2 p-2 max-w-[400px]">
-      <app-atlas-image
-        spritesheet="item"
-        [assetName]="material.sprite"
-        class="gather-material-tooltip-image"
-      />
-      <div>
-        <div class="font-bold mb-2 text-{{ material.rarity }}">
-          {{ material.name }}
-        </div>
-
-        <div class="italic text-sm">
-          {{ material.description }}
-        </div>
-      </div>
-    </div>
-  </ng-template>
 } @else {
   <div [tp]="'A material yet to be discovered.'" [tpPlacement]="'top'">
     <app-icon-unknown />
