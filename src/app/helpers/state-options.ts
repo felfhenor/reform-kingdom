@@ -28,6 +28,8 @@ export function defaultOptions(): GameOptions {
     analyticsEnabled: true,
 
     mapZoom: 1,
+
+    partyViewAutoCollapse: false,
   };
 }
 

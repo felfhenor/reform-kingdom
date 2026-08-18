@@ -3,8 +3,8 @@
 @if (heroes().length > 0) {
   <div
     class="hero-status"
-    (mouseenter)="isExpanded.set(true)"
-    (mouseleave)="isExpanded.set(false)"
+    (mouseenter)="setHovered(true)"
+    (mouseleave)="setHovered(false)"
   >
     @for (hero of heroes(); track hero.character.id) {
       <div

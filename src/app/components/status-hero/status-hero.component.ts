@@ -14,6 +14,7 @@ import {
   heroDamageEventsClear,
 } from '@helpers/combat-damage-events';
 import { partyGet } from '@helpers/party';
+import { getOption } from '@helpers/state-options';
 import type { Character, HeroDamageEvent, JobContent } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -38,7 +39,17 @@ const DAMAGE_NUMBER_LIFETIME_MS = 1100;
   styleUrl: './status-hero.component.scss',
 })
 export class StatusHeroComponent {
-  public isExpanded = signal(false);
+  // Only used when `partyViewAutoCollapse` is on - otherwise the party view
+  // stays expanded regardless of hover state.
+  private isHovered = signal(false);
+
+  public isExpanded = computed(
+    () => !getOption('partyViewAutoCollapse') || this.isHovered(),
+  );
+
+  public setHovered(hovered: boolean): void {
+    this.isHovered.set(hovered);
+  }
 
   public heroes = computed<HeroStatusEntry[]>(() =>
     partyGet().map((character) => {

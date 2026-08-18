@@ -17,6 +17,23 @@
             <span class="label-text">Backdrop Grid</span>
           </label>
         </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="getOption('partyViewAutoCollapse')"
+              class="checkbox checkbox-secondary"
+              (click)="
+                setOption(
+                  'partyViewAutoCollapse',
+                  !getOption('partyViewAutoCollapse')
+                )
+              "
+            />
+            <span class="label-text">Auto-Collapse Party View</span>
+          </label>
+        </div>
       </div>
     </div>
 
