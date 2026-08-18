@@ -14,6 +14,7 @@ export * from './collectibles';
 export * from './combat';
 export * from './combat-create';
 export * from './combat-damage';
+export * from './combat-damage-events';
 export * from './combat-end';
 export * from './combat-log';
 export * from './combat-order';

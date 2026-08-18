@@ -117,6 +117,45 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   return { container, update };
 }
 
+// A small bar hovering above the party's tile while fighting through an
+// encounter chain, filling left to right as each fight in the chain is won -
+// full means the node is fully cleared. Same shape/positioning contract as
+// `pixiIndicatorGatherProgressCreate` (only the fill color differs, so the
+// two are visually distinguishable), since gathering and combat can never be
+// active at the same tile simultaneously.
+export function pixiIndicatorEncounterProgressCreate(tileSize: number): {
+  container: Container;
+  update: (fraction: number) => void;
+} {
+  const barWidth = tileSize * 0.8;
+  const barHeight = 6;
+  const offsetX = (tileSize - barWidth) / 2;
+  const offsetY = -40;
+
+  const container = new Container();
+  container.cullable = true;
+  container.visible = false;
+
+  const background = new Graphics()
+    .rect(0, 0, barWidth, barHeight)
+    .fill(0x000000);
+  background.alpha = 0.6;
+  background.x = offsetX;
+  background.y = offsetY;
+
+  const fill = new Graphics().rect(0, 0, barWidth, barHeight).fill(0xfb7185);
+  fill.x = offsetX;
+  fill.y = offsetY;
+
+  container.addChild(background, fill);
+
+  const update = (fraction: number) => {
+    fill.scale.x = clamp(fraction, 0, 1);
+  };
+
+  return { container, update };
+}
+
 // A floating nametag rendered above every interactable node (gather/explore/
 // travel), always visible rather than only on hover or selection, so players
 // can tell at a glance which nodes they can go to and what level they need.

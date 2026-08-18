@@ -16,6 +16,7 @@ import { getEntry } from '@helpers/content';
 import { gatheringProgressFraction, isGathering } from '@helpers/gathering';
 import { isGlobalEffectActive } from '@helpers/global-effects';
 import { getMap } from '@helpers/maps';
+import { modalHasAnyOpen } from '@helpers/modal-stack';
 import { partyGet } from '@helpers/party';
 import {
   pixiAppInitialize,
@@ -29,6 +30,7 @@ import {
 } from '@helpers/pixi-camera';
 import { pixiGridOverlayCreate } from '@helpers/pixi-grid';
 import {
+  pixiIndicatorEncounterProgressCreate,
   pixiIndicatorGatherProgressCreate,
   pixiIndicatorNodeSelectionCreate,
   pixiIndicatorPlayerAtLocationCreate,
@@ -50,6 +52,7 @@ import {
   worldCameraRecenterRequest,
 } from '@helpers/ui';
 import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
+import { worldNodeEncounterCount } from '@helpers/world-node-encounter';
 import { worldNodeLabelInfo } from '@helpers/world-node-status';
 import {
   isWorldNodeVisible,
@@ -138,6 +141,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     container: Container;
     update: (fraction: number) => void;
   };
+  private encounterProgressContainer?: Container;
+  private encounterProgressBar?: {
+    container: Container;
+    update: (fraction: number) => void;
+  };
   private nodeSelectionContainer?: Container;
   private nodeSelectionIndicator?: Graphics;
   private nodeLabels?: Map<string, Text>;
@@ -180,6 +188,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private partyTokenTextures: Texture[] = [];
   private isTransitioningMap = false;
   private wasPartyDead = false;
+  private lastAutoOpenLocationName?: string;
 
   constructor() {
     // Bootstraps the very first map load - this fires reliably since it's
@@ -221,6 +230,47 @@ export class GamePlayWorldComponent implements OnDestroy {
       }
       untracked(() => this.recenterCamera());
     });
+
+    // Auto-opens the map node panel ("zone box") when the party engages a
+    // new encounter, but only if nothing else is already occupying the
+    // screen - otherwise it would yank focus away from a modal, or re-show a
+    // panel the player just closed on purpose. Keyed off `combat.locationName`
+    // rather than `combat.id` or a plain "was in combat" boolean:
+    //  - Not `combat.id`: an encounter with several chained fights (see
+    //    `encounter.ts`/`encounter-random-combat.ts`) generates a fresh
+    //    `combat.id` for every fight in the chain, so keying on id would
+    //    re-open the panel after every single fight even if the player
+    //    deliberately closed it mid-chain.
+    //  - Not a boolean: the gameloop's tick loop (`gameloop.ts`) runs fully
+    //    synchronously with no `await` between ticks, so this zoneless
+    //    effect only ever observes state *after* the whole batch - it can
+    //    genuinely miss an in-batch `combat -> undefined -> combat` flip
+    //    (e.g. one encounter resolving and an unrelated one starting at a
+    //    different node within the same tick burst). A boolean would read
+    //    "was true, still true" and wrongly stay silent for that second,
+    //    distinct encounter. `locationName` sidesteps this entirely: it's
+    //    stable across a chain's fights (suppressing re-opens mid-chain) but
+    //    differs between genuinely different encounters regardless of
+    //    whether the transient `undefined` in between was ever observed.
+    // Reads `selectedMapNode`/`modalHasAnyOpen` inside `untracked` so this
+    // effect only re-fires on an actual encounter-identity change, not every
+    // time the player opens/closes a panel or modal in between.
+    effect(() => {
+      const locationName = gamestate().world.combat?.locationName;
+      untracked(() => this.autoOpenZoneBoxForCombat(locationName));
+    });
+  }
+
+  private autoOpenZoneBoxForCombat(locationName: string | undefined): void {
+    const previousLocationName = this.lastAutoOpenLocationName;
+    this.lastAutoOpenLocationName = locationName;
+    if (locationName === undefined || locationName === previousLocationName) {
+      return;
+    }
+    if (selectedMapNode() || modalHasAnyOpen()) return;
+
+    const entry = worldNodeByName(locationName);
+    if (entry) mapNodeSelect(entry);
   }
 
   private checkForMapChange(mapName: string): void {
@@ -322,6 +372,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.mapContainer?.removeChildren();
     this.playerIndicatorContainer?.removeChildren();
     this.gatherProgressContainer?.removeChildren();
+    this.encounterProgressContainer?.removeChildren();
     this.nodeSelectionContainer?.removeChildren();
     this.app?.destroy(true, { children: true, texture: true });
 
@@ -332,6 +383,8 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.playerIndicatorContainer = undefined;
     this.gatherProgressContainer = undefined;
     this.gatherProgressBar = undefined;
+    this.encounterProgressContainer = undefined;
+    this.encounterProgressBar = undefined;
     this.nodeSelectionContainer = undefined;
     this.nodeSelectionIndicator = undefined;
     this.nodeLabels = undefined;
@@ -359,6 +412,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.mapContainer = containers.mapContainer;
     this.playerIndicatorContainer = containers.playerIndicatorContainer;
     this.gatherProgressContainer = containers.gatherProgressContainer;
+    this.encounterProgressContainer = containers.encounterProgressContainer;
     this.nodeSelectionContainer = containers.nodeSelectionContainer;
 
     // Clicking a node selects it; clicking anywhere else on the map (the
@@ -409,6 +463,13 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.gatherProgressBar = pixiIndicatorGatherProgressCreate(map.tilewidth);
     this.gatherProgressContainer.addChild(this.gatherProgressBar.container);
 
+    this.encounterProgressBar = pixiIndicatorEncounterProgressCreate(
+      map.tilewidth,
+    );
+    this.encounterProgressContainer.addChild(
+      this.encounterProgressBar.container,
+    );
+
     if (this.partyTokenTextures.length === 0) {
       this.partyTokenTextures = await this.loadPartyTokenTextures();
     }
@@ -422,6 +483,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateVisualPosition();
       this.updatePlayerIndicatorIfNeeded();
       this.updateGatherProgressIndicator();
+      this.updateEncounterProgressIndicator();
       this.updateNodeLabels();
       this.positionCamera();
     };
@@ -644,6 +706,28 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (active) this.gatherProgressBar.update(gatheringProgressFraction());
   }
 
+  // The encounter progress bar hovers above the party's tile while fighting
+  // through an encounter chain, filling as each fight in the chain is won -
+  // `combat.fightIndex` (0-based, the fight currently in progress) doubles as
+  // "how many prior fights have already been cleared". Gated on visual
+  // arrival for the same reason as `updateGatherProgressIndicator`, and
+  // hidden once the node's total fight count can't be resolved (e.g. content
+  // not yet loaded) rather than showing a bar that never fills.
+  private updateEncounterProgressIndicator(): void {
+    if (!this.encounterProgressBar) return;
+
+    const combat = gamestate().world.combat;
+    const entry = combat ? worldNodeByName(combat.locationName) : undefined;
+    const total = entry ? worldNodeEncounterCount(entry) : undefined;
+
+    const active =
+      !!combat && !!total && total > 0 && this.isVisuallyAtTarget();
+    this.encounterProgressBar.container.visible = active;
+    if (active && combat && total) {
+      this.encounterProgressBar.update((combat.fightIndex ?? 0) / total);
+    }
+  }
+
   // Eases the rendered token position toward the tick-driven, authoritative
   // `currentLocation` instead of snapping - see the field doc on
   // `visualPosition`. Deliberately does *not* wait for a travel step to
@@ -732,6 +816,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       !this.mapContainer ||
       !this.playerIndicatorContainer ||
       !this.gatherProgressContainer ||
+      !this.encounterProgressContainer ||
       !this.nodeSelectionContainer ||
       !this.map
     )
@@ -795,6 +880,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
 
     this.gatherProgressContainer.position.set(
+      Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
+      Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
+    );
+
+    this.encounterProgressContainer.position.set(
       Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
       Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
     );

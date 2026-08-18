@@ -52,27 +52,32 @@ export function pixiWorldContainersCreate(app: Application): {
   mapContainer: Container;
   playerIndicatorContainer: Container;
   gatherProgressContainer: Container;
+  encounterProgressContainer: Container;
   nodeSelectionContainer: Container;
 } {
   const mapContainer = new Container();
   const playerIndicatorContainer = new Container();
   const gatherProgressContainer = new Container();
+  const encounterProgressContainer = new Container();
   const nodeSelectionContainer = new Container();
 
   app.stage.addChild(mapContainer);
   app.stage.addChild(playerIndicatorContainer);
   app.stage.addChild(gatherProgressContainer);
+  app.stage.addChild(encounterProgressContainer);
   app.stage.addChild(nodeSelectionContainer);
 
   mapContainer.cullable = true;
   playerIndicatorContainer.cullable = false;
   gatherProgressContainer.cullable = false;
+  encounterProgressContainer.cullable = false;
   nodeSelectionContainer.cullable = false;
 
   return {
     mapContainer,
     playerIndicatorContainer,
     gatherProgressContainer,
+    encounterProgressContainer,
     nodeSelectionContainer,
   };
 }

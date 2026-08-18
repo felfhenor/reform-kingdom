@@ -2,12 +2,19 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   signal,
+  untracked,
 } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { getEntry } from '@helpers/content';
+import {
+  heroDamageEvents,
+  heroDamageEventsClear,
+} from '@helpers/combat-damage-events';
 import { partyGet } from '@helpers/party';
-import type { Character, JobContent } from '@interfaces';
+import type { Character, HeroDamageEvent, JobContent } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
 type HeroStatusEntry = {
@@ -18,10 +25,15 @@ type HeroStatusEntry = {
   isDead: boolean;
 };
 
+// How long a floating damage/heal number stays on screen before being
+// removed - must match the CSS animation duration in the stylesheet so the
+// number doesn't pop out mid-fade.
+const DAMAGE_NUMBER_LIFETIME_MS = 1100;
+
 @Component({
   selector: 'app-status-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconJobComponent],
+  imports: [DecimalPipe, IconJobComponent],
   templateUrl: './status-hero.component.html',
   styleUrl: './status-hero.component.scss',
 })
@@ -42,4 +54,43 @@ export class StatusHeroComponent {
       };
     }),
   );
+
+  // Floating damage/heal numbers currently on screen, keyed by the hero they
+  // belong to - always rendered regardless of `isExpanded`, since the point
+  // is to show something is happening even when the bar is collapsed.
+  private displayedDamageNumbers = signal<HeroDamageEvent[]>([]);
+
+  public damageNumbersByHero = computed(() => {
+    const grouped = new Map<string, HeroDamageEvent[]>();
+    this.displayedDamageNumbers().forEach((entry) => {
+      const existing = grouped.get(entry.characterId) ?? [];
+      grouped.set(entry.characterId, [...existing, entry]);
+    });
+    return grouped;
+  });
+
+  constructor() {
+    // `heroDamageEvents` is a shared queue rather than per-component state,
+    // so this both displays and drains it in the same pass - reading
+    // `displayedDamageNumbers` inside `untracked` avoids this effect
+    // re-triggering itself off its own write.
+    effect(() => {
+      const events = heroDamageEvents();
+      if (events.length === 0) return;
+
+      untracked(() => this.showDamageEvents(events));
+    });
+  }
+
+  private showDamageEvents(events: HeroDamageEvent[]): void {
+    this.displayedDamageNumbers.update((current) => [...current, ...events]);
+    heroDamageEventsClear(events.map((event) => event.id));
+
+    setTimeout(() => {
+      const ids = new Set(events.map((event) => event.id));
+      this.displayedDamageNumbers.update((current) =>
+        current.filter((event) => !ids.has(event.id)),
+      );
+    }, DAMAGE_NUMBER_LIFETIME_MS);
+  }
 }

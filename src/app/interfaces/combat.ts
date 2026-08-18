@@ -86,3 +86,14 @@ export type Combat = {
   encounterRandomId?: EncounterRandomId;
   fightIndex?: number;
 };
+
+// A single hero HP change (damage or healing) - pushed to `heroDamageEvents`
+// (see `combat-damage-events.ts`) so the bottom-right hero status bar can
+// show a floating +/- number above whichever hero was hit or healed.
+// `amount` is signed for display: positive shows as a heal, negative as
+// damage.
+export type HeroDamageEvent = {
+  id: string;
+  characterId: string;
+  amount: number;
+};

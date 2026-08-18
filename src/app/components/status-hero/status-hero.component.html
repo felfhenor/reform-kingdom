@@ -12,6 +12,21 @@
         [class.expanded]="expanded"
         [class.dead]="hero.isDead"
       >
+        @let damageNumbers = damageNumbersByHero().get(hero.character.id);
+        @if (damageNumbers && damageNumbers.length > 0) {
+          <div class="damage-numbers">
+            @for (number of damageNumbers; track number.id) {
+              <span
+                class="damage-number"
+                [class.heal]="number.amount > 0"
+                [class.damage]="number.amount < 0"
+              >
+                {{ number.amount > 0 ? '+' : '' }}{{ number.amount | number }}
+              </span>
+            }
+          </div>
+        }
+
         <div class="hero-top">
           <div class="hero-sprite">
             @if (hero.job; as job) {

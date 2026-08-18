@@ -9,7 +9,7 @@
 }
 
 .hero-entry {
-  @apply flex flex-col items-center bg-black/60 border border-black/50 rounded;
+  @apply relative flex flex-col items-center bg-black/60 border border-black/50 rounded;
   width: 40px;
   padding: 2px;
   gap: 2px;
@@ -104,4 +104,50 @@
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
+}
+
+// Anchored to `.hero-entry` (not `.hero-sprite`), so the numbers sit at the
+// same spot above the hero whether the entry is collapsed or expanded -
+// both sizes share the same box, just resized.
+.damage-numbers {
+  @apply absolute flex flex-col-reverse items-center pointer-events-none;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+}
+
+.damage-number {
+  font-weight: 700;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  animation: damage-number-float 1100ms ease-out forwards;
+
+  &.damage {
+    color: #ef4444;
+  }
+
+  &.heal {
+    color: #4ade80;
+  }
+}
+
+@keyframes damage-number-float {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
 }

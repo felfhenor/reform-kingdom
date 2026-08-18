@@ -1,11 +1,15 @@
-import { combatApplySkillToTarget } from '@helpers/combat-damage';
+import {
+  combatApplySkillToTarget,
+  combatCombatantTakeDamage,
+} from '@helpers/combat-damage';
+import { heroDamageEvents } from '@helpers/combat-damage-events';
 import type {
   Combat,
   Combatant,
   EquipmentSkill,
   EquipmentSkillContentTechnique,
 } from '@interfaces';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 function buildCombat(overrides: Partial<Combat> = {}): Combat {
   return {
@@ -271,5 +275,47 @@ describe('combatApplySkillToTarget defense', () => {
     // baseDamage = Strength(100) * 0.75 + Intelligence(100) * 0.25 = 100;
     // fully absorbed by defense (250), so no damage gets through.
     expect(target.hp).toBe(100 - Math.max(0, 100 - 250));
+  });
+});
+
+describe('combatCombatantTakeDamage', () => {
+  beforeEach(() => {
+    heroDamageEvents.set([]);
+  });
+
+  it('emits a hero damage event with the sign flipped for a hero taking damage', () => {
+    const hero = buildCombatant({ isEnemy: false, hp: 100 });
+
+    combatCombatantTakeDamage(hero, 25);
+
+    expect(heroDamageEvents()).toMatchObject([
+      { characterId: hero.id, amount: -25 },
+    ]);
+  });
+
+  it('emits a positive amount for a hero being healed', () => {
+    const hero = buildCombatant({ isEnemy: false, hp: 50 });
+
+    combatCombatantTakeDamage(hero, -25);
+
+    expect(heroDamageEvents()).toMatchObject([
+      { characterId: hero.id, amount: 25 },
+    ]);
+  });
+
+  it('does not emit an event for an enemy combatant', () => {
+    const enemy = buildCombatant({ isEnemy: true, hp: 100 });
+
+    combatCombatantTakeDamage(enemy, 25);
+
+    expect(heroDamageEvents()).toHaveLength(0);
+  });
+
+  it('does not emit an event when the amount is zero', () => {
+    const hero = buildCombatant({ isEnemy: false, hp: 100 });
+
+    combatCombatantTakeDamage(hero, 0);
+
+    expect(heroDamageEvents()).toHaveLength(0);
   });
 });
