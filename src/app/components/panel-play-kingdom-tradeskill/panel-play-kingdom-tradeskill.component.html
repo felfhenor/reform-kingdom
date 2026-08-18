@@ -1,11 +1,25 @@
 @let buildingData = building();
-@let entries = recipeEntries();
+@let entries = visibleRecipeEntries();
 @let queue = queueViewModels();
 @let full = isQueueFull();
+@let uncraftableTotal = uncraftableCount();
 
 <app-card-page heightProfile="full">
   <span header>{{ tradeskill() }} - Lv. {{ buildingData.level }}</span>
+
   <app-button-kingdom-back pageactions />
+
+  <div pageactionsleft>
+    <label class="label cursor-pointer label-checkbox gap-2 self-start">
+      <input
+        type="checkbox"
+        [checked]="hideUncraftable()"
+        class="checkbox checkbox-sm checkbox-secondary"
+        (click)="toggleHideUncraftable()"
+      />
+      Hide uncraftable ({{ uncraftableTotal | number }})
+    </label>
+  </div>
 
   <div class="flex flex-col gap-4 p-4 h-full min-h-0">
     <div class="flex flex-col gap-2 flex-shrink-0">
@@ -206,7 +220,13 @@
           </div>
         </div>
       } @empty {
-        <div class="text-xs italic text-lighter">No recipes available yet.</div>
+        <div class="text-xs italic text-lighter">
+          @if (hideUncraftable() && uncraftableTotal > 0) {
+            All available recipes are currently uncraftable.
+          } @else {
+            No recipes available yet.
+          }
+        </div>
       }
     </div>
   </div>

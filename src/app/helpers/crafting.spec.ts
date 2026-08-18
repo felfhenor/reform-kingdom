@@ -151,7 +151,7 @@ describe('getCraftableRecipeEntries', () => {
     expect(entries.map((entry) => entry.recipe.id)).toEqual(['discovered']);
   });
 
-  it('sorts uncraftable entries to the bottom', () => {
+  it('sorts by level regardless of craftability, so order stays stable as craftability changes', () => {
     vi.mocked(craftMaxCraftableQuantity).mockImplementation((recipe) =>
       recipe.id === 'unaffordable' ? 0 : 1,
     );
@@ -162,7 +162,7 @@ describe('getCraftableRecipeEntries', () => {
       buildRecipe({
         id: 'unaffordable' as RecipeId,
         name: 'A - Unaffordable',
-        minTradeskillLevel: 1,
+        minTradeskillLevel: 3,
         requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
       }),
       buildRecipe({
@@ -175,8 +175,8 @@ describe('getCraftableRecipeEntries', () => {
 
     const entries = getCraftableRecipeEntries('Blacksmithing');
     expect(entries.map((entry) => entry.recipe.id)).toEqual([
-      'free',
       'unaffordable',
+      'free',
     ]);
   });
 
@@ -207,6 +207,71 @@ describe('getCraftableRecipeEntries', () => {
       'high',
       'mid',
       'low',
+    ]);
+  });
+
+  it("sorts by the recipe's own minTradeskillLevel, ignoring the result item's (possibly different) level requirement", () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding({ level: 20 })),
+    } as unknown as GameState);
+    vi.mocked(getEntriesByType).mockReturnValue([
+      buildRecipe({
+        id: 'same-tier-high-equip-level' as RecipeId,
+        name: 'Coppersilk Robe',
+        minTradeskillLevel: 4,
+      }),
+      buildRecipe({
+        id: 'same-tier-low-equip-level' as RecipeId,
+        name: 'Bone-Hewn Cloak',
+        minTradeskillLevel: 4,
+      }),
+    ]);
+    vi.mocked(recipeResultContent).mockImplementation(
+      (recipe) =>
+        ({
+          levelRequirement: recipe.id === 'same-tier-high-equip-level' ? 6 : 4,
+          rarity: 'Common',
+        }) as never,
+    );
+
+    const entries = getCraftableRecipeEntries('Blacksmithing');
+    expect(entries.map((entry) => entry.recipe.id)).toEqual([
+      'same-tier-low-equip-level',
+      'same-tier-high-equip-level',
+    ]);
+  });
+
+  it('breaks ties at the same minTradeskillLevel by rarity, then name', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding({ level: 20 })),
+    } as unknown as GameState);
+    vi.mocked(getEntriesByType).mockReturnValue([
+      buildRecipe({
+        id: 'rare-z' as RecipeId,
+        name: 'Z - Rare',
+        minTradeskillLevel: 4,
+      }),
+      buildRecipe({
+        id: 'common-a' as RecipeId,
+        name: 'A - Common',
+        minTradeskillLevel: 4,
+      }),
+      buildRecipe({
+        id: 'common-b' as RecipeId,
+        name: 'B - Common',
+        minTradeskillLevel: 4,
+      }),
+    ]);
+    vi.mocked(recipeResultContent).mockImplementation(
+      (recipe) =>
+        ({ rarity: recipe.id === 'rare-z' ? 'Rare' : 'Common' }) as never,
+    );
+
+    const entries = getCraftableRecipeEntries('Blacksmithing');
+    expect(entries.map((entry) => entry.recipe.id)).toEqual([
+      'common-a',
+      'common-b',
+      'rare-z',
     ]);
   });
 

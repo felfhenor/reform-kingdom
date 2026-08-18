@@ -11,7 +11,11 @@ import {
   recipeResultOwnedQuantity,
   recipeResultSpritesheet,
 } from '@helpers/recipes';
-import { craftXpChance, craftXpChanceTier, tradeskillBuilding } from '@helpers/tradeskill';
+import {
+  craftXpChance,
+  craftXpChanceTier,
+  tradeskillBuilding,
+} from '@helpers/tradeskill';
 import type {
   CollectibleContent,
   CraftRecipeEntry,
@@ -25,18 +29,6 @@ import type {
 } from '@interfaces';
 import { ALL_TRADESKILLS, RARITY_PRIORITY } from '@interfaces';
 import { orderBy, sumBy } from 'es-toolkit/compat';
-
-function recipeEffectiveLevel(
-  recipe: RecipeContent,
-  resultContent:
-    ItemContent | EquipmentContent | CollectibleContent | undefined,
-): number {
-  if (resultContent && 'levelRequirement' in resultContent) {
-    return resultContent.levelRequirement;
-  }
-
-  return recipe.minTradeskillLevel;
-}
 
 function buildRequirementEntry(
   requirement: RecipeRequirement,
@@ -89,11 +81,15 @@ function recipeRequirementEntries(
 
 // Only recipes the building has actually reached are shown at all, and only
 // once any world-drop gate on the recipe itself is satisfied (see
-// `isRecipeCraftable`). Entries that are currently uncraftable (out of
-// resources, or a unique collectible already owned/queued) sort to the
-// bottom rather than disappearing, so the list stays a stable reference of
-// everything unlocked. Within that, recipes sort by level descending
-// (newest/highest-level first).
+// `isRecipeCraftable`). Sorted purely by the recipe's own tradeskill level
+// descending (highest first) - not the resulting item's equip-level
+// requirement, which can diverge from the recipe tier it's actually crafted
+// at and would otherwise scatter same-tier recipes apart. This also keeps
+// the order stable as craftability changes while the player crafts - entries
+// that are currently uncraftable (out of resources, or a unique collectible
+// already owned/queued) stay in place rather than jumping to the bottom.
+// Callers that want to hide uncraftable entries should filter separately
+// rather than relying on sort position.
 export function getCraftableRecipeEntries(
   tradeskill: Tradeskill,
 ): CraftRecipeEntry[] {
@@ -116,7 +112,6 @@ export function getCraftableRecipeEntries(
         resultSpritesheet: recipeResultSpritesheet(recipe),
         resultChance: recipe.result.chance ?? 100,
         backdropSprite,
-        effectiveLevel: recipeEffectiveLevel(recipe, resultContent),
         maxCraftable: craftMaxCraftableQuantity(recipe, tradeskill),
         ownedQuantity: recipeResultOwnedQuantity(recipe),
         xp: recipe.tradeskillXP,
@@ -129,13 +124,12 @@ export function getCraftableRecipeEntries(
   return orderBy(
     entries,
     [
-      (entry) => (entry.maxCraftable === 0 ? 1 : 0),
-      (entry) => entry.effectiveLevel,
+      (entry) => entry.recipe.minTradeskillLevel,
       (entry) =>
         entry.resultContent ? RARITY_PRIORITY[entry.resultContent.rarity] : 0,
       (entry) => entry.recipe.name,
     ],
-    ['asc', 'desc', 'asc', 'asc'],
+    ['desc', 'asc', 'asc'],
   );
 }
 

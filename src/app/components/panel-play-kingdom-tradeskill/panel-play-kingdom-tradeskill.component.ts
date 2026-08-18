@@ -1,4 +1,4 @@
-import { formatNumber } from '@angular/common';
+import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,7 +23,11 @@ import {
   tradeskillBuilding,
   tradeskillMaxQueueSize,
 } from '@helpers/tradeskill';
-import { uiClockTick } from '@helpers/ui';
+import {
+  craftingHideUncraftable,
+  craftingHideUncraftableToggle,
+  uiClockTick,
+} from '@helpers/ui';
 import type {
   CollectibleContent,
   CraftQueueEntryId,
@@ -43,6 +47,7 @@ import { clamp } from 'es-toolkit/compat';
   imports: [
     AtlasImageComponent,
     CardPageComponent,
+    DecimalPipe,
     SlotIconBlankComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
@@ -60,6 +65,20 @@ export class PanelPlayKingdomTradeskillComponent {
   public building = computed(() => tradeskillBuilding(this.tradeskill()));
   public recipeEntries = computed(() =>
     getCraftableRecipeEntries(this.tradeskill()),
+  );
+
+  public hideUncraftable = craftingHideUncraftable;
+  public toggleHideUncraftable = craftingHideUncraftableToggle;
+
+  public uncraftableCount = computed(
+    () =>
+      this.recipeEntries().filter((entry) => entry.maxCraftable === 0).length,
+  );
+
+  public visibleRecipeEntries = computed(() =>
+    this.hideUncraftable()
+      ? this.recipeEntries().filter((entry) => entry.maxCraftable > 0)
+      : this.recipeEntries(),
   );
   public isQueueFull = computed(
     () =>

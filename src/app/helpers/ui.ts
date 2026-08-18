@@ -99,6 +99,18 @@ export function caravanTradeOpen(entry: WorldNodeEntry): void {
   modalOpen('caravan-trade');
 }
 
+// Whether uncraftable recipes are hidden on tradeskill crafting pages -
+// global across all tradeskills rather than per-tradeskill, since it's a
+// display preference about the crafting UI itself, not the building.
+export const craftingHideUncraftable = localStorageSignal<boolean>(
+  'craftingHideUncraftable',
+  false,
+);
+
+export function craftingHideUncraftableToggle(): void {
+  craftingHideUncraftable.update((hide) => !hide);
+}
+
 export function closeAllMenus(smart = false) {
   if (smart && showAnySubmenu()) {
     showAnySubmenu.set(false);

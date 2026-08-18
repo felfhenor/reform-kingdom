@@ -44,7 +44,6 @@ export type CraftRecipeEntry = {
   resultSpritesheet: 'item' | 'equipment' | 'collectible';
   resultChance: number;
   backdropSprite: string | undefined;
-  effectiveLevel: number;
   maxCraftable: number;
   ownedQuantity: number;
   xp: number;
