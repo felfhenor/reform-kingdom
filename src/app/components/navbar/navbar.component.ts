@@ -136,10 +136,7 @@ export class NavbarComponent {
     }
   }
 
-  // ESC closes whichever modal is on top of the stack. The pause menu is
-  // the one exception with side effects (resuming the game), so it's
-  // routed through its own close method; everything else can just pop.
-  // With nothing open, ESC opens the pause menu.
+  // Pause menu is special-cased (resuming has side effects); with nothing open, ESC opens the pause menu instead.
   public closeAllMenus() {
     if (modalIsTopmost('pause-menu')) {
       this.closePauseMenu();

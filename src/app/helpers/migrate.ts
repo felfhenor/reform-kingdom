@@ -39,12 +39,7 @@ import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
 import { merge } from 'es-toolkit/compat';
 import type { GameStateDiscoveredGatherNodes, GameStateMaterials } from '@interfaces';
 
-// One-time backfill for saves that predate gather-node discovery tracking:
-// if the player already has material progress but no recorded node visits,
-// treat every GatherNode as found rather than retroactively hiding
-// materials they've legitimately already gathered. A save with neither
-// materials nor discoveries is a genuinely fresh game, which should still
-// start fully ungated.
+// Backfill for pre-discovery-tracking saves: existing material progress with no recorded visits means treat every GatherNode as found.
 function backfillLegacyGatherNodeDiscoveries(
   discoveredGatherNodes: GameStateDiscoveredGatherNodes,
   materials: GameStateMaterials,

@@ -43,19 +43,14 @@ export type PixiNodeLabelResolver = (
   object: TiledObject,
 ) => WorldNodeLabelInfo | undefined;
 
-// Display info for a reward, resolved down to its underlying content -
-// used anywhere a reward needs to be shown outside of a full
-// `SlotCompletionRewardComponent` (e.g. a Decree clause's farm target).
+// Resolved reward display info, for use outside a full SlotCompletionRewardComponent.
 export type RewardContentInfo = {
   name: string;
   sprite: string;
   spritesheet: AtlasedImage;
 };
 
-// One option in the Farm Node clause's node picker. Carries the full entry
-// (rather than a precomputed sprite frame) so the picker can render it
-// through the reusable `SpriteNodeComponent`, which resolves the frame
-// itself.
+// Carries the full entry (not a precomputed sprite frame) so SpriteNodeComponent can resolve it.
 export type ExploreNodeFarmOption = {
   nodeName: string;
   levelLabel: string;

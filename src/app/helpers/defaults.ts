@@ -52,10 +52,7 @@ export function defaultGameState(): GameState {
   };
 }
 
-// Every building starts at level 1 with an empty queue - `xp.maximum: 10`
-// matches `tradeskillXpForLevel(1)` in `crafting.ts` (kept as a literal here
-// rather than imported, to avoid a `defaults.ts` <-> `state-game.ts` cycle
-// through `crafting.ts`).
+// `xp.maximum: 10` matches `tradeskillXpForLevel(1)` in `crafting.ts`, kept as a literal here to avoid an import cycle through `crafting.ts`.
 function defaultTradeskills(): GameStateTradeskills {
   return ALL_TRADESKILLS.reduce((tradeskills, tradeskill) => {
     tradeskills[tradeskill] = {

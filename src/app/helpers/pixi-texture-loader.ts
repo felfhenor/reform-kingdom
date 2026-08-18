@@ -7,10 +7,7 @@ export async function pixiTiledTilesetTexturesLoad(
 ): Promise<Record<number, Texture>> {
   const baseTexture = await Assets.load(tiledTilesetImagePath(tileset));
 
-  // Linear filtering (the default) samples across a tile's frame edge into
-  // its neighbors in the shared atlas image, producing hairline seams
-  // between adjacent tiles. Nearest-neighbor sampling keeps each tile's
-  // pixels self-contained, which also suits this game's pixel art.
+  // Nearest-neighbor avoids hairline seams from linear filtering sampling across tile edges in the atlas.
   baseTexture.source.scaleMode = 'nearest';
 
   const textures: Record<number, Texture> = {};
@@ -38,10 +35,7 @@ export async function pixiTiledMapTexturesLoad(
   return Object.assign({}, ...textureSets);
 }
 
-// Slices `frameCount` consecutive `frame`-sized frames (left to right, same
-// row) out of a spritesheet image, matching the atlas layout convention
-// `AtlasAnimationComponent` uses for CSS-driven job/hero animations - here
-// used to build an `AnimatedSprite`'s texture frames instead.
+// Slices consecutive same-row frames out of a spritesheet, matching AtlasAnimationComponent's layout convention.
 export async function pixiSpriteFrameTexturesLoad(
   imageUrl: string,
   frame: { x: number; y: number; width: number; height: number },

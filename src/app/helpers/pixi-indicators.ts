@@ -44,10 +44,7 @@ export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   return { graphics, ticker };
 }
 
-// The party's token while it's traveling between locations. Renders the lead
-// hero's job walk-cycle (animates itself via Ticker.shared once playing, no
-// manual ticker needed) - falls back to a plain circle if no sprite frames
-// could be resolved (e.g. content not yet loaded).
+// Renders the lead hero's walk-cycle (self-animates via Ticker.shared); falls back to a plain circle if no frames resolved.
 export function pixiIndicatorPlayerSpriteCreate(
   tileSize: number,
   frameTextures: Texture[],
@@ -77,13 +74,8 @@ export function pixiIndicatorPlayerSpriteCreate(
   return sprite;
 }
 
-// A small bar hovering above the party's tile while gathering, filling left
-// to right as the current gather cycle progresses - full means the next
-// item-chance roll is about to happen. Its screen position is set every
-// frame by the caller (see game-play-world.component.ts); the bar/background
-// graphics carry the "float above the tile" offset in their own transform
-// (not baked into their drawn rect) so scaling the fill for progress doesn't
-// also drag it sideways.
+// Progress bar above the party's tile while gathering. The float-above offset lives in the graphics'
+// transform, not their drawn rect, so scaling the fill doesn't drag it sideways.
 export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   container: Container;
   update: (fraction: number) => void;
@@ -117,12 +109,7 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   return { container, update };
 }
 
-// A small bar hovering above the party's tile while fighting through an
-// encounter chain, filling left to right as each fight in the chain is won -
-// full means the node is fully cleared. Same shape/positioning contract as
-// `pixiIndicatorGatherProgressCreate` (only the fill color differs, so the
-// two are visually distinguishable), since gathering and combat can never be
-// active at the same tile simultaneously.
+// Same shape/positioning as `pixiIndicatorGatherProgressCreate`, just a different fill color.
 export function pixiIndicatorEncounterProgressCreate(tileSize: number): {
   container: Container;
   update: (fraction: number) => void;
@@ -156,9 +143,7 @@ export function pixiIndicatorEncounterProgressCreate(tileSize: number): {
   return { container, update };
 }
 
-// A floating nametag rendered above every interactable node (gather/explore/
-// travel), always visible rather than only on hover or selection, so players
-// can tell at a glance which nodes they can go to and what level they need.
+// Always visible (not just on hover/selection) so players can spot interactable nodes at a glance.
 export function pixiIndicatorNodeLabelCreate(
   kind: WorldNodeInteractionKind,
   text: string,

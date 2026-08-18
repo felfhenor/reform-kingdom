@@ -109,13 +109,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   private cameraOffset = signal<CameraPosition>({ x: 0, y: 0 });
 
-  // Captured once when a pan first moves the camera away from center, and
-  // held fixed for as long as the camera stays panned - see `panCamera` and
-  // `positionCamera`. Without this, re-deriving the hero-centered base from
-  // the party's live position every frame (as `positionCamera` otherwise
-  // does) would drag the panned view along with the party as it moves,
-  // which is exactly the "auto follow" behavior panning is meant to escape.
-  // Cleared by `recenterCamera` to resume following.
+  // Frozen anchor while panned, so party movement doesn't drag the panned view. Cleared by `recenterCamera`.
   private frozenCameraBase?: CameraPosition;
 
   public fadeVisible = signal<boolean>(false);
@@ -158,44 +152,24 @@ export class GamePlayWorldComponent implements OnDestroy {
   private dragPointerId?: number;
   private lastPointerPosition = { x: 0, y: 0 };
 
-  // The rendered token/camera position, eased toward `currentLocation` in
-  // real time rather than snapping to it - see `updateVisualPosition`. Kept
-  // separate from `currentLocation` (which is the tick-driven, save-safe
-  // source of truth, and only jumps once *every* tick of a step has
-  // resolved) so game logic never has to reason about fractional tile
-  // positions.
+  // Rendered position, eased toward the tick-driven `currentLocation` rather than snapping to it - see `updateVisualPosition`.
   private visualPosition: CurrentLocation = { mapName: '', x: 0, y: 0 };
 
-  // The endpoints and real-time schedule of whichever travel step is
-  // currently being glided toward - captured once when that step first
-  // becomes current (see `updateVisualPosition`), not recomputed per frame,
-  // so the glide's pace stays constant for the step's whole duration instead
-  // of drifting as `visualPosition` moves. `stepOriginTile` starts from
-  // wherever `visualPosition` already was (not the tick-driven origin tile)
-  // so a step-to-step handoff never causes a visible snap.
+  // Endpoints/schedule of the step currently being glided toward, captured once so pace stays constant - see `updateVisualPosition`.
   private stepOriginTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
   private stepDestinationTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
   private stepStartTime = performance.now();
   private stepDurationMs = 0;
   private hasActiveStep = false;
 
-  // Whether the "at location" indicator (rather than the walking token) is
-  // currently shown - driven by visual arrival (see `updatePlayerIndicator`),
-  // not the instant `currentLocation` ticks over, so the walking token stays
-  // visible for the full glide instead of swapping the moment the tile is
-  // reached logically.
+  // Driven by visual arrival, not the tick-layer `currentLocation`, so the walking token stays visible for the full glide.
   private isShowingAtLocationIndicator = false;
   private partyTokenTextures: Texture[] = [];
   private isTransitioningMap = false;
   private wasPartyDead = false;
 
   constructor() {
-    // Bootstraps the very first map load - this fires reliably since it's
-    // the component's initial synchronous effect run. Further map changes
-    // (driven by the gameloop's background ticking, not a user-triggered
-    // Angular event) aren't guaranteed to wake the zoneless effect scheduler
-    // promptly, so `checkForMapChange` below re-checks every render frame
-    // via the Pixi ticker instead, independent of Angular's CD entirely.
+    // Bootstraps the first map load; later map changes are re-checked via the Pixi ticker instead (zoneless CD isn't guaranteed to wake for background ticks).
     effect(() => {
       const mapName = currentLocationGet().mapName;
       this.checkForMapChange(mapName);
@@ -206,21 +180,8 @@ export class GamePlayWorldComponent implements OnDestroy {
       if (this.gridOverlay) this.gridOverlay.visible = showBackdropGrid;
     });
 
-    // Zooms the map view only - scaling `app.stage` (rather than the UI
-    // around it) leaves every other panel/overlay untouched. This only
-    // handles the option changing *while already in-game* - `this.app` isn't
-    // a signal, so this effect doesn't re-run when `initPixi` creates or
-    // recreates it on map load/transition; `initPixi` applies the current
-    // zoom itself for that case (search "stage.scale.set" there). If
-    // `this.app` isn't set yet (e.g. this effect's first run, before any map
-    // has loaded), there's nothing to scale - it'll pick up the last-set
-    // `mapZoom` once `initPixi` runs. `positionCamera` is re-run so the
-    // viewport-tiles math (which accounts for zoom - see
-    // `viewportTilesCalculate`) re-centers the camera at the new scale
-    // instead of waiting for the next ticker frame. Wrapped in `untracked`
-    // for the same reason as the recenter effect below: `positionCamera`
-    // transitively reads `cameraOffset`, and without `untracked` that read
-    // would make a later drag re-trigger this effect pointlessly.
+    // Only handles zoom changing while already in-game; `initPixi` applies zoom itself on (re)creation since `this.app` isn't a signal.
+    // `untracked` avoids self-retrigger, since `positionCamera` transitively reads `cameraOffset`.
     effect(() => {
       const mapZoom = getOption('mapZoom');
       if (this.app) this.app.stage.scale.set(mapZoom);
@@ -231,16 +192,8 @@ export class GamePlayWorldComponent implements OnDestroy {
       isWorldCameraPanned.set(this.isPanned());
     });
 
-    // The recenter button lives in the navbar (so it can sit beside the
-    // pause button), but the camera offset it resets is owned here - this
-    // effect is the bridge between the navbar's click and this component's
-    // state. Skipped on the initial run so mounting the component doesn't
-    // itself count as a recenter request. The call is wrapped in `untracked`
-    // because `recenterCamera` transitively reads `cameraOffset` (via
-    // `positionCamera`) - without it, that read would register as a
-    // dependency of this same effect, so any later drag (which also writes
-    // `cameraOffset`) would re-trigger it and immediately snap the camera
-    // back to center again.
+    // Bridges the navbar's recenter button to this component's camera state; skips the initial run so mounting doesn't count as a request.
+    // `untracked` avoids self-retrigger via `cameraOffset` (read transitively through `recenterCamera`/`positionCamera`).
     let isFirstRecenterCheck = true;
     effect(() => {
       worldCameraRecenterRequest();
@@ -264,15 +217,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     });
   }
 
-  // Deaths Door expiring recalls the party to the kingdom with an instant
-  // teleport (see `handleDeathsDoorExpiry`) - they never walk there. When
-  // that also changes the loaded map, `checkForMapChange` already covers it
-  // with its own fade. But if the party died on the kingdom's own map,
-  // there's no map-name change for it to catch, so `updateVisualPosition`
-  // would otherwise glide the token from the death spot back to the
-  // recall point - a visible "walk back". This snaps `visualPosition`
-  // straight to the target behind a plain CSS fade (no Pixi teardown, so
-  // no re-triggering texture loads) to mask the jump.
+  // Deaths Door recall teleports instantly; if it happens on the same map, `checkForMapChange` won't catch it, so this snaps the token to avoid a visible walk-back.
   private checkForDeathsDoorRecall(): void {
     const isDead = isGlobalEffectActive('Deaths Door' as GlobalEffectId);
     const justRecalled = this.wasPartyDead && !isDead;
@@ -386,10 +331,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       backgroundAlpha: 0,
       antialias: false,
     });
-    // Applies whatever zoom is currently set - the mapZoom effect above
-    // can't do this itself since `this.app` didn't exist yet when it last
-    // ran (it only reacts to the option changing later, not to this app
-    // being created).
+    // The mapZoom effect can't apply this itself - `this.app` didn't exist when it last ran.
     this.app.stage.scale.set(getOption('mapZoom'));
 
     const containers = pixiWorldContainersCreate(this.app);
@@ -399,13 +341,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.encounterProgressContainer = containers.encounterProgressContainer;
     this.nodeSelectionContainer = containers.nodeSelectionContainer;
 
-    // Clicking a node selects it; clicking anywhere else on the map (the
-    // stage background behind everything) deselects it. Node clicks stop
-    // propagation before it reaches this handler - see pixi-map-render.ts.
-    // Dragging to pan the map also lands a pointertap here since the pointer
-    // goes down and up over the same stage target; `dragMoved` (set by our
-    // own pointermove handler below, always before this fires) tells the two
-    // apart so panning doesn't also deselect the current node.
+    // Clicking empty map deselects the node (node clicks stop propagation, see pixi-map-render.ts). `dragMoved` distinguishes a pan-drag's pointertap from an actual deselect click.
     this.app.stage.eventMode = 'static';
     this.app.stage.hitArea = this.app.screen;
     this.app.stage.on('pointertap', () => {
@@ -491,16 +427,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     return entry ? worldNodeLabelInfo(entry) : undefined;
   }
 
-  // Every node's label is created up front (see `pixi-map-render.ts`) but
-  // starts invisible with no pointer cursor, so this is what actually shows
-  // it - run once right after the map renders, then every tick thereafter.
-  // The per-tick refresh covers two live-changing cases: an `ExploreRandomNode`'s
-  // countdown text (ticks every second) and a hidden node's visibility/cursor
-  // flipping the instant it's clicked-discovered, without needing a full map
-  // re-render. PixiJS's `Text.text`/`visible`/`cursor` setters are no-ops
-  // when the value is unchanged, so recomputing every frame for values that
-  // rarely change is cheap and needs no manual throttling - same pattern as
-  // `updateGatherProgressIndicator`.
+  // Runs every tick to catch countdown text and hidden-node discovery updates; PixiJS setters are no-ops when unchanged so this needs no throttling.
   private updateNodeLabels(): void {
     if (!this.nodeLabels) return;
 
@@ -566,10 +493,7 @@ export class GamePlayWorldComponent implements OnDestroy {
         this.map.tileheight,
       );
 
-    // Anchor the pan to wherever the hero-centered camera is right now, but
-    // only the first time this pan gesture moves it off-center - subsequent
-    // drag deltas (and any party movement in between) accumulate against
-    // this same frozen anchor instead of a freshly re-centered one.
+    // Anchor only on the first off-center move of this gesture; later deltas accumulate against the same frozen anchor.
     if (!this.frozenCameraBase) {
       const location = this.visualPosition;
       this.frozenCameraBase = cameraPositionCalculate(
@@ -588,11 +512,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.map.height,
     );
 
-    // Drag deltas arrive in real screen pixels, but offset is tracked in
-    // unscaled tile units (matching viewportWidthTiles/bounds above) - so the
-    // tile size used to convert one to the other must include the zoom
-    // factor too, or a drag would move the camera by more tiles than the
-    // cursor visually crossed whenever the map is zoomed in.
+    // Tile size must include zoom, since drag deltas are screen pixels but offset is unscaled tile units.
     this.cameraOffset.set(
       cameraOffsetFromDrag(
         this.cameraOffset(),
@@ -657,12 +577,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.playerIndicatorContainer.addChild(sprite);
   }
 
-  // True once the eased `visualPosition` has actually caught up to the
-  // tick-driven `currentLocation` - the two fall out of sync for the
-  // duration of a glide (see `visualPosition`'s field doc), so anything that
-  // should only happen once the party has visibly, not just logically,
-  // arrived at a tile needs to check this rather than `isPlayerAtLocation()`
-  // alone.
+  // True once the eased `visualPosition` catches up to `currentLocation` - use for anything gated on visible, not just logical, arrival.
   private isVisuallyAtTarget(): boolean {
     const target = currentLocationGet();
     return (
@@ -672,11 +587,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
   }
 
-  // The walking token should stay visible for the entire glide, only
-  // swapping to the "at location" indicator once the token has visually
-  // (not just logically) arrived - otherwise it flips the instant the
-  // destination tile is reached at the tick layer, well before the render
-  // layer has finished easing into it.
+  // Swaps to the "at location" indicator only on visual arrival, so it doesn't flip before the glide finishes.
   private updatePlayerIndicatorIfNeeded(): void {
     const shouldShowAtLocation =
       this.isVisuallyAtTarget() && isPlayerAtLocation();
@@ -686,14 +597,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.setupPlayerIndicator();
   }
 
-  // The gather progress bar hovers above the party's tile while a gather
-  // cycle is running, filling as `gatheringProcessTick` (see helpers/
-  // gathering.ts) counts up toward the node's `gatherTime` - full means the
-  // next item-chance roll is about to happen. Gated on visual arrival (not
-  // just `isGathering()`) so it doesn't pop in while the token is still
-  // mid-glide toward the node - gathering starts the instant the tick layer
-  // resolves the final travel step, which can be well before the walk
-  // animation has finished easing into the tile.
+  // Gated on visual arrival, not just `isGathering()`, so the bar doesn't pop in while the token is still mid-glide.
   private updateGatherProgressIndicator(): void {
     if (!this.gatherProgressBar) return;
 
@@ -702,13 +606,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (active) this.gatherProgressBar.update(gatheringProgressFraction());
   }
 
-  // The encounter progress bar hovers above the party's tile while fighting
-  // through an encounter chain, filling as each fight in the chain is won -
-  // `combat.fightIndex` (0-based, the fight currently in progress) doubles as
-  // "how many prior fights have already been cleared". Gated on visual
-  // arrival for the same reason as `updateGatherProgressIndicator`, and
-  // hidden once the node's total fight count can't be resolved (e.g. content
-  // not yet loaded) rather than showing a bar that never fills.
+  // `combat.fightIndex` (0-based, in-progress fight) doubles as fights-cleared count. Gated on visual arrival like the gather bar.
   private updateEncounterProgressIndicator(): void {
     if (!this.encounterProgressBar) return;
 
@@ -724,22 +622,8 @@ export class GamePlayWorldComponent implements OnDestroy {
     }
   }
 
-  // Eases the rendered token position toward the tick-driven, authoritative
-  // `currentLocation` instead of snapping - see the field doc on
-  // `visualPosition`. Deliberately does *not* wait for a travel step to
-  // fully resolve (i.e. for `currentLocation` to jump) before starting to
-  // glide toward it: a step's ticks only resolve in a single lump once every
-  // `travelStepTicksCost` ticks (see `helpers/travel.ts`), so gliding *after*
-  // that jump instead of *during* it would mean the token sits fully still
-  // for the whole tick-accumulation window and then glides - doubling the
-  // real-world time per tile and, worse, making every path/off-path speed
-  // change look like a dead stop. Instead, the moment a new step becomes
-  // current (`travel.path[0]`), its real-time schedule is captured once (see
-  // `stepOriginTile`/`stepDurationMs`) and the token eases toward it
-  // continuously for that step's whole duration, landing on the destination
-  // tile at (approximately) the same real moment the tick layer resolves it.
-  // A map change is handled separately (with a fade) by `transitionToMap`,
-  // so a mismatched map name here just snaps rather than gliding across maps.
+  // Glides toward the in-flight step as soon as it becomes current, rather than waiting for its ticks to resolve - otherwise the token would sit still for the whole tick-accumulation window then jump.
+  // Map changes are handled separately (with a fade) by `transitionToMap`, so a mismatched map name here just snaps.
   private updateVisualPosition(): void {
     if (!this.map) return;
 
@@ -756,9 +640,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const inFlightStep =
       travel.status === 'Traveling' ? travel.path[0] : undefined;
 
-    // Idle, or an instant (0-tick) Teleport hop that's about to resolve in
-    // the same tick it became current - nothing to glide toward, so settle
-    // directly onto the authoritative tile.
+    // Idle, or an instant Teleport hop - nothing to glide toward.
     if (!inFlightStep || inFlightStep.kind === 'Teleport') {
       this.visualPosition = { ...location };
       this.hasActiveStep = false;
@@ -772,10 +654,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.stepDestinationTile.y !== inFlightStep.y;
 
     if (destinationChanged) {
-      // Origin is wherever the token is *currently rendered* - not the
-      // tick-driven `location` - so a handoff from one step to the next
-      // never causes a visible snap even if the previous glide hadn't
-      // pixel-perfectly finished yet.
+      // Origin is wherever the token is currently rendered, not tick-driven `location`, to avoid a visible snap on step handoff.
       this.stepOriginTile = { ...this.visualPosition };
       this.stepDestinationTile = {
         mapName: inFlightStep.mapName,
@@ -837,11 +716,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     const offset = this.cameraOffset();
 
-    // While panned, stay anchored at `frozenCameraBase` instead of
-    // re-deriving the hero-centered base from the party's live position -
-    // otherwise the party moving would drag the panned view along with it.
-    // Once recentered, `frozenCameraBase` is cleared and this goes back to
-    // tracking the party every frame.
+    // Stay anchored at `frozenCameraBase` while panned, so party movement doesn't drag the view.
     const base =
       this.frozenCameraBase ??
       cameraPositionCalculate(
@@ -853,25 +728,17 @@ export class GamePlayWorldComponent implements OnDestroy {
         this.map.height,
       );
 
-    // Reclamping the combined position (rather than trusting `offset` alone)
-    // covers cases like a viewport resize while panned shifting the bounds
-    // out from under the frozen base.
+    // Reclamped (not trusting `offset` alone) to cover a resize while panned shifting the bounds.
     const camera = {
       x: clamp(base.x + offset.x, bounds.minX, bounds.maxX),
       y: clamp(base.y + offset.y, bounds.minY, bounds.maxY),
     };
 
-    // Camera tiles are anchored by their top-left corner, so without this
-    // offset the player's tile sits with its top-left corner at screen
-    // center rather than the tile (and player) itself being centered.
+    // Offsets by half a tile so the tile center, not its top-left corner, lands at screen center.
     const centerOffsetX = -this.map.tilewidth / 2;
     const centerOffsetY = -this.map.tileheight / 2;
 
-    // The camera position is fractional (it's derived from viewport size in
-    // tiles, which rarely divides evenly), so without rounding here the map
-    // container sits at a subpixel offset. That misaligns every tile sprite
-    // from the pixel grid by the same fractional amount, which shows up as
-    // hairline tearing between tiles.
+    // Rounded to avoid subpixel offset, which shows up as hairline tearing between tiles.
     this.mapContainer.position.set(
       Math.round(-camera.x * this.map.tilewidth + centerOffsetX),
       Math.round(-camera.y * this.map.tileheight + centerOffsetY),

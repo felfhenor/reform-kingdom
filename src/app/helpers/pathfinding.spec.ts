@@ -182,11 +182,7 @@ describe('tiledMapPathMatrix', () => {
   });
 
   it('marks the tile a rotated bend object actually renders into, not its unrotated footprint', () => {
-    // A 64x64 corner-bend tile pivoted at (128, 128) and rotated -90deg -
-    // matching how `pixiTiledObjectRender` rotates a tile object around its
-    // own (x, y) origin - lands on tile (1, 1). A rotation-blind bounding
-    // box (the pre-fix bug) would instead compute the unrotated tile (2, 1),
-    // leaving a gap at the real corner and the wrong tile marked as on-path.
+    // Rotated -90deg around (128,128) lands on (1,1); a rotation-blind bounding box would wrongly give (2,1).
     const pathObjectsLayer: TiledLayer = {
       id: 2,
       name: 'Path Objects',
@@ -557,9 +553,7 @@ describe('travelPathTo', () => {
   });
 
   it('detours onto a longer Path Tiles route instead of the shortest off-road one', () => {
-    // Row 0 is an authored path connecting (0,0) to (4,0) then down to (4,4).
-    // The direct diagonal-ish route (8 Manhattan steps, all off-road) costs
-    // more than the longer on-path route, so travel should prefer the path.
+    // Row 0 is an authored path; the shorter off-road diagonal route costs more than the longer on-path one.
     const pathTilesLayer: TiledLayer = {
       id: 1,
       name: 'Path Tiles',

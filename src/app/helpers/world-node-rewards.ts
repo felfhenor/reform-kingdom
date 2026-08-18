@@ -20,12 +20,7 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 
-// A stable identity for a reward, used to de-dupe the preview list below -
-// mirrors how `worldNodeGatherMaterialIds` de-dupes by itemId via a `Set`.
-// Takes the bare `RewardIdentity` shape rather than a full `DroppedReward` so
-// it can also key a reward a caller only has an id for (e.g. a Decree
-// clause's stored farm target) - any `DroppedReward` is still accepted,
-// since it's structurally a `RewardIdentity` plus extra odds/quantity fields.
+// Stable identity string for de-duping rewards; takes RewardIdentity so callers with only an id (no odds/quantity) can use it too.
 export function rewardKey(reward: RewardIdentity): string {
   if ('itemId' in reward) return `item:${reward.itemId}`;
   if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
@@ -33,10 +28,7 @@ export function rewardKey(reward: RewardIdentity): string {
   return `collectible:${reward.collectibleId}`;
 }
 
-// Resolves a reward down to displayable content - the same fields
-// `SlotCompletionRewardComponent` shows, minus discovery-gating, for UI that
-// needs a reward's icon/name without also needing its drop odds (e.g. the
-// Farm Node clause's reward picker and its row/summary display).
+// Resolves a reward to displayable icon/name content, without discovery-gating or drop odds.
 export function rewardContentInfo(
   reward: RewardIdentity,
 ): RewardContentInfo | undefined {
@@ -64,11 +56,7 @@ export function rewardContentInfo(
   const recipe = getEntry<RecipeContent>(reward.recipeId);
   if (!recipe) return undefined;
 
-  // The recipe's own name (not its crafted result's) - a recipe reward
-  // grants the blueprint, not the item, and recipe names already carry a
-  // "Category: Item" naming convention (e.g. "Equipment: Bone-Hewn Cloak")
-  // that calls this out. Sprite/spritesheet still borrow the result, since a
-  // recipe has no icon of its own.
+  // Use the recipe's own name (it grants the blueprint, not the item) but the result's sprite, since recipes have no icon.
   const result = recipeResultContent(recipe);
   return result
     ? {
@@ -84,9 +72,7 @@ export function isGoldCoinReward(reward: DroppedReward): boolean {
   return reward.itemId === getEntry<ItemContent>('Gold Coin')?.id;
 }
 
-// The distinct completion rewards an encounter can grant, excluding Gold
-// Coin (which isn't tracked as a "reward" for discovery/preview purposes)
-// and de-duplicated by reward identity.
+// Distinct completion rewards, excluding Gold Coin and de-duplicated by identity.
 export function worldNodeCompletionRewards(
   entry: WorldNodeEntry,
 ): DroppedReward[] {
@@ -118,8 +104,7 @@ export function isRewardDiscovered(reward: DroppedReward): boolean {
   return isCollectibleDiscovered(reward.collectibleId);
 }
 
-// How many of an encounter's completion rewards the player has ever
-// obtained, out of the total - used for the "X/Y Rewards" info-popup badge.
+// Obtained/total counts for the "X/Y Rewards" info-popup badge.
 export function worldNodeCompletionRewardProgress(
   entry: WorldNodeEntry,
 ): WorldNodeCompletionRewardProgress {

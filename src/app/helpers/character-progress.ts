@@ -48,9 +48,7 @@ export function healPartyToFull(): void {
 const HEALING_MINIMUM_SECONDS = 10;
 const HEALING_SECONDS_PER_LEVEL = 2;
 
-// A flat 10-second minimum recovery period, plus ~2 ticks (roughly 2 seconds
-// at 1x speed) of global healing per hero level on top of it. See M1-09 in
-// the roadmap for the eventual per-hero healing-timer design.
+// Flat minimum plus per-level scaling; see M1-09 in the roadmap for the eventual per-hero healing-timer design.
 export function healingTicksForLevel(members: { level: number }[]): number {
   const highestLevel = Math.max(...members.map((member) => member.level), 1);
   return HEALING_MINIMUM_SECONDS + highestLevel * HEALING_SECONDS_PER_LEVEL;
@@ -83,10 +81,7 @@ function characterLeveledUp(character: Character, amount: number): Character {
   };
 }
 
-// Skills are derived from job + level rather than tracked as "known" state
-// (see heroSkillsAtLevel), so diffing the unlocked skill ids before/after
-// also naturally announces within-path rank upgrades (e.g. Double Strike I
-// -> II) as a newly learned skill.
+// Skills are derived from job + level, not tracked as "known" state, so diffing before/after ids also announces rank upgrades (e.g. Double Strike I -> II).
 function logCharacterProgress(before: Character, after: Character): void {
   if (after.level === before.level) return;
 
@@ -113,11 +108,7 @@ function xpProgressForLevel(level: number, currentXp: number): Character['xp'] {
   return { current: Math.min(currentXp, maximum), maximum };
 }
 
-// Rescales every character's xp.maximum (current level and, for jobProgress,
-// each held-but-inactive job) to match the current `characterXpForLevel`
-// curve, clamping `current` down if it now exceeds the new maximum. Never
-// forces a level-up itself - a character sitting exactly at its new maximum
-// simply levels up on its next real XP gain (see `characterLeveledUp`).
+// Rescales xp.maximum to the current `characterXpForLevel` curve, clamping `current` down if needed. Never forces a level-up itself.
 export function retrofitPartyXp(party: Character[]): Character[] {
   return party.map((character) => {
     const jobProgress = Object.fromEntries(
@@ -140,10 +131,7 @@ export function retrofitPartyXp(party: Character[]): Character[] {
   });
 }
 
-// Returns whether any party member leveled up from this gain - callers
-// (e.g. `combat-end.ts`) use it to know when a stronger party might be
-// worth retrying nodes it previously gave up on (see
-// `autoModeResetNodeFailureCounts`).
+// Callers (e.g. `combat-end.ts`) use the return value to know when to retry nodes previously given up on (see `autoModeResetNodeFailureCounts`).
 export function partyGainXp(amount: number): boolean {
   let anyLeveledUp = false;
 

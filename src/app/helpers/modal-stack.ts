@@ -1,10 +1,7 @@
 import { signal } from '@angular/core';
 import type { ModalId } from '@interfaces';
 
-// Single source of truth for which modals are open, in open order. Closing
-// always affects the topmost entry unless a specific id is given, so
-// callers never have to hand-roll a priority order across separate
-// visibility signals.
+// Single source of truth for which modals are open, in open order.
 const modalStack = signal<ModalId[]>([]);
 
 export function modalOpen(id: ModalId): void {

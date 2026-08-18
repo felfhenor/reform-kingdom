@@ -162,10 +162,7 @@ describe('riskLevelOfExploreNode', () => {
   });
 
   it('is High rather than Medium when the floor is only slightly above the party', () => {
-    // A node whose fights are randomized across its whole levelRange (see
-    // `encounterStartFight`) can still roll a much tougher fight even when
-    // its floor is close to the party - so a near floor alone isn't enough
-    // for Medium; the party must be able to clear the floor outright.
+    // A near floor alone isn't enough for Medium; the party must clear the floor outright.
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 13, max: 16 },
     } as EncounterContent);

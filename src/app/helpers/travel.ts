@@ -35,20 +35,13 @@ function travelGet(): TravelState {
   return gamestate().world.travel;
 }
 
-// A node's own tile counts as "on path" even off the authored path layer -
-// otherwise every node visit pays the off-path tick cost just for standing
-// at the destination, which looks like an odd stutter right at arrival.
+// A node's own tile counts as "on path" so arriving doesn't stutter with the off-path cost.
 function travelTileCountsAsPath(mapName: string, x: number, y: number): boolean {
   return tileIsOnPath(mapName, x, y) || !!worldNodeAt(mapName, x, y);
 }
 
-// Crossing a TeleportNode is instant (0 ticks). A plain Move step is cheap
-// when its destination is an authored path tile or a node tile (entering),
-// or when it's leaving a node tile (exiting) - regardless of whether that
-// node tile itself sits on the path layer. Note this is deliberately
-// asymmetric: an ordinary path tile does *not* similarly discount the step
-// leaving it, only a node does - otherwise every path -> off-path transition
-// would be mispriced as cheap too, defeating the point of the off-path cost.
+// Teleport is instant. Move is cheap entering a path/node tile, or leaving a node tile -
+// leaving an ordinary path tile is deliberately not discounted, or the off-path cost would never apply.
 export function travelStepTicksCost(
   step: TravelStep,
   originTile: CurrentLocation,
@@ -80,10 +73,7 @@ export function canPartyTravel(): boolean {
   );
 }
 
-// Settles the party as arrived at `destinationNodeName` without moving them -
-// used when a mid-travel redirect targets the tile they're already standing
-// on (e.g. redirecting back to the node they just departed, before its first
-// step has resolved).
+// Settles the party as arrived without moving - used when a redirect targets the tile they're already on.
 function travelArriveWithoutMoving(destinationNodeName: string): void {
   const location = currentLocationGet();
 
@@ -95,11 +85,7 @@ function travelArriveWithoutMoving(destinationNodeName: string): void {
   travelArriveAtNode(destinationNodeName, { kind: 'Move', ...location });
 }
 
-// Safety net: if pathfinding can't produce a route at all (e.g. the party's
-// current tile got walled off by a map edit), they'd otherwise be stuck on
-// that tile forever with no way to travel anywhere. Recall them to the
-// kingdom and log exactly where it happened so the underlying map issue can
-// be diagnosed.
+// Safety net for an unroutable tile (e.g. walled off by a map edit): recall to kingdom and log where it happened.
 function travelRecoverFromPathingFailure(destinationNodeName: string): void {
   const location = currentLocationGet();
   const kingdom = worldNodesOfType('Kingdom')[0];
@@ -120,9 +106,7 @@ function travelRecoverFromPathingFailure(destinationNodeName: string): void {
   );
 }
 
-// A manually-initiated travel (isAutoMode = false, the default) always wins
-// over standing orders - it fully disables Auto Mode rather than merely
-// pausing it, per design: the player has taken the wheel back.
+// Manual travel fully disables Auto Mode (not just pauses it) - the player has taken the wheel back.
 export function travelStart(
   destinationNodeName: string,
   isAutoMode = false,
@@ -141,12 +125,8 @@ export function travelStart(
     travelRecoverFromPathingFailure(destinationNodeName);
     return false;
   }
-  // A manual click on the tile the party is already standing on is a no-op
-  // (prevents accidental re-triggering from a stray click). Auto Mode
-  // deliberately re-targets the same node this way, though - e.g. the
-  // nearest eligible node for a LevelUpParty/FinishUnfinishedAreas clause is
-  // often the one the party just fought at - so it needs to fall through to
-  // `travelArriveWithoutMoving` below and actually re-trigger the node.
+  // Manual click on the current tile is a no-op (avoids stray re-triggers); Auto Mode falls
+  // through instead, since it deliberately re-targets the node the party is already on.
   if (path.length === 0 && !wasTraveling && !isAutoMode) return false;
 
   analyticsSendDesignEvent('World:Travel:Start');
@@ -177,9 +157,7 @@ export function travelStart(
   return true;
 }
 
-// How long Deaths Door lasts: 10 seconds per teleport-hop between the map
-// the party died on and the kingdom's map, 10 seconds minimum (so dying right
-// next to the kingdom still costs a beat, not an instant recall).
+// 10 seconds per teleport-hop to the kingdom's map, 10 second minimum so dying nearby still costs a beat.
 function deathsDoorDurationTicks(): number {
   const kingdom = worldNodesOfType('Kingdom')[0];
   if (!kingdom) return DEATHS_DOOR_MINIMUM_SECONDS;
@@ -191,9 +169,7 @@ function deathsDoorDurationTicks(): number {
   );
 }
 
-// The party doesn't walk home when defeated - Deaths Door is purely a timer;
-// on expiry (see `globalEffectsProcessTick`) they're teleported straight to
-// the kingdom and healing begins there.
+// Deaths Door is purely a timer; on expiry (`globalEffectsProcessTick`) the party teleports to the kingdom.
 export function travelBeginDeathsDoor(): void {
   addGlobalEffect(
     'Deaths Door' as GlobalEffectId,
@@ -240,9 +216,7 @@ function travelArriveAtNode(
   }
 }
 
-// Completes `completedStep` and either continues on to the next step -
-// resolving it immediately too if it's also instant (a chain of Teleport
-// steps should never wait for extra ticks) - or finishes the trip.
+// Chains through instant (0-tick) steps immediately so a run of Teleports never waits on ticks.
 function travelCompleteStep(
   destinationNodeName: string | undefined,
   completedStep: TravelStep,

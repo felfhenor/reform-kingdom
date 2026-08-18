@@ -56,10 +56,7 @@ export class PanelHeroEquipmentEquipmentComponent {
 
   public selectedSlot = signal<EquipmentSlot | undefined>(undefined);
 
-  // Only equippable-right-now gear shows up in the picker - ineligible items
-  // are filtered out entirely rather than shown disabled. Returns one entry
-  // per owned instance, not deduped by content id, so distinct physical
-  // copies (e.g. differently-infused swords) stay individually pickable.
+  // Ineligible items are filtered out, not shown disabled. One entry per owned instance (not deduped) so distinct copies stay pickable.
   public pickerItems = computed<EquipmentArmoryEntry[]>(() => {
     const slot = this.selectedSlot();
     if (!slot) return [];
@@ -79,9 +76,7 @@ export class PanelHeroEquipmentEquipmentComponent {
     return isSlotAvailableForJob(slot, this.character().jobId);
   }
 
-  // Skips rendering a paperdoll row entirely (rather than an empty gap) when
-  // none of its slots apply to this hero's class - e.g. the Ammo/Artifact
-  // row for anyone who isn't a Ranger or Magician.
+  // Skips a paperdoll row entirely (not an empty gap) when none of its slots apply to this hero's class.
   public rowHasVisibleSlot(row: EquipmentSlot[]): boolean {
     return row.some((slot) => this.isSlotVisible(slot));
   }

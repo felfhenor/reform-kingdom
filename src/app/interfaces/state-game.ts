@@ -40,9 +40,7 @@ export type GameStateMaterials = {
   [key: MaterialId]: { quantity: number; foundAt: number };
 };
 
-// Where a collectible was found is never stored per-player - the museum
-// derives it fresh from content every render (see
-// `helpers/collectible-source.ts`), so this only needs to track ownership.
+// Where a collectible was found is derived fresh from content each render (see `helpers/collectible-source.ts`), so this only tracks ownership.
 export type GameStateCollectibles = {
   [key: CollectibleId]: {
     quantity: number;
@@ -50,9 +48,7 @@ export type GameStateCollectibles = {
   };
 };
 
-// Permanent record of every equipment id ever owned - unlike `armory`, this
-// is never pruned when a piece of gear is equipped, sold, or broken down, so
-// it survives as a standing "has this ever been found" flag.
+// Unlike `armory`, this is never pruned on equip/sell/breakdown - it's a standing "has this ever been found" flag.
 export type GameStateDiscoveredEquipment = {
   [key: EquipmentId]: { foundAt: number };
 };
@@ -63,29 +59,17 @@ export type GameStateDiscoveredRecipes = {
   [key: RecipeId]: { foundAt: number; foundAtNode?: string };
 };
 
-// Permanent record of every GatherNode the party has physically visited -
-// keyed by the Tiled node's name (there's no branded id for world nodes).
-// Used to scope auto-mode's material picker to materials the player has
-// actually found a source for, rather than every material gatherable
-// anywhere in the world.
+// Keyed by Tiled node name (no branded id for world nodes). Scopes auto-mode's material picker to sources the player has actually found.
 export type GameStateDiscoveredGatherNodes = {
   [key: string]: { foundAt: number };
 };
 
-// Permanent record of every `hidden` world node the player has revealed by
-// clicking it - unlike `discoveredGatherNodes` (GatherNodes only, recorded on
-// travel arrival), this covers every node type and is recorded on click, so
-// a hidden node's label/cursor can be gated on it (see `world-node-discovery.ts`).
+// Unlike `discoveredGatherNodes` (GatherNodes only, recorded on arrival), this covers every node type, recorded on click (see `world-node-discovery.ts`).
 export type GameStateWorldDiscoveries = {
   [key: string]: { foundAt: number };
 };
 
-// Permanent record of every monster the party has ever defeated - `kills`
-// keeps counting past the first kill, unlike the other discovery slices,
-// since the bestiary shows a running kill count per monster. `minLevelFound`
-// / `maxLevelFound` track the actual levels it's been fought at (not the
-// theoretical range from its encounter data), and `foundAtNodes` accumulates
-// every distinct location it's been killed at, not just the first.
+// `kills` keeps counting past the first kill (unlike other discovery slices) for the bestiary's running count. `minLevelFound`/`maxLevelFound` are actual fought levels, not encounter data's theoretical range.
 export type GameStateBestiary = {
   [key: MonsterId]: {
     foundAt: number;

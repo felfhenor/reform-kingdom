@@ -28,16 +28,10 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// A node's floor sitting this many levels above the party's weakest hero
-// still counts as High risk - anything further is excluded outright (see
-// `riskLevelOfExploreNode`), regardless of any risk setting. Exported so UI
-// copy (the Risk Tolerance dropdown's explanations) can quote the real
-// threshold instead of hardcoding a number that could drift out of sync.
+// Beyond this many levels above the party's floor, a node is excluded outright (TooHigh) regardless of risk setting.
 export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
 
-// Once the least-failed node in a challenge tier has lost this many fights,
-// `mostChallengingExploreNodeForRisk` gives up on that tier and steps down
-// to the next easiest one - see its comment for the full ranking.
+// Losing streak at which mostChallengingExploreNodeForRisk gives up on a tier and steps down.
 export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 
 const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
@@ -46,14 +40,7 @@ const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
   High: 2,
 };
 
-// A node's encounter level is rolled uniformly across its whole levelRange
-// (see `encounterStartFight`), not just its floor - so risk has to be judged
-// against both ends of that range, not merely how far the floor sits above
-// the party. Low means every possible roll is at or below the party's level;
-// Medium means the party can already clear the floor, even though a roll
-// near the ceiling could still be a stretch; anything where the party can't
-// even handle the floor is High (or TooHigh once that gap is too large - see
-// `HIGH_RISK_LEVELS_ABOVE_PARTY`).
+// Judged against both ends of the encounter's levelRange, since the roll can land anywhere in it, not just the floor.
 export function riskLevelOfExploreNode(
   entry: WorldNodeEntry,
 ): ExploreNodeRiskBand {
@@ -119,38 +106,19 @@ export function nearestUnfinishedExploreNode(): WorldNodeEntry | undefined {
   });
 }
 
-// The toughest fight a node within `ceiling` can throw at the party - used
-// to rank explore nodes by challenge rather than distance (see
-// `mostChallengingExploreNodeForRisk`).
+// Toughest fight a node can throw at the party; used to rank by challenge rather than distance.
 function worldNodeChallengeLevel(entry: WorldNodeEntry): number {
   return worldNodeEncounter(entry)?.levelRange.max ?? -Infinity;
 }
 
-// The candidate in `entries` with the shortest current losing streak (see
-// `decreeNodeFailureCount`) - ties keep `entries`' existing order, so a tier
-// with no failure data at all still resolves deterministically.
+// Shortest current losing streak; ties keep entries' existing order for deterministic results.
 function leastFailedNodeIn(
   entries: WorldNodeEntry[],
 ): WorldNodeEntry | undefined {
   return sortBy(entries, (entry) => decreeNodeFailureCount(entry.nodeName))[0];
 }
 
-// LevelUpParty has no risk setting of its own - it always targets the
-// standing global `riskTolerance` directly (see `decreeRiskTolerance`).
-// Ranked by challenge, not proximity - a trivial node right next to the
-// kingdom does little for leveling up, so the hardest reachable node the
-// tolerance allows wins even if a much easier one is closer.
-//
-// Within the hardest tier still worth trying, nodes that keep losing are
-// passed over in favor of a comparable (same-challenge) node that hasn't
-// been failing as much - see `leastFailedNodeIn`. Once every node in a tier
-// has lost `LEVEL_UP_NODE_FAILURE_LIMIT`+ fights in a row, that tier is
-// written off and the search steps down to the next easiest one, so the
-// party settles somewhere it can actually win and keep growing instead of
-// grinding forever against a fight it can't clear. A node so far below the
-// party's strongest hero that it's already degraded to the flat 1 XP floor
-// (see `isXpTrivialAtOverLevel`) is excluded outright, even if nothing else
-// disqualifies it - clearing it wouldn't grow the party at all.
+// Ranked by challenge (not proximity) within the global risk tolerance; steps down a tier once it's lost LEVEL_UP_NODE_FAILURE_LIMIT+ fights in a row, so the party settles where it can actually win.
 export function mostChallengingExploreNodeForRisk():
   WorldNodeEntry | undefined {
   const ceiling = decreeRiskTolerance();
@@ -186,14 +154,11 @@ export function mostChallengingExploreNodeForRisk():
     }
   }
 
-  // Every tier has been losing too often - fall back to whatever's failed
-  // least overall rather than stalling entirely.
+  // Every tier losing too often - fall back to whatever's failed least overall.
   return leastFailedNodeIn(candidates);
 }
 
-// Only considers GatherNodes the player has actually visited before - a
-// material that's also gatherable at an undiscovered node shouldn't be
-// auto-targeted there before the player has found it themselves.
+// Only considers GatherNodes the player has already discovered.
 export function nearestGatherNodeFor(
   materialId: MaterialId,
 ): WorldNodeEntry | undefined {
@@ -229,9 +194,7 @@ export function clauseTargetNode(
   }
 }
 
-// GatherMaterial and ReturnToKingdom never risk combat, so the "wait for
-// full health" setting only ever gates the clause types that travel to an
-// ExploreNode (and therefore trigger a fight on arrival).
+// Only gates clause types that travel to an ExploreNode; GatherMaterial/ReturnToKingdom never risk combat.
 function blockedByHealth(): boolean {
   return decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth();
 }
@@ -264,10 +227,7 @@ export function isClauseSatisfiable(clause: DecreeClause): boolean {
   }
 }
 
-// Whether `clause` would be satisfiable right now if not for the "wait for
-// full health" gate - lets Auto Mode tell "genuinely nothing to do" (fall
-// back to the kingdom) apart from "paused to heal" (stay put and let
-// `restingProcessTick` recover the party wherever they already are).
+// Lets Auto Mode distinguish "nothing to do" (fall back to kingdom) from "paused to heal" (stay put and recover).
 export function isClauseBlockedOnlyByHealth(clause: DecreeClause): boolean {
   if (!clause.enabled || !blockedByHealth()) return false;
 

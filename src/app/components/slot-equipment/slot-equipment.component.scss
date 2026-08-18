@@ -4,11 +4,7 @@
   @apply block;
 }
 
-// Enlarged from the shared 64px blank-slot size via a scale transform
-// (rather than resizing IconBlankSlotComponent itself, which would also
-// affect Storage/Armory) - the child scales symmetrically around its own
-// center, and since the button is flex-centered at exactly the scaled-up
-// size, it lines up with no extra offset.
+// Scaled up via transform rather than resizing IconBlankSlotComponent itself, which would also affect Storage/Armory.
 .equipment-slot {
   @apply relative flex items-center justify-center cursor-pointer overflow-hidden;
 }
@@ -25,9 +21,7 @@
   @apply relative z-10;
 }
 
-// Secondary slot for a multi-slot item (e.g. a two-handed weapon also
-// occupying Offhand) - shown faded so it reads as "same item, not empty"
-// rather than a second distinct piece of equipment.
+// Secondary slot of a multi-slot item, shown faded so it reads as "same item" not a second distinct piece.
 .equipment-slot-image-secondary {
   @apply opacity-50;
 }
@@ -36,9 +30,7 @@
   @apply shrink-0;
 }
 
-// Very small inline rendering of a granted skill's icon next to "Teaches" -
-// shrinks the shared 64px icon-blank-slot box down via scale, the same
-// technique `.hero-tab-icon` (game-play-heroes) uses for its 32px variant.
+// Shrinks the shared 64px icon-blank-slot box via scale, same technique as `.hero-tab-icon`'s 32px variant.
 .equipment-slot-granted-skill-icon {
   @apply relative overflow-hidden shrink-0 inline-block align-middle;
   width: 16px;

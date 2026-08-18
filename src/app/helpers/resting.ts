@@ -18,11 +18,7 @@ const RESTING_REGEN_PERCENT = 0.01;
 // expiry Deaths Door/Healing rely on.
 const IDLE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365;
 
-// True whenever the party has nothing else going on - not traveling,
-// gathering, fighting, or recovering from Deaths Door/Healing (those already
-// have their own global effects, and Healing already restores the party in
-// full on expiry) - so sitting at a location with nothing queued reads as
-// "resting" rather than just quietly doing nothing.
+// True when the party has nothing else going on - not traveling, gathering, fighting, or recovering.
 export function isPartyResting(): boolean {
   return (
     gamestate().world.travel.status === 'Idle' &&
@@ -33,11 +29,7 @@ export function isPartyResting(): boolean {
   );
 }
 
-// Grants/revokes the Idle global effect to match isPartyResting(), so it
-// shows up in the existing global-effect-bar UI exactly like Deaths
-// Door/Healing. Only toggles on a state change - addGlobalEffect doesn't
-// dedupe by id, so calling it every tick would push a fresh duplicate entry
-// into state each time instead of refreshing the existing one.
+// Only toggles on a state change - addGlobalEffect doesn't dedupe, so calling it every tick would duplicate entries.
 function syncIdleGlobalEffect(resting: boolean): void {
   const isIdleActive = isGlobalEffectActive('Idle' as GlobalEffectId);
   if (resting === isIdleActive) return;
@@ -60,11 +52,7 @@ function restedStat(current: number, max: number): number {
   );
 }
 
-// Meant to run once per game tick, alongside the other tick processors in
-// gameloop.ts - keeps the Idle global effect in sync and regenerates a
-// little HP/EP for every hero while the party is resting (see
-// isPartyResting), so waiting at a location isn't purely dead time between
-// actions.
+// Runs once per tick alongside gameloop.ts's other processors - syncs the Idle effect and regens HP/EP while resting.
 export function restingProcessTick(): void {
   const resting = isPartyResting();
   syncIdleGlobalEffect(resting);

@@ -46,13 +46,7 @@ export function getMonsterLevelRangeFound(
   return { min: entry.minLevelFound, max: entry.maxLevelFound };
 }
 
-// Records a monster kill - the first kill also marks it discovered for the
-// bestiary; every kill after that just increments the running counter, folds
-// the kill's level into the found min/max, and accumulates the location
-// into the set of every place it's been found. Guards against a corrupt or
-// pre-level-tracking existing entry (an unset `minLevelFound`/`maxLevelFound`
-// would otherwise poison every future kill via `Math.min`/`Math.max` with
-// NaN) by treating anything non-finite as unset.
+// First kill marks the monster discovered; later kills fold in level/location. Treats non-finite min/max as unset to avoid NaN poisoning from pre-level-tracking entries.
 export function monsterRecordKill(
   monsterId: MonsterId,
   level: number,
@@ -92,11 +86,7 @@ export function monsterRecordKill(
   }
 }
 
-// Repairs bestiary entries written before min/max level tracking existed,
-// or ones already corrupted into NaN by that gap (see `monsterRecordKill`).
-// There's no way to recover the original kill levels, so a corrupted or
-// missing range collapses to a single unknown level and widens again
-// naturally the next time the monster is killed.
+// Repairs entries predating min/max level tracking (see `monsterRecordKill`) by collapsing them to a single unknown level; widens again on the next kill.
 export function repairInvalidBestiaryLevels(
   bestiary: GameStateBestiary,
 ): GameStateBestiary {
@@ -132,9 +122,7 @@ export function pruneInvalidBestiaryEntries(
   return pruned;
 }
 
-// Every authored (static Encounter) or generated (EncounterRandom pool)
-// place this monster can be fought - the data source for its "discoverable
-// in" hint on an undiscovered entry.
+// Every authored or generated place this monster can be fought - backs the "discoverable in" hint on undiscovered entries.
 function monsterEncounters(
   monsterId: MonsterId,
 ): Array<EncounterContent | EncounterRandomContent> {
@@ -158,10 +146,7 @@ export function monsterSourceNodeNames(monsterId: MonsterId): string[] {
   return monsterEncounters(monsterId).map((encounter) => encounter.name);
 }
 
-// Item drops roll a quantity range that scales with the kill's level (via
-// `rangeAtLevel`, the same resolution `rollDroppedRewards`/`loot.ts` uses to
-// actually grant them); equipment/collectible/recipe drops are always a
-// flat chance for one, regardless of level.
+// Item drops roll a level-scaled quantity range (via `rangeAtLevel`); other reward types are always a flat chance for one.
 export function bestiaryDropQuantityLabel(
   reward: DroppedReward,
   level: number,
@@ -180,9 +165,7 @@ export function bestiaryXpLabel(
   return rangeLabelAtLevel(monster.xp, level);
 }
 
-// Every monster in the game, killed or not - undiscovered entries are still
-// returned so the bestiary can render them as silhouettes rather than
-// omitting them entirely (see `filterBestiaryEntries`).
+// Undiscovered monsters are still returned so the bestiary can render them as silhouettes instead of omitting them.
 export function getBestiaryEntries(): BestiaryEntry[] {
   const monsters = getEntriesByType<MonsterContent>('monster');
 
@@ -214,9 +197,7 @@ export function getBestiaryEntries(): BestiaryEntry[] {
   );
 }
 
-// Undiscovered ("???") entries never match a search, by name, drop, or
-// location - unlike the museum, a bestiary search can't hint at a monster
-// the player hasn't killed yet.
+// Undiscovered ("???") entries never match a search - unlike the museum, bestiary search can't hint at an unkilled monster.
 export function filterBestiaryEntries(
   entries: BestiaryEntry[],
   searchText: string,

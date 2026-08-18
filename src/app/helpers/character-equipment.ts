@@ -83,16 +83,8 @@ export function characterUnequipItem(
   }));
 }
 
-// Equips an armory item onto a hero, occupying every slot the item's
-// content declares (e.g. a two-handed weapon fills both Weapon and Offhand
-// at once). Any item(s) currently occupying those slots are fully displaced
-// - including from any *other* slot they themselves occupy, so partially
-// overwriting one hand of an already-equipped two-hander frees the other
-// hand too - and returned to the armory as whole items, not duplicated per
-// slot. Atomic: a failed check never partially mutates either side. Returns
-// false without changing state if equipment can't currently be modified,
-// the item isn't eligible (level/class), or the item isn't actually in the
-// armory.
+// Equips into every slot the item's type declares (e.g. two-handed fills Weapon+Offhand),
+// fully displacing whatever occupied those slots (and any other slots they held) back to the armory as whole items.
 export function characterEquipFromArmory(
   characterId: CharacterId,
   equipmentItemId: EquipmentItemId,
@@ -112,9 +104,7 @@ export function characterEquipFromArmory(
 
   const targetSlots = EquipmentTypeToSlot[equipmentContent.type];
 
-  // Keyed by instance id (not content id) so the exact displaced physical
-  // item - with whatever it's infused with - is what goes back to the
-  // armory, not a freshly reconstructed bare item.
+  // Keyed by instance id so the exact displaced item, infusions included, goes back to the armory.
   const displacedItems = new Map<EquipmentItemId, EquipmentItem>();
   targetSlots.forEach((slot) => {
     const existing = character.equipment[slot];
@@ -171,11 +161,7 @@ export function characterEquipFromArmory(
   return true;
 }
 
-// Moves a hero's currently-equipped item (if any) back into the armory,
-// clearing every slot it occupies (a two-handed weapon frees both hands at
-// once, as a single armory entry, not one per slot). Returns false without
-// changing state if equipment can't currently be modified or the slot is
-// already empty.
+// Unequips a hero's item back to the armory, clearing every slot it occupies (e.g. both hands of a two-hander) as a single entry.
 export function characterUnequipToArmory(
   characterId: CharacterId,
   slot: EquipmentSlot,
@@ -220,12 +206,7 @@ export function characterUnequipToArmory(
   return true;
 }
 
-// Equips the best armory item for every eligible slot, ranked by the hero's
-// job `statPriority` (see `planEquipmentOptimization`). Slots where nothing
-// in the armory beats what's already equipped are left untouched. Backs the
-// manual "Optimize Equipment" button; reclassing runs its own optimization
-// pass inline instead (see `characterReclass`), since it needs to happen
-// atomically with the job swap rather than against live gamestate.
+// Backs the manual "Optimize Equipment" button; reclassing runs its own pass instead (see `characterReclass`) to stay atomic with the job swap.
 export function optimizeCharacterEquipment(characterId: CharacterId): void {
   const character = partyGet().find((c) => c.id === characterId);
   if (!character) return;
@@ -237,13 +218,7 @@ export function optimizeCharacterEquipment(characterId: CharacterId): void {
   winners.forEach((winner) => characterEquipFromArmory(characterId, winner.item.id));
 }
 
-// Permanently infuses a material into one of a hero's equipped item's
-// slots, paid for in Gold Coin. Targets a specific slot index rather than
-// "the next open one" - infusing an already-filled slot is allowed and
-// simply overwrites its bonus, with no refund for what was displaced.
-// Returns false without changing state if equipment can't currently be
-// modified, the item/slot/material combination isn't valid, or the player
-// can't afford it.
+// Infuses a specific slot index (not "next open"); overwriting an already-filled slot is allowed with no refund for what was displaced.
 export function characterInfuseEquipment(
   characterId: CharacterId,
   equipmentItemId: EquipmentItemId,

@@ -38,10 +38,7 @@ export type Combatant = HasAnimation & {
   name: string;
 
   isEnemy: boolean;
-  // Set only for enemy combatants; the MonsterId they were created from, so
-  // rewards (XP/drops) can be resolved once combat ends. Left untyped as
-  // MonsterId to avoid a circular import between combat.ts and
-  // content-monster.ts.
+  // Enemy-only MonsterId source for post-combat rewards; untyped to avoid a circular import with content-monster.ts.
   monsterId?: string;
 
   level: number;
@@ -87,11 +84,7 @@ export type Combat = {
   fightIndex?: number;
 };
 
-// A single hero HP change (damage or healing) - pushed to `heroDamageEvents`
-// (see `combat-damage-events.ts`) so the bottom-right hero status bar can
-// show a floating +/- number above whichever hero was hit or healed.
-// `amount` is signed for display: positive shows as a heal, negative as
-// damage.
+// A hero HP change, pushed to heroDamageEvents to show a floating +/- number; amount is signed for display (positive = heal).
 export type HeroDamageEvent = {
   id: string;
   characterId: string;

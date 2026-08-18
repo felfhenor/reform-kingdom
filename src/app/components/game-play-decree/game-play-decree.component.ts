@@ -68,9 +68,7 @@ type RiskToleranceOption = {
   description: string;
 };
 
-// Reward-shaped view of a gatherable material, so the Gather Material
-// picker's option template can reuse `app-option-reward` instead of
-// duplicating its icon+name row.
+// Reward-shaped so the Gather Material picker can reuse `app-option-reward` for its icon+name row.
 type MaterialOption = RewardContentInfo & { id: MaterialId };
 
 const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
@@ -148,16 +146,12 @@ export class GamePlayDecreeComponent {
     return nodeName ? farmNodeRewardOptions(nodeName) : [];
   });
 
-  // The reward picker is keyed by a stable string (see `FarmNodeRewardOption.key`)
-  // rather than the reward identity object itself, so it can drive a plain
-  // ng-select `bindValue` the same way `draftMaterialId` does for GatherMaterial.
+  // Keyed by a stable string (`FarmNodeRewardOption.key`) rather than the reward object, so it can drive ng-select's bindValue like `draftMaterialId`.
   public selectedRewardOption = computed(() =>
     this.rewardOptions().find((option) => option.key === this.draftRewardKey()),
   );
 
-  // GatherMaterial and FarmNode clauses have parameters worth editing in
-  // place - see `RowDecreeClauseComponent.isEditable`, which gates the row's
-  // Edit button the same way.
+  // Only GatherMaterial/FarmNode clauses are editable in place - see `RowDecreeClauseComponent.isEditable`.
   public editingClauseId = signal<DecreeClauseId | undefined>(undefined);
   public isEditing = computed(() => !!this.editingClauseId());
 
@@ -194,9 +188,7 @@ export class GamePlayDecreeComponent {
     }
   });
 
-  // Excludes the clause currently being edited, so saving it back with the
-  // same material (just a different quantity, say) isn't flagged as a
-  // duplicate of itself.
+  // Excludes the clause being edited, so saving it back unchanged isn't flagged as a duplicate of itself.
   public otherClauses = computed(() =>
     this.clauses().filter((clause) => clause.id !== this.editingClauseId()),
   );
@@ -228,10 +220,7 @@ export class GamePlayDecreeComponent {
     );
   }
 
-  // ng-select's (change) output emits the full selected item from `items`,
-  // not the `bindValue`-mapped field (that mapping only applies to
-  // ngModel/writeValue) - so a bindValue select's change handler has to pull
-  // the field back out itself.
+  // ng-select's (change) emits the full item, not the bindValue-mapped field, so this pulls it out manually.
   public setRiskTolerance(option: RiskToleranceOption): void {
     decreeSetRiskTolerance(option.value);
   }

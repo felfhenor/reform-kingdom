@@ -116,10 +116,7 @@ describe('characterReclass', () => {
     vi.clearAllMocks();
   });
 
-  // `equippableTypes: []` keeps the auto-optimize-on-reclass pass (see
-  // `characterReclass`) from picking up the starter gear these fixtures
-  // always vacate into the armory - these tests are about the job-swap
-  // mechanics, not equipment optimization (covered separately below).
+  // `equippableTypes: []` keeps auto-optimize from picking up the vacated starter gear - these tests cover job-swap mechanics only.
   const warriorJob: JobContent = {
     ...mockJob,
     id: 'job-warrior' as JobId,

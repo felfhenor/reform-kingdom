@@ -25,18 +25,12 @@ const DENSE_OBJECT_LAYER_NAME = 'Dense Objects';
 const PATH_TILE_LAYER_NAME = 'Path Tiles';
 const PATH_OBJECT_LAYER_NAME = 'Path Objects';
 
-// Stepping onto a tile marked by the Path Tiles/Path Objects layers is
-// cheaper than stepping onto any other open tile, so pathfinding prefers to
-// hug authored paths without ever treating off-road tiles as impassable.
+// Path tiles are cheaper than other open tiles so pathfinding hugs authored paths without blocking off-road.
 const ON_PATH_MOVE_COST = 1;
 const OFF_PATH_MOVE_COST = 4;
 
-// The object's own (x, y) is its rotation pivot - the bottom-left corner of
-// its *unrotated* footprint - matching how `pixiTiledObjectRender` renders
-// it. Rotating the four corners around that pivot (rather than trusting the
-// raw x/y/width/height box) is what makes a rotated bend tile - as used by
-// Path Objects at corners - resolve to the grid cell it's actually drawn
-// into, not the one its unrotated footprint would suggest.
+// (x, y) is the unrotated bottom-left pivot (matches `pixiTiledObjectRender`); rotating the corners
+// around it is what makes a rotated bend tile resolve to the grid cell it's actually drawn into.
 function objectWorldCorners(object: TiledObject): { x: number; y: number }[] {
   const angle = ((object.rotation ?? 0) * Math.PI) / 180;
   const cos = Math.cos(angle);
@@ -129,10 +123,7 @@ export function tiledMapPathMatrix(map: TiledMap): boolean[][] {
   return matrix;
 }
 
-// Combines walkability and path preference into a single per-tile move cost:
-// impassable tiles are infinitely expensive, path tiles are cheap, and every
-// other open tile is more expensive - so pathfinding is drawn to paths
-// without off-roading ever being blocked outright.
+// Impassable tiles cost infinity, path tiles are cheap, other open tiles cost more - draws pathfinding to paths.
 export function tiledMapMoveCostMatrix(map: TiledMap): number[][] {
   const blocked = tiledMapWalkabilityMatrix(map);
   const onPath = tiledMapPathMatrix(map);
@@ -158,10 +149,8 @@ export const mapMoveCostMatrices = computed<Map<string, number[][]>>(() => {
   return matrices;
 });
 
-// A save can load standing on a tile that's since become unwalkable (a map
-// edit, a bad migration, etc.), which would otherwise strand the party there
-// forever with no route out. Called at load time (see `migrateGameState`) to
-// bounce them back to the kingdom before that can happen.
+// Called at load time (`migrateGameState`) so a save standing on a tile made unwalkable since (map edit,
+// bad migration) doesn't strand the party there forever.
 export function repairUnwalkableCurrentLocation(
   location: CurrentLocation,
 ): CurrentLocation {
@@ -192,9 +181,7 @@ export function tileIsOnPath(mapName: string, x: number, y: number): boolean {
   return mapPathMatrices().get(mapName)?.[y]?.[x] ?? false;
 }
 
-// A query-specific copy of the map's move cost matrix with every node tile
-// blocked, except the `allowedTiles` (this query's own from/to endpoints) -
-// so a path never cuts through some other, unrelated node along the way.
+// Blocks every node tile except `allowedTiles` (the query's own from/to) so a path never cuts through another node.
 function moveCostMatrixForQuery(
   mapName: string,
   allowedTiles: { x: number; y: number }[],
@@ -244,18 +231,14 @@ function teleportNodeProperty(
   return tiledObjectProperty<string>(node.nodeData, name);
 }
 
-// Tags are validated unique across every map (see
-// scripts/validate-teleportnodes.ts), so a `toTag` resolves to exactly one
-// `tag` regardless of which map it lives on.
+// Tags are validated unique across every map (scripts/validate-teleportnodes.ts), so this resolves to exactly one node.
 function findTeleportArrivalByTag(tag: string): WorldNodeEntry | undefined {
   return worldNodesOfType('TeleportNode').find(
     (node) => teleportNodeProperty(node, 'tag') === tag,
   );
 }
 
-// Walks to a TeleportNode on the current map and appends the instant jump to
-// its paired arrival tile - the building block for both traveling directly
-// to a TeleportNode and for using one as a waypoint into `travelPathAcrossMaps`.
+// Building block for both direct TeleportNode travel and waypointing through `travelPathAcrossMaps`.
 function travelPathViaTeleport(
   location: CurrentLocation,
   teleportNode: WorldNodeEntry,
@@ -338,9 +321,7 @@ function mapGraphNeighbors(mapName: string): string[] {
     .filter((neighborMapName): neighborMapName is string => !!neighborMapName);
 }
 
-// Fewest teleport hops needed to get from one map to another - used to scale
-// how long Deaths Door lasts based on how far from the kingdom's map the
-// party died (see `helpers/travel.ts`).
+// Fewest teleport hops between maps - scales Deaths Door duration (see `helpers/travel.ts`).
 export function mapHopsBetween(fromMapName: string, toMapName: string): number {
   if (fromMapName === toMapName) return 0;
 

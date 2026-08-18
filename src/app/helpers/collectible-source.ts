@@ -10,13 +10,7 @@ import type {
   RecipeContent,
 } from '@interfaces';
 
-// Builds the canonical collectible -> source lookup purely from static
-// content (encounter/encounterrandom drops, recipe results, trader sells) -
-// nothing about a player's actual discovery history factors in, so the
-// museum always reflects the current content even for old saves. Each
-// collectible is expected to resolve to exactly one source; if authoring
-// gives it more than one, that's a content bug and gets logged rather than
-// silently resolved.
+// Builds the collectible -> source lookup from static content only, so it reflects current content even for old saves. A collectible with more than one source is a content bug and gets logged.
 export function collectibleSourceMapBuild(): Map<
   CollectibleId,
   CollectibleSource[]
@@ -66,9 +60,7 @@ export function collectibleSourceMapBuild(): Map<
   return sources;
 }
 
-// Memoized on the content signals `collectibleSourceMapBuild` reads - only
-// rebuilds when content itself changes, not on every gamestate tick, so the
-// collision check above only ever logs once per actual content load.
+// Memoized on content signals - rebuilds only on content change, not every tick.
 export const collectibleSourceLookup = computed(() =>
   collectibleSourceMapBuild(),
 );

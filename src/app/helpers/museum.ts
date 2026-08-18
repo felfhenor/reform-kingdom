@@ -20,12 +20,7 @@ import { orderBy } from 'es-toolkit/compat';
 
 const CRAFTING_SOURCE_NAME = 'Crafting';
 
-// Every collectible in the game, discovered or not - undiscovered entries
-// are still returned (with `quantity: 0`) so the museum can render them as
-// silhouettes rather than omitting them entirely. A collectible's source is
-// derived fresh from content every call (see `getCollectibleSource`), not
-// tracked per-player, so this always reflects the current content even for
-// old saves.
+// Includes undiscovered collectibles (quantity: 0) so the museum can render them as silhouettes.
 export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
   const collectibles = getEntriesByType<CollectibleContent>('collectible');
 
@@ -91,9 +86,7 @@ export function filterMuseumCollectibleEntries(
   });
 }
 
-// The nodes an as-yet-undiscovered recipe can drop from, mirroring
-// `collectibleSourceNodeNames` - recipes don't know their own source node
-// until a copy has actually been found.
+// Nodes an undiscovered recipe can drop from - recipes don't know their own source node until found.
 export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
   const encounters = getEntriesByType<EncounterContent>('encounter');
 
@@ -108,10 +101,7 @@ export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
   return [...names];
 }
 
-// Only recipes that can actually be found as a world drop are museum-worthy
-// - a recipe with no source node (only ever learned by leveling a
-// tradeskill building) is excluded entirely rather than shown as an
-// always-undiscovered silhouette.
+// Recipes with no source node (only learned via tradeskill leveling) are excluded, not shown as always-undiscovered.
 export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
   const recipes = getEntriesByType<RecipeContent>('recipe');
 

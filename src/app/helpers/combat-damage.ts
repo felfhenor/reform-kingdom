@@ -97,10 +97,7 @@ export function combatCombatantTakeDamage(
 ) {
   combatant.hp = clamp(combatant.hp - damage, 0, combatant.totalStats.Health);
 
-  // Damage is positive (shows as "-"), healing is negative (shows as "+") -
-  // flip the sign here so the emitted amount is what the player should see.
-  // Only heroes get a floating number - the status bar this feeds has
-  // nothing to anchor a monster's number to.
+  // Sign flipped so positive damage shows as "-"; only heroes get a floating number (no status bar for monsters).
   if (!combatant.isEnemy && damage !== 0) {
     heroDamageEventEmit(combatant.id, -damage);
   }

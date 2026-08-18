@@ -546,13 +546,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // `gamestate()` is a static mock here (unlike the real store, it doesn't
-    // reflect this tick's own `updateGamestate` calls as they happen), so
-    // adoption and the target-reached stop can't both be observed within one
-    // synthetic tick - the "stops gathering once a GatherMaterial target is
-    // reached" test above already proves the stop-check works correctly
-    // once a clause is active. This test only needs to prove adoption itself
-    // fires - i.e. the *first* update sets the matched clause active.
+    // `gamestate()` is a static mock, so adoption and the target-reached stop can't both be observed in one tick - this only proves adoption fires (the first update sets the matched clause active).
     const firstUpdateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = firstUpdateFn(buildState({ activeClauseId: undefined }));
     expect(result.world.autoMode.activeClauseId).toBe('copper-clause');
@@ -585,10 +579,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // The disabled clause is never adopted, so there's nothing whose target
-    // could be "reached" via `stopGatherIfTargetReached` - but the gather is
-    // still orphaned (no clause tracking it), so `stopOrphanedGather` ends
-    // it anyway rather than leaving Auto Mode stuck at this node forever.
+    // The disabled clause is never adopted, so `stopOrphanedGather` (not `stopGatherIfTargetReached`) is what ends this gather.
     expect(gatheringStop).toHaveBeenCalled();
   });
 
@@ -640,11 +631,7 @@ describe('autoModeProcessTick', () => {
         gatheringNodeName: 'Carrina Copper Mines',
       }),
     );
-    // `isGathering` is a static mock elsewhere in this file, which can't
-    // observe `gatheringStop()` being called mid-tick - this makes the mock
-    // reflect that call, so the test can actually exercise the
-    // `isPartyIdleForAutoMode` -> `advanceToNextClause` fallthrough, not
-    // just the stop itself.
+    // Makes the `isGathering` mock reflect `gatheringStop()` mid-tick, so the test exercises the `isPartyIdleForAutoMode` -> `advanceToNextClause` fallthrough, not just the stop.
     vi.mocked(isGathering).mockImplementation(
       () => vi.mocked(gatheringStop).mock.calls.length === 0,
     );
@@ -657,12 +644,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // `stopGatherIfTargetReached` finds the clause (it's still in the list,
-    // merely disabled) and leaves it alone since the target isn't met - but
-    // a disabled clause should never keep holding the party at its node, so
-    // `stopOrphanedGather` must treat it the same as no active clause at
-    // all, freeing Auto Mode to pick up the next enabled clause instead of
-    // sitting at the gather node forever.
+    // A disabled clause shouldn't keep holding the party at its node - `stopOrphanedGather` treats it the same as no active clause.
     expect(gatheringStop).toHaveBeenCalled();
     expect(travelStart).toHaveBeenCalledWith('Jelly Fields', true);
   });
@@ -683,10 +665,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // Full health means there's no reason to route through the kingdom -
-    // but the orphaned gather still gets ended so the normal per-tick
-    // evaluation (falling back to the kingdom here, since the decree is
-    // empty) can take back over instead of gathering forever.
+    // Full health means no reason to route through the kingdom, but the orphaned gather still ends so per-tick evaluation can take back over.
     expect(gatheringStop).toHaveBeenCalled();
   });
 
@@ -701,12 +680,7 @@ describe('autoModeProcessTick', () => {
         gatheringNodeName: 'Wergen Woods',
       }),
     );
-    // `isGathering` is a static mock elsewhere in this file, which can't
-    // observe `gatheringStop()` being called mid-tick - so those tests can
-    // only prove the gather was canceled, not that Auto Mode picked back up
-    // afterward. This one makes the mock reflect that call, so it actually
-    // exercises the `isPartyIdleForAutoMode` -> `advanceToNextClause`
-    // fallthrough the non-health-blocked path depends on.
+    // Makes `isGathering` reflect `gatheringStop()` mid-tick, so this proves Auto Mode picks back up afterward (not just that the gather was canceled).
     vi.mocked(isGathering).mockImplementation(
       () => vi.mocked(gatheringStop).mock.calls.length === 0,
     );
@@ -802,9 +776,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // Nothing adopts this gather (no enabled clause targets its material),
-    // so it's orphaned - `stopOrphanedGather` ends it so Auto Mode can go
-    // back to evaluating clauses instead of sitting here indefinitely.
+    // No enabled clause targets this material, so it's orphaned - `stopOrphanedGather` ends it so clause evaluation resumes.
     expect(gatheringStop).toHaveBeenCalled();
   });
 });

@@ -20,9 +20,7 @@ function manhattanDistance(
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
-// The heuristic must never overestimate the true remaining cost, so it's
-// scaled by the cheapest possible per-tile cost on the grid rather than a
-// flat 1.
+// Scaled by the cheapest per-tile cost (not a flat 1) so the heuristic never overestimates remaining cost.
 function cheapestMoveCost(costs: number[][]): number {
   return Math.min(...costs.flatMap((row) => row.filter((cost) => Number.isFinite(cost))));
 }
@@ -87,17 +85,8 @@ function reconstructPath(
   return path;
 }
 
-/**
- * Finds the cheapest 4-directional route through `costs`, where
- * `costs[y][x]` is the price of stepping onto that tile and a non-finite
- * value marks it impassable. Unlike a plain walkable/blocked grid, tiles can
- * carry different costs - so a route that touches more, cheaper tiles can
- * beat a shorter route through expensive ones.
- *
- * Grids here are small (world maps top out around 50x50 tiles), so scanning
- * the open set for its cheapest node each iteration is fast enough without a
- * binary heap.
- */
+// A* over `costs[y][x]` (non-finite = impassable); grids are small (~50x50) so a linear open-set
+// scan is fine without a binary heap.
 export function weightedGridPathFind(
   costs: number[][],
   start: { x: number; y: number },

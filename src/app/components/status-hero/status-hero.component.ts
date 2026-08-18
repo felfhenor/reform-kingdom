@@ -66,9 +66,7 @@ export class StatusHeroComponent {
     }),
   );
 
-  // Floating damage/heal numbers currently on screen, keyed by the hero they
-  // belong to - always rendered regardless of `isExpanded`, since the point
-  // is to show something is happening even when the bar is collapsed.
+  // Always rendered regardless of `isExpanded`, so something still shows when the bar is collapsed.
   private displayedDamageNumbers = signal<HeroDamageEvent[]>([]);
 
   public damageNumbersByHero = computed(() => {
@@ -81,10 +79,7 @@ export class StatusHeroComponent {
   });
 
   constructor() {
-    // `heroDamageEvents` is a shared queue rather than per-component state,
-    // so this both displays and drains it in the same pass - reading
-    // `displayedDamageNumbers` inside `untracked` avoids this effect
-    // re-triggering itself off its own write.
+    // Drains the shared queue in the same pass it displays it; `untracked` avoids self-retrigger off its own write.
     effect(() => {
       const events = heroDamageEvents();
       if (events.length === 0) return;

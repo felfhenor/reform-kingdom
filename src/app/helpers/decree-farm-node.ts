@@ -32,11 +32,7 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// ExploreNodes the player has looted at least one completion reward from -
-// the closest proxy this game has to "already beaten", since ExploreNodes
-// themselves carry no discrete discovery/completion flag of their own (see
-// `worldNodeCompletionRewardProgress`). The data source for the Farm Node
-// clause's node picker.
+// ExploreNodes with at least one completion reward looted - the closest proxy to "already beaten" this game has.
 export function farmableExploreNodes(): WorldNodeEntry[] {
   return worldNodesOfType('ExploreNode').filter(
     (entry) => worldNodeCompletionRewardProgress(entry).obtained > 0,
@@ -80,12 +76,7 @@ function worldNodeMonsterIds(entry: WorldNodeEntry): MonsterId[] {
   return encounterRandom?.creaturePool.map((pool) => pool.monsterId) ?? [];
 }
 
-// Discovered kill drops from every monster fought at `entry`, de-duplicated
-// by reward identity. Undiscovered drops are excluded - a reward the player
-// hasn't seen yet has no known name/sprite to farm toward, mirroring how the
-// bestiary hides undiscovered drops (see `isRewardDiscovered`). Gold Coin is
-// excluded too, matching `worldNodeCompletionRewards` - it isn't tracked as
-// a "reward" for farming purposes.
+// Discovered kill drops from every monster fought at `entry`, de-duplicated; excludes undiscovered drops and Gold Coin.
 function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
   const monsterIds = new Set(worldNodeMonsterIds(entry));
 
@@ -109,13 +100,7 @@ function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
   return drops;
 }
 
-// The rewards a Farm Node clause could target at `nodeName` - every
-// completion reward the node's encounter can grant, plus every discovered
-// kill drop from the monsters fought there, resolved to display info and
-// de-duplicated by reward identity. The data source for the Farm Node
-// clause's reward picker. Excludes recipe rewards - a recipe can only ever
-// drop once (it's a boolean unlock, not something you accumulate), so "farm
-// until you have N of it" never makes sense for one.
+// Completion rewards plus discovered kill drops for `nodeName`, de-duplicated. Excludes recipes since they're a one-time unlock, not something to accumulate.
 export function farmNodeRewardOptions(nodeName: string): FarmNodeRewardOption[] {
   const entry = worldNodeByName(nodeName);
   if (!entry) return [];
@@ -143,13 +128,7 @@ export function farmNodeRewardOptions(nodeName: string): FarmNodeRewardOption[] 
     .filter((option): option is FarmNodeRewardOption => !!option);
 }
 
-// How many of `reward` the player currently owns - the same "current stock"
-// concept `getMaterialQuantity` gives the GatherMaterial clause, generalized
-// across every reward type a node's completion table can grant. Equipment
-// has no per-id quantity field (armory items are one entry per physical
-// piece, never merged), so it's counted by filtering owned armory entries. A
-// recipe is a boolean unlock rather than something stackable, so it reads as
-// 1 once known and 0 until then.
+// Current stock of `reward`, generalized across all reward types. Equipment has no quantity field so it's counted from owned armory entries; recipes read as 1/0 (known or not).
 export function farmNodeRewardQuantity(reward: RewardIdentity): number {
   if ('itemId' in reward) return getMaterialQuantity(reward.itemId);
 

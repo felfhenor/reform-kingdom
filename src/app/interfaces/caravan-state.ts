@@ -13,9 +13,7 @@ export type CaravanNodeState = {
   // this cycle - always length <= 4, see `caravanProcessTick`.
   activeTradeIndices: number[];
 
-  // How many times each active trade (keyed by its index in the trader's
-  // `trades` array) has been bought/sold this cycle - compared against
-  // `CaravanTrade.limit` to determine "sold out".
+  // Times each active trade has been bought/sold this cycle, vs CaravanTrade.limit.
   tradeCounts: Record<number, number>;
 
   generatedAtTick: number;
@@ -35,10 +33,7 @@ export type CaravanTradeCounts = {
   sellable: number;
 };
 
-// One trade slot's worth of pre-computed display state, assembled by
-// `ModalCaravanTradeComponent` and handed to `SlotCaravanTradeComponent` -
-// keeps the numeric/boolean derivations (helper calls) out of the
-// presentational slot component.
+// Pre-computed display state for one trade slot, keeping helper-call derivations out of the presentational slot component.
 export type CaravanTradeRow = {
   index: number;
   trade: CaravanTrade;

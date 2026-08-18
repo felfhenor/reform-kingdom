@@ -41,13 +41,7 @@ export function localStorageSignal<T>(
   return writableSignal;
 }
 
-/**
- * Creates a signal that persists its value to IndexedDB
- * @param indexedDbKey The key to use for storing the value in IndexedDB
- * @param initialValue The initial value to use if no stored value exists
- * @param onLoad Optional callback called when a value is loaded from IndexedDB
- * @returns A writable signal that automatically persists changes to IndexedDB
- */
+// Creates a signal that persists its value to IndexedDB.
 export function indexedDbSignal<T>(
   indexedDbKey: string,
   initialValue: T,

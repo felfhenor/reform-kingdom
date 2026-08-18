@@ -184,10 +184,7 @@ describe('Global Effect Helper Functions', () => {
       });
     }
 
-    // `addGlobalEffect`/`removeGlobalEffect` are the real functions under
-    // test here (not mocks), so their effect is only observable through the
-    // `updateGamestate` updater functions they pass along - one of several
-    // calls `globalEffectsProcessTick` makes in a single run.
+    // These are real functions (not mocked), so their effect is only observable via the `updateGamestate` updaters they pass along.
     function healingWasGranted(): boolean {
       return vi.mocked(updateGamestate).mock.calls.some(([updateFn]) => {
         const result = updateFn({ globalEffects: [] } as unknown as GameState);

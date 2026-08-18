@@ -17,18 +17,12 @@ export function caravanState(caravanId: CaravanId): CaravanNodeState | undefined
   return gamestate().world.caravans[caravanId];
 }
 
-// A caravan's node name is authored as "<Brand Name> - <Branch Name>" (e.g.
-// "Goblin Group Company - Carrina") - the branch is just the map it's on,
-// which is redundant once you're looking at that map, so every player-facing
-// display (map label, node panel) shows only the brand name.
+// Node names are authored "<Brand> - <Branch>"; the branch (map name) is redundant in UI.
 export function caravanBrandName(nodeName: string): string {
   return nodeName.split(' - ')[0];
 }
 
-// Every trader eligible to staff `content` - in one of its `traderCategories`
-// and within its `level` range. A caravan with zero eligible traders (a
-// content-authoring gap) ends up with no assigned trader at all, see
-// `caravanProcessTick`.
+// Traders matching content's traderCategories and level range; zero eligible traders leaves the caravan unstaffed (see caravanProcessTick).
 export function caravanEligibleTraders(
   content: CaravanContent,
 ): CaravanTraderContent[] {

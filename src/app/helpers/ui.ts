@@ -12,12 +12,7 @@ export function isPageVisible(): boolean {
   return !document.hidden;
 }
 
-// Ticks once a second, independent of the gameloop (which only advances on
-// its own cadence and skips entirely while the tab isn't visible). Purely a
-// change-detection nudge - components that display live countdowns (craft
-// queues, etc.) read this inside a `computed()` so their derived text
-// re-renders every second even when the underlying game state hasn't
-// changed since the last real gameloop tick.
+// Change-detection nudge ticking once a second independent of the gameloop, so live countdowns re-render even without a gameloop tick.
 export const uiClockTick = signal<number>(0);
 setInterval(() => uiClockTick.update((tick) => tick + 1), 1000);
 
@@ -48,10 +43,7 @@ export function kingdomSubviewClear(): void {
   kingdomSubview.set(undefined);
 }
 
-// The hero the Combat Orders modal is currently open for. Not cleared on
-// close, same reasoning as `activeCaravanNode` below - the modal's body
-// content is derived from this signal, and clearing it in the same tick
-// as closing would collapse the DOM mid-transition.
+// Not cleared on close - clearing it would collapse the modal's DOM mid-transition (see `activeCaravanNode`).
 export const combatOrdersModalCharacterId = signal<CharacterId | undefined>(
   undefined,
 );
@@ -63,11 +55,7 @@ export function combatOrdersModalOpen(characterId: CharacterId): void {
 
 export const isWorldCameraPanned = signal<boolean>(false);
 
-// Incremented to signal a recenter request; the world map component (which
-// owns the actual camera state) watches this via an effect and reacts by
-// resetting its camera offset - the trigger has to live here rather than a
-// direct method call because the recenter button is rendered in the navbar,
-// a component with no reference to the map component.
+// Incremented to signal a recenter request; the navbar's button has no direct reference to the map component, so this bridges them.
 export const worldCameraRecenterRequest = signal<number>(0);
 
 export function worldCameraRecenter(): void {
@@ -84,25 +72,14 @@ export function mapNodeDeselect(): void {
   selectedMapNode.set(undefined);
 }
 
-// Called once per travel arrival (see `travelArriveAtNode`) so whatever the
-// party walked into - combat, gathering, or just a plain node - is visible
-// immediately instead of silently happening behind a panel the player closed
-// when they clicked Travel. Only fires if nothing else is already occupying
-// the screen, so it never yanks focus from a selection or modal the player
-// opened on purpose.
+// Surfaces whatever the party walked into on arrival, but only if nothing else already occupies the screen (see `travelArriveAtNode`).
 export function mapNodeAutoShowOnArrival(entry: WorldNodeEntry): void {
   if (selectedMapNode() || modalHasAnyOpen()) return;
   selectedMapNode.set(entry);
 }
 
-// The caravan node the trade modal is currently open for - set from both the
-// map node panel's "Open Trade" button and the navbar's glowing trade
-// button, so the modal (mounted once in the navbar) can be reached from any
-// screen without needing a direct reference to whichever button opened it.
-// Not cleared on close - the trade modal's body content is derived from
-// this same signal, and clearing it in the same tick as closing would
-// collapse the modal's DOM mid-transition (see `ModalComponent`). It's
-// simply overwritten the next time a trade is opened.
+// Set from either trade-opening button so the modal (mounted once in the navbar) needs no direct reference to the caller.
+// Not cleared on close - would collapse the modal's DOM mid-transition (see `ModalComponent`); overwritten next open instead.
 export const activeCaravanNode = signal<WorldNodeEntry | undefined>(undefined);
 
 export function caravanTradeOpen(entry: WorldNodeEntry): void {
@@ -110,9 +87,7 @@ export function caravanTradeOpen(entry: WorldNodeEntry): void {
   modalOpen('caravan-trade');
 }
 
-// Whether uncraftable recipes are hidden on tradeskill crafting pages -
-// global across all tradeskills rather than per-tradeskill, since it's a
-// display preference about the crafting UI itself, not the building.
+// Global across all tradeskills, not per-tradeskill - it's a UI display preference, not a per-building setting.
 export const craftingHideUncraftable = localStorageSignal<boolean>(
   'craftingHideUncraftable',
   false,

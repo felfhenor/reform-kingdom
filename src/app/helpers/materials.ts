@@ -38,11 +38,7 @@ export function isMaterialDiscovered(materialId: MaterialId): boolean {
   return !!gamestate().materials[materialId]?.foundAt;
 }
 
-// The single shared implementation for adding/subtracting a material's
-// quantity in place - clamps at 0, drops the entry entirely once depleted,
-// and preserves the original `foundAt` timestamp. Every direct mutator of
-// `state.materials` (gold included, which is just a regular material) should
-// go through this rather than reimplementing the clamp/delete logic locally.
+// Shared mutator for material quantity - clamps at 0, drops the entry once depleted. All state.materials mutators (gold included) should go through this.
 export function applyMaterialDelta(
   state: GameState,
   materialId: MaterialId,
@@ -75,9 +71,7 @@ export function removeMaterial(materialId: MaterialId, quantity: number): void {
   });
 }
 
-// Gold-specific shorthands so call sites don't each have to import
-// `goldCoinId` and resolve it themselves - gold is still just a material
-// under the hood, these just save the repeated `goldCoinId()` lookup.
+// Gold-specific shorthands - gold is just a material under the hood.
 export function getGoldQuantity(): number {
   return getMaterialQuantity(goldCoinId());
 }

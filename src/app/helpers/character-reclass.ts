@@ -15,9 +15,7 @@ import type {
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
 
-// Snapshots the character's current level/xp under their outgoing job, then
-// pulls out any progress previously saved for the incoming job (if the
-// character has held it before), falling back to level 1 otherwise.
+// Saves outgoing job's level/xp, restores incoming job's saved progress if held before, else level 1.
 function characterJobProgressSwap(
   character: Character,
   jobId: JobId,
@@ -43,10 +41,7 @@ function characterJobProgressSwap(
   return { jobProgress, level, xp };
 }
 
-// Equips each `planEquipmentOptimization` winner into a freshly-reset
-// equipment block (every slot empty, as after a reclass) and removes it from
-// the armory. No displacement bookkeeping is needed since every target slot
-// starts empty - see `characterReclass`, the only caller.
+// No displacement bookkeeping needed since every target slot starts empty (only caller is `characterReclass`).
 function applyOptimizationWinners(
   armory: EquipmentItem[],
   winners: EquipmentArmoryEntry[],
@@ -66,12 +61,7 @@ function applyOptimizationWinners(
   };
 }
 
-// Reclassing fully unequips the hero; their old gear is routed to the
-// Armory rather than discarded, per M2-03 in the roadmap. Level/xp for the
-// outgoing job is saved and, if the incoming job was held before, restored.
-// The freshly emptied loadout is then auto-optimized against the incoming
-// job's `statPriority` (see `planEquipmentOptimization`), so a hero reclasses
-// straight into the best gear their armory can already offer.
+// Reclassing unequips gear to the Armory (per M2-03) rather than discarding it, then auto-optimizes the new loadout.
 export function characterReclass(characterId: CharacterId, jobId: JobId): void {
   let didReclass = false;
 

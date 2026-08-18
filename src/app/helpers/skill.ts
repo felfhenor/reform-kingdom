@@ -10,9 +10,7 @@ import type { GameStat, SkillStatScaling, StatBlock } from '@interfaces/stat';
 import { StatOrder } from '@interfaces/stat';
 import { clamp, intersection, uniq } from 'es-toolkit/compat';
 
-// Heroes need one of a skill's `requiredWeaponTypes` equipped to use it -
-// e.g. Snipe requires a Bow. An empty list means no weapon is required.
-// Monsters never carry equipment, so this check only applies to heroes.
+// Heroes need one of requiredWeaponTypes equipped (empty = no requirement); monsters never carry equipment.
 export function skillIsUsableWithEquippedWeapons(
   skill: EquipmentSkill,
   equippedWeaponTypes: EquipmentItemType[],
@@ -49,12 +47,7 @@ export function skillTechniqueDamageScalingStat(
   return technique.damageScaling[stat];
 }
 
-// Which stats a skill's damage/healing scales from, and by how much - e.g.
-// Attack -> [{ stat: 'Strength', multiplier: 1 }], Starshine ->
-// [{ stat: 'Intelligence', multiplier: 1 }, { stat: 'Vitality', multiplier: 0.5 }].
-// Multi-technique skills sum each stat's multiplier across techniques, same
-// as `skillTechniquePreviewValue` sums their damage. Purely derived from
-// content - unlike the damage preview, this needs no combatant.
+// Which stats a skill's damage/healing scales from and by how much; multi-technique skills sum multipliers across techniques.
 export function skillStatScaling(
   skill: EquipmentSkillContent,
 ): SkillStatScaling[] {
@@ -134,11 +127,7 @@ const ROMAN_NUMERAL_TIERS: Record<string, number> = {
   X: 10,
 };
 
-// Splits a skill's display name into its upgrade family and rank, e.g.
-// "Starshine II" -> { family: 'Starshine', tier: 2 } (matching the existing
-// "Double Strike I/II" naming convention job skill paths already use). A
-// name with no recognized numeral suffix is its own family at tier 1, so
-// unrelated skills never compare as upgrades of one another.
+// Splits a display name into upgrade family and rank, e.g. "Starshine II" -> { family: 'Starshine', tier: 2 }.
 function skillNameTier(name: string): { family: string; tier: number } {
   const match = name.match(/^(.*) (I{1,3}|IV|V)$/);
   if (!match) return { family: name, tier: 1 };
@@ -146,10 +135,7 @@ function skillNameTier(name: string): { family: string; tier: number } {
   return { family: match[1], tier: ROMAN_NUMERAL_TIERS[match[2]] };
 }
 
-// Slots one equipment-granted skill into a hero's known skill list: it
-// replaces an already-known lower-tier skill of the same family (e.g.
-// Starshine I -> II), is dropped if a same-or-higher tier is already known,
-// and is otherwise appended as a newly learned skill.
+// Upgrades a known same-family skill to the granted tier, drops it if a same-or-higher tier is already known, else appends.
 function applyGrantedSkill(
   skills: EquipmentSkillContent[],
   granted: EquipmentSkillContent,

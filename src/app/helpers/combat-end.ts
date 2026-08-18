@@ -66,17 +66,12 @@ function defeatedMonsters(combat: Combat): DefeatedMonster[] {
     .filter((entry): entry is DefeatedMonster => !!entry);
 }
 
-// The party's highest hero level represents it for over-level XP scaling,
-// same convention as `healingTicksForLevel` - one overleveled hero is enough
-// to mark the node as trivial for the whole party.
+// Highest hero level represents the party for over-level XP scaling.
 function partyRepresentativeLevel(combat: Combat): number {
   return Math.max(...combat.heroes.map((hero) => hero.level), 1);
 }
 
-// The declared max level for the encounter this combat came from, used to
-// cap over-level XP scaling - works the same for a static `EncounterContent`
-// and a generated `EncounterRandomContent` node, since both declare a
-// `levelRange`.
+// Max level for the source encounter, used to cap over-level XP scaling.
 function encounterMaxLevel(combat: Combat): number | undefined {
   if (combat.encounterId) {
     return getEntry<EncounterContent>(combat.encounterId)?.levelRange?.max;
@@ -115,9 +110,7 @@ function grantVictoryRewards(combat: Combat): void {
   grantResolvedDrops(combat, drops);
 }
 
-// Fires once the last fight in an encounter has been won (the node is fully
-// cleared) - rolled fresh every time, so repeat clears can hit the same
-// rewards again, same as per-kill monster drops.
+// Fires once the encounter's last fight is won; rolled fresh each clear.
 function grantEncounterCompletionRewards(combat: Combat): void {
   if (combat.encounterId === undefined) return;
 
@@ -153,9 +146,7 @@ function nextFightFor(
   return { encounterId: combat.encounterId, fightIndex };
 }
 
-// Returns true if another fight in the same encounter was started - callers
-// must not reset combat state in that case, since it would immediately wipe
-// out the fight `encounterStartFight` just wrote to `state.world.combat`.
+// Returns true if another fight was started; callers must not reset combat state then.
 function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Win');

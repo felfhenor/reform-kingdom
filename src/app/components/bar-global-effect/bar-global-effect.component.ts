@@ -83,33 +83,21 @@ export class BarGlobalEffectComponent {
   public displayedEffects = signal<DisplayedEffect[]>([]);
   public durationLabel = globalEffectDurationLabel;
 
-  // Auto Mode's description is live status ("Gathering Wood...") rather than
-  // the static YAML description - computed at render time instead of stored
-  // in gamestate, since it changes far more often than a normal effect does.
+  // Auto Mode's description is live status text, computed at render time rather than stored in gamestate since it changes often.
   public effectDescription(effect: GlobalEffect): string {
     if (effect.name !== 'Auto Mode') return effect.description;
     return autoModeStatusLabel() ?? effect.description;
   }
 
   constructor() {
-    // `syncDisplayedEffects` both reads and writes `displayedEffects` - if
-    // that read weren't untracked, the effect would depend on its own
-    // output signal, and since every `.set()` below produces a new array
-    // reference (a "change" as far as signals are concerned) it would
-    // retrigger itself forever instead of only reacting to
-    // `activeGlobalEffects()`.
+    // `untracked` avoids self-retrigger, since `syncDisplayedEffects` both reads and writes `displayedEffects`.
     effect(() => {
       const active = activeGlobalEffects();
       untracked(() => this.syncDisplayedEffects(active));
     });
   }
 
-  // Keeps effects that just expired in the DOM (marked `leaving`) for one
-  // fade cycle instead of yanking them out immediately, and starts newly
-  // granted effects (marked `entering`) at opacity 0 so they fade in on the
-  // next frame rather than popping straight to visible - otherwise an effect
-  // granted the instant another expires (Deaths Door -> Healing) reads as a
-  // jump cut rather than a hand-off.
+  // Keeps expiring effects mounted for one fade cycle and fades new ones in, so a same-tick swap (e.g. Deaths Door -> Healing) reads as a hand-off, not a jump cut.
   private syncDisplayedEffects(active: GlobalEffect[]): void {
     const activeIds = new Set(active.map((effect) => effect.id));
     const current = this.displayedEffects();

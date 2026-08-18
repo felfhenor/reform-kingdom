@@ -80,17 +80,8 @@ function recipeRequirementEntries(
   );
 }
 
-// Only recipes the building has actually reached are shown at all, and only
-// once any world-drop gate on the recipe itself is satisfied (see
-// `isRecipeCraftable`). Sorted purely by the recipe's own tradeskill level
-// descending (highest first) - not the resulting item's equip-level
-// requirement, which can diverge from the recipe tier it's actually crafted
-// at and would otherwise scatter same-tier recipes apart. This also keeps
-// the order stable as craftability changes while the player crafts - entries
-// that are currently uncraftable (out of resources, or a unique collectible
-// already owned/queued) stay in place rather than jumping to the bottom.
-// Callers that want to hide uncraftable entries should filter separately
-// rather than relying on sort position.
+// Only recipes the building has reached and that pass isRecipeCraftable are
+// shown, sorted by recipe level (not item level) so entries stay put as craftability changes.
 export function getCraftableRecipeEntries(
   tradeskill: Tradeskill,
 ): CraftRecipeEntry[] {
@@ -152,9 +143,7 @@ export function craftQueueTicksRemaining(tradeskill: Tradeskill): number {
   });
 }
 
-// Total ticks the whole queue will *ever* take, start to finish - the
-// denominator for an overall queue progress bar (`craftQueueTicksRemaining`
-// is what's left; this minus that is what's already done).
+// Denominator for the queue progress bar; craftQueueTicksRemaining is what's left.
 export function craftQueueTotalTicks(tradeskill: Tradeskill): number {
   return sumBy(tradeskillBuilding(tradeskill).queue, (entry) => {
     const recipe = getEntry<RecipeContent>(entry.recipeId);
@@ -164,9 +153,7 @@ export function craftQueueTotalTicks(tradeskill: Tradeskill): number {
   });
 }
 
-// Total individual units still to be crafted across every queue entry - not
-// the same as `queue.length` (the number of *batches*/slots), since a single
-// slot can be crafting dozens of the same item.
+// Not queue.length - a single slot can be crafting many units of one item.
 export function craftQueueUnitsRemaining(tradeskill: Tradeskill): number {
   return sumBy(
     tradeskillBuilding(tradeskill).queue,

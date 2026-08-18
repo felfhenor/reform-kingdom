@@ -18,10 +18,7 @@ const TRADESKILL_XP_START = 10;
 const TRADESKILL_XP_END = 5000;
 const XP_CURVE_EASE = 1.5;
 
-// Tunable XP curve: eases in from 10 XP at level 1 up to 5,000 XP at the
-// level cap, rounded to the nearest 10 for clean numbers. The
-// `progress ** 1.5` ease keeps the early-level jumps gentle instead of a
-// straight line's constant per-level step dominating a tiny starting value.
+// Eases from 10 XP at level 1 to 5,000 at the cap; progress**1.5 keeps early-level jumps gentle.
 export function tradeskillXpForLevel(level: number): number {
   const progress = (level - 1) / (TRADESKILL_MAX_LEVEL - 1);
   const xp =
@@ -60,9 +57,7 @@ export function tradeskillLevelGateSatisfied(
   return isCollectibleDiscovered(requirement.requiredCollectibleId);
 }
 
-// The requirement blocking the *next* level, only while it's still
-// unsatisfied - once the collectible is found this returns undefined and the
-// building levels up on its next XP grant (see `tradeskillLeveledUp`).
+// The requirement blocking the next level, or undefined once satisfied (see tradeskillLeveledUp).
 export function tradeskillActiveGate(
   tradeskill: Tradeskill,
 ): TradeskillLevelRequirementContent | undefined {
@@ -72,10 +67,7 @@ export function tradeskillActiveGate(
   return levelRequirementFor(tradeskill, nextLevel);
 }
 
-// Mirrors `characterLeveledUp` in `party.ts`, but each level also requires
-// `tradeskillLevelGateSatisfied` - if XP is enough but the gate isn't met,
-// XP holds at the cap (no loss) rather than levelling, and releases the next
-// time XP is granted after the collectible is found.
+// Like characterLeveledUp, but gated by tradeskillLevelGateSatisfied - XP holds at the cap (no loss) until the gate clears.
 function tradeskillLeveledUp(
   building: TradeskillBuildingState,
   tradeskill: Tradeskill,
@@ -100,11 +92,7 @@ function tradeskillLeveledUp(
   return { ...building, level, xp: { current, maximum } };
 }
 
-// Rescales every tradeskill's xp.maximum to match the current
-// `tradeskillXpForLevel` curve, clamping `current` down if it now exceeds
-// the new maximum. Never forces a level-up itself - a building sitting
-// exactly at its new maximum simply levels up on its next real XP grant
-// (see `tradeskillLeveledUp`).
+// Rescales xp.maximum to the current curve, clamping current down if needed. Never forces a level-up itself.
 export function retrofitTradeskillXp(
   tradeskills: GameStateTradeskills,
 ): GameStateTradeskills {
@@ -144,11 +132,7 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   }
 }
 
-// WoW-style skill-up odds: fresh (< 50% through the recipe's level range) is
-// guaranteed, the back half is a coin flip, the last quarter is a long shot,
-// and a building that has out-levelled the recipe entirely gets nothing. A
-// recipe with a single-level range (min === max) is always exactly "fresh"
-// the moment it's visible, so it's always guaranteed too.
+// WoW-style skill-up odds: guaranteed early, coin flip past halfway, long shot near the cap, nothing once out-levelled.
 export function craftXpChance(
   recipe: RecipeContent,
   buildingLevel: number,

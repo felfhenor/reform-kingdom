@@ -8,9 +8,7 @@ import type {
   JobContent,
 } from '@interfaces';
 
-// Party hero names whose job can equip `equipment`'s type - shown by every
-// item tooltip (see `TooltipItemPreviewComponent`) so the player can tell at
-// a glance whether anyone can use a piece of gear.
+// Hero names whose job can equip this type, shown in item tooltips.
 function equippableHeroNames(equipment: EquipmentContent): string[] {
   return partyGet()
     .filter((hero) =>
@@ -21,10 +19,7 @@ function equippableHeroNames(equipment: EquipmentContent): string[] {
     .map((hero) => hero.name);
 }
 
-// Normalizes an item/equipment/collectible down to the flattened shape
-// `app-tooltip-item-preview` renders - equipment surfaces its base stats,
-// level requirement, and who can equip it, an item surfaces its infusion
-// stats (if any), and a collectible carries neither.
+// Flattens item/equipment/collectible to the shape app-tooltip-item-preview renders.
 export function itemPreviewDisplay(
   content: ItemPreviewContent,
   spritesheet: ItemPreviewSpritesheet,

@@ -20,11 +20,7 @@ export function armoryGet(): EquipmentItem[] {
   return gamestate().armory;
 }
 
-// Resolves every owned armory item to its content, one entry per item -
-// duplicate equipment is never merged/counted, each physical item stays
-// its own entry, same as the underlying `armory` state list. Carries the
-// instance alongside its content so callers can show per-instance
-// infusion state, not just the shared content.
+// One entry per owned item (duplicates never merged), carrying the instance alongside its content for per-instance infusion state.
 export function getArmoryEntries(): EquipmentArmoryEntry[] {
   const entries = armoryGet()
     .map((item) => {
@@ -94,9 +90,7 @@ export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {
   return !!gamestate().discoveredEquipment[equipmentId]?.foundAt;
 }
 
-// Same gold-per-stat-point rate infusion pricing uses, plus a per-level
-// component so higher-tier drops are worth meaningfully more regardless of
-// how small their stat block is, scaled up further by rarity.
+// Same rate infusion pricing uses, plus a per-level component so higher-tier drops are worth more.
 const SELL_GOLD_PER_STAT_POINT = 20;
 const SELL_GOLD_PER_LEVEL = 10;
 const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
@@ -107,9 +101,7 @@ const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
   Legendary: 4,
 };
 
-// Base stats plus any infusion bonus both count toward stat value - selling
-// an infused item is worth more than an identical bare one, even though the
-// infusion materials themselves are never refunded.
+// Base stats plus infusion bonus both count - an infused item sells for more, but infusion materials aren't refunded.
 export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
   const statTotal =
     sum(Object.values(entry.content.baseStats)) +
@@ -122,9 +114,7 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
   return Math.max(1, Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity]));
 }
 
-// Sells one or more owned armory items for gold in a single atomic commit.
-// Ids no longer present in the armory (stale selection) are silently
-// skipped. Returns the total gold gained.
+// Sells owned armory items atomically; stale ids are silently skipped. Returns total gold gained.
 export function sellEquipmentItems(equipmentItemIds: EquipmentItemId[]): number {
   const idsToSell = new Set(equipmentItemIds);
   const entries = getArmoryEntries().filter((entry) => idsToSell.has(entry.item.id));

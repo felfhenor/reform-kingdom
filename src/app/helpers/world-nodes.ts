@@ -116,9 +116,7 @@ export function worldNodeCaravan(
   return content?.__type === 'caravan' ? content : undefined;
 }
 
-// A manually-authored override for a node's displayed data - lets a node
-// (e.g. a Kingdom node like the Duchy of Carrina) have text like a
-// description without needing to be backed by an Encounter/Gathering entry.
+// Lets a node have display text without being backed by an Encounter/Gathering entry.
 export function worldNodeOverride(
   entry: WorldNodeEntry,
 ): NodeOverrideContent | undefined {
@@ -126,9 +124,7 @@ export function worldNodeOverride(
   return content?.__type === 'nodeoverride' ? content : undefined;
 }
 
-// Whether `entry` is authored as hidden - checks whichever content type it
-// actually resolves to (only one of the four ever matches a given node, so
-// this `??` chain is safe).
+// Only one content type ever matches a given node, so this `??` chain is safe.
 export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
   return (
     worldNodeEncounter(entry)?.hidden ??
@@ -139,26 +135,19 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
   );
 }
 
-// A hidden node is only visible once the player has clicked/discovered it -
-// every other node is always visible. Gates the map label/cursor (see
-// `worldNodeLabelInfo`, `pixi-map-render.ts`) and auto-mode targeting (see
-// `decree-evaluation.ts`).
+// Gates the map label/cursor and auto-mode targeting; non-hidden nodes are always visible.
 export function isWorldNodeVisible(entry: WorldNodeEntry): boolean {
   return !isWorldNodeHidden(entry) || isWorldNodeDiscovered(entry.nodeName);
 }
 
-// Reveals `entry` if it's hidden and not yet discovered - the single call
-// site the map click handler uses, so the hidden/already-discovered
-// conditional lives here rather than in the component.
+// Keeps the hidden/already-discovered check out of the map click handler.
 export function worldNodeDiscoverIfHidden(entry: WorldNodeEntry): void {
   if (isWorldNodeHidden(entry) && !isWorldNodeDiscovered(entry.nodeName)) {
     worldNodeDiscover(entry.nodeName);
   }
 }
 
-// The name to show for `nodeName` anywhere it's surfaced off-map (bestiary,
-// museum, etc.) - masked to '???' if it's a still-undiscovered hidden node,
-// so a location can't leak before the player has actually found it.
+// Masked to '???' when still hidden/undiscovered, so a location can't leak off-map.
 export function worldNodeDisplayName(nodeName: string): string {
   const entry = worldNodeByName(nodeName);
   if (!entry) return nodeName;

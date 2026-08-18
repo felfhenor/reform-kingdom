@@ -23,10 +23,7 @@ export class ModalComponent {
 
   public modal = viewChild<ElementRef<HTMLDialogElement>>('modal');
 
-  // The stack is the only source of truth for open/closed - content stays
-  // mounted and untouched by this component while it closes, so a
-  // component whose body derives from the same data that drove it open
-  // doesn't tear down its content mid-transition.
+  // Content stays mounted while closing (stack is the source of truth), so it doesn't tear down mid-transition.
   public isOpen = computed(() => modalIsOpen(this.modalId()));
 
   constructor() {

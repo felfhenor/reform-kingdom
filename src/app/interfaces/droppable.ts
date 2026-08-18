@@ -40,29 +40,18 @@ export type DropRange = {
 };
 
 export type DropHasBonusPerLevel = {
-  // A flat per-level addition (`level * bonusPerLevel`) folded into both
-  // ends of the range - see `rangeAtLevel`. Omitted entirely for a range
-  // that doesn't scale with level, rather than authored as `bonusPerLevel: 0`.
+  // Flat per-level addition folded into both ends of the range (see rangeAtLevel); omitted, not 0, if unscaled.
   bonusPerLevel?: number;
 };
 
-// A `{min,max}` range that optionally scales by a flat amount per level -
-// shared by anything that rolls a level-scaled range (monster XP rewards,
-// item drop quantities), rather than each having its own specifically-named
-// alias. Resolve it down to a concrete range via `rangeAtLevel`.
+// A range that optionally scales per level; resolve via rangeAtLevel.
 export type LeveledRange = DropRange & DropHasBonusPerLevel;
 
 export type DropHasChance = {
   chance: number;
 };
 
-// A single drop-table entry - an `ItemId` (stackable material, with a rolled
-// quantity range), an `EquipmentId` (gear), a `CollectibleId` (curio), or a
-// `RecipeId` (a world-found recipe), told apart by which id field is
-// present. Only item rewards roll a quantity - equipment, collectibles, and
-// recipes are always a flat chance for one. Shared by monster kill drops
-// (`MonsterContent.drops`) and node completion rewards
-// (`EncounterContent.completionRewards`).
+// A single drop-table entry, told apart by which id field is present. Only item rewards roll a quantity; the rest are a flat chance for one.
 export type DroppedItemReward = LeveledRange & DropHasChance & DropItem;
 export type DroppedEquipmentReward = DropHasChance & DropEquipment;
 export type DroppedCollectibleReward = DropHasChance & DropCollectible;
@@ -74,11 +63,7 @@ export type DroppedReward =
   | DroppedCollectibleReward
   | DroppedRecipeReward;
 
-// The bare identity of a reward - which content it points to, with none of
-// the drop-table odds/quantity-range fields `DroppedReward` carries. Any
-// `DroppedReward` is structurally assignable here, so this doubles as "just
-// the id part" of one. Used where a reward needs to be stored or compared
-// (e.g. a Decree clause's farm target) without pinning it to a specific roll.
+// Bare content identity, without DroppedReward's odds/quantity fields. Used to store/compare a reward target (e.g. a Decree clause) without pinning a roll.
 export type RewardIdentity =
   | DropItem
   | DropEquipment

@@ -49,9 +49,7 @@ type LevelOption = { value: number; label: string };
 export class DetailBestiaryMonsterComponent {
   public entry = input.required<BestiaryEntry>();
 
-  // The actual min/max level the party has fought this monster at - the
-  // "Lv. X-Y" summary line and the level picker's bounds. Distinct from
-  // `selectedLevel`, which is just which single level is being previewed.
+  // Actual min/max fought, for the "Lv. X-Y" line and picker bounds - distinct from `selectedLevel`, the single level being previewed.
   public levelMin = computed(() => this.entry().levelRange?.min ?? 1);
   public levelMax = computed(() => this.entry().levelRange?.max ?? 1);
 
@@ -68,11 +66,7 @@ export class DetailBestiaryMonsterComponent {
   private lastMonsterId: MonsterId | undefined;
 
   constructor() {
-    // Defaults (and resets) the picker to the monster's highest found level
-    // whenever the *monster* changes - not on every `entry()` recompute,
-    // which fires far more often (e.g. a kill count ticking up elsewhere
-    // while this monster is open) and would otherwise snap a manually
-    // picked level back to max.
+    // Resets the picker only when the monster changes, not on every `entry()` recompute (which fires more often, e.g. a live kill count).
     effect(() => {
       const entry = this.entry();
       if (entry.monster.id === this.lastMonsterId) return;
@@ -98,9 +92,7 @@ export class DetailBestiaryMonsterComponent {
       .filter((skill): skill is EquipmentSkillContent => !!skill),
   );
 
-  // A skill's `{{ value }}` preview is computed against the monster at the
-  // selected level - a level 1 monster's skill would otherwise always
-  // preview as weaker than what the player actually faces at higher levels.
+  // Preview is computed at the selected level, not level 1, so it reflects what the player actually faces.
   private combatantAtSelectedLevel = computed<Combatant>(() =>
     combatantFromMonster(this.entry().monster, this.selectedLevel(), 0),
   );

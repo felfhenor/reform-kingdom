@@ -33,10 +33,7 @@ function regenerateEncounterRandomNode(
   });
 }
 
-// Regenerates every `ExploreRandomNode`'s fights once its `resetTime` has
-// elapsed - skipped entirely for a node whose combat is currently active, so
-// regeneration is deferred (not lost) rather than rewriting the monsters a
-// party is mid-fight against.
+// Skips a node with active combat so regeneration is deferred, not lost, rather than rewriting a mid-fight's monsters.
 export function encounterRandomProcessTick(): void {
   const nowTick = timerTicksElapsed();
   const activeEncounterRandomId = gamestate().world.combat?.encounterRandomId;

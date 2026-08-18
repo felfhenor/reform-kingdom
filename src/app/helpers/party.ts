@@ -25,10 +25,7 @@ const XP_CURVE_EASE = 1.5;
 const STARTER_ARMOR_NAME = 'Cloak of Adventuring';
 const STARTER_HAT_NAME = 'Hat of Adventuring';
 
-// Tunable XP curve: eases in from 100 XP at level 1 up to 100,000 XP at the
-// level cap (1000x the starting requirement), rounded to the nearest 10.
-// The `progress ** 1.5` ease keeps the early-level jumps gentle instead of a
-// straight line's constant per-level step dominating a tiny starting value.
+// `progress ** 1.5` eases in gently at low levels instead of a straight line's constant step dominating a tiny starting value.
 export function characterXpForLevel(level: number): number {
   const progress = (level - 1) / (CHARACTER_MAX_LEVEL - 1);
   const xp = XP_START + (XP_END - XP_START) * progress ** XP_CURVE_EASE;
@@ -125,9 +122,7 @@ export function setParty(party: Character[]): void {
   });
 }
 
-// Clears any equipped gear that no longer resolves to real content (e.g.
-// after a piece of gear is renamed/removed from gamedata) and recalculates
-// stats/hp/ep to match, since pruning can shrink max Health/Energy.
+// Recalculates stats/hp/ep after pruning, since it can shrink max Health/Energy.
 export function pruneInvalidPartyEquipment(party: Character[]): Character[] {
   return party.map((character) => {
     const equipment = pruneInvalidEquippedItems(character.equipment);

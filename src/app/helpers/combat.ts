@@ -131,12 +131,7 @@ export function combatantTakeTurn(
       0,
   );
 
-  // Combat Orders (see combat-order-evaluation.ts) take priority over the
-  // default weighted-random pick when a hero has any configured for their
-  // current job - a hero with none configured (the common case, and every
-  // enemy) takes the exact same weighted-random branch as before this
-  // existed, so the feature can't change behavior for anyone who hasn't
-  // opted in.
+  // Combat Orders override the weighted-random pick only if the hero has any configured.
   const combatOrderPick =
     !combatant.isEnemy && combatant.combatOrders.length > 0
       ? pickSkillFromCombatOrders(combat, combatant, skills)

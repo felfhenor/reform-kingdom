@@ -15,13 +15,7 @@ import mustache from 'mustache';
 
 export const combatLog = localStorageSignal<CombatLog[]>('combatLog', []);
 
-// While a batch is open (between `beginCombatLogCommits`/`endCombatLogCommits`),
-// every log entry - not just `combatMessageLog` ones - must be deferred into
-// `pendingCombatLogMessages` rather than written straight to the `combatLog`
-// signal. Writing straight through mid-batch (e.g. a `travelMessageLog` call
-// nested inside combat defeat handling) would insert that entry into the
-// signal before the batch's own entries are flushed, displacing it from its
-// true chronological position relative to the rest of the batch.
+// While a batch is open, all log entries defer here instead of writing straight to combatLog, preserving chronological order.
 let pendingCombatLogMessages: CombatLog[] | null = null;
 
 export function beginCombatLogCommits() {
@@ -101,9 +95,7 @@ export function craftMessageLog(locationName: string, message: string): void {
   });
 }
 
-// Colors an item's name by its rarity for adventure log messages (e.g. combat
-// and gather drop announcements) - `adventureLogMessageHtml` renders the log
-// message as markdown-inline, which passes raw HTML like this through as-is.
+// Raw HTML passes through since adventureLogMessageHtml renders markdown-inline.
 export function itemNameHtml(
   item: ItemContent,
   displayName = item.name,

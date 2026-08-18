@@ -42,10 +42,7 @@ import {
 } from '@helpers/equipment';
 import type { Combat } from '@interfaces';
 
-// A distinct EquipmentItem instance for a given content id - equipped-item
-// dedup is now keyed by instance id, not content id, so every fixture that
-// represents a distinct physical item needs its own id (and a two-handed
-// item occupying two slots must reuse the *same* instance across both).
+// Dedup is keyed by instance id, not content id, so each distinct physical item needs its own id (a two-hander reuses the same instance across both slots).
 function mockEquipmentItem(
   equipmentId: EquipmentId,
   id = equipmentId,
@@ -353,10 +350,7 @@ describe('Equipment Helper Functions', () => {
       expect(items).toEqual([spearItem]);
     });
 
-    // The real-world case this guards against: a legacy save whose
-    // two-handed item was backfilled with a different instance id per slot
-    // (see `backfillEquipmentBlock`) - even though the two slots don't
-    // share an id, primary-slot dedup still only surfaces it once.
+    // Guards against a legacy save backfilled with a different instance id per slot (see `backfillEquipmentBlock`).
     it('only returns a two-handed item once even if its slots hold different instance ids', () => {
       vi.mocked(getEntry).mockReturnValue(spear);
 

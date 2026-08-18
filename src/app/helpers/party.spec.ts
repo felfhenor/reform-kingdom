@@ -104,9 +104,7 @@ describe('Party Helper Functions', () => {
     type: 'Hat',
   };
 
-  // Mocks getEntry() so it resolves the starter cloak/hat plus any content
-  // items passed in, matching by either id or name like the real
-  // implementation.
+  // Resolves the starter cloak/hat plus any passed-in items, matching by id or name like the real implementation.
   function mockGetEntry(...entries: IsContentItem[]): void {
     const known = [mockCloak, mockStarterHat, ...entries];
     vi.mocked(getEntry).mockImplementation(
@@ -426,10 +424,7 @@ describe('Party Helper Functions', () => {
 
   let fixtureItemCounter = 0;
 
-  // A hand-built EquipmentItem instance for fixtures that need one - uses
-  // its own counter (not the mocked uuid) so tests can construct armory
-  // items independently of how many rngUuid calls the code under test
-  // happens to make.
+  // Uses its own counter (not the mocked uuid) so fixtures are independent of how many rngUuid calls the code under test makes.
   function mockEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
     return {
       id: `fixture-item-${fixtureItemCounter++}` as EquipmentItemId,

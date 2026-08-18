@@ -49,11 +49,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
   timer.startTimer('gameloop');
 
-  // Tick the clock forward one tick at a time (rather than one bulk `+=
-  // numTicks`) so tick-driven systems below - travel progress, global effect
-  // expiry, combat rounds - see an accurate `timerTicksElapsed()` as they
-  // process each tick, instead of all `numTicks` iterations seeing the same
-  // pre-batch clock value.
+  // Tick one at a time (not one bulk +=) so tick-driven systems see an accurate timerTicksElapsed() each iteration.
   for (let i = 0; i < numTicks; i++) {
     updateGamestate((state) => {
       state.clock.numTicks += 1;

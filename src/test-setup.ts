@@ -64,13 +64,8 @@ vi.mock('@angular/platform-browser', () => ({
   Title: vi.fn(() => ({})),
 }));
 
-// Mock rxjs to prevent observable issues
-//
-// `vi.fn(impl)` proxies `new MockedClass()` straight through to
-// `Reflect.construct(impl, args)`, which throws "is not a constructor" if
-// `impl` is an arrow function (arrow functions have no [[Construct]]). Real
-// `function` expressions are constructable and return their explicit object
-// return value in place of `this`, so `new Subject()` resolves correctly.
+// Mock rxjs to prevent observable issues.
+// Uses `function` expressions (not arrows) for Subject/BehaviorSubject since arrow functions aren't constructable via `new`.
 vi.mock('rxjs', () => ({
   interval: vi.fn(() => ({
     subscribe: vi.fn(),

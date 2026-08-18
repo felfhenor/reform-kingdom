@@ -68,10 +68,7 @@ export class PlayKingdomInfusionComponent {
     this.party().find((c) => c.id === this.selectedCharacterId()),
   );
 
-  // Keyed by primary slot rather than instance id, so a two-handed item
-  // never shows up twice - not even for a legacy save whose two-handed
-  // item was backfilled with mismatched per-slot instance ids (see
-  // `equippedItemsByPrimarySlot`).
+  // Keyed by primary slot, not instance id, so a two-handed item never shows up twice - see `equippedItemsByPrimarySlot`.
   public selectedCharacterEquippedItems = computed<EquipmentItem[]>(() => {
     const character = this.selectedCharacter();
     return character ? equippedItemsByPrimarySlot(character.equipment) : [];
@@ -167,10 +164,7 @@ export class PlayKingdomInfusionComponent {
     const swal = this.infuseSwal();
     if (!swal) return;
 
-    // `swalOptions` is a plain setter (unlike `[text]`, which only takes
-    // effect once Angular flushes a bound input - too late for a `.fire()`
-    // called synchronously right after), so this is the one that reliably
-    // reaches `Swal.fire()` with fresh text every time.
+    // `swalOptions` is a plain setter, unlike `[text]` which needs an Angular flush - too late for a synchronous `.fire()` right after.
     swal.swalOptions = { text: this.buildInfuseConfirmText(materialItemId) };
     this.pendingMaterialId.set(materialItemId);
     swal.fire();

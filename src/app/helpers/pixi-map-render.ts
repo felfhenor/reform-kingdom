@@ -13,20 +13,11 @@ import { Container, Sprite, type Texture } from 'pixi.js';
 
 export type PixiTiledMapRenderResult = {
   container: Container;
-  // Node-name -> its always-on nametag `Text`, for callers that need to
-  // live-update a label after the map is built (e.g. an `ExploreRandomNode`'s
-  // countdown timer) - see `resolveNodeLabel`'s per-object result, which is
-  // otherwise only ever read once at render time.
+  // Node-name -> nametag Text, so callers can live-update a label after render (e.g. a countdown timer).
   nodeLabels: Map<string, Text>;
 };
 
-/**
- * Carrina-style maps are authored with a fixed layer order that this renderer
- * relies on for correct stacking, bottom to top: World Tiles, Dense Tiles,
- * Decorative Tiles, Path Tiles, Dense Objects, Decorative Objects, Path
- * Objects, Explore Nodes, Other Nodes. We render `map.layers` in file order
- * rather than re-sorting by name so that ordering is preserved automatically.
- */
+// Relies on the authored layer order for correct stacking, so `map.layers` renders in file order, not re-sorted.
 
 const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
 const FLIPPED_VERTICALLY_FLAG = 0x40000000;
@@ -34,9 +25,7 @@ const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 const FLIP_FLAGS_MASK =
   FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG;
 
-// Tiled composes its 3 flip flags in a fixed order - diagonal (a transpose)
-// first, then horizontal, then vertical - which for a square tile always
-// reduces to one of these 8 (rotation, scaleX, scaleY) sprite transforms.
+// Tiled's 3 flip flags (diagonal, horizontal, vertical) reduce to one of these 8 sprite transforms for a square tile.
 // Keyed by `${flipHorizontal}${flipVertical}${flipDiagonal}` as 0/1 digits.
 const ORIENTATION_BY_FLAGS: Record<
   string,
@@ -124,11 +113,7 @@ function pixiTiledObjectRender(
   );
   sprite.rotation = orientation.rotation;
 
-  // Tiled also supports a free-form `rotation` on the object itself
-  // (independent of the gid flip flags - this is what river/road bend tiles
-  // use), applied clockwise around the object's own origin, which is its
-  // bottom-left corner rather than its center. A wrapper container placed at
-  // that origin gives us the correct pivot for it.
+  // Tiled's free-form `rotation` (used by bend tiles) applies clockwise around the object's bottom-left origin.
   const wrapper = new Container();
   wrapper.addChild(sprite);
   wrapper.x = object.x;
@@ -136,28 +121,19 @@ function pixiTiledObjectRender(
   wrapper.rotation = ((object.rotation ?? 0) * Math.PI) / 180;
   wrapper.cullable = true;
 
-  // Only node objects (Explore Nodes / Other Nodes layers) carry a `type`;
-  // decorative/terrain objects are typeless and should stay unclickable.
-  // The click handler stays wired even for a still-hidden node - clicking is
-  // how a hidden node gets discovered in the first place.
+  // Only node objects carry a `type`; decorative/terrain objects stay unclickable. Wired even when
+  // hidden, since clicking is how a hidden node gets discovered.
   if (onNodeClick && object.type) {
     wrapper.eventMode = 'static';
     wrapper.on('pointertap', (event: FederatedPointerEvent) => {
-      // Stops the tap from also reaching the stage's background handler,
-      // which would otherwise treat this as an empty-map click and
-      // immediately deselect the node this same tap just selected.
+      // Stop the tap from also reaching the background handler and deselecting the node just selected.
       event.stopPropagation();
       onNodeClick(object);
     });
   }
 
-  // Same restriction as the click handler above - only node objects carry a
-  // `type`, so decorative/terrain objects never get a label. The label is
-  // always created (even for a currently-hidden node) so it exists to be
-  // live-updated later without a full map re-render - it starts invisible
-  // with no pointer cursor, and `GamePlayWorldComponent.updateNodeLabels`
-  // (run once immediately after render, then every tick) sets the real
-  // visibility/cursor from current discovery state.
+  // Label is always created (even hidden) so it can be live-updated later; `GamePlayWorldComponent.updateNodeLabels`
+  // sets the real visibility/cursor from current discovery state.
   const labelInfo = object.type ? resolveNodeLabel?.(object) : undefined;
   let label: Text | undefined;
   if (labelInfo) {

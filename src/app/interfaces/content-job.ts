@@ -27,11 +27,7 @@ export type JobContent = IsContentItem &
 
     equippableTypes: EquipmentItemType[];
 
-    // Stats an "Optimize Equipment" pass should favor for this job, highest
-    // priority first - a candidate item always wins on an earlier stat
-    // before a later one is even considered (see `planEquipmentOptimization`
-    // in `equipment.ts`). Stats omitted from the list never influence the
-    // choice; ties fall back to the item's level requirement instead.
+    // Stats "Optimize Equipment" favors, highest priority first (see planEquipmentOptimization); ties fall back to level requirement.
     statPriority: BaseStat[];
 
     skillPath: JobSkillPath[];

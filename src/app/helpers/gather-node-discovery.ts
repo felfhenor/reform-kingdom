@@ -27,10 +27,7 @@ export function gatherNodeDiscover(nodeName: string): void {
   }
 }
 
-// Drops any discovery entries for nodes that no longer exist on any loaded
-// map - e.g. after a map edit removes or renames a GatherNode. Takes an
-// existence check rather than importing `worldNodeByName` directly, to avoid
-// a `world-nodes.ts` <-> `gather-node-discovery.ts` import cycle.
+// Takes an existence check (not `worldNodeByName`) to avoid a world-nodes.ts <-> gather-node-discovery.ts import cycle.
 export function pruneInvalidGatherNodeDiscoveries(
   discovered: GameStateDiscoveredGatherNodes,
   nodeExists: (nodeName: string) => boolean,
@@ -46,14 +43,8 @@ export function pruneInvalidGatherNodeDiscoveries(
   return pruned;
 }
 
-// One-time migration backfill: saves from before gather-node discovery
-// tracking existed have real material progress (things the player has
-// legitimately gathered over hours of play) but no recorded node visits,
-// since that history was never captured. Without this, every such save
-// would suddenly see an empty auto-mode material picker despite having
-// obviously found plenty of gather sources already. Marks every real
-// GatherNode as discovered - callers gate this to only run once, when
-// `discoveredGatherNodes` is empty but `materials` isn't (see `migrate.ts`).
+// One-time migration backfill for pre-tracking saves that have material progress but no recorded node
+// visits; marks every GatherNode discovered. Callers gate this to run only once (see `migrate.ts`).
 export function grandfatherGatherNodeDiscoveries(
   allGatherNodeNames: string[],
 ): GameStateDiscoveredGatherNodes {

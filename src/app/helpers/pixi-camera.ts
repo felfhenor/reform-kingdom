@@ -1,11 +1,7 @@
 import type { CameraBounds, CameraPosition, ViewportTiles } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
-// Screen pixels are converted to tile units by dividing out the tile size, as
-// usual - but also the zoom factor first, since the map is rendered at
-// `zoom`x scale (see `GamePlayWorldComponent`'s `app.stage.scale`). A smaller
-// "effective" screen size at zoom > 1 means fewer tiles are visible, which is
-// what makes the map appear zoomed in.
+// Divides out zoom first (map is rendered at `zoom`x scale via `app.stage.scale`), so fewer tiles are visible at zoom > 1.
 export function viewportTilesCalculate(
   screenWidth: number,
   screenHeight: number,
@@ -19,14 +15,8 @@ export function viewportTilesCalculate(
   };
 }
 
-// The map (and everything positioned within it - see positionCamera's
-// `centerOffset`) is rendered shifted half a tile up/left so a hero's
-// tile-center, rather than its top-left corner, lands at screen center.
-// That shift means the camera has to be able to travel half a tile past
-// each nominal edge for the map's true edges to land exactly on the
-// viewport's edges, rather than stopping half a tile short on one side and
-// overshooting by half a tile on the other. There's nothing to correct for
-// when the map is smaller than the viewport - the camera can't move at all.
+// The map is rendered shifted half a tile up/left so a hero's tile-center lands at screen center, so
+// bounds extend half a tile past each nominal edge to compensate. No correction when the map fits the viewport.
 export function cameraBoundsCalculate(
   viewportWidthTiles: number,
   viewportHeightTiles: number,
@@ -65,11 +55,8 @@ export function cameraPositionCalculate(
   return { x, y };
 }
 
-// The offset is stored relative to the hero-centered `base` position rather
-// than as an absolute camera position, so that it stays meaningful (and
-// clamped) even as the base shifts - e.g. when the hero moves while the map
-// is panned. Clamping against `bounds - base` keeps `base + offset` (the
-// final camera position) inside the map bounds.
+// Offset is relative to the hero-centered `base`, not absolute, so it stays valid as `base` shifts;
+// clamping against `bounds - base` keeps `base + offset` inside the map bounds.
 export function cameraOffsetFromDrag(
   currentOffset: CameraPosition,
   dragDeltaX: number,

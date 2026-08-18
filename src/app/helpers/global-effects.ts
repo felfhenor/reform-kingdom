@@ -19,10 +19,7 @@ export function activeGlobalEffects(): GlobalEffect[] {
   );
 }
 
-// Accepts either a content id or a content name (see `getEntry`) so callers
-// can use the same readable literal (e.g. `'Healing' as GlobalEffectId`)
-// `addGlobalEffect` uses to grant the effect in the first place - stored
-// effects are keyed by their real content id, not that literal.
+// Accepts either a content id or name (see `getEntry`) so callers can use the same readable literal `addGlobalEffect` grants with.
 export function isGlobalEffectActive(globalEffectId: GlobalEffectId): boolean {
   const content = getEntry<GlobalEffectContent>(globalEffectId);
   if (!content) return false;
@@ -60,9 +57,7 @@ export function removeGlobalEffect(id: GlobalEffectId): void {
   });
 }
 
-// Deaths Door is a pure timer - the party doesn't walk anywhere while it's
-// active. On expiry they're teleported straight to the kingdom, then healing
-// begins (so healing only ever starts once they're actually there).
+// Deaths Door is a pure timer; on expiry the party teleports to the kingdom before healing begins there.
 function handleDeathsDoorExpiry(): void {
   const kingdom = worldNodesOfType('Kingdom')[0];
   if (kingdom) {
@@ -73,9 +68,7 @@ function handleDeathsDoorExpiry(): void {
   addGlobalEffect('Healing' as GlobalEffectId, healingTicksForLevel(partyGet()));
 }
 
-// Effects never remove themselves - `activeGlobalEffects` just filters them
-// out of view once expired - so this drives their expiry side effects and
-// sweeps them out of state. Meant to run once per game tick.
+// Effects never remove themselves; this drives expiry side effects and sweeps them out of state. Run once per game tick.
 export function globalEffectsProcessTick(): void {
   const currentTick = timerTicksElapsed();
   const expiredEffects = gamestate().globalEffects.filter(

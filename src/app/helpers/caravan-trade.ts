@@ -32,9 +32,7 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 
-// Resolves whichever content type `trade` references down to display info -
-// mirrors `rewardContentInfo` in `world-nodes.ts`, plus the description/
-// rarity/stats the trade modal's tooltip needs that helper doesn't carry.
+// Mirrors rewardContentInfo in world-nodes.ts, plus the tooltip fields that helper doesn't carry.
 export function caravanTradeDisplay(
   trade: CaravanTrade,
 ): ItemPreviewDisplay | undefined {
@@ -58,9 +56,7 @@ export function caravanTradeDisplay(
   return undefined;
 }
 
-// How many of whatever `trade` targets the party currently owns - shown in
-// the trade modal so a "buy" trade's price can be weighed against what's
-// already in storage/armory.
+// How many of trade's target the party owns, shown so price can be weighed against stock.
 export function caravanTradeOwnedQuantity(trade: CaravanTrade): number {
   if (trade.itemId) return getMaterialQuantity(trade.itemId);
 
@@ -97,9 +93,7 @@ export function caravanTradeRemaining(
   return Math.max(0, trade.limit - (tradeCounts[index] ?? 0));
 }
 
-// A collectible sell is always a one-time purchase, even when authored with
-// no explicit `limit` (the WIP data's unique trader-exclusive collectibles
-// never set one) - once owned, it's sold out everywhere, permanently.
+// A collectible sell is always one-time even with no explicit limit - once owned, sold out everywhere.
 export function caravanIsTradeSoldOut(
   trade: CaravanTrade,
   tradeCounts: Record<number, number>,
@@ -113,12 +107,7 @@ export function caravanIsTradeSoldOut(
   return remaining !== undefined && remaining <= 0;
 }
 
-// The most units of `trade` the party could transact right now - the lesser
-// of what's left in stock (`limit`) and what the party can actually afford
-// (gold for a `sell` trade, owned quantity for a `buy` trade). A collectible
-// is always capped at 1 (and 0 once owned - see `caravanIsTradeSoldOut`).
-// Drives both the "sold out"/disabled state and the max on the quantity
-// prompt.
+// Lesser of remaining stock and what the party can afford; a collectible is capped at 1 (0 once owned).
 export function caravanTradeMaxQuantity(
   caravan: CaravanContent,
   trade: CaravanTrade,
@@ -179,9 +168,7 @@ function grantCaravanReward(
   }
 }
 
-// Removes `quantity` units of whatever `trade` is buying from storage/
-// armory - the only two places a caravan purchase is allowed to draw from,
-// per spec.
+// Removes payment from storage/armory - the only two sources a purchase may draw from.
 function takeCaravanPayment(
   state: GameState,
   trade: CaravanTrade,
@@ -204,11 +191,7 @@ function takeCaravanPayment(
   }
 }
 
-// Buys/sells `quantity` units of `tradeIndex` (an index into the assigned
-// trader's `trades`) at `entry`'s caravan, in a single atomic commit.
-// Returns false without changing state if the caravan/trader/trade can't be
-// resolved, the trade isn't currently active, or `quantity` exceeds what's
-// available (sold out, insufficient gold, or insufficient owned quantity).
+// Buys/sells quantity units of tradeIndex atomically; returns false without changing state if unresolvable, inactive, or unaffordable.
 export function caravanExecuteTrade(
   entry: WorldNodeEntry,
   tradeIndex: number,

@@ -28,10 +28,7 @@ export function canModifyEquipment(): boolean {
   return !currentCombat();
 }
 
-// Returns each distinct equipped item once - a two-handed weapon (or any
-// item with more than one entry in its own `slots`) occupies multiple
-// paperdoll slots simultaneously, but is still a single physical item
-// (same instance id in both slots).
+// A two-handed item occupies multiple paperdoll slots but is still one physical item (same instance id) - dedupe by instance id.
 export function equippedItems(equipment: EquipmentBlock): EquipmentItem[] {
   const seen = new Set<EquipmentItemId>();
 
@@ -44,12 +41,7 @@ export function equippedItems(equipment: EquipmentBlock): EquipmentItem[] {
   });
 }
 
-// Like `equippedItems`, but resolves duplicates by paperdoll slot instead
-// of instance id - a two-handed item is only ever returned for the first
-// slot its type declares (see `EquipmentTypeToSlot`), never its secondary
-// slot(s). Used by pickers (e.g. the Infusion page) that need "one row per
-// physical item," since it doesn't depend on every slot referencing the
-// exact same instance object the way `equippedItems`'s id-based dedup does.
+// Like `equippedItems` but dedupes by primary slot (see `EquipmentTypeToSlot`) instead of instance id, for pickers needing "one row per physical item" even across legacy saves where a two-hander's slots don't share an instance id.
 export function equippedItemsByPrimarySlot(
   equipment: EquipmentBlock,
 ): EquipmentItem[] {
@@ -64,9 +56,7 @@ export function equippedItemsByPrimarySlot(
     .map((slot) => equipment[slot] as EquipmentItem);
 }
 
-// Clears any slot whose equipped item's equipmentId no longer resolves to
-// real content - e.g. after a piece of gear is renamed/removed from
-// gamedata.
+// Clears slots whose equipmentId no longer resolves to real content (e.g. renamed/removed gear).
 export function pruneInvalidEquippedItems(
   equipment: EquipmentBlock,
 ): EquipmentBlock {
@@ -93,9 +83,7 @@ export function slotsHoldingEquipment(
   );
 }
 
-// Class-unique slots per the design doc (Artifact/Mage, Ammo/Ranger) -
-// matched by job name, the same "match content by name" convention
-// `party.ts` uses for `STARTER_ARMOR_NAME`.
+// Class-unique slots per the design doc (Artifact/Mage, Ammo/Ranger), matched by job name (same convention as `party.ts`'s `STARTER_ARMOR_NAME`).
 const CLASS_EXCLUSIVE_SLOT_JOBS: Partial<Record<EquipmentSlot, string>> = {
   Artifact: 'Magician',
   Ammo: 'Ranger',
@@ -123,10 +111,7 @@ export function canEquipItem(
   return job.equippableTypes.includes(equipment.type);
 }
 
-// Resolves the entries of `armory` eligible for `slot` (by content type),
-// sorted by level requirement descending. Takes the armory as a parameter
-// rather than reading `armoryGet()` directly so it can also be used against
-// a draft/in-progress armory (see `planEquipmentOptimization`).
+// Takes `armory` as a parameter (rather than reading `armoryGet()`) so it also works against a draft armory (see `planEquipmentOptimization`).
 function equipmentEntriesForSlot(
   armory: EquipmentItem[],
   slot: EquipmentSlot,
@@ -143,10 +128,7 @@ function equipmentEntriesForSlot(
   return orderBy(forSlot, [(entry) => entry.content.levelRequirement], ['desc']);
 }
 
-// Only equipment actually sitting in the armory can be picked - this is the
-// player's owned gear, not the full game content catalog. Returns one entry
-// per owned *instance*, never deduped by content id, so distinct physical
-// copies (e.g. differently-infused swords) stay individually pickable.
+// Returns one entry per owned instance (not deduped by content id), so distinct physical copies (e.g. differently-infused swords) stay pickable.
 export function equipmentAvailableForSlot(
   slot: EquipmentSlot,
 ): EquipmentArmoryEntry[] {
@@ -163,9 +145,7 @@ export function equippedItemTypes(
     .filter((type): type is EquipmentItemType => !!type);
 }
 
-// Sums each distinct equipped item's baseStats plus its infusion bonus
-// once, regardless of how many paperdoll slots it occupies (see
-// `equippedItems`).
+// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
 export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
   const totals = defaultStats();
 
@@ -183,10 +163,7 @@ export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
   return totals;
 }
 
-// Every skill granted by a distinct equipped item, deduped - see
-// `EquipmentContent.grantedSkillIds`. Merging these into a hero's known
-// skills is handled separately (see `mergeGrantedSkills`/
-// `heroSkillsWithEquipment`), since that needs skill content, not just ids.
+// Merging these into known skills is handled separately (see `mergeGrantedSkills`/`heroSkillsWithEquipment`), which needs skill content, not just ids.
 export function equipmentGrantedSkillIds(
   equipment: EquipmentBlock,
 ): EquipmentSkillId[] {
@@ -221,9 +198,7 @@ export function backfillEquipmentBlock(equipment: EquipmentBlock): EquipmentBloc
   return backfilled;
 }
 
-// Two-handed-capable slots are decided first so they claim their secondary
-// slot (e.g. Offhand) before anything is chosen for it - see
-// `planEquipmentOptimization`.
+// Two-handed-capable slots go first so they claim their secondary slot (e.g. Offhand) before anything else is chosen for it.
 const SLOT_OPTIMIZATION_ORDER: EquipmentSlot[] = [
   'Weapon',
   'Offhand',
@@ -244,11 +219,7 @@ function candidateStatValue(entry: EquipmentArmoryEntry, stat: BaseStat): number
   );
 }
 
-// Ranks candidates lexicographically by statPriority - a higher-priority
-// stat always outweighs every lower-priority one, however small the
-// difference. Stats past the end of the list (or ties throughout) fall back
-// to `entries`'s existing order, i.e. highest level requirement first (see
-// `equipmentEntriesForSlot`).
+// Ranks lexicographically by statPriority (a higher-priority stat always outweighs a lower one); ties fall back to `entries`'s existing order (highest level requirement first).
 function bestBySlotPriority(
   entries: EquipmentArmoryEntry[],
   statPriority: BaseStat[],
@@ -272,12 +243,7 @@ function currentEquipmentEntry(
   return item && content ? { item, content } : undefined;
 }
 
-// Picks the best armory replacement for a character's equipment, slot by
-// slot, ranked by their job's `statPriority` (descending). Only returns the
-// slots that should change - a slot is omitted whenever nothing in the
-// armory beats what's already equipped there, so callers never need to
-// "re-equip" an already-optimal item. Each returned item appears once, even
-// if it fills more than one slot (e.g. a two-handed weapon).
+// Only returns slots that should change - a slot is omitted when nothing in the armory beats what's already equipped there.
 export function planEquipmentOptimization(
   character: Character,
   armory: EquipmentItem[],

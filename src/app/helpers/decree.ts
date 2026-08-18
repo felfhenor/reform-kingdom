@@ -36,11 +36,7 @@ export function decreeSetWaitForFullHealthBeforeCombat(value: boolean): void {
   });
 }
 
-// Two clauses "duplicate" each other if they'd always become satisfiable/
-// unsatisfiable together and target the same thing - same type for the
-// param-less clause types, or same material for GatherMaterial regardless of
-// its target quantity (a lower-priority "gather until 20" is dead weight
-// once a "gather until 100" of the same material exists ahead of it).
+// Two clauses conflict if they target the same thing regardless of quantity (e.g. a lower "gather until 20" is dead weight behind a "gather until 100").
 export function decreeClauseConflicts(
   action: DecreeClauseAction,
   existing: DecreeClause[],
@@ -81,12 +77,7 @@ export function decreeClauseAdd(action: DecreeClauseAction): boolean {
   return true;
 }
 
-// Replaces a clause's action in place, keeping its id/enabled/failureCount
-// and its position in the priority list - the alternative (remove + re-add)
-// loses both. Rebuilds the clause fresh from `action` rather than spreading
-// it over the old one, so switching away from a field (e.g. GatherMaterial's
-// materialId) doesn't leave it dangling on the updated clause. Returns
-// whether the update was actually applied.
+// Rebuilds the clause fresh from `action` (not spread) so a dropped field can't linger from the old clause.
 export function decreeClauseUpdate(
   clauseId: DecreeClauseId,
   action: DecreeClauseAction,
@@ -175,10 +166,7 @@ export function decreeSetRiskTolerance(riskTolerance: DecreeRiskLevel): void {
   analyticsSendDesignEvent('Decree:Risk:Change');
 }
 
-// A short, stock-independent description of what a clause is set up to do -
-// used on the Decree screen's clause list. Distinct from
-// `auto-mode.ts`'s `autoModeStatusLabel`, which describes the *currently
-// active* clause's live progress.
+// Static description of what a clause does; distinct from auto-mode.ts's autoModeStatusLabel, which shows live progress.
 export function decreeClauseSummary(clause: DecreeClause): string {
   switch (clause.type) {
     case 'GatherMaterial': {

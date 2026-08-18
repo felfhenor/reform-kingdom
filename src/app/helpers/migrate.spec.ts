@@ -251,11 +251,7 @@ describe('migrateGameState', () => {
   });
 
   it('retrofits party and tradeskill xp to the current curve before committing', () => {
-    // Earlier tests in this file override `pruneInvalidPartyEquipment` via
-    // `mockReturnValue`, which `vi.clearAllMocks()` in `beforeEach` does not
-    // clear (only `mockReset`/`mockRestore` clear a configured return
-    // value) - reassert the identity implementation so this test isn't
-    // sensitive to run order.
+    // Reassert identity impl - vi.clearAllMocks() doesn't clear an earlier test's mockReturnValue.
     vi.mocked(pruneInvalidPartyEquipment).mockImplementation(
       (party) => party,
     );
@@ -325,10 +321,7 @@ describe('migrateGameState', () => {
   });
 
   it('does not grandfather a genuinely fresh save with no materials', () => {
-    // An earlier test in this file overrides `pruneInvalidMaterials` via
-    // `mockReturnValue`, which `vi.clearAllMocks()` does not clear -
-    // reassert the identity implementation so this test isn't sensitive to
-    // run order (same caveat noted on the xp-retrofit test above).
+    // Same mock-leak caveat as the xp-retrofit test above.
     vi.mocked(pruneInvalidMaterials).mockImplementation(
       (materials) => materials,
     );

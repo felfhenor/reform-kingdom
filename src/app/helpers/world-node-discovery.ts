@@ -39,10 +39,7 @@ export function worldNodeUndiscover(nodeName: string): void {
   });
 }
 
-// Drops any discovery entries for nodes that no longer exist on any loaded
-// map - e.g. after a map edit removes or renames a node. Takes an existence
-// check rather than importing `worldNodeByName` directly, to avoid a
-// `world-nodes.ts` <-> `world-node-discovery.ts` import cycle.
+// Takes an existence check (not `worldNodeByName`) to avoid a world-nodes.ts <-> world-node-discovery.ts import cycle.
 export function pruneInvalidWorldDiscoveries(
   discovered: GameStateWorldDiscoveries,
   nodeExists: (nodeName: string) => boolean,

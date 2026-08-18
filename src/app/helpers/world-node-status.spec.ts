@@ -148,10 +148,7 @@ describe('encounter-backed node accessors', () => {
     });
 
     it('still resolves the real label for a hidden, undiscovered node', () => {
-      // Visibility gating happens at the map-render layer
-      // (`pixi-map-render.ts`/`GamePlayWorldComponent.updateNodeLabels`), not
-      // here - the label needs to exist up front so it can be toggled live
-      // once discovered, without a full map re-render.
+      // Visibility gating happens at the map-render layer, not here.
       seedEncounter(buildEncounter({ hidden: true, levelRange: { min: 2, max: 5 } }));
       vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
 

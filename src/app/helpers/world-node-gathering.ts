@@ -22,12 +22,7 @@ export function worldNodeGatherMaterialIds(entry: WorldNodeEntry): ItemId[] {
   return [...ids];
 }
 
-// Every material obtainable from a GatherNode the player has actually
-// visited before - the data source for the auto-mode "gather material"
-// clause picker. Deliberately narrower than "every GatherNode in the
-// world": a material that's only reachable from a node the player hasn't
-// found yet (and might otherwise also be craftable) shouldn't be offered as
-// a gather target before they've discovered where it actually comes from.
+// Materials from discovered GatherNodes only, for the auto-mode clause picker - undiscovered sources aren't offered.
 export function gatherableMaterialIds(): MaterialId[] {
   const ids = new Set<MaterialId>();
 

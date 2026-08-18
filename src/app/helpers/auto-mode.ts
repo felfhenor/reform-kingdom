@@ -34,9 +34,7 @@ import type {
   ItemContent,
 } from '@interfaces';
 
-// Long enough that the Auto Mode global effect never expires on its own -
-// it's granted/revoked explicitly by `syncAutoModeGlobalEffect` below, based
-// on `autoMode.enabled`, the same "~1 year" trick `resting.ts` uses for Idle.
+// Long enough it never expires on its own; granted/revoked explicitly by `syncAutoModeGlobalEffect` (same "~1 year" trick `resting.ts` uses for Idle).
 const AUTO_MODE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365;
 
 export function autoModeIsEnabled(): boolean {
@@ -72,9 +70,7 @@ export function autoModeRecordClauseFailure(): void {
   });
 }
 
-// Mirrors `autoModeRecordClauseFailure` - a won fight proves the active
-// clause is working again, so its streak of prior failures shouldn't keep
-// counting against it (and tripping the UI's failure warning) forever.
+// A won fight proves the clause works again, so its failure streak shouldn't keep tripping the UI's warning forever.
 export function autoModeRecordClauseSuccess(): void {
   const activeClauseId = gamestate().world.autoMode.activeClauseId;
   if (!activeClauseId) return;
@@ -87,10 +83,7 @@ export function autoModeRecordClauseSuccess(): void {
   });
 }
 
-// Recorded for every lost fight regardless of which clause sent the party
-// there - only `LevelUpParty`'s node picker reads this back (see
-// `mostChallengingExploreNodeForRisk`), but a node that's losing is losing no
-// matter which clause caused the trip.
+// Recorded for every lost fight regardless of clause; only `LevelUpParty`'s node picker reads it back (see `mostChallengingExploreNodeForRisk`).
 export function autoModeRecordNodeFailure(nodeName: string): void {
   let newFailureCount = 0;
 
@@ -119,11 +112,7 @@ export function autoModeRecordNodeSuccess(nodeName: string): void {
   });
 }
 
-// Wipes every node's losing streak - called whenever a hero levels up (see
-// `combat-end.ts`'s `partyGainXp` call), since a stronger party may now be
-// able to clear a node `mostChallengingExploreNodeForRisk` had previously
-// written off, and it deserves a fresh try rather than staying avoided
-// forever.
+// Called on level-up (see `combat-end.ts`'s `partyGainXp`) so a stronger party gets a fresh try at nodes previously written off.
 export function autoModeResetNodeFailureCounts(): void {
   updateGamestate((state) => {
     state.world.autoMode.nodeFailureCounts = {};
@@ -184,14 +173,7 @@ function syncAutoModeGlobalEffect(enabled: boolean): void {
   if (content) removeGlobalEffect(content.id);
 }
 
-// `activeClauseId` is only ever set by `runClause` below, so a gather
-// session Auto Mode didn't personally start - because it was already in
-// progress the moment Auto Mode was enabled, or the party was already
-// idle-gathering for some other reason - is otherwise invisible to
-// `stopGatherIfTargetReached`, which would then never notice the target was
-// met and let it run forever. This adopts any in-progress gather that
-// matches an enabled GatherMaterial clause, so the stop-check below always
-// has an active clause to work with while gathering is underway.
+// A gather Auto Mode didn't itself start (already in progress when enabled, etc.) has no `activeClauseId`, so `stopGatherIfTargetReached` below would never notice its target was met. Adopts any in-progress gather matching an enabled GatherMaterial clause so the stop-check always has a clause to work with.
 function adoptInProgressGatherClause(): void {
   const autoMode = gamestate().world.autoMode;
   if (autoMode.activeClauseId) return;
@@ -214,9 +196,7 @@ function adoptInProgressGatherClause(): void {
   setActiveClause(matchingClause.id);
 }
 
-// Once a `GatherMaterial` clause's target is reached, gathering has no
-// natural stop condition of its own (it loops forever) - this is what ends
-// it and hands control back to the next tick's clause re-evaluation.
+// Gathering loops forever on its own; this ends it once the target is reached and hands control back to clause re-evaluation.
 function stopGatherIfTargetReached(): void {
   const autoMode = gamestate().world.autoMode;
   if (!autoMode.activeClauseId) return;
@@ -240,26 +220,7 @@ function isPartyIdleForAutoMode(): boolean {
   );
 }
 
-// A gather session with no clause behind it (started manually, or its
-// GatherMaterial clause no longer matches, was disabled, etc.) has no
-// natural stop condition of its own - unlike a clause-tracked gather, which
-// `stopGatherIfTargetReached` ends once its target is hit. Left alone it
-// loops forever, so `isPartyIdleForAutoMode` never sees the party as idle
-// and `advanceToNextClause` never runs again - Auto Mode is permanently
-// stuck at that node regardless of health. Ending the gather here hands
-// control straight back to the normal per-tick evaluation below, which
-// decides what happens next.
-//
-// A hurt party waiting on the "wait for full health" gate is a special case
-// of this: `restingProcessTick` also requires `!isGathering()`, so on top of
-// blocking clause evaluation, an orphaned gather silently breaks the
-// "Healing before the next move..." promise `autoModeStatusLabel` shows for
-// that state. Ending the gather alone isn't enough there, though -
-// `advanceToNextClause`'s blocked-only-by-health branch can never fire from
-// this path (it requires the same health-blocked condition this function
-// just found to be false), so a GatherNode would otherwise be treated as
-// "nothing to do" rather than "waiting to heal." Route through the kingdom
-// explicitly instead.
+// An orphaned gather (no clause tracking it, e.g. started manually or its clause got disabled) never stops on its own, leaving Auto Mode stuck at that node. Ends it so per-tick evaluation resumes. If the party is also hurt and waiting for full health, routes through the kingdom explicitly - `restingProcessTick` needs `!isGathering()` to heal, and `advanceToNextClause`'s health-blocked branch can't fire from this path.
 function stopOrphanedGather(): boolean {
   const autoMode = gamestate().world.autoMode;
   if (!isGathering()) return false;
@@ -292,9 +253,7 @@ function runClause(clause: DecreeClause): void {
   if (target) travelStart(target.nodeName, true);
 }
 
-// No enabled clause is satisfiable (including an empty Decree) - park at the
-// kingdom rather than leaving the party stuck wherever they last were. Not
-// tracked as an active clause, so it never accrues failures.
+// Parks at the kingdom when no clause is satisfiable, rather than leaving the party stuck. Not tracked as an active clause, so it never accrues failures.
 function returnToKingdomFallback(): void {
   setActiveClause(undefined);
   if (isPlayerAtKingdom()) return;
@@ -311,9 +270,7 @@ function advanceToNextClause(): void {
     return;
   }
 
-  // Nothing satisfiable purely because the "wait for full health" gate is
-  // holding it back - stay put and let `restingProcessTick` heal the party
-  // wherever they already are, rather than trekking back to the kingdom.
+  // Blocked only by the health gate - stay put and let `restingProcessTick` heal in place, instead of trekking back to the kingdom.
   if (clauses.some(isClauseBlockedOnlyByHealth)) {
     setActiveClause(undefined);
     return;

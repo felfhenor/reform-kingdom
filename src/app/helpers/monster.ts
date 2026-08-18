@@ -27,11 +27,7 @@ export function monsterXpReward(
   return rngNumberRange(range.min, range.max);
 }
 
-// Explore nodes advertise a level range (e.g. "3-5") as their recommended
-// difficulty, with the max acting as a soft cap. Once the party out-levels
-// it, XP degrades 25% per level over cap, bottoming out at a flat 1 XP once
-// 4+ levels over - keeps overleveled parties from farming trivial nodes for
-// full XP.
+// XP degrades once the party out-levels a node's max, bottoming out at a flat 1 XP - keeps overleveled parties from farming trivial nodes.
 const OVERLEVEL_XP_DEGRADE_PER_LEVEL = 0.25;
 const OVERLEVEL_XP_HARD_CAP_LEVELS = 4;
 const OVERLEVEL_XP_HARD_CAP_AMOUNT = 1;
@@ -54,10 +50,7 @@ export function xpForOverLevel(
   );
 }
 
-// True once `xpForOverLevel` would already be sitting at the flat 1 XP
-// floor for this party/node pairing, regardless of a monster's raw XP value
-// - lets a node be judged not worth the trip before any fight happens (see
-// `mostChallengingExploreNodeForRisk`), rather than only after the fact.
+// Lets a node be judged not worth the trip before any fight happens (see `mostChallengingExploreNodeForRisk`), rather than only after.
 export function isXpTrivialAtOverLevel(
   partyLevel: number,
   nodeMaxLevel: number,
@@ -65,10 +58,7 @@ export function isXpTrivialAtOverLevel(
   return partyLevel - nodeMaxLevel >= OVERLEVEL_XP_HARD_CAP_LEVELS;
 }
 
-// De-dupes and resolves the monsters referenced across a node's fights (used
-// by both authored Encounters and generated ExploreRandom fights, which
-// share the same `{ monsters: EncounterFightMonster[] }` shape), sorted
-// alphabetically for display in the map node panel's monster tooltip.
+// Shared by authored Encounters and generated ExploreRandom fights; sorted alphabetically for the map node panel's monster tooltip.
 export function monstersFromFights(
   fights: Array<{ monsters: EncounterFightMonster[] }>,
 ): MonsterContent[] {

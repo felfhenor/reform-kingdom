@@ -66,13 +66,7 @@ export class GamestateService {
 
     const applicationRef = this.applicationRef;
 
-    // `gameloop` mutates gamestate signals from a background RxJS interval,
-    // outside any Angular-tracked call stack. In this zoneless app nothing
-    // else notices that write happened, so templates/effects reading that
-    // state (health bars, global effect timers, etc.) can silently go stale
-    // until something else happens to trigger change detection. Forcing a
-    // tick here after every gameloop batch is the documented escape hatch
-    // for exactly this "background async work changed signals" case.
+    // `gameloop` mutates signals from a background RxJS interval, untracked in this zoneless app - force a tick so stale UI (health bars, timers) refreshes.
     async function runLoop(numTicks: number) {
       lastRunTime = Date.now();
       await gameloop(numTicks);

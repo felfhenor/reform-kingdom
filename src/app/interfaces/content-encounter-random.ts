@@ -36,15 +36,11 @@ export type EncounterRandomContent = IsContentItem &
 
     creaturePool: EncounterRandomPoolMonster[];
 
-    // Always empty as-authored - the actual fights are rolled at runtime
-    // (see `generateEncounterRandomFights`) and stored in game state, not
-    // here. Kept on the content type for schema/shape parity with
-    // `EncounterContent`.
+    // Always empty as-authored; fights are rolled at runtime (see generateEncounterRandomFights) and stored in game state.
     fights: EncounterFight[];
 
     completionRewards: DroppedReward[];
 
-    // When true, the node's name/level label and map cursor stay hidden
-    // until the player discovers it (see `world-node-discovery.ts`).
+    // When true, name/level label and map cursor stay hidden until discovered (see world-node-discovery.ts).
     hidden?: boolean;
   };

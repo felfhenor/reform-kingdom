@@ -92,9 +92,7 @@ export function combatOrderConditionMatches(
   }
 }
 
-// A Combat Order row references a skill *family* (stable across tiers and
-// source - see content-skill.ts), resolved here against whatever the
-// combatant can actually cast right now.
+// Resolves a skill family (stable across tiers/source) to a currently castable skill.
 export function resolveFamilyToSkill(
   family: string,
   availableSkills: EquipmentSkill[],
@@ -102,11 +100,7 @@ export function resolveFamilyToSkill(
   return availableSkills.find((skill) => skill.family === family);
 }
 
-// Walks a hero's enabled Combat Orders in priority order; the first clause
-// whose skill is both resolvable and condition-matched wins. `RandomSkill`
-// always matches and stops. Returns undefined if nothing matched (e.g. a
-// hand-edited save missing the mandatory trailing clause) - callers should
-// fall back to today's weighted-random selection in that case.
+// First enabled clause that resolves and matches wins; undefined means callers should fall back to weighted-random.
 export function pickSkillFromCombatOrders(
   combat: Combat,
   combatant: Combatant,
@@ -132,10 +126,7 @@ export function pickSkillFromCombatOrders(
   return undefined;
 }
 
-// Edit-time warning helpers - `heroSkills`/`jobOnlySkills` are the caller's
-// already-resolved skill lists (see `heroSkillsWithEquipment`/
-// `heroSkillsAtLevel` in job.ts), kept out of this file to stay pure.
-
+// Edit-time warning helpers; skill lists are resolved by the caller (job.ts) to keep this file pure.
 export function isCombatOrderFamilyKnown(
   family: string,
   heroSkills: EquipmentSkillContent[],

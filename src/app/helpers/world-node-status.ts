@@ -30,10 +30,7 @@ export function worldNodeLevelLabel(levelRange: LevelRange): string {
   return rangeLabel(levelRange);
 }
 
-// Every clickable node type maps to one of three things a player can do at
-// it - this is what the always-on map label (see `pixiIndicatorNodeLabelCreate`)
-// communicates so players can tell interactable nodes apart at a glance
-// without opening each one.
+// What the always-on map label (`pixiIndicatorNodeLabelCreate`) shows so nodes are distinguishable at a glance.
 export function worldNodeInteractionKind(
   entry: WorldNodeEntry,
 ): WorldNodeInteractionKind | undefined {
@@ -54,11 +51,8 @@ export function worldNodeInteractionKind(
   }
 }
 
-// Always resolves the label text/kind regardless of hidden/discovered state
-// - the map renderer (`pixi-map-render.ts`) creates every node's label
-// up front and toggles its visibility live via `isWorldNodeVisible` once
-// discovery state can change without a full map re-render, rather than
-// baking that gating into the text itself.
+// Ignores hidden/discovered state - pixi-map-render.ts creates every label up front and toggles
+// visibility separately via `isWorldNodeVisible`, so discovery changes don't need a full re-render.
 export function worldNodeLabelInfo(
   entry: WorldNodeEntry,
 ): WorldNodeLabelInfo | undefined {
@@ -66,15 +60,10 @@ export function worldNodeLabelInfo(
   if (!kind) return undefined;
 
   const levelRange = worldNodeLevelRange(entry);
-  // A caravan's name is authored as "<Brand Name> - <Branch Name>" (e.g.
-  // "Duchy Trading Caravan - Carrina") - the branch is just the map it's on,
-  // so the map label drops it entirely rather than showing the full
-  // hyphenated name.
+  // Caravan names are authored as "<Brand> - <Branch>"; the branch is just the map, so drop it here.
   const lines =
     kind === 'Trade' ? [caravanBrandName(entry.nodeName)] : [entry.nodeName];
-  // A caravan's level range is shown in the map node panel instead (see
-  // `worldNodeCaravanTraderLevel`/`worldNodeCaravanTradeCounts`) - the
-  // floating map label stays focused on name + reset timer.
+  // Caravan level range shows in the node panel instead; the floating label stays name + timer only.
   if (levelRange && kind !== 'Trade') {
     lines.push(`Lv.${worldNodeLevelLabel(levelRange)}`);
   }

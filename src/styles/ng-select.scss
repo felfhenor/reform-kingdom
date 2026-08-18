@@ -21,11 +21,7 @@
   color: var(--color-base-content);
   border-color: var(--color-base-300) !important;
 
-  // ng-select is configured with appendTo: 'body' globally, which makes it
-  // inline-style the panel's width to match the trigger's width on every
-  // position update. Override with !important so the panel instead grows
-  // to fit its widest option (min-width keeps it from shrinking below the
-  // trigger, since the panel's own inline min-width matches the trigger).
+  // Overrides ng-select's inline width (from global appendTo: 'body') so the panel grows to fit its widest option instead of matching the trigger.
   width: auto !important;
   max-width: min(90vw, 32rem);
   white-space: nowrap;
