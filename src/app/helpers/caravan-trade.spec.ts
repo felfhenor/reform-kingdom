@@ -36,6 +36,10 @@ vi.mock('@helpers/materials', async (importOriginal) => {
   };
 });
 
+vi.mock('@helpers/party', () => ({
+  partyGet: vi.fn(),
+}));
+
 vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(),
 }));
@@ -62,6 +66,7 @@ import {
 import { getCollectibleQuantity, isCollectibleDiscovered } from '@helpers/collectibles';
 import { getEntry } from '@helpers/content';
 import { getGoldQuantity, getMaterialQuantity } from '@helpers/materials';
+import { partyGet } from '@helpers/party';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-nodes';
@@ -334,6 +339,7 @@ describe('caravanTradeDisplay', () => {
       baseStats: { Strength: 5 },
     } as EquipmentContent;
     vi.mocked(getEntry).mockReturnValue(equipment);
+    vi.mocked(partyGet).mockReturnValue([]);
 
     expect(
       caravanTradeDisplay({
@@ -350,6 +356,7 @@ describe('caravanTradeDisplay', () => {
       rarity: 'Rare',
       levelRequirement: 4,
       stats: { Strength: 5 },
+      equippableHeroNames: [],
     });
   });
 

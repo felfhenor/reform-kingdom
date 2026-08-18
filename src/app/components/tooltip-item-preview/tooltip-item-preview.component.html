@@ -15,12 +15,24 @@
           <div class="text-xs mb-2">Lv. {{ item.levelRequirement }}</div>
         }
 
+        @if (item.equippableHeroNames; as equippable) {
+          <div class="text-xs mb-2">
+            @if (equippable.length > 0) {
+              Equippable by: {{ equippable.join(', ') }}
+            } @else {
+              <span class="text-warning">
+                None of your heroes can equip this.
+              </span>
+            }
+          </div>
+        }
+
         <div class="italic text-sm mb-2">
           {{ item.description }}
         </div>
 
         @if (item.stats) {
-          <app-row-item-stats [stats]="item.stats" />
+          <app-row-item-stats [stats]="item.stats" [bonusStats]="bonusStats()" />
         }
 
         <ng-content></ng-content>

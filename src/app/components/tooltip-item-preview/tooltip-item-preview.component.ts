@@ -7,7 +7,7 @@ import {
 import type { TemplateRef } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import type { ItemPreviewDisplay } from '@interfaces';
+import type { ItemPreviewDisplay, StatBlock } from '@interfaces';
 
 // Headless: renders only an `ng-template` and exposes it via `template()`,
 // for callers to hand to `[tp]` on whatever icon markup they render
@@ -21,6 +21,10 @@ import type { ItemPreviewDisplay } from '@interfaces';
 })
 export class TooltipItemPreviewComponent {
   public display = input<ItemPreviewDisplay>();
+  // Extra flat bonus (e.g. from infusions) shown as its own set of rows in
+  // the stats block - see `RowItemStatsComponent.bonusStats`. Only ever
+  // meaningful for equipment, so most callers leave this unset.
+  public bonusStats = input<StatBlock>();
 
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
 }

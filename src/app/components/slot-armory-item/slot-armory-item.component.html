@@ -1,5 +1,23 @@
 @let item = equipment();
 
+<app-tooltip-item-preview
+  #preview
+  [display]="display()"
+  [bonusStats]="infusionBonus()"
+>
+  <div class="text-xs my-2 flex items-center gap-2">
+    Sell value:
+    <app-currency-cost [type]="goldCoinItemId" [amount]="sellValue()" />
+  </div>
+
+  @if (item.slots > 0) {
+    <app-row-infused-materials
+      [infusedItemIds]="equipmentItem().infusedItemIds"
+      [maxSlots]="item.slots"
+    />
+  }
+</app-tooltip-item-preview>
+
 <div
   class="armory-item-slot outline-2 outline-offset-[-2px] rounded outline-{{
     item.rarity
@@ -7,7 +25,7 @@
   [class.armory-item-slot-sellable]="sellMode()"
   [class.armory-item-slot-dimmed]="sellMode() && !selected()"
   [class.armory-item-slot-selected]="sellMode() && selected()"
-  [tp]="tooltip"
+  [tp]="preview.template()"
   [tpPlacement]="'top'"
   (click)="onClick($event)"
 >
@@ -15,52 +33,3 @@
     <app-atlas-image spritesheet="equipment" [assetName]="item.sprite" />
   </app-slot-icon-blank>
 </div>
-
-<ng-template #tooltip>
-  <div class="flex gap-2 p-2">
-    <app-atlas-image
-      spritesheet="equipment"
-      [assetName]="item.sprite"
-      class="armory-item-tooltip-image"
-    />
-    <div>
-      <div class="font-bold mb-1 text-{{ item.rarity }}">
-        {{ item.name }}
-      </div>
-
-      <div class="text-xs mb-2">Lv. {{ item.levelRequirement }}</div>
-
-      <div class="text-xs mb-2">
-        @let equippable = equippableHeroes();
-        @if (equippable.length > 0) {
-          Equippable by: {{ equippableHeroes().join(', ') }}
-        } @else {
-          <span class="text-warning">None of your heroes can equip this.</span>
-        }
-      </div>
-
-      <div class="mb-2">
-        <app-row-item-stats
-          [stats]="item.baseStats"
-          [bonusStats]="infusionBonus()"
-        />
-      </div>
-
-      <div class="italic text-sm max-w-[300px] mb-2">
-        {{ item.description }}
-      </div>
-
-      <div class="text-xs mb-2 flex items-center gap-2">
-        Sell value:
-        <app-currency-cost [type]="goldCoinItemId" [amount]="sellValue()" />
-      </div>
-
-      @if (item.slots > 0) {
-        <app-row-infused-materials
-          [infusedItemIds]="equipmentItem().infusedItemIds"
-          [maxSlots]="item.slots"
-        />
-      }
-    </div>
-  </div>
-</ng-template>

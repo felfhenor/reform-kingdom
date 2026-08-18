@@ -24,4 +24,6 @@ export type ItemPreviewDisplay = {
   stats?: StatBlock;
   // Equipment only.
   levelRequirement?: number;
+  // Equipment only - party hero names whose job can equip this item.
+  equippableHeroNames?: string[];
 };
