@@ -37,6 +37,7 @@ import {
   decreeSetRiskTolerance,
   decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
+  pruneInvalidDecreeGatherClauses,
 } from '@helpers/decree';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { rewardContentInfo } from '@helpers/world-node-rewards';
@@ -620,5 +621,39 @@ describe('decreeClauseSummary', () => {
     expect(
       decreeClauseSummary(buildClause({ type: 'ReturnToKingdom' })),
     ).toBe('Return to the kingdom');
+  });
+});
+
+describe('pruneInvalidDecreeGatherClauses', () => {
+  it('drops a GatherMaterial clause whose material no GatherNode produces', () => {
+    const clauses = [
+      buildClause({
+        type: 'GatherMaterial',
+        materialId: 'wergen-stick' as MaterialId,
+        targetQuantity: 1000,
+      }),
+    ];
+
+    expect(pruneInvalidDecreeGatherClauses(clauses, [])).toEqual([]);
+  });
+
+  it('keeps a GatherMaterial clause whose material is still produced somewhere', () => {
+    const clauses = [
+      buildClause({
+        type: 'GatherMaterial',
+        materialId: 'copper-ore' as MaterialId,
+        targetQuantity: 1000,
+      }),
+    ];
+
+    expect(
+      pruneInvalidDecreeGatherClauses(clauses, ['copper-ore' as MaterialId]),
+    ).toEqual(clauses);
+  });
+
+  it('leaves non-GatherMaterial clauses untouched', () => {
+    const clauses = [buildClause({ type: 'ReturnToKingdom' })];
+
+    expect(pruneInvalidDecreeGatherClauses(clauses, [])).toEqual(clauses);
   });
 });

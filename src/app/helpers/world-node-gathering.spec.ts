@@ -12,6 +12,10 @@ vi.mock('@helpers/gather-node-discovery', () => ({
   isGatherNodeDiscovered: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/materials', () => ({
+  isMaterialDiscovered: vi.fn(() => true),
+}));
+
 vi.mock('@helpers/world-node-discovery', () => ({
   isWorldNodeDiscovered: vi.fn(() => false),
   worldNodeDiscover: vi.fn(),
@@ -20,8 +24,12 @@ vi.mock('@helpers/world-node-discovery', () => ({
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
 import { setAllMaps } from '@helpers/maps';
+import { isMaterialDiscovered } from '@helpers/materials';
 import { isWorldNodeDiscovered } from '@helpers/world-node-discovery';
-import { gatherableMaterialIds } from '@helpers/world-node-gathering';
+import {
+  allGatherableMaterialIds,
+  gatherableMaterialIds,
+} from '@helpers/world-node-gathering';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {
@@ -227,5 +235,72 @@ describe('gatherableMaterialIds', () => {
     vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
 
     expect(gatherableMaterialIds()).toEqual(['wood']);
+  });
+
+  it('excludes a material from a discovered node until it has actually been obtained', () => {
+    const gathering = buildGathering({
+      gatherResults: [
+        { chance: 50, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
+        { chance: 50, items: [{ itemId: 'sap' as ItemId, quantity: 1 }] },
+      ],
+    });
+
+    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
+    setAllContentById(new Map([['gather-1', gathering]]));
+
+    const map = buildMap({
+      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
+    vi.mocked(isMaterialDiscovered).mockImplementation((id) => id === 'wood');
+
+    expect(gatherableMaterialIds()).toEqual(['wood']);
+
+    vi.mocked(isMaterialDiscovered).mockReturnValue(true);
+  });
+});
+
+describe('allGatherableMaterialIds', () => {
+  function buildGathering(
+    overrides: Partial<GatheringContent> = {},
+  ): GatheringContent {
+    return {
+      id: 'gather-1' as GatheringId,
+      name: 'Wergen Woods',
+      __type: 'gathering',
+      description: 'A dry forest.',
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherTime: 10,
+      gatherResults: [
+        {
+          chance: 100,
+          items: [{ itemId: 'wood' as ItemId, quantity: 1 }],
+        },
+      ],
+      ...overrides,
+    } as GatheringContent;
+  }
+
+  it('includes materials from GatherNodes the player has not discovered', () => {
+    const woodGathering = buildGathering();
+
+    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
+    setAllContentById(new Map([['gather-1', woodGathering]]));
+
+    const map = buildMap({
+      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(isGatherNodeDiscovered).mockReturnValue(false);
+
+    expect(allGatherableMaterialIds()).toEqual(['wood']);
+  });
+
+  it('returns nothing when no GatherNodes exist', () => {
+    setAllMaps(new Map());
+
+    expect(allGatherableMaterialIds()).toEqual([]);
   });
 });

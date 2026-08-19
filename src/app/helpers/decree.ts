@@ -9,10 +9,25 @@ import type {
   DecreeClauseId,
   DecreeRiskLevel,
   ItemContent,
+  MaterialId,
 } from '@interfaces';
 
 export function decreeClauses(): DecreeClause[] {
   return gamestate().world.autoMode.clauses;
+}
+
+// Drops clauses whose material no GatherNode produces anymore (post-rebalance) - unlike an
+// undiscovered/unreachable node, exploring more can never fix this, so it's safe to prune.
+export function pruneInvalidDecreeGatherClauses(
+  clauses: DecreeClause[],
+  gatherableMaterialIds: MaterialId[],
+): DecreeClause[] {
+  const gatherable = new Set(gatherableMaterialIds);
+
+  return clauses.filter(
+    (clause) =>
+      clause.type !== 'GatherMaterial' || gatherable.has(clause.materialId),
+  );
 }
 
 export function decreeRiskTolerance(): DecreeRiskLevel {

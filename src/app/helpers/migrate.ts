@@ -12,6 +12,7 @@ import {
 } from '@helpers/collectibles';
 import { retrofitPartyXp } from '@helpers/character-progress';
 import { pruneInvalidCraftQueues } from '@helpers/crafting';
+import { pruneInvalidDecreeGatherClauses } from '@helpers/decree';
 import { defaultGameState } from '@helpers/defaults';
 import {
   backfillEquipmentBlock,
@@ -30,6 +31,7 @@ import {
   retrofitTradeskillXp,
 } from '@helpers/tradeskill';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node-discovery';
+import { allGatherableMaterialIds } from '@helpers/world-node-gathering';
 import {
   gamestate,
   gamestateTickEnd,
@@ -93,6 +95,10 @@ export function migrateGameState() {
   newState.worldDiscoveries = pruneInvalidWorldDiscoveries(
     newState.worldDiscoveries,
     (nodeName) => !!worldNodeByName(nodeName),
+  );
+  newState.world.autoMode.clauses = pruneInvalidDecreeGatherClauses(
+    newState.world.autoMode.clauses,
+    allGatherableMaterialIds(),
   );
   newState.bestiary = pruneInvalidBestiaryEntries(newState.bestiary);
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);

@@ -31,6 +31,10 @@ vi.mock('@helpers/crafting', () => ({
   pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
 }));
 
+vi.mock('@helpers/decree', () => ({
+  pruneInvalidDecreeGatherClauses: vi.fn((clauses) => clauses),
+}));
+
 vi.mock('@helpers/equipment', () => ({
   backfillEquipmentItem: vi.fn((item) => item),
   backfillEquipmentBlock: vi.fn((equipment) => equipment),
@@ -67,7 +71,7 @@ vi.mock('@helpers/defaults', () => ({
     discoveredGatherNodes: {},
     worldDiscoveries: {},
     bestiary: {},
-    world: { party: [] },
+    world: { party: [], autoMode: { clauses: [] } },
   })),
 }));
 
@@ -83,6 +87,10 @@ vi.mock('@helpers/world-nodes', () => ({
 
 vi.mock('@helpers/world-node-discovery', () => ({
   pruneInvalidWorldDiscoveries: vi.fn((discovered) => discovered),
+}));
+
+vi.mock('@helpers/world-node-gathering', () => ({
+  allGatherableMaterialIds: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -108,6 +116,7 @@ import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
+import { pruneInvalidDecreeGatherClauses } from '@helpers/decree';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
@@ -119,8 +128,9 @@ import {
   migrateTradeskillStateKeys,
   retrofitTradeskillXp,
 } from '@helpers/tradeskill';
+import { allGatherableMaterialIds } from '@helpers/world-node-gathering';
 import { worldNodesOfType } from '@helpers/world-nodes';
-import type { WorldNodeEntry } from '@interfaces';
+import type { DecreeClause, DecreeClauseId, WorldNodeEntry } from '@interfaces';
 
 describe('migrateGameState', () => {
   beforeEach(() => {
@@ -368,6 +378,42 @@ describe('migrateGameState', () => {
     expect(committed.discoveredGatherNodes).toEqual({
       'Wergen Woods': { foundAt: 1000 },
     });
+  });
+
+  it('prunes decree GatherMaterial clauses no GatherNode can satisfy anymore', () => {
+    const staleClauses = [
+      {
+        id: 'clause-1' as DecreeClauseId,
+        type: 'GatherMaterial',
+        materialId: 'wergen-stick' as MaterialId,
+        targetQuantity: 1000,
+        enabled: true,
+        failureCount: 0,
+      } as DecreeClause,
+    ];
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: {},
+      world: { party: [], autoMode: { clauses: staleClauses } },
+    } as unknown as GameState);
+
+    vi.mocked(allGatherableMaterialIds).mockReturnValue([]);
+    vi.mocked(pruneInvalidDecreeGatherClauses).mockReturnValue([]);
+
+    migrateGameState();
+
+    expect(pruneInvalidDecreeGatherClauses).toHaveBeenCalledWith(
+      staleClauses,
+      [],
+    );
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.world.autoMode.clauses).toEqual([]);
   });
 
   it('relocates the party off an unwalkable current location before committing', () => {
