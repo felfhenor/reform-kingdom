@@ -4,13 +4,15 @@ import {
   encounterRandomTimerLabel,
 } from '@helpers/encounter-random';
 import { monstersFromFights } from '@helpers/monster';
+import { gamestate } from '@helpers/state-game';
 import { worldNodeEncounter, worldNodeEncounterRandom } from '@helpers/world-nodes';
 import type {
   EncounterRandomFight,
   MonsterContent,
+  WorldNodeEncounterProgress,
   WorldNodeEntry,
 } from '@interfaces';
-import { sumBy } from 'es-toolkit/compat';
+import { clamp, sumBy } from 'es-toolkit/compat';
 
 export function worldNodeExploreRandomIsAvailable(
   entry: WorldNodeEntry,
@@ -59,6 +61,24 @@ export function worldNodeMonsterCount(
 
   const fights = worldNodeExploreRandomFights(entry);
   return fights ? sumBy(fights, (fight) => fight.monsters.length) : undefined;
+}
+
+// `combat.fightIndex` is 0-based (the fight in progress) and doubles as the fights-cleared count.
+export function worldNodeEncounterProgress(
+  entry: WorldNodeEntry,
+): WorldNodeEncounterProgress | undefined {
+  const combat = gamestate().world.combat;
+  if (!combat || combat.locationName !== entry.nodeName) return undefined;
+
+  const total = worldNodeEncounterCount(entry);
+  if (!total || total <= 0) return undefined;
+
+  const fightIndex = combat.fightIndex ?? 0;
+  return {
+    current: fightIndex + 1,
+    total,
+    fraction: clamp(fightIndex / total, 0, 1),
+  };
 }
 
 export function worldNodeMonsters(entry: WorldNodeEntry): MonsterContent[] {

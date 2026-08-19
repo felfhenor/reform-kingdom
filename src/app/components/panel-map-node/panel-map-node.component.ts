@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
-import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
 import { PanelMapNodeBadgesCaravanComponent } from '@components/panel-map-node-badges-caravan/panel-map-node-badges-caravan.component';
 import { PanelMapNodeBadgesExploreComponent } from '@components/panel-map-node-badges-explore/panel-map-node-badges-explore.component';
 import { PanelMapNodeBadgesGatherComponent } from '@components/panel-map-node-badges-gather/panel-map-node-badges-gather.component';
+import { PanelMapNodeStatusEncounterComponent } from '@components/panel-map-node-status-encounter/panel-map-node-status-encounter.component';
+import { PanelMapNodeStatusGatherComponent } from '@components/panel-map-node-status-gather/panel-map-node-status-gather.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotGatherMaterialComponent } from '@components/slot-gather-material/slot-gather-material.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
@@ -57,10 +58,11 @@ import { sortBy, sum } from 'es-toolkit/compat';
     SlotGatherMaterialComponent,
     PanelMapNodeActionsCaravanComponent,
     PanelMapNodeActionsExploreComponent,
-    PanelMapNodeActionsGatherComponent,
     PanelMapNodeBadgesCaravanComponent,
     PanelMapNodeBadgesExploreComponent,
     PanelMapNodeBadgesGatherComponent,
+    PanelMapNodeStatusEncounterComponent,
+    PanelMapNodeStatusGatherComponent,
     SpriteNodeComponent,
     SFXDirective,
   ],

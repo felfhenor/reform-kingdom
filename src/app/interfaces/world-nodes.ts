@@ -34,6 +34,13 @@ export type WorldNodeCompletionRewardProgress = {
   total: number;
 };
 
+// `current` is 1-based (the fight in progress); `total` is the encounter's fight count.
+export type WorldNodeEncounterProgress = {
+  current: number;
+  total: number;
+  fraction: number;
+};
+
 export type WorldNodeLabelInfo = {
   kind: WorldNodeInteractionKind;
   text: string;

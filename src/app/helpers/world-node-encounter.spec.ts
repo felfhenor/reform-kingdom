@@ -11,12 +11,19 @@ vi.mock('@helpers/world-node-discovery', () => ({
   worldNodeDiscover: vi.fn(),
 }));
 
+vi.mock('@helpers/state-game', () => ({
+  gamestate: vi.fn(),
+}));
+
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { gamestate } from '@helpers/state-game';
 import { isWorldNodeDiscovered } from '@helpers/world-node-discovery';
 import {
+  worldNodeEncounterProgress,
   worldNodeMonsterCount,
   worldNodeMonsters,
 } from '@helpers/world-node-encounter';
+import type { Combat, GameState } from '@interfaces';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {
@@ -75,6 +82,9 @@ describe('encounter-backed node accessors', () => {
     setAllIdsByName(new Map());
     setAllContentById(new Map());
     vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+    vi.mocked(gamestate).mockReturnValue({
+      world: { combat: undefined },
+    } as unknown as GameState);
   });
 
   describe('worldNodeMonsterCount', () => {
@@ -142,6 +152,61 @@ describe('encounter-backed node accessors', () => {
 
     it('returns an empty array when there is no matching encounter', () => {
       expect(worldNodeMonsters(buildEntry())).toEqual([]);
+    });
+  });
+
+  describe('worldNodeEncounterProgress', () => {
+    function mockCombat(combat: Partial<Combat> | undefined): void {
+      vi.mocked(gamestate).mockReturnValue({
+        world: { combat },
+      } as unknown as GameState);
+    }
+
+    it('returns the 1-based current fight and total when combat is at this node', () => {
+      seedEncounter(
+        buildEncounter({
+          fights: [{ monsters: [] }, { monsters: [] }, { monsters: [] }],
+        }),
+      );
+      mockCombat({ locationName: 'Forest Ruins', fightIndex: 1 });
+
+      expect(worldNodeEncounterProgress(buildEntry())).toEqual({
+        current: 2,
+        total: 3,
+        fraction: 1 / 3,
+      });
+    });
+
+    it('defaults fightIndex to 0 when undefined', () => {
+      seedEncounter(
+        buildEncounter({ fights: [{ monsters: [] }, { monsters: [] }] }),
+      );
+      mockCombat({ locationName: 'Forest Ruins', fightIndex: undefined });
+
+      expect(worldNodeEncounterProgress(buildEntry())).toEqual({
+        current: 1,
+        total: 2,
+        fraction: 0,
+      });
+    });
+
+    it('returns undefined when there is no active combat', () => {
+      mockCombat(undefined);
+
+      expect(worldNodeEncounterProgress(buildEntry())).toBeUndefined();
+    });
+
+    it('returns undefined when combat is at a different node', () => {
+      seedEncounter(buildEncounter({ fights: [{ monsters: [] }] }));
+      mockCombat({ locationName: 'Somewhere Else', fightIndex: 0 });
+
+      expect(worldNodeEncounterProgress(buildEntry())).toBeUndefined();
+    });
+
+    it('returns undefined when the node has no encounter fights', () => {
+      mockCombat({ locationName: 'Forest Ruins', fightIndex: 0 });
+
+      expect(worldNodeEncounterProgress(buildEntry())).toBeUndefined();
     });
   });
 });

@@ -9,7 +9,10 @@
   padding: 1rem;
 }
 
-.map-node-panel {
+.map-node-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   width: 32rem;
   max-width: calc(100% - 2rem);
 }

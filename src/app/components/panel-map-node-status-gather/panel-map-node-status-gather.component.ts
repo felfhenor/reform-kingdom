@@ -1,0 +1,13 @@
+import { DecimalPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+
+@Component({
+  selector: 'app-panel-map-node-status-gather',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DecimalPipe],
+  templateUrl: './panel-map-node-status-gather.component.html',
+  styleUrl: './panel-map-node-status-gather.component.scss',
+})
+export class PanelMapNodeStatusGatherComponent {
+  public gatherProgressPercent = input.required<number>();
+}
