@@ -234,16 +234,63 @@
             </span>
 
             <div class="flex gap-2 items-center">
-              <input
-                type="number"
-                class="input input-xs w-16"
-                min="1"
-                [max]="entry.maxCraftable"
-                [value]="quantity"
-                (input)="
-                  onQuantityInput($event, entry.recipe.id, entry.maxCraftable)
-                "
-              />
+              <div class="join">
+                <button
+                  class="btn btn-xs btn-secondary"
+                  [disabled]="
+                    uncraftable || full || quantitySelector.valueAsNumber === 1
+                  "
+                  (click)="quantitySelector.stepDown(10)"
+                >
+                  -10
+                </button>
+
+                <button
+                  class="btn btn-xs btn-secondary"
+                  [disabled]="
+                    uncraftable || full || quantitySelector.valueAsNumber === 1
+                  "
+                  (click)="quantitySelector.stepDown(1)"
+                >
+                  -1
+                </button>
+
+                <input
+                  #quantitySelector
+                  type="number"
+                  class="input input-xs w-16"
+                  min="1"
+                  [max]="entry.maxCraftable"
+                  [value]="quantity"
+                  (input)="
+                    onQuantityInput($event, entry.recipe.id, entry.maxCraftable)
+                  "
+                />
+
+                <button
+                  class="btn btn-xs btn-secondary"
+                  [disabled]="
+                    uncraftable ||
+                    full ||
+                    quantitySelector.valueAsNumber === entry.maxCraftable
+                  "
+                  (click)="quantitySelector.stepUp(1)"
+                >
+                  +1
+                </button>
+
+                <button
+                  class="btn btn-xs btn-secondary"
+                  [disabled]="
+                    uncraftable ||
+                    full ||
+                    quantitySelector.valueAsNumber === entry.maxCraftable
+                  "
+                  (click)="quantitySelector.stepUp(10)"
+                >
+                  +10
+                </button>
+              </div>
 
               <button
                 class="btn btn-xs btn-primary"
