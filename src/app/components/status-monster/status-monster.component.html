@@ -1,0 +1,14 @@
+@if (rows().length > 0) {
+  <div class="monster-rows">
+    @for (row of rows(); track $index) {
+      <div class="monster-row">
+        @for (entry of row; track entry.combatantId) {
+          <app-card-status-combatant
+            [entry]="entry"
+            [expanded]="expanded()"
+          ></app-card-status-combatant>
+        }
+      </div>
+    }
+  </div>
+}

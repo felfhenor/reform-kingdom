@@ -20,6 +20,7 @@ export * from './combat-log';
 export * from './combat-order';
 export * from './combat-order-evaluation';
 export * from './combat-rewards';
+export * from './combat-skill-events';
 export * from './combat-stats';
 export * from './combat-statuseffects';
 export * from './combat-targetting';

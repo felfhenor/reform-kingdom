@@ -1,44 +1,44 @@
 import {
-  heroDamageEventEmit,
-  heroDamageEvents,
-  heroDamageEventsClear,
+  combatantDamageEventEmit,
+  combatantDamageEvents,
+  combatantDamageEventsClear,
 } from '@helpers/combat-damage-events';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-describe('heroDamageEventEmit', () => {
+describe('combatantDamageEventEmit', () => {
   beforeEach(() => {
-    heroDamageEvents.set([]);
+    combatantDamageEvents.set([]);
   });
 
-  it('appends a new event with the given characterId and amount', () => {
-    heroDamageEventEmit('hero-1', -25);
+  it('appends a new event with the given combatantId and amount', () => {
+    combatantDamageEventEmit('hero-1', -25);
 
-    const events = heroDamageEvents();
+    const events = combatantDamageEvents();
     expect(events).toHaveLength(1);
-    expect(events[0]).toMatchObject({ characterId: 'hero-1', amount: -25 });
+    expect(events[0]).toMatchObject({ combatantId: 'hero-1', amount: -25 });
   });
 
   it('assigns each emitted event a unique id', () => {
-    heroDamageEventEmit('hero-1', -25);
-    heroDamageEventEmit('hero-1', -10);
+    combatantDamageEventEmit('hero-1', -25);
+    combatantDamageEventEmit('hero-1', -10);
 
-    const [first, second] = heroDamageEvents();
+    const [first, second] = combatantDamageEvents();
     expect(first.id).not.toBe(second.id);
   });
 });
 
-describe('heroDamageEventsClear', () => {
+describe('combatantDamageEventsClear', () => {
   beforeEach(() => {
-    heroDamageEvents.set([]);
+    combatantDamageEvents.set([]);
   });
 
   it('removes only the events matching the given ids', () => {
-    heroDamageEventEmit('hero-1', -25);
-    heroDamageEventEmit('hero-2', 15);
+    combatantDamageEventEmit('hero-1', -25);
+    combatantDamageEventEmit('hero-2', 15);
 
-    const [toRemove, toKeep] = heroDamageEvents();
-    heroDamageEventsClear([toRemove.id]);
+    const [toRemove, toKeep] = combatantDamageEvents();
+    combatantDamageEventsClear([toRemove.id]);
 
-    expect(heroDamageEvents()).toEqual([toKeep]);
+    expect(combatantDamageEvents()).toEqual([toKeep]);
   });
 });

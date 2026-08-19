@@ -46,6 +46,7 @@ export * from './sfx';
 export * from './stat';
 export * from './state-game';
 export * from './state-options';
+export * from './status-card';
 export * from './storage';
 export * from './tiled-map';
 export * from './timer';

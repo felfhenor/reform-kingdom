@@ -2,7 +2,7 @@ import {
   combatApplySkillToTarget,
   combatCombatantTakeDamage,
 } from '@helpers/combat-damage';
-import { heroDamageEvents } from '@helpers/combat-damage-events';
+import { combatantDamageEvents } from '@helpers/combat-damage-events';
 import type {
   Combat,
   Combatant,
@@ -280,16 +280,16 @@ describe('combatApplySkillToTarget defense', () => {
 
 describe('combatCombatantTakeDamage', () => {
   beforeEach(() => {
-    heroDamageEvents.set([]);
+    combatantDamageEvents.set([]);
   });
 
-  it('emits a hero damage event with the sign flipped for a hero taking damage', () => {
+  it('emits a damage event with the sign flipped for a hero taking damage', () => {
     const hero = buildCombatant({ isEnemy: false, hp: 100 });
 
     combatCombatantTakeDamage(hero, 25);
 
-    expect(heroDamageEvents()).toMatchObject([
-      { characterId: hero.id, amount: -25 },
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: hero.id, amount: -25 },
     ]);
   });
 
@@ -298,17 +298,19 @@ describe('combatCombatantTakeDamage', () => {
 
     combatCombatantTakeDamage(hero, -25);
 
-    expect(heroDamageEvents()).toMatchObject([
-      { characterId: hero.id, amount: 25 },
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: hero.id, amount: 25 },
     ]);
   });
 
-  it('does not emit an event for an enemy combatant', () => {
+  it('emits a damage event for an enemy combatant too', () => {
     const enemy = buildCombatant({ isEnemy: true, hp: 100 });
 
     combatCombatantTakeDamage(enemy, 25);
 
-    expect(heroDamageEvents()).toHaveLength(0);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: enemy.id, amount: -25 },
+    ]);
   });
 
   it('does not emit an event when the amount is zero', () => {
@@ -316,6 +318,6 @@ describe('combatCombatantTakeDamage', () => {
 
     combatCombatantTakeDamage(hero, 0);
 
-    expect(heroDamageEvents()).toHaveLength(0);
+    expect(combatantDamageEvents()).toHaveLength(0);
   });
 });

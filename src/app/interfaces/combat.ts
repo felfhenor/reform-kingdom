@@ -84,9 +84,17 @@ export type Combat = {
   fightIndex?: number;
 };
 
-// A hero HP change, pushed to heroDamageEvents to show a floating +/- number; amount is signed for display (positive = heal).
-export type HeroDamageEvent = {
+// A combatant HP change, pushed to combatantDamageEvents to show a floating +/- number; amount is signed for display (positive = heal).
+export type CombatantDamageEvent = {
   id: string;
-  characterId: string;
+  combatantId: string;
   amount: number;
+};
+
+// Pushed when a combatant resolves which skill to use for their turn, to flash the skill's icon/name on their status card.
+export type CombatantSkillCastEvent = {
+  id: string;
+  combatantId: string;
+  skillName: string;
+  skillSprite: string;
 };

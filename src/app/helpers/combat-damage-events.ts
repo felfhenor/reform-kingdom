@@ -1,22 +1,24 @@
 import { signal } from '@angular/core';
 import { rngUuid } from '@helpers/rng';
-import type { HeroDamageEvent } from '@interfaces';
+import type { CombatantDamageEvent } from '@interfaces';
 
-// Pushed to whenever a hero combatant's HP changes (damage or healing) via
-// `combatCombatantTakeDamage` - drained by the hero status bar component to
-// show a floating +/- number above whichever hero was hit or healed.
-export const heroDamageEvents = signal<HeroDamageEvent[]>([]);
+// Pushed by `combatCombatantTakeDamage` on any HP change - drained by the
+// status card component to show a floating +/- number.
+export const combatantDamageEvents = signal<CombatantDamageEvent[]>([]);
 
-export function heroDamageEventEmit(characterId: string, amount: number): void {
-  heroDamageEvents.update((events) => [
+export function combatantDamageEventEmit(
+  combatantId: string,
+  amount: number,
+): void {
+  combatantDamageEvents.update((events) => [
     ...events,
-    { id: rngUuid(), characterId, amount },
+    { id: rngUuid(), combatantId, amount },
   ]);
 }
 
-export function heroDamageEventsClear(ids: string[]): void {
+export function combatantDamageEventsClear(ids: string[]): void {
   const idSet = new Set(ids);
-  heroDamageEvents.update((events) =>
+  combatantDamageEvents.update((events) =>
     events.filter((event) => !idSet.has(event.id)),
   );
 }

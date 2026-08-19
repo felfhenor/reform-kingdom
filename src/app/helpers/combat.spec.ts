@@ -43,6 +43,7 @@ vi.mock('@helpers/combat-targetting', () => ({
 vi.mock('@helpers/rng', () => ({
   rngChoiceWeighted: vi.fn(),
   rngSucceedsChance: vi.fn(() => false),
+  rngUuid: vi.fn(() => 'uuid'),
 }));
 
 vi.mock('@helpers/skill', () => ({
@@ -56,6 +57,7 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { combatantTakeTurn } from '@helpers/combat';
+import { combatantSkillCastEvents } from '@helpers/combat-skill-events';
 import { pickSkillFromCombatOrders } from '@helpers/combat-order-evaluation';
 import { combatAvailableSkillsForCombatant } from '@helpers/combat-targetting';
 import { rngChoiceWeighted } from '@helpers/rng';
@@ -126,9 +128,31 @@ function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  combatantSkillCastEvents.set([]);
 });
 
 describe('combatantTakeTurn skill selection', () => {
+  it('emits a skill-cast event for the chosen skill', () => {
+    const weightedSkill = buildSkill({
+      id: 'weighted' as never,
+      name: 'Fireball',
+      sprite: '0042',
+    });
+
+    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
+      weightedSkill,
+    ]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(weightedSkill);
+
+    const combatant = buildCombatant({ id: 'caster-1', combatOrders: [] });
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatantSkillCastEvents()).toMatchObject([
+      { combatantId: 'caster-1', skillName: 'Fireball', skillSprite: '0042' },
+    ]);
+  });
+
   it('uses the Combat Orders pick when the hero has configured orders', () => {
     const orderedSkill = buildSkill({
       id: 'ordered' as never,

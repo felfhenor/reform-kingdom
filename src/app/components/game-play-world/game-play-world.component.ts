@@ -10,7 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-global-effect.component';
-import { StatusHeroComponent } from '@components/status-hero/status-hero.component';
+import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
 import { getEntry } from '@helpers/content';
 import { gatheringProgressFraction, isGathering } from '@helpers/gathering';
@@ -82,7 +82,7 @@ const FADE_DURATION_MS = 300;
   imports: [
     PanelMapNodeComponent,
     BarGlobalEffectComponent,
-    StatusHeroComponent,
+    StatusEncounterComponent,
   ],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
@@ -97,7 +97,7 @@ const FADE_DURATION_MS = 300;
     <app-bar-global-effect class="global-effect-bar"></app-bar-global-effect>
     <app-panel-map-node></app-panel-map-node>
 
-    <app-status-hero class="hero-status-layer"></app-status-hero>
+    <app-status-encounter class="encounter-status-layer"></app-status-encounter>
   `,
   styleUrl: './game-play-world.component.scss',
 })

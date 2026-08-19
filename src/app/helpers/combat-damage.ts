@@ -1,4 +1,4 @@
-import { heroDamageEventEmit } from '@helpers/combat-damage-events';
+import { combatantDamageEventEmit } from '@helpers/combat-damage-events';
 import { combatantIsDead } from '@helpers/combat-end';
 import { combatFormatMessage, combatMessageLog } from '@helpers/combat-log';
 import { combatCombatantCombatStatValue } from '@helpers/combat-stats';
@@ -97,9 +97,9 @@ export function combatCombatantTakeDamage(
 ) {
   combatant.hp = clamp(combatant.hp - damage, 0, combatant.totalStats.Health);
 
-  // Sign flipped so positive damage shows as "-"; only heroes get a floating number (no status bar for monsters).
-  if (!combatant.isEnemy && damage !== 0) {
-    heroDamageEventEmit(combatant.id, -damage);
+  // Sign flipped so positive damage shows as "-".
+  if (damage !== 0) {
+    combatantDamageEventEmit(combatant.id, -damage);
   }
 }
 

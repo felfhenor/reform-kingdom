@@ -1,0 +1,78 @@
+@let isExpanded = expanded();
+@let data = entry();
+
+<div
+  class="status-entry"
+  [class.expanded]="isExpanded"
+  [class.dead]="data.isDead"
+>
+  @let damageNumbers = damageNumbersByCombatant().get(data.combatantId);
+  @if (damageNumbers && damageNumbers.length > 0) {
+    <div class="damage-numbers">
+      @for (num of damageNumbers; track num.event.id) {
+        <span
+          class="damage-number"
+          [class.heal]="num.event.amount > 0"
+          [class.damage]="num.event.amount < 0"
+          [style.left.%]="xOffsetPercent(num.xOffsetSeed)"
+        >
+          {{ num.event.amount > 0 ? '+' : '' }}{{ num.event.amount | number }}
+        </span>
+      }
+    </div>
+  }
+
+  <div class="entry-top">
+    <div class="entry-sprite">
+      <app-atlas-animation
+        [spritesheet]="data.spritesheet"
+        [assetName]="data.spriteAssetName"
+        [frames]="data.spriteFrames"
+      ></app-atlas-animation>
+    </div>
+
+    @if (isExpanded) {
+      <div class="entry-details">
+        <span class="entry-name">{{ data.name }}</span>
+        @if (data.subtitleLabel) {
+          <span class="entry-subtitle text-lighter">
+            Lv. {{ data.subtitleLevel | number }} {{ data.subtitleLabel }}
+          </span>
+        }
+
+        <!-- Always rendered (fixed height) so a skill flashing in/out never reflows the name/subtitle above it. -->
+        <span class="skill-cast-slot">
+          @let skillCast = skillCastByCombatant().get(data.combatantId);
+          @if (skillCast) {
+            <span class="skill-cast">
+              <app-atlas-image
+                class="zoom-inline"
+                spritesheet="skill"
+                [assetName]="skillCast.skillSprite"
+              />
+              {{ skillCast.skillName }}
+            </span>
+          }
+        </span>
+      </div>
+    }
+  </div>
+
+  <div class="entry-bars">
+    @for (bar of data.bars; track $index) {
+      <div
+        class="bar"
+        [class.small]="!isExpanded"
+        [class.bar-hp]="bar.variant === 'hp'"
+        [class.bar-xp]="bar.variant === 'xp'"
+      >
+        <div class="bar-inner" [style.width.%]="bar.percent"></div>
+        @if (isExpanded) {
+          <span class="bar-label">
+            {{ bar.current | number }} / {{ bar.max | number }}
+          </span>
+        }
+      </div>
+    }
+  </div>
+</div>

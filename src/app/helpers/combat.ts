@@ -13,6 +13,7 @@ import {
   combatMessageLog,
   endCombatLogCommits,
 } from '@helpers/combat-log';
+import { combatantSkillCastEventEmit } from '@helpers/combat-skill-events';
 import {
   combatCanTakeTurn,
   combatHandleCombatantStatusEffects,
@@ -149,6 +150,11 @@ export function combatantTakeTurn(
   }
 
   combatantMarkSkillUse(combatant, chosenSkill);
+  combatantSkillCastEventEmit(
+    combatant.id,
+    chosenSkill.name,
+    chosenSkill.sprite,
+  );
 
   // Capture the creator's stats before any modifications from this skill
   const capturedCreatorStats = { ...combatant.totalStats };

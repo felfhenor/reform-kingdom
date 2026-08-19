@@ -2,101 +2,69 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
-  signal,
-  untracked,
+  input,
 } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
-import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
+import { currentCombat } from '@helpers/combat';
 import { getEntry } from '@helpers/content';
-import {
-  heroDamageEvents,
-  heroDamageEventsClear,
-} from '@helpers/combat-damage-events';
 import { partyGet } from '@helpers/party';
-import { getOption } from '@helpers/state-options';
-import type { Character, HeroDamageEvent, JobContent } from '@interfaces';
+import type { Combatant, JobContent, StatusCardEntry } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-
-type HeroStatusEntry = {
-  character: Character;
-  job: JobContent | undefined;
-  hpPercent: number;
-  xpPercent: number;
-  isDead: boolean;
-};
-
-// How long a floating damage/heal number stays on screen before being
-// removed - must match the CSS animation duration in the stylesheet so the
-// number doesn't pop out mid-fade.
-const DAMAGE_NUMBER_LIFETIME_MS = 1100;
 
 @Component({
   selector: 'app-status-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, IconJobComponent],
+  imports: [CardStatusCombatantComponent],
   templateUrl: './status-hero.component.html',
   styleUrl: './status-hero.component.scss',
 })
 export class StatusHeroComponent {
-  // Only used when `partyViewAutoCollapse` is on - otherwise the party view
-  // stays expanded regardless of hover state.
-  private isHovered = signal(false);
+  public expanded = input<boolean>(false);
 
-  public isExpanded = computed(
-    () => !getOption('partyViewAutoCollapse') || this.isHovered(),
-  );
+  public entries = computed<StatusCardEntry[]>(() => {
+    // HP lives on the live `Combatant` during a fight - `Character.hp` only
+    // resyncs once combat ends, so it'd show stale HP for the whole fight.
+    const liveCombatantsById = new Map<string, Combatant>(
+      (currentCombat()?.heroes ?? []).map((combatant) => [
+        combatant.id,
+        combatant,
+      ]),
+    );
 
-  public setHovered(hovered: boolean): void {
-    this.isHovered.set(hovered);
-  }
-
-  public heroes = computed<HeroStatusEntry[]>(() =>
-    partyGet().map((character) => {
-      const maxHp = Math.max(character.stats.Health, 1);
+    return partyGet().map((character) => {
+      const live = liveCombatantsById.get(character.id);
+      const hp = live?.hp ?? character.hp;
+      const maxHp = Math.max(
+        live?.totalStats.Health ?? character.stats.Health,
+        1,
+      );
       const maxXp = Math.max(character.xp.maximum, 1);
+      const job = getEntry<JobContent>(character.jobId);
 
       return {
-        character,
-        job: getEntry<JobContent>(character.jobId),
-        hpPercent: clamp((character.hp / maxHp) * 100, 0, 100),
-        xpPercent: clamp((character.xp.current / maxXp) * 100, 0, 100),
-        isDead: character.hp <= 0,
+        combatantId: character.id,
+        name: character.name,
+        subtitleLevel: character.level,
+        subtitleLabel: job?.name ?? '',
+        spritesheet: 'job',
+        spriteAssetName: job?.sprite ?? '',
+        spriteFrames: job?.frames ?? 4,
+        isDead: hp <= 0,
+        bars: [
+          {
+            variant: 'hp',
+            percent: clamp((hp / maxHp) * 100, 0, 100),
+            current: hp,
+            max: maxHp,
+          },
+          {
+            variant: 'xp',
+            percent: clamp((character.xp.current / maxXp) * 100, 0, 100),
+            current: character.xp.current,
+            max: maxXp,
+          },
+        ],
       };
-    }),
-  );
-
-  // Always rendered regardless of `isExpanded`, so something still shows when the bar is collapsed.
-  private displayedDamageNumbers = signal<HeroDamageEvent[]>([]);
-
-  public damageNumbersByHero = computed(() => {
-    const grouped = new Map<string, HeroDamageEvent[]>();
-    this.displayedDamageNumbers().forEach((entry) => {
-      const existing = grouped.get(entry.characterId) ?? [];
-      grouped.set(entry.characterId, [...existing, entry]);
     });
-    return grouped;
   });
-
-  constructor() {
-    // Drains the shared queue in the same pass it displays it; `untracked` avoids self-retrigger off its own write.
-    effect(() => {
-      const events = heroDamageEvents();
-      if (events.length === 0) return;
-
-      untracked(() => this.showDamageEvents(events));
-    });
-  }
-
-  private showDamageEvents(events: HeroDamageEvent[]): void {
-    this.displayedDamageNumbers.update((current) => [...current, ...events]);
-    heroDamageEventsClear(events.map((event) => event.id));
-
-    setTimeout(() => {
-      const ids = new Set(events.map((event) => event.id));
-      this.displayedDamageNumbers.update((current) =>
-        current.filter((event) => !ids.has(event.id)),
-      );
-    }, DAMAGE_NUMBER_LIFETIME_MS);
-  }
 }

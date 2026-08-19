@@ -1,0 +1,179 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block pointer-events-auto;
+}
+
+.status-entry {
+  @apply relative flex flex-col items-center bg-black/60 border border-black/50 rounded;
+  width: 40px;
+  padding: 2px;
+  gap: 2px;
+  transition:
+    width 150ms ease,
+    padding 150ms ease;
+
+  &.dead {
+    filter: grayscale(1);
+    opacity: 0.6;
+  }
+
+  &.expanded {
+    @apply items-stretch;
+    width: 190px;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+}
+
+.entry-top {
+  @apply flex flex-row items-center;
+  gap: 6px;
+}
+
+.entry-sprite {
+  @apply relative overflow-hidden shrink-0;
+  width: 32px;
+  height: 32px;
+
+  app-atlas-animation {
+    display: block;
+    transform: scale(0.5);
+    transform-origin: top left;
+  }
+}
+
+.status-entry.expanded .entry-sprite {
+  width: 64px;
+  height: 64px;
+
+  app-atlas-animation {
+    transform: scale(1);
+  }
+}
+
+.entry-details {
+  @apply flex flex-col justify-center text-white overflow-hidden;
+}
+
+.entry-name {
+  @apply font-semibold truncate text-xs;
+}
+
+.entry-subtitle {
+  @apply truncate;
+  font-size: 0.65rem;
+}
+
+// Always occupies its final height (icon + line), even with no active skill
+// cast, so a flash fading in/out never pushes the name/subtitle above it.
+.skill-cast-slot {
+  @apply flex items-center;
+  height: 16px;
+}
+
+.skill-cast {
+  @apply flex items-center gap-1 truncate text-amber-300;
+  font-size: 0.6rem;
+  animation: skill-cast-fade 1500ms ease-out forwards;
+}
+
+.entry-bars {
+  @apply flex flex-col w-full;
+  gap: 2px;
+}
+
+.bar {
+  @apply relative w-full bg-black/70 rounded-sm overflow-hidden;
+  height: 10px;
+
+  &.small {
+    height: 4px;
+  }
+}
+
+.bar-inner {
+  @apply h-full;
+  transition: width 200ms ease;
+}
+
+.bar-hp .bar-inner {
+  background-color: #dc2626;
+}
+
+.bar-xp .bar-inner {
+  background-color: #16a34a;
+}
+
+.bar-label {
+  @apply absolute inset-0 flex items-center justify-center text-white;
+  font-size: 0.6rem;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+// Spans the full card width (not just the sprite) so each number's `left`
+// jitter is relative to the card's own width at any expand state.
+.damage-numbers {
+  @apply absolute flex flex-col-reverse items-center pointer-events-none;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  z-index: 30;
+}
+
+.damage-number {
+  // `position: relative` (not absolute) keeps concurrent numbers stacked via
+  // flex-col-reverse instead of overlapping at the same spot.
+  position: relative;
+  font-weight: 700;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  animation: damage-number-float 1100ms ease-out forwards;
+
+  &.damage {
+    color: #ef4444;
+  }
+
+  &.heal {
+    color: #4ade80;
+  }
+}
+
+@keyframes damage-number-float {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
+@keyframes skill-cast-fade {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

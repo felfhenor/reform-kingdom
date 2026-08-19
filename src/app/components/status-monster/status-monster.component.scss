@@ -1,0 +1,14 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block pointer-events-none;
+}
+
+// `column-reverse` stacks row 0 (nearest the hero row) at the bottom.
+.monster-rows {
+  @apply flex flex-col-reverse gap-2 pointer-events-auto;
+}
+
+.monster-row {
+  @apply flex gap-2;
+}

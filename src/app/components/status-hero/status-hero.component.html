@@ -1,70 +1,10 @@
-@let expanded = isExpanded();
-
-@if (heroes().length > 0) {
-  <div
-    class="hero-status"
-    (mouseenter)="setHovered(true)"
-    (mouseleave)="setHovered(false)"
-  >
-    @for (hero of heroes(); track hero.character.id) {
-      <div
-        class="hero-entry"
-        [class.expanded]="expanded"
-        [class.dead]="hero.isDead"
-      >
-        @let damageNumbers = damageNumbersByHero().get(hero.character.id);
-        @if (damageNumbers && damageNumbers.length > 0) {
-          <div class="damage-numbers">
-            @for (number of damageNumbers; track number.id) {
-              <span
-                class="damage-number"
-                [class.heal]="number.amount > 0"
-                [class.damage]="number.amount < 0"
-              >
-                {{ number.amount > 0 ? '+' : '' }}{{ number.amount | number }}
-              </span>
-            }
-          </div>
-        }
-
-        <div class="hero-top">
-          <div class="hero-sprite">
-            @if (hero.job; as job) {
-              <app-icon-job [job]="job"></app-icon-job>
-            }
-          </div>
-
-          @if (expanded) {
-            <div class="hero-details">
-              <span class="hero-name">{{ hero.character.name }}</span>
-              <span class="hero-level text-lighter">
-                Lv. {{ hero.character.level }} {{ hero.job?.name }}
-              </span>
-            </div>
-          }
-        </div>
-
-        <div class="hero-bars">
-          <div class="bar bar-hp" [class.small]="!expanded">
-            <div class="bar-inner" [style.width.%]="hero.hpPercent"></div>
-            @if (expanded) {
-              <span class="bar-label">
-                {{ hero.character.hp }} / {{ hero.character.stats.Health }}
-              </span>
-            }
-          </div>
-
-          <div class="bar bar-xp" [class.small]="!expanded">
-            <div class="bar-inner" [style.width.%]="hero.xpPercent"></div>
-            @if (expanded) {
-              <span class="bar-label">
-                {{ hero.character.xp.current }} /
-                {{ hero.character.xp.maximum }}
-              </span>
-            }
-          </div>
-        </div>
-      </div>
+@if (entries().length > 0) {
+  <div class="hero-status">
+    @for (entry of entries(); track entry.combatantId) {
+      <app-card-status-combatant
+        [entry]="entry"
+        [expanded]="expanded()"
+      ></app-card-status-combatant>
     }
   </div>
 }
