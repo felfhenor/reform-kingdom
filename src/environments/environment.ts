@@ -7,7 +7,7 @@ export const environment = {
   },
   rollbar: {
     accessToken:
-      'c43dd56f173f48c4837648a054f32749b9a40619068e3ffa646b9abaf329f21e593c91c2f7f9a3db33550457717b9b08',
+      '6330079979a34716b98fea893a2e7c201030667728c8931ff12291e13808c46b46745d2500495192dc157174bab0bb3a',
     hostBlockList: ['netlify.app'],
     captureUncaught: true,
     captureUnhandledRejections: true,
