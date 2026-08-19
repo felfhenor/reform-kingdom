@@ -11,7 +11,17 @@
             class="checkbox checkbox-secondary"
             (click)="toggleAutoMode()"
           />
-          <span class="label-text">Enable Auto Mode</span>
+          <span class="label-text flex gap-2 items-center">
+            Enable Auto Mode
+
+            <app-icon
+              name="gameHelp"
+              size="1em"
+              class="zoom-tooltip text-lighter"
+              [tp]="'Auto mode will execute your Decree (seen below). This lets you automate certain aspects of gameplay. By default, it will only go to your kingdom and heal you. You can make it do more by adding Clauses to your Decree.'"
+              [tpPlacement]="'top'"
+            />
+          </span>
         </label>
       </div>
 

@@ -44,7 +44,9 @@ import {
   NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
+import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
+import { IconComponent } from '../icon/icon.component';
 
 const CLAUSE_TYPE_OPTIONS: {
   value: DecreeClauseAction['type'];
@@ -99,6 +101,8 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
     RowDecreeClauseComponent,
     SpriteNodeComponent,
     OptionRewardComponent,
+    IconComponent,
+    TippyDirective,
   ],
   templateUrl: './game-play-decree.component.html',
 })
@@ -276,7 +280,10 @@ export class GamePlayDecreeComponent {
       return;
     }
 
-    if (clause.type === 'LevelUpParty' || clause.type === 'FinishUnfinishedAreas') {
+    if (
+      clause.type === 'LevelUpParty' ||
+      clause.type === 'FinishUnfinishedAreas'
+    ) {
       this.editingClauseId.set(clause.id);
       this.draftType.set(clause.type);
       this.draftRiskTolerance.set(clause.riskTolerance);
