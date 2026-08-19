@@ -131,13 +131,19 @@ function buildState(overrides: {
   clauses?: DecreeClause[];
   activeClauseId?: DecreeClauseId;
   travelStatus?: 'Idle' | 'Traveling';
+  travelDestinationNodeName?: string;
   gatheringStatus?: 'Idle' | 'Gathering';
   gatheringNodeName?: string;
   nodeFailureCounts?: Partial<Record<string, number>>;
 }): GameState {
   return {
     world: {
-      travel: { status: overrides.travelStatus ?? 'Idle', path: [], ticksIntoStep: 0 },
+      travel: {
+        status: overrides.travelStatus ?? 'Idle',
+        destinationNodeName: overrides.travelDestinationNodeName,
+        path: [],
+        ticksIntoStep: 0,
+      },
       gathering: {
         status: overrides.gatheringStatus ?? 'Idle',
         ticksIntoGather: 0,
@@ -741,6 +747,212 @@ describe('autoModeProcessTick', () => {
     vi.mocked(getMaterialQuantity).mockReturnValue(2);
     vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
     vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).not.toHaveBeenCalled();
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('abandons an in-progress gather immediately when reordering makes a different clause top priority', () => {
+    const woodClause = buildClause({
+      id: 'wood-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'wergen-wood' as MaterialId,
+      targetQuantity: 50,
+    });
+    const copperClause = buildClause({
+      id: 'copper-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      targetQuantity: 30,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [copperClause, woodClause],
+        activeClauseId: woodClause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Wergen Woods',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(getMaterialQuantity).mockReturnValue(10);
+    vi.mocked(decreeClauses).mockReturnValue([copperClause, woodClause]);
+    vi.mocked(pickNextClause).mockReturnValue(copperClause);
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Carrina Copper Mines',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledWith('Carrina Copper Mines', true);
+  });
+
+  it('hands active-clause tracking to the new top-priority clause without restarting the action when both target the same node', () => {
+    const oldClause = buildClause({
+      id: 'old-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'wergen-wood' as MaterialId,
+      targetQuantity: 50,
+    });
+    const newClause = buildClause({
+      id: 'new-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'wergen-stick' as MaterialId,
+      targetQuantity: 20,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [newClause, oldClause],
+        activeClauseId: oldClause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Wergen Woods',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(getMaterialQuantity).mockReturnValue(5);
+    vi.mocked(decreeClauses).mockReturnValue([newClause, oldClause]);
+    vi.mocked(pickNextClause).mockReturnValue(newClause);
+    // Both clauses are gatherable at the same node - a multi-material GatherNode.
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Wergen Woods',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).not.toHaveBeenCalled();
+    expect(travelStart).not.toHaveBeenCalled();
+
+    const result = applyLastUpdate(
+      buildState({ activeClauseId: oldClause.id }),
+    );
+    expect(result.world.autoMode.activeClauseId).toBe('new-clause');
+  });
+
+  it('abandons an in-progress gather when the active clause is edited in place (same id, new material), not just reordered', () => {
+    const clause = buildClause({
+      id: 'top-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'wergen-wood' as MaterialId,
+      targetQuantity: 50,
+    });
+    const editedClause = { ...clause, materialId: 'copper-ore' as MaterialId };
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [editedClause],
+        activeClauseId: clause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Wergen Woods',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(getMaterialQuantity).mockReturnValue(10);
+    vi.mocked(decreeClauses).mockReturnValue([editedClause]);
+    vi.mocked(pickNextClause).mockReturnValue(editedClause);
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Carrina Copper Mines',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledWith('Carrina Copper Mines', true);
+  });
+
+  it('redirects mid-travel immediately when a reorder/edit changes the top priority target', () => {
+    const oldClause = buildClause({
+      id: 'farm-clause' as DecreeClauseId,
+      type: 'FarmNode',
+      nodeName: 'Old Ruins',
+      reward: { itemId: 'bone' as ItemId },
+      targetQuantity: 10,
+    });
+    const newClause = buildClause({
+      id: 'gather-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      targetQuantity: 30,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [newClause, oldClause],
+        activeClauseId: oldClause.id,
+        travelStatus: 'Traveling',
+        travelDestinationNodeName: 'Old Ruins',
+      }),
+    );
+    vi.mocked(decreeClauses).mockReturnValue([newClause, oldClause]);
+    vi.mocked(pickNextClause).mockReturnValue(newClause);
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Carrina Copper Mines',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).not.toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledWith('Carrina Copper Mines', true);
+  });
+
+  it('does not re-dispatch when the active clause is still top priority after a tick', () => {
+    const clause = buildClause({
+      id: 'wood-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'wergen-wood' as MaterialId,
+      targetQuantity: 50,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [clause],
+        activeClauseId: clause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Wergen Woods',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(getMaterialQuantity).mockReturnValue(10);
+    vi.mocked(decreeClauses).mockReturnValue([clause]);
+    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Wergen Woods',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).not.toHaveBeenCalled();
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('never interrupts mid-combat even if a reorder would otherwise change priority', () => {
+    const woodClause = buildClause({
+      id: 'wood-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'wergen-wood' as MaterialId,
+      targetQuantity: 50,
+    });
+    const copperClause = buildClause({
+      id: 'copper-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      targetQuantity: 30,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [copperClause, woodClause],
+        activeClauseId: woodClause.id,
+      }),
+    );
+    vi.mocked(currentCombat).mockReturnValue(
+      {} as ReturnType<typeof currentCombat>,
+    );
+    vi.mocked(decreeClauses).mockReturnValue([copperClause, woodClause]);
+    vi.mocked(pickNextClause).mockReturnValue(copperClause);
 
     autoModeProcessTick();
 

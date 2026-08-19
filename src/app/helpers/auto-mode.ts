@@ -278,6 +278,62 @@ function advanceToNextClause(): void {
   returnToKingdomFallback();
 }
 
+// Where the party is currently headed for the active clause - not just idle-vs-not, so it can be compared against a freshly re-picked clause's target below.
+function activeDestinationNodeName(): string | undefined {
+  const world = gamestate().world;
+  if (world.gathering.status === 'Gathering') return world.gathering.nodeName;
+  if (world.travel.status === 'Traveling') return world.travel.destinationNodeName;
+  return undefined;
+}
+
+// `decreeClauseUpdate` edits a clause in place (same id, e.g. swapping a GatherMaterial's material), so comparing by id would miss it - compare the node the clause actually sends the party to instead.
+function clauseDispatchTarget(clause: DecreeClause): string | undefined {
+  if (clause.type === 'ReturnToKingdom') {
+    return worldNodesOfType('Kingdom')[0]?.nodeName;
+  }
+  return clauseTargetNode(clause)?.nodeName;
+}
+
+// Reference, not deep-equal - `decreeClauses()` only gets a new array on an actual edit (see decree.ts), so this skips pickNextClause's pathfinding on the (vast majority of) ticks where nothing changed.
+let lastCheckedDecreeClauses: DecreeClause[] | undefined;
+
+// Editing the decree should preempt an in-progress clause, not wait for it to finish; combat can't be redirected mid-fight.
+function interruptForPriorityChange(): boolean {
+  if (currentCombat()) return false;
+
+  const autoMode = gamestate().world.autoMode;
+  if (!autoMode.activeClauseId) return false;
+
+  const currentTarget = activeDestinationNodeName();
+  if (!currentTarget) return false;
+
+  const clauses = decreeClauses();
+  if (clauses === lastCheckedDecreeClauses) return false;
+  lastCheckedDecreeClauses = clauses;
+
+  const nextClause = pickNextClause(clauses);
+  if (!nextClause) return false;
+
+  // `decreeClauseUpdate` edits in place (same id), so a same-id clause can still need a full
+  // redispatch - only treat it as truly unchanged when the target matches too.
+  const nextTarget = clauseDispatchTarget(nextClause);
+  if (nextClause.id === autoMode.activeClauseId && nextTarget === currentTarget) {
+    return false;
+  }
+
+  // Same node either way (e.g. two clauses sharing a multi-material GatherNode) - hand the "active"
+  // role to the real top-priority clause, so quantity/failure tracking follows it, without
+  // restarting an already-correct gather/travel.
+  if (nextTarget === currentTarget) {
+    setActiveClause(nextClause.id);
+    return false;
+  }
+
+  if (isGathering()) gatheringStop();
+  runClause(nextClause);
+  return true;
+}
+
 export function autoModeProcessTick(): void {
   const enabled = autoModeIsEnabled();
   syncAutoModeGlobalEffect(enabled);
@@ -286,6 +342,7 @@ export function autoModeProcessTick(): void {
   adoptInProgressGatherClause();
   stopGatherIfTargetReached();
   if (stopOrphanedGather()) return;
+  if (interruptForPriorityChange()) return;
   if (!isPartyIdleForAutoMode()) return;
 
   advanceToNextClause();
