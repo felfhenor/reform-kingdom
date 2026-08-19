@@ -112,7 +112,7 @@
 
     <div class="flex-1 flex flex-col gap-2 overflow-y-auto">
       @for (entry of entries; track entry.recipe.id) {
-        @let quantity = quantityFor(entry.recipe.id);
+        @let quantity = displayQuantity(entry.recipe.id, entry.maxCraftable);
         @let uncraftable = entry.maxCraftable === 0;
 
         <div
@@ -237,26 +237,25 @@
               <div class="join">
                 <button
                   class="btn btn-xs btn-secondary"
-                  [disabled]="
-                    uncraftable || full || quantitySelector.valueAsNumber === 1
+                  [disabled]="uncraftable || full || quantity === 1"
+                  (click)="
+                    stepQuantity(entry.recipe.id, entry.maxCraftable, -10)
                   "
-                  (click)="quantitySelector.stepDown(10)"
                 >
                   -10
                 </button>
 
                 <button
                   class="btn btn-xs btn-secondary"
-                  [disabled]="
-                    uncraftable || full || quantitySelector.valueAsNumber === 1
+                  [disabled]="uncraftable || full || quantity === 1"
+                  (click)="
+                    stepQuantity(entry.recipe.id, entry.maxCraftable, -1)
                   "
-                  (click)="quantitySelector.stepDown(1)"
                 >
                   -1
                 </button>
 
                 <input
-                  #quantitySelector
                   type="number"
                   class="input input-xs w-16"
                   min="1"
@@ -270,11 +269,9 @@
                 <button
                   class="btn btn-xs btn-secondary"
                   [disabled]="
-                    uncraftable ||
-                    full ||
-                    quantitySelector.valueAsNumber === entry.maxCraftable
+                    uncraftable || full || quantity === entry.maxCraftable
                   "
-                  (click)="quantitySelector.stepUp(1)"
+                  (click)="stepQuantity(entry.recipe.id, entry.maxCraftable, 1)"
                 >
                   +1
                 </button>
@@ -282,11 +279,11 @@
                 <button
                   class="btn btn-xs btn-secondary"
                   [disabled]="
-                    uncraftable ||
-                    full ||
-                    quantitySelector.valueAsNumber === entry.maxCraftable
+                    uncraftable || full || quantity === entry.maxCraftable
                   "
-                  (click)="quantitySelector.stepUp(10)"
+                  (click)="
+                    stepQuantity(entry.recipe.id, entry.maxCraftable, 10)
+                  "
                 >
                   +10
                 </button>

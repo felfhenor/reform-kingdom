@@ -80,20 +80,21 @@ export class PanelPlayKingdomTradeskillComponent {
     uiClockTick();
     const current = this.tradeskill();
 
-    return sortBy(getEntriesByType<TradeskillContent>('tradeskill'), (t) => t.name).map(
-      (content) => {
-        const name = content.name as Tradeskill;
-        const building = tradeskillBuilding(name);
+    return sortBy(
+      getEntriesByType<TradeskillContent>('tradeskill'),
+      (t) => t.name,
+    ).map((content) => {
+      const name = content.name as Tradeskill;
+      const building = tradeskillBuilding(name);
 
-        return {
-          content,
-          subview: kingdomSubviewForTradeskill(name),
-          isCurrent: name === current,
-          isIdle: building.queue.length === 0,
-          tooltip: this.tradeskillNavTooltip(content, building, name),
-        };
-      },
-    );
+      return {
+        content,
+        subview: kingdomSubviewForTradeskill(name),
+        isCurrent: name === current,
+        isIdle: building.queue.length === 0,
+        tooltip: this.tradeskillNavTooltip(content, building, name),
+      };
+    });
   });
 
   private tradeskillNavTooltip(
@@ -102,7 +103,8 @@ export class PanelPlayKingdomTradeskillComponent {
     tradeskill: Tradeskill,
   ): string {
     const level = formatNumber(building.level, this.locale);
-    if (building.queue.length === 0) return `${content.name} Lv.${level} (idle)`;
+    if (building.queue.length === 0)
+      return `${content.name} Lv.${level} (idle)`;
 
     const units = formatNumber(
       craftQueueUnitsRemaining(tradeskill),
@@ -187,6 +189,38 @@ export class PanelPlayKingdomTradeskillComponent {
     return this.quantities()[recipeId] ?? 1;
   }
 
+  // Clamps the stored selection against the recipe's current craftable
+  // ceiling, so it's never shown above what's actually craftable. This is
+  // what keeps the field showing the last-used quantity after a craft (or a
+  // lower value if resources no longer support it) without needing to know
+  // the post-craft state directly - gamestate updates asynchronously, so
+  // recomputing craftability right after `craftQueueStart` would still see
+  // stale, pre-craft resource counts.
+  public displayQuantity(recipeId: RecipeId, maxCraftable: number): number {
+    return clamp(Math.floor(this.quantityFor(recipeId)), 1, maxCraftable);
+  }
+
+  // Steps from the clamped displayed value (not the raw stored one), and
+  // writes back through the signal - native `stepUp`/`stepDown` on the input
+  // itself don't fire an `input` event, so driving the buttons that way left
+  // the stored quantity out of sync with what was visibly shown.
+  public stepQuantity(
+    recipeId: RecipeId,
+    maxCraftable: number,
+    delta: number,
+  ): void {
+    const next = clamp(
+      this.displayQuantity(recipeId, maxCraftable) + delta,
+      1,
+      maxCraftable,
+    );
+
+    this.quantities.update((quantities) => ({
+      ...quantities,
+      [recipeId]: next,
+    }));
+  }
+
   // Clamps live as the user types (rather than only on Craft) so the field
   // can never visually sit above what's actually craftable, and resets to 1
   // if the field is cleared entirely.
@@ -219,13 +253,8 @@ export class PanelPlayKingdomTradeskillComponent {
   }
 
   public craft(recipeId: RecipeId, maxCraftable: number): void {
-    const quantity = clamp(
-      1,
-      Math.floor(this.quantityFor(recipeId)),
-      maxCraftable,
-    );
+    const quantity = this.displayQuantity(recipeId, maxCraftable);
     craftQueueStart(this.tradeskill(), recipeId, quantity);
-    this.quantities.update((quantities) => ({ ...quantities, [recipeId]: 1 }));
   }
 
   public onQueueEntryContextMenu(
