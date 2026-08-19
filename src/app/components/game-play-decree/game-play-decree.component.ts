@@ -57,7 +57,6 @@ const CLAUSE_TYPE_OPTIONS: {
     { value: 'FarmNode', label: 'Farm Node' },
     { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
     { value: 'LevelUpParty', label: 'Level Up Party' },
-    { value: 'ReturnToKingdom', label: 'Return to Kingdom' },
   ],
   'label',
 );

@@ -190,13 +190,6 @@
     <div class="card-body gap-2 flex-1 min-h-0 flex flex-col">
       <div class="card-title">Decree</div>
 
-      @if (clauses().length === 0) {
-        <div class="italic text-lighter">
-          No clauses yet - the party will idle at the kingdom while in auto mode
-          until you add one.
-        </div>
-      }
-
       <ul
         cdkDropList
         class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto"
@@ -219,6 +212,12 @@
             />
           </li>
         }
+
+        <li
+          class="flex flex-row items-center gap-2 p-2 rounded bg-base-200 pl-[20px]"
+        >
+          Return to kingdom and heal
+        </li>
       </ul>
     </div>
   </div>
