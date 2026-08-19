@@ -36,8 +36,8 @@ import { LoggerService, RollbarErrorHandler } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { NotifyService } from '@services/notify.service';
 import { SoundService } from '@services/sound.service';
-import { AdventureLogTimeagoFormatter } from '@services/timeago-formatter.service';
 import { ThemeService } from '@services/theme.service';
+import { AdventureLogTimeagoFormatter } from '@services/timeago-formatter.service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { NG_EVENT_PLUGINS } from '@taiga-ui/event-plugins';
 import { TimeagoFormatter, provideTimeago } from 'ngx-timeago';
@@ -76,7 +76,10 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAnimations(),
     provideTimeago({
-      formatter: { provide: TimeagoFormatter, useClass: AdventureLogTimeagoFormatter },
+      formatter: {
+        provide: TimeagoFormatter,
+        useClass: AdventureLogTimeagoFormatter,
+      },
     }),
     provideToastr({
       positionClass: 'toast-bottom-right',
