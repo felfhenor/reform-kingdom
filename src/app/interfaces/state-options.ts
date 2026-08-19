@@ -10,6 +10,7 @@ export type GameOption =
   | 'gameloopPaused'
   | 'showBackdropGrid'
   | 'analyticsEnabled'
+  | 'analyticsOptInDismissed'
   | 'partyViewAutoCollapse';
 
 export type NotificationCategory = 'Error' | 'Success';

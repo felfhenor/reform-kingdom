@@ -25,7 +25,8 @@ export function defaultOptions(): GameOptions {
 
     showBackdropGrid: false,
 
-    analyticsEnabled: true,
+    analyticsEnabled: false,
+    analyticsOptInDismissed: false,
 
     mapZoom: 1,
 
@@ -54,4 +55,10 @@ export function getOption<T extends keyof GameOptions>(
   option: T,
 ): GameOptions[T] {
   return options()[option];
+}
+
+export function shouldShowAnalyticsConsentBanner(): boolean {
+  return (
+    !getOption('analyticsEnabled') && !getOption('analyticsOptInDismissed')
+  );
 }
