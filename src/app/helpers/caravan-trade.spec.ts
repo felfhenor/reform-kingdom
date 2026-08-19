@@ -479,6 +479,7 @@ describe('caravanExecuteTrade', () => {
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
       materials: { ['gold-coin' as ItemId]: { quantity: 1000, foundAt: 1 } },
+      discoveredMaterials: {},
       armory: [],
       collectibles: {},
       discoveredEquipment: {},
@@ -499,6 +500,7 @@ describe('caravanExecuteTrade', () => {
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
       materials: { ['ore' as ItemId]: { quantity: 3, foundAt: 1 } },
+      discoveredMaterials: {},
       armory: [],
       collectibles: {},
       discoveredEquipment: {},
@@ -556,6 +558,7 @@ describe('caravanExecuteTrade', () => {
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
       materials: { ['gold-coin' as ItemId]: { quantity: 1_000_000, foundAt: 1 } },
+      discoveredMaterials: {},
       armory: [],
       collectibles: {},
       discoveredEquipment: {},
@@ -577,6 +580,7 @@ describe('caravanExecuteTrade', () => {
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
       materials: { ['ore' as ItemId]: { quantity: 5, foundAt: 1 } },
+      discoveredMaterials: {},
       armory: [],
       collectibles: {},
       discoveredEquipment: {},

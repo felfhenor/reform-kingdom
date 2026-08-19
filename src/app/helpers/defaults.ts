@@ -39,6 +39,7 @@ export function defaultGameState(): GameState {
       caravans: {},
     },
     materials: {},
+    discoveredMaterials: {},
     collectibles: {},
     armory: [],
     discoveredEquipment: {},

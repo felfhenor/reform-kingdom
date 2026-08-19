@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   GameState,
+  GameStateDiscoveredMaterials,
   GameStateMaterials,
   ItemContent,
   ItemId,
@@ -34,8 +35,24 @@ export function getMaterialQuantity(materialId: MaterialId): number {
   return gamestate().materials[materialId]?.quantity ?? 0;
 }
 
+// Reads the permanent `discoveredMaterials` record, not live stock - unlike `materials`, it survives being spent down to 0.
 export function isMaterialDiscovered(materialId: MaterialId): boolean {
-  return !!gamestate().materials[materialId]?.foundAt;
+  return !!gamestate().discoveredMaterials[materialId]?.foundAt;
+}
+
+// Drops any invalid discoveredMaterials entries whose id no longer resolves to real content, same as `pruneInvalidMaterials`.
+export function pruneInvalidDiscoveredMaterials(
+  discoveredMaterials: GameStateDiscoveredMaterials,
+): GameStateDiscoveredMaterials {
+  const pruned: GameStateDiscoveredMaterials = {};
+
+  (Object.keys(discoveredMaterials) as MaterialId[]).forEach((materialId) => {
+    if (getEntry<ItemContent>(materialId)) {
+      pruned[materialId] = discoveredMaterials[materialId];
+    }
+  });
+
+  return pruned;
 }
 
 // Shared mutator for material quantity - clamps at 0, drops the entry once depleted. All state.materials mutators (gold included) should go through this.
@@ -54,6 +71,10 @@ export function applyMaterialDelta(
       quantity,
       foundAt: existing?.foundAt ?? Date.now(),
     };
+  }
+
+  if (delta > 0 && !state.discoveredMaterials[materialId]) {
+    state.discoveredMaterials[materialId] = { foundAt: Date.now() };
   }
 }
 

@@ -40,6 +40,11 @@ export type GameStateMaterials = {
   [key: MaterialId]: { quantity: number; foundAt: number };
 };
 
+// Unlike `materials` (deletes the entry once stock hits 0), this is never pruned on spend - a standing "has this ever been found" flag.
+export type GameStateDiscoveredMaterials = {
+  [key: MaterialId]: { foundAt: number };
+};
+
 // Where a collectible was found is derived fresh from content each render (see `helpers/collectible-source.ts`), so this only tracks ownership.
 export type GameStateCollectibles = {
   [key: CollectibleId]: {
@@ -98,6 +103,7 @@ export type GameState = {
   clock: GameStateClock;
   world: GameStateWorld;
   materials: GameStateMaterials;
+  discoveredMaterials: GameStateDiscoveredMaterials;
   collectibles: GameStateCollectibles;
   armory: EquipmentItem[];
   discoveredEquipment: GameStateDiscoveredEquipment;

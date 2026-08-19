@@ -22,7 +22,10 @@ import {
   grandfatherGatherNodeDiscoveries,
   pruneInvalidGatherNodeDiscoveries,
 } from '@helpers/gather-node-discovery';
-import { pruneInvalidMaterials } from '@helpers/materials';
+import {
+  pruneInvalidDiscoveredMaterials,
+  pruneInvalidMaterials,
+} from '@helpers/materials';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
@@ -42,7 +45,26 @@ import {
 import { defaultOptions, options, setOptions } from '@helpers/state-options';
 import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
 import { merge } from 'es-toolkit/compat';
-import type { GameStateDiscoveredGatherNodes, GameStateMaterials } from '@interfaces';
+import type {
+  GameStateDiscoveredGatherNodes,
+  GameStateDiscoveredMaterials,
+  GameStateMaterials,
+  MaterialId,
+} from '@interfaces';
+
+// Backfill for pre-materials-discovery-tracking saves - anything currently held was obviously found already.
+function backfillLegacyDiscoveredMaterials(
+  discoveredMaterials: GameStateDiscoveredMaterials,
+  materials: GameStateMaterials,
+): GameStateDiscoveredMaterials {
+  const backfilled = { ...discoveredMaterials };
+
+  (Object.keys(materials) as MaterialId[]).forEach((materialId) => {
+    backfilled[materialId] ??= { foundAt: materials[materialId].foundAt };
+  });
+
+  return backfilled;
+}
 
 // Backfill for pre-discovery-tracking saves: existing material progress with no recorded visits means treat every GatherNode as found.
 function backfillLegacyGatherNodeDiscoveries(
@@ -76,6 +98,13 @@ export function migrateGameState() {
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
   newState.materials = pruneInvalidMaterials(newState.materials);
+  newState.discoveredMaterials = pruneInvalidDiscoveredMaterials(
+    newState.discoveredMaterials,
+  );
+  newState.discoveredMaterials = backfillLegacyDiscoveredMaterials(
+    newState.discoveredMaterials,
+    newState.materials,
+  );
   newState.discoveredEquipment = pruneInvalidDiscoveredEquipment(
     newState.discoveredEquipment,
   );

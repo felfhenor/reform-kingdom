@@ -373,6 +373,7 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [swordItem1, swordItem2],
         materials: {},
+        discoveredMaterials: {},
       } as unknown as GameState);
 
       expect(result.armory).toEqual([swordItem2]);
@@ -393,6 +394,7 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [swordItem1],
         materials: { ['gold-coin' as ItemId]: { quantity: 50, foundAt: 1000 } },
+        discoveredMaterials: {},
       } as unknown as GameState);
 
       expect(result.materials['gold-coin' as ItemId]).toEqual({

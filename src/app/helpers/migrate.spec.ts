@@ -42,6 +42,7 @@ vi.mock('@helpers/equipment', () => ({
 
 vi.mock('@helpers/materials', () => ({
   pruneInvalidMaterials: vi.fn((materials) => materials),
+  pruneInvalidDiscoveredMaterials: vi.fn((discovered) => discovered),
 }));
 
 vi.mock('@helpers/pathfinding', () => ({
@@ -65,6 +66,7 @@ vi.mock('@helpers/defaults', () => ({
   defaultGameState: vi.fn(() => ({
     armory: [],
     materials: {},
+    discoveredMaterials: {},
     collectibles: {},
     discoveredEquipment: {},
     discoveredRecipes: {},
@@ -118,7 +120,10 @@ import {
 } from '@helpers/collectibles';
 import { pruneInvalidDecreeGatherClauses } from '@helpers/decree';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
-import { pruneInvalidMaterials } from '@helpers/materials';
+import {
+  pruneInvalidDiscoveredMaterials,
+  pruneInvalidMaterials,
+} from '@helpers/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
@@ -414,6 +419,48 @@ describe('migrateGameState', () => {
 
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.world.autoMode.clauses).toEqual([]);
+  });
+
+  it('prunes stale discoveredMaterials entries and backfills from current stock', () => {
+    const staleDiscovered = {
+      ['gold-coin' as MaterialId]: { foundAt: 1000 },
+      ['stale-material' as MaterialId]: { foundAt: 2000 },
+    };
+    // gold-coin's foundAt (500) deliberately differs from its current-stock foundAt (1000), so an
+    // errant backfill overwrite (instead of preserving the pruned entry) would be caught below.
+    const currentMaterials = {
+      ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
+      ['copper-ore' as MaterialId]: { quantity: 3, foundAt: 3000 },
+    };
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: currentMaterials,
+      discoveredMaterials: staleDiscovered,
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: {},
+      world: { party: [] },
+    } as unknown as GameState);
+
+    const prunedDiscovered = { ['gold-coin' as MaterialId]: { foundAt: 500 } };
+    vi.mocked(pruneInvalidMaterials).mockReturnValue(currentMaterials);
+    vi.mocked(pruneInvalidDiscoveredMaterials).mockReturnValue(
+      prunedDiscovered,
+    );
+
+    migrateGameState();
+
+    expect(pruneInvalidDiscoveredMaterials).toHaveBeenCalledWith(
+      staleDiscovered,
+    );
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.discoveredMaterials).toEqual({
+      ['gold-coin' as MaterialId]: { foundAt: 500 },
+      ['copper-ore' as MaterialId]: { foundAt: 3000 },
+    });
   });
 
   it('relocates the party off an unwalkable current location before committing', () => {

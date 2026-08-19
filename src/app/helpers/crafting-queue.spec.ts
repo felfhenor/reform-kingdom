@@ -364,6 +364,7 @@ describe('craftQueueStart', () => {
 
     const state: GameState = {
       materials: { ore: { quantity: 6, foundAt: 1000 } },
+      discoveredMaterials: {},
       tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
     } as unknown as GameState;
     const result = applyUpdateAt(0, state);
@@ -410,6 +411,7 @@ describe('craftQueueRemove', () => {
 
     const state: GameState = {
       materials: {},
+      discoveredMaterials: {},
       tradeskills: {
         [BLACKSMITHING_ID]: buildBuilding({
           queue: [buildQueueEntry({ quantityTotal: 5, quantityCompleted: 2 })],
