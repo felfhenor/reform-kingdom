@@ -1,22 +1,15 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  ElementRef,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
-import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
-import { SlotGatherMaterialComponent } from '@components/slot-gather-material/slot-gather-material.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
 import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
 import { PanelMapNodeBadgesCaravanComponent } from '@components/panel-map-node-badges-caravan/panel-map-node-badges-caravan.component';
 import { PanelMapNodeBadgesExploreComponent } from '@components/panel-map-node-badges-explore/panel-map-node-badges-explore.component';
 import { PanelMapNodeBadgesGatherComponent } from '@components/panel-map-node-badges-gather/panel-map-node-badges-gather.component';
+import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
+import { SlotGatherMaterialComponent } from '@components/slot-gather-material/slot-gather-material.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { sortBy, sum } from 'es-toolkit/compat';
 import { caravanBrandName } from '@helpers/caravan';
 import { encounterStartFight } from '@helpers/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter-random-combat';
@@ -53,6 +46,7 @@ import {
   worldNodeEncounterRandom,
   worldNodeGathering,
 } from '@helpers/world-nodes';
+import { sortBy, sum } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-map-node',
@@ -72,13 +66,8 @@ import {
   ],
   templateUrl: './panel-map-node.component.html',
   styleUrl: './panel-map-node.component.scss',
-  host: {
-    '(document:pointerdown)': 'onDocumentPointerDown($event)',
-  },
 })
 export class PanelMapNodeComponent {
-  private elementRef = inject(ElementRef<HTMLElement>);
-
   public node = computed(() => selectedMapNode());
 
   public displayName = computed(() => {
@@ -247,17 +236,6 @@ export class PanelMapNodeComponent {
   }
 
   public close(): void {
-    mapNodeDeselect();
-  }
-
-  protected onDocumentPointerDown(event: PointerEvent): void {
-    if (!this.node()) return;
-
-    const target = event.target;
-    if (!(target instanceof Node)) return;
-    if (target instanceof HTMLCanvasElement) return;
-    if (this.elementRef.nativeElement.contains(target)) return;
-
     mapNodeDeselect();
   }
 }
