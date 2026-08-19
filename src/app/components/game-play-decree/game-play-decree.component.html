@@ -26,27 +26,6 @@
           <span class="label-text">Wait for Full Health Before Combat</span>
         </label>
       </div>
-
-      <div class="flex flex-row items-center gap-2">
-        <span class="label-text">Risk Tolerance</span>
-
-        <ng-select
-          class="w-72"
-          [items]="riskToleranceOptions"
-          bindLabel="label"
-          bindValue="value"
-          [clearable]="false"
-          [ngModel]="riskTolerance()"
-          (change)="setRiskTolerance($event)"
-        >
-          <ng-template ng-option-tmp let-item="item">
-            <div class="font-sembold text-sm">{{ item.label }}</div>
-            <div class="text-xs text-lighter whitespace-normal">
-              {{ item.description }}
-            </div>
-          </ng-template>
-        </ng-select>
-      </div>
     </div>
   </div>
 
@@ -159,6 +138,28 @@
               draftTargetQuantity.set($any($event.target).valueAsNumber)
             "
           />
+        }
+
+        @if (
+          draftType() === 'LevelUpParty' ||
+          draftType() === 'FinishUnfinishedAreas'
+        ) {
+          <ng-select
+            class="w-72"
+            [items]="riskToleranceOptions"
+            bindLabel="label"
+            bindValue="value"
+            [clearable]="false"
+            [ngModel]="draftRiskTolerance()"
+            (change)="setDraftRiskTolerance($event)"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <div class="font-sembold text-sm">{{ item.label }}</div>
+              <div class="text-xs text-lighter whitespace-normal">
+                {{ item.description }}
+              </div>
+            </ng-template>
+          </ng-select>
         }
 
         <button

@@ -32,6 +32,7 @@ vi.mock('@helpers/crafting', () => ({
 }));
 
 vi.mock('@helpers/decree', () => ({
+  backfillDecreeClauseRiskTolerance: vi.fn((clauses) => clauses),
   pruneInvalidDecreeGatherClauses: vi.fn((clauses) => clauses),
 }));
 
@@ -118,7 +119,10 @@ import {
   grantFoundingStoneIfMissing,
   pruneInvalidCollectibles,
 } from '@helpers/collectibles';
-import { pruneInvalidDecreeGatherClauses } from '@helpers/decree';
+import {
+  backfillDecreeClauseRiskTolerance,
+  pruneInvalidDecreeGatherClauses,
+} from '@helpers/decree';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
 import {
   pruneInvalidDiscoveredMaterials,
@@ -419,6 +423,66 @@ describe('migrateGameState', () => {
 
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.world.autoMode.clauses).toEqual([]);
+  });
+
+  it('backfills the legacy global risk tolerance onto risk-aware clauses', () => {
+    const clauses = [
+      { id: 'clause-1' as DecreeClauseId, type: 'LevelUpParty' } as DecreeClause,
+    ];
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: {},
+      world: {
+        party: [],
+        autoMode: { clauses, riskTolerance: 'High' },
+      },
+    } as unknown as GameState);
+
+    vi.mocked(pruneInvalidDecreeGatherClauses).mockReturnValue(clauses);
+    const backfilled = [
+      { ...clauses[0], riskTolerance: 'High' } as DecreeClause,
+    ];
+    vi.mocked(backfillDecreeClauseRiskTolerance).mockReturnValue(backfilled);
+
+    migrateGameState();
+
+    expect(backfillDecreeClauseRiskTolerance).toHaveBeenCalledWith(
+      clauses,
+      'High',
+    );
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.world.autoMode.clauses).toEqual(backfilled);
+  });
+
+  it('defaults the legacy risk tolerance to Medium when no save had it', () => {
+    const clauses = [
+      { id: 'clause-1' as DecreeClauseId, type: 'LevelUpParty' } as DecreeClause,
+    ];
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredGatherNodes: {},
+      world: { party: [], autoMode: { clauses } },
+    } as unknown as GameState);
+
+    vi.mocked(pruneInvalidDecreeGatherClauses).mockReturnValue(clauses);
+
+    migrateGameState();
+
+    expect(backfillDecreeClauseRiskTolerance).toHaveBeenCalledWith(
+      clauses,
+      'Medium',
+    );
   });
 
   it('prunes stale discoveredMaterials entries and backfills from current stock', () => {

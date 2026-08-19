@@ -3,7 +3,6 @@ import { currentCombat } from '@helpers/combat';
 import { getEntry } from '@helpers/content';
 import {
   decreeClauses,
-  decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
@@ -135,7 +134,7 @@ function clauseStatusLabel(clause: DecreeClause): string {
     case 'FinishUnfinishedAreas':
       return 'Seeking unfinished areas...';
     case 'LevelUpParty':
-      return `Leveling up (${decreeRiskTolerance()} risk)...`;
+      return `Leveling up (${clause.riskTolerance} risk)...`;
     case 'ReturnToKingdom':
       return 'Returning to the kingdom...';
   }

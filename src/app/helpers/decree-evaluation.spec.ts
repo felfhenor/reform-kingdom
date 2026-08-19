@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/decree', () => ({
   decreeNodeFailureCount: vi.fn(() => 0),
-  decreeRiskTolerance: vi.fn(() => 'High'),
   decreeWaitForFullHealthBeforeCombat: vi.fn(() => false),
 }));
 
@@ -57,7 +56,6 @@ vi.mock('@helpers/world-nodes', () => ({
 
 import {
   decreeNodeFailureCount,
-  decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
@@ -113,6 +111,7 @@ function buildClause(overrides: Partial<DecreeClause> = {}): DecreeClause {
     type: 'FinishUnfinishedAreas',
     enabled: true,
     failureCount: 0,
+    riskTolerance: 'Medium',
     ...overrides,
   } as DecreeClause;
 }
@@ -122,7 +121,6 @@ beforeEach(() => {
   vi.mocked(partyMinLevel).mockReturnValue(10);
   vi.mocked(partyMaxLevel).mockReturnValue(10);
   vi.mocked(isXpTrivialAtOverLevel).mockReturnValue(false);
-  vi.mocked(decreeRiskTolerance).mockReturnValue('High');
   vi.mocked(worldNodesOfType).mockReturnValue([]);
   vi.mocked(worldNodeByName).mockReturnValue(undefined);
   vi.mocked(isWorldNodeVisible).mockReturnValue(true);
@@ -216,7 +214,7 @@ describe('nearestUnfinishedExploreNode', () => {
       name === 'Near' ? [{} as never] : [{} as never, {} as never],
     );
 
-    expect(nearestUnfinishedExploreNode()).toBe(near);
+    expect(nearestUnfinishedExploreNode('High')).toBe(near);
   });
 
   it('ignores fully-looted nodes', () => {
@@ -228,10 +226,10 @@ describe('nearestUnfinishedExploreNode', () => {
     });
     vi.mocked(travelPathTo).mockReturnValue([]);
 
-    expect(nearestUnfinishedExploreNode()).toBeUndefined();
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
   });
 
-  it('excludes candidates outside the global risk tolerance', () => {
+  it('excludes candidates outside the given risk tolerance', () => {
     const node = buildNode('TooRisky');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
     vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
@@ -242,9 +240,8 @@ describe('nearestUnfinishedExploreNode', () => {
       levelRange: { min: 30, max: 30 },
     } as EncounterContent);
     vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
 
-    expect(nearestUnfinishedExploreNode()).toBeUndefined();
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
   });
 
   it('excludes a hidden node that has not been discovered', () => {
@@ -260,13 +257,12 @@ describe('nearestUnfinishedExploreNode', () => {
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(isWorldNodeVisible).mockReturnValue(false);
 
-    expect(nearestUnfinishedExploreNode()).toBeUndefined();
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
   });
 });
 
 describe('mostChallengingExploreNodeForRisk', () => {
-  it('accepts a node at or below the global risk tolerance', () => {
-    vi.mocked(decreeRiskTolerance).mockReturnValue('Low');
+  it('accepts a node at or below the given risk tolerance', () => {
     const node = buildNode('Safe');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
@@ -274,26 +270,24 @@ describe('mostChallengingExploreNodeForRisk', () => {
     } as EncounterContent);
     vi.mocked(travelPathTo).mockReturnValue([]);
 
-    expect(mostChallengingExploreNodeForRisk()).toBe(node);
+    expect(mostChallengingExploreNodeForRisk('Low')).toBe(node);
   });
 
-  it('excludes a node above the global risk tolerance', () => {
+  it('excludes a node above the given risk tolerance', () => {
     const node = buildNode('TooRisky');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 16, max: 16 },
     } as EncounterContent);
     vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('Medium');
 
-    expect(mostChallengingExploreNodeForRisk()).toBeUndefined();
+    expect(mostChallengingExploreNodeForRisk('Medium')).toBeUndefined();
   });
 
   it('prefers the more challenging reachable node over a nearer, easier one', () => {
     const near = buildNode('Near');
     const far = buildNode('Far');
     vi.mocked(worldNodesOfType).mockReturnValue([near, far]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('Medium');
     vi.mocked(worldNodeEncounter).mockImplementation(
       (entry) =>
         ({
@@ -306,14 +300,13 @@ describe('mostChallengingExploreNodeForRisk', () => {
       name === 'Near' ? [{} as never] : [{} as never, {} as never, {} as never],
     );
 
-    expect(mostChallengingExploreNodeForRisk()).toBe(far);
+    expect(mostChallengingExploreNodeForRisk('Medium')).toBe(far);
   });
 
   it('falls back to an easier node when the toughest one is unreachable', () => {
     const near = buildNode('Near');
     const unreachable = buildNode('Unreachable');
     vi.mocked(worldNodesOfType).mockReturnValue([near, unreachable]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('Medium');
     vi.mocked(worldNodeEncounter).mockImplementation(
       (entry) =>
         ({
@@ -325,14 +318,13 @@ describe('mostChallengingExploreNodeForRisk', () => {
       name === 'Near' ? [] : undefined,
     );
 
-    expect(mostChallengingExploreNodeForRisk()).toBe(near);
+    expect(mostChallengingExploreNodeForRisk('Medium')).toBe(near);
   });
 
   it('prefers a comparable (same-tier) node with fewer failures over one that keeps losing', () => {
     const losing = buildNode('Losing');
     const comparable = buildNode('Comparable');
     vi.mocked(worldNodesOfType).mockReturnValue([losing, comparable]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 10, max: 10 },
     } as EncounterContent);
@@ -341,14 +333,13 @@ describe('mostChallengingExploreNodeForRisk', () => {
       nodeName === 'Losing' ? 2 : 0,
     );
 
-    expect(mostChallengingExploreNodeForRisk()).toBe(comparable);
+    expect(mostChallengingExploreNodeForRisk('High')).toBe(comparable);
   });
 
   it('steps down a tier once every node in it has hit the failure limit', () => {
     const hard = buildNode('Hard');
     const easy = buildNode('Easy');
     vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
     vi.mocked(worldNodeEncounter).mockImplementation(
       (entry) =>
         ({
@@ -361,14 +352,13 @@ describe('mostChallengingExploreNodeForRisk', () => {
       nodeName === 'Hard' ? LEVEL_UP_NODE_FAILURE_LIMIT : 0,
     );
 
-    expect(mostChallengingExploreNodeForRisk()).toBe(easy);
+    expect(mostChallengingExploreNodeForRisk('High')).toBe(easy);
   });
 
   it('falls back to the least-failed node overall once every tier has hit the limit', () => {
     const hard = buildNode('Hard');
     const easy = buildNode('Easy');
     vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
     vi.mocked(worldNodeEncounter).mockImplementation(
       (entry) =>
         ({
@@ -383,14 +373,13 @@ describe('mostChallengingExploreNodeForRisk', () => {
         : LEVEL_UP_NODE_FAILURE_LIMIT,
     );
 
-    expect(mostChallengingExploreNodeForRisk()).toBe(easy);
+    expect(mostChallengingExploreNodeForRisk('High')).toBe(easy);
   });
 
   it('excludes a node that would only give 1 XP due to over-level', () => {
     const trivial = buildNode('Trivial');
     const worthwhile = buildNode('Worthwhile');
     vi.mocked(worldNodesOfType).mockReturnValue([trivial, worthwhile]);
-    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
     vi.mocked(worldNodeEncounter).mockImplementation(
       (entry) =>
         ({
@@ -403,7 +392,7 @@ describe('mostChallengingExploreNodeForRisk', () => {
       (_partyLevel, nodeMaxLevel) => nodeMaxLevel === 1,
     );
 
-    expect(mostChallengingExploreNodeForRisk()).toBe(worthwhile);
+    expect(mostChallengingExploreNodeForRisk('High')).toBe(worthwhile);
   });
 
   it('fails when every reachable node would only give 1 XP', () => {
@@ -415,7 +404,7 @@ describe('mostChallengingExploreNodeForRisk', () => {
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(isXpTrivialAtOverLevel).mockReturnValue(true);
 
-    expect(mostChallengingExploreNodeForRisk()).toBeUndefined();
+    expect(mostChallengingExploreNodeForRisk('High')).toBeUndefined();
   });
 
   it('excludes a hidden node that has not been discovered', () => {
@@ -427,13 +416,12 @@ describe('mostChallengingExploreNodeForRisk', () => {
     vi.mocked(travelPathTo).mockReturnValue([]);
     vi.mocked(isWorldNodeVisible).mockReturnValue(false);
 
-    expect(mostChallengingExploreNodeForRisk()).toBeUndefined();
+    expect(mostChallengingExploreNodeForRisk('High')).toBeUndefined();
   });
 });
 
 describe('nearestGatherNodeFor', () => {
   it('is unaffected by risk tolerance', () => {
-    vi.mocked(decreeRiskTolerance).mockReturnValue('Low');
     const node = buildNode('Grove');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
     vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([

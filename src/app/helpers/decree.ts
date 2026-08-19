@@ -30,10 +30,6 @@ export function pruneInvalidDecreeGatherClauses(
   );
 }
 
-export function decreeRiskTolerance(): DecreeRiskLevel {
-  return gamestate().world.autoMode.riskTolerance;
-}
-
 export function decreeWaitForFullHealthBeforeCombat(): boolean {
   return gamestate().world.autoMode.waitForFullHealthBeforeCombat;
 }
@@ -172,15 +168,6 @@ export function decreeClauseReorder(
   });
 }
 
-export function decreeSetRiskTolerance(riskTolerance: DecreeRiskLevel): void {
-  updateGamestate((state) => {
-    state.world.autoMode.riskTolerance = riskTolerance;
-    return state;
-  });
-
-  analyticsSendDesignEvent('Decree:Risk:Change');
-}
-
 // Static description of what a clause does; distinct from auto-mode.ts's autoModeStatusLabel, which shows live progress.
 export function decreeClauseSummary(clause: DecreeClause): string {
   switch (clause.type) {
@@ -193,10 +180,26 @@ export function decreeClauseSummary(clause: DecreeClause): string {
       return `Farm ${clause.nodeName} until ${clause.targetQuantity.toLocaleString()}x ${reward?.name ?? 'reward'} obtained`;
     }
     case 'FinishUnfinishedAreas':
-      return 'Finish unfinished areas';
+      return `Finish unfinished areas (${clause.riskTolerance} risk)`;
     case 'LevelUpParty':
-      return 'Level up the party';
+      return `Level up the party (${clause.riskTolerance} risk)`;
     case 'ReturnToKingdom':
       return 'Return to the kingdom';
   }
+}
+
+// Pre-per-clause-risk saves stored one global risk tolerance for both risk-aware clause types; backfill it onto any
+// clause that predates the split (merge can't do this - it has no per-clause field to copy the legacy value into).
+export function backfillDecreeClauseRiskTolerance(
+  clauses: DecreeClause[],
+  legacyRiskTolerance: DecreeRiskLevel,
+): DecreeClause[] {
+  return clauses.map((clause) => {
+    if (clause.type !== 'FinishUnfinishedAreas' && clause.type !== 'LevelUpParty') {
+      return clause;
+    }
+    if (clause.riskTolerance) return clause;
+
+    return { ...clause, riskTolerance: legacyRiskTolerance };
+  });
 }

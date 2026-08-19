@@ -83,7 +83,6 @@ export function defaultAutoModeState(): AutoModeState {
   return {
     enabled: false,
     clauses: [],
-    riskTolerance: 'Medium',
     waitForFullHealthBeforeCombat: false,
     nodeFailureCounts: {},
   };

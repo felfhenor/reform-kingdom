@@ -10,7 +10,6 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/decree', () => ({
   decreeClauses: vi.fn(() => []),
-  decreeRiskTolerance: vi.fn(() => 'Medium'),
   decreeWaitForFullHealthBeforeCombat: vi.fn(() => false),
 }));
 
@@ -84,7 +83,6 @@ import { currentCombat } from '@helpers/combat';
 import { getEntry } from '@helpers/content';
 import {
   decreeClauses,
-  decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
 import {
@@ -123,6 +121,7 @@ function buildClause(overrides: Partial<DecreeClause> = {}): DecreeClause {
     type: 'FinishUnfinishedAreas',
     enabled: true,
     failureCount: 0,
+    riskTolerance: 'Medium',
     ...overrides,
   } as DecreeClause;
 }
@@ -148,7 +147,6 @@ function buildState(overrides: {
         enabled: overrides.enabled ?? true,
         clauses: overrides.clauses ?? [],
         activeClauseId: overrides.activeClauseId,
-        riskTolerance: 'Medium',
         nodeFailureCounts: overrides.nodeFailureCounts ?? {},
       },
     },
@@ -366,15 +364,15 @@ describe('autoModeStatusLabel', () => {
     );
   });
 
-  it('describes an active LevelUpParty clause using the global risk tolerance', () => {
+  it("describes an active LevelUpParty clause using the clause's risk tolerance", () => {
     const clause = buildClause({
       id: 'a' as DecreeClauseId,
       type: 'LevelUpParty',
+      riskTolerance: 'High',
     });
     vi.mocked(gamestate).mockReturnValue(
       buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
     );
-    vi.mocked(decreeRiskTolerance).mockReturnValue('High');
 
     expect(autoModeStatusLabel()).toBe('Leveling up (High risk)...');
   });

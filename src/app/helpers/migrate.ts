@@ -12,7 +12,10 @@ import {
 } from '@helpers/collectibles';
 import { retrofitPartyXp } from '@helpers/character-progress';
 import { pruneInvalidCraftQueues } from '@helpers/crafting';
-import { pruneInvalidDecreeGatherClauses } from '@helpers/decree';
+import {
+  backfillDecreeClauseRiskTolerance,
+  pruneInvalidDecreeGatherClauses,
+} from '@helpers/decree';
 import { defaultGameState } from '@helpers/defaults';
 import {
   backfillEquipmentBlock,
@@ -46,6 +49,8 @@ import { defaultOptions, options, setOptions } from '@helpers/state-options';
 import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
 import { merge } from 'es-toolkit/compat';
 import type {
+  AutoModeState,
+  DecreeRiskLevel,
   GameStateDiscoveredGatherNodes,
   GameStateDiscoveredMaterials,
   GameStateMaterials,
@@ -89,6 +94,13 @@ export function migrateGameState() {
   };
   const newState = merge(defaultGameState(), remappedState);
 
+  // Pre-per-clause-risk saves stored this on `world.autoMode` directly; the field no longer exists on `AutoModeState`.
+  const legacyAutoMode = newState.world.autoMode as AutoModeState & {
+    riskTolerance?: DecreeRiskLevel;
+  };
+  const legacyRiskTolerance = legacyAutoMode.riskTolerance ?? 'Medium';
+  delete legacyAutoMode.riskTolerance;
+
   newState.armory = newState.armory.map(backfillEquipmentItem);
   newState.world.party = newState.world.party.map((character) => ({
     ...character,
@@ -128,6 +140,10 @@ export function migrateGameState() {
   newState.world.autoMode.clauses = pruneInvalidDecreeGatherClauses(
     newState.world.autoMode.clauses,
     allGatherableMaterialIds(),
+  );
+  newState.world.autoMode.clauses = backfillDecreeClauseRiskTolerance(
+    newState.world.autoMode.clauses,
+    legacyRiskTolerance,
   );
   newState.bestiary = pruneInvalidBestiaryEntries(newState.bestiary);
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);

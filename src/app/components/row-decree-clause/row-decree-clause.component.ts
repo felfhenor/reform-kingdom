@@ -19,6 +19,8 @@ const FAILURE_WARNING_THRESHOLD = 3;
 const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   'GatherMaterial',
   'FarmNode',
+  'FinishUnfinishedAreas',
+  'LevelUpParty',
 ];
 
 @Component({

@@ -25,6 +25,7 @@ vi.mock('@helpers/world-node-rewards', () => ({
 
 import { getEntry } from '@helpers/content';
 import {
+  backfillDecreeClauseRiskTolerance,
   decreeClauseAdd,
   decreeClauseConflicts,
   decreeClauseReorder,
@@ -33,8 +34,6 @@ import {
   decreeClauseSummary,
   decreeClauseUpdate,
   decreeClauses,
-  decreeRiskTolerance,
-  decreeSetRiskTolerance,
   decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
   pruneInvalidDecreeGatherClauses,
@@ -62,7 +61,6 @@ function buildClause(overrides: Partial<DecreeClause> = {}): DecreeClause {
 
 function stateWithAutoMode(
   clauses: DecreeClause[],
-  riskTolerance: 'Low' | 'Medium' | 'High' = 'Medium',
   waitForFullHealthBeforeCombat = false,
   nodeFailureCounts: Partial<Record<string, number>> = {},
 ): GameState {
@@ -71,7 +69,6 @@ function stateWithAutoMode(
       autoMode: {
         enabled: false,
         clauses,
-        riskTolerance,
         waitForFullHealthBeforeCombat,
         nodeFailureCounts,
       },
@@ -97,16 +94,8 @@ describe('decree read accessors', () => {
     expect(decreeClauses()).toBe(clauses);
   });
 
-  it('decreeRiskTolerance returns the stored risk tolerance', () => {
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([], 'High'));
-
-    expect(decreeRiskTolerance()).toBe('High');
-  });
-
   it('decreeWaitForFullHealthBeforeCombat returns the stored flag', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithAutoMode([], 'Medium', true),
-    );
+    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([], true));
 
     expect(decreeWaitForFullHealthBeforeCombat()).toBe(true);
   });
@@ -169,19 +158,29 @@ describe('decreeClauseAdd', () => {
 });
 
 describe('decreeClauseConflicts', () => {
-  it('flags two param-less clauses of the same type as conflicting', () => {
-    const existing = [buildClause({ type: 'LevelUpParty' })];
+  it('flags two clauses of the same type as conflicting regardless of risk tolerance', () => {
+    const existing = [
+      buildClause({ type: 'LevelUpParty', riskTolerance: 'Low' }),
+    ];
 
-    expect(decreeClauseConflicts({ type: 'LevelUpParty' }, existing)).toBe(
-      true,
-    );
+    expect(
+      decreeClauseConflicts(
+        { type: 'LevelUpParty', riskTolerance: 'High' },
+        existing,
+      ),
+    ).toBe(true);
   });
 
   it('does not flag different clause types as conflicting', () => {
-    const existing = [buildClause({ type: 'LevelUpParty' })];
+    const existing = [
+      buildClause({ type: 'LevelUpParty', riskTolerance: 'Medium' }),
+    ];
 
     expect(
-      decreeClauseConflicts({ type: 'FinishUnfinishedAreas' }, existing),
+      decreeClauseConflicts(
+        { type: 'FinishUnfinishedAreas', riskTolerance: 'Medium' },
+        existing,
+      ),
     ).toBe(false);
   });
 
@@ -372,12 +371,14 @@ describe('decreeClauseUpdate', () => {
 
     decreeClauseUpdate('clause-1' as DecreeClauseId, {
       type: 'FinishUnfinishedAreas',
+      riskTolerance: 'Medium',
     });
 
     const result = applyLastUpdate(stateWithAutoMode([existing]));
     expect(result.world.autoMode.clauses[0]).toEqual({
       id: 'clause-1',
       type: 'FinishUnfinishedAreas',
+      riskTolerance: 'Medium',
       enabled: true,
       failureCount: 0,
     });
@@ -521,21 +522,6 @@ describe('decreeClauseReorder', () => {
   });
 });
 
-describe('decreeSetRiskTolerance', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('updates the stored risk tolerance', () => {
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([]));
-
-    decreeSetRiskTolerance('High');
-
-    const result = applyLastUpdate(stateWithAutoMode([]));
-    expect(result.world.autoMode.riskTolerance).toBe('High');
-  });
-});
-
 describe('decreeClauseSummary', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -605,16 +591,20 @@ describe('decreeClauseSummary', () => {
     expect(summary).toBe('Farm Forest Ruins until 5x reward obtained');
   });
 
-  it('describes FinishUnfinishedAreas', () => {
+  it('describes FinishUnfinishedAreas including its risk tolerance', () => {
     expect(
-      decreeClauseSummary(buildClause({ type: 'FinishUnfinishedAreas' })),
-    ).toBe('Finish unfinished areas');
+      decreeClauseSummary(
+        buildClause({ type: 'FinishUnfinishedAreas', riskTolerance: 'Low' }),
+      ),
+    ).toBe('Finish unfinished areas (Low risk)');
   });
 
-  it('describes LevelUpParty', () => {
+  it('describes LevelUpParty including its risk tolerance', () => {
     expect(
-      decreeClauseSummary(buildClause({ type: 'LevelUpParty' })),
-    ).toBe('Level up the party');
+      decreeClauseSummary(
+        buildClause({ type: 'LevelUpParty', riskTolerance: 'High' }),
+      ),
+    ).toBe('Level up the party (High risk)');
   });
 
   it('describes ReturnToKingdom', () => {
@@ -655,5 +645,41 @@ describe('pruneInvalidDecreeGatherClauses', () => {
     const clauses = [buildClause({ type: 'ReturnToKingdom' })];
 
     expect(pruneInvalidDecreeGatherClauses(clauses, [])).toEqual(clauses);
+  });
+});
+
+describe('backfillDecreeClauseRiskTolerance', () => {
+  it('applies the legacy risk tolerance to a LevelUpParty clause missing it', () => {
+    const clauses = [buildClause({ type: 'LevelUpParty' })];
+
+    expect(
+      backfillDecreeClauseRiskTolerance(clauses, 'High')[0],
+    ).toMatchObject({ riskTolerance: 'High' });
+  });
+
+  it('applies the legacy risk tolerance to a FinishUnfinishedAreas clause missing it', () => {
+    const clauses = [buildClause({ type: 'FinishUnfinishedAreas' })];
+
+    expect(
+      backfillDecreeClauseRiskTolerance(clauses, 'Low')[0],
+    ).toMatchObject({ riskTolerance: 'Low' });
+  });
+
+  it('does not override a risk tolerance the clause already has', () => {
+    const clauses = [
+      buildClause({ type: 'LevelUpParty', riskTolerance: 'Low' }),
+    ];
+
+    expect(
+      backfillDecreeClauseRiskTolerance(clauses, 'High')[0],
+    ).toMatchObject({ riskTolerance: 'Low' });
+  });
+
+  it('leaves clause types without a risk tolerance untouched', () => {
+    const clauses = [buildClause({ type: 'ReturnToKingdom' })];
+
+    expect(backfillDecreeClauseRiskTolerance(clauses, 'High')).toEqual(
+      clauses,
+    );
   });
 });

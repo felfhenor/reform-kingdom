@@ -20,8 +20,6 @@ import {
   decreeClauses,
   decreeClauseSetEnabled,
   decreeClauseUpdate,
-  decreeRiskTolerance,
-  decreeSetRiskTolerance,
   decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
@@ -106,7 +104,6 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
 })
 export class GamePlayDecreeComponent {
   public autoModeEnabled = computed(() => autoModeIsEnabled());
-  public riskTolerance = computed(() => decreeRiskTolerance());
   public waitForFullHealthBeforeCombat = computed(() =>
     decreeWaitForFullHealthBeforeCombat(),
   );
@@ -137,6 +134,7 @@ export class GamePlayDecreeComponent {
   public draftNodeName = signal<string | undefined>(undefined);
   public draftRewardKey = signal<string | undefined>(undefined);
   public draftTargetQuantity = signal<number>(1);
+  public draftRiskTolerance = signal<DecreeRiskLevel>('Medium');
 
   // Scoped to the currently-selected node - a FarmNode reward only ever
   // makes sense in the context of the node it's farmed from.
@@ -150,7 +148,7 @@ export class GamePlayDecreeComponent {
     this.rewardOptions().find((option) => option.key === this.draftRewardKey()),
   );
 
-  // Only GatherMaterial/FarmNode clauses are editable in place - see `RowDecreeClauseComponent.isEditable`.
+  // Which clause types are editable in place is decided by `RowDecreeClauseComponent.isEditable`.
   public editingClauseId = signal<DecreeClauseId | undefined>(undefined);
   public isEditing = computed(() => !!this.editingClauseId());
 
@@ -179,9 +177,15 @@ export class GamePlayDecreeComponent {
           : undefined;
       }
       case 'LevelUpParty':
-        return { type: 'LevelUpParty' };
+        return {
+          type: 'LevelUpParty',
+          riskTolerance: this.draftRiskTolerance(),
+        };
       case 'FinishUnfinishedAreas':
-        return { type: 'FinishUnfinishedAreas' };
+        return {
+          type: 'FinishUnfinishedAreas',
+          riskTolerance: this.draftRiskTolerance(),
+        };
       case 'ReturnToKingdom':
         return { type: 'ReturnToKingdom' };
     }
@@ -220,8 +224,8 @@ export class GamePlayDecreeComponent {
   }
 
   // ng-select's (change) emits the full item, not the bindValue-mapped field, so this pulls it out manually.
-  public setRiskTolerance(option: RiskToleranceOption): void {
-    decreeSetRiskTolerance(option.value);
+  public setDraftRiskTolerance(option: RiskToleranceOption): void {
+    this.draftRiskTolerance.set(option.value);
   }
 
   public setDraftType(option: { value: DecreeClauseAction['type'] }): void {
@@ -269,6 +273,13 @@ export class GamePlayDecreeComponent {
       this.draftNodeName.set(clause.nodeName);
       this.draftRewardKey.set(rewardKey(clause.reward));
       this.draftTargetQuantity.set(clause.targetQuantity);
+      return;
+    }
+
+    if (clause.type === 'LevelUpParty' || clause.type === 'FinishUnfinishedAreas') {
+      this.editingClauseId.set(clause.id);
+      this.draftType.set(clause.type);
+      this.draftRiskTolerance.set(clause.riskTolerance);
     }
   }
 
@@ -278,6 +289,7 @@ export class GamePlayDecreeComponent {
     this.draftNodeName.set(undefined);
     this.draftRewardKey.set(undefined);
     this.draftTargetQuantity.set(1);
+    this.draftRiskTolerance.set('Medium');
   }
 
   public submitClause(): void {

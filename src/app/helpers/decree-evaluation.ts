@@ -1,6 +1,5 @@
 import {
   decreeNodeFailureCount,
-  decreeRiskTolerance,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree-farm-node';
@@ -95,9 +94,9 @@ function nearestReachableExploreNode(
   );
 }
 
-export function nearestUnfinishedExploreNode(): WorldNodeEntry | undefined {
-  const riskTolerance = decreeRiskTolerance();
-
+export function nearestUnfinishedExploreNode(
+  riskTolerance: DecreeRiskLevel,
+): WorldNodeEntry | undefined {
   return nearestReachableExploreNode((entry) => {
     const { obtained, total } = worldNodeCompletionRewardProgress(entry);
     if (obtained >= total) return false;
@@ -118,10 +117,10 @@ function leastFailedNodeIn(
   return sortBy(entries, (entry) => decreeNodeFailureCount(entry.nodeName))[0];
 }
 
-// Ranked by challenge (not proximity) within the global risk tolerance; steps down a tier once it's lost LEVEL_UP_NODE_FAILURE_LIMIT+ fights in a row, so the party settles where it can actually win.
-export function mostChallengingExploreNodeForRisk():
-  WorldNodeEntry | undefined {
-  const ceiling = decreeRiskTolerance();
+// Ranked by challenge (not proximity) within the clause's risk tolerance; steps down a tier once it's lost LEVEL_UP_NODE_FAILURE_LIMIT+ fights in a row, so the party settles where it can actually win.
+export function mostChallengingExploreNodeForRisk(
+  ceiling: DecreeRiskLevel,
+): WorldNodeEntry | undefined {
   const partyLevel = partyMaxLevel();
 
   const candidates = worldNodesOfType('ExploreNode')
@@ -186,9 +185,9 @@ export function clauseTargetNode(
       return travelPathTo(entry.nodeName) ? entry : undefined;
     }
     case 'FinishUnfinishedAreas':
-      return nearestUnfinishedExploreNode();
+      return nearestUnfinishedExploreNode(clause.riskTolerance);
     case 'LevelUpParty':
-      return mostChallengingExploreNodeForRisk();
+      return mostChallengingExploreNodeForRisk(clause.riskTolerance);
     case 'ReturnToKingdom':
       return undefined;
   }

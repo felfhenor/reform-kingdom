@@ -12,7 +12,6 @@ import {
   decreeClauseReorder,
   decreeClauses,
   decreeClauseSetEnabled,
-  decreeSetRiskTolerance,
 } from '@helpers/decree';
 import { equippedItems, isSlotAvailableForJob } from '@helpers/equipment';
 import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
@@ -96,14 +95,13 @@ const STRATEGY_PRESETS: Record<StrategyName, StrategyPreset> = {
 // level actually allows gathering each one, and must therefore be re-checked
 // every tick rather than decided once up front.
 export function configureStrategyDecree(): void {
-  decreeSetRiskTolerance('High');
   rebuildPartyEquipmentTargets();
   rebuildPartyRelevantMaterialIds();
   resetGatherTimeTracking();
 
   if (decreeClauses().length === 0) {
-    decreeClauseAdd({ type: 'LevelUpParty' });
-    decreeClauseAdd({ type: 'FinishUnfinishedAreas' });
+    decreeClauseAdd({ type: 'LevelUpParty', riskTolerance: 'High' });
+    decreeClauseAdd({ type: 'FinishUnfinishedAreas', riskTolerance: 'High' });
     decreeClauseAdd({ type: 'ReturnToKingdom' });
   }
 
