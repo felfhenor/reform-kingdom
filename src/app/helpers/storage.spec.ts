@@ -47,6 +47,36 @@ describe('Storage Helper Functions', () => {
           [tatteredHide.id]: { quantity: 2, foundAt: 1000 },
           [goldCoin.id]: { quantity: 5, foundAt: 2000 },
         },
+        discoveredMaterials: {
+          [tatteredHide.id]: { foundAt: 1000 },
+          [goldCoin.id]: { foundAt: 2000 },
+        },
+      } as unknown as GameState);
+
+      expect(getStorageMaterials()).toEqual([
+        { item: goldCoin, quantity: 5, foundAt: 2000 },
+        { item: tatteredHide, quantity: 2, foundAt: 1000 },
+      ]);
+    });
+
+    it('sorts by first-ever discovery, not the live entry foundAt (which resets on 0-then-regain)', () => {
+      setAllContentById(
+        new Map([
+          [tatteredHide.id, tatteredHide],
+          [goldCoin.id, goldCoin],
+        ]),
+      );
+      vi.mocked(gamestate).mockReturnValue({
+        materials: {
+          // tattered hide was just regained after dropping to 0, so its live foundAt is newer...
+          [tatteredHide.id]: { quantity: 2, foundAt: 5000 },
+          [goldCoin.id]: { quantity: 5, foundAt: 2000 },
+        },
+        discoveredMaterials: {
+          // ...but it was discovered first, so it should still sort after gold coin
+          [tatteredHide.id]: { foundAt: 1000 },
+          [goldCoin.id]: { foundAt: 2000 },
+        },
       } as unknown as GameState);
 
       expect(getStorageMaterials()).toEqual([
@@ -59,6 +89,7 @@ describe('Storage Helper Functions', () => {
       setAllContentById(new Map([[goldCoin.id, goldCoin]]));
       vi.mocked(gamestate).mockReturnValue({
         materials: { [goldCoin.id]: { quantity: 0, foundAt: 1000 } },
+        discoveredMaterials: { [goldCoin.id]: { foundAt: 1000 } },
       } as unknown as GameState);
 
       expect(getStorageMaterials()).toEqual([]);
@@ -68,6 +99,7 @@ describe('Storage Helper Functions', () => {
       setAllContentById(new Map());
       vi.mocked(gamestate).mockReturnValue({
         materials: { [goldCoin.id]: { quantity: 5, foundAt: 1000 } },
+        discoveredMaterials: { [goldCoin.id]: { foundAt: 1000 } },
       } as unknown as GameState);
 
       expect(getStorageMaterials()).toEqual([]);
