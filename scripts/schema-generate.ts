@@ -291,6 +291,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve(__dirname, '../src/app/interfaces/content-skill.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-statuseffect.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-trait.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-tradeskill.ts'),
     path.resolve(
       __dirname,
       '../src/app/interfaces/content-tradeskill-level-requirement.ts',
@@ -334,6 +335,7 @@ const contentTypeMap = {
   skill: 'EquipmentSkillContent',
   statuseffect: 'StatusEffectContent',
   trait: 'TraitContent',
+  tradeskill: 'TradeskillContent',
   tradeskilllevelrequirement: 'TradeskillLevelRequirementContent',
 };
 

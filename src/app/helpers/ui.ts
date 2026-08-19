@@ -5,6 +5,7 @@ import type {
   CharacterId,
   GamePlayView,
   KingdomSubview,
+  Tradeskill,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -41,6 +42,20 @@ export function kingdomSubviewShow(subview: KingdomSubview): void {
 
 export function kingdomSubviewClear(): void {
   kingdomSubview.set(undefined);
+}
+
+const TRADESKILL_SUBVIEWS: Record<Tradeskill, KingdomSubview> = {
+  Artificing: 'tradeskill-artificing',
+  Blacksmithing: 'tradeskill-blacksmithing',
+  Jewelcrafting: 'tradeskill-jewelcrafting',
+  Tailoring: 'tradeskill-tailoring',
+  Woodworking: 'tradeskill-woodworking',
+};
+
+export function kingdomSubviewForTradeskill(
+  tradeskill: Tradeskill,
+): KingdomSubview {
+  return TRADESKILL_SUBVIEWS[tradeskill];
 }
 
 // Not cleared on close - clearing it would collapse the modal's DOM mid-transition (see `activeCaravanNode`).

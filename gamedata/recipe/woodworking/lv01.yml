@@ -8,7 +8,7 @@
     - itemId: Wergen Wood
       quantity: 1
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 1
   maxTradeskillLevel: 4
   tradeskillXP: 1
@@ -26,7 +26,7 @@
     - itemId: Wergen Wood
       quantity: 2
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
   tradeskillXP: 5
@@ -41,7 +41,7 @@
     - itemId: Wergen Stick
       quantity: 1
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 3
   maxTradeskillLevel: 6
   tradeskillXP: 5
@@ -58,7 +58,7 @@
     - itemId: Copper Ingot
       quantity: 1
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
   tradeskillXP: 8
@@ -76,7 +76,7 @@
     - itemId: Wergen Stick
       quantity: 3
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 5
   maxTradeskillLevel: 8
   tradeskillXP: 5
@@ -97,7 +97,7 @@
     - itemId: Gold Coin
       quantity: 250
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 5
   maxTradeskillLevel: 5
   tradeskillXP: 25

@@ -82,3 +82,7 @@
 @utility zoom-header {
   zoom: 150%;
 }
+
+@utility glow-idle {
+  box-shadow: 0 0 6px 2px color-mix(in oklab, var(--color-success) 70%, transparent);
+}

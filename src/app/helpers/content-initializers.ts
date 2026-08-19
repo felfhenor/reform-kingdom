@@ -69,6 +69,8 @@ import type {
   StatusEffectBehaviorType,
   StatusEffectContent,
   StatusEffectId,
+  TradeskillContent,
+  TradeskillId,
   TradeskillLevelRequirementContent,
   TradeskillLevelRequirementId,
   TraitContent,
@@ -95,6 +97,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   skill: ensureSkill,
   statuseffect: ensureStatusEffect,
   trait: ensureTrait,
+  tradeskill: ensureTradeskill,
   tradeskilllevelrequirement: ensureTradeskillLevelRequirement,
 };
 
@@ -484,11 +487,23 @@ function ensureRecipe(recipe: Partial<RecipeContent>): Required<RecipeContent> {
     __type: 'recipe',
     result: recipe.result ?? { itemId: 'UNKNOWN' as ItemId, quantity: 1 },
     requirements: ensureArray(recipe.requirements, ensureRecipeRequirement),
-    tradeskill: recipe.tradeskill ?? 'Blacksmithing',
+    tradeskillId: recipe.tradeskillId ?? ('UNKNOWN' as TradeskillId),
     minTradeskillLevel: recipe.minTradeskillLevel ?? 1,
     maxTradeskillLevel: recipe.maxTradeskillLevel ?? 1,
     tradeskillXP: recipe.tradeskillXP ?? 0,
     craftTime: recipe.craftTime ?? 60,
+  };
+}
+
+function ensureTradeskill(
+  tradeskill: Partial<TradeskillContent>,
+): Required<TradeskillContent> {
+  return {
+    id: tradeskill.id ?? ('UNKNOWN' as TradeskillId),
+    name: tradeskill.name ?? 'UNKNOWN',
+    __type: 'tradeskill',
+    sprite: tradeskill.sprite ?? 'UNKNOWN',
+    description: tradeskill.description ?? 'UNKNOWN',
   };
 }
 
@@ -603,7 +618,7 @@ function ensureTradeskillLevelRequirement(
     id: requirement.id ?? ('UNKNOWN' as TradeskillLevelRequirementId),
     name: requirement.name ?? 'UNKNOWN',
     __type: 'tradeskilllevelrequirement',
-    tradeskill: requirement.tradeskill ?? 'Blacksmithing',
+    tradeskillId: requirement.tradeskillId ?? ('UNKNOWN' as TradeskillId),
     level: requirement.level ?? 1,
     requiredCollectibleId:
       requirement.requiredCollectibleId ?? ('UNKNOWN' as CollectibleId),

@@ -13,7 +13,7 @@
     - itemId: Purple Slime Core
       quantity: 3
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 5
   maxTradeskillLevel: 8
   tradeskillXP: 15
@@ -31,7 +31,7 @@
     - itemId: Purple Slime Core
       quantity: 5
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 6
   maxTradeskillLevel: 9
   tradeskillXP: 15
@@ -49,7 +49,7 @@
     - itemId: Purple Slime Core
       quantity: 5
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 7
   maxTradeskillLevel: 10
   tradeskillXP: 15
@@ -70,7 +70,7 @@
     - itemId: Purple Slime Core
       quantity: 2
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 8
   maxTradeskillLevel: 11
   tradeskillXP: 15
@@ -88,7 +88,7 @@
     - itemId: Trislime Core
       quantity: 1
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 9
   maxTradeskillLevel: 12
   tradeskillXP: 15

@@ -1,6 +1,6 @@
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { isCollectibleDiscovered } from '@helpers/collectibles';
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { roundToNearest10 } from '@helpers/number';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -9,6 +9,8 @@ import type {
   RecipeContent,
   Tradeskill,
   TradeskillBuildingState,
+  TradeskillContent,
+  TradeskillId,
   TradeskillLevelRequirementContent,
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
@@ -17,6 +19,30 @@ export const TRADESKILL_MAX_LEVEL = 50;
 const TRADESKILL_XP_START = 10;
 const TRADESKILL_XP_END = 5000;
 const XP_CURVE_EASE = 1.5;
+
+// `xp.maximum: 10` matches `tradeskillXpForLevel(1)`, kept as a literal here to avoid an import cycle.
+const DEFAULT_BUILDING: TradeskillBuildingState = {
+  level: 1,
+  xp: { current: 0, maximum: 10 },
+  queue: [],
+};
+
+// Never throws - content may not be loaded yet on early renders (e.g. a
+// returning player whose persisted `kingdomSubview` reopens a tradeskill
+// screen before `ContentService` finishes its async load). Callers must
+// tolerate `undefined` gracefully; `getEntry` is reactive, so once content
+// loads any `computed()` that read this resolves correctly on its own.
+export function tradeskillIdForName(
+  tradeskill: Tradeskill,
+): TradeskillId | undefined {
+  return getEntry<TradeskillContent>(tradeskill)?.id;
+}
+
+export function tradeskillNameForId(
+  id: TradeskillId,
+): Tradeskill | undefined {
+  return getEntry<TradeskillContent>(id)?.name as Tradeskill | undefined;
+}
 
 // Eases from 10 XP at level 1 to 5,000 at the cap; progress**1.5 keeps early-level jumps gentle.
 export function tradeskillXpForLevel(level: number): number {
@@ -35,16 +61,21 @@ export function tradeskillMaxQueueSize(level: number): number {
 export function tradeskillBuilding(
   tradeskill: Tradeskill,
 ): TradeskillBuildingState {
-  return gamestate().tradeskills[tradeskill];
+  const id = tradeskillIdForName(tradeskill);
+  if (!id) return DEFAULT_BUILDING;
+  return gamestate().tradeskills[id] ?? DEFAULT_BUILDING;
 }
 
 function levelRequirementFor(
   tradeskill: Tradeskill,
   level: number,
 ): TradeskillLevelRequirementContent | undefined {
+  const tradeskillId = tradeskillIdForName(tradeskill);
   return getEntriesByType<TradeskillLevelRequirementContent>(
     'tradeskilllevelrequirement',
-  ).find((entry) => entry.tradeskill === tradeskill && entry.level === level);
+  ).find(
+    (entry) => entry.tradeskillId === tradeskillId && entry.level === level,
+  );
 }
 
 export function tradeskillLevelGateSatisfied(
@@ -98,11 +129,11 @@ export function retrofitTradeskillXp(
 ): GameStateTradeskills {
   const retrofitted = { ...tradeskills };
 
-  ALL_TRADESKILLS.forEach((tradeskill) => {
-    const building = retrofitted[tradeskill];
+  (Object.keys(retrofitted) as TradeskillId[]).forEach((tradeskillId) => {
+    const building = retrofitted[tradeskillId];
     const maximum = tradeskillXpForLevel(building.level);
 
-    retrofitted[tradeskill] = {
+    retrofitted[tradeskillId] = {
       ...building,
       xp: { current: Math.min(building.xp.current, maximum), maximum },
     };
@@ -114,22 +145,54 @@ export function retrofitTradeskillXp(
 export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   if (amount <= 0) return;
 
+  const tradeskillId = tradeskillIdForName(tradeskill);
+  if (!tradeskillId) return;
+
   const previousLevel = tradeskillBuilding(tradeskill).level;
   let newLevel = previousLevel;
 
   updateGamestate((state) => {
-    state.tradeskills[tradeskill] = tradeskillLeveledUp(
-      state.tradeskills[tradeskill],
+    state.tradeskills[tradeskillId] = tradeskillLeveledUp(
+      state.tradeskills[tradeskillId],
       tradeskill,
       amount,
     );
-    newLevel = state.tradeskills[tradeskill].level;
+    newLevel = state.tradeskills[tradeskillId].level;
     return state;
   });
 
   if (newLevel > previousLevel) {
     analyticsSendDesignEvent('Kingdom:Building:LevelUp', newLevel);
   }
+}
+
+// Remaps a save's tradeskill keys from the pre-gamedata `Tradeskill` name
+// strings (e.g. "Blacksmithing") to real TradeskillId values, then backfills
+// any tradeskill known to gamedata that still has no entry (covers a
+// brand-new save, whose `defaultTradeskills()` is deliberately empty - see
+// `defaults.ts`). A legacy key already shaped like an id passes through
+// unchanged, and an unresolvable legacy key (should never happen once
+// content is loaded) is defensively dropped rather than aborting the whole
+// migration. This function is only ever called once content is guaranteed
+// loaded (see `migrateGameState`), unlike `tradeskillIdForName` elsewhere.
+export function migrateTradeskillStateKeys(
+  tradeskills: Record<string, TradeskillBuildingState>,
+): GameStateTradeskills {
+  const remapped = {} as GameStateTradeskills;
+
+  Object.entries(tradeskills ?? {}).forEach(([key, building]) => {
+    const isLegacyName = (ALL_TRADESKILLS as string[]).includes(key);
+    const id = isLegacyName
+      ? tradeskillIdForName(key as Tradeskill)
+      : (key as TradeskillId);
+    if (id) remapped[id] = building;
+  });
+
+  getEntriesByType<TradeskillContent>('tradeskill').forEach((content) => {
+    remapped[content.id] ??= DEFAULT_BUILDING;
+  });
+
+  return remapped;
 }
 
 // WoW-style skill-up odds: guaranteed early, coin flip past halfway, long shot near the cap, nothing once out-levelled.

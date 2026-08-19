@@ -10,7 +10,7 @@
     - itemId: Purple Slime Core
       quantity: 5
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 5
   maxTradeskillLevel: 8
   tradeskillXP: 15
@@ -28,7 +28,7 @@
     - itemId: Red Slime Core
       quantity: 5
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 6
   maxTradeskillLevel: 9
   tradeskillXP: 15
@@ -49,7 +49,7 @@
     - itemId: Red Slime Core
       quantity: 5
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 7
   maxTradeskillLevel: 10
   tradeskillXP: 15
@@ -70,7 +70,7 @@
     - itemId: Red Slime Core
       quantity: 5
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 8
   maxTradeskillLevel: 11
   tradeskillXP: 15
@@ -85,7 +85,7 @@
     - itemId: Elven Wood
       quantity: 20
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 9
   maxTradeskillLevel: 12
   tradeskillXP: 25

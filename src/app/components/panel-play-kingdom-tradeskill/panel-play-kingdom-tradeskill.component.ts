@@ -14,8 +14,12 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { getEntry } from '@helpers/content';
-import { getCraftableRecipeEntries } from '@helpers/crafting';
+import { getEntriesByType, getEntry } from '@helpers/content';
+import {
+  craftQueueTicksRemaining,
+  craftQueueUnitsRemaining,
+  getCraftableRecipeEntries,
+} from '@helpers/crafting';
 import { craftQueueRemove, craftQueueStart } from '@helpers/crafting-queue';
 import { recipeResultContent, recipeResultSpritesheet } from '@helpers/recipes';
 import { formatDuration } from '@helpers/timer';
@@ -27,6 +31,8 @@ import {
 import {
   craftingHideUncraftable,
   craftingHideUncraftableToggle,
+  kingdomSubviewForTradeskill,
+  kingdomSubviewShow,
   uiClockTick,
 } from '@helpers/ui';
 import type {
@@ -36,11 +42,13 @@ import type {
   RecipeContent,
   RecipeId,
   Tradeskill,
+  TradeskillBuildingState,
+  TradeskillContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { clamp } from 'es-toolkit/compat';
+import { clamp, sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-play-kingdom-tradeskill',
@@ -63,6 +71,46 @@ export class PanelPlayKingdomTradeskillComponent {
   public tradeskill = input.required<Tradeskill>();
 
   public formatDuration = formatDuration;
+  public kingdomSubviewShow = kingdomSubviewShow;
+
+  // Alphabetical, to the left of the Back button - see the pageactions row
+  // in the template. Recomputes once a second (via `uiClockTick`) so the
+  // per-tradeskill queue/remaining-time tooltips never look frozen.
+  public tradeskillNav = computed(() => {
+    uiClockTick();
+    const current = this.tradeskill();
+
+    return sortBy(getEntriesByType<TradeskillContent>('tradeskill'), (t) => t.name).map(
+      (content) => {
+        const name = content.name as Tradeskill;
+        const building = tradeskillBuilding(name);
+
+        return {
+          content,
+          subview: kingdomSubviewForTradeskill(name),
+          isCurrent: name === current,
+          isIdle: building.queue.length === 0,
+          tooltip: this.tradeskillNavTooltip(content, building, name),
+        };
+      },
+    );
+  });
+
+  private tradeskillNavTooltip(
+    content: TradeskillContent,
+    building: TradeskillBuildingState,
+    tradeskill: Tradeskill,
+  ): string {
+    const level = formatNumber(building.level, this.locale);
+    if (building.queue.length === 0) return `${content.name} Lv.${level} (idle)`;
+
+    const units = formatNumber(
+      craftQueueUnitsRemaining(tradeskill),
+      this.locale,
+    );
+    const remaining = formatDuration(craftQueueTicksRemaining(tradeskill));
+    return `${content.name} Lv.${level} (${units} items crafting, ${remaining} remaining)`;
+  }
 
   public building = computed(() => tradeskillBuilding(this.tradeskill()));
   public recipeEntries = computed(() =>

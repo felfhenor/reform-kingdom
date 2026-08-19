@@ -1,29 +1,29 @@
 - id: ae193a64-18c5-4afe-b008-aa065fac8771
   name: 'Tradeskill Level Requirement: Artificing 6'
-  tradeskill: Artificing
+  tradeskillId: Artificing
   level: 6
   requiredCollectibleId: Minor Artificing Effigy
 
 - id: 4201cc67-ef28-457d-b13e-4d131fb53ba3
   name: 'Tradeskill Level Requirement: Blacksmithing 6'
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   level: 6
   requiredCollectibleId: Minor Blacksmithing Effigy
 
 - id: d1ef3705-b154-424a-ab5b-b85d63e4ad8e
   name: 'Tradeskill Level Requirement: Jewelcrafting 6'
-  tradeskill: Jewelcrafting
+  tradeskillId: Jewelcrafting
   level: 6
   requiredCollectibleId: Minor Jewelcrafting Effigy
 
 - id: 1dc58d38-bda8-41ba-8eea-cd12921ab473
   name: 'Tradeskill Level Requirement: Tailoring 6'
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   level: 6
   requiredCollectibleId: Minor Tailoring Effigy
 
 - id: a6cac84a-ab8f-48df-9719-1966a66290f8
   name: 'Tradeskill Level Requirement: Woodworking 6'
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   level: 6
   requiredCollectibleId: Minor Woodworking Effigy

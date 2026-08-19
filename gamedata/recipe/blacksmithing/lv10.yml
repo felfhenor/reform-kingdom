@@ -13,7 +13,7 @@
     - itemId: Wergen Wood
       quantity: 3
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 10
   maxTradeskillLevel: 13
   tradeskillXP: 25

@@ -57,7 +57,7 @@ const effigyRecipe: RecipeContent = {
   __type: 'recipe',
   result: { collectibleId: minorEffigy },
   requirements: [],
-  tradeskill: 'Blacksmithing',
+  tradeskillId: 'blacksmithing-id' as never,
   minTradeskillLevel: 1,
   maxTradeskillLevel: 3,
   tradeskillXP: 1,

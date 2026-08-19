@@ -7,7 +7,7 @@
     - itemId: Elven Wood
       quantity: 6
 
-  tradeskill: Woodworking
+  tradeskillId: Woodworking
   minTradeskillLevel: 10
   maxTradeskillLevel: 13
   tradeskillXP: 25

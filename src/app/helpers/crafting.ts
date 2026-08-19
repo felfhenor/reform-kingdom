@@ -16,6 +16,7 @@ import {
   craftXpChance,
   craftXpChanceTier,
   tradeskillBuilding,
+  tradeskillIdForName,
 } from '@helpers/tradeskill';
 import type {
   CollectibleContent,
@@ -27,8 +28,9 @@ import type {
   RecipeContent,
   RecipeRequirement,
   Tradeskill,
+  TradeskillId,
 } from '@interfaces';
-import { ALL_TRADESKILLS, RARITY_PRIORITY } from '@interfaces';
+import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy, sumBy } from 'es-toolkit/compat';
 
 function buildRequirementEntry(
@@ -87,11 +89,12 @@ export function getCraftableRecipeEntries(
 ): CraftRecipeEntry[] {
   const building = tradeskillBuilding(tradeskill);
   const backdropSprite = recipeBackdropSprite();
+  const tradeskillId = tradeskillIdForName(tradeskill);
 
   const entries: CraftRecipeEntry[] = getEntriesByType<RecipeContent>('recipe')
     .filter(
       (recipe) =>
-        recipe.tradeskill === tradeskill &&
+        recipe.tradeskillId === tradeskillId &&
         building.level >= recipe.minTradeskillLevel &&
         isRecipeCraftable(recipe.id),
     )
@@ -168,9 +171,9 @@ export function pruneInvalidCraftQueues(
 ): GameStateTradeskills {
   const pruned = { ...tradeskills };
 
-  ALL_TRADESKILLS.forEach((tradeskill) => {
-    const building = pruned[tradeskill];
-    pruned[tradeskill] = {
+  (Object.keys(pruned) as TradeskillId[]).forEach((tradeskillId) => {
+    const building = pruned[tradeskillId];
+    pruned[tradeskillId] = {
       ...building,
       queue: building.queue.filter(
         (entry) => !!getEntry<RecipeContent>(entry.recipeId),

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { armoryGet } from '@helpers/armory';
 import { getBestiaryEntries } from '@helpers/bestiary';
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   craftQueueTicksRemaining,
   craftQueueTotalTicks,
@@ -16,23 +17,31 @@ import {
 import { gamestate } from '@helpers/state-game';
 import { formatDuration } from '@helpers/timer';
 import { tradeskillBuilding } from '@helpers/tradeskill';
-import { kingdomSubviewShow, uiClockTick } from '@helpers/ui';
+import {
+  kingdomSubviewForTradeskill,
+  kingdomSubviewShow,
+  uiClockTick,
+} from '@helpers/ui';
 import { isPlayerAtKingdom } from '@helpers/world';
-import type { KingdomSubview, RecipeContent, Tradeskill } from '@interfaces';
+import type {
+  KingdomSubview,
+  RecipeContent,
+  Tradeskill,
+  TradeskillContent,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { clamp } from 'es-toolkit/compat';
+import { clamp, sortBy } from 'es-toolkit/compat';
 import { PluralizePipe } from '../../pipes/pluralize.pipe';
-
-interface TradeskillButton {
-  subview: KingdomSubview;
-  label: string;
-  tradeskill: Tradeskill;
-}
 
 @Component({
   selector: 'app-play-kingdom-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CardPageComponent, TippyDirective, PluralizePipe],
+  imports: [
+    AtlasImageComponent,
+    CardPageComponent,
+    TippyDirective,
+    PluralizePipe,
+  ],
   templateUrl: './play-kingdom-home.component.html',
 })
 export class PlayKingdomHomeComponent {
@@ -63,33 +72,9 @@ export class PlayKingdomHomeComponent {
     () => this.bestiaryEntries().filter((entry) => entry.discovered).length,
   );
 
-  public readonly tradeskillButtons: TradeskillButton[] = [
-    {
-      subview: 'tradeskill-artificing',
-      label: 'Artificing',
-      tradeskill: 'Artificing',
-    },
-    {
-      subview: 'tradeskill-blacksmithing',
-      label: 'Blacksmithing',
-      tradeskill: 'Blacksmithing',
-    },
-    {
-      subview: 'tradeskill-jewelcrafting',
-      label: 'Jewelcrafting',
-      tradeskill: 'Jewelcrafting',
-    },
-    {
-      subview: 'tradeskill-tailoring',
-      label: 'Tailoring',
-      tradeskill: 'Tailoring',
-    },
-    {
-      subview: 'tradeskill-woodworking',
-      label: 'Woodworking',
-      tradeskill: 'Woodworking',
-    },
-  ];
+  public readonly tradeskillContent = computed(() =>
+    sortBy(getEntriesByType<TradeskillContent>('tradeskill'), (t) => t.name),
+  );
 
   // Recomputes whenever `gamestate()` changes AND once a second regardless
   // (via `uiClockTick`), so the progress bars never look frozen even if the
@@ -97,15 +82,16 @@ export class PlayKingdomHomeComponent {
   public tradeskillButtonViewModels = computed(() => {
     uiClockTick();
 
-    return this.tradeskillButtons.map((button) => {
-      const building = tradeskillBuilding(button.tradeskill);
+    return this.tradeskillContent().map((content) => {
+      const tradeskill = content.name as Tradeskill;
+      const building = tradeskillBuilding(tradeskill);
       const activeEntry = building.queue[0];
       const activeRecipe = activeEntry
         ? getEntry<RecipeContent>(activeEntry.recipeId)
         : undefined;
 
-      const totalTicks = craftQueueTotalTicks(button.tradeskill);
-      const remainingTicks = craftQueueTicksRemaining(button.tradeskill);
+      const totalTicks = craftQueueTotalTicks(tradeskill);
+      const remainingTicks = craftQueueTicksRemaining(tradeskill);
       const overallPercent =
         totalTicks > 0
           ? clamp(
@@ -126,7 +112,10 @@ export class PlayKingdomHomeComponent {
           : 0;
 
       return {
-        ...button,
+        subview: kingdomSubviewForTradeskill(tradeskill),
+        label: content.name,
+        sprite: content.sprite,
+        tradeskill,
         level: building.level,
         xpCurrent: building.xp.current,
         xpMaximum: building.xp.maximum,
@@ -139,7 +128,7 @@ export class PlayKingdomHomeComponent {
               )
             : 0,
         hasQueue: building.queue.length > 0,
-        queueUnitsRemaining: craftQueueUnitsRemaining(button.tradeskill),
+        queueUnitsRemaining: craftQueueUnitsRemaining(tradeskill),
         overallPercent,
         activePercent,
         totalRemainingLabel:

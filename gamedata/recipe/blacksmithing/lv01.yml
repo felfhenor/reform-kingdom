@@ -8,7 +8,7 @@
     - itemId: Copper Ore
       quantity: 1
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
   tradeskillXP: 1
@@ -23,7 +23,7 @@
     - itemId: Copper Ingot
       quantity: 1
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 2
   maxTradeskillLevel: 4
   tradeskillXP: 5
@@ -38,7 +38,7 @@
     - itemId: Copper Ingot
       quantity: 3
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 3
   maxTradeskillLevel: 5
   tradeskillXP: 5
@@ -56,7 +56,7 @@
     - itemId: Weak Spider Silk
       quantity: 5
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
   tradeskillXP: 12
@@ -73,7 +73,7 @@
     - itemId: Copper Ingot
       quantity: 1
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 4
   maxTradeskillLevel: 6
   tradeskillXP: 8
@@ -91,7 +91,7 @@
     - itemId: Wergen Wood
       quantity: 3
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 3
   maxTradeskillLevel: 6
   tradeskillXP: 8
@@ -109,7 +109,7 @@
     - itemId: Wergen Wood
       quantity: 2
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 5
   maxTradeskillLevel: 7
   tradeskillXP: 10
@@ -130,7 +130,7 @@
     - itemId: Gold Coin
       quantity: 250
 
-  tradeskill: Blacksmithing
+  tradeskillId: Blacksmithing
   minTradeskillLevel: 5
   maxTradeskillLevel: 5
   tradeskillXP: 25

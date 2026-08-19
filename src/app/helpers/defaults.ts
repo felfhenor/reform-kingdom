@@ -11,7 +11,6 @@ import type {
   StatBlock,
   TravelState,
 } from '@interfaces';
-import { ALL_TRADESKILLS } from '@interfaces';
 
 export function defaultGameState(): GameState {
   return {
@@ -52,16 +51,16 @@ export function defaultGameState(): GameState {
   };
 }
 
-// `xp.maximum: 10` matches `tradeskillXpForLevel(1)` in `crafting.ts`, kept as a literal here to avoid an import cycle through `crafting.ts`.
+// Deliberately empty and free of any content dependency - `state-game.ts`
+// calls `defaultGameState()` eagerly at module-eval time (before content is
+// loaded, and before every spec file's `@helpers/content` mock is
+// guaranteed to exist), so this must never call into gamedata lookups.
+// Real per-tradeskill entries (keyed by TradeskillId, sourced from loaded
+// gamedata) are populated by `migrateTradeskillStateKeys` in
+// `@helpers/tradeskill`, which only ever runs once content is guaranteed
+// loaded - see `migrateGameState`.
 function defaultTradeskills(): GameStateTradeskills {
-  return ALL_TRADESKILLS.reduce((tradeskills, tradeskill) => {
-    tradeskills[tradeskill] = {
-      level: 1,
-      xp: { current: 0, maximum: 10 },
-      queue: [],
-    };
-    return tradeskills;
-  }, {} as GameStateTradeskills);
+  return {} as GameStateTradeskills;
 }
 
 export function defaultTravelState(): TravelState {

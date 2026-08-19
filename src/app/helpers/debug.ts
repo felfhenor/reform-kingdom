@@ -7,7 +7,11 @@ import {
   characterStatsForLevel,
   characterXpForLevel,
 } from '@helpers/party';
-import { TRADESKILL_MAX_LEVEL, tradeskillXpForLevel } from '@helpers/tradeskill';
+import {
+  TRADESKILL_MAX_LEVEL,
+  tradeskillIdForName,
+  tradeskillXpForLevel,
+} from '@helpers/tradeskill';
 import { updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import {
@@ -120,11 +124,14 @@ export function debugSetTradeskillLevel(
   tradeskill: Tradeskill,
   level: number,
 ): void {
+  const tradeskillId = tradeskillIdForName(tradeskill);
+  if (!tradeskillId) return;
+
   const clampedLevel = clamp(Math.round(level), 1, TRADESKILL_MAX_LEVEL);
 
   updateGamestate((state) => {
-    state.tradeskills[tradeskill] = {
-      ...state.tradeskills[tradeskill],
+    state.tradeskills[tradeskillId] = {
+      ...state.tradeskills[tradeskillId],
       level: clampedLevel,
       xp: { current: 0, maximum: tradeskillXpForLevel(clampedLevel) },
     };

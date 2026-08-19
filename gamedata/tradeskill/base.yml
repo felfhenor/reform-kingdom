@@ -1,0 +1,24 @@
+- id: bc9657b5-37ff-45d9-bdb0-2158f13f4523
+  name: Artificing
+  sprite: '0000'
+  description: Crafts arcane devices and mechanical contraptions.
+
+- id: 79abfdef-bcc4-46fe-8832-bb6634d30a62
+  name: Blacksmithing
+  sprite: '0001'
+  description: Forges weapons and armor from raw ore.
+
+- id: bd864fb4-8ae8-4659-9cbc-9b6e871aa6c8
+  name: Jewelcrafting
+  sprite: '0002'
+  description: Cuts and sets gems into fine jewelry.
+
+- id: eaf6d7fe-6a11-4e13-8f38-550eb5eab41f
+  name: Tailoring
+  sprite: '0003'
+  description: Sews cloth and leather into wearable gear.
+
+- id: 9c2b245d-c7e0-4922-9395-b510376bbf23
+  name: Woodworking
+  sprite: '0004'
+  description: Shapes timber into tools and fittings.

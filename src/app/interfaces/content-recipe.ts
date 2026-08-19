@@ -1,8 +1,8 @@
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
+import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
-import type { Tradeskill } from '@interfaces/tradeskill';
 
 export type RecipeId = Branded<string, 'RecipeId'>;
 
@@ -56,7 +56,7 @@ export type RecipeContent = IsContentItem & {
   result: RecipeResult;
   requirements: RecipeRequirement[];
 
-  tradeskill: Tradeskill;
+  tradeskillId: TradeskillId;
   minTradeskillLevel: number;
   maxTradeskillLevel: number;
   tradeskillXP: number;

@@ -53,6 +53,7 @@ vi.mock('@helpers/recipes', () => ({
 }));
 
 vi.mock('@helpers/tradeskill', () => ({
+  migrateTradeskillStateKeys: vi.fn((tradeskills) => tradeskills),
   retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
 }));
 
@@ -114,7 +115,10 @@ import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
-import { retrofitTradeskillXp } from '@helpers/tradeskill';
+import {
+  migrateTradeskillStateKeys,
+  retrofitTradeskillXp,
+} from '@helpers/tradeskill';
 import { worldNodesOfType } from '@helpers/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
 
@@ -279,6 +283,7 @@ describe('migrateGameState', () => {
     migrateGameState();
 
     expect(retrofitPartyXp).toHaveBeenCalledWith(staleParty);
+    expect(migrateTradeskillStateKeys).toHaveBeenCalledWith(staleTradeskills);
     expect(retrofitTradeskillXp).toHaveBeenCalledWith(staleTradeskills);
 
     const committed = vi.mocked(setGameState).mock.calls[0][0];

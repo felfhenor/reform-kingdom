@@ -82,7 +82,12 @@
           (click)="openSubview(tradeskill.subview)"
           (keydown.enter)="openSubview(tradeskill.subview)"
         >
-          <span class="font-bold">
+          <span class="font-bold flex items-center gap-2 justify-center">
+            <app-atlas-image
+              spritesheet="tradeskill"
+              [assetName]="tradeskill.sprite"
+              class="zoom-inline"
+            />
             {{ tradeskill.label }} Lv. {{ tradeskill.level }}
           </span>
 

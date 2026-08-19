@@ -8,7 +8,7 @@
     - itemId: Flax Flower
       quantity: 1
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 1
   maxTradeskillLevel: 4
   tradeskillXP: 1
@@ -23,7 +23,7 @@
     - itemId: Linen Thread
       quantity: 5
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
   tradeskillXP: 5
@@ -41,7 +41,7 @@
     - itemId: Tattered Hide
       quantity: 1
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 3
   maxTradeskillLevel: 6
   tradeskillXP: 5
@@ -62,7 +62,7 @@
     - itemId: Small Goblin Bone
       quantity: 3
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
   tradeskillXP: 10
@@ -83,7 +83,7 @@
     - itemId: Weak Spider Silk
       quantity: 5
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
   tradeskillXP: 10
@@ -104,7 +104,7 @@
     - itemId: Gold Coin
       quantity: 250
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 5
   maxTradeskillLevel: 5
   tradeskillXP: 25

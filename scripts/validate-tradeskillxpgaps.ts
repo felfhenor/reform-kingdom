@@ -40,7 +40,7 @@ const ALL_TRADESKILLS = [
 
 type Recipe = {
   name: string;
-  tradeskill: string;
+  tradeskillId: string;
   minTradeskillLevel: number;
   maxTradeskillLevel: number;
   tradeskillXP: number;
@@ -75,7 +75,9 @@ function recipeGrantsXpAtLevel(recipe: Recipe, level: number): boolean {
 function checkTradeskill(tradeskill: string, recipes: Recipe[]): string[] {
   const problems: string[] = [];
 
-  const tradeskillRecipes = recipes.filter((r) => r.tradeskill === tradeskill);
+  const tradeskillRecipes = recipes.filter(
+    (r) => r.tradeskillId === tradeskill,
+  );
   const xpRecipes = tradeskillRecipes.filter((r) => r.tradeskillXP > 0);
 
   if (xpRecipes.length === 0) {

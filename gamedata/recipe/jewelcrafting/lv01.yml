@@ -8,7 +8,7 @@
     - itemId: Copper Ore
       quantity: 1
 
-  tradeskill: Jewelcrafting
+  tradeskillId: Jewelcrafting
   minTradeskillLevel: 1
   maxTradeskillLevel: 4
   tradeskillXP: 1
@@ -23,7 +23,7 @@
     - itemId: Copper Ingot
       quantity: 1
 
-  tradeskill: Jewelcrafting
+  tradeskillId: Jewelcrafting
   minTradeskillLevel: 2
   maxTradeskillLevel: 5
   tradeskillXP: 5
@@ -38,7 +38,7 @@
     - itemId: Copper Ingot
       quantity: 2
 
-  tradeskill: Jewelcrafting
+  tradeskillId: Jewelcrafting
   minTradeskillLevel: 3
   maxTradeskillLevel: 6
   tradeskillXP: 5
@@ -54,7 +54,7 @@
     - itemId: Copper Ore
       quantity: 1
 
-  tradeskill: Jewelcrafting
+  tradeskillId: Jewelcrafting
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
   tradeskillXP: 1
@@ -72,7 +72,7 @@
     - itemId: Gold Coin
       quantity: 250
 
-  tradeskill: Jewelcrafting
+  tradeskillId: Jewelcrafting
   minTradeskillLevel: 5
   maxTradeskillLevel: 5
   tradeskillXP: 25

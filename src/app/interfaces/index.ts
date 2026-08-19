@@ -22,6 +22,7 @@ export * from './content-node-override';
 export * from './content-recipe';
 export * from './content-skill';
 export * from './content-statuseffect';
+export * from './content-tradeskill';
 export * from './content-tradeskill-level-requirement';
 export * from './content-trait';
 export * from './crafting';

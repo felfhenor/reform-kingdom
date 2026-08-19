@@ -1,6 +1,6 @@
 import type { CollectibleId } from '@interfaces/content-collectible';
+import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
-import type { Tradeskill } from '@interfaces/tradeskill';
 
 export type TradeskillLevelRequirementId = Branded<
   string,
@@ -10,7 +10,7 @@ export type TradeskillLevelRequirementId = Branded<
 export type TradeskillLevelRequirementContent = IsContentItem & {
   id: TradeskillLevelRequirementId;
   __type: 'tradeskilllevelrequirement';
-  tradeskill: Tradeskill;
+  tradeskillId: TradeskillId;
   level: number;
   requiredCollectibleId: CollectibleId;
 };

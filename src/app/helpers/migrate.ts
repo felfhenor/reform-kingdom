@@ -25,7 +25,10 @@ import { pruneInvalidMaterials } from '@helpers/materials';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
-import { retrofitTradeskillXp } from '@helpers/tradeskill';
+import {
+  migrateTradeskillStateKeys,
+  retrofitTradeskillXp,
+} from '@helpers/tradeskill';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node-discovery';
 import {
   gamestate,
@@ -56,7 +59,11 @@ function backfillLegacyGatherNodeDiscoveries(
 
 export function migrateGameState() {
   const state = gamestate();
-  const newState = merge(defaultGameState(), state);
+  const remappedState = {
+    ...state,
+    tradeskills: migrateTradeskillStateKeys(state.tradeskills ?? {}),
+  };
+  const newState = merge(defaultGameState(), remappedState);
 
   newState.armory = newState.armory.map(backfillEquipmentItem);
   newState.world.party = newState.world.party.map((character) => ({

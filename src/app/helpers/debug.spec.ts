@@ -10,6 +10,7 @@ import type {
   ItemId,
   StatBlock,
   TradeskillBuildingState,
+  TradeskillId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -38,6 +39,7 @@ vi.mock('@helpers/party', () => ({
 
 vi.mock('@helpers/tradeskill', () => ({
   TRADESKILL_MAX_LEVEL: 50,
+  tradeskillIdForName: vi.fn(),
   tradeskillXpForLevel: vi.fn(),
 }));
 
@@ -72,7 +74,7 @@ import {
 import { addMaterial } from '@helpers/materials';
 import { characterStatsForLevel, characterXpForLevel } from '@helpers/party';
 import { updateGamestate } from '@helpers/state-game';
-import { tradeskillXpForLevel } from '@helpers/tradeskill';
+import { tradeskillIdForName, tradeskillXpForLevel } from '@helpers/tradeskill';
 import {
   worldNodeDiscover,
   worldNodeUndiscover,
@@ -317,16 +319,19 @@ describe('Debug Helper Functions', () => {
   });
 
   describe('debugSetTradeskillLevel', () => {
+    const WOODWORKING_ID = 'woodworking-id' as TradeskillId;
+
     function runWithTradeskills(building: TradeskillBuildingState): {
       building: TradeskillBuildingState;
     } {
       const captured = { building };
+      vi.mocked(tradeskillIdForName).mockReturnValue(WOODWORKING_ID);
       vi.mocked(updateGamestate).mockImplementation((func) => {
         const state = {
-          tradeskills: { Woodworking: captured.building },
+          tradeskills: { [WOODWORKING_ID]: captured.building },
         } as unknown as GameState;
         const result = func(state);
-        captured.building = result.tradeskills.Woodworking;
+        captured.building = result.tradeskills[WOODWORKING_ID];
         return Promise.resolve();
       });
       return captured;

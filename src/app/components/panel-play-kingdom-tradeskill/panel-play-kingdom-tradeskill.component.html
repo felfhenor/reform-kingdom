@@ -7,7 +7,28 @@
 <app-card-page heightProfile="full">
   <span header>{{ tradeskill() }} - Lv. {{ buildingData.level }}</span>
 
-  <app-button-kingdom-back pageactions />
+  <div pageactions class="flex items-center gap-2">
+    @for (nav of tradeskillNav(); track nav.content.id) {
+      <button
+        type="button"
+        class="btn btn-sm btn-neutral btn-outline p-0"
+        [class.opacity-100]="nav.isCurrent"
+        [class.opacity-50]="!nav.isCurrent"
+        [class.glow-idle]="nav.isIdle"
+        [tp]="nav.tooltip"
+        [tpPlacement]="'top'"
+        (click)="kingdomSubviewShow(nav.subview)"
+      >
+        <div class="zoom-row">
+          <app-atlas-image
+            spritesheet="tradeskill"
+            [assetName]="nav.content.sprite"
+          />
+        </div>
+      </button>
+    }
+    <app-button-kingdom-back />
+  </div>
 
   <div pageactionsleft>
     <label class="label cursor-pointer label-checkbox gap-2 self-start">

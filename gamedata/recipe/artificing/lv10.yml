@@ -7,7 +7,7 @@
     - itemId: Elven Wood
       quantity: 12
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 10
   maxTradeskillLevel: 13
   tradeskillXP: 25

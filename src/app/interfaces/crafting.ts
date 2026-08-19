@@ -3,9 +3,9 @@ import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
 import type { RecipeContent, RecipeId } from '@interfaces/content-recipe';
+import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded } from '@interfaces/identifiable';
 import type { ItemPreviewDisplay } from '@interfaces/item-preview';
-import type { Tradeskill } from '@interfaces/tradeskill';
 
 export type CraftQueueEntryId = Branded<string, 'CraftQueueEntryId'>;
 
@@ -23,7 +23,10 @@ export type TradeskillBuildingState = {
   queue: CraftQueueEntry[];
 };
 
-export type GameStateTradeskills = Record<Tradeskill, TradeskillBuildingState>;
+export type GameStateTradeskills = Record<
+  TradeskillId,
+  TradeskillBuildingState
+>;
 
 // A single requirement resolved for display - collectible requirements
 // aren't consumed, so `quantity` is always 1 for them (a possession gate,

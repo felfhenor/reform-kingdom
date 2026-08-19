@@ -50,7 +50,7 @@ type RecipeRequirement = {
 type Recipe = {
   id: string;
   name: string;
-  tradeskill: string;
+  tradeskillId: string;
   minTradeskillLevel: number;
   result: { itemId?: string; equipmentId?: string; collectibleId?: string };
   requirements?: RecipeRequirement[];
@@ -58,7 +58,7 @@ type Recipe = {
 
 type ItemProducer = {
   name: string;
-  tradeskill: string;
+  tradeskillId: string;
   minTradeskillLevel: number;
 };
 
@@ -91,7 +91,7 @@ function buildItemProducerIndex(recipes: Recipe[]): Map<string, ItemProducer[]> 
     const producers = index.get(itemId) ?? [];
     producers.push({
       name: recipe.name,
-      tradeskill: recipe.tradeskill,
+      tradeskillId: recipe.tradeskillId,
       minTradeskillLevel: recipe.minTradeskillLevel,
     });
     index.set(itemId, producers);
@@ -114,9 +114,9 @@ function checkRecipe(
       if (producer.minTradeskillLevel <= recipe.minTradeskillLevel) return;
 
       const message =
-        `${recipe.tradeskill} recipe "${recipe.name}" (minTradeskillLevel ` +
+        `${recipe.tradeskillId} recipe "${recipe.name}" (minTradeskillLevel ` +
         `${recipe.minTradeskillLevel}) requires item "${requirement.itemId}", ` +
-        `but that item is only craftable via ${producer.tradeskill} recipe ` +
+        `but that item is only craftable via ${producer.tradeskillId} recipe ` +
         `"${producer.name}" at minTradeskillLevel ${producer.minTradeskillLevel} - ` +
         `an ingredient recipe can't require a higher tradeskill level than the ` +
         `recipe that consumes it.`;
@@ -195,7 +195,7 @@ async function main(): Promise<void> {
     const equip = equipmentByName.get(equipmentId);
     if (!equip) return;
 
-    const groupLabel = `${recipe.tradeskill} / ${equip.type}`;
+    const groupLabel = `${recipe.tradeskillId} / ${equip.type}`;
     const group = levelRequirementGroups.get(groupLabel) ?? [];
     group.push({
       name: recipe.name,

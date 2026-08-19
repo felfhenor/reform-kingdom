@@ -10,7 +10,7 @@
     - itemId: Weak Spider Silk
       quantity: 3
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 5
   maxTradeskillLevel: 8
   tradeskillXP: 5
@@ -28,7 +28,7 @@
     - itemId: Green Slime Core
       quantity: 3
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 6
   maxTradeskillLevel: 9
   tradeskillXP: 15
@@ -46,7 +46,7 @@
     - itemId: Green Slime Core
       quantity: 3
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 7
   maxTradeskillLevel: 10
   tradeskillXP: 15
@@ -64,7 +64,7 @@
     - itemId: Green Slime Core
       quantity: 3
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 8
   maxTradeskillLevel: 11
   tradeskillXP: 15
@@ -85,7 +85,7 @@
     - itemId: Linen Thread
       quantity: 20
 
-  tradeskill: Tailoring
+  tradeskillId: Tailoring
   minTradeskillLevel: 9
   maxTradeskillLevel: 12
   tradeskillXP: 25

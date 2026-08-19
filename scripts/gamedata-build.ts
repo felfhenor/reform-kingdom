@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { isArray, isString, isObject } from 'es-toolkit/compat';
+import { isArray, isString, isObject, sortBy } from 'es-toolkit/compat';
 import * as yaml from 'js-yaml';
 import fs from 'fs-extra';
 import rec from 'recursive-readdir';
@@ -78,8 +78,14 @@ const rewriteDataIds = () => {
   // magically transform any key that requests an id to that id
   const iterateObject = (entry: any) => {
     Object.keys(entry).forEach((entryKey) => {
-      // no match, skip
-      const keyMatch = allIds.find((id) => entryKey.toLowerCase().includes(id));
+      // no match, skip. Prefer the longest (most specific) matching folder
+      // name over the first one found - e.g. `tradeskillId` contains both
+      // `skill` and `tradeskill` as substrings, and only the latter is the
+      // correct match.
+      const keyMatch = sortBy(
+        allIds.filter((id) => entryKey.toLowerCase().includes(id)),
+        (id) => id.length,
+      ).at(-1);
       if (!keyMatch) {
         // check deeper, if it's an array we want to check our sub objects
         if (isArray(entry[entryKey])) {

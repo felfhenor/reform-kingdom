@@ -22,7 +22,12 @@ import { getMaterialQuantity } from '@helpers/materials';
 import { partyGet } from '@helpers/party';
 import { isRecipeCraftable } from '@helpers/recipes';
 import { gamestate } from '@helpers/state-game';
-import { tradeskillActiveGate, tradeskillBuilding } from '@helpers/tradeskill';
+import {
+  tradeskillActiveGate,
+  tradeskillBuilding,
+  tradeskillIdForName,
+  tradeskillNameForId,
+} from '@helpers/tradeskill';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
 import {
   isWorldNodeVisible,
@@ -174,9 +179,10 @@ function recipeProducingItem(
   tradeskill: Tradeskill,
   itemId: ItemId,
 ): RecipeContent | undefined {
+  const tradeskillId = tradeskillIdForName(tradeskill);
   return getEntriesByType<RecipeContent>('recipe').find(
     (recipe) =>
-      recipe.tradeskill === tradeskill &&
+      recipe.tradeskillId === tradeskillId &&
       'itemId' in recipe.result &&
       recipe.result.itemId === itemId,
   );
@@ -241,7 +247,9 @@ function attemptCapstoneCraft(tradeskill: Tradeskill): boolean {
   if (!gate) return false;
 
   const recipe = collectibleRecipeIndex().get(gate.requiredCollectibleId);
-  if (!recipe || recipe.tradeskill !== tradeskill) return false;
+  if (!recipe || recipe.tradeskillId !== tradeskillIdForName(tradeskill)) {
+    return false;
+  }
 
   return attemptCraftRecipeChain(tradeskill, recipe, 1, new Set());
 }
@@ -296,9 +304,12 @@ function rebuildPartyEquipmentTargets(): void {
       const recipesByTradeskill = new Map<Tradeskill, RecipeContent>();
 
       (index.get(equipment.id) ?? []).forEach((recipe) => {
-        const existing = recipesByTradeskill.get(recipe.tradeskill);
+        const name = tradeskillNameForId(recipe.tradeskillId);
+        if (!name) return;
+
+        const existing = recipesByTradeskill.get(name);
         if (!existing || recipe.minTradeskillLevel > existing.minTradeskillLevel) {
-          recipesByTradeskill.set(recipe.tradeskill, recipe);
+          recipesByTradeskill.set(name, recipe);
         }
       });
 
@@ -328,7 +339,10 @@ function collectGatherableRequirementIds(
       return;
     }
 
-    const prereqRecipe = recipeProducingItem(recipe.tradeskill, requirement.itemId);
+    const name = tradeskillNameForId(recipe.tradeskillId);
+    if (!name) return;
+
+    const prereqRecipe = recipeProducingItem(name, requirement.itemId);
     if (prereqRecipe) {
       collectGatherableRequirementIds(prereqRecipe, gatherable, found, visited, depth + 1);
     }

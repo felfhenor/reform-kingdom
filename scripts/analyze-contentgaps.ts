@@ -535,9 +535,9 @@ async function main(): Promise<void> {
 
   const recipesByTradeskill = new Map<string, any[]>();
   recipes.forEach((r) => {
-    const list = recipesByTradeskill.get(r.tradeskill) ?? [];
+    const list = recipesByTradeskill.get(r.tradeskillId) ?? [];
     list.push(r);
-    recipesByTradeskill.set(r.tradeskill, list);
+    recipesByTradeskill.set(r.tradeskillId, list);
   });
 
   // Shared across every tradeskill, not derived per-tradeskill - a

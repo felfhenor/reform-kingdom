@@ -26,6 +26,7 @@ import {
   craftXpChance,
   tradeskillBuilding,
   tradeskillGainXp,
+  tradeskillIdForName,
   tradeskillMaxQueueSize,
 } from '@helpers/tradeskill';
 import type {
@@ -182,7 +183,10 @@ export function craftQueueStart(
   quantity: number,
 ): boolean {
   const recipe = getEntry<RecipeContent>(recipeId);
-  if (!recipe || recipe.tradeskill !== tradeskill) return false;
+  const tradeskillId = tradeskillIdForName(tradeskill);
+  if (!recipe || !tradeskillId || recipe.tradeskillId !== tradeskillId) {
+    return false;
+  }
   if (!isRecipeCraftable(recipeId)) return false;
 
   const building = tradeskillBuilding(tradeskill);
@@ -211,9 +215,9 @@ export function craftQueueStart(
       ticksIntoCraft: 0,
     };
 
-    state.tradeskills[tradeskill] = {
-      ...state.tradeskills[tradeskill],
-      queue: [...state.tradeskills[tradeskill].queue, entry],
+    state.tradeskills[tradeskillId] = {
+      ...state.tradeskills[tradeskillId],
+      queue: [...state.tradeskills[tradeskillId].queue, entry],
     };
 
     return state;
@@ -231,8 +235,11 @@ export function craftQueueRemove(
   tradeskill: Tradeskill,
   queueEntryId: CraftQueueEntryId,
 ): void {
+  const tradeskillId = tradeskillIdForName(tradeskill);
+  if (!tradeskillId) return;
+
   updateGamestate((state) => {
-    const building = state.tradeskills[tradeskill];
+    const building = state.tradeskills[tradeskillId];
     const entry = building.queue.find((queued) => queued.id === queueEntryId);
     if (!entry) return state;
 
@@ -245,7 +252,7 @@ export function craftQueueRemove(
       });
     }
 
-    state.tradeskills[tradeskill] = {
+    state.tradeskills[tradeskillId] = {
       ...building,
       queue: building.queue.filter((queued) => queued.id !== queueEntryId),
     };
@@ -327,8 +334,11 @@ function advanceQueueEntry(
   tradeskill: Tradeskill,
   entryId: CraftQueueEntryId,
 ): void {
+  const tradeskillId = tradeskillIdForName(tradeskill);
+  if (!tradeskillId) return;
+
   updateGamestate((state) => {
-    const building = state.tradeskills[tradeskill];
+    const building = state.tradeskills[tradeskillId];
     const index = building.queue.findIndex((queued) => queued.id === entryId);
     if (index === -1) return state;
 
@@ -344,7 +354,7 @@ function advanceQueueEntry(
               : queued,
           );
 
-    state.tradeskills[tradeskill] = { ...building, queue };
+    state.tradeskills[tradeskillId] = { ...building, queue };
     return state;
   });
 }
@@ -357,11 +367,14 @@ export function craftProcessTick(): void {
     const recipe = getEntry<RecipeContent>(entry.recipeId);
     if (!recipe) return;
 
+    const tradeskillId = tradeskillIdForName(tradeskill);
+    if (!tradeskillId) return;
+
     const ticksIntoCraft = entry.ticksIntoCraft + 1;
 
     if (ticksIntoCraft < recipe.craftTime) {
       updateGamestate((state) => {
-        const building = state.tradeskills[tradeskill];
+        const building = state.tradeskills[tradeskillId];
         const index = building.queue.findIndex(
           (queued) => queued.id === entry.id,
         );

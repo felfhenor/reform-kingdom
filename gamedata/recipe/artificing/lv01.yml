@@ -13,7 +13,7 @@
     - itemId: Malachite
       quantity: 1
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 1
   maxTradeskillLevel: 5
   tradeskillXP: 5
@@ -34,7 +34,7 @@
     - itemId: Malachite
       quantity: 1
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 2
   maxTradeskillLevel: 6
   tradeskillXP: 5
@@ -52,7 +52,7 @@
     - itemId: Malachite
       quantity: 1
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 3
   maxTradeskillLevel: 7
   tradeskillXP: 8
@@ -73,7 +73,7 @@
     - itemId: Small Asura Tendon
       quantity: 4
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
   tradeskillXP: 12
@@ -91,7 +91,7 @@
     - itemId: Gold Coin
       quantity: 250
 
-  tradeskill: Artificing
+  tradeskillId: Artificing
   minTradeskillLevel: 5
   maxTradeskillLevel: 5
   tradeskillXP: 25

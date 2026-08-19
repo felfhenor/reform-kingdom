@@ -15,6 +15,7 @@ export type ContentType =
   | 'skill'
   | 'statuseffect'
   | 'trait'
+  | 'tradeskill'
   | 'tradeskilllevelrequirement';
 
 export type Identifiable = {

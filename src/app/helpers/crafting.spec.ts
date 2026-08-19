@@ -52,7 +52,23 @@ import type {
   RecipeContent,
   RecipeId,
   TradeskillBuildingState,
+  TradeskillContent,
+  TradeskillId,
 } from '@interfaces';
+
+const ARTIFICING_ID = 'artificing-id' as TradeskillId;
+const BLACKSMITHING_ID = 'blacksmithing-id' as TradeskillId;
+const JEWELCRAFTING_ID = 'jewelcrafting-id' as TradeskillId;
+const TAILORING_ID = 'tailoring-id' as TradeskillId;
+const WOODWORKING_ID = 'woodworking-id' as TradeskillId;
+
+const blacksmithingContent: TradeskillContent = {
+  id: BLACKSMITHING_ID,
+  name: 'Blacksmithing',
+  __type: 'tradeskill',
+  sprite: '0001',
+  description: 'Forges weapons and armor from raw ore.',
+};
 
 function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
   return {
@@ -61,7 +77,7 @@ function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
     __type: 'recipe',
     result: { itemId: 'copper-ingot' as ItemId, quantity: 1 },
     requirements: [],
-    tradeskill: 'Blacksmithing',
+    tradeskillId: BLACKSMITHING_ID,
     minTradeskillLevel: 1,
     maxTradeskillLevel: 10,
     tradeskillXP: 1,
@@ -85,11 +101,11 @@ function buildAllTradeskills(
   blacksmithing: TradeskillBuildingState,
 ): GameStateTradeskills {
   return {
-    Artificing: buildBuilding(),
-    Blacksmithing: blacksmithing,
-    Jewelcrafting: buildBuilding(),
-    Tailoring: buildBuilding(),
-    Woodworking: buildBuilding(),
+    [ARTIFICING_ID]: buildBuilding(),
+    [BLACKSMITHING_ID]: blacksmithing,
+    [JEWELCRAFTING_ID]: buildBuilding(),
+    [TAILORING_ID]: buildBuilding(),
+    [WOODWORKING_ID]: buildBuilding(),
   };
 }
 
@@ -112,6 +128,9 @@ describe('getCraftableRecipeEntries', () => {
     vi.mocked(recipeResultSpritesheet).mockReturnValue('item');
     vi.mocked(recipeResultContent).mockReturnValue(undefined);
     vi.mocked(isRecipeCraftable).mockReturnValue(true);
+    vi.mocked(getEntry).mockImplementation((key: string) =>
+      key === 'Blacksmithing' ? (blacksmithingContent as never) : undefined,
+    );
   });
 
   it('only includes recipes the building has actually reached', () => {
@@ -330,6 +349,7 @@ describe('craftQueueTicksRemaining / craftQueueTotalTicks / craftQueueUnitsRemai
     vi.mocked(getEntry).mockImplementation((id: string) => {
       if (id === 'ore-recipe') return buildRecipe({ craftTime: 10 }) as never;
       if (id === 'ring-recipe') return buildRecipe({ craftTime: 20 }) as never;
+      if (id === 'Blacksmithing') return blacksmithingContent as never;
       return undefined;
     });
   });
@@ -355,14 +375,14 @@ describe('pruneInvalidCraftQueues', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
 
     const tradeskills: GameStateTradeskills = {
-      Artificing: buildBuilding(),
-      Blacksmithing: buildBuilding({ queue: [buildQueueEntry()] }),
-      Jewelcrafting: buildBuilding(),
-      Tailoring: buildBuilding(),
-      Woodworking: buildBuilding(),
+      [ARTIFICING_ID]: buildBuilding(),
+      [BLACKSMITHING_ID]: buildBuilding({ queue: [buildQueueEntry()] }),
+      [JEWELCRAFTING_ID]: buildBuilding(),
+      [TAILORING_ID]: buildBuilding(),
+      [WOODWORKING_ID]: buildBuilding(),
     };
 
     const result = pruneInvalidCraftQueues(tradeskills);
-    expect(result.Blacksmithing.queue).toEqual([]);
+    expect(result[BLACKSMITHING_ID].queue).toEqual([]);
   });
 });

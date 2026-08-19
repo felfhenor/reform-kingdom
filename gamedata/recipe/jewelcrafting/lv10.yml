@@ -10,7 +10,7 @@
     - itemId: Azurite
       quantity: 5
 
-  tradeskill: Jewelcrafting
+  tradeskillId: Jewelcrafting
   minTradeskillLevel: 10
   maxTradeskillLevel: 13
   tradeskillXP: 35

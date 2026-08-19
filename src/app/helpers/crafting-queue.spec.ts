@@ -88,7 +88,50 @@ import type {
   RecipeContent,
   RecipeId,
   TradeskillBuildingState,
+  TradeskillContent,
+  TradeskillId,
 } from '@interfaces';
+
+const ARTIFICING_ID = 'artificing-id' as TradeskillId;
+const BLACKSMITHING_ID = 'blacksmithing-id' as TradeskillId;
+const JEWELCRAFTING_ID = 'jewelcrafting-id' as TradeskillId;
+const TAILORING_ID = 'tailoring-id' as TradeskillId;
+const WOODWORKING_ID = 'woodworking-id' as TradeskillId;
+
+const blacksmithingContent: TradeskillContent = {
+  id: BLACKSMITHING_ID,
+  name: 'Blacksmithing',
+  __type: 'tradeskill',
+  sprite: '0001',
+  description: 'Forges weapons and armor from raw ore.',
+};
+const woodworkingContent: TradeskillContent = {
+  id: WOODWORKING_ID,
+  name: 'Woodworking',
+  __type: 'tradeskill',
+  sprite: '0004',
+  description: 'Shapes timber into tools and fittings.',
+};
+
+const TRADESKILL_CONTENT_BY_KEY: Record<string, TradeskillContent> = {
+  Blacksmithing: blacksmithingContent,
+  [BLACKSMITHING_ID]: blacksmithingContent,
+  Woodworking: woodworkingContent,
+  [WOODWORKING_ID]: woodworkingContent,
+};
+
+// `getEntry` resolves both recipe/item lookups (by whatever id/name a test
+// supplies in `byKey`) and tradeskill name<->id lookups off the same mocked
+// function, mirroring how the real content map works.
+function mockGetEntry(byKey: Record<string, unknown> = {}): void {
+  vi.mocked(getEntry).mockImplementation((key: string) => {
+    if (key in byKey) return byKey[key] as never;
+    if (key in TRADESKILL_CONTENT_BY_KEY) {
+      return TRADESKILL_CONTENT_BY_KEY[key] as never;
+    }
+    return undefined as never;
+  });
+}
 
 function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
   return {
@@ -97,7 +140,7 @@ function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
     __type: 'recipe',
     result: { itemId: 'copper-ingot' as ItemId, quantity: 1 },
     requirements: [],
-    tradeskill: 'Blacksmithing',
+    tradeskillId: BLACKSMITHING_ID,
     minTradeskillLevel: 1,
     maxTradeskillLevel: 10,
     tradeskillXP: 1,
@@ -121,11 +164,11 @@ function buildAllTradeskills(
   blacksmithing: TradeskillBuildingState,
 ): GameStateTradeskills {
   return {
-    Artificing: buildBuilding(),
-    Blacksmithing: blacksmithing,
-    Jewelcrafting: buildBuilding(),
-    Tailoring: buildBuilding(),
-    Woodworking: buildBuilding(),
+    [ARTIFICING_ID]: buildBuilding(),
+    [BLACKSMITHING_ID]: blacksmithing,
+    [JEWELCRAFTING_ID]: buildBuilding(),
+    [TAILORING_ID]: buildBuilding(),
+    [WOODWORKING_ID]: buildBuilding(),
   };
 }
 
@@ -151,6 +194,7 @@ function applyUpdateAt(index: number, state: GameState): GameState {
 describe('craftMaxCraftableQuantity', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetEntry();
     vi.mocked(gamestate).mockReturnValue({
       tradeskills: buildAllTradeskills(buildBuilding()),
     } as unknown as GameState);
@@ -261,9 +305,9 @@ describe('craftQueueStart', () => {
   });
 
   it('fails when the recipe does not belong to the tradeskill', () => {
-    vi.mocked(getEntry).mockReturnValue(
-      buildRecipe({ tradeskill: 'Woodworking' }),
-    );
+    mockGetEntry({
+      'recipe-1': buildRecipe({ tradeskillId: WOODWORKING_ID }),
+    });
 
     expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1)).toBe(
       false,
@@ -272,9 +316,9 @@ describe('craftQueueStart', () => {
   });
 
   it('fails when the building has not reached the recipe level yet', () => {
-    vi.mocked(getEntry).mockReturnValue(buildRecipe({ minTradeskillLevel: 5 }));
+    mockGetEntry({ 'recipe-1': buildRecipe({ minTradeskillLevel: 5 }) });
     vi.mocked(gamestate).mockReturnValue({
-      tradeskills: { Blacksmithing: buildBuilding({ level: 1 }) },
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
     } as unknown as GameState);
 
     expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1)).toBe(
@@ -284,10 +328,10 @@ describe('craftQueueStart', () => {
   });
 
   it('fails when the queue is already full', () => {
-    vi.mocked(getEntry).mockReturnValue(buildRecipe());
+    mockGetEntry({ 'recipe-1': buildRecipe() });
     vi.mocked(gamestate).mockReturnValue({
       tradeskills: {
-        Blacksmithing: buildBuilding({
+        [BLACKSMITHING_ID]: buildBuilding({
           level: 1,
           queue: [
             buildQueueEntry(),
@@ -305,11 +349,13 @@ describe('craftQueueStart', () => {
 
   it('clamps the requested quantity to what is craftable and reserves materials', () => {
     vi.mocked(getMaterialQuantity).mockReturnValue(6);
-    vi.mocked(getEntry).mockReturnValue(
-      buildRecipe({ requirements: [{ itemId: 'ore' as ItemId, quantity: 2 }] }),
-    );
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 2 }],
+      }),
+    });
     vi.mocked(gamestate).mockReturnValue({
-      tradeskills: { Blacksmithing: buildBuilding({ level: 1 }) },
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
     } as unknown as GameState);
 
     expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 10)).toBe(
@@ -318,12 +364,12 @@ describe('craftQueueStart', () => {
 
     const state: GameState = {
       materials: { ore: { quantity: 6, foundAt: 1000 } },
-      tradeskills: { Blacksmithing: buildBuilding({ level: 1 }) },
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
     } as unknown as GameState;
     const result = applyUpdateAt(0, state);
 
     expect(result.materials['ore' as ItemId]).toBeUndefined();
-    expect(result.tradeskills.Blacksmithing.queue).toEqual([
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([
       {
         id: 'queue-entry-1',
         recipeId: 'recipe-1',
@@ -335,9 +381,9 @@ describe('craftQueueStart', () => {
   });
 
   it('sends an analytics event with the recipe name when a craft is queued', () => {
-    vi.mocked(getEntry).mockReturnValue(buildRecipe({ name: 'Copper Ingot' }));
+    mockGetEntry({ 'recipe-1': buildRecipe({ name: 'Copper Ingot' }) });
     vi.mocked(gamestate).mockReturnValue({
-      tradeskills: { Blacksmithing: buildBuilding({ level: 1 }) },
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
     } as unknown as GameState);
 
     craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1);
@@ -354,16 +400,18 @@ describe('craftQueueRemove', () => {
   });
 
   it('refunds only the unconsumed remainder and drops the entry', () => {
-    vi.mocked(getEntry).mockReturnValue(
-      buildRecipe({ requirements: [{ itemId: 'ore' as ItemId, quantity: 2 }] }),
-    );
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 2 }],
+      }),
+    });
 
     craftQueueRemove('Blacksmithing', 'queue-entry-1' as CraftQueueEntryId);
 
     const state: GameState = {
       materials: {},
       tradeskills: {
-        Blacksmithing: buildBuilding({
+        [BLACKSMITHING_ID]: buildBuilding({
           queue: [buildQueueEntry({ quantityTotal: 5, quantityCompleted: 2 })],
         }),
       },
@@ -372,7 +420,7 @@ describe('craftQueueRemove', () => {
 
     // 3 units unconsumed * 2 ore per unit = 6 refunded.
     expect(result.materials['ore' as ItemId].quantity).toBe(6);
-    expect(result.tradeskills.Blacksmithing.queue).toEqual([]);
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([]);
   });
 });
 
@@ -387,7 +435,7 @@ describe('craftProcessTick', () => {
         buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 2 })] }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(buildRecipe({ craftTime: 5 }));
+    mockGetEntry({ 'recipe-1': buildRecipe({ craftTime: 5 }) });
 
     craftProcessTick();
 
@@ -400,7 +448,9 @@ describe('craftProcessTick', () => {
       ),
     } as unknown as GameState;
     const result = applyUpdateAt(0, state);
-    expect(result.tradeskills.Blacksmithing.queue[0].ticksIntoCraft).toBe(3);
+    expect(result.tradeskills[BLACKSMITHING_ID].queue[0].ticksIntoCraft).toBe(
+      3,
+    );
   });
 
   it('completes an item craft: grants the item, logs it, and advances the queue', () => {
@@ -413,10 +463,9 @@ describe('craftProcessTick', () => {
         buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'recipe-1') return recipe as never;
-      if (id === 'copper-ingot') return { name: 'Copper Ingot' } as never;
-      return undefined;
+    mockGetEntry({
+      'recipe-1': recipe,
+      'copper-ingot': { name: 'Copper Ingot' },
     });
 
     craftProcessTick();
@@ -436,9 +485,9 @@ describe('craftProcessTick', () => {
         buildBuilding({ level: 1, xp: { current: 0, maximum: 10 } }),
       ),
     } as unknown as GameState;
-    expect(applyUpdateAt(0, xpState).tradeskills.Blacksmithing.xp.current).toBe(
-      1,
-    );
+    expect(
+      applyUpdateAt(0, xpState).tradeskills[BLACKSMITHING_ID].xp.current,
+    ).toBe(1);
 
     // Call 1: queue advance - single-unit batch, so the entry is dropped.
     const queueState: GameState = {
@@ -447,7 +496,7 @@ describe('craftProcessTick', () => {
       ),
     } as unknown as GameState;
     expect(
-      applyUpdateAt(1, queueState).tradeskills.Blacksmithing.queue,
+      applyUpdateAt(1, queueState).tradeskills[BLACKSMITHING_ID].queue,
     ).toEqual([]);
   });
 
@@ -461,10 +510,9 @@ describe('craftProcessTick', () => {
         buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'recipe-1') return recipe as never;
-      if (id === 'copper-dagger') return { name: 'Copper Dagger' } as never;
-      return undefined;
+    mockGetEntry({
+      'recipe-1': recipe,
+      'copper-dagger': { name: 'Copper Dagger' },
     });
 
     craftProcessTick();
@@ -486,12 +534,9 @@ describe('craftProcessTick', () => {
         buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'recipe-1') return recipe as never;
-      if (id === 'minor-blacksmithing-effigy') {
-        return { name: 'Minor Blacksmithing Effigy' } as never;
-      }
-      return undefined;
+    mockGetEntry({
+      'recipe-1': recipe,
+      'minor-blacksmithing-effigy': { name: 'Minor Blacksmithing Effigy' },
     });
 
     craftProcessTick();
@@ -516,7 +561,7 @@ describe('craftProcessTick', () => {
         buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(recipe);
+    mockGetEntry({ 'recipe-1': recipe });
     vi.mocked(rngSucceedsChance).mockReturnValue(false);
 
     craftProcessTick();
@@ -542,7 +587,7 @@ describe('craftProcessTick', () => {
         buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(recipe);
+    mockGetEntry({ 'recipe-1': recipe });
     // First roll (craft result) fails, second roll (XP) succeeds.
     vi.mocked(rngSucceedsChance)
       .mockReturnValueOnce(false)
@@ -569,10 +614,7 @@ describe('craftProcessTick', () => {
         buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'recipe-1') return recipe as never;
-      return { name: 'Malachite' } as never;
-    });
+    mockGetEntry({ 'recipe-1': recipe, malachite: { name: 'Malachite' } });
     vi.mocked(rngSucceedsChance).mockReturnValue(true);
 
     craftProcessTick();
@@ -595,9 +637,9 @@ describe('craftProcessTick', () => {
         }),
       ),
     } as unknown as GameState);
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'recipe-1') return recipe as never;
-      return { name: 'Copper Ingot' } as never;
+    mockGetEntry({
+      'recipe-1': recipe,
+      'copper-ingot': { name: 'Copper Ingot' },
     });
 
     craftProcessTick();
@@ -616,7 +658,7 @@ describe('craftProcessTick', () => {
       ),
     } as unknown as GameState;
     const result = applyUpdateAt(1, queueState);
-    expect(result.tradeskills.Blacksmithing.queue).toEqual([
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([
       buildQueueEntry({
         ticksIntoCraft: 0,
         quantityTotal: 3,
