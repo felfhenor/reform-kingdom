@@ -35,10 +35,16 @@
       class="pause-vignette absolute inset-0 pointer-events-none flex items-start justify-center pt-8"
       aria-hidden="true"
     >
-      <div class="flex items-center gap-2 text-lighter">
-        <app-icon name="gamePauseButton" size="1.5em"></app-icon>
-        <span class="text-lg tracking-wide uppercase">Paused</span>
-      </div>
+      @if (activeGamePlayView() === 'world') {
+        <div
+          class="flex items-center justify-center text-lighter w-full h-full"
+        >
+          <div class="pt-[96px] flex items-center gap-2">
+            <app-icon name="gamePauseButton" size="1.5em"></app-icon>
+            <span class="text-lg uppercase">Paused</span>
+          </div>
+        </div>
+      }
     </div>
   }
 </div>
