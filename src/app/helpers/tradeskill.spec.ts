@@ -233,6 +233,15 @@ describe('craftXpChance / craftXpChanceTier', () => {
     expect(craftXpChance(fixedRecipe, 5)).toBe(100);
     expect(craftXpChanceTier(fixedRecipe, 5)).toBe('Guaranteed');
   });
+
+  it('treats a degenerate (min === max) range as out-levelled once past that level', () => {
+    const fixedRecipe = buildRecipe({
+      minTradeskillLevel: 5,
+      maxTradeskillLevel: 5,
+    });
+    expect(craftXpChance(fixedRecipe, 6)).toBe(0);
+    expect(craftXpChanceTier(fixedRecipe, 6)).toBe('Trivial');
+  });
 });
 
 describe('tradeskillIdForName / tradeskillNameForId', () => {

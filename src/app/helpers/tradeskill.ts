@@ -201,7 +201,7 @@ export function craftXpChance(
   buildingLevel: number,
 ): number {
   const { minTradeskillLevel: min, maxTradeskillLevel: max } = recipe;
-  if (max <= min) return 100;
+  if (max <= min) return buildingLevel <= min ? 100 : 0;
 
   const progress = (buildingLevel - min) / (max - min);
   if (progress >= 1) return 0;
