@@ -1,15 +1,16 @@
-@if (canReExplore()) {
+@if (isExploreRandomCleared()) {
+  <div class="text-sm text-lighter">
+    No monsters remain. Check back in {{ exploreRandomTimerText() }}.
+  </div>
+} @else {
   <button
     type="button"
     class="btn btn-sm btn-primary"
     (click)="reExplore.emit()"
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
+    [disabled]="!canReExplore()"
   >
     Explore Again
   </button>
-} @else if (isExploreRandomCleared()) {
-  <div class="text-sm text-lighter">
-    No monsters remain. Check back in {{ exploreRandomTimerText() }}.
-  </div>
 }
