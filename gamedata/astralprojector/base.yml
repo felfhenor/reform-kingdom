@@ -1,0 +1,94 @@
+- id: 429cf0d1-e9a0-4d0d-824f-24055c48948f
+  name: 'Power: Strength of the Duchy I'
+  globalEffectId: Strength of the Duchy I
+
+  duration: 1800
+
+  requiredCollectibles:
+    - collectibleId: Goblin Ruby
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 1000
+
+    - itemId: Goblin Nail
+      quantity: 5
+
+    - itemId: Goblin Teeth
+      quantity: 5
+
+    - itemId: Small Goblin Bone
+      quantity: 15
+
+- id: f68c3e0a-9127-4ba6-b51b-a9a173f7c24c
+  name: 'Power: Magic of the Ceruleans I'
+  globalEffectId: Magic of the Ceruleans I
+
+  duration: 1800
+
+  requiredCollectibles:
+    - collectibleId: Jelly Flower
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 1000
+
+    - itemId: Green Slime Crystal
+      quantity: 1
+
+    - itemId: Purple Slime Crystal
+      quantity: 1
+
+    - itemId: Red Slime Crystal
+      quantity: 1
+
+- id: e0970e6e-10eb-47cc-9446-4b10cf737cf7
+  name: 'Enhance: Luck of the Elvish I'
+  globalEffectId: Luck of the Elvish I
+
+  duration: 1800
+
+  requiredCollectibles:
+    - collectibleId: Hawk Feathers
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Elven Wood
+      quantity: 25
+
+    - itemId: Azurite
+      quantity: 10
+
+- id: ce0c9c0e-642a-4637-9b70-6710c175ca51
+  name: 'Enhance: Invigoration of the Zelks I'
+  globalEffectId: Invigoration of the Zelks I
+
+  duration: 1800
+
+  requiredCollectibles:
+    - collectibleId: Swamp Clam
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 1500
+
+    - itemId: Small Asura Tendon
+      quantity: 25
+
+    - itemId: Orc Bone
+      quantity: 10
+
+- id: c1c7b718-23e3-4b60-bdc9-52fb242b9ca7
+  name: 'Boost: Wisdom of the Founder I'
+  globalEffectId: Wisdom of the Founder I
+
+  duration: 1800
+
+  requiredCollectibles:
+    - collectibleId: Purple Lotus
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 500

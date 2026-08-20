@@ -1,0 +1,55 @@
+- id: f80cdc93-31fe-41e3-bb00-b2ba6ec79e5c
+  name: Strength of the Duchy I
+  sprite: '0004'
+  description: +5 STR/VIT for all heroes.
+
+  effects:
+    - effectType: GainStats
+      stat: Strength
+      value: 5
+    - effectType: GainStats
+      stat: Vitality
+      value: 5
+
+- id: c29d0b5f-8fba-42a4-8fb8-0645aa0ce9e5
+  name: Magic of the Ceruleans I
+  sprite: '0005'
+  description: +5 INT/RES for all heroes.
+
+  effects:
+    - effectType: GainStats
+      stat: Intelligence
+      value: 5
+    - effectType: GainStats
+      stat: Resistance
+      value: 5
+
+- id: 5c0e119f-04d8-4daa-8d91-20e91a8e0ae2
+  name: Luck of the Elvish I
+  sprite: '0006'
+  description: +5 LUK for all heroes.
+
+  effects:
+    - effectType: GainStats
+      stat: Luck
+      value: 5
+
+- id: 512154e2-b4f3-4e87-a246-cb6551b79b7d
+  name: Invigoration of the Zelks I
+  sprite: '0007'
+  description: +25 HP/EP for all heroes.
+  effects:
+    - effectType: GainStats
+      stat: Health
+      value: 25
+    - effectType: GainStats
+      stat: Energy
+      value: 25
+
+- id: 8ca328f6-a57c-4f16-8aa8-d0935ebc11c6
+  name: Wisdom of the Founder I
+  sprite: '0008'
+  description: +10% XP gain for all heroes.
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.1
