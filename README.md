@@ -63,11 +63,20 @@ npm run analyze:contentgaps -- --expanded
 
 This will examine all content in the game (at the time of writing: items, tradeskills, infusions) and look for excessive gaps in utilization (default of 4)
 
+### Node Levels
+
+```
+npm run analyze:nodelevels
+npm run analyze:nodelevels -- --gap=<x>
+```
+
+This will examine all encounterable nodes in the game and sort them by level, showing their map and any gaps in levels (default of 2).
+
 ### The Simulator
 
 ```
 npm run simulate -- --mode=curated --trials=1 --tick-budget=36000 --verbose=true
-npm run simulate -- --mode=<exhaustive|curated> --trials=<1> --tick-budget=<500000>
+npm run simulate -- --mode=<exhaustive|curated> --trials=<1> --tick-budget=<60000>
 ```
 
 This will run the simulator to verify different parties and see how far they get. This will help make sure the game is playable with many different configurations of hero jobs. It will output a leaderboard as well as where each party gets stuck, if it does. A tick budget gives the party a certain amount of time to get to a certain place, and simulates a player playing for that length of time - 3600 ticks = 1 hour.

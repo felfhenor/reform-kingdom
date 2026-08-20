@@ -39,6 +39,7 @@
     "analyze:monsterstats": "ts-node --project tsconfig.scripts.json scripts/analyze-monsterstats",
     "analyze:materialutilization": "ts-node --project tsconfig.scripts.json scripts/analyze-materialutilization",
     "analyze:contentgaps": "ts-node --project tsconfig.scripts.json scripts/analyze-contentgaps",
+    "analyze:nodelevels": "ts-node --project tsconfig.scripts.json scripts/analyze-nodelevels",
     "util:changelog:generate": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "util:changelog:generate:current": "conventional-changelog -p angular -o CHANGELOG-current.md -r 2",
     "util:changelog:commit": "git commit CHANGELOG.md CHANGELOG-current.md -m \"Update changelog\" || true",
