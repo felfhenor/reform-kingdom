@@ -72,8 +72,6 @@ import { ContentService } from '@services/content.service';
 import { clamp } from 'es-toolkit/compat';
 import type { Application, Container, Graphics, Text, Texture } from 'pixi.js';
 
-const JOB_SPRITESHEET_URL = 'art/spritesheets/job.webp';
-
 const FADE_DURATION_MS = 300;
 
 @Component({
@@ -547,7 +545,11 @@ export class GamePlayWorldComponent implements OnDestroy {
       ];
     if (!frame) return [];
 
-    return pixiSpriteFrameTexturesLoad(JOB_SPRITESHEET_URL, frame, job.frames);
+    const jobSpritesheetUrl = this.contentService.toCacheBustURL(
+      'art/spritesheets/job.webp',
+    );
+
+    return pixiSpriteFrameTexturesLoad(jobSpritesheetUrl, frame, job.frames);
   }
 
   private setupPlayerIndicator(): void {

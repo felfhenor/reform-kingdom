@@ -16,3 +16,12 @@ export function versionInfoToSemver(versionInfo: VersionInfo) {
     versionInfo.hash
   );
 }
+
+// Versions static asset URLs (spritesheets, tilesets) so cached image bytes can never
+// diverge from a freshly-fetched, cache-busted coordinate/data JSON on the same asset.
+export function cacheBustURL(url: string): string {
+  const local = localVersion();
+  if (!local) return url;
+
+  return `${url}?v=${versionInfoToSemver(local)}`;
+}

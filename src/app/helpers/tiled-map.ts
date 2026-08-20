@@ -1,3 +1,4 @@
+import { cacheBustURL } from '@helpers/version';
 import type {
   TiledLayer,
   TiledMap,
@@ -58,7 +59,7 @@ export function tiledLayerTileAt(layer: TiledLayer, x: number, y: number): numbe
 }
 
 export function tiledTilesetImagePath(tileset: TiledTileset): string {
-  return tileset.image.replace(/^\.\.\//, '');
+  return cacheBustURL(tileset.image.replace(/^\.\.\//, ''));
 }
 
 export function tiledObjectProperty<T>(

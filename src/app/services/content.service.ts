@@ -53,7 +53,7 @@ export class ContentService {
     this.loadMaps();
   }
 
-  private toCacheBustURL(url: string): string {
+  public toCacheBustURL(url: string): string {
     return `${url}?v=${this.metaService.versionString()}`;
   }
 
@@ -75,7 +75,7 @@ export class ContentService {
 
     spritesheetsToLoad.forEach((sheet, idx) => {
       const img = new Image();
-      img.src = `art/spritesheets/${sheet}.webp`;
+      img.src = this.toCacheBustURL(`art/spritesheets/${sheet}.webp`);
       this.artSignals[idx].set(false);
       img.onload = async () => {
         artImageHash[sheet] = img;

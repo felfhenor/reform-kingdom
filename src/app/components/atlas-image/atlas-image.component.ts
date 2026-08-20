@@ -16,8 +16,10 @@ export class AtlasImageComponent {
   public assetName = input.required<string>();
   public cssClass = input<string>('');
 
-  public assetUrl = computed(
-    () => `art/spritesheets/${this.spritesheet()}.webp`,
+  public assetUrl = computed(() =>
+    this.contentService.toCacheBustURL(
+      `art/spritesheets/${this.spritesheet()}.webp`,
+    ),
   );
   public assetPath = computed(
     () => `gameassets/${this.spritesheet()}/${this.assetName()}.png`,
