@@ -12,13 +12,13 @@
       quantity: 1000
 
     - itemId: Goblin Nail
-      quantity: 5
+      quantity: 3
 
     - itemId: Goblin Teeth
-      quantity: 5
+      quantity: 3
 
     - itemId: Small Goblin Bone
-      quantity: 15
+      quantity: 5
 
 - id: f68c3e0a-9127-4ba6-b51b-a9a173f7c24c
   name: 'Power: Magic of the Ceruleans I'
@@ -59,7 +59,7 @@
       quantity: 25
 
     - itemId: Azurite
-      quantity: 10
+      quantity: 5
 
 - id: ce0c9c0e-642a-4637-9b70-6710c175ca51
   name: 'Enhance: Invigoration of the Zelks I'
@@ -75,10 +75,10 @@
       quantity: 1500
 
     - itemId: Small Asura Tendon
-      quantity: 25
+      quantity: 3
 
     - itemId: Orc Bone
-      quantity: 10
+      quantity: 5
 
 - id: c1c7b718-23e3-4b60-bdc9-52fb242b9ca7
   name: 'Boost: Wisdom of the Founder I'
@@ -87,7 +87,7 @@
   duration: 1800
 
   requiredCollectibles:
-    - collectibleId: Purple Lotus
+    - collectibleId: Founding Stone
 
   requiredMaterials:
     - itemId: Gold Coin
