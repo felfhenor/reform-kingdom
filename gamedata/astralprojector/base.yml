@@ -56,7 +56,7 @@
       quantity: 2500
 
     - itemId: Elven Wood
-      quantity: 25
+      quantity: 15
 
     - itemId: Azurite
       quantity: 5
@@ -78,7 +78,7 @@
       quantity: 3
 
     - itemId: Orc Bone
-      quantity: 5
+      quantity: 3
 
 - id: c1c7b718-23e3-4b60-bdc9-52fb242b9ca7
   name: 'Boost: Wisdom of the Founder I'
