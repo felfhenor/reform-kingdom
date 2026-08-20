@@ -23,5 +23,5 @@ export function cacheBustURL(url: string): string {
   const local = localVersion();
   if (!local) return url;
 
-  return `${url}?v=${versionInfoToSemver(local)}`;
+  return `${url}?v=${encodeURIComponent(versionInfoToSemver(local))}`;
 }

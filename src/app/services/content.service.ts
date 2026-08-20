@@ -54,7 +54,7 @@ export class ContentService {
   }
 
   public toCacheBustURL(url: string): string {
-    return `${url}?v=${this.metaService.versionString()}`;
+    return `${url}?v=${encodeURIComponent(this.metaService.versionString())}`;
   }
 
   private async loadArt() {
