@@ -12,6 +12,9 @@
  *   - caravan trading: a caravan trader `buy`s it from the party
  *     (`gamedata/caravantrader/*.yml` `trades[].type === 'buy'`) - a gold
  *     sink for the material, same as a recipe consuming it
+ *   - astral projector casting: an astral projector spell requirement
+ *     (`gamedata/astralprojector/*.yml` `requiredMaterials[].itemId`) - spent
+ *     every time the spell is cast, same as a recipe requirement
  *
  * Production (how many ways a material can be obtained - monster drops,
  * encounter completion rewards, gathering nodes, recipe results, and now a
@@ -77,6 +80,7 @@ type MaterialStats = {
   gatherSources: number;
   caravanBuys: number;
   caravanSells: number;
+  astralCasts: number;
 };
 
 function emptyStats(item: any): MaterialStats {
@@ -93,16 +97,17 @@ function emptyStats(item: any): MaterialStats {
     gatherSources: 0,
     caravanBuys: 0,
     caravanSells: 0,
+    astralCasts: 0,
   };
 }
 
-// The general-purpose "how many uses does this item have" number - one per
-// recipe that requires it, one per caravan trader willing to buy it (a gold
-// sink), plus one more if it's infusable (any equipment slot is a valid
-// sink for it).
+// One point per recipe, caravan buy, and astral spell that consumes it, plus one if infusable.
 function score(stats: MaterialStats): number {
   return (
-    stats.craftedFrom + stats.caravanBuys + (stats.infusable ? 1 : 0)
+    stats.craftedFrom +
+    stats.caravanBuys +
+    stats.astralCasts +
+    (stats.infusable ? 1 : 0)
   );
 }
 
@@ -143,15 +148,23 @@ async function main(): Promise<void> {
 
   console.log('=== analyze:materialutilization ===\n');
 
-  const [items, recipes, monsters, encounters, gatherings, caravanTraders] =
-    await Promise.all([
-      loadContentType('item'),
-      loadContentType('recipe'),
-      loadContentType('monster'),
-      loadContentType('encounter'),
-      loadContentType('gathering'),
-      loadContentType('caravantrader'),
-    ]);
+  const [
+    items,
+    recipes,
+    monsters,
+    encounters,
+    gatherings,
+    caravanTraders,
+    astralProjectors,
+  ] = await Promise.all([
+    loadContentType('item'),
+    loadContentType('recipe'),
+    loadContentType('monster'),
+    loadContentType('encounter'),
+    loadContentType('gathering'),
+    loadContentType('caravantrader'),
+    loadContentType('astralprojector'),
+  ]);
 
   const byName = new Map<string, MaterialStats>();
   items
@@ -205,6 +218,15 @@ async function main(): Promise<void> {
     });
   });
 
+  astralProjectors.forEach((astralProjector) => {
+    (astralProjector.requiredMaterials ?? []).forEach((requirement: any) => {
+      if (!requirement.itemId) return;
+      const stats = byName.get(requirement.itemId);
+      if (!stats) return;
+      stats.astralCasts += 1;
+    });
+  });
+
   const allStats = [...byName.values()].sort((a, b) => {
     const scoreDiff = score(a) - score(b);
     if (scoreDiff !== 0) return scoreDiff;
@@ -221,6 +243,7 @@ async function main(): Promise<void> {
           'Crafted From (qty)': stats.craftedFromQuantity,
           Infusable: stats.infusable ? 'Yes' : 'No',
           'Caravan Buys': stats.caravanBuys,
+          'Astral Casts': stats.astralCasts,
           'Crafted Into': stats.craftedInto,
           'Monster Drops': stats.monsterDrops,
           'Encounter Rewards': stats.encounterRewards,
@@ -254,6 +277,7 @@ async function main(): Promise<void> {
     const sinks: string[] = [];
     if (stats.craftedFrom > 0) sinks.push(`${stats.craftedFrom} recipe(s)`);
     if (stats.caravanBuys > 0) sinks.push(`${stats.caravanBuys} caravan buy(s)`);
+    if (stats.astralCasts > 0) sinks.push(`${stats.astralCasts} astral spell(s)`);
     if (stats.infusable) sinks.push('infusable');
     const sinkDescription =
       sinks.length > 0 ? sinks.join(', ') : 'no known sinks';

@@ -1,4 +1,5 @@
 export type ContentType =
+  | 'astralprojector'
   | 'caravan'
   | 'caravantrader'
   | 'collectible'

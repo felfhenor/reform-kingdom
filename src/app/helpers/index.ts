@@ -1,5 +1,6 @@
 export * from './analytics';
 export * from './armory';
+export * from './astral-projector';
 export * from './auto-mode';
 export * from './bestiary';
 export * from './caravan';

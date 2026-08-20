@@ -1,4 +1,5 @@
 export * from './artable';
+export * from './astral-projector';
 export * from './bestiary';
 export * from './caravan-state';
 export * from './chance-tier';
@@ -7,6 +8,7 @@ export * from './collectible-source';
 export * from './combat';
 export * from './combat-log';
 export * from './combat-order';
+export * from './content-astralprojector';
 export * from './content-caravan';
 export * from './content-caravan-trader';
 export * from './content-collectible';

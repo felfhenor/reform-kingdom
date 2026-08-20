@@ -111,7 +111,8 @@ export function combatApplyStatusEffectToTarget(
   combatTriggerApplyStatusEffect(combat, combatant, statusEffect);
 }
 
-function combatApplyStatDeltaToCombatant(
+// Exported for `combat-create.ts`, which applies active `GainStats` global effects to heroes at creation time.
+export function combatApplyStatDeltaToCombatant(
   combatant: Combatant,
   stat: GameStat,
   value: number,

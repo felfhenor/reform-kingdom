@@ -3,6 +3,10 @@ import {
   pruneInvalidDiscoveredEquipment,
 } from '@helpers/armory';
 import {
+  pruneInvalidActiveAstralProjectorSpells,
+  pruneInvalidDiscoveredAstralProjectorSpells,
+} from '@helpers/astral-projector';
+import {
   pruneInvalidBestiaryEntries,
   repairInvalidBestiaryLevels,
 } from '@helpers/bestiary';
@@ -155,6 +159,14 @@ export function migrateGameState() {
 
   newState.world.party = retrofitPartyXp(newState.world.party);
   newState.tradeskills = retrofitTradeskillXp(newState.tradeskills);
+
+  newState.discoveredAstralProjectorSpells =
+    pruneInvalidDiscoveredAstralProjectorSpells(
+      newState.discoveredAstralProjectorSpells,
+    );
+  newState.activeAstralProjectorSpells = pruneInvalidActiveAstralProjectorSpells(
+    newState.activeAstralProjectorSpells,
+  );
 
   setGameState(newState);
   gamestateTickStart();

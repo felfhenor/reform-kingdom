@@ -28,12 +28,15 @@
       </button>
 
       <button
-        [disabled]="true"
         class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
         (click)="openSubview('astralprojector')"
       >
+        @let spellCount = unlockedAstralSpellCount();
         <span class="text-base font-bold">Astral Projector</span>
-        <span class="text-xs text-lighter">0 spells learned</span>
+        <span class="text-xs text-lighter">
+          {{ spellCount | number }}
+          {{ 'spell' | pluralize: spellCount > 1 }} learned
+        </span>
       </button>
     </div>
 

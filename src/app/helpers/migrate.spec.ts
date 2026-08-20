@@ -13,6 +13,11 @@ vi.mock('@helpers/armory', () => ({
   pruneInvalidDiscoveredEquipment: vi.fn((discovered) => discovered),
 }));
 
+vi.mock('@helpers/astral-projector', () => ({
+  pruneInvalidDiscoveredAstralProjectorSpells: vi.fn((discovered) => discovered),
+  pruneInvalidActiveAstralProjectorSpells: vi.fn((active) => active),
+}));
+
 vi.mock('@helpers/bestiary', () => ({
   pruneInvalidBestiaryEntries: vi.fn((bestiary) => bestiary),
   repairInvalidBestiaryLevels: vi.fn((bestiary) => bestiary),
@@ -74,6 +79,8 @@ vi.mock('@helpers/defaults', () => ({
     discoveredGatherNodes: {},
     worldDiscoveries: {},
     bestiary: {},
+    discoveredAstralProjectorSpells: {},
+    activeAstralProjectorSpells: [],
     world: { party: [], autoMode: { clauses: [] } },
   })),
 }));

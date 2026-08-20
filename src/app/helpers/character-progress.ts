@@ -1,6 +1,7 @@
 import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { miscellaneousMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
+import { activeGlobalEffects } from '@helpers/global-effects';
 import { heroSkillsAtLevel } from '@helpers/job';
 import {
   CHARACTER_MAX_LEVEL,
@@ -14,7 +15,16 @@ import type {
   EquipmentSkillContent,
   JobContent,
 } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
+import { clamp, sumBy } from 'es-toolkit/compat';
+
+// Sums every active `GlobalXPGainMultiplier` effect into one multiplier - 1x with none active.
+function xpGainMultiplier(): number {
+  const bonus = sumBy(
+    activeGlobalEffects().flatMap((effect) => effect.effects),
+    (effect) => (effect.effectType === 'GlobalXPGainMultiplier' ? effect.value : 0),
+  );
+  return 1 + bonus;
+}
 
 export function syncPartyHpFromCombat(heroes: Combatant[]): void {
   updateGamestate((state) => {
@@ -134,10 +144,11 @@ export function retrofitPartyXp(party: Character[]): Character[] {
 // Callers (e.g. `combat-end.ts`) use the return value to know when to retry nodes previously given up on (see `autoModeResetNodeFailureCounts`).
 export function partyGainXp(amount: number): boolean {
   let anyLeveledUp = false;
+  const boostedAmount = Math.round(amount * xpGainMultiplier());
 
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => {
-      const updated = characterLeveledUp(character, amount);
+      const updated = characterLeveledUp(character, boostedAmount);
       if (updated.level > character.level) {
         anyLeveledUp = true;
         analyticsSendDesignEvent('Hero:LevelUp', updated.level);

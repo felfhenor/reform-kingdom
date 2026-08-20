@@ -12,12 +12,17 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/global-effects', () => ({
+  activeGlobalEffects: vi.fn(() => []),
+}));
+
 vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'rng-id'),
 }));
 
 import { combatantFromCharacter, combatantFromMonster } from '@helpers/combat-create';
 import { getEntry } from '@helpers/content';
+import { activeGlobalEffects } from '@helpers/global-effects';
 import type {
   Character,
   CharacterId,
@@ -26,6 +31,8 @@ import type {
   EquipmentId,
   EquipmentSkillContent,
   EquipmentSkillId,
+  GlobalEffect,
+  GlobalEffectId,
   JobContent,
   JobId,
   MonsterContent,
@@ -163,6 +170,77 @@ describe('combatantFromCharacter', () => {
     );
     expect(combatant.skillIds).toHaveLength(2);
   });
+
+  it('applies active GainStats global effects to statBoosts and totalStats', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        id: 'strength' as GlobalEffectId,
+        name: 'Strength of the Duchy I',
+        __type: 'globaleffect',
+        description: '',
+        sprite: '0000',
+        startTick: 0,
+        expiresAtTick: 100,
+        effects: [
+          { effectType: 'GainStats', stat: 'Strength', value: 5 },
+          { effectType: 'GainStats', stat: 'Vitality', value: 5 },
+        ],
+      },
+    ] as GlobalEffect[]);
+
+    const combatant = combatantFromCharacter(buildCharacter());
+
+    expect(combatant.statBoosts.Strength).toBe(5);
+    expect(combatant.statBoosts.Vitality).toBe(5);
+    expect(combatant.totalStats.Strength).toBe(5);
+    expect(combatant.totalStats.Vitality).toBe(5);
+  });
+
+  it('tops up current hp/ep by a Health/Energy GainStats bonus, even when not at full health', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        id: 'invigoration' as GlobalEffectId,
+        name: 'Invigoration of the Zelks I',
+        __type: 'globaleffect',
+        description: '',
+        sprite: '0000',
+        startTick: 0,
+        expiresAtTick: 100,
+        effects: [
+          { effectType: 'GainStats', stat: 'Health', value: 25 },
+          { effectType: 'GainStats', stat: 'Energy', value: 25 },
+        ],
+      },
+    ] as GlobalEffect[]);
+
+    const combatant = combatantFromCharacter(
+      buildCharacter({ hp: 6, ep: 4 }),
+    );
+
+    expect(combatant.hp).toBe(31);
+    expect(combatant.ep).toBe(29);
+    expect(combatant.totalStats.Health).toBe(25);
+    expect(combatant.totalStats.Energy).toBe(25);
+  });
+
+  it('ignores active GlobalXPGainMultiplier effects when applying stat boosts', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        id: 'wisdom' as GlobalEffectId,
+        name: 'Wisdom of the Founder I',
+        __type: 'globaleffect',
+        description: '',
+        sprite: '0000',
+        startTick: 0,
+        expiresAtTick: 100,
+        effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.1 }],
+      },
+    ] as GlobalEffect[]);
+
+    const combatant = combatantFromCharacter(buildCharacter());
+
+    expect(combatant.statBoosts).toEqual(zeroStats());
+  });
 });
 
 describe('combatantFromMonster', () => {
@@ -209,5 +287,37 @@ describe('combatantFromMonster', () => {
       [attackSkill.id]: 1,
       [snipeSkill.id]: 3,
     });
+  });
+
+  it('is not affected by active GainStats global effects - those only apply to heroes', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        id: 'strength' as GlobalEffectId,
+        name: 'Strength of the Duchy I',
+        __type: 'globaleffect',
+        description: '',
+        sprite: '0000',
+        startTick: 0,
+        expiresAtTick: 100,
+        effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
+      },
+    ] as GlobalEffect[]);
+
+    const monster: MonsterContent = {
+      id: 'goblin' as MonsterId,
+      name: 'Goblin',
+      __type: 'monster',
+      description: '',
+      sprite: '0000',
+      frames: 4,
+      targettingType: 'Random',
+      baseStats: zeroStats(),
+      statsPerLevel: zeroStats(),
+      skills: [{ skillId: attackSkill.id, weight: 1 }],
+    } as MonsterContent;
+
+    const combatant = combatantFromMonster(monster, 1, 0);
+
+    expect(combatant.statBoosts).toEqual(zeroStats());
   });
 });

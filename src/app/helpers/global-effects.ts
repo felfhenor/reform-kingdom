@@ -7,6 +7,7 @@ import { timerTicksElapsed } from '@helpers/timer';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodesOfType } from '@helpers/world-nodes';
 import type {
+  GameState,
   GlobalEffect,
   GlobalEffectContent,
   GlobalEffectId,
@@ -27,6 +28,32 @@ export function isGlobalEffectActive(globalEffectId: GlobalEffectId): boolean {
   return activeGlobalEffects().some((effect) => effect.id === content.id);
 }
 
+// Direct-state mutators for callers folding this into a larger `updateGamestate` commit - mirrors `applyMaterialDelta` in `materials.ts`.
+export function applyGlobalEffectAdd(
+  state: GameState,
+  globalEffectId: GlobalEffectId,
+  durationTicks: number,
+  currentTick: number,
+): void {
+  const content = getEntry<GlobalEffectContent>(globalEffectId);
+  if (!content) return;
+
+  state.globalEffects.push({
+    ...content,
+    startTick: currentTick,
+    expiresAtTick: currentTick + durationTicks,
+  });
+}
+
+export function applyGlobalEffectRemove(
+  state: GameState,
+  id: GlobalEffectId,
+): void {
+  state.globalEffects = state.globalEffects.filter(
+    (effect) => effect.id !== id,
+  );
+}
+
 export function addGlobalEffect(
   globalEffectId: GlobalEffectId,
   durationTicks: number,
@@ -37,22 +64,14 @@ export function addGlobalEffect(
   const currentTick = timerTicksElapsed();
 
   updateGamestate((state) => {
-    state.globalEffects.push({
-      ...content,
-      startTick: currentTick,
-      expiresAtTick: currentTick + durationTicks,
-    });
-
+    applyGlobalEffectAdd(state, globalEffectId, durationTicks, currentTick);
     return state;
   });
 }
 
 export function removeGlobalEffect(id: GlobalEffectId): void {
   updateGamestate((state) => {
-    state.globalEffects = state.globalEffects.filter(
-      (effect) => effect.id !== id,
-    );
-
+    applyGlobalEffectRemove(state, id);
     return state;
   });
 }

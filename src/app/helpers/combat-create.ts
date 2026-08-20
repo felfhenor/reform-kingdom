@@ -1,3 +1,4 @@
+import { combatApplyStatDeltaToCombatant } from '@helpers/combat-statuseffects';
 import { getEntry } from '@helpers/content';
 import {
   defaultAffinities,
@@ -5,6 +6,7 @@ import {
   defaultStats,
 } from '@helpers/defaults';
 import { equippedItemTypes } from '@helpers/equipment';
+import { activeGlobalEffects } from '@helpers/global-effects';
 import { heroSkillsWithEquipment } from '@helpers/job';
 import { monsterStatsAtLevel } from '@helpers/monster';
 import { rngUuid } from '@helpers/rng';
@@ -34,10 +36,28 @@ function heroUsableSkillIds(
   });
 }
 
+// Applied once here rather than read live, so the buff holds for the whole encounter even if its timer expires mid-fight.
+// Health/Energy also tops up current hp/ep (not just max), so it's felt immediately even if not at full health.
+function applyActiveGainStatsEffects(combatant: Combatant): void {
+  activeGlobalEffects().forEach((effect) => {
+    effect.effects.forEach((effectEntry) => {
+      if (effectEntry.effectType !== 'GainStats') return;
+      combatApplyStatDeltaToCombatant(
+        combatant,
+        effectEntry.stat,
+        effectEntry.value,
+      );
+
+      if (effectEntry.stat === 'Health') combatant.hp += effectEntry.value;
+      if (effectEntry.stat === 'Energy') combatant.ep += effectEntry.value;
+    });
+  });
+}
+
 export function combatantFromCharacter(character: Character): Combatant {
   const job = getEntry<JobContent>(character.jobId);
 
-  return {
+  const combatant: Combatant = {
     id: character.id,
     name: character.name,
     isEnemy: false,
@@ -77,6 +97,10 @@ export function combatantFromCharacter(character: Character): Combatant {
     statusEffects: [],
     statusEffectData: {},
   };
+
+  applyActiveGainStatsEffects(combatant);
+
+  return combatant;
 }
 
 export function combatantFromMonster(

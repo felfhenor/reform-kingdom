@@ -49,6 +49,8 @@ export function defaultGameState(): GameState {
     bestiary: {},
     globalEffects: [],
     tradeskills: defaultTradeskills(),
+    discoveredAstralProjectorSpells: {},
+    activeAstralProjectorSpells: [],
   };
 }
 

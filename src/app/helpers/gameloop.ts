@@ -1,6 +1,7 @@
 import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
+import { astralProjectorProcessTick } from '@helpers/astral-projector';
 import { autoModeProcessTick } from '@helpers/auto-mode';
 import { caravanProcessTick } from '@helpers/caravan-tick';
 import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
@@ -58,6 +59,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
     travelProcessTick();
     globalEffectsProcessTick();
+    astralProjectorProcessTick();
     gatheringProcessTick();
     encounterRandomProcessTick();
     caravanProcessTick();

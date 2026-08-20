@@ -4,6 +4,8 @@ import type {
   EquipmentSkillContent,
   EquipmentSkillId,
   GameState,
+  GlobalEffect,
+  GlobalEffectId,
   IsContentItem,
   JobContent,
   JobId,
@@ -22,6 +24,10 @@ vi.mock('@helpers/combat-log', () => ({
   miscellaneousMessageLog: vi.fn(),
 }));
 
+vi.mock('@helpers/global-effects', () => ({
+  activeGlobalEffects: vi.fn(() => []),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -36,6 +42,7 @@ import {
 } from '@helpers/character-progress';
 import { miscellaneousMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
+import { activeGlobalEffects } from '@helpers/global-effects';
 import { CHARACTER_MAX_LEVEL, characterXpForLevel, createCharacter } from '@helpers/party';
 import { updateGamestate } from '@helpers/state-game';
 
@@ -310,6 +317,96 @@ describe('Character Progress Helper Functions', () => {
       });
 
       expect(partyGainXp(30)).toBe(false);
+    });
+
+    it('scales the granted xp by any active GlobalXPGainMultiplier effect(s)', () => {
+      vi.mocked(activeGlobalEffects).mockReturnValue([
+        {
+          id: 'wisdom' as GlobalEffectId,
+          name: 'Wisdom of the Founder I',
+          __type: 'globaleffect',
+          description: '',
+          sprite: '0000',
+          startTick: 0,
+          expiresAtTick: 100,
+          effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.5 }],
+        },
+      ] as GlobalEffect[]);
+
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(30);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].xp.current).toBe(45);
+    });
+
+    it('sums multiple active GlobalXPGainMultiplier effects together', () => {
+      vi.mocked(activeGlobalEffects).mockReturnValue([
+        {
+          id: 'wisdom-1' as GlobalEffectId,
+          name: 'Wisdom I',
+          __type: 'globaleffect',
+          description: '',
+          sprite: '0000',
+          startTick: 0,
+          expiresAtTick: 100,
+          effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.5 }],
+        },
+        {
+          id: 'wisdom-2' as GlobalEffectId,
+          name: 'Wisdom II',
+          __type: 'globaleffect',
+          description: '',
+          sprite: '0000',
+          startTick: 0,
+          expiresAtTick: 100,
+          effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.25 }],
+        },
+      ] as GlobalEffect[]);
+
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(100);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      // 100 * (1 + 0.5 + 0.25) = 175
+      expect(result.world.party[0].xp.current).toBe(75);
+      expect(result.world.party[0].level).toBe(2);
+    });
+
+    it('ignores active GainStats effects when computing the xp multiplier', () => {
+      vi.mocked(activeGlobalEffects).mockReturnValue([
+        {
+          id: 'strength' as GlobalEffectId,
+          name: 'Strength of the Duchy I',
+          __type: 'globaleffect',
+          description: '',
+          sprite: '0000',
+          startTick: 0,
+          expiresAtTick: 100,
+          effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
+        },
+      ] as GlobalEffect[]);
+
+      const jala = createCharacterStub('Jala');
+
+      partyGainXp(30);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].xp.current).toBe(30);
     });
   });
 

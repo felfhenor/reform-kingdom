@@ -3,5 +3,98 @@
 
   <app-button-kingdom-back pageactions />
 
-  <div class="p-4 italic">Coming soon.</div>
+  <div class="flex flex-col gap-2 p-4 h-full overflow-y-auto">
+    @for (row of rows(); track row.content.id) {
+      <div
+        class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-24 lg:min-h-0"
+      >
+        <div class="w-16 h-16 relative flex-shrink-0">
+          @if (row.effect) {
+            <app-atlas-image
+              spritesheet="globaleffect"
+              [assetName]="row.effect.sprite"
+            />
+          }
+        </div>
+
+        <div
+          class="flex-1 flex flex-col lg:flex-row lg:items-center gap-2 min-w-0"
+        >
+          <div class="flex flex-col gap-1 min-w-0 lg:w-128 lg:shrink-0">
+            <span class="font-semibold truncate">{{ row.content.name }}</span>
+            <span class="text-xs text-lighter truncate">
+              {{ row.effect?.description }}
+            </span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 lg:flex-1">
+            @for (material of row.materialEntries; track $index) {
+              <div
+                class="relative w-8 h-8 shrink-0"
+                [tp]="materialTooltip(material)"
+                [tpPlacement]="'top'"
+              >
+                <div class="zoom-row">
+                  <app-slot-icon-blank>
+                    @if (material.discovered && material.content) {
+                      <app-atlas-image
+                        spritesheet="item"
+                        [assetName]="material.content.sprite"
+                      />
+                    } @else {
+                      <app-icon-unknown />
+                    }
+                  </app-slot-icon-blank>
+                </div>
+
+                <span
+                  class="absolute bottom-0 right-0 text-[10px] leading-tight px-0.5 rounded-sm {{
+                    material.owned < material.quantity
+                      ? 'bg-error text-white'
+                      : 'bg-black/70'
+                  }}"
+                >
+                  {{ material.quantity | number }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div
+          class="flex flex-col lg:flex-row items-end lg:items-center gap-2 flex-shrink-0"
+        >
+          <span class="text-xs text-lighter lg:w-20 lg:shrink-0 lg:text-center">
+            {{ row.durationLabel }}
+          </span>
+
+          <button
+            class="btn btn-xs btn-primary"
+            [disabled]="!row.castable"
+            (click)="onCastClick(row.content)"
+          >
+            Cast
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-xs italic text-lighter">
+        No spells unlocked yet - find the required collectibles to unlock one.
+      </div>
+    }
+  </div>
 </app-card-page>
+
+<swal
+  #overwriteSwal
+  title="Overwrite active spell?"
+  [text]="
+    'Casting this will end ' +
+    (overwriteTargetName() ?? 'the active spell') +
+    '. Continue?'
+  "
+  icon="warning"
+  confirmButtonText="Yes, cast it"
+  cancelButtonText="Cancel"
+  (confirm)="confirmCast()"
+></swal>

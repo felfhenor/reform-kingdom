@@ -1,6 +1,7 @@
 import type { GameStateCaravans } from '@interfaces/caravan-state';
 import type { Character } from '@interfaces/character';
 import type { Combat } from '@interfaces/combat';
+import type { AstralProjectorId } from '@interfaces/content-astralprojector';
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
@@ -64,6 +65,17 @@ export type GameStateDiscoveredRecipes = {
   [key: RecipeId]: { foundAt: number; foundAtNode?: string };
 };
 
+// One-time ledger of already-announced unlocks - unlock itself is a live check (`isAstralProjectorCollectiblesMet`).
+export type GameStateDiscoveredAstralProjectorSpells = {
+  [key: AstralProjectorId]: { foundAt: number };
+};
+
+export type GameStateActiveAstralProjectorSpell = {
+  astralProjectorId: AstralProjectorId;
+  startedAtTick: number;
+  expiresAtTick: number;
+};
+
 // Keyed by Tiled node name (no branded id for world nodes). Scopes auto-mode's material picker to sources the player has actually found.
 export type GameStateDiscoveredGatherNodes = {
   [key: string]: { foundAt: number };
@@ -113,4 +125,6 @@ export type GameState = {
   bestiary: GameStateBestiary;
   globalEffects: GlobalEffect[];
   tradeskills: GameStateTradeskills;
+  discoveredAstralProjectorSpells: GameStateDiscoveredAstralProjectorSpells;
+  activeAstralProjectorSpells: GameStateActiveAstralProjectorSpell[];
 };

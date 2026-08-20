@@ -1,7 +1,9 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { armoryGet } from '@helpers/armory';
+import { unlockedAstralProjectorEntries } from '@helpers/astral-projector';
 import { getBestiaryEntries } from '@helpers/bestiary';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
@@ -39,6 +41,7 @@ import { PluralizePipe } from '../../pipes/pluralize.pipe';
   imports: [
     AtlasImageComponent,
     CardPageComponent,
+    DecimalPipe,
     TippyDirective,
     PluralizePipe,
   ],
@@ -52,6 +55,10 @@ export class PlayKingdomHomeComponent {
   );
 
   public armoryCount = computed(() => armoryGet().length);
+
+  public unlockedAstralSpellCount = computed(
+    () => unlockedAstralProjectorEntries().length,
+  );
 
   public museumCollectibleEntries = computed(() =>
     getMuseumCollectibleEntries(),

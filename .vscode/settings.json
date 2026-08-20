@@ -14,6 +14,7 @@
   "eslint.validate": ["typescript", "javascript"],
   "eslint.workingDirectories": [{ "mode": "auto" }],
   "yaml.schemas": {
+    "./schemas/astralprojector.schema.json": "gamedata/astralprojector/**/*.yml",
     "./schemas/caravan.schema.json": "gamedata/caravan/**/*.yml",
     "./schemas/caravantrader.schema.json": "gamedata/caravantrader/**/*.yml",
     "./schemas/collectible.schema.json": "gamedata/collectible/**/*.yml",

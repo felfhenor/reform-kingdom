@@ -4,6 +4,10 @@ import {
   defaultStats,
 } from '@helpers/defaults';
 import type {
+  AstralProjectorContent,
+  AstralProjectorId,
+  AstralProjectorRequirementCollectible,
+  AstralProjectorRequirementMaterial,
   CaravanContent,
   CaravanId,
   CaravanTrade,
@@ -45,6 +49,9 @@ import type {
   GatheringContent,
   GatheringId,
   GlobalEffectContent,
+  GlobalEffectEffect,
+  GlobalEffectEffectGainStats,
+  GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
   IsContentItem,
   ItemContent,
@@ -81,6 +88,7 @@ import { EquipmentTypeToSlot } from '@interfaces';
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
+  astralprojector: ensureAstralProjector,
   caravan: ensureCaravan,
   caravantrader: ensureCaravanTrader,
   collectible: ensureCollectible,
@@ -577,6 +585,21 @@ function ensureStatusEffect(
   };
 }
 
+function ensureGlobalEffectEffect(
+  effect: Partial<GlobalEffectEffectGainStats> &
+    Partial<GlobalEffectEffectXPGainMultiplier> = {},
+): GlobalEffectEffect {
+  if (effect.effectType === 'GlobalXPGainMultiplier') {
+    return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
+  }
+
+  return {
+    effectType: 'GainStats',
+    stat: (effect.stat ?? 'Strength') as GameStat,
+    value: effect.value ?? 0,
+  };
+}
+
 function ensureGlobalEffect(
   effect: Partial<GlobalEffectContent>,
 ): Required<GlobalEffectContent> {
@@ -586,6 +609,41 @@ function ensureGlobalEffect(
     __type: 'globaleffect',
     sprite: effect.sprite ?? 'UNKNOWN',
     description: effect.description ?? 'UNKNOWN',
+    effects: ensureArray(effect.effects, ensureGlobalEffectEffect),
+  };
+}
+
+function ensureAstralProjectorRequirement(
+  requirement: Partial<AstralProjectorRequirementCollectible> &
+    Partial<AstralProjectorRequirementMaterial> = {},
+): AstralProjectorRequirementCollectible | AstralProjectorRequirementMaterial {
+  if (requirement.collectibleId) {
+    return { collectibleId: requirement.collectibleId };
+  }
+
+  return {
+    itemId: requirement.itemId ?? ('UNKNOWN' as ItemId),
+    quantity: requirement.quantity ?? 1,
+  };
+}
+
+function ensureAstralProjector(
+  astralProjector: Partial<AstralProjectorContent>,
+): Required<AstralProjectorContent> {
+  return {
+    id: astralProjector.id ?? ('UNKNOWN' as AstralProjectorId),
+    name: astralProjector.name ?? 'UNKNOWN',
+    __type: 'astralprojector',
+    globalEffectId: astralProjector.globalEffectId ?? ('UNKNOWN' as GlobalEffectId),
+    duration: astralProjector.duration ?? 60,
+    requiredCollectibles: ensureArray(
+      astralProjector.requiredCollectibles,
+      ensureAstralProjectorRequirement,
+    ) as AstralProjectorRequirementCollectible[],
+    requiredMaterials: ensureArray(
+      astralProjector.requiredMaterials,
+      ensureAstralProjectorRequirement,
+    ) as AstralProjectorRequirementMaterial[],
   };
 }
 
