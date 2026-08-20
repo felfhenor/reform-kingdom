@@ -4,10 +4,6 @@ import { getEntry } from '@helpers/content';
 import { getMaterialQuantity } from '@helpers/materials';
 import { isRecipeDiscovered } from '@helpers/recipes';
 import {
-  worldNodeLevelLabel,
-  worldNodeLevelRange,
-} from '@helpers/world-node-status';
-import {
   isGoldCoinReward,
   isRewardDiscovered,
   rewardContentInfo,
@@ -15,6 +11,10 @@ import {
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
 } from '@helpers/world-node-rewards';
+import {
+  worldNodeLevelLabel,
+  worldNodeLevelRange,
+} from '@helpers/world-node-status';
 import {
   worldNodeByName,
   worldNodeEncounter,
@@ -101,7 +101,9 @@ function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
 }
 
 // Completion rewards plus discovered kill drops for `nodeName`, de-duplicated. Excludes recipes since they're a one-time unlock, not something to accumulate.
-export function farmNodeRewardOptions(nodeName: string): FarmNodeRewardOption[] {
+export function farmNodeRewardOptions(
+  nodeName: string,
+): FarmNodeRewardOption[] {
   const entry = worldNodeByName(nodeName);
   if (!entry) return [];
 

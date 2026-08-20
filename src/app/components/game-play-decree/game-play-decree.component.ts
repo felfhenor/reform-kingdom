@@ -146,7 +146,7 @@ export class GamePlayDecreeComponent {
   // makes sense in the context of the node it's farmed from.
   public rewardOptions = computed<FarmNodeRewardOption[]>(() => {
     const nodeName = this.draftNodeName();
-    return nodeName ? farmNodeRewardOptions(nodeName) : [];
+    return nodeName ? sortBy(farmNodeRewardOptions(nodeName), 'name') : [];
   });
 
   // Keyed by a stable string (`FarmNodeRewardOption.key`) rather than the reward object, so it can drive ng-select's bindValue like `draftMaterialId`.
