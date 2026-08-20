@@ -21,7 +21,12 @@
         </div>
 
         <div class="flex flex-wrap gap-2 text-sm">
-          <div class="badge badge-outline">Level {{ levelLabel() }}</div>
+          <div
+            class="badge badge-outline"
+            [class.badge-error]="!meetsGatherLevelRequirement()"
+          >
+            Level {{ levelLabel() }}
+          </div>
 
           @if (isExploreNode()) {
             <app-panel-map-node-badges-explore [entry]="entry" />
@@ -55,12 +60,6 @@
         }
 
         @if (!isAtNode()) {
-          @if (!meetsGatherLevelRequirement()) {
-            <div class="text-sm text-rose-400">
-              Lv. {{ levelLabel() }} required.
-            </div>
-          }
-
           @if (!meetsCaravanAvailability()) {
             <div class="text-sm text-rose-400">
               No traders are available for this timeframe. Check back later.
