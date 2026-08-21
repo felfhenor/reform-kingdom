@@ -116,7 +116,7 @@
         @let uncraftable = entry.maxCraftable === 0;
 
         <div
-          class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-24 lg:min-h-0"
+          class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-[72px] max-h-[72px]"
           [class.opacity-50]="uncraftable"
         >
           <app-tooltip-item-preview #preview [display]="entry.resultDisplay" />
