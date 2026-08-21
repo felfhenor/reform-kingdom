@@ -9,6 +9,7 @@ import type {
   ItemContent,
   ItemId,
   MonsterContent,
+  RecipeContent,
   StatBlock,
   TradeskillBuildingState,
   TradeskillId,
@@ -35,6 +36,11 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/materials', () => ({
   addMaterial: vi.fn(),
+}));
+
+vi.mock('@helpers/recipes', () => ({
+  isRecipeDropGated: vi.fn(),
+  recipeDiscover: vi.fn(),
 }));
 
 vi.mock('@helpers/party', () => ({
@@ -67,6 +73,7 @@ import { monsterEncounters, monsterRecordKill } from '@helpers/bestiary';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
+  debugDiscoverAllRecipes,
   debugDiscoverWorldNode,
   debugFillBestiary,
   debugGiveAllEquipment,
@@ -81,6 +88,7 @@ import {
 } from '@helpers/debug';
 import { addMaterial } from '@helpers/materials';
 import { characterStatsForLevel, characterXpForLevel } from '@helpers/party';
+import { isRecipeDropGated, recipeDiscover } from '@helpers/recipes';
 import { updateGamestate } from '@helpers/state-game';
 import { tradeskillIdForName, tradeskillXpForLevel } from '@helpers/tradeskill';
 import {
@@ -442,6 +450,22 @@ describe('Debug Helper Functions', () => {
       debugUndiscoverWorldNode('Hidden Grove');
 
       expect(worldNodeUndiscover).toHaveBeenCalledWith('Hidden Grove');
+    });
+  });
+
+  describe('debugDiscoverAllRecipes', () => {
+    it('discovers only drop-gated recipe entries', () => {
+      const smelting = { id: 'smelting' } as RecipeContent;
+      const carving = { id: 'carving' } as RecipeContent;
+      vi.mocked(getEntriesByType).mockReturnValue([smelting, carving]);
+      vi.mocked(isRecipeDropGated).mockImplementation(
+        (id) => id === 'smelting',
+      );
+
+      debugDiscoverAllRecipes();
+
+      expect(recipeDiscover).toHaveBeenCalledTimes(1);
+      expect(recipeDiscover).toHaveBeenCalledWith('smelting');
     });
   });
 

@@ -8,6 +8,7 @@ import {
   characterStatsForLevel,
   characterXpForLevel,
 } from '@helpers/party';
+import { isRecipeDropGated, recipeDiscover } from '@helpers/recipes';
 import {
   TRADESKILL_MAX_LEVEL,
   tradeskillIdForName,
@@ -28,6 +29,7 @@ import type {
   ItemContent,
   ItemId,
   MonsterContent,
+  RecipeContent,
   Tradeskill,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
@@ -207,4 +209,14 @@ export function debugGiveCollectible(
   }
 
   collectiblesAdd(collectible.id, quantity);
+}
+
+// Discovers every drop-gated recipe so it becomes craftable (see
+// `isRecipeCraftable`); non-drop-gated recipes need no discovery record.
+export function debugDiscoverAllRecipes(): void {
+  getEntriesByType<RecipeContent>('recipe')
+    .filter((recipe) => isRecipeDropGated(recipe.id))
+    .forEach((recipe) => {
+      recipeDiscover(recipe.id);
+    });
 }
