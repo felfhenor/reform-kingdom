@@ -1,6 +1,10 @@
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat-stats';
 import { getEntry } from '@helpers/content';
-import { skillEpCost, skillTechniqueNumTargets, skillUses } from '@helpers/skill';
+import {
+  skillEpCost,
+  skillTechniqueNumTargets,
+  skillUses,
+} from '@helpers/skill';
 import type {
   Combat,
   Combatant,
@@ -148,8 +152,8 @@ export function combatGetTargetsFromListBasedOnType(
         combatants.filter((c) => c.id === context?.targetCharacterId),
       // matchingAllies must be first - intersection() keeps its first arg's order.
       MatchingAllies: () =>
-        intersection(context?.matchingAllies ?? [], combatants).slice(
-          0,
+        sampleSize(
+          intersection(context?.matchingAllies ?? [], combatants),
           select,
         ),
     };
