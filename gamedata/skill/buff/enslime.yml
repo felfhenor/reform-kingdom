@@ -1,0 +1,31 @@
+- id: 448c145b-e099-40f9-871a-94bceec46098
+  name: Enslime
+  family: Enslime
+  description: Cover 2 allies with slimy skin, increasing their VIT and RES.
+
+  sprite: '0026'
+
+  rarity: Common
+
+  epCost: 12
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [Buff]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Slime Skin
+
+      statusEffects:
+        - statusEffectId: Slime Skin
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}**.'

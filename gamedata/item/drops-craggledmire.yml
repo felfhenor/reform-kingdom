@@ -1,0 +1,20 @@
+- id: 7b029f6c-58f4-4f09-b68f-07fbb29034af
+  name: Oozehide
+  description: A resilient hide reinforced with oozy mucus.
+  rarity: Common
+
+  sprite: '0030'
+
+  infusionStats:
+    Resistance: 1
+    Vitality: 1
+
+- id: e97f5fc7-6ca3-4974-936c-ff4e64f4bafd
+  name: Spirit Flesh
+  description: A tuft of tangible ectoplasmic flesh, taken from a fading ghost.
+  rarity: Common
+
+  sprite: '0031'
+
+  infusionStats:
+    Resistance: 2

@@ -1,0 +1,13 @@
+- id: 15f7a76a-e809-45d5-9a81-1694adfad632
+  name: Mireweed
+  description: A weak weed that, when processed, becomes much stronger and more capable of being woven into fabric.
+  rarity: Common
+
+  sprite: '0033'
+
+- id: 5a538dff-3d9d-4be0-8462-b1312110096e
+  name: Mirethread
+  description: A thick thread used to make resilient gear.
+  rarity: Common
+
+  sprite: '0034'

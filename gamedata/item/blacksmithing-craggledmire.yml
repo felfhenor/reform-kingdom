@@ -1,0 +1,13 @@
+- id: 0f9f2730-f4e9-4de4-896a-22367eb71ec4
+  name: Miremetal Ore
+  description: A glowing chunk of gooey, slimy ore.
+  rarity: Common
+
+  sprite: '0027'
+
+- id: 0ffaf413-5dbb-40d5-8c04-a69b3f2ea6c0
+  name: Miremetal Ingot
+  description: An ingot forged from ores found in the mire. It retains it's gooey nature even when forged.
+  rarity: Uncommon
+
+  sprite: '0028'

@@ -1,13 +1,13 @@
-- id: 4a2103cb-a704-46b2-8168-7f39b184851f
-  name: Slow Web I
-  family: Slow Web
-  description: Web an enemy for {{ value }} damage, slowing them down.
+- id: 7bfb1c25-a60e-41ad-ac46-95a4ea1aaf2e
+  name: Venom Spit I
+  family: Venom Spit
+  description: Spit at an enemy for {{ value }} damage, inflicting Venom on them sometimes.
 
-  sprite: '0010'
+  sprite: '0025'
 
   rarity: Common
 
-  epCost: 6
+  epCost: 5
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
@@ -21,27 +21,28 @@
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect
-          statusEffectId: Slowed
+          statusEffectId: Venom I
       damageScaling:
-        Strength: 0.5
+        Agility: 0.5
+        Strength: 0.25
 
       statusEffects:
-        - statusEffectId: Slowed
-          chance: 100
-          duration: 3
+        - statusEffectId: Venom I
+          chance: 50
+          duration: 5
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-- id: 394a4f06-42de-47d5-8d37-812b9d7b96c6
-  name: Slow Web II
-  family: Slow Web
-  description: Web an enemy for {{ value }} damage, stopping them in place.
+- id: 35c5adc6-4565-4d59-92fc-4b81e1a73101
+  name: Venom Spit II
+  family: Venom Spit
+  description: Spit at an enemy for {{ value }} damage, inflicting Venom on them sometimes.
 
-  sprite: '0010'
+  sprite: '0025'
 
-  rarity: Common
+  rarity: Uncommon
 
-  epCost: 12
+  epCost: 10
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
@@ -55,13 +56,14 @@
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect
-          statusEffectId: Stopped
+          statusEffectId: Venom II
       damageScaling:
-        Strength: 1
+        Agility: 1
+        Strength: 0.5
 
       statusEffects:
-        - statusEffectId: Stopped
-          chance: 100
-          duration: 1
+        - statusEffectId: Venom II
+          chance: 50
+          duration: 3
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

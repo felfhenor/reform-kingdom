@@ -1,13 +1,13 @@
-- id: 95ceab2d-284b-42b9-8534-817fa6396c02
-  name: Slime Toss
-  family: Slime Toss
-  description: Toss slime at an enemy for {{ value }} damage, lowering their resistance.
+- id: 97a5da3d-5784-40cc-a47e-7dd55c28491d
+  name: Toxic Breath
+  family: Toxic Breath
+  description: Breathe toxicity at 3 foes for {{ value }} damage, and inflicting them with Disgusted.
 
-  sprite: '0007'
+  sprite: '0027'
 
   rarity: Common
 
-  epCost: 6
+  epCost: 12
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
@@ -16,18 +16,19 @@
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
       elements: []
-      targets: 1
+      targets: 3
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect
-          statusEffectId: Slimed
+          statusEffectId: Disgusted
       damageScaling:
-        Vitality: 0.5
+        Inteligence: 0.5
+        Strength: 0.5
 
       statusEffects:
-        - statusEffectId: Slimed
+        - statusEffectId: Disgusted
           chance: 100
-          duration: 2
+          duration: 3
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -1,0 +1,9 @@
+- id: 056e9c68-87cd-490f-995d-9a7b21d6e207
+  name: Peridot
+  description: A deep green gem used for crafting jewelry.
+  rarity: Uncommon
+
+  sprite: '0029'
+
+  infusionStats:
+    Intelligence: 1

@@ -112,9 +112,7 @@
   effectType: Debuff
   elements: [Earth]
 
-  trigger: TurnEnd
-
-  useTargetStats: true
+  trigger: TurnStart
 
   onApply:
     - type: AddCombatStatNumber
@@ -132,9 +130,7 @@
   effectType: Debuff
   elements: [Earth]
 
-  trigger: TurnEnd
-
-  useTargetStats: true
+  trigger: TurnStart
 
   onApply:
     - type: AddCombatStatNumber
@@ -145,6 +141,24 @@
     - type: TakeCombatStatNumber
       combatStat: stunChance
       value: 60
+
+- id: 8ab6330d-c4c1-4a60-bccb-e0e28b8ae72a
+  name: Stunned
+
+  effectType: Debuff
+  elements: [Air]
+
+  trigger: TurnStart
+
+  onApply:
+    - type: AddCombatStatNumber
+      combatStat: stunChance
+      value: 100
+
+  onUnapply:
+    - type: TakeCombatStatNumber
+      combatStat: stunChance
+      value: 100
 
 - id: a469aaf3-5542-4191-a751-dd75d07773c8
   name: Stopped
@@ -200,3 +214,79 @@
     - type: TakeCombatStatNumber
       combatStat: missChance
       value: 25
+
+- id: 473b3b78-9531-49db-9c60-11b2924cf34f
+  name: Brittle I
+
+  type: Debuff
+  elements: [Water]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Health: 0.2
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has been made brittle (-{{ damage }} Health)!'
+      modifyStat: Health
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has recovered from brittleness (+{{ damage }} Health)!'
+      modifyStat: Health
+
+- id: 46e3db32-3cb9-45b9-b506-01b5b0b1ce68
+  name: Brittle II
+
+  type: Debuff
+  elements: [Water]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Health: 0.4
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has been made brittle (-{{ damage }} Health)!'
+      modifyStat: Health
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has recovered from brittleness (+{{ damage }} Health)!'
+      modifyStat: Health
+
+- id: 313d488f-ea69-4b8e-ac66-7ce3fda0218b
+  name: Disgusted
+
+  effectType: Debuff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  statScaling:
+    Vitality: 0.3
+    Resistance: 0.3
+
+  onApply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** is disgusted (-{{ damage }} Resistance)!'
+      modifyStat: Resistance
+
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** is disgusted (-{{ damage }} Vitality)!'
+      modifyStat: Vitality
+
+  onUnapply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** is no longer disgusted (+{{ damage }} Resistance)!'
+      modifyStat: Resistance
+
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** is no longer disgusted (+{{ damage }} Vitality)!'
+      modifyStat: Vitality

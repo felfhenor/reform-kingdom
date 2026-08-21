@@ -1,45 +1,11 @@
-- id: cc65aced-a210-42ac-8248-980361ddedad
-  name: Venom Bite I
-  family: Venom Bite
-  description: Bite an enemy for {{ value }} damage, inflicting Venom on them.
+- id: 07c04cff-c671-4a5c-b646-81dcb08c899c
+  name: Chilling Touch I
+  family: Chilling Touch
+  description: Chill a foe with your touch, dealing {{ value }} damage and inflicting Brittle.
 
-  sprite: '0009'
+  sprite: '0023'
 
   rarity: Common
-
-  epCost: 5
-  usesPerCombat: -1
-
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
-
-  techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
-      elements: []
-      targets: 1
-      targetType: Enemies
-      targetBehaviors:
-        - behavior: NotZeroHealth
-        - behavior: IfNotStatusEffect
-          statusEffectId: Venom I
-      damageScaling:
-        Strength: 0.5
-
-      statusEffects:
-        - statusEffectId: Venom I
-          chance: 100
-          duration: 5
-
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
-
-- id: a24cef74-932d-4345-bcf9-eadc62e89381
-  name: Venom Bite II
-  family: Venom Bite
-  description: Bite an enemy for {{ value }} damage, inflicting Venom on them.
-
-  sprite: '0009'
-
-  rarity: Uncommon
 
   epCost: 10
   usesPerCombat: -1
@@ -48,20 +14,60 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
-      elements: []
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink]
       targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect
-          statusEffectId: Venom II
+          statusEffectId: Brittle I
+        - behavior: IfNotStatusEffect
+          statusEffectId: Brittle II
       damageScaling:
-        Strength: 1
+        Intelligence: 1
+        Strength: 0.5
 
       statusEffects:
-        - statusEffectId: Venom II
-          chance: 100
+        - chance: 100
+          statusEffectId: Brittle I
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: e4b5bc1d-b79e-4e3c-bfce-e9481306ec02
+  name: Chilling Touch II
+  family: Chilling Touch
+  description: Chill a foe with your touch, dealing {{ value }} damage and inflicting Brittle.
+
+  sprite: '0023'
+
+  rarity: Uncommon
+
+  epCost: 15
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Brittle I
+        - behavior: IfNotStatusEffect
+          statusEffectId: Brittle II
+      damageScaling:
+        Intelligence: 1.25
+        Strength: 0.75
+
+      statusEffects:
+        - chance: 100
+          statusEffectId: Brittle II
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

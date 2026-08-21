@@ -1,0 +1,77 @@
+- id: db7d5e8b-738d-439e-93e1-438a8ad8a396
+  name: Miremetal Mines
+  description: A swampy plains, perfect for finding a variety of natural resources to craft.
+
+  levelRange:
+    min: 15
+    max: 16
+
+  xpGainedIfInLevelRange: 5
+  gatherTime: 10
+
+  gatherResults:
+    - chance: 40
+      items:
+        - itemId: Miremetal Ore
+          quantity: 1
+
+    - chance: 30
+      items:
+        - itemId: Miremetal Ore
+          quantity: 2
+
+    - chance: 20
+      items:
+        - itemId: Miremetal Ore
+          quantity: 3
+
+    - chance: 20
+      items:
+        - itemId: Peridot
+          quantity: 1
+
+- id: 46f49626-9c31-4bee-9ce6-b2cf3acf8a5f
+  name: Swampfields
+  description: A swampy plains, perfect for finding a variety of natural resources to craft.
+
+  levelRange:
+    min: 15
+    max: 16
+
+  xpGainedIfInLevelRange: 5
+  gatherTime: 10
+
+  gatherResults:
+    - chance: 40
+      items:
+        - itemId: Mirewood
+          quantity: 1
+
+    - chance: 40
+      items:
+        - itemId: Mireweed
+          quantity: 1
+
+    - chance: 25
+      items:
+        - itemId: Mirewood
+          quantity: 1
+        - itemId: Mireweed
+          quantity: 1
+
+    - chance: 10
+      items:
+        - itemId: Mirewood
+          quantity: 3
+
+    - chance: 10
+      items:
+        - itemId: Mireweed
+          quantity: 3
+
+    - chance: 1
+      items:
+        - itemId: Mirewood
+          quantity: 3
+        - itemId: Mireweed
+          quantity: 3

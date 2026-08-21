@@ -1,5 +1,35 @@
 - id: 3c14460d-839e-4475-aa69-ad6d8b50fa25
   name: Swamp Clam
-  rarity: Uncommon
+  rarity: Common
   description: A clam found in the swamp. The goblins of the swamp found these to be delicious.
   sprite: '0003'
+
+- id: 4dc20183-9530-4765-9f7d-1502aa0c4024
+  name: Cane of Etheria
+  rarity: Uncommon
+  description: A red cane emanating magical energy. In another world, holding it would create tangible energy.
+  sprite: '0026'
+
+- id: aa56310d-bc6d-4dd7-a5eb-1db1421da48d
+  name: Craggle Pebble
+  rarity: Common
+  description: A small chunk of metal used as currency by the Craggled Mire orcs.
+  sprite: '0027'
+
+- id: a0a05ad6-e4eb-4a67-b008-24571eedfd18
+  name: Mirefrog Tongue
+  rarity: Common
+  description: A tiny, rotting tongue taken from the frogs of Craggled Mire.
+  sprite: '0028'
+
+- id: ad16c486-0b93-4146-89cf-230c8d46c4f0
+  name: Cyclops Skull
+  rarity: Common
+  description: A large skull with one eye hole, found in a Craggled Mire mausoleum.
+  sprite: '0029'
+
+- id: 443d1ae8-d3d1-4d8c-9009-fc64a7af7bff
+  name: Ghost Orbs
+  rarity: Common
+  description: A set of ethereal orbs. These are made by condensing ghostly essence with artificing tools, and are then made tangible as a result.
+  sprite: '0030'

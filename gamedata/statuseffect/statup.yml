@@ -102,3 +102,33 @@
     - type: TakeDamageFromStat
       combatMessage: '**{{ combatant.name }}** has lost their substantial luck (-{{ damage }} Luck)!'
       modifyStat: Luck
+
+- id: 4e2f3e0d-f300-4b3d-bb5e-ec83b2412905
+  name: Slime Skin
+
+  effectType: Buff
+  elements: [Earth]
+
+  trigger: TurnEnd
+
+  statScaling:
+    Vitality: 0.3
+    Resistance: 0.3
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** is covered in protective slime (-{{ damage }} Resistance)!'
+      modifyStat: Resistance
+
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** is covered in protective slime (-{{ damage }} Vitality)!'
+      modifyStat: Vitality
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** is no longer covered in protective slime (+{{ damage }} Resistance)!'
+      modifyStat: Resistance
+
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** is no longer covered in protective slime (+{{ damage }} Vitality)!'
+      modifyStat: Vitality

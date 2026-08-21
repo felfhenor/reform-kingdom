@@ -1,0 +1,204 @@
+- id: 33761b06-355e-4bad-ac2d-7bb03e2f8c2d
+  name: Angry Spirit
+  description: An angry spirit that refuses to leave the mortal plane, instead preferring to cause mayhem near where it died.
+
+  sprite: '0068'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 35
+    max: 40
+    bonusPerLevel: 3
+
+  drops:
+    - itemId: Spirit Flesh
+      min: 1
+      max: 2
+      chance: 75
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Chilling Touch I
+      weight: 3
+
+    - skillId: Piercing Scream I
+      weight: 3
+
+  baseStats:
+    Health: 75
+    Energy: 35
+    Luck: 1
+    Intelligence: 13
+    Strength: 10
+    Vitality: 4
+    Resistance: 10
+    Agility: 5
+
+  statsPerLevel:
+    Health: 7
+    Energy: 4
+    Luck: 1
+    Intelligence: 0.5
+    Strength: 0.4
+    Vitality: 0.2
+    Resistance: 0.75
+    Agility: 0.5
+
+- id: 0148e305-80ae-4da7-9409-7a15fbb132b7
+  name: Banshee
+  description: An elder spirit that has refined it's screech to a point of causing terror in a large radius around itself.
+
+  sprite: '0072'
+  frames: 4
+
+  targettingType: Weakest
+
+  rarity: Uncommon
+
+  xp:
+    min: 40
+    max: 50
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Spirit Flesh
+      min: 3
+      max: 5
+      chance: 100
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Chilling Touch II
+      weight: 3
+
+    - skillId: Piercing Scream II
+      weight: 3
+
+  baseStats:
+    Health: 150
+    Energy: 65
+    Luck: 1
+    Intelligence: 19
+    Strength: 13
+    Vitality: 13
+    Resistance: 18
+    Agility: 5
+
+  statsPerLevel:
+    Health: 7
+    Energy: 4
+    Luck: 1
+    Intelligence: 0.65
+    Strength: 0.4
+    Vitality: 0.35
+    Resistance: 0.95
+    Agility: 0.9
+
+- id: d430f23e-4731-45bc-87e4-5404a09a89eb
+  name: Poison Dartfrog
+  description: A small green frog known for it's venomous spit that stings like a dart.
+
+  sprite: '0076'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 30
+    max: 35
+    bonusPerLevel: 3
+
+  drops:
+    - itemId: Oozehide
+      min: 1
+      max: 2
+      chance: 75
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Venom Spit I
+      weight: 3
+
+    - skillId: Enslime
+      weight: 3
+
+  baseStats:
+    Health: 50
+    Energy: 25
+    Luck: 1
+    Intelligence: 10
+    Strength: 8
+    Vitality: 4
+    Resistance: 13
+    Agility: 9
+
+  statsPerLevel:
+    Health: 5
+    Energy: 4
+    Luck: 1
+    Intelligence: 0.6
+    Strength: 0.6
+    Vitality: 0.4
+    Resistance: 0.5
+    Agility: 0.75
+
+- id: b1067f91-f48a-4548-a91b-25a5df8fd533
+  name: Toxic Toad
+  description: A large orange toad, known worldwide for its extremely toxic breath.
+
+  sprite: '0080'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Common
+
+  xp:
+    min: 30
+    max: 35
+    bonusPerLevel: 3
+
+  drops:
+    - itemId: Oozehide
+      min: 1
+      max: 2
+      chance: 75
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Toxic Breath
+      weight: 3
+
+  baseStats:
+    Health: 65
+    Energy: 35
+    Luck: 1
+    Intelligence: 10
+    Strength: 8
+    Vitality: 4
+    Resistance: 13
+    Agility: 9
+
+  statsPerLevel:
+    Health: 8
+    Energy: 4
+    Luck: 1
+    Intelligence: 0.6
+    Strength: 0.6
+    Vitality: 0.4
+    Resistance: 0.5
+    Agility: 0.75

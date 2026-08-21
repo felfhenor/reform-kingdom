@@ -1,47 +1,47 @@
-- id: 4a2103cb-a704-46b2-8168-7f39b184851f
-  name: Slow Web I
-  family: Slow Web
-  description: Web an enemy for {{ value }} damage, slowing them down.
+- id: aa028fb4-d643-48ef-820e-1baf3c3928ad
+  name: Piercing Scream I
+  family: Piercing Scream
+  description: Scream at a foe, dealing {{ value }} magical damage and potentially stunning them.
 
-  sprite: '0010'
+  sprite: '0024'
 
   rarity: Common
 
-  epCost: 6
+  epCost: 10
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+    - attributes: [Debuff]
       elements: []
       targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect
-          statusEffectId: Slowed
+          statusEffectId: Stunned
       damageScaling:
-        Strength: 0.5
+        Resistance: 1
 
       statusEffects:
-        - statusEffectId: Slowed
-          chance: 100
-          duration: 3
+        - statusEffectId: Stunned
+          chance: 25
+          duration: 1
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-- id: 394a4f06-42de-47d5-8d37-812b9d7b96c6
-  name: Slow Web II
-  family: Slow Web
-  description: Web an enemy for {{ value }} damage, stopping them in place.
+- id: d14e8d16-e000-47fd-9da4-95ac36a479ad
+  name: Piercing Scream II
+  family: Piercing Scream
+  description: Scream at 2 foes, dealing {{ value }} magical damage and potentially stunning them.
 
-  sprite: '0010'
+  sprite: '0024'
 
-  rarity: Common
+  rarity: Uncommon
 
-  epCost: 12
+  epCost: 16
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
@@ -50,18 +50,18 @@
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
       elements: []
-      targets: 1
+      targets: 2
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect
-          statusEffectId: Stopped
+          statusEffectId: Stunned
       damageScaling:
-        Strength: 1
+        Resistance: 1.5
 
       statusEffects:
-        - statusEffectId: Stopped
-          chance: 100
+        - statusEffectId: Stunned
+          chance: 50
           duration: 1
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
