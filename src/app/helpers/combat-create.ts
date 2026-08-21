@@ -40,7 +40,7 @@ function heroUsableSkillIds(
 // Health/Energy also tops up current hp/ep (not just max), so it's felt immediately even if not at full health.
 function applyActiveGainStatsEffects(combatant: Combatant): void {
   activeGlobalEffects().forEach((effect) => {
-    effect.effects.forEach((effectEntry) => {
+    (effect.effects ?? []).forEach((effectEntry) => {
       if (effectEntry.effectType !== 'GainStats') return;
       combatApplyStatDeltaToCombatant(
         combatant,
