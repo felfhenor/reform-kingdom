@@ -1,4 +1,5 @@
 import { armoryAdd } from '@helpers/armory';
+import { monsterEncounters, monsterRecordKill } from '@helpers/bestiary';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { addMaterial } from '@helpers/materials';
@@ -26,6 +27,7 @@ import type {
   EquipmentId,
   ItemContent,
   ItemId,
+  MonsterContent,
   Tradeskill,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
@@ -147,6 +149,26 @@ export function debugResetBestiary(): void {
   updateGamestate((state) => {
     state.bestiary = {};
     return state;
+  });
+}
+
+// Records a kill for every monster at every node it can be fought in, at
+// that node's level range, so the bestiary shows real stat spreads instead
+// of needing to fight everything manually. Monsters authored nowhere fall
+// back to a single level-1 kill so they still show up.
+export function debugFillBestiary(): void {
+  getEntriesByType<MonsterContent>('monster').forEach((monster) => {
+    const encounters = monsterEncounters(monster.id);
+
+    if (encounters.length === 0) {
+      monsterRecordKill(monster.id, 1);
+      return;
+    }
+
+    encounters.forEach((encounter) => {
+      monsterRecordKill(monster.id, encounter.levelRange.min, encounter.name);
+      monsterRecordKill(monster.id, encounter.levelRange.max, encounter.name);
+    });
   });
 }
 

@@ -123,7 +123,7 @@ export function pruneInvalidBestiaryEntries(
 }
 
 // Every authored or generated place this monster can be fought - backs the "discoverable in" hint on undiscovered entries.
-function monsterEncounters(
+export function monsterEncounters(
   monsterId: MonsterId,
 ): Array<EncounterContent | EncounterRandomContent> {
   const encounters = getEntriesByType<EncounterContent>('encounter').filter(

@@ -8,6 +8,7 @@ import type {
   GameState,
   ItemContent,
   ItemId,
+  MonsterContent,
   StatBlock,
   TradeskillBuildingState,
   TradeskillId,
@@ -16,6 +17,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/armory', () => ({
   armoryAdd: vi.fn(),
+}));
+
+vi.mock('@helpers/bestiary', () => ({
+  monsterEncounters: vi.fn(),
+  monsterRecordKill: vi.fn(),
 }));
 
 vi.mock('@helpers/collectibles', () => ({
@@ -57,10 +63,12 @@ vi.mock('@helpers/world-node-discovery', () => ({
 }));
 
 import { armoryAdd } from '@helpers/armory';
+import { monsterEncounters, monsterRecordKill } from '@helpers/bestiary';
 import { collectiblesAdd } from '@helpers/collectibles';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   debugDiscoverWorldNode,
+  debugFillBestiary,
   debugGiveAllEquipment,
   debugGiveCollectible,
   debugGiveEquipment,
@@ -388,6 +396,36 @@ describe('Debug Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.bestiary).toEqual({});
+    });
+  });
+
+  describe('debugFillBestiary', () => {
+    it("records a kill at each encounter node's min and max level", () => {
+      const goblin = { id: 'goblin' } as MonsterContent;
+      vi.mocked(getEntriesByType).mockReturnValue([goblin]);
+      vi.mocked(monsterEncounters).mockReturnValue([
+        { name: 'Field Ruins', levelRange: { min: 1, max: 5 } },
+        { name: 'Swamp', levelRange: { min: 4, max: 8 } },
+      ] as never);
+
+      debugFillBestiary();
+
+      expect(monsterRecordKill).toHaveBeenCalledTimes(4);
+      expect(monsterRecordKill).toHaveBeenCalledWith('goblin', 1, 'Field Ruins');
+      expect(monsterRecordKill).toHaveBeenCalledWith('goblin', 5, 'Field Ruins');
+      expect(monsterRecordKill).toHaveBeenCalledWith('goblin', 4, 'Swamp');
+      expect(monsterRecordKill).toHaveBeenCalledWith('goblin', 8, 'Swamp');
+    });
+
+    it('falls back to a single level-1 kill when the monster appears in no encounters', () => {
+      const slime = { id: 'slime' } as MonsterContent;
+      vi.mocked(getEntriesByType).mockReturnValue([slime]);
+      vi.mocked(monsterEncounters).mockReturnValue([]);
+
+      debugFillBestiary();
+
+      expect(monsterRecordKill).toHaveBeenCalledTimes(1);
+      expect(monsterRecordKill).toHaveBeenCalledWith('slime', 1);
     });
   });
 

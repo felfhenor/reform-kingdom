@@ -4,6 +4,7 @@ import { OptionsBaseComponent } from '@components/panel-options/option-base-page
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { getEntriesByType } from '@helpers/content';
 import {
+  debugFillBestiary,
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
@@ -113,5 +114,9 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public resetBestiary(): void {
     debugResetBestiary();
+  }
+
+  public fillBestiary(): void {
+    debugFillBestiary();
   }
 }
