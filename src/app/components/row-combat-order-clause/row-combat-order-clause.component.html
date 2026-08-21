@@ -32,6 +32,14 @@
   >
     i
   </span>
+} @else if (!isTargetModeUsable()) {
+  <span
+    class="badge badge-error"
+    [tp]="'This skill can never reach a valid target with this targeting - it will always be skipped.'"
+    [tpPlacement]="'top'"
+  >
+    !
+  </span>
 }
 
 @if (!readOnly()) {

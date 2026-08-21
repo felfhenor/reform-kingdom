@@ -29,6 +29,7 @@ export class RowCombatOrderClauseComponent {
   public isFamilyKnown = input<boolean>(true);
   public isFamilyUsable = input<boolean>(true);
   public isFamilyEquipmentOnly = input<boolean>(false);
+  public isTargetModeUsable = input<boolean>(true);
 
   // The hero's currently-resolved skills, used to look up a representative
   // sprite for the clause's family (see `familyOptions` in the modal, which

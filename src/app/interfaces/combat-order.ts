@@ -1,4 +1,5 @@
-import type { CombatantTargettingType } from '@interfaces/combat';
+import type { CharacterId } from '@interfaces/character';
+import type { Combatant, CombatantTargettingType } from '@interfaces/combat';
 import type { EquipmentSkill } from '@interfaces/content-skill';
 import type { Branded } from '@interfaces/identifiable';
 
@@ -32,13 +33,20 @@ export type CombatOrderCondition =
       comparator: CombatOrderComparator;
       count: number;
     }
-  | { type: 'EnemyCount'; comparator: CombatOrderComparator; count: number };
+  | { type: 'EnemyCount'; comparator: CombatOrderComparator; count: number }
+  | {
+      type: 'SpecificHeroHealthPercent';
+      characterId: CharacterId;
+      comparator: CombatOrderComparator;
+      value: number;
+    };
 
 export type CombatOrderAction =
   | {
       type: 'CastSkillFamily';
       family: string;
       targetMode?: CombatantTargettingType;
+      targetCharacterId?: CharacterId;
     }
   | { type: 'RandomSkill' };
 
@@ -55,4 +63,7 @@ export type CombatOrderClause = {
 export type CombatOrderPick = {
   skill: EquipmentSkill;
   targetMode?: CombatantTargettingType;
+  targetCharacterId?: CharacterId;
+  // Resolved once at pick time for `MatchingAllies` targeting - see `matchingAlliesForCondition`.
+  matchingAllies?: Combatant[];
 };

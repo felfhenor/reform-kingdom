@@ -1,9 +1,11 @@
 import { combatantIsDead } from '@helpers/combat-end';
+import { combatSkillHasValidTargetsForMode } from '@helpers/combat-targetting';
 import { rngChoice } from '@helpers/rng';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/skill';
 import type {
   Combat,
   Combatant,
+  CombatantTargettingType,
   CombatOrderCondition,
   CombatOrderComparator,
   CombatOrderPick,
@@ -11,6 +13,7 @@ import type {
   EquipmentSkill,
   EquipmentSkillContent,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 function compareNumbers(
   a: number,
@@ -52,6 +55,20 @@ function livingEnemies(combat: Combat, combatant: Combatant): Combatant[] {
   return pool.filter((c) => !combatantIsDead(c));
 }
 
+function alliesMatchingHealthDirection(
+  combat: Combat,
+  combatant: Combatant,
+  healthDirection: 'Above' | 'Below',
+  healthPercentThreshold: number,
+): Combatant[] {
+  const matchesDirection = (ally: Combatant) =>
+    healthDirection === 'Above'
+      ? healthPercent(ally) > healthPercentThreshold
+      : healthPercent(ally) < healthPercentThreshold;
+
+  return livingAllies(combat, combatant).filter(matchesDirection);
+}
+
 export function combatOrderConditionMatches(
   condition: CombatOrderCondition,
   combat: Combat,
@@ -73,13 +90,11 @@ export function combatOrderConditionMatches(
         condition.value,
       );
     case 'AllyCountHealthPercent': {
-      const matchesDirection = (ally: Combatant) =>
-        condition.healthDirection === 'Above'
-          ? healthPercent(ally) > condition.healthPercent
-          : healthPercent(ally) < condition.healthPercent;
-
-      const count = livingAllies(combat, combatant).filter(
-        matchesDirection,
+      const count = alliesMatchingHealthDirection(
+        combat,
+        combatant,
+        condition.healthDirection,
+        condition.healthPercent,
       ).length;
       return compareNumbers(count, condition.comparator, condition.count);
     }
@@ -89,7 +104,38 @@ export function combatOrderConditionMatches(
         condition.comparator,
         condition.count,
       );
+    case 'SpecificHeroHealthPercent': {
+      const hero = livingAllies(combat, combatant).find(
+        (ally) => ally.id === condition.characterId,
+      );
+      if (!hero) return false;
+      return compareNumbers(
+        healthPercent(hero),
+        condition.comparator,
+        condition.value,
+      );
+    }
   }
+}
+
+// Sorted most-relevant-first, so a skill with fewer targets than matches still lands on the ones that matter most.
+export function matchingAlliesForCondition(
+  combat: Combat,
+  combatant: Combatant,
+  condition: CombatOrderCondition,
+): Combatant[] | undefined {
+  if (condition.type !== 'AllyCountHealthPercent') return undefined;
+
+  const matches = alliesMatchingHealthDirection(
+    combat,
+    combatant,
+    condition.healthDirection,
+    condition.healthPercent,
+  );
+
+  return condition.healthDirection === 'Below'
+    ? sortBy(matches, (ally) => ally.hp)
+    : sortBy(matches, (ally) => -ally.hp);
 }
 
 // Resolves a skill family (stable across tiers/source) to a currently castable skill.
@@ -100,7 +146,7 @@ export function resolveFamilyToSkill(
   return availableSkills.find((skill) => skill.family === family);
 }
 
-// First enabled clause that resolves and matches wins; undefined means callers should fall back to weighted-random.
+// First enabled clause that resolves, matches, and has a valid target wins; undefined falls back to weighted-random.
 export function pickSkillFromCombatOrders(
   combat: Combat,
   combatant: Combatant,
@@ -116,11 +162,50 @@ export function pickSkillFromCombatOrders(
 
     const skill = resolveFamilyToSkill(clause.action.family, availableSkills);
     if (
-      skill &&
-      combatOrderConditionMatches(clause.condition, combat, combatant)
+      !skill ||
+      !combatOrderConditionMatches(clause.condition, combat, combatant)
     ) {
-      return { skill, targetMode: clause.action.targetMode };
+      continue;
     }
+
+    const targetMode = clause.action.targetMode;
+    const needsValidityCheck =
+      targetMode === 'Self' ||
+      targetMode === 'SpecificHero' ||
+      targetMode === 'MatchingAllies';
+
+    // Only the new modes can resolve to zero targets - others are unchanged from before.
+    if (!needsValidityCheck) return { skill, targetMode };
+
+    const matchingAllies = matchingAlliesForCondition(
+      combat,
+      combatant,
+      clause.condition,
+    );
+    const context = {
+      combatant,
+      targetCharacterId: clause.action.targetCharacterId,
+      matchingAllies,
+    };
+
+    if (
+      !combatSkillHasValidTargetsForMode(
+        combat,
+        combatant,
+        skill,
+        targetMode,
+        context,
+      )
+    ) {
+      continue;
+    }
+
+    return {
+      skill,
+      targetMode,
+      targetCharacterId: clause.action.targetCharacterId,
+      matchingAllies,
+    };
   }
 
   return undefined;
@@ -150,4 +235,31 @@ export function isCombatOrderFamilyEquipmentOnly(
   jobOnlySkills: EquipmentSkillContent[],
 ): boolean {
   return !jobOnlySkills.some((skill) => skill.family === family);
+}
+
+// Flags a clause that can never resolve a target given its family + target mode.
+export function isCombatOrderTargetModeUsable(
+  family: string,
+  heroSkills: EquipmentSkillContent[],
+  targetMode: CombatantTargettingType | undefined,
+): boolean {
+  if (
+    targetMode !== 'Self' &&
+    targetMode !== 'SpecificHero' &&
+    targetMode !== 'MatchingAllies'
+  ) {
+    return true;
+  }
+
+  const skill = heroSkills.find((s) => s.family === family);
+  if (!skill) return true; // isCombatOrderFamilyKnown already flags this case
+
+  if (targetMode === 'Self') {
+    return skill.techniques.some((tech) => tech.targetType !== 'Enemies');
+  }
+
+  // SpecificHero / MatchingAllies both target a (possibly different) ally.
+  return skill.techniques.some(
+    (tech) => tech.targetType === 'Allies' || tech.targetType === 'All',
+  );
 }

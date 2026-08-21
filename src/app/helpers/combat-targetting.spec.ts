@@ -1,5 +1,15 @@
-import { combatAvailableSkillsForCombatant } from '@helpers/combat-targetting';
-import type { Combatant, EquipmentSkill } from '@interfaces';
+import {
+  combatAvailableSkillsForCombatant,
+  combatGetTargetsFromListBasedOnType,
+  combatSkillHasValidTargetsForMode,
+} from '@helpers/combat-targetting';
+import type {
+  Combat,
+  Combatant,
+  CombatTargetModeContext,
+  EquipmentSkill,
+  EquipmentSkillContentTechnique,
+} from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
@@ -17,6 +27,34 @@ function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
     techniques: [],
     requiredWeaponTypes: [],
     family: 'Test Skill',
+    ...overrides,
+  };
+}
+
+function buildTechnique(
+  overrides: Partial<EquipmentSkillContentTechnique> = {},
+): EquipmentSkillContentTechnique {
+  return {
+    targets: 1,
+    targetType: 'Allies',
+    targetBehaviors: [{ behavior: 'Always' }],
+    damageScaling: {} as never,
+    elements: [],
+    attributes: [],
+    statusEffects: [],
+    combatMessage: '',
+    ...overrides,
+  };
+}
+
+function buildCombat(overrides: Partial<Combat> = {}): Combat {
+  return {
+    id: 'combat-1' as never,
+    locationName: 'Field Ruins',
+    locationPosition: { x: 0, y: 0 },
+    rounds: 1,
+    heroes: [],
+    guardians: [],
     ...overrides,
   };
 }
@@ -80,5 +118,152 @@ describe('combatAvailableSkillsForCombatant', () => {
     });
 
     expect(combatAvailableSkillsForCombatant(combatant)).toEqual([]);
+  });
+});
+
+describe('combatGetTargetsFromListBasedOnType', () => {
+  it('Self returns only the caster from the given list', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const ally = buildCombatant({ id: 'ally' });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatGetTargetsFromListBasedOnType([caster, ally], 'Self', 1, context),
+    ).toEqual([caster]);
+  });
+
+  it('Self returns nothing when the caster is not in the given list', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const ally = buildCombatant({ id: 'ally' });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatGetTargetsFromListBasedOnType([ally], 'Self', 1, context),
+    ).toEqual([]);
+  });
+
+  it('SpecificHero returns only the combatant matching the target character id', () => {
+    const target = buildCombatant({ id: 'target-hero' });
+    const other = buildCombatant({ id: 'other-hero' });
+    const context: CombatTargetModeContext = {
+      combatant: other,
+      targetCharacterId: 'target-hero' as never,
+    };
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [target, other],
+        'SpecificHero',
+        1,
+        context,
+      ),
+    ).toEqual([target]);
+  });
+
+  it('SpecificHero returns nothing when the target character is not in the given list', () => {
+    const other = buildCombatant({ id: 'other-hero' });
+    const context: CombatTargetModeContext = {
+      combatant: other,
+      targetCharacterId: 'missing-hero' as never,
+    };
+
+    expect(
+      combatGetTargetsFromListBasedOnType([other], 'SpecificHero', 1, context),
+    ).toEqual([]);
+  });
+
+  it('MatchingAllies preserves matchingAllies priority order rather than the pool order', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const critical = buildCombatant({ id: 'critical', hp: 5 });
+    const wounded = buildCombatant({ id: 'wounded', hp: 40 });
+
+    // Guards against intersection(pool, matchingAllies) silently reverting to pool order.
+    const context: CombatTargetModeContext = {
+      combatant: caster,
+      matchingAllies: [critical, wounded],
+    };
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [wounded, critical],
+        'MatchingAllies',
+        1,
+        context,
+      ),
+    ).toEqual([critical]);
+  });
+
+  it('MatchingAllies excludes matches no longer present in the base target pool', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const critical = buildCombatant({ id: 'critical', hp: 5 });
+    const noLongerValid = buildCombatant({ id: 'no-longer-valid', hp: 1 });
+
+    const context: CombatTargetModeContext = {
+      combatant: caster,
+      matchingAllies: [noLongerValid, critical],
+    };
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [critical],
+        'MatchingAllies',
+        5,
+        context,
+      ),
+    ).toEqual([critical]);
+  });
+});
+
+describe('combatSkillHasValidTargetsForMode', () => {
+  it('is true when a technique pool can resolve the override mode', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const combat = buildCombat({ heroes: [caster] });
+    const skill = buildSkill({
+      techniques: [buildTechnique({ targetType: 'Self' })],
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatSkillHasValidTargetsForMode(
+        combat,
+        caster,
+        skill,
+        'Self',
+        context,
+      ),
+    ).toBe(true);
+  });
+
+  // Mirrors "target self with Fortify, skip if already buffed" via IfNotStatusEffect.
+  it('is false when the caster has been filtered out of every technique pool', () => {
+    const caster = buildCombatant({
+      id: 'caster',
+      statusEffects: [{ id: 'Invigorated' } as never],
+    });
+    const combat = buildCombat({ heroes: [caster] });
+    const skill = buildSkill({
+      techniques: [
+        buildTechnique({
+          targetType: 'Allies',
+          targetBehaviors: [
+            {
+              behavior: 'IfNotStatusEffect',
+              statusEffectId: 'Invigorated' as never,
+            },
+          ],
+        }),
+      ],
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatSkillHasValidTargetsForMode(
+        combat,
+        caster,
+        skill,
+        'Self',
+        context,
+      ),
+    ).toBe(false);
   });
 });

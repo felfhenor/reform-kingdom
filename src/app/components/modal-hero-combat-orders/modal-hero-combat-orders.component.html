@@ -3,7 +3,7 @@
   [showCloseButton]="true"
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
-  [widthClass]="'max-w-4xl'"
+  [widthClass]="'max-w-5xl'"
   (modalClose)="resetProps()"
 >
   <span title>Combat Orders</span>
@@ -98,6 +98,58 @@
               />
             }
 
+            @if (draftConditionType() === 'SpecificHeroHealthPercent') {
+              <ng-select
+                class="w-48"
+                [items]="heroOptions()"
+                bindLabel="name"
+                bindValue="id"
+                [clearable]="false"
+                placeholder="Select a hero..."
+                [ngModel]="draftConditionCharacterId()"
+                (change)="setDraftConditionCharacterId($event)"
+              >
+                <ng-template ng-option-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-icon-job class="zoom-row" [job]="item.job" />
+                    <div>
+                      <div class="font-semibold text-sm">{{ item.name }}</div>
+                      <div class="text-xs text-lighter">
+                        Lv. {{ item.level }} {{ item.job?.name }}
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+
+                <ng-template ng-label-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-icon-job class="zoom-row" [job]="item.job" />
+                    {{ item.name }}
+                  </div>
+                </ng-template>
+              </ng-select>
+
+              <ng-select
+                class="w-24"
+                [items]="comparatorOptions"
+                bindLabel="label"
+                bindValue="value"
+                [clearable]="false"
+                [ngModel]="draftComparator()"
+                (change)="setDraftComparator($event)"
+              ></ng-select>
+
+              <input
+                type="number"
+                min="0"
+                max="100"
+                class="input input-bordered input-sm w-24"
+                [value]="draftValue()"
+                (change)="draftValue.set($any($event.target).valueAsNumber)"
+              />
+              <span class="text-xs text-lighter">%</span>
+            }
+
             @if (draftConditionType() === 'EnemyCount') {
               <ng-select
                 class="w-24"
@@ -161,13 +213,45 @@
 
             <ng-select
               class="w-56"
-              [items]="targetModeOptions"
+              [items]="targetModeOptions()"
               bindLabel="label"
               bindValue="value"
               [clearable]="false"
               [ngModel]="draftTargetMode() ?? ''"
               (change)="setDraftTargetMode($event)"
             ></ng-select>
+
+            @if (draftTargetMode() === 'SpecificHero') {
+              <ng-select
+                class="w-48"
+                [items]="heroOptions()"
+                bindLabel="name"
+                bindValue="id"
+                [clearable]="false"
+                placeholder="Select a hero..."
+                [ngModel]="draftTargetCharacterId()"
+                (change)="setDraftTargetCharacterId($event)"
+              >
+                <ng-template ng-option-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-icon-job class="zoom-row" [job]="item.job" />
+                    <div>
+                      <div class="font-semibold text-sm">{{ item.name }}</div>
+                      <div class="text-xs text-lighter">
+                        Lv. {{ item.level }} {{ item.job?.name }}
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+
+                <ng-template ng-label-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-icon-job class="zoom-row" [job]="item.job" />
+                    {{ item.name }}
+                  </div>
+                </ng-template>
+              </ng-select>
+            }
 
             <button
               class="btn btn-sm btn-primary"
@@ -217,6 +301,7 @@
                   [isFamilyKnown]="isFamilyKnown(clause)"
                   [isFamilyUsable]="isFamilyUsable(clause)"
                   [isFamilyEquipmentOnly]="isFamilyEquipmentOnly(clause)"
+                  [isTargetModeUsable]="isTargetModeUsable(clause)"
                   [heroSkills]="heroSkills()"
                   (toggleEnabled)="toggleClauseEnabled(clause)"
                   (remove)="removeClause(clause.id)"

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RowCombatOrderClauseComponent } from '@components/row-combat-order-clause/row-combat-order-clause.component';
 import {
@@ -23,6 +24,7 @@ import {
   isCombatOrderFamilyEquipmentOnly,
   isCombatOrderFamilyKnown,
   isCombatOrderFamilyUsable,
+  isCombatOrderTargetModeUsable,
 } from '@helpers/combat-order-evaluation';
 import { getEntry } from '@helpers/content';
 import { equippedItemTypes } from '@helpers/equipment';
@@ -31,6 +33,7 @@ import { partyGet } from '@helpers/party';
 import { combatOrdersModalCharacterId } from '@helpers/ui';
 import type {
   Character,
+  CharacterId,
   CombatantTargettingType,
   CombatOrderAction,
   CombatOrderClause,
@@ -51,6 +54,12 @@ import { sortBy, uniq } from 'es-toolkit/compat';
 
 type SelectOption<T> = { value: T; label: string };
 type FamilyOption = SelectOption<string> & { sprite: string };
+type HeroOption = {
+  id: CharacterId;
+  name: string;
+  level: number;
+  job: JobContent | undefined;
+};
 
 const CONDITION_TYPE_OPTIONS: SelectOption<CombatOrderCondition['type']>[] = [
   { value: 'Always', label: 'Always' },
@@ -58,6 +67,7 @@ const CONDITION_TYPE_OPTIONS: SelectOption<CombatOrderCondition['type']>[] = [
   { value: 'SelfEnergyPercent', label: 'My Energy %' },
   { value: 'AllyCountHealthPercent', label: 'Ally Count vs Health %' },
   { value: 'EnemyCount', label: 'Enemy Count' },
+  { value: 'SpecificHeroHealthPercent', label: 'Specific Hero Health %' },
 ];
 
 const COMPARATOR_OPTIONS: SelectOption<CombatOrderComparator>[] = [
@@ -73,11 +83,14 @@ const HEALTH_DIRECTION_OPTIONS: SelectOption<CombatOrderHealthDirection>[] = [
   { value: 'Above', label: 'above' },
 ];
 
-const TARGET_MODE_OPTIONS: SelectOption<CombatantTargettingType | ''>[] = [
+const ALL_TARGET_MODE_OPTIONS: SelectOption<CombatantTargettingType | ''>[] = [
   { value: '', label: "Skill's default targeting" },
   { value: 'Random', label: 'Random' },
   { value: 'Strongest', label: 'Strongest (Highest HP)' },
   { value: 'Weakest', label: 'Weakest (Lowest HP)' },
+  { value: 'Self', label: 'Self' },
+  { value: 'SpecificHero', label: 'Specific Hero' },
+  { value: 'MatchingAllies', label: 'Matching Allies' },
 ];
 
 const DEFAULT_DRAFT_COMPARATOR: CombatOrderComparator = 'LessThan';
@@ -105,6 +118,7 @@ const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
     NgOptionTemplateDirective,
     NgLabelTemplateDirective,
     AtlasImageComponent,
+    IconJobComponent,
   ],
   templateUrl: './modal-hero-combat-orders.component.html',
 })
@@ -113,8 +127,19 @@ export class ModalHeroCombatOrdersComponent {
   public readonly conditionTypeOptions = CONDITION_TYPE_OPTIONS;
   public readonly comparatorOptions = COMPARATOR_OPTIONS;
   public readonly healthDirectionOptions = HEALTH_DIRECTION_OPTIONS;
-  public readonly targetModeOptions = TARGET_MODE_OPTIONS;
   public readonly alwaysRandomClause = ALWAYS_RANDOM_CLAUSE;
+
+  public party = computed<Character[]>(() => partyGet());
+
+  // Carries each hero's job so the picker can show a portrait + "Lv. X ClassName".
+  public heroOptions = computed<HeroOption[]>(() =>
+    this.party().map((character) => ({
+      id: character.id,
+      name: character.name,
+      level: character.level,
+      job: getEntry<JobContent>(character.jobId),
+    })),
+  );
 
   public character = computed<Character | undefined>(() =>
     partyGet().find((c) => c.id === combatOrdersModalCharacterId()),
@@ -184,9 +209,23 @@ export class ModalHeroCombatOrdersComponent {
   );
   public draftHealthPercent = signal<number>(50);
   public draftCount = signal<number>(1);
+  public draftConditionCharacterId = signal<CharacterId | undefined>(undefined);
   public draftFamily = signal<string | undefined>(undefined);
   public draftTargetMode = signal<CombatantTargettingType | undefined>(
     undefined,
+  );
+  public draftTargetCharacterId = signal<CharacterId | undefined>(undefined);
+
+  // "Matching Allies" only means anything for an Ally Count vs Health % condition.
+  public targetModeOptions = computed<
+    SelectOption<CombatantTargettingType | ''>[]
+  >(() =>
+    sortBy(
+      this.draftConditionType() === 'AllyCountHealthPercent'
+        ? ALL_TARGET_MODE_OPTIONS
+        : ALL_TARGET_MODE_OPTIONS.filter((o) => o.value !== 'MatchingAllies'),
+      (t) => t.label,
+    ),
   );
 
   public draftCondition = computed<CombatOrderCondition | undefined>(() => {
@@ -217,6 +256,16 @@ export class ModalHeroCombatOrdersComponent {
         };
       case 'EnemyCount':
         return { type: 'EnemyCount', comparator, count: this.draftCount() };
+      case 'SpecificHeroHealthPercent': {
+        const characterId = this.draftConditionCharacterId();
+        if (!characterId) return undefined;
+        return {
+          type: 'SpecificHeroHealthPercent',
+          characterId,
+          comparator,
+          value: this.draftValue(),
+        };
+      }
     }
   });
 
@@ -224,10 +273,19 @@ export class ModalHeroCombatOrdersComponent {
     const family = this.draftFamily();
     if (!family) return undefined;
 
+    const targetMode = this.draftTargetMode();
+    if (targetMode === 'SpecificHero' && !this.draftTargetCharacterId()) {
+      return undefined;
+    }
+
     return {
       type: 'CastSkillFamily',
       family,
-      targetMode: this.draftTargetMode(),
+      targetMode,
+      targetCharacterId:
+        targetMode === 'SpecificHero'
+          ? this.draftTargetCharacterId()
+          : undefined,
     };
   });
 
@@ -239,7 +297,16 @@ export class ModalHeroCombatOrdersComponent {
   public setDraftConditionType(
     option: SelectOption<CombatOrderCondition['type']> | null,
   ): void {
-    this.draftConditionType.set(option?.value ?? 'Always');
+    const next = option?.value ?? 'Always';
+    this.draftConditionType.set(next);
+
+    // Clear a stale "Matching Allies" selection rather than saving a mismatched clause.
+    if (
+      next !== 'AllyCountHealthPercent' &&
+      this.draftTargetMode() === 'MatchingAllies'
+    ) {
+      this.draftTargetMode.set(undefined);
+    }
   }
 
   public setDraftComparator(
@@ -263,7 +330,20 @@ export class ModalHeroCombatOrdersComponent {
   public setDraftTargetMode(
     option: SelectOption<CombatantTargettingType | ''> | null,
   ): void {
-    this.draftTargetMode.set(option?.value ? option.value : undefined);
+    const next = option?.value ? option.value : undefined;
+    this.draftTargetMode.set(next);
+
+    if (next !== 'SpecificHero') {
+      this.draftTargetCharacterId.set(undefined);
+    }
+  }
+
+  public setDraftConditionCharacterId(hero: HeroOption | null): void {
+    this.draftConditionCharacterId.set(hero?.id);
+  }
+
+  public setDraftTargetCharacterId(hero: HeroOption | null): void {
+    this.draftTargetCharacterId.set(hero?.id);
   }
 
   public isFamilyKnown(clause: CombatOrderClause): boolean {
@@ -285,6 +365,15 @@ export class ModalHeroCombatOrdersComponent {
     return isCombatOrderFamilyEquipmentOnly(
       clause.action.family,
       this.jobOnlySkills(),
+    );
+  }
+
+  public isTargetModeUsable(clause: CombatOrderClause): boolean {
+    if (clause.action.type !== 'CastSkillFamily') return true;
+    return isCombatOrderTargetModeUsable(
+      clause.action.family,
+      this.heroSkills(),
+      clause.action.targetMode,
     );
   }
 
@@ -328,8 +417,20 @@ export class ModalHeroCombatOrdersComponent {
 
     this.editingClauseId.set(clause.id);
     this.draftFamily.set(clause.action.family);
-    this.draftTargetMode.set(clause.action.targetMode);
     this.setDraftFromCondition(clause.condition);
+
+    // Drop a MatchingAllies targetMode if the loaded condition no longer matches it.
+    const targetMode =
+      clause.action.targetMode === 'MatchingAllies' &&
+      clause.condition.type !== 'AllyCountHealthPercent'
+        ? undefined
+        : clause.action.targetMode;
+    this.draftTargetMode.set(targetMode);
+    this.draftTargetCharacterId.set(
+      targetMode === 'SpecificHero'
+        ? clause.action.targetCharacterId
+        : undefined,
+    );
   }
 
   private setDraftFromCondition(condition: CombatOrderCondition): void {
@@ -349,6 +450,10 @@ export class ModalHeroCombatOrdersComponent {
     } else if (condition.type === 'EnemyCount') {
       this.draftComparator.set(condition.comparator);
       this.draftCount.set(condition.count);
+    } else if (condition.type === 'SpecificHeroHealthPercent') {
+      this.draftConditionCharacterId.set(condition.characterId);
+      this.draftComparator.set(condition.comparator);
+      this.draftValue.set(condition.value);
     }
   }
 
@@ -360,8 +465,10 @@ export class ModalHeroCombatOrdersComponent {
     this.draftHealthDirection.set(DEFAULT_DRAFT_HEALTH_DIRECTION);
     this.draftHealthPercent.set(50);
     this.draftCount.set(1);
+    this.draftConditionCharacterId.set(undefined);
     this.draftFamily.set(undefined);
     this.draftTargetMode.set(undefined);
+    this.draftTargetCharacterId.set(undefined);
   }
 
   public submitClause(): void {

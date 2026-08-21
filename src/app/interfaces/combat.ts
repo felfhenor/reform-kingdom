@@ -1,4 +1,5 @@
 import type { HasAnimation } from '@interfaces/artable';
+import type { CharacterId } from '@interfaces/character';
 import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { EncounterId } from '@interfaces/content-encounter';
 import type { EncounterRandomId } from '@interfaces/content-encounter-random';
@@ -31,7 +32,20 @@ export type CombatantCombatStats = {
   stunChance: number;
 };
 
-export type CombatantTargettingType = 'Random' | 'Strongest' | 'Weakest';
+export type CombatantTargettingType =
+  | 'Random'
+  | 'Strongest'
+  | 'Weakest'
+  | 'Self'
+  | 'SpecificHero'
+  | 'MatchingAllies';
+
+// Extra context only the Self/SpecificHero/MatchingAllies targeting modes need.
+export type CombatTargetModeContext = {
+  combatant: Combatant;
+  targetCharacterId?: CharacterId;
+  matchingAllies?: Combatant[];
+};
 
 export type Combatant = HasAnimation & {
   id: string;

@@ -351,4 +351,91 @@ describe('combatOrderClauseSummary', () => {
 
     expect(combatOrderClauseSummary(clause)).toBe('Use a random skill');
   });
+
+  it('resolves the named hero for a SpecificHeroHealthPercent condition', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithParty([
+        buildCharacter({ id: 'hero-1' as CharacterId, name: 'Aria' }),
+      ]),
+    );
+    const clause = buildClause({
+      condition: {
+        type: 'SpecificHeroHealthPercent',
+        characterId: 'hero-1' as CharacterId,
+        comparator: 'LessThan',
+        value: 50,
+      },
+      action: { type: 'CastSkillFamily', family: 'Cure' },
+    });
+
+    expect(combatOrderClauseSummary(clause)).toBe(
+      "Cast Cure (default) if Aria's Health < 50%",
+    );
+  });
+
+  it('falls back to "Unknown Hero" when the referenced hero is no longer in the party', () => {
+    vi.mocked(gamestate).mockReturnValue(stateWithParty([]));
+    const clause = buildClause({
+      condition: {
+        type: 'SpecificHeroHealthPercent',
+        characterId: 'gone' as CharacterId,
+        comparator: 'LessThan',
+        value: 50,
+      },
+      action: { type: 'CastSkillFamily', family: 'Cure' },
+    });
+
+    expect(combatOrderClauseSummary(clause)).toBe(
+      "Cast Cure (default) if Unknown Hero's Health < 50%",
+    );
+  });
+
+  it('describes the Self and Matching Allies target-mode overrides', () => {
+    const self = buildClause({
+      condition: { type: 'Always' },
+      action: {
+        type: 'CastSkillFamily',
+        family: 'Fortify',
+        targetMode: 'Self',
+      },
+    });
+    const matchingAllies = buildClause({
+      condition: {
+        type: 'AllyCountHealthPercent',
+        healthDirection: 'Below',
+        healthPercent: 50,
+        comparator: 'GreaterThanOrEqual',
+        count: 1,
+      },
+      action: {
+        type: 'CastSkillFamily',
+        family: 'Starshine',
+        targetMode: 'MatchingAllies',
+      },
+    });
+
+    expect(combatOrderClauseSummary(self)).toBe('Cast Fortify (on self)');
+    expect(combatOrderClauseSummary(matchingAllies)).toBe(
+      'Cast Starshine (on matching allies) if allies below 50% HP >= 1',
+    );
+  });
+
+  it('resolves the named hero for a SpecificHero target-mode override', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithParty([
+        buildCharacter({ id: 'hero-2' as CharacterId, name: 'Bram' }),
+      ]),
+    );
+    const clause = buildClause({
+      condition: { type: 'Always' },
+      action: {
+        type: 'CastSkillFamily',
+        family: 'Cure',
+        targetMode: 'SpecificHero',
+        targetCharacterId: 'hero-2' as CharacterId,
+      },
+    });
+
+    expect(combatOrderClauseSummary(clause)).toBe('Cast Cure (on Bram)');
+  });
 });

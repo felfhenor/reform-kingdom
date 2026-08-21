@@ -1,8 +1,8 @@
+import { partyGet } from '@helpers/party';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CharacterId,
-  CombatantTargettingType,
   CombatOrderAction,
   CombatOrderClause,
   CombatOrderClauseId,
@@ -21,6 +21,10 @@ const COMPARATOR_SYMBOLS: Record<CombatOrderComparator, string> = {
   GreaterThan: '>',
 };
 
+function heroName(characterId: CharacterId): string {
+  return partyGet().find((c) => c.id === characterId)?.name ?? 'Unknown Hero';
+}
+
 // A short, stock-independent description of when a clause fires - used on
 // the Combat Orders modal's clause list. Mirrors `decreeClauseSummary`.
 function conditionSummary(condition: CombatOrderCondition): string {
@@ -38,22 +42,32 @@ function conditionSummary(condition: CombatOrderCondition): string {
     }
     case 'EnemyCount':
       return `if enemy count ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
+    case 'SpecificHeroHealthPercent':
+      return `if ${heroName(condition.characterId)}'s Health ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.value}%`;
   }
 }
 
 // A short parenthetical noting where a CastSkillFamily action will land -
 // e.g. "(on lowest HP)" - or "(default)" when no override is set, so the
 // clause list shows targeting at a glance instead of only on Edit.
-function targetModeSuffix(
-  targetMode: CombatantTargettingType | undefined,
-): string {
-  switch (targetMode) {
+function targetModeSuffix(action: CombatOrderAction): string {
+  if (action.type !== 'CastSkillFamily') return '';
+
+  switch (action.targetMode) {
     case 'Weakest':
       return ' (on lowest HP)';
     case 'Strongest':
       return ' (on highest HP)';
     case 'Random':
       return ' (on random)';
+    case 'Self':
+      return ' (on self)';
+    case 'SpecificHero':
+      return action.targetCharacterId
+        ? ` (on ${heroName(action.targetCharacterId)})`
+        : ' (on specific hero)';
+    case 'MatchingAllies':
+      return ' (on matching allies)';
     default:
       return ' (default)';
   }
@@ -63,7 +77,7 @@ export function combatOrderClauseSummary(clause: CombatOrderClause): string {
   const actionText =
     clause.action.type === 'RandomSkill'
       ? 'Use a random skill'
-      : `Cast ${clause.action.family}${targetModeSuffix(clause.action.targetMode)}`;
+      : `Cast ${clause.action.family}${targetModeSuffix(clause.action)}`;
 
   const conditionText = conditionSummary(clause.condition);
   return conditionText === 'Always'

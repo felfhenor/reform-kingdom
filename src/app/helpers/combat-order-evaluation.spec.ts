@@ -3,6 +3,7 @@ import {
   isCombatOrderFamilyEquipmentOnly,
   isCombatOrderFamilyKnown,
   isCombatOrderFamilyUsable,
+  isCombatOrderTargetModeUsable,
   pickSkillFromCombatOrders,
   resolveFamilyToSkill,
 } from '@helpers/combat-order-evaluation';
@@ -12,6 +13,7 @@ import type {
   CombatOrderCondition,
   EquipmentSkill,
   EquipmentSkillContent,
+  EquipmentSkillContentTechnique,
 } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -79,6 +81,22 @@ function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
     techniques: [],
     requiredWeaponTypes: [],
     family: 'Test Skill',
+    ...overrides,
+  };
+}
+
+function buildTechnique(
+  overrides: Partial<EquipmentSkillContentTechnique> = {},
+): EquipmentSkillContentTechnique {
+  return {
+    targets: 1,
+    targetType: 'Allies',
+    targetBehaviors: [{ behavior: 'Always' }],
+    damageScaling: {} as never,
+    elements: [],
+    attributes: [],
+    statusEffects: [],
+    combatMessage: '',
     ...overrides,
   };
 }
@@ -224,6 +242,60 @@ describe('combatOrderConditionMatches', () => {
         caster,
       ),
     ).toBe(true);
+  });
+
+  it('SpecificHeroHealthPercent compares the named hero (not the caster) against the threshold', () => {
+    const caster = buildCombatant({ id: 'caster', hp: 100 });
+    const target = buildCombatant({ id: 'target', hp: 20 });
+    const combatWithAllies = buildCombat({ heroes: [caster, target] });
+
+    expect(
+      combatOrderConditionMatches(
+        {
+          type: 'SpecificHeroHealthPercent',
+          characterId: 'target' as never,
+          comparator: 'LessThan',
+          value: 50,
+        },
+        combatWithAllies,
+        caster,
+      ),
+    ).toBe(true);
+    expect(
+      combatOrderConditionMatches(
+        {
+          type: 'SpecificHeroHealthPercent',
+          characterId: 'target' as never,
+          comparator: 'GreaterThan',
+          value: 50,
+        },
+        combatWithAllies,
+        caster,
+      ),
+    ).toBe(false);
+  });
+
+  it('SpecificHeroHealthPercent is false when the named hero is dead or missing from the party', () => {
+    const caster = buildCombatant({ id: 'caster', hp: 100 });
+    const deadTarget = buildCombatant({ id: 'dead-target', hp: 0 });
+    const combatWithAllies = buildCombat({ heroes: [caster, deadTarget] });
+    const condition: CombatOrderCondition = {
+      type: 'SpecificHeroHealthPercent',
+      characterId: 'dead-target' as never,
+      comparator: 'LessThanOrEqual',
+      value: 100,
+    };
+
+    expect(
+      combatOrderConditionMatches(condition, combatWithAllies, caster),
+    ).toBe(false);
+    expect(
+      combatOrderConditionMatches(
+        { ...condition, characterId: 'not-in-party' as never },
+        combatWithAllies,
+        caster,
+      ),
+    ).toBe(false);
   });
 
   it('EnemyCount counts only living guardians against the given comparator', () => {
@@ -372,6 +444,62 @@ describe('pickSkillFromCombatOrders', () => {
     });
   });
 
+  it('falls through to the next clause when a Self override resolves to zero targets', () => {
+    // Mirrors "target self with Fortify, skip if already buffed" - falls through instead of wasting the turn.
+    const fortify = buildSkill({
+      id: 'fortify' as never,
+      family: 'Fortify',
+      techniques: [
+        buildTechnique({
+          targetType: 'Allies',
+          targetBehaviors: [
+            {
+              behavior: 'IfNotStatusEffect',
+              statusEffectId: 'Invigorated' as never,
+            },
+          ],
+        }),
+      ],
+    });
+    const fireball = buildSkill({
+      id: 'fireball' as never,
+      family: 'Fireball',
+      techniques: [buildTechnique({ targetType: 'Enemies' })],
+    });
+
+    const combatant = buildCombatant({
+      id: 'caster',
+      statusEffects: [{ id: 'Invigorated' } as never],
+      combatOrders: [
+        {
+          id: 'c1' as never,
+          enabled: true,
+          condition: { type: 'Always' },
+          action: {
+            type: 'CastSkillFamily',
+            family: 'Fortify',
+            targetMode: 'Self',
+          },
+        },
+        {
+          id: 'c2' as never,
+          enabled: true,
+          condition: { type: 'Always' },
+          action: { type: 'CastSkillFamily', family: 'Fireball' },
+        },
+      ],
+    });
+    // combat.heroes must hold this exact reference - Self matches by identity, not id.
+    const combatWithCaster = buildCombat({ heroes: [combatant] });
+
+    expect(
+      pickSkillFromCombatOrders(combatWithCaster, combatant, [
+        fortify,
+        fireball,
+      ]),
+    ).toEqual({ skill: fireball, targetMode: undefined });
+  });
+
   it('RandomSkill always matches and stops, uniformly picking an available skill', () => {
     const cure = buildSkill({ id: 'cure' as never, family: 'Cure' });
     const combatant = buildCombatant({
@@ -441,5 +569,85 @@ describe('isCombatOrderFamilyEquipmentOnly', () => {
     expect(isCombatOrderFamilyEquipmentOnly('Attack', jobOnlySkills)).toBe(
       false,
     );
+  });
+});
+
+describe('isCombatOrderTargetModeUsable', () => {
+  it('is true for Random/Strongest/Weakest/default regardless of the family', () => {
+    const skills = [
+      buildSkill({
+        family: 'Fireball',
+        techniques: [buildTechnique({ targetType: 'Enemies' })],
+      }) as EquipmentSkillContent,
+    ];
+
+    expect(isCombatOrderTargetModeUsable('Fireball', skills, undefined)).toBe(
+      true,
+    );
+    expect(isCombatOrderTargetModeUsable('Fireball', skills, 'Random')).toBe(
+      true,
+    );
+  });
+
+  it('is false for Self when every technique is Enemies-only', () => {
+    const skills = [
+      buildSkill({
+        family: 'Fireball',
+        techniques: [buildTechnique({ targetType: 'Enemies' })],
+      }) as EquipmentSkillContent,
+    ];
+
+    expect(isCombatOrderTargetModeUsable('Fireball', skills, 'Self')).toBe(
+      false,
+    );
+  });
+
+  it('is true for Self when a technique can include the caster', () => {
+    const skills = [
+      buildSkill({
+        family: 'Fortify',
+        techniques: [buildTechnique({ targetType: 'Allies' })],
+      }) as EquipmentSkillContent,
+    ];
+
+    expect(isCombatOrderTargetModeUsable('Fortify', skills, 'Self')).toBe(
+      true,
+    );
+  });
+
+  it('is false for SpecificHero/MatchingAllies when every technique is Enemies or Self only', () => {
+    const skills = [
+      buildSkill({
+        family: 'Ward',
+        techniques: [buildTechnique({ targetType: 'Self' })],
+      }) as EquipmentSkillContent,
+    ];
+
+    expect(
+      isCombatOrderTargetModeUsable('Ward', skills, 'SpecificHero'),
+    ).toBe(false);
+    expect(
+      isCombatOrderTargetModeUsable('Ward', skills, 'MatchingAllies'),
+    ).toBe(false);
+  });
+
+  it('is true for SpecificHero/MatchingAllies when a technique can hit another ally', () => {
+    const skills = [
+      buildSkill({
+        family: 'Starshine',
+        techniques: [buildTechnique({ targetType: 'Allies' })],
+      }) as EquipmentSkillContent,
+    ];
+
+    expect(
+      isCombatOrderTargetModeUsable('Starshine', skills, 'SpecificHero'),
+    ).toBe(true);
+    expect(
+      isCombatOrderTargetModeUsable('Starshine', skills, 'MatchingAllies'),
+    ).toBe(true);
+  });
+
+  it('is true when the family is unknown (other warnings already cover that case)', () => {
+    expect(isCombatOrderTargetModeUsable('Unknown', [], 'Self')).toBe(true);
   });
 });

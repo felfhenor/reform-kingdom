@@ -1,10 +1,11 @@
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat-stats';
 import { getEntry } from '@helpers/content';
-import { skillEpCost, skillUses } from '@helpers/skill';
+import { skillEpCost, skillTechniqueNumTargets, skillUses } from '@helpers/skill';
 import type {
   Combat,
   Combatant,
   CombatantTargettingType,
+  CombatTargetModeContext,
   EquipmentSkill,
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
@@ -135,13 +136,49 @@ export function combatGetTargetsFromListBasedOnType(
   combatants: Combatant[],
   type: CombatantTargettingType,
   select: number,
+  context?: CombatTargetModeContext,
 ): Combatant[] {
   const targettingActions: Record<CombatantTargettingType, () => Combatant[]> =
     {
       Random: () => sampleSize(combatants, select),
       Strongest: () => sortBy(combatants, (c) => -c.hp).slice(0, select),
       Weakest: () => sortBy(combatants, (c) => c.hp).slice(0, select),
+      Self: () => combatants.filter((c) => c === context?.combatant),
+      SpecificHero: () =>
+        combatants.filter((c) => c.id === context?.targetCharacterId),
+      // matchingAllies must be first - intersection() keeps its first arg's order.
+      MatchingAllies: () =>
+        intersection(context?.matchingAllies ?? [], combatants).slice(
+          0,
+          select,
+        ),
     };
 
   return targettingActions[type]();
+}
+
+// Lets a combat order clause fall through instead of wasting the turn on zero targets.
+export function combatSkillHasValidTargetsForMode(
+  combat: Combat,
+  combatant: Combatant,
+  skill: EquipmentSkillContent,
+  mode: CombatantTargettingType,
+  context: CombatTargetModeContext,
+): boolean {
+  return skill.techniques.some((tech) => {
+    const baseList = combatGetPossibleCombatantTargetsForSkillTechnique(
+      combat,
+      combatant,
+      skill,
+      tech,
+    );
+    return (
+      combatGetTargetsFromListBasedOnType(
+        baseList,
+        mode,
+        skillTechniqueNumTargets(skill, tech),
+        context,
+      ).length > 0
+    );
+  });
 }

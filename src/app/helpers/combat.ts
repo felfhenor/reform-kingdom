@@ -173,6 +173,11 @@ export function combatantTakeTurn(
       baseTargetList,
       combatOrderPick?.targetMode ?? combatant.targettingType,
       numTargets,
+      {
+        combatant,
+        targetCharacterId: combatOrderPick?.targetCharacterId,
+        matchingAllies: combatOrderPick?.matchingAllies,
+      },
     );
 
     targets.forEach((target) => {
