@@ -1,6 +1,6 @@
 - id: cdd6110a-4b5f-42d8-9603-450492fabca1
   name: Cloak of Adventuring
-  description: A cloak that is worn by beginning adventurers.
+  description: A cloak that is worn by beginning adventurers, patched more than once but still holding together.
   levelRequirement: 1
   rarity: Common
   type: Cloth Armor
@@ -27,7 +27,7 @@
 
 - id: 24c9a991-d792-4296-9900-1b3d89a9af69
   name: Bone-Hewn Cloak
-  description: A cloak made of leather and bone.
+  description: A cloak made of leather and bone, rattling faintly with each step.
   levelRequirement: 4
   rarity: Uncommon
   type: Cloth Armor

@@ -3,7 +3,7 @@
 
 - id: 2db40cd8-0c8a-4b6e-9e4f-dd9148e9c461
   name: Copper Mace
-  description: A magical mace made of copper and wergen wood.
+  description: A magical mace made of copper and wergen wood, crackling faintly with each swing.
   levelRequirement: 1
   rarity: Common
   type: Mace
@@ -15,7 +15,7 @@
 
 - id: bee7634d-3f06-40c7-b58d-8aecafebff19
   name: Copper Greatmace
-  description: A Duchy-made greatmace, composed primarily of copper.
+  description: A Duchy-made greatmace, composed primarily of copper, built more for intimidation than finesse.
   levelRequirement: 4
   rarity: Uncommon
   type: Mace

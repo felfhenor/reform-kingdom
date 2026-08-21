@@ -1,6 +1,6 @@
 - id: 39658362-29fc-47fb-8170-69d2229153bc
   name: Coppersilk Robe
-  description: A robe made of coppersilk.
+  description: A robe made of coppersilk, cool to the touch even in the heat of battle.
   levelRequirement: 6
   rarity: Common
   type: Cloth Armor
@@ -14,7 +14,7 @@
 
 - id: 41805abc-dc1c-439d-a6ea-b264d3bb3b24
   name: Silkslime Shirt
-  description: A shirt made of silkslime.
+  description: A shirt made of silkslime, clingy in a way that somehow works in your favor.
   levelRequirement: 8
   rarity: Common
   type: Cloth Armor

@@ -1,6 +1,6 @@
 - id: 4059ebf0-bd38-4d1d-aa26-40d53fe17d31
   name: Copperspun Chain
-  description: A copper chain spun together of muscle fiber and metal together.
+  description: A copper chain spun together from muscle fiber and metal, unnervingly warm to the touch.
   levelRequirement: 5
   rarity: Uncommon
   type: Trinket
@@ -12,7 +12,7 @@
 
 - id: 9d9f3fee-1752-4419-a44a-b7243b7dd6d5
   name: Mysterious Die
-  description: A strange die that improves the luck of its holder.
+  description: A strange die that improves the luck of its holder, though no one agrees on how many sides it has.
   levelRequirement: 9
   rarity: Uncommon
   type: Trinket

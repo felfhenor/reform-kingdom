@@ -3,7 +3,7 @@
 
 - id: a9b8b3a2-bdaf-4257-983a-1cf965a17906
   name: Elvenwood Sword
-  description: A beautifully carved sword made of elven wood.
+  description: A beautifully carved sword made of elven wood, said to never dull.
   levelRequirement: 12
   rarity: Uncommon
   type: Sword

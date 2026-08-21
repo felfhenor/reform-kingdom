@@ -3,7 +3,7 @@
 
 - id: 4580fcd9-759b-4f94-a748-b04f1dfc3d54
   name: Miremetal Mace
-  description: A mace made of miremetal.
+  description: A mace made of miremetal, each swing landing with a satisfying clang.
   levelRequirement: 16
   rarity: Common
   type: Mace

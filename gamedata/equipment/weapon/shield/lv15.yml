@@ -16,7 +16,7 @@
 
 - id: 931df41a-c230-40af-a2a3-5e63effeab6f
   name: Ghostwood Shield
-  description: A shield made solely of ghostwood.
+  description: A shield made solely of ghostwood, strangely light for its size.
   levelRequirement: 16
   rarity: Common
   type: Shield
@@ -28,7 +28,7 @@
 
 - id: a4097535-fbe0-43c2-89b0-91f86f4e903a
   name: Miremirror Shield
-  description: A shield made of highly-polished miremetal.
+  description: A shield made of highly-polished miremetal, reflective enough to double as a mirror.
   levelRequirement: 18
   rarity: Uncommon
   type: Shield

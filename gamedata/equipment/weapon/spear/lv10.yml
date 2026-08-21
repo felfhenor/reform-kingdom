@@ -3,7 +3,7 @@
 
 - id: 1ca45cc0-343b-431c-bc48-60847d40aab6
   name: Elvenwood Spear
-  description: A beautifully carved spear made of elven wood.
+  description: A beautifully carved spear made of elven wood, light enough to thrust twice as fast.
   levelRequirement: 12
   rarity: Uncommon
   type: Spear

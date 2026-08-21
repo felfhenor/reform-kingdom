@@ -1,6 +1,6 @@
 - id: d356c0c9-adab-4f9e-97b8-51e9133e3d38
   name: Miremetal Crown
-  description: A crown made of miremetal, and set with 3 gems.
+  description: A crown made of miremetal and set with 3 gems, worn by mire chieftains long before the Duchy arrived.
   levelRequirement: 15
   rarity: Common
   type: Hat
@@ -14,7 +14,7 @@
 
 - id: 3cc3ada3-7e43-4db0-afef-6961ab00ec06
   name: Miresewn Hat
-  description: A hat made of mirethread.
+  description: A hat made of mirethread, woven tight enough to keep out the mire's damp chill.
   levelRequirement: 17
   rarity: Common
   type: Hat

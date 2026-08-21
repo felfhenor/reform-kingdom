@@ -16,7 +16,7 @@
 
 - id: 87aa63a9-4bd2-4fa4-8d19-48dc37e70062
   name: Coppergob Dirk
-  description: A crudely-made dirk, crafted by goblins using primitive forging techinques.
+  description: A crudely-made dirk, crafted by goblins using primitive forging techniques, but effective all the same.
   levelRequirement: 4
   rarity: Uncommon
   type: Dirk

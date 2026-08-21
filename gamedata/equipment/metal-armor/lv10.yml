@@ -1,6 +1,6 @@
 - id: 5b9d8540-30fc-4436-b625-b079f0fdbc36
   name: Miremetal Breastplate
-  description: A breastplate made of miremetal.
+  description: A breastplate made of miremetal, forged to withstand the mire's corrosive damp.
   levelRequirement: 14
   rarity: Common
   type: Metal Armor

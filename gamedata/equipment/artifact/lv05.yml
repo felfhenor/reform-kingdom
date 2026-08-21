@@ -1,6 +1,6 @@
 - id: 98a8abec-ec40-4170-875c-efeae641833b
   name: Antigonus Artifact
-  description: An ancient, mystical artifact with a strange origin.
+  description: An ancient, mystical artifact with a strange origin. No scholar has managed to identify its maker.
   levelRequirement: 6
   rarity: Uncommon
   type: Artifact

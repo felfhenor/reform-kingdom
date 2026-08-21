@@ -3,7 +3,7 @@
 
 - id: 8b6573b3-251e-435f-ae35-a1d140eab407
   name: Copperslime Mace
-  description: A magical mace made of copperslime and wergen wood.
+  description: A magical mace made of copperslime and wergen wood, the slime dampening the worst of the recoil.
   levelRequirement: 6
   rarity: Common
   type: Mace

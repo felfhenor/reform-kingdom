@@ -3,7 +3,7 @@
 
 - id: 92966e34-2774-42e1-9243-9904ae11b99f
   name: Mirewood Spear
-  description: A smelly spear made of mirewood.
+  description: A smelly spear made of mirewood, though its reach makes up for the odor.
   levelRequirement: 16
   rarity: Common
   type: Spear

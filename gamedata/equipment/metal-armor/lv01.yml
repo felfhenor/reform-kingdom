@@ -1,6 +1,6 @@
 - id: cb772fa4-fdd1-469e-ac39-7f322522b76f
   name: Copper Breastplate
-  description: A Duchy-made breastplate made of copper.
+  description: A Duchy-made breastplate made of copper, gleaming bright on parade but dented easily in a real fight.
   levelRequirement: 2
   rarity: Uncommon
   type: Metal Armor
@@ -12,7 +12,7 @@
 
 - id: 5fb070f8-c521-4452-8105-3ca3ace2c75b
   name: Coppersilk Breastplate
-  description: A breastplate made of coppersilk.
+  description: A breastplate made of coppersilk, lighter than it looks.
   levelRequirement: 4
   rarity: Common
   type: Metal Armor

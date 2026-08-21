@@ -1,6 +1,6 @@
 - id: 2fcace4d-840a-456f-872e-0b434c6215ed
   name: Green Copperslime Ring
-  description: A ring made of copper, coated in viscous green slime.
+  description: A ring made of copper, coated in viscous green slime that smells faintly of moss.
   levelRequirement: 5
   rarity: Uncommon
   type: Ring
@@ -13,7 +13,7 @@
 
 - id: d2a0b4ee-e346-4860-b223-6b3fa8b4af4d
   name: Purple Copperslime Ring
-  description: A ring made of copper, coated in viscous purple slime.
+  description: A ring made of copper, coated in viscous purple slime that's faintly warm to the touch.
   levelRequirement: 5
   rarity: Uncommon
   type: Ring
@@ -25,7 +25,7 @@
 
 - id: 2576f193-3816-4d6e-89da-a7e956064ecf
   name: Red Copperslime Ring
-  description: A ring made of copper, coated in viscous red slime.
+  description: A ring made of copper, coated in viscous red slime said to quicken the wearer's pulse.
   levelRequirement: 5
   rarity: Uncommon
   type: Ring
@@ -37,7 +37,7 @@
 
 - id: f30136ae-a542-44f1-8c46-d8099356dd19
   name: Refined Copperslime Ring
-  description: A copperslime ring, refined with the finest slime core.
+  description: A copperslime ring, refined with the finest slime core, prized among slime alchemists.
   levelRequirement: 8
   rarity: Rare
   type: Ring

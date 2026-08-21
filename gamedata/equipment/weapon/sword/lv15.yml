@@ -3,7 +3,7 @@
 
 - id: 2ba7e540-a3e3-4dbd-9e4d-91c6f50b5927
   name: Miremetal Sword
-  description: A sword forged from miremetal.
+  description: A sword forged from miremetal, heavy enough to cleave through mire-thick hides.
   levelRequirement: 15
   rarity: Common
   type: Sword
@@ -16,7 +16,7 @@
 
 - id: 0c452080-ee10-4d91-82c2-49ce5fe61dff
   name: Miremetal Cutlass
-  description: A sword forged from miremetal.
+  description: A sword forged from miremetal, curved for quick, slashing strikes.
   levelRequirement: 18
   rarity: Uncommon
   type: Sword

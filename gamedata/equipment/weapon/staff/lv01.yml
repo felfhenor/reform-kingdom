@@ -3,7 +3,7 @@
 
 - id: 8830ffe2-2ac5-4138-8814-a55b8ff16a3c
   name: Wergen Staff
-  description: A magical staff made of wergen wood.
+  description: A magical staff made of wergen wood, carved by apprentices learning their first cantrips.
   levelRequirement: 1
   rarity: Common
   type: Staff

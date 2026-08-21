@@ -1,6 +1,6 @@
 - id: a65a81d0-1be8-4ae4-8547-8b5008dbd407
   name: Copper Helm
-  description: A duchy-made helm crafted from copper.
+  description: A duchy-made helm crafted from copper, standard issue for Duchy recruits.
   levelRequirement: 4
   rarity: Uncommon
   type: Helm

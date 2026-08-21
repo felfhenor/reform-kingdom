@@ -3,7 +3,7 @@
 
 - id: 94d45b7c-1989-4900-8bb1-362382d87f57
   name: Wergenslime Spear
-  description: A spear tipped with wergenslime.
+  description: A spear tipped with wergenslime, leaving a faint trail wherever it strikes.
   levelRequirement: 6
   rarity: Common
   type: Spear
@@ -15,7 +15,7 @@
 
 - id: d59e9ce7-4012-4454-97ad-be31ad12e543
   name: Elvenwood Harpoon
-  description: A beautifully carved harpoon made of elven wood.
+  description: A beautifully carved harpoon made of elven wood, designed with fishing, not war, in mind.
   levelRequirement: 9
   rarity: Uncommon
   type: Spear

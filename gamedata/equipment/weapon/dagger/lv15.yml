@@ -3,7 +3,7 @@
 
 - id: 59dffcff-c535-4af1-8f6b-f544822647d9
   name: Miremetal Dagger
-  description: A dagger made of miremetal.
+  description: A dagger made of miremetal, favored by mire scouts for its silent draw.
   levelRequirement: 15
   rarity: Uncommon
   type: Dagger

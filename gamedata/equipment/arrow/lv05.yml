@@ -1,6 +1,6 @@
 - id: c4d8024e-9180-4043-b0b7-31697d744055
   name: Wergenslime Arrow
-  description: A sharpened wooden arrow, coated in slime.
+  description: A sharpened wooden arrow, coated in slime that somehow makes it fly straighter.
   levelRequirement: 6
   rarity: Common
   type: Arrow

@@ -1,6 +1,6 @@
 - id: 84f8a792-08e9-41ab-a69b-b1cde4d1eac6
   name: Silkslime Hat
-  description: A hat crafted from silkslime.
+  description: A hat crafted from silkslime, faintly sticky no matter how often it's washed.
   levelRequirement: 6
   rarity: Common
   type: Hat

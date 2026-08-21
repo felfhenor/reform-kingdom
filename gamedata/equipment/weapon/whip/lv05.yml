@@ -3,7 +3,7 @@
 
 - id: e216b0ba-83df-43f1-a1b4-e63ac0fcae9a
   name: Copperslime Whip
-  description: A magical whip made of copperslime and wergen wood.
+  description: A magical whip made of copperslime and wergen wood, leaving a faint residue with every strike.
   levelRequirement: 6
   rarity: Common
   type: Whip

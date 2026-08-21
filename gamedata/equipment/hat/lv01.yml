@@ -1,6 +1,6 @@
 - id: 194e9fc1-1df6-431d-ab53-26ffe6fa8249
   name: Hat of Adventuring
-  description: A hat that is worn by beginning adventurers.
+  description: A hat that is worn by beginning adventurers, faded from one too many sunburnt afternoons.
   levelRequirement: 1
   rarity: Common
   type: Hat

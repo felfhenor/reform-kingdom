@@ -3,7 +3,7 @@
 
 - id: 31c7cac4-5120-4681-ab60-0cf8e5aa5b05
   name: Copper Whip
-  description: A magical whip made of copper and wergen wood.
+  description: A magical whip made of copper and wergen wood, cracking with a spark of magic on impact.
   levelRequirement: 1
   rarity: Common
   type: Whip

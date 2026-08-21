@@ -3,7 +3,7 @@
 
 - id: 5db42c67-f619-40a5-a003-3053019aff1a
   name: Elvenwood Staff
-  description: A beautifully carved magical staff made of elven wood.
+  description: A beautifully carved magical staff made of elven wood, channeling magic with almost no resistance.
   levelRequirement: 12
   rarity: Common
   type: Staff

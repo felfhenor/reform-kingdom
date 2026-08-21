@@ -3,7 +3,7 @@
 
 - id: 2683d850-8bb6-40ef-aa95-29689fe4a4ff
   name: Jelly Dirk
-  description: A dirk made of magical jelly.
+  description: A dirk made of magical jelly, somehow holding an edge despite its wobble.
   levelRequirement: 8
   rarity: Uncommon
   type: Dirk

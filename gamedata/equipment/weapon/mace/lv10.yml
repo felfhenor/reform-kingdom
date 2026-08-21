@@ -3,7 +3,7 @@
 
 - id: 915abf06-ecb7-4bfa-889b-7e83a8d21f9a
   name: Elvenwood Mace
-  description: A mace made only of finely-carved elven wood.
+  description: A mace made only of finely-carved elven wood, surprisingly heavy for something so elegant.
   levelRequirement: 12
   rarity: Uncommon
   type: Mace

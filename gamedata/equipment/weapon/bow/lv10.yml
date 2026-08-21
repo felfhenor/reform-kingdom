@@ -3,7 +3,7 @@
 
 - id: cf201970-47ee-4417-9c64-9b357963cf8f
   name: Elvenwood Bow
-  description: A beautifully carved bow made of elven wood.
+  description: A beautifully carved bow made of elven wood, strung with fibers no outsider knows how to replicate.
   levelRequirement: 11
   rarity: Uncommon
   type: Bow

@@ -3,7 +3,7 @@
 
 - id: 7136236a-75d8-424a-8769-822d9b9c9038
   name: Copperslime Dagger
-  description: A dagger made of copperslime.
+  description: A dagger made of copperslime, light enough for a quick, precise strike.
   levelRequirement: 6
   rarity: Common
   type: Dagger
@@ -16,7 +16,7 @@
 
 - id: 7a8a044a-0f3a-47b0-a864-6c685938d481
   name: Coppergob Dagger
-  description: A crudely-made dagger, crafted by goblins using primitive forging techinques.
+  description: A crudely-made dagger, crafted by goblins using primitive forging techniques, but effective all the same.
   levelRequirement: 9
   rarity: Uncommon
   type: Dagger

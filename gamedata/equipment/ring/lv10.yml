@@ -1,6 +1,6 @@
 - id: 5df80b1c-4072-4978-a4ea-f0d614a0c528
   name: Elvenwood Malachite Ring
-  description: A ring carved out of elven wood, and set with malachite.
+  description: A ring carved out of elven wood, and set with malachite polished smooth by generations of elven crafters.
   levelRequirement: 10
   rarity: Uncommon
   type: Ring
@@ -13,7 +13,7 @@
 
 - id: 5b3b3299-ff6c-464c-ab70-11f46d022e21
   name: Elvenwood Azurite Ring
-  description: A ring carved out of elven wood, and set with azurite.
+  description: A ring carved out of elven wood, and set with azurite that hums faintly under moonlight.
   levelRequirement: 12
   rarity: Uncommon
   type: Ring
