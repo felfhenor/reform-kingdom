@@ -1,0 +1,12 @@
+- id: 62e85e72-949d-430e-b655-5476dbb37a1d
+  name: Ooze Parchment
+  description: A parchment made of ooze and mirethread. Prized by magicians of all kinds for its magical energies.
+  levelRequirement: 15
+  rarity: Uncommon
+  type: Artifact
+  sprite: '0086'
+  slots: 1
+  baseStats:
+    Intelligence: 5.1
+    Energy: 15
+    Resistance: 2.3

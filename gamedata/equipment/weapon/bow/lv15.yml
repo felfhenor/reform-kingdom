@@ -1,0 +1,26 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 83867870-4f21-4d1a-a751-9b2775d8a9b5
+  name: Mirewood Crossbow
+  description: A stinky crossbow made of mirewood.
+  levelRequirement: 15
+  rarity: Common
+  type: Bow
+  sprite: '0112'
+  slots: 1
+  baseStats:
+    Strength: 5.3
+    Resistance: 5.6
+
+- id: 4b9d7e65-bcd4-424a-b363-c71803e26a4b
+  name: Ghostwood Bow
+  description: An ethereal bow made of finely-crafted ghostwood.
+  levelRequirement: 119
+  rarity: Uncommon
+  type: Bow
+  sprite: '0108'
+  slots: 1
+  baseStats:
+    Strength: 7.4
+    Agility: 7.3

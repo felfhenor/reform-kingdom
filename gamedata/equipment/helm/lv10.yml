@@ -1,0 +1,11 @@
+- id: 300e9062-1b98-4b7b-900e-f9702592d0ee
+  name: Miremetal Helm
+  description: A helm crafted from miremetal.
+  levelRequirement: 14
+  rarity: Common
+  type: Helm
+  sprite: '0088'
+  slots: 1
+  baseStats:
+    Health: 25
+    Vitality: 4.5

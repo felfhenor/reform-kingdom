@@ -1,0 +1,37 @@
+- id: 49c95b1d-5971-4f7b-9ae0-599db8bc1edc
+  name: Golden Miremetal Peridot Ring
+  description: A ring forged from miremetal, and alchemized to be golden. Set with a peridot that represents physical power.
+  levelRequirement: 15
+  rarity: Common
+  type: Ring
+  sprite: '0096'
+  slots: 1
+  baseStats:
+    Strength: 3.2
+    Vitality: 3.4
+    Health: 25
+
+- id: a63ac9fe-29f3-4cf9-9b80-12c288803f57
+  name: Golden Miremetal Ghost Peridot Ring
+  description: A ring forged from miremetal, and alchemized to be golden. Set with a ghost peridot that represents magical prowess.
+  levelRequirement: 16
+  rarity: Common
+  type: Ring
+  sprite: '0098'
+  slots: 1
+  baseStats:
+    Intelligence: 3.1
+    Resistance: 3.6
+    Energy: 20
+
+- id: d06ff7bc-49a3-4780-b99e-98d188edc16a
+  name: Golden Miremetal Pristine Ring
+  description: A ring forged from miremetal, and alchemized to be golden. Set with a litany of peridots.
+  levelRequirement: 18
+  rarity: Uncommon
+  type: Ring
+  sprite: '0100'
+  slots: 1
+  baseStats:
+    Intelligence: 3.7
+    Strength: 3.9

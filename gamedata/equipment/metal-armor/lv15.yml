@@ -1,0 +1,11 @@
+- id: c9aa435b-cb74-4767-8ee6-f1519c493308
+  name: Oozemire Plate
+  description: A breastplate made of miremetal and ooze.
+  levelRequirement: 18
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0094'
+  slots: 1
+  baseStats:
+    Vitality: 5.4
+    Resistance: 10.1

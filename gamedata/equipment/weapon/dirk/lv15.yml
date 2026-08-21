@@ -1,0 +1,14 @@
+# Primary Stat: Agility
+# Secondary Stat: Vitality
+
+- id: f2f885cf-3f15-4bdc-b8c3-3061e1e2daae
+  name: Miremetal Dirk
+  description: A dirk made of miremetal. It's excellent for blocking and parrying.
+  levelRequirement: 15
+  rarity: Common
+  type: Dirk
+  sprite: '0093'
+  slots: 1
+  baseStats:
+    Agility: 4.8
+    Vitality: 2.1

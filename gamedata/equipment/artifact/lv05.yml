@@ -8,15 +8,3 @@
   slots: 1
   baseStats:
     Intelligence: 4.2
-
-- id: 0dd6637c-cc4f-454d-b297-3f8d7d6a7ada
-  name: Elven Aiming Artifact
-  description: An ancient elven artifact that helps apprentice casters aim their spells.
-  levelRequirement: 9
-  rarity: Uncommon
-  type: Artifact
-  sprite: '0076'
-  slots: 1
-  baseStats:
-    Intelligence: 5.7
-    Energy: 5

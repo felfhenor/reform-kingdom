@@ -1,0 +1,14 @@
+# Primary Stat: Strength
+# Secondary Stat: Intelligence
+
+- id: 4580fcd9-759b-4f94-a748-b04f1dfc3d54
+  name: Miremetal Mace
+  description: A mace made of miremetal.
+  levelRequirement: 16
+  rarity: Common
+  type: Mace
+  sprite: '0095'
+  slots: 1
+  baseStats:
+    Strength: 5.2
+    Intelligence: 7.3

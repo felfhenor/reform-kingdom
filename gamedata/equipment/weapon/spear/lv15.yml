@@ -1,0 +1,15 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 92966e34-2774-42e1-9243-9904ae11b99f
+  name: Mirewood Spear
+  description: A smelly spear made of mirewood.
+  levelRequirement: 16
+  rarity: Common
+  type: Spear
+  sprite: '0109'
+  slots: 1
+  baseStats:
+    Strength: 5.6
+    Agility: 4.2
+    Vitality: 1.8

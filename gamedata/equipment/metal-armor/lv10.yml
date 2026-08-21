@@ -1,0 +1,14 @@
+- id: 5b9d8540-30fc-4436-b625-b079f0fdbc36
+  name: Miremetal Breastplate
+  description: A breastplate made of miremetal.
+  levelRequirement: 14
+  rarity: Common
+  type: Metal Armor
+  sprite: '0089'
+  slots: 1
+  baseStats:
+    Vitality: 8
+    Resistance: 3
+    Agility: 1.3
+    Health: 20
+    Energy: 9

@@ -32,3 +32,40 @@
   rarity: Uncommon
 
   sprite: '0010'
+
+##
+
+- id: f856940a-c54a-452d-a762-4d859729d6e9
+  name: Ooze-coated Miremetal
+  description: A vibrantly magical miremetal ingot coated in magical ooze.
+  rarity: Uncommon
+
+  sprite: '0034'
+
+- id: 9f96d75b-00ca-40e3-93bb-f8166e016009
+  name: Finely-made Sharp Star
+  description: A small star made with excellent blacksmithing techniques. Maybe it could be used as a weapon.
+  rarity: Uncommon
+
+  sprite: '0031'
+
+- id: e62f1776-3f5a-4de7-ae45-b860f74a3d90
+  name: Artistically-crafted Miremetal Ring
+  description: A small ring made of miremetal, set with a lovely peridot. It's more artistic than useful.
+  rarity: Uncommon
+
+  sprite: '0035'
+
+- id: b76062ca-4ba6-48c4-9e7a-4cdc177f5faa
+  name: Fluff-filled Plushy Creature
+  description: A tiny creature made of the finest threading and fluff, with two gems for eyes. It's cute!
+  rarity: Uncommon
+
+  sprite: '0033'
+
+- id: edfb45db-8a41-4ab2-8d02-e4e74e0e90f1
+  name: Ooze-filled Drawing Tool
+  description: A small wooden tool used to draw complex magical circles. Magic ooze fills it, making it a potent tool.
+  rarity: Uncommon
+
+  sprite: '0032'

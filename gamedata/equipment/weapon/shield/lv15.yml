@@ -1,0 +1,39 @@
+# Primary Stat: Vitality
+# Secondary Stat: Resistance
+
+- id: bce27fae-21d6-43e1-8228-4f59b213e565
+  name: Miremetal Shield
+  description: A shield made of miremetal, emblazoned with the crest of the Duchy.
+  levelRequirement: 15
+  rarity: Common
+  type: Shield
+  sprite: '0092'
+  slots: 1
+  baseStats:
+    Vitality: 6.1
+    Resistance: 2.5
+    Strength: 1.1
+
+- id: 931df41a-c230-40af-a2a3-5e63effeab6f
+  name: Ghostwood Shield
+  description: A shield made solely of ghostwood.
+  levelRequirement: 16
+  rarity: Common
+  type: Shield
+  sprite: '0111'
+  slots: 1
+  baseStats:
+    Vitality: 9.2
+    Resistance: 3.1
+
+- id: a4097535-fbe0-43c2-89b0-91f86f4e903a
+  name: Miremirror Shield
+  description: A shield made of highly-polished miremetal.
+  levelRequirement: 18
+  rarity: Uncommon
+  type: Shield
+  sprite: '0080'
+  slots: 1
+  baseStats:
+    Intelligence: 2.1
+    Resistance: 5.5

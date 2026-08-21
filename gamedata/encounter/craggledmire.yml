@@ -65,6 +65,9 @@
     - collectibleId: Craggle Pebble
       chance: 75
 
+    - recipeId: 'Weapon: Miremetal Cutlass'
+      chance: 25
+
 - id: b04d13b9-586f-4c56-8002-5413ce5ed552
   name: Mirefrog Marsh
   description: A small marsh, home to many, many mire frogs. It smells like death, and the air is palpable. And yet, goblins around ride the marsh creatures as if it was a casual day out.
@@ -94,6 +97,15 @@
     - collectibleId: Mirefrog Tongue
       chance: 75
 
+    - recipeId: 'Equipment: Oozemire Plate'
+      chance: 25
+
+    - recipeId: 'Equipment: Oozemire Hat'
+      chance: 25
+
+    - recipeId: 'Weapon: Oozemire Rod'
+      chance: 25
+
 - id: 7e651b41-48d6-434f-87ea-bab973915b14
   name: Ghostyard
   description: A massive graveyard with tombstones in every orientation, due to the mire being excessively marshy. A haunting chill lingers in the air.
@@ -121,6 +133,9 @@
   completionRewards:
     - collectibleId: Cyclops Skull
       chance: 75
+
+    - recipeId: 'Weapon: Ghostwood Dagger'
+      chance: 25
 
 - id: 4fc58634-8a5c-4336-930a-e926fa32d348
   name: Spirit Nexus
@@ -151,6 +166,12 @@
   completionRewards:
     - collectibleId: Ghost Orbs
       chance: 75
+
+    - recipeId: 'Equipment: Miremirror Shield'
+      chance: 25
+
+    - recipeId: 'Equipment: Golden Miremetal Pristine Ring'
+      chance: 25
 
 - id: 08711d79-afbd-4845-b295-661ec7e53628
   name: Miserable Mire

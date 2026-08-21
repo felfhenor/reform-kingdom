@@ -1,0 +1,11 @@
+- id: 0e877bb8-4221-44e9-b6b1-ff2e2709a6e8
+  name: Miremetal Earrings
+  description: A pair of earrings made of miremetal. It smells, but it's trendy.
+  levelRequirement: 11
+  rarity: Uncommon
+  type: Trinket
+  sprite: '0084'
+  slots: 1
+  baseStats:
+    Health: 35
+    Energy: 15

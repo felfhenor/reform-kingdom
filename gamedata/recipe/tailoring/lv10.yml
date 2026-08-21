@@ -1,0 +1,128 @@
+- id: 2bbdcb11-f3e6-4316-ad77-bcf1053e6384
+  name: 'Material: Mirethread'
+  result:
+    itemId: Mirethread
+
+  requirements:
+    - itemId: Mireweed
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 12
+  tradeskillXP: 15
+  craftTime: 10
+
+- id: 5912f4ff-6ce8-45e5-9f31-c0c699a6a4c2
+  name: 'Equipment: Miresewn Cloak'
+  result:
+    equipmentId: Miresewn Cloak
+
+  requirements:
+    - itemId: Mirethread
+      quantity: 4
+
+    - itemId: Oozehide
+      quantity: 3
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 11
+  maxTradeskillLevel: 15
+  tradeskillXP: 65
+  craftTime: 180
+
+- id: 8311e468-362a-45aa-9afe-e07f93f7157a
+  name: 'Equipment: Miresewn Hat'
+  result:
+    equipmentId: Miresewn Hat
+
+  requirements:
+    - itemId: Mirethread
+      quantity: 4
+
+    - itemId: Oozehide
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 12
+  maxTradeskillLevel: 16
+  tradeskillXP: 75
+  craftTime: 180
+
+- id: 10866863-e3c2-4b86-8087-bda8cb9a9172
+  name: 'Equipment: Miresewn Gloves'
+  result:
+    equipmentId: Miresewn Gloves
+
+  requirements:
+    - itemId: Mirethread
+      quantity: 8
+
+    - itemId: Oozehide
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 13
+  maxTradeskillLevel: 17
+  tradeskillXP: 85
+  craftTime: 180
+
+- id: a38e9bb8-2c66-4f28-b1c4-aefca3f81689
+  name: 'Equipment: Oozemire Tunic'
+  result:
+    equipmentId: Oozemire Tunic
+
+  requirements:
+    - equipmentId: Miresewn Cloak
+      quantity: 1
+
+    - itemId: Mirethread
+      quantity: 8
+
+    - itemId: Oozehide
+      quantity: 4
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 18
+  tradeskillXP: 95
+  craftTime: 180
+
+- id: 781d8c3d-a849-45d0-9c10-b47a987cb2bb
+  name: 'Collectible: Fluff-filled Plushy Creature'
+  result:
+    collectibleId: Fluff-filled Plushy Creature
+
+  requirements:
+    - itemId: Mirethread
+      quantity: 15
+
+    - itemId: Peridot
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 15
+  tradeskillXP: 350
+  craftTime: 1800
+
+- id: a6c58313-f9c7-4000-9dfb-d5ebb99cdc5b
+  name: 'Equipment: Oozemire Hat'
+  result:
+    equipmentId: Oozemire Hat
+
+  requirements:
+    - equipmentId: Miresewn Hat
+      quantity: 1
+
+    - itemId: Mirethread
+      quantity: 4
+
+    - itemId: Oozehide
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 19
+  tradeskillXP: 95
+  craftTime: 180

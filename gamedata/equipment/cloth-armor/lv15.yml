@@ -1,0 +1,26 @@
+- id: ac42e5bf-2d80-4bc1-9f72-e47e2f14c120
+  name: Miresewn Cloak
+  description: A refined cloak made of mirethread.
+  levelRequirement: 15
+  rarity: Common
+  type: Cloth Armor
+  sprite: '0101'
+  slots: 1
+  baseStats:
+    Resistance: 6.3
+    Agility: 5.2
+    Health: 20
+    Energy: 14
+
+- id: e11fda67-ea1d-4b48-9a31-a371eb5a3f0e
+  name: Oozemire Tunic
+  description: A tunic made of mirethread and ooze, somehow holding together.
+  levelRequirement: 18
+  rarity: Common
+  type: Cloth Armor
+  sprite: '0104'
+  slots: 1
+  baseStats:
+    Resistance: 7.1
+    Agility: 3.2
+    Vitality: 5.5

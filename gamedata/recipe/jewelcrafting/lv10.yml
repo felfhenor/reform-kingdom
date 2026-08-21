@@ -15,3 +15,136 @@
   maxTradeskillLevel: 13
   tradeskillXP: 35
   craftTime: 240
+
+- id: 8c848f8d-9eda-4db9-8f2d-4b08187943e4
+  name: 'Material: Peridot'
+  result:
+    itemId: Peridot
+    chance: 15
+
+  requirements:
+    - itemId: Miremetal Ore
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 12
+  tradeskillXP: 10
+  craftTime: 5
+
+- id: f2c994d5-39fe-4003-b7fe-bdf6a6ef815f
+  name: 'Equipment: Golden Miremetal Peridot Ring'
+  result:
+    equipmentId: Golden Miremetal Peridot Ring
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Peridot
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 11
+  maxTradeskillLevel: 15
+  tradeskillXP: 65
+  craftTime: 180
+
+- id: 8b369743-0add-4c23-88ec-0e41b8950b8f
+  name: 'Equipment: Miremetal Crown'
+  result:
+    equipmentId: Miremetal Crown
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 5
+
+    - itemId: Peridot
+      quantity: 1
+
+    - itemId: Azurite
+      quantity: 1
+
+    - itemId: Malachite
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 12
+  maxTradeskillLevel: 16
+  tradeskillXP: 75
+  craftTime: 180
+
+- id: c0429042-1e94-484f-a761-483c0a6bae3a
+  name: 'Equipment: Golden Miremetal Ghost Peridot Ring'
+  result:
+    equipmentId: Golden Miremetal Ghost Peridot Ring
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Ghost Peridot
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 13
+  maxTradeskillLevel: 17
+  tradeskillXP: 85
+  craftTime: 180
+
+- id: 494da1a0-2620-4cca-882c-5917f777fba0
+  name: 'Equipment: Miremetal Brooch'
+  result:
+    equipmentId: Miremetal Brooch
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Peridot
+      quantity: 3
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 18
+  tradeskillXP: 95
+  craftTime: 180
+
+- id: 5589be60-8ccf-408e-8f73-76584d9369cc
+  name: 'Collectible: Artistically-crafted Miremetal Ring'
+  result:
+    collectibleId: Artistically-crafted Miremetal Ring
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 5
+
+    - itemId: Peridot
+      quantity: 10
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 15
+  tradeskillXP: 350
+  craftTime: 1800
+
+- id: 5cdc1987-d5e7-4de3-99ee-17ee9cda40d5
+  name: 'Equipment: Golden Miremetal Pristine Ring'
+  result:
+    equipmentId: Golden Miremetal Ghost Peridot Ring
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Ghost Peridot
+      quantity: 2
+
+    - itemId: Peridot
+      quantity: 2
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 19
+  tradeskillXP: 95
+  craftTime: 180

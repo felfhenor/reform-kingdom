@@ -4,3 +4,10 @@
   rarity: Common
 
   sprite: '0032'
+
+- id: e55a81a9-dfa8-4f33-b9eb-0b8794ce11bc
+  name: Ghostwood
+  description: A piece of mirewood mixed with ghostly energies. It's kinda spooky.
+  rarity: Uncommon
+
+  sprite: '0035'

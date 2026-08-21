@@ -12,3 +12,222 @@
   maxTradeskillLevel: 13
   tradeskillXP: 25
   craftTime: 120
+
+- id: 1482302b-1ed5-4085-aada-6349c94b1f1f
+  name: 'Weapon: Mirewood Staff'
+  result:
+    equipmentId: Mirewood Staff
+
+  requirements:
+    - itemId: Mirewood
+      quantity: 10
+
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 14
+  tradeskillXP: 35
+  craftTime: 180
+
+- id: 8eb26eb6-f5a5-4bf3-a52a-6ab1e3d079ed
+  name: 'Equipment: Miremetal Earrings'
+  result:
+    equipmentId: Miremetal Earrings
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 14
+  tradeskillXP: 50
+  craftTime: 120
+
+- id: 2adb8ece-b5e7-4385-9f4d-6ae136c9a619
+  name: 'Weapon: Miremetal Whip'
+  result:
+    equipmentId: Miremetal Whip
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 8
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 11
+  maxTradeskillLevel: 15
+  tradeskillXP: 65
+  craftTime: 180
+
+- id: 6b7daa9d-1933-46f6-910e-fa808dd82909
+  name: 'Material: Ghost Peridot'
+  result:
+    itemId: Ghost Peridot
+
+  requirements:
+    - itemId: Peridot
+      quantity: 1
+
+    - itemId: Spirit Flesh
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 11
+  maxTradeskillLevel: 13
+  tradeskillXP: 15
+  craftTime: 15
+
+- id: a62a5151-d96e-424c-9e9d-ec61e7871175
+  name: 'Equipment: Star Charm'
+  result:
+    equipmentId: Star Charm
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Ghost Peridot
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 12
+  maxTradeskillLevel: 15
+  tradeskillXP: 65
+  craftTime: 180
+
+- id: c3f7b43d-570e-408e-8490-0eac7e176b77
+  name: 'Equipment: Miremirror Shield'
+  result:
+    equipmentId: Miremirror Shield
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Ghost Peridot
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 12
+  maxTradeskillLevel: 15
+  tradeskillXP: 85
+  craftTime: 240
+
+- id: a6cba0cb-1b6e-46db-b55d-de585a4265d3
+  name: 'Equipment: Miremetal Amulet'
+  result:
+    equipmentId: Miremetal Amulet
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Ghost Peridot
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 13
+  maxTradeskillLevel: 16
+  tradeskillXP: 75
+  craftTime: 180
+
+- id: df0d0420-ac43-4888-9193-eb02df7dedd3
+  name: 'Weapon: Oozemire Rod'
+  result:
+    equipmentId: Oozemire Rod
+
+  requirements:
+    - itemId: Mirewood
+      quantity: 4
+
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Ghost Peridot
+      quantity: 1
+
+    - itemId: Oozehide
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 13
+  maxTradeskillLevel: 16
+  tradeskillXP: 95
+  craftTime: 240
+
+- id: 13374ed9-731a-4eb7-a49a-57ac51477dad
+  name: 'Equipment: Miremetal Bracer'
+  result:
+    equipmentId: Miremetal Bracer
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 4
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 17
+  tradeskillXP: 85
+  craftTime: 180
+
+- id: 7da4d46f-0080-4256-b0b3-e7b1fa90bfcd
+  name: 'Weapon: Ghostwood Dagger'
+  result:
+    equipmentId: Ghostwood Dagger
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 4
+
+    - itemId: Ghostwood
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 17
+  tradeskillXP: 95
+  craftTime: 240
+
+- id: 318a19a9-d26e-4488-97f0-2e1d128ffd1b
+  name: 'Collectible: Ooze-coated Miremetal'
+  result:
+    collectibleId: Ooze-coated Miremetal
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 10
+
+    - itemId: Oozehide
+      quantity: 5
+
+    - itemId: Ghost Peridot
+      quantity: 3
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 15
+  tradeskillXP: 350
+  craftTime: 1800
+
+- id: 0ce428d5-2d3f-4cdd-87f1-6f8ca3fac0a2
+  name: 'Equipment: Ooze Parchment'
+  result:
+    equipmentId: Ooze Parchment
+
+  requirements:
+    - itemId: Ghost Peridot
+      quantity: 2
+
+    - itemId: Mirethread
+      quantity: 2
+
+    - itemId: Spirit Flesh
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 105
+  craftTime: 180

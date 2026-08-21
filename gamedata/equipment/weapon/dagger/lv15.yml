@@ -1,0 +1,26 @@
+# Primary Stat: Agility
+# Secondary Stat: Strength
+
+- id: 59dffcff-c535-4af1-8f6b-f544822647d9
+  name: Miremetal Dagger
+  description: A dagger made of miremetal.
+  levelRequirement: 15
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0085'
+  slots: 1
+  baseStats:
+    Agility: 5.9
+    Strength: 4.1
+
+- id: b303a684-ec9d-419c-9981-6f38d8767db3
+  name: Ghostwood Dagger
+  description: A dagger carved out of ghostwood and made with miremetal. It emits strange energies.
+  levelRequirement: 18
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0085'
+  slots: 1
+  baseStats:
+    Intelligence: 4.3
+    Agility: 4.9

@@ -1,0 +1,15 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Resistance
+
+- id: eff6be58-41c3-47ce-9e64-37c8b85b9f93
+  name: Miremetal Whip
+  description: A whip made of miremetal. It seems to have a life of its own.
+  levelRequirement: 15
+  rarity: Common
+  type: Whip
+  sprite: '0078'
+  slots: 1
+  baseStats:
+    Intelligence: 4.1
+    Resistance: 2.1
+    Strength: 2.3

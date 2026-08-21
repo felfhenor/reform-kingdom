@@ -7,3 +7,15 @@
 
   infusionStats:
     Intelligence: 1
+
+- id: b55b4f94-7f55-42f0-8a39-c4a824f85917
+  name: Ghost Peridot
+  description: A peridot refined and formed with ghostly energies.
+  rarity: Uncommon
+
+  sprite: '0036'
+
+  infusionStats:
+    Luck: 0.5
+    Intelligence: 0.5
+    Energy: 5

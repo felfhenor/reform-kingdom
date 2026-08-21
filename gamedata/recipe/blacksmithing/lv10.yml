@@ -18,3 +18,192 @@
   maxTradeskillLevel: 13
   tradeskillXP: 25
   craftTime: 90
+
+- id: 855372d4-556e-42c5-b5bb-b3815c7fab66
+  name: 'Material: Miremetal Ingot'
+  result:
+    itemId: Miremetal Ingot
+
+  requirements:
+    - itemId: Miremetal Ore
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 12
+  tradeskillXP: 15
+  craftTime: 10
+
+- id: 8f19fe15-e6b5-45e3-85eb-fd824f5d6800
+  name: 'Weapon: Miremetal Sword'
+  result:
+    equipmentId: Miremetal Sword
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 5
+
+    - itemId: Mirewood
+      quantity: 3
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 10
+  maxTradeskillLevel: 14
+  tradeskillXP: 35
+  craftTime: 120
+
+- id: cf740590-0b93-4943-a331-09ea3dc632d3
+  name: 'Equipment: Miremetal Helm'
+  result:
+    equipmentId: Miremetal Helm
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 11
+  maxTradeskillLevel: 15
+  tradeskillXP: 65
+  craftTime: 180
+
+- id: bcceb1e0-3c03-40a1-a4b2-dffc4ffbab26
+  name: 'Equipment: Miremetal Breastplate'
+  result:
+    equipmentId: Miremetal Breastplate
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 8
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 12
+  maxTradeskillLevel: 16
+  tradeskillXP: 65
+  craftTime: 180
+
+- id: 5a9a0509-db7e-4db9-a26e-fabb238e0086
+  name: 'Weapon: Miremetal Cutlass'
+  result:
+    equipmentId: Miremetal Cutlass
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 8
+
+    - itemId: Mirewood
+      quantity: 5
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 12
+  maxTradeskillLevel: 16
+  tradeskillXP: 75
+  craftTime: 240
+
+- id: 9e704415-9b34-40df-82ab-c972a13c5017
+  name: 'Weapon: Miremetal Dagger'
+  result:
+    equipmentId: Miremetal Dagger
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 4
+
+    - itemId: Mirewood
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 13
+  maxTradeskillLevel: 17
+  tradeskillXP: 75
+  craftTime: 180
+
+- id: 190e5bd3-a013-411d-a134-ae1b3e8bd28c
+  name: 'Equipment: Miremetal Shield'
+  result:
+    equipmentId: Miremetal Shield
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 8
+
+    - itemId: Mirewood
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 13
+  maxTradeskillLevel: 17
+  tradeskillXP: 75
+  craftTime: 180
+
+- id: 3d92ba50-fba8-4364-b80c-a94687114538
+  name: 'Weapon: Miremetal Dirk'
+  result:
+    equipmentId: Miremetal Dirk
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 5
+
+    - itemId: Mirewood
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 18
+  tradeskillXP: 85
+  craftTime: 180
+
+- id: 74a1bd30-1cb4-43b7-b664-95466840d347
+  name: 'Equipment: Oozemire Plate'
+  result:
+    equipmentId: Oozemire Plate
+
+  requirements:
+    - equipmentId: Miremetal Breastplate
+      quantity: 1
+
+    - itemId: Miremetal Ingot
+      quantity: 2
+
+    - itemId: Oozehide
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 18
+  tradeskillXP: 105
+  craftTime: 240
+
+- id: 893b615b-0558-4696-97ef-5ccba3efa7ae
+  name: 'Collectible: Finely-made Sharp Star'
+  result:
+    collectibleId: Finely-made Sharp Star
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 25
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 15
+  tradeskillXP: 350
+  craftTime: 1800
+
+- id: ac659723-a0ec-4965-a562-59227dbf6db4
+  name: 'Weapon: Miremetal Mace'
+  result:
+    equipmentId: Miremetal Mace
+
+  requirements:
+    - itemId: Miremetal Ingot
+      quantity: 8
+
+    - itemId: Mirewood
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 19
+  tradeskillXP: 95
+  craftTime: 180

@@ -1,0 +1,27 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Vitality
+
+- id: becdc5ac-3f0f-4301-b4ff-d4403e1ef36b
+  name: Mirewood Staff
+  description: A stinky staff made of mirewood. It's effective, but repulsive.
+  levelRequirement: 15
+  rarity: Common
+  type: Staff
+  sprite: '0077'
+  slots: 1
+  baseStats:
+    Intelligence: 8.3
+    Resistance: 8.3
+
+- id: 9d086cef-5cce-4eb3-aa24-5cc9da7d3b6f
+  name: Oozemire Rod
+  description: A rod made with ghostwood and mire oozeflesh, tied together with ghostly energy.
+  levelRequirement: 19
+  rarity: Uncommon
+  type: Staff
+  sprite: '0082'
+  slots: 1
+  baseStats:
+    Intelligence: 12.1
+    Vitality: 9.1
+    Resistance: 2.1

@@ -1,0 +1,27 @@
+# Primary Stat: Strength
+# Secondary Stat: Vitality
+
+- id: 2ba7e540-a3e3-4dbd-9e4d-91c6f50b5927
+  name: Miremetal Sword
+  description: A sword forged from miremetal.
+  levelRequirement: 15
+  rarity: Common
+  type: Sword
+  sprite: '0087'
+  slots: 1
+  baseStats:
+    Strength: 6.1
+    Vitality: 4.6
+    Agility: 2.3
+
+- id: 0c452080-ee10-4d91-82c2-49ce5fe61dff
+  name: Miremetal Cutlass
+  description: A sword forged from miremetal.
+  levelRequirement: 18
+  rarity: Uncommon
+  type: Sword
+  sprite: '0090'
+  slots: 1
+  baseStats:
+    Strength: 7.3
+    Agility: 7.3

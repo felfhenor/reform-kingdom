@@ -1,0 +1,24 @@
+- id: cb35e344-761b-43f5-b06f-cd4c2fba2de1
+  name: Mirewood Arrow
+  description: An arrow made from mirewood.
+  levelRequirement: 15
+  rarity: Common
+  type: Arrow
+  sprite: '0107'
+  slots: 1
+  baseStats:
+    Strength: 6.3
+    Agility: 2.2
+    Energy: 3
+
+- id: 3296eea5-9d27-49bb-b7db-dd0a6ec673c1
+  name: Ghostwood Arrow
+  description: An arrow made from mirewood, dripping with ghostly ooze.
+  levelRequirement: 19
+  rarity: Common
+  type: Arrow
+  sprite: '0110'
+  slots: 1
+  baseStats:
+    Strength: 4.3
+    Resistance: 4.9

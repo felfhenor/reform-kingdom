@@ -27,3 +27,35 @@
   tradeskillId: Woodworking
   level: 6
   requiredCollectibleId: Minor Woodworking Effigy
+
+##
+
+- id: dd4baccf-7d8e-4a02-a213-e4acba55f9a2
+  name: 'Tradeskill Level Requirement: Artificing 16'
+  tradeskillId: Artificing
+  level: 6
+  requiredCollectibleId: Ooze-coated Miremetal
+
+- id: f076667f-b9f9-484a-a801-a662e004154f
+  name: 'Tradeskill Level Requirement: Blacksmithing 16'
+  tradeskillId: Blacksmithing
+  level: 6
+  requiredCollectibleId: Finely-made Sharp Star
+
+- id: 68b262c8-115a-493b-ac00-55f0410961d5
+  name: 'Tradeskill Level Requirement: Jewelcrafting 16'
+  tradeskillId: Jewelcrafting
+  level: 6
+  requiredCollectibleId: Artistically-crafted Miremetal Ring
+
+- id: 4a2a2cce-17da-4843-a440-d4cfdf73e208
+  name: 'Tradeskill Level Requirement: Tailoring 16'
+  tradeskillId: Tailoring
+  level: 6
+  requiredCollectibleId: Fluff-filled Plushy Creature
+
+- id: 3b38607d-b17c-4fd1-9510-d0ce103fbf11
+  name: 'Tradeskill Level Requirement: Woodworking 16'
+  tradeskillId: Woodworking
+  level: 6
+  requiredCollectibleId: Ooze-filled Drawing Tool

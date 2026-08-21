@@ -8,3 +8,15 @@
   slots: 1
   baseStats:
     Intelligence: 5.5
+
+- id: 0aadfec2-925f-42b9-8886-9788141717e3
+  name: Star Charm
+  description: A charm crafted from miremetal. It guides the wearer east at all times.
+  rarity: Uncommon
+  levelRequirement: 14
+  type: Charm
+  sprite: '0079'
+  slots: 1
+  baseStats:
+    Intelligence: 4.5
+    Resistance: 2.3
