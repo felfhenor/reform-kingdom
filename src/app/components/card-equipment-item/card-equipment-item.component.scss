@@ -8,7 +8,7 @@
 // row sizes for its offset math) can lay these out correctly - keep this in
 // sync with the `itemSize` passed to `cdk-virtual-scroll-viewport`.
 .equipment-item-row {
-  @apply flex items-center gap-3 w-full h-[72px] px-2 text-left cursor-pointer rounded overflow-hidden;
+  @apply flex items-center gap-3 w-full h-[96px] px-2 text-left cursor-pointer rounded overflow-hidden;
 }
 
 .equipment-item-row-icon {
@@ -28,7 +28,7 @@
 }
 
 .equipment-item-row-stats {
-  @apply flex flex-wrap gap-2 text-sm max-h-[3em] overflow-hidden;
+  @apply flex flex-wrap gap-2 text-sm overflow-hidden;
 }
 
 .equipment-item-row-stat {

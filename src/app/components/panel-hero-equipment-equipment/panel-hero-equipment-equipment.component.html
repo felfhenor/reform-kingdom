@@ -50,7 +50,7 @@
 
     @if (items.length > 0) {
       <cdk-virtual-scroll-viewport
-        itemSize="72"
+        itemSize="96"
         class="equipment-item-list flex-1 min-h-0"
       >
         <div *cdkVirtualFor="let entry of items; trackBy: trackByItemId">
