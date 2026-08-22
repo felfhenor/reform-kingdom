@@ -256,13 +256,19 @@
                 </button>
 
                 <input
+                  #input
                   type="number"
                   class="input input-xs w-16"
                   min="1"
                   [max]="entry.maxCraftable"
                   [value]="quantity"
                   (input)="
-                    onQuantityInput($event, entry.recipe.id, entry.maxCraftable)
+                    onQuantityInput(
+                      input,
+                      $event,
+                      entry.recipe.id,
+                      entry.maxCraftable
+                    )
                   "
                 />
 

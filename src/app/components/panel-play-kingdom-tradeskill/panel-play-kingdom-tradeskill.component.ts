@@ -225,6 +225,7 @@ export class PanelPlayKingdomTradeskillComponent {
   // can never visually sit above what's actually craftable, and resets to 1
   // if the field is cleared entirely.
   public onQuantityInput(
+    input: HTMLInputElement,
     event: Event,
     recipeId: RecipeId,
     maxCraftable: number,
@@ -236,6 +237,8 @@ export class PanelPlayKingdomTradeskillComponent {
       ...quantities,
       [recipeId]: clamped,
     }));
+
+    input.value = clamped.toString();
   }
 
   public requirementTooltip(entry: CraftRequirementEntry): string {
