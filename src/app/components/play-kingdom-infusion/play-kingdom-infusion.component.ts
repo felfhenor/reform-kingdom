@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
@@ -15,7 +16,7 @@ import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { characterInfuseEquipment } from '@helpers/character-equipment';
 import { getEntry } from '@helpers/content';
-import { equippedItemsByPrimarySlot } from '@helpers/equipment';
+import { canModifyEquipment, equippedItemsByPrimarySlot } from '@helpers/equipment';
 import {
   canInfuseEquipmentItem,
   equipmentItemInfusionBonus,
@@ -39,6 +40,7 @@ import type {
 } from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-play-kingdom-infusion',
@@ -46,6 +48,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   imports: [
     AtlasImageComponent,
     CardPageComponent,
+    IconComponent,
     SlotIconBlankComponent,
     IconJobComponent,
     RowInfusedMaterialsComponent,
@@ -53,6 +56,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     RowDebuffResistancesComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
+    TippyDirective,
   ],
   templateUrl: './play-kingdom-infusion.component.html',
   styleUrl: './play-kingdom-infusion.component.scss',
@@ -102,6 +106,9 @@ export class PlayKingdomInfusionComponent {
   public infusionMaterials = computed<StorageMaterialEntry[]>(() =>
     getStorageMaterials().filter((entry) => isInfusionMaterial(entry.item)),
   );
+
+  // Gear can't be infused mid-fight; drives disabling the material list and the header warning icon.
+  public equipmentModifiable = computed(() => canModifyEquipment());
 
   public goldCoinQuantity = computed(() => getGoldQuantity());
 

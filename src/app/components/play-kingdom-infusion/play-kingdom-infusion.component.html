@@ -5,9 +5,21 @@
 @let content = selectedItemContent();
 @let slotIndex = selectedSlotIndex();
 @let materials = infusionMaterials();
+@let modifiable = equipmentModifiable();
 
 <app-card-page heightProfile="full">
-  <span header>Infusion</span>
+  <span header class="flex items-center gap-2">
+    Infusion
+    @if (!modifiable) {
+      <app-icon
+        name="gameCrossedSwords"
+        size="1.1em"
+        class="text-error"
+        [tp]="'Equipment cannot be infused during combat.'"
+        [tpPlacement]="'right'"
+      />
+    }
+  </span>
 
   <app-button-kingdom-back pageactions />
 
@@ -125,7 +137,7 @@
                     <button
                       type="button"
                       class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 py-2 text-neutral-content"
-                      [disabled]="!affordable"
+                      [disabled]="!affordable || !modifiable"
                       (click)="requestInfuse(entry.item.id)"
                     >
                       <div class="flex items-center gap-2">
