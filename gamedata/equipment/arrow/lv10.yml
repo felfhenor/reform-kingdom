@@ -10,3 +10,14 @@
     Strength: 4.1
     Agility: 1.1
     Resistance: 0.5
+
+- id: b638ff50-9780-463d-97de-5d9926a3816f
+  name: Mireweed Arrow
+  description: A smelly arrow made from mirewood and held together with mireweed. They say it can be smelled a mile away.
+  levelRequirement: 13
+  rarity: Uncommon
+  type: Arrow
+  sprite: '0053'
+  slots: 1
+  baseStats:
+    Agility: 6.5

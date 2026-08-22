@@ -106,6 +106,9 @@
     - recipeId: 'Weapon: Oozemire Rod'
       chance: 25
 
+    - equipmentId: Mireweed Arrow
+      chance: 10
+
 - id: 7e651b41-48d6-434f-87ea-bab973915b14
   name: Ghostyard
   description: A massive graveyard with tombstones in every orientation, due to the mire being excessively marshy. A haunting chill lingers in the air.
