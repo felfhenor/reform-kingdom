@@ -11,7 +11,7 @@
           [sfxOffset]="1"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'1'"
-          (hotkey)="changeGamePlayView('kingdom')"
+          (hotkey)="hotkeyMatches($event, '1') && changeGamePlayView('kingdom')"
           isGlobal
         >
           Kingdom
@@ -26,7 +26,7 @@
           [sfxOffset]="0"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'2'"
-          (hotkey)="changeGamePlayView('world')"
+          (hotkey)="hotkeyMatches($event, '2') && changeGamePlayView('world')"
           isGlobal
         >
           World
@@ -41,7 +41,7 @@
           [sfxOffset]="3"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'3'"
-          (hotkey)="changeGamePlayView('heroes')"
+          (hotkey)="hotkeyMatches($event, '3') && changeGamePlayView('heroes')"
           isGlobal
         >
           Heroes
@@ -56,7 +56,7 @@
           [sfxOffset]="2"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'4'"
-          (hotkey)="changeGamePlayView('adventurelog')"
+          (hotkey)="hotkeyMatches($event, '4') && changeGamePlayView('adventurelog')"
           isGlobal
         >
           Adventure Log
@@ -71,7 +71,7 @@
           [sfxOffset]="4"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'5'"
-          (hotkey)="changeGamePlayView('decree')"
+          (hotkey)="hotkeyMatches($event, '5') && changeGamePlayView('decree')"
           isGlobal
         >
           Decree
@@ -91,7 +91,7 @@
             [tp]="panel.name + ' [' + panel.hotkey + ']'"
             (click)="panel.clickCb()"
             [hotkeys]="panel.hotkey"
-            (hotkey)="panel.clickCb()"
+            (hotkey)="hotkeyMatches($event, panel.hotkey) && panel.clickCb()"
             isGlobal
             appSfx="ui-click"
             [sfxOffset]="$index"
@@ -112,7 +112,8 @@
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
             [hotkeys]="'t'"
-            (hotkey)="openCaravanTrade()"
+            [hotkeysOptions]="noPreventDefault"
+            (hotkey)="hotkeyMatches($event, 't') && openCaravanTrade()"
             isGlobal
           >
             <app-icon name="gameSwapBag" size="2em" color="#000"></app-icon>
@@ -130,7 +131,8 @@
             [sfxOffset]="panelConfigs.length + 3"
             [sfxTrigger]="['click', 'hover']"
             [hotkeys]="'r'"
-            (hotkey)="recenterCamera()"
+            [hotkeysOptions]="noPreventDefault"
+            (hotkey)="hotkeyMatches($event, 'r') && recenterCamera()"
             isGlobal
           >
             <app-icon name="tablerFocus" size="2em" color="#000"></app-icon>
@@ -147,7 +149,7 @@
           [sfxOffset]="panelConfigs.length + 2"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'SPACE'"
-          (hotkey)="togglePause()"
+          (hotkey)="hotkeyMatches($event, 'SPACE') && togglePause()"
           isGlobal
         >
           <app-icon
@@ -167,7 +169,7 @@
           [sfxOffset]="panelConfigs.length + 1"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'q'"
-          (hotkey)="leaveSwal.fire()"
+          (hotkey)="hotkeyMatches($event, 'q') && leaveSwal.fire()"
           isGlobal
         >
           <app-icon name="gameExitDoor" size="2em" color="#000"></app-icon>
@@ -183,7 +185,7 @@
           [sfxOffset]="panelConfigs.length + 2"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'ESCAPE'"
-          (hotkey)="closeAllMenus()"
+          (hotkey)="hotkeyMatches($event, 'ESCAPE') && closeAllMenus()"
           isGlobal
         >
           <app-icon

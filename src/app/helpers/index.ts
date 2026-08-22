@@ -46,6 +46,7 @@ export * from './gameloop';
 export * from './gather-node-discovery';
 export * from './gathering';
 export * from './global-effects';
+export * from './hotkeys';
 export * from './icons';
 export * from './infusion';
 export * from './item-preview';

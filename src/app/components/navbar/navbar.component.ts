@@ -18,6 +18,7 @@ import {
   modalIsTopmost,
   modalOpen,
 } from '@helpers/modal-stack';
+import { hotkeyMatches } from '@helpers/hotkeys';
 import { isSetup } from '@helpers/setup';
 import { saveGameState } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
@@ -67,6 +68,11 @@ import { ButtonContentAnalysisComponent } from '../button-content-analysis/butto
 export class NavbarComponent {
   public meta = inject(MetaService);
   public router = inject(Router);
+
+  protected hotkeyMatches = hotkeyMatches;
+
+  // "t"/"r" fire unfiltered on every keydown (see hotkeys.ts) - don't also eat other keys' defaults.
+  protected readonly noPreventDefault = { preventDefault: false };
 
   public showPauseMenu = computed(() => modalIsOpen('pause-menu'));
   private wasPausedBeforeOpeningMenu = signal<boolean>(false);
