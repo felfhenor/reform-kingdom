@@ -1,4 +1,5 @@
 import type { Routes } from '@angular/router';
+import { debugModeGuard } from '@guards/debug-mode.guard';
 import { setupPageGuard } from '@guards/require-not-setup.guard';
 import { requireSetupGuard } from '@guards/require-setup.guard';
 import { GameComponent } from '@pages/game/game.component';
@@ -14,6 +15,12 @@ export const routes: Routes = [
   {
     component: TransitionComponent,
     path: 'transition',
+  },
+  {
+    path: 'debug',
+    loadComponent: () =>
+      import('@pages/debug/debug.component').then((m) => m.DebugComponent),
+    canActivate: [debugModeGuard],
   },
   {
     component: SetupComponent,

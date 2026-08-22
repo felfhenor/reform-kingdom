@@ -1,118 +1,23 @@
 /**
- * Validates that every `recipeId` completion reward across every encounter
- * (and random encounter) resolves to a real compiled recipe.
- * `scripts/gamedata-build.ts` already enforces this at build time (it halts
- * with "has no corresponding id" for any name that doesn't resolve) - this
- * re-checks the *compiled* output (`public/json/recipe.json`,
- * `public/json/encounter.json`, `public/json/encounterrandom.json`) as a
- * defense in depth against stale/hand-edited artifacts, mirroring
- * `validate-completionrewards.ts`.
- *
- * This must run after `npm run gamedata:build` has produced those files.
+ * Validates that every recipeId completion reward resolves to a real recipe.
+ * Thin CLI wrapper - logic lives in `src/app/helpers/debug/analysis-reciperewards.ts`,
+ * shared with the `/debug` dashboard. Requires compiled content
+ * (`npm run gamedata:build`).
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import fs from 'fs-extra';
-import path from 'path';
-
-const RECIPE_FILE = path.resolve(__dirname, '../public/json/recipe.json');
-const ENCOUNTER_FILE = path.resolve(
-  __dirname,
-  '../public/json/encounter.json',
-);
-const ENCOUNTER_RANDOM_FILE = path.resolve(
-  __dirname,
-  '../public/json/encounterrandom.json',
-);
-
-function loadRequiredJson(filePath: string, description: string): any {
-  if (!fs.existsSync(filePath)) {
-    console.log(
-      `::error::[validate:reciperewards] Could not find ${description} at "${filePath}". ` +
-        `Run "npm run gamedata:build" before validating.`,
-    );
-    console.error(
-      `[validate:reciperewards] FATAL: missing ${description} at "${filePath}".`,
-    );
-    process.exit(1);
-  }
-
-  return fs.readJsonSync(filePath);
-}
+import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
+import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
+import { printAnalysisResult } from './debug/run-analysis-cli';
 
 function main(): void {
-  console.log('=== validate:reciperewards ===');
-  console.log(
-    'Checking that every recipeId completion reward (encounter or random encounter) resolves to a real recipe.\n',
-  );
-
-  const recipes: Array<{ id: string; name: string }> = loadRequiredJson(
-    RECIPE_FILE,
-    'compiled recipe content (public/json/recipe.json)',
-  );
-  const recipeIds = new Set(recipes.map((recipe) => recipe.id));
-  console.log(`  Found ${recipes.length} recipe(s).`);
-
-  const encounters: Array<{
-    id: string;
-    name: string;
-    completionRewards?: any[];
-  }> = loadRequiredJson(
-    ENCOUNTER_FILE,
-    'compiled encounter content (public/json/encounter.json)',
-  );
-  console.log(`  Found ${encounters.length} encounter(s).`);
-
-  const encounterRandoms: Array<{
-    id: string;
-    name: string;
-    completionRewards?: any[];
-  }> = loadRequiredJson(
-    ENCOUNTER_RANDOM_FILE,
-    'compiled random encounter content (public/json/encounterrandom.json)',
-  );
-  console.log(`  Found ${encounterRandoms.length} random encounter(s).`);
-
-  const problems: string[] = [];
-
-  [...encounters, ...encounterRandoms].forEach((encounter) => {
-    (encounter.completionRewards ?? []).forEach((reward: any) => {
-      if (!reward.recipeId) return;
-
-      if (!recipeIds.has(reward.recipeId)) {
-        const message = `Encounter "${encounter.name}" has a completion reward referencing recipeId "${reward.recipeId}", which doesn't resolve to any compiled recipe.`;
-        console.log(`  ✗ ${message}`);
-        problems.push(message);
-        return;
-      }
-
-      console.log(
-        `  ✓ "${encounter.name}" -> recipeId "${reward.recipeId}" resolves.`,
-      );
-    });
-  });
-
-  console.log('\n=== Summary ===');
-
-  if (problems.length > 0) {
-    console.log(`\n${problems.length} problem(s) found:\n`);
-    problems.forEach((message) => {
-      console.log(`  - ${message}`);
-      console.log(
-        `::error file=${path.relative(path.resolve(__dirname, '..'), ENCOUNTER_FILE)}::${message}`,
-      );
-    });
-
-    console.error(
-      `\n[validate:reciperewards] FAILED: ${problems.length} recipe reward(s) don't resolve.`,
-    );
+  try {
+    loadCompiledContentFromDisk();
+    const result = runRecipeRewardsAnalysis();
+    printAnalysisResult('validate:reciperewards', result, { strict: true });
+  } catch (err) {
+    console.error(`[validate:reciperewards] FATAL: ${err instanceof Error ? err.message : err}`);
     process.exit(1);
   }
-
-  console.log(
-    '\n[validate:reciperewards] PASSED: every recipeId completion reward resolves to a real recipe.',
-  );
 }
 
 main();

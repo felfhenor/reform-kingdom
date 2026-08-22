@@ -1,0 +1,124 @@
+@let inputDef = def();
+
+@switch (inputDef.type) {
+  @case ('boolean') {
+    <label class="label cursor-pointer label-checkbox gap-2">
+      <input
+        type="checkbox"
+        class="checkbox checkbox-secondary"
+        [checked]="value()"
+        (change)="valueChange.emit(checkedFromEvent($event))"
+      />
+      <span class="label-text">{{ inputDef.label }}</span>
+      <app-icon
+        name="gameHelp"
+        size="16px"
+        [tp]="supportingScripts()"
+        [tpPlacement]="'right'"
+      />
+    </label>
+  }
+  @default {
+    <div class="form-control flex flex-row items-center gap-2">
+      <label class="label gap-2">
+        <span class="label-text">{{ inputDef.label }}</span>
+        <app-icon
+          name="gameHelp"
+          size="16px"
+          [tp]="supportingScripts()"
+          [tpPlacement]="'right'"
+        />
+      </label>
+
+      @switch (inputDef.type) {
+        @case ('number') {
+          <input
+            type="number"
+            class="input input-bordered"
+            [value]="value()"
+            [attr.min]="inputDef.min"
+            [attr.max]="inputDef.max"
+            (input)="valueChange.emit(numberFromEvent($event))"
+          />
+        }
+        @case ('text') {
+          <input
+            type="text"
+            class="input input-bordered"
+            [value]="value()"
+            (input)="valueChange.emit(textFromEvent($event))"
+          />
+        }
+        @case ('jobMultiSelect') {
+          <ng-select
+            class="w-full pr-2"
+            [items]="jobs"
+            bindLabel="name"
+            bindValue="name"
+            [ngModel]="value()"
+            [multiple]="true"
+            [closeOnSelect]="false"
+            placeholder="All classes"
+            (change)="valueChange.emit(namesFromSelection($event))"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <div class="flex items-center gap-2">
+                <div class="zoom-row">
+                  <app-icon-job [job]="item" />
+                </div>
+                <span>{{ item.name }}</span>
+              </div>
+            </ng-template>
+
+            <ng-template ng-label-tmp let-item="item">
+              <div class="flex items-center gap-1 pr-2">
+                <div class="zoom-row">
+                  <app-icon-job [job]="item" />
+                </div>
+                <span>{{ item.name }}</span>
+              </div>
+            </ng-template>
+          </ng-select>
+        }
+        @case ('monsterMultiSelect') {
+          <ng-select
+            class="w-full pr-2"
+            [items]="monsters"
+            bindLabel="name"
+            bindValue="name"
+            [ngModel]="value()"
+            [multiple]="true"
+            [closeOnSelect]="false"
+            placeholder="All monsters"
+            (change)="valueChange.emit(namesFromSelection($event))"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <div class="flex items-center gap-2">
+                <div class="zoom-row">
+                  <app-atlas-animation
+                    spritesheet="monster"
+                    [assetName]="item.sprite"
+                    [frames]="item.frames"
+                  />
+                </div>
+                <span>{{ item.name }}</span>
+              </div>
+            </ng-template>
+            <ng-template ng-label-tmp let-item="item">
+              <div class="flex items-center gap-1 pr-2">
+                <div class="zoom-row">
+                  <app-atlas-animation
+                    spritesheet="monster"
+                    [assetName]="item.sprite"
+                    [frames]="item.frames"
+                  />
+                </div>
+                <span>{{ item.name }}</span>
+              </div>
+            </ng-template>
+          </ng-select>
+        }
+      }
+    </div>
+  }
+}

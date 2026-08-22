@@ -1,0 +1,178 @@
+@if (!isReady()) {
+  <div class="p-4 text-lighter">Loading content…</div>
+} @else {
+  <div class="flex h-screen flex-col gap-4 overflow-hidden p-4">
+    <div class="card bg-base-100 foreground shadow-xl">
+      <div class="card-body gap-4">
+        <h1 class="text-2xl font-bold">Content Analysis Dashboard</h1>
+
+        <div class="flex flex-row flex-wrap items-end gap-4">
+          @for (input of globalInputs; track input.key) {
+            <app-input-analysis
+              [def]="input"
+              [value]="inputValue(input.key)"
+              [supportingScripts]="supportingScripts(input.key)"
+              (valueChange)="setInput(input.key, $event)"
+            />
+          }
+        </div>
+
+        <div class="tabs tabs-lift">
+          @for (category of categories; track category) {
+            @let status = categoryStatuses[category]();
+
+            <button
+              type="button"
+              class="tab gap-2"
+              [class.tab-active]="activeCategory() === category"
+              [class.opacity-50]="activeCategory() !== category"
+              (click)="activeCategory.set(category)"
+            >
+              {{ category }}
+
+              @if (status.fail === 0 && status.warning === 0) {
+                <span
+                  class="text-success"
+                  [tp]="status.pass + ' successful check(s)'"
+                  [tpPlacement]="'top'"
+                  >✓</span
+                >
+              }
+              @if (status.warning > 0) {
+                <span
+                  class="text-warning"
+                  [tp]="status.warning + ' warning(s)'"
+                  [tpPlacement]="'top'"
+                  >⚠</span
+                >
+              }
+              @if (status.fail > 0) {
+                <span
+                  class="text-error"
+                  [tp]="status.fail + ' error(s)'"
+                  [tpPlacement]="'top'"
+                  >✗</span
+                >
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+      @for (
+        script of scriptsForCategory(activeCategory());
+        track script.definition.id
+      ) {
+        @let state = script.state();
+
+        <div class="card bg-base-100 foreground shadow-xl">
+          <div class="card-body">
+            <div class="flex flex-row items-center gap-2">
+              <div class="card-title">{{ script.definition.title }}</div>
+
+              @if (state.error) {
+                <span class="badge badge-error">Error</span>
+              } @else if (state.result) {
+                @let failing = failCount(state.result);
+                @let warning = warningCount(state.result);
+
+                @if (failing > 0) {
+                  <span class="badge badge-error">{{ failing }} failing</span>
+                }
+                @if (warning > 0) {
+                  <span class="badge badge-warning">
+                    {{ warning }} warning(s)
+                  </span>
+                }
+                @if (failing === 0 && warning === 0) {
+                  <span class="badge badge-success">All passing</span>
+                }
+              }
+            </div>
+
+            <p class="text-lighter">{{ script.definition.description }}</p>
+
+            @if (script.ownInputs.length > 0) {
+              <div class="flex flex-row flex-wrap gap-4">
+                @for (input of script.ownInputs; track input.key) {
+                  <app-input-analysis
+                    class="flex-1"
+                    [def]="input"
+                    [value]="inputValue(input.key)"
+                    [supportingScripts]="supportingScripts(input.key)"
+                    (valueChange)="setInput(input.key, $event)"
+                  />
+                }
+              </div>
+            }
+
+            @if (state.error) {
+              <div class="alert alert-error">{{ state.error }}</div>
+            } @else if (state.result) {
+              <details class="mt-2">
+                <summary class="cursor-pointer font-bold">
+                  {{ state.result.checks.length }} check(s)
+                </summary>
+
+                <div class="mt-2 flex flex-col gap-2">
+                  @for (check of state.result.checks; track check.id) {
+                    <div class="flex flex-row items-start gap-2">
+                      <span
+                        class="font-bold"
+                        [class.text-error]="check.status === 'fail'"
+                        [class.text-success]="check.status === 'pass'"
+                        [class.text-warning]="check.status === 'warning'"
+                        [class.text-lighter]="check.status === 'info'"
+                      >
+                        {{
+                          check.status === 'fail'
+                            ? '✗'
+                            : check.status === 'pass'
+                              ? '✓'
+                              : check.status === 'warning'
+                                ? '⚠'
+                                : '-'
+                        }}
+                      </span>
+                      <span>{{ check.message }}</span>
+                    </div>
+                  }
+
+                  <div class="text-lighter">{{ state.result.summary }}</div>
+
+                  @for (table of state.result.tables ?? []; track table.title) {
+                    <div class="flex flex-col gap-2">
+                      <div class="font-bold">{{ table.title }}</div>
+                      <div class="overflow-x-auto">
+                        <table class="table table-zebra">
+                          <thead>
+                            <tr>
+                              @for (column of table.columns; track column) {
+                                <th>{{ column }}</th>
+                              }
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (row of table.rows; track $index) {
+                              <tr>
+                                @for (column of table.columns; track column) {
+                                  <td>{{ row[column] }}</td>
+                                }
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </details>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

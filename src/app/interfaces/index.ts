@@ -28,6 +28,7 @@ export * from './content-tradeskill';
 export * from './content-tradeskill-level-requirement';
 export * from './content-trait';
 export * from './crafting';
+export * from './debug-analysis';
 export * from './decree';
 export * from './discord';
 export * from './droppable';

@@ -1,18 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import type { WritableSignal } from '@angular/core';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import {
-  allContentById,
-  allIdsByName,
-  setAllContentById,
-  setAllIdsByName,
-} from '@helpers/content';
-import {
-  ensureContent,
-  hasContentInitializer,
-} from '@helpers/content-initializers';
+import { unfurlContent } from '@helpers/content';
 import { setAllMaps } from '@helpers/maps';
-import type { ContentType, GameMap, IsContentItem } from '@interfaces';
+import type { GameMap, IsContentItem } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { lastValueFrom } from 'rxjs';
@@ -97,7 +88,7 @@ export class ContentService {
 
     const assets = await lastValueFrom(req);
 
-    this.unfurlAssets(assets);
+    unfurlContent(assets, (message) => this.logger.warn('Content', message));
 
     this.logger.info(
       'Content:LoadJSON',
@@ -129,50 +120,5 @@ export class ContentService {
 
     this.logger.info('Content:LoadMaps', `Maps loaded: ${mapNames.join(', ')}`);
     this.hasLoadedMaps.set(true);
-  }
-
-  private unfurlAssets(assets: Record<string, IsContentItem[]>) {
-    const allIdsByNameAssets: Map<string, string> = allIdsByName();
-    const allEntriesByIdAssets: Map<string, IsContentItem> = allContentById();
-
-    Object.keys(assets).forEach((subtype) => {
-      Object.values(assets[subtype]).forEach((entry) => {
-        entry.__type = subtype as ContentType;
-
-        if (allIdsByNameAssets.has(entry.name)) {
-          this.logger.warn(
-            'Content',
-            `"${entry.name}/${
-              entry.id
-            }" is a duplicate name to "${allIdsByNameAssets.get(
-              entry.name,
-            )}". Skipping...`,
-          );
-          return;
-        }
-
-        const dupe = allEntriesByIdAssets.get(entry.id);
-        if (dupe) {
-          this.logger.warn(
-            'Content',
-            `"${entry.name}/${entry.id}" is a duplicate id to "${dupe.name}/${dupe.id}". Skipping...`,
-          );
-          return;
-        }
-
-        if (!hasContentInitializer(entry)) {
-          this.logger.warn(`Content type ${entry.__type} has no initializer`);
-          return;
-        }
-
-        const cleanedEntry = ensureContent(entry);
-
-        allIdsByNameAssets.set(cleanedEntry.name, cleanedEntry.id);
-        allEntriesByIdAssets.set(cleanedEntry.id, cleanedEntry);
-      });
-    });
-
-    setAllIdsByName(allIdsByNameAssets);
-    setAllContentById(allEntriesByIdAssets);
   }
 }

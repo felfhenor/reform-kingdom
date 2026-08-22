@@ -91,3 +91,5 @@ npm run simulate -- --mode=<exhaustive|curated> --trials=<1> --tick-budget=<6000
 This will run the simulator to verify different parties and see how far they get. This will help make sure the game is playable with many different configurations of hero jobs. It will output a leaderboard as well as where each party gets stuck, if it does. A tick budget gives the party a certain amount of time to get to a certain place, and simulates a player playing for that length of time - 3600 ticks = 1 hour.
 
 ## Good-To-Knows
+
+- To see the above, visit `/debug`. It's much more easily digestible than a bunch of CLI scripts.
