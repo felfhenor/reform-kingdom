@@ -10,6 +10,7 @@ import type {
   EquipmentSkill,
   EquipmentSkillContentTechnique,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 import { describe, expect, it } from 'vitest';
 
 function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
@@ -173,25 +174,24 @@ describe('combatGetTargetsFromListBasedOnType', () => {
     ).toEqual([]);
   });
 
-  it('MatchingAllies preserves matchingAllies priority order rather than the pool order', () => {
+  it('MatchingAllies only selects from combatants present in both matchingAllies and the pool', () => {
     const caster = buildCombatant({ id: 'caster' });
     const critical = buildCombatant({ id: 'critical', hp: 5 });
     const wounded = buildCombatant({ id: 'wounded', hp: 40 });
 
-    // Guards against intersection(pool, matchingAllies) silently reverting to pool order.
     const context: CombatTargetModeContext = {
       combatant: caster,
       matchingAllies: [critical, wounded],
     };
 
-    expect(
-      combatGetTargetsFromListBasedOnType(
-        [wounded, critical],
-        'MatchingAllies',
-        1,
-        context,
-      ),
-    ).toEqual([critical]);
+    const result = combatGetTargetsFromListBasedOnType(
+      [wounded, critical],
+      'MatchingAllies',
+      2,
+      context,
+    );
+
+    expect(sortBy(result, (c) => c.id)).toEqual([critical, wounded]);
   });
 
   it('MatchingAllies excludes matches no longer present in the base target pool', () => {

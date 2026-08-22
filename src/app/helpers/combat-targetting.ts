@@ -150,7 +150,7 @@ export function combatGetTargetsFromListBasedOnType(
       Self: () => combatants.filter((c) => c === context?.combatant),
       SpecificHero: () =>
         combatants.filter((c) => c.id === context?.targetCharacterId),
-      // matchingAllies must be first - intersection() keeps its first arg's order.
+      // intersection() narrows matchingAllies down to combatants still in the pool.
       MatchingAllies: () =>
         sampleSize(
           intersection(context?.matchingAllies ?? [], combatants),
