@@ -24,3 +24,5 @@
   baseStats:
     Intelligence: 4.3
     Agility: 4.9
+  debuffResistances:
+    Stun: 5

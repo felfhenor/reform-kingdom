@@ -36,3 +36,5 @@
   baseStats:
     Vitality: 3.5
     Resistance: 6.2
+  debuffResistances:
+    Poison: 5

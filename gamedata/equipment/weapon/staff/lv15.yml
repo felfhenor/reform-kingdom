@@ -25,3 +25,5 @@
     Intelligence: 12.1
     Vitality: 9.1
     Resistance: 2.1
+  debuffResistances:
+    Poison: 4

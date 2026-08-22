@@ -28,6 +28,9 @@
           </div>
           @if (isInfusable(slot.content)) {
             <app-row-item-stats [stats]="slot.content.infusionStats!" />
+            <app-row-debuff-resistances
+              [resistances]="slot.content.infusionDebuffResistances"
+            />
           }
         </div>
       } @else {

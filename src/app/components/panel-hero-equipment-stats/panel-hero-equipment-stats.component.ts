@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
+import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
+import { characterTagResistances } from '@helpers/equipment';
 import {
   StatInformation,
   StatOrder,
@@ -12,7 +14,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-panel-hero-equipment-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconStatComponent, TippyDirective],
+  imports: [IconStatComponent, RowDebuffResistancesComponent, TippyDirective],
   host: {
     class: 'flex flex-col gap-2',
   },
@@ -24,6 +26,12 @@ export class PanelHeroEquipmentStatsComponent {
   public statKeys = StatOrder;
   public statShorthand = StatShorthand;
   public statInformation = StatInformation;
+
+  // Gear-only, same as the stats above - the temporary Astral Projector
+  // buff is combat-time only and intentionally not reflected here.
+  public resistances = computed(() =>
+    characterTagResistances(this.character()),
+  );
 
   public statValue(stat: BaseStat): number {
     return Math.round(this.character().stats[stat] * 10) / 10;

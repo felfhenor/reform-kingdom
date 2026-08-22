@@ -26,6 +26,7 @@ import { getEntry } from '@helpers/content';
 import {
   canInfuseEquipmentItem,
   equipmentItemInfusionBonus,
+  equipmentItemInfusionResistanceBonus,
   equipmentItemSlotCount,
   infusionMaterialCost,
   isInfusionMaterial,
@@ -69,6 +70,24 @@ const plainMaterial: ItemContent = {
   rarity: 'Common',
 };
 
+// Resistance-only material - no infusionStats at all, only infusionDebuffResistances.
+const spiritFlesh: ItemContent = {
+  id: 'spirit-flesh' as ItemId,
+  name: 'Spirit Flesh',
+  __type: 'item',
+  description: '',
+  sprite: '0031',
+  rarity: 'Common',
+  infusionDebuffResistances: {
+    Stun: 0,
+    StatDown: 2,
+    Accuracy: 0,
+    DamageOverTime: 0,
+    Poison: 0,
+    Burn: 0,
+  },
+};
+
 const sword: EquipmentContent = {
   id: 'sword' as EquipmentId,
   name: 'Sword',
@@ -101,6 +120,7 @@ function mockContentEntry(id: string) {
   if (id === crystal.id) return crystal;
   if (id === goldCoin.id || id === goldCoin.name) return goldCoin;
   if (id === plainMaterial.id) return plainMaterial;
+  if (id === spiritFlesh.id) return spiritFlesh;
   if (id === sword.id) return sword;
   return undefined;
 }
@@ -130,6 +150,34 @@ describe('Infusion Helper Functions', () => {
     it('returns zeroed stats for an empty array', () => {
       const bonus = equipmentItemInfusionBonus([]);
       expect(bonus.Strength).toBe(0);
+    });
+  });
+
+  describe('equipmentItemInfusionResistanceBonus', () => {
+    it('sums infusionDebuffResistances of every non-null slot', () => {
+      const bonus = equipmentItemInfusionResistanceBonus([
+        spiritFlesh.id,
+        spiritFlesh.id,
+      ]);
+      expect(bonus.StatDown).toBe(4);
+    });
+
+    it('skips null (empty) slots', () => {
+      const bonus = equipmentItemInfusionResistanceBonus([spiritFlesh.id, null]);
+      expect(bonus.StatDown).toBe(2);
+    });
+
+    it('skips ids that resolve to no content or no infusionDebuffResistances', () => {
+      const bonus = equipmentItemInfusionResistanceBonus([
+        'missing' as ItemId,
+        crystal.id,
+      ]);
+      expect(bonus.StatDown).toBe(0);
+    });
+
+    it('returns zeroed resistances for an empty array', () => {
+      const bonus = equipmentItemInfusionResistanceBonus([]);
+      expect(bonus.StatDown).toBe(0);
     });
   });
 
@@ -169,6 +217,26 @@ describe('Infusion Helper Functions', () => {
         }),
       ).toBe(false);
     });
+
+    it('is true when only infusionDebuffResistances has a nonzero value (no infusionStats at all)', () => {
+      expect(isInfusionMaterial(spiritFlesh)).toBe(true);
+    });
+
+    it('is false when infusionDebuffResistances is present but all zero', () => {
+      expect(
+        isInfusionMaterial({
+          ...plainMaterial,
+          infusionDebuffResistances: {
+            Stun: 0,
+            StatDown: 0,
+            Accuracy: 0,
+            DamageOverTime: 0,
+            Poison: 0,
+            Burn: 0,
+          },
+        }),
+      ).toBe(false);
+    });
   });
 
   describe('infusionMaterialCost', () => {
@@ -187,6 +255,19 @@ describe('Infusion Helper Functions', () => {
 
     it('costs 0 when the item has no infusionStats', () => {
       expect(infusionMaterialCost(plainMaterial.id)).toBe(0);
+    });
+
+    it('costs 100g per total resistance point for a resistance-only item', () => {
+      expect(infusionMaterialCost(spiritFlesh.id)).toBe(200);
+    });
+
+    it('sums both infusionStats (30g/point) and infusionDebuffResistances (100g/point) when an item has both', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        ...crystal,
+        infusionDebuffResistances: spiritFlesh.infusionDebuffResistances,
+      } as never);
+
+      expect(infusionMaterialCost(crystal.id)).toBe(30 + 200);
     });
   });
 
@@ -218,6 +299,10 @@ describe('Infusion Helper Functions', () => {
 
     it('rejects a material with no infusionStats', () => {
       expect(canInfuseEquipmentItem(swordItem, 0, plainMaterial.id)).toBe(false);
+    });
+
+    it('allows a resistance-only material (no infusionStats)', () => {
+      expect(canInfuseEquipmentItem(swordItem, 0, spiritFlesh.id)).toBe(true);
     });
 
     it('rejects when the player does not own the material', () => {

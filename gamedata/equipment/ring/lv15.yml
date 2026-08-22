@@ -35,3 +35,5 @@
   baseStats:
     Intelligence: 3.7
     Strength: 3.9
+  debuffResistances:
+    Stun: 4

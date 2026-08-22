@@ -3,6 +3,7 @@
 
   effectType: Debuff
   elements: [Fire]
+  tags: [DamageOverTime, Burn]
 
   trigger: TurnEnd
 
@@ -22,6 +23,7 @@
 
   effectType: Debuff
   elements: [Earth]
+  tags: [DamageOverTime, Poison]
 
   trigger: TurnEnd
 
@@ -43,6 +45,7 @@
 
   effectType: Debuff
   elements: [Earth]
+  tags: [DamageOverTime, Poison]
 
   trigger: TurnEnd
 

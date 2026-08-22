@@ -10,6 +10,26 @@ export type StatusEffectId = Branded<string, 'StatusEffectId'>;
 
 export type StatusEffectTrigger = 'TurnStart' | 'TurnEnd';
 
+// Categorizes what a status effect *does*, independent of its element, so
+// gear/infusions can grant resistance to a family of debuffs (e.g. every
+// stun-like effect) rather than one specific effect by id.
+export type StatusEffectTag =
+  | 'Stun'
+  | 'StatDown'
+  | 'Accuracy'
+  | 'DamageOverTime'
+  | 'Poison'
+  | 'Burn';
+
+export const StatusEffectTagLabel: Record<StatusEffectTag, string> = {
+  Stun: 'Stun',
+  StatDown: 'Stat Down',
+  Accuracy: 'Accuracy',
+  DamageOverTime: 'Damage over Time',
+  Poison: 'Poison',
+  Burn: 'Burn',
+};
+
 export type StatusEffectBehaviorType =
   | 'ModifyStatusEffectData'
   | 'AddDamageToStat'
@@ -84,6 +104,7 @@ export type StatusEffectContent = IsContentItem & {
 
   effectType: 'Buff' | 'Debuff';
   elements: GameElement[];
+  tags: StatusEffectTag[];
 
   trigger: StatusEffectTrigger;
 

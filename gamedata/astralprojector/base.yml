@@ -92,3 +92,22 @@
   requiredMaterials:
     - itemId: Gold Coin
       quantity: 500
+
+- id: 7c3d5a1b-9e4f-4b2a-8c6d-0f1e3a7b5d92
+  name: 'Ward: Fortitude of the Warden I'
+  globalEffectId: Fortitude of the Warden I
+
+  duration: 1800
+
+  requiredCollectibles:
+    - collectibleId: Ghost Orbs
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 2000
+
+    - itemId: Oozehide
+      quantity: 4
+
+    - itemId: Miremetal Ingot
+      quantity: 3

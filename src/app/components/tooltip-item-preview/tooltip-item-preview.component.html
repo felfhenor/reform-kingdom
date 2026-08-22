@@ -32,7 +32,18 @@
         </div>
 
         @if (item.stats) {
-          <app-row-item-stats [stats]="item.stats" [bonusStats]="bonusStats()" />
+          <app-row-item-stats
+            [stats]="item.stats"
+            [bonusStats]="bonusStats()"
+          />
+        }
+
+        @if (item.resistances) {
+          <app-row-debuff-resistances
+            class="block mt-2"
+            [resistances]="item.resistances"
+            [bonusResistances]="bonusResistances()"
+          />
         }
 
         <ng-content></ng-content>

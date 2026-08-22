@@ -4,8 +4,9 @@ import {
   defaultAffinities,
   defaultCombatStats,
   defaultStats,
+  defaultTagResistances,
 } from '@helpers/defaults';
-import { equippedItemTypes } from '@helpers/equipment';
+import { characterTagResistances, equippedItemTypes } from '@helpers/equipment';
 import { activeGlobalEffects } from '@helpers/global-effects';
 import { heroSkillsWithEquipment } from '@helpers/job';
 import { monsterStatsAtLevel } from '@helpers/monster';
@@ -20,6 +21,7 @@ import type {
   EquipmentSkillId,
   JobContent,
   MonsterContent,
+  StatusEffectTag,
 } from '@interfaces';
 
 function heroUsableSkillIds(
@@ -50,6 +52,23 @@ function applyActiveGainStatsEffects(combatant: Combatant): void {
 
       if (effectEntry.stat === 'Health') combatant.hp += effectEntry.value;
       if (effectEntry.stat === 'Energy') combatant.ep += effectEntry.value;
+    });
+  });
+}
+
+// Applied once at creation, same as `applyActiveGainStatsEffects` above -
+// the Astral Projector's DebuffResistance spells add a flat percent to
+// every tag, on top of whatever gear already grants.
+function applyActiveDebuffResistanceEffects(combatant: Combatant): void {
+  activeGlobalEffects().forEach((effect) => {
+    (effect.effects ?? []).forEach((effectEntry) => {
+      if (effectEntry.effectType !== 'DebuffResistance') return;
+
+      (Object.keys(combatant.tagResistance) as StatusEffectTag[]).forEach(
+        (tag) => {
+          combatant.tagResistance[tag] += effectEntry.value;
+        },
+      );
     });
   });
 }
@@ -92,6 +111,7 @@ export function combatantFromCharacter(character: Character): Combatant {
 
     affinity: defaultAffinities(),
     resistance: defaultAffinities(),
+    tagResistance: characterTagResistances(character),
 
     skillUses: {},
     statusEffects: [],
@@ -99,6 +119,7 @@ export function combatantFromCharacter(character: Character): Combatant {
   };
 
   applyActiveGainStatsEffects(combatant);
+  applyActiveDebuffResistanceEffects(combatant);
 
   return combatant;
 }
@@ -139,6 +160,7 @@ export function combatantFromMonster(
 
     affinity: defaultAffinities(),
     resistance: defaultAffinities(),
+    tagResistance: defaultTagResistances(),
 
     skillUses: {},
     statusEffects: [],

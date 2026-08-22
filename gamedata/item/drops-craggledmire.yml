@@ -16,5 +16,5 @@
 
   sprite: '0031'
 
-  infusionStats:
-    Resistance: 2
+  infusionDebuffResistances:
+    StatDown: 2

@@ -53,3 +53,12 @@
   effects:
     - effectType: GlobalXPGainMultiplier
       value: 0.1
+
+- id: 1a6f4a0e-2c53-4e2c-8e5f-5f2f2e4c8a19
+  name: Fortitude of the Warden I
+  sprite: '0009'
+  description: +10% resistance to all debuffs for all heroes.
+
+  effects:
+    - effectType: DebuffResistance
+      value: 10

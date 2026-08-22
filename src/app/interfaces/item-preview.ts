@@ -1,6 +1,7 @@
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
+import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { DropRarity } from '@interfaces/droppable';
 import type { StatBlock } from '@interfaces/stat';
 
@@ -22,6 +23,8 @@ export type ItemPreviewDisplay = {
   // Infusion stats for an item, base stats for equipment - undefined for a
   // collectible, or an item with no infusion stats to show.
   stats?: StatBlock;
+  // Same split as `stats`, for per-tag debuff resistance.
+  resistances?: Record<StatusEffectTag, number>;
   // Equipment only.
   levelRequirement?: number;
   // Equipment only - party hero names whose job can equip this item.

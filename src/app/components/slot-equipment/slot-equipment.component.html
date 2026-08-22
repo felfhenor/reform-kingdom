@@ -70,6 +70,12 @@
           [bonusStats]="infusionBonus()"
         />
 
+        <app-row-debuff-resistances
+          class="block mt-2"
+          [resistances]="content.debuffResistances"
+          [bonusResistances]="infusionResistanceBonus()"
+        />
+
         @if (content.slots > 0) {
           <div class="mt-2">
             <app-row-infused-materials

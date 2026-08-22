@@ -25,3 +25,5 @@
   baseStats:
     Strength: 7.3
     Agility: 7.3
+  debuffResistances:
+    StatDown: 3

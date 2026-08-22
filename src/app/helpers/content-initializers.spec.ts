@@ -2,8 +2,11 @@ import { ensureContent } from '@helpers/content-initializers';
 import type {
   EncounterContent,
   EncounterRandomContent,
+  EquipmentContent,
   EquipmentSkillContent,
   GatheringContent,
+  GlobalEffectContent,
+  ItemContent,
   JobContent,
   MonsterContent,
   RecipeContent,
@@ -239,6 +242,95 @@ describe('ensureContent', () => {
           combatStat: 'repeatActionChance',
           value: 5,
         },
+      ]);
+    });
+
+    it('filters invalid tags and defaults to an empty array when omitted', () => {
+      const withTags = ensureContent({
+        __type: 'statuseffect',
+        id: 'stopped',
+        name: 'Stopped',
+        tags: ['StatDown', 'Accuracy', 'NotARealTag'],
+      } as unknown as StatusEffectContent);
+      expect(withTags.tags).toEqual(['StatDown', 'Accuracy']);
+
+      const withoutTags = ensureContent({
+        __type: 'statuseffect',
+        id: 'empowered',
+        name: 'Empowered',
+      } as unknown as StatusEffectContent);
+      expect(withoutTags.tags).toEqual([]);
+    });
+  });
+
+  describe('equipment', () => {
+    it('fills in debuffResistances densely, defaulting unauthored tags to 0', () => {
+      const result = ensureContent({
+        __type: 'equipment',
+        id: 'oozemire-plate',
+        name: 'Oozemire Plate',
+        debuffResistances: { Poison: 6 },
+      } as unknown as EquipmentContent);
+
+      expect(result.debuffResistances).toEqual({
+        Stun: 0,
+        StatDown: 0,
+        Accuracy: 0,
+        DamageOverTime: 0,
+        Poison: 6,
+        Burn: 0,
+      });
+    });
+
+    it('defaults to all-zero debuffResistances when omitted', () => {
+      const result = ensureContent({
+        __type: 'equipment',
+        id: 'plain-sword',
+        name: 'Plain Sword',
+      } as unknown as EquipmentContent);
+
+      expect(result.debuffResistances).toEqual({
+        Stun: 0,
+        StatDown: 0,
+        Accuracy: 0,
+        DamageOverTime: 0,
+        Poison: 0,
+        Burn: 0,
+      });
+    });
+  });
+
+  describe('item', () => {
+    it('fills in infusionDebuffResistances densely, defaulting unauthored tags to 0', () => {
+      const result = ensureContent({
+        __type: 'item',
+        id: 'spirit-flesh',
+        name: 'Spirit Flesh',
+        infusionDebuffResistances: { StatDown: 2 },
+      } as unknown as ItemContent);
+
+      expect(result.infusionDebuffResistances).toEqual({
+        Stun: 0,
+        StatDown: 2,
+        Accuracy: 0,
+        DamageOverTime: 0,
+        Poison: 0,
+        Burn: 0,
+      });
+    });
+  });
+
+  describe('globaleffect', () => {
+    it('validates a DebuffResistance effect entry', () => {
+      const result = ensureContent({
+        __type: 'globaleffect',
+        id: 'fortitude-of-the-warden-i',
+        name: 'Fortitude of the Warden I',
+        effects: [{ effectType: 'DebuffResistance', value: 10 }],
+      } as unknown as GlobalEffectContent);
+
+      expect(result.effects).toEqual([
+        { effectType: 'DebuffResistance', value: 10 },
       ]);
     });
   });

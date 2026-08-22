@@ -16,7 +16,7 @@
 - id: 4b9d7e65-bcd4-424a-b363-c71803e26a4b
   name: Ghostwood Bow
   description: An ethereal bow made of finely-crafted ghostwood, said to hum with the whispers of the departed.
-  levelRequirement: 119
+  levelRequirement: 19
   rarity: Uncommon
   type: Bow
   sprite: '0108'

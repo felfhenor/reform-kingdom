@@ -161,7 +161,10 @@ describe('combatantFromCharacter', () => {
   it('includes a weapon-gated skill once the required weapon is equipped', () => {
     const combatant = combatantFromCharacter(
       buildCharacter({
-        equipment: { ...emptyEquipment, Weapon: { equipmentId: bow.id } },
+        equipment: {
+          ...emptyEquipment,
+          Weapon: { id: 'bow-1', equipmentId: bow.id, infusedItemIds: [] },
+        },
       }),
     );
 

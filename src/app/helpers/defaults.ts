@@ -9,6 +9,7 @@ import type {
   GameStateTradeskills,
   GatheringState,
   StatBlock,
+  StatusEffectTag,
   TravelState,
 } from '@interfaces';
 
@@ -125,6 +126,17 @@ export function defaultCombatStats(): CombatantCombatStats {
     healingIgnorePercent: 0,
     reviveChance: 0,
     stunChance: 0,
+  };
+}
+
+export function defaultTagResistances(): Record<StatusEffectTag, number> {
+  return {
+    Stun: 0,
+    StatDown: 0,
+    Accuracy: 0,
+    DamageOverTime: 0,
+    Poison: 0,
+    Burn: 0,
   };
 }
 

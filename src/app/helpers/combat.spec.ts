@@ -96,6 +96,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     combatStats: {} as never,
     resistance: {} as never,
     affinity: {} as never,
+    tagResistance: {} as never,
     skillIds: [],
     skillRefs: [],
     skillWeights: {},

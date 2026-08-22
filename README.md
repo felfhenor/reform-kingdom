@@ -72,6 +72,15 @@ npm run analyze:nodelevels -- --gap=<x>
 
 This will examine all encounterable nodes in the game and sort them by level, showing their map and any gaps in levels (default of 2).
 
+### Debuff Resistance
+
+```
+npm run analyze:debuffresistance
+npm run analyze:debuffresistance -- --gap=<x>
+```
+
+This will examine all debuffs and show if they have any resistance allocated to them, and at what levels, factoring in the specified level gap (default of 4).
+
 ### The Simulator
 
 ```

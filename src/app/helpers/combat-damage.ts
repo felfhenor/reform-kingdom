@@ -5,6 +5,7 @@ import { combatCombatantCombatStatValue } from '@helpers/combat-stats';
 import {
   combatApplyStatusEffectToTarget,
   combatCreateStatusEffect,
+  statusEffectTagResistance,
 } from '@helpers/combat-statuseffects';
 import { getEntry } from '@helpers/content';
 import { luckReducedChance, luckRollSucceeds } from '@helpers/luck';
@@ -226,12 +227,25 @@ export function combatApplySkillToTarget(
     if (!effectContent) return;
 
     const totalChance = skillTechniqueStatusEffectChance(skill, effData);
-    const resistedChance = luckReducedChance(
+    const luckAdjustedChance = luckReducedChance(
       totalChance,
       target.totalStats.Luck,
     );
 
-    if (!rngSucceedsChance(resistedChance)) return;
+    if (!rngSucceedsChance(luckAdjustedChance)) return;
+
+    // Independent second roll - gear resistance doesn't multiply into the
+    // LUK roll above, it's a separate chance to shrug the effect off.
+    const tagResistance = statusEffectTagResistance(target, effectContent.tags);
+
+    if (tagResistance > 0 && rngSucceedsChance(tagResistance)) {
+      combatMessageLog(
+        combat,
+        `**${effectContent.name}** is resisted by **${target.name}**!`,
+        target,
+      );
+      return;
+    }
 
     const statusEffect = combatCreateStatusEffect(
       effectContent,

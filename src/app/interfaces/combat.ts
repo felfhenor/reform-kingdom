@@ -7,7 +7,10 @@ import type {
   EquipmentSkill,
   EquipmentSkillId,
 } from '@interfaces/content-skill';
-import type { StatusEffect } from '@interfaces/content-statuseffect';
+import type {
+  StatusEffect,
+  StatusEffectTag,
+} from '@interfaces/content-statuseffect';
 import type { ElementBlock } from '@interfaces/element';
 import type { Branded } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
@@ -72,6 +75,7 @@ export type Combatant = HasAnimation & {
 
   resistance: ElementBlock;
   affinity: ElementBlock;
+  tagResistance: Record<StatusEffectTag, number>;
 
   skillIds: EquipmentSkillId[];
   skillRefs: EquipmentSkill[];

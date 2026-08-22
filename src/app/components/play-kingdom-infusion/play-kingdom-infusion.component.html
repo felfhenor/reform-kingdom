@@ -41,7 +41,7 @@
             @if (equippedContent) {
               <button
                 type="button"
-                class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 text-neutral-content text-left"
+                class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 text-neutral-content text-left ps-0"
                 [class.btn-active]="item?.id === equippedItem.id"
                 (click)="selectItem(equippedItem.id)"
               >
@@ -84,6 +84,12 @@
               <app-row-item-stats
                 [stats]="content.baseStats"
                 [bonusStats]="selectedItemBonus()"
+              />
+
+              <app-row-debuff-resistances
+                class="block mt-2"
+                [resistances]="content.debuffResistances"
+                [bonusResistances]="selectedItemResistanceBonus()"
               />
             </div>
           </div>
@@ -146,6 +152,12 @@
                           [stats]="entry.item.infusionStats!"
                           [layout]="'row'"
                           [maxDecimals]="1"
+                        />
+
+                        <app-row-debuff-resistances
+                          class="text-xs"
+                          [resistances]="entry.item.infusionDebuffResistances"
+                          [layout]="'row'"
                         />
                       </div>
 

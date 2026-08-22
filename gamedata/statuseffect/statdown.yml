@@ -3,6 +3,7 @@
 
   effectType: Debuff
   elements: [Earth]
+  tags: [StatDown]
 
   trigger: TurnEnd
 
@@ -26,6 +27,7 @@
 
   effectType: Debuff
   elements: [Earth]
+  tags: [StatDown]
 
   trigger: TurnEnd
 
@@ -49,6 +51,7 @@
 
   effectType: Debuff
   elements: [Water]
+  tags: [StatDown, Accuracy]
 
   trigger: TurnEnd
 
@@ -80,6 +83,7 @@
 
   effectType: Debuff
   elements: [Air]
+  tags: [StatDown, Accuracy]
 
   trigger: TurnEnd
 
@@ -111,6 +115,7 @@
 
   effectType: Debuff
   elements: [Earth]
+  tags: [Stun]
 
   trigger: TurnStart
 
@@ -129,6 +134,7 @@
 
   effectType: Debuff
   elements: [Earth]
+  tags: [Stun]
 
   trigger: TurnStart
 
@@ -147,6 +153,7 @@
 
   effectType: Debuff
   elements: [Air]
+  tags: [Stun]
 
   trigger: TurnStart
 
@@ -165,6 +172,7 @@
 
   effectType: Debuff
   elements: [Air]
+  tags: [StatDown, Accuracy]
 
   trigger: TurnEnd
 
@@ -194,8 +202,9 @@
 - id: 7392cbab-cf6c-44d7-8ce2-c9a869548504
   name: Trembling
 
-  type: Debuff
+  effectType: Debuff
   elements: [Earth]
+  tags: [Accuracy]
 
   trigger: TurnEnd
 
@@ -218,8 +227,9 @@
 - id: 473b3b78-9531-49db-9c60-11b2924cf34f
   name: Brittle I
 
-  type: Debuff
+  effectType: Debuff
   elements: [Water]
+  tags: [StatDown]
 
   trigger: TurnEnd
 
@@ -241,8 +251,9 @@
 - id: 46e3db32-3cb9-45b9-b506-01b5b0b1ce68
   name: Brittle II
 
-  type: Debuff
+  effectType: Debuff
   elements: [Water]
+  tags: [StatDown]
 
   trigger: TurnEnd
 
@@ -266,6 +277,7 @@
 
   effectType: Debuff
   elements: [Earth]
+  tags: [StatDown]
 
   trigger: TurnEnd
 

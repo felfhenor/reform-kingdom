@@ -1,15 +1,28 @@
-import {
-  combatApplySkillToTarget,
-  combatCombatantTakeDamage,
-} from '@helpers/combat-damage';
-import { combatantDamageEvents } from '@helpers/combat-damage-events';
+import type * as RngHelper from '@helpers/rng';
 import type {
   Combat,
   Combatant,
   EquipmentSkill,
   EquipmentSkillContentTechnique,
+  StatusEffectContent,
+  StatusEffectId,
 } from '@interfaces';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/content', () => ({ getEntry: vi.fn() }));
+
+vi.mock('@helpers/rng', async (importOriginal) => {
+  const actual = await importOriginal<typeof RngHelper>();
+  return { ...actual, rngSucceedsChance: vi.fn().mockReturnValue(false) };
+});
+
+import {
+  combatApplySkillToTarget,
+  combatCombatantTakeDamage,
+} from '@helpers/combat-damage';
+import { combatantDamageEvents } from '@helpers/combat-damage-events';
+import { getEntry } from '@helpers/content';
+import { rngSucceedsChance } from '@helpers/rng';
 
 function buildCombat(overrides: Partial<Combat> = {}): Combat {
   return {
@@ -61,6 +74,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     },
     resistance: {} as never,
     affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
+    tagResistance: {} as never,
     skillIds: [],
     skillRefs: [],
     skillWeights: {},
@@ -115,6 +129,11 @@ function buildTechnique(
     ...overrides,
   };
 }
+
+beforeEach(() => {
+  vi.mocked(rngSucceedsChance).mockClear();
+  vi.mocked(getEntry).mockClear();
+});
 
 describe('combatApplySkillToTarget defense', () => {
   it('mitigates a purely physical technique using only the target Vitality stat', () => {
@@ -319,5 +338,123 @@ describe('combatCombatantTakeDamage', () => {
     combatCombatantTakeDamage(hero, 0);
 
     expect(combatantDamageEvents()).toHaveLength(0);
+  });
+});
+
+describe('combatApplySkillToTarget status effect resistance', () => {
+  const stunEffect: StatusEffectContent = {
+    id: 'stun-effect' as StatusEffectId,
+    name: 'Test Stun',
+    __type: 'statuseffect',
+    effectType: 'Debuff',
+    elements: [],
+    tags: ['Stun'],
+    trigger: 'TurnStart',
+    onApply: [],
+    onTick: [],
+    onUnapply: [],
+    statScaling: {
+      Agility: 0,
+      Energy: 0,
+      Health: 0,
+      Intelligence: 0,
+      Luck: 0,
+      Resistance: 0,
+      Strength: 0,
+      Vitality: 0,
+    },
+    useTargetStats: false,
+  };
+
+  beforeEach(() => {
+    vi.mocked(getEntry).mockReturnValue(stunEffect as never);
+  });
+
+  function runWithStunTechnique(target: Combatant): Combatant {
+    const attacker = buildCombatant({ id: 'attacker' });
+    const skill = buildSkill();
+    // damageScaling all zero -> baseDamage is 0, so no crit/dodge roll
+    // happens before the status effect block - rngSucceedsChance calls
+    // below come only from the resist rolls under test.
+    const technique = buildTechnique({
+      statusEffects: [
+        { statusEffectId: stunEffect.id, chance: 60, duration: 3 },
+      ],
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      skill,
+      technique,
+    );
+
+    return target;
+  }
+
+  it('resists via LUK alone - the gear roll never runs', () => {
+    vi.mocked(rngSucceedsChance).mockReturnValueOnce(false);
+
+    const target = buildCombatant({ id: 'target' });
+    runWithStunTechnique(target);
+
+    expect(target.statusEffects).toHaveLength(0);
+    expect(rngSucceedsChance).toHaveBeenCalledTimes(1);
+    expect(rngSucceedsChance).toHaveBeenCalledWith(60);
+  });
+
+  it('resists via gear after the LUK roll already succeeded - two independent rolls', () => {
+    vi.mocked(rngSucceedsChance)
+      .mockReturnValueOnce(true) // LUK roll: not resisted
+      .mockReturnValueOnce(true); // gear roll: resisted
+
+    const target = buildCombatant({
+      id: 'target',
+      tagResistance: { Stun: 25 } as never,
+    });
+    runWithStunTechnique(target);
+
+    expect(target.statusEffects).toHaveLength(0);
+    expect(rngSucceedsChance).toHaveBeenCalledTimes(2);
+    expect(rngSucceedsChance).toHaveBeenNthCalledWith(1, 60);
+    expect(rngSucceedsChance).toHaveBeenNthCalledWith(2, 25);
+  });
+
+  it('applies the effect when neither roll resists it', () => {
+    vi.mocked(rngSucceedsChance)
+      .mockReturnValueOnce(true) // LUK roll: not resisted
+      .mockReturnValueOnce(false); // gear roll: not resisted
+
+    const target = buildCombatant({
+      id: 'target',
+      tagResistance: { Stun: 25 } as never,
+    });
+    runWithStunTechnique(target);
+
+    expect(target.statusEffects).toHaveLength(1);
+    // A 3rd call happens once the effect is actually applied - the
+    // pre-existing, unrelated `debuffIgnoreChance` full-negation roll in
+    // `combatApplyStatusEffectToTarget` (0% here, so it doesn't fire).
+    expect(rngSucceedsChance).toHaveBeenCalledTimes(3);
+    expect(rngSucceedsChance).toHaveBeenNthCalledWith(1, 60);
+    expect(rngSucceedsChance).toHaveBeenNthCalledWith(2, 25);
+  });
+
+  it('skips the gear roll entirely when the target has no resistance to the effect\'s tags', () => {
+    vi.mocked(rngSucceedsChance).mockReturnValueOnce(true); // LUK roll: not resisted
+
+    const target = buildCombatant({
+      id: 'target',
+      tagResistance: { Stun: 0 } as never,
+    });
+    runWithStunTechnique(target);
+
+    expect(target.statusEffects).toHaveLength(1);
+    // Only 2 calls, not 3 - proves the gear roll (guarded by
+    // `tagResistance > 0`) was skipped, leaving just the LUK roll plus the
+    // unrelated downstream `debuffIgnoreChance` roll.
+    expect(rngSucceedsChance).toHaveBeenCalledTimes(2);
+    expect(rngSucceedsChance).toHaveBeenNthCalledWith(1, 60);
   });
 });

@@ -7,10 +7,14 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { getEntry } from '@helpers/content';
-import { equipmentItemInfusionBonus } from '@helpers/infusion';
+import {
+  equipmentItemInfusionBonus,
+  equipmentItemInfusionResistanceBonus,
+} from '@helpers/infusion';
 import {
   EquipmentTypeToSlot,
   type EquipmentContent,
@@ -28,6 +32,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotIconBlankComponent,
     RowInfusedMaterialsComponent,
     RowItemStatsComponent,
+    RowDebuffResistancesComponent,
     TippyDirective,
   ],
   templateUrl: './slot-equipment.component.html',
@@ -49,6 +54,12 @@ export class SlotEquipmentComponent {
 
   public infusionBonus = computed(() =>
     equipmentItemInfusionBonus(this.equippedItem()?.infusedItemIds ?? []),
+  );
+
+  public infusionResistanceBonus = computed(() =>
+    equipmentItemInfusionResistanceBonus(
+      this.equippedItem()?.infusedItemIds ?? [],
+    ),
   );
 
   // The paperdoll slots this piece of gear occupies (e.g. a two-handed

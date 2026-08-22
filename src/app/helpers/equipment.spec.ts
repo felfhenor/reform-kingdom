@@ -29,9 +29,11 @@ import { getEntry } from '@helpers/content';
 import {
   canEquipItem,
   canModifyEquipment,
+  characterTagResistances,
   equipmentAvailableForSlot,
   equipmentGrantedSkillIds,
   equipmentStatTotals,
+  equipmentTagResistanceTotals,
   equippedItems,
   equippedItemsByPrimarySlot,
   equippedItemTypes,
@@ -229,6 +231,117 @@ describe('Equipment Helper Functions', () => {
       });
 
       expect(totals.Strength).toBe(sword.baseStats.Strength + 2);
+    });
+  });
+
+  describe('equipmentTagResistanceTotals', () => {
+    const zeroResistances = {
+      Stun: 0,
+      StatDown: 0,
+      Accuracy: 0,
+      DamageOverTime: 0,
+      Poison: 0,
+      Burn: 0,
+    };
+
+    it('should return zeroed resistances when nothing is equipped', () => {
+      expect(equipmentTagResistanceTotals(emptyEquipment)).toEqual(
+        zeroResistances,
+      );
+      expect(getEntry).not.toHaveBeenCalled();
+    });
+
+    it('should sum debuffResistances across all equipped slots', () => {
+      const poisonHelmet = {
+        ...helmet,
+        debuffResistances: { ...zeroResistances, Poison: 5 },
+      };
+      const stunSword = {
+        ...sword,
+        debuffResistances: { ...zeroResistances, Stun: 3 },
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === 'sword' ? stunSword : poisonHelmet) as never,
+      );
+
+      const totals = equipmentTagResistanceTotals({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(sword.id),
+        Helmet: mockEquipmentItem(helmet.id),
+      });
+
+      expect(totals).toEqual({ ...zeroResistances, Stun: 3, Poison: 5 });
+    });
+
+    it('should additively stack the same tag across multiple equipped items', () => {
+      const poisonHelmet = {
+        ...helmet,
+        debuffResistances: { ...zeroResistances, Poison: 5 },
+      };
+      const poisonSword = {
+        ...sword,
+        debuffResistances: { ...zeroResistances, Poison: 3 },
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === 'sword' ? poisonSword : poisonHelmet) as never,
+      );
+
+      const totals = equipmentTagResistanceTotals({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(sword.id),
+        Helmet: mockEquipmentItem(helmet.id),
+      });
+
+      expect(totals.Poison).toBe(8);
+    });
+
+    it('adds each equipped item\'s infusion resistance bonus on top of its debuffResistances', () => {
+      const spiritFlesh = {
+        id: 'spirit-flesh' as never,
+        name: 'Spirit Flesh',
+        __type: 'item',
+        description: '',
+        sprite: '0000',
+        rarity: 'Common',
+        infusionDebuffResistances: { ...zeroResistances, StatDown: 2 },
+      };
+      const statDownSword = {
+        ...sword,
+        debuffResistances: { ...zeroResistances, StatDown: 3 },
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === 'sword'
+          ? statDownSword
+          : id === 'spirit-flesh'
+            ? spiritFlesh
+            : undefined) as never,
+      );
+
+      const totals = equipmentTagResistanceTotals({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          infusedItemIds: ['spirit-flesh' as never],
+        },
+      });
+
+      expect(totals.StatDown).toBe(5);
+    });
+  });
+
+  describe('characterTagResistances', () => {
+    it('delegates to equipmentTagResistanceTotals with the character\'s equipment', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      const character = { equipment: emptyEquipment } as Character;
+      expect(characterTagResistances(character)).toEqual({
+        Stun: 0,
+        StatDown: 0,
+        Accuracy: 0,
+        DamageOverTime: 0,
+        Poison: 0,
+        Burn: 0,
+      });
     });
   });
 

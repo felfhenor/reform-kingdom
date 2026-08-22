@@ -9,6 +9,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
@@ -18,6 +19,7 @@ import { equippedItemsByPrimarySlot } from '@helpers/equipment';
 import {
   canInfuseEquipmentItem,
   equipmentItemInfusionBonus,
+  equipmentItemInfusionResistanceBonus,
   infusionMaterialCost,
   isInfusionMaterial,
 } from '@helpers/infusion';
@@ -48,6 +50,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     IconJobComponent,
     RowInfusedMaterialsComponent,
     RowItemStatsComponent,
+    RowDebuffResistancesComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
   ],
@@ -87,6 +90,12 @@ export class PlayKingdomInfusionComponent {
 
   public selectedItemBonus = computed(() =>
     equipmentItemInfusionBonus(this.selectedItem()?.infusedItemIds ?? []),
+  );
+
+  public selectedItemResistanceBonus = computed(() =>
+    equipmentItemInfusionResistanceBonus(
+      this.selectedItem()?.infusedItemIds ?? [],
+    ),
   );
 
   // Owned materials that can be infused - shown once a slot is picked.

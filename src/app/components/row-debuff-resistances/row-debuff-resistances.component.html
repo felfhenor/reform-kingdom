@@ -1,0 +1,29 @@
+<div
+  class="flex gap-2"
+  [class.flex-col]="layout() === 'column'"
+  [class.flex-row]="layout() === 'row'"
+  [class.flex-wrap]="layout() === 'row'"
+  [class.gap-x-3]="layout() === 'row'"
+>
+  @for (tag of baseRows(); track tag) {
+    <div>
+      @if (layout() === 'row') {
+        {{ tagLabel[tag] }} Resist {{ baseValue(tag) | statDisplay }}%
+      } @else {
+        {{ baseValue(tag) | statDisplay }}% resistance to
+        {{ tagLabel[tag] }}
+      }
+    </div>
+  }
+
+  @for (tag of bonusRows(); track tag) {
+    <div class="text-green-400">
+      @if (layout() === 'row') {
+        {{ tagLabel[tag] }} {{ bonusValue(tag) | statDisplay }}%
+      } @else {
+        {{ bonusValue(tag) | statDisplay }}% resistance to
+        {{ tagLabel[tag] }}
+      }
+    </div>
+  }
+</div>

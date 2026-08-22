@@ -36,13 +36,18 @@ export function itemPreviewDisplay(
     return {
       ...base,
       stats: content.baseStats,
+      resistances: content.debuffResistances,
       levelRequirement: content.levelRequirement,
       equippableHeroNames: equippableHeroNames(content),
     };
   }
 
   if ('infusionStats' in content) {
-    return { ...base, stats: content.infusionStats };
+    return {
+      ...base,
+      stats: content.infusionStats,
+      resistances: content.infusionDebuffResistances,
+    };
   }
 
   return base;

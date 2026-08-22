@@ -2,6 +2,7 @@ import {
   defaultAffinities,
   defaultCombatStats,
   defaultStats,
+  defaultTagResistances,
 } from '@helpers/defaults';
 import type {
   AstralProjectorContent,
@@ -50,6 +51,7 @@ import type {
   GatheringId,
   GlobalEffectContent,
   GlobalEffectEffect,
+  GlobalEffectEffectDebuffResistance,
   GlobalEffectEffectGainStats,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -76,6 +78,7 @@ import type {
   StatusEffectBehaviorType,
   StatusEffectContent,
   StatusEffectId,
+  StatusEffectTag,
   TradeskillContent,
   TradeskillId,
   TradeskillLevelRequirementContent,
@@ -110,6 +113,9 @@ const initializers: Record<ContentType, (entry: any) => any> = {
 };
 
 const VALID_GAME_ELEMENTS = Object.keys(defaultAffinities()) as GameElement[];
+const VALID_STATUS_EFFECT_TAGS = Object.keys(
+  defaultTagResistances(),
+) as StatusEffectTag[];
 const VALID_GAME_STATS = Object.keys(defaultStats()) as GameStat[];
 const VALID_COMBAT_STATS = Object.keys(
   defaultCombatStats(),
@@ -143,6 +149,12 @@ const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
 
 function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
   return Object.assign({}, defaultStats(), statblock);
+}
+
+function ensureTagResistances(
+  resistances: Partial<Record<StatusEffectTag, number>> = {},
+): Record<StatusEffectTag, number> {
+  return Object.assign({}, defaultTagResistances(), resistances);
 }
 
 // `ensureItemFn` is typed with `any` so every concrete `ensure*` helper can
@@ -192,6 +204,9 @@ function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     description: item.description ?? 'UNKNOWN',
     sprite: item.sprite ?? 'UNKNOWN',
     infusionStats: ensureStats(item.infusionStats),
+    infusionDebuffResistances: ensureTagResistances(
+      item.infusionDebuffResistances,
+    ),
     unobtainable: item.unobtainable ?? false,
   };
 }
@@ -423,6 +438,7 @@ function ensureEquipment(
     rarity: equipment.rarity ?? 'Common',
     description: equipment.description ?? 'UNKNOWN',
     baseStats: ensureStats(equipment.baseStats),
+    debuffResistances: ensureTagResistances(equipment.debuffResistances),
     sprite: equipment.sprite ?? 'UNKNOWN',
     type: equipment.type ?? 'Accessory',
     // Defaults to 0, not 1 - infusion slots must always be explicitly
@@ -576,6 +592,7 @@ function ensureStatusEffect(
     __type: 'statuseffect',
     effectType: effect.effectType ?? 'Buff',
     elements: ensureEnumArray(effect.elements, VALID_GAME_ELEMENTS),
+    tags: ensureEnumArray(effect.tags, VALID_STATUS_EFFECT_TAGS),
     trigger: effect.trigger ?? 'TurnStart',
     onApply: ensureArray(effect.onApply, ensureStatusEffectBehavior),
     onTick: ensureArray(effect.onTick, ensureStatusEffectBehavior),
@@ -587,10 +604,15 @@ function ensureStatusEffect(
 
 function ensureGlobalEffectEffect(
   effect: Partial<GlobalEffectEffectGainStats> &
-    Partial<GlobalEffectEffectXPGainMultiplier> = {},
+    Partial<GlobalEffectEffectXPGainMultiplier> &
+    Partial<GlobalEffectEffectDebuffResistance> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'DebuffResistance') {
+    return { effectType: 'DebuffResistance', value: effect.value ?? 0 };
   }
 
   return {

@@ -11,7 +11,10 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { equipmentSellValue } from '@helpers/armory';
-import { equipmentItemInfusionBonus } from '@helpers/infusion';
+import {
+  equipmentItemInfusionBonus,
+  equipmentItemInfusionResistanceBonus,
+} from '@helpers/infusion';
 import { itemPreviewDisplay } from '@helpers/item-preview';
 import { goldCoinId } from '@helpers/materials';
 import type { EquipmentContent, EquipmentItem } from '@interfaces';
@@ -47,6 +50,10 @@ export class SlotArmoryItemComponent {
 
   public infusionBonus = computed(() =>
     equipmentItemInfusionBonus(this.equipmentItem().infusedItemIds),
+  );
+
+  public infusionResistanceBonus = computed(() =>
+    equipmentItemInfusionResistanceBonus(this.equipmentItem().infusedItemIds),
   );
 
   public sellValue = computed(() =>

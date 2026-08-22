@@ -16,6 +16,7 @@ import type {
   StatusEffectBehaviorTakeStat,
   StatusEffectBehaviorType,
   StatusEffectContent,
+  StatusEffectTag,
   StatusEffectTakeCombatStatNumber,
   StatusEffectTrigger,
 } from '@interfaces/content-statuseffect';
@@ -24,6 +25,17 @@ import { isNumber, sumBy } from 'es-toolkit/compat';
 
 export function combatCanTakeTurn(combatant: Combatant): boolean {
   return !combatant.statusEffectData.isFrozen;
+}
+
+// The highest resistance the combatant has across any of the effect's tags,
+// not a sum - stacking multiple tag bonuses on one multi-tag effect would
+// let unrelated gear combine into near-guaranteed immunity.
+export function statusEffectTagResistance(
+  combatant: Combatant,
+  tags: StatusEffectTag[],
+): number {
+  if (tags.length === 0) return 0;
+  return Math.max(0, ...tags.map((tag) => combatant.tagResistance?.[tag] ?? 0));
 }
 
 function statusEffectDamage(effect: StatusEffect): number {

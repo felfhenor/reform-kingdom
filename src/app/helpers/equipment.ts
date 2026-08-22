@@ -1,8 +1,11 @@
 import { armoryGet } from '@helpers/armory';
 import { currentCombat } from '@helpers/combat';
 import { getEntry } from '@helpers/content';
-import { defaultStats } from '@helpers/defaults';
-import { equipmentItemInfusionBonus } from '@helpers/infusion';
+import { defaultStats, defaultTagResistances } from '@helpers/defaults';
+import {
+  equipmentItemInfusionBonus,
+  equipmentItemInfusionResistanceBonus,
+} from '@helpers/infusion';
 import { rngUuid } from '@helpers/rng';
 import {
   EquipmentTypeToSlot,
@@ -20,6 +23,7 @@ import {
   type JobContent,
   type JobId,
   type StatBlock,
+  type StatusEffectTag,
 } from '@interfaces';
 import { orderBy, uniq } from 'es-toolkit/compat';
 
@@ -161,6 +165,36 @@ export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
   });
 
   return totals;
+}
+
+// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
+export function equipmentTagResistanceTotals(
+  equipment: EquipmentBlock,
+): Record<StatusEffectTag, number> {
+  const totals = defaultTagResistances();
+
+  equippedItems(equipment).forEach((item) => {
+    const content = getEntry<EquipmentContent>(item.equipmentId);
+    if (!content) return;
+
+    const infusionBonus = equipmentItemInfusionResistanceBonus(
+      item.infusedItemIds,
+    );
+
+    (Object.keys(totals) as StatusEffectTag[]).forEach((tag) => {
+      totals[tag] += (content.debuffResistances?.[tag] ?? 0) + infusionBonus[tag];
+    });
+  });
+
+  return totals;
+}
+
+// Computed on demand (not baked into persisted `Character.stats`, which is
+// a fixed 8-key `StatBlock` shape unrelated to this keyspace).
+export function characterTagResistances(
+  character: Character,
+): Record<StatusEffectTag, number> {
+  return equipmentTagResistanceTotals(character.equipment);
 }
 
 // Merging these into known skills is handled separately (see `mergeGrantedSkills`/`heroSkillsWithEquipment`), which needs skill content, not just ids.

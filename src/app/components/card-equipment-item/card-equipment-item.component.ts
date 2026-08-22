@@ -8,11 +8,15 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
+import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { defaultStats } from '@helpers/defaults';
 import { getEntry } from '@helpers/content';
-import { equipmentItemInfusionBonus } from '@helpers/infusion';
+import {
+  equipmentItemInfusionBonus,
+  equipmentItemInfusionResistanceBonus,
+} from '@helpers/infusion';
 import {
   StatShorthand,
   type BaseStat,
@@ -33,6 +37,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
     IconStatComponent,
     RowInfusedMaterialsComponent,
     RowItemStatsComponent,
+    RowDebuffResistancesComponent,
     StatDisplayPipe,
     TippyDirective,
   ],
@@ -52,6 +57,10 @@ export class CardEquipmentItemComponent {
 
   public infusionBonus = computed(() =>
     equipmentItemInfusionBonus(this.equipmentItem().infusedItemIds),
+  );
+
+  public infusionResistanceBonus = computed(() =>
+    equipmentItemInfusionResistanceBonus(this.equipmentItem().infusedItemIds),
   );
 
   // Stats shown on the row itself - only what this item actually boosts,
