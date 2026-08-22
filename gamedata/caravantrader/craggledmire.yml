@@ -1,0 +1,67 @@
+- id: 0a72a5ee-8c33-49be-abdf-52888c3dec44
+  name: Aguro
+  description: Heroes! Buy orc goods!
+  category: Orcwell
+  level: 13
+
+  trades:
+    # unique to this trader
+    - type: sell
+      value: 15000
+      collectibleId: Golden Orc Skull
+      weight: 5
+
+    # base game items
+    - type: sell
+      value: 350
+      itemId: Mirewood
+      limit: 50
+      weight: 2
+
+    - type: buy
+      value: 500
+      itemId: Ghostwood
+      limit: 50
+      weight: 2
+
+    - type: sell
+      value: 450
+      itemId: Mireweed
+      limit: 50
+      weight: 2
+
+    - type: buy
+      value: 600
+      itemId: Mirethread
+      limit: 50
+      weight: 2
+
+    - type: sell
+      value: 550
+      itemId: Miremetal Ore
+      limit: 50
+      weight: 2
+
+    - type: buy
+      value: 750
+      itemId: Miremetal Ingot
+      limit: 50
+      weight: 2
+
+    - type: sell
+      value: 1000
+      itemId: Spirit Flesh
+      limit: 10
+      weight: 1
+
+    - type: sell
+      value: 900
+      itemId: Oozehide
+      limit: 10
+      weight: 1
+
+    - type: buy
+      value: 5150
+      itemId: Ghost Peridot
+      limit: 5
+      weight: 1

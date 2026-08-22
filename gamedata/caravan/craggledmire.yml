@@ -1,0 +1,17 @@
+- id: 177cce85-f602-48df-892f-db2c45f3a00f
+  name: Orcwell Trading Group - Craggled Mire
+  description: The Craggled Mire branch of the Orcwell Trading Group traders.
+
+  traderResetTime: 3600
+
+  level:
+    min: 5
+    max: 15
+
+  markupPercentages:
+    sell: 15
+    buy: -10
+
+  traderCategories:
+    - Carrina
+    - Orcwell

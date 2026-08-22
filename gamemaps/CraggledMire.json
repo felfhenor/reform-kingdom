@@ -411,6 +411,19 @@
                  "width":64,
                  "x":1280,
                  "y":704
+                }, 
+                {
+                 "gid":407,
+                 "height":64,
+                 "id":151,
+                 "name":"Orcwell Trading Group - Craggled Mire",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"CaravanNode",
+                 "visible":true,
+                 "width":64,
+                 "x":768,
+                 "y":1024
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -419,7 +432,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":151,
+ "nextobjectid":152,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

@@ -5,8 +5,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { SlotCaravanTradeComponent } from '@components/slot-caravan-trade/slot-caravan-trade.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { SlotCaravanTradeComponent } from '@components/slot-caravan-trade/slot-caravan-trade.component';
 import {
   caravanState,
   caravanTicksUntilReset,
@@ -118,7 +118,9 @@ export class ModalCaravanTradeComponent {
     if (row.maxQuantity === 1) {
       const swal = this.confirmSwal();
       if (!swal) return;
-      swal.swalOptions = { text: `${verb} ${name} for ${row.price}g?` };
+      swal.swalOptions = {
+        text: `${verb} ${name} for ${row.price.toLocaleString()}g?`,
+      };
       swal.fire();
       return;
     }
@@ -126,7 +128,7 @@ export class ModalCaravanTradeComponent {
     const swal = this.quantitySwal();
     if (!swal) return;
     swal.swalOptions = {
-      text: `How many ${name} would you like to ${verb.toLowerCase()}? (${row.price}g each)`,
+      text: `How many ${name} would you like to ${verb.toLowerCase()}? (${row.price.toLocaleString()}g each)`,
       inputValue: 1,
       inputAttributes: { min: '0', max: `${row.maxQuantity}` },
     };
