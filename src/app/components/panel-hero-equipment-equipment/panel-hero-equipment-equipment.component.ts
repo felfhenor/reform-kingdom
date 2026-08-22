@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
 import {
   characterEquipFromArmory,
@@ -16,6 +17,7 @@ import {
 import { getEntry } from '@helpers/content';
 import {
   canEquipItem,
+  canModifyEquipment,
   equipmentAvailableForSlot,
   isSlotAvailableForJob,
 } from '@helpers/equipment';
@@ -27,6 +29,7 @@ import type {
   EquipmentItemId,
   EquipmentSlot,
 } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 const PAPERDOLL_ROWS: EquipmentSlot[][] = [
   ['Helmet', 'Accessory'],
@@ -42,6 +45,8 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
     SlotEquipmentComponent,
     CardEquipmentItemComponent,
     ScrollingModule,
+    IconComponent,
+    TippyDirective,
   ],
   host: {
     class: 'contents',
@@ -55,6 +60,9 @@ export class PanelHeroEquipmentEquipmentComponent {
   public paperdollRows = PAPERDOLL_ROWS;
 
   public selectedSlot = signal<EquipmentSlot | undefined>(undefined);
+
+  // Gear can't be swapped mid-fight; drives disabling the picker/unequip UI and the header warning icon.
+  public equipmentModifiable = computed(() => canModifyEquipment());
 
   // Ineligible items are filtered out, not shown disabled. One entry per owned instance (not deduped) so distinct copies stay pickable.
   public pickerItems = computed<EquipmentArmoryEntry[]>(() => {

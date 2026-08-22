@@ -11,6 +11,11 @@
   @apply flex items-center gap-3 w-full h-[96px] px-2 text-left cursor-pointer rounded overflow-hidden;
 }
 
+// Not the native `disabled` attribute - see onEquipClick(), which keeps hover/tooltip working while blocking the click.
+.equipment-item-row-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
 .equipment-item-row-icon {
   @apply relative shrink-0;
 }

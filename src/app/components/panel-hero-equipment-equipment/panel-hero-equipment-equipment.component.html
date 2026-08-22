@@ -1,13 +1,26 @@
 @let selected = selectedSlot();
 @let selectedContent = selectedSlotContent();
 @let items = pickerItems();
+@let modifiable = equipmentModifiable();
 
 <div class="flex flex-col gap-4 items-center overflow-y-auto">
   <div class="flex items-center justify-between w-full">
-    <span class="font-semibold text-xl">Equipment</span>
+    <span class="font-semibold text-xl flex items-center gap-2">
+      Equipment
+      @if (!modifiable) {
+        <app-icon
+          name="gameCrossedSwords"
+          size="1.1em"
+          class="text-error"
+          [tp]="'Equipment cannot be changed during combat.'"
+          [tpPlacement]="'right'"
+        />
+      }
+    </span>
     <button
       type="button"
       class="btn btn-xs btn-primary"
+      [disabled]="!modifiable"
       (click)="optimizeEquipment()"
     >
       Optimize Equipment
@@ -41,6 +54,7 @@
         <button
           type="button"
           class="btn btn-xs btn-warning"
+          [disabled]="!modifiable"
           (click)="unequip(selected)"
         >
           Unequip
@@ -58,6 +72,7 @@
             [equipment]="entry.content"
             [equipmentItem]="entry.item"
             [comparisonStats]="selectedContent?.baseStats"
+            [disabled]="!modifiable"
             (equip)="equip(entry.item.id)"
           />
         </div>

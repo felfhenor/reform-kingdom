@@ -48,6 +48,7 @@ export class CardEquipmentItemComponent {
   public equipment = input.required<EquipmentContent>();
   public equipmentItem = input.required<EquipmentItem>();
   public comparisonStats = input<StatBlock>();
+  public disabled = input<boolean>(false);
 
   public equip = output<void>();
 
@@ -80,4 +81,11 @@ export class CardEquipmentItemComponent {
       )
       .filter((skill): skill is EquipmentSkillContent => !!skill),
   );
+
+  // Blocked by click rather than the native `disabled` attribute, so the stat-comparison
+  // tooltip stays available for inspection (e.g. planning swaps) while equipping is locked.
+  public onEquipClick(): void {
+    if (this.disabled()) return;
+    this.equip.emit();
+  }
 }

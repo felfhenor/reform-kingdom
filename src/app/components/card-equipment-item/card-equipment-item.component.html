@@ -3,9 +3,11 @@
 <button
   type="button"
   class="equipment-item-row hover:bg-base-300"
+  [class.equipment-item-row-disabled]="disabled()"
+  [attr.aria-disabled]="disabled() ? true : null"
   [tp]="tooltip"
   [tpPlacement]="'right'"
-  (click)="equip.emit()"
+  (click)="onEquipClick()"
 >
   <span
     class="equipment-item-row-icon outline-2 outline-offset-[-2px] rounded outline-{{
