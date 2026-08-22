@@ -40,7 +40,7 @@
   rarity: Common
   levelRequirement: 17
   type: Accessory
-  sprite: '0081'
+  sprite: '0099'
   slots: 1
   baseStats:
     Strength: 2.1

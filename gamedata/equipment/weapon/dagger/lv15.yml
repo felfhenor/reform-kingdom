@@ -19,7 +19,7 @@
   levelRequirement: 18
   rarity: Uncommon
   type: Dagger
-  sprite: '0085'
+  sprite: '0091'
   slots: 1
   baseStats:
     Intelligence: 4.3

@@ -131,7 +131,7 @@
 - id: 5cdc1987-d5e7-4de3-99ee-17ee9cda40d5
   name: 'Equipment: Golden Miremetal Pristine Ring'
   result:
-    equipmentId: Golden Miremetal Ghost Peridot Ring
+    equipmentId: Golden Miremetal Pristine Ring
 
   requirements:
     - itemId: Miremetal Ingot

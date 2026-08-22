@@ -161,7 +161,7 @@
   craftTime: 1800
 
 - id: 760761df-6376-4188-92e3-74649e6c12b4
-  name: 'Equipment: Ghostwood Bow'
+  name: 'Weapon: Ghostwood Bow'
   result:
     equipmentId: Ghostwood Bow
 
