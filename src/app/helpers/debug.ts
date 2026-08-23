@@ -11,6 +11,7 @@ import {
 import { isRecipeDropGated, recipeDiscover } from '@helpers/recipes';
 import {
   TRADESKILL_MAX_LEVEL,
+  tradeskillBuildingIn,
   tradeskillIdForName,
   tradeskillXpForLevel,
 } from '@helpers/tradeskill';
@@ -135,7 +136,7 @@ export function debugSetTradeskillLevel(
 
   updateGamestate((state) => {
     state.tradeskills[tradeskillId] = {
-      ...state.tradeskills[tradeskillId],
+      ...tradeskillBuildingIn(state, tradeskillId),
       level: clampedLevel,
       xp: { current: 0, maximum: tradeskillXpForLevel(clampedLevel) },
     };

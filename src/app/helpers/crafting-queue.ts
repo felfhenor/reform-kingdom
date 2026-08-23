@@ -25,6 +25,7 @@ import { updateGamestate } from '@helpers/state-game';
 import {
   craftXpChance,
   tradeskillBuilding,
+  tradeskillBuildingIn,
   tradeskillGainXp,
   tradeskillIdForName,
   tradeskillMaxQueueSize,
@@ -215,9 +216,10 @@ export function craftQueueStart(
       ticksIntoCraft: 0,
     };
 
+    const building = tradeskillBuildingIn(state, tradeskillId);
     state.tradeskills[tradeskillId] = {
-      ...state.tradeskills[tradeskillId],
-      queue: [...state.tradeskills[tradeskillId].queue, entry],
+      ...building,
+      queue: [...building.queue, entry],
     };
 
     return state;
@@ -239,7 +241,7 @@ export function craftQueueRemove(
   if (!tradeskillId) return;
 
   updateGamestate((state) => {
-    const building = state.tradeskills[tradeskillId];
+    const building = tradeskillBuildingIn(state, tradeskillId);
     const entry = building.queue.find((queued) => queued.id === queueEntryId);
     if (!entry) return state;
 
@@ -338,7 +340,7 @@ function advanceQueueEntry(
   if (!tradeskillId) return;
 
   updateGamestate((state) => {
-    const building = state.tradeskills[tradeskillId];
+    const building = tradeskillBuildingIn(state, tradeskillId);
     const index = building.queue.findIndex((queued) => queued.id === entryId);
     if (index === -1) return state;
 
@@ -374,15 +376,18 @@ export function craftProcessTick(): void {
 
     if (ticksIntoCraft < recipe.craftTime) {
       updateGamestate((state) => {
-        const building = state.tradeskills[tradeskillId];
+        const building = tradeskillBuildingIn(state, tradeskillId);
         const index = building.queue.findIndex(
           (queued) => queued.id === entry.id,
         );
         if (index === -1) return state;
 
-        building.queue = building.queue.map((queued, i) =>
-          i === index ? { ...queued, ticksIntoCraft } : queued,
-        );
+        state.tradeskills[tradeskillId] = {
+          ...building,
+          queue: building.queue.map((queued, i) =>
+            i === index ? { ...queued, ticksIntoCraft } : queued,
+          ),
+        };
         return state;
       });
       return;

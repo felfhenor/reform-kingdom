@@ -24,6 +24,7 @@ import {
   retrofitTradeskillXp,
   tradeskillActiveGate,
   tradeskillBuilding,
+  tradeskillBuildingIn,
   tradeskillGainXp,
   tradeskillIdForName,
   tradeskillLevelGateSatisfied,
@@ -285,6 +286,26 @@ describe('tradeskillBuilding', () => {
     vi.mocked(gamestate).mockReturnValue({ tradeskills: {} } as unknown as GameState);
 
     expect(tradeskillBuilding('Blacksmithing')).toEqual({
+      level: 1,
+      xp: { current: 0, maximum: 10 },
+      queue: [],
+    });
+  });
+});
+
+describe('tradeskillBuildingIn', () => {
+  it('returns the entry from the given state, not from gamestate()', () => {
+    const state = {
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 7 }) },
+    } as unknown as GameState;
+
+    expect(tradeskillBuildingIn(state, BLACKSMITHING_ID).level).toBe(7);
+  });
+
+  it('falls back to a safe default when the id has no entry, rather than throwing', () => {
+    const state = { tradeskills: {} } as unknown as GameState;
+
+    expect(tradeskillBuildingIn(state, BLACKSMITHING_ID)).toEqual({
       level: 1,
       xp: { current: 0, maximum: 10 },
       queue: [],

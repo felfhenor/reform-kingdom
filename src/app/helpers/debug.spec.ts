@@ -53,6 +53,7 @@ vi.mock('@helpers/tradeskill', () => ({
   TRADESKILL_MAX_LEVEL: 50,
   tradeskillIdForName: vi.fn(),
   tradeskillXpForLevel: vi.fn(),
+  tradeskillBuildingIn: vi.fn((state, id) => state.tradeskills[id]),
 }));
 
 vi.mock('@helpers/state-game', () => ({

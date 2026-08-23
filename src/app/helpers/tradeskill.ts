@@ -5,6 +5,7 @@ import { roundToNearest10 } from '@helpers/number';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   ChanceTier,
+  GameState,
   GameStateTradeskills,
   RecipeContent,
   Tradeskill,
@@ -64,6 +65,15 @@ export function tradeskillBuilding(
   const id = tradeskillIdForName(tradeskill);
   if (!id) return DEFAULT_BUILDING;
   return gamestate().tradeskills[id] ?? DEFAULT_BUILDING;
+}
+
+// Same fallback as `tradeskillBuilding`, for `updateGamestate` callbacks -
+// they must read the draft `state` they were handed, not `gamestate()`.
+export function tradeskillBuildingIn(
+  state: GameState,
+  tradeskillId: TradeskillId,
+): TradeskillBuildingState {
+  return state.tradeskills[tradeskillId] ?? DEFAULT_BUILDING;
 }
 
 function levelRequirementFor(
@@ -153,7 +163,7 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
 
   updateGamestate((state) => {
     state.tradeskills[tradeskillId] = tradeskillLeveledUp(
-      state.tradeskills[tradeskillId],
+      tradeskillBuildingIn(state, tradeskillId),
       tradeskill,
       amount,
     );
