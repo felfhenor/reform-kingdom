@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.scripts.json",
+  "compilerOptions": {
+    "rootDir": "."
+  },
+  "ts-node": {
+    "files": false
+  }
+}

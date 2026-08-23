@@ -85,10 +85,12 @@ This will examine all debuffs and show if they have any resistance allocated to 
 
 ```
 npm run simulate -- --mode=curated --trials=1 --tick-budget=36000 --verbose=true
-npm run simulate -- --mode=<exhaustive|curated> --trials=<1> --tick-budget=<60000>
+npm run simulate -- --mode=<exhaustive|curated> --trials=<1> --tick-budget=<60000> --workers=<N>
 ```
 
 This will run the simulator to verify different parties and see how far they get. This will help make sure the game is playable with many different configurations of hero jobs. It will output a leaderboard as well as where each party gets stuck, if it does. A tick budget gives the party a certain amount of time to get to a certain place, and simulates a player playing for that length of time - 3600 ticks = 1 hour.
+
+Scenarios (comp x strategy x trial) run across a pool of worker processes, one per CPU core by default - pass `--workers=1` to run everything serially in a single process instead (useful for debugging with breakpoints, since a forked worker can't be attached to the same way).
 
 ## Good-To-Knows
 

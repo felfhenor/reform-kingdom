@@ -73,9 +73,12 @@ function freshTracker(): TrackerState {
 
 // Best reachable node's max challenge level vs. the party's weakest member -
 // mirrors the private `worldNodeChallengeLevel` in decree-evaluation.ts,
-// applied to the node that function itself would pick.
+// applied to the node that function itself would pick. 'High' matches the
+// fixed risk tolerance `configureStrategyDecree` (strategy.ts) always gives
+// the sim's `LevelUpParty` clause, so this reflects the same node that
+// clause is actually pursuing.
 function bestReachableChallengeLevel(): number | undefined {
-  const node = mostChallengingExploreNodeForRisk();
+  const node = mostChallengingExploreNodeForRisk('High');
   if (!node) return undefined;
 
   return worldNodeEncounter(node)?.levelRange.max;

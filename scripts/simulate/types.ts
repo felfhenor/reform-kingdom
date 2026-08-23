@@ -38,6 +38,7 @@ export type RunOptions = {
   tickBudget: number;
   strategies: StrategyName[];
   verbose: boolean;
+  workers: number;
 };
 
 // Resolved job content, keyed by the job name strings used in `PartyComp`.
