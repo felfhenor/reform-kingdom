@@ -6,7 +6,12 @@ import { getEntry } from '@helpers/content';
 import { encounterRandomState } from '@helpers/encounter-random';
 import { rollDroppedRewards } from '@helpers/loot';
 import { partyGet } from '@helpers/party';
+import { researchPointItemId } from '@helpers/research/research';
 import { updateGamestate } from '@helpers/state-game';
+import {
+  isFirstTimeNodeRewardsGranted,
+  markFirstTimeNodeRewardsGranted,
+} from '@helpers/world-node-first-time-rewards';
 import {
   worldNodeByName,
   worldNodeEncounterRandom,
@@ -16,8 +21,10 @@ import type {
   EncounterRandomContent,
   EncounterRandomId,
   MonsterContent,
+  ResolvedItemDrop,
   WorldNodeEntry,
 } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
 
 export function encounterRandomStartFight(
   entry: WorldNodeEntry,
@@ -84,6 +91,32 @@ function grantEncounterRandomCompletionRewards(combat: Combat): void {
   markEncounterRandomCompleted(combat.encounterRandomId);
 }
 
+// Fires once per physical node, ever - the regeneration cycle keeps rolling
+// completionRewards fresh, but the ledger (not completedThisCycle) is what
+// keeps this genuinely once-ever. Same shape as
+// combat-end.ts's grantEncounterFirstTimeRewards.
+function grantEncounterRandomFirstTimeRewards(combat: Combat): void {
+  if (!combat.encounterRandomId) return;
+
+  const content = getEntry<EncounterRandomContent>(combat.encounterRandomId);
+  if (!content?.firstTimeRewards?.length) return;
+  if (isFirstTimeNodeRewardsGranted(combat.locationName)) return;
+
+  const level = combat.guardians[0]?.level ?? 1;
+  const drops = rollDroppedRewards(content.firstTimeRewards, level);
+  grantResolvedDrops(combat, drops);
+
+  const rpItemId = researchPointItemId();
+  const rpGranted = sumBy(
+    drops.filter(
+      (drop): drop is ResolvedItemDrop =>
+        'itemId' in drop && drop.itemId === rpItemId,
+    ),
+    (drop) => drop.quantity,
+  );
+  markFirstTimeNodeRewardsGranted(combat.locationName, rpGranted);
+}
+
 // Returns true if another generated fight was started - callers must not
 // reset combat state in that case, mirroring `nextFightFor`/
 // `handleCombatVictory` in combat-end.ts for static encounters.
@@ -96,6 +129,7 @@ export function encounterRandomHandleVictory(combat: Combat): boolean {
 
   if (!nextFight) {
     grantEncounterRandomCompletionRewards(combat);
+    grantEncounterRandomFirstTimeRewards(combat);
     return false;
   }
 

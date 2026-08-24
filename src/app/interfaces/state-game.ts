@@ -8,6 +8,7 @@ import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
+import type { ResearchCost, ResearchId } from '@interfaces/content-research';
 import type { GameStateTradeskills } from '@interfaces/crafting';
 import type { AutoModeState } from '@interfaces/decree';
 import type { EquipmentItem } from '@interfaces/equipment';
@@ -76,6 +77,33 @@ export type GameStateActiveAstralProjectorSpell = {
   expiresAtTick: number;
 };
 
+export type ResearchState = {
+  status: 'Idle' | 'Researching';
+  researchId: ResearchId | undefined;
+  ticksIntoResearch: number;
+  // Snapshot of what was actually paid to start the active node - needed so
+  // an involuntary forfeit (the node's content removed entirely, see
+  // retrofitResearch in research.ts) can refund the right amount even after
+  // the content that defined the cost no longer exists to look up.
+  costPaid: ResearchCost | undefined;
+};
+
+// One-time ledger - a research node, once completed, stays completed forever
+// regardless of later content changes to its cost/effect (same convention as
+// discoveredRecipes / discoveredAstralProjectorSpells).
+export type GameStateDiscoveredResearch = {
+  [key: ResearchId]: { foundAt: number };
+};
+
+// Keyed by WorldNodeEntry.nodeName (like discoveredGatherNodes) rather than
+// content id, since the same node content could in principle back multiple
+// map placements. `rpGranted` is the actual quantity granted at the time -
+// not just a boolean - so `reconcileFirstTimeRewardGrants` can top up or
+// claw back if the authored amount changes later (see migrate.ts).
+export type GameStateFirstTimeNodeRewardsGranted = {
+  [key: string]: { foundAt: number; rpGranted: number };
+};
+
 // Keyed by Tiled node name (no branded id for world nodes). Scopes auto-mode's material picker to sources the player has actually found.
 export type GameStateDiscoveredGatherNodes = {
   [key: string]: { foundAt: number };
@@ -127,4 +155,7 @@ export type GameState = {
   tradeskills: GameStateTradeskills;
   discoveredAstralProjectorSpells: GameStateDiscoveredAstralProjectorSpells;
   activeAstralProjectorSpells: GameStateActiveAstralProjectorSpell[];
+  research: ResearchState;
+  discoveredResearch: GameStateDiscoveredResearch;
+  firstTimeNodeRewardsGranted: GameStateFirstTimeNodeRewardsGranted;
 };

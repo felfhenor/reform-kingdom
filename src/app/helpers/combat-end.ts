@@ -18,8 +18,19 @@ import { getEntry } from '@helpers/content';
 import { encounterStartFight } from '@helpers/encounter';
 import { encounterRandomHandleVictory } from '@helpers/encounter-random-combat';
 import { rollDroppedRewards } from '@helpers/loot';
+import { addMaterial, goldCoinId } from '@helpers/materials';
 import { monsterXpReward, xpForOverLevel } from '@helpers/monster';
+import { researchPointItemId } from '@helpers/research/research';
+import {
+  researchMonsterBonusGoldChance,
+  researchMonsterLootBonusQuantity,
+} from '@helpers/research/research-effects';
+import { rngSucceedsChance } from '@helpers/rng';
 import { travelBeginDeathsDoor } from '@helpers/travel';
+import {
+  isFirstTimeNodeRewardsGranted,
+  markFirstTimeNodeRewardsGranted,
+} from '@helpers/world-node-first-time-rewards';
 import type {
   Combat,
   Combatant,
@@ -27,6 +38,8 @@ import type {
   EncounterId,
   EncounterRandomContent,
   MonsterContent,
+  ResolvedDrop,
+  ResolvedItemDrop,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -83,6 +96,30 @@ function encounterMaxLevel(combat: Combat): number | undefined {
   return undefined;
 }
 
+// Trophy Hunter's effect: unconditional +N to every resolved item drop's
+// quantity from monster kills - no chance roll, no gold-exclusion logic
+// needed since equipment/collectible/recipe drops have no `quantity` field.
+function applyMonsterLootBonusQuantity(drops: ResolvedDrop[]): ResolvedDrop[] {
+  const bonus = researchMonsterLootBonusQuantity();
+  if (bonus <= 0) return drops;
+
+  return drops.map((drop) =>
+    'itemId' in drop ? { ...drop, quantity: drop.quantity + bonus } : drop,
+  );
+}
+
+// Looters' effect: scoped to monster-kill gold specifically, not node/dungeon
+// completion gold (grantEncounterCompletionRewards is a separate function).
+function grantMonsterBonusGold(combat: Combat, monsterCount: number): void {
+  if (monsterCount === 0) return;
+
+  const { chance, bonusGold } = researchMonsterBonusGoldChance();
+  if (chance <= 0 || bonusGold <= 0 || !rngSucceedsChance(chance)) return;
+
+  addMaterial(goldCoinId(), bonusGold);
+  combatMessageLog(combat, `The party looted an extra ${bonusGold} gold!`);
+}
+
 function grantVictoryRewards(combat: Combat): void {
   const monsters = defeatedMonsters(combat);
   const maxLevel = encounterMaxLevel(combat);
@@ -107,7 +144,8 @@ function grantVictoryRewards(combat: Combat): void {
   const drops = monsters.flatMap(({ monster, level }) =>
     rollDroppedRewards(monster.drops, level),
   );
-  grantResolvedDrops(combat, drops);
+  grantResolvedDrops(combat, applyMonsterLootBonusQuantity(drops));
+  grantMonsterBonusGold(combat, monsters.length);
 }
 
 // Fires once the encounter's last fight is won; rolled fresh each clear.
@@ -126,6 +164,33 @@ function grantEncounterCompletionRewards(combat: Combat): void {
   const level = combat.guardians[0]?.level ?? 1;
   const drops = rollDroppedRewards(encounter.completionRewards, level);
   grantResolvedDrops(combat, drops);
+}
+
+// Fires once per physical node, ever - gated by the ledger, not by anything
+// about the tree's completion state (see world-node-first-time-rewards.ts).
+// Marks granted even on a whiffed roll (chance < 100 on an authored RP entry
+// is a content bug the researchrpgaps validator flags, not something this
+// retries).
+function grantEncounterFirstTimeRewards(combat: Combat): void {
+  if (combat.encounterId === undefined) return;
+
+  const encounter = getEntry<EncounterContent>(combat.encounterId);
+  if (!encounter?.firstTimeRewards?.length) return;
+  if (isFirstTimeNodeRewardsGranted(combat.locationName)) return;
+
+  const level = combat.guardians[0]?.level ?? 1;
+  const drops = rollDroppedRewards(encounter.firstTimeRewards, level);
+  grantResolvedDrops(combat, drops);
+
+  const rpItemId = researchPointItemId();
+  const rpGranted = sumBy(
+    drops.filter(
+      (drop): drop is ResolvedItemDrop =>
+        'itemId' in drop && drop.itemId === rpItemId,
+    ),
+    (drop) => drop.quantity,
+  );
+  markFirstTimeNodeRewardsGranted(combat.locationName, rpGranted);
 }
 
 // The fight after this one within the same encounter, if there is one -
@@ -163,6 +228,7 @@ function handleCombatVictory(combat: Combat): boolean {
   const nextFight = nextFightFor(combat);
   if (!nextFight) {
     grantEncounterCompletionRewards(combat);
+    grantEncounterFirstTimeRewards(combat);
     return false;
   }
 

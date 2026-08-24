@@ -20,6 +20,7 @@ import {
   getMaterialQuantity,
 } from '@helpers/materials';
 import { isRecipeCraftable } from '@helpers/recipes';
+import { researchCraftBonusXp } from '@helpers/research/research-effects';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import {
@@ -320,15 +321,28 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   }
 }
 
+// Keen Eye/Sharper Eye/Deeper Insight's combined chance/bonus (see
+// research-effects.ts) - a separate roll from the recipe's own skill-up
+// chance above, only relevant when the recipe trains a tradeskill at all.
+function grantResearchBonusCraftXp(tradeskill: Tradeskill): void {
+  const { chance, bonusXp } = researchCraftBonusXp();
+  if (chance <= 0 || bonusXp <= 0 || !rngSucceedsChance(chance)) return;
+
+  tradeskillGainXp(tradeskill, bonusXp);
+}
+
 function resolveCraftUnit(tradeskill: Tradeskill, recipe: RecipeContent): void {
   grantCraftResult(tradeskill, recipe);
   analyticsSendDesignEvent(
     `Kingdom:Craft:Complete:${analyticsSafeSegment(recipe.name)}`,
   );
 
-  const chance = craftXpChance(recipe, tradeskillBuilding(tradeskill).level);
-  if (recipe.tradeskillXP > 0 && rngSucceedsChance(chance)) {
-    tradeskillGainXp(tradeskill, recipe.tradeskillXP);
+  if (recipe.tradeskillXP > 0) {
+    const chance = craftXpChance(recipe, tradeskillBuilding(tradeskill).level);
+    if (rngSucceedsChance(chance)) {
+      tradeskillGainXp(tradeskill, recipe.tradeskillXP);
+    }
+    grantResearchBonusCraftXp(tradeskill);
   }
 }
 

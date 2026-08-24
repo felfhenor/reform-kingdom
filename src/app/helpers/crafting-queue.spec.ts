@@ -35,6 +35,7 @@ vi.mock('@helpers/combat-log', () => ({
 }));
 
 vi.mock('@helpers/content', () => ({
+  getEntriesByType: vi.fn(() => []),
   getEntry: vi.fn(),
 }));
 

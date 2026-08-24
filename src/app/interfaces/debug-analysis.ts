@@ -49,7 +49,8 @@ export type AnalysisScriptCategory =
   | 'Tradeskills & Recipes'
   | 'World & Maps'
   | 'Hero Stats'
-  | 'Monster Stats';
+  | 'Monster Stats'
+  | 'Research';
 
 export type AnalysisScriptDefinition = {
   id: string;
@@ -59,6 +60,10 @@ export type AnalysisScriptDefinition = {
   strict: boolean;
   inputKeys: string[];
   run: (params: AnalysisParams) => AnalysisRunResult;
+  // Reads live gamestate() - browser/`/debug`-dashboard only. Never give a
+  // script with this flag a scripts/validate-*.ts CLI wrapper; it has no
+  // save file to load outside the Angular app.
+  usesGamestate?: true;
 };
 
 // --- Local shapes used by `src/app/helpers/debug/analysis-*.ts` - kept here

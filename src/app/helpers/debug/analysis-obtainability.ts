@@ -111,19 +111,31 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
     collectFromDroppedRewards(monster.drops, obtainableItems, obtainableEquipment, obtainableCollectibles),
   );
 
-  [...encounters, ...encounterRandoms].forEach((encounter) =>
+  [...encounters, ...encounterRandoms].forEach((encounter) => {
     collectFromDroppedRewards(
       encounter.completionRewards,
       obtainableItems,
       obtainableEquipment,
       obtainableCollectibles,
-    ),
-  );
+    );
+    collectFromDroppedRewards(
+      encounter.firstTimeRewards ?? [],
+      obtainableItems,
+      obtainableEquipment,
+      obtainableCollectibles,
+    );
+  });
 
   gatherings.forEach((gathering) => {
     gathering.gatherResults.forEach((result) => {
       result.items.forEach((item) => addIfPresent(obtainableItems, item.itemId));
     });
+    collectFromDroppedRewards(
+      gathering.firstTimeRewards ?? [],
+      obtainableItems,
+      obtainableEquipment,
+      obtainableCollectibles,
+    );
   });
 
   recipes.forEach((recipe) => {

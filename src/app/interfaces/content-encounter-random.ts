@@ -3,7 +3,7 @@ import type { MonsterId } from '@interfaces/content-monster';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
-import type { HasDescription } from '@interfaces/traits';
+import type { HasDescription, HasMapNodeGating } from '@interfaces/traits';
 
 export type EncounterRandomId = Branded<string, 'EncounterRandomId'>;
 
@@ -23,7 +23,8 @@ export type EncounterRandomPoolMonster = {
 };
 
 export type EncounterRandomContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  HasMapNodeGating & {
     id: EncounterRandomId;
     __type: 'encounterrandom';
 
@@ -41,6 +42,9 @@ export type EncounterRandomContent = IsContentItem &
 
     completionRewards: DroppedReward[];
 
-    // When true, name/level label and map cursor stay hidden until discovered (see world-node-discovery.ts).
-    hidden?: boolean;
+    // Rolled once, ever, per physical node - see
+    // world-node-first-time-rewards.ts. Absent/empty means no first-time
+    // reward. RP-only by convention, enforced by the researchrpgaps
+    // validator.
+    firstTimeRewards?: DroppedReward[];
   };

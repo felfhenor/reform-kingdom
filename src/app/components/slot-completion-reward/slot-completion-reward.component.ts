@@ -49,6 +49,13 @@ type RewardContent = {
 export class SlotCompletionRewardComponent {
   public reward = input.required<DroppedReward>();
 
+  // Overrides isDiscovered's global-discovery check when set - used for a
+  // firstTimeRewards slot, where "obtained" means the per-node ledger says
+  // granted, not "the player has ever found this item anywhere" (see
+  // world-node-first-time-rewards.ts). Omitted for ordinary completionRewards
+  // slots, which keep the existing global-discovery behavior.
+  public obtainedOverride = input<boolean | undefined>(undefined);
+
   // A recipe has no sprite/rarity of its own - it borrows whatever it
   // crafts, so its spritesheet/content resolve through the recipe's result.
   private recipeContent = computed<RecipeContent | undefined>(() => {
@@ -94,6 +101,9 @@ export class SlotCompletionRewardComponent {
   });
 
   public isDiscovered = computed(() => {
+    const override = this.obtainedOverride();
+    if (override !== undefined) return override;
+
     const reward = this.reward();
     if ('itemId' in reward) return isMaterialDiscovered(reward.itemId);
     if ('equipmentId' in reward) {

@@ -52,6 +52,14 @@ export function defaultGameState(): GameState {
     tradeskills: defaultTradeskills(),
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
+    research: {
+      status: 'Idle',
+      researchId: undefined,
+      ticksIntoResearch: 0,
+      costPaid: undefined,
+    },
+    discoveredResearch: {},
+    firstTimeNodeRewardsGranted: {},
   };
 }
 

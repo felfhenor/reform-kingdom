@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ModalPlayKingdomReclassComponent } from '@components/modal-play-kingdom-reclass/modal-play-kingdom-reclass.component';
 import { PlayKingdomAchievementsComponent } from '@components/play-kingdom-achievements/play-kingdom-achievements.component';
+import { PlayKingdomArchiveComponent } from '@components/play-kingdom-archive/play-kingdom-archive.component';
 import { PlayKingdomArmoryComponent } from '@components/play-kingdom-armory/play-kingdom-armory.component';
 import { PlayKingdomAstralProjectorComponent } from '@components/play-kingdom-astralprojector/play-kingdom-astralprojector.component';
 import { PlayKingdomBestiaryComponent } from '@components/play-kingdom-bestiary/play-kingdom-bestiary.component';
@@ -23,6 +24,7 @@ import { kingdomSubview } from '@helpers/ui';
     PlayKingdomHomeComponent,
     PlayKingdomStorageComponent,
     PlayKingdomMuseumComponent,
+    PlayKingdomArchiveComponent,
     PlayKingdomArmoryComponent,
     PlayKingdomAstralProjectorComponent,
     PlayKingdomBestiaryComponent,

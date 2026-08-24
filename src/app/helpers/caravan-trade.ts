@@ -15,6 +15,7 @@ import {
   hasGold,
   spendGold,
 } from '@helpers/materials';
+import { researchCaravanPriceReductionPercent } from '@helpers/research/research-effects';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-nodes';
@@ -71,13 +72,19 @@ export function caravanTradeOwnedQuantity(trade: CaravanTrade): number {
   return 0;
 }
 
+// Research price reductions only discount the caravan *selling* to the party
+// (the price the party pays) - not the buy-side markup used when the party
+// sells its own goods to the caravan.
 export function caravanTradePrice(
   caravan: CaravanContent,
   trade: CaravanTrade,
 ): number {
   const markup =
     trade.type === 'sell'
-      ? caravan.markupPercentages.sell
+      ? Math.max(
+          0,
+          caravan.markupPercentages.sell - researchCaravanPriceReductionPercent(),
+        )
       : caravan.markupPercentages.buy;
 
   return Math.max(1, Math.round(trade.value * (1 + markup / 100)));

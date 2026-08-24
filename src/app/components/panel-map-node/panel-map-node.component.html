@@ -51,10 +51,17 @@
         }
 
         @let rewardList = completionRewards();
-        @if (rewardList.length > 0) {
+        @let firstTimeRewardEntry = firstTimeReward();
+        @if (rewardList.length > 0 || firstTimeRewardEntry) {
           <div class="flex flex-wrap gap-2">
             @for (reward of rewardList; track $index) {
               <app-slot-completion-reward [reward]="reward" />
+            }
+            @if (firstTimeRewardEntry) {
+              <app-slot-completion-reward
+                [reward]="firstTimeRewardEntry"
+                [obtainedOverride]="firstTimeRewardObtained()"
+              />
             }
           </div>
         }

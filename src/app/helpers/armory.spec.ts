@@ -10,6 +10,7 @@ import type {
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content', () => ({
+  getEntriesByType: vi.fn(() => []),
   getEntry: vi.fn(),
 }));
 

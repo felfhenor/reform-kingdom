@@ -11,6 +11,7 @@ import { encounterRandomProcessTick } from '@helpers/encounter-random-tick';
 import { gatheringProcessTick } from '@helpers/gathering';
 import { globalEffectsProcessTick } from '@helpers/global-effects';
 import { debug } from '@helpers/logging';
+import { researchProcessTick } from '@helpers/research/research-queue';
 import { restingProcessTick } from '@helpers/resting';
 import { schedulerYield } from '@helpers/scheduler';
 import { isSetup } from '@helpers/setup';
@@ -65,6 +66,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     caravanProcessTick();
     autoModeProcessTick();
     craftProcessTick();
+    researchProcessTick();
     restingProcessTick();
 
     if (currentCombat()) {

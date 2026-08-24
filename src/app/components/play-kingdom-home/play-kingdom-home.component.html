@@ -2,7 +2,7 @@
   <span header>Kingdom</span>
 
   <div class="flex flex-col justify-between gap-6 p-4 h-full overflow-y-auto">
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-4 gap-4">
       <button
         class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
         (click)="openSubview('storage')"
@@ -36,6 +36,17 @@
         <span class="text-xs text-lighter">
           {{ spellCount | number }}
           {{ 'spell' | pluralize: spellCount > 1 }} learned
+        </span>
+      </button>
+
+      <button
+        class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+        (click)="openSubview('archive')"
+      >
+        @let researchTotal = allResearchEntries().length;
+        <span class="text-base font-bold">The Archive</span>
+        <span class="text-xs text-lighter">
+          {{ completedResearchCount() }}/{{ researchTotal }} researched
         </span>
       </button>
     </div>

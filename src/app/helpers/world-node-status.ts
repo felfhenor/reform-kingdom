@@ -22,7 +22,7 @@ export function worldNodeLevelRange(
     worldNodeEncounter(entry)?.levelRange ??
     worldNodeGathering(entry)?.levelRange ??
     worldNodeEncounterRandom(entry)?.levelRange ??
-    worldNodeCaravan(entry)?.level
+    worldNodeCaravan(entry)?.levelRange
   );
 }
 

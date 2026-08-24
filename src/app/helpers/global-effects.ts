@@ -2,6 +2,7 @@ import { healingTicksForLevel, healPartyToFull } from '@helpers/character-progre
 import { miscellaneousMessageLog } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { partyGet } from '@helpers/party';
+import { researchPostWipeHealTimeReductionPercent } from '@helpers/research/research-effects';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { timerTicksElapsed } from '@helpers/timer';
 import { currentLocationSet } from '@helpers/world';
@@ -84,7 +85,15 @@ function handleDeathsDoorExpiry(): void {
   }
 
   miscellaneousMessageLog('The party has been recalled to the kingdom.');
-  addGlobalEffect('Healing' as GlobalEffectId, healingTicksForLevel(partyGet()));
+
+  const baseHealTicks = healingTicksForLevel(partyGet());
+  const reducedHealTicks = Math.max(
+    1,
+    Math.round(
+      baseHealTicks * (1 - researchPostWipeHealTimeReductionPercent() / 100),
+    ),
+  );
+  addGlobalEffect('Healing' as GlobalEffectId, reducedHealTicks);
 }
 
 // Effects never remove themselves; this drives expiry side effects and sweeps them out of state. Run once per game tick.

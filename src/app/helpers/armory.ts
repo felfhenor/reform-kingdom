@@ -2,6 +2,7 @@ import { analyticsSendDesignEvent } from '@helpers/analytics';
 import { getEntry } from '@helpers/content';
 import { equipmentItemInfusionBonus } from '@helpers/infusion';
 import { gainGold } from '@helpers/materials';
+import { researchArmorySellValueIncreasePercent } from '@helpers/research/research-effects';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -110,8 +111,12 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
   const base =
     statTotal * SELL_GOLD_PER_STAT_POINT +
     entry.content.levelRequirement * SELL_GOLD_PER_LEVEL;
+  const researchBonus = 1 + researchArmorySellValueIncreasePercent() / 100;
 
-  return Math.max(1, Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity]));
+  return Math.max(
+    1,
+    Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity] * researchBonus),
+  );
 }
 
 // Sells owned armory items atomically; stale ids are silently skipped. Returns total gold gained.

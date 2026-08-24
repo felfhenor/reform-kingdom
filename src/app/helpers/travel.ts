@@ -7,6 +7,8 @@ import { gatherNodeDiscover } from '@helpers/gather-node-discovery';
 import { travelMessageLog } from '@helpers/combat-log';
 import { gatheringStart, gatheringStop } from '@helpers/gathering';
 import { mapHopsBetween, tileIsOnPath, travelPathTo } from '@helpers/pathfinding';
+import { researchTravelTimeReductionPercent } from '@helpers/research/research-effects';
+import { rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { mapNodeAutoShowOnArrival } from '@helpers/ui';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
@@ -40,6 +42,23 @@ function travelTileCountsAsPath(mapName: string, x: number, y: number): boolean 
   return tileIsOnPath(mapName, x, y) || !!worldNodeAt(mapName, x, y);
 }
 
+// A % reduction can't cleanly scale a 1-3 tick base cost (it would just round
+// back to the same integer), so research-driven reduction instead rolls a
+// chance, once per step-cost query, to shave a single tick off - same
+// probabilistic-bonus idiom as luckRollSucceeds/gatherBonusQuantityChance.
+// Floored at 1, never 0: `=== 0` is the sentinel travelCompleteStep uses to
+// chain instantly through Teleport steps, and travelProcessTick already
+// resolves a 1-tick on-path step in a single call - letting the roll reach 0
+// there would recursively chain through every following step for free
+// (compounding without bound as more TravelTimeReduction is authored),
+// which is a different and far stronger effect than "shave one tick."
+function applyTravelTimeReduction(baseCost: number): number {
+  const percent = researchTravelTimeReductionPercent();
+  if (percent <= 0 || !rngSucceedsChance(percent)) return baseCost;
+
+  return Math.max(1, baseCost - 1);
+}
+
 // Teleport is instant. Move is cheap entering a path/node tile, or leaving a node tile -
 // leaving an ordinary path tile is deliberately not discounted, or the off-path cost would never apply.
 export function travelStepTicksCost(
@@ -59,9 +78,11 @@ export function travelStepTicksCost(
     originTile.y,
   );
 
-  return enteringPathOrNode || exitingNode
+  const baseCost = enteringPathOrNode || exitingNode
     ? TICKS_PER_STEP_ON_PATH
     : TICKS_PER_STEP_OFF_PATH;
+
+  return applyTravelTimeReduction(baseCost);
 }
 
 // Deaths Door/Healing are the only true blockers - being mid-Travel is not,

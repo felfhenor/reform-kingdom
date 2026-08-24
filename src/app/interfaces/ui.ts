@@ -10,6 +10,7 @@ export type KingdomSubview =
   | 'museum'
   | 'bestiary'
   | 'armory'
+  | 'archive'
   | 'astralprojector'
   | 'infusion'
   | 'tradeskill-artificing'

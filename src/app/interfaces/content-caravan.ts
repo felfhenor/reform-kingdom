@@ -1,6 +1,6 @@
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
-import type { HasDescription } from '@interfaces/traits';
+import type { HasDescription, HasMapNodeGating } from '@interfaces/traits';
 
 export type CaravanId = Branded<string, 'CaravanId'>;
 
@@ -10,7 +10,8 @@ export type CaravanMarkupPercentages = {
 };
 
 export type CaravanContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  HasMapNodeGating & {
     id: CaravanId;
     __type: 'caravan';
 
@@ -18,7 +19,7 @@ export type CaravanContent = IsContentItem &
     // rerolling its active trades.
     traderResetTime: number;
 
-    level: LevelRange;
+    levelRange: LevelRange;
 
     // Applied to a trade's authored `value` at purchase time - `sell` marks
     // up what the trader charges the player, `buy` (typically negative)

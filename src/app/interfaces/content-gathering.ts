@@ -1,7 +1,8 @@
 import type { ItemId } from '@interfaces/content-item';
+import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
-import type { HasDescription } from '@interfaces/traits';
+import type { HasDescription, HasMapNodeGating } from '@interfaces/traits';
 
 export type GatheringId = Branded<string, 'GatheringId'>;
 
@@ -16,7 +17,8 @@ export type GatherResult = {
 };
 
 export type GatheringContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  HasMapNodeGating & {
     id: GatheringId;
     __type: 'gathering';
 
@@ -27,7 +29,10 @@ export type GatheringContent = IsContentItem &
 
     gatherResults: GatherResult[];
 
-    // When true, the node's name/level label and map cursor stay hidden
-    // until the player discovers it (see `world-node-discovery.ts`).
-    hidden?: boolean;
+    // Rolled once, ever, per physical node - see
+    // world-node-first-time-rewards.ts. Absent/empty means no first-time
+    // reward. RP-only by convention (every entry must be a DroppedItemReward
+    // pointing at the Insight Crystal item id), enforced by the
+    // researchrpgaps validator.
+    firstTimeRewards?: DroppedReward[];
   };

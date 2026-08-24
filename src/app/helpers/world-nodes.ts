@@ -1,6 +1,7 @@
 import { computed } from '@angular/core';
 import { getEntry } from '@helpers/content';
 import { allMaps } from '@helpers/maps';
+import { isResearchCompleted } from '@helpers/research/research';
 import { tiledMapGetLayer } from '@helpers/tiled-map';
 import {
   isWorldNodeDiscovered,
@@ -70,21 +71,29 @@ export function worldNodeMapsBuild(
 
 export const worldNodeLookup = computed(() => worldNodeMapsBuild(allMaps()));
 
+// Public, filtered accessors - a blocked node returns/lists as if it didn't
+// exist. `worldNodeLookup()` itself stays unfiltered and cheap (depends only
+// on `allMaps()`, never rebuilds on gamestate changes); the pixi renderer
+// specifically needs that raw unfiltered form to find currently-blocked
+// nodes so it can hide them, so it calls `worldNodeLookup()` directly rather
+// than these wrappers - see pixi-map-render.ts.
 export function worldNodeAt(
   mapName: string,
   x: number,
   y: number,
 ): WorldNodeEntry | undefined {
-  return worldNodeLookup().byPosition[mapName]?.[x]?.[y];
+  const entry = worldNodeLookup().byPosition[mapName]?.[x]?.[y];
+  return entry && !isWorldNodeBlockedByResearch(entry) ? entry : undefined;
 }
 
 export function worldNodeByName(nodeName: string): WorldNodeEntry | undefined {
-  return worldNodeLookup().byName[nodeName];
+  const entry = worldNodeLookup().byName[nodeName];
+  return entry && !isWorldNodeBlockedByResearch(entry) ? entry : undefined;
 }
 
 export function worldNodesOfType(type: WorldNodeType): WorldNodeEntry[] {
   return Object.values(worldNodeLookup().byName).filter(
-    (entry) => entry.nodeData.type === type,
+    (entry) => entry.nodeData.type === type && !isWorldNodeBlockedByResearch(entry),
   );
 }
 
@@ -122,6 +131,21 @@ export function worldNodeOverride(
 ): NodeOverrideContent | undefined {
   const content = getEntry<NodeOverrideContent>(entry.nodeName);
   return content?.__type === 'nodeoverride' ? content : undefined;
+}
+
+// Existence-gating, distinct from isWorldNodeHidden's proximity-based
+// fog-of-war - a blocked node isn't fogged, it doesn't exist at all until
+// the referenced research completes. Only one content type ever matches a
+// given node, so this `??` chain is safe.
+export function isWorldNodeBlockedByResearch(entry: WorldNodeEntry): boolean {
+  const blockedBy =
+    worldNodeEncounter(entry)?.blockedByResearchId ??
+    worldNodeGathering(entry)?.blockedByResearchId ??
+    worldNodeEncounterRandom(entry)?.blockedByResearchId ??
+    worldNodeOverride(entry)?.blockedByResearchId ??
+    worldNodeCaravan(entry)?.blockedByResearchId;
+
+  return !!blockedBy && !isResearchCompleted(blockedBy);
 }
 
 // Only one content type ever matches a given node, so this `??` chain is safe.

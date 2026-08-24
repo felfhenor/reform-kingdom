@@ -4,3 +4,17 @@
   rarity: Common
 
   sprite: '0000'
+
+- id: 8892669e-7aa1-4db9-8362-15fd0048a51b
+  name: Insight Crystal
+  description: Crystallized understanding, drawn from the world's hidden corners. Fuels research at the Archive.
+  rarity: Uncommon
+
+  # Temporary placeholder art - '0037' has no real gameassets/item/0037.png,
+  # so it rendered as a 0x0 invisible icon everywhere. Borrows Ghost
+  # Peridot's sprite - every valid item-sprite index (0000-0036) is already
+  # claimed by some other item, so this WILL visually collide with Ghost
+  # Peridot wherever both are shown together (e.g. Storage lists every
+  # owned item regardless of category) - accepted as the lesser evil vs. an
+  # invisible icon, per user direction, until real art exists.
+  sprite: '0036'

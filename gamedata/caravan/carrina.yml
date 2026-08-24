@@ -4,7 +4,7 @@
 
   traderResetTime: 10800
 
-  level:
+  levelRange:
     min: 1
     max: 10
 
@@ -21,7 +21,7 @@
 
   traderResetTime: 21600
 
-  level:
+  levelRange:
     min: 1
     max: 10
 
@@ -36,9 +36,11 @@
   name: Goblin Group Company - Carrina
   description: The Carrina branch of the Goblin Group Company Caravan. They're a crafty group of goblins looking to get ahead.
 
+  blockedByResearchId: "Cartographer's Eye: Goblin Traders"
+
   traderResetTime: 21600
 
-  level:
+  levelRange:
     min: 1
     max: 10
 

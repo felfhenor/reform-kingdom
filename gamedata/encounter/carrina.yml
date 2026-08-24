@@ -34,6 +34,12 @@
     - equipmentId: Gobskull Charm
       chance: 10
 
+  firstTimeRewards:
+    - itemId: Insight Crystal
+      min: 15
+      max: 15
+      chance: 100
+
 - id: c6e4119c-b365-4de1-a952-5bf86f7ff173
   name: Forest Ruins
   description: A dilapidated ruin in the forest, home to a small goblin tribe.
@@ -75,6 +81,12 @@
 
     - equipmentId: Goblin Skull
       chance: 10
+
+  firstTimeRewards:
+    - itemId: Insight Crystal
+      min: 20
+      max: 20
+      chance: 100
 
 - id: c89e5d32-f802-4398-ae81-ceb0fdc04224
   name: Slimed Waystation
@@ -122,6 +134,12 @@
     - itemId: Gold Coin
       min: 100
       max: 125
+      chance: 100
+
+  firstTimeRewards:
+    - itemId: Insight Crystal
+      min: 30
+      max: 30
       chance: 100
 
 - id: def818a1-e9b4-462a-a108-4544d388ba4f
@@ -395,6 +413,12 @@
       max: 3
       chance: 75
 
+  firstTimeRewards:
+    - itemId: Insight Crystal
+      min: 40
+      max: 40
+      chance: 100
+
 - id: 6f35047f-8aea-4e79-9513-f90a20971ebf
   name: Fallen Elven Outpost
   description: An old elven outpost in the middle of the woods. It used to be their base of operations in the Carrina region before it was destroyed.
@@ -430,6 +454,12 @@
     - itemId: Gold Coin
       min: 300
       max: 400
+      chance: 100
+
+  firstTimeRewards:
+    - itemId: Insight Crystal
+      min: 45
+      max: 45
       chance: 100
 
 - id: 0ceb0531-c96d-48b5-b920-1c5556542df4

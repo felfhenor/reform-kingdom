@@ -73,6 +73,16 @@ import type {
   RecipeRequirementCollectible,
   RecipeRequirementEquipment,
   RecipeRequirementItem,
+  ResearchContent,
+  ResearchCost,
+  ResearchEffect,
+  ResearchId,
+  ResearchMaterialRequirement,
+  ResearchTreeBlankCell,
+  ResearchTreeCell,
+  ResearchTreeContent,
+  ResearchTreeNodeCell,
+  ResearchTreeId,
   StatBlock,
   StatusEffectBehavior,
   StatusEffectBehaviorType,
@@ -105,6 +115,8 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   monster: ensureMonster,
   nodeoverride: ensureNodeOverride,
   recipe: ensureRecipe,
+  research: ensureResearch,
+  researchtree: ensureResearchTree,
   skill: ensureSkill,
   statuseffect: ensureStatusEffect,
   trait: ensureTrait,
@@ -304,7 +316,15 @@ function ensureEncounter(
       encounter.completionRewards,
       ensureDroppedReward,
     ),
+    firstTimeRewards: ensureArray(
+      encounter.firstTimeRewards,
+      ensureDroppedReward,
+    ),
     hidden: encounter.hidden ?? false,
+    // `as` needed because Required<> (this function's return type) strips
+    // the field down to non-nullable ResearchId despite the `| undefined`
+    // in its declared type - see HasMapNodeGating in traits.ts.
+    blockedByResearchId: encounter.blockedByResearchId as ResearchId,
   };
 }
 
@@ -338,7 +358,15 @@ function ensureEncounterRandom(
       encounter.completionRewards,
       ensureDroppedReward,
     ),
+    firstTimeRewards: ensureArray(
+      encounter.firstTimeRewards,
+      ensureDroppedReward,
+    ),
     hidden: encounter.hidden ?? false,
+    // `as` needed because Required<> (this function's return type) strips
+    // the field down to non-nullable ResearchId despite the `| undefined`
+    // in its declared type - see HasMapNodeGating in traits.ts.
+    blockedByResearchId: encounter.blockedByResearchId as ResearchId,
   };
 }
 
@@ -370,7 +398,13 @@ function ensureGathering(
     xpGainedIfInLevelRange: gathering.xpGainedIfInLevelRange ?? 0,
     gatherTime: gathering.gatherTime ?? 1,
     gatherResults: ensureArray(gathering.gatherResults, ensureGatherResult),
+    firstTimeRewards: ensureArray(
+      gathering.firstTimeRewards,
+      ensureDroppedReward,
+    ),
     hidden: gathering.hidden ?? false,
+    // `as` needed - see the comment on the encounter/encounterrandom variant above.
+    blockedByResearchId: gathering.blockedByResearchId as ResearchId,
   };
 }
 
@@ -407,9 +441,12 @@ function ensureCaravan(caravan: Partial<CaravanContent>): Required<CaravanConten
     __type: 'caravan',
     description: caravan.description ?? 'UNKNOWN',
     traderResetTime: caravan.traderResetTime ?? 3600,
-    level: caravan.level ?? { min: 1, max: 1 },
+    levelRange: caravan.levelRange ?? { min: 1, max: 1 },
     markupPercentages: caravan.markupPercentages ?? { sell: 0, buy: 0 },
     traderCategories: caravan.traderCategories ?? [],
+    hidden: caravan.hidden ?? false,
+    // `as` needed - see the comment on the encounter/encounterrandom variant above.
+    blockedByResearchId: caravan.blockedByResearchId as ResearchId,
   };
 }
 
@@ -516,6 +553,132 @@ function ensureRecipe(recipe: Partial<RecipeContent>): Required<RecipeContent> {
     maxTradeskillLevel: recipe.maxTradeskillLevel ?? 1,
     tradeskillXP: recipe.tradeskillXP ?? 0,
     craftTime: recipe.craftTime ?? 60,
+  };
+}
+
+function ensureResearchMaterialRequirement(
+  material: Partial<ResearchMaterialRequirement> = {},
+): ResearchMaterialRequirement {
+  return {
+    itemId: material.itemId ?? ('UNKNOWN' as ItemId),
+    quantity: material.quantity ?? 1,
+  };
+}
+
+function ensureResearchCost(cost: Partial<ResearchCost> = {}): ResearchCost {
+  return {
+    rp: cost.rp ?? 0,
+    gold: cost.gold ?? 0,
+    materials: ensureArray(cost.materials, ensureResearchMaterialRequirement),
+    collectibleId: cost.collectibleId,
+  };
+}
+
+// Mirrors ensureStatusEffectBehavior's switch-on-`type` pattern.
+function ensureResearchEffect(
+  effect: Record<string, unknown> = {},
+): ResearchEffect {
+  const type = effect['type'] as ResearchEffect['type'];
+
+  switch (type) {
+    case 'TravelTimeReduction':
+    case 'CaravanPriceReduction':
+    case 'AstralSpellDurationIncrease':
+    case 'ArmorySellValueIncrease':
+    case 'PostWipeHealTimeReduction':
+      return { type, percent: (effect['percent'] as number) ?? 0 };
+
+    case 'GatherBonusQuantityChance':
+      return {
+        type,
+        chance: (effect['chance'] as number) ?? 0,
+        bonusQuantity: (effect['bonusQuantity'] as number) ?? 0,
+      };
+
+    case 'CraftBonusXpChance':
+      return {
+        type,
+        chance: (effect['chance'] as number) ?? 0,
+        bonusXp: (effect['bonusXp'] as number) ?? 0,
+      };
+
+    case 'CraftBonusXpChanceIncrease':
+      return { type, chance: (effect['chance'] as number) ?? 0 };
+
+    case 'CraftBonusXpAmountIncrease':
+      return { type, bonusXp: (effect['bonusXp'] as number) ?? 0 };
+
+    case 'MonsterBonusGoldChance':
+      return {
+        type,
+        chance: (effect['chance'] as number) ?? 0,
+        bonusGold: (effect['bonusGold'] as number) ?? 0,
+      };
+
+    case 'MonsterLootBonusQuantity':
+      return { type, bonusQuantity: (effect['bonusQuantity'] as number) ?? 0 };
+
+    case 'MaterialAutomation':
+      return {
+        type,
+        itemId: (effect['itemId'] as ItemId) ?? ('UNKNOWN' as ItemId),
+        quantityPerGrant: (effect['quantityPerGrant'] as number) ?? 1,
+        ticksPerGrant: (effect['ticksPerGrant'] as number) ?? 3600,
+      };
+
+    default:
+      return { type: 'TravelTimeReduction', percent: 0 };
+  }
+}
+
+function ensureResearch(
+  research: Partial<ResearchContent>,
+): Required<ResearchContent> {
+  return {
+    id: research.id ?? ('UNKNOWN' as ResearchId),
+    name: research.name ?? 'UNKNOWN',
+    __type: 'research',
+    description: research.description ?? 'UNKNOWN',
+    prerequisiteResearchIds: ensureArray(
+      research.prerequisiteResearchIds,
+      (id: unknown) => id as ResearchId,
+    ),
+    cost: ensureResearchCost(research.cost),
+    researchTime: research.researchTime ?? 3600,
+    // `as` needed - Required<> strips this to non-nullable ResearchEffect
+    // despite the `| undefined` in its declared type, same reasoning as
+    // blockedByResearchId above.
+    effect: (research.effect
+      ? ensureResearchEffect(research.effect as Record<string, unknown>)
+      : undefined) as ResearchEffect,
+  };
+}
+
+function ensureResearchTreeCell(
+  cell: Partial<ResearchTreeNodeCell & ResearchTreeBlankCell> = {},
+): ResearchTreeCell {
+  // A cell authored with both `blank: true` and a `researchId` is malformed
+  // - the researchId wins so the node still gets placed (and stays
+  // findable/debuggable) rather than silently vanishing into a blank slot.
+  if (cell.researchId) return { researchId: cell.researchId };
+  if (cell.blank) return { blank: true };
+
+  return {
+    researchId: 'UNKNOWN' as ResearchId,
+  };
+}
+
+function ensureResearchTree(
+  tree: Partial<ResearchTreeContent>,
+): Required<ResearchTreeContent> {
+  return {
+    id: tree.id ?? ('UNKNOWN' as ResearchTreeId),
+    name: tree.name ?? 'UNKNOWN',
+    __type: 'researchtree',
+    description: tree.description ?? 'UNKNOWN',
+    rows: ensureArray(tree.rows, (row: unknown) =>
+      ensureArray(row, ensureResearchTreeCell),
+    ),
   };
 }
 
@@ -678,6 +841,8 @@ function ensureNodeOverride(
     __type: 'nodeoverride',
     description: override.description ?? 'UNKNOWN',
     hidden: override.hidden ?? false,
+    // `as` needed - see the comment on the encounter/encounterrandom variant above.
+    blockedByResearchId: override.blockedByResearchId as ResearchId,
   };
 }
 

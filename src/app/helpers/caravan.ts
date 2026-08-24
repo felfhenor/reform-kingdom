@@ -29,8 +29,8 @@ export function caravanEligibleTraders(
   return getEntriesByType<CaravanTraderContent>('caravantrader').filter(
     (trader) =>
       content.traderCategories.includes(trader.category) &&
-      trader.level >= content.level.min &&
-      trader.level <= content.level.max,
+      trader.level >= content.levelRange.min &&
+      trader.level <= content.levelRange.max,
   );
 }
 

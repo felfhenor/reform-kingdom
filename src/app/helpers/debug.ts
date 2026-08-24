@@ -9,6 +9,7 @@ import {
   characterXpForLevel,
 } from '@helpers/party';
 import { isRecipeDropGated, recipeDiscover } from '@helpers/recipes';
+import { researchForfeitActiveWithRefund } from '@helpers/research/research';
 import {
   TRADESKILL_MAX_LEVEL,
   tradeskillBuildingIn,
@@ -37,6 +38,14 @@ import { clamp } from 'es-toolkit/compat';
 
 export function debugToggle() {
   setOption('showDebug', true);
+}
+
+// Manual recovery escape hatch for the active research node - refunds
+// whatever was paid and resets to Idle, same behavior as the
+// removed-content path in retrofitResearch (research.ts). Cheap insurance
+// for any desync shape the automatic migration didn't anticipate.
+export function debugResetResearch(): void {
+  researchForfeitActiveWithRefund();
 }
 
 export function debugGiveItem(itemId: ItemId, quantity: number): void {

@@ -13,6 +13,8 @@ export type ContentType =
   | 'monster'
   | 'nodeoverride'
   | 'recipe'
+  | 'research'
+  | 'researchtree'
   | 'skill'
   | 'statuseffect'
   | 'trait'

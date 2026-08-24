@@ -35,6 +35,7 @@ const CATEGORIES: AnalysisScriptCategory[] = [
   'World & Maps',
   'Hero Stats',
   'Monster Stats',
+  'Research',
 ];
 
 // `level` has a content-derived default (see `computeDefaultLevel`), so its

@@ -7,6 +7,8 @@ import {
 } from '@helpers/global-effects';
 import { applyMaterialDelta, getMaterialQuantity, isMaterialDiscovered } from '@helpers/materials';
 import { notifySuccess } from '@helpers/notify';
+import { isResearchCompleted } from '@helpers/research/research';
+import { researchAstralSpellDurationIncreasePercent } from '@helpers/research/research-effects';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { timerTicksElapsed } from '@helpers/timer';
 import type {
@@ -18,11 +20,33 @@ import type {
   GameStateActiveAstralProjectorSpell,
   GameStateDiscoveredAstralProjectorSpells,
   ItemContent,
+  ResearchContent,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// Only one spell can be active for now - raising this later is a one-line change.
-export const MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS = 1;
+// The two Arcana-tab research nodes that raise the cap - see the "Node
+// roster" section of the research tree plan. Referenced by name (resolved
+// to a real id via getEntry, same as goldCoinId/researchPointItemId) since
+// research content ids are build-time-generated UUIDs, not stable strings.
+// Base cap is 1; each completed node raises it by 1, to a max of 3.
+const ASTRAL_CAP_RESEARCH_NAMES = ['Astral Reach I', 'Astral Reach II'];
+
+// The Arcana tab's Amplify I/II nodes stack a % increase, applied live to
+// AstralProjectorContent.duration - same "derive don't mutate" approach as
+// the cap above, so a balance patch to the effect applies immediately.
+function astralProjectorEffectiveDuration(content: AstralProjectorContent): number {
+  const percent = researchAstralSpellDurationIncreasePercent();
+  return Math.round(content.duration * (1 + percent / 100));
+}
+
+export function astralProjectorMaxActiveSpells(): number {
+  const completedCount = ASTRAL_CAP_RESEARCH_NAMES.filter((name) => {
+    const research = getEntry<ResearchContent>(name);
+    return research && isResearchCompleted(research.id);
+  }).length;
+
+  return 1 + completedCount;
+}
 
 export function astralProjectorEntries(): AstralProjectorContent[] {
   return getEntriesByType<AstralProjectorContent>('astralprojector');
@@ -86,7 +110,7 @@ export function astralProjectorSpellToBeOverwritten(
   id: AstralProjectorId,
 ): AstralProjectorContent | undefined {
   const active = activeAstralProjectorSpells();
-  if (active.length < MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS) return undefined;
+  if (active.length < astralProjectorMaxActiveSpells()) return undefined;
 
   const oldest = sortBy(active, (spell) => spell.startedAtTick)[0];
   if (!oldest || oldest.astralProjectorId === id) return undefined;
@@ -102,6 +126,7 @@ export function astralProjectorCast(id: AstralProjectorId): void {
 
   const evicted = astralProjectorSpellToBeOverwritten(id);
   const currentTick = timerTicksElapsed();
+  const duration = astralProjectorEffectiveDuration(content);
 
   updateGamestate((state) => {
     content.requiredMaterials.forEach((requirement) => {
@@ -119,14 +144,14 @@ export function astralProjectorCast(id: AstralProjectorId): void {
     applyGlobalEffectAdd(
       state,
       content.globalEffectId,
-      content.duration,
+      duration,
       currentTick,
     );
 
     const existing = state.activeAstralProjectorSpells.find(
       (spell) => spell.astralProjectorId === id,
     );
-    const expiresAtTick = currentTick + content.duration;
+    const expiresAtTick = currentTick + duration;
 
     if (existing) {
       existing.expiresAtTick = expiresAtTick;

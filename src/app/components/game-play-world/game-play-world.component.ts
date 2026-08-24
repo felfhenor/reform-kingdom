@@ -55,9 +55,11 @@ import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
 import { worldNodeEncounterCount } from '@helpers/world-node-encounter';
 import { worldNodeLabelInfo } from '@helpers/world-node-status';
 import {
+  isWorldNodeBlockedByResearch,
   isWorldNodeVisible,
   worldNodeByName,
   worldNodeDiscoverIfHidden,
+  worldNodeLookup,
 } from '@helpers/world-nodes';
 import type {
   CameraPosition,
@@ -141,6 +143,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private nodeSelectionContainer?: Container;
   private nodeSelectionIndicator?: Graphics;
   private nodeLabels?: Map<string, Text>;
+  private nodeWrappers?: Map<string, Container>;
   private resizeObserver?: ResizeObserver;
   private playerIndicatorTicker?: () => void;
   private visualPositionTicker?: () => void;
@@ -310,6 +313,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.nodeSelectionContainer = undefined;
     this.nodeSelectionIndicator = undefined;
     this.nodeLabels = undefined;
+    this.nodeWrappers = undefined;
     this.resizeObserver = undefined;
     this.canvas = undefined;
   }
@@ -367,7 +371,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.mapContainer.addChild(renderedMap.container);
     this.nodeLabels = renderedMap.nodeLabels;
+    this.nodeWrappers = renderedMap.nodeWrappers;
     this.updateNodeLabels();
+    this.updateBlockedNodeVisibility();
 
     this.gridOverlay = pixiGridOverlayCreate(map);
     this.gridOverlay.visible = getOption('showBackdropGrid');
@@ -403,6 +409,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateGatherProgressIndicator();
       this.updateEncounterProgressIndicator();
       this.updateNodeLabels();
+      this.updateBlockedNodeVisibility();
       this.positionCamera();
     };
     this.app.ticker.add(this.visualPositionTicker);
@@ -440,6 +447,30 @@ export class GamePlayWorldComponent implements OnDestroy {
 
       const info = worldNodeLabelInfo(entry);
       if (info) label.text = info.text;
+    });
+  }
+
+  // Runs every tick, single source of truth for a blocked node's wrapper
+  // visibility/interactivity in both directions (a node blocking or
+  // unblocking while the map is already loaded). Reads the unfiltered
+  // worldNodeLookup() directly, not worldNodeByName - the filtered accessor
+  // returns undefined for exactly the blocked nodes this needs to find.
+  // Known limitation, accepted for simplicity: a node that starts blocked
+  // never got a label at initial render (resolveNodeLabel goes through the
+  // filtered worldNodeByName too), so its name/level text stays missing
+  // until the next full map (re)load even after it unblocks - only the
+  // sprite/cursor react live. Avoids needing to hot-rebuild pixi containers
+  // mid-session.
+  private updateBlockedNodeVisibility(): void {
+    if (!this.nodeWrappers) return;
+
+    this.nodeWrappers.forEach((wrapper, nodeName) => {
+      const entry = worldNodeLookup().byName[nodeName];
+      if (!entry) return;
+
+      const blocked = isWorldNodeBlockedByResearch(entry);
+      wrapper.visible = !blocked;
+      wrapper.eventMode = blocked ? 'none' : 'static';
     });
   }
 

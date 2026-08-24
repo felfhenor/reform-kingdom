@@ -118,14 +118,14 @@ export function buildItemSources(
     const eligibleCaravans = caravans.filter(
       (caravan) =>
         caravan.traderCategories.includes(trader.category) &&
-        trader.level >= caravan.level.min &&
-        trader.level <= caravan.level.max,
+        trader.level >= caravan.levelRange.min &&
+        trader.level <= caravan.levelRange.max,
     );
 
     trader.trades.forEach((trade) => {
       if (trade.type !== 'sell' || !trade.itemId) return;
       eligibleCaravans.forEach((caravan) =>
-        addSource(itemSources, trade.itemId, caravan.level.min),
+        addSource(itemSources, trade.itemId, caravan.levelRange.min),
       );
     });
   });

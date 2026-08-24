@@ -96,6 +96,7 @@ export * from './world-node-caravan';
 export * from './world-node-content';
 export * from './world-node-discovery';
 export * from './world-node-encounter';
+export * from './world-node-first-time-rewards';
 export * from './world-node-gathering';
 export * from './world-node-rewards';
 export * from './world-node-status';

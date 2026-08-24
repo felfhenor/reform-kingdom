@@ -2,7 +2,7 @@ import type { MonsterId } from '@interfaces/content-monster';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
-import type { HasDescription } from '@interfaces/traits';
+import type { HasDescription, HasMapNodeGating } from '@interfaces/traits';
 
 export type EncounterId = Branded<string, 'EncounterId'>;
 
@@ -15,7 +15,8 @@ export type EncounterFight = {
 };
 
 export type EncounterContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  HasMapNodeGating & {
     id: EncounterId;
     __type: 'encounter';
 
@@ -25,7 +26,10 @@ export type EncounterContent = IsContentItem &
 
     completionRewards: DroppedReward[];
 
-    // When true, the node's name/level label and map cursor stay hidden
-    // until the player discovers it (see `world-node-discovery.ts`).
-    hidden?: boolean;
+    // Rolled once, ever, per physical node - see
+    // world-node-first-time-rewards.ts. Absent/empty means no first-time
+    // reward. RP-only by convention (every entry must be a DroppedItemReward
+    // pointing at the Insight Crystal item id), enforced by the
+    // researchrpgaps validator.
+    firstTimeRewards?: DroppedReward[];
   };

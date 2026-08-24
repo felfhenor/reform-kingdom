@@ -36,7 +36,11 @@ import { worldNodeCaravanIsAvailable } from '@helpers/world-node-caravan';
 import { worldNodeDescription } from '@helpers/world-node-content';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node-encounter';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
-import { worldNodeCompletionRewards } from '@helpers/world-node-rewards';
+import {
+  worldNodeCompletionRewards,
+  worldNodeFirstTimeReward,
+} from '@helpers/world-node-rewards';
+import { isFirstTimeNodeRewardsGranted } from '@helpers/world-node-first-time-rewards';
 import {
   worldNodeLevelLabel,
   worldNodeLevelRange,
@@ -102,6 +106,16 @@ export class PanelMapNodeComponent {
     if (!entry) return [];
 
     return sortBy(worldNodeCompletionRewards(entry), [rewardDisplayOrder]);
+  });
+
+  public firstTimeReward = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeFirstTimeReward(entry) : undefined;
+  });
+
+  public firstTimeRewardObtained = computed(() => {
+    const entry = this.node();
+    return !!entry && isFirstTimeNodeRewardsGranted(entry.nodeName);
   });
 
   public meetsGatherLevelRequirement = computed(() => {

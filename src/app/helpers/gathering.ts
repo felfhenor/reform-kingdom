@@ -3,13 +3,25 @@ import { gatherMessageLog, itemDropHtml } from '@helpers/combat-log';
 import { getEntry } from '@helpers/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/luck';
+import { rollDroppedRewards } from '@helpers/loot';
 import { addMaterial } from '@helpers/materials';
 import { partyGet } from '@helpers/party';
-import { rngChoiceWeighted } from '@helpers/rng';
+import { researchPointItemId } from '@helpers/research/research';
+import { researchGatherBonusQuantityChance } from '@helpers/research/research-effects';
+import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  isFirstTimeNodeRewardsGranted,
+  markFirstTimeNodeRewardsGranted,
+} from '@helpers/world-node-first-time-rewards';
 import { worldNodeByName, worldNodeGathering } from '@helpers/world-nodes';
-import type { GatherResult, GatheringContent, ItemContent } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
+import type {
+  GatherResult,
+  GatheringContent,
+  ItemContent,
+  ResolvedItemDrop,
+} from '@interfaces';
+import { clamp, sumBy } from 'es-toolkit/compat';
 
 export function partyMinLevel(): number {
   const party = partyGet();
@@ -107,11 +119,17 @@ function grantGatherItems(
   result: GatherResult,
   nodeName: string,
   yieldMultiplier: number,
+  bonusQuantity: number,
 ): void {
   const descriptions = result.items
     .filter(({ quantity }) => quantity > 0)
-    .map(({ itemId, quantity }) => {
-      const grantedQuantity = quantity * yieldMultiplier;
+    // Research bonusQuantity is a once-per-cycle extra, not per item type -
+    // applying it to every item in a multi-item result (e.g. a gather node
+    // that yields both wood and a stick on one roll) would over-grant it
+    // once per item, so it only ever lands on the first granted item.
+    .map(({ itemId, quantity }, index) => {
+      const grantedQuantity =
+        quantity * yieldMultiplier + (index === 0 ? bonusQuantity : 0);
       addMaterial(itemId, grantedQuantity);
 
       const item = getEntry<ItemContent>(itemId);
@@ -126,14 +144,45 @@ function grantGatherItems(
   gatherMessageLog(nodeName, `The party found ${descriptions.join(', ')}!`);
 }
 
+// Fires once per physical node, ever - see world-node-first-time-rewards.ts.
+// Gathering has no combat context to hand rollDroppedRewards's resolved
+// drops to, so this reuses addMaterial/gatherMessageLog directly, same as
+// grantGatherItems does for the node's regular gatherResults.
+function grantGatherFirstTimeRewards(
+  content: GatheringContent,
+  nodeName: string,
+): void {
+  if (!content.firstTimeRewards?.length) return;
+  if (isFirstTimeNodeRewardsGranted(nodeName)) return;
+
+  const drops = rollDroppedRewards(content.firstTimeRewards, partyMaxLevel());
+  const itemDrops = drops.filter(
+    (drop): drop is ResolvedItemDrop => 'itemId' in drop,
+  );
+
+  itemDrops.forEach(({ itemId, quantity }) => addMaterial(itemId, quantity));
+
+  const rpItemId = researchPointItemId();
+  const rpGranted = sumBy(
+    itemDrops.filter((drop) => drop.itemId === rpItemId),
+    (drop) => drop.quantity,
+  );
+  markFirstTimeNodeRewardsGranted(nodeName, rpGranted);
+}
+
 function resolveGatherCycle(content: GatheringContent, nodeName: string): void {
   grantGatherXpIfInRange(content);
 
   const result = gatheringRollResult(content);
   if (result) {
     const yieldMultiplier = luckRollSucceeds(partyMaxLuck()) ? 2 : 1;
-    grantGatherItems(result, nodeName, yieldMultiplier);
+    const { chance, bonusQuantity } = researchGatherBonusQuantityChance();
+    const researchBonus =
+      chance > 0 && rngSucceedsChance(chance) ? bonusQuantity : 0;
+    grantGatherItems(result, nodeName, yieldMultiplier, researchBonus);
   }
+
+  grantGatherFirstTimeRewards(content, nodeName);
 
   updateGamestate((state) => {
     state.world.gathering.ticksIntoGather = 0;

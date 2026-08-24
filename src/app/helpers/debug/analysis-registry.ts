@@ -11,6 +11,9 @@ import { runObtainabilityAnalysis } from '@helpers/debug/analysis-obtainability'
 import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipeingredientorder';
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
+import { runResearchRpGapsAnalysis } from '@helpers/debug/analysis-researchrpgaps';
+import { runResearchTreePlacementAnalysis } from '@helpers/debug/analysis-researchtreeplacement';
+import { runResearchUnspentRpAnalysis } from '@helpers/debug/analysis-researchunspentrp';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runTradeskillXpGapsAnalysis } from '@helpers/debug/analysis-tradeskillxpgaps';
@@ -182,5 +185,38 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: false,
     inputKeys: ['level', 'monsterFilter'],
     run: runMonsterStatsAnalysis,
+  },
+
+  // --- Research ---
+  {
+    id: 'researchrpgaps',
+    title: 'Research RP Gaps',
+    description:
+      'Every research node is affordable within total obtainable Insight Crystal, with no prerequisite cycles or dangling references.',
+    category: 'Research',
+    strict: true,
+    inputKeys: [],
+    run: runResearchRpGapsAnalysis,
+  },
+  {
+    id: 'researchtreeplacement',
+    title: 'Research Tree Placement',
+    description:
+      'Every research node is placed exactly once in a research tree, with no dangling cells or row-ordering violations.',
+    category: 'Research',
+    strict: true,
+    inputKeys: [],
+    run: runResearchTreePlacementAnalysis,
+  },
+  {
+    id: 'researchunspentrp',
+    title: 'Research Unspent RP',
+    description:
+      "Current Insight Crystal balance vs. remaining research costs, and the firstTimeNodeRewardsGranted ledger's consistency invariant.",
+    category: 'Research',
+    strict: false,
+    inputKeys: [],
+    usesGamestate: true,
+    run: runResearchUnspentRpAnalysis,
   },
 ];

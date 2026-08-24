@@ -110,6 +110,11 @@ describe('Astral Projector Helper Functions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // clearAllMocks doesn't reset a prior test's mockReturnValue - default
+    // getEntriesByType to no research entries so research-effects.ts's
+    // queries (now called from astralProjectorCast) don't pick up a
+    // leftover astral-projector-content list from an earlier describe block.
+    vi.mocked(getEntriesByType).mockReturnValue([]);
   });
 
   describe('isAstralProjectorCollectiblesMet', () => {

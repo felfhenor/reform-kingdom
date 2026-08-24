@@ -63,6 +63,16 @@ vi.mock('@helpers/recipes', () => ({
   pruneInvalidDiscoveredRecipes: vi.fn((discovered) => discovered),
 }));
 
+vi.mock('@helpers/research/research', () => ({
+  pruneInvalidDiscoveredResearch: vi.fn((discovered) => discovered),
+  retrofitResearch: vi.fn(),
+}));
+
+vi.mock('@helpers/world-node-first-time-rewards', () => ({
+  pruneInvalidFirstTimeNodeRewardsGranted: vi.fn((granted) => granted),
+  reconcileFirstTimeRewardGrants: vi.fn(),
+}));
+
 vi.mock('@helpers/tradeskill', () => ({
   migrateTradeskillStateKeys: vi.fn((tradeskills) => tradeskills),
   retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
@@ -81,6 +91,9 @@ vi.mock('@helpers/defaults', () => ({
     bestiary: {},
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
+    discoveredResearch: {},
+    firstTimeNodeRewardsGranted: {},
+    research: { status: 'Idle', researchId: undefined, ticksIntoResearch: 0, costPaid: undefined },
     world: { party: [], autoMode: { clauses: [] } },
   })),
 }));

@@ -37,11 +37,19 @@ import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
 import { pruneInvalidPartyEquipment } from '@helpers/party';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
 import {
+  pruneInvalidDiscoveredResearch,
+  retrofitResearch,
+} from '@helpers/research/research';
+import {
   migrateTradeskillStateKeys,
   retrofitTradeskillXp,
 } from '@helpers/tradeskill';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node-gathering';
+import {
+  pruneInvalidFirstTimeNodeRewardsGranted,
+  reconcileFirstTimeRewardGrants,
+} from '@helpers/world-node-first-time-rewards';
 import {
   gamestate,
   gamestateTickEnd,
@@ -167,6 +175,21 @@ export function migrateGameState() {
   newState.activeAstralProjectorSpells = pruneInvalidActiveAstralProjectorSpells(
     newState.activeAstralProjectorSpells,
   );
+
+  newState.discoveredResearch = pruneInvalidDiscoveredResearch(
+    newState.discoveredResearch,
+  );
+  newState.firstTimeNodeRewardsGranted =
+    pruneInvalidFirstTimeNodeRewardsGranted(
+      newState.firstTimeNodeRewardsGranted,
+      (nodeName) => !!worldNodeByName(nodeName),
+    );
+  // Reconcile before retrofit: reconciliation needs the ledger already
+  // pruned of dangling entries, and retrofit's refund-on-removed-content
+  // path is independent of both (see the "Migration and desync recovery"
+  // plan section for the full reasoning).
+  reconcileFirstTimeRewardGrants(newState);
+  retrofitResearch(newState);
 
   setGameState(newState);
   gamestateTickStart();

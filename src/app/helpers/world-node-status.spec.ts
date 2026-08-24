@@ -126,7 +126,7 @@ describe('encounter-backed node accessors', () => {
         __type: 'caravan',
         description: 'A caravan.',
         traderResetTime: 3600,
-        level: { min: 2, max: 5 },
+        levelRange: { min: 2, max: 5 },
         markupPercentages: { sell: 25, buy: -15 },
         traderCategories: ['Carrina'],
       };

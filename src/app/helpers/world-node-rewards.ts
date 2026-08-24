@@ -7,7 +7,12 @@ import {
   recipeResultContent,
   recipeResultSpritesheet,
 } from '@helpers/recipes';
-import { worldNodeEncounter, worldNodeEncounterRandom } from '@helpers/world-nodes';
+import { isFirstTimeNodeRewardsGranted } from '@helpers/world-node-first-time-rewards';
+import {
+  worldNodeEncounter,
+  worldNodeEncounterRandom,
+  worldNodeGathering,
+} from '@helpers/world-nodes';
 import type {
   CollectibleContent,
   DroppedReward,
@@ -104,14 +109,45 @@ export function isRewardDiscovered(reward: DroppedReward): boolean {
   return isCollectibleDiscovered(reward.collectibleId);
 }
 
-// Obtained/total counts for the "X/Y Rewards" info-popup badge.
+// RP-only by authoring convention (enforced by the researchrpgaps
+// validator), so there's at most one meaningful entry - the UI only ever
+// needs the first.
+export function worldNodeFirstTimeReward(
+  entry: WorldNodeEntry,
+): DroppedReward | undefined {
+  const rewards =
+    worldNodeEncounter(entry)?.firstTimeRewards ??
+    worldNodeGathering(entry)?.firstTimeRewards ??
+    worldNodeEncounterRandom(entry)?.firstTimeRewards;
+  return rewards?.[0];
+}
+
+function nodeHasFirstTimeRewards(entry: WorldNodeEntry): boolean {
+  return !!worldNodeFirstTimeReward(entry);
+}
+
+// Obtained/total counts for the "X/Y Rewards" info-popup badge. Folds in one
+// pseudo-slot for the node's first-time reward (if it has one) using the
+// per-node ledger, not isRewardDiscovered's global-discovery check - that
+// check is wrong here, since Insight Crystal is a real material and
+// isMaterialDiscovered would go true globally after the player's first pickup
+// on ANY node, incorrectly marking every other node's first-time reward
+// "already obtained". This same counter also drives
+// decree-evaluation.ts's nearestUnfinishedExploreNode "unfinished" check, so
+// a node with an unclaimed first-time reward gets auto-mode-prioritized for
+// free - no separate decree-clause logic needed.
 export function worldNodeCompletionRewardProgress(
   entry: WorldNodeEntry,
 ): WorldNodeCompletionRewardProgress {
   const rewards = worldNodeCompletionRewards(entry);
+  const hasFirstTimeReward = nodeHasFirstTimeRewards(entry);
 
   return {
-    obtained: rewards.filter(isRewardDiscovered).length,
-    total: rewards.length,
+    obtained:
+      rewards.filter(isRewardDiscovered).length +
+      (hasFirstTimeReward && isFirstTimeNodeRewardsGranted(entry.nodeName)
+        ? 1
+        : 0),
+    total: rewards.length + (hasFirstTimeReward ? 1 : 0),
   };
 }

@@ -15,6 +15,7 @@ vi.mock('@helpers/collectibles', () => ({
 }));
 
 vi.mock('@helpers/content', () => ({
+  getEntriesByType: vi.fn(() => []),
   getEntry: vi.fn(),
 }));
 
@@ -93,7 +94,7 @@ const caravan: CaravanContent = {
   __type: 'caravan',
   description: 'A caravan.',
   traderResetTime: 100,
-  level: { min: 1, max: 10 },
+  levelRange: { min: 1, max: 10 },
   markupPercentages: { sell: 25, buy: -15 },
   traderCategories: ['Carrina'],
 };

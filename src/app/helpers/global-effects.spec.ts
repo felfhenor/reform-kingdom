@@ -7,6 +7,7 @@ vi.mock('@helpers/character-progress', () => ({
 }));
 
 vi.mock('@helpers/content', () => ({
+  getEntriesByType: vi.fn(() => []),
   getEntry: vi.fn(),
 }));
 

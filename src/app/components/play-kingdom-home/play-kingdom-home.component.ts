@@ -16,6 +16,7 @@ import {
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
 } from '@helpers/museum';
+import { isResearchCompleted, researchEntries } from '@helpers/research/research';
 import { gamestate } from '@helpers/state-game';
 import { formatDuration } from '@helpers/timer';
 import { tradeskillBuilding } from '@helpers/tradeskill';
@@ -58,6 +59,14 @@ export class PlayKingdomHomeComponent {
 
   public unlockedAstralSpellCount = computed(
     () => unlockedAstralProjectorEntries().length,
+  );
+
+  public allResearchEntries = computed(() => researchEntries());
+  public completedResearchCount = computed(
+    () =>
+      this.allResearchEntries().filter((content) =>
+        isResearchCompleted(content.id),
+      ).length,
   );
 
   public museumCollectibleEntries = computed(() =>

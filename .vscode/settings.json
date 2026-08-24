@@ -28,6 +28,8 @@
     "./schemas/monster.schema.json": "gamedata/monster/**/*.yml",
     "./schemas/nodeoverride.schema.json": "gamedata/nodeoverride/**/*.yml",
     "./schemas/recipe.schema.json": "gamedata/recipe/**/*.yml",
+    "./schemas/research.schema.json": "gamedata/research/**/*.yml",
+    "./schemas/researchtree.schema.json": "gamedata/researchtree/**/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/**/*.yml",
     "./schemas/statuseffect.schema.json": "gamedata/statuseffect/**/*.yml",
     "./schemas/trait.schema.json": "gamedata/trait/**/*.yml",

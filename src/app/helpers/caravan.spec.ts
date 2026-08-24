@@ -38,7 +38,7 @@ const caravan: CaravanContent = {
   __type: 'caravan',
   description: 'A caravan.',
   traderResetTime: 100,
-  level: { min: 3, max: 7 },
+  levelRange: { min: 3, max: 7 },
   markupPercentages: { sell: 25, buy: -15 },
   traderCategories: ['Carrina'],
 };
