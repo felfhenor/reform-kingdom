@@ -2,6 +2,11 @@ import type { AtlasedImage } from '@interfaces/artable';
 import type { RewardIdentity } from '@interfaces/droppable';
 import type { TiledObject } from '@interfaces/tiled-map';
 
+export type WorldNodeHideable = {
+  // When true, name/level label and map cursor stay hidden until discovered (see world-node-discovery.ts).
+  hidden?: boolean;
+};
+
 export type WorldNodeEntry = {
   mapName: string;
   x: number;
@@ -23,11 +28,7 @@ export type WorldNodeLookup = {
 };
 
 export type WorldNodeInteractionKind =
-  | 'Gather'
-  | 'Explore'
-  | 'ExploreRandom'
-  | 'Trade'
-  | 'Travel';
+  'Gather' | 'Explore' | 'ExploreRandom' | 'Trade' | 'Travel';
 
 export type WorldNodeCompletionRewardProgress = {
   obtained: number;

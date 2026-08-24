@@ -15,7 +15,6 @@ export type ContentType =
   | 'recipe'
   | 'skill'
   | 'statuseffect'
-  | 'trait'
   | 'tradeskill'
   | 'tradeskilllevelrequirement';
 

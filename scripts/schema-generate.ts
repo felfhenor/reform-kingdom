@@ -26,9 +26,9 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as TJS from 'typescript-json-schema';
 import fs from 'fs-extra';
 import path from 'path';
+import * as TJS from 'typescript-json-schema';
 
 // Ensure the schemas directory exists
 const schemasDir = './schemas';
@@ -336,7 +336,6 @@ const contentTypeMap = {
   recipe: 'RecipeContent',
   skill: 'EquipmentSkillContent',
   statuseffect: 'StatusEffectContent',
-  trait: 'TraitContent',
   tradeskill: 'TradeskillContent',
   tradeskilllevelrequirement: 'TradeskillLevelRequirementContent',
 };

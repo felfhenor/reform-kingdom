@@ -1,6 +1,7 @@
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
+import type { WorldNodeHideable } from '@interfaces/world-nodes';
 
 export type CaravanId = Branded<string, 'CaravanId'>;
 
@@ -10,7 +11,8 @@ export type CaravanMarkupPercentages = {
 };
 
 export type CaravanContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  WorldNodeHideable & {
     id: CaravanId;
     __type: 'caravan';
 

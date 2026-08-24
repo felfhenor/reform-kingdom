@@ -1,8 +1,7 @@
-import type { Branded } from '@interfaces/identifiable';
 import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { JobId } from '@interfaces/content-job';
-import type { TraitId } from '@interfaces/content-trait';
 import type { EquipmentBlock } from '@interfaces/equipment';
+import type { Branded } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
 
 export type CharacterId = Branded<string, 'CharacterId'>;
@@ -37,6 +36,4 @@ export type Character = {
   stats: StatBlock;
 
   equipment: EquipmentBlock;
-
-  traitIds: TraitId[];
-}
+};

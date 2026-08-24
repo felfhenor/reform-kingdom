@@ -3,7 +3,7 @@ import type { ItemContent } from '@interfaces/content-item';
 
 // `discovered` drives the bestiary-style "???" masking for an unfound material.
 export type AstralProjectorMaterialEntry = {
-  content: ItemContent | undefined;
+  content?: ItemContent;
   quantity: number;
   owned: number;
   discovered: boolean;
@@ -11,5 +11,5 @@ export type AstralProjectorMaterialEntry = {
 
 // Always discovered - unlocking the spell already required finding it (not consumed).
 export type AstralProjectorCollectibleEntry = {
-  content: CollectibleContent | undefined;
+  content?: CollectibleContent;
 };

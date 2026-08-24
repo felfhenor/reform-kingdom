@@ -1,6 +1,9 @@
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
-import { equipmentStatTotals, pruneInvalidEquippedItems } from '@helpers/equipment';
+import {
+  equipmentStatTotals,
+  pruneInvalidEquippedItems,
+} from '@helpers/equipment';
 import { roundToNearest10 } from '@helpers/number';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -103,7 +106,6 @@ export function createCharacter(name: string, jobId: JobId): Character {
     ep: stats.Energy,
     stats,
     equipment,
-    traitIds: [],
   };
 }
 
@@ -112,7 +114,9 @@ export function partyGet(): Character[] {
 }
 
 export function isPartyAtFullHealth(): boolean {
-  return partyGet().every((character) => character.hp >= character.stats.Health);
+  return partyGet().every(
+    (character) => character.hp >= character.stats.Health,
+  );
 }
 
 export function setParty(party: Character[]): void {

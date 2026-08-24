@@ -1,3 +1,8 @@
+export type GameMap = {
+  name: string;
+  data: unknown;
+};
+
 export type TiledTileset = {
   firstgid: number;
   name: string;

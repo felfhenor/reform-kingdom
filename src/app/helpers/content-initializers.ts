@@ -45,10 +45,10 @@ import type {
   EquipmentSkillTechniqueStatusEffectApplication,
   GameElement,
   GameStat,
-  GatherResult,
-  GatherResultItem,
   GatheringContent,
   GatheringId,
+  GatherResult,
+  GatherResultItem,
   GlobalEffectContent,
   GlobalEffectEffect,
   GlobalEffectEffectDebuffResistance,
@@ -83,8 +83,6 @@ import type {
   TradeskillId,
   TradeskillLevelRequirementContent,
   TradeskillLevelRequirementId,
-  TraitContent,
-  TraitId,
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
 
@@ -107,7 +105,6 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   recipe: ensureRecipe,
   skill: ensureSkill,
   statuseffect: ensureStatusEffect,
-  trait: ensureTrait,
   tradeskill: ensureTradeskill,
   tradeskilllevelrequirement: ensureTradeskillLevelRequirement,
 };
@@ -400,7 +397,9 @@ function ensureCaravanTrade(trade: Partial<CaravanTrade> = {}): CaravanTrade {
   };
 }
 
-function ensureCaravan(caravan: Partial<CaravanContent>): Required<CaravanContent> {
+function ensureCaravan(
+  caravan: Partial<CaravanContent>,
+): Required<CaravanContent> {
   return {
     id: caravan.id ?? ('UNKNOWN' as CaravanId),
     name: caravan.name ?? 'UNKNOWN',
@@ -410,6 +409,7 @@ function ensureCaravan(caravan: Partial<CaravanContent>): Required<CaravanConten
     level: caravan.level ?? { min: 1, max: 1 },
     markupPercentages: caravan.markupPercentages ?? { sell: 0, buy: 0 },
     traderCategories: caravan.traderCategories ?? [],
+    hidden: caravan.hidden ?? false,
   };
 }
 
@@ -656,7 +656,8 @@ function ensureAstralProjector(
     id: astralProjector.id ?? ('UNKNOWN' as AstralProjectorId),
     name: astralProjector.name ?? 'UNKNOWN',
     __type: 'astralprojector',
-    globalEffectId: astralProjector.globalEffectId ?? ('UNKNOWN' as GlobalEffectId),
+    globalEffectId:
+      astralProjector.globalEffectId ?? ('UNKNOWN' as GlobalEffectId),
     duration: astralProjector.duration ?? 60,
     requiredCollectibles: ensureArray(
       astralProjector.requiredCollectibles,
@@ -678,16 +679,6 @@ function ensureNodeOverride(
     __type: 'nodeoverride',
     description: override.description ?? 'UNKNOWN',
     hidden: override.hidden ?? false,
-  };
-}
-
-function ensureTrait(trait: Partial<TraitContent>): Required<TraitContent> {
-  return {
-    id: trait.id ?? ('UNKNOWN' as TraitId),
-    name: trait.name ?? 'UNKNOWN',
-    __type: 'trait',
-    description: trait.description ?? 'UNKNOWN',
-    baseStats: ensureStats(trait.baseStats),
   };
 }
 

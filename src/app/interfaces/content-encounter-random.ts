@@ -4,18 +4,9 @@ import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
+import type { WorldNodeHideable } from '@interfaces/world-nodes';
 
 export type EncounterRandomId = Branded<string, 'EncounterRandomId'>;
-
-export type EncounterRandomEncounterRange = {
-  min: number;
-  max: number;
-};
-
-export type EncounterRandomCombatantRange = {
-  min: number;
-  max: number;
-};
 
 export type EncounterRandomPoolMonster = {
   monsterId: MonsterId;
@@ -23,7 +14,8 @@ export type EncounterRandomPoolMonster = {
 };
 
 export type EncounterRandomContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  WorldNodeHideable & {
     id: EncounterRandomId;
     __type: 'encounterrandom';
 
@@ -31,8 +23,8 @@ export type EncounterRandomContent = IsContentItem &
     resetTime: number;
 
     levelRange: LevelRange;
-    encounterRange: EncounterRandomEncounterRange;
-    combatantRange: EncounterRandomCombatantRange;
+    encounterRange: LevelRange;
+    combatantRange: LevelRange;
 
     creaturePool: EncounterRandomPoolMonster[];
 
@@ -40,7 +32,4 @@ export type EncounterRandomContent = IsContentItem &
     fights: EncounterFight[];
 
     completionRewards: DroppedReward[];
-
-    // When true, name/level label and map cursor stay hidden until discovered (see world-node-discovery.ts).
-    hidden?: boolean;
   };

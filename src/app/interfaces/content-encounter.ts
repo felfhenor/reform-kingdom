@@ -3,6 +3,7 @@ import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
+import type { WorldNodeHideable } from '@interfaces/world-nodes';
 
 export type EncounterId = Branded<string, 'EncounterId'>;
 
@@ -15,7 +16,8 @@ export type EncounterFight = {
 };
 
 export type EncounterContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  WorldNodeHideable & {
     id: EncounterId;
     __type: 'encounter';
 
@@ -24,8 +26,4 @@ export type EncounterContent = IsContentItem &
     fights: EncounterFight[];
 
     completionRewards: DroppedReward[];
-
-    // When true, the node's name/level label and map cursor stay hidden
-    // until the player discovers it (see `world-node-discovery.ts`).
-    hidden?: boolean;
   };

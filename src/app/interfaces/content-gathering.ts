@@ -2,6 +2,7 @@ import type { ItemId } from '@interfaces/content-item';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
+import type { WorldNodeHideable } from '@interfaces/world-nodes';
 
 export type GatheringId = Branded<string, 'GatheringId'>;
 
@@ -16,7 +17,8 @@ export type GatherResult = {
 };
 
 export type GatheringContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  WorldNodeHideable & {
     id: GatheringId;
     __type: 'gathering';
 
@@ -26,8 +28,4 @@ export type GatheringContent = IsContentItem &
     gatherTime: number;
 
     gatherResults: GatherResult[];
-
-    // When true, the node's name/level label and map cursor stay hidden
-    // until the player discovers it (see `world-node-discovery.ts`).
-    hidden?: boolean;
   };
