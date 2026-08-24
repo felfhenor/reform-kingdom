@@ -1,6 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { getEntry, getMaterialQuantity } from '../../helpers';
+import { getEntry } from '@helpers/content';
+import { getMaterialQuantity } from '@helpers/item/materials';
 import type { ItemContent } from '../../interfaces';
 
 @Component({

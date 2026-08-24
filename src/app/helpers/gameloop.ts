@@ -1,18 +1,20 @@
 import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
-import { astralProjectorProcessTick } from '@helpers/astral-projector';
-import { autoModeProcessTick } from '@helpers/auto-mode';
-import { caravanProcessTick } from '@helpers/caravan-tick';
-import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
-import { craftProcessTick } from '@helpers/crafting-queue';
-import { discordUpdateStatus } from '@helpers/discord';
-import { encounterRandomProcessTick } from '@helpers/encounter-random-tick';
-import { gatheringProcessTick } from '@helpers/gathering';
-import { globalEffectsProcessTick } from '@helpers/global-effects';
-import { debug } from '@helpers/logging';
-import { restingProcessTick } from '@helpers/resting';
-import { schedulerYield } from '@helpers/scheduler';
+import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
+import { combatDoCombatIteration, currentCombat } from '@helpers/combat/combat';
+import { craftProcessTick } from '@helpers/crafting/crafting-queue';
+import { autoModeProcessTick } from '@helpers/decree/auto-mode';
+import { discordUpdateStatus } from '@helpers/engine/discord';
+import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
+import { debug } from '@helpers/engine/logging';
+import { schedulerYield } from '@helpers/engine/scheduler';
+import { timerLastSaveTick, timerTicksElapsed } from '@helpers/engine/timer';
+import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
+import { restingProcessTick } from '@helpers/hero/resting';
+import { travelProcessTick } from '@helpers/hero/travel';
+import { gatheringProcessTick } from '@helpers/item/gathering';
+import { astralProjectorProcessTick } from '@helpers/kingdom/astral-projector';
 import { isSetup } from '@helpers/setup';
 import {
   gamestateTickEnd,
@@ -22,8 +24,6 @@ import {
   updateGamestate,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import { timerLastSaveTick, timerTicksElapsed } from '@helpers/timer';
-import { travelProcessTick } from '@helpers/travel';
 import { clamp } from 'es-toolkit/compat';
 
 export const isGameloopPaused = computed(() => getOption('gameloopPaused'));

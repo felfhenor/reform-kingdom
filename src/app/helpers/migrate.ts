@@ -1,47 +1,45 @@
-import {
-  pruneInvalidArmoryItems,
-  pruneInvalidDiscoveredEquipment,
-} from '@helpers/armory';
-import {
-  pruneInvalidActiveAstralProjectorSpells,
-  pruneInvalidDiscoveredAstralProjectorSpells,
-} from '@helpers/astral-projector';
-import {
-  pruneInvalidBestiaryEntries,
-  repairInvalidBestiaryLevels,
-} from '@helpers/bestiary';
-import {
-  grantFoundingStoneIfMissing,
-  pruneInvalidCollectibles,
-} from '@helpers/collectibles';
-import { retrofitPartyXp } from '@helpers/character-progress';
-import { pruneInvalidCraftQueues } from '@helpers/crafting';
-import {
-  backfillDecreeClauseRiskTolerance,
-  pruneInvalidDecreeGatherClauses,
-} from '@helpers/decree';
-import { defaultGameState } from '@helpers/defaults';
-import {
-  backfillEquipmentBlock,
-  backfillEquipmentItem,
-} from '@helpers/equipment';
-import {
-  grandfatherGatherNodeDiscoveries,
-  pruneInvalidGatherNodeDiscoveries,
-} from '@helpers/gather-node-discovery';
-import {
-  pruneInvalidDiscoveredMaterials,
-  pruneInvalidMaterials,
-} from '@helpers/materials';
-import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
-import { pruneInvalidPartyEquipment } from '@helpers/party';
-import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
+import { pruneInvalidCraftQueues } from '@helpers/crafting/crafting';
+import { pruneInvalidDiscoveredRecipes } from '@helpers/crafting/recipes';
 import {
   migrateTradeskillStateKeys,
   retrofitTradeskillXp,
-} from '@helpers/tradeskill';
-import { pruneInvalidWorldDiscoveries } from '@helpers/world-node-discovery';
-import { allGatherableMaterialIds } from '@helpers/world-node-gathering';
+} from '@helpers/crafting/tradeskill';
+import {
+  backfillDecreeClauseRiskTolerance,
+  pruneInvalidDecreeGatherClauses,
+} from '@helpers/decree/decree';
+import { defaultGameState } from '@helpers/defaults';
+import { retrofitPartyXp } from '@helpers/hero/character-progress';
+import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
+import {
+  grantFoundingStoneIfMissing,
+  pruneInvalidCollectibles,
+} from '@helpers/item/collectibles';
+import {
+  backfillEquipmentBlock,
+  backfillEquipmentItem,
+} from '@helpers/item/equipment';
+import {
+  grandfatherGatherNodeDiscoveries,
+  pruneInvalidGatherNodeDiscoveries,
+} from '@helpers/item/gather-node-discovery';
+import {
+  pruneInvalidDiscoveredMaterials,
+  pruneInvalidMaterials,
+} from '@helpers/item/materials';
+import {
+  pruneInvalidArmoryItems,
+  pruneInvalidDiscoveredEquipment,
+} from '@helpers/kingdom/armory';
+import {
+  pruneInvalidActiveAstralProjectorSpells,
+  pruneInvalidDiscoveredAstralProjectorSpells,
+} from '@helpers/kingdom/astral-projector';
+import {
+  pruneInvalidBestiaryEntries,
+  repairInvalidBestiaryLevels,
+} from '@helpers/kingdom/bestiary';
+import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import {
   gamestate,
   gamestateTickEnd,
@@ -50,8 +48,12 @@ import {
   setGameState,
 } from '@helpers/state-game';
 import { defaultOptions, options, setOptions } from '@helpers/state-options';
-import { worldNodeByName, worldNodesOfType } from '@helpers/world-nodes';
-import { merge } from 'es-toolkit/compat';
+import { pruneInvalidWorldDiscoveries } from '@helpers/world-node/world-node-discovery';
+import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
+import {
+  worldNodeByName,
+  worldNodesOfType,
+} from '@helpers/world-node/world-nodes';
 import type {
   AutoModeState,
   DecreeRiskLevel,
@@ -60,6 +62,7 @@ import type {
   GameStateMaterials,
   MaterialId,
 } from '@interfaces';
+import { merge } from 'es-toolkit/compat';
 
 // Backfill for pre-materials-discovery-tracking saves - anything currently held was obviously found already.
 function backfillLegacyDiscoveredMaterials(
@@ -83,7 +86,8 @@ function backfillLegacyGatherNodeDiscoveries(
   const hasNoRecordedVisits = Object.keys(discoveredGatherNodes).length === 0;
   const hasExistingProgress = Object.keys(materials).length > 0;
 
-  if (!hasNoRecordedVisits || !hasExistingProgress) return discoveredGatherNodes;
+  if (!hasNoRecordedVisits || !hasExistingProgress)
+    return discoveredGatherNodes;
 
   return grandfatherGatherNodeDiscoveries(
     worldNodesOfType('GatherNode').map((entry) => entry.nodeName),
@@ -164,9 +168,10 @@ export function migrateGameState() {
     pruneInvalidDiscoveredAstralProjectorSpells(
       newState.discoveredAstralProjectorSpells,
     );
-  newState.activeAstralProjectorSpells = pruneInvalidActiveAstralProjectorSpells(
-    newState.activeAstralProjectorSpells,
-  );
+  newState.activeAstralProjectorSpells =
+    pruneInvalidActiveAstralProjectorSpells(
+      newState.activeAstralProjectorSpells,
+    );
 
   setGameState(newState);
   gamestateTickStart();

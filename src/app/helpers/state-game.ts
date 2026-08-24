@@ -1,8 +1,8 @@
 import { signal } from '@angular/core';
 import { defaultGameState } from '@helpers/defaults';
-import { debug, error } from '@helpers/logging';
-import { schedulerYield } from '@helpers/scheduler';
-import { indexedDbSignal } from '@helpers/signal';
+import { debug, error } from '@helpers/engine/logging';
+import { schedulerYield } from '@helpers/engine/scheduler';
+import { indexedDbSignal } from '@helpers/engine/signal';
 import { type GameState } from '@interfaces';
 
 export const isGameStateReady = signal<boolean>(false);

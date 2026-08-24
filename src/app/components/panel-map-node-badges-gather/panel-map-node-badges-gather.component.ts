@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { worldNodeGatherTime } from '@helpers/world-node-gathering';
+import { worldNodeGatherTime } from '@helpers/world-node/world-node-gathering';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({

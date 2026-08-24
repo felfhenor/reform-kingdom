@@ -19,18 +19,18 @@ import {
   combatOrderClauses,
   combatOrderClauseSetEnabled,
   combatOrderClauseUpdate,
-} from '@helpers/combat-order';
+} from '@helpers/combat/combat-order';
 import {
   isCombatOrderFamilyEquipmentOnly,
   isCombatOrderFamilyKnown,
   isCombatOrderFamilyUsable,
   isCombatOrderTargetModeUsable,
-} from '@helpers/combat-order-evaluation';
+} from '@helpers/combat/combat-order-evaluation';
 import { getEntry } from '@helpers/content';
-import { equippedItemTypes } from '@helpers/equipment';
-import { heroSkillsAtLevel, heroSkillsWithEquipment } from '@helpers/job';
-import { partyGet } from '@helpers/party';
-import { combatOrdersModalCharacterId } from '@helpers/ui';
+import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
+import { heroSkillsAtLevel, heroSkillsWithEquipment } from '@helpers/hero/job';
+import { partyGet } from '@helpers/hero/party';
+import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
   CharacterId,

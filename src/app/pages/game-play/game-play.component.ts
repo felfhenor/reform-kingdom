@@ -9,8 +9,8 @@ import { IconComponent } from '@components/icon/icon.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { PlayAdventureLogComponent } from '@components/play-adventurelog/play-adventurelog.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
+import { gamePlayView } from '@helpers/engine/ui';
 import { getOption } from '@helpers/state-options';
-import { gamePlayView } from '@helpers/ui';
 
 @Component({
   selector: 'app-game-play',

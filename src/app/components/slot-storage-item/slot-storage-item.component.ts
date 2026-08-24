@@ -9,8 +9,8 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { BadgeInfusableComponent } from '@components/badge-infusable/badge-infusable.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { isInfusionMaterial } from '@helpers/infusion';
-import { itemPreviewDisplay } from '@helpers/item-preview';
+import { isInfusionMaterial } from '@helpers/item/infusion';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import type { StorageMaterialEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

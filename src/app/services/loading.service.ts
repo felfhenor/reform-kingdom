@@ -1,5 +1,5 @@
 import { computed, inject, Injectable } from '@angular/core';
-import { loadingProgressCalculate } from '@helpers/loading';
+import { loadingProgressCalculate } from '@helpers/engine/loading';
 import { hasGameStateLoaded } from '@helpers/state-game';
 import { ContentService } from '@services/content.service';
 import { GamestateService } from '@services/gamestate.service';

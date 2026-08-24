@@ -12,7 +12,7 @@ import {
   caravanTicksUntilReset,
   caravanTimerLabel,
   caravanTimerUrgency,
-} from '@helpers/caravan';
+} from '@helpers/caravan/caravan';
 import {
   caravanExecuteTrade,
   caravanIsTradeSoldOut,
@@ -21,11 +21,11 @@ import {
   caravanTradeOwnedQuantity,
   caravanTradePrice,
   caravanTradeRemaining,
-} from '@helpers/caravan-trade';
+} from '@helpers/caravan/caravan-trade';
 import { getEntry } from '@helpers/content';
-import { notifySuccess } from '@helpers/notify';
-import { activeCaravanNode } from '@helpers/ui';
-import { worldNodeCaravan } from '@helpers/world-nodes';
+import { notifySuccess } from '@helpers/engine/notify';
+import { activeCaravanNode } from '@helpers/engine/ui';
+import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type { CaravanTraderContent, CaravanTradeRow } from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';

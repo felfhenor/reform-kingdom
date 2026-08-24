@@ -19,22 +19,28 @@ import {
   craftQueueTicksRemaining,
   craftQueueUnitsRemaining,
   getCraftableRecipeEntries,
-} from '@helpers/crafting';
-import { craftQueueRemove, craftQueueStart } from '@helpers/crafting-queue';
-import { recipeResultContent, recipeResultSpritesheet } from '@helpers/recipes';
-import { formatDuration } from '@helpers/timer';
+} from '@helpers/crafting/crafting';
+import {
+  craftQueueRemove,
+  craftQueueStart,
+} from '@helpers/crafting/crafting-queue';
+import {
+  recipeResultContent,
+  recipeResultSpritesheet,
+} from '@helpers/crafting/recipes';
 import {
   tradeskillActiveGate,
   tradeskillBuilding,
   tradeskillMaxQueueSize,
-} from '@helpers/tradeskill';
+} from '@helpers/crafting/tradeskill';
+import { formatDuration } from '@helpers/engine/timer';
 import {
   craftingHideUncraftable,
   craftingHideUncraftableToggle,
   kingdomSubviewForTradeskill,
   kingdomSubviewShow,
   uiClockTick,
-} from '@helpers/ui';
+} from '@helpers/engine/ui';
 import type {
   CollectibleContent,
   CraftQueueEntryId,

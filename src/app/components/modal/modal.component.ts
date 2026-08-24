@@ -1,8 +1,15 @@
 import { NgClass } from '@angular/common';
 import type { ElementRef } from '@angular/core';
-import { Component, computed, effect, input, output, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  viewChild,
+} from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
-import { modalClose, modalIsOpen } from '@helpers/modal-stack';
+import { modalClose, modalIsOpen } from '@helpers/engine/modal-stack';
 import type { ModalId } from '@interfaces';
 
 @Component({

@@ -5,9 +5,9 @@ import { ButtonSavefileExportComponent } from '@components/button-savefile-expor
 import { ButtonSavefileImportComponent } from '@components/button-savefile-import/button-savefile-import.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { ticksToDurationParts, timerTicksElapsed } from '@helpers/engine/timer';
 import { gameReset } from '@helpers/game-init';
 import { gamestate } from '@helpers/state-game';
-import { ticksToDurationParts, timerTicksElapsed } from '@helpers/timer';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({

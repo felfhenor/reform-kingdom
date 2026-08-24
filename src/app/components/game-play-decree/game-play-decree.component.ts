@@ -10,8 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { autoModeIsEnabled, autoModeToggle } from '@helpers/auto-mode';
 import { getEntry } from '@helpers/content';
+import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import {
   decreeClauseAdd,
   decreeClauseConflicts,
@@ -22,14 +22,14 @@ import {
   decreeClauseUpdate,
   decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
-} from '@helpers/decree';
-import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/decree-evaluation';
+} from '@helpers/decree/decree';
+import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/decree/decree-evaluation';
 import {
   exploreNodeFarmOptions,
   farmNodeRewardOptions,
-} from '@helpers/decree-farm-node';
-import { gatherableMaterialIds } from '@helpers/world-node-gathering';
-import { rewardKey } from '@helpers/world-node-rewards';
+} from '@helpers/decree/decree-farm-node';
+import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import type {
   DecreeClause,
   DecreeClauseAction,

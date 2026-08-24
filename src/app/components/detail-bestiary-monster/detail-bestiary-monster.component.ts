@@ -8,16 +8,19 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
+import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { RowBestiarySkillComponent } from '@components/row-bestiary-skill/row-bestiary-skill.component';
+import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { bestiaryDropQuantityLabel, bestiaryXpLabel } from '@helpers/bestiary';
-import { combatantFromMonster } from '@helpers/combat-create';
+import { combatantFromMonster } from '@helpers/combat/combat-create';
+import { monsterStatsAtLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content';
-import { monsterStatsAtLevel } from '@helpers/monster';
-import { skillDescriptionWithPreview } from '@helpers/skill-preview';
+import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
+import {
+  bestiaryDropQuantityLabel,
+  bestiaryXpLabel,
+} from '@helpers/kingdom/bestiary';
 import type {
   BestiaryEntry,
   Combatant,

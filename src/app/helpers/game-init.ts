@@ -1,4 +1,4 @@
-import { grantStartingGold } from '@helpers/materials';
+import { grantStartingGold } from '@helpers/item/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { setupFinish } from '@helpers/setup';
 import { resetGameState, updateGamestate } from '@helpers/state-game';

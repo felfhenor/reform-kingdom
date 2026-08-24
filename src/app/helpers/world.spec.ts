@@ -6,18 +6,18 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/world-nodes', () => ({
+vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeAt: vi.fn(),
 }));
 
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   currentLocationGet,
   currentLocationSet,
   isPlayerAtKingdom,
   isPlayerAtLocation,
 } from '@helpers/world';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { worldNodeAt } from '@helpers/world-nodes';
+import { worldNodeAt } from '@helpers/world-node/world-nodes';
 
 describe('World Helper Functions', () => {
   beforeEach(() => {

@@ -17,11 +17,7 @@ import {
   modalIsOpen,
   modalIsTopmost,
   modalOpen,
-} from '@helpers/modal-stack';
-import { hotkeyMatches } from '@helpers/hotkeys';
-import { isSetup } from '@helpers/setup';
-import { saveGameState } from '@helpers/state-game';
-import { getOption, setOption } from '@helpers/state-options';
+} from '@helpers/engine/modal-stack';
 import {
   caravanTradeOpen,
   closeAllMenus,
@@ -29,10 +25,14 @@ import {
   isWorldCameraPanned,
   setGamePlayView,
   worldCameraRecenter,
-} from '@helpers/ui';
+} from '@helpers/engine/ui';
+import { hotkeyMatches } from '@helpers/engine/hotkeys';
+import { isSetup } from '@helpers/setup';
+import { saveGameState } from '@helpers/state-game';
+import { getOption, setOption } from '@helpers/state-options';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
-import { worldNodeCaravanIsAvailable } from '@helpers/world-node-caravan';
-import { worldNodeCaravan } from '@helpers/world-nodes';
+import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan';
+import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type { GamePlayView, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { HotkeysDirective } from '@ngneat/hotkeys';

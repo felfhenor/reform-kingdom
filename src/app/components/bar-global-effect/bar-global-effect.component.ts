@@ -6,11 +6,11 @@ import {
   untracked,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { autoModeStatusLabel } from '@helpers/auto-mode';
+import { autoModeStatusLabel } from '@helpers/decree/auto-mode';
 import {
   activeGlobalEffects,
   globalEffectDurationLabel,
-} from '@helpers/global-effects';
+} from '@helpers/hero/global-effects';
 import type { GlobalEffect } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

@@ -5,18 +5,18 @@ import {
   input,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { isEquipmentDiscovered } from '@helpers/armory';
-import { isCollectibleDiscovered } from '@helpers/collectibles';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
-import { isMaterialDiscovered } from '@helpers/materials';
 import {
   isRecipeDiscovered,
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
-} from '@helpers/recipes';
+} from '@helpers/crafting/recipes';
+import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { isMaterialDiscovered } from '@helpers/item/materials';
+import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import type {
   CollectibleContent,
   DropRarity,

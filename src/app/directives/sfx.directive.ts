@@ -1,5 +1,5 @@
 import { Directive, HostListener, input } from '@angular/core';
-import { playSFX } from '@helpers/sfx';
+import { playSFX } from '@helpers/engine/sfx';
 import type { SFX } from '@interfaces';
 
 type SFXTrigger = 'click' | 'hover';

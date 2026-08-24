@@ -6,15 +6,15 @@ import {
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { TippyDirective } from '@ngneat/helipopper';
-import { isMonsterDiscovered } from '@helpers/bestiary';
+import { isMonsterDiscovered } from '@helpers/kingdom/bestiary';
 import {
   worldNodeEncounterCount,
   worldNodeMonsterCount,
   worldNodeMonsters,
-} from '@helpers/world-node-encounter';
-import { worldNodeCompletionRewardProgress } from '@helpers/world-node-rewards';
+} from '@helpers/world-node/world-node-encounter';
+import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import type { WorldNodeEntry } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-map-node-badges-explore',

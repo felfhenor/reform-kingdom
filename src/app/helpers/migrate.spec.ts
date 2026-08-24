@@ -8,62 +8,64 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/armory', () => ({
+vi.mock('@helpers/kingdom/armory', () => ({
   pruneInvalidArmoryItems: vi.fn((armory) => armory),
   pruneInvalidDiscoveredEquipment: vi.fn((discovered) => discovered),
 }));
 
-vi.mock('@helpers/astral-projector', () => ({
-  pruneInvalidDiscoveredAstralProjectorSpells: vi.fn((discovered) => discovered),
+vi.mock('@helpers/kingdom/astral-projector', () => ({
+  pruneInvalidDiscoveredAstralProjectorSpells: vi.fn(
+    (discovered) => discovered,
+  ),
   pruneInvalidActiveAstralProjectorSpells: vi.fn((active) => active),
 }));
 
-vi.mock('@helpers/bestiary', () => ({
+vi.mock('@helpers/kingdom/bestiary', () => ({
   pruneInvalidBestiaryEntries: vi.fn((bestiary) => bestiary),
   repairInvalidBestiaryLevels: vi.fn((bestiary) => bestiary),
 }));
 
-vi.mock('@helpers/collectibles', () => ({
+vi.mock('@helpers/item/collectibles', () => ({
   grantFoundingStoneIfMissing: vi.fn((collectibles) => collectibles),
   pruneInvalidCollectibles: vi.fn((collectibles) => collectibles),
 }));
 
-vi.mock('@helpers/character-progress', () => ({
+vi.mock('@helpers/hero/character-progress', () => ({
   retrofitPartyXp: vi.fn((party) => party),
 }));
 
-vi.mock('@helpers/crafting', () => ({
+vi.mock('@helpers/crafting/crafting', () => ({
   pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
 }));
 
-vi.mock('@helpers/decree', () => ({
+vi.mock('@helpers/decree/decree', () => ({
   backfillDecreeClauseRiskTolerance: vi.fn((clauses) => clauses),
   pruneInvalidDecreeGatherClauses: vi.fn((clauses) => clauses),
 }));
 
-vi.mock('@helpers/equipment', () => ({
+vi.mock('@helpers/item/equipment', () => ({
   backfillEquipmentItem: vi.fn((item) => item),
   backfillEquipmentBlock: vi.fn((equipment) => equipment),
 }));
 
-vi.mock('@helpers/materials', () => ({
+vi.mock('@helpers/item/materials', () => ({
   pruneInvalidMaterials: vi.fn((materials) => materials),
   pruneInvalidDiscoveredMaterials: vi.fn((discovered) => discovered),
 }));
 
-vi.mock('@helpers/pathfinding', () => ({
+vi.mock('@helpers/pathfinding/pathfinding', () => ({
   repairUnwalkableCurrentLocation: vi.fn((location) => location),
 }));
 
-vi.mock('@helpers/party', () => ({
+vi.mock('@helpers/hero/party', () => ({
   pruneInvalidPartyEquipment: vi.fn((party) => party),
 }));
 
-vi.mock('@helpers/recipes', () => ({
+vi.mock('@helpers/crafting/recipes', () => ({
   pruneInvalidDiscoveredRecipes: vi.fn((discovered) => discovered),
 }));
 
-vi.mock('@helpers/tradeskill', () => ({
+vi.mock('@helpers/crafting/tradeskill', () => ({
   migrateTradeskillStateKeys: vi.fn((tradeskills) => tradeskills),
   retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
 }));
@@ -85,21 +87,21 @@ vi.mock('@helpers/defaults', () => ({
   })),
 }));
 
-vi.mock('@helpers/gather-node-discovery', () => ({
+vi.mock('@helpers/item/gather-node-discovery', () => ({
   pruneInvalidGatherNodeDiscoveries: vi.fn((discovered) => discovered),
   grandfatherGatherNodeDiscoveries: vi.fn(() => ({})),
 }));
 
-vi.mock('@helpers/world-nodes', () => ({
+vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/world-node-discovery', () => ({
+vi.mock('@helpers/world-node/world-node-discovery', () => ({
   pruneInvalidWorldDiscoveries: vi.fn((discovered) => discovered),
 }));
 
-vi.mock('@helpers/world-node-gathering', () => ({
+vi.mock('@helpers/world-node/world-node-gathering', () => ({
   allGatherableMaterialIds: vi.fn(() => []),
 }));
 
@@ -117,35 +119,35 @@ vi.mock('@helpers/state-options', () => ({
   setOptions: vi.fn(),
 }));
 
-import {
-  pruneInvalidArmoryItems,
-  pruneInvalidDiscoveredEquipment,
-} from '@helpers/armory';
-import { retrofitPartyXp } from '@helpers/character-progress';
-import {
-  grantFoundingStoneIfMissing,
-  pruneInvalidCollectibles,
-} from '@helpers/collectibles';
-import {
-  backfillDecreeClauseRiskTolerance,
-  pruneInvalidDecreeGatherClauses,
-} from '@helpers/decree';
-import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
-import {
-  pruneInvalidDiscoveredMaterials,
-  pruneInvalidMaterials,
-} from '@helpers/materials';
-import { migrateGameState } from '@helpers/migrate';
-import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding';
-import { pruneInvalidPartyEquipment } from '@helpers/party';
-import { pruneInvalidDiscoveredRecipes } from '@helpers/recipes';
-import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
+import { pruneInvalidDiscoveredRecipes } from '@helpers/crafting/recipes';
 import {
   migrateTradeskillStateKeys,
   retrofitTradeskillXp,
-} from '@helpers/tradeskill';
-import { allGatherableMaterialIds } from '@helpers/world-node-gathering';
-import { worldNodesOfType } from '@helpers/world-nodes';
+} from '@helpers/crafting/tradeskill';
+import {
+  backfillDecreeClauseRiskTolerance,
+  pruneInvalidDecreeGatherClauses,
+} from '@helpers/decree/decree';
+import { retrofitPartyXp } from '@helpers/hero/character-progress';
+import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
+import {
+  grantFoundingStoneIfMissing,
+  pruneInvalidCollectibles,
+} from '@helpers/item/collectibles';
+import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
+import {
+  pruneInvalidDiscoveredMaterials,
+  pruneInvalidMaterials,
+} from '@helpers/item/materials';
+import {
+  pruneInvalidArmoryItems,
+  pruneInvalidDiscoveredEquipment,
+} from '@helpers/kingdom/armory';
+import { migrateGameState } from '@helpers/migrate';
+import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
+import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
+import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type { DecreeClause, DecreeClauseId, WorldNodeEntry } from '@interfaces';
 
 describe('migrateGameState', () => {
@@ -282,9 +284,7 @@ describe('migrateGameState', () => {
 
   it('retrofits party and tradeskill xp to the current curve before committing', () => {
     // Reassert identity impl - vi.clearAllMocks() doesn't clear an earlier test's mockReturnValue.
-    vi.mocked(pruneInvalidPartyEquipment).mockImplementation(
-      (party) => party,
-    );
+    vi.mocked(pruneInvalidPartyEquipment).mockImplementation((party) => party);
 
     const staleParty = [{ id: 'jala', combatOrders: {} } as Character];
     const staleTradeskills = { Blacksmithing: { level: 1 } };
@@ -300,7 +300,9 @@ describe('migrateGameState', () => {
     } as unknown as GameState);
 
     const retrofittedParty = [{ id: 'jala', xp: 'retrofitted' } as never];
-    const retrofittedTradeskills = { Blacksmithing: { level: 1, xp: 'retrofitted' } };
+    const retrofittedTradeskills = {
+      Blacksmithing: { level: 1, xp: 'retrofitted' },
+    };
     vi.mocked(retrofitPartyXp).mockReturnValue(retrofittedParty);
     vi.mocked(retrofitTradeskillXp).mockReturnValue(
       retrofittedTradeskills as never,
@@ -320,7 +322,9 @@ describe('migrateGameState', () => {
   it('grandfathers gather-node discoveries for a save with material progress but no recorded visits', () => {
     vi.mocked(gamestate).mockReturnValue({
       armory: [],
-      materials: { ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 } },
+      materials: {
+        ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
+      },
       collectibles: {},
       discoveredEquipment: {},
       discoveredRecipes: {},
@@ -378,7 +382,9 @@ describe('migrateGameState', () => {
   it('does not re-grandfather a save that already has recorded visits', () => {
     vi.mocked(gamestate).mockReturnValue({
       armory: [],
-      materials: { ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 } },
+      materials: {
+        ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
+      },
       collectibles: {},
       discoveredEquipment: {},
       discoveredRecipes: {},
@@ -434,7 +440,10 @@ describe('migrateGameState', () => {
 
   it('backfills the legacy global risk tolerance onto risk-aware clauses', () => {
     const clauses = [
-      { id: 'clause-1' as DecreeClauseId, type: 'LevelUpParty' } as DecreeClause,
+      {
+        id: 'clause-1' as DecreeClauseId,
+        type: 'LevelUpParty',
+      } as DecreeClause,
     ];
 
     vi.mocked(gamestate).mockReturnValue({
@@ -469,7 +478,10 @@ describe('migrateGameState', () => {
 
   it('defaults the legacy risk tolerance to Medium when no save had it', () => {
     const clauses = [
-      { id: 'clause-1' as DecreeClauseId, type: 'LevelUpParty' } as DecreeClause,
+      {
+        id: 'clause-1' as DecreeClauseId,
+        type: 'LevelUpParty',
+      } as DecreeClause,
     ];
 
     vi.mocked(gamestate).mockReturnValue({
@@ -554,9 +566,7 @@ describe('migrateGameState', () => {
 
     migrateGameState();
 
-    expect(repairUnwalkableCurrentLocation).toHaveBeenCalledWith(
-      staleLocation,
-    );
+    expect(repairUnwalkableCurrentLocation).toHaveBeenCalledWith(staleLocation);
 
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.world.currentLocation).toEqual(repairedLocation);

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { isInElectron } from '@helpers/discord';
+import { isInElectron } from '@helpers/engine/discord';
 import { MetaService } from '@services/meta.service';
 
 @Component({

@@ -7,12 +7,12 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowSkillStatScalingComponent } from '@components/row-skill-stat-scaling/row-skill-stat-scaling.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { combatantFromCharacter } from '@helpers/combat-create';
+import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content';
-import { equippedItemTypes } from '@helpers/equipment';
-import { heroSkillsWithEquipment } from '@helpers/job';
-import { skillIsUsableWithEquippedWeapons } from '@helpers/skill';
-import { skillDescriptionWithPreview } from '@helpers/skill-preview';
+import { heroSkillsWithEquipment } from '@helpers/hero/job';
+import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
+import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
+import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
   Combatant,

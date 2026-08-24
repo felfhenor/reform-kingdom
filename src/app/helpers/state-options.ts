@@ -1,6 +1,6 @@
 import type { Signal } from '@angular/core';
 import { environment } from '@environments/environment';
-import { localStorageSignal } from '@helpers/signal';
+import { localStorageSignal } from '@helpers/engine/signal';
 import type { GameOptions } from '@interfaces';
 
 export function defaultOptions(): GameOptions {

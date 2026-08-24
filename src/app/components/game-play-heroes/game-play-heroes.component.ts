@@ -6,10 +6,10 @@ import {
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/panel-hero-equipment.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/panel-hero-equipment.component';
 import { getEntry } from '@helpers/content';
-import { partyGet } from '@helpers/party';
+import { partyGet } from '@helpers/hero/party';
 import type { CharacterId, JobContent, JobId } from '@interfaces';
 
 @Component({

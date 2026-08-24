@@ -2,28 +2,28 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { armoryGet } from '@helpers/armory';
-import { unlockedAstralProjectorEntries } from '@helpers/astral-projector';
-import { getBestiaryEntries } from '@helpers/bestiary';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   craftQueueTicksRemaining,
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
-} from '@helpers/crafting';
-import { modalOpen } from '@helpers/modal-stack';
-import {
-  getMuseumCollectibleEntries,
-  getMuseumRecipeEntries,
-} from '@helpers/museum';
-import { gamestate } from '@helpers/state-game';
-import { formatDuration } from '@helpers/timer';
-import { tradeskillBuilding } from '@helpers/tradeskill';
+} from '@helpers/crafting/crafting';
+import { tradeskillBuilding } from '@helpers/crafting/tradeskill';
+import { modalOpen } from '@helpers/engine/modal-stack';
+import { formatDuration } from '@helpers/engine/timer';
 import {
   kingdomSubviewForTradeskill,
   kingdomSubviewShow,
   uiClockTick,
-} from '@helpers/ui';
+} from '@helpers/engine/ui';
+import { armoryGet } from '@helpers/kingdom/armory';
+import { unlockedAstralProjectorEntries } from '@helpers/kingdom/astral-projector';
+import { getBestiaryEntries } from '@helpers/kingdom/bestiary';
+import {
+  getMuseumCollectibleEntries,
+  getMuseumRecipeEntries,
+} from '@helpers/kingdom/museum';
+import { gamestate } from '@helpers/state-game';
 import { isPlayerAtKingdom } from '@helpers/world';
 import type {
   KingdomSubview,

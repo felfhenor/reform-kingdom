@@ -1,5 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { skillStatScaling } from '@helpers/skill';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
+import { skillStatScaling } from '@helpers/hero/skill';
 import { StatShorthand, type EquipmentSkillContent } from '@interfaces';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 

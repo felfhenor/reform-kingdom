@@ -2,10 +2,10 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { notifySuccess } from '@helpers/engine/notify';
+import { closeAllMenus } from '@helpers/engine/ui';
 import { migrateGameState } from '@helpers/migrate';
-import { notifySuccess } from '@helpers/notify';
 import { setGameState } from '@helpers/state-game';
-import { closeAllMenus } from '@helpers/ui';
 import type { GameState } from '@interfaces';
 
 @Component({

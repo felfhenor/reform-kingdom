@@ -1,5 +1,5 @@
 import { Directive, input } from '@angular/core';
-import { modalOpen } from '@helpers/modal-stack';
+import { modalOpen } from '@helpers/engine/modal-stack';
 import type { ModalId } from '@interfaces';
 
 @Directive({

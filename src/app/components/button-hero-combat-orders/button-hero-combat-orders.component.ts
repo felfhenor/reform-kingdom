@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { combatOrdersModalOpen } from '@helpers/ui';
+import { combatOrdersModalOpen } from '@helpers/engine/ui';
 import type { CharacterId } from '@interfaces';
 
 @Component({

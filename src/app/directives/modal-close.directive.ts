@@ -1,5 +1,5 @@
 import { Directive } from '@angular/core';
-import { modalCloseTop } from '@helpers/modal-stack';
+import { modalCloseTop } from '@helpers/engine/modal-stack';
 
 @Directive({
   selector: '[appModalClose]',

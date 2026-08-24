@@ -1,11 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
-import { isInElectron } from '@helpers/discord';
+import { isInElectron } from '@helpers/engine/discord';
 import {
   liveVersion,
   localVersion,
   versionInfoToSemver,
-} from '@helpers/version';
+} from '@helpers/engine/version';
 import { LoggerService } from '@services/logger.service';
 import { marked, Renderer } from 'marked';
 import { interval } from 'rxjs';

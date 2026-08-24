@@ -6,27 +6,30 @@ import {
   viewChild,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { IconComponent } from '@components/icon/icon.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
-import { characterInfuseEquipment } from '@helpers/character-equipment';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
-import { canModifyEquipment, equippedItemsByPrimarySlot } from '@helpers/equipment';
+import { characterInfuseEquipment } from '@helpers/hero/character-equipment';
+import { partyGet } from '@helpers/hero/party';
+import {
+  canModifyEquipment,
+  equippedItemsByPrimarySlot,
+} from '@helpers/item/equipment';
 import {
   canInfuseEquipmentItem,
   equipmentItemInfusionBonus,
   equipmentItemInfusionResistanceBonus,
   infusionMaterialCost,
   isInfusionMaterial,
-} from '@helpers/infusion';
-import { getGoldQuantity, goldCoinId } from '@helpers/materials';
-import { partyGet } from '@helpers/party';
-import { getStorageMaterials } from '@helpers/storage';
+} from '@helpers/item/infusion';
+import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
+import { getStorageMaterials } from '@helpers/kingdom/storage';
 import type {
   Character,
   CharacterId,
@@ -38,9 +41,9 @@ import type {
   JobContent,
   StorageMaterialEntry,
 } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-play-kingdom-infusion',

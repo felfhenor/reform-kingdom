@@ -5,7 +5,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { worldNodeEncounterProgress } from '@helpers/world-node-encounter';
+import { worldNodeEncounterProgress } from '@helpers/world-node/world-node-encounter';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({

@@ -9,8 +9,8 @@ import { SFXDirective } from '@directives/sfx.directive';
 import {
   worldNodeExploreRandomIsAvailable,
   worldNodeExploreRandomTimerText,
-} from '@helpers/world-node-encounter';
-import { worldNodeEncounterRandom } from '@helpers/world-nodes';
+} from '@helpers/world-node/world-node-encounter';
+import { worldNodeEncounterRandom } from '@helpers/world-node/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({

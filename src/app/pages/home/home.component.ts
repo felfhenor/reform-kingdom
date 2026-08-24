@@ -8,9 +8,9 @@ import { ButtonUpdateComponent } from '@components/button-update/button-update.c
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { discordSetMainStatus, discordSetStatus } from '@helpers/discord';
+import { discordSetMainStatus, discordSetStatus } from '@helpers/engine/discord';
+import { modalOpen } from '@helpers/engine/modal-stack';
 import { gameReset } from '@helpers/game-init';
-import { modalOpen } from '@helpers/modal-stack';
 import { isSetup } from '@helpers/setup';
 import { getOption, setOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';

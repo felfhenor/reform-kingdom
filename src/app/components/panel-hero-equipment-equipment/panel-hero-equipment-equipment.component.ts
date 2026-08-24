@@ -9,18 +9,18 @@ import {
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
+import { getEntry } from '@helpers/content';
 import {
   characterEquipFromArmory,
   characterUnequipToArmory,
   optimizeCharacterEquipment,
-} from '@helpers/character-equipment';
-import { getEntry } from '@helpers/content';
+} from '@helpers/hero/character-equipment';
 import {
   canEquipItem,
   canModifyEquipment,
   equipmentAvailableForSlot,
   isSlotAvailableForJob,
-} from '@helpers/equipment';
+} from '@helpers/item/equipment';
 import type {
   Character,
   EquipmentArmoryEntry,

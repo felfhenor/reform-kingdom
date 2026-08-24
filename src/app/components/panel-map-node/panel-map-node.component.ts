@@ -11,42 +11,42 @@ import { SlotCompletionRewardComponent } from '@components/slot-completion-rewar
 import { SlotGatherMaterialComponent } from '@components/slot-gather-material/slot-gather-material.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { caravanBrandName } from '@helpers/caravan';
-import { encounterStartFight } from '@helpers/encounter';
-import { encounterRandomStartFight } from '@helpers/encounter-random-combat';
-import {
-  canEnterGatherNode,
-  gatheringProgressFraction,
-} from '@helpers/gathering';
-import { rewardDisplayOrder } from '@helpers/loot';
-import { travelPathTo } from '@helpers/pathfinding';
-import { gamestate } from '@helpers/state-game';
-import {
-  canPartyTravel,
-  travelStart,
-  travelStepTicksCost,
-} from '@helpers/travel';
+import { caravanBrandName } from '@helpers/caravan/caravan';
+import { encounterStartFight } from '@helpers/encounter/encounter';
+import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
 import {
   caravanTradeOpen,
   mapNodeDeselect,
   selectedMapNode,
-} from '@helpers/ui';
+} from '@helpers/engine/ui';
+import {
+  canPartyTravel,
+  travelStart,
+  travelStepTicksCost,
+} from '@helpers/hero/travel';
+import {
+  canEnterGatherNode,
+  gatheringProgressFraction,
+} from '@helpers/item/gathering';
+import { rewardDisplayOrder } from '@helpers/item/loot';
+import { travelPathTo } from '@helpers/pathfinding/pathfinding';
+import { gamestate } from '@helpers/state-game';
 import { currentLocationGet } from '@helpers/world';
-import { worldNodeCaravanIsAvailable } from '@helpers/world-node-caravan';
-import { worldNodeDescription } from '@helpers/world-node-content';
-import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node-encounter';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
-import { worldNodeCompletionRewards } from '@helpers/world-node-rewards';
+import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan';
+import { worldNodeDescription } from '@helpers/world-node/world-node-content';
+import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { worldNodeCompletionRewards } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeLevelLabel,
   worldNodeLevelRange,
-} from '@helpers/world-node-status';
+} from '@helpers/world-node/world-node-status';
 import {
   worldNodeCaravan,
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeGathering,
-} from '@helpers/world-nodes';
+} from '@helpers/world-node/world-nodes';
 import { sortBy, sum } from 'es-toolkit/compat';
 
 @Component({

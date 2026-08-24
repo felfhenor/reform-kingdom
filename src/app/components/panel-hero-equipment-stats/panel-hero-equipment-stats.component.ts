@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
-import { characterTagResistances } from '@helpers/equipment';
+import { characterTagResistances } from '@helpers/item/equipment';
 import {
   StatInformation,
   StatOrder,

@@ -10,55 +10,58 @@ import {
   viewChild,
 } from '@angular/core';
 import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-global-effect.component';
-import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
+import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { getEntry } from '@helpers/content';
-import { gatheringProgressFraction, isGathering } from '@helpers/gathering';
-import { isGlobalEffectActive } from '@helpers/global-effects';
-import { getMap } from '@helpers/maps';
-import { partyGet } from '@helpers/party';
-import {
-  pixiAppInitialize,
-  pixiResponsiveCanvasSetup,
-  pixiWorldContainersCreate,
-} from '@helpers/pixi-app-setup';
-import {
-  cameraBoundsCalculate,
-  cameraOffsetFromDrag,
-  cameraPositionCalculate,
-  viewportTilesCalculate,
-} from '@helpers/pixi-camera';
-import { pixiGridOverlayCreate } from '@helpers/pixi-grid';
-import {
-  pixiIndicatorEncounterProgressCreate,
-  pixiIndicatorGatherProgressCreate,
-  pixiIndicatorNodeSelectionCreate,
-  pixiIndicatorPlayerAtLocationCreate,
-  pixiIndicatorPlayerSpriteCreate,
-} from '@helpers/pixi-indicators';
-import { pixiTiledMapRender } from '@helpers/pixi-map-render';
-import {
-  pixiSpriteFrameTexturesLoad,
-  pixiTiledMapTexturesLoad,
-} from '@helpers/pixi-texture-loader';
-import { gamestate } from '@helpers/state-game';
-import { getOption } from '@helpers/state-options';
-import { travelStepTicksCost } from '@helpers/travel';
 import {
   isWorldCameraPanned,
   mapNodeDeselect,
   mapNodeSelect,
   selectedMapNode,
   worldCameraRecenterRequest,
-} from '@helpers/ui';
+} from '@helpers/engine/ui';
+import { isGlobalEffectActive } from '@helpers/hero/global-effects';
+import { partyGet } from '@helpers/hero/party';
+import { travelStepTicksCost } from '@helpers/hero/travel';
+import {
+  gatheringProgressFraction,
+  isGathering,
+} from '@helpers/item/gathering';
+import { getMap } from '@helpers/maps';
+import {
+  pixiAppInitialize,
+  pixiResponsiveCanvasSetup,
+  pixiWorldContainersCreate,
+} from '@helpers/pixi/pixi-app-setup';
+import {
+  cameraBoundsCalculate,
+  cameraOffsetFromDrag,
+  cameraPositionCalculate,
+  viewportTilesCalculate,
+} from '@helpers/pixi/pixi-camera';
+import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid';
+import {
+  pixiIndicatorEncounterProgressCreate,
+  pixiIndicatorGatherProgressCreate,
+  pixiIndicatorNodeSelectionCreate,
+  pixiIndicatorPlayerAtLocationCreate,
+  pixiIndicatorPlayerSpriteCreate,
+} from '@helpers/pixi/pixi-indicators';
+import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
+import {
+  pixiSpriteFrameTexturesLoad,
+  pixiTiledMapTexturesLoad,
+} from '@helpers/pixi/pixi-texture-loader';
+import { gamestate } from '@helpers/state-game';
+import { getOption } from '@helpers/state-options';
 import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
-import { worldNodeEncounterCount } from '@helpers/world-node-encounter';
-import { worldNodeLabelInfo } from '@helpers/world-node-status';
+import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
+import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status';
 import {
   isWorldNodeVisible,
   worldNodeByName,
   worldNodeDiscoverIfHidden,
-} from '@helpers/world-nodes';
+} from '@helpers/world-node/world-nodes';
 import type {
   CameraPosition,
   CurrentLocation,

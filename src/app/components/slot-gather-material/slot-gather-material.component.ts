@@ -5,12 +5,12 @@ import {
   input,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntry } from '@helpers/content';
-import { itemPreviewDisplay } from '@helpers/item-preview';
-import { isMaterialDiscovered } from '@helpers/materials';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import { isMaterialDiscovered } from '@helpers/item/materials';
 import type { ItemContent, ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

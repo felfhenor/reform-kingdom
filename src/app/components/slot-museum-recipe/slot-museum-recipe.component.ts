@@ -5,13 +5,13 @@ import {
   input,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import {
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
-} from '@helpers/recipes';
+} from '@helpers/crafting/recipes';
 import type {
   CollectibleContent,
   EquipmentContent,

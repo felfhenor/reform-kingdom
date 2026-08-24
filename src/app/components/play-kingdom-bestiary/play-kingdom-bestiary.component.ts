@@ -5,11 +5,14 @@ import {
   signal,
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
-import { DetailBestiaryMonsterComponent } from '@components/detail-bestiary-monster/detail-bestiary-monster.component';
-import { CardPageComponent } from '@components/card-page/card-page.component';
-import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
-import { filterBestiaryEntries, getBestiaryEntries } from '@helpers/bestiary';
+import { CardPageComponent } from '@components/card-page/card-page.component';
+import { DetailBestiaryMonsterComponent } from '@components/detail-bestiary-monster/detail-bestiary-monster.component';
+import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import {
+  filterBestiaryEntries,
+  getBestiaryEntries,
+} from '@helpers/kingdom/bestiary';
 import type { MonsterId } from '@interfaces';
 
 @Component({

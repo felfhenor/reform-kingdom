@@ -1,6 +1,10 @@
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { worldNodeAt } from '@helpers/world-nodes';
-import type { CurrentLocation, GameStateWorld, WorldNodeEntry } from '@interfaces';
+import { worldNodeAt } from '@helpers/world-node/world-nodes';
+import type {
+  CurrentLocation,
+  GameStateWorld,
+  WorldNodeEntry,
+} from '@interfaces';
 
 export function setWorld(world: GameStateWorld): void {
   updateGamestate((gs) => {

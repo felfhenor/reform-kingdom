@@ -1,19 +1,16 @@
-import {
-  Injectable,
-  computed,
-  effect,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Injectable, computed, effect, signal, untracked } from '@angular/core';
 import {
   combatantDamageEvents,
   combatantDamageEventsClear,
-} from '@helpers/combat-damage-events';
+} from '@helpers/combat/combat-damage-events';
 import {
   combatantSkillCastEvents,
   combatantSkillCastEventsClear,
-} from '@helpers/combat-skill-events';
-import type { CombatantDamageEvent, CombatantSkillCastEvent } from '@interfaces';
+} from '@helpers/combat/combat-skill-events';
+import type {
+  CombatantDamageEvent,
+  CombatantSkillCastEvent,
+} from '@interfaces';
 
 type DisplayedDamageNumber = {
   event: CombatantDamageEvent;

@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { worldNodeSpriteFrame } from '@helpers/world-node-content';
+import { worldNodeSpriteFrame } from '@helpers/world-node/world-node-content';
 import type { WorldNodeEntry } from '@interfaces';
 
 // A node's map tile cropped from its tileset, shared by anywhere a node needs to show its icon off-map.

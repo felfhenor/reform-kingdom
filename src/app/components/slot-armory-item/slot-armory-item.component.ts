@@ -7,16 +7,16 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { equipmentSellValue } from '@helpers/armory';
 import {
   equipmentItemInfusionBonus,
   equipmentItemInfusionResistanceBonus,
-} from '@helpers/infusion';
-import { itemPreviewDisplay } from '@helpers/item-preview';
-import { goldCoinId } from '@helpers/materials';
+} from '@helpers/item/infusion';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import { goldCoinId } from '@helpers/item/materials';
+import { equipmentSellValue } from '@helpers/kingdom/armory';
 import type { EquipmentContent, EquipmentItem } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

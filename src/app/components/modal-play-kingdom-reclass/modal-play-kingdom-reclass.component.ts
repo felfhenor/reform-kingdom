@@ -15,11 +15,11 @@ import {
 } from '@angular/forms/signals';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
-import { characterReclass } from '@helpers/character-reclass';
 import { getEntry } from '@helpers/content';
-import { getUnlockedJobs } from '@helpers/job';
-import { modalIsOpen } from '@helpers/modal-stack';
-import { partyGet } from '@helpers/party';
+import { modalIsOpen } from '@helpers/engine/modal-stack';
+import { characterReclass } from '@helpers/hero/character-reclass';
+import { getUnlockedJobs } from '@helpers/hero/job';
+import { partyGet } from '@helpers/hero/party';
 import type { Character, JobContent, JobId } from '@interfaces';
 import {
   NgLabelTemplateDirective,

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { getEntriesByType } from '@helpers/content';
+import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting/tradeskill';
 import {
   debugDiscoverAllRecipes,
   debugFillBestiary,
@@ -12,9 +13,8 @@ import {
   debugResetBestiary,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
-} from '@helpers/debug';
-import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/party';
-import { TRADESKILL_MAX_LEVEL } from '@helpers/tradeskill';
+} from '@helpers/debug/debug';
+import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
 import type {
   CharacterId,
   CollectibleContent,

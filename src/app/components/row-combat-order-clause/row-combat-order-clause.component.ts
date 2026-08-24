@@ -6,7 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { combatOrderClauseSummary } from '@helpers/combat-order';
+import { combatOrderClauseSummary } from '@helpers/combat/combat-order';
 import type { CombatOrderClause, EquipmentSkillContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

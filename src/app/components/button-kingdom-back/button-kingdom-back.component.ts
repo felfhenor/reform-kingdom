@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { hotkeyMatches } from '@helpers/hotkeys';
-import { kingdomSubviewClear } from '@helpers/ui';
+import { kingdomSubviewClear } from '@helpers/engine/ui';
+import { hotkeyMatches } from '@helpers/engine/hotkeys';
 import { TippyDirective } from '@ngneat/helipopper';
 import { HotkeysDirective } from '@ngneat/hotkeys';
 

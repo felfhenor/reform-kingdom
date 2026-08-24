@@ -5,15 +5,15 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotMuseumCollectibleComponent } from '@components/slot-museum-collectible/slot-museum-collectible.component';
 import { SlotMuseumRecipeComponent } from '@components/slot-museum-recipe/slot-museum-recipe.component';
-import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import {
   filterMuseumCollectibleEntries,
   filterMuseumRecipeEntries,
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
-} from '@helpers/museum';
+} from '@helpers/kingdom/museum';
 import type {
   MuseumCollectibleEntry,
   MuseumRecipeEntry,

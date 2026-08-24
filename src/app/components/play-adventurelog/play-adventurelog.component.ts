@@ -5,7 +5,7 @@ import {
   adventureLogTimestampTooltip,
   combatLog,
   combatLogHealthColor,
-} from '@helpers/combat-log';
+} from '@helpers/combat/combat-log';
 import type { CombatLog } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { TimeagoPipe } from 'ngx-timeago';
