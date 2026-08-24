@@ -293,6 +293,22 @@
                 >
                   +10
                 </button>
+
+                <button
+                  class="btn btn-xs btn-secondary"
+                  [disabled]="
+                    uncraftable || full || quantity === entry.maxCraftable
+                  "
+                  (click)="
+                    stepQuantity(
+                      entry.recipe.id,
+                      entry.maxCraftable,
+                      entry.maxCraftable
+                    )
+                  "
+                >
+                  Max
+                </button>
               </div>
 
               <button

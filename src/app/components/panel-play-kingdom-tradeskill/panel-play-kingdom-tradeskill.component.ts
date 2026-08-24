@@ -195,13 +195,6 @@ export class PanelPlayKingdomTradeskillComponent {
     return this.quantities()[recipeId] ?? 1;
   }
 
-  // Clamps the stored selection against the recipe's current craftable
-  // ceiling, so it's never shown above what's actually craftable. This is
-  // what keeps the field showing the last-used quantity after a craft (or a
-  // lower value if resources no longer support it) without needing to know
-  // the post-craft state directly - gamestate updates asynchronously, so
-  // recomputing craftability right after `craftQueueStart` would still see
-  // stale, pre-craft resource counts.
   public displayQuantity(recipeId: RecipeId, maxCraftable: number): number {
     return clamp(Math.floor(this.quantityFor(recipeId)), 1, maxCraftable);
   }
