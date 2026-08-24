@@ -11,12 +11,9 @@ export type MuseumCollectibleEntry = {
   source?: CollectibleSource;
 };
 
-// Only recipes that can be found as a world drop are museum-worthy - recipes
-// that are only ever learned by leveling a tradeskill building never get an
-// entry (see `getMuseumRecipeEntries`).
+// Only world-drop recipes get an entry; sourceNodeNames is always computed live, never stored.
 export type MuseumRecipeEntry = {
   recipe: RecipeContent;
   discovered: boolean;
-  foundAtNode?: string;
   sourceNodeNames: string[];
 };

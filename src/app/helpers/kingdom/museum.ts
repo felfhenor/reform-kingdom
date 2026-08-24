@@ -1,7 +1,7 @@
 import { getEntriesByType } from '@helpers/content';
 import {
-  getRecipeFoundAtNode,
   isRecipeDiscovered,
+  isRecipeDropGated,
 } from '@helpers/crafting/recipes';
 import { getCollectibleSource } from '@helpers/item/collectible-source';
 import {
@@ -91,7 +91,7 @@ export function filterMuseumCollectibleEntries(
   });
 }
 
-// Nodes an undiscovered recipe can drop from - recipes don't know their own source node until found.
+// Encounters a recipe can drop from - computed live so it can't go stale.
 export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
   const encounters = getEntriesByType<EncounterContent>('encounter');
 
@@ -106,27 +106,17 @@ export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
   return [...names];
 }
 
-// Recipes with no source node (only learned via tradeskill leveling) are excluded, not shown as always-undiscovered.
+// Only drop-gated recipes are shown - level-learned recipes have no discovery to track.
 export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
-  const recipes = getEntriesByType<RecipeContent>('recipe');
+  const recipes = getEntriesByType<RecipeContent>('recipe').filter((recipe) =>
+    isRecipeDropGated(recipe.id),
+  );
 
-  const entries = recipes
-    .map((recipe) => {
-      const discovered = isRecipeDiscovered(recipe.id);
-      const foundAtNode = getRecipeFoundAtNode(recipe.id);
-
-      return {
-        recipe,
-        discovered,
-        foundAtNode: foundAtNode
-          ? worldNodeDisplayName(foundAtNode)
-          : undefined,
-        sourceNodeNames: discovered
-          ? []
-          : recipeSourceNodeNames(recipe.id).map(worldNodeDisplayName),
-      };
-    })
-    .filter((entry) => entry.discovered || entry.sourceNodeNames.length > 0);
+  const entries = recipes.map((recipe) => ({
+    recipe,
+    discovered: isRecipeDiscovered(recipe.id),
+    sourceNodeNames: recipeSourceNodeNames(recipe.id).map(worldNodeDisplayName),
+  }));
 
   return orderBy(
     entries,
@@ -143,15 +133,12 @@ export function filterMuseumRecipeEntries(
   if (text === '') return entries;
 
   return entries.filter((entry) => {
-    if (!entry.discovered) {
-      return entry.sourceNodeNames.some((name) =>
-        name.toLowerCase().includes(text),
-      );
+    if (entry.discovered && entry.recipe.name.toLowerCase().includes(text)) {
+      return true;
     }
 
-    if (entry.recipe.name.toLowerCase().includes(text)) return true;
-    if (entry.foundAtNode?.toLowerCase().includes(text)) return true;
-
-    return false;
+    return entry.sourceNodeNames.some((name) =>
+      name.toLowerCase().includes(text),
+    );
   });
 }

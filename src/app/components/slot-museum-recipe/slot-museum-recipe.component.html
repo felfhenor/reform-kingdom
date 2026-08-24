@@ -63,20 +63,15 @@
         <div class="font-bold mb-1 {{ result ? 'text-' + result.rarity : '' }}">
           {{ e.recipe.name }}
         </div>
-
-        @if (e.foundAtNode) {
-          <div class="text-xs">Location: {{ e.foundAtNode }}</div>
-        }
       } @else {
         <div class="font-bold mb-1">???</div>
+      }
 
-        @if (e.sourceNodeNames.length > 0) {
-          <div class="text-xs">
-            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
-          </div>
-        } @else {
-          <div class="text-xs italic">Location unknown</div>
-        }
+      @if (e.sourceNodeNames.length > 0) {
+        <div class="text-xs">
+          {{ e.discovered ? 'Found in' : 'Discoverable in' }}:
+          {{ e.sourceNodeNames.join(', ') }}
+        </div>
       }
     </div>
   </div>

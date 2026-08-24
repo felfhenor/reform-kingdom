@@ -42,16 +42,11 @@ export function isRecipeCraftable(recipeId: RecipeId): boolean {
   return !isRecipeDropGated(recipeId);
 }
 
-export function getRecipeFoundAtNode(recipeId: RecipeId): string | undefined {
-  return gamestate().discoveredRecipes[recipeId]?.foundAtNode;
-}
-
-export function recipeDiscover(recipeId: RecipeId, foundAtNode?: string): void {
+export function recipeDiscover(recipeId: RecipeId): void {
   updateGamestate((state) => {
     const existing = state.discoveredRecipes[recipeId];
     state.discoveredRecipes[recipeId] = {
       foundAt: existing?.foundAt ?? Date.now(),
-      foundAtNode: existing?.foundAtNode ?? foundAtNode,
     };
     return state;
   });

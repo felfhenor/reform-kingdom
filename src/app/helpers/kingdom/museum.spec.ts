@@ -25,8 +25,8 @@ vi.mock('@helpers/content', () => ({
 }));
 
 vi.mock('@helpers/crafting/recipes', () => ({
-  getRecipeFoundAtNode: vi.fn(),
   isRecipeDiscovered: vi.fn(),
+  isRecipeDropGated: vi.fn(),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
@@ -35,8 +35,8 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 
 import { getEntriesByType } from '@helpers/content';
 import {
-  getRecipeFoundAtNode,
   isRecipeDiscovered,
+  isRecipeDropGated,
 } from '@helpers/crafting/recipes';
 import { getCollectibleSource } from '@helpers/item/collectible-source';
 import {
@@ -275,15 +275,17 @@ describe('Museum Helper Functions', () => {
   });
 
   describe('getMuseumRecipeEntries', () => {
-    it('includes discovered recipes and undiscovered ones with a source node', () => {
+    it('includes an undiscovered drop-gated recipe with its source encounter names', () => {
       vi.mocked(getEntriesByType).mockImplementation(
         (type) =>
           (type === 'recipe'
             ? [copperIngotRecipe, boneHewnCloakRecipe]
             : [fieldRuinsEncounter]) as never,
       );
+      vi.mocked(isRecipeDropGated).mockImplementation(
+        (id) => id === boneHewnCloakRecipe.id,
+      );
       vi.mocked(isRecipeDiscovered).mockReturnValue(false);
-      vi.mocked(getRecipeFoundAtNode).mockReturnValue(undefined);
 
       const entries = getMuseumRecipeEntries();
 
@@ -291,34 +293,37 @@ describe('Museum Helper Functions', () => {
         {
           recipe: boneHewnCloakRecipe,
           discovered: false,
-          foundAtNode: undefined,
           sourceNodeNames: ['Field Ruins'],
         },
       ]);
     });
 
-    it('excludes recipes that never drop from a location, even if they resolve', () => {
+    it('excludes recipes that are only learned via tradeskill leveling, even if marked discovered', () => {
       vi.mocked(getEntriesByType).mockImplementation(
         (type) => (type === 'recipe' ? [copperIngotRecipe] : []) as never,
       );
-      vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+      vi.mocked(isRecipeDropGated).mockReturnValue(false);
+      vi.mocked(isRecipeDiscovered).mockReturnValue(true);
 
       expect(getMuseumRecipeEntries()).toEqual([]);
     });
 
-    it('includes a recipe once discovered even though it no longer reports a source node', () => {
+    // Guards against relying on stale stored discovery state.
+    it('recomputes source encounter names live even for a discovered recipe', () => {
       vi.mocked(getEntriesByType).mockImplementation(
-        (type) => (type === 'recipe' ? [boneHewnCloakRecipe] : []) as never,
+        (type) =>
+          (type === 'recipe'
+            ? [boneHewnCloakRecipe]
+            : [fieldRuinsEncounter]) as never,
       );
+      vi.mocked(isRecipeDropGated).mockReturnValue(true);
       vi.mocked(isRecipeDiscovered).mockReturnValue(true);
-      vi.mocked(getRecipeFoundAtNode).mockReturnValue('Carrina');
 
       expect(getMuseumRecipeEntries()).toEqual([
         {
           recipe: boneHewnCloakRecipe,
           discovered: true,
-          foundAtNode: 'Carrina',
-          sourceNodeNames: [],
+          sourceNodeNames: ['Field Ruins'],
         },
       ]);
     });
@@ -328,14 +333,13 @@ describe('Museum Helper Functions', () => {
     const discoveredEntry: MuseumRecipeEntry = {
       recipe: boneHewnCloakRecipe,
       discovered: true,
-      foundAtNode: 'Carrina',
-      sourceNodeNames: [],
+      sourceNodeNames: ['Field Ruins'],
     };
 
     const undiscoveredEntry: MuseumRecipeEntry = {
       recipe: copperIngotRecipe,
       discovered: false,
-      sourceNodeNames: ['Field Ruins'],
+      sourceNodeNames: ['Swamp'],
     };
 
     const entries = [discoveredEntry, undiscoveredEntry];
@@ -344,17 +348,17 @@ describe('Museum Helper Functions', () => {
       expect(filterMuseumRecipeEntries(entries, '   ')).toEqual(entries);
     });
 
-    it('filters discovered entries by name or found-at node', () => {
+    it('filters discovered entries by name or source encounter name', () => {
       expect(filterMuseumRecipeEntries(entries, 'bone-hewn')).toEqual([
         discoveredEntry,
       ]);
-      expect(filterMuseumRecipeEntries(entries, 'carrina')).toEqual([
+      expect(filterMuseumRecipeEntries(entries, 'field ruins')).toEqual([
         discoveredEntry,
       ]);
     });
 
-    it('filters undiscovered entries only by their source node names', () => {
-      expect(filterMuseumRecipeEntries(entries, 'field')).toEqual([
+    it('filters undiscovered entries only by their source encounter names', () => {
+      expect(filterMuseumRecipeEntries(entries, 'swamp')).toEqual([
         undiscoveredEntry,
       ]);
       expect(filterMuseumRecipeEntries(entries, 'copper ingot')).toEqual([]);

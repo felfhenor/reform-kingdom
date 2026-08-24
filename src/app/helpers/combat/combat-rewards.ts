@@ -57,7 +57,7 @@ export function grantResolvedDrops(
     }
 
     if ('recipeId' in drop) {
-      recipeDiscover(drop.recipeId, combat.locationName);
+      recipeDiscover(drop.recipeId);
 
       const recipe = getEntry<RecipeContent>(drop.recipeId);
       if (!recipe) return;

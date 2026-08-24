@@ -46,7 +46,6 @@ vi.mock('@helpers/state-game', () => ({
 
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
-  getRecipeFoundAtNode,
   isRecipeCraftable,
   isRecipeDiscovered,
   isRecipeDropGated,
@@ -209,26 +208,6 @@ describe('Recipes Helper Functions', () => {
     });
   });
 
-  describe('getRecipeFoundAtNode', () => {
-    it('returns the node the recipe was found in', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000, foundAtNode: 'Carrina' },
-        },
-      } as unknown as GameState);
-
-      expect(getRecipeFoundAtNode(equipmentRecipe.id)).toBe('Carrina');
-    });
-
-    it('returns undefined when the recipe has never been found', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(getRecipeFoundAtNode(equipmentRecipe.id)).toBeUndefined();
-    });
-  });
-
   describe('recipeDiscover', () => {
     it('adds a new discovery entry with the current timestamp', () => {
       recipeDiscover(equipmentRecipe.id);
@@ -252,34 +231,6 @@ describe('Recipes Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBe(1000);
-    });
-
-    it('records the node it was found in', () => {
-      recipeDiscover(equipmentRecipe.id, 'Carrina');
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(result.discoveredRecipes[equipmentRecipe.id].foundAtNode).toBe(
-        'Carrina',
-      );
-    });
-
-    it('preserves the original found-at node on repeat finds', () => {
-      recipeDiscover(equipmentRecipe.id, 'Craggledmire');
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000, foundAtNode: 'Carrina' },
-        },
-      } as unknown as GameState);
-
-      expect(result.discoveredRecipes[equipmentRecipe.id].foundAtNode).toBe(
-        'Carrina',
-      );
     });
   });
 

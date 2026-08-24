@@ -275,7 +275,7 @@ describe('combatCheckIfOver', () => {
 
     combatCheckIfOver(combat);
 
-    expect(recipeDiscover).toHaveBeenCalledWith(recipe.id, 'Field Ruins');
+    expect(recipeDiscover).toHaveBeenCalledWith(recipe.id);
   });
 
   it('resets combat on victory when the combat has no encounter (e.g. a bare fight)', () => {

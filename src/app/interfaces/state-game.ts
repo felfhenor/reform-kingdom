@@ -59,10 +59,9 @@ export type GameStateDiscoveredEquipment = {
   [key: EquipmentId]: { foundAt: number };
 };
 
-// Permanent record of every world-found recipe - recipes only ever learned
-// by leveling a tradeskill building never appear here (see `recipeDiscover`).
+// Level-learned recipes never appear here. No stored location - see `recipeSourceNodeNames`.
 export type GameStateDiscoveredRecipes = {
-  [key: RecipeId]: { foundAt: number; foundAtNode?: string };
+  [key: RecipeId]: { foundAt: number };
 };
 
 // One-time ledger of already-announced unlocks - unlock itself is a live check (`isAstralProjectorCollectiblesMet`).
