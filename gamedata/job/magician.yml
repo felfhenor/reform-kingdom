@@ -53,10 +53,10 @@
         - level: 1
           skillId: Fireball I
 
-        - level: 6
+        - level: 7
           skillId: Fireball II
 
-        - level: 15
+        - level: 18
           skillId: Fireball III
 
     - pathName: Thunderbolt
@@ -67,7 +67,7 @@
         - level: 11
           skillId: Thunderbolt II
 
-        - level: 19
+        - level: 21
           skillId: Thunderbolt III
 
     - pathName: Frostfire Bolt
@@ -77,3 +77,6 @@
 
         - level: 17
           skillId: Frostfire Bolt II
+
+        - level: 29
+          skillId: Frostfire Bolt III

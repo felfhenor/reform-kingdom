@@ -139,3 +139,92 @@
         Agility: 0.35
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 04e05169-56c4-4594-98e0-4cdcef381841
+  name: Rapidfire III
+  family: Rapidfire
+  description: Shoot 6 arrows, doing a total of {{ value }} damage.
+
+  rarity: Rare
+  sprite: '0021'
+
+  epCost: 22
+  usesPerCombat: 1
+
+  requiredWeaponTypes: [Bow]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.6
+        Agility: 0.6
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.55
+        Agility: 0.55
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.5
+        Agility: 0.5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.45
+        Agility: 0.45
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.4
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.35
+        Agility: 0.35
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

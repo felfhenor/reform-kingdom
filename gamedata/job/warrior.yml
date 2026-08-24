@@ -55,10 +55,10 @@
         - level: 1
           skillId: Double Strike I
 
-        - level: 6
+        - level: 8
           skillId: Double Strike II
 
-        - level: 15
+        - level: 18
           skillId: Double Strike III
 
     - pathName: Sweep
@@ -66,10 +66,10 @@
         - level: 4
           skillId: Sweep I
 
-        - level: 9
+        - level: 10
           skillId: Sweep II
 
-        - level: 18
+        - level: 23
           skillId: Sweep III
 
     - pathName: Smashing Board
@@ -79,3 +79,6 @@
 
         - level: 13
           skillId: Smashing Board II
+
+        - level: 26
+          skillId: Smashing Board III

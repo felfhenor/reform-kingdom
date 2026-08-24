@@ -34,7 +34,7 @@
 
   sprite: '0014'
 
-  rarity: Common
+  rarity: Uncommon
 
   epCost: 5
   usesPerCombat: -1

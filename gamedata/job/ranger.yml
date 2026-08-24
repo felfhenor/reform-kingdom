@@ -50,10 +50,10 @@
         - level: 1
           skillId: Snipe I
 
-        - level: 7
+        - level: 8
           skillId: Snipe II
 
-        - level: 17
+        - level: 21
           skillId: Snipe III
 
     - pathName: Rapidfire
@@ -63,6 +63,9 @@
 
         - level: 10
           skillId: Rapidfire II
+
+        - level: 27
+          skillId: Rapidfire III
 
     - pathName: Arrow Rain
       levels:

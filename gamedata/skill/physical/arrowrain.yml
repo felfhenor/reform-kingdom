@@ -23,7 +23,7 @@
         - behavior: NotZeroHealth
       damageScaling:
         Strength: 0.5
-        Agility: 0.75
+        Agility: 0.5
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
@@ -34,8 +34,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 0.35
-        Agility: 0.5
+        Strength: 0.25
+        Agility: 0.25
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
@@ -64,7 +64,7 @@
         - behavior: NotZeroHealth
       damageScaling:
         Strength: 0.75
-        Agility: 1.25
+        Agility: 0.75
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
@@ -76,7 +76,7 @@
         - behavior: NotZeroHealth
       damageScaling:
         Strength: 0.5
-        Agility: 0.75
+        Agility: 0.5
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
@@ -87,7 +87,7 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 0.35
-        Agility: 0.5
+        Strength: 0.25
+        Agility: 0.25
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

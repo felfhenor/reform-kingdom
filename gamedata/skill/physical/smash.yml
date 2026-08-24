@@ -65,3 +65,37 @@
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 06d268f8-d333-4a35-9ebd-c7243eaaec90
+  name: Smashing Board III
+  family: Smashing Board
+  description: Smash your shield into an enemy, dealing {{ value }} damage and inflicting Dazed on them.
+
+  rarity: Rare
+  sprite: '0022'
+
+  epCost: 18
+  usesPerCombat: -1
+
+  requiredWeaponTypes: [Shield]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1.6
+        Vitality: 1.1
+
+      statusEffects:
+        - statusEffectId: Dazed II
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

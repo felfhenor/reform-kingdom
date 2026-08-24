@@ -58,7 +58,7 @@
         - level: 6
           skillId: Holy Smite II
 
-        - level: 15
+        - level: 17
           skillId: Holy Smite III
 
     - pathName: Cure
@@ -66,10 +66,10 @@
         - level: 3
           skillId: Cure I
 
-        - level: 8
+        - level: 10
           skillId: Cure II
 
-        - level: 19
+        - level: 21
           skillId: Cure III
 
     - pathName: Starshine
@@ -79,6 +79,9 @@
 
         - level: 14
           skillId: Starshine II
+
+        - level: 25
+          skillId: Starshine III
 
     - pathName: Empower
       levels:
