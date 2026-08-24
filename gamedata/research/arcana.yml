@@ -1,0 +1,44 @@
+- id: 2b0b036b-264e-4711-928b-c1f3abcf9209
+  name: Astral Reach I
+  description: A second thread of astral focus, held alongside the first.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  # No `effect` - raises astralProjectorMaxActiveSpells() to 2, referenced by
+  # name directly from astral-projector.ts's ASTRAL_CAP_RESEARCH_NAMES.
+
+- id: defe6165-92c8-4ce0-b38e-c7b8ade8f56f
+  name: Amplify I
+  description: Astral spells linger longer once cast.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: AstralSpellDurationIncrease
+    percent: 15
+
+- id: 8cf5509b-0cf1-4b0d-9cfb-39f037d0e082
+  name: Astral Reach II
+  description: A third thread of astral focus.
+  prerequisiteResearchIds: [Astral Reach I]
+  cost:
+    rp: 35
+    gold: 1200
+  researchTime: 7200
+  # No `effect` - raises astralProjectorMaxActiveSpells() to 3.
+
+- id: 3f513fd4-1bff-40c2-869f-28f1cac852a3
+  name: Amplify II
+  description: Astral spells linger longer still.
+  prerequisiteResearchIds: [Amplify I]
+  cost:
+    rp: 35
+    gold: 1200
+  researchTime: 7200
+  effect:
+    type: AstralSpellDurationIncrease
+    percent: 15

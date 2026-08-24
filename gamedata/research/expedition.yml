@@ -1,0 +1,71 @@
+- id: d538a0c6-6cf7-417a-a576-5e14f70722e3
+  name: Worn Paths
+  description: Well-trodden roads shave time off every journey.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: TravelTimeReduction
+    percent: 5
+
+- id: 86ebcfd6-787a-40af-a24b-7d3a81bc4063
+  name: "Quartermaster's Contracts I"
+  description: Better terms with the caravans on the road.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: CaravanPriceReduction
+    percent: 5
+
+- id: 2aa0e34e-6c8d-44d3-bf44-2372c23d8461
+  name: Charted Roads
+  description: Detailed maps of the well-worn paths shave off still more time.
+  prerequisiteResearchIds: [Worn Paths]
+  cost:
+    rp: 35
+    gold: 1200
+  researchTime: 7200
+  effect:
+    type: TravelTimeReduction
+    percent: 5
+
+- id: 3affb7c7-5dfe-4abc-b559-284d1b8d45f2
+  name: "Quartermaster's Contracts II"
+  description: Deeper trade ties with the road caravans.
+  prerequisiteResearchIds: ["Quartermaster's Contracts I"]
+  cost:
+    rp: 35
+    gold: 1200
+  researchTime: 7200
+  effect:
+    type: CaravanPriceReduction
+    percent: 5
+
+- id: b0ddd53e-ff97-4097-8f40-916d0df18a20
+  name: "Cartographer's Eye: Goblin Traders"
+  description: Rumor has it a goblin trading company works these roads, if you know where to look.
+  prerequisiteResearchIds: [Worn Paths]
+  cost:
+    rp: 35
+    gold: 1200
+  researchTime: 7200
+  # No `effect` - this node's only job is being the name that
+  # gamedata/caravan/carrina.yml's Goblin Group Company entry points its
+  # blockedByResearchId at.
+
+- id: 426c6b98-5a1d-4c54-8755-00b1b1fab4eb
+  name: "Quartermaster's Contracts III"
+  description: The caravans consider the Duchy a trusted trading partner.
+  prerequisiteResearchIds: ["Quartermaster's Contracts II"]
+  cost:
+    rp: 70
+    gold: 2500
+  researchTime: 14400
+  effect:
+    type: CaravanPriceReduction
+    percent: 5

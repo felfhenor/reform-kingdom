@@ -1,0 +1,98 @@
+- id: 6adecab0-6531-4074-84fe-960f0a7a8787
+  name: Steady Hands
+  description: A calmer touch means fuller hands at the end of a gather.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: GatherBonusQuantityChance
+    chance: 5
+    bonusQuantity: 1
+
+- id: 1e524db9-465c-457b-bf35-586a96c4d0df
+  name: Keen Eye
+  description: A sharper eye for detail while crafting.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: CraftBonusXpChance
+    chance: 5
+    bonusXp: 1
+
+- id: 73045c39-f30d-4c86-838a-78292e481a9c
+  name: Looters
+  description: The party knows where to look on a fallen enemy.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: MonsterBonusGoldChance
+    chance: 5
+    bonusGold: 10
+
+- id: 10e9d6b2-a47a-44b2-87b6-4839bf87145e
+  name: Fair Trade
+  description: The Armory gets better prices for old gear.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: ArmorySellValueIncrease
+    percent: 5
+
+- id: 3c7ac1f0-d61f-4c80-83a6-a6abc5d802e4
+  name: Swift Recovery
+  description: The party recovers from a wipe faster than before.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: PostWipeHealTimeReduction
+    percent: 15
+
+- id: a6c530a4-5f50-409e-a843-5881b628c8c5
+  name: Trophy Hunter
+  description: Every kill leaves a little more behind.
+  prerequisiteResearchIds: []
+  cost:
+    rp: 15
+    gold: 500
+  researchTime: 3600
+  effect:
+    type: MonsterLootBonusQuantity
+    bonusQuantity: 1
+
+- id: 1ee8c57a-e437-4d6d-aa14-c9c3423f171a
+  name: Sharper Eye
+  description: Keen Eye's insight comes more often.
+  prerequisiteResearchIds: [Keen Eye]
+  cost:
+    rp: 35
+    gold: 1200
+  researchTime: 7200
+  effect:
+    type: CraftBonusXpChanceIncrease
+    chance: 5
+
+- id: 69f84d40-7e28-4653-b8dd-538e51b2e555
+  name: Deeper Insight
+  description: Keen Eye's insight runs deeper when it lands.
+  prerequisiteResearchIds: [Keen Eye]
+  cost:
+    rp: 35
+    gold: 1200
+  researchTime: 7200
+  effect:
+    type: CraftBonusXpAmountIncrease
+    bonusXp: 1

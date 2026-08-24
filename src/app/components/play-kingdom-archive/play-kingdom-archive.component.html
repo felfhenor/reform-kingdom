@@ -1,0 +1,78 @@
+<app-card-page heightProfile="full">
+  <span header>The Archive</span>
+
+  <app-button-kingdom-back pageactions />
+
+  <div class="flex flex-col gap-4 p-4 h-full overflow-y-auto">
+    @let research = currentResearch();
+    <div class="flex flex-col gap-1 p-2 rounded bg-base-200">
+      <span class="text-xs text-lighter">Active research</span>
+      @if (research) {
+        <span class="font-semibold">{{ research.name }}</span>
+        <div class="w-full h-2 bg-base-300 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-primary"
+            [style.width.%]="currentProgressFraction() * 100"
+          ></div>
+        </div>
+      } @else {
+        <span class="text-sm text-lighter italic">Nothing being researched.</span>
+      }
+    </div>
+
+    <div role="tablist" class="tabs tabs-boxed tabs-lg justify-center">
+      @for (tree of trees(); track tree.id) {
+        @let isActive = tree.id === activeTree()?.id;
+        <button
+          type="button"
+          role="tab"
+          class="tab font-semibold px-6"
+          [class.tab-active]="isActive"
+          [class.bg-primary]="isActive"
+          [class.text-primary-content]="isActive"
+          (click)="selectTree(tree.id)"
+        >
+          {{ tree.name }}
+        </button>
+      }
+    </div>
+
+    <div
+      class="grid gap-2 justify-center"
+      [style.grid-template-columns]="gridTemplateColumns()"
+    >
+      @for (row of rows(); track $index; let rowIndex = $index) {
+        @for (cell of row; track $index; let colIndex = $index) {
+          @if (cell) {
+            <app-button-research-node
+              [style.grid-row]="rowIndex + 1"
+              [style.grid-column]="colIndex + 1"
+              [cell]="cell"
+              (researchSelect)="onSelectNode($event)"
+            />
+          } @else {
+            <div
+              class="w-32 h-36"
+              [style.grid-row]="rowIndex + 1"
+              [style.grid-column]="colIndex + 1"
+            ></div>
+          }
+        }
+      }
+    </div>
+  </div>
+</app-card-page>
+
+<swal
+  #swapSwal
+  title="Abandon current research?"
+  [text]="
+    'Switching now forfeits all progress and the resources already spent on ' +
+    (currentResearch()?.name ?? 'the active research') +
+    '. Continue?'
+  "
+  icon="warning"
+  confirmButtonText="Yes, switch"
+  cancelButtonText="Cancel"
+  (confirm)="confirmSwap()"
+></swal>

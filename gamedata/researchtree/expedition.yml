@@ -1,0 +1,11 @@
+- id: 99c23bef-220f-4d13-b1c0-66eb0ce2d14e
+  name: Expedition
+  description: Faster roads, better trade terms, and eyes on the hidden corners of the map.
+  rows:
+    - - researchId: Worn Paths
+      - researchId: "Quartermaster's Contracts I"
+    - - researchId: Charted Roads
+      - researchId: "Quartermaster's Contracts II"
+      - researchId: "Cartographer's Eye: Goblin Traders"
+    - - blank: true
+      - researchId: "Quartermaster's Contracts III"

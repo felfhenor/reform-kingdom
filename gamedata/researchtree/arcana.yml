@@ -1,0 +1,8 @@
+- id: 49c54e4a-b5e9-4017-a3b0-687c0b391e43
+  name: Arcana
+  description: Deepen the Astral Projector's reach and staying power.
+  rows:
+    - - researchId: Astral Reach I
+      - researchId: Amplify I
+    - - researchId: Astral Reach II
+      - researchId: Amplify II

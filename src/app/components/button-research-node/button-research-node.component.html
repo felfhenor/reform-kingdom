@@ -1,0 +1,73 @@
+@let node = cell();
+
+<button
+  type="button"
+  class="btn btn-outline btn-neutral w-32 h-36 shrink-0 flex flex-col items-center justify-between gap-1 py-2 px-2 text-center normal-case font-normal"
+  [class.btn-active]="node.state === 'Active'"
+  [class.cursor-default]="!isClickable()"
+  [attr.aria-disabled]="isClickable() ? null : true"
+  [tp]="tooltip"
+  [tpPlacement]="'top'"
+  (click)="onClick()"
+>
+  <div class="flex flex-col items-center gap-1">
+    @switch (node.state) {
+      @case ('Locked') {
+        <app-icon name="tablerLock" size="16px" class="opacity-50" />
+      }
+      @case ('Completed') {
+        <app-icon name="tablerCheck" size="16px" />
+      }
+      @case ('Active') {
+        <app-icon name="gamePlayButton" size="16px" />
+      }
+      @default {
+        <app-icon
+          name="gamePlainCircle"
+          size="16px"
+          [class.opacity-50]="isDimmed()"
+        />
+      }
+    }
+
+    <span
+      class="text-xs font-semibold leading-tight line-clamp-2"
+      [class.text-lighter]="isDimmed()"
+      >{{ node.content.name }}</span
+    >
+  </div>
+
+  @if (node.state === 'Active') {
+    <div class="w-full h-1 bg-base-300 rounded-full overflow-hidden">
+      <div class="h-full bg-primary" [style.width.%]="node.progressFraction * 100"></div>
+    </div>
+  }
+
+  @if (prerequisiteLabel(); as label) {
+    <span class="text-[10px] text-lighter leading-tight line-clamp-1">{{
+      label
+    }}</span>
+  }
+
+  <div class="flex items-center gap-2">
+    <app-currency-cost
+      [type]="researchPointItemId()"
+      [amount]="node.content.cost.rp"
+    />
+    <app-currency-cost [type]="goldCoinId()" [amount]="node.content.cost.gold" />
+  </div>
+</button>
+
+<ng-template #tooltip>
+  <div class="flex flex-col gap-2 max-w-[400px]">
+    <div class="font-bold">{{ node.content.name }}</div>
+
+    <div class="italic text-sm">{{ node.content.description }}</div>
+
+    @if (effectDescription(); as effect) {
+      <div class="text-sm">{{ effect }}</div>
+    }
+
+    <div class="text-sm text-lighter">Cost: {{ costSummary() }}</div>
+  </div>
+</ng-template>

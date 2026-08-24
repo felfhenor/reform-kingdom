@@ -1,0 +1,12 @@
+- id: 3237992e-d443-4239-b62c-2d160a970f29
+  name: Domain
+  description: A steadier home front - gathering, gold, recovery, and the spoils of battle.
+  rows:
+    - - researchId: Steady Hands
+      - researchId: Keen Eye
+      - researchId: Looters
+      - researchId: Fair Trade
+      - researchId: Swift Recovery
+      - researchId: Trophy Hunter
+    - - researchId: Sharper Eye
+      - researchId: Deeper Insight
