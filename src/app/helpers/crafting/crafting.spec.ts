@@ -28,6 +28,7 @@ vi.mock('@helpers/state-game', () => ({
 
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
+  craftingActiveStatusEntries,
   craftQueueTicksRemaining,
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
@@ -367,6 +368,91 @@ describe('craftQueueTicksRemaining / craftQueueTotalTicks / craftQueueUnitsRemai
   it('sums individual units still to be crafted, not the number of queue slots', () => {
     // Ore: 5-2 = 3 remaining. Ring: 2-0 = 2 remaining. Total 5, across 2 slots.
     expect(craftQueueUnitsRemaining('Blacksmithing')).toBe(5);
+  });
+});
+
+describe('craftingActiveStatusEntries', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getEntry).mockImplementation((key: string) => {
+      if (key === 'Blacksmithing') return blacksmithingContent as never;
+      if (key === 'recipe-1') {
+        return buildRecipe({
+          name: 'Material: Copper Ingot',
+          craftTime: 10,
+        }) as never;
+      }
+      if (key === 'recipe-2') {
+        return buildRecipe({
+          name: 'Material: Tin Ingot',
+          craftTime: 20,
+        }) as never;
+      }
+      return undefined;
+    });
+    vi.mocked(recipeResultSpritesheet).mockReturnValue('item');
+    vi.mocked(recipeResultContent).mockReturnValue({
+      sprite: 'copper-ingot-sprite',
+    } as never);
+  });
+
+  it('includes only tradeskills with an active queue, stripping the "Category: " prefix from the head entry\'s recipe name', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({
+          queue: [
+            buildQueueEntry({
+              recipeId: 'recipe-1' as RecipeId,
+              ticksIntoCraft: 4,
+            }),
+          ],
+        }),
+      ),
+    } as unknown as GameState);
+
+    // Remaining: craftTime (10) - ticksIntoCraft (4) = 6, single unit queued.
+    expect(craftingActiveStatusEntries()).toEqual([
+      {
+        tradeskillId: BLACKSMITHING_ID,
+        tradeskill: 'Blacksmithing',
+        itemName: 'Copper Ingot',
+        resultSpritesheet: 'item',
+        resultSprite: 'copper-ingot-sprite',
+        remainingTicks: 6,
+      },
+    ]);
+  });
+
+  it('returns nothing when every tradeskill queue is empty', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding()),
+    } as unknown as GameState);
+
+    expect(craftingActiveStatusEntries()).toEqual([]);
+  });
+
+  it('reports the whole queue\'s remaining time, not just the head entry\'s, when a second recipe is queued behind it', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({
+          queue: [
+            buildQueueEntry({
+              id: 'entry-1' as CraftQueueEntryId,
+              recipeId: 'recipe-1' as RecipeId,
+              ticksIntoCraft: 4,
+            }),
+            buildQueueEntry({
+              id: 'entry-2' as CraftQueueEntryId,
+              recipeId: 'recipe-2' as RecipeId,
+              ticksIntoCraft: 0,
+            }),
+          ],
+        }),
+      ),
+    } as unknown as GameState);
+
+    // Head entry remainder (10-4=6) + the fully-queued second entry (20) = 26.
+    expect(craftingActiveStatusEntries()[0].remainingTicks).toBe(26);
   });
 });
 

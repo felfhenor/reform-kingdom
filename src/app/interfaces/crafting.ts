@@ -6,6 +6,7 @@ import type { RecipeContent, RecipeId } from '@interfaces/content-recipe';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded } from '@interfaces/identifiable';
 import type { ItemPreviewDisplay } from '@interfaces/item-preview';
+import type { Tradeskill } from '@interfaces/tradeskill';
 
 export type CraftQueueEntryId = Branded<string, 'CraftQueueEntryId'>;
 
@@ -27,6 +28,20 @@ export type GameStateTradeskills = Record<
   TradeskillId,
   TradeskillBuildingState
 >;
+
+// Display-only shape for one active-craft corner card - built by
+// `craftingActiveStatusEntries`, rendered by `card-status-crafting`.
+export type CraftingStatusEntry = {
+  tradeskillId: TradeskillId;
+  tradeskill: Tradeskill;
+  // The recipe's own name with its "Category: " prefix stripped (see
+  // `stripRecipeCategory`) - just the item, e.g. "Copper Ingot".
+  itemName: string;
+  resultSpritesheet: 'item' | 'equipment' | 'collectible';
+  resultSprite: string;
+  // Whole-queue remaining ticks for this tradeskill, not just the item above.
+  remainingTicks: number;
+};
 
 // A single requirement resolved for display - collectible requirements
 // aren't consumed, so `quantity` is always 1 for them (a possession gate,

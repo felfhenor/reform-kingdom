@@ -22,16 +22,33 @@
           <label class="label cursor-pointer label-checkbox">
             <input
               type="checkbox"
-              [checked]="getOption('partyViewAutoCollapse')"
+              [checked]="getOption('partyViewAlwaysExpand')"
               class="checkbox checkbox-secondary"
               (click)="
                 setOption(
-                  'partyViewAutoCollapse',
-                  !getOption('partyViewAutoCollapse')
+                  'partyViewAlwaysExpand',
+                  !getOption('partyViewAlwaysExpand')
                 )
               "
             />
-            <span class="label-text">Auto-Collapse Party View</span>
+            <span class="label-text">Always Expand Party View</span>
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="getOption('craftingViewAlwaysExpand')"
+              class="checkbox checkbox-secondary"
+              (click)="
+                setOption(
+                  'craftingViewAlwaysExpand',
+                  !getOption('craftingViewAlwaysExpand')
+                )
+              "
+            />
+            <span class="label-text">Always Expand Crafting View</span>
           </label>
         </div>
       </div>

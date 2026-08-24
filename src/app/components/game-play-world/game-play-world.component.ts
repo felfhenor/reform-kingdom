@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-global-effect.component';
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
+import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { getEntry } from '@helpers/content';
 import {
@@ -84,6 +85,7 @@ const FADE_DURATION_MS = 300;
     PanelMapNodeComponent,
     BarGlobalEffectComponent,
     StatusEncounterComponent,
+    StatusCraftingComponent,
   ],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
@@ -99,6 +101,7 @@ const FADE_DURATION_MS = 300;
     <app-panel-map-node></app-panel-map-node>
 
     <app-status-encounter class="encounter-status-layer"></app-status-encounter>
+    <app-status-crafting class="crafting-status-layer"></app-status-crafting>
   `,
   styleUrl: './game-play-world.component.scss',
 })

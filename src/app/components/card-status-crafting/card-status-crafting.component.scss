@@ -1,0 +1,50 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block pointer-events-auto;
+}
+
+.status-entry {
+  @apply relative flex flex-row items-center bg-black/60 border border-black/50 rounded;
+  width: 40px;
+  height: 40px;
+  padding: 2px;
+  gap: 6px;
+  transition:
+    width 150ms ease,
+    padding 150ms ease;
+
+  &.expanded {
+    @apply items-stretch;
+    width: 190px;
+    height: auto;
+    padding: 6px 8px;
+  }
+}
+
+.entry-icon {
+  @apply relative flex items-center justify-center shrink-0 overflow-hidden rounded;
+  width: 32px;
+  height: 32px;
+}
+
+// Small text badge over the bottom of the icon so the timer stays readable
+// without needing the card to expand.
+.entry-timer {
+  @apply absolute inset-x-0 bottom-0 text-center bg-black/70;
+  font-size: 0.55rem;
+  line-height: 1.2;
+}
+
+.entry-details {
+  @apply flex flex-col justify-center text-white overflow-hidden;
+}
+
+.entry-name {
+  @apply font-semibold text-xs;
+}
+
+.entry-subtitle {
+  @apply truncate;
+  font-size: 0.65rem;
+}

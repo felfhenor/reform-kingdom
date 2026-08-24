@@ -11,7 +11,8 @@ export type GameOption =
   | 'showBackdropGrid'
   | 'analyticsEnabled'
   | 'analyticsOptInDismissed'
-  | 'partyViewAutoCollapse';
+  | 'partyViewAlwaysExpand'
+  | 'craftingViewAlwaysExpand';
 
 export type NotificationCategory = 'Error' | 'Success';
 

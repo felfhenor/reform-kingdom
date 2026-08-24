@@ -1,0 +1,25 @@
+@let isExpanded = expanded();
+@let data = entry();
+
+<div class="status-entry" [class.expanded]="isExpanded">
+  <div class="entry-icon">
+    <div class="zoom-row">
+      <app-atlas-image
+        [spritesheet]="data.resultSpritesheet"
+        [assetName]="data.resultSprite"
+      />
+    </div>
+    @if (!isExpanded) {
+      <span class="entry-timer">{{ formatDuration(data.remainingTicks) }}</span>
+    }
+  </div>
+
+  @if (isExpanded) {
+    <div class="entry-details">
+      <span class="entry-subtitle text-lighter">
+        {{ formatDuration(data.remainingTicks) }} remaining
+      </span>
+      <span class="entry-name truncate">{{ data.itemName }}</span>
+    </div>
+  }
+</div>

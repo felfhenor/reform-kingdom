@@ -39,12 +39,12 @@ import { getOption } from '@helpers/state-options';
   `,
 })
 export class StatusEncounterComponent {
-  // Only used when `partyViewAutoCollapse` is on - otherwise the corner
-  // stays expanded regardless of hover state.
+  // Ignored once `partyViewAlwaysExpand` is on - the corner then stays
+  // expanded regardless of hover state.
   private isHovered = signal(false);
 
   public isExpanded = computed(
-    () => !getOption('partyViewAutoCollapse') || this.isHovered(),
+    () => getOption('partyViewAlwaysExpand') || this.isHovered(),
   );
 
   public setHovered(hovered: boolean): void {
