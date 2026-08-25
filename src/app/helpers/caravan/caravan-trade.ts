@@ -12,7 +12,9 @@ import {
   getGoldQuantity,
   getMaterialQuantity,
   hasGold,
+  hasTraderTokens,
   spendGold,
+  traderTokenId,
 } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { rngUuid } from '@helpers/rng';
@@ -20,9 +22,11 @@ import { updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanContent,
+  CaravanTokenTrade,
   CaravanTrade,
   CaravanTraderContent,
   CollectibleContent,
+  CollectibleId,
   EquipmentContent,
   EquipmentItem,
   EquipmentItemId,
@@ -32,28 +36,43 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 
-// Mirrors rewardContentInfo in world-nodes.ts, plus the tooltip fields that helper doesn't carry.
-export function caravanTradeDisplay(
-  trade: CaravanTrade,
-): ItemPreviewDisplay | undefined {
-  if (trade.itemId) {
-    const item = getEntry<ItemContent>(trade.itemId);
+// Shared by CaravanTrade and CaravanTokenTrade - both are itemId/equipmentId/collectibleId unions.
+function resolveRewardDisplay(reward: {
+  itemId?: ItemContent['id'];
+  equipmentId?: EquipmentContent['id'];
+  collectibleId?: CollectibleId;
+}): ItemPreviewDisplay | undefined {
+  if (reward.itemId) {
+    const item = getEntry<ItemContent>(reward.itemId);
     return item ? itemPreviewDisplay(item, 'item') : undefined;
   }
 
-  if (trade.equipmentId) {
-    const equipment = getEntry<EquipmentContent>(trade.equipmentId);
+  if (reward.equipmentId) {
+    const equipment = getEntry<EquipmentContent>(reward.equipmentId);
     return equipment ? itemPreviewDisplay(equipment, 'equipment') : undefined;
   }
 
-  if (trade.collectibleId) {
-    const collectible = getEntry<CollectibleContent>(trade.collectibleId);
+  if (reward.collectibleId) {
+    const collectible = getEntry<CollectibleContent>(reward.collectibleId);
     return collectible
       ? itemPreviewDisplay(collectible, 'collectible')
       : undefined;
   }
 
   return undefined;
+}
+
+// Mirrors rewardContentInfo in world-nodes.ts, plus the tooltip fields that helper doesn't carry.
+export function caravanTradeDisplay(
+  trade: CaravanTrade,
+): ItemPreviewDisplay | undefined {
+  return resolveRewardDisplay(trade);
+}
+
+export function caravanTokenTradeDisplay(
+  trade: CaravanTokenTrade,
+): ItemPreviewDisplay | undefined {
+  return resolveRewardDisplay(trade);
 }
 
 // How many of trade's target the party owns, shown so price can be weighed against stock.
@@ -132,6 +151,19 @@ export function caravanTradeMaxQuantity(
   return remaining === undefined ? owned : Math.min(remaining, owned);
 }
 
+// Shared by both the gold-trade and token-trade collectible-grant paths.
+function grantCollectible(
+  state: GameState,
+  collectibleId: CollectibleId,
+  quantity: number,
+): void {
+  const existing = state.collectibles[collectibleId];
+  state.collectibles[collectibleId] = {
+    quantity: (existing?.quantity ?? 0) + quantity,
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+}
+
 // Grants whichever reward type `trade` sells, `quantity` times. `quantity`
 // is always 1 for a collectible (enforced by `caravanTradeMaxQuantity`).
 function grantCaravanReward(
@@ -160,11 +192,7 @@ function grantCaravanReward(
   }
 
   if (trade.collectibleId) {
-    const existing = state.collectibles[trade.collectibleId];
-    state.collectibles[trade.collectibleId] = {
-      quantity: (existing?.quantity ?? 0) + quantity,
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
+    grantCollectible(state, trade.collectibleId, quantity);
   }
 }
 
@@ -241,5 +269,69 @@ export function caravanExecuteTrade(
   });
 
   analyticsSendDesignEvent('Kingdom:Caravan:Trade');
+  return true;
+}
+
+// A collectible token trade is a one-time purchase, same rule as a gold
+// collectible trade; item/equipment token trades have no such gate.
+function isTokenTradeAlreadyOwned(trade: CaravanTokenTrade): boolean {
+  if (trade.collectibleId) return isCollectibleDiscovered(trade.collectibleId);
+  return false;
+}
+
+function grantTokenTradeReward(state: GameState, trade: CaravanTokenTrade): void {
+  if (trade.itemId) {
+    applyMaterialDelta(state, trade.itemId, 1);
+    return;
+  }
+
+  if (trade.equipmentId) {
+    const newItem: EquipmentItem = {
+      id: rngUuid() as EquipmentItemId,
+      equipmentId: trade.equipmentId,
+      infusedItemIds: [],
+    };
+    state.armory = [...state.armory, newItem];
+
+    const existing = state.discoveredEquipment[trade.equipmentId];
+    state.discoveredEquipment[trade.equipmentId] = {
+      foundAt: existing?.foundAt ?? Date.now(),
+    };
+    return;
+  }
+
+  if (trade.collectibleId) {
+    grantCollectible(state, trade.collectibleId, 1);
+  }
+}
+
+// Buys one of a trader's always-visible token trades; returns false without
+// changing state if unresolvable, already owned, or unaffordable.
+export function caravanExecuteTokenTrade(
+  entry: WorldNodeEntry,
+  tokenTradeIndex: number,
+): boolean {
+  const caravan = worldNodeCaravan(entry);
+  if (!caravan) return false;
+
+  const state = caravanState(caravan.id);
+  const trader = state?.traderId
+    ? getEntry<CaravanTraderContent>(state.traderId)
+    : undefined;
+  if (!trader) return false;
+
+  const trade = trader.tokenTrades[tokenTradeIndex];
+  if (!trade) return false;
+
+  if (isTokenTradeAlreadyOwned(trade)) return false;
+  if (!hasTraderTokens(trade.tokenCost)) return false;
+
+  updateGamestate((s) => {
+    grantTokenTradeReward(s, trade);
+    applyMaterialDelta(s, traderTokenId(), -trade.tokenCost);
+    return s;
+  });
+
+  analyticsSendDesignEvent('Kingdom:Caravan:TokenTrade');
   return true;
 }

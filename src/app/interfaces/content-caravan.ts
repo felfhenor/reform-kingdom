@@ -1,3 +1,4 @@
+import type { CommissionOfferId } from '@interfaces/content-commission-offer';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
@@ -8,6 +9,13 @@ export type CaravanId = Branded<string, 'CaravanId'>;
 export type CaravanMarkupPercentages = {
   sell: number;
   buy: number;
+};
+
+// Weight lives per-caravan (not on CommissionOfferContent) so the same
+// offer can be common at one caravan and rare at another.
+export type CommissionOfferSlot = {
+  commissionOfferId: CommissionOfferId;
+  weight: number;
 };
 
 export type CaravanContent = IsContentItem &
@@ -30,4 +38,9 @@ export type CaravanContent = IsContentItem &
     // Tags matched against `CaravanTraderContent.category` - only traders
     // in one of these categories are eligible to staff this caravan.
     traderCategories: string[];
+
+    // Direct pool this caravan rolls its daily commission from - see
+    // `commissionProcessTick`. Not category-matched like traders; the
+    // caravan owns its own list.
+    commissionOffers: CommissionOfferSlot[];
   };

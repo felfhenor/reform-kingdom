@@ -67,7 +67,10 @@
     </div>
 
     @for (entry of recipesGrid.pagedEntries(); track entry.recipe.id) {
-      <app-slot-museum-recipe [entry]="entry" />
+      <app-slot-museum-recipe
+        [entry]="entry"
+        (unlock)="unlockRecipe(entry.recipe.id)"
+      />
     }
   </app-page-paged-grid>
 }

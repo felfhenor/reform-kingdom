@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { getEntriesByType } from '@helpers/content';
+import { isRecipeDropGated } from '@helpers/crafting/recipes';
 import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting/tradeskill';
 import {
   debugDiscoverAllRecipes,
@@ -11,8 +12,10 @@ import {
   debugGiveEquipment,
   debugGiveItem,
   debugResetBestiary,
+  debugResetCommissions,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
+  debugUndiscoverRecipe,
 } from '@helpers/debug/debug';
 import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
 import type {
@@ -23,6 +26,8 @@ import type {
   EquipmentId,
   ItemContent,
   ItemId,
+  RecipeContent,
+  RecipeId,
   Tradeskill,
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
@@ -64,6 +69,19 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public selectedCollectibleId = signal<CollectibleId | undefined>(undefined);
   public collectibleQuantity = signal<number>(1);
+
+  // Only drop-gated recipes have a discovery record to undo - see
+  // `debugDiscoverAllRecipes`'s identical filter.
+  public debugDropGatedRecipes = computed(() =>
+    sortBy(
+      getEntriesByType<RecipeContent>('recipe').filter((recipe) =>
+        isRecipeDropGated(recipe.id),
+      ),
+      (recipe) => recipe.name,
+    ),
+  );
+
+  public selectedRecipeId = signal<RecipeId | undefined>(undefined);
 
   public party = computed(() =>
     sortBy(partyGet(), (character) => character.name),
@@ -117,11 +135,22 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     debugResetBestiary();
   }
 
+  public resetCommissions(): void {
+    debugResetCommissions();
+  }
+
   public fillBestiary(): void {
     debugFillBestiary();
   }
 
   public discoverAllRecipes(): void {
     debugDiscoverAllRecipes();
+  }
+
+  public undiscoverRecipe(): void {
+    const recipeId = this.selectedRecipeId();
+    if (!recipeId) return;
+
+    debugUndiscoverRecipe(recipeId);
   }
 }

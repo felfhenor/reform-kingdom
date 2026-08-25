@@ -1,0 +1,53 @@
+- id: 863cb2c0-cd2d-4de7-9e51-1d3ec6345d00
+  name: Commission - Craggled Weaponry
+  description: The caravan needs to restock their basic weaponry.
+
+  requirements:
+    - equipmentId: Miremetal Whip
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Miremetal Dirk
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Miremetal Dagger
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Miremetal Sword
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Mirewood Crossbow
+      quantityMin: 1
+      quantityMax: 3
+
+  tokenReward: 3
+
+- id: 11d1fa0f-ac8c-4285-87a8-30c2a4ded172
+  name: Commission - Craggled Armor
+  description: The caravan needs to restock their basic armor.
+
+  requirements:
+    - equipmentId: Miresewn Cloak
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Miresewn Hat
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Miremetal Brooch
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Miremetal Helm
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Miremetal Breastplate
+      quantityMin: 1
+      quantityMax: 3
+
+  tokenReward: 3

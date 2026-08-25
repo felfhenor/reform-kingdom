@@ -15,3 +15,23 @@
   traderCategories:
     - Carrina
     - Orcwell
+
+  commissionOffers:
+    - commissionOfferId: Commission - Mireweeds
+      weight: 1
+    - commissionOfferId: Commission - Mirewood
+      weight: 1
+    - commissionOfferId: Commission - Miremetal Ores
+      weight: 1
+    - commissionOfferId: Commission - Peridots
+      weight: 1
+    - commissionOfferId: Commission - Oozehides
+      weight: 1
+    - commissionOfferId: Commission - Orc Bones
+      weight: 1
+    - commissionOfferId: Commission - Spirit Flesh
+      weight: 1
+    - commissionOfferId: Commission - Craggled Weaponry
+      weight: 1
+    - commissionOfferId: Commission - Craggled Armor
+      weight: 1

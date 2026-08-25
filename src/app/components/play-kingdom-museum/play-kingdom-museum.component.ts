@@ -8,17 +8,22 @@ import {
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotMuseumCollectibleComponent } from '@components/slot-museum-collectible/slot-museum-collectible.component';
 import { SlotMuseumRecipeComponent } from '@components/slot-museum-recipe/slot-museum-recipe.component';
+import { recipeUnlockWithTokens } from '@helpers/crafting/recipes';
+import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import {
   filterMuseumCollectibleEntries,
   filterMuseumRecipeEntries,
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum';
-import type {
-  MuseumCollectibleEntry,
-  MuseumRecipeEntry,
-  MuseumTab,
+import type { RecipeContent } from '@interfaces';
+import {
+  type MuseumCollectibleEntry,
+  type MuseumRecipeEntry,
+  type MuseumTab,
+  type RecipeId,
 } from '@interfaces';
+import { getEntry } from '../../helpers';
 
 @Component({
   selector: 'app-play-kingdom-museum',
@@ -61,5 +66,17 @@ export class PlayKingdomMuseumComponent {
     this.activeTab.set(tab);
     this.collectiblesGrid()?.resetPage();
     this.recipesGrid()?.resetPage();
+  }
+
+  public unlockRecipe(recipeId: RecipeId): void {
+    if (!recipeUnlockWithTokens(recipeId)) {
+      notifyError('Not enough Trader Scrips to unlock this recipe.');
+      return;
+    }
+
+    const recipe = getEntry<RecipeContent>(recipeId);
+    if (!recipe) return;
+
+    notifySuccess(`Recipe "${recipe.name}" unlocked!`);
   }
 }

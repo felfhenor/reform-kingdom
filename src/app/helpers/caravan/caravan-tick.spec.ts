@@ -86,6 +86,7 @@ const caravan: CaravanContent = {
   level: { min: 1, max: 10 },
   markupPercentages: { sell: 25, buy: -15 },
   traderCategories: ['Carrina'],
+  commissionOffers: [],
 };
 
 function trader(
@@ -99,6 +100,7 @@ function trader(
     category: 'Carrina',
     level: 5,
     trades: [],
+    tokenTrades: [],
     ...overrides,
   };
 }

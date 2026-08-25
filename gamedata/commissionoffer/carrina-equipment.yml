@@ -1,0 +1,57 @@
+- id: c8f509e3-c05d-44d9-b7eb-0583be2257d8
+  name: Commission - Simple Weaponry
+  description: The caravan needs to restock their basic weaponry.
+
+  requirements:
+    - equipmentId: Copper Whip
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Copper Mace
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Copper Shield
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Copper Sword
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Wergen Staff
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Wergen Bow
+      quantityMin: 1
+      quantityMax: 3
+
+  tokenReward: 3
+
+- id: b53a7d22-0155-4934-a0c8-aa3ec43fc979
+  name: Commission - Simple Armor
+  description: The caravan needs to restock their basic armor.
+
+  requirements:
+    - equipmentId: Coppersilk Robe
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Linen Hat
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Linen Shirt
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Copper Bangle
+      quantityMin: 1
+      quantityMax: 3
+
+    - equipmentId: Coppersilk Breastplate
+      quantityMin: 1
+      quantityMax: 3
+
+  tokenReward: 3

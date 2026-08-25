@@ -30,6 +30,16 @@
       </div>
     </app-slot-icon-blank>
   </div>
+} @else if (canUnlock()) {
+  <button
+    type="button"
+    class="museum-recipe-slot"
+    [tp]="tooltip"
+    [tpPlacement]="'top'"
+    (click)="unlock.emit()"
+  >
+    <app-icon-unknown />
+  </button>
 } @else {
   <div [tp]="tooltip" [tpPlacement]="'top'">
     <app-icon-unknown />
@@ -71,6 +81,16 @@
         <div class="text-xs">
           {{ e.discovered ? 'Found in' : 'Discoverable in' }}:
           {{ e.sourceNodeNames.join(', ') }}
+        </div>
+      }
+
+      @if (e.tokenUnlockCost !== undefined) {
+        <div class="text-xs flex items-center gap-1 mt-1">
+          {{ canUnlock() ? 'Click to unlock for' : 'Unlock for' }}
+          <app-currency-cost
+            [type]="traderTokenItemId"
+            [amount]="e.tokenUnlockCost"
+          />
         </div>
       }
     </div>

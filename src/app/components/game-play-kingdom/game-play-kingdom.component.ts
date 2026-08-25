@@ -4,6 +4,7 @@ import { PlayKingdomAchievementsComponent } from '@components/play-kingdom-achie
 import { PlayKingdomArmoryComponent } from '@components/play-kingdom-armory/play-kingdom-armory.component';
 import { PlayKingdomAstralProjectorComponent } from '@components/play-kingdom-astralprojector/play-kingdom-astralprojector.component';
 import { PlayKingdomBestiaryComponent } from '@components/play-kingdom-bestiary/play-kingdom-bestiary.component';
+import { PlayKingdomCommissionsComponent } from '@components/play-kingdom-commissions/play-kingdom-commissions.component';
 import { PlayKingdomHomeComponent } from '@components/play-kingdom-home/play-kingdom-home.component';
 import { PlayKingdomInfusionComponent } from '@components/play-kingdom-infusion/play-kingdom-infusion.component';
 import { PlayKingdomMuseumComponent } from '@components/play-kingdom-museum/play-kingdom-museum.component';
@@ -26,6 +27,7 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomArmoryComponent,
     PlayKingdomAstralProjectorComponent,
     PlayKingdomBestiaryComponent,
+    PlayKingdomCommissionsComponent,
     PlayKingdomInfusionComponent,
     PlayKingdomTradeskillArtificingComponent,
     PlayKingdomTradeskillBlacksmithingComponent,

@@ -6,7 +6,9 @@ import {
   viewChild,
 } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
+import { SlotCaravanTokenTradeComponent } from '@components/slot-caravan-token-trade/slot-caravan-token-trade.component';
 import { SlotCaravanTradeComponent } from '@components/slot-caravan-trade/slot-caravan-trade.component';
+import { SlotCommissionComponent } from '@components/slot-commission/slot-commission.component';
 import {
   caravanState,
   caravanTicksUntilReset,
@@ -14,26 +16,40 @@ import {
   caravanTimerUrgency,
 } from '@helpers/caravan/caravan';
 import {
+  caravanExecuteTokenTrade,
   caravanExecuteTrade,
   caravanIsTradeSoldOut,
+  caravanTokenTradeDisplay,
   caravanTradeDisplay,
   caravanTradeMaxQuantity,
   caravanTradeOwnedQuantity,
   caravanTradePrice,
   caravanTradeRemaining,
 } from '@helpers/caravan/caravan-trade';
+import { commissionRowViewModel } from '@helpers/commission/commission-fulfill';
 import { getEntry } from '@helpers/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { activeCaravanNode } from '@helpers/engine/ui';
+import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
-import type { CaravanTraderContent, CaravanTradeRow } from '@interfaces';
+import type {
+  CaravanTokenTradeRow,
+  CaravanTraderContent,
+  CaravanTradeRow,
+} from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-modal-caravan-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SlotCaravanTradeComponent, ModalComponent, SweetAlert2Module],
+  imports: [
+    SlotCaravanTradeComponent,
+    SlotCaravanTokenTradeComponent,
+    SlotCommissionComponent,
+    ModalComponent,
+    SweetAlert2Module,
+  ],
   templateUrl: './modal-caravan-trade.component.html',
 })
 export class ModalCaravanTradeComponent {
@@ -52,6 +68,23 @@ export class ModalCaravanTradeComponent {
   public trader = computed(() => {
     const traderId = this.nodeState()?.traderId;
     return traderId ? getEntry<CaravanTraderContent>(traderId) : undefined;
+  });
+
+  public tokenTrades = computed<CaravanTokenTradeRow[]>(() => {
+    const trader = this.trader();
+    if (!trader) return [];
+
+    return trader.tokenTrades
+      .map((trade, index) => ({ index, trade }))
+      .filter(
+        ({ trade }) =>
+          !trade.collectibleId || !isCollectibleDiscovered(trade.collectibleId),
+      );
+  });
+
+  public commission = computed(() => {
+    const entry = this.entry();
+    return entry ? commissionRowViewModel(entry) : undefined;
   });
 
   public trades = computed<CaravanTradeRow[]>(() => {
@@ -168,5 +201,15 @@ export class ModalCaravanTradeComponent {
         ? `You bought ${name}${qtyLabel}!`
         : `You sold ${name}${qtyLabel}!`,
     );
+  }
+
+  public buyTokenTrade(row: CaravanTokenTradeRow): void {
+    const entry = this.entry();
+    if (!entry) return;
+
+    const name = caravanTokenTradeDisplay(row.trade)?.name ?? 'item';
+    if (!caravanExecuteTokenTrade(entry, row.index)) return;
+
+    notifySuccess(`You bought ${name}!`);
   }
 }

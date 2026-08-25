@@ -4,13 +4,11 @@
   category: Orcwell
   level: 13
 
-  trades:
-    # unique to this trader
-    - type: sell
-      value: 15000
-      collectibleId: Golden Orc Skull
-      weight: 5
+  tokenTrades:
+    - collectibleId: Golden Orc Skull
+      tokenCost: 3
 
+  trades:
     # base game items
     - type: sell
       value: 350

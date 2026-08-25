@@ -21,6 +21,7 @@ vi.mock('@helpers/content', () => ({
 vi.mock('@helpers/item/materials', async (importOriginal) => {
   const actual = await importOriginal<typeof MaterialsHelper>();
   const testGoldCoinId = 'gold-coin' as ItemId;
+  const testTraderTokenId = 'trader-token' as ItemId;
   const getGoldQuantity = vi.fn();
   return {
     ...actual,
@@ -33,6 +34,8 @@ vi.mock('@helpers/item/materials', async (importOriginal) => {
     spendGold: vi.fn((state: GameState, amount: number) =>
       actual.applyMaterialDelta(state, testGoldCoinId, -amount),
     ),
+    traderTokenId: vi.fn(() => testTraderTokenId),
+    hasTraderTokens: vi.fn(),
   };
 });
 
@@ -54,8 +57,10 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 
 import { caravanState } from '@helpers/caravan/caravan';
 import {
+  caravanExecuteTokenTrade,
   caravanExecuteTrade,
   caravanIsTradeSoldOut,
+  caravanTokenTradeDisplay,
   caravanTradeDisplay,
   caravanTradeMaxQuantity,
   caravanTradeOwnedQuantity,
@@ -68,7 +73,11 @@ import {
   getCollectibleQuantity,
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
-import { getGoldQuantity, getMaterialQuantity } from '@helpers/item/materials';
+import {
+  getGoldQuantity,
+  getMaterialQuantity,
+  hasTraderTokens,
+} from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
@@ -77,6 +86,7 @@ import type {
   CaravanContent,
   CaravanId,
   CaravanNodeState,
+  CaravanTokenTrade,
   CaravanTrade,
   CaravanTraderContent,
   CaravanTraderId,
@@ -99,6 +109,7 @@ const caravan: CaravanContent = {
   level: { min: 1, max: 10 },
   markupPercentages: { sell: 25, buy: -15 },
   traderCategories: ['Carrina'],
+  commissionOffers: [],
 };
 
 describe('caravanTradePrice', () => {
@@ -467,6 +478,7 @@ describe('caravanExecuteTrade', () => {
         weight: 1,
       },
     ],
+    tokenTrades: [],
   };
 
   function nodeState(
@@ -647,5 +659,183 @@ describe('caravanExecuteTrade', () => {
     expect(result.materials['ore' as ItemId].quantity).toBe(2);
     expect(result.materials['gold-coin' as ItemId].quantity).toBe(129);
     expect(result.world.caravans[caravan.id].tradeCounts[1]).toBe(3);
+  });
+});
+
+describe('caravanTokenTradeDisplay', () => {
+  it('resolves a collectible token trade', () => {
+    const collectible = {
+      id: 'trinket' as CollectibleId,
+      name: 'Trinket',
+      description: 'Curious.',
+      sprite: '0003',
+      rarity: 'Legendary',
+    } as CollectibleContent;
+    vi.mocked(getEntry).mockReturnValue(collectible);
+
+    expect(
+      caravanTokenTradeDisplay({
+        tokenCost: 3,
+        collectibleId: collectible.id,
+      })?.spritesheet,
+    ).toBe('collectible');
+  });
+
+  it('returns undefined when the trade has no target id', () => {
+    expect(caravanTokenTradeDisplay({ tokenCost: 3 })).toBeUndefined();
+  });
+});
+
+describe('caravanExecuteTokenTrade', () => {
+  const entry = {
+    nodeName: 'Duchy Trading Caravan - Carrina',
+  } as WorldNodeEntry;
+
+  const tokenTrade: CaravanTokenTrade = {
+    tokenCost: 3,
+    collectibleId: 'trinket' as CollectibleId,
+  };
+  const itemTokenTrade: CaravanTokenTrade = {
+    tokenCost: 2,
+    itemId: 'ore' as ItemId,
+  };
+  const equipmentTokenTrade: CaravanTokenTrade = {
+    tokenCost: 5,
+    equipmentId: 'sword' as EquipmentId,
+  };
+
+  const trader: CaravanTraderContent = {
+    id: 'trader-a' as CaravanTraderId,
+    name: 'Trader A',
+    __type: 'caravantrader',
+    description: 'A trader.',
+    category: 'Carrina',
+    level: 5,
+    trades: [],
+    tokenTrades: [tokenTrade, itemTokenTrade, equipmentTokenTrade],
+  };
+
+  function nodeState(
+    overrides: Partial<CaravanNodeState> = {},
+  ): CaravanNodeState {
+    return {
+      traderId: trader.id,
+      activeTradeIndices: [],
+      tradeCounts: {},
+      generatedAtTick: 1000,
+      ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
+    vi.mocked(getEntry).mockReturnValue(trader);
+    vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+  });
+
+  it('returns false when the node is not a caravan', () => {
+    vi.mocked(worldNodeCaravan).mockReturnValue(undefined);
+
+    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('returns false when no trader is currently assigned', () => {
+    vi.mocked(caravanState).mockReturnValue(
+      nodeState({ traderId: undefined }),
+    );
+
+    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+  });
+
+  it('returns false for an out-of-range token trade index', () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+
+    expect(caravanExecuteTokenTrade(entry, 5)).toBe(false);
+  });
+
+  it('returns false when the collectible is already owned', () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+    vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('returns false when the player cannot afford the token cost', () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(hasTraderTokens).mockReturnValue(false);
+
+    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('grants the collectible and spends tokens on success', () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+    expect(caravanExecuteTokenTrade(entry, 0)).toBe(true);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      materials: {
+        ['trader-token' as ItemId]: { quantity: 5, foundAt: 1 },
+      },
+      discoveredMaterials: {},
+      collectibles: {},
+    } as unknown as GameState);
+
+    expect(result.collectibles['trinket' as CollectibleId].quantity).toBe(1);
+    expect(result.materials['trader-token' as ItemId].quantity).toBe(2);
+  });
+
+  it('grants an item reward and spends tokens on success', () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+    expect(caravanExecuteTokenTrade(entry, 1)).toBe(true);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      materials: {
+        ['trader-token' as ItemId]: { quantity: 5, foundAt: 1 },
+      },
+      discoveredMaterials: {},
+      collectibles: {},
+    } as unknown as GameState);
+
+    expect(result.materials['ore' as ItemId].quantity).toBe(1);
+    expect(result.materials['trader-token' as ItemId].quantity).toBe(3);
+  });
+
+  it('grants an equipment reward and spends tokens on success', () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(hasTraderTokens).mockReturnValue(true);
+    vi.mocked(rngUuid).mockReturnValue('new-equipment-item-id');
+
+    expect(caravanExecuteTokenTrade(entry, 2)).toBe(true);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      materials: {
+        ['trader-token' as ItemId]: { quantity: 5, foundAt: 1 },
+      },
+      discoveredMaterials: {},
+      collectibles: {},
+      armory: [],
+      discoveredEquipment: {},
+    } as unknown as GameState);
+
+    expect(result.armory).toEqual([
+      {
+        id: 'new-equipment-item-id',
+        equipmentId: 'sword',
+        infusedItemIds: [],
+      },
+    ]);
+    expect(result.discoveredEquipment['sword' as EquipmentId].foundAt).toBeGreaterThan(0);
+    expect(result.materials['trader-token' as ItemId]).toBeUndefined();
   });
 });

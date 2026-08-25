@@ -112,11 +112,18 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
     isRecipeDropGated(recipe.id),
   );
 
-  const entries = recipes.map((recipe) => ({
-    recipe,
-    discovered: isRecipeDiscovered(recipe.id),
-    sourceNodeNames: recipeSourceNodeNames(recipe.id).map(worldNodeDisplayName),
-  }));
+  const entries = recipes.map((recipe) => {
+    const discovered = isRecipeDiscovered(recipe.id);
+
+    return {
+      recipe,
+      discovered,
+      sourceNodeNames: recipeSourceNodeNames(recipe.id).map(
+        worldNodeDisplayName,
+      ),
+      tokenUnlockCost: discovered ? undefined : recipe.tokenUnlockCost,
+    };
+  });
 
   return orderBy(
     entries,

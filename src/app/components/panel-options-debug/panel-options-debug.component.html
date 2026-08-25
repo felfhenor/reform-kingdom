@@ -191,6 +191,26 @@
           >
             Give
           </button>
+
+          <span class="label-text text-right">Recipe</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="debugDropGatedRecipes()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Select a recipe..."
+            [(ngModel)]="selectedRecipeId"
+          ></ng-select>
+          <span></span>
+          <button
+            type="button"
+            class="btn btn-warning debug-give-btn"
+            appAnalyticsClick="Options:Debug:UndiscoverRecipe"
+            (click)="undiscoverRecipe()"
+          >
+            Unlearn
+          </button>
         </div>
       </div>
     </div>
@@ -272,6 +292,14 @@
           (click)="resetBestiary()"
         >
           Reset Bestiary
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning btn-sm"
+          appAnalyticsClick="Options:Debug:ResetCommissions"
+          (click)="resetCommissions()"
+        >
+          Reset Commissions
         </button>
         <button
           type="button"

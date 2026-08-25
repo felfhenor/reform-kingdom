@@ -145,6 +145,7 @@ function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
     maxTradeskillLevel: 10,
     tradeskillXP: 1,
     craftTime: 5,
+    tokenUnlockCost: 3,
     ...overrides,
   };
 }

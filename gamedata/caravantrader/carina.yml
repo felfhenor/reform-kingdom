@@ -4,13 +4,11 @@
   category: Carrina
   level: 3
 
-  trades:
-    # unique to this trader
-    - type: sell
-      value: 3500
-      collectibleId: Blank Playing Card
-      weight: 5
+  tokenTrades:
+    - collectibleId: Blank Playing Card
+      tokenCost: 3
 
+  trades:
     - type: sell
       value: 500
       equipmentId: Copper Helm
@@ -84,13 +82,11 @@
   category: Carrina
   level: 5
 
-  trades:
-    # unique to this trader
-    - type: sell
-      value: 5000
-      collectibleId: Safety Float
-      weight: 5
+  tokenTrades:
+    - collectibleId: Safety Float
+      tokenCost: 3
 
+  trades:
     - type: sell
       value: 500
       equipmentId: Copper Greatmace
@@ -134,13 +130,11 @@
   category: Goblem
   level: 3
 
-  trades:
-    # unique to this trader
-    - type: sell
-      value: 2500
-      collectibleId: Crude Treasure Map
-      weight: 5
+  tokenTrades:
+    - collectibleId: Crude Treasure Map
+      tokenCost: 3
 
+  trades:
     - type: sell
       value: 500
       equipmentId: Coppergob Dagger
@@ -178,13 +172,11 @@
   category: Goblem
   level: 5
 
-  trades:
-    # unique to this trader
-    - type: sell
-      value: 5000
-      collectibleId: Gobsweet
-      weight: 5
+  tokenTrades:
+    - collectibleId: Gobsweet
+      tokenCost: 3
 
+  trades:
     - type: sell
       value: 500
       itemId: Goblin Teeth
@@ -216,13 +208,11 @@
   category: Elfheim
   level: 5
 
-  trades:
-    # unique to this trader
-    - type: sell
-      value: 15000
-      collectibleId: Elvish Boomerang
-      weight: 5
+  tokenTrades:
+    - collectibleId: Elvish Boomerang
+      tokenCost: 3
 
+  trades:
     - type: sell
       value: 3500
       equipmentId: Ace of Spades
@@ -266,13 +256,11 @@
   category: Elfheim
   level: 7
 
-  trades:
-    # unique to this trader
-    - type: sell
-      value: 25000
-      collectibleId: Elven Staffrune Book
-      weight: 5
+  tokenTrades:
+    - collectibleId: Elven Staffrune Book
+      tokenCost: 3
 
+  trades:
     - type: sell
       value: 2500
       equipmentId: Elfsilk Hat

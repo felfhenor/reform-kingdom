@@ -1,28 +1,6 @@
-/**
- * YAML Schema Generation from TypeScript Interfaces
- *
- * This script automatically generates JSON schemas for all game content types
- * using the `typescript-json-schema` library directly from the actual TypeScript
- * interfaces in the codebase. This ensures that schemas stay perfectly in sync
- * with TypeScript type definitions.
- *
- * HOW IT WORKS:
- * 1. Reads TypeScript interfaces directly from `src/app/interfaces/`
- * 2. typescript-json-schema generates JSON schemas from these interfaces
- * 3. Generated schemas provide IDE support and validation for YAML content
- *
- * KEEPING SCHEMAS IN SYNC WITH TYPESCRIPT:
- * - Schemas are automatically generated from actual TypeScript interfaces
- * - Run `npm run schemas:generate` to regenerate schemas after interface changes
- * - Schemas are automatically regenerated during `npm install` (postinstall)
- *
- * BENEFITS:
- * - Real-time validation in VSCode for YAML content files
- * - IntelliSense autocomplete for properties and enum values
- * - Type safety ensures content matches expected TypeScript interfaces
- * - Single source of truth: TypeScript interfaces drive both code and validation
- * - No manual maintenance required - schemas automatically stay in sync
- */
+// Generates JSON schemas for YAML content validation directly from the
+// TypeScript content interfaces via typescript-json-schema. Run via `npm run
+// schemas:generate` after interface changes (also runs on postinstall).
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -133,13 +111,9 @@ function stripInjectedFields(schema: any): any {
   return traverse(schema);
 }
 
-// Top-level content properties (id, name, description, baseStats itself, etc.)
-// are mandatory. But sub-object internals - the fields *inside* a nested
-// object/array-item schema like `baseStats`, `damageScaling`, or a
-// `techniques` entry - are meant to be authored as partials (see
-// `ensure*`/`ensureStats` in content-initializers.ts), so their `required`
-// arrays must be stripped. Only the outermost facet-level `required` arrays
-// (which list which top-level properties are mandatory) are preserved.
+// Nested object/array-item fields (baseStats, techniques, etc.) are authored
+// as partials (see `ensure*` in content-initializers.ts), so only the
+// top-level facet's own `required` array is preserved - deeper ones are stripped.
 function relaxSubObjectRequired(schema: any): any {
   if (!schema) return schema;
 
@@ -276,6 +250,10 @@ const program = TJS.getProgramFromFiles(
     path.resolve(__dirname, '../src/app/interfaces/content-caravan.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-caravan-trader.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-collectible.ts'),
+    path.resolve(
+      __dirname,
+      '../src/app/interfaces/content-commission-offer.ts',
+    ),
     path.resolve(__dirname, '../src/app/interfaces/content-encounter.ts'),
     path.resolve(
       __dirname,
@@ -324,6 +302,7 @@ const contentTypeMap = {
   caravan: 'CaravanContent',
   caravantrader: 'CaravanTraderContent',
   collectible: 'CollectibleContent',
+  commissionoffer: 'CommissionOfferContent',
   encounter: 'EncounterContent',
   encounterrandom: 'EncounterRandomContent',
   equipment: 'EquipmentContent',
@@ -388,15 +367,8 @@ for (const [contentType, typeName] of Object.entries(contentTypeMap)) {
   }
 }
 
-// Point VSCode's YAML validation at the schemas we just generated, one entry
-// per content type, keyed by the schema path so it stays in sync with
-// whatever's actually on disk instead of requiring a manual settings edit.
-//
-// This patches the `"yaml.schemas": { ... }` block in place via string
-// surgery rather than parsing+re-serializing the whole file - a full
-// JSON.stringify round-trip reformats unrelated keys elsewhere in the file
-// (e.g. re-wrapping single-line arrays/objects), which would show up as
-// unrelated diff noise every time schemas are regenerated.
+// Patches the `"yaml.schemas"` block via string surgery rather than a full
+// JSON round-trip, which would reformat unrelated keys and add diff noise.
 function updateVscodeSettings(): void {
   const settingsPath = path.resolve(__dirname, '../.vscode/settings.json');
 
@@ -407,10 +379,7 @@ function updateVscodeSettings(): void {
 
   const raw: string = fs.readFileSync(settingsPath, 'utf-8');
 
-  // Recursive (`**/*.yml`) rather than a flat `*.yml` - `gamedata-build.ts`
-  // scans every content folder recursively (see `recursive-readdir` there),
-  // so a type authored in a nested subfolder (e.g. `gamedata/collectible/
-  // caravan/*.yml`) still needs schema validation.
+  // Recursive glob - gamedata-build.ts scans content folders recursively too.
   const schemaEntries = generatedContentTypes
     .map(
       (contentType) =>

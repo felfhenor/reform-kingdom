@@ -1,9 +1,5 @@
-/**
- * Validates that every item, collectible, and equipment entry is actually
- * obtainable in game - dropped, rewarded, gathered, crafted, traded, or
- * explicitly marked `unobtainable: true`. Ported from
- * `scripts/validate-obtainability.ts`.
- */
+// Validates every item/collectible/equipment is obtainable (dropped,
+// rewarded, gathered, crafted, traded) or marked `unobtainable: true`.
 
 import { getEntriesByType } from '@helpers/content';
 import type {
@@ -21,10 +17,8 @@ import type {
   RecipeContent,
 } from '@interfaces';
 
-// Content granted unconditionally by game code rather than any drop/reward/
-// recipe - kept in sync by hand with `STARTER_ARMOR_NAME`/`STARTER_HAT_NAME`
-// in `src/app/helpers/party.ts` and `FOUNDING_STONE_NAME` in
-// `src/app/helpers/collectibles.ts`.
+// Granted unconditionally by game code - kept in sync by hand with
+// `STARTER_ARMOR_NAME`/`STARTER_HAT_NAME`/`FOUNDING_STONE_NAME`.
 const GUARANTEED_GRANT_NAMES = new Set<string>([
   'Cloak of Adventuring',
   'Hat of Adventuring',
@@ -44,7 +38,8 @@ function collectFromDroppedRewards(
   rewards.forEach((reward) => {
     if ('itemId' in reward) addIfPresent(itemIds, reward.itemId);
     if ('equipmentId' in reward) addIfPresent(equipmentIds, reward.equipmentId);
-    if ('collectibleId' in reward) addIfPresent(collectibleIds, reward.collectibleId);
+    if ('collectibleId' in reward)
+      addIfPresent(collectibleIds, reward.collectibleId);
   });
 }
 
@@ -98,17 +93,24 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
   const equipment = getEntriesByType<EquipmentContent>('equipment');
   const monsters = getEntriesByType<MonsterContent>('monster');
   const encounters = getEntriesByType<EncounterContent>('encounter');
-  const encounterRandoms = getEntriesByType<EncounterRandomContent>('encounterrandom');
+  const encounterRandoms =
+    getEntriesByType<EncounterRandomContent>('encounterrandom');
   const gatherings = getEntriesByType<GatheringContent>('gathering');
   const recipes = getEntriesByType<RecipeContent>('recipe');
-  const caravanTraders = getEntriesByType<CaravanTraderContent>('caravantrader');
+  const caravanTraders =
+    getEntriesByType<CaravanTraderContent>('caravantrader');
 
   const obtainableItems = new Set<string>();
   const obtainableEquipment = new Set<string>();
   const obtainableCollectibles = new Set<string>();
 
   monsters.forEach((monster) =>
-    collectFromDroppedRewards(monster.drops, obtainableItems, obtainableEquipment, obtainableCollectibles),
+    collectFromDroppedRewards(
+      monster.drops,
+      obtainableItems,
+      obtainableEquipment,
+      obtainableCollectibles,
+    ),
   );
 
   [...encounters, ...encounterRandoms].forEach((encounter) =>
@@ -122,20 +124,30 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
 
   gatherings.forEach((gathering) => {
     gathering.gatherResults.forEach((result) => {
-      result.items.forEach((item) => addIfPresent(obtainableItems, item.itemId));
+      result.items.forEach((item) =>
+        addIfPresent(obtainableItems, item.itemId),
+      );
     });
   });
 
   recipes.forEach((recipe) => {
     const result = recipe.result;
     if ('itemId' in result) addIfPresent(obtainableItems, result.itemId);
-    if ('equipmentId' in result) addIfPresent(obtainableEquipment, result.equipmentId);
-    if ('collectibleId' in result) addIfPresent(obtainableCollectibles, result.collectibleId);
+    if ('equipmentId' in result)
+      addIfPresent(obtainableEquipment, result.equipmentId);
+    if ('collectibleId' in result)
+      addIfPresent(obtainableCollectibles, result.collectibleId);
   });
 
   caravanTraders.forEach((trader) => {
     trader.trades.forEach((trade) => {
       if (trade.type !== 'sell') return;
+      addIfPresent(obtainableItems, trade.itemId);
+      addIfPresent(obtainableEquipment, trade.equipmentId);
+      addIfPresent(obtainableCollectibles, trade.collectibleId);
+    });
+
+    (trader.tokenTrades ?? []).forEach((trade) => {
       addIfPresent(obtainableItems, trade.itemId);
       addIfPresent(obtainableEquipment, trade.equipmentId);
       addIfPresent(obtainableCollectibles, trade.collectibleId);

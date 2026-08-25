@@ -8,6 +8,14 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/caravan/caravan', () => ({
+  pruneInvalidDiscoveredCaravans: vi.fn((discovered) => discovered),
+}));
+
+vi.mock('@helpers/commission/commission-tick', () => ({
+  pruneInvalidCommissions: vi.fn((commissions) => commissions),
+}));
+
 vi.mock('@helpers/kingdom/armory', () => ({
   pruneInvalidArmoryItems: vi.fn((armory) => armory),
   pruneInvalidDiscoveredEquipment: vi.fn((discovered) => discovered),
@@ -77,13 +85,14 @@ vi.mock('@helpers/defaults', () => ({
     discoveredMaterials: {},
     collectibles: {},
     discoveredEquipment: {},
+    discoveredCaravans: {},
     discoveredRecipes: {},
     discoveredGatherNodes: {},
     worldDiscoveries: {},
     bestiary: {},
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
-    world: { party: [], autoMode: { clauses: [] } },
+    world: { party: [], autoMode: { clauses: [] }, commissions: {} },
   })),
 }));
 

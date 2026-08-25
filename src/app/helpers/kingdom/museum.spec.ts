@@ -81,6 +81,7 @@ const boneHewnCloakRecipe: RecipeContent = {
   maxTradeskillLevel: 5,
   tradeskillXP: 1,
   craftTime: 60,
+  tokenUnlockCost: 3,
 };
 
 const copperIngotRecipe: RecipeContent = {
@@ -94,6 +95,7 @@ const copperIngotRecipe: RecipeContent = {
   maxTradeskillLevel: 3,
   tradeskillXP: 1,
   craftTime: 60,
+  tokenUnlockCost: 3,
 };
 
 const fieldRuinsEncounter: EncounterContent = {
@@ -294,6 +296,7 @@ describe('Museum Helper Functions', () => {
           recipe: boneHewnCloakRecipe,
           discovered: false,
           sourceNodeNames: ['Field Ruins'],
+          tokenUnlockCost: boneHewnCloakRecipe.tokenUnlockCost,
         },
       ]);
     });

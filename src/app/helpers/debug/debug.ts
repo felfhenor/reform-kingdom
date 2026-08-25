@@ -1,5 +1,9 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { isRecipeDropGated, recipeDiscover } from '@helpers/crafting/recipes';
+import {
+  isRecipeDropGated,
+  recipeDiscover,
+  recipeUndiscover,
+} from '@helpers/crafting/recipes';
 import {
   TRADESKILL_MAX_LEVEL,
   tradeskillBuildingIn,
@@ -34,6 +38,7 @@ import type {
   ItemId,
   MonsterContent,
   RecipeContent,
+  RecipeId,
   Tradeskill,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
@@ -158,10 +163,8 @@ export function debugResetBestiary(): void {
   });
 }
 
-// Records a kill for every monster at every node it can be fought in, at
-// that node's level range, so the bestiary shows real stat spreads instead
-// of needing to fight everything manually. Monsters authored nowhere fall
-// back to a single level-1 kill so they still show up.
+// Records a kill for every monster at every node/level it's fought at, so
+// the bestiary shows real stat spreads without fighting everything manually.
 export function debugFillBestiary(): void {
   getEntriesByType<MonsterContent>('monster').forEach((monster) => {
     const encounters = monsterEncounters(monster.id);
@@ -175,6 +178,16 @@ export function debugFillBestiary(): void {
       monsterRecordKill(monster.id, encounter.levelRange.min, encounter.name);
       monsterRecordKill(monster.id, encounter.levelRange.max, encounter.name);
     });
+  });
+}
+
+// Clears every caravan's commission state so it regenerates on the next
+// visit/tick - a recovery tool for a commission stuck blank (see
+// `regenerateCommissionNode`'s no-eligible-offer case).
+export function debugResetCommissions(): void {
+  updateGamestate((state) => {
+    state.world.commissions = {};
+    return state;
   });
 }
 
@@ -223,4 +236,16 @@ export function debugDiscoverAllRecipes(): void {
     .forEach((recipe) => {
       recipeDiscover(recipe.id);
     });
+}
+
+// Reverts a single drop-gated recipe back to undiscovered - a testing tool
+// for re-triggering discovery/unlock flows without waiting on a real drop.
+export function debugUndiscoverRecipe(recipeId: RecipeId): void {
+  const recipe = getEntry<RecipeContent>(recipeId);
+  if (!recipe) {
+    console.warn(`Recipe with ID ${recipeId} not found.`);
+    return;
+  }
+
+  recipeUndiscover(recipe.id);
 }

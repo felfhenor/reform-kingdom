@@ -4,3 +4,11 @@
   rarity: Common
 
   sprite: '0000'
+
+- id: b59b89fa-063a-49d6-b3c4-6a6cd9a05d92
+  name: Trader Scrip
+  description: Earned by fulfilling caravan commissions. Traders will universally take these and exchange some of their most prized possessions.
+  rarity: Rare
+
+  sprite: '0037'
+  unobtainable: true

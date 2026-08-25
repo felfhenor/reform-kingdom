@@ -33,6 +33,13 @@ vi.mock('@helpers/item/equipment', () => ({
 
 vi.mock('@helpers/item/materials', () => ({
   getMaterialQuantity: vi.fn(() => 0),
+  hasTraderTokens: vi.fn(() => false),
+  traderTokenId: vi.fn(() => 'trader-token'),
+  applyMaterialDelta: vi.fn(),
+}));
+
+vi.mock('@helpers/engine/analytics', () => ({
+  analyticsSendDesignEvent: vi.fn(),
 }));
 
 vi.mock('@helpers/hero/party', () => ({
@@ -50,15 +57,23 @@ import {
   isRecipeDiscovered,
   isRecipeDropGated,
   pruneInvalidDiscoveredRecipes,
+  recipeCanUnlockWithTokens,
   recipeDiscover,
   recipeResultContent,
   recipeResultOwnedQuantity,
   recipeResultSpritesheet,
+  recipeUndiscover,
+  recipeUnlockWithTokens,
 } from '@helpers/crafting/recipes';
+import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
-import { getMaterialQuantity } from '@helpers/item/materials';
+import {
+  applyMaterialDelta,
+  getMaterialQuantity,
+  hasTraderTokens,
+} from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
@@ -94,6 +109,7 @@ const itemRecipe: RecipeContent = {
   maxTradeskillLevel: 3,
   tradeskillXP: 1,
   craftTime: 60,
+  tokenUnlockCost: 3,
 };
 
 const equipmentRecipe: RecipeContent = {
@@ -107,6 +123,7 @@ const equipmentRecipe: RecipeContent = {
   maxTradeskillLevel: 5,
   tradeskillXP: 1,
   craftTime: 60,
+  tokenUnlockCost: 3,
 };
 
 const minorEffigy: CollectibleContent = {
@@ -130,6 +147,7 @@ const collectibleRecipe: RecipeContent = {
   maxTradeskillLevel: 5,
   tradeskillXP: 5,
   craftTime: 1500,
+  tokenUnlockCost: 3,
 };
 
 const forestRuinsEncounter: EncounterContent = {
@@ -234,6 +252,30 @@ describe('Recipes Helper Functions', () => {
     });
   });
 
+  describe('recipeUndiscover', () => {
+    it('removes an existing discovery entry', () => {
+      recipeUndiscover(equipmentRecipe.id);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(result.discoveredRecipes[equipmentRecipe.id]).toBeUndefined();
+    });
+
+    it('is a no-op when the recipe was never discovered', () => {
+      recipeUndiscover(equipmentRecipe.id);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(result.discoveredRecipes).toEqual({});
+    });
+  });
+
   describe('pruneInvalidDiscoveredRecipes', () => {
     it('keeps entries that resolve to real recipe content', () => {
       vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
@@ -328,6 +370,94 @@ describe('Recipes Helper Functions', () => {
       vi.mocked(partyGet).mockReturnValue([]);
 
       expect(recipeResultOwnedQuantity(equipmentRecipe)).toBe(0);
+    });
+  });
+
+  describe('recipeCanUnlockWithTokens', () => {
+    beforeEach(() => {
+      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
+    });
+
+    it('is true for a drop-gated, undiscovered recipe the player can afford', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+      vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+      expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(true);
+      expect(hasTraderTokens).toHaveBeenCalledWith(
+        equipmentRecipe.tokenUnlockCost,
+      );
+    });
+
+    it('is false once the recipe is already discovered', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState);
+      vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+      expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);
+    });
+
+    it('is false for a recipe that is not drop-gated', () => {
+      vi.mocked(getEntry).mockReturnValue(itemRecipe);
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+      vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+      expect(recipeCanUnlockWithTokens(itemRecipe.id)).toBe(false);
+    });
+
+    it('is false when the player cannot afford the token cost', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+      vi.mocked(hasTraderTokens).mockReturnValue(false);
+
+      expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);
+    });
+  });
+
+  describe('recipeUnlockWithTokens', () => {
+    beforeEach(() => {
+      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
+    });
+
+    it('returns false and does not mutate state when unlock conditions are not met', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+      vi.mocked(hasTraderTokens).mockReturnValue(false);
+
+      expect(recipeUnlockWithTokens(equipmentRecipe.id)).toBe(false);
+      expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('spends tokens and discovers the recipe atomically on success', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+      vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+      expect(recipeUnlockWithTokens(equipmentRecipe.id)).toBe(true);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        discoveredRecipes: {},
+      } as unknown as GameState);
+
+      expect(applyMaterialDelta).toHaveBeenCalledWith(
+        expect.anything(),
+        'trader-token',
+        -equipmentRecipe.tokenUnlockCost,
+      );
+      expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBeGreaterThan(0);
+      expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+        'Kingdom:Museum:RecipeUnlock',
+      );
     });
   });
 });

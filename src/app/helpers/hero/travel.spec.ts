@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/caravan/caravan', () => ({
+  caravanMarkVisited: vi.fn(),
+}));
+
 vi.mock('@helpers/decree/auto-mode', () => ({
   autoModeIsEnabled: vi.fn(() => false),
   autoModeToggle: vi.fn(),
@@ -50,6 +54,7 @@ vi.mock('@helpers/world-node/world-node-encounter', () => ({
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeAt: vi.fn(() => undefined),
   worldNodeByName: vi.fn(),
+  worldNodeCaravan: vi.fn(() => undefined),
   worldNodeEncounter: vi.fn(),
   worldNodeEncounterRandom: vi.fn(),
   worldNodeGathering: vi.fn(),
@@ -64,6 +69,7 @@ vi.mock('@helpers/engine/ui', () => ({
   mapNodeAutoShowOnArrival: vi.fn(),
 }));
 
+import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import { travelMessageLog } from '@helpers/combat/combat-log';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
@@ -75,6 +81,7 @@ import {
 import {
   canPartyTravel,
   travelBeginDeathsDoor,
+  travelEtaSecondsTo,
   travelProcessTick,
   travelStart,
 } from '@helpers/hero/travel';
@@ -90,11 +97,14 @@ import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
   worldNodeAt,
   worldNodeByName,
+  worldNodeCaravan,
   worldNodeEncounter,
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
+  CaravanContent,
+  CaravanId,
   EncounterContent,
   GameState,
   GatheringContent,
@@ -144,6 +154,56 @@ describe('canPartyTravel', () => {
     );
 
     expect(canPartyTravel()).toBe(false);
+  });
+});
+
+describe('travelEtaSecondsTo', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(currentLocationGet).mockReturnValue({
+      mapName: 'Carrina',
+      x: 0,
+      y: 0,
+    });
+  });
+
+  it('is undefined when idle', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
+    );
+
+    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBeUndefined();
+  });
+
+  it('is undefined when traveling toward a different destination', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Somewhere Else',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+        ticksIntoStep: 0,
+      }),
+    );
+
+    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBeUndefined();
+  });
+
+  it('sums remaining ticks on the current step plus full cost of later steps', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Duchy Trading Caravan - Carrina',
+        path: [
+          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+        ],
+        ticksIntoStep: 1,
+      }),
+    );
+
+    // Off-path Move steps cost TICKS_PER_STEP_OFF_PATH (3) each; the first
+    // step already has 1 tick of progress, so 2 remain, plus 3 for the second.
+    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBe(5);
   });
 });
 
@@ -790,6 +850,33 @@ describe('travelProcessTick', () => {
     // Arrival always surfaces wherever the party ends up, not just when
     // something (combat/gathering) kicks off there - see `mapNodeAutoShowOnArrival`.
     expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
+    expect(caravanMarkVisited).not.toHaveBeenCalled();
+  });
+
+  it('on arrival at a caravan node, marks the caravan visited', () => {
+    const node = {
+      mapName: 'Carrina',
+      x: 1,
+      y: 0,
+      nodeName: 'Duchy Trading Caravan - Carrina',
+      nodeData: {} as never,
+    };
+    const caravan = { id: 'duchy-caravan' as CaravanId } as CaravanContent;
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Duchy Trading Caravan - Carrina',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+        ticksIntoStep: 2,
+      }),
+    );
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
+    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
+
+    travelProcessTick();
+
+    expect(caravanMarkVisited).toHaveBeenCalledWith('duchy-caravan');
   });
 
   it('on arrival at a node with a gathering site and no encounter, starts gathering and shows the node', () => {

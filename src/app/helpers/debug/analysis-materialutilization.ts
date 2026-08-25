@@ -14,6 +14,7 @@ import type {
   AnalysisTable,
   AstralProjectorContent,
   CaravanTraderContent,
+  CommissionOfferContent,
   EncounterContent,
   GatheringContent,
   ItemContent,
@@ -42,12 +43,20 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     caravanBuys: 0,
     caravanSells: 0,
     astralCasts: 0,
+    commissionRequirements: 0,
   };
 }
 
-// One point per recipe, caravan buy, and astral spell that consumes it, plus one if infusable.
+// One point per recipe, caravan buy, astral spell, and commission that
+// consumes it, plus one if infusable.
 function score(stats: MaterialUtilizationStats): number {
-  return stats.craftedFrom + stats.caravanBuys + stats.astralCasts + (stats.infusable ? 1 : 0);
+  return (
+    stats.craftedFrom +
+    stats.caravanBuys +
+    stats.astralCasts +
+    stats.commissionRequirements +
+    (stats.infusable ? 1 : 0)
+  );
 }
 
 function productionCount(stats: MaterialUtilizationStats): number {
@@ -78,6 +87,7 @@ export function runMaterialUtilizationAnalysis(
   const gatherings = getEntriesByType<GatheringContent>('gathering');
   const caravanTraders = getEntriesByType<CaravanTraderContent>('caravantrader');
   const astralProjectors = getEntriesByType<AstralProjectorContent>('astralprojector');
+  const commissionOffers = getEntriesByType<CommissionOfferContent>('commissionoffer');
 
   const byId = new Map<string, MaterialUtilizationStats>();
   items.filter((item) => !item.unobtainable).forEach((item) => byId.set(item.id, emptyStats(item)));
@@ -139,6 +149,14 @@ export function runMaterialUtilizationAnalysis(
     });
   });
 
+  commissionOffers.forEach((offer) => {
+    offer.requirements.forEach((requirement) => {
+      if (!('itemId' in requirement)) return;
+      const stats = byId.get(requirement.itemId);
+      if (stats) stats.commissionRequirements += 1;
+    });
+  });
+
   const allStats = sortBy([...byId.values()], [
     (stats: MaterialUtilizationStats) => score(stats),
     (stats: MaterialUtilizationStats) => stats.name,
@@ -156,6 +174,7 @@ export function runMaterialUtilizationAnalysis(
           Infusable: stats.infusable ? 'Yes' : 'No',
           'Caravan Buys': stats.caravanBuys,
           'Astral Casts': stats.astralCasts,
+          'Commission Requirements': stats.commissionRequirements,
           'Crafted Into': stats.craftedInto,
           'Monster Drops': stats.monsterDrops,
           'Encounter Rewards': stats.encounterRewards,
@@ -181,6 +200,7 @@ export function runMaterialUtilizationAnalysis(
     if (stats.craftedFrom > 0) sinks.push(`${stats.craftedFrom} recipe(s)`);
     if (stats.caravanBuys > 0) sinks.push(`${stats.caravanBuys} caravan buy(s)`);
     if (stats.astralCasts > 0) sinks.push(`${stats.astralCasts} astral spell(s)`);
+    if (stats.commissionRequirements > 0) sinks.push(`${stats.commissionRequirements} commission(s)`);
     if (stats.infusable) sinks.push('infusable');
     const sinkDescription = sinks.length > 0 ? sinks.join(', ') : 'no known sinks';
     const sources = productionCount(stats);

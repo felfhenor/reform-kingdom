@@ -1,3 +1,4 @@
+import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import { travelMessageLog } from '@helpers/combat/combat-log';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
@@ -21,6 +22,7 @@ import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-nod
 import {
   worldNodeAt,
   worldNodeByName,
+  worldNodeCaravan,
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeGathering,
@@ -32,6 +34,7 @@ import type {
   TravelState,
   TravelStep,
 } from '@interfaces';
+import { clamp, sum } from 'es-toolkit/compat';
 
 export const TICKS_PER_STEP_ON_PATH = 1;
 export const TICKS_PER_STEP_OFF_PATH = 3;
@@ -73,6 +76,24 @@ export function travelStepTicksCost(
   return enteringPathOrNode || exitingNode
     ? TICKS_PER_STEP_ON_PATH
     : TICKS_PER_STEP_OFF_PATH;
+}
+
+// Remaining seconds until arrival if actively traveling toward this node,
+// else undefined - drives a disabled "mm:ss" travel button in the UI.
+export function travelEtaSecondsTo(nodeName: string): number | undefined {
+  const travel = travelGet();
+  if (travel.status !== 'Traveling' || travel.destinationNodeName !== nodeName) {
+    return undefined;
+  }
+
+  let origin = currentLocationGet();
+  const costs = travel.path.map((step, index) => {
+    const cost = travelStepTicksCost(step, origin);
+    origin = step;
+    return index === 0 ? clamp(cost - travel.ticksIntoStep, 0, cost) : cost;
+  });
+
+  return sum(costs);
 }
 
 // Deaths Door/Healing are the only true blockers - being mid-Travel is not,
@@ -209,6 +230,9 @@ function travelArriveAtNode(
   if (!node) return;
 
   mapNodeAutoShowOnArrival(node);
+
+  const caravan = worldNodeCaravan(node);
+  if (caravan) caravanMarkVisited(caravan.id);
 
   const encounter = worldNodeEncounter(node);
   if (encounter) {

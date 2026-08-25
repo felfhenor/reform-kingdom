@@ -3,15 +3,19 @@ import {
   Component,
   computed,
   input,
+  output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import {
   recipeBackdropSprite,
+  recipeCanUnlockWithTokens,
   recipeResultContent,
   recipeResultSpritesheet,
 } from '@helpers/crafting/recipes';
+import { traderTokenId } from '@helpers/item/materials';
 import type {
   CollectibleContent,
   EquipmentContent,
@@ -25,6 +29,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
+    CurrencyCostComponent,
     SlotIconBlankComponent,
     IconUnknownComponent,
     TippyDirective,
@@ -35,6 +40,10 @@ import { TippyDirective } from '@ngneat/helipopper';
 export class SlotMuseumRecipeComponent {
   public entry = input.required<MuseumRecipeEntry>();
 
+  public unlock = output<void>();
+
+  public traderTokenItemId = traderTokenId();
+
   public resultContent = computed<
     ItemContent | EquipmentContent | CollectibleContent | undefined
   >(() => recipeResultContent(this.entry().recipe));
@@ -44,4 +53,8 @@ export class SlotMuseumRecipeComponent {
   );
 
   public backdropSprite = computed(() => recipeBackdropSprite());
+
+  public canUnlock = computed(() =>
+    recipeCanUnlockWithTokens(this.entry().recipe.id),
+  );
 }

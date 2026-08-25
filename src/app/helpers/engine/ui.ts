@@ -12,6 +12,8 @@ import type {
   Tradeskill,
   WorldNodeEntry,
 } from '@interfaces';
+import { caravanMarkVisited } from '../caravan/caravan';
+import { worldNodeCaravan } from '../world-node/world-nodes';
 
 export function isPageVisible(): boolean {
   return !document.hidden;
@@ -102,6 +104,9 @@ export function mapNodeAutoShowOnArrival(entry: WorldNodeEntry): void {
 export const activeCaravanNode = signal<WorldNodeEntry | undefined>(undefined);
 
 export function caravanTradeOpen(entry: WorldNodeEntry): void {
+  const caravan = worldNodeCaravan(entry);
+  if (caravan) caravanMarkVisited(caravan.id);
+
   activeCaravanNode.set(entry);
   modalOpen('caravan-trade');
 }

@@ -6,11 +6,17 @@
 
 .museum-recipe-slot {
   @apply relative w-[64px] h-[64px] cursor-default;
+
+  // Overridden here (not via utility classes) to avoid a specificity/load-order tie with `cursor-default`.
+  &:where(button) {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
 }
 
-// Both layers are centered independently (rather than stretched to fill),
-// since the backdrop and result sprites aren't guaranteed to share the same
-// intrinsic size.
+// Centered independently, not stretched - sprites aren't guaranteed the same size.
 .museum-recipe-icon {
   @apply relative w-full h-full;
 }

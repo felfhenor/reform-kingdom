@@ -289,6 +289,7 @@ describe('rewardContentInfo', () => {
       maxTradeskillLevel: 5,
       tradeskillXP: 1,
       craftTime: 60,
+      tokenUnlockCost: 3,
     };
     seedContent([cloak, recipe]);
 

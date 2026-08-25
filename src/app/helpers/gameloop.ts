@@ -3,6 +3,7 @@ import { LoggerTimer } from 'logger-timer';
 import { computed } from '@angular/core';
 import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
 import { combatDoCombatIteration, currentCombat } from '@helpers/combat/combat';
+import { commissionProcessTick } from '@helpers/commission/commission-tick';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { discordUpdateStatus } from '@helpers/engine/discord';
@@ -63,6 +64,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     gatheringProcessTick();
     encounterRandomProcessTick();
     caravanProcessTick();
+    commissionProcessTick();
     autoModeProcessTick();
     craftProcessTick();
     restingProcessTick();

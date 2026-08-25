@@ -48,6 +48,7 @@ export type AnalysisScriptCategory =
   | 'Equipment & Items'
   | 'Tradeskills & Recipes'
   | 'World & Maps'
+  | 'Caravans & Commissions'
   | 'Hero Stats'
   | 'Monster Stats';
 
@@ -82,6 +83,7 @@ export type MaterialUtilizationStats = {
   caravanBuys: number;
   caravanSells: number;
   astralCasts: number;
+  commissionRequirements: number;
 };
 
 export type NodeLevelCheckEntry = {

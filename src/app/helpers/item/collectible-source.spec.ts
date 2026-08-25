@@ -62,6 +62,7 @@ const effigyRecipe: RecipeContent = {
   maxTradeskillLevel: 3,
   tradeskillXP: 1,
   craftTime: 60,
+  tokenUnlockCost: 3,
 };
 
 const jukeItos: CaravanTraderContent = {
@@ -75,6 +76,7 @@ const jukeItos: CaravanTraderContent = {
     { type: 'sell', value: 3500, collectibleId: blankPlayingCard, weight: 5 },
     { type: 'buy', value: 100, collectibleId: goblinRuby, weight: 1 },
   ],
+  tokenTrades: [],
 };
 
 function mockContent(overrides: {

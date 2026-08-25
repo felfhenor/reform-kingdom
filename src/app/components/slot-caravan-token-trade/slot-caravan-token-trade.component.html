@@ -1,0 +1,47 @@
+@let item = display();
+
+<app-tooltip-item-preview #preview [display]="item">
+  <div preview-footer class="mt-2 italic text-center">
+    This trader's unique offering, bought with Trader Scrips.
+  </div>
+</app-tooltip-item-preview>
+
+<button
+  type="button"
+  class="caravan-token-trade-slot btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start"
+  [disabled]="!canAfford()"
+  [tp]="item ? preview.template() : undefined"
+  [tpPlacement]="'top'"
+  (click)="activate.emit()"
+>
+  @if (item) {
+    <div class="flex flex-col items-center gap-1 shrink-0">
+      <div
+        class="outline-2 outline-offset-[-2px] rounded outline-{{
+          item.rarity
+        }}"
+      >
+        <app-slot-icon-blank>
+          <app-atlas-image
+            [spritesheet]="item.spritesheet"
+            [assetName]="item.sprite"
+          />
+        </app-slot-icon-blank>
+      </div>
+    </div>
+
+    <div class="flex flex-col flex-1 min-w-0 gap-1">
+      <span class="font-bold text-{{ item.rarity }} truncate">
+        {{ item.name }}
+      </span>
+
+      <span class="badge badge-sm badge-success">Unique</span>
+    </div>
+
+    <app-currency-cost
+      [type]="traderTokenItemId"
+      [amount]="trade().tokenCost"
+      class="ml-auto mr-2 shrink-0"
+    />
+  }
+</button>

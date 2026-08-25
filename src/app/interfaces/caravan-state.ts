@@ -1,5 +1,6 @@
 import type { CaravanId } from '@interfaces/content-caravan';
 import type {
+  CaravanTokenTrade,
   CaravanTrade,
   CaravanTraderId,
 } from '@interfaces/content-caravan-trader';
@@ -44,4 +45,11 @@ export type CaravanTradeRow = {
   // unaffordable/insufficiently owned) - see `caravanTradeMaxQuantity`.
   maxQuantity: number;
   ownedQuantity: number;
+};
+
+// Index into the trader's `tokenTrades` array - kept alongside the trade
+// itself so a caller can execute the trade after filtering the display list.
+export type CaravanTokenTradeRow = {
+  index: number;
+  trade: CaravanTokenTrade;
 };

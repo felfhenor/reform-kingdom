@@ -1,3 +1,5 @@
+import { pruneInvalidDiscoveredCaravans } from '@helpers/caravan/caravan';
+import { pruneInvalidCommissions } from '@helpers/commission/commission-tick';
 import { pruneInvalidCraftQueues } from '@helpers/crafting/crafting';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/crafting/recipes';
 import {
@@ -127,6 +129,12 @@ export function migrateGameState() {
   );
   newState.discoveredEquipment = pruneInvalidDiscoveredEquipment(
     newState.discoveredEquipment,
+  );
+  newState.discoveredCaravans = pruneInvalidDiscoveredCaravans(
+    newState.discoveredCaravans,
+  );
+  newState.world.commissions = pruneInvalidCommissions(
+    newState.world.commissions,
   );
   newState.collectibles = pruneInvalidCollectibles(newState.collectibles);
   newState.collectibles = grantFoundingStoneIfMissing(newState.collectibles);

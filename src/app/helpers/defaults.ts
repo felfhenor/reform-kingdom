@@ -38,12 +38,14 @@ export function defaultGameState(): GameState {
       autoMode: defaultAutoModeState(),
       exploreRandom: {},
       caravans: {},
+      commissions: {},
     },
     materials: {},
     discoveredMaterials: {},
     collectibles: {},
     armory: [],
     discoveredEquipment: {},
+    discoveredCaravans: {},
     discoveredRecipes: {},
     discoveredGatherNodes: {},
     worldDiscoveries: {},
@@ -55,14 +57,9 @@ export function defaultGameState(): GameState {
   };
 }
 
-// Deliberately empty and free of any content dependency - `state-game.ts`
-// calls `defaultGameState()` eagerly at module-eval time (before content is
-// loaded, and before every spec file's `@helpers/content` mock is
-// guaranteed to exist), so this must never call into gamedata lookups.
-// Real per-tradeskill entries (keyed by TradeskillId, sourced from loaded
-// gamedata) are populated by `migrateTradeskillStateKeys` in
-// `@helpers/tradeskill`, which only ever runs once content is guaranteed
-// loaded - see `migrateGameState`.
+// Deliberately empty and content-free - `defaultGameState()` runs at
+// module-eval time, before content is loaded. Real entries are populated by
+// `migrateTradeskillStateKeys` once content is guaranteed loaded.
 function defaultTradeskills(): GameStateTradeskills {
   return {} as GameStateTradeskills;
 }

@@ -130,6 +130,7 @@ describe('encounter-backed node accessors', () => {
         level: { min: 2, max: 5 },
         markupPercentages: { sell: 25, buy: -15 },
         traderCategories: ['Carrina'],
+        commissionOffers: [],
       };
       seedContent([caravan]);
       vi.mocked(caravanTimerLabel).mockReturnValue('01:00:00');

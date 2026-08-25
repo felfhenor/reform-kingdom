@@ -29,6 +29,17 @@ export type CaravanTrade = {
   weight: number;
 };
 
+// A trader's own token-priced offerings - always visible (not subject to
+// the 4-slot weighted `trades` rotation), bought with Trader Scrips instead
+// of gold. Named generically since the reward won't always be a collectible.
+export type CaravanTokenTrade = {
+  tokenCost: number;
+
+  itemId?: ItemId;
+  equipmentId?: EquipmentId;
+  collectibleId?: CollectibleId;
+};
+
 export type CaravanTraderContent = IsContentItem &
   HasDescription & {
     id: CaravanTraderId;
@@ -41,4 +52,5 @@ export type CaravanTraderContent = IsContentItem &
     level: number;
 
     trades: CaravanTrade[];
+    tokenTrades: CaravanTokenTrade[];
   };

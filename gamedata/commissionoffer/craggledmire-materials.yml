@@ -1,0 +1,76 @@
+- id: 0120a591-52da-4226-ae27-b76a9f8174d2
+  name: Commission - Mireweeds
+  description: The caravan needs a bunch of Mireweed for restocking tailoring supplies.
+
+  requirements:
+    - itemId: Mireweed
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: 4d399638-d2f2-4265-bef1-0ef08374361b
+  name: Commission - Mirewood
+  description: The caravan needs a bunch of Mirewood for repairing structures.
+
+  requirements:
+    - itemId: Mirewood
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: 5cfab264-713b-41ed-8b68-6cfa4712810b
+  name: Commission - Miremetal Ores
+  description: The caravan needs a bunch of Miremetal Ore for repairing armor and weaponry.
+
+  requirements:
+    - itemId: Miremetal Ore
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: 7557f966-f17c-4f16-b054-73ac430e9eb0
+  name: Commission - Peridots
+  description: The caravan needs a bunch of Peridot for restocking their jewelcrafting supplies.
+
+  requirements:
+    - itemId: Peridot
+      quantityMin: 50
+      quantityMax: 50
+
+  tokenReward: 1
+
+- id: 1b1066ea-265c-44b1-a6ba-aec52cbf378a
+  name: Commission - Oozehides
+  description: The caravan needs an assortment of Oozehides to re-finish their armor and weaponry.
+
+  requirements:
+    - itemId: Oozehide
+      quantityMin: 25
+      quantityMax: 50
+
+  tokenReward: 1
+
+- id: f27586ad-4f82-48d4-a219-00714fe3f7e1
+  name: Commission - Orc Bones
+  description: The caravan needs to reclaim Orc Bones to bury their ancestors.
+
+  requirements:
+    - itemId: Orc Bone
+      quantityMin: 25
+      quantityMax: 50
+
+  tokenReward: 1
+
+- id: 013d164c-e8c1-4363-a97d-135cd3345085
+  name: Commission - Spirit Flesh
+  description: The caravan needs an assortment of Spirit Flesh to commune with the local spirits.
+
+  requirements:
+    - itemId: Spirit Flesh
+      quantityMin: 25
+      quantityMax: 50
+
+  tokenReward: 1

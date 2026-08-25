@@ -1,12 +1,16 @@
-import { getEntriesByType } from '@helpers/content';
+import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
+import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanContent,
   CaravanId,
   CaravanNodeState,
   CaravanTimerUrgency,
   CaravanTraderContent,
+  GameStateDiscoveredCaravans,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -65,4 +69,46 @@ export function caravanTimerUrgency(
   if (ticksUntilReset >= URGENCY_SAFE_MIN_TICKS) return 'safe';
   if (ticksUntilReset >= URGENCY_WARNING_MIN_TICKS) return 'warning';
   return 'danger';
+}
+
+export function isCaravanDiscovered(caravanId: CaravanId): boolean {
+  return !!gamestate().discoveredCaravans[caravanId]?.foundAt;
+}
+
+export function isPartyAtCaravan(caravanId: CaravanId): boolean {
+  const entry = worldNodeAtCurrentLocation();
+  return !!entry && worldNodeCaravan(entry)?.id === caravanId;
+}
+
+export function caravanMarkDiscovered(caravanId: CaravanId): void {
+  if (isCaravanDiscovered(caravanId)) return;
+
+  updateGamestate((state) => {
+    state.discoveredCaravans[caravanId] = { foundAt: Date.now() };
+    return state;
+  });
+}
+
+// Every "party is engaging with this caravan" call site (travel arrival,
+// opening trade while already there) should go through this, not the two
+// halves separately - otherwise one gets forgotten.
+export function caravanMarkVisited(caravanId: CaravanId): void {
+  caravanMarkDiscovered(caravanId);
+  commissionGenerateIfMissing(caravanId);
+}
+
+// Drops any discovery entries whose caravanId no longer resolves to real
+// content - e.g. after a caravan is renamed/removed from gamedata.
+export function pruneInvalidDiscoveredCaravans(
+  discovered: GameStateDiscoveredCaravans,
+): GameStateDiscoveredCaravans {
+  const pruned: GameStateDiscoveredCaravans = {};
+
+  (Object.keys(discovered) as CaravanId[]).forEach((caravanId) => {
+    if (getEntry<CaravanContent>(caravanId)) {
+      pruned[caravanId] = discovered[caravanId];
+    }
+  });
+
+  return pruned;
 }

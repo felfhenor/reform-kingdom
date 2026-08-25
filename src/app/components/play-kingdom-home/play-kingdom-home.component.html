@@ -154,6 +154,15 @@
         Infusion
       </button>
 
+      @if (commissionsUnlocked()) {
+        <button
+          class="btn btn-accent btn-sm"
+          (click)="openSubview('commissions')"
+        >
+          Commissions
+        </button>
+      }
+
       <button
         [disabled]="true"
         class="btn btn-accent btn-sm"

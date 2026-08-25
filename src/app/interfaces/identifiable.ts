@@ -3,6 +3,7 @@ export type ContentType =
   | 'caravan'
   | 'caravantrader'
   | 'collectible'
+  | 'commissionoffer'
   | 'encounter'
   | 'encounterrandom'
   | 'equipment'

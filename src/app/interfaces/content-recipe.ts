@@ -25,9 +25,7 @@ export type RecipeResultCollectible = {
 };
 
 export type RecipeResult =
-  | RecipeResultItem
-  | RecipeResultEquipment
-  | RecipeResultCollectible;
+  RecipeResultItem | RecipeResultEquipment | RecipeResultCollectible;
 
 export type RecipeRequirementItem = {
   itemId: ItemId;
@@ -61,4 +59,9 @@ export type RecipeContent = IsContentItem & {
   maxTradeskillLevel: number;
   tradeskillXP: number;
   craftTime: number;
+
+  // Trader Scrips to unlock this recipe via the Museum, bypassing its
+  // world-drop gate. Meaningless (unused by the UI) for recipes that aren't
+  // drop-gated in the first place - see `isRecipeDropGated`.
+  tokenUnlockCost: number;
 };

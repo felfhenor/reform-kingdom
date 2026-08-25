@@ -1,7 +1,9 @@
 import type { GameStateCaravans } from '@interfaces/caravan-state';
 import type { Character } from '@interfaces/character';
 import type { Combat } from '@interfaces/combat';
+import type { GameStateCommissions } from '@interfaces/commission-state';
 import type { AstralProjectorId } from '@interfaces/content-astralprojector';
+import type { CaravanId } from '@interfaces/content-caravan';
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
@@ -33,6 +35,7 @@ export type GameStateWorld = {
   autoMode: AutoModeState;
   exploreRandom: GameStateExploreRandom;
   caravans: GameStateCaravans;
+  commissions: GameStateCommissions;
 };
 
 export type MaterialId = ItemId;
@@ -57,6 +60,13 @@ export type GameStateCollectibles = {
 // Unlike `armory`, this is never pruned on equip/sell/breakdown - it's a standing "has this ever been found" flag.
 export type GameStateDiscoveredEquipment = {
   [key: EquipmentId]: { foundAt: number };
+};
+
+// Marked when the player opens a caravan's trade UI - gates which caravans
+// show in the Commissions panel. Keyed by caravan (not trader), since
+// traders don't map 1:1 to a caravan brand.
+export type GameStateDiscoveredCaravans = {
+  [key: CaravanId]: { foundAt: number };
 };
 
 // Level-learned recipes never appear here. No stored location - see `recipeSourceNodeNames`.
@@ -118,6 +128,7 @@ export type GameState = {
   collectibles: GameStateCollectibles;
   armory: EquipmentItem[];
   discoveredEquipment: GameStateDiscoveredEquipment;
+  discoveredCaravans: GameStateDiscoveredCaravans;
   discoveredRecipes: GameStateDiscoveredRecipes;
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;
   worldDiscoveries: GameStateWorldDiscoveries;

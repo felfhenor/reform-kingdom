@@ -11,6 +11,24 @@
       <p class="text-sm text-lighter italic">{{ traderContent.description }}</p>
     }
 
+    @if (commission(); as activeCommission) {
+      <app-slot-commission
+        [row]="activeCommission"
+        [isInCaravanTradePopup]="true"
+      />
+    }
+
+    @if (tokenTrades().length > 0) {
+      <div class="flex flex-col gap-2">
+        @for (row of tokenTrades(); track row.index) {
+          <app-slot-caravan-token-trade
+            [trade]="row.trade"
+            (activate)="buyTokenTrade(row)"
+          />
+        }
+      </div>
+    }
+
     <div class="flex flex-col gap-2">
       @for (row of trades(); track row.index) {
         <app-slot-caravan-trade [row]="row" (activate)="requestTrade(row)" />

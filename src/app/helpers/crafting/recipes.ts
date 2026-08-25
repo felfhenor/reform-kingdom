@@ -1,8 +1,14 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
+import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
-import { getMaterialQuantity } from '@helpers/item/materials';
+import {
+  applyMaterialDelta,
+  getMaterialQuantity,
+  hasTraderTokens,
+  traderTokenId,
+} from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -50,6 +56,51 @@ export function recipeDiscover(recipeId: RecipeId): void {
     };
     return state;
   });
+}
+
+// Reverts a drop-gated recipe back to undiscovered - a debug/testing tool
+// (see debugUndiscoverRecipe), not something normal play ever triggers.
+export function recipeUndiscover(recipeId: RecipeId): void {
+  updateGamestate((state) => {
+    delete state.discoveredRecipes[recipeId];
+    return state;
+  });
+}
+
+// Only meaningful for drop-gated, undiscovered recipes - a recipe that's
+// already discovered or was never drop-gated has nothing to unlock.
+export function recipeCanUnlockWithTokens(recipeId: RecipeId): boolean {
+  const recipe = getEntry<RecipeContent>(recipeId);
+  if (!recipe) return false;
+
+  return (
+    isRecipeDropGated(recipeId) &&
+    !isRecipeDiscovered(recipeId) &&
+    hasTraderTokens(recipe.tokenUnlockCost)
+  );
+}
+
+// Spends tokens and discovers the recipe atomically - not a separate call
+// into `recipeDiscover`, so the two mutations land in one updateGamestate.
+export function recipeUnlockWithTokens(recipeId: RecipeId): boolean {
+  if (!recipeCanUnlockWithTokens(recipeId)) return false;
+
+  const recipe = getEntry<RecipeContent>(recipeId);
+  if (!recipe) return false;
+
+  updateGamestate((state) => {
+    applyMaterialDelta(state, traderTokenId(), -recipe.tokenUnlockCost);
+
+    const existing = state.discoveredRecipes[recipeId];
+    state.discoveredRecipes[recipeId] = {
+      foundAt: existing?.foundAt ?? Date.now(),
+    };
+
+    return state;
+  });
+
+  analyticsSendDesignEvent('Kingdom:Museum:RecipeUnlock');
+  return true;
 }
 
 // Drops any discovery entries whose recipeId no longer resolves to real

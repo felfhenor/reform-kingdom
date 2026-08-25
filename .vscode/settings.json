@@ -18,6 +18,7 @@
     "./schemas/caravan.schema.json": "gamedata/caravan/**/*.yml",
     "./schemas/caravantrader.schema.json": "gamedata/caravantrader/**/*.yml",
     "./schemas/collectible.schema.json": "gamedata/collectible/**/*.yml",
+    "./schemas/commissionoffer.schema.json": "gamedata/commissionoffer/**/*.yml",
     "./schemas/encounter.schema.json": "gamedata/encounter/**/*.yml",
     "./schemas/encounterrandom.schema.json": "gamedata/encounterrandom/**/*.yml",
     "./schemas/equipment.schema.json": "gamedata/equipment/**/*.yml",
@@ -30,7 +31,6 @@
     "./schemas/recipe.schema.json": "gamedata/recipe/**/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/**/*.yml",
     "./schemas/statuseffect.schema.json": "gamedata/statuseffect/**/*.yml",
-    "./schemas/trait.schema.json": "gamedata/trait/**/*.yml",
     "./schemas/tradeskill.schema.json": "gamedata/tradeskill/**/*.yml",
     "./schemas/tradeskilllevelrequirement.schema.json": "gamedata/tradeskilllevelrequirement/**/*.yml"
   },

@@ -1,0 +1,81 @@
+@let r = row();
+
+<div class="flex items-center gap-2 p-4 rounded bg-base-200">
+  <div class="flex flex-col flex-1 min-w-0 gap-2">
+    <span class="font-semibold truncate">
+      @if (isInCaravanTradePopup()) {
+        Active Commission
+      } @else {
+        {{ r.caravanName }}
+      }
+    </span>
+
+    @if (r.completed) {
+      <span class="text-sm text-lighter italic">
+        Daily commission fulfilled! Check back after the reset for another.
+      </span>
+    } @else {
+      <div class="flex flex-wrap gap-2">
+        @for (req of r.requirementEntries; track $index) {
+          <div
+            class="relative w-8 h-8 shrink-0"
+            [tp]="requirementTooltip(req)"
+            [tpPlacement]="'top'"
+          >
+            <div class="zoom-row">
+              <app-slot-icon-blank>
+                @if (req.content) {
+                  <app-atlas-image
+                    [spritesheet]="req.spritesheet"
+                    [assetName]="req.content.sprite"
+                  />
+                }
+              </app-slot-icon-blank>
+            </div>
+
+            <span
+              class="absolute bottom-0 right-0 text-[10px] leading-tight px-0.5 rounded-sm {{
+                req.owned < req.quantity ? 'bg-error text-white' : 'bg-black/70'
+              }}"
+            >
+              {{ req.quantity }}
+            </span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (!r.completed) {
+    <div class="flex flex-col items-end gap-2 shrink-0">
+      <app-currency-cost [type]="traderTokenItemId" [amount]="r.tokenReward" />
+
+      <div class="flex gap-2">
+        @if (!isInCaravanTradePopup() && !r.isPartyHere) {
+          @if (r.travelEtaSeconds !== undefined) {
+            <button type="button" class="btn btn-xs btn-secondary" disabled>
+              {{ etaLabel(r.travelEtaSeconds) }}
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn btn-xs btn-secondary"
+              (click)="travel.emit()"
+            >
+              Travel Here
+            </button>
+          }
+        }
+
+        <button
+          type="button"
+          class="btn btn-xs btn-primary"
+          [disabled]="!r.canFulfill || !r.isPartyHere"
+          (click)="turnIn(r.caravanId)"
+        >
+          Turn In Commission
+        </button>
+      </div>
+    </div>
+  }
+</div>

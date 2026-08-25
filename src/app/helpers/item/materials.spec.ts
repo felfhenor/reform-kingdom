@@ -24,11 +24,13 @@ import {
   getGoldQuantity,
   getMaterialQuantity,
   grantStartingGold,
+  hasTraderTokens,
   isMaterialDiscovered,
   pruneInvalidDiscoveredMaterials,
   pruneInvalidMaterials,
   removeMaterial,
   goldCoinId as resolveGoldCoinId,
+  traderTokenId as resolveTraderTokenId,
   spendGold,
 } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -46,6 +48,40 @@ describe('Material Helper Functions', () => {
 
       expect(resolveGoldCoinId()).toBe(goldCoinId);
       expect(getEntry).toHaveBeenCalledWith('Gold Coin');
+    });
+  });
+
+  describe('traderTokenId', () => {
+    it("resolves the item id of the 'Trader Scrip' content entry", () => {
+      const traderTokenId = 'trader-token' as MaterialId;
+      vi.mocked(getEntry).mockReturnValue({ id: traderTokenId } as ItemContent);
+
+      expect(resolveTraderTokenId()).toBe(traderTokenId);
+      expect(getEntry).toHaveBeenCalledWith('Trader Scrip');
+    });
+  });
+
+  describe('hasTraderTokens', () => {
+    const traderTokenId = 'trader-token' as MaterialId;
+
+    beforeEach(() => {
+      vi.mocked(getEntry).mockReturnValue({ id: traderTokenId } as ItemContent);
+    });
+
+    it('returns true when the stored quantity meets the requested amount', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        materials: { [traderTokenId]: { quantity: 5, foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(hasTraderTokens(5)).toBe(true);
+    });
+
+    it('returns false when the stored quantity is short', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        materials: { [traderTokenId]: { quantity: 2, foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(hasTraderTokens(3)).toBe(false);
     });
   });
 

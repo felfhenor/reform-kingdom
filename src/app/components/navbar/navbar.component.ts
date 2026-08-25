@@ -10,6 +10,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { hotkeyMatches } from '@helpers/engine/hotkeys';
 import {
   modalClose,
   modalCloseTop,
@@ -26,7 +27,6 @@ import {
   setGamePlayView,
   worldCameraRecenter,
 } from '@helpers/engine/ui';
-import { hotkeyMatches } from '@helpers/engine/hotkeys';
 import { isSetup } from '@helpers/setup';
 import { saveGameState } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
@@ -100,7 +100,9 @@ export class NavbarComponent {
 
   public openCaravanTrade(): void {
     const entry = worldNodeAtCurrentLocation();
-    if (entry) caravanTradeOpen(entry);
+    if (!entry) return;
+
+    caravanTradeOpen(entry);
   }
 
   public changeGamePlayView(view: GamePlayView): void {

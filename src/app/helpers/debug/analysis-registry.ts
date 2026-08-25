@@ -1,3 +1,4 @@
+import { runCommissionUsageAnalysis } from '@helpers/debug/analysis-commissionusage';
 import { runCompletionRewardsAnalysis } from '@helpers/debug/analysis-completionrewards';
 import { runContentGapsAnalysis } from '@helpers/debug/analysis-contentgaps';
 import { runDebuffResistanceAnalysis } from '@helpers/debug/analysis-debuffresistance';
@@ -160,6 +161,17 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runFieldNodesAnalysis,
+  },
+
+  // --- Caravans & Commissions ---
+  {
+    id: 'commissionusage',
+    title: 'Commission Usage',
+    description: 'Every commission offer is referenced by at least one caravan.',
+    category: 'Caravans & Commissions',
+    strict: true,
+    inputKeys: [],
+    run: runCommissionUsageAnalysis,
   },
 
   // --- Hero Stats ---

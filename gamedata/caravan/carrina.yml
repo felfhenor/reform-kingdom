@@ -15,6 +15,24 @@
   traderCategories:
     - Carrina
 
+  commissionOffers:
+    - commissionOfferId: Commission - Wergen Sticks
+      weight: 1
+    - commissionOfferId: Commission - Wergen Wood
+      weight: 1
+    - commissionOfferId: Commission - Malachite
+      weight: 1
+    - commissionOfferId: Commission - Elven Wood
+      weight: 1
+    - commissionOfferId: Commission - Flax Flowers
+      weight: 1
+    - commissionOfferId: Commission - Green Slime Cores
+      weight: 1
+    - commissionOfferId: Commission - Simple Weaponry
+      weight: 1
+    - commissionOfferId: Commission - Simple Armor
+      weight: 1
+
 - id: 4b1efc97-fd5f-44ef-9ecb-6c7fd3d92c00
   name: Elfheim Merchants - Carrina
   description: The Carrina branch of the Elfheim Merchants Caravan. They rarely extend trade with others, so their high quality goods are often kept to themselves.
@@ -31,6 +49,22 @@
 
   traderCategories:
     - Elfheim
+
+  commissionOffers:
+    - commissionOfferId: Commission - Azurite
+      weight: 1
+    - commissionOfferId: Commission - Elven Wood
+      weight: 1
+    - commissionOfferId: Commission - Weak Spider Silk
+      weight: 1
+    - commissionOfferId: Commission - Small Goblin Bones
+      weight: 1
+    - commissionOfferId: Commission - Goblin Nails
+      weight: 1
+    - commissionOfferId: Commission - Goblin Teeth
+      weight: 1
+    - commissionOfferId: Commission - Purple Slime Cores
+      weight: 1
 
 - id: 784f2295-f492-4b15-a853-018c9b9ca553
   name: Goblin Group Company - Carrina
@@ -49,3 +83,19 @@
   traderCategories:
     - Carrina
     - Goblem
+
+  commissionOffers:
+    - commissionOfferId: Commission - Wergen Sticks
+      weight: 1
+    - commissionOfferId: Commission - Tattered Hides
+      weight: 1
+    - commissionOfferId: Commission - Wergen Wood
+      weight: 1
+    - commissionOfferId: Commission - Elven Wood
+      weight: 1
+    - commissionOfferId: Commission - Simple Weaponry
+      weight: 1
+    - commissionOfferId: Commission - Simple Armor
+      weight: 1
+    - commissionOfferId: Commission - Red Slime Cores
+      weight: 1

@@ -1,11 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/commission/commission-tick', () => ({
+  commissionGenerateIfMissing: vi.fn(),
+}));
+
 vi.mock('@helpers/content', () => ({
   getEntriesByType: vi.fn(),
+  getEntry: vi.fn(),
 }));
 
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
+  updateGamestate: vi.fn(),
 }));
 
 vi.mock('@helpers/engine/timer', () => ({
@@ -13,23 +19,41 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
 }));
 
+vi.mock('@helpers/world', () => ({
+  worldNodeAtCurrentLocation: vi.fn(),
+}));
+
+vi.mock('@helpers/world-node/world-nodes', () => ({
+  worldNodeCaravan: vi.fn(),
+}));
+
 import {
   caravanBrandName,
   caravanEligibleTraders,
+  caravanMarkDiscovered,
+  caravanMarkVisited,
   caravanState,
   caravanTicksUntilReset,
   caravanTimerLabel,
   caravanTimerUrgency,
+  isCaravanDiscovered,
+  isPartyAtCaravan,
+  pruneInvalidDiscoveredCaravans,
 } from '@helpers/caravan/caravan';
-import { getEntriesByType } from '@helpers/content';
+import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
+import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanContent,
   CaravanId,
   CaravanTraderContent,
   CaravanTraderId,
   GameState,
+  GameStateDiscoveredCaravans,
+  WorldNodeEntry,
 } from '@interfaces';
 
 const caravan: CaravanContent = {
@@ -41,6 +65,7 @@ const caravan: CaravanContent = {
   level: { min: 3, max: 7 },
   markupPercentages: { sell: 25, buy: -15 },
   traderCategories: ['Carrina'],
+  commissionOffers: [],
 };
 
 function trader(
@@ -54,6 +79,7 @@ function trader(
     category: 'Carrina',
     level: 5,
     trades: [],
+    tokenTrades: [],
     ...overrides,
   };
 }
@@ -180,5 +206,125 @@ describe('caravanBrandName', () => {
     expect(caravanBrandName('Goblin Group Company')).toBe(
       'Goblin Group Company',
     );
+  });
+});
+
+describe('isCaravanDiscovered', () => {
+  it('is true once a foundAt is recorded', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: { [caravan.id]: { foundAt: 1000 } },
+    } as unknown as GameState);
+
+    expect(isCaravanDiscovered(caravan.id)).toBe(true);
+  });
+
+  it('is false when never visited', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: {},
+    } as unknown as GameState);
+
+    expect(isCaravanDiscovered(caravan.id)).toBe(false);
+  });
+});
+
+describe('isPartyAtCaravan', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('is false when the party is not on any world node', () => {
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
+
+    expect(isPartyAtCaravan(caravan.id)).toBe(false);
+  });
+
+  it('is false when the current node is a different caravan', () => {
+    const entry = {} as WorldNodeEntry;
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
+    vi.mocked(worldNodeCaravan).mockReturnValue({
+      ...caravan,
+      id: 'other-caravan' as CaravanId,
+    });
+
+    expect(isPartyAtCaravan(caravan.id)).toBe(false);
+  });
+
+  it('is true when standing on this caravan node', () => {
+    const entry = {} as WorldNodeEntry;
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
+    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
+
+    expect(isPartyAtCaravan(caravan.id)).toBe(true);
+  });
+});
+
+describe('caravanMarkDiscovered', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('does nothing when already discovered', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: { [caravan.id]: { foundAt: 1000 } },
+    } as unknown as GameState);
+
+    caravanMarkDiscovered(caravan.id);
+
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('records a fresh foundAt when visited for the first time', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: {},
+    } as unknown as GameState);
+    vi.spyOn(Date, 'now').mockReturnValue(5000);
+
+    caravanMarkDiscovered(caravan.id);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      discoveredCaravans: {},
+    } as unknown as GameState);
+
+    expect(result.discoveredCaravans[caravan.id]).toEqual({ foundAt: 5000 });
+
+    vi.restoreAllMocks();
+  });
+});
+
+describe('pruneInvalidDiscoveredCaravans', () => {
+  it('keeps entries that resolve to real content', () => {
+    vi.mocked(getEntry).mockReturnValue(caravan);
+    const discovered: GameStateDiscoveredCaravans = {
+      [caravan.id]: { foundAt: 1000 },
+    };
+
+    expect(pruneInvalidDiscoveredCaravans(discovered)).toEqual(discovered);
+  });
+
+  it('drops entries whose id no longer resolves to real content', () => {
+    vi.mocked(getEntry).mockReturnValue(undefined);
+    const discovered: GameStateDiscoveredCaravans = {
+      [caravan.id]: { foundAt: 1000 },
+    };
+
+    expect(pruneInvalidDiscoveredCaravans(discovered)).toEqual({});
+  });
+});
+
+describe('caravanMarkVisited', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('marks discovered and backfills the commission', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: {},
+    } as unknown as GameState);
+
+    caravanMarkVisited(caravan.id);
+
+    expect(updateGamestate).toHaveBeenCalled();
+    expect(commissionGenerateIfMissing).toHaveBeenCalledWith(caravan.id);
   });
 });

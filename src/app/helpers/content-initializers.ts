@@ -12,6 +12,7 @@ import type {
   CaravanContent,
   CaravanId,
   CaravanTrade,
+  CaravanTokenTrade,
   CaravanTraderContent,
   CaravanTraderId,
   CaravanTradeType,
@@ -19,6 +20,12 @@ import type {
   CollectibleId,
   CombatantCombatStats,
   CombatantStatusEffectData,
+  CommissionOfferContent,
+  CommissionOfferId,
+  CommissionOfferRequirement,
+  CommissionOfferRequirementEquipment,
+  CommissionOfferRequirementItem,
+  CommissionOfferSlot,
   ContentType,
   DroppedCollectibleReward,
   DroppedEquipmentReward,
@@ -93,6 +100,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   caravan: ensureCaravan,
   caravantrader: ensureCaravanTrader,
   collectible: ensureCollectible,
+  commissionoffer: ensureCommissionOffer,
   encounter: ensureEncounter,
   encounterrandom: ensureEncounterRandom,
   equipment: ensureEquipment,
@@ -397,6 +405,15 @@ function ensureCaravanTrade(trade: Partial<CaravanTrade> = {}): CaravanTrade {
   };
 }
 
+function ensureCommissionOfferSlot(
+  slot: Partial<CommissionOfferSlot> = {},
+): CommissionOfferSlot {
+  return {
+    commissionOfferId: slot.commissionOfferId ?? ('UNKNOWN' as CommissionOfferId),
+    weight: slot.weight ?? 1,
+  };
+}
+
 function ensureCaravan(
   caravan: Partial<CaravanContent>,
 ): Required<CaravanContent> {
@@ -409,7 +426,22 @@ function ensureCaravan(
     level: caravan.level ?? { min: 1, max: 1 },
     markupPercentages: caravan.markupPercentages ?? { sell: 0, buy: 0 },
     traderCategories: caravan.traderCategories ?? [],
+    commissionOffers: ensureArray(
+      caravan.commissionOffers,
+      ensureCommissionOfferSlot,
+    ),
     hidden: caravan.hidden ?? false,
+  };
+}
+
+function ensureCaravanTokenTrade(
+  trade: Partial<CaravanTokenTrade> = {},
+): CaravanTokenTrade {
+  return {
+    tokenCost: trade.tokenCost ?? 3,
+    itemId: trade.itemId,
+    equipmentId: trade.equipmentId,
+    collectibleId: trade.collectibleId,
   };
 }
 
@@ -424,6 +456,42 @@ function ensureCaravanTrader(
     category: trader.category ?? 'UNKNOWN',
     level: trader.level ?? 1,
     trades: ensureArray(trader.trades, ensureCaravanTrade),
+    tokenTrades: ensureArray(trader.tokenTrades, ensureCaravanTokenTrade),
+  };
+}
+
+function ensureCommissionOfferRequirement(
+  requirement: Partial<CommissionOfferRequirementItem> &
+    Partial<CommissionOfferRequirementEquipment> = {},
+): CommissionOfferRequirement {
+  if (requirement.equipmentId) {
+    return {
+      equipmentId: requirement.equipmentId,
+      quantityMin: requirement.quantityMin ?? 1,
+      quantityMax: requirement.quantityMax ?? 1,
+    };
+  }
+
+  return {
+    itemId: requirement.itemId ?? ('UNKNOWN' as ItemId),
+    quantityMin: requirement.quantityMin ?? 1,
+    quantityMax: requirement.quantityMax ?? 1,
+  };
+}
+
+function ensureCommissionOffer(
+  offer: Partial<CommissionOfferContent>,
+): Required<CommissionOfferContent> {
+  return {
+    id: offer.id ?? ('UNKNOWN' as CommissionOfferId),
+    name: offer.name ?? 'UNKNOWN',
+    __type: 'commissionoffer',
+    description: offer.description ?? 'UNKNOWN',
+    requirements: ensureArray(
+      offer.requirements,
+      ensureCommissionOfferRequirement,
+    ),
+    tokenReward: offer.tokenReward ?? 1,
   };
 }
 
@@ -516,6 +584,7 @@ function ensureRecipe(recipe: Partial<RecipeContent>): Required<RecipeContent> {
     maxTradeskillLevel: recipe.maxTradeskillLevel ?? 1,
     tradeskillXP: recipe.tradeskillXP ?? 0,
     craftTime: recipe.craftTime ?? 60,
+    tokenUnlockCost: recipe.tokenUnlockCost ?? 3,
   };
 }
 

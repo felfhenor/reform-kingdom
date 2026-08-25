@@ -41,6 +41,7 @@ vi.mock('@helpers/item/materials', () => ({
 vi.mock('@helpers/crafting/recipes', () => ({
   isRecipeDropGated: vi.fn(),
   recipeDiscover: vi.fn(),
+  recipeUndiscover: vi.fn(),
 }));
 
 vi.mock('@helpers/hero/party', () => ({
@@ -70,7 +71,11 @@ vi.mock('@helpers/world-node/world-node-discovery', () => ({
 }));
 
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { isRecipeDropGated, recipeDiscover } from '@helpers/crafting/recipes';
+import {
+  isRecipeDropGated,
+  recipeDiscover,
+  recipeUndiscover,
+} from '@helpers/crafting/recipes';
 import {
   tradeskillIdForName,
   tradeskillXpForLevel,
@@ -86,6 +91,7 @@ import {
   debugResetBestiary,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
+  debugUndiscoverRecipe,
   debugUndiscoverWorldNode,
   debugWipeWorldDiscoveries,
 } from '@helpers/debug/debug';
@@ -486,6 +492,25 @@ describe('Debug Helper Functions', () => {
 
       expect(recipeDiscover).toHaveBeenCalledTimes(1);
       expect(recipeDiscover).toHaveBeenCalledWith('smelting');
+    });
+  });
+
+  describe('debugUndiscoverRecipe', () => {
+    it('undiscovers a known recipe', () => {
+      const smelting = { id: 'smelting' } as RecipeContent;
+      vi.mocked(getEntry).mockReturnValue(smelting);
+
+      debugUndiscoverRecipe('smelting' as never);
+
+      expect(recipeUndiscover).toHaveBeenCalledWith('smelting');
+    });
+
+    it('does nothing for an unknown recipe id', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      debugUndiscoverRecipe('unknown' as never);
+
+      expect(recipeUndiscover).not.toHaveBeenCalled();
     });
   });
 

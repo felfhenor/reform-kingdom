@@ -15,6 +15,12 @@ export function goldCoinId(): ItemId {
   return getEntry<ItemContent>(GOLD_COIN_NAME)!.id;
 }
 
+const TRADER_TOKEN_NAME = 'Trader Scrip';
+
+export function traderTokenId(): ItemId {
+  return getEntry<ItemContent>(TRADER_TOKEN_NAME)!.id;
+}
+
 // Drops any storage entries whose id no longer resolves to real content -
 // e.g. after a material is renamed/removed from gamedata.
 export function pruneInvalidMaterials(
@@ -109,6 +115,10 @@ export function spendGold(state: GameState, amount: number): void {
 
 export function hasGold(amount: number): boolean {
   return getGoldQuantity() >= amount;
+}
+
+export function hasTraderTokens(amount: number): boolean {
+  return getMaterialQuantity(traderTokenId()) >= amount;
 }
 
 const STARTING_GOLD_AMOUNT = 100;

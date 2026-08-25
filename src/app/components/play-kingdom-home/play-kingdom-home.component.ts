@@ -2,6 +2,8 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
+import { hasAnyCommission } from '@helpers/commission/commission-tick';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   craftQueueTicksRemaining,
@@ -25,6 +27,10 @@ import {
 } from '@helpers/kingdom/museum';
 import { gamestate } from '@helpers/state-game';
 import { isPlayerAtKingdom } from '@helpers/world';
+import {
+  worldNodeCaravan,
+  worldNodesOfType,
+} from '@helpers/world-node/world-nodes';
 import type {
   KingdomSubview,
   RecipeContent,
@@ -77,6 +83,18 @@ export class PlayKingdomHomeComponent {
   public bestiaryEntries = computed(() => getBestiaryEntries());
   public bestiaryDiscoveredCount = computed(
     () => this.bestiaryEntries().filter((entry) => entry.discovered).length,
+  );
+
+  // Hidden until any caravan has actually generated a commission.
+  public commissionsUnlocked = computed(() => hasAnyCommission());
+
+  // Commissions ready to turn in right now - shown as a nudge on the tile.
+  public fulfillableCommissionCount = computed(
+    () =>
+      worldNodesOfType('CaravanNode').filter((entry) => {
+        const caravan = worldNodeCaravan(entry);
+        return !!caravan && commissionCanFulfill(caravan.id);
+      }).length,
   );
 
   public readonly tradeskillContent = computed(() =>
