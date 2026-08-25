@@ -186,11 +186,6 @@
         - monsterId: Red Slime
         - monsterId: Red Slime
         - monsterId: Green Slime
-    - monsters:
-        - monsterId: Purple Slime
-        - monsterId: Purple Slime
-        - monsterId: Red Slime
-        - monsterId: Green Slime
 
   completionRewards:
     - collectibleId: Jelly Flower
