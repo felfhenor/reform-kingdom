@@ -279,7 +279,7 @@ describe('commissionFulfill', () => {
     vi.mocked(isPartyAtCaravan).mockReturnValue(true);
   });
 
-  it('returns false and does not mutate state when requirements are unmet', () => {
+  it('returns false and does not mutate state when requirements are unmet', async () => {
     withCommissionState({
       commissionOfferId: offer.id,
       requirements: [{ itemId: wergenStick.id, quantity: 100 }],
@@ -288,11 +288,11 @@ describe('commissionFulfill', () => {
     });
     vi.mocked(getMaterialQuantity).mockReturnValue(0);
 
-    expect(commissionFulfill(caravanId)).toBe(false);
+    expect(await commissionFulfill(caravanId)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('returns false and does not mutate state when the party is not at the caravan', () => {
+  it('returns false and does not mutate state when the party is not at the caravan', async () => {
     withCommissionState({
       commissionOfferId: offer.id,
       requirements: [{ itemId: wergenStick.id, quantity: 100 }],
@@ -302,11 +302,11 @@ describe('commissionFulfill', () => {
     vi.mocked(getMaterialQuantity).mockReturnValue(100);
     vi.mocked(isPartyAtCaravan).mockReturnValue(false);
 
-    expect(commissionFulfill(caravanId)).toBe(false);
+    expect(await commissionFulfill(caravanId)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('spends every requirement, grants tokens, and flips completed on success', () => {
+  it('spends every requirement, grants tokens, and flips completed on success', async () => {
     withCommissionState({
       commissionOfferId: offer.id,
       requirements: [{ itemId: wergenStick.id, quantity: 100 }],
@@ -316,10 +316,16 @@ describe('commissionFulfill', () => {
     vi.mocked(getMaterialQuantity).mockReturnValue(100);
     vi.mocked(getEntry).mockReturnValue(offer);
 
-    expect(commissionFulfill(caravanId)).toBe(true);
+    // updateGamestate is a dumb recorder in this suite (it doesn't actually
+    // invoke the callback), so the resolved success/failure of
+    // commissionFulfill depends on the callback below having already run
+    // before the outer promise is awaited - matching how the double-fire
+    // regression test further down feeds committed state through it.
+    const resultPromise = commissionFulfill(caravanId);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const state = {
+      materials: { [wergenStick.id]: { quantity: 100, foundAt: 1 } },
       armory: [],
       world: {
         commissions: {
@@ -334,6 +340,7 @@ describe('commissionFulfill', () => {
     } as unknown as GameState;
     const result = updateFn(state);
 
+    expect(await resultPromise).toBe(true);
     expect(applyMaterialDelta).toHaveBeenCalledWith(
       state,
       wergenStick.id,
@@ -346,7 +353,7 @@ describe('commissionFulfill', () => {
     );
   });
 
-  it('consumes equipment requirements from the armory instead of materials', () => {
+  it('consumes equipment requirements from the armory instead of materials', async () => {
     withCommissionState({
       commissionOfferId: offer.id,
       requirements: [{ equipmentId: sword.id, quantity: 2 }],
@@ -360,10 +367,11 @@ describe('commissionFulfill', () => {
     ] as never);
     vi.mocked(getEntry).mockReturnValue(offer);
 
-    expect(commissionFulfill(caravanId)).toBe(true);
+    const resultPromise = commissionFulfill(caravanId);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const state = {
+      materials: {},
       armory: [
         { equipmentId: sword.id, id: 'a', infusedItemIds: [] },
         { equipmentId: sword.id, id: 'b', infusedItemIds: [] },
@@ -382,9 +390,64 @@ describe('commissionFulfill', () => {
     } as unknown as GameState;
     const result = updateFn(state);
 
+    expect(await resultPromise).toBe(true);
     expect(result.armory).toEqual([
       { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
     ]);
+  });
+
+  it('does not double-grant tokens when two turn-ins race before either commits', async () => {
+    // Regression test for the rapid-click double-fire bug: updateGamestate
+    // doesn't commit until an async yield later, so commissionCanFulfill's
+    // fast-path check (run synchronously before that yield) can pass twice
+    // against the same stale, pre-commit state if two calls race in before
+    // the first one's callback actually runs.
+    withCommissionState({
+      commissionOfferId: offer.id,
+      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
+      completed: false,
+      generatedAt: 1000,
+    });
+    vi.mocked(getMaterialQuantity).mockReturnValue(100);
+    vi.mocked(getEntry).mockReturnValue(offer);
+
+    const call1 = commissionFulfill(caravanId);
+    const call2 = commissionFulfill(caravanId);
+
+    expect(updateGamestate).toHaveBeenCalledTimes(2);
+    const [updateFn1, updateFn2] = vi
+      .mocked(updateGamestate)
+      .mock.calls.map((call) => call[0]);
+
+    const initialState = {
+      materials: { [wergenStick.id]: { quantity: 100, foundAt: 1 } },
+      armory: [],
+      world: {
+        commissions: {
+          [caravanId]: {
+            commissionOfferId: offer.id,
+            requirements: [{ itemId: wergenStick.id, quantity: 100 }],
+            completed: false,
+            generatedAt: 1000,
+          },
+        },
+      },
+    } as unknown as GameState;
+
+    // Simulates commit ordering: call1's callback commits first; call2's
+    // callback then runs against that already-committed result, as it would
+    // once its own updateGamestate yield resolves.
+    const afterFirst = updateFn1(initialState);
+    const afterSecond = updateFn2(afterFirst);
+
+    const [result1, result2] = await Promise.all([call1, call2]);
+
+    expect(result1).toBe(true);
+    expect(result2).toBe(false);
+    expect(afterSecond).toBe(afterFirst);
+    expect(afterFirst.world.commissions[caravanId].completed).toBe(true);
+    // One spend + one grant from call1; call2 must no-op entirely.
+    expect(applyMaterialDelta).toHaveBeenCalledTimes(2);
   });
 });
 

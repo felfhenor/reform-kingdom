@@ -47,8 +47,8 @@ export class SlotCommissionComponent {
     return formatDuration(seconds);
   }
 
-  public turnIn(caravanId: CaravanId): void {
-    if (!commissionFulfill(caravanId)) return;
+  public async turnIn(caravanId: CaravanId): Promise<void> {
+    if (!(await commissionFulfill(caravanId))) return;
     notifySuccess(
       `Commission turned in: +${this.row().tokenReward} Trader Scrips!`,
     );

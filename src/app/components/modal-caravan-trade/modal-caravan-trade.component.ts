@@ -188,12 +188,15 @@ export class ModalCaravanTradeComponent {
     this.commitTrade(row, quantity);
   }
 
-  private commitTrade(row: CaravanTradeRow, quantity: number): void {
+  private async commitTrade(
+    row: CaravanTradeRow,
+    quantity: number,
+  ): Promise<void> {
     const entry = this.entry();
     if (!entry) return;
 
     const name = caravanTradeDisplay(row.trade)?.name ?? 'item';
-    if (!caravanExecuteTrade(entry, row.index, quantity)) return;
+    if (!(await caravanExecuteTrade(entry, row.index, quantity))) return;
 
     const qtyLabel = quantity > 1 ? ` x${quantity}` : '';
     notifySuccess(
@@ -203,12 +206,12 @@ export class ModalCaravanTradeComponent {
     );
   }
 
-  public buyTokenTrade(row: CaravanTokenTradeRow): void {
+  public async buyTokenTrade(row: CaravanTokenTradeRow): Promise<void> {
     const entry = this.entry();
     if (!entry) return;
 
     const name = caravanTokenTradeDisplay(row.trade)?.name ?? 'item';
-    if (!caravanExecuteTokenTrade(entry, row.index)) return;
+    if (!(await caravanExecuteTokenTrade(entry, row.index))) return;
 
     notifySuccess(`You bought ${name}!`);
   }

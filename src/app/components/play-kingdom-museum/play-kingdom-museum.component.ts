@@ -68,8 +68,8 @@ export class PlayKingdomMuseumComponent {
     this.recipesGrid()?.resetPage();
   }
 
-  public unlockRecipe(recipeId: RecipeId): void {
-    if (!recipeUnlockWithTokens(recipeId)) {
+  public async unlockRecipe(recipeId: RecipeId): Promise<void> {
+    if (!(await recipeUnlockWithTokens(recipeId))) {
       notifyError('Not enough Trader Scrips to unlock this recipe.');
       return;
     }

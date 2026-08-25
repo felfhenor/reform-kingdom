@@ -27,6 +27,7 @@ vi.mock('@helpers/item/materials', async (importOriginal) => {
     ...actual,
     getMaterialQuantity: vi.fn(),
     getGoldQuantity,
+    goldCoinId: vi.fn(() => testGoldCoinId),
     hasGold: vi.fn((amount: number) => getGoldQuantity() >= amount),
     gainGold: vi.fn((state: GameState, amount: number) =>
       actual.applyMaterialDelta(state, testGoldCoinId, amount),
@@ -500,47 +501,51 @@ describe('caravanExecuteTrade', () => {
     vi.mocked(rngUuid).mockReturnValue('new-item-id');
   });
 
-  it('returns false when the node is not a caravan', () => {
+  it('returns false when the node is not a caravan', async () => {
     vi.mocked(worldNodeCaravan).mockReturnValue(undefined);
 
-    expect(caravanExecuteTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('returns false when no trader is currently assigned', () => {
+  it('returns false when no trader is currently assigned', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState({ traderId: undefined }));
 
-    expect(caravanExecuteTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0)).toBe(false);
   });
 
-  it('returns false for a trade index that is not currently active', () => {
+  it('returns false for a trade index that is not currently active', async () => {
     vi.mocked(caravanState).mockReturnValue(
       nodeState({ activeTradeIndices: [1] }),
     );
 
-    expect(caravanExecuteTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0)).toBe(false);
   });
 
-  it('returns false once the trade is sold out', () => {
+  it('returns false once the trade is sold out', async () => {
     vi.mocked(caravanState).mockReturnValue(
       nodeState({ tradeCounts: { 0: 2 } }),
     );
 
-    expect(caravanExecuteTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0)).toBe(false);
   });
 
-  it('returns false when the party cannot afford a sell trade', () => {
+  it('returns false when the party cannot afford a sell trade', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(getGoldQuantity).mockReturnValue(0);
 
-    expect(caravanExecuteTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0)).toBe(false);
   });
 
-  it('grants the item and deducts gold on a successful sell trade', () => {
+  it('grants the item and deducts gold on a successful sell trade', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(getGoldQuantity).mockReturnValue(1000);
 
-    expect(caravanExecuteTrade(entry, 0)).toBe(true);
+    // updateGamestate is a dumb recorder here (it doesn't invoke the
+    // callback itself), so the callback is captured and run manually before
+    // awaiting the outer promise - mirroring the double-fire regression test
+    // further down, which relies on the same capture-then-invoke shape.
+    const resultPromise = caravanExecuteTrade(entry, 0);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
@@ -552,16 +557,17 @@ describe('caravanExecuteTrade', () => {
       world: { caravans: { [caravan.id]: nodeState() } },
     } as unknown as GameState);
 
+    expect(await resultPromise).toBe(true);
     expect(result.materials['ore' as ItemId].quantity).toBe(1);
     expect(result.materials['gold-coin' as ItemId].quantity).toBe(875);
     expect(result.world.caravans[caravan.id].tradeCounts[0]).toBe(1);
   });
 
-  it('takes the item and credits gold on a successful buy trade', () => {
+  it('takes the item and credits gold on a successful buy trade', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(getMaterialQuantity).mockReturnValue(3);
 
-    expect(caravanExecuteTrade(entry, 1)).toBe(true);
+    const resultPromise = caravanExecuteTrade(entry, 1);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
@@ -573,53 +579,66 @@ describe('caravanExecuteTrade', () => {
       world: { caravans: { [caravan.id]: nodeState() } },
     } as unknown as GameState);
 
+    expect(await resultPromise).toBe(true);
     expect(result.materials['ore' as ItemId].quantity).toBe(2);
     expect(result.materials['gold-coin' as ItemId].quantity).toBe(43);
     expect(result.world.caravans[caravan.id].tradeCounts[1]).toBe(1);
   });
 
-  it('succeeds a buy trade even when the party currently has no gold', () => {
+  it('succeeds a buy trade even when the party currently has no gold', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(getMaterialQuantity).mockReturnValue(3);
     vi.mocked(getGoldQuantity).mockReturnValue(0);
 
-    expect(caravanExecuteTrade(entry, 1)).toBe(true);
+    const resultPromise = caravanExecuteTrade(entry, 1);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    updateFn({
+      materials: { ['ore' as ItemId]: { quantity: 3, foundAt: 1 } },
+      discoveredMaterials: {},
+      armory: [],
+      collectibles: {},
+      discoveredEquipment: {},
+      world: { caravans: { [caravan.id]: nodeState() } },
+    } as unknown as GameState);
+
+    expect(await resultPromise).toBe(true);
   });
 
-  it('blocks buying an undiscovered collectible the party cannot afford, even though max quantity ignores gold', () => {
+  it('blocks buying an undiscovered collectible the party cannot afford, even though max quantity ignores gold', async () => {
     vi.mocked(caravanState).mockReturnValue(
       nodeState({ activeTradeIndices: [0, 1, 2] }),
     );
     vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
     vi.mocked(getGoldQuantity).mockReturnValue(0);
 
-    expect(caravanExecuteTrade(entry, 2)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 2)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('returns false for a quantity of 0 or less', () => {
+  it('returns false for a quantity of 0 or less', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(getGoldQuantity).mockReturnValue(1000);
 
-    expect(caravanExecuteTrade(entry, 0, 0)).toBe(false);
-    expect(caravanExecuteTrade(entry, 0, -1)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0, 0)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0, -1)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('returns false when the requested quantity exceeds what is available', () => {
+  it('returns false when the requested quantity exceeds what is available', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     // Trade 0 has limit 2 and none bought yet - only 2 are available.
     vi.mocked(getGoldQuantity).mockReturnValue(1_000_000);
 
-    expect(caravanExecuteTrade(entry, 0, 3)).toBe(false);
+    expect(await caravanExecuteTrade(entry, 0, 3)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('buys multiple units in a single atomic commit', () => {
+  it('buys multiple units in a single atomic commit', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(getGoldQuantity).mockReturnValue(1_000_000);
 
-    expect(caravanExecuteTrade(entry, 0, 2)).toBe(true);
+    const resultPromise = caravanExecuteTrade(entry, 0, 2);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
@@ -633,17 +652,18 @@ describe('caravanExecuteTrade', () => {
       world: { caravans: { [caravan.id]: nodeState() } },
     } as unknown as GameState);
 
+    expect(await resultPromise).toBe(true);
     // price 125 (100 marked up 25%) x2 = 250
     expect(result.materials['ore' as ItemId].quantity).toBe(2);
     expect(result.materials['gold-coin' as ItemId].quantity).toBe(999_750);
     expect(result.world.caravans[caravan.id].tradeCounts[0]).toBe(2);
   });
 
-  it('sells multiple units in a single atomic commit', () => {
+  it('sells multiple units in a single atomic commit', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(getMaterialQuantity).mockReturnValue(5);
 
-    expect(caravanExecuteTrade(entry, 1, 3)).toBe(true);
+    const resultPromise = caravanExecuteTrade(entry, 1, 3);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
@@ -655,10 +675,55 @@ describe('caravanExecuteTrade', () => {
       world: { caravans: { [caravan.id]: nodeState() } },
     } as unknown as GameState);
 
+    expect(await resultPromise).toBe(true);
     // price 43 (50 marked down 15%, rounded) x3 = 129
     expect(result.materials['ore' as ItemId].quantity).toBe(2);
     expect(result.materials['gold-coin' as ItemId].quantity).toBe(129);
     expect(result.world.caravans[caravan.id].tradeCounts[1]).toBe(3);
+  });
+
+  it('does not oversell stock when two purchases race before either commits', async () => {
+    // Regression test for the rapid-click double-fire bug: updateGamestate
+    // doesn't commit until an async yield later, so the outer max-quantity
+    // check (run synchronously before that yield) can pass twice against
+    // the same stale, pre-commit tradeCounts if two calls race in before
+    // the first one's callback actually runs.
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(getGoldQuantity).mockReturnValue(1_000_000);
+
+    const call1 = caravanExecuteTrade(entry, 0, 2);
+    const call2 = caravanExecuteTrade(entry, 0, 2);
+
+    expect(updateGamestate).toHaveBeenCalledTimes(2);
+    const [updateFn1, updateFn2] = vi
+      .mocked(updateGamestate)
+      .mock.calls.map((call) => call[0]);
+
+    const initialState = {
+      materials: {
+        ['gold-coin' as ItemId]: { quantity: 1_000_000, foundAt: 1 },
+      },
+      discoveredMaterials: {},
+      armory: [],
+      collectibles: {},
+      discoveredEquipment: {},
+      world: { caravans: { [caravan.id]: nodeState() } },
+    } as unknown as GameState;
+
+    // Simulates commit ordering: call1's callback commits first; call2's
+    // callback then runs against that already-committed result, as it would
+    // once its own updateGamestate yield resolves.
+    const afterFirst = updateFn1(initialState);
+    const afterSecond = updateFn2(afterFirst);
+
+    const [result1, result2] = await Promise.all([call1, call2]);
+
+    expect(result1).toBe(true);
+    expect(result2).toBe(false);
+    expect(afterSecond).toBe(afterFirst);
+    // Trade 0's limit is 2 - only call1's purchase should have gone through.
+    expect(afterFirst.materials['ore' as ItemId].quantity).toBe(2);
+    expect(afterFirst.world.caravans[caravan.id].tradeCounts[0]).toBe(2);
   });
 });
 
@@ -734,49 +799,49 @@ describe('caravanExecuteTokenTrade', () => {
     vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
   });
 
-  it('returns false when the node is not a caravan', () => {
+  it('returns false when the node is not a caravan', async () => {
     vi.mocked(worldNodeCaravan).mockReturnValue(undefined);
 
-    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTokenTrade(entry, 0)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('returns false when no trader is currently assigned', () => {
+  it('returns false when no trader is currently assigned', async () => {
     vi.mocked(caravanState).mockReturnValue(
       nodeState({ traderId: undefined }),
     );
 
-    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTokenTrade(entry, 0)).toBe(false);
   });
 
-  it('returns false for an out-of-range token trade index', () => {
+  it('returns false for an out-of-range token trade index', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
 
-    expect(caravanExecuteTokenTrade(entry, 5)).toBe(false);
+    expect(await caravanExecuteTokenTrade(entry, 5)).toBe(false);
   });
 
-  it('returns false when the collectible is already owned', () => {
+  it('returns false when the collectible is already owned', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
     vi.mocked(hasTraderTokens).mockReturnValue(true);
 
-    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTokenTrade(entry, 0)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('returns false when the player cannot afford the token cost', () => {
+  it('returns false when the player cannot afford the token cost', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(hasTraderTokens).mockReturnValue(false);
 
-    expect(caravanExecuteTokenTrade(entry, 0)).toBe(false);
+    expect(await caravanExecuteTokenTrade(entry, 0)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 
-  it('grants the collectible and spends tokens on success', () => {
+  it('grants the collectible and spends tokens on success', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(hasTraderTokens).mockReturnValue(true);
 
-    expect(caravanExecuteTokenTrade(entry, 0)).toBe(true);
+    const resultPromise = caravanExecuteTokenTrade(entry, 0);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
@@ -787,15 +852,16 @@ describe('caravanExecuteTokenTrade', () => {
       collectibles: {},
     } as unknown as GameState);
 
+    expect(await resultPromise).toBe(true);
     expect(result.collectibles['trinket' as CollectibleId].quantity).toBe(1);
     expect(result.materials['trader-token' as ItemId].quantity).toBe(2);
   });
 
-  it('grants an item reward and spends tokens on success', () => {
+  it('grants an item reward and spends tokens on success', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(hasTraderTokens).mockReturnValue(true);
 
-    expect(caravanExecuteTokenTrade(entry, 1)).toBe(true);
+    const resultPromise = caravanExecuteTokenTrade(entry, 1);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
@@ -806,16 +872,17 @@ describe('caravanExecuteTokenTrade', () => {
       collectibles: {},
     } as unknown as GameState);
 
+    expect(await resultPromise).toBe(true);
     expect(result.materials['ore' as ItemId].quantity).toBe(1);
     expect(result.materials['trader-token' as ItemId].quantity).toBe(3);
   });
 
-  it('grants an equipment reward and spends tokens on success', () => {
+  it('grants an equipment reward and spends tokens on success', async () => {
     vi.mocked(caravanState).mockReturnValue(nodeState());
     vi.mocked(hasTraderTokens).mockReturnValue(true);
     vi.mocked(rngUuid).mockReturnValue('new-equipment-item-id');
 
-    expect(caravanExecuteTokenTrade(entry, 2)).toBe(true);
+    const resultPromise = caravanExecuteTokenTrade(entry, 2);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
@@ -828,6 +895,7 @@ describe('caravanExecuteTokenTrade', () => {
       discoveredEquipment: {},
     } as unknown as GameState);
 
+    expect(await resultPromise).toBe(true);
     expect(result.armory).toEqual([
       {
         id: 'new-equipment-item-id',
@@ -837,5 +905,42 @@ describe('caravanExecuteTokenTrade', () => {
     ]);
     expect(result.discoveredEquipment['sword' as EquipmentId].foundAt).toBeGreaterThan(0);
     expect(result.materials['trader-token' as ItemId]).toBeUndefined();
+  });
+
+  it('does not double-grant a collectible when two purchases race before either commits', async () => {
+    // Regression test for the rapid-click double-fire bug: updateGamestate
+    // doesn't commit until an async yield later, so isTokenTradeAlreadyOwned
+    // (checked synchronously before that yield) can pass twice against the
+    // same stale, pre-commit collectibles state if two calls race in before
+    // the first one's callback actually runs.
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(hasTraderTokens).mockReturnValue(true);
+
+    const call1 = caravanExecuteTokenTrade(entry, 0);
+    const call2 = caravanExecuteTokenTrade(entry, 0);
+
+    expect(updateGamestate).toHaveBeenCalledTimes(2);
+    const [updateFn1, updateFn2] = vi
+      .mocked(updateGamestate)
+      .mock.calls.map((call) => call[0]);
+
+    const initialState = {
+      materials: { ['trader-token' as ItemId]: { quantity: 5, foundAt: 1 } },
+      discoveredMaterials: {},
+      collectibles: {},
+    } as unknown as GameState;
+
+    const afterFirst = updateFn1(initialState);
+    const afterSecond = updateFn2(afterFirst);
+
+    const [result1, result2] = await Promise.all([call1, call2]);
+
+    expect(result1).toBe(true);
+    expect(result2).toBe(false);
+    expect(afterSecond).toBe(afterFirst);
+    expect(afterFirst.collectibles['trinket' as CollectibleId].quantity).toBe(
+      1,
+    );
+    expect(afterFirst.materials['trader-token' as ItemId].quantity).toBe(2);
   });
 });

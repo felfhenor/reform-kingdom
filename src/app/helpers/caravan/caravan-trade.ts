@@ -11,6 +11,7 @@ import {
   gainGold,
   getGoldQuantity,
   getMaterialQuantity,
+  goldCoinId,
   hasGold,
   hasTraderTokens,
   spendGold,
@@ -75,17 +76,34 @@ export function caravanTokenTradeDisplay(
   return resolveRewardDisplay(trade);
 }
 
-// How many of trade's target the party owns, shown so price can be weighed against stock.
-export function caravanTradeOwnedQuantity(trade: CaravanTrade): number {
-  if (trade.itemId) return getMaterialQuantity(trade.itemId);
+// How many of trade's target the party owns, shown so price can be weighed
+// against stock. Accepts an explicit `state` to re-validate at commit time.
+export function caravanTradeOwnedQuantity(
+  trade: CaravanTrade,
+  state?: GameState,
+): number {
+  if (trade.itemId) {
+    return state
+      ? (state.materials[trade.itemId]?.quantity ?? 0)
+      : getMaterialQuantity(trade.itemId);
+  }
 
   if (trade.equipmentId) {
+    if (state) {
+      return state.armory.filter(
+        (item) => item.equipmentId === trade.equipmentId,
+      ).length;
+    }
     return getArmoryEntries().filter(
       (entry) => entry.content.id === trade.equipmentId,
     ).length;
   }
 
-  if (trade.collectibleId) return getCollectibleQuantity(trade.collectibleId);
+  if (trade.collectibleId) {
+    return state
+      ? (state.collectibles[trade.collectibleId]?.quantity ?? 0)
+      : getCollectibleQuantity(trade.collectibleId);
+  }
 
   return 0;
 }
@@ -126,28 +144,36 @@ export function caravanIsTradeSoldOut(
   return remaining !== undefined && remaining <= 0;
 }
 
-// Lesser of remaining stock and what the party can afford; a collectible is capped at 1 (0 once owned).
+// Lesser of remaining stock and what the party can afford; a collectible is
+// capped at 1 (0 once owned). Accepts `state` for commit-time re-validation.
 export function caravanTradeMaxQuantity(
   caravan: CaravanContent,
   trade: CaravanTrade,
   tradeCounts: Record<number, number>,
   index: number,
+  state?: GameState,
 ): number {
   if (trade.collectibleId) {
-    return isCollectibleDiscovered(trade.collectibleId) ? 0 : 1;
+    const discovered = state
+      ? !!state.collectibles[trade.collectibleId]?.foundAt
+      : isCollectibleDiscovered(trade.collectibleId);
+    return discovered ? 0 : 1;
   }
 
   const remaining = caravanTradeRemaining(trade, tradeCounts, index);
 
   if (trade.type === 'sell') {
     const price = caravanTradePrice(caravan, trade);
-    const affordable = Math.floor(getGoldQuantity() / price);
+    const goldQuantity = state
+      ? (state.materials[goldCoinId()]?.quantity ?? 0)
+      : getGoldQuantity();
+    const affordable = Math.floor(goldQuantity / price);
     return remaining === undefined
       ? affordable
       : Math.min(remaining, affordable);
   }
 
-  const owned = caravanTradeOwnedQuantity(trade);
+  const owned = caravanTradeOwnedQuantity(trade, state);
   return remaining === undefined ? owned : Math.min(remaining, owned);
 }
 
@@ -219,12 +245,13 @@ function takeCaravanPayment(
   }
 }
 
-// Buys/sells quantity units of tradeIndex atomically; returns false without changing state if unresolvable, inactive, or unaffordable.
-export function caravanExecuteTrade(
+// Fast path only - caravanTradeMaxQuantity is re-run against live state
+// inside the callback, since updateGamestate commits asynchronously.
+export async function caravanExecuteTrade(
   entry: WorldNodeEntry,
   tradeIndex: number,
   quantity = 1,
-): boolean {
+): Promise<boolean> {
   if (quantity <= 0) return false;
 
   const caravan = worldNodeCaravan(entry);
@@ -252,7 +279,23 @@ export function caravanExecuteTrade(
   const totalPrice = caravanTradePrice(caravan, trade) * quantity;
   if (trade.type === 'sell' && !hasGold(totalPrice)) return false;
 
-  updateGamestate((s) => {
+  let executed = false;
+
+  await updateGamestate((s) => {
+    const nodeState = s.world.caravans[caravan.id];
+    if (!nodeState || !nodeState.activeTradeIndices.includes(tradeIndex)) {
+      return s;
+    }
+
+    const liveMax = caravanTradeMaxQuantity(
+      caravan,
+      trade,
+      nodeState.tradeCounts,
+      tradeIndex,
+      s,
+    );
+    if (quantity > liveMax) return s;
+
     if (trade.type === 'sell') {
       grantCaravanReward(s, trade, quantity);
       spendGold(s, totalPrice);
@@ -261,21 +304,28 @@ export function caravanExecuteTrade(
       gainGold(s, totalPrice);
     }
 
-    const nodeState = s.world.caravans[caravan.id];
     nodeState.tradeCounts[tradeIndex] =
       (nodeState.tradeCounts[tradeIndex] ?? 0) + quantity;
+    executed = true;
 
     return s;
   });
 
-  analyticsSendDesignEvent('Kingdom:Caravan:Trade');
-  return true;
+  if (executed) analyticsSendDesignEvent('Kingdom:Caravan:Trade');
+  return executed;
 }
 
 // A collectible token trade is a one-time purchase, same rule as a gold
 // collectible trade; item/equipment token trades have no such gate.
-function isTokenTradeAlreadyOwned(trade: CaravanTokenTrade): boolean {
-  if (trade.collectibleId) return isCollectibleDiscovered(trade.collectibleId);
+function isTokenTradeAlreadyOwned(
+  trade: CaravanTokenTrade,
+  state?: GameState,
+): boolean {
+  if (trade.collectibleId) {
+    return state
+      ? !!state.collectibles[trade.collectibleId]?.foundAt
+      : isCollectibleDiscovered(trade.collectibleId);
+  }
   return false;
 }
 
@@ -305,12 +355,11 @@ function grantTokenTradeReward(state: GameState, trade: CaravanTokenTrade): void
   }
 }
 
-// Buys one of a trader's always-visible token trades; returns false without
-// changing state if unresolvable, already owned, or unaffordable.
-export function caravanExecuteTokenTrade(
+// Same commit-time re-validation reasoning as caravanExecuteTrade above.
+export async function caravanExecuteTokenTrade(
   entry: WorldNodeEntry,
   tokenTradeIndex: number,
-): boolean {
+): Promise<boolean> {
   const caravan = worldNodeCaravan(entry);
   if (!caravan) return false;
 
@@ -326,12 +375,21 @@ export function caravanExecuteTokenTrade(
   if (isTokenTradeAlreadyOwned(trade)) return false;
   if (!hasTraderTokens(trade.tokenCost)) return false;
 
-  updateGamestate((s) => {
+  let executed = false;
+
+  await updateGamestate((s) => {
+    if (isTokenTradeAlreadyOwned(trade, s)) return s;
+
+    const tokenQuantity = s.materials[traderTokenId()]?.quantity ?? 0;
+    if (tokenQuantity < trade.tokenCost) return s;
+
     grantTokenTradeReward(s, trade);
     applyMaterialDelta(s, traderTokenId(), -trade.tokenCost);
+    executed = true;
+
     return s;
   });
 
-  analyticsSendDesignEvent('Kingdom:Caravan:TokenTrade');
-  return true;
+  if (executed) analyticsSendDesignEvent('Kingdom:Caravan:TokenTrade');
+  return executed;
 }

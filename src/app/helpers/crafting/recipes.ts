@@ -6,7 +6,6 @@ import { equippedItems } from '@helpers/item/equipment';
 import {
   applyMaterialDelta,
   getMaterialQuantity,
-  hasTraderTokens,
   traderTokenId,
 } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
@@ -16,6 +15,7 @@ import type {
   EncounterContent,
   EquipmentContent,
   EquipmentId,
+  GameState,
   GameStateDiscoveredRecipes,
   ItemContent,
   RecipeContent,
@@ -26,8 +26,11 @@ import { sumBy } from 'es-toolkit/compat';
 // Whether this recipe has ever been found as a world drop - recipes that are
 // only ever learned by leveling a tradeskill building are never discovered
 // this way (see `getMuseumRecipeEntries`).
-export function isRecipeDiscovered(recipeId: RecipeId): boolean {
-  return !!gamestate().discoveredRecipes[recipeId]?.foundAt;
+export function isRecipeDiscovered(
+  recipeId: RecipeId,
+  state: GameState = gamestate(),
+): boolean {
+  return !!state.discoveredRecipes[recipeId]?.foundAt;
 }
 
 // Whether this recipe is gated behind a world drop - i.e. it appears as a
@@ -69,38 +72,46 @@ export function recipeUndiscover(recipeId: RecipeId): void {
 
 // Only meaningful for drop-gated, undiscovered recipes - a recipe that's
 // already discovered or was never drop-gated has nothing to unlock.
-export function recipeCanUnlockWithTokens(recipeId: RecipeId): boolean {
+export function recipeCanUnlockWithTokens(
+  recipeId: RecipeId,
+  state: GameState = gamestate(),
+): boolean {
   const recipe = getEntry<RecipeContent>(recipeId);
   if (!recipe) return false;
 
+  const tokenQuantity = state.materials[traderTokenId()]?.quantity ?? 0;
+
   return (
     isRecipeDropGated(recipeId) &&
-    !isRecipeDiscovered(recipeId) &&
-    hasTraderTokens(recipe.tokenUnlockCost)
+    !isRecipeDiscovered(recipeId, state) &&
+    tokenQuantity >= recipe.tokenUnlockCost
   );
 }
 
 // Spends tokens and discovers the recipe atomically - not a separate call
-// into `recipeDiscover`, so the two mutations land in one updateGamestate.
-export function recipeUnlockWithTokens(recipeId: RecipeId): boolean {
+// into `recipeDiscover`, so both mutations land in one updateGamestate.
+export async function recipeUnlockWithTokens(
+  recipeId: RecipeId,
+): Promise<boolean> {
   if (!recipeCanUnlockWithTokens(recipeId)) return false;
 
   const recipe = getEntry<RecipeContent>(recipeId);
   if (!recipe) return false;
 
-  updateGamestate((state) => {
-    applyMaterialDelta(state, traderTokenId(), -recipe.tokenUnlockCost);
+  let unlocked = false;
 
-    const existing = state.discoveredRecipes[recipeId];
-    state.discoveredRecipes[recipeId] = {
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
+  await updateGamestate((state) => {
+    if (!recipeCanUnlockWithTokens(recipeId, state)) return state;
+
+    applyMaterialDelta(state, traderTokenId(), -recipe.tokenUnlockCost);
+    state.discoveredRecipes[recipeId] = { foundAt: Date.now() };
+    unlocked = true;
 
     return state;
   });
 
-  analyticsSendDesignEvent('Kingdom:Museum:RecipeUnlock');
-  return true;
+  if (unlocked) analyticsSendDesignEvent('Kingdom:Museum:RecipeUnlock');
+  return unlocked;
 }
 
 // Drops any discovery entries whose recipeId no longer resolves to real

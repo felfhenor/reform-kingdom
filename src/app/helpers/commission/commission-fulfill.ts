@@ -20,24 +20,33 @@ import type {
   CraftRequirementEntry,
   EquipmentContent,
   EquipmentItem,
+  GameState,
   ItemContent,
   WorldNodeEntry,
 } from '@interfaces';
 
 function commissionState(
   caravanId: CaravanId,
+  state: GameState = gamestate(),
 ): CommissionNodeState | undefined {
-  return gamestate().world.commissions[caravanId];
+  return state.world.commissions[caravanId];
 }
 
-function ownedQuantity(requirement: CommissionRequirement): number {
+// Reads off an explicit `state` when given, so this can be re-validated
+// against a commit-time state instead of the possibly-stale live gamestate().
+function ownedQuantity(
+  requirement: CommissionRequirement,
+  state?: GameState,
+): number {
   if ('equipmentId' in requirement) {
-    return armoryGet().filter(
-      (item) => item.equipmentId === requirement.equipmentId,
-    ).length;
+    const armory = state ? state.armory : armoryGet();
+    return armory.filter((item) => item.equipmentId === requirement.equipmentId)
+      .length;
   }
 
-  return getMaterialQuantity(requirement.itemId);
+  return state
+    ? (state.materials[requirement.itemId]?.quantity ?? 0)
+    : getMaterialQuantity(requirement.itemId);
 }
 
 // Shaped like CraftRequirementEntry so both UI surfaces (the Commissions
@@ -83,12 +92,18 @@ export function commissionTokenReward(caravanId: CaravanId): number {
   return offer?.tokenReward ?? 0;
 }
 
-export function commissionCanFulfill(caravanId: CaravanId): boolean {
-  const state = commissionState(caravanId);
-  if (!state || state.completed || !state.commissionOfferId) return false;
+// Accepts an explicit `state` to re-validate at commit time (see `ownedQuantity`).
+export function commissionCanFulfill(
+  caravanId: CaravanId,
+  state?: GameState,
+): boolean {
+  const nodeState = commissionState(caravanId, state);
+  if (!nodeState || nodeState.completed || !nodeState.commissionOfferId) {
+    return false;
+  }
 
-  return state.requirements.every(
-    (requirement) => ownedQuantity(requirement) >= requirement.quantity,
+  return nodeState.requirements.every(
+    (requirement) => ownedQuantity(requirement, state) >= requirement.quantity,
   );
 }
 
@@ -127,19 +142,27 @@ function consumeEquipmentRequirement(
   });
 }
 
-export function commissionFulfill(caravanId: CaravanId): boolean {
+// Fast path only - commissionCanFulfill is repeated against live state
+// inside the callback, since updateGamestate commits asynchronously.
+export async function commissionFulfill(
+  caravanId: CaravanId,
+): Promise<boolean> {
   if (!commissionCanFulfill(caravanId) || !isPartyAtCaravan(caravanId)) {
     return false;
   }
 
-  const state = commissionState(caravanId);
-  if (!state?.commissionOfferId) return false;
+  let fulfilled = false;
 
-  const offer = getEntry<CommissionOfferContent>(state.commissionOfferId);
-  const tokenReward = offer?.tokenReward ?? 0;
+  await updateGamestate((s) => {
+    if (!commissionCanFulfill(caravanId, s)) return s;
 
-  updateGamestate((s) => {
-    state.requirements.forEach((requirement) => {
+    const nodeState = s.world.commissions[caravanId];
+    if (!nodeState?.commissionOfferId) return s;
+
+    const offer = getEntry<CommissionOfferContent>(nodeState.commissionOfferId);
+    const tokenReward = offer?.tokenReward ?? 0;
+
+    nodeState.requirements.forEach((requirement) => {
       if ('equipmentId' in requirement) {
         s.armory = consumeEquipmentRequirement(s.armory, requirement);
         return;
@@ -148,13 +171,12 @@ export function commissionFulfill(caravanId: CaravanId): boolean {
       applyMaterialDelta(s, requirement.itemId, -requirement.quantity);
     });
     applyMaterialDelta(s, traderTokenId(), tokenReward);
-
-    const nodeState = s.world.commissions[caravanId];
-    if (nodeState) nodeState.completed = true;
+    nodeState.completed = true;
+    fulfilled = true;
 
     return s;
   });
 
-  analyticsSendDesignEvent('Kingdom:Commission:Fulfill');
-  return true;
+  if (fulfilled) analyticsSendDesignEvent('Kingdom:Commission:Fulfill');
+  return fulfilled;
 }
