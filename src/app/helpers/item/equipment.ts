@@ -9,6 +9,7 @@ import { armoryGet } from '@helpers/kingdom/armory';
 import { rngUuid } from '@helpers/rng';
 import {
   EquipmentTypeToSlot,
+  StatOrder,
   type BaseStat,
   type Character,
   type EquipmentArmoryEntry,
@@ -263,22 +264,25 @@ function candidateStatValue(
   );
 }
 
-// Ranks lexicographically by statPriority (a higher-priority stat always outweighs a lower one); ties fall back to `entries`'s existing order (highest level requirement first).
+// Ranks by statPriority, then by every other stat as a tie-break, then by `entries`'s existing order.
 function bestBySlotPriority(
   entries: EquipmentArmoryEntry[],
   statPriority: BaseStat[],
 ): EquipmentArmoryEntry | undefined {
   if (entries.length === 0) return undefined;
-  if (statPriority.length === 0) return entries[0];
 
-  const iteratees = statPriority.map(
+  const rankedStats = [
+    ...statPriority,
+    ...StatOrder.filter((stat) => !statPriority.includes(stat)),
+  ];
+  const iteratees = rankedStats.map(
     (stat) => (entry: EquipmentArmoryEntry) => candidateStatValue(entry, stat),
   );
 
   return orderBy(
     entries,
     iteratees,
-    statPriority.map(() => 'desc' as const),
+    rankedStats.map(() => 'desc' as const),
   )[0];
 }
 
@@ -315,8 +319,9 @@ export function planEquipmentOptimization(
         !usedItemIds.has(entry.item.id) &&
         canEquipItem(character, entry.content),
     );
+    // current goes first so a stat-for-stat tie keeps it equipped (stable sort favors earlier entries).
     const winner = bestBySlotPriority(
-      current ? [...candidates, current] : candidates,
+      current ? [current, ...candidates] : candidates,
       statPriority,
     );
     if (!winner) return;

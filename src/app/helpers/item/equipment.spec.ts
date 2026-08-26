@@ -827,6 +827,66 @@ describe('Equipment Helper Functions', () => {
       expect(winners).toEqual([]);
     });
 
+    it('leaves a slot untouched when an armory candidate exactly ties the currently equipped item', () => {
+      const tiedSword = {
+        ...sword,
+        id: 'tied' as EquipmentId,
+        baseStats: { ...sword.baseStats, Strength: 10 },
+      };
+      const equippedSword = {
+        ...sword,
+        id: 'equipped' as EquipmentId,
+        baseStats: { ...sword.baseStats, Strength: 10 },
+      };
+      mockContentEntries(tiedSword, equippedSword);
+      const equippedItem = mockEquipmentItem(equippedSword.id);
+      const armoryItem = mockEquipmentItem(tiedSword.id);
+      const character = buildCharacter({
+        equipment: { ...emptyEquipment, Weapon: equippedItem },
+      });
+
+      const winners = planEquipmentOptimization(
+        character,
+        [armoryItem],
+        ['Strength'],
+      );
+
+      expect(winners).toEqual([]);
+    });
+
+    it('prefers a candidate that beats the equipped item on a stat outside statPriority, even when priority stats tie (e.g. Copper Bangle vs. Copper Ring, both 0 on Strength/Vitality/Agility/Resistance)', () => {
+      const copperRing = {
+        ...sword,
+        id: 'copper-ring' as EquipmentId,
+        baseStats: { ...sword.baseStats, Strength: 0, Agility: 0, Energy: 3 },
+      };
+      const copperBangle = {
+        ...sword,
+        id: 'copper-bangle' as EquipmentId,
+        baseStats: {
+          ...sword.baseStats,
+          Strength: 0,
+          Agility: 0,
+          Energy: 3,
+          Health: 3,
+        },
+      };
+      mockContentEntries(copperRing, copperBangle);
+      const equippedRing = mockEquipmentItem(copperRing.id);
+      const armoryBangle = mockEquipmentItem(copperBangle.id);
+      const character = buildCharacter({
+        equipment: { ...emptyEquipment, Weapon: equippedRing },
+      });
+
+      const winners = planEquipmentOptimization(
+        character,
+        [armoryBangle],
+        ['Strength', 'Vitality', 'Agility', 'Resistance'],
+      );
+
+      expect(winners).toEqual([{ item: armoryBangle, content: copperBangle }]);
+    });
+
     it("claims a two-handed item's secondary slot so nothing separate is chosen for it", () => {
       const shield = {
         ...sword,
