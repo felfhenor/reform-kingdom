@@ -35,6 +35,33 @@ jobs:
 
       - run: npm run validate
 
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: "./dist/reformkingdom/browser"
+          production-branch: master
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+          enable-commit-status: true
+          overwrites-pull-request-comment: true
+          production-deploy: true
+          enable-github-deployment: true
+          github-deployment-environment: production
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Notify deploy to Rollbar
+        uses: rollbar/github-deploy-action@2.1.2
+        with:
+          environment: "production"
+          version: ${{ github.sha }}
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+          ROLLBAR_USERNAME: ${{ github.actor }}
+
       - id: loadChangelog
         run: |
           echo 'CHANGELOG<<EOF' >> $GITHUB_ENV
