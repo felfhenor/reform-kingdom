@@ -15,6 +15,8 @@ export type PixiTiledMapRenderResult = {
   container: Container;
   // Node-name -> nametag Text, so callers can live-update a label after render (e.g. a countdown timer).
   nodeLabels: Map<string, Text>;
+  // Node-name -> wrapper Container, so callers can toggle visibility/click-ability live.
+  nodeWrappers: Map<string, Container>;
 };
 
 // Relies on the authored layer order for correct stacking, so `map.layers` renders in file order, not re-sorted.
@@ -152,10 +154,15 @@ function pixiTiledObjectLayerRender(
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
-): { container: Container; nodeLabels: Map<string, Text> } {
+): {
+  container: Container;
+  nodeLabels: Map<string, Text>;
+  nodeWrappers: Map<string, Container>;
+} {
   const container = new Container();
   container.cullable = true;
   const nodeLabels = new Map<string, Text>();
+  const nodeWrappers = new Map<string, Container>();
 
   (layer.objects ?? []).forEach((object) => {
     const rendered = pixiTiledObjectRender(
@@ -167,10 +174,12 @@ function pixiTiledObjectLayerRender(
     if (!rendered) return;
 
     container.addChild(rendered.wrapper);
+    // Only node objects carry a `type`; decorative/terrain objects are never toggled by name.
+    if (object.type) nodeWrappers.set(object.name, rendered.wrapper);
     if (rendered.label) nodeLabels.set(object.name, rendered.label);
   });
 
-  return { container, nodeLabels };
+  return { container, nodeLabels, nodeWrappers };
 }
 
 export function pixiTiledMapRender(
@@ -181,6 +190,7 @@ export function pixiTiledMapRender(
 ): PixiTiledMapRenderResult {
   const container = new Container();
   const nodeLabels = new Map<string, Text>();
+  const nodeWrappers = new Map<string, Container>();
 
   map.layers.forEach((layer) => {
     if (layer.type === 'tilelayer') {
@@ -200,7 +210,10 @@ export function pixiTiledMapRender(
     rendered.nodeLabels.forEach((label, nodeName) =>
       nodeLabels.set(nodeName, label),
     );
+    rendered.nodeWrappers.forEach((wrapper, nodeName) =>
+      nodeWrappers.set(nodeName, wrapper),
+    );
   });
 
-  return { container, nodeLabels };
+  return { container, nodeLabels, nodeWrappers };
 }

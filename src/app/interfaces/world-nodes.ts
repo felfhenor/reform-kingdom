@@ -1,10 +1,14 @@
 import type { AtlasedImage } from '@interfaces/artable';
+import type { CollectibleId } from '@interfaces/content-collectible';
 import type { RewardIdentity } from '@interfaces/droppable';
 import type { TiledObject } from '@interfaces/tiled-map';
 
 export type WorldNodeHideable = {
   // When true, name/level label and map cursor stay hidden until discovered (see world-node-discovery.ts).
   hidden?: boolean;
+
+  // Node is fully unrendered/unclickable/unnavigable until every listed collectible has been found.
+  invisibleUntilCollectibleIdsFound?: CollectibleId[];
 };
 
 export type WorldNodeEntry = {

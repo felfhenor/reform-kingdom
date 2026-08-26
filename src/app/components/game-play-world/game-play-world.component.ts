@@ -65,8 +65,10 @@ import { workersTravelingTokens } from '@helpers/worker/worker-travel';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
 import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status';
 import {
+  isWorldNodeCollectibleGateMet,
   isWorldNodeVisible,
   worldNodeByName,
+  worldNodeDiscoverIfCollectibleGateMet,
   worldNodeDiscoverIfHidden,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -170,6 +172,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private nodeSelectionContainer?: Container;
   private nodeSelectionIndicator?: Graphics;
   private nodeLabels?: Map<string, Text>;
+  private nodeWrappers?: Map<string, Container>;
   private resizeObserver?: ResizeObserver;
   private playerIndicatorTicker?: () => void;
   private visualPositionTicker?: () => void;
@@ -344,6 +347,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.nodeSelectionContainer = undefined;
     this.nodeSelectionIndicator = undefined;
     this.nodeLabels = undefined;
+    this.nodeWrappers = undefined;
     this.resizeObserver = undefined;
     this.canvas = undefined;
   }
@@ -402,7 +406,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.mapContainer.addChild(renderedMap.container);
     this.nodeLabels = renderedMap.nodeLabels;
+    this.nodeWrappers = renderedMap.nodeWrappers;
     this.updateNodeLabels();
+    this.updateNodeWrapperVisibility();
 
     this.gridOverlay = pixiGridOverlayCreate(map);
     this.gridOverlay.visible = getOption('showBackdropGrid');
@@ -438,6 +444,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateGatherProgressIndicator();
       this.updateEncounterProgressIndicator();
       this.updateNodeLabels();
+      this.updateNodeWrapperVisibility();
       this.positionCamera();
       this.updateWorkerIndicators();
     };
@@ -449,9 +456,26 @@ export class GamePlayWorldComponent implements OnDestroy {
   private onNodeClick(object: TiledObject): void {
     const entry = worldNodeByName(object.name);
     if (!entry) return;
+    if (!isWorldNodeCollectibleGateMet(entry)) return;
 
     worldNodeDiscoverIfHidden(entry);
     mapNodeSelect(entry);
+  }
+
+  // Runs every tick since a collectible pickup doesn't trigger a map rebuild.
+  private updateNodeWrapperVisibility(): void {
+    if (!this.nodeWrappers) return;
+
+    this.nodeWrappers.forEach((wrapper, nodeName) => {
+      const entry = worldNodeByName(nodeName);
+      if (!entry) return;
+
+      worldNodeDiscoverIfCollectibleGateMet(entry);
+
+      const unlocked = isWorldNodeCollectibleGateMet(entry);
+      wrapper.visible = unlocked;
+      wrapper.eventMode = unlocked ? 'static' : 'none';
+    });
   }
 
   private resolveNodeLabel(

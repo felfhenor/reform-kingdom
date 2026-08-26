@@ -21,6 +21,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import {
+  isWorldNodeCollectibleGateMet,
   worldNodeAt,
   worldNodeByName,
   worldNodeCaravan,
@@ -170,6 +171,11 @@ export function travelStart(
 ): boolean {
   if (!isAutoMode && autoModeIsEnabled()) autoModeToggle(false);
   if (!canPartyTravel()) return false;
+
+  const destinationEntry = worldNodeByName(destinationNodeName);
+  if (destinationEntry && !isWorldNodeCollectibleGateMet(destinationEntry)) {
+    return false;
+  }
 
   const travel = travelGet();
   const wasTraveling = travel.status === 'Traveling';

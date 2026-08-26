@@ -56,6 +56,7 @@ vi.mock('@helpers/world-node/world-node-encounter', () => ({
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
+  isWorldNodeCollectibleGateMet: vi.fn(() => true),
   worldNodeAt: vi.fn(() => undefined),
   worldNodeByName: vi.fn(),
   worldNodeCaravan: vi.fn(() => undefined),
@@ -101,6 +102,7 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
+  isWorldNodeCollectibleGateMet,
   worldNodeAt,
   worldNodeByName,
   worldNodeCaravan,
@@ -278,6 +280,20 @@ describe('travelStart', () => {
     vi.mocked(isGlobalEffectActive).mockReturnValue(true);
 
     expect(travelStart('Field Ruins')).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('refuses to start when the destination is collectible-gated and the gate is unmet', () => {
+    vi.mocked(worldNodeByName).mockReturnValue({
+      mapName: 'Carrina',
+      x: 5,
+      y: 5,
+      nodeName: 'Spider Tower',
+    } as unknown as WorldNodeEntry);
+    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValueOnce(false);
+
+    expect(travelStart('Spider Tower')).toBe(false);
+    expect(travelPathTo).not.toHaveBeenCalled();
     expect(updateGamestate).not.toHaveBeenCalled();
   });
 

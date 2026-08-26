@@ -329,6 +329,8 @@ function ensureEncounter(
       ensureDroppedReward,
     ),
     hidden: encounter.hidden ?? false,
+    invisibleUntilCollectibleIdsFound:
+      encounter.invisibleUntilCollectibleIdsFound ?? [],
   };
 }
 
@@ -363,6 +365,8 @@ function ensureEncounterRandom(
       ensureDroppedReward,
     ),
     hidden: encounter.hidden ?? false,
+    invisibleUntilCollectibleIdsFound:
+      encounter.invisibleUntilCollectibleIdsFound ?? [],
   };
 }
 
@@ -395,6 +399,8 @@ function ensureGathering(
     gatherTime: gathering.gatherTime ?? 1,
     gatherResults: ensureArray(gathering.gatherResults, ensureGatherResult),
     hidden: gathering.hidden ?? false,
+    invisibleUntilCollectibleIdsFound:
+      gathering.invisibleUntilCollectibleIdsFound ?? [],
     workerLevelRange: gathering.workerLevelRange ?? { min: 1, max: 99 },
   };
 }
@@ -452,6 +458,8 @@ function ensureCaravan(
       ensureCommissionOfferSlot,
     ),
     hidden: caravan.hidden ?? false,
+    invisibleUntilCollectibleIdsFound:
+      caravan.invisibleUntilCollectibleIdsFound ?? [],
   };
 }
 
@@ -796,6 +804,8 @@ function ensureNodeOverride(
     __type: 'nodeoverride',
     description: override.description ?? 'UNKNOWN',
     hidden: override.hidden ?? false,
+    invisibleUntilCollectibleIdsFound:
+      override.invisibleUntilCollectibleIdsFound ?? [],
   };
 }
 

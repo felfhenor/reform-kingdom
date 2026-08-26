@@ -1,5 +1,7 @@
 import { computed } from '@angular/core';
+import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
+import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import { tiledMapGetLayer } from '@helpers/pixi/tiled-map';
 import {
@@ -8,6 +10,7 @@ import {
 } from '@helpers/world-node/world-node-discovery';
 import type {
   CaravanContent,
+  CollectibleId,
   EncounterContent,
   EncounterRandomContent,
   GameMap,
@@ -21,6 +24,7 @@ import type {
   WorldNodePositionMap,
   WorldNodeType,
 } from '@interfaces';
+import { notifySuccess } from '../engine/notify';
 
 const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
 
@@ -141,8 +145,28 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
   );
 }
 
+// Only one content type ever matches a given node, so this `??` chain is safe.
+function worldNodeCollectibleGateIds(entry: WorldNodeEntry): CollectibleId[] {
+  return (
+    worldNodeEncounter(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeGathering(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeEncounterRandom(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeCaravan(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeOverride(entry)?.invisibleUntilCollectibleIdsFound ??
+    []
+  );
+}
+
+// Nodes with no gate are always met; gated nodes need every listed collectible found.
+export function isWorldNodeCollectibleGateMet(entry: WorldNodeEntry): boolean {
+  return worldNodeCollectibleGateIds(entry).every((collectibleId) =>
+    isCollectibleDiscovered(collectibleId),
+  );
+}
+
 // Gates the map label/cursor and auto-mode targeting; non-hidden nodes are always visible.
 export function isWorldNodeVisible(entry: WorldNodeEntry): boolean {
+  if (!isWorldNodeCollectibleGateMet(entry)) return false;
   return !isWorldNodeHidden(entry) || isWorldNodeDiscovered(entry.nodeName);
 }
 
@@ -151,6 +175,21 @@ export function worldNodeDiscoverIfHidden(entry: WorldNodeEntry): void {
   if (isWorldNodeHidden(entry) && !isWorldNodeDiscovered(entry.nodeName)) {
     worldNodeDiscover(entry.nodeName);
   }
+}
+
+// Reuses the discovery ledger/notify to dedupe; skipped when also `hidden` so a click
+// (worldNodeDiscoverIfHidden) still owns the reveal instead of the gate opening silently.
+export function worldNodeDiscoverIfCollectibleGateMet(
+  entry: WorldNodeEntry,
+): void {
+  if (worldNodeCollectibleGateIds(entry).length === 0) return;
+  if (isWorldNodeHidden(entry)) return;
+  if (isWorldNodeDiscovered(entry.nodeName)) return;
+  if (!isWorldNodeCollectibleGateMet(entry)) return;
+
+  worldNodeDiscover(entry.nodeName);
+  miscellaneousMessageLog(`**${entry.nodeName}** is now accessible.`);
+  notifySuccess(`${entry.nodeName} is now accessible.`);
 }
 
 // Masked to '???' when still hidden/undiscovered, so a location can't leak off-map.
