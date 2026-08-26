@@ -15,10 +15,6 @@ import type {
 import { caravanMarkVisited } from '../caravan/caravan';
 import { worldNodeCaravan } from '../world-node/world-nodes';
 
-export function isPageVisible(): boolean {
-  return !document.hidden;
-}
-
 // Change-detection nudge ticking once a second independent of the gameloop, so live countdowns re-render even without a gameloop tick.
 export const uiClockTick = signal<number>(0);
 setInterval(() => uiClockTick.update((tick) => tick + 1), 1000);

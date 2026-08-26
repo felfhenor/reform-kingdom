@@ -77,7 +77,7 @@ function installHeadlessShims(): void {
   g.window = globalThis;
   g.localStorage = new MemoryStorage();
   g.indexedDB = createFakeIndexedDb();
-  // `hidden: true` so `isPageVisible()` (helpers/ui.ts) reads "not visible" -
+  // `hidden: true` so `isPageVisible()` (helpers/page-visibility.ts) reads "not visible" -
   // the simulator has no real page, so notifications it would trigger
   // (worldNodeDiscover's "You discovered X!" toast, etc.) should no-op
   // rather than throw `document is not defined`.

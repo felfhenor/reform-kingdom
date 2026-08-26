@@ -5,7 +5,7 @@ import {
   Injectable,
   signal,
 } from '@angular/core';
-import { isPageVisible } from '@helpers/engine/ui';
+import { isPageVisible } from '@helpers/engine/page-visibility';
 import { gameloop } from '@helpers/gameloop';
 import { migrateGameState, migrateOptionsState } from '@helpers/migrate';
 import {

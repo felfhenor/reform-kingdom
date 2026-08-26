@@ -1,5 +1,5 @@
+import type { ItemId } from '@interfaces/content-item';
 import type { RewardIdentity } from '@interfaces/droppable';
-import type { MaterialId } from '@interfaces/state-game';
 import type { Branded } from '@interfaces/identifiable';
 
 export type DecreeClauseId = Branded<string, 'DecreeClauseId'>;
@@ -8,7 +8,7 @@ export type DecreeRiskLevel = 'Low' | 'Medium' | 'High';
 export type ExploreNodeRiskBand = DecreeRiskLevel | 'TooHigh';
 
 export type DecreeClauseAction =
-  | { type: 'GatherMaterial'; materialId: MaterialId; targetQuantity: number }
+  | { type: 'GatherMaterial'; materialId: ItemId; targetQuantity: number }
   | {
       type: 'FarmNode';
       nodeName: string;
