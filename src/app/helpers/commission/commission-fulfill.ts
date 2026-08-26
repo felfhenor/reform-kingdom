@@ -1,7 +1,7 @@
 import { isPartyAtCaravan } from '@helpers/caravan/caravan';
 import { getEntry } from '@helpers/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { travelEtaSecondsTo } from '@helpers/hero/travel';
+import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import {
   applyMaterialDelta,
   getMaterialQuantity,
@@ -124,6 +124,7 @@ export function commissionRowViewModel(
     canFulfill: commissionCanFulfill(caravan.id),
     completed: !!commissionState(caravan.id)?.completed,
     isPartyHere: isPartyAtCaravan(caravan.id),
+    canTravel: canPartyTravel(),
     travelEtaSeconds: travelEtaSecondsTo(entry.nodeName),
   };
 }

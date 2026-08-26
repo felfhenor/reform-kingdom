@@ -30,7 +30,7 @@ vi.mock('@helpers/hero/character-progress', () => ({
   syncPartyHpFromCombat: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat', () => ({
+vi.mock('@helpers/combat/combat-state', () => ({
   combatReset: vi.fn(),
   currentCombat: vi.fn(),
 }));
@@ -76,12 +76,12 @@ vi.mock('@helpers/hero/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));
 
-import { combatReset } from '@helpers/combat/combat';
 import { combatCheckIfOver } from '@helpers/combat/combat-end';
 import {
   collectibleDropHtml,
   recipeDropHtml,
 } from '@helpers/combat/combat-log';
+import { combatReset } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content';
 import { recipeDiscover } from '@helpers/crafting/recipes';

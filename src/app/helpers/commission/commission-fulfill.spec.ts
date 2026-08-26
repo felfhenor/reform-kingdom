@@ -13,6 +13,7 @@ vi.mock('@helpers/engine/analytics', () => ({
 }));
 
 vi.mock('@helpers/hero/travel', () => ({
+  canPartyTravel: vi.fn(() => true),
   travelEtaSecondsTo: vi.fn(() => undefined),
 }));
 
@@ -46,7 +47,7 @@ import {
 } from '@helpers/commission/commission-fulfill';
 import { getEntry } from '@helpers/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { travelEtaSecondsTo } from '@helpers/hero/travel';
+import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import { applyMaterialDelta, getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -468,6 +469,7 @@ describe('commissionRowViewModel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(isPartyAtCaravan).mockReturnValue(true);
+    vi.mocked(canPartyTravel).mockReturnValue(true);
     vi.mocked(travelEtaSecondsTo).mockReturnValue(undefined);
   });
 
@@ -514,6 +516,7 @@ describe('commissionRowViewModel', () => {
       canFulfill: true,
       completed: false,
       isPartyHere: true,
+      canTravel: true,
       travelEtaSeconds: undefined,
     });
   });
@@ -534,5 +537,18 @@ describe('commissionRowViewModel', () => {
     expect(row?.completed).toBe(true);
     expect(row?.isPartyHere).toBe(false);
     expect(row?.travelEtaSeconds).toBe(42);
+  });
+
+  it('reflects that the party cannot travel (e.g. mid-combat)', () => {
+    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
+    withCommissionState({
+      commissionOfferId: offer.id,
+      requirements: [],
+      completed: false,
+      generatedAt: 1000,
+    });
+    vi.mocked(canPartyTravel).mockReturnValue(false);
+
+    expect(commissionRowViewModel(entry)?.canTravel).toBe(false);
   });
 });

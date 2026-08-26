@@ -37,6 +37,7 @@ export type CommissionRowViewModel = {
   canFulfill: boolean;
   completed: boolean;
   isPartyHere: boolean;
+  canTravel: boolean;
   // Set only while actively traveling toward this caravan's node.
   travelEtaSeconds: number | undefined;
 };

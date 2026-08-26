@@ -15,6 +15,7 @@ import {
 } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
+import { combatReset, currentCombat } from '@helpers/combat/combat-state';
 import {
   combatCanTakeTurn,
   combatHandleCombatantStatusEffects,
@@ -26,7 +27,7 @@ import {
   combatGetPossibleCombatantTargetsForSkillTechnique,
   combatGetTargetsFromListBasedOnType,
 } from '@helpers/combat/combat-targetting';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate } from '@helpers/state-game';
 
 import { clamp, sortBy } from 'es-toolkit/compat';
 
@@ -41,10 +42,6 @@ import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
 type CombatTurnResult = {
   takeAnotherTurn?: boolean;
 };
-
-export function currentCombat(): Combat | undefined {
-  return gamestate().world.combat;
-}
 
 function orderCombatantsByAgility(combat: Combat): Combatant[] {
   return sortBy(
@@ -309,11 +306,4 @@ export function combatHandleFlee(): void {
   combatMessageLog(combat, 'The heroes have fled!');
   combatHandleDefeat(combat);
   combatReset();
-}
-
-export function combatReset(): void {
-  updateGamestate((state) => {
-    state.world.combat = undefined;
-    return state;
-  });
 }

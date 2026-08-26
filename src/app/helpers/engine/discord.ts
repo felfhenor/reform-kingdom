@@ -1,5 +1,5 @@
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
-import { currentCombat } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
 import { partyGet } from '@helpers/hero/party';
 import { gamestate } from '@helpers/state-game';

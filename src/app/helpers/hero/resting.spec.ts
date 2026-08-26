@@ -6,7 +6,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat', () => ({
+vi.mock('@helpers/combat/combat-state', () => ({
   currentCombat: vi.fn(() => undefined),
 }));
 
@@ -29,7 +29,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { currentCombat } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
 import {
   addGlobalEffect,

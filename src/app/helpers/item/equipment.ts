@@ -1,4 +1,4 @@
-import { currentCombat } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
 import { defaultStats, defaultTagResistances } from '@helpers/defaults';
 import {

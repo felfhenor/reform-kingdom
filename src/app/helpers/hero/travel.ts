@@ -1,5 +1,6 @@
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import { travelMessageLog } from '@helpers/combat/combat-log';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
@@ -115,12 +116,13 @@ export function travelPathTotalTicks(
   return sum(costs);
 }
 
-// Deaths Door/Healing are the only true blockers - being mid-Travel is not,
+// Deaths Door/Healing/active combat are the only true blockers - being mid-Travel is not,
 // so the party can redirect to a new destination without arriving first.
 export function canPartyTravel(): boolean {
   return (
     !isGlobalEffectActive('Deaths Door' as GlobalEffectId) &&
-    !isGlobalEffectActive('Healing' as GlobalEffectId)
+    !isGlobalEffectActive('Healing' as GlobalEffectId) &&
+    !currentCombat()
   );
 }
 

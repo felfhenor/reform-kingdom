@@ -2,7 +2,8 @@ import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
 import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
-import { combatDoCombatIteration, currentCombat } from '@helpers/combat/combat';
+import { combatDoCombatIteration } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { commissionProcessTick } from '@helpers/commission/commission-tick';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';

@@ -5,7 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
-import { currentCombat } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
 import type { StatusCardEntry } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 

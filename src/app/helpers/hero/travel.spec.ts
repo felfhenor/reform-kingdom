@@ -4,6 +4,10 @@ vi.mock('@helpers/caravan/caravan', () => ({
   caravanMarkVisited: vi.fn(),
 }));
 
+vi.mock('@helpers/combat/combat-state', () => ({
+  currentCombat: vi.fn(() => undefined),
+}));
+
 vi.mock('@helpers/decree/auto-mode', () => ({
   autoModeIsEnabled: vi.fn(() => false),
   autoModeToggle: vi.fn(),
@@ -71,6 +75,7 @@ vi.mock('@helpers/engine/ui', () => ({
 
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import { travelMessageLog } from '@helpers/combat/combat-log';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
@@ -153,6 +158,16 @@ describe('canPartyTravel', () => {
     vi.mocked(isGlobalEffectActive).mockImplementation(
       (id) => id === 'Deaths Door',
     );
+
+    expect(canPartyTravel()).toBe(false);
+  });
+
+  it('is false while combat is active', () => {
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
+    );
+    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
+    vi.mocked(currentCombat).mockReturnValue({} as never);
 
     expect(canPartyTravel()).toBe(false);
   });
@@ -251,6 +266,7 @@ describe('travelStart', () => {
       stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
     );
     vi.mocked(isGlobalEffectActive).mockReturnValue(false);
+    vi.mocked(currentCombat).mockReturnValue(undefined);
     vi.mocked(currentLocationGet).mockReturnValue({
       mapName: 'Carrina',
       x: 0,

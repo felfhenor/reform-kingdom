@@ -60,6 +60,7 @@
             <button
               type="button"
               class="btn btn-xs btn-secondary"
+              [disabled]="!r.canTravel"
               (click)="travel.emit()"
             >
               Travel Here

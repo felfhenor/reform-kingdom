@@ -5,7 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
-import { currentCombat } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
 import { partyGet } from '@helpers/hero/party';
 import type { Combatant, JobContent, StatusCardEntry } from '@interfaces';

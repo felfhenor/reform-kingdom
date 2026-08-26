@@ -1,6 +1,6 @@
-import { combatReset, currentCombat } from '@helpers/combat/combat';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
+import { combatReset, currentCombat } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content';
 import {

@@ -24,7 +24,7 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat', () => ({
+vi.mock('@helpers/combat/combat-state', () => ({
   currentCombat: vi.fn(),
 }));
 
@@ -33,7 +33,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { currentCombat } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
 import { defaultStats } from '@helpers/defaults';
 import {
