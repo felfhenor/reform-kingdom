@@ -69,6 +69,8 @@ const effigyRecipe: RecipeContent = {
   tokenUnlockCost: 3,
 };
 
+const crudeTreasureMap = 'crude-treasure-map' as CollectibleId;
+
 const jukeItos: CaravanTraderContent = {
   id: 'juke-itos' as never,
   name: 'Juke Itos',
@@ -80,7 +82,7 @@ const jukeItos: CaravanTraderContent = {
     { type: 'sell', value: 3500, collectibleId: blankPlayingCard, weight: 5 },
     { type: 'buy', value: 100, collectibleId: goblinRuby, weight: 1 },
   ],
-  tokenTrades: [],
+  tokenTrades: [{ tokenCost: 3, collectibleId: crudeTreasureMap }],
 };
 
 function mockContent(overrides: {
@@ -136,6 +138,16 @@ describe('collectibleSourceMapBuild', () => {
       { type: 'trader', name: 'Juke Itos' },
     ]);
     expect(sources.get(goblinRuby)).toBeUndefined();
+  });
+
+  it('records a trader source from a token trade (Trader Scrip offer)', () => {
+    mockContent({ caravantrader: [jukeItos] });
+
+    const sources = collectibleSourceMapBuild();
+
+    expect(sources.get(crudeTreasureMap)).toEqual([
+      { type: 'trader', name: 'Juke Itos' },
+    ]);
   });
 
   it('leaves a collectible with no source absent from the map', () => {

@@ -48,6 +48,13 @@ export function collectibleSourceMapBuild(): Map<
         addSource(trade.collectibleId, { type: 'trader', name: trader.name });
       }
     });
+
+    // Token trades (bought with Trader Scrip) are a separate offer list from `trades`.
+    trader.tokenTrades.forEach((trade) => {
+      if (trade.collectibleId) {
+        addSource(trade.collectibleId, { type: 'trader', name: trader.name });
+      }
+    });
   });
 
   sources.forEach((collectibleSources, collectibleId) => {
