@@ -1,6 +1,6 @@
 {
   "name": "reformkingdom",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "scripts": {
     "start": "concurrently \"npm run start:app\" \"npm run gamedata:watch\"",
     "start:app": "ng serve --open --port 9766",
