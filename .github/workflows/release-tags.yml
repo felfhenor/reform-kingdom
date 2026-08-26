@@ -37,6 +37,7 @@ jobs:
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
+        continue-on-error: true
         with:
           publish-dir: "./dist/reformkingdom/browser"
           production-branch: master
