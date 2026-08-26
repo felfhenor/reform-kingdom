@@ -5,7 +5,6 @@ import {
 import {
   combatantIsDead,
   combatCheckIfOver,
-  combatHandleDefeat,
   isCombatOver,
 } from '@helpers/combat/combat-end';
 import {
@@ -15,7 +14,7 @@ import {
 } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
-import { combatReset, currentCombat } from '@helpers/combat/combat-state';
+import { currentCombat } from '@helpers/combat/combat-state';
 import {
   combatCanTakeTurn,
   combatHandleCombatantStatusEffects,
@@ -297,13 +296,4 @@ export function combatDoCombatIteration(): void {
   combatCheckIfOver(combat);
 
   endCombatLogCommits();
-}
-
-export function combatHandleFlee(): void {
-  const combat = currentCombat();
-  if (!combat) return;
-
-  combatMessageLog(combat, 'The heroes have fled!');
-  combatHandleDefeat(combat);
-  combatReset();
 }

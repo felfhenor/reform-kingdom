@@ -8,7 +8,7 @@ import type { GameElement } from '@interfaces/element';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { GameStat, SkillStatScaling, StatBlock } from '@interfaces/stat';
 import { StatOrder } from '@interfaces/stat';
-import { clamp, intersection, uniq } from 'es-toolkit/compat';
+import { clamp, uniq } from 'es-toolkit/compat';
 
 // Heroes need one of requiredWeaponTypes equipped (empty = no requirement); monsters never carry equipment.
 export function skillIsUsableWithEquippedWeapons(
@@ -91,27 +91,6 @@ export function skillTechniqueStatusEffectDuration(
 
 export function skillElements(skill: EquipmentSkill): GameElement[] {
   return uniq(skill.techniques.flatMap((t) => t.elements)).sort();
-}
-
-export function skillDisplayElement(skill: EquipmentSkill): string {
-  const elements = skillElements(skill);
-
-  if (intersection(elements, ['Air', 'Fire', 'Water', 'Earth']).length === 4)
-    return 'Holy';
-
-  if (intersection(elements, ['Fire', 'Water']).length === 2) return 'Steam';
-  if (intersection(elements, ['Fire', 'Air']).length === 2) return 'Heat';
-  if (intersection(elements, ['Fire', 'Earth']).length === 2) return 'Molten';
-  if (intersection(elements, ['Water', 'Earth']).length === 2) return 'Mud';
-  if (intersection(elements, ['Water', 'Air']).length === 2) return 'Mist';
-  if (intersection(elements, ['Earth', 'Air']).length === 2) return 'Sand';
-
-  if (intersection(elements, ['Fire']).length === 1) return 'Fire';
-  if (intersection(elements, ['Water']).length === 1) return 'Water';
-  if (intersection(elements, ['Earth']).length === 1) return 'Earth';
-  if (intersection(elements, ['Air']).length === 1) return 'Air';
-
-  return elements.join(', ');
 }
 
 const ROMAN_NUMERAL_TIERS: Record<string, number> = {
