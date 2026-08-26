@@ -1,5 +1,47 @@
 <div class="flex flex-row gap-2">
   <div class="flex-1 flex flex-col">
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Timers</div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <span class="label-text !ml-0 mr-2">Tick Multiplier</span>
+            <input
+              #tickMultiplier
+              type="range"
+              [min]="1"
+              [max]="100"
+              [value]="getOption('debugTickMultiplier')"
+              (change)="
+                setOption('debugTickMultiplier', tickMultiplier.valueAsNumber)
+              "
+              class="range range-secondary"
+            />
+            <span class="ml-2">{{ getOption('debugTickMultiplier') }}x</span>
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <span class="label-text !ml-0 mr-2">Save Interval</span>
+            <input
+              #saveInterval
+              type="range"
+              [min]="1"
+              [max]="60"
+              [value]="getOption('debugSaveInterval')"
+              (change)="
+                setOption('debugSaveInterval', saveInterval.valueAsNumber)
+              "
+              class="range range-secondary"
+            />
+            <span class="ml-2">{{ getOption('debugSaveInterval') }}s</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
     <div class="card bg-base-100 foreground shadow-xl">
       <div class="card-body">
         <div class="card-title">Console Options</div>
@@ -61,50 +103,6 @@
               "
             />
             <span class="label-text">Allow Background Operations</span>
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="flex-1">
-    <div class="card bg-base-100 foreground shadow-xl mt-3">
-      <div class="card-body">
-        <div class="card-title">Timers</div>
-
-        <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
-            <span class="label-text !ml-0 mr-2">Tick Multiplier</span>
-            <input
-              #tickMultiplier
-              type="range"
-              [min]="1"
-              [max]="100"
-              [value]="getOption('debugTickMultiplier')"
-              (change)="
-                setOption('debugTickMultiplier', tickMultiplier.valueAsNumber)
-              "
-              class="range range-secondary"
-            />
-            <span class="ml-2">{{ getOption('debugTickMultiplier') }}x</span>
-          </label>
-        </div>
-
-        <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
-            <span class="label-text !ml-0 mr-2">Save Interval</span>
-            <input
-              #saveInterval
-              type="range"
-              [min]="1"
-              [max]="60"
-              [value]="getOption('debugSaveInterval')"
-              (change)="
-                setOption('debugSaveInterval', saveInterval.valueAsNumber)
-              "
-              class="range range-secondary"
-            />
-            <span class="ml-2">{{ getOption('debugSaveInterval') }}s</span>
           </label>
         </div>
       </div>
@@ -296,7 +294,7 @@
             placeholder="Select a worker..."
             [(ngModel)]="selectedWorkerId"
           ></ng-select>
-          <span></span>
+
           <button
             type="button"
             class="btn btn-secondary debug-give-btn"
@@ -306,7 +304,10 @@
             Rescue
           </button>
 
+          <span></span>
+
           <span class="label-text text-right">Worker Level</span>
+
           <input
             type="number"
             [min]="1"
@@ -314,6 +315,7 @@
             class="input input-bordered debug-give-qty"
             [(ngModel)]="workerLevel"
           />
+
           <button
             type="button"
             class="btn btn-secondary debug-give-btn"
