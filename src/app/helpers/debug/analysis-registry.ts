@@ -15,6 +15,8 @@ import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards'
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runTradeskillXpGapsAnalysis } from '@helpers/debug/analysis-tradeskillxpgaps';
+import { runWorkerReachabilityAnalysis } from '@helpers/debug/analysis-workerreachability';
+import { runWorkerStaminaAnalysis } from '@helpers/debug/analysis-workerstamina';
 import type { AnalysisScriptDefinition } from '@interfaces';
 
 // Every script the `/debug` dashboard and the `analyze:*`/`validate:*` CLI
@@ -161,6 +163,26 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runFieldNodesAnalysis,
+  },
+  {
+    id: 'workerstamina',
+    title: 'Worker Stamina',
+    description:
+      'One-way travel-tick cost from the Kingdom to every gather node, for worker stamina calibration.',
+    category: 'World & Maps',
+    strict: false,
+    inputKeys: [],
+    run: runWorkerStaminaAnalysis,
+  },
+  {
+    id: 'workerreachability',
+    title: 'Worker Reachability',
+    description:
+      'Every gather node is reachable by at least one worker, and no worker stalls before the content-wide level cap.',
+    category: 'World & Maps',
+    strict: false,
+    inputKeys: [],
+    run: runWorkerReachabilityAnalysis,
   },
 
   // --- Caravans & Commissions ---

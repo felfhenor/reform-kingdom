@@ -55,6 +55,21 @@ export function cameraPositionCalculate(
   return { x, y };
 }
 
+// Converts a tile-space position to a screen-space pixel position for the given camera.
+// Rounded to avoid subpixel offset, which shows up as hairline tearing between tiles.
+export function tileToScreenPosition(
+  tileX: number,
+  tileY: number,
+  camera: CameraPosition,
+  tileWidth: number,
+  tileHeight: number,
+): { x: number; y: number } {
+  return {
+    x: Math.round((tileX - camera.x) * tileWidth - tileWidth / 2),
+    y: Math.round((tileY - camera.y) * tileHeight - tileHeight / 2),
+  };
+}
+
 // Offset is relative to the hero-centered `base`, not absolute, so it stays valid as `base` shifts;
 // clamping against `bounds - base` keeps `base + offset` inside the map bounds.
 export function cameraOffsetFromDrag(

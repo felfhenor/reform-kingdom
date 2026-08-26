@@ -16,6 +16,7 @@ import {
   characterXpForLevel,
 } from '@helpers/hero/party';
 import { collectiblesAdd } from '@helpers/item/collectibles';
+import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { addMaterial } from '@helpers/item/materials';
 import { armoryAdd } from '@helpers/kingdom/armory';
 import {
@@ -24,6 +25,12 @@ import {
 } from '@helpers/kingdom/bestiary';
 import { updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
+import { workerRescue } from '@helpers/worker/worker-discovery';
+import {
+  WORKER_MAX_LEVEL,
+  workerXpForLevel,
+} from '@helpers/worker/worker-progression';
+import { workerAssign, workerRecall } from '@helpers/worker/worker-travel';
 import {
   worldNodeDiscover,
   worldNodeUndiscover,
@@ -40,6 +47,8 @@ import type {
   RecipeContent,
   RecipeId,
   Tradeskill,
+  WorkerContent,
+  WorkerId,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -199,6 +208,11 @@ export function debugUndiscoverWorldNode(nodeName: string): void {
   worldNodeUndiscover(nodeName);
 }
 
+// Marks a GatherNode as visited without walking the party there - workers can only be assigned to nodes discovered this way.
+export function debugDiscoverGatherNode(nodeName: string): void {
+  gatherNodeDiscover(nodeName);
+}
+
 // Reverts every hidden node back to undiscovered - a recovery tool for
 // testing hidden-node content without needing to click through each one.
 export function debugWipeWorldDiscoveries(): void {
@@ -248,4 +262,44 @@ export function debugUndiscoverRecipe(recipeId: RecipeId): void {
   }
 
   recipeUndiscover(recipe.id);
+}
+
+export function debugRescueWorker(workerId: WorkerId): void {
+  const worker = getEntry<WorkerContent>(workerId);
+  if (!worker) {
+    console.warn(`Worker with ID ${workerId} not found.`);
+    return;
+  }
+
+  workerRescue(worker.id);
+}
+
+// Bypasses the gold cost `workerLevelUp` normally requires - sets xp/level directly.
+export function debugSetWorkerLevel(workerId: WorkerId, level: number): void {
+  const clampedLevel = clamp(Math.round(level), 1, WORKER_MAX_LEVEL);
+
+  updateGamestate((state) => {
+    const worker = state.workers[workerId];
+    if (!worker) return state;
+
+    worker.level = clampedLevel;
+    worker.xp = { current: 0, maximum: workerXpForLevel(clampedLevel) };
+    return state;
+  });
+}
+
+export function debugAssignWorker(
+  workerId: WorkerId,
+  nodeName: string,
+  itemId: ItemId,
+): void {
+  if (!workerAssign(workerId, nodeName, itemId)) {
+    console.warn(
+      `Could not assign worker ${workerId} to ${nodeName} for ${itemId} - not rescued, node not discovered, item not gathered there, or out of stamina range.`,
+    );
+  }
+}
+
+export function debugRecallWorker(workerId: WorkerId): void {
+  workerRecall(workerId);
 }

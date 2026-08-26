@@ -5,8 +5,10 @@ import {
   recipeResultSpritesheet,
 } from '@helpers/crafting/recipes';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { assertNeverReward } from '@helpers/item/loot';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
+import { isWorkerRescued } from '@helpers/worker/worker-discovery';
 import {
   worldNodeEncounter,
   worldNodeEncounterRandom,
@@ -19,15 +21,18 @@ import type {
   RecipeContent,
   RewardContentInfo,
   RewardIdentity,
+  WorkerContent,
   WorldNodeCompletionRewardProgress,
   WorldNodeEntry,
 } from '@interfaces';
 
-// Stable identity string for de-duping rewards; takes RewardIdentity so callers with only an id (no odds/quantity) can use it too.
+// Stable de-dupe key. `RewardIdentity` has no `kind` (it also stores a persisted
+// Decree clause target, so it stays a minimal bare-id shape) - structural `in` checks, not a switch.
 export function rewardKey(reward: RewardIdentity): string {
   if ('itemId' in reward) return `item:${reward.itemId}`;
   if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
   if ('recipeId' in reward) return `recipe:${reward.recipeId}`;
+  if ('workerId' in reward) return `worker:${reward.workerId}`;
   return `collectible:${reward.collectibleId}`;
 }
 
@@ -61,6 +66,13 @@ export function rewardContentInfo(
           sprite: collectible.sprite,
           spritesheet: 'collectible',
         }
+      : undefined;
+  }
+
+  if ('workerId' in reward) {
+    const worker = getEntry<WorkerContent>(reward.workerId);
+    return worker
+      ? { name: worker.name, sprite: worker.sprite, spritesheet: 'worker' }
       : undefined;
   }
 
@@ -109,10 +121,20 @@ export function worldNodeCompletionRewards(
 }
 
 export function isRewardDiscovered(reward: DroppedReward): boolean {
-  if ('itemId' in reward) return isMaterialDiscovered(reward.itemId);
-  if ('equipmentId' in reward) return isEquipmentDiscovered(reward.equipmentId);
-  if ('recipeId' in reward) return isRecipeDiscovered(reward.recipeId);
-  return isCollectibleDiscovered(reward.collectibleId);
+  switch (reward.kind) {
+    case 'Item':
+      return isMaterialDiscovered(reward.itemId);
+    case 'Equipment':
+      return isEquipmentDiscovered(reward.equipmentId);
+    case 'Recipe':
+      return isRecipeDiscovered(reward.recipeId);
+    case 'Worker':
+      return isWorkerRescued(reward.workerId);
+    case 'Collectible':
+      return isCollectibleDiscovered(reward.collectibleId);
+    default:
+      return assertNeverReward(reward);
+  }
 }
 
 // Obtained/total counts for the "X/Y Rewards" info-popup badge.

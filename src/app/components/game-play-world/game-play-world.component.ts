@@ -13,6 +13,7 @@ import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-glob
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
 import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
+import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/status-worker-levelup.component';
 import { getEntry } from '@helpers/content';
 import {
   isWorldCameraPanned,
@@ -23,7 +24,6 @@ import {
 } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
 import { partyGet } from '@helpers/hero/party';
-import { travelStepTicksCost } from '@helpers/hero/travel';
 import {
   gatheringProgressFraction,
   isGathering,
@@ -38,6 +38,7 @@ import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
   cameraPositionCalculate,
+  tileToScreenPosition,
   viewportTilesCalculate,
 } from '@helpers/pixi/pixi-camera';
 import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid';
@@ -53,9 +54,14 @@ import {
   pixiSpriteFrameTexturesLoad,
   pixiTiledMapTexturesLoad,
 } from '@helpers/pixi/pixi-texture-loader';
+import {
+  defaultTravelGlideState,
+  travelGlideAdvance,
+} from '@helpers/pixi/pixi-travel-glide';
 import { gamestate } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
+import { workersTravelingTokens } from '@helpers/worker/worker-travel';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
 import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status';
 import {
@@ -70,11 +76,15 @@ import type {
   JobContent,
   TiledMap,
   TiledObject,
+  TravelGlideState,
+  WorkerContent,
+  WorkerId,
   WorldNodeLabelInfo,
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
 import { clamp } from 'es-toolkit/compat';
-import type { Application, Container, Graphics, Text, Texture } from 'pixi.js';
+import { Container } from 'pixi.js';
+import type { Application, Graphics, Text, Texture } from 'pixi.js';
 
 const FADE_DURATION_MS = 300;
 
@@ -86,6 +96,7 @@ const FADE_DURATION_MS = 300;
     BarGlobalEffectComponent,
     StatusEncounterComponent,
     StatusCraftingComponent,
+    StatusWorkerLevelupComponent,
   ],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
@@ -101,7 +112,10 @@ const FADE_DURATION_MS = 300;
     <app-panel-map-node></app-panel-map-node>
 
     <app-status-encounter class="encounter-status-layer"></app-status-encounter>
-    <app-status-crafting class="crafting-status-layer"></app-status-crafting>
+    <div class="top-right-status-layer">
+      <app-status-worker-levelup></app-status-worker-levelup>
+      <app-status-crafting></app-status-crafting>
+    </div>
   `,
   styleUrl: './game-play-world.component.scss',
 })
@@ -134,6 +148,15 @@ export class GamePlayWorldComponent implements OnDestroy {
   private mapContainer?: Container;
   private gridOverlay?: Graphics;
   private playerIndicatorContainer?: Container;
+  private workerIndicatorContainer?: Container;
+  // Each worker's sprite/graphics lives inside its own tile-positioned container, mirroring
+  // playerIndicatorContainer's child-offset scheme so the anchor math never needs duplicating here.
+  private workerTokens = new Map<WorkerId, Container>();
+  private workerGlideStates = new Map<WorkerId, TravelGlideState>();
+  private workerTokenTextures = new Map<WorkerId, Texture[]>();
+  private pendingWorkerTextureLoads = new Set<WorkerId>();
+  // Cached by positionCamera() each frame so updateWorkerIndicators() doesn't recompute it per worker.
+  private lastCamera: CameraPosition = { x: 0, y: 0 };
   private gatherProgressContainer?: Container;
   private gatherProgressBar?: {
     container: Container;
@@ -299,6 +322,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.resizeObserver?.disconnect();
     this.mapContainer?.removeChildren();
     this.playerIndicatorContainer?.removeChildren();
+    this.workerIndicatorContainer?.removeChildren();
     this.gatherProgressContainer?.removeChildren();
     this.encounterProgressContainer?.removeChildren();
     this.nodeSelectionContainer?.removeChildren();
@@ -309,6 +333,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.mapContainer = undefined;
     this.gridOverlay = undefined;
     this.playerIndicatorContainer = undefined;
+    this.workerIndicatorContainer = undefined;
+    // Tokens/glide state are per-app-instance; loaded textures persist across map transitions, same as partyTokenTextures.
+    this.workerTokens.clear();
+    this.workerGlideStates.clear();
     this.gatherProgressContainer = undefined;
     this.gatherProgressBar = undefined;
     this.encounterProgressContainer = undefined;
@@ -341,6 +369,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const containers = pixiWorldContainersCreate(this.app);
     this.mapContainer = containers.mapContainer;
     this.playerIndicatorContainer = containers.playerIndicatorContainer;
+    this.workerIndicatorContainer = containers.workerIndicatorContainer;
     this.gatherProgressContainer = containers.gatherProgressContainer;
     this.encounterProgressContainer = containers.encounterProgressContainer;
     this.nodeSelectionContainer = containers.nodeSelectionContainer;
@@ -410,6 +439,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateEncounterProgressIndicator();
       this.updateNodeLabels();
       this.positionCamera();
+      this.updateWorkerIndicators();
     };
     this.app.ticker.add(this.visualPositionTicker);
 
@@ -635,62 +665,32 @@ export class GamePlayWorldComponent implements OnDestroy {
   private updateVisualPosition(): void {
     if (!this.map) return;
 
-    const now = performance.now();
-
     const location = currentLocationGet();
-    if (location.mapName !== this.visualPosition.mapName) {
-      this.visualPosition = { ...location };
-      this.hasActiveStep = false;
-      return;
-    }
-
     const travel = gamestate().world.travel;
     const inFlightStep =
       travel.status === 'Traveling' ? travel.path[0] : undefined;
 
-    // Idle, or an instant Teleport hop - nothing to glide toward.
-    if (!inFlightStep || inFlightStep.kind === 'Teleport') {
-      this.visualPosition = { ...location };
-      this.hasActiveStep = false;
-      return;
-    }
+    const glide = travelGlideAdvance(
+      {
+        visual: this.visualPosition,
+        stepOrigin: this.stepOriginTile,
+        stepDestination: this.stepDestinationTile,
+        stepStartTime: this.stepStartTime,
+        stepDurationMs: this.stepDurationMs,
+        hasActiveStep: this.hasActiveStep,
+      },
+      location,
+      inFlightStep,
+      performance.now(),
+      getOption('debugTickMultiplier'),
+    );
 
-    const destinationChanged =
-      !this.hasActiveStep ||
-      this.stepDestinationTile.mapName !== inFlightStep.mapName ||
-      this.stepDestinationTile.x !== inFlightStep.x ||
-      this.stepDestinationTile.y !== inFlightStep.y;
-
-    if (destinationChanged) {
-      // Origin is wherever the token is currently rendered, not tick-driven `location`, to avoid a visible snap on step handoff.
-      this.stepOriginTile = { ...this.visualPosition };
-      this.stepDestinationTile = {
-        mapName: inFlightStep.mapName,
-        x: inFlightStep.x,
-        y: inFlightStep.y,
-      };
-
-      const speedMultiplier = Math.max(getOption('debugTickMultiplier'), 0.001);
-      const stepTicks = travelStepTicksCost(inFlightStep, location);
-      this.stepDurationMs = (stepTicks * 1000) / speedMultiplier;
-      this.stepStartTime = now;
-      this.hasActiveStep = true;
-    }
-
-    const fraction =
-      this.stepDurationMs > 0
-        ? clamp((now - this.stepStartTime) / this.stepDurationMs, 0, 1)
-        : 1;
-
-    this.visualPosition = {
-      mapName: location.mapName,
-      x:
-        this.stepOriginTile.x +
-        (this.stepDestinationTile.x - this.stepOriginTile.x) * fraction,
-      y:
-        this.stepOriginTile.y +
-        (this.stepDestinationTile.y - this.stepOriginTile.y) * fraction,
-    };
+    this.visualPosition = glide.visual;
+    this.stepOriginTile = glide.stepOrigin;
+    this.stepDestinationTile = glide.stepDestination;
+    this.stepStartTime = glide.stepStartTime;
+    this.stepDurationMs = glide.stepDurationMs;
+    this.hasActiveStep = glide.hasActiveStep;
   }
 
   private positionCamera(): void {
@@ -743,47 +743,167 @@ export class GamePlayWorldComponent implements OnDestroy {
     };
 
     // Offsets by half a tile so the tile center, not its top-left corner, lands at screen center.
-    const centerOffsetX = -this.map.tilewidth / 2;
-    const centerOffsetY = -this.map.tileheight / 2;
-
-    // Rounded to avoid subpixel offset, which shows up as hairline tearing between tiles.
+    // (mapContainer itself moves opposite the camera, unlike the token containers below, which
+    // stay screen-anchored at the party's own tile - so it's positioned directly, not via tileToScreenPosition.)
     this.mapContainer.position.set(
-      Math.round(-camera.x * this.map.tilewidth + centerOffsetX),
-      Math.round(-camera.y * this.map.tileheight + centerOffsetY),
+      Math.round(-camera.x * this.map.tilewidth - this.map.tilewidth / 2),
+      Math.round(-camera.y * this.map.tileheight - this.map.tileheight / 2),
     );
 
+    const tokenScreenPosition = tileToScreenPosition(
+      location.x,
+      location.y,
+      camera,
+      this.map.tilewidth,
+      this.map.tileheight,
+    );
     this.playerIndicatorContainer.position.set(
-      Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
-      Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
+      tokenScreenPosition.x,
+      tokenScreenPosition.y,
     );
-
     this.gatherProgressContainer.position.set(
-      Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
-      Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
+      tokenScreenPosition.x,
+      tokenScreenPosition.y,
     );
-
     this.encounterProgressContainer.position.set(
-      Math.round((location.x - camera.x) * this.map.tilewidth + centerOffsetX),
-      Math.round((location.y - camera.y) * this.map.tileheight + centerOffsetY),
+      tokenScreenPosition.x,
+      tokenScreenPosition.y,
     );
 
-    this.positionNodeSelectionIndicator(camera, centerOffsetX, centerOffsetY);
+    this.positionNodeSelectionIndicator(camera);
+    // Cached for updateWorkerIndicators(), which runs right after this in
+    // the ticker and needs the same camera to position N worker tokens.
+    this.lastCamera = camera;
   }
 
-  private positionNodeSelectionIndicator(
-    camera: { x: number; y: number },
-    centerOffsetX: number,
-    centerOffsetY: number,
-  ): void {
+  private positionNodeSelectionIndicator(camera: CameraPosition): void {
     if (!this.nodeSelectionIndicator || !this.map) return;
 
     const selected = selectedMapNode();
     this.nodeSelectionIndicator.visible = !!selected;
     if (!selected) return;
 
-    this.nodeSelectionIndicator.position.set(
-      Math.round((selected.x - camera.x) * this.map.tilewidth + centerOffsetX),
-      Math.round((selected.y - camera.y) * this.map.tileheight + centerOffsetY),
+    const screenPosition = tileToScreenPosition(
+      selected.x,
+      selected.y,
+      camera,
+      this.map.tilewidth,
+      this.map.tileheight,
     );
+    this.nodeSelectionIndicator.position.set(screenPosition.x, screenPosition.y);
+  }
+
+  private async loadWorkerTokenTextures(workerId: WorkerId): Promise<Texture[]> {
+    const worker = getEntry<WorkerContent>(workerId);
+    if (!worker) return [];
+
+    const frame =
+      this.contentService.artAtlases()['worker']?.[
+        `gameassets/worker/${worker.sprite}.png`
+      ];
+    if (!frame) return [];
+
+    const workerSpritesheetUrl = this.contentService.toCacheBustURL(
+      'art/spritesheets/worker.webp',
+    );
+
+    return pixiSpriteFrameTexturesLoad(workerSpritesheetUrl, frame, worker.frames);
+  }
+
+  // Diffs `workersTravelingTokens()` against the currently-rendered sprites, creating/destroying/repositioning as needed.
+  private updateWorkerIndicators(): void {
+    if (!this.workerIndicatorContainer || !this.map) return;
+
+    const tokens = workersTravelingTokens().filter(
+      (token) => token.mapName === this.loadedMapName,
+    );
+    const activeIds = new Set(tokens.map((token) => token.workerId));
+
+    for (const [workerId, token] of this.workerTokens) {
+      if (activeIds.has(workerId)) continue;
+
+      token.destroy({ children: true });
+      this.workerTokens.delete(workerId);
+      this.workerGlideStates.delete(workerId);
+    }
+
+    const now = performance.now();
+    const speedMultiplier = getOption('debugTickMultiplier');
+
+    tokens.forEach((token) => {
+      const workerLocation = gamestate().workers[token.workerId]?.location;
+      if (!workerLocation) return;
+
+      if (
+        !this.workerTokens.has(token.workerId) &&
+        !this.pendingWorkerTextureLoads.has(token.workerId)
+      ) {
+        this.createWorkerSprite(token.workerId, workerLocation);
+      }
+
+      const glide = this.workerGlideStates.get(token.workerId);
+      const workerToken = this.workerTokens.get(token.workerId);
+      if (!glide || !workerToken || !this.map) return;
+
+      const inFlightStep = token.path[0];
+      const nextGlide = travelGlideAdvance(
+        glide,
+        workerLocation,
+        inFlightStep,
+        now,
+        speedMultiplier,
+      );
+      this.workerGlideStates.set(token.workerId, nextGlide);
+
+      const screenPosition = tileToScreenPosition(
+        nextGlide.visual.x,
+        nextGlide.visual.y,
+        this.lastCamera,
+        this.map.tilewidth,
+        this.map.tileheight,
+      );
+      workerToken.position.set(screenPosition.x, screenPosition.y);
+    });
+  }
+
+  private createWorkerSprite(
+    workerId: WorkerId,
+    initialLocation: CurrentLocation,
+  ): void {
+    this.pendingWorkerTextureLoads.add(workerId);
+
+    void this.resolveWorkerTokenTextures(workerId).then((textures) => {
+      this.pendingWorkerTextureLoads.delete(workerId);
+
+      // Worker/map state may have changed while textures were loading - re-check first.
+      if (!this.workerIndicatorContainer || !this.map) return;
+      if (this.workerTokens.has(workerId)) return;
+
+      const sprite = pixiIndicatorPlayerSpriteCreate(
+        this.map.tilewidth,
+        textures,
+      );
+      // A per-worker container, positioned at the tile's screen corner, so the sprite/graphics
+      // child's own centering offset (baked in by pixiIndicatorPlayerSpriteCreate) applies unmodified.
+      const token = new Container();
+      token.addChild(sprite);
+      this.workerIndicatorContainer.addChild(token);
+      this.workerTokens.set(workerId, token);
+      this.workerGlideStates.set(
+        workerId,
+        defaultTravelGlideState(initialLocation),
+      );
+    });
+  }
+
+  private async resolveWorkerTokenTextures(
+    workerId: WorkerId,
+  ): Promise<Texture[]> {
+    const cached = this.workerTokenTextures.get(workerId);
+    if (cached) return cached;
+
+    const textures = await this.loadWorkerTokenTextures(workerId);
+    this.workerTokenTextures.set(workerId, textures);
+    return textures;
   }
 }

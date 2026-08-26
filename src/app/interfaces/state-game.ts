@@ -17,6 +17,10 @@ import type { GameStateExploreRandom } from '@interfaces/explore-random';
 import type { GatheringState } from '@interfaces/gathering';
 import type { Branded } from '@interfaces/identifiable';
 import type { TravelState } from '@interfaces/travel';
+import type {
+  GameStateDiscoveredWorkers,
+  GameStateWorkers,
+} from '@interfaces/worker-state';
 
 export type GameId = Branded<string, 'GameId'>;
 
@@ -133,6 +137,8 @@ export type GameState = {
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;
   worldDiscoveries: GameStateWorldDiscoveries;
   bestiary: GameStateBestiary;
+  workers: GameStateWorkers;
+  discoveredWorkers: GameStateDiscoveredWorkers;
   globalEffects: GlobalEffect[];
   tradeskills: GameStateTradeskills;
   discoveredAstralProjectorSpells: GameStateDiscoveredAstralProjectorSpells;

@@ -152,7 +152,9 @@ const forestRuinsEncounter: EncounterContent = {
   description: 'A dilapidated ruin.',
   levelRange: { min: 1, max: 3 },
   fights: [],
-  completionRewards: [{ recipeId: equipmentRecipe.id, chance: 0.25 }],
+  completionRewards: [
+    { kind: 'Recipe', recipeId: equipmentRecipe.id, chance: 0.25 },
+  ],
 };
 
 describe('Recipes Helper Functions', () => {

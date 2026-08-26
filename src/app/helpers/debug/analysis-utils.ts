@@ -1,5 +1,31 @@
+import { allMaps } from '@helpers/maps';
 import { sumBy } from 'es-toolkit/compat';
-import type { AnalysisLevelWindow, BaseStat, StatBlock } from '@interfaces';
+import type {
+  AnalysisLevelWindow,
+  BaseStat,
+  StatBlock,
+  TiledMap,
+} from '@interfaces';
+
+const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
+
+// Node name -> map name, from every map's Explore/Other Nodes Tiled layers.
+// Shared by analyses that need to place a content entry (by its `name`,
+// which doubles as the node name) on a specific map.
+export function buildNodeNameToMap(): Map<string, string> {
+  const nodeNameToMap = new Map<string, string>();
+
+  allMaps().forEach((gameMap) => {
+    const map = gameMap.data as TiledMap;
+    const nodes = (map.layers ?? [])
+      .filter((layer) => NODE_LAYER_NAMES.includes(layer.name))
+      .flatMap((layer) => layer.objects ?? []);
+
+    nodes.forEach((node) => nodeNameToMap.set(node.name, gameMap.name));
+  });
+
+  return nodeNameToMap;
+}
 
 const STATS: BaseStat[] = [
   'Intelligence',

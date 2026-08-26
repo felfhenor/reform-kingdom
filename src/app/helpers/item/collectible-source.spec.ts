@@ -34,7 +34,9 @@ const fieldRuinsEncounter: EncounterContent = {
   description: 'A ruined field.',
   levelRange: { min: 1, max: 5 },
   fights: [],
-  completionRewards: [{ collectibleId: goblinRuby, chance: 0.1 }],
+  completionRewards: [
+    { kind: 'Collectible', collectibleId: goblinRuby, chance: 0.1 },
+  ],
 };
 
 const gobslimeShrine: EncounterRandomContent = {
@@ -48,7 +50,9 @@ const gobslimeShrine: EncounterRandomContent = {
   combatantRange: { min: 4, max: 7 },
   creaturePool: [],
   fights: [],
-  completionRewards: [{ collectibleId: gobslimeFlower, chance: 1 }],
+  completionRewards: [
+    { kind: 'Collectible', collectibleId: gobslimeFlower, chance: 1 },
+  ],
 };
 
 const effigyRecipe: RecipeContent = {

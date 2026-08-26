@@ -31,3 +31,6 @@
   completionRewards:
     - collectibleId: Cane of Etheria
       chance: 100
+
+    - workerId: Sefirah Hornacis
+      chance: 100

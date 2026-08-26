@@ -3,6 +3,7 @@ import {
   defaultCombatStats,
   defaultStats,
   defaultTagResistances,
+  defaultWorkerStats,
 } from '@helpers/defaults';
 import type {
   AstralProjectorContent,
@@ -11,8 +12,8 @@ import type {
   AstralProjectorRequirementMaterial,
   CaravanContent,
   CaravanId,
-  CaravanTrade,
   CaravanTokenTrade,
+  CaravanTrade,
   CaravanTraderContent,
   CaravanTraderId,
   CaravanTradeType,
@@ -32,6 +33,7 @@ import type {
   DroppedItemReward,
   DroppedRecipeReward,
   DroppedReward,
+  DroppedWorkerReward,
   EncounterContent,
   EncounterFight,
   EncounterFightMonster,
@@ -90,6 +92,9 @@ import type {
   TradeskillId,
   TradeskillLevelRequirementContent,
   TradeskillLevelRequirementId,
+  WorkerContent,
+  WorkerId,
+  WorkerStatBlock,
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
 
@@ -115,6 +120,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   statuseffect: ensureStatusEffect,
   tradeskill: ensureTradeskill,
   tradeskilllevelrequirement: ensureTradeskillLevelRequirement,
+  worker: ensureWorker,
 };
 
 const VALID_GAME_ELEMENTS = Object.keys(defaultAffinities()) as GameElement[];
@@ -220,10 +226,12 @@ function ensureDroppedReward(
   reward: Partial<DroppedItemReward> &
     Partial<DroppedEquipmentReward> &
     Partial<DroppedCollectibleReward> &
-    Partial<DroppedRecipeReward> = {},
+    Partial<DroppedRecipeReward> &
+    Partial<DroppedWorkerReward> = {},
 ): DroppedReward {
   if (reward.equipmentId) {
     return {
+      kind: 'Equipment',
       equipmentId: reward.equipmentId,
       chance: reward.chance ?? 0,
     };
@@ -231,6 +239,7 @@ function ensureDroppedReward(
 
   if (reward.collectibleId) {
     return {
+      kind: 'Collectible',
       collectibleId: reward.collectibleId,
       chance: reward.chance ?? 0,
     };
@@ -238,12 +247,22 @@ function ensureDroppedReward(
 
   if (reward.recipeId) {
     return {
+      kind: 'Recipe',
       recipeId: reward.recipeId,
       chance: reward.chance ?? 0,
     };
   }
 
+  if (reward.workerId) {
+    return {
+      kind: 'Worker',
+      workerId: reward.workerId,
+      chance: reward.chance ?? 0,
+    };
+  }
+
   return {
+    kind: 'Item',
     itemId: reward.itemId ?? ('UNKNOWN' as ItemId),
     min: reward.min ?? 0,
     max: reward.max ?? 0,
@@ -376,6 +395,7 @@ function ensureGathering(
     gatherTime: gathering.gatherTime ?? 1,
     gatherResults: ensureArray(gathering.gatherResults, ensureGatherResult),
     hidden: gathering.hidden ?? false,
+    workerLevelRange: gathering.workerLevelRange ?? { min: 1, max: 99 },
   };
 }
 
@@ -409,7 +429,8 @@ function ensureCommissionOfferSlot(
   slot: Partial<CommissionOfferSlot> = {},
 ): CommissionOfferSlot {
   return {
-    commissionOfferId: slot.commissionOfferId ?? ('UNKNOWN' as CommissionOfferId),
+    commissionOfferId:
+      slot.commissionOfferId ?? ('UNKNOWN' as CommissionOfferId),
     weight: slot.weight ?? 1,
   };
 }
@@ -550,6 +571,33 @@ function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     ),
     statPriority: ensureEnumArray(job.statPriority, VALID_GAME_STATS),
     skillPath: ensureArray(job.skillPath, ensureJobSkillPath),
+  };
+}
+
+function ensureWorkerStats(
+  statblock: Partial<WorkerStatBlock> = {},
+): Required<WorkerStatBlock> {
+  return Object.assign({}, defaultWorkerStats(), statblock);
+}
+
+function ensureWorker(worker: Partial<WorkerContent>): Required<WorkerContent> {
+  const baseStats = ensureWorkerStats(worker.baseStats);
+  // A 0 gatherSpeed would make worker-gathering's tick formula divide by
+  // zero (infinite ticks per unit) - floor the BASE value only (not
+  // statsPerLevel, which can legitimately be a small or zero per-level
+  // increment) so a missing/zero-authored value can never produce a
+  // silent, permanent gather stall.
+  baseStats.gatherSpeed = Math.max(1, baseStats.gatherSpeed);
+
+  return {
+    id: worker.id ?? ('UNKNOWN' as WorkerId),
+    name: worker.name ?? 'UNKNOWN',
+    __type: 'worker',
+    description: worker.description ?? 'UNKNOWN',
+    sprite: worker.sprite ?? 'UNKNOWN',
+    frames: worker.frames ?? 4,
+    baseStats,
+    statsPerLevel: ensureWorkerStats(worker.statsPerLevel),
   };
 }
 

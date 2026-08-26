@@ -40,7 +40,7 @@
   z-index: 20;
 }
 
-.crafting-status-layer {
-  @apply absolute top-4 right-4;
+.top-right-status-layer {
+  @apply absolute top-4 right-4 flex gap-2;
   z-index: 20;
 }

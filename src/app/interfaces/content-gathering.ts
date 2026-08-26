@@ -28,4 +28,7 @@ export type GatheringContent = IsContentItem &
     gatherTime: number;
 
     gatherResults: GatherResult[];
+
+    // Gates whether a worker (see content-worker.ts) gains XP gathering here.
+    workerLevelRange: LevelRange;
   };

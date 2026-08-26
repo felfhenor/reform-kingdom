@@ -283,6 +283,77 @@
 
     <div class="card bg-base-100 foreground shadow-xl mt-3">
       <div class="card-body">
+        <div class="card-title">Workers</div>
+
+        <div class="debug-give-grid">
+          <span class="label-text text-right">Worker</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="debugWorkers()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Select a worker..."
+            [(ngModel)]="selectedWorkerId"
+          ></ng-select>
+          <span></span>
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:RescueWorker"
+            (click)="rescueWorker()"
+          >
+            Rescue
+          </button>
+
+          <span class="label-text text-right">Worker Level</span>
+          <input
+            type="number"
+            [min]="1"
+            [max]="workerMaxLevel"
+            class="input input-bordered debug-give-qty"
+            [(ngModel)]="workerLevel"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:SetWorkerLevel"
+            (click)="setWorkerLevel()"
+          >
+            Set
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Gather Nodes</div>
+
+        <div class="debug-give-grid">
+          <span class="label-text text-right">Gather Node</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="debugGatherNodes()"
+            [clearable]="false"
+            placeholder="Select a gather node..."
+            [(ngModel)]="selectedGatherNodeName"
+          ></ng-select>
+          <span></span>
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:DiscoverGatherNode"
+            (click)="discoverGatherNode()"
+          >
+            Discover
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
         <div class="card-title">Reset</div>
 
         <button

@@ -114,6 +114,7 @@ beforeEach(() => {
     if ('itemId' in reward) return `item:${reward.itemId}`;
     if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
     if ('collectibleId' in reward) return `collectible:${reward.collectibleId}`;
+    if ('workerId' in reward) return `worker:${reward.workerId}`;
     return `recipe:${reward.recipeId}`;
   });
 });
@@ -165,7 +166,7 @@ describe('farmNodeRewardOptions', () => {
     const entry = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
-      { itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
+      { kind: 'Item', itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
     ]);
     vi.mocked(rewardContentInfo).mockReturnValue({
       name: 'Bone',
@@ -188,7 +189,7 @@ describe('farmNodeRewardOptions', () => {
     const entry = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
-      { itemId: 'unknown' as ItemId, min: 1, max: 1, chance: 100 },
+      { kind: 'Item', itemId: 'unknown' as ItemId, min: 1, max: 1, chance: 100 },
     ]);
     vi.mocked(rewardContentInfo).mockReturnValue(undefined);
 
@@ -199,8 +200,8 @@ describe('farmNodeRewardOptions', () => {
     const entry = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
-      { recipeId: 'equipment-cloak' as never, chance: 25 },
-      { itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
+      { kind: 'Recipe', recipeId: 'equipment-cloak' as never, chance: 25 },
+      { kind: 'Item', itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
     ]);
     vi.mocked(rewardContentInfo).mockReturnValue({
       name: 'Bone',
@@ -222,7 +223,9 @@ describe('farmNodeRewardOptions', () => {
       fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
     } as EncounterContent);
     vi.mocked(getEntry).mockReturnValue({
-      drops: [{ itemId: 'fang' as ItemId, min: 1, max: 1, chance: 50 }],
+      drops: [
+        { kind: 'Item', itemId: 'fang' as ItemId, min: 1, max: 1, chance: 50 },
+      ],
     } as MonsterContent);
     vi.mocked(isRewardDiscovered).mockReturnValue(true);
     vi.mocked(rewardContentInfo).mockReturnValue({
@@ -244,7 +247,9 @@ describe('farmNodeRewardOptions', () => {
       fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
     } as EncounterContent);
     vi.mocked(getEntry).mockReturnValue({
-      drops: [{ itemId: 'fang' as ItemId, min: 1, max: 1, chance: 50 }],
+      drops: [
+        { kind: 'Item', itemId: 'fang' as ItemId, min: 1, max: 1, chance: 50 },
+      ],
     } as MonsterContent);
     vi.mocked(isRewardDiscovered).mockReturnValue(false);
 
@@ -260,7 +265,9 @@ describe('farmNodeRewardOptions', () => {
       creaturePool: [{ monsterId: 'hawk' as MonsterId, weight: 1 }],
     } as EncounterRandomContent);
     vi.mocked(getEntry).mockReturnValue({
-      drops: [{ itemId: 'feather' as ItemId, min: 1, max: 1, chance: 50 }],
+      drops: [
+        { kind: 'Item', itemId: 'feather' as ItemId, min: 1, max: 1, chance: 50 },
+      ],
     } as MonsterContent);
     vi.mocked(isRewardDiscovered).mockReturnValue(true);
     vi.mocked(rewardContentInfo).mockReturnValue({
@@ -282,7 +289,15 @@ describe('farmNodeRewardOptions', () => {
       fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
     } as EncounterContent);
     vi.mocked(getEntry).mockReturnValue({
-      drops: [{ itemId: 'gold-coin' as ItemId, min: 1, max: 1, chance: 100 }],
+      drops: [
+        {
+          kind: 'Item',
+          itemId: 'gold-coin' as ItemId,
+          min: 1,
+          max: 1,
+          chance: 100,
+        },
+      ],
     } as MonsterContent);
     vi.mocked(isRewardDiscovered).mockReturnValue(true);
     vi.mocked(isGoldCoinReward).mockReturnValue(true);
@@ -295,13 +310,15 @@ describe('farmNodeRewardOptions', () => {
     const entry = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
-      { itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
+      { kind: 'Item', itemId: 'bone' as ItemId, min: 1, max: 1, chance: 100 },
     ]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       fights: [{ monsters: [{ monsterId: 'wolf' as MonsterId }] }],
     } as EncounterContent);
     vi.mocked(getEntry).mockReturnValue({
-      drops: [{ itemId: 'bone' as ItemId, min: 1, max: 1, chance: 50 }],
+      drops: [
+        { kind: 'Item', itemId: 'bone' as ItemId, min: 1, max: 1, chance: 50 },
+      ],
     } as MonsterContent);
     vi.mocked(isRewardDiscovered).mockReturnValue(true);
     vi.mocked(rewardContentInfo).mockReturnValue({

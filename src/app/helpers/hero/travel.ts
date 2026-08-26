@@ -96,6 +96,25 @@ export function travelEtaSecondsTo(nodeName: string): number | undefined {
   return sum(costs);
 }
 
+// Sums a path's tick cost, threading each completed step as the next
+// origin - mirrors the per-step costing `travelProcessTick` does live, just
+// resolved all at once for a location that isn't ticking through it. Used by
+// worker stamina-gating and the workerstamina analysis script, so this
+// costing logic exists in exactly one place.
+export function travelPathTotalTicks(
+  path: TravelStep[],
+  origin: CurrentLocation,
+): number {
+  let originTile = origin;
+  const costs = path.map((step) => {
+    const cost = travelStepTicksCost(step, originTile);
+    originTile = { mapName: step.mapName, x: step.x, y: step.y };
+    return cost;
+  });
+
+  return sum(costs);
+}
+
 // Deaths Door/Healing are the only true blockers - being mid-Travel is not,
 // so the party can redirect to a new destination without arriving first.
 export function canPartyTravel(): boolean {

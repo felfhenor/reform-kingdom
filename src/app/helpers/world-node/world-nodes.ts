@@ -88,6 +88,12 @@ export function worldNodesOfType(type: WorldNodeType): WorldNodeEntry[] {
   );
 }
 
+// Returns the WorldNodeEntry (not a bare CurrentLocation) - callers need both its
+// coordinates and its `.nodeName` (see worker-travel.ts).
+export function kingdomNodeGet(): WorldNodeEntry | undefined {
+  return worldNodesOfType('Kingdom')[0];
+}
+
 export function worldNodeEncounter(
   entry: WorldNodeEntry,
 ): EncounterContent | undefined {

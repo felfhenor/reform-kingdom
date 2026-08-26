@@ -1,0 +1,220 @@
+<app-card-page heightProfile="full">
+  <span header>Quartermaster's Annex</span>
+
+  <app-button-kingdom-back pageactions />
+
+  <div class="workers-page">
+    <div class="text-xs text-center text-lighter pt-2">
+      {{ busyCount() }}/{{ entries().length }} workers busy
+    </div>
+
+    <div class="workers-layout">
+      <div class="workers-list">
+        <div class="workers-list-scroll">
+          @let selected = selectedEntry();
+
+          @for (entry of entries(); track entry.id) {
+            @let display = entryStatusDisplay(entry);
+
+            <button
+              type="button"
+              class="btn btn-outline btn-neutral justify-start h-auto normal-case font-normal gap-2 text-neutral-content text-start w-full"
+              [class.btn-active]="entry.id === selected?.id"
+              (click)="selectWorker(entry.id)"
+            >
+              <div class="zoom-row shrink-0">
+                <app-atlas-animation
+                  spritesheet="worker"
+                  [assetName]="entry.content.sprite"
+                  [frames]="entry.content.frames"
+                />
+              </div>
+
+              <div class="flex flex-col gap-1 min-w-0">
+                <span class="truncate">
+                  {{ entry.content.name }} (Lv. {{ entry.state.level }})
+                </span>
+                <span class="flex items-center gap-1 text-xs text-lighter">
+                  @if (display.locationEntry) {
+                    <app-sprite-node
+                      class="zoom-inline shrink-0"
+                      [entry]="display.locationEntry"
+                    />
+                  }
+                  <span class="truncate">{{ display.label }}</span>
+                </span>
+              </div>
+            </button>
+          } @empty {
+            <div class="text-sm text-lighter p-2">No workers rescued yet.</div>
+          }
+        </div>
+      </div>
+
+      <div class="workers-detail">
+        @if (selectedEntry(); as entry) {
+          @let displayInfo = entryStatusDisplay(entry);
+          @let stats = selectedStats();
+
+          <div class="flex items-center gap-4">
+            <div class="zoom-header shrink-0">
+              <app-atlas-animation
+                spritesheet="worker"
+                [assetName]="entry.content.sprite"
+                [frames]="entry.content.frames"
+              />
+            </div>
+
+            <div class="flex flex-col items-start gap-2">
+              <div class="font-semibold text-lg">
+                {{ entry.content.name }}
+                <span class="text-sm text-lighter font-normal">
+                  Lv. {{ entry.state.level }}
+                </span>
+              </div>
+
+              <progress
+                class="progress progress-primary w-56"
+                [value]="entry.state.xp.current"
+                [max]="entry.state.xp.maximum"
+              ></progress>
+
+              <div class="text-xs text-lighter">
+                {{ entry.state.xp.current | number }} /
+                {{ entry.state.xp.maximum | number }} XP
+              </div>
+            </div>
+
+            <button
+              class="btn btn-sm btn-accent w-fit"
+              [disabled]="!canLevelUp()"
+              [tp]="
+                entry.state.level >= workerMaxLevel
+                  ? 'Already at max level'
+                  : 'Costs ' + (levelUpCost() | number) + ' gold'
+              "
+              (click)="levelUp()"
+            >
+              Level Up ({{ levelUpCost() | number }}g)
+            </button>
+          </div>
+
+          @if (stats) {
+            <div class="flex gap-4 text-sm">
+              <span class="flex items-center gap-2">
+                <app-icon name="gameSwapBag" size="1.2em" />
+                {{ capacityDisplay() | number }} capacity
+              </span>
+
+              <span class="flex items-center gap-2">
+                <app-icon name="gameClockwork" size="1.2em" />
+                {{ stats.gatherSpeed | number: '1.0-1' }} speed
+              </span>
+
+              <span class="flex items-center gap-2">
+                <app-icon name="gameHeartBeats" size="1.2em" />
+                {{ stats.stamina | number: '1.0-1' }} stamina
+              </span>
+
+              <div class="flex flex-row gap-2 items-center">
+                @if (displayInfo.locationEntry) {
+                  <app-sprite-node
+                    class="zoom-inline shrink-0"
+                    [entry]="displayInfo.locationEntry"
+                  />
+                }
+                <div class="text-sm">{{ statusLabel() }}</div>
+              </div>
+            </div>
+          }
+
+          <p class="text-sm italic text-lighter">
+            {{ entry.content.description }}
+          </p>
+
+          <div class="divider my-1"></div>
+
+          <div class="flex flex-col gap-2">
+            <span class="font-bold text-sm">Current Assignment</span>
+
+            <div class="flex flex-row gap-2">
+              <ng-select
+                class="w-full"
+                [items]="nodeOptions()"
+                bindLabel="nodeName"
+                bindValue="nodeName"
+                placeholder="Select a gather node..."
+                [clearable]="false"
+                [ngModel]="displayedNodeName()"
+                (change)="setDraftNodeName($event.nodeName)"
+              >
+                <ng-template ng-option-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-sprite-node class="zoom-row" [entry]="item.entry" />
+                    <div>
+                      <div class="font-semibold text-sm">
+                        {{ item.nodeName }}
+                      </div>
+                      <div class="text-xs text-lighter">
+                        Lv. {{ item.levelRangeLabel }}
+                        @if (item.staminaCost !== undefined) {
+                          · {{ item.staminaCost | number }} stamina
+                        } @else {
+                          · unreachable
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+
+                <ng-template ng-label-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-sprite-node class="zoom-row" [entry]="item.entry" />
+                    {{ item.nodeName }}
+                  </div>
+                </ng-template>
+              </ng-select>
+
+              @if (displayedNodeName()) {
+                <ng-select
+                  class="w-full"
+                  [items]="itemOptions()"
+                  bindLabel="name"
+                  bindValue="id"
+                  placeholder="Select a material..."
+                  [clearable]="false"
+                  [ngModel]="displayedItemId()"
+                  (change)="setDraftItemId($event.id)"
+                >
+                  <ng-template ng-option-tmp let-item="item">
+                    <app-option-reward [reward]="item" />
+                  </ng-template>
+
+                  <ng-template ng-label-tmp let-item="item">
+                    <app-option-reward [reward]="item" />
+                  </ng-template>
+                </ng-select>
+              }
+
+              <button
+                class="btn btn-sm btn-primary w-fit"
+                [disabled]="!canConfirmAssignment()"
+                (click)="confirmAssignment()"
+              >
+                Confirm Assignment
+              </button>
+
+              @if (canRecall()) {
+                <button class="btn btn-sm btn-error w-fit" (click)="recall()">
+                  Recall
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="text-sm text-lighter">No worker selected.</div>
+        }
+      </div>
+    </div>
+  </div>
+</app-card-page>

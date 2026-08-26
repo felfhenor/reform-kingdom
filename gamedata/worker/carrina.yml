@@ -1,0 +1,31 @@
+- id: 6aa84bbe-0d78-4936-8d78-0f1b89269f87
+  name: Weaver Welch
+  description: Welch was once stuck in the tower, lost while gathering spider silk. She knows how to gather a thing or two, despite how clumsy she appears.
+  sprite: '0000'
+  frames: 4
+
+  baseStats:
+    capacity: 6
+    gatherSpeed: 0.5
+    stamina: 30
+
+  statsPerLevel:
+    capacity: 0.5
+    gatherSpeed: 0.1
+    stamina: 3.5
+
+- id: 5d6e1292-0ccc-40f2-a2b4-929074579cf1
+  name: Dekar Anten
+  description: Dekar got lost exploring the Gobslime Shrine, but now that he's saved, he'll go do all of the gathering requested of him.
+  sprite: '0004'
+  frames: 4
+
+  baseStats:
+    capacity: 8
+    gatherSpeed: 1
+    stamina: 40
+
+  statsPerLevel:
+    capacity: 0.5
+    gatherSpeed: 0.1
+    stamina: 2

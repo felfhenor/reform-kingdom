@@ -32,7 +32,8 @@
     "./schemas/skill.schema.json": "gamedata/skill/**/*.yml",
     "./schemas/statuseffect.schema.json": "gamedata/statuseffect/**/*.yml",
     "./schemas/tradeskill.schema.json": "gamedata/tradeskill/**/*.yml",
-    "./schemas/tradeskilllevelrequirement.schema.json": "gamedata/tradeskilllevelrequirement/**/*.yml"
+    "./schemas/tradeskilllevelrequirement.schema.json": "gamedata/tradeskilllevelrequirement/**/*.yml",
+    "./schemas/worker.schema.json": "gamedata/worker/**/*.yml"
   },
   "exportall.config.relExclusion": [
     "/src/app/interfaces/index.ts",

@@ -106,8 +106,8 @@ const fieldRuinsEncounter: EncounterContent = {
   levelRange: { min: 1, max: 5 },
   fights: [],
   completionRewards: [
-    { collectibleId: goblinRuby.id, chance: 0.1 },
-    { recipeId: boneHewnCloakRecipe.id, chance: 0.25 },
+    { kind: 'Collectible', collectibleId: goblinRuby.id, chance: 0.1 },
+    { kind: 'Recipe', recipeId: boneHewnCloakRecipe.id, chance: 0.25 },
   ],
 };
 

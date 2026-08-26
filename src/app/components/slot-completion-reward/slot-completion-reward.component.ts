@@ -15,8 +15,10 @@ import {
   recipeResultSpritesheet,
 } from '@helpers/crafting/recipes';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { assertNeverReward } from '@helpers/item/loot';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
+import { isWorkerRescued } from '@helpers/worker/worker-discovery';
 import type {
   CollectibleContent,
   DropRarity,
@@ -24,6 +26,7 @@ import type {
   EquipmentContent,
   ItemContent,
   RecipeContent,
+  WorkerContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -57,16 +60,27 @@ export class SlotCompletionRewardComponent {
     return getEntry<RecipeContent>(reward.recipeId);
   });
 
-  public spritesheet = computed<'item' | 'equipment' | 'collectible'>(() => {
-    const reward = this.reward();
-    if ('itemId' in reward) return 'item';
-    if ('equipmentId' in reward) return 'equipment';
-    if ('recipeId' in reward) {
-      const recipe = this.recipeContent();
-      return recipe ? recipeResultSpritesheet(recipe) : 'item';
-    }
-    return 'collectible';
-  });
+  public spritesheet = computed<'item' | 'equipment' | 'collectible' | 'worker'>(
+    () => {
+      const reward = this.reward();
+      switch (reward.kind) {
+        case 'Item':
+          return 'item';
+        case 'Equipment':
+          return 'equipment';
+        case 'Worker':
+          return 'worker';
+        case 'Recipe': {
+          const recipe = this.recipeContent();
+          return recipe ? recipeResultSpritesheet(recipe) : 'item';
+        }
+        case 'Collectible':
+          return 'collectible';
+        default:
+          return assertNeverReward(reward);
+      }
+    },
+  );
 
   // Composited behind the result sprite for recipe rewards only (see
   // `SlotMuseumRecipeComponent`, which uses the same backdrop) - the visual
@@ -78,28 +92,47 @@ export class SlotCompletionRewardComponent {
 
   public content = computed<RewardContent | undefined>(() => {
     const reward = this.reward();
-    if ('itemId' in reward) return getEntry<ItemContent>(reward.itemId);
-    if ('equipmentId' in reward) {
-      return getEntry<EquipmentContent>(reward.equipmentId);
+    switch (reward.kind) {
+      case 'Item':
+        return getEntry<ItemContent>(reward.itemId);
+      case 'Equipment':
+        return getEntry<EquipmentContent>(reward.equipmentId);
+      case 'Worker': {
+        const worker = getEntry<WorkerContent>(reward.workerId);
+        // Workers have no rarity of their own - displayed as Rare, matching
+        // how rare a worker rescue actually is.
+        return worker ? { ...worker, rarity: 'Rare' as DropRarity } : undefined;
+      }
+      case 'Recipe': {
+        const recipe = this.recipeContent();
+        const result = recipe ? recipeResultContent(recipe) : undefined;
+        // The recipe's own name (not its crafted result's) - a recipe reward
+        // grants the blueprint, not the item, and recipe names already carry
+        // a "Category: Item" naming convention that calls this out.
+        return recipe && result ? { ...result, name: recipe.name } : undefined;
+      }
+      case 'Collectible':
+        return getEntry<CollectibleContent>(reward.collectibleId);
+      default:
+        return assertNeverReward(reward);
     }
-    if ('recipeId' in reward) {
-      const recipe = this.recipeContent();
-      const result = recipe ? recipeResultContent(recipe) : undefined;
-      // The recipe's own name (not its crafted result's) - a recipe reward
-      // grants the blueprint, not the item, and recipe names already carry
-      // a "Category: Item" naming convention that calls this out.
-      return recipe && result ? { ...result, name: recipe.name } : undefined;
-    }
-    return getEntry<CollectibleContent>(reward.collectibleId);
   });
 
   public isDiscovered = computed(() => {
     const reward = this.reward();
-    if ('itemId' in reward) return isMaterialDiscovered(reward.itemId);
-    if ('equipmentId' in reward) {
-      return isEquipmentDiscovered(reward.equipmentId);
+    switch (reward.kind) {
+      case 'Item':
+        return isMaterialDiscovered(reward.itemId);
+      case 'Equipment':
+        return isEquipmentDiscovered(reward.equipmentId);
+      case 'Recipe':
+        return isRecipeDiscovered(reward.recipeId);
+      case 'Worker':
+        return isWorkerRescued(reward.workerId);
+      case 'Collectible':
+        return isCollectibleDiscovered(reward.collectibleId);
+      default:
+        return assertNeverReward(reward);
     }
-    if ('recipeId' in reward) return isRecipeDiscovered(reward.recipeId);
-    return isCollectibleDiscovered(reward.collectibleId);
   });
 }

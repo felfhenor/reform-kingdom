@@ -30,9 +30,16 @@ describe('ensureContent', () => {
       } as unknown as MonsterContent);
 
       expect(result.drops).toEqual([
-        { itemId: 'gold', min: 1, max: 5, bonusPerLevel: 2, chance: 0.5 },
-        { equipmentId: 'rusty-sword', chance: 0.1 },
-        { itemId: 'UNKNOWN', min: 0, max: 0, chance: 0 },
+        {
+          kind: 'Item',
+          itemId: 'gold',
+          min: 1,
+          max: 5,
+          bonusPerLevel: 2,
+          chance: 0.5,
+        },
+        { kind: 'Equipment', equipmentId: 'rusty-sword', chance: 0.1 },
+        { kind: 'Item', itemId: 'UNKNOWN', min: 0, max: 0, chance: 0 },
       ]);
       expect(result.skills).toEqual([
         { skillId: 'bite', weight: 1 },
@@ -67,7 +74,7 @@ describe('ensureContent', () => {
         { monsters: [] },
       ]);
       expect(result.completionRewards).toEqual([
-        { collectibleId: 'seed', chance: 1 },
+        { kind: 'Collectible', collectibleId: 'seed', chance: 1 },
       ]);
     });
   });
@@ -92,7 +99,7 @@ describe('ensureContent', () => {
       ]);
       expect(result.fights).toEqual([]);
       expect(result.completionRewards).toEqual([
-        { collectibleId: 'gobslime-flower', chance: 100 },
+        { kind: 'Collectible', collectibleId: 'gobslime-flower', chance: 100 },
       ]);
     });
 

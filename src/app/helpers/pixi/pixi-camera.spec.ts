@@ -4,6 +4,7 @@ import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
   cameraPositionCalculate,
+  tileToScreenPosition,
   viewportTilesCalculate,
 } from '@helpers/pixi/pixi-camera';
 
@@ -106,5 +107,28 @@ describe('cameraOffsetFromDrag', () => {
     expect(
       cameraOffsetFromDrag({ x: 0, y: 0 }, 100000, 0, 32, 32, base, bounds),
     ).toEqual({ x: bounds.minX - base.x, y: 0 });
+  });
+});
+
+describe('tileToScreenPosition', () => {
+  it('centers the tile at the camera origin, offset by half a tile', () => {
+    expect(tileToScreenPosition(0, 0, { x: 0, y: 0 }, 32, 32)).toEqual({
+      x: -16,
+      y: -16,
+    });
+  });
+
+  it('offsets by the distance from the camera, in pixels', () => {
+    expect(tileToScreenPosition(5, 3, { x: 2, y: 1 }, 32, 32)).toEqual({
+      x: (5 - 2) * 32 - 16,
+      y: (3 - 1) * 32 - 16,
+    });
+  });
+
+  it('rounds to whole pixels to avoid subpixel tearing', () => {
+    expect(tileToScreenPosition(1.4, 2.6, { x: 0, y: 0 }, 32, 32)).toEqual({
+      x: Math.round(1.4 * 32 - 16),
+      y: Math.round(2.6 * 32 - 16),
+    });
   });
 });

@@ -6,6 +6,10 @@
     min: 15
     max: 16
 
+  workerLevelRange:
+    min: 10
+    max: 15
+
   xpGainedIfInLevelRange: 5
   gatherTime: 10
 
@@ -37,6 +41,10 @@
   levelRange:
     min: 15
     max: 16
+
+  workerLevelRange:
+    min: 5
+    max: 15
 
   xpGainedIfInLevelRange: 5
   gatherTime: 10

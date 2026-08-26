@@ -90,6 +90,8 @@ vi.mock('@helpers/defaults', () => ({
     discoveredGatherNodes: {},
     worldDiscoveries: {},
     bestiary: {},
+    workers: {},
+    discoveredWorkers: {},
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
     world: { party: [], autoMode: { clauses: [] }, commissions: {} },
@@ -112,6 +114,16 @@ vi.mock('@helpers/world-node/world-node-discovery', () => ({
 
 vi.mock('@helpers/world-node/world-node-gathering', () => ({
   allGatherableMaterialIds: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/worker/worker-discovery', () => ({
+  isWorkerContentKnown: vi.fn(() => true),
+  pruneInvalidDiscoveredWorkers: vi.fn((discovered) => discovered),
+  pruneInvalidWorkerStates: vi.fn((workers) => workers),
+}));
+
+vi.mock('@helpers/worker/worker-travel', () => ({
+  workerAssignmentIsValid: vi.fn(() => true),
 }));
 
 vi.mock('@helpers/state-game', () => ({

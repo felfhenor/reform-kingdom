@@ -1,0 +1,15 @@
+- id: a1cfe88b-4380-45fa-b51f-90b2ba456e6b
+  name: Sefirah Hornacis
+  description: A great explorer, but like most, got lost in the Miserable Mire. She knows her way around the Craggled Mire region.
+  sprite: '0008'
+  frames: 4
+
+  baseStats:
+    capacity: 7
+    gatherSpeed: 1.3
+    stamina: 50
+
+  statsPerLevel:
+    capacity: 1
+    gatherSpeed: 0.1
+    stamina: 2

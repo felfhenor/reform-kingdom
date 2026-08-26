@@ -7,17 +7,22 @@ import { isRecipeDropGated } from '@helpers/crafting/recipes';
 import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting/tradeskill';
 import {
   debugDiscoverAllRecipes,
+  debugDiscoverGatherNode,
   debugFillBestiary,
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
+  debugRescueWorker,
   debugResetBestiary,
   debugResetCommissions,
   debugSetCharacterLevel,
   debugSetTradeskillLevel,
+  debugSetWorkerLevel,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug';
 import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
+import { WORKER_MAX_LEVEL } from '@helpers/worker/worker-progression';
+import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type {
   CharacterId,
   CollectibleContent,
@@ -29,6 +34,8 @@ import type {
   RecipeContent,
   RecipeId,
   Tradeskill,
+  WorkerContent,
+  WorkerId,
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -96,6 +103,22 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedTradeskill = signal<Tradeskill | undefined>(undefined);
   public tradeskillLevel = signal<number>(1);
 
+  public debugWorkers = computed(() =>
+    sortBy(getEntriesByType<WorkerContent>('worker'), (worker) => worker.name),
+  );
+
+  public workerMaxLevel = WORKER_MAX_LEVEL;
+  public selectedWorkerId = signal<WorkerId | undefined>(undefined);
+  public workerLevel = signal<number>(1);
+
+  public debugGatherNodes = computed(() =>
+    sortBy(
+      worldNodesOfType('GatherNode').map((entry) => entry.nodeName),
+      (nodeName) => nodeName,
+    ),
+  );
+  public selectedGatherNodeName = signal<string | undefined>(undefined);
+
   public giveItem(): void {
     const itemId = this.selectedItemId();
     if (!itemId) return;
@@ -152,5 +175,26 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!recipeId) return;
 
     debugUndiscoverRecipe(recipeId);
+  }
+
+  public rescueWorker(): void {
+    const workerId = this.selectedWorkerId();
+    if (!workerId) return;
+
+    debugRescueWorker(workerId);
+  }
+
+  public setWorkerLevel(): void {
+    const workerId = this.selectedWorkerId();
+    if (!workerId) return;
+
+    debugSetWorkerLevel(workerId, this.workerLevel());
+  }
+
+  public discoverGatherNode(): void {
+    const nodeName = this.selectedGatherNodeName();
+    if (!nodeName) return;
+
+    debugDiscoverGatherNode(nodeName);
   }
 }

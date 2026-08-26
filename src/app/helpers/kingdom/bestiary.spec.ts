@@ -94,6 +94,7 @@ const goblin: MonsterContent = {
   xp: { min: 3, max: 5, bonusPerLevel: 1 },
   drops: [
     {
+      kind: 'Item',
       itemId: 'gold-coin' as ItemId,
       min: 3,
       max: 10,
@@ -507,6 +508,7 @@ describe('Bestiary Helper Functions', () => {
   describe('bestiaryDropQuantityLabel', () => {
     it('shows the raw range when bonusPerLevel is absent, regardless of level', () => {
       const reward = {
+        kind: 'Item' as const,
         itemId: 'gold-coin' as ItemId,
         min: 3,
         max: 10,
@@ -521,6 +523,7 @@ describe('Bestiary Helper Functions', () => {
       expect(
         bestiaryDropQuantityLabel(
           {
+            kind: 'Item',
             itemId: 'gold-coin' as ItemId,
             min: 3,
             max: 10,
@@ -535,7 +538,13 @@ describe('Bestiary Helper Functions', () => {
     it('collapses to a single number when min equals max', () => {
       expect(
         bestiaryDropQuantityLabel(
-          { itemId: 'gold-coin' as ItemId, min: 5, max: 5, chance: 100 },
+          {
+            kind: 'Item',
+            itemId: 'gold-coin' as ItemId,
+            min: 5,
+            max: 5,
+            chance: 100,
+          },
           1,
         ),
       ).toBe('5');
@@ -544,7 +553,7 @@ describe('Bestiary Helper Functions', () => {
     it('shows 1 for a flat-chance equipment/collectible/recipe drop regardless of level', () => {
       expect(
         bestiaryDropQuantityLabel(
-          { equipmentId: 'sword' as never, chance: 10 },
+          { kind: 'Equipment', equipmentId: 'sword' as never, chance: 10 },
           5,
         ),
       ).toBe('1');

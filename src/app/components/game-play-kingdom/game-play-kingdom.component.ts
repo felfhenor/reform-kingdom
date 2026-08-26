@@ -15,6 +15,7 @@ import { PlayKingdomTradeskillBlacksmithingComponent } from '@components/play-ki
 import { PlayKingdomTradeskillJewelcraftingComponent } from '@components/play-kingdom-tradeskill-jewelcrafting/play-kingdom-tradeskill-jewelcrafting.component';
 import { PlayKingdomTradeskillTailoringComponent } from '@components/play-kingdom-tradeskill-tailoring/play-kingdom-tradeskill-tailoring.component';
 import { PlayKingdomTradeskillWoodworkingComponent } from '@components/play-kingdom-tradeskill-woodworking/play-kingdom-tradeskill-woodworking.component';
+import { PlayKingdomWorkersComponent } from '@components/play-kingdom-workers/play-kingdom-workers.component';
 import { kingdomSubview } from '@helpers/engine/ui';
 
 @Component({
@@ -36,6 +37,7 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomTradeskillWoodworkingComponent,
     PlayKingdomAchievementsComponent,
     PlayKingdomPrestigeComponent,
+    PlayKingdomWorkersComponent,
     ModalPlayKingdomReclassComponent,
   ],
   templateUrl: './game-play-kingdom.component.html',

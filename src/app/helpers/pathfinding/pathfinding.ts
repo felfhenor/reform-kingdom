@@ -294,13 +294,14 @@ function travelPathAcrossMaps(
   return undefined;
 }
 
-export function travelPathTo(
+// Pure by-location variant of `travelPathTo`, so non-party travelers (workers - see
+// `worker-travel.ts`) can path from an arbitrary origin, not just the hero party's current tile.
+export function travelPathFrom(
+  location: CurrentLocation,
   destinationNodeName: string,
 ): TravelStep[] | undefined {
   const destination = worldNodeByName(destinationNodeName);
   if (!destination) return undefined;
-
-  const location = currentLocationGet();
 
   // Traveling "to" a TeleportNode means crossing it, not just standing next
   // to it - so the jump to its paired arrival tile is part of this path.
@@ -313,6 +314,12 @@ export function travelPathTo(
   }
 
   return travelPathAcrossMaps(location, destination);
+}
+
+export function travelPathTo(
+  destinationNodeName: string,
+): TravelStep[] | undefined {
+  return travelPathFrom(currentLocationGet(), destinationNodeName);
 }
 
 // Neighboring maps reachable by a single teleport hop from `mapName`.

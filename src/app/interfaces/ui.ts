@@ -19,4 +19,5 @@ export type KingdomSubview =
   | 'tradeskill-tailoring'
   | 'tradeskill-woodworking'
   | 'achievements'
-  | 'prestige';
+  | 'prestige'
+  | 'workers';

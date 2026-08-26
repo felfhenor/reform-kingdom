@@ -18,4 +18,5 @@ export type AtlasedImage =
   | 'job'
   | 'monster'
   | 'skill'
-  | 'tradeskill';
+  | 'tradeskill'
+  | 'worker';

@@ -7,8 +7,11 @@
 
 import { sortBy } from 'es-toolkit/compat';
 import { getEntriesByType } from '@helpers/content';
-import { formatWindows, gapWindowsForRanges } from '@helpers/debug/analysis-utils';
-import { allMaps } from '@helpers/maps';
+import {
+  buildNodeNameToMap,
+  formatWindows,
+  gapWindowsForRanges,
+} from '@helpers/debug/analysis-utils';
 import type {
   AnalysisCheck,
   AnalysisParams,
@@ -18,25 +21,7 @@ import type {
   EncounterRandomContent,
   GatheringContent,
   NodeLevelCheckEntry,
-  TiledMap,
 } from '@interfaces';
-
-const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
-
-function buildNodeNameToMap(): Map<string, string> {
-  const nodeNameToMap = new Map<string, string>();
-
-  allMaps().forEach((gameMap) => {
-    const map = gameMap.data as TiledMap;
-    const nodes = (map.layers ?? [])
-      .filter((layer) => NODE_LAYER_NAMES.includes(layer.name))
-      .flatMap((layer) => layer.objects ?? []);
-
-    nodes.forEach((node) => nodeNameToMap.set(node.name, gameMap.name));
-  });
-
-  return nodeNameToMap;
-}
 
 export function runNodeLevelsAnalysis(params: AnalysisParams): AnalysisRunResult {
   const gapSize = Number(params['gap'] ?? 4);

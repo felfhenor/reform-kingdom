@@ -160,6 +160,9 @@
       max: 200
       chance: 100
 
+    - workerId: Weaver Welch
+      chance: 1
+
 - id: 1c711838-085f-4be3-b1cb-2d672f8b4660
   name: Jelly Fields
   description: A majestic field where slimes run free in peaceful harmony.

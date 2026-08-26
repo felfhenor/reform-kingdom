@@ -22,6 +22,7 @@ import {
   tiledMapPathMatrix,
   tiledMapWalkabilityMatrix,
   tileIsOnPath,
+  travelPathFrom,
   travelPathTo,
 } from '@helpers/pathfinding/pathfinding';
 import { currentLocationGet } from '@helpers/world';
@@ -596,6 +597,43 @@ describe('travelPathTo', () => {
 
     expect(path).not.toBeUndefined();
     expect(path?.every((step) => step.x === 4 || step.y === 0)).toBe(true);
+  });
+});
+
+describe('travelPathFrom', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
+  });
+
+  // Behavior-preserving extraction from travelPathTo (which now just calls
+  // this with currentLocationGet()) - this confirms a non-party origin works
+  // too, which is what worker travel relies on.
+  it('paths from an arbitrary origin, not just the current location', () => {
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
+    );
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([
+        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
+      ]),
+    );
+
+    expect(
+      travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins'),
+    ).toEqual([
+      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+    ]);
+    expect(currentLocationGet).not.toHaveBeenCalled();
+  });
+
+  it('returns undefined when the destination node does not exist', () => {
+    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+
+    expect(
+      travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Nowhere'),
+    ).toBeUndefined();
   });
 });
 

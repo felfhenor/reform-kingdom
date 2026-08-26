@@ -51,24 +51,29 @@ export function pixiResponsiveCanvasSetup(
 export function pixiWorldContainersCreate(app: Application): {
   mapContainer: Container;
   playerIndicatorContainer: Container;
+  workerIndicatorContainer: Container;
   gatherProgressContainer: Container;
   encounterProgressContainer: Container;
   nodeSelectionContainer: Container;
 } {
   const mapContainer = new Container();
   const playerIndicatorContainer = new Container();
+  const workerIndicatorContainer = new Container();
   const gatherProgressContainer = new Container();
   const encounterProgressContainer = new Container();
   const nodeSelectionContainer = new Container();
 
   app.stage.addChild(mapContainer);
   app.stage.addChild(playerIndicatorContainer);
+  app.stage.addChild(workerIndicatorContainer);
   app.stage.addChild(gatherProgressContainer);
   app.stage.addChild(encounterProgressContainer);
   app.stage.addChild(nodeSelectionContainer);
 
   mapContainer.cullable = true;
   playerIndicatorContainer.cullable = false;
+  // Stays at (0,0), unlike playerIndicatorContainer - holds N worker tokens, each positioned individually.
+  workerIndicatorContainer.cullable = false;
   gatherProgressContainer.cullable = false;
   encounterProgressContainer.cullable = false;
   nodeSelectionContainer.cullable = false;
@@ -76,6 +81,7 @@ export function pixiWorldContainersCreate(app: Application): {
   return {
     mapContainer,
     playerIndicatorContainer,
+    workerIndicatorContainer,
     gatherProgressContainer,
     encounterProgressContainer,
     nodeSelectionContainer,

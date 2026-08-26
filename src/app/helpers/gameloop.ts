@@ -25,6 +25,7 @@ import {
   updateGamestate,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
+import { workersProcessTick } from '@helpers/worker/worker-tick';
 import { clamp } from 'es-toolkit/compat';
 
 export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
@@ -68,6 +69,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     autoModeProcessTick();
     craftProcessTick();
     restingProcessTick();
+    workersProcessTick();
 
     if (currentCombat()) {
       combatDoCombatIteration();

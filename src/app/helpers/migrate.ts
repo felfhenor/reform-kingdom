@@ -50,6 +50,12 @@ import {
   setGameState,
 } from '@helpers/state-game';
 import { defaultOptions, options, setOptions } from '@helpers/state-options';
+import {
+  isWorkerContentKnown,
+  pruneInvalidDiscoveredWorkers,
+  pruneInvalidWorkerStates,
+} from '@helpers/worker/worker-discovery';
+import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node/world-node-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import {
@@ -163,6 +169,14 @@ export function migrateGameState() {
   );
   newState.bestiary = pruneInvalidBestiaryEntries(newState.bestiary);
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);
+  newState.discoveredWorkers = pruneInvalidDiscoveredWorkers(
+    newState.discoveredWorkers,
+    isWorkerContentKnown,
+  );
+  newState.workers = pruneInvalidWorkerStates(
+    newState.workers,
+    workerAssignmentIsValid,
+  );
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
   newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
   newState.world.currentLocation = repairUnwalkableCurrentLocation(

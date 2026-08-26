@@ -11,6 +11,7 @@ import type {
   StatBlock,
   StatusEffectTag,
   TravelState,
+  WorkerStatBlock,
 } from '@interfaces';
 
 export function defaultGameState(): GameState {
@@ -50,6 +51,8 @@ export function defaultGameState(): GameState {
     discoveredGatherNodes: {},
     worldDiscoveries: {},
     bestiary: {},
+    workers: {},
+    discoveredWorkers: {},
     globalEffects: [],
     tradeskills: defaultTradeskills(),
     discoveredAstralProjectorSpells: {},
@@ -98,6 +101,14 @@ export function defaultStats(): StatBlock {
     Resistance: 0,
     Strength: 0,
     Vitality: 0,
+  };
+}
+
+export function defaultWorkerStats(): WorkerStatBlock {
+  return {
+    capacity: 0,
+    gatherSpeed: 0,
+    stamina: 0,
   };
 }
 

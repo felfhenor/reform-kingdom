@@ -43,7 +43,14 @@ describe('Monster Helper Functions', () => {
     targettingType: 'Random',
     xp: { min: 3, max: 5, bonusPerLevel: 1 },
     drops: [
-      { itemId: goldCoinId, min: 3, max: 10, bonusPerLevel: 1, chance: 100 },
+      {
+        kind: 'Item',
+        itemId: goldCoinId,
+        min: 3,
+        max: 10,
+        bonusPerLevel: 1,
+        chance: 100,
+      },
     ],
     skills: [{ skillId: 'Attack' as EquipmentSkillId, weight: 1 }],
   };

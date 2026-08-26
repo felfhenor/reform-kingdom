@@ -1,8 +1,10 @@
 import { getEntry } from '@helpers/content';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
+import { assertNeverReward } from '@helpers/item/loot';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
+import { isWorkerRescued } from '@helpers/worker/worker-discovery';
 import {
   isGoldCoinReward,
   isRewardDiscovered,
@@ -53,13 +55,22 @@ export function exploreNodeFarmOptions(): ExploreNodeFarmOption[] {
   );
 }
 
-// Strips a reward down to its bare identity - drops the drop-table odds/
-// quantity-range fields, which have no bearing on what's being farmed.
+// Strips a reward down to its bare identity, dropping the drop-table odds/quantity fields.
 function toRewardIdentity(reward: DroppedReward): RewardIdentity {
-  if ('itemId' in reward) return { itemId: reward.itemId };
-  if ('equipmentId' in reward) return { equipmentId: reward.equipmentId };
-  if ('collectibleId' in reward) return { collectibleId: reward.collectibleId };
-  return { recipeId: reward.recipeId };
+  switch (reward.kind) {
+    case 'Item':
+      return { itemId: reward.itemId };
+    case 'Equipment':
+      return { equipmentId: reward.equipmentId };
+    case 'Collectible':
+      return { collectibleId: reward.collectibleId };
+    case 'Worker':
+      return { workerId: reward.workerId };
+    case 'Recipe':
+      return { recipeId: reward.recipeId };
+    default:
+      return assertNeverReward(reward);
+  }
 }
 
 // Every monster fought at `entry`'s encounter - a static fight list for an
@@ -114,8 +125,10 @@ export function farmNodeRewardOptions(
 
   const seen = new Set<string>();
 
+  // Recipes and workers are excluded: both are one-time unlocks, not
+  // something to accumulate/farm a quantity of.
   return rewards
-    .filter((reward) => !('recipeId' in reward))
+    .filter((reward) => !('recipeId' in reward) && !('workerId' in reward))
     .map((reward) => {
       const identity = toRewardIdentity(reward);
       const key = rewardKey(identity);
@@ -131,6 +144,8 @@ export function farmNodeRewardOptions(
 }
 
 // Current stock of `reward`, generalized across all reward types. Equipment has no quantity field so it's counted from owned armory entries; recipes read as 1/0 (known or not).
+// Workers read the same way (1/0 rescued or not) - unreachable in practice
+// since farmNodeRewardOptions excludes them, kept for type completeness.
 export function farmNodeRewardQuantity(reward: RewardIdentity): number {
   if ('itemId' in reward) return getMaterialQuantity(reward.itemId);
 
@@ -142,6 +157,8 @@ export function farmNodeRewardQuantity(reward: RewardIdentity): number {
   if ('collectibleId' in reward) {
     return getCollectibleQuantity(reward.collectibleId);
   }
+
+  if ('workerId' in reward) return isWorkerRescued(reward.workerId) ? 1 : 0;
 
   return isRecipeDiscovered(reward.recipeId) ? 1 : 0;
 }

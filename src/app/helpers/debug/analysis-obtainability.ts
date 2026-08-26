@@ -15,6 +15,7 @@ import type {
   ItemContent,
   MonsterContent,
   RecipeContent,
+  WorkerContent,
 } from '@interfaces';
 
 // Granted unconditionally by game code - kept in sync by hand with
@@ -34,12 +35,14 @@ function collectFromDroppedRewards(
   itemIds: Set<string>,
   equipmentIds: Set<string>,
   collectibleIds: Set<string>,
+  workerIds: Set<string>,
 ): void {
   rewards.forEach((reward) => {
     if ('itemId' in reward) addIfPresent(itemIds, reward.itemId);
     if ('equipmentId' in reward) addIfPresent(equipmentIds, reward.equipmentId);
     if ('collectibleId' in reward)
       addIfPresent(collectibleIds, reward.collectibleId);
+    if ('workerId' in reward) addIfPresent(workerIds, reward.workerId);
   });
 }
 
@@ -99,10 +102,12 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
   const recipes = getEntriesByType<RecipeContent>('recipe');
   const caravanTraders =
     getEntriesByType<CaravanTraderContent>('caravantrader');
+  const workers = getEntriesByType<WorkerContent>('worker');
 
   const obtainableItems = new Set<string>();
   const obtainableEquipment = new Set<string>();
   const obtainableCollectibles = new Set<string>();
+  const obtainableWorkers = new Set<string>();
 
   monsters.forEach((monster) =>
     collectFromDroppedRewards(
@@ -110,6 +115,7 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
       obtainableItems,
       obtainableEquipment,
       obtainableCollectibles,
+      obtainableWorkers,
     ),
   );
 
@@ -119,6 +125,7 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
       obtainableItems,
       obtainableEquipment,
       obtainableCollectibles,
+      obtainableWorkers,
     ),
   );
 
@@ -158,6 +165,7 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
     ...checkCandidates('Item', items, obtainableItems),
     ...checkCandidates('Collectible', collectibles, obtainableCollectibles),
     ...checkCandidates('Equipment', equipment, obtainableEquipment),
+    ...checkCandidates('Worker', workers, obtainableWorkers),
   ];
 
   const failures = checks.filter((c) => c.status === 'fail').length;

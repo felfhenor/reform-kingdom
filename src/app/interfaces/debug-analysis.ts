@@ -93,6 +93,40 @@ export type NodeLevelCheckEntry = {
   mapName: string;
 };
 
+export type WorkerStaminaCheckEntry = {
+  name: string;
+  mapName: string;
+  oneWayTicks: number | undefined;
+};
+
+// A gather node's stamina cost and worker level window, as seen by the reachability analysis.
+export type WorkerReachabilityNode = {
+  nodeName: string;
+  mapName: string;
+  oneWayTicks: number | undefined;
+  levelRange: LevelRange;
+};
+
+export type WorkerReachabilityCheckEntry = {
+  workerName: string;
+  nodeName: string;
+  mapName: string;
+  oneWayTicks: number | undefined;
+  // Undefined unless the worker's own leveling progression actually reaches this level - see `achievableLevelCap`.
+  reachableAtLevel: number | undefined;
+  levelRange: LevelRange;
+};
+
+// One worker whose leveling stalls short of the content-wide ideal cap, and why.
+export type WorkerLevelingGapEntry = {
+  workerName: string;
+  stuckAtLevel: number;
+  blockingNodeName: string | undefined;
+  blockingNodeLevelRange: LevelRange | undefined;
+  workerStaminaAtStuckLevel: number;
+  blockingNodeStaminaCost: number | undefined;
+};
+
 export type MapNodeCheckRef = {
   mapName: string;
   node: TiledObject;

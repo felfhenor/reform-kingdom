@@ -40,3 +40,6 @@
       min: 200
       max: 250
       chance: 100
+
+    - workerId: Dekar Anten
+      chance: 100

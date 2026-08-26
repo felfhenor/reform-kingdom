@@ -238,7 +238,7 @@ describe('combatCheckIfOver', () => {
       (id) => (id === 'enc-1' ? encounter : collectible) as never,
     );
     vi.mocked(rollDroppedRewards).mockReturnValue([
-      { collectibleId: collectible.id },
+      { kind: 'Collectible', collectibleId: collectible.id },
     ]);
     vi.mocked(collectibleDropHtml).mockReturnValue('Swamp Clam');
 
@@ -265,7 +265,9 @@ describe('combatCheckIfOver', () => {
     vi.mocked(getEntry).mockImplementation(
       (id) => (id === 'enc-1' ? encounter : recipe) as never,
     );
-    vi.mocked(rollDroppedRewards).mockReturnValue([{ recipeId: recipe.id }]);
+    vi.mocked(rollDroppedRewards).mockReturnValue([
+      { kind: 'Recipe', recipeId: recipe.id },
+    ]);
     vi.mocked(recipeDropHtml).mockReturnValue('Equipment: Bone-Hewn Cloak');
 
     const combat = buildCombat({

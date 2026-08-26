@@ -275,6 +275,7 @@ const program = TJS.getProgramFromFiles(
       __dirname,
       '../src/app/interfaces/content-tradeskill-level-requirement.ts',
     ),
+    path.resolve(__dirname, '../src/app/interfaces/content-worker.ts'),
   ],
   {
     strictNullChecks: false, // Disabled to handle complex types
@@ -317,6 +318,7 @@ const contentTypeMap = {
   statuseffect: 'StatusEffectContent',
   tradeskill: 'TradeskillContent',
   tradeskilllevelrequirement: 'TradeskillLevelRequirementContent',
+  worker: 'WorkerContent',
 };
 
 // Content types whose schema generated successfully - used to populate

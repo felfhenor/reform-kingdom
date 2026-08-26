@@ -101,10 +101,10 @@ describe('worldNodeCompletionRewards', () => {
 
     const encounter = buildEncounter({
       completionRewards: [
-        { itemId: goldCoin.id, min: 1, max: 1, chance: 100 },
-        { itemId: bone.id, min: 1, max: 1, chance: 100 },
-        { itemId: bone.id, min: 1, max: 1, chance: 50 },
-        { collectibleId: clam.id, chance: 50 },
+        { kind: 'Item', itemId: goldCoin.id, min: 1, max: 1, chance: 100 },
+        { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 100 },
+        { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 50 },
+        { kind: 'Collectible', collectibleId: clam.id, chance: 50 },
       ],
     });
 
@@ -114,8 +114,8 @@ describe('worldNodeCompletionRewards', () => {
     seedContent([goldCoin, bone, clam, encounter]);
 
     expect(worldNodeCompletionRewards(buildEntry())).toEqual([
-      { itemId: bone.id, min: 1, max: 1, chance: 100 },
-      { collectibleId: clam.id, chance: 50 },
+      { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 100 },
+      { kind: 'Collectible', collectibleId: clam.id, chance: 50 },
     ]);
   });
 
@@ -138,13 +138,13 @@ describe('worldNodeCompletionRewards', () => {
     };
 
     const encounter = buildEncounter({
-      completionRewards: [{ recipeId: recipe.id, chance: 25 }],
+      completionRewards: [{ kind: 'Recipe', recipeId: recipe.id, chance: 25 }],
     });
 
     seedContent([recipe, encounter]);
 
     expect(worldNodeCompletionRewards(buildEntry())).toEqual([
-      { recipeId: recipe.id, chance: 25 },
+      { kind: 'Recipe', recipeId: recipe.id, chance: 25 },
     ]);
   });
 });
@@ -178,8 +178,8 @@ describe('worldNodeCompletionRewardProgress', () => {
 
     const encounter = buildEncounter({
       completionRewards: [
-        { itemId: bone.id, min: 1, max: 1, chance: 100 },
-        { equipmentId: equipment.id, chance: 10 },
+        { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 100 },
+        { kind: 'Equipment', equipmentId: equipment.id, chance: 10 },
       ],
     });
 

@@ -82,6 +82,7 @@ import {
   canPartyTravel,
   travelBeginDeathsDoor,
   travelEtaSecondsTo,
+  travelPathTotalTicks,
   travelProcessTick,
   travelStart,
 } from '@helpers/hero/travel';
@@ -204,6 +205,42 @@ describe('travelEtaSecondsTo', () => {
     // Off-path Move steps cost TICKS_PER_STEP_OFF_PATH (3) each; the first
     // step already has 1 tick of progress, so 2 remain, plus 3 for the second.
     expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBe(5);
+  });
+});
+
+describe('travelPathTotalTicks', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns 0 for an empty path', () => {
+    expect(
+      travelPathTotalTicks([], { mapName: 'Carrina', x: 0, y: 0 }),
+    ).toBe(0);
+  });
+
+  it('sums off-path move costs, threading each step as the next origin', () => {
+    const path = [
+      { kind: 'Move' as const, mapName: 'Carrina', x: 1, y: 0 },
+      { kind: 'Move' as const, mapName: 'Carrina', x: 2, y: 0 },
+    ];
+
+    // Both steps are plain off-path Moves (worldNodeAt/tileIsOnPath default
+    // to false/undefined), so each costs TICKS_PER_STEP_OFF_PATH (3).
+    expect(
+      travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 }),
+    ).toBe(6);
+  });
+
+  it('treats a Teleport step as free', () => {
+    const path = [
+      { kind: 'Teleport' as const, mapName: 'Craggledmire', x: 5, y: 5 },
+      { kind: 'Move' as const, mapName: 'Craggledmire', x: 6, y: 5 },
+    ];
+
+    expect(
+      travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 }),
+    ).toBe(3);
   });
 });
 

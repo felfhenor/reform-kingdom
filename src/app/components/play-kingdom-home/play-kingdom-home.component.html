@@ -40,7 +40,7 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-3 gap-4">
       <button
         class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
         (click)="openSubview('museum')"
@@ -71,6 +71,26 @@
           discovered
         </span>
       </button>
+
+      @if (workersUnlocked()) {
+        <button
+          class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+          (click)="openSubview('workers')"
+        >
+          @let levelUpReady = workerLevelUpReadyCount();
+
+          <span class="text-base font-bold">Quartermaster's Annex</span>
+          <span class="text-xs text-lighter">
+            {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
+          </span>
+          @if (levelUpReady > 0) {
+            <span class="text-xs text-lighter">
+              {{ levelUpReady }}
+              {{ 'worker' | pluralize: levelUpReady > 1 }} ready for level up
+            </span>
+          }
+        </button>
+      }
     </div>
 
     <div class="grid grid-cols-5 gap-4">

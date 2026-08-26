@@ -26,6 +26,7 @@ import {
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum';
 import { gamestate } from '@helpers/state-game';
+import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
   worldNodeCaravan,
@@ -83,6 +84,23 @@ export class PlayKingdomHomeComponent {
   public bestiaryEntries = computed(() => getBestiaryEntries());
   public bestiaryDiscoveredCount = computed(
     () => this.bestiaryEntries().filter((entry) => entry.discovered).length,
+  );
+
+  // Hidden until the player has rescued at least one worker.
+  public workersUnlocked = computed(
+    () => Object.keys(gamestate().discoveredWorkers).length > 0,
+  );
+  public workerTotalCount = computed(
+    () => Object.keys(gamestate().workers).length,
+  );
+  public workerBusyCount = computed(
+    () =>
+      Object.values(gamestate().workers).filter(
+        (worker) => worker.status.kind !== 'AtDuchy',
+      ).length,
+  );
+  public workerLevelUpReadyCount = computed(
+    () => workersReadyToLevelUpEntries().length,
   );
 
   // Hidden until any caravan has actually generated a commission.

@@ -4,8 +4,14 @@
   @apply block h-full;
 }
 
+// Flex-col wrapper for the discovered-count subtitle + the two-column layout below it, so the
+// layout gets its remaining share of height via flex-1 rather than fighting the subtitle for h-full.
+.bestiary-page {
+  @apply flex flex-col h-full min-h-0;
+}
+
 .bestiary-layout {
-  @apply flex gap-4 h-full p-4 min-h-0;
+  @apply flex gap-4 p-4 min-h-0 flex-1;
 }
 
 .bestiary-list {

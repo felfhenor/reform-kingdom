@@ -1,0 +1,24 @@
+@let isExpanded = expanded();
+@let data = entry();
+
+<div class="status-entry" [class.expanded]="isExpanded">
+  <div class="entry-icon">
+    <div class="zoom-row">
+      <app-atlas-animation
+        spritesheet="worker"
+        [assetName]="data.sprite"
+        [frames]="data.frames"
+      />
+    </div>
+    @if (!isExpanded) {
+      <span class="entry-timer">Lv. {{ data.level }}</span>
+    }
+  </div>
+
+  @if (isExpanded) {
+    <div class="entry-details">
+      <span class="entry-subtitle text-lighter">Ready to level up</span>
+      <span class="entry-name truncate">{{ data.name }}</span>
+    </div>
+  }
+</div>
