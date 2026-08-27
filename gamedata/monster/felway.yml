@@ -20,6 +20,12 @@
     - skillId: Attack
       weight: 1
 
+    - skillId: Double Strike III
+      weight: 4
+
+    - skillId: Sweep III
+      weight: 4
+
   baseStats:
     Health: 500
     Energy: 100
