@@ -1,0 +1,41 @@
+- id: abada04f-1132-47c6-8555-4864e691227b
+  name: Lesser Fel Demon
+  description: A lesser demon, often found serving Fel's commander.
+
+  sprite: '0088'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Uncommon
+
+  xp:
+    min: 125
+    max: 130
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+  baseStats:
+    Health: 500
+    Energy: 100
+    Luck: 5
+    Intelligence: 15
+    Strength: 25
+    Vitality: 20
+    Resistance: 15
+    Agility: 10
+
+  statsPerLevel:
+    Health: 15
+    Energy: 5
+    Luck: 0.3
+    Intelligence: 0.3
+    Strength: 0.4
+    Vitality: 0.2
+    Resistance: 0.3
+    Agility: 0.4

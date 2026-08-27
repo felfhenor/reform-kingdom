@@ -20,3 +20,11 @@
 - id: f43cbdc1-d635-4448-9906-80bc91cce184
   name: Templar's Exit
   description: A passageway from Templar's Retreat back to Carrina.
+
+- id: 458a1ee7-080e-4463-a247-c297d079b16e
+  name: Felway Path
+  description: A passageway used by the demons of Fel to invade Carrina.
+
+- id: 290f772d-af55-4915-9d12-9119ecaf106e
+  name: Carrina Path
+  description: A passageway used by the demons of Fel to invade Carrina.

@@ -81,3 +81,9 @@
   rarity: Uncommon
   description: Feathers from a hawk trained by elves in their secret training grounds.
   sprite: '0019'
+
+- id: 28517507-04e5-452d-81b0-c909d67ebd6d
+  name: Fel Demon Feather
+  rarity: Uncommon
+  description: A broken feather, torn from the wing of a fel demon. It stands as a reminder of the evil that infests the world.
+  sprite: '0039'
