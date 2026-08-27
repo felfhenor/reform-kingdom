@@ -5,8 +5,8 @@ import {
   input,
   output,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import {
@@ -28,7 +28,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-museum-recipe',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
+    IconItemPreviewComponent,
     CurrencyCostComponent,
     SlotIconBlankComponent,
     IconUnknownComponent,

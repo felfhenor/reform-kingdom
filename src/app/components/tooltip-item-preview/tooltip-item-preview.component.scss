@@ -8,5 +8,5 @@
 }
 
 .tooltip-item-preview-image {
-  @apply shrink-0;
+  @apply relative w-[64px] h-[64px] shrink-0;
 }

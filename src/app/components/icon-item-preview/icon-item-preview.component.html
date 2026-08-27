@@ -1,0 +1,20 @@
+@if (backdropSprite(); as backdrop) {
+  <div class="icon-item-preview-stack {{ cssClass() }}">
+    <app-atlas-image
+      spritesheet="item"
+      [assetName]="backdrop"
+      class="icon-item-preview-backdrop"
+    />
+    <app-atlas-image
+      [spritesheet]="spritesheet()"
+      [assetName]="sprite()"
+      class="icon-item-preview-result"
+    />
+  </div>
+} @else {
+  <app-atlas-image
+    [spritesheet]="spritesheet()"
+    [assetName]="sprite()"
+    [cssClass]="cssClass()"
+  />
+}

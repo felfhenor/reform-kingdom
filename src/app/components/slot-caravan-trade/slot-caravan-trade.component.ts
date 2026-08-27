@@ -5,11 +5,11 @@ import {
   input,
   output,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { caravanTradeDisplay } from '@helpers/caravan/caravan-trade';
+import { caravanTradeDisplay } from '@helpers/caravan/caravan-trade-display';
 import { goldCoinId, hasGold } from '@helpers/item/materials';
 import type { CaravanTradeRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -18,7 +18,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-caravan-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
+    IconItemPreviewComponent,
     CurrencyCostComponent,
     SlotIconBlankComponent,
     TooltipItemPreviewComponent,

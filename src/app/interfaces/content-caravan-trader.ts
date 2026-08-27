@@ -1,6 +1,7 @@
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
+import type { RecipeId } from '@interfaces/content-recipe';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
@@ -20,6 +21,8 @@ export type CaravanTrade = {
   itemId?: ItemId;
   equipmentId?: EquipmentId;
   collectibleId?: CollectibleId;
+  // A recipe sale is one-time like a collectible - see caravanTradeMaxQuantity.
+  recipeId?: RecipeId;
 
   // Omitted for unlimited-quantity trades (e.g. unique collectible sells).
   limit?: number;
@@ -31,13 +34,14 @@ export type CaravanTrade = {
 
 // A trader's own token-priced offerings - always visible (not subject to
 // the 4-slot weighted `trades` rotation), bought with Trader Scrips instead
-// of gold. Named generically since the reward won't always be a collectible.
+// of gold.
 export type CaravanTokenTrade = {
   tokenCost: number;
 
   itemId?: ItemId;
   equipmentId?: EquipmentId;
   collectibleId?: CollectibleId;
+  recipeId?: RecipeId;
 };
 
 export type CaravanTraderContent = IsContentItem &

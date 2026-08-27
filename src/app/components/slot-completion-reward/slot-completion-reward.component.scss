@@ -4,25 +4,6 @@
   @apply block;
 }
 
-.completion-reward-tooltip-image {
-  @apply shrink-0;
-}
-
-// Both layers are centered independently (rather than stretched to fill),
-// since the backdrop and result sprites aren't guaranteed to share the same
-// intrinsic size - mirrors `MuseumRecipeSlotComponent`'s composited icon.
-.completion-reward-icon {
-  @apply relative w-full h-full;
-}
-
 .completion-reward-tooltip-icon {
   @apply relative w-[64px] h-[64px] shrink-0;
-}
-
-.completion-reward-icon-backdrop {
-  @apply absolute z-0;
-}
-
-.completion-reward-icon-result {
-  @apply absolute z-10;
 }

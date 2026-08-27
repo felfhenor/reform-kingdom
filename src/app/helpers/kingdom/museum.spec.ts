@@ -111,6 +111,24 @@ const fieldRuinsEncounter: EncounterContent = {
   ],
 };
 
+const alekiaTrader = {
+  id: 'alekia-figaro' as never,
+  name: 'Alekia Figaro',
+  __type: 'caravantrader',
+  description: 'I deal in mystical recipes.',
+  category: 'Carrina',
+  level: 15,
+  trades: [
+    {
+      type: 'sell',
+      value: 25000,
+      recipeId: copperIngotRecipe.id,
+      weight: 1,
+    },
+  ],
+  tokenTrades: [],
+} as never;
+
 describe('Museum Helper Functions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -262,7 +280,10 @@ describe('Museum Helper Functions', () => {
 
   describe('recipeSourceNodeNames', () => {
     it('returns the names of encounters that can drop the recipe', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([fieldRuinsEncounter]);
+      vi.mocked(getEntriesByType).mockImplementation(
+        (type) =>
+          (type === 'encounter' ? [fieldRuinsEncounter] : []) as never,
+      );
 
       expect(recipeSourceNodeNames(boneHewnCloakRecipe.id)).toEqual([
         'Field Ruins',
@@ -270,20 +291,33 @@ describe('Museum Helper Functions', () => {
     });
 
     it('excludes encounters whose rewards do not include the recipe', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([fieldRuinsEncounter]);
+      vi.mocked(getEntriesByType).mockImplementation(
+        (type) =>
+          (type === 'encounter' ? [fieldRuinsEncounter] : []) as never,
+      );
 
       expect(recipeSourceNodeNames(copperIngotRecipe.id)).toEqual([]);
+    });
+
+    it('returns the names of caravan traders that sell the recipe', () => {
+      vi.mocked(getEntriesByType).mockImplementation(
+        (type) =>
+          (type === 'caravantrader' ? [alekiaTrader] : []) as never,
+      );
+
+      expect(recipeSourceNodeNames(copperIngotRecipe.id)).toEqual([
+        'Alekia Figaro',
+      ]);
     });
   });
 
   describe('getMuseumRecipeEntries', () => {
     it('includes an undiscovered drop-gated recipe with its source encounter names', () => {
-      vi.mocked(getEntriesByType).mockImplementation(
-        (type) =>
-          (type === 'recipe'
-            ? [copperIngotRecipe, boneHewnCloakRecipe]
-            : [fieldRuinsEncounter]) as never,
-      );
+      vi.mocked(getEntriesByType).mockImplementation(((type: string) => {
+        if (type === 'recipe') return [copperIngotRecipe, boneHewnCloakRecipe];
+        if (type === 'encounter') return [fieldRuinsEncounter];
+        return [];
+      }) as typeof getEntriesByType);
       vi.mocked(isRecipeDropGated).mockImplementation(
         (id) => id === boneHewnCloakRecipe.id,
       );
@@ -313,12 +347,11 @@ describe('Museum Helper Functions', () => {
 
     // Guards against relying on stale stored discovery state.
     it('recomputes source encounter names live even for a discovered recipe', () => {
-      vi.mocked(getEntriesByType).mockImplementation(
-        (type) =>
-          (type === 'recipe'
-            ? [boneHewnCloakRecipe]
-            : [fieldRuinsEncounter]) as never,
-      );
+      vi.mocked(getEntriesByType).mockImplementation(((type: string) => {
+        if (type === 'recipe') return [boneHewnCloakRecipe];
+        if (type === 'encounter') return [fieldRuinsEncounter];
+        return [];
+      }) as typeof getEntriesByType);
       vi.mocked(isRecipeDropGated).mockReturnValue(true);
       vi.mocked(isRecipeDiscovered).mockReturnValue(true);
 
@@ -327,6 +360,27 @@ describe('Museum Helper Functions', () => {
           recipe: boneHewnCloakRecipe,
           discovered: true,
           sourceNodeNames: ['Field Ruins'],
+        },
+      ]);
+    });
+
+    it('includes a trader-sold recipe, sourced by the trader name', () => {
+      vi.mocked(getEntriesByType).mockImplementation(((type: string) => {
+        if (type === 'recipe') return [copperIngotRecipe];
+        if (type === 'caravantrader') return [alekiaTrader];
+        return [];
+      }) as typeof getEntriesByType);
+      vi.mocked(isRecipeDropGated).mockImplementation(
+        (id) => id === copperIngotRecipe.id,
+      );
+      vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+
+      expect(getMuseumRecipeEntries()).toEqual([
+        {
+          recipe: copperIngotRecipe,
+          discovered: false,
+          sourceNodeNames: ['Alekia Figaro'],
+          tokenUnlockCost: copperIngotRecipe.tokenUnlockCost,
         },
       ]);
     });

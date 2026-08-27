@@ -125,18 +125,11 @@
             [tp]="entry.resultDisplay ? preview.template() : undefined"
             [tpPlacement]="'top'"
           >
-            @if (entry.backdropSprite) {
-              <app-atlas-image
-                spritesheet="item"
-                [assetName]="entry.backdropSprite"
-                class="absolute inset-0"
-              />
-            }
             @if (entry.resultContent) {
-              <app-atlas-image
+              <app-icon-item-preview
+                [sprite]="entry.resultContent.sprite"
                 [spritesheet]="entry.resultSpritesheet"
-                [assetName]="entry.resultContent.sprite"
-                class="absolute inset-0"
+                [backdropSprite]="entry.backdropSprite"
               />
             }
           </div>

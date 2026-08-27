@@ -1,0 +1,18 @@
+@reference 'tailwindcss';
+
+// Contents so this component's own box doesn't affect the caller's layout.
+:host {
+  @apply contents;
+}
+
+.icon-item-preview-stack {
+  @apply relative w-full h-full;
+}
+
+.icon-item-preview-backdrop {
+  @apply absolute z-0;
+}
+
+.icon-item-preview-result {
+  @apply absolute z-10;
+}

@@ -12,6 +12,7 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntriesByType, getEntry } from '@helpers/content';
@@ -63,6 +64,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     AtlasImageComponent,
     CardPageComponent,
     DecimalPipe,
+    IconItemPreviewComponent,
     SlotIconBlankComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,

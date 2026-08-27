@@ -10,6 +10,7 @@ import {
 } from '@helpers/item/collectibles';
 import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
 import type {
+  CaravanTraderContent,
   CollectibleContent,
   CollectibleSource,
   EncounterContent,
@@ -91,9 +92,10 @@ export function filterMuseumCollectibleEntries(
   });
 }
 
-// Encounters a recipe can drop from - computed live so it can't go stale.
+// Encounters a recipe can drop from, plus caravan traders that sell it.
 export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
   const encounters = getEntriesByType<EncounterContent>('encounter');
+  const traders = getEntriesByType<CaravanTraderContent>('caravantrader');
 
   const names = new Set<string>();
   encounters.forEach((encounter) => {
@@ -101,6 +103,13 @@ export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
       (reward) => 'recipeId' in reward && reward.recipeId === recipeId,
     );
     if (dropsHere) names.add(encounter.name);
+  });
+
+  traders.forEach((trader) => {
+    const soldHere =
+      trader.trades.some((trade) => trade.recipeId === recipeId) ||
+      trader.tokenTrades.some((trade) => trade.recipeId === recipeId);
+    if (soldHere) names.add(trader.name);
   });
 
   return [...names];

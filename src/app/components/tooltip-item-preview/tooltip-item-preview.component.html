@@ -1,11 +1,13 @@
 <ng-template #tooltipContent>
   @if (display(); as item) {
     <div class="flex gap-2 p-2 max-w-[400px]">
-      <app-atlas-image
-        [spritesheet]="item.spritesheet"
-        [assetName]="item.sprite"
-        class="tooltip-item-preview-image shrink-0"
-      />
+      <div class="tooltip-item-preview-image">
+        <app-icon-item-preview
+          [sprite]="item.sprite"
+          [spritesheet]="item.spritesheet"
+          [backdropSprite]="item.backdropSprite"
+        />
+      </div>
       <div>
         <div class="font-bold mb-1 text-{{ item.rarity }}">
           {{ item.name }}

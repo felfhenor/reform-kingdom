@@ -1,4 +1,5 @@
 import { caravanEligibleTraders } from '@helpers/caravan/caravan';
+import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -64,14 +65,15 @@ function pickTrader(
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// A unique collectible sell is permanently removed from every trader's
-// rotation once owned - it should never be re-offered anywhere.
+// A unique collectible or recipe sell is retired from the rotation once owned.
 function pickActiveTradeIndices(trader: CaravanTraderContent): number[] {
   const eligible = trader.trades
     .map((trade, index) => ({ index, weight: trade.weight, trade }))
     .filter(
       ({ trade }) =>
-        !trade.collectibleId || !isCollectibleDiscovered(trade.collectibleId),
+        (!trade.collectibleId ||
+          !isCollectibleDiscovered(trade.collectibleId)) &&
+        (!trade.recipeId || !isRecipeDiscovered(trade.recipeId)),
     );
 
   return caravanWeightedSample(eligible, ACTIVE_TRADE_COUNT).map(

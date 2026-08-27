@@ -157,6 +157,32 @@ const forestRuinsEncounter: EncounterContent = {
   ],
 };
 
+const alekiaTrader = {
+  id: 'alekia-figaro' as never,
+  name: 'Alekia Figaro',
+  __type: 'caravantrader',
+  description: 'I deal in mystical recipes.',
+  category: 'Carrina',
+  level: 15,
+  trades: [
+    { type: 'sell', value: 25000, recipeId: collectibleRecipe.id, weight: 1 },
+  ],
+  tokenTrades: [],
+} as never;
+
+// getEntriesByType is a single generic mock shared across content types -
+// route each call by the `type` argument instead of one blanket return value.
+function mockEntriesByType(
+  traders: unknown[] = [],
+  encounters: EncounterContent[] = [forestRuinsEncounter],
+): void {
+  vi.mocked(getEntriesByType).mockImplementation(((type: string) => {
+    if (type === 'encounter') return encounters;
+    if (type === 'caravantrader') return traders;
+    return [];
+  }) as typeof getEntriesByType);
+}
+
 describe('Recipes Helper Functions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -182,13 +208,25 @@ describe('Recipes Helper Functions', () => {
 
   describe('isRecipeDropGated', () => {
     it('returns true when the recipe appears as a completion reward', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      mockEntriesByType();
 
       expect(isRecipeDropGated(equipmentRecipe.id)).toBe(true);
     });
 
     it('returns false when the recipe never appears as a completion reward', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      mockEntriesByType();
+
+      expect(isRecipeDropGated(itemRecipe.id)).toBe(false);
+    });
+
+    it('returns true when a caravan trader sells the recipe', () => {
+      mockEntriesByType([alekiaTrader]);
+
+      expect(isRecipeDropGated(collectibleRecipe.id)).toBe(true);
+    });
+
+    it('returns false when no trader sells the recipe and it has no other drop source', () => {
+      mockEntriesByType([alekiaTrader]);
 
       expect(isRecipeDropGated(itemRecipe.id)).toBe(false);
     });
@@ -196,7 +234,7 @@ describe('Recipes Helper Functions', () => {
 
   describe('isRecipeCraftable', () => {
     it('is true once a drop-gated recipe has been discovered', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      mockEntriesByType();
       vi.mocked(gamestate).mockReturnValue({
         discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
       } as unknown as GameState);
@@ -205,7 +243,7 @@ describe('Recipes Helper Functions', () => {
     });
 
     it('is false for a drop-gated recipe that has not been found', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      mockEntriesByType();
       vi.mocked(gamestate).mockReturnValue({
         discoveredRecipes: {},
       } as unknown as GameState);
@@ -214,7 +252,7 @@ describe('Recipes Helper Functions', () => {
     });
 
     it('is true for a recipe that never drops from a location', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      mockEntriesByType();
       vi.mocked(gamestate).mockReturnValue({
         discoveredRecipes: {},
       } as unknown as GameState);
@@ -372,7 +410,7 @@ describe('Recipes Helper Functions', () => {
 
   describe('recipeCanUnlockWithTokens', () => {
     beforeEach(() => {
-      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      mockEntriesByType();
       vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
     });
 
@@ -431,7 +469,7 @@ describe('Recipes Helper Functions', () => {
 
   describe('recipeUnlockWithTokens', () => {
     beforeEach(() => {
-      vi.mocked(getEntriesByType).mockReturnValue([forestRuinsEncounter]);
+      mockEntriesByType();
       vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
     });
 

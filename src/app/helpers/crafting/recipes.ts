@@ -11,6 +11,7 @@ import {
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  CaravanTraderContent,
   CollectibleContent,
   EncounterContent,
   EquipmentContent,
@@ -33,14 +34,22 @@ export function isRecipeDiscovered(
   return !!state.discoveredRecipes[recipeId]?.foundAt;
 }
 
-// Whether this recipe is gated behind a world drop - i.e. it appears as a
-// `recipeId` completion reward somewhere. Drop-gated recipes should never be
-// craftable until discovered, even once the tradeskill level gate is met.
+// Whether this recipe is gated behind a world drop or a caravan trader sale -
+// gated recipes should never be craftable until discovered.
 export function isRecipeDropGated(recipeId: RecipeId): boolean {
-  return getEntriesByType<EncounterContent>('encounter').some((encounter) =>
+  const droppedByEncounter = getEntriesByType<EncounterContent>(
+    'encounter',
+  ).some((encounter) =>
     encounter.completionRewards.some(
       (reward) => 'recipeId' in reward && reward.recipeId === recipeId,
     ),
+  );
+  if (droppedByEncounter) return true;
+
+  return getEntriesByType<CaravanTraderContent>('caravantrader').some(
+    (trader) =>
+      trader.trades.some((trade) => trade.recipeId === recipeId) ||
+      trader.tokenTrades.some((trade) => trade.recipeId === recipeId),
   );
 }
 

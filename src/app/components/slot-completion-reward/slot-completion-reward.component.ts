@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
@@ -41,7 +41,7 @@ type RewardContent = {
   selector: 'app-slot-completion-reward',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
+    IconItemPreviewComponent,
     SlotIconBlankComponent,
     IconUnknownComponent,
     TippyDirective,

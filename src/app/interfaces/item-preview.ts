@@ -29,4 +29,6 @@ export type ItemPreviewDisplay = {
   levelRequirement?: number;
   // Equipment only - party hero names whose job can equip this item.
   equippableHeroNames?: string[];
+  // Recipe trades only - composited behind `sprite`. See `recipeBackdropSprite`.
+  backdropSprite?: string;
 };

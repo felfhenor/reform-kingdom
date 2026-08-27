@@ -4,6 +4,10 @@ vi.mock('@helpers/caravan/caravan', () => ({
   caravanEligibleTraders: vi.fn(),
 }));
 
+vi.mock('@helpers/crafting/recipes', () => ({
+  isRecipeDiscovered: vi.fn(),
+}));
+
 vi.mock('@helpers/item/collectibles', () => ({
   isCollectibleDiscovered: vi.fn(),
 }));
@@ -27,6 +31,7 @@ import {
   caravanProcessTick,
   caravanWeightedSample,
 } from '@helpers/caravan/caravan-tick';
+import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -42,6 +47,7 @@ import type {
   CollectibleId,
   GameState,
   ItemId,
+  RecipeId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -118,6 +124,7 @@ describe('caravanProcessTick', () => {
     vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
     vi.mocked(timerTicksElapsed).mockReturnValue(1000);
     vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -223,6 +230,34 @@ describe('caravanProcessTick', () => {
     });
     vi.mocked(caravanEligibleTraders).mockReturnValue([withCollectible]);
     vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+
+    caravanProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { caravans: {} },
+    } as unknown as GameState);
+
+    expect(result.world.caravans[caravan.id].activeTradeIndices).toEqual([1]);
+  });
+
+  it('excludes an already-discovered recipe sell from the active trades', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    withCaravanState({});
+
+    const withRecipe = trader({
+      trades: [
+        {
+          type: 'sell',
+          value: 25000,
+          recipeId: 'recipe-a' as RecipeId,
+          weight: 5,
+        },
+        { type: 'sell', value: 10, itemId: 'ore' as ItemId, weight: 1 },
+      ],
+    });
+    vi.mocked(caravanEligibleTraders).mockReturnValue([withRecipe]);
+    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
 
     caravanProcessTick();
 

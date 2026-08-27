@@ -426,6 +426,7 @@ function ensureCaravanTrade(trade: Partial<CaravanTrade> = {}): CaravanTrade {
     itemId: trade.itemId,
     equipmentId: trade.equipmentId,
     collectibleId: trade.collectibleId,
+    recipeId: trade.recipeId,
     limit: trade.limit,
     weight: trade.weight ?? 1,
   };
@@ -471,6 +472,7 @@ function ensureCaravanTokenTrade(
     itemId: trade.itemId,
     equipmentId: trade.equipmentId,
     collectibleId: trade.collectibleId,
+    recipeId: trade.recipeId,
   };
 }
 

@@ -18,6 +18,13 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/crafting/recipes', () => ({
+  isRecipeDiscovered: vi.fn(),
+  recipeBackdropSprite: vi.fn(),
+  recipeResultContent: vi.fn(),
+  recipeResultSpritesheet: vi.fn(),
+}));
+
 vi.mock('@helpers/item/materials', async (importOriginal) => {
   const actual = await importOriginal<typeof MaterialsHelper>();
   const testGoldCoinId = 'gold-coin' as ItemId;
@@ -60,15 +67,25 @@ import { caravanState } from '@helpers/caravan/caravan';
 import {
   caravanExecuteTokenTrade,
   caravanExecuteTrade,
-  caravanIsTradeSoldOut,
+} from '@helpers/caravan/caravan-trade';
+import {
   caravanTokenTradeDisplay,
   caravanTradeDisplay,
+} from '@helpers/caravan/caravan-trade-display';
+import {
+  caravanIsTradeSoldOut,
   caravanTradeMaxQuantity,
   caravanTradeOwnedQuantity,
   caravanTradePrice,
   caravanTradeRemaining,
-} from '@helpers/caravan/caravan-trade';
+} from '@helpers/caravan/caravan-trade-quantity';
 import { getEntry } from '@helpers/content';
+import {
+  isRecipeDiscovered,
+  recipeBackdropSprite,
+  recipeResultContent,
+  recipeResultSpritesheet,
+} from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
 import {
   getCollectibleQuantity,
@@ -98,6 +115,8 @@ import type {
   GameState,
   ItemContent,
   ItemId,
+  RecipeContent,
+  RecipeId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -214,6 +233,30 @@ describe('caravanIsTradeSoldOut', () => {
 
     expect(caravanIsTradeSoldOut(trade, {}, 0)).toBe(false);
   });
+
+  it('is always sold out for an already-discovered recipe, even with no limit', () => {
+    const trade: CaravanTrade = {
+      type: 'sell',
+      value: 25000,
+      recipeId: 'recipe-a' as RecipeId,
+      weight: 1,
+    };
+    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
+
+    expect(caravanIsTradeSoldOut(trade, {}, 0)).toBe(true);
+  });
+
+  it('is not sold out for a not-yet-discovered recipe', () => {
+    const trade: CaravanTrade = {
+      type: 'sell',
+      value: 25000,
+      recipeId: 'recipe-a' as RecipeId,
+      weight: 1,
+    };
+    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+
+    expect(caravanIsTradeSoldOut(trade, {}, 0)).toBe(false);
+  });
 });
 
 describe('caravanTradeOwnedQuantity', () => {
@@ -262,6 +305,32 @@ describe('caravanTradeOwnedQuantity', () => {
         weight: 1,
       }),
     ).toBe(1);
+  });
+
+  it('resolves owned quantity for a recipe trade', () => {
+    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
+
+    expect(
+      caravanTradeOwnedQuantity({
+        type: 'sell',
+        value: 1,
+        recipeId: 'recipe-a' as RecipeId,
+        weight: 1,
+      }),
+    ).toBe(1);
+  });
+
+  it('returns 0 for an undiscovered recipe trade', () => {
+    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+
+    expect(
+      caravanTradeOwnedQuantity({
+        type: 'sell',
+        value: 1,
+        recipeId: 'recipe-a' as RecipeId,
+        weight: 1,
+      }),
+    ).toBe(0);
   });
 
   it('returns 0 for a trade with no target id', () => {
@@ -347,6 +416,30 @@ describe('caravanTradeMaxQuantity', () => {
       weight: 1,
     };
     vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+
+    expect(caravanTradeMaxQuantity(caravan, trade, {}, 0)).toBe(0);
+  });
+
+  it('is always at most 1 for an undiscovered recipe, regardless of limit or gold', () => {
+    const trade: CaravanTrade = {
+      type: 'sell',
+      value: 25000,
+      recipeId: 'recipe-a' as RecipeId,
+      weight: 1,
+    };
+    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+
+    expect(caravanTradeMaxQuantity(caravan, trade, {}, 0)).toBe(1);
+  });
+
+  it('is 0 for an already-discovered recipe', () => {
+    const trade: CaravanTrade = {
+      type: 'sell',
+      value: 25000,
+      recipeId: 'recipe-a' as RecipeId,
+      weight: 1,
+    };
+    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
 
     expect(caravanTradeMaxQuantity(caravan, trade, {}, 0)).toBe(0);
   });
@@ -450,6 +543,69 @@ describe('caravanTradeDisplay', () => {
       }),
     ).toBeUndefined();
   });
+
+  it('resolves a recipe trade using the recipe name and its result icon/description', () => {
+    const recipe: RecipeContent = {
+      id: 'recipe-a' as RecipeId,
+      name: 'Equipment: Ghostcopper Gear',
+      __type: 'recipe',
+      result: { equipmentId: 'ghostcopper-gear' as EquipmentId },
+      requirements: [],
+      tradeskillId: 'artificing-id' as never,
+      minTradeskillLevel: 10,
+      maxTradeskillLevel: 10,
+      tradeskillXP: 1,
+      craftTime: 60,
+      tokenUnlockCost: 3,
+    };
+    const equipment = {
+      id: 'ghostcopper-gear' as EquipmentId,
+      name: 'Ghostcopper Gear',
+      description: 'A copper gear, enhanced with ghostcopper dust.',
+      sprite: '0116',
+      rarity: 'Rare',
+      levelRequirement: 20,
+      baseStats: { Resistance: 4.5, Vitality: 4.5 },
+    } as EquipmentContent;
+
+    vi.mocked(getEntry).mockReturnValue(recipe);
+    vi.mocked(recipeResultContent).mockReturnValue(equipment);
+    vi.mocked(recipeResultSpritesheet).mockReturnValue('equipment');
+    vi.mocked(recipeBackdropSprite).mockReturnValue('recipe-backdrop');
+    vi.mocked(partyGet).mockReturnValue([]);
+
+    expect(
+      caravanTradeDisplay({
+        type: 'sell',
+        value: 25000,
+        recipeId: recipe.id,
+        weight: 1,
+      }),
+    ).toEqual({
+      name: 'Equipment: Ghostcopper Gear',
+      description: 'A copper gear, enhanced with ghostcopper dust.',
+      sprite: '0116',
+      spritesheet: 'equipment',
+      rarity: 'Rare',
+      levelRequirement: 20,
+      stats: { Resistance: 4.5, Vitality: 4.5 },
+      equippableHeroNames: [],
+      backdropSprite: 'recipe-backdrop',
+    });
+  });
+
+  it('returns undefined for a recipe trade whose recipe no longer exists', () => {
+    vi.mocked(getEntry).mockReturnValue(undefined);
+
+    expect(
+      caravanTradeDisplay({
+        type: 'sell',
+        value: 25000,
+        recipeId: 'gone' as RecipeId,
+        weight: 1,
+      }),
+    ).toBeUndefined();
+  });
 });
 
 describe('caravanExecuteTrade', () => {
@@ -476,6 +632,13 @@ describe('caravanExecuteTrade', () => {
         type: 'sell',
         value: 1000,
         collectibleId: 'trinket' as CollectibleId,
+        weight: 1,
+      },
+      {
+        type: 'sell',
+        value: 25000,
+        recipeId: 'recipe-a' as RecipeId,
+        limit: 1,
         weight: 1,
       },
     ],
@@ -725,6 +888,49 @@ describe('caravanExecuteTrade', () => {
     expect(afterFirst.materials['ore' as ItemId].quantity).toBe(2);
     expect(afterFirst.world.caravans[caravan.id].tradeCounts[0]).toBe(2);
   });
+
+  it('discovers the recipe and deducts gold on a successful recipe purchase', async () => {
+    vi.mocked(caravanState).mockReturnValue(
+      nodeState({ activeTradeIndices: [3] }),
+    );
+    vi.mocked(getGoldQuantity).mockReturnValue(1_000_000);
+    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+
+    const resultPromise = caravanExecuteTrade(entry, 3);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      materials: {
+        ['gold-coin' as ItemId]: { quantity: 1_000_000, foundAt: 1 },
+      },
+      discoveredMaterials: {},
+      armory: [],
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      world: {
+        caravans: { [caravan.id]: nodeState({ activeTradeIndices: [3] }) },
+      },
+    } as unknown as GameState);
+
+    expect(await resultPromise).toBe(true);
+    expect(
+      result.discoveredRecipes['recipe-a' as RecipeId].foundAt,
+    ).toBeGreaterThan(0);
+    // price 25000 marked up 25% = 31250
+    expect(result.materials['gold-coin' as ItemId].quantity).toBe(968_750);
+  });
+
+  it('blocks re-purchasing an already-discovered recipe', async () => {
+    vi.mocked(caravanState).mockReturnValue(
+      nodeState({ activeTradeIndices: [3] }),
+    );
+    vi.mocked(getGoldQuantity).mockReturnValue(1_000_000);
+    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
+
+    expect(await caravanExecuteTrade(entry, 3)).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
 });
 
 describe('caravanTokenTradeDisplay', () => {
@@ -768,6 +974,10 @@ describe('caravanExecuteTokenTrade', () => {
     tokenCost: 5,
     equipmentId: 'sword' as EquipmentId,
   };
+  const recipeTokenTrade: CaravanTokenTrade = {
+    tokenCost: 4,
+    recipeId: 'recipe-a' as RecipeId,
+  };
 
   const trader: CaravanTraderContent = {
     id: 'trader-a' as CaravanTraderId,
@@ -777,7 +987,12 @@ describe('caravanExecuteTokenTrade', () => {
     category: 'Carrina',
     level: 5,
     trades: [],
-    tokenTrades: [tokenTrade, itemTokenTrade, equipmentTokenTrade],
+    tokenTrades: [
+      tokenTrade,
+      itemTokenTrade,
+      equipmentTokenTrade,
+      recipeTokenTrade,
+    ],
   };
 
   function nodeState(
@@ -942,5 +1157,38 @@ describe('caravanExecuteTokenTrade', () => {
       1,
     );
     expect(afterFirst.materials['trader-token' as ItemId].quantity).toBe(2);
+  });
+
+  it('discovers the recipe and spends tokens on a successful recipe token trade', async () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(hasTraderTokens).mockReturnValue(true);
+    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+
+    const resultPromise = caravanExecuteTokenTrade(entry, 3);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      materials: {
+        ['trader-token' as ItemId]: { quantity: 5, foundAt: 1 },
+      },
+      discoveredMaterials: {},
+      collectibles: {},
+      discoveredRecipes: {},
+    } as unknown as GameState);
+
+    expect(await resultPromise).toBe(true);
+    expect(
+      result.discoveredRecipes['recipe-a' as RecipeId].foundAt,
+    ).toBeGreaterThan(0);
+    expect(result.materials['trader-token' as ItemId].quantity).toBe(1);
+  });
+
+  it('returns false when the recipe is already discovered', async () => {
+    vi.mocked(caravanState).mockReturnValue(nodeState());
+    vi.mocked(hasTraderTokens).mockReturnValue(true);
+    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
+
+    expect(await caravanExecuteTokenTrade(entry, 3)).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
   });
 });

@@ -11,23 +11,13 @@
     [tpPlacement]="'top'"
   >
     <app-slot-icon-blank>
-      <div class="museum-recipe-icon">
-        @if (backdrop) {
-          <app-atlas-image
-            spritesheet="item"
-            [assetName]="backdrop"
-            class="museum-recipe-icon-backdrop"
-          />
-        }
-
-        @if (result) {
-          <app-atlas-image
-            [spritesheet]="resultSpritesheet()"
-            [assetName]="result.sprite"
-            class="museum-recipe-icon-result"
-          />
-        }
-      </div>
+      @if (result) {
+        <app-icon-item-preview
+          [sprite]="result.sprite"
+          [spritesheet]="resultSpritesheet()"
+          [backdropSprite]="backdrop"
+        />
+      }
     </app-slot-icon-blank>
   </div>
 } @else if (canUnlock()) {
@@ -48,23 +38,13 @@
 
 <ng-template #tooltip>
   <div class="flex gap-2 p-2">
-    @if (e.discovered) {
+    @if (e.discovered && result) {
       <div class="museum-recipe-tooltip-icon">
-        @if (backdrop) {
-          <app-atlas-image
-            spritesheet="item"
-            [assetName]="backdrop"
-            class="museum-recipe-icon-backdrop"
-          />
-        }
-
-        @if (result) {
-          <app-atlas-image
-            [spritesheet]="resultSpritesheet()"
-            [assetName]="result.sprite"
-            class="museum-recipe-icon-result"
-          />
-        }
+        <app-icon-item-preview
+          [sprite]="result.sprite"
+          [spritesheet]="resultSpritesheet()"
+          [backdropSprite]="backdrop"
+        />
       </div>
     }
 

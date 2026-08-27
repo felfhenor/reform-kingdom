@@ -18,16 +18,21 @@ import {
 import {
   caravanExecuteTokenTrade,
   caravanExecuteTrade,
-  caravanIsTradeSoldOut,
+} from '@helpers/caravan/caravan-trade';
+import {
   caravanTokenTradeDisplay,
   caravanTradeDisplay,
+} from '@helpers/caravan/caravan-trade-display';
+import {
+  caravanIsTradeSoldOut,
   caravanTradeMaxQuantity,
   caravanTradeOwnedQuantity,
   caravanTradePrice,
   caravanTradeRemaining,
-} from '@helpers/caravan/caravan-trade';
+} from '@helpers/caravan/caravan-trade-quantity';
 import { commissionRowViewModel } from '@helpers/commission/commission-fulfill';
 import { getEntry } from '@helpers/content';
+import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { notifySuccess } from '@helpers/engine/notify';
 import { activeCaravanNode } from '@helpers/engine/ui';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
@@ -78,7 +83,9 @@ export class ModalCaravanTradeComponent {
       .map((trade, index) => ({ index, trade }))
       .filter(
         ({ trade }) =>
-          !trade.collectibleId || !isCollectibleDiscovered(trade.collectibleId),
+          (!trade.collectibleId ||
+            !isCollectibleDiscovered(trade.collectibleId)) &&
+          (!trade.recipeId || !isRecipeDiscovered(trade.recipeId)),
       );
   });
 

@@ -5,7 +5,7 @@ import {
   viewChild,
 } from '@angular/core';
 import type { TemplateRef } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import type { ItemPreviewDisplay, StatBlock, StatusEffectTag } from '@interfaces';
@@ -16,7 +16,7 @@ import type { ItemPreviewDisplay, StatBlock, StatusEffectTag } from '@interfaces
 @Component({
   selector: 'app-tooltip-item-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasImageComponent, RowItemStatsComponent, RowDebuffResistancesComponent],
+  imports: [IconItemPreviewComponent, RowItemStatsComponent, RowDebuffResistancesComponent],
   templateUrl: './tooltip-item-preview.component.html',
   styleUrl: './tooltip-item-preview.component.scss',
 })

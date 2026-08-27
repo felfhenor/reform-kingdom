@@ -22,9 +22,10 @@
         }}"
       >
         <app-slot-icon-blank>
-          <app-atlas-image
+          <app-icon-item-preview
+            [sprite]="item.sprite"
             [spritesheet]="item.spritesheet"
-            [assetName]="item.sprite"
+            [backdropSprite]="item.backdropSprite"
           />
         </app-slot-icon-blank>
       </div>
