@@ -55,7 +55,7 @@
 - id: 8c6193c1-760f-466f-b658-12769b937f30
   name: Gobweb
   rarity: Common
-  description: A useless web that can no longer serve the purpose of catching food.
+  description: A useless web that can no longer serve the purpose of catching food. It reveals the presence of the Spider Tower.
   sprite: '0015'
 
 - id: 1afafc1d-480f-46a7-a565-575bb9c471db

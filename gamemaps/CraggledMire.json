@@ -350,22 +350,11 @@
                  "width":64,
                  "x":512,
                  "y":1792
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":5,
-         "name":"Other Nodes",
-         "objects":[
+                }, 
                 {
                  "gid":409,
                  "height":64,
-                 "id":132,
+                 "id":156,
                  "name":"Carrina Cave",
                  "opacity":1,
                  "properties":[
@@ -389,7 +378,7 @@
                 {
                  "gid":409,
                  "height":64,
-                 "id":142,
+                 "id":157,
                  "name":"Miremetal Mines",
                  "opacity":1,
                  "rotation":0,
@@ -402,7 +391,7 @@
                 {
                  "gid":592,
                  "height":64,
-                 "id":145,
+                 "id":158,
                  "name":"Swampfields",
                  "opacity":1,
                  "rotation":0,
@@ -415,7 +404,7 @@
                 {
                  "gid":407,
                  "height":64,
-                 "id":151,
+                 "id":159,
                  "name":"Orcwell Trading Group - Craggled Mire",
                  "opacity":1,
                  "rotation":0,
@@ -432,7 +421,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":152,
+ "nextobjectid":160,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

@@ -16,6 +16,8 @@
     - Carrina
 
   commissionOffers:
+    - commissionOfferId: Commission - Copper Ore
+      weight: 1
     - commissionOfferId: Commission - Wergen Sticks
       weight: 1
     - commissionOfferId: Commission - Wergen Wood

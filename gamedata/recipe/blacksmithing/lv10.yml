@@ -207,3 +207,21 @@
   maxTradeskillLevel: 19
   tradeskillXP: 95
   craftTime: 180
+
+- id: fe8c5916-4480-4592-bc8b-1334650b12e4
+  name: 'Equipment: Ghostcopper Dirk'
+  result:
+    equipmentId: Ghostcopper Dirk
+
+  requirements:
+    - equipmentId: Copper Dirk
+      quantity: 1
+
+    - itemId: Ghostcopper Dust
+      quantity: 10
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 150
+  craftTime: 300

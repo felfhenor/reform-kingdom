@@ -211,6 +211,42 @@
   tradeskillXP: 350
   craftTime: 1800
 
+- id: 2dec6c8a-95c0-4435-8544-e386bfeb94a9
+  name: 'Material: Ghostcopper Dust'
+  result:
+    itemId: Ghostcopper Dust
+
+  requirements:
+    - itemId: Spirit Flesh
+      quantity: 1
+
+    - itemId: Copper Ore
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 17
+  tradeskillXP: 15
+  craftTime: 20
+
+- id: f27f5085-96c1-4e35-b2fd-260473f9ed4f
+  name: 'Equipment: Ghostcopper Gear'
+  result:
+    equipmentId: Ghostcopper Gear
+
+  requirements:
+    - equipmentId: Copper Gear
+      quantity: 1
+
+    - itemId: Ghostcopper Dust
+      quantity: 5
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 150
+  craftTime: 300
+
 - id: 0ce428d5-2d3f-4cdd-87f1-6f8ca3fac0a2
   name: 'Equipment: Ooze Parchment'
   result:

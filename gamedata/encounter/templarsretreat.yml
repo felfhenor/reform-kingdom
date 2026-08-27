@@ -1,0 +1,41 @@
+- id: f072f35a-29c1-4e90-a057-3ebdf15d392f
+  name: Collapsed Temple
+  description: A collapsed temple deep within a cave. It's haunted by all manner of spirits and those who channel their essence into the world.
+
+  levelRange:
+    min: 22
+    max: 26
+
+  fights:
+    - monsters:
+        - monsterId: Angry Spirit
+        - monsterId: Angry Spirit
+        - monsterId: Templar
+
+    - monsters:
+        - monsterId: Angry Spirit
+        - monsterId: Templar
+        - monsterId: Templar
+
+    - monsters:
+        - monsterId: Angry Spirit
+        - monsterId: Templar
+        - monsterId: Templar
+        - monsterId: Banshee
+
+  completionRewards:
+    - collectibleId: Templar Summoning Scroll
+      chance: 25
+
+    - recipeId: 'Material: Ghostcopper Dust'
+      chance: 10
+
+    - itemId: Ghostcopper Dust
+      min: 1
+      max: 2
+      chance: 25
+
+    - itemId: Gold Coin
+      min: 500
+      max: 825
+      chance: 100

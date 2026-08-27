@@ -1,0 +1,43 @@
+- id: 8d733645-a13d-4c47-b1e6-405483abb552
+  name: Ghostlight Mines
+  description: A dry forest, perfect for gathering wood and leather from the local wildlife.
+
+  levelRange:
+    min: 14
+    max: 15
+
+  workerLevelRange:
+    min: 7
+    max: 13
+
+  xpGainedIfInLevelRange: 6
+  gatherTime: 15
+
+  gatherResults:
+    - chance: 6
+      items:
+        - itemId: Copper Ore
+          quantity: 1
+
+    - chance: 5
+      items:
+        - itemId: Malachite
+          quantity: 1
+
+    - chance: 4
+      items:
+        - itemId: Spirit Flesh
+          quantity: 1
+
+    - chance: 3
+      items:
+        - itemId: Spirit Flesh
+          quantity: 1
+
+        - itemId: Copper Ore
+          quantity: 1
+
+    - chance: 1
+      items:
+        - itemId: Ghostcopper Dust
+          quantity: 1

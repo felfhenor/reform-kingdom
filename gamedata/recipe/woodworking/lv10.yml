@@ -177,3 +177,21 @@
   maxTradeskillLevel: 19
   tradeskillXP: 95
   craftTime: 180
+
+- id: de558cad-ac40-4e69-a3f1-2adb13f51027
+  name: 'Weapon: Ghostcopper Spear'
+  result:
+    equipmentId: Ghostcopper Spear
+
+  requirements:
+    - equipmentId: Copper Spear
+      quantity: 1
+
+    - itemId: Ghostcopper Dust
+      quantity: 10
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 150
+  craftTime: 300

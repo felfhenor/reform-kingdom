@@ -148,3 +148,24 @@
   maxTradeskillLevel: 19
   tradeskillXP: 95
   craftTime: 180
+
+- id: 68dc3706-c1cf-45b7-ad64-918bfd35f75b
+  name: 'Equipment: Ghostcopper Chain'
+  result:
+    equipmentId: Ghostcopper Chain
+
+  requirements:
+    - equipmentId: Copperspun Chain
+      quantity: 1
+
+    - itemId: Ghost Peridot
+      quantity: 1
+
+    - itemId: Ghostcopper Dust
+      quantity: 5
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 150
+  craftTime: 300

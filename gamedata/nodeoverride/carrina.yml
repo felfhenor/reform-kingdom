@@ -9,3 +9,14 @@
 - id: 685c435d-d572-43b7-ab46-3597893787d6
   name: Craggled Cave
   description: A short passageway towards the Craggled Mire.
+
+- id: fef0e00a-9047-4356-ab1e-3a84943397b1
+  name: Templar's Pathway
+  description: A hidden passageway to Templar's Retreat.
+
+  invisibleUntilCollectibleIdsFound:
+    - Craggle Pebble
+
+- id: f43cbdc1-d635-4448-9906-80bc91cce184
+  name: Templar's Exit
+  description: A passageway from Templar's Retreat back to Carrina.

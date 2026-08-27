@@ -1,0 +1,15 @@
+- id: f03637bf-933c-49d7-8052-b242c2e6442f
+  name: Ghostcopper Gear
+  description: A copper gear, enhanced with ghostcopper dust.
+  levelRequirement: 20
+  rarity: Rare
+  type: Trinket
+  sprite: '0116'
+  slots: 3
+  baseStats:
+    Resistance: 4.5
+    Vitality: 4.5
+
+  debuffResistances:
+    Accuracy: 10
+    Stun: 5

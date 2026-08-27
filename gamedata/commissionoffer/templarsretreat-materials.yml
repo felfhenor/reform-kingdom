@@ -1,0 +1,10 @@
+- id: 5098c23f-6aa7-4b5d-a53e-9f5629942714
+  name: Commission - Ghostcopper Dust
+  description: The caravan needs a bundle of Ghostcopper Dust to engage in mystic arts.
+
+  requirements:
+    - itemId: Ghostcopper Dust
+      quantityMin: 15
+      quantityMax: 25
+
+  tokenReward: 1

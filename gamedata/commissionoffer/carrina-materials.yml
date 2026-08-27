@@ -31,6 +31,17 @@
 
   tokenReward: 1
 
+- id: ed1f2716-14bf-40f7-a9dc-f93262032bdf
+  name: Commission - Copper Ore
+  description: The caravan needs a bundle of Copper Ore for armor and weapon crafting.
+
+  requirements:
+    - itemId: Copper Ore
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
 - id: f5257a00-e804-47ac-8966-90045623b63e
   name: Commission - Malachite
   description: The caravan needs Malachite to restock their jewelcrafting supplies.

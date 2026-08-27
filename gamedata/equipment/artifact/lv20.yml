@@ -1,0 +1,15 @@
+- id: ef60ca7a-3ea4-4808-b68d-6c6441f00c8d
+  name: Ghostcopper Chain
+  description: An adapted copperspun chain, mixed with ghostcopper dust to make a magical artifact suitable for magicians.
+  levelRequirement: 20
+  rarity: Rare
+  type: Artifact
+  sprite: '0115'
+  slots: 2
+  baseStats:
+    Intelligence: 7.3
+    Resistance: 4.5
+
+  debuffResistances:
+    Poison: 5
+    Burn: 5

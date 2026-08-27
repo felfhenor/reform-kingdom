@@ -16,7 +16,7 @@ Currently there is no repository for these, so creating new content is harder to
 
 ## Maps
 
-The most massive type of content, requiring a lot of design and sub-content pieces. When making a map, the easiest way is to copy the `Template.json` file, then edit from there. It should have tilesets, patterns, etc already set up. After designing the map, the following things need to be created (where applicable):
+The most massive type of content, requiring a lot of design and sub-content pieces. When making a map, the easiest way is to copy the `Template.json` file, then edit from there. Maps should be a minimum of 31x31. It should have tilesets, patterns, etc already set up. After designing the map, the following things need to be created (where applicable):
 
 - [ ] Combat Nodes
 - [ ] Procgen Combat Nodes

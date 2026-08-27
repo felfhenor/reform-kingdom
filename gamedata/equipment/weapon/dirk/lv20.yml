@@ -1,0 +1,14 @@
+# Primary Stat: Agility
+# Secondary Stat: Vitality
+
+- id: ce5f2296-d1d3-413d-af70-e28801c651f3
+  name: Ghostcopper Dirk
+  description: A copper dirk enhanced with ghostcopper ore. It's excellent at resisting spiritual attacks.
+  levelRequirement: 20
+  rarity: Rare
+  type: Dirk
+  sprite: '0113'
+  slots: 2
+  baseStats:
+    Agility: 9.1
+    Resistance: 5.1

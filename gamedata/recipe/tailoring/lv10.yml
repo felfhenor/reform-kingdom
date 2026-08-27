@@ -126,3 +126,21 @@
   maxTradeskillLevel: 19
   tradeskillXP: 95
   craftTime: 180
+
+- id: 6f0cbac1-5178-412d-8a55-9332a2c21b4a
+  name: 'Equipment: Ghostly Scroll'
+  result:
+    equipmentId: Ghostly Scroll
+
+  requirements:
+    - itemId: Linen Thread
+      quantity: 30
+
+    - itemId: Ghostcopper Dust
+      quantity: 15
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 150
+  craftTime: 300

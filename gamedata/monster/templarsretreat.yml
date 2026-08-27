@@ -1,0 +1,62 @@
+- id: 6a9ffd47-fcf4-4d87-b1ec-65bae2b4a029
+  name: Templar
+  description: A spirit channeler that hides from society to practice dark magic.
+
+  sprite: '0084'
+  frames: 4
+
+  targettingType: Random
+
+  rarity: Uncommon
+
+  xp:
+    min: 55
+    max: 60
+    bonusPerLevel: 3
+
+  drops:
+    - itemId: Spirit Flesh
+      min: 1
+      max: 2
+      chance: 75
+
+    - itemId: Ghostcopper Dust
+      min: 1
+      max: 1
+      chance: 25
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Chilling Touch I
+      weight: 3
+
+    - skillId: Thunderbolt I
+      weight: 1
+
+    - skillId: Cure I
+      weight: 2
+
+    - skillId: Smashing Board I
+      weight: 1
+
+  baseStats:
+    Health: 125
+    Energy: 35
+    Luck: 1
+    Intelligence: 13
+    Strength: 6
+    Vitality: 6
+    Resistance: 15
+    Agility: 5
+
+  statsPerLevel:
+    Health: 10
+    Energy: 3
+    Luck: 1
+    Intelligence: 0.6
+    Strength: 0.3
+    Vitality: 0.1
+    Resistance: 1
+    Agility: 0.3

@@ -74,7 +74,7 @@
   gatherTime: 5
 
   gatherResults:
-    - chance: 30
+    - chance: 7
       items:
         - itemId: Copper Ore
           quantity: 1

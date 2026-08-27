@@ -1,0 +1,10 @@
+- id: e563402b-49f1-4691-ba5c-29a5012355d7
+  name: Ghostcopper Dust
+  description: An eerie dust formed when spirit flesh mixes with copper ore.
+  rarity: Uncommon
+
+  sprite: '0038'
+
+  infusionDebuffResistances:
+    Stun: 1
+    StatDown: 1

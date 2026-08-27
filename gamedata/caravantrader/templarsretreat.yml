@@ -1,0 +1,46 @@
+- id: 55b17ce9-1178-4e33-a50c-fdd226613610
+  name: Alekia Figaro
+  description: Greetings, Duchy heroes. I deal in mystical recipes.
+  category: Carrina
+  level: 15
+
+  tokenTrades:
+    - collectibleId: Blank Templar Scroll
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 500
+      itemId: Spirit Flesh
+      limit: 15
+      weight: 1
+
+    - type: sell
+      value: 25000
+      recipeId: 'Equipment: Ghostcopper Gear'
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 25000
+      recipeId: 'Equipment: Ghostcopper Chain'
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 35000
+      recipeId: 'Weapon: Ghostcopper Spear'
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 35000
+      recipeId: 'Equipment: Ghostcopper Dirk'
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 50000
+      recipeId: 'Equipment: Ghostly Scroll'
+      limit: 1
+      weight: 1

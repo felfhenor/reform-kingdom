@@ -1,0 +1,16 @@
+- id: 270a7d10-d9ae-4ee1-a829-ab1fa05c7ac3
+  name: Ghostly Scroll
+  description: An uninked blank scroll, haunted by ghostly energies.
+  levelRequirement: 20
+  rarity: Rare
+  type: Charm
+  sprite: '0117'
+  slots: 2
+  baseStats:
+    Intelligence: 4.7
+    Resistance: 7.5
+
+  debuffResistances:
+    Stun: 15
+    StatDown: 15
+    Accuracy: 15

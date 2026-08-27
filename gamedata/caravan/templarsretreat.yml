@@ -1,0 +1,26 @@
+- id: f1601d8e-a7f1-40fb-a610-89f5d057fedc
+  name: Duchy Trading Caravan - Templar's Retreat
+  description: The Templar's Retreat branch of the Duchy Trading Caravan. They operate in secret and deal in black market goods.
+
+  traderResetTime: 3600
+
+  level:
+    min: 15
+    max: 20
+
+  markupPercentages:
+    sell: 50
+    buy: -30
+
+  traderCategories:
+    - Carrina
+
+  commissionOffers:
+    - commissionOfferId: Commission - Copper Ore
+      weight: 1
+
+    - commissionOfferId: Commission - Spirit Flesh
+      weight: 2
+
+    - commissionOfferId: Commission - Ghostcopper Dust
+      weight: 3
