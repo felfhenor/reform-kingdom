@@ -1,10 +1,7 @@
 @use 'tailwindcss';
 @reference 'tailwindcss';
 
-.text-buff {
-  @apply text-green-400;
-}
-
+.text-buff,
 .text-debuff {
-  @apply text-rose-400;
+  @apply text-inherit;
 }
