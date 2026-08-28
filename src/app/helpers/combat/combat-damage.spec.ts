@@ -21,6 +21,11 @@ import {
   combatCombatantTakeDamage,
 } from '@helpers/combat/combat-damage';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
+import {
+  combatantMessageToken,
+  combatLog,
+  combatLogReset,
+} from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
 import { rngSucceedsChance } from '@helpers/rng';
 
@@ -456,5 +461,55 @@ describe('combatApplySkillToTarget status effect resistance', () => {
     // unrelated downstream `debuffIgnoreChance` roll.
     expect(rngSucceedsChance).toHaveBeenCalledTimes(2);
     expect(rngSucceedsChance).toHaveBeenNthCalledWith(1, 60);
+  });
+});
+
+describe('combatApplySkillToTarget combat message rendering', () => {
+  beforeEach(() => {
+    combatLogReset();
+  });
+
+  it('embeds combatant/target id tokens (not raw names) and reflects post-damage HP', () => {
+    const zeroStats = {
+      Agility: 0,
+      Energy: 0,
+      Health: 0,
+      Intelligence: 0,
+      Luck: 0,
+      Resistance: 0,
+      Strength: 0,
+      Vitality: 0,
+    };
+    const attacker = buildCombatant({
+      id: 'attacker',
+      name: 'Jala',
+      totalStats: { ...zeroStats, Strength: 30 },
+    });
+    const target = buildCombatant({
+      id: 'target',
+      name: 'Goblin',
+      hp: 100,
+      totalStats: { ...zeroStats, Health: 100 },
+    });
+    const skill = buildSkill();
+    const technique = buildTechnique({
+      damageScaling: { ...zeroStats, Strength: 1 },
+      combatMessage:
+        '**{{ combatant.name }}** hits **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).',
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      skill,
+      technique,
+    );
+
+    // Proves the id tokens (not raw names) are embedded, and that target.hp
+    // reflects the just-applied damage rather than a stale pre-damage snapshot.
+    expect(combatLog()[0].message).toBe(
+      `**${combatantMessageToken(attacker)}** hits **${combatantMessageToken(target)}** for 30 damage (70/100 HP remaining).`,
+    );
   });
 });

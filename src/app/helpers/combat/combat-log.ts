@@ -48,8 +48,17 @@ export function combatMessageLog(
   combat: Combat,
   message: string,
   actor?: Combatant,
-  colorOverride?: string,
 ): void {
+  const combatants = [
+    ...(combat.heroes ?? []),
+    ...(combat.guardians ?? []),
+  ].map((combatant) => ({
+    id: combatant.id,
+    name: combatant.name,
+    hp: combatant.hp,
+    maxHp: combatant.totalStats.Health,
+  }));
+
   pushLogEntry({
     kind: 'Combat',
     combatId: combat.id,
@@ -59,10 +68,13 @@ export function combatMessageLog(
     message,
     spritesheet: actor?.isEnemy ? 'guardian' : 'hero',
     sprite: actor?.sprite,
-    hp: actor?.hp,
-    maxHp: actor?.totalStats.Health,
-    colorOverride,
+    combatants,
   });
+}
+
+// Stands in for a combatant's name; adventureLogEntryHtml swaps it for the HP-colored name.
+export function combatantMessageToken(combatant: Combatant): string {
+  return `@@${combatant.id}@@`;
 }
 
 export function travelMessageLog(locationName: string, message: string): void {
@@ -178,6 +190,29 @@ export function combatLogHealthColor(
 // ..."), rendered inline (no wrapping <p>) since each entry is a single line.
 export function adventureLogMessageHtml(message: string): string {
   return parseInline(message, { async: false });
+}
+
+const COMBATANT_TOKEN_PATTERN = /@@([^@]+)@@/g;
+
+// Swaps each `@@id@@` token (see combatantMessageToken) for that combatant's HP-colored name.
+export function adventureLogEntryHtml(entry: CombatLog): string {
+  if (!entry.combatants || entry.combatants.length === 0) {
+    return adventureLogMessageHtml(entry.message);
+  }
+
+  const combatantsById = new Map(entry.combatants.map((c) => [c.id, c]));
+  const coloredMessage = entry.message.replace(
+    COMBATANT_TOKEN_PATTERN,
+    (token, id: string) => {
+      const combatant = combatantsById.get(id);
+      if (!combatant) return token;
+
+      const color = combatLogHealthColor(combatant.hp, combatant.maxHp);
+      return `<span class="${color}">${combatant.name}</span>`;
+    },
+  );
+
+  return adventureLogMessageHtml(coloredMessage);
 }
 
 export function adventureLogTimestampTooltip(timestamp: number): string {

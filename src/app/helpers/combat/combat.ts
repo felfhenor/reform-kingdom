@@ -9,6 +9,7 @@ import {
 } from '@helpers/combat/combat-end';
 import {
   beginCombatLogCommits,
+  combatantMessageToken,
   combatMessageLog,
   endCombatLogCommits,
 } from '@helpers/combat/combat-log';
@@ -80,7 +81,7 @@ export function combatantTakeTurn(
     if (rngSucceedsChance(combatant.combatStats.reviveChance)) {
       combatMessageLog(
         combat,
-        `**${combatant.name}** has sprung to life!`,
+        `**${combatantMessageToken(combatant)}** has sprung to life!`,
         combatant,
       );
 
@@ -88,7 +89,10 @@ export function combatantTakeTurn(
 
       combatUnapplyAllStatusEffects(combat, combatant);
     } else {
-      combatMessageLog(combat, `**${combatant.name}** is dead, skipping turn.`);
+      combatMessageLog(
+        combat,
+        `**${combatantMessageToken(combatant)}** is dead, skipping turn.`,
+      );
       return {};
     }
   }
@@ -98,14 +102,17 @@ export function combatantTakeTurn(
   if (combatantIsDead(combatant)) {
     combatMessageLog(
       combat,
-      `**${combatant.name}** has been defeated!`,
+      `**${combatantMessageToken(combatant)}** has been defeated!`,
       combatant,
     );
     return {};
   }
 
   if (!combatCanTakeTurn(combatant)) {
-    combatMessageLog(combat, `**${combatant.name}** lost their turn!`);
+    combatMessageLog(
+      combat,
+      `**${combatantMessageToken(combatant)}** lost their turn!`,
+    );
     return {};
   }
 
@@ -117,7 +124,7 @@ export function combatantTakeTurn(
   if (isStunned) {
     combatMessageLog(
       combat,
-      `**${combatant.name}** is stunned and loses their turn!`,
+      `**${combatantMessageToken(combatant)}** is stunned and loses their turn!`,
     );
     return {};
   }
@@ -140,7 +147,7 @@ export function combatantTakeTurn(
   if (!chosenSkill) {
     combatMessageLog(
       combat,
-      `**${combatant.name}** has no skills available, skipping turn.`,
+      `**${combatantMessageToken(combatant)}** has no skills available, skipping turn.`,
     );
     return {};
   }
@@ -188,7 +195,7 @@ export function combatantTakeTurn(
       if (shouldMiss) {
         combatMessageLog(
           combat,
-          `**${combatant.name}**'s **${chosenSkill.name}** misses **${target.name}**!`,
+          `**${combatantMessageToken(combatant)}**'s **${chosenSkill.name}** misses **${combatantMessageToken(target)}**!`,
         );
         return;
       }
@@ -227,7 +234,7 @@ export function combatantTakeTurn(
   if (combatantIsDead(combatant)) {
     combatMessageLog(
       combat,
-      `**${combatant.name}** has been defeated!`,
+      `**${combatantMessageToken(combatant)}** has been defeated!`,
       combatant,
     );
     return {};
@@ -264,7 +271,7 @@ export function combatDoCombatIteration(): void {
     if (res?.takeAnotherTurn) {
       combatMessageLog(
         combat,
-        `**${char.name}** was blessed by the elements, and gets to go again!`,
+        `**${combatantMessageToken(char)}** was blessed by the elements, and gets to go again!`,
       );
       combatantTakeTurn(combat, char);
     }

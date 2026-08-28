@@ -1,6 +1,19 @@
-import { statusEffectTagResistance } from '@helpers/combat/combat-statuseffects';
-import type { Combatant, StatusEffectTag } from '@interfaces';
-import { describe, expect, it } from 'vitest';
+import {
+  combatantMessageToken,
+  combatLog,
+  combatLogReset,
+} from '@helpers/combat/combat-log';
+import {
+  combatApplyStatusEffectToTarget,
+  statusEffectTagResistance,
+} from '@helpers/combat/combat-statuseffects';
+import type {
+  Combat,
+  Combatant,
+  StatusEffect,
+  StatusEffectTag,
+} from '@interfaces';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 function buildTagResistance(
   overrides: Partial<Record<StatusEffectTag, number>> = {},
@@ -43,5 +56,54 @@ describe('statusEffectTagResistance', () => {
   it('returns 0 for a tag the combatant has no resistance to', () => {
     const combatant = { tagResistance: buildTagResistance() } as Combatant;
     expect(statusEffectTagResistance(combatant, ['Stun'])).toBe(0);
+  });
+});
+
+describe('combatApplyStatusEffectToTarget combat message rendering', () => {
+  beforeEach(() => {
+    combatLogReset();
+  });
+
+  it('embeds the combatant id token (not the raw name) and reflects post-effect HP', () => {
+    const combatant = {
+      id: 'combatant-1',
+      name: 'Ashen',
+      hp: 100,
+      totalStats: { Health: 100 },
+      combatStats: { debuffIgnoreChance: 0 },
+      statusEffects: [],
+      statusEffectData: {},
+    } as unknown as Combatant;
+    const combat = {
+      id: 'combat-1',
+      heroes: [combatant],
+      guardians: [],
+    } as unknown as Combat;
+    const statusEffect = {
+      id: 'burn',
+      name: 'Burn',
+      effectType: 'Debuff',
+      onApply: [
+        {
+          type: 'TakeDamage',
+          combatMessage:
+            '**{{ combatant.name }}** is burning for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).',
+        },
+      ],
+      onTick: [],
+      onUnapply: [],
+      statScaling: { Strength: 1 },
+      useTargetStats: false,
+      creatorStats: { Strength: 10 },
+      targetStats: {},
+    } as unknown as StatusEffect;
+
+    combatApplyStatusEffectToTarget(combat, combatant, statusEffect);
+
+    // Proves the id token (not the raw name) is embedded, and that
+    // combatant.hp reflects the just-applied burn damage, not a stale snapshot.
+    expect(combatLog()[0].message).toBe(
+      `**${combatantMessageToken(combatant)}** is burning for 10 damage (90/100 HP remaining).`,
+    );
   });
 });

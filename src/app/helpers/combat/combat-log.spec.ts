@@ -1,7 +1,9 @@
 import {
+  adventureLogEntryHtml,
   adventureLogMessageHtml,
   adventureLogTimestampTooltip,
   beginCombatLogCommits,
+  combatantMessageToken,
   combatLog,
   combatLogReset,
   combatMessageLog,
@@ -17,6 +19,7 @@ import {
 import type {
   Combat,
   Combatant,
+  CombatLog,
   EquipmentContent,
   ItemContent,
   RecipeContent,
@@ -28,41 +31,70 @@ describe('combatMessageLog', () => {
     combatLogReset();
   });
 
-  it('snapshots the actor hp/maxHp onto the entry', () => {
-    const combat = {
-      id: 'combat-1',
-      locationName: 'Field Ruins',
-    } as unknown as Combat;
-    const actor = {
+  it('snapshots every hero/guardian id+name+hp+maxHp onto the entry, not just the actor', () => {
+    const hero = {
+      id: 'hero-1',
+      name: 'Jala',
       isEnemy: false,
       sprite: '0000',
       hp: 12,
       totalStats: { Health: 20 },
     } as unknown as Combatant;
-
-    beginCombatLogCommits();
-    combatMessageLog(combat, '**Jala** attacks Goblin.', actor);
-    endCombatLogCommits();
-
-    expect(combatLog()[0]).toMatchObject({
-      hp: 12,
-      maxHp: 20,
-      spritesheet: 'hero',
-    });
-  });
-
-  it('leaves hp/maxHp undefined when there is no actor', () => {
+    const guardian = {
+      id: 'guardian-1',
+      name: 'Goblin',
+      isEnemy: true,
+      hp: 2,
+      totalStats: { Health: 10 },
+    } as unknown as Combatant;
     const combat = {
       id: 'combat-1',
       locationName: 'Field Ruins',
+      heroes: [hero],
+      guardians: [guardian],
+    } as unknown as Combat;
+
+    beginCombatLogCommits();
+    combatMessageLog(combat, '**Jala** attacks **Goblin**.', hero);
+    endCombatLogCommits();
+
+    expect(combatLog()[0]).toMatchObject({
+      spritesheet: 'hero',
+      combatants: [
+        { id: 'hero-1', name: 'Jala', hp: 12, maxHp: 20 },
+        { id: 'guardian-1', name: 'Goblin', hp: 2, maxHp: 10 },
+      ],
+    });
+  });
+
+  it('still snapshots the roster when there is no actor', () => {
+    const hero = {
+      id: 'hero-1',
+      name: 'Jala',
+      hp: 12,
+      totalStats: { Health: 20 },
+    } as unknown as Combatant;
+    const combat = {
+      id: 'combat-1',
+      locationName: 'Field Ruins',
+      heroes: [hero],
+      guardians: [],
     } as unknown as Combat;
 
     beginCombatLogCommits();
     combatMessageLog(combat, 'Combat is over.');
     endCombatLogCommits();
 
-    expect(combatLog()[0].hp).toBeUndefined();
-    expect(combatLog()[0].maxHp).toBeUndefined();
+    expect(combatLog()[0].combatants).toEqual([
+      { id: 'hero-1', name: 'Jala', hp: 12, maxHp: 20 },
+    ]);
+  });
+});
+
+describe('combatantMessageToken', () => {
+  it('embeds the combatant id in an opaque, id-addressable token', () => {
+    const combatant = { id: 'hero-1' } as unknown as Combatant;
+    expect(combatantMessageToken(combatant)).toBe('@@hero-1@@');
   });
 });
 
@@ -111,6 +143,57 @@ describe('adventureLogMessageHtml', () => {
 
   it('passes plain text through unchanged', () => {
     expect(adventureLogMessageHtml('Combat is over.')).toBe('Combat is over.');
+  });
+});
+
+describe('adventureLogEntryHtml', () => {
+  it('colors every named combatant by their own HP status, not just one', () => {
+    const entry = {
+      message: '**@@hero-1@@** attacks **@@guardian-1@@** for 8 damage.',
+      combatants: [
+        { id: 'hero-1', name: 'Jala', hp: 18, maxHp: 20 },
+        { id: 'guardian-1', name: 'Goblin', hp: 2, maxHp: 20 },
+      ],
+    } as unknown as CombatLog;
+
+    expect(adventureLogEntryHtml(entry)).toBe(
+      '<strong><span class="text-green-400">Jala</span></strong> attacks <strong><span class="text-rose-400">Goblin</span></strong> for 8 damage.',
+    );
+  });
+
+  it('leaves the message unstyled when the entry has no combatants', () => {
+    const entry = {
+      message: '**@@hero-1@@** attacks **@@guardian-1@@** for 8 damage.',
+    } as unknown as CombatLog;
+
+    expect(adventureLogEntryHtml(entry)).toBe(
+      '<strong>@@hero-1@@</strong> attacks <strong>@@guardian-1@@</strong> for 8 damage.',
+    );
+  });
+
+  it('leaves an unrecognized token as-is instead of stripping it', () => {
+    const entry = {
+      message: '**@@stale-id@@** has been defeated!',
+      combatants: [{ id: 'hero-1', name: 'Jala', hp: 18, maxHp: 20 }],
+    } as unknown as CombatLog;
+
+    expect(adventureLogEntryHtml(entry)).toBe(
+      '<strong>@@stale-id@@</strong> has been defeated!',
+    );
+  });
+
+  it('colors two combatants that share the same name independently, by id', () => {
+    const entry = {
+      message: '**@@hero-1@@** protects **@@hero-2@@**.',
+      combatants: [
+        { id: 'hero-1', name: 'Rowan', hp: 18, maxHp: 20 },
+        { id: 'hero-2', name: 'Rowan', hp: 2, maxHp: 20 },
+      ],
+    } as unknown as CombatLog;
+
+    expect(adventureLogEntryHtml(entry)).toBe(
+      '<strong><span class="text-green-400">Rowan</span></strong> protects <strong><span class="text-rose-400">Rowan</span></strong>.',
+    );
   });
 });
 

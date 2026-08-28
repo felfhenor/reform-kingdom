@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import {
-  adventureLogMessageHtml,
+  adventureLogEntryHtml,
   adventureLogTimestampTooltip,
   combatLog,
-  combatLogHealthColor,
 } from '@helpers/combat/combat-log';
-import type { CombatLog } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { TimeagoPipe } from 'ngx-timeago';
 
@@ -21,12 +19,6 @@ export class PlayAdventureLogComponent {
     combatLog().filter((entry) => entry.message.trim() !== ''),
   );
 
-  public messageHtml = adventureLogMessageHtml;
+  public messageHtml = adventureLogEntryHtml;
   public timestampTooltip = adventureLogTimestampTooltip;
-
-  public messageColor(entry: CombatLog): string {
-    if (entry.colorOverride) return entry.colorOverride;
-    if (entry.hp === undefined || !entry.maxHp) return '';
-    return combatLogHealthColor(entry.hp, entry.maxHp);
-  }
 }

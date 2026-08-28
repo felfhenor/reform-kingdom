@@ -1,5 +1,6 @@
 import { combatCombatantTakeDamage } from '@helpers/combat/combat-damage';
 import {
+  combatantMessageToken,
   combatFormatMessage,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
@@ -116,7 +117,7 @@ export function combatApplyStatusEffectToTarget(
   if (statusEffect.effectType === 'Debuff' && shouldIgnoreDebuff) {
     combatMessageLog(
       combat,
-      `**${statusEffect.name}** is shrugged off by **${combatant.name}**!`,
+      `**${statusEffect.name}** is shrugged off by **${combatantMessageToken(combatant)}**!`,
       combatant,
     );
     return;
@@ -228,9 +229,13 @@ function combatHandleStatusEffectBehaviors(
   behaviorTypes[behavior.type]();
 
   if (!suppressMessages && behavior.combatMessage) {
-    const message = combatFormatMessage(behavior.combatMessage, templateData);
-    const color = effect.effectType === 'Buff' ? 'text-buff' : 'text-debuff';
-    combatMessageLog(combat, message, combatant, color);
+    // Spread here, not in templateData, so combatant keeps the damage/healing applied above.
+    const renderData = {
+      ...templateData,
+      combatant: { ...combatant, name: combatantMessageToken(combatant) },
+    };
+    const message = combatFormatMessage(behavior.combatMessage, renderData);
+    combatMessageLog(combat, message, combatant);
   }
 }
 

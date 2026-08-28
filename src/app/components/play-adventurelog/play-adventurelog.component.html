@@ -11,10 +11,7 @@
           {{ entry.timestamp | timeago }}
         </span>
         <span class="text-lighter shrink-0">[{{ entry.locationName }}]</span>
-        <span
-          [class]="messageColor(entry)"
-          [innerHTML]="messageHtml(entry.message)"
-        ></span>
+        <span [innerHTML]="messageHtml(entry)"></span>
       </div>
     } @empty {
       <div class="p-4 italic text-lighter">Nothing has happened yet.</div>

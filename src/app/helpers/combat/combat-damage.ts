@@ -1,6 +1,7 @@
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatantIsDead } from '@helpers/combat/combat-end';
 import {
+  combatantMessageToken,
   combatFormatMessage,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
@@ -121,7 +122,7 @@ export function combatApplySkillToTarget(
   ) {
     combatMessageLog(
       combat,
-      `**${target.name}** dodges **${combatant.name}**'s **${skill.name}**!`,
+      `**${combatantMessageToken(target)}** dodges **${combatantMessageToken(combatant)}**'s **${skill.name}**!`,
       target,
     );
     return;
@@ -210,7 +211,13 @@ export function combatApplySkillToTarget(
   }
 
   if (technique.combatMessage) {
-    const message = combatFormatMessage(technique.combatMessage, templateData);
+    // Spread here, not in templateData, so combatant/target keep the damage applied above.
+    const renderData = {
+      ...templateData,
+      combatant: { ...combatant, name: combatantMessageToken(combatant) },
+      target: { ...target, name: combatantMessageToken(target) },
+    };
+    const message = combatFormatMessage(technique.combatMessage, renderData);
     const critSuffix = isCriticalHit ? ' **Critical hit (2x)!**' : '';
     combatMessageLog(combat, `${message}${critSuffix}`, target);
   }
@@ -220,7 +227,7 @@ export function combatApplySkillToTarget(
 
     combatMessageLog(
       combat,
-      `**${combatant.name}** took ${retaliationDamage} damage in retaliation (${combatant.hp}/${combatant.totalStats.Health} HP remaining)!`,
+      `**${combatantMessageToken(combatant)}** took ${retaliationDamage} damage in retaliation (${combatant.hp}/${combatant.totalStats.Health} HP remaining)!`,
       combatant,
     );
   }
@@ -244,7 +251,7 @@ export function combatApplySkillToTarget(
     if (tagResistance > 0 && rngSucceedsChance(tagResistance)) {
       combatMessageLog(
         combat,
-        `**${effectContent.name}** is resisted by **${target.name}**!`,
+        `**${effectContent.name}** is resisted by **${combatantMessageToken(target)}**!`,
         target,
       );
       return;
@@ -265,6 +272,9 @@ export function combatApplySkillToTarget(
   });
 
   if (combatantIsDead(target)) {
-    combatMessageLog(combat, `**${target.name}** has been defeated!`);
+    combatMessageLog(
+      combat,
+      `**${combatantMessageToken(target)}** has been defeated!`,
+    );
   }
 }
