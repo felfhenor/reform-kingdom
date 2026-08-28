@@ -59,7 +59,6 @@ export function healPartyToFull(): void {
 const HEALING_MINIMUM_SECONDS = 10;
 const HEALING_SECONDS_PER_LEVEL = 2;
 
-// Flat minimum plus per-level scaling; see M1-09 in the roadmap for the eventual per-hero healing-timer design.
 export function healingTicksForLevel(members: { level: number }[]): number {
   const highestLevel = Math.max(...members.map((member) => member.level), 1);
   return HEALING_MINIMUM_SECONDS + highestLevel * HEALING_SECONDS_PER_LEVEL;

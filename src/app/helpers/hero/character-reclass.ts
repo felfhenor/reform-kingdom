@@ -139,7 +139,7 @@ function reclassCharacterInState(
   return true;
 }
 
-// Reclassing unequips gear to the Armory (per M2-03) rather than discarding it, then auto-optimizes the new loadout.
+// Reclassing unequips gear to the Armory rather than discarding it, then auto-optimizes the new loadout.
 // Batched into one `updateGamestate` transaction so a multi-hero "Reclass All" prices and applies every swap atomically.
 export function charactersReclass(picks: CharacterReclassPick[]): void {
   let reclassedCount = 0;
