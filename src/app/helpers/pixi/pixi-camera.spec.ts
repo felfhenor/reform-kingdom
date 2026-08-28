@@ -29,29 +29,32 @@ describe('cameraBoundsCalculate', () => {
 });
 
 describe('cameraPositionCalculate', () => {
+  const largeMapBounds = cameraBoundsCalculate(10, 10, 50, 50);
+  const smallMapBounds = cameraBoundsCalculate(20, 20, 10, 10);
+
   it('should center the camera on the player away from any edge', () => {
-    expect(cameraPositionCalculate(24, 24, 10, 10, 50, 50)).toEqual({
+    expect(cameraPositionCalculate(24, 24, 10, 10, largeMapBounds)).toEqual({
       x: 19,
       y: 19,
     });
   });
 
   it('should clamp half a tile past the left/top edge when the player is near the start', () => {
-    expect(cameraPositionCalculate(1, 1, 10, 10, 50, 50)).toEqual({
+    expect(cameraPositionCalculate(1, 1, 10, 10, largeMapBounds)).toEqual({
       x: -0.5,
       y: -0.5,
     });
   });
 
   it('should clamp half a tile past the right/bottom edge when the player is near the end', () => {
-    expect(cameraPositionCalculate(49, 49, 10, 10, 50, 50)).toEqual({
+    expect(cameraPositionCalculate(49, 49, 10, 10, largeMapBounds)).toEqual({
       x: 39.5,
       y: 39.5,
     });
   });
 
   it('should fill the viewport entirely when the map is smaller than the viewport', () => {
-    expect(cameraPositionCalculate(5, 5, 20, 20, 10, 10)).toEqual({
+    expect(cameraPositionCalculate(5, 5, 20, 20, smallMapBounds)).toEqual({
       x: 0,
       y: 0,
     });

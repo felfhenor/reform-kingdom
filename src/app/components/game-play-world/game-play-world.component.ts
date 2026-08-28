@@ -72,6 +72,7 @@ import {
   worldNodeDiscoverIfHidden,
 } from '@helpers/world-node/world-nodes';
 import type {
+  CameraBounds,
   CameraPosition,
   CurrentLocation,
   GlobalEffectId,
@@ -79,6 +80,7 @@ import type {
   TiledMap,
   TiledObject,
   TravelGlideState,
+  ViewportTiles,
   WorkerContent,
   WorkerId,
   WorldNodeLabelInfo,
@@ -131,6 +133,10 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   // Frozen anchor while panned, so party movement doesn't drag the panned view. Cleared by `recenterCamera`.
   private frozenCameraBase?: CameraPosition;
+
+  // Refreshed only on resize/zoom/map-load by `refreshViewportGeometry`, not every frame.
+  private viewportTiles: ViewportTiles = { widthTiles: 0, heightTiles: 0 };
+  private cameraBounds: CameraBounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
 
   public fadeVisible = signal<boolean>(false);
   public isMapLoading = signal<boolean>(true);
@@ -215,7 +221,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     effect(() => {
       const mapZoom = getOption('mapZoom');
       if (this.app) this.app.stage.scale.set(mapZoom);
-      untracked(() => this.positionCamera());
+      untracked(() => {
+        this.refreshViewportGeometry();
+        this.positionCamera();
+      });
     });
 
     effect(() => {
@@ -369,6 +378,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     });
     // The mapZoom effect can't apply this itself - `this.app` didn't exist when it last ran.
     this.app.stage.scale.set(getOption('mapZoom'));
+    this.refreshViewportGeometry();
 
     const containers = pixiWorldContainersCreate(this.app);
     this.mapContainer = containers.mapContainer;
@@ -393,9 +403,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.canvas.addEventListener('pointerup', this.onPointerUp);
     this.canvas.addEventListener('pointercancel', this.onPointerUp);
 
-    this.resizeObserver = pixiResponsiveCanvasSetup(this.app, element, () =>
-      this.positionCamera(),
-    );
+    this.resizeObserver = pixiResponsiveCanvasSetup(this.app, element, () => {
+      this.refreshViewportGeometry();
+      this.positionCamera();
+    });
 
     const textures = await pixiTiledMapTexturesLoad(map);
     const renderedMap = pixiTiledMapRender(
@@ -538,18 +549,31 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.dragPointerId = undefined;
   };
 
+  // Screen size/zoom/map dimensions only change on resize/zoom/map load, not every frame.
+  private refreshViewportGeometry(): void {
+    if (!this.app || !this.map) return;
+
+    this.viewportTiles = viewportTilesCalculate(
+      this.app.screen.width,
+      this.app.screen.height,
+      getOption('mapZoom'),
+      this.map.tilewidth,
+      this.map.tileheight,
+    );
+    this.cameraBounds = cameraBoundsCalculate(
+      this.viewportTiles.widthTiles,
+      this.viewportTiles.heightTiles,
+      this.map.width,
+      this.map.height,
+    );
+  }
+
   private panCamera(dragDeltaX: number, dragDeltaY: number): void {
     if (!this.app || !this.map) return;
 
     const zoom = getOption('mapZoom');
     const { widthTiles: viewportWidthTiles, heightTiles: viewportHeightTiles } =
-      viewportTilesCalculate(
-        this.app.screen.width,
-        this.app.screen.height,
-        zoom,
-        this.map.tilewidth,
-        this.map.tileheight,
-      );
+      this.viewportTiles;
 
     // Anchor only on the first off-center move of this gesture; later deltas accumulate against the same frozen anchor.
     if (!this.frozenCameraBase) {
@@ -559,16 +583,9 @@ export class GamePlayWorldComponent implements OnDestroy {
         location.y,
         viewportWidthTiles,
         viewportHeightTiles,
-        this.map.width,
-        this.map.height,
+        this.cameraBounds,
       );
     }
-    const bounds = cameraBoundsCalculate(
-      viewportWidthTiles,
-      viewportHeightTiles,
-      this.map.width,
-      this.map.height,
-    );
 
     // Tile size must include zoom, since drag deltas are screen pixels but offset is unscaled tile units.
     this.cameraOffset.set(
@@ -579,7 +596,7 @@ export class GamePlayWorldComponent implements OnDestroy {
         this.map.tilewidth * zoom,
         this.map.tileheight * zoom,
         this.frozenCameraBase,
-        bounds,
+        this.cameraBounds,
       ),
     );
 
@@ -730,22 +747,9 @@ export class GamePlayWorldComponent implements OnDestroy {
       return;
 
     const location = this.visualPosition;
-    const zoom = getOption('mapZoom');
     const { widthTiles: viewportWidthTiles, heightTiles: viewportHeightTiles } =
-      viewportTilesCalculate(
-        this.app.screen.width,
-        this.app.screen.height,
-        zoom,
-        this.map.tilewidth,
-        this.map.tileheight,
-      );
-
-    const bounds = cameraBoundsCalculate(
-      viewportWidthTiles,
-      viewportHeightTiles,
-      this.map.width,
-      this.map.height,
-    );
+      this.viewportTiles;
+    const bounds = this.cameraBounds;
     const offset = this.cameraOffset();
 
     // Stay anchored at `frozenCameraBase` while panned, so party movement doesn't drag the view.
@@ -756,8 +760,7 @@ export class GamePlayWorldComponent implements OnDestroy {
         location.y,
         viewportWidthTiles,
         viewportHeightTiles,
-        this.map.width,
-        this.map.height,
+        bounds,
       );
 
     // Reclamped (not trusting `offset` alone) to cover a resize while panned shifting the bounds.

@@ -39,16 +39,8 @@ export function cameraPositionCalculate(
   playerY: number,
   viewportWidthTiles: number,
   viewportHeightTiles: number,
-  mapWidthTiles: number,
-  mapHeightTiles: number,
+  bounds: CameraBounds,
 ): CameraPosition {
-  const bounds = cameraBoundsCalculate(
-    viewportWidthTiles,
-    viewportHeightTiles,
-    mapWidthTiles,
-    mapHeightTiles,
-  );
-
   const x = clamp(playerX - viewportWidthTiles / 2, bounds.minX, bounds.maxX);
   const y = clamp(playerY - viewportHeightTiles / 2, bounds.minY, bounds.maxY);
 

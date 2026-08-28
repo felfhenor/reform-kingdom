@@ -1,3 +1,5 @@
+import type { Signal } from '@angular/core';
+import { computed } from '@angular/core';
 import { getEntry } from '@helpers/content';
 import {
   analyticsSafeSegment,
@@ -220,14 +222,16 @@ export function workerTravelRemainingTicks(workerId: WorkerId): number | undefin
   return sum(costs);
 }
 
-// Read by the PIXI map-rendering layer to know which workers need a visible
-// token right now, and where their in-progress step is.
-export function workersTravelingTokens(): {
-  workerId: WorkerId;
-  mapName: string;
-  path: TravelStep[];
-  ticksIntoStep: number;
-}[] {
+// Read every animation frame by the PIXI map-rendering layer - memoized so an unchanged
+// gamestate reuses the same array instead of rebuilding it from all workers each frame.
+export const workersTravelingTokens: Signal<
+  {
+    workerId: WorkerId;
+    mapName: string;
+    path: TravelStep[];
+    ticksIntoStep: number;
+  }[]
+> = computed(() => {
   const workers = gamestate().workers;
 
   return (Object.keys(workers) as WorkerId[])
@@ -248,4 +252,4 @@ export function workersTravelingTokens(): {
       };
     })
     .filter((token): token is NonNullable<typeof token> => !!token);
-}
+});
