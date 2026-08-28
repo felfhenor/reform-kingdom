@@ -43,6 +43,14 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node/world-node-gathering', () => ({
+  gatheringResultsAtLevel: vi.fn((gathering) => gathering.gatherResults),
+}));
+
+vi.mock('@helpers/world-node/world-node-level', () => ({
+  worldNodeLevel: vi.fn(() => 0),
+}));
+
 import { gatherMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
 import { partyGainXp } from '@helpers/hero/character-progress';
@@ -63,6 +71,8 @@ import {
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
+import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
   worldNodeGathering,
@@ -250,7 +260,7 @@ describe('gatheringRollResult', () => {
     vi.clearAllMocks();
   });
 
-  it('delegates to rngChoiceWeighted using each result chance as its weight', () => {
+  it('delegates to rngChoiceWeighted over the results available at the given level', () => {
     const results = [
       { chance: 40, items: [] },
       { chance: 10, items: [] },
@@ -258,7 +268,9 @@ describe('gatheringRollResult', () => {
     vi.mocked(rngChoiceWeighted).mockReturnValue(results[1]);
 
     const gathering = buildGathering({ gatherResults: results });
-    expect(gatheringRollResult(gathering)).toBe(results[1]);
+    expect(gatheringRollResult(gathering, 2)).toBe(results[1]);
+
+    expect(gatheringResultsAtLevel).toHaveBeenCalledWith(gathering, 2);
 
     const [items, weightFn] = vi.mocked(rngChoiceWeighted).mock.calls[0];
     expect(items).toBe(results);
@@ -406,6 +418,7 @@ describe('gatheringProcessTick', () => {
 
     gatheringProcessTick();
 
+    expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
     expect(partyGainXp).toHaveBeenCalledWith(3);
     expect(addMaterial).toHaveBeenCalledWith('wood', 2);
     expect(gatherMessageLog).toHaveBeenCalledWith(

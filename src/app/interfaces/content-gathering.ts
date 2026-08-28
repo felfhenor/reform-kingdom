@@ -14,6 +14,9 @@ export type GatherResultItem = {
 export type GatherResult = {
   chance: number;
   items: GatherResultItem[];
+
+  // Node development level this result is restricted to; omitted means always available.
+  levelRequirement?: number;
 };
 
 export type GatheringContent = IsContentItem &
@@ -31,4 +34,11 @@ export type GatheringContent = IsContentItem &
 
     // Gates whether a worker (see content-worker.ts) gains XP gathering here.
     workerLevelRange: LevelRange;
+
+    // Tier count for gold-funded leveling (see world-node-level.ts) - never factored into
+    // levelRange/workerLevelRange eligibility checks.
+    maxLevel: number;
+
+    // Gold cost to level up from level N to N+1 is levelCostScalar * (N+1).
+    levelCostScalar: number;
   };

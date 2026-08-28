@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
+import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
 import { PanelMapNodeBadgesCaravanComponent } from '@components/panel-map-node-badges-caravan/panel-map-node-badges-caravan.component';
 import { PanelMapNodeBadgesExploreComponent } from '@components/panel-map-node-badges-explore/panel-map-node-badges-explore.component';
 import { PanelMapNodeBadgesGatherComponent } from '@components/panel-map-node-badges-gather/panel-map-node-badges-gather.component';
@@ -36,6 +37,10 @@ import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-cara
 import { worldNodeDescription } from '@helpers/world-node/world-node-content';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering';
+import {
+  gatherNodeLevelUp,
+  worldNodeLevel,
+} from '@helpers/world-node/world-node-level';
 import { worldNodeCompletionRewards } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeLevelLabel,
@@ -58,6 +63,7 @@ import { sortBy, sum } from 'es-toolkit/compat';
     SlotGatherMaterialComponent,
     PanelMapNodeActionsCaravanComponent,
     PanelMapNodeActionsExploreComponent,
+    PanelMapNodeActionsGatherComponent,
     PanelMapNodeBadgesCaravanComponent,
     PanelMapNodeBadgesExploreComponent,
     PanelMapNodeBadgesGatherComponent,
@@ -72,13 +78,19 @@ import { sortBy, sum } from 'es-toolkit/compat';
 export class PanelMapNodeComponent {
   public node = computed(() => selectedMapNode());
 
+  public gatherNodeLevel = computed(() => {
+    const entry = this.node();
+    return entry && this.isGatherNode() ? worldNodeLevel(entry.nodeName) : 0;
+  });
+
   public displayName = computed(() => {
     const entry = this.node();
     if (!entry) return '';
 
-    return this.isCaravanNode()
-      ? caravanBrandName(entry.nodeName)
-      : entry.nodeName;
+    if (this.isCaravanNode()) return caravanBrandName(entry.nodeName);
+
+    const level = this.gatherNodeLevel();
+    return level > 0 ? `${entry.nodeName} +${level}` : entry.nodeName;
   });
 
   public levelLabel = computed(() => {
@@ -235,6 +247,13 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     caravanTradeOpen(entry);
+  }
+
+  public develop(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    gatherNodeLevelUp(entry.nodeName);
   }
 
   public close(): void {

@@ -3,6 +3,7 @@ import { runCompletionRewardsAnalysis } from '@helpers/debug/analysis-completion
 import { runContentGapsAnalysis } from '@helpers/debug/analysis-contentgaps';
 import { runDebuffResistanceAnalysis } from '@helpers/debug/analysis-debuffresistance';
 import { runFieldNodesAnalysis } from '@helpers/debug/analysis-fieldnodes';
+import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gatherdevelopmentlevels';
 import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
 import { runMaterialUtilizationAnalysis } from '@helpers/debug/analysis-materialutilization';
 import { runMonsterStatsAnalysis } from '@helpers/debug/analysis-monsterstats';
@@ -163,6 +164,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runFieldNodesAnalysis,
+  },
+  {
+    id: 'gatherdevelopmentlevels',
+    title: 'Gather Development Levels',
+    description:
+      'Every GatherNode development level (0..maxLevel-1) has at least one available gatherResults entry.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runGatherDevelopmentLevelsAnalysis,
   },
   {
     id: 'workerstamina',

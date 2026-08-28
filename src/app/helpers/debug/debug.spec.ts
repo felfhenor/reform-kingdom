@@ -70,6 +70,11 @@ vi.mock('@helpers/world-node/world-node-discovery', () => ({
   worldNodeUndiscover: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node/world-nodes', () => ({
+  worldNodeByName: vi.fn(),
+  worldNodeGathering: vi.fn(),
+}));
+
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   isRecipeDropGated,
@@ -90,6 +95,7 @@ import {
   debugGiveItem,
   debugResetBestiary,
   debugSetCharacterLevel,
+  debugSetGatherNodeLevel,
   debugSetTradeskillLevel,
   debugUndiscoverRecipe,
   debugUndiscoverWorldNode,
@@ -111,6 +117,10 @@ import {
   worldNodeDiscover,
   worldNodeUndiscover,
 } from '@helpers/world-node/world-node-discovery';
+import {
+  worldNodeByName,
+  worldNodeGathering,
+} from '@helpers/world-node/world-nodes';
 
 describe('Debug Helper Functions', () => {
   beforeEach(() => {
@@ -524,6 +534,55 @@ describe('Debug Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.worldDiscoveries).toEqual({});
+    });
+  });
+
+  describe('debugSetGatherNodeLevel', () => {
+    // debugSetTradeskillLevel's tests above leave a stale auto-invoking mockImplementation
+    // on updateGamestate (mockClear doesn't remove it) - reset it to a clean, non-executing mock.
+    beforeEach(() => {
+      vi.mocked(updateGamestate).mockReset();
+    });
+
+    it('warns and does nothing for an unknown gather node', () => {
+      vi.mocked(worldNodeByName).mockReturnValue(undefined);
+
+      debugSetGatherNodeLevel('Nowhere', 2);
+
+      expect(console.warn).toHaveBeenCalled();
+      expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it("clamps the level between 0 and the node's max achievable level (maxLevel - 1)", () => {
+      vi.mocked(worldNodeByName).mockReturnValue({} as never);
+      vi.mocked(worldNodeGathering).mockReturnValue({ maxLevel: 5 } as never);
+
+      debugSetGatherNodeLevel('Carrina Copper Mines', 8);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        gatherNodeLevels: {},
+      } as unknown as GameState);
+
+      expect(result.gatherNodeLevels['Carrina Copper Mines']).toEqual({
+        level: 4,
+      });
+    });
+
+    it('rounds and floors a negative level to 0', () => {
+      vi.mocked(worldNodeByName).mockReturnValue({} as never);
+      vi.mocked(worldNodeGathering).mockReturnValue({ maxLevel: 5 } as never);
+
+      debugSetGatherNodeLevel('Carrina Copper Mines', -3);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        gatherNodeLevels: {},
+      } as unknown as GameState);
+
+      expect(result.gatherNodeLevels['Carrina Copper Mines']).toEqual({
+        level: 0,
+      });
     });
   });
 });

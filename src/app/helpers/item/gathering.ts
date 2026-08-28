@@ -7,6 +7,8 @@ import { partyGet } from '@helpers/hero/party';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
+import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
   worldNodeGathering,
@@ -62,8 +64,12 @@ export function gatheringProgressFraction(): number {
 
 export function gatheringRollResult(
   gathering: GatheringContent,
+  level: number,
 ): GatherResult | undefined {
-  return rngChoiceWeighted(gathering.gatherResults, (result) => result.chance);
+  return rngChoiceWeighted(
+    gatheringResultsAtLevel(gathering, level),
+    (result) => result.chance,
+  );
 }
 
 export function gatheringStart(nodeName: string): boolean {
@@ -132,7 +138,7 @@ function grantGatherItems(
 function resolveGatherCycle(content: GatheringContent, nodeName: string): void {
   grantGatherXpIfInRange(content);
 
-  const result = gatheringRollResult(content);
+  const result = gatheringRollResult(content, worldNodeLevel(nodeName));
   if (result) {
     const yieldMultiplier = luckRollSucceeds(partyMaxLuck()) ? 2 : 1;
     grantGatherItems(result, nodeName, yieldMultiplier);

@@ -24,6 +24,14 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node/world-node-gathering', () => ({
+  gatheringResultsAtLevel: vi.fn((gathering) => gathering.gatherResults),
+}));
+
+vi.mock('@helpers/world-node/world-node-level', () => ({
+  worldNodeLevel: vi.fn(() => 0),
+}));
+
 import { getEntry } from '@helpers/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -39,6 +47,8 @@ import {
   workerGainXp,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
+import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
+import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
   worldNodeGathering,
@@ -107,9 +117,13 @@ describe('workerGatherRate', () => {
     const gathering = buildGathering();
 
     // Copper is 80/100 of the table weight, so its rate is 80% of gatherSpeed.
-    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID)).toBe(1.6);
+    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 0)).toBe(
+      1.6,
+    );
     // Malachite is rarer (20/100), so it's gathered proportionally slower.
-    expect(workerGatherRate(workerContent, 1, gathering, MALACHITE_ID)).toBe(0.4);
+    expect(
+      workerGatherRate(workerContent, 1, gathering, MALACHITE_ID, 0),
+    ).toBe(0.4);
   });
 
   it('is 0 for an item not present in the gather table', () => {
@@ -122,8 +136,32 @@ describe('workerGatherRate', () => {
     const gathering = buildGathering();
 
     expect(
-      workerGatherRate(workerContent, 1, gathering, 'unknown-item' as ItemId),
+      workerGatherRate(
+        workerContent,
+        1,
+        gathering,
+        'unknown-item' as ItemId,
+        0,
+      ),
     ).toBe(0);
+  });
+
+  it('restricts the weighted table to results available at the given node level', () => {
+    vi.mocked(workerStatsForLevel).mockReturnValue({
+      capacity: 6,
+      gatherSpeed: 2,
+      stamina: 30,
+    });
+    vi.mocked(gatheringResultsAtLevel).mockReturnValueOnce([
+      { chance: 80, items: [{ itemId: COPPER_ID, quantity: 1 }] },
+    ]);
+
+    const gathering = buildGathering();
+
+    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 2)).toBe(
+      2,
+    );
+    expect(gatheringResultsAtLevel).toHaveBeenCalledWith(gathering, 2);
   });
 });
 
@@ -182,6 +220,7 @@ describe('workerGatheringProcessTick', () => {
       workers: { [WORKER_ID]: buildWorker() },
     } as unknown as GameState);
 
+    expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
     expect(result.workers[WORKER_ID].status).toMatchObject({
       kind: 'Gathering',
       ticksIntoGather: 1,

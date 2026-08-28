@@ -350,6 +350,22 @@
           >
             Discover
           </button>
+
+          <span class="label-text text-right">Node Level</span>
+          <input
+            type="number"
+            [min]="0"
+            class="input input-bordered debug-give-qty"
+            [(ngModel)]="gatherNodeLevel"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:SetGatherNodeLevel"
+            (click)="setGatherNodeLevel()"
+          >
+            Set
+          </button>
         </div>
       </div>
     </div>

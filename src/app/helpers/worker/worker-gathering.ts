@@ -8,6 +8,8 @@ import {
   workerAssignmentIsValid,
   workerBeginReturnTrip,
 } from '@helpers/worker/worker-travel';
+import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
+import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
   worldNodeGathering,
@@ -29,20 +31,24 @@ function gatheringContentForNode(
   return worldNodeGathering(node);
 }
 
-// Rate scales with this item's share of the node's weighted gatherResults table.
+// Rate scales with this item's share of the node's weighted gatherResults table,
+// restricted to results available at the node's current development level.
 export function workerGatherRate(
   worker: WorkerContent,
   level: number,
   gathering: GatheringContent,
   itemId: ItemId,
+  nodeLevel: number,
 ): number {
+  const resultsAtLevel = gatheringResultsAtLevel(gathering, nodeLevel);
+
   const itemWeight = sumBy(
-    gathering.gatherResults.filter((result) =>
+    resultsAtLevel.filter((result) =>
       result.items.some((item) => item.itemId === itemId),
     ),
     (result) => result.chance,
   );
-  const totalWeight = sumBy(gathering.gatherResults, (result) => result.chance);
+  const totalWeight = sumBy(resultsAtLevel, (result) => result.chance);
 
   if (itemWeight <= 0 || totalWeight <= 0) return 0;
 
@@ -115,6 +121,7 @@ export function workerGatheringProcessTick(workerId: WorkerId): void {
     worker.level,
     gathering,
     status.itemId,
+    worldNodeLevel(status.nodeName),
   );
   if (rate <= 0) return;
 

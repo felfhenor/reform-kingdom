@@ -13,31 +13,72 @@
   xpGainedIfInLevelRange: 6
   gatherTime: 15
 
+  maxLevel: 3
+  levelCostScalar: 75000
+
   gatherResults:
+    # level 1
     - chance: 6
+      levelRequirement: 0
       items:
         - itemId: Copper Ore
           quantity: 1
 
+    - chance: 1
+      levelRequirement: 0
+      items:
+        - itemId: Spirit Flesh
+          quantity: 1
+
+    # level 2
+    - chance: 6
+      levelRequirement: 1
+      items:
+        - itemId: Copper Ore
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      items:
+        - itemId: Malachite
+          quantity: 1
+
+    - chance: 3
+      levelRequirement: 1
+      items:
+        - itemId: Spirit Flesh
+          quantity: 2
+
+    # level 3
+    - chance: 6
+      levelRequirement: 2
+      items:
+        - itemId: Copper Ore
+          quantity: 3
+
     - chance: 5
+      levelRequirement: 2
       items:
         - itemId: Malachite
           quantity: 1
 
     - chance: 4
+      levelRequirement: 2
       items:
         - itemId: Spirit Flesh
-          quantity: 1
+          quantity: 2
 
     - chance: 3
+      levelRequirement: 2
       items:
         - itemId: Spirit Flesh
           quantity: 1
 
         - itemId: Copper Ore
-          quantity: 1
+          quantity: 2
 
     - chance: 1
+      levelRequirement: 2
       items:
         - itemId: Ghostcopper Dust
           quantity: 1

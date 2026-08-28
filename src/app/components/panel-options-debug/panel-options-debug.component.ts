@@ -16,6 +16,7 @@ import {
   debugResetBestiary,
   debugResetCommissions,
   debugSetCharacterLevel,
+  debugSetGatherNodeLevel,
   debugSetTradeskillLevel,
   debugSetWorkerLevel,
   debugUndiscoverRecipe,
@@ -118,6 +119,7 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     ),
   );
   public selectedGatherNodeName = signal<string | undefined>(undefined);
+  public gatherNodeLevel = signal<number>(0);
 
   public giveItem(): void {
     const itemId = this.selectedItemId();
@@ -196,5 +198,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!nodeName) return;
 
     debugDiscoverGatherNode(nodeName);
+  }
+
+  public setGatherNodeLevel(): void {
+    const nodeName = this.selectedGatherNodeName();
+    if (!nodeName) return;
+
+    debugSetGatherNodeLevel(nodeName, this.gatherNodeLevel());
   }
 }

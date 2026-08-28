@@ -21,6 +21,10 @@ vi.mock('@helpers/world-node/world-node-discovery', () => ({
   worldNodeDiscover: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node/world-node-level', () => ({
+  worldNodeLevel: vi.fn(() => 0),
+}));
+
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { isMaterialDiscovered } from '@helpers/item/materials';
@@ -29,7 +33,9 @@ import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery'
 import {
   allGatherableMaterialIds,
   gatherableMaterialIds,
+  gatheringResultsAtLevel,
 } from '@helpers/world-node/world-node-gathering';
+import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {
@@ -259,6 +265,84 @@ describe('gatherableMaterialIds', () => {
 
     vi.mocked(isMaterialDiscovered).mockReturnValue(true);
   });
+
+  it('excludes a level-gated material until the node is developed to that level', () => {
+    const gathering = buildGathering({
+      gatherResults: [
+        { chance: 50, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
+        {
+          chance: 50,
+          items: [{ itemId: 'azurite' as ItemId, quantity: 1 }],
+          levelRequirement: 2,
+        },
+      ],
+    });
+
+    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
+    setAllContentById(new Map([['gather-1', gathering]]));
+
+    const map = buildMap({
+      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
+    vi.mocked(worldNodeLevel).mockReturnValue(0);
+
+    expect(gatherableMaterialIds().sort()).toEqual(['wood']);
+
+    vi.mocked(worldNodeLevel).mockReturnValue(2);
+
+    expect(gatherableMaterialIds().sort()).toEqual(['azurite', 'wood']);
+
+    vi.mocked(worldNodeLevel).mockReturnValue(0);
+  });
+});
+
+describe('gatheringResultsAtLevel', () => {
+  function buildGathering(
+    overrides: Partial<GatheringContent> = {},
+  ): GatheringContent {
+    return {
+      id: 'gather-1' as GatheringId,
+      name: 'Carrina Copper Mines',
+      __type: 'gathering',
+      description: 'A small copper mine.',
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherTime: 10,
+      gatherResults: [],
+      ...overrides,
+    } as GatheringContent;
+  }
+
+  it('always includes results with no levelRequirement, regardless of level', () => {
+    const unrestricted = {
+      chance: 40,
+      items: [{ itemId: 'wood' as ItemId, quantity: 1 }],
+    };
+    const gathering = buildGathering({ gatherResults: [unrestricted] });
+
+    expect(gatheringResultsAtLevel(gathering, 0)).toEqual([unrestricted]);
+    expect(gatheringResultsAtLevel(gathering, 3)).toEqual([unrestricted]);
+  });
+
+  it('only includes a level-gated result at its exact level, not earlier or later ones', () => {
+    const levelOne = {
+      chance: 7,
+      items: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      levelRequirement: 0,
+    };
+    const levelTwo = {
+      chance: 4,
+      items: [{ itemId: 'azurite' as ItemId, quantity: 1 }],
+      levelRequirement: 1,
+    };
+    const gathering = buildGathering({ gatherResults: [levelOne, levelTwo] });
+
+    expect(gatheringResultsAtLevel(gathering, 0)).toEqual([levelOne]);
+    expect(gatheringResultsAtLevel(gathering, 1)).toEqual([levelTwo]);
+    expect(gatheringResultsAtLevel(gathering, 2)).toEqual([]);
+  });
 });
 
 describe('allGatherableMaterialIds', () => {
@@ -302,5 +386,29 @@ describe('allGatherableMaterialIds', () => {
     setAllMaps(new Map());
 
     expect(allGatherableMaterialIds()).toEqual([]);
+  });
+
+  it('includes a level-gated material regardless of the node\'s current development level - pruneInvalidDecreeGatherClauses relies on this to not delete a clause for a material that is just not unlocked yet', () => {
+    const gathering = buildGathering({
+      gatherResults: [
+        { chance: 50, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
+        {
+          chance: 50,
+          items: [{ itemId: 'azurite' as ItemId, quantity: 1 }],
+          levelRequirement: 3,
+        },
+      ],
+    });
+
+    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
+    setAllContentById(new Map([['gather-1', gathering]]));
+
+    const map = buildMap({
+      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+    });
+    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    vi.mocked(worldNodeLevel).mockReturnValue(0);
+
+    expect(allGatherableMaterialIds().sort()).toEqual(['azurite', 'wood']);
   });
 });

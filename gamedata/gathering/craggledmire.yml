@@ -13,25 +13,47 @@
   xpGainedIfInLevelRange: 5
   gatherTime: 10
 
+  maxLevel: 3
+  levelCostScalar: 50000
+
   gatherResults:
-    - chance: 40
+    # level 1
+    - chance: 5
+      levelRequirement: 0
       items:
         - itemId: Miremetal Ore
           quantity: 1
 
-    - chance: 30
+    # level 2
+    - chance: 5
+      levelRequirement: 1
       items:
         - itemId: Miremetal Ore
           quantity: 2
 
-    - chance: 20
+    - chance: 2
+      levelRequirement: 1
+      items:
+        - itemId: Peridot
+          quantity: 1
+
+    # level 3
+    - chance: 15
+      levelRequirement: 2
       items:
         - itemId: Miremetal Ore
           quantity: 3
 
-    - chance: 20
+    - chance: 10
+      levelRequirement: 2
       items:
         - itemId: Peridot
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 2
+      items:
+        - itemId: Ghost Peridot
           quantity: 1
 
 - id: 46f49626-9c31-4bee-9ce6-b2cf3acf8a5f
@@ -49,37 +71,61 @@
   xpGainedIfInLevelRange: 5
   gatherTime: 10
 
+  maxLevel: 3
+  levelCostScalar: 45000
+
   gatherResults:
-    - chance: 40
+    # level 1
+    - chance: 4
+      levelRequirement: 0
       items:
         - itemId: Mirewood
           quantity: 1
 
-    - chance: 40
+    - chance: 4
+      levelRequirement: 0
       items:
         - itemId: Mireweed
           quantity: 1
 
-    - chance: 25
+    # level 2
+    - chance: 4
+      levelRequirement: 1
+      items:
+        - itemId: Mirewood
+          quantity: 2
+
+    - chance: 4
+      levelRequirement: 1
+      items:
+        - itemId: Mireweed
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
       items:
         - itemId: Mirewood
           quantity: 1
         - itemId: Mireweed
           quantity: 1
 
-    - chance: 10
+    # level 3
+    - chance: 4
+      levelRequirement: 2
       items:
         - itemId: Mirewood
           quantity: 3
 
-    - chance: 10
+    - chance: 4
+      levelRequirement: 2
       items:
         - itemId: Mireweed
           quantity: 3
 
     - chance: 1
+      levelRequirement: 2
       items:
         - itemId: Mirewood
-          quantity: 3
+          quantity: 2
         - itemId: Mireweed
-          quantity: 3
+          quantity: 2

@@ -13,29 +13,84 @@
   xpGainedIfInLevelRange: 3
   gatherTime: 5
 
+  maxLevel: 3
+  levelCostScalar: 10000
+
   gatherResults:
-    - chance: 40
+    # level 1
+    - chance: 4
+      levelRequirement: 0
       items:
         - itemId: Wergen Stick
           quantity: 1
 
-    - chance: 30
+    - chance: 3
+      levelRequirement: 0
       items:
         - itemId: Wergen Wood
           quantity: 1
 
-    - chance: 10
-      items:
-        - itemId: Wergen Wood
-          quantity: 1
-
-        - itemId: Wergen Stick
-          quantity: 1
-
-    - chance: 30
+    - chance: 3
+      levelRequirement: 0
       items:
         - itemId: Tattered Hide
           quantity: 1
+
+    # level 2
+    - chance: 4
+      levelRequirement: 1
+      items:
+        - itemId: Wergen Stick
+          quantity: 2
+
+    - chance: 3
+      levelRequirement: 1
+      items:
+        - itemId: Wergen Wood
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      items:
+        - itemId: Wergen Wood
+          quantity: 1
+
+        - itemId: Wergen Stick
+          quantity: 1
+
+    - chance: 3
+      levelRequirement: 1
+      items:
+        - itemId: Tattered Hide
+          quantity: 2
+
+    # level 3
+    - chance: 4
+      levelRequirement: 2
+      items:
+        - itemId: Wergen Stick
+          quantity: 3
+
+    - chance: 3
+      levelRequirement: 2
+      items:
+        - itemId: Wergen Wood
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      items:
+        - itemId: Wergen Wood
+          quantity: 2
+
+        - itemId: Wergen Stick
+          quantity: 2
+
+    - chance: 3
+      levelRequirement: 2
+      items:
+        - itemId: Tattered Hide
+          quantity: 3
 
 - id: b947fc5a-9e29-413e-b529-b202ab540821
   name: Fieren Fields
@@ -52,11 +107,27 @@
   xpGainedIfInLevelRange: 3
   gatherTime: 5
 
+  maxLevel: 3
+  levelCostScalar: 10000
+
   gatherResults:
     - chance: 1
+      levelRequirement: 0
       items:
         - itemId: Flax Flower
           quantity: 1
+
+    - chance: 1
+      levelRequirement: 1
+      items:
+        - itemId: Flax Flower
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 2
+      items:
+        - itemId: Flax Flower
+          quantity: 3
 
 - id: 18846107-ec4c-479c-bd81-82c8d986d24e
   name: Carrina Copper Mines
@@ -73,15 +144,85 @@
   xpGainedIfInLevelRange: 3
   gatherTime: 5
 
+  maxLevel: 5
+  levelCostScalar: 15000
+
   gatherResults:
+    # level 1
     - chance: 7
+      levelRequirement: 0
       items:
         - itemId: Copper Ore
           quantity: 1
 
+    # level 2
+    - chance: 7
+      levelRequirement: 1
+      items:
+        - itemId: Copper Ore
+          quantity: 2
+
     - chance: 1
+      levelRequirement: 1
       items:
         - itemId: Malachite
+          quantity: 1
+
+    # level 3
+    - chance: 7
+      levelRequirement: 2
+      items:
+        - itemId: Copper Ore
+          quantity: 3
+
+    - chance: 4
+      levelRequirement: 2
+      items:
+        - itemId: Malachite
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 2
+      items:
+        - itemId: Azurite
+          quantity: 1
+
+    # level 4
+    - chance: 7
+      levelRequirement: 3
+      items:
+        - itemId: Copper Ore
+          quantity: 4
+
+    - chance: 4
+      levelRequirement: 3
+      items:
+        - itemId: Malachite
+          quantity: 2
+
+    - chance: 4
+      levelRequirement: 3
+      items:
+        - itemId: Azurite
+          quantity: 1
+
+    # level 5
+    - chance: 7
+      levelRequirement: 4
+      items:
+        - itemId: Copper Ore
+          quantity: 5
+
+    - chance: 4
+      levelRequirement: 4
+      items:
+        - itemId: Malachite
+          quantity: 2
+
+    - chance: 4
+      levelRequirement: 4
+      items:
+        - itemId: Azurite
           quantity: 1
 
 - id: 42c72ae0-56ba-42f5-ad7f-7b4b155074cf
@@ -101,13 +242,45 @@
   xpGainedIfInLevelRange: 10
   gatherTime: 10
 
+  maxLevel: 3
+  levelCostScalar: 35000
+
   gatherResults:
-    - chance: 100
+    # level 1
+    - chance: 10
+      levelRequirement: 0
       items:
         - itemId: Elven Wood
           quantity: 1
 
-    - chance: 10
+    - chance: 1
+      levelRequirement: 0
       items:
         - itemId: Elven Wood
           quantity: 2
+
+    # level 2
+    - chance: 5
+      levelRequirement: 1
+      items:
+        - itemId: Elven Wood
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      items:
+        - itemId: Elven Wood
+          quantity: 3
+
+    # level 3
+    - chance: 3
+      levelRequirement: 2
+      items:
+        - itemId: Elven Wood
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      items:
+        - itemId: Elven Wood
+          quantity: 4

@@ -142,6 +142,47 @@ describe('ensureContent', () => {
         },
       ]);
     });
+
+    it('preserves a gather result levelRequirement when authored', () => {
+      const result = ensureContent({
+        __type: 'gathering',
+        id: 'oak-tree',
+        name: 'Oak Tree',
+        gatherResults: [
+          {
+            chance: 0.5,
+            items: [{ itemId: 'wood', quantity: 3 }],
+            levelRequirement: 2,
+          },
+        ],
+      } as unknown as GatheringContent);
+
+      expect(result.gatherResults[0].levelRequirement).toBe(2);
+    });
+
+    it('defaults maxLevel to 1 and levelCostScalar to 0 when unauthored', () => {
+      const result = ensureContent({
+        __type: 'gathering',
+        id: 'oak-tree',
+        name: 'Oak Tree',
+      } as unknown as GatheringContent);
+
+      expect(result.maxLevel).toBe(1);
+      expect(result.levelCostScalar).toBe(0);
+    });
+
+    it('preserves an authored maxLevel and levelCostScalar', () => {
+      const result = ensureContent({
+        __type: 'gathering',
+        id: 'oak-tree',
+        name: 'Oak Tree',
+        maxLevel: 5,
+        levelCostScalar: 15000,
+      } as unknown as GatheringContent);
+
+      expect(result.maxLevel).toBe(5);
+      expect(result.levelCostScalar).toBe(15000);
+    });
   });
 
   describe('job', () => {

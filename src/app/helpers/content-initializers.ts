@@ -383,6 +383,7 @@ function ensureGatherResult(result: Partial<GatherResult> = {}): GatherResult {
   return {
     chance: result.chance ?? 0,
     items: ensureArray(result.items, ensureGatherResultItem),
+    levelRequirement: result.levelRequirement,
   };
 }
 
@@ -402,6 +403,8 @@ function ensureGathering(
     invisibleUntilCollectibleIdsFound:
       gathering.invisibleUntilCollectibleIdsFound ?? [],
     workerLevelRange: gathering.workerLevelRange ?? { min: 1, max: 99 },
+    maxLevel: gathering.maxLevel ?? 1,
+    levelCostScalar: gathering.levelCostScalar ?? 0,
   };
 }
 

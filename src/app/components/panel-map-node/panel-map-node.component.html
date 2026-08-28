@@ -84,6 +84,11 @@
           />
         } @else if (isCaravanNode()) {
           <app-panel-map-node-actions-caravan (openTrade)="openTrade()" />
+        } @else if (isGatherNode()) {
+          <app-panel-map-node-actions-gather
+            [entry]="entry"
+            (develop)="develop()"
+          />
         }
       </div>
     </div>

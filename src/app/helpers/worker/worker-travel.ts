@@ -5,6 +5,8 @@ import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
+import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
+import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
   kingdomNodeGet,
   worldNodeByName,
@@ -26,8 +28,8 @@ function gatherNodeHasItem(nodeName: string, itemId: ItemId): boolean {
   const gathering = worldNodeGathering(node);
   if (!gathering) return false;
 
-  return gathering.gatherResults.some((result) =>
-    result.items.some((item) => item.itemId === itemId),
+  return gatheringResultsAtLevel(gathering, worldNodeLevel(nodeName)).some(
+    (result) => result.items.some((item) => item.itemId === itemId),
   );
 }
 

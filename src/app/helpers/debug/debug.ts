@@ -35,6 +35,8 @@ import {
   worldNodeDiscover,
   worldNodeUndiscover,
 } from '@helpers/world-node/world-node-discovery';
+import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
+import { worldNodeByName, worldNodeGathering } from '@helpers/world-node/world-nodes';
 import type {
   CharacterId,
   CollectibleContent,
@@ -302,4 +304,25 @@ export function debugAssignWorker(
 
 export function debugRecallWorker(workerId: WorkerId): void {
   workerRecall(workerId);
+}
+
+// Bypasses the gold cost `gatherNodeLevelUp` normally requires - sets the level directly.
+export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
+  const node = worldNodeByName(nodeName);
+  const gathering = node ? worldNodeGathering(node) : undefined;
+  if (!gathering) {
+    console.warn(`Gather node "${nodeName}" not found.`);
+    return;
+  }
+
+  const clampedLevel = clamp(
+    Math.round(level),
+    0,
+    worldNodeMaxAchievableLevel(gathering),
+  );
+
+  updateGamestate((state) => {
+    state.gatherNodeLevels[nodeName] = { level: clampedLevel };
+    return state;
+  });
 }

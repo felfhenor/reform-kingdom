@@ -1,0 +1,16 @@
+<button
+  type="button"
+  class="btn btn-sm btn-primary"
+  [disabled]="!canDevelop()"
+  (click)="develop.emit()"
+  appSfx="ui-click"
+  [sfxTrigger]="['click', 'hover']"
+  [tp]="'Developing this location increases the yields from gathering here, and can unlock new material drops.'"
+>
+  @if (isMaxLevel()) {
+    This location is fully developed
+  } @else {
+    Develop for
+    <app-currency-cost [type]="goldItemId" [amount]="cost()" />
+  }
+</button>

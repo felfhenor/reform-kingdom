@@ -58,8 +58,10 @@ import {
 import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node/world-node-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { pruneInvalidGatherNodeLevels } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
+  worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -154,6 +156,13 @@ export function migrateGameState() {
   newState.discoveredGatherNodes = backfillLegacyGatherNodeDiscoveries(
     newState.discoveredGatherNodes,
     newState.materials,
+  );
+  newState.gatherNodeLevels = pruneInvalidGatherNodeLevels(
+    newState.gatherNodeLevels,
+    (nodeName) => {
+      const node = worldNodeByName(nodeName);
+      return node ? worldNodeGathering(node) : undefined;
+    },
   );
   newState.worldDiscoveries = pruneInvalidWorldDiscoveries(
     newState.worldDiscoveries,
