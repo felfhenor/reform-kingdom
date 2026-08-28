@@ -21,8 +21,8 @@ import { getEntry } from '@helpers/content';
 import { modalIsOpen } from '@helpers/engine/modal-stack';
 import {
   characterJobLevel,
-  charactersReclass,
   characterReclassCost,
+  charactersReclass,
 } from '@helpers/hero/character-reclass';
 import { getUnlockedJobs } from '@helpers/hero/job';
 import { partyGet } from '@helpers/hero/party';
@@ -38,7 +38,6 @@ import {
   NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
-import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy, sum } from 'es-toolkit/compat';
 
@@ -61,7 +60,6 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
     NgOptionTemplateDirective,
     NgLabelTemplateDirective,
     FormField,
-    TippyDirective,
     DecimalPipe,
     SweetAlert2Module,
   ],
@@ -91,12 +89,11 @@ export class ModalPlayKingdomReclassComponent {
 
   public totalReclassCost = computed(() =>
     sum(
-      this.picksModel()
-        .map((pick, index) => {
-          const character = this.party()[index];
-          if (!character || pick.jobId === character.jobId) return 0;
-          return characterReclassCost(character, pick.jobId);
-        }),
+      this.picksModel().map((pick, index) => {
+        const character = this.party()[index];
+        if (!character || pick.jobId === character.jobId) return 0;
+        return characterReclassCost(character, pick.jobId);
+      }),
     ),
   );
 
