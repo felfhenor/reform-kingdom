@@ -41,10 +41,17 @@
     }
   </div>
 
-  <div actions>
+  <div actions class="flex gap-4 items-center">
+    @if (hasChanges()) {
+      <div class="flex items-center justify-end gap-2 text-sm">
+        <span>Cost:</span>
+        <app-currency-cost [type]="goldItemId" [amount]="totalReclassCost()" />
+      </div>
+    }
+
     <button
       class="btn btn-primary"
-      [disabled]="!hasChanges()"
+      [disabled]="!hasChanges() || !canAffordReclass()"
       [swal]="reclassAllSwal"
     >
       Reclass All
@@ -55,7 +62,11 @@
 <swal
   #reclassAllSwal
   title="Reclass all changed heroes?"
-  text="Any hero whose class you changed will be reclassed and their equipment will be unequipped."
+  [text]="
+    'Any hero whose class you changed will be reclassed and their equipment will be unequipped. This action will cost ' +
+    (totalReclassCost() | number) +
+    ' gold.'
+  "
   icon="warning"
   (confirm)="applyReclassAll()"
 ></swal>

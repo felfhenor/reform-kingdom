@@ -37,3 +37,10 @@ export type Character = {
 
   equipment: EquipmentBlock;
 };
+
+// One hero's chosen new job, as batched by the reclass modal so a multi-hero
+// "Reclass All" applies (and prices) every swap within a single state update.
+export type CharacterReclassPick = {
+  characterId: CharacterId;
+  jobId: JobId;
+};

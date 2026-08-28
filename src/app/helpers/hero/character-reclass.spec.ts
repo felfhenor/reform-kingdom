@@ -6,7 +6,10 @@ import type {
   EquipmentItem,
   EquipmentItemId,
   GameState,
+  GameStateMaterials,
   IsContentItem,
+  ItemContent,
+  ItemId,
   JobContent,
   JobId,
 } from '@interfaces';
@@ -28,7 +31,12 @@ vi.mock('@helpers/state-game', () => ({
 
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
-import { characterReclass } from '@helpers/hero/character-reclass';
+import {
+  characterJobLevel,
+  characterReclass,
+  characterReclassCost,
+  charactersReclass,
+} from '@helpers/hero/character-reclass';
 import { characterStatsForLevel, createCharacter } from '@helpers/hero/party';
 import { updateGamestate } from '@helpers/state-game';
 
@@ -87,8 +95,21 @@ describe('characterReclass', () => {
     type: 'Hat',
   };
 
+  const mockGoldCoin: ItemContent = {
+    id: 'item-gold-coin' as ItemId,
+    name: 'Gold Coin',
+    __type: 'item',
+    description: '',
+    sprite: '0000',
+    rarity: 'Common',
+  };
+
+  function richMaterials(quantity = 100_000): GameStateMaterials {
+    return { [mockGoldCoin.id]: { quantity, foundAt: 0 } };
+  }
+
   function mockGetEntry(...entries: IsContentItem[]): void {
-    const known = [mockCloak, mockStarterHat, ...entries];
+    const known = [mockCloak, mockStarterHat, mockGoldCoin, ...entries];
     vi.mocked(getEntry).mockImplementation(
       (idOrName) =>
         known.find(
@@ -136,6 +157,7 @@ describe('characterReclass', () => {
     const result = updateFn({
       world: { party: [jala] },
       armory: [],
+      materials: richMaterials(),
     } as unknown as GameState);
 
     const expectedStats = characterStatsForLevel(
@@ -163,6 +185,7 @@ describe('characterReclass', () => {
     const result = updateFn({
       world: { party: [jala] },
       armory: [],
+      materials: richMaterials(),
     } as unknown as GameState);
 
     expect(result.world.party[0].equipment).toEqual(defaultEquipment());
@@ -178,6 +201,7 @@ describe('characterReclass', () => {
     const result = updateFn({
       world: { party: [jala] },
       armory: [],
+      materials: richMaterials(),
     } as unknown as GameState);
 
     expect(result.armory).toEqual([
@@ -197,6 +221,7 @@ describe('characterReclass', () => {
     const result = updateFn({
       world: { party: [jala] },
       armory: [existingItem],
+      materials: richMaterials(),
     } as unknown as GameState);
 
     expect(result.armory).toEqual([
@@ -217,6 +242,7 @@ describe('characterReclass', () => {
     const result = updateFn({
       world: { party: [jala] },
       armory: [],
+      materials: richMaterials(),
     } as unknown as GameState);
 
     expect(result.world.party[0].jobProgress['job-explorer' as JobId]).toEqual({
@@ -236,6 +262,7 @@ describe('characterReclass', () => {
     const afterFirstReclass = updateFn1({
       world: { party: [jala] },
       armory: [],
+      materials: richMaterials(),
     } as unknown as GameState).world.party[0];
 
     vi.clearAllMocks();
@@ -246,6 +273,7 @@ describe('characterReclass', () => {
     const result = updateFn2({
       world: { party: [afterFirstReclass] },
       armory: [],
+      materials: richMaterials(),
     } as unknown as GameState);
 
     expect(result.world.party[0].level).toBe(10);
@@ -276,9 +304,131 @@ describe('characterReclass', () => {
     const result = updateFn({
       world: { party: [jala, spoorle] },
       armory: [],
+      materials: richMaterials(),
     } as unknown as GameState);
 
     expect(result.world.party[1]).toEqual(spoorle);
+  });
+
+  describe('characterJobLevel', () => {
+    it('returns 1 for a job never held', () => {
+      const jala = { ...createCharacterStub('Jala'), level: 10 };
+      expect(characterJobLevel(jala, 'job-warrior' as JobId)).toBe(1);
+    });
+
+    it('returns the current level for the active job', () => {
+      const jala = { ...createCharacterStub('Jala'), level: 10 };
+      expect(characterJobLevel(jala, 'job-explorer' as JobId)).toBe(10);
+    });
+
+    it('returns the saved progress level for a previously held job', () => {
+      const jala = createCharacterStub('Jala');
+      jala.jobProgress['job-warrior' as JobId] = {
+        level: 7,
+        xp: { current: 0, maximum: 100 },
+      };
+      expect(characterJobLevel(jala, 'job-warrior' as JobId)).toBe(7);
+    });
+  });
+
+  describe('characterReclassCost', () => {
+    it('costs 100 gold per level of the target job', () => {
+      const jala = createCharacterStub('Jala');
+      jala.jobProgress['job-warrior' as JobId] = {
+        level: 7,
+        xp: { current: 0, maximum: 100 },
+      };
+
+      expect(characterReclassCost(jala, 'job-unheld' as JobId)).toBe(100);
+      expect(characterReclassCost(jala, 'job-warrior' as JobId)).toBe(700);
+    });
+  });
+
+  it('spends gold from the target job level, and leaves the state untouched if unaffordable', () => {
+    mockGetEntry(mockJob, warriorJob);
+    const jala = createCharacterStub('Jala');
+
+    characterReclass(jala.id, 'job-warrior' as JobId);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const goldId = mockGoldCoin.id;
+
+    const affordableResult = updateFn({
+      world: { party: [jala] },
+      armory: [],
+      materials: richMaterials(100),
+    } as unknown as GameState);
+
+    expect(affordableResult.materials[goldId]?.quantity ?? 0).toBe(0);
+    expect(affordableResult.world.party[0].jobId).toBe('job-warrior');
+
+    const tooPoorState = {
+      world: { party: [jala] },
+      armory: [],
+      materials: richMaterials(99),
+    } as unknown as GameState;
+    const unaffordableResult = updateFn(tooPoorState);
+
+    expect(unaffordableResult).toBe(tooPoorState);
+    expect(unaffordableResult.world.party[0].jobId).toBe('job-explorer');
+  });
+
+  describe('charactersReclass (batch)', () => {
+    it('applies every pick within a single updateGamestate transaction', () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = createCharacterStub('Jala');
+      const spoorle = {
+        ...createCharacterStub('Spoorle'),
+        id: 'other-uuid' as CharacterId,
+      };
+
+      charactersReclass([
+        { characterId: jala.id, jobId: 'job-warrior' as JobId },
+        { characterId: spoorle.id, jobId: 'job-warrior' as JobId },
+      ]);
+
+      expect(vi.mocked(updateGamestate).mock.calls.length).toBe(1);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala, spoorle] },
+        armory: [],
+        materials: richMaterials(),
+      } as unknown as GameState);
+
+      expect(result.world.party[0].jobId).toBe('job-warrior');
+      expect(result.world.party[1].jobId).toBe('job-warrior');
+    });
+
+    // Whole batch runs as one updateGamestate call, so no other transaction can interleave between picks.
+    it("shares one gold pool across the batch, so a later hero's reclass is skipped once an earlier one spends it down", () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = { ...createCharacterStub('Jala'), level: 1 };
+      const spoorle = {
+        ...createCharacterStub('Spoorle'),
+        id: 'other-uuid' as CharacterId,
+        level: 1,
+      };
+
+      charactersReclass([
+        { characterId: jala.id, jobId: 'job-warrior' as JobId },
+        { characterId: spoorle.id, jobId: 'job-warrior' as JobId },
+      ]);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const goldId = mockGoldCoin.id;
+
+      // Both cost 100g (level 1 target); fund only enough for one.
+      const result = updateFn({
+        world: { party: [jala, spoorle] },
+        armory: [],
+        materials: richMaterials(100),
+      } as unknown as GameState);
+
+      expect(result.world.party[0].jobId).toBe('job-warrior');
+      expect(result.world.party[1].jobId).toBe('job-explorer');
+      expect(result.materials[goldId]?.quantity ?? 0).toBe(0);
+    });
   });
 
   describe('auto-optimize equipment', () => {
@@ -317,6 +467,7 @@ describe('characterReclass', () => {
       const result = updateFn({
         world: { party: [jala] },
         armory: [armorySword],
+        materials: richMaterials(),
       } as unknown as GameState);
 
       expect(result.world.party[0].equipment.Weapon).toEqual(armorySword);
@@ -334,6 +485,7 @@ describe('characterReclass', () => {
       const result = updateFn({
         world: { party: [jala] },
         armory: [armorySword],
+        materials: richMaterials(),
       } as unknown as GameState);
 
       expect(result.world.party[0].stats.Strength).toBe(
@@ -356,6 +508,7 @@ describe('characterReclass', () => {
       const result = updateFn({
         world: { party: [jala] },
         armory: [armorySword],
+        materials: richMaterials(),
       } as unknown as GameState);
 
       expect(result.world.party[0].equipment.Weapon).toBeUndefined();
@@ -373,6 +526,7 @@ describe('characterReclass', () => {
       const result = updateFn({
         world: { party: [jala] },
         armory: [armorySpear],
+        materials: richMaterials(),
       } as unknown as GameState);
 
       expect(result.world.party[0].equipment.Weapon).toEqual(armorySpear);
@@ -391,6 +545,7 @@ describe('characterReclass', () => {
       const result = updateFn({
         world: { party: [jala] },
         armory: [armorySword],
+        materials: richMaterials(),
       } as unknown as GameState);
 
       expect(result.world.party[0].equipment).toEqual(defaultEquipment());
