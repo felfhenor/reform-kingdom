@@ -1,3 +1,4 @@
+import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/caravan/caravan', () => ({
@@ -8,9 +9,13 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSendDesignEvent: vi.fn(),
-}));
+vi.mock('@helpers/engine/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/hero/travel', () => ({
   canPartyTravel: vi.fn(() => true),
@@ -350,7 +355,7 @@ describe('commissionFulfill', () => {
     expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'trader-token', 2);
     expect(result.world.commissions[caravanId].completed).toBe(true);
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Kingdom:Commission:Fulfill',
+      'Kingdom:Commission:Fulfill:Commission - Wergen Sticks',
     );
   });
 

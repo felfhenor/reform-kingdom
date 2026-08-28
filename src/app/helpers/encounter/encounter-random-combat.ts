@@ -3,7 +3,10 @@ import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content';
 import { encounterRandomState } from '@helpers/encounter/encounter-random';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { partyGet } from '@helpers/hero/party';
 import { rollDroppedRewards } from '@helpers/item/loot';
 import { updateGamestate } from '@helpers/state-game';
@@ -72,7 +75,9 @@ function grantEncounterRandomCompletionRewards(combat: Combat): void {
   const content = getEntry<EncounterRandomContent>(combat.encounterRandomId);
   if (!content) return;
 
-  analyticsSendDesignEvent('World:Event:Complete');
+  analyticsSendDesignEvent(
+    `World:Event:Complete:${analyticsSafeSegment(content.name)}`,
+  );
 
   // The fight's level is rolled once per generation and applied to every
   // guardian at `encounterRandomStartFight` time, so the first guardian's

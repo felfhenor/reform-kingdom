@@ -1,3 +1,4 @@
+import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -37,9 +38,13 @@ vi.mock('@helpers/item/materials', () => ({
   applyMaterialDelta: vi.fn(),
 }));
 
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSendDesignEvent: vi.fn(),
-}));
+vi.mock('@helpers/engine/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(() => []),
@@ -513,7 +518,7 @@ describe('Recipes Helper Functions', () => {
       );
       expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBeGreaterThan(0);
       expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-        'Kingdom:Museum:RecipeUnlock',
+        'Kingdom:Museum:RecipeUnlock:Equipment Bone-Hewn Cloak',
       );
     });
 

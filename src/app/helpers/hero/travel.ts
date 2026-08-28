@@ -4,7 +4,10 @@ import { currentCombat } from '@helpers/combat/combat-state';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
 import {
   addGlobalEffect,
@@ -192,7 +195,9 @@ export function travelStart(
   // through instead, since it deliberately re-targets the node the party is already on.
   if (path.length === 0 && !wasTraveling && !isAutoMode) return false;
 
-  analyticsSendDesignEvent('World:Travel:Start');
+  analyticsSendDesignEvent(
+    `World:Travel:Start:${analyticsSafeSegment(destinationNodeName)}`,
+  );
   gatheringStop();
 
   if (path.length === 0) {

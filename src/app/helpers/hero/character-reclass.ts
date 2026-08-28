@@ -1,6 +1,9 @@
 import { getEntry } from '@helpers/content';
 import { defaultEquipment } from '@helpers/defaults';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import {
   characterStatsForLevel,
   characterXpForLevel,
@@ -145,6 +148,13 @@ export function charactersReclass(picks: CharacterReclassPick[]): void {
     picks.forEach((pick) => {
       if (reclassCharacterInState(state, pick.characterId, pick.jobId)) {
         reclassedCount += 1;
+
+        const jobName = getEntry<JobContent>(pick.jobId)?.name;
+        if (jobName) {
+          analyticsSendDesignEvent(
+            `Hero:Reclass:Start:${analyticsSafeSegment(jobName)}`,
+          );
+        }
       }
     });
 

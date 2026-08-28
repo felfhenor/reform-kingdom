@@ -1,5 +1,8 @@
 import { getEntry } from '@helpers/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { hasGold, spendGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -146,6 +149,11 @@ export function workerLevelUp(workerId: WorkerId): boolean {
     return state;
   });
 
-  analyticsSendDesignEvent('Worker:LevelUp');
+  const workerName = getEntry<WorkerContent>(workerId)?.name;
+  analyticsSendDesignEvent(
+    workerName
+      ? `Worker:LevelUp:${analyticsSafeSegment(workerName)}`
+      : 'Worker:LevelUp',
+  );
   return true;
 }

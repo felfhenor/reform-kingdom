@@ -1,5 +1,8 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
@@ -119,7 +122,11 @@ export async function recipeUnlockWithTokens(
     return state;
   });
 
-  if (unlocked) analyticsSendDesignEvent('Kingdom:Museum:RecipeUnlock');
+  if (unlocked) {
+    analyticsSendDesignEvent(
+      `Kingdom:Museum:RecipeUnlock:${analyticsSafeSegment(recipe.name)}`,
+    );
+  }
   return unlocked;
 }
 

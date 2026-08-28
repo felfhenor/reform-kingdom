@@ -1,5 +1,8 @@
 import { getEntry } from '@helpers/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { travelPathTotalTicks, travelStepTicksCost } from '@helpers/hero/travel';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding';
@@ -155,7 +158,12 @@ export function workerAssign(
     workerBeginOutboundTrip(workerId, assignment);
   }
 
-  analyticsSendDesignEvent('Worker:Assign');
+  const workerName = getEntry<WorkerContent>(workerId)?.name;
+  analyticsSendDesignEvent(
+    workerName
+      ? `Worker:Assign:${analyticsSafeSegment(workerName)}`
+      : 'Worker:Assign',
+  );
   return true;
 }
 
@@ -182,7 +190,13 @@ export function workerRecall(workerId: WorkerId): void {
     worker.status.kind === 'Gathering' ? worker.status.itemsGathered : 0;
 
   workerBeginReturnTrip(workerId, carriedItemId, carriedQuantity);
-  analyticsSendDesignEvent('Worker:Recall');
+
+  const workerName = getEntry<WorkerContent>(workerId)?.name;
+  analyticsSendDesignEvent(
+    workerName
+      ? `Worker:Recall:${analyticsSafeSegment(workerName)}`
+      : 'Worker:Recall',
+  );
 }
 
 // Remaining ticks for a TravelingTo/TravelingBack worker, else undefined - drives the

@@ -67,6 +67,7 @@ import type {
 const entry = { nodeName: 'Mystical Gobslime Shrine' } as WorldNodeEntry;
 const content = {
   id: 'gobslime-shrine' as EncounterRandomId,
+  name: 'Gobslime Shrine',
   completionRewards: [{ collectibleId: 'gobslime-flower', chance: 100 }],
 } as unknown as EncounterRandomContent;
 

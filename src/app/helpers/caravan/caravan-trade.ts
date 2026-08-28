@@ -5,7 +5,10 @@ import {
 } from '@helpers/caravan/caravan-trade-quantity';
 import { getEntry } from '@helpers/content';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
   applyMaterialDelta,
@@ -22,13 +25,32 @@ import type {
   CaravanTokenTrade,
   CaravanTrade,
   CaravanTraderContent,
+  CollectibleContent,
   CollectibleId,
+  EquipmentContent,
   EquipmentItem,
   EquipmentItemId,
   GameState,
+  ItemContent,
+  RecipeContent,
   RecipeId,
   WorldNodeEntry,
 } from '@interfaces';
+
+// Resolves whichever reward type a trade offers into its content name, for analytics.
+function caravanTradeName(
+  trade: CaravanTrade | CaravanTokenTrade,
+): string | undefined {
+  if (trade.itemId) return getEntry<ItemContent>(trade.itemId)?.name;
+  if (trade.equipmentId) {
+    return getEntry<EquipmentContent>(trade.equipmentId)?.name;
+  }
+  if (trade.collectibleId) {
+    return getEntry<CollectibleContent>(trade.collectibleId)?.name;
+  }
+  if (trade.recipeId) return getEntry<RecipeContent>(trade.recipeId)?.name;
+  return undefined;
+}
 
 // Shared by both the gold-trade and token-trade collectible-grant paths.
 function grantCollectible(
@@ -178,7 +200,14 @@ export async function caravanExecuteTrade(
     return s;
   });
 
-  if (executed) analyticsSendDesignEvent('Kingdom:Caravan:Trade');
+  if (executed) {
+    const tradeName = caravanTradeName(trade);
+    analyticsSendDesignEvent(
+      tradeName
+        ? `Kingdom:Caravan:Trade:${analyticsSafeSegment(tradeName)}`
+        : 'Kingdom:Caravan:Trade',
+    );
+  }
   return executed;
 }
 
@@ -269,6 +298,13 @@ export async function caravanExecuteTokenTrade(
     return s;
   });
 
-  if (executed) analyticsSendDesignEvent('Kingdom:Caravan:TokenTrade');
+  if (executed) {
+    const tradeName = caravanTradeName(trade);
+    analyticsSendDesignEvent(
+      tradeName
+        ? `Kingdom:Caravan:TokenTrade:${analyticsSafeSegment(tradeName)}`
+        : 'Kingdom:Caravan:TokenTrade',
+    );
+  }
   return executed;
 }

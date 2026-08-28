@@ -1,5 +1,8 @@
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -170,7 +173,10 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   });
 
   if (newLevel > previousLevel) {
-    analyticsSendDesignEvent('Kingdom:Building:LevelUp', newLevel);
+    analyticsSendDesignEvent(
+      `Kingdom:Building:LevelUp:${analyticsSafeSegment(tradeskill)}`,
+      newLevel,
+    );
   }
 }
 

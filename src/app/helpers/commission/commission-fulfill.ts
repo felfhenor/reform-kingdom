@@ -1,6 +1,9 @@
 import { isPartyAtCaravan } from '@helpers/caravan/caravan';
 import { getEntry } from '@helpers/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import {
   applyMaterialDelta,
@@ -153,6 +156,7 @@ export async function commissionFulfill(
   }
 
   let fulfilled = false;
+  let offerName: string | undefined;
 
   await updateGamestate((s) => {
     if (!commissionCanFulfill(caravanId, s)) return s;
@@ -162,6 +166,7 @@ export async function commissionFulfill(
 
     const offer = getEntry<CommissionOfferContent>(nodeState.commissionOfferId);
     const tokenReward = offer?.tokenReward ?? 0;
+    offerName = offer?.name;
 
     nodeState.requirements.forEach((requirement) => {
       if ('equipmentId' in requirement) {
@@ -178,6 +183,10 @@ export async function commissionFulfill(
     return s;
   });
 
-  if (fulfilled) analyticsSendDesignEvent('Kingdom:Commission:Fulfill');
+  if (fulfilled && offerName) {
+    analyticsSendDesignEvent(
+      `Kingdom:Commission:Fulfill:${analyticsSafeSegment(offerName)}`,
+    );
+  }
   return fulfilled;
 }

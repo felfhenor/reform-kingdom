@@ -1,5 +1,8 @@
 import { getEntry } from '@helpers/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  analyticsSafeSegment,
+  analyticsSendDesignEvent,
+} from '@helpers/engine/analytics';
 import {
   characterStatsForLevel,
   newEquipmentItem,
@@ -28,6 +31,7 @@ import {
   type EquipmentItem,
   type EquipmentItemId,
   type EquipmentSlot,
+  type ItemContent,
   type ItemId,
   type JobContent,
 } from '@interfaces';
@@ -164,7 +168,9 @@ export function characterEquipFromArmory(
     return state;
   });
 
-  analyticsSendDesignEvent('Hero:Equip:Item');
+  analyticsSendDesignEvent(
+    `Hero:Equip:Item:${analyticsSafeSegment(equipmentContent.name)}`,
+  );
   return true;
 }
 
@@ -181,6 +187,9 @@ export function characterUnequipToArmory(
 
   const occupiedSlots = slotsHoldingEquipment(
     character.equipment,
+    previousItem.equipmentId,
+  );
+  const equipmentContent = getEntry<EquipmentContent>(
     previousItem.equipmentId,
   );
 
@@ -209,7 +218,11 @@ export function characterUnequipToArmory(
     return state;
   });
 
-  analyticsSendDesignEvent('Hero:Unequip:Item');
+  analyticsSendDesignEvent(
+    equipmentContent
+      ? `Hero:Unequip:Item:${analyticsSafeSegment(equipmentContent.name)}`
+      : 'Hero:Unequip:Item',
+  );
   return true;
 }
 
@@ -257,6 +270,7 @@ export function characterInfuseEquipment(
   infusedItemIds[slotIndex] = materialItemId;
   const infusedItem: EquipmentItem = { ...item, infusedItemIds };
   const cost = infusionMaterialCost(materialItemId);
+  const materialContent = getEntry<ItemContent>(materialItemId);
 
   updateGamestate((state) => {
     state.world.party = state.world.party.map((c) => {
@@ -284,6 +298,10 @@ export function characterInfuseEquipment(
     return state;
   });
 
-  analyticsSendDesignEvent('Hero:Infuse:Item');
+  analyticsSendDesignEvent(
+    materialContent
+      ? `Hero:Infuse:Item:${analyticsSafeSegment(materialContent.name)}`
+      : 'Hero:Infuse:Item',
+  );
   return true;
 }
