@@ -87,6 +87,12 @@ export function indexedDbSignal<T>(
 
   // Load value from IndexedDB
   const loadFromDB = async (): Promise<void> => {
+    // Not an error - just no IndexedDB in this environment (e.g. scripts/analyze-*, scripts/validate-*).
+    if (typeof indexedDB === 'undefined') {
+      isInitialized = true;
+      return;
+    }
+
     try {
       const database = await initDB();
       const transaction = database.transaction([STORE_NAME], 'readonly');
@@ -136,7 +142,7 @@ export function indexedDbSignal<T>(
 
   // Save value to IndexedDB (synchronous call)
   const saveToDBSync = (value: T): void => {
-    if (!isInitialized) return;
+    if (!isInitialized || typeof indexedDB === 'undefined') return;
 
     saveToDB(value).catch((e) => {
       error('IndexedDbSignal', 'Failed to save value:', e);

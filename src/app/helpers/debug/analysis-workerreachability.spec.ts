@@ -8,7 +8,7 @@ vi.mock('@helpers/debug/analysis-utils', () => ({
   buildNodeNameToMap: vi.fn(() => new Map()),
 }));
 
-vi.mock('@helpers/hero/travel', () => ({
+vi.mock('@helpers/hero/travel-cost', () => ({
   travelPathTotalTicks: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 
 import { getEntriesByType } from '@helpers/content';
 import { runWorkerReachabilityAnalysis } from '@helpers/debug/analysis-workerreachability';
-import { travelPathTotalTicks } from '@helpers/hero/travel';
+import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
 import type { GatheringContent, LevelRange, WorkerContent, WorkerId } from '@interfaces';
 
 function buildWorker(

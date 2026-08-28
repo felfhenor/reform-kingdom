@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { formatDate } from '@angular/common';
 import { color } from 'console-log-colors';
+
+// Avoids `@angular/common`'s formatDate - importing it triggers an Angular JIT check that crashes outside a browser (e.g. scripts/analyze-*, scripts/validate-*).
+const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: true,
+});
 
 export function _logMessage(
   level: 'debug' | 'error' | 'log' | 'info' | 'warn',
@@ -16,7 +26,7 @@ export function _logMessage(
   };
   const colorFunc = color[colors[level]] as unknown as (str: string) => string;
 
-  const timestamp = formatDate(new Date(), 'medium', 'en-US');
+  const timestamp = TIMESTAMP_FORMAT.format(new Date());
   console[level](colorFunc(`[${timestamp}] {${category}}`), ...data);
 }
 

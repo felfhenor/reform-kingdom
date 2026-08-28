@@ -39,7 +39,7 @@ vi.mock('@helpers/world', () => ({
   isPlayerAtKingdom: vi.fn(() => false),
 }));
 
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
+vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
   worldNodeGatherMaterialIds: vi.fn(() => []),
 }));
 
@@ -78,7 +78,7 @@ import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding';
 import { isPlayerAtKingdom } from '@helpers/world';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import {
   isWorldNodeVisible,

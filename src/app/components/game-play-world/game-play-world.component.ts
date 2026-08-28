@@ -62,13 +62,13 @@ import { gamestate } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
 import { workersTravelingTokens } from '@helpers/worker/worker-travel';
+import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
 import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status';
 import {
   isWorldNodeCollectibleGateMet,
   isWorldNodeVisible,
   worldNodeByName,
-  worldNodeDiscoverIfCollectibleGateMet,
   worldNodeDiscoverIfHidden,
 } from '@helpers/world-node/world-nodes';
 import type {

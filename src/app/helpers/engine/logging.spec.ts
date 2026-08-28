@@ -9,10 +9,16 @@ import {
 import { color } from 'console-log-colors';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock Angular's formatDate
-vi.mock('@angular/common', () => ({
-  formatDate: () => '2025-07-22 12:00:00',
-}));
+const FIXED_DATE = new Date('2025-07-22T12:00:00-00:00');
+const TIMESTAMP = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: true,
+}).format(FIXED_DATE);
 
 describe('Logging Functions', () => {
   const originalConsole = { ...console };
@@ -26,11 +32,14 @@ describe('Logging Functions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(FIXED_DATE);
     // Replace console methods with mocks
     Object.assign(console, mockConsole);
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     // Restore original console methods
     Object.assign(console, originalConsole);
   });
@@ -40,7 +49,7 @@ describe('Logging Functions', () => {
       _logMessage('info', 'Test', 'message');
 
       expect(mockConsole.info).toHaveBeenCalledWith(
-        color.blue('[2025-07-22 12:00:00] {Test}'),
+        color.blue(`[${TIMESTAMP}] {Test}`),
         'message',
       );
     });
@@ -49,7 +58,7 @@ describe('Logging Functions', () => {
       _logMessage('debug', 'Test', 'message1', 'message2', { test: true });
 
       expect(mockConsole.debug).toHaveBeenCalledWith(
-        color.gray('[2025-07-22 12:00:00] {Test}'),
+        color.gray(`[${TIMESTAMP}] {Test}`),
         'message1',
         'message2',
         { test: true },
@@ -62,7 +71,7 @@ describe('Logging Functions', () => {
       log('Test', 'message');
 
       expect(mockConsole.log).toHaveBeenCalledWith(
-        color.magenta('[2025-07-22 12:00:00] {Test}'),
+        color.magenta(`[${TIMESTAMP}] {Test}`),
         'message',
       );
     });
@@ -73,7 +82,7 @@ describe('Logging Functions', () => {
       info('Test', 'message');
 
       expect(mockConsole.info).toHaveBeenCalledWith(
-        color.blue('[2025-07-22 12:00:00] {Test}'),
+        color.blue(`[${TIMESTAMP}] {Test}`),
         'message',
       );
     });
@@ -84,7 +93,7 @@ describe('Logging Functions', () => {
       warn('Test', 'message');
 
       expect(mockConsole.warn).toHaveBeenCalledWith(
-        color.yellow('[2025-07-22 12:00:00] {Test}'),
+        color.yellow(`[${TIMESTAMP}] {Test}`),
         'message',
       );
     });
@@ -95,7 +104,7 @@ describe('Logging Functions', () => {
       debug('Test', 'message');
 
       expect(mockConsole.debug).toHaveBeenCalledWith(
-        color.gray('[2025-07-22 12:00:00] {Test}'),
+        color.gray(`[${TIMESTAMP}] {Test}`),
         'message',
       );
     });
@@ -106,7 +115,7 @@ describe('Logging Functions', () => {
       error('Test', 'message');
 
       expect(mockConsole.error).toHaveBeenCalledWith(
-        color.red('[2025-07-22 12:00:00] {Test}'),
+        color.red(`[${TIMESTAMP}] {Test}`),
         'message',
       );
     });

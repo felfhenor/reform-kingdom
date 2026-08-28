@@ -13,19 +13,15 @@ import {
   addGlobalEffect,
   isGlobalEffectActive,
 } from '@helpers/hero/global-effects';
+import { travelStepTicksCost } from '@helpers/hero/travel-cost';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
-import {
-  mapHopsBetween,
-  tileIsOnPath,
-  travelPathTo,
-} from '@helpers/pathfinding/pathfinding';
+import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import {
   isWorldNodeCollectibleGateMet,
-  worldNodeAt,
   worldNodeByName,
   worldNodeCaravan,
   worldNodeEncounter,
@@ -33,54 +29,21 @@ import {
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
-import type {
-  CurrentLocation,
-  GlobalEffectId,
-  TravelState,
-  TravelStep,
-} from '@interfaces';
+import type { GlobalEffectId, TravelState, TravelStep } from '@interfaces';
 import { clamp, sum } from 'es-toolkit/compat';
 
-export const TICKS_PER_STEP_ON_PATH = 1;
-export const TICKS_PER_STEP_OFF_PATH = 3;
+export {
+  TICKS_PER_STEP_OFF_PATH,
+  TICKS_PER_STEP_ON_PATH,
+  travelPathTotalTicks,
+  travelStepTicksCost,
+} from '@helpers/hero/travel-cost';
+
 const DEATHS_DOOR_SECONDS_PER_MAP = 10;
 const DEATHS_DOOR_MINIMUM_SECONDS = 10;
 
 function travelGet(): TravelState {
   return gamestate().world.travel;
-}
-
-// A node's own tile counts as "on path" so arriving doesn't stutter with the off-path cost.
-function travelTileCountsAsPath(
-  mapName: string,
-  x: number,
-  y: number,
-): boolean {
-  return tileIsOnPath(mapName, x, y) || !!worldNodeAt(mapName, x, y);
-}
-
-// Teleport is instant. Move is cheap entering a path/node tile, or leaving a node tile -
-// leaving an ordinary path tile is deliberately not discounted, or the off-path cost would never apply.
-export function travelStepTicksCost(
-  step: TravelStep,
-  originTile: CurrentLocation,
-): number {
-  if (step.kind === 'Teleport') return 0;
-
-  const enteringPathOrNode = travelTileCountsAsPath(
-    step.mapName,
-    step.x,
-    step.y,
-  );
-  const exitingNode = !!worldNodeAt(
-    originTile.mapName,
-    originTile.x,
-    originTile.y,
-  );
-
-  return enteringPathOrNode || exitingNode
-    ? TICKS_PER_STEP_ON_PATH
-    : TICKS_PER_STEP_OFF_PATH;
 }
 
 // Remaining seconds until arrival if actively traveling toward this node,
@@ -96,25 +59,6 @@ export function travelEtaSecondsTo(nodeName: string): number | undefined {
     const cost = travelStepTicksCost(step, origin);
     origin = step;
     return index === 0 ? clamp(cost - travel.ticksIntoStep, 0, cost) : cost;
-  });
-
-  return sum(costs);
-}
-
-// Sums a path's tick cost, threading each completed step as the next
-// origin - mirrors the per-step costing `travelProcessTick` does live, just
-// resolved all at once for a location that isn't ticking through it. Used by
-// worker stamina-gating and the workerstamina analysis script, so this
-// costing logic exists in exactly one place.
-export function travelPathTotalTicks(
-  path: TravelStep[],
-  origin: CurrentLocation,
-): number {
-  let originTile = origin;
-  const costs = path.map((step) => {
-    const cost = travelStepTicksCost(step, originTile);
-    originTile = { mapName: step.mapName, x: step.x, y: step.y };
-    return cost;
   });
 
   return sum(costs);

@@ -2,7 +2,7 @@
 
 import { getEntriesByType } from '@helpers/content';
 import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
-import { travelPathTotalTicks } from '@helpers/hero/travel';
+import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding';
 import {
   WORKER_MAX_LEVEL,

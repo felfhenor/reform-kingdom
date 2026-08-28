@@ -21,11 +21,6 @@ vi.mock('@helpers/item/collectibles', () => ({
   isCollectibleDiscovered: vi.fn(() => true),
 }));
 
-vi.mock('@helpers/combat/combat-log', () => ({
-  miscellaneousMessageLog: vi.fn(),
-}));
-
-import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { setAllMaps } from '@helpers/maps';
@@ -37,7 +32,6 @@ import {
   isWorldNodeCollectibleGateMet,
   isWorldNodeHidden,
   isWorldNodeVisible,
-  worldNodeDiscoverIfCollectibleGateMet,
   worldNodeDisplayName,
   worldNodeMapsBuild,
   worldNodeOverride,
@@ -243,7 +237,6 @@ describe('encounter-backed node accessors', () => {
     vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
     vi.mocked(isCollectibleDiscovered).mockReset().mockReturnValue(true);
     vi.mocked(worldNodeDiscover).mockClear();
-    vi.mocked(miscellaneousMessageLog).mockClear();
   });
 
   describe('isWorldNodeHidden', () => {
@@ -358,79 +351,6 @@ describe('encounter-backed node accessors', () => {
       vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
-    });
-  });
-
-  describe('worldNodeDiscoverIfCollectibleGateMet', () => {
-    it('does nothing for a node with no gate', () => {
-      seedEncounter(buildEncounter());
-
-      worldNodeDiscoverIfCollectibleGateMet(buildEntry());
-
-      expect(worldNodeDiscover).not.toHaveBeenCalled();
-      expect(miscellaneousMessageLog).not.toHaveBeenCalled();
-    });
-
-    it('does nothing while the gate remains unmet', () => {
-      seedEncounter(
-        buildEncounter({
-          invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
-        }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
-
-      worldNodeDiscoverIfCollectibleGateMet(buildEntry());
-
-      expect(worldNodeDiscover).not.toHaveBeenCalled();
-      expect(miscellaneousMessageLog).not.toHaveBeenCalled();
-    });
-
-    it('discovers and logs the unlock exactly once the gate becomes met', () => {
-      seedEncounter(
-        buildEncounter({
-          invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
-        }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
-
-      worldNodeDiscoverIfCollectibleGateMet(buildEntry());
-
-      expect(worldNodeDiscover).toHaveBeenCalledWith('Forest Ruins');
-      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
-        '**Forest Ruins** is now accessible.',
-      );
-    });
-
-    it('stays silent for a node that is also hidden, leaving reveal-on-click intact', () => {
-      seedEncounter(
-        buildEncounter({
-          hidden: true,
-          invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
-        }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
-
-      worldNodeDiscoverIfCollectibleGateMet(buildEntry());
-
-      expect(worldNodeDiscover).not.toHaveBeenCalled();
-      expect(miscellaneousMessageLog).not.toHaveBeenCalled();
-    });
-
-    it('does not re-notify a node that has already been discovered', () => {
-      seedEncounter(
-        buildEncounter({
-          invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
-        }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
-
-      worldNodeDiscoverIfCollectibleGateMet(buildEntry());
-
-      expect(worldNodeDiscover).not.toHaveBeenCalled();
-      expect(miscellaneousMessageLog).not.toHaveBeenCalled();
     });
   });
 

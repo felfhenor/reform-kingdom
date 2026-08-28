@@ -28,7 +28,7 @@ import {
   exploreNodeFarmOptions,
   farmNodeRewardOptions,
 } from '@helpers/decree/decree-farm-node';
-import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import type {
   DecreeClause,

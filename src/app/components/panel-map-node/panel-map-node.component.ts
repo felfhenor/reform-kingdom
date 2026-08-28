@@ -36,7 +36,7 @@ import { currentLocationGet } from '@helpers/world';
 import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan';
 import { worldNodeDescription } from '@helpers/world-node/world-node-content';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import {
   gatherNodeLevelUp,
   worldNodeLevel,

@@ -1,5 +1,4 @@
 import { computed } from '@angular/core';
-import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
@@ -24,7 +23,6 @@ import type {
   WorldNodePositionMap,
   WorldNodeType,
 } from '@interfaces';
-import { notifySuccess } from '../engine/notify';
 
 const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
 
@@ -146,7 +144,9 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
 }
 
 // Only one content type ever matches a given node, so this `??` chain is safe.
-function worldNodeCollectibleGateIds(entry: WorldNodeEntry): CollectibleId[] {
+export function worldNodeCollectibleGateIds(
+  entry: WorldNodeEntry,
+): CollectibleId[] {
   return (
     worldNodeEncounter(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeGathering(entry)?.invisibleUntilCollectibleIdsFound ??
@@ -175,21 +175,6 @@ export function worldNodeDiscoverIfHidden(entry: WorldNodeEntry): void {
   if (isWorldNodeHidden(entry) && !isWorldNodeDiscovered(entry.nodeName)) {
     worldNodeDiscover(entry.nodeName);
   }
-}
-
-// Reuses the discovery ledger/notify to dedupe; skipped when also `hidden` so a click
-// (worldNodeDiscoverIfHidden) still owns the reveal instead of the gate opening silently.
-export function worldNodeDiscoverIfCollectibleGateMet(
-  entry: WorldNodeEntry,
-): void {
-  if (worldNodeCollectibleGateIds(entry).length === 0) return;
-  if (isWorldNodeHidden(entry)) return;
-  if (isWorldNodeDiscovered(entry.nodeName)) return;
-  if (!isWorldNodeCollectibleGateMet(entry)) return;
-
-  worldNodeDiscover(entry.nodeName);
-  miscellaneousMessageLog(`**${entry.nodeName}** is now accessible.`);
-  notifySuccess(`${entry.nodeName} is now accessible.`);
 }
 
 // Masked to '???' when still hidden/undiscovered, so a location can't leak off-map.

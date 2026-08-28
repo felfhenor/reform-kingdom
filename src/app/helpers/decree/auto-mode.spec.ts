@@ -55,7 +55,7 @@ vi.mock('@helpers/world', () => ({
   isPlayerAtKingdom: vi.fn(() => false),
 }));
 
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
+vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
   worldNodeGatherMaterialIds: vi.fn(() => []),
 }));
 
@@ -102,7 +102,7 @@ import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { isPlayerAtKingdom } from '@helpers/world';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeByName,

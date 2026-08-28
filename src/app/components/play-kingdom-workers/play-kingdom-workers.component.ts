@@ -31,7 +31,7 @@ import {
   workerStaminaCostToNode,
   workerTravelRemainingTicks,
 } from '@helpers/worker/worker-travel';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import { worldNodeLevelLabel } from '@helpers/world-node/world-node-status';
 import {
