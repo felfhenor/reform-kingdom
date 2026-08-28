@@ -236,22 +236,22 @@ describe('Character Progress Helper Functions', () => {
 
     it('does not log anything when the character does not level up', () => {
       const jala = createCharacterStub('Jala');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
 
       partyGainXp(30);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      updateFn({ world: { party: [jala] } } as unknown as GameState);
 
       expect(miscellaneousMessageLog).not.toHaveBeenCalled();
     });
 
     it('logs a level-up message when the character levels up', () => {
       const jala = createCharacterStub('Jala');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
 
       partyGainXp(100);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      updateFn({ world: { party: [jala] } } as unknown as GameState);
 
       expect(miscellaneousMessageLog).toHaveBeenCalledWith(
         '**Jala** reached level 2!',
@@ -278,11 +278,11 @@ describe('Character Progress Helper Functions', () => {
       mockGetEntry(jobWithSkills, attackSkill);
 
       const jala = createCharacterStub('Jala');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
 
       partyGainXp(100);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      updateFn({ world: { party: [jala] } } as unknown as GameState);
 
       expect(miscellaneousMessageLog).toHaveBeenCalledWith(
         '**Jala** learned **Attack**!',
@@ -293,11 +293,11 @@ describe('Character Progress Helper Functions', () => {
       mockGetEntry();
 
       const jala = createCharacterStub('Jala');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
 
       partyGainXp(100);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      updateFn({ world: { party: [jala] } } as unknown as GameState);
 
       expect(miscellaneousMessageLog).toHaveBeenCalledWith(
         '**Jala** reached level 2!',

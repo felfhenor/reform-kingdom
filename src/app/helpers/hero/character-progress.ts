@@ -143,22 +143,25 @@ export function retrofitPartyXp(party: Character[]): Character[] {
 
 // Callers (e.g. `combat-end.ts`) use the return value to know when to retry nodes previously given up on (see `autoModeResetNodeFailureCounts`).
 export function partyGainXp(amount: number): boolean {
-  let anyLeveledUp = false;
   const boostedAmount = Math.round(amount * xpGainMultiplier());
+  const progress: { before: Character; after: Character }[] = [];
 
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => {
       const updated = characterLeveledUp(character, boostedAmount);
-      if (updated.level > character.level) {
-        anyLeveledUp = true;
-        analyticsSendDesignEvent('Hero:LevelUp', updated.level);
-      }
-      logCharacterProgress(character, updated);
+      progress.push({ before: character, after: updated });
       return updated;
     });
 
     return state;
   });
 
-  return anyLeveledUp;
+  progress.forEach(({ before, after }) => {
+    if (after.level > before.level) {
+      analyticsSendDesignEvent('Hero:LevelUp', after.level);
+    }
+    logCharacterProgress(before, after);
+  });
+
+  return progress.some((p) => p.after.level > p.before.level);
 }

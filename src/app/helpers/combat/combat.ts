@@ -277,25 +277,25 @@ export function combatDoCombatIteration(): void {
     }
   });
 
+  const previousRounds = combat.rounds;
+  combat.rounds++;
+
+  // Check if we've crossed into a new deadlock prevention tier
+  const previousMultiplierTier = Math.floor(previousRounds / 25);
+  const currentMultiplierTier = Math.floor(combat.rounds / 25);
+
+  if (
+    currentMultiplierTier > previousMultiplierTier &&
+    currentMultiplierTier > 0
+  ) {
+    const damageIncreasePercent = currentMultiplierTier * 25;
+    combatMessageLog(
+      combat,
+      `Due to exhaustion, damage received is increased by ${damageIncreasePercent}% for all combatants.`,
+    );
+  }
+
   updateGamestate((state) => {
-    const previousRounds = combat.rounds;
-    combat.rounds++;
-
-    // Check if we've crossed into a new deadlock prevention tier
-    const previousMultiplierTier = Math.floor(previousRounds / 25);
-    const currentMultiplierTier = Math.floor(combat.rounds / 25);
-
-    if (
-      currentMultiplierTier > previousMultiplierTier &&
-      currentMultiplierTier > 0
-    ) {
-      const damageIncreasePercent = currentMultiplierTier * 25;
-      combatMessageLog(
-        combat,
-        `Due to exhaustion, damage received is increased by ${damageIncreasePercent}% for all combatants.`,
-      );
-    }
-
     state.world.combat = combat;
     return state;
   });

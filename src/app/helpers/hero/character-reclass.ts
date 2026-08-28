@@ -141,31 +141,36 @@ function reclassCharacterInState(
 
 // Reclassing unequips gear to the Armory rather than discarding it, then auto-optimizes the new loadout.
 // Batched into one `updateGamestate` transaction so a multi-hero "Reclass All" prices and applies every swap atomically.
-export function charactersReclass(picks: CharacterReclassPick[]): void {
-  let reclassedCount = 0;
+export async function charactersReclass(
+  picks: CharacterReclassPick[],
+): Promise<void> {
+  const reclassedJobNames: string[] = [];
 
-  updateGamestate((state) => {
+  await updateGamestate((state) => {
     picks.forEach((pick) => {
       if (reclassCharacterInState(state, pick.characterId, pick.jobId)) {
-        reclassedCount += 1;
-
         const jobName = getEntry<JobContent>(pick.jobId)?.name;
-        if (jobName) {
-          analyticsSendDesignEvent(
-            `Hero:Reclass:Start:${analyticsSafeSegment(jobName)}`,
-          );
-        }
+        if (jobName) reclassedJobNames.push(jobName);
       }
     });
 
     return state;
   });
 
-  if (reclassedCount > 0) {
-    analyticsSendDesignEvent('Hero:Reclass:Start', reclassedCount);
+  reclassedJobNames.forEach((jobName) => {
+    analyticsSendDesignEvent(
+      `Hero:Reclass:Start:${analyticsSafeSegment(jobName)}`,
+    );
+  });
+
+  if (reclassedJobNames.length > 0) {
+    analyticsSendDesignEvent('Hero:Reclass:Start', reclassedJobNames.length);
   }
 }
 
-export function characterReclass(characterId: CharacterId, jobId: JobId): void {
-  charactersReclass([{ characterId, jobId }]);
+export async function characterReclass(
+  characterId: CharacterId,
+  jobId: JobId,
+): Promise<void> {
+  await charactersReclass([{ characterId, jobId }]);
 }

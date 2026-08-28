@@ -12,7 +12,9 @@
             (click)="openSubview('storage')"
           >
             @let count = materialCount();
-            <span class="text-base font-bold flex items-center gap-2 justify-center">
+            <span
+              class="text-base font-bold flex items-center gap-2 justify-center"
+            >
               <app-icon name="gameChest" size="1.15em" />
               Storage
             </span>
@@ -27,7 +29,9 @@
             (click)="openSubview('armory')"
           >
             @let armoryTotal = armoryCount();
-            <span class="text-base font-bold flex items-center gap-2 justify-center">
+            <span
+              class="text-base font-bold flex items-center gap-2 justify-center"
+            >
               <app-icon name="gameCrossedSwords" size="1.15em" />
               Armory
             </span>
@@ -42,7 +46,9 @@
             (click)="openSubview('astralprojector')"
           >
             @let spellCount = unlockedAstralSpellCount();
-            <span class="text-base font-bold flex items-center gap-2 justify-center">
+            <span
+              class="text-base font-bold flex items-center gap-2 justify-center"
+            >
               <app-icon name="gameCrystalBall" size="1.15em" />
               Astral Projector
             </span>
@@ -69,12 +75,16 @@
             @let foundCollectibles = museumCollectiblesFound();
             @let foundRecipes = museumRecipesFound();
 
-            <span class="text-base font-bold flex items-center gap-2 justify-center">
+            <span
+              class="text-base font-bold flex items-center gap-2 justify-center"
+            >
               <app-icon name="gameTrophyCup" size="1.15em" />
               Museum
             </span>
 
-            <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
+            <div
+              class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+            >
               <div
                 class="absolute inset-y-0 left-0 bg-primary"
                 [style.width.%]="
@@ -90,7 +100,9 @@
               </div>
             </div>
 
-            <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
+            <div
+              class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+            >
               <div
                 class="absolute inset-y-0 left-0 bg-primary"
                 [style.width.%]="
@@ -114,12 +126,16 @@
             @let bestiaryList = bestiaryEntries();
             @let discovered = bestiaryDiscoveredCount();
 
-            <span class="text-base font-bold flex items-center gap-2 justify-center">
+            <span
+              class="text-base font-bold flex items-center gap-2 justify-center"
+            >
               <app-icon name="gameOpenBook" size="1.15em" />
               Bestiary
             </span>
 
-            <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
+            <div
+              class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+            >
               <div
                 class="absolute inset-y-0 left-0 bg-primary"
                 [style.width.%]="
@@ -149,7 +165,9 @@
             (click)="openSubview('workers')"
           >
             @let levelUpReady = workerLevelUpReadyCount();
-            <span class="text-base font-bold flex items-center gap-2 justify-center">
+            <span
+              class="text-base font-bold flex items-center gap-2 justify-center"
+            >
               <app-icon name="gameMeepleGroup" size="1.15em" />
               Quartermaster's Annex
             </span>
@@ -192,7 +210,9 @@
                 {{ tradeskill.label }} Lv. {{ tradeskill.level }}
               </span>
 
-              <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
+              <div
+                class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+              >
                 <div
                   class="absolute inset-y-0 left-0 bg-primary"
                   [style.width.%]="tradeskill.xpPercent"
@@ -244,18 +264,16 @@
           <button
             class="btn btn-accent btn-sm"
             [disabled]="!canReclass()"
-            [tp]="
-              canReclass()
-                ? 'Reclass Heroes'
-                : 'You must be in the Kingdom to reclass heroes'
-            "
             (click)="openReclassModal()"
           >
             <app-icon name="gameBodySwapping" size="1em" />
             Reclass Heroes
           </button>
 
-          <button class="btn btn-accent btn-sm" (click)="openSubview('infusion')">
+          <button
+            class="btn btn-accent btn-sm"
+            (click)="openSubview('infusion')"
+          >
             <app-icon name="gameMagicPotion" size="1em" />
             Infusion
           </button>

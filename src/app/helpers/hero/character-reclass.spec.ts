@@ -1,3 +1,4 @@
+import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import type {
   Character,
   CharacterId,
@@ -24,6 +25,14 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/engine/analytics', async (importOriginal) => {
+  const actual = await importOriginal<typeof AnalyticsHelper>();
+  return {
+    ...actual,
+    analyticsSendDesignEvent: vi.fn(),
+  };
+});
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -31,6 +40,7 @@ vi.mock('@helpers/state-game', () => ({
 
 import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
+import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
   characterJobLevel,
   characterReclass,
@@ -428,6 +438,34 @@ describe('characterReclass', () => {
       expect(result.world.party[0].jobId).toBe('job-warrior');
       expect(result.world.party[1].jobId).toBe('job-explorer');
       expect(result.materials[goldId]?.quantity ?? 0).toBe(0);
+    });
+
+    // Regression: charactersReclass is only ever called from a UI handler (never mid-tick), so
+    // updateGamestate takes the deferred/async path there - the analytics calls must await it.
+    it('fires analytics events only after the deferred updateGamestate transaction resolves', async () => {
+      mockGetEntry(mockJob, warriorJob);
+      const jala = createCharacterStub('Jala');
+
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        await Promise.resolve();
+        fn({
+          world: { party: [jala] },
+          armory: [],
+          materials: richMaterials(),
+        } as unknown as GameState);
+      });
+
+      await charactersReclass([
+        { characterId: jala.id, jobId: 'job-warrior' as JobId },
+      ]);
+
+      expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+        'Hero:Reclass:Start:Warrior',
+      );
+      expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+        'Hero:Reclass:Start',
+        1,
+      );
     });
   });
 
