@@ -1,203 +1,304 @@
 <app-card-page heightProfile="full">
   <span header>Kingdom</span>
 
-  <div class="flex flex-col justify-between gap-6 p-4 h-full overflow-y-auto">
-    <div class="grid grid-cols-3 gap-4">
-      <button
-        class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
-        (click)="openSubview('storage')"
-      >
-        @let count = materialCount();
-        <span class="text-base font-bold">Storage</span>
-        <span class="text-xs text-lighter">
-          {{ count }}
-          {{ 'material' | pluralize: count > 1 }} stored
-        </span>
-      </button>
+  <div class="flex flex-col gap-4 p-4 h-full overflow-y-auto">
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body p-3 gap-2">
+        <h2 class="card-title text-base">Reserves</h2>
 
-      <button
-        class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
-        (click)="openSubview('armory')"
-      >
-        @let armoryTotal = armoryCount();
-        <span class="text-base font-bold">Armory</span>
-        <span class="text-xs text-lighter">
-          {{ armoryTotal }}
-          {{ 'item' | pluralize: armoryTotal > 1 }} stored
-        </span>
-      </button>
-
-      <button
-        class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
-        (click)="openSubview('astralprojector')"
-      >
-        @let spellCount = unlockedAstralSpellCount();
-        <span class="text-base font-bold">Astral Projector</span>
-        <span class="text-xs text-lighter">
-          {{ spellCount | number }}
-          {{ 'spell' | pluralize: spellCount > 1 }} learned
-        </span>
-      </button>
-    </div>
-
-    <div class="grid grid-cols-3 gap-4">
-      <button
-        class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
-        (click)="openSubview('museum')"
-      >
-        @let museumEntries = museumCollectibleEntries();
-        @let recipeEntries = museumRecipeEntries();
-
-        <span class="text-base font-bold">Museum</span>
-        <span class="text-xs text-lighter">
-          {{ museumCollectiblesFound() }}/{{ museumEntries.length }}
-          collectibles found
-        </span>
-
-        <span class="text-xs text-lighter">
-          {{ museumRecipesFound() }}/{{ recipeEntries.length }} recipes found
-        </span>
-      </button>
-
-      <button
-        class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
-        (click)="openSubview('bestiary')"
-      >
-        @let bestiaryList = bestiaryEntries();
-
-        <span class="text-base font-bold">Bestiary</span>
-        <span class="text-xs text-lighter">
-          {{ bestiaryDiscoveredCount() }}/{{ bestiaryList.length }} monsters
-          discovered
-        </span>
-      </button>
-
-      @if (workersUnlocked()) {
-        <button
-          class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
-          (click)="openSubview('workers')"
-        >
-          @let levelUpReady = workerLevelUpReadyCount();
-
-          <span class="text-base font-bold">Quartermaster's Annex</span>
-          <span class="text-xs text-lighter">
-            {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
-          </span>
-          @if (levelUpReady > 0) {
-            <span class="text-xs text-lighter">
-              {{ levelUpReady }}
-              {{ 'worker' | pluralize: levelUpReady > 1 }} ready for level up
+        <div class="grid grid-cols-3 gap-2">
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('storage')"
+          >
+            @let count = materialCount();
+            <span class="text-base font-bold flex items-center gap-2 justify-center">
+              <app-icon name="gameChest" size="1.15em" />
+              Storage
             </span>
-          }
-        </button>
-      }
+            <span class="text-xs text-lighter">
+              {{ count }}
+              {{ 'material' | pluralize: count > 1 }} stored
+            </span>
+          </button>
+
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('armory')"
+          >
+            @let armoryTotal = armoryCount();
+            <span class="text-base font-bold flex items-center gap-2 justify-center">
+              <app-icon name="gameCrossedSwords" size="1.15em" />
+              Armory
+            </span>
+            <span class="text-xs text-lighter">
+              {{ armoryTotal }}
+              {{ 'item' | pluralize: armoryTotal > 1 }} stored
+            </span>
+          </button>
+
+          <button
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            (click)="openSubview('astralprojector')"
+          >
+            @let spellCount = unlockedAstralSpellCount();
+            <span class="text-base font-bold flex items-center gap-2 justify-center">
+              <app-icon name="gameCrystalBall" size="1.15em" />
+              Astral Projector
+            </span>
+            <span class="text-xs text-lighter">
+              {{ spellCount | number }}
+              {{ 'spell' | pluralize: spellCount > 1 }} learned
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="grid grid-cols-5 gap-4">
-      @for (
-        tradeskill of tradeskillButtonViewModels();
-        track tradeskill.subview
-      ) {
-        <div
-          class="btn btn-secondary h-auto py-2 px-2 flex flex-col justify-center gap-2"
-          role="button"
-          tabindex="0"
-          (click)="openSubview(tradeskill.subview)"
-          (keydown.enter)="openSubview(tradeskill.subview)"
-        >
-          <span class="font-bold flex items-center gap-2 justify-center">
-            <app-atlas-image
-              spritesheet="tradeskill"
-              [assetName]="tradeskill.sprite"
-              class="zoom-inline"
-            />
-            {{ tradeskill.label }} Lv. {{ tradeskill.level }}
-          </span>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body p-3 gap-2">
+        <h2 class="card-title text-base">Collections</h2>
 
-          <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
-            <div
-              class="absolute inset-y-0 left-0 bg-primary"
-              [style.width.%]="tradeskill.xpPercent"
-            ></div>
-            <div
-              class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
-            >
-              {{ tradeskill.xpCurrent }}/{{ tradeskill.xpMaximum }}
-            </div>
-          </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            class="btn btn-accent h-32 flex flex-col justify-center gap-1"
+            (click)="openSubview('museum')"
+          >
+            @let museumEntries = museumCollectibleEntries();
+            @let recipeEntries = museumRecipeEntries();
+            @let foundCollectibles = museumCollectiblesFound();
+            @let foundRecipes = museumRecipesFound();
 
-          @if (tradeskill.hasQueue) {
-            <div
-              class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
-            >
+            <span class="text-base font-bold flex items-center gap-2 justify-center">
+              <app-icon name="gameTrophyCup" size="1.15em" />
+              Museum
+            </span>
+
+            <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
               <div
-                class="absolute inset-y-0 left-0 bg-accent"
-                [style.width.%]="tradeskill.overallPercent"
-              ></div>
-              <div
-                class="absolute inset-y-0 w-0.5 bg-white"
-                [style.left.%]="tradeskill.activePercent"
+                class="absolute inset-y-0 left-0 bg-primary"
+                [style.width.%]="
+                  museumEntries.length > 0
+                    ? (foundCollectibles / museumEntries.length) * 100
+                    : 0
+                "
               ></div>
               <div
                 class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
               >
-                {{ tradeskill.queueUnitsRemaining }}
-                {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
-                ·
-                {{ tradeskill.totalRemainingLabel }}
+                {{ foundCollectibles }}/{{ museumEntries.length }} collectibles
               </div>
             </div>
-          } @else {
-            <div class="relative w-full h-4 italic text-xs">
-              Not currently crafting
+
+            <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
+              <div
+                class="absolute inset-y-0 left-0 bg-primary"
+                [style.width.%]="
+                  recipeEntries.length > 0
+                    ? (foundRecipes / recipeEntries.length) * 100
+                    : 0
+                "
+              ></div>
+              <div
+                class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
+              >
+                {{ foundRecipes }}/{{ recipeEntries.length }} recipes
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="btn btn-accent h-32 flex flex-col justify-center gap-1"
+            (click)="openSubview('bestiary')"
+          >
+            @let bestiaryList = bestiaryEntries();
+            @let discovered = bestiaryDiscoveredCount();
+
+            <span class="text-base font-bold flex items-center gap-2 justify-center">
+              <app-icon name="gameOpenBook" size="1.15em" />
+              Bestiary
+            </span>
+
+            <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
+              <div
+                class="absolute inset-y-0 left-0 bg-primary"
+                [style.width.%]="
+                  bestiaryList.length > 0
+                    ? (discovered / bestiaryList.length) * 100
+                    : 0
+                "
+              ></div>
+              <div
+                class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
+              >
+                {{ discovered }}/{{ bestiaryList.length }} discovered
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    @if (workersUnlocked()) {
+      <div class="card bg-base-200 shadow-sm">
+        <div class="card-body p-3 gap-2">
+          <h2 class="card-title text-base">Workforce</h2>
+
+          <button
+            class="btn btn-secondary btn-lg h-28 w-full max-w-sm flex flex-col justify-center gap-0"
+            (click)="openSubview('workers')"
+          >
+            @let levelUpReady = workerLevelUpReadyCount();
+            <span class="text-base font-bold flex items-center gap-2 justify-center">
+              <app-icon name="gameMeepleGroup" size="1.15em" />
+              Quartermaster's Annex
+            </span>
+            <span class="text-xs text-lighter">
+              {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
+            </span>
+            @if (levelUpReady > 0) {
+              <span class="text-xs text-lighter">
+                {{ levelUpReady }}
+                {{ 'worker' | pluralize: levelUpReady > 1 }} ready to level up
+              </span>
+            }
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body p-3 gap-2">
+        <h2 class="card-title text-base">Crafting</h2>
+
+        <div class="grid grid-cols-5 gap-2">
+          @for (
+            tradeskill of tradeskillButtonViewModels();
+            track tradeskill.subview
+          ) {
+            <div
+              class="btn btn-secondary h-auto py-2 px-2 flex flex-col justify-center gap-2"
+              role="button"
+              tabindex="0"
+              (click)="openSubview(tradeskill.subview)"
+              (keydown.enter)="openSubview(tradeskill.subview)"
+            >
+              <span class="font-bold flex items-center gap-2 justify-center">
+                <app-atlas-image
+                  spritesheet="tradeskill"
+                  [assetName]="tradeskill.sprite"
+                  class="zoom-inline"
+                />
+                {{ tradeskill.label }} Lv. {{ tradeskill.level }}
+              </span>
+
+              <div class="relative w-full h-4 rounded bg-black/30 overflow-hidden">
+                <div
+                  class="absolute inset-y-0 left-0 bg-primary"
+                  [style.width.%]="tradeskill.xpPercent"
+                ></div>
+                <div
+                  class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
+                >
+                  {{ tradeskill.xpCurrent }}/{{ tradeskill.xpMaximum }}
+                </div>
+              </div>
+
+              @if (tradeskill.hasQueue) {
+                <div
+                  class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+                >
+                  <div
+                    class="absolute inset-y-0 left-0 bg-accent"
+                    [style.width.%]="tradeskill.overallPercent"
+                  ></div>
+                  <div
+                    class="absolute inset-y-0 w-0.5 bg-white"
+                    [style.left.%]="tradeskill.activePercent"
+                  ></div>
+                  <div
+                    class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
+                  >
+                    {{ tradeskill.queueUnitsRemaining }}
+                    {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
+                    ·
+                    {{ tradeskill.totalRemainingLabel }}
+                  </div>
+                </div>
+              } @else {
+                <div class="relative w-full h-4 italic text-xs">
+                  Not currently crafting
+                </div>
+              }
             </div>
           }
         </div>
-      }
+      </div>
     </div>
 
-    <div class="flex gap-4">
-      <button
-        class="btn btn-accent btn-sm"
-        [disabled]="!canReclass()"
-        [tp]="
-          canReclass()
-            ? 'Reclass Heroes'
-            : 'You must be in the Kingdom to reclass heroes'
-        "
-        (click)="openReclassModal()"
-      >
-        Reclass Heroes
-      </button>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body p-3 gap-2">
+        <h2 class="card-title text-base">Kingdom Actions</h2>
 
-      <button class="btn btn-accent btn-sm" (click)="openSubview('infusion')">
-        Infusion
-      </button>
+        <div class="flex flex-wrap gap-2">
+          <button
+            class="btn btn-accent btn-sm"
+            [disabled]="!canReclass()"
+            [tp]="
+              canReclass()
+                ? 'Reclass Heroes'
+                : 'You must be in the Kingdom to reclass heroes'
+            "
+            (click)="openReclassModal()"
+          >
+            <app-icon name="gameBodySwapping" size="1em" />
+            Reclass Heroes
+          </button>
 
-      @if (commissionsUnlocked()) {
-        <button
-          class="btn btn-accent btn-sm"
-          (click)="openSubview('commissions')"
-        >
-          Commissions
-        </button>
-      }
+          <button class="btn btn-accent btn-sm" (click)="openSubview('infusion')">
+            <app-icon name="gameMagicPotion" size="1em" />
+            Infusion
+          </button>
 
-      <button
-        [disabled]="true"
-        class="btn btn-accent btn-sm"
-        (click)="openSubview('achievements')"
-      >
-        Achievements
-      </button>
+          @if (commissionsUnlocked()) {
+            <button
+              class="btn btn-accent btn-sm"
+              (click)="openSubview('commissions')"
+            >
+              <app-icon name="gameContract" size="1em" />
+              Commissions
+            </button>
+          }
+        </div>
+      </div>
+    </div>
 
-      <button
-        [disabled]="true"
-        class="btn btn-accent btn-sm"
-        (click)="openSubview('prestige')"
-      >
-        Prestige
-      </button>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body p-3 gap-2">
+        <h2 class="card-title text-base">Progression</h2>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            [disabled]="true"
+            class="btn btn-accent btn-sm"
+            [tp]="'Not yet available'"
+            (click)="openSubview('achievements')"
+          >
+            <app-icon name="gameMedal" size="1em" />
+            Achievements
+          </button>
+
+          <button
+            [disabled]="true"
+            class="btn btn-accent btn-sm"
+            [tp]="'Not yet available'"
+            (click)="openSubview('prestige')"
+          >
+            <app-icon name="gameCrown" size="1em" />
+            Prestige
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </app-card-page>

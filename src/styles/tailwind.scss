@@ -35,6 +35,14 @@
     nord;
 }
 
+// daisyUI's default dark-theme accent is light enough that white button
+// text reads as low-contrast against it - darken the accent and lighten
+// its content color to match the primary/secondary pairing instead.
+[data-theme='dark'] {
+  --color-accent: oklch(60% 0.13 181.912);
+  --color-accent-content: oklch(96% 0.02 181.912);
+}
+
 .navbar {
   padding: 0;
   min-height: 2rem;

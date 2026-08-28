@@ -2,6 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
 import { hasAnyCommission } from '@helpers/commission/commission-tick';
 import { getEntriesByType, getEntry } from '@helpers/content';
@@ -49,6 +50,7 @@ import { PluralizePipe } from '../../pipes/pluralize.pipe';
     AtlasImageComponent,
     CardPageComponent,
     DecimalPipe,
+    IconComponent,
     TippyDirective,
     PluralizePipe,
   ],
