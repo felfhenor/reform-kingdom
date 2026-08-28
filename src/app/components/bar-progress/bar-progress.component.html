@@ -1,0 +1,14 @@
+<progress
+  class="progress w-full"
+  [class]="colorClass()"
+  [value]="value()"
+  [max]="max()"
+></progress>
+
+@if (text(); as label) {
+  <span
+    class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black pointer-events-none"
+  >
+    {{ label }}
+  </span>
+}

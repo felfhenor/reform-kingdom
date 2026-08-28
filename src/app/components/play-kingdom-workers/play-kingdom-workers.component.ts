@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -85,6 +86,7 @@ type EntryStatusDisplay = {
     CardPageComponent,
     ButtonKingdomBackComponent,
     AtlasAnimationComponent,
+    BarProgressComponent,
     IconComponent,
     SpriteNodeComponent,
     OptionRewardComponent,

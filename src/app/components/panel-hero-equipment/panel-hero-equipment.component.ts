@@ -5,6 +5,7 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ButtonHeroCombatOrdersComponent } from '@components/button-hero-combat-orders/button-hero-combat-orders.component';
 import { ModalHeroCombatOrdersComponent } from '@components/modal-hero-combat-orders/modal-hero-combat-orders.component';
 import { PanelHeroEquipmentEquipmentComponent } from '@components/panel-hero-equipment-equipment/panel-hero-equipment-equipment.component';
@@ -25,6 +26,7 @@ import type { Character, JobContent } from '@interfaces';
     DecimalPipe,
     ButtonHeroCombatOrdersComponent,
     ModalHeroCombatOrdersComponent,
+    BarProgressComponent,
   ],
   templateUrl: './panel-hero-equipment.component.html',
   styleUrl: './panel-hero-equipment.component.scss',

@@ -12,11 +12,12 @@
           Lv. {{ char.level }} {{ job()?.name }}
         </span>
       </div>
-      <progress
-        class="progress progress-primary w-56"
+      <app-bar-progress
+        class="w-56"
+        color="primary"
         [value]="char.xp.current"
         [max]="char.xp.maximum"
-      ></progress>
+      />
       <div class="text-xs text-lighter">
         {{ char.xp.current | number }} / {{ char.xp.maximum | number }} XP
       </div>

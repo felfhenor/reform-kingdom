@@ -5,13 +5,14 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { worldNodeEncounterProgress } from '@helpers/world-node/world-node-encounter';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({
   selector: 'app-panel-map-node-status-encounter',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, BarProgressComponent],
   templateUrl: './panel-map-node-status-encounter.component.html',
   styleUrl: './panel-map-node-status-encounter.component.scss',
 })

@@ -6,11 +6,7 @@
           progressValue.total | number
         }}
       </div>
-      <progress
-        class="progress progress-primary w-full"
-        [value]="progressPercent()"
-        max="100"
-      ></progress>
+      <app-bar-progress color="primary" [value]="progressPercent()" />
     </div>
   </div>
 }

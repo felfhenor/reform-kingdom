@@ -3,10 +3,6 @@
     <div class="text-xs text-lighter">
       Gathering... {{ gatherProgressPercent() | number }}%
     </div>
-    <progress
-      class="progress progress-primary w-full"
-      [value]="gatherProgressPercent()"
-      max="100"
-    ></progress>
+    <app-bar-progress color="primary" [value]="gatherProgressPercent()" />
   </div>
 </div>

@@ -73,11 +73,12 @@
                 </span>
               </div>
 
-              <progress
-                class="progress progress-primary w-56"
+              <app-bar-progress
+                class="w-56"
+                color="primary"
                 [value]="entry.state.xp.current"
                 [max]="entry.state.xp.maximum"
-              ></progress>
+              />
 
               <div class="text-xs text-lighter">
                 {{ entry.state.xp.current | number }} /
