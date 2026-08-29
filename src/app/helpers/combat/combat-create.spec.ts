@@ -245,6 +245,12 @@ describe('combatantFromCharacter', () => {
 
     expect(combatant.statBoosts).toEqual(zeroStats());
   });
+
+  it('sets jobId from the character so a monster targetting entry can match it', () => {
+    const combatant = combatantFromCharacter(buildCharacter());
+
+    expect(combatant.jobId).toBe(rangerJob.id);
+  });
 });
 
 describe('combatantFromMonster', () => {
@@ -256,7 +262,7 @@ describe('combatantFromMonster', () => {
       description: '',
       sprite: '0000',
       frames: 4,
-      targettingType: 'Random',
+      targetting: [{ type: 'Random' }],
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
       skills: [{ skillId: snipeSkill.id, weight: 1 }],
@@ -276,7 +282,7 @@ describe('combatantFromMonster', () => {
       description: '',
       sprite: '0000',
       frames: 4,
-      targettingType: 'Random',
+      targetting: [{ type: 'Random' }],
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
       skills: [
@@ -314,7 +320,7 @@ describe('combatantFromMonster', () => {
       description: '',
       sprite: '0000',
       frames: 4,
-      targettingType: 'Random',
+      targetting: [{ type: 'Random' }],
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
       skills: [{ skillId: attackSkill.id, weight: 1 }],
@@ -323,5 +329,33 @@ describe('combatantFromMonster', () => {
     const combatant = combatantFromMonster(monster, 1, 0);
 
     expect(combatant.statBoosts).toEqual(zeroStats());
+  });
+
+  it('carries the targetting priority list through from the monster content', () => {
+    const monster: MonsterContent = {
+      id: 'goblin' as MonsterId,
+      name: 'Goblin',
+      __type: 'monster',
+      description: '',
+      sprite: '0000',
+      frames: 4,
+      rarity: 'Common',
+      targetting: [
+        { type: 'Random', jobId: rangerJob.id },
+        { type: 'Random' },
+      ],
+      xp: { min: 0, max: 0 },
+      drops: [],
+      baseStats: zeroStats(),
+      statsPerLevel: zeroStats(),
+      skills: [],
+    } as MonsterContent;
+
+    const combatant = combatantFromMonster(monster, 1, 0);
+
+    expect(combatant.targetting).toEqual([
+      { type: 'Random', jobId: rangerJob.id },
+      { type: 'Random' },
+    ]);
   });
 });

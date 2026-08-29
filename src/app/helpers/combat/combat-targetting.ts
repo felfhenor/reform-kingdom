@@ -16,6 +16,7 @@ import type {
   EquipmentSkillTargetBehavior,
   EquipmentSkillTargetBehaviorData,
   EquipmentSkillTargetType,
+  TargettingPriorityEntry,
 } from '@interfaces';
 import { intersection, sampleSize, sortBy, union } from 'es-toolkit/compat';
 
@@ -159,6 +160,31 @@ export function combatGetTargetsFromListBasedOnType(
     };
 
   return targettingActions[type]();
+}
+
+// Tries each priority entry in order, narrowing to entry.jobId (if set) before entry.type
+// picks from the narrowed pool - e.g. Weakest + jobId: Healer targets the weakest healer.
+// Returns the first entry's non-empty result.
+export function combatGetTargetsFromPriorityList(
+  combatants: Combatant[],
+  priority: TargettingPriorityEntry[],
+  select: number,
+  context: CombatTargetModeContext,
+): Combatant[] {
+  for (const entry of priority) {
+    const pool = entry.jobId
+      ? combatants.filter((c) => c.jobId === entry.jobId)
+      : combatants;
+    const targets = combatGetTargetsFromListBasedOnType(
+      pool,
+      entry.type,
+      select,
+      context,
+    );
+    if (targets.length > 0) return targets;
+  }
+
+  return [];
 }
 
 // Lets a combat order clause fall through instead of wasting the turn on zero targets.

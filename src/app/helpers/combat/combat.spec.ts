@@ -37,7 +37,7 @@ vi.mock('@helpers/combat/combat-targetting', () => ({
   combatAvailableSkillsForCombatant: vi.fn(),
   combatGetPossibleCombatantTargetsForSkill: vi.fn(() => [{ id: 'target' }]),
   combatGetPossibleCombatantTargetsForSkillTechnique: vi.fn(() => []),
-  combatGetTargetsFromListBasedOnType: vi.fn(() => []),
+  combatGetTargetsFromPriorityList: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/rng', () => ({
@@ -59,7 +59,11 @@ vi.mock('@helpers/state-game', () => ({
 import { combatantTakeTurn } from '@helpers/combat/combat';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
-import { combatAvailableSkillsForCombatant } from '@helpers/combat/combat-targetting';
+import {
+  combatAvailableSkillsForCombatant,
+  combatGetPossibleCombatantTargetsForSkillTechnique,
+  combatGetTargetsFromPriorityList,
+} from '@helpers/combat/combat-targetting';
 import { rngChoiceWeighted } from '@helpers/rng';
 import type {
   Combat,
@@ -89,7 +93,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     ep: 10,
     sprite: '0000',
     frames: 4,
-    targettingType: 'Random',
+    targetting: [{ type: 'Random' }],
     baseStats: {} as never,
     statBoosts: {} as never,
     totalStats: { Health: 100, Energy: 10 } as never,
@@ -231,5 +235,92 @@ describe('combatantTakeTurn skill selection', () => {
 
     expect(pickSkillFromCombatOrders).not.toHaveBeenCalled();
     expect(combatant.skillUses['weighted' as never]).toBe(1);
+  });
+});
+
+describe('combatantTakeTurn targeting', () => {
+  function buildTargetingSkill() {
+    return buildSkill({
+      id: 'weighted' as never,
+      techniques: [
+        {
+          targets: 1,
+          targetType: 'Enemies',
+          targetBehaviors: [{ behavior: 'Always' }],
+          damageScaling: {} as never,
+          elements: [],
+          attributes: [],
+          statusEffects: [],
+          combatMessage: '',
+        },
+      ],
+    });
+  }
+
+  it('resolves targets from the combatant own targetting priority list when no Combat Order override applies', () => {
+    const weightedSkill = buildTargetingSkill();
+
+    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
+      weightedSkill,
+    ]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(weightedSkill);
+
+    const baseList = [{ id: 'target' } as never];
+    vi.mocked(
+      combatGetPossibleCombatantTargetsForSkillTechnique,
+    ).mockReturnValue(baseList);
+
+    const priority = [
+      { type: 'Random' as const, jobId: 'healer' as never },
+      { type: 'Random' as const },
+    ];
+    const combatant = buildCombatant({ targetting: priority });
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatGetTargetsFromPriorityList).toHaveBeenCalledWith(
+      baseList,
+      priority,
+      1,
+      expect.anything(),
+    );
+  });
+
+  it("wraps a Combat Order's targetMode override into a single-entry priority list, taking precedence over the combatant's own list", () => {
+    const orderedSkill = buildTargetingSkill();
+
+    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
+      orderedSkill,
+    ]);
+    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
+      skill: orderedSkill,
+      targetMode: 'Weakest',
+    });
+
+    const baseList = [{ id: 'target' } as never];
+    vi.mocked(
+      combatGetPossibleCombatantTargetsForSkillTechnique,
+    ).mockReturnValue(baseList);
+
+    const combatant = buildCombatant({
+      targetting: [{ type: 'Random', jobId: 'healer' as never }],
+      combatOrders: [
+        {
+          id: 'clause-1' as CombatOrderClauseId,
+          enabled: true,
+          condition: { type: 'Always' },
+          action: { type: 'CastSkillFamily', family: 'Fireball' },
+        },
+      ],
+    });
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatGetTargetsFromPriorityList).toHaveBeenCalledWith(
+      baseList,
+      [{ type: 'Weakest' }],
+      1,
+      expect.anything(),
+    );
   });
 });

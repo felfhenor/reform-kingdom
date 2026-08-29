@@ -84,7 +84,8 @@ export function combatantFromCharacter(character: Character): Combatant {
     name: character.name,
     isEnemy: false,
 
-    targettingType: 'Random',
+    targetting: [{ type: 'Random' }],
+    jobId: character.jobId,
 
     baseStats: structuredClone(character.stats),
     statBoosts: defaultStats(),
@@ -140,7 +141,7 @@ export function combatantFromMonster(
     name: `${monster.name} Lv.${level} [${String.fromCharCode(index + 65)}]`,
     isEnemy: true,
 
-    targettingType: monster.targettingType,
+    targetting: monster.targetting,
 
     baseStats: structuredClone(stats),
     statBoosts: defaultStats(),

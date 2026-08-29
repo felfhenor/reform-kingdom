@@ -122,7 +122,7 @@ describe('encounter-backed node accessors', () => {
         rarity: 'Common',
         baseStats: {} as never,
         statsPerLevel: {} as never,
-        targettingType: 'Random',
+        targetting: [{ type: 'Random' }],
         xp: { min: 1, max: 1 },
         drops: [],
         skills: [],

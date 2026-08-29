@@ -90,7 +90,7 @@ const goblin: MonsterContent = {
     Resistance: 0,
     Agility: 0,
   },
-  targettingType: 'Random',
+  targetting: [{ type: 'Random' }],
   xp: { min: 3, max: 5, bonusPerLevel: 1 },
   drops: [
     {

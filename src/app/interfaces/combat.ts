@@ -2,6 +2,7 @@ import type { HasAnimation } from '@interfaces/artable';
 import type { CharacterId } from '@interfaces/character';
 import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { EncounterId } from '@interfaces/content-encounter';
+import type { JobId } from '@interfaces/content-job';
 import type { EncounterRandomId } from '@interfaces/content-encounter-random';
 import type {
   EquipmentSkill,
@@ -43,6 +44,13 @@ export type CombatantTargettingType =
   | 'SpecificHero'
   | 'MatchingAllies';
 
+// One step of a combatant's target priority list - tried in order, first non-empty result wins.
+// jobId, when set, narrows the pool to that job before type's mode picks from it (e.g. Weakest + jobId: Healer -> the weakest healer).
+export type TargettingPriorityEntry = {
+  type: CombatantTargettingType;
+  jobId?: JobId;
+};
+
 // Extra context only the Self/SpecificHero/MatchingAllies targeting modes need.
 export type CombatTargetModeContext = {
   combatant: Combatant;
@@ -62,7 +70,10 @@ export type Combatant = HasAnimation & {
   hp: number;
   ep: number;
 
-  targettingType: CombatantTargettingType;
+  // Priority list of targeting modes, tried in order - see combatGetTargetsFromPriorityList.
+  targetting: TargettingPriorityEntry[];
+  // Set for hero combatants only (from Character.jobId), so a monster's targetting entries can narrow by jobId.
+  jobId?: JobId;
   // Resolved once at Combatant creation from the owning hero's current job
   // (empty for monsters) - see combatantFromCharacter.
   combatOrders: CombatOrderClause[];

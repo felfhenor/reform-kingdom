@@ -4,12 +4,13 @@
  * `scripts/analyze-monsterstats.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { filterByNames, round2, statSum } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisParams,
   AnalysisRunResult,
   AnalysisTable,
+  JobContent,
   MonsterContent,
   StatBlock,
 } from '@interfaces';
@@ -27,7 +28,10 @@ const STAT_NAMES = [
   'Luck',
 ] as const;
 
-function monsterStatsAtLevel(monster: MonsterContent, level: number): StatBlock {
+function monsterStatsAtLevel(
+  monster: MonsterContent,
+  level: number,
+): StatBlock {
   const stats = { ...monster.baseStats };
   STAT_NAMES.forEach((stat) => {
     stats[stat] += (monster.statsPerLevel[stat] ?? 0) * (level - 1);
@@ -62,7 +66,13 @@ export function runMonsterStatsAnalysis(
     const row: Record<string, string | number> = {
       Monster: monster.name,
       Rarity: monster.rarity,
-      Targetting: monster.targettingType,
+      Targetting: monster.targetting
+        .map((entry) =>
+          entry.jobId
+            ? `${entry.type} (${getEntry<JobContent>(entry.jobId)?.name ?? entry.jobId})`
+            : entry.type,
+        )
+        .join(', '),
     };
     STAT_NAMES.forEach((stat) => {
       row[stat] = round2(stats[stat]);

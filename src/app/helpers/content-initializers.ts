@@ -88,6 +88,7 @@ import type {
   StatusEffectContent,
   StatusEffectId,
   StatusEffectTag,
+  TargettingPriorityEntry,
   TradeskillContent,
   TradeskillId,
   TradeskillLevelRequirementContent,
@@ -278,6 +279,15 @@ function ensureMonsterSkill(skill: Partial<MonsterSkill> = {}): MonsterSkill {
   };
 }
 
+function ensureTargettingPriorityEntry(
+  entry: Partial<TargettingPriorityEntry> = {},
+): TargettingPriorityEntry {
+  return {
+    type: entry.type ?? 'Random',
+    jobId: entry.jobId,
+  };
+}
+
 function ensureMonster(
   monster: Partial<MonsterContent>,
 ): Required<MonsterContent> {
@@ -290,7 +300,12 @@ function ensureMonster(
     frames: monster.frames ?? 4,
     baseStats: ensureStats(monster.baseStats),
     statsPerLevel: ensureStats(monster.statsPerLevel),
-    targettingType: monster.targettingType ?? 'Random',
+    // A trailing unqualified Random is always appended, so a priority list can never resolve
+    // zero targets and waste the monster's turn - content never needs to author its own catch-all.
+    targetting: [
+      ...ensureArray(monster.targetting, ensureTargettingPriorityEntry),
+      { type: 'Random' },
+    ],
     rarity: monster.rarity ?? 'Common',
     xp: monster.xp ?? { min: 0, max: 0 },
     drops: ensureArray(monster.drops, ensureDroppedReward),

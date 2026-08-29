@@ -1,6 +1,7 @@
 import {
   combatAvailableSkillsForCombatant,
   combatGetTargetsFromListBasedOnType,
+  combatGetTargetsFromPriorityList,
   combatSkillHasValidTargetsForMode,
 } from '@helpers/combat/combat-targetting';
 import type {
@@ -70,7 +71,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     ep: 10,
     sprite: '0000',
     frames: 4,
-    targettingType: 'Random',
+    targetting: [{ type: 'Random' }],
     baseStats: {} as never,
     statBoosts: {} as never,
     totalStats: {} as never,
@@ -216,6 +217,88 @@ describe('combatGetTargetsFromListBasedOnType', () => {
         context,
       ),
     ).toEqual([critical]);
+  });
+});
+
+describe('combatGetTargetsFromPriorityList', () => {
+  it('returns targets from the first entry that resolves a non-empty result', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const healer = buildCombatant({ id: 'healer', jobId: 'healer' as never });
+    const warrior = buildCombatant({
+      id: 'warrior',
+      jobId: 'warrior' as never,
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    const result = combatGetTargetsFromPriorityList(
+      [warrior, healer],
+      [{ type: 'Random', jobId: 'healer' as never }, { type: 'Random' }],
+      1,
+      context,
+    );
+
+    expect(result).toEqual([healer]);
+  });
+
+  it("narrows to jobId before applying the entry's mode, e.g. the weakest combatant of that job rather than the weakest overall", () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const frailHealer = buildCombatant({
+      id: 'frail-healer',
+      hp: 5,
+      jobId: 'healer' as never,
+    });
+    const sturdyHealer = buildCombatant({
+      id: 'sturdy-healer',
+      hp: 50,
+      jobId: 'healer' as never,
+    });
+    const frailWarrior = buildCombatant({
+      id: 'frail-warrior',
+      hp: 1,
+      jobId: 'warrior' as never,
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    const result = combatGetTargetsFromPriorityList(
+      [frailWarrior, sturdyHealer, frailHealer],
+      [{ type: 'Weakest', jobId: 'healer' as never }],
+      1,
+      context,
+    );
+
+    expect(result).toEqual([frailHealer]);
+  });
+
+  it('falls through to the next entry when the first resolves no targets', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const warrior = buildCombatant({
+      id: 'warrior',
+      jobId: 'warrior' as never,
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    const result = combatGetTargetsFromPriorityList(
+      [warrior],
+      [{ type: 'Random', jobId: 'healer' as never }, { type: 'Random' }],
+      1,
+      context,
+    );
+
+    expect(result).toEqual([warrior]);
+  });
+
+  it('returns an empty list when every entry resolves no targets', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    const result = combatGetTargetsFromPriorityList(
+      [],
+      [{ type: 'Random', jobId: 'healer' as never }],
+      1,
+      context,
+    );
+
+    expect(result).toEqual([]);
   });
 });
 

@@ -25,7 +25,7 @@ import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
   combatGetPossibleCombatantTargetsForSkillTechnique,
-  combatGetTargetsFromListBasedOnType,
+  combatGetTargetsFromPriorityList,
 } from '@helpers/combat/combat-targetting';
 import { updateGamestate } from '@helpers/state-game';
 
@@ -172,9 +172,15 @@ export function combatantTakeTurn(
 
     const numTargets = skillTechniqueNumTargets(chosenSkill, tech);
 
-    const targets = combatGetTargetsFromListBasedOnType(
+    // A Combat Order's targetMode is an explicit override - it wins outright rather than
+    // joining the combatant's own priority list.
+    const targetPriority = combatOrderPick?.targetMode
+      ? [{ type: combatOrderPick.targetMode }]
+      : combatant.targetting;
+
+    const targets = combatGetTargetsFromPriorityList(
       baseTargetList,
-      combatOrderPick?.targetMode ?? combatant.targettingType,
+      targetPriority,
       numTargets,
       {
         combatant,

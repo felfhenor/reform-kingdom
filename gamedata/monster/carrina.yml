@@ -5,7 +5,7 @@
   sprite: '0000'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -72,7 +72,7 @@
   sprite: '0004'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -133,7 +133,8 @@
   sprite: '0008'
   frames: 4
 
-  targettingType: Weakest
+  targetting:
+    - type: Weakest
 
   rarity: Common
 
@@ -192,7 +193,8 @@
   sprite: '0036'
   frames: 4
 
-  targettingType: Strongest
+  targetting:
+    - type: Strongest
 
   rarity: Uncommon
 
@@ -252,7 +254,8 @@
   sprite: '0012'
   frames: 4
 
-  targettingType: Strongest
+  targetting:
+    - type: Strongest
 
   rarity: Common
 
@@ -300,7 +303,8 @@
   sprite: '0016'
   frames: 4
 
-  targettingType: Strongest
+  targetting:
+    - type: Strongest
 
   rarity: Common
 
@@ -350,7 +354,8 @@
   sprite: '0020'
   frames: 4
 
-  targettingType: Strongest
+  targetting:
+    - type: Strongest
 
   rarity: Common
 
@@ -398,7 +403,7 @@
   sprite: '0024'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -446,7 +451,7 @@
   sprite: '0028'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -496,7 +501,7 @@
   sprite: '0032'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Rare
 
@@ -548,7 +553,7 @@
   sprite: '0040'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -604,7 +609,7 @@
   sprite: '0044'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -660,7 +665,8 @@
   sprite: '0060'
   frames: 4
 
-  targettingType: Weakest
+  targetting:
+    - type: Weakest
 
   rarity: Common
 
@@ -716,7 +722,7 @@
   sprite: '0052'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -772,7 +778,7 @@
   sprite: '0048'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -830,7 +836,7 @@
   sprite: '0056'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -874,7 +880,8 @@
   sprite: '0064'
   frames: 4
 
-  targettingType: Strongest
+  targetting:
+    - type: Strongest
 
   rarity: Rare
 

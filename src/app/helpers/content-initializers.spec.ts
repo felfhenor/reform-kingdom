@@ -57,6 +57,30 @@ describe('ensureContent', () => {
       expect(result.drops).toEqual([]);
       expect(result.skills).toEqual([]);
     });
+
+    it('defaults targetting to a single Random entry when omitted', () => {
+      const result = ensureContent({
+        __type: 'monster',
+        id: 'goblin',
+        name: 'Goblin',
+      } as unknown as MonsterContent);
+
+      expect(result.targetting).toEqual([{ type: 'Random' }]);
+    });
+
+    it('always appends a trailing Random entry after any authored targetting list', () => {
+      const result = ensureContent({
+        __type: 'monster',
+        id: 'goblin',
+        name: 'Goblin',
+        targetting: [{ type: 'Weakest', jobId: 'healer' }],
+      } as unknown as MonsterContent);
+
+      expect(result.targetting).toEqual([
+        { type: 'Weakest', jobId: 'healer' },
+        { type: 'Random' },
+      ]);
+    });
   });
 
   describe('encounter', () => {

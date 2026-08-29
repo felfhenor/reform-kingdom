@@ -5,7 +5,7 @@
   sprite: '0084'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Uncommon
 

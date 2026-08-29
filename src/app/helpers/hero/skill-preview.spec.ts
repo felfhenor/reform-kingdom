@@ -20,7 +20,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     ep: 10,
     sprite: '0000',
     frames: 4,
-    targettingType: 'Random',
+    targetting: [{ type: 'Random' }],
     baseStats: {} as never,
     statBoosts: {} as never,
     totalStats: {

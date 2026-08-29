@@ -5,7 +5,9 @@
   sprite: '0088'
   frames: 4
 
-  targettingType: Random
+  targetting:
+    - type: Random
+      jobId: Healer
 
   rarity: Uncommon
 

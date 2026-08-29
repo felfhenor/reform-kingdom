@@ -5,7 +5,7 @@
   sprite: '0068'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -57,7 +57,8 @@
   sprite: '0072'
   frames: 4
 
-  targettingType: Weakest
+  targetting:
+    - type: Weakest
 
   rarity: Uncommon
 
@@ -109,7 +110,7 @@
   sprite: '0076'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
@@ -161,7 +162,7 @@
   sprite: '0080'
   frames: 4
 
-  targettingType: Random
+  targetting: []
 
   rarity: Common
 
