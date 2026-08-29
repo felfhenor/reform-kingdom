@@ -16,6 +16,10 @@ vi.mock('@helpers/combat/combat-log', () => ({
   ),
 }));
 
+vi.mock('@helpers/engine/gather-vfx', () => ({
+  gatherVfxEmit: vi.fn(),
+}));
+
 vi.mock('@helpers/hero/luck', () => ({
   luckRollSucceeds: vi.fn(),
   partyMaxLuck: vi.fn(),
@@ -53,6 +57,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
 
 import { gatherMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
+import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGet } from '@helpers/hero/party';
@@ -409,7 +414,7 @@ describe('gatheringProcessTick', () => {
     vi.mocked(getEntry).mockImplementation((id: string) => {
       if (id === 'gather-1') return gathering as never;
       if (id === 'wood')
-        return { name: 'Wergen Wood', rarity: 'Common' } as never;
+        return { name: 'Wergen Wood', sprite: 'wergen-wood', rarity: 'Common' } as never;
       return undefined;
     });
     vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
@@ -425,6 +430,13 @@ describe('gatheringProcessTick', () => {
       'Wergen Woods',
       expect.stringContaining('2'),
     );
+    expect(gatherVfxEmit).toHaveBeenCalledWith({
+      nodeName: 'Wergen Woods',
+      name: 'Wergen Wood',
+      sprite: 'wergen-wood',
+      spritesheet: 'item',
+      quantity: 2,
+    });
 
     const result = applyLastUpdate({
       world: { gathering: { ticksIntoGather: 4 } },
@@ -467,6 +479,9 @@ describe('gatheringProcessTick', () => {
 
     expect(luckRollSucceeds).toHaveBeenCalledWith(50);
     expect(addMaterial).toHaveBeenCalledWith('wood', 4);
+    expect(gatherVfxEmit).toHaveBeenCalledWith(
+      expect.objectContaining({ quantity: 4 }),
+    );
   });
 
   it('does not grant xp when the party has outleveled the node', () => {

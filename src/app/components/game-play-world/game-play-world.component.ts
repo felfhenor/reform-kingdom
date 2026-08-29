@@ -15,6 +15,7 @@ import { StatusCraftingComponent } from '@components/status-crafting/status-craf
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/status-worker-levelup.component';
 import { getEntry } from '@helpers/content';
+import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
   isWorldCameraPanned,
   mapNodeDeselect,
@@ -42,6 +43,7 @@ import {
   viewportTilesCalculate,
 } from '@helpers/pixi/pixi-camera';
 import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid';
+import { pixiFloatingTextCreate } from '@helpers/pixi/pixi-floating-text';
 import {
   pixiIndicatorEncounterProgressCreate,
   pixiIndicatorGatherProgressCreate,
@@ -72,9 +74,11 @@ import {
   worldNodeDiscoverIfHidden,
 } from '@helpers/world-node/world-nodes';
 import type {
+  AtlasedImage,
   CameraBounds,
   CameraPosition,
   CurrentLocation,
+  GatherVfxEvent,
   GlobalEffectId,
   JobContent,
   TiledMap,
@@ -86,11 +90,16 @@ import type {
   WorldNodeLabelInfo,
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
-import { clamp } from 'es-toolkit/compat';
+import { clamp, maxBy, sumBy } from 'es-toolkit/compat';
 import { Container } from 'pixi.js';
 import type { Application, Graphics, Text, Texture } from 'pixi.js';
+import type { Subscription } from 'rxjs';
 
 const FADE_DURATION_MS = 300;
+// Minimum time between two floating-text spawns at the same node, so simultaneous gathers stagger instead of stacking.
+const FLOATING_TEXT_STAGGER_MS = 180;
+const FLOATING_TEXT_MAX_ACTIVE = 24;
+const FLOATING_TEXT_MAX_PENDING = 40;
 
 @Component({
   selector: 'app-game-play-world',
@@ -179,6 +188,23 @@ export class GamePlayWorldComponent implements OnDestroy {
   private nodeSelectionIndicator?: Graphics;
   private nodeLabels?: Map<string, Text>;
   private nodeWrappers?: Map<string, Container>;
+  private floatingTextContainer?: Container;
+  // Keyed per node (not one global FIFO) so a busy node's stagger gate can't head-of-line-block another node's popups.
+  private pendingGatherVfxByNode = new Map<string, GatherVfxEvent[]>();
+  private lastFloatingTextSpawnAtByNode = new Map<string, number>();
+  private activeFloatingTexts: Array<{
+    container: Container;
+    update: (
+      elapsedMs: number,
+      nodePosition: { x: number; y: number },
+    ) => boolean;
+    spawnedAt: number;
+    nodeName: string;
+  }> = [];
+  // Icon textures persist across map transitions, same as workerTokenTextures/partyTokenTextures below.
+  private floatingTextIconTextures = new Map<string, Texture>();
+  private pendingFloatingTextTextureLoads = new Map<string, GatherVfxEvent[]>();
+  private gatherVfxSubscription?: Subscription;
   private resizeObserver?: ResizeObserver;
   private playerIndicatorTicker?: () => void;
   private visualPositionTicker?: () => void;
@@ -242,6 +268,12 @@ export class GamePlayWorldComponent implements OnDestroy {
       }
       untracked(() => this.recenterCamera());
     });
+
+    // Subscribed once (not per initPixi) so it survives map transitions; queued events are dropped
+    // in updateFloatingTexts when their node isn't on the currently loaded map.
+    this.gatherVfxSubscription = gatherVfx$.subscribe((event) => {
+      this.enqueueGatherVfx(event);
+    });
   }
 
   private checkForMapChange(mapName: string): void {
@@ -282,6 +314,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.teardownPixi();
+    this.gatherVfxSubscription?.unsubscribe();
   }
 
   private async transitionToMap(map: TiledMap, mapName: string): Promise<void> {
@@ -338,7 +371,19 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.gatherProgressContainer?.removeChildren();
     this.encounterProgressContainer?.removeChildren();
     this.nodeSelectionContainer?.removeChildren();
+    // Destroyed individually (not via removeChildren + app.destroy's cascade) - each Text's canvas
+    // texture would otherwise leak, since app.destroy only cascades into children still attached to it.
+    this.activeFloatingTexts.forEach((entry) =>
+      entry.container.destroy({ children: true }),
+    );
     this.app?.destroy(true, { children: true, texture: true });
+
+    // Queued/active floating text is map-scoped (positions reference nodes on the map being torn down) -
+    // the icon texture cache is not, and persists below like workerTokenTextures does.
+    this.pendingGatherVfxByNode.clear();
+    this.lastFloatingTextSpawnAtByNode.clear();
+    this.pendingFloatingTextTextureLoads.clear();
+    this.activeFloatingTexts = [];
 
     this.app = undefined;
     this.map = undefined;
@@ -357,6 +402,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.nodeSelectionIndicator = undefined;
     this.nodeLabels = undefined;
     this.nodeWrappers = undefined;
+    this.floatingTextContainer = undefined;
     this.resizeObserver = undefined;
     this.canvas = undefined;
   }
@@ -387,6 +433,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.gatherProgressContainer = containers.gatherProgressContainer;
     this.encounterProgressContainer = containers.encounterProgressContainer;
     this.nodeSelectionContainer = containers.nodeSelectionContainer;
+    this.floatingTextContainer = containers.floatingTextContainer;
 
     // Clicking empty map deselects the node (node clicks stop propagation, see pixi-map-render.ts). `dragMoved` distinguishes a pan-drag's pointertap from an actual deselect click.
     this.app.stage.eventMode = 'static';
@@ -458,6 +505,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateNodeWrapperVisibility();
       this.positionCamera();
       this.updateWorkerIndicators();
+      this.updateFloatingTexts();
     };
     this.app.ticker.add(this.visualPositionTicker);
 
@@ -932,5 +980,150 @@ export class GamePlayWorldComponent implements OnDestroy {
     const textures = await this.loadWorkerTokenTextures(workerId);
     this.workerTokenTextures.set(workerId, textures);
     return textures;
+  }
+
+  private enqueueGatherVfx(event: GatherVfxEvent): void {
+    const queue = this.pendingGatherVfxByNode.get(event.nodeName) ?? [];
+    queue.push(event);
+    this.pendingGatherVfxByNode.set(event.nodeName, queue);
+    this.trimPendingGatherVfx();
+  }
+
+  // Drops the oldest event from the largest queue on overflow, so one runaway node can't starve the others.
+  private trimPendingGatherVfx(): void {
+    const queues = Array.from(this.pendingGatherVfxByNode.values());
+    const total = sumBy(queues, (queue) => queue.length);
+    if (total <= FLOATING_TEXT_MAX_PENDING) return;
+
+    maxBy(queues, (queue) => queue.length)?.shift();
+  }
+
+  // Each node's queue is checked independently every frame - a busy/gated node never blocks another node's popups.
+  private updateFloatingTexts(): void {
+    if (!this.floatingTextContainer || !this.map) return;
+
+    const now = performance.now();
+
+    this.pendingGatherVfxByNode.forEach((queue, nodeName) => {
+      if (queue.length === 0) return;
+      if (this.activeFloatingTexts.length >= FLOATING_TEXT_MAX_ACTIVE) return;
+
+      const lastSpawn = this.lastFloatingTextSpawnAtByNode.get(nodeName) ?? 0;
+      if (now - lastSpawn < FLOATING_TEXT_STAGGER_MS) return;
+
+      const event = queue.shift();
+      if (event) this.spawnFloatingText(event, now);
+    });
+
+    const map = this.map;
+    this.activeFloatingTexts = this.activeFloatingTexts.filter((entry) => {
+      const node = worldNodeByName(entry.nodeName);
+      // Recomputed live every frame, not cached from spawn time, so the popup tracks the node while the camera pans.
+      const nodePosition = node
+        ? tileToScreenPosition(
+            node.x,
+            node.y,
+            this.lastCamera,
+            map.tilewidth,
+            map.tileheight,
+          )
+        : undefined;
+
+      const alive =
+        !!nodePosition && entry.update(now - entry.spawnedAt, nodePosition);
+      if (!alive) entry.container.destroy({ children: true });
+      return alive;
+    });
+  }
+
+  private spawnFloatingText(event: GatherVfxEvent, now: number): void {
+    const entry = worldNodeByName(event.nodeName);
+    // Content data could reference a removed node, or the event's node could be on a different
+    // map than the one currently loaded - either way, there's nowhere valid to draw it.
+    if (!entry || entry.mapName !== this.loadedMapName) return;
+
+    const textureKey = `${event.spritesheet}:${event.sprite}`;
+    const texture = this.floatingTextIconTextures.get(textureKey);
+
+    if (!texture) {
+      this.queueFloatingTextTextureWait(event, textureKey);
+      return;
+    }
+
+    this.lastFloatingTextSpawnAtByNode.set(event.nodeName, now);
+    this.createFloatingText(event, texture, now);
+  }
+
+  // Parks the event until its icon texture resolves, rather than spawning without one - re-enqueued
+  // onto the normal per-node queue afterward so it still goes through the stagger gate.
+  private queueFloatingTextTextureWait(
+    event: GatherVfxEvent,
+    textureKey: string,
+  ): void {
+    const waiting = this.pendingFloatingTextTextureLoads.get(textureKey);
+    if (waiting) {
+      // Bounded independently of trimPendingGatherVfx's cap - this bucket sits outside
+      // pendingGatherVfxByNode until the texture resolves, so it needs its own ceiling.
+      if (waiting.length < FLOATING_TEXT_MAX_PENDING) waiting.push(event);
+      return;
+    }
+
+    this.pendingFloatingTextTextureLoads.set(textureKey, [event]);
+
+    void this.resolveFloatingTextTexture(event.spritesheet, event.sprite).then(
+      (texture) => {
+        const waitingEvents =
+          this.pendingFloatingTextTextureLoads.get(textureKey) ?? [];
+        this.pendingFloatingTextTextureLoads.delete(textureKey);
+        if (!texture) return;
+
+        this.floatingTextIconTextures.set(textureKey, texture);
+        waitingEvents.forEach((waitingEvent) =>
+          this.enqueueGatherVfx(waitingEvent),
+        );
+      },
+    );
+  }
+
+  private async resolveFloatingTextTexture(
+    spritesheet: AtlasedImage,
+    sprite: string,
+  ): Promise<Texture | undefined> {
+    const frame =
+      this.contentService.artAtlases()[spritesheet]?.[
+        `gameassets/${spritesheet}/${sprite}.png`
+      ];
+    if (!frame) return undefined;
+
+    const url = this.contentService.toCacheBustURL(
+      `art/spritesheets/${spritesheet}.webp`,
+    );
+
+    const textures = await pixiSpriteFrameTexturesLoad(url, frame, 1);
+    return textures[0];
+  }
+
+  private createFloatingText(
+    event: GatherVfxEvent,
+    texture: Texture,
+    now: number,
+  ): void {
+    if (!this.map || !this.floatingTextContainer) return;
+
+    const { container, update } = pixiFloatingTextCreate(
+      event,
+      texture,
+      this.map.tilewidth,
+    );
+
+    this.floatingTextContainer.addChild(container);
+    // Position is set on the first `updateFloatingTexts` pass right after this (not here) - see
+    // that method's filter loop, which recomputes every active popup's node position each frame.
+    this.activeFloatingTexts.push({
+      container,
+      update,
+      spawnedAt: now,
+      nodeName: event.nodeName,
+    });
   }
 }

@@ -72,6 +72,14 @@ vi.mock('@helpers/crafting/recipes', () => ({
   recipeDiscover: vi.fn(),
 }));
 
+vi.mock('@helpers/engine/gather-vfx', () => ({
+  gatherVfxEmit: vi.fn(),
+}));
+
+vi.mock('@helpers/world-node/world-node-rewards', () => ({
+  rewardContentInfo: vi.fn(),
+}));
+
 vi.mock('@helpers/hero/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));

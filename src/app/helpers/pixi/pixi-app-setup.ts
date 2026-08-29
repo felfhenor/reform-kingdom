@@ -55,6 +55,7 @@ export function pixiWorldContainersCreate(app: Application): {
   gatherProgressContainer: Container;
   encounterProgressContainer: Container;
   nodeSelectionContainer: Container;
+  floatingTextContainer: Container;
 } {
   const mapContainer = new Container();
   const playerIndicatorContainer = new Container();
@@ -62,6 +63,7 @@ export function pixiWorldContainersCreate(app: Application): {
   const gatherProgressContainer = new Container();
   const encounterProgressContainer = new Container();
   const nodeSelectionContainer = new Container();
+  const floatingTextContainer = new Container();
 
   app.stage.addChild(mapContainer);
   app.stage.addChild(playerIndicatorContainer);
@@ -69,6 +71,8 @@ export function pixiWorldContainersCreate(app: Application): {
   app.stage.addChild(gatherProgressContainer);
   app.stage.addChild(encounterProgressContainer);
   app.stage.addChild(nodeSelectionContainer);
+  // Added last so gather/reward popups render above every other map overlay.
+  app.stage.addChild(floatingTextContainer);
 
   mapContainer.cullable = true;
   playerIndicatorContainer.cullable = false;
@@ -77,6 +81,8 @@ export function pixiWorldContainersCreate(app: Application): {
   gatherProgressContainer.cullable = false;
   encounterProgressContainer.cullable = false;
   nodeSelectionContainer.cullable = false;
+  // Same (0,0)-anchored, individually-positioned scheme as workerIndicatorContainer.
+  floatingTextContainer.cullable = false;
 
   return {
     mapContainer,
@@ -85,5 +91,6 @@ export function pixiWorldContainersCreate(app: Application): {
     gatherProgressContainer,
     encounterProgressContainer,
     nodeSelectionContainer,
+    floatingTextContainer,
   };
 }

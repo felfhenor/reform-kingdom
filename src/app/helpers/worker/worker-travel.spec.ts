@@ -1,13 +1,34 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
 }));
 
-import { gamestate } from '@helpers/state-game';
-import { workersTravelingTokens } from '@helpers/worker/worker-travel';
-import type { GameState, WorkerId } from '@interfaces';
+vi.mock('@helpers/pathfinding/pathfinding', () => ({
+  travelPathFrom: vi.fn(),
+}));
+
+vi.mock('@helpers/world-node/world-nodes', () => ({
+  kingdomNodeGet: vi.fn(),
+  worldNodeByName: vi.fn(),
+  worldNodeGathering: vi.fn(),
+}));
+
+import { travelPathFrom } from '@helpers/pathfinding/pathfinding';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  workerBeginReturnTrip,
+  workersTravelingTokens,
+} from '@helpers/worker/worker-travel';
+import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
+import type { GameState, ItemId, WorkerId, WorldNodeEntry } from '@interfaces';
+
+function applyLastUpdate(state: GameState): GameState {
+  const calls = vi.mocked(updateGamestate).mock.calls;
+  const updateFn = calls[calls.length - 1][0];
+  return updateFn(state);
+}
 
 describe('workersTravelingTokens', () => {
   // Single read: `workersTravelingTokens` is a `computed()`, so a second call in this file
@@ -85,5 +106,54 @@ describe('workersTravelingTokens', () => {
         ticksIntoStep: 1,
       },
     ]);
+  });
+});
+
+describe('workerBeginReturnTrip', () => {
+  const WORKER_ID = 'weaver-nell' as WorkerId;
+  const COPPER_ID = 'copper-ore' as ItemId;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(gamestate).mockReturnValue({
+      workers: {
+        [WORKER_ID]: {
+          location: { mapName: 'Carrina', x: 3, y: 3 },
+        },
+      },
+    } as unknown as GameState);
+    vi.mocked(kingdomNodeGet).mockReturnValue({
+      nodeName: 'The Duchy',
+    } as WorldNodeEntry);
+  });
+
+  it('returns true and starts the traveling-back status when a path home resolves', () => {
+    const path = [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 3 }];
+    vi.mocked(travelPathFrom).mockReturnValue(path as never);
+
+    const result = workerBeginReturnTrip(WORKER_ID, COPPER_ID, 4);
+
+    expect(result).toBe(true);
+    const state = applyLastUpdate({
+      workers: { [WORKER_ID]: {} },
+    } as unknown as GameState);
+    expect(state.workers[WORKER_ID].status).toMatchObject({
+      kind: 'TravelingBack',
+      path,
+      carriedItemId: COPPER_ID,
+      carriedQuantity: 4,
+    });
+  });
+
+  it('returns false and parks AtDuchy when no path home resolves', () => {
+    vi.mocked(travelPathFrom).mockReturnValue(undefined);
+
+    const result = workerBeginReturnTrip(WORKER_ID, COPPER_ID, 4);
+
+    expect(result).toBe(false);
+    const state = applyLastUpdate({
+      workers: { [WORKER_ID]: {} },
+    } as unknown as GameState);
+    expect(state.workers[WORKER_ID].status).toEqual({ kind: 'AtDuchy' });
   });
 });

@@ -1,4 +1,5 @@
 import { getEntry } from '@helpers/content';
+import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   workerGainXp,
@@ -16,6 +17,7 @@ import {
 } from '@helpers/world-node/world-nodes';
 import type {
   GatheringContent,
+  ItemContent,
   ItemId,
   WorkerContent,
   WorkerId,
@@ -76,16 +78,33 @@ function abandonInvalidGather(workerId: WorkerId): void {
   });
 }
 
+function emitWorkerGatherUnitVfx(nodeName: string, itemId: ItemId): void {
+  const item = getEntry<ItemContent>(itemId);
+  if (!item) return;
+
+  gatherVfxEmit({
+    nodeName,
+    name: item.name,
+    sprite: item.sprite,
+    spritesheet: 'item',
+    quantity: 1,
+  });
+}
+
 function completeGatherUnit(
   workerId: WorkerId,
+  nodeName: string,
   itemId: ItemId,
   itemsGathered: number,
   capacity: number,
 ): void {
   if (itemsGathered >= capacity) {
-    workerBeginReturnTrip(workerId, itemId, itemsGathered);
+    const startedTrip = workerBeginReturnTrip(workerId, itemId, itemsGathered);
+    if (startedTrip) emitWorkerGatherUnitVfx(nodeName, itemId);
     return;
   }
+
+  emitWorkerGatherUnitVfx(nodeName, itemId);
 
   updateGamestate((state) => {
     const target = state.workers[workerId];
@@ -146,6 +165,7 @@ export function workerGatheringProcessTick(workerId: WorkerId): void {
   const capacity = workerStatsForLevel(content, worker.level).capacity;
   completeGatherUnit(
     workerId,
+    status.nodeName,
     status.itemId,
     status.itemsGathered + 1,
     capacity,

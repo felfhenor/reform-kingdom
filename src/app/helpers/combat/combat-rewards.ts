@@ -7,11 +7,13 @@ import {
 } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
 import { recipeDiscover } from '@helpers/crafting/recipes';
+import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
 import { addMaterial } from '@helpers/item/materials';
 import { armoryAdd } from '@helpers/kingdom/armory';
 import { isWorkerRescued, workerRescue } from '@helpers/worker/worker-discovery';
+import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   CollectibleContent,
   Combat,
@@ -22,6 +24,18 @@ import type {
   ResolvedDrop,
   WorkerContent,
 } from '@interfaces';
+
+// `rewardContentInfo` only structurally checks for `itemId`/`equipmentId`/etc, so a `ResolvedDrop` satisfies it like a `RewardIdentity` would.
+function emitRewardVfx(
+  combat: Combat,
+  drop: ResolvedDrop,
+  quantity: number,
+): void {
+  const info = rewardContentInfo(drop);
+  if (!info) return;
+
+  gatherVfxEmit({ nodeName: combat.locationName, quantity, ...info });
+}
 
 // Shared by monster kill drops and encounter/encounter-random completion rewards (see `loot.ts`).
 // A worker reward always rolls its chance but only ever grants once - the already-rescued check is here.
@@ -43,6 +57,7 @@ export function grantResolvedDrops(
           combat,
           `The party found ${equipmentDropHtml(equipment)}!`,
         );
+        emitRewardVfx(combat, drop, 1);
         return;
       }
 
@@ -56,6 +71,7 @@ export function grantResolvedDrops(
           combat,
           `The party found ${collectibleDropHtml(collectible)}!`,
         );
+        emitRewardVfx(combat, drop, 1);
         return;
       }
 
@@ -66,6 +82,7 @@ export function grantResolvedDrops(
         if (!recipe) return;
 
         combatMessageLog(combat, `The party found ${recipeDropHtml(recipe)}!`);
+        emitRewardVfx(combat, drop, 1);
         return;
       }
 
@@ -78,6 +95,7 @@ export function grantResolvedDrops(
         if (!worker) return;
 
         combatMessageLog(combat, `The party rescued ${worker.name}!`);
+        emitRewardVfx(combat, drop, 1);
         return;
       }
 
@@ -104,5 +122,6 @@ export function grantResolvedDrops(
       combat,
       `The party found ${itemDropHtml(item, quantity)}!`,
     );
+    emitRewardVfx(combat, { kind: 'Item', itemId: itemId as ItemId, quantity }, quantity);
   });
 }

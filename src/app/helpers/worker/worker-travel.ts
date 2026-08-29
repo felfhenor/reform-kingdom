@@ -103,11 +103,12 @@ export function workerBeginOutboundTrip(
 
 // Starts a return trip from the worker's current location, recomputed fresh each time.
 // `carriedItemId`/`carriedQuantity` is whatever was gathered so far - XP is already granted per-unit.
+// Returns whether a route home resolved - false means the worker was parked `AtDuchy` with its cargo discarded instead.
 export function workerBeginReturnTrip(
   workerId: WorkerId,
   carriedItemId: ItemId | undefined,
   carriedQuantity: number,
-): void {
+): boolean {
   const worker = gamestate().workers[workerId];
   const kingdom = kingdomNodeGet();
 
@@ -131,6 +132,8 @@ export function workerBeginReturnTrip(
       : { kind: 'AtDuchy' };
     return state;
   });
+
+  return !!path;
 }
 
 // Returns early ("not rescued") if `workers[workerId]` doesn't exist -

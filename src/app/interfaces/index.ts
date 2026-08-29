@@ -37,6 +37,7 @@ export * from './droppable';
 export * from './element';
 export * from './equipment';
 export * from './explore-random';
+export * from './gather-vfx';
 export * from './gathering';
 export * from './identifiable';
 export * from './item-preview';

@@ -4,6 +4,10 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/engine/gather-vfx', () => ({
+  gatherVfxEmit: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -33,6 +37,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
 }));
 
 import { getEntry } from '@helpers/content';
+import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   workerGatherRate,
@@ -201,7 +206,10 @@ describe('workerGatheringProcessTick', () => {
     vi.mocked(worldNodeGathering).mockReturnValue(
       buildGathering({ gatherTime: 10 }),
     );
-    vi.mocked(getEntry).mockReturnValue(workerContent);
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === WORKER_ID) return workerContent as never;
+      return { name: 'Copper Ore', sprite: 'copper-ore' } as never;
+    });
     vi.mocked(workerStatsForLevel).mockReturnValue({
       capacity: 6,
       gatherSpeed: 2,
@@ -267,9 +275,17 @@ describe('workerGatheringProcessTick', () => {
       itemsGathered: 1,
       ticksIntoGather: 0,
     });
+    expect(gatherVfxEmit).toHaveBeenCalledWith({
+      nodeName: 'Wergen Woods',
+      name: 'Copper Ore',
+      sprite: 'copper-ore',
+      spritesheet: 'item',
+      quantity: 1,
+    });
   });
 
-  it('begins the return trip once capacity is reached instead of resetting the cycle', () => {
+  it('begins the return trip once capacity is reached instead of resetting the cycle, and emits the VFX', () => {
+    vi.mocked(workerBeginReturnTrip).mockReturnValue(true);
     vi.mocked(gamestate).mockReturnValue({
       workers: {
         [WORKER_ID]: buildWorker({
@@ -288,6 +304,31 @@ describe('workerGatheringProcessTick', () => {
 
     expect(workerBeginReturnTrip).toHaveBeenCalledWith(WORKER_ID, COPPER_ID, 6);
     expect(updateGamestate).not.toHaveBeenCalled();
+    expect(gatherVfxEmit).toHaveBeenCalledWith(
+      expect.objectContaining({ nodeName: 'Wergen Woods', quantity: 1 }),
+    );
+  });
+
+  it('does not emit the VFX when the capacity-reached return trip finds no path home', () => {
+    vi.mocked(workerBeginReturnTrip).mockReturnValue(false);
+    vi.mocked(gamestate).mockReturnValue({
+      workers: {
+        [WORKER_ID]: buildWorker({
+          status: {
+            kind: 'Gathering',
+            nodeName: 'Wergen Woods',
+            itemId: COPPER_ID,
+            itemsGathered: 5,
+            ticksIntoGather: 6,
+          },
+        }),
+      },
+    } as unknown as GameState);
+
+    workerGatheringProcessTick(WORKER_ID);
+
+    expect(workerBeginReturnTrip).toHaveBeenCalledWith(WORKER_ID, COPPER_ID, 6);
+    expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
   it('abandons the gather and parks AtDuchy when the assignment goes stale', () => {

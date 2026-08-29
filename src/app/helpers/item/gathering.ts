@@ -1,6 +1,7 @@
 import { gatherMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
 import { defaultGatheringState } from '@helpers/defaults';
+import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGet } from '@helpers/hero/party';
@@ -125,6 +126,14 @@ function grantGatherItems(
 
       const item = getEntry<ItemContent>(itemId);
       if (!item) return undefined;
+
+      gatherVfxEmit({
+        nodeName,
+        name: item.name,
+        sprite: item.sprite,
+        spritesheet: 'item',
+        quantity: grantedQuantity,
+      });
 
       return itemDropHtml(item, grantedQuantity);
     })
