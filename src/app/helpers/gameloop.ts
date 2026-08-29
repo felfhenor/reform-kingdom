@@ -31,6 +31,12 @@ import { clamp } from 'es-toolkit/compat';
 
 export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
 
+// Caps how many ticks run before yielding to the browser during a long catch-up (e.g. after the tab was backgrounded), so it doesn't block the main thread for seconds at a time.
+const TICKS_PER_YIELD = 100;
+
+// Guards tickGamestate (state-game.ts) from a second call landing mid-batch now that the loop yields - e.g. a manual `window.api.gameloop()` during a catch-up.
+let isProcessingTicks = false;
+
 export function gameloopShouldRun(): boolean {
   return window.location.toString().includes('/game');
 }
@@ -40,59 +46,69 @@ export async function gameloop(totalTicks: number): Promise<void> {
   if (!isGameStateReady()) return;
   if (!gameloopShouldRun()) return;
   if (isGameloopPaused()) return;
+  if (isProcessingTicks) return;
 
-  gamestateTickStart();
+  isProcessingTicks = true;
+  try {
+    gamestateTickStart();
 
-  const ticksToCalculate = totalTicks * getOption('debugTickMultiplier');
-  const numTicks = clamp(ticksToCalculate, 1, 3600);
+    const ticksToCalculate = totalTicks * getOption('debugTickMultiplier');
+    const numTicks = clamp(ticksToCalculate, 1, 3600);
 
-  const timer = new LoggerTimer({
-    dumpThreshold: 100,
-    isActive: getOption('debugGameloopTimerUpdates'),
-  });
-
-  timer.startTimer('gameloop');
-
-  // Tick one at a time (not one bulk +=) so tick-driven systems see an accurate timerTicksElapsed() each iteration.
-  for (let i = 0; i < numTicks; i++) {
-    updateGamestate((state) => {
-      state.clock.numTicks += 1;
-      return state;
+    const timer = new LoggerTimer({
+      dumpThreshold: 100,
+      isActive: getOption('debugGameloopTimerUpdates'),
     });
 
-    travelProcessTick();
-    globalEffectsProcessTick();
-    astralProjectorProcessTick();
-    gatheringProcessTick();
-    encounterRandomProcessTick();
-    caravanProcessTick();
-    commissionProcessTick();
-    autoModeProcessTick();
-    craftProcessTick();
-    restingProcessTick();
-    workersProcessTick();
+    timer.startTimer('gameloop');
 
-    if (currentCombat()) {
-      combatDoCombatIteration();
+    // Tick one at a time (not one bulk +=) so tick-driven systems see an accurate timerTicksElapsed() each iteration.
+    for (let i = 0; i < numTicks; i++) {
+      updateGamestate((state) => {
+        state.clock.numTicks += 1;
+        return state;
+      });
+
+      travelProcessTick();
+      globalEffectsProcessTick();
+      astralProjectorProcessTick();
+      gatheringProcessTick();
+      encounterRandomProcessTick();
+      caravanProcessTick();
+      commissionProcessTick();
+      autoModeProcessTick();
+      craftProcessTick();
+      restingProcessTick();
+      workersProcessTick();
+
+      if (currentCombat()) {
+        combatDoCombatIteration();
+      }
+
+      if ((i + 1) % TICKS_PER_YIELD === 0) {
+        await schedulerYield();
+      }
     }
-  }
 
-  timer.dumpTimers((timers) => debug('Gameloop:Timers', timers));
+    timer.dumpTimers((timers) => debug('Gameloop:Timers', timers));
 
-  discordUpdateStatus();
+    discordUpdateStatus();
 
-  gamestateTickEnd();
+    gamestateTickEnd();
 
-  const currentTick = timerTicksElapsed();
-  const nextSaveTick = timerLastSaveTick() + getOption('debugSaveInterval');
-  if (currentTick >= nextSaveTick) {
-    updateGamestate((state) => {
-      state.clock.lastSaveTick = currentTick;
-      return state;
-    });
+    const currentTick = timerTicksElapsed();
+    const nextSaveTick = timerLastSaveTick() + getOption('debugSaveInterval');
+    if (currentTick >= nextSaveTick) {
+      updateGamestate((state) => {
+        state.clock.lastSaveTick = currentTick;
+        return state;
+      });
 
-    await schedulerYield();
-    saveGameState();
-    debug('Gameloop:Save', `Saving @ tick ${currentTick}`);
+      await schedulerYield();
+      saveGameState();
+      debug('Gameloop:Save', `Saving @ tick ${currentTick}`);
+    }
+  } finally {
+    isProcessingTicks = false;
   }
 }

@@ -63,20 +63,27 @@ export class GamestateService {
 
   private doGameloop() {
     let lastRunTime = 0;
+    // gameloop() itself now no-ops on overlap, but this also stops lastRunTime from advancing mid-catch-up, so elapsed time isn't silently dropped.
+    let isRunning = false;
 
     const applicationRef = this.applicationRef;
 
     // `gameloop` mutates signals from a background RxJS interval, untracked in this zoneless app - force a tick so stale UI (health bars, timers) refreshes.
     async function runLoop(numTicks: number) {
       lastRunTime = Date.now();
-      await gameloop(numTicks);
+      isRunning = true;
+      try {
+        await gameloop(numTicks);
+      } finally {
+        isRunning = false;
+      }
       applicationRef.tick();
     }
 
     void runLoop(1);
 
     interval(1000).subscribe(() => {
-      if (lastRunTime <= 0 || !this.hasLoaded()) return;
+      if (lastRunTime <= 0 || !this.hasLoaded() || isRunning) return;
 
       if (!isPageVisible() && !getOption('debugAllowBackgroundOperations')) {
         return;
