@@ -158,15 +158,21 @@ describe('Party Helper Functions', () => {
       ).toBe(true);
     });
 
-    it('should fall back to default (zeroed) job stats when the job cannot be found', () => {
+    it('should fall back to default job stats, floored to a minimum of 1, when the job cannot be found', () => {
       mockGetEntry();
 
       const character = createCharacter('Spoorle', 'unknown-job' as JobId);
 
+      // All inputs are 0-0.2, below the 1-minimum floor.
       expect(character.stats).toEqual({
-        ...defaultStats(),
-        Agility: mockCloak.baseStats.Agility,
-        Resistance: mockCloak.baseStats.Resistance,
+        Health: 1,
+        Energy: 1,
+        Luck: 1,
+        Intelligence: 1,
+        Strength: 1,
+        Vitality: 1,
+        Resistance: 1,
+        Agility: 1,
       });
     });
   });
@@ -420,6 +426,37 @@ describe('Party Helper Functions', () => {
       expect(stats.Strength).toBe(
         mockJob.baseStats.Strength + mockJob.statsPerLevel.Strength * 4 + 5,
       );
+    });
+
+    it('floors a stat at 1 when negative equipment stats would otherwise drop it to 0 or below', () => {
+      const cursedRing: EquipmentContent = {
+        id: 'cursed-ring' as EquipmentId,
+        name: 'Cursed Ring',
+        __type: 'equipment',
+        description: '',
+        sprite: '0000',
+        rarity: 'Common',
+        levelRequirement: 1,
+        baseStats: { ...defaultStats(), Vitality: -50, Health: -1000 },
+        type: 'Ring',
+        slots: 1,
+      };
+
+      mockGetEntry(mockJob, cursedRing);
+
+      const equipment: EquipmentBlock = {
+        ...defaultEquipment(),
+        Ring: mockEquipmentItem('cursed-ring' as EquipmentId),
+      };
+
+      const stats = characterStatsForLevel(
+        'job-explorer' as JobId,
+        1,
+        equipment,
+      );
+
+      expect(stats.Vitality).toBe(1);
+      expect(stats.Health).toBe(1);
     });
   });
 

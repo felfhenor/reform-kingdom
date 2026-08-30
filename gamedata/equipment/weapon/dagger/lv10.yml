@@ -3,7 +3,7 @@
 
 - id: 76b4f41c-6ee1-42bc-8d38-bde9b07a00cf
   name: Elvenwood Dagger
-  description: A beautifully carved dagger made of elven wood, balanced to a razor's edge.
+  description: A beautifully carved dagger made of elven wood, balanced to a razor's edge - so finely honed it sacrifices heft for speed.
   levelRequirement: 12
   rarity: Uncommon
   type: Dagger
@@ -13,3 +13,4 @@
     Agility: 4.3
     Strength: 3.5
     Luck: 1
+    Vitality: -1.5

@@ -17,7 +17,7 @@
   }
 
   @for (tag of bonusRows(); track tag) {
-    <div class="text-green-400">
+    <div class="text-value-positive">
       @if (layout() === 'row') {
         {{ tagLabel[tag] }} {{ bonusValue(tag) | statDisplay }}%
       } @else {

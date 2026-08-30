@@ -1,6 +1,6 @@
 - id: 8955ed40-6956-4682-9c90-2a47e5af1f3d
   name: Miremetal Bracer
-  description: A bracer made of miremetal. It's often seen as a good luck charm by those who live in the Craggled Mire.
+  description: A bracer made of miremetal. It's often seen as a good luck charm by those who live in the Craggled Mire, though it's said luck favors the reckless.
   levelRequirement: 15
   rarity: Uncommon
   type: Trinket
@@ -8,3 +8,4 @@
   slots: 1
   baseStats:
     Luck: 4.4
+    Vitality: -2

@@ -941,6 +941,74 @@ describe('Equipment Helper Functions', () => {
 
       expect(winners).toEqual([]);
     });
+
+    it('prefers a tradeoff candidate whose non-priority stats net positive, even though one of those stats is negative', () => {
+      const zeroRing = {
+        ...sword,
+        id: 'zero-ring' as EquipmentId,
+        baseStats: { ...sword.baseStats, Strength: 0, Agility: 0 },
+      };
+      const tradeoffBangle = {
+        ...sword,
+        id: 'tradeoff-bangle' as EquipmentId,
+        baseStats: {
+          ...sword.baseStats,
+          Strength: 0,
+          Agility: 0,
+          Luck: 10,
+          Vitality: -3,
+        },
+      };
+      mockContentEntries(zeroRing, tradeoffBangle);
+      const equippedItem = mockEquipmentItem(zeroRing.id);
+      const armoryItem = mockEquipmentItem(tradeoffBangle.id);
+      const character = buildCharacter({
+        equipment: { ...emptyEquipment, Weapon: equippedItem },
+      });
+
+      const winners = planEquipmentOptimization(
+        character,
+        [armoryItem],
+        ['Strength', 'Agility'],
+      );
+
+      expect(winners).toEqual([
+        { item: armoryItem, content: tradeoffBangle },
+      ]);
+    });
+
+    it('rejects a tradeoff candidate whose non-priority stats net negative overall', () => {
+      const zeroRing = {
+        ...sword,
+        id: 'zero-ring' as EquipmentId,
+        baseStats: { ...sword.baseStats, Strength: 0, Agility: 0 },
+      };
+      const cursedBangle = {
+        ...sword,
+        id: 'cursed-bangle' as EquipmentId,
+        baseStats: {
+          ...sword.baseStats,
+          Strength: 0,
+          Agility: 0,
+          Luck: 2,
+          Vitality: -5,
+        },
+      };
+      mockContentEntries(zeroRing, cursedBangle);
+      const equippedItem = mockEquipmentItem(zeroRing.id);
+      const armoryItem = mockEquipmentItem(cursedBangle.id);
+      const character = buildCharacter({
+        equipment: { ...emptyEquipment, Weapon: equippedItem },
+      });
+
+      const winners = planEquipmentOptimization(
+        character,
+        [armoryItem],
+        ['Strength', 'Agility'],
+      );
+
+      expect(winners).toEqual([]);
+    });
   });
 
   describe('isSlotAvailableForJob', () => {

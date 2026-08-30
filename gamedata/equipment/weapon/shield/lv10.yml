@@ -3,7 +3,7 @@
 
 - id: 93721a1a-dc56-416d-bfe8-3b4cffe48886
   name: Elven Shield Copycat
-  description: A shield made of elven wood, but... not quite as well as they would do it.
+  description: A shield made of elven wood, but... not quite as well as they would do it. Its clumsy weight throws off the wielder's footing.
   levelRequirement: 11
   rarity: Common
   type: Shield
@@ -12,3 +12,4 @@
   baseStats:
     Vitality: 4.2
     Resistance: 0.5
+    Agility: -1.5

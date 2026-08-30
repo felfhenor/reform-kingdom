@@ -9,6 +9,7 @@
   baseStats:
     Intelligence: 4.7
     Resistance: 7.5
+    Health: -10
 
   debuffResistances:
     Stun: 15

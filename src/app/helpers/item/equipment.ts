@@ -26,7 +26,7 @@ import {
   type StatBlock,
   type StatusEffectTag,
 } from '@interfaces';
-import { orderBy, uniq } from 'es-toolkit/compat';
+import { orderBy, sumBy, uniq } from 'es-toolkit/compat';
 
 // Gear can be swapped freely while gathering, but not mid-fight.
 export function canModifyEquipment(): boolean {
@@ -264,25 +264,34 @@ function candidateStatValue(
   );
 }
 
-// Ranks by statPriority, then by every other stat as a tie-break, then by `entries`'s existing order.
+// Ranks by statPriority stat-by-stat, then by the net sum of remaining stats (so a tradeoff item's bonus/penalty are weighed together), then each remaining stat individually as a final tie-break.
 function bestBySlotPriority(
   entries: EquipmentArmoryEntry[],
   statPriority: BaseStat[],
 ): EquipmentArmoryEntry | undefined {
   if (entries.length === 0) return undefined;
 
-  const rankedStats = [
-    ...statPriority,
-    ...StatOrder.filter((stat) => !statPriority.includes(stat)),
-  ];
-  const iteratees = rankedStats.map(
-    (stat) => (entry: EquipmentArmoryEntry) => candidateStatValue(entry, stat),
+  const nonPriorityStats = StatOrder.filter(
+    (stat) => !statPriority.includes(stat),
   );
+
+  const iteratees = [
+    ...statPriority.map(
+      (stat) => (entry: EquipmentArmoryEntry) =>
+        candidateStatValue(entry, stat),
+    ),
+    (entry: EquipmentArmoryEntry) =>
+      sumBy(nonPriorityStats, (stat) => candidateStatValue(entry, stat)),
+    ...nonPriorityStats.map(
+      (stat) => (entry: EquipmentArmoryEntry) =>
+        candidateStatValue(entry, stat),
+    ),
+  ];
 
   return orderBy(
     entries,
     iteratees,
-    rankedStats.map(() => 'desc' as const),
+    iteratees.map(() => 'desc' as const),
   )[0];
 }
 

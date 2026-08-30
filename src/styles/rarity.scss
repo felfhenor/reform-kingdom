@@ -9,6 +9,14 @@
   --color-yellow-400: #facc15;
 }
 
+.text-value-positive {
+  @apply text-green-600;
+}
+
+.text-value-negative {
+  @apply text-red-600;
+}
+
 .text-Common {
   @apply text-white;
 }

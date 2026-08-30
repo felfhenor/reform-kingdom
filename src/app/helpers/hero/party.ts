@@ -56,8 +56,9 @@ export function characterStatsForLevel(
   const stats = jobStatsAtLevel(jobId, level);
   const equipmentStats = equipmentStatTotals(equipment);
 
+  // Floored at 1 - a stat at or below 0 (Health/Energy especially) breaks max-pool clamping downstream.
   (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
-    stats[stat] += equipmentStats[stat];
+    stats[stat] = clamp(stats[stat] + equipmentStats[stat], 1, Infinity);
   });
 
   return stats;

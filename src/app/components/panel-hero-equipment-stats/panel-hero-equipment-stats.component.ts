@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,7 +12,6 @@ import {
   StatInformation,
   StatOrder,
   StatShorthand,
-  type BaseStat,
   type Character,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -19,7 +19,12 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-panel-hero-equipment-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconStatComponent, RowDebuffResistancesComponent, TippyDirective],
+  imports: [
+    DecimalPipe,
+    IconStatComponent,
+    RowDebuffResistancesComponent,
+    TippyDirective,
+  ],
   host: {
     class: 'flex flex-col gap-2',
   },
@@ -37,8 +42,4 @@ export class PanelHeroEquipmentStatsComponent {
   public resistances = computed(() =>
     characterTagResistances(this.character()),
   );
-
-  public statValue(stat: BaseStat): number {
-    return Math.round(this.character().stats[stat] * 10) / 10;
-  }
 }

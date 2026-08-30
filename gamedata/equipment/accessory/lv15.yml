@@ -13,7 +13,7 @@
 
 - id: 568c362d-c361-4797-b727-dc76bd5229f1
   name: Mirewood Clogs
-  description: A pair of clogs that boosts the wearer's speed, though they clatter loudly with every step.
+  description: A pair of clogs that boosts the wearer's speed, though they clatter loudly with every step, leaving the wearer exposed.
   rarity: Common
   levelRequirement: 16
   type: Accessory
@@ -21,6 +21,7 @@
   slots: 1
   baseStats:
     Agility: 3.1
+    Vitality: -1.5
 
 - id: 9df4d947-91d4-4a3e-af9a-128447b8b5d9
   name: Miresewn Gloves
