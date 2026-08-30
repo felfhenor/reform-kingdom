@@ -20,6 +20,7 @@
     # level 1
     - chance: 5
       levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Miremetal Ore
           quantity: 1
@@ -27,12 +28,14 @@
     # level 2
     - chance: 5
       levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Miremetal Ore
           quantity: 2
 
     - chance: 2
       levelRequirement: 1
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Peridot
           quantity: 1
@@ -40,18 +43,21 @@
     # level 3
     - chance: 15
       levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Miremetal Ore
           quantity: 3
 
     - chance: 10
       levelRequirement: 2
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Peridot
           quantity: 1
 
     - chance: 1
       levelRequirement: 2
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Ghost Peridot
           quantity: 1
@@ -78,12 +84,14 @@
     # level 1
     - chance: 4
       levelRequirement: 0
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Mirewood
           quantity: 1
 
     - chance: 4
       levelRequirement: 0
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Mireweed
           quantity: 1
@@ -91,6 +99,7 @@
     # level 2
     - chance: 4
       levelRequirement: 1
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Mirewood
           quantity: 2
@@ -103,6 +112,7 @@
 
     - chance: 1
       levelRequirement: 1
+      tradeskillIds: [Woodworking, Tailoring]
       items:
         - itemId: Mirewood
           quantity: 1
@@ -112,18 +122,21 @@
     # level 3
     - chance: 4
       levelRequirement: 2
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Mirewood
           quantity: 3
 
     - chance: 4
       levelRequirement: 2
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Mireweed
           quantity: 3
 
     - chance: 1
       levelRequirement: 2
+      tradeskillIds: [Woodworking, Tailoring]
       items:
         - itemId: Mirewood
           quantity: 2

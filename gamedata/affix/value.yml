@@ -1,0 +1,47 @@
+- id: a8995f65-c656-4df2-b11d-3b37e5fe6436
+  name: Valuable
+  description: This item is worth more when sold.
+  rarity: Uncommon
+  family: SellValue
+  position: Prefix
+  effects:
+    - kind: SellValue
+      value: 250
+
+- id: f991e3df-9ae3-4848-9033-9e2cecb23bda
+  name: of Minor Fortunes
+  description: This item is worth more when sold.
+  rarity: Uncommon
+  family: SellValue
+  effects:
+    - kind: SellValue
+      value: 1000
+
+- id: 6b9ec6e6-6655-4d19-bdd0-ed4b4a928958
+  name: of Major Fortunes
+  description: This item is worth more when sold.
+  rarity: Mystical
+  family: SellValue
+  effects:
+    - kind: SellValue
+      value: 5000
+
+- id: bdfb9c2c-d582-4f02-b60a-a5484f5940f0
+  name: Haggling
+  description: Discounts caravan purchases.
+  rarity: Rare
+  family: CaravanBuyDiscount
+  position: Prefix
+  effects:
+    - kind: CaravanBuyDiscount
+      value: 5
+
+- id: a16701cb-156b-48bd-bdb5-6ca1db1c5fd1
+  name: Mercantile
+  description: Increases gold earned from caravan sales.
+  rarity: Rare
+  family: CaravanSellBonus
+  position: Prefix
+  effects:
+    - kind: CaravanSellBonus
+      value: 5

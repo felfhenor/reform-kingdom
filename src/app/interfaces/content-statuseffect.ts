@@ -14,17 +14,12 @@ export type StatusEffectTrigger = 'TurnStart' | 'TurnEnd';
 // gear/infusions can grant resistance to a family of debuffs (e.g. every
 // stun-like effect) rather than one specific effect by id.
 export type StatusEffectTag =
-  | 'Stun'
-  | 'StatDown'
-  | 'Accuracy'
-  | 'DamageOverTime'
-  | 'Poison'
-  | 'Burn';
+  'Stun' | 'StatDown' | 'Accuracy' | 'DamageOverTime' | 'Poison' | 'Burn';
 
 export const StatusEffectTagLabel: Record<StatusEffectTag, string> = {
   Stun: 'Stun',
   StatDown: 'Stat Down',
-  Accuracy: 'Accuracy',
+  Accuracy: 'Accuracy Down',
   DamageOverTime: 'Damage over Time',
   Poison: 'Poison',
   Burn: 'Burn',

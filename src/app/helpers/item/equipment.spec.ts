@@ -17,6 +17,7 @@ vi.mock('@helpers/kingdom/armory', () => ({
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(),
 }));
 
 vi.mock('@helpers/combat/combat-state', () => ({
@@ -24,11 +25,12 @@ vi.mock('@helpers/combat/combat-state', () => ({
 }));
 
 import { currentCombat } from '@helpers/combat/combat-state';
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   canEquipItem,
   canModifyEquipment,
   characterTagResistances,
+  equipmentAffixEffects,
   equipmentAvailableForSlot,
   equipmentGrantedSkillIds,
   equipmentStatTotals,
@@ -37,12 +39,13 @@ import {
   equippedItemsByPrimarySlot,
   equippedItemTypes,
   isSlotAvailableForJob,
+  newEquipmentItem,
   planEquipmentOptimization,
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
 import { armoryGet } from '@helpers/kingdom/armory';
-import type { Combat } from '@interfaces';
+import type { AffixContent, AffixId, Combat } from '@interfaces';
 
 // Dedup is keyed by instance id, not content id, so each distinct physical item needs its own id (a two-hander reuses the same instance across both slots).
 function mockEquipmentItem(
@@ -53,6 +56,7 @@ function mockEquipmentItem(
     id: id as unknown as EquipmentItemId,
     equipmentId,
     infusedItemIds: [],
+    affixIds: [],
   };
 }
 
@@ -237,6 +241,30 @@ describe('Equipment Helper Functions', () => {
 
       expect(totals.Strength).toBe(sword.baseStats.Strength + 2);
     });
+
+    it("adds a rolled Stat affix's value on top of baseStats", () => {
+      const strengthAffix = {
+        id: 'affix-str' as never,
+        rarity: 'Common',
+        family: 'Strength',
+        effects: [{ kind: 'Stat', stat: 'Strength', value: 4 }],
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? sword
+            : id === strengthAffix.id
+              ? strengthAffix
+              : undefined) as never,
+      );
+
+      const totals = equipmentStatTotals({
+        ...emptyEquipment,
+        Weapon: { ...mockEquipmentItem(sword.id), affixIds: [strengthAffix.id] },
+      });
+
+      expect(totals.Strength).toBe(sword.baseStats.Strength + 4);
+    });
   });
 
   describe('equipmentTagResistanceTotals', () => {
@@ -333,6 +361,34 @@ describe('Equipment Helper Functions', () => {
 
       expect(totals.StatDown).toBe(5);
     });
+
+    it("adds a rolled Resistance affix's value on top of debuffResistances", () => {
+      const stunAffix = {
+        id: 'affix-stun' as never,
+        rarity: 'Uncommon',
+        family: 'StunResist',
+        effects: [{ kind: 'Resistance', tag: 'Stun', value: 10 }],
+      };
+      const stunSword = {
+        ...sword,
+        debuffResistances: { ...zeroResistances, Stun: 3 },
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? stunSword
+            : id === stunAffix.id
+              ? stunAffix
+              : undefined) as never,
+      );
+
+      const totals = equipmentTagResistanceTotals({
+        ...emptyEquipment,
+        Weapon: { ...mockEquipmentItem(sword.id), affixIds: [stunAffix.id] },
+      });
+
+      expect(totals.Stun).toBe(13);
+    });
   });
 
   describe('characterTagResistances', () => {
@@ -404,6 +460,33 @@ describe('Equipment Helper Functions', () => {
       });
 
       expect(skillIds).toEqual([]);
+    });
+
+    it("includes a rolled GrantSkill affix's skillId alongside content-granted skills", () => {
+      const grantAffix = {
+        id: 'affix-grant' as never,
+        rarity: 'Mystical',
+        family: 'GrantAttack',
+        effects: [{ kind: 'GrantSkill', skillId: 'attack' }],
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? sword
+            : id === grantAffix.id
+              ? grantAffix
+              : undefined) as never,
+      );
+
+      const skillIds = equipmentGrantedSkillIds({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          affixIds: [grantAffix.id],
+        },
+      });
+
+      expect(skillIds).toEqual(['attack']);
     });
   });
 
@@ -1031,6 +1114,88 @@ describe('Equipment Helper Functions', () => {
 
       vi.mocked(getEntry).mockReturnValue({ name: 'Magician' } as JobContent);
       expect(isSlotAvailableForJob('Ammo', 'magician' as JobId)).toBe(false);
+    });
+  });
+
+  describe('newEquipmentItem', () => {
+    const strengthAffix: AffixContent = {
+      id: 'affix-str' as AffixId,
+      name: 'of Strength',
+      __type: 'affix',
+      description: '',
+      rarity: 'Common',
+      family: 'Strength',
+      effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
+    };
+
+    it('rolls affixes for the resolved content rarity', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        ...sword,
+        rarity: 'Legendary',
+      } as never);
+      vi.mocked(getEntriesByType).mockReturnValue([strengthAffix] as never);
+
+      const item = newEquipmentItem(sword.id);
+
+      expect(item.equipmentId).toBe(sword.id);
+      expect(item.infusedItemIds).toEqual([]);
+      expect(item.affixIds).toEqual([strengthAffix.id]);
+    });
+
+    it('rolls no affixes when the content cannot be found', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      const item = newEquipmentItem(sword.id);
+      expect(item.affixIds).toEqual([]);
+      expect(getEntriesByType).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('equipmentAffixEffects', () => {
+    const strengthAffix: AffixContent = {
+      id: 'affix-str' as AffixId,
+      name: 'of Strength',
+      __type: 'affix',
+      description: '',
+      rarity: 'Common',
+      family: 'Strength',
+      effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
+    };
+
+    it('collects affix effects from every distinct equipped item', () => {
+      vi.mocked(getEntry).mockImplementation(
+        (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
+      );
+
+      const equipment: EquipmentBlock = {
+        ...emptyEquipment,
+        Weapon: { ...mockEquipmentItem(sword.id), affixIds: [strengthAffix.id] },
+      };
+
+      expect(equipmentAffixEffects(equipment)).toEqual(strengthAffix.effects);
+    });
+
+    it('counts a two-handed item once even though it occupies two slots', () => {
+      vi.mocked(getEntry).mockImplementation(
+        (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
+      );
+
+      const spearItem = {
+        ...mockEquipmentItem(spear.id),
+        affixIds: [strengthAffix.id],
+      };
+
+      const equipment: EquipmentBlock = {
+        ...emptyEquipment,
+        Weapon: spearItem,
+        Offhand: spearItem,
+      };
+
+      expect(equipmentAffixEffects(equipment)).toEqual(strengthAffix.effects);
+    });
+
+    it('returns an empty array when nothing is equipped', () => {
+      expect(equipmentAffixEffects(emptyEquipment)).toEqual([]);
     });
   });
 });

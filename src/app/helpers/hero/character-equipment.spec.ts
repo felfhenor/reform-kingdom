@@ -22,6 +22,7 @@ vi.mock('uuid', () => ({
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/combat/combat-state', () => ({
@@ -136,6 +137,7 @@ describe('Character Equipment Helper Functions', () => {
       id: `fixture-item-${fixtureItemCounter++}` as EquipmentItemId,
       equipmentId,
       infusedItemIds: [],
+      affixIds: [],
     };
   }
 
@@ -157,6 +159,7 @@ describe('Character Equipment Helper Functions', () => {
         id: expect.any(String),
         equipmentId: mockHelmet.id,
         infusedItemIds: [],
+        affixIds: [],
       });
       expect(updated.equipment.Armor).toEqual(jala.equipment.Armor);
       expect(updated.stats).toEqual(

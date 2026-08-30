@@ -1,8 +1,9 @@
 import { getEntry } from '@helpers/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
+import { newEquipmentItem } from '@helpers/item/equipment';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { gainGold } from '@helpers/item/materials';
-import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   DropRarity,
@@ -68,11 +69,9 @@ export function armoryAdd(equipmentId: EquipmentId, quantity = 1): void {
   if (quantity <= 0) return;
 
   updateGamestate((state) => {
-    const newItems: EquipmentItem[] = Array.from({ length: quantity }, () => ({
-      id: rngUuid() as EquipmentItemId,
-      equipmentId,
-      infusedItemIds: [],
-    }));
+    const newItems: EquipmentItem[] = Array.from({ length: quantity }, () =>
+      newEquipmentItem(equipmentId),
+    );
     state.armory = [...state.armory, ...newItems];
 
     const existing = state.discoveredEquipment[equipmentId];
@@ -103,17 +102,25 @@ const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
 
 // Base stats plus infusion bonus both count - an infused item sells for more, but infusion materials aren't refunded.
 export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
+  const affixEffects = equipmentItemAffixEffects(entry.item);
+  const affixStatBoost = affixEffectSum(affixEffects, 'Stat');
+
   const statTotal =
     sum(Object.values(entry.content.baseStats)) +
-    sum(Object.values(equipmentItemInfusionBonus(entry.item.infusedItemIds)));
+    sum(Object.values(equipmentItemInfusionBonus(entry.item.infusedItemIds))) +
+    affixStatBoost;
 
   const base =
     statTotal * SELL_GOLD_PER_STAT_POINT +
     entry.content.levelRequirement * SELL_GOLD_PER_LEVEL;
 
+  // A SellValue affix is a flat bonus, added after the rarity multiplier rather than scaled by it.
+  const affixBonus = affixEffectSum(affixEffects, 'SellValue');
+
   return Math.max(
     1,
-    Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity]),
+    Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity]) +
+      affixBonus,
   );
 }
 

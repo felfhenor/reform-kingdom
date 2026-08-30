@@ -13,10 +13,13 @@ import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
 import { defaultStats } from '@helpers/defaults';
+import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionResistanceBonus,
-} from '@helpers/item/infusion';
+  equipmentItemBonusResistances,
+  equipmentItemBonusStats,
+  equipmentItemGrantedSkillIds,
+} from '@helpers/item/equipment-display';
+import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
   StatShorthand,
   type BaseStat,
@@ -56,29 +59,35 @@ export class CardEquipmentItemComponent {
 
   private statKeys = Object.keys(defaultStats()) as BaseStat[];
 
-  public infusionBonus = computed(() =>
-    equipmentItemInfusionBonus(this.equipmentItem().infusedItemIds),
+  public displayName = computed(() =>
+    equipmentItemDisplayName(this.equipmentItem(), this.equipment().name),
   );
 
-  public infusionResistanceBonus = computed(() =>
-    equipmentItemInfusionResistanceBonus(this.equipmentItem().infusedItemIds),
+  public bonusStats = computed(() =>
+    equipmentItemBonusStats(this.equipmentItem()),
+  );
+
+  public bonusResistances = computed(() =>
+    equipmentItemBonusResistances(this.equipmentItem()),
+  );
+
+  public infusionSlotCount = computed(() =>
+    equipmentItemSlotCount(this.equipmentItem()),
   );
 
   // Stats shown on the row itself - only what this item actually boosts,
-  // baseStats plus any infusion bonus combined into one total.
+  // baseStats plus any infusion/affix bonus combined into one total.
   public rowStatKeys = computed<BaseStat[]>(() =>
     this.statKeys.filter((stat) => this.totalStatValue(stat) !== 0),
   );
 
   public totalStatValue(stat: BaseStat): number {
-    return this.equipment().baseStats[stat] + this.infusionBonus()[stat];
+    return this.equipment().baseStats[stat] + this.bonusStats()[stat];
   }
 
   public grantedSkills = computed<EquipmentSkillContent[]>(() =>
-    this.equipment()
-      .grantedSkillIds.map((skillId) =>
-        getEntry<EquipmentSkillContent>(skillId),
-      )
+    equipmentItemGrantedSkillIds(this.equipmentItem(), this.equipment())
+      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
       .filter((skill): skill is EquipmentSkillContent => !!skill),
   );
 

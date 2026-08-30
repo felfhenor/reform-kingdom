@@ -163,6 +163,8 @@ describe('ensureContent', () => {
             { itemId: 'wood', quantity: 3 },
             { itemId: 'UNKNOWN', quantity: 1 },
           ],
+          levelRequirement: undefined,
+          tradeskillIds: [],
         },
       ]);
     });

@@ -20,18 +20,21 @@
     # level 1
     - chance: 4
       levelRequirement: 0
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Stick
           quantity: 1
 
     - chance: 3
       levelRequirement: 0
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Wood
           quantity: 1
 
     - chance: 3
       levelRequirement: 0
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Tattered Hide
           quantity: 1
@@ -39,18 +42,21 @@
     # level 2
     - chance: 4
       levelRequirement: 1
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Stick
           quantity: 2
 
     - chance: 3
       levelRequirement: 1
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Wood
           quantity: 2
 
     - chance: 1
       levelRequirement: 1
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Wood
           quantity: 1
@@ -60,6 +66,7 @@
 
     - chance: 3
       levelRequirement: 1
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Tattered Hide
           quantity: 2
@@ -67,18 +74,21 @@
     # level 3
     - chance: 4
       levelRequirement: 2
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Stick
           quantity: 3
 
     - chance: 3
       levelRequirement: 2
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Wood
           quantity: 3
 
     - chance: 1
       levelRequirement: 2
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Wood
           quantity: 2
@@ -88,6 +98,7 @@
 
     - chance: 3
       levelRequirement: 2
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Tattered Hide
           quantity: 3
@@ -113,18 +124,21 @@
   gatherResults:
     - chance: 1
       levelRequirement: 0
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Flax Flower
           quantity: 1
 
     - chance: 1
       levelRequirement: 1
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Flax Flower
           quantity: 2
 
     - chance: 1
       levelRequirement: 2
+      tradeskillIds: [Tailoring]
       items:
         - itemId: Flax Flower
           quantity: 3
@@ -151,6 +165,7 @@
     # level 1
     - chance: 7
       levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 1
@@ -158,12 +173,14 @@
     # level 2
     - chance: 7
       levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 2
 
     - chance: 1
       levelRequirement: 1
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Malachite
           quantity: 1
@@ -171,18 +188,21 @@
     # level 3
     - chance: 7
       levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 3
 
     - chance: 4
       levelRequirement: 2
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Malachite
           quantity: 2
 
     - chance: 1
       levelRequirement: 2
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Azurite
           quantity: 1
@@ -190,18 +210,21 @@
     # level 4
     - chance: 7
       levelRequirement: 3
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 4
 
     - chance: 4
       levelRequirement: 3
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Malachite
           quantity: 2
 
     - chance: 4
       levelRequirement: 3
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Azurite
           quantity: 1
@@ -209,18 +232,21 @@
     # level 5
     - chance: 7
       levelRequirement: 4
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 5
 
     - chance: 4
       levelRequirement: 4
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Malachite
           quantity: 2
 
     - chance: 4
       levelRequirement: 4
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Azurite
           quantity: 1
@@ -249,12 +275,14 @@
     # level 1
     - chance: 10
       levelRequirement: 0
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Elven Wood
           quantity: 1
 
     - chance: 1
       levelRequirement: 0
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Elven Wood
           quantity: 2
@@ -262,12 +290,14 @@
     # level 2
     - chance: 5
       levelRequirement: 1
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Elven Wood
           quantity: 2
 
     - chance: 1
       levelRequirement: 1
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Elven Wood
           quantity: 3
@@ -275,12 +305,14 @@
     # level 3
     - chance: 3
       levelRequirement: 2
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Elven Wood
           quantity: 3
 
     - chance: 1
       levelRequirement: 2
+      tradeskillIds: [Woodworking]
       items:
         - itemId: Elven Wood
           quantity: 4

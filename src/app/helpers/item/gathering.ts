@@ -4,7 +4,8 @@ import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
-import { partyGet } from '@helpers/hero/party';
+import { partyAffixEffects, partyGet } from '@helpers/hero/party';
+import { affixEffectSum } from '@helpers/item/affix';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -14,7 +15,12 @@ import {
   worldNodeByName,
   worldNodeGathering,
 } from '@helpers/world-node/world-nodes';
-import type { GatherResult, GatheringContent, ItemContent } from '@interfaces';
+import type {
+  GatherResult,
+  GatheringContent,
+  ItemContent,
+  TradeskillId,
+} from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
 export function partyMinLevel(): number {
@@ -113,15 +119,26 @@ function grantGatherXpIfInRange(content: GatheringContent): void {
   partyGainXp(content.xpGainedIfInLevelRange);
 }
 
+// Tradeskills come from the rolled GatherResult, not the node, so a Tailoring affix can't boost a Woodworking-only roll at a mixed node.
+function partyGatherYieldBonus(tradeskillIds: TradeskillId[]): number {
+  return affixEffectSum(partyAffixEffects(), 'GatherYield', (effect) =>
+    tradeskillIds.includes(effect.tradeskillId),
+  );
+}
+
 function grantGatherItems(
   result: GatherResult,
   nodeName: string,
   yieldMultiplier: number,
 ): void {
+  const yieldBonus = partyGatherYieldBonus(result.tradeskillIds);
+
   const descriptions = result.items
     .filter(({ quantity }) => quantity > 0)
-    .map(({ itemId, quantity }) => {
-      const grantedQuantity = quantity * yieldMultiplier;
+    .map(({ itemId, quantity }, index) => {
+      // Bonus is flat per gather cycle, not per item line - only the first line gets it.
+      const grantedQuantity =
+        quantity * yieldMultiplier + (index === 0 ? yieldBonus : 0);
       addMaterial(itemId, grantedQuantity);
 
       const item = getEntry<ItemContent>(itemId);

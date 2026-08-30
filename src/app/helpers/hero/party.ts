@@ -2,19 +2,19 @@ import { getEntry } from '@helpers/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
 import {
+  equipmentAffixEffects,
   equipmentStatTotals,
+  newEquipmentItem,
   pruneInvalidEquippedItems,
 } from '@helpers/item/equipment';
 import { rngUuid } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  AffixEffect,
   Character,
   CharacterId,
   EquipmentBlock,
   EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  EquipmentItemId,
   JobContent,
   JobId,
   StatBlock,
@@ -64,14 +64,6 @@ export function characterStatsForLevel(
   return stats;
 }
 
-export function newEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
-  return {
-    id: rngUuid() as EquipmentItemId,
-    equipmentId,
-    infusedItemIds: [],
-  };
-}
-
 function starterEquipment(): EquipmentBlock {
   const equipment = defaultEquipment();
 
@@ -112,6 +104,13 @@ export function createCharacter(name: string, jobId: JobId): Character {
 
 export function partyGet(): Character[] {
   return gamestate().world.party;
+}
+
+// Party-wide passive affix effects (GatherYield, CaravanBuyDiscount, etc.) from every hero's equipped gear, regardless of who's "doing" the action.
+export function partyAffixEffects(): AffixEffect[] {
+  return partyGet().flatMap((character) =>
+    equipmentAffixEffects(character.equipment),
+  );
 }
 
 export function isPartyAtFullHealth(): boolean {

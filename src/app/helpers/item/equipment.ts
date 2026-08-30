@@ -2,6 +2,12 @@ import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
 import { defaultStats, defaultTagResistances } from '@helpers/defaults';
 import {
+  affixEffectsOfKind,
+  affixEffectSum,
+  equipmentItemAffixEffects,
+  rollAffixIds,
+} from '@helpers/item/affix';
+import {
   equipmentItemInfusionBonus,
   equipmentItemInfusionResistanceBonus,
 } from '@helpers/item/infusion';
@@ -10,6 +16,7 @@ import { rngUuid } from '@helpers/rng';
 import {
   EquipmentTypeToSlot,
   StatOrder,
+  type AffixEffect,
   type BaseStat,
   type Character,
   type EquipmentArmoryEntry,
@@ -31,6 +38,18 @@ import { orderBy, sumBy, uniq } from 'es-toolkit/compat';
 // Gear can be swapped freely while gathering, but not mid-fight.
 export function canModifyEquipment(): boolean {
   return !currentCombat();
+}
+
+// Single construction site for a fresh EquipmentItem - every drop/craft/purchase/starter-gear path should use this instead of an inline literal.
+export function newEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
+  const content = getEntry<EquipmentContent>(equipmentId);
+
+  return {
+    id: rngUuid() as EquipmentItemId,
+    equipmentId,
+    infusedItemIds: [],
+    affixIds: content ? rollAffixIds(content.rarity) : [],
+  };
 }
 
 // A two-handed item occupies multiple paperdoll slots but is still one physical item (same instance id) - dedupe by instance id.
@@ -163,9 +182,16 @@ export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
     if (!content) return;
 
     const infusionBonus = equipmentItemInfusionBonus(item.infusedItemIds);
+    const affixEffects = equipmentItemAffixEffects(item);
 
     (Object.keys(totals) as Array<keyof StatBlock>).forEach((stat) => {
-      totals[stat] += content.baseStats[stat] + infusionBonus[stat];
+      const affixBonus = affixEffectSum(
+        affixEffects,
+        'Stat',
+        (effect) => effect.stat === stat,
+      );
+      totals[stat] +=
+        content.baseStats[stat] + infusionBonus[stat] + affixBonus;
     });
   });
 
@@ -185,14 +211,25 @@ export function equipmentTagResistanceTotals(
     const infusionBonus = equipmentItemInfusionResistanceBonus(
       item.infusedItemIds,
     );
+    const affixEffects = equipmentItemAffixEffects(item);
 
     (Object.keys(totals) as StatusEffectTag[]).forEach((tag) => {
+      const affixBonus = affixEffectSum(
+        affixEffects,
+        'Resistance',
+        (effect) => effect.tag === tag,
+      );
       totals[tag] +=
-        (content.debuffResistances?.[tag] ?? 0) + infusionBonus[tag];
+        (content.debuffResistances?.[tag] ?? 0) + infusionBonus[tag] + affixBonus;
     });
   });
 
   return totals;
+}
+
+// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
+export function equipmentAffixEffects(equipment: EquipmentBlock): AffixEffect[] {
+  return equippedItems(equipment).flatMap(equipmentItemAffixEffects);
 }
 
 // Computed on demand (not baked into persisted `Character.stats`, which is
@@ -208,10 +245,16 @@ export function equipmentGrantedSkillIds(
   equipment: EquipmentBlock,
 ): EquipmentSkillId[] {
   return uniq(
-    equippedItems(equipment).flatMap(
-      (item) =>
-        getEntry<EquipmentContent>(item.equipmentId)?.grantedSkillIds ?? [],
-    ),
+    equippedItems(equipment).flatMap((item) => {
+      const contentSkillIds =
+        getEntry<EquipmentContent>(item.equipmentId)?.grantedSkillIds ?? [];
+      const affixSkillIds = affixEffectsOfKind(
+        equipmentItemAffixEffects(item),
+        'GrantSkill',
+      ).map((effect) => effect.skillId);
+
+      return [...contentSkillIds, ...affixSkillIds];
+    }),
   );
 }
 
@@ -222,6 +265,7 @@ export function backfillEquipmentItem(item: EquipmentItem): EquipmentItem {
     id: item.id ?? (rngUuid() as EquipmentItemId),
     equipmentId: item.equipmentId,
     infusedItemIds: item.infusedItemIds ?? [],
+    affixIds: item.affixIds ?? [],
   };
 }
 

@@ -1,7 +1,7 @@
 - id: 52f455db-43e8-4f32-80fe-be917f70d1a9
   name: Miremetal Amulet
   description: An amulet set with a peridot that enhances the user's magical capabilities, said to hum when danger draws near.
-  rarity: Common
+  rarity: Uncommon
   levelRequirement: 15
   type: Accessory
   sprite: '0081'

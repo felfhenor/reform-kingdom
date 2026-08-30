@@ -1,3 +1,4 @@
+import type { AffixId } from '@interfaces/content-affix';
 import type {
   EquipmentContent,
   EquipmentId,
@@ -67,6 +68,9 @@ export type EquipmentItem = {
   // is empty (`null`). Infusing a slot always overwrites whatever was
   // there; there is no way to empty a slot back out.
   infusedItemIds: (ItemId | null)[];
+
+  // Rolled once at find/craft time - fixed thereafter, unlike infusion which can be reapplied.
+  affixIds: AffixId[];
 };
 
 export type EquipmentBlock = Record<EquipmentSlot, EquipmentItem | undefined>;

@@ -1,4 +1,6 @@
 import type {
+  AffixContent,
+  AffixId,
   Character,
   CharacterId,
   EquipmentBlock,
@@ -20,6 +22,7 @@ vi.mock('uuid', () => ({
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -35,6 +38,7 @@ import {
   characterXpForLevel,
   createCharacter,
   isPartyAtFullHealth,
+  partyAffixEffects,
   partyGet,
   pruneInvalidPartyEquipment,
   setParty,
@@ -145,11 +149,13 @@ describe('Party Helper Functions', () => {
         id: expect.any(String),
         equipmentId: mockCloak.id,
         infusedItemIds: [],
+        affixIds: [],
       });
       expect(character.equipment.Helmet).toEqual({
         id: expect.any(String),
         equipmentId: mockStarterHat.id,
         infusedItemIds: [],
+        affixIds: [],
       });
       expect(
         Object.entries(character.equipment)
@@ -472,6 +478,48 @@ describe('Party Helper Functions', () => {
       id: `fixture-item-${fixtureItemCounter++}` as EquipmentItemId,
       equipmentId,
       infusedItemIds: [],
+      affixIds: [],
     };
   }
+
+  describe('partyAffixEffects', () => {
+    const strengthAffix: AffixContent = {
+      id: 'affix-str' as AffixId,
+      name: 'of Strength',
+      __type: 'affix',
+      description: '',
+      rarity: 'Common',
+      family: 'Strength',
+      effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
+    };
+
+    it('collects affix effects across every party member', () => {
+      mockGetEntry(mockJob);
+      const hero = createCharacterStub('Jala');
+      hero.equipment = {
+        ...defaultEquipment(),
+        Weapon: {
+          ...mockEquipmentItem('sword' as EquipmentId),
+          affixIds: [strengthAffix.id],
+        },
+      };
+
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [hero] },
+      } as unknown as GameState);
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === strengthAffix.id ? strengthAffix : undefined) as never,
+      );
+
+      expect(partyAffixEffects()).toEqual(strengthAffix.effects);
+    });
+
+    it('returns an empty array for an empty party', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [] },
+      } as unknown as GameState);
+
+      expect(partyAffixEffects()).toEqual([]);
+    });
+  });
 });

@@ -3,14 +3,11 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import {
-  characterStatsForLevel,
-  newEquipmentItem,
-  partyGet,
-} from '@helpers/hero/party';
+import { characterStatsForLevel, partyGet } from '@helpers/hero/party';
 import {
   canEquipItem,
   canModifyEquipment,
+  newEquipmentItem,
   planEquipmentOptimization,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';

@@ -231,6 +231,7 @@ describe('Job Helper Functions', () => {
           id: 'staff-item' as EquipmentItemId,
           equipmentId: wergenStaff.id,
           infusedItemIds: [],
+          affixIds: [],
         },
       };
 
@@ -250,6 +251,7 @@ describe('Job Helper Functions', () => {
           id: 'ring-item' as EquipmentItemId,
           equipmentId: ringOfDoubleStrike2.id,
           infusedItemIds: [],
+          affixIds: [],
         },
       };
 
@@ -268,6 +270,7 @@ describe('Job Helper Functions', () => {
           id: 'ring-item' as EquipmentItemId,
           equipmentId: ringOfDoubleStrike1.id,
           infusedItemIds: [],
+          affixIds: [],
         },
       };
 

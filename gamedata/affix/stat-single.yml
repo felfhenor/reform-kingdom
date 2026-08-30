@@ -1,0 +1,243 @@
+# Minor Stat Boosts (Common)
+
+- id: e4c1b801-5a5e-48b7-80d2-f505f4bc8c4a
+  name: of Minor Strength
+  description: Grants a bonus to Strength.
+  rarity: Common
+  family: Strength
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 1
+
+- id: 81fd44c6-2833-491d-bd82-00353dd1040a
+  name: of Minor Intelligence
+  description: Grants a bonus to Intelligence.
+  rarity: Common
+  family: Intelligence
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 1
+
+- id: 31426090-b199-43f4-8407-babfafea94bd
+  name: of Minor Vitality
+  description: Grants a bonus to Vitality.
+  rarity: Common
+  family: Vitality
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 1
+
+- id: 0345a5ab-3e18-46e7-98a1-d358a5019280
+  name: of Minor Resistance
+  description: Grants a bonus to Resistance.
+  rarity: Common
+  family: Resistance
+  effects:
+    - kind: Stat
+      stat: Resistance
+      value: 1
+
+- id: 791c6f70-0e47-452d-a851-aed56a67d351
+  name: of Minor Agility
+  description: Grants a bonus to Agility.
+  rarity: Common
+  family: Agility
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: 1
+
+- id: c04d08ad-531e-4895-81f7-13eeb968bc6a
+  name: of Minor Luck
+  description: Grants a bonus to Luck.
+  rarity: Common
+  family: Luck
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 1
+
+- id: 9b1068c4-cd42-4b78-b5eb-2464f7c822df
+  name: of Minor Health
+  description: Grants a bonus to Health.
+  rarity: Common
+  family: Health
+  effects:
+    - kind: Stat
+      stat: Health
+      value: 10
+
+- id: 0b7ae800-928f-4a8a-a072-5254c38a1be6
+  name: of Minor Energy
+  description: Grants a bonus to Energy.
+  rarity: Common
+  family: Energy
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 5
+
+# Basic Stat Boosts (Uncommon)
+- id: 7680e4e8-c17d-48ff-9ee5-42b027fd2357
+  name: of Basic Strength
+  description: Grants a bonus to Strength.
+  rarity: Uncommon
+  family: Strength
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 2.5
+
+- id: c8b166bf-0a51-4f75-9fa3-92daabfb1e84
+  name: of Basic Intelligence
+  description: Grants a bonus to Intelligence.
+  rarity: Uncommon
+  family: Intelligence
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 2.5
+
+- id: 5c690b96-f376-47cd-969b-cbb992409a94
+  name: of Basic Vitality
+  description: Grants a bonus to Vitality.
+  rarity: Uncommon
+  family: Vitality
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 2.5
+
+- id: 1639dd96-1487-44ce-9343-a3836f26db6f
+  name: of Basic Resistance
+  description: Grants a bonus to Resistance.
+  rarity: Uncommon
+  family: Resistance
+  effects:
+    - kind: Stat
+      stat: Resistance
+      value: 2.5
+
+- id: ea92c671-8179-44a2-8652-a6fe2a55786b
+  name: of Basic Agility
+  description: Grants a bonus to Agility.
+  rarity: Uncommon
+  family: Agility
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: 2.5
+
+- id: 79077678-789d-424f-8c4a-7738d24878ce
+  name: of Basic Luck
+  description: Grants a bonus to Luck.
+  rarity: Uncommon
+  family: Luck
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 2.5
+
+- id: 81556ade-3bb2-4dfd-91f6-2e55cdc62822
+  name: of Basic Health
+  description: Grants a bonus to Health.
+  rarity: Uncommon
+  family: Health
+  effects:
+    - kind: Stat
+      stat: Health
+      value: 25
+
+- id: 57ce6904-899b-4872-9cf1-ad86cc83dfb8
+  name: of Basic Energy
+  description: Grants a bonus to Energy.
+  rarity: Uncommon
+  family: Energy
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 10
+
+# Plain Stat Boosts (Uncommon)
+- id: 60eab916-5417-47a1-9bd9-6a7f431e69b3
+  name: of Strength
+  description: Grants a bonus to Strength.
+  rarity: Rare
+  family: Strength
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 5
+
+- id: 1e32fcc6-949c-47d7-927e-a5a472c15334
+  name: of Intelligence
+  description: Grants a bonus to Intelligence.
+  rarity: Rare
+  family: Intelligence
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 5
+
+- id: 155e1c1d-5eb7-482b-aa1c-2ec6777075e0
+  name: of Vitality
+  description: Grants a bonus to Vitality.
+  rarity: Rare
+  family: Vitality
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 5
+
+- id: 774d85ba-3391-498d-a77b-88756259b0b4
+  name: of Resistance
+  description: Grants a bonus to Resistance.
+  rarity: Rare
+  family: Resistance
+  effects:
+    - kind: Stat
+      stat: Resistance
+      value: 5
+
+- id: 06912630-e8c2-4ad8-946f-f77900a5a633
+  name: of Agility
+  description: Grants a bonus to Agility.
+  rarity: Rare
+  family: Agility
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: 5
+
+- id: a00eb987-d715-4edb-993b-2cf7b4ee8e68
+  name: of Luck
+  description: Grants a bonus to Luck.
+  rarity: Rare
+  family: Luck
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 5
+
+- id: 8d2655ae-cd1b-44e2-8bf7-89eed1eb831e
+  name: of Health
+  description: Grants a bonus to Health.
+  rarity: Rare
+  family: Health
+  effects:
+    - kind: Stat
+      stat: Health
+      value: 35
+
+- id: 8aa93903-5065-4980-979b-38ce93074cf8
+  name: of Energy
+  description: Grants a bonus to Energy.
+  rarity: Rare
+  family: Energy
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 15

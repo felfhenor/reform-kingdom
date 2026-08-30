@@ -64,7 +64,7 @@
                   />
                 </app-slot-icon-blank>
                 <span class="text-sm text-{{ equippedContent.rarity }}">
-                  {{ equippedContent.name }}
+                  {{ displayNameFor(equippedItem, equippedContent) }}
                 </span>
               </button>
             }
@@ -90,7 +90,7 @@
           <div class="flex-1">
             <div class="shrink-0">
               <div class="font-semibold text-lg text-{{ content.rarity }}">
-                {{ content.name }}
+                {{ selectedItemDisplayName() }}
               </div>
 
               <app-row-item-stats
@@ -107,16 +107,16 @@
           </div>
         </div>
 
-        @if (content.slots > 0) {
+        @if (selectedItemSlotCount() > 0) {
           <div class="shrink-0">
             <div class="font-semibold mb-1">Infusion Slots</div>
-            <div class="text-xs text-lighter mb-2">
+            <div class="text-xs text-lighter mb-2 italic">
               Click a slot to choose what to infuse into it.
             </div>
 
             <app-row-infused-materials
               [infusedItemIds]="item.infusedItemIds"
-              [maxSlots]="content.slots"
+              [maxSlots]="selectedItemSlotCount()"
               [selectedSlotIndex]="slotIndex"
               (slotClick)="selectSlot($event)"
             />

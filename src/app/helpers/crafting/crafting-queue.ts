@@ -22,6 +22,7 @@ import {
   collectiblesAdd,
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
+import { newEquipmentItem } from '@helpers/item/equipment';
 import {
   addMaterial,
   applyMaterialDelta,
@@ -36,7 +37,6 @@ import type {
   CraftQueueEntryId,
   EquipmentContent,
   EquipmentItem,
-  EquipmentItemId,
   GameState,
   ItemContent,
   RecipeContent,
@@ -156,11 +156,9 @@ function applyRequirementQuantity(
   }
 
   if (sign > 0) {
-    const added: EquipmentItem[] = Array.from({ length: quantity }, () => ({
-      id: rngUuid() as EquipmentItemId,
-      equipmentId: requirement.equipmentId,
-      infusedItemIds: [],
-    }));
+    const added: EquipmentItem[] = Array.from({ length: quantity }, () =>
+      newEquipmentItem(requirement.equipmentId),
+    );
     state.armory = [...state.armory, ...added];
     return;
   }

@@ -1,9 +1,9 @@
 import { getEntry } from '@helpers/content';
 import { defaultStats, defaultTagResistances } from '@helpers/defaults';
+import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import { getGoldQuantity, getMaterialQuantity } from '@helpers/item/materials';
 import type {
   EquipmentContent,
-  EquipmentId,
   EquipmentItem,
   ItemContent,
   ItemId,
@@ -15,9 +15,7 @@ import { sum } from 'es-toolkit/compat';
 const GOLD_PER_STAT_POINT = 30;
 const GOLD_PER_RESISTANCE_POINT = 100;
 
-// Sums the `infusionStats` of every non-empty slot into a single bonus
-// block - infusions are tracked by itemId, so the bonus is always resolved
-// live from current content, never baked into the equipment item itself.
+// Sums the `infusionStats` of every non-empty slot
 export function equipmentItemInfusionBonus(
   infusedItemIds: (ItemId | null)[],
 ): StatBlock {
@@ -58,8 +56,14 @@ export function equipmentItemInfusionResistanceBonus(
   return bonus;
 }
 
-export function equipmentItemSlotCount(equipmentId: EquipmentId): number {
-  return getEntry<EquipmentContent>(equipmentId)?.slots ?? 0;
+export function equipmentItemSlotCount(item: EquipmentItem): number {
+  const baseSlots = getEntry<EquipmentContent>(item.equipmentId)?.slots ?? 0;
+  const affixBonus = affixEffectSum(
+    equipmentItemAffixEffects(item),
+    'InfusionSlot',
+  );
+
+  return baseSlots + affixBonus;
 }
 
 export function isInfusionMaterial(item: ItemContent): boolean {
@@ -97,7 +101,7 @@ export function canInfuseEquipmentItem(
   slotIndex: number,
   materialItemId: ItemId,
 ): boolean {
-  const slotCount = equipmentItemSlotCount(item.equipmentId);
+  const slotCount = equipmentItemSlotCount(item);
   if (slotIndex < 0 || slotIndex >= slotCount) return false;
 
   const material = getEntry<ItemContent>(materialItemId);

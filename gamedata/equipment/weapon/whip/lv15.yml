@@ -5,7 +5,7 @@
   name: Miremetal Whip
   description: A whip made of miremetal. It seems to have a life of its own.
   levelRequirement: 15
-  rarity: Common
+  rarity: Uncommon
   type: Whip
   sprite: '0078'
   slots: 1

@@ -31,6 +31,7 @@ vi.mock('@helpers/item/materials', () => ({
 
 vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(),
+  partyAffixEffects: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/rng', () => ({
@@ -60,7 +61,7 @@ import { getEntry } from '@helpers/content';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
-import { partyGet } from '@helpers/hero/party';
+import { partyAffixEffects, partyGet } from '@helpers/hero/party';
 import {
   canEnterGatherNode,
   currentGatheringContent,
@@ -83,10 +84,12 @@ import {
   worldNodeGathering,
 } from '@helpers/world-node/world-nodes';
 import type {
+  AffixEffect,
   Character,
   GameState,
   GatheringContent,
   GatheringId,
+  TradeskillId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -482,6 +485,203 @@ describe('gatheringProcessTick', () => {
     expect(gatherVfxEmit).toHaveBeenCalledWith(
       expect.objectContaining({ quantity: 4 }),
     );
+  });
+
+  it("adds a party-wide GatherYield affix bonus matching the node's tradeskill", () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 4,
+        },
+      },
+    } as unknown as GameState);
+
+    const gathering = buildGathering({
+      gatherTime: 5,
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherResults: [
+        {
+          chance: 100,
+          tradeskillIds: ['Woodworking' as TradeskillId],
+          items: [{ itemId: 'wood', quantity: 2 }],
+        },
+      ],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === 'gather-1') return gathering as never;
+      if (id === 'wood')
+        return { name: 'Wergen Wood', rarity: 'Common' } as never;
+      return undefined;
+    });
+    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+    vi.mocked(partyAffixEffects).mockReturnValue([
+      {
+        kind: 'GatherYield',
+        tradeskillId: 'Woodworking' as TradeskillId,
+        value: 3,
+      },
+      // A different tradeskill's bonus must not apply to this result.
+      {
+        kind: 'GatherYield',
+        tradeskillId: 'Blacksmithing' as TradeskillId,
+        value: 100,
+      },
+    ] as AffixEffect[]);
+
+    gatheringProcessTick();
+
+    expect(addMaterial).toHaveBeenCalledWith('wood', 5);
+  });
+
+  it("matches a GatherYield affix against any of a single result's multiple tradeskills", () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 4,
+        },
+      },
+    } as unknown as GameState);
+
+    const gathering = buildGathering({
+      gatherTime: 5,
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherResults: [
+        {
+          chance: 100,
+          tradeskillIds: [
+            'Woodworking' as TradeskillId,
+            'Tailoring' as TradeskillId,
+          ],
+          items: [{ itemId: 'hide', quantity: 1 }],
+        },
+      ],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === 'gather-1') return gathering as never;
+      return { name: id, rarity: 'Common' } as never;
+    });
+    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+    // The result lists Woodworking first, but the affix targets Tailoring - its second tag - and must still match.
+    vi.mocked(partyAffixEffects).mockReturnValue([
+      {
+        kind: 'GatherYield',
+        tradeskillId: 'Tailoring' as TradeskillId,
+        value: 4,
+      },
+    ] as AffixEffect[]);
+
+    gatheringProcessTick();
+
+    expect(addMaterial).toHaveBeenCalledWith('hide', 5);
+  });
+
+  it("does not apply a GatherYield bonus to a rolled result whose own tags don't match, even when a different possible result at the same node would", () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 4,
+        },
+      },
+    } as unknown as GameState);
+
+    const woodResult = {
+      chance: 50,
+      tradeskillIds: ['Woodworking' as TradeskillId],
+      items: [{ itemId: 'wood', quantity: 2 }],
+    };
+    const hideResult = {
+      chance: 50,
+      tradeskillIds: ['Tailoring' as TradeskillId],
+      items: [{ itemId: 'hide', quantity: 1 }],
+    };
+    const gathering = buildGathering({
+      gatherTime: 5,
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherResults: [woodResult, hideResult],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === 'gather-1') return gathering as never;
+      return { name: id, rarity: 'Common' } as never;
+    });
+    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    // The Woodworking result is the one that actually rolls this cycle.
+    vi.mocked(rngChoiceWeighted).mockReturnValue(woodResult);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+    vi.mocked(partyAffixEffects).mockReturnValue([
+      {
+        kind: 'GatherYield',
+        tradeskillId: 'Tailoring' as TradeskillId,
+        value: 100,
+      },
+    ] as AffixEffect[]);
+
+    gatheringProcessTick();
+
+    expect(addMaterial).toHaveBeenCalledWith('wood', 2);
+  });
+
+  it('applies the GatherYield bonus once per cycle, not once per item line in the result', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 4,
+        },
+      },
+    } as unknown as GameState);
+
+    const gathering = buildGathering({
+      gatherTime: 5,
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherResults: [
+        {
+          chance: 100,
+          tradeskillIds: ['Woodworking' as TradeskillId],
+          items: [
+            { itemId: 'wood', quantity: 2 },
+            { itemId: 'stick', quantity: 1 },
+          ],
+        },
+      ],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === 'gather-1') return gathering as never;
+      return { name: id, rarity: 'Common' } as never;
+    });
+    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+    vi.mocked(partyAffixEffects).mockReturnValue([
+      {
+        kind: 'GatherYield',
+        tradeskillId: 'Woodworking' as TradeskillId,
+        value: 3,
+      },
+    ] as AffixEffect[]);
+
+    gatheringProcessTick();
+
+    expect(addMaterial).toHaveBeenCalledWith('wood', 5);
+    expect(addMaterial).toHaveBeenCalledWith('stick', 1);
   });
 
   it('does not grant xp when the party has outleveled the node', () => {

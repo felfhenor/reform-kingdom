@@ -15,16 +15,21 @@ import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
+import { defaultStats, defaultTagResistances } from '@helpers/defaults';
 import { characterInfuseEquipment } from '@helpers/hero/character-equipment';
 import { partyGet } from '@helpers/hero/party';
+import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   canModifyEquipment,
   equippedItemsByPrimarySlot,
 } from '@helpers/item/equipment';
 import {
+  equipmentItemBonusResistances,
+  equipmentItemBonusStats,
+} from '@helpers/item/equipment-display';
+import {
   canInfuseEquipmentItem,
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionResistanceBonus,
+  equipmentItemSlotCount,
   infusionMaterialCost,
   isInfusionMaterial,
 } from '@helpers/item/infusion';
@@ -95,15 +100,28 @@ export class PlayKingdomInfusionComponent {
     return item ? getEntry<EquipmentContent>(item.equipmentId) : undefined;
   });
 
-  public selectedItemBonus = computed(() =>
-    equipmentItemInfusionBonus(this.selectedItem()?.infusedItemIds ?? []),
-  );
+  public selectedItemDisplayName = computed(() => {
+    const item = this.selectedItem();
+    const content = this.selectedItemContent();
+    return item && content
+      ? equipmentItemDisplayName(item, content.name)
+      : '';
+  });
 
-  public selectedItemResistanceBonus = computed(() =>
-    equipmentItemInfusionResistanceBonus(
-      this.selectedItem()?.infusedItemIds ?? [],
-    ),
-  );
+  public selectedItemBonus = computed(() => {
+    const item = this.selectedItem();
+    return item ? equipmentItemBonusStats(item) : defaultStats();
+  });
+
+  public selectedItemResistanceBonus = computed(() => {
+    const item = this.selectedItem();
+    return item ? equipmentItemBonusResistances(item) : defaultTagResistances();
+  });
+
+  public selectedItemSlotCount = computed(() => {
+    const item = this.selectedItem();
+    return item ? equipmentItemSlotCount(item) : 0;
+  });
 
   // Owned materials that can be infused - shown once a slot is picked.
   public infusionMaterials = computed<StorageMaterialEntry[]>(() =>
@@ -123,6 +141,10 @@ export class PlayKingdomInfusionComponent {
     item: EquipmentItem,
   ): EquipmentContent | undefined {
     return getEntry<EquipmentContent>(item.equipmentId);
+  }
+
+  public displayNameFor(item: EquipmentItem, content: EquipmentContent): string {
+    return equipmentItemDisplayName(item, content.name);
   }
 
   public jobFor(character: Character): JobContent | undefined {

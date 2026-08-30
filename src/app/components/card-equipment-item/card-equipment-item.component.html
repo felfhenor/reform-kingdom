@@ -21,7 +21,7 @@
 
   <span class="equipment-item-row-info">
     <span class="equipment-item-row-name text-{{ content.rarity }}">
-      {{ content.name }}
+      {{ displayName() }}
       <span class="equipment-item-row-level text-lighter"></span>
       (Lv. {{ content.levelRequirement }})
     </span>
@@ -43,7 +43,7 @@
 <ng-template #tooltip>
   <div class="p-3">
     <div class="font-bold text-base mb-1 text-{{ content.rarity }}">
-      {{ content.name }}
+      {{ displayName() }}
     </div>
     <div class="text-sm mb-2">Lv. {{ content.levelRequirement }}</div>
 
@@ -62,20 +62,20 @@
     <app-row-item-stats
       [stats]="content.baseStats"
       [comparisonStats]="comparisonStats()"
-      [bonusStats]="infusionBonus()"
+      [bonusStats]="bonusStats()"
     />
 
     <app-row-debuff-resistances
       class="block mt-2"
       [resistances]="content.debuffResistances"
-      [bonusResistances]="infusionResistanceBonus()"
+      [bonusResistances]="bonusResistances()"
     />
 
-    @if (content.slots > 0) {
+    @if (infusionSlotCount() > 0) {
       <div class="mt-2">
         <app-row-infused-materials
           [infusedItemIds]="equipmentItem().infusedItemIds"
-          [maxSlots]="content.slots"
+          [maxSlots]="infusionSlotCount()"
         />
       </div>
     }

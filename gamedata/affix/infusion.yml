@@ -1,0 +1,17 @@
+- id: 108ab5e7-a1ba-4da5-95d2-657010532ca0
+  name: of the Infuser
+  description: Grants an additional infusion slot.
+  rarity: Rare
+  family: InfusionSlot
+  effects:
+    - kind: InfusionSlot
+      value: 1
+
+- id: bbe6136f-b8a0-4466-8cd4-6b19e8931ff3
+  name: of the Scientist
+  description: Grants two additional infusion slots.
+  rarity: Legendary
+  family: InfusionSlot
+  effects:
+    - kind: InfusionSlot
+      value: 2

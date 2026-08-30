@@ -1,0 +1,87 @@
+- id: 149e7c50-d397-4eda-b616-f961836a44d7
+  name: Weakening
+  description: Saps Strength from its wielder.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: -2
+
+- id: fc078b8b-a6d7-42e9-897f-3c322005890c
+  name: Dulling
+  description: Dulls the mind of its wielder.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: -2
+
+- id: 1d3f09e3-7a12-4fb9-ba51-ce7d09ff5694
+  name: Frail
+  description: Saps Vitality from its wielder.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: -2
+
+- id: d809b615-bd32-40ac-9cfe-8058125bed98
+  name: Exposing
+  description: Leaves its wielder exposed to magic.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Resistance
+      value: -2
+
+- id: 261fb527-2777-47b8-b4aa-d10e60bf4e82
+  name: Clumsy
+  description: Slows the step of its wielder.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: -2
+
+- id: 3215602e-ed66-4219-b4ba-716a2fb78ace
+  name: Sickly
+  description: Weakens the constitution of its wielder.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Health
+      value: -15
+
+- id: 8361aae1-8582-4f59-b626-4781aa8c5b3e
+  name: Fatiguing
+  description: Tires its wielder more quickly.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: -8
+
+- id: 54725178-4166-4fd7-90dd-f62b6f35939c
+  name: Unlucky
+  description: Invites misfortune upon its wielder.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: -2

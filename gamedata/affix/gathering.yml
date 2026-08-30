@@ -1,0 +1,51 @@
+- id: 3f0d4429-7347-4b13-a974-9c78b42af994
+  name: of the Wooden
+  description: Yields more Woodworking materials when gathering.
+  rarity: Uncommon
+  family: WoodworkingYield
+  effects:
+    - kind: GatherYield
+      tradeskillId: Woodworking
+      value: 1
+
+- id: c58c8ee1-b528-4746-bd94-b983c5b889dc
+  name: of the Jeweler
+  description: Yields more Jewelcrafting materials when gathering.
+  rarity: Uncommon
+  family: JewelcraftingYield
+  effects:
+    - kind: GatherYield
+      tradeskillId: Jewelcrafting
+      value: 1
+
+- id: d48471c7-1939-4df8-aba6-bb89f14de62b
+  name: of the Artificer
+  description: Yields more Artificing materials when gathering.
+  rarity: Uncommon
+  family: ArtificingYield
+  effects:
+    - kind: GatherYield
+      tradeskillId: Artificing
+      value: 1
+
+- id: a6d41904-f368-4af1-af13-85ee7f9243aa
+  name: Smithing
+  description: Yields more Blacksmithing materials when gathering.
+  rarity: Uncommon
+  family: BlacksmithingYield
+  position: Prefix
+  effects:
+    - kind: GatherYield
+      tradeskillId: Blacksmithing
+      value: 1
+
+- id: ff922a56-211e-4620-8a6b-b78d1072fa50
+  name: Tailored
+  description: Yields more Tailoring materials when gathering.
+  rarity: Uncommon
+  family: TailoringYield
+  position: Prefix
+  effects:
+    - kind: GatherYield
+      tradeskillId: Tailoring
+      value: 1

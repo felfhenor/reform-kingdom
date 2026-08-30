@@ -1,0 +1,83 @@
+- id: b56c9a62-7623-4dd2-acf7-b5120c6d1490
+  name: of the Bear
+  description: Grants a bonus to multiple stats.
+  rarity: Uncommon
+  family: HybridStat
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 1
+
+    - kind: Stat
+      stat: Vitality
+      value: 1
+
+- id: 17cfa401-490a-44c8-b297-e2e8c0657977
+  name: of the Bunny
+  description: Grants a bonus to multiple stats.
+  rarity: Uncommon
+  family: HybridStat
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 5
+
+    - kind: Stat
+      stat: Agility
+      value: 1
+
+- id: 44a0ed4e-9d05-4fa0-9d2d-664bc00ea901
+  name: of the Owl
+  description: Grants a bonus to multiple stats.
+  rarity: Uncommon
+  family: HybridStat
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 1
+
+    - kind: Stat
+      stat: Agility
+      value: 1
+
+- id: bf114622-af6c-4c78-a785-5057724023ee
+  name: of the Groundhog
+  description: Grants a bonus to multiple stats.
+  rarity: Uncommon
+  family: HybridStat
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 1
+
+    - kind: Stat
+      stat: Resistance
+      value: 1
+
+- id: bd0d5db6-86ad-4b00-8ea3-6c75f0cc1d3a
+  name: of the Armadillo
+  description: Grants a bonus to multiple stats.
+  rarity: Uncommon
+  family: HybridStat
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 1
+
+    - kind: Stat
+      stat: Resistance
+      value: 1
+
+- id: 95930a2b-8ce9-41d2-a97c-521aaff0d8a6
+  name: of the Turtle
+  description: Grants a bonus to multiple stats.
+  rarity: Uncommon
+  family: HybridStat
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 1
+
+    - kind: Stat
+      stat: Health
+      value: 10

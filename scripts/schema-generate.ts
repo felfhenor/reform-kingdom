@@ -246,6 +246,7 @@ const settings = {
 // Create a program from the actual interface files
 const program = TJS.getProgramFromFiles(
   [
+    path.resolve(__dirname, '../src/app/interfaces/content-affix.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-astralprojector.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-caravan.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-caravan-trader.ts'),
@@ -299,6 +300,7 @@ const program = TJS.getProgramFromFiles(
 // Content type mappings to actual TypeScript interface names.
 // Keys must match the gamedata folder names (and `ContentType` union).
 const contentTypeMap = {
+  affix: 'AffixContent',
   astralprojector: 'AstralProjectorContent',
   caravan: 'CaravanContent',
   caravantrader: 'CaravanTraderContent',

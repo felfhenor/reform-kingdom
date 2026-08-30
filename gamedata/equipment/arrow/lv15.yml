@@ -15,7 +15,7 @@
   name: Ghostwood Arrow
   description: An arrow made from mirewood, dripping with ghostly ooze.
   levelRequirement: 19
-  rarity: Common
+  rarity: Uncommon
   type: Arrow
   sprite: '0110'
   slots: 1

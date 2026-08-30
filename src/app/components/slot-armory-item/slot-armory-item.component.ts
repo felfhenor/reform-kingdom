@@ -10,14 +10,22 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { getEntry } from '@helpers/content';
+import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionResistanceBonus,
-} from '@helpers/item/infusion';
+  equipmentItemBonusResistances,
+  equipmentItemBonusStats,
+  equipmentItemGrantedSkillIds,
+} from '@helpers/item/equipment-display';
+import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { goldCoinId } from '@helpers/item/materials';
 import { equipmentSellValue } from '@helpers/kingdom/armory';
-import type { EquipmentContent, EquipmentItem } from '@interfaces';
+import type {
+  EquipmentContent,
+  EquipmentItem,
+  EquipmentSkillContent,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -44,16 +52,31 @@ export class SlotArmoryItemComponent {
 
   public goldCoinItemId = goldCoinId();
 
-  public display = computed(() =>
-    itemPreviewDisplay(this.equipment(), 'equipment'),
+  public displayName = computed(() =>
+    equipmentItemDisplayName(this.equipmentItem(), this.equipment().name),
   );
 
-  public infusionBonus = computed(() =>
-    equipmentItemInfusionBonus(this.equipmentItem().infusedItemIds),
+  public display = computed(() => ({
+    ...itemPreviewDisplay(this.equipment(), 'equipment'),
+    name: this.displayName(),
+  }));
+
+  public bonusStats = computed(() =>
+    equipmentItemBonusStats(this.equipmentItem()),
   );
 
-  public infusionResistanceBonus = computed(() =>
-    equipmentItemInfusionResistanceBonus(this.equipmentItem().infusedItemIds),
+  public bonusResistances = computed(() =>
+    equipmentItemBonusResistances(this.equipmentItem()),
+  );
+
+  public infusionSlotCount = computed(() =>
+    equipmentItemSlotCount(this.equipmentItem()),
+  );
+
+  public grantedSkills = computed<EquipmentSkillContent[]>(() =>
+    equipmentItemGrantedSkillIds(this.equipmentItem(), this.equipment())
+      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
+      .filter((skill): skill is EquipmentSkillContent => !!skill),
   );
 
   public sellValue = computed(() =>

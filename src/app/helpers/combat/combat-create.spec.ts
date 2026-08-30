@@ -166,7 +166,12 @@ describe('combatantFromCharacter', () => {
       buildCharacter({
         equipment: {
           ...emptyEquipment,
-          Weapon: { id: 'bow-1', equipmentId: bow.id, infusedItemIds: [] },
+          Weapon: {
+            id: 'bow-1',
+            equipmentId: bow.id,
+            infusedItemIds: [],
+            affixIds: [],
+          },
         },
       }),
     );

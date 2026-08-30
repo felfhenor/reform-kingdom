@@ -11,10 +11,14 @@ import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
+import { defaultStats, defaultTagResistances } from '@helpers/defaults';
+import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionResistanceBonus,
-} from '@helpers/item/infusion';
+  equipmentItemBonusResistances,
+  equipmentItemBonusStats,
+  equipmentItemGrantedSkillIds,
+} from '@helpers/item/equipment-display';
+import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
   EquipmentTypeToSlot,
   type EquipmentContent,
@@ -52,15 +56,28 @@ export class SlotEquipmentComponent {
     return getEntry<EquipmentContent>(equipmentId);
   });
 
-  public infusionBonus = computed(() =>
-    equipmentItemInfusionBonus(this.equippedItem()?.infusedItemIds ?? []),
-  );
+  public displayName = computed(() => {
+    const item = this.equippedItem();
+    const content = this.equippedContent();
+    return item && content
+      ? equipmentItemDisplayName(item, content.name)
+      : '';
+  });
 
-  public infusionResistanceBonus = computed(() =>
-    equipmentItemInfusionResistanceBonus(
-      this.equippedItem()?.infusedItemIds ?? [],
-    ),
-  );
+  public bonusStats = computed(() => {
+    const item = this.equippedItem();
+    return item ? equipmentItemBonusStats(item) : defaultStats();
+  });
+
+  public bonusResistances = computed(() => {
+    const item = this.equippedItem();
+    return item ? equipmentItemBonusResistances(item) : defaultTagResistances();
+  });
+
+  public infusionSlotCount = computed(() => {
+    const item = this.equippedItem();
+    return item ? equipmentItemSlotCount(item) : 0;
+  });
 
   // The paperdoll slots this piece of gear occupies (e.g. a two-handed
   // weapon occupies both Weapon + Offhand) - distinct from
@@ -71,10 +88,11 @@ export class SlotEquipmentComponent {
   });
 
   public grantedSkills = computed<EquipmentSkillContent[]>(() => {
+    const item = this.equippedItem();
     const content = this.equippedContent();
-    if (!content) return [];
+    if (!item || !content) return [];
 
-    return content.grantedSkillIds
+    return equipmentItemGrantedSkillIds(item, content)
       .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
       .filter((skill): skill is EquipmentSkillContent => !!skill);
   });

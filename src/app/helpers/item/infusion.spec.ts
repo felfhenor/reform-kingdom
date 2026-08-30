@@ -114,6 +114,7 @@ const swordItem: EquipmentItem = {
   id: 'sword-1' as EquipmentItemId,
   equipmentId: sword.id,
   infusedItemIds: [],
+  affixIds: [],
 };
 
 function mockContentEntry(id: string) {
@@ -191,11 +192,35 @@ describe('Infusion Helper Functions', () => {
 
   describe('equipmentItemSlotCount', () => {
     it("returns the equipment content's slots", () => {
-      expect(equipmentItemSlotCount(sword.id)).toBe(2);
+      expect(equipmentItemSlotCount(swordItem)).toBe(2);
     });
 
     it('returns 0 when the content cannot be found', () => {
-      expect(equipmentItemSlotCount('missing' as EquipmentId)).toBe(0);
+      const missing: EquipmentItem = {
+        ...swordItem,
+        equipmentId: 'missing' as EquipmentId,
+      };
+      expect(equipmentItemSlotCount(missing)).toBe(0);
+    });
+
+    it('adds an InfusionSlot affix bonus on top of the base slot count', () => {
+      vi.mocked(getEntry).mockImplementation((id) => {
+        if (id === 'affix-slot') {
+          return {
+            id: 'affix-slot',
+            rarity: 'Rare',
+            family: 'InfusionSlot',
+            effects: [{ kind: 'InfusionSlot', value: 1 }],
+          } as never;
+        }
+        return mockContentEntry(id) as never;
+      });
+
+      const withAffix: EquipmentItem = {
+        ...swordItem,
+        affixIds: ['affix-slot' as never],
+      };
+      expect(equipmentItemSlotCount(withAffix)).toBe(3);
     });
   });
 

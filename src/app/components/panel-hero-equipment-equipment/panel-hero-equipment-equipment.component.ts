@@ -21,6 +21,7 @@ import {
   equipmentAvailableForSlot,
   isSlotAvailableForJob,
 } from '@helpers/item/equipment';
+import { equipmentItemTotalStats } from '@helpers/item/equipment-display';
 import type {
   Character,
   EquipmentArmoryEntry,
@@ -28,6 +29,7 @@ import type {
   EquipmentItem,
   EquipmentItemId,
   EquipmentSlot,
+  StatBlock,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -78,6 +80,14 @@ export class PanelHeroEquipmentEquipmentComponent {
   public selectedSlotContent = computed<EquipmentContent | undefined>(() => {
     const slot = this.selectedSlot();
     return slot ? this.equippedContentFor(slot) : undefined;
+  });
+
+  // Must include the equipped item's own bonus, or a candidate's diff looks off.
+  public selectedSlotComparisonStats = computed<StatBlock | undefined>(() => {
+    const slot = this.selectedSlot();
+    const item = slot ? this.equippedItemFor(slot) : undefined;
+    const content = this.selectedSlotContent();
+    return item && content ? equipmentItemTotalStats(item, content) : undefined;
   });
 
   public isSlotVisible(slot: EquipmentSlot): boolean {

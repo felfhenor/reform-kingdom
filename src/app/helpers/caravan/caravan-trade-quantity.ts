@@ -1,4 +1,6 @@
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
+import { partyAffixEffects } from '@helpers/hero/party';
+import { affixEffectSum } from '@helpers/item/affix';
 import {
   getCollectibleQuantity,
   isCollectibleDiscovered,
@@ -50,6 +52,16 @@ export function caravanTradeOwnedQuantity(
   return 0;
 }
 
+// Party-wide affix bonus for this trade direction
+// CaravanBuyDiscount reduces what the player pays CaravanSellBonus increases what the player receives
+function partyCaravanAffixPercent(trade: CaravanTrade): number {
+  const kind =
+    trade.type === 'sell' ? 'CaravanBuyDiscount' : 'CaravanSellBonus';
+  const bonusPercent = affixEffectSum(partyAffixEffects(), kind);
+
+  return trade.type === 'sell' ? -bonusPercent : bonusPercent;
+}
+
 export function caravanTradePrice(
   caravan: CaravanContent,
   trade: CaravanTrade,
@@ -59,7 +71,12 @@ export function caravanTradePrice(
       ? caravan.markupPercentages.sell
       : caravan.markupPercentages.buy;
 
-  return Math.max(1, Math.round(trade.value * (1 + markup / 100)));
+  const affixPercent = partyCaravanAffixPercent(trade);
+
+  return Math.max(
+    1,
+    Math.round(trade.value * (1 + markup / 100) * (1 + affixPercent / 100)),
+  );
 }
 
 // Undefined for an unlimited-quantity trade.

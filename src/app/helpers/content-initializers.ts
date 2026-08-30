@@ -6,6 +6,10 @@ import {
   defaultWorkerStats,
 } from '@helpers/defaults';
 import type {
+  AffixContent,
+  AffixEffect,
+  AffixId,
+  AffixPosition,
   AstralProjectorContent,
   AstralProjectorId,
   AstralProjectorRequirementCollectible,
@@ -102,6 +106,7 @@ import { EquipmentTypeToSlot } from '@interfaces';
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
+  affix: ensureAffix,
   astralprojector: ensureAstralProjector,
   caravan: ensureCaravan,
   caravantrader: ensureCaravanTrader,
@@ -149,6 +154,7 @@ const VALID_SKILL_TARGET_BEHAVIORS: EquipmentSkillTargetBehavior[] = [
   'IfNotStatusEffect',
 ];
 const VALID_CARAVAN_TRADE_TYPES: CaravanTradeType[] = ['sell', 'buy'];
+const VALID_AFFIX_POSITIONS: AffixPosition[] = ['Prefix', 'Suffix'];
 const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'BypassDefense',
   'DamagesTarget',
@@ -220,6 +226,66 @@ function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
       item.infusionDebuffResistances,
     ),
     unobtainable: item.unobtainable ?? false,
+  };
+}
+
+function ensureAffixEffect(effect: Record<string, unknown> = {}): AffixEffect {
+  const kind = effect['kind'] as AffixEffect['kind'];
+  const value = (effect['value'] as number) ?? 0;
+
+  switch (kind) {
+    case 'Resistance':
+      return {
+        kind: 'Resistance',
+        tag: ensureEnumValue(effect['tag'], VALID_STATUS_EFFECT_TAGS, 'Stun'),
+        value,
+      };
+    case 'InfusionSlot':
+      return {
+        kind: 'InfusionSlot',
+        value: effect['value'] === undefined ? 1 : value,
+      };
+    case 'GrantSkill':
+      return {
+        kind: 'GrantSkill',
+        skillId:
+          (effect['skillId'] as EquipmentSkillId) ??
+          ('UNKNOWN' as EquipmentSkillId),
+      };
+    case 'GatherYield':
+      return {
+        kind: 'GatherYield',
+        tradeskillId:
+          (effect['tradeskillId'] as TradeskillId) ??
+          ('UNKNOWN' as TradeskillId),
+        value,
+      };
+    case 'SellValue':
+      return { kind: 'SellValue', value };
+    case 'CaravanBuyDiscount':
+      return { kind: 'CaravanBuyDiscount', value };
+    case 'CaravanSellBonus':
+      return { kind: 'CaravanSellBonus', value };
+    case 'Stat':
+    default:
+      return {
+        kind: 'Stat',
+        stat: ensureEnumValue(effect['stat'], VALID_GAME_STATS, 'Strength'),
+        value,
+      };
+  }
+}
+
+function ensureAffix(affix: Partial<AffixContent>): Required<AffixContent> {
+  return {
+    id: affix.id ?? ('UNKNOWN' as AffixId),
+    name: affix.name ?? 'UNKNOWN',
+    __type: 'affix',
+    description: affix.description ?? 'UNKNOWN',
+    rarity: affix.rarity ?? 'Common',
+    family: affix.family ?? 'UNKNOWN',
+    position: ensureEnumValue(affix.position, VALID_AFFIX_POSITIONS, 'Suffix'),
+    effects: ensureArray(affix.effects, ensureAffixEffect),
   };
 }
 
@@ -399,6 +465,7 @@ function ensureGatherResult(result: Partial<GatherResult> = {}): GatherResult {
     chance: result.chance ?? 0,
     items: ensureArray(result.items, ensureGatherResultItem),
     levelRequirement: result.levelRequirement,
+    tradeskillIds: result.tradeskillIds ?? [],
   };
 }
 

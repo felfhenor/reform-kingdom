@@ -18,7 +18,7 @@
   name: Ghostwood Shield
   description: A shield made solely of ghostwood, strangely light for its size.
   levelRequirement: 16
-  rarity: Common
+  rarity: Uncommon
   type: Shield
   sprite: '0111'
   slots: 1

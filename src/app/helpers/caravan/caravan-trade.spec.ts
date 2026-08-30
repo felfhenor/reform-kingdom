@@ -16,6 +16,7 @@ vi.mock('@helpers/item/collectibles', () => ({
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/crafting/recipes', () => ({
@@ -49,6 +50,7 @@ vi.mock('@helpers/item/materials', async (importOriginal) => {
 
 vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(),
+  partyAffixEffects: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/rng', () => ({
@@ -1116,6 +1118,7 @@ describe('caravanExecuteTokenTrade', () => {
         id: 'new-equipment-item-id',
         equipmentId: 'sword',
         infusedItemIds: [],
+        affixIds: [],
       },
     ]);
     expect(result.discoveredEquipment['sword' as EquipmentId].foundAt).toBeGreaterThan(0);

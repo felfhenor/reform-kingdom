@@ -1,4 +1,5 @@
 import type { ItemId } from '@interfaces/content-item';
+import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
@@ -17,6 +18,9 @@ export type GatherResult = {
 
   // Node development level this result is restricted to; omitted means always available.
   levelRequirement?: number;
+
+  // Which tradeskill(s) this specific result's items feed, for gather-yield affixes.
+  tradeskillIds: TradeskillId[];
 };
 
 export type GatheringContent = IsContentItem &

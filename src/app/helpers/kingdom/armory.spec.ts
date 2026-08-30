@@ -100,6 +100,7 @@ describe('Armory Helper Functions', () => {
           id: expect.any(String),
           equipmentId: 'sword',
           infusedItemIds: [],
+          affixIds: [],
         },
       ]);
     });
@@ -119,6 +120,7 @@ describe('Armory Helper Functions', () => {
           id: expect.any(String),
           equipmentId: 'sword',
           infusedItemIds: [],
+          affixIds: [],
         });
       });
 
@@ -340,6 +342,7 @@ describe('Armory Helper Functions', () => {
           id: 'sword-1' as EquipmentItemId,
           equipmentId: sword.id,
           infusedItemIds: [],
+          affixIds: [],
         },
         content: {
           ...sword,
@@ -358,6 +361,7 @@ describe('Armory Helper Functions', () => {
           id: 'shield-1' as EquipmentItemId,
           equipmentId: shield.id,
           infusedItemIds: [],
+          affixIds: [],
         },
         content: {
           ...shield,
@@ -380,6 +384,7 @@ describe('Armory Helper Functions', () => {
           id: 'sword-1' as EquipmentItemId,
           equipmentId: sword.id,
           infusedItemIds: ['crystal' as ItemId],
+          affixIds: [],
         },
         content: {
           ...sword,
@@ -398,11 +403,41 @@ describe('Armory Helper Functions', () => {
           id: 'sword-1' as EquipmentItemId,
           equipmentId: sword.id,
           infusedItemIds: [],
+          affixIds: [],
         },
         content: { ...sword, baseStats: defaultStats(), levelRequirement: 0 },
       };
 
       expect(equipmentSellValue(entry)).toBe(1);
+    });
+
+    it('adds a SellValue affix bonus as a flat amount after the rarity multiplier', () => {
+      const sellValueAffix = {
+        id: 'affix-sell' as never,
+        rarity: 'Uncommon',
+        family: 'SellValue',
+        effects: [{ kind: 'SellValue', value: 250 }],
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === sellValueAffix.id ? sellValueAffix : undefined) as never,
+      );
+
+      const entry = {
+        item: {
+          id: 'sword-1' as EquipmentItemId,
+          equipmentId: sword.id,
+          infusedItemIds: [],
+          affixIds: [sellValueAffix.id],
+        },
+        content: {
+          ...sword,
+          baseStats: { ...defaultStats(), Strength: 5 },
+          levelRequirement: 2,
+        },
+      };
+
+      // same base 120 as the bare-item case, plus the flat 250 affix bonus, unscaled by rarity
+      expect(equipmentSellValue(entry)).toBe(370);
     });
   });
 
@@ -416,11 +451,13 @@ describe('Armory Helper Functions', () => {
         id: 'sword-1' as EquipmentItemId,
         equipmentId: sword.id,
         infusedItemIds: [],
+        affixIds: [],
       };
       const swordItem2 = {
         id: 'sword-2' as EquipmentItemId,
         equipmentId: sword.id,
         infusedItemIds: [],
+        affixIds: [],
       };
 
       vi.mocked(gamestate).mockReturnValue({
@@ -449,6 +486,7 @@ describe('Armory Helper Functions', () => {
         id: 'sword-1' as EquipmentItemId,
         equipmentId: sword.id,
         infusedItemIds: [],
+        affixIds: [],
       };
 
       vi.mocked(gamestate).mockReturnValue({
@@ -478,11 +516,13 @@ describe('Armory Helper Functions', () => {
         id: 'sword-1' as EquipmentItemId,
         equipmentId: sword.id,
         infusedItemIds: [],
+        affixIds: [],
       };
       const shieldItem = {
         id: 'shield-1' as EquipmentItemId,
         equipmentId: shield.id,
         infusedItemIds: [],
+        affixIds: [],
       };
 
       vi.mocked(gamestate).mockReturnValue({

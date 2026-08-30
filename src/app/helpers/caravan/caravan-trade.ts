@@ -10,6 +10,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { newEquipmentItem } from '@helpers/item/equipment';
 import {
   applyMaterialDelta,
   gainGold,
@@ -18,7 +19,6 @@ import {
   spendGold,
   traderTokenId,
 } from '@helpers/item/materials';
-import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
@@ -29,7 +29,6 @@ import type {
   CollectibleId,
   EquipmentContent,
   EquipmentItem,
-  EquipmentItemId,
   GameState,
   ItemContent,
   RecipeContent,
@@ -87,11 +86,9 @@ function grantCaravanReward(
   }
 
   if (trade.equipmentId) {
-    const newItems: EquipmentItem[] = Array.from({ length: quantity }, () => ({
-      id: rngUuid() as EquipmentItemId,
-      equipmentId: trade.equipmentId!,
-      infusedItemIds: [],
-    }));
+    const newItems: EquipmentItem[] = Array.from({ length: quantity }, () =>
+      newEquipmentItem(trade.equipmentId!),
+    );
     state.armory = [...state.armory, ...newItems];
 
     const existing = state.discoveredEquipment[trade.equipmentId];
@@ -239,11 +236,7 @@ function grantTokenTradeReward(state: GameState, trade: CaravanTokenTrade): void
   }
 
   if (trade.equipmentId) {
-    const newItem: EquipmentItem = {
-      id: rngUuid() as EquipmentItemId,
-      equipmentId: trade.equipmentId,
-      infusedItemIds: [],
-    };
+    const newItem: EquipmentItem = newEquipmentItem(trade.equipmentId);
     state.armory = [...state.armory, newItem];
 
     const existing = state.discoveredEquipment[trade.equipmentId];

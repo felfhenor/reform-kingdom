@@ -1,0 +1,76 @@
+- id: dbcd6e28-bdf9-41ae-89d3-30619c40a405
+  name: of Healing
+  description: Grants the Cure I skill.
+  rarity: Rare
+  family: GrantCure
+  effects:
+    - kind: GrantSkill
+      skillId: Cure I
+
+- id: e89c2b49-1b53-4a6a-8703-cce557ff4544
+  name: of the Stars
+  description: Grants the Starshine I skill.
+  rarity: Rare
+  family: GrantStarshine
+  effects:
+    - kind: GrantSkill
+      skillId: Starshine I
+
+- id: bfacbca1-d407-4aa5-a7d0-a702fa8e1067
+  name: of Toxicity
+  description: Grants the Toxic Breath skill.
+  rarity: Rare
+  family: GrantToxicBreath
+  effects:
+    - kind: GrantSkill
+      skillId: Toxic Breath
+
+- id: fe5f1d38-1ffd-49ce-871d-f1a0124779d7
+  name: Thundering
+  description: Grants the Thunderbolt I skill.
+  rarity: Rare
+  family: GrantThunderbolt
+  position: Prefix
+  effects:
+    - kind: GrantSkill
+      skillId: Thunderbolt I
+
+- id: 6445cc25-6c53-457a-914b-6ec5b92adc41
+  name: Chilling
+  description: Grants the Chilling Touch I skill.
+  rarity: Rare
+  family: GrantChillingTouch
+  position: Prefix
+  effects:
+    - kind: GrantSkill
+      skillId: Chilling Touch I
+
+- id: c37bd787-3fb9-4ef6-9cbd-ffa324760499
+  name: Smiting
+  description: Grants the Holy Smite I skill.
+  rarity: Rare
+  family: GrantSmiting
+  position: Prefix
+  effects:
+    - kind: GrantSkill
+      skillId: Holy Smite I
+
+- id: a16549ff-9f78-4b16-a159-73a68ce4f76c
+  name: Fiery
+  description: Grants the Fireball I skill.
+  rarity: Rare
+  family: GrantFireball
+  position: Prefix
+  effects:
+    - kind: GrantSkill
+      skillId: Fireball I
+
+- id: 1e7b4316-bf35-42f1-a414-ddbfb5e1968a
+  name: Quaking
+  description: Grants the Earthshake I skill.
+  rarity: Rare
+  family: GrantEarthshake
+  position: Prefix
+  effects:
+    - kind: GrantSkill
+      skillId: Earthshake I

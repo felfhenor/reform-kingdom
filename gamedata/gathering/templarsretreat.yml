@@ -20,12 +20,14 @@
     # level 1
     - chance: 6
       levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 1
 
     - chance: 1
       levelRequirement: 0
+      tradeskillIds: [Artificing]
       items:
         - itemId: Spirit Flesh
           quantity: 1
@@ -33,18 +35,21 @@
     # level 2
     - chance: 6
       levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 2
 
     - chance: 1
       levelRequirement: 1
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Malachite
           quantity: 1
 
     - chance: 3
       levelRequirement: 1
+      tradeskillIds: [Artificing]
       items:
         - itemId: Spirit Flesh
           quantity: 2
@@ -52,24 +57,28 @@
     # level 3
     - chance: 6
       levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
       items:
         - itemId: Copper Ore
           quantity: 3
 
     - chance: 5
       levelRequirement: 2
+      tradeskillIds: [Jewelcrafting]
       items:
         - itemId: Malachite
           quantity: 1
 
     - chance: 4
       levelRequirement: 2
+      tradeskillIds: [Artificing]
       items:
         - itemId: Spirit Flesh
           quantity: 2
 
     - chance: 3
       levelRequirement: 2
+      tradeskillIds: [Blacksmithing, Artificing]
       items:
         - itemId: Spirit Flesh
           quantity: 1
@@ -79,6 +88,8 @@
 
     - chance: 1
       levelRequirement: 2
+      tradeskillIds:
+        [Blacksmithing, Artificing, Jewelcrafting, Woodworking, Tailoring]
       items:
         - itemId: Ghostcopper Dust
           quantity: 1

@@ -23,6 +23,7 @@ vi.mock('uuid', () => ({
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/engine/analytics', async (importOriginal) => {
@@ -139,6 +140,7 @@ describe('characterReclass', () => {
       id: `fixture-item-${fixtureItemCounter++}` as EquipmentItemId,
       equipmentId,
       infusedItemIds: [],
+      affixIds: [],
     };
   }
 
