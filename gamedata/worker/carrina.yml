@@ -12,7 +12,7 @@
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
-    stamina: 3.5
+    stamina: 4.5
 
 - id: 5d6e1292-0ccc-40f2-a2b4-929074579cf1
   name: Dekar Anten
@@ -28,4 +28,4 @@
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
-    stamina: 2
+    stamina: 3.5

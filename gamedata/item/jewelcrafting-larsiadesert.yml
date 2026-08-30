@@ -1,0 +1,9 @@
+- id: 40efeaad-09ea-4ebd-b0c5-e566686148e0
+  name: Amber
+  description: A small chunk of amber removed from a petrifiwood.
+  rarity: Uncommon
+
+  sprite: '0039'
+
+  infusionDebuffResistances:
+    Burn: 3

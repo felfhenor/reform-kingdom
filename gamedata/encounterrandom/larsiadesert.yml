@@ -1,0 +1,21 @@
+- id: 88ef9eb0-2fd3-4c9f-8aef-82d38141db4e
+  name: Sandhenge
+  description: A mystical ruin in the middle of the desert. The paved pathing surrounding paired with the mysterious disappearance of any devotees makes this place seem like it was forcibly abandoned.
+
+  levelRange:
+    min: 32
+    max: 35
+
+  encounterRange:
+    min: 3
+    max: 4
+
+  combatantRange:
+    min: 3
+    max: 5
+
+  creaturePool: []
+
+  completionRewards:
+    - collectibleId: Three-Leaf Clover
+      chance: 100

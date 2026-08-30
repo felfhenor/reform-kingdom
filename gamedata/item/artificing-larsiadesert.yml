@@ -1,0 +1,17 @@
+- id: e041f8ec-3da8-4d9b-b0ba-660bba8fc840
+  name: Cactspine
+  description: A chunk of cactus and spines, used for magical reinforcement and refining.
+  rarity: Common
+
+  sprite: '0044'
+
+  infusionStats:
+    Resistance: 1.1
+    Vitality: 1.2
+
+- id: 6f9e8f02-9fdd-4a5f-a8f5-ada952a4f092
+  name: Firmwater
+  description: A viscious bubble of water taken from a Larsian oasis. It's firm to the touch, but melts in your mouth. Very convenient to have in a desert!
+  rarity: Common
+
+  sprite: '0042'

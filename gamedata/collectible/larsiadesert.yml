@@ -1,0 +1,29 @@
+- id: 4565aa30-8fc3-44d8-92c6-d7627b94b6a5
+  name: Three-Leaf Clover
+  rarity: Uncommon
+  description: An almost-lucky clover found in an altar in the Sandhenge. It must not have been lucky enough.
+  sprite: '0040'
+
+- id: cb641233-5e9c-436e-b90c-ad0affed1ec4
+  name: Desertcrab Claw
+  rarity: Uncommon
+  description: The claw of a crab, found on the wreck in Larsia Desert. It looks too aged to be tasty.
+  sprite: '0041'
+
+- id: 492db028-b34f-4347-9cdc-7bfc7c6b5d18
+  name: Mystical Mirror
+  rarity: Uncommon
+  description: A hand mirror, often used for self reflection in the Cimmerian Temple area. Those who use it slowly see through themselves.
+  sprite: '0042'
+
+- id: 45ca2ac3-d748-4976-8676-cb0d29192934
+  name: Adventurer's Satchel
+  rarity: Uncommon
+  description: A small satchel filled with water, rations, and other simple adventuring goods. It doesn't do anyone any good left in the desert.
+  sprite: '0043'
+
+- id: f3596c4f-2150-4458-a603-9af14f9d9da5
+  name: Deadwoods Sunflower
+  rarity: Uncommon
+  description: A beaming sunflower found in the Deadwoods. Despite all the other dead plant growth, these seem to thrive there.
+  sprite: '0044'

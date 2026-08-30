@@ -1,0 +1,220 @@
+- id: 7faab500-8beb-4c83-b58e-99f9cccf8552
+  name: Mescalin Expanse
+  description: A sandfield with cacti as far as the eye can see. Dead trees lay on the ground, but cacti thrive.
+
+  levelRange:
+    min: 24
+    max: 25
+
+  workerLevelRange:
+    min: 15
+    max: 20
+
+  xpGainedIfInLevelRange: 10
+  gatherTime: 20
+
+  maxLevel: 3
+  levelCostScalar: 20000
+
+  gatherResults:
+    # level 1
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Cactspine
+          quantity: 1
+
+    # level 2
+    - chance: 3
+      levelRequirement: 1
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Cactspine
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Cactspine
+          quantity: 2
+
+    # level 3
+    - chance: 3
+      levelRequirement: 2
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Cactspine
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Cactspine
+          quantity: 3
+
+- id: 97d6c2ca-9eb1-46fd-af60-983b0ad05511
+  name: Oasis Wellspring
+  description: A beautiful oasis with relaxing pools filled with firmwater, and sparkling trees that bring life to the energy of the oasis.
+
+  levelRange:
+    min: 25
+    max: 26
+
+  workerLevelRange:
+    min: 14
+    max: 19
+
+  xpGainedIfInLevelRange: 10
+  gatherTime: 20
+
+  maxLevel: 3
+  levelCostScalar: 20000
+
+  gatherResults:
+    # level 1
+    - chance: 4
+      levelRequirement: 0
+      items:
+        - itemId: Firmwater
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Timberfuzz
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Strongreed
+          quantity: 1
+
+    # level 2
+    - chance: 1
+      levelRequirement: 1
+      items:
+        - itemId: Firmwater
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Timberfuzz
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Strongreed
+          quantity: 1
+
+    # level 3
+    - chance: 1
+      levelRequirement: 2
+      items:
+        - itemId: Firmwater
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Timberfuzz
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Strongreed
+          quantity: 2
+
+- id: 59e04673-e239-449e-bcca-2af7ad23692d
+  name: Wet Dry Forest
+  description: A lively forest containing zounds of living and not-quite-alive trees.
+
+  levelRange:
+    min: 26
+    max: 27
+
+  workerLevelRange:
+    min: 13
+    max: 17
+
+  xpGainedIfInLevelRange: 10
+  gatherTime: 20
+
+  maxLevel: 3
+  levelCostScalar: 20000
+
+  gatherResults:
+    # level 1
+    - chance: 7
+      levelRequirement: 0
+      tradeskillIds: [Blacksmithing, Woodworking]
+      items:
+        - itemId: Petrifiwood
+          quantity: 1
+
+    - chance: 4
+      levelRequirement: 0
+      items:
+        - itemId: Firmwater
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Jewelcrafting]
+      items:
+        - itemId: Amber
+          quantity: 1
+
+    # level 2
+    - chance: 4
+      levelRequirement: 1
+      tradeskillIds: [Blacksmithing, Woodworking]
+      items:
+        - itemId: Petrifiwood
+          quantity: 2
+
+    - chance: 2
+      levelRequirement: 1
+      items:
+        - itemId: Firmwater
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Jewelcrafting]
+      items:
+        - itemId: Amber
+          quantity: 1
+
+    # level 2
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Blacksmithing, Woodworking]
+      items:
+        - itemId: Petrifiwood
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      items:
+        - itemId: Firmwater
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Jewelcrafting]
+      items:
+        - itemId: Amber
+          quantity: 1

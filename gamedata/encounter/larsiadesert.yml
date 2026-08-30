@@ -1,0 +1,55 @@
+- id: d320f709-1d7a-40ae-ac56-84912be9c71d
+  name: Deadwoods
+  description: A forest dry as the desert surrounding it. The petrifiwood sparkles brightly, and the sunflowers provide a stark contrast to the dead landscape.
+
+  levelRange:
+    min: 24
+    max: 27
+
+  fights: []
+
+  completionRewards:
+    - collectibleId: Deadwoods Sunflower
+      chance: 50
+
+- id: 80050323-967a-4ae1-989d-9c9b2bd0be8e
+  name: Rolling Sands
+  description: A strange place in the middle of the desert. In every direction is sand, sand, and more sand. Here the winds lie still, yet the sand still moves.
+
+  levelRange:
+    min: 26
+    max: 29
+
+  fights: []
+
+  completionRewards:
+    - collectibleId: Adventurer's Satchel
+      chance: 5
+
+- id: cc216288-7eae-4b1f-8132-b9e8480ff0e4
+  name: Cimmerian Temple
+  description: A temple sequestered away in the desert mountain range. It was home to a nomadic tribe that prayed to an unknown deity.
+
+  levelRange:
+    min: 28
+    max: 31
+
+  fights: []
+
+  completionRewards:
+    - collectibleId: Mystical Mirror
+      chance: 25
+
+- id: 7239ede2-311e-4114-a595-afcf52842699
+  name: Ghostmirage Wreck
+  description: A long-abandoned wreck. It's simultaneously haunted by ghosts, inhabited by lizardmen, and home to many crustaceans from the local desert lake.
+
+  levelRange:
+    min: 30
+    max: 33
+
+  fights: []
+
+  completionRewards:
+    - collectibleId: Desertcrab Claw
+      chance: 25
