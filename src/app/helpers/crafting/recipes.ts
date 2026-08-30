@@ -63,12 +63,17 @@ export function isRecipeCraftable(recipeId: RecipeId): boolean {
   return !isRecipeDropGated(recipeId);
 }
 
+// Mutates `state.discoveredRecipes` in place, for callers already inside their own `updateGamestate`.
+export function applyRecipeDiscovery(state: GameState, recipeId: RecipeId): void {
+  const existing = state.discoveredRecipes[recipeId];
+  state.discoveredRecipes[recipeId] = {
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+}
+
 export function recipeDiscover(recipeId: RecipeId): void {
   updateGamestate((state) => {
-    const existing = state.discoveredRecipes[recipeId];
-    state.discoveredRecipes[recipeId] = {
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
+    applyRecipeDiscovery(state, recipeId);
     return state;
   });
 }
@@ -116,7 +121,7 @@ export async function recipeUnlockWithTokens(
     if (!recipeCanUnlockWithTokens(recipeId, state)) return state;
 
     applyMaterialDelta(state, traderTokenId(), -recipe.tokenUnlockCost);
-    state.discoveredRecipes[recipeId] = { foundAt: Date.now() };
+    applyRecipeDiscovery(state, recipeId);
     unlocked = true;
 
     return state;

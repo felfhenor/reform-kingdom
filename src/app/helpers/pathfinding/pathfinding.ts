@@ -69,58 +69,59 @@ function forEachObjectTile(
   }
 }
 
-export function tiledMapWalkabilityMatrix(map: TiledMap): number[][] {
-  const matrix: number[][] = Array.from({ length: map.height }, () =>
-    new Array(map.width).fill(0),
+// Shared grid-builder behind tiledMapWalkabilityMatrix/tiledMapPathMatrix - marks tiles from a named tile layer, then a named object layer.
+function tiledMapLayerMatrix<T>(
+  map: TiledMap,
+  tileLayerName: string,
+  objectLayerName: string,
+  emptyValue: T,
+  markedValue: T,
+): T[][] {
+  const matrix: T[][] = Array.from({ length: map.height }, () =>
+    new Array<T>(map.width).fill(emptyValue),
   );
 
-  const denseTileLayer = tiledMapGetLayer(map, DENSE_TILE_LAYER_NAME);
-  if (denseTileLayer) {
+  const tileLayer = tiledMapGetLayer(map, tileLayerName);
+  if (tileLayer) {
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
-        if (tiledLayerTileAt(denseTileLayer, x, y) !== 0) {
-          matrix[y][x] = 1;
+        if (tiledLayerTileAt(tileLayer, x, y) !== 0) {
+          matrix[y][x] = markedValue;
         }
       }
     }
   }
 
-  const denseObjectLayer = tiledMapGetLayer(map, DENSE_OBJECT_LAYER_NAME);
-  (denseObjectLayer?.objects ?? []).forEach((object) => {
+  const objectLayer = tiledMapGetLayer(map, objectLayerName);
+  (objectLayer?.objects ?? []).forEach((object) => {
     forEachObjectTile(map, object, (x, y) => {
-      matrix[y][x] = 1;
+      matrix[y][x] = markedValue;
     });
   });
 
   return matrix;
 }
 
+export function tiledMapWalkabilityMatrix(map: TiledMap): number[][] {
+  return tiledMapLayerMatrix(
+    map,
+    DENSE_TILE_LAYER_NAME,
+    DENSE_OBJECT_LAYER_NAME,
+    0,
+    1,
+  );
+}
+
 // Marks every tile the Path Tiles/Path Objects layers cover as "on path" -
 // the preferred (but not exclusive) route for in-map pathfinding.
 export function tiledMapPathMatrix(map: TiledMap): boolean[][] {
-  const matrix: boolean[][] = Array.from({ length: map.height }, () =>
-    new Array(map.width).fill(false),
+  return tiledMapLayerMatrix(
+    map,
+    PATH_TILE_LAYER_NAME,
+    PATH_OBJECT_LAYER_NAME,
+    false,
+    true,
   );
-
-  const pathTileLayer = tiledMapGetLayer(map, PATH_TILE_LAYER_NAME);
-  if (pathTileLayer) {
-    for (let y = 0; y < map.height; y++) {
-      for (let x = 0; x < map.width; x++) {
-        if (tiledLayerTileAt(pathTileLayer, x, y) !== 0) {
-          matrix[y][x] = true;
-        }
-      }
-    }
-  }
-
-  const pathObjectLayer = tiledMapGetLayer(map, PATH_OBJECT_LAYER_NAME);
-  (pathObjectLayer?.objects ?? []).forEach((object) => {
-    forEachObjectTile(map, object, (x, y) => {
-      matrix[y][x] = true;
-    });
-  });
-
-  return matrix;
 }
 
 // Impassable tiles cost infinity, path tiles are cheap, other open tiles cost more - draws pathfinding to paths.
@@ -139,15 +140,20 @@ export function tiledMapMoveCostMatrix(map: TiledMap): number[][] {
   );
 }
 
-export const mapMoveCostMatrices = computed<Map<string, number[][]>>(() => {
-  const matrices = new Map<string, number[][]>();
+// Builds a mapName -> matrix lookup by running `compute` over every loaded map's Tiled data.
+function mapMatrices<T>(compute: (map: TiledMap) => T[][]): Map<string, T[][]> {
+  const matrices = new Map<string, T[][]>();
 
   allMaps().forEach((gameMap, mapName) => {
-    matrices.set(mapName, tiledMapMoveCostMatrix(gameMap.data as TiledMap));
+    matrices.set(mapName, compute(gameMap.data as TiledMap));
   });
 
   return matrices;
-});
+}
+
+export const mapMoveCostMatrices = computed<Map<string, number[][]>>(() =>
+  mapMatrices(tiledMapMoveCostMatrix),
+);
 
 // Called at load time (`migrateGameState`) so a save standing on a tile made unwalkable since (map edit,
 // bad migration) doesn't strand the party there forever.
@@ -165,15 +171,9 @@ export function repairUnwalkableCurrentLocation(
   return { mapName: kingdom.mapName, x: kingdom.x, y: kingdom.y };
 }
 
-const mapPathMatrices = computed<Map<string, boolean[][]>>(() => {
-  const matrices = new Map<string, boolean[][]>();
-
-  allMaps().forEach((gameMap, mapName) => {
-    matrices.set(mapName, tiledMapPathMatrix(gameMap.data as TiledMap));
-  });
-
-  return matrices;
-});
+const mapPathMatrices = computed<Map<string, boolean[][]>>(() =>
+  mapMatrices(tiledMapPathMatrix),
+);
 
 // Whether a specific tile is on an authored path - used by `helpers/travel.ts`
 // to charge the faster on-path travel tick cost for that step.

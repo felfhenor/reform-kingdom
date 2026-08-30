@@ -57,6 +57,7 @@ vi.mock('@helpers/state-game', () => ({
 
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
+  applyRecipeDiscovery,
   isRecipeCraftable,
   isRecipeDiscovered,
   isRecipeDropGated,
@@ -289,6 +290,27 @@ describe('Recipes Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBe(1000);
+    });
+  });
+
+  describe('applyRecipeDiscovery', () => {
+    it('mutates the passed-in state directly, without opening its own updateGamestate', () => {
+      const state = { discoveredRecipes: {} } as unknown as GameState;
+
+      applyRecipeDiscovery(state, equipmentRecipe.id);
+
+      expect(state.discoveredRecipes[equipmentRecipe.id].foundAt).toBeGreaterThan(0);
+      expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('preserves the original foundAt on repeat finds', () => {
+      const state = {
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState;
+
+      applyRecipeDiscovery(state, equipmentRecipe.id);
+
+      expect(state.discoveredRecipes[equipmentRecipe.id].foundAt).toBe(1000);
     });
   });
 

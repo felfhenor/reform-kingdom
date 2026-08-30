@@ -93,6 +93,28 @@ export function combatOrderClauses(
   return character?.combatOrders[jobId] ?? [];
 }
 
+// Shared by every clause mutator below. `transform` returning `undefined` means "no change" -
+// the character is left untouched (same reference) rather than rebuilt with an identical list.
+function updateCombatOrderClauses(
+  characterId: CharacterId,
+  jobId: JobId,
+  transform: (
+    clauses: CombatOrderClause[],
+  ) => CombatOrderClause[] | undefined,
+): void {
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((c) => {
+      if (c.id !== characterId) return c;
+
+      const clauses = transform(c.combatOrders[jobId] ?? []);
+      if (!clauses) return c;
+
+      return { ...c, combatOrders: { ...c.combatOrders, [jobId]: clauses } };
+    });
+    return state;
+  });
+}
+
 // Refuses to add past `COMBAT_ORDER_ROW_CAP`. Returns whether it was added.
 export function combatOrderClauseAdd(
   characterId: CharacterId,
@@ -111,20 +133,10 @@ export function combatOrderClauseAdd(
     action,
   };
 
-  updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) =>
-      c.id === characterId
-        ? {
-            ...c,
-            combatOrders: {
-              ...c.combatOrders,
-              [jobId]: [clause, ...(c.combatOrders[jobId] ?? [])],
-            },
-          }
-        : c,
-    );
-    return state;
-  });
+  updateCombatOrderClauses(characterId, jobId, (clauses) => [
+    clause,
+    ...clauses,
+  ]);
 
   return true;
 }
@@ -138,24 +150,11 @@ export function combatOrderClauseUpdate(
   condition: CombatOrderCondition,
   action: CombatOrderAction,
 ): void {
-  updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) =>
-      c.id === characterId
-        ? {
-            ...c,
-            combatOrders: {
-              ...c.combatOrders,
-              [jobId]: (c.combatOrders[jobId] ?? []).map((clause) =>
-                clause.id === clauseId
-                  ? { ...clause, condition, action }
-                  : clause,
-              ),
-            },
-          }
-        : c,
-    );
-    return state;
-  });
+  updateCombatOrderClauses(characterId, jobId, (clauses) =>
+    clauses.map((clause) =>
+      clause.id === clauseId ? { ...clause, condition, action } : clause,
+    ),
+  );
 }
 
 export function combatOrderClauseRemove(
@@ -163,22 +162,9 @@ export function combatOrderClauseRemove(
   jobId: JobId,
   clauseId: CombatOrderClauseId,
 ): void {
-  updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) =>
-      c.id === characterId
-        ? {
-            ...c,
-            combatOrders: {
-              ...c.combatOrders,
-              [jobId]: (c.combatOrders[jobId] ?? []).filter(
-                (clause) => clause.id !== clauseId,
-              ),
-            },
-          }
-        : c,
-    );
-    return state;
-  });
+  updateCombatOrderClauses(characterId, jobId, (clauses) =>
+    clauses.filter((clause) => clause.id !== clauseId),
+  );
 }
 
 export function combatOrderClauseSetEnabled(
@@ -187,22 +173,11 @@ export function combatOrderClauseSetEnabled(
   clauseId: CombatOrderClauseId,
   enabled: boolean,
 ): void {
-  updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) =>
-      c.id === characterId
-        ? {
-            ...c,
-            combatOrders: {
-              ...c.combatOrders,
-              [jobId]: (c.combatOrders[jobId] ?? []).map((clause) =>
-                clause.id === clauseId ? { ...clause, enabled } : clause,
-              ),
-            },
-          }
-        : c,
-    );
-    return state;
-  });
+  updateCombatOrderClauses(characterId, jobId, (clauses) =>
+    clauses.map((clause) =>
+      clause.id === clauseId ? { ...clause, enabled } : clause,
+    ),
+  );
 }
 
 // Rebuilds the clause list in a new order - the priority list is a simple
@@ -213,17 +188,12 @@ export function combatOrderClauseReorder(
   previousIndex: number,
   newIndex: number,
 ): void {
-  updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) => {
-      if (c.id !== characterId) return c;
+  updateCombatOrderClauses(characterId, jobId, (clauses) => {
+    const reordered = [...clauses];
+    const [moved] = reordered.splice(previousIndex, 1);
+    if (!moved) return undefined;
 
-      const clauses = [...(c.combatOrders[jobId] ?? [])];
-      const [moved] = clauses.splice(previousIndex, 1);
-      if (!moved) return c;
-
-      clauses.splice(newIndex, 0, moved);
-      return { ...c, combatOrders: { ...c.combatOrders, [jobId]: clauses } };
-    });
-    return state;
+    reordered.splice(newIndex, 0, moved);
+    return reordered;
   });
 }

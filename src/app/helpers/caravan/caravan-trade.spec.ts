@@ -1,3 +1,4 @@
+import type * as RecipesHelper from '@helpers/crafting/recipes';
 import type * as MaterialsHelper from '@helpers/item/materials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +20,8 @@ vi.mock('@helpers/content', () => ({
   getEntriesByType: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/crafting/recipes', () => ({
+vi.mock('@helpers/crafting/recipes', async (importOriginal) => ({
+  ...(await importOriginal<typeof RecipesHelper>()),
   isRecipeDiscovered: vi.fn(),
   recipeBackdropSprite: vi.fn(),
   recipeResultContent: vi.fn(),

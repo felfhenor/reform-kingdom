@@ -58,31 +58,29 @@ function setActiveClause(clauseId?: DecreeClauseId): void {
   });
 }
 
-export function autoModeRecordClauseFailure(): void {
+function updateActiveClauseFailureCount(
+  nextFailureCount: (current: number) => number,
+): void {
   const activeClauseId = gamestate().world.autoMode.activeClauseId;
   if (!activeClauseId) return;
 
   updateGamestate((state) => {
     state.world.autoMode.clauses = state.world.autoMode.clauses.map((clause) =>
       clause.id === activeClauseId
-        ? { ...clause, failureCount: clause.failureCount + 1 }
+        ? { ...clause, failureCount: nextFailureCount(clause.failureCount) }
         : clause,
     );
     return state;
   });
 }
 
+export function autoModeRecordClauseFailure(): void {
+  updateActiveClauseFailureCount((count) => count + 1);
+}
+
 // A won fight proves the clause works again, so its failure streak shouldn't keep tripping the UI's warning forever.
 export function autoModeRecordClauseSuccess(): void {
-  const activeClauseId = gamestate().world.autoMode.activeClauseId;
-  if (!activeClauseId) return;
-
-  updateGamestate((state) => {
-    state.world.autoMode.clauses = state.world.autoMode.clauses.map((clause) =>
-      clause.id === activeClauseId ? { ...clause, failureCount: 0 } : clause,
-    );
-    return state;
-  });
+  updateActiveClauseFailureCount(() => 0);
 }
 
 // Recorded for every lost fight regardless of clause; only `LevelUpParty`'s node picker reads it back (see `mostChallengingExploreNodeForRisk`).

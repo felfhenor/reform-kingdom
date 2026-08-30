@@ -4,7 +4,10 @@ import {
   caravanTradePrice,
 } from '@helpers/caravan/caravan-trade-quantity';
 import { getEntry } from '@helpers/content';
-import { isRecipeDiscovered } from '@helpers/crafting/recipes';
+import {
+  applyRecipeDiscovery,
+  isRecipeDiscovered,
+} from '@helpers/crafting/recipes';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
@@ -32,7 +35,6 @@ import type {
   GameState,
   ItemContent,
   RecipeContent,
-  RecipeId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -64,20 +66,10 @@ function grantCollectible(
   };
 }
 
-// Mirrors recipeDiscover (recipes.ts) but mutates the in-flight `state`
-// directly, since this runs inside an existing updateGamestate callback.
-function discoverRecipe(state: GameState, recipeId: RecipeId): void {
-  const existing = state.discoveredRecipes[recipeId];
-  state.discoveredRecipes[recipeId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
-}
-
-// Grants whichever reward type `trade` sells, `quantity` times. `quantity`
-// is always 1 for a collectible or recipe (enforced by `caravanTradeMaxQuantity`).
+// Grants whichever reward type `trade` sells, `quantity` times - always 1 for a collectible, recipe, or token trade.
 function grantCaravanReward(
   state: GameState,
-  trade: CaravanTrade,
+  trade: CaravanTrade | CaravanTokenTrade,
   quantity: number,
 ): void {
   if (trade.itemId) {
@@ -104,7 +96,7 @@ function grantCaravanReward(
   }
 
   if (trade.recipeId) {
-    discoverRecipe(state, trade.recipeId);
+    applyRecipeDiscovery(state, trade.recipeId);
   }
 }
 
@@ -229,33 +221,6 @@ function isTokenTradeAlreadyOwned(
   return false;
 }
 
-function grantTokenTradeReward(state: GameState, trade: CaravanTokenTrade): void {
-  if (trade.itemId) {
-    applyMaterialDelta(state, trade.itemId, 1);
-    return;
-  }
-
-  if (trade.equipmentId) {
-    const newItem: EquipmentItem = newEquipmentItem(trade.equipmentId);
-    state.armory = [...state.armory, newItem];
-
-    const existing = state.discoveredEquipment[trade.equipmentId];
-    state.discoveredEquipment[trade.equipmentId] = {
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
-    return;
-  }
-
-  if (trade.collectibleId) {
-    grantCollectible(state, trade.collectibleId, 1);
-    return;
-  }
-
-  if (trade.recipeId) {
-    discoverRecipe(state, trade.recipeId);
-  }
-}
-
 // Same commit-time re-validation reasoning as caravanExecuteTrade above.
 export async function caravanExecuteTokenTrade(
   entry: WorldNodeEntry,
@@ -284,7 +249,7 @@ export async function caravanExecuteTokenTrade(
     const tokenQuantity = s.materials[traderTokenId()]?.quantity ?? 0;
     if (tokenQuantity < trade.tokenCost) return s;
 
-    grantTokenTradeReward(s, trade);
+    grantCaravanReward(s, trade, 1);
     applyMaterialDelta(s, traderTokenId(), -trade.tokenCost);
     executed = true;
 
