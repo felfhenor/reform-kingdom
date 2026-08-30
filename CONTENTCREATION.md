@@ -55,7 +55,7 @@ Traders have a list of items they will buy and sell, and also, each trader _shou
 
 ## Tradeskills
 
-Adding a new tradeskill requires a lot of tradeskill recipes.
+Adding a new tradeskill requires a lot of tradeskill recipes. Also, add an affix for them.
 
 ## Tradeskill Recipes
 
@@ -71,7 +71,7 @@ Adding a new job requires adding:
 
 ## Skills
 
-Skills are self-contained.
+Skills are self-contained. They can be attached to gear or affixes.
 
 ## Equipment
 
