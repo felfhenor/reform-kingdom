@@ -16,7 +16,7 @@ import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
-  equipmentItemGrantedSkillIds,
+  equipmentItemGrantedSkills,
 } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
@@ -92,9 +92,7 @@ export class SlotEquipmentComponent {
     const content = this.equippedContent();
     if (!item || !content) return [];
 
-    return equipmentItemGrantedSkillIds(item, content)
-      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
-      .filter((skill): skill is EquipmentSkillContent => !!skill);
+    return equipmentItemGrantedSkills(item, content);
   });
 
   public isSecondarySlot = computed<boolean>(() => {

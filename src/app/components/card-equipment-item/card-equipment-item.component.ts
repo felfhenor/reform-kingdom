@@ -11,13 +11,12 @@ import { RowDebuffResistancesComponent } from '@components/row-debuff-resistance
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { getEntry } from '@helpers/content';
 import { defaultStats } from '@helpers/defaults';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
-  equipmentItemGrantedSkillIds,
+  equipmentItemGrantedSkills,
 } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
@@ -86,9 +85,7 @@ export class CardEquipmentItemComponent {
   }
 
   public grantedSkills = computed<EquipmentSkillContent[]>(() =>
-    equipmentItemGrantedSkillIds(this.equipmentItem(), this.equipment())
-      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
-      .filter((skill): skill is EquipmentSkillContent => !!skill),
+    equipmentItemGrantedSkills(this.equipmentItem(), this.equipment()),
   );
 
   // Blocked by click rather than the native `disabled` attribute, so the stat-comparison

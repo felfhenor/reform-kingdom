@@ -34,6 +34,26 @@ import {
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
+// Recomputes derived stats after an equipment change and clamps current hp/ep to the new max.
+function applyEquipmentToCharacter(
+  character: Character,
+  equipment: EquipmentBlock,
+): Character {
+  const stats = characterStatsForLevel(
+    character.jobId,
+    character.level,
+    equipment,
+  );
+
+  return {
+    ...character,
+    equipment,
+    stats,
+    hp: clamp(character.hp, 0, stats.Health),
+    ep: clamp(character.ep, 0, stats.Energy),
+  };
+}
+
 function applyCharacterEquipment(
   characterId: CharacterId,
   equipmentForCharacter: (character: Character) => EquipmentBlock,
@@ -44,20 +64,10 @@ function applyCharacterEquipment(
     state.world.party = state.world.party.map((character) => {
       if (character.id !== characterId) return character;
 
-      const equipment = equipmentForCharacter(character);
-      const stats = characterStatsForLevel(
-        character.jobId,
-        character.level,
-        equipment,
+      return applyEquipmentToCharacter(
+        character,
+        equipmentForCharacter(character),
       );
-
-      return {
-        ...character,
-        equipment,
-        stats,
-        hp: clamp(character.hp, 0, stats.Health),
-        ep: clamp(character.ep, 0, stats.Energy),
-      };
     });
 
     return state;
@@ -151,15 +161,7 @@ export function characterEquipFromArmory(
         equipment[slot] = armoryItem;
       });
 
-      const stats = characterStatsForLevel(c.jobId, c.level, equipment);
-
-      return {
-        ...c,
-        equipment,
-        stats,
-        hp: clamp(c.hp, 0, stats.Health),
-        ep: clamp(c.ep, 0, stats.Energy),
-      };
+      return applyEquipmentToCharacter(c, equipment);
     });
 
     return state;
@@ -201,15 +203,7 @@ export function characterUnequipToArmory(
         equipment[occupiedSlot] = undefined;
       });
 
-      const stats = characterStatsForLevel(c.jobId, c.level, equipment);
-
-      return {
-        ...c,
-        equipment,
-        stats,
-        hp: clamp(c.hp, 0, stats.Health),
-        ep: clamp(c.ep, 0, stats.Energy),
-      };
+      return applyEquipmentToCharacter(c, equipment);
     });
 
     return state;
@@ -278,15 +272,7 @@ export function characterInfuseEquipment(
         equipment[slot] = infusedItem;
       });
 
-      const stats = characterStatsForLevel(c.jobId, c.level, equipment);
-
-      return {
-        ...c,
-        equipment,
-        stats,
-        hp: clamp(c.hp, 0, stats.Health),
-        ep: clamp(c.ep, 0, stats.Energy),
-      };
+      return applyEquipmentToCharacter(c, equipment);
     });
 
     applyMaterialDelta(state, materialItemId, -1);

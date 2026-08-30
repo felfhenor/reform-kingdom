@@ -1,3 +1,4 @@
+import { getEntry } from '@helpers/content';
 import { defaultStats, defaultTagResistances } from '@helpers/defaults';
 import {
   affixEffectsOfKind,
@@ -11,6 +12,7 @@ import {
 import type {
   EquipmentContent,
   EquipmentItem,
+  EquipmentSkillContent,
   EquipmentSkillId,
   StatBlock,
   StatusEffectTag,
@@ -81,4 +83,14 @@ export function equipmentItemGrantedSkillIds(
   ).map((effect) => effect.skillId);
 
   return uniq([...content.grantedSkillIds, ...affixSkillIds]);
+}
+
+// Resolves `equipmentItemGrantedSkillIds` to their skill content, dropping any id that no longer resolves.
+export function equipmentItemGrantedSkills(
+  item: EquipmentItem,
+  content: EquipmentContent,
+): EquipmentSkillContent[] {
+  return equipmentItemGrantedSkillIds(item, content)
+    .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
+    .filter((skill): skill is EquipmentSkillContent => !!skill);
 }

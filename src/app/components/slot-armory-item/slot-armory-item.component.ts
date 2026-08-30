@@ -10,12 +10,11 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { getEntry } from '@helpers/content';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
-  equipmentItemGrantedSkillIds,
+  equipmentItemGrantedSkills,
 } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
@@ -74,9 +73,7 @@ export class SlotArmoryItemComponent {
   );
 
   public grantedSkills = computed<EquipmentSkillContent[]>(() =>
-    equipmentItemGrantedSkillIds(this.equipmentItem(), this.equipment())
-      .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
-      .filter((skill): skill is EquipmentSkillContent => !!skill),
+    equipmentItemGrantedSkills(this.equipmentItem(), this.equipment()),
   );
 
   public sellValue = computed(() =>
