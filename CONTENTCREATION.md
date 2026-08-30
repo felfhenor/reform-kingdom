@@ -70,3 +70,13 @@ Adding a new job requires adding:
 - [ ] New skills & skill paths
 
 ## Skills
+
+Skills are self-contained.
+
+## Equipment
+
+Equipment is fairly self-explanatory, but there are a lot of knobs that can be twisted for equipment. They can have some of the following options:
+
+- [ ] Stats (including negative stats)
+- [ ] Infusion Slots
+- [ ] Skills learned on equip
