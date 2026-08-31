@@ -6,9 +6,7 @@ import {
   tiledMapGetLayer,
   tiledObjectProperty,
 } from '@helpers/pixi/tiled-map';
-import { currentLocationGet } from '@helpers/world';
 import {
-  worldNodeByName,
   worldNodeLookup,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
@@ -206,7 +204,7 @@ function moveCostMatrixForQuery(
   return matrix;
 }
 
-function findInMapPath(
+export function findInMapPath(
   mapName: string,
   from: { x: number; y: number },
   to: { x: number; y: number },
@@ -224,7 +222,7 @@ function findInMapPath(
     .map(({ x, y }): TravelStep => ({ kind: 'Move', mapName, x, y }));
 }
 
-function teleportNodeProperty(
+export function teleportNodeProperty(
   node: WorldNodeEntry,
   name: 'tag' | 'toTag',
 ): string | undefined {
@@ -232,14 +230,14 @@ function teleportNodeProperty(
 }
 
 // Tags are validated unique across every map (scripts/validate-teleportnodes.ts), so this resolves to exactly one node.
-function findTeleportArrivalByTag(tag: string): WorldNodeEntry | undefined {
+export function findTeleportArrivalByTag(tag: string): WorldNodeEntry | undefined {
   return worldNodesOfType('TeleportNode').find(
     (node) => teleportNodeProperty(node, 'tag') === tag,
   );
 }
 
-// Building block for both direct TeleportNode travel and waypointing through `travelPathAcrossMaps`.
-function travelPathViaTeleport(
+// Handles a TeleportNode as the destination itself - crossing it, not just standing next to it.
+export function travelPathViaTeleport(
   location: CurrentLocation,
   teleportNode: WorldNodeEntry,
 ): TravelStep[] | undefined {
@@ -266,60 +264,6 @@ function travelPathViaTeleport(
   };
 
   return [...toTeleportSteps, teleportStep];
-}
-
-function travelPathAcrossMaps(
-  location: CurrentLocation,
-  destination: WorldNodeEntry,
-): TravelStep[] | undefined {
-  const teleportsOnStartMap = worldNodesOfType('TeleportNode').filter(
-    (node) => node.mapName === location.mapName,
-  );
-
-  for (const teleport of teleportsOnStartMap) {
-    const toTeleportPath = travelPathViaTeleport(location, teleport);
-    if (!toTeleportPath) continue;
-
-    const arrival = toTeleportPath[toTeleportPath.length - 1];
-    const fromArrivalSteps = findInMapPath(
-      destination.mapName,
-      arrival,
-      destination,
-    );
-    if (!fromArrivalSteps) continue;
-
-    return [...toTeleportPath, ...fromArrivalSteps];
-  }
-
-  return undefined;
-}
-
-// Pure by-location variant of `travelPathTo`, so non-party travelers (workers - see
-// `worker-travel.ts`) can path from an arbitrary origin, not just the hero party's current tile.
-export function travelPathFrom(
-  location: CurrentLocation,
-  destinationNodeName: string,
-): TravelStep[] | undefined {
-  const destination = worldNodeByName(destinationNodeName);
-  if (!destination) return undefined;
-
-  // Traveling "to" a TeleportNode means crossing it, not just standing next
-  // to it - so the jump to its paired arrival tile is part of this path.
-  if (destination.nodeData.type === 'TeleportNode') {
-    return travelPathViaTeleport(location, destination);
-  }
-
-  if (location.mapName === destination.mapName) {
-    return findInMapPath(location.mapName, location, destination);
-  }
-
-  return travelPathAcrossMaps(location, destination);
-}
-
-export function travelPathTo(
-  destinationNodeName: string,
-): TravelStep[] | undefined {
-  return travelPathFrom(currentLocationGet(), destinationNodeName);
 }
 
 // Neighboring maps reachable by a single teleport hop from `mapName`.

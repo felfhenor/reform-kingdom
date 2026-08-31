@@ -30,7 +30,7 @@ import {
   gatheringProgressFraction,
 } from '@helpers/item/gathering';
 import { rewardDisplayOrder } from '@helpers/item/loot';
-import { travelPathTo } from '@helpers/pathfinding/pathfinding';
+import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate } from '@helpers/state-game';
 import { currentLocationGet } from '@helpers/world';
 import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan';

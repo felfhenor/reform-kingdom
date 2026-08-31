@@ -3,7 +3,7 @@
 import { getEntriesByType } from '@helpers/content';
 import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
 import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
-import { travelPathFrom } from '@helpers/pathfinding/pathfinding';
+import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import {
   WORKER_MAX_LEVEL,
   workerMinLevelForStamina,

@@ -5,7 +5,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
+vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
   travelPathFrom: vi.fn(),
 }));
 
@@ -15,7 +15,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
-import { travelPathFrom } from '@helpers/pathfinding/pathfinding';
+import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   workerBeginReturnTrip,

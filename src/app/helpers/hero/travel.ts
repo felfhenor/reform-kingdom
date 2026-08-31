@@ -16,7 +16,8 @@ import {
 import { travelStepTicksCost } from '@helpers/hero/travel-cost';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
-import { mapHopsBetween, travelPathTo } from '@helpers/pathfinding/pathfinding';
+import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
+import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';

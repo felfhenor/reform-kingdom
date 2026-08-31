@@ -12,7 +12,7 @@ vi.mock('@helpers/hero/travel-cost', () => ({
   travelPathTotalTicks: vi.fn(),
 }));
 
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
+vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
   travelPathFrom: vi.fn((kingdom: unknown, nodeName: string) => ({ nodeName })),
 }));
 

@@ -7,7 +7,7 @@ import {
 } from '@helpers/engine/analytics';
 import { travelPathTotalTicks, travelStepTicksCost } from '@helpers/hero/travel';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
-import { travelPathFrom } from '@helpers/pathfinding/pathfinding';
+import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';

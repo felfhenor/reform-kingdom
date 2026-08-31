@@ -38,6 +38,9 @@ vi.mock('@helpers/item/gathering', () => ({
 vi.mock('@helpers/pathfinding/pathfinding', () => ({
   mapHopsBetween: vi.fn(() => 0),
   tileIsOnPath: vi.fn(() => false),
+}));
+
+vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
   travelPathTo: vi.fn(),
 }));
 
@@ -94,11 +97,8 @@ import {
 } from '@helpers/hero/travel';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
-import {
-  mapHopsBetween,
-  tileIsOnPath,
-  travelPathTo,
-} from '@helpers/pathfinding/pathfinding';
+import { mapHopsBetween, tileIsOnPath } from '@helpers/pathfinding/pathfinding';
+import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {

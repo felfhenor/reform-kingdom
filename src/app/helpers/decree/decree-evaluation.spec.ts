@@ -31,7 +31,7 @@ vi.mock('@helpers/hero/party', () => ({
   isPartyAtFullHealth: vi.fn(() => true),
 }));
 
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
+vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
   travelPathTo: vi.fn(),
 }));
 
@@ -76,7 +76,7 @@ import { isPartyAtFullHealth } from '@helpers/hero/party';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { travelPathTo } from '@helpers/pathfinding/pathfinding';
+import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { isPlayerAtKingdom } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
