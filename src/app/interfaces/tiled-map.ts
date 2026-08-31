@@ -33,6 +33,7 @@ export type TiledObject = {
 
 export type WorldNodeType =
   | 'Kingdom'
+  | 'NonPlayerKingdom'
   | 'CaravanNode'
   | 'ExploreNode'
   | 'ExploreRandomNode'
@@ -40,6 +41,9 @@ export type WorldNodeType =
   | 'TeleportNode';
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
+export type NonPlayerKingdomObject = TiledObject & {
+  type: 'NonPlayerKingdom';
+};
 export type CaravanNodeObject = TiledObject & { type: 'CaravanNode' };
 export type ExploreNodeObject = TiledObject & { type: 'ExploreNode' };
 export type ExploreRandomNodeObject = TiledObject & {
@@ -58,6 +62,7 @@ export type TeleportNodeObject = TiledObject & {
 
 export type WorldNodeObject =
   | KingdomObject
+  | NonPlayerKingdomObject
   | CaravanNodeObject
   | ExploreNodeObject
   | ExploreRandomNodeObject

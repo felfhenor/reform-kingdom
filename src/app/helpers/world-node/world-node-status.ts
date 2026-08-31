@@ -46,6 +46,7 @@ export function worldNodeInteractionKind(
       return 'Trade';
     case 'TeleportNode':
     case 'Kingdom':
+    case 'NonPlayerKingdom':
       return 'Travel';
     default:
       return undefined;

@@ -171,6 +171,7 @@ describe('worldNodeInteractionKind', () => {
     ['CaravanNode', 'Trade'],
     ['TeleportNode', 'Travel'],
     ['Kingdom', 'Travel'],
+    ['NonPlayerKingdom', 'Travel'],
   ] as const)('maps %s to %s', (type, kind) => {
     expect(worldNodeInteractionKind(buildEntry({ type }))).toBe(kind);
   });
