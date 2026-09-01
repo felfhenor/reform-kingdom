@@ -383,6 +383,7 @@ function ensureMonster(
     frames: monster.frames ?? 4,
     baseStats: ensureStats(monster.baseStats),
     statsPerLevel: ensureStats(monster.statsPerLevel),
+    combatStats: ensureCombatStats(monster.combatStats),
     // A trailing unqualified Random is always appended, so a priority list can never resolve
     // zero targets and waste the monster's turn - content never needs to author its own catch-all.
     targetting: [

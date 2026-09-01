@@ -29,6 +29,7 @@ import {
   combatantFromMonster,
 } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content';
+import { defaultCombatStats } from '@helpers/defaults';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import type {
   Character,
@@ -373,6 +374,7 @@ describe('combatantFromMonster', () => {
       targetting: [{ type: 'Random' }],
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
+      combatStats: defaultCombatStats(),
       skills: [{ skillId: attackSkill.id, weight: 1 }],
     } as MonsterContent;
 
@@ -398,6 +400,7 @@ describe('combatantFromMonster', () => {
       drops: [],
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
+      combatStats: defaultCombatStats(),
       skills: [],
     } as MonsterContent;
 

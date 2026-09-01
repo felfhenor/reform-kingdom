@@ -6,6 +6,7 @@ import {
   xpForOverLevel,
 } from '@helpers/combat/monster';
 import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { defaultCombatStats } from '@helpers/defaults';
 import type { EquipmentSkillId, ItemId, MonsterContent } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -40,6 +41,7 @@ describe('Monster Helper Functions', () => {
       Resistance: 0,
       Agility: 0,
     },
+    combatStats: defaultCombatStats(),
     targetting: [{ type: 'Random' }],
     xp: { min: 3, max: 5, bonusPerLevel: 1 },
     drops: [

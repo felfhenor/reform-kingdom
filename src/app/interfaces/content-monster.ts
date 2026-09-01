@@ -1,5 +1,5 @@
 import type { HasAnimation } from '@interfaces/artable';
-import type { TargettingPriorityEntry } from '@interfaces/combat';
+import type { CombatStat, TargettingPriorityEntry } from '@interfaces/combat';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type {
   DroppedReward,
@@ -24,6 +24,7 @@ export type MonsterContent = IsContentItem &
     id: MonsterId;
     baseStats: StatBlock;
     statsPerLevel: StatBlock;
+    combatStats: Record<CombatStat, number>;
 
     // Priority list of targeting modes, tried in order - see combatGetTargetsFromPriorityList.
     targetting: TargettingPriorityEntry[];

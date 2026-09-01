@@ -205,6 +205,9 @@
     Resistance: 0.7
     Agility: 0.1
 
+  combatStats:
+    debuffIgnoreChance: 15
+
 - id: 588493d0-2e31-46b5-95c8-4b0e3ec8641a
   name: Bloodmoth
   description: A moth bathed in the blood of the desert battlefields. It's intricate patterns attract the ire of its foes.

@@ -4,7 +4,6 @@ import { monsterStatsAtLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content';
 import {
   defaultAffinities,
-  defaultCombatStats,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
@@ -161,7 +160,7 @@ export function combatantFromMonster(
 
     combatOrders: [],
 
-    combatStats: defaultCombatStats(),
+    combatStats: structuredClone(monster.combatStats),
 
     affinity: defaultAffinities(),
     resistance: defaultAffinities(),
