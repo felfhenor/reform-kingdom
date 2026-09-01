@@ -31,10 +31,7 @@ import { updateGamestate } from '@helpers/state-game';
 
 import { clamp, sortBy } from 'es-toolkit/compat';
 
-import {
-  combatCombatantCombatStatSucceedsChance,
-  combatCombatantCombatStatValue,
-} from '@helpers/combat/combat-stats';
+import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
 import { skillEpCost, skillTechniqueNumTargets } from '@helpers/hero/skill';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
@@ -54,17 +51,8 @@ function combatantMarkSkillUse(
   combatant: Combatant,
   skill: EquipmentSkill,
 ): void {
-  const shouldApplyExtraUses = combatCombatantCombatStatSucceedsChance(
-    combatant,
-    'skillAdditionalUseChance',
-  );
-
-  const extraUses = shouldApplyExtraUses
-    ? combatCombatantCombatStatValue(combatant, 'skillAdditionalUseCount')
-    : 0;
-
   combatant.skillUses[skill.id] ??= 0;
-  combatant.skillUses[skill.id] += 1 + extraUses;
+  combatant.skillUses[skill.id] += 1;
 
   combatant.ep = clamp(
     combatant.ep - skillEpCost(skill),

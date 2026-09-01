@@ -25,8 +25,6 @@ export type CombatantStatusEffectData = {
 export type CombatantCombatStats = {
   repeatActionChance: number;
   skillStrikeAgainChance: number;
-  skillAdditionalUseChance: number;
-  skillAdditionalUseCount: number;
   redirectionChance: number;
   missChance: number;
   debuffIgnoreChance: number;

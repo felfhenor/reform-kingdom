@@ -30,7 +30,6 @@ vi.mock('@helpers/combat/combat-statuseffects', () => ({
 
 vi.mock('@helpers/combat/combat-stats', () => ({
   combatCombatantCombatStatSucceedsChance: vi.fn(() => false),
-  combatCombatantCombatStatValue: vi.fn(() => 0),
 }));
 
 vi.mock('@helpers/combat/combat-targetting', () => ({

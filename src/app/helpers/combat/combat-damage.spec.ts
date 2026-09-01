@@ -73,8 +73,6 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     combatStats: {
       repeatActionChance: 0,
       skillStrikeAgainChance: 0,
-      skillAdditionalUseChance: 0,
-      skillAdditionalUseCount: 0,
       redirectionChance: 0,
       missChance: 0,
       debuffIgnoreChance: 0,
@@ -82,6 +80,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
       healingIgnorePercent: 0,
       reviveChance: 0,
       stunChance: 0,
+      agroValue: 0,
     },
     resistance: {} as never,
     affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },

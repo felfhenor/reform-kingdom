@@ -126,8 +126,6 @@ export function defaultCombatStats(): CombatantCombatStats {
   return {
     repeatActionChance: 0,
     skillStrikeAgainChance: 0,
-    skillAdditionalUseChance: 0,
-    skillAdditionalUseCount: 0,
     redirectionChance: 0,
     missChance: 0,
     debuffIgnoreChance: 0,
