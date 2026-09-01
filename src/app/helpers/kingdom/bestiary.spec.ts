@@ -1,3 +1,4 @@
+import { defaultCombatStats } from '@helpers/defaults';
 import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import type {
   BestiaryEntry,
@@ -90,6 +91,7 @@ const goblin: MonsterContent = {
     Resistance: 0,
     Agility: 0,
   },
+  combatStats: defaultCombatStats(),
   targetting: [{ type: 'Random' }],
   xp: { min: 3, max: 5, bonusPerLevel: 1 },
   drops: [

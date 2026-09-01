@@ -18,7 +18,14 @@
   </div>
 }
 
-<app-row-debuff-resistances
-  class="mt-2 text-base"
-  [resistances]="resistances()"
+<app-row-labeled-values
+  class="text-base"
+  [dimension]="resistanceDimension"
+  [values]="resistances()"
+/>
+
+<app-row-labeled-values
+  class="text-base"
+  [dimension]="combatStatDimension"
+  [values]="combatStats()"
 />

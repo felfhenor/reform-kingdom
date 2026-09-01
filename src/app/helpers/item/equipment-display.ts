@@ -1,19 +1,14 @@
 import { getEntry } from '@helpers/content';
 import {
-  defaultCombatStats,
-  defaultStats,
-  defaultTagResistances,
-} from '@helpers/defaults';
-import {
   affixEffectsOfKind,
-  affixEffectSum,
   equipmentItemAffixEffects,
 } from '@helpers/item/affix';
 import {
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionCombatStatBonus,
-  equipmentItemInfusionResistanceBonus,
-} from '@helpers/item/infusion';
+  COMBAT_STAT_BONUS,
+  equipmentItemBonusTotals,
+  RESISTANCE_BONUS,
+  STAT_BONUS,
+} from '@helpers/item/equipment-bonus';
 import type {
   CombatantCombatStats,
   EquipmentContent,
@@ -27,62 +22,21 @@ import { uniq } from 'es-toolkit/compat';
 
 // Combines infusion + affix Stat bonuses into one block, for the "green bonus rows" UI components already show under an item's base stats.
 export function equipmentItemBonusStats(item: EquipmentItem): StatBlock {
-  const infusion = equipmentItemInfusionBonus(item.infusedItemIds);
-  const affixEffects = equipmentItemAffixEffects(item);
-  const combined = defaultStats();
-
-  (Object.keys(combined) as Array<keyof StatBlock>).forEach((stat) => {
-    const affixBonus = affixEffectSum(
-      affixEffects,
-      'Stat',
-      (effect) => effect.stat === stat,
-    );
-    combined[stat] = infusion[stat] + affixBonus;
-  });
-
-  return combined;
+  return equipmentItemBonusTotals(item, STAT_BONUS);
 }
 
 // The resistance analog of `equipmentItemBonusStats`.
 export function equipmentItemBonusResistances(
   item: EquipmentItem,
 ): Record<StatusEffectTag, number> {
-  const infusion = equipmentItemInfusionResistanceBonus(item.infusedItemIds);
-  const affixEffects = equipmentItemAffixEffects(item);
-  const combined = defaultTagResistances();
-
-  (Object.keys(combined) as StatusEffectTag[]).forEach((tag) => {
-    const affixBonus = affixEffectSum(
-      affixEffects,
-      'Resistance',
-      (effect) => effect.tag === tag,
-    );
-    combined[tag] = infusion[tag] + affixBonus;
-  });
-
-  return combined;
+  return equipmentItemBonusTotals(item, RESISTANCE_BONUS);
 }
 
 // The combat-stat analog of `equipmentItemBonusStats`.
 export function equipmentItemBonusCombatStats(
   item: EquipmentItem,
 ): CombatantCombatStats {
-  const infusion = equipmentItemInfusionCombatStatBonus(item.infusedItemIds);
-  const affixEffects = equipmentItemAffixEffects(item);
-  const combined = defaultCombatStats();
-
-  (Object.keys(combined) as Array<keyof CombatantCombatStats>).forEach(
-    (stat) => {
-      const affixBonus = affixEffectSum(
-        affixEffects,
-        'CombatStat',
-        (effect) => effect.stat === stat,
-      );
-      combined[stat] = infusion[stat] + affixBonus;
-    },
-  );
-
-  return combined;
+  return equipmentItemBonusTotals(item, COMBAT_STAT_BONUS);
 }
 
 // Base + bonus combined - the comparison baseline for diffing a candidate item against what's equipped.

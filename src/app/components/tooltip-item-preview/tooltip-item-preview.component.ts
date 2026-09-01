@@ -6,14 +6,15 @@ import {
 } from '@angular/core';
 import type { TemplateRef } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
-import { RowCombatStatsComponent } from '@components/row-combat-stats/row-combat-stats.component';
-import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import type {
-  CombatantCombatStats,
-  ItemPreviewDisplay,
-  StatBlock,
-  StatusEffectTag,
+import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
+import {
+  CombatStatDimension,
+  StatusEffectTagDimension,
+  type CombatantCombatStats,
+  type ItemPreviewDisplay,
+  type StatBlock,
+  type StatusEffectTag,
 } from '@interfaces';
 
 // Headless: renders only an `ng-template` and exposes it via `template()`,
@@ -25,8 +26,7 @@ import type {
   imports: [
     IconItemPreviewComponent,
     RowItemStatsComponent,
-    RowDebuffResistancesComponent,
-    RowCombatStatsComponent,
+    RowLabeledValuesComponent,
   ],
   templateUrl: './tooltip-item-preview.component.html',
   styleUrl: './tooltip-item-preview.component.scss',
@@ -41,6 +41,9 @@ export class TooltipItemPreviewComponent {
   public bonusResistances = input<Record<StatusEffectTag, number>>();
   // Same idea as `bonusStats`, for combat stats.
   public bonusCombatStats = input<CombatantCombatStats>();
+
+  public resistanceDimension = StatusEffectTagDimension;
+  public combatStatDimension = CombatStatDimension;
 
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
 }

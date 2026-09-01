@@ -1,21 +1,17 @@
 import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
 import {
-  defaultCombatStats,
-  defaultStats,
-  defaultTagResistances,
-} from '@helpers/defaults';
-import {
   affixEffectsOfKind,
-  affixEffectSum,
   equipmentItemAffixEffects,
   rollAffixIds,
 } from '@helpers/item/affix';
 import {
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionCombatStatBonus,
-  equipmentItemInfusionResistanceBonus,
-} from '@helpers/item/infusion';
+  COMBAT_STAT_BONUS,
+  equipmentItemBonusTotals,
+  RESISTANCE_BONUS,
+  STAT_BONUS,
+} from '@helpers/item/equipment-bonus';
+import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngUuid } from '@helpers/rng';
 import {
@@ -27,6 +23,7 @@ import {
   type CombatantCombatStats,
   type EquipmentArmoryEntry,
   type EquipmentBlock,
+  type EquipmentBonusDimension,
   type EquipmentContent,
   type EquipmentId,
   type EquipmentItem,
@@ -179,91 +176,44 @@ export function equippedItemTypes(
     .filter((type): type is EquipmentItemType => !!type);
 }
 
-// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
-export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
-  const totals = defaultStats();
+// Sums one dimension's total (base content + infusion + affix) across every
+// equipped item, counting a two-hander once even though it fills two slots.
+function equipmentDimensionTotals<K extends string>(
+  equipment: EquipmentBlock,
+  dimension: EquipmentBonusDimension<K>,
+): Record<K, number> {
+  const totals = dimension.defaultBlock();
 
   equippedItems(equipment).forEach((item) => {
     const content = getEntry<EquipmentContent>(item.equipmentId);
     if (!content) return;
 
-    const infusionBonus = equipmentItemInfusionBonus(item.infusedItemIds);
-    const affixEffects = equipmentItemAffixEffects(item);
+    const bonus = equipmentItemBonusTotals(item, dimension);
+    const base = dimension.equipmentBlock(content);
 
-    (Object.keys(totals) as Array<keyof StatBlock>).forEach((stat) => {
-      const affixBonus = affixEffectSum(
-        affixEffects,
-        'Stat',
-        (effect) => effect.stat === stat,
-      );
-      totals[stat] +=
-        content.baseStats[stat] + infusionBonus[stat] + affixBonus;
+    (Object.keys(totals) as K[]).forEach((key) => {
+      totals[key] += (base?.[key] ?? 0) + bonus[key];
     });
   });
 
   return totals;
 }
 
-// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
+export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
+  return equipmentDimensionTotals(equipment, STAT_BONUS);
+}
+
+// Applied at combat creation, not baked into `Character.stats` - see `combatStatsForCharacterEquipment`.
 export function equipmentCombatStatTotals(
   equipment: EquipmentBlock,
 ): CombatantCombatStats {
-  const totals = defaultCombatStats();
-
-  equippedItems(equipment).forEach((item) => {
-    const content = getEntry<EquipmentContent>(item.equipmentId);
-    if (!content) return;
-
-    const infusionBonus = equipmentItemInfusionCombatStatBonus(
-      item.infusedItemIds,
-    );
-    const affixEffects = equipmentItemAffixEffects(item);
-
-    (Object.keys(totals) as Array<keyof CombatantCombatStats>).forEach(
-      (stat) => {
-        const affixBonus = affixEffectSum(
-          affixEffects,
-          'CombatStat',
-          (effect) => effect.stat === stat,
-        );
-        totals[stat] +=
-          (content.combatStats?.[stat] ?? 0) + infusionBonus[stat] + affixBonus;
-      },
-    );
-  });
-
-  return totals;
+  return equipmentDimensionTotals(equipment, COMBAT_STAT_BONUS);
 }
 
-// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
 export function equipmentTagResistanceTotals(
   equipment: EquipmentBlock,
 ): Record<StatusEffectTag, number> {
-  const totals = defaultTagResistances();
-
-  equippedItems(equipment).forEach((item) => {
-    const content = getEntry<EquipmentContent>(item.equipmentId);
-    if (!content) return;
-
-    const infusionBonus = equipmentItemInfusionResistanceBonus(
-      item.infusedItemIds,
-    );
-    const affixEffects = equipmentItemAffixEffects(item);
-
-    (Object.keys(totals) as StatusEffectTag[]).forEach((tag) => {
-      const affixBonus = affixEffectSum(
-        affixEffects,
-        'Resistance',
-        (effect) => effect.tag === tag,
-      );
-      totals[tag] +=
-        (content.debuffResistances?.[tag] ?? 0) +
-        infusionBonus[tag] +
-        affixBonus;
-    });
-  });
-
-  return totals;
+  return equipmentDimensionTotals(equipment, RESISTANCE_BONUS);
 }
 
 // Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
@@ -279,6 +229,15 @@ export function characterTagResistances(
   character: Character,
 ): Record<StatusEffectTag, number> {
   return equipmentTagResistanceTotals(character.equipment);
+}
+
+// The combat-stat analog of `characterTagResistances` - gear-only, not the
+// in-combat value (which also factors in `combatStatsForCharacterEquipment`'s
+// default baseline, meaningless outside a `Combatant`).
+export function characterCombatStatTotals(
+  character: Character,
+): CombatantCombatStats {
+  return equipmentCombatStatTotals(character.equipment);
 }
 
 // Merging these into known skills is handled separately (see `mergeGrantedSkills`/`heroSkillsWithEquipment`), which needs skill content, not just ids.

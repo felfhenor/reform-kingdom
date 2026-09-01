@@ -19,8 +19,6 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/item/infusion', () => ({
   equipmentItemInfusionBonus: vi.fn(),
-  equipmentItemInfusionCombatStatBonus: vi.fn(),
-  equipmentItemInfusionResistanceBonus: vi.fn(),
 }));
 
 vi.mock('@helpers/item/materials', async (importOriginal) => {
@@ -40,11 +38,7 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { getEntry } from '@helpers/content';
-import {
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionCombatStatBonus,
-  equipmentItemInfusionResistanceBonus,
-} from '@helpers/item/infusion';
+import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import {
   armoryAdd,
   armoryGet,
@@ -344,12 +338,6 @@ describe('Armory Helper Functions', () => {
   describe('equipmentSellValue', () => {
     beforeEach(() => {
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
-      vi.mocked(equipmentItemInfusionCombatStatBonus).mockReturnValue(
-        defaultCombatStats(),
-      );
-      vi.mocked(equipmentItemInfusionResistanceBonus).mockReturnValue(
-        defaultTagResistances(),
-      );
     });
 
     it('prices a bare item from its base stats and level, scaled by rarity', () => {
@@ -534,19 +522,23 @@ describe('Armory Helper Functions', () => {
         family: 'StunResist',
         effects: [{ kind: 'Resistance', tag: 'Stun', value: 3 }],
       };
+      const spiritFlesh = {
+        id: 'spirit-flesh' as never,
+        infusionDebuffResistances: { ...defaultTagResistances(), Stun: 1 },
+      };
       vi.mocked(getEntry).mockImplementation((id) =>
-        (id === stunAffix.id ? stunAffix : undefined) as never,
+        (id === stunAffix.id
+          ? stunAffix
+          : id === spiritFlesh.id
+            ? spiritFlesh
+            : undefined) as never,
       );
-      vi.mocked(equipmentItemInfusionResistanceBonus).mockReturnValue({
-        ...defaultTagResistances(),
-        Stun: 1,
-      });
 
       const entry = {
         item: {
           id: 'sword-1' as EquipmentItemId,
           equipmentId: sword.id,
-          infusedItemIds: ['spirit-flesh' as never],
+          infusedItemIds: [spiritFlesh.id],
           affixIds: [stunAffix.id],
         },
         content: {
@@ -565,12 +557,6 @@ describe('Armory Helper Functions', () => {
   describe('sellEquipmentItems', () => {
     beforeEach(() => {
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
-      vi.mocked(equipmentItemInfusionCombatStatBonus).mockReturnValue(
-        defaultCombatStats(),
-      );
-      vi.mocked(equipmentItemInfusionResistanceBonus).mockReturnValue(
-        defaultTagResistances(),
-      );
     });
 
     it('removes only the sold items from the armory and credits their gold value', () => {

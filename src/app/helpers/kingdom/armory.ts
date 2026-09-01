@@ -3,10 +3,11 @@ import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import {
-  equipmentItemInfusionBonus,
-  equipmentItemInfusionCombatStatBonus,
-  equipmentItemInfusionResistanceBonus,
-} from '@helpers/item/infusion';
+  COMBAT_STAT_BONUS,
+  equipmentItemBonusTotals,
+  RESISTANCE_BONUS,
+} from '@helpers/item/equipment-bonus';
+import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { gainGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -127,23 +128,13 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
 
   // Combat stats (base + infusion + affix) are also a flat bonus, unscaled by rarity - same treatment as SellValue.
   const combatStatTotal =
-    sum(Object.values(entry.content.combatStats ?? {})) +
-    sum(
-      Object.values(
-        equipmentItemInfusionCombatStatBonus(entry.item.infusedItemIds),
-      ),
-    ) +
-    affixEffectSum(affixEffects, 'CombatStat');
+    sum(Object.values(COMBAT_STAT_BONUS.equipmentBlock(entry.content) ?? {})) +
+    sum(Object.values(equipmentItemBonusTotals(entry.item, COMBAT_STAT_BONUS)));
 
   // Debuff resistances (base + infusion + affix) get the same flat treatment.
   const resistanceTotal =
-    sum(Object.values(entry.content.debuffResistances ?? {})) +
-    sum(
-      Object.values(
-        equipmentItemInfusionResistanceBonus(entry.item.infusedItemIds),
-      ),
-    ) +
-    affixEffectSum(affixEffects, 'Resistance');
+    sum(Object.values(RESISTANCE_BONUS.equipmentBlock(entry.content) ?? {})) +
+    sum(Object.values(equipmentItemBonusTotals(entry.item, RESISTANCE_BONUS)));
 
   return Math.max(
     1,

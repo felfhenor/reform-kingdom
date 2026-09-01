@@ -6,13 +6,17 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { RowCombatStatsComponent } from '@components/row-combat-stats/row-combat-stats.component';
-import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
+import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
 import { isInfusionMaterial } from '@helpers/item/infusion';
-import type { ItemContent, ItemId } from '@interfaces';
+import {
+  CombatStatDimension,
+  StatusEffectTagDimension,
+  type ItemContent,
+  type ItemId,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -22,8 +26,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     AtlasImageComponent,
     SlotIconBlankComponent,
     RowItemStatsComponent,
-    RowDebuffResistancesComponent,
-    RowCombatStatsComponent,
+    RowLabeledValuesComponent,
     TippyDirective,
   ],
   templateUrl: './row-infused-materials.component.html',
@@ -36,6 +39,9 @@ export class RowInfusedMaterialsComponent {
   // pick a target slot). Purely visual/read-only when left unset.
   public selectedSlotIndex = input<number>();
   public slotClick = output<number>();
+
+  public resistanceDimension = StatusEffectTagDimension;
+  public combatStatDimension = CombatStatDimension;
 
   public slots = computed(() =>
     Array.from({ length: this.maxSlots() }, (_, index) => {

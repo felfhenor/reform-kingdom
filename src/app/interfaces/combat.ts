@@ -15,6 +15,7 @@ import type {
 import type { ElementBlock } from '@interfaces/element';
 import type { Branded } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
+import type { StatDisplayDimension } from '@interfaces/stat-display';
 
 export type CombatId = Branded<string, 'CombatId'>;
 
@@ -37,45 +38,56 @@ export type CombatantCombatStats = {
 
 export type CombatStat = keyof CombatantCombatStats;
 
-// Display order for combat stats in UI rows (tooltips, panels, etc.).
-export const CombatStatOrder: CombatStat[] = [
-  'repeatActionChance',
-  'skillStrikeAgainChance',
-  'damageReflectPercent',
-  'debuffIgnoreChance',
-  'reviveChance',
-  'agroValue',
-  'missChance',
-  'stunChance',
-  'redirectionChance',
-  'healingIgnorePercent',
-];
-
-export const CombatStatLabel: Record<CombatStat, string> = {
-  repeatActionChance: 'Extra Turn Chance',
-  skillStrikeAgainChance: 'Skill Repeat Chance',
-  redirectionChance: 'Confusion Chance',
-  missChance: 'Miss Chance',
-  debuffIgnoreChance: 'Debuff Resist Chance',
-  damageReflectPercent: 'Damage Reflect Percent',
-  healingIgnorePercent: 'Healing Reduction Percent',
-  reviveChance: 'Revive Chance',
-  stunChance: 'Self-Stun Chance',
-  agroValue: 'Aggro',
-};
-
 // Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier (see `rngSucceedsChance`).
-export const CombatStatIsPercent: Record<CombatStat, boolean> = {
-  repeatActionChance: true,
-  skillStrikeAgainChance: true,
-  redirectionChance: true,
-  missChance: true,
-  debuffIgnoreChance: true,
-  damageReflectPercent: true,
-  healingIgnorePercent: true,
-  reviveChance: true,
-  stunChance: true,
-  agroValue: false,
+export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
+  order: [
+    'repeatActionChance',
+    'skillStrikeAgainChance',
+    'damageReflectPercent',
+    'debuffIgnoreChance',
+    'reviveChance',
+    'agroValue',
+    'missChance',
+    'stunChance',
+    'redirectionChance',
+    'healingIgnorePercent',
+  ],
+  label: {
+    repeatActionChance: 'Extra Turn Chance',
+    skillStrikeAgainChance: 'Skill Repeat Chance',
+    redirectionChance: 'Confusion Chance',
+    missChance: 'Miss Chance',
+    debuffIgnoreChance: 'Debuff Resist Chance',
+    damageReflectPercent: 'Damage Reflect',
+    healingIgnorePercent: 'Healing Reduction',
+    reviveChance: 'Revive Chance',
+    stunChance: 'Self-Stun Chance',
+    agroValue: 'Aggro',
+  },
+  icon: {
+    repeatActionChance: 'gameExtraTime',
+    skillStrikeAgainChance: 'gameDeadlyStrike',
+    redirectionChance: 'gameTwister',
+    missChance: 'gameDodge',
+    debuffIgnoreChance: 'gameMagicShield',
+    damageReflectPercent: 'gameShieldReflect',
+    healingIgnorePercent: 'gameBrokenHeart',
+    reviveChance: 'gameAngelWings',
+    stunChance: 'gameKnockedOutStars',
+    agroValue: 'gameTargeted',
+  },
+  isPercent: {
+    repeatActionChance: true,
+    skillStrikeAgainChance: true,
+    redirectionChance: true,
+    missChance: true,
+    debuffIgnoreChance: true,
+    damageReflectPercent: true,
+    healingIgnorePercent: true,
+    reviveChance: true,
+    stunChance: true,
+    agroValue: false,
+  },
 };
 
 export type CombatantTargettingType =

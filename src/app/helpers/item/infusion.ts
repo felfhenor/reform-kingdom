@@ -1,10 +1,11 @@
 import { getEntry } from '@helpers/content';
-import {
-  defaultCombatStats,
-  defaultStats,
-  defaultTagResistances,
-} from '@helpers/defaults';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
+import {
+  COMBAT_STAT_BONUS,
+  equipmentItemInfusionTotals,
+  RESISTANCE_BONUS,
+  STAT_BONUS,
+} from '@helpers/item/equipment-bonus';
 import { getGoldQuantity, getMaterialQuantity } from '@helpers/item/materials';
 import type {
   CombatantCombatStats,
@@ -25,63 +26,21 @@ const GOLD_PER_COMBAT_STAT_POINT = 50;
 export function equipmentItemInfusionBonus(
   infusedItemIds: (ItemId | null)[],
 ): StatBlock {
-  const bonus = defaultStats();
-
-  infusedItemIds.forEach((itemId) => {
-    if (!itemId) return;
-
-    const stats = getEntry<ItemContent>(itemId)?.infusionStats;
-    if (!stats) return;
-
-    (Object.keys(bonus) as Array<keyof StatBlock>).forEach((stat) => {
-      bonus[stat] += stats[stat];
-    });
-  });
-
-  return bonus;
+  return equipmentItemInfusionTotals(infusedItemIds, STAT_BONUS);
 }
 
 // Sibling of `equipmentItemInfusionBonus` for per-tag debuff resistance.
 export function equipmentItemInfusionResistanceBonus(
   infusedItemIds: (ItemId | null)[],
 ): Record<StatusEffectTag, number> {
-  const bonus = defaultTagResistances();
-
-  infusedItemIds.forEach((itemId) => {
-    if (!itemId) return;
-
-    const resistances =
-      getEntry<ItemContent>(itemId)?.infusionDebuffResistances;
-    if (!resistances) return;
-
-    (Object.keys(bonus) as StatusEffectTag[]).forEach((tag) => {
-      bonus[tag] += resistances[tag];
-    });
-  });
-
-  return bonus;
+  return equipmentItemInfusionTotals(infusedItemIds, RESISTANCE_BONUS);
 }
 
 // Sibling of `equipmentItemInfusionBonus` for combat stats.
 export function equipmentItemInfusionCombatStatBonus(
   infusedItemIds: (ItemId | null)[],
 ): CombatantCombatStats {
-  const bonus = defaultCombatStats();
-
-  infusedItemIds.forEach((itemId) => {
-    if (!itemId) return;
-
-    const stats = getEntry<ItemContent>(itemId)?.infusionCombatStats;
-    if (!stats) return;
-
-    (Object.keys(bonus) as Array<keyof CombatantCombatStats>).forEach(
-      (stat) => {
-        bonus[stat] += stats[stat];
-      },
-    );
-  });
-
-  return bonus;
+  return equipmentItemInfusionTotals(infusedItemIds, COMBAT_STAT_BONUS);
 }
 
 export function equipmentItemSlotCount(item: EquipmentItem): number {
@@ -95,15 +54,15 @@ export function equipmentItemSlotCount(item: EquipmentItem): number {
 }
 
 export function isInfusionMaterial(item: ItemContent): boolean {
-  const hasStatBonus =
-    !!item.infusionStats &&
-    Object.values(item.infusionStats).some((value) => value !== 0);
-  const hasResistanceBonus =
-    !!item.infusionDebuffResistances &&
-    Object.values(item.infusionDebuffResistances).some((value) => value !== 0);
-  const hasCombatStatBonus =
-    !!item.infusionCombatStats &&
-    Object.values(item.infusionCombatStats).some((value) => value !== 0);
+  const hasStatBonus = Object.values(
+    STAT_BONUS.infusionBlock(item) ?? {},
+  ).some((value) => value !== 0);
+  const hasResistanceBonus = Object.values(
+    RESISTANCE_BONUS.infusionBlock(item) ?? {},
+  ).some((value) => value !== 0);
+  const hasCombatStatBonus = Object.values(
+    COMBAT_STAT_BONUS.infusionBlock(item) ?? {},
+  ).some((value) => value !== 0);
 
   return hasStatBonus || hasResistanceBonus || hasCombatStatBonus;
 }
@@ -114,18 +73,16 @@ export function isInfusionMaterial(item: ItemContent): boolean {
 // +1% resistance -> 100g, +1 combat stat -> 50g).
 export function infusionMaterialCost(itemId: ItemId): number {
   const content = getEntry<ItemContent>(itemId);
-  const stats = content?.infusionStats;
-  const resistances = content?.infusionDebuffResistances;
-  const combatStats = content?.infusionCombatStats;
-  if (!stats && !resistances && !combatStats) return 0;
+  if (!content) return 0;
 
-  const statCost = stats ? GOLD_PER_STAT_POINT * sum(Object.values(stats)) : 0;
-  const resistanceCost = resistances
-    ? GOLD_PER_RESISTANCE_POINT * sum(Object.values(resistances))
-    : 0;
-  const combatStatCost = combatStats
-    ? GOLD_PER_COMBAT_STAT_POINT * sum(Object.values(combatStats))
-    : 0;
+  const statCost =
+    GOLD_PER_STAT_POINT * sum(Object.values(STAT_BONUS.infusionBlock(content) ?? {}));
+  const resistanceCost =
+    GOLD_PER_RESISTANCE_POINT *
+    sum(Object.values(RESISTANCE_BONUS.infusionBlock(content) ?? {}));
+  const combatStatCost =
+    GOLD_PER_COMBAT_STAT_POINT *
+    sum(Object.values(COMBAT_STAT_BONUS.infusionBlock(content) ?? {}));
 
   return Math.round(statCost + resistanceCost + combatStatCost);
 }

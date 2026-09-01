@@ -41,18 +41,20 @@
         }
 
         @if (item.resistances) {
-          <app-row-debuff-resistances
-            class="block mt-2"
-            [resistances]="item.resistances"
-            [bonusResistances]="bonusResistances()"
+          <app-row-labeled-values
+            class="block mt-2 text-xs"
+            [dimension]="resistanceDimension"
+            [values]="item.resistances"
+            [bonusValues]="bonusResistances()"
           />
         }
 
         @if (item.combatStats) {
-          <app-row-combat-stats
-            class="block mt-2"
-            [stats]="item.combatStats"
-            [bonusStats]="bonusCombatStats()"
+          <app-row-labeled-values
+            class="block mt-2 text-xs"
+            [dimension]="combatStatDimension"
+            [values]="item.combatStats"
+            [bonusValues]="bonusCombatStats()"
           />
         }
 

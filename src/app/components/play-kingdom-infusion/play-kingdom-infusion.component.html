@@ -98,16 +98,18 @@
                 [bonusStats]="selectedItemBonus()"
               />
 
-              <app-row-debuff-resistances
-                class="block mt-2"
-                [resistances]="content.debuffResistances"
-                [bonusResistances]="selectedItemResistanceBonus()"
+              <app-row-labeled-values
+                class="block mt-2 text-xs"
+                [dimension]="resistanceDimension"
+                [values]="content.debuffResistances"
+                [bonusValues]="selectedItemResistanceBonus()"
               />
 
-              <app-row-combat-stats
-                class="block mt-2"
-                [stats]="content.combatStats"
-                [bonusStats]="selectedItemCombatStatBonus()"
+              <app-row-labeled-values
+                class="block mt-2 text-xs"
+                [dimension]="combatStatDimension"
+                [values]="content.combatStats"
+                [bonusValues]="selectedItemCombatStatBonus()"
               />
             </div>
           </div>
@@ -172,15 +174,17 @@
                           [maxDecimals]="1"
                         />
 
-                        <app-row-debuff-resistances
+                        <app-row-labeled-values
                           class="text-xs"
-                          [resistances]="entry.item.infusionDebuffResistances"
+                          [dimension]="resistanceDimension"
+                          [values]="entry.item.infusionDebuffResistances"
                           [layout]="'row'"
                         />
 
-                        <app-row-combat-stats
+                        <app-row-labeled-values
                           class="text-xs"
-                          [stats]="entry.item.infusionCombatStats"
+                          [dimension]="combatStatDimension"
+                          [values]="entry.item.infusionCombatStats"
                           [layout]="'row'"
                         />
                       </div>
