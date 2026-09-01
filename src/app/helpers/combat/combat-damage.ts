@@ -5,6 +5,7 @@ import {
   combatFormatMessage,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
+import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitigation';
 import { combatCombatantCombatStatValue } from '@helpers/combat/combat-stats';
 import {
   combatApplyStatusEffectToTarget,
@@ -172,7 +173,11 @@ export function combatApplySkillToTarget(
     }
 
     if (!techniqueHasAttribute(technique, 'BypassDefense')) {
-      effectiveDamage = Math.max(0, effectiveDamage - targetDefense);
+      const rolledDefense = combatDamageMitigationRoll(
+        targetDefense,
+        target.totalStats.Luck,
+      );
+      effectiveDamage = Math.max(0, effectiveDamage - rolledDefense);
     }
 
     if (techniqueHasAttribute(technique, 'AllowPlink')) {

@@ -13,7 +13,13 @@ vi.mock('@helpers/content', () => ({ getEntry: vi.fn() }));
 
 vi.mock('@helpers/rng', async (importOriginal) => {
   const actual = await importOriginal<typeof RngHelper>();
-  return { ...actual, rngSucceedsChance: vi.fn().mockReturnValue(false) };
+  return {
+    ...actual,
+    rngSucceedsChance: vi.fn().mockReturnValue(false),
+    // 1 => mitigation roll always lands at the full ceiling, reproducing
+    // the old flat-subtraction numbers for the pre-existing defense tests.
+    rngUniform: vi.fn().mockReturnValue(1),
+  };
 });
 
 import {
@@ -27,7 +33,7 @@ import {
   combatLogReset,
 } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content';
-import { rngSucceedsChance } from '@helpers/rng';
+import { rngSucceedsChance, rngUniform } from '@helpers/rng';
 
 function buildCombat(overrides: Partial<Combat> = {}): Combat {
   return {
@@ -137,6 +143,7 @@ function buildTechnique(
 
 beforeEach(() => {
   vi.mocked(rngSucceedsChance).mockClear();
+  vi.mocked(rngUniform).mockClear();
   vi.mocked(getEntry).mockClear();
 });
 
@@ -299,6 +306,80 @@ describe('combatApplySkillToTarget defense', () => {
     // baseDamage = Strength(100) * 0.75 + Intelligence(100) * 0.25 = 100;
     // fully absorbed by defense (250), so no damage gets through.
     expect(target.hp).toBe(100 - Math.max(0, 100 - 250));
+  });
+});
+
+describe('combatApplySkillToTarget mitigation roll', () => {
+  function buildRollScenario(targetLuck: number) {
+    const attacker = buildCombatant({
+      totalStats: {
+        Agility: 0,
+        Energy: 0,
+        Health: 100,
+        Intelligence: 0,
+        Luck: 0,
+        Resistance: 0,
+        Strength: 100,
+        Vitality: 0,
+      },
+    });
+    const target = buildCombatant({
+      hp: 1000,
+      totalStats: {
+        Agility: 0,
+        Energy: 0,
+        Health: 1000,
+        Intelligence: 0,
+        Luck: targetLuck,
+        Resistance: 0,
+        Strength: 0,
+        Vitality: 40,
+      },
+    });
+    const skill = buildSkill();
+    const technique = buildTechnique({
+      damageScaling: {
+        Agility: 0,
+        Energy: 0,
+        Health: 0,
+        Intelligence: 0,
+        Luck: 0,
+        Resistance: 0,
+        Strength: 1,
+        Vitality: 0,
+      },
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      skill,
+      technique,
+    );
+
+    // baseDamage = Strength(100) * 1 = 100; ceiling = Vitality(40).
+    return target.hp;
+  }
+
+  it('rolls below the flat ceiling when rngUniform is below 1', () => {
+    vi.mocked(rngUniform).mockReturnValue(0.5);
+
+    // diceEquivalent at 0 Luck = 2, so rolled defense = 40 * 0.5^(1/2) ≈ 28.28.
+    const hp = buildRollScenario(0);
+
+    expect(hp).toBe(1000 - Math.floor(100 - 40 * 0.5 ** (1 / 2)));
+  });
+
+  it('raises the rolled defense as target Luck increases, for the same roll', () => {
+    vi.mocked(rngUniform).mockReturnValue(0.5);
+
+    const hpAtZeroLuck = buildRollScenario(0);
+    const hpAtHighLuck = buildRollScenario(50);
+
+    // Same rngUniform draw, but 50 Luck (diceEquivalent 7) skews closer to
+    // the ceiling than 0 Luck (diceEquivalent 2) - higher HP remaining.
+    expect(hpAtHighLuck).toBeGreaterThan(hpAtZeroLuck);
   });
 });
 

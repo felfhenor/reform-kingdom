@@ -7,6 +7,7 @@ import {
   rngSeeded,
   rngShuffle,
   rngSucceedsChance,
+  rngUniform,
   rngUuid,
 } from '@helpers/rng';
 import type { Identifiable } from '@interfaces';
@@ -42,6 +43,21 @@ describe('RNG Helper Functions', () => {
       const rng2 = rngSeeded('test-seed-2');
 
       expect(rng1()).not.toBe(rng2());
+    });
+  });
+
+  describe('rngUniform', () => {
+    it('returns the raw draw from the given rng, in [0, 1)', () => {
+      const value = rngUniform(rngSeeded('test-seed'));
+
+      expect(value).toBeGreaterThanOrEqual(0);
+      expect(value).toBeLessThan(1);
+    });
+
+    it('returns consistent results for the same seed', () => {
+      expect(rngUniform(rngSeeded('test-seed'))).toBe(
+        rngUniform(rngSeeded('test-seed')),
+      );
     });
   });
 

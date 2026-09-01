@@ -46,6 +46,10 @@ export function rngNumber(max: number, rng = rngSeeded(rngUuid())): number {
   return Math.floor(rng() * max);
 }
 
+export function rngUniform(rng = rngSeeded(rngUuid())): number {
+  return rng();
+}
+
 export function rngNumberRange(
   min: number,
   max: number,

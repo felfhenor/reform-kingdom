@@ -42,7 +42,7 @@ export const StatInformation: Record<BaseStat, string> = {
   Health:
     'HP determines how many Health Points a hero has when going into an encounter.',
   Intelligence: 'Intelligence is used primarily to scale magical skills.',
-  Luck: 'Luck is used to mitigate incoming debuffs, get critical hits, and rarely contributes to damage scaling for some skills.',
+  Luck: 'Luck is used to mitigate incoming damage, debuffs, get critical hits, and rarely contributes to damage scaling for some skills.',
   Resistance: 'Resistance is used to mitigate incoming magical damage.',
   Strength: 'Strength is used primarily to scale physical skills.',
   Vitality: 'Vitality is used to mitigate incoming physical damage.',

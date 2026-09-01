@@ -8,6 +8,7 @@
  */
 
 import { maxBy, sumBy } from 'es-toolkit/compat';
+import { combatDamageMitigationExpectedValue } from '@helpers/combat/combat-damage-mitigation';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import {
   addStats,
@@ -194,6 +195,14 @@ function statRow(job: JobContent, stats: StatBlock): Record<string, string | num
     row[stat] = round2(stats[stat]);
   });
   row['Total'] = round2(statSum(stats));
+  // Expected value of the mitigation roll (combat-damage-mitigation.ts),
+  // not the raw stat - what actually lands on defense in combat, on average.
+  row['Avg Phys Mit'] = round2(
+    combatDamageMitigationExpectedValue(stats.Vitality, stats.Luck),
+  );
+  row['Avg Mag Mit'] = round2(
+    combatDamageMitigationExpectedValue(stats.Resistance, stats.Luck),
+  );
   return row;
 }
 
@@ -284,7 +293,13 @@ export function runHeroStatsAnalysis(params: AnalysisParams): AnalysisRunResult 
     });
   });
 
-  const statColumns = ['Job', ...STAT_NAMES, 'Total'];
+  const statColumns = [
+    'Job',
+    ...STAT_NAMES,
+    'Total',
+    'Avg Phys Mit',
+    'Avg Mag Mit',
+  ];
   const tables: AnalysisTable[] = [
     { title: `MIN (unequipped) stats at level ${level}`, columns: statColumns, rows: minRows },
     { title: `MID (average of min/max) stats at level ${level}`, columns: statColumns, rows: midRows },
