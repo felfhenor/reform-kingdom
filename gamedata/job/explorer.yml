@@ -75,3 +75,8 @@
 
         - level: 21
           skillId: Lucky Charm II
+
+    - pathName: Zephyr
+      levels:
+        - level: 24
+          skillId: Zephyr I

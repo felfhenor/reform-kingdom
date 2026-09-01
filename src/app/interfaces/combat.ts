@@ -2,8 +2,8 @@ import type { HasAnimation } from '@interfaces/artable';
 import type { CharacterId } from '@interfaces/character';
 import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { EncounterId } from '@interfaces/content-encounter';
-import type { JobId } from '@interfaces/content-job';
 import type { EncounterRandomId } from '@interfaces/content-encounter-random';
+import type { JobId } from '@interfaces/content-job';
 import type {
   EquipmentSkill,
   EquipmentSkillId,
@@ -34,6 +34,7 @@ export type CombatantCombatStats = {
   healingIgnorePercent: number;
   reviveChance: number;
   stunChance: number;
+  agroValue: number;
 };
 
 export type CombatantTargettingType =

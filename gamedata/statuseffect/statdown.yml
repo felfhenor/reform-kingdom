@@ -302,3 +302,27 @@
     - type: AddDamageToStat
       combatMessage: '**{{ combatant.name }}** is no longer disgusted (+{{ damage }} Vitality)!'
       modifyStat: Vitality
+
+- id: 88812a39-580f-466e-98ff-ca495550f925
+  name: Scorched
+
+  effectType: Debuff
+  elements: [Fire]
+  tags: [StatDown]
+
+  trigger: TurnEnd
+
+  useTargetStats: true
+
+  statScaling:
+    Agility: 0.5
+
+  onApply:
+    - type: AddCombatStatNumber
+      combatStat: healingIgnorePercent
+      value: 50
+
+  onUnapply:
+    - type: TakeCombatStatNumber
+      combatStat: healingIgnorePercent
+      value: 50

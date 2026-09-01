@@ -75,7 +75,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
     baseStats: {} as never,
     statBoosts: {} as never,
     totalStats: {} as never,
-    combatStats: {} as never,
+    combatStats: { agroValue: 0 } as never,
     resistance: {} as never,
     affinity: {} as never,
     tagResistance: {} as never,
@@ -217,6 +217,46 @@ describe('combatGetTargetsFromListBasedOnType', () => {
         context,
       ),
     ).toEqual([critical]);
+  });
+
+  it('always includes an agro\'d combatant in a partial AoE selection, even if hp ordering would exclude them', () => {
+    const agroed = buildCombatant({
+      id: 'agroed',
+      hp: 100,
+      combatStats: { agroValue: 10 } as never,
+    });
+    const weakest = buildCombatant({ id: 'weakest', hp: 1 });
+    const other = buildCombatant({ id: 'other', hp: 5 });
+
+    const result = combatGetTargetsFromListBasedOnType(
+      [agroed, weakest, other],
+      'Weakest',
+      2,
+    );
+
+    expect(sortBy(result, (c) => c.id)).toEqual([agroed, weakest]);
+  });
+
+  it('picks the highest-agro combatant as the sole target for a single-target skill, ignoring hp ordering', () => {
+    const lowAgro = buildCombatant({
+      id: 'low-agro',
+      hp: 1,
+      combatStats: { agroValue: 10 } as never,
+    });
+    const highAgro = buildCombatant({
+      id: 'high-agro',
+      hp: 100,
+      combatStats: { agroValue: 50 } as never,
+    });
+    const noAgro = buildCombatant({ id: 'no-agro', hp: 1 });
+
+    const result = combatGetTargetsFromListBasedOnType(
+      [lowAgro, highAgro, noAgro],
+      'Weakest',
+      1,
+    );
+
+    expect(result).toEqual([highAgro]);
   });
 });
 

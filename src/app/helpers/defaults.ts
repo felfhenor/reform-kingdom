@@ -135,6 +135,7 @@ export function defaultCombatStats(): CombatantCombatStats {
     healingIgnorePercent: 0,
     reviveChance: 0,
     stunChance: 0,
+    agroValue: 0,
   };
 }
 

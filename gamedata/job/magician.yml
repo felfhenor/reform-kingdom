@@ -80,3 +80,8 @@
 
         - level: 29
           skillId: Frostfire Bolt III
+
+    - pathName: Broil
+      levels:
+        - level: 25
+          skillId: Broil I

@@ -1,0 +1,83 @@
+- id: a2b6fd51-642a-4147-aa28-f41da85643e8
+  name: Regrowth I
+  family: Regrowth
+  description: Heal 2+ living allies for a total of {{ value }} HP.
+
+  sprite: '0031'
+
+  rarity: Common
+
+  epCost: 16
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [BypassDefense, HealsTarget]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Agility: 1
+        Intelligence: 0.5
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [BypassDefense, HealsTarget]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Agility: 0.5
+        Intelligence: 0.25
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: a1d5adcd-f7f8-4add-8c78-25f6ab973d83
+  name: Regrowth II
+  family: Regrowth
+  description: Heal 2+ living allies for a total of {{ value }} HP.
+
+  sprite: '0031'
+
+  rarity: Uncommon
+
+  epCost: 31
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [BypassDefense, HealsTarget]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Agility: 1.5
+        Intelligence: 0.75
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [BypassDefense, HealsTarget]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Agility: 1
+        Intelligence: 0.5
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

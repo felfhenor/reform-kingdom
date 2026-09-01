@@ -143,11 +143,37 @@ export function combatGetTargetsFromListBasedOnType(
   select: number,
   context?: CombatTargetModeContext,
 ): Combatant[] {
+  const targetsWithAgro = sortBy(
+    combatants.filter((c) => c.combatStats.agroValue > 0),
+    (c) => -c.combatStats.agroValue,
+  );
+  const targetsWithoutAgro = combatants.filter(
+    (c) => c.combatStats.agroValue <= 0,
+  );
+
   const targettingActions: Record<CombatantTargettingType, () => Combatant[]> =
     {
-      Random: () => sampleSize(combatants, select),
-      Strongest: () => sortBy(combatants, (c) => -c.hp).slice(0, select),
-      Weakest: () => sortBy(combatants, (c) => c.hp).slice(0, select),
+      Random: () =>
+        [
+          ...targetsWithAgro,
+          ...sampleSize(targetsWithoutAgro, select - targetsWithAgro.length),
+        ].slice(0, select),
+      Strongest: () =>
+        [
+          ...targetsWithAgro,
+          ...sortBy(targetsWithoutAgro, (c) => -c.hp).slice(
+            0,
+            Math.max(0, select - targetsWithAgro.length),
+          ),
+        ].slice(0, select),
+      Weakest: () =>
+        [
+          ...targetsWithAgro,
+          ...sortBy(targetsWithoutAgro, (c) => c.hp).slice(
+            0,
+            Math.max(0, select - targetsWithAgro.length),
+          ),
+        ].slice(0, select),
       Self: () => combatants.filter((c) => c === context?.combatant),
       SpecificHero: () =>
         combatants.filter((c) => c.id === context?.targetCharacterId),

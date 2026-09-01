@@ -90,3 +90,8 @@
 
         - level: 14
           skillId: Empower II
+
+    - pathName: Spiked Smash
+      levels:
+        - level: 24
+          skillId: Spiked Smash I

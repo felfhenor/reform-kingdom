@@ -82,3 +82,8 @@
 
         - level: 26
           skillId: Smashing Board III
+
+    - pathName: Taunt
+      levels:
+        - level: 20
+          skillId: Taunt I

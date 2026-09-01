@@ -74,3 +74,11 @@
 
         - level: 15
           skillId: Arrow Rain II
+
+    - pathName: Regrowth
+      levels:
+        - level: 13
+          skillId: Regrowth I
+
+        - level: 29
+          skillId: Regrowth II

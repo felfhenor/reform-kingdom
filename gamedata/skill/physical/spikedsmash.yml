@@ -1,0 +1,32 @@
+- id: acb6692e-c647-4346-9ea7-651ec0c33fc1
+  name: Spiked Smash I
+  family: Spiked Smash
+  description: Smash the spikes of your mace into an enemy, dealing {{ value }} damage and having a chance to inflict Stunned on them.
+
+  rarity: Common
+  sprite: '0028'
+
+  epCost: 15
+  usesPerCombat: -1
+
+  requiredWeaponTypes: [Mace]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 2.5
+
+      statusEffects:
+        - statusEffectId: Stunned
+          chance: 25
+          duration: 1
+
+      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

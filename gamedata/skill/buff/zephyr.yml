@@ -1,0 +1,28 @@
+- id: 6a635fa1-76b3-4d5f-8faf-d5c49dc34433
+  name: Zephyr I
+  family: Zephyr
+  description: Increase the Agility and repeat action chance of all allies.
+
+  sprite: '0029'
+
+  rarity: Common
+
+  epCost: 25
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Air]
+      attributes: [Buff]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Zephyr Boost I
+
+      statusEffects:
+        - statusEffectId: Zephyr Boost I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'

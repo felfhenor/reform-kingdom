@@ -12,3 +12,6 @@
   baseStats:
     Strength: 9.6
     Intelligence: 7.8
+
+  grantedSkillIds:
+    - Spiked Smash I

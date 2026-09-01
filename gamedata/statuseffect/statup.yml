@@ -132,3 +132,50 @@
     - type: TakeDamageFromStat
       combatMessage: '**{{ combatant.name }}** is no longer covered in protective slime (+{{ damage }} Vitality)!'
       modifyStat: Vitality
+
+- id: 9bdca754-a92b-417e-bc21-9e2d6bc2e53c
+  name: Zephyr Boost I
+
+  effectType: Buff
+  elements: [Air]
+
+  trigger: TurnStart
+
+  statScaling:
+    Agility: 0.4
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has gained the speed of the wind (+{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: AddCombatStatNumber
+      combatStat: skillStrikeAgainChance
+      value: 10
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has lost their speed of the wind (-{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: TakeCombatStatNumber
+      combatStat: skillStrikeAgainChance
+      value: 10
+
+- id: eecca871-8d48-4b7d-8cec-dd9d5acf32a8
+  name: Taunting I
+
+  effectType: Buff
+  elements: [Fire]
+
+  trigger: TurnStart
+
+  onApply:
+    - type: AddCombatStatNumber
+      combatStat: agroValue
+      value: 50
+
+  onUnapply:
+    - type: TakeCombatStatNumber
+      combatStat: agroValue
+      value: 50

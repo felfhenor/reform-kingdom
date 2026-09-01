@@ -1,0 +1,28 @@
+- id: b8c9f249-69a2-4b0c-b14f-758726b2780b
+  name: Taunt I
+  family: Taunt
+  description: Increase the chance of enemies targetting the caster.
+
+  sprite: '0032'
+
+  rarity: Common
+
+  epCost: 15
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Fire]
+      attributes: [Buff]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Taunting I
+
+      statusEffects:
+        - statusEffectId: Taunting I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** taunts all foes!'

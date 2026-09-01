@@ -1,0 +1,36 @@
+- id: 4995ad60-7a52-4a5b-b94f-06a9593a3e4f
+  name: Broil I
+  family: Broil
+  description: Broil 1 enemy alive for {{ value }} fire damage, with a 75% chance of inflicting Burning and a 50% chance of inflicting Scorched.
+
+  sprite: '0030'
+
+  rarity: Common
+
+  epCost: 40
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.75
+        Resistance: 1
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 75
+          duration: 3
+
+        - statusEffectId: Scorched
+          chance: 50
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
