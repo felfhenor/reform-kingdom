@@ -1,0 +1,29 @@
+- id: fbb8172a-296d-4360-9e3e-5c9c02ba0b02
+  name: Larsian Cloak
+  description: A cloak style popularized in Larsia. It keeps the wearer cool and allows the wearer to be very mobile.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0133'
+  slots: 1
+  baseStats:
+    Resistance: 9.2
+    Agility: 8.7
+    Vitality: 3.7
+
+  debuffResistances:
+    Burn: 5
+
+- id: 4094575a-2ef9-4844-b86f-816f58f913b2
+  name: Cimmerian Cloak
+  description: A style of cloak nearly lost to time. It's a rare find in modern society.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0135'
+  slots: 1
+  baseStats:
+    Resistance: 17.2
+
+  debuffResistances:
+    Accuracy: 5

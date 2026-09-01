@@ -1,0 +1,30 @@
+# Primary Stat: Strength
+# Secondary Stat: Agility
+
+- id: 403684e2-d777-42ab-bcb1-5f26a16cae6b
+  name: Larsian Bow
+  description: A bow made of strange Larsian materials. It works, but feels inefficient.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Bow
+  sprite: '0130'
+  slots: 1
+  baseStats:
+    Strength: 9.4
+    Agility: 8.3
+    Vitality: -1.2
+
+- id: 802585c2-a264-4123-b04a-d96c5a2669f5
+  name: Cimmerian Bow
+  description: An ancient style of bow that helps the wearer resist dark magic.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Bow
+  sprite: '0132'
+  slots: 1
+  baseStats:
+    Strength: 11.8
+    Resistance: 6.2
+
+  debuffResistances:
+    Accuracy: 5

@@ -1,0 +1,14 @@
+# Primary Stat: Strength
+# Secondary Stat: Intelligence
+
+- id: c97a5567-53f6-41ff-86c6-6aa19ceab149
+  name: Larsian Greatmace
+  description: A mace made of petrifiwood. It makes a big thud when it strikes.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Mace
+  sprite: '0127'
+  slots: 1
+  baseStats:
+    Strength: 9.6
+    Intelligence: 7.8

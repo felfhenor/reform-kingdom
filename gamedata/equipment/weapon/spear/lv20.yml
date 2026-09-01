@@ -13,3 +13,15 @@
     Strength: 7.2
     Agility: 2.1
     Resistance: 4.5
+
+- id: 6320cb81-eb3c-4093-ae1a-3d5951e679ed
+  name: Larsian Spear
+  description: A spear made of petrifiwood and timberfuzz - a sturdy combination.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Spear
+  sprite: '0129'
+  slots: 1
+  baseStats:
+    Strength: 8.4
+    Agility: 4.2

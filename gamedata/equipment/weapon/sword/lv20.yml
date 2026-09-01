@@ -1,0 +1,14 @@
+# Primary Stat: Strength
+# Secondary Stat: Vitality
+
+- id: 40f78cb5-a779-4bc4-a247-561e7b94629c
+  name: Larsian Sword
+  description: A sword crafted with petrifiwood and timberfuzz, making a sturdy weapon that's also easy to use.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Sword
+  sprite: '0142'
+  slots: 1
+  baseStats:
+    Strength: 9.7
+    Agility: 9.7

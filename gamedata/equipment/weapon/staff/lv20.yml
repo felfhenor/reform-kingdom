@@ -1,0 +1,14 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Vitality
+
+- id: 699a8b9e-07eb-4404-ae8c-b7945c7a15c1
+  name: Larsian Staff
+  description: A staff made of magical cactspine.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Staff
+  sprite: '0120'
+  slots: 1
+  baseStats:
+    Intelligence: 15.2
+    Vitality: 7.1

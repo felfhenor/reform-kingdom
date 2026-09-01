@@ -14,3 +14,15 @@
   debuffResistances:
     Poison: 5
     Burn: 5
+
+- id: 1451bdd4-0b36-4005-bb1d-fea4e9007f43
+  name: Larsian Boots
+  description: A pair of Larsian boots set with amber. They're large enough to fit over another pair of boots, yet tight enough to be mobile.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Artifact
+  sprite: '0119'
+  slots: 2
+  baseStats:
+    Intelligence: 8.2
+    Agility: 4.9

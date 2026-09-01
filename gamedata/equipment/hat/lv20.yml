@@ -1,0 +1,30 @@
+- id: 67e77f5e-9a7d-4ea0-8b59-8f5ce2f37e98
+  name: Larsian Sunhat
+  description: A hat made of Larsian specialty goods. It keeps the wearers head cool at all times.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Hat
+  sprite: '0134'
+  slots: 1
+  baseStats:
+    Vitality: 4.6
+    Health: 16
+
+  debuffResistances:
+    Burn: 5
+
+- id: 670438a0-0d5b-4c63-b7c7-5f6d65127eb8
+  name: Cimmerian Darkhat
+  description: A hat nearly lost to time. It protects the wearer from the darkest of magic.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Hat
+  sprite: '0136'
+  slots: 1
+  baseStats:
+    Resistance: 8.1
+    Vitality: 2.1
+    Health: 5
+
+  debuffResistances:
+    Accuracy: 5

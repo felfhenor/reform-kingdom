@@ -12,3 +12,14 @@
   baseStats:
     Agility: 9.1
     Resistance: 5.1
+
+- id: 1c20e326-28f8-4baa-8af6-f185a60d5b47
+  name: Larsian Dirk
+  description: A dirk made in the Larsian style. It allows for excellent maneuverability in combat.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0124'
+  slots: 1
+  baseStats:
+    Agility: 15.2

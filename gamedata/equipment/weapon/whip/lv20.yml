@@ -1,0 +1,15 @@
+# Primary Stat: Intelligence
+# Secondary Stat: Resistance
+
+- id: a8ee1466-50db-4b29-b1f2-d895898da556
+  name: Larsian Whip
+  description: A whip made of magical cactspine and strongreed. It stings on contact!
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Whip
+  sprite: '0118'
+  slots: 1
+  baseStats:
+    Intelligence: 9.3
+    Resistance: 4.7
+    Strength: 3.3

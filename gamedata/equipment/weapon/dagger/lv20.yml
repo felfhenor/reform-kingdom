@@ -1,0 +1,14 @@
+# Primary Stat: Agility
+# Secondary Stat: Strength
+
+- id: c45ad63f-2b0a-45c6-bc71-fd68235e4c42
+  name: Larsian Dagger
+  description: A dagger made in the Larsian style. The grip feels solid and the blade feels sharp.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0128'
+  slots: 1
+  baseStats:
+    Agility: 8.7
+    Strength: 5.4

@@ -1,0 +1,14 @@
+- id: 5678d150-8c04-46dd-93e3-095887179be3
+  name: Larsian Breastplate
+  description: A breastplate made of petrifiwood. It protects the water well, and keeps them cool in the desert.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0123'
+  slots: 1
+  baseStats:
+    Vitality: 15.4
+    Resistance: 7.1
+
+  debuffResistances:
+    Burn: 5

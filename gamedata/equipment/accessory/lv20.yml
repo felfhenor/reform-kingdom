@@ -1,0 +1,28 @@
+- id: e4c66567-6124-469b-b01d-d21eeaf2f4c7
+  name: Desert Sandals
+  description: A pair of sandals favored by the Larsians. They allow for smooth travel in rough desert sands.
+  rarity: Uncommon
+  levelRequirement: 24
+  type: Accessory
+  sprite: '0141'
+  slots: 1
+  baseStats:
+    Vitality: 2.9
+
+  debuffResistances:
+    Burn: 5
+
+- id: 082063f9-59d0-4a57-8e29-e14a195def01
+  name: Cimmerian Bracer
+  description: A bracer made in the Cimmerian style. It helps the wearer resist the darkest of magic.
+  rarity: Uncommon
+  levelRequirement: 27
+  type: Accessory
+  sprite: '0122'
+  slots: 1
+  baseStats:
+    Luck: 1
+    Resistance: 3.4
+
+  debuffResistances:
+    Accuracy: 5

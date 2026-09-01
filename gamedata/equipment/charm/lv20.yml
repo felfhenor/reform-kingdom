@@ -15,3 +15,34 @@
     Stun: 15
     StatDown: 15
     Accuracy: 15
+
+- id: 6c56c2b5-7e87-4d43-a25f-870a6adba420
+  name: Desert Bangle
+  description: A bangle made by the Larsians to help keep the wearer cool and resist the scorching desert heat.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Charm
+  sprite: '0138'
+  slots: 1
+  baseStats:
+    Resistance: 8.1
+    Energy: 8
+
+  debuffResistances:
+    Burn: 5
+
+- id: dcd28145-2664-46a8-a784-f70076bd89ca
+  name: Cimmerian Bangle
+  description: A bangle worn by the ancient Cimmerians. It helps the wearer resist the darkest of magic.
+  levelRequirement: 27
+  rarity: Uncommon
+  type: Charm
+  sprite: '0121'
+  slots: 1
+  baseStats:
+    Energy: 15
+    Inteligence: 5.1
+    Resistance: 2.1
+
+  debuffResistances:
+    Accuracy: 5

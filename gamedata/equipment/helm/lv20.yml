@@ -1,0 +1,11 @@
+- id: 0fcfead9-790e-4a13-8fef-3c5e02f78585
+  name: Larsian Helm
+  description: A helm crafted from petrifiwood, it protects the wearer well.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Helm
+  sprite: '0125'
+  slots: 1
+  baseStats:
+    Health: 40
+    Vitality: 8.5

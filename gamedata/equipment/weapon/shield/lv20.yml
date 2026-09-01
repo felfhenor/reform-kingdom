@@ -1,0 +1,14 @@
+# Primary Stat: Vitality
+# Secondary Stat: Resistance
+
+- id: 6ea2fa68-c605-427b-913d-37704da89ca6
+  name: Larsian Tower Shield
+  description: A tall shield made of petrifiwood, set with a massive amber chunk.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Shield
+  sprite: '0126'
+  slots: 1
+  baseStats:
+    Vitality: 10.3
+    Resistance: 3.8

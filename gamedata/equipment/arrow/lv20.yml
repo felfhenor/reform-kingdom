@@ -1,0 +1,12 @@
+- id: 150ab269-3e16-4534-8898-8ff0e3335f5f
+  name: Larsian Arrow
+  description: An arrow made from timberfuzz with a cactspine tip. These fly fast and hurt a lot.
+  levelRequirement: 24
+  rarity: Uncommon
+  type: Arrow
+  sprite: '0131'
+  slots: 1
+  baseStats:
+    Strength: 4.3
+    Agility: 3.2
+    Energy: 8
