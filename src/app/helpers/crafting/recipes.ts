@@ -129,7 +129,7 @@ export async function recipeUnlockWithTokens(
 
   if (unlocked) {
     analyticsSendDesignEvent(
-      `Kingdom:Museum:RecipeUnlock:${analyticsSafeSegment(recipe.name)}`,
+      `Progress:Museum:RecipeUnlock:${analyticsSafeSegment(recipe.name)}`,
     );
   }
   return unlocked;

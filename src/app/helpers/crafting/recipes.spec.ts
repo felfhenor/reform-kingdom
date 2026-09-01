@@ -540,7 +540,7 @@ describe('Recipes Helper Functions', () => {
       );
       expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBeGreaterThan(0);
       expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-        'Kingdom:Museum:RecipeUnlock:Equipment Bone-Hewn Cloak',
+        'Progress:Museum:RecipeUnlock:Equipment Bone-Hewn Cloak',
       );
     });
 
