@@ -48,3 +48,117 @@
   maxTradeskillLevel: 18
   tradeskillXP: 150
   craftTime: 300
+
+- id: d9ebeb88-6c16-4318-8ce6-1ede4bfff283
+  name: 'Equipment: Larsian Breastplate'
+  result:
+    equipmentId: Larsian Breastplate
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 4
+
+    - itemId: Petrifiwood
+      quantity: 8
+
+    - itemId: Firmwater
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 115
+  craftTime: 240
+
+- id: 72d9670a-b5b2-41c7-aa01-e7925ad2acab
+  name: 'Weapon: Larsian Sword'
+  result:
+    equipmentId: Larsian Sword
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 6
+
+    - itemId: Timberfuzz
+      quantity: 3
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 16
+  maxTradeskillLevel: 19
+  tradeskillXP: 120
+  craftTime: 240
+
+- id: 35f4b607-db60-4350-acbc-efc7243696ff
+  name: 'Equipment: Larsian Dirk'
+  result:
+    equipmentId: Larsian Dirk
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 4
+
+    - itemId: Timberfuzz
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 16
+  maxTradeskillLevel: 19
+  tradeskillXP: 120
+  craftTime: 240
+
+- id: a85142cb-ad84-4be7-a6ba-22f45cfcf4c6
+  name: 'Equipment: Larsian Helm'
+  result:
+    equipmentId: Larsian Helm
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 4
+
+    - itemId: Firmwater
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 17
+  maxTradeskillLevel: 20
+  tradeskillXP: 125
+  craftTime: 240
+
+- id: fb578f8f-faed-482c-8e73-da68025f4637
+  name: 'Equipment: Larsian Tower Shield'
+  result:
+    equipmentId: Larsian Tower Shield
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 10
+
+    - itemId: Amber
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 18
+  maxTradeskillLevel: 21
+  tradeskillXP: 130
+  craftTime: 240
+
+- id: b7b493c6-dd61-4a17-9f13-ce761c57a7bc
+  name: 'Equipment: Larsian Greatmace'
+  result:
+    equipmentId: Larsian Greatmace
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 4
+
+    - itemId: Cactspine
+      quantity: 4
+
+    - itemId: Timberfuzz
+      quantity: 3
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 135
+  craftTime: 240

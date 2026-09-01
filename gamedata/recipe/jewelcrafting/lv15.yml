@@ -57,3 +57,97 @@
   maxTradeskillLevel: 18
   tradeskillXP: 150
   craftTime: 300
+
+- id: e2fb007c-ddfa-4538-a5a0-61d67899979b
+  name: 'Material: Amber'
+  result:
+    itemId: Amber
+    chance: 15
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 16
+  tradeskillXP: 15
+  craftTime: 10
+
+- id: 994eed7f-9050-4ed1-8879-80d14f82fc63
+  name: 'Equipment: Desert Ring'
+  result:
+    equipmentId: Desert Ring
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 2
+
+    - itemId: Amber
+      quantity: 3
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 16
+  maxTradeskillLevel: 19
+  tradeskillXP: 115
+  craftTime: 240
+
+- id: 8bab043b-e17b-47e7-8d52-2a368ecdac28
+  name: 'Equipment: Desert Bangle'
+  result:
+    equipmentId: Desert Bangle
+
+  requirements:
+    - itemId: Cactspine
+      quantity: 3
+
+    - itemId: Amber
+      quantity: 1
+
+    - itemId: Firmwater
+      quantity: 3
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 17
+  maxTradeskillLevel: 20
+  tradeskillXP: 120
+  craftTime: 240
+
+- id: df3d5009-a248-45f3-b5e4-3285c42d22db
+  name: 'Equipment: Desert Heatcharm'
+  result:
+    equipmentId: Desert Heatcharm
+
+  requirements:
+    - itemId: Cactspine
+      quantity: 3
+
+    - itemId: Strongreed
+      quantity: 3
+
+    - itemId: Firmwater
+      quantity: 10
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 18
+  maxTradeskillLevel: 21
+  tradeskillXP: 125
+  craftTime: 240
+
+- id: 1a3a9e24-ab7c-437d-a597-2741151a565d
+  name: 'Equipment: Cimmerian Ring'
+  result:
+    equipmentId: Cimmerian Ring
+
+  requirements:
+    - itemId: Cactspine
+      quantity: 5
+
+    - itemId: Amber
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 130
+  craftTime: 240

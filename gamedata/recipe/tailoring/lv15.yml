@@ -54,3 +54,96 @@
   maxTradeskillLevel: 18
   tradeskillXP: 150
   craftTime: 300
+
+- id: 7964d5f1-d753-4b85-bae3-9d14824bddaa
+  name: 'Equipment: Larsian Cloak'
+  result:
+    equipmentId: Larsian Cloak
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 10
+
+    - itemId: Timberfuzz
+      quantity: 3
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 115
+  craftTime: 240
+
+- id: 121ef529-977b-45d8-85fa-8c9d115747cb
+  name: 'Equipment: Larsian Sunhat'
+  result:
+    equipmentId: Larsian Sunhat
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 4
+
+    - itemId: Timberfuzz
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 16
+  maxTradeskillLevel: 19
+  tradeskillXP: 120
+  craftTime: 240
+
+- id: d175f4a3-092f-4464-878c-c26ecdffed8c
+  name: 'Equipment: Desert Sandals'
+  result:
+    equipmentId: Desert Sandals
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 6
+
+    - itemId: Firmwater
+      quantity: 4
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 17
+  maxTradeskillLevel: 20
+  tradeskillXP: 125
+  craftTime: 240
+
+- id: 3ea3de9e-cfaf-421c-8154-fac6a9f29017
+  name: 'Equipment: Cimmerian Cloak'
+  result:
+    equipmentId: Cimmerian Cloak
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 8
+
+    - itemId: Timberfuzz
+      quantity: 4
+
+    - itemId: Firmwater
+      quantity: 6
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 18
+  maxTradeskillLevel: 21
+  tradeskillXP: 130
+  craftTime: 240
+
+- id: 69c1b412-45f5-436b-bb36-693bd2e43e31
+  name: 'Equipment: Cimmerian Darkhat'
+  result:
+    equipmentId: Cimmerian Darkhat
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 4
+
+    - itemId: Firmwater
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 135
+  craftTime: 240

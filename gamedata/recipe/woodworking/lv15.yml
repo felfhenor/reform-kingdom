@@ -51,3 +51,105 @@
   maxTradeskillLevel: 18
   tradeskillXP: 150
   craftTime: 300
+
+- id: dddaaa81-e773-4997-bb92-6cfad8416f5a
+  name: 'Weapon: Larsian Bow'
+  result:
+    equipmentId: Larsian Bow
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 4
+
+    - itemId: Timberfuzz
+      quantity: 6
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 18
+  tradeskillXP: 115
+  craftTime: 240
+
+- id: 58723ccf-1dda-4fe1-b306-55c4a7ffdcad
+  name: 'Equipment: Larsian Arrow'
+  result:
+    equipmentId: Larsian Arrow
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 2
+
+    - itemId: Timberfuzz
+      quantity: 2
+
+    - itemId: Cactspine
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 16
+  maxTradeskillLevel: 19
+  tradeskillXP: 120
+  craftTime: 240
+
+- id: e9c859f1-aa1c-4fcb-9fc6-086bc52a2153
+  name: 'Weapon: Larsian Dagger'
+  result:
+    equipmentId: Larsian Dagger
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 3
+
+    - itemId: Timberfuzz
+      quantity: 2
+
+    - itemId: Cactspine
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 17
+  maxTradeskillLevel: 20
+  tradeskillXP: 125
+  craftTime: 240
+
+- id: b9c000ad-e253-4d5e-96e5-636c9ce2caaf
+  name: 'Weapon: Larsian Spear'
+  result:
+    equipmentId: Larsian Spear
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 6
+
+    - itemId: Timberfuzz
+      quantity: 3
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 18
+  maxTradeskillLevel: 21
+  tradeskillXP: 130
+  craftTime: 240
+
+- id: ade3d3e6-fb90-4a8f-a6a3-994931f0f607
+  name: 'Weapon: Cimmerian Bow'
+  result:
+    equipmentId: Cimmerian Bow
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 4
+
+    - itemId: Amber
+      quantity: 1
+
+    - itemId: Cactspine
+      quantity: 2
+
+    - itemId: Timberfuzz
+      quantity: 6
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 135
+  craftTime: 240
