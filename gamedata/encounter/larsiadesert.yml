@@ -6,7 +6,22 @@
     min: 24
     max: 27
 
-  fights: []
+  fights:
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Bloodmoth
+
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Bloodmoth
+
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Bloodmoth
+        - monsterId: Bloodmoth
+        - monsterId: Bloodmoth
 
   completionRewards:
     - collectibleId: Deadwoods Sunflower
@@ -20,7 +35,22 @@
     min: 26
     max: 29
 
-  fights: []
+  fights:
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Akroki Mage
+        - monsterId: Akroki Swashbuckler
+
+    - monsters:
+        - monsterId: Akroki Vanguard
+        - monsterId: Akroki Mage
+        - monsterId: Akroki Swashbuckler
+
+    - monsters:
+        - monsterId: Akroki Vanguard
+        - monsterId: Akroki Mage
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Akroki Swashbuckler
 
   completionRewards:
     - collectibleId: Adventurer's Satchel
@@ -34,7 +64,21 @@
     min: 28
     max: 31
 
-  fights: []
+  fights:
+    - monsters:
+        - monsterId: Akroki Vanguard
+        - monsterId: Akroki Mage
+
+    - monsters:
+        - monsterId: Akroki Vanguard
+        - monsterId: Akroki Mage
+        - monsterId: Brightwisp
+
+    - monsters:
+        - monsterId: Akroki Vanguard
+        - monsterId: Akroki Mage
+        - monsterId: Brightwisp
+        - monsterId: Brightwisp
 
   completionRewards:
     - collectibleId: Mystical Mirror
@@ -48,7 +92,24 @@
     min: 30
     max: 33
 
-  fights: []
+  fights:
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Angry Spirit
+        - monsterId: Bloodmoth
+
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Akroki Vanguard
+        - monsterId: Angry Spirit
+        - monsterId: Bloodmoth
+
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Akroki Vanguard
+        - monsterId: Angry Spirit
+        - monsterId: Bloodmoth
+        - monsterId: Bloodmoth
 
   completionRewards:
     - collectibleId: Desertcrab Claw

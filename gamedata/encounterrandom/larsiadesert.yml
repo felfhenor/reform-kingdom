@@ -14,7 +14,17 @@
     min: 3
     max: 5
 
-  creaturePool: []
+  creaturePool:
+    - monsterId: Akroki Mage
+      weight: 2
+    - monsterId: Akroki Vanguard
+      weight: 2
+    - monsterId: Akroki Swashbuckler
+      weight: 3
+    - monsterId: Brightwisp
+      weight: 1
+    - monsterId: Bloodmoth
+      weight: 1
 
   completionRewards:
     - collectibleId: Three-Leaf Clover

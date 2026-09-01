@@ -326,3 +326,22 @@
     - type: TakeCombatStatNumber
       combatStat: healingIgnorePercent
       value: 50
+
+- id: cb65b76b-adb4-4a88-a2e1-d450cfb9b18d
+  name: Blind I
+
+  effectType: Debuff
+  elements: [Water]
+  tags: [StatDown]
+
+  trigger: TurnEnd
+
+  onApply:
+    - type: AddCombatStatNumber
+      combatStat: missChance
+      value: 50
+
+  onUnapply:
+    - type: TakeCombatStatNumber
+      combatStat: missChance
+      value: 50

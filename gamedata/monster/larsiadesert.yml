@@ -1,0 +1,254 @@
+- id: 7b7cd443-80c7-42c4-b234-8ea1e6efd0ca
+  name: Akroki Mage
+  description: A lizard magician that specializes in burning its victims alive.
+
+  sprite: '0096'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 60
+    max: 65
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Broil I
+      weight: 3
+
+    - skillId: Fireball I
+      weight: 2
+
+  baseStats:
+    Health: 150
+    Energy: 75
+    Luck: 1
+    Intelligence: 25
+    Strength: 6
+    Vitality: 10
+    Resistance: 30
+    Agility: 5
+
+  statsPerLevel:
+    Health: 10
+    Energy: 3
+    Luck: 0.2
+    Intelligence: 0.9
+    Strength: 0.2
+    Vitality: 0.3
+    Resistance: 0.5
+    Agility: 0.1
+
+- id: 3f3d1b23-4d11-499a-919c-f9a4cb36a70a
+  name: Akroki Vanguard
+  description: A lizard warrior that specializes in distracting its victims to allow its allies to have a bigger window of opportunity to strike.
+
+  sprite: '0100'
+  frames: 4
+
+  targetting:
+    - type: Strongest
+
+  rarity: Common
+
+  xp:
+    min: 60
+    max: 65
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Taunt I
+      weight: 3
+
+    - skillId: Earthshake I
+      weight: 4
+
+    - skillId: Regrowth I
+      weight: 2
+
+  baseStats:
+    Health: 250
+    Energy: 45
+    Luck: 1
+    Intelligence: 10
+    Strength: 15
+    Vitality: 30
+    Resistance: 20
+    Agility: 1
+
+  statsPerLevel:
+    Health: 15
+    Energy: 4
+    Luck: 0.2
+    Intelligence: 0.2
+    Strength: 0.7
+    Vitality: 0.5
+    Resistance: 0.8
+    Agility: 0.1
+
+- id: 5ad99b28-e8d9-4a2f-90f9-48c79aec07d7
+  name: Akroki Swashbuckler
+  description: A lizard warrior that strikes its foes with deadly precision and speed.
+
+  sprite: '0092'
+  frames: 4
+
+  targetting:
+    - type: Weakest
+
+  rarity: Common
+
+  xp:
+    min: 60
+    max: 65
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Sweep I
+      weight: 3
+
+    - skillId: Smashing Board I
+      weight: 4
+
+    - skillId: Spiked Smash I
+      weight: 2
+
+    - skillId: Zephyr I
+      weight: 2
+
+  baseStats:
+    Health: 200
+    Energy: 55
+    Luck: 1
+    Intelligence: 10
+    Strength: 25
+    Vitality: 10
+    Resistance: 10
+    Agility: 5
+
+  statsPerLevel:
+    Health: 10
+    Energy: 2
+    Luck: 0.2
+    Intelligence: 0.3
+    Strength: 0.9
+    Vitality: 0.8
+    Resistance: 0.5
+    Agility: 0.3
+
+- id: 41f5ce8c-0379-4554-a05d-4ad51bea6d93
+  name: Brightwisp
+  description: A magical wisp that lights up the night with it's blinding bright glow.
+
+  sprite: '0104'
+  frames: 4
+
+  targetting:
+    - type: Strongest
+
+  rarity: Uncommon
+
+  xp:
+    min: 60
+    max: 65
+    bonusPerLevel: 3
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Thunderbolt I
+      weight: 3
+
+    - skillId: Flash I
+      weight: 4
+
+    - skillId: Zephyr I
+      weight: 2
+
+  baseStats:
+    Health: 100
+    Energy: 85
+    Luck: 1
+    Intelligence: 25
+    Strength: 5
+    Vitality: 10
+    Resistance: 50
+    Agility: 25
+
+  statsPerLevel:
+    Health: 10
+    Energy: 3
+    Luck: 0.2
+    Intelligence: 0.7
+    Strength: 0.1
+    Vitality: 0.3
+    Resistance: 0.7
+    Agility: 0.1
+
+- id: 588493d0-2e31-46b5-95c8-4b0e3ec8641a
+  name: Bloodmoth
+  description: A moth bathed in the blood of the desert battlefields. It's intricate patterns attract the ire of its foes.
+
+  sprite: '0108'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 40
+    max: 45
+    bonusPerLevel: 3
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Cure I
+      weight: 2
+
+    - skillId: Taunt I
+      weight: 4
+
+  baseStats:
+    Health: 50
+    Energy: 35
+    Luck: 1
+    Intelligence: 25
+    Strength: 5
+    Vitality: 10
+    Resistance: 10
+    Agility: 50
+
+  statsPerLevel:
+    Health: 7
+    Energy: 3
+    Luck: 0.1
+    Intelligence: 0.4
+    Strength: 0.1
+    Vitality: 0.3
+    Resistance: 0.3
+    Agility: 0.5

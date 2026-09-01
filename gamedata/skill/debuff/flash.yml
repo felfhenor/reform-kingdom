@@ -1,0 +1,31 @@
+- id: 651c06b9-bfad-4d4e-a09d-a5f4b95fe27d
+  name: Flash I
+  family: Flash
+  description: Blind a foe with bright light, lowering their hit chance by 50%.
+
+  sprite: '0033'
+
+  rarity: Common
+
+  epCost: 15
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Blind I
+
+      statusEffects:
+        - statusEffectId: Blind I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}**.'
