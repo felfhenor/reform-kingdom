@@ -1,3 +1,4 @@
+import type { CombatStat } from '@interfaces/combat';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
@@ -11,6 +12,12 @@ export type AffixId = Branded<string, 'AffixId'>;
 export type AffixEffectStat = {
   kind: 'Stat';
   stat: BaseStat;
+  value: number; // negative = curse
+};
+
+export type AffixEffectCombatStat = {
+  kind: 'CombatStat';
+  stat: CombatStat;
   value: number; // negative = curse
 };
 
@@ -53,6 +60,7 @@ export type AffixEffectCaravanSellBonus = {
 
 export type AffixEffect =
   | AffixEffectStat
+  | AffixEffectCombatStat
   | AffixEffectResistance
   | AffixEffectInfusionSlot
   | AffixEffectGrantSkill

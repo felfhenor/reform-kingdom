@@ -1,5 +1,6 @@
 import { ensureContent } from '@helpers/content-initializers';
 import type {
+  AffixContent,
   EncounterContent,
   EncounterRandomContent,
   EquipmentContent,
@@ -372,6 +373,28 @@ describe('ensureContent', () => {
         Burn: 0,
       });
     });
+
+    it('fills in combatStats densely, defaulting unauthored stats to 0', () => {
+      const result = ensureContent({
+        __type: 'equipment',
+        id: 'reflective-plate',
+        name: 'Reflective Plate',
+        combatStats: { damageReflectPercent: 10 },
+      } as unknown as EquipmentContent);
+
+      expect(result.combatStats).toEqual({
+        repeatActionChance: 0,
+        skillStrikeAgainChance: 0,
+        redirectionChance: 0,
+        missChance: 0,
+        debuffIgnoreChance: 0,
+        damageReflectPercent: 10,
+        healingIgnorePercent: 0,
+        reviveChance: 0,
+        stunChance: 0,
+        agroValue: 0,
+      });
+    });
   });
 
   describe('item', () => {
@@ -391,6 +414,60 @@ describe('ensureContent', () => {
         Poison: 0,
         Burn: 0,
       });
+    });
+
+    it('fills in infusionCombatStats densely, defaulting unauthored stats to 0', () => {
+      const result = ensureContent({
+        __type: 'item',
+        id: 'vengeance-shard',
+        name: 'Vengeance Shard',
+        infusionCombatStats: { damageReflectPercent: 5 },
+      } as unknown as ItemContent);
+
+      expect(result.infusionCombatStats).toEqual({
+        repeatActionChance: 0,
+        skillStrikeAgainChance: 0,
+        redirectionChance: 0,
+        missChance: 0,
+        debuffIgnoreChance: 0,
+        damageReflectPercent: 5,
+        healingIgnorePercent: 0,
+        reviveChance: 0,
+        stunChance: 0,
+        agroValue: 0,
+      });
+    });
+  });
+
+  describe('affix', () => {
+    it('validates a CombatStat effect entry', () => {
+      const result = ensureContent({
+        __type: 'affix',
+        id: 'of-reflection',
+        name: 'of Reflection',
+        effects: [
+          { kind: 'CombatStat', stat: 'damageReflectPercent', value: 5 },
+        ],
+      } as unknown as AffixContent);
+
+      expect(result.effects).toEqual([
+        { kind: 'CombatStat', stat: 'damageReflectPercent', value: 5 },
+      ]);
+    });
+
+    it('falls back to repeatActionChance for an invalid combat stat', () => {
+      const result = ensureContent({
+        __type: 'affix',
+        id: 'of-mystery',
+        name: 'of Mystery',
+        effects: [
+          { kind: 'CombatStat', stat: 'notARealStat', value: 5 },
+        ],
+      } as unknown as AffixContent);
+
+      expect(result.effects).toEqual([
+        { kind: 'CombatStat', stat: 'repeatActionChance', value: 5 },
+      ]);
     });
   });
 

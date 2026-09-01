@@ -1,0 +1,20 @@
+- id: 4f0ab10c-4c68-4fa5-9bc8-4c6fde5375c1
+  name: Hastened
+  description: Occasionally grants an extra turn in combat.
+  rarity: Rare
+  family: ExtraTurn
+  position: Prefix
+  effects:
+    - kind: CombatStat
+      stat: repeatActionChance
+      value: 5
+
+- id: 41c85fbd-26a7-4bd5-a4e6-46f48e82ec02
+  name: of Thorns
+  description: Reflects a portion of incoming damage back at the attacker.
+  rarity: Rare
+  family: DamageReflect
+  effects:
+    - kind: CombatStat
+      stat: damageReflectPercent
+      value: 10

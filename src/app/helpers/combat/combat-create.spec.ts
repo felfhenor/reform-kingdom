@@ -8,6 +8,10 @@ vi.mock('@helpers/combat/combat', () => ({
   currentCombat: vi.fn(),
 }));
 
+vi.mock('@helpers/combat/combat-state', () => ({
+  currentCombat: vi.fn(),
+}));
+
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
@@ -255,6 +259,47 @@ describe('combatantFromCharacter', () => {
     const combatant = combatantFromCharacter(buildCharacter());
 
     expect(combatant.jobId).toBe(rangerJob.id);
+  });
+
+  it("adds an equipped item's combatStats bonus on top of the default value", () => {
+    const reflectiveBow: EquipmentContent = {
+      ...bow,
+      combatStats: {
+        repeatActionChance: 0,
+        skillStrikeAgainChance: 0,
+        redirectionChance: 0,
+        missChance: 0,
+        debuffIgnoreChance: 0,
+        damageReflectPercent: 10,
+        healingIgnorePercent: 0,
+        reviveChance: 0,
+        stunChance: 0,
+        agroValue: 0,
+      },
+    };
+    vi.mocked(getEntry).mockImplementation((id) => {
+      if (id === rangerJob.id) return rangerJob as never;
+      if (id === attackSkill.id) return attackSkill as never;
+      if (id === snipeSkill.id) return snipeSkill as never;
+      if (id === bow.id) return reflectiveBow as never;
+      return undefined as never;
+    });
+
+    const combatant = combatantFromCharacter(
+      buildCharacter({
+        equipment: {
+          ...emptyEquipment,
+          Weapon: {
+            id: 'bow-1',
+            equipmentId: bow.id,
+            infusedItemIds: [],
+            affixIds: [],
+          },
+        },
+      }),
+    );
+
+    expect(combatant.combatStats.damageReflectPercent).toBe(10);
   });
 });
 

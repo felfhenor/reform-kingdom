@@ -13,3 +13,5 @@
     Vitality: 4.2
     Resistance: 0.5
     Agility: -1.5
+  combatStats:
+    agroValue: 15

@@ -10,3 +10,5 @@
     Intelligence: 5.1
     Energy: 15
     Resistance: 2.3
+  combatStats:
+    debuffIgnoreChance: 8

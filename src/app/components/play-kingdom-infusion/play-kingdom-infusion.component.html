@@ -103,6 +103,12 @@
                 [resistances]="content.debuffResistances"
                 [bonusResistances]="selectedItemResistanceBonus()"
               />
+
+              <app-row-combat-stats
+                class="block mt-2"
+                [stats]="content.combatStats"
+                [bonusStats]="selectedItemCombatStatBonus()"
+              />
             </div>
           </div>
         </div>
@@ -169,6 +175,12 @@
                         <app-row-debuff-resistances
                           class="text-xs"
                           [resistances]="entry.item.infusionDebuffResistances"
+                          [layout]="'row'"
+                        />
+
+                        <app-row-combat-stats
+                          class="text-xs"
+                          [stats]="entry.item.infusionCombatStats"
                           [layout]="'row'"
                         />
                       </div>

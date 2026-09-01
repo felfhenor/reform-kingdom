@@ -12,3 +12,5 @@
   baseStats:
     Agility: 4.8
     Vitality: 2.1
+  combatStats:
+    damageReflectPercent: 4

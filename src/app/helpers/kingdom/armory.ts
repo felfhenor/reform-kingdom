@@ -2,7 +2,11 @@ import { getEntry } from '@helpers/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
-import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
+import {
+  equipmentItemInfusionBonus,
+  equipmentItemInfusionCombatStatBonus,
+  equipmentItemInfusionResistanceBonus,
+} from '@helpers/item/infusion';
 import { gainGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -92,6 +96,10 @@ export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {
 // Same rate infusion pricing uses, plus a per-level component so higher-tier drops are worth more.
 const SELL_GOLD_PER_STAT_POINT = 20;
 const SELL_GOLD_PER_LEVEL = 10;
+// Combat stats are rarer/more specialized than a raw base stat point, so they're worth more.
+const SELL_GOLD_PER_COMBAT_STAT_POINT = 50;
+// Same rate infusion pricing uses for a resistance point - the rarest, most specialized bonus.
+const SELL_GOLD_PER_RESISTANCE_POINT = 100;
 const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
   Common: 1,
   Uncommon: 1.25,
@@ -117,10 +125,32 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
   // A SellValue affix is a flat bonus, added after the rarity multiplier rather than scaled by it.
   const affixBonus = affixEffectSum(affixEffects, 'SellValue');
 
+  // Combat stats (base + infusion + affix) are also a flat bonus, unscaled by rarity - same treatment as SellValue.
+  const combatStatTotal =
+    sum(Object.values(entry.content.combatStats ?? {})) +
+    sum(
+      Object.values(
+        equipmentItemInfusionCombatStatBonus(entry.item.infusedItemIds),
+      ),
+    ) +
+    affixEffectSum(affixEffects, 'CombatStat');
+
+  // Debuff resistances (base + infusion + affix) get the same flat treatment.
+  const resistanceTotal =
+    sum(Object.values(entry.content.debuffResistances ?? {})) +
+    sum(
+      Object.values(
+        equipmentItemInfusionResistanceBonus(entry.item.infusedItemIds),
+      ),
+    ) +
+    affixEffectSum(affixEffects, 'Resistance');
+
   return Math.max(
     1,
     Math.round(base * RARITY_SELL_MULTIPLIER[entry.content.rarity]) +
-      affixBonus,
+      affixBonus +
+      combatStatTotal * SELL_GOLD_PER_COMBAT_STAT_POINT +
+      resistanceTotal * SELL_GOLD_PER_RESISTANCE_POINT,
   );
 }
 

@@ -12,6 +12,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
+  equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
   equipmentItemGrantedSkills,
@@ -66,6 +67,10 @@ export class SlotArmoryItemComponent {
 
   public bonusResistances = computed(() =>
     equipmentItemBonusResistances(this.equipmentItem()),
+  );
+
+  public bonusCombatStats = computed(() =>
+    equipmentItemBonusCombatStats(this.equipmentItem()),
   );
 
   public infusionSlotCount = computed(() =>

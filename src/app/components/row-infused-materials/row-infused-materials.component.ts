@@ -6,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { RowCombatStatsComponent } from '@components/row-combat-stats/row-combat-stats.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
@@ -22,6 +23,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotIconBlankComponent,
     RowItemStatsComponent,
     RowDebuffResistancesComponent,
+    RowCombatStatsComponent,
     TippyDirective,
   ],
   templateUrl: './row-infused-materials.component.html',

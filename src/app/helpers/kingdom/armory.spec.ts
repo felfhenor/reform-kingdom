@@ -1,4 +1,8 @@
-import { defaultStats } from '@helpers/defaults';
+import {
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
 import type * as MaterialsHelper from '@helpers/item/materials';
 import type {
   EquipmentContent,
@@ -15,6 +19,8 @@ vi.mock('@helpers/content', () => ({
 
 vi.mock('@helpers/item/infusion', () => ({
   equipmentItemInfusionBonus: vi.fn(),
+  equipmentItemInfusionCombatStatBonus: vi.fn(),
+  equipmentItemInfusionResistanceBonus: vi.fn(),
 }));
 
 vi.mock('@helpers/item/materials', async (importOriginal) => {
@@ -34,7 +40,11 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { getEntry } from '@helpers/content';
-import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
+import {
+  equipmentItemInfusionBonus,
+  equipmentItemInfusionCombatStatBonus,
+  equipmentItemInfusionResistanceBonus,
+} from '@helpers/item/infusion';
 import {
   armoryAdd,
   armoryGet,
@@ -334,6 +344,12 @@ describe('Armory Helper Functions', () => {
   describe('equipmentSellValue', () => {
     beforeEach(() => {
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
+      vi.mocked(equipmentItemInfusionCombatStatBonus).mockReturnValue(
+        defaultCombatStats(),
+      );
+      vi.mocked(equipmentItemInfusionResistanceBonus).mockReturnValue(
+        defaultTagResistances(),
+      );
     });
 
     it('prices a bare item from its base stats and level, scaled by rarity', () => {
@@ -439,11 +455,122 @@ describe('Armory Helper Functions', () => {
       // same base 120 as the bare-item case, plus the flat 250 affix bonus, unscaled by rarity
       expect(equipmentSellValue(entry)).toBe(370);
     });
+
+    it('adds 50g per point of the equipment content combatStats, unscaled by rarity', () => {
+      const entry = {
+        item: {
+          id: 'sword-1' as EquipmentItemId,
+          equipmentId: sword.id,
+          infusedItemIds: [],
+          affixIds: [],
+        },
+        content: {
+          ...sword,
+          baseStats: defaultStats(),
+          levelRequirement: 0,
+          combatStats: { ...defaultCombatStats(), reviveChance: 2 },
+        },
+      };
+
+      // base 0 stats/level -> 0, plus 2 combat stat points * 50g
+      expect(equipmentSellValue(entry)).toBe(100);
+    });
+
+    it('adds a CombatStat affix bonus as a flat amount after the rarity multiplier', () => {
+      const combatStatAffix = {
+        id: 'affix-combat-stat' as never,
+        rarity: 'Uncommon',
+        family: 'DamageReflect',
+        effects: [
+          { kind: 'CombatStat', stat: 'damageReflectPercent', value: 3 },
+        ],
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === combatStatAffix.id ? combatStatAffix : undefined) as never,
+      );
+
+      const entry = {
+        item: {
+          id: 'sword-1' as EquipmentItemId,
+          equipmentId: sword.id,
+          infusedItemIds: [],
+          affixIds: [combatStatAffix.id],
+        },
+        content: {
+          ...sword,
+          baseStats: defaultStats(),
+          levelRequirement: 0,
+        },
+      };
+
+      // base 0 stats/level -> 0, plus 3 combat stat points * 50g
+      expect(equipmentSellValue(entry)).toBe(150);
+    });
+
+    it('adds 100g per point of the equipment content debuffResistances, unscaled by rarity', () => {
+      const entry = {
+        item: {
+          id: 'sword-1' as EquipmentItemId,
+          equipmentId: sword.id,
+          infusedItemIds: [],
+          affixIds: [],
+        },
+        content: {
+          ...sword,
+          baseStats: defaultStats(),
+          levelRequirement: 0,
+          debuffResistances: { ...defaultTagResistances(), Stun: 2 },
+        },
+      };
+
+      // base 0 stats/level -> 0, plus 2 resistance points * 100g
+      expect(equipmentSellValue(entry)).toBe(200);
+    });
+
+    it('adds infusion and Resistance-affix bonuses on top of the content debuffResistances', () => {
+      const stunAffix = {
+        id: 'affix-stun' as never,
+        rarity: 'Uncommon',
+        family: 'StunResist',
+        effects: [{ kind: 'Resistance', tag: 'Stun', value: 3 }],
+      };
+      vi.mocked(getEntry).mockImplementation((id) =>
+        (id === stunAffix.id ? stunAffix : undefined) as never,
+      );
+      vi.mocked(equipmentItemInfusionResistanceBonus).mockReturnValue({
+        ...defaultTagResistances(),
+        Stun: 1,
+      });
+
+      const entry = {
+        item: {
+          id: 'sword-1' as EquipmentItemId,
+          equipmentId: sword.id,
+          infusedItemIds: ['spirit-flesh' as never],
+          affixIds: [stunAffix.id],
+        },
+        content: {
+          ...sword,
+          baseStats: defaultStats(),
+          levelRequirement: 0,
+          debuffResistances: { ...defaultTagResistances(), Stun: 2 },
+        },
+      };
+
+      // base 0 stats/level -> 0, plus (2 + 1 + 3) resistance points * 100g
+      expect(equipmentSellValue(entry)).toBe(600);
+    });
   });
 
   describe('sellEquipmentItems', () => {
     beforeEach(() => {
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
+      vi.mocked(equipmentItemInfusionCombatStatBonus).mockReturnValue(
+        defaultCombatStats(),
+      );
+      vi.mocked(equipmentItemInfusionResistanceBonus).mockReturnValue(
+        defaultTagResistances(),
+      );
     });
 
     it('removes only the sold items from the armory and credits their gold value', () => {

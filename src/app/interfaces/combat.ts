@@ -35,6 +35,49 @@ export type CombatantCombatStats = {
   agroValue: number;
 };
 
+export type CombatStat = keyof CombatantCombatStats;
+
+// Display order for combat stats in UI rows (tooltips, panels, etc.).
+export const CombatStatOrder: CombatStat[] = [
+  'repeatActionChance',
+  'skillStrikeAgainChance',
+  'damageReflectPercent',
+  'debuffIgnoreChance',
+  'reviveChance',
+  'agroValue',
+  'missChance',
+  'stunChance',
+  'redirectionChance',
+  'healingIgnorePercent',
+];
+
+export const CombatStatLabel: Record<CombatStat, string> = {
+  repeatActionChance: 'Extra Turn Chance',
+  skillStrikeAgainChance: 'Skill Repeat Chance',
+  redirectionChance: 'Confusion Chance',
+  missChance: 'Miss Chance',
+  debuffIgnoreChance: 'Debuff Resist Chance',
+  damageReflectPercent: 'Damage Reflect Percent',
+  healingIgnorePercent: 'Healing Reduction Percent',
+  reviveChance: 'Revive Chance',
+  stunChance: 'Self-Stun Chance',
+  agroValue: 'Aggro',
+};
+
+// Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier (see `rngSucceedsChance`).
+export const CombatStatIsPercent: Record<CombatStat, boolean> = {
+  repeatActionChance: true,
+  skillStrikeAgainChance: true,
+  redirectionChance: true,
+  missChance: true,
+  debuffIgnoreChance: true,
+  damageReflectPercent: true,
+  healingIgnorePercent: true,
+  reviveChance: true,
+  stunChance: true,
+  agroValue: false,
+};
+
 export type CombatantTargettingType =
   | 'Random'
   | 'Strongest'

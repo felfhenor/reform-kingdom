@@ -1,5 +1,9 @@
 import { getEntry } from '@helpers/content';
-import { defaultStats, defaultTagResistances } from '@helpers/defaults';
+import {
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
 import {
   affixEffectsOfKind,
   affixEffectSum,
@@ -7,9 +11,11 @@ import {
 } from '@helpers/item/affix';
 import {
   equipmentItemInfusionBonus,
+  equipmentItemInfusionCombatStatBonus,
   equipmentItemInfusionResistanceBonus,
 } from '@helpers/item/infusion';
 import type {
+  CombatantCombatStats,
   EquipmentContent,
   EquipmentItem,
   EquipmentSkillContent,
@@ -53,6 +59,28 @@ export function equipmentItemBonusResistances(
     );
     combined[tag] = infusion[tag] + affixBonus;
   });
+
+  return combined;
+}
+
+// The combat-stat analog of `equipmentItemBonusStats`.
+export function equipmentItemBonusCombatStats(
+  item: EquipmentItem,
+): CombatantCombatStats {
+  const infusion = equipmentItemInfusionCombatStatBonus(item.infusedItemIds);
+  const affixEffects = equipmentItemAffixEffects(item);
+  const combined = defaultCombatStats();
+
+  (Object.keys(combined) as Array<keyof CombatantCombatStats>).forEach(
+    (stat) => {
+      const affixBonus = affixEffectSum(
+        affixEffects,
+        'CombatStat',
+        (effect) => effect.stat === stat,
+      );
+      combined[stat] = infusion[stat] + affixBonus;
+    },
+  );
 
   return combined;
 }

@@ -48,6 +48,14 @@
           />
         }
 
+        @if (item.combatStats) {
+          <app-row-combat-stats
+            class="block mt-2"
+            [stats]="item.combatStats"
+            [bonusStats]="bonusCombatStats()"
+          />
+        }
+
         <ng-content></ng-content>
       </div>
     </div>

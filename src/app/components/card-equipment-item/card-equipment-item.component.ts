@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
+import { RowCombatStatsComponent } from '@components/row-combat-stats/row-combat-stats.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
@@ -14,6 +15,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { defaultStats } from '@helpers/defaults';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
+  equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
   equipmentItemGrantedSkills,
@@ -40,6 +42,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
     RowInfusedMaterialsComponent,
     RowItemStatsComponent,
     RowDebuffResistancesComponent,
+    RowCombatStatsComponent,
     StatDisplayPipe,
     TippyDirective,
   ],
@@ -68,6 +71,10 @@ export class CardEquipmentItemComponent {
 
   public bonusResistances = computed(() =>
     equipmentItemBonusResistances(this.equipmentItem()),
+  );
+
+  public bonusCombatStats = computed(() =>
+    equipmentItemBonusCombatStats(this.equipmentItem()),
   );
 
   public infusionSlotCount = computed(() =>

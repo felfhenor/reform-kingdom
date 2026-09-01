@@ -20,10 +20,10 @@
 
 - id: a74034d6-579a-4222-9dec-79be631e67db
   name: Goblin Nail
-  description: A large nail from a large goblin.
+  description: A large, jagged nail from a large goblin.
   rarity: Uncommon
 
   sprite: '0026'
 
-  infusionStats:
-    Vitality: 0.4
+  infusionCombatStats:
+    damageReflectPercent: 1

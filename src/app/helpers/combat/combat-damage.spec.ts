@@ -146,6 +146,73 @@ beforeEach(() => {
   vi.mocked(getEntry).mockClear();
 });
 
+describe('combatApplySkillToTarget healing', () => {
+  it("reduces a heal by the target's healingIgnorePercent, treated as a 0-100 percent (not a raw fraction)", () => {
+    const attacker = buildCombatant({
+      totalStats: {
+        Agility: 0,
+        Energy: 0,
+        Health: 100,
+        Intelligence: 0,
+        Luck: 0,
+        Resistance: 0,
+        Strength: 100,
+        Vitality: 0,
+      },
+    });
+    const target = buildCombatant({
+      hp: 0,
+      totalStats: {
+        Agility: 0,
+        Energy: 0,
+        Health: 10000,
+        Intelligence: 0,
+        Luck: 0,
+        Resistance: 0,
+        Strength: 0,
+        Vitality: 0,
+      },
+      combatStats: {
+        repeatActionChance: 0,
+        skillStrikeAgainChance: 0,
+        redirectionChance: 0,
+        missChance: 0,
+        debuffIgnoreChance: 0,
+        damageReflectPercent: 0,
+        healingIgnorePercent: 20,
+        reviveChance: 0,
+        stunChance: 0,
+        agroValue: 0,
+      },
+    });
+    const skill = buildSkill();
+    const technique = buildTechnique({
+      damageScaling: {
+        Agility: 0,
+        Energy: 0,
+        Health: 0,
+        Intelligence: 0,
+        Luck: 0,
+        Resistance: 0,
+        Strength: 1,
+        Vitality: 0,
+      },
+      attributes: ['HealsTarget', 'BypassDefense'],
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      skill,
+      technique,
+    );
+
+    // baseDamage = Strength(100) * 1 = 100, reduced by 20% -> heals for 80.
+    expect(target.hp).toBe(80);
+  });
+});
+
 describe('combatApplySkillToTarget defense', () => {
   it('mitigates a purely physical technique using only the target Vitality stat', () => {
     const attacker = buildCombatant({

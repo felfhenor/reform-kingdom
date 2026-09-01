@@ -32,6 +32,7 @@ import {
   characterTagResistances,
   equipmentAffixEffects,
   equipmentAvailableForSlot,
+  equipmentCombatStatTotals,
   equipmentGrantedSkillIds,
   equipmentStatTotals,
   equipmentTagResistanceTotals,
@@ -388,6 +389,132 @@ describe('Equipment Helper Functions', () => {
       });
 
       expect(totals.Stun).toBe(13);
+    });
+  });
+
+  describe('equipmentCombatStatTotals', () => {
+    const zeroCombatStats = {
+      repeatActionChance: 0,
+      skillStrikeAgainChance: 0,
+      redirectionChance: 0,
+      missChance: 0,
+      debuffIgnoreChance: 0,
+      damageReflectPercent: 0,
+      healingIgnorePercent: 0,
+      reviveChance: 0,
+      stunChance: 0,
+      agroValue: 0,
+    };
+
+    it('should return zeroed combat stats when nothing is equipped', () => {
+      expect(equipmentCombatStatTotals(emptyEquipment)).toEqual(
+        zeroCombatStats,
+      );
+      expect(getEntry).not.toHaveBeenCalled();
+    });
+
+    it('should sum combatStats across all equipped slots', () => {
+      const reflectiveSword = {
+        ...sword,
+        combatStats: { ...zeroCombatStats, damageReflectPercent: 10 },
+      };
+      const luckyHelmet = {
+        ...helmet,
+        combatStats: { ...zeroCombatStats, reviveChance: 5 },
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) => (id === 'sword' ? reflectiveSword : luckyHelmet) as never,
+      );
+
+      const totals = equipmentCombatStatTotals({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(sword.id),
+        Helmet: mockEquipmentItem(helmet.id),
+      });
+
+      expect(totals).toEqual({
+        ...zeroCombatStats,
+        damageReflectPercent: 10,
+        reviveChance: 5,
+      });
+    });
+
+    it('should ignore equipment content with no combatStats field at all', () => {
+      vi.mocked(getEntry).mockReturnValue(sword);
+
+      const totals = equipmentCombatStatTotals({
+        ...emptyEquipment,
+        Weapon: mockEquipmentItem(sword.id),
+      });
+
+      expect(totals).toEqual(zeroCombatStats);
+    });
+
+    it("adds each equipped item's infusion combat-stat bonus on top of its combatStats", () => {
+      const vengeanceShard = {
+        id: 'vengeance-shard' as never,
+        name: 'Vengeance Shard',
+        __type: 'item',
+        description: '',
+        sprite: '0000',
+        rarity: 'Common',
+        infusionCombatStats: { ...zeroCombatStats, damageReflectPercent: 3 },
+      };
+      const reflectiveSword = {
+        ...sword,
+        combatStats: { ...zeroCombatStats, damageReflectPercent: 10 },
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? reflectiveSword
+            : id === 'vengeance-shard'
+              ? vengeanceShard
+              : undefined) as never,
+      );
+
+      const totals = equipmentCombatStatTotals({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          infusedItemIds: ['vengeance-shard' as never],
+        },
+      });
+
+      expect(totals.damageReflectPercent).toBe(13);
+    });
+
+    it("adds a rolled CombatStat affix's value on top of combatStats", () => {
+      const reflectAffix = {
+        id: 'affix-reflect' as never,
+        rarity: 'Uncommon',
+        family: 'DamageReflect',
+        effects: [
+          { kind: 'CombatStat', stat: 'damageReflectPercent', value: 7 },
+        ],
+      };
+      const reflectiveSword = {
+        ...sword,
+        combatStats: { ...zeroCombatStats, damageReflectPercent: 10 },
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? reflectiveSword
+            : id === reflectAffix.id
+              ? reflectAffix
+              : undefined) as never,
+      );
+
+      const totals = equipmentCombatStatTotals({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          affixIds: [reflectAffix.id],
+        },
+      });
+
+      expect(totals.damageReflectPercent).toBe(17);
     });
   });
 

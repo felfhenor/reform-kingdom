@@ -6,9 +6,15 @@ import {
 } from '@angular/core';
 import type { TemplateRef } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
+import { RowCombatStatsComponent } from '@components/row-combat-stats/row-combat-stats.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import type { ItemPreviewDisplay, StatBlock, StatusEffectTag } from '@interfaces';
+import type {
+  CombatantCombatStats,
+  ItemPreviewDisplay,
+  StatBlock,
+  StatusEffectTag,
+} from '@interfaces';
 
 // Headless: renders only an `ng-template` and exposes it via `template()`,
 // for callers to hand to `[tp]` on whatever icon markup they render
@@ -16,7 +22,12 @@ import type { ItemPreviewDisplay, StatBlock, StatusEffectTag } from '@interfaces
 @Component({
   selector: 'app-tooltip-item-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconItemPreviewComponent, RowItemStatsComponent, RowDebuffResistancesComponent],
+  imports: [
+    IconItemPreviewComponent,
+    RowItemStatsComponent,
+    RowDebuffResistancesComponent,
+    RowCombatStatsComponent,
+  ],
   templateUrl: './tooltip-item-preview.component.html',
   styleUrl: './tooltip-item-preview.component.scss',
 })
@@ -28,6 +39,8 @@ export class TooltipItemPreviewComponent {
   public bonusStats = input<StatBlock>();
   // Same idea as `bonusStats`, for per-tag debuff resistance.
   public bonusResistances = input<Record<StatusEffectTag, number>>();
+  // Same idea as `bonusStats`, for combat stats.
+  public bonusCombatStats = input<CombatantCombatStats>();
 
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
 }

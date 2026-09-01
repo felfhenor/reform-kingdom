@@ -1,3 +1,4 @@
+import type { CombatantCombatStats } from '@interfaces/combat';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
@@ -25,6 +26,8 @@ export type ItemPreviewDisplay = {
   stats?: StatBlock;
   // Same split as `stats`, for per-tag debuff resistance.
   resistances?: Record<StatusEffectTag, number>;
+  // Same split as `stats`, for combat stats.
+  combatStats?: CombatantCombatStats;
   // Equipment only.
   levelRequirement?: number;
   // Equipment only - party hero names whose job can equip this item.

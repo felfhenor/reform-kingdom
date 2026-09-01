@@ -175,6 +175,12 @@ function ensureTagResistances(
   return Object.assign({}, defaultTagResistances(), resistances);
 }
 
+function ensureCombatStats(
+  combatStats: Partial<CombatantCombatStats> = {},
+): Required<CombatantCombatStats> {
+  return Object.assign({}, defaultCombatStats(), combatStats);
+}
+
 // `ensureItemFn` is typed with `any` so every concrete `ensure*` helper can
 // keep its own narrow `Partial<...>` (or union-of-partials) parameter type
 // without fighting function parameter variance here.
@@ -225,6 +231,7 @@ function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     infusionDebuffResistances: ensureTagResistances(
       item.infusionDebuffResistances,
     ),
+    infusionCombatStats: ensureCombatStats(item.infusionCombatStats),
     unobtainable: item.unobtainable ?? false,
   };
 }
@@ -258,6 +265,16 @@ function ensureAffixEffect(effect: Record<string, unknown> = {}): AffixEffect {
         tradeskillId:
           (effect['tradeskillId'] as TradeskillId) ??
           ('UNKNOWN' as TradeskillId),
+        value,
+      };
+    case 'CombatStat':
+      return {
+        kind: 'CombatStat',
+        stat: ensureEnumValue(
+          effect['stat'],
+          VALID_COMBAT_STATS,
+          'repeatActionChance',
+        ),
         value,
       };
     case 'SellValue':
@@ -623,6 +640,7 @@ function ensureEquipment(
     description: equipment.description ?? 'UNKNOWN',
     baseStats: ensureStats(equipment.baseStats),
     debuffResistances: ensureTagResistances(equipment.debuffResistances),
+    combatStats: ensureCombatStats(equipment.combatStats),
     sprite: equipment.sprite ?? 'UNKNOWN',
     type: equipment.type ?? 'Accessory',
     // Defaults to 0, not 1 - infusion slots must always be explicitly

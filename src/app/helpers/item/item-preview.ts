@@ -37,6 +37,7 @@ export function itemPreviewDisplay(
       ...base,
       stats: content.baseStats,
       resistances: content.debuffResistances,
+      combatStats: content.combatStats,
       levelRequirement: content.levelRequirement,
       equippableHeroNames: equippableHeroNames(content),
     };
@@ -47,6 +48,7 @@ export function itemPreviewDisplay(
       ...base,
       stats: content.infusionStats,
       resistances: content.infusionDebuffResistances,
+      combatStats: content.infusionCombatStats,
     };
   }
 

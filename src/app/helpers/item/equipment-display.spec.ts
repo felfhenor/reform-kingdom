@@ -4,6 +4,7 @@ vi.mock('@helpers/content', () => ({
 
 import { getEntry } from '@helpers/content';
 import {
+  equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
   equipmentItemGrantedSkillIds,
@@ -55,6 +56,38 @@ const grantAffix: AffixContent = {
   family: 'GrantAttack',
   position: 'Suffix',
   effects: [{ kind: 'GrantSkill', skillId: 'attack' }],
+};
+
+const reflectAffix: AffixContent = {
+  id: 'affix-reflect' as AffixId,
+  name: 'of Reflection',
+  __type: 'affix',
+  description: '',
+  rarity: 'Rare',
+  family: 'DamageReflect',
+  position: 'Suffix',
+  effects: [{ kind: 'CombatStat', stat: 'damageReflectPercent', value: 5 }],
+};
+
+const vengeanceShard: ItemContent = {
+  id: 'vengeance-shard' as ItemId,
+  name: 'Vengeance Shard',
+  __type: 'item',
+  description: '',
+  sprite: '0000',
+  rarity: 'Common',
+  infusionCombatStats: {
+    repeatActionChance: 0,
+    skillStrikeAgainChance: 0,
+    redirectionChance: 0,
+    missChance: 0,
+    debuffIgnoreChance: 0,
+    damageReflectPercent: 3,
+    healingIgnorePercent: 0,
+    reviveChance: 0,
+    stunChance: 0,
+    agroValue: 0,
+  },
 };
 
 const crystal: ItemContent = {
@@ -141,6 +174,39 @@ describe('equipmentItemBonusResistances', () => {
       buildItem({ affixIds: [stunAffix.id] }),
     );
     expect(bonus.Stun).toBe(10);
+  });
+});
+
+describe('equipmentItemBonusCombatStats', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('is zeroed when the item has no infusions or affixes', () => {
+    expect(
+      equipmentItemBonusCombatStats(buildItem()).damageReflectPercent,
+    ).toBe(0);
+  });
+
+  it('includes an affix CombatStat bonus', () => {
+    mockContent(reflectAffix);
+
+    const bonus = equipmentItemBonusCombatStats(
+      buildItem({ affixIds: [reflectAffix.id] }),
+    );
+    expect(bonus.damageReflectPercent).toBe(5);
+  });
+
+  it('sums infusion and affix bonuses to the same combat stat', () => {
+    mockContent(reflectAffix, vengeanceShard);
+
+    const bonus = equipmentItemBonusCombatStats(
+      buildItem({
+        infusedItemIds: [vengeanceShard.id],
+        affixIds: [reflectAffix.id],
+      }),
+    );
+    expect(bonus.damageReflectPercent).toBe(8);
   });
 });
 

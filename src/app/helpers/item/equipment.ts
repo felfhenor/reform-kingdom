@@ -1,6 +1,10 @@
 import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content';
-import { defaultStats, defaultTagResistances } from '@helpers/defaults';
+import {
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
 import {
   affixEffectsOfKind,
   affixEffectSum,
@@ -9,6 +13,7 @@ import {
 } from '@helpers/item/affix';
 import {
   equipmentItemInfusionBonus,
+  equipmentItemInfusionCombatStatBonus,
   equipmentItemInfusionResistanceBonus,
 } from '@helpers/item/infusion';
 import { armoryGet } from '@helpers/kingdom/armory';
@@ -19,6 +24,7 @@ import {
   type AffixEffect,
   type BaseStat,
   type Character,
+  type CombatantCombatStats,
   type EquipmentArmoryEntry,
   type EquipmentBlock,
   type EquipmentContent,
@@ -199,6 +205,37 @@ export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
 }
 
 // Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
+export function equipmentCombatStatTotals(
+  equipment: EquipmentBlock,
+): CombatantCombatStats {
+  const totals = defaultCombatStats();
+
+  equippedItems(equipment).forEach((item) => {
+    const content = getEntry<EquipmentContent>(item.equipmentId);
+    if (!content) return;
+
+    const infusionBonus = equipmentItemInfusionCombatStatBonus(
+      item.infusedItemIds,
+    );
+    const affixEffects = equipmentItemAffixEffects(item);
+
+    (Object.keys(totals) as Array<keyof CombatantCombatStats>).forEach(
+      (stat) => {
+        const affixBonus = affixEffectSum(
+          affixEffects,
+          'CombatStat',
+          (effect) => effect.stat === stat,
+        );
+        totals[stat] +=
+          (content.combatStats?.[stat] ?? 0) + infusionBonus[stat] + affixBonus;
+      },
+    );
+  });
+
+  return totals;
+}
+
+// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
 export function equipmentTagResistanceTotals(
   equipment: EquipmentBlock,
 ): Record<StatusEffectTag, number> {
@@ -220,7 +257,9 @@ export function equipmentTagResistanceTotals(
         (effect) => effect.tag === tag,
       );
       totals[tag] +=
-        (content.debuffResistances?.[tag] ?? 0) + infusionBonus[tag] + affixBonus;
+        (content.debuffResistances?.[tag] ?? 0) +
+        infusionBonus[tag] +
+        affixBonus;
     });
   });
 
@@ -228,7 +267,9 @@ export function equipmentTagResistanceTotals(
 }
 
 // Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
-export function equipmentAffixEffects(equipment: EquipmentBlock): AffixEffect[] {
+export function equipmentAffixEffects(
+  equipment: EquipmentBlock,
+): AffixEffect[] {
   return equippedItems(equipment).flatMap(equipmentItemAffixEffects);
 }
 

@@ -10,12 +10,17 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { RowCombatStatsComponent } from '@components/row-combat-stats/row-combat-stats.component';
 import { RowDebuffResistancesComponent } from '@components/row-debuff-resistances/row-debuff-resistances.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
-import { defaultStats, defaultTagResistances } from '@helpers/defaults';
+import {
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
 import { characterInfuseEquipment } from '@helpers/hero/character-equipment';
 import { partyGet } from '@helpers/hero/party';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
@@ -24,6 +29,7 @@ import {
   equippedItemsByPrimarySlot,
 } from '@helpers/item/equipment';
 import {
+  equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
 } from '@helpers/item/equipment-display';
@@ -62,6 +68,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     RowInfusedMaterialsComponent,
     RowItemStatsComponent,
     RowDebuffResistancesComponent,
+    RowCombatStatsComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
     TippyDirective,
@@ -116,6 +123,11 @@ export class PlayKingdomInfusionComponent {
   public selectedItemResistanceBonus = computed(() => {
     const item = this.selectedItem();
     return item ? equipmentItemBonusResistances(item) : defaultTagResistances();
+  });
+
+  public selectedItemCombatStatBonus = computed(() => {
+    const item = this.selectedItem();
+    return item ? equipmentItemBonusCombatStats(item) : defaultCombatStats();
   });
 
   public selectedItemSlotCount = computed(() => {

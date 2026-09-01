@@ -1,0 +1,25 @@
+<div
+  class="flex gap-2"
+  [class.flex-col]="layout() === 'column'"
+  [class.flex-row]="layout() === 'row'"
+  [class.flex-wrap]="layout() === 'row'"
+  [class.gap-x-3]="layout() === 'row'"
+>
+  @for (stat of baseRows(); track stat) {
+    <div class="text-xs">
+      {{ statLabel[stat] }}:
+      {{ baseValue(stat) | statDisplay }}{{ isPercent[stat] ? '%' : '' }}
+    </div>
+  }
+
+  @for (stat of bonusRows(); track stat) {
+    <div
+      class="text-xs"
+      [class.text-value-positive]="bonusValue(stat) > 0"
+      [class.text-value-negative]="bonusValue(stat) < 0"
+    >
+      {{ statLabel[stat] }}:
+      {{ bonusValue(stat) | statDisplay }}{{ isPercent[stat] ? '%' : '' }}
+    </div>
+  }
+</div>

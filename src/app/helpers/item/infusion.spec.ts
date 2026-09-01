@@ -26,6 +26,7 @@ import { getEntry } from '@helpers/content';
 import {
   canInfuseEquipmentItem,
   equipmentItemInfusionBonus,
+  equipmentItemInfusionCombatStatBonus,
   equipmentItemInfusionResistanceBonus,
   equipmentItemSlotCount,
   infusionMaterialCost,
@@ -88,6 +89,28 @@ const spiritFlesh: ItemContent = {
   },
 };
 
+// Combat-stat-only material - no infusionStats at all, only infusionCombatStats.
+const vengeanceShard: ItemContent = {
+  id: 'vengeance-shard' as ItemId,
+  name: 'Vengeance Shard',
+  __type: 'item',
+  description: '',
+  sprite: '0032',
+  rarity: 'Common',
+  infusionCombatStats: {
+    repeatActionChance: 0,
+    skillStrikeAgainChance: 0,
+    redirectionChance: 0,
+    missChance: 0,
+    debuffIgnoreChance: 0,
+    damageReflectPercent: 3,
+    healingIgnorePercent: 0,
+    reviveChance: 0,
+    stunChance: 0,
+    agroValue: 0,
+  },
+};
+
 const sword: EquipmentContent = {
   id: 'sword' as EquipmentId,
   name: 'Sword',
@@ -122,6 +145,7 @@ function mockContentEntry(id: string) {
   if (id === goldCoin.id || id === goldCoin.name) return goldCoin;
   if (id === plainMaterial.id) return plainMaterial;
   if (id === spiritFlesh.id) return spiritFlesh;
+  if (id === vengeanceShard.id) return vengeanceShard;
   if (id === sword.id) return sword;
   return undefined;
 }
@@ -190,6 +214,37 @@ describe('Infusion Helper Functions', () => {
     });
   });
 
+  describe('equipmentItemInfusionCombatStatBonus', () => {
+    it('sums infusionCombatStats of every non-null slot', () => {
+      const bonus = equipmentItemInfusionCombatStatBonus([
+        vengeanceShard.id,
+        vengeanceShard.id,
+      ]);
+      expect(bonus.damageReflectPercent).toBe(6);
+    });
+
+    it('skips null (empty) slots', () => {
+      const bonus = equipmentItemInfusionCombatStatBonus([
+        vengeanceShard.id,
+        null,
+      ]);
+      expect(bonus.damageReflectPercent).toBe(3);
+    });
+
+    it('skips ids that resolve to no content or no infusionCombatStats', () => {
+      const bonus = equipmentItemInfusionCombatStatBonus([
+        'missing' as ItemId,
+        crystal.id,
+      ]);
+      expect(bonus.damageReflectPercent).toBe(0);
+    });
+
+    it('returns zeroed combat stats for an empty array', () => {
+      const bonus = equipmentItemInfusionCombatStatBonus([]);
+      expect(bonus.damageReflectPercent).toBe(0);
+    });
+  });
+
   describe('equipmentItemSlotCount', () => {
     it("returns the equipment content's slots", () => {
       expect(equipmentItemSlotCount(swordItem)).toBe(2);
@@ -255,6 +310,10 @@ describe('Infusion Helper Functions', () => {
       expect(isInfusionMaterial(spiritFlesh)).toBe(true);
     });
 
+    it('is true when only infusionCombatStats has a nonzero value (no infusionStats at all)', () => {
+      expect(isInfusionMaterial(vengeanceShard)).toBe(true);
+    });
+
     it('is false when infusionDebuffResistances is present but all zero', () => {
       expect(
         isInfusionMaterial({
@@ -302,6 +361,19 @@ describe('Infusion Helper Functions', () => {
 
       expect(infusionMaterialCost(crystal.id)).toBe(30 + 200);
     });
+
+    it('costs 50g per total combat stat point for a combat-stat-only item', () => {
+      expect(infusionMaterialCost(vengeanceShard.id)).toBe(150);
+    });
+
+    it('sums infusionStats (30g/point) and infusionCombatStats (50g/point) when an item has both', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        ...crystal,
+        infusionCombatStats: vengeanceShard.infusionCombatStats,
+      } as never);
+
+      expect(infusionMaterialCost(crystal.id)).toBe(30 + 150);
+    });
   });
 
   describe('canInfuseEquipmentItem', () => {
@@ -338,6 +410,12 @@ describe('Infusion Helper Functions', () => {
 
     it('allows a resistance-only material (no infusionStats)', () => {
       expect(canInfuseEquipmentItem(swordItem, 0, spiritFlesh.id)).toBe(true);
+    });
+
+    it('allows a combat-stat-only material (no infusionStats)', () => {
+      expect(canInfuseEquipmentItem(swordItem, 0, vengeanceShard.id)).toBe(
+        true,
+      );
     });
 
     it('rejects when the player does not own the material', () => {

@@ -71,6 +71,12 @@
       [bonusResistances]="bonusResistances()"
     />
 
+    <app-row-combat-stats
+      class="block mt-2"
+      [stats]="content.combatStats"
+      [bonusStats]="bonusCombatStats()"
+    />
+
     @if (infusionSlotCount() > 0) {
       <div class="mt-2">
         <app-row-infused-materials

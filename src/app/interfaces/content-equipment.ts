@@ -1,4 +1,5 @@
 import type { HasSprite } from '@interfaces/artable';
+import type { CombatantCombatStats } from '@interfaces/combat';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
@@ -19,6 +20,9 @@ export type EquipmentContent = IsContentItem &
     // Optional like `ItemContent.infusionStats` - only meaningful once
     // `ensureEquipment` fills it densely; hand-built test fixtures may omit it.
     debuffResistances?: Record<StatusEffectTag, number>;
+    // Same optionality convention - flat combat-stat bonus granted to the
+    // wearer at combat start (see `combatStatsForCharacterEquipment`).
+    combatStats?: CombatantCombatStats;
     type: EquipmentItemType;
     slots: number;
 

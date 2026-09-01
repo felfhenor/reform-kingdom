@@ -1,3 +1,4 @@
+import { combatStatsForCharacterEquipment } from '@helpers/combat/combat-stats';
 import { combatApplyStatDeltaToCombatant } from '@helpers/combat/combat-statuseffects';
 import { monsterStatsAtLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content';
@@ -111,7 +112,7 @@ export function combatantFromCharacter(character: Character): Combatant {
 
     combatOrders: character.combatOrders[character.jobId] ?? [],
 
-    combatStats: defaultCombatStats(),
+    combatStats: combatStatsForCharacterEquipment(character.equipment),
 
     affinity: defaultAffinities(),
     resistance: defaultAffinities(),

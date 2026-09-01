@@ -167,7 +167,7 @@ export function combatApplySkillToTarget(
         target,
         'healingIgnorePercent',
       );
-      effectiveDamage *= 1 - reduction;
+      effectiveDamage *= 1 - reduction / 100;
 
       effectiveDamage = -Math.abs(effectiveDamage);
     }
