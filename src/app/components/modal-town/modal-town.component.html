@@ -1,0 +1,85 @@
+<app-modal
+  modalId="town"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+>
+  <span title>{{ town()?.name ?? 'Town' }}</span>
+
+  <div body class="flex flex-col gap-4">
+    @if (town()) {
+      <div role="tablist" class="tabs tabs-boxed">
+        <a
+          role="tab"
+          class="tab"
+          [class.tab-active]="currentTab() === 'shop'"
+          (click)="currentTab.set('shop')"
+          (keydown.enter)="currentTab.set('shop')"
+          tabindex="1"
+        >
+          Shop
+        </a>
+        <a
+          role="tab"
+          class="tab"
+          [class.tab-active]="currentTab() === 'crafting'"
+          (click)="currentTab.set('crafting')"
+          (keydown.enter)="currentTab.set('crafting')"
+          tabindex="1"
+        >
+          Crafting
+        </a>
+        <a
+          role="tab"
+          class="tab"
+          [class.tab-active]="currentTab() === 'workers'"
+          (click)="currentTab.set('workers')"
+          (keydown.enter)="currentTab.set('workers')"
+          tabindex="1"
+        >
+          Workers
+        </a>
+        <a
+          role="tab"
+          class="tab"
+          [class.tab-active]="currentTab() === 'quests'"
+          (click)="currentTab.set('quests')"
+          (keydown.enter)="currentTab.set('quests')"
+          tabindex="1"
+        >
+          Quests
+        </a>
+        <a
+          role="tab"
+          class="tab"
+          [class.tab-active]="currentTab() === 'raid'"
+          (click)="currentTab.set('raid')"
+          (keydown.enter)="currentTab.set('raid')"
+          tabindex="1"
+        >
+          Raid
+        </a>
+      </div>
+
+      <div class="text-sm text-lighter min-h-16">
+        @switch (currentTab()) {
+          @case ('shop') {
+            <p>This town's shop hasn't opened for business yet.</p>
+          }
+          @case ('crafting') {
+            <p>No crafting orders are queued yet.</p>
+          }
+          @case ('workers') {
+            <p>No workers have been assigned yet.</p>
+          }
+          @case ('quests') {
+            <p>No commissions are available yet.</p>
+          }
+          @case ('raid') {
+            <p>No raid is currently threatening this town.</p>
+          }
+        }
+      </div>
+    }
+  </div>
+</app-modal>

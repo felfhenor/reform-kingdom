@@ -31,3 +31,10 @@ export type KingdomSubview =
   | 'achievements'
   | 'prestige'
   | 'workers';
+
+export type TownModalTab =
+  | 'shop'
+  | 'crafting'
+  | 'workers'
+  | 'quests'
+  | 'raid';

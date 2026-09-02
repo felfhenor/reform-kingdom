@@ -34,6 +34,8 @@
             <app-panel-map-node-badges-gather [entry]="entry" />
           } @else if (isCaravanNode()) {
             <app-panel-map-node-badges-caravan [entry]="entry" />
+          } @else if (isTownNode()) {
+            <app-panel-map-node-badges-town [entry]="entry" />
           }
         </div>
 
@@ -89,6 +91,8 @@
             [entry]="entry"
             (develop)="develop()"
           />
+        } @else if (isTownNode()) {
+          <app-panel-map-node-actions-town (openTown)="openTown()" />
         }
       </div>
     </div>

@@ -6,6 +6,7 @@ import {
   worldNodeEncounterRandom,
   worldNodeGathering,
   worldNodeOverride,
+  worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
   TiledMap,
@@ -21,7 +22,8 @@ export function worldNodeDescription(
     worldNodeEncounter(entry)?.description ??
     worldNodeGathering(entry)?.description ??
     worldNodeEncounterRandom(entry)?.description ??
-    worldNodeCaravan(entry)?.description
+    worldNodeCaravan(entry)?.description ??
+    worldNodeTown(entry)?.description
   );
 }
 

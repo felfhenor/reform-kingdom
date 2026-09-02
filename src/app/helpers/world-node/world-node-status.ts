@@ -8,6 +8,7 @@ import {
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeGathering,
+  worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
   LevelRange,
@@ -19,11 +20,14 @@ import type {
 export function worldNodeLevelRange(
   entry: WorldNodeEntry,
 ): LevelRange | undefined {
+  const townLevel = worldNodeTown(entry)?.level;
+
   return (
     worldNodeEncounter(entry)?.levelRange ??
     worldNodeGathering(entry)?.levelRange ??
     worldNodeEncounterRandom(entry)?.levelRange ??
-    worldNodeCaravan(entry)?.level
+    worldNodeCaravan(entry)?.level ??
+    (townLevel !== undefined ? { min: townLevel, max: townLevel } : undefined)
   );
 }
 

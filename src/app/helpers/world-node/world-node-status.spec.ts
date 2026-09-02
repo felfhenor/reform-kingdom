@@ -3,6 +3,7 @@ import type {
   CaravanId,
   EncounterContent,
   TiledObject,
+  TownContent,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -96,6 +97,19 @@ describe('encounter-backed node accessors', () => {
 
     it('returns undefined when there is no matching encounter', () => {
       expect(worldNodeLevelRange(buildEntry())).toBeUndefined();
+    });
+
+    it("collapses a town's single level into a min-max range", () => {
+      seedContent([
+        {
+          id: 'town-forest-ruins',
+          name: 'Forest Ruins',
+          __type: 'town',
+          level: 25,
+        } as unknown as TownContent,
+      ]);
+
+      expect(worldNodeLevelRange(buildEntry())).toEqual({ min: 25, max: 25 });
     });
   });
 

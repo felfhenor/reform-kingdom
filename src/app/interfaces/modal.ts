@@ -4,4 +4,5 @@ export type ModalId =
   | 'reclass-heroes'
   | 'changelog'
   | 'pause-menu'
-  | 'settings';
+  | 'settings'
+  | 'town';

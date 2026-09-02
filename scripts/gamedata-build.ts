@@ -9,6 +9,7 @@ fs.ensureDirSync('./public/json');
 
 const allData: Record<string, any[]> = {};
 const trackedIds: Record<string, boolean> = {};
+const trackedNames: Record<string, boolean> = {};
 const idToName: Record<string, Record<string, string>> = {};
 
 // preload
@@ -33,7 +34,7 @@ const processFiles = async () => {
               return;
             }
 
-            if (idToName[folder][entry.name]) {
+            if (trackedNames[entry.name]) {
               console.error(
                 `Name "${entry.name}" already exists somewhere in the content.`,
               );
@@ -48,6 +49,7 @@ const processFiles = async () => {
             }
 
             trackedIds[entry.id] = true;
+            trackedNames[entry.name] = true;
             idToName[folder][entry.name] = entry.id;
           });
 

@@ -6,6 +6,7 @@ import type {
   TiledMap,
   TiledObject,
   TiledTileset,
+  TownContent,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -112,6 +113,16 @@ function buildNodeOverride(
   };
 }
 
+function buildTown(overrides: Partial<TownContent> = {}): TownContent {
+  return {
+    id: 'town-forest-ruins',
+    name: 'Forest Ruins',
+    __type: 'town',
+    description: 'A bustling trade town.',
+    ...overrides,
+  } as TownContent;
+}
+
 describe('worldNodeDescription', () => {
   beforeEach(() => {
     setAllIdsByName(new Map());
@@ -128,6 +139,12 @@ describe('worldNodeDescription', () => {
     seedContent([buildNodeOverride({ description: 'The town square.' })]);
 
     expect(worldNodeDescription(buildEntry())).toBe('The town square.');
+  });
+
+  it("reads the description from a town when nothing else matches", () => {
+    seedContent([buildTown({ description: 'A desert trade hub.' })]);
+
+    expect(worldNodeDescription(buildEntry())).toBe('A desert trade hub.');
   });
 
   it('returns undefined when there is no matching encounter or override', () => {

@@ -13,7 +13,8 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 import { caravanMarkVisited } from '../caravan/caravan';
-import { worldNodeCaravan } from '../world-node/world-nodes';
+import { townMarkVisited } from '../town/town-visit';
+import { worldNodeCaravan, worldNodeTown } from '../world-node/world-nodes';
 
 // Change-detection nudge ticking once a second independent of the gameloop, so live countdowns re-render even without a gameloop tick.
 export const uiClockTick = signal<number>(0);
@@ -105,6 +106,17 @@ export function caravanTradeOpen(entry: WorldNodeEntry): void {
 
   activeCaravanNode.set(entry);
   modalOpen('caravan-trade');
+}
+
+// Not cleared on close - would collapse the modal's DOM mid-transition (see `ModalComponent`); overwritten next open instead.
+export const activeTownNode = signal<WorldNodeEntry | undefined>(undefined);
+
+export function townOpen(entry: WorldNodeEntry): void {
+  const town = worldNodeTown(entry);
+  if (town) townMarkVisited(town.id);
+
+  activeTownNode.set(entry);
+  modalOpen('town');
 }
 
 // Global across all tradeskills, not per-tradeskill - it's a UI display preference, not a per-building setting.
