@@ -9,7 +9,7 @@ import type {
   GameStateTradeskills,
   GatheringState,
   StatBlock,
-  StatusEffectTag,
+  StatusEffectBlock,
   TravelState,
   WorkerStatBlock,
 } from '@interfaces';
@@ -137,7 +137,7 @@ export function defaultCombatStats(): CombatStatBlock {
   };
 }
 
-export function defaultTagResistances(): Record<StatusEffectTag, number> {
+export function defaultTagResistances(): StatusEffectBlock {
   return {
     Stun: 0,
     StatDown: 0,

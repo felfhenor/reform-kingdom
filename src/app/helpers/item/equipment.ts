@@ -14,6 +14,7 @@ import {
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngUuid } from '@helpers/rng';
+import type { StatusEffectBlock } from '@interfaces';
 import {
   EquipmentTypeToSlot,
   StatOrder,
@@ -34,7 +35,6 @@ import {
   type JobContent,
   type JobId,
   type StatBlock,
-  type StatusEffectTag,
 } from '@interfaces';
 import { orderBy, sumBy, uniq } from 'es-toolkit/compat';
 
@@ -212,7 +212,7 @@ export function equipmentCombatStatTotals(
 
 export function equipmentTagResistanceTotals(
   equipment: EquipmentBlock,
-): Record<StatusEffectTag, number> {
+): StatusEffectBlock {
   return equipmentDimensionTotals(equipment, RESISTANCE_BONUS);
 }
 
@@ -227,7 +227,7 @@ export function equipmentAffixEffects(
 // a fixed 8-key `StatBlock` shape unrelated to this keyspace).
 export function characterTagResistances(
   character: Character,
-): Record<StatusEffectTag, number> {
+): StatusEffectBlock {
   return equipmentTagResistanceTotals(character.equipment);
 }
 

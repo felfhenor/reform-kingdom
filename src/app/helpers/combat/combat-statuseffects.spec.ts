@@ -11,13 +11,13 @@ import type {
   Combat,
   Combatant,
   StatusEffect,
-  StatusEffectTag,
+  StatusEffectBlock,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 function buildTagResistance(
-  overrides: Partial<Record<StatusEffectTag, number>> = {},
-): Record<StatusEffectTag, number> {
+  overrides: Partial<StatusEffectBlock> = {},
+): StatusEffectBlock {
   return {
     Stun: 0,
     StatDown: 0,

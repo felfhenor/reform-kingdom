@@ -16,7 +16,7 @@ import type {
   EquipmentSkillContent,
   EquipmentSkillId,
   StatBlock,
-  StatusEffectTag,
+  StatusEffectBlock,
 } from '@interfaces';
 import { uniq } from 'es-toolkit/compat';
 
@@ -28,7 +28,7 @@ export function equipmentItemBonusStats(item: EquipmentItem): StatBlock {
 // The resistance analog of `equipmentItemBonusStats`.
 export function equipmentItemBonusResistances(
   item: EquipmentItem,
-): Record<StatusEffectTag, number> {
+): StatusEffectBlock {
   return equipmentItemBonusTotals(item, RESISTANCE_BONUS);
 }
 

@@ -1,6 +1,6 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { CombatStatBlock } from '@interfaces/combat';
-import type { StatusEffectTag } from '@interfaces/content-statuseffect';
+import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
@@ -20,7 +20,7 @@ export type ItemContent = IsContentItem &
     infusionStats?: StatBlock;
 
     // Same idea as `infusionStats`, but for per-tag debuff resistance.
-    infusionDebuffResistances?: Record<StatusEffectTag, number>;
+    infusionDebuffResistances?: StatusEffectBlock;
 
     // Same idea as `infusionStats`, but for combat stats.
     infusionCombatStats?: CombatStatBlock;

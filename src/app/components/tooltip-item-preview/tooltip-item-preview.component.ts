@@ -7,11 +7,11 @@ import {
 } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
+import type { StatusEffectBlock } from '@interfaces';
 import {
   type CombatStatBlock,
   type ItemPreviewDisplay,
   type StatBlock,
-  type StatusEffectTag,
 } from '@interfaces';
 
 // Headless: renders only an `ng-template` and exposes it via `template()`,
@@ -31,7 +31,7 @@ export class TooltipItemPreviewComponent {
   // meaningful for equipment, so most callers leave this unset.
   public bonusStats = input<StatBlock>();
   // Same idea as `bonusStats`, for per-tag debuff resistance.
-  public bonusResistances = input<Record<StatusEffectTag, number>>();
+  public bonusResistances = input<StatusEffectBlock>();
   // Same idea as `bonusStats`, for combat stats.
   public bonusCombatStats = input<CombatStatBlock>();
 

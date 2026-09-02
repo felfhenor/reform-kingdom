@@ -89,6 +89,7 @@ import type {
   StatBlock,
   StatusEffectBehavior,
   StatusEffectBehaviorType,
+  StatusEffectBlock,
   StatusEffectContent,
   StatusEffectId,
   StatusEffectTag,
@@ -170,8 +171,8 @@ function ensureStats(statblock: Partial<StatBlock> = {}): Required<StatBlock> {
 }
 
 function ensureTagResistances(
-  resistances: Partial<Record<StatusEffectTag, number>> = {},
-): Record<StatusEffectTag, number> {
+  resistances: Partial<StatusEffectBlock> = {},
+): StatusEffectBlock {
   return Object.assign({}, defaultTagResistances(), resistances);
 }
 

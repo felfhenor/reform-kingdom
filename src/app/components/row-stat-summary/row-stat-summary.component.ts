@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
-import type { CombatStat, GameStat } from '@interfaces';
+import type { CombatStat, GameStat, StatusEffectBlock } from '@interfaces';
 import {
   CombatStatDimension,
   StatusEffectTagDimension,
@@ -27,8 +27,8 @@ export class RowStatSummaryComponent {
   public bonusStats = input<StatBlock>();
   public comparisonStats = input<StatBlock>();
 
-  public resistances = input<Record<StatusEffectTag, number>>();
-  public bonusResistances = input<Record<StatusEffectTag, number>>();
+  public resistances = input<StatusEffectBlock>();
+  public bonusResistances = input<StatusEffectBlock>();
 
   public combatStats = input<CombatStatBlock>();
   public bonusCombatStats = input<CombatStatBlock>();
@@ -45,8 +45,7 @@ export class RowStatSummaryComponent {
   });
 
   public hasAnyResistances = computed(() => {
-    const resistances =
-      this.resistances() ?? ({} as Record<StatusEffectTag, number>);
+    const resistances = this.resistances() ?? ({} as StatusEffectBlock);
     return Object.keys(resistances).some(
       (k) => (resistances[k as StatusEffectTag] ?? 0) > 0,
     );

@@ -2,7 +2,7 @@ import type { CombatStatBlock } from '@interfaces/combat';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
-import type { StatusEffectTag } from '@interfaces/content-statuseffect';
+import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { DropRarity } from '@interfaces/droppable';
 import type { StatBlock } from '@interfaces/stat';
 
@@ -26,7 +26,7 @@ export type ItemPreviewDisplay = {
   // collectible, or an item with no infusion stats to show.
   stats?: StatBlock;
   // Same split as `stats`, for per-tag debuff resistance.
-  resistances?: Record<StatusEffectTag, number>;
+  resistances?: StatusEffectBlock;
   // Same split as `stats`, for combat stats.
   combatStats?: CombatStatBlock;
   // Equipment only.

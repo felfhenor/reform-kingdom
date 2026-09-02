@@ -14,7 +14,7 @@ import type {
   ItemContent,
   ItemId,
   StatBlock,
-  StatusEffectTag,
+  StatusEffectBlock,
 } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
 
@@ -32,7 +32,7 @@ export function equipmentItemInfusionBonus(
 // Sibling of `equipmentItemInfusionBonus` for per-tag debuff resistance.
 export function equipmentItemInfusionResistanceBonus(
   infusedItemIds: (ItemId | null)[],
-): Record<StatusEffectTag, number> {
+): StatusEffectBlock {
   return equipmentItemInfusionTotals(infusedItemIds, RESISTANCE_BONUS);
 }
 

@@ -1,7 +1,7 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { CombatStatBlock } from '@interfaces/combat';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
-import type { StatusEffectTag } from '@interfaces/content-statuseffect';
+import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
@@ -17,17 +17,13 @@ export type EquipmentContent = IsContentItem &
     id: EquipmentId;
     levelRequirement: number;
     baseStats: StatBlock;
-    // Optional like `ItemContent.infusionStats` - only meaningful once
-    // `ensureEquipment` fills it densely; hand-built test fixtures may omit it.
-    debuffResistances?: Record<StatusEffectTag, number>;
-    // Same optionality convention - flat combat-stat bonus granted to the
-    // wearer at combat start (see `combatStatsForCharacterEquipment`).
+    debuffResistances?: StatusEffectBlock;
+    // flat combat-stat bonus granted to the wearer at combat start
     combatStats?: CombatStatBlock;
     type: EquipmentItemType;
     slots: number;
 
-    // Skills a hero learns simply by having this equipped - merged into
-    // their job-path skills (see `mergeGrantedSkills`/`heroSkillsWithEquipment`).
+    // Skills a hero learns simply by having this equipped
     grantedSkillIds: EquipmentSkillId[];
 
     unobtainable?: boolean;
