@@ -35,7 +35,7 @@ export type CombatStat =
   | 'stunChance'
   | 'agroValue';
 
-export type CombatantCombatStats = Record<CombatStat, number>;
+export type CombatStatBlock = Record<CombatStat, number>;
 
 // Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier (see `rngSucceedsChance`).
 export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
@@ -135,7 +135,7 @@ export type Combatant = HasAnimation & {
   statBoosts: StatBlock;
   totalStats: StatBlock;
 
-  combatStats: CombatantCombatStats;
+  combatStats: CombatStatBlock;
 
   resistance: ElementBlock;
   affinity: ElementBlock;

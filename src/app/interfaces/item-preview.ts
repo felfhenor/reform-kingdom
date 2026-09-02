@@ -1,4 +1,4 @@
-import type { CombatantCombatStats } from '@interfaces/combat';
+import type { CombatStatBlock } from '@interfaces/combat';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
@@ -9,7 +9,8 @@ import type { StatBlock } from '@interfaces/stat';
 // Anything `itemPreviewDisplay` can normalize down to a hover preview - the
 // three content kinds a recipe, stored material, or caravan trade can
 // resolve to.
-export type ItemPreviewContent = ItemContent | EquipmentContent | CollectibleContent;
+export type ItemPreviewContent =
+  ItemContent | EquipmentContent | CollectibleContent;
 
 export type ItemPreviewSpritesheet = 'item' | 'equipment' | 'collectible';
 
@@ -27,7 +28,7 @@ export type ItemPreviewDisplay = {
   // Same split as `stats`, for per-tag debuff resistance.
   resistances?: Record<StatusEffectTag, number>;
   // Same split as `stats`, for combat stats.
-  combatStats?: CombatantCombatStats;
+  combatStats?: CombatStatBlock;
   // Equipment only.
   levelRequirement?: number;
   // Equipment only - party hero names whose job can equip this item.

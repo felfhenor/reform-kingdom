@@ -8,7 +8,7 @@ import {
 } from '@helpers/item/equipment-bonus';
 import { getGoldQuantity, getMaterialQuantity } from '@helpers/item/materials';
 import type {
-  CombatantCombatStats,
+  CombatStatBlock,
   EquipmentContent,
   EquipmentItem,
   ItemContent,
@@ -39,7 +39,7 @@ export function equipmentItemInfusionResistanceBonus(
 // Sibling of `equipmentItemInfusionBonus` for combat stats.
 export function equipmentItemInfusionCombatStatBonus(
   infusedItemIds: (ItemId | null)[],
-): CombatantCombatStats {
+): CombatStatBlock {
   return equipmentItemInfusionTotals(infusedItemIds, COMBAT_STAT_BONUS);
 }
 
@@ -54,9 +54,9 @@ export function equipmentItemSlotCount(item: EquipmentItem): number {
 }
 
 export function isInfusionMaterial(item: ItemContent): boolean {
-  const hasStatBonus = Object.values(
-    STAT_BONUS.infusionBlock(item) ?? {},
-  ).some((value) => value !== 0);
+  const hasStatBonus = Object.values(STAT_BONUS.infusionBlock(item) ?? {}).some(
+    (value) => value !== 0,
+  );
   const hasResistanceBonus = Object.values(
     RESISTANCE_BONUS.infusionBlock(item) ?? {},
   ).some((value) => value !== 0);
@@ -76,7 +76,8 @@ export function infusionMaterialCost(itemId: ItemId): number {
   if (!content) return 0;
 
   const statCost =
-    GOLD_PER_STAT_POINT * sum(Object.values(STAT_BONUS.infusionBlock(content) ?? {}));
+    GOLD_PER_STAT_POINT *
+    sum(Object.values(STAT_BONUS.infusionBlock(content) ?? {}));
   const resistanceCost =
     GOLD_PER_RESISTANCE_POINT *
     sum(Object.values(RESISTANCE_BONUS.infusionBlock(content) ?? {}));

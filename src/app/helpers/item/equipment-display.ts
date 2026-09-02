@@ -10,7 +10,7 @@ import {
   STAT_BONUS,
 } from '@helpers/item/equipment-bonus';
 import type {
-  CombatantCombatStats,
+  CombatStatBlock,
   EquipmentContent,
   EquipmentItem,
   EquipmentSkillContent,
@@ -35,7 +35,7 @@ export function equipmentItemBonusResistances(
 // The combat-stat analog of `equipmentItemBonusStats`.
 export function equipmentItemBonusCombatStats(
   item: EquipmentItem,
-): CombatantCombatStats {
+): CombatStatBlock {
   return equipmentItemBonusTotals(item, COMBAT_STAT_BONUS);
 }
 

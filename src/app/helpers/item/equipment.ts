@@ -20,7 +20,7 @@ import {
   type AffixEffect,
   type BaseStat,
   type Character,
-  type CombatantCombatStats,
+  type CombatStatBlock,
   type EquipmentArmoryEntry,
   type EquipmentBlock,
   type EquipmentBonusDimension,
@@ -206,7 +206,7 @@ export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
 // Applied at combat creation, not baked into `Character.stats` - see `combatStatsForCharacterEquipment`.
 export function equipmentCombatStatTotals(
   equipment: EquipmentBlock,
-): CombatantCombatStats {
+): CombatStatBlock {
   return equipmentDimensionTotals(equipment, COMBAT_STAT_BONUS);
 }
 
@@ -236,7 +236,7 @@ export function characterTagResistances(
 // default baseline, meaningless outside a `Combatant`).
 export function characterCombatStatTotals(
   character: Character,
-): CombatantCombatStats {
+): CombatStatBlock {
   return equipmentCombatStatTotals(character.equipment);
 }
 

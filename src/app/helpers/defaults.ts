@@ -1,7 +1,7 @@
 import { rngUuid } from '@helpers/rng';
 import type {
   AutoModeState,
-  CombatantCombatStats,
+  CombatStatBlock,
   ElementBlock,
   EquipmentBlock,
   GameId,
@@ -122,7 +122,7 @@ export function defaultAffinities(): ElementBlock {
   };
 }
 
-export function defaultCombatStats(): CombatantCombatStats {
+export function defaultCombatStats(): CombatStatBlock {
   return {
     repeatActionChance: 0,
     skillStrikeAgainChance: 0,

@@ -1,14 +1,14 @@
+import type { TemplateRef } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   input,
   viewChild,
 } from '@angular/core';
-import type { TemplateRef } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import {
-  type CombatantCombatStats,
+  type CombatStatBlock,
   type ItemPreviewDisplay,
   type StatBlock,
   type StatusEffectTag,
@@ -33,7 +33,7 @@ export class TooltipItemPreviewComponent {
   // Same idea as `bonusStats`, for per-tag debuff resistance.
   public bonusResistances = input<Record<StatusEffectTag, number>>();
   // Same idea as `bonusStats`, for combat stats.
-  public bonusCombatStats = input<CombatantCombatStats>();
+  public bonusCombatStats = input<CombatStatBlock>();
 
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
 }

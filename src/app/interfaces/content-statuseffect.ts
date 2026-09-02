@@ -1,5 +1,5 @@
 import type {
-  CombatantCombatStats,
+  CombatStatBlock,
   CombatantStatusEffectData,
 } from '@interfaces/combat';
 import type { GameElement } from '@interfaces/element';
@@ -64,14 +64,14 @@ export type StatusEffectBehaviorDataChange = {
 export type StatusEffectAddCombatStatNumber = {
   type: 'AddCombatStatNumber';
   combatMessage?: string;
-  combatStat: keyof CombatantCombatStats;
+  combatStat: keyof CombatStatBlock;
   value: number;
 };
 
 export type StatusEffectTakeCombatStatNumber = {
   type: 'TakeCombatStatNumber';
   combatMessage?: string;
-  combatStat: keyof CombatantCombatStats;
+  combatStat: keyof CombatStatBlock;
   value: number;
 };
 

@@ -10,7 +10,7 @@ import type { CombatStat, GameStat } from '@interfaces';
 import {
   CombatStatDimension,
   StatusEffectTagDimension,
-  type CombatantCombatStats,
+  type CombatStatBlock,
   type StatBlock,
   type StatusEffectTag,
 } from '@interfaces';
@@ -30,8 +30,8 @@ export class RowStatSummaryComponent {
   public resistances = input<Record<StatusEffectTag, number>>();
   public bonusResistances = input<Record<StatusEffectTag, number>>();
 
-  public combatStats = input<CombatantCombatStats>();
-  public bonusCombatStats = input<CombatantCombatStats>();
+  public combatStats = input<CombatStatBlock>();
+  public bonusCombatStats = input<CombatStatBlock>();
 
   // 'column' (default) for tooltips/detail panels; 'row' for compact,
   // space-constrained lists (e.g. a picker row) - mirrors the underlying rows.

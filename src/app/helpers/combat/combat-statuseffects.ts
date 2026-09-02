@@ -5,11 +5,7 @@ import {
   combatMessageLog,
 } from '@helpers/combat/combat-log';
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
-import type {
-  Combat,
-  Combatant,
-  CombatantCombatStats,
-} from '@interfaces/combat';
+import type { Combat, Combatant, CombatStatBlock } from '@interfaces/combat';
 import type { EquipmentSkill } from '@interfaces/content-skill';
 import type {
   StatusEffect,
@@ -139,7 +135,7 @@ export function combatApplyStatDeltaToCombatant(
 
 function combatApplyCombatStatNumberDeltaToCombatant(
   combatant: Combatant,
-  stat: keyof CombatantCombatStats,
+  stat: keyof CombatStatBlock,
   value: number,
 ): void {
   const ref = combatant.combatStats[stat];

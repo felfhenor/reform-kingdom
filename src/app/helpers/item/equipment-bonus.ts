@@ -6,7 +6,7 @@ import {
 } from '@helpers/defaults';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import type {
-  CombatantCombatStats,
+  CombatStatBlock,
   EquipmentBonusDimension,
   EquipmentItem,
   ItemContent,
@@ -33,15 +33,18 @@ export const RESISTANCE_BONUS: EquipmentBonusDimension<StatusEffectTag> = {
     affixEffectSum(affixEffects, 'Resistance', (effect) => effect.tag === key),
 };
 
-export const COMBAT_STAT_BONUS: EquipmentBonusDimension<
-  keyof CombatantCombatStats
-> = {
-  defaultBlock: defaultCombatStats,
-  equipmentBlock: (content) => content.combatStats,
-  infusionBlock: (content) => content.infusionCombatStats,
-  affixBonusFor: (affixEffects, key) =>
-    affixEffectSum(affixEffects, 'CombatStat', (effect) => effect.stat === key),
-};
+export const COMBAT_STAT_BONUS: EquipmentBonusDimension<keyof CombatStatBlock> =
+  {
+    defaultBlock: defaultCombatStats,
+    equipmentBlock: (content) => content.combatStats,
+    infusionBlock: (content) => content.infusionCombatStats,
+    affixBonusFor: (affixEffects, key) =>
+      affixEffectSum(
+        affixEffects,
+        'CombatStat',
+        (effect) => effect.stat === key,
+      ),
+  };
 
 // Sums one dimension's infusion bonus across every non-empty slot.
 export function equipmentItemInfusionTotals<K extends string>(

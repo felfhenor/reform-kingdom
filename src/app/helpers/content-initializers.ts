@@ -23,8 +23,8 @@ import type {
   CaravanTradeType,
   CollectibleContent,
   CollectibleId,
-  CombatantCombatStats,
   CombatantStatusEffectData,
+  CombatStatBlock,
   CommissionOfferContent,
   CommissionOfferId,
   CommissionOfferRequirement,
@@ -136,7 +136,7 @@ const VALID_STATUS_EFFECT_TAGS = Object.keys(
 const VALID_GAME_STATS = Object.keys(defaultStats()) as GameStat[];
 const VALID_COMBAT_STATS = Object.keys(
   defaultCombatStats(),
-) as (keyof CombatantCombatStats)[];
+) as (keyof CombatStatBlock)[];
 const VALID_EQUIPMENT_ITEM_TYPES = Object.keys(
   EquipmentTypeToSlot,
 ) as EquipmentItemType[];
@@ -176,8 +176,8 @@ function ensureTagResistances(
 }
 
 function ensureCombatStats(
-  combatStats: Partial<CombatantCombatStats> = {},
-): Required<CombatantCombatStats> {
+  combatStats: Partial<CombatStatBlock> = {},
+): Required<CombatStatBlock> {
   return Object.assign({}, defaultCombatStats(), combatStats);
 }
 
