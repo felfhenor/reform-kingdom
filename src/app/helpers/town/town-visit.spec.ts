@@ -46,6 +46,7 @@ describe('townMarkVisited', () => {
 
     expect(state.world.towns[townId]).toEqual({
       lastProcessedTick: {},
+      stock: [],
       firstVisitedAtTick: 500,
     });
   });
@@ -85,8 +86,32 @@ describe('townMarkVisited', () => {
 
     expect(state.world.towns[townId]).toEqual({
       lastProcessedTick: { worker: 42 },
+      stock: [],
       firstVisitedAtTick: 500,
     });
+  });
+
+  it('preserves existing stock when activating', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: {
+          [townId]: { lastProcessedTick: {}, stock: [{ quantity: 3 }] },
+        },
+      },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: {
+          [townId]: { lastProcessedTick: {}, stock: [{ quantity: 3 }] },
+        },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].stock).toEqual([{ quantity: 3 }]);
   });
 
   it('is a no-op and fires no analytics if the town was already visited', () => {

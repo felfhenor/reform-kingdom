@@ -1,6 +1,7 @@
 import { getEntry } from '@helpers/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { pruneInvalidTownStock } from '@helpers/town/shop/town-stock';
 import type {
   GameStateTowns,
   TownContent,
@@ -44,7 +45,10 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
 
   (Object.keys(towns) as TownId[]).forEach((townId) => {
     if (getEntry<TownContent>(townId)) {
-      pruned[townId] = towns[townId];
+      pruned[townId] = {
+        ...towns[townId],
+        stock: pruneInvalidTownStock(towns[townId].stock ?? []),
+      };
     }
   });
 

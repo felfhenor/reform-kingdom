@@ -4,13 +4,23 @@ vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/crafting/recipes', () => ({
+  recipeBackdropSprite: vi.fn(() => 'recipe-backdrop'),
+  recipeResultContent: vi.fn(),
+  recipeResultSpritesheet: vi.fn(() => 'equipment'),
+}));
+
 vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(),
 }));
 
 import { getEntry } from '@helpers/content';
+import { recipeResultContent } from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
-import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import {
+  itemPreviewDisplay,
+  resolveRewardDisplay,
+} from '@helpers/item/item-preview';
 import type {
   CharacterId,
   CollectibleContent,
@@ -21,6 +31,8 @@ import type {
   ItemId,
   JobContent,
   JobId,
+  RecipeContent,
+  RecipeId,
 } from '@interfaces';
 
 describe('itemPreviewDisplay', () => {
@@ -160,5 +172,88 @@ describe('itemPreviewDisplay', () => {
       spritesheet: 'collectible',
       rarity: 'Legendary',
     });
+  });
+});
+
+describe('resolveRewardDisplay', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('resolves an itemId to its display', () => {
+    const item = {
+      id: 'ore' as ItemId,
+      name: 'Copper Ore',
+      description: 'Shiny.',
+      sprite: '0001',
+      rarity: 'Common',
+    } as ItemContent;
+    vi.mocked(getEntry).mockReturnValue(item);
+
+    expect(resolveRewardDisplay({ itemId: item.id })?.name).toBe(
+      'Copper Ore',
+    );
+  });
+
+  it('resolves an equipmentId to its display', () => {
+    const equipment = {
+      id: 'sword' as EquipmentId,
+      name: 'Sword',
+      description: 'Sharp.',
+      sprite: '0002',
+      rarity: 'Rare',
+    } as EquipmentContent;
+    vi.mocked(getEntry).mockReturnValue(equipment);
+    vi.mocked(partyGet).mockReturnValue([]);
+
+    expect(resolveRewardDisplay({ equipmentId: equipment.id })?.name).toBe(
+      'Sword',
+    );
+  });
+
+  it('resolves a collectibleId to its display', () => {
+    const collectible = {
+      id: 'trinket' as CollectibleId,
+      name: 'Trinket',
+      description: 'Curious.',
+      sprite: '0003',
+      rarity: 'Legendary',
+    } as CollectibleContent;
+    vi.mocked(getEntry).mockReturnValue(collectible);
+
+    expect(
+      resolveRewardDisplay({ collectibleId: collectible.id })?.name,
+    ).toBe('Trinket');
+  });
+
+  it("resolves a recipeId to the crafted result's display, using the recipe's own name", () => {
+    const recipe = { id: 'recipe-1' as RecipeId, name: 'Blueprint: Sword' } as RecipeContent;
+    const result = {
+      id: 'sword' as EquipmentId,
+      name: 'Sword',
+      description: 'Sharp.',
+      sprite: '0002',
+      rarity: 'Rare',
+    } as EquipmentContent;
+    vi.mocked(getEntry).mockReturnValue(recipe);
+    vi.mocked(recipeResultContent).mockReturnValue(result);
+    vi.mocked(partyGet).mockReturnValue([]);
+
+    const display = resolveRewardDisplay({ recipeId: recipe.id });
+
+    expect(display?.name).toBe('Blueprint: Sword');
+    expect(display?.backdropSprite).toBe('recipe-backdrop');
+  });
+
+  it('returns undefined when no id is set', () => {
+    expect(resolveRewardDisplay({})).toBeUndefined();
+  });
+
+  it('returns undefined when the referenced id no longer resolves to content', () => {
+    vi.mocked(getEntry).mockReturnValue(undefined);
+
+    expect(
+      resolveRewardDisplay({ itemId: 'missing' as ItemId }),
+    ).toBeUndefined();
   });
 });

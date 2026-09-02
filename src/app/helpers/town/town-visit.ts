@@ -18,6 +18,7 @@ export function townMarkVisited(townId: TownId): void {
 
     state.world.towns[townId] = {
       lastProcessedTick: existing?.lastProcessedTick ?? {},
+      stock: existing?.stock ?? [],
       firstVisitedAtTick: timerTicksElapsed(),
     };
     return state;

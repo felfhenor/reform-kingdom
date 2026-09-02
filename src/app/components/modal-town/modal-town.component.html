@@ -64,7 +64,29 @@
       <div class="text-sm text-lighter min-h-16">
         @switch (currentTab()) {
           @case ('shop') {
-            <p>This town's shop hasn't opened for business yet.</p>
+            @let shopStock = stock();
+
+            <div class="flex justify-between items-center">
+              <span>
+                {{ shopStock.length | number }} / {{ stockCap() | number }}
+                items in stock
+              </span>
+            </div>
+
+            @if (shopStock.length > 0) {
+              <div class="flex flex-col gap-2">
+                @for (stockEntry of shopStock; track $index) {
+                  <div class="flex justify-between items-center">
+                    <span>{{ stockEntryName(stockEntry) }}</span>
+                    <span class="badge badge-outline badge-sm">
+                      x{{ stockEntry.quantity | number }}
+                    </span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p>This town's shop hasn't opened for business yet.</p>
+            }
           }
           @case ('crafting') {
             <p>No crafting orders are queued yet.</p>

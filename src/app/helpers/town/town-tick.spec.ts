@@ -144,7 +144,7 @@ describe('pruneInvalidTowns', () => {
   it('keeps entries that resolve to real content', () => {
     vi.mocked(getEntry).mockReturnValue(town);
     const towns: GameStateTowns = {
-      [townId]: { lastProcessedTick: {} },
+      [townId]: { lastProcessedTick: {}, stock: [] },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual(towns);
@@ -153,9 +153,36 @@ describe('pruneInvalidTowns', () => {
   it('drops entries whose id no longer resolves to real content', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
     const towns: GameStateTowns = {
-      [townId]: { lastProcessedTick: {} },
+      [townId]: { lastProcessedTick: {}, stock: [] },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual({});
+  });
+
+  it('backfills a missing stock array on a legacy entry', () => {
+    vi.mocked(getEntry).mockReturnValue(town);
+    const towns = {
+      [townId]: { lastProcessedTick: {} },
+    } as unknown as GameStateTowns;
+
+    expect(pruneInvalidTowns(towns)).toEqual({
+      [townId]: { lastProcessedTick: {}, stock: [] },
+    });
+  });
+
+  it('drops stock entries whose referenced item no longer resolves', () => {
+    vi.mocked(getEntry).mockImplementation((id: unknown) =>
+      id === townId ? town : undefined,
+    );
+    const towns: GameStateTowns = {
+      [townId]: {
+        lastProcessedTick: {},
+        stock: [{ itemId: 'removed-item' as never, quantity: 1 }],
+      },
+    };
+
+    expect(pruneInvalidTowns(towns)).toEqual({
+      [townId]: { lastProcessedTick: {}, stock: [] },
+    });
   });
 });
