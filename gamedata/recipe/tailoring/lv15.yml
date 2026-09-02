@@ -157,7 +157,7 @@
 - id: e9cb3a68-dd8b-41f1-81da-06a5942a1bf6
   name: 'Material: Cimmerian Water Charm'
   result:
-    itemId: Cimmerian Skull Charm
+    itemId: Cimmerian Water Charm
 
   requirements:
     - itemId: Strongreed
