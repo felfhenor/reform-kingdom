@@ -1,3 +1,4 @@
+import type * as TownWorkerRosterHelper from '@helpers/town/worker/town-worker-roster';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content', () => ({
@@ -13,6 +14,14 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
 }));
 
+vi.mock('@helpers/town/worker/town-worker-roster', async (importOriginal) => {
+  const actual = await importOriginal<typeof TownWorkerRosterHelper>();
+  return {
+    ...actual,
+    townWorkerRosterMaterialize: vi.fn((_town, existing) => existing),
+  };
+});
+
 import { getEntry } from '@helpers/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -21,14 +30,17 @@ import {
   markTownSubsystemProcessed,
   pruneInvalidTowns,
 } from '@helpers/town/town-tick';
+import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import type {
   GameState,
   GameStateTowns,
   TownContent,
   TownId,
+  WorkerId,
 } from '@interfaces';
 
 const townId = 'larsia' as TownId;
+const darwinId = 'darwin' as WorkerId;
 
 const town: TownContent = {
   id: townId,
@@ -50,7 +62,7 @@ const town: TownContent = {
     gatherRateMultiplier: 5,
     goldGatheredPerMaterial: 5,
     goldRequiredBeforeCutoff: 25000,
-    workers: [],
+    workers: [{ workerId: darwinId, level: 1 }],
   },
   reputation: { buff: { name: 'Larsian Influence', tiers: [] } },
   defense: {
@@ -144,7 +156,7 @@ describe('pruneInvalidTowns', () => {
   it('keeps entries that resolve to real content', () => {
     vi.mocked(getEntry).mockReturnValue(town);
     const towns: GameStateTowns = {
-      [townId]: { lastProcessedTick: {}, stock: [] },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual(towns);
@@ -153,20 +165,20 @@ describe('pruneInvalidTowns', () => {
   it('drops entries whose id no longer resolves to real content', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
     const towns: GameStateTowns = {
-      [townId]: { lastProcessedTick: {}, stock: [] },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual({});
   });
 
-  it('backfills a missing stock array on a legacy entry', () => {
+  it('backfills missing stock/workers on a legacy entry', () => {
     vi.mocked(getEntry).mockReturnValue(town);
     const towns = {
       [townId]: { lastProcessedTick: {} },
     } as unknown as GameStateTowns;
 
     expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: { lastProcessedTick: {}, stock: [] },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
     });
   });
 
@@ -178,11 +190,54 @@ describe('pruneInvalidTowns', () => {
       [townId]: {
         lastProcessedTick: {},
         stock: [{ itemId: 'removed-item' as never, quantity: 1 }],
+        workers: {},
       },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: { lastProcessedTick: {}, stock: [] },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
     });
+  });
+
+  it('drops worker state for a WorkerId no longer in the roster', () => {
+    vi.mocked(getEntry).mockReturnValue(town);
+    const removedId = 'removed' as WorkerId;
+    const towns: GameStateTowns = {
+      [townId]: {
+        lastProcessedTick: {},
+        stock: [],
+        workers: {
+          [darwinId]: { level: 1 } as never,
+          [removedId]: { level: 1 } as never,
+        },
+      },
+    };
+
+    expect(pruneInvalidTowns(towns)).toEqual({
+      [townId]: {
+        lastProcessedTick: {},
+        stock: [],
+        workers: { [darwinId]: { level: 1 } },
+      },
+    });
+  });
+
+  it('materializes any newly-authored roster entries on an already-activated town', () => {
+    vi.mocked(getEntry).mockReturnValue(town);
+    vi.mocked(townWorkerRosterMaterialize).mockReturnValue({
+      [darwinId]: { level: 1 },
+    } as never);
+    const towns: GameStateTowns = {
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
+    };
+
+    expect(pruneInvalidTowns(towns)).toEqual({
+      [townId]: {
+        lastProcessedTick: {},
+        stock: [],
+        workers: { [darwinId]: { level: 1 } },
+      },
+    });
+    expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {});
   });
 });

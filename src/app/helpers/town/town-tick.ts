@@ -2,6 +2,10 @@ import { getEntry } from '@helpers/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { pruneInvalidTownStock } from '@helpers/town/shop/town-stock';
+import {
+  pruneInvalidTownWorkers,
+  townWorkerRosterMaterialize,
+} from '@helpers/town/worker/town-worker-roster';
 import type {
   GameStateTowns,
   TownContent,
@@ -44,10 +48,18 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
   const pruned: GameStateTowns = {};
 
   (Object.keys(towns) as TownId[]).forEach((townId) => {
-    if (getEntry<TownContent>(townId)) {
+    const town = getEntry<TownContent>(townId);
+    if (town) {
+      // Materialize after pruning, not just at first-visit - self-heals legacy saves and content that later adds a roster entry.
+      const workers = townWorkerRosterMaterialize(
+        town,
+        pruneInvalidTownWorkers(town, towns[townId].workers ?? {}),
+      );
+
       pruned[townId] = {
         ...towns[townId],
         stock: pruneInvalidTownStock(towns[townId].stock ?? []),
+        workers,
       };
     }
   });

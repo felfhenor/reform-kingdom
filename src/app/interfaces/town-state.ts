@@ -1,6 +1,8 @@
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
 import type { TownId } from '@interfaces/content-town';
+import type { WorkerId } from '@interfaces/content-worker';
+import type { TownWorkerState } from '@interfaces/town-worker-state';
 
 // Each subsystem gates off its own key here, not a single shared tick field, so a fast one can't starve a slow one's due-check.
 export type TownTickSubsystem = 'worker' | 'craft' | 'raid' | 'quest';
@@ -17,6 +19,7 @@ export type TownNodeState = {
   firstVisitedAtTick?: number;
   lastProcessedTick: Partial<Record<TownTickSubsystem, number>>;
   stock: TownStockEntry[];
+  workers: Record<WorkerId, TownWorkerState>;
 };
 
 export type GameStateTowns = {

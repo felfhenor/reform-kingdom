@@ -29,6 +29,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   WORKER_MAX_LEVEL,
   defaultWorkerState,
+  statBlockForLevel,
   workerGainXp,
   workerIsReadyToLevelUp,
   workerLevelUp,
@@ -110,6 +111,18 @@ describe('workerStatsForLevel', () => {
       gatherSpeed: 1.4,
       stamina: 38,
     });
+  });
+});
+
+describe('statBlockForLevel', () => {
+  it('adds perLevel * (level - 1) to base', () => {
+    expect(
+      statBlockForLevel(
+        { capacity: 10, gatherSpeed: 0.5, stamina: 100 },
+        { capacity: 0.5, gatherSpeed: 0.1, stamina: 1 },
+        3,
+      ),
+    ).toEqual({ capacity: 11, gatherSpeed: 0.7, stamina: 102 });
   });
 });
 

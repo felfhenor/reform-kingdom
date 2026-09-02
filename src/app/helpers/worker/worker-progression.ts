@@ -32,21 +32,25 @@ export function workerXpForLevel(level: number): number {
   return roundToNearest10(xp);
 }
 
-// Pure `base + perLevel * (level - 1)`, same formula as characterStatsForLevel -
-// no cached/stored stats field needed, workers have no equipment layer to blend in.
+// Pure `base + perLevel * (level - 1)` - shared with townWorkerStatsForLevel, the one piece the two parallel systems have in common.
+export function statBlockForLevel(
+  base: WorkerStatBlock,
+  perLevel: WorkerStatBlock,
+  level: number,
+): WorkerStatBlock {
+  return {
+    capacity: base.capacity + perLevel.capacity * (level - 1),
+    gatherSpeed: base.gatherSpeed + perLevel.gatherSpeed * (level - 1),
+    stamina: base.stamina + perLevel.stamina * (level - 1),
+  };
+}
+
+// No cached/stored stats field needed, workers have no equipment layer to blend in.
 export function workerStatsForLevel(
   worker: WorkerContent,
   level: number,
 ): WorkerStatBlock {
-  return {
-    capacity:
-      worker.baseStats.capacity + worker.statsPerLevel.capacity * (level - 1),
-    gatherSpeed:
-      worker.baseStats.gatherSpeed +
-      worker.statsPerLevel.gatherSpeed * (level - 1),
-    stamina:
-      worker.baseStats.stamina + worker.statsPerLevel.stamina * (level - 1),
-  };
+  return statBlockForLevel(worker.baseStats, worker.statsPerLevel, level);
 }
 
 // Lowest level whose stamina covers `requiredStamina`, or undefined if it never does by WORKER_MAX_LEVEL.

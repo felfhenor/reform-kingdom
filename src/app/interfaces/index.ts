@@ -60,6 +60,7 @@ export * from './storage';
 export * from './tiled-map';
 export * from './timer';
 export * from './town-state';
+export * from './town-worker-state';
 export * from './tradeskill';
 export * from './traits';
 export * from './travel';

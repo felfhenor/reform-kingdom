@@ -15,6 +15,7 @@ import type {
   ItemContent,
   MonsterContent,
   RecipeContent,
+  TownContent,
   WorkerContent,
 } from '@interfaces';
 
@@ -103,6 +104,7 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
   const caravanTraders =
     getEntriesByType<CaravanTraderContent>('caravantrader');
   const workers = getEntriesByType<WorkerContent>('worker');
+  const towns = getEntriesByType<TownContent>('town');
 
   const obtainableItems = new Set<string>();
   const obtainableEquipment = new Set<string>();
@@ -159,6 +161,13 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
       addIfPresent(obtainableEquipment, trade.equipmentId);
       addIfPresent(obtainableCollectibles, trade.collectibleId);
     });
+  });
+
+  // Town-referenced workers are obtainable by working for that town, not via drop/reward - no CaravanTrade-style pool exists for them.
+  towns.forEach((town) => {
+    town.gathering.workers.forEach((worker) =>
+      addIfPresent(obtainableWorkers, worker.workerId),
+    );
   });
 
   const checks: AnalysisCheck[] = [

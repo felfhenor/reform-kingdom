@@ -18,13 +18,16 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
 }));
 
+vi.mock('@helpers/town/worker/town-worker-roster', () => ({
+  townWorkerRosterMaterialize: vi.fn((_town, existing) => existing),
+}));
+
 import { getEntry } from '@helpers/content';
-import {
-  analyticsSendDesignEvent,
-} from '@helpers/engine/analytics';
+import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { townMarkVisited } from '@helpers/town/town-visit';
+import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import type { GameState, TownContent, TownId } from '@interfaces';
 
 const townId = 'larsia' as TownId;
@@ -47,6 +50,7 @@ describe('townMarkVisited', () => {
     expect(state.world.towns[townId]).toEqual({
       lastProcessedTick: {},
       stock: [],
+      workers: {},
       firstVisitedAtTick: 500,
     });
   });
@@ -87,6 +91,7 @@ describe('townMarkVisited', () => {
     expect(state.world.towns[townId]).toEqual({
       lastProcessedTick: { worker: 42 },
       stock: [],
+      workers: {},
       firstVisitedAtTick: 500,
     });
   });
@@ -112,6 +117,37 @@ describe('townMarkVisited', () => {
     townMarkVisited(townId);
 
     expect(state.world.towns[townId].stock).toEqual([{ quantity: 3 }]);
+  });
+
+  it('materializes the worker roster via townWorkerRosterMaterialize when the town resolves', () => {
+    const town = { name: 'Larsia' } as TownContent;
+    vi.mocked(getEntry).mockReturnValue(town);
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: {
+          [townId]: { lastProcessedTick: {}, workers: { existing: 1 } },
+        },
+      },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    vi.mocked(townWorkerRosterMaterialize).mockReturnValue({
+      materialized: 1,
+    } as never);
+    const state = {
+      world: {
+        towns: {
+          [townId]: { lastProcessedTick: {}, workers: { existing: 1 } },
+        },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townMarkVisited(townId);
+
+    expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {
+      existing: 1,
+    });
+    expect(state.world.towns[townId].workers).toEqual({ materialized: 1 });
   });
 
   it('is a no-op and fires no analytics if the town was already visited', () => {

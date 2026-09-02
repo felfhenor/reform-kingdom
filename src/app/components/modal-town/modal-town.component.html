@@ -8,16 +8,20 @@
 
   <div body class="flex flex-col gap-4">
     @if (town()) {
+      @let shopStock = stock();
       <div role="tablist" class="tabs tabs-boxed">
         <a
           role="tab"
-          class="tab"
+          class="tab flex gap-2"
           [class.tab-active]="currentTab() === 'shop'"
           (click)="currentTab.set('shop')"
           (keydown.enter)="currentTab.set('shop')"
           tabindex="1"
         >
           Shop
+          <span class="badge badge-sm badge-info">
+            {{ shopStock.length | number }} / {{ stockCap() | number }}
+          </span>
         </a>
         <a
           role="tab"
@@ -64,15 +68,6 @@
       <div class="text-sm text-lighter min-h-16">
         @switch (currentTab()) {
           @case ('shop') {
-            @let shopStock = stock();
-
-            <div class="flex justify-between items-center">
-              <span>
-                {{ shopStock.length | number }} / {{ stockCap() | number }}
-                items in stock
-              </span>
-            </div>
-
             @if (shopStock.length > 0) {
               <div class="flex flex-col gap-2">
                 @for (stockEntry of shopStock; track $index) {
@@ -92,7 +87,45 @@
             <p>No crafting orders are queued yet.</p>
           }
           @case ('workers') {
-            <p>No workers have been assigned yet.</p>
+            @let roster = workers();
+
+            @if (roster.length > 0) {
+              <div class="flex flex-col gap-2">
+                @for (worker of roster; track worker.workerId) {
+                  @let statusDisplay = workerStatusDisplay(worker);
+
+                  <div class="flex items-center gap-2">
+                    <div class="zoom-row shrink-0">
+                      <app-atlas-animation
+                        spritesheet="worker"
+                        [assetName]="worker.sprite"
+                        [frames]="worker.frames"
+                      />
+                    </div>
+
+                    <div class="flex flex-col min-w-0 grow gap-1">
+                      <div class="flex justify-between items-center">
+                        <span>{{ worker.name }}</span>
+                        <span class="badge badge-outline badge-sm">
+                          Lv {{ worker.level | number }}
+                        </span>
+                      </div>
+                      <div class="flex items-center gap-2 text-xs text-lighter">
+                        @if (statusDisplay.locationEntry) {
+                          <app-sprite-node
+                            class="zoom-inline shrink-0"
+                            [entry]="statusDisplay.locationEntry"
+                          />
+                        }
+                        <span class="truncate">{{ statusDisplay.label }}</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p>No workers have been assigned yet.</p>
+            }
           }
           @case ('quests') {
             <p>No commissions are available yet.</p>
