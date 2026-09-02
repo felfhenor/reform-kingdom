@@ -59,24 +59,14 @@
       </div>
     }
 
-    <app-row-item-stats
+    <app-row-stat-summary
       [stats]="content.baseStats"
       [comparisonStats]="comparisonStats()"
       [bonusStats]="bonusStats()"
-    />
-
-    <app-row-labeled-values
-      class="block mt-2 text-xs"
-      [dimension]="resistanceDimension"
-      [values]="content.debuffResistances"
-      [bonusValues]="bonusResistances()"
-    />
-
-    <app-row-labeled-values
-      class="block mt-2 text-xs"
-      [dimension]="combatStatDimension"
-      [values]="content.combatStats"
-      [bonusValues]="bonusCombatStats()"
+      [resistances]="content.debuffResistances"
+      [bonusResistances]="bonusResistances()"
+      [combatStats]="content.combatStats"
+      [bonusCombatStats]="bonusCombatStats()"
     />
 
     @if (infusionSlotCount() > 0) {

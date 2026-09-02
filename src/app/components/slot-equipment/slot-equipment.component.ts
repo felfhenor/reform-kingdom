@@ -7,8 +7,7 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
+import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
 import { defaultCombatStats, defaultStats, defaultTagResistances } from '@helpers/defaults';
@@ -21,9 +20,7 @@ import {
 } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
-  CombatStatDimension,
   EquipmentTypeToSlot,
-  StatusEffectTagDimension,
   type EquipmentContent,
   type EquipmentItem,
   type EquipmentSkillContent,
@@ -38,16 +35,13 @@ import { TippyDirective } from '@ngneat/helipopper';
     AtlasImageComponent,
     SlotIconBlankComponent,
     RowInfusedMaterialsComponent,
-    RowItemStatsComponent,
-    RowLabeledValuesComponent,
+    RowStatSummaryComponent,
     TippyDirective,
   ],
   templateUrl: './slot-equipment.component.html',
   styleUrl: './slot-equipment.component.scss',
 })
 export class SlotEquipmentComponent {
-  public resistanceDimension = StatusEffectTagDimension;
-  public combatStatDimension = CombatStatDimension;
   public slot = input.required<EquipmentSlot>();
   public equippedItem = input<EquipmentItem>();
   public isSelected = input<boolean>(false);

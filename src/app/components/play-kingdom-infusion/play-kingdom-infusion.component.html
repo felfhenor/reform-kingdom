@@ -93,23 +93,13 @@
                 {{ selectedItemDisplayName() }}
               </div>
 
-              <app-row-item-stats
+              <app-row-stat-summary
                 [stats]="content.baseStats"
                 [bonusStats]="selectedItemBonus()"
-              />
-
-              <app-row-labeled-values
-                class="block mt-2 text-xs"
-                [dimension]="resistanceDimension"
-                [values]="content.debuffResistances"
-                [bonusValues]="selectedItemResistanceBonus()"
-              />
-
-              <app-row-labeled-values
-                class="block mt-2 text-xs"
-                [dimension]="combatStatDimension"
-                [values]="content.combatStats"
-                [bonusValues]="selectedItemCombatStatBonus()"
+                [resistances]="content.debuffResistances"
+                [bonusResistances]="selectedItemResistanceBonus()"
+                [combatStats]="content.combatStats"
+                [bonusCombatStats]="selectedItemCombatStatBonus()"
               />
             </div>
           </div>
@@ -168,24 +158,12 @@
                           {{ entry.item.name }} (x{{ entry.quantity }})
                         </span>
 
-                        <app-row-item-stats
+                        <app-row-stat-summary
                           [stats]="entry.item.infusionStats!"
+                          [resistances]="entry.item.infusionDebuffResistances"
+                          [combatStats]="entry.item.infusionCombatStats"
                           [layout]="'row'"
                           [maxDecimals]="1"
-                        />
-
-                        <app-row-labeled-values
-                          class="text-xs"
-                          [dimension]="resistanceDimension"
-                          [values]="entry.item.infusionDebuffResistances"
-                          [layout]="'row'"
-                        />
-
-                        <app-row-labeled-values
-                          class="text-xs"
-                          [dimension]="combatStatDimension"
-                          [values]="entry.item.infusionCombatStats"
-                          [layout]="'row'"
                         />
                       </div>
 

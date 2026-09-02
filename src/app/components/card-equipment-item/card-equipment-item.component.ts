@@ -8,8 +8,7 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
+import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { defaultStats } from '@helpers/defaults';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
@@ -21,9 +20,7 @@ import {
 } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
-  CombatStatDimension,
   StatShorthand,
-  StatusEffectTagDimension,
   type BaseStat,
   type EquipmentContent,
   type EquipmentItem,
@@ -41,8 +38,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
     SlotIconBlankComponent,
     IconStatComponent,
     RowInfusedMaterialsComponent,
-    RowItemStatsComponent,
-    RowLabeledValuesComponent,
+    RowStatSummaryComponent,
     StatDisplayPipe,
     TippyDirective,
   ],
@@ -58,8 +54,6 @@ export class CardEquipmentItemComponent {
   public equip = output<void>();
 
   public statShorthand = StatShorthand;
-  public resistanceDimension = StatusEffectTagDimension;
-  public combatStatDimension = CombatStatDimension;
 
   private statKeys = Object.keys(defaultStats()) as BaseStat[];
 

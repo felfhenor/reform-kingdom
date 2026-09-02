@@ -11,8 +11,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
-import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
+import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content';
 import {
@@ -41,8 +40,6 @@ import {
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { getStorageMaterials } from '@helpers/kingdom/storage';
 import {
-  CombatStatDimension,
-  StatusEffectTagDimension,
   type Character,
   type CharacterId,
   type EquipmentContent,
@@ -67,8 +64,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SlotIconBlankComponent,
     IconJobComponent,
     RowInfusedMaterialsComponent,
-    RowItemStatsComponent,
-    RowLabeledValuesComponent,
+    RowStatSummaryComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
     TippyDirective,
@@ -79,8 +75,6 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 export class PlayKingdomInfusionComponent {
   public party = computed(() => partyGet());
   public goldCoinId = goldCoinId;
-  public resistanceDimension = StatusEffectTagDimension;
-  public combatStatDimension = CombatStatDimension;
 
   public selectedCharacterId = signal<CharacterId | undefined>(undefined);
   public selectedEquipmentItemId = signal<EquipmentItemId | undefined>(

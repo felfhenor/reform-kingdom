@@ -27,16 +27,10 @@
             {{ slot.content.name }}
           </div>
           @if (isInfusable(slot.content)) {
-            <app-row-item-stats [stats]="slot.content.infusionStats!" />
-            <app-row-labeled-values
-              class="text-xs"
-              [dimension]="resistanceDimension"
-              [values]="slot.content.infusionDebuffResistances"
-            />
-            <app-row-labeled-values
-              class="text-xs"
-              [dimension]="combatStatDimension"
-              [values]="slot.content.infusionCombatStats"
+            <app-row-stat-summary
+              [stats]="slot.content.infusionStats!"
+              [resistances]="slot.content.infusionDebuffResistances"
+              [combatStats]="slot.content.infusionCombatStats"
             />
           }
         </div>

@@ -23,20 +23,19 @@ export type CombatantStatusEffectData = {
   isFrozen?: boolean;
 };
 
-export type CombatantCombatStats = {
-  repeatActionChance: number;
-  skillStrikeAgainChance: number;
-  redirectionChance: number;
-  missChance: number;
-  debuffIgnoreChance: number;
-  damageReflectPercent: number;
-  healingIgnorePercent: number;
-  reviveChance: number;
-  stunChance: number;
-  agroValue: number;
-};
+export type CombatStat =
+  | 'repeatActionChance'
+  | 'skillStrikeAgainChance'
+  | 'redirectionChance'
+  | 'missChance'
+  | 'debuffIgnoreChance'
+  | 'damageReflectPercent'
+  | 'healingIgnorePercent'
+  | 'reviveChance'
+  | 'stunChance'
+  | 'agroValue';
 
-export type CombatStat = keyof CombatantCombatStats;
+export type CombatantCombatStats = Record<CombatStat, number>;
 
 // Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier (see `rngSucceedsChance`).
 export const CombatStatDimension: StatDisplayDimension<CombatStat> = {

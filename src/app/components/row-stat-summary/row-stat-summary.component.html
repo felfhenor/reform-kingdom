@@ -1,0 +1,32 @@
+@if (stats(); as s) {
+  <app-row-item-stats
+    [stats]="s"
+    [bonusStats]="bonusStats()"
+    [comparisonStats]="comparisonStats()"
+    [layout]="layout()"
+    [maxDecimals]="maxDecimals()"
+    [showSign]="showSign()"
+  />
+}
+
+@if (hasAnyResistances()) {
+  <app-row-labeled-values
+    class="block text-xs"
+    [class.mt-2]="layout() === 'column'"
+    [dimension]="resistanceDimension"
+    [values]="resistances()"
+    [bonusValues]="bonusResistances()"
+    [layout]="layout()"
+  />
+}
+
+@if (hasAnyCombatStats()) {
+  <app-row-labeled-values
+    class="block text-xs"
+    [class.mt-2]="layout() === 'column'"
+    [dimension]="combatStatDimension"
+    [values]="combatStats()"
+    [bonusValues]="bonusCombatStats()"
+    [layout]="layout()"
+  />
+}

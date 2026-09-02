@@ -33,30 +33,14 @@
           {{ item.description }}
         </div>
 
-        @if (item.stats) {
-          <app-row-item-stats
-            [stats]="item.stats"
-            [bonusStats]="bonusStats()"
-          />
-        }
-
-        @if (item.resistances) {
-          <app-row-labeled-values
-            class="block mt-2 text-xs"
-            [dimension]="resistanceDimension"
-            [values]="item.resistances"
-            [bonusValues]="bonusResistances()"
-          />
-        }
-
-        @if (item.combatStats) {
-          <app-row-labeled-values
-            class="block mt-2 text-xs"
-            [dimension]="combatStatDimension"
-            [values]="item.combatStats"
-            [bonusValues]="bonusCombatStats()"
-          />
-        }
+        <app-row-stat-summary
+          [stats]="item.stats"
+          [bonusStats]="bonusStats()"
+          [resistances]="item.resistances"
+          [bonusResistances]="bonusResistances()"
+          [combatStats]="item.combatStats"
+          [bonusCombatStats]="bonusCombatStats()"
+        />
 
         <ng-content></ng-content>
       </div>

@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { RowBestiarySkillComponent } from '@components/row-bestiary-skill/row-bestiary-skill.component';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
+import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { combatantFromMonster } from '@helpers/combat/combat-create';
@@ -43,7 +43,7 @@ type LevelOption = { value: number; label: string };
     FormsModule,
     SlotIconBlankComponent,
     IconUnknownComponent,
-    RowItemStatsComponent,
+    RowStatSummaryComponent,
     NgSelectComponent,
   ],
   templateUrl: './detail-bestiary-monster.component.html',
