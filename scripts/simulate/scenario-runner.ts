@@ -4,18 +4,19 @@ import { settle } from './shims';
 
 import { getEntry } from '@helpers/content';
 import { gameReset, gameStart } from '@helpers/game-init';
-import { grandfatherGatherNodeDiscoveries } from '@helpers/gather-node-discovery';
+import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
 import { migrateGameState } from '@helpers/migrate';
-import { createCharacter, setParty } from '@helpers/party';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { worldNodeDiscover } from '@helpers/world-node-discovery';
+import { createCharacter, setParty } from '@helpers/hero/party';
+import { gamestate, setGameState, updateGamestate } from '@helpers/state-game';
+import { worldNodeDiscover } from '@helpers/world-node/world-node-discovery';
 import {
   isWorldNodeHidden,
   worldNodeLookup,
   worldNodesOfType,
-} from '@helpers/world-nodes';
+} from '@helpers/world-node/world-nodes';
 import type { JobContent, JobId } from '@interfaces';
 import { runScenario } from './driver';
+import { loadSeed, writeSeed } from './seeds';
 import { configureStrategyDecree } from './strategy';
 import type { PartyComp, ScenarioConfig, SimResult } from './types';
 import type { LoggedRuntimeError, LoggedStonewall } from './worker-protocol';
@@ -60,14 +61,18 @@ function discoverAllGatherNodesForSimulation(): void {
   });
 }
 
+// The dump already has party/world/decree/discovery state baked in, so none
+// of the fresh-game setup below needs to run again.
+async function resumeFromSeed(seedPath: string): Promise<void> {
+  setGameState(loadSeed(seedPath), false);
+  migrateGameState();
+  await settle();
+}
+
 // Builds a fresh `GameState` and starts a new game with `comp`'s party.
 // `settle()` lets each fire-and-forget `updateGamestate` write land before
 // the next step reads state.
 async function setUpNewGame(comp: PartyComp): Promise<void> {
-  gameReset();
-  migrateGameState();
-  await settle();
-
   const party = comp.jobNames.map((jobName, i) =>
     createCharacter(`${comp.label} #${i + 1}`, resolveJobId(jobName)),
   );
@@ -121,7 +126,12 @@ export async function executeScenario(
   try {
     if (verbose) console.log(`[${label}] party starting up...`);
 
-    await setUpNewGame(scenario.comp);
+    gameReset();
+    if (scenario.seedPath) {
+      await resumeFromSeed(scenario.seedPath);
+    } else {
+      await setUpNewGame(scenario.comp);
+    }
     configureStrategyDecree();
     await settle();
 
@@ -129,6 +139,10 @@ export async function executeScenario(
       scenario,
       (event, stateSnapshot) => stonewalls.push({ event, stateSnapshot }),
       verbose,
+      scenario.dumpSeedsDir
+        ? (level, stateSnapshot) =>
+            writeSeed(scenario.dumpSeedsDir!, scenario, level, stateSnapshot)
+        : undefined,
     );
 
     return { result, crashed: false, stonewalls, runtimeErrors };

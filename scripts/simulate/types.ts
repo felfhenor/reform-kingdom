@@ -12,6 +12,11 @@ export type ScenarioConfig = {
   strategy: StrategyName;
   trial: number;
   tickBudget: number;
+  // Resume from this dumped `GameState` instead of starting a fresh game.
+  seedPath?: string;
+  // Write a seed checkpoint to this directory every `dumpIntervalLevels`.
+  dumpSeedsDir?: string;
+  dumpIntervalLevels?: number;
 };
 
 export type StonewallKind = 'HardStonewall' | 'XpDecay' | 'SupplyStall';
@@ -39,6 +44,13 @@ export type RunOptions = {
   strategies: StrategyName[];
   verbose: boolean;
   workers: number;
+  dumpSeeds: boolean;
+  dumpIntervalLevels: number;
+  // Resume exactly this one seed file.
+  resumeSeed?: string;
+  // Resume every seed file at this level (searches `resumeSeedsDir`, or the most recently dumped run if unset).
+  resumeLevel?: number;
+  resumeSeedsDir?: string;
 };
 
 // Resolved job content, keyed by the job name strings used in `PartyComp`.

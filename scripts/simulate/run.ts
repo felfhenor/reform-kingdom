@@ -4,10 +4,15 @@
 import { silenceDebugLogging } from './shims';
 
 import { fork, type ChildProcess } from 'child_process';
+import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 import { bootstrapContent } from './bootstrap';
-import { DEFAULT_TICK_BUDGET, DEFAULT_TRIALS } from './constants';
+import {
+  DEFAULT_SEED_CHECKPOINT_LEVELS,
+  DEFAULT_TICK_BUDGET,
+  DEFAULT_TRIALS,
+} from './constants';
 import type { RunLogger } from './logger';
 import { createRunLogger } from './logger';
 import { curatedPartyComps, exhaustivePartyComps } from './party-comps';
@@ -21,6 +26,11 @@ import {
 } from './report';
 import type { ScenarioOutcome } from './scenario-runner';
 import { executeScenario } from './scenario-runner';
+import {
+  findSeedsAtLevel,
+  resolveSeedsDir,
+  seedsDirFor,
+} from './seeds';
 import type {
   PartyComp,
   RunOptions,
@@ -34,17 +44,24 @@ const ALL_STRATEGIES: StrategyName[] = ['periodic-craft', 'always-craft'];
 
 // A malformed value here used to become `NaN`, which made `runParallel`
 // spawn zero workers and hang forever with no error - fail fast instead.
-function parsePositiveInt(
+function parseOptionalPositiveInt(
   value: string | undefined,
-  fallback: number,
   flagName: string,
-): number {
-  if (value === undefined) return fallback;
+): number | undefined {
+  if (value === undefined) return undefined;
   const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed < 1) {
     throw new Error(`--${flagName} must be a positive integer, got "${value}"`);
   }
   return parsed;
+}
+
+function parsePositiveInt(
+  value: string | undefined,
+  fallback: number,
+  flagName: string,
+): number {
+  return parseOptionalPositiveInt(value, flagName) ?? fallback;
 }
 
 function parseArgs(argv: string[]): RunOptions {
@@ -74,24 +91,105 @@ function parseArgs(argv: string[]): RunOptions {
       os.cpus().length,
       'workers',
     ),
+    dumpSeeds: args.has('dump-seeds'),
+    dumpIntervalLevels: parsePositiveInt(
+      args.get('dump-interval'),
+      DEFAULT_SEED_CHECKPOINT_LEVELS,
+      'dump-interval',
+    ),
+    resumeSeed: args.get('resume-seed'),
+    resumeLevel: parseOptionalPositiveInt(
+      args.get('resume-level'),
+      'resume-level',
+    ),
+    resumeSeedsDir: args.get('resume-seeds-dir'),
   };
 }
 
-function buildScenarios(
-  comps: PartyComp[],
-  strategies: StrategyName[],
-  trials: number,
-  tickBudget: number,
+function buildFreshScenarios(
+  options: RunOptions,
+  seedsDir: string | undefined,
 ): ScenarioConfig[] {
+  const comps: PartyComp[] =
+    options.mode === 'exhaustive' ? exhaustivePartyComps() : curatedPartyComps();
+
   const scenarios: ScenarioConfig[] = [];
   comps.forEach((comp) => {
-    strategies.forEach((strategy) => {
-      for (let trial = 1; trial <= trials; trial++) {
-        scenarios.push({ comp, strategy, trial, tickBudget });
+    options.strategies.forEach((strategy) => {
+      for (let trial = 1; trial <= options.trials; trial++) {
+        scenarios.push({
+          comp,
+          strategy,
+          trial,
+          tickBudget: options.tickBudget,
+          dumpSeedsDir: seedsDir,
+          dumpIntervalLevels: options.dumpIntervalLevels,
+        });
       }
     });
   });
   return scenarios;
+}
+
+// A resumed scenario's `comp` only carries a label for reporting - the seed
+// already has the real party baked in, so `jobNames` is never read for it.
+function compFromSeedFile(seedFile: string): PartyComp {
+  return { label: path.basename(seedFile, '.json'), jobNames: [] };
+}
+
+// `seedsDir` (only set when `--dump-seeds` is also passed) lets a resumed
+// run itself be checkpointed further, e.g. resume a batch at L20 and dump its own new checkpoints.
+function buildResumeScenarios(
+  options: RunOptions,
+  seedPaths: string[],
+  seedsDir: string | undefined,
+): ScenarioConfig[] {
+  const scenarios: ScenarioConfig[] = [];
+  seedPaths.forEach((seedPath) => {
+    options.strategies.forEach((strategy) => {
+      for (let trial = 1; trial <= options.trials; trial++) {
+        scenarios.push({
+          comp: compFromSeedFile(seedPath),
+          strategy,
+          trial,
+          tickBudget: options.tickBudget,
+          seedPath,
+          dumpSeedsDir: seedsDir,
+          dumpIntervalLevels: options.dumpIntervalLevels,
+        });
+      }
+    });
+  });
+  return scenarios;
+}
+
+function buildScenarios(
+  options: RunOptions,
+  seedsDir: string | undefined,
+): ScenarioConfig[] {
+  if (options.resumeSeed) {
+    const resolved = path.resolve(options.resumeSeed);
+    if (!fs.existsSync(resolved)) {
+      throw new Error(`--resume-seed file not found: ${resolved}`);
+    }
+    return buildResumeScenarios(options, [resolved], seedsDir);
+  }
+
+  if (options.resumeLevel !== undefined) {
+    const dir = resolveSeedsDir(options.resumeSeedsDir);
+    const seedPaths = findSeedsAtLevel(dir, options.resumeLevel);
+    if (seedPaths.length === 0) {
+      throw new Error(
+        `No seeds at level ${options.resumeLevel} found in ${dir}`,
+      );
+    }
+    console.log(
+      `Resuming ${seedPaths.length} seed(s) at level ${options.resumeLevel} from ${dir}`,
+    );
+    return buildResumeScenarios(options, seedPaths, seedsDir);
+  }
+
+  return buildFreshScenarios(options, seedsDir);
 }
 
 type RunOutcome = { results: SimResult[]; failedScenarios: number };
@@ -278,18 +376,11 @@ async function main(): Promise<void> {
   console.log(`Bootstrapping content...`);
   bootstrapContent();
 
-  const comps =
-    options.mode === 'exhaustive' ? exhaustivePartyComps() : curatedPartyComps();
-
-  const scenarios = buildScenarios(
-    comps,
-    options.strategies,
-    options.trials,
-    options.tickBudget,
-  );
-
   const runId = new Date().toISOString().replace(/[:.]/g, '-');
   const logger = createRunLogger(runId, options.verbose);
+  const seedsDir = options.dumpSeeds ? seedsDirFor(logger.logDir) : undefined;
+
+  const scenarios = buildScenarios(options, seedsDir);
 
   const workerCount = Math.max(
     1,
@@ -297,9 +388,9 @@ async function main(): Promise<void> {
   );
 
   console.log(
-    `Running ${comps.length} comp(s) x ${options.strategies.length} strategy(ies) x ${options.trials} trial(s) ` +
-      `(${scenarios.length} scenario(s) total), tick budget ${options.tickBudget} each, ` +
-      `across ${workerCount} worker(s)...`,
+    `Running ${scenarios.length} scenario(s), tick budget ${options.tickBudget} each, ` +
+      `across ${workerCount} worker(s)...` +
+      (seedsDir ? ` Dumping seed checkpoints to ${seedsDir}.` : ''),
   );
 
   const { results, failedScenarios } =

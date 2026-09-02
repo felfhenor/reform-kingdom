@@ -1,38 +1,38 @@
-import { armoryGet } from '@helpers/armory';
-import { autoModeToggle } from '@helpers/auto-mode';
+import { armoryGet } from '@helpers/kingdom/armory';
+import { autoModeToggle } from '@helpers/decree/auto-mode';
 import {
   characterInfuseEquipment,
   optimizeCharacterEquipment,
-} from '@helpers/character-equipment';
+} from '@helpers/hero/character-equipment';
 import { getEntriesByType, getEntry } from '@helpers/content';
-import { getCraftableRecipeEntries } from '@helpers/crafting';
-import { craftMaxCraftableQuantity, craftQueueStart } from '@helpers/crafting-queue';
+import { getCraftableRecipeEntries } from '@helpers/crafting/crafting';
+import { craftMaxCraftableQuantity, craftQueueStart } from '@helpers/crafting/crafting-queue';
 import {
   decreeClauseAdd,
   decreeClauseReorder,
   decreeClauses,
   decreeClauseSetEnabled,
-} from '@helpers/decree';
-import { equippedItems, isSlotAvailableForJob } from '@helpers/equipment';
-import { isGatherNodeDiscovered } from '@helpers/gather-node-discovery';
-import { gatheringStop, isGathering, partyMinLevel } from '@helpers/gathering';
-import { canInfuseEquipmentItem, isInfusionMaterial } from '@helpers/infusion';
-import { getMaterialQuantity } from '@helpers/materials';
-import { partyGet } from '@helpers/party';
-import { isRecipeCraftable } from '@helpers/recipes';
+} from '@helpers/decree/decree';
+import { equippedItems, isSlotAvailableForJob } from '@helpers/item/equipment';
+import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
+import { gatheringStop, isGathering, partyMinLevel } from '@helpers/item/gathering';
+import { canInfuseEquipmentItem, isInfusionMaterial } from '@helpers/item/infusion';
+import { getMaterialQuantity } from '@helpers/item/materials';
+import { partyGet } from '@helpers/hero/party';
+import { isRecipeCraftable } from '@helpers/crafting/recipes';
 import { gamestate } from '@helpers/state-game';
 import {
   tradeskillActiveGate,
   tradeskillBuilding,
   tradeskillIdForName,
   tradeskillNameForId,
-} from '@helpers/tradeskill';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node-gathering';
+} from '@helpers/crafting/tradeskill';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import {
   isWorldNodeVisible,
   worldNodeGathering,
   worldNodesOfType,
-} from '@helpers/world-nodes';
+} from '@helpers/world-node/world-nodes';
 import type {
   CollectibleId,
   DecreeClauseId,
@@ -502,7 +502,7 @@ function resetGatherTimeTracking(): void {
 // Whether the party has already spent its whole `GATHER_TIME_BUDGET_FRACTION`
 // allowance actively gathering this scenario - see `checkSupplyStall` in
 // driver.ts, which uses this in place of the real game's own
-// `gatherableMaterialIds()` (`@helpers/world-node-gathering`) to detect a
+// `gatherableMaterialIds()` (`@helpers/world-node/world-node-gathering`) to detect a
 // genuine supply-chain dead end. That helper is gated on discovery, but
 // every GatherNode is pre-discovered for this simulator from tick 1 (see
 // `discoverAllGatherNodesForSimulation` in run.ts) - so `gatherableMaterialIds`

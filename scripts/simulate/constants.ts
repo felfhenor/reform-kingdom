@@ -15,6 +15,11 @@ export const PARTY_SIZE = 4;
 export const DEFAULT_TICK_BUDGET = 50_000;
 export const DEFAULT_TRIALS = 5;
 
+// --- seeds.ts / run.ts dump/resume ---
+
+// Default `--dump-seeds` checkpoint cadence, overridable via `--dump-interval`.
+export const DEFAULT_SEED_CHECKPOINT_LEVELS = 5;
+
 // --- driver.ts stonewall/decay detection thresholds ---
 
 // Mirrors `xpForOverLevel` (monster.ts)'s decay onset - 4+ levels above the

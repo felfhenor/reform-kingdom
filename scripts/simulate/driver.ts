@@ -1,32 +1,33 @@
-import { armoryGet } from '@helpers/armory';
-import { autoModeProcessTick } from '@helpers/auto-mode';
-import { combatDoCombatIteration, currentCombat } from '@helpers/combat';
-import { combatLog } from '@helpers/combat-log';
-import { craftProcessTick } from '@helpers/crafting-queue';
-import { decreeClauses } from '@helpers/decree';
+import { armoryGet } from '@helpers/kingdom/armory';
+import { autoModeProcessTick } from '@helpers/decree/auto-mode';
+import { combatDoCombatIteration } from '@helpers/combat/combat';
+import { currentCombat } from '@helpers/combat/combat-state';
+import { combatLog } from '@helpers/combat/combat-log';
+import { craftProcessTick } from '@helpers/crafting/crafting-queue';
+import { decreeClauses } from '@helpers/decree/decree';
 import {
   mostChallengingExploreNodeForRisk,
   pickNextClause,
-} from '@helpers/decree-evaluation';
-import { encounterRandomProcessTick } from '@helpers/encounter-random-tick';
-import { canModifyEquipment } from '@helpers/equipment';
-import { gatheringProcessTick, partyMinLevel } from '@helpers/gathering';
-import { globalEffectsProcessTick } from '@helpers/global-effects';
-import { getGoldQuantity } from '@helpers/materials';
-import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/party';
-import { restingProcessTick } from '@helpers/resting';
+} from '@helpers/decree/decree-evaluation';
+import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
+import { canModifyEquipment } from '@helpers/item/equipment';
+import { gatheringProcessTick, partyMinLevel } from '@helpers/item/gathering';
+import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
+import { getGoldQuantity } from '@helpers/item/materials';
+import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
+import { restingProcessTick } from '@helpers/hero/resting';
 import {
   gamestate,
   gamestateTickEnd,
   gamestateTickStart,
   updateGamestate,
 } from '@helpers/state-game';
-import { travelProcessTick } from '@helpers/travel';
+import { travelProcessTick } from '@helpers/hero/travel';
 import {
   isPlayerAtKingdom,
   worldNodeAtCurrentLocation,
 } from '@helpers/world';
-import { worldNodeEncounter } from '@helpers/world-nodes';
+import { worldNodeEncounter } from '@helpers/world-node/world-nodes';
 import type {
   CharacterId,
   CombatLog,
@@ -34,6 +35,7 @@ import type {
   GameState,
 } from '@interfaces';
 import {
+  DEFAULT_SEED_CHECKPOINT_LEVELS,
   HARD_STONEWALL_TICKS,
   SUPPLY_STALL_TICKS,
   TICKS_PER_HOUR,
@@ -50,6 +52,11 @@ import type { ScenarioConfig, SimResult, StonewallEvent } from './types';
 
 export type StonewallHandler = (
   event: StonewallEvent,
+  stateSnapshot: GameState,
+) => void;
+
+export type LevelCheckpointHandler = (
+  level: number,
   stateSnapshot: GameState,
 ) => void;
 
@@ -334,6 +341,7 @@ export function runScenario(
   scenario: ScenarioConfig,
   onStonewall?: StonewallHandler,
   verbose = false,
+  onLevelCheckpoint?: LevelCheckpointHandler,
 ): SimResult {
   const tracker = freshTracker();
   const stonewalls: StonewallEvent[] = [];
@@ -343,6 +351,11 @@ export function runScenario(
     partyGet().map((character) => [character.id, character.level]),
   );
   const seenArmoryItemIds = new Set(armoryGet().map((item) => item.id));
+  const dumpIntervalLevels =
+    scenario.dumpIntervalLevels ?? DEFAULT_SEED_CHECKPOINT_LEVELS;
+  // Starts at the party's actual level (not 0) so resuming from an already
+  // L20 seed doesn't immediately re-dump L20 on tick 1.
+  let lastDumpedLevel = partyMinLevel();
   // Scopes the adventure-log tail to only what *this* scenario produces -
   // `combatLog` is a `localStorageSignal` that persists across scenarios, so
   // starting from `undefined` would replay the previous scenario's tail too.
@@ -389,7 +402,16 @@ export function runScenario(
       const supplyStallEvent = checkSupplyStall(tracker, craftResult, tick);
       if (supplyStallEvent) emit(supplyStallEvent);
 
-      if (partyMinLevel() >= CHARACTER_MAX_LEVEL) {
+      const currentLevel = partyMinLevel();
+      if (
+        onLevelCheckpoint &&
+        currentLevel - lastDumpedLevel >= dumpIntervalLevels
+      ) {
+        onLevelCheckpoint(currentLevel, structuredClone(gamestate()));
+        lastDumpedLevel = currentLevel;
+      }
+
+      if (currentLevel >= CHARACTER_MAX_LEVEL) {
         terminalReason = 'MaxLevel';
         break;
       }

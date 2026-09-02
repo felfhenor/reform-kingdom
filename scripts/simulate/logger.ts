@@ -31,11 +31,11 @@ export type RuntimeErrorLogEntry = {
   dumpFile?: string;
 };
 
-function sanitizeForFilename(value: string): string {
+export function sanitizeForFilename(value: string): string {
   return value.replace(/[^a-z0-9]+/gi, '_');
 }
 
-function scenarioLabel(scenario: ScenarioConfig): string {
+export function scenarioLabel(scenario: ScenarioConfig): string {
   return `${scenario.comp.label}__${scenario.strategy}__trial${scenario.trial}`;
 }
 
