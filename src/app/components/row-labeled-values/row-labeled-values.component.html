@@ -7,7 +7,7 @@
 >
   @for (key of baseRows(); track key) {
     <div class="flex items-center gap-1">
-      <app-icon [name]="icon(key)" size="1.2em" />
+      <app-icon [name]="icon(key)" size="row" />
       <span>{{ label(key) }}: {{ baseValue(key) | statDisplay }}{{ suffix(key) }}</span>
     </div>
   }
@@ -18,7 +18,7 @@
       [class.text-value-positive]="bonusValue(key) > 0"
       [class.text-value-negative]="bonusValue(key) < 0"
     >
-      <app-icon [name]="icon(key)" size="1.2em" />
+      <app-icon [name]="icon(key)" size="row" />
       <span>{{ label(key) }}: {{ bonusValue(key) | statDisplay }}{{ suffix(key) }}</span>
     </div>
   }

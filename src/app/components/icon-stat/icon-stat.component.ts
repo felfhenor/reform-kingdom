@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
-import type { BaseStat, Icon } from '@interfaces';
+import type { BaseStat, Icon, IconSize } from '@interfaces';
 
 const icons: Record<BaseStat, Icon> = {
   Intelligence: 'gameBrain',
@@ -32,6 +32,7 @@ const colors: Record<BaseStat, string> = {
 })
 export class IconStatComponent {
   public stat = input.required<BaseStat>();
+  public size = input<IconSize>('stat');
 
   public icon = computed(() => icons[this.stat()]);
   public color = computed(() => colors[this.stat()]);

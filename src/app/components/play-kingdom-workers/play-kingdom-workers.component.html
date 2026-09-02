@@ -103,17 +103,17 @@
           @if (stats) {
             <div class="flex gap-4 text-sm">
               <span class="flex items-center gap-2">
-                <app-icon name="gameSwapBag" size="1.2em" />
+                <app-icon name="gameSwapBag" size="row" />
                 {{ capacityDisplay() | number }} capacity
               </span>
 
               <span class="flex items-center gap-2">
-                <app-icon name="gameClockwork" size="1.2em" />
+                <app-icon name="gameClockwork" size="row" />
                 {{ stats.gatherSpeed | number: '1.0-1' }} speed
               </span>
 
               <span class="flex items-center gap-2">
-                <app-icon name="gameHeartBeats" size="1.2em" />
+                <app-icon name="gameHeartBeats" size="row" />
                 {{ stats.stamina | number: '1.0-1' }} stamina
               </span>
 

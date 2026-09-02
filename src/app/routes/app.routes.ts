@@ -23,6 +23,12 @@ export const routes: Routes = [
     canActivate: [debugModeGuard],
   },
   {
+    path: 'icons',
+    loadComponent: () =>
+      import('@pages/icons/icons.component').then((m) => m.IconsComponent),
+    canActivate: [debugModeGuard],
+  },
+  {
     component: SetupComponent,
     path: 'setup',
     loadChildren: () =>

@@ -67,8 +67,8 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
   icon: {
     repeatActionChance: 'gameExtraTime',
     skillStrikeAgainChance: 'gameDeadlyStrike',
-    redirectionChance: 'gameTwister',
-    missChance: 'gameDodge',
+    redirectionChance: 'gameFog',
+    missChance: 'gameDodging',
     debuffIgnoreChance: 'gameMagicShield',
     damageReflectPercent: 'gameShieldReflect',
     healingIgnorePercent: 'gameBrokenHeart',

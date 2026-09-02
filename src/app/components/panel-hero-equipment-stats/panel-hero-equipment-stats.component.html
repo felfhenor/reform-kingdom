@@ -6,11 +6,7 @@
   @let value = character().stats[stat];
 
   <div class="flex items-center gap-2">
-    <app-icon-stat
-      [stat]="stat"
-      class="text-2xl"
-      [tp]="statInformation[stat]"
-    />
+    <app-icon-stat [stat]="stat" [tp]="statInformation[stat]" />
     <span class="text-base">{{ stat }} ({{ statShorthand[stat] }})</span>
     <span class="ml-auto font-semibold text-lg">
       {{ value | number: '1.0-1' }}
@@ -18,7 +14,7 @@
   </div>
 }
 
-<div>
+<div class="mt-2">
   <span class="font-semibold text-xl">Combat Stats</span>
 </div>
 
@@ -26,11 +22,7 @@
   @let value = combatStats()[stat];
 
   <div class="flex items-center gap-2">
-    <app-icon
-      [name]="combatStatDimension.icon[stat]"
-      size="1.5em"
-      class="text-2xl"
-    />
+    <app-icon [name]="combatStatDimension.icon[stat]" size="stat" />
     <span class="text-base">{{ combatStatDimension.label[stat] }}</span>
     <span class="ml-auto font-semibold text-lg">
       {{ value | statDisplay: 0 }}{{ suffix(combatStatDimension, stat) }}
@@ -38,7 +30,7 @@
   </div>
 }
 
-<div>
+<div class="mt-2">
   <span class="font-semibold text-xl">Resistances</span>
 </div>
 
@@ -46,11 +38,7 @@
   @let value = resistances()[stat];
 
   <div class="flex items-center gap-2">
-    <app-icon
-      [name]="resistanceDimension.icon[stat]"
-      size="1.5em"
-      class="text-2xl"
-    />
+    <app-icon [name]="resistanceDimension.icon[stat]" size="stat" />
     <span class="text-base">{{ resistanceDimension.label[stat] }}</span>
     <span class="ml-auto font-semibold text-lg">
       {{ value | statDisplay: 0 }}{{ suffix(resistanceDimension, stat) }}

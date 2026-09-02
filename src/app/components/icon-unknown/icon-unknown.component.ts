@@ -8,7 +8,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
   imports: [SlotIconBlankComponent, IconComponent],
   template: `
     <app-slot-icon-blank>
-      <app-icon name="gameHelp" size="32px" />
+      <app-icon name="gameHelp" size="nav" />
     </app-slot-icon-blank>
   `,
 })

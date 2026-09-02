@@ -97,7 +97,7 @@
             [sfxOffset]="$index"
             [sfxTrigger]="['click', 'hover']"
           >
-            <app-icon [name]="panel.icon" size="2em" color="#000"></app-icon>
+            <app-icon [name]="panel.icon" size="nav" color="#000"></app-icon>
           </button>
         </li>
       }
@@ -116,7 +116,7 @@
             (hotkey)="hotkeyMatches($event, 't') && openCaravanTrade()"
             isGlobal
           >
-            <app-icon name="gameSwapBag" size="2em" color="#000"></app-icon>
+            <app-icon name="gameSwapBag" size="nav" color="#000"></app-icon>
           </button>
         </li>
       }
@@ -135,7 +135,7 @@
             (hotkey)="hotkeyMatches($event, 'r') && recenterCamera()"
             isGlobal
           >
-            <app-icon name="tablerFocus" size="2em" color="#000"></app-icon>
+            <app-icon name="tablerFocus" size="nav" color="#000"></app-icon>
           </button>
         </li>
       }
@@ -154,7 +154,7 @@
         >
           <app-icon
             [name]="isPaused() ? 'gamePlayButton' : 'gamePauseButton'"
-            size="2em"
+            size="nav"
             color="#000"
           ></app-icon>
         </button>
@@ -172,7 +172,7 @@
           (hotkey)="hotkeyMatches($event, 'q') && leaveSwal.fire()"
           isGlobal
         >
-          <app-icon name="gameExitDoor" size="2em" color="#000"></app-icon>
+          <app-icon name="gameExitDoor" size="nav" color="#000"></app-icon>
         </a>
       </li>
 
@@ -190,7 +190,7 @@
         >
           <app-icon
             [name]="'tablerSettings'"
-            size="2em"
+            size="nav"
             color="#000"
           ></app-icon>
         </button>

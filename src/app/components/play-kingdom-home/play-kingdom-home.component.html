@@ -15,7 +15,7 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameChest" size="1.15em" />
+              <app-icon name="gameChest" size="row" />
               Storage
             </span>
             <span class="text-xs text-lighter">
@@ -32,7 +32,7 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameCrossedSwords" size="1.15em" />
+              <app-icon name="gameCrossedSwords" size="row" />
               Armory
             </span>
             <span class="text-xs text-lighter">
@@ -49,7 +49,7 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameCrystalBall" size="1.15em" />
+              <app-icon name="gameCrystalBall" size="row" />
               Astral Projector
             </span>
             <span class="text-xs text-lighter">
@@ -78,7 +78,7 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameTrophyCup" size="1.15em" />
+              <app-icon name="gameTrophyCup" size="row" />
               Museum
             </span>
 
@@ -129,7 +129,7 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameOpenBook" size="1.15em" />
+              <app-icon name="gameOpenBook" size="row" />
               Bestiary
             </span>
 
@@ -168,7 +168,7 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameMeepleGroup" size="1.15em" />
+              <app-icon name="gameMeepleGroup" size="row" />
               Quartermaster's Annex
             </span>
             <span class="text-xs text-lighter">
@@ -266,7 +266,7 @@
             [disabled]="!canReclass()"
             (click)="openReclassModal()"
           >
-            <app-icon name="gameBodySwapping" size="1em" />
+            <app-icon name="gameBodySwapping" size="inline" />
             Reclass Heroes
           </button>
 
@@ -274,7 +274,7 @@
             class="btn btn-accent btn-sm"
             (click)="openSubview('infusion')"
           >
-            <app-icon name="gameMagicPotion" size="1em" />
+            <app-icon name="gameMagicPotion" size="inline" />
             Infusion
           </button>
 
@@ -283,7 +283,7 @@
               class="btn btn-accent btn-sm"
               (click)="openSubview('commissions')"
             >
-              <app-icon name="gameContract" size="1em" />
+              <app-icon name="gameContract" size="inline" />
               Commissions
             </button>
           }
@@ -302,7 +302,7 @@
             [tp]="'Not yet available'"
             (click)="openSubview('achievements')"
           >
-            <app-icon name="gameMedal" size="1em" />
+            <app-icon name="gameMedal" size="inline" />
             Achievements
           </button>
 
@@ -312,7 +312,7 @@
             [tp]="'Not yet available'"
             (click)="openSubview('prestige')"
           >
-            <app-icon name="gameCrown" size="1em" />
+            <app-icon name="gameCrown" size="inline" />
             Prestige
           </button>
         </div>
