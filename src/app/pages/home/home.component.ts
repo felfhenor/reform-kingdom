@@ -5,6 +5,7 @@ import { ButtonConnectComponent } from '@components/button-connect/button-connec
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
+import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/panel-debug-buttons.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
@@ -16,7 +17,6 @@ import { getOption, setOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { ButtonContentAnalysisComponent } from '../../components/button-content-analysis/button-content-analysis.component';
 
 @Component({
   selector: 'app-home',
@@ -29,7 +29,7 @@ import { ButtonContentAnalysisComponent } from '../../components/button-content-
     ButtonQuitComponent,
     TeleportOutletDirective,
     ButtonSettingsComponent,
-    ButtonContentAnalysisComponent,
+    PanelDebugButtonsComponent,
   ],
   providers: [],
   templateUrl: './home.component.html',

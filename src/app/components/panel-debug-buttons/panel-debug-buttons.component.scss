@@ -1,0 +1,5 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply flex w-full flex-col gap-2;
+}

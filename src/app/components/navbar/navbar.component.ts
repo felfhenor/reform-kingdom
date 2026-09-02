@@ -41,7 +41,7 @@ import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import { BarResourceComponent } from '@components/bar-resource/bar-resource.component';
-import { ButtonContentAnalysisComponent } from '../button-content-analysis/button-content-analysis.component';
+import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/panel-debug-buttons.component';
 
 @Component({
   selector: 'app-navbar',
@@ -60,7 +60,7 @@ import { ButtonContentAnalysisComponent } from '../button-content-analysis/butto
     ButtonGlowComponent,
     BarResourceComponent,
     ModalCaravanTradeComponent,
-    ButtonContentAnalysisComponent,
+    PanelDebugButtonsComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
