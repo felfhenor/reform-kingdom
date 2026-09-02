@@ -5,7 +5,7 @@
 @for (stat of statKeys; track stat) {
   @let value = character().stats[stat];
 
-  <div class="flex items-center gap-3">
+  <div class="flex items-center gap-2">
     <app-icon-stat
       [stat]="stat"
       class="text-2xl"
@@ -18,14 +18,42 @@
   </div>
 }
 
-<app-row-labeled-values
-  class="text-base"
-  [dimension]="resistanceDimension"
-  [values]="resistances()"
-/>
+<div>
+  <span class="font-semibold text-xl">Combat Stats</span>
+</div>
 
-<app-row-labeled-values
-  class="text-base"
-  [dimension]="combatStatDimension"
-  [values]="combatStats()"
-/>
+@for (stat of combatStatRows(); track stat) {
+  @let value = combatStats()[stat];
+
+  <div class="flex items-center gap-2">
+    <app-icon
+      [name]="combatStatDimension.icon[stat]"
+      size="1.5em"
+      class="text-2xl"
+    />
+    <span class="text-base">{{ combatStatDimension.label[stat] }}</span>
+    <span class="ml-auto font-semibold text-lg">
+      {{ value | statDisplay: 0 }}{{ suffix(combatStatDimension, stat) }}
+    </span>
+  </div>
+}
+
+<div>
+  <span class="font-semibold text-xl">Resistances</span>
+</div>
+
+@for (stat of resistanceRows(); track stat) {
+  @let value = resistances()[stat];
+
+  <div class="flex items-center gap-2">
+    <app-icon
+      [name]="resistanceDimension.icon[stat]"
+      size="1.5em"
+      class="text-2xl"
+    />
+    <span class="text-base">{{ resistanceDimension.label[stat] }}</span>
+    <span class="ml-auto font-semibold text-lg">
+      {{ value | statDisplay: 0 }}{{ suffix(resistanceDimension, stat) }}
+    </span>
+  </div>
+}

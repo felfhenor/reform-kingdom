@@ -5,8 +5,8 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
-import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
 import {
   characterCombatStatTotals,
   characterTagResistances,
@@ -18,17 +18,20 @@ import {
   StatShorthand,
   StatusEffectTagDimension,
   type Character,
+  type StatDisplayDimension,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-panel-hero-equipment-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DecimalPipe,
+    IconComponent,
     IconStatComponent,
-    RowLabeledValuesComponent,
     TippyDirective,
+    StatDisplayPipe,
   ],
   host: {
     class: 'flex flex-col gap-2',
@@ -53,4 +56,23 @@ export class PanelHeroEquipmentStatsComponent {
   public combatStats = computed(() =>
     characterCombatStatTotals(this.character()),
   );
+
+  public resistanceRows = computed(() =>
+    this.nonzeroRows(this.resistanceDimension, this.resistances()),
+  );
+
+  public combatStatRows = computed(() =>
+    this.nonzeroRows(this.combatStatDimension, this.combatStats()),
+  );
+
+  public suffix(dimension: StatDisplayDimension, key: string): string {
+    return (dimension.isPercent?.[key] ?? true) ? '%' : '';
+  }
+
+  private nonzeroRows<K extends string>(
+    dimension: StatDisplayDimension<K>,
+    values: Record<K, number>,
+  ): K[] {
+    return dimension.order.filter((key) => (values[key] ?? 0) !== 0);
+  }
 }
