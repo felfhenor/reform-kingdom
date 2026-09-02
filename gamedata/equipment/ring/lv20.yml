@@ -1,3 +1,19 @@
+- id: 65106d9e-0ba9-4c85-abc0-8991ff052c05
+  name: Larsian Ring
+  description: A specialty ring produced only in Larsia. Wearers often feel a sense of charm and whimsy.
+  levelRequirement: 21
+  rarity: Mystical
+  type: Ring
+  sprite: '0143'
+  slots: 3
+  baseStats:
+    Strength: 3
+    Vitality: 3
+    Intelligence: 3
+    Resistance: 3
+    Agility: 3
+    Luck: 3
+
 - id: 323a760e-a3fc-41a3-b4d9-9bfa84eb1937
   name: Desert Ring
   description: A ring style popularized in the Larsian desert. Larsians treat it as a status symbol.

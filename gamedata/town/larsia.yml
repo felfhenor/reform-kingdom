@@ -1,0 +1,108 @@
+- id: 7e6c8603-6cd5-4bf1-a828-81478315b462
+  name: Larsia
+  description: The desert Kingdom of Larsia town settings.
+
+  scaleType: City
+
+  level: 25
+
+  crafting:
+    maxQueueSize: 12
+    maxTradeskillLevel: 20
+    specialtyTradeskillId: Jewelcrafting
+
+    uniqueRecipeIds:
+      - 'Equipment: Larsian Ring'
+
+  traders:
+    sellItemCount: 10
+
+    markupPercentages:
+      sell: 25
+      buy: -15
+
+  gathering:
+    gatherRateMultiplier: 5
+    goldGatheredPerMaterial: 5
+    goldRequiredBeforeCutoff: 25000
+
+    workers:
+      - workerId: Darwin Nork
+        level: 1
+      - workerId: Talbot Frore
+        level: 1
+      - workerId: Nevyn Maeling
+        level: 1
+
+  reputation:
+    buff:
+      name: Larsian Influence
+      tiers:
+        - tier: 1
+          stats:
+            Strength: 1
+
+          combatStats:
+            reviveChance: 1
+
+          debuffResistances:
+            Accuracy: 5
+
+        - tier: 2
+          stats:
+            Strength: 3
+
+          combatStats:
+            reviveChance: 2
+
+          debuffResistances:
+            Accuracy: 10
+
+        - tier: 3
+          stats:
+            Strength: 5
+
+          combatStats:
+            reviveChance: 3
+
+          debuffResistances:
+            Accuracy: 15
+
+        - tier: 4
+          stats:
+            Strength: 10
+
+          combatStats:
+            reviveChance: 5
+
+          debuffResistances:
+            Accuracy: 25
+
+  defense:
+    rewards:
+      - collectibleId: Larsian House Model
+        chance: 100
+
+    guardian:
+      numGuardians: 3
+      guardianName: Larsian Citizen
+
+    assaulter:
+      numMonsters: 15
+      monsterIds:
+        - Bloodmoth
+        - Brightwisp
+        - Akroki Swashbuckler
+        - Akroki Mage
+        - Akroki Vanguard
+
+      level:
+        min: 20
+        max: 25
+
+    quests:
+      commissions:
+        - commissionOfferId: Commission - Copper Ore
+          weight: 1
+        - commissionOfferId: Commission - Wergen Sticks
+          weight: 1

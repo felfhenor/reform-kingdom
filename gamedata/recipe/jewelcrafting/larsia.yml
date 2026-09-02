@@ -1,0 +1,20 @@
+- id: ceafd168-1ea9-41f9-99af-0b079823236c
+  name: 'Equipment: Larsian Ring'
+  result:
+    equipmentId: Larsian Ring
+
+  requirements:
+    - itemId: Cactspine
+      quantity: 2
+
+    - itemId: Petrifiwood
+      quantity: 2
+
+    - itemId: Brightwisp Core
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 15
+  maxTradeskillLevel: 20
+  tradeskillXP: 200
+  craftTime: 300
