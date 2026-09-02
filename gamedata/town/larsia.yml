@@ -83,6 +83,11 @@
       - collectibleId: Larsian House Model
         chance: 100
 
+      - itemId: Gold Coin
+        chance: 100
+        min: 5000
+        max: 5500
+
     guardian:
       numGuardians: 3
       guardianName: Larsian Citizen
