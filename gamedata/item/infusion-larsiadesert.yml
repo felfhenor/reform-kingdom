@@ -1,0 +1,49 @@
+- id: bfaf595a-dda5-4253-8869-3fcef4b78cd7
+  name: Cimmerian Holy Charm
+  description: A small cross charm held by ancient Cimmerians to help in case of dire straits.
+  rarity: Rare
+
+  sprite: '0047'
+
+  infusionCombatStats:
+    reviveChance: 1
+
+- id: 5660902c-513e-4b4f-b141-95dd85c446ed
+  name: Cimmerian Fire Charm
+  description: A small fire charm held by ancient Cimmerians to intensify their combat capabilities.
+  rarity: Rare
+
+  sprite: '0048'
+
+  infusionCombatStats:
+    skillStrikeAgainChance: 1
+
+- id: 87ac56ad-32d1-4dc3-aad6-0eede3e06514
+  name: Cimmerian Water Charm
+  description: A small water drop charm held by ancient Cimmerians to reflect the world around them.
+  rarity: Rare
+
+  sprite: '0049'
+
+  infusionCombatStats:
+    damageReflectPercent: 1
+
+- id: 97119f71-91d8-4f4c-bd4d-484289ef1ff7
+  name: Cimmerian Lightning Charm
+  description: A small lightning charm held by ancient Cimerians to help train for combat.
+  rarity: Rare
+
+  sprite: '0050'
+
+  infusionCombatStats:
+    repeatActionChance: 1
+
+- id: b0a228fa-62dd-4df1-a1b2-ffb0a27e84c3
+  name: Cimmerian Skull Charm
+  description: A small skull charm held by ancient Cimmerians to ward off maladies.
+  rarity: Rare
+
+  sprite: '0051'
+
+  infusionCombatStats:
+    debuffIgnoreChance: 1

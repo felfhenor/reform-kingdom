@@ -148,8 +148,29 @@
     - itemId: Timberfuzz
       quantity: 6
 
+    - itemId: Cimmerian Dust
+      quantity: 2
+
   tradeskillId: Woodworking
   minTradeskillLevel: 19
   maxTradeskillLevel: 22
   tradeskillXP: 135
   craftTime: 240
+
+- id: 17a52941-821f-454a-b433-1485aa54710d
+  name: 'Material: Cimmerian Skull Charm'
+  result:
+    itemId: Cimmerian Skull Charm
+
+  requirements:
+    - itemId: Timberfuzz
+      quantity: 10
+
+    - itemId: Cimmerian Dust
+      quantity: 5
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 450
+  craftTime: 900

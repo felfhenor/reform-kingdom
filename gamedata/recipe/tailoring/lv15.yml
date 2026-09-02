@@ -124,6 +124,9 @@
     - itemId: Firmwater
       quantity: 6
 
+    - itemId: Cimmerian Dust
+      quantity: 2
+
   tradeskillId: Tailoring
   minTradeskillLevel: 18
   maxTradeskillLevel: 21
@@ -142,8 +145,29 @@
     - itemId: Firmwater
       quantity: 2
 
+    - itemId: Cimmerian Dust
+      quantity: 2
+
   tradeskillId: Tailoring
   minTradeskillLevel: 19
   maxTradeskillLevel: 22
   tradeskillXP: 135
   craftTime: 240
+
+- id: e9cb3a68-dd8b-41f1-81da-06a5942a1bf6
+  name: 'Material: Cimmerian Water Charm'
+  result:
+    itemId: Cimmerian Skull Charm
+
+  requirements:
+    - itemId: Strongreed
+      quantity: 10
+
+    - itemId: Cimmerian Dust
+      quantity: 5
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 450
+  craftTime: 900

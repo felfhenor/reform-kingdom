@@ -1,0 +1,26 @@
+- id: d8795c3a-56d8-4918-9e3d-ea2dcf0ae428
+  name: Cimmerian Dust
+  description: A pile of dust used by ancient Cimmerians when performing rituals, such as crafting items.
+  rarity: Rare
+
+  sprite: '0052'
+
+- id: 8120aa0d-3975-4808-855a-df3262feb2a8
+  name: Preserved Bloodmoth
+  description: A deceased bloodmoth, quickly captured and preserved to retain it's angering nature.
+  rarity: Uncommon
+
+  sprite: '0046'
+
+  infusionCombatStats:
+    agroValue: 7
+
+- id: 775b8067-e7dd-4168-9d47-4801b99527b8
+  name: Brightwisp Core
+  description: The magical core of a brightwisp, taken after its defeat.
+  rarity: Uncommon
+
+  sprite: '0045'
+
+  infusionDebuffResistances:
+    Accuracy: 10

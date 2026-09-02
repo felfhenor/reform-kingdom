@@ -14,7 +14,16 @@
     max: 65
     bonusPerLevel: 5
 
-  drops: []
+  drops:
+    - chance: 100
+      itemId: Gold Coin
+      min: 200
+      max: 400
+
+    - chance: 5
+      itemId: Cimmerian Dust
+      min: 3
+      max: 5
 
   skills:
     - skillId: Attack
@@ -63,7 +72,16 @@
     max: 65
     bonusPerLevel: 5
 
-  drops: []
+  drops:
+    - chance: 100
+      itemId: Gold Coin
+      min: 250
+      max: 350
+
+    - chance: 10
+      itemId: Cimmerian Dust
+      min: 2
+      max: 3
 
   skills:
     - skillId: Attack
@@ -115,7 +133,16 @@
     max: 65
     bonusPerLevel: 5
 
-  drops: []
+  drops:
+    - chance: 100
+      itemId: Gold Coin
+      min: 500
+      max: 600
+
+    - chance: 15
+      itemId: Cimmerian Dust
+      min: 1
+      max: 2
 
   skills:
     - skillId: Attack
@@ -170,7 +197,9 @@
     max: 65
     bonusPerLevel: 3
 
-  drops: []
+  drops:
+    - chance: 10
+      itemId: Brightwisp Core
 
   skills:
     - skillId: Attack
@@ -224,7 +253,9 @@
     max: 45
     bonusPerLevel: 3
 
-  drops: []
+  drops:
+    - chance: 10
+      itemId: Preserved Bloodmoth
 
   skills:
     - skillId: Attack

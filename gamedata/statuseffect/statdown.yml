@@ -332,7 +332,7 @@
 
   effectType: Debuff
   elements: [Water]
-  tags: [StatDown]
+  tags: [Accuracy]
 
   trigger: TurnEnd
 

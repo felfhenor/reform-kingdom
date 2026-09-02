@@ -162,3 +162,21 @@
   maxTradeskillLevel: 22
   tradeskillXP: 135
   craftTime: 240
+
+- id: 5176e79b-cb3a-4e22-bd29-4194c0026e66
+  name: 'Material: Cimmerian Fire Charm'
+  result:
+    itemId: Cimmerian Fire Charm
+
+  requirements:
+    - itemId: Petrifiwood
+      quantity: 10
+
+    - itemId: Cimmerian Dust
+      quantity: 5
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 450
+  craftTime: 900

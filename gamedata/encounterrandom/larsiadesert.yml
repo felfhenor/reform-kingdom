@@ -29,3 +29,6 @@
   completionRewards:
     - collectibleId: Three-Leaf Clover
       chance: 100
+
+    - recipeId: 'Material: Cimmerian Fire Charm'
+      chance: 5

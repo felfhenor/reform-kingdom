@@ -146,8 +146,29 @@
     - itemId: Amber
       quantity: 1
 
+    - itemId: Cimmerian Dust
+      quantity: 1
+
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 19
   maxTradeskillLevel: 22
   tradeskillXP: 130
   craftTime: 240
+
+- id: d9dff21e-eb8b-4aaf-a006-deb35b4feb5d
+  name: 'Material: Cimmerian Holy Charm'
+  result:
+    itemId: Cimmerian Holy Charm
+
+  requirements:
+    - itemId: Amber
+      quantity: 10
+
+    - itemId: Cimmerian Dust
+      quantity: 5
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 450
+  craftTime: 900

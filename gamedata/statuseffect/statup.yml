@@ -173,9 +173,9 @@
   onApply:
     - type: AddCombatStatNumber
       combatStat: agroValue
-      value: 50
+      value: 10
 
   onUnapply:
     - type: TakeCombatStatNumber
       combatStat: agroValue
-      value: 50
+      value: 10

@@ -109,6 +109,9 @@
     - itemId: Cactspine
       quantity: 2
 
+    - itemId: Cimmerian Dust
+      quantity: 1
+
   tradeskillId: Artificing
   minTradeskillLevel: 18
   maxTradeskillLevel: 21
@@ -127,8 +130,29 @@
     - itemId: Cactspine
       quantity: 4
 
+    - itemId: Cimmerian Dust
+      quantity: 2
+
   tradeskillId: Artificing
   minTradeskillLevel: 19
   maxTradeskillLevel: 22
   tradeskillXP: 135
   craftTime: 240
+
+- id: ac97212c-e924-4ba3-8004-9edfa2c042d3
+  name: 'Material: Cimmerian Lightning Charm'
+  result:
+    itemId: Cimmerian Lightning Charm
+
+  requirements:
+    - itemId: Cactspine
+      quantity: 10
+
+    - itemId: Cimmerian Dust
+      quantity: 5
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 19
+  maxTradeskillLevel: 22
+  tradeskillXP: 450
+  craftTime: 900

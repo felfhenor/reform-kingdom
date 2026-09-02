@@ -27,6 +27,19 @@
     - collectibleId: Deadwoods Sunflower
       chance: 50
 
+    - itemId: Timberfuzz
+      chance: 75
+      min: 5
+      max: 10
+
+    - itemId: Petrifiwood
+      chance: 50
+      min: 5
+      max: 10
+
+    - recipeId: 'Material: Cimmerian Skull Charm'
+      chance: 5
+
 - id: 80050323-967a-4ae1-989d-9c9b2bd0be8e
   name: Rolling Sands
   description: A strange place in the middle of the desert. In every direction is sand, sand, and more sand. Here the winds lie still, yet the sand still moves.
@@ -56,6 +69,14 @@
     - collectibleId: Adventurer's Satchel
       chance: 5
 
+    - itemId: Cactspine
+      chance: 50
+      min: 5
+      max: 10
+
+    - recipeId: 'Material: Cimmerian Lightning Charm'
+      chance: 5
+
 - id: cc216288-7eae-4b1f-8132-b9e8480ff0e4
   name: Cimmerian Temple
   description: A temple sequestered away in the desert mountain range. It was home to a nomadic tribe that prayed to an unknown deity.
@@ -83,6 +104,14 @@
   completionRewards:
     - collectibleId: Mystical Mirror
       chance: 25
+
+    - itemId: Cimmerian Dust
+      chance: 10
+      min: 2
+      max: 4
+
+    - recipeId: 'Material: Cimmerian Holy Charm'
+      chance: 5
 
 - id: 7239ede2-311e-4114-a595-afcf52842699
   name: Ghostmirage Wreck
@@ -114,3 +143,16 @@
   completionRewards:
     - collectibleId: Desertcrab Claw
       chance: 25
+
+    - itemId: Firmwater
+      chance: 50
+      min: 5
+      max: 10
+
+    - itemId: Strongreed
+      chance: 50
+      min: 5
+      max: 10
+
+    - recipeId: 'Material: Cimmerian Water Charm'
+      chance: 5
