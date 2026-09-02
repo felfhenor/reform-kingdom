@@ -271,6 +271,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve(__dirname, '../src/app/interfaces/content-skill.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-statuseffect.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-trait.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-town.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-tradeskill.ts'),
     path.resolve(
       __dirname,
@@ -318,6 +319,7 @@ const contentTypeMap = {
   recipe: 'RecipeContent',
   skill: 'EquipmentSkillContent',
   statuseffect: 'StatusEffectContent',
+  town: 'TownContent',
   tradeskill: 'TradeskillContent',
   tradeskilllevelrequirement: 'TradeskillLevelRequirementContent',
   worker: 'WorkerContent',

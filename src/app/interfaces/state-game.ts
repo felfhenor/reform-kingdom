@@ -16,6 +16,7 @@ import type { EquipmentItem } from '@interfaces/equipment';
 import type { GameStateExploreRandom } from '@interfaces/explore-random';
 import type { GatheringState } from '@interfaces/gathering';
 import type { Branded } from '@interfaces/identifiable';
+import type { GameStateTowns } from '@interfaces/town-state';
 import type { TravelState } from '@interfaces/travel';
 import type {
   GameStateDiscoveredWorkers,
@@ -40,6 +41,7 @@ export type GameStateWorld = {
   exploreRandom: GameStateExploreRandom;
   caravans: GameStateCaravans;
   commissions: GameStateCommissions;
+  towns: GameStateTowns;
 };
 
 export type MaterialId = ItemId;

@@ -40,6 +40,7 @@ export function defaultGameState(): GameState {
       exploreRandom: {},
       caravans: {},
       commissions: {},
+      towns: {},
     },
     materials: {},
     discoveredMaterials: {},

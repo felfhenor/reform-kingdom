@@ -78,6 +78,10 @@ vi.mock('@helpers/crafting/tradeskill', () => ({
   retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
 }));
 
+vi.mock('@helpers/town/town-tick', () => ({
+  pruneInvalidTowns: vi.fn((towns) => towns),
+}));
+
 vi.mock('@helpers/defaults', () => ({
   defaultGameState: vi.fn(() => ({
     armory: [],

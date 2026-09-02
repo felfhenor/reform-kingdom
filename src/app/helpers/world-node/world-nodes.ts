@@ -17,6 +17,7 @@ import type {
   NodeOverrideContent,
   TiledMap,
   TiledObject,
+  TownContent,
   WorldNodeEntry,
   WorldNodeLookup,
   WorldNodeNameMap,
@@ -124,6 +125,11 @@ export function worldNodeCaravan(
   return content?.__type === 'caravan' ? content : undefined;
 }
 
+export function worldNodeTown(entry: WorldNodeEntry): TownContent | undefined {
+  const content = getEntry<TownContent>(entry.nodeName);
+  return content?.__type === 'town' ? content : undefined;
+}
+
 // Lets a node have display text without being backed by an Encounter/Gathering entry.
 export function worldNodeOverride(
   entry: WorldNodeEntry,
@@ -139,6 +145,7 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
     worldNodeGathering(entry)?.hidden ??
     worldNodeEncounterRandom(entry)?.hidden ??
     worldNodeOverride(entry)?.hidden ??
+    worldNodeTown(entry)?.hidden ??
     false
   );
 }
@@ -153,6 +160,7 @@ export function worldNodeCollectibleGateIds(
     worldNodeEncounterRandom(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeCaravan(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeOverride(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeTown(entry)?.invisibleUntilCollectibleIdsFound ??
     []
   );
 }

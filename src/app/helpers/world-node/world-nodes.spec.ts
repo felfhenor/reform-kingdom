@@ -8,6 +8,8 @@ import type {
   TiledLayer,
   TiledMap,
   TiledObject,
+  TownContent,
+  TownId,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -35,6 +37,7 @@ import {
   worldNodeDisplayName,
   worldNodeMapsBuild,
   worldNodeOverride,
+  worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type { CollectibleId } from '@interfaces';
 
@@ -230,6 +233,38 @@ function buildCaravan(overrides: Partial<CaravanContent> = {}): CaravanContent {
   };
 }
 
+function buildTown(overrides: Partial<TownContent> = {}): TownContent {
+  return {
+    id: 'town-forest-ruins' as TownId,
+    name: 'Forest Ruins',
+    __type: 'town',
+    description: 'A town at the edge of the forest.',
+    scaleType: 'Outpost',
+    level: 5,
+    crafting: {
+      maxQueueSize: 1,
+      maxTradeskillLevel: 1,
+      specialtyTradeskillId: 'UNKNOWN' as never,
+      uniqueRecipeIds: [],
+    },
+    traders: { sellItemCount: 0, markupPercentages: { sell: 0, buy: 0 } },
+    gathering: {
+      gatherRateMultiplier: 1,
+      goldGatheredPerMaterial: 0,
+      goldRequiredBeforeCutoff: 0,
+      workers: [],
+    },
+    reputation: { buff: { name: 'UNKNOWN', tiers: [] } },
+    defense: {
+      rewards: [],
+      guardian: { numGuardians: 0, guardianName: 'UNKNOWN' },
+      assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
+      quests: { commissions: [] },
+    },
+    ...overrides,
+  };
+}
+
 describe('encounter-backed node accessors', () => {
   beforeEach(() => {
     setAllIdsByName(new Map());
@@ -254,6 +289,12 @@ describe('encounter-backed node accessors', () => {
 
     it('is false when there is no matching content', () => {
       expect(isWorldNodeHidden(buildEntry())).toBe(false);
+    });
+
+    it('is true when the matching town is authored hidden', () => {
+      seedContent([buildTown({ hidden: true })]);
+
+      expect(isWorldNodeHidden(buildEntry())).toBe(true);
     });
   });
 
@@ -352,6 +393,21 @@ describe('encounter-backed node accessors', () => {
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
     });
+
+    it('reads the gate off a town-backed node too', () => {
+      seedContent([
+        buildTown({
+          invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
+        }),
+      ]);
+      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+
+      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
+
+      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+
+      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
+    });
   });
 
   describe('worldNodeOverride', () => {
@@ -367,6 +423,24 @@ describe('encounter-backed node accessors', () => {
 
     it('returns undefined when there is no matching override', () => {
       expect(worldNodeOverride(buildEntry())).toBeUndefined();
+    });
+  });
+
+  describe('worldNodeTown', () => {
+    it('reads the matching town', () => {
+      seedContent([buildTown({ level: 25 })]);
+
+      expect(worldNodeTown(buildEntry())?.level).toBe(25);
+    });
+
+    it('returns undefined when there is no matching town', () => {
+      expect(worldNodeTown(buildEntry())).toBeUndefined();
+    });
+
+    it('returns undefined for a same-name node backed by a different content type', () => {
+      seedEncounter(buildEncounter());
+
+      expect(worldNodeTown(buildEntry())).toBeUndefined();
     });
   });
 });

@@ -12,6 +12,7 @@ import type {
   MonsterContent,
   RecipeContent,
   StatusEffectContent,
+  TownContent,
 } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
@@ -526,6 +527,123 @@ describe('ensureContent', () => {
       } as unknown as EquipmentSkillContent);
 
       expect(result.techniques).toEqual([]);
+    });
+  });
+
+  describe('town', () => {
+    it('fills defaults for every nested config section when omitted', () => {
+      const result = ensureContent({
+        __type: 'town',
+        id: 'larsia',
+        name: 'Larsia',
+      } as unknown as TownContent);
+
+      expect(result.scaleType).toBe('Outpost');
+      expect(result.crafting).toEqual({
+        maxQueueSize: 1,
+        maxTradeskillLevel: 1,
+        specialtyTradeskillId: 'UNKNOWN',
+        uniqueRecipeIds: [],
+      });
+      expect(result.traders).toEqual({
+        sellItemCount: 0,
+        markupPercentages: { sell: 0, buy: 0 },
+      });
+      expect(result.gathering).toEqual({
+        gatherRateMultiplier: 1,
+        goldGatheredPerMaterial: 0,
+        goldRequiredBeforeCutoff: 0,
+        workers: [],
+      });
+      expect(result.reputation).toEqual({
+        buff: { name: 'UNKNOWN', tiers: [] },
+      });
+      expect(result.defense).toEqual({
+        rewards: [],
+        guardian: { numGuardians: 0, guardianName: 'UNKNOWN' },
+        assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
+        quests: { commissions: [] },
+      });
+    });
+
+    it('normalizes an authored reputation buff tier, including partial stat blocks', () => {
+      const result = ensureContent({
+        __type: 'town',
+        id: 'larsia',
+        name: 'Larsia',
+        gathering: {
+          workers: [{ workerId: 'darwin-nork', level: 1 }],
+        },
+        reputation: {
+          buff: {
+            name: 'Larsian Influence',
+            tiers: [
+              {
+                tier: 1,
+                stats: { Strength: 1 },
+                combatStats: { reviveChance: 1 },
+                debuffResistances: { Accuracy: 5 },
+              },
+            ],
+          },
+        },
+      } as unknown as TownContent);
+
+      expect(result.gathering.workers).toEqual([
+        { workerId: 'darwin-nork', level: 1 },
+      ]);
+
+      const tier = result.reputation.buff.tiers[0];
+      expect(tier.tier).toBe(1);
+      // Partial input is normalized to a full stat block, not left partial.
+      expect(tier.stats.Strength).toBe(1);
+      expect(tier.stats.Agility).toBe(0);
+      expect(tier.combatStats.reviveChance).toBe(1);
+      expect(tier.combatStats.stunChance).toBe(0);
+      expect(tier.debuffResistances.Accuracy).toBe(5);
+      expect(tier.debuffResistances.Stun).toBe(0);
+    });
+
+    it('carries through defense rewards, assaulter pool, and quest commissions', () => {
+      const result = ensureContent({
+        __type: 'town',
+        id: 'larsia',
+        name: 'Larsia',
+        defense: {
+          rewards: [
+            { collectibleId: 'larsian-house-model', chance: 100 },
+            { itemId: 'gold-coin', chance: 100, min: 5000, max: 5500 },
+          ],
+          assaulter: {
+            numMonsters: 15,
+            monsterIds: ['bloodmoth', 'brightwisp'],
+            level: { min: 20, max: 25 },
+          },
+          quests: {
+            commissions: [{ commissionOfferId: 'commission-copper-ore', weight: 1 }],
+          },
+        },
+      } as unknown as TownContent);
+
+      expect(result.defense.rewards).toEqual([
+        { kind: 'Collectible', collectibleId: 'larsian-house-model', chance: 100 },
+        {
+          kind: 'Item',
+          itemId: 'gold-coin',
+          min: 5000,
+          max: 5500,
+          bonusPerLevel: undefined,
+          chance: 100,
+        },
+      ]);
+      expect(result.defense.assaulter).toEqual({
+        numMonsters: 15,
+        monsterIds: ['bloodmoth', 'brightwisp'],
+        level: { min: 20, max: 25 },
+      });
+      expect(result.defense.quests.commissions).toEqual([
+        { commissionOfferId: 'commission-copper-ore', weight: 1 },
+      ]);
     });
   });
 });

@@ -1,0 +1,52 @@
+import { getEntry } from '@helpers/content';
+import { timerTicksElapsed } from '@helpers/engine/timer';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import type {
+  GameStateTowns,
+  TownContent,
+  TownId,
+  TownTickSubsystem,
+} from '@interfaces';
+
+// Per-subsystem, not a single shared gate - independently-cadenced tick functions would otherwise clobber each other's due-check.
+// An un-activated town (no state entry - never visited) is never due, so callers don't each have to re-check activation themselves.
+export function isTownDueForUpdate(
+  townId: TownId,
+  subsystem: TownTickSubsystem,
+  interval: number,
+): boolean {
+  const state = gamestate().world.towns[townId];
+  if (!state) return false;
+
+  const lastProcessed = state.lastProcessedTick[subsystem];
+  if (lastProcessed === undefined) return true;
+
+  return timerTicksElapsed() - lastProcessed >= interval;
+}
+
+export function markTownSubsystemProcessed(
+  townId: TownId,
+  subsystem: TownTickSubsystem,
+): void {
+  const nowTick = timerTicksElapsed();
+
+  updateGamestate((state) => {
+    const target = state.world.towns[townId];
+    if (!target) return state;
+
+    target.lastProcessedTick[subsystem] = nowTick;
+    return state;
+  });
+}
+
+export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
+  const pruned: GameStateTowns = {};
+
+  (Object.keys(towns) as TownId[]).forEach((townId) => {
+    if (getEntry<TownContent>(townId)) {
+      pruned[townId] = towns[townId];
+    }
+  });
+
+  return pruned;
+}

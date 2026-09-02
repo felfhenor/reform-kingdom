@@ -94,6 +94,18 @@ import type {
   StatusEffectId,
   StatusEffectTag,
   TargettingPriorityEntry,
+  TownContent,
+  TownCraftingConfig,
+  TownDefenseAssaulterConfig,
+  TownDefenseConfig,
+  TownDefenseGuardianConfig,
+  TownDefenseQuestsConfig,
+  TownGatheringConfig,
+  TownGatheringWorker,
+  TownId,
+  TownReputationBuffTier,
+  TownReputationConfig,
+  TownTradersConfig,
   TradeskillContent,
   TradeskillId,
   TradeskillLevelRequirementContent,
@@ -125,6 +137,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   recipe: ensureRecipe,
   skill: ensureSkill,
   statuseffect: ensureStatusEffect,
+  town: ensureTown,
   tradeskill: ensureTradeskill,
   tradeskilllevelrequirement: ensureTradeskillLevelRequirement,
   worker: ensureWorker,
@@ -748,6 +761,129 @@ function ensureRecipe(recipe: Partial<RecipeContent>): Required<RecipeContent> {
     tradeskillXP: recipe.tradeskillXP ?? 0,
     craftTime: recipe.craftTime ?? 60,
     tokenUnlockCost: recipe.tokenUnlockCost ?? 3,
+  };
+}
+
+function ensureTownCrafting(
+  crafting: Partial<TownCraftingConfig> = {},
+): TownCraftingConfig {
+  return {
+    maxQueueSize: crafting.maxQueueSize ?? 1,
+    maxTradeskillLevel: crafting.maxTradeskillLevel ?? 1,
+    specialtyTradeskillId:
+      crafting.specialtyTradeskillId ?? ('UNKNOWN' as TradeskillId),
+    uniqueRecipeIds: crafting.uniqueRecipeIds ?? [],
+  };
+}
+
+function ensureTownTraders(
+  traders: Partial<TownTradersConfig> = {},
+): TownTradersConfig {
+  return {
+    sellItemCount: traders.sellItemCount ?? 0,
+    markupPercentages: traders.markupPercentages ?? { sell: 0, buy: 0 },
+  };
+}
+
+function ensureTownGatheringWorker(
+  worker: Partial<TownGatheringWorker> = {},
+): TownGatheringWorker {
+  return {
+    workerId: worker.workerId ?? ('UNKNOWN' as WorkerId),
+    level: worker.level ?? 1,
+  };
+}
+
+function ensureTownGathering(
+  gathering: Partial<TownGatheringConfig> = {},
+): TownGatheringConfig {
+  return {
+    gatherRateMultiplier: gathering.gatherRateMultiplier ?? 1,
+    goldGatheredPerMaterial: gathering.goldGatheredPerMaterial ?? 0,
+    goldRequiredBeforeCutoff: gathering.goldRequiredBeforeCutoff ?? 0,
+    workers: ensureArray(gathering.workers, ensureTownGatheringWorker),
+  };
+}
+
+function ensureTownReputationBuffTier(
+  tier: Partial<TownReputationBuffTier> = {},
+): TownReputationBuffTier {
+  return {
+    tier: tier.tier ?? 0,
+    stats: ensureStats(tier.stats),
+    combatStats: ensureCombatStats(tier.combatStats),
+    debuffResistances: ensureTagResistances(tier.debuffResistances),
+  };
+}
+
+function ensureTownReputation(
+  reputation: Partial<TownReputationConfig> = {},
+): TownReputationConfig {
+  return {
+    buff: {
+      name: reputation.buff?.name ?? 'UNKNOWN',
+      tiers: ensureArray(
+        reputation.buff?.tiers,
+        ensureTownReputationBuffTier,
+      ),
+    },
+  };
+}
+
+function ensureTownDefenseGuardian(
+  guardian: Partial<TownDefenseGuardianConfig> = {},
+): TownDefenseGuardianConfig {
+  return {
+    numGuardians: guardian.numGuardians ?? 0,
+    guardianName: guardian.guardianName ?? 'UNKNOWN',
+  };
+}
+
+function ensureTownDefenseAssaulter(
+  assaulter: Partial<TownDefenseAssaulterConfig> = {},
+): TownDefenseAssaulterConfig {
+  return {
+    numMonsters: assaulter.numMonsters ?? 0,
+    monsterIds: assaulter.monsterIds ?? [],
+    level: assaulter.level ?? { min: 1, max: 1 },
+  };
+}
+
+function ensureTownDefenseQuests(
+  quests: Partial<TownDefenseQuestsConfig> = {},
+): TownDefenseQuestsConfig {
+  return {
+    commissions: ensureArray(quests.commissions, ensureCommissionOfferSlot),
+  };
+}
+
+function ensureTownDefense(
+  defense: Partial<TownDefenseConfig> = {},
+): TownDefenseConfig {
+  return {
+    rewards: ensureArray(defense.rewards, ensureDroppedReward),
+    guardian: ensureTownDefenseGuardian(defense.guardian),
+    assaulter: ensureTownDefenseAssaulter(defense.assaulter),
+    quests: ensureTownDefenseQuests(defense.quests),
+  };
+}
+
+function ensureTown(town: Partial<TownContent>): Required<TownContent> {
+  return {
+    id: town.id ?? ('UNKNOWN' as TownId),
+    name: town.name ?? 'UNKNOWN',
+    __type: 'town',
+    description: town.description ?? 'UNKNOWN',
+    hidden: town.hidden ?? false,
+    invisibleUntilCollectibleIdsFound:
+      town.invisibleUntilCollectibleIdsFound ?? [],
+    scaleType: town.scaleType ?? 'Outpost',
+    level: town.level ?? 1,
+    crafting: ensureTownCrafting(town.crafting),
+    traders: ensureTownTraders(town.traders),
+    gathering: ensureTownGathering(town.gathering),
+    reputation: ensureTownReputation(town.reputation),
+    defense: ensureTownDefense(town.defense),
   };
 }
 

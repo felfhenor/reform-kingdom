@@ -32,6 +32,7 @@
     "./schemas/recipe.schema.json": "gamedata/recipe/**/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/**/*.yml",
     "./schemas/statuseffect.schema.json": "gamedata/statuseffect/**/*.yml",
+    "./schemas/town.schema.json": "gamedata/town/**/*.yml",
     "./schemas/tradeskill.schema.json": "gamedata/tradeskill/**/*.yml",
     "./schemas/tradeskilllevelrequirement.schema.json": "gamedata/tradeskilllevelrequirement/**/*.yml",
     "./schemas/worker.schema.json": "gamedata/worker/**/*.yml"
