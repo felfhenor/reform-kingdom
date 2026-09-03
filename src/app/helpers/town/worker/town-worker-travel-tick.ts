@@ -12,7 +12,7 @@ import type {
 } from '@interfaces';
 
 // Worker pauses this long between filling up and hauling back
-export const TOWN_WORKER_REST_TICKS = 10;
+export const TOWN_WORKER_REST_TICKS = 30;
 
 // Mirrors worker-travel-tick.ts's advancePathOneTick - structural fork, not shared state.
 function advancePathOneTick(

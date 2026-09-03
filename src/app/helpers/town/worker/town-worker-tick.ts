@@ -14,7 +14,7 @@ import type { TownContent, WorkerId } from '@interfaces';
 
 // Runs every tick once activated - worker travel/gathering progress continuously, like the player's own workersProcessTick.
 // Raising this is a blunt slowdown on the whole worker economy, it advances ticksIntoStep/ticksIntoGather/ticksIntoRest by +1 regardless of how many real ticks elapsed since the last run.
-const WORKER_TICK_INTERVAL = 5;
+const WORKER_TICK_INTERVAL = 1;
 
 function processTownWorker(town: TownContent, workerId: WorkerId): void {
   const worker = gamestate().world.towns[town.id]?.workers[workerId];

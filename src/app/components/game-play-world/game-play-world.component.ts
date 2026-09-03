@@ -62,6 +62,7 @@ import {
 } from '@helpers/pixi/pixi-travel-glide';
 import { gamestate } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
+import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-travel';
 import { workersTravelingTokens } from '@helpers/worker/worker-travel';
 import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
 import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate';
@@ -174,6 +175,10 @@ export class GamePlayWorldComponent implements OnDestroy {
   private workerGlideStates = new Map<WorkerId, TravelGlideState>();
   private workerTokenTextures = new Map<WorkerId, Texture[]>();
   private pendingWorkerTextureLoads = new Set<WorkerId>();
+  // Keyed by "townId:workerId", not WorkerId alone, in case content ever reuses one across towns.
+  // Shares workerTokenTextures/pendingWorkerTextureLoads with the player system below (same content pool).
+  private townWorkerTokens = new Map<string, Container>();
+  private townWorkerGlideStates = new Map<string, TravelGlideState>();
   // Cached by positionCamera() each frame so updateWorkerIndicators() doesn't recompute it per worker.
   private lastCamera: CameraPosition = { x: 0, y: 0 };
   private gatherProgressContainer?: Container;
@@ -398,6 +403,8 @@ export class GamePlayWorldComponent implements OnDestroy {
     // Tokens/glide state are per-app-instance; loaded textures persist across map transitions, same as partyTokenTextures.
     this.workerTokens.clear();
     this.workerGlideStates.clear();
+    this.townWorkerTokens.clear();
+    this.townWorkerGlideStates.clear();
     this.gatherProgressContainer = undefined;
     this.gatherProgressBar = undefined;
     this.encounterProgressContainer = undefined;
@@ -509,6 +516,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.maybeUpdateNodeStatus(performance.now());
       this.positionCamera();
       this.updateWorkerIndicators();
+      this.updateTownWorkerIndicators();
       this.updateFloatingTexts();
     };
     this.app.ticker.add(this.visualPositionTicker);
@@ -1003,6 +1011,96 @@ export class GamePlayWorldComponent implements OnDestroy {
     const textures = await this.loadWorkerTokenTextures(workerId);
     this.workerTokenTextures.set(workerId, textures);
     return textures;
+  }
+
+  // Mirrors updateWorkerIndicators, diffing townWorkersTravelingTokens() instead.
+  private updateTownWorkerIndicators(): void {
+    if (!this.workerIndicatorContainer || !this.map) return;
+
+    const tokens = townWorkersTravelingTokens().filter(
+      (token) => token.mapName === this.loadedMapName,
+    );
+    const activeKeys = new Set(
+      tokens.map((token) => `${token.townId}:${token.workerId}`),
+    );
+
+    for (const [key, token] of this.townWorkerTokens) {
+      if (activeKeys.has(key)) continue;
+
+      token.destroy({ children: true });
+      this.townWorkerTokens.delete(key);
+      this.townWorkerGlideStates.delete(key);
+    }
+
+    const now = performance.now();
+    const speedMultiplier = getOption('debugTickMultiplier');
+
+    tokens.forEach((token) => {
+      const key = `${token.townId}:${token.workerId}`;
+      const workerLocation =
+        gamestate().world.towns[token.townId]?.workers[token.workerId]
+          ?.location;
+      if (!workerLocation) return;
+
+      if (
+        !this.townWorkerTokens.has(key) &&
+        !this.pendingWorkerTextureLoads.has(token.workerId)
+      ) {
+        this.createTownWorkerSprite(key, token.workerId, workerLocation);
+      }
+
+      const glide = this.townWorkerGlideStates.get(key);
+      const workerToken = this.townWorkerTokens.get(key);
+      if (!glide || !workerToken || !this.map) return;
+
+      const inFlightStep = token.path[0];
+      const nextGlide = travelGlideAdvance(
+        glide,
+        workerLocation,
+        inFlightStep,
+        now,
+        speedMultiplier,
+      );
+      this.townWorkerGlideStates.set(key, nextGlide);
+
+      const screenPosition = tileToScreenPosition(
+        nextGlide.visual.x,
+        nextGlide.visual.y,
+        this.lastCamera,
+        this.map.tilewidth,
+        this.map.tileheight,
+      );
+      workerToken.position.set(screenPosition.x, screenPosition.y);
+    });
+  }
+
+  private createTownWorkerSprite(
+    key: string,
+    workerId: WorkerId,
+    initialLocation: CurrentLocation,
+  ): void {
+    this.pendingWorkerTextureLoads.add(workerId);
+
+    void this.resolveWorkerTokenTextures(workerId).then((textures) => {
+      this.pendingWorkerTextureLoads.delete(workerId);
+
+      // Worker/map state may have changed while textures were loading - re-check first.
+      if (!this.workerIndicatorContainer || !this.map) return;
+      if (this.townWorkerTokens.has(key)) return;
+
+      const sprite = pixiIndicatorPlayerSpriteCreate(
+        this.map.tilewidth,
+        textures,
+      );
+      const token = new Container();
+      token.addChild(sprite);
+      this.workerIndicatorContainer.addChild(token);
+      this.townWorkerTokens.set(key, token);
+      this.townWorkerGlideStates.set(
+        key,
+        defaultTravelGlideState(initialLocation),
+      );
+    });
   }
 
   private enqueueGatherVfx(event: GatherVfxEvent): void {
