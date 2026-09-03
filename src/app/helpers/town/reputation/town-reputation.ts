@@ -10,9 +10,9 @@ import type {
 export const TOWN_REPUTATION_THRESHOLDS: Record<number, number> = {
   0: 0,
   1: 100,
-  2: 500,
-  3: 1500,
-  4: 5000,
+  2: 600,
+  3: 2100,
+  4: 7100,
 };
 
 export const TOWN_REPUTATION_TIER_NAMES: Record<number, string> = {
