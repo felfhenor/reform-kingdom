@@ -9,13 +9,42 @@ import { partyGet } from '@helpers/hero/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
-import type {
-  GameState,
-  GlobalEffect,
-  GlobalEffectContent,
-  GlobalEffectId,
-  TownContent,
+import {
+  CombatStatDimension,
+  StatusEffectTagDimension,
+  type GameState,
+  type GlobalEffect,
+  type GlobalEffectContent,
+  type GlobalEffectEffect,
+  type GlobalEffectId,
+  type TownContent,
 } from '@interfaces';
+
+// Renders a set of effects as short "Label: +N[%]" fragments, comma-joined - for
+// appending live numbers onto a buff's tooltip description (e.g. town reputation buffs).
+export function globalEffectEffectsDescription(
+  effects: GlobalEffectEffect[],
+): string {
+  return effects
+    .map((effect) => {
+      switch (effect.effectType) {
+        case 'GainStats':
+          return `${effect.stat}: +${effect.value}`;
+        case 'GainCombatStat': {
+          const isPercent =
+            CombatStatDimension.isPercent?.[effect.combatStat] ?? true;
+          return `${CombatStatDimension.label[effect.combatStat]}: +${effect.value}${isPercent ? '%' : ''}`;
+        }
+        case 'GlobalXPGainMultiplier':
+          return `XP Gain: +${effect.value * 100}%`;
+        case 'DebuffResistance':
+          return `All Debuff Resist: +${effect.value}%`;
+        case 'DebuffResistanceTag':
+          return `${StatusEffectTagDimension.label[effect.tag]}: +${effect.value}%`;
+      }
+    })
+    .join(', ');
+}
 
 export function activeGlobalEffects(): GlobalEffect[] {
   const currentTick = timerTicksElapsed();
