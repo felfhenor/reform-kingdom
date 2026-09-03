@@ -11,7 +11,7 @@ import type {
   CaravanTrade,
   CaravanTraderContent,
   CaravanTraderId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureCaravanTrade(trade: Partial<CaravanTrade> = {}): CaravanTrade {
   return {

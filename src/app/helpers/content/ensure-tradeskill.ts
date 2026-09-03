@@ -4,7 +4,7 @@ import type {
   TradeskillId,
   TradeskillLevelRequirementContent,
   TradeskillLevelRequirementId,
-} from '../../interfaces';
+} from '@interfaces';
 
 export function ensureTradeskill(
   tradeskill: Partial<TradeskillContent>,

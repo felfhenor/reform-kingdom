@@ -9,7 +9,7 @@ import type {
   EncounterRandomId,
   EncounterRandomPoolMonster,
   MonsterId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureEncounterFightMonster(
   monster: Partial<EncounterFightMonster> = {},

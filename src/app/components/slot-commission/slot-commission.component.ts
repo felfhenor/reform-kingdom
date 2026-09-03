@@ -7,6 +7,8 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { commissionFulfill } from '@helpers/commission/commission-fulfill';
+import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
 import { traderTokenId } from '@helpers/item/materials';
 import type {
@@ -15,8 +17,6 @@ import type {
   CraftRequirementEntry,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { commissionFulfill } from '../../helpers/commission/commission-fulfill';
-import { notifySuccess } from '../../helpers/engine/notify';
 
 @Component({
   selector: 'app-slot-commission',

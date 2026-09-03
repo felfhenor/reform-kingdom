@@ -22,7 +22,7 @@ import type {
   TownTradersConfig,
   TradeskillId,
   WorkerId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureTownCrafting(
   crafting: Partial<TownCraftingConfig> = {},

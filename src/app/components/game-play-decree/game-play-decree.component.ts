@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
@@ -47,7 +48,6 @@ import {
 } from '@ng-select/ng-select';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
-import { IconComponent } from '../icon/icon.component';
 
 const CLAUSE_TYPE_OPTIONS: {
   value: DecreeClauseAction['type'];

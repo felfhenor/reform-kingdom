@@ -1,3 +1,9 @@
+import {
+  defaultAffinities,
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
 import type {
   AffixPosition,
   CaravanTradeType,
@@ -9,14 +15,8 @@ import type {
   GameElement,
   GameStat,
   StatusEffectTag,
-} from '../../interfaces';
-import { EquipmentTypeToSlot } from '../../interfaces';
-import {
-  defaultAffinities,
-  defaultCombatStats,
-  defaultStats,
-  defaultTagResistances,
-} from '../defaults';
+} from '@interfaces';
+import { EquipmentTypeToSlot } from '@interfaces';
 
 export const VALID_GAME_ELEMENTS = Object.keys(
   defaultAffinities(),

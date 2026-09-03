@@ -1,9 +1,5 @@
-import type {
-  WorkerContent,
-  WorkerId,
-  WorkerStatBlock,
-} from '../../interfaces';
-import { defaultWorkerStats } from '../defaults';
+import { defaultWorkerStats } from '@helpers/defaults';
+import type { WorkerContent, WorkerId, WorkerStatBlock } from '@interfaces';
 
 function ensureWorkerStats(
   statblock: Partial<WorkerStatBlock> = {},

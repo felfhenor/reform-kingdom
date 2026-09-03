@@ -11,7 +11,7 @@ import type {
   TownContent,
   TownId,
   WorldNodeEntry,
-} from '@interfaces';
+ CollectibleId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/world-node/world-node-discovery', () => ({
@@ -39,7 +39,7 @@ import {
   worldNodeOverride,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
-import type { CollectibleId } from '@interfaces';
+
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {

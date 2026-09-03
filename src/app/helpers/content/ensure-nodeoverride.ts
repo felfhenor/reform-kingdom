@@ -1,4 +1,4 @@
-import type { NodeOverrideContent, NodeOverrideId } from '../../interfaces';
+import type { NodeOverrideContent, NodeOverrideId } from '@interfaces';
 
 export function ensureNodeOverride(
   override: Partial<NodeOverrideContent>,

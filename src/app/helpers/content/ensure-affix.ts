@@ -14,7 +14,7 @@ import type {
   AffixId,
   EquipmentSkillId,
   TradeskillId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureAffixEffect(effect: Record<string, unknown> = {}): AffixEffect {
   const kind = effect['kind'] as AffixEffect['kind'];

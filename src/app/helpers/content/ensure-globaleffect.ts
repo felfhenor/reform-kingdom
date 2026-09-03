@@ -11,7 +11,7 @@ import type {
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
   StatusEffectTag,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureGlobalEffectEffect(
   effect: Partial<GlobalEffectEffectGainStats> &

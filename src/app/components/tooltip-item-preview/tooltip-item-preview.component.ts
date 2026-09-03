@@ -7,11 +7,11 @@ import {
 } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
-import type { StatusEffectBlock } from '@interfaces';
 import {
   type CombatStatBlock,
   type ItemPreviewDisplay,
   type StatBlock,
+  type StatusEffectBlock,
 } from '@interfaces';
 
 // Headless: renders only an `ng-template` and exposes it via `template()`,

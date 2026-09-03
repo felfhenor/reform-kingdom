@@ -10,12 +10,12 @@ import {
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
-import type { TownContent } from '@interfaces';
 import {
   type AnalysisCheck,
   type AnalysisRunResult,
   type AnalysisTable,
   type GatheringContent,
+  type TownContent,
   type WorkerContent,
   type WorkerLevelingGapEntry,
   type WorkerReachabilityCheckEntry,

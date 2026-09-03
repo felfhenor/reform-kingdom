@@ -3,7 +3,7 @@ import type {
   MonsterContent,
   TiledObject,
   WorldNodeEntry,
-} from '@interfaces';
+ Combat, GameState } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/world-node/world-node-discovery', () => ({
@@ -23,7 +23,7 @@ import {
   worldNodeMonsterCount,
   worldNodeMonsters,
 } from '@helpers/world-node/world-node-encounter';
-import type { Combat, GameState } from '@interfaces';
+
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {

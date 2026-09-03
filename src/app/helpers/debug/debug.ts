@@ -41,7 +41,6 @@ import {
   worldNodeByName,
   worldNodeGathering,
 } from '@helpers/world-node/world-nodes';
-import type { TownContent } from '@interfaces';
 import {
   type CharacterId,
   type CollectibleContent,
@@ -53,6 +52,7 @@ import {
   type MonsterContent,
   type RecipeContent,
   type RecipeId,
+  type TownContent,
   type TownId,
   type Tradeskill,
   type WorkerContent,

@@ -1,8 +1,10 @@
 import type {
   GameState,
   GlobalEffectContent,
+  GlobalEffectEffect,
   GlobalEffectId,
   TownContent,
+  WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -52,7 +54,6 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
-import type { GlobalEffectEffect, WorldNodeEntry } from '@interfaces';
 
 describe('Global Effect Helper Functions', () => {
   const healingId = 'healing-1' as GlobalEffectId;

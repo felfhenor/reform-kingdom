@@ -18,7 +18,7 @@ import type {
   EquipmentSkillTargetBehaviorData,
   EquipmentSkillTechniqueStatusEffectApplication,
   StatusEffectId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureEquipmentSkillTargetBehaviorData(
   behavior: Partial<EquipmentSkillTargetBehaviorData> = {},

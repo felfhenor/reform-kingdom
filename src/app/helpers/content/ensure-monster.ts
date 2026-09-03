@@ -10,7 +10,7 @@ import type {
   MonsterId,
   MonsterSkill,
   TargettingPriorityEntry,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureMonsterSkill(skill: Partial<MonsterSkill> = {}): MonsterSkill {
   return {

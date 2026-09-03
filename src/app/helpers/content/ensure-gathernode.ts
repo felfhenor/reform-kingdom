@@ -5,7 +5,7 @@ import type {
   GatherResult,
   GatherResultItem,
   ItemId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureGatherResultItem(
   item: Partial<GatherResultItem> = {},

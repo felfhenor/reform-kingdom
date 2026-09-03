@@ -5,7 +5,7 @@ import type {
   GameState,
   MaterialId,
   RecipeId,
-} from '@interfaces';
+ DecreeClause, DecreeClauseId, WorldNodeEntry } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/caravan/caravan', () => ({
@@ -179,7 +179,7 @@ import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfindin
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
-import type { DecreeClause, DecreeClauseId, WorldNodeEntry } from '@interfaces';
+
 
 describe('migrateGameState', () => {
   beforeEach(() => {

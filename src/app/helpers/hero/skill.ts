@@ -1,15 +1,17 @@
 import type {
+  EquipmentItemType,
   EquipmentSkill,
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   EquipmentSkillTechniqueStatusEffectApplication,
-} from '@interfaces/content-skill';
-import type { GameElement } from '@interfaces/element';
-import type { EquipmentItemType } from '@interfaces/equipment';
-import type { GameStat, SkillStatScaling, StatBlock } from '@interfaces/stat';
-import { StatOrder } from '@interfaces/stat';
+  GameElement,
+  GameStat,
+  SkillStatScaling,
+  StatBlock,
+} from '@interfaces';
+import { ROMAN_NUMERAL_TIERS, StatOrder } from '@interfaces';
+
 import { clamp, uniq } from 'es-toolkit/compat';
-import { ROMAN_NUMERAL_TIERS } from '../../interfaces';
 
 // Heroes need one of requiredWeaponTypes equipped (empty = no requirement); monsters never carry equipment.
 export function skillIsUsableWithEquippedWeapons(

@@ -8,7 +8,7 @@ import type {
   RecipeRequirementEquipment,
   RecipeRequirementItem,
   TradeskillId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureRecipeRequirement(
   requirement: Partial<RecipeRequirementItem> &

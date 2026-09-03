@@ -6,7 +6,7 @@ import type {
   AstralProjectorRequirementMaterial,
   GlobalEffectId,
   ItemId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureAstralProjectorRequirement(
   requirement: Partial<AstralProjectorRequirementCollectible> &

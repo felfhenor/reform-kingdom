@@ -13,7 +13,7 @@ import type {
   JobId,
   JobSkillPath,
   JobSkillPathLevel,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureJobSkillPathLevel(
   level: Partial<JobSkillPathLevel> = {},

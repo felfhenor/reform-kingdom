@@ -10,7 +10,7 @@ import type {
   EquipmentId,
   ItemContent,
   ItemId,
-} from '../../interfaces';
+} from '@interfaces';
 
 export function ensureCollectible(
   collectible: Partial<CollectibleContent>,

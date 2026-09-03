@@ -1,4 +1,4 @@
-import type { CommissionOfferId, CommissionOfferSlot } from '../../interfaces';
+import type { CommissionOfferId, CommissionOfferSlot } from '@interfaces';
 
 export function ensureCommissionOfferSlot(
   slot: Partial<CommissionOfferSlot> = {},

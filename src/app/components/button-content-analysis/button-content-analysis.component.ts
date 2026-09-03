@@ -1,7 +1,7 @@
 import { Component, computed, HostBinding, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SFXDirective } from '@directives/sfx.directive';
-import { getOption } from '../../helpers';
+import { getOption } from '@helpers/state-options';
 
 @Component({
   selector: 'app-button-content-analysis',

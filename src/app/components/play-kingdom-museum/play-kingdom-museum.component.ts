@@ -17,11 +17,11 @@ import {
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum';
-import type { RecipeContent } from '@interfaces';
 import {
   type MuseumCollectibleEntry,
   type MuseumRecipeEntry,
   type MuseumTab,
+  type RecipeContent,
   type RecipeId,
 } from '@interfaces';
 

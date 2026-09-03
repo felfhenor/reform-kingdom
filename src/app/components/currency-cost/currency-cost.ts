@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
-import type { ItemId } from '../../interfaces';
+import type { ItemId } from '@interfaces';
 
 @Component({
   selector: 'app-currency-cost',

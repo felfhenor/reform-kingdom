@@ -1,10 +1,16 @@
 import { signal } from '@angular/core';
+import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import {
   modalCloseAll,
   modalHasAnyOpen,
   modalOpen,
 } from '@helpers/engine/modal-stack';
 import { localStorageSignal } from '@helpers/engine/signal';
+import { townMarkVisited } from '@helpers/town/town-visit';
+import {
+  worldNodeCaravan,
+  worldNodeTown,
+} from '@helpers/world-node/world-nodes';
 import type {
   CharacterId,
   GamePlayView,
@@ -12,9 +18,6 @@ import type {
   Tradeskill,
   WorldNodeEntry,
 } from '@interfaces';
-import { caravanMarkVisited } from '../caravan/caravan';
-import { townMarkVisited } from '../town/town-visit';
-import { worldNodeCaravan, worldNodeTown } from '../world-node/world-nodes';
 
 // Change-detection nudge ticking once a second independent of the gameloop, so live countdowns re-render even without a gameloop tick.
 export const uiClockTick = signal<number>(0);

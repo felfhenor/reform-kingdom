@@ -6,7 +6,7 @@ import type {
   CommissionOfferRequirementEquipment,
   CommissionOfferRequirementItem,
   ItemId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureCommissionOfferRequirement(
   requirement: Partial<CommissionOfferRequirementItem> &

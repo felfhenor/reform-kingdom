@@ -6,13 +6,15 @@ import {
 } from '@angular/core';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
-import type { CombatStat, GameStat, StatusEffectBlock } from '@interfaces';
 import {
-  CombatStatDimension,
-  StatusEffectTagDimension,
+  type CombatStat,
   type CombatStatBlock,
+  CombatStatDimension,
+  type GameStat,
   type StatBlock,
+  type StatusEffectBlock,
   type StatusEffectTag,
+  StatusEffectTagDimension,
 } from '@interfaces';
 
 @Component({

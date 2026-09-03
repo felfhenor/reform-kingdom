@@ -8,7 +8,7 @@ import type {
   EquipmentItemId,
   JobContent,
   JobId,
-} from '@interfaces';
+ AffixContent, AffixId, Combat } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/kingdom/armory', () => ({
@@ -46,7 +46,7 @@ import {
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
 import { armoryGet } from '@helpers/kingdom/armory';
-import type { AffixContent, AffixId, Combat } from '@interfaces';
+
 
 // Dedup is keyed by instance id, not content id, so each distinct physical item needs its own id (a two-hander reuses the same instance across both slots).
 function mockEquipmentItem(

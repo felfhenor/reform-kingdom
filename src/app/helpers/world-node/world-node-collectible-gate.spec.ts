@@ -2,7 +2,7 @@ import type {
   EncounterContent,
   TiledObject,
   WorldNodeEntry,
-} from '@interfaces';
+ CollectibleId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/world-node/world-node-discovery', () => ({
@@ -26,7 +26,7 @@ import {
   isWorldNodeDiscovered,
   worldNodeDiscover,
 } from '@helpers/world-node/world-node-discovery';
-import type { CollectibleId } from '@interfaces';
+
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {

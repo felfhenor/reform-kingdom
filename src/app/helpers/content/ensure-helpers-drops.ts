@@ -6,7 +6,7 @@ import type {
   DroppedReward,
   DroppedWorkerReward,
   ItemId,
-} from '../../interfaces';
+} from '@interfaces';
 
 export function ensureDroppedReward(
   reward: Partial<DroppedItemReward> &

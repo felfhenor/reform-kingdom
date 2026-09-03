@@ -14,7 +14,6 @@ import {
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngUuid } from '@helpers/rng';
-import type { StatusEffectBlock } from '@interfaces';
 import {
   EquipmentTypeToSlot,
   StatOrder,
@@ -35,7 +34,9 @@ import {
   type JobContent,
   type JobId,
   type StatBlock,
+  type StatusEffectBlock,
 } from '@interfaces';
+
 import { orderBy, sumBy, uniq } from 'es-toolkit/compat';
 
 // Gear can be swapped freely while gathering, but not mid-fight.

@@ -40,8 +40,8 @@ import type {
   TradeskillContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { PluralizePipe } from '@pipes/pluralize.pipe';
 import { clamp, sortBy } from 'es-toolkit/compat';
-import { PluralizePipe } from '../../pipes/pluralize.pipe';
 
 @Component({
   selector: 'app-play-kingdom-home',

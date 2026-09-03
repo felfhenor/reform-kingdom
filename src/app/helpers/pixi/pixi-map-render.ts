@@ -8,8 +8,15 @@ import type {
   TiledObject,
   TiledObjectOrientation,
 } from '@interfaces';
-import type { FederatedPointerEvent, Renderer, Text } from 'pixi.js';
-import { Container, Rectangle, Sprite, type Texture } from 'pixi.js';
+import {
+  Container,
+  type FederatedPointerEvent,
+  Rectangle,
+  type Renderer,
+  Sprite,
+  type Text,
+  type Texture,
+} from 'pixi.js';
 
 export type PixiTiledMapRenderResult = {
   container: Container;

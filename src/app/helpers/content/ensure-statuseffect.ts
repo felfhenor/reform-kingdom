@@ -16,7 +16,7 @@ import type {
   StatusEffectBehaviorType,
   StatusEffectContent,
   StatusEffectId,
-} from '../../interfaces';
+} from '@interfaces';
 
 function ensureStatusEffectBehavior(
   behavior: Record<string, unknown> = {},

@@ -4,6 +4,8 @@ const { defineConfig } = require('eslint/config');
 const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
 const typescriptPaths = require('eslint-plugin-typescript-paths');
+const importPlugin = require('eslint-plugin-import');
+const tsParser = require('@typescript-eslint/parser');
 
 module.exports = defineConfig([
   {
@@ -12,10 +14,21 @@ module.exports = defineConfig([
       eslint.configs.recommended,
       tseslint.configs.recommended,
       angular.configs.tsRecommended,
+      importPlugin.flatConfigs.recommended,
     ],
+    languageOptions: {
+      parser: tsParser,
+    },
     processor: angular.processInlineTemplates,
     plugins: {
       'typescript-paths': typescriptPaths,
+      imports: importPlugin,
+    },
+    settings: {
+      'import/resolver': {
+        typescript: true,
+        node: true,
+      },
     },
     rules: {
       '@angular-eslint/directive-selector': [
@@ -49,6 +62,7 @@ module.exports = defineConfig([
       'space-before-blocks': ['error'],
       'typescript-paths/absolute-import': ['error', { enableAlias: true }],
       eqeqeq: ['error', 'always'],
+      'no-restricted-imports': ['error', { patterns: ['..*'] }],
     },
   },
   {
