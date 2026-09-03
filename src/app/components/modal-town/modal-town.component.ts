@@ -1,17 +1,24 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
+  LOCALE_ID,
   signal,
+  viewChild,
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { activeTownNode } from '@helpers/engine/ui';
+import { notifySuccess } from '@helpers/engine/notify';
+import { getGoldQuantity } from '@helpers/item/materials';
 import { townReputationDisplay } from '@helpers/town/reputation/town-reputation';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
+import { townExecuteTrade, townStockMaxQuantity } from '@helpers/town/shop/town-trade';
+import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
 import {
   townWorkerRosterEntries,
@@ -21,9 +28,13 @@ import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
   TownModalTab,
   TownStockEntry,
+  TownStockRow,
   TownWorkerRosterEntry,
   TownWorkerStatusDisplay,
 } from '@interfaces';
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { clamp } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-modal-town',
@@ -34,10 +45,13 @@ import type {
     AtlasAnimationComponent,
     SpriteNodeComponent,
     BarProgressComponent,
+    SweetAlert2Module,
   ],
   templateUrl: './modal-town.component.html',
 })
 export class ModalTownComponent {
+  private locale = inject(LOCALE_ID);
+
   public entry = computed(() => activeTownNode());
 
   public town = computed(() => {
@@ -52,9 +66,23 @@ export class ModalTownComponent {
 
   public currentTab = signal<TownModalTab>('shop');
 
-  public stock = computed(() => {
+  public stockRows = computed<TownStockRow[]>(() => {
     const town = this.town();
-    return town ? townStock(town.id) : [];
+    if (!town) return [];
+
+    const goldQuantity = getGoldQuantity();
+    return townStock(town.id).map((entry, index) => {
+      const price = townStockPrice(town, entry);
+      return {
+        index,
+        entry,
+        price,
+        maxQuantity:
+          price === undefined
+            ? 0
+            : townStockMaxQuantity(entry, price, goldQuantity),
+      };
+    });
   });
 
   public stockCap = computed(() => {
@@ -78,5 +106,68 @@ export class ModalTownComponent {
     return town
       ? townWorkerStatusDisplay(town, entry.status)
       : { label: '', locationEntry: undefined };
+  }
+
+  private confirmSwal = viewChild<SwalComponent>('confirmSwal');
+  private quantitySwal = viewChild<SwalComponent>('quantitySwal');
+  private pendingRow = signal<TownStockRow | undefined>(undefined);
+
+  // A row with only one unit buyable skips straight to a plain yes/no confirm;
+  // anything more prompts for how many (0 = cancel, capped at maxQuantity).
+  public requestTrade(row: TownStockRow): void {
+    if (row.price === undefined || row.maxQuantity <= 0) return;
+
+    this.pendingRow.set(row);
+    const name = this.stockEntryName(row.entry);
+
+    const price = formatNumber(row.price, this.locale);
+
+    if (row.maxQuantity === 1) {
+      const swal = this.confirmSwal();
+      if (!swal) return;
+      swal.swalOptions = { text: `Buy ${name} for ${price}g?` };
+      swal.fire();
+      return;
+    }
+
+    const swal = this.quantitySwal();
+    if (!swal) return;
+    swal.swalOptions = {
+      text: `How many ${name} would you like to buy? (${price}g each)`,
+      inputValue: 1,
+      inputAttributes: { min: '0', max: `${row.maxQuantity}` },
+    };
+    swal.fire();
+  }
+
+  public confirmSingle(): void {
+    const row = this.pendingRow();
+    this.pendingRow.set(undefined);
+    if (row) this.commitTrade(row, 1);
+  }
+
+  public confirmQuantity(value: unknown): void {
+    const row = this.pendingRow();
+    this.pendingRow.set(undefined);
+    if (!row) return;
+
+    const requested = Math.floor(Number(value));
+    const quantity = Number.isFinite(requested)
+      ? clamp(requested, 0, row.maxQuantity)
+      : 0;
+    if (quantity <= 0) return;
+
+    this.commitTrade(row, quantity);
+  }
+
+  private async commitTrade(row: TownStockRow, quantity: number): Promise<void> {
+    const town = this.town();
+    if (!town) return;
+
+    const name = this.stockEntryName(row.entry);
+    if (!(await townExecuteTrade(town.id, row.index, quantity))) return;
+
+    const qtyLabel = quantity > 1 ? ` x${quantity}` : '';
+    notifySuccess(`You bought ${name}${qtyLabel}!`);
   }
 }

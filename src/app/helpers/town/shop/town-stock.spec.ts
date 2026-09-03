@@ -53,13 +53,24 @@ describe('townStock', () => {
 });
 
 describe('townStockDisplay', () => {
-  it('delegates to the shared resolveRewardDisplay resolver', () => {
+  it('delegates to the shared resolveRewardDisplay resolver for an item entry', () => {
     const display = { name: 'Gold Coin' } as ItemPreviewDisplay;
     vi.mocked(resolveRewardDisplay).mockReturnValue(display);
     const entry = { itemId: 'gold-coin' as never, quantity: 1 };
 
     expect(townStockDisplay(entry)).toBe(display);
-    expect(resolveRewardDisplay).toHaveBeenCalledWith(entry);
+    expect(resolveRewardDisplay).toHaveBeenCalledWith({ itemId: 'gold-coin' });
+  });
+
+  it('delegates to the shared resolveRewardDisplay resolver for an equipment entry', () => {
+    const display = { name: 'Iron Sword' } as ItemPreviewDisplay;
+    vi.mocked(resolveRewardDisplay).mockReturnValue(display);
+    const entry = {
+      equipmentItem: { equipmentId: 'sword' as never } as never,
+    };
+
+    expect(townStockDisplay(entry)).toBe(display);
+    expect(resolveRewardDisplay).toHaveBeenCalledWith({ equipmentId: 'sword' });
   });
 });
 
@@ -73,19 +84,26 @@ describe('pruneInvalidTownStock', () => {
 
   it('keeps an equipment entry that still resolves to content', () => {
     vi.mocked(getEntry).mockReturnValue({} as EquipmentContent);
-    const entry = { equipmentId: 'sword' as never, quantity: 1 };
+    const entry = {
+      equipmentItem: { equipmentId: 'sword' as never } as never,
+    };
 
     expect(pruneInvalidTownStock([entry])).toEqual([entry]);
   });
 
-  it('drops an entry whose referenced id no longer resolves', () => {
+  it('drops an item entry whose itemId no longer resolves', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
     const entry = { itemId: 'removed-item' as never, quantity: 1 };
 
     expect(pruneInvalidTownStock([entry])).toEqual([]);
   });
 
-  it('drops an entry with neither itemId nor equipmentId', () => {
-    expect(pruneInvalidTownStock([{ quantity: 1 }])).toEqual([]);
+  it('drops an equipment entry whose equipmentId no longer resolves', () => {
+    vi.mocked(getEntry).mockReturnValue(undefined);
+    const entry = {
+      equipmentItem: { equipmentId: 'removed-sword' as never } as never,
+    };
+
+    expect(pruneInvalidTownStock([entry])).toEqual([]);
   });
 });

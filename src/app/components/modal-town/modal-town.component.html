@@ -20,7 +20,7 @@
         </app-bar-progress>
       }
 
-      @let shopStock = stock();
+      @let shopStockRows = stockRows();
       <div role="tablist" class="tabs tabs-boxed">
         <a
           role="tab"
@@ -32,7 +32,7 @@
         >
           Shop
           <span class="badge badge-sm badge-info">
-            {{ shopStock.length | number }} / {{ stockCap() | number }}
+            {{ shopStockRows.length | number }} / {{ stockCap() | number }}
           </span>
         </a>
         <a
@@ -80,15 +80,27 @@
       <div class="text-sm text-lighter min-h-16">
         @switch (currentTab()) {
           @case ('shop') {
-            @if (shopStock.length > 0) {
+            @if (shopStockRows.length > 0) {
               <div class="flex flex-col gap-2">
-                @for (stockEntry of shopStock; track $index) {
-                  <div class="flex justify-between items-center">
-                    <span>{{ stockEntryName(stockEntry) }}</span>
-                    <span class="badge badge-outline badge-sm">
-                      x{{ stockEntry.quantity | number }}
-                    </span>
-                  </div>
+                @for (row of shopStockRows; track row.index) {
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-neutral justify-start h-auto normal-case font-normal gap-2 text-neutral-content text-start w-full"
+                    [disabled]="row.price === undefined || row.maxQuantity <= 0"
+                    (click)="requestTrade(row)"
+                  >
+                    <span class="grow">{{ stockEntryName(row.entry) }}</span>
+                    @if ('quantity' in row.entry) {
+                      <span class="badge badge-outline badge-sm">
+                        x{{ row.entry.quantity | number }}
+                      </span>
+                    }
+                    @if (row.price !== undefined) {
+                      <span class="badge badge-outline badge-sm">
+                        {{ row.price | number }}g
+                      </span>
+                    }
+                  </button>
                 }
               </div>
             } @else {
@@ -147,3 +159,20 @@
     }
   </div>
 </app-modal>
+
+<swal
+  #confirmSwal
+  icon="question"
+  confirmButtonText="Yes"
+  cancelButtonText="Cancel"
+  (confirm)="confirmSingle()"
+></swal>
+
+<swal
+  #quantitySwal
+  icon="question"
+  input="number"
+  confirmButtonText="Confirm"
+  cancelButtonText="Cancel"
+  (confirm)="confirmQuantity($event)"
+></swal>
