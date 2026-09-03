@@ -46,10 +46,13 @@
         @if (townReputation(); as repDisplay) {
           <app-bar-progress
             color="secondary"
-            [text]="repDisplay.tierName"
             [value]="repDisplay.reputation"
             [max]="repDisplay.nextThreshold ?? 100"
-          ></app-bar-progress>
+          >
+            {{ repDisplay.tierName }} [{{ repDisplay.reputation }}/{{
+              repDisplay.nextThreshold ?? 100
+            }}]
+          </app-bar-progress>
         }
 
         @let materialIds = gatherMaterialIds();

@@ -31,7 +31,6 @@ export class BarProgressComponent {
   public value = input.required<number>();
   public max = input(100);
   public color = input<DaisyColor>('primary');
-  public text = input<string>();
 
   public colorClass = computed(() => PROGRESS_COLOR_CLASSES[this.color()]);
 }

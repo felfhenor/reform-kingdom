@@ -78,12 +78,11 @@
                 color="primary"
                 [value]="entry.state.xp.current"
                 [max]="entry.state.xp.maximum"
-              />
-
-              <div class="text-xs text-lighter">
-                {{ entry.state.xp.current | number }} /
-                {{ entry.state.xp.maximum | number }} XP
-              </div>
+              >
+                {{ entry.state.xp.current | number }}/{{
+                  entry.state.xp.maximum | number
+                }}
+              </app-bar-progress>
             </div>
 
             <button

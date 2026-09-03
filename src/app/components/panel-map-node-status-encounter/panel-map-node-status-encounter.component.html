@@ -1,12 +1,11 @@
 @if (progress(); as progressValue) {
   <div class="card bg-base-100 shadow-xl pointer-events-auto">
     <div class="card-body gap-2 p-3">
-      <div class="text-xs text-lighter">
-        Fighting monsters... Encounter {{ progressValue.current | number }}/{{
+      <app-bar-progress color="primary" [value]="progressPercent()">
+        Encounter {{ progressValue.current | number }}/{{
           progressValue.total | number
         }}
-      </div>
-      <app-bar-progress color="primary" [value]="progressPercent()" />
+      </app-bar-progress>
     </div>
   </div>
 }

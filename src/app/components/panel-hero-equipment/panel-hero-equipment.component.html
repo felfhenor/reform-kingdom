@@ -17,10 +17,9 @@
         color="primary"
         [value]="char.xp.current"
         [max]="char.xp.maximum"
-      />
-      <div class="text-xs text-lighter">
-        {{ char.xp.current | number }} / {{ char.xp.maximum | number }} XP
-      </div>
+      >
+        {{ char.xp.current | number }}/{{ char.xp.maximum | number }}
+      </app-bar-progress>
     </div>
 
     <app-button-hero-combat-orders [characterId]="char.id" />
