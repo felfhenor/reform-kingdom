@@ -10,19 +10,22 @@ import {
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
-import type {
-  AnalysisCheck,
-  AnalysisRunResult,
-  AnalysisTable,
-  GatheringContent,
-  WorkerContent,
-  WorkerLevelingGapEntry,
-  WorkerReachabilityCheckEntry,
-  WorkerReachabilityNode,
+import type { TownContent } from '@interfaces';
+import {
+  type AnalysisCheck,
+  type AnalysisRunResult,
+  type AnalysisTable,
+  type GatheringContent,
+  type WorkerContent,
+  type WorkerLevelingGapEntry,
+  type WorkerReachabilityCheckEntry,
+  type WorkerReachabilityNode,
 } from '@interfaces';
 import { minBy, sortBy } from 'es-toolkit/compat';
 
-function buildNodes(nodeNameToMap: Map<string, string>): WorkerReachabilityNode[] {
+function buildNodes(
+  nodeNameToMap: Map<string, string>,
+): WorkerReachabilityNode[] {
   const kingdom = kingdomNodeGet();
   const gatherings = getEntriesByType<GatheringContent>('gathering');
 
@@ -48,7 +51,8 @@ function levelIsCovered(
   const stamina = worker ? workerStatsForLevel(worker, level).stamina : 0;
 
   return nodes.some((node) => {
-    if (level < node.levelRange.min || level > node.levelRange.max) return false;
+    if (level < node.levelRange.min || level > node.levelRange.max)
+      return false;
     if (ignoreStamina) return true;
     return node.oneWayTicks !== undefined && node.oneWayTicks <= stamina;
   });
@@ -109,7 +113,10 @@ function findBlockingNode(
   const candidates = nodes.filter(
     (node) => level >= node.levelRange.min && level <= node.levelRange.max,
   );
-  return minBy(candidates, (node) => node.oneWayTicks ?? Number.MAX_SAFE_INTEGER);
+  return minBy(
+    candidates,
+    (node) => node.oneWayTicks ?? Number.MAX_SAFE_INTEGER,
+  );
 }
 
 function buildLevelingGapEntries(
@@ -190,10 +197,18 @@ function levelingGapCheck(
 }
 
 export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
-  const workers = getEntriesByType<WorkerContent>('worker');
+  const towns = getEntriesByType<TownContent>('town');
+  const allWorkers = getEntriesByType<WorkerContent>('worker');
   const nodeNameToMap = buildNodeNameToMap();
   const nodes = buildNodes(nodeNameToMap);
   const kingdom = kingdomNodeGet();
+
+  const workers = allWorkers.filter(
+    (w) =>
+      !towns.some((t) =>
+        t.gathering.workers.find((tw) => tw.workerId === w.id),
+      ),
+  );
 
   const caps = new Map(
     workers.map((worker) => [worker.id, achievableLevelCap(worker, nodes)]),
@@ -236,16 +251,18 @@ export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
       'Worker Stamina',
       'Node Stamina Req',
     ],
-    rows: sortBy(gaps, (g: WorkerLevelingGapEntry) => g.workerName).map((g) => ({
-      Worker: g.workerName,
-      'Stuck At': g.stuckAtLevel,
-      'Blocking Node': g.blockingNodeName ?? '(none)',
-      'Blocking Node Window': g.blockingNodeLevelRange
-        ? `${g.blockingNodeLevelRange.min}-${g.blockingNodeLevelRange.max}`
-        : '-',
-      'Worker Stamina': g.workerStaminaAtStuckLevel,
-      'Node Stamina Req': g.blockingNodeStaminaCost ?? 'unroutable',
-    })),
+    rows: sortBy(gaps, (g: WorkerLevelingGapEntry) => g.workerName).map(
+      (g) => ({
+        Worker: g.workerName,
+        'Stuck At': g.stuckAtLevel,
+        'Blocking Node': g.blockingNodeName ?? '(none)',
+        'Blocking Node Window': g.blockingNodeLevelRange
+          ? `${g.blockingNodeLevelRange.min}-${g.blockingNodeLevelRange.max}`
+          : '-',
+        'Worker Stamina': g.workerStaminaAtStuckLevel,
+        'Node Stamina Req': g.blockingNodeStaminaCost ?? 'unroutable',
+      }),
+    ),
   };
 
   const checks: AnalysisCheck[] = [
