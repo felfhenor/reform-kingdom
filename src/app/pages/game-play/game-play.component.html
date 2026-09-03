@@ -10,25 +10,33 @@
     [class.invisible]="activeGamePlayView() !== 'world'"
   ></app-game-play-world>
 
-  <app-game-play-kingdom
-    class="absolute inset-0"
-    [class.hidden]="activeGamePlayView() !== 'kingdom'"
-  ></app-game-play-kingdom>
+  @defer (when activeGamePlayView() === 'kingdom') {
+    <app-game-play-kingdom
+      class="absolute inset-0"
+      [class.hidden]="activeGamePlayView() !== 'kingdom'"
+    ></app-game-play-kingdom>
+  }
 
-  <app-game-play-heroes
-    class="absolute inset-0"
-    [class.hidden]="activeGamePlayView() !== 'heroes'"
-  ></app-game-play-heroes>
+  @defer (when activeGamePlayView() === 'heroes') {
+    <app-game-play-heroes
+      class="absolute inset-0"
+      [class.hidden]="activeGamePlayView() !== 'heroes'"
+    ></app-game-play-heroes>
+  }
 
-  <app-play-adventurelog
-    class="absolute inset-0"
-    [class.hidden]="activeGamePlayView() !== 'adventurelog'"
-  ></app-play-adventurelog>
+  @defer (when activeGamePlayView() === 'adventurelog') {
+    <app-play-adventurelog
+      class="absolute inset-0"
+      [class.hidden]="activeGamePlayView() !== 'adventurelog'"
+    ></app-play-adventurelog>
+  }
 
-  <app-game-play-decree
-    class="absolute inset-0"
-    [class.hidden]="activeGamePlayView() !== 'decree'"
-  ></app-game-play-decree>
+  @defer (when activeGamePlayView() === 'decree') {
+    <app-game-play-decree
+      class="absolute inset-0"
+      [class.hidden]="activeGamePlayView() !== 'decree'"
+    ></app-game-play-decree>
+  }
 
   @if (isPaused()) {
     <div

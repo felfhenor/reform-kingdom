@@ -8,8 +8,8 @@ import type {
   TiledObject,
   TiledObjectOrientation,
 } from '@interfaces';
-import type { FederatedPointerEvent, Text } from 'pixi.js';
-import { Container, Sprite, type Texture } from 'pixi.js';
+import type { FederatedPointerEvent, Renderer, Text } from 'pixi.js';
+import { Container, Rectangle, Sprite, type Texture } from 'pixi.js';
 
 export type PixiTiledMapRenderResult = {
   container: Container;
@@ -84,6 +84,29 @@ function pixiTiledLayerRender(
   }
 
   return container;
+}
+
+// Bakes a run of tile-layer sprites into one static texture, so N tiles cost one draw call instead
+// of N - safe since nothing reaches into individual tile sprites after render.
+function pixiTiledLayerRunBake(
+  renderer: Renderer,
+  source: Container,
+  width: number,
+  height: number,
+): Sprite {
+  const texture = renderer.generateTexture({
+    target: source,
+    frame: new Rectangle(0, 0, width, height),
+    // Matches the atlas's own scaleMode (pixi-texture-loader.ts) - otherwise the bake defaults to
+    // linear filtering and blurs/bleeds at non-1x zoom.
+    textureSourceOptions: { scaleMode: 'nearest' },
+  });
+  // children:true only - texture/textureSource stay false so the shared tileset atlas isn't touched.
+  source.destroy({ children: true });
+
+  const sprite = new Sprite(texture);
+  sprite.cullable = true;
+  return sprite;
 }
 
 type PixiTiledObjectRenderResult = {
@@ -183,6 +206,7 @@ function pixiTiledObjectLayerRender(
 }
 
 export function pixiTiledMapRender(
+  renderer: Renderer,
   map: TiledMap,
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
@@ -192,13 +216,32 @@ export function pixiTiledMapRender(
   const nodeLabels = new Map<string, Text>();
   const nodeWrappers = new Map<string, Container>();
 
+  // Baked per consecutive run (not one texture for all tilelayers) so a future map interleaving
+  // an object layer between tile layers still renders in the authored stacking order.
+  let pendingTileRun: Container | undefined;
+  const flushTileRun = () => {
+    if (!pendingTileRun) return;
+    container.addChild(
+      pixiTiledLayerRunBake(
+        renderer,
+        pendingTileRun,
+        map.width * map.tilewidth,
+        map.height * map.tileheight,
+      ),
+    );
+    pendingTileRun = undefined;
+  };
+
   map.layers.forEach((layer) => {
     if (layer.type === 'tilelayer') {
-      container.addChild(
+      pendingTileRun ??= new Container();
+      pendingTileRun.addChild(
         pixiTiledLayerRender(layer, textures, map.tilewidth, map.tileheight),
       );
       return;
     }
+
+    flushTileRun();
 
     const rendered = pixiTiledObjectLayerRender(
       layer,
@@ -214,6 +257,8 @@ export function pixiTiledMapRender(
       nodeWrappers.set(nodeName, wrapper),
     );
   });
+
+  flushTileRun();
 
   return { container, nodeLabels, nodeWrappers };
 }

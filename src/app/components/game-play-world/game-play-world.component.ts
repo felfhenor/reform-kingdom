@@ -100,6 +100,8 @@ const FADE_DURATION_MS = 300;
 const FLOATING_TEXT_STAGGER_MS = 180;
 const FLOATING_TEXT_MAX_ACTIVE = 24;
 const FLOATING_TEXT_MAX_PENDING = 40;
+// Countdown/visibility text only needs to read accurately within this window, not every tick.
+const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
 
 @Component({
   selector: 'app-game-play-world',
@@ -192,6 +194,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   // Keyed per node (not one global FIFO) so a busy node's stagger gate can't head-of-line-block another node's popups.
   private pendingGatherVfxByNode = new Map<string, GatherVfxEvent[]>();
   private lastFloatingTextSpawnAtByNode = new Map<string, number>();
+  private lastNodeStatusUpdateAt = 0;
   private activeFloatingTexts: Array<{
     container: Container;
     update: (
@@ -382,6 +385,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     // the icon texture cache is not, and persists below like workerTokenTextures does.
     this.pendingGatherVfxByNode.clear();
     this.lastFloatingTextSpawnAtByNode.clear();
+    this.lastNodeStatusUpdateAt = 0;
     this.pendingFloatingTextTextureLoads.clear();
     this.activeFloatingTexts = [];
 
@@ -457,6 +461,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     const textures = await pixiTiledMapTexturesLoad(map);
     const renderedMap = pixiTiledMapRender(
+      this.app.renderer,
       map,
       textures,
       (object) => this.onNodeClick(object),
@@ -501,8 +506,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updatePlayerIndicatorIfNeeded();
       this.updateGatherProgressIndicator();
       this.updateEncounterProgressIndicator();
-      this.updateNodeLabels();
-      this.updateNodeWrapperVisibility();
+      this.maybeUpdateNodeStatus(performance.now());
       this.positionCamera();
       this.updateWorkerIndicators();
       this.updateFloatingTexts();
@@ -521,7 +525,16 @@ export class GamePlayWorldComponent implements OnDestroy {
     mapNodeSelect(entry);
   }
 
-  // Runs every tick since a collectible pickup doesn't trigger a map rebuild.
+  // Throttled: worldNodeLabelInfo() does up to 5 getEntry() lookups + string building per node - real
+  // JS-side work even though the resulting Pixi setters are no-ops when unchanged.
+  private maybeUpdateNodeStatus(now: number): void {
+    if (now - this.lastNodeStatusUpdateAt < NODE_STATUS_UPDATE_INTERVAL_MS) return;
+    this.lastNodeStatusUpdateAt = now;
+    this.updateNodeLabels();
+    this.updateNodeWrapperVisibility();
+  }
+
+  // Throttled via maybeUpdateNodeStatus; a collectible pickup doesn't trigger a map rebuild so this still needs to poll.
   private updateNodeWrapperVisibility(): void {
     if (!this.nodeWrappers) return;
 
@@ -544,7 +557,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     return entry ? worldNodeLabelInfo(entry) : undefined;
   }
 
-  // Runs every tick to catch countdown text and hidden-node discovery updates; PixiJS setters are no-ops when unchanged so this needs no throttling.
+  // Catches countdown text and hidden-node discovery updates; see maybeUpdateNodeStatus for the polling cadence.
   private updateNodeLabels(): void {
     if (!this.nodeLabels) return;
 

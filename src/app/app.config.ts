@@ -112,7 +112,7 @@ export const appConfig: ApplicationConfig = {
         const logger = inject(LoggerService);
         const analytics = inject(AnalyticsService);
 
-        await meta.init();
+        void meta.init();
         logger.init();
         analytics.init();
       },
