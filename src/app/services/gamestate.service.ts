@@ -14,6 +14,7 @@ import {
   isGameStateReady,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
+import { townReputationBuffReconcile } from '@helpers/town/reputation/town-reputation-buff';
 import { ContentService } from '@services/content.service';
 import { LoggerService } from '@services/logger.service';
 import { interval } from 'rxjs';
@@ -40,6 +41,9 @@ export class GamestateService {
 
       migrateGameState();
       migrateOptionsState();
+
+      // currentLocationSet (the normal sync hook) never runs on load, so town-region buffs need re-deriving here.
+      townReputationBuffReconcile(gamestate().world.currentLocation.mapName);
 
       this.logger.info('GameState', 'Gamestate migrated & loaded.');
       this.hasLoaded.set(true);

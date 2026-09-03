@@ -2,6 +2,7 @@ import type {
   GameState,
   GlobalEffectContent,
   GlobalEffectId,
+  TownContent,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,6 +13,7 @@ vi.mock('@helpers/hero/character-progress', () => ({
 
 vi.mock('@helpers/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/hero/party', () => ({
@@ -35,13 +37,14 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodesOfType: vi.fn(() => []),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { healPartyToFull } from '@helpers/hero/character-progress';
 import {
   activeGlobalEffects,
   addGlobalEffect,
   globalEffectDurationLabel,
+  globalEffectEffectsDescription,
   globalEffectsProcessTick,
   isGlobalEffectActive,
   removeGlobalEffect,
@@ -49,7 +52,7 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
-import type { WorldNodeEntry } from '@interfaces';
+import type { GlobalEffectEffect, WorldNodeEntry } from '@interfaces';
 
 describe('Global Effect Helper Functions', () => {
   const healingId = 'healing-1' as GlobalEffectId;
@@ -63,6 +66,27 @@ describe('Global Effect Helper Functions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe('globalEffectEffectsDescription', () => {
+    it('renders every effect type as a comma-joined "Label: +N[%]" string', () => {
+      const effects: GlobalEffectEffect[] = [
+        { effectType: 'GainStats', stat: 'Strength', value: 5 },
+        { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
+        { effectType: 'GainCombatStat', combatStat: 'agroValue', value: 3 },
+        { effectType: 'GlobalXPGainMultiplier', value: 0.1 },
+        { effectType: 'DebuffResistance', value: 10 },
+        { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
+      ];
+
+      expect(globalEffectEffectsDescription(effects)).toBe(
+        'Strength: +5, Revive Chance: +2%, Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%',
+      );
+    });
+
+    it('returns an empty string for an empty effect list', () => {
+      expect(globalEffectEffectsDescription([])).toBe('');
+    });
   });
 
   describe('activeGlobalEffects', () => {
@@ -244,6 +268,49 @@ describe('Global Effect Helper Functions', () => {
       });
       expect(healingWasGranted()).toBe(true);
       expect(healPartyToFull).not.toHaveBeenCalled();
+    });
+
+    it('clears any active town-region buff on Deaths Door expiry', () => {
+      vi.mocked(timerTicksElapsed).mockReturnValue(20);
+      mockContentLookup();
+      vi.mocked(worldNodesOfType).mockReturnValue([]);
+      const regionalBuffId = 'larsian-influence' as GlobalEffectId;
+      vi.mocked(getEntriesByType).mockReturnValue([
+        {
+          reputation: { buff: { globalEffectId: regionalBuffId, tiers: [] } },
+        } as unknown as TownContent,
+      ]);
+      const regionalBuff = {
+        id: regionalBuffId,
+        name: 'Larsian Influence',
+        __type: 'globaleffect',
+        description: '',
+        sprite: '0000',
+        startTick: 0,
+        expiresAtTick: 999999,
+        effects: [],
+      };
+      vi.mocked(gamestate).mockReturnValue({
+        globalEffects: [
+          { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
+          regionalBuff,
+        ],
+      } as unknown as GameState);
+
+      globalEffectsProcessTick();
+
+      const removedRegionalBuff = vi
+        .mocked(updateGamestate)
+        .mock.calls.some(([updateFn]) => {
+          const result = updateFn({
+            globalEffects: [regionalBuff],
+          } as unknown as GameState);
+          return !result.globalEffects.some(
+            (effect) => effect.id === regionalBuffId,
+          );
+        });
+
+      expect(removedRegionalBuff).toBe(true);
     });
 
     it('still removes an expired Deaths Door even when there is no Kingdom node', () => {

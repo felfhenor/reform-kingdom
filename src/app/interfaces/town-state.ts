@@ -20,6 +20,8 @@ export type TownNodeState = {
   lastProcessedTick: Partial<Record<TownTickSubsystem, number>>;
   stock: TownStockEntry[];
   workers: Record<WorkerId, TownWorkerState>;
+  // Cumulative - never decreases except an explicit raid-loss penalty (Phase 9).
+  reputation: number;
 };
 
 export type GameStateTowns = {

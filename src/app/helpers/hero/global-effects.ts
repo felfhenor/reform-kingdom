@@ -1,5 +1,5 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   healingTicksForLevel,
@@ -14,6 +14,7 @@ import type {
   GlobalEffect,
   GlobalEffectContent,
   GlobalEffectId,
+  TownContent,
 } from '@interfaces';
 
 export function activeGlobalEffects(): GlobalEffect[] {
@@ -79,6 +80,20 @@ export function removeGlobalEffect(id: GlobalEffectId): void {
   });
 }
 
+// Bypasses travel.ts's normal resync (would import back into this file) - identifies
+// town buffs by cross-referencing each town's own authored globalEffectId instead.
+function clearRegionalBuffs(): void {
+  const townBuffIds = new Set(
+    getEntriesByType<TownContent>('town').map(
+      (town) => town.reputation.buff.globalEffectId,
+    ),
+  );
+
+  gamestate()
+    .globalEffects.filter((effect) => townBuffIds.has(effect.id))
+    .forEach((effect) => removeGlobalEffect(effect.id));
+}
+
 // Deaths Door is a pure timer; on expiry the party teleports to the kingdom before healing begins there.
 function handleDeathsDoorExpiry(): void {
   const kingdom = worldNodesOfType('Kingdom')[0];
@@ -90,6 +105,7 @@ function handleDeathsDoorExpiry(): void {
     });
   }
 
+  clearRegionalBuffs();
   miscellaneousMessageLog('The party has been recalled to the kingdom.');
   addGlobalEffect(
     'Healing' as GlobalEffectId,

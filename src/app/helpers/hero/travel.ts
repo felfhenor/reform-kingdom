@@ -19,6 +19,7 @@ import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import {
@@ -98,6 +99,7 @@ function travelRecoverFromPathingFailure(destinationNodeName: string): void {
       x: kingdom.x,
       y: kingdom.y,
     });
+    townReputationBuffSync(location.mapName, kingdom.mapName);
   }
 
   updateGamestate((state) => {
@@ -238,11 +240,13 @@ function travelCompleteStep(
   completedStep: TravelStep,
   remainingPath: TravelStep[],
 ): void {
+  const previousLocation = currentLocationGet();
   currentLocationSet({
     mapName: completedStep.mapName,
     x: completedStep.x,
     y: completedStep.y,
   });
+  townReputationBuffSync(previousLocation.mapName, completedStep.mapName);
 
   if (remainingPath.length === 0) {
     updateGamestate((state) => {

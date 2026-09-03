@@ -25,6 +25,7 @@ import {
 } from '@helpers/kingdom/bestiary';
 import { updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import {
   WORKER_MAX_LEVEL,
@@ -36,21 +37,26 @@ import {
   worldNodeUndiscover,
 } from '@helpers/world-node/world-node-discovery';
 import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
-import { worldNodeByName, worldNodeGathering } from '@helpers/world-node/world-nodes';
-import type {
-  CharacterId,
-  CollectibleContent,
-  CollectibleId,
-  EquipmentContent,
-  EquipmentId,
-  ItemContent,
-  ItemId,
-  MonsterContent,
-  RecipeContent,
-  RecipeId,
-  Tradeskill,
-  WorkerContent,
-  WorkerId,
+import {
+  worldNodeByName,
+  worldNodeGathering,
+} from '@helpers/world-node/world-nodes';
+import type { TownContent } from '@interfaces';
+import {
+  type CharacterId,
+  type CollectibleContent,
+  type CollectibleId,
+  type EquipmentContent,
+  type EquipmentId,
+  type ItemContent,
+  type ItemId,
+  type MonsterContent,
+  type RecipeContent,
+  type RecipeId,
+  type TownId,
+  type Tradeskill,
+  type WorkerContent,
+  type WorkerId,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -306,7 +312,33 @@ export function debugRecallWorker(workerId: WorkerId): void {
   workerRecall(workerId);
 }
 
-// Bypasses the gold cost `gatherNodeLevelUp` normally requires - sets the level directly.
+export function debugSetTownReputation(
+  townId: TownId,
+  reputation: number,
+): void {
+  const realTown = getEntry<TownContent>(townId);
+  if (!realTown) {
+    console.warn(`Could not find a town with matching id ${townId}.`);
+    return;
+  }
+
+  const realTownId = realTown.id;
+
+  const clamped = clamp(
+    Math.round(reputation),
+    0,
+    TOWN_REPUTATION_THRESHOLDS[4],
+  );
+
+  updateGamestate((state) => {
+    const town = state.world.towns[realTownId];
+    if (!town) return state;
+
+    town.reputation = clamped;
+    return state;
+  });
+}
+
 export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
   const node = worldNodeByName(nodeName);
   const gathering = node ? worldNodeGathering(node) : undefined;

@@ -1,4 +1,6 @@
 import type { HasSprite } from '@interfaces/artable';
+import type { CombatStat } from '@interfaces/combat';
+import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { GameStat } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
@@ -8,6 +10,12 @@ export type GlobalEffectId = Branded<string, 'GlobalEffectId'>;
 export type GlobalEffectEffectGainStats = {
   effectType: 'GainStats';
   stat: GameStat;
+  value: number;
+};
+
+export type GlobalEffectEffectGainCombatStat = {
+  effectType: 'GainCombatStat';
+  combatStat: CombatStat;
   value: number;
 };
 
@@ -23,10 +31,19 @@ export type GlobalEffectEffectDebuffResistance = {
   value: number;
 };
 
+// Same as GlobalEffectEffectDebuffResistance but targets one tag only - see `applyActiveDebuffResistanceTagEffects`.
+export type GlobalEffectEffectDebuffResistanceTag = {
+  effectType: 'DebuffResistanceTag';
+  tag: StatusEffectTag;
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
+  | GlobalEffectEffectGainCombatStat
   | GlobalEffectEffectXPGainMultiplier
-  | GlobalEffectEffectDebuffResistance;
+  | GlobalEffectEffectDebuffResistance
+  | GlobalEffectEffectDebuffResistanceTag;
 
 export type GlobalEffectContent = IsContentItem &
   HasDescription &
@@ -34,9 +51,12 @@ export type GlobalEffectContent = IsContentItem &
     id: GlobalEffectId;
     __type: 'globaleffect';
     effects: GlobalEffectEffect[];
+    hideDuration?: boolean;
   };
 
 export type GlobalEffect = GlobalEffectContent & {
   startTick: number;
   expiresAtTick: number;
+
+  extendedDescription?: string;
 };

@@ -1,5 +1,8 @@
 import { combatStatsForCharacterEquipment } from '@helpers/combat/combat-stats';
-import { combatApplyStatDeltaToCombatant } from '@helpers/combat/combat-statuseffects';
+import {
+  combatApplyCombatStatNumberDeltaToCombatant,
+  combatApplyStatDeltaToCombatant,
+} from '@helpers/combat/combat-statuseffects';
 import { monsterStatsAtLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content';
 import {
@@ -76,6 +79,30 @@ function applyActiveDebuffResistanceEffects(combatant: Combatant): void {
   });
 }
 
+// Same as applyActiveDebuffResistanceEffects but targets one tag only.
+function applyActiveDebuffResistanceTagEffects(combatant: Combatant): void {
+  activeGlobalEffects().forEach((effect) => {
+    (effect.effects ?? []).forEach((effectEntry) => {
+      if (effectEntry.effectType !== 'DebuffResistanceTag') return;
+      combatant.tagResistance[effectEntry.tag] += effectEntry.value;
+    });
+  });
+}
+
+// Same as applyActiveGainStatsEffects but for combatStats (e.g. reviveChance) instead of base stats.
+function applyActiveGainCombatStatEffects(combatant: Combatant): void {
+  activeGlobalEffects().forEach((effect) => {
+    (effect.effects ?? []).forEach((effectEntry) => {
+      if (effectEntry.effectType !== 'GainCombatStat') return;
+      combatApplyCombatStatNumberDeltaToCombatant(
+        combatant,
+        effectEntry.combatStat,
+        effectEntry.value,
+      );
+    });
+  });
+}
+
 export function combatantFromCharacter(character: Character): Combatant {
   const job = getEntry<JobContent>(character.jobId);
 
@@ -124,6 +151,8 @@ export function combatantFromCharacter(character: Character): Combatant {
 
   applyActiveGainStatsEffects(combatant);
   applyActiveDebuffResistanceEffects(combatant);
+  applyActiveDebuffResistanceTagEffects(combatant);
+  applyActiveGainCombatStatEffects(combatant);
 
   return combatant;
 }

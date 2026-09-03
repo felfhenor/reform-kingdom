@@ -31,7 +31,7 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
             class="global-effect-box tooltip tooltip-bottom"
             [class.entering]="effect.phase === 'entering'"
             [class.leaving]="effect.phase === 'leaving'"
-            [tp]="effect.name + ': ' + effectDescription(effect)"
+            [tp]="effectTooltip"
             [tpPlacement]="'bottom'"
           >
             <app-atlas-image
@@ -40,12 +40,26 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
               [assetName]="effect.sprite"
             />
 
-            @if (effect.name !== 'Idle' && effect.name !== 'Auto Mode') {
+            @if (!effect.hideDuration) {
               <div class="duration z-15 text-lg">
                 {{ durationLabel(effect) }}
               </div>
             }
           </li>
+
+          <ng-template #effectTooltip>
+            <div class="p-2">
+              <div class="font-bold mb-2">{{ effect.name }}</div>
+
+              <p class="italic">{{ effectDescription(effect) }}</p>
+
+              @if (effect.extendedDescription) {
+                <p class="italic mt-2 text-xs">
+                  {{ effect.extendedDescription }}
+                </p>
+              }
+            </div>
+          </ng-template>
         }
       </ul>
     }

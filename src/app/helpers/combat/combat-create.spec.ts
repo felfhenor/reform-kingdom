@@ -256,6 +256,49 @@ describe('combatantFromCharacter', () => {
     expect(combatant.statBoosts).toEqual(zeroStats());
   });
 
+  it('applies active GainCombatStat global effects to combatStats', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        id: 'larsian-influence' as GlobalEffectId,
+        name: 'Larsian Influence',
+        __type: 'globaleffect',
+        description: '',
+        sprite: '0000',
+        startTick: 0,
+        expiresAtTick: 100,
+        effects: [
+          { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
+        ],
+      },
+    ] as GlobalEffect[]);
+
+    const combatant = combatantFromCharacter(buildCharacter());
+
+    expect(combatant.combatStats.reviveChance).toBe(2);
+  });
+
+  it('applies active DebuffResistanceTag global effects to only the targeted tag', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        id: 'larsian-influence' as GlobalEffectId,
+        name: 'Larsian Influence',
+        __type: 'globaleffect',
+        description: '',
+        sprite: '0000',
+        startTick: 0,
+        expiresAtTick: 100,
+        effects: [
+          { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
+        ],
+      },
+    ] as GlobalEffect[]);
+
+    const combatant = combatantFromCharacter(buildCharacter());
+
+    expect(combatant.tagResistance.Accuracy).toBe(5);
+    expect(combatant.tagResistance.Stun).toBe(0);
+  });
+
   it('sets jobId from the character so a monster targetting entry can match it', () => {
     const combatant = combatantFromCharacter(buildCharacter());
 

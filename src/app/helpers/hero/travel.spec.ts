@@ -44,6 +44,10 @@ vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
   travelPathTo: vi.fn(),
 }));
 
+vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
+  townReputationBuffSync: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -100,6 +104,7 @@ import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween, tileIsOnPath } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
   isWorldNodeCollectibleGateMet,
@@ -328,6 +333,10 @@ describe('travelStart', () => {
       x: 5,
       y: 5,
     });
+    expect(townReputationBuffSync).toHaveBeenCalledWith(
+      'CraggledMire',
+      'Carrina',
+    );
     const result = applyLastUpdate(
       stateWithTravel({
         status: 'Traveling',
@@ -354,6 +363,7 @@ describe('travelStart', () => {
     expect(travelStart('Field Ruins')).toBe(false);
 
     expect(currentLocationSet).not.toHaveBeenCalled();
+    expect(townReputationBuffSync).not.toHaveBeenCalled();
     expect(travelMessageLog).toHaveBeenCalled();
   });
 
@@ -663,6 +673,33 @@ describe('travelProcessTick', () => {
       path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
       ticksIntoStep: 0,
     });
+  });
+
+  it('syncs the town reputation buff with the map before/after a completed step', () => {
+    vi.mocked(tileIsOnPath).mockReturnValue(false);
+    vi.mocked(currentLocationGet).mockReturnValue({
+      mapName: 'Carrina',
+      x: 2,
+      y: 0,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Larsia',
+        path: [
+          { kind: 'Move', mapName: 'LarsianDesert', x: 5, y: 9 },
+          { kind: 'Move', mapName: 'LarsianDesert', x: 6, y: 9 },
+        ],
+        ticksIntoStep: 2,
+      }),
+    );
+
+    travelProcessTick();
+
+    expect(townReputationBuffSync).toHaveBeenCalledWith(
+      'Carrina',
+      'LarsianDesert',
+    );
   });
 
   it('completes an on-path step at the 1-tick cost, moving to the next tile', () => {

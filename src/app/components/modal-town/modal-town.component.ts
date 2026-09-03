@@ -6,9 +6,11 @@ import {
   signal,
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { activeTownNode } from '@helpers/engine/ui';
+import { townReputationDisplay } from '@helpers/town/reputation/town-reputation';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
 import {
@@ -31,6 +33,7 @@ import type {
     DecimalPipe,
     AtlasAnimationComponent,
     SpriteNodeComponent,
+    BarProgressComponent,
   ],
   templateUrl: './modal-town.component.html',
 })
@@ -40,6 +43,11 @@ export class ModalTownComponent {
   public town = computed(() => {
     const entry = this.entry();
     return entry ? worldNodeTown(entry) : undefined;
+  });
+
+  public townReputation = computed(() => {
+    const town = this.town();
+    return town ? townReputationDisplay(town.id) : undefined;
   });
 
   public currentTab = signal<TownModalTab>('shop');

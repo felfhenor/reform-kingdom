@@ -485,6 +485,36 @@ describe('ensureContent', () => {
         { effectType: 'DebuffResistance', value: 10 },
       ]);
     });
+
+    it('validates a DebuffResistanceTag effect entry', () => {
+      const result = ensureContent({
+        __type: 'globaleffect',
+        id: 'larsian-influence',
+        name: 'Larsian Influence',
+        effects: [
+          { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
+        ],
+      } as unknown as GlobalEffectContent);
+
+      expect(result.effects).toEqual([
+        { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
+      ]);
+    });
+
+    it('validates a GainCombatStat effect entry', () => {
+      const result = ensureContent({
+        __type: 'globaleffect',
+        id: 'larsian-influence',
+        name: 'Larsian Influence',
+        effects: [
+          { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
+        ],
+      } as unknown as GlobalEffectContent);
+
+      expect(result.effects).toEqual([
+        { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
+      ]);
+    });
   });
 
   describe('skill', () => {
@@ -556,7 +586,7 @@ describe('ensureContent', () => {
         workers: [],
       });
       expect(result.reputation).toEqual({
-        buff: { name: 'UNKNOWN', tiers: [] },
+        buff: { globalEffectId: 'UNKNOWN', tiers: [] },
       });
       expect(result.defense).toEqual({
         rewards: [],
@@ -576,7 +606,7 @@ describe('ensureContent', () => {
         },
         reputation: {
           buff: {
-            name: 'Larsian Influence',
+            globalEffectId: 'larsian-influence',
             tiers: [
               {
                 tier: 1,

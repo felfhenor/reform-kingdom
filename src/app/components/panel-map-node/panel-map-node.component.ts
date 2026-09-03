@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
@@ -35,6 +36,7 @@ import {
 import { rewardDisplayOrder } from '@helpers/item/loot';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate } from '@helpers/state-game';
+import { townReputationDisplay } from '@helpers/town/reputation/town-reputation';
 import { currentLocationGet } from '@helpers/world';
 import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan';
 import { worldNodeDescription } from '@helpers/world-node/world-node-content';
@@ -77,6 +79,7 @@ import { sortBy, sum } from 'es-toolkit/compat';
     PanelMapNodeStatusGatherComponent,
     SpriteNodeComponent,
     SFXDirective,
+    BarProgressComponent,
   ],
   templateUrl: './panel-map-node.component.html',
   styleUrl: './panel-map-node.component.scss',
@@ -149,6 +152,12 @@ export class PanelMapNodeComponent {
   public isTownNode = computed(() => {
     const entry = this.node();
     return !!entry && !!worldNodeTown(entry);
+  });
+
+  public townReputation = computed(() => {
+    const entry = this.node();
+    const town = entry ? worldNodeTown(entry) : undefined;
+    return town ? townReputationDisplay(town.id) : undefined;
   });
 
   public meetsCaravanAvailability = computed(() => {

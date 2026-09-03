@@ -156,7 +156,7 @@ describe('pruneInvalidTowns', () => {
   it('keeps entries that resolve to real content', () => {
     vi.mocked(getEntry).mockReturnValue(town);
     const towns: GameStateTowns = {
-      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {}, reputation: 0 },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual(towns);
@@ -165,21 +165,35 @@ describe('pruneInvalidTowns', () => {
   it('drops entries whose id no longer resolves to real content', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
     const towns: GameStateTowns = {
-      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {}, reputation: 0 },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual({});
   });
 
-  it('backfills missing stock/workers on a legacy entry', () => {
+  it('backfills missing stock/workers/reputation on a legacy entry', () => {
     vi.mocked(getEntry).mockReturnValue(town);
     const towns = {
       [townId]: { lastProcessedTick: {} },
     } as unknown as GameStateTowns;
 
     expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {}, reputation: 0 },
     });
+  });
+
+  it('preserves existing reputation', () => {
+    vi.mocked(getEntry).mockReturnValue(town);
+    const towns: GameStateTowns = {
+      [townId]: {
+        lastProcessedTick: {},
+        stock: [],
+        workers: {},
+        reputation: 350,
+      },
+    };
+
+    expect(pruneInvalidTowns(towns)[townId].reputation).toBe(350);
   });
 
   it('drops stock entries whose referenced item no longer resolves', () => {
@@ -191,11 +205,12 @@ describe('pruneInvalidTowns', () => {
         lastProcessedTick: {},
         stock: [{ itemId: 'removed-item' as never, quantity: 1 }],
         workers: {},
+        reputation: 0,
       },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {}, reputation: 0 },
     });
   });
 
@@ -210,6 +225,7 @@ describe('pruneInvalidTowns', () => {
           [darwinId]: { level: 1 } as never,
           [removedId]: { level: 1 } as never,
         },
+        reputation: 0,
       },
     };
 
@@ -218,6 +234,7 @@ describe('pruneInvalidTowns', () => {
         lastProcessedTick: {},
         stock: [],
         workers: { [darwinId]: { level: 1 } },
+        reputation: 0,
       },
     });
   });
@@ -228,7 +245,7 @@ describe('pruneInvalidTowns', () => {
       [darwinId]: { level: 1 },
     } as never);
     const towns: GameStateTowns = {
-      [townId]: { lastProcessedTick: {}, stock: [], workers: {} },
+      [townId]: { lastProcessedTick: {}, stock: [], workers: {}, reputation: 0 },
     };
 
     expect(pruneInvalidTowns(towns)).toEqual({
@@ -236,6 +253,7 @@ describe('pruneInvalidTowns', () => {
         lastProcessedTick: {},
         stock: [],
         workers: { [darwinId]: { level: 1 } },
+        reputation: 0,
       },
     });
     expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {});

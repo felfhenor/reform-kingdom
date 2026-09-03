@@ -43,6 +43,15 @@
           {{ description() ?? 'No information available yet.' }}
         </p>
 
+        @if (townReputation(); as repDisplay) {
+          <app-bar-progress
+            color="secondary"
+            [text]="repDisplay.tierName"
+            [value]="repDisplay.reputation"
+            [max]="repDisplay.nextThreshold ?? 100"
+          ></app-bar-progress>
+        }
+
         @let materialIds = gatherMaterialIds();
         @if (materialIds.length > 0) {
           <div class="flex flex-wrap gap-2">

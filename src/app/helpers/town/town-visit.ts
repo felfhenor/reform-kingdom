@@ -24,6 +24,7 @@ export function townMarkVisited(townId: TownId): void {
       workers: town
         ? townWorkerRosterMaterialize(town, existing?.workers ?? {})
         : (existing?.workers ?? {}),
+      reputation: existing?.reputation ?? 0,
       firstVisitedAtTick: timerTicksElapsed(),
     };
     return state;

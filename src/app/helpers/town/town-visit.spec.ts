@@ -51,6 +51,7 @@ describe('townMarkVisited', () => {
       lastProcessedTick: {},
       stock: [],
       workers: {},
+      reputation: 0,
       firstVisitedAtTick: 500,
     });
   });
@@ -92,6 +93,7 @@ describe('townMarkVisited', () => {
       lastProcessedTick: { worker: 42 },
       stock: [],
       workers: {},
+      reputation: 0,
       firstVisitedAtTick: 500,
     });
   });
@@ -117,6 +119,25 @@ describe('townMarkVisited', () => {
     townMarkVisited(townId);
 
     expect(state.world.towns[townId].stock).toEqual([{ quantity: 3 }]);
+  });
+
+  it('preserves existing reputation when activating', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, reputation: 250 } },
+      },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, reputation: 250 } },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].reputation).toBe(250);
   });
 
   it('materializes the worker roster via townWorkerRosterMaterialize when the town resolves', () => {

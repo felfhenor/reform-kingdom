@@ -60,6 +60,7 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
         ...towns[townId],
         stock: pruneInvalidTownStock(towns[townId].stock ?? []),
         workers,
+        reputation: towns[townId].reputation ?? 0,
       };
     }
   });

@@ -24,6 +24,7 @@ import type {
   CollectibleContent,
   CollectibleId,
   CombatantStatusEffectData,
+  CombatStat,
   CombatStatBlock,
   CommissionOfferContent,
   CommissionOfferId,
@@ -65,6 +66,8 @@ import type {
   GlobalEffectContent,
   GlobalEffectEffect,
   GlobalEffectEffectDebuffResistance,
+  GlobalEffectEffectDebuffResistanceTag,
+  GlobalEffectEffectGainCombatStat,
   GlobalEffectEffectGainStats,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -821,11 +824,9 @@ function ensureTownReputation(
 ): TownReputationConfig {
   return {
     buff: {
-      name: reputation.buff?.name ?? 'UNKNOWN',
-      tiers: ensureArray(
-        reputation.buff?.tiers,
-        ensureTownReputationBuffTier,
-      ),
+      globalEffectId:
+        reputation.buff?.globalEffectId ?? ('UNKNOWN' as GlobalEffectId),
+      tiers: ensureArray(reputation.buff?.tiers, ensureTownReputationBuffTier),
     },
   };
 }
@@ -972,8 +973,10 @@ function ensureStatusEffect(
 
 function ensureGlobalEffectEffect(
   effect: Partial<GlobalEffectEffectGainStats> &
+    Partial<GlobalEffectEffectGainCombatStat> &
     Partial<GlobalEffectEffectXPGainMultiplier> &
-    Partial<GlobalEffectEffectDebuffResistance> = {},
+    Partial<GlobalEffectEffectDebuffResistance> &
+    Partial<GlobalEffectEffectDebuffResistanceTag> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
@@ -981,6 +984,22 @@ function ensureGlobalEffectEffect(
 
   if (effect.effectType === 'DebuffResistance') {
     return { effectType: 'DebuffResistance', value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'DebuffResistanceTag') {
+    return {
+      effectType: 'DebuffResistanceTag',
+      tag: (effect.tag ?? 'Stun') as StatusEffectTag,
+      value: effect.value ?? 0,
+    };
+  }
+
+  if (effect.effectType === 'GainCombatStat') {
+    return {
+      effectType: 'GainCombatStat',
+      combatStat: (effect.combatStat ?? 'reviveChance') as CombatStat,
+      value: effect.value ?? 0,
+    };
   }
 
   return {
@@ -1000,6 +1019,7 @@ function ensureGlobalEffect(
     sprite: effect.sprite ?? 'UNKNOWN',
     description: effect.description ?? 'UNKNOWN',
     effects: ensureArray(effect.effects, ensureGlobalEffectEffect),
+    hideDuration: effect.hideDuration ?? false,
   };
 }
 

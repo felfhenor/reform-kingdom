@@ -9,6 +9,7 @@ import type { EquipmentItemType } from '@interfaces/equipment';
 import type { GameStat, SkillStatScaling, StatBlock } from '@interfaces/stat';
 import { StatOrder } from '@interfaces/stat';
 import { clamp, uniq } from 'es-toolkit/compat';
+import { ROMAN_NUMERAL_TIERS } from '../../interfaces';
 
 // Heroes need one of requiredWeaponTypes equipped (empty = no requirement); monsters never carry equipment.
 export function skillIsUsableWithEquippedWeapons(
@@ -93,22 +94,9 @@ export function skillElements(skill: EquipmentSkill): GameElement[] {
   return uniq(skill.techniques.flatMap((t) => t.elements)).sort();
 }
 
-const ROMAN_NUMERAL_TIERS: Record<string, number> = {
-  I: 1,
-  II: 2,
-  III: 3,
-  IV: 4,
-  V: 5,
-  VI: 6,
-  VII: 7,
-  VIII: 8,
-  IX: 9,
-  X: 10,
-};
-
 // Splits a display name into upgrade family and rank, e.g. "Starshine II" -> { family: 'Starshine', tier: 2 }.
 function skillNameTier(name: string): { family: string; tier: number } {
-  const match = name.match(/^(.*) (I{1,3}|IV|V)$/);
+  const match = name.match(/^(.*) (I{1,3}|IV|V|VI{1,3}|IX|X)$/);
   if (!match) return { family: name, tier: 1 };
 
   return { family: match[1], tier: ROMAN_NUMERAL_TIERS[match[2]] };

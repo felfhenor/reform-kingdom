@@ -17,11 +17,13 @@ import {
   debugResetCommissions,
   debugSetCharacterLevel,
   debugSetGatherNodeLevel,
+  debugSetTownReputation,
   debugSetTradeskillLevel,
   debugSetWorkerLevel,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug';
 import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { WORKER_MAX_LEVEL } from '@helpers/worker/worker-progression';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type {
@@ -34,6 +36,8 @@ import type {
   ItemId,
   RecipeContent,
   RecipeId,
+  TownContent,
+  TownId,
   Tradeskill,
   WorkerContent,
   WorkerId,
@@ -121,6 +125,14 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedGatherNodeName = signal<string | undefined>(undefined);
   public gatherNodeLevel = signal<number>(0);
 
+  public debugTowns = computed(() =>
+    sortBy(getEntriesByType<TownContent>('town'), (town) => town.name),
+  );
+
+  public townReputationMax = TOWN_REPUTATION_THRESHOLDS[4];
+  public selectedTownId = signal<TownId | undefined>(undefined);
+  public townReputationValue = signal<number>(0);
+
   public giveItem(): void {
     const itemId = this.selectedItemId();
     if (!itemId) return;
@@ -205,5 +217,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!nodeName) return;
 
     debugSetGatherNodeLevel(nodeName, this.gatherNodeLevel());
+  }
+
+  public setTownReputation(): void {
+    const townId = this.selectedTownId();
+    if (!townId) return;
+
+    debugSetTownReputation(townId, this.townReputationValue());
   }
 }

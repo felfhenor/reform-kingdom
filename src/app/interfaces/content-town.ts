@@ -3,6 +3,7 @@ import type {
   CaravanMarkupPercentages,
   CommissionOfferSlot,
 } from '@interfaces/content-caravan';
+import type { GlobalEffectId } from '@interfaces/content-globaleffect';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
@@ -57,7 +58,7 @@ export type TownReputationBuffTier = {
 };
 
 export type TownReputationBuffConfig = {
-  name: string;
+  globalEffectId: GlobalEffectId;
   tiers: TownReputationBuffTier[];
 };
 

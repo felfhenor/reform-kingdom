@@ -1,0 +1,6 @@
+- id: 3c0d0360-6bb8-47c4-b855-b96e60676296
+  name: Larsian Influence
+  sprite: '0010'
+  description: The power of Larsia, the kingdom in the desert.
+
+  hideDuration: true

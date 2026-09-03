@@ -11,6 +11,8 @@ import type {
   MonsterContent,
   RecipeContent,
   StatBlock,
+  TownContent,
+  TownId,
   TradeskillBuildingState,
   TradeskillId,
 } from '@interfaces';
@@ -65,6 +67,10 @@ vi.mock('@helpers/state-options', () => ({
   setOption: vi.fn(),
 }));
 
+vi.mock('@helpers/town/reputation/town-reputation', () => ({
+  TOWN_REPUTATION_THRESHOLDS: { 0: 0, 1: 100, 2: 500, 3: 1500, 4: 5000 },
+}));
+
 vi.mock('@helpers/world-node/world-node-discovery', () => ({
   worldNodeDiscover: vi.fn(),
   worldNodeUndiscover: vi.fn(),
@@ -96,6 +102,7 @@ import {
   debugResetBestiary,
   debugSetCharacterLevel,
   debugSetGatherNodeLevel,
+  debugSetTownReputation,
   debugSetTradeskillLevel,
   debugUndiscoverRecipe,
   debugUndiscoverWorldNode,
@@ -583,6 +590,63 @@ describe('Debug Helper Functions', () => {
       expect(result.gatherNodeLevels['Carrina Copper Mines']).toEqual({
         level: 0,
       });
+    });
+  });
+
+  describe('debugSetTownReputation', () => {
+    beforeEach(() => {
+      vi.mocked(updateGamestate).mockReset();
+    });
+
+    it('warns and does nothing for an unknown town id', () => {
+      vi.mocked(getEntry).mockReturnValue(undefined);
+
+      debugSetTownReputation('unknown' as TownId, 500);
+
+      expect(console.warn).toHaveBeenCalled();
+      expect(updateGamestate).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when the town has no state entry yet (not visited)', () => {
+      const townId = 'larsia' as TownId;
+      vi.mocked(getEntry).mockReturnValue({ id: townId } as TownContent);
+
+      debugSetTownReputation(townId, 500);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { towns: {} },
+      } as unknown as GameState);
+
+      expect(result.world.towns).toEqual({});
+    });
+
+    it('clamps reputation between 0 and the max tier threshold', () => {
+      const townId = 'larsia' as TownId;
+      vi.mocked(getEntry).mockReturnValue({ id: townId } as TownContent);
+
+      debugSetTownReputation(townId, 999999);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { towns: { [townId]: { reputation: 0 } } },
+      } as unknown as GameState);
+
+      expect(result.world.towns[townId].reputation).toBe(5000);
+    });
+
+    it('rounds and floors a negative value to 0', () => {
+      const townId = 'larsia' as TownId;
+      vi.mocked(getEntry).mockReturnValue({ id: townId } as TownContent);
+
+      debugSetTownReputation(townId, -50);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { towns: { [townId]: { reputation: 100 } } },
+      } as unknown as GameState);
+
+      expect(result.world.towns[townId].reputation).toBe(0);
     });
   });
 });

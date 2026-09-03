@@ -36,7 +36,8 @@
 
   reputation:
     buff:
-      name: Larsian Influence
+      globalEffectId: Larsian Influence
+
       tiers:
         - tier: 1
           stats:
