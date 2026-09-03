@@ -1,6 +1,6 @@
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { partyGet } from '@helpers/hero/party';
 import { rngNumberRange } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';

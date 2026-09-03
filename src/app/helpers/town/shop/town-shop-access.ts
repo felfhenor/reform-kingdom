@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import type { TownContent, TownId } from '@interfaces';
 
 export function townShopItemCap(townId: TownId): number {

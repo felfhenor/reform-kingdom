@@ -8,7 +8,7 @@ vi.mock('@helpers/item/collectibles', () => ({
   getCollectibleQuantity: vi.fn(() => 0),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -41,7 +41,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodesOfType: vi.fn(() => []),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import {
   exploreNodeFarmOptions,
@@ -189,7 +189,13 @@ describe('farmNodeRewardOptions', () => {
     const entry = buildNode('Forest Ruins');
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeCompletionRewards).mockReturnValue([
-      { kind: 'Item', itemId: 'unknown' as ItemId, min: 1, max: 1, chance: 100 },
+      {
+        kind: 'Item',
+        itemId: 'unknown' as ItemId,
+        min: 1,
+        max: 1,
+        chance: 100,
+      },
     ]);
     vi.mocked(rewardContentInfo).mockReturnValue(undefined);
 
@@ -266,7 +272,13 @@ describe('farmNodeRewardOptions', () => {
     } as EncounterRandomContent);
     vi.mocked(getEntry).mockReturnValue({
       drops: [
-        { kind: 'Item', itemId: 'feather' as ItemId, min: 1, max: 1, chance: 50 },
+        {
+          kind: 'Item',
+          itemId: 'feather' as ItemId,
+          min: 1,
+          max: 1,
+          chance: 50,
+        },
       ],
     } as MonsterContent);
     vi.mocked(isRewardDiscovered).mockReturnValue(true);

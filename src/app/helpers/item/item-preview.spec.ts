@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -14,7 +14,7 @@ vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { recipeResultContent } from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
 import {
@@ -190,9 +190,7 @@ describe('resolveRewardDisplay', () => {
     } as ItemContent;
     vi.mocked(getEntry).mockReturnValue(item);
 
-    expect(resolveRewardDisplay({ itemId: item.id })?.name).toBe(
-      'Copper Ore',
-    );
+    expect(resolveRewardDisplay({ itemId: item.id })?.name).toBe('Copper Ore');
   });
 
   it('resolves an equipmentId to its display', () => {
@@ -221,13 +219,16 @@ describe('resolveRewardDisplay', () => {
     } as CollectibleContent;
     vi.mocked(getEntry).mockReturnValue(collectible);
 
-    expect(
-      resolveRewardDisplay({ collectibleId: collectible.id })?.name,
-    ).toBe('Trinket');
+    expect(resolveRewardDisplay({ collectibleId: collectible.id })?.name).toBe(
+      'Trinket',
+    );
   });
 
   it("resolves a recipeId to the crafted result's display, using the recipe's own name", () => {
-    const recipe = { id: 'recipe-1' as RecipeId, name: 'Blueprint: Sword' } as RecipeContent;
+    const recipe = {
+      id: 'recipe-1' as RecipeId,
+      name: 'Blueprint: Sword',
+    } as RecipeContent;
     const result = {
       id: 'sword' as EquipmentId,
       name: 'Sword',

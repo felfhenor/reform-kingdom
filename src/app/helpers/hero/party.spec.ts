@@ -20,7 +20,7 @@ vi.mock('uuid', () => ({
   v4: vi.fn(() => `mock-uuid-${mockUuidCounter++}`),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
 }));
@@ -30,7 +30,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
   CHARACTER_MAX_LEVEL,
@@ -507,8 +507,8 @@ describe('Party Helper Functions', () => {
       vi.mocked(gamestate).mockReturnValue({
         world: { party: [hero] },
       } as unknown as GameState);
-      vi.mocked(getEntry).mockImplementation((id) =>
-        (id === strengthAffix.id ? strengthAffix : undefined) as never,
+      vi.mocked(getEntry).mockImplementation(
+        (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
       );
 
       expect(partyAffixEffects()).toEqual(strengthAffix.effects);

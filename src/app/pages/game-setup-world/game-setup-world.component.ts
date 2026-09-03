@@ -13,8 +13,11 @@ import { Router } from '@angular/router';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { getEntry } from '@helpers/content';
-import { discordSetMainStatus, discordSetStatus } from '@helpers/engine/discord';
+import { getEntry } from '@helpers/content/content';
+import {
+  discordSetMainStatus,
+  discordSetStatus,
+} from '@helpers/engine/discord';
 import { gameReset } from '@helpers/game-init';
 import { getUnlockedJobs } from '@helpers/hero/job';
 import { createCharacter, setParty } from '@helpers/hero/party';

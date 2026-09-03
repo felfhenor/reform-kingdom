@@ -6,7 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { decreeClauseSummary } from '@helpers/decree/decree';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type { DecreeClause, ItemContent, RewardContentInfo } from '@interfaces';

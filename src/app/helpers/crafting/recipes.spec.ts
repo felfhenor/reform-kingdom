@@ -23,7 +23,7 @@ vi.mock('@helpers/item/collectibles', () => ({
   getCollectibleQuantity: vi.fn(() => 0),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
 }));
@@ -55,7 +55,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   applyRecipeDiscovery,
   isRecipeCraftable,
@@ -74,7 +74,10 @@ import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
-import { applyMaterialDelta, getMaterialQuantity } from '@helpers/item/materials';
+import {
+  applyMaterialDelta,
+  getMaterialQuantity,
+} from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
@@ -299,7 +302,9 @@ describe('Recipes Helper Functions', () => {
 
       applyRecipeDiscovery(state, equipmentRecipe.id);
 
-      expect(state.discoveredRecipes[equipmentRecipe.id].foundAt).toBeGreaterThan(0);
+      expect(
+        state.discoveredRecipes[equipmentRecipe.id].foundAt,
+      ).toBeGreaterThan(0);
       expect(updateGamestate).not.toHaveBeenCalled();
     });
 
@@ -538,7 +543,9 @@ describe('Recipes Helper Functions', () => {
         'trader-token',
         -equipmentRecipe.tokenUnlockCost,
       );
-      expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBeGreaterThan(0);
+      expect(
+        result.discoveredRecipes[equipmentRecipe.id].foundAt,
+      ).toBeGreaterThan(0);
       expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
         'Progress:Museum:RecipeUnlock:Equipment Bone-Hewn Cloak',
       );

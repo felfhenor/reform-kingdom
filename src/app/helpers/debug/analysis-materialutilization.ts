@@ -5,8 +5,7 @@
  * `scripts/analyze-materialutilization.ts`.
  */
 
-import { sortBy } from 'es-toolkit/compat';
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisParams,
@@ -22,6 +21,7 @@ import type {
   MonsterContent,
   RecipeContent,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 function isInfusionMaterial(item: ItemContent): boolean {
   if (!item.infusionStats) return false;
@@ -85,12 +85,17 @@ export function runMaterialUtilizationAnalysis(
   const monsters = getEntriesByType<MonsterContent>('monster');
   const encounters = getEntriesByType<EncounterContent>('encounter');
   const gatherings = getEntriesByType<GatheringContent>('gathering');
-  const caravanTraders = getEntriesByType<CaravanTraderContent>('caravantrader');
-  const astralProjectors = getEntriesByType<AstralProjectorContent>('astralprojector');
-  const commissionOffers = getEntriesByType<CommissionOfferContent>('commissionoffer');
+  const caravanTraders =
+    getEntriesByType<CaravanTraderContent>('caravantrader');
+  const astralProjectors =
+    getEntriesByType<AstralProjectorContent>('astralprojector');
+  const commissionOffers =
+    getEntriesByType<CommissionOfferContent>('commissionoffer');
 
   const byId = new Map<string, MaterialUtilizationStats>();
-  items.filter((item) => !item.unobtainable).forEach((item) => byId.set(item.id, emptyStats(item)));
+  items
+    .filter((item) => !item.unobtainable)
+    .forEach((item) => byId.set(item.id, emptyStats(item)));
 
   recipes.forEach((recipe) => {
     recipe.requirements.forEach((requirement) => {
@@ -157,32 +162,35 @@ export function runMaterialUtilizationAnalysis(
     });
   });
 
-  const allStats = sortBy([...byId.values()], [
-    (stats: MaterialUtilizationStats) => score(stats),
-    (stats: MaterialUtilizationStats) => stats.name,
-  ]);
+  const allStats = sortBy(
+    [...byId.values()],
+    [
+      (stats: MaterialUtilizationStats) => score(stats),
+      (stats: MaterialUtilizationStats) => stats.name,
+    ],
+  );
 
   const rows: Record<string, string | number>[] = allStats.map(
     (stats): Record<string, string | number> =>
       expanded
         ? {
-          Material: stats.name,
-          Rarity: stats.rarity,
-          Score: score(stats),
-          'Crafted From (recipes)': stats.craftedFrom,
-          'Crafted From (qty)': stats.craftedFromQuantity,
-          Infusable: stats.infusable ? 'Yes' : 'No',
-          'Caravan Buys': stats.caravanBuys,
-          'Astral Casts': stats.astralCasts,
-          'Commission Requirements': stats.commissionRequirements,
-          'Crafted Into': stats.craftedInto,
-          'Monster Drops': stats.monsterDrops,
-          'Encounter Rewards': stats.encounterRewards,
-          'Gather Sources': stats.gatherSources,
-          'Caravan Sells': stats.caravanSells,
-          Production: productionCount(stats),
-        }
-      : { Material: stats.name, Rarity: stats.rarity, Score: score(stats) },
+            Material: stats.name,
+            Rarity: stats.rarity,
+            Score: score(stats),
+            'Crafted From (recipes)': stats.craftedFrom,
+            'Crafted From (qty)': stats.craftedFromQuantity,
+            Infusable: stats.infusable ? 'Yes' : 'No',
+            'Caravan Buys': stats.caravanBuys,
+            'Astral Casts': stats.astralCasts,
+            'Commission Requirements': stats.commissionRequirements,
+            'Crafted Into': stats.craftedInto,
+            'Monster Drops': stats.monsterDrops,
+            'Encounter Rewards': stats.encounterRewards,
+            'Gather Sources': stats.gatherSources,
+            'Caravan Sells': stats.caravanSells,
+            Production: productionCount(stats),
+          }
+        : { Material: stats.name, Rarity: stats.rarity, Score: score(stats) },
   );
 
   const table: AnalysisTable = {
@@ -198,11 +206,15 @@ export function runMaterialUtilizationAnalysis(
   const checks: AnalysisCheck[] = underUtilized.map((stats) => {
     const sinks: string[] = [];
     if (stats.craftedFrom > 0) sinks.push(`${stats.craftedFrom} recipe(s)`);
-    if (stats.caravanBuys > 0) sinks.push(`${stats.caravanBuys} caravan buy(s)`);
-    if (stats.astralCasts > 0) sinks.push(`${stats.astralCasts} astral spell(s)`);
-    if (stats.commissionRequirements > 0) sinks.push(`${stats.commissionRequirements} commission(s)`);
+    if (stats.caravanBuys > 0)
+      sinks.push(`${stats.caravanBuys} caravan buy(s)`);
+    if (stats.astralCasts > 0)
+      sinks.push(`${stats.astralCasts} astral spell(s)`);
+    if (stats.commissionRequirements > 0)
+      sinks.push(`${stats.commissionRequirements} commission(s)`);
     if (stats.infusable) sinks.push('infusable');
-    const sinkDescription = sinks.length > 0 ? sinks.join(', ') : 'no known sinks';
+    const sinkDescription =
+      sinks.length > 0 ? sinks.join(', ') : 'no known sinks';
     const sources = productionCount(stats);
 
     return {

@@ -8,6 +8,7 @@ import {
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotMuseumCollectibleComponent } from '@components/slot-museum-collectible/slot-museum-collectible.component';
 import { SlotMuseumRecipeComponent } from '@components/slot-museum-recipe/slot-museum-recipe.component';
+import { getEntry } from '@helpers/content/content';
 import { recipeUnlockWithTokens } from '@helpers/crafting/recipes';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import {
@@ -23,7 +24,6 @@ import {
   type MuseumTab,
   type RecipeId,
 } from '@interfaces';
-import { getEntry } from '../../helpers';
 
 @Component({
   selector: 'app-play-kingdom-museum',

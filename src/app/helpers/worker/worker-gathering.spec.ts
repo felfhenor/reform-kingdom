@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -36,7 +36,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
   worldNodeLevel: vi.fn(() => 0),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -45,13 +45,13 @@ import {
   workerGatheringProcessTick,
 } from '@helpers/worker/worker-gathering';
 import {
-  workerAssignmentIsValid,
-  workerBeginReturnTrip,
-} from '@helpers/worker/worker-travel';
-import {
   workerGainXp,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
+import {
+  workerAssignmentIsValid,
+  workerBeginReturnTrip,
+} from '@helpers/worker/worker-travel';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -88,7 +88,9 @@ const workerContent: WorkerContent = {
   statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
 };
 
-function buildGathering(overrides: Partial<GatheringContent> = {}): GatheringContent {
+function buildGathering(
+  overrides: Partial<GatheringContent> = {},
+): GatheringContent {
   return {
     id: 'gathering-1' as never,
     name: 'Wergen Woods',
@@ -126,9 +128,9 @@ describe('workerGatherRate', () => {
       1.6,
     );
     // Malachite is rarer (20/100), so it's gathered proportionally slower.
-    expect(
-      workerGatherRate(workerContent, 1, gathering, MALACHITE_ID, 0),
-    ).toBe(0.4);
+    expect(workerGatherRate(workerContent, 1, gathering, MALACHITE_ID, 0)).toBe(
+      0.4,
+    );
   });
 
   it('is 0 for an item not present in the gather table', () => {
@@ -163,9 +165,7 @@ describe('workerGatherRate', () => {
 
     const gathering = buildGathering();
 
-    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 2)).toBe(
-      2,
-    );
+    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 2)).toBe(2);
     expect(gatheringResultsAtLevel).toHaveBeenCalledWith(gathering, 2);
   });
 });

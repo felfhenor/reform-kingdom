@@ -7,7 +7,7 @@ import {
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   isRecipeDiscovered,
   recipeBackdropSprite,
@@ -60,27 +60,27 @@ export class SlotCompletionRewardComponent {
     return getEntry<RecipeContent>(reward.recipeId);
   });
 
-  public spritesheet = computed<'item' | 'equipment' | 'collectible' | 'worker'>(
-    () => {
-      const reward = this.reward();
-      switch (reward.kind) {
-        case 'Item':
-          return 'item';
-        case 'Equipment':
-          return 'equipment';
-        case 'Worker':
-          return 'worker';
-        case 'Recipe': {
-          const recipe = this.recipeContent();
-          return recipe ? recipeResultSpritesheet(recipe) : 'item';
-        }
-        case 'Collectible':
-          return 'collectible';
-        default:
-          return assertNeverReward(reward);
+  public spritesheet = computed<
+    'item' | 'equipment' | 'collectible' | 'worker'
+  >(() => {
+    const reward = this.reward();
+    switch (reward.kind) {
+      case 'Item':
+        return 'item';
+      case 'Equipment':
+        return 'equipment';
+      case 'Worker':
+        return 'worker';
+      case 'Recipe': {
+        const recipe = this.recipeContent();
+        return recipe ? recipeResultSpritesheet(recipe) : 'item';
       }
-    },
-  );
+      case 'Collectible':
+        return 'collectible';
+      default:
+        return assertNeverReward(reward);
+    }
+  });
 
   // Composited behind the result sprite for recipe rewards only (see
   // `SlotMuseumRecipeComponent`, which uses the same backdrop) - the visual

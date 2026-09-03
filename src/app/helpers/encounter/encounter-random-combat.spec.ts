@@ -12,7 +12,7 @@ vi.mock('@helpers/combat/combat-rewards', () => ({
   grantResolvedDrops: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -39,7 +39,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { encounterRandomState } from '@helpers/encounter/encounter-random';
 import {
   encounterRandomHandleVictory,

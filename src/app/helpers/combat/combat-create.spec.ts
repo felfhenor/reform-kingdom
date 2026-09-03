@@ -12,7 +12,7 @@ vi.mock('@helpers/combat/combat-state', () => ({
   currentCombat: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -28,7 +28,7 @@ import {
   combatantFromCharacter,
   combatantFromMonster,
 } from '@helpers/combat/combat-create';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { defaultCombatStats } from '@helpers/defaults';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import type {
@@ -267,7 +267,11 @@ describe('combatantFromCharacter', () => {
         startTick: 0,
         expiresAtTick: 100,
         effects: [
-          { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
+          {
+            effectType: 'GainCombatStat',
+            combatStat: 'reviveChance',
+            value: 2,
+          },
         ],
       },
     ] as GlobalEffect[]);
@@ -435,10 +439,7 @@ describe('combatantFromMonster', () => {
       sprite: '0000',
       frames: 4,
       rarity: 'Common',
-      targetting: [
-        { type: 'Random', jobId: rangerJob.id },
-        { type: 'Random' },
-      ],
+      targetting: [{ type: 'Random', jobId: rangerJob.id }, { type: 'Random' }],
       xp: { min: 0, max: 0 },
       drops: [],
       baseStats: zeroStats(),

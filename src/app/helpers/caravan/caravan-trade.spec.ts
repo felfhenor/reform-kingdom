@@ -15,7 +15,7 @@ vi.mock('@helpers/item/collectibles', () => ({
   isCollectibleDiscovered: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
 }));
@@ -83,7 +83,7 @@ import {
   caravanTradePrice,
   caravanTradeRemaining,
 } from '@helpers/caravan/caravan-trade-quantity';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   isRecipeDiscovered,
   recipeBackdropSprite,
@@ -1026,9 +1026,7 @@ describe('caravanExecuteTokenTrade', () => {
   });
 
   it('returns false when no trader is currently assigned', async () => {
-    vi.mocked(caravanState).mockReturnValue(
-      nodeState({ traderId: undefined }),
-    );
+    vi.mocked(caravanState).mockReturnValue(nodeState({ traderId: undefined }));
 
     expect(await caravanExecuteTokenTrade(entry, 0)).toBe(false);
   });
@@ -1123,7 +1121,9 @@ describe('caravanExecuteTokenTrade', () => {
         affixIds: [],
       },
     ]);
-    expect(result.discoveredEquipment['sword' as EquipmentId].foundAt).toBeGreaterThan(0);
+    expect(
+      result.discoveredEquipment['sword' as EquipmentId].foundAt,
+    ).toBeGreaterThan(0);
     expect(result.materials['trader-token' as ItemId]).toBeUndefined();
   });
 

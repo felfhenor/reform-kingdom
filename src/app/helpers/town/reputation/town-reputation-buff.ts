@@ -1,4 +1,4 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   applyGlobalEffectRemove,

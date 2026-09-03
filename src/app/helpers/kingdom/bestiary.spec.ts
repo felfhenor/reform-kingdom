@@ -22,7 +22,7 @@ vi.mock('@helpers/engine/analytics', async (importOriginal) => {
   };
 });
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
   getEntry: vi.fn(),
 }));
@@ -41,7 +41,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
 }));
 
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
   bestiaryDropQuantityLabel,

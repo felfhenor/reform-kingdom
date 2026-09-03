@@ -1,5 +1,5 @@
 import { mostRecentCommissionResetAt } from '@helpers/commission/commission-reset';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted, rngNumberRange } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {

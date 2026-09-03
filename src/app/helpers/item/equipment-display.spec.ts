@@ -1,8 +1,8 @@
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
@@ -281,7 +281,7 @@ describe('equipmentItemGrantedSkillIds', () => {
     vi.clearAllMocks();
   });
 
-  it("combines content-granted and affix-granted skills", () => {
+  it('combines content-granted and affix-granted skills', () => {
     mockContent(grantAffix);
 
     const skillIds = equipmentItemGrantedSkillIds(
@@ -332,7 +332,10 @@ describe('equipmentItemGrantedSkills', () => {
     },
     type: 'Sword',
     slots: 0,
-    grantedSkillIds: ['starshine-2' as EquipmentSkillId, 'ghost-2' as EquipmentSkillId],
+    grantedSkillIds: [
+      'starshine-2' as EquipmentSkillId,
+      'ghost-2' as EquipmentSkillId,
+    ],
   };
 
   const starshine: EquipmentSkillContent = {

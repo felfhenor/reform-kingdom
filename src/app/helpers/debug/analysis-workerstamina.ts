@@ -1,7 +1,7 @@
 // Lists every gather node's one-way travel-tick cost from the Kingdom, for
 // calibrating worker `stamina` stats against.
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
 import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';

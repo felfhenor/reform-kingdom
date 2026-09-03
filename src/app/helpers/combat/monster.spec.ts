@@ -5,7 +5,7 @@ import {
   monsterXpReward,
   xpForOverLevel,
 } from '@helpers/combat/monster';
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { defaultCombatStats } from '@helpers/defaults';
 import type { EquipmentSkillId, ItemId, MonsterContent } from '@interfaces';
 import { describe, expect, it } from 'vitest';

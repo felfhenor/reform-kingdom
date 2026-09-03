@@ -1,5 +1,5 @@
 import { currentCombat } from '@helpers/combat/combat-state';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   decreeClauses,
   decreeWaitForFullHealthBeforeCombat,

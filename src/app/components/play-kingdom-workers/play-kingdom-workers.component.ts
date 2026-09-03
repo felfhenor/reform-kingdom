@@ -13,7 +13,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { gamestate } from '@helpers/state-game';

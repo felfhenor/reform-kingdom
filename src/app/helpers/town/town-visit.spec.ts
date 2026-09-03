@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@helpers/town/worker/town-worker-roster', () => ({
   townWorkerRosterMaterialize: vi.fn((_town, existing) => existing),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -70,9 +70,7 @@ describe('townMarkVisited', () => {
 
     townMarkVisited(townId);
 
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Town:Visit:Larsia',
-    );
+    expect(analyticsSendDesignEvent).toHaveBeenCalledWith('Town:Visit:Larsia');
   });
 
   it('preserves existing lastProcessedTick progress when activating', () => {

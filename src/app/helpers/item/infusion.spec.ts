@@ -9,7 +9,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@helpers/item/materials', async (importOriginal) => {
   };
 });
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   canInfuseEquipmentItem,
   equipmentItemInfusionBonus,

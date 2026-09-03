@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
 import {

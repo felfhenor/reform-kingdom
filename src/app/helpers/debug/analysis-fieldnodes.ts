@@ -5,7 +5,7 @@
  * from `scripts/validate-fieldnodes.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { allMaps } from '@helpers/maps';
 import type {
   AnalysisCheck,
@@ -20,12 +20,22 @@ const FIELD_NODE_LAYER_NAME = 'Explore Nodes';
 const FIELD_NODE_TYPES = ['ExploreNode', 'ExploreRandomNode', 'GatherNode'];
 
 export function runFieldNodesAnalysis(): AnalysisRunResult {
-  const encounterNames = new Set(getEntriesByType<EncounterContent>('encounter').map((e) => e.name));
-  const encounterRandomNames = new Set(
-    getEntriesByType<EncounterRandomContent>('encounterrandom').map((e) => e.name),
+  const encounterNames = new Set(
+    getEntriesByType<EncounterContent>('encounter').map((e) => e.name),
   );
-  const gatheringNames = new Set(getEntriesByType<GatheringContent>('gathering').map((g) => g.name));
-  const nodeNames = new Set([...encounterNames, ...encounterRandomNames, ...gatheringNames]);
+  const encounterRandomNames = new Set(
+    getEntriesByType<EncounterRandomContent>('encounterrandom').map(
+      (e) => e.name,
+    ),
+  );
+  const gatheringNames = new Set(
+    getEntriesByType<GatheringContent>('gathering').map((g) => g.name),
+  );
+  const nodeNames = new Set([
+    ...encounterNames,
+    ...encounterRandomNames,
+    ...gatheringNames,
+  ]);
 
   const checks: AnalysisCheck[] = [];
   let total = 0;

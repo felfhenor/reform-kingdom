@@ -8,7 +8,7 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { isInfusionMaterial } from '@helpers/item/infusion';
 import { type ItemContent, type ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';

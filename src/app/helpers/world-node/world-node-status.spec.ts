@@ -20,7 +20,7 @@ vi.mock('@helpers/world-node/world-node-discovery', () => ({
 }));
 
 import { caravanTimerLabel } from '@helpers/caravan/caravan';
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import {
   worldNodeInteractionKind,

@@ -7,11 +7,11 @@
  * from a CLI script or the `/debug` dashboard.
  */
 
-import fs from 'fs-extra';
-import path from 'path';
-import { unfurlContent } from '@helpers/content';
+import { unfurlContent } from '@helpers/content/content';
 import { setAllMaps } from '@helpers/maps';
 import type { GameMap, IsContentItem } from '@interfaces';
+import fs from 'fs-extra';
+import path from 'path';
 
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
 const JSON_DIR = path.join(ROOT_DIR, 'public', 'json');

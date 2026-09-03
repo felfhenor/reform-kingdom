@@ -11,7 +11,7 @@ vi.mock('@helpers/hero/character-progress', () => ({
   healPartyToFull: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
 }));
@@ -37,7 +37,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodesOfType: vi.fn(() => []),
 }));
 
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { healPartyToFull } from '@helpers/hero/character-progress';
 import {

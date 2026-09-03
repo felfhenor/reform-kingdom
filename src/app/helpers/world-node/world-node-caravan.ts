@@ -1,5 +1,5 @@
 import { caravanState, caravanTimerLabel } from '@helpers/caravan/caravan';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanTrade,

@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import {

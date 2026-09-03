@@ -4,7 +4,7 @@ import {
   equipmentDropHtml,
   itemDropHtml,
 } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { isRecipeCraftable } from '@helpers/crafting/recipes';
 import {
   craftXpChance,

@@ -4,7 +4,7 @@ vi.mock('@helpers/item/collectibles', () => ({
   isCollectibleDiscovered: vi.fn(() => true),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(() => []),
   getEntry: vi.fn(),
 }));
@@ -14,7 +14,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftXpChance,
   craftXpChanceTier,

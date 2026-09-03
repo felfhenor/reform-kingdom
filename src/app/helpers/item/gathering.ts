@@ -1,5 +1,5 @@
 import { gatherMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';

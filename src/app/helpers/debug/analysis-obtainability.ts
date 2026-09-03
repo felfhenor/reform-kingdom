@@ -1,7 +1,7 @@
 // Validates every item/collectible/equipment is obtainable (dropped,
 // rewarded, gathered, crafted, traded) or marked `unobtainable: true`.
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,

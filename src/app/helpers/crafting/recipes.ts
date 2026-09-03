@@ -1,4 +1,4 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
@@ -64,7 +64,10 @@ export function isRecipeCraftable(recipeId: RecipeId): boolean {
 }
 
 // Mutates `state.discoveredRecipes` in place, for callers already inside their own `updateGamestate`.
-export function applyRecipeDiscovery(state: GameState, recipeId: RecipeId): void {
+export function applyRecipeDiscovery(
+  state: GameState,
+  recipeId: RecipeId,
+): void {
   const existing = state.discoveredRecipes[recipeId];
   state.discoveredRecipes[recipeId] = {
     foundAt: existing?.foundAt ?? Date.now(),

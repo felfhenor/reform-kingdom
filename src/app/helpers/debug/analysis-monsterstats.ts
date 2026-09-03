@@ -4,7 +4,7 @@
  * `scripts/analyze-monsterstats.ts`.
  */
 
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { filterByNames, round2, statSum } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisParams,

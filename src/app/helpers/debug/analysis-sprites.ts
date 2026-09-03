@@ -6,7 +6,7 @@
  * share an icon and are excluded. Ported from `scripts/validate-sprites.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
@@ -87,7 +87,9 @@ function checkContentType(type: ContentType): AnalysisCheck[] {
 }
 
 export function runSpritesAnalysis(): AnalysisRunResult {
-  const checks = SPRITED_CONTENT_TYPES.flatMap((type) => checkContentType(type));
+  const checks = SPRITED_CONTENT_TYPES.flatMap((type) =>
+    checkContentType(type),
+  );
   const failures = checks.filter((c) => c.status === 'fail').length;
 
   return {

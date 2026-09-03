@@ -4,7 +4,7 @@ vi.mock('@helpers/commission/commission-reset', () => ({
   mostRecentCommissionResetAt: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -30,7 +30,7 @@ import {
   hasAnyCommission,
   pruneInvalidCommissions,
 } from '@helpers/commission/commission-tick';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted, rngNumberRange } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -165,7 +165,11 @@ describe('hasAnyCommission', () => {
 
   it('is true once at least one commission exists', () => {
     withCommissionState({
-      [caravan.id]: { generatedAt: 1000, commissionOfferId: offer.id, completed: false },
+      [caravan.id]: {
+        generatedAt: 1000,
+        commissionOfferId: offer.id,
+        completed: false,
+      },
     });
 
     expect(hasAnyCommission()).toBe(true);
@@ -175,8 +179,8 @@ describe('hasAnyCommission', () => {
 describe('pruneInvalidCommissions', () => {
   // Resolves by id so caravan-key and commissionOfferId validation can be asserted independently.
   function mockContentLookup(...content: { id: string }[]): void {
-    vi.mocked(getEntry).mockImplementation((id: string) =>
-      content.find((c) => c.id === id) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id: string) => content.find((c) => c.id === id) as never,
     );
   }
 

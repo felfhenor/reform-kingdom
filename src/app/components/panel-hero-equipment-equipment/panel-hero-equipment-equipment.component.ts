@@ -9,7 +9,7 @@ import {
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   characterEquipFromArmory,
   characterUnequipToArmory,

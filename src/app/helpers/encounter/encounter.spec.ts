@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { partyGet } from '@helpers/hero/party';
 import { rngNumberRange } from '@helpers/rng';

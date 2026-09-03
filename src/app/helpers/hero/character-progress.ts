@@ -1,5 +1,5 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { heroSkillsAtLevel } from '@helpers/hero/job';

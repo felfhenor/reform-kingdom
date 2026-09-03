@@ -15,7 +15,7 @@ vi.mock('@helpers/kingdom/armory', () => ({
   armoryGet: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(),
 }));
@@ -25,7 +25,7 @@ vi.mock('@helpers/combat/combat-state', () => ({
 }));
 
 import { currentCombat } from '@helpers/combat/combat-state';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   canEquipItem,
   canModifyEquipment,
@@ -261,7 +261,10 @@ describe('Equipment Helper Functions', () => {
 
       const totals = equipmentStatTotals({
         ...emptyEquipment,
-        Weapon: { ...mockEquipmentItem(sword.id), affixIds: [strengthAffix.id] },
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          affixIds: [strengthAffix.id],
+        },
       });
 
       expect(totals.Strength).toBe(sword.baseStats.Strength + 4);
@@ -1182,9 +1185,7 @@ describe('Equipment Helper Functions', () => {
         ['Strength', 'Agility'],
       );
 
-      expect(winners).toEqual([
-        { item: armoryItem, content: tradeoffBangle },
-      ]);
+      expect(winners).toEqual([{ item: armoryItem, content: tradeoffBangle }]);
     });
 
     it('rejects a tradeoff candidate whose non-priority stats net negative overall', () => {
@@ -1296,7 +1297,10 @@ describe('Equipment Helper Functions', () => {
 
       const equipment: EquipmentBlock = {
         ...emptyEquipment,
-        Weapon: { ...mockEquipmentItem(sword.id), affixIds: [strengthAffix.id] },
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          affixIds: [strengthAffix.id],
+        },
       };
 
       expect(equipmentAffixEffects(equipment)).toEqual(strengthAffix.effects);

@@ -13,7 +13,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
   defaultStats,
@@ -106,9 +106,7 @@ export class PlayKingdomInfusionComponent {
   public selectedItemDisplayName = computed(() => {
     const item = this.selectedItem();
     const content = this.selectedItemContent();
-    return item && content
-      ? equipmentItemDisplayName(item, content.name)
-      : '';
+    return item && content ? equipmentItemDisplayName(item, content.name) : '';
   });
 
   public selectedItemBonus = computed(() => {
@@ -151,7 +149,10 @@ export class PlayKingdomInfusionComponent {
     return getEntry<EquipmentContent>(item.equipmentId);
   }
 
-  public displayNameFor(item: EquipmentItem, content: EquipmentContent): string {
+  public displayNameFor(
+    item: EquipmentItem,
+    content: EquipmentContent,
+  ): string {
     return equipmentItemDisplayName(item, content.name);
   }
 

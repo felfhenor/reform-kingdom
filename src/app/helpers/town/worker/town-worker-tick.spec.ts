@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
@@ -26,7 +26,7 @@ vi.mock('@helpers/town/worker/town-worker-travel-tick', () => ({
   townWorkerTravelProcessTick: vi.fn(),
 }));
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import {
   isTownDueForUpdate,

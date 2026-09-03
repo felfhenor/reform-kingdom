@@ -6,7 +6,7 @@
  * `scripts/validate-tradeskillxpgaps.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
@@ -32,7 +32,9 @@ function checkTradeskill(
 ): AnalysisCheck[] {
   const checks: AnalysisCheck[] = [];
 
-  const tradeskillRecipes = recipes.filter((r) => r.tradeskillId === tradeskill.id);
+  const tradeskillRecipes = recipes.filter(
+    (r) => r.tradeskillId === tradeskill.id,
+  );
   const xpRecipes = tradeskillRecipes.filter((r) => r.tradeskillXP > 0);
 
   if (xpRecipes.length === 0) {
@@ -56,11 +58,15 @@ function checkTradeskill(
     }
   });
 
-  const highestMinLevel = Math.max(...xpRecipes.map((r) => r.minTradeskillLevel));
+  const highestMinLevel = Math.max(
+    ...xpRecipes.map((r) => r.minTradeskillLevel),
+  );
 
   const gapLevels: number[] = [];
   for (let level = 1; level <= highestMinLevel; level += 1) {
-    const covered = xpRecipes.some((recipe) => recipeGrantsXpAtLevel(recipe, level));
+    const covered = xpRecipes.some((recipe) =>
+      recipeGrantsXpAtLevel(recipe, level),
+    );
     if (!covered) gapLevels.push(level);
   }
 
@@ -87,7 +93,9 @@ export function runTradeskillXpGapsAnalysis(): AnalysisRunResult {
   const recipes = getEntriesByType<RecipeContent>('recipe');
   const tradeskills = getEntriesByType<TradeskillContent>('tradeskill');
 
-  const checks = tradeskills.flatMap((tradeskill) => checkTradeskill(tradeskill, recipes));
+  const checks = tradeskills.flatMap((tradeskill) =>
+    checkTradeskill(tradeskill, recipes),
+  );
   const failures = checks.filter((c) => c.status === 'fail').length;
 
   return {

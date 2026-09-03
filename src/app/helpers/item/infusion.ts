@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import {
   COMBAT_STAT_BONUS,

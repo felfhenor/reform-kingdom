@@ -9,8 +9,12 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { getEntry } from '@helpers/content';
-import { defaultCombatStats, defaultStats, defaultTagResistances } from '@helpers/defaults';
+import { getEntry } from '@helpers/content/content';
+import {
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   equipmentItemBonusCombatStats,
@@ -58,9 +62,7 @@ export class SlotEquipmentComponent {
   public displayName = computed(() => {
     const item = this.equippedItem();
     const content = this.equippedContent();
-    return item && content
-      ? equipmentItemDisplayName(item, content.name)
-      : '';
+    return item && content ? equipmentItemDisplayName(item, content.name) : '';
   });
 
   public bonusStats = computed(() => {

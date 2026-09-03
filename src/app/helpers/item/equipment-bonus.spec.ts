@@ -1,8 +1,8 @@
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
@@ -11,9 +11,9 @@ import {
 import type {
   AffixContent,
   AffixId,
+  EquipmentId,
   EquipmentItem,
   EquipmentItemId,
-  EquipmentId,
   ItemContent,
   ItemId,
 } from '@interfaces';

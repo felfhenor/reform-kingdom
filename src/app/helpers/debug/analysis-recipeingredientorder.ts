@@ -6,8 +6,7 @@
  * `scripts/validate-recipeingredientorder.ts`.
  */
 
-import { sortBy } from 'es-toolkit/compat';
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
@@ -17,6 +16,7 @@ import type {
   RecipeItemProducer,
   TradeskillContent,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 function buildItemProducerIndex(
   recipes: RecipeContent[],
@@ -44,7 +44,8 @@ function checkRecipe(
   tradeskillNameById: Map<string, string>,
 ): AnalysisCheck[] {
   const checks: AnalysisCheck[] = [];
-  const recipeTradeskillName = tradeskillNameById.get(recipe.tradeskillId) ?? recipe.tradeskillId;
+  const recipeTradeskillName =
+    tradeskillNameById.get(recipe.tradeskillId) ?? recipe.tradeskillId;
 
   recipe.requirements.forEach((requirement) => {
     if (!('itemId' in requirement)) return;
@@ -53,7 +54,8 @@ function checkRecipe(
     producers.forEach((producer) => {
       if (producer.minTradeskillLevel <= recipe.minTradeskillLevel) return;
 
-      const producerTradeskillName = tradeskillNameById.get(producer.tradeskillId) ?? producer.tradeskillId;
+      const producerTradeskillName =
+        tradeskillNameById.get(producer.tradeskillId) ?? producer.tradeskillId;
       checks.push({
         id: `ingredient-order:${recipe.id}:${producer.name}`,
         label: recipe.name,
@@ -99,7 +101,10 @@ export function runRecipeIngredientOrderAnalysis(): AnalysisRunResult {
   const recipes = getEntriesByType<RecipeContent>('recipe');
   const equipment = getEntriesByType<EquipmentContent>('equipment');
   const tradeskillNameById = new Map(
-    getEntriesByType<TradeskillContent>('tradeskill').map((t) => [t.id, t.name]),
+    getEntriesByType<TradeskillContent>('tradeskill').map((t) => [
+      t.id,
+      t.name,
+    ]),
   );
   const equipmentById = new Map(equipment.map((e) => [e.id, e]));
 
@@ -110,14 +115,18 @@ export function runRecipeIngredientOrderAnalysis(): AnalysisRunResult {
     checks.push(...checkRecipe(recipe, itemProducers, tradeskillNameById));
   });
 
-  const levelRequirementGroups = new Map<string, EquipmentResultRecipeCheck[]>();
+  const levelRequirementGroups = new Map<
+    string,
+    EquipmentResultRecipeCheck[]
+  >();
   recipes.forEach((recipe) => {
     if (!('equipmentId' in recipe.result)) return;
 
     const equip = equipmentById.get(recipe.result.equipmentId);
     if (!equip) return;
 
-    const tradeskillName = tradeskillNameById.get(recipe.tradeskillId) ?? recipe.tradeskillId;
+    const tradeskillName =
+      tradeskillNameById.get(recipe.tradeskillId) ?? recipe.tradeskillId;
     const groupLabel = `${tradeskillName} / ${equip.type}`;
     const group = levelRequirementGroups.get(groupLabel) ?? [];
     group.push({

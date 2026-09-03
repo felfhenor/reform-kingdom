@@ -8,7 +8,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
   recipeDropHtml: vi.fn(() => 'recipe-html'),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -43,10 +43,13 @@ vi.mock('@helpers/world-node/world-node-rewards', () => ({
 
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { addMaterial } from '@helpers/item/materials';
-import { isWorkerRescued, workerRescue } from '@helpers/worker/worker-discovery';
+import {
+  isWorkerRescued,
+  workerRescue,
+} from '@helpers/worker/worker-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   Combat,

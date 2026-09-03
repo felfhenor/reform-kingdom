@@ -16,7 +16,7 @@ vi.mock('uuid', () => ({
   v4: vi.fn(() => `mock-uuid-${Math.random()}`),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -34,7 +34,7 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   healingTicksForLevel,
   healPartyToFull,

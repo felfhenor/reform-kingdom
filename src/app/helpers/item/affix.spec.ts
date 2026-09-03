@@ -1,4 +1,4 @@
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
   getEntry: vi.fn(),
 }));
@@ -7,7 +7,7 @@ vi.mock('@helpers/rng', () => ({
   rngChoiceRarity: vi.fn(),
 }));
 
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   affixEffectsOfKind,
   affixEffectSum,
@@ -171,9 +171,9 @@ describe('equipmentItemAffixEffects', () => {
       (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
     );
 
-    expect(
-      equipmentItemAffixEffects(buildItem([strengthAffix.id])),
-    ).toEqual(strengthAffix.effects);
+    expect(equipmentItemAffixEffects(buildItem([strengthAffix.id]))).toEqual(
+      strengthAffix.effects,
+    );
   });
 
   it('flattens multiple effects from a single affix', () => {
@@ -189,9 +189,9 @@ describe('equipmentItemAffixEffects', () => {
         (id === multiEffectAffix.id ? multiEffectAffix : undefined) as never,
     );
 
-    expect(
-      equipmentItemAffixEffects(buildItem([multiEffectAffix.id])),
-    ).toEqual(multiEffectAffix.effects);
+    expect(equipmentItemAffixEffects(buildItem([multiEffectAffix.id]))).toEqual(
+      multiEffectAffix.effects,
+    );
   });
 
   it('combines effects from multiple affixes on the same item', () => {
@@ -314,9 +314,7 @@ describe('affixEffectsOfKind', () => {
   });
 
   it('returns an empty array when no effects match', () => {
-    expect(affixEffectsOfKind([strengthStatEffect], 'Resistance')).toEqual(
-      [],
-    );
+    expect(affixEffectsOfKind([strengthStatEffect], 'Resistance')).toEqual([]);
   });
 
   it('returns an empty array for an empty input', () => {

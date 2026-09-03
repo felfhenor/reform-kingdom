@@ -1,5 +1,5 @@
 import { gatherMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { travelStepTicksCost } from '@helpers/hero/travel';
 import { addMaterial } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';

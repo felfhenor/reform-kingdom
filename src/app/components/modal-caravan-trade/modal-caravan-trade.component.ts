@@ -31,7 +31,7 @@ import {
   caravanTradeRemaining,
 } from '@helpers/caravan/caravan-trade-quantity';
 import { commissionRowViewModel } from '@helpers/commission/commission-fulfill';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { notifySuccess } from '@helpers/engine/notify';
 import { activeCaravanNode } from '@helpers/engine/ui';

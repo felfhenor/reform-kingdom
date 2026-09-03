@@ -4,7 +4,7 @@ vi.mock('@helpers/item/collectibles', () => ({
   isCollectibleDiscovered: vi.fn(() => true),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
 }));
@@ -26,7 +26,7 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftingActiveStatusEntries,
   craftQueueTicksRemaining,
@@ -432,7 +432,7 @@ describe('craftingActiveStatusEntries', () => {
     expect(craftingActiveStatusEntries()).toEqual([]);
   });
 
-  it('reports the whole queue\'s remaining time, not just the head entry\'s, when a second recipe is queued behind it', () => {
+  it("reports the whole queue's remaining time, not just the head entry's, when a second recipe is queued behind it", () => {
     vi.mocked(gamestate).mockReturnValue({
       tradeskills: buildAllTradeskills(
         buildBuilding({

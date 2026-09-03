@@ -34,7 +34,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
   ),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -62,7 +62,7 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { craftMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
   craftProcessTick,

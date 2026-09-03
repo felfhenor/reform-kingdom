@@ -1,4 +1,4 @@
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { setAllMaps } from '@helpers/maps';
 import {
   allGatherableMaterialIds,

@@ -1,4 +1,4 @@
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import {
   isTownDueForUpdate,

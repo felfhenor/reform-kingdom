@@ -1,4 +1,4 @@
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -15,12 +15,12 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
 import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantCombatStatValue,
   combatStatsForCharacterEquipment,
 } from '@helpers/combat/combat-stats';
+import { getEntry } from '@helpers/content/content';
 import { defaultCombatStats } from '@helpers/defaults';
 import { rngSucceedsChance } from '@helpers/rng';
 import type {

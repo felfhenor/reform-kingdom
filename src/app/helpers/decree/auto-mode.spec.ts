@@ -4,7 +4,7 @@ vi.mock('@helpers/combat/combat-state', () => ({
   currentCombat: vi.fn(() => undefined),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -69,7 +69,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { currentCombat } from '@helpers/combat/combat-state';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   autoModeIsEnabled,
   autoModeProcessTick,

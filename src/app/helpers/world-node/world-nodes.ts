@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import { tiledMapGetLayer } from '@helpers/pixi/tiled-map';

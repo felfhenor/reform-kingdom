@@ -9,7 +9,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({ getEntry: vi.fn() }));
+vi.mock('@helpers/content/content', () => ({ getEntry: vi.fn() }));
 
 vi.mock('@helpers/rng', async (importOriginal) => {
   const actual = await importOriginal<typeof RngHelper>();
@@ -32,7 +32,7 @@ import {
   combatLog,
   combatLogReset,
 } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { rngSucceedsChance, rngUniform } from '@helpers/rng';
 
 function buildCombat(overrides: Partial<Combat> = {}): Combat {

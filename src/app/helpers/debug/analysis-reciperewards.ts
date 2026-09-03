@@ -4,7 +4,7 @@
  * `scripts/validate-reciperewards.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
@@ -14,9 +14,12 @@ import type {
 } from '@interfaces';
 
 export function runRecipeRewardsAnalysis(): AnalysisRunResult {
-  const recipeIds = new Set(getEntriesByType<RecipeContent>('recipe').map((r) => r.id));
+  const recipeIds = new Set(
+    getEntriesByType<RecipeContent>('recipe').map((r) => r.id),
+  );
   const encounters = getEntriesByType<EncounterContent>('encounter');
-  const encounterRandoms = getEntriesByType<EncounterRandomContent>('encounterrandom');
+  const encounterRandoms =
+    getEntriesByType<EncounterRandomContent>('encounterrandom');
 
   const checks: AnalysisCheck[] = [];
 

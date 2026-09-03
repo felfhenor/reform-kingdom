@@ -1,7 +1,7 @@
 // Validates every commission offer is referenced by at least one caravan's
 // commissionOffers pool - otherwise it can never actually be rolled.
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,

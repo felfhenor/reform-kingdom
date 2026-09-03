@@ -5,14 +5,17 @@ import {
   itemDropHtml,
   recipeDropHtml,
 } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { recipeDiscover } from '@helpers/crafting/recipes';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
 import { addMaterial } from '@helpers/item/materials';
 import { armoryAdd } from '@helpers/kingdom/armory';
-import { isWorkerRescued, workerRescue } from '@helpers/worker/worker-discovery';
+import {
+  isWorkerRescued,
+  workerRescue,
+} from '@helpers/worker/worker-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   CollectibleContent,
@@ -100,7 +103,8 @@ export function grantResolvedDrops(
       }
 
       case 'Item': {
-        itemsFound[drop.itemId] = (itemsFound[drop.itemId] ?? 0) + drop.quantity;
+        itemsFound[drop.itemId] =
+          (itemsFound[drop.itemId] ?? 0) + drop.quantity;
         return;
       }
 
@@ -122,6 +126,10 @@ export function grantResolvedDrops(
       combat,
       `The party found ${itemDropHtml(item, quantity)}!`,
     );
-    emitRewardVfx(combat, { kind: 'Item', itemId: itemId as ItemId, quantity }, quantity);
+    emitRewardVfx(
+      combat,
+      { kind: 'Item', itemId: itemId as ItemId, quantity },
+      quantity,
+    );
   });
 }

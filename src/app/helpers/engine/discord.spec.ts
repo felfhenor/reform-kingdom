@@ -33,7 +33,7 @@ vi.mock('@helpers/caravan/caravan', () => ({
   caravanBrandName: vi.fn((name: string) => name.split(' - ')[0]),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(() => undefined),
 }));
 
@@ -43,7 +43,7 @@ vi.mock('@helpers/hero/party', () => ({
 
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
 import { currentCombat } from '@helpers/combat/combat-state';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   discordSetMainStatus,
   discordUpdateStatus,

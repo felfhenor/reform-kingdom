@@ -4,7 +4,7 @@ vi.mock('@helpers/commission/commission-tick', () => ({
   commissionGenerateIfMissing: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
   getEntry: vi.fn(),
 }));
@@ -41,7 +41,7 @@ import {
   pruneInvalidDiscoveredCaravans,
 } from '@helpers/caravan/caravan';
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';

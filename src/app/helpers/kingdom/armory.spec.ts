@@ -13,7 +13,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -37,7 +37,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import {
   armoryAdd,
@@ -422,8 +422,9 @@ describe('Armory Helper Functions', () => {
         family: 'SellValue',
         effects: [{ kind: 'SellValue', value: 250 }],
       };
-      vi.mocked(getEntry).mockImplementation((id) =>
-        (id === sellValueAffix.id ? sellValueAffix : undefined) as never,
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === sellValueAffix.id ? sellValueAffix : undefined) as never,
       );
 
       const entry = {
@@ -473,8 +474,9 @@ describe('Armory Helper Functions', () => {
           { kind: 'CombatStat', stat: 'damageReflectPercent', value: 3 },
         ],
       };
-      vi.mocked(getEntry).mockImplementation((id) =>
-        (id === combatStatAffix.id ? combatStatAffix : undefined) as never,
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === combatStatAffix.id ? combatStatAffix : undefined) as never,
       );
 
       const entry = {
@@ -526,12 +528,13 @@ describe('Armory Helper Functions', () => {
         id: 'spirit-flesh' as never,
         infusionDebuffResistances: { ...defaultTagResistances(), Stun: 1 },
       };
-      vi.mocked(getEntry).mockImplementation((id) =>
-        (id === stunAffix.id
-          ? stunAffix
-          : id === spiritFlesh.id
-            ? spiritFlesh
-            : undefined) as never,
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === stunAffix.id
+            ? stunAffix
+            : id === spiritFlesh.id
+              ? spiritFlesh
+              : undefined) as never,
       );
 
       const entry = {

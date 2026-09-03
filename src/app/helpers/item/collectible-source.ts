@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { error } from '@helpers/engine/logging';
 import type {
   CaravanTraderContent,

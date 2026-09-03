@@ -6,7 +6,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { setAllContentById } from '@helpers/content';
+import { setAllContentById } from '@helpers/content/content';
 import {
   filterStorageMaterials,
   getStorageMaterials,

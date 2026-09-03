@@ -1,7 +1,7 @@
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { encounterRandomState } from '@helpers/encounter/encounter-random';
 import {
   analyticsSafeSegment,

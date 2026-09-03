@@ -23,7 +23,7 @@ vi.mock('@helpers/item/collectibles', () => ({
   isCollectibleDiscovered: vi.fn(() => true),
 }));
 
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { setAllMaps } from '@helpers/maps';
 import {

@@ -7,7 +7,7 @@
  * Mirrors `gatheringResultsAtLevel` in `helpers/world-node/world-node-gathering.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import type {
   AnalysisCheck,

@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import {
   decreeClauseAdd,

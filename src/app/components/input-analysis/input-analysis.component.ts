@@ -1,9 +1,14 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
-import { IconComponent } from '@components/icon/icon.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
-import { getEntriesByType } from '@helpers/content';
+import { IconComponent } from '@components/icon/icon.component';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisInputDef,
   AnalysisInputValue,

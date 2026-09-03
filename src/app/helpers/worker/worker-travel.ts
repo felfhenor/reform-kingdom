@@ -1,11 +1,14 @@
 import type { Signal } from '@angular/core';
 import { computed } from '@angular/core';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { travelPathTotalTicks, travelStepTicksCost } from '@helpers/hero/travel';
+import {
+  travelPathTotalTicks,
+  travelStepTicksCost,
+} from '@helpers/hero/travel';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -112,9 +115,10 @@ export function workerBeginReturnTrip(
   const worker = gamestate().workers[workerId];
   const kingdom = kingdomNodeGet();
 
-  const path = worker && kingdom
-    ? travelPathFrom(worker.location, kingdom.nodeName)
-    : undefined;
+  const path =
+    worker && kingdom
+      ? travelPathFrom(worker.location, kingdom.nodeName)
+      : undefined;
 
   updateGamestate((state) => {
     const target = state.workers[workerId];
@@ -147,7 +151,8 @@ export function workerAssign(
   if (!worker) return false;
 
   const assignment: WorkerAssignment = { nodeName, itemId };
-  if (!workerAssignmentIsValid(workerId, worker.level, assignment)) return false;
+  if (!workerAssignmentIsValid(workerId, worker.level, assignment))
+    return false;
 
   updateGamestate((state) => {
     const target = state.workers[workerId];
@@ -185,7 +190,10 @@ export function workerRecall(workerId: WorkerId): void {
 
   const worker = gamestate().workers[workerId];
   if (!worker) return;
-  if (worker.status.kind === 'TravelingBack' || worker.status.kind === 'AtDuchy') {
+  if (
+    worker.status.kind === 'TravelingBack' ||
+    worker.status.kind === 'AtDuchy'
+  ) {
     return;
   }
 
@@ -206,10 +214,15 @@ export function workerRecall(workerId: WorkerId): void {
 
 // Remaining ticks for a TravelingTo/TravelingBack worker, else undefined - drives the
 // "mm:ss remaining" status line, same math as the party's travelEtaSecondsTo.
-export function workerTravelRemainingTicks(workerId: WorkerId): number | undefined {
+export function workerTravelRemainingTicks(
+  workerId: WorkerId,
+): number | undefined {
   const worker = gamestate().workers[workerId];
   if (!worker) return undefined;
-  if (worker.status.kind !== 'TravelingTo' && worker.status.kind !== 'TravelingBack') {
+  if (
+    worker.status.kind !== 'TravelingTo' &&
+    worker.status.kind !== 'TravelingBack'
+  ) {
     return undefined;
   }
 

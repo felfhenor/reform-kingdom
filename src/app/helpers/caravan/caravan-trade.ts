@@ -3,7 +3,7 @@ import {
   caravanTradeMaxQuantity,
   caravanTradePrice,
 } from '@helpers/caravan/caravan-trade-quantity';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   applyRecipeDiscovery,
   isRecipeDiscovered,

@@ -5,8 +5,7 @@
  * granting resistance to it. Ported from `scripts/analyze-debuffresistance.ts`.
  */
 
-import { sortBy } from 'es-toolkit/compat';
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { formatWindows, gapWindows } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisCheck,
@@ -17,6 +16,7 @@ import type {
   StatusEffectContent,
   StatusEffectTag,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 // Keep in sync with `StatusEffectTag` in `src/app/interfaces/content-statuseffect.ts`.
 const ALL_STATUS_EFFECT_TAGS: StatusEffectTag[] = [
@@ -65,7 +65,9 @@ export function runDebuffResistanceAnalysis(
 
   ALL_STATUS_EFFECT_TAGS.forEach((tag) => {
     const equipmentSources = sortBy(
-      obtainableEquipment.filter((e) => (e.debuffResistances?.[tag] ?? 0) !== 0),
+      obtainableEquipment.filter(
+        (e) => (e.debuffResistances?.[tag] ?? 0) !== 0,
+      ),
       [(e: EquipmentContent) => e.levelRequirement ?? 0],
     );
     const itemSources = items.filter(

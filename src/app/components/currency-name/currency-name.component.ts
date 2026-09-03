@@ -7,9 +7,9 @@ import {
 } from '@angular/core';
 import { pluralize } from '@boringnode/pluralize';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { getEntry } from '@helpers/content/content';
+import type { ItemContent, ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { getEntry } from '../../helpers';
-import type { ItemContent, ItemId } from '../../interfaces';
 
 @Component({
   selector: 'app-currency-name',

@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import {
   ensureContent,
   hasContentInitializer,
-} from '@helpers/content-initializers';
+} from '@helpers/content/content-initializers';
 import type { ContentType, IsContentItem } from '@interfaces';
 
 const _allIdsByName = signal<Map<string, string>>(new Map());
@@ -32,9 +32,7 @@ export function getEntriesByType<T>(type: ContentType): T[] {
 }
 
 // Turns a fetched content bundle (keyed by subtype, e.g. `all.json`) into
-// the `allIdsByName`/`allContentById` signals - shared by `ContentService`
-// (browser) and the debug-dashboard CLI bootstrap (`scripts/debug/load-compiled-content.ts`)
-// so both read content through the exact same accessors below.
+// the `allIdsByName`/`allContentById` signals
 export function unfurlContent(
   assets: Record<string, IsContentItem[]>,
   onWarn?: (message: string) => void,

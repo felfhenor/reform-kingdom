@@ -25,7 +25,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
   worldNodeLevel: vi.fn(() => 0),
 }));
 
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { setAllMaps } from '@helpers/maps';

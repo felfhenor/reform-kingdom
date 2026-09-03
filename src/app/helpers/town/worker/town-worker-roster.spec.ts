@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -16,7 +16,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import {
@@ -196,9 +196,10 @@ describe('townWorkerStatusDisplay', () => {
   });
 
   it('labels an idle worker as at the town', () => {
-    expect(
-      townWorkerStatusDisplay(buildTown(), { kind: 'AtTown' }),
-    ).toEqual({ label: 'At Town', locationEntry: townEntry });
+    expect(townWorkerStatusDisplay(buildTown(), { kind: 'AtTown' })).toEqual({
+      label: 'At Town',
+      locationEntry: townEntry,
+    });
   });
 
   it('labels a traveling worker with its destination node', () => {

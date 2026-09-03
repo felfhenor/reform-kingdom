@@ -5,8 +5,7 @@
  * `scripts/analyze-nodelevels.ts`.
  */
 
-import { sortBy } from 'es-toolkit/compat';
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import {
   buildNodeNameToMap,
   formatWindows,
@@ -22,27 +21,39 @@ import type {
   GatheringContent,
   NodeLevelCheckEntry,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
-export function runNodeLevelsAnalysis(params: AnalysisParams): AnalysisRunResult {
+export function runNodeLevelsAnalysis(
+  params: AnalysisParams,
+): AnalysisRunResult {
   const gapSize = Number(params['gap'] ?? 4);
   if (!Number.isInteger(gapSize) || gapSize < 1) {
     throw new Error(`"gap" must be a positive integer, got ${params['gap']}.`);
   }
 
   const encounters = getEntriesByType<EncounterContent>('encounter');
-  const encounterRandoms = getEntriesByType<EncounterRandomContent>('encounterrandom');
+  const encounterRandoms =
+    getEntriesByType<EncounterRandomContent>('encounterrandom');
   const gatherings = getEntriesByType<GatheringContent>('gathering');
 
   const nodeNameToMap = buildNodeNameToMap();
 
   const entries: NodeLevelCheckEntry[] = [
-    ...encounters.map((n) => ({ name: n.name, kind: 'Encounter', levelRange: n.levelRange })),
+    ...encounters.map((n) => ({
+      name: n.name,
+      kind: 'Encounter',
+      levelRange: n.levelRange,
+    })),
     ...encounterRandoms.map((n) => ({
       name: n.name,
       kind: 'Encounter (Random)',
       levelRange: n.levelRange,
     })),
-    ...gatherings.map((n) => ({ name: n.name, kind: 'Gathering', levelRange: n.levelRange })),
+    ...gatherings.map((n) => ({
+      name: n.name,
+      kind: 'Gathering',
+      levelRange: n.levelRange,
+    })),
   ]
     .filter((n) => n.levelRange)
     .map((n) => ({ ...n, mapName: nodeNameToMap.get(n.name) ?? '(unplaced)' }));

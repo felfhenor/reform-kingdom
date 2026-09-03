@@ -15,7 +15,7 @@ import { SlotCompletionRewardComponent } from '@components/slot-completion-rewar
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { combatantFromMonster } from '@helpers/combat/combat-create';
 import { monsterStatsAtLevel } from '@helpers/combat/monster';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
 import {
   bestiaryDropQuantityLabel,

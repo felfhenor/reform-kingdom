@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
@@ -188,9 +188,7 @@ export function characterUnequipToArmory(
     character.equipment,
     previousItem.equipmentId,
   );
-  const equipmentContent = getEntry<EquipmentContent>(
-    previousItem.equipmentId,
-  );
+  const equipmentContent = getEntry<EquipmentContent>(previousItem.equipmentId);
 
   updateGamestate((state) => {
     state.armory = [...state.armory, previousItem];

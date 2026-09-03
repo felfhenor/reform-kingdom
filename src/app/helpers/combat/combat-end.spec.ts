@@ -47,7 +47,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
   recipeDropHtml: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -91,7 +91,7 @@ import {
 } from '@helpers/combat/combat-log';
 import { combatReset } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { recipeDiscover } from '@helpers/crafting/recipes';
 import {
   autoModeRecordClauseFailure,

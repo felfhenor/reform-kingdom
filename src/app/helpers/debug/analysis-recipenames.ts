@@ -4,7 +4,7 @@
  * Ported from `scripts/validate-recipenames.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
@@ -44,10 +44,13 @@ function expectedPrefix(
   if ('equipmentId' in result) {
     const type = equipmentTypeById.get(result.equipmentId);
     if (!type) return undefined;
-    return MAIN_HAND_EQUIPMENT_TYPES.has(type) ? PREFIXES.weapon : PREFIXES.equipment;
+    return MAIN_HAND_EQUIPMENT_TYPES.has(type)
+      ? PREFIXES.weapon
+      : PREFIXES.equipment;
   }
 
-  if ('itemId' in result && itemIds.has(result.itemId)) return PREFIXES.material;
+  if ('itemId' in result && itemIds.has(result.itemId))
+    return PREFIXES.material;
   if ('collectibleId' in result && collectibleIds.has(result.collectibleId)) {
     return PREFIXES.collectible;
   }
@@ -60,13 +63,20 @@ export function runRecipeNamesAnalysis(): AnalysisRunResult {
   const equipmentTypeById = new Map(
     getEntriesByType<EquipmentContent>('equipment').map((e) => [e.id, e.type]),
   );
-  const itemIds = new Set(getEntriesByType<ItemContent>('item').map((i) => i.id));
+  const itemIds = new Set(
+    getEntriesByType<ItemContent>('item').map((i) => i.id),
+  );
   const collectibleIds = new Set(
     getEntriesByType<CollectibleContent>('collectible').map((c) => c.id),
   );
 
   const checks: AnalysisCheck[] = recipes.map((recipe) => {
-    const prefix = expectedPrefix(recipe.result, equipmentTypeById, itemIds, collectibleIds);
+    const prefix = expectedPrefix(
+      recipe.result,
+      equipmentTypeById,
+      itemIds,
+      collectibleIds,
+    );
 
     if (!prefix) {
       return {

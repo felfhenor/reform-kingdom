@@ -13,7 +13,8 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
+import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
 import {
   astralProjectorCast,
@@ -31,7 +32,6 @@ import type {
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { notifySuccess } from '@helpers/engine/notify';
 
 type AstralProjectorRowViewModel = {
   content: AstralProjectorContent;

@@ -5,7 +5,7 @@ vi.mock('@helpers/caravan/caravan', () => ({
   isPartyAtCaravan: vi.fn(() => true),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -50,10 +50,13 @@ import {
   commissionRowViewModel,
   commissionTokenReward,
 } from '@helpers/commission/commission-fulfill';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
-import { applyMaterialDelta, getMaterialQuantity } from '@helpers/item/materials';
+import {
+  applyMaterialDelta,
+  getMaterialQuantity,
+} from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
@@ -458,7 +461,9 @@ describe('commissionFulfill', () => {
 });
 
 describe('commissionRowViewModel', () => {
-  const entry = { nodeName: 'Duchy Trading Caravan - Carrina' } as WorldNodeEntry;
+  const entry = {
+    nodeName: 'Duchy Trading Caravan - Carrina',
+  } as WorldNodeEntry;
   const caravan: CaravanContent = {
     id: caravanId,
     name: 'Duchy Trading Caravan - Carrina',
@@ -499,8 +504,8 @@ describe('commissionRowViewModel', () => {
       completed: false,
       generatedAt: 1000,
     });
-    vi.mocked(getEntry).mockImplementation((id) =>
-      (id === offer.id ? offer : wergenStick) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === offer.id ? offer : wergenStick) as never,
     );
     vi.mocked(getMaterialQuantity).mockReturnValue(100);
 

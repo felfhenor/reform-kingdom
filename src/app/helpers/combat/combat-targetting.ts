@@ -1,5 +1,5 @@
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   skillEpCost,
   skillTechniqueNumTargets,

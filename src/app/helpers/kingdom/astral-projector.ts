@@ -1,5 +1,5 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {

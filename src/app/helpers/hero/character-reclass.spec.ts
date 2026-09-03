@@ -21,7 +21,7 @@ vi.mock('uuid', () => ({
   v4: vi.fn(() => `mock-uuid-${mockUuidCounter++}`),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
 }));
@@ -39,7 +39,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {

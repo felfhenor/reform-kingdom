@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import type { WritableSignal } from '@angular/core';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { unfurlContent } from '@helpers/content';
+import { unfurlContent } from '@helpers/content/content';
 import { setAllMaps } from '@helpers/maps';
 import type { GameMap, IsContentItem } from '@interfaces';
 import { LoggerService } from '@services/logger.service';

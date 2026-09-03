@@ -1,18 +1,18 @@
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
+import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitigation';
 import { combatantIsDead } from '@helpers/combat/combat-end';
 import {
   combatantMessageToken,
   combatFormatMessage,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
-import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitigation';
 import { combatCombatantCombatStatValue } from '@helpers/combat/combat-stats';
 import {
   combatApplyStatusEffectToTarget,
   combatCreateStatusEffect,
   statusEffectTagResistance,
 } from '@helpers/combat/combat-statuseffects';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { luckReducedChance, luckRollSucceeds } from '@helpers/hero/luck';
 import {
   skillTechniqueDamageScalingStat,

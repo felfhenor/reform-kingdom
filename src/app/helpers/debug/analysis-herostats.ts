@@ -7,9 +7,8 @@
  * tie-break, raw pre-mitigation skill power).
  */
 
-import { maxBy, sumBy } from 'es-toolkit/compat';
 import { combatDamageMitigationExpectedValue } from '@helpers/combat/combat-damage-mitigation';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   addStats,
   filterByNames,
@@ -31,6 +30,7 @@ import type {
   StatBlock,
   StatusEffectContent,
 } from '@interfaces';
+import { maxBy, sumBy } from 'es-toolkit/compat';
 
 const CHARACTER_MAX_LEVEL = 99;
 
@@ -130,7 +130,12 @@ function bestEquipmentSet(
   });
 
   const bestTwoHanded = bestOfTypes(equipment, TWO_HANDED_TYPES, job, level);
-  const bestOneHanded = bestOfTypes(equipment, ONE_HANDED_WEAPON_TYPES, job, level);
+  const bestOneHanded = bestOfTypes(
+    equipment,
+    ONE_HANDED_WEAPON_TYPES,
+    job,
+    level,
+  );
   const bestOffhand = bestOfTypes(equipment, OFFHAND_ONLY_TYPES, job, level);
 
   const twoHandedValue = bestTwoHanded ? statSum(bestTwoHanded.baseStats) : -1;
@@ -157,7 +162,10 @@ function midpoint(min: StatBlock, max: StatBlock): StatBlock {
 }
 
 // Highest-level entry unlocked so far on each skill path.
-function heroSkillIdsAtLevel(job: JobContent, level: number): EquipmentSkillId[] {
+function heroSkillIdsAtLevel(
+  job: JobContent,
+  level: number,
+): EquipmentSkillId[] {
   return job.skillPath
     .map((path) => {
       const unlocked = path.levels.filter((entry) => entry.level <= level);
@@ -189,7 +197,10 @@ function techniqueRawValue(
   });
 }
 
-function statRow(job: JobContent, stats: StatBlock): Record<string, string | number> {
+function statRow(
+  job: JobContent,
+  stats: StatBlock,
+): Record<string, string | number> {
   const row: Record<string, string | number> = { Job: job.name };
   STAT_NAMES.forEach((stat) => {
     row[stat] = round2(stats[stat]);
@@ -206,7 +217,9 @@ function statRow(job: JobContent, stats: StatBlock): Record<string, string | num
   return row;
 }
 
-export function runHeroStatsAnalysis(params: AnalysisParams): AnalysisRunResult {
+export function runHeroStatsAnalysis(
+  params: AnalysisParams,
+): AnalysisRunResult {
   const level = Number(params['level'] ?? 50);
   if (!Number.isInteger(level) || level < 1 || level > CHARACTER_MAX_LEVEL) {
     throw new Error(
@@ -217,7 +230,10 @@ export function runHeroStatsAnalysis(params: AnalysisParams): AnalysisRunResult 
   const jobs = getEntriesByType<JobContent>('job');
   const equipment = getEntriesByType<EquipmentContent>('equipment');
 
-  const selectedJobs = filterByNames(jobs, params['classFilter'] as string[] | undefined);
+  const selectedJobs = filterByNames(
+    jobs,
+    params['classFilter'] as string[] | undefined,
+  );
   if (selectedJobs.length === 0) {
     throw new Error(
       `No classes matched "${params['classFilter']}". Available classes: ${jobs.map((job) => job.name).join(', ')}`,
@@ -247,7 +263,10 @@ export function runHeroStatsAnalysis(params: AnalysisParams): AnalysisRunResult 
       status: 'info',
       message: `${job.name} MAX gear: ${
         gearSet
-          .map((item) => `${item.name} (${item.type}, req L${item.levelRequirement})`)
+          .map(
+            (item) =>
+              `${item.name} (${item.type}, req L${item.levelRequirement})`,
+          )
           .join(', ') || '(nothing available to equip at this level)'
       }`,
     });
@@ -277,9 +296,15 @@ export function runHeroStatsAnalysis(params: AnalysisParams): AnalysisRunResult 
           Type: type,
           Elements: (technique.elements ?? []).join(', ') || '-',
           Targets: technique.targets,
-          'Min value': isValued ? Math.floor(techniqueRawValue(min, technique)) : '-',
-          'Mid value': isValued ? Math.floor(techniqueRawValue(mid, technique)) : '-',
-          'Max value': isValued ? Math.floor(techniqueRawValue(max, technique)) : '-',
+          'Min value': isValued
+            ? Math.floor(techniqueRawValue(min, technique))
+            : '-',
+          'Mid value': isValued
+            ? Math.floor(techniqueRawValue(mid, technique))
+            : '-',
+          'Max value': isValued
+            ? Math.floor(techniqueRawValue(max, technique))
+            : '-',
           'Status effects':
             (technique.statusEffects ?? [])
               .map(
@@ -301,12 +326,33 @@ export function runHeroStatsAnalysis(params: AnalysisParams): AnalysisRunResult 
     'Avg Mag Mit',
   ];
   const tables: AnalysisTable[] = [
-    { title: `MIN (unequipped) stats at level ${level}`, columns: statColumns, rows: minRows },
-    { title: `MID (average of min/max) stats at level ${level}`, columns: statColumns, rows: midRows },
-    { title: `MAX (best gear) stats at level ${level}`, columns: statColumns, rows: maxRows },
+    {
+      title: `MIN (unequipped) stats at level ${level}`,
+      columns: statColumns,
+      rows: minRows,
+    },
+    {
+      title: `MID (average of min/max) stats at level ${level}`,
+      columns: statColumns,
+      rows: midRows,
+    },
+    {
+      title: `MAX (best gear) stats at level ${level}`,
+      columns: statColumns,
+      rows: maxRows,
+    },
     {
       title: 'Skill damage/healing estimates (raw, pre-mitigation)',
-      columns: ['Skill', 'Type', 'Elements', 'Targets', 'Min value', 'Mid value', 'Max value', 'Status effects'],
+      columns: [
+        'Skill',
+        'Type',
+        'Elements',
+        'Targets',
+        'Min value',
+        'Mid value',
+        'Max value',
+        'Status effects',
+      ],
       rows: skillRows,
     },
   ];

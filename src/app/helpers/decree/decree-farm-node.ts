@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';

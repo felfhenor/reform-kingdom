@@ -5,7 +5,7 @@
  * collectible drop. Ported from `scripts/validate-completionrewards.ts`.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { allMaps } from '@helpers/maps';
 import type {
   AnalysisCheck,
@@ -21,14 +21,19 @@ const EXPLORE_NODE_TYPES = ['ExploreNode', 'ExploreRandomNode'];
 function hasCollectibleReward(
   encounter: EncounterContent | EncounterRandomContent,
 ): boolean {
-  return encounter.completionRewards.some((reward) => 'collectibleId' in reward);
+  return encounter.completionRewards.some(
+    (reward) => 'collectibleId' in reward,
+  );
 }
 
 export function runCompletionRewardsAnalysis(): AnalysisRunResult {
   const encounters = getEntriesByType<EncounterContent>('encounter');
-  const encounterRandoms = getEntriesByType<EncounterRandomContent>('encounterrandom');
+  const encounterRandoms =
+    getEntriesByType<EncounterRandomContent>('encounterrandom');
   const encountersByName = new Map(encounters.map((e) => [e.name, e]));
-  const encounterRandomsByName = new Map(encounterRandoms.map((e) => [e.name, e]));
+  const encounterRandomsByName = new Map(
+    encounterRandoms.map((e) => [e.name, e]),
+  );
 
   const checks: AnalysisCheck[] = [];
   let total = 0;
@@ -44,7 +49,9 @@ export function runCompletionRewardsAnalysis(): AnalysisRunResult {
 
     exploreNodes.forEach((node) => {
       total += 1;
-      const encounter = encountersByName.get(node.name) ?? encounterRandomsByName.get(node.name);
+      const encounter =
+        encountersByName.get(node.name) ??
+        encounterRandomsByName.get(node.name);
       const id = `${gameMap.name}:${node.name}`;
 
       if (encounter && hasCollectibleReward(encounter)) {

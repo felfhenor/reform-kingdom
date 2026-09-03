@@ -5,7 +5,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   kingdomNodeGet: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { hasGold, spendGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -201,13 +201,17 @@ describe('workerGainXp', () => {
 
   it('adds xp up to the cap', () => {
     vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildWorker({ xp: { current: 0, maximum: 10 } }) },
+      workers: {
+        [WORKER_ID]: buildWorker({ xp: { current: 0, maximum: 10 } }),
+      },
     } as unknown as GameState);
 
     workerGainXp(WORKER_ID, 4);
 
     const result = applyLastUpdate({
-      workers: { [WORKER_ID]: buildWorker({ xp: { current: 0, maximum: 10 } }) },
+      workers: {
+        [WORKER_ID]: buildWorker({ xp: { current: 0, maximum: 10 } }),
+      },
     } as unknown as GameState);
 
     expect(result.workers[WORKER_ID].xp.current).toBe(4);
@@ -215,13 +219,17 @@ describe('workerGainXp', () => {
 
   it('never banks past the current level cap', () => {
     vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildWorker({ xp: { current: 8, maximum: 10 } }) },
+      workers: {
+        [WORKER_ID]: buildWorker({ xp: { current: 8, maximum: 10 } }),
+      },
     } as unknown as GameState);
 
     workerGainXp(WORKER_ID, 100);
 
     const result = applyLastUpdate({
-      workers: { [WORKER_ID]: buildWorker({ xp: { current: 8, maximum: 10 } }) },
+      workers: {
+        [WORKER_ID]: buildWorker({ xp: { current: 8, maximum: 10 } }),
+      },
     } as unknown as GameState);
 
     expect(result.workers[WORKER_ID].xp.current).toBe(10);
@@ -260,7 +268,10 @@ describe('workerIsReadyToLevelUp', () => {
     vi.mocked(hasGold).mockReturnValue(true);
     expect(
       workerIsReadyToLevelUp(
-        buildWorker({ level: WORKER_MAX_LEVEL, xp: { current: 10, maximum: 10 } }),
+        buildWorker({
+          level: WORKER_MAX_LEVEL,
+          xp: { current: 10, maximum: 10 },
+        }),
       ),
     ).toBe(false);
   });
@@ -343,7 +354,9 @@ describe('workerLevelUp', () => {
   });
 
   it('fails when the worker does not exist', () => {
-    vi.mocked(gamestate).mockReturnValue({ workers: {} } as unknown as GameState);
+    vi.mocked(gamestate).mockReturnValue({
+      workers: {},
+    } as unknown as GameState);
 
     expect(workerLevelUp(WORKER_ID)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();

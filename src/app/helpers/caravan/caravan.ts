@@ -1,5 +1,5 @@
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';

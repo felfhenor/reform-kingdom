@@ -1,5 +1,5 @@
 import { isPartyAtCaravan } from '@helpers/caravan/caravan';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,

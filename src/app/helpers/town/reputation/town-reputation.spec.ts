@@ -33,12 +33,12 @@ describe('townReputationTierForAmount', () => {
     [0, 0],
     [99, 0],
     [100, 1],
-    [499, 1],
-    [500, 2],
-    [1499, 2],
-    [1500, 3],
-    [4999, 3],
-    [5000, 4],
+    [599, 1],
+    [600, 2],
+    [2099, 2],
+    [2100, 3],
+    [7099, 3],
+    [7100, 4],
     [999999, 4],
   ])('maps %i reputation to tier %i', (reputation, tier) => {
     expect(townReputationTierForAmount(reputation)).toBe(tier);
@@ -81,7 +81,7 @@ describe('townReputationTier', () => {
       world: { towns: { [townId]: { reputation: 1500 } } },
     } as unknown as GameState);
 
-    expect(townReputationTier(townId)).toBe(3);
+    expect(townReputationTier(townId)).toBe(2);
   });
 });
 
@@ -94,7 +94,7 @@ describe('townReputationDisplay', () => {
     expect(townReputationDisplay(townId)).toEqual({
       reputation: 250,
       tierName: 'Friendly',
-      nextThreshold: 500,
+      nextThreshold: 600,
       nextTierName: 'Honored',
     });
   });
@@ -114,7 +114,7 @@ describe('townReputationDisplay', () => {
 });
 
 describe('townReputationGain', () => {
-  it('adds the amount to the town\'s reputation', () => {
+  it("adds the amount to the town's reputation", () => {
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
     } as unknown as GameState;
@@ -127,7 +127,9 @@ describe('townReputationGain', () => {
 
   it('fires an analytics event tagged with the source', () => {
     vi.mocked(updateGamestate).mockImplementation(async (fn) =>
-      fn({ world: { towns: { [townId]: { reputation: 0 } } } } as unknown as GameState),
+      fn({
+        world: { towns: { [townId]: { reputation: 0 } } },
+      } as unknown as GameState),
     );
 
     townReputationGain(townId, 10, 'RaidDefense');

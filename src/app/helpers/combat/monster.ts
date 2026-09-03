@@ -1,7 +1,11 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { rngNumberRange } from '@helpers/rng';
-import type { EncounterFightMonster, MonsterContent, StatBlock } from '@interfaces';
+import type {
+  EncounterFightMonster,
+  MonsterContent,
+  StatBlock,
+} from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
 // A monster's stats at a given level - `baseStats` is its level-1 block,
@@ -44,10 +48,7 @@ export function xpForOverLevel(
   }
 
   const multiplier = 1 - OVERLEVEL_XP_DEGRADE_PER_LEVEL * levelsOverCap;
-  return Math.max(
-    OVERLEVEL_XP_HARD_CAP_AMOUNT,
-    Math.round(rawXp * multiplier),
-  );
+  return Math.max(OVERLEVEL_XP_HARD_CAP_AMOUNT, Math.round(rawXp * multiplier));
 }
 
 // Lets a node be judged not worth the trip before any fight happens (see `mostChallengingExploreNodeForRisk`), rather than only after.

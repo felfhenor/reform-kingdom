@@ -26,7 +26,7 @@ import {
   isCombatOrderFamilyUsable,
   isCombatOrderTargetModeUsable,
 } from '@helpers/combat/combat-order-evaluation';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
 import { heroSkillsAtLevel, heroSkillsWithEquipment } from '@helpers/hero/job';
 import { partyGet } from '@helpers/hero/party';

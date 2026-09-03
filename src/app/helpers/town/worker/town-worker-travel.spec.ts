@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -33,17 +33,17 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { travelPathTotalTicks } from '@helpers/hero/travel';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { updateGamestate } from '@helpers/state-game';
+import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import {
   townWorkerAssignmentIsValid,
   townWorkerBeginOutboundTrip,
   townWorkerBeginReturnTrip,
   townWorkerStaminaCostToNode,
 } from '@helpers/town/worker/town-worker-travel';
-import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import {
   worldNodeByName,
@@ -216,9 +216,7 @@ describe('townWorkerBeginOutboundTrip', () => {
     const state = applyLastUpdate({
       world: { towns: { [townId]: { workers: { [workerId]: {} } } } },
     } as unknown as GameState);
-    expect(
-      state.world.towns[townId].workers[workerId].status,
-    ).toMatchObject({
+    expect(state.world.towns[townId].workers[workerId].status).toMatchObject({
       kind: 'TravelingTo',
       nodeName: 'Wergen Woods',
       itemId: oreId,
@@ -250,9 +248,7 @@ describe('townWorkerBeginReturnTrip', () => {
         },
       },
     } as unknown as GameState);
-    expect(
-      state.world.towns[townId].workers[workerId].status,
-    ).toMatchObject({
+    expect(state.world.towns[townId].workers[workerId].status).toMatchObject({
       kind: 'TravelingBack',
       path,
       carriedItemId: oreId,

@@ -1,4 +1,4 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
   requirementAvailable,
@@ -31,8 +31,7 @@ import type {
   Tradeskill,
   TradeskillId,
 } from '@interfaces';
-import { ALL_TRADESKILLS } from '@interfaces';
-import { RARITY_PRIORITY } from '@interfaces';
+import { ALL_TRADESKILLS, RARITY_PRIORITY } from '@interfaces';
 import { orderBy, sumBy } from 'es-toolkit/compat';
 
 function buildRequirementEntry(

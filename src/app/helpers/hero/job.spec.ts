@@ -1,4 +1,4 @@
-import { setAllContentById } from '@helpers/content';
+import { setAllContentById } from '@helpers/content/content';
 import {
   getUnlockedJobs,
   heroSkillsAtLevel,

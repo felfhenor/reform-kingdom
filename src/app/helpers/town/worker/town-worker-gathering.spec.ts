@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -31,17 +31,17 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  townWorkerGatherRate,
+  townWorkerGatheringProcessTick,
+} from '@helpers/town/worker/town-worker-gathering';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import {
   townWorkerAssignmentIsValid,
   townWorkerBeginReturnTrip,
 } from '@helpers/town/worker/town-worker-travel';
-import {
-  townWorkerGatherRate,
-  townWorkerGatheringProcessTick,
-} from '@helpers/town/worker/town-worker-gathering';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import {
   worldNodeByName,

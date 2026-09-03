@@ -17,7 +17,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
   miscellaneousMessageLog: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
   getEntry: vi.fn(),
 }));
@@ -28,8 +28,9 @@ vi.mock('@helpers/hero/global-effects', () => ({
 }));
 
 vi.mock('@helpers/item/materials', async () => {
-  const actual =
-    await vi.importActual<typeof MaterialsModule>('@helpers/item/materials');
+  const actual = await vi.importActual<typeof MaterialsModule>(
+    '@helpers/item/materials',
+  );
   return {
     ...actual,
     getMaterialQuantity: vi.fn(),
@@ -51,7 +52,7 @@ vi.mock('@helpers/engine/timer', () => ({
 }));
 
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {

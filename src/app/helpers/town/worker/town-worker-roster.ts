@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';

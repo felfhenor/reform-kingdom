@@ -20,7 +20,7 @@ vi.mock('@helpers/item/collectible-source', () => ({
   getCollectibleSource: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
@@ -33,7 +33,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
 }));
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import {
   isRecipeDiscovered,
   isRecipeDropGated,
@@ -281,8 +281,7 @@ describe('Museum Helper Functions', () => {
   describe('recipeSourceNodeNames', () => {
     it('returns the names of encounters that can drop the recipe', () => {
       vi.mocked(getEntriesByType).mockImplementation(
-        (type) =>
-          (type === 'encounter' ? [fieldRuinsEncounter] : []) as never,
+        (type) => (type === 'encounter' ? [fieldRuinsEncounter] : []) as never,
       );
 
       expect(recipeSourceNodeNames(boneHewnCloakRecipe.id)).toEqual([
@@ -292,8 +291,7 @@ describe('Museum Helper Functions', () => {
 
     it('excludes encounters whose rewards do not include the recipe', () => {
       vi.mocked(getEntriesByType).mockImplementation(
-        (type) =>
-          (type === 'encounter' ? [fieldRuinsEncounter] : []) as never,
+        (type) => (type === 'encounter' ? [fieldRuinsEncounter] : []) as never,
       );
 
       expect(recipeSourceNodeNames(copperIngotRecipe.id)).toEqual([]);
@@ -301,8 +299,7 @@ describe('Museum Helper Functions', () => {
 
     it('returns the names of caravan traders that sell the recipe', () => {
       vi.mocked(getEntriesByType).mockImplementation(
-        (type) =>
-          (type === 'caravantrader' ? [alekiaTrader] : []) as never,
+        (type) => (type === 'caravantrader' ? [alekiaTrader] : []) as never,
       );
 
       expect(recipeSourceNodeNames(copperIngotRecipe.id)).toEqual([

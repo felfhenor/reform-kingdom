@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -8,7 +8,7 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import {
   applyTownMaterialDelta,
@@ -58,9 +58,7 @@ describe('applyTownMaterialDelta', () => {
   it('does nothing when the town has no state entry', () => {
     const state = { world: { towns: {} } } as unknown as GameState;
 
-    expect(() =>
-      applyTownMaterialDelta(state, townId, oreId, 5),
-    ).not.toThrow();
+    expect(() => applyTownMaterialDelta(state, townId, oreId, 5)).not.toThrow();
     expect(state.world.towns[townId]).toBeUndefined();
   });
 });

@@ -10,7 +10,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
@@ -18,7 +18,7 @@ vi.mock('@helpers/engine/logging', () => ({
   error: vi.fn(),
 }));
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { error } from '@helpers/engine/logging';
 import { collectibleSourceMapBuild } from '@helpers/item/collectible-source';
 

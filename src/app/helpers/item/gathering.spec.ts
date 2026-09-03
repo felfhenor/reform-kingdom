@@ -4,7 +4,7 @@ vi.mock('@helpers/hero/character-progress', () => ({
   partyGainXp: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -57,7 +57,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
 }));
 
 import { gatherMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
@@ -417,7 +417,11 @@ describe('gatheringProcessTick', () => {
     vi.mocked(getEntry).mockImplementation((id: string) => {
       if (id === 'gather-1') return gathering as never;
       if (id === 'wood')
-        return { name: 'Wergen Wood', sprite: 'wergen-wood', rarity: 'Common' } as never;
+        return {
+          name: 'Wergen Wood',
+          sprite: 'wergen-wood',
+          rarity: 'Common',
+        } as never;
       return undefined;
     });
     vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);

@@ -11,7 +11,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { setAllMaps } from '@helpers/maps';
 import {
   worldNodeDescription,
@@ -141,7 +141,7 @@ describe('worldNodeDescription', () => {
     expect(worldNodeDescription(buildEntry())).toBe('The town square.');
   });
 
-  it("reads the description from a town when nothing else matches", () => {
+  it('reads the description from a town when nothing else matches', () => {
     seedContent([buildTown({ description: 'A desert trade hub.' })]);
 
     expect(worldNodeDescription(buildEntry())).toBe('A desert trade hub.');

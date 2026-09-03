@@ -5,7 +5,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
 import { hasAnyCommission } from '@helpers/commission/commission-tick';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftQueueTicksRemaining,
   craftQueueTotalTicks,

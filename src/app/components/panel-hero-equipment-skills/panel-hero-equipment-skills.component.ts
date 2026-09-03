@@ -8,7 +8,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { RowSkillStatScalingComponent } from '@components/row-skill-stat-scaling/row-skill-stat-scaling.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { heroSkillsWithEquipment } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';

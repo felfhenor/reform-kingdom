@@ -5,7 +5,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -28,7 +28,7 @@ vi.mock('@helpers/worker/worker-progression', () => ({
   })),
 }));
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
 import { gamestate, updateGamestate } from '@helpers/state-game';

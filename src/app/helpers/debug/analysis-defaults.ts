@@ -7,7 +7,7 @@
  * content rather than an arbitrary number.
  */
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { buildMonsterLevels } from '@helpers/debug/analysis-item-sources';
 import type {
   EncounterContent,

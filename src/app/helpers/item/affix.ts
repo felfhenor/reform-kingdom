@@ -1,4 +1,4 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { rngChoiceRarity } from '@helpers/rng';
 import type {
   AffixContent,
@@ -82,8 +82,7 @@ export function affixEffectSum<K extends AffixEffect['kind']>(
   matches?: (effect: Extract<AffixEffect, { kind: K }>) => boolean,
 ): number {
   const matching = affixEffectsOfKind(effects, kind);
-  return sumBy(
-    matches ? matching.filter(matches) : matching,
-    (effect) => ('value' in effect ? effect.value : 0),
+  return sumBy(matches ? matching.filter(matches) : matching, (effect) =>
+    'value' in effect ? effect.value : 0,
   );
 }

@@ -4,7 +4,7 @@ import {
   combatApplyStatDeltaToCombatant,
 } from '@helpers/combat/combat-statuseffects';
 import { monsterStatsAtLevel } from '@helpers/combat/monster';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import {
   defaultAffinities,
   defaultStats,

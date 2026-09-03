@@ -15,7 +15,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftQueueTicksRemaining,
   craftQueueUnitsRemaining,

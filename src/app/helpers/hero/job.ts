@@ -1,4 +1,4 @@
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { mergeGrantedSkills } from '@helpers/hero/skill';
 import { equipmentGrantedSkillIds } from '@helpers/item/equipment';
 import type {

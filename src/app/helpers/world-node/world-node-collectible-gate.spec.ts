@@ -1,4 +1,8 @@
-import type { EncounterContent, TiledObject, WorldNodeEntry } from '@interfaces';
+import type {
+  EncounterContent,
+  TiledObject,
+  WorldNodeEntry,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/world-node/world-node-discovery', () => ({
@@ -15,7 +19,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
 }));
 
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate';
 import {

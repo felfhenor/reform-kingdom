@@ -1,6 +1,6 @@
 // Bounds worker/node reachability by each worker's real leveling progression, not just raw stamina.
 
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
 import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';

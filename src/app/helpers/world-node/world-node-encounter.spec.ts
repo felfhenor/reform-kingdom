@@ -15,7 +15,7 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import {

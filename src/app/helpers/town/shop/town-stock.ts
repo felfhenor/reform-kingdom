@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { gamestate } from '@helpers/state-game';
 import type {

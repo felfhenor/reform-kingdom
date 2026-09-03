@@ -14,7 +14,7 @@ import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node
 import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/status-worker-levelup.component';
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
   isWorldCameraPanned,
@@ -42,8 +42,8 @@ import {
   tileToScreenPosition,
   viewportTilesCalculate,
 } from '@helpers/pixi/pixi-camera';
-import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid';
 import { pixiFloatingTextCreate } from '@helpers/pixi/pixi-floating-text';
+import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid';
 import {
   pixiIndicatorEncounterProgressCreate,
   pixiIndicatorGatherProgressCreate,
@@ -62,8 +62,8 @@ import {
 } from '@helpers/pixi/pixi-travel-glide';
 import { gamestate } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
 import { workersTravelingTokens } from '@helpers/worker/worker-travel';
+import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
 import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
 import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status';
@@ -91,8 +91,8 @@ import type {
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
 import { clamp, maxBy, sumBy } from 'es-toolkit/compat';
-import { Container } from 'pixi.js';
 import type { Application, Graphics, Text, Texture } from 'pixi.js';
+import { Container } from 'pixi.js';
 import type { Subscription } from 'rxjs';
 
 const FADE_DURATION_MS = 300;
@@ -528,7 +528,8 @@ export class GamePlayWorldComponent implements OnDestroy {
   // Throttled: worldNodeLabelInfo() does up to 5 getEntry() lookups + string building per node - real
   // JS-side work even though the resulting Pixi setters are no-ops when unchanged.
   private maybeUpdateNodeStatus(now: number): void {
-    if (now - this.lastNodeStatusUpdateAt < NODE_STATUS_UPDATE_INTERVAL_MS) return;
+    if (now - this.lastNodeStatusUpdateAt < NODE_STATUS_UPDATE_INTERVAL_MS)
+      return;
     this.lastNodeStatusUpdateAt = now;
     this.updateNodeLabels();
     this.updateNodeWrapperVisibility();
@@ -878,10 +879,15 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.map.tilewidth,
       this.map.tileheight,
     );
-    this.nodeSelectionIndicator.position.set(screenPosition.x, screenPosition.y);
+    this.nodeSelectionIndicator.position.set(
+      screenPosition.x,
+      screenPosition.y,
+    );
   }
 
-  private async loadWorkerTokenTextures(workerId: WorkerId): Promise<Texture[]> {
+  private async loadWorkerTokenTextures(
+    workerId: WorkerId,
+  ): Promise<Texture[]> {
     const worker = getEntry<WorkerContent>(workerId);
     if (!worker) return [];
 
@@ -895,7 +901,11 @@ export class GamePlayWorldComponent implements OnDestroy {
       'art/spritesheets/worker.webp',
     );
 
-    return pixiSpriteFrameTexturesLoad(workerSpritesheetUrl, frame, worker.frames);
+    return pixiSpriteFrameTexturesLoad(
+      workerSpritesheetUrl,
+      frame,
+      worker.frames,
+    );
   }
 
   // Diffs `workersTravelingTokens()` against the currently-rendered sprites, creating/destroying/repositioning as needed.

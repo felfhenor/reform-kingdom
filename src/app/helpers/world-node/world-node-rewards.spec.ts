@@ -13,7 +13,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { setAllContentById, setAllIdsByName } from '@helpers/content';
+import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import {
   rewardContentInfo,
   worldNodeCompletionRewardProgress,

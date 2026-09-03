@@ -7,14 +7,13 @@
  * ...) are already-resolved ids rather than authored names.
  */
 
-import { sortBy } from 'es-toolkit/compat';
-import { getEntriesByType } from '@helpers/content';
-import { formatWindows, gapWindows } from '@helpers/debug/analysis-utils';
+import { getEntriesByType } from '@helpers/content/content';
 import {
   buildItemSources,
   buildMonsterLevels,
   earliestLevel,
 } from '@helpers/debug/analysis-item-sources';
+import { formatWindows, gapWindows } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisCheck,
   AnalysisParams,
@@ -31,6 +30,7 @@ import type {
   RecipeContent,
   TradeskillContent,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 // Keep in sync with `EquipmentItemType` in `src/app/interfaces/equipment.ts`.
 const ALL_EQUIPMENT_TYPES = [
@@ -158,8 +158,13 @@ function infusionChecks(
     }
 
     const entries = statItems
-      .map((item) => ({ name: item.name, level: earliestLevel(itemSources, item.id) }))
-      .filter((e): e is { name: string; level: number } => e.level !== undefined);
+      .map((item) => ({
+        name: item.name,
+        level: earliestLevel(itemSources, item.id),
+      }))
+      .filter(
+        (e): e is { name: string; level: number } => e.level !== undefined,
+      );
 
     const unsourced = statItems.filter(
       (item) => earliestLevel(itemSources, item.id) === undefined,
@@ -184,7 +189,11 @@ function infusionChecks(
       );
     }
 
-    const windows = gapWindows(entries.map((e) => e.level), maxContentLevel, gapSize);
+    const windows = gapWindows(
+      entries.map((e) => e.level),
+      maxContentLevel,
+      gapSize,
+    );
     checks.push(
       windows.length > 0
         ? {
@@ -250,7 +259,10 @@ function tradeskillChecks(
     recipesByTradeskill.set(r.tradeskillId, list);
   });
 
-  const topTradeskillLevel = Math.max(0, ...recipes.map((r) => r.maxTradeskillLevel));
+  const topTradeskillLevel = Math.max(
+    0,
+    ...recipes.map((r) => r.maxTradeskillLevel),
+  );
 
   tradeskills.forEach((tradeskill) => {
     const entries = recipesByTradeskill.get(tradeskill.id) ?? [];
@@ -322,7 +334,11 @@ export function runContentGapsAnalysis(
     getEntriesByType<CaravanTraderContent>('caravantrader');
   const tradeskills = getEntriesByType<TradeskillContent>('tradeskill');
 
-  const nodeRanges: LevelRange[] = [...encounters, ...encounterRandoms, ...gatherings]
+  const nodeRanges: LevelRange[] = [
+    ...encounters,
+    ...encounterRandoms,
+    ...gatherings,
+  ]
     .map((n) => n.levelRange)
     .filter(Boolean);
   const derivedMaxLevel = Math.max(0, ...nodeRanges.map((r) => r.max));

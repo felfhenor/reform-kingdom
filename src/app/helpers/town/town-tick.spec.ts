@@ -1,7 +1,7 @@
 import type * as TownWorkerRosterHelper from '@helpers/town/worker/town-worker-roster';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content', () => ({
+vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@helpers/town/worker/town-worker-roster', async (importOriginal) => {
   };
 });
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
