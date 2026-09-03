@@ -52,6 +52,8 @@ describe('townMarkVisited', () => {
       stock: [],
       workers: {},
       reputation: 0,
+      hiddenGold: 0,
+      materials: {},
       firstVisitedAtTick: 500,
     });
   });
@@ -94,6 +96,8 @@ describe('townMarkVisited', () => {
       stock: [],
       workers: {},
       reputation: 0,
+      hiddenGold: 0,
+      materials: {},
       firstVisitedAtTick: 500,
     });
   });
@@ -138,6 +142,45 @@ describe('townMarkVisited', () => {
     townMarkVisited(townId);
 
     expect(state.world.towns[townId].reputation).toBe(250);
+  });
+
+  it('preserves existing hiddenGold when activating', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, hiddenGold: 1200 } },
+      },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, hiddenGold: 1200 } },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].hiddenGold).toBe(1200);
+  });
+
+  it('preserves existing materials when activating', () => {
+    const materials = { 'copper-ore': 8 };
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, materials } },
+      },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, materials } },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].materials).toEqual(materials);
   });
 
   it('materializes the worker roster via townWorkerRosterMaterialize when the town resolves', () => {

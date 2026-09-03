@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { pruneInvalidTownStock } from '@helpers/town/shop/town-stock';
+import { pruneInvalidTownMaterials } from '@helpers/town/town-materials';
 import {
   pruneInvalidTownWorkers,
   townWorkerRosterMaterialize,
@@ -61,6 +62,8 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
         stock: pruneInvalidTownStock(towns[townId].stock ?? []),
         workers,
         reputation: towns[townId].reputation ?? 0,
+        hiddenGold: towns[townId].hiddenGold ?? 0,
+        materials: pruneInvalidTownMaterials(towns[townId].materials ?? {}),
       };
     }
   });

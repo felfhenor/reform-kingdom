@@ -14,6 +14,9 @@ export type TownStockEntry = {
   quantity: number;
 };
 
+// Raw materials workers have hauled back
+export type TownMaterials = Partial<Record<ItemId, number>>;
+
 export type TownNodeState = {
   // Undefined = not yet activated (crafting/workers/commissions stay inert until the player first visits).
   firstVisitedAtTick?: number;
@@ -22,6 +25,9 @@ export type TownNodeState = {
   workers: Record<WorkerId, TownWorkerState>;
   // Cumulative - never decreases except an explicit raid-loss penalty (Phase 9).
   reputation: number;
+  // Hidden gold trickle from worker gathering - capped at TownGatheringConfig.goldRequiredBeforeCutoff.
+  hiddenGold: number;
+  materials: TownMaterials;
 };
 
 export type GameStateTowns = {

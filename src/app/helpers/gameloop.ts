@@ -26,6 +26,7 @@ import {
   updateGamestate,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
+import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
 import { workersProcessTick } from '@helpers/worker/worker-tick';
 import { clamp } from 'es-toolkit/compat';
 
@@ -80,6 +81,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       craftProcessTick();
       restingProcessTick();
       workersProcessTick();
+      townWorkerProcessTick();
 
       if (currentCombat()) {
         combatDoCombatIteration();
