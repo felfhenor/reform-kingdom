@@ -77,6 +77,7 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
       opacity: 0.85;
       background: transparent;
       transition: opacity 300ms ease;
+      contain: content;
 
       &.entering,
       &.leaving {
