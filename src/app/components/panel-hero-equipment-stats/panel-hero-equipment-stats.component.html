@@ -14,9 +14,11 @@
   </div>
 }
 
-<div class="mt-2">
-  <span class="font-semibold text-xl">Combat Stats</span>
-</div>
+@if (combatStatRows().length > 0) {
+  <div class="mt-2">
+    <span class="font-semibold text-xl">Combat Stats</span>
+  </div>
+}
 
 @for (stat of combatStatRows(); track stat) {
   @let value = combatStats()[stat];
@@ -30,9 +32,11 @@
   </div>
 }
 
-<div class="mt-2">
-  <span class="font-semibold text-xl">Resistances</span>
-</div>
+@if (resistanceRows().length > 0) {
+  <div class="mt-2">
+    <span class="font-semibold text-xl">Resistances</span>
+  </div>
+}
 
 @for (stat of resistanceRows(); track stat) {
   @let value = resistances()[stat];
