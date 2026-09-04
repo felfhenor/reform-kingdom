@@ -110,8 +110,43 @@
         max: 5500
 
     guardian:
-      numGuardians: 3
-      guardianName: Larsian Citizen
+      reputationTiers:
+        - tier: 0
+          guardians:
+            - monsterId: Larsian Citizen
+              quantity: 3
+
+        - tier: 1
+          guardians:
+            - monsterId: Larsian Citizen
+              quantity: 2
+
+            - monsterId: Larsian Guard
+              quantity: 1
+
+        - tier: 2
+          guardians:
+            - monsterId: Larsian Citizen
+              quantity: 1
+
+            - monsterId: Larsian Guard
+              quantity: 2
+
+        - tier: 3
+          guardians:
+            - monsterId: Larsian Citizen
+              quantity: 1
+
+            - monsterId: Larsian Guard
+              quantity: 3
+
+        - tier: 4
+          guardians:
+            - monsterId: Larsian Citizen
+              quantity: 1
+
+            - monsterId: Larsian Guard
+              quantity: 5
 
     assaulter:
       numMonsters: 15

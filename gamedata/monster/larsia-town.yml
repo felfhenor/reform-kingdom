@@ -1,0 +1,95 @@
+- id: 512934d5-6801-4648-b2da-69b78f96f2ca
+  name: Larsian Citizen
+  description: A faithful citizen of Larsia.
+
+  sprite: '0112'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 0
+    max: 0
+    bonusPerLevel: 0
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Double Strike I
+      weight: 3
+
+    - skillId: Cure I
+      weight: 2
+
+  baseStats:
+    Health: 100
+    Energy: 55
+    Luck: 1
+    Intelligence: 15
+    Strength: 15
+    Vitality: 10
+    Resistance: 10
+    Agility: 5
+
+  statsPerLevel:
+    Health: 5
+    Energy: 2
+    Luck: 0.2
+    Intelligence: 0.3
+    Strength: 0.9
+    Vitality: 0.8
+    Resistance: 0.5
+    Agility: 0.3
+
+- id: 117491b9-6f30-481c-b3b3-acecb71aa6bc
+  name: Larsian Guard
+  description: A faithful guard of Larsia.
+
+  sprite: '0116'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 0
+    max: 0
+    bonusPerLevel: 0
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Double Strike II
+      weight: 3
+
+    - skillId: Sweep II
+      weight: 3
+
+  baseStats:
+    Health: 175
+    Energy: 55
+    Luck: 1
+    Intelligence: 10
+    Strength: 20
+    Vitality: 10
+    Resistance: 10
+    Agility: 5
+
+  statsPerLevel:
+    Health: 7
+    Energy: 2
+    Luck: 0.2
+    Intelligence: 0.3
+    Strength: 0.9
+    Vitality: 0.8
+    Resistance: 0.5
+    Agility: 0.3
