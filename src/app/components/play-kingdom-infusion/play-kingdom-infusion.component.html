@@ -134,19 +134,17 @@
 
                     <button
                       type="button"
-                      class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 py-2 text-neutral-content"
+                      class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 py-0 ps-0 text-neutral-content"
                       [disabled]="!affordable || !modifiable"
                       (click)="requestInfuse(entry.item.id)"
                     >
                       <div class="flex items-center gap-2">
-                        <div class="zoom-row shrink-0">
-                          <app-slot-icon-blank>
-                            <app-atlas-image
-                              spritesheet="item"
-                              [assetName]="entry.item.sprite"
-                            />
-                          </app-slot-icon-blank>
-                        </div>
+                        <app-slot-icon-blank>
+                          <app-atlas-image
+                            spritesheet="item"
+                            [assetName]="entry.item.sprite"
+                          />
+                        </app-slot-icon-blank>
                       </div>
 
                       <div class="pl-4 flex flex-col gap-2">
