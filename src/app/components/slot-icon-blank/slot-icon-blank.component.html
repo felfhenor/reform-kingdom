@@ -3,4 +3,8 @@
   [class.bg-gray-400]="showBackground()"
 >
   <ng-content></ng-content>
+
+  <span class="label-text label-text-br">
+    <ng-content select="[text-br]"></ng-content>
+  </span>
 </div>

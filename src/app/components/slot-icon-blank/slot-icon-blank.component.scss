@@ -1,0 +1,26 @@
+@reference 'tailwindcss';
+
+.label-text {
+  @apply absolute text-[14px] font-semibold text-white leading-none pointer-events-none;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+.label-text-br {
+  @apply bottom-0 right-0 px-1;
+}
+
+.label-text-bl {
+  @apply bottom-0 left-0 px-1;
+}
+
+.label-text-tr {
+  @apply top-0 right-0 px-1;
+}
+
+.label-text-tl {
+  @apply top-0 left-0 px-1;
+}

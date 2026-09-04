@@ -14,9 +14,8 @@
         spritesheet="collectible"
         [assetName]="e.collectible.sprite"
       />
+      <span text-br>{{ displayQuantity() }}</span>
     </app-slot-icon-blank>
-
-    <span class="museum-collectible-count">{{ displayQuantity() }}</span>
   </div>
 } @else {
   <div [tp]="tooltip" [tpPlacement]="'top'">

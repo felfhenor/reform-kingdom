@@ -15,11 +15,11 @@
 >
   <app-slot-icon-blank>
     <app-atlas-image spritesheet="item" [assetName]="item.sprite" />
+
+    <span text-br>{{ displayQuantity() }}</span>
   </app-slot-icon-blank>
 
   @if (isInfusable()) {
     <app-badge-infusable />
   }
-
-  <span class="storage-item-count">{{ displayQuantity() }}</span>
 </div>
