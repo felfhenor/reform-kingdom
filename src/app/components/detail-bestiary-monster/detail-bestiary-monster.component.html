@@ -1,17 +1,15 @@
 @let e = entry();
 
 <div class="flex flex-col gap-4">
-  <div class="flex items-center gap-4">
+  <div class="flex gap-4">
     @if (e.discovered) {
-      <div class="zoom-header">
-        <app-slot-icon-blank>
-          <app-atlas-animation
-            spritesheet="monster"
-            [assetName]="e.monster.sprite"
-            [frames]="e.monster.frames"
-          />
-        </app-slot-icon-blank>
-      </div>
+      <app-slot-icon-blank>
+        <app-atlas-animation
+          spritesheet="monster"
+          [assetName]="e.monster.sprite"
+          [frames]="e.monster.frames"
+        />
+      </app-slot-icon-blank>
 
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-3">
