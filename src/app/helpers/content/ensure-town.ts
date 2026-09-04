@@ -8,11 +8,14 @@ import {
 } from '@helpers/content/ensure-helpers-stats';
 import type {
   GlobalEffectId,
+  MonsterId,
   TownContent,
   TownCraftingConfig,
   TownDefenseAssaulterConfig,
   TownDefenseConfig,
   TownDefenseGuardianConfig,
+  TownDefenseGuardianEntry,
+  TownDefenseGuardianReputationTier,
   TownDefenseQuestsConfig,
   TownGatheringConfig,
   TownGatheringWorker,
@@ -106,12 +109,32 @@ function ensureTownReputation(
   };
 }
 
+function ensureTownDefenseGuardianEntry(
+  entry: Partial<TownDefenseGuardianEntry> = {},
+): TownDefenseGuardianEntry {
+  return {
+    monsterId: entry.monsterId ?? ('UNKNOWN' as MonsterId),
+    quantity: entry.quantity ?? 0,
+  };
+}
+
+function ensureTownDefenseGuardianReputationTier(
+  tier: Partial<TownDefenseGuardianReputationTier> = {},
+): TownDefenseGuardianReputationTier {
+  return {
+    tier: tier.tier ?? 0,
+    guardians: ensureArray(tier.guardians, ensureTownDefenseGuardianEntry),
+  };
+}
+
 function ensureTownDefenseGuardian(
   guardian: Partial<TownDefenseGuardianConfig> = {},
 ): TownDefenseGuardianConfig {
   return {
-    numGuardians: guardian.numGuardians ?? 0,
-    guardianName: guardian.guardianName ?? 'UNKNOWN',
+    reputationTiers: ensureArray(
+      guardian.reputationTiers,
+      ensureTownDefenseGuardianReputationTier,
+    ),
   };
 }
 

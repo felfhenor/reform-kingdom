@@ -51,6 +51,7 @@ export function combatMessageLog(
 ): void {
   const combatants = [
     ...(combat.heroes ?? []),
+    ...(combat.helpers ?? []),
     ...(combat.guardians ?? []),
   ].map((combatant) => ({
     id: combatant.id,

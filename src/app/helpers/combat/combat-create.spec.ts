@@ -27,6 +27,7 @@ vi.mock('@helpers/rng', () => ({
 import {
   combatantFromCharacter,
   combatantFromMonster,
+  combatantsFromTownGuardians,
 } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { defaultCombatStats } from '@helpers/defaults';
@@ -454,5 +455,84 @@ describe('combatantFromMonster', () => {
       { type: 'Random', jobId: rangerJob.id },
       { type: 'Random' },
     ]);
+  });
+});
+
+describe('combatantsFromTownGuardians', () => {
+  const citizen: MonsterContent = {
+    id: 'larsian-citizen' as MonsterId,
+    name: 'Larsian Citizen',
+    __type: 'monster',
+    description: '',
+    sprite: '0000',
+    frames: 4,
+    targetting: [{ type: 'Random' }],
+    baseStats: zeroStats(),
+    statsPerLevel: zeroStats(),
+    combatStats: defaultCombatStats(),
+    skills: [],
+  } as MonsterContent;
+
+  it('spawns one combatant per entry quantity', () => {
+    vi.mocked(getEntry).mockReturnValue(citizen as never);
+
+    const combatants = combatantsFromTownGuardians(
+      [{ monsterId: citizen.id, quantity: 3 }],
+      25,
+    );
+
+    expect(combatants).toHaveLength(3);
+    expect(combatants.every((c) => c.monsterId === citizen.id)).toBe(true);
+  });
+
+  // combatantFromMonster defaults isEnemy to true (it's built for the assaulter side too) -
+  // a helper fighting for the party must have that overridden, or targeting/turn-order treat it
+  // as an enemy of the party it's supposed to be defending.
+  it('fights for the party, not the assaulters', () => {
+    vi.mocked(getEntry).mockReturnValue(citizen as never);
+
+    const combatants = combatantsFromTownGuardians(
+      [{ monsterId: citizen.id, quantity: 2 }],
+      25,
+    );
+
+    expect(combatants.every((c) => c.isEnemy === false)).toBe(true);
+  });
+
+  it('assigns a unique letter suffix across entries, not restarted per entry', () => {
+    const guard: MonsterContent = {
+      ...citizen,
+      id: 'larsian-guard' as MonsterId,
+      name: 'Larsian Guard',
+    };
+    vi.mocked(getEntry).mockImplementation((id) =>
+      (id === citizen.id ? citizen : guard) as never,
+    );
+
+    const combatants = combatantsFromTownGuardians(
+      [
+        { monsterId: citizen.id, quantity: 2 },
+        { monsterId: guard.id, quantity: 2 },
+      ],
+      25,
+    );
+
+    expect(combatants.map((c) => c.name)).toEqual([
+      'Larsian Citizen Lv.25 [A]',
+      'Larsian Citizen Lv.25 [B]',
+      'Larsian Guard Lv.25 [C]',
+      'Larsian Guard Lv.25 [D]',
+    ]);
+  });
+
+  it('skips an entry whose monster id no longer resolves to content', () => {
+    vi.mocked(getEntry).mockReturnValue(undefined);
+
+    const combatants = combatantsFromTownGuardians(
+      [{ monsterId: citizen.id, quantity: 3 }],
+      25,
+    );
+
+    expect(combatants).toEqual([]);
   });
 });

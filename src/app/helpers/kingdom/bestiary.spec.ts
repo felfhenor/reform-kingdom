@@ -615,6 +615,35 @@ describe('Bestiary Helper Functions', () => {
       ]);
     });
 
+    it('excludes monsters referenced in any town guardian tier', () => {
+      const guardian: MonsterContent = { ...goblin, id: 'guardian' as MonsterId };
+      vi.mocked(getEntriesByType).mockImplementation((type) => {
+        if (type === 'monster') return [goblin, guardian] as never;
+        if (type === 'town')
+          return [
+            {
+              defense: {
+                guardian: {
+                  reputationTiers: [
+                    {
+                      tier: 0,
+                      guardians: [{ monsterId: guardian.id, quantity: 1 }],
+                    },
+                  ],
+                },
+              },
+            },
+          ] as never;
+        return [] as never;
+      });
+      vi.mocked(gamestate).mockReturnValue({ bestiary: {} } as unknown as GameState);
+      vi.mocked(isRewardDiscovered).mockReturnValue(false);
+
+      const entries = getBestiaryEntries();
+
+      expect(entries.map((entry) => entry.monster.id)).toEqual([goblin.id]);
+    });
+
     it('uses the actual found level range and locations for a discovered monster', () => {
       vi.mocked(getEntriesByType).mockImplementation((type) => {
         if (type === 'monster') return [goblin] as never;

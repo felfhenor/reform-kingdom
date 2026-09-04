@@ -6,6 +6,7 @@ import {
 import { rangeLabelAtLevel } from '@helpers/engine/leveled-range';
 import { rewardDisplayOrder } from '@helpers/item/loot';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { townGuardianMonsterIds } from '@helpers/town/town-guardian';
 import {
   isRewardDiscovered,
   rewardContentInfo,
@@ -167,7 +168,10 @@ export function bestiaryXpLabel(
 
 // Undiscovered monsters are still returned so the bestiary can render them as silhouettes instead of omitting them.
 export function getBestiaryEntries(): BestiaryEntry[] {
-  const monsters = getEntriesByType<MonsterContent>('monster');
+  const guardianMonsterIds = new Set(townGuardianMonsterIds());
+  const monsters = getEntriesByType<MonsterContent>('monster').filter(
+    (monster) => !guardianMonsterIds.has(monster.id),
+  );
 
   const entries = monsters.map((monster) => {
     const discovered = isMonsterDiscovered(monster.id);

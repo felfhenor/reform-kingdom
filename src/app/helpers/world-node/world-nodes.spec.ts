@@ -261,7 +261,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     reputation: { buff: { name: 'UNKNOWN', tiers: [] } },
     defense: {
       rewards: [],
-      guardian: { numGuardians: 0, guardianName: 'UNKNOWN' },
+      guardian: { reputationTiers: [] },
       assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
       quests: { commissions: [] },
     },

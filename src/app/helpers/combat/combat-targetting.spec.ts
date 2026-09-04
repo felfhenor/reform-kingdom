@@ -56,6 +56,7 @@ function buildCombat(overrides: Partial<Combat> = {}): Combat {
     locationPosition: { x: 0, y: 0 },
     rounds: 1,
     heroes: [],
+    helpers: [],
     guardians: [],
     ...overrides,
   };
@@ -343,6 +344,26 @@ describe('combatGetTargetsFromPriorityList', () => {
 });
 
 describe('combatSkillHasValidTargetsForMode', () => {
+  it('treats a town-guardian helper as an ally, alongside heroes', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const helper = buildCombatant({ id: 'helper-1', hp: 5 });
+    const combat = buildCombat({ heroes: [caster], helpers: [helper] });
+    const skill = buildSkill({
+      techniques: [buildTechnique({ targetType: 'Allies' })],
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatSkillHasValidTargetsForMode(
+        combat,
+        caster,
+        skill,
+        'SpecificHero',
+        { ...context, targetCharacterId: helper.id },
+      ),
+    ).toBe(true);
+  });
+
   it('is true when a technique pool can resolve the override mode', () => {
     const caster = buildCombatant({ id: 'caster' });
     const combat = buildCombat({ heroes: [caster] });

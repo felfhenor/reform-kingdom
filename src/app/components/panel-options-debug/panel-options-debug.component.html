@@ -386,6 +386,7 @@
             [(ngModel)]="selectedTownId"
           ></ng-select>
           <span></span>
+          <span></span>
 
           <span class="label-text text-right">Reputation</span>
           <input
@@ -402,6 +403,18 @@
             (click)="setTownReputation()"
           >
             Set
+          </button>
+
+          <span></span>
+          <span></span>
+
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:StartTownDefenseCombat"
+            (click)="startTownDefenseCombat()"
+          >
+            Start Defense Combat
           </button>
         </div>
       </div>

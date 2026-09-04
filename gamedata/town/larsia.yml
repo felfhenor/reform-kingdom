@@ -149,7 +149,7 @@
               quantity: 5
 
     assaulter:
-      numMonsters: 15
+      numMonsters: 12
       monsterIds:
         - Bloodmoth
         - Brightwisp
@@ -158,8 +158,8 @@
         - Akroki Vanguard
 
       level:
-        min: 20
-        max: 25
+        min: 15
+        max: 22
 
     quests:
       commissions:

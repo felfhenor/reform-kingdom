@@ -42,7 +42,7 @@ type CombatTurnResult = {
 
 function orderCombatantsByAgility(combat: Combat): Combatant[] {
   return sortBy(
-    [...combat.guardians, ...combat.heroes],
+    [...combat.guardians, ...combat.heroes, ...combat.helpers],
     (c) => -c.totalStats.Agility,
   );
 }

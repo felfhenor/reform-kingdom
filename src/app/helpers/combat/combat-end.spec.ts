@@ -84,7 +84,7 @@ vi.mock('@helpers/hero/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));
 
-import { combatCheckIfOver } from '@helpers/combat/combat-end';
+import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
 import {
   collectibleDropHtml,
   recipeDropHtml,
@@ -155,11 +155,34 @@ function buildCombat(overrides: Partial<Combat>): Combat {
     locationPosition: { x: 0, y: 0 },
     rounds: 1,
     heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
+    helpers: [],
     guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
     elementalModifiers: {} as never,
     ...overrides,
   };
 }
+
+describe('isCombatOver', () => {
+  it('is a loss once every hero is dead, even if a town-guardian helper is still alive', () => {
+    const combat = buildCombat({
+      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
+      helpers: [buildCombatant({ id: 'helper-1', hp: 10 })],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+    });
+
+    expect(isCombatOver(combat)).toBe(true);
+  });
+
+  it('is not over while at least one hero and one guardian are alive, regardless of helpers', () => {
+    const combat = buildCombat({
+      heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
+      helpers: [buildCombatant({ id: 'helper-1', hp: 0 })],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+    });
+
+    expect(isCombatOver(combat)).toBe(false);
+  });
+});
 
 describe('combatCheckIfOver', () => {
   beforeEach(() => {

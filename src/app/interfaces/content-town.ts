@@ -81,9 +81,18 @@ export type TownReputationConfig = {
   buff: TownReputationBuffConfig;
 };
 
+export type TownDefenseGuardianEntry = {
+  monsterId: MonsterId;
+  quantity: number;
+};
+
+export type TownDefenseGuardianReputationTier = {
+  tier: number;
+  guardians: TownDefenseGuardianEntry[];
+};
+
 export type TownDefenseGuardianConfig = {
-  numGuardians: number;
-  guardianName: string;
+  reputationTiers: TownDefenseGuardianReputationTier[];
 };
 
 export type TownDefenseAssaulterConfig = {

@@ -28,6 +28,7 @@ import type {
   JobContent,
   MonsterContent,
   StatusEffectTag,
+  TownDefenseGuardianEntry,
 } from '@interfaces';
 
 function heroUsableSkillIds(
@@ -201,11 +202,29 @@ export function combatantFromMonster(
   };
 }
 
+export function combatantsFromTownGuardians(
+  entries: TownDefenseGuardianEntry[],
+  level: number,
+): Combatant[] {
+  const monsters = entries.flatMap((entry) => {
+    const monster = getEntry<MonsterContent>(entry.monsterId);
+    if (!monster) return [];
+
+    return Array.from({ length: entry.quantity }, () => monster);
+  });
+
+  return monsters.map((monster, i) => ({
+    ...combatantFromMonster(monster, level, i),
+    isEnemy: false,
+  }));
+}
+
 export function combatCreateForEncounter(
   party: Character[],
   monsters: MonsterContent[],
   encounterLevel: number,
   locationName = 'Unknown',
+  helpers: Combatant[] = [],
 ): Combat {
   const heroes: Combatant[] = party.map((character) =>
     combatantFromCharacter(character),
@@ -221,6 +240,7 @@ export function combatCreateForEncounter(
     locationPosition: { x: 0, y: 0 },
     rounds: 0,
     heroes,
+    helpers,
     guardians,
   };
 }

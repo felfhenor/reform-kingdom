@@ -159,6 +159,8 @@ export type Combat = {
   locationPosition: { x: number; y: number };
   rounds: number;
   heroes: Combatant[];
+  // Town NPC allies (e.g. raid defenders) - fight alongside heroes but don't count toward the loss check.
+  helpers: Combatant[];
   guardians: Combatant[];
 
   encounterId?: EncounterId;

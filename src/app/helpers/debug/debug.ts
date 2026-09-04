@@ -1,3 +1,7 @@
+import {
+  combatantsFromTownGuardians,
+  combatCreateForEncounter,
+} from '@helpers/combat/combat-create';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   isRecipeDropGated,
@@ -14,6 +18,7 @@ import {
   CHARACTER_MAX_LEVEL,
   characterStatsForLevel,
   characterXpForLevel,
+  partyGet,
 } from '@helpers/hero/party';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
@@ -26,6 +31,7 @@ import {
 import { updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
+import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import {
   WORKER_MAX_LEVEL,
@@ -335,6 +341,45 @@ export function debugSetTownReputation(
     if (!town) return state;
 
     town.reputation = clamped;
+    return state;
+  });
+}
+
+// Spins up a combat pairing a town's current-reputation guardians (as
+// `helpers`) against its assaulter pool - manual testing scaffold for the
+// combat-side raid plumbing, not the real raid generation/telegraph system.
+export function debugStartTownDefenseCombat(townId: TownId): void {
+  const town = getEntry<TownContent>(townId);
+  if (!town) {
+    console.warn(`Could not find a town with matching id ${townId}.`);
+    return;
+  }
+
+  const { monsterIds, numMonsters, level } = town.defense.assaulter;
+  if (monsterIds.length === 0) {
+    console.warn(`Town ${town.name} has no assaulter monsters authored.`);
+    return;
+  }
+
+  const helpers = combatantsFromTownGuardians(
+    townGuardiansForCurrentReputation(town),
+    town.level,
+  );
+
+  const enemies = Array.from({ length: numMonsters }, (_, i) =>
+    getEntry<MonsterContent>(monsterIds[i % monsterIds.length]),
+  ).filter((monster): monster is MonsterContent => !!monster);
+
+  const combat = combatCreateForEncounter(
+    partyGet(),
+    enemies,
+    level.max,
+    town.name,
+    helpers,
+  );
+
+  updateGamestate((state) => {
+    state.world.combat = combat;
     return state;
   });
 }

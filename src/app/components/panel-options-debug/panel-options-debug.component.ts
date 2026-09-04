@@ -20,6 +20,7 @@ import {
   debugSetTownReputation,
   debugSetTradeskillLevel,
   debugSetWorkerLevel,
+  debugStartTownDefenseCombat,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug';
 import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
@@ -224,5 +225,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!townId) return;
 
     debugSetTownReputation(townId, this.townReputationValue());
+  }
+
+  public startTownDefenseCombat(): void {
+    const townId = this.selectedTownId();
+    if (!townId) return;
+
+    debugStartTownDefenseCombat(townId);
   }
 }

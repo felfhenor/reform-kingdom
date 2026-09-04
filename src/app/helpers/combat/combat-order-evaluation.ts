@@ -46,12 +46,16 @@ function energyPercent(combatant: Combatant): number {
 
 // The caster counts as their own ally; dead combatants are excluded.
 function livingAllies(combat: Combat, combatant: Combatant): Combatant[] {
-  const pool = combatant.isEnemy ? combat.guardians : combat.heroes;
+  const pool = combatant.isEnemy
+    ? combat.guardians
+    : [...combat.heroes, ...combat.helpers];
   return pool.filter((c) => !combatantIsDead(c));
 }
 
 function livingEnemies(combat: Combat, combatant: Combatant): Combatant[] {
-  const pool = combatant.isEnemy ? combat.heroes : combat.guardians;
+  const pool = combatant.isEnemy
+    ? [...combat.heroes, ...combat.helpers]
+    : combat.guardians;
   return pool.filter((c) => !combatantIsDead(c));
 }
 

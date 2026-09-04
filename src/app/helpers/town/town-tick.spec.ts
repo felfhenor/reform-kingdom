@@ -76,7 +76,14 @@ const town: TownContent = {
   },
   defense: {
     rewards: [],
-    guardian: { numGuardians: 3, guardianName: 'Larsian Citizen' },
+    guardian: {
+      reputationTiers: [
+        {
+          tier: 0,
+          guardians: [{ monsterId: 'Larsian Citizen' as never, quantity: 3 }],
+        },
+      ],
+    },
     assaulter: { numMonsters: 15, monsterIds: [], level: { min: 20, max: 25 } },
     quests: { commissions: [] },
   },

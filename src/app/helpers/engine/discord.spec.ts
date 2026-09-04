@@ -80,6 +80,7 @@ function buildCombat(overrides: Partial<Combat> = {}): Combat {
     locationPosition: { x: 0, y: 0 },
     rounds: 0,
     heroes: [],
+    helpers: [],
     guardians: [],
     ...overrides,
   } as Combat;

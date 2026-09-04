@@ -4,6 +4,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { StatusHelperComponent } from '@components/status-helper/status-helper.component';
 import { StatusHeroComponent } from '@components/status-hero/status-hero.component';
 import { StatusMonsterComponent } from '@components/status-monster/status-monster.component';
 import { getOption } from '@helpers/state-options';
@@ -11,7 +12,7 @@ import { getOption } from '@helpers/state-options';
 @Component({
   selector: 'app-status-encounter',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StatusHeroComponent, StatusMonsterComponent],
+  imports: [StatusHeroComponent, StatusHelperComponent, StatusMonsterComponent],
   template: `
     <div
       class="encounter-status"
@@ -19,6 +20,7 @@ import { getOption } from '@helpers/state-options';
       (mouseleave)="setHovered(false)"
     >
       <app-status-hero [expanded]="isExpanded()"></app-status-hero>
+      <app-status-helper [expanded]="isExpanded()"></app-status-helper>
       <app-status-monster [expanded]="isExpanded()"></app-status-monster>
     </div>
   `,

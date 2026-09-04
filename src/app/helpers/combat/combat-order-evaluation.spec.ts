@@ -24,6 +24,7 @@ function buildCombat(overrides: Partial<Combat> = {}): Combat {
     locationPosition: { x: 0, y: 0 },
     rounds: 1,
     heroes: [],
+    helpers: [],
     guardians: [],
     ...overrides,
   };
@@ -218,6 +219,30 @@ describe('combatOrderConditionMatches', () => {
         caster,
       ),
     ).toBe(false);
+  });
+
+  it('AllyCountHealthPercent counts town-guardian helpers as allies, alongside heroes', () => {
+    const caster = buildCombatant({ id: 'caster', hp: 40 });
+    const lowHpHelper = buildCombatant({ id: 'helper-1', hp: 10 });
+
+    const combatWithHelper = buildCombat({
+      heroes: [caster],
+      helpers: [lowHpHelper],
+    });
+
+    expect(
+      combatOrderConditionMatches(
+        {
+          type: 'AllyCountHealthPercent',
+          healthDirection: 'Below',
+          healthPercent: 75,
+          comparator: 'GreaterThanOrEqual',
+          count: 2,
+        },
+        combatWithHelper,
+        caster,
+      ),
+    ).toBe(true);
   });
 
   it('AllyCountHealthPercent (Above) counts allies strictly above the threshold', () => {

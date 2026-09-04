@@ -79,9 +79,10 @@ function getBaseCombatantTargetListForSkillTechnique(
   skill: EquipmentSkill,
   technique: EquipmentSkillContentTechnique,
 ): Combatant[] {
+  const heroSide = [...combat.heroes, ...combat.helpers];
   const myType = combatant.isEnemy ? 'guardian' : 'hero';
-  let allies = myType === 'guardian' ? combat.guardians : combat.heroes;
-  let enemies = myType === 'guardian' ? combat.heroes : combat.guardians;
+  let allies = myType === 'guardian' ? combat.guardians : heroSide;
+  let enemies = myType === 'guardian' ? heroSide : combat.guardians;
 
   const shouldReverse = combatCombatantCombatStatSucceedsChance(
     combatant,

@@ -97,6 +97,7 @@ describe('encounterRandomStartFight', () => {
       locationPosition: { x: 0, y: 0 },
       rounds: 0,
       heroes: [],
+      helpers: [],
       guardians: [],
     } as unknown as Combat;
     vi.mocked(combatCreateForEncounter).mockReturnValue(builtCombat);
@@ -170,6 +171,7 @@ describe('encounterRandomHandleVictory', () => {
       locationPosition: { x: 0, y: 0 },
       rounds: 0,
       heroes: [],
+      helpers: [],
       guardians: [],
     } as unknown as Combat);
 

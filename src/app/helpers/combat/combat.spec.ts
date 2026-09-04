@@ -78,6 +78,7 @@ function buildCombat(): Combat {
     locationPosition: { x: 0, y: 0 },
     rounds: 1,
     heroes: [],
+    helpers: [],
     guardians: [],
   };
 }
