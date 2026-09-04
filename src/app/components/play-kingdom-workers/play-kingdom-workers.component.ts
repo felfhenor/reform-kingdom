@@ -12,6 +12,7 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
@@ -96,6 +97,7 @@ type EntryStatusDisplay = {
     NgLabelTemplateDirective,
     DecimalPipe,
     TippyDirective,
+    SlotIconBlankComponent,
   ],
   templateUrl: './play-kingdom-workers.component.html',
   styleUrl: './play-kingdom-workers.component.scss',

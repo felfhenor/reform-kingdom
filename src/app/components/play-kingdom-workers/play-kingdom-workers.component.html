@@ -57,12 +57,14 @@
           @let stats = selectedStats();
 
           <div class="flex items-center gap-4">
-            <div class="zoom-header shrink-0">
-              <app-atlas-animation
-                spritesheet="worker"
-                [assetName]="entry.content.sprite"
-                [frames]="entry.content.frames"
-              />
+            <div class="shrink-0">
+              <app-slot-icon-blank>
+                <app-atlas-animation
+                  spritesheet="worker"
+                  [assetName]="entry.content.sprite"
+                  [frames]="entry.content.frames"
+                />
+              </app-slot-icon-blank>
             </div>
 
             <div class="flex flex-col items-start gap-2">
