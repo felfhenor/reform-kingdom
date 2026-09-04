@@ -3,10 +3,10 @@ import { craftXpChance } from '@helpers/crafting/tradeskill';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
-import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import { townTradeskillLeveledUp } from '@helpers/town/crafting/town-craft-level';
-import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
+import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
+import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import {
   isTownDueForUpdate,
@@ -16,49 +16,34 @@ import type {
   CraftQueueEntryId,
   GameState,
   RecipeContent,
-  RecipeResult,
   TownContent,
   TownCraftQueueEntry,
   TownId,
   TownNodeState,
-  TownStockEntry,
 } from '@interfaces';
 
 // Runs every tick once activated, same reasoning as WORKER_TICK_INTERVAL - craft progress is continuous.
 const CRAFT_TICK_INTERVAL = 1;
 
-// A result that stacks onto an existing item entry (applyTownStockAdd's own rule) never needs a free slot.
-function craftResultNeedsNewSlot(
-  stock: TownStockEntry[],
-  result: RecipeResult,
-): boolean {
-  if ('itemId' in result) {
-    return !stock.some(
-      (entry) => 'itemId' in entry && entry.itemId === result.itemId,
-    );
-  }
-  return true;
-}
-
-// Grants the recipe's result unconditionally - the caller has already decided the craft succeeds.
-function grantCraftedStock(
+// Grants the result unconditionally (the caller already decided the craft succeeds) - a material result
+// feeds the materials stash directly, only equipment lands in stock.
+function grantCraftedResult(
   state: GameState,
   townId: TownId,
   recipe: RecipeContent,
 ): void {
-  const cap = townShopItemCap(townId);
-
   if ('itemId' in recipe.result) {
-    applyTownStockAdd(
+    applyTownMaterialDelta(
       state,
       townId,
-      { itemId: recipe.result.itemId, quantity: recipe.result.quantity ?? 1 },
-      cap,
+      recipe.result.itemId,
+      recipe.result.quantity ?? 1,
     );
     return;
   }
 
   if ('equipmentId' in recipe.result) {
+    const cap = townShopItemCap(townId);
     applyTownStockAdd(
       state,
       townId,
@@ -79,15 +64,14 @@ function resolveQueueEntryCompletion(
   const building = target.tradeskills[entry.tradeskillId];
   if (!building) return true; // orphaned tradeskill - drop the entry defensively
 
-  // Unlike the player (whose result can whiff on recipe.result.chance), a town's craft always succeeds.
   if (
-    craftResultNeedsNewSlot(target.stock, recipe.result) &&
+    'equipmentId' in recipe.result &&
     target.stock.length >= townShopItemCap(town.id)
   ) {
     return false;
   }
 
-  grantCraftedStock(state, town.id, recipe);
+  grantCraftedResult(state, town.id, recipe);
 
   // Mirrors the player's resolveCraftUnit: XP odds taper off as the tradeskill outlevels the recipe.
   const xpChance = craftXpChance(recipe, building.level);
@@ -120,7 +104,13 @@ function advanceQueueEntry(
   const ticksIntoCraft = entry.ticksIntoCraft + 1;
   if (ticksIntoCraft < craftTime) return { ...entry, ticksIntoCraft };
 
-  const completed = resolveQueueEntryCompletion(state, town, target, entry, recipe);
+  const completed = resolveQueueEntryCompletion(
+    state,
+    town,
+    target,
+    entry,
+    recipe,
+  );
   return completed ? undefined : { ...entry, ticksIntoCraft };
 }
 

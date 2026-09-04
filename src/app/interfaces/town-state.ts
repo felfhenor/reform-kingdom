@@ -11,16 +11,12 @@ import type { TownWorkerState } from '@interfaces/town-worker-state';
 // Each subsystem gates off its own key here, not a single shared tick field, so a fast one can't starve a slow one's due-check.
 export type TownTickSubsystem = 'worker' | 'craft' | 'raid' | 'quest' | 'shop';
 
-// Materials stack by quantity; a crafted equipment item is always its own entry (rolled
-// affixes make each one distinct, mirroring how the player's own armory is a flat item list).
-// addedAtTick drives TownTradersConfig.itemExpirationTimer - applyTownStockAdd resets it on every restock.
-export type TownStockEntry =
-  | { itemId: ItemId; quantity: number; addedAtTick: number }
-  | { equipmentItem: EquipmentItem; addedAtTick: number };
+export type TownStockEntry = {
+  equipmentItem: EquipmentItem;
+  addedAtTick: number;
+};
 
-// What a caller supplies to applyTownStockAdd (which stamps addedAtTick itself) - written out rather than Omit<TownStockEntry, 'addedAtTick'> since Omit doesn't distribute over a union.
-export type TownStockAddition =
-  { itemId: ItemId; quantity: number } | { equipmentItem: EquipmentItem };
+export type TownStockAddition = Omit<TownStockEntry, 'addedAtTick'>;
 
 // Raw materials workers have hauled back
 export type TownMaterials = Partial<Record<ItemId, number>>;
@@ -71,7 +67,8 @@ export type TownStockRow = {
   index: number;
   entry: TownStockEntry;
   price?: number;
-  maxQuantity: number;
+  // A town's shop stock is always single rolled equipment instances - "can I afford one", not a quantity range.
+  affordable: boolean;
   // Pre-formatted (formatDuration) time left before this entry cycles out - undefined when the town has expiration disabled (itemExpirationTimer <= 0).
   expiresIn?: string;
 };

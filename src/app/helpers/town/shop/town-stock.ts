@@ -12,7 +12,6 @@ import type {
   CombatStatBlock,
   EquipmentContent,
   GameState,
-  ItemContent,
   ItemPreviewDisplay,
   StatBlock,
   StatusEffectBlock,
@@ -29,8 +28,6 @@ export function townStock(townId: TownId): TownStockEntry[] {
 export function townStockDisplay(
   entry: TownStockEntry,
 ): ItemPreviewDisplay | undefined {
-  if ('itemId' in entry) return resolveRewardDisplay({ itemId: entry.itemId });
-
   const display = resolveRewardDisplay({
     equipmentId: entry.equipmentItem.equipmentId,
   });
@@ -43,29 +40,21 @@ export function townStockDisplay(
   };
 }
 
-// Affix/infusion bonus rows for a rolled equipment entry's tooltip (mirrors slot-armory-item's bonusStats/etc) - undefined for a stacked item entry, which has nothing to roll.
-export function townStockBonusStats(
-  entry: TownStockEntry,
-): StatBlock | undefined {
-  return 'equipmentItem' in entry
-    ? equipmentItemBonusStats(entry.equipmentItem)
-    : undefined;
+// Affix/infusion bonus rows for a rolled stock entry's tooltip - mirrors slot-armory-item's bonusStats/etc.
+export function townStockBonusStats(entry: TownStockEntry): StatBlock {
+  return equipmentItemBonusStats(entry.equipmentItem);
 }
 
 export function townStockBonusResistances(
   entry: TownStockEntry,
-): StatusEffectBlock | undefined {
-  return 'equipmentItem' in entry
-    ? equipmentItemBonusResistances(entry.equipmentItem)
-    : undefined;
+): StatusEffectBlock {
+  return equipmentItemBonusResistances(entry.equipmentItem);
 }
 
 export function townStockBonusCombatStats(
   entry: TownStockEntry,
-): CombatStatBlock | undefined {
-  return 'equipmentItem' in entry
-    ? equipmentItemBonusCombatStats(entry.equipmentItem)
-    : undefined;
+): CombatStatBlock {
+  return equipmentItemBonusCombatStats(entry.equipmentItem);
 }
 
 // Formatted (formatDuration) time left before this entry cycles out - undefined when the town has expiration disabled (itemExpirationTimer <= 0).
@@ -76,19 +65,20 @@ export function townStockExpiresIn(
   const { itemExpirationTimer } = town.traders;
   if (itemExpirationTimer <= 0) return undefined;
 
-  const remaining = itemExpirationTimer - (timerTicksElapsed() - entry.addedAtTick);
+  const remaining =
+    itemExpirationTimer - (timerTicksElapsed() - entry.addedAtTick);
   return formatDuration(remaining);
 }
 
-// Drops entries whose itemId/equipmentId no longer resolves, and backfills a legacy entry's missing addedAtTick to now (not zero, so it doesn't instantly expire).
+// Drops entries whose equipmentId no longer resolves
 export function pruneInvalidTownStock(
   stock: TownStockEntry[],
 ): TownStockEntry[] {
   return stock
-    .filter((entry) =>
-      'itemId' in entry
-        ? !!getEntry<ItemContent>(entry.itemId)
-        : !!getEntry<EquipmentContent>(entry.equipmentItem.equipmentId),
+    .filter(
+      (entry) =>
+        !!entry.equipmentItem &&
+        !!getEntry<EquipmentContent>(entry.equipmentItem.equipmentId),
     )
     .map((entry) =>
       entry.addedAtTick === undefined
@@ -97,7 +87,7 @@ export function pruneInvalidTownStock(
     );
 }
 
-// Stacks onto a matching itemId entry, resetting its addedAtTick (a restock counts as fresh, extending the whole stack's life); equipment (rolled, never merged) always lands as its own new entry.
+// Always lands as its own new entry (rolled equipment is never merged) - capped, so a full shop simply refuses the addition.
 export function applyTownStockAdd(
   state: GameState,
   townId: TownId,
@@ -106,27 +96,11 @@ export function applyTownStockAdd(
 ): void {
   const target = state.world.towns[townId];
   if (!target) return;
-
-  if ('itemId' in addition) {
-    const existingIndex = target.stock.findIndex(
-      (entry) => 'itemId' in entry && entry.itemId === addition.itemId,
-    );
-    if (existingIndex !== -1) {
-      target.stock = target.stock.map((entry, i) =>
-        i === existingIndex && 'itemId' in entry
-          ? {
-              ...entry,
-              quantity: entry.quantity + addition.quantity,
-              addedAtTick: timerTicksElapsed(),
-            }
-          : entry,
-      );
-      return;
-    }
-  }
-
   if (target.stock.length >= cap) return;
 
-  const entry: TownStockEntry = { ...addition, addedAtTick: timerTicksElapsed() };
+  const entry: TownStockEntry = {
+    ...addition,
+    addedAtTick: timerTicksElapsed(),
+  };
   target.stock = [...target.stock, entry];
 }

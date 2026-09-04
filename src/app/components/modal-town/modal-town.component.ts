@@ -12,23 +12,22 @@ import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-anima
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { IconComponent } from '@components/icon/icon.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { activeTownNode } from '@helpers/engine/ui';
 import { notifySuccess } from '@helpers/engine/notify';
+import { activeTownNode } from '@helpers/engine/ui';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import {
   townCraftQueueRows,
   townTradeskillLevelRows,
 } from '@helpers/town/crafting/town-craft-display';
 import { townReputationDisplay } from '@helpers/town/reputation/town-reputation';
-import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
-import { townExecuteTrade, townStockMaxQuantity } from '@helpers/town/shop/town-trade';
 import { townStockPrice } from '@helpers/town/shop/town-price';
+import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import {
   townStock,
   townStockBonusCombatStats,
@@ -37,6 +36,10 @@ import {
   townStockDisplay,
   townStockExpiresIn,
 } from '@helpers/town/shop/town-stock';
+import {
+  townExecuteTrade,
+  townStockAffordable,
+} from '@helpers/town/shop/town-trade';
 import {
   townWorkerRosterEntries,
   townWorkerStatusDisplay,
@@ -51,10 +54,9 @@ import type {
   TownWorkerRosterEntry,
   TownWorkerStatusDisplay,
 } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { TippyDirective } from '@ngneat/helipopper';
-import { clamp } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-modal-town',
@@ -105,10 +107,8 @@ export class ModalTownComponent {
         index,
         entry,
         price,
-        maxQuantity:
-          price === undefined
-            ? 0
-            : townStockMaxQuantity(entry, price, goldQuantity),
+        affordable:
+          price !== undefined && townStockAffordable(price, goldQuantity),
         expiresIn: townStockExpiresIn(entry, town),
       };
     });
@@ -174,65 +174,31 @@ export class ModalTownComponent {
   }
 
   private confirmSwal = viewChild<SwalComponent>('confirmSwal');
-  private quantitySwal = viewChild<SwalComponent>('quantitySwal');
   private pendingRow = signal<TownStockRow | undefined>(undefined);
-
-  // A row with only one unit buyable skips straight to a plain yes/no confirm;
-  // anything more prompts for how many (0 = cancel, capped at maxQuantity).
   public requestTrade(row: TownStockRow): void {
-    if (row.price === undefined || row.maxQuantity <= 0) return;
+    if (row.price === undefined || !row.affordable) return;
 
     this.pendingRow.set(row);
     const name = this.stockEntryName(row.entry);
-
     const price = formatNumber(row.price, this.locale);
 
-    if (row.maxQuantity === 1) {
-      const swal = this.confirmSwal();
-      if (!swal) return;
-      swal.swalOptions = { text: `Buy ${name} for ${price}g?` };
-      swal.fire();
-      return;
-    }
-
-    const swal = this.quantitySwal();
+    const swal = this.confirmSwal();
     if (!swal) return;
-    swal.swalOptions = {
-      text: `How many ${name} would you like to buy? (${price}g each)`,
-      inputValue: 1,
-      inputAttributes: { min: '0', max: `${row.maxQuantity}` },
-    };
+    swal.swalOptions = { text: `Buy ${name} for ${price}g?` };
     swal.fire();
   }
 
-  public confirmSingle(): void {
-    const row = this.pendingRow();
-    this.pendingRow.set(undefined);
-    if (row) this.commitTrade(row, 1);
-  }
-
-  public confirmQuantity(value: unknown): void {
+  public async confirmSingle(): Promise<void> {
     const row = this.pendingRow();
     this.pendingRow.set(undefined);
     if (!row) return;
 
-    const requested = Math.floor(Number(value));
-    const quantity = Number.isFinite(requested)
-      ? clamp(requested, 0, row.maxQuantity)
-      : 0;
-    if (quantity <= 0) return;
-
-    this.commitTrade(row, quantity);
-  }
-
-  private async commitTrade(row: TownStockRow, quantity: number): Promise<void> {
     const town = this.town();
     if (!town) return;
 
     const name = this.stockEntryName(row.entry);
-    if (!(await townExecuteTrade(town.id, row.index, quantity))) return;
+    if (!(await townExecuteTrade(town.id, row.index))) return;
 
-    const qtyLabel = quantity > 1 ? ` x${quantity}` : '';
-    notifySuccess(`You bought ${name}${qtyLabel}!`);
+    notifySuccess(`You bought ${name}!`);
   }
 }

@@ -233,9 +233,10 @@ describe('townCraftProcessTick - advancing the queue', () => {
 
 describe('townCraftProcessTick - completing the queue', () => {
   it('holds a finished craft rather than dropping it when the shop is at its stock cap', () => {
-    const cappedStock = new Array(10)
-      .fill(0)
-      .map((_, i) => ({ itemId: `other-${i}` as ItemId, quantity: 1 }));
+    const cappedStock = new Array(10).fill(0).map((_, i) => ({
+      equipmentItem: { equipmentId: `other-${i}` } as never,
+      addedAtTick: 0,
+    }));
     const queue = [
       {
         id: 'q1',
@@ -247,7 +248,7 @@ describe('townCraftProcessTick - completing the queue', () => {
     const recipe = {
       craftTime: 5,
       tradeskillXP: 7,
-      result: { itemId: 'ingot' as ItemId, quantity: 1 },
+      result: { equipmentId: 'sword' },
     } as RecipeContent;
     vi.mocked(getEntry).mockReturnValue(recipe);
 
@@ -271,50 +272,7 @@ describe('townCraftProcessTick - completing the queue', () => {
     expect(state.world.towns[townId].craftQueue[0].id).toBe('q1');
   });
 
-  it('completes a capped shop craft anyway when the result stacks onto an existing item entry', () => {
-    const cappedStock = new Array(9)
-      .fill(0)
-      .map((_, i) => ({ itemId: `other-${i}` as ItemId, quantity: 1 }))
-      .concat([{ itemId: 'ingot' as ItemId, quantity: 3 }]);
-    const queue = [
-      {
-        id: 'q1',
-        tradeskillId: blacksmithingId,
-        recipeId: 'recipe-1',
-        ticksIntoCraft: 4,
-      },
-    ];
-    const recipe = {
-      craftTime: 5,
-      tradeskillXP: 7,
-      result: { itemId: 'ingot' as ItemId, quantity: 1 },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
-
-    townCraftProcessTick();
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: cappedStock,
-            tradeskills: { [blacksmithingId]: { level: 3 } },
-            craftQueue: queue,
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(applyTownStockAdd).toHaveBeenCalledWith(
-      expect.anything(),
-      townId,
-      { itemId: 'ingot', quantity: 1 },
-      10,
-    );
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
-  });
-
-  it('completes a craft, grants an item result to stock, gains xp, and dequeues', () => {
+  it('completes a craft, feeds an item result into the town materials stash, gains xp, and dequeues', () => {
     const recipe = {
       craftTime: 5,
       tradeskillXP: 7,
@@ -348,12 +306,13 @@ describe('townCraftProcessTick - completing the queue', () => {
       7,
       20,
     );
-    expect(applyTownStockAdd).toHaveBeenCalledWith(
+    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
       expect.anything(),
       townId,
-      { itemId: 'ingot', quantity: 2 },
-      10,
+      'ingot',
+      2,
     );
+    expect(applyTownStockAdd).not.toHaveBeenCalled();
     expect(state.world.towns[townId].craftQueue).toEqual([]);
   });
 
@@ -429,11 +388,11 @@ describe('townCraftProcessTick - completing the queue', () => {
       },
     } as unknown as GameState);
 
-    expect(applyTownStockAdd).toHaveBeenCalledWith(
+    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
       expect.anything(),
       townId,
-      { itemId: 'ingot', quantity: 1 },
-      10,
+      'ingot',
+      1,
     );
     expect(state.world.towns[townId].craftQueue).toEqual([]);
     expect(townTradeskillLeveledUp).toHaveBeenCalled();

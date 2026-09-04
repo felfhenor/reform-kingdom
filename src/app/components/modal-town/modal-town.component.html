@@ -96,7 +96,7 @@
                   <button
                     type="button"
                     class="btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start ps-0"
-                    [disabled]="row.price === undefined || row.maxQuantity <= 0"
+                    [disabled]="row.price === undefined || !row.affordable"
                     [tp]="item ? preview.template() : undefined"
                     [tpPlacement]="'top'"
                     (click)="requestTrade(row)"
@@ -123,20 +123,15 @@
                           {{ item.name }}
                         </span>
 
-                        <div class="flex items-center gap-2 flex-wrap">
-                          @if ('quantity' in row.entry) {
-                            <span class="badge badge-outline badge-sm">
-                              x{{ row.entry.quantity | number }}
-                            </span>
-                          }
-                          @if (row.expiresIn) {
+                        @if (row.expiresIn) {
+                          <div class="flex items-center gap-2 flex-wrap">
                             <span
                               class="badge badge-outline badge-warning badge-sm"
                             >
                               {{ row.expiresIn }}
                             </span>
-                          }
-                        </div>
+                          </div>
+                        }
                       </div>
 
                       @if (row.price !== undefined) {
@@ -278,13 +273,4 @@
   confirmButtonText="Yes"
   cancelButtonText="Cancel"
   (confirm)="confirmSingle()"
-></swal>
-
-<swal
-  #quantitySwal
-  icon="question"
-  input="number"
-  confirmButtonText="Confirm"
-  cancelButtonText="Cancel"
-  (confirm)="confirmQuantity($event)"
 ></swal>

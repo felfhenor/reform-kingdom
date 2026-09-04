@@ -260,14 +260,19 @@ describe('pruneInvalidTowns', () => {
     expect(result.materials).toEqual({});
   });
 
-  it('drops stock entries whose referenced item no longer resolves', () => {
+  it('drops stock entries whose referenced equipment no longer resolves', () => {
     vi.mocked(getEntry).mockImplementation((id: unknown) =>
       id === townId ? town : undefined,
     );
     const towns: GameStateTowns = {
       [townId]: {
         lastProcessedTick: {},
-        stock: [{ itemId: 'removed-item' as never, quantity: 1 }],
+        stock: [
+          {
+            equipmentItem: { equipmentId: 'removed-equipment' } as never,
+            addedAtTick: 0,
+          },
+        ],
         workers: {},
         reputation: 0,
         hiddenGold: 0,
