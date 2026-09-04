@@ -30,11 +30,13 @@
       @for (hero of heroes; track hero.id) {
         <button
           type="button"
-          class="btn btn-lg btn-neutral btn-outline h-auto justify-start gap-3 py-3 text-neutral-content"
+          class="btn btn-lg btn-neutral btn-outline h-auto justify-start gap-3 py-0 ps-0 text-neutral-content"
           [class.btn-active]="character?.id === hero.id"
           (click)="selectCharacter(hero.id)"
         >
-          <app-icon-job [job]="jobFor(hero)" />
+          <app-slot-icon-blank>
+            <app-icon-job [job]="jobFor(hero)" />
+          </app-slot-icon-blank>
           {{ hero.name }}
         </button>
       } @empty {
