@@ -305,7 +305,11 @@ function candidateStatValue(
 ): number {
   return (
     entry.content.baseStats[stat] +
-    equipmentItemInfusionBonus(entry.item.infusedItemIds)[stat]
+    equipmentItemInfusionBonus(entry.item.infusedItemIds)[stat] +
+    sumBy(
+      affixEffectsOfKind(equipmentItemAffixEffects(entry.item), 'Stat'),
+      (effect) => (effect.stat === stat ? effect.value : 0),
+    )
   );
 }
 
