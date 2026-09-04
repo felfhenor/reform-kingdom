@@ -72,5 +72,5 @@ export type TownWorkerRosterEntry = {
 // Status label + the node the worker is currently at (or heading to/returning to) - built by townWorkerStatusDisplay.
 export type TownWorkerStatusDisplay = {
   label: string;
-  locationEntry: WorldNodeEntry | undefined;
+  locationEntry?: WorldNodeEntry;
 };

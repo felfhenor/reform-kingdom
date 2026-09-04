@@ -66,7 +66,7 @@ export class DetailBestiaryMonsterComponent {
 
   public selectedLevel = signal(1);
 
-  private lastMonsterId: MonsterId | undefined;
+  private lastMonsterId?: MonsterId;
 
   constructor() {
     // Resets the picker only when the monster changes, not on every `entry()` recompute (which fires more often, e.g. a live kill count).

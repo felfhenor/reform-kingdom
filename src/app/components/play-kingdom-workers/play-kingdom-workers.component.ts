@@ -67,7 +67,7 @@ type WorkerEntry = {
 type NodeOption = {
   nodeName: string;
   entry: WorldNodeEntry;
-  staminaCost: number | undefined;
+  staminaCost?: number;
   levelRangeLabel: string;
   disabled: boolean;
 };
@@ -76,7 +76,7 @@ type ItemOption = RewardContentInfo & { id: ItemId };
 
 type EntryStatusDisplay = {
   label: string;
-  locationEntry: WorldNodeEntry | undefined;
+  locationEntry?: WorldNodeEntry;
 };
 
 @Component({

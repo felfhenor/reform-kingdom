@@ -48,7 +48,7 @@ export type CraftingStatusEntry = {
 // not a cost).
 export type CraftRequirementEntry = {
   kind: 'collectible' | 'equipment' | 'item';
-  content: CollectibleContent | EquipmentContent | ItemContent | undefined;
+  content?: CollectibleContent | EquipmentContent | ItemContent;
   spritesheet: 'collectible' | 'equipment' | 'item';
   quantity: number;
   owned: number;
@@ -58,12 +58,11 @@ export type CraftRequirementEntry = {
 // the UI needs to render + sort a row without re-deriving it per-field.
 export type CraftRecipeEntry = {
   recipe: RecipeContent;
-  resultContent:
-    ItemContent | EquipmentContent | CollectibleContent | undefined;
+  resultContent?: ItemContent | EquipmentContent | CollectibleContent;
   resultSpritesheet: 'item' | 'equipment' | 'collectible';
-  resultDisplay: ItemPreviewDisplay | undefined;
+  resultDisplay?: ItemPreviewDisplay;
   resultChance: number;
-  backdropSprite: string | undefined;
+  backdropSprite?: string;
   maxCraftable: number;
   ownedQuantity: number;
   xp: number;

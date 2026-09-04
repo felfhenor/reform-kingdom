@@ -19,8 +19,8 @@ import type {
 
 function noteMonsterLevel(
   monsterLevels: Map<string, LevelRange>,
-  monsterId: string | undefined,
-  range: LevelRange | undefined,
+  monsterId?: string,
+  range?: LevelRange,
 ): void {
   if (!monsterId || !range) return;
 
@@ -63,8 +63,8 @@ export function buildMonsterLevels(
 
 function addSource(
   itemSources: Map<string, AnalysisItemSource[]>,
-  itemId: string | undefined,
-  level: number | undefined,
+  itemId?: string,
+  level?: number,
 ): void {
   if (!itemId || level === undefined || !Number.isFinite(level)) return;
 

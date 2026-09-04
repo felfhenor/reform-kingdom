@@ -1,11 +1,11 @@
 import { allMaps } from '@helpers/maps';
-import { sumBy } from 'es-toolkit/compat';
 import type {
   AnalysisLevelWindow,
   BaseStat,
   StatBlock,
   TiledMap,
 } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
 
 const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
 
@@ -102,7 +102,7 @@ export function addStats(target: StatBlock, source: Partial<StatBlock>): void {
 // empty/omitted.
 export function filterByNames<T extends { name: string }>(
   items: T[],
-  names: string[] | undefined,
+  names?: string[],
 ): T[] {
   if (!names || names.length === 0) return items;
 

@@ -1,32 +1,29 @@
-import { armoryGet } from '@helpers/kingdom/armory';
-import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { combatDoCombatIteration } from '@helpers/combat/combat';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { combatLog } from '@helpers/combat/combat-log';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
+import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { decreeClauses } from '@helpers/decree/decree';
 import {
   mostChallengingExploreNodeForRisk,
   pickNextClause,
 } from '@helpers/decree/decree-evaluation';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
-import { canModifyEquipment } from '@helpers/item/equipment';
-import { gatheringProcessTick, partyMinLevel } from '@helpers/item/gathering';
 import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
-import { getGoldQuantity } from '@helpers/item/materials';
 import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
 import { restingProcessTick } from '@helpers/hero/resting';
+import { travelProcessTick } from '@helpers/hero/travel';
+import { canModifyEquipment } from '@helpers/item/equipment';
+import { gatheringProcessTick, partyMinLevel } from '@helpers/item/gathering';
+import { getGoldQuantity } from '@helpers/item/materials';
+import { armoryGet } from '@helpers/kingdom/armory';
 import {
   gamestate,
   gamestateTickEnd,
   gamestateTickStart,
   updateGamestate,
 } from '@helpers/state-game';
-import { travelProcessTick } from '@helpers/hero/travel';
-import {
-  isPlayerAtKingdom,
-  worldNodeAtCurrentLocation,
-} from '@helpers/world';
+import { isPlayerAtKingdom, worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeEncounter } from '@helpers/world-node/world-nodes';
 import type {
   CharacterId,
@@ -303,7 +300,7 @@ function describeAdventureLogEntry(entry: CombatLog): string | undefined {
 
 function logAdventureLogTail(
   label: string,
-  lastSeenMessageId: string | undefined,
+  lastSeenMessageId?: string,
 ): string | undefined {
   const logs = combatLog();
   if (logs.length === 0) return lastSeenMessageId;

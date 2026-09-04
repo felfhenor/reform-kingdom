@@ -58,7 +58,7 @@ type HeroOption = {
   id: CharacterId;
   name: string;
   level: number;
-  job: JobContent | undefined;
+  job?: JobContent;
 };
 
 const CONDITION_TYPE_OPTIONS: SelectOption<CombatOrderCondition['type']>[] = [

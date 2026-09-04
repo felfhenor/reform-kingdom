@@ -42,10 +42,10 @@ export class SoundService {
   private context = new AudioContext();
   private audioRefs: Partial<Record<SFX | BGM, AudioBuffer>> = {};
 
-  private bgmGain: GainNode | undefined;
-  private bgm: AudioBufferSourceNode | undefined;
+  private bgmGain?: GainNode;
+  private bgm?: AudioBufferSourceNode;
 
-  private lastSFX: AudioBufferSourceNode | undefined;
+  private lastSFX?: AudioBufferSourceNode;
 
   private hasInteracted = signal<boolean>(false);
   public allowAudioInteractions = this.hasInteracted.asReadonly();

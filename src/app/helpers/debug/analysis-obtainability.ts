@@ -27,7 +27,7 @@ const GUARANTEED_GRANT_NAMES = new Set<string>([
   'Founding Stone',
 ]);
 
-function addIfPresent(set: Set<string>, value: string | undefined): void {
+function addIfPresent(set: Set<string>, value?: string): void {
   if (value) set.add(value);
 }
 

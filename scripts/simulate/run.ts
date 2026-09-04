@@ -26,11 +26,7 @@ import {
 } from './report';
 import type { ScenarioOutcome } from './scenario-runner';
 import { executeScenario } from './scenario-runner';
-import {
-  findSeedsAtLevel,
-  resolveSeedsDir,
-  seedsDirFor,
-} from './seeds';
+import { findSeedsAtLevel, resolveSeedsDir, seedsDirFor } from './seeds';
 import type {
   PartyComp,
   RunOptions,
@@ -86,11 +82,7 @@ function parseArgs(argv: string[]): RunOptions {
     ),
     strategies,
     verbose: args.has('verbose'),
-    workers: parsePositiveInt(
-      args.get('workers'),
-      os.cpus().length,
-      'workers',
-    ),
+    workers: parsePositiveInt(args.get('workers'), os.cpus().length, 'workers'),
     dumpSeeds: args.has('dump-seeds'),
     dumpIntervalLevels: parsePositiveInt(
       args.get('dump-interval'),
@@ -108,10 +100,12 @@ function parseArgs(argv: string[]): RunOptions {
 
 function buildFreshScenarios(
   options: RunOptions,
-  seedsDir: string | undefined,
+  seedsDir?: string,
 ): ScenarioConfig[] {
   const comps: PartyComp[] =
-    options.mode === 'exhaustive' ? exhaustivePartyComps() : curatedPartyComps();
+    options.mode === 'exhaustive'
+      ? exhaustivePartyComps()
+      : curatedPartyComps();
 
   const scenarios: ScenarioConfig[] = [];
   comps.forEach((comp) => {
@@ -142,7 +136,7 @@ function compFromSeedFile(seedFile: string): PartyComp {
 function buildResumeScenarios(
   options: RunOptions,
   seedPaths: string[],
-  seedsDir: string | undefined,
+  seedsDir?: string,
 ): ScenarioConfig[] {
   const scenarios: ScenarioConfig[] = [];
   seedPaths.forEach((seedPath) => {
@@ -165,7 +159,7 @@ function buildResumeScenarios(
 
 function buildScenarios(
   options: RunOptions,
-  seedsDir: string | undefined,
+  seedsDir?: string,
 ): ScenarioConfig[] {
   if (options.resumeSeed) {
     const resolved = path.resolve(options.resumeSeed);
@@ -382,10 +376,7 @@ async function main(): Promise<void> {
 
   const scenarios = buildScenarios(options, seedsDir);
 
-  const workerCount = Math.max(
-    1,
-    Math.min(options.workers, scenarios.length),
-  );
+  const workerCount = Math.max(1, Math.min(options.workers, scenarios.length));
 
   console.log(
     `Running ${scenarios.length} scenario(s), tick budget ${options.tickBudget} each, ` +

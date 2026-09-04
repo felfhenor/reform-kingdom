@@ -4,11 +4,7 @@ import type { LevelRange } from '@interfaces/level-range';
 import type { TiledObject } from '@interfaces/tiled-map';
 
 export type AnalysisInputType =
-  | 'number'
-  | 'boolean'
-  | 'text'
-  | 'jobMultiSelect'
-  | 'monsterMultiSelect';
+  'number' | 'boolean' | 'text' | 'jobMultiSelect' | 'monsterMultiSelect';
 
 export type AnalysisInputValue = number | boolean | string | string[];
 
@@ -96,14 +92,14 @@ export type NodeLevelCheckEntry = {
 export type WorkerStaminaCheckEntry = {
   name: string;
   mapName: string;
-  oneWayTicks: number | undefined;
+  oneWayTicks?: number;
 };
 
 // A gather node's stamina cost and worker level window, as seen by the reachability analysis.
 export type WorkerReachabilityNode = {
   nodeName: string;
   mapName: string;
-  oneWayTicks: number | undefined;
+  oneWayTicks?: number;
   levelRange: LevelRange;
 };
 
@@ -111,9 +107,9 @@ export type WorkerReachabilityCheckEntry = {
   workerName: string;
   nodeName: string;
   mapName: string;
-  oneWayTicks: number | undefined;
+  oneWayTicks?: number;
   // Undefined unless the worker's own leveling progression actually reaches this level - see `achievableLevelCap`.
-  reachableAtLevel: number | undefined;
+  reachableAtLevel?: number;
   levelRange: LevelRange;
 };
 
@@ -121,10 +117,10 @@ export type WorkerReachabilityCheckEntry = {
 export type WorkerLevelingGapEntry = {
   workerName: string;
   stuckAtLevel: number;
-  blockingNodeName: string | undefined;
-  blockingNodeLevelRange: LevelRange | undefined;
+  blockingNodeName?: string;
+  blockingNodeLevelRange?: LevelRange;
   workerStaminaAtStuckLevel: number;
-  blockingNodeStaminaCost: number | undefined;
+  blockingNodeStaminaCost?: number;
 };
 
 export type MapNodeCheckRef = {
@@ -135,8 +131,8 @@ export type MapNodeCheckRef = {
 export type TeleportNodeCheckRef = {
   mapName: string;
   nodeName: string;
-  tag: string | undefined;
-  toTag: string | undefined;
+  tag?: string;
+  toTag?: string;
 };
 
 export type RecipeItemProducer = {

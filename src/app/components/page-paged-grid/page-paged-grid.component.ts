@@ -8,8 +8,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { CardPageComponent } from '@components/card-page/card-page.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
+import { CardPageComponent } from '@components/card-page/card-page.component';
 
 const CELL_FOOTPRINT_PX = 72;
 
@@ -23,11 +23,10 @@ const CELL_FOOTPRINT_PX = 72;
 export class PagePagedGridComponent<T> implements OnDestroy {
   private gridContainer =
     viewChild<ElementRef<HTMLDivElement>>('gridContainer');
-  private gridResizeObserver: ResizeObserver | undefined;
+  private gridResizeObserver?: ResizeObserver;
 
   public entries = input.required<T[]>();
-  public filterFn =
-    input.required<(entries: T[], searchText: string) => T[]>();
+  public filterFn = input.required<(entries: T[], searchText: string) => T[]>();
   public searchPlaceholder = input('Search by name or description...');
   public emptyMessage = input('No results found.');
   public showToolbar = input(true);
@@ -42,10 +41,7 @@ export class PagePagedGridComponent<T> implements OnDestroy {
   );
 
   public totalPages = computed(() =>
-    Math.max(
-      1,
-      Math.ceil(this.filteredEntries().length / this.itemsPerPage()),
-    ),
+    Math.max(1, Math.ceil(this.filteredEntries().length / this.itemsPerPage())),
   );
 
   public page = computed(() =>
@@ -91,10 +87,7 @@ export class PagePagedGridComponent<T> implements OnDestroy {
         1,
         Math.floor(el.clientWidth / CELL_FOOTPRINT_PX),
       );
-      const rows = Math.max(
-        1,
-        Math.floor(el.clientHeight / CELL_FOOTPRINT_PX),
-      );
+      const rows = Math.max(1, Math.floor(el.clientHeight / CELL_FOOTPRINT_PX));
       this.itemsPerPage.set(columns * rows);
     };
 

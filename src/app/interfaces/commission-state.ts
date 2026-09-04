@@ -11,8 +11,7 @@ export type CommissionRequirementEquipment = {
   quantity: number;
 };
 export type CommissionRequirement =
-  | CommissionRequirementItem
-  | CommissionRequirementEquipment;
+  CommissionRequirementItem | CommissionRequirementEquipment;
 
 export type CommissionNodeState = {
   commissionOfferId?: CommissionOfferId;
@@ -39,5 +38,5 @@ export type CommissionRowViewModel = {
   isPartyHere: boolean;
   canTravel: boolean;
   // Set only while actively traveling toward this caravan's node.
-  travelEtaSeconds: number | undefined;
+  travelEtaSeconds?: number;
 };
