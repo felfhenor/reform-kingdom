@@ -26,6 +26,10 @@ vi.mock('@helpers/town/crafting/town-craft-pick', () => ({
   townPickRecipeToQueue: vi.fn(),
 }));
 
+vi.mock('@helpers/town/raid/town-raid-state', () => ({
+  isTownCraftDebuffActive: vi.fn(() => false),
+}));
+
 vi.mock('@helpers/town/crafting/town-craft-level', () => ({
   townTradeskillLeveledUp: vi.fn((building) => building),
 }));
@@ -56,6 +60,7 @@ import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import { townTradeskillLeveledUp } from '@helpers/town/crafting/town-craft-level';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
+import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import {
   isTownDueForUpdate,
@@ -107,6 +112,7 @@ beforeEach(() => {
   vi.mocked(rngSucceedsChance).mockReturnValue(true);
   vi.mocked(craftXpChance).mockReturnValue(100);
   vi.mocked(townPickRecipeToQueue).mockReturnValue(undefined);
+  vi.mocked(isTownCraftDebuffActive).mockReturnValue(false);
 });
 
 describe('townCraftProcessTick - due-gate', () => {
@@ -161,6 +167,44 @@ describe('townCraftProcessTick - advancing the queue', () => {
         tradeskillId: blacksmithingId,
         recipeId: 'recipe-1',
         ticksIntoCraft: 3,
+      },
+    ]);
+  });
+
+  it('doubles craft time while the raid-loss craft debuff is active', () => {
+    vi.mocked(isTownCraftDebuffActive).mockReturnValue(true);
+    vi.mocked(getEntry).mockReturnValue({ craftTime: 5 } as RecipeContent);
+
+    townCraftProcessTick();
+
+    const state = applyLastUpdate({
+      world: {
+        towns: {
+          [townId]: {
+            stock: [],
+            craftSpeedDebuffExpiresAtTick: 999,
+            tradeskills: { [blacksmithingId]: { level: 3 } },
+            craftQueue: [
+              {
+                id: 'q1',
+                tradeskillId: blacksmithingId,
+                recipeId: 'recipe-1',
+                ticksIntoCraft: 8,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState);
+
+    // craftTime 5 * multiplier 1 * debuff 2 = 10; 8 + 1 = 9, still below - stays queued.
+    // Without the debuff, effective craftTime would be 5 and this entry would already be complete.
+    expect(state.world.towns[townId].craftQueue).toEqual([
+      {
+        id: 'q1',
+        tradeskillId: blacksmithingId,
+        recipeId: 'recipe-1',
+        ticksIntoCraft: 9,
       },
     ]);
   });

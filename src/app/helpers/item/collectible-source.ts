@@ -8,6 +8,7 @@ import type {
   EncounterContent,
   EncounterRandomContent,
   RecipeContent,
+  TownContent,
 } from '@interfaces';
 
 // Builds the collectible -> source lookup from static content only, so it reflects current content even for old saves. A collectible with more than one source is a content bug and gets logged.
@@ -53,6 +54,14 @@ export function collectibleSourceMapBuild(): Map<
     trader.tokenTrades.forEach((trade) => {
       if (trade.collectibleId) {
         addSource(trade.collectibleId, { type: 'trader', name: trader.name });
+      }
+    });
+  });
+
+  getEntriesByType<TownContent>('town').forEach((town) => {
+    town.defense.rewards.forEach((reward) => {
+      if ('collectibleId' in reward) {
+        addSource(reward.collectibleId, { type: 'raid', name: town.name });
       }
     });
   });

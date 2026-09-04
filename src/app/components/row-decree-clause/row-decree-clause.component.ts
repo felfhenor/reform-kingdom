@@ -21,6 +21,7 @@ const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   'FarmNode',
   'FinishUnfinishedAreas',
   'LevelUpParty',
+  'DefendTowns',
 ];
 
 @Component({

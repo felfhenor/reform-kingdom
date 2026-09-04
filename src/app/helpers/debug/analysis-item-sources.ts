@@ -15,6 +15,7 @@ import type {
   LevelRange,
   MonsterContent,
   RecipeContent,
+  TownContent,
 } from '@interfaces';
 
 function noteMonsterLevel(
@@ -82,6 +83,7 @@ export function buildItemSources(
   caravans: CaravanContent[],
   caravanTraders: CaravanTraderContent[],
   monsterLevels: Map<string, LevelRange>,
+  towns: TownContent[] = [],
 ): Map<string, AnalysisItemSource[]> {
   const itemSources = new Map<string, AnalysisItemSource[]>();
 
@@ -96,6 +98,14 @@ export function buildItemSources(
     encounter.completionRewards.forEach((reward) => {
       if ('itemId' in reward) {
         addSource(itemSources, reward.itemId, encounter.levelRange?.min);
+      }
+    });
+  });
+
+  towns.forEach((town) => {
+    town.defense.rewards.forEach((reward) => {
+      if ('itemId' in reward) {
+        addSource(itemSources, reward.itemId, town.defense.assaulter.level.min);
       }
     });
   });

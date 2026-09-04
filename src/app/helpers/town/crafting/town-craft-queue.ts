@@ -5,6 +5,7 @@ import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { townTradeskillLeveledUp } from '@helpers/town/crafting/town-craft-level';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
+import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
@@ -24,6 +25,8 @@ import type {
 
 // Runs every tick once activated, same reasoning as WORKER_TICK_INTERVAL - craft progress is continuous.
 const CRAFT_TICK_INTERVAL = 1;
+
+const RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER = 2;
 
 // Grants the result unconditionally (the caller already decided the craft succeeds) - a material result
 // feeds the materials stash directly, only equipment lands in stock.
@@ -100,7 +103,13 @@ function advanceQueueEntry(
   const recipe = getEntry<RecipeContent>(entry.recipeId);
   if (!recipe) return undefined; // unresolvable - drop defensively
 
-  const craftTime = recipe.craftTime * town.crafting.craftingDurationMultiplier;
+  const debuffMultiplier = isTownCraftDebuffActive(target)
+    ? RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER
+    : 1;
+  const craftTime =
+    recipe.craftTime *
+    town.crafting.craftingDurationMultiplier *
+    debuffMultiplier;
   const ticksIntoCraft = entry.ticksIntoCraft + 1;
   if (ticksIntoCraft < craftTime) return { ...entry, ticksIntoCraft };
 

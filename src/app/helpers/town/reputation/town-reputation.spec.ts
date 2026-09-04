@@ -15,6 +15,7 @@ import {
   townReputation,
   townReputationDisplay,
   townReputationGain,
+  townReputationLose,
   townReputationTier,
   townReputationTierForAmount,
   townReputationTierMultiplier,
@@ -152,6 +153,59 @@ describe('townReputationGain', () => {
     vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
 
     expect(() => townReputationGain(townId, 10, 'Trade')).not.toThrow();
+  });
+});
+
+describe('townReputationLose', () => {
+  it("subtracts the amount from the town's reputation", () => {
+    const state = {
+      world: { towns: { [townId]: { reputation: 100 } } },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townReputationLose(townId, 30, 'RaidDefense');
+
+    expect(state.world.towns[townId].reputation).toBe(70);
+  });
+
+  it('clamps at 0 rather than going negative', () => {
+    const state = {
+      world: { towns: { [townId]: { reputation: 20 } } },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townReputationLose(townId, 50, 'RaidDefense');
+
+    expect(state.world.towns[townId].reputation).toBe(0);
+  });
+
+  it('fires a distinct Lose analytics event tagged with the source', () => {
+    vi.mocked(updateGamestate).mockImplementation(async (fn) =>
+      fn({
+        world: { towns: { [townId]: { reputation: 100 } } },
+      } as unknown as GameState),
+    );
+
+    townReputationLose(townId, 10, 'RaidDefense');
+
+    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
+      'Town:Reputation:Lose:RaidDefense',
+    );
+  });
+
+  it('is a no-op for a zero or negative amount', () => {
+    townReputationLose(townId, 0, 'RaidDefense');
+    townReputationLose(townId, -5, 'RaidDefense');
+
+    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
+  });
+
+  it('does not throw when the town has no state entry', () => {
+    const state = { world: { towns: {} } } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    expect(() => townReputationLose(townId, 10, 'RaidDefense')).not.toThrow();
   });
 });
 

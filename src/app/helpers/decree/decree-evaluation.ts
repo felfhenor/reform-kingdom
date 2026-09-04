@@ -1,14 +1,17 @@
 import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
+import { getEntry } from '@helpers/content/content';
 import {
   decreeNodeFailureCount,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
+import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { CHARACTER_MAX_LEVEL, isPartyAtFullHealth } from '@helpers/hero/party';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
+import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { isPlayerAtKingdom } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
@@ -23,12 +26,10 @@ import type {
   DecreeRiskLevel,
   ExploreNodeRiskBand,
   MaterialId,
+  TownContent,
   WorldNodeEntry,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
-
-// Beyond this many levels above the party's floor, a node is excluded outright (TooHigh) regardless of risk setting.
-export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
 
 // Losing streak at which mostChallengingExploreNodeForRisk gives up on a tier and steps down.
 export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
@@ -39,21 +40,13 @@ const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
   High: 2,
 };
 
-// Judged against both ends of the encounter's levelRange, since the roll can land anywhere in it, not just the floor.
 export function riskLevelOfExploreNode(
   entry: WorldNodeEntry,
 ): ExploreNodeRiskBand {
   const encounter = worldNodeEncounter(entry);
   if (!encounter) return 'TooHigh';
 
-  const partyLevel = partyMinLevel();
-  if (encounter.levelRange.max <= partyLevel) return 'Low';
-  if (encounter.levelRange.min <= partyLevel) return 'Medium';
-
-  const levelsAboveParty = encounter.levelRange.min - partyLevel;
-  if (levelsAboveParty <= HIGH_RISK_LEVELS_ABOVE_PARTY) return 'High';
-
-  return 'TooHigh';
+  return riskBandForLevelRange(encounter.levelRange, partyMinLevel());
 }
 
 export function riskLevelSatisfies(
@@ -171,6 +164,44 @@ export function nearestGatherNodeFor(
   return nearestReachableNode(candidates);
 }
 
+// Towns currently telegraphing a raid the party can accept at this risk tolerance.
+function acceptableRaidTowns(riskTolerance: DecreeRiskLevel): TownContent[] {
+  const partyLevel = partyMinLevel();
+
+  return telegraphedRaidTownIds()
+    .map((townId) => getEntry<TownContent>(townId))
+    .filter((town): town is TownContent => !!town)
+    .filter((town) =>
+      riskLevelSatisfies(
+        riskBandForLevelRange(town.defense.assaulter.level, partyLevel),
+        riskTolerance,
+      ),
+    );
+}
+
+// Fixed townName mirrors FarmNode's stored target; unset scans like nearestGatherNodeFor.
+function defendTownsTargetNode(
+  clause: Extract<DecreeClause, { type: 'DefendTowns' }>,
+): WorldNodeEntry | undefined {
+  const acceptable = acceptableRaidTowns(clause.riskTolerance);
+
+  if (clause.townName) {
+    if (!acceptable.some((town) => town.name === clause.townName)) {
+      return undefined;
+    }
+    const entry = worldNodeByName(clause.townName);
+    if (!entry || !isWorldNodeVisible(entry)) return undefined;
+    return travelPathTo(entry.nodeName) ? entry : undefined;
+  }
+
+  const candidates = acceptable
+    .map((town) => worldNodeByName(town.name))
+    .filter(
+      (entry): entry is WorldNodeEntry => !!entry && isWorldNodeVisible(entry),
+    );
+  return nearestReachableNode(candidates);
+}
+
 // The node a clause would travel to if run right now, or undefined if it has
 // no node target (`ReturnToKingdom`) or nothing currently qualifies.
 export function clauseTargetNode(
@@ -190,6 +221,8 @@ export function clauseTargetNode(
       return mostChallengingExploreNodeForRisk(clause.riskTolerance);
     case 'ReturnToKingdom':
       return undefined;
+    case 'DefendTowns':
+      return defendTownsTargetNode(clause);
   }
 }
 
@@ -223,6 +256,8 @@ export function isClauseSatisfiable(clause: DecreeClause): boolean {
       );
     case 'ReturnToKingdom':
       return !isPlayerAtKingdom();
+    case 'DefendTowns':
+      return !blockedByHealth() && !!clauseTargetNode(clause);
   }
 }
 
@@ -242,6 +277,8 @@ export function isClauseBlockedOnlyByHealth(clause: DecreeClause): boolean {
       return (
         partyMinLevel() < CHARACTER_MAX_LEVEL && !!clauseTargetNode(clause)
       );
+    case 'DefendTowns':
+      return !!clauseTargetNode(clause);
     default:
       return false;
   }

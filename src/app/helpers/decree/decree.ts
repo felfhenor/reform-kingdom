@@ -66,6 +66,9 @@ export function decreeClauseConflicts(
         rewardKey(clause.reward) === rewardKey(action.reward)
       );
     }
+    if (action.type === 'DefendTowns' && clause.type === 'DefendTowns') {
+      return clause.townName === action.townName;
+    }
     return true;
   });
 }
@@ -188,6 +191,10 @@ export function decreeClauseSummary(clause: DecreeClause): string {
       return `Level up the party (${clause.riskTolerance} risk)`;
     case 'ReturnToKingdom':
       return 'Return to the kingdom';
+    case 'DefendTowns':
+      return clause.townName
+        ? `Defend ${clause.townName} from raids (${clause.riskTolerance} risk)`
+        : `Defend towns from raids (${clause.riskTolerance} risk)`;
   }
 }
 

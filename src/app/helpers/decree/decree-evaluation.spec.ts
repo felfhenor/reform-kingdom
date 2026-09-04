@@ -26,6 +26,14 @@ vi.mock('@helpers/combat/monster', () => ({
   isXpTrivialAtOverLevel: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/content/content', () => ({
+  getEntry: vi.fn(),
+}));
+
+vi.mock('@helpers/town/raid/town-raid-state', () => ({
+  telegraphedRaidTownIds: vi.fn(() => []),
+}));
+
 vi.mock('@helpers/hero/party', () => ({
   CHARACTER_MAX_LEVEL: 99,
   isPartyAtFullHealth: vi.fn(() => true),
@@ -55,6 +63,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
+import { getEntry } from '@helpers/content/content';
 import {
   decreeNodeFailureCount,
   decreeWaitForFullHealthBeforeCombat,
@@ -77,6 +86,7 @@ import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
+import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { isPlayerAtKingdom } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
@@ -92,6 +102,8 @@ import type {
   EncounterContent,
   ItemId,
   MaterialId,
+  TownContent,
+  TownId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -132,6 +144,8 @@ beforeEach(() => {
   vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
   vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
   vi.mocked(decreeNodeFailureCount).mockReturnValue(0);
+  vi.mocked(getEntry).mockReturnValue(undefined);
+  vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
 });
 
 describe('riskLevelOfExploreNode', () => {
@@ -714,6 +728,155 @@ describe('clauseTargetNode', () => {
         }),
       ),
     ).toBeUndefined();
+  });
+});
+
+describe('clauseTargetNode - DefendTowns', () => {
+  function buildTown(overrides: Partial<TownContent> = {}): TownContent {
+    return {
+      id: 'larsia' as TownId,
+      name: 'Larsia',
+      defense: { assaulter: { level: { min: 20, max: 25 } } },
+      ...overrides,
+    } as TownContent;
+  }
+
+  it('targets the fixed town when telegraphed, reachable, and within risk tolerance', () => {
+    const node = buildNode('Larsia');
+    vi.mocked(telegraphedRaidTownIds).mockReturnValue(['larsia' as TownId]);
+    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(partyMinLevel).mockReturnValue(25); // clears the assaulter's max (25) outright - Low risk
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'DefendTowns',
+          riskTolerance: 'Low',
+          townName: 'Larsia',
+        }),
+      ),
+    ).toBe(node);
+  });
+
+  it('has no target for a fixed town that is not currently telegraphing a raid', () => {
+    vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'DefendTowns',
+          riskTolerance: 'High',
+          townName: 'Larsia',
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('has no target for a fixed town outside the risk tolerance', () => {
+    vi.mocked(telegraphedRaidTownIds).mockReturnValue(['larsia' as TownId]);
+    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
+    vi.mocked(partyMinLevel).mockReturnValue(1); // 19+ levels below the assaulter floor
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'DefendTowns',
+          riskTolerance: 'High',
+          townName: 'Larsia',
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('picks the nearest reachable telegraphed town when untargeted', () => {
+    const near = buildTown({ id: 'near' as TownId, name: 'Near' });
+    const far = buildTown({ id: 'far' as TownId, name: 'Far' });
+    const nearNode = buildNode('Near');
+    const farNode = buildNode('Far');
+
+    vi.mocked(telegraphedRaidTownIds).mockReturnValue([
+      'near' as TownId,
+      'far' as TownId,
+    ]);
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'near' ? near : far) as never,
+    );
+    vi.mocked(worldNodeByName).mockImplementation((name) =>
+      name === 'Near' ? nearNode : farNode,
+    );
+    vi.mocked(partyMinLevel).mockReturnValue(25); // clears the assaulter's max (25) outright - Low risk
+    vi.mocked(travelPathTo).mockImplementation((name) =>
+      name === 'Near' ? [{} as never] : [{} as never, {} as never],
+    );
+
+    expect(
+      clauseTargetNode(
+        buildClause({ type: 'DefendTowns', riskTolerance: 'Low' }),
+      ),
+    ).toBe(nearNode);
+  });
+
+  it('has no target when nothing is telegraphed', () => {
+    vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
+
+    expect(
+      clauseTargetNode(
+        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
+      ),
+    ).toBeUndefined();
+  });
+});
+
+describe('isClauseSatisfiable/isClauseBlockedOnlyByHealth - DefendTowns', () => {
+  function buildTown(): TownContent {
+    return {
+      id: 'larsia' as TownId,
+      name: 'Larsia',
+      defense: { assaulter: { level: { min: 1, max: 1 } } },
+    } as TownContent;
+  }
+
+  beforeEach(() => {
+    vi.mocked(telegraphedRaidTownIds).mockReturnValue(['larsia' as TownId]);
+    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
+    vi.mocked(worldNodeByName).mockReturnValue(buildNode('Larsia'));
+    vi.mocked(travelPathTo).mockReturnValue([]);
+  });
+
+  it('is satisfiable when a telegraphed town is reachable and the party is healthy', () => {
+    expect(
+      isClauseSatisfiable(
+        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
+      ),
+    ).toBe(true);
+  });
+
+  it('is blocked while waiting for full health', () => {
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+
+    expect(
+      isClauseSatisfiable(
+        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
+      ),
+    ).toBe(false);
+    expect(
+      isClauseBlockedOnlyByHealth(
+        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
+      ),
+    ).toBe(true);
+  });
+
+  it('is unsatisfiable when nothing is telegraphed', () => {
+    vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
+
+    expect(
+      isClauseSatisfiable(
+        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
+      ),
+    ).toBe(false);
   });
 });
 

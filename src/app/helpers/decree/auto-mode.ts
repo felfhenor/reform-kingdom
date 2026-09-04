@@ -21,12 +21,14 @@ import { travelStart } from '@helpers/hero/travel';
 import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { isPlayerAtKingdom } from '@helpers/world';
+import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
+import { isPlayerAtKingdom, worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeByName,
   worldNodesOfType,
+  worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
   DecreeClause,
@@ -138,6 +140,10 @@ function clauseStatusLabel(clause: DecreeClause): string {
       return `Leveling up (${clause.riskTolerance} risk)...`;
     case 'ReturnToKingdom':
       return 'Returning to the kingdom...';
+    case 'DefendTowns':
+      return clause.townName
+        ? `Defending ${clause.townName}...`
+        : 'Seeking a town to defend...';
   }
 }
 
@@ -339,6 +345,26 @@ function interruptForPriorityChange(): boolean {
   return true;
 }
 
+// Unlike every other clause, arriving at a DefendTowns target means "engage", not "done".
+function attemptDefendTownsEngage(): boolean {
+  const autoMode = gamestate().world.autoMode;
+  const clause = autoMode.clauses.find(
+    (candidate) => candidate.id === autoMode.activeClauseId,
+  );
+  if (!clause || clause.type !== 'DefendTowns') return false;
+
+  const target = clauseTargetNode(clause);
+  if (!target) return false;
+
+  const entry = worldNodeAtCurrentLocation();
+  if (!entry || entry.nodeName !== target.nodeName) return false;
+
+  const town = worldNodeTown(entry);
+  if (!town) return false;
+
+  return raidEngageCombat(town.id);
+}
+
 export function autoModeProcessTick(): void {
   const enabled = autoModeIsEnabled();
   syncAutoModeGlobalEffect(enabled);
@@ -349,6 +375,7 @@ export function autoModeProcessTick(): void {
   if (stopOrphanedGather()) return;
   if (interruptForPriorityChange()) return;
   if (!isPartyIdleForAutoMode()) return;
+  if (attemptDefendTownsEngage()) return;
 
   advanceToNextClause();
 }

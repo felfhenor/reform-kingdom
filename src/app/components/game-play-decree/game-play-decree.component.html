@@ -150,9 +150,23 @@
           />
         }
 
+        @if (draftType() === 'DefendTowns') {
+          <ng-select
+            class="w-56"
+            [items]="townOptions()"
+            bindLabel="name"
+            bindValue="name"
+            [clearable]="true"
+            placeholder="Any town"
+            [ngModel]="draftTownName()"
+            (change)="setDraftTownName($event)"
+          ></ng-select>
+        }
+
         @if (
           draftType() === 'LevelUpParty' ||
-          draftType() === 'FinishUnfinishedAreas'
+          draftType() === 'FinishUnfinishedAreas' ||
+          draftType() === 'DefendTowns'
         ) {
           <ng-select
             class="w-72"

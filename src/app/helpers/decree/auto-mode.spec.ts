@@ -51,8 +51,13 @@ vi.mock('@helpers/hero/travel', () => ({
   travelStart: vi.fn(),
 }));
 
+vi.mock('@helpers/town/raid/town-raid-combat', () => ({
+  raidEngageCombat: vi.fn(() => false),
+}));
+
 vi.mock('@helpers/world', () => ({
   isPlayerAtKingdom: vi.fn(() => false),
+  worldNodeAtCurrentLocation: vi.fn(() => undefined),
 }));
 
 vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
@@ -66,6 +71,7 @@ vi.mock('@helpers/world-node/world-node-rewards', () => ({
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
+  worldNodeTown: vi.fn(() => undefined),
 }));
 
 import { currentCombat } from '@helpers/combat/combat-state';
@@ -101,12 +107,14 @@ import { travelStart } from '@helpers/hero/travel';
 import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { isPlayerAtKingdom } from '@helpers/world';
+import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
+import { isPlayerAtKingdom, worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeByName,
   worldNodesOfType,
+  worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
   DecreeClause,
@@ -115,6 +123,8 @@ import type {
   ItemContent,
   ItemId,
   MaterialId,
+  TownContent,
+  TownId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -181,6 +191,10 @@ beforeEach(() => {
   vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([]);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
   vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
+  vi.mocked(raidEngageCombat).mockReturnValue(false);
+  vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
+  vi.mocked(worldNodeTown).mockReturnValue(undefined);
+  vi.mocked(clauseTargetNode).mockReturnValue(undefined);
 });
 
 describe('autoModeIsEnabled / autoModeToggle', () => {
@@ -393,6 +407,33 @@ describe('autoModeStatusLabel', () => {
 
     expect(autoModeStatusLabel()).toBe('Leveling up (High risk)...');
   });
+
+  it('describes an active targeted DefendTowns clause using the town name', () => {
+    const clause = buildClause({
+      id: 'a' as DecreeClauseId,
+      type: 'DefendTowns',
+      riskTolerance: 'High',
+      townName: 'Larsia',
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
+    );
+
+    expect(autoModeStatusLabel()).toBe('Defending Larsia...');
+  });
+
+  it('describes an active untargeted DefendTowns clause as seeking a town', () => {
+    const clause = buildClause({
+      id: 'a' as DecreeClauseId,
+      type: 'DefendTowns',
+      riskTolerance: 'High',
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
+    );
+
+    expect(autoModeStatusLabel()).toBe('Seeking a town to defend...');
+  });
 });
 
 describe('autoModeProcessTick', () => {
@@ -456,6 +497,77 @@ describe('autoModeProcessTick', () => {
     autoModeProcessTick();
 
     expect(travelStart).toHaveBeenCalledWith('Old Ruins', true);
+  });
+
+  it('engages the raid instead of re-dispatching travel when idle at the DefendTowns target', () => {
+    const clause = buildClause({
+      id: 'a' as DecreeClauseId,
+      type: 'DefendTowns',
+      riskTolerance: 'High',
+    });
+    const town = { id: 'larsia' as TownId, name: 'Larsia' } as TownContent;
+    const node = { nodeName: 'Larsia' } as WorldNodeEntry;
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [clause],
+        activeClauseId: clause.id,
+      }),
+    );
+    vi.mocked(clauseTargetNode).mockReturnValue(node);
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(node);
+    vi.mocked(worldNodeTown).mockReturnValue(town);
+    vi.mocked(raidEngageCombat).mockReturnValue(true);
+
+    autoModeProcessTick();
+
+    expect(raidEngageCombat).toHaveBeenCalledWith('larsia');
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('falls through to normal dispatch when not yet standing at the DefendTowns target', () => {
+    const clause = buildClause({
+      id: 'a' as DecreeClauseId,
+      type: 'DefendTowns',
+      riskTolerance: 'High',
+    });
+    const node = { nodeName: 'Larsia' } as WorldNodeEntry;
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [clause],
+        activeClauseId: clause.id,
+      }),
+    );
+    vi.mocked(decreeClauses).mockReturnValue([clause]);
+    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(clauseTargetNode).mockReturnValue(node);
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
+
+    autoModeProcessTick();
+
+    expect(raidEngageCombat).not.toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledWith('Larsia', true);
+  });
+
+  it('does not attempt to engage for a non-DefendTowns active clause', () => {
+    const clause = buildClause({
+      id: 'a' as DecreeClauseId,
+      type: 'FinishUnfinishedAreas',
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [clause],
+        activeClauseId: clause.id,
+      }),
+    );
+    vi.mocked(decreeClauses).mockReturnValue([clause]);
+    vi.mocked(pickNextClause).mockReturnValue(clause);
+
+    autoModeProcessTick();
+
+    expect(raidEngageCombat).not.toHaveBeenCalled();
   });
 
   it('falls back to the kingdom when no clause is satisfiable and not already there', () => {

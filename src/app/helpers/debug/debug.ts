@@ -28,10 +28,13 @@ import {
   monsterEncounters,
   monsterRecordKill,
 } from '@helpers/kingdom/bestiary';
-import { updateGamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
+import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
+import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
+import { townMarkVisited } from '@helpers/town/town-visit';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import {
   WORKER_MAX_LEVEL,
@@ -345,9 +348,7 @@ export function debugSetTownReputation(
   });
 }
 
-// Spins up a combat pairing a town's current-reputation guardians (as
-// `helpers`) against its assaulter pool - manual testing scaffold for the
-// combat-side raid plumbing, not the real raid generation/telegraph system.
+// Raid combat from anywhere, no telegraph/standing-at-town required - unlike raidEngageCombat.
 export function debugStartTownDefenseCombat(townId: TownId): void {
   const town = getEntry<TownContent>(townId);
   if (!town) {
@@ -355,8 +356,7 @@ export function debugStartTownDefenseCombat(townId: TownId): void {
     return;
   }
 
-  const { monsterIds, numMonsters, level } = town.defense.assaulter;
-  if (monsterIds.length === 0) {
+  if (town.defense.assaulter.monsterIds.length === 0) {
     console.warn(`Town ${town.name} has no assaulter monsters authored.`);
     return;
   }
@@ -366,22 +366,40 @@ export function debugStartTownDefenseCombat(townId: TownId): void {
     town.level,
   );
 
-  const enemies = Array.from({ length: numMonsters }, (_, i) =>
-    getEntry<MonsterContent>(monsterIds[i % monsterIds.length]),
-  ).filter((monster): monster is MonsterContent => !!monster);
+  const enemies = raidAssaulterMonsterIds(town.defense.assaulter)
+    .map((monsterId) => getEntry<MonsterContent>(monsterId))
+    .filter((monster): monster is MonsterContent => !!monster);
 
-  const combat = combatCreateForEncounter(
-    partyGet(),
-    enemies,
-    level.max,
-    town.name,
-    helpers,
-  );
+  const combat = {
+    ...combatCreateForEncounter(
+      partyGet(),
+      enemies,
+      town.defense.assaulter.level.max,
+      town.name,
+      helpers,
+    ),
+    raidTownId: town.id,
+  };
 
   updateGamestate((state) => {
     state.world.combat = combat;
     return state;
   });
+}
+
+// Forces a telegraph via the real write path, skipping the visited/cooldown/anti-rush gates.
+export function debugTelegraphRaid(townId: TownId): void {
+  const town = getEntry<TownContent>(townId);
+  if (!town) {
+    console.warn(`Could not find a town with matching id ${townId}.`);
+    return;
+  }
+
+  if (gamestate().world.towns[townId]?.firstVisitedAtTick === undefined) {
+    townMarkVisited(townId);
+  }
+
+  telegraphRaid(town);
 }
 
 export function debugSetGatherNodeLevel(nodeName: string, level: number): void {

@@ -276,6 +276,53 @@ describe('decreeClauseConflicts', () => {
     ).toBe(false);
   });
 
+  it('flags two DefendTowns clauses targeting the same town', () => {
+    const existing = [
+      buildClause({
+        type: 'DefendTowns',
+        riskTolerance: 'Low',
+        townName: 'Larsia',
+      }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        { type: 'DefendTowns', riskTolerance: 'High', townName: 'Larsia' },
+        existing,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not flag DefendTowns clauses targeting different towns', () => {
+    const existing = [
+      buildClause({
+        type: 'DefendTowns',
+        riskTolerance: 'Low',
+        townName: 'Larsia',
+      }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        { type: 'DefendTowns', riskTolerance: 'Low', townName: 'Carrina' },
+        existing,
+      ),
+    ).toBe(false);
+  });
+
+  it('flags two untargeted ("any town") DefendTowns clauses as conflicting', () => {
+    const existing = [
+      buildClause({ type: 'DefendTowns', riskTolerance: 'Low' }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        { type: 'DefendTowns', riskTolerance: 'High' },
+        existing,
+      ),
+    ).toBe(true);
+  });
+
   it('does not flag FarmNode clauses for the same reward at a different node', () => {
     const existing = [
       buildClause({
@@ -615,6 +662,26 @@ describe('decreeClauseSummary', () => {
     expect(decreeClauseSummary(buildClause({ type: 'ReturnToKingdom' }))).toBe(
       'Return to the kingdom',
     );
+  });
+
+  it('describes a targeted DefendTowns clause using the town name', () => {
+    expect(
+      decreeClauseSummary(
+        buildClause({
+          type: 'DefendTowns',
+          riskTolerance: 'Medium',
+          townName: 'Larsia',
+        }),
+      ),
+    ).toBe('Defend Larsia from raids (Medium risk)');
+  });
+
+  it('describes an untargeted DefendTowns clause as defending any town', () => {
+    expect(
+      decreeClauseSummary(
+        buildClause({ type: 'DefendTowns', riskTolerance: 'Low' }),
+      ),
+    ).toBe('Defend towns from raids (Low risk)');
   });
 });
 

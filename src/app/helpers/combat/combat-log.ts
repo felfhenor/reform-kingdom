@@ -122,7 +122,7 @@ export function itemDropHtml(item: ItemContent, quantity: number): string {
   const lowerName = item.name.toLowerCase();
   const displayName = quantity === 1 ? lowerName : pluralize(lowerName);
 
-  return `${quantity} ${itemNameHtml(item, displayName)}`;
+  return `${quantity.toLocaleString()} ${itemNameHtml(item, displayName)}`;
 }
 
 // Colors an equipment item's name by its rarity, mirroring `itemNameHtml`.

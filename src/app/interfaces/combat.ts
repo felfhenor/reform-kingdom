@@ -166,6 +166,8 @@ export type Combat = {
   encounterId?: EncounterId;
   encounterRandomId?: EncounterRandomId;
   fightIndex?: number;
+  // Untyped (not TownId) to avoid a circular import - content-town.ts already imports CombatStatBlock from here.
+  raidTownId?: string;
 };
 
 // A combatant HP change, pushed to combatantDamageEvents to show a floating +/- number; amount is signed for display (positive = heal).

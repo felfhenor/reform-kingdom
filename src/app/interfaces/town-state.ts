@@ -1,4 +1,5 @@
 import type { ItemId } from '@interfaces/content-item';
+import type { MonsterContent, MonsterId } from '@interfaces/content-monster';
 import type { RecipeContent, RecipeId } from '@interfaces/content-recipe';
 import type { TownId } from '@interfaces/content-town';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
@@ -56,10 +57,32 @@ export type TownNodeState = {
   tradeskills: Record<TradeskillId, TownTradeskillState>;
   // Combined across all tradeskills (not one queue per tradeskill) - entries tick simultaneously, mirroring multiple workers crafting in tandem.
   craftQueue: TownCraftQueueEntry[];
+  // Undefined = no raid currently pending. Set together by townRaidProcessTick's telegraph step, cleared together on engage/resolve.
+  raidTelegraphedAtTick?: number;
+  raidEngageWindowExpiresAtTick?: number;
+  // Rolled once at telegraph time so the Raid tab preview always matches what raidEngageCombat actually spawns.
+  raidTelegraphedAssaulterIds?: MonsterId[];
+  // Gates the once/day/town raid cap - set on every resolution (win, loss, or missed-window).
+  lastRaidResolvedAtTick?: number;
+  // Raid-loss penalty - consumed as an extra multiplier in advanceQueueEntry (town-craft-queue.ts).
+  craftSpeedDebuffExpiresAtTick?: number;
 };
 
 export type GameStateTowns = {
   [key: TownId]: TownNodeState;
+};
+
+// All three fields are always set/cleared together - see townRaidTelegraph (town-raid-state.ts).
+export type TownRaidTelegraph = {
+  telegraphedAtTick: number;
+  engageWindowExpiresAtTick: number;
+  assaulterMonsterIds: MonsterId[];
+};
+
+// One resolved+counted monster row for the Raid tab's assaulter/defender preview lists.
+export type TownRaidCombatantRow = {
+  monster: MonsterContent;
+  quantity: number;
 };
 
 // Pre-computed display state for one stock row - keeps helper-call derivations out of the component.

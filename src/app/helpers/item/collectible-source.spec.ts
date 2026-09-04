@@ -7,6 +7,8 @@ import type {
   EncounterRandomId,
   RecipeContent,
   RecipeId,
+  TownContent,
+  TownId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -70,6 +72,19 @@ const effigyRecipe: RecipeContent = {
 };
 
 const crudeTreasureMap = 'crude-treasure-map' as CollectibleId;
+const larsianHouseModel = 'larsian-house-model' as CollectibleId;
+
+const larsia: TownContent = {
+  id: 'larsia' as TownId,
+  name: 'Larsia',
+  __type: 'town',
+  defense: {
+    rewards: [{ collectibleId: larsianHouseModel, chance: 100 }],
+    guardian: { reputationTiers: [] },
+    assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
+    quests: { commissions: [] },
+  },
+} as unknown as TownContent;
 
 const jukeItos: CaravanTraderContent = {
   id: 'juke-itos' as never,
@@ -90,6 +105,7 @@ function mockContent(overrides: {
   encounterrandom?: EncounterRandomContent[];
   recipe?: RecipeContent[];
   caravantrader?: CaravanTraderContent[];
+  town?: TownContent[];
 }) {
   vi.mocked(getEntriesByType).mockImplementation(
     (type) => (overrides[type as keyof typeof overrides] ?? []) as never,
@@ -147,6 +163,16 @@ describe('collectibleSourceMapBuild', () => {
 
     expect(sources.get(crudeTreasureMap)).toEqual([
       { type: 'trader', name: 'Juke Itos' },
+    ]);
+  });
+
+  it("records a raid source from a town's defense.rewards", () => {
+    mockContent({ town: [larsia] });
+
+    const sources = collectibleSourceMapBuild();
+
+    expect(sources.get(larsianHouseModel)).toEqual([
+      { type: 'raid', name: 'Larsia' },
     ]);
   });
 

@@ -131,6 +131,16 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
     ),
   );
 
+  towns.forEach((town) =>
+    collectFromDroppedRewards(
+      town.defense.rewards,
+      obtainableItems,
+      obtainableEquipment,
+      obtainableCollectibles,
+      obtainableWorkers,
+    ),
+  );
+
   gatherings.forEach((gathering) => {
     gathering.gatherResults.forEach((result) => {
       result.items.forEach((item) =>

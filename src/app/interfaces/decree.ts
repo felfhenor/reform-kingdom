@@ -17,7 +17,8 @@ export type DecreeClauseAction =
     }
   | { type: 'FinishUnfinishedAreas'; riskTolerance: DecreeRiskLevel }
   | { type: 'LevelUpParty'; riskTolerance: DecreeRiskLevel }
-  | { type: 'ReturnToKingdom' };
+  | { type: 'ReturnToKingdom' }
+  | { type: 'DefendTowns'; riskTolerance: DecreeRiskLevel; townName?: string };
 
 export type DecreeClause = DecreeClauseAction & {
   id: DecreeClauseId;

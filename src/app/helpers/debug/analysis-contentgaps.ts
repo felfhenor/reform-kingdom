@@ -28,6 +28,7 @@ import type {
   LevelRange,
   MonsterContent,
   RecipeContent,
+  TownContent,
   TradeskillContent,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
@@ -333,6 +334,7 @@ export function runContentGapsAnalysis(
   const caravanTraders =
     getEntriesByType<CaravanTraderContent>('caravantrader');
   const tradeskills = getEntriesByType<TradeskillContent>('tradeskill');
+  const towns = getEntriesByType<TownContent>('town');
 
   const nodeRanges: LevelRange[] = [
     ...encounters,
@@ -355,6 +357,7 @@ export function runContentGapsAnalysis(
     caravans,
     caravanTraders,
     monsterLevels,
+    towns,
   );
 
   const checks: AnalysisCheck[] = [

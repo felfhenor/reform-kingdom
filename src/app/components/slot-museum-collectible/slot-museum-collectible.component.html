@@ -62,6 +62,8 @@
           <div class="text-xs">From: {{ source.name }}</div>
         } @else if (source?.type === 'node') {
           <div class="text-xs">Discoverable in: {{ source.name }}</div>
+        } @else if (source?.type === 'raid') {
+          <div class="text-xs">From defending: {{ source.name }}</div>
         } @else {
           <div class="text-xs italic">Source unknown</div>
         }

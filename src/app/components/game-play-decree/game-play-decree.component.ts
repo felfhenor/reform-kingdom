@@ -11,7 +11,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { getEntry } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import {
   decreeClauseAdd,
@@ -24,11 +24,11 @@ import {
   decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree';
-import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/decree/decree-evaluation';
 import {
   exploreNodeFarmOptions,
   farmNodeRewardOptions,
 } from '@helpers/decree/decree-farm-node';
+import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/engine/risk-band';
 import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import type {
@@ -40,6 +40,7 @@ import type {
   ItemContent,
   MaterialId,
   RewardContentInfo,
+  TownContent,
 } from '@interfaces';
 import {
   NgLabelTemplateDirective,
@@ -58,6 +59,7 @@ const CLAUSE_TYPE_OPTIONS: {
     { value: 'FarmNode', label: 'Farm Node' },
     { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
     { value: 'LevelUpParty', label: 'Level Up Party' },
+    { value: 'DefendTowns', label: 'Defend Towns' },
   ],
   'label',
 );
@@ -141,6 +143,12 @@ export class GamePlayDecreeComponent {
   public draftRewardKey = signal<string | undefined>(undefined);
   public draftTargetQuantity = signal<number>(1);
   public draftRiskTolerance = signal<DecreeRiskLevel>('Medium');
+  // Undefined = "any town" - distinct from draftNodeName, FarmNode's explore-node picker.
+  public draftTownName = signal<string | undefined>(undefined);
+
+  public townOptions = computed(() =>
+    sortBy(getEntriesByType<TownContent>('town'), (town) => town.name),
+  );
 
   // Scoped to the currently-selected node - a FarmNode reward only ever
   // makes sense in the context of the node it's farmed from.
@@ -194,6 +202,12 @@ export class GamePlayDecreeComponent {
         };
       case 'ReturnToKingdom':
         return { type: 'ReturnToKingdom' };
+      case 'DefendTowns':
+        return {
+          type: 'DefendTowns',
+          riskTolerance: this.draftRiskTolerance(),
+          townName: this.draftTownName(),
+        };
     }
   });
 
@@ -251,6 +265,10 @@ export class GamePlayDecreeComponent {
     this.draftRewardKey.set(option ? option.key : undefined);
   }
 
+  public setDraftTownName(option: TownContent | null): void {
+    this.draftTownName.set(option ? option.name : undefined);
+  }
+
   public toggleClauseEnabled(clause: DecreeClause): void {
     decreeClauseSetEnabled(clause.id, !clause.enabled);
   }
@@ -289,6 +307,14 @@ export class GamePlayDecreeComponent {
       this.editingClauseId.set(clause.id);
       this.draftType.set(clause.type);
       this.draftRiskTolerance.set(clause.riskTolerance);
+      return;
+    }
+
+    if (clause.type === 'DefendTowns') {
+      this.editingClauseId.set(clause.id);
+      this.draftType.set('DefendTowns');
+      this.draftRiskTolerance.set(clause.riskTolerance);
+      this.draftTownName.set(clause.townName);
     }
   }
 
@@ -299,6 +325,7 @@ export class GamePlayDecreeComponent {
     this.draftRewardKey.set(undefined);
     this.draftTargetQuantity.set(1);
     this.draftRiskTolerance.set('Medium');
+    this.draftTownName.set(undefined);
   }
 
   public submitClause(): void {

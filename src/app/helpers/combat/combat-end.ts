@@ -23,6 +23,10 @@ import {
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { rollDroppedRewards } from '@helpers/item/loot';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
+import {
+  raidResolveDefeat,
+  raidResolveVictory,
+} from '@helpers/town/raid/town-raid-resolve';
 import type {
   Combat,
   Combatant,
@@ -30,6 +34,8 @@ import type {
   EncounterId,
   EncounterRandomContent,
   MonsterContent,
+  TownContent,
+  TownId,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -82,6 +88,10 @@ function encounterMaxLevel(combat: Combat): number | undefined {
   if (combat.encounterRandomId) {
     return getEntry<EncounterRandomContent>(combat.encounterRandomId)
       ?.levelRange?.max;
+  }
+  if (combat.raidTownId) {
+    return getEntry<TownContent>(combat.raidTownId as TownId)?.defense
+      ?.assaulter?.level?.max;
   }
   return undefined;
 }
@@ -159,6 +169,11 @@ function handleCombatVictory(combat: Combat): boolean {
   autoModeRecordNodeSuccess(combat.locationName);
   grantVictoryRewards(combat);
 
+  if (combat.raidTownId) {
+    raidResolveVictory(combat, combat.raidTownId as TownId);
+    return false;
+  }
+
   if (combat.encounterRandomId) {
     return encounterRandomHandleVictory(combat);
   }
@@ -185,6 +200,11 @@ export function combatHandleDefeat(combat: Combat): void {
   autoModeRecordClauseFailure();
   autoModeRecordNodeFailure(combat.locationName);
   travelBeginDeathsDoor();
+
+  // A raid loss is still a real party wipe (Deaths Door above) plus its own town-scoped consequence.
+  if (combat.raidTownId) {
+    raidResolveDefeat(combat.raidTownId as TownId);
+  }
 }
 
 export function combatCheckIfOver(combat: Combat): boolean {

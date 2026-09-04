@@ -84,6 +84,11 @@ vi.mock('@helpers/hero/travel', () => ({
   travelBeginDeathsDoor: vi.fn(),
 }));
 
+vi.mock('@helpers/town/raid/town-raid-resolve', () => ({
+  raidResolveVictory: vi.fn(),
+  raidResolveDefeat: vi.fn(),
+}));
+
 import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
 import {
   collectibleDropHtml,
@@ -107,6 +112,10 @@ import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { rollDroppedRewards } from '@helpers/item/loot';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
+import {
+  raidResolveDefeat,
+  raidResolveVictory,
+} from '@helpers/town/raid/town-raid-resolve';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -117,6 +126,8 @@ import type {
   MonsterContent,
   RecipeContent,
   RecipeId,
+  TownContent,
+  TownId,
 } from '@interfaces';
 
 function buildCombatant(overrides: Partial<Combatant>): Combatant {
@@ -346,6 +357,42 @@ describe('combatCheckIfOver', () => {
     expect(autoModeRecordNodeFailure).toHaveBeenCalledWith('Field Ruins');
   });
 
+  it('routes a raid victory to raidResolveVictory instead of the encounter-completion path', () => {
+    vi.mocked(getEntry).mockReturnValue(undefined);
+    const combat = buildCombat({ raidTownId: 'larsia' });
+
+    const result = combatCheckIfOver(combat);
+
+    expect(result).toBe(true);
+    expect(raidResolveVictory).toHaveBeenCalledWith(combat, 'larsia');
+    expect(encounterStartFight).not.toHaveBeenCalled();
+    expect(combatReset).toHaveBeenCalled();
+  });
+
+  it('calls raidResolveDefeat in addition to the normal Deaths Door defeat handling for a raid loss', () => {
+    const combat = buildCombat({
+      raidTownId: 'larsia',
+      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(travelBeginDeathsDoor).toHaveBeenCalled();
+    expect(raidResolveDefeat).toHaveBeenCalledWith('larsia');
+  });
+
+  it('does not call raidResolveDefeat for a non-raid loss', () => {
+    const combat = buildCombat({
+      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(raidResolveDefeat).not.toHaveBeenCalled();
+  });
+
   it('degrades XP via xpForOverLevel using the encounter max and highest hero level', () => {
     const monster = { id: 'monster-1' } as MonsterContent;
     const encounter = {
@@ -383,6 +430,39 @@ describe('combatCheckIfOver', () => {
     // Uses the highest hero level (7) against the node's max (5).
     expect(xpForOverLevel).toHaveBeenCalledWith(100, 7, 5);
     expect(partyGainXp).toHaveBeenCalledWith(50);
+  });
+
+  it("grants over-level-scaled XP for a raid win, using the town's assaulter max level", () => {
+    const monster = { id: 'monster-1' } as MonsterContent;
+    const town = {
+      id: 'larsia' as TownId,
+      defense: { assaulter: { level: { min: 20, max: 25 } } },
+    } as TownContent;
+
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'larsia' ? town : monster) as never,
+    );
+    vi.mocked(monsterXpReward).mockReturnValue(100);
+    vi.mocked(xpForOverLevel).mockReturnValue(80);
+
+    const combat = buildCombat({
+      raidTownId: 'larsia',
+      heroes: [buildCombatant({ id: 'hero-1', level: 22, hp: 10 })],
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+          level: 25,
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(xpForOverLevel).toHaveBeenCalledWith(100, 22, 25);
+    expect(partyGainXp).toHaveBeenCalledWith(80);
   });
 
   it('wipes every node failure count when the XP gain levels up the party', () => {

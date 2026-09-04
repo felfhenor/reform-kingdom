@@ -5,3 +5,7 @@
 @if (reputationTierName(); as tierName) {
   <div class="badge badge-secondary badge-outline">{{ tierName }}</div>
 }
+
+@if (raidCountdown(); as countdown) {
+  <div class="badge badge-error badge-outline">Raid in {{ countdown }}</div>
+}

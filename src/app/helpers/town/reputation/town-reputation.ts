@@ -78,6 +78,25 @@ export function townReputationGain(
   analyticsSendDesignEvent(`Town:Reputation:${source}`);
 }
 
+// The sole subtraction path - reputation is otherwise cumulative-only, reserved for a raid loss.
+export function townReputationLose(
+  townId: TownId,
+  amount: number,
+  source: TownReputationGainSource,
+): void {
+  if (amount <= 0) return;
+
+  updateGamestate((state) => {
+    const town = state.world.towns[townId];
+    if (!town) return state;
+
+    town.reputation = Math.max(0, town.reputation - amount);
+    return state;
+  });
+
+  analyticsSendDesignEvent(`Town:Reputation:Lose:${source}`);
+}
+
 // Highest-defined tier at or below the current one - lets a table author only some tiers and still resolve sensibly below that.
 export function townReputationTierMultiplier<T>(
   tier: number,

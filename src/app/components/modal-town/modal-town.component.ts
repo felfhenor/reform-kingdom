@@ -15,12 +15,21 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { notifySuccess } from '@helpers/engine/notify';
+import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
+import { modalCloseTop } from '@helpers/engine/modal-stack';
+import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import { activeTownNode } from '@helpers/engine/ui';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
+import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
+import {
+  raidAssaulterPreview,
+  raidDefenderPreview,
+  townRaidTelegraph,
+} from '@helpers/town/raid/town-raid-state';
 import {
   townCraftQueueRows,
   townTradeskillLevelRows,
@@ -48,6 +57,7 @@ import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
   TownCraftQueueRow,
   TownModalTab,
+  TownRaidCombatantRow,
   TownStockEntry,
   TownStockRow,
   TownTradeskillLevelRow,
@@ -72,11 +82,13 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     IconComponent,
     IconItemPreviewComponent,
     SlotIconBlankComponent,
+    SlotCompletionRewardComponent,
     TooltipItemPreviewComponent,
     CurrencyCostComponent,
     TippyDirective,
   ],
   templateUrl: './modal-town.component.html',
+  styleUrl: './modal-town.component.scss',
 })
 export class ModalTownComponent {
   private locale = inject(LOCALE_ID);
@@ -95,6 +107,44 @@ export class ModalTownComponent {
   });
 
   public currentTab = signal<TownModalTab>('shop');
+
+  public raidTelegraph = computed(() => {
+    const town = this.town();
+    return town ? townRaidTelegraph(town.id) : undefined;
+  });
+
+  public raidCountdown = computed(() => {
+    const telegraph = this.raidTelegraph();
+    if (!telegraph) return undefined;
+
+    return formatDuration(
+      telegraph.engageWindowExpiresAtTick - timerTicksElapsed(),
+    );
+  });
+
+  public raidRewards = computed(() => this.town()?.defense.rewards ?? []);
+
+  public raidAssaulters = computed<TownRaidCombatantRow[]>(() => {
+    const town = this.town();
+    return town ? raidAssaulterPreview(town) : [];
+  });
+
+  public raidDefenders = computed<TownRaidCombatantRow[]>(() => {
+    const town = this.town();
+    return town ? raidDefenderPreview(town) : [];
+  });
+
+  public engageRaid(): void {
+    const town = this.town();
+    if (!town) return;
+
+    if (!raidEngageCombat(town.id)) {
+      notifyError(`Could not engage the raid on ${town.name}.`);
+      return;
+    }
+
+    modalCloseTop();
+  }
 
   public stockRows = computed<TownStockRow[]>(() => {
     const town = this.town();

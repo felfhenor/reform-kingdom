@@ -21,6 +21,7 @@ import {
   debugSetTradeskillLevel,
   debugSetWorkerLevel,
   debugStartTownDefenseCombat,
+  debugTelegraphRaid,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug';
 import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
@@ -232,5 +233,12 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!townId) return;
 
     debugStartTownDefenseCombat(townId);
+  }
+
+  public telegraphRaid(): void {
+    const townId = this.selectedTownId();
+    if (!townId) return;
+
+    debugTelegraphRaid(townId);
   }
 }
