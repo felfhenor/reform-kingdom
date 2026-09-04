@@ -20,7 +20,7 @@
   (click)="activate.emit()"
 >
   @if (item) {
-    <div class="flex flex-col items-center gap-1 shrink-0">
+    <div class="flex flex-col items-center gap-2 shrink-0">
       <div
         class="outline-2 outline-offset-[-2px] rounded outline-{{
           item.rarity
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col flex-1 min-w-0 gap-1">
+    <div class="flex flex-col flex-1 min-w-0 gap-2">
       <span class="font-bold text-{{ item.rarity }} truncate">
         {{ item.name }}
       </span>

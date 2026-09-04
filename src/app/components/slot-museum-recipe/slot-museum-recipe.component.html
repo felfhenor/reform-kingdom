@@ -65,7 +65,7 @@
       }
 
       @if (e.tokenUnlockCost !== undefined) {
-        <div class="text-xs flex items-center gap-1 mt-1">
+        <div class="text-xs flex items-center gap-2 mt-1">
           {{ canUnlock() ? 'Click to unlock for' : 'Unlock for' }}
           <app-currency-cost
             [type]="traderTokenItemId"
