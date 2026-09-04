@@ -25,8 +25,8 @@
     Agility: 0.8
 
   statPriority:
-    - Agility
     - Strength
+    - Agility
     - Luck
     - Resistance
 
