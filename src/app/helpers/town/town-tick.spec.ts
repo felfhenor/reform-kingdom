@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -57,6 +58,10 @@ const town: TownContent = {
     maxQueueSize: 12,
     maxTradeskillLevel: 20,
     specialtyTradeskillId: 'jewelcrafting' as never,
+    craftingDurationMultiplier: 3,
+    craftingChanceOnTick: 3,
+    craftingChanceItemThreshold: 4,
+    tradeskillLevels: [],
     uniqueRecipeIds: [],
   },
   traders: { sellItemCount: 10, markupPercentages: { sell: 25, buy: -15 } },
@@ -167,6 +172,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     };
 
@@ -183,6 +190,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     };
 
@@ -203,6 +212,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     });
   });
@@ -217,6 +228,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 350,
         hiddenGold: 1200,
         materials: { [oreId]: 8 },
+        tradeskills: {},
+        craftQueue: [],
       },
     };
 
@@ -238,6 +251,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: { [oreId]: 5 },
+        tradeskills: {},
+        craftQueue: [],
       },
     };
 
@@ -257,6 +272,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     };
 
@@ -268,6 +285,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     });
   });
@@ -286,6 +305,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     };
 
@@ -297,6 +318,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     });
   });
@@ -314,6 +337,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     };
 
@@ -325,6 +350,8 @@ describe('pruneInvalidTowns', () => {
         reputation: 0,
         hiddenGold: 0,
         materials: {},
+        tradeskills: {},
+        craftQueue: [],
       },
     });
     expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {});

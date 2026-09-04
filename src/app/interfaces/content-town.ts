@@ -22,16 +22,31 @@ export type TownId = Branded<string, 'TownId'>;
 // every numeric knob below is authored directly per-town instead.
 export type TownScaleType = 'City' | 'Town' | 'Outpost';
 
+// A seeded floor for one tradeskill's level - materialization never lowers a town's tradeskill below this.
+export type TownTradeskillLevelSeed = {
+  tradeskillId: TradeskillId;
+  level: number;
+};
+
 export type TownCraftingConfig = {
   maxQueueSize: number;
   maxTradeskillLevel: number;
   specialtyTradeskillId: TradeskillId;
+  // Multiplies every recipe's craftTime for this town - towns craft slower than the player so shop stock doesn't churn instantly.
+  craftingDurationMultiplier: number;
+  // Percent chance per tick to queue a new craft once the queue is at/above craftingChanceItemThreshold.
+  craftingChanceOnTick: number;
+  // Below this queue length, a new craft is queued every tick (materials permitting); at/above it, craftingChanceOnTick gates it.
+  craftingChanceItemThreshold: number;
+  tradeskillLevels: TownTradeskillLevelSeed[];
   // Never appears in the player's own tradeskill craft list (see isRecipeCraftable) - exclusively obtainable through this town.
   uniqueRecipeIds: RecipeId[];
 };
 
 export type TownTradersConfig = {
   sellItemCount: number;
+  // Ticks a stock entry sits unsold before it's cycled out, keeping the shop's selection from going stale.
+  itemExpirationTimer: number;
   markupPercentages: CaravanMarkupPercentages;
 };
 

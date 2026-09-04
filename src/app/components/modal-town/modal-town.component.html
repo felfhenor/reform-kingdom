@@ -83,22 +83,69 @@
             @if (shopStockRows.length > 0) {
               <div class="flex flex-col gap-2">
                 @for (row of shopStockRows; track row.index) {
+                  @let item = stockRowDisplay(row.entry);
+
+                  <app-tooltip-item-preview
+                    #preview
+                    [display]="item"
+                    [bonusStats]="stockRowBonusStats(row.entry)"
+                    [bonusResistances]="stockRowBonusResistances(row.entry)"
+                    [bonusCombatStats]="stockRowBonusCombatStats(row.entry)"
+                  />
+
                   <button
                     type="button"
-                    class="btn btn-outline btn-neutral justify-start h-auto normal-case font-normal gap-2 text-neutral-content text-start w-full"
+                    class="btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start ps-0"
                     [disabled]="row.price === undefined || row.maxQuantity <= 0"
+                    [tp]="item ? preview.template() : undefined"
+                    [tpPlacement]="'top'"
                     (click)="requestTrade(row)"
                   >
-                    <span class="grow">{{ stockEntryName(row.entry) }}</span>
-                    @if ('quantity' in row.entry) {
-                      <span class="badge badge-outline badge-sm">
-                        x{{ row.entry.quantity | number }}
-                      </span>
-                    }
-                    @if (row.price !== undefined) {
-                      <span class="badge badge-outline badge-sm">
-                        {{ row.price | number }}g
-                      </span>
+                    @if (item) {
+                      <div class="flex flex-col items-center gap-1 shrink-0">
+                        <div
+                          class="outline-2 outline-offset-[-2px] rounded outline-{{
+                            item.rarity
+                          }}"
+                        >
+                          <app-slot-icon-blank>
+                            <app-icon-item-preview
+                              [sprite]="item.sprite"
+                              [spritesheet]="item.spritesheet"
+                              [backdropSprite]="item.backdropSprite"
+                            />
+                          </app-slot-icon-blank>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-col flex-1 min-w-0 gap-1">
+                        <span class="font-bold text-{{ item.rarity }} truncate">
+                          {{ item.name }}
+                        </span>
+
+                        <div class="flex items-center gap-2 flex-wrap">
+                          @if ('quantity' in row.entry) {
+                            <span class="badge badge-outline badge-sm">
+                              x{{ row.entry.quantity | number }}
+                            </span>
+                          }
+                          @if (row.expiresIn) {
+                            <span
+                              class="badge badge-outline badge-warning badge-sm"
+                            >
+                              {{ row.expiresIn }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+
+                      @if (row.price !== undefined) {
+                        <app-currency-cost
+                          [type]="goldCoinItemId"
+                          [amount]="row.price"
+                          class="ml-auto mr-2 shrink-0"
+                        />
+                      }
                     }
                   </button>
                 }
@@ -108,7 +155,72 @@
             }
           }
           @case ('crafting') {
-            <p>No crafting orders are queued yet.</p>
+            <div class="flex flex-col gap-4">
+              <div class="flex flex-wrap gap-2">
+                @for (row of tradeskillLevelRows(); track row.tradeskillId) {
+                  <div
+                    class="relative w-16 h-16 shrink-0"
+                    [tp]="tradeskillTooltip(row)"
+                    [tpPlacement]="'top'"
+                  >
+                    <app-slot-icon-blank>
+                      <app-atlas-image
+                        spritesheet="tradeskill"
+                        [assetName]="row.sprite"
+                      />
+                    </app-slot-icon-blank>
+                    @if (row.isSpecialty) {
+                      <span class="absolute top-1 right-1">
+                        <app-icon
+                          name="gameSevenPointedStar"
+                          size="badge"
+                          class="text-yellow-400 drop-shadow"
+                        />
+                      </span>
+                    }
+                    <span
+                      class="absolute bottom-0 inset-x-0 text-center text-xs text-shadow-black"
+                    >
+                      Lv {{ row.level | number }}
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                @for (_ of craftQueueSlots(); track $index) {
+                  @let row = craftQueueRows()[$index];
+                  @if (row && row.resultDisplay; as item) {
+                    <div
+                      class="relative w-16 h-16 shrink-0 outline-2 outline-offset-[-2px] rounded outline-{{
+                        item.rarity
+                      }}"
+                      [tp]="row.tradeskillName + ': ' + item.name"
+                      [tpPlacement]="'top'"
+                    >
+                      <app-slot-icon-blank>
+                        <app-icon-item-preview
+                          [sprite]="item.sprite"
+                          [spritesheet]="item.spritesheet"
+                          [backdropSprite]="item.backdropSprite"
+                        />
+                      </app-slot-icon-blank>
+                      <div
+                        class="absolute top-0 inset-x-0 text-[10px] text-center bg-black/60"
+                      >
+                        {{ row.remaining }}
+                      </div>
+                    </div>
+                  } @else {
+                    <div
+                      class="relative w-16 h-16 shrink-0 outline-2 outline-offset-[-2px] rounded outline-gray-500"
+                    >
+                      <app-slot-icon-blank></app-slot-icon-blank>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
           }
           @case ('workers') {
             @let roster = workers();

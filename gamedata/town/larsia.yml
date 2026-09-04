@@ -10,12 +10,32 @@
     maxQueueSize: 12
     maxTradeskillLevel: 20
     specialtyTradeskillId: Jewelcrafting
+    craftingDurationMultiplier: 3
+    craftingChanceOnTick: 3
+    craftingChanceItemThreshold: 4
+
+    tradeskillLevels:
+      - tradeskillId: Jewelcrafting
+        level: 16
+
+      - tradeskillId: Blacksmithing
+        level: 12
+
+      - tradeskillId: Tailoring
+        level: 13
+
+      - tradeskillId: Woodworking
+        level: 9
+
+      - tradeskillId: Artificing
+        level: 9
 
     uniqueRecipeIds:
       - 'Equipment: Larsian Ring'
 
   traders:
     sellItemCount: 10
+    itemExpirationTimer: 1800
 
     markupPercentages:
       sell: 25

@@ -5,6 +5,7 @@ import {
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { townTradeskillsMaterialize } from '@helpers/town/crafting/town-craft-tradeskills';
 import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import type { TownContent, TownId } from '@interfaces';
 
@@ -27,6 +28,11 @@ export function townMarkVisited(townId: TownId): void {
       reputation: existing?.reputation ?? 0,
       hiddenGold: existing?.hiddenGold ?? 0,
       materials: existing?.materials ?? {},
+      tradeskills: townTradeskillsMaterialize(
+        townId,
+        existing?.tradeskills ?? {},
+      ),
+      craftQueue: existing?.craftQueue ?? [],
       firstVisitedAtTick: timerTicksElapsed(),
     };
     return state;

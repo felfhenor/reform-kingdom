@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/engine/analytics', () => ({
@@ -54,6 +55,8 @@ describe('townMarkVisited', () => {
       reputation: 0,
       hiddenGold: 0,
       materials: {},
+      tradeskills: {},
+      craftQueue: [],
       firstVisitedAtTick: 500,
     });
   });
@@ -96,6 +99,8 @@ describe('townMarkVisited', () => {
       reputation: 0,
       hiddenGold: 0,
       materials: {},
+      tradeskills: {},
+      craftQueue: [],
       firstVisitedAtTick: 500,
     });
   });
@@ -179,6 +184,46 @@ describe('townMarkVisited', () => {
     townMarkVisited(townId);
 
     expect(state.world.towns[townId].materials).toEqual(materials);
+  });
+
+  it('preserves existing tradeskills when activating', () => {
+    const tradeskills = { blacksmithing: { level: 3 } };
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, tradeskills } },
+      },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, tradeskills } },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].tradeskills).toEqual(tradeskills);
+  });
+
+  it('preserves existing craftQueue when activating', () => {
+    const craftQueue = [{ id: 'q1', tradeskillId: 'blacksmithing' }];
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, craftQueue } },
+      },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: { [townId]: { lastProcessedTick: {}, craftQueue } },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].craftQueue).toEqual(craftQueue);
   });
 
   it('materializes the worker roster via townWorkerRosterMaterialize when the town resolves', () => {

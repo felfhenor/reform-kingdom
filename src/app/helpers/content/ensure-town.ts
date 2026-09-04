@@ -20,9 +20,19 @@ import type {
   TownReputationBuffTier,
   TownReputationConfig,
   TownTradersConfig,
+  TownTradeskillLevelSeed,
   TradeskillId,
   WorkerId,
 } from '@interfaces';
+
+function ensureTownTradeskillLevelSeed(
+  seed: Partial<TownTradeskillLevelSeed> = {},
+): TownTradeskillLevelSeed {
+  return {
+    tradeskillId: seed.tradeskillId ?? ('UNKNOWN' as TradeskillId),
+    level: seed.level ?? 1,
+  };
+}
 
 function ensureTownCrafting(
   crafting: Partial<TownCraftingConfig> = {},
@@ -32,6 +42,13 @@ function ensureTownCrafting(
     maxTradeskillLevel: crafting.maxTradeskillLevel ?? 1,
     specialtyTradeskillId:
       crafting.specialtyTradeskillId ?? ('UNKNOWN' as TradeskillId),
+    craftingDurationMultiplier: crafting.craftingDurationMultiplier ?? 1,
+    craftingChanceOnTick: crafting.craftingChanceOnTick ?? 100,
+    craftingChanceItemThreshold: crafting.craftingChanceItemThreshold ?? 1,
+    tradeskillLevels: ensureArray(
+      crafting.tradeskillLevels,
+      ensureTownTradeskillLevelSeed,
+    ),
     uniqueRecipeIds: crafting.uniqueRecipeIds ?? [],
   };
 }
@@ -41,6 +58,7 @@ function ensureTownTraders(
 ): TownTradersConfig {
   return {
     sellItemCount: traders.sellItemCount ?? 0,
+    itemExpirationTimer: traders.itemExpirationTimer ?? 0,
     markupPercentages: traders.markupPercentages ?? { sell: 0, buy: 0 },
   };
 }
