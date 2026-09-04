@@ -24,6 +24,7 @@ import type {
   ItemContent,
   RecipeContent,
   RecipeId,
+  TownContent,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -56,9 +57,17 @@ export function isRecipeDropGated(recipeId: RecipeId): boolean {
   );
 }
 
+// Exclusively obtainable through the authoring town's own shop stock (see TownCraftingConfig.uniqueRecipeIds) - never on the player's own tradeskill craft list.
+export function isRecipeTownUnique(recipeId: RecipeId): boolean {
+  return getEntriesByType<TownContent>('town').some((town) =>
+    town.crafting.uniqueRecipeIds.includes(recipeId),
+  );
+}
+
 // A drop-gated recipe can only be crafted once found; every other recipe is
 // available as soon as the tradeskill level gate is met.
 export function isRecipeCraftable(recipeId: RecipeId): boolean {
+  if (isRecipeTownUnique(recipeId)) return false;
   if (isRecipeDiscovered(recipeId)) return true;
   return !isRecipeDropGated(recipeId);
 }

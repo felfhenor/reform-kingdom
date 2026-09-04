@@ -388,6 +388,7 @@ describe('townCraftProcessTick - completing the queue', () => {
       },
     } as unknown as GameState);
 
+    expect(newEquipmentItem).toHaveBeenCalledWith('sword');
     expect(applyTownStockAdd).toHaveBeenCalledWith(
       expect.anything(),
       townId,
@@ -712,7 +713,7 @@ describe('townCraftProcessTick - queueing new crafts', () => {
     expect(state.world.towns[townId].craftQueue).toEqual([]);
   });
 
-  it('calls townPickRecipeToQueue with just the townId', () => {
+  it('calls townPickRecipeToQueue with the whole town content', () => {
     townCraftProcessTick();
 
     applyLastUpdate({
@@ -727,6 +728,8 @@ describe('townCraftProcessTick - queueing new crafts', () => {
       },
     } as unknown as GameState);
 
-    expect(townPickRecipeToQueue).toHaveBeenCalledWith(townId);
+    expect(townPickRecipeToQueue).toHaveBeenCalledWith(
+      expect.objectContaining({ id: townId }),
+    );
   });
 });

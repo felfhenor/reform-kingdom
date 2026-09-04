@@ -27,6 +27,7 @@ vi.mock('@helpers/combat/combat-state', () => ({
 import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
+  backfillEquipmentItem,
   canEquipItem,
   canModifyEquipment,
   characterTagResistances,
@@ -1276,6 +1277,18 @@ describe('Equipment Helper Functions', () => {
       const item = newEquipmentItem(sword.id);
       expect(item.affixIds).toEqual([]);
       expect(getEntriesByType).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('backfillEquipmentItem', () => {
+    it('backfills a missing id and defaults infusedItemIds/affixIds', () => {
+      const item = { equipmentId: sword.id } as unknown as EquipmentItem;
+
+      const backfilled = backfillEquipmentItem(item);
+
+      expect(backfilled.id).toBeTruthy();
+      expect(backfilled.infusedItemIds).toEqual([]);
+      expect(backfilled.affixIds).toEqual([]);
     });
   });
 

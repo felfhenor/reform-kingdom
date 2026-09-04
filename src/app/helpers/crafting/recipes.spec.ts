@@ -61,6 +61,7 @@ import {
   isRecipeCraftable,
   isRecipeDiscovered,
   isRecipeDropGated,
+  isRecipeTownUnique,
   pruneInvalidDiscoveredRecipes,
   recipeCanUnlockWithTokens,
   recipeDiscover,
@@ -184,10 +185,12 @@ const alekiaTrader = {
 function mockEntriesByType(
   traders: unknown[] = [],
   encounters: EncounterContent[] = [forestRuinsEncounter],
+  towns: unknown[] = [],
 ): void {
   vi.mocked(getEntriesByType).mockImplementation(((type: string) => {
     if (type === 'encounter') return encounters;
     if (type === 'caravantrader') return traders;
+    if (type === 'town') return towns;
     return [];
   }) as typeof getEntriesByType);
 }
@@ -267,6 +270,34 @@ describe('Recipes Helper Functions', () => {
       } as unknown as GameState);
 
       expect(isRecipeCraftable(itemRecipe.id)).toBe(true);
+    });
+
+    it('is false for a recipe listed in any town\'s uniqueRecipeIds, even if already discovered', () => {
+      mockEntriesByType([], [forestRuinsEncounter], [
+        { crafting: { uniqueRecipeIds: [equipmentRecipe.id] } },
+      ]);
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState);
+
+      expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
+    });
+  });
+
+  describe('isRecipeTownUnique', () => {
+    it('is false when no town lists the recipe', () => {
+      mockEntriesByType();
+
+      expect(isRecipeTownUnique(itemRecipe.id)).toBe(false);
+    });
+
+    it('is true when a town lists the recipe in its uniqueRecipeIds', () => {
+      mockEntriesByType([], [forestRuinsEncounter], [
+        { crafting: { uniqueRecipeIds: [] } },
+        { crafting: { uniqueRecipeIds: [itemRecipe.id] } },
+      ]);
+
+      expect(isRecipeTownUnique(itemRecipe.id)).toBe(true);
     });
   });
 

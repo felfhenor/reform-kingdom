@@ -5,7 +5,7 @@ vi.mock('@helpers/content/content', () => ({
 }));
 
 vi.mock('@helpers/rng', () => ({
-  rngChoice: vi.fn(),
+  rngChoiceWeighted: vi.fn(),
 }));
 
 vi.mock('@helpers/town/crafting/town-craft-eligibility', () => ({
@@ -13,10 +13,16 @@ vi.mock('@helpers/town/crafting/town-craft-eligibility', () => ({
 }));
 
 import { getEntriesByType } from '@helpers/content/content';
-import { rngChoice } from '@helpers/rng';
+import { rngChoiceWeighted } from '@helpers/rng';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
-import type { RecipeContent, RecipeId, TownId, TradeskillId } from '@interfaces';
+import type {
+  RecipeContent,
+  RecipeId,
+  TownContent,
+  TownId,
+  TradeskillId,
+} from '@interfaces';
 
 const townId = 'larsia' as TownId;
 const blacksmithingId = 'blacksmithing' as TradeskillId;
@@ -24,6 +30,13 @@ const woodworkingId = 'woodworking' as TradeskillId;
 
 function buildRecipe(id: string, tradeskillId = blacksmithingId): RecipeContent {
   return { id: id as RecipeId, tradeskillId } as RecipeContent;
+}
+
+function buildTown(specialtyTradeskillId: TradeskillId): TownContent {
+  return {
+    id: townId,
+    crafting: { specialtyTradeskillId },
+  } as unknown as TownContent;
 }
 
 beforeEach(() => {
@@ -35,11 +48,11 @@ describe('townPickRecipeToQueue', () => {
     vi.mocked(getEntriesByType).mockReturnValue([buildRecipe('a')]);
     vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
 
-    expect(townPickRecipeToQueue(townId)).toBeUndefined();
-    expect(rngChoice).not.toHaveBeenCalled();
+    expect(townPickRecipeToQueue(buildTown(blacksmithingId))).toBeUndefined();
+    expect(rngChoiceWeighted).not.toHaveBeenCalled();
   });
 
-  it('filters to recipes eligible across all tradeskills, then picks one', () => {
+  it('filters to recipes eligible across all tradeskills, then weight-picks one', () => {
     const eligible = buildRecipe('b', woodworkingId);
     vi.mocked(getEntriesByType).mockReturnValue([
       buildRecipe('a', blacksmithingId),
@@ -48,12 +61,36 @@ describe('townPickRecipeToQueue', () => {
     vi.mocked(isRecipeCraftableByTown).mockImplementation(
       (recipe) => recipe.id === eligible.id,
     );
-    vi.mocked(rngChoice).mockImplementation((choices) => choices[0]);
+    vi.mocked(rngChoiceWeighted).mockImplementation((choices) => choices[0]);
 
-    const result = townPickRecipeToQueue(townId);
+    const result = townPickRecipeToQueue(buildTown(blacksmithingId));
 
     expect(isRecipeCraftableByTown).toHaveBeenCalledWith(eligible, townId);
-    expect(rngChoice).toHaveBeenCalledWith([eligible]);
+    expect(rngChoiceWeighted).toHaveBeenCalledWith([eligible], expect.any(Function));
     expect(result).toEqual({ tradeskillId: woodworkingId, recipe: eligible });
+  });
+
+  it('returns undefined if rngChoiceWeighted has nothing to pick from (zero total weight)', () => {
+    vi.mocked(getEntriesByType).mockReturnValue([buildRecipe('a')]);
+    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
+
+    expect(townPickRecipeToQueue(buildTown(blacksmithingId))).toBeUndefined();
+  });
+
+  it('weights a specialty-tradeskill recipe higher than a non-specialty one', () => {
+    const specialtyRecipe = buildRecipe('a', woodworkingId);
+    const otherRecipe = buildRecipe('b', blacksmithingId);
+    vi.mocked(getEntriesByType).mockReturnValue([specialtyRecipe, otherRecipe]);
+    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
+    let weightFn: (recipe: RecipeContent) => number = () => 0;
+    vi.mocked(rngChoiceWeighted).mockImplementation((choices, fn) => {
+      weightFn = fn;
+      return choices[0];
+    });
+
+    townPickRecipeToQueue(buildTown(woodworkingId));
+
+    expect(weightFn(specialtyRecipe)).toBeGreaterThan(weightFn(otherRecipe));
   });
 });

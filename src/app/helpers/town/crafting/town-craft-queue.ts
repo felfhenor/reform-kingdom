@@ -156,7 +156,7 @@ function maybeQueueNewCraft(
   if (target.craftQueue.length >= town.crafting.maxQueueSize) return;
   if (!shouldAttemptQueue(town, target.craftQueue.length)) return;
 
-  const pick = townPickRecipeToQueue(town.id);
+  const pick = townPickRecipeToQueue(town);
   if (!pick) return;
 
   pick.recipe.requirements.forEach((requirement) => {
