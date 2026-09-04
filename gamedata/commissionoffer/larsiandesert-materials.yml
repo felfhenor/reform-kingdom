@@ -1,0 +1,98 @@
+- id: 0e64c135-11f2-4c0e-80be-9cd232aba1fa
+  name: Commission - Firmwater
+  description: The caravan needs a lot of firmwater for hydration.
+
+  requirements:
+    - itemId: Firmwater
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: bb06915f-c340-417b-ab71-199a3c233ac3
+  name: Commission - Timberfuzz
+  description: The caravan needs a lot of timberfuzz for crafting.
+
+  requirements:
+    - itemId: Timberfuzz
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: d653f285-f941-4fd0-a6d2-4ed7a232ca54
+  name: Commission - Petrifiwood
+  description: The caravan needs a lot of petrifiwood for crafting.
+
+  requirements:
+    - itemId: Petrifiwood
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: 90158f52-b4db-4104-9aac-10ddce3ceee3
+  name: Commission - Cactspine
+  description: The caravan needs a lot of cactspines for magical crafting.
+
+  requirements:
+    - itemId: Cactspine
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: 6b39bec4-e9f7-44b3-9c48-9d1bd5afe39c
+  name: Commission - Strongreed
+  description: The caravan needs a lot of strongreed for making clothing.
+
+  requirements:
+    - itemId: Strongreed
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: e3efd3f0-f9c3-4eb5-ac47-ad9209e76a23
+  name: Commission - Amber
+  description: The caravan needs a lot of strongreed for jewelcrafting.
+
+  requirements:
+    - itemId: Amber
+      quantityMin: 100
+      quantityMax: 100
+
+  tokenReward: 1
+
+- id: bbaa61b8-0d04-4852-81aa-864ef30ea7c3
+  name: Commission - Brightwisp Core
+  description: The caravan needs an assortment of brightwisp cores for artificing purposes.
+
+  requirements:
+    - itemId: Brightwisp Core
+      quantityMin: 10
+      quantityMax: 15
+
+  tokenReward: 1
+
+- id: d18b5223-16e4-4987-a858-4602c7dd13bd
+  name: Commission - Preserved Bloodmoth
+  description: The caravan needs an assortment of preserved bloodmoths for artificing purposes.
+
+  requirements:
+    - itemId: Preserved Bloodmoth
+      quantityMin: 10
+      quantityMax: 15
+
+  tokenReward: 1
+
+- id: 10a3de62-7e72-429f-ae51-56b3cf29d8a7
+  name: Commission - Pumpkin Gem
+  description: The caravan needs an assortment of pumpkin gems.
+
+  requirements:
+    - itemId: Pumpkin Gem
+      quantityMin: 10
+      quantityMax: 15
+
+  tokenReward: 1

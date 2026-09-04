@@ -28,6 +28,12 @@
   description: A beaming sunflower found in the Deadwoods. Despite all the other dead plant growth, these seem to thrive there.
   sprite: '0044'
 
+- id: 8863a523-4cb2-420e-a4cf-3934220eb2e2
+  name: Shiny Hat
+  rarity: Uncommon
+  description: A shiny hat that reflects the sun in the desert. The idea is good, but the execution is poor.
+  sprite: '0045'
+
 - id: b320452a-557a-4caa-b91f-b417f4a6b493
   name: Larsian House Model
   rarity: Mystical

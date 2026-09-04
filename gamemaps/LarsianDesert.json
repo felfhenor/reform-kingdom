@@ -571,6 +571,19 @@
                  "width":64,
                  "x":1088,
                  "y":1472
+                }, 
+                {
+                 "gid":407,
+                 "height":64,
+                 "id":186,
+                 "name":"Larsian Lizards - Larsia",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"CaravanNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1600,
+                 "y":704
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -579,7 +592,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":186,
+ "nextobjectid":187,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

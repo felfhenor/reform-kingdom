@@ -1,0 +1,45 @@
+- id: 46b3d73b-d870-4bc1-86b2-ac0fcae149bf
+  name: Larsian Lizards - Larsia
+  description: An intrepid group of Akroki that go around peddling wares and buying things they find useful.
+
+  traderResetTime: 10800
+
+  level:
+    min: 15
+    max: 25
+
+  markupPercentages:
+    sell: 25
+    buy: -15
+
+  traderCategories:
+    - Carrina
+    - Lizard
+
+  commissionOffers:
+    - commissionOfferId: Commission - Firmwater
+      weight: 1
+
+    - commissionOfferId: Commission - Timberfuzz
+      weight: 1
+
+    - commissionOfferId: Commission - Petrifiwood
+      weight: 1
+
+    - commissionOfferId: Commission - Cactspine
+      weight: 1
+
+    - commissionOfferId: Commission - Strongreed
+      weight: 1
+
+    - commissionOfferId: Commission - Amber
+      weight: 1
+
+    - commissionOfferId: Commission - Brightwisp Core
+      weight: 1
+
+    - commissionOfferId: Commission - Preserved Bloodmoth
+      weight: 1
+
+    - commissionOfferId: Commission - Pumpkin Gem
+      weight: 2

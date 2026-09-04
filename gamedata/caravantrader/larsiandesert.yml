@@ -1,0 +1,70 @@
+- id: 96948e3f-bc18-4732-8e7d-ebd684670cfd
+  name: Boozle Potos
+  description: Greetingsssss heroesssss.
+  category: Lizard
+  level: 20
+
+  tokenTrades:
+    - collectibleId: Shiny Hat
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 3500
+      itemId: Cimmerian Dust
+      limit: 5
+      weight: 3
+
+    - type: buy
+      value: 1000
+      itemId: Brightwisp Core
+      limit: 5
+      weight: 3
+
+    - type: buy
+      value: 1000
+      itemId: Preserved Bloodmoth
+      limit: 5
+      weight: 3
+
+    - type: buy
+      value: 5000
+      itemId: Pumpkin Gem
+      limit: 5
+      weight: 2
+
+    - type: buy
+      value: 100
+      itemId: Petrifiwood
+      limit: 500
+      weight: 1
+
+    - type: buy
+      value: 100
+      itemId: Firmwater
+      limit: 500
+      weight: 1
+
+    - type: buy
+      value: 250
+      itemId: Amber
+      limit: 500
+      weight: 1
+
+    - type: buy
+      value: 150
+      itemId: Timberfuzz
+      limit: 500
+      weight: 1
+
+    - type: buy
+      value: 150
+      itemId: Cactspine
+      limit: 500
+      weight: 1
+
+    - type: buy
+      value: 200
+      itemId: Strongreed
+      limit: 500
+      weight: 1
