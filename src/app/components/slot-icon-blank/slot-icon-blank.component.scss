@@ -13,14 +13,14 @@
   @apply bottom-0 right-0 px-1;
 }
 
-.label-text-bl {
-  @apply bottom-0 left-0 px-1;
+.label-banner {
+  @apply absolute inset-x-0 text-[10px] text-white text-center bg-black/60;
 }
 
-.label-text-tr {
-  @apply top-0 right-0 px-1;
+.label-banner-top {
+  @apply top-0;
 }
 
-.label-text-tl {
-  @apply top-0 left-0 px-1;
+.label-banner-bottom {
+  @apply bottom-0;
 }

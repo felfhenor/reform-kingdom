@@ -87,18 +87,19 @@
                   [assetName]="q.resultContent.sprite"
                 />
               }
-            </app-slot-icon-blank>
 
-            <div
-              class="absolute top-0 inset-x-0 text-[10px] text-center bg-black/60"
-            >
-              {{ q.remaining }}
-            </div>
-            <div
-              class="absolute bottom-0 inset-x-0 text-[10px] text-center bg-black/60"
-            >
-              {{ q.entry.quantityCompleted }}/{{ q.entry.quantityTotal }}
-            </div>
+              @if (q.resultContent) {
+                <span text-banner-top>
+                  {{ q.remaining }}
+                </span>
+              }
+
+              @if (q.resultContent) {
+                <span text-banner-bottom>
+                  {{ q.entry.quantityCompleted }}/{{ q.entry.quantityTotal }}
+                </span>
+              }
+            </app-slot-icon-blank>
           </div>
         } @else {
           <div

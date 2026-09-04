@@ -205,12 +205,11 @@
                           [spritesheet]="item.spritesheet"
                           [backdropSprite]="item.backdropSprite"
                         />
+
+                        <span text-banner-top>
+                          {{ row.remaining }}
+                        </span>
                       </app-slot-icon-blank>
-                      <div
-                        class="absolute top-0 inset-x-0 text-[10px] text-center bg-black/60"
-                      >
-                        {{ row.remaining }}
-                      </div>
                     </div>
                   } @else {
                     <div
