@@ -41,6 +41,18 @@
 [data-theme='dark'] {
   --color-accent: oklch(60% 0.13 181.912);
   --color-accent-content: oklch(96% 0.02 181.912);
+
+  --color-info: oklch(60% 0.14561 233.348);
+  --color-info-content: oklch(96% 0.066 243.157);
+
+  --color-success: oklch(60% 0.177 163.223);
+  --color-success-content: oklch(96% 0.077 168.94);
+
+  --color-warning: oklch(60% 0.189 84.429);
+  --color-warning-content: oklch(96% 0.112 45.904);
+
+  --color-error: oklch(60% 0.194 13.428);
+  --color-error-content: oklch(96% 0.105 12.094);
 }
 
 .navbar {
