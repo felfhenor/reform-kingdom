@@ -37,4 +37,6 @@ export type CommissionOfferContent = IsContentItem &
 
     requirements: CommissionOfferRequirement[];
     rewards: DroppedReward[];
+    // Granted instead of `rewards` when fulfilled at a town (never both) - ignored by caravan fulfillment, which has no town to credit.
+    townReputationReward: number;
   };

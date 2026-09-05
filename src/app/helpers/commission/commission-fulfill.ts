@@ -1,29 +1,28 @@
 import { isPartyAtCaravan } from '@helpers/caravan/caravan';
+import {
+  buildCommissionRequirementEntries,
+  commissionRequirementOwnedQuantity,
+} from '@helpers/commission/commission-requirement';
+import {
+  grantCommissionRewards,
+  spendCommissionRequirements,
+} from '@helpers/commission/commission-turn-in';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
-import { applyResolvedDropToState, rollDroppedRewards } from '@helpers/item/loot';
-import { applyMaterialDelta, getMaterialQuantity } from '@helpers/item/materials';
-import { armoryGet } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanId,
   CommissionNodeState,
   CommissionOfferContent,
-  CommissionRequirement,
   CommissionRequirementEntry,
-  CommissionRequirementEquipment,
   CommissionRowViewModel,
   DroppedReward,
-  EquipmentContent,
-  EquipmentItem,
   GameState,
-  ItemContent,
-  MonsterContent,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -32,26 +31,6 @@ function commissionState(
   state: GameState = gamestate(),
 ): CommissionNodeState | undefined {
   return state.world.commissions[caravanId];
-}
-
-// Reads off an explicit `state` when given, so this can be re-validated
-// against a commit-time state instead of the possibly-stale live gamestate().
-function ownedQuantity(
-  requirement: CommissionRequirement,
-  state?: GameState,
-): number {
-  if ('equipmentId' in requirement) {
-    const armory = state ? state.armory : armoryGet();
-    return armory.filter((item) => item.equipmentId === requirement.equipmentId)
-      .length;
-  }
-
-  // A kill requirement's progress is tallied on the requirement itself, not read from inventory.
-  if ('monsterId' in requirement) return requirement.progress;
-
-  return state
-    ? (state.materials[requirement.itemId]?.quantity ?? 0)
-    : getMaterialQuantity(requirement.itemId);
 }
 
 // Shaped like CraftRequirementEntry so both UI surfaces (the Commissions
@@ -63,35 +42,7 @@ export function commissionRequirementEntries(
   const state = commissionState(caravanId);
   if (!state) return [];
 
-  return state.requirements.map((requirement) => {
-    if ('equipmentId' in requirement) {
-      return {
-        kind: 'equipment',
-        content: getEntry<EquipmentContent>(requirement.equipmentId),
-        spritesheet: 'equipment',
-        quantity: requirement.quantity,
-        owned: ownedQuantity(requirement),
-      };
-    }
-
-    if ('monsterId' in requirement) {
-      return {
-        kind: 'monster',
-        content: getEntry<MonsterContent>(requirement.monsterId),
-        spritesheet: 'monster',
-        quantity: requirement.quantity,
-        owned: ownedQuantity(requirement),
-      };
-    }
-
-    return {
-      kind: 'item',
-      content: getEntry<ItemContent>(requirement.itemId),
-      spritesheet: 'item',
-      quantity: requirement.quantity,
-      owned: ownedQuantity(requirement),
-    };
-  });
+  return buildCommissionRequirementEntries(state.requirements);
 }
 
 // False until the first `commissionProcessTick` has generated this
@@ -109,7 +60,7 @@ export function commissionRewards(caravanId: CaravanId): DroppedReward[] {
   return offer?.rewards ?? [];
 }
 
-// Accepts an explicit `state` to re-validate at commit time (see `ownedQuantity`).
+// Accepts an explicit `state` to re-validate at commit time (see `commissionRequirementOwnedQuantity`).
 export function commissionCanFulfill(
   caravanId: CaravanId,
   state?: GameState,
@@ -120,7 +71,9 @@ export function commissionCanFulfill(
   }
 
   return nodeState.requirements.every(
-    (requirement) => ownedQuantity(requirement, state) >= requirement.quantity,
+    (requirement) =>
+      commissionRequirementOwnedQuantity(requirement, state) >=
+      requirement.quantity,
   );
 }
 
@@ -135,7 +88,7 @@ export function commissionRowViewModel(
   return {
     caravanId: caravan.id,
     nodeName: entry.nodeName,
-    caravanName: caravan.name,
+    title: caravan.name,
     requirementEntries: commissionRequirementEntries(caravan.id),
     rewards: commissionRewards(caravan.id),
     canFulfill: commissionCanFulfill(caravan.id),
@@ -144,20 +97,6 @@ export function commissionRowViewModel(
     canTravel: canPartyTravel(),
     travelEtaSeconds: travelEtaSecondsTo(entry.nodeName),
   };
-}
-
-function consumeEquipmentRequirement(
-  armory: EquipmentItem[],
-  requirement: CommissionRequirementEquipment,
-): EquipmentItem[] {
-  let remaining = requirement.quantity;
-  return armory.filter((item) => {
-    if (item.equipmentId !== requirement.equipmentId || remaining <= 0) {
-      return true;
-    }
-    remaining -= 1;
-    return false;
-  });
 }
 
 // Fast path only - commissionCanFulfill is repeated against live state
@@ -181,21 +120,8 @@ export async function commissionFulfill(
     const offer = getEntry<CommissionOfferContent>(nodeState.commissionOfferId);
     offerName = offer?.name;
 
-    nodeState.requirements.forEach((requirement) => {
-      if ('equipmentId' in requirement) {
-        s.armory = consumeEquipmentRequirement(s.armory, requirement);
-        return;
-      }
-
-      // A kill requirement has nothing to spend - its progress already gates commissionCanFulfill.
-      if ('monsterId' in requirement) return;
-
-      applyMaterialDelta(s, requirement.itemId, -requirement.quantity);
-    });
-
-    // Commission rewards aren't level-scaled (no bonusPerLevel is ever authored here), so the level passed to rollDroppedRewards is inert.
-    const resolvedRewards = offer ? rollDroppedRewards(offer.rewards, 1) : [];
-    resolvedRewards.forEach((drop) => applyResolvedDropToState(s, drop));
+    spendCommissionRequirements(s, nodeState.requirements);
+    if (offer) grantCommissionRewards(s, offer);
     nodeState.completed = true;
     fulfilled = true;
 

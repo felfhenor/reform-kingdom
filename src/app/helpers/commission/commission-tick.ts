@@ -1,6 +1,10 @@
 import { mostRecentCommissionResetAt } from '@helpers/commission/commission-reset';
+import {
+  eligibleCommissionOffers,
+  rollCommissionRequirements,
+} from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
-import { rngChoiceWeighted, rngNumberRange } from '@helpers/rng';
+import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   worldNodeCaravan,
@@ -11,12 +15,8 @@ import type {
   CaravanId,
   CommissionNodeState,
   CommissionOfferContent,
-  CommissionOfferSlot,
-  CommissionRequirement,
   GameStateCommissions,
 } from '@interfaces';
-
-type EligibleSlot = { offer: CommissionOfferContent; weight: number };
 
 function isDueForRegeneration(
   state: CommissionNodeState | undefined,
@@ -26,46 +26,21 @@ function isDueForRegeneration(
   return state.generatedAt < mostRecentCommissionResetAt(now);
 }
 
-function eligibleSlots(caravan: CaravanContent): EligibleSlot[] {
-  return caravan.commissionOffers
-    .map((slot: CommissionOfferSlot) => {
-      const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
-      return offer ? { offer, weight: slot.weight } : undefined;
-    })
-    .filter((slot): slot is EligibleSlot => !!slot);
-}
-
-function rollRequirements(
-  offer: CommissionOfferContent,
-): CommissionRequirement[] {
-  return offer.requirements.map((requirement) => {
-    const quantity = rngNumberRange(
-      requirement.quantityMin,
-      requirement.quantityMax,
-    );
-
-    if ('equipmentId' in requirement) {
-      return { equipmentId: requirement.equipmentId, quantity };
-    }
-    if ('monsterId' in requirement) {
-      return { monsterId: requirement.monsterId, quantity, progress: 0 };
-    }
-    return { itemId: requirement.itemId, quantity };
-  });
-}
-
 // Leaves state untouched (rather than writing an empty stub) when no offer
 // resolves, so the next visit/tick retries instead of waiting a full day -
 // e.g. content hadn't finished loading yet when this first ran.
 function regenerateCommissionNode(caravan: CaravanContent, now: number): void {
-  const slot = rngChoiceWeighted(eligibleSlots(caravan), (s) => s.weight);
-  const offer = slot?.offer;
+  const picked = rngChoiceWeighted(
+    eligibleCommissionOffers(caravan.commissionOffers),
+    (s) => s.weight,
+  );
+  const offer = picked?.offer;
   if (!offer) return;
 
   updateGamestate((state) => {
     state.world.commissions[caravan.id] = {
       commissionOfferId: offer.id,
-      requirements: rollRequirements(offer),
+      requirements: rollCommissionRequirements(offer),
       completed: false,
       generatedAt: now,
     };

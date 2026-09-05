@@ -14,7 +14,8 @@
     @if (commission(); as activeCommission) {
       <app-slot-commission
         [row]="activeCommission"
-        [isInCaravanTradePopup]="true"
+        [isInLocationModal]="true"
+        [fulfill]="() => fulfillCommission()"
       />
     }
 

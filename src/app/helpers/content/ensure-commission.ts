@@ -51,5 +51,6 @@ export function ensureCommissionOffer(
       ensureCommissionOfferRequirement,
     ),
     rewards: ensureArray(offer.rewards, ensureDroppedReward),
+    townReputationReward: offer.townReputationReward ?? 0,
   };
 }

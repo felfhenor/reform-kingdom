@@ -15,6 +15,7 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { SlotCommissionComponent } from '@components/slot-commission/slot-commission.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
@@ -23,8 +24,13 @@ import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { modalCloseTop } from '@helpers/engine/modal-stack';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import { activeTownNode } from '@helpers/engine/ui';
+import { travelStart } from '@helpers/hero/travel';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
+import {
+  townCommissionFulfill,
+  townCommissionRowViewModels,
+} from '@helpers/town/town-commission-fulfill';
 import {
   raidAssaulterPreview,
   raidDefenderPreview,
@@ -55,6 +61,7 @@ import {
 } from '@helpers/town/worker/town-worker-roster';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
+  TownCommissionRowViewModel,
   TownCraftQueueRow,
   TownModalTab,
   TownRaidCombatantRow,
@@ -81,6 +88,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SweetAlert2Module,
     IconComponent,
     IconItemPreviewComponent,
+    SlotCommissionComponent,
     SlotIconBlankComponent,
     SlotCompletionRewardComponent,
     TooltipItemPreviewComponent,
@@ -221,6 +229,22 @@ export class ModalTownComponent {
     return town
       ? townWorkerStatusDisplay(town, entry.status)
       : { label: '', locationEntry: undefined };
+  }
+
+  public commissions = computed<TownCommissionRowViewModel[]>(() => {
+    const entry = this.entry();
+    return entry ? townCommissionRowViewModels(entry) : [];
+  });
+
+  public travelToTown(): void {
+    const entry = this.entry();
+    if (entry) travelStart(entry.nodeName);
+  }
+
+  public fulfillCommission(
+    row: TownCommissionRowViewModel,
+  ): Promise<boolean> {
+    return townCommissionFulfill(row.townId, row.slotId);
   }
 
   private confirmSwal = viewChild<SwalComponent>('confirmSwal');

@@ -164,7 +164,7 @@
     quests:
       commissions:
         - commissionOfferId: Commission - Firmwater
-          weight: 1
+          weight: 3
 
         - commissionOfferId: Commission - Timberfuzz
           weight: 1
@@ -182,10 +182,13 @@
           weight: 1
 
         - commissionOfferId: Commission - Brightwisp Core
-          weight: 1
+          weight: 3
+
+        - commissionOfferId: Commission - Cimmerian Dust
+          weight: 2
 
         - commissionOfferId: Commission - Preserved Bloodmoth
-          weight: 1
+          weight: 2
 
         - commissionOfferId: Commission - Akroki Bounty
-          weight: 1
+          weight: 2

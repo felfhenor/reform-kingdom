@@ -30,7 +30,10 @@ import {
   caravanTradePrice,
   caravanTradeRemaining,
 } from '@helpers/caravan/caravan-trade-quantity';
-import { commissionRowViewModel } from '@helpers/commission/commission-fulfill';
+import {
+  commissionFulfill,
+  commissionRowViewModel,
+} from '@helpers/commission/commission-fulfill';
 import { getEntry } from '@helpers/content/content';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { notifySuccess } from '@helpers/engine/notify';
@@ -93,6 +96,11 @@ export class ModalCaravanTradeComponent {
     const entry = this.entry();
     return entry ? commissionRowViewModel(entry) : undefined;
   });
+
+  public fulfillCommission(): Promise<boolean> {
+    const row = this.commission();
+    return row ? commissionFulfill(row.caravanId) : Promise.resolve(false);
+  }
 
   public trades = computed<CaravanTradeRow[]>(() => {
     const caravan = this.caravan();

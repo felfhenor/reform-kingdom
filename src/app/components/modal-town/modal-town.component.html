@@ -258,7 +258,19 @@
             }
           }
           @case ('quests') {
-            <p>No commissions are available yet.</p>
+            <div class="flex flex-col gap-2">
+              @for (row of commissions(); track row.slotId) {
+                <app-slot-commission
+                  [row]="row"
+                  [fulfill]="() => fulfillCommission(row)"
+                  (travel)="travelToTown()"
+                />
+              } @empty {
+                <p class="text-sm text-lighter italic">
+                  No commissions are available yet.
+                </p>
+              }
+            </div>
           }
           @case ('raid') {
             @if (raidTelegraph(); as telegraph) {

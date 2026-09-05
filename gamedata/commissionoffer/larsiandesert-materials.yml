@@ -13,6 +13,8 @@
       min: 1
       max: 1
 
+  townReputationReward: 15
+
 - id: bb06915f-c340-417b-ab71-199a3c233ac3
   name: Commission - Timberfuzz
   description: The caravan needs a lot of timberfuzz for crafting.
@@ -27,6 +29,8 @@
       chance: 100
       min: 1
       max: 1
+
+  townReputationReward: 15
 
 - id: d653f285-f941-4fd0-a6d2-4ed7a232ca54
   name: Commission - Petrifiwood
@@ -43,6 +47,8 @@
       min: 1
       max: 1
 
+  townReputationReward: 15
+
 - id: 90158f52-b4db-4104-9aac-10ddce3ceee3
   name: Commission - Cactspine
   description: The caravan needs a lot of cactspines for magical crafting.
@@ -57,6 +63,8 @@
       chance: 100
       min: 1
       max: 1
+
+  townReputationReward: 15
 
 - id: 6b39bec4-e9f7-44b3-9c48-9d1bd5afe39c
   name: Commission - Strongreed
@@ -73,6 +81,8 @@
       min: 1
       max: 1
 
+  townReputationReward: 15
+
 - id: e3efd3f0-f9c3-4eb5-ac47-ad9209e76a23
   name: Commission - Amber
   description: The caravan needs a lot of strongreed for jewelcrafting.
@@ -87,6 +97,25 @@
       chance: 100
       min: 1
       max: 1
+
+  townReputationReward: 15
+
+- id: 93aa0bac-512d-40df-9660-1b56b5ca572b
+  name: Commission - Cimmerian Dust
+  description: The caravan needs a lot of cimmerian dust for upgrading their equipment.
+
+  requirements:
+    - itemId: Cimmerian Dust
+      quantityMin: 10
+      quantityMax: 15
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 15
 
 - id: bbaa61b8-0d04-4852-81aa-864ef30ea7c3
   name: Commission - Brightwisp Core
@@ -103,6 +132,8 @@
       min: 1
       max: 1
 
+  townReputationReward: 20
+
 - id: d18b5223-16e4-4987-a858-4602c7dd13bd
   name: Commission - Preserved Bloodmoth
   description: The caravan needs an assortment of preserved bloodmoths for artificing purposes.
@@ -118,6 +149,8 @@
       min: 1
       max: 1
 
+  townReputationReward: 20
+
 - id: 10a3de62-7e72-429f-ae51-56b3cf29d8a7
   name: Commission - Pumpkin Gem
   description: The caravan needs an assortment of pumpkin gems.
@@ -132,3 +165,5 @@
       chance: 100
       min: 1
       max: 1
+
+  townReputationReward: 20

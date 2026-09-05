@@ -7,6 +7,7 @@ import {
   pruneInvalidTownTradeskills,
   townTradeskillsMaterialize,
 } from '@helpers/town/crafting/town-craft-tradeskills';
+import { pruneInvalidTownCommissionSlots } from '@helpers/town/town-commission-slots';
 import { pruneInvalidTownMaterials } from '@helpers/town/town-materials';
 import {
   pruneInvalidTownWorkers,
@@ -74,6 +75,9 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
           pruneInvalidTownTradeskills(towns[townId].tradeskills ?? {}),
         ),
         craftQueue: pruneInvalidTownCraftQueue(towns[townId].craftQueue ?? []),
+        commissionSlots: pruneInvalidTownCommissionSlots(
+          towns[townId].commissionSlots ?? [],
+        ),
       };
     }
   });

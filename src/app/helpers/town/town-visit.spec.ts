@@ -23,13 +23,28 @@ vi.mock('@helpers/town/worker/town-worker-roster', () => ({
   townWorkerRosterMaterialize: vi.fn((_town, existing) => existing),
 }));
 
+vi.mock('@helpers/world', () => ({
+  worldNodeAtCurrentLocation: vi.fn(),
+}));
+
+vi.mock('@helpers/world-node/world-nodes', () => ({
+  worldNodeTown: vi.fn(),
+}));
+
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { townMarkVisited } from '@helpers/town/town-visit';
+import { isPartyAtTown, townMarkVisited } from '@helpers/town/town-visit';
 import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
-import type { GameState, TownContent, TownId } from '@interfaces';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
+import { worldNodeTown } from '@helpers/world-node/world-nodes';
+import type {
+  GameState,
+  TownContent,
+  TownId,
+  WorldNodeEntry,
+} from '@interfaces';
 
 const townId = 'larsia' as TownId;
 
@@ -57,6 +72,7 @@ describe('townMarkVisited', () => {
       materials: {},
       tradeskills: {},
       craftQueue: [],
+      commissionSlots: [],
       firstVisitedAtTick: 500,
     });
   });
@@ -101,6 +117,7 @@ describe('townMarkVisited', () => {
       materials: {},
       tradeskills: {},
       craftQueue: [],
+      commissionSlots: [],
       firstVisitedAtTick: 500,
     });
   });
@@ -279,5 +296,31 @@ describe('townMarkVisited', () => {
 
     expect(state.world.towns[townId].firstVisitedAtTick).toBe(100);
     expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe('isPartyAtTown', () => {
+  it('is false when the party is nowhere (no current location)', () => {
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
+
+    expect(isPartyAtTown(townId)).toBe(false);
+  });
+
+  it('is false when the current location is not this town', () => {
+    const entry = { nodeName: 'Larsia' } as WorldNodeEntry;
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
+    vi.mocked(worldNodeTown).mockReturnValue({
+      id: 'other-town' as TownId,
+    } as TownContent);
+
+    expect(isPartyAtTown(townId)).toBe(false);
+  });
+
+  it('is true when the current location resolves to this town', () => {
+    const entry = { nodeName: 'Larsia' } as WorldNodeEntry;
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
+    vi.mocked(worldNodeTown).mockReturnValue({ id: townId } as TownContent);
+
+    expect(isPartyAtTown(townId)).toBe(true);
   });
 });

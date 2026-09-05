@@ -1,3 +1,5 @@
+import type { CommissionRequirement } from '@interfaces/commission-state';
+import type { CommissionOfferId } from '@interfaces/content-commission-offer';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterContent, MonsterId } from '@interfaces/content-monster';
 import type { RecipeContent, RecipeId } from '@interfaces/content-recipe';
@@ -6,6 +8,7 @@ import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { WorkerId } from '@interfaces/content-worker';
 import type { CraftQueueEntryId } from '@interfaces/crafting';
 import type { EquipmentItem } from '@interfaces/equipment';
+import type { Branded } from '@interfaces/identifiable';
 import type { ItemPreviewDisplay } from '@interfaces/item-preview';
 import type { TownWorkerState } from '@interfaces/town-worker-state';
 
@@ -42,6 +45,16 @@ export type TownRecipePick = {
   recipe: RecipeContent;
 };
 
+export type TownCommissionSlotId = Branded<string, 'TownCommissionSlotId'>;
+
+// Unlike a caravan's single commission, a town holds several simultaneous slots that persist until turned in - a fulfilled one is removed outright, not flagged, and the next tick refills the opening.
+export type TownCommissionSlotState = {
+  id: TownCommissionSlotId;
+  commissionOfferId: CommissionOfferId;
+  requirements: CommissionRequirement[];
+  generatedAtTick: number;
+};
+
 export type TownNodeState = {
   // Undefined = not yet activated (crafting/workers/commissions stay inert until the player first visits).
   firstVisitedAtTick?: number;
@@ -57,6 +70,7 @@ export type TownNodeState = {
   tradeskills: Record<TradeskillId, TownTradeskillState>;
   // Combined across all tradeskills (not one queue per tradeskill) - entries tick simultaneously, mirroring multiple workers crafting in tandem.
   craftQueue: TownCraftQueueEntry[];
+  commissionSlots: TownCommissionSlotState[];
   // Undefined = no raid currently pending. Set together by townRaidProcessTick's telegraph step, cleared together on engage/resolve.
   raidTelegraphedAtTick?: number;
   raidEngageWindowExpiresAtTick?: number;

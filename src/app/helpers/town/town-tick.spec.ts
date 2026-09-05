@@ -181,6 +181,7 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
       },
     };
 
@@ -221,6 +222,7 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
       },
     });
   });
@@ -299,6 +301,7 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
       },
     });
   });
@@ -332,6 +335,7 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
       },
     });
   });
@@ -364,6 +368,7 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
       },
     });
     expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {});

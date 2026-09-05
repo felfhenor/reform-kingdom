@@ -3,10 +3,10 @@
 <div class="flex items-center gap-2 p-4 rounded bg-base-200">
   <div class="flex flex-col flex-1 min-w-0 gap-2">
     <span class="font-semibold truncate">
-      @if (isInCaravanTradePopup()) {
+      @if (isInLocationModal()) {
         Active Commission
       } @else {
-        {{ r.caravanName }}
+        {{ r.title }}
       }
     </span>
 
@@ -49,6 +49,12 @@
   @if (!r.completed) {
     <div class="flex flex-col items-end gap-2 shrink-0">
       <div class="flex gap-2">
+        @if (r.reputationReward) {
+          <div class="badge badge-secondary badge-outline">
+            +{{ r.reputationReward | number }} Reputation
+          </div>
+        }
+
         @for (reward of r.rewards; track $index) {
           <div class="relative shrink-0">
             <div class="zoom-row">
@@ -65,7 +71,7 @@
       </div>
 
       <div class="flex gap-2">
-        @if (!isInCaravanTradePopup() && !r.isPartyHere) {
+        @if (!isInLocationModal() && !r.isPartyHere) {
           @if (r.travelEtaSeconds !== undefined) {
             <button type="button" class="btn btn-xs btn-secondary" disabled>
               {{ etaLabel(r.travelEtaSeconds) }}
@@ -86,7 +92,7 @@
           type="button"
           class="btn btn-xs btn-primary"
           [disabled]="!r.canFulfill || !r.isPartyHere"
-          (click)="turnIn(r.caravanId)"
+          (click)="doTurnIn()"
         >
           Turn In Commission
         </button>

@@ -99,6 +99,7 @@ const offer: CommissionOfferContent = {
       max: 2,
     },
   ],
+  townReputationReward: 0,
 };
 
 const wergenStick: ItemContent = {
@@ -622,7 +623,7 @@ describe('commissionRowViewModel', () => {
     expect(commissionRowViewModel(entry)).toEqual({
       caravanId: caravan.id,
       nodeName: entry.nodeName,
-      caravanName: caravan.name,
+      title: caravan.name,
       requirementEntries: [
         {
           kind: 'item',

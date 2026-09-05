@@ -26,11 +26,13 @@ import {
   updateGamestate,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
+import { townCommissionProcessTick } from '@helpers/town/town-commission-generate';
 import { townCraftProcessTick } from '@helpers/town/crafting/town-craft-queue';
 import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
 import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
 import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
 import { workersProcessTick } from '@helpers/worker/worker-tick';
+
 import { clamp } from 'es-toolkit/compat';
 
 export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
@@ -88,6 +90,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       townCraftProcessTick();
       townShopProcessTick();
       townRaidProcessTick();
+      townCommissionProcessTick();
 
       if (currentCombat()) {
         combatDoCombatIteration();
