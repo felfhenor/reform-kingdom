@@ -1,4 +1,4 @@
-import { formatNumber } from '@angular/common';
+import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,6 +16,7 @@ import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/to
 import { notifySuccess } from '@helpers/engine/notify';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { townStockPrice } from '@helpers/town/shop/town-price';
+import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import {
   townStock,
   townStockBonusCombatStats,
@@ -38,12 +39,14 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CurrencyCostComponent,
+    DecimalPipe,
     IconItemPreviewComponent,
     SlotIconBlankComponent,
     SweetAlert2Module,
     TippyDirective,
     TooltipItemPreviewComponent,
   ],
+  host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-shop.component.html',
 })
 export class PanelTownShopComponent {
@@ -51,6 +54,8 @@ export class PanelTownShopComponent {
   public town = input.required<TownContent>();
 
   public goldCoinItemId = goldCoinId();
+
+  public stockCap = computed(() => townShopItemCap(this.town().id));
 
   public stockRows = computed<TownStockRow[]>(() => {
     const town = this.town();

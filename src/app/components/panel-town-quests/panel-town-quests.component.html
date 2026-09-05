@@ -1,0 +1,26 @@
+@let questRows = commissions();
+
+<div class="card-body p-3 gap-2 flex-1 min-h-0">
+  <h2 class="card-title text-base justify-between shrink-0">
+    Quests
+    <span class="badge badge-sm badge-info">
+      {{ questRows.length | number }}
+    </span>
+  </h2>
+
+  <div class="flex-1 min-h-0 overflow-y-auto">
+    <div class="flex flex-col gap-2">
+      @for (row of questRows; track row.slotId) {
+        <app-slot-commission
+          [row]="row"
+          [fulfill]="() => fulfillCommission(row)"
+          (travel)="travelToTown()"
+        />
+      } @empty {
+        <p class="text-sm text-lighter italic">
+          No commissions are available yet.
+        </p>
+      }
+    </div>
+  </div>
+</div>

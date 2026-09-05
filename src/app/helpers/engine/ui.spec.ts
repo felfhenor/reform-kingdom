@@ -7,17 +7,15 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeTown: vi.fn(),
 }));
 
-import {
-  modalCloseAll,
-  modalIsOpen,
-  modalOpen,
-} from '@helpers/engine/modal-stack';
+import { modalCloseAll, modalOpen } from '@helpers/engine/modal-stack';
 import {
   activeTownNode,
+  gamePlayView,
   mapNodeAutoShowOnArrival,
   mapNodeDeselect,
   mapNodeSelect,
   selectedMapNode,
+  setGamePlayView,
   townOpen,
 } from '@helpers/engine/ui';
 import { townMarkVisited } from '@helpers/town/town-visit';
@@ -61,16 +59,17 @@ describe('mapNodeAutoShowOnArrival', () => {
 describe('townOpen', () => {
   beforeEach(() => {
     modalCloseAll();
+    setGamePlayView('world');
     vi.clearAllMocks();
   });
 
-  it('sets the active town node and opens the town modal', () => {
+  it('sets the active town node and switches to the town view', () => {
     vi.mocked(worldNodeTown).mockReturnValue({ id: 'larsia' } as TownContent);
 
     townOpen(node('Larsia'));
 
     expect(activeTownNode()).toEqual(node('Larsia'));
-    expect(modalIsOpen('town')).toBe(true);
+    expect(gamePlayView()).toBe('town');
   });
 
   it('marks the town visited when the node resolves to a town', () => {
@@ -87,6 +86,6 @@ describe('townOpen', () => {
     townOpen(node('Field Ruins'));
 
     expect(townMarkVisited).not.toHaveBeenCalled();
-    expect(modalIsOpen('town')).toBe(true);
+    expect(gamePlayView()).toBe('town');
   });
 });

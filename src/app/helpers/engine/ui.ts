@@ -111,15 +111,18 @@ export function caravanTradeOpen(entry: WorldNodeEntry): void {
   modalOpen('caravan-trade');
 }
 
-// Not cleared on close - would collapse the modal's DOM mid-transition (see `ModalComponent`); overwritten next open instead.
-export const activeTownNode = signal<WorldNodeEntry | undefined>(undefined);
+// Persisted (not just in-memory) so a page reload while on the Town view can restore it - see `GamePlayTownComponent`'s fallback-to-World guard for what happens if the persisted entry no longer resolves to a town.
+export const activeTownNode = localStorageSignal<WorldNodeEntry | undefined>(
+  'activeTownNode',
+  undefined,
+);
 
 export function townOpen(entry: WorldNodeEntry): void {
   const town = worldNodeTown(entry);
   if (town) townMarkVisited(town.id);
 
   activeTownNode.set(entry);
-  modalOpen('town');
+  setGamePlayView('town');
 }
 
 // Global across all tradeskills, not per-tradeskill - it's a UI display preference, not a per-building setting.

@@ -54,6 +54,17 @@
     <app-page-blank></app-page-blank>
   }
 
+  @defer (when activeGamePlayView() === 'town'; prefetch on idle) {
+    <app-game-play-town
+      class="absolute inset-0"
+      [class.hidden]="activeGamePlayView() !== 'town'"
+    ></app-game-play-town>
+  } @loading (minimum 100ms) {
+    <app-page-blank></app-page-blank>
+  } @placeholder {
+    <app-page-blank></app-page-blank>
+  }
+
   @if (isPaused()) {
     <div
       class="pause-vignette absolute inset-0 pointer-events-none flex items-start justify-center pt-8"

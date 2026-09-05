@@ -1,37 +1,46 @@
 @let roster = workers();
 
-@if (roster.length > 0) {
-  <div class="flex flex-col gap-2">
-    @for (worker of roster; track worker.workerId) {
-      @let statusDisplay = workerStatusDisplay(worker);
+<div class="card-body p-3 gap-2 flex-1 min-h-0">
+  <h2 class="card-title text-base justify-between shrink-0">
+    Workers
+    <span class="badge badge-sm badge-info">{{ roster.length | number }}</span>
+  </h2>
 
-      <div class="flex gap-2">
-        <app-slot-icon-blank>
-          <app-atlas-animation
-            spritesheet="worker"
-            [assetName]="worker.sprite"
-            [frames]="worker.frames"
-          />
-        </app-slot-icon-blank>
+  <div class="flex-1 min-h-0 overflow-y-auto">
+    @if (roster.length > 0) {
+      <div class="flex flex-col gap-2">
+        @for (worker of roster; track worker.workerId) {
+          @let statusDisplay = workerStatusDisplay(worker);
 
-        <div class="flex flex-col min-w-0 gap-2">
-          <span class="font-bold">{{ worker.name }}</span>
-
-          <div class="flex gap-2 text-xs text-lighter">
-            @if (statusDisplay.locationEntry) {
-              <app-sprite-node
-                class="zoom-inline shrink-0"
-                [entry]="statusDisplay.locationEntry"
+          <div class="flex gap-2">
+            <app-slot-icon-blank>
+              <app-atlas-animation
+                spritesheet="worker"
+                [assetName]="worker.sprite"
+                [frames]="worker.frames"
               />
-            }
-            <span class="truncate">
-              {{ statusDisplay.label }}
-            </span>
+            </app-slot-icon-blank>
+
+            <div class="flex flex-col min-w-0 gap-2">
+              <span class="font-bold">{{ worker.name }}</span>
+
+              <div class="flex gap-2 text-xs text-lighter">
+                @if (statusDisplay.locationEntry) {
+                  <app-sprite-node
+                    class="zoom-inline shrink-0"
+                    [entry]="statusDisplay.locationEntry"
+                  />
+                }
+                <span class="truncate">
+                  {{ statusDisplay.label }}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
+        }
       </div>
+    } @else {
+      <p>No workers have been assigned yet.</p>
     }
   </div>
-} @else {
-  <p>No workers have been assigned yet.</p>
-}
+</div>

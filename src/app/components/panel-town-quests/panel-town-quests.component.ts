@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,22 +16,9 @@ import type { TownCommissionRowViewModel, WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-town-quests',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SlotCommissionComponent],
-  template: `
-    <div class="flex flex-col gap-2">
-      @for (row of commissions(); track row.slotId) {
-        <app-slot-commission
-          [row]="row"
-          [fulfill]="() => fulfillCommission(row)"
-          (travel)="travelToTown()"
-        />
-      } @empty {
-        <p class="text-sm text-lighter italic">
-          No commissions are available yet.
-        </p>
-      }
-    </div>
-  `,
+  imports: [DecimalPipe, SlotCommissionComponent],
+  host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
+  templateUrl: './panel-town-quests.component.html',
 })
 export class PanelTownQuestsComponent {
   public entry = input.required<WorldNodeEntry>();

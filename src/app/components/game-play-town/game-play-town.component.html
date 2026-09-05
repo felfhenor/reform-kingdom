@@ -1,0 +1,40 @@
+@let townData = town();
+
+<app-card-page heightProfile="full">
+  <span header class="flex gap-2 items-center">
+    @if (townData) {
+      {{ townData.name }}
+      <span class="badge badge-outline badge-info">
+        Level {{ townData.level | number }} {{ townData.scaleType }}
+      </span>
+    }
+  </span>
+
+  <div class="h-full flex flex-col gap-4 min-h-0">
+    @if (townData) {
+      <div class="flex items-center gap-4 shrink-0">
+        <app-bar-town-reputation [townId]="townData.id" class="flex-1" />
+
+        @if (entry(); as entry) {
+          <app-button-town-home [entry]="entry" [town]="townData" />
+        }
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 flex-1 min-h-0">
+        <div class="flex flex-col gap-4 min-h-0">
+          <app-panel-town-shop [town]="townData" class="flex-[3] min-h-0" />
+
+          @if (entry(); as entry) {
+            <app-panel-town-quests [entry]="entry" class="flex-[2] min-h-0" />
+          }
+        </div>
+
+        <div class="flex flex-col gap-4 min-h-0 overflow-y-auto">
+          <app-panel-town-workers [town]="townData" class="h-64 shrink-0" />
+          <app-panel-town-crafting [town]="townData" class="shrink-0" />
+          <app-panel-town-raid [town]="townData" class="shrink-0" />
+        </div>
+      </div>
+    }
+  </div>
+</app-card-page>

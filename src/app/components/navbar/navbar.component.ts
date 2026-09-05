@@ -6,7 +6,6 @@ import { ButtonSettingsComponent } from '@components/button-settings/button-sett
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalCaravanTradeComponent } from '@components/modal-caravan-trade/modal-caravan-trade.component';
-import { ModalTownComponent } from '@components/modal-town/modal-town.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
@@ -26,6 +25,7 @@ import {
   gamePlayView,
   isWorldCameraPanned,
   setGamePlayView,
+  townOpen,
   worldCameraRecenter,
 } from '@helpers/engine/ui';
 import { isSetup } from '@helpers/setup';
@@ -33,7 +33,10 @@ import { saveGameState } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan';
-import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
+import {
+  worldNodeCaravan,
+  worldNodeTown,
+} from '@helpers/world-node/world-nodes';
 import type { GamePlayView, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { HotkeysDirective } from '@ngneat/hotkeys';
@@ -61,7 +64,6 @@ import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/pane
     ButtonGlowComponent,
     BarResourceComponent,
     ModalCaravanTradeComponent,
-    ModalTownComponent,
     PanelDebugButtonsComponent,
   ],
   templateUrl: './navbar.component.html',
@@ -105,6 +107,24 @@ export class NavbarComponent {
     if (!entry) return;
 
     caravanTradeOpen(entry);
+  }
+
+  // Aliases "Enter Town" - only shown while physically at the town's node, same gate as that button.
+  public currentTownEntry = computed(() => {
+    const entry = worldNodeAtCurrentLocation();
+    return entry && worldNodeTown(entry) ? entry : undefined;
+  });
+
+  public currentTownName = computed(() => {
+    const entry = this.currentTownEntry();
+    return (entry ? worldNodeTown(entry)?.name : undefined) ?? 'Town';
+  });
+
+  public openCurrentTown(): void {
+    const entry = this.currentTownEntry();
+    if (!entry) return;
+
+    townOpen(entry);
   }
 
   public changeGamePlayView(view: GamePlayView): void {

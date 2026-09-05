@@ -56,7 +56,9 @@
           [sfxOffset]="2"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'4'"
-          (hotkey)="hotkeyMatches($event, '4') && changeGamePlayView('adventurelog')"
+          (hotkey)="
+            hotkeyMatches($event, '4') && changeGamePlayView('adventurelog')
+          "
           isGlobal
         >
           Adventure Log
@@ -76,6 +78,23 @@
         >
           Decree
         </button>
+
+        @if (currentTownEntry()) {
+          <button
+            class="btn btn-xs btn-info"
+            [class.btn-outline]="activeGamePlayView() !== 'town'"
+            [tp]="currentTownName() + ' [6]'"
+            (click)="openCurrentTown()"
+            appSfx="ui-click"
+            [sfxOffset]="5"
+            [sfxTrigger]="['click', 'hover']"
+            [hotkeys]="'6'"
+            (hotkey)="hotkeyMatches($event, '6') && openCurrentTown()"
+            isGlobal
+          >
+            {{ currentTownName() }}
+          </button>
+        }
       </li>
     </ul>
   </div>
@@ -254,5 +273,3 @@
 </app-modal>
 
 <app-modal-caravan-trade></app-modal-caravan-trade>
-
-<app-modal-town></app-modal-town>

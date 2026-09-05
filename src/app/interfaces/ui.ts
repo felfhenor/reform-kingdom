@@ -9,11 +9,7 @@ export type DaisyColor =
   | 'error';
 
 export type GamePlayView =
-  | 'world'
-  | 'kingdom'
-  | 'adventurelog'
-  | 'heroes'
-  | 'decree';
+  'world' | 'kingdom' | 'adventurelog' | 'heroes' | 'decree' | 'town';
 
 export type KingdomSubview =
   | 'storage'
@@ -31,10 +27,3 @@ export type KingdomSubview =
   | 'achievements'
   | 'prestige'
   | 'workers';
-
-export type TownModalTab =
-  | 'shop'
-  | 'crafting'
-  | 'workers'
-  | 'quests'
-  | 'raid';

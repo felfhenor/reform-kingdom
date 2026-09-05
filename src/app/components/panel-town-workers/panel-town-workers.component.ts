@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -22,9 +23,11 @@ import type {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasAnimationComponent,
+    DecimalPipe,
     SlotIconBlankComponent,
     SpriteNodeComponent,
   ],
+  host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-workers.component.html',
 })
 export class PanelTownWorkersComponent {

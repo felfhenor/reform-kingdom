@@ -32,6 +32,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotIconBlankComponent,
     TippyDirective,
   ],
+  host: { class: 'flex flex-col gap-4' },
   templateUrl: './panel-town-crafting.component.html',
 })
 export class PanelTownCraftingComponent {

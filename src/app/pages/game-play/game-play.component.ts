@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { GamePlayDecreeComponent } from '@components/game-play-decree/game-play-decree.component';
 import { GamePlayHeroesComponent } from '@components/game-play-heroes/game-play-heroes.component';
 import { GamePlayKingdomComponent } from '@components/game-play-kingdom/game-play-kingdom.component';
+import { GamePlayTownComponent } from '@components/game-play-town/game-play-town.component';
 import { GamePlayWorldComponent } from '@components/game-play-world/game-play-world.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { PageBlankComponent } from '@components/page-blank/page-blank.component';
@@ -23,6 +24,7 @@ import { getOption } from '@helpers/state-options';
     GamePlayHeroesComponent,
     PlayAdventureLogComponent,
     GamePlayDecreeComponent,
+    GamePlayTownComponent,
     IconComponent,
     PageBlankComponent,
   ],

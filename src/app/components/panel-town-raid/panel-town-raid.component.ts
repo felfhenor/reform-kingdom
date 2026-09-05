@@ -8,8 +8,8 @@ import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-anima
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
-import { modalCloseTop } from '@helpers/engine/modal-stack';
 import { notifyError } from '@helpers/engine/notify';
+import { setGamePlayView } from '@helpers/engine/ui';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import {
   raidAssaulterPreview,
@@ -28,6 +28,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotIconBlankComponent,
     TippyDirective,
   ],
+  host: { class: 'card bg-base-200 shadow-sm' },
   templateUrl: './panel-town-raid.component.html',
   styleUrl: './panel-town-raid.component.scss',
 })
@@ -63,6 +64,7 @@ export class PanelTownRaidComponent {
       return;
     }
 
-    modalCloseTop();
+    // Combat plays out on the World view, not here - switch back to it so the player sees the fight.
+    setGamePlayView('world');
   }
 }
