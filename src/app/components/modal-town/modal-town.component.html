@@ -7,32 +7,13 @@
   <span title>{{ town()?.name ?? 'Town' }}</span>
 
   <div body class="flex flex-col gap-4">
-    @if (town()) {
-      @if (townReputation(); as repDisplay) {
-        <app-bar-progress
-          color="secondary"
-          [value]="repDisplay.reputation"
-          [max]="repDisplay.nextThreshold ?? 100"
-        >
-          {{ repDisplay.tierName }} [{{ repDisplay.reputation }}/{{
-            repDisplay.nextThreshold ?? 100
-          }}]
-        </app-bar-progress>
+    @if (town(); as town) {
+      @if (entry(); as entry) {
+        <app-bar-town-reputation [townId]="town.id" />
+
+        <app-button-town-home [entry]="entry" [town]="town" />
       }
 
-      @if (isHomeNode()) {
-        <div class="badge badge-secondary">Home</div>
-      } @else if (canSetHome()) {
-        <button
-          type="button"
-          class="btn btn-outline btn-secondary btn-sm w-fit"
-          (click)="setHome()"
-        >
-          Set as Home
-        </button>
-      }
-
-      @let shopStockRows = stockRows();
       <div role="tablist" class="tabs tabs-boxed">
         <a
           role="tab"
@@ -44,7 +25,7 @@
         >
           Shop
           <span class="badge badge-sm badge-info">
-            {{ shopStockRows.length | number }} / {{ stockCap() | number }}
+            {{ shopStockCount() | number }} / {{ stockCap() | number }}
           </span>
         </a>
         <a
@@ -89,7 +70,7 @@
 
           @if (raidCountdown(); as countdown) {
             <span class="badge badge-sm badge-warning">
-              {{ raidCountdown() }}
+              {{ countdown }}
             </span>
           }
         </a>
@@ -98,289 +79,24 @@
       <div class="text-sm text-lighter min-h-16">
         @switch (currentTab()) {
           @case ('shop') {
-            @if (shopStockRows.length > 0) {
-              <div class="flex flex-col gap-2">
-                @for (row of shopStockRows; track row.index) {
-                  @let item = stockRowDisplay(row.entry);
-
-                  <app-tooltip-item-preview
-                    #preview
-                    [display]="item"
-                    [bonusStats]="stockRowBonusStats(row.entry)"
-                    [bonusResistances]="stockRowBonusResistances(row.entry)"
-                    [bonusCombatStats]="stockRowBonusCombatStats(row.entry)"
-                  />
-
-                  <button
-                    type="button"
-                    class="btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start ps-0"
-                    [disabled]="row.price === undefined || !row.affordable"
-                    [tp]="item ? preview.template() : undefined"
-                    [tpPlacement]="'top'"
-                    (click)="requestTrade(row)"
-                  >
-                    @if (item) {
-                      <div class="flex flex-col items-center gap-2 shrink-0">
-                        <div
-                          class="outline-2 outline-offset-[-2px] rounded outline-{{
-                            item.rarity
-                          }}"
-                        >
-                          <app-slot-icon-blank>
-                            <app-icon-item-preview
-                              [sprite]="item.sprite"
-                              [spritesheet]="item.spritesheet"
-                              [backdropSprite]="item.backdropSprite"
-                            ></app-icon-item-preview>
-
-                            @if (row.expiresIn) {
-                              <span text-banner-top>
-                                {{ row.expiresIn }}
-                              </span>
-                            }
-                          </app-slot-icon-blank>
-                        </div>
-                      </div>
-
-                      <div class="flex flex-col flex-1 min-w-0 gap-2">
-                        <span class="font-bold text-{{ item.rarity }} truncate">
-                          {{ item.name }}
-                        </span>
-                      </div>
-
-                      @if (row.price !== undefined) {
-                        <app-currency-cost
-                          [type]="goldCoinItemId"
-                          [amount]="row.price"
-                          class="ml-auto mr-2 shrink-0"
-                        />
-                      }
-                    }
-                  </button>
-                }
-              </div>
-            } @else {
-              <p>This town's shop hasn't opened for business yet.</p>
-            }
+            <app-panel-town-shop [town]="town" />
           }
           @case ('crafting') {
-            <div class="flex flex-col gap-4">
-              <div class="flex flex-wrap gap-2">
-                @for (row of tradeskillLevelRows(); track row.tradeskillId) {
-                  <div
-                    class="relative w-16 h-16 shrink-0"
-                    [tp]="tradeskillTooltip(row)"
-                    [tpPlacement]="'top'"
-                  >
-                    <app-slot-icon-blank>
-                      <app-atlas-image
-                        spritesheet="tradeskill"
-                        [assetName]="row.sprite"
-                      />
-                    </app-slot-icon-blank>
-                    @if (row.isSpecialty) {
-                      <span class="absolute top-1 right-1">
-                        <app-icon
-                          name="gameSevenPointedStar"
-                          size="badge"
-                          class="text-yellow-400 drop-shadow"
-                        />
-                      </span>
-                    }
-                    <span
-                      class="absolute bottom-0 inset-x-0 text-center text-xs text-shadow-black"
-                    >
-                      Lv {{ row.level | number }}
-                    </span>
-                  </div>
-                }
-              </div>
-
-              <div class="flex flex-wrap gap-2">
-                @for (_ of craftQueueSlots(); track $index) {
-                  @let row = craftQueueRows()[$index];
-                  @if (row && row.resultDisplay; as item) {
-                    <div
-                      class="relative w-16 h-16 shrink-0 outline-2 outline-offset-[-2px] rounded outline-{{
-                        item.rarity
-                      }}"
-                      [tp]="row.tradeskillName + ': ' + item.name"
-                      [tpPlacement]="'top'"
-                    >
-                      <app-slot-icon-blank>
-                        <app-icon-item-preview
-                          [sprite]="item.sprite"
-                          [spritesheet]="item.spritesheet"
-                          [backdropSprite]="item.backdropSprite"
-                        />
-
-                        <span text-banner-top>
-                          {{ row.remaining }}
-                        </span>
-                      </app-slot-icon-blank>
-                    </div>
-                  } @else {
-                    <div
-                      class="relative w-16 h-16 shrink-0 outline-2 outline-offset-[-2px] rounded outline-gray-500"
-                    >
-                      <app-slot-icon-blank></app-slot-icon-blank>
-                    </div>
-                  }
-                }
-              </div>
-            </div>
+            <app-panel-town-crafting [town]="town" />
           }
           @case ('workers') {
-            @let roster = workers();
-
-            @if (roster.length > 0) {
-              <div class="flex flex-col gap-2">
-                @for (worker of roster; track worker.workerId) {
-                  @let statusDisplay = workerStatusDisplay(worker);
-
-                  <div class="flex gap-2">
-                    <app-slot-icon-blank>
-                      <app-atlas-animation
-                        spritesheet="worker"
-                        [assetName]="worker.sprite"
-                        [frames]="worker.frames"
-                      />
-                    </app-slot-icon-blank>
-
-                    <div class="flex flex-col min-w-0 gap-2">
-                      <span class="font-bold">{{ worker.name }}</span>
-
-                      <div class="flex gap-2 text-xs text-lighter">
-                        @if (statusDisplay.locationEntry) {
-                          <app-sprite-node
-                            class="zoom-inline shrink-0"
-                            [entry]="statusDisplay.locationEntry"
-                          />
-                        }
-                        <span class="truncate">
-                          {{ statusDisplay.label }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <p>No workers have been assigned yet.</p>
-            }
+            <app-panel-town-workers [town]="town" />
           }
           @case ('quests') {
-            <div class="flex flex-col gap-2">
-              @for (row of commissions(); track row.slotId) {
-                <app-slot-commission
-                  [row]="row"
-                  [fulfill]="() => fulfillCommission(row)"
-                  (travel)="travelToTown()"
-                />
-              } @empty {
-                <p class="text-sm text-lighter italic">
-                  No commissions are available yet.
-                </p>
-              }
-            </div>
+            @if (entry(); as entry) {
+              <app-panel-town-quests [entry]="entry" />
+            }
           }
           @case ('raid') {
-            @if (raidTelegraph(); as telegraph) {
-              <div class="flex flex-col gap-4">
-                <p class="italic text-center">
-                  A raid is threatening this town! Defend it within
-                  <span class="font-bold">{{ raidCountdown() }}</span>
-                  or it will go undefended.
-                </p>
-
-                @let assaulters = raidAssaulters();
-                @if (assaulters.length > 0) {
-                  <div class="flex flex-col gap-2">
-                    <div class="font-bold text-neutral-content">Assaulters</div>
-                    <div class="flex flex-wrap gap-2">
-                      @for (row of assaulters; track row.monster.id) {
-                        <div
-                          class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
-                            row.monster.rarity
-                          }}"
-                          [tp]="row.monster.name"
-                          [tpPlacement]="'top'"
-                        >
-                          <app-slot-icon-blank>
-                            <app-atlas-animation
-                              spritesheet="monster"
-                              [assetName]="row.monster.sprite"
-                              [frames]="row.monster.frames"
-                            />
-                            <span text-br>x{{ row.quantity }}</span>
-                          </app-slot-icon-blank>
-                        </div>
-                      }
-                    </div>
-                  </div>
-                }
-
-                @let defenders = raidDefenders();
-                @if (defenders.length > 0) {
-                  <div class="flex flex-col gap-2">
-                    <div class="font-bold text-neutral-content">Defenders</div>
-                    <div class="flex flex-wrap gap-2">
-                      @for (row of defenders; track row.monster.id) {
-                        <div
-                          class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
-                            row.monster.rarity
-                          }}"
-                          [tp]="row.monster.name"
-                          [tpPlacement]="'top'"
-                        >
-                          <app-slot-icon-blank>
-                            <app-atlas-animation
-                              spritesheet="monster"
-                              [assetName]="row.monster.sprite"
-                              [frames]="row.monster.frames"
-                            />
-                            <span text-br>x{{ row.quantity }}</span>
-                          </app-slot-icon-blank>
-                        </div>
-                      }
-                    </div>
-                  </div>
-                }
-
-                @let rewards = raidRewards();
-                @if (rewards.length > 0) {
-                  <div class="flex flex-col gap-2">
-                    <div class="font-bold text-neutral-content">Rewards</div>
-                    <div class="flex flex-wrap gap-2">
-                      @for (reward of rewards; track $index) {
-                        <app-slot-completion-reward [reward]="reward" />
-                      }
-                    </div>
-                  </div>
-                }
-
-                <button
-                  type="button"
-                  class="btn btn-error"
-                  (click)="engageRaid()"
-                >
-                  Engage Raid
-                </button>
-              </div>
-            } @else {
-              <p>No raid is currently threatening this town.</p>
-            }
+            <app-panel-town-raid [town]="town" />
           }
         }
       </div>
     }
   </div>
 </app-modal>
-
-<swal
-  #confirmSwal
-  icon="question"
-  confirmButtonText="Yes"
-  cancelButtonText="Cancel"
-  (confirm)="confirmSingle()"
-></swal>

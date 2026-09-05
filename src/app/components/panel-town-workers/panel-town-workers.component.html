@@ -1,0 +1,37 @@
+@let roster = workers();
+
+@if (roster.length > 0) {
+  <div class="flex flex-col gap-2">
+    @for (worker of roster; track worker.workerId) {
+      @let statusDisplay = workerStatusDisplay(worker);
+
+      <div class="flex gap-2">
+        <app-slot-icon-blank>
+          <app-atlas-animation
+            spritesheet="worker"
+            [assetName]="worker.sprite"
+            [frames]="worker.frames"
+          />
+        </app-slot-icon-blank>
+
+        <div class="flex flex-col min-w-0 gap-2">
+          <span class="font-bold">{{ worker.name }}</span>
+
+          <div class="flex gap-2 text-xs text-lighter">
+            @if (statusDisplay.locationEntry) {
+              <app-sprite-node
+                class="zoom-inline shrink-0"
+                [entry]="statusDisplay.locationEntry"
+              />
+            }
+            <span class="truncate">
+              {{ statusDisplay.label }}
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <p>No workers have been assigned yet.</p>
+}

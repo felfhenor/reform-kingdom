@@ -1,0 +1,74 @@
+@let shopStockRows = stockRows();
+
+@if (shopStockRows.length > 0) {
+  <div class="flex flex-col gap-2">
+    @for (row of shopStockRows; track row.index) {
+      @let item = stockRowDisplay(row.entry);
+
+      <app-tooltip-item-preview
+        #preview
+        [display]="item"
+        [bonusStats]="stockRowBonusStats(row.entry)"
+        [bonusResistances]="stockRowBonusResistances(row.entry)"
+        [bonusCombatStats]="stockRowBonusCombatStats(row.entry)"
+      />
+
+      <button
+        type="button"
+        class="btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start ps-0"
+        [disabled]="row.price === undefined || !row.affordable"
+        [tp]="item ? preview.template() : undefined"
+        [tpPlacement]="'top'"
+        (click)="requestTrade(row)"
+      >
+        @if (item) {
+          <div class="flex flex-col items-center gap-2 shrink-0">
+            <div
+              class="outline-2 outline-offset-[-2px] rounded outline-{{
+                item.rarity
+              }}"
+            >
+              <app-slot-icon-blank>
+                <app-icon-item-preview
+                  [sprite]="item.sprite"
+                  [spritesheet]="item.spritesheet"
+                  [backdropSprite]="item.backdropSprite"
+                ></app-icon-item-preview>
+
+                @if (row.expiresIn) {
+                  <span text-banner-top>
+                    {{ row.expiresIn }}
+                  </span>
+                }
+              </app-slot-icon-blank>
+            </div>
+          </div>
+
+          <div class="flex flex-col flex-1 min-w-0 gap-2">
+            <span class="font-bold text-{{ item.rarity }} truncate">
+              {{ item.name }}
+            </span>
+          </div>
+
+          @if (row.price !== undefined) {
+            <app-currency-cost
+              [type]="goldCoinItemId"
+              [amount]="row.price"
+              class="ml-auto mr-2 shrink-0"
+            />
+          }
+        }
+      </button>
+    }
+  </div>
+} @else {
+  <p>This town's shop hasn't opened for business yet.</p>
+}
+
+<swal
+  #confirmSwal
+  icon="question"
+  confirmButtonText="Yes"
+  cancelButtonText="Cancel"
+  (confirm)="confirmSingle()"
+></swal>

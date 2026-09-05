@@ -1,0 +1,81 @@
+@if (raidTelegraph(); as telegraph) {
+  <div class="flex flex-col gap-4">
+    <p class="italic text-center">
+      A raid is threatening this town! Defend it within
+      <span class="font-bold">{{ raidCountdown() }}</span>
+      or it will go undefended.
+    </p>
+
+    @let assaulters = raidAssaulters();
+    @if (assaulters.length > 0) {
+      <div class="flex flex-col gap-2">
+        <div class="font-bold text-neutral-content">Assaulters</div>
+        <div class="flex flex-wrap gap-2">
+          @for (row of assaulters; track row.monster.id) {
+            <div
+              class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
+                row.monster.rarity
+              }}"
+              [tp]="row.monster.name"
+              [tpPlacement]="'top'"
+            >
+              <app-slot-icon-blank>
+                <app-atlas-animation
+                  spritesheet="monster"
+                  [assetName]="row.monster.sprite"
+                  [frames]="row.monster.frames"
+                />
+                <span text-br>x{{ row.quantity }}</span>
+              </app-slot-icon-blank>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @let defenders = raidDefenders();
+    @if (defenders.length > 0) {
+      <div class="flex flex-col gap-2">
+        <div class="font-bold text-neutral-content">Defenders</div>
+        <div class="flex flex-wrap gap-2">
+          @for (row of defenders; track row.monster.id) {
+            <div
+              class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
+                row.monster.rarity
+              }}"
+              [tp]="row.monster.name"
+              [tpPlacement]="'top'"
+            >
+              <app-slot-icon-blank>
+                <app-atlas-animation
+                  spritesheet="monster"
+                  [assetName]="row.monster.sprite"
+                  [frames]="row.monster.frames"
+                />
+                <span text-br>x{{ row.quantity }}</span>
+              </app-slot-icon-blank>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @let rewards = raidRewards();
+    @if (rewards.length > 0) {
+      <div class="flex flex-col gap-2">
+        <div class="font-bold text-neutral-content">Rewards</div>
+        <div class="flex flex-wrap gap-2">
+          @for (reward of rewards; track $index) {
+            <app-slot-completion-reward [reward]="reward" />
+          }
+        </div>
+      </div>
+    }
+
+    <button type="button" class="btn btn-error" (click)="engageRaid()">
+      Engage Raid
+    </button>
+  </div>
+} @else {
+  <p>No raid is currently threatening this town.</p>
+}

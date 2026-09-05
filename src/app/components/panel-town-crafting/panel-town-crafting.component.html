@@ -1,0 +1,62 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap gap-2">
+    @for (row of tradeskillLevelRows(); track row.tradeskillId) {
+      <div
+        class="relative w-16 h-16 shrink-0"
+        [tp]="tradeskillTooltip(row)"
+        [tpPlacement]="'top'"
+      >
+        <app-slot-icon-blank>
+          <app-atlas-image spritesheet="tradeskill" [assetName]="row.sprite" />
+        </app-slot-icon-blank>
+        @if (row.isSpecialty) {
+          <span class="absolute top-1 right-1">
+            <app-icon
+              name="gameSevenPointedStar"
+              size="badge"
+              class="text-yellow-400 drop-shadow"
+            />
+          </span>
+        }
+        <span
+          class="absolute bottom-0 inset-x-0 text-center text-xs text-shadow-black"
+        >
+          Lv {{ row.level | number }}
+        </span>
+      </div>
+    }
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    @for (_ of craftQueueSlots(); track $index) {
+      @let row = craftQueueRows()[$index];
+      @if (row && row.resultDisplay; as item) {
+        <div
+          class="relative w-16 h-16 shrink-0 outline-2 outline-offset-[-2px] rounded outline-{{
+            item.rarity
+          }}"
+          [tp]="row.tradeskillName + ': ' + item.name"
+          [tpPlacement]="'top'"
+        >
+          <app-slot-icon-blank>
+            <app-icon-item-preview
+              [sprite]="item.sprite"
+              [spritesheet]="item.spritesheet"
+              [backdropSprite]="item.backdropSprite"
+            />
+
+            <span text-banner-top>
+              {{ row.remaining }}
+            </span>
+          </app-slot-icon-blank>
+        </div>
+      } @else {
+        <div
+          class="relative w-16 h-16 shrink-0 outline-2 outline-offset-[-2px] rounded outline-gray-500"
+        >
+          <app-slot-icon-blank></app-slot-icon-blank>
+        </div>
+      }
+    }
+  </div>
+</div>
