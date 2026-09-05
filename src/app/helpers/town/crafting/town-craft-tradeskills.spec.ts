@@ -27,7 +27,10 @@ const woodworkingId = 'woodworking' as TradeskillId;
 function buildTown(
   tradeskillLevels: { tradeskillId: TradeskillId; level: number }[] = [],
 ): TownContent {
-  return { id: townId, crafting: { tradeskillLevels } } as unknown as TownContent;
+  return {
+    id: townId,
+    crafting: { tradeskillLevels },
+  } as unknown as TownContent;
 }
 
 function mockContentFor(town: TownContent | undefined): void {
@@ -43,12 +46,12 @@ beforeEach(() => {
 describe('townTradeskillsMaterialize', () => {
   it('returns existing unchanged when the town content no longer resolves', () => {
     mockContentFor(undefined);
-    const existing = { [blacksmithingId]: { level: 5, xp: { current: 0, maximum: 10 } } };
+    const existing = { [blacksmithingId]: { level: 5 } };
 
     expect(townTradeskillsMaterialize(townId, existing)).toBe(existing);
   });
 
-  it('fills in a default (level 1) entry for every tradeskill the town has no seed for', () => {
+  it('defaults to level 1 for every tradeskill the town has no seed for', () => {
     mockContentFor(buildTown());
     vi.mocked(getEntriesByType).mockReturnValue([
       { id: blacksmithingId } as TradeskillContent,
@@ -57,57 +60,47 @@ describe('townTradeskillsMaterialize', () => {
 
     const result = townTradeskillsMaterialize(townId, {});
 
-    expect(result[blacksmithingId]).toEqual({
-      level: 1,
-      xp: { current: 0, maximum: expect.any(Number) },
-    });
-    expect(result[woodworkingId].level).toBe(1);
+    expect(result[blacksmithingId]).toEqual({ level: 1 });
+    expect(result[woodworkingId]).toEqual({ level: 1 });
   });
 
-  it('materializes a missing entry at the town-authored seed level', () => {
-    mockContentFor(
-      buildTown([{ tradeskillId: blacksmithingId, level: 12 }]),
-    );
+  it('syncs a tradeskill to its town-authored seed level', () => {
+    mockContentFor(buildTown([{ tradeskillId: blacksmithingId, level: 12 }]));
     vi.mocked(getEntriesByType).mockReturnValue([
       { id: blacksmithingId } as TradeskillContent,
     ]);
 
     const result = townTradeskillsMaterialize(townId, {});
 
-    expect(result[blacksmithingId].level).toBe(12);
+    expect(result[blacksmithingId]).toEqual({ level: 12 });
   });
 
-  it('never overwrites an existing entry already at or above the seed level', () => {
-    mockContentFor(
-      buildTown([{ tradeskillId: blacksmithingId, level: 5 }]),
-    );
+  it('overwrites an existing level that no longer matches the authored seed, in either direction', () => {
+    mockContentFor(buildTown([{ tradeskillId: blacksmithingId, level: 12 }]));
     vi.mocked(getEntriesByType).mockReturnValue([
       { id: blacksmithingId } as TradeskillContent,
     ]);
-    const existing: TownTradeskillState = { level: 12, xp: { current: 3, maximum: 20 } };
 
-    const result = townTradeskillsMaterialize(townId, {
-      [blacksmithingId]: existing,
+    const raised = townTradeskillsMaterialize(townId, {
+      [blacksmithingId]: { level: 3 },
     });
+    expect(raised[blacksmithingId]).toEqual({ level: 12 });
 
-    expect(result[blacksmithingId]).toBe(existing);
+    const lowered = townTradeskillsMaterialize(townId, {
+      [blacksmithingId]: { level: 40 },
+    });
+    expect(lowered[blacksmithingId]).toEqual({ level: 12 });
   });
 
-  it('raises an existing entry below the seed level up to the floor', () => {
-    mockContentFor(
-      buildTown([{ tradeskillId: blacksmithingId, level: 12 }]),
-    );
+  it('clamps a seed level above TRADESKILL_MAX_LEVEL down to the cap', () => {
+    mockContentFor(buildTown([{ tradeskillId: blacksmithingId, level: 999 }]));
     vi.mocked(getEntriesByType).mockReturnValue([
       { id: blacksmithingId } as TradeskillContent,
     ]);
-    const existing: TownTradeskillState = { level: 3, xp: { current: 7, maximum: 15 } };
 
-    const result = townTradeskillsMaterialize(townId, {
-      [blacksmithingId]: existing,
-    });
+    const result = townTradeskillsMaterialize(townId, {});
 
-    expect(result[blacksmithingId].level).toBe(12);
-    expect(result[blacksmithingId].xp.current).toBe(0);
+    expect(result[blacksmithingId]).toEqual({ level: 50 });
   });
 });
 
@@ -116,7 +109,7 @@ describe('pruneInvalidTownTradeskills', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
 
     const result = pruneInvalidTownTradeskills({
-      [blacksmithingId]: { level: 1, xp: { current: 0, maximum: 10 } },
+      [blacksmithingId]: { level: 1 },
     });
 
     expect(result).toEqual({});
@@ -126,7 +119,7 @@ describe('pruneInvalidTownTradeskills', () => {
     vi.mocked(getEntry).mockImplementation((id: unknown) =>
       id === blacksmithingId ? ({ id } as TradeskillContent) : undefined,
     );
-    const state: TownTradeskillState = { level: 4, xp: { current: 1, maximum: 10 } };
+    const state: TownTradeskillState = { level: 4 };
 
     const result = pruneInvalidTownTradeskills({ [blacksmithingId]: state });
 

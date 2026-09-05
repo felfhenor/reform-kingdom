@@ -56,7 +56,6 @@ function ensureTownCrafting(
       crafting.maxQueueSize,
       ensureTownCraftingQueueSizeTier,
     ),
-    maxTradeskillLevel: crafting.maxTradeskillLevel ?? 1,
     specialtyTradeskillId:
       crafting.specialtyTradeskillId ?? ('UNKNOWN' as TradeskillId),
     craftingDurationMultiplier: crafting.craftingDurationMultiplier ?? 1,
@@ -177,10 +176,7 @@ function ensureTownDefenseQuests(
   quests: Partial<TownDefenseQuestsConfig> = {},
 ): TownDefenseQuestsConfig {
   return {
-    commissions: ensureArray(
-      quests.commissions,
-      ensureTownCommissionOfferSlot,
-    ),
+    commissions: ensureArray(quests.commissions, ensureTownCommissionOfferSlot),
   };
 }
 

@@ -32,7 +32,6 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     level: 25,
     crafting: {
       maxQueueSize: [{ tier: 0, queueSize: 1 }],
-      maxTradeskillLevel: 1,
       specialtyTradeskillId: 'jewelcrafting' as never,
       craftingDurationMultiplier: 1,
       craftingChanceOnTick: 1,

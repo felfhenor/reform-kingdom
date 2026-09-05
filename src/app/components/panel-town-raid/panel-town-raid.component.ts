@@ -14,6 +14,7 @@ import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import {
   raidAssaulterPreview,
   raidDefenderPreview,
+  townCraftDebuffExpiresAtTick,
   townRaidTelegraph,
 } from '@helpers/town/raid/town-raid-state';
 import type { TownContent, TownRaidCombatantRow } from '@interfaces';
@@ -44,6 +45,13 @@ export class PanelTownRaidComponent {
     return formatDuration(
       telegraph.engageWindowExpiresAtTick - timerTicksElapsed(),
     );
+  });
+
+  public craftDebuffRemaining = computed(() => {
+    const expiresAtTick = townCraftDebuffExpiresAtTick(this.town().id);
+    if (expiresAtTick === undefined) return undefined;
+
+    return formatDuration(expiresAtTick - timerTicksElapsed());
   });
 
   public raidRewards = computed(() => this.town().defense.rewards ?? []);

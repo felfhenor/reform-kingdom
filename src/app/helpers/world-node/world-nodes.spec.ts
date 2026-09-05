@@ -11,7 +11,8 @@ import type {
   TownContent,
   TownId,
   WorldNodeEntry,
- CollectibleId } from '@interfaces';
+  CollectibleId,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/world-node/world-node-discovery', () => ({
@@ -39,7 +40,6 @@ import {
   worldNodeOverride,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
-
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {
@@ -243,7 +243,6 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     level: 5,
     crafting: {
       maxQueueSize: [{ tier: 0, queueSize: 1 }],
-      maxTradeskillLevel: 1,
       specialtyTradeskillId: 'UNKNOWN' as never,
       craftingDurationMultiplier: 1,
       craftingChanceOnTick: 100,

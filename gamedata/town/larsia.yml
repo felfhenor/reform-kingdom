@@ -23,7 +23,6 @@
       - tier: 4
         queueSize: 20
 
-    maxTradeskillLevel: 20
     specialtyTradeskillId: Jewelcrafting
     craftingDurationMultiplier: 3
     craftingChanceOnTick: 3

@@ -1,11 +1,13 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { craftXpChance } from '@helpers/crafting/tradeskill';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
-import { townTradeskillLeveledUp } from '@helpers/town/crafting/town-craft-level';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
+import {
+  RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER,
+  townCraftTimeFor,
+} from '@helpers/town/crafting/town-craft-time';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
@@ -26,8 +28,6 @@ import type {
 
 // Runs every tick once activated, same reasoning as WORKER_TICK_INTERVAL - craft progress is continuous.
 const CRAFT_TICK_INTERVAL = 1;
-
-const RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER = 2;
 
 // Grants the result unconditionally (the caller already decided the craft succeeds) - a material result
 // feeds the materials stash directly, only equipment lands in stock.
@@ -65,8 +65,7 @@ function resolveQueueEntryCompletion(
   entry: TownCraftQueueEntry,
   recipe: RecipeContent,
 ): boolean {
-  const building = target.tradeskills[entry.tradeskillId];
-  if (!building) return true; // orphaned tradeskill - drop the entry defensively
+  if (!target.tradeskills[entry.tradeskillId]) return true; // orphaned tradeskill - drop the entry defensively
 
   if (
     'equipmentId' in recipe.result &&
@@ -76,20 +75,6 @@ function resolveQueueEntryCompletion(
   }
 
   grantCraftedResult(state, town.id, recipe);
-
-  // Mirrors the player's resolveCraftUnit: XP odds taper off as the tradeskill outlevels the recipe.
-  const xpChance = craftXpChance(recipe, building.level);
-  const grantsXp = recipe.tradeskillXP > 0 && rngSucceedsChance(xpChance);
-  if (grantsXp) {
-    target.tradeskills = {
-      ...target.tradeskills,
-      [entry.tradeskillId]: townTradeskillLeveledUp(
-        building,
-        recipe.tradeskillXP,
-        town.crafting.maxTradeskillLevel,
-      ),
-    };
-  }
 
   return true;
 }
@@ -107,10 +92,8 @@ function advanceQueueEntry(
   const debuffMultiplier = isTownCraftDebuffActive(target)
     ? RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER
     : 1;
-  const craftTime =
-    recipe.craftTime *
-    town.crafting.craftingDurationMultiplier *
-    debuffMultiplier;
+  const level = target.tradeskills[entry.tradeskillId]?.level ?? 1;
+  const craftTime = townCraftTimeFor(recipe, town, level, debuffMultiplier);
   const ticksIntoCraft = entry.ticksIntoCraft + 1;
   if (ticksIntoCraft < craftTime) return { ...entry, ticksIntoCraft };
 

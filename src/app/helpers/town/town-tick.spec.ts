@@ -56,7 +56,6 @@ const town: TownContent = {
   level: 25,
   crafting: {
     maxQueueSize: [{ tier: 0, queueSize: 12 }],
-    maxTradeskillLevel: 20,
     specialtyTradeskillId: 'jewelcrafting' as never,
     craftingDurationMultiplier: 3,
     craftingChanceOnTick: 3,

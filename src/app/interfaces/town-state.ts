@@ -25,10 +25,10 @@ export type TownStockAddition = Omit<TownStockEntry, 'addedAtTick'>;
 // Raw materials workers have hauled back
 export type TownMaterials = Partial<Record<ItemId, number>>;
 
-// Level/xp only - unlike the player's TradeskillBuildingState, a town's queue is shared (TownNodeState.craftQueue), not nested per tradeskill.
+// Fixed, content-authored level only - a town never gains tradeskill xp, unlike the player's TradeskillBuildingState.
+// The queue is also shared (TownNodeState.craftQueue), not nested per tradeskill.
 export type TownTradeskillState = {
   level: number;
-  xp: { current: number; maximum: number };
 };
 
 // One crafting slot in the town's shared queue - always a single unit, unlike the player's batched queue.

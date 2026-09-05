@@ -6,6 +6,13 @@
     }
   </h2>
 
+  @if (craftDebuffRemaining(); as debuffRemaining) {
+    <p class="text-warning italic">
+      This town was recently raided, it will craft slower for
+      {{ debuffRemaining }}.
+    </p>
+  }
+
   @if (raidTelegraph()) {
     <div class="flex flex-col gap-2">
       @let assaulters = raidAssaulters();

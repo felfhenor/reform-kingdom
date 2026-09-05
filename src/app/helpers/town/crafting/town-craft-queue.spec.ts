@@ -5,10 +5,6 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
-vi.mock('@helpers/crafting/tradeskill', () => ({
-  craftXpChance: vi.fn(() => 100),
-}));
-
 vi.mock('@helpers/item/equipment', () => ({
   newEquipmentItem: vi.fn(),
 }));
@@ -35,10 +31,6 @@ vi.mock('@helpers/town/raid/town-raid-state', () => ({
   isTownCraftDebuffActive: vi.fn(() => false),
 }));
 
-vi.mock('@helpers/town/crafting/town-craft-level', () => ({
-  townTradeskillLeveledUp: vi.fn((building) => building),
-}));
-
 vi.mock('@helpers/town/shop/town-stock', () => ({
   applyTownStockAdd: vi.fn(),
 }));
@@ -57,12 +49,10 @@ vi.mock('@helpers/town/town-tick', () => ({
 }));
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { craftXpChance } from '@helpers/crafting/tradeskill';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
-import { townTradeskillLeveledUp } from '@helpers/town/crafting/town-craft-level';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
@@ -93,7 +83,6 @@ function buildTown(
   return {
     id: townId,
     crafting: {
-      maxTradeskillLevel: 20,
       maxQueueSize: 12,
       craftingDurationMultiplier: 1,
       craftingChanceOnTick: 100,
@@ -115,7 +104,6 @@ beforeEach(() => {
   vi.mocked(isTownDueForUpdate).mockReturnValue(true);
   vi.mocked(townShopItemCap).mockReturnValue(10);
   vi.mocked(rngSucceedsChance).mockReturnValue(true);
-  vi.mocked(craftXpChance).mockReturnValue(100);
   vi.mocked(townPickRecipeToQueue).mockReturnValue(undefined);
   vi.mocked(isTownCraftDebuffActive).mockReturnValue(false);
 });
@@ -296,7 +284,6 @@ describe('townCraftProcessTick - completing the queue', () => {
     ];
     const recipe = {
       craftTime: 5,
-      tradeskillXP: 7,
       result: { equipmentId: 'sword' },
     } as RecipeContent;
     vi.mocked(getEntry).mockReturnValue(recipe);
@@ -316,15 +303,13 @@ describe('townCraftProcessTick - completing the queue', () => {
     } as unknown as GameState);
 
     expect(applyTownStockAdd).not.toHaveBeenCalled();
-    expect(townTradeskillLeveledUp).not.toHaveBeenCalled();
     expect(state.world.towns[townId].craftQueue).toHaveLength(1);
     expect(state.world.towns[townId].craftQueue[0].id).toBe('q1');
   });
 
-  it('completes a craft, feeds an item result into the town materials stash, gains xp, and dequeues', () => {
+  it('completes a craft, feeds an item result into the town materials stash, and dequeues', () => {
     const recipe = {
       craftTime: 5,
-      tradeskillXP: 7,
       result: { itemId: 'ingot' as ItemId, quantity: 2 },
     } as RecipeContent;
     vi.mocked(getEntry).mockReturnValue(recipe);
@@ -350,11 +335,6 @@ describe('townCraftProcessTick - completing the queue', () => {
       },
     } as unknown as GameState);
 
-    expect(townTradeskillLeveledUp).toHaveBeenCalledWith(
-      expect.anything(),
-      7,
-      20,
-    );
     expect(applyTownMaterialDelta).toHaveBeenCalledWith(
       expect.anything(),
       townId,
@@ -365,12 +345,43 @@ describe('townCraftProcessTick - completing the queue', () => {
     expect(state.world.towns[townId].craftQueue).toEqual([]);
   });
 
+  it('a higher tradeskill level shortens the effective craft time', () => {
+    const recipe = {
+      craftTime: 100,
+      result: { itemId: 'ingot' as ItemId, quantity: 1 },
+    } as RecipeContent;
+    vi.mocked(getEntry).mockReturnValue(recipe);
+
+    townCraftProcessTick();
+
+    const state = applyLastUpdate({
+      world: {
+        towns: {
+          [townId]: {
+            stock: [],
+            tradeskills: { [blacksmithingId]: { level: 50 } },
+            craftQueue: [
+              {
+                id: 'q1',
+                tradeskillId: blacksmithingId,
+                recipeId: 'recipe-1',
+                ticksIntoCraft: 49,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState);
+
+    // craftTime 100 reduced 50% by level 50 = 50; 49 + 1 = 50, no longer below - completes.
+    expect(state.world.towns[townId].craftQueue).toEqual([]);
+  });
+
   it('completes a craft with an equipment result via newEquipmentItem', () => {
     const rolledItem = { id: 'sword-1', equipmentId: 'sword' } as never;
     vi.mocked(newEquipmentItem).mockReturnValue(rolledItem);
     const recipe = {
       craftTime: 5,
-      tradeskillXP: 7,
       result: { equipmentId: 'sword' },
     } as RecipeContent;
     vi.mocked(getEntry).mockReturnValue(recipe);
@@ -406,12 +417,10 @@ describe('townCraftProcessTick - completing the queue', () => {
   });
 
   it("always grants the result even when the recipe has a result chance - a town's craft never whiffs, unlike the player's", () => {
-    vi.mocked(craftXpChance).mockReturnValue(100);
     // Would always fail a 25% roll if one were rolled - proves no roll happens for the result grant.
     vi.mocked(rngSucceedsChance).mockImplementation((chance) => chance !== 25);
     const recipe = {
       craftTime: 5,
-      tradeskillXP: 7,
       result: { itemId: 'ingot' as ItemId, quantity: 1, chance: 25 },
     } as RecipeContent;
     vi.mocked(getEntry).mockReturnValue(recipe);
@@ -444,49 +453,11 @@ describe('townCraftProcessTick - completing the queue', () => {
       1,
     );
     expect(state.world.towns[townId].craftQueue).toEqual([]);
-    expect(townTradeskillLeveledUp).toHaveBeenCalled();
-  });
-
-  it('skips the xp grant (but still dequeues) once the recipe is fully outlevelled', () => {
-    vi.mocked(craftXpChance).mockReturnValue(0);
-    vi.mocked(rngSucceedsChance).mockReturnValue(false);
-    const recipe = {
-      craftTime: 5,
-      tradeskillXP: 7,
-      result: { itemId: 'ingot' as ItemId, quantity: 1 },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
-
-    townCraftProcessTick();
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 20 } },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 4,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(craftXpChance).toHaveBeenCalledWith(recipe, 20);
-    expect(townTradeskillLeveledUp).not.toHaveBeenCalled();
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
   });
 
   it('drops an entry defensively if its tradeskill has no live building', () => {
     const recipe = {
       craftTime: 5,
-      tradeskillXP: 7,
       result: { itemId: 'ingot' as ItemId, quantity: 1 },
     } as RecipeContent;
     vi.mocked(getEntry).mockReturnValue(recipe);

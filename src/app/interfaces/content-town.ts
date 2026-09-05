@@ -22,7 +22,7 @@ export type TownId = Branded<string, 'TownId'>;
 // every numeric knob below is authored directly per-town instead.
 export type TownScaleType = 'City' | 'Town' | 'Outpost';
 
-// A seeded floor for one tradeskill's level - materialization never lowers a town's tradeskill below this.
+// A town's fixed tradeskill level, authored directly (never changes at runtime) - clamped to TRADESKILL_MAX_LEVEL on materialization.
 export type TownTradeskillLevelSeed = {
   tradeskillId: TradeskillId;
   level: number;
@@ -36,7 +36,6 @@ export type TownCraftingQueueSizeTier = {
 
 export type TownCraftingConfig = {
   maxQueueSize: TownCraftingQueueSizeTier[];
-  maxTradeskillLevel: number;
   specialtyTradeskillId: TradeskillId;
   // Multiplies every recipe's craftTime for this town - towns craft slower than the player so shop stock doesn't churn instantly.
   craftingDurationMultiplier: number;

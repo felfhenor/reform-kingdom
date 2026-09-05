@@ -1,9 +1,11 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
+  LOCALE_ID,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -36,6 +38,8 @@ import { TippyDirective } from '@ngneat/helipopper';
   templateUrl: './panel-town-crafting.component.html',
 })
 export class PanelTownCraftingComponent {
+  private locale = inject(LOCALE_ID);
+
   public town = input.required<TownContent>();
 
   public tradeskillLevelRows = computed<TownTradeskillLevelRow[]>(() =>
@@ -43,7 +47,9 @@ export class PanelTownCraftingComponent {
   );
 
   public tradeskillTooltip(row: TownTradeskillLevelRow): string {
-    return row.isSpecialty ? `${row.name} (Speciality)` : row.name;
+    const name = row.isSpecialty ? `${row.name} (Speciality)` : row.name;
+    const reduction = formatNumber(row.level, this.locale);
+    return `${name}: -${reduction}% crafting time for matching recipes`;
   }
 
   public craftQueueRows = computed<TownCraftQueueRow[]>(() =>

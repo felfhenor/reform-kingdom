@@ -1,5 +1,6 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { tradeskillXpForLevel } from '@helpers/crafting/tradeskill';
+import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting/tradeskill';
+import { clamp } from 'es-toolkit/compat';
 import type {
   RecipeContent,
   TownContent,
@@ -19,10 +20,10 @@ function seedLevelFor(town: TownContent, tradeskillId: TradeskillId): number {
 }
 
 function buildingAtLevel(level: number): TownTradeskillState {
-  return { level, xp: { current: 0, maximum: tradeskillXpForLevel(level) } };
+  return { level: clamp(level, 1, TRADESKILL_MAX_LEVEL) };
 }
 
-// Backfills any missing tradeskill entry and floors every tradeskill at its content-authored seed level.
+// A town's tradeskill level is fixed, content-authored data - always synced to the current seed rather than accumulated.
 export function townTradeskillsMaterialize(
   townId: TownId,
   existing: Record<TradeskillId, TownTradeskillState>,
@@ -33,12 +34,9 @@ export function townTradeskillsMaterialize(
   const materialized = { ...existing };
 
   getEntriesByType<TradeskillContent>('tradeskill').forEach((tradeskill) => {
-    const seedLevel = seedLevelFor(town, tradeskill.id);
-    const current = materialized[tradeskill.id];
-
-    if (!current || current.level < seedLevel) {
-      materialized[tradeskill.id] = buildingAtLevel(seedLevel);
-    }
+    materialized[tradeskill.id] = buildingAtLevel(
+      seedLevelFor(town, tradeskill.id),
+    );
   });
 
   return materialized;

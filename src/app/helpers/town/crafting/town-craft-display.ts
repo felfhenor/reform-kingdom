@@ -2,6 +2,11 @@ import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { gamestate } from '@helpers/state-game';
+import {
+  RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER,
+  townCraftTimeFor,
+} from '@helpers/town/crafting/town-craft-time';
+import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import type {
   RecipeContent,
   TownContent,
@@ -12,7 +17,9 @@ import type {
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
 
-export function townTradeskillLevelRows(townId: TownId): TownTradeskillLevelRow[] {
+export function townTradeskillLevelRows(
+  townId: TownId,
+): TownTradeskillLevelRow[] {
   const town = getEntry<TownContent>(townId);
   if (!town) return [];
 
@@ -46,7 +53,11 @@ export function townCraftQueueRows(townId: TownId): TownCraftQueueRow[] {
     const tradeskill = getEntry<TradeskillContent>(entry.tradeskillId);
     if (!recipe || !tradeskill) return [];
 
-    const craftTime = recipe.craftTime * town.crafting.craftingDurationMultiplier;
+    const level = state.tradeskills[entry.tradeskillId]?.level ?? 1;
+    const debuffMultiplier = isTownCraftDebuffActive(state)
+      ? RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER
+      : 1;
+    const craftTime = townCraftTimeFor(recipe, town, level, debuffMultiplier);
 
     return [
       {

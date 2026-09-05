@@ -16,9 +16,14 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
+vi.mock('@helpers/town/raid/town-raid-state', () => ({
+  isTownCraftDebuffActive: vi.fn(() => false),
+}));
+
 import { getEntry } from '@helpers/content/content';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { gamestate } from '@helpers/state-game';
+import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import {
   townCraftQueueRows,
   townTradeskillLevelRows,
@@ -62,6 +67,7 @@ function mockOnlyBlacksmithingResolves(town: TownContent | undefined): void {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(isTownCraftDebuffActive).mockReturnValue(false);
 });
 
 describe('townTradeskillLevelRows', () => {
@@ -180,6 +186,7 @@ describe('townCraftQueueRows', () => {
       world: {
         towns: {
           [townId]: {
+            tradeskills: {},
             craftQueue: [
               {
                 id: 'q1',
@@ -195,13 +202,90 @@ describe('townCraftQueueRows', () => {
 
     const [row] = townCraftQueueRows(townId);
 
-    // craftTime 5 * multiplier 3 = 15; remaining = 15 - 2 = 13.
+    // craftTime 5 * multiplier 3 = 15, level defaults to 1 (-1% rounds back to 15); remaining = 15 - 2 = 13.
     expect(row).toEqual({
       id: 'q1',
       tradeskillName: 'Blacksmithing',
       resultDisplay: display,
       remaining: 'formatted:13',
     });
+  });
+
+  it('applies the tradeskill level reduction to the remaining time', () => {
+    const town = buildTown();
+    const result = { itemId: 'copper-ingot' };
+    vi.mocked(getEntry).mockImplementation((id: unknown) => {
+      if (id === townId) return town;
+      if (id === blacksmithingId) {
+        return { id, name: 'Blacksmithing' } as TradeskillContent;
+      }
+      if (id === 'recipe-1') {
+        return { craftTime: 100, result } as RecipeContent;
+      }
+      return undefined;
+    });
+    vi.mocked(resolveRewardDisplay).mockReturnValue(undefined);
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: {
+          [townId]: {
+            tradeskills: { [blacksmithingId]: { level: 50 } },
+            craftQueue: [
+              {
+                id: 'q1',
+                tradeskillId: blacksmithingId,
+                recipeId: 'recipe-1',
+                ticksIntoCraft: 0,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState);
+
+    const [row] = townCraftQueueRows(townId);
+
+    // craftTime 100 * multiplier 3 = 300, halved by level 50 = 150.
+    expect(row.remaining).toBe('formatted:150');
+  });
+
+  it('doubles the remaining time while the raid-loss craft debuff is active', () => {
+    vi.mocked(isTownCraftDebuffActive).mockReturnValue(true);
+    const town = buildTown();
+    const result = { itemId: 'copper-ingot' };
+    vi.mocked(getEntry).mockImplementation((id: unknown) => {
+      if (id === townId) return town;
+      if (id === blacksmithingId) {
+        return { id, name: 'Blacksmithing' } as TradeskillContent;
+      }
+      if (id === 'recipe-1') {
+        return { craftTime: 5, result } as RecipeContent;
+      }
+      return undefined;
+    });
+    vi.mocked(resolveRewardDisplay).mockReturnValue(undefined);
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: {
+          [townId]: {
+            tradeskills: {},
+            craftQueue: [
+              {
+                id: 'q1',
+                tradeskillId: blacksmithingId,
+                recipeId: 'recipe-1',
+                ticksIntoCraft: 0,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState);
+
+    const [row] = townCraftQueueRows(townId);
+
+    // craftTime 5 * multiplier 3 * debuff 2 = 30, level defaults to 1 (-1% rounds back to 30).
+    expect(row.remaining).toBe('formatted:30');
   });
 });
 
