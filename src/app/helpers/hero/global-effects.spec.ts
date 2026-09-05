@@ -1,9 +1,7 @@
 import type {
   GameState,
   GlobalEffectContent,
-  GlobalEffectEffect,
   GlobalEffectId,
-  TownContent,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,7 +13,6 @@ vi.mock('@helpers/hero/character-progress', () => ({
 
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/hero/party', () => ({
@@ -31,29 +28,34 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
 }));
 
+vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
+  townReputationBuffSync: vi.fn(),
+}));
+
+vi.mock('@helpers/town/town-spawn', () => ({
+  homeNodeGet: vi.fn(),
+}));
+
 vi.mock('@helpers/world', () => ({
+  currentLocationGet: vi.fn(() => ({ mapName: 'Carrina', x: 0, y: 0 })),
   currentLocationSet: vi.fn(),
 }));
 
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodesOfType: vi.fn(() => []),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { healPartyToFull } from '@helpers/hero/character-progress';
 import {
   activeGlobalEffects,
   addGlobalEffect,
   globalEffectDurationLabel,
-  globalEffectEffectsDescription,
   globalEffectsProcessTick,
   isGlobalEffectActive,
   removeGlobalEffect,
 } from '@helpers/hero/global-effects';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { currentLocationSet } from '@helpers/world';
-import { worldNodesOfType } from '@helpers/world-node/world-nodes';
+import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { homeNodeGet } from '@helpers/town/town-spawn';
+import { currentLocationGet, currentLocationSet } from '@helpers/world';
 
 describe('Global Effect Helper Functions', () => {
   const healingId = 'healing-1' as GlobalEffectId;
@@ -67,27 +69,6 @@ describe('Global Effect Helper Functions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe('globalEffectEffectsDescription', () => {
-    it('renders every effect type as a comma-joined "Label: +N[%]" string', () => {
-      const effects: GlobalEffectEffect[] = [
-        { effectType: 'GainStats', stat: 'Strength', value: 5 },
-        { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
-        { effectType: 'GainCombatStat', combatStat: 'agroValue', value: 3 },
-        { effectType: 'GlobalXPGainMultiplier', value: 0.1 },
-        { effectType: 'DebuffResistance', value: 10 },
-        { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
-      ];
-
-      expect(globalEffectEffectsDescription(effects)).toBe(
-        'Strength: +5, Revive Chance: +2%, Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%',
-      );
-    });
-
-    it('returns an empty string for an empty effect list', () => {
-      expect(globalEffectEffectsDescription([])).toBe('');
-    });
   });
 
   describe('activeGlobalEffects', () => {
@@ -240,20 +221,19 @@ describe('Global Effect Helper Functions', () => {
       expect(result.globalEffects).toHaveLength(0);
     });
 
-    it('teleports the party to the kingdom and grants Healing when Deaths Door expires', () => {
+    it('teleports the party home, resyncs the regional buff, and grants Healing when Deaths Door expires', () => {
       vi.mocked(timerTicksElapsed).mockReturnValue(20);
       mockContentLookup();
-      vi.mocked(worldNodesOfType).mockImplementation((type) =>
-        type === 'Kingdom'
-          ? [
-              {
-                mapName: 'Carrina',
-                x: 24,
-                y: 24,
-              } as unknown as WorldNodeEntry,
-            ]
-          : [],
-      );
+      vi.mocked(currentLocationGet).mockReturnValue({
+        mapName: 'CraggledMire',
+        x: 3,
+        y: 3,
+      });
+      vi.mocked(homeNodeGet).mockReturnValue({
+        mapName: 'Carrina',
+        x: 24,
+        y: 24,
+      } as unknown as WorldNodeEntry);
       vi.mocked(gamestate).mockReturnValue({
         globalEffects: [
           { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
@@ -267,57 +247,18 @@ describe('Global Effect Helper Functions', () => {
         x: 24,
         y: 24,
       });
+      expect(townReputationBuffSync).toHaveBeenCalledWith(
+        'CraggledMire',
+        'Carrina',
+      );
       expect(healingWasGranted()).toBe(true);
       expect(healPartyToFull).not.toHaveBeenCalled();
     });
 
-    it('clears any active town-region buff on Deaths Door expiry', () => {
+    it('does not touch the current location or resync buffs when there is no home node at all', () => {
       vi.mocked(timerTicksElapsed).mockReturnValue(20);
       mockContentLookup();
-      vi.mocked(worldNodesOfType).mockReturnValue([]);
-      const regionalBuffId = 'larsian-influence' as GlobalEffectId;
-      vi.mocked(getEntriesByType).mockReturnValue([
-        {
-          reputation: { buff: { globalEffectId: regionalBuffId, tiers: [] } },
-        } as unknown as TownContent,
-      ]);
-      const regionalBuff = {
-        id: regionalBuffId,
-        name: 'Larsian Influence',
-        __type: 'globaleffect',
-        description: '',
-        sprite: '0000',
-        startTick: 0,
-        expiresAtTick: 999999,
-        effects: [],
-      };
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [
-          { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
-          regionalBuff,
-        ],
-      } as unknown as GameState);
-
-      globalEffectsProcessTick();
-
-      const removedRegionalBuff = vi
-        .mocked(updateGamestate)
-        .mock.calls.some(([updateFn]) => {
-          const result = updateFn({
-            globalEffects: [regionalBuff],
-          } as unknown as GameState);
-          return !result.globalEffects.some(
-            (effect) => effect.id === regionalBuffId,
-          );
-        });
-
-      expect(removedRegionalBuff).toBe(true);
-    });
-
-    it('still removes an expired Deaths Door even when there is no Kingdom node', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(20);
-      mockContentLookup();
-      vi.mocked(worldNodesOfType).mockReturnValue([]);
+      vi.mocked(homeNodeGet).mockReturnValue(undefined);
       vi.mocked(gamestate).mockReturnValue({
         globalEffects: [
           { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
@@ -327,6 +268,7 @@ describe('Global Effect Helper Functions', () => {
       globalEffectsProcessTick();
 
       expect(currentLocationSet).not.toHaveBeenCalled();
+      expect(townReputationBuffSync).not.toHaveBeenCalled();
       expect(healingWasGranted()).toBe(true);
     });
 

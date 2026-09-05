@@ -22,7 +22,7 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/global-effects', () => ({
+vi.mock('@helpers/hero/global-effect-state', () => ({
   applyGlobalEffectAdd: vi.fn(),
   applyGlobalEffectRemove: vi.fn(),
 }));
@@ -58,7 +58,7 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   applyGlobalEffectAdd,
   applyGlobalEffectRemove,
-} from '@helpers/hero/global-effects';
+} from '@helpers/hero/global-effect-state';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
   getMaterialQuantity,

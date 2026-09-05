@@ -20,6 +20,7 @@ import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import {
@@ -52,7 +53,10 @@ function travelGet(): TravelState {
 // else undefined - drives a disabled "mm:ss" travel button in the UI.
 export function travelEtaSecondsTo(nodeName: string): number | undefined {
   const travel = travelGet();
-  if (travel.status !== 'Traveling' || travel.destinationNodeName !== nodeName) {
+  if (
+    travel.status !== 'Traveling' ||
+    travel.destinationNodeName !== nodeName
+  ) {
     return undefined;
   }
 
@@ -172,25 +176,25 @@ export function travelStart(
   return true;
 }
 
-// 10 seconds per teleport-hop to the kingdom's map, 10 second minimum so dying nearby still costs a beat.
+// 10 seconds per teleport-hop to the home node's map (a designated Town, or the Duchy), 10 second minimum so dying nearby still costs a beat.
 function deathsDoorDurationTicks(): number {
-  const kingdom = worldNodesOfType('Kingdom')[0];
-  if (!kingdom) return DEATHS_DOOR_MINIMUM_SECONDS;
+  const home = homeNodeGet();
+  if (!home) return DEATHS_DOOR_MINIMUM_SECONDS;
 
-  const hops = mapHopsBetween(currentLocationGet().mapName, kingdom.mapName);
+  const hops = mapHopsBetween(currentLocationGet().mapName, home.mapName);
   return Math.max(
     DEATHS_DOOR_MINIMUM_SECONDS,
     hops * DEATHS_DOOR_SECONDS_PER_MAP,
   );
 }
 
-// Deaths Door is purely a timer; on expiry (`globalEffectsProcessTick`) the party teleports to the kingdom.
+// Deaths Door is purely a timer; on expiry (`globalEffectsProcessTick`) the party teleports home.
 export function travelBeginDeathsDoor(): void {
   addGlobalEffect('Deaths Door' as GlobalEffectId, deathsDoorDurationTicks());
 
   travelMessageLog(
     currentLocationGet().mapName,
-    'The fallen party awaits recall to the kingdom.',
+    'The fallen party awaits recall home.',
   );
 }
 

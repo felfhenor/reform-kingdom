@@ -5,7 +5,10 @@ import type {
   GameState,
   MaterialId,
   RecipeId,
- DecreeClause, DecreeClauseId, WorldNodeEntry } from '@interfaces';
+  DecreeClause,
+  DecreeClauseId,
+  WorldNodeEntry,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/caravan/caravan', () => ({
@@ -80,6 +83,10 @@ vi.mock('@helpers/crafting/tradeskill', () => ({
 
 vi.mock('@helpers/town/town-tick', () => ({
   pruneInvalidTowns: vi.fn((towns) => towns),
+}));
+
+vi.mock('@helpers/town/town-spawn', () => ({
+  pruneInvalidHomeNode: vi.fn((homeNodeName) => homeNodeName),
 }));
 
 vi.mock('@helpers/defaults', () => ({
@@ -179,7 +186,6 @@ import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfindin
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
-
 
 describe('migrateGameState', () => {
   beforeEach(() => {

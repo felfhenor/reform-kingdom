@@ -48,6 +48,10 @@ vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
   townReputationBuffSync: vi.fn(),
 }));
 
+vi.mock('@helpers/town/town-spawn', () => ({
+  homeNodeGet: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -105,6 +109,7 @@ import { mapHopsBetween, tileIsOnPath } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import {
   isWorldNodeCollectibleGateMet,
@@ -195,7 +200,9 @@ describe('travelEtaSecondsTo', () => {
       stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
     );
 
-    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBeUndefined();
+    expect(
+      travelEtaSecondsTo('Duchy Trading Caravan - Carrina'),
+    ).toBeUndefined();
   });
 
   it('is undefined when traveling toward a different destination', () => {
@@ -208,7 +215,9 @@ describe('travelEtaSecondsTo', () => {
       }),
     );
 
-    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBeUndefined();
+    expect(
+      travelEtaSecondsTo('Duchy Trading Caravan - Carrina'),
+    ).toBeUndefined();
   });
 
   it('sums remaining ticks on the current step plus full cost of later steps', () => {
@@ -236,9 +245,9 @@ describe('travelPathTotalTicks', () => {
   });
 
   it('returns 0 for an empty path', () => {
-    expect(
-      travelPathTotalTicks([], { mapName: 'Carrina', x: 0, y: 0 }),
-    ).toBe(0);
+    expect(travelPathTotalTicks([], { mapName: 'Carrina', x: 0, y: 0 })).toBe(
+      0,
+    );
   });
 
   it('sums off-path move costs, threading each step as the next origin', () => {
@@ -249,9 +258,9 @@ describe('travelPathTotalTicks', () => {
 
     // Both steps are plain off-path Moves (worldNodeAt/tileIsOnPath default
     // to false/undefined), so each costs TICKS_PER_STEP_OFF_PATH (3).
-    expect(
-      travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 }),
-    ).toBe(6);
+    expect(travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 })).toBe(
+      6,
+    );
   });
 
   it('treats a Teleport step as free', () => {
@@ -260,9 +269,9 @@ describe('travelPathTotalTicks', () => {
       { kind: 'Move' as const, mapName: 'Craggledmire', x: 6, y: 5 },
     ];
 
-    expect(
-      travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 }),
-    ).toBe(3);
+    expect(travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 })).toBe(
+      3,
+    );
   });
 });
 
@@ -548,11 +557,9 @@ describe('travelBeginDeathsDoor', () => {
       x: 3,
       y: 3,
     });
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'Kingdom'
-        ? [{ mapName: 'Carrina' } as unknown as WorldNodeEntry]
-        : [],
-    );
+    vi.mocked(homeNodeGet).mockReturnValue({
+      mapName: 'Carrina',
+    } as unknown as WorldNodeEntry);
   });
 
   it('does not touch travel state - it is a pure timer, not a walk home', () => {
@@ -564,7 +571,7 @@ describe('travelBeginDeathsDoor', () => {
     expect(currentLocationSet).not.toHaveBeenCalled();
   });
 
-  it('grants Deaths Door for 10 seconds per map hop to the kingdom', () => {
+  it('grants Deaths Door for 10 seconds per map hop to the home node', () => {
     vi.mocked(mapHopsBetween).mockReturnValue(2);
 
     travelBeginDeathsDoor();
@@ -573,7 +580,7 @@ describe('travelBeginDeathsDoor', () => {
     expect(addGlobalEffect).toHaveBeenCalledWith('Deaths Door', 20);
   });
 
-  it('applies a 10 second minimum even when already on the kingdom map', () => {
+  it('applies a 10 second minimum even when already on the home map', () => {
     vi.mocked(mapHopsBetween).mockReturnValue(0);
 
     travelBeginDeathsDoor();
@@ -588,8 +595,16 @@ describe('travelBeginDeathsDoor', () => {
 
     expect(travelMessageLog).toHaveBeenCalledWith(
       'CraggledMire',
-      'The fallen party awaits recall to the kingdom.',
+      'The fallen party awaits recall home.',
     );
+  });
+
+  it('applies the minimum when there is no home node at all', () => {
+    vi.mocked(homeNodeGet).mockReturnValue(undefined);
+
+    travelBeginDeathsDoor();
+
+    expect(addGlobalEffect).toHaveBeenCalledWith('Deaths Door', 10);
   });
 });
 

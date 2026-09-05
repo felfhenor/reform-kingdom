@@ -660,7 +660,7 @@ describe('decreeClauseSummary', () => {
 
   it('describes ReturnToKingdom', () => {
     expect(decreeClauseSummary(buildClause({ type: 'ReturnToKingdom' }))).toBe(
-      'Return to the kingdom',
+      'Return home',
     );
   });
 

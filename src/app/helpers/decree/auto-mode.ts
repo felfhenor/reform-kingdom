@@ -22,12 +22,12 @@ import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
-import { isPlayerAtKingdom, worldNodeAtCurrentLocation } from '@helpers/world';
+import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeByName,
-  worldNodesOfType,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -139,7 +139,7 @@ function clauseStatusLabel(clause: DecreeClause): string {
     case 'LevelUpParty':
       return `Leveling up (${clause.riskTolerance} risk)...`;
     case 'ReturnToKingdom':
-      return 'Returning to the kingdom...';
+      return 'Returning home...';
     case 'DefendTowns':
       return clause.townName
         ? `Defending ${clause.townName}...`
@@ -226,7 +226,7 @@ function isPartyIdleForAutoMode(): boolean {
   );
 }
 
-// An orphaned gather (no clause tracking it, e.g. started manually or its clause got disabled) never stops on its own, leaving Auto Mode stuck at that node. Ends it so per-tick evaluation resumes. If the party is also hurt and waiting for full health, routes through the kingdom explicitly - `restingProcessTick` needs `!isGathering()` to heal, and `advanceToNextClause`'s health-blocked branch can't fire from this path.
+// An orphaned gather (no clause tracking it, e.g. started manually or its clause got disabled) never stops on its own, leaving Auto Mode stuck at that node. Ends it so per-tick evaluation resumes. If the party is also hurt and waiting for full health, routes home explicitly - `restingProcessTick` needs `!isGathering()` to heal, and `advanceToNextClause`'s health-blocked branch can't fire from this path.
 function stopOrphanedGather(): boolean {
   const autoMode = gamestate().world.autoMode;
   if (!isGathering()) return false;
@@ -250,8 +250,8 @@ function runClause(clause: DecreeClause): void {
   setActiveClause(clause.id);
 
   if (clause.type === 'ReturnToKingdom') {
-    const kingdom = worldNodesOfType('Kingdom')[0];
-    if (kingdom) travelStart(kingdom.nodeName, true);
+    const home = homeNodeGet();
+    if (home) travelStart(home.nodeName, true);
     return;
   }
 
@@ -259,13 +259,13 @@ function runClause(clause: DecreeClause): void {
   if (target) travelStart(target.nodeName, true);
 }
 
-// Parks at the kingdom when no clause is satisfiable, rather than leaving the party stuck. Not tracked as an active clause, so it never accrues failures.
+// Parks at home when no clause is satisfiable, rather than leaving the party stuck. Not tracked as an active clause, so it never accrues failures.
 function returnToKingdomFallback(): void {
   setActiveClause(undefined);
-  if (isPlayerAtKingdom()) return;
+  if (isPlayerAtHome()) return;
 
-  const kingdom = worldNodesOfType('Kingdom')[0];
-  if (kingdom) travelStart(kingdom.nodeName, true);
+  const home = homeNodeGet();
+  if (home) travelStart(home.nodeName, true);
 }
 
 function advanceToNextClause(): void {
@@ -276,7 +276,7 @@ function advanceToNextClause(): void {
     return;
   }
 
-  // Blocked only by the health gate - stay put and let `restingProcessTick` heal in place, instead of trekking back to the kingdom.
+  // Blocked only by the health gate - stay put and let `restingProcessTick` heal in place, instead of trekking back home.
   if (clauses.some(isClauseBlockedOnlyByHealth)) {
     setActiveClause(undefined);
     return;
@@ -297,7 +297,7 @@ function activeDestinationNodeName(): string | undefined {
 // `decreeClauseUpdate` edits a clause in place (same id, e.g. swapping a GatherMaterial's material), so comparing by id would miss it - compare the node the clause actually sends the party to instead.
 function clauseDispatchTarget(clause: DecreeClause): string | undefined {
   if (clause.type === 'ReturnToKingdom') {
-    return worldNodesOfType('Kingdom')[0]?.nodeName;
+    return homeNodeGet()?.nodeName;
   }
   return clauseTargetNode(clause)?.nodeName;
 }

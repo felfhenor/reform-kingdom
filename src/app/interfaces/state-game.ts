@@ -42,6 +42,8 @@ export type GameStateWorld = {
   caravans: GameStateCaravans;
   commissions: GameStateCommissions;
   towns: GameStateTowns;
+  // The node name recalled to on Deaths Door and by the ReturnToKingdom decree clause - undefined means the Duchy.
+  homeNodeName?: string;
 };
 
 export type MaterialId = ItemId;

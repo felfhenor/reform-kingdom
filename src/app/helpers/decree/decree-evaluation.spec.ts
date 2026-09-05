@@ -43,8 +43,8 @@ vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
   travelPathTo: vi.fn(),
 }));
 
-vi.mock('@helpers/world', () => ({
-  isPlayerAtKingdom: vi.fn(() => false),
+vi.mock('@helpers/town/town-spawn', () => ({
+  isPlayerAtHome: vi.fn(() => false),
 }));
 
 vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
@@ -87,7 +87,7 @@ import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
-import { isPlayerAtKingdom } from '@helpers/world';
+import { isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import {
@@ -137,7 +137,7 @@ beforeEach(() => {
   vi.mocked(worldNodeByName).mockReturnValue(undefined);
   vi.mocked(isWorldNodeVisible).mockReturnValue(true);
   vi.mocked(travelPathTo).mockReturnValue(undefined);
-  vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
+  vi.mocked(isPlayerAtHome).mockReturnValue(false);
   vi.mocked(getMaterialQuantity).mockReturnValue(0);
   vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
@@ -540,7 +540,7 @@ describe('isClauseSatisfiable', () => {
   });
 
   it('ReturnToKingdom is unsatisfiable once already at the kingdom', () => {
-    vi.mocked(isPlayerAtKingdom).mockReturnValue(true);
+    vi.mocked(isPlayerAtHome).mockReturnValue(true);
 
     expect(isClauseSatisfiable(buildClause({ type: 'ReturnToKingdom' }))).toBe(
       false,
@@ -628,7 +628,7 @@ describe('isClauseSatisfiable', () => {
 
 describe('pickNextClause', () => {
   it('returns the first satisfiable clause in priority order', () => {
-    vi.mocked(isPlayerAtKingdom).mockReturnValue(true); // ReturnToKingdom unsatisfiable
+    vi.mocked(isPlayerAtHome).mockReturnValue(true); // ReturnToKingdom unsatisfiable
 
     const clauses = [
       buildClause({ id: 'a' as DecreeClauseId, type: 'ReturnToKingdom' }),
@@ -648,7 +648,7 @@ describe('pickNextClause', () => {
   });
 
   it('returns undefined when nothing is satisfiable', () => {
-    vi.mocked(isPlayerAtKingdom).mockReturnValue(true);
+    vi.mocked(isPlayerAtHome).mockReturnValue(true);
 
     expect(
       pickNextClause([buildClause({ type: 'ReturnToKingdom' })]),

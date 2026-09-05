@@ -12,7 +12,7 @@ import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
-import { isPlayerAtKingdom } from '@helpers/world';
+import { isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import {
@@ -255,13 +255,13 @@ export function isClauseSatisfiable(clause: DecreeClause): boolean {
         !!clauseTargetNode(clause)
       );
     case 'ReturnToKingdom':
-      return !isPlayerAtKingdom();
+      return !isPlayerAtHome();
     case 'DefendTowns':
       return !blockedByHealth() && !!clauseTargetNode(clause);
   }
 }
 
-// Lets Auto Mode distinguish "nothing to do" (fall back to kingdom) from "paused to heal" (stay put and recover).
+// Lets Auto Mode distinguish "nothing to do" (fall back home) from "paused to heal" (stay put and recover).
 export function isClauseBlockedOnlyByHealth(clause: DecreeClause): boolean {
   if (!clause.enabled || !blockedByHealth()) return false;
 

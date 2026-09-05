@@ -42,6 +42,7 @@ import {
   repairInvalidBestiaryLevels,
 } from '@helpers/kingdom/bestiary';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
+import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
 import { pruneInvalidTowns } from '@helpers/town/town-tick';
 import {
   gamestate,
@@ -146,6 +147,9 @@ export function migrateGameState() {
     newState.world.commissions,
   );
   newState.world.towns = pruneInvalidTowns(newState.world.towns);
+  newState.world.homeNodeName = pruneInvalidHomeNode(
+    newState.world.homeNodeName,
+  );
   newState.collectibles = pruneInvalidCollectibles(newState.collectibles);
   newState.collectibles = grantFoundingStoneIfMissing(newState.collectibles);
   newState.discoveredRecipes = pruneInvalidDiscoveredRecipes(

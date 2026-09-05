@@ -57,6 +57,11 @@ import {
   townStockAffordable,
 } from '@helpers/town/shop/town-trade';
 import {
+  canSetHomeNode,
+  homeNodeGet,
+  homeNodeSet,
+} from '@helpers/town/town-spawn';
+import {
   townWorkerRosterEntries,
   townWorkerStatusDisplay,
 } from '@helpers/town/worker/town-worker-roster';
@@ -116,6 +121,24 @@ export class ModalTownComponent {
   });
 
   public currentTab = signal<TownModalTab>('shop');
+
+  public isHomeNode = computed(() => {
+    const entry = this.entry();
+    return !!entry && homeNodeGet()?.nodeName === entry.nodeName;
+  });
+
+  public canSetHome = computed(() => {
+    const town = this.town();
+    return !!town && !this.isHomeNode() && canSetHomeNode(town.id);
+  });
+
+  public setHome(): void {
+    const town = this.town();
+    if (!town) return;
+
+    homeNodeSet(town.id);
+    notifySuccess(`${town.name} is now your home.`);
+  }
 
   public raidTelegraph = computed(() => {
     const town = this.town();
@@ -242,9 +265,7 @@ export class ModalTownComponent {
     if (entry) travelStart(entry.nodeName);
   }
 
-  public fulfillCommission(
-    row: TownCommissionRowViewModel,
-  ): Promise<boolean> {
+  public fulfillCommission(row: TownCommissionRowViewModel): Promise<boolean> {
     return townCommissionFulfill(row.townId, row.slotId);
   }
 

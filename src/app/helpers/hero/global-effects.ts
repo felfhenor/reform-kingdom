@@ -1,50 +1,24 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   healingTicksForLevel,
   healPartyToFull,
 } from '@helpers/hero/character-progress';
+import {
+  applyGlobalEffectAdd,
+  applyGlobalEffectRemove,
+} from '@helpers/hero/global-effect-state';
 import { partyGet } from '@helpers/hero/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { currentLocationSet } from '@helpers/world';
-import { worldNodesOfType } from '@helpers/world-node/world-nodes';
-import {
-  CombatStatDimension,
-  StatusEffectTagDimension,
-  type GameState,
-  type GlobalEffect,
-  type GlobalEffectContent,
-  type GlobalEffectEffect,
-  type GlobalEffectId,
-  type TownContent,
+import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { homeNodeGet } from '@helpers/town/town-spawn';
+import { currentLocationGet, currentLocationSet } from '@helpers/world';
+import type {
+  GlobalEffect,
+  GlobalEffectContent,
+  GlobalEffectId,
 } from '@interfaces';
-
-// Renders a set of effects as short "Label: +N[%]" fragments, comma-joined - for
-// appending live numbers onto a buff's tooltip description (e.g. town reputation buffs).
-export function globalEffectEffectsDescription(
-  effects: GlobalEffectEffect[],
-): string {
-  return effects
-    .map((effect) => {
-      switch (effect.effectType) {
-        case 'GainStats':
-          return `${effect.stat}: +${effect.value}`;
-        case 'GainCombatStat': {
-          const isPercent =
-            CombatStatDimension.isPercent?.[effect.combatStat] ?? true;
-          return `${CombatStatDimension.label[effect.combatStat]}: +${effect.value}${isPercent ? '%' : ''}`;
-        }
-        case 'GlobalXPGainMultiplier':
-          return `XP Gain: +${effect.value * 100}%`;
-        case 'DebuffResistance':
-          return `All Debuff Resist: +${effect.value}%`;
-        case 'DebuffResistanceTag':
-          return `${StatusEffectTagDimension.label[effect.tag]}: +${effect.value}%`;
-      }
-    })
-    .join(', ');
-}
 
 export function activeGlobalEffects(): GlobalEffect[] {
   const currentTick = timerTicksElapsed();
@@ -59,32 +33,6 @@ export function isGlobalEffectActive(globalEffectId: GlobalEffectId): boolean {
   if (!content) return false;
 
   return activeGlobalEffects().some((effect) => effect.id === content.id);
-}
-
-// Direct-state mutators for callers folding this into a larger `updateGamestate` commit - mirrors `applyMaterialDelta` in `materials.ts`.
-export function applyGlobalEffectAdd(
-  state: GameState,
-  globalEffectId: GlobalEffectId,
-  durationTicks: number,
-  currentTick: number,
-): void {
-  const content = getEntry<GlobalEffectContent>(globalEffectId);
-  if (!content) return;
-
-  state.globalEffects.push({
-    ...content,
-    startTick: currentTick,
-    expiresAtTick: currentTick + durationTicks,
-  });
-}
-
-export function applyGlobalEffectRemove(
-  state: GameState,
-  id: GlobalEffectId,
-): void {
-  state.globalEffects = state.globalEffects.filter(
-    (effect) => effect.id !== id,
-  );
 }
 
 export function addGlobalEffect(
@@ -109,33 +57,20 @@ export function removeGlobalEffect(id: GlobalEffectId): void {
   });
 }
 
-// Bypasses travel.ts's normal resync (would import back into this file) - identifies
-// town buffs by cross-referencing each town's own authored globalEffectId instead.
-function clearRegionalBuffs(): void {
-  const townBuffIds = new Set(
-    getEntriesByType<TownContent>('town').map(
-      (town) => town.reputation.buff.globalEffectId,
-    ),
-  );
-
-  gamestate()
-    .globalEffects.filter((effect) => townBuffIds.has(effect.id))
-    .forEach((effect) => removeGlobalEffect(effect.id));
-}
-
-// Deaths Door is a pure timer; on expiry the party teleports to the kingdom before healing begins there.
+// Deaths Door is a pure timer; on expiry the party teleports home (a designated Town, or the Duchy) before healing begins there.
 function handleDeathsDoorExpiry(): void {
-  const kingdom = worldNodesOfType('Kingdom')[0];
-  if (kingdom) {
+  const previousMapName = currentLocationGet().mapName;
+  const home = homeNodeGet();
+  if (home) {
     currentLocationSet({
-      mapName: kingdom.mapName,
-      x: kingdom.x,
-      y: kingdom.y,
+      mapName: home.mapName,
+      x: home.x,
+      y: home.y,
     });
+    townReputationBuffSync(previousMapName, home.mapName);
   }
 
-  clearRegionalBuffs();
-  miscellaneousMessageLog('The party has been recalled to the kingdom.');
+  miscellaneousMessageLog('The party has been recalled home.');
   addGlobalEffect(
     'Healing' as GlobalEffectId,
     healingTicksForLevel(partyGet()),

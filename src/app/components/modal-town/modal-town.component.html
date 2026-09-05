@@ -20,6 +20,18 @@
         </app-bar-progress>
       }
 
+      @if (isHomeNode()) {
+        <div class="badge badge-secondary">Home</div>
+      } @else if (canSetHome()) {
+        <button
+          type="button"
+          class="btn btn-outline btn-secondary btn-sm w-fit"
+          (click)="setHome()"
+        >
+          Set as Home
+        </button>
+      }
+
       @let shopStockRows = stockRows();
       <div role="tablist" class="tabs tabs-boxed">
         <a

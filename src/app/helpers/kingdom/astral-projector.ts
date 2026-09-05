@@ -5,7 +5,7 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   applyGlobalEffectAdd,
   applyGlobalEffectRemove,
-} from '@helpers/hero/global-effects';
+} from '@helpers/hero/global-effect-state';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
   applyMaterialDelta,

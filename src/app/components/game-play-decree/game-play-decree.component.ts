@@ -29,8 +29,10 @@ import {
   farmNodeRewardOptions,
 } from '@helpers/decree/decree-farm-node';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/engine/risk-band';
+import { homeNodeGet } from '@helpers/town/town-spawn';
 import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
+import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
   DecreeClause,
   DecreeClauseAction,
@@ -116,6 +118,12 @@ export class GamePlayDecreeComponent {
     decreeWaitForFullHealthBeforeCombat(),
   );
   public clauses = computed(() => decreeClauses());
+
+  public homeDisplayName = computed(() => {
+    const home = homeNodeGet();
+    if (!home) return 'the Duchy';
+    return worldNodeTown(home)?.name ?? home.nodeName;
+  });
 
   public readonly clauseTypeOptions = CLAUSE_TYPE_OPTIONS;
   public readonly riskToleranceOptions = RISK_TOLERANCE_OPTIONS;

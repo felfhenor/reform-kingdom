@@ -3,7 +3,7 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   applyGlobalEffectRemove,
   globalEffectEffectsDescription,
-} from '@helpers/hero/global-effects';
+} from '@helpers/hero/global-effect-state';
 import { updateGamestate } from '@helpers/state-game';
 import { townReputationTierForAmount } from '@helpers/town/reputation/town-reputation';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';

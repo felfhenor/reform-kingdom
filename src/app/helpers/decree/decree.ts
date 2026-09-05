@@ -190,7 +190,7 @@ export function decreeClauseSummary(clause: DecreeClause): string {
     case 'LevelUpParty':
       return `Level up the party (${clause.riskTolerance} risk)`;
     case 'ReturnToKingdom':
-      return 'Return to the kingdom';
+      return 'Return home';
     case 'DefendTowns':
       return clause.townName
         ? `Defend ${clause.townName} from raids (${clause.riskTolerance} risk)`

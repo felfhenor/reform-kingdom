@@ -55,8 +55,12 @@ vi.mock('@helpers/town/raid/town-raid-combat', () => ({
   raidEngageCombat: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/town/town-spawn', () => ({
+  homeNodeGet: vi.fn(() => undefined),
+  isPlayerAtHome: vi.fn(() => false),
+}));
+
 vi.mock('@helpers/world', () => ({
-  isPlayerAtKingdom: vi.fn(() => false),
   worldNodeAtCurrentLocation: vi.fn(() => undefined),
 }));
 
@@ -70,7 +74,6 @@ vi.mock('@helpers/world-node/world-node-rewards', () => ({
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
-  worldNodesOfType: vi.fn(() => []),
   worldNodeTown: vi.fn(() => undefined),
 }));
 
@@ -108,12 +111,12 @@ import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
-import { isPlayerAtKingdom, worldNodeAtCurrentLocation } from '@helpers/world';
+import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeByName,
-  worldNodesOfType,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -183,10 +186,10 @@ beforeEach(() => {
   vi.mocked(currentCombat).mockReturnValue(undefined);
   vi.mocked(isGathering).mockReturnValue(false);
   vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-  vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
+  vi.mocked(isPlayerAtHome).mockReturnValue(false);
+  vi.mocked(homeNodeGet).mockReturnValue(undefined);
   vi.mocked(pickNextClause).mockReturnValue(undefined);
   vi.mocked(isClauseBlockedOnlyByHealth).mockReturnValue(false);
-  vi.mocked(worldNodesOfType).mockReturnValue([]);
   vi.mocked(worldNodeByName).mockReturnValue(undefined);
   vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([]);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
@@ -570,37 +573,37 @@ describe('autoModeProcessTick', () => {
     expect(raidEngageCombat).not.toHaveBeenCalled();
   });
 
-  it('falls back to the kingdom when no clause is satisfiable and not already there', () => {
+  it('falls back home when no clause is satisfiable and not already there', () => {
     vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
     vi.mocked(pickNextClause).mockReturnValue(undefined);
-    vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
-    vi.mocked(worldNodesOfType).mockReturnValue([
-      { nodeName: 'Kingdom' } as WorldNodeEntry,
-    ]);
+    vi.mocked(isPlayerAtHome).mockReturnValue(false);
+    vi.mocked(homeNodeGet).mockReturnValue({
+      nodeName: 'Kingdom',
+    } as WorldNodeEntry);
 
     autoModeProcessTick();
 
     expect(travelStart).toHaveBeenCalledWith('Kingdom', true);
   });
 
-  it('does not travel when the fallback is already satisfied at the kingdom', () => {
+  it('does not travel when the fallback is already satisfied at home', () => {
     vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
     vi.mocked(pickNextClause).mockReturnValue(undefined);
-    vi.mocked(isPlayerAtKingdom).mockReturnValue(true);
+    vi.mocked(isPlayerAtHome).mockReturnValue(true);
 
     autoModeProcessTick();
 
     expect(travelStart).not.toHaveBeenCalled();
   });
 
-  it('stays put instead of falling back to the kingdom while blocked only by health', () => {
+  it('stays put instead of falling back home while blocked only by health', () => {
     const clause = buildClause({ type: 'LevelUpParty' });
     vi.mocked(gamestate).mockReturnValue(
       buildState({ enabled: true, clauses: [clause] }),
     );
     vi.mocked(pickNextClause).mockReturnValue(undefined);
     vi.mocked(isClauseBlockedOnlyByHealth).mockReturnValue(true);
-    vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
+    vi.mocked(isPlayerAtHome).mockReturnValue(false);
 
     autoModeProcessTick();
 
@@ -712,7 +715,7 @@ describe('autoModeProcessTick', () => {
     expect(gatheringStop).toHaveBeenCalled();
   });
 
-  it('breaks off an orphaned gather and heads to the kingdom when hurt and waiting for full health', () => {
+  it('breaks off an orphaned gather and heads home when hurt and waiting for full health', () => {
     vi.mocked(gamestate).mockReturnValue(
       buildState({
         enabled: true,
@@ -725,10 +728,10 @@ describe('autoModeProcessTick', () => {
     vi.mocked(isGathering).mockReturnValue(true);
     vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
     vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-    vi.mocked(isPlayerAtKingdom).mockReturnValue(false);
-    vi.mocked(worldNodesOfType).mockReturnValue([
-      { nodeName: 'Kingdom' } as WorldNodeEntry,
-    ]);
+    vi.mocked(isPlayerAtHome).mockReturnValue(false);
+    vi.mocked(homeNodeGet).mockReturnValue({
+      nodeName: 'Kingdom',
+    } as WorldNodeEntry);
 
     autoModeProcessTick();
 
@@ -778,7 +781,7 @@ describe('autoModeProcessTick', () => {
     expect(travelStart).toHaveBeenCalledWith('Jelly Fields', true);
   });
 
-  it('stops an orphaned gather without forcing a kingdom trip when at full health', () => {
+  it('stops an orphaned gather without forcing a trip home when at full health', () => {
     vi.mocked(gamestate).mockReturnValue(
       buildState({
         enabled: true,
@@ -794,7 +797,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // Full health means no reason to route through the kingdom, but the orphaned gather still ends so per-tick evaluation can take back over.
+    // Full health means no reason to route home, but the orphaned gather still ends so per-tick evaluation can take back over.
     expect(gatheringStop).toHaveBeenCalled();
   });
 
