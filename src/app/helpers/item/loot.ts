@@ -1,6 +1,17 @@
+import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
+import { newEquipmentItem } from '@helpers/item/equipment';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import { rngNumberRange } from '@helpers/rng';
-import type { DroppedReward, ResolvedDrop } from '@interfaces';
+import { defaultWorkerState } from '@helpers/worker/worker-progression';
+import type {
+  DroppedReward,
+  GameState,
+  ResolvedCollectibleDrop,
+  ResolvedDrop,
+  ResolvedEquipmentDrop,
+  ResolvedWorkerDrop,
+} from '@interfaces';
 
 // Shared exhaustiveness helper for `switch (x.kind)` blocks over
 // DroppedReward/ResolvedDrop - a missing case fails to compile here (via the
@@ -63,4 +74,58 @@ export function rollDroppedRewards(
   return rewards
     .map((drop) => resolveDrop(drop, level))
     .filter((drop): drop is ResolvedDrop => !!drop);
+}
+
+function applyEquipmentDrop(
+  state: GameState,
+  drop: ResolvedEquipmentDrop,
+): void {
+  state.armory = [...state.armory, newEquipmentItem(drop.equipmentId)];
+  const existing = state.discoveredEquipment[drop.equipmentId];
+  state.discoveredEquipment[drop.equipmentId] = {
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+}
+
+function applyCollectibleDrop(
+  state: GameState,
+  drop: ResolvedCollectibleDrop,
+): void {
+  const existing = state.collectibles[drop.collectibleId];
+  state.collectibles[drop.collectibleId] = {
+    quantity: (existing?.quantity ?? 0) + 1,
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+}
+
+function applyWorkerDrop(state: GameState, drop: ResolvedWorkerDrop): void {
+  if (state.discoveredWorkers[drop.workerId]) return;
+  state.discoveredWorkers[drop.workerId] = { foundAt: Date.now() };
+  state.workers[drop.workerId] = defaultWorkerState();
+}
+
+// Mutates `state` directly with no side effects, for callers already inside their own `updateGamestate`.
+export function applyResolvedDropToState(
+  state: GameState,
+  drop: ResolvedDrop,
+): void {
+  switch (drop.kind) {
+    case 'Item':
+      applyMaterialDelta(state, drop.itemId, drop.quantity);
+      return;
+    case 'Equipment':
+      applyEquipmentDrop(state, drop);
+      return;
+    case 'Collectible':
+      applyCollectibleDrop(state, drop);
+      return;
+    case 'Recipe':
+      applyRecipeDiscovery(state, drop.recipeId);
+      return;
+    case 'Worker':
+      applyWorkerDrop(state, drop);
+      return;
+    default:
+      assertNeverReward(drop);
+  }
 }

@@ -3,6 +3,7 @@ import type { CommissionOfferId } from '@interfaces/content-commission-offer';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
 import type { CraftRequirementEntry } from '@interfaces/crafting';
+import type { DroppedReward } from '@interfaces/droppable';
 
 // Rolled from a CommissionOfferRequirement's quantityMin/quantityMax at generation time.
 export type CommissionRequirementItem = { itemId: ItemId; quantity: number };
@@ -32,7 +33,7 @@ export type CommissionRowViewModel = {
   nodeName: string;
   caravanName: string;
   requirementEntries: CraftRequirementEntry[];
-  tokenReward: number;
+  rewards: DroppedReward[];
   canFulfill: boolean;
   completed: boolean;
   isPartyHere: boolean;

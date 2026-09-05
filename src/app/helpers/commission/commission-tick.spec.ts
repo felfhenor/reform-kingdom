@@ -71,7 +71,7 @@ const offer: CommissionOfferContent = {
   requirements: [
     { itemId: 'wergen-stick' as ItemId, quantityMin: 100, quantityMax: 100 },
   ],
-  tokenReward: 1,
+  rewards: [],
 };
 
 function withCommissionState(commissions: Record<string, unknown>): void {

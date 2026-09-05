@@ -5,11 +5,8 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
-import {
-  applyMaterialDelta,
-  getMaterialQuantity,
-  traderTokenId,
-} from '@helpers/item/materials';
+import { applyResolvedDropToState, rollDroppedRewards } from '@helpers/item/loot';
+import { applyMaterialDelta, getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
@@ -21,6 +18,7 @@ import type {
   CommissionRequirementEquipment,
   CommissionRowViewModel,
   CraftRequirementEntry,
+  DroppedReward,
   EquipmentContent,
   EquipmentItem,
   GameState,
@@ -86,13 +84,13 @@ export function commissionExists(caravanId: CaravanId): boolean {
   return !!commissionState(caravanId)?.commissionOfferId;
 }
 
-export function commissionTokenReward(caravanId: CaravanId): number {
+export function commissionRewards(caravanId: CaravanId): DroppedReward[] {
   const state = commissionState(caravanId);
   const offer = state?.commissionOfferId
     ? getEntry<CommissionOfferContent>(state.commissionOfferId)
     : undefined;
 
-  return offer?.tokenReward ?? 0;
+  return offer?.rewards ?? [];
 }
 
 // Accepts an explicit `state` to re-validate at commit time (see `ownedQuantity`).
@@ -123,7 +121,7 @@ export function commissionRowViewModel(
     nodeName: entry.nodeName,
     caravanName: caravan.name,
     requirementEntries: commissionRequirementEntries(caravan.id),
-    tokenReward: commissionTokenReward(caravan.id),
+    rewards: commissionRewards(caravan.id),
     canFulfill: commissionCanFulfill(caravan.id),
     completed: !!commissionState(caravan.id)?.completed,
     isPartyHere: isPartyAtCaravan(caravan.id),
@@ -165,7 +163,6 @@ export async function commissionFulfill(
     if (!nodeState?.commissionOfferId) return s;
 
     const offer = getEntry<CommissionOfferContent>(nodeState.commissionOfferId);
-    const tokenReward = offer?.tokenReward ?? 0;
     offerName = offer?.name;
 
     nodeState.requirements.forEach((requirement) => {
@@ -176,7 +173,10 @@ export async function commissionFulfill(
 
       applyMaterialDelta(s, requirement.itemId, -requirement.quantity);
     });
-    applyMaterialDelta(s, traderTokenId(), tokenReward);
+
+    // Commission rewards aren't level-scaled (no bonusPerLevel is ever authored here), so the level passed to rollDroppedRewards is inert.
+    const resolvedRewards = offer ? rollDroppedRewards(offer.rewards, 1) : [];
+    resolvedRewards.forEach((drop) => applyResolvedDropToState(s, drop));
     nodeState.completed = true;
     fulfilled = true;
 

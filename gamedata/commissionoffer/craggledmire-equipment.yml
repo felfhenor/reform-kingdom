@@ -23,7 +23,11 @@
       quantityMin: 1
       quantityMax: 3
 
-  tokenReward: 3
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 3
+      max: 3
 
 - id: 11d1fa0f-ac8c-4285-87a8-30c2a4ded172
   name: Commission - Craggled Armor
@@ -50,4 +54,8 @@
       quantityMin: 1
       quantityMax: 3
 
-  tokenReward: 3
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 3
+      max: 3

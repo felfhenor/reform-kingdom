@@ -25,11 +25,16 @@ vi.mock('@helpers/hero/travel', () => ({
 vi.mock('@helpers/item/materials', () => ({
   applyMaterialDelta: vi.fn(),
   getMaterialQuantity: vi.fn(),
-  traderTokenId: vi.fn(() => 'trader-token'),
 }));
 
 vi.mock('@helpers/kingdom/armory', () => ({
   armoryGet: vi.fn(() => []),
+}));
+
+// Deterministic drop resolution: the chance check (`rngNumberRange(0, 100) < chance`)
+// and the quantity roll (`rngNumberRange(min, max)`) both resolve to their lower bound.
+vi.mock('@helpers/rng', () => ({
+  rngNumberRange: vi.fn((min: number) => min),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -47,8 +52,8 @@ import {
   commissionExists,
   commissionFulfill,
   commissionRequirementEntries,
+  commissionRewards,
   commissionRowViewModel,
-  commissionTokenReward,
 } from '@helpers/commission/commission-fulfill';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
@@ -83,7 +88,15 @@ const offer: CommissionOfferContent = {
   requirements: [
     { itemId: 'wergen-stick' as ItemId, quantityMin: 100, quantityMax: 100 },
   ],
-  tokenReward: 2,
+  rewards: [
+    {
+      kind: 'Item',
+      itemId: 'trader-token' as ItemId,
+      chance: 100,
+      min: 2,
+      max: 2,
+    },
+  ],
 };
 
 const wergenStick: ItemContent = {
@@ -172,7 +185,7 @@ describe('commissionRequirementEntries', () => {
   });
 });
 
-describe('commissionExists / commissionTokenReward', () => {
+describe('commissionExists / commissionRewards', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -192,7 +205,7 @@ describe('commissionExists / commissionTokenReward', () => {
     expect(commissionExists(caravanId)).toBe(true);
   });
 
-  it('commissionTokenReward resolves the offer reward', () => {
+  it('commissionRewards resolves the offer reward', () => {
     withCommissionState({
       commissionOfferId: offer.id,
       requirements: [],
@@ -201,12 +214,12 @@ describe('commissionExists / commissionTokenReward', () => {
     });
     vi.mocked(getEntry).mockReturnValue(offer);
 
-    expect(commissionTokenReward(caravanId)).toBe(2);
+    expect(commissionRewards(caravanId)).toEqual(offer.rewards);
   });
 
-  it('commissionTokenReward is 0 with no active commission', () => {
+  it('commissionRewards is empty with no active commission', () => {
     withCommissionState(undefined);
-    expect(commissionTokenReward(caravanId)).toBe(0);
+    expect(commissionRewards(caravanId)).toEqual([]);
   });
 });
 
@@ -522,7 +535,7 @@ describe('commissionRowViewModel', () => {
           owned: 100,
         },
       ],
-      tokenReward: 2,
+      rewards: offer.rewards,
       canFulfill: true,
       completed: false,
       isPartyHere: true,

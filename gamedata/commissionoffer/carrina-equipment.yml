@@ -27,7 +27,11 @@
       quantityMin: 1
       quantityMax: 3
 
-  tokenReward: 3
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 3
+      max: 3
 
 - id: b53a7d22-0155-4934-a0c8-aa3ec43fc979
   name: Commission - Simple Armor
@@ -54,4 +58,8 @@
       quantityMin: 1
       quantityMax: 3
 
-  tokenReward: 3
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 3
+      max: 3

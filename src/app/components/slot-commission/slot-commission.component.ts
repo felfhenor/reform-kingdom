@@ -5,16 +5,17 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { commissionFulfill } from '@helpers/commission/commission-fulfill';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
-import { traderTokenId } from '@helpers/item/materials';
+import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary';
 import type {
   CaravanId,
   CommissionRowViewModel,
   CraftRequirementEntry,
+  DroppedReward,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -23,7 +24,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
-    CurrencyCostComponent,
+    SlotCompletionRewardComponent,
     SlotIconBlankComponent,
     TippyDirective,
   ],
@@ -36,8 +37,6 @@ export class SlotCommissionComponent {
 
   public travel = output<void>();
 
-  public traderTokenItemId = traderTokenId();
-
   public requirementTooltip(entry: CraftRequirementEntry): string {
     const name = entry.content?.name ?? 'Unknown';
     return `${name} (${entry.owned}/${entry.quantity})`;
@@ -47,10 +46,13 @@ export class SlotCommissionComponent {
     return formatDuration(seconds);
   }
 
+  // Commission rewards aren't level-scaled, so the level passed here is inert.
+  public rewardQuantityLabel(reward: DroppedReward): string {
+    return bestiaryDropQuantityLabel(reward, 1);
+  }
+
   public async turnIn(caravanId: CaravanId): Promise<void> {
     if (!(await commissionFulfill(caravanId))) return;
-    notifySuccess(
-      `Commission turned in: +${this.row().tokenReward} Trader Scrips!`,
-    );
+    notifySuccess('Commission turned in!');
   }
 }

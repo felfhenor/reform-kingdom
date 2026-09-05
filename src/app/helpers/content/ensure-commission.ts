@@ -1,4 +1,5 @@
 import { ensureArray } from '@helpers/content/ensure-helpers-core';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import type {
   CommissionOfferContent,
   CommissionOfferId,
@@ -39,6 +40,6 @@ export function ensureCommissionOffer(
       offer.requirements,
       ensureCommissionOfferRequirement,
     ),
-    tokenReward: offer.tokenReward ?? 1,
+    rewards: ensureArray(offer.rewards, ensureDroppedReward),
   };
 }

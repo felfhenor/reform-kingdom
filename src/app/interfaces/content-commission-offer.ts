@@ -1,5 +1,6 @@
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
+import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
@@ -27,7 +28,5 @@ export type CommissionOfferContent = IsContentItem &
     __type: 'commissionoffer';
 
     requirements: CommissionOfferRequirement[];
-
-    // Trader Scrips granted on turn-in.
-    tokenReward: number;
+    rewards: DroppedReward[];
   };

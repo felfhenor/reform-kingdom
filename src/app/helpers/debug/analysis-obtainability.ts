@@ -7,6 +7,7 @@ import type {
   AnalysisRunResult,
   CaravanTraderContent,
   CollectibleContent,
+  CommissionOfferContent,
   DroppedReward,
   EncounterContent,
   EncounterRandomContent,
@@ -105,6 +106,8 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
     getEntriesByType<CaravanTraderContent>('caravantrader');
   const workers = getEntriesByType<WorkerContent>('worker');
   const towns = getEntriesByType<TownContent>('town');
+  const commissionOffers =
+    getEntriesByType<CommissionOfferContent>('commissionoffer');
 
   const obtainableItems = new Set<string>();
   const obtainableEquipment = new Set<string>();
@@ -134,6 +137,16 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
   towns.forEach((town) =>
     collectFromDroppedRewards(
       town.defense.rewards,
+      obtainableItems,
+      obtainableEquipment,
+      obtainableCollectibles,
+      obtainableWorkers,
+    ),
+  );
+
+  commissionOffers.forEach((offer) =>
+    collectFromDroppedRewards(
+      offer.rewards,
       obtainableItems,
       obtainableEquipment,
       obtainableCollectibles,

@@ -1,14 +1,17 @@
 /**
  * Collates "when can a player first obtain this item" across every source
  * channel (monster drops, node completion rewards, gathering, tradeskill
- * crafting, caravan trades) - shared by `analysis-contentgaps.ts`, the only
- * script that needs a per-item earliest-obtainable-level.
+ * crafting, caravan trades, commission rewards) - shared by
+ * `analysis-contentgaps.ts`, the only script that needs a per-item
+ * earliest-obtainable-level.
  */
 
+import { getEntry } from '@helpers/content/content';
 import type {
   AnalysisItemSource,
   CaravanContent,
   CaravanTraderContent,
+  CommissionOfferContent,
   EncounterContent,
   EncounterRandomContent,
   GatheringContent,
@@ -122,6 +125,18 @@ export function buildItemSources(
     if ('itemId' in recipe.result) {
       addSource(itemSources, recipe.result.itemId, recipe.minTradeskillLevel);
     }
+  });
+
+  // A commission's reward has no level of its own - attributed to the caravan offering it.
+  caravans.forEach((caravan) => {
+    caravan.commissionOffers.forEach((slot) => {
+      const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
+      offer?.rewards.forEach((reward) => {
+        if ('itemId' in reward) {
+          addSource(itemSources, reward.itemId, caravan.level.min);
+        }
+      });
+    });
   });
 
   caravanTraders.forEach((trader) => {

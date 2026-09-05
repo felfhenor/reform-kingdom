@@ -7,7 +7,11 @@
       quantityMin: 100
       quantityMax: 100
 
-  tokenReward: 1
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
 
 - id: 4d399638-d2f2-4265-bef1-0ef08374361b
   name: Commission - Mirewood
@@ -18,7 +22,11 @@
       quantityMin: 100
       quantityMax: 100
 
-  tokenReward: 1
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
 
 - id: 5cfab264-713b-41ed-8b68-6cfa4712810b
   name: Commission - Miremetal Ores
@@ -29,7 +37,11 @@
       quantityMin: 100
       quantityMax: 100
 
-  tokenReward: 1
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
 
 - id: 7557f966-f17c-4f16-b054-73ac430e9eb0
   name: Commission - Peridots
@@ -40,7 +52,11 @@
       quantityMin: 50
       quantityMax: 50
 
-  tokenReward: 1
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
 
 - id: 1b1066ea-265c-44b1-a6ba-aec52cbf378a
   name: Commission - Oozehides
@@ -51,7 +67,11 @@
       quantityMin: 25
       quantityMax: 50
 
-  tokenReward: 1
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
 
 - id: f27586ad-4f82-48d4-a219-00714fe3f7e1
   name: Commission - Orc Bones
@@ -62,7 +82,11 @@
       quantityMin: 25
       quantityMax: 50
 
-  tokenReward: 1
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
 
 - id: 013d164c-e8c1-4363-a97d-135cd3345085
   name: Commission - Spirit Flesh
@@ -73,4 +97,8 @@
       quantityMin: 25
       quantityMax: 50
 
-  tokenReward: 1
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
