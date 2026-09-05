@@ -12,7 +12,7 @@
 
   <div class="h-full flex flex-col gap-4 min-h-0">
     @if (townData) {
-      <div class="flex items-center gap-4 shrink-0">
+      <div class="flex items-center gap-4 shrink-0 px-3">
         <app-bar-town-reputation [townId]="townData.id" class="flex-1" />
 
         @if (entry(); as entry) {

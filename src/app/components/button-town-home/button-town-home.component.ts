@@ -4,6 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { notifySuccess } from '@helpers/engine/notify';
 import {
   canSetHomeNode,
@@ -11,13 +12,19 @@ import {
   homeNodeSet,
 } from '@helpers/town/town-spawn';
 import type { TownContent, WorldNodeEntry } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-button-town-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isHomeNode()) {
-      <div class="badge badge-secondary">Home</div>
+      <div class="badge badge-secondary">
+        <app-icon
+          name="gameHouse"
+          [tp]="'This location is your home. You will respawn here after dying, and your decree will bring you here to heal if necessary.'"
+        ></app-icon>
+      </div>
     } @else if (canSetHome()) {
       <button
         type="button"
@@ -28,6 +35,7 @@ import type { TownContent, WorldNodeEntry } from '@interfaces';
       </button>
     }
   `,
+  imports: [IconComponent, TippyDirective],
 })
 export class ButtonTownHomeComponent {
   public entry = input.required<WorldNodeEntry>();
