@@ -211,3 +211,6 @@
 
         - commissionOfferId: Commission - Akroki Bounty
           weight: 2
+
+        - commissionOfferId: Commission - Flying Bounty
+          weight: 2

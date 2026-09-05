@@ -1,9 +1,38 @@
 - id: a95ceeca-ec97-4dc5-a931-b56d2f51a11d
   name: Commission - Akroki Bounty
-  description: The caravan wants the local Akroki bandit gangs thinned out before they raid another shipment.
+  description: The caravan wants the local Akroki groups thinned out before they raid another shipment.
 
   requirements:
     - monsterId: Akroki Swashbuckler
+      quantityMin: 5
+      quantityMax: 10
+
+    - monsterId: Akroki Vanguard
+      quantityMin: 5
+      quantityMax: 10
+
+    - monsterId: Akroki Mage
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 30
+
+- id: 33642805-018a-461a-a67f-7bc82d639b6b
+  name: Commission - Flying Bounty
+  description: The caravan wants to thin out local magical creatures before they cause more problems with travelers.
+
+  requirements:
+    - monsterId: Brightwisp
+      quantityMin: 5
+      quantityMax: 10
+
+    - monsterId: Bloodmoth
       quantityMin: 5
       quantityMax: 10
 
