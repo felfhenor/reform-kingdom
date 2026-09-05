@@ -1,14 +1,15 @@
 import { ensureArray } from '@helpers/content/ensure-helpers-core';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { ensureCommissionOfferSlot } from '@helpers/content/ensure-helpers-quests';
 import {
   ensureCombatStats,
   ensureStats,
   ensureTagResistances,
 } from '@helpers/content/ensure-helpers-stats';
 import type {
+  CommissionOfferId,
   GlobalEffectId,
   MonsterId,
+  TownCommissionOfferSlot,
   TownContent,
   TownCraftingConfig,
   TownDefenseAssaulterConfig,
@@ -22,6 +23,7 @@ import type {
   TownId,
   TownReputationBuffTier,
   TownReputationConfig,
+  TownCraftingQueueSizeTier,
   TownTradersConfig,
   TownTradeskillLevelSeed,
   TradeskillId,
@@ -37,11 +39,23 @@ function ensureTownTradeskillLevelSeed(
   };
 }
 
+function ensureTownCraftingQueueSizeTier(
+  tier: Partial<TownCraftingQueueSizeTier> = {},
+): TownCraftingQueueSizeTier {
+  return {
+    tier: tier.tier ?? 0,
+    queueSize: tier.queueSize ?? 1,
+  };
+}
+
 function ensureTownCrafting(
   crafting: Partial<TownCraftingConfig> = {},
 ): TownCraftingConfig {
   return {
-    maxQueueSize: crafting.maxQueueSize ?? 1,
+    maxQueueSize: ensureArray(
+      crafting.maxQueueSize,
+      ensureTownCraftingQueueSizeTier,
+    ),
     maxTradeskillLevel: crafting.maxTradeskillLevel ?? 1,
     specialtyTradeskillId:
       crafting.specialtyTradeskillId ?? ('UNKNOWN' as TradeskillId),
@@ -148,11 +162,25 @@ function ensureTownDefenseAssaulter(
   };
 }
 
+function ensureTownCommissionOfferSlot(
+  slot: Partial<TownCommissionOfferSlot> = {},
+): TownCommissionOfferSlot {
+  return {
+    commissionOfferId:
+      slot.commissionOfferId ?? ('UNKNOWN' as CommissionOfferId),
+    weight: slot.weight ?? 1,
+    persistent: slot.persistent ?? false,
+  };
+}
+
 function ensureTownDefenseQuests(
   quests: Partial<TownDefenseQuestsConfig> = {},
 ): TownDefenseQuestsConfig {
   return {
-    commissions: ensureArray(quests.commissions, ensureCommissionOfferSlot),
+    commissions: ensureArray(
+      quests.commissions,
+      ensureTownCommissionOfferSlot,
+    ),
   };
 }
 

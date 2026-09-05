@@ -3,6 +3,7 @@ import { craftXpChance } from '@helpers/crafting/tradeskill';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
+import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
 import { townTradeskillLeveledUp } from '@helpers/town/crafting/town-craft-level';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
@@ -152,7 +153,7 @@ function maybeQueueNewCraft(
   town: TownContent,
   target: TownNodeState,
 ): void {
-  if (target.craftQueue.length >= town.crafting.maxQueueSize) return;
+  if (target.craftQueue.length >= townCraftQueueSize(town)) return;
   if (!shouldAttemptQueue(town, target.craftQueue.length)) return;
 
   const pick = townPickRecipeToQueue(town);

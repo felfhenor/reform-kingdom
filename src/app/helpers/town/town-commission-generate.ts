@@ -15,6 +15,8 @@ import {
   markTownSubsystemProcessed,
 } from '@helpers/town/town-tick';
 import type {
+  CommissionOfferContent,
+  EligibleCommissionOffer,
   TownCommissionSlotId,
   TownContent,
   TownNodeState,
@@ -37,26 +39,64 @@ export function townCommissionSlotCount(town: TownContent): number {
   return townReputationTierMultiplier(tier, TOWN_COMMISSION_SLOT_COUNTS) ?? 1;
 }
 
+function addCommissionSlot(
+  target: TownNodeState,
+  offer: CommissionOfferContent,
+): void {
+  target.commissionSlots = [
+    ...target.commissionSlots,
+    {
+      id: rngUuid() as TownCommissionSlotId,
+      commissionOfferId: offer.id,
+      requirements: rollCommissionRequirements(offer),
+      generatedAtTick: timerTicksElapsed(),
+    },
+  ];
+}
+
+// Persistence lives on the town's own commission-slot entry (TownCommissionOfferSlot), not on the shared CommissionOfferContent.
+function partitionByPersistence(town: TownContent): {
+  persistent: EligibleCommissionOffer[];
+  rolled: EligibleCommissionOffer[];
+} {
+  const slots = town.defense.quests.commissions;
+  return {
+    persistent: eligibleCommissionOffers(slots.filter((s) => s.persistent)),
+    rolled: eligibleCommissionOffers(slots.filter((s) => !s.persistent)),
+  };
+}
+
+// Persistent offers always have exactly one live slot - outside the reputation-scaled cap, never part of the weighted roll below.
+function ensurePersistentCommissionSlots(
+  target: TownNodeState,
+  persistent: EligibleCommissionOffer[],
+): void {
+  persistent.forEach(({ offer }) => {
+    const alreadyPresent = target.commissionSlots.some(
+      (slot) => slot.commissionOfferId === offer.id,
+    );
+    if (!alreadyPresent) addCommissionSlot(target, offer);
+  });
+}
+
+// Persistent slots don't count against the cap - only rolled ones do.
 function fillEmptyCommissionSlots(
   town: TownContent,
   target: TownNodeState,
+  rolled: EligibleCommissionOffer[],
+  persistentOfferIds: Set<CommissionOfferContent['id']>,
 ): void {
   const maxSlots = townCommissionSlotCount(town);
-  const offers = eligibleCommissionOffers(town.defense.quests.commissions);
+  const rolledSlotCount = () =>
+    target.commissionSlots.filter(
+      (slot) => !persistentOfferIds.has(slot.commissionOfferId),
+    ).length;
 
-  while (target.commissionSlots.length < maxSlots) {
-    const picked = rngChoiceWeighted(offers, (o) => o.weight);
+  while (rolledSlotCount() < maxSlots) {
+    const picked = rngChoiceWeighted(rolled, (o) => o.weight);
     if (!picked) return; // no eligible offer - stop retrying this tick
 
-    target.commissionSlots = [
-      ...target.commissionSlots,
-      {
-        id: rngUuid() as TownCommissionSlotId,
-        commissionOfferId: picked.offer.id,
-        requirements: rollCommissionRequirements(picked.offer),
-        generatedAtTick: timerTicksElapsed(),
-      },
-    ];
+    addCommissionSlot(target, picked.offer);
   }
 }
 
@@ -70,7 +110,13 @@ export function townCommissionProcessTick(): void {
 
     updateGamestate((state) => {
       const target = state.world.towns[town.id];
-      if (target) fillEmptyCommissionSlots(town, target);
+      if (!target) return state;
+
+      const { persistent, rolled } = partitionByPersistence(town);
+      const persistentOfferIds = new Set(persistent.map((p) => p.offer.id));
+
+      ensurePersistentCommissionSlots(target, persistent);
+      fillEmptyCommissionSlots(town, target, rolled, persistentOfferIds);
       return state;
     });
     markTownSubsystemProcessed(town.id, 'quest');

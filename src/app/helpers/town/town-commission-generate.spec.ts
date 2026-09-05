@@ -55,32 +55,38 @@ import {
 import type {
   CommissionOfferContent,
   CommissionOfferId,
+  EligibleCommissionOffer,
   GameState,
   ItemId,
+  TownCommissionOfferSlot,
   TownContent,
   TownId,
 } from '@interfaces';
 
-const town: TownContent = {
-  id: 'larsia' as TownId,
-  name: 'Larsia',
-  __type: 'town',
-  description: 'A town.',
-  hidden: false,
-  invisibleUntilCollectibleIdsFound: [],
-  scaleType: 'City',
-  level: 25,
-  crafting: {} as never,
-  traders: {} as never,
-  gathering: {} as never,
-  reputation: {} as never,
-  defense: {
-    rewards: [],
-    guardian: { reputationTiers: [] },
-    assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
-    quests: { commissions: [{ commissionOfferId: 'offer-a', weight: 1 }] },
-  },
-};
+function buildTown(
+  commissions: TownCommissionOfferSlot[],
+): TownContent {
+  return {
+    id: 'larsia' as TownId,
+    name: 'Larsia',
+    __type: 'town',
+    description: 'A town.',
+    hidden: false,
+    invisibleUntilCollectibleIdsFound: [],
+    scaleType: 'City',
+    level: 25,
+    crafting: {} as never,
+    traders: {} as never,
+    gathering: {} as never,
+    reputation: {} as never,
+    defense: {
+      rewards: [],
+      guardian: { reputationTiers: [] },
+      assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
+      quests: { commissions },
+    },
+  };
+}
 
 const offer: CommissionOfferContent = {
   id: 'offer-a' as CommissionOfferId,
@@ -93,6 +99,29 @@ const offer: CommissionOfferContent = {
   rewards: [],
   townReputationReward: 0,
 };
+
+const persistentOffer: CommissionOfferContent = {
+  ...offer,
+  id: 'offer-persistent' as CommissionOfferId,
+  name: 'Commission - Larsian Coffers',
+};
+
+const town = buildTown([
+  { commissionOfferId: offer.id, weight: 1, persistent: false },
+]);
+
+// Mirrors the real eligibleCommissionOffers (slot -> resolved content), without going through getEntry.
+function stubEligibleOffers(offers: CommissionOfferContent[]): void {
+  const byId = new Map(offers.map((o) => [o.id, o]));
+  vi.mocked(eligibleCommissionOffers).mockImplementation((slots) =>
+    slots
+      .map((slot) => {
+        const found = byId.get(slot.commissionOfferId);
+        return found ? { offer: found, weight: slot.weight } : undefined;
+      })
+      .filter((entry): entry is EligibleCommissionOffer => !!entry),
+  );
+}
 
 describe('townCommissionSlotCount', () => {
   it.each([
@@ -113,9 +142,7 @@ describe('townCommissionProcessTick', () => {
     vi.mocked(getEntriesByType).mockReturnValue([town]);
     vi.mocked(townReputationTier).mockReturnValue(0);
     vi.mocked(isTownDueForUpdate).mockReturnValue(true);
-    vi.mocked(eligibleCommissionOffers).mockReturnValue([
-      { offer, weight: 1 },
-    ]);
+    stubEligibleOffers([offer]);
   });
 
   it('does nothing when the town is not due for its quest tick', () => {
@@ -208,5 +235,106 @@ describe('townCommissionProcessTick', () => {
     const state = { world: { towns: {} } } as unknown as GameState;
 
     expect(() => updateFn(state)).not.toThrow();
+  });
+
+  describe('persistent commissions', () => {
+    const persistentTown = buildTown([
+      { commissionOfferId: persistentOffer.id, weight: 1, persistent: true },
+    ]);
+
+    beforeEach(() => {
+      vi.mocked(getEntriesByType).mockReturnValue([persistentTown]);
+      stubEligibleOffers([persistentOffer]);
+    });
+
+    it('adds a slot for a persistent offer even when no rolled offer is eligible', () => {
+      vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
+      vi.mocked(rollCommissionRequirements).mockReturnValue([]);
+
+      townCommissionProcessTick();
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const state = {
+        world: { towns: { [persistentTown.id]: { commissionSlots: [] } } },
+      } as unknown as GameState;
+      updateFn(state);
+
+      expect(state.world.towns[persistentTown.id].commissionSlots).toEqual([
+        {
+          id: 'slot-uuid',
+          commissionOfferId: persistentOffer.id,
+          requirements: [],
+          generatedAtTick: 0,
+        },
+      ]);
+    });
+
+    it('does not duplicate a persistent offer that already has a live slot', () => {
+      vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
+
+      townCommissionProcessTick();
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const state = {
+        world: {
+          towns: {
+            [persistentTown.id]: {
+              commissionSlots: [
+                {
+                  id: 'existing-persistent',
+                  commissionOfferId: persistentOffer.id,
+                  requirements: [],
+                  generatedAtTick: 0,
+                },
+              ],
+            },
+          },
+        },
+      } as unknown as GameState;
+      updateFn(state);
+
+      expect(state.world.towns[persistentTown.id].commissionSlots).toHaveLength(
+        1,
+      );
+      expect(
+        state.world.towns[persistentTown.id].commissionSlots[0].id,
+      ).toBe('existing-persistent');
+    });
+
+    it('excludes persistent offers from the weighted roll pool and does not count them against the cap', () => {
+      const mixedTown = buildTown([
+        { commissionOfferId: persistentOffer.id, weight: 1, persistent: true },
+        { commissionOfferId: offer.id, weight: 1, persistent: false },
+      ]);
+      vi.mocked(getEntriesByType).mockReturnValue([mixedTown]);
+      stubEligibleOffers([persistentOffer, offer]);
+      vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
+
+      townCommissionProcessTick();
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const state = {
+        world: {
+          towns: {
+            [mixedTown.id]: {
+              commissionSlots: [
+                {
+                  id: 'existing-persistent',
+                  commissionOfferId: persistentOffer.id,
+                  requirements: [],
+                  generatedAtTick: 0,
+                },
+              ],
+            },
+          },
+        },
+      } as unknown as GameState;
+      updateFn(state);
+
+      expect(rngChoiceWeighted).toHaveBeenCalledWith(
+        [{ offer, weight: 1 }],
+        expect.any(Function),
+      );
+    });
   });
 });

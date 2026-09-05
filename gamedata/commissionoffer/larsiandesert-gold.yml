@@ -1,0 +1,12 @@
+- id: 47a18e41-1cab-4b01-bbba-bc490745faa2
+  name: Commission - Larsian Coffers
+  description: The town treasury is always happy to take a generous gold donation off your hands.
+
+  requirements:
+    - itemId: Gold Coin
+      quantityMin: 10000
+      quantityMax: 10000
+
+  rewards: []
+
+  townReputationReward: 10

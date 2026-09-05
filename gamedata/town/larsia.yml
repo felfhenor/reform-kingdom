@@ -7,7 +7,22 @@
   level: 25
 
   crafting:
-    maxQueueSize: 12
+    maxQueueSize:
+      - tier: 0
+        queueSize: 12
+
+      - tier: 1
+        queueSize: 14
+
+      - tier: 2
+        queueSize: 16
+
+      - tier: 3
+        queueSize: 18
+
+      - tier: 4
+        queueSize: 20
+
     maxTradeskillLevel: 20
     specialtyTradeskillId: Jewelcrafting
     craftingDurationMultiplier: 3
@@ -163,6 +178,10 @@
 
     quests:
       commissions:
+        - commissionOfferId: Commission - Larsian Coffers
+          persistent: true
+          weight: 1
+
         - commissionOfferId: Commission - Firmwater
           weight: 3
 

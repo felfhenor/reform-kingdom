@@ -242,7 +242,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     scaleType: 'Outpost',
     level: 5,
     crafting: {
-      maxQueueSize: 1,
+      maxQueueSize: [{ tier: 0, queueSize: 1 }],
       maxTradeskillLevel: 1,
       specialtyTradeskillId: 'UNKNOWN' as never,
       craftingDurationMultiplier: 1,

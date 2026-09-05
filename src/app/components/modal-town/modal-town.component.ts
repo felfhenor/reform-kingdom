@@ -40,6 +40,7 @@ import {
   townCraftQueueRows,
   townTradeskillLevelRows,
 } from '@helpers/town/crafting/town-craft-display';
+import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
 import { townReputationDisplay } from '@helpers/town/reputation/town-reputation';
 import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
@@ -211,10 +212,10 @@ export class ModalTownComponent {
     return town ? townCraftQueueRows(town.id) : [];
   });
 
-  // Fixed length so the grid always shows every slot up to maxQueueSize, not just the filled ones.
+  // Fixed length so the grid always shows every slot up to the reputation-scaled max, not just the filled ones.
   public craftQueueSlots = computed<undefined[]>(() => {
     const town = this.town();
-    return new Array(town?.crafting.maxQueueSize ?? 0).fill(undefined);
+    return new Array(town ? townCraftQueueSize(town) : 0).fill(undefined);
   });
 
   public workers = computed(() => {

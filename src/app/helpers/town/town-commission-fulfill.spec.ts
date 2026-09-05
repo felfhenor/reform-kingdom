@@ -85,6 +85,12 @@ const offer: CommissionOfferContent = {
   townReputationReward: 25,
 };
 
+const persistentOffer: CommissionOfferContent = {
+  ...offer,
+  id: 'offer-persistent' as CommissionOfferId,
+  name: 'Commission - Larsian Coffers',
+};
+
 function withTownState(state: unknown): void {
   vi.mocked(gamestate).mockReturnValue({
     world: { towns: { [townId]: state } },
@@ -183,6 +189,18 @@ describe('townCommissionRowViewModels', () => {
     id: townId,
     name: 'Larsia',
     __type: 'town',
+    defense: {
+      quests: {
+        commissions: [
+          { commissionOfferId: offer.id, weight: 1, persistent: false },
+          {
+            commissionOfferId: persistentOffer.id,
+            weight: 1,
+            persistent: true,
+          },
+        ],
+      },
+    },
   } as TownContent;
 
   beforeEach(() => {
@@ -234,6 +252,36 @@ describe('townCommissionRowViewModels', () => {
       canTravel: true,
     });
     expect(rows[1].slotId).toBe('slot-2');
+  });
+
+  it('sorts a persistent slot to the top even when generated after the others', () => {
+    vi.mocked(worldNodeTown).mockReturnValue(town);
+    withTownState({
+      commissionSlots: [
+        {
+          id: 'slot-rolled' as TownCommissionSlotId,
+          commissionOfferId: offer.id,
+          requirements: [],
+          generatedAtTick: 0,
+        },
+        {
+          id: 'slot-persistent' as TownCommissionSlotId,
+          commissionOfferId: persistentOffer.id,
+          requirements: [],
+          generatedAtTick: 1,
+        },
+      ],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) =>
+      id === persistentOffer.id ? persistentOffer : offer,
+    );
+
+    const rows = townCommissionRowViewModels(entry);
+
+    expect(rows.map((row) => row.slotId)).toEqual([
+      'slot-persistent',
+      'slot-rolled',
+    ]);
   });
 });
 

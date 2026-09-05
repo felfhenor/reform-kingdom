@@ -28,8 +28,14 @@ export type TownTradeskillLevelSeed = {
   level: number;
 };
 
+// Reputation-tier-scaled queue capacity - same "exact tier or fall back to the highest one below it" convention as townReputationTierMultiplier.
+export type TownCraftingQueueSizeTier = {
+  tier: number;
+  queueSize: number;
+};
+
 export type TownCraftingConfig = {
-  maxQueueSize: number;
+  maxQueueSize: TownCraftingQueueSizeTier[];
   maxTradeskillLevel: number;
   specialtyTradeskillId: TradeskillId;
   // Multiplies every recipe's craftTime for this town - towns craft slower than the player so shop stock doesn't churn instantly.
@@ -101,8 +107,14 @@ export type TownDefenseAssaulterConfig = {
   level: LevelRange;
 };
 
+// Town-only extension of the shared CommissionOfferSlot - a persistent entry always has exactly one live slot,
+// doesn't consume one of the town's reputation-tier-scaled rolled slots (weight is then unused), and sorts first in the Quests list.
+export type TownCommissionOfferSlot = CommissionOfferSlot & {
+  persistent: boolean;
+};
+
 export type TownDefenseQuestsConfig = {
-  commissions: CommissionOfferSlot[];
+  commissions: TownCommissionOfferSlot[];
 };
 
 export type TownDefenseConfig = {

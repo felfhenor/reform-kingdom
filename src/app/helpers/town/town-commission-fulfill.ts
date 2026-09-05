@@ -17,6 +17,7 @@ import type {
   CommissionOfferContent,
   CommissionRequirementEntry,
   GameState,
+  TownContent,
   TownCommissionRowViewModel,
   TownCommissionSlotId,
   TownCommissionSlotState,
@@ -69,7 +70,19 @@ export function townCommissionCanFulfill(
   return !!slot && commissionRequirementsSatisfied(slot.requirements, state);
 }
 
+// Persistence lives on the town's own authored commission-slot entry (TownCommissionOfferSlot), not on the shared offer content.
+function isSlotPersistent(
+  town: TownContent,
+  slot: TownCommissionSlotState,
+): boolean {
+  return town.defense.quests.commissions.some(
+    (entry) =>
+      entry.commissionOfferId === slot.commissionOfferId && entry.persistent,
+  );
+}
+
 // Every active slot becomes its own row - unlike a caravan (always exactly one live commission), a town can have several at once.
+// Persistent slots (always-available, e.g. a standing gold-for-reputation offer) sort first.
 export function townCommissionRowViewModels(
   entry: WorldNodeEntry,
 ): TownCommissionRowViewModel[] {
@@ -80,20 +93,25 @@ export function townCommissionRowViewModels(
   const canTravel = canPartyTravel();
   const travelEtaSeconds = travelEtaSecondsTo(entry.nodeName);
 
-  return commissionSlots(town.id).map((slot) => ({
-    townId: town.id,
-    slotId: slot.id,
-    nodeName: entry.nodeName,
-    title: town.name,
-    requirementEntries: townCommissionRequirementEntries(town.id, slot.id),
-    rewards: [],
-    reputationReward: townCommissionReputationReward(town.id, slot.id),
-    canFulfill: townCommissionCanFulfill(town.id, slot.id),
-    completed: false,
-    isPartyHere,
-    canTravel,
-    travelEtaSeconds,
-  }));
+  return [...commissionSlots(town.id)]
+    .sort(
+      (a, b) =>
+        Number(isSlotPersistent(town, b)) - Number(isSlotPersistent(town, a)),
+    )
+    .map((slot) => ({
+      townId: town.id,
+      slotId: slot.id,
+      nodeName: entry.nodeName,
+      title: town.name,
+      requirementEntries: townCommissionRequirementEntries(town.id, slot.id),
+      rewards: [],
+      reputationReward: townCommissionReputationReward(town.id, slot.id),
+      canFulfill: townCommissionCanFulfill(town.id, slot.id),
+      completed: false,
+      isPartyHere,
+      canTravel,
+      travelEtaSeconds,
+    }));
 }
 
 // Fast path only - townCommissionCanFulfill is repeated against live state inside the callback, since updateGamestate commits asynchronously.
