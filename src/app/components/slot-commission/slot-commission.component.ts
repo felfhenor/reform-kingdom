@@ -13,8 +13,8 @@ import { formatDuration } from '@helpers/engine/timer';
 import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary';
 import type {
   CaravanId,
+  CommissionRequirementEntry,
   CommissionRowViewModel,
-  CraftRequirementEntry,
   DroppedReward,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -37,7 +37,7 @@ export class SlotCommissionComponent {
 
   public travel = output<void>();
 
-  public requirementTooltip(entry: CraftRequirementEntry): string {
+  public requirementTooltip(entry: CommissionRequirementEntry): string {
     const name = entry.content?.name ?? 'Unknown';
     return `${name} (${entry.owned}/${entry.quantity})`;
   }

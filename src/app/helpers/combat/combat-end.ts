@@ -2,6 +2,7 @@ import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset, currentCombat } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
+import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import { getEntry } from '@helpers/content/content';
 import {
   autoModeRecordClauseFailure,
@@ -101,9 +102,10 @@ function grantVictoryRewards(combat: Combat): void {
   const maxLevel = encounterMaxLevel(combat);
   const partyLevel = partyRepresentativeLevel(combat);
 
-  monsters.forEach(({ monster, level }) =>
-    monsterRecordKill(monster.id, level, combat.locationName),
-  );
+  monsters.forEach(({ monster, level }) => {
+    monsterRecordKill(monster.id, level, combat.locationName);
+    commissionRecordMonsterKill(monster.id);
+  });
 
   const totalXp = sumBy(monsters, ({ monster, level }) => {
     const rawXp = monsterXpReward(monster, level);

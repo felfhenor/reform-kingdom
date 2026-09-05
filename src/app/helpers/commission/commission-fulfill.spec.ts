@@ -75,6 +75,8 @@ import type {
   GameState,
   ItemContent,
   ItemId,
+  MonsterContent,
+  MonsterId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -121,6 +123,15 @@ const sword: EquipmentContent = {
   slots: 1,
   grantedSkillIds: [],
 };
+
+const sandWorm: MonsterContent = {
+  id: 'sand-worm' as MonsterId,
+  name: 'Sand Worm',
+  __type: 'monster',
+  description: 'A worm.',
+  sprite: '0000',
+  frames: 1,
+} as unknown as MonsterContent;
 
 function withCommissionState(state: unknown): void {
   vi.mocked(gamestate).mockReturnValue({
@@ -180,6 +191,28 @@ describe('commissionRequirementEntries', () => {
         spritesheet: 'equipment',
         quantity: 2,
         owned: 2,
+      },
+    ]);
+  });
+
+  it('resolves a monster-kill requirement with its own tracked progress as owned', () => {
+    withCommissionState({
+      commissionOfferId: offer.id,
+      requirements: [
+        { monsterId: sandWorm.id, quantity: 5, progress: 3 },
+      ],
+      completed: false,
+      generatedAt: 1000,
+    });
+    vi.mocked(getEntry).mockReturnValue(sandWorm);
+
+    expect(commissionRequirementEntries(caravanId)).toEqual([
+      {
+        kind: 'monster',
+        content: sandWorm,
+        spritesheet: 'monster',
+        quantity: 5,
+        owned: 3,
       },
     ]);
   });
@@ -290,6 +323,32 @@ describe('commissionCanFulfill', () => {
       generatedAt: 1000,
     });
     vi.mocked(getMaterialQuantity).mockReturnValue(100);
+
+    expect(commissionCanFulfill(caravanId)).toBe(true);
+  });
+
+  it('is false when a monster-kill requirement has not reached its quantity', () => {
+    withCommissionState({
+      commissionOfferId: offer.id,
+      requirements: [
+        { monsterId: sandWorm.id, quantity: 5, progress: 4 },
+      ],
+      completed: false,
+      generatedAt: 1000,
+    });
+
+    expect(commissionCanFulfill(caravanId)).toBe(false);
+  });
+
+  it('is true once a monster-kill requirement reaches its quantity', () => {
+    withCommissionState({
+      commissionOfferId: offer.id,
+      requirements: [
+        { monsterId: sandWorm.id, quantity: 5, progress: 5 },
+      ],
+      completed: false,
+      generatedAt: 1000,
+    });
 
     expect(commissionCanFulfill(caravanId)).toBe(true);
   });
@@ -416,6 +475,44 @@ describe('commissionFulfill', () => {
     expect(result.armory).toEqual([
       { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
     ]);
+  });
+
+  it('completes a monster-kill commission without spending anything for the kill requirement', async () => {
+    withCommissionState({
+      commissionOfferId: offer.id,
+      requirements: [
+        { monsterId: sandWorm.id, quantity: 5, progress: 5 },
+      ],
+      completed: false,
+      generatedAt: 1000,
+    });
+    vi.mocked(getEntry).mockReturnValue(offer);
+
+    const resultPromise = commissionFulfill(caravanId);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = {
+      materials: {},
+      armory: [],
+      world: {
+        commissions: {
+          [caravanId]: {
+            commissionOfferId: offer.id,
+            requirements: [
+              { monsterId: sandWorm.id, quantity: 5, progress: 5 },
+            ],
+            completed: false,
+            generatedAt: 1000,
+          },
+        },
+      },
+    } as unknown as GameState;
+    const result = updateFn(state);
+
+    expect(await resultPromise).toBe(true);
+    expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'trader-token', 2);
+    expect(applyMaterialDelta).toHaveBeenCalledTimes(1);
+    expect(result.world.commissions[caravanId].completed).toBe(true);
   });
 
   it('does not double-grant tokens when two turn-ins race before either commits', async () => {

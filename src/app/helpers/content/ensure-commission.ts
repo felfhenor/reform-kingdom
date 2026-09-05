@@ -6,16 +6,26 @@ import type {
   CommissionOfferRequirement,
   CommissionOfferRequirementEquipment,
   CommissionOfferRequirementItem,
+  CommissionOfferRequirementMonsterKill,
   ItemId,
 } from '@interfaces';
 
 function ensureCommissionOfferRequirement(
   requirement: Partial<CommissionOfferRequirementItem> &
-    Partial<CommissionOfferRequirementEquipment> = {},
+    Partial<CommissionOfferRequirementEquipment> &
+    Partial<CommissionOfferRequirementMonsterKill> = {},
 ): CommissionOfferRequirement {
   if (requirement.equipmentId) {
     return {
       equipmentId: requirement.equipmentId,
+      quantityMin: requirement.quantityMin ?? 1,
+      quantityMax: requirement.quantityMax ?? 1,
+    };
+  }
+
+  if (requirement.monsterId) {
+    return {
+      monsterId: requirement.monsterId,
       quantityMin: requirement.quantityMin ?? 1,
       quantityMax: requirement.quantityMax ?? 1,
     };

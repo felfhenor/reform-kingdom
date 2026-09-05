@@ -45,6 +45,7 @@ import type {
   GameState,
   GameStateCommissions,
   ItemId,
+  MonsterId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -153,6 +154,38 @@ describe('commissionProcessTick', () => {
     commissionProcessTick();
 
     expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('rolls a monster-kill requirement starting at zero progress', () => {
+    const killOffer: CommissionOfferContent = {
+      ...offer,
+      requirements: [
+        {
+          monsterId: 'sand-worm' as MonsterId,
+          quantityMin: 5,
+          quantityMax: 5,
+        },
+      ],
+    };
+    withCommissionState({});
+    vi.mocked(getEntry).mockReturnValue(killOffer);
+    vi.mocked(rngChoiceWeighted).mockReturnValue({
+      offer: killOffer,
+      weight: 1,
+    });
+    vi.mocked(rngNumberRange).mockReturnValue(5);
+    vi.spyOn(Date, 'now').mockReturnValue(9000);
+
+    commissionProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { commissions: {} },
+    } as unknown as GameState);
+
+    expect(result.world.commissions[caravan.id].requirements).toEqual([
+      { monsterId: 'sand-worm', quantity: 5, progress: 0 },
+    ]);
   });
 });
 

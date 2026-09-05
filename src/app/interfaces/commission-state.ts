@@ -2,6 +2,7 @@ import type { CaravanId } from '@interfaces/content-caravan';
 import type { CommissionOfferId } from '@interfaces/content-commission-offer';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
+import type { MonsterContent, MonsterId } from '@interfaces/content-monster';
 import type { CraftRequirementEntry } from '@interfaces/crafting';
 import type { DroppedReward } from '@interfaces/droppable';
 
@@ -11,8 +12,27 @@ export type CommissionRequirementEquipment = {
   equipmentId: EquipmentId;
   quantity: number;
 };
+// Progress is tallied here directly (not derived from inventory like item/equipment) since a kill leaves nothing to own.
+export type CommissionRequirementMonsterKill = {
+  monsterId: MonsterId;
+  quantity: number;
+  progress: number;
+};
 export type CommissionRequirement =
-  CommissionRequirementItem | CommissionRequirementEquipment;
+  | CommissionRequirementItem
+  | CommissionRequirementEquipment
+  | CommissionRequirementMonsterKill;
+
+// CraftRequirementEntry plus a monster-kill variant - kept separate since recipes never have kill requirements.
+export type CommissionRequirementEntry =
+  | CraftRequirementEntry
+  | {
+      kind: 'monster';
+      content?: MonsterContent;
+      spritesheet: 'monster';
+      quantity: number;
+      owned: number;
+    };
 
 export type CommissionNodeState = {
   commissionOfferId?: CommissionOfferId;
@@ -32,7 +52,7 @@ export type CommissionRowViewModel = {
   caravanId: CaravanId;
   nodeName: string;
   caravanName: string;
-  requirementEntries: CraftRequirementEntry[];
+  requirementEntries: CommissionRequirementEntry[];
   rewards: DroppedReward[];
   canFulfill: boolean;
   completed: boolean;

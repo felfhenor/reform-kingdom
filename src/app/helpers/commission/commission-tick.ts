@@ -44,9 +44,13 @@ function rollRequirements(
       requirement.quantityMax,
     );
 
-    return 'equipmentId' in requirement
-      ? { equipmentId: requirement.equipmentId, quantity }
-      : { itemId: requirement.itemId, quantity };
+    if ('equipmentId' in requirement) {
+      return { equipmentId: requirement.equipmentId, quantity };
+    }
+    if ('monsterId' in requirement) {
+      return { monsterId: requirement.monsterId, quantity, progress: 0 };
+    }
+    return { itemId: requirement.itemId, quantity };
   });
 }
 

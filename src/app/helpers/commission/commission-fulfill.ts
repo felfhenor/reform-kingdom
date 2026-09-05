@@ -15,14 +15,15 @@ import type {
   CommissionNodeState,
   CommissionOfferContent,
   CommissionRequirement,
+  CommissionRequirementEntry,
   CommissionRequirementEquipment,
   CommissionRowViewModel,
-  CraftRequirementEntry,
   DroppedReward,
   EquipmentContent,
   EquipmentItem,
   GameState,
   ItemContent,
+  MonsterContent,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -45,6 +46,9 @@ function ownedQuantity(
       .length;
   }
 
+  // A kill requirement's progress is tallied on the requirement itself, not read from inventory.
+  if ('monsterId' in requirement) return requirement.progress;
+
   return state
     ? (state.materials[requirement.itemId]?.quantity ?? 0)
     : getMaterialQuantity(requirement.itemId);
@@ -55,27 +59,39 @@ function ownedQuantity(
 // the tradeskill panel already uses for recipe requirements.
 export function commissionRequirementEntries(
   caravanId: CaravanId,
-): CraftRequirementEntry[] {
+): CommissionRequirementEntry[] {
   const state = commissionState(caravanId);
   if (!state) return [];
 
-  return state.requirements.map((requirement) =>
-    'equipmentId' in requirement
-      ? {
-          kind: 'equipment',
-          content: getEntry<EquipmentContent>(requirement.equipmentId),
-          spritesheet: 'equipment',
-          quantity: requirement.quantity,
-          owned: ownedQuantity(requirement),
-        }
-      : {
-          kind: 'item',
-          content: getEntry<ItemContent>(requirement.itemId),
-          spritesheet: 'item',
-          quantity: requirement.quantity,
-          owned: ownedQuantity(requirement),
-        },
-  );
+  return state.requirements.map((requirement) => {
+    if ('equipmentId' in requirement) {
+      return {
+        kind: 'equipment',
+        content: getEntry<EquipmentContent>(requirement.equipmentId),
+        spritesheet: 'equipment',
+        quantity: requirement.quantity,
+        owned: ownedQuantity(requirement),
+      };
+    }
+
+    if ('monsterId' in requirement) {
+      return {
+        kind: 'monster',
+        content: getEntry<MonsterContent>(requirement.monsterId),
+        spritesheet: 'monster',
+        quantity: requirement.quantity,
+        owned: ownedQuantity(requirement),
+      };
+    }
+
+    return {
+      kind: 'item',
+      content: getEntry<ItemContent>(requirement.itemId),
+      spritesheet: 'item',
+      quantity: requirement.quantity,
+      owned: ownedQuantity(requirement),
+    };
+  });
 }
 
 // False until the first `commissionProcessTick` has generated this
@@ -170,6 +186,9 @@ export async function commissionFulfill(
         s.armory = consumeEquipmentRequirement(s.armory, requirement);
         return;
       }
+
+      // A kill requirement has nothing to spend - its progress already gates commissionCanFulfill.
+      if ('monsterId' in requirement) return;
 
       applyMaterialDelta(s, requirement.itemId, -requirement.quantity);
     });

@@ -25,6 +25,10 @@ vi.mock('@helpers/kingdom/bestiary', () => ({
   monsterRecordKill: vi.fn(),
 }));
 
+vi.mock('@helpers/commission/commission-kill-progress', () => ({
+  commissionRecordMonsterKill: vi.fn(),
+}));
+
 vi.mock('@helpers/hero/character-progress', () => ({
   partyGainXp: vi.fn(),
   syncPartyHpFromCombat: vi.fn(),
@@ -96,6 +100,7 @@ import {
 } from '@helpers/combat/combat-log';
 import { combatReset } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
+import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import { getEntry } from '@helpers/content/content';
 import { recipeDiscover } from '@helpers/crafting/recipes';
 import {
@@ -567,6 +572,7 @@ describe('combatCheckIfOver', () => {
       5,
       'Field Ruins',
     );
+    expect(commissionRecordMonsterKill).toHaveBeenCalledWith('monster-1');
   });
 
   it('does not record a bestiary kill on defeat', () => {
@@ -578,6 +584,7 @@ describe('combatCheckIfOver', () => {
     combatCheckIfOver(combat);
 
     expect(monsterRecordKill).not.toHaveBeenCalled();
+    expect(commissionRecordMonsterKill).not.toHaveBeenCalled();
   });
 
   it('returns false when combat is not yet over', () => {
