@@ -1,0 +1,14 @@
+- id: a95ceeca-ec97-4dc5-a931-b56d2f51a11d
+  name: Commission - Akroki Bounty
+  description: The caravan wants the local Akroki bandit gangs thinned out before they raid another shipment.
+
+  requirements:
+    - monsterId: Akroki Swashbuckler
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1

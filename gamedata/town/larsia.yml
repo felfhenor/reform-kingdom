@@ -163,7 +163,29 @@
 
     quests:
       commissions:
-        - commissionOfferId: Commission - Copper Ore
+        - commissionOfferId: Commission - Firmwater
           weight: 1
-        - commissionOfferId: Commission - Wergen Sticks
+
+        - commissionOfferId: Commission - Timberfuzz
+          weight: 1
+
+        - commissionOfferId: Commission - Petrifiwood
+          weight: 1
+
+        - commissionOfferId: Commission - Cactspine
+          weight: 1
+
+        - commissionOfferId: Commission - Strongreed
+          weight: 1
+
+        - commissionOfferId: Commission - Amber
+          weight: 1
+
+        - commissionOfferId: Commission - Brightwisp Core
+          weight: 1
+
+        - commissionOfferId: Commission - Preserved Bloodmoth
+          weight: 1
+
+        - commissionOfferId: Commission - Akroki Bounty
           weight: 1
