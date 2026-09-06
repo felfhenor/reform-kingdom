@@ -242,7 +242,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     scaleType: 'Outpost',
     level: 5,
     crafting: {
-      maxQueueSize: [{ tier: 0, queueSize: 1 }],
+      maxQueueSize: [{ tier: 0, value: 1 }],
       specialtyTradeskillId: 'UNKNOWN' as never,
       craftingDurationMultiplier: 1,
       craftingChanceOnTick: 100,
@@ -250,7 +250,10 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
       tradeskillLevels: [],
       uniqueRecipeIds: [],
     },
-    traders: { sellItemCount: 0, markupPercentages: { sell: 0, buy: 0 } },
+    traders: {
+      sellItemCount: [{ tier: 0, value: 0 }],
+      markupPercentages: { sell: 0, buy: 0 },
+    },
     gathering: {
       gatherRateMultiplier: 1,
       goldGatheredPerMaterial: 0,

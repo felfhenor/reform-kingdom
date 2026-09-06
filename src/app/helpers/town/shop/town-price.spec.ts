@@ -20,7 +20,10 @@ import type {
 
 function buildTown(sellMarkup: number): TownContent {
   return {
-    traders: { sellItemCount: 10, markupPercentages: { sell: sellMarkup, buy: 0 } },
+    traders: {
+      sellItemCount: [{ tier: 0, value: 10 }],
+      markupPercentages: { sell: sellMarkup, buy: 0 },
+    },
   } as unknown as TownContent;
 }
 

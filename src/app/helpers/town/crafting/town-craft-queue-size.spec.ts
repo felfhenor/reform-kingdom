@@ -24,11 +24,11 @@ function buildTown(
 
 describe('townCraftQueueSize', () => {
   const town = buildTown([
-    { tier: 0, queueSize: 12 },
-    { tier: 1, queueSize: 14 },
-    { tier: 2, queueSize: 16 },
-    { tier: 3, queueSize: 18 },
-    { tier: 4, queueSize: 20 },
+    { tier: 0, value: 12 },
+    { tier: 1, value: 14 },
+    { tier: 2, value: 16 },
+    { tier: 3, value: 18 },
+    { tier: 4, value: 20 },
   ]);
 
   it.each([
@@ -44,8 +44,8 @@ describe('townCraftQueueSize', () => {
 
   it('falls back to the highest authored tier at or below the current one when a tier is missing', () => {
     const sparseTown = buildTown([
-      { tier: 0, queueSize: 10 },
-      { tier: 3, queueSize: 15 },
+      { tier: 0, value: 10 },
+      { tier: 3, value: 15 },
     ]);
     vi.mocked(townReputationTier).mockReturnValue(2);
 

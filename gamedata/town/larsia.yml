@@ -9,19 +9,19 @@
   crafting:
     maxQueueSize:
       - tier: 0
-        queueSize: 12
+        value: 12
 
       - tier: 1
-        queueSize: 14
+        value: 14
 
       - tier: 2
-        queueSize: 16
+        value: 16
 
       - tier: 3
-        queueSize: 18
+        value: 18
 
       - tier: 4
-        queueSize: 20
+        value: 20
 
     specialtyTradeskillId: Jewelcrafting
     craftingDurationMultiplier: 3
@@ -48,7 +48,22 @@
       - 'Equipment: Larsian Ring'
 
   traders:
-    sellItemCount: 10
+    sellItemCount:
+      - tier: 0
+        value: 7
+
+      - tier: 1
+        value: 9
+
+      - tier: 2
+        value: 11
+
+      - tier: 3
+        value: 13
+
+      - tier: 4
+        value: 15
+
     itemExpirationTimer: 1800
 
     markupPercentages:

@@ -28,14 +28,14 @@ export type TownTradeskillLevelSeed = {
   level: number;
 };
 
-// Reputation-tier-scaled queue capacity - same "exact tier or fall back to the highest one below it" convention as townReputationTierMultiplier.
-export type TownCraftingQueueSizeTier = {
+// Reputation-tier-scaled numeric knob - same "exact tier or fall back to the highest one below it" convention as townReputationTierMultiplier.
+export type TownReputationTierValue = {
   tier: number;
-  queueSize: number;
+  value: number;
 };
 
 export type TownCraftingConfig = {
-  maxQueueSize: TownCraftingQueueSizeTier[];
+  maxQueueSize: TownReputationTierValue[];
   specialtyTradeskillId: TradeskillId;
   // Multiplies every recipe's craftTime for this town - towns craft slower than the player so shop stock doesn't churn instantly.
   craftingDurationMultiplier: number;
@@ -49,7 +49,7 @@ export type TownCraftingConfig = {
 };
 
 export type TownTradersConfig = {
-  sellItemCount: number;
+  sellItemCount: TownReputationTierValue[];
   // Ticks a stock entry sits unsold before it's cycled out, keeping the shop's selection from going stale.
   itemExpirationTimer: number;
   markupPercentages: CaravanMarkupPercentages;

@@ -55,7 +55,7 @@ const town: TownContent = {
   scaleType: 'City',
   level: 25,
   crafting: {
-    maxQueueSize: [{ tier: 0, queueSize: 12 }],
+    maxQueueSize: [{ tier: 0, value: 12 }],
     specialtyTradeskillId: 'jewelcrafting' as never,
     craftingDurationMultiplier: 3,
     craftingChanceOnTick: 3,
@@ -63,7 +63,10 @@ const town: TownContent = {
     tradeskillLevels: [],
     uniqueRecipeIds: [],
   },
-  traders: { sellItemCount: 10, markupPercentages: { sell: 25, buy: -15 } },
+  traders: {
+    sellItemCount: [{ tier: 0, value: 10 }],
+    markupPercentages: { sell: 25, buy: -15 },
+  },
   gathering: {
     gatherRateMultiplier: 5,
     goldGatheredPerMaterial: 5,
