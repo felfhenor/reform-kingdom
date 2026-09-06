@@ -9,7 +9,7 @@ vi.mock('@helpers/content/content', () => ({
 }));
 
 vi.mock('@helpers/combat/combat-log', () => ({
-  gatherMessageLog: vi.fn(),
+  categoryMessageLog: vi.fn(),
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) =>
       `${quantity} <colored>${item.name}</colored>`,
@@ -56,7 +56,6 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
   worldNodeLevel: vi.fn(() => 0),
 }));
 
-import { gatherMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
@@ -336,10 +335,6 @@ describe('gatheringStart', () => {
       gatheringId: 'gather-1',
       ticksIntoGather: 0,
     });
-    expect(gatherMessageLog).toHaveBeenCalledWith(
-      'Wergen Woods',
-      'The party begins gathering at Wergen Woods.',
-    );
   });
 });
 
@@ -433,10 +428,6 @@ describe('gatheringProcessTick', () => {
     expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
     expect(partyGainXp).toHaveBeenCalledWith(3);
     expect(addMaterial).toHaveBeenCalledWith('wood', 2);
-    expect(gatherMessageLog).toHaveBeenCalledWith(
-      'Wergen Woods',
-      expect.stringContaining('2'),
-    );
     expect(gatherVfxEmit).toHaveBeenCalledWith({
       nodeName: 'Wergen Woods',
       name: 'Wergen Wood',

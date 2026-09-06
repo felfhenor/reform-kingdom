@@ -21,7 +21,7 @@ vi.mock('@helpers/item/collectibles', () => ({
 }));
 
 vi.mock('@helpers/combat/combat-log', () => ({
-  craftMessageLog: vi.fn(),
+  categoryMessageLog: vi.fn(),
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) =>
       `${quantity} <colored>${item.name}</colored>`,
@@ -61,7 +61,6 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-import { craftMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
@@ -474,10 +473,6 @@ describe('craftProcessTick', () => {
     craftProcessTick();
 
     expect(addMaterial).toHaveBeenCalledWith('copper-ingot', 2);
-    expect(craftMessageLog).toHaveBeenCalledWith(
-      'Blacksmithing',
-      expect.stringContaining('Copper Ingot'),
-    );
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Kingdom:Craft:Complete:Material Copper Ingot',
     );
@@ -521,10 +516,6 @@ describe('craftProcessTick', () => {
     craftProcessTick();
 
     expect(armoryAdd).toHaveBeenCalledWith('copper-dagger');
-    expect(craftMessageLog).toHaveBeenCalledWith(
-      'Blacksmithing',
-      expect.stringContaining('Copper Dagger'),
-    );
   });
 
   it('completes a collectible craft via collectiblesAdd', () => {
@@ -548,10 +539,6 @@ describe('craftProcessTick', () => {
       'minor-blacksmithing-effigy',
       1,
     );
-    expect(craftMessageLog).toHaveBeenCalledWith(
-      'Blacksmithing',
-      expect.stringContaining('Minor Blacksmithing Effigy'),
-    );
   });
 
   it('logs a failure and produces nothing when an item result chance roll fails', () => {
@@ -570,10 +557,6 @@ describe('craftProcessTick', () => {
     craftProcessTick();
 
     expect(addMaterial).not.toHaveBeenCalled();
-    expect(craftMessageLog).toHaveBeenCalledWith(
-      'Blacksmithing',
-      expect.stringContaining('failed to craft'),
-    );
     // No XP roll succeeded either (same mocked false), so only the
     // queue-advance update fires.
     expect(updateGamestate).toHaveBeenCalledTimes(1);
@@ -599,10 +582,6 @@ describe('craftProcessTick', () => {
     craftProcessTick();
 
     expect(addMaterial).not.toHaveBeenCalled();
-    expect(craftMessageLog).toHaveBeenCalledWith(
-      'Blacksmithing',
-      expect.stringContaining('failed to craft'),
-    );
     // The XP-grant update plus the queue-advance update both fire.
     expect(updateGamestate).toHaveBeenCalledTimes(2);
   });

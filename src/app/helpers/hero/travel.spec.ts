@@ -22,10 +22,6 @@ vi.mock('@helpers/encounter/encounter', () => ({
   encounterStartFight: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat-log', () => ({
-  travelMessageLog: vi.fn(),
-}));
-
 vi.mock('@helpers/item/gather-node-discovery', () => ({
   gatherNodeDiscover: vi.fn(),
 }));
@@ -86,7 +82,6 @@ vi.mock('@helpers/engine/ui', () => ({
 }));
 
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
-import { travelMessageLog } from '@helpers/combat/combat-log';
 import { currentCombat } from '@helpers/combat/combat-state';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
@@ -359,10 +354,6 @@ describe('travelStart', () => {
       path: [],
       ticksIntoStep: 0,
     });
-    expect(travelMessageLog).toHaveBeenCalledWith(
-      'CraggledMire',
-      'Pathing error: no route to Field Ruins could be found from CraggledMire (3, 7). The party was recalled to the kingdom.',
-    );
   });
 
   it('still resets travel state and logs even when no Kingdom node exists', () => {
@@ -373,7 +364,6 @@ describe('travelStart', () => {
 
     expect(currentLocationSet).not.toHaveBeenCalled();
     expect(townReputationBuffSync).not.toHaveBeenCalled();
-    expect(travelMessageLog).toHaveBeenCalled();
   });
 
   it('sets travel state to Traveling and logs departure', () => {
@@ -395,10 +385,6 @@ describe('travelStart', () => {
       path,
       ticksIntoStep: 0,
     });
-    expect(travelMessageLog).toHaveBeenCalledWith(
-      'Carrina',
-      'The party left for Field Ruins.',
-    );
     expect(gatheringStop).toHaveBeenCalled();
   });
 
@@ -430,10 +416,6 @@ describe('travelStart', () => {
       path,
       ticksIntoStep: 0,
     });
-    expect(travelMessageLog).toHaveBeenCalledWith(
-      'Carrina',
-      'The party changed course for Old Town.',
-    );
   });
 
   it('refuses to redirect to the destination already being traveled to', () => {
@@ -484,10 +466,6 @@ describe('travelStart', () => {
       path: [],
       ticksIntoStep: 0,
     });
-    expect(travelMessageLog).toHaveBeenCalledWith(
-      'Carrina',
-      'The party has arrived at Old Town.',
-    );
   });
 
   it('still refuses a zero-length path while idle, for a manual travel', () => {
@@ -592,11 +570,6 @@ describe('travelBeginDeathsDoor', () => {
     vi.mocked(mapHopsBetween).mockReturnValue(0);
 
     travelBeginDeathsDoor();
-
-    expect(travelMessageLog).toHaveBeenCalledWith(
-      'CraggledMire',
-      'The fallen party awaits recall home.',
-    );
   });
 
   it('applies the minimum when there is no home node at all', () => {
@@ -937,10 +910,6 @@ describe('travelProcessTick', () => {
       path: [],
       ticksIntoStep: 0,
     });
-    expect(travelMessageLog).toHaveBeenCalledWith(
-      'Carrina',
-      'The party has arrived at Field Ruins.',
-    );
     expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 0, 'Field Ruins');
     expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
   });

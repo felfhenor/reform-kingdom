@@ -1,5 +1,5 @@
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
-import { travelMessageLog } from '@helpers/combat/combat-log';
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { currentCombat } from '@helpers/combat/combat-state';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
@@ -111,7 +111,8 @@ function travelRecoverFromPathingFailure(destinationNodeName: string): void {
     return state;
   });
 
-  travelMessageLog(
+  categoryMessageLog(
+    'Travel',
     location.mapName,
     `Pathing error: no route to ${destinationNodeName} could be found from ` +
       `${location.mapName} (${location.x}, ${location.y}). The party was recalled to the kingdom.`,
@@ -166,7 +167,8 @@ export function travelStart(
     return state;
   });
 
-  travelMessageLog(
+  categoryMessageLog(
+    'Travel',
     currentLocationGet().mapName,
     wasTraveling
       ? `The party changed course for ${destinationNodeName}.`
@@ -192,7 +194,8 @@ function deathsDoorDurationTicks(): number {
 export function travelBeginDeathsDoor(): void {
   addGlobalEffect('Deaths Door' as GlobalEffectId, deathsDoorDurationTicks());
 
-  travelMessageLog(
+  categoryMessageLog(
+    'Travel',
     currentLocationGet().mapName,
     'The fallen party awaits recall home.',
   );
@@ -204,7 +207,8 @@ function travelArriveAtNode(
 ): void {
   if (!destinationNodeName) return;
 
-  travelMessageLog(
+  categoryMessageLog(
+    'Travel',
     tile.mapName,
     `The party has arrived at ${destinationNodeName}.`,
   );

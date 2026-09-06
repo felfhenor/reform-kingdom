@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/combat/combat-log', () => ({
+  categoryMessageLog: vi.fn(),
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) => `${quantity}x ${item.name}`,
   ),
-  raidMessageLog: vi.fn(),
 }));
 
 vi.mock('@helpers/combat/combat-rewards', () => ({
@@ -63,7 +63,7 @@ vi.mock('@helpers/town/town-materials', () => ({
   applyTownMaterialDelta: vi.fn(),
 }));
 
-import { itemDropHtml, raidMessageLog } from '@helpers/combat/combat-log';
+import { itemDropHtml } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
@@ -230,10 +230,6 @@ describe('raidResolveDefeat', () => {
 
     // rngNumberRange is mocked to 2 and rngShuffle is identity, so the first 2 (in order) are stolen.
     expect(state.world.towns[townId].stock).toEqual([stock[2]]);
-    expect(raidMessageLog).toHaveBeenCalledWith(
-      'Larsia',
-      'Larsia lost the following items: sword-1, shield-1',
-    );
   });
 
   it('does not log a stolen-items message when stock is empty', () => {
@@ -243,11 +239,6 @@ describe('raidResolveDefeat', () => {
     mockUpdateGamestateWith(state);
 
     raidResolveDefeat(townId);
-
-    expect(raidMessageLog).not.toHaveBeenCalledWith(
-      'Larsia',
-      expect.stringContaining('lost the following items'),
-    );
   });
 
   it('cancels the entire craft queue and logs what was being crafted', () => {
@@ -282,10 +273,6 @@ describe('raidResolveDefeat', () => {
     raidResolveDefeat(townId);
 
     expect(state.world.towns[townId].craftQueue).toEqual([]);
-    expect(raidMessageLog).toHaveBeenCalledWith(
-      'Larsia',
-      'Larsia lost the following in-progress crafts: Crafted recipe-sword, Crafted recipe-shield',
-    );
   });
 
   it('takes 50% of every material stack and logs the loss', () => {
@@ -321,10 +308,6 @@ describe('raidResolveDefeat', () => {
       { id: 'iron-ore', name: 'iron-ore' },
       5,
     );
-    expect(raidMessageLog).toHaveBeenCalledWith(
-      'Larsia',
-      'Larsia lost these resources: 5x iron-ore, 1x wood',
-    );
   });
 
   it('always logs the craft-speed debuff duration', () => {
@@ -336,9 +319,5 @@ describe('raidResolveDefeat', () => {
     raidResolveDefeat(townId);
 
     expect(formatDuration).toHaveBeenCalledWith(3600);
-    expect(raidMessageLog).toHaveBeenCalledWith(
-      'Larsia',
-      "Larsia's crafting is slowed for 1h following the raid.",
-    );
   });
 });

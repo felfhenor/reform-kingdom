@@ -2,6 +2,7 @@ import { pluralize } from '@boringnode/pluralize';
 import { localStorageSignal } from '@helpers/engine/signal';
 import { rngUuid } from '@helpers/rng';
 import type {
+  AdventureLogEntryKind,
   CollectibleContent,
   Combat,
   CombatLog,
@@ -78,39 +79,13 @@ export function combatantMessageToken(combatant: Combatant): string {
   return `@@${combatant.id}@@`;
 }
 
-export function travelMessageLog(locationName: string, message: string): void {
+export function categoryMessageLog(
+  category: AdventureLogEntryKind,
+  locationName: string,
+  message: string,
+): void {
   pushLogEntry({
-    kind: 'Travel',
-    messageId: rngUuid(),
-    timestamp: Date.now(),
-    locationName,
-    message,
-  });
-}
-
-export function gatherMessageLog(locationName: string, message: string): void {
-  pushLogEntry({
-    kind: 'Gather',
-    messageId: rngUuid(),
-    timestamp: Date.now(),
-    locationName,
-    message,
-  });
-}
-
-export function craftMessageLog(locationName: string, message: string): void {
-  pushLogEntry({
-    kind: 'Craft',
-    messageId: rngUuid(),
-    timestamp: Date.now(),
-    locationName,
-    message,
-  });
-}
-
-export function raidMessageLog(locationName: string, message: string): void {
-  pushLogEntry({
-    kind: 'Raid',
+    kind: category,
     messageId: rngUuid(),
     timestamp: Date.now(),
     locationName,

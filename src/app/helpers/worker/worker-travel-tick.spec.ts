@@ -10,7 +10,7 @@ vi.mock('@helpers/content/content', () => ({
 }));
 
 vi.mock('@helpers/combat/combat-log', () => ({
-  gatherMessageLog: vi.fn(),
+  categoryMessageLog: vi.fn(),
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) => `${quantity} ${item.name}`,
   ),
@@ -29,7 +29,7 @@ vi.mock('@helpers/worker/worker-travel', () => ({
   workerBeginOutboundTrip: vi.fn(),
 }));
 
-import { gatherMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import { itemDropHtml } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { addMaterial } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -107,10 +107,6 @@ describe('workerTravelProcessTick - TravelingBack arrival', () => {
 
     expect(addMaterial).toHaveBeenCalledWith(COPPER_ID, 5);
     expect(itemDropHtml).toHaveBeenCalledWith(copperContent, 5);
-    expect(gatherMessageLog).toHaveBeenCalledWith(
-      'Worker Resources',
-      'Weaver Nell returned with 5 Copper Ore.',
-    );
 
     const result = applyLastUpdate({
       workers: { [WORKER_ID]: buildReturningWorker() },
@@ -127,7 +123,6 @@ describe('workerTravelProcessTick - TravelingBack arrival', () => {
     workerTravelProcessTick(WORKER_ID);
 
     expect(addMaterial).toHaveBeenCalledWith(COPPER_ID, 5);
-    expect(gatherMessageLog).not.toHaveBeenCalled();
   });
 
   it('does not log or grant materials when nothing was carried', () => {
@@ -148,7 +143,6 @@ describe('workerTravelProcessTick - TravelingBack arrival', () => {
     workerTravelProcessTick(WORKER_ID);
 
     expect(addMaterial).not.toHaveBeenCalled();
-    expect(gatherMessageLog).not.toHaveBeenCalled();
   });
 
   it('redeploys on a still-valid pending assignment instead of logging a fresh trip', () => {

@@ -14,7 +14,6 @@ import {
   itemNameHtml,
   recipeDropHtml,
   recipeNameHtml,
-  travelMessageLog,
 } from '@helpers/combat/combat-log';
 import type {
   Combat,
@@ -95,34 +94,6 @@ describe('combatantMessageToken', () => {
   it('embeds the combatant id in an opaque, id-addressable token', () => {
     const combatant = { id: 'hero-1' } as unknown as Combatant;
     expect(combatantMessageToken(combatant)).toBe('@@hero-1@@');
-  });
-});
-
-describe('travelMessageLog', () => {
-  beforeEach(() => {
-    combatLogReset();
-  });
-
-  it('pushes a Travel-kind entry with no combatId onto the shared adventure log', () => {
-    travelMessageLog('Duchy of Carrina', 'The party left for Field Ruins.');
-
-    expect(combatLog()).toHaveLength(1);
-    expect(combatLog()[0].combatId).toBeUndefined();
-    expect(combatLog()[0]).toMatchObject({
-      kind: 'Travel',
-      locationName: 'Duchy of Carrina',
-      message: 'The party left for Field Ruins.',
-    });
-  });
-
-  it('prepends new entries so the log stays newest-first', () => {
-    travelMessageLog('Duchy of Carrina', 'The party left for Field Ruins.');
-    travelMessageLog('Field Ruins', 'The party has arrived at Field Ruins.');
-
-    expect(combatLog().map((entry) => entry.message)).toEqual([
-      'The party has arrived at Field Ruins.',
-      'The party left for Field Ruins.',
-    ]);
   });
 });
 

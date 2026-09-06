@@ -1,4 +1,4 @@
-import { gatherMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { travelStepTicksCost } from '@helpers/hero/travel';
 import { addMaterial } from '@helpers/item/materials';
@@ -129,7 +129,8 @@ function logWorkerReturn(
   const item = getEntry<ItemContent>(itemId);
   if (!worker || !item) return;
 
-  gatherMessageLog(
+  categoryMessageLog(
+    'Gather',
     'Worker Resources',
     `${worker.name} returned with ${itemDropHtml(item, quantity)}.`,
   );

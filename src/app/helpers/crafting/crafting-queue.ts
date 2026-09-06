@@ -1,6 +1,6 @@
 import {
+  categoryMessageLog,
   collectibleDropHtml,
-  craftMessageLog,
   equipmentDropHtml,
   itemDropHtml,
 } from '@helpers/combat/combat-log';
@@ -268,7 +268,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   const { chance } = recipe.result;
 
   if (chance !== undefined && !rngSucceedsChance(chance)) {
-    craftMessageLog(
+    categoryMessageLog(
+      'Craft',
       tradeskill,
       `${tradeskill} failed to craft ${recipe.name}.`,
     );
@@ -283,7 +284,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
 
     const item = getEntry<ItemContent>(itemId);
     if (item) {
-      craftMessageLog(
+      categoryMessageLog(
+        'Craft',
         tradeskill,
         `${tradeskill} crafted ${itemDropHtml(item, quantity)}!`,
       );
@@ -298,7 +300,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
 
     const equipment = getEntry<EquipmentContent>(equipmentId);
     if (equipment) {
-      craftMessageLog(
+      categoryMessageLog(
+        'Craft',
         tradeskill,
         `${tradeskill} crafted ${equipmentDropHtml(equipment)}!`,
       );
@@ -311,7 +314,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
 
   const collectible = getEntry<CollectibleContent>(collectibleId);
   if (collectible) {
-    craftMessageLog(
+    categoryMessageLog(
+      'Craft',
       tradeskill,
       `${tradeskill} crafted ${collectibleDropHtml(collectible)}!`,
     );

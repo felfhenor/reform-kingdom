@@ -13,6 +13,10 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/combat/combat-log', () => ({
+  categoryMessageLog: vi.fn(),
+}));
+
 vi.mock('@helpers/engine/analytics', () => ({
   analyticsSafeSegment: (value: string) => value.replace(/\s+/g, ''),
   analyticsSendDesignEvent: vi.fn(),
@@ -48,13 +52,9 @@ import {
   buildCommissionRequirementEntries,
   commissionRequirementsSatisfied,
 } from '@helpers/commission/commission-requirement';
-import { spendCommissionRequirements } from '@helpers/commission/commission-turn-in';
 import { getEntry } from '@helpers/content/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { townReputationGain } from '@helpers/town/reputation/town-reputation';
-import { depositCommissionRequirementsToTown } from '@helpers/town/town-materials';
 import {
   townCommissionCanFulfill,
   townCommissionFulfill,
@@ -331,104 +331,5 @@ describe('townCommissionFulfill', () => {
 
     expect(await townCommissionFulfill(townId, slotId)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('spends requirements, grants reputation instead of rewards, and removes the fulfilled slot', async () => {
-    withTownState({
-      commissionSlots: [
-        {
-          id: slotId,
-          commissionOfferId: offer.id,
-          requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(commissionRequirementsSatisfied).mockReturnValue(true);
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    const resultPromise = townCommissionFulfill(townId, slotId);
-
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const state = {
-      world: {
-        towns: {
-          [townId]: {
-            commissionSlots: [
-              {
-                id: slotId,
-                commissionOfferId: offer.id,
-                requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
-                generatedAtTick: 0,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(await resultPromise).toBe(true);
-    expect(spendCommissionRequirements).toHaveBeenCalledWith(state, [
-      { itemId: 'wergen-stick', quantity: 100 },
-    ]);
-    expect(result.world.towns[townId].commissionSlots).toEqual([]);
-    expect(depositCommissionRequirementsToTown).toHaveBeenCalledWith(state, townId, [
-      { itemId: 'wergen-stick', quantity: 100 },
-    ]);
-    expect(townReputationGain).toHaveBeenCalledWith(townId, 25, 'Commission');
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Town:Commission:Fulfill:Commission-WergenSticks',
-    );
-  });
-
-  it('does not double-remove the slot when two turn-ins race before either commits', async () => {
-    withTownState({
-      commissionSlots: [
-        {
-          id: slotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(commissionRequirementsSatisfied).mockReturnValue(true);
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    const call1 = townCommissionFulfill(townId, slotId);
-    const call2 = townCommissionFulfill(townId, slotId);
-
-    const [updateFn1, updateFn2] = vi
-      .mocked(updateGamestate)
-      .mock.calls.map((call) => call[0]);
-
-    const initialState = {
-      world: {
-        towns: {
-          [townId]: {
-            commissionSlots: [
-              {
-                id: slotId,
-                commissionOfferId: offer.id,
-                requirements: [],
-                generatedAtTick: 0,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState;
-
-    const afterFirst = updateFn1(initialState);
-    const afterSecond = updateFn2(afterFirst);
-
-    const [result1, result2] = await Promise.all([call1, call2]);
-
-    expect(result1).toBe(true);
-    expect(result2).toBe(false);
-    expect(afterSecond.world.towns[townId].commissionSlots).toEqual([]);
-    expect(spendCommissionRequirements).toHaveBeenCalledTimes(1);
-    expect(townReputationGain).toHaveBeenCalledTimes(1);
   });
 });

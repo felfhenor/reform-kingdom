@@ -1,4 +1,4 @@
-import { gatherMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
@@ -98,7 +98,11 @@ export function gatheringStart(nodeName: string): boolean {
     return state;
   });
 
-  gatherMessageLog(nodeName, `The party begins gathering at ${nodeName}.`);
+  categoryMessageLog(
+    'Gather',
+    nodeName,
+    `The party begins gathering at ${nodeName}.`,
+  );
 
   return true;
 }
@@ -158,7 +162,11 @@ function grantGatherItems(
 
   if (descriptions.length === 0) return;
 
-  gatherMessageLog(nodeName, `The party found ${descriptions.join(', ')}!`);
+  categoryMessageLog(
+    'Gather',
+    nodeName,
+    `The party found ${descriptions.join(', ')}!`,
+  );
 }
 
 function resolveGatherCycle(content: GatheringContent, nodeName: string): void {

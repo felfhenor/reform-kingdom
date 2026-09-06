@@ -1,4 +1,4 @@
-import { itemDropHtml, raidMessageLog } from '@helpers/combat/combat-log';
+import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -125,14 +125,16 @@ function logRaidLossMessages(
   summary: TownRaidLossSummary,
 ): void {
   if (summary.stolenItemNames.length > 0) {
-    raidMessageLog(
+    categoryMessageLog(
+      'Raid',
       townName,
       `${townName} lost the following items: ${summary.stolenItemNames.join(', ')}`,
     );
   }
 
   if (summary.cancelledCraftNames.length > 0) {
-    raidMessageLog(
+    categoryMessageLog(
+      'Raid',
       townName,
       `${townName} lost the following in-progress crafts: ${summary.cancelledCraftNames.join(', ')}`,
     );
@@ -142,13 +144,15 @@ function logRaidLossMessages(
     const descriptions = summary.lostMaterials.map(({ item, quantity }) =>
       itemDropHtml(item, quantity),
     );
-    raidMessageLog(
+    categoryMessageLog(
+      'Raid',
       townName,
       `${townName} lost these resources: ${descriptions.join(', ')}`,
     );
   }
 
-  raidMessageLog(
+  categoryMessageLog(
+    'Raid',
     townName,
     `${townName}'s crafting is slowed for ${formatDuration(RAID_LOSS_CRAFT_DEBUFF_TICKS)} following the raid.`,
   );
