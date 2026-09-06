@@ -57,7 +57,10 @@ export type TownSpecialtyPriorityEntry = {
 export type TownItemPriorityMap = {
   weightByItem: Partial<Record<ItemId, number>>;
   reservedByItem: Partial<
-    Record<ItemId, { total: number; byRecipe: Partial<Record<RecipeId, number>> }>
+    Record<
+      ItemId,
+      { total: number; byRecipe: Partial<Record<RecipeId, number>> }
+    >
   >;
 };
 

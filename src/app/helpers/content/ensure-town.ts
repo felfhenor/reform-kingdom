@@ -7,10 +7,10 @@ import {
 } from '@helpers/content/ensure-helpers-stats';
 import type {
   CommissionOfferId,
+  CommissionOfferSlot,
   GlobalEffectId,
   ItemId,
   MonsterId,
-  TownCommissionOfferSlot,
   TownContent,
   TownCraftingConfig,
   TownDefenseAssaulterConfig,
@@ -179,8 +179,8 @@ function ensureTownDefenseAssaulter(
 }
 
 function ensureTownCommissionOfferSlot(
-  slot: Partial<TownCommissionOfferSlot> = {},
-): TownCommissionOfferSlot {
+  slot: Partial<CommissionOfferSlot> = {},
+): CommissionOfferSlot {
   return {
     commissionOfferId:
       slot.commissionOfferId ?? ('UNKNOWN' as CommissionOfferId),

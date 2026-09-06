@@ -116,14 +116,8 @@ export type TownDefenseAssaulterConfig = {
   level: LevelRange;
 };
 
-// Town-only extension of the shared CommissionOfferSlot - a persistent entry always has exactly one live slot,
-// doesn't consume one of the town's reputation-tier-scaled rolled slots (weight is then unused), and sorts first in the Quests list.
-export type TownCommissionOfferSlot = CommissionOfferSlot & {
-  persistent: boolean;
-};
-
 export type TownDefenseQuestsConfig = {
-  commissions: TownCommissionOfferSlot[];
+  commissions: CommissionOfferSlot[];
 };
 
 export type TownDefenseConfig = {

@@ -6,16 +6,16 @@ import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngChoiceWeighted, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
+import { townSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import {
   townCommissionPriorityWeightFromMap,
   townItemPriorityMap,
 } from '@helpers/town/crafting/town-craft-priority-weight';
-import { townSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
-import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import {
   townReputationTier,
   townReputationTierMultiplier,
 } from '@helpers/town/reputation/town-reputation';
+import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -23,7 +23,7 @@ import {
 import type {
   CommissionOfferContent,
   CommissionOfferId,
-  TownCommissionOfferSlot,
+  CommissionOfferSlot,
   TownCommissionSlotId,
   TownContent,
   TownNodeState,
@@ -61,19 +61,19 @@ function addCommissionSlot(
   ];
 }
 
-function persistentSlotDefs(town: TownContent): TownCommissionOfferSlot[] {
+function persistentSlotDefs(town: TownContent): CommissionOfferSlot[] {
   return town.defense.quests.commissions.filter((s) => s.persistent);
 }
 
-function rolledSlotDefs(town: TownContent): TownCommissionOfferSlot[] {
+function rolledSlotDefs(town: TownContent): CommissionOfferSlot[] {
   return town.defense.quests.commissions.filter((s) => !s.persistent);
 }
 
 // commissionOfferId is already the real content id (gamedata-build.ts resolves it at build time) - no content lookup needed here.
 function missingPersistentDefs(
   target: TownNodeState,
-  defs: TownCommissionOfferSlot[],
-): TownCommissionOfferSlot[] {
+  defs: CommissionOfferSlot[],
+): CommissionOfferSlot[] {
   return defs.filter(
     (def) =>
       !target.commissionSlots.some(
@@ -84,7 +84,7 @@ function missingPersistentDefs(
 
 function addMissingPersistentSlots(
   target: TownNodeState,
-  defs: TownCommissionOfferSlot[],
+  defs: CommissionOfferSlot[],
 ): void {
   defs.forEach((def) => {
     const offer = getEntry<CommissionOfferContent>(def.commissionOfferId);
@@ -120,7 +120,9 @@ function addOneRolledCommission(
   activeOfferIds: Set<CommissionOfferId>,
 ): void {
   const candidates = eligibleCommissionOffers(rolledSlotDefs(town)).filter(
-    (o) => !activeOfferIds.has(o.offer.id) && isOfferOpenForCommission(town, o.offer),
+    (o) =>
+      !activeOfferIds.has(o.offer.id) &&
+      isOfferOpenForCommission(town, o.offer),
   );
 
   const priority = townSpecialtyPriority(town.id);
@@ -129,7 +131,12 @@ function addOneRolledCommission(
     candidates,
     (o) =>
       o.weight *
-      townCommissionPriorityWeightFromMap(priority, priorityMap, o.offer, o.weight),
+      townCommissionPriorityWeightFromMap(
+        priority,
+        priorityMap,
+        o.offer,
+        o.weight,
+      ),
   );
   if (!picked) return;
 
@@ -138,9 +145,7 @@ function addOneRolledCommission(
 
 export function townCommissionProcessTick(): void {
   getEntriesByType<TownContent>('town').forEach((town) => {
-    if (
-      !isTownDueForUpdate(town.id, 'quest', TOWN_COMMISSION_TICK_INTERVAL)
-    ) {
+    if (!isTownDueForUpdate(town.id, 'quest', TOWN_COMMISSION_TICK_INTERVAL)) {
       return;
     }
 

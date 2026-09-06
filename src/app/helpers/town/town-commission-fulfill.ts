@@ -18,10 +18,10 @@ import type {
   CommissionOfferContent,
   CommissionRequirementEntry,
   GameState,
-  TownContent,
   TownCommissionRowViewModel,
   TownCommissionSlotId,
   TownCommissionSlotState,
+  TownContent,
   TownId,
   WorldNodeEntry,
 } from '@interfaces';
@@ -124,6 +124,9 @@ export async function townCommissionFulfill(
     return false;
   }
 
+  const townData = getEntry<TownContent>(townId);
+  if (!townData) return false;
+
   let fulfilled = false;
   let offerName: string | undefined;
   let reputationAmount = 0;
@@ -143,9 +146,13 @@ export async function townCommissionFulfill(
 
     spendCommissionRequirements(s, slot.requirements);
     depositCommissionRequirementsToTown(s, townId, slot.requirements);
-    target.commissionSlots = target.commissionSlots.filter(
-      (entry) => entry.id !== slotId,
-    );
+
+    if (!isSlotPersistent(townData, slot)) {
+      target.commissionSlots = target.commissionSlots.filter(
+        (entry) => entry.id !== slotId,
+      );
+    }
+
     fulfilled = true;
 
     return s;

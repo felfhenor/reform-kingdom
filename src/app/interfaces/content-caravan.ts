@@ -16,6 +16,7 @@ export type CaravanMarkupPercentages = {
 export type CommissionOfferSlot = {
   commissionOfferId: CommissionOfferId;
   weight: number;
+  persistent?: boolean;
 };
 
 export type CaravanContent = IsContentItem &
