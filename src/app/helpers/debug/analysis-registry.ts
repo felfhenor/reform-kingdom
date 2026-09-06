@@ -1,3 +1,4 @@
+import { runCommissionRewardsAnalysis } from '@helpers/debug/analysis-commissionrewards';
 import { runCommissionUsageAnalysis } from '@helpers/debug/analysis-commissionusage';
 import { runCompletionRewardsAnalysis } from '@helpers/debug/analysis-completionrewards';
 import { runContentGapsAnalysis } from '@helpers/debug/analysis-contentgaps';
@@ -82,7 +83,8 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
   {
     id: 'recipeingredientorder',
     title: 'Recipe Ingredient Order',
-    description: 'Ingredient recipes unlock at or before recipes that consume them.',
+    description:
+      'Ingredient recipes unlock at or before recipes that consume them.',
     category: 'Tradeskills & Recipes',
     strict: true,
     inputKeys: [],
@@ -121,7 +123,8 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
   {
     id: 'nodelevels',
     title: 'Node Levels',
-    description: 'Level-gated world nodes by map, flagging level-window coverage gaps.',
+    description:
+      'Level-gated world nodes by map, flagging level-window coverage gaps.',
     category: 'World & Maps',
     strict: false,
     inputKeys: ['gap'],
@@ -200,18 +203,30 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
   {
     id: 'commissionusage',
     title: 'Commission Usage',
-    description: 'Every commission offer is referenced by at least one caravan.',
+    description:
+      'Every commission offer is referenced by at least one caravan.',
     category: 'Caravans & Commissions',
     strict: true,
     inputKeys: [],
     run: runCommissionUsageAnalysis,
+  },
+  {
+    id: 'commissionrewards',
+    title: 'Commission Rewards',
+    description:
+      'Every commission offer has the reward(s) required by whichever pool(s) reference it.',
+    category: 'Caravans & Commissions',
+    strict: true,
+    inputKeys: [],
+    run: runCommissionRewardsAnalysis,
   },
 
   // --- Hero Stats ---
   {
     id: 'herostats',
     title: 'Hero Stats',
-    description: 'MIN/MID/MAX hero stats and skill damage/heal estimates at a level.',
+    description:
+      'MIN/MID/MAX hero stats and skill damage/heal estimates at a level.',
     category: 'Hero Stats',
     strict: false,
     inputKeys: ['level', 'classFilter'],
