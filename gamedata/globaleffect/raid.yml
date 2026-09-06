@@ -1,0 +1,6 @@
+- id: f3a9d8c2-6e4b-4a1d-9c7f-2b5e8d1a0f36
+  name: Raid Defense Requested
+  sprite: '0011'
+  description: Some towns are requesting help defending against a raid. Failure to clear their raiders will result in a loss of reputation and resources for the towns.
+
+  hideDuration: true

@@ -1,0 +1,102 @@
+<app-modal
+  modalId="raid-defense"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  widthClass="max-w-4xl"
+>
+  <span title>Requested Defenses</span>
+
+  <div body class="flex flex-col gap-4">
+    @let defenseRows = rows();
+
+    @if (defenseRows.length === 0) {
+      <p class="italic text-lighter">No towns currently need defending.</p>
+    } @else {
+      @for (row of defenseRows; track row.townId) {
+        <div class="flex flex-col gap-2 p-4 rounded bg-base-200">
+          <div class="flex items-center justify-between gap-2">
+            <span class="flex gap-2">
+              <span class="font-semibold">{{ row.townName }}</span>
+              <span class="badge badge-sm badge-warning">
+                {{ row.remainingLabel }}
+              </span>
+            </span>
+
+            @if (row.isPartyHere) {
+              <span class="badge badge-sm badge-success">You are here</span>
+            } @else if (row.travelEtaSeconds !== undefined) {
+              <button type="button" class="btn btn-xs btn-secondary" disabled>
+                {{ etaLabel(row.travelEtaSeconds) }}
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn btn-xs btn-secondary"
+                [disabled]="!row.canTravel"
+                (click)="travelTo(row.nodeName)"
+              >
+                Travel Here
+              </button>
+            }
+          </div>
+
+          <div class="flex flex-wrap gap-4">
+            <div class="flex flex-col gap-2">
+              <div class="font-bold text-neutral-content text-sm">
+                Attackers
+              </div>
+              <div class="flex flex-wrap gap-2">
+                @for (combatant of row.assaulters; track combatant.monster.id) {
+                  <div
+                    class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
+                      combatant.monster.rarity
+                    }}"
+                    [tp]="combatant.monster.name"
+                    [tpPlacement]="'top'"
+                  >
+                    <app-slot-icon-blank>
+                      <app-atlas-animation
+                        spritesheet="monster"
+                        [assetName]="combatant.monster.sprite"
+                        [frames]="combatant.monster.frames"
+                      />
+                      <span text-br>x{{ combatant.quantity }}</span>
+                    </app-slot-icon-blank>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <div class="font-bold text-neutral-content text-sm">
+                Defenders
+              </div>
+              <div class="flex flex-wrap gap-2">
+                @for (combatant of row.defenders; track combatant.monster.id) {
+                  <div
+                    class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
+                      combatant.monster.rarity
+                    }}"
+                    [tp]="combatant.monster.name"
+                    [tpPlacement]="'top'"
+                  >
+                    <app-slot-icon-blank>
+                      <app-atlas-animation
+                        spritesheet="monster"
+                        [assetName]="combatant.monster.sprite"
+                        [frames]="combatant.monster.frames"
+                      />
+                      <span text-br>x{{ combatant.quantity }}</span>
+                    </app-slot-icon-blank>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end"></div>
+        </div>
+      }
+    }
+  </div>
+</app-modal>

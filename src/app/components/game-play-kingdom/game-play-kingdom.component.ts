@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ModalPlayKingdomReclassComponent } from '@components/modal-play-kingdom-reclass/modal-play-kingdom-reclass.component';
+import { ModalRaidDefenseComponent } from '@components/modal-raid-defense/modal-raid-defense.component';
 import { PageBlankComponent } from '@components/page-blank/page-blank.component';
 import { PlayKingdomAchievementsComponent } from '@components/play-kingdom-achievements/play-kingdom-achievements.component';
 import { PlayKingdomArmoryComponent } from '@components/play-kingdom-armory/play-kingdom-armory.component';
@@ -40,6 +41,7 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomPrestigeComponent,
     PlayKingdomWorkersComponent,
     ModalPlayKingdomReclassComponent,
+    ModalRaidDefenseComponent,
     PageBlankComponent,
   ],
   templateUrl: './game-play-kingdom.component.html',

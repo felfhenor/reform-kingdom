@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
@@ -27,6 +28,7 @@ import {
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum';
 import { gamestate } from '@helpers/state-game';
+import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense';
 import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
@@ -48,6 +50,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
+    ButtonGlowComponent,
     CardPageComponent,
     DecimalPipe,
     IconComponent,
@@ -107,6 +110,8 @@ export class PlayKingdomHomeComponent {
 
   // Hidden until any caravan has actually generated a commission.
   public commissionsUnlocked = computed(() => hasAnyCommission());
+
+  public raidDefenseCount = computed(() => raidDefenseRowViewModels().length);
 
   // Commissions ready to turn in right now - shown as a nudge on the tile.
   public fulfillableCommissionCount = computed(
@@ -191,5 +196,9 @@ export class PlayKingdomHomeComponent {
   public openReclassModal(): void {
     if (!this.canReclass()) return;
     modalOpen('reclass-heroes');
+  }
+
+  public openRaidDefenseModal(): void {
+    modalOpen('raid-defense');
   }
 }

@@ -116,6 +116,21 @@ export type TownRaidCombatantRow = {
   quantity: number;
 };
 
+// One row per telegraphed raid for the Requested Defenses modal - sorted by soonest engageWindowExpiresAtTick.
+export type RaidDefenseRowViewModel = {
+  townId: TownId;
+  townName: string;
+  nodeName: string;
+  ticksUntilResolve: number;
+  remainingLabel: string;
+  assaulters: TownRaidCombatantRow[];
+  defenders: TownRaidCombatantRow[];
+  isPartyHere: boolean;
+  canTravel: boolean;
+  // Set only while actively traveling toward this row's node.
+  travelEtaSeconds?: number;
+};
+
 // One lost material row for the raid-loss adventure-log message - full content (not just name) so the log can reuse itemDropHtml's rarity coloring.
 export type TownRaidLostMaterial = {
   item: ItemContent;

@@ -22,6 +22,10 @@ vi.mock('@helpers/engine/analytics', () => ({
   analyticsSendDesignEvent: vi.fn(),
 }));
 
+vi.mock('@helpers/engine/timer', () => ({
+  timerTicksElapsed: vi.fn(() => 1000),
+}));
+
 vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(() => []),
 }));
@@ -29,6 +33,10 @@ vi.mock('@helpers/hero/party', () => ({
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
+}));
+
+vi.mock('@helpers/town/raid/town-raid-defense', () => ({
+  raidDefenseGlobalEffectApply: vi.fn(),
 }));
 
 vi.mock('@helpers/town/town-guardian', () => ({

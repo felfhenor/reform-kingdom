@@ -38,6 +38,10 @@ vi.mock('@helpers/town/reputation/town-reputation', () => ({
   townReputationTier: vi.fn(() => 0),
 }));
 
+vi.mock('@helpers/town/raid/town-raid-defense', () => ({
+  raidDefenseGlobalEffectApply: vi.fn(),
+}));
+
 vi.mock('@helpers/town/raid/town-raid-resolve', () => ({
   raidResolveDefeat: vi.fn(),
 }));

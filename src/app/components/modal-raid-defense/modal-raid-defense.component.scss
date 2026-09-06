@@ -1,0 +1,5 @@
+@reference 'tailwindcss';
+
+.raid-combatant-slot {
+  @apply relative w-[64px] h-[64px];
+}

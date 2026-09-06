@@ -261,6 +261,19 @@
         <h2 class="card-title text-base">Kingdom Actions</h2>
 
         <div class="flex flex-wrap gap-2">
+          @let raidCount = raidDefenseCount();
+          @if (raidCount > 0) {
+            <button
+              class="btn btn-warning btn-sm"
+              appButtonGlow
+              (click)="openRaidDefenseModal()"
+            >
+              <app-icon name="gameVibratingShield" size="inline" />
+              Requested Defenses
+              <span class="badge badge-sm badge-error">{{ raidCount }}</span>
+            </button>
+          }
+
           <button
             class="btn btn-accent btn-sm"
             [disabled]="!canReclass()"

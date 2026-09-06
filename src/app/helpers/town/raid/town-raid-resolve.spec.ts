@@ -42,6 +42,10 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+vi.mock('@helpers/town/raid/town-raid-defense', () => ({
+  raidDefenseGlobalEffectApply: vi.fn(),
+}));
+
 vi.mock('@helpers/town/reputation/town-reputation', () => ({
   townReputationGain: vi.fn(),
   townReputationLose: vi.fn(),

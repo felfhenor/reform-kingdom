@@ -9,8 +9,10 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { timerTicksElapsed } from '@helpers/engine/timer';
 import { partyGet } from '@helpers/hero/party';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type { Combat, MonsterContent, TownContent, TownId } from '@interfaces';
@@ -65,6 +67,7 @@ export function raidEngageCombat(townId: TownId): boolean {
       target.raidEngageWindowExpiresAtTick = undefined;
       target.raidTelegraphedAssaulterIds = undefined;
     }
+    raidDefenseGlobalEffectApply(gs, timerTicksElapsed());
     return gs;
   });
 

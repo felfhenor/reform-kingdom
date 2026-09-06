@@ -10,6 +10,7 @@ import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { rollDroppedRewards } from '@helpers/item/loot';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
+import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import {
   townReputationGain,
   townReputationLose,
@@ -180,6 +181,7 @@ export function raidResolveDefeat(townId: TownId): void {
     target.raidTelegraphedAtTick = undefined;
     target.raidEngageWindowExpiresAtTick = undefined;
     target.raidTelegraphedAssaulterIds = undefined;
+    raidDefenseGlobalEffectApply(state, now);
     return state;
   });
 

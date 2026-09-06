@@ -9,6 +9,7 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import { partyMinLevel } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
@@ -62,6 +63,7 @@ export function telegraphRaid(town: TownContent): void {
       target.raidEngageWindowExpiresAtTick = now + windowTicks;
       target.raidTelegraphedAssaulterIds = assaulterMonsterIds;
     }
+    raidDefenseGlobalEffectApply(state, now);
     return state;
   });
 }
