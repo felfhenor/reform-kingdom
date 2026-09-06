@@ -103,10 +103,10 @@ const SELL_GOLD_PER_COMBAT_STAT_POINT = 50;
 const SELL_GOLD_PER_RESISTANCE_POINT = 100;
 const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
   Common: 1,
-  Uncommon: 1.25,
-  Rare: 1.75,
-  Mystical: 2.5,
-  Legendary: 4,
+  Uncommon: 1.5,
+  Rare: 3,
+  Mystical: 5,
+  Legendary: 15,
 };
 
 // Base stats plus infusion bonus both count - an infused item sells for more, but infusion materials aren't refunded.

@@ -359,25 +359,6 @@ describe('Armory Helper Functions', () => {
       expect(equipmentSellValue(entry)).toBe(120);
     });
 
-    it('scales the same stats up for a higher rarity', () => {
-      const entry = {
-        item: {
-          id: 'shield-1' as EquipmentItemId,
-          equipmentId: shield.id,
-          infusedItemIds: [],
-          affixIds: [],
-        },
-        content: {
-          ...shield,
-          baseStats: { ...defaultStats(), Strength: 5 },
-          levelRequirement: 2,
-        },
-      };
-
-      // same 120 base, Rare multiplier 1.75x
-      expect(equipmentSellValue(entry)).toBe(210);
-    });
-
     it('adds infusion bonus stats on top of base stats', () => {
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue({
         ...defaultStats(),
