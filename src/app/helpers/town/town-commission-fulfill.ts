@@ -25,6 +25,7 @@ import type {
   TownId,
   WorldNodeEntry,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 function commissionSlots(
   townId: TownId,
@@ -94,25 +95,23 @@ export function townCommissionRowViewModels(
   const canTravel = canPartyTravel();
   const travelEtaSeconds = travelEtaSecondsTo(entry.nodeName);
 
-  return [...commissionSlots(town.id)]
-    .sort(
-      (a, b) =>
-        Number(isSlotPersistent(town, b)) - Number(isSlotPersistent(town, a)),
-    )
-    .map((slot) => ({
-      townId: town.id,
-      slotId: slot.id,
-      nodeName: entry.nodeName,
-      title: town.name,
-      requirementEntries: townCommissionRequirementEntries(town.id, slot.id),
-      rewards: [],
-      reputationReward: townCommissionReputationReward(town.id, slot.id),
-      canFulfill: townCommissionCanFulfill(town.id, slot.id),
-      completed: false,
-      isPartyHere,
-      canTravel,
-      travelEtaSeconds,
-    }));
+  return sortBy(
+    [...commissionSlots(town.id)],
+    (slot: TownCommissionSlotState) => -isSlotPersistent(town, slot),
+  ).map((slot) => ({
+    townId: town.id,
+    slotId: slot.id,
+    nodeName: entry.nodeName,
+    title: town.name,
+    requirementEntries: townCommissionRequirementEntries(town.id, slot.id),
+    rewards: [],
+    reputationReward: townCommissionReputationReward(town.id, slot.id),
+    canFulfill: townCommissionCanFulfill(town.id, slot.id),
+    completed: false,
+    isPartyHere,
+    canTravel,
+    travelEtaSeconds,
+  }));
 }
 
 // Fast path only - townCommissionCanFulfill is repeated against live state inside the callback, since updateGamestate commits asynchronously.
