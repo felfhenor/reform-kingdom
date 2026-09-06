@@ -1,6 +1,6 @@
 import type { CommissionRequirement } from '@interfaces/commission-state';
 import type { CommissionOfferId } from '@interfaces/content-commission-offer';
-import type { ItemId } from '@interfaces/content-item';
+import type { ItemContent, ItemId } from '@interfaces/content-item';
 import type { MonsterContent, MonsterId } from '@interfaces/content-monster';
 import type { RecipeContent, RecipeId } from '@interfaces/content-recipe';
 import type { TownId } from '@interfaces/content-town';
@@ -97,6 +97,19 @@ export type TownRaidTelegraph = {
 export type TownRaidCombatantRow = {
   monster: MonsterContent;
   quantity: number;
+};
+
+// One lost material row for the raid-loss adventure-log message - full content (not just name) so the log can reuse itemDropHtml's rarity coloring.
+export type TownRaidLostMaterial = {
+  item: ItemContent;
+  quantity: number;
+};
+
+// Collected during raidResolveDefeat's updateGamestate pass (kept side-effect-free) so the caller can log messages after it returns.
+export type TownRaidLossSummary = {
+  stolenItemNames: string[];
+  cancelledCraftNames: string[];
+  lostMaterials: TownRaidLostMaterial[];
 };
 
 // Pre-computed display state for one stock row - keeps helper-call derivations out of the component.

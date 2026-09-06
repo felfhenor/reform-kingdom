@@ -108,6 +108,16 @@ export function craftMessageLog(locationName: string, message: string): void {
   });
 }
 
+export function raidMessageLog(locationName: string, message: string): void {
+  pushLogEntry({
+    kind: 'Raid',
+    messageId: rngUuid(),
+    timestamp: Date.now(),
+    locationName,
+    message,
+  });
+}
+
 // Raw HTML passes through since adventureLogMessageHtml renders markdown-inline.
 export function itemNameHtml(
   item: ItemContent,

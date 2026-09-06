@@ -1,7 +1,7 @@
 import type { CombatId } from '@interfaces/combat';
 
 export type AdventureLogEntryKind =
-  'Combat' | 'Travel' | 'Gather' | 'Craft' | 'Miscellaneous';
+  'Combat' | 'Travel' | 'Gather' | 'Craft' | 'Raid' | 'Miscellaneous';
 
 // A combatant's HP snapshot at log time, keyed by id so `@@id@@` message
 // tokens (see combatantMessageToken) can be swapped for a colored name.
