@@ -70,7 +70,7 @@ const town: TownContent = {
   gathering: {
     gatherRateMultiplier: 5,
     goldGatheredPerMaterial: 5,
-    goldRequiredBeforeCutoff: 25000,
+    materialThresholds: [],
     workers: [{ workerId: darwinId, level: 1 }],
   },
   reputation: {
@@ -184,6 +184,7 @@ describe('pruneInvalidTowns', () => {
         tradeskills: {},
         craftQueue: [],
         commissionSlots: [],
+        specialtyPriority: [],
       },
     };
 
@@ -225,6 +226,7 @@ describe('pruneInvalidTowns', () => {
         tradeskills: {},
         craftQueue: [],
         commissionSlots: [],
+        specialtyPriority: [],
       },
     });
   });
@@ -304,6 +306,7 @@ describe('pruneInvalidTowns', () => {
         tradeskills: {},
         craftQueue: [],
         commissionSlots: [],
+        specialtyPriority: [],
       },
     });
   });
@@ -338,6 +341,7 @@ describe('pruneInvalidTowns', () => {
         tradeskills: {},
         craftQueue: [],
         commissionSlots: [],
+        specialtyPriority: [],
       },
     });
   });
@@ -371,6 +375,7 @@ describe('pruneInvalidTowns', () => {
         tradeskills: {},
         craftQueue: [],
         commissionSlots: [],
+        specialtyPriority: [],
       },
     });
     expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {});

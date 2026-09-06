@@ -5,7 +5,7 @@
   [class.flex-wrap]="layout() === 'row'"
   [class.gap-x-3]="layout() === 'row'"
 >
-  @for (stat of baseRows(); track stat) {
+  @for (stat of baseRows(); track $index) {
     @let value = rowValue(stat);
 
     <div

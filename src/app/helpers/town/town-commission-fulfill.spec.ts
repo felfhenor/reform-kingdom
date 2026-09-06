@@ -32,6 +32,10 @@ vi.mock('@helpers/town/reputation/town-reputation', () => ({
   townReputationGain: vi.fn(),
 }));
 
+vi.mock('@helpers/town/town-materials', () => ({
+  depositCommissionRequirementsToTown: vi.fn(),
+}));
+
 vi.mock('@helpers/town/town-visit', () => ({
   isPartyAtTown: vi.fn(() => true),
 }));
@@ -50,6 +54,7 @@ import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { townReputationGain } from '@helpers/town/reputation/town-reputation';
+import { depositCommissionRequirementsToTown } from '@helpers/town/town-materials';
 import {
   townCommissionCanFulfill,
   townCommissionFulfill,
@@ -64,6 +69,7 @@ import type {
   CommissionOfferId,
   GameState,
   ItemId,
+  RecipeId,
   TownCommissionSlotId,
   TownContent,
   TownId,
@@ -83,6 +89,7 @@ const offer: CommissionOfferContent = {
   ],
   rewards: [],
   townReputationReward: 25,
+  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
 };
 
 const persistentOffer: CommissionOfferContent = {
@@ -366,6 +373,9 @@ describe('townCommissionFulfill', () => {
       { itemId: 'wergen-stick', quantity: 100 },
     ]);
     expect(result.world.towns[townId].commissionSlots).toEqual([]);
+    expect(depositCommissionRequirementsToTown).toHaveBeenCalledWith(state, townId, [
+      { itemId: 'wergen-stick', quantity: 100 },
+    ]);
     expect(townReputationGain).toHaveBeenCalledWith(townId, 25, 'Commission');
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Town:Commission:Fulfill:Commission-WergenSticks',

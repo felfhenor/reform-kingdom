@@ -7,6 +7,7 @@ import {
   pruneInvalidTownTradeskills,
   townTradeskillsMaterialize,
 } from '@helpers/town/crafting/town-craft-tradeskills';
+import { pruneInvalidTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import { pruneInvalidTownCommissionSlots } from '@helpers/town/town-commission-slots';
 import { pruneInvalidTownMaterials } from '@helpers/town/town-materials';
 import {
@@ -77,6 +78,9 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
         craftQueue: pruneInvalidTownCraftQueue(towns[townId].craftQueue ?? []),
         commissionSlots: pruneInvalidTownCommissionSlots(
           towns[townId].commissionSlots ?? [],
+        ),
+        specialtyPriority: pruneInvalidTownSpecialtyPriority(
+          towns[townId].specialtyPriority ?? [],
         ),
       };
     }

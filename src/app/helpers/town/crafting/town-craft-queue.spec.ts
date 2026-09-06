@@ -22,6 +22,10 @@ vi.mock('@helpers/town/crafting/town-craft-pick', () => ({
   townPickRecipeToQueue: vi.fn(),
 }));
 
+vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
+  resetTownSpecialtyPriority: vi.fn(),
+}));
+
 // Reputation-tier scaling is town-craft-queue-size.spec.ts's job - here it just echoes back crafting.maxQueueSize.
 vi.mock('@helpers/town/crafting/town-craft-queue-size', () => ({
   townCraftQueueSize: vi.fn((town) => town.crafting.maxQueueSize),
@@ -53,6 +57,7 @@ import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
+import { resetTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
@@ -309,6 +314,7 @@ describe('townCraftProcessTick - completing the queue', () => {
 
   it('completes a craft, feeds an item result into the town materials stash, and dequeues', () => {
     const recipe = {
+      id: 'recipe-1' as RecipeId,
       craftTime: 5,
       result: { itemId: 'ingot' as ItemId, quantity: 2 },
     } as RecipeContent;
@@ -343,6 +349,10 @@ describe('townCraftProcessTick - completing the queue', () => {
     );
     expect(applyTownStockAdd).not.toHaveBeenCalled();
     expect(state.world.towns[townId].craftQueue).toEqual([]);
+    expect(resetTownSpecialtyPriority).toHaveBeenCalledWith(
+      state.world.towns[townId],
+      'recipe-1',
+    );
   });
 
   it('a higher tradeskill level shortens the effective craft time', () => {

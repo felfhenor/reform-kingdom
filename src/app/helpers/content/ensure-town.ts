@@ -8,6 +8,7 @@ import {
 import type {
   CommissionOfferId,
   GlobalEffectId,
+  ItemId,
   MonsterId,
   TownCommissionOfferSlot,
   TownContent,
@@ -21,6 +22,7 @@ import type {
   TownGatheringConfig,
   TownGatheringWorker,
   TownId,
+  TownMaterialThreshold,
   TownReputationBuffTier,
   TownReputationConfig,
   TownReputationTierValue,
@@ -91,13 +93,25 @@ function ensureTownGatheringWorker(
   };
 }
 
+function ensureTownMaterialThreshold(
+  threshold: Partial<TownMaterialThreshold> = {},
+): TownMaterialThreshold {
+  return {
+    itemId: threshold.itemId ?? ('UNKNOWN' as ItemId),
+    maxQuantity: threshold.maxQuantity ?? 0,
+  };
+}
+
 function ensureTownGathering(
   gathering: Partial<TownGatheringConfig> = {},
 ): TownGatheringConfig {
   return {
     gatherRateMultiplier: gathering.gatherRateMultiplier ?? 1,
     goldGatheredPerMaterial: gathering.goldGatheredPerMaterial ?? 0,
-    goldRequiredBeforeCutoff: gathering.goldRequiredBeforeCutoff ?? 0,
+    materialThresholds: ensureArray(
+      gathering.materialThresholds,
+      ensureTownMaterialThreshold,
+    ),
     workers: ensureArray(gathering.workers, ensureTownGatheringWorker),
   };
 }

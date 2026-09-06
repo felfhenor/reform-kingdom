@@ -1,6 +1,7 @@
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
+import type { RecipeId } from '@interfaces/content-recipe';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
@@ -39,4 +40,6 @@ export type CommissionOfferContent = IsContentItem &
     rewards: DroppedReward[];
     // Granted instead of `rewards` when fulfilled at a town (never both) - ignored by caravan fulfillment, which has no town to credit.
     townReputationReward: number;
+    // Links to the specialty recipe this offer unblocks - 'UNKNOWN' otherwise, per the UNKNOWN-sentinel convention for optional ids.
+    specialtyForRecipeId: RecipeId;
   };

@@ -1,4 +1,5 @@
 import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
+import { allMaps } from '@helpers/maps';
 import {
   findInMapPath,
   findTeleportArrivalByTag,
@@ -112,9 +113,39 @@ function travelPathAcrossMaps(
   return bestSteps;
 }
 
+// Cleared whenever allMaps() changes (real app: once, at load) - same (origin, destination) always resolves to the
+// same path otherwise, which is what stops a stamina check from re-pathfinding once per item at a node instead of once per node.
+let cachedMapsRef: ReturnType<typeof allMaps> | undefined;
+const pathFromCache = new Map<string, TravelStep[] | undefined>();
+
+function pathFromCacheKey(
+  location: CurrentLocation,
+  destinationNodeName: string,
+): string {
+  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}`;
+}
+
 // Pure by-location variant of `travelPathTo`, so non-party travelers (workers - see
 // `worker-travel.ts`) can path from an arbitrary origin, not just the hero party's current tile.
 export function travelPathFrom(
+  location: CurrentLocation,
+  destinationNodeName: string,
+): TravelStep[] | undefined {
+  const currentMaps = allMaps();
+  if (currentMaps !== cachedMapsRef) {
+    cachedMapsRef = currentMaps;
+    pathFromCache.clear();
+  }
+
+  const key = pathFromCacheKey(location, destinationNodeName);
+  if (pathFromCache.has(key)) return pathFromCache.get(key);
+
+  const path = computeTravelPathFrom(location, destinationNodeName);
+  pathFromCache.set(key, path);
+  return path;
+}
+
+function computeTravelPathFrom(
   location: CurrentLocation,
   destinationNodeName: string,
 ): TravelStep[] | undefined {

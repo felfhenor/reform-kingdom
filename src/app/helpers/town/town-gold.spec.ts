@@ -1,13 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/content/content', () => ({
+  getEntry: vi.fn(() => ({ id: goldCoinItemId })),
+}));
 
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
-import type { GameState, TownContent, TownId } from '@interfaces';
+import type { GameState, ItemId, TownContent, TownId } from '@interfaces';
 
 const townId = 'larsia' as TownId;
+const goldCoinItemId = 'gold-coin' as ItemId;
 
 function buildTown(goldRequiredBeforeCutoff = 1000): TownContent {
   return {
-    gathering: { goldRequiredBeforeCutoff },
+    gathering: {
+      materialThresholds: [
+        { itemId: goldCoinItemId, maxQuantity: goldRequiredBeforeCutoff },
+      ],
+    },
   } as unknown as TownContent;
 }
 

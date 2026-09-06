@@ -1,5 +1,11 @@
 import { rngChoiceWeighted } from '@helpers/rng';
 import {
+  townItemPriorityMap,
+  townItemPriorityWeightFromMap,
+} from '@helpers/town/crafting/town-craft-priority-weight';
+import { townSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
+import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
+import {
   townWorkerAssignmentIsValid,
   townWorkerBeginOutboundTrip,
 } from '@helpers/town/worker/town-worker-travel';
@@ -22,6 +28,8 @@ function candidateAssignments(
   workerId: WorkerId,
   level: number,
 ): (TownWorkerAssignment & { weight: number })[] {
+  // Built once here, not per candidate item - the priority list is small but this loop can scan hundreds of items.
+  const priorityMap = townItemPriorityMap(townSpecialtyPriority(town.id));
   const candidates: (TownWorkerAssignment & { weight: number })[] = [];
 
   worldNodesOfType('GatherNode').forEach((node) => {
@@ -31,11 +39,16 @@ function candidateAssignments(
     gatheringResultsAtLevel(gathering, worldNodeLevel(node.nodeName)).forEach(
       (result) => {
         result.items.forEach((item) => {
+          // Capped items are fully excluded, not down-weighted - a worker with nothing else worth gathering just stays idle at town.
+          if (townMaterialAtOrAboveThreshold(town, item.itemId)) return;
+
           const assignment = { nodeName: node.nodeName, itemId: item.itemId };
           if (!townWorkerAssignmentIsValid(town, workerId, level, assignment))
             return;
 
-          candidates.push({ ...assignment, weight: result.chance });
+          const weight =
+            result.chance * townItemPriorityWeightFromMap(priorityMap, item.itemId);
+          candidates.push({ ...assignment, weight });
         });
       },
     );

@@ -8,6 +8,7 @@ import type {
   CommissionOfferRequirementItem,
   CommissionOfferRequirementMonsterKill,
   ItemId,
+  RecipeId,
 } from '@interfaces';
 
 function ensureCommissionOfferRequirement(
@@ -52,5 +53,7 @@ export function ensureCommissionOffer(
     ),
     rewards: ensureArray(offer.rewards, ensureDroppedReward),
     townReputationReward: offer.townReputationReward ?? 0,
+    specialtyForRecipeId:
+      offer.specialtyForRecipeId ?? ('UNKNOWN' as RecipeId),
   };
 }

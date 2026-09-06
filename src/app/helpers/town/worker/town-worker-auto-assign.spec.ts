@@ -9,6 +9,19 @@ vi.mock('@helpers/town/worker/town-worker-travel', () => ({
   townWorkerBeginOutboundTrip: vi.fn(),
 }));
 
+vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
+  townSpecialtyPriority: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/town/crafting/town-craft-priority-weight', () => ({
+  townItemPriorityMap: vi.fn(() => ({ weightByItem: {}, reservedByItem: {} })),
+  townItemPriorityWeightFromMap: vi.fn(() => 1),
+}));
+
+vi.mock('@helpers/town/town-resource-thresholds', () => ({
+  townMaterialAtOrAboveThreshold: vi.fn(() => false),
+}));
+
 vi.mock('@helpers/world-node/world-node-gathering', () => ({
   gatheringResultsAtLevel: vi.fn(),
 }));
@@ -23,6 +36,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { rngChoiceWeighted } from '@helpers/rng';
+import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import {
   townPickGatherAssignment,
   townWorkerAutoAssign,
@@ -55,6 +69,7 @@ function buildTown(): TownContent {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(townMaterialAtOrAboveThreshold).mockReturnValue(false);
 });
 
 describe('townPickGatherAssignment', () => {
@@ -97,6 +112,25 @@ describe('townPickGatherAssignment', () => {
       { nodeName: 'Not A Gather Node' } as WorldNodeEntry,
     ]);
     vi.mocked(worldNodeGathering).mockReturnValue(undefined);
+    vi.mocked(rngChoiceWeighted).mockImplementation((items) =>
+      items.length > 0 ? items[0] : undefined,
+    );
+
+    townPickGatherAssignment(buildTown(), workerId, 1);
+
+    expect(rngChoiceWeighted).toHaveBeenCalledWith([], expect.any(Function));
+  });
+
+  it('excludes an item at or above its town material threshold', () => {
+    vi.mocked(worldNodesOfType).mockReturnValue([
+      { nodeName: 'Wergen Woods' } as WorldNodeEntry,
+    ]);
+    vi.mocked(worldNodeGathering).mockReturnValue({} as GatheringContent);
+    vi.mocked(gatheringResultsAtLevel).mockReturnValue([
+      { chance: 5, items: [{ itemId: oreId, quantity: 1 }] },
+    ] as never);
+    vi.mocked(townWorkerAssignmentIsValid).mockReturnValue(true);
+    vi.mocked(townMaterialAtOrAboveThreshold).mockReturnValue(true);
     vi.mocked(rngChoiceWeighted).mockImplementation((items) =>
       items.length > 0 ? items[0] : undefined,
     );

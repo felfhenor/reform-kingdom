@@ -49,7 +49,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     gathering: {
       gatherRateMultiplier: 1,
       goldGatheredPerMaterial: 1,
-      goldRequiredBeforeCutoff: 1,
+      materialThresholds: [],
       workers: [
         { workerId: darwinId, level: 1 },
         { workerId: talbotId, level: 2 },

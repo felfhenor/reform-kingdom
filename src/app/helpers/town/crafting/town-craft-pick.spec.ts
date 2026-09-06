@@ -12,10 +12,21 @@ vi.mock('@helpers/town/crafting/town-craft-eligibility', () => ({
   isRecipeCraftableByTown: vi.fn(),
 }));
 
+vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
+  townSpecialtyPriority: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/town/crafting/town-craft-priority-weight', () => ({
+  townItemPriorityMap: vi.fn(() => ({ weightByItem: {}, reservedByItem: {} })),
+  townItemPriorityWeightFromMap: vi.fn(() => 1),
+  townRecipeRespectsReservationsFromMap: vi.fn(() => true),
+}));
+
 import { getEntriesByType } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
+import { townRecipeRespectsReservationsFromMap } from '@helpers/town/crafting/town-craft-priority-weight';
 import type {
   RecipeContent,
   RecipeId,
@@ -29,7 +40,11 @@ const blacksmithingId = 'blacksmithing' as TradeskillId;
 const woodworkingId = 'woodworking' as TradeskillId;
 
 function buildRecipe(id: string, tradeskillId = blacksmithingId): RecipeContent {
-  return { id: id as RecipeId, tradeskillId } as RecipeContent;
+  return {
+    id: id as RecipeId,
+    tradeskillId,
+    requirements: [],
+  } as unknown as RecipeContent;
 }
 
 function buildTown(specialtyTradeskillId: TradeskillId): TownContent {
@@ -92,5 +107,20 @@ describe('townPickRecipeToQueue', () => {
     townPickRecipeToQueue(buildTown(woodworkingId));
 
     expect(weightFn(specialtyRecipe)).toBeGreaterThan(weightFn(otherRecipe));
+  });
+
+  it('excludes a craftable recipe that would violate a priority reservation', () => {
+    const reserved = buildRecipe('a');
+    const free = buildRecipe('b');
+    vi.mocked(getEntriesByType).mockReturnValue([reserved, free]);
+    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
+    vi.mocked(townRecipeRespectsReservationsFromMap).mockImplementation(
+      (_map, _townId, recipe) => recipe.id === free.id,
+    );
+    vi.mocked(rngChoiceWeighted).mockImplementation((choices) => choices[0]);
+
+    townPickRecipeToQueue(buildTown(blacksmithingId));
+
+    expect(rngChoiceWeighted).toHaveBeenCalledWith([free], expect.any(Function));
   });
 });

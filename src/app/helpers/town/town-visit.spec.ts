@@ -73,6 +73,7 @@ describe('townMarkVisited', () => {
       tradeskills: {},
       craftQueue: [],
       commissionSlots: [],
+      specialtyPriority: [],
       firstVisitedAtTick: 500,
     });
   });
@@ -118,6 +119,7 @@ describe('townMarkVisited', () => {
       tradeskills: {},
       craftQueue: [],
       commissionSlots: [],
+      specialtyPriority: [],
       firstVisitedAtTick: 500,
     });
   });

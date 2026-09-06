@@ -73,6 +73,16 @@ export function worldNodeMapsBuild(
 
 export const worldNodeLookup = computed(() => worldNodeMapsBuild(allMaps()));
 
+// Grouped once per map load (nodes never change at runtime, only visibility) instead of re-filtering all nodes on every worldNodesOfType call.
+const worldNodesByType = computed(() => {
+  const grouped: Partial<Record<WorldNodeType, WorldNodeEntry[]>> = {};
+  Object.values(worldNodeLookup().byName).forEach((entry) => {
+    const type = entry.nodeData.type as WorldNodeType;
+    (grouped[type] ??= []).push(entry);
+  });
+  return grouped;
+});
+
 export function worldNodeAt(
   mapName: string,
   x: number,
@@ -86,9 +96,7 @@ export function worldNodeByName(nodeName: string): WorldNodeEntry | undefined {
 }
 
 export function worldNodesOfType(type: WorldNodeType): WorldNodeEntry[] {
-  return Object.values(worldNodeLookup().byName).filter(
-    (entry) => entry.nodeData.type === type,
-  );
+  return worldNodesByType()[type] ?? [];
 }
 
 // Returns the WorldNodeEntry (not a bare CurrentLocation) - callers need both its

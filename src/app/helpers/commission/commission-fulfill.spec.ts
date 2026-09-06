@@ -77,6 +77,7 @@ import type {
   ItemId,
   MonsterContent,
   MonsterId,
+  RecipeId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -100,6 +101,7 @@ const offer: CommissionOfferContent = {
     },
   ],
   townReputationReward: 0,
+  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
 };
 
 const wergenStick: ItemContent = {

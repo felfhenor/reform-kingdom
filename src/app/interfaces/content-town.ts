@@ -4,6 +4,7 @@ import type {
   CommissionOfferSlot,
 } from '@interfaces/content-caravan';
 import type { GlobalEffectId } from '@interfaces/content-globaleffect';
+import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
@@ -61,11 +62,20 @@ export type TownGatheringWorker = {
   level: number;
 };
 
+// A soft per-town cap on one item - once reached, gathering/commissions stop prioritizing it (deposits still exceed it freely).
+export type TownMaterialThreshold = {
+  itemId: ItemId;
+  maxQuantity: number;
+};
+
+// A town's materialThresholds array flattened to a hash for O(1) per-item lookup - see townMaterialThresholdHash.
+export type TownMaterialThresholdHash = Partial<Record<ItemId, number>>;
+
 export type TownGatheringConfig = {
   gatherRateMultiplier: number;
-  // Hidden gold accrual rate: gold += goldGatheredPerMaterial per material gathered, capped at goldRequiredBeforeCutoff.
+  // Hidden gold accrual rate: gold += goldGatheredPerMaterial per material gathered, capped via materialThresholds (see townGoldThreshold).
   goldGatheredPerMaterial: number;
-  goldRequiredBeforeCutoff: number;
+  materialThresholds: TownMaterialThreshold[];
   workers: TownGatheringWorker[];
 };
 

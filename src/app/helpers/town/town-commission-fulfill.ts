@@ -11,6 +11,7 @@ import {
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { townReputationGain } from '@helpers/town/reputation/town-reputation';
+import { depositCommissionRequirementsToTown } from '@helpers/town/town-materials';
 import { isPartyAtTown } from '@helpers/town/town-visit';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
@@ -141,6 +142,7 @@ export async function townCommissionFulfill(
     reputationAmount = offer?.townReputationReward ?? 0;
 
     spendCommissionRequirements(s, slot.requirements);
+    depositCommissionRequirementsToTown(s, townId, slot.requirements);
     target.commissionSlots = target.commissionSlots.filter(
       (entry) => entry.id !== slotId,
     );

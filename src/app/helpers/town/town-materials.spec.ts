@@ -12,10 +12,11 @@ import { getEntry } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import {
   applyTownMaterialDelta,
+  depositCommissionRequirementsToTown,
   pruneInvalidTownMaterials,
   townMaterialQuantity,
 } from '@helpers/town/town-materials';
-import type { GameState, ItemId, TownId } from '@interfaces';
+import type { EquipmentId, GameState, ItemId, TownId } from '@interfaces';
 
 const townId = 'larsia' as TownId;
 const oreId = 'copper-ore' as ItemId;
@@ -74,6 +75,29 @@ describe('townMaterialQuantity', () => {
     vi.mocked(gamestate).mockReturnValue(buildState({}));
 
     expect(townMaterialQuantity(townId, oreId)).toBe(0);
+  });
+});
+
+describe('depositCommissionRequirementsToTown', () => {
+  it('adds each item requirement to the town materials stash', () => {
+    const state = buildState({ [oreId]: 3 });
+
+    depositCommissionRequirementsToTown(state, townId, [
+      { itemId: oreId, quantity: 5 },
+    ]);
+
+    expect(state.world.towns[townId].materials).toEqual({ [oreId]: 8 });
+  });
+
+  it('skips equipment and monster-kill requirements', () => {
+    const state = buildState({});
+
+    depositCommissionRequirementsToTown(state, townId, [
+      { equipmentId: 'sword' as EquipmentId, quantity: 1 },
+      { monsterId: 'wolf' as never, quantity: 1, progress: 1 },
+    ]);
+
+    expect(state.world.towns[townId].materials).toEqual({});
   });
 });
 

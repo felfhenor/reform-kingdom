@@ -553,4 +553,45 @@ describe('travelPathFrom', () => {
       travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Nowhere'),
     ).toBeUndefined();
   });
+
+  it('caches by (origin, destination) - a repeat query does not re-resolve the destination node', () => {
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
+    );
+    const maps = new Map<string, GameMap>([
+      ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
+    ]);
+    vi.mocked(allMaps).mockReturnValue(maps);
+
+    const first = travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
+    const callsAfterFirst = vi.mocked(worldNodeByName).mock.calls.length;
+    const second = travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
+
+    expect(second).toBe(first);
+    expect(vi.mocked(worldNodeByName).mock.calls.length).toBe(callsAfterFirst);
+  });
+
+  it('invalidates the cache once allMaps() actually changes', () => {
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
+    );
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([
+        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
+      ]),
+    );
+    travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
+    const callsAfterFirst = vi.mocked(worldNodeByName).mock.calls.length;
+
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([
+        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
+      ]),
+    );
+    travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
+
+    expect(vi.mocked(worldNodeByName).mock.calls.length).toBeGreaterThan(
+      callsAfterFirst,
+    );
+  });
 });

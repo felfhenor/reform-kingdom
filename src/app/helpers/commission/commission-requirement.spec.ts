@@ -38,6 +38,7 @@ import type {
   ItemId,
   MonsterContent,
   MonsterId,
+  RecipeId,
 } from '@interfaces';
 
 const offer: CommissionOfferContent = {
@@ -50,6 +51,7 @@ const offer: CommissionOfferContent = {
   ],
   rewards: [],
   townReputationReward: 0,
+  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
 };
 
 const wergenStick: ItemContent = {

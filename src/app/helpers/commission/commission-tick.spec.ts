@@ -46,6 +46,7 @@ import type {
   GameStateCommissions,
   ItemId,
   MonsterId,
+  RecipeId,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -74,6 +75,7 @@ const offer: CommissionOfferContent = {
   ],
   rewards: [],
   townReputationReward: 0,
+  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
 };
 
 function withCommissionState(commissions: Record<string, unknown>): void {

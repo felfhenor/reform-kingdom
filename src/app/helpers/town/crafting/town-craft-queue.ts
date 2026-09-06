@@ -2,8 +2,9 @@ import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
-import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
+import { resetTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
+import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
 import {
   RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER,
   townCraftTimeFor,
@@ -75,6 +76,7 @@ function resolveQueueEntryCompletion(
   }
 
   grantCraftedResult(state, town.id, recipe);
+  resetTownSpecialtyPriority(target, recipe.id);
 
   return true;
 }

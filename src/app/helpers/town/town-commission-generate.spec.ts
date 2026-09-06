@@ -8,6 +8,7 @@ vi.mock('@helpers/commission/commission-requirement', () => ({
 
 vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
+  getEntry: vi.fn(),
 }));
 
 vi.mock('@helpers/engine/timer', () => ({
@@ -36,11 +37,24 @@ vi.mock('@helpers/town/town-tick', () => ({
   markTownSubsystemProcessed: vi.fn(),
 }));
 
+vi.mock('@helpers/town/town-resource-thresholds', () => ({
+  townMaterialAtOrAboveThreshold: vi.fn(() => false),
+}));
+
+vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
+  townSpecialtyPriority: vi.fn(() => []),
+}));
+
+vi.mock('@helpers/town/crafting/town-craft-priority-weight', () => ({
+  townItemPriorityMap: vi.fn(() => ({ weightByItem: {}, reservedByItem: {} })),
+  townCommissionPriorityWeightFromMap: vi.fn(() => 1),
+}));
+
 import {
   eligibleCommissionOffers,
   rollCommissionRequirements,
 } from '@helpers/commission/commission-requirement';
-import { getEntriesByType } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import {
@@ -48,6 +62,7 @@ import {
   townCommissionSlotCount,
 } from '@helpers/town/town-commission-generate';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
+import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -58,6 +73,7 @@ import type {
   EligibleCommissionOffer,
   GameState,
   ItemId,
+  RecipeId,
   TownCommissionOfferSlot,
   TownContent,
   TownId,
@@ -98,6 +114,7 @@ const offer: CommissionOfferContent = {
   ],
   rewards: [],
   townReputationReward: 0,
+  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
 };
 
 const persistentOffer: CommissionOfferContent = {
@@ -142,6 +159,7 @@ describe('townCommissionProcessTick', () => {
     vi.mocked(getEntriesByType).mockReturnValue([town]);
     vi.mocked(townReputationTier).mockReturnValue(0);
     vi.mocked(isTownDueForUpdate).mockReturnValue(true);
+    vi.mocked(townMaterialAtOrAboveThreshold).mockReturnValue(false);
     stubEligibleOffers([offer]);
   });
 
@@ -210,7 +228,7 @@ describe('townCommissionProcessTick', () => {
     expect(state.world.towns[town.id].commissionSlots).toHaveLength(1);
   });
 
-  it('does not roll the same offer into two slots in the same tick', () => {
+  it('adds at most one new rolled commission per tick - slots trickle in rather than filling at once', () => {
     const offerB: CommissionOfferContent = {
       ...offer,
       id: 'offer-b' as CommissionOfferId,
@@ -228,18 +246,56 @@ describe('townCommissionProcessTick', () => {
     );
     vi.mocked(rollCommissionRequirements).mockReturnValue([]);
 
+    const state = {
+      world: { towns: { [twoSlotTown.id]: { commissionSlots: [] } } },
+    } as unknown as GameState;
+
+    townCommissionProcessTick();
+    vi.mocked(updateGamestate).mock.calls[0][0](state);
+
+    expect(
+      state.world.towns[twoSlotTown.id].commissionSlots.map(
+        (slot: { commissionOfferId: string }) => slot.commissionOfferId,
+      ),
+    ).toEqual([offer.id]);
+
+    townCommissionProcessTick();
+    vi.mocked(updateGamestate).mock.calls[1][0](state);
+
+    expect(
+      state.world.towns[twoSlotTown.id].commissionSlots.map(
+        (slot: { commissionOfferId: string }) => slot.commissionOfferId,
+      ),
+    ).toEqual([offer.id, offerB.id]);
+  });
+
+  it('skips resolving any commission content when the town is already fully stocked', () => {
+    vi.mocked(getEntriesByType).mockReturnValue([town]);
+
     townCommissionProcessTick();
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const state = {
-      world: { towns: { [twoSlotTown.id]: { commissionSlots: [] } } },
+      world: {
+        towns: {
+          [town.id]: {
+            commissionSlots: [
+              {
+                id: 'existing',
+                commissionOfferId: offer.id,
+                requirements: [],
+                generatedAtTick: 0,
+              },
+            ],
+          },
+        },
+      },
     } as unknown as GameState;
     updateFn(state);
 
-    const offerIds = state.world.towns[twoSlotTown.id].commissionSlots.map(
-      (slot: { commissionOfferId: string }) => slot.commissionOfferId,
-    );
-    expect(offerIds).toEqual([offer.id, offerB.id]);
+    expect(eligibleCommissionOffers).not.toHaveBeenCalled();
+    expect(rngChoiceWeighted).not.toHaveBeenCalled();
+    expect(state.world.towns[town.id].commissionSlots).toHaveLength(1);
   });
 
   it('excludes an offer that already has a live slot from the weighted roll pool', () => {
@@ -302,6 +358,21 @@ describe('townCommissionProcessTick', () => {
     expect(state.world.towns[town.id].commissionSlots).toEqual([]);
   });
 
+  it('excludes an offer with an item requirement at/above its town threshold', () => {
+    vi.mocked(townMaterialAtOrAboveThreshold).mockReturnValue(true);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
+
+    townCommissionProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = {
+      world: { towns: { [town.id]: { commissionSlots: [] } } },
+    } as unknown as GameState;
+    updateFn(state);
+
+    expect(rngChoiceWeighted).toHaveBeenCalledWith([], expect.any(Function));
+  });
+
   it('no-ops when the town has no state entry yet', () => {
     townCommissionProcessTick();
 
@@ -322,6 +393,7 @@ describe('townCommissionProcessTick', () => {
     });
 
     it('adds a slot for a persistent offer even when no rolled offer is eligible', () => {
+      vi.mocked(getEntry).mockReturnValue(persistentOffer);
       vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
       vi.mocked(rollCommissionRequirements).mockReturnValue([]);
 

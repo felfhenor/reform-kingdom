@@ -23,6 +23,7 @@ import type {
   EquipmentItem,
   GameState,
   ItemId,
+  RecipeId,
 } from '@interfaces';
 
 describe('spendCommissionRequirements', () => {
@@ -92,6 +93,7 @@ describe('grantCommissionRewards', () => {
         { kind: 'Item', itemId: 'trader-token' as ItemId, chance: 100, min: 2, max: 2 },
       ],
       townReputationReward: 0,
+      specialtyForRecipeId: 'UNKNOWN' as RecipeId,
     };
     vi.mocked(rollDroppedRewards).mockReturnValue([
       { kind: 'Item', itemId: 'trader-token' as ItemId, quantity: 2 },

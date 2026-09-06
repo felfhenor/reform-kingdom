@@ -1,0 +1,22 @@
+- id: 5e011569-7329-48ef-9b41-1188b40c3c63
+  name: Commission - Larsian Rings
+  description: Larsia needs materials to craft a set of its specialty rings.
+
+  specialtyForRecipeId: 'Equipment: Larsian Ring'
+
+  requirements:
+    - itemId: Cactspine
+      quantityMin: 8
+      quantityMax: 8
+
+    - itemId: Petrifiwood
+      quantityMin: 8
+      quantityMax: 8
+
+    - itemId: Brightwisp Core
+      quantityMin: 4
+      quantityMax: 4
+
+  rewards: []
+
+  townReputationReward: 30

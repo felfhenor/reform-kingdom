@@ -16,6 +16,7 @@ import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
+import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
 import { runTradeskillXpGapsAnalysis } from '@helpers/debug/analysis-tradeskillxpgaps';
 import { runWorkerReachabilityAnalysis } from '@helpers/debug/analysis-workerreachability';
 import { runWorkerStaminaAnalysis } from '@helpers/debug/analysis-workerstamina';
@@ -219,6 +220,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runCommissionRewardsAnalysis,
+  },
+  {
+    id: 'townmaterialthresholds',
+    title: 'Town Material Thresholds',
+    description:
+      'Every item a town\'s assigned commissions request has a materialThresholds entry for that town.',
+    category: 'Caravans & Commissions',
+    strict: true,
+    inputKeys: [],
+    run: runTownMaterialThresholdsAnalysis,
   },
 
   // --- Hero Stats ---

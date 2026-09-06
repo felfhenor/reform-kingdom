@@ -257,7 +257,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     gathering: {
       gatherRateMultiplier: 1,
       goldGatheredPerMaterial: 0,
-      goldRequiredBeforeCutoff: 0,
+      materialThresholds: [],
       workers: [],
     },
     reputation: { buff: { name: 'UNKNOWN', tiers: [] } },

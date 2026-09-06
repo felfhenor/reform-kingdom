@@ -73,7 +73,37 @@
   gathering:
     gatherRateMultiplier: 5
     goldGatheredPerMaterial: 5
-    goldRequiredBeforeCutoff: 25000
+
+    materialThresholds:
+      - itemId: Gold Coin
+        maxQuantity: 25000
+
+      - itemId: Cactspine
+        maxQuantity: 300
+
+      - itemId: Petrifiwood
+        maxQuantity: 300
+
+      - itemId: Brightwisp Core
+        maxQuantity: 300
+
+      - itemId: Firmwater
+        maxQuantity: 300
+
+      - itemId: Timberfuzz
+        maxQuantity: 300
+
+      - itemId: Strongreed
+        maxQuantity: 300
+
+      - itemId: Amber
+        maxQuantity: 300
+
+      - itemId: Cimmerian Dust
+        maxQuantity: 300
+
+      - itemId: Preserved Bloodmoth
+        maxQuantity: 300
 
     workers:
       - workerId: Darwin Nork
@@ -194,6 +224,9 @@
       commissions:
         - commissionOfferId: Commission - Larsian Coffers
           persistent: true
+          weight: 1
+
+        - commissionOfferId: Commission - Larsian Rings
           weight: 1
 
         - commissionOfferId: Commission - Firmwater

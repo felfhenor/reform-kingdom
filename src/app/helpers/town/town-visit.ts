@@ -41,6 +41,7 @@ export function townMarkVisited(townId: TownId): void {
       ),
       craftQueue: existing?.craftQueue ?? [],
       commissionSlots: existing?.commissionSlots ?? [],
+      specialtyPriority: existing?.specialtyPriority ?? [],
       firstVisitedAtTick: timerTicksElapsed(),
     };
     return state;

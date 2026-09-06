@@ -1,3 +1,4 @@
+import { townGoldThreshold } from '@helpers/town/town-resource-thresholds';
 import type { GameState, TownContent, TownId } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -13,6 +14,6 @@ export function applyTownAccrueHiddenGold(
   target.hiddenGold = clamp(
     target.hiddenGold + amount,
     0,
-    town.gathering.goldRequiredBeforeCutoff,
+    townGoldThreshold(town),
   );
 }

@@ -1,6 +1,7 @@
 import { getEntry } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import type {
+  CommissionRequirement,
   GameState,
   ItemContent,
   ItemId,
@@ -28,6 +29,18 @@ export function applyTownMaterialDelta(
 
 export function townMaterialQuantity(townId: TownId, itemId: ItemId): number {
   return gamestate().world.towns[townId]?.materials[itemId] ?? 0;
+}
+
+// Item requirements only - a town has no armory or kill tally to credit equipment/monster-kill requirements to.
+export function depositCommissionRequirementsToTown(
+  state: GameState,
+  townId: TownId,
+  requirements: CommissionRequirement[],
+): void {
+  requirements.forEach((requirement) => {
+    if (!('itemId' in requirement)) return;
+    applyTownMaterialDelta(state, townId, requirement.itemId, requirement.quantity);
+  });
 }
 
 // Drops entries whose itemId no longer resolves - mirrors pruneInvalidTownStock/pruneInvalidMaterials.

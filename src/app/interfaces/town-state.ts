@@ -13,7 +13,8 @@ import type { ItemPreviewDisplay } from '@interfaces/item-preview';
 import type { TownWorkerState } from '@interfaces/town-worker-state';
 
 // Each subsystem gates off its own key here, not a single shared tick field, so a fast one can't starve a slow one's due-check.
-export type TownTickSubsystem = 'worker' | 'craft' | 'raid' | 'quest' | 'shop';
+export type TownTickSubsystem =
+  'worker' | 'craft' | 'raid' | 'quest' | 'shop' | 'specialty';
 
 export type TownStockEntry = {
   equipmentItem: EquipmentItem;
@@ -45,6 +46,21 @@ export type TownRecipePick = {
   recipe: RecipeContent;
 };
 
+// A specialty recipe the town has repeatedly failed to craft - failureCount escalates gathering/commission bias toward it, removed once actually crafted.
+export type TownSpecialtyPriorityEntry = {
+  recipeId: RecipeId;
+  failureCount: number;
+};
+
+// A town's specialtyPriority flattened to per-item lookups (townItemPriorityMap) - built once per scan instead of
+// rescanning the priority list per candidate item, which matters when scanning every gatherable across every node.
+export type TownItemPriorityMap = {
+  weightByItem: Partial<Record<ItemId, number>>;
+  reservedByItem: Partial<
+    Record<ItemId, { total: number; byRecipe: Partial<Record<RecipeId, number>> }>
+  >;
+};
+
 export type TownCommissionSlotId = Branded<string, 'TownCommissionSlotId'>;
 
 // Unlike a caravan's single commission, a town holds several simultaneous slots that persist until turned in - a fulfilled one is removed outright, not flagged, and the next tick refills the opening.
@@ -63,7 +79,7 @@ export type TownNodeState = {
   workers: Record<WorkerId, TownWorkerState>;
   // Cumulative - never decreases except an explicit raid-loss penalty (Phase 9).
   reputation: number;
-  // Hidden gold trickle from worker gathering - capped at TownGatheringConfig.goldRequiredBeforeCutoff.
+  // Hidden gold trickle from worker gathering - capped via townGoldThreshold (the materialThresholds entry keyed by the real Gold Coin item).
   hiddenGold: number;
   materials: TownMaterials;
   // Nested here (not a root GameState map like the player's tradeskills) so per-town subsystems stay co-located.
@@ -71,6 +87,7 @@ export type TownNodeState = {
   // Combined across all tradeskills (not one queue per tradeskill) - entries tick simultaneously, mirroring multiple workers crafting in tandem.
   craftQueue: TownCraftQueueEntry[];
   commissionSlots: TownCommissionSlotState[];
+  specialtyPriority: TownSpecialtyPriorityEntry[];
   // Undefined = no raid currently pending. Set together by townRaidProcessTick's telegraph step, cleared together on engage/resolve.
   raidTelegraphedAtTick?: number;
   raidEngageWindowExpiresAtTick?: number;

@@ -28,6 +28,7 @@ import {
 import { getOption } from '@helpers/state-options';
 import { townCommissionProcessTick } from '@helpers/town/town-commission-generate';
 import { townCraftProcessTick } from '@helpers/town/crafting/town-craft-queue';
+import { townSpecialtyPriorityProcessTick } from '@helpers/town/crafting/town-craft-priority-state';
 import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
 import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
 import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
@@ -87,6 +88,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       restingProcessTick();
       workersProcessTick();
       townWorkerProcessTick();
+      townSpecialtyPriorityProcessTick();
       townCraftProcessTick();
       townShopProcessTick();
       townRaidProcessTick();
