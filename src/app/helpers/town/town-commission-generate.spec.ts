@@ -210,6 +210,80 @@ describe('townCommissionProcessTick', () => {
     expect(state.world.towns[town.id].commissionSlots).toHaveLength(1);
   });
 
+  it('does not roll the same offer into two slots in the same tick', () => {
+    const offerB: CommissionOfferContent = {
+      ...offer,
+      id: 'offer-b' as CommissionOfferId,
+      name: 'Commission - Offer B',
+    };
+    const twoSlotTown = buildTown([
+      { commissionOfferId: offer.id, weight: 1, persistent: false },
+      { commissionOfferId: offerB.id, weight: 1, persistent: false },
+    ]);
+    vi.mocked(townReputationTier).mockReturnValue(1); // 2 slots
+    vi.mocked(getEntriesByType).mockReturnValue([twoSlotTown]);
+    stubEligibleOffers([offer, offerB]);
+    vi.mocked(rngChoiceWeighted).mockImplementation(
+      (candidates) => (candidates as EligibleCommissionOffer[])[0],
+    );
+    vi.mocked(rollCommissionRequirements).mockReturnValue([]);
+
+    townCommissionProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = {
+      world: { towns: { [twoSlotTown.id]: { commissionSlots: [] } } },
+    } as unknown as GameState;
+    updateFn(state);
+
+    const offerIds = state.world.towns[twoSlotTown.id].commissionSlots.map(
+      (slot: { commissionOfferId: string }) => slot.commissionOfferId,
+    );
+    expect(offerIds).toEqual([offer.id, offerB.id]);
+  });
+
+  it('excludes an offer that already has a live slot from the weighted roll pool', () => {
+    const offerB: CommissionOfferContent = {
+      ...offer,
+      id: 'offer-b' as CommissionOfferId,
+      name: 'Commission - Offer B',
+    };
+    const twoOfferTown = buildTown([
+      { commissionOfferId: offer.id, weight: 1, persistent: false },
+      { commissionOfferId: offerB.id, weight: 1, persistent: false },
+    ]);
+    vi.mocked(townReputationTier).mockReturnValue(1); // 2 slots - so the existing slot doesn't already satisfy the cap
+    vi.mocked(getEntriesByType).mockReturnValue([twoOfferTown]);
+    stubEligibleOffers([offer, offerB]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
+
+    townCommissionProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = {
+      world: {
+        towns: {
+          [twoOfferTown.id]: {
+            commissionSlots: [
+              {
+                id: 'existing',
+                commissionOfferId: offer.id,
+                requirements: [],
+                generatedAtTick: 0,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState;
+    updateFn(state);
+
+    expect(rngChoiceWeighted).toHaveBeenCalledWith(
+      [{ offer: offerB, weight: 1 }],
+      expect.any(Function),
+    );
+  });
+
   it('stops retrying once no eligible offer can be picked', () => {
     vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
 

@@ -93,7 +93,12 @@ function fillEmptyCommissionSlots(
     ).length;
 
   while (rolledSlotCount() < maxSlots) {
-    const picked = rngChoiceWeighted(rolled, (o) => o.weight);
+    // Recomputed every iteration so an offer just rolled into a slot can't be rolled again this same tick.
+    const activeOfferIds = new Set(
+      target.commissionSlots.map((slot) => slot.commissionOfferId),
+    );
+    const candidates = rolled.filter((o) => !activeOfferIds.has(o.offer.id));
+    const picked = rngChoiceWeighted(candidates, (o) => o.weight);
     if (!picked) return; // no eligible offer - stop retrying this tick
 
     addCommissionSlot(target, picked.offer);
