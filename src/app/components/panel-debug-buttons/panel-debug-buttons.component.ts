@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonContentAnalysisComponent } from '@components/button-content-analysis/button-content-analysis.component';
 import { ButtonIconsComponent } from '@components/button-icons/button-icons.component';
+import { getOption } from '@helpers/state-options';
 
 @Component({
   selector: 'app-panel-debug-buttons',
@@ -8,5 +9,10 @@ import { ButtonIconsComponent } from '@components/button-icons/button-icons.comp
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './panel-debug-buttons.component.html',
   styleUrl: './panel-debug-buttons.component.scss',
+  host: {
+    '[class.!hidden]': '!debugEnabled()',
+  },
 })
-export class PanelDebugButtonsComponent {}
+export class PanelDebugButtonsComponent {
+  public debugEnabled = computed(() => getOption('showDebug'));
+}

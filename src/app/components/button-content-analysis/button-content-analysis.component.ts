@@ -1,7 +1,6 @@
-import { Component, computed, HostBinding, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SFXDirective } from '@directives/sfx.directive';
-import { getOption } from '@helpers/state-options';
 
 @Component({
   selector: 'app-button-content-analysis',
@@ -11,13 +10,6 @@ import { getOption } from '@helpers/state-options';
 })
 export class ButtonContentAnalysisComponent {
   private router = inject(Router);
-
-  public debugEnabled = computed(() => getOption('showDebug'));
-
-  @HostBinding('class.hidden')
-  get hideButton() {
-    return !this.debugEnabled();
-  }
 
   public open() {
     const url = this.router.serializeUrl(this.router.createUrlTree(['/debug']));
