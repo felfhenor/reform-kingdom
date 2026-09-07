@@ -1,9 +1,5 @@
 import {
   combatOrderConditionMatches,
-  isCombatOrderFamilyEquipmentOnly,
-  isCombatOrderFamilyKnown,
-  isCombatOrderFamilyUsable,
-  isCombatOrderTargetModeUsable,
   pickSkillFromCombatOrders,
   resolveFamilyToSkill,
 } from '@helpers/combat/combat-order-evaluation';
@@ -12,7 +8,6 @@ import type {
   Combatant,
   CombatOrderCondition,
   EquipmentSkill,
-  EquipmentSkillContent,
   EquipmentSkillContentTechnique,
 } from '@interfaces';
 import { describe, expect, it } from 'vitest';
@@ -557,121 +552,5 @@ describe('pickSkillFromCombatOrders', () => {
     });
 
     expect(pickSkillFromCombatOrders(combat, combatant, [])).toBeUndefined();
-  });
-});
-
-describe('isCombatOrderFamilyKnown', () => {
-  it('is true when a skill with the family exists in the given list', () => {
-    const skills = [buildSkill({ family: 'Cure' }) as EquipmentSkillContent];
-    expect(isCombatOrderFamilyKnown('Cure', skills)).toBe(true);
-    expect(isCombatOrderFamilyKnown('Fireball', skills)).toBe(false);
-  });
-});
-
-describe('isCombatOrderFamilyUsable', () => {
-  it('is true only when the family is known and its weapon requirement is met', () => {
-    const skills = [
-      buildSkill({
-        family: 'Snipe',
-        requiredWeaponTypes: ['Bow'],
-      }) as EquipmentSkillContent,
-    ];
-
-    expect(isCombatOrderFamilyUsable('Snipe', skills, ['Bow'])).toBe(true);
-    expect(isCombatOrderFamilyUsable('Snipe', skills, ['Sword'])).toBe(false);
-    expect(isCombatOrderFamilyUsable('Cure', skills, ['Bow'])).toBe(false);
-  });
-});
-
-describe('isCombatOrderFamilyEquipmentOnly', () => {
-  it('is true when the family is absent from the job-only skill list', () => {
-    const jobOnlySkills = [
-      buildSkill({ family: 'Attack' }) as EquipmentSkillContent,
-    ];
-
-    expect(isCombatOrderFamilyEquipmentOnly('Starshine', jobOnlySkills)).toBe(
-      true,
-    );
-    expect(isCombatOrderFamilyEquipmentOnly('Attack', jobOnlySkills)).toBe(
-      false,
-    );
-  });
-});
-
-describe('isCombatOrderTargetModeUsable', () => {
-  it('is true for Random/Strongest/Weakest/default regardless of the family', () => {
-    const skills = [
-      buildSkill({
-        family: 'Fireball',
-        techniques: [buildTechnique({ targetType: 'Enemies' })],
-      }) as EquipmentSkillContent,
-    ];
-
-    expect(isCombatOrderTargetModeUsable('Fireball', skills, undefined)).toBe(
-      true,
-    );
-    expect(isCombatOrderTargetModeUsable('Fireball', skills, 'Random')).toBe(
-      true,
-    );
-  });
-
-  it('is false for Self when every technique is Enemies-only', () => {
-    const skills = [
-      buildSkill({
-        family: 'Fireball',
-        techniques: [buildTechnique({ targetType: 'Enemies' })],
-      }) as EquipmentSkillContent,
-    ];
-
-    expect(isCombatOrderTargetModeUsable('Fireball', skills, 'Self')).toBe(
-      false,
-    );
-  });
-
-  it('is true for Self when a technique can include the caster', () => {
-    const skills = [
-      buildSkill({
-        family: 'Fortify',
-        techniques: [buildTechnique({ targetType: 'Allies' })],
-      }) as EquipmentSkillContent,
-    ];
-
-    expect(isCombatOrderTargetModeUsable('Fortify', skills, 'Self')).toBe(true);
-  });
-
-  it('is false for SpecificHero/MatchingAllies when every technique is Enemies or Self only', () => {
-    const skills = [
-      buildSkill({
-        family: 'Ward',
-        techniques: [buildTechnique({ targetType: 'Self' })],
-      }) as EquipmentSkillContent,
-    ];
-
-    expect(isCombatOrderTargetModeUsable('Ward', skills, 'SpecificHero')).toBe(
-      false,
-    );
-    expect(
-      isCombatOrderTargetModeUsable('Ward', skills, 'MatchingAllies'),
-    ).toBe(false);
-  });
-
-  it('is true for SpecificHero/MatchingAllies when a technique can hit another ally', () => {
-    const skills = [
-      buildSkill({
-        family: 'Starshine',
-        techniques: [buildTechnique({ targetType: 'Allies' })],
-      }) as EquipmentSkillContent,
-    ];
-
-    expect(
-      isCombatOrderTargetModeUsable('Starshine', skills, 'SpecificHero'),
-    ).toBe(true);
-    expect(
-      isCombatOrderTargetModeUsable('Starshine', skills, 'MatchingAllies'),
-    ).toBe(true);
-  });
-
-  it('is true when the family is unknown (other warnings already cover that case)', () => {
-    expect(isCombatOrderTargetModeUsable('Unknown', [], 'Self')).toBe(true);
   });
 });

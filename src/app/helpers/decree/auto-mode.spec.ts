@@ -19,10 +19,6 @@ vi.mock('@helpers/decree/decree-evaluation', () => ({
   pickNextClause: vi.fn(),
 }));
 
-vi.mock('@helpers/decree/decree-farm-node', () => ({
-  farmNodeRewardQuantity: vi.fn(() => 0),
-}));
-
 vi.mock('@helpers/item/gathering', () => ({
   gatheringStop: vi.fn(),
   isGathering: vi.fn(() => false),
@@ -68,10 +64,6 @@ vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
   worldNodeGatherMaterialIds: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  rewardContentInfo: vi.fn(),
-}));
-
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodeTown: vi.fn(() => undefined),
@@ -87,7 +79,6 @@ import {
   autoModeRecordNodeFailure,
   autoModeRecordNodeSuccess,
   autoModeResetNodeFailureCounts,
-  autoModeStatusLabel,
   autoModeToggle,
 } from '@helpers/decree/auto-mode';
 import {
@@ -99,7 +90,6 @@ import {
   isClauseBlockedOnlyByHealth,
   pickNextClause,
 } from '@helpers/decree/decree-evaluation';
-import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import {
   addGlobalEffect,
   isGlobalEffectActive,
@@ -114,7 +104,6 @@ import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeByName,
   worldNodeTown,
@@ -327,115 +316,6 @@ describe('autoModeResetNodeFailureCounts', () => {
 
     const result = applyLastUpdate(buildState({ nodeFailureCounts }));
     expect(result.world.autoMode.nodeFailureCounts).toEqual({});
-  });
-});
-
-describe('autoModeStatusLabel', () => {
-  it('is undefined when auto mode is off', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: false }));
-
-    expect(autoModeStatusLabel()).toBeUndefined();
-  });
-
-  it('is Idle when enabled with no active clause', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-
-    expect(autoModeStatusLabel()).toBe('Idle');
-  });
-
-  it('reports healing instead of Idle while waiting for full health', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-
-    expect(autoModeStatusLabel()).toBe('Healing before the next move...');
-  });
-
-  it('still reports Idle once healed even with the wait-for-health setting on', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
-
-    expect(autoModeStatusLabel()).toBe('Idle');
-  });
-
-  it('describes an active GatherMaterial clause with live stock', () => {
-    vi.mocked(getEntry).mockReturnValue({ name: 'Wood' } as ItemContent);
-    vi.mocked(getMaterialQuantity).mockReturnValue(3);
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wood' as MaterialId,
-      targetQuantity: 10,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
-    );
-
-    expect(autoModeStatusLabel()).toBe('Gathering Wood (3/10 in stock)...');
-  });
-
-  it('describes an active FarmNode clause with live reward progress', () => {
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Bone',
-      sprite: '0001',
-      spritesheet: 'item',
-    });
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(3);
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'FarmNode',
-      nodeName: 'Forest Ruins',
-      reward: { itemId: 'bone' as ItemId },
-      targetQuantity: 10,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
-    );
-
-    expect(autoModeStatusLabel()).toBe(
-      'Farming Forest Ruins for Bone (3/10)...',
-    );
-  });
-
-  it("describes an active LevelUpParty clause using the clause's risk tolerance", () => {
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'LevelUpParty',
-      riskTolerance: 'High',
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
-    );
-
-    expect(autoModeStatusLabel()).toBe('Leveling up (High risk)...');
-  });
-
-  it('describes an active targeted DefendTowns clause using the town name', () => {
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'DefendTowns',
-      riskTolerance: 'High',
-      townName: 'Larsia',
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
-    );
-
-    expect(autoModeStatusLabel()).toBe('Defending Larsia...');
-  });
-
-  it('describes an active untargeted DefendTowns clause as seeking a town', () => {
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'DefendTowns',
-      riskTolerance: 'High',
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ clauses: [clause], activeClauseId: 'a' as DecreeClauseId }),
-    );
-
-    expect(autoModeStatusLabel()).toBe('Seeking a town to defend...');
   });
 });
 

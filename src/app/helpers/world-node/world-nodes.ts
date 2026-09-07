@@ -3,10 +3,7 @@ import { getEntry } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import { tiledMapGetLayer } from '@helpers/pixi/tiled-map';
-import {
-  isWorldNodeDiscovered,
-  worldNodeDiscover,
-} from '@helpers/world-node/world-node-discovery';
+import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import type {
   CaravanContent,
   CollectibleId,
@@ -184,13 +181,6 @@ export function isWorldNodeCollectibleGateMet(entry: WorldNodeEntry): boolean {
 export function isWorldNodeVisible(entry: WorldNodeEntry): boolean {
   if (!isWorldNodeCollectibleGateMet(entry)) return false;
   return !isWorldNodeHidden(entry) || isWorldNodeDiscovered(entry.nodeName);
-}
-
-// Keeps the hidden/already-discovered check out of the map click handler.
-export function worldNodeDiscoverIfHidden(entry: WorldNodeEntry): void {
-  if (isWorldNodeHidden(entry) && !isWorldNodeDiscovered(entry.nodeName)) {
-    worldNodeDiscover(entry.nodeName);
-  }
 }
 
 // Masked to '???' when still hidden/undiscovered, so a location can't leak off-map.

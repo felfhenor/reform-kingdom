@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { combatLog } from '@helpers/combat/combat-log';
 import {
   adventureLogEntryHtml,
   adventureLogTimestampTooltip,
-  combatLog,
-} from '@helpers/combat/combat-log';
+} from '@helpers/combat/combat-log.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 import { TimeagoPipe } from 'ngx-timeago';
 

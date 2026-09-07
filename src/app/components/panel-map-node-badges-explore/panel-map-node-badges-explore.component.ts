@@ -7,11 +7,11 @@ import {
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { isMonsterDiscovered } from '@helpers/kingdom/bestiary';
+import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
 import {
-  worldNodeEncounterCount,
   worldNodeMonsterCount,
   worldNodeMonsters,
-} from '@helpers/world-node/world-node-encounter';
+} from '@helpers/world-node/world-node-encounter.ui';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import type { WorldNodeEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';

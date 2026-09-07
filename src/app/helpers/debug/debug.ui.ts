@@ -1,0 +1,358 @@
+import {
+  combatantsFromTownGuardians,
+  combatCreateForEncounter,
+} from '@helpers/combat/combat-create';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
+import {
+  isRecipeDropGated,
+  recipeDiscover,
+  recipeUndiscover,
+} from '@helpers/crafting/recipes';
+import {
+  TRADESKILL_MAX_LEVEL,
+  tradeskillBuildingIn,
+  tradeskillIdForName,
+  tradeskillXpForLevel,
+} from '@helpers/crafting/tradeskill';
+import {
+  CHARACTER_MAX_LEVEL,
+  characterStatsForLevel,
+  characterXpForLevel,
+  partyGet,
+} from '@helpers/hero/party';
+import { collectiblesAdd } from '@helpers/item/collectibles';
+import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
+import { addMaterial } from '@helpers/item/materials';
+import { armoryAdd } from '@helpers/kingdom/armory';
+import {
+  monsterEncounters,
+  monsterRecordKill,
+} from '@helpers/kingdom/bestiary';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
+import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
+import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
+import { townMarkVisited } from '@helpers/town/town-visit';
+import { workerRescue } from '@helpers/worker/worker-discovery';
+import {
+  WORKER_MAX_LEVEL,
+  workerXpForLevel,
+} from '@helpers/worker/worker-progression';
+import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
+import {
+  worldNodeByName,
+  worldNodeGathering,
+} from '@helpers/world-node/world-nodes';
+import {
+  type CharacterId,
+  type CollectibleContent,
+  type CollectibleId,
+  type EquipmentContent,
+  type EquipmentId,
+  type ItemContent,
+  type ItemId,
+  type MonsterContent,
+  type RecipeContent,
+  type RecipeId,
+  type TownContent,
+  type TownId,
+  type Tradeskill,
+  type WorkerContent,
+  type WorkerId,
+} from '@interfaces';
+import { clamp } from 'es-toolkit/compat';
+
+export function debugGiveItem(itemId: ItemId, quantity: number): void {
+  if (quantity <= 0) return;
+  const material = getEntry<ItemContent>(itemId);
+  if (!material) {
+    console.warn(`Item with ID ${itemId} not found.`);
+    return;
+  }
+
+  if (material.unobtainable) {
+    console.warn(`Item with ID ${itemId} not obtainable.`);
+    return;
+  }
+
+  addMaterial(material.id, quantity);
+}
+
+export function debugGiveEquipment(
+  equipmentId: EquipmentId,
+  quantity: number,
+): void {
+  if (quantity <= 0) return;
+
+  const equipment = getEntry<EquipmentContent>(equipmentId);
+  if (!equipment) {
+    console.warn(`Equipment with ID ${equipmentId} not found.`);
+    return;
+  }
+
+  if (equipment.unobtainable) {
+    console.warn(`Equipment with ID ${equipmentId} not obtainable.`);
+    return;
+  }
+
+  armoryAdd(equipment.id, quantity);
+}
+
+export function debugSetCharacterLevel(
+  characterId: CharacterId,
+  level: number,
+): void {
+  const clampedLevel = clamp(Math.round(level), 1, CHARACTER_MAX_LEVEL);
+
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((character) => {
+      if (character.id !== characterId) return character;
+
+      const stats = characterStatsForLevel(
+        character.jobId,
+        clampedLevel,
+        character.equipment,
+      );
+
+      return {
+        ...character,
+        level: clampedLevel,
+        xp: { current: 0, maximum: characterXpForLevel(clampedLevel) },
+        stats,
+        hp: clamp(character.hp, 0, stats.Health),
+        ep: clamp(character.ep, 0, stats.Energy),
+      };
+    });
+
+    return state;
+  });
+}
+
+export function debugSetTradeskillLevel(
+  tradeskill: Tradeskill,
+  level: number,
+): void {
+  const tradeskillId = tradeskillIdForName(tradeskill);
+  if (!tradeskillId) return;
+
+  const clampedLevel = clamp(Math.round(level), 1, TRADESKILL_MAX_LEVEL);
+
+  updateGamestate((state) => {
+    state.tradeskills[tradeskillId] = {
+      ...tradeskillBuildingIn(state, tradeskillId),
+      level: clampedLevel,
+      xp: { current: 0, maximum: tradeskillXpForLevel(clampedLevel) },
+    };
+
+    return state;
+  });
+}
+
+// Wipes every bestiary discovery/kill record - primarily a recovery tool
+// for a save whose bestiary data was corrupted by a since-fixed bug (e.g.
+// NaN level ranges from before min/max level tracking existed).
+export function debugResetBestiary(): void {
+  updateGamestate((state) => {
+    state.bestiary = {};
+    return state;
+  });
+}
+
+// Records a kill for every monster at every node/level it's fought at, so
+// the bestiary shows real stat spreads without fighting everything manually.
+export function debugFillBestiary(): void {
+  getEntriesByType<MonsterContent>('monster').forEach((monster) => {
+    const encounters = monsterEncounters(monster.id);
+
+    if (encounters.length === 0) {
+      monsterRecordKill(monster.id, 1);
+      return;
+    }
+
+    encounters.forEach((encounter) => {
+      monsterRecordKill(monster.id, encounter.levelRange.min, encounter.name);
+      monsterRecordKill(monster.id, encounter.levelRange.max, encounter.name);
+    });
+  });
+}
+
+// Clears every caravan's commission state so it regenerates on the next
+// visit/tick - a recovery tool for a commission stuck blank.
+export function debugResetCommissions(): void {
+  updateGamestate((state) => {
+    state.world.commissions = {};
+    return state;
+  });
+}
+
+// Marks a GatherNode as visited without walking the party there - workers can only be assigned to nodes discovered this way.
+export function debugDiscoverGatherNode(nodeName: string): void {
+  gatherNodeDiscover(nodeName);
+}
+
+export function debugGiveCollectible(
+  collectibleId: CollectibleId,
+  quantity: number,
+): void {
+  if (quantity <= 0) return;
+
+  const collectible = getEntry<CollectibleContent>(collectibleId);
+  if (!collectible) {
+    console.warn(`Collectible with ID ${collectibleId} not found.`);
+    return;
+  }
+
+  if (collectible.unobtainable) {
+    console.warn(`Collectible with ID ${collectibleId} not obtainable.`);
+    return;
+  }
+
+  collectiblesAdd(collectible.id, quantity);
+}
+
+// Discovers every drop-gated recipe so it becomes craftable; non-drop-gated
+// recipes need no discovery record.
+export function debugDiscoverAllRecipes(): void {
+  getEntriesByType<RecipeContent>('recipe')
+    .filter((recipe) => isRecipeDropGated(recipe.id))
+    .forEach((recipe) => {
+      recipeDiscover(recipe.id);
+    });
+}
+
+// Reverts a single drop-gated recipe back to undiscovered - a testing tool
+// for re-triggering discovery/unlock flows without waiting on a real drop.
+export function debugUndiscoverRecipe(recipeId: RecipeId): void {
+  const recipe = getEntry<RecipeContent>(recipeId);
+  if (!recipe) {
+    console.warn(`Recipe with ID ${recipeId} not found.`);
+    return;
+  }
+
+  recipeUndiscover(recipe.id);
+}
+
+export function debugRescueWorker(workerId: WorkerId): void {
+  const worker = getEntry<WorkerContent>(workerId);
+  if (!worker) {
+    console.warn(`Worker with ID ${workerId} not found.`);
+    return;
+  }
+
+  workerRescue(worker.id);
+}
+
+export function debugSetWorkerLevel(workerId: WorkerId, level: number): void {
+  const clampedLevel = clamp(Math.round(level), 1, WORKER_MAX_LEVEL);
+
+  updateGamestate((state) => {
+    const worker = state.workers[workerId];
+    if (!worker) return state;
+
+    worker.level = clampedLevel;
+    worker.xp = { current: 0, maximum: workerXpForLevel(clampedLevel) };
+    return state;
+  });
+}
+
+export function debugSetTownReputation(
+  townId: TownId,
+  reputation: number,
+): void {
+  const realTown = getEntry<TownContent>(townId);
+  if (!realTown) {
+    console.warn(`Could not find a town with matching id ${townId}.`);
+    return;
+  }
+
+  const realTownId = realTown.id;
+
+  const clamped = clamp(
+    Math.round(reputation),
+    0,
+    TOWN_REPUTATION_THRESHOLDS[4],
+  );
+
+  updateGamestate((state) => {
+    const town = state.world.towns[realTownId];
+    if (!town) return state;
+
+    town.reputation = clamped;
+    return state;
+  });
+}
+
+// Raid combat from anywhere, no telegraph/standing-at-town required.
+export function debugStartTownDefenseCombat(townId: TownId): void {
+  const town = getEntry<TownContent>(townId);
+  if (!town) {
+    console.warn(`Could not find a town with matching id ${townId}.`);
+    return;
+  }
+
+  if (town.defense.assaulter.monsterIds.length === 0) {
+    console.warn(`Town ${town.name} has no assaulter monsters authored.`);
+    return;
+  }
+
+  const helpers = combatantsFromTownGuardians(
+    townGuardiansForCurrentReputation(town),
+    town.level,
+  );
+
+  const enemies = raidAssaulterMonsterIds(town.defense.assaulter)
+    .map((monsterId) => getEntry<MonsterContent>(monsterId))
+    .filter((monster): monster is MonsterContent => !!monster);
+
+  const combat = {
+    ...combatCreateForEncounter(
+      partyGet(),
+      enemies,
+      town.defense.assaulter.level.max,
+      town.name,
+      helpers,
+    ),
+    raidTownId: town.id,
+  };
+
+  updateGamestate((state) => {
+    state.world.combat = combat;
+    return state;
+  });
+}
+
+// Forces a telegraph via the real write path, skipping the visited/cooldown/anti-rush gates.
+export function debugTelegraphRaid(townId: TownId): void {
+  const town = getEntry<TownContent>(townId);
+  if (!town) {
+    console.warn(`Could not find a town with matching id ${townId}.`);
+    return;
+  }
+
+  if (gamestate().world.towns[townId]?.firstVisitedAtTick === undefined) {
+    townMarkVisited(townId);
+  }
+
+  telegraphRaid(town);
+}
+
+export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
+  const node = worldNodeByName(nodeName);
+  const gathering = node ? worldNodeGathering(node) : undefined;
+  if (!gathering) {
+    console.warn(`Gather node "${nodeName}" not found.`);
+    return;
+  }
+
+  const clampedLevel = clamp(
+    Math.round(level),
+    0,
+    worldNodeMaxAchievableLevel(gathering),
+  );
+
+  updateGamestate((state) => {
+    state.gatherNodeLevels[nodeName] = { level: clampedLevel };
+    return state;
+  });
+}

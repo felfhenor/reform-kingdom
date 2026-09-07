@@ -17,12 +17,14 @@ import { getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
 import {
-  astralProjectorCast,
-  astralProjectorMaterialEntries,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
-  unlockedAstralProjectorEntries,
 } from '@helpers/kingdom/astral-projector';
+import {
+  astralProjectorCast,
+  astralProjectorMaterialEntries,
+  unlockedAstralProjectorEntries,
+} from '@helpers/kingdom/astral-projector.ui';
 import type {
   AstralProjectorContent,
   AstralProjectorId,

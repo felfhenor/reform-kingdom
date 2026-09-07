@@ -5,26 +5,15 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
 vi.mock('@helpers/item/materials', () => ({
   hasGold: vi.fn(),
-  spendGold: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSendDesignEvent: vi.fn(),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   kingdomNodeGet: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { hasGold, spendGold } from '@helpers/item/materials';
+import { hasGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   WORKER_MAX_LEVEL,
@@ -32,12 +21,10 @@ import {
   statBlockForLevel,
   workerGainXp,
   workerIsReadyToLevelUp,
-  workerLevelUp,
   workerLevelUpCost,
   workerMinLevelForStamina,
   workerStatsForLevel,
   workerXpForLevel,
-  workersReadyToLevelUpEntries,
 } from '@helpers/worker/worker-progression';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
@@ -290,125 +277,5 @@ describe('workerIsReadyToLevelUp', () => {
     expect(
       workerIsReadyToLevelUp(buildWorker({ xp: { current: 10, maximum: 10 } })),
     ).toBe(true);
-  });
-});
-
-describe('workersReadyToLevelUpEntries', () => {
-  const OTHER_ID = 'gobslime-pell' as WorkerId;
-
-  const workerContent: WorkerContent = {
-    id: WORKER_ID,
-    name: 'Weaver Nell',
-    __type: 'worker',
-    description: 'test',
-    sprite: '0000',
-    frames: 4,
-    baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
-    statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
-    canUseTeleports: true,
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('includes only workers ready to level up, resolved to their content', () => {
-    vi.mocked(hasGold).mockReturnValue(true);
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildWorker({
-          level: 3,
-          xp: { current: 10, maximum: 10 },
-        }),
-        [OTHER_ID]: buildWorker({ xp: { current: 0, maximum: 10 } }),
-      },
-    } as unknown as GameState);
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === WORKER_ID ? workerContent : undefined,
-    );
-
-    expect(workersReadyToLevelUpEntries()).toEqual([
-      {
-        workerId: WORKER_ID,
-        name: 'Weaver Nell',
-        sprite: '0000',
-        frames: 4,
-        level: 3,
-      },
-    ]);
-  });
-
-  it('omits a ready worker whose content no longer resolves', () => {
-    vi.mocked(hasGold).mockReturnValue(true);
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildWorker({ xp: { current: 10, maximum: 10 } }),
-      },
-    } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    expect(workersReadyToLevelUpEntries()).toEqual([]);
-  });
-});
-
-describe('workerLevelUp', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('fails when the worker does not exist', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {},
-    } as unknown as GameState);
-
-    expect(workerLevelUp(WORKER_ID)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('fails at the level cap', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildWorker({ level: WORKER_MAX_LEVEL }) },
-    } as unknown as GameState);
-
-    expect(workerLevelUp(WORKER_ID)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('fails without enough gold', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildWorker({
-          level: 1,
-          xp: { current: 10, maximum: 10 },
-        }),
-      },
-    } as unknown as GameState);
-    vi.mocked(hasGold).mockReturnValue(false);
-
-    expect(workerLevelUp(WORKER_ID)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('spends gold, levels up, and resets xp when affordable', () => {
-    const atCapXp = { current: 10, maximum: 10 };
-    vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildWorker({ level: 1, xp: atCapXp }) },
-    } as unknown as GameState);
-    vi.mocked(hasGold).mockReturnValue(true);
-
-    expect(workerLevelUp(WORKER_ID)).toBe(true);
-
-    const draftState = {
-      workers: { [WORKER_ID]: buildWorker({ level: 1, xp: atCapXp }) },
-    } as unknown as GameState;
-    const result = applyLastUpdate(draftState);
-
-    expect(spendGold).toHaveBeenCalledWith(draftState, workerLevelUpCost(1));
-    expect(result.workers[WORKER_ID].level).toBe(2);
-    expect(result.workers[WORKER_ID].xp).toEqual({
-      current: 0,
-      maximum: workerXpForLevel(2),
-    });
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith('Worker:LevelUp');
   });
 });

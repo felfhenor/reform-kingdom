@@ -12,21 +12,18 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanId,
   CommissionNodeState,
   CommissionOfferContent,
   CommissionRequirementEntry,
-  CommissionRowViewModel,
   DroppedReward,
   GameState,
-  WorldNodeEntry,
 } from '@interfaces';
 
-function commissionState(
+// Exported so commission-fulfill.ui.ts's UI-only view model can share this lookup.
+export function commissionState(
   caravanId: CaravanId,
   state: GameState = gamestate(),
 ): CommissionNodeState | undefined {
@@ -73,28 +70,6 @@ export function commissionCanFulfill(
       commissionRequirementOwnedQuantity(requirement, state) >=
       requirement.quantity,
   );
-}
-
-// Built once here so the Commissions panel and a caravan's trade modal
-// turn-in section render identically without duplicating this composition.
-export function commissionRowViewModel(
-  entry: WorldNodeEntry,
-): CommissionRowViewModel | undefined {
-  const caravan = worldNodeCaravan(entry);
-  if (!caravan || !commissionExists(caravan.id)) return undefined;
-
-  return {
-    caravanId: caravan.id,
-    nodeName: entry.nodeName,
-    title: caravan.name,
-    requirementEntries: commissionRequirementEntries(caravan.id),
-    rewards: commissionRewards(caravan.id),
-    canFulfill: commissionCanFulfill(caravan.id),
-    completed: !!commissionState(caravan.id)?.completed,
-    isPartyHere: isPartyAtCaravan(caravan.id),
-    canTravel: canPartyTravel(),
-    travelEtaSeconds: travelEtaSecondsTo(entry.nodeName),
-  };
 }
 
 export async function commissionFulfill(

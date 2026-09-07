@@ -3,7 +3,6 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import type * as MaterialsHelper from '@helpers/item/materials';
 import type {
   EquipmentContent,
   EquipmentId,
@@ -21,17 +20,6 @@ vi.mock('@helpers/item/infusion', () => ({
   equipmentItemInfusionBonus: vi.fn(),
 }));
 
-vi.mock('@helpers/item/materials', async (importOriginal) => {
-  const actual = await importOriginal<typeof MaterialsHelper>();
-  const testGoldCoinId = 'gold-coin' as ItemId;
-  return {
-    ...actual,
-    gainGold: vi.fn((state: GameState, amount: number) =>
-      actual.applyMaterialDelta(state, testGoldCoinId, amount),
-    ),
-  };
-});
-
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -43,12 +31,10 @@ import {
   armoryAdd,
   armoryGet,
   equipmentSellValue,
-  filterArmoryEntries,
   getArmoryEntries,
   isEquipmentDiscovered,
   pruneInvalidArmoryItems,
   pruneInvalidDiscoveredEquipment,
-  sellEquipmentItems,
 } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
@@ -299,42 +285,6 @@ describe('Armory Helper Functions', () => {
     });
   });
 
-  describe('filterArmoryEntries', () => {
-    const swordEntry = {
-      item: {
-        id: 'sword-1' as EquipmentItemId,
-        equipmentId: sword.id,
-        infusedItemIds: [],
-      },
-      content: sword,
-    };
-    const shieldEntry = {
-      item: {
-        id: 'shield-1' as EquipmentItemId,
-        equipmentId: shield.id,
-        infusedItemIds: [],
-      },
-      content: shield,
-    };
-    const entries = [swordEntry, shieldEntry];
-
-    it('returns every entry when the search text is empty', () => {
-      expect(filterArmoryEntries(entries, '   ')).toEqual(entries);
-    });
-
-    it('filters by equipment name, case-insensitively', () => {
-      expect(filterArmoryEntries(entries, 'SWORD')).toEqual([swordEntry]);
-    });
-
-    it('filters by equipment description', () => {
-      expect(filterArmoryEntries(entries, 'protective')).toEqual([shieldEntry]);
-    });
-
-    it('returns an empty array when nothing matches', () => {
-      expect(filterArmoryEntries(entries, 'nonexistent')).toEqual([]);
-    });
-  });
-
   describe('equipmentSellValue', () => {
     beforeEach(() => {
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
@@ -535,122 +485,6 @@ describe('Armory Helper Functions', () => {
 
       // base 0 stats/level -> 0, plus (2 + 1 + 3) resistance points * 100g
       expect(equipmentSellValue(entry)).toBe(600);
-    });
-  });
-
-  describe('sellEquipmentItems', () => {
-    beforeEach(() => {
-      vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
-    });
-
-    it('removes only the sold items from the armory and credits their gold value', () => {
-      const swordItem1 = {
-        id: 'sword-1' as EquipmentItemId,
-        equipmentId: sword.id,
-        infusedItemIds: [],
-        affixIds: [],
-      };
-      const swordItem2 = {
-        id: 'sword-2' as EquipmentItemId,
-        equipmentId: sword.id,
-        infusedItemIds: [],
-        affixIds: [],
-      };
-
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [swordItem1, swordItem2],
-      } as unknown as GameState);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => (id === sword.id ? sword : undefined) as never,
-      );
-
-      const total = sellEquipmentItems([swordItem1.id]);
-      expect(total).toBeGreaterThan(0);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [swordItem1, swordItem2],
-        materials: {},
-        discoveredMaterials: {},
-      } as unknown as GameState);
-
-      expect(result.armory).toEqual([swordItem2]);
-      expect(result.materials['gold-coin' as ItemId].quantity).toBe(total);
-    });
-
-    it('preserves existing gold when crediting more', () => {
-      const swordItem1 = {
-        id: 'sword-1' as EquipmentItemId,
-        equipmentId: sword.id,
-        infusedItemIds: [],
-        affixIds: [],
-      };
-
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [swordItem1],
-      } as unknown as GameState);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => (id === sword.id ? sword : undefined) as never,
-      );
-
-      const total = sellEquipmentItems([swordItem1.id]);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [swordItem1],
-        materials: { ['gold-coin' as ItemId]: { quantity: 50, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState);
-
-      expect(result.materials['gold-coin' as ItemId]).toEqual({
-        quantity: 50 + total,
-        foundAt: 1000,
-      });
-    });
-
-    it('sums the sell value of every sold item', () => {
-      const swordItem1 = {
-        id: 'sword-1' as EquipmentItemId,
-        equipmentId: sword.id,
-        infusedItemIds: [],
-        affixIds: [],
-      };
-      const shieldItem = {
-        id: 'shield-1' as EquipmentItemId,
-        equipmentId: shield.id,
-        infusedItemIds: [],
-        affixIds: [],
-      };
-
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [swordItem1, shieldItem],
-      } as unknown as GameState);
-      vi.mocked(getEntry).mockImplementation(
-        (id) =>
-          (id === sword.id
-            ? sword
-            : id === shield.id
-              ? shield
-              : undefined) as never,
-      );
-
-      const total = sellEquipmentItems([swordItem1.id, shieldItem.id]);
-
-      expect(total).toBe(
-        equipmentSellValue({ item: swordItem1, content: sword }) +
-          equipmentSellValue({ item: shieldItem, content: shield }),
-      );
-    });
-
-    it('ignores stale ids not present in the armory and does nothing', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [],
-      } as unknown as GameState);
-
-      const total = sellEquipmentItems(['missing' as EquipmentItemId]);
-
-      expect(total).toBe(0);
-      expect(updateGamestate).not.toHaveBeenCalled();
     });
   });
 });

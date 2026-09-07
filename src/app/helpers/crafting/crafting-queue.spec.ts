@@ -65,7 +65,6 @@ import { getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
   craftProcessTick,
-  craftQueueRemove,
   craftQueueStart,
 } from '@helpers/crafting/crafting-queue';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
@@ -392,37 +391,6 @@ describe('craftQueueStart', () => {
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Kingdom:Craft:Queue:Copper Ingot',
     );
-  });
-});
-
-describe('craftQueueRemove', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('refunds only the unconsumed remainder and drops the entry', () => {
-    mockGetEntry({
-      'recipe-1': buildRecipe({
-        requirements: [{ itemId: 'ore' as ItemId, quantity: 2 }],
-      }),
-    });
-
-    craftQueueRemove('Blacksmithing', 'queue-entry-1' as CraftQueueEntryId);
-
-    const state: GameState = {
-      materials: {},
-      discoveredMaterials: {},
-      tradeskills: {
-        [BLACKSMITHING_ID]: buildBuilding({
-          queue: [buildQueueEntry({ quantityTotal: 5, quantityCompleted: 2 })],
-        }),
-      },
-    } as unknown as GameState;
-    const result = applyUpdateAt(0, state);
-
-    // 3 units unconsumed * 2 ore per unit = 6 refunded.
-    expect(result.materials['ore' as ItemId].quantity).toBe(6);
-    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([]);
   });
 });
 

@@ -14,7 +14,7 @@ import {
   isGameStateReady,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import { townReputationBuffReconcile } from '@helpers/town/reputation/town-reputation-buff';
+import { townReputationBuffReconcile } from '@helpers/town/reputation/town-reputation-buff.ui';
 import { ContentService } from '@services/content.service';
 import { LoggerService } from '@services/logger.service';
 import { interval } from 'rxjs';

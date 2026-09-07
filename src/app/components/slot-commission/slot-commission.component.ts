@@ -9,10 +9,10 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { commissionRarity } from '@helpers/commission/commission-requirement';
+import { commissionRarity } from '@helpers/commission/commission-requirement.ui';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
-import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary';
+import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary.ui';
 import type {
   CommissionRequirementEntry,
   CommissionSlotDisplay,

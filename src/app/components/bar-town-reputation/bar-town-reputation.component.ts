@@ -5,7 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
-import { townReputationDisplay } from '@helpers/town/reputation/town-reputation';
+import { townReputationDisplay } from '@helpers/town/reputation/town-reputation.ui';
 import type { TownId } from '@interfaces';
 
 @Component({

@@ -26,7 +26,6 @@ import {
 import { updateGamestate } from '@helpers/state-game';
 import {
   townReputationBuffEffects,
-  townReputationBuffReconcile,
   townReputationBuffSync,
 } from '@helpers/town/reputation/town-reputation-buff';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
@@ -207,43 +206,5 @@ describe('townReputationBuffSync', () => {
     townReputationBuffSync('Carrina', 'LarsianDesert');
 
     expect(state.globalEffects).toEqual([]);
-  });
-});
-
-describe('townReputationBuffReconcile', () => {
-  it('adds a buff for the current map without treating anything as "previous"', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-      globalEffects: [],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
-
-    townReputationBuffReconcile('LarsianDesert');
-
-    expect(state.globalEffects).toHaveLength(1);
-  });
-
-  it('does not duplicate an already-active buff that survived from a prior save', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-      globalEffects: [{ ...buffContent, startTick: 0, expiresAtTick: 99 }],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
-
-    townReputationBuffReconcile('LarsianDesert');
-
-    expect(state.globalEffects).toHaveLength(1);
   });
 });

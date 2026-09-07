@@ -1,17 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSafeSegment: vi.fn((s) => s),
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
 }));
 
 vi.mock('@helpers/town/reputation/town-reputation', () => ({
@@ -28,14 +18,11 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeTown: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gamestate } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import {
   canSetHomeNode,
   homeNodeGet,
-  homeNodeSet,
   isPlayerAtHome,
   pruneInvalidHomeNode,
 } from '@helpers/town/town-spawn';
@@ -154,56 +141,6 @@ describe('canSetHomeNode', () => {
     vi.mocked(townReputationTier).mockReturnValue(2);
 
     expect(canSetHomeNode(townId)).toBe(true);
-  });
-});
-
-describe('homeNodeSet', () => {
-  it('does nothing when the town is not eligible', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-
-    homeNodeSet(townId);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
-  });
-
-  it('does nothing when the town content cannot be resolved', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { firstVisitedAtTick: 10 } } },
-    } as unknown as GameState);
-    vi.mocked(townReputationTier).mockReturnValue(2);
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    homeNodeSet(townId);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('sets the home node and fires analytics once eligible', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { firstVisitedAtTick: 10 } } },
-    } as unknown as GameState);
-    vi.mocked(townReputationTier).mockReturnValue(3);
-    vi.mocked(getEntry).mockReturnValue({
-      id: townId,
-      name: 'Larsia',
-    } as TownContent);
-    vi.mocked(updateGamestate).mockImplementation(async (fn) =>
-      fn({ world: {} } as unknown as GameState),
-    );
-
-    homeNodeSet(townId);
-
-    const state = { world: {} } as unknown as GameState;
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    updateFn(state);
-
-    expect(state.world.homeNodeName).toBe('Larsia');
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Town:Home:Set:Larsia',
-    );
   });
 });
 

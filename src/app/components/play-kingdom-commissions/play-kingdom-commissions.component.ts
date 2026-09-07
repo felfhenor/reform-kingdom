@@ -2,18 +2,16 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotCommissionComponent } from '@components/slot-commission/slot-commission.component';
-import {
-  commissionFulfill,
-  commissionRowViewModel,
-} from '@helpers/commission/commission-fulfill';
-import { nextCommissionResetAt } from '@helpers/commission/commission-reset';
+import { commissionFulfill } from '@helpers/commission/commission-fulfill';
+import { commissionRowViewModel } from '@helpers/commission/commission-fulfill.ui';
+import { nextCommissionResetAt } from '@helpers/commission/commission-reset.ui';
 import { formatDuration } from '@helpers/engine/timer';
 import { uiClockTick } from '@helpers/engine/ui';
 import { travelStart } from '@helpers/hero/travel';
 import {
   townCommissionFulfill,
   townCommissionRowViewModels,
-} from '@helpers/town/town-commission-fulfill';
+} from '@helpers/town/town-commission-fulfill.ui';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type {
   CommissionRowViewModel,

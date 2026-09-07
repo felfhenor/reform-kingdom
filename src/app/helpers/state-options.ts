@@ -57,9 +57,3 @@ export function getOption<T extends keyof GameOptions>(
 ): GameOptions[T] {
   return options()[option];
 }
-
-export function shouldShowAnalyticsConsentBanner(): boolean {
-  return (
-    !getOption('analyticsEnabled') && !getOption('analyticsOptInDismissed')
-  );
-}

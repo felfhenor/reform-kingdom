@@ -7,16 +7,16 @@ import {
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { notifyError } from '@helpers/engine/notify';
+import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { setGamePlayView } from '@helpers/engine/ui';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import {
   raidAssaulterPreview,
   raidDefenderPreview,
-  townCraftDebuffExpiresAtTick,
   townRaidTelegraph,
 } from '@helpers/town/raid/town-raid-state';
+import { townCraftDebuffExpiresAtTick } from '@helpers/town/raid/town-raid-state.ui';
 import type { TownContent, TownRaidCombatantRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

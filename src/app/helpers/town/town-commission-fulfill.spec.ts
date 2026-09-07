@@ -5,10 +5,6 @@ vi.mock('@helpers/commission/commission-requirement', () => ({
   commissionRequirementsSatisfied: vi.fn(),
 }));
 
-vi.mock('@helpers/commission/commission-turn-in', () => ({
-  spendCommissionRequirements: vi.fn(),
-}));
-
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
@@ -17,35 +13,8 @@ vi.mock('@helpers/combat/combat-log', () => ({
   categoryMessageLog: vi.fn(),
 }));
 
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSafeSegment: (value: string) => value.replace(/\s+/g, ''),
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/travel', () => ({
-  canPartyTravel: vi.fn(() => true),
-  travelEtaSecondsTo: vi.fn(() => undefined),
-}));
-
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
-
-vi.mock('@helpers/town/reputation/town-reputation', () => ({
-  townReputationGain: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-materials', () => ({
-  depositCommissionRequirementsToTown: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-visit', () => ({
-  isPartyAtTown: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeTown: vi.fn(),
 }));
 
 import {
@@ -53,17 +22,12 @@ import {
   commissionRequirementsSatisfied,
 } from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
-import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gamestate } from '@helpers/state-game';
 import {
   townCommissionCanFulfill,
-  townCommissionFulfill,
   townCommissionReputationReward,
   townCommissionRequirementEntries,
-  townCommissionRowViewModels,
 } from '@helpers/town/town-commission-fulfill';
-import { isPartyAtTown } from '@helpers/town/town-visit';
-import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
   CommissionOfferContent,
   CommissionOfferId,
@@ -71,9 +35,7 @@ import type {
   ItemId,
   RecipeId,
   TownCommissionSlotId,
-  TownContent,
   TownId,
-  WorldNodeEntry,
 } from '@interfaces';
 
 const townId = 'larsia' as TownId;
@@ -90,12 +52,6 @@ const offer: CommissionOfferContent = {
   rewards: [],
   townReputationReward: 25,
   specialtyForRecipeId: 'UNKNOWN' as RecipeId,
-};
-
-const persistentOffer: CommissionOfferContent = {
-  ...offer,
-  id: 'offer-persistent' as CommissionOfferId,
-  name: 'Commission - Larsian Coffers',
 };
 
 function withTownState(state: unknown): void {
@@ -187,149 +143,5 @@ describe('townCommissionCanFulfill', () => {
     vi.mocked(commissionRequirementsSatisfied).mockReturnValue(true);
 
     expect(townCommissionCanFulfill(townId, slotId)).toBe(true);
-  });
-});
-
-describe('townCommissionRowViewModels', () => {
-  const entry = { nodeName: 'Larsia' } as WorldNodeEntry;
-  const town: TownContent = {
-    id: townId,
-    name: 'Larsia',
-    __type: 'town',
-    defense: {
-      quests: {
-        commissions: [
-          { commissionOfferId: offer.id, weight: 1, persistent: false },
-          {
-            commissionOfferId: persistentOffer.id,
-            weight: 1,
-            persistent: true,
-          },
-        ],
-      },
-    },
-  } as TownContent;
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(isPartyAtTown).mockReturnValue(true);
-    vi.mocked(canPartyTravel).mockReturnValue(true);
-    vi.mocked(travelEtaSecondsTo).mockReturnValue(undefined);
-    vi.mocked(commissionRequirementsSatisfied).mockReturnValue(true);
-  });
-
-  it('returns no rows when the node is not a town', () => {
-    vi.mocked(worldNodeTown).mockReturnValue(undefined);
-
-    expect(townCommissionRowViewModels(entry)).toEqual([]);
-  });
-
-  it('builds one row per active slot', () => {
-    vi.mocked(worldNodeTown).mockReturnValue(town);
-    withTownState({
-      commissionSlots: [
-        {
-          id: 'slot-1' as TownCommissionSlotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-        {
-          id: 'slot-2' as TownCommissionSlotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    const rows = townCommissionRowViewModels(entry);
-
-    expect(rows).toHaveLength(2);
-    expect(rows[0]).toMatchObject({
-      townId,
-      slotId: 'slot-1',
-      nodeName: 'Larsia',
-      title: 'Larsia',
-      rewards: [],
-      reputationReward: 25,
-      completed: false,
-      isPartyHere: true,
-      canTravel: true,
-    });
-    expect(rows[1].slotId).toBe('slot-2');
-  });
-
-  it('sorts a persistent slot to the top even when generated after the others', () => {
-    vi.mocked(worldNodeTown).mockReturnValue(town);
-    withTownState({
-      commissionSlots: [
-        {
-          id: 'slot-rolled' as TownCommissionSlotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-        {
-          id: 'slot-persistent' as TownCommissionSlotId,
-          commissionOfferId: persistentOffer.id,
-          requirements: [],
-          generatedAtTick: 1,
-        },
-      ],
-    });
-    vi.mocked(getEntry).mockImplementation((id: string) =>
-      id === persistentOffer.id ? persistentOffer : offer,
-    );
-
-    const rows = townCommissionRowViewModels(entry);
-
-    expect(rows.map((row) => row.slotId)).toEqual([
-      'slot-persistent',
-      'slot-rolled',
-    ]);
-  });
-});
-
-describe('townCommissionFulfill', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(isPartyAtTown).mockReturnValue(true);
-  });
-
-  it('returns false when the party is not at the town', async () => {
-    vi.mocked(isPartyAtTown).mockReturnValue(false);
-    withTownState({
-      commissionSlots: [
-        {
-          id: slotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(commissionRequirementsSatisfied).mockReturnValue(true);
-
-    expect(await townCommissionFulfill(townId, slotId)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('returns false when requirements are unmet', async () => {
-    withTownState({
-      commissionSlots: [
-        {
-          id: slotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(commissionRequirementsSatisfied).mockReturnValue(false);
-
-    expect(await townCommissionFulfill(townId, slotId)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
   });
 });

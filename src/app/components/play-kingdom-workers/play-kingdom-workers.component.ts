@@ -21,17 +21,17 @@ import { gamestate } from '@helpers/state-game';
 import {
   WORKER_MAX_LEVEL,
   workerIsReadyToLevelUp,
-  workerLevelUp,
   workerLevelUpCost,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
+import { workerLevelUp } from '@helpers/worker/worker-progression.ui';
 import {
   canWorkerReachNode,
   workerAssign,
   workerRecall,
   workerStaminaCostToNode,
-  workerTravelRemainingTicks,
 } from '@helpers/worker/worker-travel';
+import { workerTravelRemainingTicks } from '@helpers/worker/worker-travel.ui';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import { worldNodeLevelLabel } from '@helpers/world-node/world-node-status';

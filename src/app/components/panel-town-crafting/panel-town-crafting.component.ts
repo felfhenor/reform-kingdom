@@ -14,7 +14,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import {
   townCraftQueueRows,
   townTradeskillLevelRows,
-} from '@helpers/town/crafting/town-craft-display';
+} from '@helpers/town/crafting/town-craft-display.ui';
 import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
 import type {
   TownContent,

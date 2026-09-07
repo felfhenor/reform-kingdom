@@ -1,9 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
 vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'clause-1'),
 }));
@@ -14,7 +10,6 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  rewardContentInfo: vi.fn(),
   rewardKey: vi.fn((reward) => {
     if ('itemId' in reward) return `item:${reward.itemId}`;
     if ('equipmentId' in reward) return `equipment:${reward.equipmentId}`;
@@ -23,28 +18,21 @@ vi.mock('@helpers/world-node/world-node-rewards', () => ({
   }),
 }));
 
-import { getEntry } from '@helpers/content/content';
 import {
   backfillDecreeClauseRiskTolerance,
   decreeClauseAdd,
   decreeClauseConflicts,
-  decreeClauseRemove,
   decreeClauseReorder,
   decreeClauseSetEnabled,
-  decreeClauseSummary,
-  decreeClauseUpdate,
   decreeClauses,
-  decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
   pruneInvalidDecreeGatherClauses,
 } from '@helpers/decree/decree';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   DecreeClause,
   DecreeClauseId,
   GameState,
-  ItemContent,
   ItemId,
   MaterialId,
 } from '@interfaces';
@@ -98,21 +86,6 @@ describe('decree read accessors', () => {
     vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([], true));
 
     expect(decreeWaitForFullHealthBeforeCombat()).toBe(true);
-  });
-});
-
-describe('decreeSetWaitForFullHealthBeforeCombat', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('updates the stored flag', () => {
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([]));
-
-    decreeSetWaitForFullHealthBeforeCombat(true);
-
-    const result = applyLastUpdate(stateWithAutoMode([]));
-    expect(result.world.autoMode.waitForFullHealthBeforeCombat).toBe(true);
   });
 });
 
@@ -347,188 +320,6 @@ describe('decreeClauseConflicts', () => {
   });
 });
 
-describe('decreeClauseUpdate', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('replaces the action fields while keeping id, enabled, and failureCount', () => {
-    const existing = buildClause({
-      id: 'clause-1' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wood' as MaterialId,
-      targetQuantity: 20,
-      enabled: false,
-      failureCount: 2,
-    });
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([existing]));
-
-    expect(
-      decreeClauseUpdate('clause-1' as DecreeClauseId, {
-        type: 'GatherMaterial',
-        materialId: 'wood' as MaterialId,
-        targetQuantity: 100,
-      }),
-    ).toBe(true);
-
-    const result = applyLastUpdate(stateWithAutoMode([existing]));
-    expect(result.world.autoMode.clauses).toEqual([
-      {
-        id: 'clause-1',
-        type: 'GatherMaterial',
-        materialId: 'wood',
-        targetQuantity: 100,
-        enabled: false,
-        failureCount: 2,
-      },
-    ]);
-  });
-
-  it('keeps the clause at its original position in the list', () => {
-    const clauses = [
-      buildClause({ id: 'a' as DecreeClauseId, type: 'ReturnToKingdom' }),
-      buildClause({
-        id: 'b' as DecreeClauseId,
-        type: 'GatherMaterial',
-        materialId: 'wood' as MaterialId,
-        targetQuantity: 20,
-      }),
-      buildClause({ id: 'c' as DecreeClauseId, type: 'LevelUpParty' }),
-    ];
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode(clauses));
-
-    decreeClauseUpdate('b' as DecreeClauseId, {
-      type: 'GatherMaterial',
-      materialId: 'wood' as MaterialId,
-      targetQuantity: 500,
-    });
-
-    const result = applyLastUpdate(stateWithAutoMode(clauses));
-    expect(result.world.autoMode.clauses.map((c) => c.id)).toEqual([
-      'a',
-      'b',
-      'c',
-    ]);
-  });
-
-  it('does not leave stale fields behind when the new action drops them', () => {
-    const existing = buildClause({
-      id: 'clause-1' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wood' as MaterialId,
-      targetQuantity: 20,
-    });
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([existing]));
-
-    decreeClauseUpdate('clause-1' as DecreeClauseId, {
-      type: 'FinishUnfinishedAreas',
-      riskTolerance: 'Medium',
-    });
-
-    const result = applyLastUpdate(stateWithAutoMode([existing]));
-    expect(result.world.autoMode.clauses[0]).toEqual({
-      id: 'clause-1',
-      type: 'FinishUnfinishedAreas',
-      riskTolerance: 'Medium',
-      enabled: true,
-      failureCount: 0,
-    });
-  });
-
-  it('returns false and makes no change for an unknown clause id', () => {
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([]));
-
-    expect(
-      decreeClauseUpdate('missing' as DecreeClauseId, {
-        type: 'ReturnToKingdom',
-      }),
-    ).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('refuses an update that would duplicate a different existing clause', () => {
-    const clauses = [
-      buildClause({
-        id: 'a' as DecreeClauseId,
-        type: 'GatherMaterial',
-        materialId: 'wood' as MaterialId,
-        targetQuantity: 100,
-      }),
-      buildClause({
-        id: 'b' as DecreeClauseId,
-        type: 'GatherMaterial',
-        materialId: 'stone' as MaterialId,
-        targetQuantity: 20,
-      }),
-    ];
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode(clauses));
-
-    expect(
-      decreeClauseUpdate('b' as DecreeClauseId, {
-        type: 'GatherMaterial',
-        materialId: 'wood' as MaterialId,
-        targetQuantity: 20,
-      }),
-    ).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('allows an update that keeps the clause matching itself (not a conflict with its own prior state)', () => {
-    const clauses = [
-      buildClause({
-        id: 'a' as DecreeClauseId,
-        type: 'GatherMaterial',
-        materialId: 'wood' as MaterialId,
-        targetQuantity: 100,
-      }),
-    ];
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode(clauses));
-
-    expect(
-      decreeClauseUpdate('a' as DecreeClauseId, {
-        type: 'GatherMaterial',
-        materialId: 'wood' as MaterialId,
-        targetQuantity: 250,
-      }),
-    ).toBe(true);
-  });
-});
-
-describe('decreeClauseRemove', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('removes the matching clause', () => {
-    const clauses = [
-      buildClause({ id: 'clause-1' as DecreeClauseId }),
-      buildClause({ id: 'clause-2' as DecreeClauseId }),
-    ];
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode(clauses));
-
-    decreeClauseRemove('clause-1' as DecreeClauseId);
-
-    const result = applyLastUpdate(
-      stateWithAutoMode(clauses) as unknown as GameState,
-    );
-    expect(result.world.autoMode.clauses.map((c) => c.id)).toEqual([
-      'clause-2',
-    ]);
-  });
-
-  it('clears activeClauseId when the active clause is removed', () => {
-    const clauses = [buildClause({ id: 'clause-1' as DecreeClauseId })];
-    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode(clauses));
-
-    decreeClauseRemove('clause-1' as DecreeClauseId);
-
-    const state = stateWithAutoMode(clauses);
-    state.world.autoMode.activeClauseId = 'clause-1' as DecreeClauseId;
-    const result = applyLastUpdate(state);
-    expect(result.world.autoMode.activeClauseId).toBeUndefined();
-  });
-});
-
 describe('decreeClauseSetEnabled', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -570,118 +361,6 @@ describe('decreeClauseReorder', () => {
       'clause-3',
       'clause-1',
     ]);
-  });
-});
-
-describe('decreeClauseSummary', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('describes a GatherMaterial clause using the material name', () => {
-    vi.mocked(getEntry).mockReturnValue({
-      name: 'Wood',
-    } as ItemContent);
-
-    const summary = decreeClauseSummary(
-      buildClause({
-        type: 'GatherMaterial',
-        materialId: 'wood' as MaterialId,
-        targetQuantity: 200,
-      }),
-    );
-
-    expect(summary).toBe('Gather Wood until 200 in storage');
-  });
-
-  it('falls back to a generic label when the material has no content entry', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    const summary = decreeClauseSummary(
-      buildClause({
-        type: 'GatherMaterial',
-        materialId: 'unknown' as MaterialId,
-        targetQuantity: 5,
-      }),
-    );
-
-    expect(summary).toBe('Gather materials until 5 in storage');
-  });
-
-  it('describes a FarmNode clause using the reward name', () => {
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Bone',
-      sprite: '0001',
-      spritesheet: 'item',
-    });
-
-    const summary = decreeClauseSummary(
-      buildClause({
-        type: 'FarmNode',
-        nodeName: 'Forest Ruins',
-        reward: { itemId: 'bone' as ItemId },
-        targetQuantity: 20,
-      }),
-    );
-
-    expect(summary).toBe('Farm Forest Ruins until 20x Bone obtained');
-  });
-
-  it('falls back to a generic label when the reward has no content entry', () => {
-    vi.mocked(rewardContentInfo).mockReturnValue(undefined);
-
-    const summary = decreeClauseSummary(
-      buildClause({
-        type: 'FarmNode',
-        nodeName: 'Forest Ruins',
-        reward: { itemId: 'unknown' as ItemId },
-        targetQuantity: 5,
-      }),
-    );
-
-    expect(summary).toBe('Farm Forest Ruins until 5x reward obtained');
-  });
-
-  it('describes FinishUnfinishedAreas including its risk tolerance', () => {
-    expect(
-      decreeClauseSummary(
-        buildClause({ type: 'FinishUnfinishedAreas', riskTolerance: 'Low' }),
-      ),
-    ).toBe('Finish unfinished areas (Low risk)');
-  });
-
-  it('describes LevelUpParty including its risk tolerance', () => {
-    expect(
-      decreeClauseSummary(
-        buildClause({ type: 'LevelUpParty', riskTolerance: 'High' }),
-      ),
-    ).toBe('Level up the party (High risk)');
-  });
-
-  it('describes ReturnToKingdom', () => {
-    expect(decreeClauseSummary(buildClause({ type: 'ReturnToKingdom' }))).toBe(
-      'Return home',
-    );
-  });
-
-  it('describes a targeted DefendTowns clause using the town name', () => {
-    expect(
-      decreeClauseSummary(
-        buildClause({
-          type: 'DefendTowns',
-          riskTolerance: 'Medium',
-          townName: 'Larsia',
-        }),
-      ),
-    ).toBe('Defend Larsia from raids (Medium risk)');
-  });
-
-  it('describes an untargeted DefendTowns clause as defending any town', () => {
-    expect(
-      decreeClauseSummary(
-        buildClause({ type: 'DefendTowns', riskTolerance: 'Low' }),
-      ),
-    ).toBe('Defend towns from raids (Low risk)');
   });
 });
 

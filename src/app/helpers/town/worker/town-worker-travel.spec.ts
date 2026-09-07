@@ -37,13 +37,12 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 import { getEntry } from '@helpers/content/content';
 import { travelPathTotalTicks } from '@helpers/hero/travel';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate } from '@helpers/state-game';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import {
   townWorkerAssignmentIsValid,
   townWorkerBeginOutboundTrip,
   townWorkerBeginReturnTrip,
-  townWorkersTravelingTokens,
   townWorkerStaminaCostToNode,
 } from '@helpers/town/worker/town-worker-travel';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
@@ -309,85 +308,5 @@ describe('townWorkerBeginReturnTrip', () => {
     expect(state.world.towns[townId].workers[workerId].status).toEqual({
       kind: 'AtTown',
     });
-  });
-});
-
-describe('townWorkersTravelingTokens', () => {
-  // Single read: it's a computed(), so a second call in this file would replay this mock's
-  // cached result rather than re-invoking the mocked gamestate().
-  it('returns only TravelingTo/TravelingBack workers across every town, tagged with townId', () => {
-    const otherTownId = 'carrina' as TownId;
-    const travelingToId = 'darwin' as WorkerId;
-    const travelingBackId = 'talbot' as WorkerId;
-    const atTownId = 'nevyn' as WorkerId;
-    const gatheringId = 'weaver' as WorkerId;
-
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [travelingToId]: {
-                location: { mapName: 'LarsianDesert', x: 0, y: 0 },
-                status: {
-                  kind: 'TravelingTo',
-                  nodeName: 'Wergen Woods',
-                  itemId: oreId,
-                  path: [
-                    { kind: 'Move', mapName: 'LarsianDesert', x: 1, y: 0 },
-                  ],
-                  ticksIntoStep: 2,
-                },
-              },
-              [atTownId]: {
-                location: { mapName: 'LarsianDesert', x: 0, y: 0 },
-                status: { kind: 'AtTown' },
-              },
-              [gatheringId]: {
-                location: { mapName: 'LarsianDesert', x: 5, y: 5 },
-                status: {
-                  kind: 'Gathering',
-                  nodeName: 'Wergen Woods',
-                  itemId: oreId,
-                  itemsGathered: 1,
-                  ticksIntoGather: 1,
-                },
-              },
-            },
-          },
-          [otherTownId]: {
-            workers: {
-              [travelingBackId]: {
-                location: { mapName: 'Carrina', x: 3, y: 3 },
-                status: {
-                  kind: 'TravelingBack',
-                  path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 3 }],
-                  ticksIntoStep: 1,
-                  carriedItemId: oreId,
-                  carriedQuantity: 5,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(townWorkersTravelingTokens()).toEqual([
-      {
-        townId,
-        workerId: travelingToId,
-        mapName: 'LarsianDesert',
-        path: [{ kind: 'Move', mapName: 'LarsianDesert', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      },
-      {
-        townId: otherTownId,
-        workerId: travelingBackId,
-        mapName: 'Carrina',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 3 }],
-        ticksIntoStep: 1,
-      },
-    ]);
   });
 });

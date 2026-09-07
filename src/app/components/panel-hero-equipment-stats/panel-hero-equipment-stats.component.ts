@@ -7,10 +7,8 @@ import {
 } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
-import {
-  characterCombatStatTotals,
-  characterTagResistances,
-} from '@helpers/item/equipment';
+import { characterTagResistances } from '@helpers/item/equipment';
+import { characterCombatStatTotals } from '@helpers/item/equipment.ui';
 import {
   CombatStatDimension,
   StatInformation,

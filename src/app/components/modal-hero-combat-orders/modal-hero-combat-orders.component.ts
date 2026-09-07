@@ -13,19 +13,21 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RowCombatOrderClauseComponent } from '@components/row-combat-order-clause/row-combat-order-clause.component';
 import {
   COMBAT_ORDER_ROW_CAP,
+  combatOrderClauses,
+} from '@helpers/combat/combat-order';
+import {
   combatOrderClauseAdd,
   combatOrderClauseRemove,
   combatOrderClauseReorder,
-  combatOrderClauses,
   combatOrderClauseSetEnabled,
   combatOrderClauseUpdate,
-} from '@helpers/combat/combat-order';
+} from '@helpers/combat/combat-order.ui';
 import {
   isCombatOrderFamilyEquipmentOnly,
   isCombatOrderFamilyKnown,
   isCombatOrderFamilyUsable,
   isCombatOrderTargetModeUsable,
-} from '@helpers/combat/combat-order-evaluation';
+} from '@helpers/combat/combat-order-evaluation.ui';
 import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
 import { heroSkillsAtLevel, heroSkillsWithEquipment } from '@helpers/hero/job';

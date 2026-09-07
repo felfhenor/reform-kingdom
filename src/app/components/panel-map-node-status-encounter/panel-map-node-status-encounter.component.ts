@@ -6,7 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
-import { worldNodeEncounterProgress } from '@helpers/world-node/world-node-encounter';
+import { worldNodeEncounterProgress } from '@helpers/world-node/world-node-encounter.ui';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({

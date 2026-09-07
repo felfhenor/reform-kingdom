@@ -1,7 +1,6 @@
 import {
   combatantSkillCastEventEmit,
   combatantSkillCastEvents,
-  combatantSkillCastEventsClear,
 } from '@helpers/combat/combat-skill-events';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -28,21 +27,5 @@ describe('combatantSkillCastEventEmit', () => {
 
     const [first, second] = combatantSkillCastEvents();
     expect(first.id).not.toBe(second.id);
-  });
-});
-
-describe('combatantSkillCastEventsClear', () => {
-  beforeEach(() => {
-    combatantSkillCastEvents.set([]);
-  });
-
-  it('removes only the events matching the given ids', () => {
-    combatantSkillCastEventEmit('hero-1', 'Fireball', '0001');
-    combatantSkillCastEventEmit('hero-2', 'Slash', '0002');
-
-    const [toRemove, toKeep] = combatantSkillCastEvents();
-    combatantSkillCastEventsClear([toRemove.id]);
-
-    expect(combatantSkillCastEvents()).toEqual([toKeep]);
   });
 });

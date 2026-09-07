@@ -1,4 +1,3 @@
-import { getEntry } from '@helpers/content/content';
 import {
   affixEffectsOfKind,
   equipmentItemAffixEffects,
@@ -13,7 +12,6 @@ import type {
   CombatStatBlock,
   EquipmentContent,
   EquipmentItem,
-  EquipmentSkillContent,
   EquipmentSkillId,
   StatBlock,
   StatusEffectBlock,
@@ -37,21 +35,6 @@ export function equipmentItemBonusCombatStats(
   return equipmentItemBonusTotals(item, COMBAT_STAT_BONUS);
 }
 
-// Base + bonus combined - the comparison baseline for diffing a candidate item against what's equipped.
-export function equipmentItemTotalStats(
-  item: EquipmentItem,
-  content: EquipmentContent,
-): StatBlock {
-  const bonus = equipmentItemBonusStats(item);
-  const total = { ...content.baseStats };
-
-  (Object.keys(total) as Array<keyof StatBlock>).forEach((stat) => {
-    total[stat] += bonus[stat];
-  });
-
-  return total;
-}
-
 // Content-granted skills plus any GrantSkill affix rolled on this specific item, deduped.
 export function equipmentItemGrantedSkillIds(
   item: EquipmentItem,
@@ -63,13 +46,4 @@ export function equipmentItemGrantedSkillIds(
   ).map((effect) => effect.skillId);
 
   return uniq([...content.grantedSkillIds, ...affixSkillIds]);
-}
-
-export function equipmentItemGrantedSkills(
-  item: EquipmentItem,
-  content: EquipmentContent,
-): EquipmentSkillContent[] {
-  return equipmentItemGrantedSkillIds(item, content)
-    .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
-    .filter((skill): skill is EquipmentSkillContent => !!skill);
 }

@@ -1,9 +1,4 @@
-import { getEntry } from '@helpers/content/content';
-import {
-  analyticsSafeSegment,
-  analyticsSendDesignEvent,
-} from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gamestate } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import {
@@ -11,7 +6,7 @@ import {
   worldNodeByName,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
-import type { TownContent, TownId, WorldNodeEntry } from '@interfaces';
+import type { TownId, WorldNodeEntry } from '@interfaces';
 
 // Honored - the minimum reputation tier at which a town can be designated home.
 export const TOWN_HOME_MIN_REPUTATION_TIER = 2;
@@ -39,20 +34,6 @@ export function canSetHomeNode(townId: TownId): boolean {
   if (!town || town.firstVisitedAtTick === undefined) return false;
 
   return townReputationTier(townId) >= TOWN_HOME_MIN_REPUTATION_TIER;
-}
-
-export function homeNodeSet(townId: TownId): void {
-  if (!canSetHomeNode(townId)) return;
-
-  const town = getEntry<TownContent>(townId);
-  if (!town) return;
-
-  updateGamestate((state) => {
-    state.world.homeNodeName = town.name;
-    return state;
-  });
-
-  analyticsSendDesignEvent(`Town:Home:Set:${analyticsSafeSegment(town.name)}`);
 }
 
 // Drops a home designation whose Town content no longer exists.

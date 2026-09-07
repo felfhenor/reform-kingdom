@@ -15,6 +15,7 @@ import { PanelTownRaidComponent } from '@components/panel-town-raid/panel-town-r
 import { PanelTownShopComponent } from '@components/panel-town-shop/panel-town-shop.component';
 import { PanelTownWorkersComponent } from '@components/panel-town-workers/panel-town-workers.component';
 import { activeTownNode, setGamePlayView } from '@helpers/engine/ui';
+
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import { ContentService } from '@services/content.service';
 

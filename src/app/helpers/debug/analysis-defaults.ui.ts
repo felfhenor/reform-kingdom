@@ -1,8 +1,4 @@
-/**
- * Computes a content-derived default for the shared `level` input, instead
- * of a hardcoded guess - the higher of the top monster level (unioned across
- * every encounter/random encounter it's assigned to) and the top node level.
- */
+// Computes a content-derived default for the shared `level` input - the higher of the top monster level (unioned across every encounter/random encounter it's assigned to) and the top node level.
 
 import { getEntriesByType } from '@helpers/content/content';
 import { buildMonsterLevels } from '@helpers/debug/analysis-item-sources';

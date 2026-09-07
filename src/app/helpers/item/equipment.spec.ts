@@ -8,12 +8,11 @@ import type {
   EquipmentItemId,
   JobContent,
   JobId,
- AffixContent, AffixId, Combat } from '@interfaces';
+  AffixContent,
+  AffixId,
+  Combat,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryGet: vi.fn(() => []),
-}));
 
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
@@ -32,7 +31,6 @@ import {
   canModifyEquipment,
   characterTagResistances,
   equipmentAffixEffects,
-  equipmentAvailableForSlot,
   equipmentCombatStatTotals,
   equipmentGrantedSkillIds,
   equipmentStatTotals,
@@ -46,8 +44,6 @@ import {
   pruneInvalidEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
-import { armoryGet } from '@helpers/kingdom/armory';
-
 
 // Dedup is keyed by instance id, not content id, so each distinct physical item needs its own id (a two-hander reuses the same instance across both slots).
 function mockEquipmentItem(
@@ -877,66 +873,6 @@ describe('Equipment Helper Functions', () => {
       } as JobContent);
       const item = { ...sword, levelRequirement: 99 };
       expect(canEquipItem(character, item)).toBe(false);
-    });
-  });
-
-  describe('equipmentAvailableForSlot', () => {
-    it('filters to owned items containing the slot, sorted by level requirement descending', () => {
-      const lowHelmet = {
-        ...helmet,
-        id: 'low' as EquipmentId,
-        levelRequirement: 1,
-      };
-      const highHelmet = {
-        ...helmet,
-        id: 'high' as EquipmentId,
-        levelRequirement: 10,
-      };
-      const lowHelmetItem = mockEquipmentItem(lowHelmet.id);
-      const highHelmetItem = mockEquipmentItem(highHelmet.id);
-      const swordItem = mockEquipmentItem(sword.id);
-
-      vi.mocked(getEntry).mockImplementation((id) => {
-        if (id === lowHelmet.id) return lowHelmet as never;
-        if (id === highHelmet.id) return highHelmet as never;
-        if (id === sword.id) return sword as never;
-        return undefined as never;
-      });
-      vi.mocked(armoryGet).mockReturnValue([
-        lowHelmetItem,
-        highHelmetItem,
-        swordItem,
-      ]);
-
-      expect(equipmentAvailableForSlot('Helmet')).toEqual([
-        { item: highHelmetItem, content: highHelmet },
-        { item: lowHelmetItem, content: lowHelmet },
-      ]);
-    });
-
-    it('excludes items not present in the armory', () => {
-      const lowHelmet = {
-        ...helmet,
-        id: 'low' as EquipmentId,
-        levelRequirement: 1,
-      };
-      const highHelmet = {
-        ...helmet,
-        id: 'high' as EquipmentId,
-        levelRequirement: 10,
-      };
-      const lowHelmetItem = mockEquipmentItem(lowHelmet.id);
-
-      vi.mocked(getEntry).mockImplementation((id) => {
-        if (id === lowHelmet.id) return lowHelmet as never;
-        if (id === highHelmet.id) return highHelmet as never;
-        return undefined as never;
-      });
-      vi.mocked(armoryGet).mockReturnValue([lowHelmetItem]);
-
-      expect(equipmentAvailableForSlot('Helmet')).toEqual([
-        { item: lowHelmetItem, content: lowHelmet },
-      ]);
     });
   });
 

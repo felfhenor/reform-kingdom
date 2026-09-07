@@ -4,7 +4,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { formatDuration } from '@helpers/engine/timer';
 import { travelStart } from '@helpers/hero/travel';
-import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense';
+import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({

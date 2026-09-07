@@ -17,11 +17,6 @@ vi.mock('@helpers/engine/analytics', async (importOriginal) => {
   };
 });
 
-vi.mock('@helpers/hero/travel', () => ({
-  canPartyTravel: vi.fn(() => true),
-  travelEtaSecondsTo: vi.fn(() => undefined),
-}));
-
 vi.mock('@helpers/item/materials', () => ({
   applyMaterialDelta: vi.fn(),
   getMaterialQuantity: vi.fn(),
@@ -42,10 +37,6 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeCaravan: vi.fn(),
-}));
-
 import { isPartyAtCaravan } from '@helpers/caravan/caravan';
 import {
   commissionCanFulfill,
@@ -53,20 +44,16 @@ import {
   commissionFulfill,
   commissionRequirementEntries,
   commissionRewards,
-  commissionRowViewModel,
 } from '@helpers/commission/commission-fulfill';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import {
   applyMaterialDelta,
   getMaterialQuantity,
 } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
-  CaravanContent,
   CaravanId,
   CommissionOfferContent,
   CommissionOfferId,
@@ -78,7 +65,6 @@ import type {
   MonsterContent,
   MonsterId,
   RecipeId,
-  WorldNodeEntry,
 } from '@interfaces';
 
 const caravanId = 'carrina-duchy' as CaravanId;
@@ -569,108 +555,5 @@ describe('commissionFulfill', () => {
     expect(afterFirst.world.commissions[caravanId].completed).toBe(true);
     // One spend + one grant from call1; call2 must no-op entirely.
     expect(applyMaterialDelta).toHaveBeenCalledTimes(2);
-  });
-});
-
-describe('commissionRowViewModel', () => {
-  const entry = {
-    nodeName: 'Duchy Trading Caravan - Carrina',
-  } as WorldNodeEntry;
-  const caravan: CaravanContent = {
-    id: caravanId,
-    name: 'Duchy Trading Caravan - Carrina',
-    __type: 'caravan',
-    description: 'A caravan.',
-    traderResetTime: 100,
-    level: { min: 1, max: 10 },
-    markupPercentages: { sell: 25, buy: -15 },
-    traderCategories: ['Carrina'],
-    commissionOffers: [],
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(isPartyAtCaravan).mockReturnValue(true);
-    vi.mocked(canPartyTravel).mockReturnValue(true);
-    vi.mocked(travelEtaSecondsTo).mockReturnValue(undefined);
-  });
-
-  it('returns undefined when the node is not a caravan', () => {
-    vi.mocked(worldNodeCaravan).mockReturnValue(undefined);
-
-    expect(commissionRowViewModel(entry)).toBeUndefined();
-  });
-
-  it('returns undefined when no commission has been generated yet', () => {
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-    withCommissionState(undefined);
-
-    expect(commissionRowViewModel(entry)).toBeUndefined();
-  });
-
-  it('resolves a full row once a commission is active', () => {
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === offer.id ? offer : wergenStick) as never,
-    );
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-
-    expect(commissionRowViewModel(entry)).toEqual({
-      caravanId: caravan.id,
-      nodeName: entry.nodeName,
-      title: caravan.name,
-      requirementEntries: [
-        {
-          kind: 'item',
-          content: wergenStick,
-          spritesheet: 'item',
-          quantity: 100,
-          owned: 100,
-        },
-      ],
-      rewards: offer.rewards,
-      canFulfill: true,
-      completed: false,
-      isPartyHere: true,
-      canTravel: true,
-      travelEtaSeconds: undefined,
-    });
-  });
-
-  it('reflects a completed commission and an in-progress travel ETA', () => {
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [],
-      completed: true,
-      generatedAt: 1000,
-    });
-    vi.mocked(isPartyAtCaravan).mockReturnValue(false);
-    vi.mocked(travelEtaSecondsTo).mockReturnValue(42);
-
-    const row = commissionRowViewModel(entry);
-
-    expect(row?.completed).toBe(true);
-    expect(row?.isPartyHere).toBe(false);
-    expect(row?.travelEtaSeconds).toBe(42);
-  });
-
-  it('reflects that the party cannot travel (e.g. mid-combat)', () => {
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(canPartyTravel).mockReturnValue(false);
-
-    expect(commissionRowViewModel(entry)?.canTravel).toBe(false);
   });
 });

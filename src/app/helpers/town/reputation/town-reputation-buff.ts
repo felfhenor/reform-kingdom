@@ -110,9 +110,3 @@ export function townReputationBuffSync(
     return state;
   });
 }
-
-// Re-derives every town's buff from scratch against `currentMapName` - used on game load,
-// where the normal sync hook never runs.
-export function townReputationBuffReconcile(currentMapName: string): void {
-  townReputationBuffSync('', currentMapName);
-}

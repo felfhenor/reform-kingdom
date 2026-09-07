@@ -25,18 +25,13 @@ import {
   applyTownStockAdd,
   pruneInvalidTownStock,
   townStock,
-  townStockBonusCombatStats,
-  townStockBonusResistances,
-  townStockBonusStats,
   townStockDisplay,
-  townStockExpiresIn,
 } from '@helpers/town/shop/town-stock';
 import type {
   AffixContent,
   EquipmentContent,
   GameState,
   ItemPreviewDisplay,
-  TownContent,
   TownId,
   TownStockEntry,
 } from '@interfaces';
@@ -115,16 +110,6 @@ describe('townStockDisplay', () => {
   });
 });
 
-describe('townStockBonusStats / townStockBonusResistances / townStockBonusCombatStats', () => {
-  it('resolves a zeroed bonus block for an entry with no affixes or infusions', () => {
-    const entry = buildEntry();
-
-    expect(townStockBonusStats(entry)).toBeDefined();
-    expect(townStockBonusResistances(entry)).toBeDefined();
-    expect(townStockBonusCombatStats(entry)).toBeDefined();
-  });
-});
-
 describe('pruneInvalidTownStock', () => {
   it('keeps an entry that still resolves to content', () => {
     vi.mocked(getEntry).mockReturnValue({} as EquipmentContent);
@@ -163,26 +148,6 @@ describe('pruneInvalidTownStock', () => {
   });
 });
 
-describe('townStockExpiresIn', () => {
-  function buildTown(itemExpirationTimer: number): TownContent {
-    return { traders: { itemExpirationTimer } } as unknown as TownContent;
-  }
-
-  it('returns undefined when the town has expiration disabled (itemExpirationTimer <= 0)', () => {
-    const entry = buildEntry({}, 0);
-
-    expect(townStockExpiresIn(entry, buildTown(0))).toBeUndefined();
-  });
-
-  it('formats the remaining ticks until expiration', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(120);
-    const entry = buildEntry({}, 20);
-
-    // itemExpirationTimer 1000 - (nowTick 120 - addedAtTick 20) = 900 remaining.
-    expect(townStockExpiresIn(entry, buildTown(1000))).toBe('formatted:900');
-  });
-});
-
 describe('applyTownStockAdd', () => {
   function buildState(stock: unknown[]): GameState {
     return {
@@ -206,7 +171,12 @@ describe('applyTownStockAdd', () => {
     const existing = buildEntry({}, 0);
     const state = buildState([existing]);
 
-    applyTownStockAdd(state, townId, { equipmentItem: { id: 'new' } as never }, 1);
+    applyTownStockAdd(
+      state,
+      townId,
+      { equipmentItem: { id: 'new' } as never },
+      1,
+    );
 
     expect(state.world.towns[townId].stock).toEqual([existing]);
   });

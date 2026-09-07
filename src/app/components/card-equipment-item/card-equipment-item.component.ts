@@ -16,8 +16,8 @@ import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
-  equipmentItemGrantedSkills,
 } from '@helpers/item/equipment-display';
+import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
   StatShorthand,

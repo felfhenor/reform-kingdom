@@ -12,16 +12,16 @@ import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipmen
 import { getEntry } from '@helpers/content/content';
 import {
   characterEquipFromArmory,
-  characterUnequipToArmory,
   optimizeCharacterEquipment,
 } from '@helpers/hero/character-equipment';
+import { characterUnequipToArmory } from '@helpers/hero/character-equipment.ui';
 import {
   canEquipItem,
   canModifyEquipment,
-  equipmentAvailableForSlot,
   isSlotAvailableForJob,
 } from '@helpers/item/equipment';
-import { equipmentItemTotalStats } from '@helpers/item/equipment-display';
+import { equipmentAvailableForSlot } from '@helpers/item/equipment.ui';
+import { equipmentItemTotalStats } from '@helpers/item/equipment-display.ui';
 import type {
   Character,
   EquipmentArmoryEntry,

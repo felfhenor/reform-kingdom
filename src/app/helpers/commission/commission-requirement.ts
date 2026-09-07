@@ -2,20 +2,17 @@ import { getEntry } from '@helpers/content/content';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
-import {
-  RARITY_PRIORITY,
-  type CommissionOfferContent,
-  type CommissionOfferSlot,
-  type CommissionRequirement,
-  type CommissionRequirementEntry,
-  type DropRarity,
-  type EligibleCommissionOffer,
-  type EquipmentContent,
-  type GameState,
-  type ItemContent,
-  type MonsterContent,
+import type {
+  CommissionOfferContent,
+  CommissionOfferSlot,
+  CommissionRequirement,
+  CommissionRequirementEntry,
+  EligibleCommissionOffer,
+  EquipmentContent,
+  GameState,
+  ItemContent,
+  MonsterContent,
 } from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
 
 // Shared by caravan and town commission generation - both draw from the same weighted CommissionOfferSlot[] pool shape.
 export function eligibleCommissionOffers(
@@ -111,15 +108,4 @@ export function buildCommissionRequirementEntries(
       owned: commissionRequirementOwnedQuantity(requirement),
     };
   });
-}
-
-export function commissionRarity(
-  requirements: CommissionRequirementEntry[],
-): DropRarity {
-  return sortBy(
-    requirements.map((requirement) => {
-      return requirement.content?.rarity ?? 'Common';
-    }),
-    (rarity) => RARITY_PRIORITY[rarity],
-  )[0];
 }

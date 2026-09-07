@@ -138,7 +138,7 @@ export function craftMaxCraftableQuantity(
 // Mutates `state` directly - only ever called from inside a single
 // `updateGamestate` callback, so every requirement in a batch is applied
 // atomically in one state commit.
-function applyRequirementQuantity(
+export function applyRequirementQuantity(
   state: GameState,
   requirement: RecipeRequirement,
   quantity: number,
@@ -227,38 +227,6 @@ export function craftQueueStart(
     `Kingdom:Craft:Queue:${analyticsSafeSegment(recipe.name)}`,
   );
   return true;
-}
-
-// Refunds only the unconsumed remainder of the batch - units already
-// crafted keep the materials/equipment they used.
-export function craftQueueRemove(
-  tradeskill: Tradeskill,
-  queueEntryId: CraftQueueEntryId,
-): void {
-  const tradeskillId = tradeskillIdForName(tradeskill);
-  if (!tradeskillId) return;
-
-  updateGamestate((state) => {
-    const building = tradeskillBuildingIn(state, tradeskillId);
-    const entry = building.queue.find((queued) => queued.id === queueEntryId);
-    if (!entry) return state;
-
-    const recipe = getEntry<RecipeContent>(entry.recipeId);
-    const remaining = entry.quantityTotal - entry.quantityCompleted;
-
-    if (recipe && remaining > 0) {
-      recipe.requirements.forEach((requirement) => {
-        applyRequirementQuantity(state, requirement, remaining, 1);
-      });
-    }
-
-    state.tradeskills[tradeskillId] = {
-      ...building,
-      queue: building.queue.filter((queued) => queued.id !== queueEntryId),
-    };
-
-    return state;
-  });
 }
 
 // An item result with a `chance` roll can whiff entirely, producing nothing

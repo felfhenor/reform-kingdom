@@ -17,18 +17,15 @@ import { notifySuccess } from '@helpers/engine/notify';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
+import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
 import {
-  townStock,
   townStockBonusCombatStats,
   townStockBonusResistances,
   townStockBonusStats,
-  townStockDisplay,
   townStockExpiresIn,
-} from '@helpers/town/shop/town-stock';
-import {
-  townExecuteTrade,
-  townStockAffordable,
-} from '@helpers/town/shop/town-trade';
+} from '@helpers/town/shop/town-stock.ui';
+import { townStockAffordable } from '@helpers/town/shop/town-trade';
+import { townExecuteTrade } from '@helpers/town/shop/town-trade.ui';
 import type { TownContent, TownStockEntry, TownStockRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';

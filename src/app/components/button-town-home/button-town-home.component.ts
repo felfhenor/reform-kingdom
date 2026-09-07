@@ -6,11 +6,8 @@ import {
 } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { notifySuccess } from '@helpers/engine/notify';
-import {
-  canSetHomeNode,
-  homeNodeGet,
-  homeNodeSet,
-} from '@helpers/town/town-spawn';
+import { canSetHomeNode, homeNodeGet } from '@helpers/town/town-spawn';
+import { homeNodeSet } from '@helpers/town/town-spawn.ui';
 import type { TownContent, WorldNodeEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

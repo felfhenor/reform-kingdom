@@ -11,7 +11,7 @@ import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.compone
 import {
   townWorkerRosterEntries,
   townWorkerStatusDisplay,
-} from '@helpers/town/worker/town-worker-roster';
+} from '@helpers/town/worker/town-worker-roster.ui';
 import type {
   TownContent,
   TownWorkerRosterEntry,

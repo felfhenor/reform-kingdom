@@ -1,7 +1,5 @@
 import {
-  adventureLogEntryHtml,
   adventureLogMessageHtml,
-  adventureLogTimestampTooltip,
   beginCombatLogCommits,
   combatantMessageToken,
   combatLog,
@@ -18,7 +16,6 @@ import {
 import type {
   Combat,
   Combatant,
-  CombatLog,
   EquipmentContent,
   ItemContent,
   RecipeContent,
@@ -117,57 +114,6 @@ describe('adventureLogMessageHtml', () => {
   });
 });
 
-describe('adventureLogEntryHtml', () => {
-  it('colors every named combatant by their own HP status, not just one', () => {
-    const entry = {
-      message: '**@@hero-1@@** attacks **@@guardian-1@@** for 8 damage.',
-      combatants: [
-        { id: 'hero-1', name: 'Jala', hp: 18, maxHp: 20 },
-        { id: 'guardian-1', name: 'Goblin', hp: 2, maxHp: 20 },
-      ],
-    } as unknown as CombatLog;
-
-    expect(adventureLogEntryHtml(entry)).toBe(
-      '<strong><span class="text-green-400">Jala</span></strong> attacks <strong><span class="text-rose-400">Goblin</span></strong> for 8 damage.',
-    );
-  });
-
-  it('leaves the message unstyled when the entry has no combatants', () => {
-    const entry = {
-      message: '**@@hero-1@@** attacks **@@guardian-1@@** for 8 damage.',
-    } as unknown as CombatLog;
-
-    expect(adventureLogEntryHtml(entry)).toBe(
-      '<strong>@@hero-1@@</strong> attacks <strong>@@guardian-1@@</strong> for 8 damage.',
-    );
-  });
-
-  it('leaves an unrecognized token as-is instead of stripping it', () => {
-    const entry = {
-      message: '**@@stale-id@@** has been defeated!',
-      combatants: [{ id: 'hero-1', name: 'Jala', hp: 18, maxHp: 20 }],
-    } as unknown as CombatLog;
-
-    expect(adventureLogEntryHtml(entry)).toBe(
-      '<strong>@@stale-id@@</strong> has been defeated!',
-    );
-  });
-
-  it('colors two combatants that share the same name independently, by id', () => {
-    const entry = {
-      message: '**@@hero-1@@** protects **@@hero-2@@**.',
-      combatants: [
-        { id: 'hero-1', name: 'Rowan', hp: 18, maxHp: 20 },
-        { id: 'hero-2', name: 'Rowan', hp: 2, maxHp: 20 },
-      ],
-    } as unknown as CombatLog;
-
-    expect(adventureLogEntryHtml(entry)).toBe(
-      '<strong><span class="text-green-400">Rowan</span></strong> protects <strong><span class="text-rose-400">Rowan</span></strong>.',
-    );
-  });
-});
-
 describe('itemNameHtml', () => {
   it('wraps the item name in a rarity-colored span', () => {
     const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
@@ -247,12 +193,5 @@ describe('recipeDropHtml', () => {
     expect(recipeDropHtml(recipe)).toBe(
       '<span class="font-semibold">Recipe - Equipment: Bone-Hewn Cloak</span>',
     );
-  });
-});
-
-describe('adventureLogTimestampTooltip', () => {
-  it('formats a timestamp as zero-padded HH:mm:ss', () => {
-    const date = new Date(2026, 0, 1, 4, 5, 6);
-    expect(adventureLogTimestampTooltip(date.getTime())).toBe('04:05:06');
   });
 });

@@ -1,6 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { CardStatusWorkerLevelupComponent } from '@components/card-status-worker-levelup/card-status-worker-levelup.component';
-import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression';
+import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression.ui';
 
 @Component({
   selector: 'app-status-worker-levelup',

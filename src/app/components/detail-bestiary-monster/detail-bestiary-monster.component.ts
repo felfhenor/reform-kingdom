@@ -20,7 +20,7 @@ import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
 import {
   bestiaryDropQuantityLabel,
   bestiaryXpLabel,
-} from '@helpers/kingdom/bestiary';
+} from '@helpers/kingdom/bestiary.ui';
 import type {
   BestiaryEntry,
   Combatant,

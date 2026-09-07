@@ -1,14 +1,5 @@
-import {
-  analyticsSafeSegment,
-  analyticsSendDesignEvent,
-} from '@helpers/engine/analytics';
-import { hasGold, spendGold } from '@helpers/item/materials';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gamestate } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
 import type { GameStateGatherNodeLevels, GatheringContent } from '@interfaces';
 
 // Absent entry (or a missing gatherNodeLevels, e.g. mid-migration on an old save) means level 0.
@@ -41,33 +32,6 @@ export function worldNodeLevelUpCost(
 // Mirrors isPartyAtCaravan (caravan.ts) - leveling requires physically standing at the node.
 export function isPartyAtGatherNode(nodeName: string): boolean {
   return worldNodeAtCurrentLocation()?.nodeName === nodeName;
-}
-
-export function gatherNodeLevelUp(nodeName: string): boolean {
-  const node = worldNodeByName(nodeName);
-  if (!node) return false;
-
-  const gathering = worldNodeGathering(node);
-  if (!gathering) return false;
-
-  if (worldNodeIsMaxLevel(gathering, nodeName)) return false;
-  if (!isPartyAtGatherNode(nodeName)) return false;
-
-  const cost = worldNodeLevelUpCost(gathering, nodeName);
-  if (!hasGold(cost)) return false;
-
-  updateGamestate((state) => {
-    spendGold(state, cost);
-
-    const existing = state.gatherNodeLevels[nodeName];
-    state.gatherNodeLevels[nodeName] = { level: (existing?.level ?? 0) + 1 };
-    return state;
-  });
-
-  analyticsSendDesignEvent(
-    `World:GatherNode:LevelUp:${analyticsSafeSegment(nodeName)}`,
-  );
-  return true;
 }
 
 // Drops entries whose node no longer resolves, and clamps to the current max achievable level.

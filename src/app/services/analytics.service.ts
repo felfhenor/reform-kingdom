@@ -1,13 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
-import {
-  analyticsBoundEventId,
-  analyticsEvent$,
-} from '@helpers/engine/analytics';
+import { analyticsEvent$ } from '@helpers/engine/analytics';
+import { analyticsBoundEventId } from '@helpers/engine/analytics.ui';
+import { info } from '@helpers/engine/logging';
 import { getOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';
 import gameanalytics from 'gameanalytics';
-import { info } from '@helpers/engine/logging';
 
 @Injectable({
   providedIn: 'root',

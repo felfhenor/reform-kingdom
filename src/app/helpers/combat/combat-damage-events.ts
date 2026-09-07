@@ -14,10 +14,3 @@ export function combatantDamageEventEmit(
     { id: rngUuid(), combatantId, amount },
   ]);
 }
-
-export function combatantDamageEventsClear(ids: string[]): void {
-  const idSet = new Set(ids);
-  combatantDamageEvents.update((events) =>
-    events.filter((event) => !idSet.has(event.id)),
-  );
-}

@@ -13,7 +13,6 @@ import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   townReputation,
-  townReputationDisplay,
   townReputationGain,
   townReputationLose,
   townReputationTier,
@@ -83,34 +82,6 @@ describe('townReputationTier', () => {
     } as unknown as GameState);
 
     expect(townReputationTier(townId)).toBe(2);
-  });
-});
-
-describe('townReputationDisplay', () => {
-  it('includes the next tier and threshold when not yet at max', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { reputation: 250 } } },
-    } as unknown as GameState);
-
-    expect(townReputationDisplay(townId)).toEqual({
-      reputation: 250,
-      tierName: 'Friendly',
-      nextThreshold: 600,
-      nextTierName: 'Honored',
-    });
-  });
-
-  it('omits the next tier and threshold at max reputation (Renowned)', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { reputation: 9000 } } },
-    } as unknown as GameState);
-
-    expect(townReputationDisplay(townId)).toEqual({
-      reputation: 9000,
-      tierName: 'Renowned',
-      nextThreshold: undefined,
-      nextTierName: undefined,
-    });
   });
 });
 

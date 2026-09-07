@@ -1,7 +1,6 @@
 import { defaultCombatStats } from '@helpers/defaults';
 import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import type {
-  BestiaryEntry,
   EncounterContent,
   EncounterId,
   EncounterRandomContent,
@@ -32,22 +31,9 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  isRewardDiscovered: vi.fn(),
-  rewardContentInfo: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeDisplayName: vi.fn((nodeName: string) => nodeName),
-}));
-
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
-  bestiaryDropQuantityLabel,
-  bestiaryXpLabel,
-  filterBestiaryEntries,
-  getBestiaryEntries,
   getMonsterFoundAtNodes,
   getMonsterKillCount,
   getMonsterLevelRangeFound,
@@ -58,10 +44,6 @@ import {
   repairInvalidBestiaryLevels,
 } from '@helpers/kingdom/bestiary';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import {
-  isRewardDiscovered,
-  rewardContentInfo,
-} from '@helpers/world-node/world-node-rewards';
 
 const goblin: MonsterContent = {
   id: 'goblin' as MonsterId,
@@ -504,237 +486,6 @@ describe('Bestiary Helper Functions', () => {
       );
 
       expect(monsterSourceNodeNames(goblin.id)).toEqual([]);
-    });
-  });
-
-  describe('bestiaryDropQuantityLabel', () => {
-    it('shows the raw range when bonusPerLevel is absent, regardless of level', () => {
-      const reward = {
-        kind: 'Item' as const,
-        itemId: 'gold-coin' as ItemId,
-        min: 3,
-        max: 10,
-        chance: 100,
-      };
-
-      expect(bestiaryDropQuantityLabel(reward, 1)).toBe('3-10');
-      expect(bestiaryDropQuantityLabel(reward, 10)).toBe('3-10');
-    });
-
-    it('scales the range up by level * bonusPerLevel', () => {
-      expect(
-        bestiaryDropQuantityLabel(
-          {
-            kind: 'Item',
-            itemId: 'gold-coin' as ItemId,
-            min: 3,
-            max: 10,
-            bonusPerLevel: 2,
-            chance: 100,
-          },
-          4,
-        ),
-      ).toBe('11-18');
-    });
-
-    it('collapses to a single number when min equals max', () => {
-      expect(
-        bestiaryDropQuantityLabel(
-          {
-            kind: 'Item',
-            itemId: 'gold-coin' as ItemId,
-            min: 5,
-            max: 5,
-            chance: 100,
-          },
-          1,
-        ),
-      ).toBe('5');
-    });
-
-    it('shows 1 for a flat-chance equipment/collectible/recipe drop regardless of level', () => {
-      expect(
-        bestiaryDropQuantityLabel(
-          { kind: 'Equipment', equipmentId: 'sword' as never, chance: 10 },
-          5,
-        ),
-      ).toBe('1');
-    });
-  });
-
-  describe('bestiaryXpLabel', () => {
-    it('shows the raw range when bonusPerLevel is absent, regardless of level', () => {
-      const flatXpMonster: MonsterContent = {
-        ...goblin,
-        xp: { min: 3, max: 5 },
-      };
-
-      expect(bestiaryXpLabel(flatXpMonster, 1)).toBe('3-5');
-      expect(bestiaryXpLabel(flatXpMonster, 10)).toBe('3-5');
-    });
-
-    it('scales the range up by level * bonusPerLevel', () => {
-      // xp.bonusPerLevel is 1 on the shared goblin fixture.
-      expect(bestiaryXpLabel(goblin, 3)).toBe('6-8');
-    });
-
-    it('collapses to a single number when min equals max', () => {
-      const flatXpMonster: MonsterContent = {
-        ...goblin,
-        xp: { min: 10, max: 10 },
-      };
-
-      expect(bestiaryXpLabel(flatXpMonster, 1)).toBe('10');
-    });
-  });
-
-  describe('getBestiaryEntries', () => {
-    it('builds an entry for every monster, discovered or not', () => {
-      vi.mocked(getEntriesByType).mockImplementation((type) => {
-        if (type === 'monster') return [goblin] as never;
-        if (type === 'encounter') return [fieldRuinsEncounter] as never;
-        return [] as never;
-      });
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {},
-      } as unknown as GameState);
-      vi.mocked(isRewardDiscovered).mockReturnValue(false);
-
-      const entries = getBestiaryEntries();
-
-      expect(entries).toEqual([
-        {
-          monster: goblin,
-          discovered: false,
-          kills: 0,
-          levelRange: undefined,
-          foundAtNodes: [],
-          sourceNodeNames: ['Field Ruins'],
-          drops: [{ reward: goblin.drops[0], discovered: false }],
-        },
-      ]);
-    });
-
-    it('excludes monsters referenced in any town guardian tier', () => {
-      const guardian: MonsterContent = { ...goblin, id: 'guardian' as MonsterId };
-      vi.mocked(getEntriesByType).mockImplementation((type) => {
-        if (type === 'monster') return [goblin, guardian] as never;
-        if (type === 'town')
-          return [
-            {
-              defense: {
-                guardian: {
-                  reputationTiers: [
-                    {
-                      tier: 0,
-                      guardians: [{ monsterId: guardian.id, quantity: 1 }],
-                    },
-                  ],
-                },
-              },
-            },
-          ] as never;
-        return [] as never;
-      });
-      vi.mocked(gamestate).mockReturnValue({ bestiary: {} } as unknown as GameState);
-      vi.mocked(isRewardDiscovered).mockReturnValue(false);
-
-      const entries = getBestiaryEntries();
-
-      expect(entries.map((entry) => entry.monster.id)).toEqual([goblin.id]);
-    });
-
-    it('uses the actual found level range and locations for a discovered monster', () => {
-      vi.mocked(getEntriesByType).mockImplementation((type) => {
-        if (type === 'monster') return [goblin] as never;
-        return [] as never;
-      });
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 5,
-            minLevelFound: 2,
-            maxLevelFound: 6,
-            foundAtNodes: ['Field Ruins', 'Swamp'],
-          },
-        },
-      } as unknown as GameState);
-      vi.mocked(isRewardDiscovered).mockReturnValue(true);
-
-      const entries = getBestiaryEntries();
-
-      expect(entries[0]).toEqual(
-        expect.objectContaining({
-          discovered: true,
-          kills: 5,
-          levelRange: { min: 2, max: 6 },
-          foundAtNodes: ['Field Ruins', 'Swamp'],
-        }),
-      );
-    });
-  });
-
-  describe('filterBestiaryEntries', () => {
-    const discoveredEntry: BestiaryEntry = {
-      monster: goblin,
-      discovered: true,
-      kills: 3,
-      levelRange: { min: 1, max: 5 },
-      foundAtNodes: ['Field Ruins'],
-      sourceNodeNames: ['Field Ruins'],
-      drops: [{ reward: goblin.drops[0], discovered: true }],
-    };
-
-    const undiscoveredEntry: BestiaryEntry = {
-      monster: { ...goblin, id: 'wolf' as MonsterId, name: 'Wolf' },
-      discovered: false,
-      kills: 0,
-      foundAtNodes: [],
-      sourceNodeNames: ['The Wilds'],
-      drops: [],
-    };
-
-    const entries = [discoveredEntry, undiscoveredEntry];
-
-    it('returns every entry when the search text is empty', () => {
-      expect(filterBestiaryEntries(entries, '   ')).toEqual(entries);
-    });
-
-    it('matches a discovered entry by monster name', () => {
-      expect(filterBestiaryEntries(entries, 'goblin')).toEqual([
-        discoveredEntry,
-      ]);
-    });
-
-    it('matches a discovered entry by a place it was found', () => {
-      expect(filterBestiaryEntries(entries, 'field ruins')).toEqual([
-        discoveredEntry,
-      ]);
-    });
-
-    it('matches a discovered entry by a discovered drop name', () => {
-      vi.mocked(rewardContentInfo).mockReturnValue({
-        name: 'Gold Coin',
-        sprite: '0000',
-        spritesheet: 'item',
-      });
-
-      expect(filterBestiaryEntries([discoveredEntry], 'gold coin')).toEqual([
-        discoveredEntry,
-      ]);
-    });
-
-    it('never matches an undiscovered entry, even by its source node name', () => {
-      expect(filterBestiaryEntries(entries, 'wilds')).toEqual([]);
-    });
-
-    it('does not match an undiscovered entry by its real monster name', () => {
-      expect(filterBestiaryEntries(entries, 'wolf')).toEqual([]);
-    });
-
-    it('returns an empty array when nothing matches', () => {
-      expect(filterBestiaryEntries(entries, 'nonexistent')).toEqual([]);
     });
   });
 });

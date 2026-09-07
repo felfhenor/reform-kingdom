@@ -5,13 +5,13 @@ import { ButtonGlowComponent } from '@components/button-glow/button-glow.compone
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
-import { hasAnyCommission } from '@helpers/commission/commission-tick';
+import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
 import {
-  craftQueueTicksRemaining,
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
-} from '@helpers/crafting/crafting';
+} from '@helpers/crafting/crafting.ui';
 import { tradeskillBuilding } from '@helpers/crafting/tradeskill';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { formatDuration } from '@helpers/engine/timer';
@@ -21,15 +21,15 @@ import {
   uiClockTick,
 } from '@helpers/engine/ui';
 import { armoryGet } from '@helpers/kingdom/armory';
-import { unlockedAstralProjectorEntries } from '@helpers/kingdom/astral-projector';
-import { getBestiaryEntries } from '@helpers/kingdom/bestiary';
+import { unlockedAstralProjectorEntries } from '@helpers/kingdom/astral-projector.ui';
+import { getBestiaryEntries } from '@helpers/kingdom/bestiary.ui';
 import {
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
-} from '@helpers/kingdom/museum';
+} from '@helpers/kingdom/museum.ui';
 import { gamestate } from '@helpers/state-game';
-import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense';
-import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression';
+import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
+import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression.ui';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
   worldNodeCaravan,

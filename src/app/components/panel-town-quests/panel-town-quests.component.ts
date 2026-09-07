@@ -10,7 +10,7 @@ import { travelStart } from '@helpers/hero/travel';
 import {
   townCommissionFulfill,
   townCommissionRowViewModels,
-} from '@helpers/town/town-commission-fulfill';
+} from '@helpers/town/town-commission-fulfill.ui';
 import type { TownCommissionRowViewModel, WorldNodeEntry } from '@interfaces';
 
 @Component({

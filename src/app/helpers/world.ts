@@ -29,10 +29,6 @@ export function worldNodeAtCurrentLocation(): WorldNodeEntry | undefined {
   return worldNodeAt(location.mapName, location.x, location.y);
 }
 
-export function isPlayerAtLocation(): boolean {
-  return !!worldNodeAtCurrentLocation();
-}
-
 export function isPlayerAtKingdom(): boolean {
   const location = currentLocationGet();
   const node = worldNodeAt(location.mapName, location.x, location.y);

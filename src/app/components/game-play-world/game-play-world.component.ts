@@ -34,7 +34,7 @@ import {
   pixiAppInitialize,
   pixiResponsiveCanvasSetup,
   pixiWorldContainersCreate,
-} from '@helpers/pixi/pixi-app-setup';
+} from '@helpers/pixi/pixi-app-setup.ui';
 import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
@@ -43,7 +43,7 @@ import {
   viewportTilesCalculate,
 } from '@helpers/pixi/pixi-camera';
 import { pixiFloatingTextCreate } from '@helpers/pixi/pixi-floating-text';
-import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid';
+import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid.ui';
 import {
   pixiIndicatorEncounterProgressCreate,
   pixiIndicatorGatherProgressCreate,
@@ -59,21 +59,22 @@ import {
 import {
   defaultTravelGlideState,
   travelGlideAdvance,
-} from '@helpers/pixi/pixi-travel-glide';
+} from '@helpers/pixi/pixi-travel-glide.ui';
 import { gamestate } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-travel';
-import { workersTravelingTokens } from '@helpers/worker/worker-travel';
-import { currentLocationGet, isPlayerAtLocation } from '@helpers/world';
-import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate';
+import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-travel.ui';
+import { workersTravelingTokens } from '@helpers/worker/worker-travel.ui';
+import { currentLocationGet } from '@helpers/world';
+import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate.ui';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
-import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status';
+import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status.ui';
 import {
   isWorldNodeCollectibleGateMet,
   isWorldNodeVisible,
   worldNodeByName,
-  worldNodeDiscoverIfHidden,
 } from '@helpers/world-node/world-nodes';
+import { worldNodeDiscoverIfHidden } from '@helpers/world-node/world-nodes.ui';
+import { isPlayerAtLocation } from '@helpers/world.ui';
 import type {
   AtlasedImage,
   CameraBounds,

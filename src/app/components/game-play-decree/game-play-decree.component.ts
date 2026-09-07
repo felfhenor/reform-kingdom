@@ -16,21 +16,23 @@ import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import {
   decreeClauseAdd,
   decreeClauseConflicts,
-  decreeClauseRemove,
   decreeClauseReorder,
   decreeClauses,
   decreeClauseSetEnabled,
-  decreeClauseUpdate,
-  decreeSetWaitForFullHealthBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree';
 import {
+  decreeClauseRemove,
+  decreeClauseUpdate,
+  decreeSetWaitForFullHealthBeforeCombat,
+} from '@helpers/decree/decree.ui';
+import {
   exploreNodeFarmOptions,
   farmNodeRewardOptions,
-} from '@helpers/decree/decree-farm-node';
+} from '@helpers/decree/decree-farm-node.ui';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/engine/risk-band';
 import { homeNodeGet } from '@helpers/town/town-spawn';
-import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
+import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery.ui';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {

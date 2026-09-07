@@ -1,30 +1,14 @@
 import type {
-  CaravanContent,
-  CaravanId,
   EncounterContent,
   TiledObject,
   TownContent,
   WorldNodeEntry,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/caravan/caravan', () => ({
-  caravanBrandName: vi.fn((nodeName: string) => nodeName.split(' - ')[0]),
-  caravanState: vi.fn(() => undefined),
-  caravanTimerLabel: vi.fn(() => undefined),
-}));
-
-vi.mock('@helpers/world-node/world-node-discovery', () => ({
-  isWorldNodeDiscovered: vi.fn(() => false),
-  worldNodeDiscover: vi.fn(),
-}));
-
-import { caravanTimerLabel } from '@helpers/caravan/caravan';
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
-import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import {
   worldNodeInteractionKind,
-  worldNodeLabelInfo,
   worldNodeLevelLabel,
   worldNodeLevelRange,
 } from '@helpers/world-node/world-node-status';
@@ -81,100 +65,35 @@ function seedContent(
   );
 }
 
-describe('encounter-backed node accessors', () => {
-  beforeEach(() => {
+describe('worldNodeLevelRange', () => {
+  it("reads the level range from the matching encounter's data", () => {
     setAllIdsByName(new Map());
     setAllContentById(new Map());
-    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+    seedEncounter(buildEncounter({ levelRange: { min: 2, max: 5 } }));
+
+    expect(worldNodeLevelRange(buildEntry())).toEqual({ min: 2, max: 5 });
   });
 
-  describe('worldNodeLevelRange', () => {
-    it("reads the level range from the matching encounter's data", () => {
-      seedEncounter(buildEncounter({ levelRange: { min: 2, max: 5 } }));
+  it('returns undefined when there is no matching encounter', () => {
+    setAllIdsByName(new Map());
+    setAllContentById(new Map());
 
-      expect(worldNodeLevelRange(buildEntry())).toEqual({ min: 2, max: 5 });
-    });
-
-    it('returns undefined when there is no matching encounter', () => {
-      expect(worldNodeLevelRange(buildEntry())).toBeUndefined();
-    });
-
-    it("collapses a town's single level into a min-max range", () => {
-      seedContent([
-        {
-          id: 'town-forest-ruins',
-          name: 'Forest Ruins',
-          __type: 'town',
-          level: 25,
-        } as unknown as TownContent,
-      ]);
-
-      expect(worldNodeLevelRange(buildEntry())).toEqual({ min: 25, max: 25 });
-    });
+    expect(worldNodeLevelRange(buildEntry())).toBeUndefined();
   });
 
-  describe('worldNodeLabelInfo', () => {
-    it('labels a gather node with its level range', () => {
-      seedEncounter(buildEncounter({ levelRange: { min: 2, max: 5 } }));
+  it("collapses a town's single level into a min-max range", () => {
+    setAllIdsByName(new Map());
+    setAllContentById(new Map());
+    seedContent([
+      {
+        id: 'town-forest-ruins',
+        name: 'Forest Ruins',
+        __type: 'town',
+        level: 25,
+      } as unknown as TownContent,
+    ]);
 
-      expect(worldNodeLabelInfo(buildEntry({ type: 'ExploreNode' }))).toEqual({
-        kind: 'Explore',
-        text: 'Forest Ruins\nLv.2-5',
-      });
-    });
-
-    it('omits the level suffix when there is no matching content', () => {
-      expect(worldNodeLabelInfo(buildEntry({ type: 'TeleportNode' }))).toEqual({
-        kind: 'Travel',
-        text: 'Forest Ruins',
-      });
-    });
-
-    it('returns undefined for non-interactable object types', () => {
-      expect(worldNodeLabelInfo(buildEntry({ type: '' }))).toBeUndefined();
-    });
-
-    it('shows only the caravan brand name (dropping the branch suffix and level range) and prefixes the reset timer', () => {
-      const caravan: CaravanContent = {
-        id: 'caravan-1' as CaravanId,
-        name: 'Duchy Trading Caravan - Carrina',
-        __type: 'caravan',
-        description: 'A caravan.',
-        traderResetTime: 3600,
-        level: { min: 2, max: 5 },
-        markupPercentages: { sell: 25, buy: -15 },
-        traderCategories: ['Carrina'],
-        commissionOffers: [],
-      };
-      seedContent([caravan]);
-      vi.mocked(caravanTimerLabel).mockReturnValue('01:00:00');
-
-      expect(
-        worldNodeLabelInfo({
-          mapName: 'Carrina',
-          x: 24,
-          y: 24,
-          nodeName: caravan.name,
-          nodeData: buildObject({ name: caravan.name, type: 'CaravanNode' }),
-        }),
-      ).toEqual({
-        kind: 'Trade',
-        text: '01:00:00\nDuchy Trading Caravan',
-      });
-    });
-
-    it('still resolves the real label for a hidden, undiscovered node', () => {
-      // Visibility gating happens at the map-render layer, not here.
-      seedEncounter(
-        buildEncounter({ hidden: true, levelRange: { min: 2, max: 5 } }),
-      );
-      vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
-
-      expect(worldNodeLabelInfo(buildEntry({ type: 'ExploreNode' }))).toEqual({
-        kind: 'Explore',
-        text: 'Forest Ruins\nLv.2-5',
-      });
-    });
+    expect(worldNodeLevelRange(buildEntry())).toEqual({ min: 25, max: 25 });
   });
 });
 

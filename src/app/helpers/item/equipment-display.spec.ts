@@ -8,8 +8,6 @@ import {
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
   equipmentItemGrantedSkillIds,
-  equipmentItemGrantedSkills,
-  equipmentItemTotalStats,
 } from '@helpers/item/equipment-display';
 import type {
   AffixContent,
@@ -18,8 +16,6 @@ import type {
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
-  EquipmentSkillContent,
-  EquipmentSkillId,
   ItemContent,
   ItemId,
 } from '@interfaces';
@@ -119,9 +115,7 @@ function buildItem(overrides: Partial<EquipmentItem> = {}): EquipmentItem {
   };
 }
 
-function mockContent(
-  ...entries: (AffixContent | ItemContent | EquipmentSkillContent)[]
-): void {
+function mockContent(...entries: (AffixContent | ItemContent)[]): void {
   vi.mocked(getEntry).mockImplementation(
     (id) => entries.find((entry) => entry.id === id) as never,
   );
@@ -210,49 +204,6 @@ describe('equipmentItemBonusCombatStats', () => {
   });
 });
 
-describe('equipmentItemTotalStats', () => {
-  const content: EquipmentContent = {
-    id: 'sword' as EquipmentId,
-    name: 'Sword',
-    __type: 'equipment',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    levelRequirement: 1,
-    baseStats: {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 5,
-      Vitality: 0,
-    },
-    type: 'Sword',
-    slots: 0,
-    grantedSkillIds: [],
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('equals baseStats when the item has no infusions or affixes', () => {
-    expect(equipmentItemTotalStats(buildItem(), content).Strength).toBe(5);
-  });
-
-  it('adds the affix bonus on top of baseStats', () => {
-    mockContent(strengthAffix);
-
-    const total = equipmentItemTotalStats(
-      buildItem({ affixIds: [strengthAffix.id] }),
-      content,
-    );
-    expect(total.Strength).toBe(9);
-  });
-});
-
 describe('equipmentItemGrantedSkillIds', () => {
   const content: EquipmentContent = {
     id: 'sword' as EquipmentId,
@@ -308,67 +259,5 @@ describe('equipmentItemGrantedSkillIds', () => {
   it('returns just the content-granted skills when the item has no affixes', () => {
     const skillIds = equipmentItemGrantedSkillIds(buildItem(), content);
     expect(skillIds).toEqual(['starshine-2']);
-  });
-});
-
-describe('equipmentItemGrantedSkills', () => {
-  const content: EquipmentContent = {
-    id: 'sword' as EquipmentId,
-    name: 'Sword',
-    __type: 'equipment',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    levelRequirement: 1,
-    baseStats: {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-    },
-    type: 'Sword',
-    slots: 0,
-    grantedSkillIds: [
-      'starshine-2' as EquipmentSkillId,
-      'ghost-2' as EquipmentSkillId,
-    ],
-  };
-
-  const starshine: EquipmentSkillContent = {
-    id: 'starshine-2' as EquipmentSkillId,
-    name: 'Starshine II',
-    __type: 'skill',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    family: 'Starshine',
-    requiredWeaponTypes: [],
-    techniques: [],
-    usesPerCombat: -1,
-    epCost: 0,
-    statusEffectDurationBoost: {},
-    statusEffectChanceBoost: {},
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('resolves granted skill ids to their content', () => {
-    mockContent(starshine);
-
-    const skills = equipmentItemGrantedSkills(buildItem(), content);
-    expect(skills).toEqual([starshine]);
-  });
-
-  it('drops a granted skill id that no longer resolves to content', () => {
-    mockContent();
-
-    const skills = equipmentItemGrantedSkills(buildItem(), content);
-    expect(skills).toEqual([]);
   });
 });

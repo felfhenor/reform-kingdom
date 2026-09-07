@@ -23,7 +23,7 @@ import {
   debugStartTownDefenseCombat,
   debugTelegraphRaid,
   debugUndiscoverRecipe,
-} from '@helpers/debug/debug';
+} from '@helpers/debug/debug.ui';
 import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { WORKER_MAX_LEVEL } from '@helpers/worker/worker-progression';

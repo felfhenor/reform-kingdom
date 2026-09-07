@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
-import {
-  setOption,
-  shouldShowAnalyticsConsentBanner,
-} from '@helpers/state-options';
+import { setOption } from '@helpers/state-options';
+import { shouldShowAnalyticsConsentBanner } from '@helpers/state-options.ui';
 
 @Component({
   selector: 'app-banner-analytics-consent',

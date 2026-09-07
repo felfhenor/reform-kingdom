@@ -10,7 +10,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { hotkeyMatches } from '@helpers/engine/hotkeys';
+import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
 import {
   modalClose,
   modalCloseTop,
@@ -32,7 +32,7 @@ import { isSetup } from '@helpers/setup';
 import { saveGameState } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
-import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan';
+import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan.ui';
 import {
   worldNodeCaravan,
   worldNodeTown,

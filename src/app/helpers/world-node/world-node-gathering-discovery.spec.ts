@@ -1,295 +1,133 @@
 import type {
+  GatherResult,
   GatheringContent,
   GatheringId,
   ItemId,
-  TiledLayer,
-  TiledMap,
   TiledObject,
+  WorldNodeEntry,
 } from '@interfaces';
 import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/item/gather-node-discovery', () => ({
-  isGatherNodeDiscovered: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  isMaterialDiscovered: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/world-node/world-node-discovery', () => ({
-  isWorldNodeDiscovered: vi.fn(() => false),
-  worldNodeDiscover: vi.fn(),
-}));
 
 vi.mock('@helpers/world-node/world-node-level', () => ({
   worldNodeLevel: vi.fn(() => 0),
 }));
 
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
-import { isMaterialDiscovered } from '@helpers/item/materials';
-import { setAllMaps } from '@helpers/maps';
-import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
-import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
+import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 
-function buildObject(overrides: Partial<TiledObject>): TiledObject {
+function buildGathering(
+  overrides: Partial<GatheringContent> = {},
+): GatheringContent {
   return {
-    id: 1,
-    name: 'Unnamed',
-    type: '',
-    x: 0,
-    y: 0,
-    width: 64,
-    height: 64,
-    visible: true,
+    id: 'gather-1' as GatheringId,
+    name: 'Wergen Woods',
+    __type: 'gathering',
+    description: 'A dry forest.',
+    levelRange: { min: 1, max: 5 },
+    xpGainedIfInLevelRange: 3,
+    gatherTime: 10,
+    gatherResults: [
+      buildResult({ items: [{ itemId: 'wood' as ItemId, quantity: 1 }] }),
+    ],
+    ...overrides,
+  } as GatheringContent;
+}
+
+function buildResult(overrides: Partial<GatherResult>): GatherResult {
+  return {
+    chance: 100,
+    items: [],
+    tradeskillIds: [],
     ...overrides,
   };
 }
 
-function buildMap(objects: {
-  exploreNodes?: TiledObject[];
-  otherNodes?: TiledObject[];
-}): TiledMap {
-  const layers: TiledLayer[] = [
-    {
-      id: 1,
-      name: 'Explore Nodes',
-      type: 'objectgroup',
-      visible: true,
-      objects: objects.exploreNodes ?? [],
-    },
-    {
-      id: 2,
-      name: 'Other Nodes',
-      type: 'objectgroup',
-      visible: true,
-      objects: objects.otherNodes ?? [],
-    },
-  ];
-
+function buildEntry(nodeName: string): WorldNodeEntry {
   return {
-    width: 50,
-    height: 50,
-    tilewidth: 64,
-    tileheight: 64,
-    tilesets: [],
-    layers,
+    mapName: 'Carrina',
+    x: 0,
+    y: 0,
+    nodeName,
+    nodeData: {} as TiledObject,
   };
 }
 
-describe('gatherableMaterialIds', () => {
-  function buildGathering(
-    overrides: Partial<GatheringContent> = {},
-  ): GatheringContent {
-    return {
-      id: 'gather-1' as GatheringId,
-      name: 'Wergen Woods',
-      __type: 'gathering',
-      description: 'A dry forest.',
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
-      gatherTime: 10,
+describe('worldNodeGatherMaterialIds', () => {
+  it('collects the item ids from every gather result at the node current level', () => {
+    const gathering = buildGathering({
       gatherResults: [
-        {
-          chance: 100,
+        buildResult({ items: [{ itemId: 'wood' as ItemId, quantity: 1 }] }),
+        buildResult({
+          chance: 50,
+          items: [{ itemId: 'sap' as ItemId, quantity: 1 }],
+        }),
+      ],
+    });
+    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
+    setAllContentById(new Map([['gather-1', gathering]]));
+
+    expect(
+      worldNodeGatherMaterialIds(buildEntry('Wergen Woods')).sort(),
+    ).toEqual(['sap', 'wood']);
+  });
+
+  it('de-duplicates an item id shared by multiple gather results', () => {
+    const gathering = buildGathering({
+      gatherResults: [
+        buildResult({
+          chance: 50,
           items: [{ itemId: 'wood' as ItemId, quantity: 1 }],
-        },
-      ],
-      ...overrides,
-    } as GatheringContent;
-  }
-
-  it('collects materials from every discovered GatherNode across all loaded maps', () => {
-    const woodGathering = buildGathering({
-      id: 'gather-1' as GatheringId,
-      name: 'Wergen Woods',
-      gatherResults: [
-        { chance: 100, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
+        }),
+        buildResult({
+          chance: 50,
+          items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
+        }),
       ],
     });
-    const stoneGathering = buildGathering({
-      id: 'gather-2' as GatheringId,
-      name: 'Rocky Outcrop',
-      gatherResults: [
-        { chance: 100, items: [{ itemId: 'stone' as ItemId, quantity: 1 }] },
-      ],
-    });
-
-    setAllIdsByName(
-      new Map([
-        ['Wergen Woods', 'gather-1'],
-        ['Rocky Outcrop', 'gather-2'],
-      ]),
-    );
-    setAllContentById(
-      new Map([
-        ['gather-1', woodGathering],
-        ['gather-2', stoneGathering],
-      ]),
-    );
-
-    const map = buildMap({
-      otherNodes: [
-        buildObject({ name: 'Wergen Woods', type: 'GatherNode' }),
-        buildObject({ name: 'Rocky Outcrop', type: 'GatherNode', id: 2 }),
-      ],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
-
-    expect(gatherableMaterialIds().sort()).toEqual(['stone', 'wood']);
-  });
-
-  it('excludes GatherNodes the player has not discovered yet', () => {
-    const woodGathering = buildGathering({
-      id: 'gather-1' as GatheringId,
-      name: 'Wergen Woods',
-      gatherResults: [
-        { chance: 100, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
-      ],
-    });
-    const stoneGathering = buildGathering({
-      id: 'gather-2' as GatheringId,
-      name: 'Rocky Outcrop',
-      gatherResults: [
-        { chance: 100, items: [{ itemId: 'stone' as ItemId, quantity: 1 }] },
-      ],
-    });
-
-    setAllIdsByName(
-      new Map([
-        ['Wergen Woods', 'gather-1'],
-        ['Rocky Outcrop', 'gather-2'],
-      ]),
-    );
-    setAllContentById(
-      new Map([
-        ['gather-1', woodGathering],
-        ['gather-2', stoneGathering],
-      ]),
-    );
-
-    const map = buildMap({
-      otherNodes: [
-        buildObject({ name: 'Wergen Woods', type: 'GatherNode' }),
-        buildObject({ name: 'Rocky Outcrop', type: 'GatherNode', id: 2 }),
-      ],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isGatherNodeDiscovered).mockImplementation(
-      (nodeName) => nodeName === 'Wergen Woods',
-    );
-
-    expect(gatherableMaterialIds()).toEqual(['wood']);
-  });
-
-  it('de-duplicates materials shared by multiple discovered nodes', () => {
-    const gathering = buildGathering();
-
     setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
     setAllContentById(new Map([['gather-1', gathering]]));
 
-    const map = buildMap({
-      otherNodes: [
-        buildObject({ name: 'Wergen Woods', type: 'GatherNode', x: 0 }),
-      ],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
-
-    expect(gatherableMaterialIds()).toEqual(['wood']);
+    expect(worldNodeGatherMaterialIds(buildEntry('Wergen Woods'))).toEqual([
+      'wood',
+    ]);
   });
 
-  it('returns nothing when no GatherNodes exist', () => {
-    setAllMaps(new Map());
-
-    expect(gatherableMaterialIds()).toEqual([]);
-  });
-
-  it('excludes a hidden GatherNode the player has not discovered, even if visited', () => {
-    const gathering = buildGathering({ hidden: true });
-
-    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
-    setAllContentById(new Map([['gather-1', gathering]]));
-
-    const map = buildMap({
-      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
-    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
-
-    expect(gatherableMaterialIds()).toEqual([]);
-  });
-
-  it('includes a hidden GatherNode once it has been discovered', () => {
-    const gathering = buildGathering({ hidden: true });
-
-    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
-    setAllContentById(new Map([['gather-1', gathering]]));
-
-    const map = buildMap({
-      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
-    vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
-
-    expect(gatherableMaterialIds()).toEqual(['wood']);
-  });
-
-  it('excludes a material from a discovered node until it has actually been obtained', () => {
+  it('excludes a level-gated result until the node is developed to that level', () => {
     const gathering = buildGathering({
       gatherResults: [
-        { chance: 50, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
-        { chance: 50, items: [{ itemId: 'sap' as ItemId, quantity: 1 }] },
-      ],
-    });
-
-    setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
-    setAllContentById(new Map([['gather-1', gathering]]));
-
-    const map = buildMap({
-      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
-    vi.mocked(isMaterialDiscovered).mockImplementation((id) => id === 'wood');
-
-    expect(gatherableMaterialIds()).toEqual(['wood']);
-
-    vi.mocked(isMaterialDiscovered).mockReturnValue(true);
-  });
-
-  it('excludes a level-gated material until the node is developed to that level', () => {
-    const gathering = buildGathering({
-      gatherResults: [
-        { chance: 50, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
-        {
+        buildResult({
+          chance: 50,
+          items: [{ itemId: 'wood' as ItemId, quantity: 1 }],
+        }),
+        buildResult({
           chance: 50,
           items: [{ itemId: 'azurite' as ItemId, quantity: 1 }],
           levelRequirement: 2,
-        },
+        }),
       ],
     });
-
     setAllIdsByName(new Map([['Wergen Woods', 'gather-1']]));
     setAllContentById(new Map([['gather-1', gathering]]));
-
-    const map = buildMap({
-      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
     vi.mocked(worldNodeLevel).mockReturnValue(0);
 
-    expect(gatherableMaterialIds().sort()).toEqual(['wood']);
+    expect(
+      worldNodeGatherMaterialIds(buildEntry('Wergen Woods')).sort(),
+    ).toEqual(['wood']);
 
     vi.mocked(worldNodeLevel).mockReturnValue(2);
 
-    expect(gatherableMaterialIds().sort()).toEqual(['azurite', 'wood']);
+    expect(
+      worldNodeGatherMaterialIds(buildEntry('Wergen Woods')).sort(),
+    ).toEqual(['azurite', 'wood']);
 
     vi.mocked(worldNodeLevel).mockReturnValue(0);
+  });
+
+  it('returns nothing when the node is not a gathering node', () => {
+    setAllIdsByName(new Map());
+    setAllContentById(new Map());
+
+    expect(worldNodeGatherMaterialIds(buildEntry('Not A Node'))).toEqual([]);
   });
 });

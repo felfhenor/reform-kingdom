@@ -10,12 +10,11 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
 import { goldCoinId } from '@helpers/item/materials';
+import { equipmentSellValue, getArmoryEntries } from '@helpers/kingdom/armory';
 import {
-  equipmentSellValue,
   filterArmoryEntries,
-  getArmoryEntries,
   sellEquipmentItems,
-} from '@helpers/kingdom/armory';
+} from '@helpers/kingdom/armory.ui';
 import type { EquipmentArmoryEntry, EquipmentItemId } from '@interfaces';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sum } from 'es-toolkit/compat';

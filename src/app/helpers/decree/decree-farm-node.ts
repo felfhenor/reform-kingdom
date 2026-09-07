@@ -1,142 +1,17 @@
-import { getEntry } from '@helpers/content/content';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
-import { assertNeverReward } from '@helpers/item/loot';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { isWorkerRescued } from '@helpers/worker/worker-discovery';
-import {
-  isGoldCoinReward,
-  isRewardDiscovered,
-  rewardContentInfo,
-  rewardKey,
-  worldNodeCompletionRewardProgress,
-  worldNodeCompletionRewards,
-} from '@helpers/world-node/world-node-rewards';
-import {
-  worldNodeLevelLabel,
-  worldNodeLevelRange,
-} from '@helpers/world-node/world-node-status';
-import {
-  worldNodeByName,
-  worldNodeEncounter,
-  worldNodeEncounterRandom,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
-import type {
-  DroppedReward,
-  ExploreNodeFarmOption,
-  FarmNodeRewardOption,
-  MonsterContent,
-  MonsterId,
-  RewardIdentity,
-  WorldNodeEntry,
-} from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
+import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import { worldNodesOfType } from '@helpers/world-node/world-nodes';
+import type { RewardIdentity, WorldNodeEntry } from '@interfaces';
 
 // ExploreNodes with at least one completion reward looted - the closest proxy to "already beaten" this game has.
 export function farmableExploreNodes(): WorldNodeEntry[] {
   return worldNodesOfType('ExploreNode').filter(
     (entry) => worldNodeCompletionRewardProgress(entry).obtained > 0,
   );
-}
-
-export function exploreNodeFarmOptions(): ExploreNodeFarmOption[] {
-  return sortBy(
-    farmableExploreNodes().map((entry) => {
-      const levelRange = worldNodeLevelRange(entry);
-      return {
-        nodeName: entry.nodeName,
-        levelLabel: levelRange ? worldNodeLevelLabel(levelRange) : '?',
-        entry,
-      };
-    }),
-    (option) => option.nodeName,
-  );
-}
-
-function toRewardIdentity(reward: DroppedReward): RewardIdentity {
-  switch (reward.kind) {
-    case 'Item':
-      return { itemId: reward.itemId };
-    case 'Equipment':
-      return { equipmentId: reward.equipmentId };
-    case 'Collectible':
-      return { collectibleId: reward.collectibleId };
-    case 'Worker':
-      return { workerId: reward.workerId };
-    case 'Recipe':
-      return { recipeId: reward.recipeId };
-    default:
-      return assertNeverReward(reward);
-  }
-}
-
-function worldNodeMonsterIds(entry: WorldNodeEntry): MonsterId[] {
-  const encounter = worldNodeEncounter(entry);
-  if (encounter) {
-    return encounter.fights.flatMap((fight) =>
-      fight.monsters.map((monster) => monster.monsterId),
-    );
-  }
-
-  const encounterRandom = worldNodeEncounterRandom(entry);
-  return encounterRandom?.creaturePool.map((pool) => pool.monsterId) ?? [];
-}
-
-// Discovered kill drops from every monster fought at `entry`, de-duplicated; excludes undiscovered drops and Gold Coin.
-function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
-  const monsterIds = new Set(worldNodeMonsterIds(entry));
-
-  const seen = new Set<string>();
-  const drops: DroppedReward[] = [];
-
-  monsterIds.forEach((monsterId) => {
-    const monster = getEntry<MonsterContent>(monsterId);
-    monster?.drops.forEach((reward) => {
-      if (isGoldCoinReward(reward)) return;
-      if (!isRewardDiscovered(reward)) return;
-
-      const key = rewardKey(reward);
-      if (seen.has(key)) return;
-
-      seen.add(key);
-      drops.push(reward);
-    });
-  });
-
-  return drops;
-}
-
-export function farmNodeRewardOptions(
-  nodeName: string,
-): FarmNodeRewardOption[] {
-  const entry = worldNodeByName(nodeName);
-  if (!entry) return [];
-
-  const rewards = [
-    ...worldNodeCompletionRewards(entry),
-    ...worldNodeMonsterDrops(entry),
-  ];
-
-  const seen = new Set<string>();
-
-  // Recipes and workers are excluded: both are one-time unlocks, not
-  // something to accumulate/farm a quantity of.
-  return rewards
-    .filter((reward) => !('recipeId' in reward) && !('workerId' in reward))
-    .map((reward) => {
-      const identity = toRewardIdentity(reward);
-      const key = rewardKey(identity);
-      if (seen.has(key)) return undefined;
-      seen.add(key);
-
-      const content = rewardContentInfo(identity);
-      if (!content) return undefined;
-
-      return { ...content, key, reward: identity };
-    })
-    .filter((option): option is FarmNodeRewardOption => !!option);
 }
 
 // Current stock of `reward`, generalized across all reward types. Equipment has no quantity field so it's counted from owned armory entries; recipes read as 1/0 (known or not).

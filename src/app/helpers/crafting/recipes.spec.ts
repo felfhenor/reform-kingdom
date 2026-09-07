@@ -1,4 +1,3 @@
-import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -35,16 +34,7 @@ vi.mock('@helpers/item/equipment', () => ({
 vi.mock('@helpers/item/materials', () => ({
   getMaterialQuantity: vi.fn(() => 0),
   traderTokenId: vi.fn(() => 'trader-token'),
-  applyMaterialDelta: vi.fn(),
 }));
-
-vi.mock('@helpers/engine/analytics', async (importOriginal) => {
-  const actual = await importOriginal<typeof AnalyticsHelper>();
-  return {
-    ...actual,
-    analyticsSendDesignEvent: vi.fn(),
-  };
-});
 
 vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(() => []),
@@ -69,16 +59,11 @@ import {
   recipeResultOwnedQuantity,
   recipeResultSpritesheet,
   recipeUndiscover,
-  recipeUnlockWithTokens,
 } from '@helpers/crafting/recipes';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
-import {
-  applyMaterialDelta,
-  getMaterialQuantity,
-} from '@helpers/item/materials';
+import { getMaterialQuantity } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
@@ -272,10 +257,12 @@ describe('Recipes Helper Functions', () => {
       expect(isRecipeCraftable(itemRecipe.id)).toBe(true);
     });
 
-    it('is false for a recipe listed in any town\'s uniqueRecipeIds, even if already discovered', () => {
-      mockEntriesByType([], [forestRuinsEncounter], [
-        { crafting: { uniqueRecipeIds: [equipmentRecipe.id] } },
-      ]);
+    it("is false for a recipe listed in any town's uniqueRecipeIds, even if already discovered", () => {
+      mockEntriesByType(
+        [],
+        [forestRuinsEncounter],
+        [{ crafting: { uniqueRecipeIds: [equipmentRecipe.id] } }],
+      );
       vi.mocked(gamestate).mockReturnValue({
         discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
       } as unknown as GameState);
@@ -292,10 +279,14 @@ describe('Recipes Helper Functions', () => {
     });
 
     it('is true when a town lists the recipe in its uniqueRecipeIds', () => {
-      mockEntriesByType([], [forestRuinsEncounter], [
-        { crafting: { uniqueRecipeIds: [] } },
-        { crafting: { uniqueRecipeIds: [itemRecipe.id] } },
-      ]);
+      mockEntriesByType(
+        [],
+        [forestRuinsEncounter],
+        [
+          { crafting: { uniqueRecipeIds: [] } },
+          { crafting: { uniqueRecipeIds: [itemRecipe.id] } },
+        ],
+      );
 
       expect(isRecipeTownUnique(itemRecipe.id)).toBe(true);
     });
@@ -527,110 +518,6 @@ describe('Recipes Helper Functions', () => {
       } as unknown as GameState);
 
       expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);
-    });
-  });
-
-  describe('recipeUnlockWithTokens', () => {
-    beforeEach(() => {
-      mockEntriesByType();
-      vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
-    });
-
-    it('returns false and does not mutate state when unlock conditions are not met', async () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-        materials: {},
-      } as unknown as GameState);
-
-      expect(await recipeUnlockWithTokens(equipmentRecipe.id)).toBe(false);
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('spends tokens and discovers the recipe atomically on success', async () => {
-      const state = {
-        discoveredRecipes: {},
-        materials: {
-          ['trader-token' as ItemId]: {
-            quantity: equipmentRecipe.tokenUnlockCost,
-            foundAt: 1,
-          },
-        },
-      } as unknown as GameState;
-      vi.mocked(gamestate).mockReturnValue(state);
-
-      // updateGamestate is a dumb recorder here (it doesn't invoke the
-      // callback itself), so the callback is captured and run manually
-      // before awaiting the outer promise - mirroring the double-fire
-      // regression test further down, which relies on the same
-      // capture-then-invoke shape.
-      const resultPromise = recipeUnlockWithTokens(equipmentRecipe.id);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn(state);
-
-      expect(await resultPromise).toBe(true);
-      expect(applyMaterialDelta).toHaveBeenCalledWith(
-        expect.anything(),
-        'trader-token',
-        -equipmentRecipe.tokenUnlockCost,
-      );
-      expect(
-        result.discoveredRecipes[equipmentRecipe.id].foundAt,
-      ).toBeGreaterThan(0);
-      expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-        'Progress:Museum:RecipeUnlock:Equipment Bone-Hewn Cloak',
-      );
-    });
-
-    it('does not double-spend tokens when two unlocks race before either commits', async () => {
-      // Regression test for the rapid-click double-fire bug: updateGamestate
-      // doesn't commit until an async yield later, so the affordability check
-      // (run synchronously before that yield) can pass twice against the same
-      // stale, pre-commit state if two calls race in before the first one's
-      // callback actually runs.
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-        materials: {
-          ['trader-token' as ItemId]: {
-            quantity: equipmentRecipe.tokenUnlockCost,
-            foundAt: 1,
-          },
-        },
-      } as unknown as GameState);
-
-      const call1 = recipeUnlockWithTokens(equipmentRecipe.id);
-      const call2 = recipeUnlockWithTokens(equipmentRecipe.id);
-
-      expect(updateGamestate).toHaveBeenCalledTimes(2);
-      const [updateFn1, updateFn2] = vi
-        .mocked(updateGamestate)
-        .mock.calls.map((call) => call[0]);
-
-      const initialState = {
-        discoveredRecipes: {},
-        materials: {
-          ['trader-token' as ItemId]: {
-            quantity: equipmentRecipe.tokenUnlockCost,
-            foundAt: 1,
-          },
-        },
-      } as unknown as GameState;
-
-      // Simulates commit ordering: call1's callback commits first; call2's
-      // callback then runs against that already-committed result, as it
-      // would once its own updateGamestate yield resolves.
-      const afterFirst = updateFn1(initialState);
-      const afterSecond = updateFn2(afterFirst);
-
-      const [result1, result2] = await Promise.all([call1, call2]);
-
-      expect(result1).toBe(true);
-      expect(result2).toBe(false);
-      expect(afterSecond).toBe(afterFirst);
-      expect(
-        afterFirst.discoveredRecipes[equipmentRecipe.id].foundAt,
-      ).toBeGreaterThan(0);
-      expect(applyMaterialDelta).toHaveBeenCalledTimes(1);
     });
   });
 });

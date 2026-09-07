@@ -12,7 +12,6 @@ import {
   STAT_BONUS,
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
-import { armoryGet } from '@helpers/kingdom/armory';
 import { rngUuid } from '@helpers/rng';
 import {
   EquipmentTypeToSlot,
@@ -140,7 +139,7 @@ export function canEquipItem(
 }
 
 // Takes `armory` as a parameter rather than reading it globally, so it also works against a draft armory.
-function equipmentEntriesForSlot(
+export function equipmentEntriesForSlot(
   armory: EquipmentItem[],
   slot: EquipmentSlot,
 ): EquipmentArmoryEntry[] {
@@ -158,13 +157,6 @@ function equipmentEntriesForSlot(
     [(entry) => entry.content.levelRequirement],
     ['desc'],
   );
-}
-
-// Returns one entry per owned instance (not deduped by content id), so distinct physical copies (e.g. differently-infused swords) stay pickable.
-export function equipmentAvailableForSlot(
-  slot: EquipmentSlot,
-): EquipmentArmoryEntry[] {
-  return equipmentEntriesForSlot(armoryGet(), slot);
 }
 
 // Resolves each distinct equipped item to its content `type` (e.g. `Bow`,
@@ -230,14 +222,6 @@ export function characterTagResistances(
   character: Character,
 ): StatusEffectBlock {
   return equipmentTagResistanceTotals(character.equipment);
-}
-
-// Gear-only, not the in-combat value (which also factors in a default
-// combat-stat baseline, meaningless outside a `Combatant`).
-export function characterCombatStatTotals(
-  character: Character,
-): CombatStatBlock {
-  return equipmentCombatStatTotals(character.equipment);
 }
 
 // Merging these into known skills is handled separately, which needs skill content, not just ids.

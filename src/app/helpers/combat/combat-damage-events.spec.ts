@@ -1,7 +1,6 @@
 import {
   combatantDamageEventEmit,
   combatantDamageEvents,
-  combatantDamageEventsClear,
 } from '@helpers/combat/combat-damage-events';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -24,21 +23,5 @@ describe('combatantDamageEventEmit', () => {
 
     const [first, second] = combatantDamageEvents();
     expect(first.id).not.toBe(second.id);
-  });
-});
-
-describe('combatantDamageEventsClear', () => {
-  beforeEach(() => {
-    combatantDamageEvents.set([]);
-  });
-
-  it('removes only the events matching the given ids', () => {
-    combatantDamageEventEmit('hero-1', -25);
-    combatantDamageEventEmit('hero-2', 15);
-
-    const [toRemove, toKeep] = combatantDamageEvents();
-    combatantDamageEventsClear([toRemove.id]);
-
-    expect(combatantDamageEvents()).toEqual([toKeep]);
   });
 });

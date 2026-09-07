@@ -5,7 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { CardStatusCraftingComponent } from '@components/card-status-crafting/card-status-crafting.component';
-import { craftingActiveStatusEntries } from '@helpers/crafting/crafting';
+import { craftingActiveStatusEntries } from '@helpers/crafting/crafting.ui';
 import { uiClockTick } from '@helpers/engine/ui';
 import { getOption } from '@helpers/state-options';
 

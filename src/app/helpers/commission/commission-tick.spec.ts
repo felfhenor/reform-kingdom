@@ -27,7 +27,6 @@ import { mostRecentCommissionResetAt } from '@helpers/commission/commission-rese
 import {
   commissionGenerateIfMissing,
   commissionProcessTick,
-  hasAnyCommission,
   pruneInvalidCommissions,
 } from '@helpers/commission/commission-tick';
 import { getEntry } from '@helpers/content/content';
@@ -189,26 +188,6 @@ describe('commissionProcessTick', () => {
     expect(result.world.commissions[caravan.id].requirements).toEqual([
       { monsterId: 'sand-worm', quantity: 5, progress: 0 },
     ]);
-  });
-});
-
-describe('hasAnyCommission', () => {
-  it('is false when no caravan has generated a commission yet', () => {
-    withCommissionState({});
-
-    expect(hasAnyCommission()).toBe(false);
-  });
-
-  it('is true once at least one commission exists', () => {
-    withCommissionState({
-      [caravan.id]: {
-        generatedAt: 1000,
-        commissionOfferId: offer.id,
-        completed: false,
-      },
-    });
-
-    expect(hasAnyCommission()).toBe(true);
   });
 });
 

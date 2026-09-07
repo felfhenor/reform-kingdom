@@ -1,7 +1,4 @@
-import {
-  mostRecentCommissionResetAt,
-  nextCommissionResetAt,
-} from '@helpers/commission/commission-reset';
+import { mostRecentCommissionResetAt } from '@helpers/commission/commission-reset';
 import { describe, expect, it } from 'vitest';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -20,12 +17,5 @@ describe('mostRecentCommissionResetAt', () => {
   it("returns yesterday's boundary when now is before today's", () => {
     const now = BOUNDARY - 60 * 60 * 1000;
     expect(mostRecentCommissionResetAt(now)).toBe(BOUNDARY - ONE_DAY_MS);
-  });
-});
-
-describe('nextCommissionResetAt', () => {
-  it('is exactly one day after the most recent boundary', () => {
-    const now = BOUNDARY + 60 * 60 * 1000;
-    expect(nextCommissionResetAt(now)).toBe(BOUNDARY + ONE_DAY_MS);
   });
 });

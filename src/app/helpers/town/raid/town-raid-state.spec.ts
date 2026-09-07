@@ -33,7 +33,6 @@ import {
   raidAssaulterPreview,
   raidDefenderPreview,
   telegraphedRaidTownIds,
-  townCraftDebuffExpiresAtTick,
   townRaidTelegraph,
 } from '@helpers/town/raid/town-raid-state';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
@@ -148,42 +147,6 @@ describe('isTownCraftDebuffActive', () => {
     vi.mocked(timerTicksElapsed).mockReturnValue(100);
 
     expect(isTownCraftDebuffActive(buildTownState())).toBe(false);
-  });
-});
-
-describe('townCraftDebuffExpiresAtTick', () => {
-  it('returns the expiration tick while the debuff is active', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(100);
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: buildTownState({ craftSpeedDebuffExpiresAtTick: 200 }),
-        },
-      },
-    } as unknown as GameState);
-
-    expect(townCraftDebuffExpiresAtTick(townId)).toBe(200);
-  });
-
-  it('is undefined once the debuff has expired', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(300);
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: buildTownState({ craftSpeedDebuffExpiresAtTick: 200 }),
-        },
-      },
-    } as unknown as GameState);
-
-    expect(townCraftDebuffExpiresAtTick(townId)).toBeUndefined();
-  });
-
-  it('is undefined when the town has no state at all', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-
-    expect(townCraftDebuffExpiresAtTick(townId)).toBeUndefined();
   });
 });
 

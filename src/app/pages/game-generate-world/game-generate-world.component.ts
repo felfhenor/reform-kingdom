@@ -6,7 +6,7 @@ import { isSetup } from '@helpers/setup';
 import {
   cancelWorldGeneration,
   currentWorldGenStatus,
-} from '@helpers/worldgen';
+} from '@helpers/worldgen.ui';
 import { SoundService } from '@services/sound.service';
 
 @Component({

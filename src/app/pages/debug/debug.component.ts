@@ -1,9 +1,17 @@
 import type { Signal } from '@angular/core';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { InputAnalysisComponent } from '@components/input-analysis/input-analysis.component';
-import { computeDefaultLevel } from '@helpers/debug/analysis-defaults';
-import { ALL_ANALYSIS_INPUTS, GLOBAL_ANALYSIS_INPUTS } from '@helpers/debug/analysis-inputs';
-import { ANALYSIS_SCRIPTS } from '@helpers/debug/analysis-registry';
+import { computeDefaultLevel } from '@helpers/debug/analysis-defaults.ui';
+import {
+  ALL_ANALYSIS_INPUTS,
+  GLOBAL_ANALYSIS_INPUTS,
+} from '@helpers/debug/analysis-inputs.ui';
+import { ANALYSIS_SCRIPTS } from '@helpers/debug/analysis-registry.ui';
 import type {
   AnalysisInputDef,
   AnalysisInputValue,
@@ -42,17 +50,21 @@ const CATEGORIES: AnalysisScriptCategory[] = [
 // query param is left `null` (rather than baking a static fallback into
 // `parse`) when absent - `inputValue()` below resolves that case specially.
 // Every other input's static `defaultValue` is baked into `parse` directly.
-function paramParse(input: AnalysisInputDef): (raw: string | null) => AnalysisInputValue | null {
+function paramParse(
+  input: AnalysisInputDef,
+): (raw: string | null) => AnalysisInputValue | null {
   switch (input.type) {
     case 'number':
       return (raw) => {
-        const fallback = input.key === 'level' ? null : (input.defaultValue as number);
+        const fallback =
+          input.key === 'level' ? null : (input.defaultValue as number);
         if (raw === null) return fallback;
         const value = Number(raw);
         return Number.isFinite(value) ? value : fallback;
       };
     case 'boolean':
-      return (raw) => (raw === null ? (input.defaultValue as boolean) : raw === 'true');
+      return (raw) =>
+        raw === null ? (input.defaultValue as boolean) : raw === 'true';
     case 'jobMultiSelect':
     case 'monsterMultiSelect':
       return (raw) => (raw === null || raw === '' ? [] : raw.split(','));
@@ -73,7 +85,8 @@ function paramStringify(
         return names.length > 0 ? names.join(',') : null;
       };
     case 'boolean':
-      return (value) => (value === null ? null : (value as boolean) ? 'true' : 'false');
+      return (value) =>
+        value === null ? null : (value as boolean) ? 'true' : 'false';
     default:
       return (value) => (value === null ? null : String(value));
   }
@@ -91,19 +104,26 @@ export class DebugComponent {
 
   public categories = CATEGORIES;
   public activeCategory = linkedQueryParam<AnalysisScriptCategory>('tab', {
-    parse: (raw) => (CATEGORIES.includes(raw as AnalysisScriptCategory) ? (raw as AnalysisScriptCategory) : CATEGORIES[0]),
+    parse: (raw) =>
+      CATEGORIES.includes(raw as AnalysisScriptCategory)
+        ? (raw as AnalysisScriptCategory)
+        : CATEGORIES[0],
     stringify: (value) => value,
   });
 
   public globalInputs: AnalysisInputDef[] = GLOBAL_ANALYSIS_INPUTS;
 
   public isReady = computed(
-    () => this.contentService.hasLoadedData() && this.contentService.hasLoadedMaps(),
+    () =>
+      this.contentService.hasLoadedData() &&
+      this.contentService.hasLoadedMaps(),
   );
 
   private paramSignals: Record<
     string,
-    Signal<AnalysisInputValue | null> & { set: (v: AnalysisInputValue | null) => void }
+    Signal<AnalysisInputValue | null> & {
+      set: (v: AnalysisInputValue | null) => void;
+    }
   > = Object.fromEntries(
     ALL_ANALYSIS_INPUTS.map((input) => [
       input.key,
@@ -132,7 +152,8 @@ export class DebugComponent {
     definition,
     ownInputs: ALL_ANALYSIS_INPUTS.filter(
       (input) =>
-        definition.inputKeys.includes(input.key) && !GLOBAL_ANALYSIS_INPUTS.includes(input),
+        definition.inputKeys.includes(input.key) &&
+        !GLOBAL_ANALYSIS_INPUTS.includes(input),
     ),
     state: computed<ScriptResultState>(() => {
       if (!this.isReady()) return { result: null, error: null };
@@ -140,33 +161,40 @@ export class DebugComponent {
       try {
         return { result: definition.run(this.params()), error: null };
       } catch (err) {
-        return { result: null, error: err instanceof Error ? err.message : String(err) };
+        return {
+          result: null,
+          error: err instanceof Error ? err.message : String(err),
+        };
       }
     }),
   }));
 
-  public categoryStatuses: Record<AnalysisScriptCategory, Signal<CategoryStatus>> =
-    Object.fromEntries(
-      CATEGORIES.map((category) => [
-        category,
-        computed<CategoryStatus>(() => {
-          const status: CategoryStatus = { pass: 0, warning: 0, fail: 0 };
-          this.scriptsForCategory(category).forEach((script) => {
-            const result = script.state().result;
-            if (!result) return;
-            result.checks.forEach((check) => {
-              if (check.status === 'pass') status.pass += 1;
-              else if (check.status === 'warning') status.warning += 1;
-              else if (check.status === 'fail') status.fail += 1;
-            });
+  public categoryStatuses: Record<
+    AnalysisScriptCategory,
+    Signal<CategoryStatus>
+  > = Object.fromEntries(
+    CATEGORIES.map((category) => [
+      category,
+      computed<CategoryStatus>(() => {
+        const status: CategoryStatus = { pass: 0, warning: 0, fail: 0 };
+        this.scriptsForCategory(category).forEach((script) => {
+          const result = script.state().result;
+          if (!result) return;
+          result.checks.forEach((check) => {
+            if (check.status === 'pass') status.pass += 1;
+            else if (check.status === 'warning') status.warning += 1;
+            else if (check.status === 'fail') status.fail += 1;
           });
-          return status;
-        }),
-      ]),
-    ) as Record<AnalysisScriptCategory, Signal<CategoryStatus>>;
+        });
+        return status;
+      }),
+    ]),
+  ) as Record<AnalysisScriptCategory, Signal<CategoryStatus>>;
 
   public scriptsForCategory(category: AnalysisScriptCategory): ScriptState[] {
-    return this.scripts.filter((script) => script.definition.category === category);
+    return this.scripts.filter(
+      (script) => script.definition.category === category,
+    );
   }
 
   public inputValue(key: string): AnalysisInputValue {
@@ -189,9 +217,11 @@ export class DebugComponent {
   }
 
   public supportingScripts(inputKey: string): string {
-    const titles = ANALYSIS_SCRIPTS.filter((script) => script.inputKeys.includes(inputKey)).map(
-      (script) => script.title,
-    );
-    return titles.length > 0 ? `Used by: ${titles.join(', ')}` : 'Not used by any script.';
+    const titles = ANALYSIS_SCRIPTS.filter((script) =>
+      script.inputKeys.includes(inputKey),
+    ).map((script) => script.title);
+    return titles.length > 0
+      ? `Used by: ${titles.join(', ')}`
+      : 'Not used by any script.';
   }
 }

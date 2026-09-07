@@ -18,13 +18,11 @@ import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/to
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftQueueTicksRemaining,
-  craftQueueUnitsRemaining,
   getCraftableRecipeEntries,
 } from '@helpers/crafting/crafting';
-import {
-  craftQueueRemove,
-  craftQueueStart,
-} from '@helpers/crafting/crafting-queue';
+import { craftQueueStart } from '@helpers/crafting/crafting-queue';
+import { craftQueueRemove } from '@helpers/crafting/crafting-queue.ui';
+import { craftQueueUnitsRemaining } from '@helpers/crafting/crafting.ui';
 import {
   recipeResultContent,
   recipeResultSpritesheet,

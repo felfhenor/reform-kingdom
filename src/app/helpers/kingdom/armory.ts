@@ -1,5 +1,4 @@
 import { getEntry } from '@helpers/content/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import {
@@ -8,7 +7,6 @@ import {
   RESISTANCE_BONUS,
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
-import { gainGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   DropRarity,
@@ -16,7 +14,6 @@ import type {
   EquipmentContent,
   EquipmentId,
   EquipmentItem,
-  EquipmentItemId,
   GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
@@ -43,21 +40,6 @@ export function getArmoryEntries(): EquipmentArmoryEntry[] {
     ],
     ['desc', 'asc'],
   );
-}
-
-export function filterArmoryEntries(
-  entries: EquipmentArmoryEntry[],
-  searchText: string,
-): EquipmentArmoryEntry[] {
-  const text = searchText.trim().toLowerCase();
-  if (text === '') return entries;
-
-  return entries.filter((entry) => {
-    if (entry.content.name.toLowerCase().includes(text)) return true;
-    if (entry.content.description.toLowerCase().includes(text)) return true;
-
-    return false;
-  });
 }
 
 // Drops any armory entries whose equipmentId no longer resolves to real
@@ -143,28 +125,6 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
       combatStatTotal * SELL_GOLD_PER_COMBAT_STAT_POINT +
       resistanceTotal * SELL_GOLD_PER_RESISTANCE_POINT,
   );
-}
-
-// Sells owned armory items atomically; stale ids are silently skipped. Returns total gold gained.
-export function sellEquipmentItems(
-  equipmentItemIds: EquipmentItemId[],
-): number {
-  const idsToSell = new Set(equipmentItemIds);
-  const entries = getArmoryEntries().filter((entry) =>
-    idsToSell.has(entry.item.id),
-  );
-  if (entries.length === 0) return 0;
-
-  const totalGold = sum(entries.map((entry) => equipmentSellValue(entry)));
-
-  updateGamestate((state) => {
-    state.armory = state.armory.filter((item) => !idsToSell.has(item.id));
-    gainGold(state, totalGold);
-    return state;
-  });
-
-  analyticsSendDesignEvent('Kingdom:Armory:MassSell', entries.length);
-  return totalGold;
 }
 
 // Drops any discovery entries whose equipmentId no longer resolves to real

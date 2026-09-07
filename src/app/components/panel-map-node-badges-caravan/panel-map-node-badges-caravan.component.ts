@@ -7,7 +7,7 @@ import {
 import {
   worldNodeCaravanTradeCounts,
   worldNodeCaravanTraderLevel,
-} from '@helpers/world-node/world-node-caravan';
+} from '@helpers/world-node/world-node-caravan.ui';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({

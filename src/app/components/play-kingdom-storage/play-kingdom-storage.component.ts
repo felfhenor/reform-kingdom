@@ -4,7 +4,7 @@ import { SlotStorageItemComponent } from '@components/slot-storage-item/slot-sto
 import {
   filterStorageMaterials,
   getStorageMaterials,
-} from '@helpers/kingdom/storage';
+} from '@helpers/kingdom/storage.ui';
 
 @Component({
   selector: 'app-play-kingdom-storage',

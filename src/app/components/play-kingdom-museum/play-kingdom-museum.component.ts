@@ -9,14 +9,14 @@ import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-g
 import { SlotMuseumCollectibleComponent } from '@components/slot-museum-collectible/slot-museum-collectible.component';
 import { SlotMuseumRecipeComponent } from '@components/slot-museum-recipe/slot-museum-recipe.component';
 import { getEntry } from '@helpers/content/content';
-import { recipeUnlockWithTokens } from '@helpers/crafting/recipes';
+import { recipeUnlockWithTokens } from '@helpers/crafting/recipes.ui';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import {
   filterMuseumCollectibleEntries,
   filterMuseumRecipeEntries,
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
-} from '@helpers/kingdom/museum';
+} from '@helpers/kingdom/museum.ui';
 import {
   type MuseumCollectibleEntry,
   type MuseumRecipeEntry,

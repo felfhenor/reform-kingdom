@@ -6,7 +6,7 @@ import {
   untracked,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { autoModeStatusLabel } from '@helpers/decree/auto-mode';
+import { autoModeStatusLabel } from '@helpers/decree/auto-mode.ui';
 import {
   activeGlobalEffects,
   globalEffectDurationLabel,

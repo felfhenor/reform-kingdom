@@ -22,8 +22,7 @@ import { runWorkerReachabilityAnalysis } from '@helpers/debug/analysis-workerrea
 import { runWorkerStaminaAnalysis } from '@helpers/debug/analysis-workerstamina';
 import type { AnalysisScriptDefinition } from '@interfaces';
 
-// Every script the `/debug` dashboard and the `analyze:*`/`validate:*` CLI
-// wrappers run. `inputKeys` drives which `AnalysisInputDef`s this script
+// Every script the `/debug` dashboard runs. `inputKeys` drives which `AnalysisInputDef`s this script
 // reads and, in the dashboard, which scripts a shared input's help tooltip
 // lists as supporting it. `category` drives which dashboard tab a script's
 // section appears under - order here is the tab/section display order.
@@ -224,7 +223,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'townmaterialthresholds',
     title: 'Town Material Thresholds',
     description:
-      'Every item a town\'s assigned commissions request has a materialThresholds entry for that town.',
+      "Every item a town's assigned commissions request has a materialThresholds entry for that town.",
     category: 'Caravans & Commissions',
     strict: true,
     inputKeys: [],

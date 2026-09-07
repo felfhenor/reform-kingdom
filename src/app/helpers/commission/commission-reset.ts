@@ -1,7 +1,8 @@
 // Fixed UTC-6 offset year-round (no DST handling, by design) - "3AM CST" as
 // a wall-clock reset boundary.
 const COMMISSION_RESET_HOUR_UTC = 9;
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+// Exported so commission-reset.ui.ts's countdown helper can share this constant.
+export const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 // The most recent 3AM (UTC-6) boundary at or before `now`.
 export function mostRecentCommissionResetAt(now = Date.now()): number {
@@ -14,9 +15,4 @@ export function mostRecentCommissionResetAt(now = Date.now()): number {
   );
 
   return boundary <= now ? boundary : boundary - ONE_DAY_MS;
-}
-
-// Used for the Commissions panel's countdown display.
-export function nextCommissionResetAt(now = Date.now()): number {
-  return mostRecentCommissionResetAt(now) + ONE_DAY_MS;
 }

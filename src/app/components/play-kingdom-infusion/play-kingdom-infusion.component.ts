@@ -38,7 +38,7 @@ import {
   isInfusionMaterial,
 } from '@helpers/item/infusion';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
-import { getStorageMaterials } from '@helpers/kingdom/storage';
+import { getStorageMaterials } from '@helpers/kingdom/storage.ui';
 import {
   type Character,
   type CharacterId,

@@ -74,11 +74,6 @@ export function commissionProcessTick(): void {
   });
 }
 
-// Gates the Commissions tile - true once any caravan has a live commission.
-export function hasAnyCommission(): boolean {
-  return Object.keys(gamestate().world.commissions).length > 0;
-}
-
 // Drops any commission keyed by a caravan, or referencing an offer, that no
 // longer resolves to real content.
 export function pruneInvalidCommissions(

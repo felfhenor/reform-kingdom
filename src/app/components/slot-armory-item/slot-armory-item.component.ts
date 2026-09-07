@@ -15,8 +15,8 @@ import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
-  equipmentItemGrantedSkills,
 } from '@helpers/item/equipment-display';
+import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { goldCoinId } from '@helpers/item/materials';

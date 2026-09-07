@@ -12,7 +12,7 @@ import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.comp
 import {
   filterBestiaryEntries,
   getBestiaryEntries,
-} from '@helpers/kingdom/bestiary';
+} from '@helpers/kingdom/bestiary.ui';
 import type { MonsterId } from '@interfaces';
 
 @Component({
