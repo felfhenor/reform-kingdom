@@ -79,7 +79,6 @@ export function caravanTradePrice(
   );
 }
 
-// Undefined for an unlimited-quantity trade.
 export function caravanTradeRemaining(
   trade: CaravanTrade,
   tradeCounts: Record<number, number>,

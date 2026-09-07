@@ -82,7 +82,6 @@ export function astralProjectorSpellToBeOverwritten(
   return getEntry<AstralProjectorContent>(oldest.astralProjectorId);
 }
 
-// One `updateGamestate` commit, not chained calls, to avoid `bar-global-effect` seeing a momentary gap.
 // The effect is unconditionally removed then re-added so a same-spell recast doesn't duplicate it.
 export function astralProjectorCast(id: AstralProjectorId): void {
   const content = getEntry<AstralProjectorContent>(id);
@@ -183,7 +182,7 @@ function astralProjectorProcessExpiry(): void {
   });
 }
 
-// The linked GlobalEffect expires on its own via globalEffectsProcessTick (same duration) - this just keeps our own bookkeeping in sync.
+// The linked GlobalEffect expires on its own (same duration) - this just keeps our own bookkeeping in sync.
 export function astralProjectorProcessTick(): void {
   astralProjectorProcessUnlocks();
   astralProjectorProcessExpiry();

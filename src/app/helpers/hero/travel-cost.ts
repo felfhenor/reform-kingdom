@@ -3,7 +3,7 @@ import { worldNodeAt } from '@helpers/world-node/world-nodes';
 import type { CurrentLocation, TravelStep } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
 
-// Split out of travel.ts so this pure tick-costing math stays free of its gameplay side effects.
+// Split out so this pure tick-costing math stays free of its gameplay side effects.
 
 export const TICKS_PER_STEP_ON_PATH = 1;
 export const TICKS_PER_STEP_OFF_PATH = 3;
@@ -42,7 +42,7 @@ export function travelStepTicksCost(
 }
 
 // Sums a path's tick cost, threading each completed step as the next origin - mirrors the
-// per-step costing `travelProcessTick` does live, resolved all at once for a non-ticking location.
+// per-step costing done live, resolved all at once for a non-ticking location.
 export function travelPathTotalTicks(
   path: TravelStep[],
   origin: CurrentLocation,

@@ -50,7 +50,7 @@ export function townCommissionRequirementEntries(
   return slot ? buildCommissionRequirementEntries(slot.requirements) : [];
 }
 
-// Towns pay reputation instead of the offer's normal rewards (scrip/materials) - see CommissionOfferContent.townReputationReward.
+// Towns pay reputation instead of the offer's normal rewards (scrip/materials).
 export function townCommissionReputationReward(
   townId: TownId,
   slotId: TownCommissionSlotId,
@@ -72,7 +72,7 @@ export function townCommissionCanFulfill(
   return !!slot && commissionRequirementsSatisfied(slot.requirements, state);
 }
 
-// Persistence lives on the town's own authored commission-slot entry (TownCommissionOfferSlot), not on the shared offer content.
+// Persistence lives on the town's own authored commission-slot entry, not on the shared offer content.
 function isSlotPersistent(
   town: TownContent,
   slot: TownCommissionSlotState,
@@ -114,7 +114,7 @@ export function townCommissionRowViewModels(
   }));
 }
 
-// Fast path only - townCommissionCanFulfill is repeated against live state inside the callback, since updateGamestate commits asynchronously.
+// Fast path only - the check is repeated against live state inside the callback, since updateGamestate commits asynchronously.
 export async function townCommissionFulfill(
   townId: TownId,
   slotId: TownCommissionSlotId,

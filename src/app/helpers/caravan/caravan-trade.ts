@@ -123,8 +123,6 @@ function takeCaravanPayment(
   }
 }
 
-// Fast path only - caravanTradeMaxQuantity is re-run against live state
-// inside the callback, since updateGamestate commits asynchronously.
 export async function caravanExecuteTrade(
   entry: WorldNodeEntry,
   tradeIndex: number,
@@ -221,7 +219,6 @@ function isTokenTradeAlreadyOwned(
   return false;
 }
 
-// Same commit-time re-validation reasoning as caravanExecuteTrade above.
 export async function caravanExecuteTokenTrade(
   entry: WorldNodeEntry,
   tokenTradeIndex: number,

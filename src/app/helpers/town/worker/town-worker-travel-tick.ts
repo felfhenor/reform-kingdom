@@ -14,7 +14,7 @@ import type {
 // Worker pauses this long between filling up and hauling back
 export const TOWN_WORKER_REST_TICKS = 30;
 
-// Mirrors worker-travel-tick.ts's advancePathOneTick - structural fork, not shared state.
+// Structural fork, not shared state.
 function advancePathOneTick(
   path: TravelStep[],
   ticksIntoStep: number,

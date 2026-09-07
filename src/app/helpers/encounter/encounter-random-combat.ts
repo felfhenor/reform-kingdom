@@ -67,8 +67,7 @@ function markEncounterRandomCompleted(
   });
 }
 
-// Fires once the last generated fight has been won - rolled fresh every
-// cycle, same as `grantEncounterCompletionRewards` for static encounters.
+// Fires once the last generated fight has been won - rolled fresh every cycle.
 function grantEncounterRandomCompletionRewards(combat: Combat): void {
   if (!combat.encounterRandomId) return;
 
@@ -90,8 +89,7 @@ function grantEncounterRandomCompletionRewards(combat: Combat): void {
 }
 
 // Returns true if another generated fight was started - callers must not
-// reset combat state in that case, mirroring `nextFightFor`/
-// `handleCombatVictory` in combat-end.ts for static encounters.
+// reset combat state in that case.
 export function encounterRandomHandleVictory(combat: Combat): boolean {
   if (!combat.encounterRandomId) return false;
 

@@ -147,7 +147,6 @@ export function combatantTakeTurn(
     chosenSkill.sprite,
   );
 
-  // Capture the creator's stats before any modifications from this skill
   const capturedCreatorStats = { ...combatant.totalStats };
 
   chosenSkill.techniques.forEach((tech) => {
@@ -178,7 +177,6 @@ export function combatantTakeTurn(
     );
 
     targets.forEach((target) => {
-      // check for early termination of combat
       if (isCombatOver(combat)) return;
 
       const shouldMiss = combatCombatantCombatStatSucceedsChance(
@@ -274,7 +272,6 @@ export function combatDoCombatIteration(): void {
   const previousRounds = combat.rounds;
   combat.rounds++;
 
-  // Check if we've crossed into a new deadlock prevention tier
   const previousMultiplierTier = Math.floor(previousRounds / 25);
   const currentMultiplierTier = Math.floor(combat.rounds / 25);
 

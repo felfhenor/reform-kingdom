@@ -47,7 +47,6 @@ export function cameraPositionCalculate(
   return { x, y };
 }
 
-// Converts a tile-space position to a screen-space pixel position for the given camera.
 // Rounded to avoid subpixel offset, which shows up as hairline tearing between tiles.
 export function tileToScreenPosition(
   tileX: number,

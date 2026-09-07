@@ -43,7 +43,7 @@ export function depositCommissionRequirementsToTown(
   });
 }
 
-// Drops entries whose itemId no longer resolves - mirrors pruneInvalidTownStock/pruneInvalidMaterials.
+// Drops entries whose itemId no longer resolves.
 export function pruneInvalidTownMaterials(
   materials: TownMaterials,
 ): TownMaterials {

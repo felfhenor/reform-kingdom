@@ -42,7 +42,7 @@ export class GamestateService {
       migrateGameState();
       migrateOptionsState();
 
-      // currentLocationSet (the normal sync hook) never runs on load, so town-region buffs need re-deriving here.
+      // The normal sync hook never runs on load, so town-region buffs need re-deriving here.
       townReputationBuffReconcile(gamestate().world.currentLocation.mapName);
 
       this.logger.info('GameState', 'Gamestate migrated & loaded.');

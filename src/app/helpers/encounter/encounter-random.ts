@@ -25,7 +25,7 @@ export function encounterRandomTicksUntilReset(
 
 // A node is only enterable once it has a generated fight list and hasn't
 // already been fully cleared this cycle - clearing it locks it out (no
-// monsters left) until the next regeneration, see `encounter-random-tick.ts`.
+// monsters left) until the next regeneration.
 export function encounterRandomIsAvailable(
   content: EncounterRandomContent,
   state: EncounterRandomNodeState | undefined,

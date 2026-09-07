@@ -1,8 +1,7 @@
 /**
  * Lists every level-gated world node (encounter, random encounter,
  * gathering) sorted by level, alongside the map it's placed on, then flags
- * level windows with no node covering them. Ported from
- * `scripts/analyze-nodelevels.ts`.
+ * level windows with no node covering them.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

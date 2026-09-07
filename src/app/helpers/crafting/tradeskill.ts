@@ -24,7 +24,7 @@ const TRADESKILL_XP_START = 10;
 const TRADESKILL_XP_END = 5000;
 const XP_CURVE_EASE = 1.5;
 
-// `xp.maximum: 10` matches `tradeskillXpForLevel(1)`, kept as a literal here to avoid an import cycle.
+// `xp.maximum: 10` matches the level-1 curve value, kept as a literal here to avoid an import cycle.
 const DEFAULT_BUILDING: TradeskillBuildingState = {
   level: 1,
   xp: { current: 0, maximum: 10 },
@@ -32,10 +32,10 @@ const DEFAULT_BUILDING: TradeskillBuildingState = {
 };
 
 // Never throws - content may not be loaded yet on early renders (e.g. a
-// returning player whose persisted `kingdomSubview` reopens a tradeskill
-// screen before `ContentService` finishes its async load). Callers must
-// tolerate `undefined` gracefully; `getEntry` is reactive, so once content
-// loads any `computed()` that read this resolves correctly on its own.
+// returning player reopens a tradeskill screen before content finishes its
+// async load). Callers must tolerate `undefined` gracefully; the underlying
+// lookup is reactive, so once content loads any `computed()` that read this
+// resolves correctly on its own.
 export function tradeskillIdForName(
   tradeskill: Tradeskill,
 ): TradeskillId | undefined {
@@ -68,8 +68,8 @@ export function tradeskillBuilding(
   return gamestate().tradeskills[id] ?? DEFAULT_BUILDING;
 }
 
-// Same fallback as `tradeskillBuilding`, for `updateGamestate` callbacks -
-// they must read the draft `state` they were handed, not `gamestate()`.
+// For `updateGamestate` callbacks - they must read the draft `state` they
+// were handed, not `gamestate()`.
 export function tradeskillBuildingIn(
   state: GameState,
   tradeskillId: TradeskillId,
@@ -99,7 +99,7 @@ export function tradeskillLevelGateSatisfied(
   return isCollectibleDiscovered(requirement.requiredCollectibleId);
 }
 
-// The requirement blocking the next level, or undefined once satisfied (see tradeskillLeveledUp).
+// The requirement blocking the next level, or undefined once satisfied.
 export function tradeskillActiveGate(
   tradeskill: Tradeskill,
 ): TradeskillLevelRequirementContent | undefined {
@@ -109,7 +109,7 @@ export function tradeskillActiveGate(
   return levelRequirementFor(tradeskill, nextLevel);
 }
 
-// Like characterLeveledUp, but gated by tradeskillLevelGateSatisfied - XP holds at the cap (no loss) until the gate clears.
+// Gated by tradeskillLevelGateSatisfied - XP holds at the cap (no loss) until the gate clears.
 function tradeskillLeveledUp(
   building: TradeskillBuildingState,
   tradeskill: Tradeskill,
@@ -183,12 +183,12 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
 // Remaps a save's tradeskill keys from the pre-gamedata `Tradeskill` name
 // strings (e.g. "Blacksmithing") to real TradeskillId values, then backfills
 // any tradeskill known to gamedata that still has no entry (covers a
-// brand-new save, whose `defaultTradeskills()` is deliberately empty - see
-// `defaults.ts`). A legacy key already shaped like an id passes through
-// unchanged, and an unresolvable legacy key (should never happen once
-// content is loaded) is defensively dropped rather than aborting the whole
-// migration. This function is only ever called once content is guaranteed
-// loaded (see `migrateGameState`), unlike `tradeskillIdForName` elsewhere.
+// brand-new save, whose default tradeskill state is deliberately empty).
+// A legacy key already shaped like an id passes through unchanged, and an
+// unresolvable legacy key (should never happen once content is loaded) is
+// defensively dropped rather than aborting the whole migration. This function
+// is only ever called once content is guaranteed loaded, unlike similar
+// lookups elsewhere.
 export function migrateTradeskillStateKeys(
   tradeskills: Record<string, TradeskillBuildingState>,
 ): GameStateTradeskills {

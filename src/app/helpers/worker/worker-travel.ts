@@ -58,8 +58,7 @@ export function canWorkerReachNode(nodeName: string, stamina: number): boolean {
   return cost !== undefined && cost <= stamina;
 }
 
-// Shared validity check for workerAssign/auto-redeploy/migrate. Takes `level`
-// explicitly so migrate.ts can validate against its in-progress state, not the live gamestate.
+// Shared validity check for workerAssign/auto-redeploy/migrate.
 export function workerAssignmentIsValid(
   workerId: WorkerId,
   level: number,
@@ -213,7 +212,7 @@ export function workerRecall(workerId: WorkerId): void {
 }
 
 // Remaining ticks for a TravelingTo/TravelingBack worker, else undefined - drives the
-// "mm:ss remaining" status line, same math as the party's travelEtaSecondsTo.
+// "mm:ss remaining" status line.
 export function workerTravelRemainingTicks(
   workerId: WorkerId,
 ): number | undefined {

@@ -59,11 +59,11 @@ export type CombatOrderClause = {
 
 // The result of walking a combatant's Combat Orders for their turn - the
 // skill the first matching clause resolved to, plus that clause's optional
-// target-mode override (see `pickSkillFromCombatOrders`).
+// target-mode override.
 export type CombatOrderPick = {
   skill: EquipmentSkill;
   targetMode?: CombatantTargettingType;
   targetCharacterId?: CharacterId;
-  // Resolved once at pick time for `MatchingAllies` targeting - see `matchingAlliesForCondition`.
+  // Resolved once at pick time for `MatchingAllies` targeting.
   matchingAllies?: Combatant[];
 };

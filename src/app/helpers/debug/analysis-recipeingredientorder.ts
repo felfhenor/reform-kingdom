@@ -2,8 +2,7 @@
  * Validates two ascending-order properties of crafting recipes: (1) an
  * ingredient recipe must unlock at or before the recipe that consumes it,
  * and (2) within a tradeskill+equipment-type group, `levelRequirement` must
- * ascend with `minTradeskillLevel`. Ported from
- * `scripts/validate-recipeingredientorder.ts`.
+ * ascend with `minTradeskillLevel`.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

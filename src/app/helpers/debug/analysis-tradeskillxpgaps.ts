@@ -1,9 +1,6 @@
 /**
  * Validates that, for every tradeskill, there is no level between 1 and the
- * highest authored `minTradeskillLevel` where *no* recipe can grant XP - see
- * `craftXpChance` in `src/app/helpers/crafting.ts`, which
- * `recipeGrantsXpAtLevel` below mirrors. Ported from
- * `scripts/validate-tradeskillxpgaps.ts`.
+ * highest `minTradeskillLevel` where *no* recipe can grant XP.
  */
 
 import { getEntriesByType } from '@helpers/content/content';
@@ -14,8 +11,8 @@ import type {
   TradeskillContent,
 } from '@interfaces';
 
-// See file header - mirrors `craftXpChance`, collapsed to a boolean ("can
-// this recipe grant any XP at all at this building level").
+// Collapsed to a boolean ("can this recipe grant any XP at all at this
+// building level").
 function recipeGrantsXpAtLevel(recipe: RecipeContent, level: number): boolean {
   if (recipe.tradeskillXP <= 0) return false;
 

@@ -69,7 +69,7 @@ function characterJobProgressSwap(
   return { jobProgress, level, xp };
 }
 
-// No displacement bookkeeping needed since every target slot starts empty (only caller is `reclassCharacterInState`).
+// No displacement bookkeeping needed since every target slot starts empty.
 function applyOptimizationWinners(
   armory: EquipmentItem[],
   winners: EquipmentArmoryEntry[],
@@ -89,7 +89,7 @@ function applyOptimizationWinners(
   };
 }
 
-// Mutates `state` in place - shared across every pick in a `charactersReclass` batch, so an earlier pick's gold spend is reflected before a later pick's affordability check.
+// Mutates `state` in place - shared across every pick in a reclass batch, so an earlier pick's gold spend is reflected before a later pick's affordability check.
 function reclassCharacterInState(
   state: GameState,
   characterId: CharacterId,

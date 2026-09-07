@@ -1,4 +1,4 @@
-// Derived from static content, not tracked per-player - see collectibleSourceMapBuild. Expected exactly one per collectible.
+// Derived from static content, not tracked per-player. Expected exactly one per collectible.
 export type CollectibleSource =
   | { type: 'node'; name: string }
   | { type: 'crafting' }

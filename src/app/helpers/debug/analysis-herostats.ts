@@ -1,10 +1,7 @@
 /**
  * Reports MIN (unequipped), MAX (best gear obtainable at this level), and
  * MID (average of the two) stats for every job at a given level, plus
- * estimated skill damage/heal values at each tier. Ported from
- * `scripts/analyze-herostats.ts` - see that file's history for the full
- * methodology writeup (best-gear selection, two-handed vs. one-handed+offhand
- * tie-break, raw pre-mitigation skill power).
+ * estimated skill damage/heal values at each tier.
  */
 
 import { combatDamageMitigationExpectedValue } from '@helpers/combat/combat-damage-mitigation';
@@ -45,8 +42,6 @@ const STAT_NAMES = [
   'Luck',
 ] as const;
 
-// Mirrors `EquipmentTypeToSlot` in src/app/interfaces/equipment.ts - only
-// the keys matter here (to enumerate every equippable item type).
 const EQUIPMENT_TYPES: EquipmentItemType[] = [
   'Accessory',
   'Arrow',
@@ -184,8 +179,7 @@ function techniqueType(technique: EquipmentSkillContentTechnique): string {
   return 'Effect';
 }
 
-// Raw, pre-mitigation technique power - see file header for what this
-// does/doesn't account for (no target, no defense mitigation).
+// Raw, pre-mitigation technique power (no target, no defense mitigation).
 function techniqueRawValue(
   stats: StatBlock,
   technique: EquipmentSkillContentTechnique,
@@ -206,8 +200,8 @@ function statRow(
     row[stat] = round2(stats[stat]);
   });
   row['Total'] = round2(statSum(stats));
-  // Expected value of the mitigation roll (combat-damage-mitigation.ts),
-  // not the raw stat - what actually lands on defense in combat, on average.
+  // Expected value of the mitigation roll, not the raw stat - what actually
+  // lands on defense in combat, on average.
   row['Avg Phys Mit'] = round2(
     combatDamageMitigationExpectedValue(stats.Vitality, stats.Luck),
   );

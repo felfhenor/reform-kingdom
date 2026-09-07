@@ -21,7 +21,6 @@ function townHasRequirement(
   return townMaterialQuantity(townId, requirement.itemId) >= requirement.quantity;
 }
 
-// Mirrors isRecipeCraftable but against town.materials, skipping isRecipeDropGated and the player's minTradeskillLevel gate entirely - a town crafts anything it has materials for.
 export function isRecipeCraftableByTown(
   recipe: RecipeContent,
   townId: TownId,

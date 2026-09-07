@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import type { AtlasedImage } from '@interfaces';
 
-// Renders a sprite, compositing it over an optional `backdropSprite`.
 @Component({
   selector: 'app-icon-item-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,

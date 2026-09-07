@@ -2,7 +2,7 @@
  * Validates that every `TeleportNode` object placed on the world maps has a
  * `tag`/`toTag` property, that no two `TeleportNode`s share a `tag`, and
  * that every `toTag` resolves to a `tag` that exists somewhere across the
- * maps. Ported from `scripts/validate-teleportnodes.ts`.
+ * maps.
  */
 
 import { allMaps } from '@helpers/maps';

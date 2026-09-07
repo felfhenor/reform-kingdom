@@ -1,6 +1,5 @@
 // Fixed UTC-6 offset year-round (no DST handling, by design) - "3AM CST" as
-// a wall-clock reset boundary, not a tick-elapsed timer like
-// CaravanContent.traderResetTime. See CommissionNodeState.generatedAt.
+// a wall-clock reset boundary.
 const COMMISSION_RESET_HOUR_UTC = 9;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 

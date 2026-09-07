@@ -95,7 +95,6 @@ export class SoundService {
         this.context = new AudioContext();
       }
 
-      // Resume context if it's suspended
       if (this.context.state === 'suspended') {
         await this.context.resume();
       }

@@ -39,7 +39,6 @@ export function spendCommissionRequirements(
   });
 }
 
-// Commission rewards aren't level-scaled (no bonusPerLevel is ever authored here), so the level passed to rollDroppedRewards is inert.
 export function grantCommissionRewards(
   state: GameState,
   offer: CommissionOfferContent,

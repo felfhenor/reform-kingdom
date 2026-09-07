@@ -27,7 +27,6 @@ export function activeGlobalEffects(): GlobalEffect[] {
   );
 }
 
-// Accepts either a content id or name (see `getEntry`) so callers can use the same readable literal `addGlobalEffect` grants with.
 export function isGlobalEffectActive(globalEffectId: GlobalEffectId): boolean {
   const content = getEntry<GlobalEffectContent>(globalEffectId);
   if (!content) return false;

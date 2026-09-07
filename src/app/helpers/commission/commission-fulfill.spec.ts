@@ -403,8 +403,7 @@ describe('commissionFulfill', () => {
     // updateGamestate is a dumb recorder in this suite (it doesn't actually
     // invoke the callback), so the resolved success/failure of
     // commissionFulfill depends on the callback below having already run
-    // before the outer promise is awaited - matching how the double-fire
-    // regression test further down feeds committed state through it.
+    // before the outer promise is awaited.
     const resultPromise = commissionFulfill(caravanId);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];

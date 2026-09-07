@@ -105,7 +105,7 @@ export class BarGlobalEffectComponent {
   }
 
   constructor() {
-    // `untracked` avoids self-retrigger, since `syncDisplayedEffects` both reads and writes `displayedEffects`.
+    // `untracked` avoids self-retrigger.
     effect(() => {
       const active = activeGlobalEffects();
       untracked(() => this.syncDisplayedEffects(active));

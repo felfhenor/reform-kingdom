@@ -81,9 +81,9 @@ export class PanelPlayKingdomTradeskillComponent {
   public formatDuration = formatDuration;
   public kingdomSubviewShow = kingdomSubviewShow;
 
-  // Alphabetical, to the left of the Back button - see the pageactions row
-  // in the template. Recomputes once a second (via `uiClockTick`) so the
-  // per-tradeskill queue/remaining-time tooltips never look frozen.
+  // Alphabetical, to the left of the Back button. Recomputes once a second
+  // (via `uiClockTick`) so the per-tradeskill queue/remaining-time tooltips
+  // never look frozen.
   public tradeskillNav = computed(() => {
     uiClockTick();
     const current = this.tradeskill();

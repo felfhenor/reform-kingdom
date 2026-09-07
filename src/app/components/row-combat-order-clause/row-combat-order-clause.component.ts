@@ -24,16 +24,14 @@ export class RowCombatOrderClauseComponent {
   // like any other row but isn't a real stored clause - no toggle/edit/remove.
   public readOnly = input<boolean>(false);
 
-  // Only meaningful for CastSkillFamily clauses - see the modal's warning
-  // helpers in combat-order-evaluation.ts.
+  // Only meaningful for CastSkillFamily clauses.
   public isFamilyKnown = input<boolean>(true);
   public isFamilyUsable = input<boolean>(true);
   public isFamilyEquipmentOnly = input<boolean>(false);
   public isTargetModeUsable = input<boolean>(true);
 
   // The hero's currently-resolved skills, used to look up a representative
-  // sprite for the clause's family (see `familyOptions` in the modal, which
-  // resolves sprites the same way).
+  // sprite for the clause's family.
   public heroSkills = input<EquipmentSkillContent[]>([]);
 
   public toggleEnabled = output<void>();

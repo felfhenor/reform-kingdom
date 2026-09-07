@@ -4,7 +4,7 @@ export type TownReputationGainSource =
   | 'Commission'
   | 'RaidDefense';
 
-// Display-only shape for the panel's reputation progress bar - built by panel-map-node.component.ts.
+// Display-only shape for the panel's reputation progress bar.
 export type TownReputationDisplay = {
   reputation: number;
   tierName: string;

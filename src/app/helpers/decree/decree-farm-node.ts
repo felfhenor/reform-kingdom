@@ -55,7 +55,6 @@ export function exploreNodeFarmOptions(): ExploreNodeFarmOption[] {
   );
 }
 
-// Strips a reward down to its bare identity, dropping the drop-table odds/quantity fields.
 function toRewardIdentity(reward: DroppedReward): RewardIdentity {
   switch (reward.kind) {
     case 'Item':
@@ -73,8 +72,6 @@ function toRewardIdentity(reward: DroppedReward): RewardIdentity {
   }
 }
 
-// Every monster fought at `entry`'s encounter - a static fight list for an
-// Encounter, or the creature pool for an EncounterRandom.
 function worldNodeMonsterIds(entry: WorldNodeEntry): MonsterId[] {
   const encounter = worldNodeEncounter(entry);
   if (encounter) {
@@ -111,7 +108,6 @@ function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
   return drops;
 }
 
-// Completion rewards plus discovered kill drops for `nodeName`, de-duplicated. Excludes recipes since they're a one-time unlock, not something to accumulate.
 export function farmNodeRewardOptions(
   nodeName: string,
 ): FarmNodeRewardOption[] {
@@ -144,8 +140,7 @@ export function farmNodeRewardOptions(
 }
 
 // Current stock of `reward`, generalized across all reward types. Equipment has no quantity field so it's counted from owned armory entries; recipes read as 1/0 (known or not).
-// Workers read the same way (1/0 rescued or not) - unreachable in practice
-// since farmNodeRewardOptions excludes them, kept for type completeness.
+// Workers read the same way (1/0 rescued or not) - unreachable in practice, kept for type completeness.
 export function farmNodeRewardQuantity(reward: RewardIdentity): number {
   if ('itemId' in reward) return getMaterialQuantity(reward.itemId);
 

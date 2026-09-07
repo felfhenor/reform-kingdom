@@ -4,7 +4,7 @@ import type { RewardIdentity } from '@interfaces/droppable';
 import type { TiledObject } from '@interfaces/tiled-map';
 
 export type WorldNodeHideable = {
-  // When true, name/level label and map cursor stay hidden until discovered (see world-node-discovery.ts).
+  // When true, name/level label and map cursor stay hidden until discovered.
   hidden?: boolean;
 
   // Node is fully unrendered/unclickable/unnavigable until every listed collectible has been found.
@@ -55,14 +55,14 @@ export type PixiNodeLabelResolver = (
   object: TiledObject,
 ) => WorldNodeLabelInfo | undefined;
 
-// Resolved reward display info, for use outside a full SlotCompletionRewardComponent.
+// Resolved reward display info.
 export type RewardContentInfo = {
   name: string;
   sprite: string;
   spritesheet: AtlasedImage;
 };
 
-// Carries the full entry (not a precomputed sprite frame) so SpriteNodeComponent can resolve it.
+// Carries the full entry (not a precomputed sprite frame).
 export type ExploreNodeFarmOption = {
   nodeName: string;
   levelLabel: string;

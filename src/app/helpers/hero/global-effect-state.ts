@@ -8,9 +8,6 @@ import {
   type GlobalEffectId,
 } from '@interfaces';
 
-// Split out of global-effects.ts so town-reputation-buff.ts can depend on these leaf
-// pieces without creating a cycle back into global-effects.ts.
-
 // Renders a set of effects as short "Label: +N[%]" fragments, comma-joined - for
 // appending live numbers onto a buff's tooltip description (e.g. town reputation buffs).
 export function globalEffectEffectsDescription(
@@ -37,7 +34,7 @@ export function globalEffectEffectsDescription(
     .join(', ');
 }
 
-// Direct-state mutators for callers folding this into a larger `updateGamestate` commit - mirrors `applyMaterialDelta` in `materials.ts`.
+// Direct-state mutators for callers folding this into a larger `updateGamestate` commit.
 export function applyGlobalEffectAdd(
   state: GameState,
   globalEffectId: GlobalEffectId,

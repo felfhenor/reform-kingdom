@@ -28,7 +28,6 @@ export type EncounterRandomContent = IsContentItem &
 
     creaturePool: EncounterRandomPoolMonster[];
 
-    // Always empty as-authored; fights are rolled at runtime (see generateEncounterRandomFights) and stored in game state.
     fights: EncounterFight[];
 
     completionRewards: DroppedReward[];

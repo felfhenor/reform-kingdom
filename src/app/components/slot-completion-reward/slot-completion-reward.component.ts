@@ -82,8 +82,7 @@ export class SlotCompletionRewardComponent {
     }
   });
 
-  // Composited behind the result sprite for recipe rewards only (see
-  // `SlotMuseumRecipeComponent`, which uses the same backdrop) - the visual
+  // Composited behind the result sprite for recipe rewards only - the visual
   // cue that this slot grants a recipe, not the crafted item itself.
   public backdropSprite = computed<string | undefined>(() => {
     const reward = this.reward();

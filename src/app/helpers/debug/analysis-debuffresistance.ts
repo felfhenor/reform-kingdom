@@ -2,7 +2,7 @@
  * Reports on the debuff-resistance tag system: which status effects belong
  * to each tag family, which equipment/items grant resistance to each tag
  * and how much, and whether any tag has a level-window with no gear
- * granting resistance to it. Ported from `scripts/analyze-debuffresistance.ts`.
+ * granting resistance to it.
  */
 
 import { getEntriesByType } from '@helpers/content/content';
@@ -18,7 +18,6 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// Keep in sync with `StatusEffectTag` in `src/app/interfaces/content-statuseffect.ts`.
 const ALL_STATUS_EFFECT_TAGS: StatusEffectTag[] = [
   'Stun',
   'StatDown',

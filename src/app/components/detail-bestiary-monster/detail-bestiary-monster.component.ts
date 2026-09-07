@@ -52,7 +52,7 @@ type LevelOption = { value: number; label: string };
 export class DetailBestiaryMonsterComponent {
   public entry = input.required<BestiaryEntry>();
 
-  // Actual min/max fought, for the "Lv. X-Y" line and picker bounds - distinct from `selectedLevel`, the single level being previewed.
+  // Actual min/max fought, for the "Lv. X-Y" line and picker bounds.
   public levelMin = computed(() => this.entry().levelRange?.min ?? 1);
   public levelMax = computed(() => this.entry().levelRange?.max ?? 1);
 
@@ -69,7 +69,7 @@ export class DetailBestiaryMonsterComponent {
   private lastMonsterId?: MonsterId;
 
   constructor() {
-    // Resets the picker only when the monster changes, not on every `entry()` recompute (which fires more often, e.g. a live kill count).
+    // Resets the picker only when the monster changes, not on every recompute (which fires more often, e.g. a live kill count).
     effect(() => {
       const entry = this.entry();
       if (entry.monster.id === this.lastMonsterId) return;

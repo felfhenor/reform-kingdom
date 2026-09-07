@@ -31,8 +31,6 @@ export function getEntriesByType<T>(type: ContentType): T[] {
   );
 }
 
-// Turns a fetched content bundle (keyed by subtype, e.g. `all.json`) into
-// the `allIdsByName`/`allContentById` signals
 export function unfurlContent(
   assets: Record<string, IsContentItem[]>,
   onWarn?: (message: string) => void,

@@ -14,7 +14,6 @@ import type { Identifiable } from '@interfaces';
 import type { PRNG } from 'seedrandom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock uuid
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mock-uuid'),
 }));
@@ -98,12 +97,12 @@ describe('RNG Helper Functions', () => {
 
   describe('succeedsChance', () => {
     it('should return true when random value is within chance', () => {
-      const mockRng = () => 0.5; // 50%
+      const mockRng = () => 0.5;
       expect(rngSucceedsChance(75, mockRng as PRNG)).toBeTruthy();
     });
 
     it('should return false when random value exceeds chance', () => {
-      const mockRng = () => 0.8; // 80%
+      const mockRng = () => 0.8;
       expect(rngSucceedsChance(50, mockRng as PRNG)).toBeFalsy();
     });
   });

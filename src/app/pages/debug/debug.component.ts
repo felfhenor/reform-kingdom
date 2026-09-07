@@ -38,7 +38,7 @@ const CATEGORIES: AnalysisScriptCategory[] = [
   'Monster Stats',
 ];
 
-// `level` has a content-derived default (see `computeDefaultLevel`), so its
+// `level` has a content-derived default, so its
 // query param is left `null` (rather than baking a static fallback into
 // `parse`) when absent - `inputValue()` below resolves that case specially.
 // Every other input's static `defaultValue` is baked into `parse` directly.

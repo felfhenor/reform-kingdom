@@ -32,8 +32,7 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
     const discovered = isCollectibleDiscovered(collectible.id);
     const rawSource = getCollectibleSource(collectible.id);
 
-    // A node source's name is re-masked through `worldNodeDisplayName` here
-    // (rather than cached) since it depends on live world-discovery state.
+    // A node source's name is re-masked here (rather than cached) since it depends on live world-discovery state.
     const source: CollectibleSource | undefined =
       rawSource?.type === 'node'
         ? { type: 'node', name: worldNodeDisplayName(rawSource.name) }
@@ -92,7 +91,6 @@ export function filterMuseumCollectibleEntries(
   });
 }
 
-// Encounters a recipe can drop from, plus caravan traders that sell it.
 export function recipeSourceNodeNames(recipeId: RecipeId): string[] {
   const encounters = getEntriesByType<EncounterContent>('encounter');
   const traders = getEntriesByType<CaravanTraderContent>('caravantrader');

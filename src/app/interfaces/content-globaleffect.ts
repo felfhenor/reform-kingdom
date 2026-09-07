@@ -25,13 +25,13 @@ export type GlobalEffectEffectXPGainMultiplier = {
 };
 
 // Adds `value` (a flat percent) to every status effect tag's resistance,
-// unlike gear which targets specific tags - see `applyActiveDebuffResistanceEffects`.
+// unlike gear which targets specific tags.
 export type GlobalEffectEffectDebuffResistance = {
   effectType: 'DebuffResistance';
   value: number;
 };
 
-// Same as GlobalEffectEffectDebuffResistance but targets one tag only - see `applyActiveDebuffResistanceTagEffects`.
+// Same as GlobalEffectEffectDebuffResistance but targets one tag only.
 export type GlobalEffectEffectDebuffResistanceTag = {
   effectType: 'DebuffResistanceTag';
   tag: StatusEffectTag;

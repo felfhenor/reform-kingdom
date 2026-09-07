@@ -3,7 +3,7 @@
  * index that's unique *within its own content type* (each type's atlas is
  * separate, so uniqueness is only meaningful scoped to one type). Tiered
  * variants of the same entry (e.g. "Fireball I"/"Fireball II") intentionally
- * share an icon and are excluded. Ported from `scripts/validate-sprites.ts`.
+ * share an icon and are excluded.
  */
 
 import { getEntriesByType } from '@helpers/content/content';
@@ -14,8 +14,7 @@ import type {
   SpritedContentEntry,
 } from '@interfaces';
 
-// Matches the `AtlasedImage` union in `src/app/interfaces/artable.ts` - these
-// are the content types that carry a `sprite` field.
+// These are the content types that carry a `sprite` field.
 const SPRITED_CONTENT_TYPES: ContentType[] = [
   'collectible',
   'equipment',

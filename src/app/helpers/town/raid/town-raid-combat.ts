@@ -22,7 +22,7 @@ function partyIsAtTown(town: TownContent): boolean {
   return worldNodeAtCurrentLocation()?.nodeName === town.name;
 }
 
-// Real engage path (manual button or DefendTowns) - see debugStartTownDefenseCombat for testing.
+// Real engage path (manual button or DefendTowns).
 export function raidEngageCombat(townId: TownId): boolean {
   const town = getEntry<TownContent>(townId);
   if (!town) return false;

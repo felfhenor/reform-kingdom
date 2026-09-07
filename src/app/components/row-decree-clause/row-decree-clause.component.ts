@@ -15,7 +15,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 const FAILURE_WARNING_THRESHOLD = 3;
 
 // Clause types with parameters worth editing in place - the rest have
-// nothing to change (see `isEditable`).
+// nothing to change.
 const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   'GatherMaterial',
   'FarmNode',

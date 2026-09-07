@@ -55,7 +55,7 @@ export function homeNodeSet(townId: TownId): void {
   analyticsSendDesignEvent(`Town:Home:Set:${analyticsSafeSegment(town.name)}`);
 }
 
-// Drops a home designation whose Town content no longer exists - called from migrate.ts on every load.
+// Drops a home designation whose Town content no longer exists.
 export function pruneInvalidHomeNode(
   homeNodeName?: string,
 ): string | undefined {

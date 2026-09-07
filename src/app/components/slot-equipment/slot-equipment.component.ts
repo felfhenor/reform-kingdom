@@ -86,8 +86,7 @@ export class SlotEquipmentComponent {
   });
 
   // The paperdoll slots this piece of gear occupies (e.g. a two-handed
-  // weapon occupies both Weapon + Offhand) - distinct from
-  // `EquipmentContent.slots`, which is the *infusion* slot count.
+  // weapon occupies both Weapon + Offhand).
   public occupiedPaperdollSlots = computed<EquipmentSlot[]>(() => {
     const content = this.equippedContent();
     return content ? EquipmentTypeToSlot[content.type] : [];

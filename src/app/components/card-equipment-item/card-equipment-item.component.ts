@@ -77,8 +77,6 @@ export class CardEquipmentItemComponent {
     equipmentItemSlotCount(this.equipmentItem()),
   );
 
-  // Stats shown on the row itself - only what this item actually boosts,
-  // baseStats plus any infusion/affix bonus combined into one total.
   public rowStatKeys = computed<BaseStat[]>(() =>
     this.statKeys.filter((stat) => this.totalStatValue(stat) !== 0),
   );

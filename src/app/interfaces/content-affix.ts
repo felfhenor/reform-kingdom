@@ -78,7 +78,7 @@ export type AffixContent = IsContentItem &
     id: AffixId;
     __type: 'affix';
 
-    // Cross-tier identity, same idea as skill `family` - an item never rolls two affixes of the same family.
+    // Cross-tier identity - an item never rolls two affixes of the same family.
     family: string;
 
     position: AffixPosition;
@@ -87,7 +87,6 @@ export type AffixContent = IsContentItem &
     effects: AffixEffect[];
   };
 
-// How many affixes an equipped item rolls, keyed by the item's own rarity.
 export const AffixCountByRarity: Record<DropRarity, number> = {
   Common: 0,
   Uncommon: 1,

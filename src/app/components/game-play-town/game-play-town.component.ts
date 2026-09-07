@@ -44,7 +44,7 @@ export class GamePlayTownComponent {
     return entry ? worldNodeTown(entry) : undefined;
   });
 
-  // Falls back to World if this view is reached with no town content to show - e.g. the persisted `activeTownNode` refers to content that's since been removed/renamed. Gated on content being loaded so a fresh page reload (where content hasn't finished fetching yet) doesn't misread "not loaded" as "not available" and bounce away from a town that's actually still valid.
+  // Falls back to World if this view is reached with no town content to show. Gated on content being loaded so a fresh page reload (where content hasn't finished fetching yet) doesn't misread "not loaded" as "not available" and bounce away from a town that's actually still valid.
   constructor() {
     effect(() => {
       if (this.contentService.hasLoadedData() && !this.town()) {

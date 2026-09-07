@@ -96,9 +96,9 @@ const ALL_TARGET_MODE_OPTIONS: SelectOption<CombatantTargettingType | ''>[] = [
 const DEFAULT_DRAFT_COMPARATOR: CombatOrderComparator = 'LessThan';
 const DEFAULT_DRAFT_HEALTH_DIRECTION: CombatOrderHealthDirection = 'Below';
 
-// The mandatory trailing fallback row - not a real stored clause, so it
-// isn't in `clauses()`; rendered read-only via the same row component so it
-// looks consistent with the rest of the list instead of standing out.
+// The mandatory trailing fallback row - not a real stored clause; rendered
+// read-only via the same row component so it looks consistent with the
+// rest of the list instead of standing out.
 const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
   id: 'always-random-fallback' as CombatOrderClauseId,
   enabled: true,

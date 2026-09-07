@@ -26,7 +26,7 @@ vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
   resetTownSpecialtyPriority: vi.fn(),
 }));
 
-// Reputation-tier scaling is town-craft-queue-size.spec.ts's job - here it just echoes back crafting.maxQueueSize.
+// Reputation-tier scaling is tested elsewhere - here it just echoes back crafting.maxQueueSize.
 vi.mock('@helpers/town/crafting/town-craft-queue-size', () => ({
   townCraftQueueSize: vi.fn((town) => town.crafting.maxQueueSize),
 }));

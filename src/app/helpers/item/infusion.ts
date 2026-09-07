@@ -22,21 +22,18 @@ const GOLD_PER_STAT_POINT = 30;
 const GOLD_PER_RESISTANCE_POINT = 100;
 const GOLD_PER_COMBAT_STAT_POINT = 50;
 
-// Sums the `infusionStats` of every non-empty slot
 export function equipmentItemInfusionBonus(
   infusedItemIds: (ItemId | null)[],
 ): StatBlock {
   return equipmentItemInfusionTotals(infusedItemIds, STAT_BONUS);
 }
 
-// Sibling of `equipmentItemInfusionBonus` for per-tag debuff resistance.
 export function equipmentItemInfusionResistanceBonus(
   infusedItemIds: (ItemId | null)[],
 ): StatusEffectBlock {
   return equipmentItemInfusionTotals(infusedItemIds, RESISTANCE_BONUS);
 }
 
-// Sibling of `equipmentItemInfusionBonus` for combat stats.
 export function equipmentItemInfusionCombatStatBonus(
   infusedItemIds: (ItemId | null)[],
 ): CombatStatBlock {

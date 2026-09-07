@@ -42,7 +42,7 @@ export function townTradeskillsMaterialize(
   return materialized;
 }
 
-// Drops entries whose tradeskillId no longer resolves (mirrors pruneInvalidTownStock).
+// Drops entries whose tradeskillId no longer resolves.
 export function pruneInvalidTownTradeskills(
   tradeskills: Record<TradeskillId, TownTradeskillState>,
 ): Record<TradeskillId, TownTradeskillState> {
@@ -57,7 +57,6 @@ export function pruneInvalidTownTradeskills(
   return pruned;
 }
 
-// Lives here, not town-craft-queue.ts, to avoid a cycle - town-tick.ts needs this but is imported by town-craft-queue.ts.
 export function pruneInvalidTownCraftQueue(
   queue: TownCraftQueueEntry[],
 ): TownCraftQueueEntry[] {

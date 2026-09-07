@@ -40,7 +40,7 @@ export function townStockDisplay(
   };
 }
 
-// Affix/infusion bonus rows for a rolled stock entry's tooltip - mirrors slot-armory-item's bonusStats/etc.
+// Affix/infusion bonus rows for a rolled stock entry's tooltip.
 export function townStockBonusStats(entry: TownStockEntry): StatBlock {
   return equipmentItemBonusStats(entry.equipmentItem);
 }

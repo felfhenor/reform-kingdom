@@ -90,7 +90,7 @@ export function pixiFloatingTextCreate(
     if (!state) return false;
 
     container.alpha = state.alpha;
-    // `nodePosition` is the tile's top-left corner (see `tileToScreenPosition`), so `+ tileSize / 2`
+    // `nodePosition` is the tile's top-left corner, so `+ tileSize / 2`
     // centers the row on the tile horizontally.
     container.position.set(
       nodePosition.x + tileSize / 2 + jitterX,

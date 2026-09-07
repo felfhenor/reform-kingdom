@@ -525,8 +525,7 @@ describe('travelPathFrom', () => {
     vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
   });
 
-  // travelPathTo just calls this with currentLocationGet() - confirms a non-party
-  // origin works too, which is what worker travel relies on.
+  // Confirms a non-party origin works too, which is what worker travel relies on.
   it('paths from an arbitrary origin, not just the current location', () => {
     vi.mocked(worldNodeByName).mockReturnValue(
       buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),

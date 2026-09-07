@@ -7,13 +7,12 @@ export type StatusCardBar = {
   max: number;
 };
 
-// Display-only shape for one encounter-corner card - built by
-// `status-hero`/`status-monster`, rendered by `card-status-combatant`.
+// Display-only shape for one encounter-corner card.
 export type StatusCardEntry = {
   combatantId: string;
   name: string;
   // Only heroes have a "Lv. X Job" subtitle - a monster's level/letter is
-  // already baked into `name` (see `combatantFromMonster`).
+  // already baked into `name`.
   subtitleLevel?: number;
   subtitleLabel?: string;
   spritesheet: AtlasedImage;

@@ -42,7 +42,7 @@ export type GameStateWorld = {
   caravans: GameStateCaravans;
   commissions: GameStateCommissions;
   towns: GameStateTowns;
-  // The node name recalled to on Deaths Door and by the ReturnToKingdom decree clause - undefined means the Duchy.
+  // The node name recalled to on Deaths Door - undefined means the Duchy.
   homeNodeName?: string;
 };
 
@@ -57,7 +57,7 @@ export type GameStateDiscoveredMaterials = {
   [key: MaterialId]: { foundAt: number };
 };
 
-// Where a collectible was found is derived fresh from content each render (see `helpers/collectible-source.ts`), so this only tracks ownership.
+// Where a collectible was found is derived fresh from content each render, so this only tracks ownership.
 export type GameStateCollectibles = {
   [key: CollectibleId]: {
     quantity: number;
@@ -77,12 +77,12 @@ export type GameStateDiscoveredCaravans = {
   [key: CaravanId]: { foundAt: number };
 };
 
-// Level-learned recipes never appear here. No stored location - see `recipeSourceNodeNames`.
+// Level-learned recipes never appear here. No stored location.
 export type GameStateDiscoveredRecipes = {
   [key: RecipeId]: { foundAt: number };
 };
 
-// One-time ledger of already-announced unlocks - unlock itself is a live check (`isAstralProjectorCollectiblesMet`).
+// One-time ledger of already-announced unlocks.
 export type GameStateDiscoveredAstralProjectorSpells = {
   [key: AstralProjectorId]: { foundAt: number };
 };
@@ -103,7 +103,7 @@ export type GameStateGatherNodeLevels = {
   [key: string]: { level: number };
 };
 
-// Unlike `discoveredGatherNodes` (GatherNodes only, recorded on arrival), this covers every node type, recorded on click (see `world-node-discovery.ts`).
+// Unlike `discoveredGatherNodes` (GatherNodes only, recorded on arrival), this covers every node type, recorded on click.
 export type GameStateWorldDiscoveries = {
   [key: string]: { foundAt: number };
 };

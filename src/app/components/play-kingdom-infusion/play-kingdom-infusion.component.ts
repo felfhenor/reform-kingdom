@@ -86,7 +86,7 @@ export class PlayKingdomInfusionComponent {
     this.party().find((c) => c.id === this.selectedCharacterId()),
   );
 
-  // Keyed by primary slot, not instance id, so a two-handed item never shows up twice - see `equippedItemsByPrimarySlot`.
+  // Keyed by primary slot, not instance id, so a two-handed item never shows up twice.
   public selectedCharacterEquippedItems = computed<EquipmentItem[]>(() => {
     const character = this.selectedCharacter();
     return character ? equippedItemsByPrimarySlot(character.equipment) : [];

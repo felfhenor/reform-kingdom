@@ -15,7 +15,7 @@ export function townWorkerStatsForLevel(
   return statBlockForLevel(worker.baseStats, worker.statsPerLevel, level);
 }
 
-// Mirrors defaultWorkerState() - the town is its own "home base" instead of the Duchy.
+// The town is its own "home base" instead of the Duchy.
 export function defaultTownWorkerState(
   town: TownContent,
   level: number,

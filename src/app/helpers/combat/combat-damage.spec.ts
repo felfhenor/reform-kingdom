@@ -587,8 +587,8 @@ describe('combatApplySkillToTarget status effect resistance', () => {
 
     expect(target.statusEffects).toHaveLength(1);
     // A 3rd call happens once the effect is actually applied - the
-    // pre-existing, unrelated `debuffIgnoreChance` full-negation roll in
-    // `combatApplyStatusEffectToTarget` (0% here, so it doesn't fire).
+    // pre-existing, unrelated `debuffIgnoreChance` full-negation roll
+    // (0% here, so it doesn't fire).
     expect(rngSucceedsChance).toHaveBeenCalledTimes(3);
     expect(rngSucceedsChance).toHaveBeenNthCalledWith(1, 60);
     expect(rngSucceedsChance).toHaveBeenNthCalledWith(2, 25);
@@ -604,9 +604,8 @@ describe('combatApplySkillToTarget status effect resistance', () => {
     runWithStunTechnique(target);
 
     expect(target.statusEffects).toHaveLength(1);
-    // Only 2 calls, not 3 - proves the gear roll (guarded by
-    // `tagResistance > 0`) was skipped, leaving just the LUK roll plus the
-    // unrelated downstream `debuffIgnoreChance` roll.
+    // Only 2 calls, not 3 - proves the gear roll was skipped, leaving just
+    // the LUK roll plus the unrelated downstream `debuffIgnoreChance` roll.
     expect(rngSucceedsChance).toHaveBeenCalledTimes(2);
     expect(rngSucceedsChance).toHaveBeenNthCalledWith(1, 60);
   });

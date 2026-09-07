@@ -9,7 +9,7 @@ import { currentCombat } from '@helpers/combat/combat-state';
 import type { StatusCardEntry } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
-// Max helper cards per row - extras wrap onto a new row, same convention as status-monster.
+// Max helper cards per row - extras wrap onto a new row.
 const HELPERS_PER_ROW = 4;
 
 @Component({

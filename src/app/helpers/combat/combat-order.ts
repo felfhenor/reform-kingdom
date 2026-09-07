@@ -26,7 +26,7 @@ function heroName(characterId: CharacterId): string {
 }
 
 // A short, stock-independent description of when a clause fires - used on
-// the Combat Orders modal's clause list. Mirrors `decreeClauseSummary`.
+// the Combat Orders modal's clause list.
 function conditionSummary(condition: CombatOrderCondition): string {
   switch (condition.type) {
     case 'Always':
@@ -115,7 +115,6 @@ function updateCombatOrderClauses(
   });
 }
 
-// Refuses to add past `COMBAT_ORDER_ROW_CAP`. Returns whether it was added.
 export function combatOrderClauseAdd(
   characterId: CharacterId,
   jobId: JobId,

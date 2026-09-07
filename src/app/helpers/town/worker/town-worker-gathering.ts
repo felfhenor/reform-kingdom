@@ -28,7 +28,7 @@ function gatheringContentForNode(
   return node ? worldNodeGathering(node) : undefined;
 }
 
-// Mirrors workerGatherRate, scaled by the town's own gatherRateMultiplier.
+// Scaled by the town's own gatherRateMultiplier.
 export function townWorkerGatherRate(
   worker: WorkerContent,
   level: number,

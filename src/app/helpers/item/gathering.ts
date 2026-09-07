@@ -30,7 +30,7 @@ export function partyMinLevel(): number {
   return Math.min(...party.map((character) => character.level));
 }
 
-// Strongest hero represents the party for over-level XP scaling, same convention as combat-end.ts's partyRepresentativeLevel.
+// Strongest hero represents the party for over-level XP scaling.
 export function partyMaxLevel(): number {
   const party = partyGet();
   if (party.length === 0) return 1;

@@ -25,14 +25,12 @@ export function equipmentItemBonusStats(item: EquipmentItem): StatBlock {
   return equipmentItemBonusTotals(item, STAT_BONUS);
 }
 
-// The resistance analog of `equipmentItemBonusStats`.
 export function equipmentItemBonusResistances(
   item: EquipmentItem,
 ): StatusEffectBlock {
   return equipmentItemBonusTotals(item, RESISTANCE_BONUS);
 }
 
-// The combat-stat analog of `equipmentItemBonusStats`.
 export function equipmentItemBonusCombatStats(
   item: EquipmentItem,
 ): CombatStatBlock {
@@ -67,7 +65,6 @@ export function equipmentItemGrantedSkillIds(
   return uniq([...content.grantedSkillIds, ...affixSkillIds]);
 }
 
-// Resolves `equipmentItemGrantedSkillIds` to their skill content, dropping any id that no longer resolves.
 export function equipmentItemGrantedSkills(
   item: EquipmentItem,
   content: EquipmentContent,

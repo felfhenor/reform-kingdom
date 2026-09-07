@@ -2,7 +2,7 @@
  * Validates that every "explore node" (a Tiled `ExploreNode`/`ExploreRandomNode`
  * object placed on a world map) resolves to an `Encounter`/`EncounterRandom`
  * (matched by name) whose `completionRewards` includes at least one
- * collectible drop. Ported from `scripts/validate-completionrewards.ts`.
+ * collectible drop.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

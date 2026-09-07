@@ -34,13 +34,11 @@ describe('Logging Functions', () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     vi.setSystemTime(FIXED_DATE);
-    // Replace console methods with mocks
     Object.assign(console, mockConsole);
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    // Restore original console methods
     Object.assign(console, originalConsole);
   });
 

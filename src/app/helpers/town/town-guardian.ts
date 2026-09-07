@@ -21,8 +21,7 @@ export function townGuardianMonsterIds(): MonsterId[] {
   );
 }
 
-// Exact-match on the town's current reputation tier, same convention as
-// `townReputationBuffSync`'s tier lookup - unauthored tiers resolve to no guardians.
+// Exact-match on the town's current reputation tier - unauthored tiers resolve to no guardians.
 export function townGuardiansForCurrentReputation(
   town: TownContent,
 ): TownDefenseGuardianEntry[] {

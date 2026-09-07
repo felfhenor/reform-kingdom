@@ -17,8 +17,7 @@ import type {
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
-// Same curve shape as tradeskillXpForLevel (see crafting/tradeskill.ts) - the
-// house curve for any leveled system - with its own cap/start/end.
+// The house curve for any leveled system - with its own cap/start/end.
 export const WORKER_MAX_LEVEL = 99;
 const WORKER_XP_START = 10;
 const WORKER_XP_END = 10000;
@@ -32,7 +31,6 @@ export function workerXpForLevel(level: number): number {
   return roundToNearest10(xp);
 }
 
-// Pure `base + perLevel * (level - 1)` - shared with townWorkerStatsForLevel, the one piece the two parallel systems have in common.
 export function statBlockForLevel(
   base: WorkerStatBlock,
   perLevel: WorkerStatBlock,

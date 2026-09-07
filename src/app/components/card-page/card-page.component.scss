@@ -3,27 +3,22 @@
 .card-page-container {
   transform-origin: center center;
 
-  // Full scale at larger resolutions (1600px+ width)
   @media (min-width: 1600px) {
     transform: scale(1);
   }
 
-  // Scale down to 0.9 at medium-large resolutions (1400px-1599px)
   @media (max-width: 1599px) and (min-width: 1400px) {
     transform: scale(0.95);
   }
 
-  // Scale down to 0.85 at medium resolutions (1366px-1399px)
   @media (max-width: 1399px) and (min-width: 1366px) {
     transform: scale(0.9);
   }
 
-  // Scale down to 0.8 at smaller resolutions (1200px-1365px)
   @media (max-width: 1365px) and (min-width: 1200px) {
     transform: scale(0.85);
   }
 
-  // Scale down to 0.75 at very small resolutions (<1200px)
   @media (max-width: 1199px) {
     transform: scale(0.8);
   }

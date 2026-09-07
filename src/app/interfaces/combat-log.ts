@@ -4,7 +4,7 @@ export type AdventureLogEntryKind =
   'Combat' | 'Travel' | 'Gather' | 'Craft' | 'Raid' | 'Miscellaneous';
 
 // A combatant's HP snapshot at log time, keyed by id so `@@id@@` message
-// tokens (see combatantMessageToken) can be swapped for a colored name.
+// tokens can be swapped for a colored name.
 export type CombatLogCombatantSnapshot = {
   id: string;
   name: string;

@@ -15,14 +15,12 @@ export type ItemContent = IsContentItem &
     id: ItemId;
 
     // Flat stat bonus granted when this item is infused into an equipment
-    // slot (see `helpers/infusion.ts`). Absent for ordinary materials -
-    // only a small set of items opt into being infusable.
+    // slot. Absent for ordinary materials - only a small set of items opt
+    // into being infusable.
     infusionStats?: StatBlock;
 
-    // Same idea as `infusionStats`, but for per-tag debuff resistance.
     infusionDebuffResistances?: StatusEffectBlock;
 
-    // Same idea as `infusionStats`, but for combat stats.
     infusionCombatStats?: CombatStatBlock;
 
     unobtainable?: boolean;

@@ -1,8 +1,7 @@
 /**
  * Reports how "utilized" each material (item) is - how many distinct game
  * systems actually spend it - and flags materials at or below a
- * configurable threshold as under-utilized. Ported from
- * `scripts/analyze-materialutilization.ts`.
+ * configurable threshold as under-utilized.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

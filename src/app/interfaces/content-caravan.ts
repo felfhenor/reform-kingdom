@@ -11,8 +11,8 @@ export type CaravanMarkupPercentages = {
   buy: number;
 };
 
-// Weight lives per-caravan (not on CommissionOfferContent) so the same
-// offer can be common at one caravan and rare at another.
+// Weight lives per-caravan so the same offer can be common at one caravan
+// and rare at another.
 export type CommissionOfferSlot = {
   commissionOfferId: CommissionOfferId;
   weight: number;
@@ -31,17 +31,14 @@ export type CaravanContent = IsContentItem &
 
     level: LevelRange;
 
-    // Applied to a trade's authored `value` at purchase time - `sell` marks
-    // up what the trader charges the player, `buy` (typically negative)
-    // discounts what the trader pays the player.
+    // `sell` marks up what the trader charges the player, `buy` (typically
+    // negative) discounts what the trader pays the player.
     markupPercentages: CaravanMarkupPercentages;
 
-    // Tags matched against `CaravanTraderContent.category` - only traders
-    // in one of these categories are eligible to staff this caravan.
+    // Only traders in one of these categories are eligible to staff this caravan.
     traderCategories: string[];
 
-    // Direct pool this caravan rolls its daily commission from - see
-    // `commissionProcessTick`. Not category-matched like traders; the
-    // caravan owns its own list.
+    // Direct pool this caravan rolls its daily commission from. Not
+    // category-matched like traders; the caravan owns its own list.
     commissionOffers: CommissionOfferSlot[];
   };

@@ -143,10 +143,10 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   private cameraOffset = signal<CameraPosition>({ x: 0, y: 0 });
 
-  // Frozen anchor while panned, so party movement doesn't drag the panned view. Cleared by `recenterCamera`.
+  // Frozen anchor while panned, so party movement doesn't drag the panned view.
   private frozenCameraBase?: CameraPosition;
 
-  // Refreshed only on resize/zoom/map-load by `refreshViewportGeometry`, not every frame.
+  // Refreshed only on resize/zoom/map-load, not every frame.
   private viewportTiles: ViewportTiles = { widthTiles: 0, heightTiles: 0 };
   private cameraBounds: CameraBounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
 
@@ -169,17 +169,13 @@ export class GamePlayWorldComponent implements OnDestroy {
   private gridOverlay?: Graphics;
   private playerIndicatorContainer?: Container;
   private workerIndicatorContainer?: Container;
-  // Each worker's sprite/graphics lives inside its own tile-positioned container, mirroring
-  // playerIndicatorContainer's child-offset scheme so the anchor math never needs duplicating here.
   private workerTokens = new Map<WorkerId, Container>();
   private workerGlideStates = new Map<WorkerId, TravelGlideState>();
   private workerTokenTextures = new Map<WorkerId, Texture[]>();
   private pendingWorkerTextureLoads = new Set<WorkerId>();
   // Keyed by "townId:workerId", not WorkerId alone, in case content ever reuses one across towns.
-  // Shares workerTokenTextures/pendingWorkerTextureLoads with the player system below (same content pool).
   private townWorkerTokens = new Map<string, Container>();
   private townWorkerGlideStates = new Map<string, TravelGlideState>();
-  // Cached by positionCamera() each frame so updateWorkerIndicators() doesn't recompute it per worker.
   private lastCamera: CameraPosition = { x: 0, y: 0 };
   private gatherProgressContainer?: Container;
   private gatherProgressBar?: {
@@ -209,7 +205,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     spawnedAt: number;
     nodeName: string;
   }> = [];
-  // Icon textures persist across map transitions, same as workerTokenTextures/partyTokenTextures below.
+  // Icon textures persist across map transitions.
   private floatingTextIconTextures = new Map<string, Texture>();
   private pendingFloatingTextTextureLoads = new Map<string, GatherVfxEvent[]>();
   private gatherVfxSubscription?: Subscription;
@@ -222,10 +218,10 @@ export class GamePlayWorldComponent implements OnDestroy {
   private dragPointerId?: number;
   private lastPointerPosition = { x: 0, y: 0 };
 
-  // Rendered position, eased toward the tick-driven `currentLocation` rather than snapping to it - see `updateVisualPosition`.
+  // Rendered position, eased toward the tick-driven `currentLocation` rather than snapping to it.
   private visualPosition: CurrentLocation = { mapName: '', x: 0, y: 0 };
 
-  // Endpoints/schedule of the step currently being glided toward, captured once so pace stays constant - see `updateVisualPosition`.
+  // Endpoints/schedule of the step currently being glided toward, captured once so pace stays constant.
   private stepOriginTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
   private stepDestinationTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
   private stepStartTime = performance.now();
@@ -250,8 +246,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       if (this.gridOverlay) this.gridOverlay.visible = showBackdropGrid;
     });
 
-    // Only handles zoom changing while already in-game; `initPixi` applies zoom itself on (re)creation since `this.app` isn't a signal.
-    // `untracked` avoids self-retrigger, since `positionCamera` transitively reads `cameraOffset`.
+    // `untracked` avoids self-retrigger.
     effect(() => {
       const mapZoom = getOption('mapZoom');
       if (this.app) this.app.stage.scale.set(mapZoom);
@@ -266,7 +261,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     });
 
     // Bridges the navbar's recenter button to this component's camera state; skips the initial run so mounting doesn't count as a request.
-    // `untracked` avoids self-retrigger via `cameraOffset` (read transitively through `recenterCamera`/`positionCamera`).
+    // `untracked` avoids self-retrigger.
     let isFirstRecenterCheck = true;
     effect(() => {
       worldCameraRecenterRequest();
@@ -277,8 +272,8 @@ export class GamePlayWorldComponent implements OnDestroy {
       untracked(() => this.recenterCamera());
     });
 
-    // Subscribed once (not per initPixi) so it survives map transitions; queued events are dropped
-    // in updateFloatingTexts when their node isn't on the currently loaded map.
+    // Subscribed once so it survives map transitions; queued events are dropped
+    // when their node isn't on the currently loaded map.
     this.gatherVfxSubscription = gatherVfx$.subscribe((event) => {
       this.enqueueGatherVfx(event);
     });
@@ -296,7 +291,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     });
   }
 
-  // Deaths Door recall teleports instantly; if it happens on the same map, `checkForMapChange` won't catch it, so this snaps the token to avoid a visible walk-back.
+  // Deaths Door recall teleports instantly, so this snaps the token to avoid a visible walk-back.
   private checkForDeathsDoorRecall(): void {
     const isDead = isGlobalEffectActive('Deaths Door' as GlobalEffectId);
     const justRecalled = this.wasPartyDead && !isDead;
@@ -387,7 +382,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.app?.destroy(true, { children: true, texture: true });
 
     // Queued/active floating text is map-scoped (positions reference nodes on the map being torn down) -
-    // the icon texture cache is not, and persists below like workerTokenTextures does.
+    // the icon texture cache is not, and persists below.
     this.pendingGatherVfxByNode.clear();
     this.lastFloatingTextSpawnAtByNode.clear();
     this.lastNodeStatusUpdateAt = 0;
@@ -400,7 +395,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.gridOverlay = undefined;
     this.playerIndicatorContainer = undefined;
     this.workerIndicatorContainer = undefined;
-    // Tokens/glide state are per-app-instance; loaded textures persist across map transitions, same as partyTokenTextures.
+    // Tokens/glide state are per-app-instance; loaded textures persist across map transitions.
     this.workerTokens.clear();
     this.workerGlideStates.clear();
     this.townWorkerTokens.clear();
@@ -446,7 +441,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.nodeSelectionContainer = containers.nodeSelectionContainer;
     this.floatingTextContainer = containers.floatingTextContainer;
 
-    // Clicking empty map deselects the node (node clicks stop propagation, see pixi-map-render.ts). `dragMoved` distinguishes a pan-drag's pointertap from an actual deselect click.
+    // Clicking empty map deselects the node. `dragMoved` distinguishes a pan-drag's pointertap from an actual deselect click.
     this.app.stage.eventMode = 'static';
     this.app.stage.hitArea = this.app.screen;
     this.app.stage.on('pointertap', () => {
@@ -533,8 +528,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     mapNodeSelect(entry);
   }
 
-  // Throttled: worldNodeLabelInfo() does up to 5 getEntry() lookups + string building per node - real
-  // JS-side work even though the resulting Pixi setters are no-ops when unchanged.
   private maybeUpdateNodeStatus(now: number): void {
     if (now - this.lastNodeStatusUpdateAt < NODE_STATUS_UPDATE_INTERVAL_MS)
       return;
@@ -543,7 +536,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.updateNodeWrapperVisibility();
   }
 
-  // Throttled via maybeUpdateNodeStatus; a collectible pickup doesn't trigger a map rebuild so this still needs to poll.
+  // Throttled; a collectible pickup doesn't trigger a map rebuild so this still needs to poll.
   private updateNodeWrapperVisibility(): void {
     if (!this.nodeWrappers) return;
 
@@ -566,7 +559,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     return entry ? worldNodeLabelInfo(entry) : undefined;
   }
 
-  // Catches countdown text and hidden-node discovery updates; see maybeUpdateNodeStatus for the polling cadence.
+  // Catches countdown text and hidden-node discovery updates.
   private updateNodeLabels(): void {
     if (!this.nodeLabels) return;
 
@@ -726,7 +719,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.playerIndicatorContainer.addChild(sprite);
   }
 
-  // True once the eased `visualPosition` catches up to `currentLocation` - use for anything gated on visible, not just logical, arrival.
+  // Use for anything gated on visible, not just logical, arrival.
   private isVisuallyAtTarget(): boolean {
     const target = currentLocationGet();
     return (
@@ -746,7 +739,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.setupPlayerIndicator();
   }
 
-  // Gated on visual arrival, not just `isGathering()`, so the bar doesn't pop in while the token is still mid-glide.
+  // Gated on visual arrival, so the bar doesn't pop in while the token is still mid-glide.
   private updateGatherProgressIndicator(): void {
     if (!this.gatherProgressBar) return;
 
@@ -772,7 +765,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   }
 
   // Glides toward the in-flight step as soon as it becomes current, rather than waiting for its ticks to resolve - otherwise the token would sit still for the whole tick-accumulation window then jump.
-  // Map changes are handled separately (with a fade) by `transitionToMap`, so a mismatched map name here just snaps.
+  // Map changes are handled separately (with a fade), so a mismatched map name here just snaps.
   private updateVisualPosition(): void {
     if (!this.map) return;
 
@@ -822,7 +815,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const bounds = this.cameraBounds;
     const offset = this.cameraOffset();
 
-    // Stay anchored at `frozenCameraBase` while panned, so party movement doesn't drag the view.
+    // Stay anchored while panned, so party movement doesn't drag the view.
     const base =
       this.frozenCameraBase ??
       cameraPositionCalculate(
@@ -833,15 +826,13 @@ export class GamePlayWorldComponent implements OnDestroy {
         bounds,
       );
 
-    // Reclamped (not trusting `offset` alone) to cover a resize while panned shifting the bounds.
+    // Reclamped to cover a resize while panned shifting the bounds.
     const camera = {
       x: clamp(base.x + offset.x, bounds.minX, bounds.maxX),
       y: clamp(base.y + offset.y, bounds.minY, bounds.maxY),
     };
 
     // Offsets by half a tile so the tile center, not its top-left corner, lands at screen center.
-    // (mapContainer itself moves opposite the camera, unlike the token containers below, which
-    // stay screen-anchored at the party's own tile - so it's positioned directly, not via tileToScreenPosition.)
     this.mapContainer.position.set(
       Math.round(-camera.x * this.map.tilewidth - this.map.tilewidth / 2),
       Math.round(-camera.y * this.map.tileheight - this.map.tileheight / 2),
@@ -868,8 +859,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
 
     this.positionNodeSelectionIndicator(camera);
-    // Cached for updateWorkerIndicators(), which runs right after this in
-    // the ticker and needs the same camera to position N worker tokens.
     this.lastCamera = camera;
   }
 
@@ -916,7 +905,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
   }
 
-  // Diffs `workersTravelingTokens()` against the currently-rendered sprites, creating/destroying/repositioning as needed.
   private updateWorkerIndicators(): void {
     if (!this.workerIndicatorContainer || !this.map) return;
 
@@ -990,7 +978,7 @@ export class GamePlayWorldComponent implements OnDestroy {
         textures,
       );
       // A per-worker container, positioned at the tile's screen corner, so the sprite/graphics
-      // child's own centering offset (baked in by pixiIndicatorPlayerSpriteCreate) applies unmodified.
+      // child's own centering offset applies unmodified.
       const token = new Container();
       token.addChild(sprite);
       this.workerIndicatorContainer.addChild(token);
@@ -1013,7 +1001,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     return textures;
   }
 
-  // Mirrors updateWorkerIndicators, diffing townWorkersTravelingTokens() instead.
   private updateTownWorkerIndicators(): void {
     if (!this.workerIndicatorContainer || !this.map) return;
 
@@ -1183,8 +1170,6 @@ export class GamePlayWorldComponent implements OnDestroy {
   ): void {
     const waiting = this.pendingFloatingTextTextureLoads.get(textureKey);
     if (waiting) {
-      // Bounded independently of trimPendingGatherVfx's cap - this bucket sits outside
-      // pendingGatherVfxByNode until the texture resolves, so it needs its own ceiling.
       if (waiting.length < FLOATING_TEXT_MAX_PENDING) waiting.push(event);
       return;
     }
@@ -1238,8 +1223,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
 
     this.floatingTextContainer.addChild(container);
-    // Position is set on the first `updateFloatingTexts` pass right after this (not here) - see
-    // that method's filter loop, which recomputes every active popup's node position each frame.
     this.activeFloatingTexts.push({
       container,
       update,

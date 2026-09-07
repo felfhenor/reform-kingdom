@@ -23,13 +23,12 @@ export type TownId = Branded<string, 'TownId'>;
 // every numeric knob below is authored directly per-town instead.
 export type TownScaleType = 'City' | 'Town' | 'Outpost';
 
-// A town's fixed tradeskill level, authored directly (never changes at runtime) - clamped to TRADESKILL_MAX_LEVEL on materialization.
 export type TownTradeskillLevelSeed = {
   tradeskillId: TradeskillId;
   level: number;
 };
 
-// Reputation-tier-scaled numeric knob - same "exact tier or fall back to the highest one below it" convention as townReputationTierMultiplier.
+// Reputation-tier-scaled numeric knob - same "exact tier or fall back to the highest one below it" convention.
 export type TownReputationTierValue = {
   tier: number;
   value: number;
@@ -38,14 +37,14 @@ export type TownReputationTierValue = {
 export type TownCraftingConfig = {
   maxQueueSize: TownReputationTierValue[];
   specialtyTradeskillId: TradeskillId;
-  // Multiplies every recipe's craftTime for this town - towns craft slower than the player so shop stock doesn't churn instantly.
+  // Towns craft slower than the player so shop stock doesn't churn instantly.
   craftingDurationMultiplier: number;
   // Percent chance per tick to queue a new craft once the queue is at/above craftingChanceItemThreshold.
   craftingChanceOnTick: number;
   // Below this queue length, a new craft is queued every tick (materials permitting); at/above it, craftingChanceOnTick gates it.
   craftingChanceItemThreshold: number;
   tradeskillLevels: TownTradeskillLevelSeed[];
-  // Never appears in the player's own tradeskill craft list (see isRecipeCraftable) - exclusively obtainable through this town.
+  // Never appears in the player's own tradeskill craft list - exclusively obtainable through this town.
   uniqueRecipeIds: RecipeId[];
 };
 
@@ -56,7 +55,7 @@ export type TownTradersConfig = {
   markupPercentages: CaravanMarkupPercentages;
 };
 
-// A worker this town starts with, at the given seed level - references the SAME WorkerContent pool player-rescuable workers use, not a separate town-worker type.
+// A worker this town starts with, at the given seed level - references the same pool player-rescuable workers use, not a separate town-worker type.
 export type TownGatheringWorker = {
   workerId: WorkerId;
   level: number;
@@ -68,12 +67,12 @@ export type TownMaterialThreshold = {
   maxQuantity: number;
 };
 
-// A town's materialThresholds array flattened to a hash for O(1) per-item lookup - see townMaterialThresholdHash.
+// A town's materialThresholds array flattened to a hash for O(1) per-item lookup.
 export type TownMaterialThresholdHash = Partial<Record<ItemId, number>>;
 
 export type TownGatheringConfig = {
   gatherRateMultiplier: number;
-  // Hidden gold accrual rate: gold += goldGatheredPerMaterial per material gathered, capped via materialThresholds (see townGoldThreshold).
+  // Hidden gold accrual rate: gold += goldGatheredPerMaterial per material gathered, capped via materialThresholds.
   goldGatheredPerMaterial: number;
   materialThresholds: TownMaterialThreshold[];
   workers: TownGatheringWorker[];

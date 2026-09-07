@@ -72,7 +72,6 @@ type RiskToleranceOption = {
   description: string;
 };
 
-// Reward-shaped so the Gather Material picker can reuse `app-option-reward` for its icon+name row.
 type MaterialOption = RewardContentInfo & { id: MaterialId };
 
 const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
@@ -151,7 +150,7 @@ export class GamePlayDecreeComponent {
   public draftRewardKey = signal<string | undefined>(undefined);
   public draftTargetQuantity = signal<number>(1);
   public draftRiskTolerance = signal<DecreeRiskLevel>('Medium');
-  // Undefined = "any town" - distinct from draftNodeName, FarmNode's explore-node picker.
+  // Undefined = "any town"
   public draftTownName = signal<string | undefined>(undefined);
 
   public townOptions = computed(() =>
@@ -165,12 +164,11 @@ export class GamePlayDecreeComponent {
     return nodeName ? sortBy(farmNodeRewardOptions(nodeName), 'name') : [];
   });
 
-  // Keyed by a stable string (`FarmNodeRewardOption.key`) rather than the reward object, so it can drive ng-select's bindValue like `draftMaterialId`.
+  // Keyed by a stable string rather than the reward object, so it can drive ng-select's bindValue.
   public selectedRewardOption = computed(() =>
     this.rewardOptions().find((option) => option.key === this.draftRewardKey()),
   );
 
-  // Which clause types are editable in place is decided by `RowDecreeClauseComponent.isEditable`.
   public editingClauseId = signal<DecreeClauseId | undefined>(undefined);
   public isEditing = computed(() => !!this.editingClauseId());
 

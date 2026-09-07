@@ -1,10 +1,9 @@
 /**
- * Validates that every GatherNode's development level (0..maxLevel-1, see
- * `helpers/world-node/world-node-level.ts`) has at least one gatherResults
- * entry available at that level - either an unrestricted result (no
- * levelRequirement) or one whose levelRequirement matches exactly. A level
- * with zero matching results would gather nothing once a node reaches it.
- * Mirrors `gatheringResultsAtLevel` in `helpers/world-node/world-node-gathering.ts`.
+ * Validates that every GatherNode's development level (0..maxLevel-1) has at
+ * least one gatherResults entry available at that level - either an
+ * unrestricted result (no levelRequirement) or one whose levelRequirement
+ * matches exactly. A level with zero matching results would gather nothing
+ * once a node reaches it.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

@@ -180,7 +180,7 @@ describe('raidDefenseGlobalEffectApply', () => {
 
     raidDefenseGlobalEffectApply(state, 1000);
 
-    // RAID_DEFENSE_GLOBAL_EFFECT_ID is a lookup name, not the id stored on a pushed effect -
+    // The lookup name is not the id stored on a pushed effect -
     // removal must use the resolved content's real id or it silently never matches.
     expect(applyGlobalEffectRemove).toHaveBeenCalledWith(
       state,

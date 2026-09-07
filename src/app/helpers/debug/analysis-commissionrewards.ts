@@ -33,7 +33,7 @@ export function runCommissionRewardsAnalysis(): AnalysisRunResult {
   offers.forEach((offer) => {
     const usedByCaravan = caravanOfferIds.has(offer.id);
     const usedByTown = townOfferIds.has(offer.id);
-    if (!usedByCaravan && !usedByTown) return; // unused offers are covered by the commissionusage check
+    if (!usedByCaravan && !usedByTown) return;
 
     const missing: string[] = [];
     if (usedByCaravan && offer.rewards.length === 0) {

@@ -208,8 +208,7 @@ export function debugFillBestiary(): void {
 }
 
 // Clears every caravan's commission state so it regenerates on the next
-// visit/tick - a recovery tool for a commission stuck blank (see
-// `regenerateCommissionNode`'s no-eligible-offer case).
+// visit/tick - a recovery tool for a commission stuck blank.
 export function debugResetCommissions(): void {
   updateGamestate((state) => {
     state.world.commissions = {};
@@ -259,8 +258,8 @@ export function debugGiveCollectible(
   collectiblesAdd(collectible.id, quantity);
 }
 
-// Discovers every drop-gated recipe so it becomes craftable (see
-// `isRecipeCraftable`); non-drop-gated recipes need no discovery record.
+// Discovers every drop-gated recipe so it becomes craftable; non-drop-gated
+// recipes need no discovery record.
 export function debugDiscoverAllRecipes(): void {
   getEntriesByType<RecipeContent>('recipe')
     .filter((recipe) => isRecipeDropGated(recipe.id))
@@ -291,7 +290,6 @@ export function debugRescueWorker(workerId: WorkerId): void {
   workerRescue(worker.id);
 }
 
-// Bypasses the gold cost `workerLevelUp` normally requires - sets xp/level directly.
 export function debugSetWorkerLevel(workerId: WorkerId, level: number): void {
   const clampedLevel = clamp(Math.round(level), 1, WORKER_MAX_LEVEL);
 
@@ -348,7 +346,7 @@ export function debugSetTownReputation(
   });
 }
 
-// Raid combat from anywhere, no telegraph/standing-at-town required - unlike raidEngageCombat.
+// Raid combat from anywhere, no telegraph/standing-at-town required.
 export function debugStartTownDefenseCombat(townId: TownId): void {
   const town = getEntry<TownContent>(townId);
   if (!town) {

@@ -36,14 +36,13 @@ export function rollAffixIds(rarity: DropRarity): AffixId[] {
   return rolledIds;
 }
 
-// Resolves an item's rolled affixIds to their content, dropping any that no longer resolve.
 export function equipmentItemAffixes(item: EquipmentItem): AffixContent[] {
   return item.affixIds
     .map((affixId) => getEntry<AffixContent>(affixId))
     .filter((affix): affix is AffixContent => !!affix);
 }
 
-// The affix analog of `equipmentItemInfusionBonus`. Each affix can carry multiple effects.
+// Each affix can carry multiple effects.
 export function equipmentItemAffixEffects(item: EquipmentItem): AffixEffect[] {
   return equipmentItemAffixes(item).flatMap((affix) => affix.effects);
 }

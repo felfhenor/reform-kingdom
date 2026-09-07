@@ -1,7 +1,6 @@
 /**
  * Validates that every recipe's `name` is prefixed according to what its
  * `result` produces ("Weapon:"/"Equipment:"/"Material:"/"Collectible:").
- * Ported from `scripts/validate-recipenames.ts`.
  */
 
 import { getEntriesByType } from '@helpers/content/content';
@@ -16,8 +15,7 @@ import type {
   RecipeResult,
 } from '@interfaces';
 
-// Mirrors `EquipmentTypeToSlot` in src/app/interfaces/equipment.ts - types
-// that can occupy the 'Weapon' (main hand) slot.
+// Types that can occupy the 'Weapon' (main hand) slot.
 const MAIN_HAND_EQUIPMENT_TYPES = new Set<EquipmentItemType>([
   'Bow',
   'Dagger',

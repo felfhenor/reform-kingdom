@@ -37,7 +37,7 @@ export type CombatStat =
 
 export type CombatStatBlock = Record<CombatStat, number>;
 
-// Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier (see `rngSucceedsChance`).
+// Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier.
 export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
   order: [
     'repeatActionChance',
@@ -116,19 +116,18 @@ export type Combatant = HasAnimation & {
   name: string;
 
   isEnemy: boolean;
-  // Enemy-only MonsterId source for post-combat rewards; untyped to avoid a circular import with content-monster.ts.
+  // Enemy-only MonsterId source for post-combat rewards; untyped to avoid a circular import.
   monsterId?: string;
 
   level: number;
   hp: number;
   ep: number;
 
-  // Priority list of targeting modes, tried in order - see combatGetTargetsFromPriorityList.
+  // Priority list of targeting modes, tried in order.
   targetting: TargettingPriorityEntry[];
-  // Set for hero combatants only (from Character.jobId), so a monster's targetting entries can narrow by jobId.
+  // Set for hero combatants only, so a monster's targetting entries can narrow by jobId.
   jobId?: JobId;
-  // Resolved once at Combatant creation from the owning hero's current job
-  // (empty for monsters) - see combatantFromCharacter.
+  // Resolved once at Combatant creation from the owning hero's current job (empty for monsters).
   combatOrders: CombatOrderClause[];
 
   baseStats: StatBlock;
@@ -166,11 +165,11 @@ export type Combat = {
   encounterId?: EncounterId;
   encounterRandomId?: EncounterRandomId;
   fightIndex?: number;
-  // Untyped (not TownId) to avoid a circular import - content-town.ts already imports CombatStatBlock from here.
+  // Untyped (not TownId) to avoid a circular import.
   raidTownId?: string;
 };
 
-// A combatant HP change, pushed to combatantDamageEvents to show a floating +/- number; amount is signed for display (positive = heal).
+// A combatant HP change; amount is signed for display (positive = heal).
 export type CombatantDamageEvent = {
   id: string;
   combatantId: string;

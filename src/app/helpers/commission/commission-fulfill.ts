@@ -33,9 +33,9 @@ function commissionState(
   return state.world.commissions[caravanId];
 }
 
-// Shaped like CraftRequirementEntry so both UI surfaces (the Commissions
-// panel and a caravan's trade modal) can reuse the same icon-row rendering
-// the tradeskill panel already uses for recipe requirements.
+// Both UI surfaces (the Commissions panel and a caravan's trade modal) can
+// reuse the same icon-row rendering the tradeskill panel already uses for
+// recipe requirements.
 export function commissionRequirementEntries(
   caravanId: CaravanId,
 ): CommissionRequirementEntry[] {
@@ -45,8 +45,6 @@ export function commissionRequirementEntries(
   return buildCommissionRequirementEntries(state.requirements);
 }
 
-// False until the first `commissionProcessTick` has generated this
-// caravan's commission - lets the UI skip rendering an empty row.
 export function commissionExists(caravanId: CaravanId): boolean {
   return !!commissionState(caravanId)?.commissionOfferId;
 }
@@ -60,7 +58,7 @@ export function commissionRewards(caravanId: CaravanId): DroppedReward[] {
   return offer?.rewards ?? [];
 }
 
-// Accepts an explicit `state` to re-validate at commit time (see `commissionRequirementOwnedQuantity`).
+// Accepts an explicit `state` to re-validate at commit time.
 export function commissionCanFulfill(
   caravanId: CaravanId,
   state?: GameState,
@@ -99,8 +97,6 @@ export function commissionRowViewModel(
   };
 }
 
-// Fast path only - commissionCanFulfill is repeated against live state
-// inside the callback, since updateGamestate commits asynchronously.
 export async function commissionFulfill(
   caravanId: CaravanId,
 ): Promise<boolean> {

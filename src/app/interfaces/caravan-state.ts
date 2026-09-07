@@ -6,15 +6,14 @@ import type {
 } from '@interfaces/content-caravan-trader';
 
 export type CaravanNodeState = {
-  // Undefined when no eligible trader currently exists for this caravan -
-  // gates `worldNodeCaravanIsAvailable` and travel to the node.
+  // Undefined when no eligible trader currently exists for this caravan.
   traderId?: CaravanTraderId;
 
   // Indices into the assigned trader's `trades` array that are in stock
-  // this cycle - always length <= 4, see `caravanProcessTick`.
+  // this cycle - always length <= 4.
   activeTradeIndices: number[];
 
-  // Times each active trade has been bought/sold this cycle, vs CaravanTrade.limit.
+  // Times each active trade has been bought/sold this cycle.
   tradeCounts: Record<number, number>;
 
   generatedAtTick: number;
@@ -42,7 +41,7 @@ export type CaravanTradeRow = {
   remaining?: number;
   soldOut: boolean;
   // The most units of this trade the party could transact right now (0 if
-  // unaffordable/insufficiently owned) - see `caravanTradeMaxQuantity`.
+  // unaffordable/insufficiently owned).
   maxQuantity: number;
   ownedQuantity: number;
 };

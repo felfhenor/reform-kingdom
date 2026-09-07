@@ -53,7 +53,6 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withRouterConfig({ paramsInheritanceStrategy: 'always' }),
       withNavigationErrorHandler((error) => {
-        // Handle the error, e.g., redirect to an error page
         console.error('Navigation error:', error);
         return '/';
       }),

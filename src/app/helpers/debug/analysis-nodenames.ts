@@ -1,9 +1,7 @@
 /**
  * Validates that every node object placed on the world maps (on the
  * "Explore Nodes" or "Other Nodes" layers) has a name that's unique across
- * *all* maps, regardless of node type - see `worldNodeMapsBuild` in
- * `src/app/helpers/world-nodes.ts`, which indexes nodes into one flat
- * `byName` map with no scoping. Ported from `scripts/validate-nodenames.ts`.
+ * *all* maps, regardless of node type.
  */
 
 import { allMaps } from '@helpers/maps';

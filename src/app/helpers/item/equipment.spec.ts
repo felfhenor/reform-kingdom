@@ -684,7 +684,7 @@ describe('Equipment Helper Functions', () => {
       expect(items).toEqual([spearItem]);
     });
 
-    // Guards against a legacy save backfilled with a different instance id per slot (see `backfillEquipmentBlock`).
+    // Guards against a legacy save backfilled with a different instance id per slot.
     it('only returns a two-handed item once even if its slots hold different instance ids', () => {
       vi.mocked(getEntry).mockReturnValue(spear);
 

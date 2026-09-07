@@ -69,7 +69,7 @@ export function equippedItems(equipment: EquipmentBlock): EquipmentItem[] {
   });
 }
 
-// Like `equippedItems` but dedupes by primary slot (see `EquipmentTypeToSlot`) instead of instance id, for pickers needing "one row per physical item" even across legacy saves where a two-hander's slots don't share an instance id.
+// Dedupes by primary slot instead of instance id, for pickers needing "one row per physical item" even across legacy saves where a two-hander's slots don't share an instance id.
 export function equippedItemsByPrimarySlot(
   equipment: EquipmentBlock,
 ): EquipmentItem[] {
@@ -111,7 +111,7 @@ export function slotsHoldingEquipment(
   );
 }
 
-// Class-unique slots per the design doc (Artifact/Mage, Ammo/Ranger), matched by job name (same convention as `party.ts`'s `STARTER_ARMOR_NAME`).
+// Class-unique slots per the design doc (Artifact/Mage, Ammo/Ranger), matched by job name.
 const CLASS_EXCLUSIVE_SLOT_JOBS: Partial<Record<EquipmentSlot, string>> = {
   Artifact: 'Magician',
   Ammo: 'Ranger',
@@ -139,7 +139,7 @@ export function canEquipItem(
   return job.equippableTypes.includes(equipment.type);
 }
 
-// Takes `armory` as a parameter (rather than reading `armoryGet()`) so it also works against a draft armory (see `planEquipmentOptimization`).
+// Takes `armory` as a parameter rather than reading it globally, so it also works against a draft armory.
 function equipmentEntriesForSlot(
   armory: EquipmentItem[],
   slot: EquipmentSlot,
@@ -204,7 +204,7 @@ export function equipmentStatTotals(equipment: EquipmentBlock): StatBlock {
   return equipmentDimensionTotals(equipment, STAT_BONUS);
 }
 
-// Applied at combat creation, not baked into `Character.stats` - see `combatStatsForCharacterEquipment`.
+// Applied at combat creation, not baked into `Character.stats`.
 export function equipmentCombatStatTotals(
   equipment: EquipmentBlock,
 ): CombatStatBlock {
@@ -217,7 +217,7 @@ export function equipmentTagResistanceTotals(
   return equipmentDimensionTotals(equipment, RESISTANCE_BONUS);
 }
 
-// Counts each distinct item once regardless of how many slots it occupies (see `equippedItems`).
+// Counts each distinct item once regardless of how many slots it occupies.
 export function equipmentAffixEffects(
   equipment: EquipmentBlock,
 ): AffixEffect[] {
@@ -232,16 +232,15 @@ export function characterTagResistances(
   return equipmentTagResistanceTotals(character.equipment);
 }
 
-// The combat-stat analog of `characterTagResistances` - gear-only, not the
-// in-combat value (which also factors in `combatStatsForCharacterEquipment`'s
-// default baseline, meaningless outside a `Combatant`).
+// Gear-only, not the in-combat value (which also factors in a default
+// combat-stat baseline, meaningless outside a `Combatant`).
 export function characterCombatStatTotals(
   character: Character,
 ): CombatStatBlock {
   return equipmentCombatStatTotals(character.equipment);
 }
 
-// Merging these into known skills is handled separately (see `mergeGrantedSkills`/`heroSkillsWithEquipment`), which needs skill content, not just ids.
+// Merging these into known skills is handled separately, which needs skill content, not just ids.
 export function equipmentGrantedSkillIds(
   equipment: EquipmentBlock,
 ): EquipmentSkillId[] {

@@ -1,10 +1,7 @@
 /**
  * Computes a content-derived default for the shared `level` input, instead
  * of a hardcoded guess - the higher of the top monster level (unioned across
- * every encounter/random encounter it's assigned to) and the top node level
- * (the same "item obtainable level" proxy `analysis-contentgaps.ts` uses),
- * so Hero Stats/Monster Stats default to showing the current top of authored
- * content rather than an arbitrary number.
+ * every encounter/random encounter it's assigned to) and the top node level.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

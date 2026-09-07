@@ -30,7 +30,7 @@ import { sumBy } from 'es-toolkit/compat';
 
 // Whether this recipe has ever been found as a world drop - recipes that are
 // only ever learned by leveling a tradeskill building are never discovered
-// this way (see `getMuseumRecipeEntries`).
+// this way.
 export function isRecipeDiscovered(
   recipeId: RecipeId,
   state: GameState = gamestate(),
@@ -57,7 +57,7 @@ export function isRecipeDropGated(recipeId: RecipeId): boolean {
   );
 }
 
-// Exclusively obtainable through the authoring town's own shop stock (see TownCraftingConfig.uniqueRecipeIds) - never on the player's own tradeskill craft list.
+// Exclusively obtainable through the town's own shop stock - never on the player's own tradeskill craft list.
 export function isRecipeTownUnique(recipeId: RecipeId): boolean {
   return getEntriesByType<TownContent>('town').some((town) =>
     town.crafting.uniqueRecipeIds.includes(recipeId),
@@ -90,8 +90,8 @@ export function recipeDiscover(recipeId: RecipeId): void {
   });
 }
 
-// Reverts a drop-gated recipe back to undiscovered - a debug/testing tool
-// (see debugUndiscoverRecipe), not something normal play ever triggers.
+// Reverts a drop-gated recipe back to undiscovered - a debug/testing tool,
+// not something normal play ever triggers.
 export function recipeUndiscover(recipeId: RecipeId): void {
   updateGamestate((state) => {
     delete state.discoveredRecipes[recipeId];
@@ -117,8 +117,7 @@ export function recipeCanUnlockWithTokens(
   );
 }
 
-// Spends tokens and discovers the recipe atomically - not a separate call
-// into `recipeDiscover`, so both mutations land in one updateGamestate.
+// Spends tokens and discovers the recipe atomically, so both mutations land in one updateGamestate.
 export async function recipeUnlockWithTokens(
   recipeId: RecipeId,
 ): Promise<boolean> {

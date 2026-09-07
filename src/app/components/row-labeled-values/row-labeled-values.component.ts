@@ -3,7 +3,6 @@ import { IconComponent } from '@components/icon/icon.component';
 import type { Icon, StatDisplayDimension } from '@interfaces';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
-// Renders any keyed numeric block (resistances, combat stats, ...) as labeled rows, driven by a `StatDisplayDimension` constant.
 @Component({
   selector: 'app-row-labeled-values',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,14 +12,12 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 })
 export class RowLabeledValuesComponent {
   public dimension = input.required<StatDisplayDimension>();
-  // Optional - equipment content built outside `ensureEquipment` (e.g. test
-  // fixtures) may not have this densely filled.
   public values = input<Record<string, number>>();
   // Extra bonus (e.g. from infusions/affixes) shown as its own set of rows,
-  // always in green/rose, below the base rows - mirrors `RowItemStatsComponent.bonusStats`.
+  // always in green/rose, below the base rows.
   public bonusValues = input<Record<string, number>>();
   // 'column' (default) for tooltips/detail panels, full sentence per row;
-  // 'row' for compact space-constrained lists - mirrors `RowItemStatsComponent.layout`.
+  // 'row' for compact space-constrained lists.
   public layout = input<'column' | 'row'>('column');
 
   private sortedNonzero(values: Record<string, number> | undefined): string[] {

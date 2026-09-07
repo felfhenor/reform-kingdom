@@ -122,8 +122,7 @@ function applyGrantedSkill(
   return skills.map((skill, i) => (i === existingIndex ? granted : skill));
 }
 
-// Merges equipment-granted skills into a hero's base (job-path) skills - see
-// `applyGrantedSkill` for the per-skill upgrade/ignore/append rule.
+// Merges equipment-granted skills into a hero's base (job-path) skills.
 export function mergeGrantedSkills(
   baseSkills: EquipmentSkillContent[],
   grantedSkills: EquipmentSkillContent[],

@@ -215,7 +215,7 @@ export function characterUnequipToArmory(
   return true;
 }
 
-// Backs the manual "Optimize Equipment" button; reclassing runs its own pass instead (see `characterReclass`) to stay atomic with the job swap.
+// Backs the manual "Optimize Equipment" button; reclassing runs its own pass instead, to stay atomic with the job swap.
 export function optimizeCharacterEquipment(characterId: CharacterId): void {
   const character = partyGet().find((c) => c.id === characterId);
   if (!character) return;

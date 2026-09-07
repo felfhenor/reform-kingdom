@@ -31,7 +31,7 @@ function gatherNodeHasItem(nodeName: string, itemId: ItemId): boolean {
   );
 }
 
-// Cost from the town's own node, not the Kingdom - mirrors workerStaminaCostToNode.
+// Cost from the town's own node, not the Kingdom.
 export function townWorkerStaminaCostToNode(
   town: TownContent,
   nodeName: string,
@@ -43,7 +43,7 @@ export function townWorkerStaminaCostToNode(
   return path ? travelPathTotalTicks(path, townNode) : undefined;
 }
 
-// No discovery check, unlike the player's workerAssignmentIsValid - town workers are NPC-run, not player exploration.
+// No discovery check - town workers are NPC-run, not player exploration.
 export function townWorkerAssignmentIsValid(
   town: TownContent,
   workerId: WorkerId,
@@ -119,8 +119,8 @@ export function townWorkerBeginReturnTrip(
   });
 }
 
-// Read every animation frame by the PIXI map-rendering layer, mirrors workersTravelingTokens -
-// a separate signal (not a merged one) since state lives at world.towns[townId].workers, not workers.
+// Read every animation frame by the PIXI map-rendering layer - a separate signal
+// (not a merged one) since state lives at world.towns[townId].workers, not workers.
 export const townWorkersTravelingTokens: Signal<
   {
     townId: TownId;

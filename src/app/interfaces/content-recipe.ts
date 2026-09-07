@@ -62,6 +62,6 @@ export type RecipeContent = IsContentItem & {
 
   // Trader Scrips to unlock this recipe via the Museum, bypassing its
   // world-drop gate. Meaningless (unused by the UI) for recipes that aren't
-  // drop-gated in the first place - see `isRecipeDropGated`.
+  // drop-gated in the first place.
   tokenUnlockCost: number;
 };

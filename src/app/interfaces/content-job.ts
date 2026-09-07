@@ -27,7 +27,7 @@ export type JobContent = IsContentItem &
 
     equippableTypes: EquipmentItemType[];
 
-    // Stats "Optimize Equipment" favors, highest priority first (see planEquipmentOptimization); ties fall back to level requirement.
+    // Stats "Optimize Equipment" favors, highest priority first; ties fall back to level requirement.
     statPriority: BaseStat[];
 
     skillPath: JobSkillPath[];

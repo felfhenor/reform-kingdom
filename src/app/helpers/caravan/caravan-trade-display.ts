@@ -5,7 +5,6 @@ import type {
   ItemPreviewDisplay,
 } from '@interfaces';
 
-// Mirrors rewardContentInfo in world-nodes.ts, plus the tooltip fields that helper doesn't carry.
 export function caravanTradeDisplay(
   trade: CaravanTrade,
 ): ItemPreviewDisplay | undefined {

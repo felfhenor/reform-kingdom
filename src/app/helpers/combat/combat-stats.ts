@@ -5,7 +5,7 @@ import type { Combatant, CombatStatBlock } from '@interfaces/combat';
 import type { EquipmentBlock } from '@interfaces/equipment';
 
 // Applied once at combat creation - gear's combat-stat bonuses are added to
-// the wearer's base value for the whole encounter (see `combatantFromCharacter`).
+// the wearer's base value for the whole encounter.
 export function combatStatsForCharacterEquipment(
   equipment: EquipmentBlock,
 ): CombatStatBlock {

@@ -48,8 +48,7 @@ function regenerateCommissionNode(caravan: CaravanContent, now: number): void {
   });
 }
 
-// Backfills a missing commission on arrival instead of waiting for the next
-// commissionProcessTick. No-ops if a commission already exists, even a stale one.
+// No-ops if a commission already exists, even a stale one.
 export function commissionGenerateIfMissing(caravanId: CaravanId): void {
   if (gamestate().world.commissions[caravanId]) return;
 
@@ -60,8 +59,7 @@ export function commissionGenerateIfMissing(caravanId: CaravanId): void {
 }
 
 // Regenerates every CaravanNode's commission once the daily wall-clock reset
-// boundary has passed - mirrors caravanProcessTick's shape, but checks real
-// time instead of ticks elapsed (see commission-reset.ts).
+// boundary has passed - checks real time instead of ticks elapsed.
 export function commissionProcessTick(): void {
   const now = Date.now();
 

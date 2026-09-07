@@ -149,7 +149,6 @@ export const ALL_ICONS = {
   tablerFocus,
 };
 
-// Resolves `IconSize` tokens to their CSS value, used internally by `IconComponent`.
 export const ICON_SIZE_VALUES: Record<IconSize, string> = {
   badge: '14px',
   inline: '1em',

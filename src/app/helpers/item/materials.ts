@@ -41,12 +41,12 @@ export function getMaterialQuantity(materialId: MaterialId): number {
   return gamestate().materials[materialId]?.quantity ?? 0;
 }
 
-// Reads the permanent `discoveredMaterials` record, not live stock - unlike `materials`, it survives being spent down to 0.
+// Reads the permanent `discoveredMaterials` record, not live stock - it survives being spent down to 0.
 export function isMaterialDiscovered(materialId: MaterialId): boolean {
   return !!gamestate().discoveredMaterials[materialId]?.foundAt;
 }
 
-// Drops any invalid discoveredMaterials entries whose id no longer resolves to real content, same as `pruneInvalidMaterials`.
+// Drops any invalid discoveredMaterials entries whose id no longer resolves to real content.
 export function pruneInvalidDiscoveredMaterials(
   discoveredMaterials: GameStateDiscoveredMaterials,
 ): GameStateDiscoveredMaterials {
@@ -103,8 +103,7 @@ export function getGoldQuantity(): number {
   return getMaterialQuantity(goldCoinId());
 }
 
-// Mutates `state` directly - for use inside an existing `updateGamestate`
-// callback, same as `applyMaterialDelta`.
+// Mutates `state` directly - for use inside an existing `updateGamestate` callback.
 export function gainGold(state: GameState, amount: number): void {
   applyMaterialDelta(state, goldCoinId(), amount);
 }
@@ -123,8 +122,8 @@ export function hasTraderTokens(amount: number): boolean {
 
 const STARTING_GOLD_AMOUNT = 100;
 
-// Grants the new-game starting gold - only called once, from `gameStart`
-// when a fresh world is created, so it never re-applies to an existing save.
+// Grants the new-game starting gold - only called once, when a fresh world
+// is created, so it never re-applies to an existing save.
 export function grantStartingGold(state: GameState): void {
   gainGold(state, STARTING_GOLD_AMOUNT);
 }

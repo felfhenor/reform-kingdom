@@ -27,12 +27,10 @@ import {
 export class TooltipItemPreviewComponent {
   public display = input<ItemPreviewDisplay>();
   // Extra flat bonus (e.g. from infusions) shown as its own set of rows in
-  // the stats block - see `RowStatSummaryComponent.bonusStats`. Only ever
-  // meaningful for equipment, so most callers leave this unset.
+  // the stats block. Only ever meaningful for equipment, so most callers
+  // leave this unset.
   public bonusStats = input<StatBlock>();
-  // Same idea as `bonusStats`, for per-tag debuff resistance.
   public bonusResistances = input<StatusEffectBlock>();
-  // Same idea as `bonusStats`, for combat stats.
   public bonusCombatStats = input<CombatStatBlock>();
 
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');

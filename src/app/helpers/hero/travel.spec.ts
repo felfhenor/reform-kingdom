@@ -228,7 +228,7 @@ describe('travelEtaSecondsTo', () => {
       }),
     );
 
-    // Off-path Move steps cost TICKS_PER_STEP_OFF_PATH (3) each; the first
+    // Off-path Move steps cost 3 ticks each; the first
     // step already has 1 tick of progress, so 2 remain, plus 3 for the second.
     expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBe(5);
   });
@@ -252,7 +252,7 @@ describe('travelPathTotalTicks', () => {
     ];
 
     // Both steps are plain off-path Moves (worldNodeAt/tileIsOnPath default
-    // to false/undefined), so each costs TICKS_PER_STEP_OFF_PATH (3).
+    // to false/undefined), so each costs 3 ticks.
     expect(travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 })).toBe(
       6,
     );
@@ -938,7 +938,7 @@ describe('travelProcessTick', () => {
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(gatheringStart).not.toHaveBeenCalled();
     // Arrival always surfaces wherever the party ends up, not just when
-    // something (combat/gathering) kicks off there - see `mapNodeAutoShowOnArrival`.
+    // something (combat/gathering) kicks off there.
     expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
     expect(caravanMarkVisited).not.toHaveBeenCalled();
   });

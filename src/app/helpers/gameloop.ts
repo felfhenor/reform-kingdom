@@ -41,7 +41,7 @@ export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
 // Caps how many ticks run before yielding to the browser during a long catch-up (e.g. after the tab was backgrounded), so it doesn't block the main thread for seconds at a time.
 const TICKS_PER_YIELD = 100;
 
-// Guards tickGamestate (state-game.ts) from a second call landing mid-batch now that the loop yields - e.g. a manual `window.api.gameloop()` during a catch-up.
+// Guards the loop from a second call landing mid-batch now that it yields - e.g. a manual `window.api.gameloop()` during a catch-up.
 let isProcessingTicks = false;
 
 export function gameloopShouldRun(): boolean {

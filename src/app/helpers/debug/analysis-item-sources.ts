@@ -1,9 +1,7 @@
 /**
  * Collates "when can a player first obtain this item" across every source
  * channel (monster drops, node completion rewards, gathering, tradeskill
- * crafting, caravan trades, commission rewards) - shared by
- * `analysis-contentgaps.ts`, the only script that needs a per-item
- * earliest-obtainable-level.
+ * crafting, caravan trades, commission rewards).
  */
 
 import { getEntry } from '@helpers/content/content';

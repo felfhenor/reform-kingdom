@@ -118,7 +118,7 @@ function xpProgressForLevel(level: number, currentXp: number): Character['xp'] {
   return { current: Math.min(currentXp, maximum), maximum };
 }
 
-// Rescales xp.maximum to the current `characterXpForLevel` curve, clamping `current` down if needed. Never forces a level-up itself.
+// Rescales xp.maximum to the current level's xp curve, clamping `current` down if needed. Never forces a level-up itself.
 export function retrofitPartyXp(party: Character[]): Character[] {
   return party.map((character) => {
     const jobProgress = Object.fromEntries(
@@ -141,7 +141,7 @@ export function retrofitPartyXp(party: Character[]): Character[] {
   });
 }
 
-// Callers (e.g. `combat-end.ts`) use the return value to know when to retry nodes previously given up on (see `autoModeResetNodeFailureCounts`).
+// The return value tells callers when to retry nodes previously given up on.
 export function partyGainXp(amount: number): boolean {
   const boostedAmount = Math.round(amount * xpGainMultiplier());
   const progress: { before: Character; after: Character }[] = [];

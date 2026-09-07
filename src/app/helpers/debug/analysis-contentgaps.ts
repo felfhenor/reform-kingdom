@@ -1,10 +1,6 @@
 /**
  * Reports gaps in item/equipment/infusion content across the level range the
- * game actually spans - see the original `scripts/analyze-contentgaps.ts`
- * file history for the full methodology writeup. Ported to read the already
- * -loaded compiled content (`getEntriesByType`/`getEntry`) instead of raw
- * gamedata YAML, so cross-references (`drop.itemId`, `recipe.tradeskillId`,
- * ...) are already-resolved ids rather than authored names.
+ * game actually spans.
  */
 
 import { getEntriesByType } from '@helpers/content/content';
@@ -33,7 +29,6 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// Keep in sync with `EquipmentItemType` in `src/app/interfaces/equipment.ts`.
 const ALL_EQUIPMENT_TYPES = [
   'Accessory',
   'Arrow',
@@ -56,7 +51,6 @@ const ALL_EQUIPMENT_TYPES = [
   'Whip',
 ];
 
-// Keep in sync with `BaseStat` in `src/app/interfaces/stat.ts`.
 const ALL_STATS = [
   'Intelligence',
   'Strength',

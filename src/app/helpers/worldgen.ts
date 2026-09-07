@@ -17,7 +17,6 @@ export function cancelWorldGeneration(): void {
 export async function worldgenGenerateWorld(): Promise<
   GameStateWorld & { didFinish?: boolean }
 > {
-  //
   return {
     ...gamestate().world,
     didFinish: true,

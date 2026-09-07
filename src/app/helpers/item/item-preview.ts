@@ -29,7 +29,6 @@ function equippableHeroNames(equipment: EquipmentContent): string[] {
     .map((hero) => hero.name);
 }
 
-// Flattens item/equipment/collectible to the shape app-tooltip-item-preview renders.
 export function itemPreviewDisplay(
   content: ItemPreviewContent,
   spritesheet: ItemPreviewSpritesheet,
@@ -65,7 +64,7 @@ export function itemPreviewDisplay(
   return base;
 }
 
-// Shared by anything offering a reward/stock pick from this same itemId/equipmentId/collectibleId/recipeId union - e.g. CaravanTrade, TownStockEntry.
+// Shared by anything offering a reward/stock pick from this same itemId/equipmentId/collectibleId/recipeId union.
 export function resolveRewardDisplay(reward: {
   itemId?: ItemContent['id'];
   equipmentId?: EquipmentContent['id'];

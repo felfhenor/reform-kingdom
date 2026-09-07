@@ -109,7 +109,6 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   return { container, update };
 }
 
-// Same shape/positioning as `pixiIndicatorGatherProgressCreate`, just a different fill color.
 export function pixiIndicatorEncounterProgressCreate(tileSize: number): {
   container: Container;
   update: (fraction: number) => void;

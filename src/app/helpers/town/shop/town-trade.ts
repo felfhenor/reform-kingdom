@@ -39,7 +39,7 @@ function stockEntriesMatch(a: TownStockEntry, b: TownStockEntry): boolean {
   return a.equipmentItem.id === b.equipmentItem.id;
 }
 
-// Fast path only - re-validated against live state inside the callback, same reasoning as caravanExecuteTrade.
+// Fast path only - re-validated against live state inside the callback.
 export async function townExecuteTrade(
   townId: TownId,
   stockIndex: number,

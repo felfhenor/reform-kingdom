@@ -8,8 +8,6 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// A monster's stats at a given level - `baseStats` is its level-1 block,
-// scaled up by `statsPerLevel` for every level past 1.
 export function monsterStatsAtLevel(
   monster: MonsterContent,
   level: number,
@@ -51,7 +49,7 @@ export function xpForOverLevel(
   return Math.max(OVERLEVEL_XP_HARD_CAP_AMOUNT, Math.round(rawXp * multiplier));
 }
 
-// Lets a node be judged not worth the trip before any fight happens (see `mostChallengingExploreNodeForRisk`), rather than only after.
+// Lets a node be judged not worth the trip before any fight happens, rather than only after.
 export function isXpTrivialAtOverLevel(
   partyLevel: number,
   nodeMaxLevel: number,

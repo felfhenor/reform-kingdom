@@ -215,7 +215,7 @@ export function pickSkillFromCombatOrders(
   return undefined;
 }
 
-// Edit-time warning helpers; skill lists are resolved by the caller (job.ts) to keep this file pure.
+// Edit-time warning helpers; skill lists are resolved by the caller to keep this file pure.
 export function isCombatOrderFamilyKnown(
   family: string,
   heroSkills: EquipmentSkillContent[],
@@ -256,7 +256,7 @@ export function isCombatOrderTargetModeUsable(
   }
 
   const skill = heroSkills.find((s) => s.family === family);
-  if (!skill) return true; // isCombatOrderFamilyKnown already flags this case
+  if (!skill) return true;
 
   if (targetMode === 'Self') {
     return skill.techniques.some((tech) => tech.targetType !== 'Enemies');

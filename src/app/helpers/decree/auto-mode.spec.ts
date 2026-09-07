@@ -711,7 +711,6 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // The disabled clause is never adopted, so `stopOrphanedGather` (not `stopGatherIfTargetReached`) is what ends this gather.
     expect(gatheringStop).toHaveBeenCalled();
   });
 
@@ -763,7 +762,6 @@ describe('autoModeProcessTick', () => {
         gatheringNodeName: 'Carrina Copper Mines',
       }),
     );
-    // Makes the `isGathering` mock reflect `gatheringStop()` mid-tick, so the test exercises the `isPartyIdleForAutoMode` -> `advanceToNextClause` fallthrough, not just the stop.
     vi.mocked(isGathering).mockImplementation(
       () => vi.mocked(gatheringStop).mock.calls.length === 0,
     );
@@ -776,7 +774,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // A disabled clause shouldn't keep holding the party at its node - `stopOrphanedGather` treats it the same as no active clause.
+    // A disabled clause shouldn't keep holding the party at its node.
     expect(gatheringStop).toHaveBeenCalled();
     expect(travelStart).toHaveBeenCalledWith('Jelly Fields', true);
   });
@@ -1114,7 +1112,7 @@ describe('autoModeProcessTick', () => {
 
     autoModeProcessTick();
 
-    // No enabled clause targets this material, so it's orphaned - `stopOrphanedGather` ends it so clause evaluation resumes.
+    // No enabled clause targets this material, so it's orphaned.
     expect(gatheringStop).toHaveBeenCalled();
   });
 });

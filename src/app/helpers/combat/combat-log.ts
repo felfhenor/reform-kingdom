@@ -74,7 +74,7 @@ export function combatMessageLog(
   });
 }
 
-// Stands in for a combatant's name; adventureLogEntryHtml swaps it for the HP-colored name.
+// Stands in for a combatant's name.
 export function combatantMessageToken(combatant: Combatant): string {
   return `@@${combatant.id}@@`;
 }
@@ -93,7 +93,6 @@ export function categoryMessageLog(
   });
 }
 
-// Raw HTML passes through since adventureLogMessageHtml renders markdown-inline.
 export function itemNameHtml(
   item: ItemContent,
   displayName = item.name,
@@ -110,18 +109,15 @@ export function itemDropHtml(item: ItemContent, quantity: number): string {
   return `${quantity.toLocaleString()} ${itemNameHtml(item, displayName)}`;
 }
 
-// Colors an equipment item's name by its rarity, mirroring `itemNameHtml`.
 export function equipmentNameHtml(equipment: EquipmentContent): string {
   return `<span class="text-${equipment.rarity} font-semibold">${equipment.name}</span>`;
 }
 
-// Equipment drops are always a single piece, so there's no quantity/plural
-// to handle here - unlike `itemDropHtml`.
+// Equipment drops are always a single piece, so there's no quantity/plural to handle here.
 export function equipmentDropHtml(equipment: EquipmentContent): string {
   return equipmentNameHtml(equipment);
 }
 
-// Colors a collectible's name by its rarity, mirroring `equipmentNameHtml`.
 export function collectibleNameHtml(collectible: CollectibleContent): string {
   return `<span class="text-${collectible.rarity} font-semibold">${collectible.name}</span>`;
 }
@@ -180,7 +176,7 @@ export function adventureLogMessageHtml(message: string): string {
 
 const COMBATANT_TOKEN_PATTERN = /@@([^@]+)@@/g;
 
-// Swaps each `@@id@@` token (see combatantMessageToken) for that combatant's HP-colored name.
+// Swaps each `@@id@@` token for that combatant's HP-colored name.
 export function adventureLogEntryHtml(entry: CombatLog): string {
   if (!entry.combatants || entry.combatants.length === 0) {
     return adventureLogMessageHtml(entry.message);

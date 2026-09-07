@@ -26,7 +26,7 @@ export type MonsterContent = IsContentItem &
     statsPerLevel: StatBlock;
     combatStats: Record<CombatStat, number>;
 
-    // Priority list of targeting modes, tried in order - see combatGetTargetsFromPriorityList.
+    // Priority list of targeting modes, tried in order.
     targetting: TargettingPriorityEntry[];
 
     xp: LeveledRange;

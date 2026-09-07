@@ -35,7 +35,6 @@ export type DropRecipe = {
   recipeId: RecipeId;
 };
 
-// Never authored into MonsterContent.drops - only EncounterContent/EncounterRandomContent completionRewards (authoring convention, not type-enforced).
 export type DropWorker = {
   workerId: WorkerId;
 };
@@ -46,11 +45,11 @@ export type DropRange = {
 };
 
 export type DropHasBonusPerLevel = {
-  // Flat per-level addition folded into both ends of the range (see rangeAtLevel); omitted, not 0, if unscaled.
+  // Flat per-level addition folded into both ends of the range; omitted, not 0, if unscaled.
   bonusPerLevel?: number;
 };
 
-// A range that optionally scales per level; resolve via rangeAtLevel.
+// A range that optionally scales per level.
 export type LeveledRange = DropRange & DropHasBonusPerLevel;
 
 export type DropHasChance = {
@@ -58,7 +57,7 @@ export type DropHasChance = {
 };
 
 // A single drop-table entry. `kind` is an explicit discriminant so every consumer can
-// `switch (reward.kind)` and get a compile error (via assertNeverReward) on a missed variant.
+// `switch (reward.kind)` and get a compile error on a missed variant.
 export type DroppedItemReward = LeveledRange &
   DropHasChance &
   DropItem & { kind: 'Item' };

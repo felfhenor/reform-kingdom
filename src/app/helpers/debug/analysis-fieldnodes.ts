@@ -1,8 +1,7 @@
 /**
  * Validates that every "field node" (a Tiled `ExploreNode`, `ExploreRandomNode`,
  * or `GatherNode` object placed on a world map) has a matching `Encounter`,
- * `EncounterRandom`, or `Gathering` content entry, matched by name. Ported
- * from `scripts/validate-fieldnodes.ts`.
+ * `EncounterRandom`, or `Gathering` content entry, matched by name.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

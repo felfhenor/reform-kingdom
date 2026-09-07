@@ -5,13 +5,11 @@
 }
 
 // Fixed height so the CDK virtual-scroll viewport (which assumes uniform
-// row sizes for its offset math) can lay these out correctly - keep this in
-// sync with the `itemSize` passed to `cdk-virtual-scroll-viewport`.
+// row sizes for its offset math) can lay these out correctly.
 .equipment-item-row {
   @apply flex items-center gap-3 w-full h-[96px] px-2 text-left cursor-pointer rounded overflow-hidden;
 }
 
-// Not the native `disabled` attribute - see onEquipClick(), which keeps hover/tooltip working while blocking the click.
 .equipment-item-row-disabled {
   @apply opacity-50 cursor-not-allowed;
 }
@@ -41,8 +39,7 @@
 }
 
 // Very small inline rendering of a granted skill's icon next to "Teaches" -
-// shrinks the shared 64px icon-blank-slot box down via scale, matching
-// `.equipment-slot-granted-skill-icon` (slot-equipment).
+// shrinks the shared 64px icon-blank-slot box down via scale.
 .equipment-item-row-granted-skill-icon {
   @apply relative overflow-hidden shrink-0 inline-block align-middle;
   width: 16px;

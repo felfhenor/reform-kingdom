@@ -11,7 +11,6 @@ import type { CraftRequirementEntry } from '@interfaces/crafting';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { TownCommissionSlotId } from '@interfaces/town-state';
 
-// Rolled from a CommissionOfferRequirement's quantityMin/quantityMax at generation time.
 export type CommissionRequirementItem = { itemId: ItemId; quantity: number };
 export type CommissionRequirementEquipment = {
   equipmentId: EquipmentId;
@@ -43,7 +42,7 @@ export type CommissionNodeState = {
   commissionOfferId?: CommissionOfferId;
   requirements: CommissionRequirement[];
   completed: boolean;
-  // Date.now() epoch ms - wall-clock, not a tick count. See commission-reset.ts.
+  // Date.now() epoch ms - wall-clock, not a tick count.
   generatedAt: number;
 };
 
@@ -51,20 +50,20 @@ export type GameStateCommissions = {
   [key: CaravanId]: CommissionNodeState;
 };
 
-// One weighted CommissionOfferSlot resolved to real content - shared by caravan and town commission generation.
+// Shared by caravan and town commission generation.
 export type EligibleCommissionOffer = {
   offer: CommissionOfferContent;
   weight: number;
 };
 
-// Resolved for display - rendered identically via the shared SlotCommissionComponent, whether the row came from a caravan or a town.
+// Resolved for display - rendered identically whether the row came from a caravan or a town.
 export type CommissionSlotDisplay = {
   nodeName: string;
   title: string;
   requirementEntries: CommissionRequirementEntry[];
   rewards: DroppedReward[];
   canFulfill: boolean;
-  // Always false for a town row - a fulfilled town slot is removed outright, never flagged (see TownCommissionSlotState).
+  // Always false for a town row - a fulfilled town slot is removed outright, never flagged.
   completed: boolean;
   isPartyHere: boolean;
   canTravel: boolean;

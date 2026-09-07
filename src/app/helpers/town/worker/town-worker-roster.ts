@@ -75,7 +75,7 @@ export function townWorkerRosterEntries(
     .filter((entry): entry is TownWorkerRosterEntry => !!entry);
 }
 
-// Mirrors entryStatusDisplay's shape from the player Worker system - a label plus the node the worker is currently at (or heading to/returning to).
+// A label plus the node the worker is currently at (or heading to/returning to).
 export function townWorkerStatusDisplay(
   town: TownContent,
   status: TownWorkerStatus,

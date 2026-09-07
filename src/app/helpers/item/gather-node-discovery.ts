@@ -27,7 +27,7 @@ export function gatherNodeDiscover(nodeName: string): void {
   }
 }
 
-// Takes an existence check (not `worldNodeByName`) to avoid a world-nodes.ts <-> gather-node-discovery.ts import cycle.
+// Takes an existence check as a parameter, rather than importing it directly, to avoid an import cycle.
 export function pruneInvalidGatherNodeDiscoveries(
   discovered: GameStateDiscoveredGatherNodes,
   nodeExists: (nodeName: string) => boolean,
@@ -44,7 +44,7 @@ export function pruneInvalidGatherNodeDiscoveries(
 }
 
 // One-time migration backfill for pre-tracking saves that have material progress but no recorded node
-// visits; marks every GatherNode discovered. Callers gate this to run only once (see `migrate.ts`).
+// visits; marks every GatherNode discovered. Callers gate this to run only once.
 export function grandfatherGatherNodeDiscoveries(
   allGatherNodeNames: string[],
 ): GameStateDiscoveredGatherNodes {

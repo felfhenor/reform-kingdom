@@ -20,7 +20,6 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// Mirrors REGIONAL_BUFF_DURATION_TICKS
 const RAID_DEFENSE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365 * 100;
 const RAID_DEFENSE_GLOBAL_EFFECT_ID =
   'Raid Defense Requested' as GlobalEffectId;

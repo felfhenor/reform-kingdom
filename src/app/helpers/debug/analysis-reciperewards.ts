@@ -1,7 +1,6 @@
 /**
  * Validates that every `recipeId` completion reward across every encounter
- * (and random encounter) resolves to a real compiled recipe. Ported from
- * `scripts/validate-reciperewards.ts`.
+ * (and random encounter) resolves to a real compiled recipe.
  */
 
 import { getEntriesByType } from '@helpers/content/content';

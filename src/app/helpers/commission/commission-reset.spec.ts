@@ -9,7 +9,7 @@ const BOUNDARY = Date.UTC(2024, 0, 15, 9, 0, 0); // 3AM UTC-6 = 9AM UTC, Jan 15 
 
 describe('mostRecentCommissionResetAt', () => {
   it('returns today\'s boundary when now is after it', () => {
-    const now = BOUNDARY + 60 * 60 * 1000; // 1 hour after
+    const now = BOUNDARY + 60 * 60 * 1000;
     expect(mostRecentCommissionResetAt(now)).toBe(BOUNDARY);
   });
 
@@ -18,7 +18,7 @@ describe('mostRecentCommissionResetAt', () => {
   });
 
   it("returns yesterday's boundary when now is before today's", () => {
-    const now = BOUNDARY - 60 * 60 * 1000; // 1 hour before
+    const now = BOUNDARY - 60 * 60 * 1000;
     expect(mostRecentCommissionResetAt(now)).toBe(BOUNDARY - ONE_DAY_MS);
   });
 });

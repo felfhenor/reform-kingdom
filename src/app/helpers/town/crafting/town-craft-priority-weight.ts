@@ -12,7 +12,7 @@ import type {
 
 export const TOWN_PRIORITY_WEIGHT_PER_FAILURE = 0.5;
 export const TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT = 20;
-// Uncapped (see priorityMultiplier) - the dedicated specialty commission should keep escalating for as long as its recipe keeps failing.
+// Uncapped - the dedicated specialty commission should keep escalating for as long as its recipe keeps failing.
 export const TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE = 1;
 
 function priorityMultiplier(
@@ -30,7 +30,7 @@ function activeEntries(
   return priority.filter((entry) => entry.failureCount > 0);
 }
 
-// One pass over the (small) priority list - callers scanning many items must build this once, not call townItemPriorityWeight per item.
+// One pass over the (small) priority list - callers scanning many items must build this once, not per item.
 export function townItemPriorityMap(
   priority: TownSpecialtyPriorityEntry[],
 ): TownItemPriorityMap {
@@ -74,7 +74,7 @@ export function townItemPriorityWeightFromMap(
   return map.weightByItem[itemId] ?? 1;
 }
 
-// Convenience for a single lookup - builds the map fresh each call, so a scan over many items should use townItemPriorityMap once instead.
+// Convenience for a single lookup - builds the map fresh each call, so a scan over many items should build it once instead.
 export function townItemPriorityWeight(
   priority: TownSpecialtyPriorityEntry[],
   itemId: ItemId,

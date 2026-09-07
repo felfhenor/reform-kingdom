@@ -20,8 +20,7 @@ import type {
   WorkerContent,
 } from '@interfaces';
 
-// Granted unconditionally by game code - kept in sync by hand with
-// `STARTER_ARMOR_NAME`/`STARTER_HAT_NAME`/`FOUNDING_STONE_NAME`.
+// Granted unconditionally by game code.
 const GUARANTEED_GRANT_NAMES = new Set<string>([
   'Cloak of Adventuring',
   'Hat of Adventuring',

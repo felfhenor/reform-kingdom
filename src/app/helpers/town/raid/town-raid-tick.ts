@@ -23,7 +23,7 @@ import {
 } from '@helpers/world-node/world-nodes';
 import type { TownContent } from '@interfaces';
 
-// Re-check cadence, not the actual cap - see RAID_COOLDOWN_TICKS for that.
+// Re-check cadence, not the actual cap.
 const RAID_CHECK_INTERVAL_TICKS = 60;
 
 export const RAID_COOLDOWN_TICKS = 14400;
@@ -45,7 +45,7 @@ function raidWarningWindowTicks(town: TownContent): number {
   );
 }
 
-// Exported so debugTelegraphRaid (debug.ts) reuses the same write path, not a stand-in value.
+// Exported so the debug tooling reuses the same write path, not a stand-in value.
 export function telegraphRaid(town: TownContent): void {
   const now = timerTicksElapsed();
   const windowTicks = raidWarningWindowTicks(town);

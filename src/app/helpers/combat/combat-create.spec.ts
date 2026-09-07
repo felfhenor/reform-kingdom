@@ -485,9 +485,8 @@ describe('combatantsFromTownGuardians', () => {
     expect(combatants.every((c) => c.monsterId === citizen.id)).toBe(true);
   });
 
-  // combatantFromMonster defaults isEnemy to true (it's built for the assaulter side too) -
-  // a helper fighting for the party must have that overridden, or targeting/turn-order treat it
-  // as an enemy of the party it's supposed to be defending.
+  // A helper fighting for the party must have isEnemy overridden, or targeting/turn-order
+  // treat it as an enemy of the party it's supposed to be defending.
   it('fights for the party, not the assaulters', () => {
     vi.mocked(getEntry).mockReturnValue(citizen as never);
 

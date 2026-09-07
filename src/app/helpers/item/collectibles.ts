@@ -68,7 +68,7 @@ const FOUNDING_STONE_NAME = 'Founding Stone';
 
 // Every player is guaranteed to own the Founding Stone - it isn't dropped by
 // any encounter, so new/migrated saves are granted one if they don't already
-// have it (see `migrateGameState`).
+// have it.
 export function grantFoundingStoneIfMissing(
   collectibles: GameStateCollectibles,
 ): GameStateCollectibles {

@@ -710,8 +710,7 @@ describe('caravanExecuteTrade', () => {
 
     // updateGamestate is a dumb recorder here (it doesn't invoke the
     // callback itself), so the callback is captured and run manually before
-    // awaiting the outer promise - mirroring the double-fire regression test
-    // further down, which relies on the same capture-then-invoke shape.
+    // awaiting the outer promise.
     const resultPromise = caravanExecuteTrade(entry, 0);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];

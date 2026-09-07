@@ -26,8 +26,7 @@ export type TownStockAddition = Omit<TownStockEntry, 'addedAtTick'>;
 // Raw materials workers have hauled back
 export type TownMaterials = Partial<Record<ItemId, number>>;
 
-// Fixed, content-authored level only - a town never gains tradeskill xp, unlike the player's TradeskillBuildingState.
-// The queue is also shared (TownNodeState.craftQueue), not nested per tradeskill.
+// The queue is also shared, not nested per tradeskill.
 export type TownTradeskillState = {
   level: number;
 };
@@ -40,7 +39,7 @@ export type TownCraftQueueEntry = {
   ticksIntoCraft: number;
 };
 
-// Result of townPickRecipeToQueue - returned alongside the recipe's own tradeskillId so callers don't re-derive it.
+// Returned alongside the recipe's own tradeskillId so callers don't re-derive it.
 export type TownRecipePick = {
   tradeskillId: TradeskillId;
   recipe: RecipeContent;
@@ -52,7 +51,7 @@ export type TownSpecialtyPriorityEntry = {
   failureCount: number;
 };
 
-// A town's specialtyPriority flattened to per-item lookups (townItemPriorityMap) - built once per scan instead of
+// A town's specialtyPriority flattened to per-item lookups - built once per scan instead of
 // rescanning the priority list per candidate item, which matters when scanning every gatherable across every node.
 export type TownItemPriorityMap = {
   weightByItem: Partial<Record<ItemId, number>>;
@@ -82,7 +81,7 @@ export type TownNodeState = {
   workers: Record<WorkerId, TownWorkerState>;
   // Cumulative - never decreases except an explicit raid-loss penalty (Phase 9).
   reputation: number;
-  // Hidden gold trickle from worker gathering - capped via townGoldThreshold (the materialThresholds entry keyed by the real Gold Coin item).
+  // Hidden gold trickle from worker gathering.
   hiddenGold: number;
   materials: TownMaterials;
   // Nested here (not a root GameState map like the player's tradeskills) so per-town subsystems stay co-located.
@@ -91,14 +90,14 @@ export type TownNodeState = {
   craftQueue: TownCraftQueueEntry[];
   commissionSlots: TownCommissionSlotState[];
   specialtyPriority: TownSpecialtyPriorityEntry[];
-  // Undefined = no raid currently pending. Set together by townRaidProcessTick's telegraph step, cleared together on engage/resolve.
+  // Undefined = no raid currently pending.
   raidTelegraphedAtTick?: number;
   raidEngageWindowExpiresAtTick?: number;
-  // Rolled once at telegraph time so the Raid tab preview always matches what raidEngageCombat actually spawns.
+  // Rolled once at telegraph time so the Raid tab preview always matches what actually spawns.
   raidTelegraphedAssaulterIds?: MonsterId[];
   // Gates the once/day/town raid cap - set on every resolution (win, loss, or missed-window).
   lastRaidResolvedAtTick?: number;
-  // Raid-loss penalty - consumed as an extra multiplier in advanceQueueEntry (town-craft-queue.ts).
+  // Raid-loss penalty - consumed as an extra multiplier.
   craftSpeedDebuffExpiresAtTick?: number;
 };
 
@@ -106,7 +105,7 @@ export type GameStateTowns = {
   [key: TownId]: TownNodeState;
 };
 
-// All three fields are always set/cleared together - see townRaidTelegraph (town-raid-state.ts).
+// All three fields are always set/cleared together.
 export type TownRaidTelegraph = {
   telegraphedAtTick: number;
   engageWindowExpiresAtTick: number;
@@ -134,13 +133,12 @@ export type RaidDefenseRowViewModel = {
   travelEtaSeconds?: number;
 };
 
-// One lost material row for the raid-loss adventure-log message - full content (not just name) so the log can reuse itemDropHtml's rarity coloring.
+// One lost material row for the raid-loss adventure-log message - full content (not just name).
 export type TownRaidLostMaterial = {
   item: ItemContent;
   quantity: number;
 };
 
-// Collected during raidResolveDefeat's updateGamestate pass (kept side-effect-free) so the caller can log messages after it returns.
 export type TownRaidLossSummary = {
   stolenItemNames: string[];
   cancelledCraftNames: string[];
@@ -154,11 +152,11 @@ export type TownStockRow = {
   price?: number;
   // A town's shop stock is always single rolled equipment instances - "can I afford one", not a quantity range.
   affordable: boolean;
-  // Pre-formatted (formatDuration) time left before this entry cycles out - undefined when the town has expiration disabled (itemExpirationTimer <= 0).
+  // Pre-formatted time left before this entry cycles out - undefined when the town has expiration disabled.
   expiresIn?: string;
 };
 
-// One row per tradeskill (always 5) - the top-of-tab level/speciality display, built by townTradeskillLevelRows.
+// One row per tradeskill (always 5) - the top-of-tab level/speciality display.
 export type TownTradeskillLevelRow = {
   tradeskillId: TradeskillId;
   name: string;
@@ -167,11 +165,11 @@ export type TownTradeskillLevelRow = {
   isSpecialty: boolean;
 };
 
-// One row per active queue entry - built by townCraftQueueRows, rendered as a fixed-size slot (mirrors the player's own craft queue slot).
+// One row per active queue entry - rendered as a fixed-size slot (mirrors the player's own craft queue slot).
 export type TownCraftQueueRow = {
   id: CraftQueueEntryId;
   tradeskillName: string;
   resultDisplay?: ItemPreviewDisplay;
-  // Pre-formatted (mm:ss/hh:mm:ss via formatDuration) - the UI shows actual remaining time, not a raw tick count.
+  // Pre-formatted (mm:ss/hh:mm:ss) - the UI shows actual remaining time, not a raw tick count.
   remaining: string;
 };

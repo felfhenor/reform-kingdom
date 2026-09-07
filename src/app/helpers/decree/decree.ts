@@ -37,8 +37,6 @@ export function decreeWaitForFullHealthBeforeCombat(): boolean {
   return gamestate().world.autoMode.waitForFullHealthBeforeCombat;
 }
 
-// A node's current losing streak, keyed by `WorldNodeEntry.nodeName` - see
-// `AutoModeState.nodeFailureCounts` for who reads/writes this.
 export function decreeNodeFailureCount(nodeName: string): number {
   return gamestate().world.autoMode.nodeFailureCounts[nodeName] ?? 0;
 }
@@ -73,8 +71,6 @@ export function decreeClauseConflicts(
   });
 }
 
-// Refuses to add a clause that duplicates one already on the list (see
-// `decreeClauseConflicts`). Returns whether the clause was actually added.
 export function decreeClauseAdd(action: DecreeClauseAction): boolean {
   if (decreeClauseConflicts(action, decreeClauses())) return false;
 
@@ -174,7 +170,6 @@ export function decreeClauseReorder(
   });
 }
 
-// Static description of what a clause does; distinct from auto-mode.ts's autoModeStatusLabel, which shows live progress.
 export function decreeClauseSummary(clause: DecreeClause): string {
   switch (clause.type) {
     case 'GatherMaterial': {

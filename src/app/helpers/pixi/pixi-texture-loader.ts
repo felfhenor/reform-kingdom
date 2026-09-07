@@ -38,7 +38,6 @@ export async function pixiTiledMapTexturesLoad(
   return Object.assign({}, ...textureSets);
 }
 
-// Slices consecutive same-row frames out of a spritesheet, matching AtlasAnimationComponent's layout convention.
 export async function pixiSpriteFrameTexturesLoad(
   imageUrl: string,
   frame: { x: number; y: number; width: number; height: number },

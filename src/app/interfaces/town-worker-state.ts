@@ -59,7 +59,7 @@ export type TownWorkerState = {
   assignment: TownWorkerAssignment | null;
 };
 
-// Display-only shape for one roster row - built by townWorkerRosterEntries, rendered by the Workers tab.
+// Display-only shape for one roster row - rendered by the Workers tab.
 export type TownWorkerRosterEntry = {
   workerId: WorkerId;
   name: string;
@@ -69,7 +69,7 @@ export type TownWorkerRosterEntry = {
   status: TownWorkerStatus;
 };
 
-// Status label + the node the worker is currently at (or heading to/returning to) - built by townWorkerStatusDisplay.
+// Status label + the node the worker is currently at (or heading to/returning to).
 export type TownWorkerStatusDisplay = {
   label: string;
   locationEntry?: WorldNodeEntry;

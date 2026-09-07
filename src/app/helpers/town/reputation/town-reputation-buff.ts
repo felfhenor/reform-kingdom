@@ -56,7 +56,6 @@ export function townReputationBuffEffects(
   return effects;
 }
 
-// Real, authored content (id/name/sprite/description) - only `effects` is computed per-tier at runtime.
 function townReputationBuffEffect(
   town: TownContent,
   tier: TownReputationBuffTier,
@@ -113,7 +112,7 @@ export function townReputationBuffSync(
 }
 
 // Re-derives every town's buff from scratch against `currentMapName` - used on game load,
-// where currentLocationSet (the normal sync hook) never runs.
+// where the normal sync hook never runs.
 export function townReputationBuffReconcile(currentMapName: string): void {
   townReputationBuffSync('', currentMapName);
 }

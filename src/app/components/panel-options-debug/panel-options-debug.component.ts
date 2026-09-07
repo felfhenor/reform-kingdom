@@ -84,8 +84,7 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedCollectibleId = signal<CollectibleId | undefined>(undefined);
   public collectibleQuantity = signal<number>(1);
 
-  // Only drop-gated recipes have a discovery record to undo - see
-  // `debugDiscoverAllRecipes`'s identical filter.
+  // Only drop-gated recipes have a discovery record to undo.
   public debugDropGatedRecipes = computed(() =>
     sortBy(
       getEntriesByType<RecipeContent>('recipe').filter((recipe) =>

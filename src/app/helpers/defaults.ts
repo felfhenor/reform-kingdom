@@ -63,8 +63,8 @@ export function defaultGameState(): GameState {
 }
 
 // Deliberately empty and content-free - `defaultGameState()` runs at
-// module-eval time, before content is loaded. Real entries are populated by
-// `migrateTradeskillStateKeys` once content is guaranteed loaded.
+// module-eval time, before content is loaded. Real entries are populated
+// once content is guaranteed loaded.
 function defaultTradeskills(): GameStateTradeskills {
   return {} as GameStateTradeskills;
 }

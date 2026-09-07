@@ -26,8 +26,6 @@ export type PixiTiledMapRenderResult = {
   nodeWrappers: Map<string, Container>;
 };
 
-// Relies on the authored layer order for correct stacking, so `map.layers` renders in file order, not re-sorted.
-
 const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
 const FLIPPED_VERTICALLY_FLAG = 0x40000000;
 const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
@@ -104,7 +102,7 @@ function pixiTiledLayerRunBake(
   const texture = renderer.generateTexture({
     target: source,
     frame: new Rectangle(0, 0, width, height),
-    // Matches the atlas's own scaleMode (pixi-texture-loader.ts) - otherwise the bake defaults to
+    // Matches the atlas's own scaleMode - otherwise the bake defaults to
     // linear filtering and blurs/bleeds at non-1x zoom.
     textureSourceOptions: { scaleMode: 'nearest' },
   });
@@ -164,8 +162,7 @@ function pixiTiledObjectRender(
     });
   }
 
-  // Label is always created (even hidden) so it can be live-updated later; `GamePlayWorldComponent.updateNodeLabels`
-  // sets the real visibility/cursor from current discovery state.
+  // Label is always created (even hidden) so it can be live-updated later.
   const labelInfo = object.type ? resolveNodeLabel?.(object) : undefined;
   let label: Text | undefined;
   if (labelInfo) {
@@ -223,8 +220,6 @@ export function pixiTiledMapRender(
   const nodeLabels = new Map<string, Text>();
   const nodeWrappers = new Map<string, Container>();
 
-  // Baked per consecutive run (not one texture for all tilelayers) so a future map interleaving
-  // an object layer between tile layers still renders in the authored stacking order.
   let pendingTileRun: Container | undefined;
   const flushTileRun = () => {
     if (!pendingTileRun) return;

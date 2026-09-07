@@ -58,8 +58,7 @@ export type AnalysisScriptDefinition = {
   run: (params: AnalysisParams) => AnalysisRunResult;
 };
 
-// --- Local shapes used by `src/app/helpers/debug/analysis-*.ts` - kept here
-// per project convention (no types declared inside helper files).
+// --- Kept here per project convention (no types declared inside helper files).
 
 export type AnalysisLevelWindow = { start: number; end: number };
 
@@ -108,7 +107,7 @@ export type WorkerReachabilityCheckEntry = {
   nodeName: string;
   mapName: string;
   oneWayTicks?: number;
-  // Undefined unless the worker's own leveling progression actually reaches this level - see `achievableLevelCap`.
+  // Undefined unless the worker's own leveling progression actually reaches this level.
   reachableAtLevel?: number;
   levelRange: LevelRange;
 };

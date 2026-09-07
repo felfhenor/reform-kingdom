@@ -38,7 +38,6 @@ import type {
   ItemContent,
 } from '@interfaces';
 
-// Long enough it never expires on its own; granted/revoked explicitly by `syncAutoModeGlobalEffect` (same "~1 year" trick `resting.ts` uses for Idle).
 const AUTO_MODE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365;
 
 export function autoModeIsEnabled(): boolean {
@@ -85,7 +84,7 @@ export function autoModeRecordClauseSuccess(): void {
   updateActiveClauseFailureCount(() => 0);
 }
 
-// Recorded for every lost fight regardless of clause; only `LevelUpParty`'s node picker reads it back (see `mostChallengingExploreNodeForRisk`).
+// Recorded for every lost fight regardless of clause.
 export function autoModeRecordNodeFailure(nodeName: string): void {
   let newFailureCount = 0;
 
@@ -102,8 +101,6 @@ export function autoModeRecordNodeFailure(nodeName: string): void {
   analyticsSendDesignEvent('World:Node:Fail', newFailureCount);
 }
 
-// Mirrors `autoModeRecordNodeFailure` - a won fight clears the node's losing
-// streak, the same way a clause-level success clears `failureCount`.
 export function autoModeRecordNodeSuccess(nodeName: string): void {
   updateGamestate((state) => {
     state.world.autoMode.nodeFailureCounts = {
@@ -114,7 +111,7 @@ export function autoModeRecordNodeSuccess(nodeName: string): void {
   });
 }
 
-// Called on level-up (see `combat-end.ts`'s `partyGainXp`) so a stronger party gets a fresh try at nodes previously written off.
+// Called on level-up so a stronger party gets a fresh try at nodes previously written off.
 export function autoModeResetNodeFailureCounts(): void {
   updateGamestate((state) => {
     state.world.autoMode.nodeFailureCounts = {};
@@ -179,7 +176,7 @@ function syncAutoModeGlobalEffect(enabled: boolean): void {
   if (content) removeGlobalEffect(content.id);
 }
 
-// A gather Auto Mode didn't itself start (already in progress when enabled, etc.) has no `activeClauseId`, so `stopGatherIfTargetReached` below would never notice its target was met. Adopts any in-progress gather matching an enabled GatherMaterial clause so the stop-check always has a clause to work with.
+// Adopts any in-progress gather matching an enabled GatherMaterial clause so the stop-check always has a clause to work with.
 function adoptInProgressGatherClause(): void {
   const autoMode = gamestate().world.autoMode;
   if (autoMode.activeClauseId) return;
@@ -226,7 +223,7 @@ function isPartyIdleForAutoMode(): boolean {
   );
 }
 
-// An orphaned gather (no clause tracking it, e.g. started manually or its clause got disabled) never stops on its own, leaving Auto Mode stuck at that node. Ends it so per-tick evaluation resumes. If the party is also hurt and waiting for full health, routes home explicitly - `restingProcessTick` needs `!isGathering()` to heal, and `advanceToNextClause`'s health-blocked branch can't fire from this path.
+// An orphaned gather (no clause tracking it, e.g. started manually or its clause got disabled) never stops on its own, leaving Auto Mode stuck at that node. Ends it so per-tick evaluation resumes.
 function stopOrphanedGather(): boolean {
   const autoMode = gamestate().world.autoMode;
   if (!isGathering()) return false;
@@ -276,7 +273,7 @@ function advanceToNextClause(): void {
     return;
   }
 
-  // Blocked only by the health gate - stay put and let `restingProcessTick` heal in place, instead of trekking back home.
+  // Blocked only by the health gate - stay put and heal in place, instead of trekking back home.
   if (clauses.some(isClauseBlockedOnlyByHealth)) {
     setActiveClause(undefined);
     return;
@@ -294,7 +291,6 @@ function activeDestinationNodeName(): string | undefined {
   return undefined;
 }
 
-// `decreeClauseUpdate` edits a clause in place (same id, e.g. swapping a GatherMaterial's material), so comparing by id would miss it - compare the node the clause actually sends the party to instead.
 function clauseDispatchTarget(clause: DecreeClause): string | undefined {
   if (clause.type === 'ReturnToKingdom') {
     return homeNodeGet()?.nodeName;
@@ -302,7 +298,6 @@ function clauseDispatchTarget(clause: DecreeClause): string | undefined {
   return clauseTargetNode(clause)?.nodeName;
 }
 
-// Reference, not deep-equal - `decreeClauses()` only gets a new array on an actual edit (see decree.ts), so this skips pickNextClause's pathfinding on the (vast majority of) ticks where nothing changed.
 let lastCheckedDecreeClauses: DecreeClause[] | undefined;
 
 // Editing the decree should preempt an in-progress clause, not wait for it to finish; combat can't be redirected mid-fight.
@@ -322,8 +317,6 @@ function interruptForPriorityChange(): boolean {
   const nextClause = pickNextClause(clauses);
   if (!nextClause) return false;
 
-  // `decreeClauseUpdate` edits in place (same id), so a same-id clause can still need a full
-  // redispatch - only treat it as truly unchanged when the target matches too.
   const nextTarget = clauseDispatchTarget(nextClause);
   if (
     nextClause.id === autoMode.activeClauseId &&

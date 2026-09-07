@@ -29,13 +29,12 @@ export type GameStateTradeskills = Record<
   TradeskillBuildingState
 >;
 
-// Display-only shape for one active-craft corner card - built by
-// `craftingActiveStatusEntries`, rendered by `card-status-crafting`.
+// Display-only shape for one active-craft corner card.
 export type CraftingStatusEntry = {
   tradeskillId: TradeskillId;
   tradeskill: Tradeskill;
-  // The recipe's own name with its "Category: " prefix stripped (see
-  // `stripRecipeCategory`) - just the item, e.g. "Copper Ingot".
+  // The recipe's own name with its "Category: " prefix stripped - just the
+  // item, e.g. "Copper Ingot".
   itemName: string;
   resultSpritesheet: 'item' | 'equipment' | 'collectible';
   resultSprite: string;

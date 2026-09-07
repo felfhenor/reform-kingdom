@@ -154,8 +154,7 @@ export class ModalCaravanTradeComponent {
   private pendingRow = signal<CaravanTradeRow | undefined>(undefined);
 
   // A trade with only one unit available skips straight to a plain yes/no
-  // confirm; anything more prompts for how many (0 = cancel, capped at
-  // `maxQuantity`) via `confirmQuantity`.
+  // confirm; anything more prompts for how many (0 = cancel).
   public requestTrade(row: CaravanTradeRow): void {
     if (row.soldOut || row.maxQuantity <= 0) return;
 

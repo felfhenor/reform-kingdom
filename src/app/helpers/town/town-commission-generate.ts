@@ -32,7 +32,7 @@ import type {
 // Same cadence as every other town subsystem (worker/craft/shop).
 const TOWN_COMMISSION_TICK_INTERVAL = 1;
 
-// A shared game-balance curve, not authored per-town - same convention as TOWN_REPUTATION_THRESHOLDS.
+// A shared game-balance curve, not authored per-town.
 const TOWN_COMMISSION_SLOT_COUNTS: Record<number, number> = {
   0: 1,
   1: 2,
@@ -69,7 +69,7 @@ function rolledSlotDefs(town: TownContent): CommissionOfferSlot[] {
   return town.defense.quests.commissions.filter((s) => !s.persistent);
 }
 
-// commissionOfferId is already the real content id (gamedata-build.ts resolves it at build time) - no content lookup needed here.
+// commissionOfferId is already the real content id - no content lookup needed here.
 function missingPersistentDefs(
   target: TownNodeState,
   defs: CommissionOfferSlot[],

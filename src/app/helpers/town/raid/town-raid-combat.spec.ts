@@ -183,7 +183,7 @@ describe('raidEngageCombat', () => {
     expect(combatMessageLog).toHaveBeenCalled();
     // raidEngageCombat runs from a UI click, never a game tick - the sync must happen inside the
     // updateGamestate callback (against the mutation-in-progress state), not after it, or the
-    // deferred outside-tick commit (see state-game.ts) leaves it reading stale gamestate.
+    // deferred outside-tick commit leaves it reading stale gamestate.
     expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];

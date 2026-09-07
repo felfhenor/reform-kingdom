@@ -25,8 +25,7 @@ type PathAdvanceResult =
       location: CurrentLocation;
     };
 
-// Advances one tick along a path, mirroring travelProcessTick's per-step costing.
-// Simplified vs. the party's travelCompleteStep: doesn't chase consecutive 0-tick (Teleport) steps in one tick.
+// Doesn't chase consecutive 0-tick (Teleport) steps in one tick.
 function advancePathOneTick(
   path: TravelStep[],
   ticksIntoStep: number,

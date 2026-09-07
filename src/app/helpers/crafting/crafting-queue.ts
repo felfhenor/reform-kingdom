@@ -136,8 +136,8 @@ export function craftMaxCraftableQuantity(
 }
 
 // Mutates `state` directly - only ever called from inside a single
-// `updateGamestate` callback (see `craftQueueStart`/`craftQueueRemove`), so
-// every requirement in a batch is applied atomically in one state commit.
+// `updateGamestate` callback, so every requirement in a batch is applied
+// atomically in one state commit.
 function applyRequirementQuantity(
   state: GameState,
   requirement: RecipeRequirement,
@@ -262,8 +262,7 @@ export function craftQueueRemove(
 }
 
 // An item result with a `chance` roll can whiff entirely, producing nothing
-// - but the tradeskill still attempted the craft, so XP is granted either way
-// (see `resolveCraftUnit`).
+// - but the tradeskill still attempted the craft, so XP is granted either way.
 function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   const { chance } = recipe.result;
 

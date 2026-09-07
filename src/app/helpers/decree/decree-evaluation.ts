@@ -31,7 +31,6 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// Losing streak at which mostChallengingExploreNodeForRisk gives up on a tier and steps down.
 export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 
 const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
@@ -150,7 +149,6 @@ export function mostChallengingExploreNodeForRisk(
   return leastFailedNodeIn(candidates);
 }
 
-// Only considers GatherNodes the player has already discovered.
 export function nearestGatherNodeFor(
   materialId: MaterialId,
 ): WorldNodeEntry | undefined {
@@ -164,7 +162,6 @@ export function nearestGatherNodeFor(
   return nearestReachableNode(candidates);
 }
 
-// Towns currently telegraphing a raid the party can accept at this risk tolerance.
 function acceptableRaidTowns(riskTolerance: DecreeRiskLevel): TownContent[] {
   const partyLevel = partyMinLevel();
 
@@ -179,7 +176,6 @@ function acceptableRaidTowns(riskTolerance: DecreeRiskLevel): TownContent[] {
     );
 }
 
-// Fixed townName mirrors FarmNode's stored target; unset scans like nearestGatherNodeFor.
 function defendTownsTargetNode(
   clause: Extract<DecreeClause, { type: 'DefendTowns' }>,
 ): WorldNodeEntry | undefined {

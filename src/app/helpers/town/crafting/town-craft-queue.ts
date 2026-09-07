@@ -27,7 +27,7 @@ import type {
   TownNodeState,
 } from '@interfaces';
 
-// Runs every tick once activated, same reasoning as WORKER_TICK_INTERVAL - craft progress is continuous.
+// Runs every tick once activated - craft progress is continuous.
 const CRAFT_TICK_INTERVAL = 1;
 
 // Grants the result unconditionally (the caller already decided the craft succeeds) - a material result

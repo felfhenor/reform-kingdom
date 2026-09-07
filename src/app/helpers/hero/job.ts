@@ -32,7 +32,7 @@ function resolveSkills(skillIds: EquipmentSkillId[]): EquipmentSkillContent[] {
 }
 
 // A hero's full skill list: their job-path skills at the given level, with
-// any equipment-granted skills merged in (see `mergeGrantedSkills`).
+// any equipment-granted skills merged in.
 export function heroSkillsWithEquipment(
   job: JobContent,
   level: number,

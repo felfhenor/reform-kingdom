@@ -63,8 +63,7 @@ function applyActiveGainStatsEffects(combatant: Combatant): void {
   });
 }
 
-// Applied once at creation, same as `applyActiveGainStatsEffects` above -
-// the Astral Projector's DebuffResistance spells add a flat percent to
+// The Astral Projector's DebuffResistance spells add a flat percent to
 // every tag, on top of whatever gear already grants.
 function applyActiveDebuffResistanceEffects(combatant: Combatant): void {
   activeGlobalEffects().forEach((effect) => {
@@ -80,7 +79,6 @@ function applyActiveDebuffResistanceEffects(combatant: Combatant): void {
   });
 }
 
-// Same as applyActiveDebuffResistanceEffects but targets one tag only.
 function applyActiveDebuffResistanceTagEffects(combatant: Combatant): void {
   activeGlobalEffects().forEach((effect) => {
     (effect.effects ?? []).forEach((effectEntry) => {
@@ -90,7 +88,6 @@ function applyActiveDebuffResistanceTagEffects(combatant: Combatant): void {
   });
 }
 
-// Same as applyActiveGainStatsEffects but for combatStats (e.g. reviveChance) instead of base stats.
 function applyActiveGainCombatStatEffects(combatant: Combatant): void {
   activeGlobalEffects().forEach((effect) => {
     (effect.effects ?? []).forEach((effectEntry) => {

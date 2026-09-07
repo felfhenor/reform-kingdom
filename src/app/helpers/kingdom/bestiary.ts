@@ -87,7 +87,7 @@ export function monsterRecordKill(
   }
 }
 
-// Repairs entries predating min/max level tracking (see `monsterRecordKill`) by collapsing them to a single unknown level; widens again on the next kill.
+// Repairs entries predating min/max level tracking by collapsing them to a single unknown level; widens again on the next kill.
 export function repairInvalidBestiaryLevels(
   bestiary: GameStateBestiary,
 ): GameStateBestiary {
@@ -123,7 +123,6 @@ export function pruneInvalidBestiaryEntries(
   return pruned;
 }
 
-// Every authored or generated place this monster can be fought - backs the "discoverable in" hint on undiscovered entries.
 export function monsterEncounters(
   monsterId: MonsterId,
 ): Array<EncounterContent | EncounterRandomContent> {
@@ -147,7 +146,7 @@ export function monsterSourceNodeNames(monsterId: MonsterId): string[] {
   return monsterEncounters(monsterId).map((encounter) => encounter.name);
 }
 
-// Item drops roll a level-scaled quantity range (via `rangeAtLevel`); other reward types are always a flat chance for one.
+// Item drops roll a level-scaled quantity range; other reward types are always a flat chance for one.
 export function bestiaryDropQuantityLabel(
   reward: DroppedReward,
   level: number,
@@ -157,8 +156,7 @@ export function bestiaryDropQuantityLabel(
   return rangeLabelAtLevel(reward, level);
 }
 
-// The XP a kill at this level grants, formatted the same way as
-// `bestiaryDropQuantityLabel` (a single number, or a "min-max" range).
+// The XP a kill at this level grants, formatted as a single number, or a "min-max" range.
 export function bestiaryXpLabel(
   monster: MonsterContent,
   level: number,

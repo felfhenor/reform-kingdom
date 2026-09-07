@@ -36,10 +36,10 @@ export type GatheringContent = IsContentItem &
 
     gatherResults: GatherResult[];
 
-    // Gates whether a worker (see content-worker.ts) gains XP gathering here.
+    // Gates whether a worker gains XP gathering here.
     workerLevelRange: LevelRange;
 
-    // Tier count for gold-funded leveling (see world-node-level.ts) - never factored into
+    // Tier count for gold-funded leveling - never factored into
     // levelRange/workerLevelRange eligibility checks.
     maxLevel: number;
 

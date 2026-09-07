@@ -18,7 +18,6 @@ import type {
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
-// Reused for both caravan and town rows - the caller supplies `fulfill` (which system to call), this owns the shared post-fulfill notification.
 @Component({
   selector: 'app-slot-commission',
   changeDetection: ChangeDetectionStrategy.OnPush,

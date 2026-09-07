@@ -33,7 +33,7 @@ export type TiledObjectOrientation = {
 
 // Tracks a single map-token's eased visual position toward a tick-driven
 // logical location - shared shape for the party's own token and each
-// worker's token (see helpers/pixi/pixi-travel-glide.ts).
+// worker's token.
 export type TravelGlideState = {
   visual: CurrentLocation;
   stepOrigin: CurrentLocation;

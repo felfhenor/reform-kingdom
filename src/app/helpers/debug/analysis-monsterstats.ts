@@ -1,7 +1,6 @@
 /**
  * Reports monster stats at a given level, for every monster or a chosen
- * subset - a companion to `analysis-herostats.ts`. Ported from
- * `scripts/analyze-monsterstats.ts`.
+ * subset.
  */
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';

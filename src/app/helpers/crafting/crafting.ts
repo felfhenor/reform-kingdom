@@ -83,8 +83,8 @@ function recipeRequirementEntries(
   );
 }
 
-// Only recipes the building has reached and that pass isRecipeCraftable are
-// shown, sorted by recipe level (not item level) so entries stay put as craftability changes.
+// Only recipes the building has reached and that pass the craftability check
+// are shown, sorted by recipe level (not item level) so entries stay put as craftability changes.
 export function getCraftableRecipeEntries(
   tradeskill: Tradeskill,
 ): CraftRecipeEntry[] {
@@ -147,7 +147,7 @@ export function craftQueueTicksRemaining(tradeskill: Tradeskill): number {
   });
 }
 
-// Denominator for the queue progress bar; craftQueueTicksRemaining is what's left.
+// Denominator for the queue progress bar.
 export function craftQueueTotalTicks(tradeskill: Tradeskill): number {
   return sumBy(tradeskillBuilding(tradeskill).queue, (entry) => {
     const recipe = getEntry<RecipeContent>(entry.recipeId);

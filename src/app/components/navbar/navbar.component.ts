@@ -75,7 +75,7 @@ export class NavbarComponent {
 
   protected hotkeyMatches = hotkeyMatches;
 
-  // "t"/"r" fire unfiltered on every keydown (see hotkeys.ts) - don't also eat other keys' defaults.
+  // "t"/"r" fire unfiltered on every keydown - don't also eat other keys' defaults.
   protected readonly noPreventDefault = { preventDefault: false };
 
   public showPauseMenu = computed(() => modalIsOpen('pause-menu'));

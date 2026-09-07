@@ -50,7 +50,7 @@ export type WorkerState = {
   level: number;
   xp: { current: number; maximum: number };
 
-  // The worker's own tracked tile, independent of the hero party's `world.currentLocation`.
+  // The worker's own tracked tile, independent of the hero party's location.
   location: CurrentLocation;
 
   status: WorkerStatus;
@@ -67,8 +67,7 @@ export type GameStateDiscoveredWorkers = {
   [key: WorkerId]: { foundAt: number };
 };
 
-// Display-only shape for one ready-to-level-up corner card - built by
-// `workersReadyToLevelUpEntries`, rendered by `card-status-worker-levelup`.
+// Display-only shape for one ready-to-level-up corner card.
 export type WorkerLevelUpStatusEntry = {
   workerId: WorkerId;
   name: string;

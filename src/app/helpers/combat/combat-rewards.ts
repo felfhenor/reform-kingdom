@@ -28,7 +28,6 @@ import type {
   WorkerContent,
 } from '@interfaces';
 
-// `rewardContentInfo` only structurally checks for `itemId`/`equipmentId`/etc, so a `ResolvedDrop` satisfies it like a `RewardIdentity` would.
 function emitRewardVfx(
   combat: Combat,
   drop: ResolvedDrop,
@@ -40,7 +39,6 @@ function emitRewardVfx(
   gatherVfxEmit({ nodeName: combat.locationName, quantity, ...info });
 }
 
-// Shared by monster kill drops and encounter/encounter-random completion rewards (see `loot.ts`).
 // A worker reward always rolls its chance but only ever grants once - the already-rescued check is here.
 export function grantResolvedDrops(
   combat: Combat,

@@ -215,7 +215,7 @@ export class PlayKingdomWorkersComponent {
   });
 
   // Live status while traveling/gathering, else the stored assignment (`state.assignment` may
-  // already point at a different, not-yet-started job even mid-trip - see `workerAssign`).
+  // already point at a different, not-yet-started job even mid-trip).
   public currentAssignment = computed<WorkerAssignment | null>(() => {
     const entry = this.selectedEntry();
     if (!entry) return null;

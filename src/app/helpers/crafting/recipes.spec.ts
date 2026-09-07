@@ -584,10 +584,10 @@ describe('Recipes Helper Functions', () => {
 
     it('does not double-spend tokens when two unlocks race before either commits', async () => {
       // Regression test for the rapid-click double-fire bug: updateGamestate
-      // doesn't commit until an async yield later, so
-      // recipeCanUnlockWithTokens (checked synchronously before that yield)
-      // can pass twice against the same stale, pre-commit state if two
-      // calls race in before the first one's callback actually runs.
+      // doesn't commit until an async yield later, so the affordability check
+      // (run synchronously before that yield) can pass twice against the same
+      // stale, pre-commit state if two calls race in before the first one's
+      // callback actually runs.
       vi.mocked(gamestate).mockReturnValue({
         discoveredRecipes: {},
         materials: {

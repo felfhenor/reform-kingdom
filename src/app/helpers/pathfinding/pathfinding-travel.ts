@@ -29,7 +29,7 @@ function routeWaypoints(
   return waypoints;
 }
 
-// Cost uses real tick cost (`travelPathTotalTicks`), not the A* search weight, so "cheapest chain" means the actual cheapest trip.
+// Cost uses real tick cost, not the A* search weight, so "cheapest chain" means the actual cheapest trip.
 function teleportHop(
   from: CurrentLocation,
   teleport: WorldNodeEntry,
@@ -113,7 +113,7 @@ function travelPathAcrossMaps(
   return bestSteps;
 }
 
-// Cleared whenever allMaps() changes (real app: once, at load) - same (origin, destination) always resolves to the
+// Cleared whenever the loaded maps change (real app: once, at load) - same (origin, destination) always resolves to the
 // same path otherwise, which is what stops a stamina check from re-pathfinding once per item at a node instead of once per node.
 let cachedMapsRef: ReturnType<typeof allMaps> | undefined;
 const pathFromCache = new Map<string, TravelStep[] | undefined>();
@@ -125,8 +125,7 @@ function pathFromCacheKey(
   return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}`;
 }
 
-// Pure by-location variant of `travelPathTo`, so non-party travelers (workers - see
-// `worker-travel.ts`) can path from an arbitrary origin, not just the hero party's current tile.
+// Pure by-location variant, so non-party travelers (workers) can path from an arbitrary origin, not just the hero party's current tile.
 export function travelPathFrom(
   location: CurrentLocation,
   destinationNodeName: string,

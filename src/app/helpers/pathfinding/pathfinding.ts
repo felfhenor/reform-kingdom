@@ -27,7 +27,7 @@ const PATH_OBJECT_LAYER_NAME = 'Path Objects';
 const ON_PATH_MOVE_COST = 1;
 const OFF_PATH_MOVE_COST = 4;
 
-// (x, y) is the unrotated bottom-left pivot (matches `pixiTiledObjectRender`); rotating the corners
+// (x, y) is the unrotated bottom-left pivot; rotating the corners
 // around it is what makes a rotated bend tile resolve to the grid cell it's actually drawn into.
 function objectWorldCorners(object: TiledObject): { x: number; y: number }[] {
   const angle = ((object.rotation ?? 0) * Math.PI) / 180;
@@ -67,7 +67,7 @@ function forEachObjectTile(
   }
 }
 
-// Shared grid-builder behind tiledMapWalkabilityMatrix/tiledMapPathMatrix - marks tiles from a named tile layer, then a named object layer.
+// Marks tiles from a named tile layer, then a named object layer.
 function tiledMapLayerMatrix<T>(
   map: TiledMap,
   tileLayerName: string,
@@ -153,7 +153,7 @@ export const mapMoveCostMatrices = computed<Map<string, number[][]>>(() =>
   mapMatrices(tiledMapMoveCostMatrix),
 );
 
-// Called at load time (`migrateGameState`) so a save standing on a tile made unwalkable since (map edit,
+// Called at load time so a save standing on a tile made unwalkable since (map edit,
 // bad migration) doesn't strand the party there forever.
 export function repairUnwalkableCurrentLocation(
   location: CurrentLocation,
@@ -173,8 +173,6 @@ const mapPathMatrices = computed<Map<string, boolean[][]>>(() =>
   mapMatrices(tiledMapPathMatrix),
 );
 
-// Whether a specific tile is on an authored path - used by `helpers/travel.ts`
-// to charge the faster on-path travel tick cost for that step.
 export function tileIsOnPath(mapName: string, x: number, y: number): boolean {
   return mapPathMatrices().get(mapName)?.[y]?.[x] ?? false;
 }
@@ -229,7 +227,7 @@ export function teleportNodeProperty(
   return tiledObjectProperty<string>(node.nodeData, name);
 }
 
-// Tags are validated unique across every map (scripts/validate-teleportnodes.ts), so this resolves to exactly one node.
+// Tags are validated unique across every map, so this resolves to exactly one node.
 export function findTeleportArrivalByTag(tag: string): WorldNodeEntry | undefined {
   return worldNodesOfType('TeleportNode').find(
     (node) => teleportNodeProperty(node, 'tag') === tag,
@@ -276,7 +274,7 @@ function mapGraphNeighbors(mapName: string): string[] {
     .filter((neighborMapName): neighborMapName is string => !!neighborMapName);
 }
 
-// Fewest teleport hops between maps - scales Deaths Door duration (see `helpers/travel.ts`).
+// Fewest teleport hops between maps - scales Deaths Door duration.
 export function mapHopsBetween(fromMapName: string, toMapName: string): number {
   if (fromMapName === toMapName) return 0;
 

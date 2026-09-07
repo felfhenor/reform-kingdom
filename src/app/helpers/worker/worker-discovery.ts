@@ -18,12 +18,12 @@ export function isWorkerRescued(workerId: WorkerId): boolean {
   return !!gamestate().discoveredWorkers[workerId]?.foundAt;
 }
 
-// Content-existence check (not gamestate) - used as migrate.ts's `workerExists` predicate.
+// Content-existence check (not gamestate).
 export function isWorkerContentKnown(workerId: WorkerId): boolean {
   return !!getEntry<WorkerContent>(workerId);
 }
 
-// Always unconditionally (re)initializes state - idempotency is combat-rewards.ts's job.
+// Always unconditionally (re)initializes state.
 export function workerRescue(workerId: WorkerId): void {
   const worker = getEntry<WorkerContent>(workerId);
   if (!worker) return;
@@ -65,7 +65,7 @@ export function pruneInvalidDiscoveredWorkers(
 }
 
 // Parks a worker back at the Duchy if its stored/in-flight assignment no longer resolves.
-// Takes `assignmentValid` as a param (not imported directly) to avoid a worker-travel.ts import cycle.
+// Takes `assignmentValid` as a param (not imported directly).
 export function pruneInvalidWorkerStates(
   workers: GameStateWorkers,
   assignmentValid: (

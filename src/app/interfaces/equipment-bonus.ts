@@ -3,8 +3,7 @@ import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
 
 // One config per "equipment bonus dimension" (base stats, resistances,
-// combat stats, ...) - see the STAT_BONUS/RESISTANCE_BONUS/COMBAT_STAT_BONUS
-// constants and the generic sum functions in `helpers/item/equipment-bonus.ts`.
+// combat stats, ...).
 export type EquipmentBonusDimension<K extends string> = {
   defaultBlock: () => Record<K, number>;
   equipmentBlock: (

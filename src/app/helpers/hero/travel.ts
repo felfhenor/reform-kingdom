@@ -190,7 +190,7 @@ function deathsDoorDurationTicks(): number {
   );
 }
 
-// Deaths Door is purely a timer; on expiry (`globalEffectsProcessTick`) the party teleports home.
+// Deaths Door is purely a timer; on expiry the party teleports home.
 export function travelBeginDeathsDoor(): void {
   addGlobalEffect('Deaths Door' as GlobalEffectId, deathsDoorDurationTicks());
 

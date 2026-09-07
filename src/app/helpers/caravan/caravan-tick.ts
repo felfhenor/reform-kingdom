@@ -49,8 +49,7 @@ export function caravanWeightedSample<T extends { weight: number }>(
 }
 
 // A different trader than last cycle, unless only one is eligible - in
-// which case it's reused (its stock still rerolls, see
-// `pickActiveTradeIndices`).
+// which case it's reused.
 function pickTrader(
   content: CaravanContent,
   previousTraderId: CaravanTraderId | undefined,
@@ -99,8 +98,6 @@ function regenerateCaravanNode(
   });
 }
 
-// Regenerates every `CaravanNode`'s trader/stock once its `traderResetTime`
-// has elapsed - mirrors `encounterRandomProcessTick`.
 export function caravanProcessTick(): void {
   const nowTick = timerTicksElapsed();
 

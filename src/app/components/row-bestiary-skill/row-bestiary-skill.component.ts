@@ -20,7 +20,6 @@ import { TippyDirective } from '@ngneat/helipopper';
 export class RowBestiarySkillComponent {
   public skill = input.required<EquipmentSkillContent>();
   // The skill's description with its `{{ value }}` placeholder already
-  // resolved - the caller decides which level's stats to preview against
-  // (see `DetailBestiaryMonsterComponent`'s min/max skill blocks).
+  // resolved - the caller decides which level's stats to preview against.
   public description = input.required<string>();
 }

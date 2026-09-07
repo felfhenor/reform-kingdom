@@ -1,7 +1,6 @@
 import type { AnalysisInputDef } from '@interfaces';
 
-// Shared across every script that reads it (see each script's `inputKeys`
-// in `analysis-registry.ts`) - one value, applied everywhere it's supported.
+// Shared across every script that reads it - one value, applied everywhere it's supported.
 export const GAP_INPUT: AnalysisInputDef = {
   key: 'gap',
   label: 'Gap window size',

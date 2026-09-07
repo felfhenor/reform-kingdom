@@ -14,27 +14,25 @@ export type CaravanTradeType = 'sell' | 'buy';
 export type CaravanTrade = {
   type: CaravanTradeType;
 
-  // Base gold price before the owning caravan's markup is applied - see
-  // `CaravanContent.markupPercentages`.
+  // Base gold price before the owning caravan's markup is applied.
   value: number;
 
   itemId?: ItemId;
   equipmentId?: EquipmentId;
   collectibleId?: CollectibleId;
-  // A recipe sale is one-time like a collectible - see caravanTradeMaxQuantity.
+  // A recipe sale is one-time like a collectible.
   recipeId?: RecipeId;
 
   // Omitted for unlimited-quantity trades (e.g. unique collectible sells).
   limit?: number;
 
   // Relative likelihood this trade is chosen when a caravan rerolls its
-  // active trade selection out of the trader's full `trades` list.
+  // active trade selection.
   weight: number;
 };
 
-// A trader's own token-priced offerings - always visible (not subject to
-// the 4-slot weighted `trades` rotation), bought with Trader Scrips instead
-// of gold.
+// A trader's own token-priced offerings - always visible, bought with
+// Trader Scrips instead of gold.
 export type CaravanTokenTrade = {
   tokenCost: number;
 
@@ -49,8 +47,6 @@ export type CaravanTraderContent = IsContentItem &
     id: CaravanTraderId;
     __type: 'caravantrader';
 
-    // Matched against a caravan's `traderCategories` to determine
-    // eligibility.
     category: string;
 
     level: number;

@@ -136,15 +136,15 @@ function grantEncounterCompletionRewards(combat: Combat): void {
     `World:Node:Complete:${analyticsSafeSegment(combat.locationName)}`,
   );
 
-  // The encounter's level is rolled once and applied to every guardian at
-  // `encounterStartFight` time, so the first guardian's level represents it.
+  // The encounter's level is rolled once and applied to every guardian,
+  // so the first guardian's level represents it.
   const level = combat.guardians[0]?.level ?? 1;
   const drops = rollDroppedRewards(encounter.completionRewards, level);
   grantResolvedDrops(combat, drops);
 }
 
 // The fight after this one within the same encounter, if there is one -
-// encounters can chain several escalating fights (see gamedata/encounter).
+// encounters can chain several escalating fights.
 function nextFightFor(
   combat: Combat,
 ): { encounterId: EncounterId; fightIndex: number } | undefined {

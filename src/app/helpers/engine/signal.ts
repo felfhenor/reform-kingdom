@@ -25,7 +25,6 @@ export function localStorageSignal<T>(
 
   const writableSignal = signal(initialValue);
 
-  // monkey-patch the set method to update the localStorage value
   const originalSet = writableSignal.set;
   writableSignal.set = (value: T) => {
     localStorage.setItem(localStorageKey, JSON.stringify(value));
@@ -41,7 +40,6 @@ export function localStorageSignal<T>(
   return writableSignal;
 }
 
-// Creates a signal that persists its value to IndexedDB.
 export function indexedDbSignal<T>(
   indexedDbKey: string,
   initialValue: T,
@@ -56,7 +54,6 @@ export function indexedDbSignal<T>(
 
   const writableSignal = signal(initialValue);
 
-  // Initialize IndexedDB
   const initDB = (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
       if (db) {
@@ -85,7 +82,6 @@ export function indexedDbSignal<T>(
     });
   };
 
-  // Load value from IndexedDB
   const loadFromDB = async (): Promise<void> => {
     // Not an error - just no IndexedDB in this environment (e.g. scripts/analyze-*, scripts/validate-*).
     if (typeof indexedDB === 'undefined') {
@@ -114,7 +110,6 @@ export function indexedDbSignal<T>(
               );
             }
           } else {
-            // No stored value, save the initial value
             saveToDBSync(initialValue);
           }
 
@@ -140,7 +135,6 @@ export function indexedDbSignal<T>(
     }
   };
 
-  // Save value to IndexedDB (synchronous call)
   const saveToDBSync = (value: T): void => {
     if (!isInitialized || typeof indexedDB === 'undefined') return;
 
@@ -149,7 +143,6 @@ export function indexedDbSignal<T>(
     });
   };
 
-  // Save value to IndexedDB (async)
   const saveToDB = async (value: T): Promise<void> => {
     const database = await initDB();
     const transaction = database.transaction([STORE_NAME], 'readwrite');
@@ -162,21 +155,18 @@ export function indexedDbSignal<T>(
     });
   };
 
-  // Monkey-patch the set method to update IndexedDB
   const originalSet = writableSignal.set;
   writableSignal.set = (value: T) => {
     originalSet(value);
     saveToDBSync(value);
   };
 
-  // Monkey-patch the update method to update IndexedDB
   writableSignal.update = (updateFn: (value: T) => T) => {
     const value = updateFn(writableSignal());
     originalSet(value);
     saveToDBSync(value);
   };
 
-  // Load initial value from IndexedDB
   loadFromDB();
 
   return writableSignal;
