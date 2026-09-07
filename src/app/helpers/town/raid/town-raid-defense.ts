@@ -59,12 +59,10 @@ export function raidDefenseRowViewModels(): RaidDefenseRowViewModel[] {
 }
 
 function raidDefenseGlobalEffect(
+  content: GlobalEffectContent,
   townNames: string[],
   currentTick: number,
-): GlobalEffect | undefined {
-  const content = getEntry<GlobalEffectContent>(RAID_DEFENSE_GLOBAL_EFFECT_ID);
-  if (!content) return undefined;
-
+): GlobalEffect {
   return {
     ...content,
     extendedDescription: townNames.join(', '),
@@ -89,13 +87,17 @@ export function raidDefenseGlobalEffectApply(
   state: GameState,
   currentTick: number,
 ): void {
-  applyGlobalEffectRemove(state, RAID_DEFENSE_GLOBAL_EFFECT_ID);
+  const content = getEntry<GlobalEffectContent>(RAID_DEFENSE_GLOBAL_EFFECT_ID);
+  if (!content) return;
+
+  applyGlobalEffectRemove(state, content.id);
 
   const townNames = telegraphedRaidTownIdsFromState(state)
     .map((townId) => getEntry<TownContent>(townId)?.name)
     .filter((name): name is string => !!name);
   if (townNames.length === 0) return;
 
-  const effect = raidDefenseGlobalEffect(townNames, currentTick);
-  if (effect) state.globalEffects.push(effect);
+  state.globalEffects.push(
+    raidDefenseGlobalEffect(content, townNames, currentTick),
+  );
 }

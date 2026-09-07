@@ -56,6 +56,7 @@ import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
+import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
   Combat,
@@ -180,6 +181,10 @@ describe('raidEngageCombat', () => {
     );
     expect(combatantsFromTownGuardians).toHaveBeenCalled();
     expect(combatMessageLog).toHaveBeenCalled();
+    // raidEngageCombat runs from a UI click, never a game tick - the sync must happen inside the
+    // updateGamestate callback (against the mutation-in-progress state), not after it, or the
+    // deferred outside-tick commit (see state-game.ts) leaves it reading stale gamestate.
+    expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const state = {
@@ -196,6 +201,7 @@ describe('raidEngageCombat', () => {
     } as unknown as GameState;
     const result = updateFn(state);
 
+    expect(raidDefenseGlobalEffectApply).toHaveBeenCalledWith(state, 1000);
     expect(result.world.combat?.raidTownId).toBe(townId);
     expect(result.world.towns[townId].raidTelegraphedAtTick).toBeUndefined();
     expect(

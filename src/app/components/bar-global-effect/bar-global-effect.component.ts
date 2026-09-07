@@ -118,8 +118,8 @@ export class BarGlobalEffectComponent {
     const current = this.displayedEffects();
     const currentIds = new Set(current.map((effect) => effect.id));
 
-    const kept = current
-      .filter((effect) => activeIds.has(effect.id))
+    const kept = active
+      .filter((effect) => currentIds.has(effect.id))
       .map((effect) => ({ ...effect, phase: 'visible' as const }));
 
     const stillLeaving = current.filter(

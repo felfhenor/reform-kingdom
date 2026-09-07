@@ -70,6 +70,7 @@ import { formatDuration } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { rollDroppedRewards } from '@helpers/item/loot';
 import { updateGamestate } from '@helpers/state-game';
+import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import {
   raidResolveDefeat,
   raidResolveVictory,
@@ -175,6 +176,9 @@ describe('raidResolveDefeat', () => {
     raidResolveDefeat(townId);
 
     expect(townReputationLose).toHaveBeenCalledWith(townId, 50, 'RaidDefense');
+    // Must run from inside the updateGamestate callback, not after it - updateGamestate is a bare
+    // mock here, so nothing else could have called it yet.
+    expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const state = {
@@ -192,6 +196,7 @@ describe('raidResolveDefeat', () => {
     } as unknown as GameState;
     const result = updateFn(state);
 
+    expect(raidDefenseGlobalEffectApply).toHaveBeenCalledWith(state, 1000);
     expect(result.world.towns[townId].lastRaidResolvedAtTick).toBe(1000);
     expect(result.world.towns[townId].craftSpeedDebuffExpiresAtTick).toBe(4600);
     expect(result.world.towns[townId].raidTelegraphedAtTick).toBeUndefined();

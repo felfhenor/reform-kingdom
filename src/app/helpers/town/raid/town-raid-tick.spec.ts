@@ -65,6 +65,7 @@ import { notifyError } from '@helpers/engine/notify';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import {
@@ -230,12 +231,16 @@ describe('townRaidProcessTick', () => {
 
     expect(raidAssaulterMonsterIds).toHaveBeenCalledTimes(1);
     expect(updateGamestate).toHaveBeenCalled();
+    // Must run from inside the updateGamestate callback (against the mutation-in-progress state),
+    // not after it - updateGamestate is a bare mock here, so nothing else could have called it yet.
+    expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const state = {
       world: { towns: { [townId]: buildTownState() } },
     } as unknown as GameState;
     const result = updateFn(state);
 
+    expect(raidDefenseGlobalEffectApply).toHaveBeenCalledWith(state, 1000);
     expect(result.world.towns[townId].raidTelegraphedAtTick).toBe(1000);
     expect(
       result.world.towns[townId].raidEngageWindowExpiresAtTick,

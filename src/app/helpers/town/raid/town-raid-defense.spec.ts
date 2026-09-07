@@ -61,9 +61,7 @@ function buildTown(id: TownId, name: string): TownContent {
   return { id, name } as TownContent;
 }
 
-function buildTownState(
-  overrides: Partial<TownNodeState> = {},
-): TownNodeState {
+function buildTownState(overrides: Partial<TownNodeState> = {}): TownNodeState {
   return {
     lastProcessedTick: {},
     stock: [],
@@ -176,14 +174,21 @@ describe('raidDefenseGlobalEffectApply', () => {
     } as unknown as GameState;
   }
 
-  it('removes the effect and adds nothing when no town is telegraphed', () => {
+  it('removes the effect by its real content id (not the lookup name) and adds nothing when no town is telegraphed', () => {
+    vi.mocked(getEntry).mockReturnValue(effectContent as never);
     const state = buildState({ [larsiaId]: buildTownState() });
 
     raidDefenseGlobalEffectApply(state, 1000);
 
+    // RAID_DEFENSE_GLOBAL_EFFECT_ID is a lookup name, not the id stored on a pushed effect -
+    // removal must use the resolved content's real id or it silently never matches.
     expect(applyGlobalEffectRemove).toHaveBeenCalledWith(
       state,
-      'Raid Defense Requested' as GlobalEffectId,
+      effectContent.id,
+    );
+    expect(applyGlobalEffectRemove).not.toHaveBeenCalledWith(
+      state,
+      'Raid Defense Requested',
     );
     expect(state.globalEffects).toEqual([]);
   });
@@ -211,6 +216,10 @@ describe('raidDefenseGlobalEffectApply', () => {
 
     raidDefenseGlobalEffectApply(state, 1000);
 
+    expect(applyGlobalEffectRemove).toHaveBeenCalledWith(
+      state,
+      effectContent.id,
+    );
     expect(state.globalEffects).toHaveLength(1);
     expect(state.globalEffects[0]).toMatchObject({
       id: effectContent.id,
@@ -249,8 +258,9 @@ describe('raidDefenseGlobalEffectApply', () => {
     vi.mocked(getEntriesByType).mockReturnValue([
       buildTown(larsiaId, 'Larsia'),
     ] as never);
-    vi.mocked(getEntry).mockImplementation((id) =>
-      (id === larsiaId ? buildTown(larsiaId, 'Larsia') : undefined) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id) =>
+        (id === larsiaId ? buildTown(larsiaId, 'Larsia') : undefined) as never,
     );
     const state = buildState({
       [larsiaId]: buildTownState({
@@ -261,6 +271,7 @@ describe('raidDefenseGlobalEffectApply', () => {
 
     raidDefenseGlobalEffectApply(state, 1000);
 
+    expect(applyGlobalEffectRemove).not.toHaveBeenCalled();
     expect(state.globalEffects).toEqual([]);
   });
 });
