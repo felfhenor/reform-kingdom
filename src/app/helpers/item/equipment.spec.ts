@@ -1,6 +1,9 @@
 import type {
+  AffixContent,
+  AffixId,
   Character,
   CharacterId,
+  Combat,
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
@@ -8,9 +11,6 @@ import type {
   EquipmentItemId,
   JobContent,
   JobId,
-  AffixContent,
-  AffixId,
-  Combat,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -920,7 +920,7 @@ describe('Equipment Helper Functions', () => {
       const winners = planEquipmentOptimization(
         buildCharacter(),
         [strongItem, weakItem],
-        ['Strength'],
+        [{ stat: 'Strength', multiplier: 1 }],
       );
 
       expect(winners).toEqual([{ item: strongItem, content: strongSword }]);
@@ -971,7 +971,7 @@ describe('Equipment Helper Functions', () => {
       const winners = planEquipmentOptimization(
         character,
         [armoryItem],
-        ['Strength'],
+        [{ stat: 'Strength', multiplier: 1 }],
       );
 
       expect(winners).toEqual([]);
@@ -998,7 +998,7 @@ describe('Equipment Helper Functions', () => {
       const winners = planEquipmentOptimization(
         character,
         [armoryItem],
-        ['Strength'],
+        [{ stat: 'Strength', multiplier: 1 }],
       );
 
       expect(winners).toEqual([]);
@@ -1031,7 +1031,12 @@ describe('Equipment Helper Functions', () => {
       const winners = planEquipmentOptimization(
         character,
         [armoryBangle],
-        ['Strength', 'Vitality', 'Agility', 'Resistance'],
+        [
+          { stat: 'Strength', multiplier: 1 },
+          { stat: 'Vitality', multiplier: 1 },
+          { stat: 'Agility', multiplier: 1 },
+          { stat: 'Resistance', multiplier: 1 },
+        ],
       );
 
       expect(winners).toEqual([{ item: armoryBangle, content: copperBangle }]);
@@ -1050,7 +1055,7 @@ describe('Equipment Helper Functions', () => {
       const winners = planEquipmentOptimization(
         buildCharacter(),
         [spearItem, shieldItem],
-        ['Strength'],
+        [{ stat: 'Strength', multiplier: 1 }],
       );
 
       expect(winners).toEqual([{ item: spearItem, content: spear }]);
@@ -1119,7 +1124,10 @@ describe('Equipment Helper Functions', () => {
       const winners = planEquipmentOptimization(
         character,
         [armoryItem],
-        ['Strength', 'Agility'],
+        [
+          { stat: 'Strength', multiplier: 1 },
+          { stat: 'Agility', multiplier: 1 },
+        ],
       );
 
       expect(winners).toEqual([{ item: armoryItem, content: tradeoffBangle }]);
