@@ -1,0 +1,13 @@
+- id: 47443724-f86c-4d8c-a481-d9d38251343a
+  name: Larsia Support Portal
+  description: A portal opened up by the Larsian king that allows for quick travel between Carrina and Larsia.
+
+  invisibleUntilCollectibleIdsFound:
+    - Larsian House Model
+
+- id: fa9c3f7e-9b26-40e2-8500-1ba1ee3f94bf
+  name: Carrina Support Portal
+  description: A portal opened up by the Larsian king that allows for quick travel between Carrina and Larsia.
+
+  invisibleUntilCollectibleIdsFound:
+    - Larsian House Model

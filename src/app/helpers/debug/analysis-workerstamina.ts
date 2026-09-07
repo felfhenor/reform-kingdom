@@ -21,7 +21,10 @@ export function runWorkerStaminaAnalysis(): AnalysisRunResult {
   const kingdom = kingdomNodeGet();
 
   const entries: WorkerStaminaCheckEntry[] = gatherings.map((gathering) => {
-    const path = kingdom ? travelPathFrom(kingdom, gathering.name) : undefined;
+    // Ignores collectible gates - measures eventual reachability, not this run's ungated-nothing-found state.
+    const path = kingdom
+      ? travelPathFrom(kingdom, gathering.name, true, true)
+      : undefined;
     const oneWayTicks =
       kingdom && path ? travelPathTotalTicks(path, kingdom) : undefined;
 

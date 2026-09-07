@@ -25,5 +25,6 @@ export function ensureWorker(
     frames: worker.frames ?? 4,
     baseStats,
     statsPerLevel: ensureWorkerStats(worker.statsPerLevel),
+    canUseTeleports: worker.canUseTeleports ?? true,
   };
 }

@@ -95,6 +95,7 @@ describe('workerStatsForLevel', () => {
     frames: 4,
     baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
     statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
+    canUseTeleports: true,
   };
 
   it('returns exactly baseStats at level 1', () => {
@@ -136,6 +137,7 @@ describe('workerMinLevelForStamina', () => {
     frames: 4,
     baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
     statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
+    canUseTeleports: true,
   };
 
   it('is 1 when base stamina already covers the requirement', () => {
@@ -303,6 +305,7 @@ describe('workersReadyToLevelUpEntries', () => {
     frames: 4,
     baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
     statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
+    canUseTeleports: true,
   };
 
   beforeEach(() => {

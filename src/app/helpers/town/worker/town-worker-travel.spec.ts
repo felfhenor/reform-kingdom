@@ -171,6 +171,18 @@ describe('townWorkerAssignmentIsValid', () => {
       townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment),
     ).toBe(false);
   });
+
+  it("routes with the worker content's canUseTeleports flag", () => {
+    vi.mocked(getEntry).mockReturnValue({ canUseTeleports: false } as never);
+
+    townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment);
+
+    expect(travelPathFrom).toHaveBeenCalledWith(
+      expect.anything(),
+      assignment.nodeName,
+      false,
+    );
+  });
 });
 
 describe('townWorkerBeginOutboundTrip', () => {
@@ -229,6 +241,26 @@ describe('townWorkerBeginOutboundTrip', () => {
       nodeName: 'Wergen Woods',
       itemId: oreId,
     });
+  });
+
+  it('blocks the trip from crossing a teleport when the worker cannot use them', () => {
+    vi.mocked(getEntry).mockReturnValue({ canUseTeleports: false } as never);
+    vi.mocked(worldNodeByName).mockReturnValue({
+      mapName: 'Carrina',
+      x: 5,
+      y: 5,
+    } as WorldNodeEntry);
+
+    townWorkerBeginOutboundTrip(townId, buildTown(), workerId, {
+      nodeName: 'Wergen Woods',
+      itemId: oreId,
+    });
+
+    expect(travelPathFrom).toHaveBeenCalledWith(
+      expect.anything(),
+      'Wergen Woods',
+      false,
+    );
   });
 });
 
@@ -301,7 +333,9 @@ describe('townWorkersTravelingTokens', () => {
                   kind: 'TravelingTo',
                   nodeName: 'Wergen Woods',
                   itemId: oreId,
-                  path: [{ kind: 'Move', mapName: 'LarsianDesert', x: 1, y: 0 }],
+                  path: [
+                    { kind: 'Move', mapName: 'LarsianDesert', x: 1, y: 0 },
+                  ],
                   ticksIntoStep: 2,
                 },
               },

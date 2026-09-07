@@ -5,6 +5,7 @@ vi.mock('@helpers/maps', () => ({
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
+  isWorldNodeCollectibleGateMet: vi.fn(() => true),
   worldNodesOfType: vi.fn(),
 }));
 
@@ -17,7 +18,10 @@ import {
   tiledMapWalkabilityMatrix,
   tileIsOnPath,
 } from '@helpers/pathfinding/pathfinding';
-import { worldNodesOfType } from '@helpers/world-node/world-nodes';
+import {
+  isWorldNodeCollectibleGateMet,
+  worldNodesOfType,
+} from '@helpers/world-node/world-nodes';
 import type {
   GameMap,
   TiledLayer,
@@ -360,5 +364,70 @@ describe('mapHopsBetween', () => {
     vi.mocked(worldNodesOfType).mockReturnValue([]);
 
     expect(mapHopsBetween('Carrina', 'Nowhere')).toBeGreaterThan(0);
+  });
+
+  it('routes around a locked teleport pair instead of counting it as a hop', () => {
+    // A direct (but locked) pair plus a longer unlocked detour through a third map -
+    // if the lock is respected, the detour's 2 hops win over the direct pair's 1.
+    const directOut = buildEntry({
+      mapName: 'Carrina',
+      nodeName: 'Direct Out',
+      nodeData: buildObject({
+        type: 'TeleportNode',
+        properties: [{ name: 'toTag', type: 'string', value: 'direct-in' }],
+      }),
+    });
+    const directIn = buildEntry({
+      mapName: 'CraggledMire',
+      nodeName: 'Direct In',
+      nodeData: buildObject({
+        type: 'TeleportNode',
+        properties: [{ name: 'tag', type: 'string', value: 'direct-in' }],
+      }),
+    });
+    const detourOut = buildEntry({
+      mapName: 'Carrina',
+      nodeName: 'Detour Out',
+      nodeData: buildObject({
+        type: 'TeleportNode',
+        properties: [{ name: 'toTag', type: 'string', value: 'waypoint-in' }],
+      }),
+    });
+    const waypointIn = buildEntry({
+      mapName: 'Waypoint',
+      nodeName: 'Waypoint In',
+      nodeData: buildObject({
+        type: 'TeleportNode',
+        properties: [{ name: 'tag', type: 'string', value: 'waypoint-in' }],
+      }),
+    });
+    const waypointOut = buildEntry({
+      mapName: 'Waypoint',
+      nodeName: 'Waypoint Out',
+      nodeData: buildObject({
+        type: 'TeleportNode',
+        properties: [{ name: 'toTag', type: 'string', value: 'detour-in' }],
+      }),
+    });
+    const detourIn = buildEntry({
+      mapName: 'CraggledMire',
+      nodeName: 'Detour In',
+      nodeData: buildObject({
+        type: 'TeleportNode',
+        properties: [{ name: 'tag', type: 'string', value: 'detour-in' }],
+      }),
+    });
+
+    vi.mocked(worldNodesOfType).mockImplementation((type) =>
+      type === 'TeleportNode'
+        ? [directOut, directIn, detourOut, waypointIn, waypointOut, detourIn]
+        : [],
+    );
+    vi.mocked(isWorldNodeCollectibleGateMet).mockImplementation(
+      (entry) =>
+        entry.nodeName !== 'Direct Out' && entry.nodeName !== 'Direct In',
+    );
+
+    expect(mapHopsBetween('Carrina', 'CraggledMire')).toBe(2);
   });
 });

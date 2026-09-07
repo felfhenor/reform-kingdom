@@ -34,6 +34,12 @@ export function isCollectibleDiscovered(collectibleId: CollectibleId): boolean {
   return !!gamestate().collectibles[collectibleId]?.foundAt;
 }
 
+export function discoveredCollectibleCount(): number {
+  return Object.values(gamestate().collectibles).filter(
+    (entry) => !!entry?.foundAt,
+  ).length;
+}
+
 export function collectiblesAdd(
   collectibleId: CollectibleId,
   quantity = 1,

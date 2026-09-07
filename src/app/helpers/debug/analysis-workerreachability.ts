@@ -30,7 +30,10 @@ function buildNodes(
   const gatherings = getEntriesByType<GatheringContent>('gathering');
 
   return gatherings.map((gathering) => {
-    const path = kingdom ? travelPathFrom(kingdom, gathering.name) : undefined;
+    // Ignores collectible gates - measures eventual reachability, not this run's ungated-nothing-found state.
+    const path = kingdom
+      ? travelPathFrom(kingdom, gathering.name, true, true)
+      : undefined;
     return {
       nodeName: gathering.name,
       mapName: nodeNameToMap.get(gathering.name) ?? '(unplaced)',

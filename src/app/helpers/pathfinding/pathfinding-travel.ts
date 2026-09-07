@@ -1,16 +1,15 @@
 import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
+import { discoveredCollectibleCount } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import {
   findInMapPath,
   findTeleportArrivalByTag,
   teleportNodeProperty,
   travelPathViaTeleport,
+  unlockedTeleportNodes,
 } from '@helpers/pathfinding/pathfinding';
 import { currentLocationGet } from '@helpers/world';
-import {
-  worldNodeByName,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type { CurrentLocation, TravelStep, WorldNodeEntry } from '@interfaces';
 import { minBy } from 'es-toolkit/compat';
 
@@ -33,9 +32,12 @@ function routeWaypoints(
 function teleportHop(
   from: CurrentLocation,
   teleport: WorldNodeEntry,
+  ignoreCollectibleGate: boolean,
 ): { arrivalKey: string; steps: TravelStep[]; cost: number } | undefined {
   const toTag = teleportNodeProperty(teleport, 'toTag');
-  const arrival = toTag ? findTeleportArrivalByTag(toTag) : undefined;
+  const arrival = toTag
+    ? findTeleportArrivalByTag(toTag, ignoreCollectibleGate)
+    : undefined;
   if (!arrival) return undefined;
 
   const walkSteps = findInMapPath(from.mapName, from, teleport);
@@ -61,8 +63,9 @@ function teleportHop(
 function travelPathAcrossMaps(
   location: CurrentLocation,
   destination: WorldNodeEntry,
+  ignoreCollectibleGate: boolean,
 ): TravelStep[] | undefined {
-  const teleportNodes = worldNodesOfType('TeleportNode');
+  const teleportNodes = unlockedTeleportNodes(ignoreCollectibleGate);
   const waypoints = routeWaypoints(location, teleportNodes);
 
   const dist = new Map<string, number>([[ROUTE_START_KEY, 0]]);
@@ -70,8 +73,12 @@ function travelPathAcrossMaps(
   const unvisited = new Set(waypoints.keys());
 
   while (unvisited.size > 0) {
-    const currentKey = minBy([...unvisited], (key) => dist.get(key) ?? Number.POSITIVE_INFINITY);
-    const currentDist = currentKey === undefined ? undefined : dist.get(currentKey);
+    const currentKey = minBy(
+      [...unvisited],
+      (key) => dist.get(key) ?? Number.POSITIVE_INFINITY,
+    );
+    const currentDist =
+      currentKey === undefined ? undefined : dist.get(currentKey);
     if (currentKey === undefined || currentDist === undefined) break;
 
     unvisited.delete(currentKey);
@@ -81,11 +88,13 @@ function travelPathAcrossMaps(
     teleportNodes
       .filter((node) => node.mapName === currentPos.mapName)
       .forEach((teleport) => {
-        const hop = teleportHop(currentPos, teleport);
+        const hop = teleportHop(currentPos, teleport, ignoreCollectibleGate);
         if (!hop) return;
 
         const candidateDist = currentDist + hop.cost;
-        if (candidateDist < (dist.get(hop.arrivalKey) ?? Number.POSITIVE_INFINITY)) {
+        if (
+          candidateDist < (dist.get(hop.arrivalKey) ?? Number.POSITIVE_INFINITY)
+        ) {
           dist.set(hop.arrivalKey, candidateDist);
           stepsFromStart.set(hop.arrivalKey, [...currentSteps, ...hop.steps]);
         }
@@ -113,33 +122,54 @@ function travelPathAcrossMaps(
   return bestSteps;
 }
 
-// Cleared whenever the loaded maps change (real app: once, at load) - same (origin, destination) always resolves to the
-// same path otherwise, which is what stops a stamina check from re-pathfinding once per item at a node instead of once per node.
+// Cleared when maps reload or a collectible is found (can flip a gated TeleportNode - see
+// unlockedTeleportNodes); otherwise (origin, destination) always resolves the same.
 let cachedMapsRef: ReturnType<typeof allMaps> | undefined;
+let cachedDiscoveredCollectibleCount: number | undefined;
 const pathFromCache = new Map<string, TravelStep[] | undefined>();
 
 function pathFromCacheKey(
   location: CurrentLocation,
   destinationNodeName: string,
+  allowTeleport: boolean,
+  ignoreCollectibleGate: boolean,
 ): string {
-  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}`;
+  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}::${allowTeleport}:${ignoreCollectibleGate}`;
 }
 
-// Pure by-location variant, so non-party travelers (workers) can path from an arbitrary origin, not just the hero party's current tile.
+// Pure by-location variant, so non-party travelers (workers) can path from an arbitrary origin, not just the hero
+// party's current tile. `ignoreCollectibleGate` is for content-only debug/analysis tooling.
 export function travelPathFrom(
   location: CurrentLocation,
   destinationNodeName: string,
+  allowTeleport = true,
+  ignoreCollectibleGate = false,
 ): TravelStep[] | undefined {
   const currentMaps = allMaps();
-  if (currentMaps !== cachedMapsRef) {
+  const currentDiscoveredCollectibleCount = discoveredCollectibleCount();
+  if (
+    currentMaps !== cachedMapsRef ||
+    currentDiscoveredCollectibleCount !== cachedDiscoveredCollectibleCount
+  ) {
     cachedMapsRef = currentMaps;
+    cachedDiscoveredCollectibleCount = currentDiscoveredCollectibleCount;
     pathFromCache.clear();
   }
 
-  const key = pathFromCacheKey(location, destinationNodeName);
+  const key = pathFromCacheKey(
+    location,
+    destinationNodeName,
+    allowTeleport,
+    ignoreCollectibleGate,
+  );
   if (pathFromCache.has(key)) return pathFromCache.get(key);
 
-  const path = computeTravelPathFrom(location, destinationNodeName);
+  const path = computeTravelPathFrom(
+    location,
+    destinationNodeName,
+    allowTeleport,
+    ignoreCollectibleGate,
+  );
   pathFromCache.set(key, path);
   return path;
 }
@@ -147,6 +177,8 @@ export function travelPathFrom(
 function computeTravelPathFrom(
   location: CurrentLocation,
   destinationNodeName: string,
+  allowTeleport: boolean,
+  ignoreCollectibleGate: boolean,
 ): TravelStep[] | undefined {
   const destination = worldNodeByName(destinationNodeName);
   if (!destination) return undefined;
@@ -154,18 +186,29 @@ function computeTravelPathFrom(
   // Traveling "to" a TeleportNode means crossing it, not just standing next
   // to it - so the jump to its paired arrival tile is part of this path.
   if (destination.nodeData.type === 'TeleportNode') {
-    return travelPathViaTeleport(location, destination);
+    return allowTeleport
+      ? travelPathViaTeleport(location, destination, ignoreCollectibleGate)
+      : undefined;
   }
 
   if (location.mapName === destination.mapName) {
     return findInMapPath(location.mapName, location, destination);
   }
 
-  return travelPathAcrossMaps(location, destination);
+  return allowTeleport
+    ? travelPathAcrossMaps(location, destination, ignoreCollectibleGate)
+    : undefined;
 }
 
 export function travelPathTo(
   destinationNodeName: string,
+  allowTeleport = true,
+  ignoreCollectibleGate = false,
 ): TravelStep[] | undefined {
-  return travelPathFrom(currentLocationGet(), destinationNodeName);
+  return travelPathFrom(
+    currentLocationGet(),
+    destinationNodeName,
+    allowTeleport,
+    ignoreCollectibleGate,
+  );
 }

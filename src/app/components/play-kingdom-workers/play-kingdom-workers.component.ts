@@ -239,6 +239,7 @@ export class PlayKingdomWorkersComponent {
   // disabled (not filtered out) when out of stamina range for the selected worker.
   public nodeOptions = computed<NodeOption[]>(() => {
     const stamina = this.selectedStats()?.stamina ?? 0;
+    const allowTeleport = this.selectedEntry()?.content.canUseTeleports ?? true;
 
     const options = worldNodesOfType('GatherNode')
       .filter((node) => isGatherNodeDiscovered(node.nodeName))
@@ -247,11 +248,11 @@ export class PlayKingdomWorkersComponent {
         return {
           nodeName: node.nodeName,
           entry: node,
-          staminaCost: workerStaminaCostToNode(node.nodeName),
+          staminaCost: workerStaminaCostToNode(node.nodeName, allowTeleport),
           levelRangeLabel: gathering
             ? worldNodeLevelLabel(gathering.workerLevelRange)
             : '?',
-          disabled: !canWorkerReachNode(node.nodeName, stamina),
+          disabled: !canWorkerReachNode(node.nodeName, stamina, allowTeleport),
         };
       });
 

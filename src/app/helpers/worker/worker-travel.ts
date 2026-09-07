@@ -43,18 +43,25 @@ function gatherNodeHasItem(nodeName: string, itemId: ItemId): boolean {
 
 // One-way only - the return trip is never stamina-gated (deliberate design
 // decision: stamina is a one-way "how far can this worker be sent" budget).
-export function workerStaminaCostToNode(nodeName: string): number | undefined {
+export function workerStaminaCostToNode(
+  nodeName: string,
+  allowTeleport = true,
+): number | undefined {
   const kingdom = kingdomNodeGet();
   if (!kingdom) return undefined;
 
-  const path = travelPathFrom(kingdom, nodeName);
+  const path = travelPathFrom(kingdom, nodeName, allowTeleport);
   if (!path) return undefined;
 
   return travelPathTotalTicks(path, kingdom);
 }
 
-export function canWorkerReachNode(nodeName: string, stamina: number): boolean {
-  const cost = workerStaminaCostToNode(nodeName);
+export function canWorkerReachNode(
+  nodeName: string,
+  stamina: number,
+  allowTeleport = true,
+): boolean {
+  const cost = workerStaminaCostToNode(nodeName, allowTeleport);
   return cost !== undefined && cost <= stamina;
 }
 
@@ -72,7 +79,7 @@ export function workerAssignmentIsValid(
   return (
     isGatherNodeDiscovered(assignment.nodeName) &&
     gatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
-    canWorkerReachNode(assignment.nodeName, stamina)
+    canWorkerReachNode(assignment.nodeName, stamina, content.canUseTeleports)
   );
 }
 
@@ -85,7 +92,9 @@ export function workerBeginOutboundTrip(
   const kingdom = kingdomNodeGet();
   if (!kingdom) return;
 
-  const path = travelPathFrom(kingdom, assignment.nodeName);
+  const canUseTeleports =
+    getEntry<WorkerContent>(workerId)?.canUseTeleports ?? true;
+  const path = travelPathFrom(kingdom, assignment.nodeName, canUseTeleports);
   if (!path) return;
 
   updateGamestate((state) => {
@@ -113,10 +122,12 @@ export function workerBeginReturnTrip(
 ): boolean {
   const worker = gamestate().workers[workerId];
   const kingdom = kingdomNodeGet();
+  const canUseTeleports =
+    getEntry<WorkerContent>(workerId)?.canUseTeleports ?? true;
 
   const path =
     worker && kingdom
-      ? travelPathFrom(worker.location, kingdom.nodeName)
+      ? travelPathFrom(worker.location, kingdom.nodeName, canUseTeleports)
       : undefined;
 
   updateGamestate((state) => {

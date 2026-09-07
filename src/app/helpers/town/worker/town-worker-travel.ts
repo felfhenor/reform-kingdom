@@ -35,11 +35,12 @@ function gatherNodeHasItem(nodeName: string, itemId: ItemId): boolean {
 export function townWorkerStaminaCostToNode(
   town: TownContent,
   nodeName: string,
+  allowTeleport = true,
 ): number | undefined {
   const townNode = worldNodeByName(town.name);
   if (!townNode) return undefined;
 
-  const path = travelPathFrom(townNode, nodeName);
+  const path = travelPathFrom(townNode, nodeName, allowTeleport);
   return path ? travelPathTotalTicks(path, townNode) : undefined;
 }
 
@@ -54,7 +55,11 @@ export function townWorkerAssignmentIsValid(
   if (!content) return false;
 
   const stamina = townWorkerStatsForLevel(content, level).stamina;
-  const cost = townWorkerStaminaCostToNode(town, assignment.nodeName);
+  const cost = townWorkerStaminaCostToNode(
+    town,
+    assignment.nodeName,
+    content.canUseTeleports,
+  );
 
   return (
     gatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
@@ -73,7 +78,9 @@ export function townWorkerBeginOutboundTrip(
   const townNode = worldNodeByName(town.name);
   if (!townNode) return;
 
-  const path = travelPathFrom(townNode, assignment.nodeName);
+  const canUseTeleports =
+    getEntry<WorkerContent>(workerId)?.canUseTeleports ?? true;
+  const path = travelPathFrom(townNode, assignment.nodeName, canUseTeleports);
   if (!path) return;
 
   updateGamestate((state) => {
@@ -100,11 +107,14 @@ export function townWorkerBeginReturnTrip(
   carriedItemId: ItemId | undefined,
   carriedQuantity: number,
 ): void {
+  const canUseTeleports =
+    getEntry<WorkerContent>(workerId)?.canUseTeleports ?? true;
+
   updateGamestate((state) => {
     const target = state.world.towns[townId]?.workers[workerId];
     if (!target) return state;
 
-    const path = travelPathFrom(target.location, town.name);
+    const path = travelPathFrom(target.location, town.name, canUseTeleports);
 
     target.status = path
       ? {

@@ -584,6 +584,30 @@
                  "width":64,
                  "x":1600,
                  "y":704
+                }, 
+                {
+                 "gid":422,
+                 "height":64,
+                 "id":188,
+                 "name":"Carrina Support Portal",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"LarsiaToCarrina"
+                        }, 
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"CarrinaToLarsia"
+                        }],
+                 "rotation":0,
+                 "type":"TeleportNode",
+                 "visible":true,
+                 "width":64,
+                 "x":256,
+                 "y":448
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -592,7 +616,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":187,
+ "nextobjectid":189,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

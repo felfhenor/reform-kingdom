@@ -28,6 +28,7 @@ import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
   collectiblesAdd,
+  discoveredCollectibleCount,
   getCollectibleQuantity,
   grantFoundingStoneIfMissing,
   isCollectibleDiscovered,
@@ -82,6 +83,27 @@ describe('Collectibles Helper Functions', () => {
       } as unknown as GameState);
 
       expect(isCollectibleDiscovered(foundingStone.id)).toBe(false);
+    });
+  });
+
+  describe('discoveredCollectibleCount', () => {
+    it('counts only entries with foundAt set', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        collectibles: {
+          [foundingStone.id]: { quantity: 1, foundAt: 1000 },
+          ['other-id' as CollectibleId]: { quantity: 1, foundAt: 0 },
+        },
+      } as unknown as GameState);
+
+      expect(discoveredCollectibleCount()).toBe(1);
+    });
+
+    it('returns 0 when nothing has been found', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        collectibles: {},
+      } as unknown as GameState);
+
+      expect(discoveredCollectibleCount()).toBe(0);
     });
   });
 

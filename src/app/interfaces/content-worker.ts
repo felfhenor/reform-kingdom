@@ -4,7 +4,10 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type WorkerId = Branded<string, 'WorkerId'>;
 
-export type WorkerStatBlock = Record<'capacity' | 'gatherSpeed' | 'stamina', number>;
+export type WorkerStatBlock = Record<
+  'capacity' | 'gatherSpeed' | 'stamina',
+  number
+>;
 
 export type WorkerContent = IsContentItem &
   HasDescription &
@@ -13,4 +16,6 @@ export type WorkerContent = IsContentItem &
 
     baseStats: WorkerStatBlock;
     statsPerLevel: WorkerStatBlock;
+
+    canUseTeleports: boolean;
   };

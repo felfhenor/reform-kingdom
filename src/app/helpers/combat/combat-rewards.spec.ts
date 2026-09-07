@@ -71,6 +71,7 @@ const workerContent: WorkerContent = {
   frames: 4,
   baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
   statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
+  canUseTeleports: true,
 };
 
 describe('grantResolvedDrops - Worker rewards', () => {

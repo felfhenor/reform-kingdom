@@ -1452,6 +1452,30 @@
                  "width":64,
                  "x":1152,
                  "y":128
+                }, 
+                {
+                 "gid":422,
+                 "height":64,
+                 "id":294,
+                 "name":"Larsia Support Portal",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"CarrinaToLarsia"
+                        }, 
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"LarsiaToCarrina"
+                        }],
+                 "rotation":0,
+                 "type":"TeleportNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1664,
+                 "y":1920
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1460,7 +1484,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":294,
+ "nextobjectid":295,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

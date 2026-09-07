@@ -14,6 +14,8 @@
     gatherSpeed: 0.1
     stamina: 1
 
+  canUseTeleports: false
+
 - id: 300a1ef0-f11e-4696-86d8-c21801d22c37
   name: Talbot Frore
   description: Talbot is a hard worker.
@@ -30,6 +32,8 @@
     gatherSpeed: 0.1
     stamina: 1
 
+  canUseTeleports: false
+
 - id: 4f594f84-1aff-4b5b-8f44-af156b906ad8
   name: Nevyn Maeling
   description: Nevyn is a hard worker.
@@ -45,3 +49,5 @@
     capacity: 0.5
     gatherSpeed: 0.1
     stamina: 1
+
+  canUseTeleports: false

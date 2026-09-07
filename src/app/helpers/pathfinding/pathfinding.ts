@@ -7,6 +7,7 @@ import {
   tiledObjectProperty,
 } from '@helpers/pixi/tiled-map';
 import {
+  isWorldNodeCollectibleGateMet,
   worldNodeLookup,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
@@ -227,9 +228,21 @@ export function teleportNodeProperty(
   return tiledObjectProperty<string>(node.nodeData, name);
 }
 
+export function unlockedTeleportNodes(
+  ignoreCollectibleGate = false,
+): WorldNodeEntry[] {
+  const teleportNodes = worldNodesOfType('TeleportNode');
+  return ignoreCollectibleGate
+    ? teleportNodes
+    : teleportNodes.filter(isWorldNodeCollectibleGateMet);
+}
+
 // Tags are validated unique across every map, so this resolves to exactly one node.
-export function findTeleportArrivalByTag(tag: string): WorldNodeEntry | undefined {
-  return worldNodesOfType('TeleportNode').find(
+export function findTeleportArrivalByTag(
+  tag: string,
+  ignoreCollectibleGate = false,
+): WorldNodeEntry | undefined {
+  return unlockedTeleportNodes(ignoreCollectibleGate).find(
     (node) => teleportNodeProperty(node, 'tag') === tag,
   );
 }
@@ -238,13 +251,17 @@ export function findTeleportArrivalByTag(tag: string): WorldNodeEntry | undefine
 export function travelPathViaTeleport(
   location: CurrentLocation,
   teleportNode: WorldNodeEntry,
+  ignoreCollectibleGate = false,
 ): TravelStep[] | undefined {
   if (location.mapName !== teleportNode.mapName) return undefined;
+  if (!ignoreCollectibleGate && !isWorldNodeCollectibleGateMet(teleportNode)) {
+    return undefined;
+  }
 
   const toTag = teleportNodeProperty(teleportNode, 'toTag');
   if (!toTag) return undefined;
 
-  const arrival = findTeleportArrivalByTag(toTag);
+  const arrival = findTeleportArrivalByTag(toTag, ignoreCollectibleGate);
   if (!arrival) return undefined;
 
   const toTeleportSteps = findInMapPath(
@@ -266,7 +283,7 @@ export function travelPathViaTeleport(
 
 // Neighboring maps reachable by a single teleport hop from `mapName`.
 function mapGraphNeighbors(mapName: string): string[] {
-  return worldNodesOfType('TeleportNode')
+  return unlockedTeleportNodes()
     .filter((node) => node.mapName === mapName)
     .map((node) => teleportNodeProperty(node, 'toTag'))
     .filter((tag): tag is string => !!tag)
