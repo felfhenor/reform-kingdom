@@ -20,9 +20,15 @@
       </app-slot-icon-blank>
     </span>
 
-    <span class="hero-skill-row-name text-{{ skill.rarity }}">
-      {{ skill.name }}
-    </span>
+    <div class="hero-skill-row-name">
+      <div class=" text-{{ skill.rarity }}">
+        {{ skill.name }}
+      </div>
+
+      <span class="badge badge-sm badge-info badge-outline">
+        {{ skill.epCost }} EP
+      </span>
+    </div>
   </div>
 
   <ng-template #skillTooltip>
