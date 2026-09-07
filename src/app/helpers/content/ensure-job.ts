@@ -1,7 +1,4 @@
-import {
-  VALID_EQUIPMENT_ITEM_TYPES,
-  VALID_GAME_STATS,
-} from '@helpers/content/ensure-helpers-constants';
+import { VALID_EQUIPMENT_ITEM_TYPES } from '@helpers/content/ensure-helpers-constants';
 import {
   ensureArray,
   ensureEnumArray,
@@ -45,7 +42,10 @@ export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
       job.equippableTypes,
       VALID_EQUIPMENT_ITEM_TYPES,
     ),
-    statPriority: ensureEnumArray(job.statPriority, VALID_GAME_STATS),
+    statPriority: ensureArray(job.statPriority, (prio) => ({
+      stat: prio.stat ?? 'UNKNOWN',
+      multiplier: prio.multiplier ?? 1,
+    })),
     skillPath: ensureArray(job.skillPath, ensureJobSkillPath),
   };
 }

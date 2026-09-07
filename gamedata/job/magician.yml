@@ -25,10 +25,14 @@
     Agility: 0.4
 
   statPriority:
-    - Intelligence
-    - Energy
-    - Resistance
-    - Vitality
+    - stat: Intelligence
+      multiplier: 1.5
+    - stat: Energy
+      multiplier: 1.25
+    - stat: Resistance
+      multiplier: 1.25
+    - stat: Vitality
+      multiplier: 1.25
 
   equippableTypes:
     - Cloth Armor

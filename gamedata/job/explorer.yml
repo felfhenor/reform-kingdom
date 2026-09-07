@@ -25,10 +25,14 @@
     Agility: 0.7
 
   statPriority:
-    - Strength
-    - Vitality
-    - Luck
-    - Agility
+    - stat: Luck
+      multiplier: 1.5
+    - stat: Strength
+      multiplier: 1.25
+    - stat: Vitality
+      multiplier: 1.25
+    - stat: Agility
+      multiplier: 1.25
 
   equippableTypes:
     - Cloth Armor

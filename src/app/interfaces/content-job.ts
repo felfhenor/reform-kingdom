@@ -17,6 +17,11 @@ export type JobSkillPath = {
   levels: JobSkillPathLevel[];
 };
 
+export type JobStatPriority = {
+  stat: BaseStat;
+  multiplier: number;
+};
+
 export type JobContent = IsContentItem &
   HasDescription &
   HasAnimation & {
@@ -28,7 +33,7 @@ export type JobContent = IsContentItem &
     equippableTypes: EquipmentItemType[];
 
     // Stats "Optimize Equipment" favors, highest priority first; ties fall back to level requirement.
-    statPriority: BaseStat[];
+    statPriority: JobStatPriority[];
 
     skillPath: JobSkillPath[];
   };

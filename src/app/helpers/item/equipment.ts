@@ -13,28 +13,28 @@ import {
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { rngUuid } from '@helpers/rng';
-import {
-  EquipmentTypeToSlot,
-  StatOrder,
-  type AffixEffect,
-  type BaseStat,
-  type Character,
-  type CombatStatBlock,
-  type EquipmentArmoryEntry,
-  type EquipmentBlock,
-  type EquipmentBonusDimension,
-  type EquipmentContent,
-  type EquipmentId,
-  type EquipmentItem,
-  type EquipmentItemId,
-  type EquipmentItemType,
-  type EquipmentSkillId,
-  type EquipmentSlot,
-  type JobContent,
-  type JobId,
-  type StatBlock,
-  type StatusEffectBlock,
+import type {
+  AffixEffect,
+  BaseStat,
+  Character,
+  CombatStatBlock,
+  EquipmentArmoryEntry,
+  EquipmentBlock,
+  EquipmentBonusDimension,
+  EquipmentContent,
+  EquipmentId,
+  EquipmentItem,
+  EquipmentItemId,
+  EquipmentItemType,
+  EquipmentSkillId,
+  EquipmentSlot,
+  JobContent,
+  JobId,
+  JobStatPriority,
+  StatBlock,
+  StatusEffectBlock,
 } from '@interfaces';
+import { EquipmentTypeToSlot, StatOrder } from '@interfaces';
 
 import { orderBy, sumBy, uniq } from 'es-toolkit/compat';
 
@@ -296,34 +296,31 @@ function candidateStatValue(
   );
 }
 
-// Ranks by statPriority stat-by-stat, then by the net sum of remaining stats (so a tradeoff item's bonus/penalty are weighed together), then each remaining stat individually as a final tie-break.
+// Ranks by statPriority with the multipliers as well as all the non-priority stats (at a rate of x1).
 function bestBySlotPriority(
   entries: EquipmentArmoryEntry[],
-  statPriority: BaseStat[],
+  statPriority: JobStatPriority[],
 ): EquipmentArmoryEntry | undefined {
   if (entries.length === 0) return undefined;
 
   const nonPriorityStats = StatOrder.filter(
-    (stat) => !statPriority.includes(stat),
+    (prio) => !statPriority.some((sp) => sp.stat === prio),
   );
-
-  const iteratees = [
-    ...statPriority.map(
-      (stat) => (entry: EquipmentArmoryEntry) =>
-        candidateStatValue(entry, stat),
-    ),
-    (entry: EquipmentArmoryEntry) =>
-      sumBy(nonPriorityStats, (stat) => candidateStatValue(entry, stat)),
-    ...nonPriorityStats.map(
-      (stat) => (entry: EquipmentArmoryEntry) =>
-        candidateStatValue(entry, stat),
-    ),
-  ];
 
   return orderBy(
     entries,
-    iteratees,
-    iteratees.map(() => 'desc' as const),
+    (item) => {
+      const priorityTotal = sumBy(
+        statPriority,
+        (prio) => candidateStatValue(item, prio.stat) * prio.multiplier,
+      );
+      const nonPriorityTotal = sumBy(nonPriorityStats, (stat) =>
+        candidateStatValue(item, stat),
+      );
+
+      return priorityTotal + nonPriorityTotal;
+    },
+    'desc',
   )[0];
 }
 
@@ -340,7 +337,7 @@ function currentEquipmentEntry(
 export function planEquipmentOptimization(
   character: Character,
   armory: EquipmentItem[],
-  statPriority: BaseStat[],
+  statPriority: JobStatPriority[],
 ): EquipmentArmoryEntry[] {
   const claimedSlots = new Set<EquipmentSlot>();
   const usedItemIds = new Set<EquipmentItemId>();
