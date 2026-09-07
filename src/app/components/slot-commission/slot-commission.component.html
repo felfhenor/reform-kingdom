@@ -6,7 +6,9 @@
       @if (isInLocationModal()) {
         Active Commission
       } @else {
-        {{ r.title }}
+        <span class="text-{{ rarityLabel() }}">
+          {{ r.title }}
+        </span>
       }
     </span>
 

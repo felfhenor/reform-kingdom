@@ -2,17 +2,20 @@ import { getEntry } from '@helpers/content/content';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
-import type {
-  CommissionOfferContent,
-  CommissionOfferSlot,
-  CommissionRequirement,
-  CommissionRequirementEntry,
-  EligibleCommissionOffer,
-  EquipmentContent,
-  GameState,
-  ItemContent,
-  MonsterContent,
+import {
+  RARITY_PRIORITY,
+  type CommissionOfferContent,
+  type CommissionOfferSlot,
+  type CommissionRequirement,
+  type CommissionRequirementEntry,
+  type DropRarity,
+  type EligibleCommissionOffer,
+  type EquipmentContent,
+  type GameState,
+  type ItemContent,
+  type MonsterContent,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 // Shared by caravan and town commission generation - both draw from the same weighted CommissionOfferSlot[] pool shape.
 export function eligibleCommissionOffers(
@@ -45,7 +48,7 @@ export function rollCommissionRequirements(
   });
 }
 
-// Reads off an explicit `state` when given, so callers can re-validate against a commit-time state instead of the possibly-stale live gamestate().
+// Reads off an explicit `state` when given, so callers can re-validate against a commit-time state.
 export function commissionRequirementOwnedQuantity(
   requirement: CommissionRequirement,
   state?: GameState,
@@ -75,7 +78,7 @@ export function commissionRequirementsSatisfied(
   );
 }
 
-// Shaped like CraftRequirementEntry so every UI surface reuses the same icon-row rendering the tradeskill panel already uses for recipe requirements.
+// Every UI surface reuses the same icon-row rendering the tradeskill panel already uses for recipe requirements.
 export function buildCommissionRequirementEntries(
   requirements: CommissionRequirement[],
 ): CommissionRequirementEntry[] {
@@ -108,4 +111,15 @@ export function buildCommissionRequirementEntries(
       owned: commissionRequirementOwnedQuantity(requirement),
     };
   });
+}
+
+export function commissionRarity(
+  requirements: CommissionRequirementEntry[],
+): DropRarity {
+  return sortBy(
+    requirements.map((requirement) => {
+      return requirement.content?.rarity ?? 'Common';
+    }),
+    (rarity) => RARITY_PRIORITY[rarity],
+  )[0];
 }

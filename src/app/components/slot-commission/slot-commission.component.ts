@@ -2,12 +2,14 @@ import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { commissionRarity } from '@helpers/commission/commission-requirement';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
 import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary';
@@ -41,6 +43,10 @@ export class SlotCommissionComponent {
 
   public turnIn = output<void>();
   public travel = output<void>();
+
+  public rarityLabel = computed(() =>
+    commissionRarity(this.row().requirementEntries),
+  );
 
   public requirementTooltip(entry: CommissionRequirementEntry): string {
     const name = entry.content?.name ?? 'Unknown';
