@@ -17,19 +17,19 @@
     - Orcwell
 
   commissionOffers:
-    - commissionOfferId: Commission - Mireweeds
+    - commissionOfferId: Commission - Basket of Dried Mireweeds
       weight: 1
-    - commissionOfferId: Commission - Mirewood
+    - commissionOfferId: Commission - Cord of Mirewood
       weight: 1
-    - commissionOfferId: Commission - Miremetal Ores
+    - commissionOfferId: Commission - Case of Miremetal Ore
       weight: 1
-    - commissionOfferId: Commission - Peridots
+    - commissionOfferId: Commission - Container of Peridots
       weight: 1
-    - commissionOfferId: Commission - Oozehides
+    - commissionOfferId: Commission - Container of Oozehides
       weight: 1
-    - commissionOfferId: Commission - Orc Bones
+    - commissionOfferId: Commission - Container of Orc Bones
       weight: 1
-    - commissionOfferId: Commission - Spirit Flesh
+    - commissionOfferId: Commission - Vessels of Spirit Flesh
       weight: 1
     - commissionOfferId: Commission - Craggled Weaponry
       weight: 1

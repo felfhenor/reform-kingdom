@@ -16,11 +16,11 @@
     - Carrina
 
   commissionOffers:
-    - commissionOfferId: Commission - Copper Ore
+    - commissionOfferId: Commission - Cart of Copper Ore
       weight: 1
 
-    - commissionOfferId: Commission - Spirit Flesh
+    - commissionOfferId: Commission - Vessels of Spirit Flesh
       weight: 2
 
-    - commissionOfferId: Commission - Ghostcopper Dust
+    - commissionOfferId: Commission - Vessels of Ghostcopper Dust
       weight: 3

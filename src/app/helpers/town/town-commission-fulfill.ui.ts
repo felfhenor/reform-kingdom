@@ -67,6 +67,7 @@ export function townCommissionRowViewModels(
     isPartyHere,
     canTravel,
     travelEtaSeconds,
+    commission: getEntry<CommissionOfferContent>(slot.commissionOfferId),
   }));
 }
 

@@ -17,29 +17,29 @@
     - Lizard
 
   commissionOffers:
-    - commissionOfferId: Commission - Firmwater
+    - commissionOfferId: Commission - Bottles of Firmwater
       weight: 1
 
-    - commissionOfferId: Commission - Timberfuzz
+    - commissionOfferId: Commission - Cord of Timberfuzz
       weight: 1
 
-    - commissionOfferId: Commission - Petrifiwood
+    - commissionOfferId: Commission - Cord of Petrifiwood
       weight: 1
 
-    - commissionOfferId: Commission - Cactspine
+    - commissionOfferId: Commission - Basket of Cactspines
       weight: 1
 
-    - commissionOfferId: Commission - Strongreed
+    - commissionOfferId: Commission - Basket of Strongreeds
       weight: 1
 
-    - commissionOfferId: Commission - Amber
+    - commissionOfferId: Commission - Case of Ambers
       weight: 1
 
-    - commissionOfferId: Commission - Brightwisp Core
+    - commissionOfferId: Commission - Case of Brightwisp Cores
       weight: 1
 
-    - commissionOfferId: Commission - Preserved Bloodmoth
+    - commissionOfferId: Commission - Slats of Preserved Bloodmoths
       weight: 1
 
-    - commissionOfferId: Commission - Pumpkin Gem
+    - commissionOfferId: Commission - Box of Pumpkin Gems
       weight: 2

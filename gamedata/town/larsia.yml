@@ -229,31 +229,31 @@
         - commissionOfferId: Commission - Larsian Rings
           weight: 1
 
-        - commissionOfferId: Commission - Firmwater
+        - commissionOfferId: Commission - Bottles of Firmwater
           weight: 3
 
-        - commissionOfferId: Commission - Timberfuzz
+        - commissionOfferId: Commission - Cord of Timberfuzz
           weight: 1
 
-        - commissionOfferId: Commission - Petrifiwood
+        - commissionOfferId: Commission - Cord of Petrifiwood
           weight: 1
 
-        - commissionOfferId: Commission - Cactspine
+        - commissionOfferId: Commission - Basket of Cactspines
           weight: 1
 
-        - commissionOfferId: Commission - Strongreed
+        - commissionOfferId: Commission - Basket of Strongreeds
           weight: 1
 
-        - commissionOfferId: Commission - Amber
+        - commissionOfferId: Commission - Case of Ambers
           weight: 1
 
-        - commissionOfferId: Commission - Brightwisp Core
+        - commissionOfferId: Commission - Case of Brightwisp Cores
           weight: 3
 
-        - commissionOfferId: Commission - Cimmerian Dust
+        - commissionOfferId: Commission - Vessels of Cimmerian Dust
           weight: 2
 
-        - commissionOfferId: Commission - Preserved Bloodmoth
+        - commissionOfferId: Commission - Slats of Preserved Bloodmoths
           weight: 2
 
         - commissionOfferId: Commission - Akroki Bounty

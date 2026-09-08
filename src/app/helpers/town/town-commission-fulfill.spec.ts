@@ -43,7 +43,7 @@ const slotId = 'slot-1' as TownCommissionSlotId;
 
 const offer: CommissionOfferContent = {
   id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Wergen Sticks',
+  name: 'Commission - Bundle of Wergen Sticks',
   __type: 'commissionoffer',
   description: 'A commission.',
   requirements: [

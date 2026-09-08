@@ -43,7 +43,7 @@ import type {
 
 const offer: CommissionOfferContent = {
   id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Wergen Sticks',
+  name: 'Commission - Bundle of Wergen Sticks',
   __type: 'commissionoffer',
   description: 'A commission.',
   requirements: [
@@ -96,9 +96,7 @@ describe('eligibleCommissionOffers', () => {
     ];
     vi.mocked(getEntry).mockReturnValue(offer);
 
-    expect(eligibleCommissionOffers(slots)).toEqual([
-      { offer, weight: 3 },
-    ]);
+    expect(eligibleCommissionOffers(slots)).toEqual([{ offer, weight: 3 }]);
   });
 
   it('drops a slot whose offer no longer resolves to real content', () => {
@@ -121,9 +119,7 @@ describe('rollCommissionRequirements', () => {
   it('rolls an equipment requirement without a progress field', () => {
     const equipmentOffer: CommissionOfferContent = {
       ...offer,
-      requirements: [
-        { equipmentId: sword.id, quantityMin: 2, quantityMax: 2 },
-      ],
+      requirements: [{ equipmentId: sword.id, quantityMin: 2, quantityMax: 2 }],
     };
 
     expect(rollCommissionRequirements(equipmentOffer)).toEqual([

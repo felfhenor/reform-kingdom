@@ -13,7 +13,10 @@ import {
   grantCommissionRewards,
   spendCommissionRequirements,
 } from '@helpers/commission/commission-turn-in';
-import { applyResolvedDropToState, rollDroppedRewards } from '@helpers/item/loot';
+import {
+  applyResolvedDropToState,
+  rollDroppedRewards,
+} from '@helpers/item/loot';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
   CommissionOfferContent,
@@ -85,12 +88,18 @@ describe('grantCommissionRewards', () => {
   it('rolls the offer rewards at an inert level and applies each resolved drop', () => {
     const offer: CommissionOfferContent = {
       id: 'offer-a' as CommissionOfferId,
-      name: 'Commission - Wergen Sticks',
+      name: 'Commission - Bundle of Wergen Sticks',
       __type: 'commissionoffer',
       description: 'A commission.',
       requirements: [],
       rewards: [
-        { kind: 'Item', itemId: 'trader-token' as ItemId, chance: 100, min: 2, max: 2 },
+        {
+          kind: 'Item',
+          itemId: 'trader-token' as ItemId,
+          chance: 100,
+          min: 2,
+          max: 2,
+        },
       ],
       townReputationReward: 0,
       specialtyForRecipeId: 'UNKNOWN' as RecipeId,

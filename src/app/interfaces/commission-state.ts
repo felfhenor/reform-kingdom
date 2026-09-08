@@ -71,6 +71,8 @@ export type CommissionSlotDisplay = {
   travelEtaSeconds?: number;
   // Town rows only - granted instead of `rewards`, which towns never pay out.
   reputationReward?: number;
+
+  commission?: CommissionOfferContent;
 };
 
 export type CommissionRowViewModel = CommissionSlotDisplay & {

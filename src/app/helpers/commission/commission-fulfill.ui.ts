@@ -6,12 +6,15 @@ import {
   commissionRewards,
   commissionState,
 } from '@helpers/commission/commission-fulfill';
+import { getEntry } from '@helpers/content/content';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
-import type { CommissionRowViewModel, WorldNodeEntry } from '@interfaces';
+import type {
+  CommissionOfferContent,
+  CommissionRowViewModel,
+  WorldNodeEntry,
+} from '@interfaces';
 
-// Built once here so the Commissions panel and a caravan's trade modal
-// turn-in section render identically without duplicating this composition.
 export function commissionRowViewModel(
   entry: WorldNodeEntry,
 ): CommissionRowViewModel | undefined {
@@ -22,6 +25,9 @@ export function commissionRowViewModel(
     caravanId: caravan.id,
     nodeName: entry.nodeName,
     title: caravan.name,
+    commission: getEntry<CommissionOfferContent>(
+      commissionState(caravan.id)?.commissionOfferId ?? '',
+    ),
     requirementEntries: commissionRequirementEntries(caravan.id),
     rewards: commissionRewards(caravan.id),
     canFulfill: commissionCanFulfill(caravan.id),

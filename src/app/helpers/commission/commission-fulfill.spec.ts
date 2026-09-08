@@ -71,7 +71,7 @@ const caravanId = 'carrina-duchy' as CaravanId;
 
 const offer: CommissionOfferContent = {
   id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Wergen Sticks',
+  name: 'Commission - Bundle of Wergen Sticks',
   __type: 'commissionoffer',
   description: 'A commission.',
   requirements: [
@@ -187,9 +187,7 @@ describe('commissionRequirementEntries', () => {
   it('resolves a monster-kill requirement with its own tracked progress as owned', () => {
     withCommissionState({
       commissionOfferId: offer.id,
-      requirements: [
-        { monsterId: sandWorm.id, quantity: 5, progress: 3 },
-      ],
+      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 3 }],
       completed: false,
       generatedAt: 1000,
     });
@@ -319,9 +317,7 @@ describe('commissionCanFulfill', () => {
   it('is false when a monster-kill requirement has not reached its quantity', () => {
     withCommissionState({
       commissionOfferId: offer.id,
-      requirements: [
-        { monsterId: sandWorm.id, quantity: 5, progress: 4 },
-      ],
+      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 4 }],
       completed: false,
       generatedAt: 1000,
     });
@@ -332,9 +328,7 @@ describe('commissionCanFulfill', () => {
   it('is true once a monster-kill requirement reaches its quantity', () => {
     withCommissionState({
       commissionOfferId: offer.id,
-      requirements: [
-        { monsterId: sandWorm.id, quantity: 5, progress: 5 },
-      ],
+      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 5 }],
       completed: false,
       generatedAt: 1000,
     });
@@ -418,7 +412,7 @@ describe('commissionFulfill', () => {
     expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'trader-token', 2);
     expect(result.world.commissions[caravanId].completed).toBe(true);
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Kingdom:Commission:Fulfill:Commission - Wergen Sticks',
+      'Kingdom:Commission:Fulfill:Commission - Bundle of Wergen Sticks',
     );
   });
 
@@ -468,9 +462,7 @@ describe('commissionFulfill', () => {
   it('completes a monster-kill commission without spending anything for the kill requirement', async () => {
     withCommissionState({
       commissionOfferId: offer.id,
-      requirements: [
-        { monsterId: sandWorm.id, quantity: 5, progress: 5 },
-      ],
+      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 5 }],
       completed: false,
       generatedAt: 1000,
     });

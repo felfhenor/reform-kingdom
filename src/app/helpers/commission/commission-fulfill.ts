@@ -22,7 +22,6 @@ import type {
   GameState,
 } from '@interfaces';
 
-// Exported so commission-fulfill.ui.ts's UI-only view model can share this lookup.
 export function commissionState(
   caravanId: CaravanId,
   state: GameState = gamestate(),

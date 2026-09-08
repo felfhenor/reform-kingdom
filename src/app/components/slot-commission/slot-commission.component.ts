@@ -42,6 +42,10 @@ export class SlotCommissionComponent {
   public turnIn = output<void>();
   public travel = output<void>();
 
+  public commissionName = computed(() =>
+    (this.row().commission?.name ?? 'Commission').replace('Commission - ', ''),
+  );
+
   public rarityLabel = computed(() =>
     commissionRarity(this.row().requirementEntries),
   );

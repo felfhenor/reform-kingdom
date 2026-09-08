@@ -2,15 +2,15 @@
 
 <div class="flex items-center gap-2 p-4 rounded bg-base-200">
   <div class="flex flex-col flex-1 min-w-0 gap-2">
-    <span class="font-semibold truncate">
-      @if (isInLocationModal()) {
-        Active Commission
-      } @else {
-        <span class="text-{{ rarityLabel() }}">
-          {{ r.title }}
-        </span>
-      }
-    </span>
+    @if (isInLocationModal()) {
+      <div class="font-semibold">Active Commission</div>
+    } @else {
+      <div class="font-semibold text-{{ rarityLabel() }}">
+        {{ commissionName() }}
+      </div>
+
+      <div class="text-xs italic mb-2">For: {{ r.title }}</div>
+    }
 
     @if (r.completed) {
       <span class="text-sm text-lighter italic">
@@ -45,6 +45,8 @@
           </div>
         }
       </div>
+
+      <p class="my-2 text-sm italic">{{ r.commission?.description }}</p>
     }
   </div>
 

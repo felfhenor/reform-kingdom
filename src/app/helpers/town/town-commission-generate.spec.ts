@@ -57,11 +57,11 @@ import {
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
+import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import {
   townCommissionProcessTick,
   townCommissionSlotCount,
 } from '@helpers/town/town-commission-generate';
-import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import {
   isTownDueForUpdate,
@@ -79,9 +79,7 @@ import type {
   TownId,
 } from '@interfaces';
 
-function buildTown(
-  commissions: TownCommissionOfferSlot[],
-): TownContent {
+function buildTown(commissions: TownCommissionOfferSlot[]): TownContent {
   return {
     id: 'larsia' as TownId,
     name: 'Larsia',
@@ -106,7 +104,7 @@ function buildTown(
 
 const offer: CommissionOfferContent = {
   id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Wergen Sticks',
+  name: 'Commission - Bundle of Wergen Sticks',
   __type: 'commissionoffer',
   description: 'A commission.',
   requirements: [
@@ -442,9 +440,9 @@ describe('townCommissionProcessTick', () => {
       expect(state.world.towns[persistentTown.id].commissionSlots).toHaveLength(
         1,
       );
-      expect(
-        state.world.towns[persistentTown.id].commissionSlots[0].id,
-      ).toBe('existing-persistent');
+      expect(state.world.towns[persistentTown.id].commissionSlots[0].id).toBe(
+        'existing-persistent',
+      );
     });
 
     it('excludes persistent offers from the weighted roll pool and does not count them against the cap', () => {
