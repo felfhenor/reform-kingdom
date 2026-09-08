@@ -15,7 +15,10 @@
 
       <app-row-skill-stat-scaling class="block mt-2" [skill]="skillData" />
 
-      @if (skillData.requiredWeaponTypes.length > 0) {
+      @if (
+        displayCharacterWeaponTypes().length > 0 &&
+        skillData.requiredWeaponTypes.length > 0
+      ) {
         <div class="text-xs mt-2 italic" [class.text-error]="!skillUsable()">
           Skill only usable with
           {{ skillData.requiredWeaponTypes.join(', ') }}
