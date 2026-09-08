@@ -16,7 +16,6 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { combatantFromMonster } from '@helpers/combat/combat-create';
 import { monsterStatsAtLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content/content';
-import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
 import {
   bestiaryDropQuantityLabel,
   bestiaryXpLabel,
@@ -95,14 +94,9 @@ export class DetailBestiaryMonsterComponent {
       .filter((skill): skill is EquipmentSkillContent => !!skill),
   );
 
-  // Preview is computed at the selected level, not level 1, so it reflects what the player actually faces.
-  private combatantAtSelectedLevel = computed<Combatant>(() =>
+  public combatantAtSelectedLevel = computed<Combatant>(() =>
     combatantFromMonster(this.entry().monster, this.selectedLevel(), 0),
   );
-
-  public skillDescription(skill: EquipmentSkillContent): string {
-    return skillDescriptionWithPreview(this.combatantAtSelectedLevel(), skill);
-  }
 
   public dropQuantityLabel(reward: DroppedReward): string {
     return bestiaryDropQuantityLabel(reward, this.selectedLevel());

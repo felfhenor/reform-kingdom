@@ -4,17 +4,14 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { RowSkillStatScalingComponent } from '@components/row-skill-stat-scaling/row-skill-stat-scaling.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { heroSkillsWithEquipment } from '@helpers/hero/job';
-import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
-import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
 import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
-  Combatant,
   EquipmentItemType,
   EquipmentSkillContent,
   JobContent,
@@ -25,9 +22,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-hero-equipment-skills',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    RowSkillStatScalingComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
+    TooltipSkillPreviewComponent,
   ],
   host: {
     class: 'flex flex-col gap-2 overflow-y-auto',
@@ -53,19 +50,11 @@ export class PanelHeroEquipmentSkillsComponent {
     );
   });
 
-  public equippedWeaponTypes = computed<EquipmentItemType[]>(() =>
-    equippedItemTypes(this.character().equipment),
-  );
-
-  private combatant = computed<Combatant>(() =>
+  public heroCombatant = computed(() =>
     combatantFromCharacter(this.character()),
   );
 
-  public isSkillUsable(skill: EquipmentSkillContent): boolean {
-    return skillIsUsableWithEquippedWeapons(skill, this.equippedWeaponTypes());
-  }
-
-  public skillDescription(skill: EquipmentSkillContent): string {
-    return skillDescriptionWithPreview(this.combatant(), skill);
-  }
+  public equippedWeaponTypes = computed<EquipmentItemType[]>(() =>
+    equippedItemTypes(this.character().equipment),
+  );
 }

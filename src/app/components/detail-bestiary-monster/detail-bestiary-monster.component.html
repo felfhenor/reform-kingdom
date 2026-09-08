@@ -76,7 +76,7 @@
           @for (skill of skills(); track skill.id) {
             <app-row-bestiary-skill
               [skill]="skill"
-              [description]="skillDescription(skill)"
+              [usingCombatant]="combatantAtSelectedLevel()"
             />
           } @empty {
             <span class="text-xs italic text-lighter">No skills.</span>

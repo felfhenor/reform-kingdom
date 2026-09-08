@@ -1,6 +1,16 @@
 @let s = skill();
 
-<div class="flex items-center gap-2" [tp]="skillTooltip" [tpPlacement]="'left'">
+<app-tooltip-skill-preview
+  #preview
+  [display]="s"
+  [displayCombatant]="usingCombatant()"
+/>
+
+<div
+  class="flex items-center gap-2"
+  [tp]="preview.template()"
+  [tpPlacement]="'left'"
+>
   <div class="zoom-row shrink-0">
     <app-slot-rarity-outline
       [entry]="s"
@@ -9,11 +19,3 @@
   </div>
   <span class="text-xs truncate text-{{ s.rarity }}">{{ s.name }}</span>
 </div>
-
-<ng-template #skillTooltip>
-  <div class="p-2 max-w-xs">
-    <div class="font-bold mb-1 text-{{ s.rarity }}">{{ s.name }}</div>
-    <div class="text-sm">{{ description() }}</div>
-    <app-row-skill-stat-scaling class="block mt-2" [skill]="s" />
-  </div>
-</ng-template>

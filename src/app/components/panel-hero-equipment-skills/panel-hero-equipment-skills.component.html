@@ -3,11 +3,16 @@
 </div>
 
 @for (skill of heroSkills(); track skill.id) {
-  @let usable = isSkillUsable(skill);
+  <app-tooltip-skill-preview
+    #preview
+    [display]="skill"
+    [displayCombatant]="heroCombatant()"
+    [displayCharacterWeaponTypes]="equippedWeaponTypes()"
+  />
 
   <div
     class="hero-skill-row hover:bg-base-300"
-    [tp]="skillTooltip"
+    [tp]="preview.template()"
     [tpPlacement]="'left'"
   >
     <app-slot-rarity-outline
@@ -26,23 +31,6 @@
       </span>
     </div>
   </div>
-
-  <ng-template #skillTooltip>
-    <div class="p-3 max-w-xs">
-      <div class="font-bold text-base mb-1 text-{{ skill.rarity }}">
-        {{ skill.name }}
-      </div>
-      <div class="text-sm">{{ skillDescription(skill) }}</div>
-      <app-row-skill-stat-scaling class="block mt-2" [skill]="skill" />
-
-      @if (skill.requiredWeaponTypes.length > 0) {
-        <div class="text-xs mt-2" [class.text-error]="!usable">
-          Skill only usable with
-          {{ skill.requiredWeaponTypes.join(', ') }}
-        </div>
-      }
-    </div>
-  </ng-template>
 } @empty {
   <div class="italic text-sm p-4">No skills learned yet.</div>
 }

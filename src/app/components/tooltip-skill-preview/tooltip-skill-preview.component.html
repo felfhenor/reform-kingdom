@@ -1,0 +1,26 @@
+<ng-template #tooltipContent>
+  @let skillData = display();
+
+  <div class="flex flex-row gap-4 p-2">
+    <div class="tooltip-skill-preview-image">
+      <app-icon-item-preview [sprite]="skillData.sprite" spritesheet="skill" />
+    </div>
+
+    <div>
+      <div class="font-bold mb-1 text-{{ skillData.rarity }}">
+        {{ skillData.name }}
+      </div>
+
+      <div class="text-sm">{{ skillDescription() }}</div>
+
+      <app-row-skill-stat-scaling class="block mt-2" [skill]="skillData" />
+
+      @if (skillData.requiredWeaponTypes.length > 0) {
+        <div class="text-xs mt-2 italic" [class.text-error]="!skillUsable()">
+          Skill only usable with
+          {{ skillData.requiredWeaponTypes.join(', ') }}
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>
