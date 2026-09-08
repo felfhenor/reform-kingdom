@@ -1,4 +1,4 @@
-import { DecimalPipe, formatNumber } from '@angular/common';
+import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -51,7 +51,6 @@ type AstralProjectorRowViewModel = {
   imports: [
     ButtonKingdomBackComponent,
     CardPageComponent,
-    DecimalPipe,
     IconUnknownComponent,
     SlotIconBlankComponent,
     SweetAlert2Module,
