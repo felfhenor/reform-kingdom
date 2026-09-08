@@ -67,7 +67,7 @@
 
   requirements:
     - itemId: Malachite
-      quantity: 50
+      quantity: 25
 
     - itemId: Gold Coin
       quantity: 250
