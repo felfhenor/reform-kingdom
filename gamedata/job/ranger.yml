@@ -33,6 +33,10 @@
       multiplier: 1.25
     - stat: Resistance
       multiplier: 1.25
+    - stat: Health
+      multiplier: 0.5
+    - stat: Energy
+      multiplier: 0.25
 
   equippableTypes:
     - Cloth Armor
