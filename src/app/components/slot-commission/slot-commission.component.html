@@ -60,14 +60,11 @@
         @for (reward of r.rewards; track $index) {
           <div class="relative shrink-0">
             <div class="zoom-row">
-              <app-slot-completion-reward [reward]="reward" />
+              <app-slot-completion-reward
+                [reward]="reward"
+                [rewardText]="rewardQuantityLabel(reward)"
+              />
             </div>
-
-            <span
-              class="absolute bottom-0 right-0 text-[10px] leading-tight px-0.5 rounded-sm bg-black/70"
-            >
-              {{ rewardQuantityLabel(reward) }}
-            </span>
           </div>
         }
       </div>

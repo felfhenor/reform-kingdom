@@ -5,6 +5,12 @@
       [spritesheet]="spritesheet()"
     >
       <span text-banner-top>{{ reward().chance }}%</span>
+
+      @if (rewardText(); as rewText) {
+        <span badge-br>
+          {{ rewText }}
+        </span>
+      }
     </app-slot-rarity-outline>
   </div>
 

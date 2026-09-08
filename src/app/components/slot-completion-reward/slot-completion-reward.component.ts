@@ -51,6 +51,7 @@ type RewardContent = {
 })
 export class SlotCompletionRewardComponent {
   public reward = input.required<DroppedReward>();
+  public rewardText = input<string>();
 
   // A recipe has no sprite/rarity of its own - it borrows whatever it
   // crafts, so its spritesheet/content resolve through the recipe's result.
