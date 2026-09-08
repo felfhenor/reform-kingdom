@@ -8,7 +8,7 @@
       quantity: 1
 
     - itemId: Weak Spider Silk
-      quantity: 3
+      quantity: 2
 
   tradeskillId: Tailoring
   minTradeskillLevel: 5
