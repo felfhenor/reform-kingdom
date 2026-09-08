@@ -4,9 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntry } from '@helpers/content/content';
@@ -19,8 +17,6 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-gather-material',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
-    SlotIconBlankComponent,
     IconUnknownComponent,
     TooltipItemPreviewComponent,
     TippyDirective,
