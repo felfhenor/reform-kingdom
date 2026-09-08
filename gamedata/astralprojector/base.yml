@@ -21,6 +21,26 @@
     - itemId: Small Goblin Bone
       quantity: 5
 
+- id: 7ac0114e-797b-498e-a5b7-003b9564ce0a
+  name: 'Power: Strength of the Duchy II'
+  globalEffectId: Strength of the Duchy II
+  rarity: Uncommon
+
+  duration: 2700
+
+  requiredCollectibles:
+    - collectibleId: Desertcrab Claw
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 3000
+
+    - itemId: Preserved Bloodmoth
+      quantity: 3
+
+    - itemId: Brightwisp Core
+      quantity: 3
+
 - id: f68c3e0a-9127-4ba6-b51b-a9a173f7c24c
   name: 'Power: Magic of the Cimmerians I'
   globalEffectId: Magic of the Cimmerians I
@@ -43,6 +63,23 @@
 
     - itemId: Red Slime Crystal
       quantity: 1
+
+- id: 488d5606-9487-4727-a7bb-85c96703424e
+  name: 'Power: Magic of the Cimmerians II'
+  globalEffectId: Magic of the Cimmerians II
+  rarity: Uncommon
+
+  duration: 2700
+
+  requiredCollectibles:
+    - collectibleId: Mystical Mirror
+
+  requiredMaterials:
+    - itemId: Gold Coin
+      quantity: 3000
+
+    - itemId: Cimmerian Dust
+      quantity: 5
 
 - id: e0970e6e-10eb-47cc-9446-4b10cf737cf7
   name: 'Enhance: Luck of the Elvish I'

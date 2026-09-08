@@ -11,6 +11,19 @@
       stat: Vitality
       value: 5
 
+- id: 3ce69c39-7d04-42f3-8ca2-e0842ffebad9
+  name: Strength of the Duchy II
+  sprite: '0004'
+  description: +10 STR/VIT for all heroes.
+
+  effects:
+    - effectType: GainStats
+      stat: Strength
+      value: 10
+    - effectType: GainStats
+      stat: Vitality
+      value: 10
+
 - id: c29d0b5f-8fba-42a4-8fb8-0645aa0ce9e5
   name: Magic of the Cimmerians I
   sprite: '0005'
@@ -23,6 +36,19 @@
     - effectType: GainStats
       stat: Resistance
       value: 5
+
+- id: c1090324-b2cd-4134-a5ce-8a04acc8192a
+  name: Magic of the Cimmerians II
+  sprite: '0005'
+  description: +10 INT/RES for all heroes.
+
+  effects:
+    - effectType: GainStats
+      stat: Intelligence
+      value: 10
+    - effectType: GainStats
+      stat: Resistance
+      value: 10
 
 - id: 5c0e119f-04d8-4daa-8d91-20e91a8e0ae2
   name: Luck of the Elvish I
