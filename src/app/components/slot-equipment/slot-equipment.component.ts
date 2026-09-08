@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
-import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
@@ -23,6 +23,7 @@ import {
 } from '@helpers/item/equipment-display';
 import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import {
   EquipmentTypeToSlot,
   type EquipmentContent,
@@ -39,8 +40,8 @@ import { TippyDirective } from '@ngneat/helipopper';
     AtlasImageComponent,
     SlotIconBlankComponent,
     RowInfusedMaterialsComponent,
-    RowStatSummaryComponent,
     TippyDirective,
+    TooltipItemPreviewComponent,
   ],
   templateUrl: './slot-equipment.component.html',
   styleUrl: './slot-equipment.component.scss',
@@ -83,6 +84,18 @@ export class SlotEquipmentComponent {
   public infusionSlotCount = computed(() => {
     const item = this.equippedItem();
     return item ? equipmentItemSlotCount(item) : 0;
+  });
+
+  public display = computed(() => {
+    const content = this.equippedContent();
+    if (content) {
+      return {
+        ...itemPreviewDisplay(content, 'equipment'),
+        name: this.displayName(),
+      };
+    }
+
+    return undefined;
   });
 
   // The paperdoll slots this piece of gear occupies (e.g. a two-handed

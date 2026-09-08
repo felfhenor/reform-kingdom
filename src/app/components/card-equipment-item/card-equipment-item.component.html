@@ -41,6 +41,7 @@
     <div class="font-bold text-base mb-1 text-{{ content.rarity }}">
       {{ displayName() }}
     </div>
+
     <div class="text-sm mb-2">Lv. {{ content.levelRequirement }}</div>
 
     @for (skill of grantedSkills(); track skill.id) {
