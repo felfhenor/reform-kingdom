@@ -29,17 +29,19 @@
                 <app-slot-rarity-outline
                   [entry]="req.content"
                   [spritesheet]="req.spritesheet"
-                ></app-slot-rarity-outline>
+                >
+                  @if (req.owned >= req.quantity) {
+                    <span badge-br>
+                      {{ req.quantity }}
+                    </span>
+                  } @else {
+                    <span badge-br-unmet>
+                      {{ req.quantity }}
+                    </span>
+                  }
+                </app-slot-rarity-outline>
               }
             </div>
-
-            <span
-              class="absolute bottom-0 right-0 text-[10px] leading-tight px-0.5 rounded-sm {{
-                req.owned < req.quantity ? 'bg-error text-white' : 'bg-black/70'
-              }}"
-            >
-              {{ req.quantity }}
-            </span>
           </div>
         }
       </div>

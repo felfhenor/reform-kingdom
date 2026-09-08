@@ -15,7 +15,7 @@ import type { ItemId } from '@interfaces';
     />
   `,
   host: {
-    class: 'inline-flex items-center',
+    class: 'inline-flex items-center tabular-nums',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

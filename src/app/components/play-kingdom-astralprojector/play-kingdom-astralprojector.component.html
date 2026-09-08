@@ -41,23 +41,23 @@
                     <app-slot-rarity-outline
                       [entry]="material.content"
                       spritesheet="item"
-                    ></app-slot-rarity-outline>
+                    >
+                      @if (material.owned >= material.quantity) {
+                        <span badge-br>
+                          {{ material.quantity }}
+                        </span>
+                      } @else {
+                        <span badge-br-unmet>
+                          {{ material.quantity }}
+                        </span>
+                      }
+                    </app-slot-rarity-outline>
                   } @else {
                     <app-slot-icon-blank>
                       <app-icon-unknown />
                     </app-slot-icon-blank>
                   }
                 </div>
-
-                <span
-                  class="absolute bottom-0 right-0 text-[10px] leading-tight px-0.5 rounded-sm {{
-                    material.owned < material.quantity
-                      ? 'bg-error text-white'
-                      : 'bg-black/70'
-                  }}"
-                >
-                  {{ material.quantity | number }}
-                </span>
               </div>
             }
           </div>
