@@ -1,16 +1,11 @@
 @if (isDiscovered() && item(); as material) {
   <app-tooltip-item-preview #preview [display]="display()" />
 
-  <div
-    class="outline-2 outline-offset-[-2px] rounded outline-{{
-      material.rarity
-    }}"
-    [tp]="preview.template()"
-    [tpPlacement]="'top'"
-  >
-    <app-slot-icon-blank>
-      <app-atlas-image spritesheet="item" [assetName]="material.sprite" />
-    </app-slot-icon-blank>
+  <div [tp]="preview.template()" [tpPlacement]="'top'">
+    <app-slot-rarity-outline
+      spritesheet="item"
+      [entry]="material"
+    ></app-slot-rarity-outline>
   </div>
 } @else {
   <div [tp]="'A material yet to be discovered.'" [tpPlacement]="'top'">

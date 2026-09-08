@@ -1,6 +1,7 @@
 - id: 429cf0d1-e9a0-4d0d-824f-24055c48948f
   name: 'Power: Strength of the Duchy I'
   globalEffectId: Strength of the Duchy I
+  rarity: Common
 
   duration: 1800
 
@@ -21,8 +22,9 @@
       quantity: 5
 
 - id: f68c3e0a-9127-4ba6-b51b-a9a173f7c24c
-  name: 'Power: Magic of the Ceruleans I'
-  globalEffectId: Magic of the Ceruleans I
+  name: 'Power: Magic of the Cimmerians I'
+  globalEffectId: Magic of the Cimmerians I
+  rarity: Common
 
   duration: 1800
 
@@ -45,6 +47,7 @@
 - id: e0970e6e-10eb-47cc-9446-4b10cf737cf7
   name: 'Enhance: Luck of the Elvish I'
   globalEffectId: Luck of the Elvish I
+  rarity: Common
 
   duration: 1800
 
@@ -64,6 +67,7 @@
 - id: ce0c9c0e-642a-4637-9b70-6710c175ca51
   name: 'Enhance: Invigoration of the Zelks I'
   globalEffectId: Invigoration of the Zelks I
+  rarity: Common
 
   duration: 1800
 
@@ -83,6 +87,7 @@
 - id: c1c7b718-23e3-4b60-bdc9-52fb242b9ca7
   name: 'Boost: Wisdom of the Founder I'
   globalEffectId: Wisdom of the Founder I
+  rarity: Common
 
   duration: 1800
 
@@ -96,6 +101,7 @@
 - id: 7c3d5a1b-9e4f-4b2a-8c6d-0f1e3a7b5d92
   name: 'Ward: Fortitude of the Warden I'
   globalEffectId: Fortitude of the Warden I
+  rarity: Common
 
   duration: 1800
 

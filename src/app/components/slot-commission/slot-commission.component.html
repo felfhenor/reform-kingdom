@@ -25,14 +25,12 @@
             [tpPlacement]="'top'"
           >
             <div class="zoom-row">
-              <app-slot-icon-blank>
-                @if (req.content) {
-                  <app-atlas-image
-                    [spritesheet]="req.spritesheet"
-                    [assetName]="req.content.sprite"
-                  />
-                }
-              </app-slot-icon-blank>
+              @if (req.content) {
+                <app-slot-rarity-outline
+                  [entry]="req.content"
+                  [spritesheet]="req.spritesheet"
+                ></app-slot-rarity-outline>
+              }
             </div>
 
             <span

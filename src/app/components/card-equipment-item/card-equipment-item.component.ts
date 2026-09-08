@@ -10,6 +10,7 @@ import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { defaultStats } from '@helpers/defaults';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
@@ -36,6 +37,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
   imports: [
     AtlasImageComponent,
     SlotIconBlankComponent,
+    SlotRarityOutlineComponent,
     IconStatComponent,
     RowInfusedMaterialsComponent,
     RowStatSummaryComponent,

@@ -10,8 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { notifySuccess } from '@helpers/engine/notify';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
@@ -37,11 +36,10 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   imports: [
     CurrencyCostComponent,
     DecimalPipe,
-    IconItemPreviewComponent,
-    SlotIconBlankComponent,
     SweetAlert2Module,
     TippyDirective,
     TooltipItemPreviewComponent,
+    SlotRarityOutlineComponent,
   ],
   host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-shop.component.html',

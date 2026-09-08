@@ -1,0 +1,43 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+.equipment-slot {
+  @apply relative flex items-center justify-center cursor-pointer overflow-hidden;
+}
+
+.equipment-slot-selected {
+  @apply outline-4;
+}
+
+.equipment-slot-label {
+  @apply absolute inset-0 flex items-center justify-center text-center text-[10px] leading-tight px-1 pointer-events-none;
+}
+
+.equipment-slot-image {
+  @apply relative z-10;
+}
+
+// Secondary slot of a multi-slot item, shown faded so it reads as "same item" not a second distinct piece.
+.equipment-slot-image-secondary {
+  @apply opacity-50;
+}
+
+.equipment-slot-tooltip-image {
+  @apply shrink-0;
+}
+
+// Shrinks the shared 64px icon-blank-slot box via scale.
+.equipment-slot-granted-skill-icon {
+  @apply relative overflow-hidden shrink-0 inline-block align-middle;
+  width: 16px;
+  height: 16px;
+
+  app-icon-blank-slot {
+    display: block;
+    transform: scale(0.25);
+    transform-origin: top left;
+  }
+}

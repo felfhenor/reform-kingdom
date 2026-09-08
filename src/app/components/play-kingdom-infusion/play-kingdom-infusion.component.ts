@@ -13,6 +13,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
@@ -68,6 +69,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ButtonKingdomBackComponent,
     SweetAlert2Module,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './play-kingdom-infusion.component.html',
   styleUrl: './play-kingdom-infusion.component.scss',

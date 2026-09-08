@@ -50,23 +50,18 @@
         @let row = craftQueueRows()[$index];
         @if (row && row.resultDisplay; as item) {
           <div
-            class="relative w-16 h-16 shrink-0 outline-2 outline-offset-[-2px] rounded outline-{{
-              item.rarity
-            }}"
+            class="relative w-16 h-16 shrink-0"
             [tp]="row.tradeskillName + ': ' + item.name"
             [tpPlacement]="'top'"
           >
-            <app-slot-icon-blank>
-              <app-icon-item-preview
-                [sprite]="item.sprite"
-                [spritesheet]="item.spritesheet"
-                [backdropSprite]="item.backdropSprite"
-              />
-
+            <app-slot-rarity-outline
+              [entry]="item"
+              [spritesheet]="item.spritesheet"
+            >
               <span text-banner-top>
                 {{ row.remaining }}
               </span>
-            </app-slot-icon-blank>
+            </app-slot-rarity-outline>
           </div>
         } @else {
           <div

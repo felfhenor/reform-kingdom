@@ -8,11 +8,11 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
@@ -30,6 +30,8 @@ import type {
   AstralProjectorId,
   AstralProjectorMaterialEntry,
   GlobalEffectContent,
+  HasRarity,
+  HasSprite,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -37,7 +39,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 type AstralProjectorRowViewModel = {
   content: AstralProjectorContent;
-  effect: GlobalEffectContent | undefined;
+  effect: Partial<GlobalEffectContent> & HasSprite & HasRarity;
   materialEntries: AstralProjectorMaterialEntry[];
   castable: boolean;
   durationLabel: string;
@@ -47,7 +49,6 @@ type AstralProjectorRowViewModel = {
   selector: 'app-play-kingdom-astralprojector',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,
     DecimalPipe,
@@ -55,6 +56,7 @@ type AstralProjectorRowViewModel = {
     SlotIconBlankComponent,
     SweetAlert2Module,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './play-kingdom-astralprojector.component.html',
 })
@@ -64,7 +66,11 @@ export class PlayKingdomAstralProjectorComponent {
   public rows = computed<AstralProjectorRowViewModel[]>(() =>
     unlockedAstralProjectorEntries().map((content) => ({
       content,
-      effect: getEntry<GlobalEffectContent>(content.globalEffectId),
+      effect: {
+        rarity: content.rarity,
+        sprite: '',
+        ...(getEntry<GlobalEffectContent>(content.globalEffectId) ?? {}),
+      },
       materialEntries: astralProjectorMaterialEntries(content),
       castable: isAstralProjectorCastable(content),
       durationLabel: formatDuration(content.duration),

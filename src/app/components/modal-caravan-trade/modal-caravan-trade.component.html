@@ -6,7 +6,7 @@
 >
   <span title>{{ trader()?.name ?? 'Trader' }}</span>
 
-  <div body class="flex flex-col gap-4">
+  <div body class="flex flex-col gap-2">
     @if (trader(); as traderContent) {
       <p class="text-sm text-lighter italic">{{ traderContent.description }}</p>
     }

@@ -33,9 +33,7 @@
 </app-tooltip-item-preview>
 
 <div
-  class="armory-item-slot outline-2 outline-offset-[-2px] rounded outline-{{
-    item.rarity
-  }}"
+  class="armory-item-slot"
   [class.armory-item-slot-sellable]="sellMode()"
   [class.armory-item-slot-dimmed]="sellMode() && !selected()"
   [class.armory-item-slot-selected]="sellMode() && selected()"
@@ -43,7 +41,8 @@
   [tpPlacement]="'top'"
   (click)="onClick($event)"
 >
-  <app-slot-icon-blank>
-    <app-atlas-image spritesheet="equipment" [assetName]="item.sprite" />
-  </app-slot-icon-blank>
+  <app-slot-rarity-outline
+    [entry]="item"
+    spritesheet="equipment"
+  ></app-slot-rarity-outline>
 </div>

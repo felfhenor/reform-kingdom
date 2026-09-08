@@ -7,7 +7,7 @@
 // Fixed height so the CDK virtual-scroll viewport (which assumes uniform
 // row sizes for its offset math) can lay these out correctly.
 .equipment-item-row {
-  @apply flex items-center gap-3 w-full h-[96px] px-2 text-left cursor-pointer rounded overflow-hidden;
+  @apply flex items-center gap-2 w-full h-[96px] px-2 text-left cursor-pointer rounded overflow-hidden;
 }
 
 .equipment-item-row-disabled {

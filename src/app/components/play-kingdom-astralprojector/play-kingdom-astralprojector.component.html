@@ -6,14 +6,14 @@
   <div class="flex flex-col gap-2 p-4 h-full overflow-y-auto">
     @for (row of rows(); track row.content.id) {
       <div
-        class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-24 lg:min-h-0"
+        class="flex items-center gap-2 pr-2 rounded bg-base-200 min-h-24 lg:min-h-0"
       >
         <div class="w-16 h-16 relative flex-shrink-0">
           @if (row.effect) {
-            <app-atlas-image
+            <app-slot-rarity-outline
+              [entry]="row.effect"
               spritesheet="globaleffect"
-              [assetName]="row.effect.sprite"
-            />
+            ></app-slot-rarity-outline>
           }
         </div>
 
@@ -21,9 +21,11 @@
           class="flex-1 flex flex-col lg:flex-row lg:items-center gap-2 min-w-0"
         >
           <div class="flex flex-col gap-2 min-w-0 lg:w-128 lg:shrink-0">
-            <span class="font-semibold truncate">{{ row.content.name }}</span>
+            <span class="font-semibold truncate text-{{ row.effect.rarity }}">
+              {{ row.content.name }}
+            </span>
             <span class="text-xs text-lighter truncate">
-              {{ row.effect?.description }}
+              {{ row.effect.description }}
             </span>
           </div>
 
@@ -35,16 +37,16 @@
                 [tpPlacement]="'top'"
               >
                 <div class="zoom-row">
-                  <app-slot-icon-blank>
-                    @if (material.discovered && material.content) {
-                      <app-atlas-image
-                        spritesheet="item"
-                        [assetName]="material.content.sprite"
-                      />
-                    } @else {
+                  @if (material.discovered && material.content) {
+                    <app-slot-rarity-outline
+                      [entry]="material.content"
+                      spritesheet="item"
+                    ></app-slot-rarity-outline>
+                  } @else {
+                    <app-slot-icon-blank>
                       <app-icon-unknown />
-                    }
-                  </app-slot-icon-blank>
+                    </app-slot-icon-blank>
+                  }
                 </div>
 
                 <span

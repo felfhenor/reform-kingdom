@@ -1,0 +1,21 @@
+<app-slot-icon-blank>
+  <app-icon-item-preview
+    [spritesheet]="spritesheet()"
+    [sprite]="entry().sprite"
+    [backdropSprite]="backdropSprite()"
+  />
+
+  <ng-content></ng-content>
+
+  <span text-br>
+    <ng-content select="[text-br]"></ng-content>
+  </span>
+
+  <span text-banner-top>
+    <ng-content select="[text-banner-top]"></ng-content>
+  </span>
+
+  <span text-banner-bottom>
+    <ng-content select="[text-banner-bottom]"></ng-content>
+  </span>
+</app-slot-icon-blank>

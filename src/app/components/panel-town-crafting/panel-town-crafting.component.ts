@@ -9,8 +9,8 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconComponent } from '@components/icon/icon.component';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import {
   townCraftQueueRows,
   townTradeskillLevelRows,
@@ -30,9 +30,9 @@ import { TippyDirective } from '@ngneat/helipopper';
     AtlasImageComponent,
     DecimalPipe,
     IconComponent,
-    IconItemPreviewComponent,
     SlotIconBlankComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   host: { class: 'flex flex-col gap-4' },
   templateUrl: './panel-town-crafting.component.html',

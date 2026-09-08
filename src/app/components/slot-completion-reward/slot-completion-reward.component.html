@@ -1,16 +1,9 @@
 @if (isDiscovered() && content(); as reward) {
-  <div
-    class="outline-2 outline-offset-[-2px] rounded outline-{{ reward.rarity }}"
-    [tp]="tooltip"
-    [tpPlacement]="'top'"
-  >
-    <app-slot-icon-blank>
-      <app-icon-item-preview
-        [sprite]="reward.sprite"
-        [spritesheet]="spritesheet()"
-        [backdropSprite]="backdropSprite()"
-      />
-    </app-slot-icon-blank>
+  <div [tp]="tooltip" [tpPlacement]="'top'">
+    <app-slot-rarity-outline
+      [entry]="reward"
+      [spritesheet]="spritesheet()"
+    ></app-slot-rarity-outline>
   </div>
 
   <ng-template #tooltip>

@@ -6,9 +6,8 @@ import {
   input,
   output,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { commissionRarity } from '@helpers/commission/commission-requirement.ui';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
@@ -24,11 +23,10 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-commission',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
     DecimalPipe,
     SlotCompletionRewardComponent,
-    SlotIconBlankComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-commission.component.html',
 })

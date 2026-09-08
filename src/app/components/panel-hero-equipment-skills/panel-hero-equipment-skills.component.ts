@@ -4,9 +4,8 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowSkillStatScalingComponent } from '@components/row-skill-stat-scaling/row-skill-stat-scaling.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { heroSkillsWithEquipment } from '@helpers/hero/job';
@@ -26,10 +25,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-hero-equipment-skills',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
     RowSkillStatScalingComponent,
-    SlotIconBlankComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   host: {
     class: 'flex flex-col gap-2 overflow-y-auto',

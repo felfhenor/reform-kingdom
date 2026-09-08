@@ -30,7 +30,7 @@
       @for (hero of heroes; track hero.id) {
         <button
           type="button"
-          class="btn btn-lg btn-neutral btn-outline h-auto justify-start gap-3 py-0 ps-0 text-neutral-content"
+          class="btn btn-lg btn-neutral btn-outline h-auto justify-start gap-2 py-0 ps-0 text-neutral-content text-sm"
           [class.btn-active]="character?.id === hero.id"
           (click)="selectCharacter(hero.id)"
         >
@@ -59,12 +59,11 @@
                 [class.btn-active]="item?.id === equippedItem.id"
                 (click)="selectItem(equippedItem.id)"
               >
-                <app-slot-icon-blank>
-                  <app-atlas-image
-                    spritesheet="equipment"
-                    [assetName]="equippedContent.sprite"
-                  />
-                </app-slot-icon-blank>
+                <app-slot-rarity-outline
+                  [entry]="equippedContent"
+                  spritesheet="equipment"
+                ></app-slot-rarity-outline>
+
                 <span class="text-sm text-{{ equippedContent.rarity }}">
                   {{ displayNameFor(equippedItem, equippedContent) }}
                 </span>
@@ -86,12 +85,10 @@
         </div>
 
         <div class="flex flex-row items-start gap-4">
-          <app-slot-icon-blank>
-            <app-atlas-image
-              spritesheet="equipment"
-              [assetName]="content.sprite"
-            />
-          </app-slot-icon-blank>
+          <app-slot-rarity-outline
+            [entry]="content"
+            spritesheet="equipment"
+          ></app-slot-rarity-outline>
 
           <div class="flex-1">
             <div class="shrink-0">
@@ -141,12 +138,10 @@
                       (click)="requestInfuse(entry.item.id)"
                     >
                       <div class="flex items-center gap-2">
-                        <app-slot-icon-blank>
-                          <app-atlas-image
-                            spritesheet="item"
-                            [assetName]="entry.item.sprite"
-                          />
-                        </app-slot-icon-blank>
+                        <app-slot-rarity-outline
+                          [entry]="entry.item"
+                          spritesheet="item"
+                        ></app-slot-rarity-outline>
                       </div>
 
                       <div class="pl-4 flex flex-col gap-2">

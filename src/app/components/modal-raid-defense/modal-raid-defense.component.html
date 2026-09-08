@@ -48,9 +48,7 @@
               <div class="flex flex-wrap gap-2">
                 @for (combatant of row.assaulters; track combatant.monster.id) {
                   <div
-                    class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
-                      combatant.monster.rarity
-                    }}"
+                    class="raid-combatant-slot"
                     [tp]="combatant.monster.name"
                     [tpPlacement]="'top'"
                   >
@@ -74,9 +72,7 @@
               <div class="flex flex-wrap gap-2">
                 @for (combatant of row.defenders; track combatant.monster.id) {
                   <div
-                    class="raid-combatant-slot outline-2 outline-offset-[-2px] rounded outline-{{
-                      combatant.monster.rarity
-                    }}"
+                    class="raid-combatant-slot"
                     [tp]="combatant.monster.name"
                     [tpPlacement]="'top'"
                   >

@@ -1,6 +1,7 @@
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { GlobalEffectId } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
+import type { HasRarity } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 
 export type AstralProjectorId = Branded<string, 'AstralProjectorId'>;
@@ -14,13 +15,14 @@ export type AstralProjectorRequirementMaterial = {
   quantity: number;
 };
 
-export type AstralProjectorContent = IsContentItem & {
-  id: AstralProjectorId;
-  __type: 'astralprojector';
+export type AstralProjectorContent = IsContentItem &
+  HasRarity & {
+    id: AstralProjectorId;
+    __type: 'astralprojector';
 
-  globalEffectId: GlobalEffectId;
-  duration: number;
+    globalEffectId: GlobalEffectId;
+    duration: number;
 
-  requiredCollectibles: AstralProjectorRequirementCollectible[];
-  requiredMaterials: AstralProjectorRequirementMaterial[];
-};
+    requiredCollectibles: AstralProjectorRequirementCollectible[];
+    requiredMaterials: AstralProjectorRequirementMaterial[];
+  };

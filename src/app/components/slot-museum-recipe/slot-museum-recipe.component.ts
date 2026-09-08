@@ -8,7 +8,7 @@ import {
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import {
   recipeBackdropSprite,
   recipeCanUnlockWithTokens,
@@ -30,9 +30,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   imports: [
     IconItemPreviewComponent,
     CurrencyCostComponent,
-    SlotIconBlankComponent,
     IconUnknownComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-museum-recipe.component.html',
   styleUrl: './slot-museum-recipe.component.scss',

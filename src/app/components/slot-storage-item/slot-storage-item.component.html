@@ -6,18 +6,10 @@
   </div>
 </app-tooltip-item-preview>
 
-<div
-  class="storage-item-slot outline-2 outline-offset-[-2px] rounded outline-{{
-    item.rarity
-  }}"
-  [tp]="preview.template()"
-  [tpPlacement]="'top'"
->
-  <app-slot-icon-blank>
-    <app-atlas-image spritesheet="item" [assetName]="item.sprite" />
-
+<div class="storage-item-slot" [tp]="preview.template()" [tpPlacement]="'top'">
+  <app-slot-rarity-outline [entry]="item" spritesheet="item">
     <span text-br>{{ displayQuantity() }}</span>
-  </app-slot-icon-blank>
+  </app-slot-rarity-outline>
 
   @if (isInfusable()) {
     <app-badge-infusable />

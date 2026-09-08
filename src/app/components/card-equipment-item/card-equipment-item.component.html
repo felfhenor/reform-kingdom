@@ -9,15 +9,11 @@
   [tpPlacement]="'right'"
   (click)="onEquipClick()"
 >
-  <span
-    class="equipment-item-row-icon outline-2 outline-offset-[-2px] rounded outline-{{
-      content.rarity
-    }}"
-  >
-    <app-slot-icon-blank>
-      <app-atlas-image spritesheet="equipment" [assetName]="content.sprite" />
-    </app-slot-icon-blank>
-  </span>
+  <app-slot-rarity-outline
+    class="equipment-item-row-icon"
+    [entry]="content"
+    spritesheet="equipment"
+  ></app-slot-rarity-outline>
 
   <span class="equipment-item-row-info">
     <span class="equipment-item-row-name text-{{ content.rarity }}">

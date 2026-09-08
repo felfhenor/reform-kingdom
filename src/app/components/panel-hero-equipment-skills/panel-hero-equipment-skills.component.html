@@ -10,15 +10,11 @@
     [tp]="skillTooltip"
     [tpPlacement]="'left'"
   >
-    <span
-      class="hero-skill-row-icon outline-2 outline-offset-[-2px] rounded outline-{{
-        skill.rarity
-      }}"
-    >
-      <app-slot-icon-blank>
-        <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />
-      </app-slot-icon-blank>
-    </span>
+    <app-slot-rarity-outline
+      class="hero-skill-row-icon"
+      [entry]="skill"
+      spritesheet="skill"
+    ></app-slot-rarity-outline>
 
     <div class="hero-skill-row-name">
       <div class=" text-{{ skill.rarity }}">

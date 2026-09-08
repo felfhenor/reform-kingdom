@@ -40,5 +40,6 @@ export function ensureAstralProjector(
       astralProjector.requiredMaterials,
       ensureAstralProjectorRequirement,
     ) as AstralProjectorRequirementMaterial[],
+    rarity: astralProjector.rarity ?? 'Common',
   };
 }

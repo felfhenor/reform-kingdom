@@ -16,19 +16,10 @@
 >
   @if (item) {
     <div class="flex flex-col items-center gap-2 shrink-0">
-      <div
-        class="outline-2 outline-offset-[-2px] rounded outline-{{
-          item.rarity
-        }}"
-      >
-        <app-slot-icon-blank>
-          <app-icon-item-preview
-            [sprite]="item.sprite"
-            [spritesheet]="item.spritesheet"
-            [backdropSprite]="item.backdropSprite"
-          />
-        </app-slot-icon-blank>
-      </div>
+      <app-slot-rarity-outline
+        [entry]="item"
+        [spritesheet]="item.spritesheet"
+      ></app-slot-rarity-outline>
     </div>
 
     <div class="flex flex-col flex-1 min-w-0 gap-2">

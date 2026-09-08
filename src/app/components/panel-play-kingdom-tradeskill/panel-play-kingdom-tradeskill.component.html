@@ -67,44 +67,34 @@
       </div>
     </div>
 
-    <div class="flex gap-2 overflow-x-auto pb-2 flex-shrink-0">
+    <div class="flex gap-2 overflow-x-auto p-2 flex-shrink-0">
       @for (_ of queueSize(); track $index) {
         @let q = queue[$index];
 
         @if (q) {
           <div
-            class="relative w-16 h-16 flex-shrink-0 outline-2 outline-offset-[-2px] rounded cursor-pointer {{
-              q.resultContent
-                ? 'outline-' + q.resultContent.rarity
-                : 'outline-gray-500'
-            }}"
+            class="cursor-pointer"
             (contextmenu)="onQueueEntryContextMenu($event, q.entry.id)"
           >
-            <app-slot-icon-blank>
-              @if (q.resultContent) {
-                <app-atlas-image
-                  [spritesheet]="q.resultSpritesheet"
-                  [assetName]="q.resultContent.sprite"
-                />
-              }
-
-              @if (q.resultContent) {
+            @if (q.resultContent) {
+              <app-slot-rarity-outline
+                [entry]="q.resultContent"
+                [spritesheet]="q.resultSpritesheet"
+              >
                 <span text-banner-top>
                   {{ q.remaining }}
                 </span>
-              }
 
-              @if (q.resultContent) {
                 <span text-banner-bottom>
                   {{ q.entry.quantityCompleted }}/{{ q.entry.quantityTotal }}
                 </span>
-              }
-            </app-slot-icon-blank>
+              </app-slot-rarity-outline>
+            } @else {
+              <app-slot-icon-blank />
+            }
           </div>
         } @else {
-          <div
-            class="relative w-16 h-16 flex-shrink-0 outline-2 outline-offset-[-2px] rounded outline-gray-500"
-          >
+          <div class="relative w-16 h-16 flex-shrink-0 rounded">
             <app-slot-icon-blank></app-slot-icon-blank>
           </div>
         }
@@ -121,6 +111,7 @@
           [class.opacity-50]="uncraftable"
         >
           <app-tooltip-item-preview #preview [display]="entry.resultDisplay" />
+
           <div
             class="w-16 h-16 relative flex-shrink-0 overflow-hidden"
             [tp]="entry.resultDisplay ? preview.template() : undefined"
@@ -148,6 +139,7 @@
               >
                 {{ entry.recipe.name }}
               </span>
+
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="badge badge-sm badge-info badge-outline">
                   Craftable: {{ entry.maxCraftable }}
@@ -179,14 +171,12 @@
                     [tpPlacement]="'top'"
                   >
                     <div class="zoom-row">
-                      <app-slot-icon-blank>
-                        @if (req.content) {
-                          <app-atlas-image
-                            [spritesheet]="req.spritesheet"
-                            [assetName]="req.content.sprite"
-                          />
-                        }
-                      </app-slot-icon-blank>
+                      @if (req.content) {
+                        <app-slot-rarity-outline
+                          [entry]="req.content"
+                          [spritesheet]="req.spritesheet"
+                        ></app-slot-rarity-outline>
+                      }
                     </div>
 
                     @if (req.kind === 'item') {

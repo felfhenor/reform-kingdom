@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowSkillStatScalingComponent } from '@components/row-skill-stat-scaling/row-skill-stat-scaling.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import type { EquipmentSkillContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -9,10 +8,10 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-row-bestiary-skill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
     RowSkillStatScalingComponent,
-    SlotIconBlankComponent,
+
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './row-bestiary-skill.component.html',
   styleUrl: './row-bestiary-skill.component.scss',

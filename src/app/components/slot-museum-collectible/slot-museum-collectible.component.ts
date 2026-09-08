@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import type { MuseumCollectibleEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -12,9 +17,9 @@ const MAX_DISPLAY_QUANTITY = 9999;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
-    SlotIconBlankComponent,
     IconUnknownComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-museum-collectible.component.html',
   styleUrl: './slot-museum-collectible.component.scss',

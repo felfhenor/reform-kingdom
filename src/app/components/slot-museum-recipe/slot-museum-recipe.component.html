@@ -3,22 +3,14 @@
 @let backdrop = backdropSprite();
 
 @if (e.discovered) {
-  <div
-    class="museum-recipe-slot outline-2 outline-offset-[-2px] rounded {{
-      result ? 'outline-' + result.rarity : 'outline-gray-500'
-    }}"
-    [tp]="tooltip"
-    [tpPlacement]="'top'"
-  >
-    <app-slot-icon-blank>
-      @if (result) {
-        <app-icon-item-preview
-          [sprite]="result.sprite"
-          [spritesheet]="resultSpritesheet()"
-          [backdropSprite]="backdrop"
-        />
-      }
-    </app-slot-icon-blank>
+  <div class="museum-recipe-slot" [tp]="tooltip" [tpPlacement]="'top'">
+    @if (result) {
+      <app-slot-rarity-outline
+        [entry]="result"
+        [spritesheet]="resultSpritesheet()"
+        [backdropSprite]="backdrop"
+      ></app-slot-rarity-outline>
+    }
   </div>
 } @else if (canUnlock()) {
   <button

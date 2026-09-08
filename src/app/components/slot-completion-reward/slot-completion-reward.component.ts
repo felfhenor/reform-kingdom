@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { getEntry } from '@helpers/content/content';
 import {
   isRecipeDiscovered,
@@ -42,9 +42,9 @@ type RewardContent = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IconItemPreviewComponent,
-    SlotIconBlankComponent,
     IconUnknownComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-completion-reward.component.html',
   styleUrl: './slot-completion-reward.component.scss',

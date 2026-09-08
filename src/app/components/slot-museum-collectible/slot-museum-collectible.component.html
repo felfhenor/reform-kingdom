@@ -2,20 +2,10 @@
 @let source = e.source;
 
 @if (e.discovered) {
-  <div
-    class="museum-collectible-slot outline-2 outline-offset-[-2px] rounded outline-{{
-      e.collectible.rarity
-    }}"
-    [tp]="tooltip"
-    [tpPlacement]="'top'"
-  >
-    <app-slot-icon-blank>
-      <app-atlas-image
-        spritesheet="collectible"
-        [assetName]="e.collectible.sprite"
-      />
+  <div class="museum-collectible-slot" [tp]="tooltip" [tpPlacement]="'top'">
+    <app-slot-rarity-outline [entry]="e.collectible" spritesheet="collectible">
       <span text-br>{{ displayQuantity() }}</span>
-    </app-slot-icon-blank>
+    </app-slot-rarity-outline>
   </div>
 } @else {
   <div [tp]="tooltip" [tpPlacement]="'top'">

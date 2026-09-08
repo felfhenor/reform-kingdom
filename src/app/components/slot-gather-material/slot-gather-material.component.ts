@@ -7,6 +7,7 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntry } from '@helpers/content/content';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
@@ -23,6 +24,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     IconUnknownComponent,
     TooltipItemPreviewComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-gather-material.component.html',
   styleUrl: './slot-gather-material.component.scss',

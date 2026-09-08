@@ -12,7 +12,7 @@
       value: 5
 
 - id: c29d0b5f-8fba-42a4-8fb8-0645aa0ce9e5
-  name: Magic of the Ceruleans I
+  name: Magic of the Cimmerians I
   sprite: '0005'
   description: +5 INT/RES for all heroes.
 
@@ -38,6 +38,7 @@
   name: Invigoration of the Zelks I
   sprite: '0007'
   description: +25 HP/EP for all heroes.
+
   effects:
     - effectType: GainStats
       stat: Health

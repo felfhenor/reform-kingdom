@@ -9,6 +9,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
@@ -38,6 +39,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     RowInfusedMaterialsComponent,
     TooltipItemPreviewComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-armory-item.component.html',
   styleUrl: './slot-armory-item.component.scss',

@@ -5,9 +5,8 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BadgeInfusableComponent } from '@components/badge-infusable/badge-infusable.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { isInfusionMaterial } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
@@ -20,12 +19,11 @@ const MAX_DISPLAY_QUANTITY = 9999;
   selector: 'app-slot-storage-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
-    SlotIconBlankComponent,
     BadgeInfusableComponent,
     TooltipItemPreviewComponent,
     TippyDirective,
     DecimalPipe,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-storage-item.component.html',
   styleUrl: './slot-storage-item.component.scss',

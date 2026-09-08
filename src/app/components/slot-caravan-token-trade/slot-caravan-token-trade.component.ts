@@ -6,8 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { caravanTokenTradeDisplay } from '@helpers/caravan/caravan-trade-display.ui';
 import { hasTraderTokens, traderTokenId } from '@helpers/item/materials';
@@ -18,11 +17,10 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-caravan-token-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IconItemPreviewComponent,
     CurrencyCostComponent,
-    SlotIconBlankComponent,
     TooltipItemPreviewComponent,
     TippyDirective,
+    SlotRarityOutlineComponent,
   ],
   templateUrl: './slot-caravan-token-trade.component.html',
   styleUrl: './slot-caravan-token-trade.component.scss',
