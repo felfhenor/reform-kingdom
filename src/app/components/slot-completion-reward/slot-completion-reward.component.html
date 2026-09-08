@@ -1,27 +1,29 @@
-@if (isDiscovered() && content(); as reward) {
+@if (isDiscovered() && content(); as contentEntry) {
   <div [tp]="tooltip" [tpPlacement]="'top'">
     <app-slot-rarity-outline
-      [entry]="reward"
+      [entry]="contentEntry"
       [spritesheet]="spritesheet()"
-    ></app-slot-rarity-outline>
+    >
+      <span text-banner-top>{{ reward().chance }}%</span>
+    </app-slot-rarity-outline>
   </div>
 
   <ng-template #tooltip>
     <div class="flex gap-2 p-2 max-w-[400px]">
       <div class="completion-reward-tooltip-icon">
         <app-icon-item-preview
-          [sprite]="reward.sprite"
+          [sprite]="contentEntry.sprite"
           [spritesheet]="spritesheet()"
           [backdropSprite]="backdropSprite()"
         />
       </div>
       <div>
-        <div class="font-bold mb-2 text-{{ reward.rarity }}">
-          {{ reward.name }}
+        <div class="font-bold mb-2 text-{{ contentEntry.rarity }}">
+          {{ contentEntry.name }}
         </div>
 
         <div class="italic text-sm">
-          {{ reward.description }}
+          {{ contentEntry.description }}
         </div>
       </div>
     </div>

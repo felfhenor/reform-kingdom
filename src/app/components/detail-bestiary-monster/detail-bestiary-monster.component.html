@@ -93,9 +93,6 @@
           @for (drop of e.drops; track $index) {
             <div class="flex items-center gap-2">
               <app-slot-completion-reward [reward]="drop.reward" />
-              <span class="text-xs min-w-[150px]">
-                {{ drop.reward.chance }}% chance
-              </span>
               <span class="text-xs">
                 Qty: {{ dropQuantityLabel(drop.reward) }}
               </span>
