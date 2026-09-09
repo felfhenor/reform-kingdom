@@ -49,9 +49,11 @@
       @for (_ of craftQueueSlots(); track $index) {
         @let row = craftQueueRows()[$index];
         @if (row && row.resultDisplay; as item) {
+          <app-tooltip-item-preview #preview [display]="item" />
+
           <div
             class="relative w-16 h-16 shrink-0"
-            [tp]="row.tradeskillName + ': ' + item.name"
+            [tp]="preview.template()"
             [tpPlacement]="'top'"
           >
             <app-slot-rarity-outline
