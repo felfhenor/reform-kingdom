@@ -20,15 +20,17 @@ import {
   bestiaryDropQuantityLabel,
   bestiaryXpLabel,
 } from '@helpers/kingdom/bestiary.ui';
-import type {
-  BestiaryEntry,
-  Combatant,
-  DroppedReward,
-  EquipmentSkillContent,
-  MonsterId,
-  StatBlock,
+import {
+  type BestiaryEntry,
+  type Combatant,
+  type EncounterContent,
+  type EquipmentSkillContent,
+  type MonsterId,
+  type StatBlock,
 } from '@interfaces';
+
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { maxBy, minBy, uniq } from 'es-toolkit/compat';
 
 type LevelOption = { value: number; label: string };
 
@@ -51,32 +53,52 @@ type LevelOption = { value: number; label: string };
 export class DetailBestiaryMonsterComponent {
   public entry = input.required<BestiaryEntry>();
 
-  // Actual min/max fought, for the "Lv. X-Y" line and picker bounds.
-  public levelMin = computed(() => this.entry().levelRange?.min ?? 1);
-  public levelMax = computed(() => this.entry().levelRange?.max ?? 1);
-
-  public levelOptions = computed<LevelOption[]>(() => {
-    const options: LevelOption[] = [];
-    for (let level = this.levelMin(); level <= this.levelMax(); level++) {
-      options.push({ value: level, label: `Lv. ${level}` });
-    }
-    return options;
-  });
-
   public selectedLevel = signal(1);
 
   private lastMonsterId?: MonsterId;
 
-  constructor() {
-    // Resets the picker only when the monster changes, not on every recompute (which fires more often, e.g. a live kill count).
-    effect(() => {
-      const entry = this.entry();
-      if (entry.monster.id === this.lastMonsterId) return;
+  public levelMin = computed(
+    () => minBy(this.levelOptions(), 'value')?.value ?? 1,
+  );
+  public levelMax = computed(
+    () => maxBy(this.levelOptions(), 'value')?.value ?? 1,
+  );
 
-      this.lastMonsterId = entry.monster.id;
-      this.selectedLevel.set(entry.levelRange?.max ?? 1);
-    });
-  }
+  public filteredSourceNodes = computed(() => {
+    return this.entry()
+      .sourceNodeNames.map((e) => getEntry<EncounterContent>(e)!)
+      .filter(Boolean);
+  });
+
+  public levelOptions = computed<LevelOption[]>(() => {
+    return uniq(
+      this.filteredSourceNodes().flatMap((node) =>
+        Array(node.levelRange.max - node.levelRange.min)
+          .fill(0)
+          .map((_, i) => i + node.levelRange.min),
+      ),
+    )
+      .sort()
+      .map((x) => ({ value: x, label: `Lv. ${x}` }));
+  });
+
+  public sourceNodesAtLevel = computed(() => {
+    return this.filteredSourceNodes()
+
+      .filter((node) => {
+        const curLevel = this.selectedLevel();
+
+        return (
+          curLevel >= node.levelRange.min && curLevel <= node.levelRange.max
+        );
+      });
+  });
+
+  public nodeNameString = computed(() =>
+    this.sourceNodesAtLevel()
+      .map((e) => e.name)
+      .join(', '),
+  );
 
   public stats = computed<StatBlock>(() =>
     monsterStatsAtLevel(this.entry().monster, this.selectedLevel()),
@@ -98,7 +120,20 @@ export class DetailBestiaryMonsterComponent {
     combatantFromMonster(this.entry().monster, this.selectedLevel(), 0),
   );
 
-  public dropQuantityLabel(reward: DroppedReward): string {
-    return bestiaryDropQuantityLabel(reward, this.selectedLevel());
+  public filteredDrops = computed(() =>
+    this.entry().drops.map((d) => ({
+      ...d,
+      label: bestiaryDropQuantityLabel(d.reward, this.selectedLevel()),
+    })),
+  );
+
+  constructor() {
+    effect(() => {
+      const entry = this.entry();
+      if (entry.monster.id === this.lastMonsterId) return;
+
+      this.lastMonsterId = entry.monster.id;
+      this.selectedLevel.set(this.levelOptions()[0].value);
+    });
   }
 }
