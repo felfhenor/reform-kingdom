@@ -1,7 +1,10 @@
 import { getEntry } from '@helpers/content/content';
-import { decreeWaitForFullHealthBeforeCombat } from '@helpers/decree/decree';
+import {
+  decreeWaitForFullEnergyBeforeCombat,
+  decreeWaitForFullHealthBeforeCombat,
+} from '@helpers/decree/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
-import { isPartyAtFullHealth } from '@helpers/hero/party';
+import { isPartyAtFullEnergy, isPartyAtFullHealth } from '@helpers/hero/party';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { gamestate } from '@helpers/state-game';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
@@ -43,6 +46,10 @@ export function autoModeStatusLabel(): string | undefined {
 
   if (decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth()) {
     return 'Healing before the next move...';
+  }
+
+  if (decreeWaitForFullEnergyBeforeCombat() && !isPartyAtFullEnergy()) {
+    return 'Energizing before the next move...';
   }
 
   return 'Idle';

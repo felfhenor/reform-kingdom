@@ -32,6 +32,7 @@ export type AutoModeState = {
   activeClauseId?: DecreeClauseId;
   // When true, fight-risking clause types wait for full health before a new trip; GatherMaterial/ReturnToKingdom are unaffected.
   waitForFullHealthBeforeCombat: boolean;
+  waitForFullEnergyBeforeCombat: boolean;
   // Per-node win/loss streak, keyed by nodeName; only LevelUpParty reads it back to steer away from losing nodes.
   nodeFailureCounts: Partial<Record<string, number>>;
 };

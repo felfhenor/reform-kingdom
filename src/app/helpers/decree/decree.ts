@@ -32,6 +32,10 @@ export function decreeWaitForFullHealthBeforeCombat(): boolean {
   return gamestate().world.autoMode.waitForFullHealthBeforeCombat;
 }
 
+export function decreeWaitForFullEnergyBeforeCombat(): boolean {
+  return gamestate().world.autoMode.waitForFullEnergyBeforeCombat;
+}
+
 export function decreeNodeFailureCount(nodeName: string): number {
   return gamestate().world.autoMode.nodeFailureCounts[nodeName] ?? 0;
 }

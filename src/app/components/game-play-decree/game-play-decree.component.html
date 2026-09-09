@@ -36,6 +36,18 @@
           <span class="label-text">Wait for Full Health Before Combat</span>
         </label>
       </div>
+
+      <div class="form-control">
+        <label class="label cursor-pointer label-checkbox">
+          <input
+            type="checkbox"
+            [checked]="waitForFullEnergyBeforeCombat()"
+            class="checkbox checkbox-secondary"
+            (click)="toggleWaitForFullEnergyBeforeCombat()"
+          />
+          <span class="label-text">Wait for Full Energy Before Combat</span>
+        </label>
+      </div>
     </div>
   </div>
 

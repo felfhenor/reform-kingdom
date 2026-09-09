@@ -2,11 +2,16 @@ import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content/content';
 import {
   decreeNodeFailureCount,
+  decreeWaitForFullEnergyBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
-import { CHARACTER_MAX_LEVEL, isPartyAtFullHealth } from '@helpers/hero/party';
+import {
+  CHARACTER_MAX_LEVEL,
+  isPartyAtFullEnergy,
+  isPartyAtFullHealth,
+} from '@helpers/hero/party';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
@@ -224,7 +229,10 @@ export function clauseTargetNode(
 
 // Only gates clause types that travel to an ExploreNode; GatherMaterial/ReturnToKingdom never risk combat.
 function blockedByHealth(): boolean {
-  return decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth();
+  return (
+    (decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth()) ||
+    (decreeWaitForFullEnergyBeforeCombat() && !isPartyAtFullEnergy())
+  );
 }
 
 export function isClauseSatisfiable(clause: DecreeClause): boolean {

@@ -19,6 +19,7 @@ import {
   decreeClauseReorder,
   decreeClauses,
   decreeClauseSetEnabled,
+  decreeWaitForFullEnergyBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree';
 import {
@@ -28,6 +29,7 @@ import {
 import {
   decreeClauseRemove,
   decreeClauseUpdate,
+  decreeSetWaitForFullEnergyBeforeCombat,
   decreeSetWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree.ui';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/engine/risk-band';
@@ -117,6 +119,9 @@ export class GamePlayDecreeComponent {
   public autoModeEnabled = computed(() => autoModeIsEnabled());
   public waitForFullHealthBeforeCombat = computed(() =>
     decreeWaitForFullHealthBeforeCombat(),
+  );
+  public waitForFullEnergyBeforeCombat = computed(() =>
+    decreeWaitForFullEnergyBeforeCombat(),
   );
   public clauses = computed(() => decreeClauses());
 
@@ -248,6 +253,12 @@ export class GamePlayDecreeComponent {
   public toggleWaitForFullHealthBeforeCombat(): void {
     decreeSetWaitForFullHealthBeforeCombat(
       !this.waitForFullHealthBeforeCombat(),
+    );
+  }
+
+  public toggleWaitForFullEnergyBeforeCombat(): void {
+    decreeSetWaitForFullEnergyBeforeCombat(
+      !this.waitForFullEnergyBeforeCombat(),
     );
   }
 

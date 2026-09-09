@@ -17,6 +17,13 @@ export function decreeSetWaitForFullHealthBeforeCombat(value: boolean): void {
   });
 }
 
+export function decreeSetWaitForFullEnergyBeforeCombat(value: boolean): void {
+  updateGamestate((state) => {
+    state.world.autoMode.waitForFullEnergyBeforeCombat = value;
+    return state;
+  });
+}
+
 // Rebuilds the clause fresh from `action` (not spread) so a dropped field can't linger from the old clause.
 export function decreeClauseUpdate(
   clauseId: DecreeClauseId,

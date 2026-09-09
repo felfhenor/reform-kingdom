@@ -119,6 +119,12 @@ export function isPartyAtFullHealth(): boolean {
   );
 }
 
+export function isPartyAtFullEnergy(): boolean {
+  return partyGet().every(
+    (character) => character.ep >= character.stats.Energy,
+  );
+}
+
 export function setParty(party: Character[]): void {
   updateGamestate((state) => {
     state.world.party = party;

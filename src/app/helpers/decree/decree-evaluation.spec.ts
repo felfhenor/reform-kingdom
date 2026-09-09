@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/decree/decree', () => ({
   decreeNodeFailureCount: vi.fn(() => 0),
   decreeWaitForFullHealthBeforeCombat: vi.fn(() => false),
+  decreeWaitForFullEnergyBeforeCombat: vi.fn(() => false),
 }));
 
 vi.mock('@helpers/decree/decree-farm-node', () => ({

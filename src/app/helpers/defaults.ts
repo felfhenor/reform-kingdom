@@ -89,6 +89,7 @@ export function defaultAutoModeState(): AutoModeState {
     enabled: false,
     clauses: [],
     waitForFullHealthBeforeCombat: false,
+    waitForFullEnergyBeforeCombat: false,
     nodeFailureCounts: {},
   };
 }
