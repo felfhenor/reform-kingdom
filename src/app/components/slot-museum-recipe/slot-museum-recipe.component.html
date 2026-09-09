@@ -43,7 +43,7 @@
     <div>
       @if (e.discovered) {
         <div class="font-bold mb-1 {{ result ? 'text-' + result.rarity : '' }}">
-          {{ e.recipe.name }}
+          {{ recipeName() }}
         </div>
       } @else {
         <div class="font-bold mb-1">???</div>

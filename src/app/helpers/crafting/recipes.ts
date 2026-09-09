@@ -17,6 +17,7 @@ import type {
   RecipeContent,
   RecipeId,
   TownContent,
+  TradeskillContent,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -189,4 +190,13 @@ const RECIPE_BACKDROP_ITEM_NAME = 'Recipe Backdrop';
 // "item" atlas) rendered behind whatever the recipe crafts.
 export function recipeBackdropSprite(): string | undefined {
   return getEntry<ItemContent>(RECIPE_BACKDROP_ITEM_NAME)?.sprite;
+}
+
+export function recipeStylizedName(recipe: RecipeContent): string {
+  const tradeskill = getEntry<TradeskillContent>(recipe.tradeskillId);
+  if (!tradeskill) return recipe.name;
+
+  const baseName = recipe.name.split(':')[1];
+
+  return `${tradeskill.name} Recipe: ${baseName}`;
 }

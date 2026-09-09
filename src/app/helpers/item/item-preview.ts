@@ -3,25 +3,26 @@ import {
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
+  recipeStylizedName,
 } from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
 import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
-import type {
-  CollectibleContent,
-  CollectibleId,
-  EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  ItemContent,
-  ItemId,
-  ItemPreviewContent,
-  ItemPreviewDisplay,
-  ItemPreviewSpritesheet,
-  JobContent,
-  RecipeContent,
-  RecipeId,
-  WorkerContent,
-  WorkerId,
+import {
+  type CollectibleContent,
+  type CollectibleId,
+  type EquipmentContent,
+  type EquipmentId,
+  type EquipmentItem,
+  type ItemContent,
+  type ItemId,
+  type ItemPreviewContent,
+  type ItemPreviewDisplay,
+  type ItemPreviewSpritesheet,
+  type JobContent,
+  type RecipeContent,
+  type RecipeId,
+  type WorkerContent,
+  type WorkerId,
 } from '@interfaces';
 
 // Hero names whose job can equip this type, shown in item tooltips.
@@ -120,7 +121,7 @@ export function resolveRewardDisplay(reward: {
     // Recipe's own name, not the crafted item's - it grants the blueprint.
     return {
       ...itemPreviewDisplay(recipeResultSpritesheet(recipe), result),
-      name: recipe.name,
+      name: recipeStylizedName(recipe),
       backdropSprite: recipeBackdropSprite(),
     };
   }

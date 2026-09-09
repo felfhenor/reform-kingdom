@@ -14,6 +14,7 @@ import {
   recipeCanUnlockWithTokens,
   recipeResultContent,
   recipeResultSpritesheet,
+  recipeStylizedName,
 } from '@helpers/crafting/recipes';
 import { traderTokenId } from '@helpers/item/materials';
 import type {
@@ -57,4 +58,6 @@ export class SlotMuseumRecipeComponent {
   public canUnlock = computed(() =>
     recipeCanUnlockWithTokens(this.entry().recipe.id),
   );
+
+  public recipeName = computed(() => recipeStylizedName(this.entry().recipe));
 }
