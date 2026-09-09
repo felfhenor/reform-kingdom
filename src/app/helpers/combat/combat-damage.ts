@@ -153,26 +153,27 @@ export function combatApplySkillToTarget(
     luckRollSucceeds(combatant.totalStats.Luck);
 
   if (baseDamage > 0) {
-    const targetDefense = targetDefenseValue(target, technique);
-
     let effectiveDamage = baseDamage;
 
     if (techniqueHasAttribute(technique, 'HealsTarget')) {
+      const reduction = combatCombatantCombatStatValue(
+        target,
+        'healingIgnorePercent',
+      );
+
+      effectiveDamage *= 1 - reduction / 100;
+
       effectiveDamage = Math.min(
         effectiveDamage,
         target.totalStats.Health - target.hp,
       );
 
-      const reduction = combatCombatantCombatStatValue(
-        target,
-        'healingIgnorePercent',
-      );
-      effectiveDamage *= 1 - reduction / 100;
-
       effectiveDamage = -Math.abs(effectiveDamage);
     }
 
     if (!techniqueHasAttribute(technique, 'BypassDefense')) {
+      const targetDefense = targetDefenseValue(target, technique);
+
       const rolledDefense = combatDamageMitigationRoll(
         targetDefense,
         target.totalStats.Luck,
