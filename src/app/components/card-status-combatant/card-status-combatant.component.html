@@ -65,11 +65,13 @@
         [class.small]="!isExpanded"
         [class.bar-hp]="bar.variant === 'hp'"
         [class.bar-xp]="bar.variant === 'xp'"
+        [class.bar-ep]="bar.variant === 'ep'"
       >
         <div class="bar-inner" [style.width.%]="bar.percent"></div>
         @if (isExpanded) {
           <span class="bar-label">
             {{ bar.current | number }} / {{ bar.max | number }}
+            {{ bar.variant | uppercase }}
           </span>
         }
       </div>

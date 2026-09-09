@@ -1,14 +1,14 @@
+import { DecimalPipe, UpperCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   inject,
   input,
 } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { CombatStatusPlaybackService } from '@services/combat-status-playback.service';
 import type { StatusCardEntry } from '@interfaces';
+import { CombatStatusPlaybackService } from '@services/combat-status-playback.service';
 
 // Random X jitter so a burst of hits doesn't stream from one spot - smaller
 // range when collapsed since the card itself is narrower.
@@ -18,7 +18,12 @@ const COLLAPSED_X_JITTER_PERCENT = 12;
 @Component({
   selector: 'app-card-status-combatant',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, AtlasAnimationComponent, AtlasImageComponent],
+  imports: [
+    DecimalPipe,
+    AtlasAnimationComponent,
+    AtlasImageComponent,
+    UpperCasePipe,
+  ],
   templateUrl: './card-status-combatant.component.html',
   styleUrl: './card-status-combatant.component.scss',
 })

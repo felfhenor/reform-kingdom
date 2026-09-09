@@ -38,6 +38,11 @@ export class StatusHeroComponent {
         live?.totalStats.Health ?? character.stats.Health,
         1,
       );
+      const ep = live?.ep ?? character.ep;
+      const maxEp = Math.max(
+        live?.totalStats.Energy ?? character.stats.Energy,
+        1,
+      );
       const maxXp = Math.max(character.xp.maximum, 1);
       const job = getEntry<JobContent>(character.jobId);
 
@@ -56,6 +61,12 @@ export class StatusHeroComponent {
             percent: clamp((hp / maxHp) * 100, 0, 100),
             current: hp,
             max: maxHp,
+          },
+          {
+            variant: 'ep',
+            percent: clamp((ep / maxEp) * 100, 0, 100),
+            current: ep,
+            max: maxEp,
           },
           {
             variant: 'xp',
