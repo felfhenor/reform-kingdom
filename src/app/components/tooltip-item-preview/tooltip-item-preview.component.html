@@ -15,11 +15,11 @@
         </div>
 
         @if (item.levelRequirement) {
-          <div class="text-xs mb-2">Lv. {{ item.levelRequirement }}</div>
+          <div class="text-xs my-1">Lv. {{ item.levelRequirement }}</div>
         }
 
         @for (skill of item.skills; track skill.id) {
-          <div class="text-xs mb-1 italic text-lighter flex items-center gap-2">
+          <div class="text-xs my-1 italic text-lighter flex items-center gap-2">
             Teaches
             <span class="zoom-inline">
               <app-slot-icon-blank [showBackground]="false">

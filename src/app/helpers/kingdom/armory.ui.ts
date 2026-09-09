@@ -1,4 +1,5 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { gainGold } from '@helpers/item/materials';
 import { equipmentSellValue, getArmoryEntries } from '@helpers/kingdom/armory';
 import { updateGamestate } from '@helpers/state-game';
@@ -13,7 +14,8 @@ export function filterArmoryEntries(
   if (text === '') return entries;
 
   return entries.filter((entry) => {
-    if (entry.content.name.toLowerCase().includes(text)) return true;
+    const itemName = equipmentItemDisplayName(entry.item, entry.content.name);
+    if (itemName.toLowerCase().includes(text)) return true;
     if (entry.content.description.toLowerCase().includes(text)) return true;
 
     return false;
