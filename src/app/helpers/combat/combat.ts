@@ -133,10 +133,6 @@ export function combatantTakeTurn(
     combatOrderPick?.skill ??
     rngChoiceWeighted(skills, (skill) => combatant.skillWeights[skill.id] ?? 1);
   if (!chosenSkill) {
-    combatMessageLog(
-      combat,
-      `**${combatantMessageToken(combatant)}** has no skills available, skipping turn.`,
-    );
     return {};
   }
 
