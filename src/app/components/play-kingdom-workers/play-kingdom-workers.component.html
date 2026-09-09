@@ -18,20 +18,20 @@
 
             <button
               type="button"
-              class="btn btn-outline btn-neutral justify-start h-auto normal-case font-normal gap-2 text-neutral-content text-start w-full"
+              class="btn btn btn-lg btn-neutral btn-outline h-auto justify-start gap-2 py-0 ps-0 text-neutral-content text-sm"
               [class.btn-active]="entry.id === selected?.id"
               (click)="selectWorker(entry.id)"
               appSfx="ui-click"
               [sfxOffset]="$index"
               [sfxTrigger]="['click', 'hover']"
             >
-              <div class="zoom-row shrink-0">
+              <app-slot-icon-blank>
                 <app-atlas-animation
                   spritesheet="worker"
                   [assetName]="entry.content.sprite"
                   [frames]="entry.content.frames"
                 />
-              </div>
+              </app-slot-icon-blank>
 
               <div class="flex flex-col gap-2 min-w-0">
                 <span class="truncate">

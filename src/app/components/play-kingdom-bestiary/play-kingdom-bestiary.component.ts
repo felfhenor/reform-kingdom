@@ -9,6 +9,7 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { DetailBestiaryMonsterComponent } from '@components/detail-bestiary-monster/detail-bestiary-monster.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   filterBestiaryEntries,
@@ -26,6 +27,7 @@ import type { MonsterId } from '@interfaces';
     IconUnknownComponent,
     ButtonKingdomBackComponent,
     SFXDirective,
+    SlotIconBlankComponent,
   ],
   templateUrl: './play-kingdom-bestiary.component.html',
   styleUrl: './play-kingdom-bestiary.component.scss',

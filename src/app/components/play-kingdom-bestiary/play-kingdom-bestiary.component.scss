@@ -15,15 +15,11 @@
 }
 
 .bestiary-list {
-  @apply flex flex-col gap-2 w-64 shrink-0 min-h-0;
+  @apply flex flex-col gap-2 w-[300px] shrink-0 min-h-0;
 }
 
 .bestiary-list-scroll {
   @apply flex-1 flex flex-col gap-2 overflow-y-auto min-h-0;
-}
-
-.bestiary-list-row {
-  @apply w-full gap-2 normal-case font-normal;
 }
 
 .bestiary-detail {

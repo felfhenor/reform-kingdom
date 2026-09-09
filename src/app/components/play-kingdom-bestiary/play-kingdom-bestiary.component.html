@@ -24,14 +24,14 @@
           @for (entry of filteredEntries(); track entry.monster.id) {
             <button
               type="button"
-              class="bestiary-list-row btn btn-outline btn-neutral justify-start h-auto py-2"
+              class="bestiary-list-row btn btn-lg btn-neutral btn-outline h-auto justify-start gap-2 py-0 ps-0 text-neutral-content text-sm"
               [class.btn-active]="entry.monster.id === selected?.monster.id"
               (click)="selectMonster(entry.monster.id)"
               appSfx="ui-click"
               [sfxOffset]="$index"
               [sfxTrigger]="['click', 'hover']"
             >
-              <div class="zoom-row shrink-0">
+              <app-slot-icon-blank>
                 @if (entry.discovered) {
                   <app-atlas-animation
                     spritesheet="monster"
@@ -41,7 +41,7 @@
                 } @else {
                   <app-icon-unknown />
                 }
-              </div>
+              </app-slot-icon-blank>
 
               @if (entry.discovered) {
                 <span class="truncate text-neutral-content">
