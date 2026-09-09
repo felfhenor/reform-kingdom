@@ -23,6 +23,7 @@ export type EquipmentSkillTargetBehavior =
 
 export type EquipmentSkillAttribute =
   | 'BypassDefense'
+  | 'NeverMisses'
   | 'DamagesTarget'
   | 'AllowPlink'
   | 'AllowLuckDodge'

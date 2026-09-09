@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Earth]
-      attributes: [BypassDefense, HealsTarget]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
       targets: 2
       targetType: Allies
       targetBehaviors:
@@ -28,7 +28,7 @@
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - elements: [Water]
-      attributes: [BypassDefense, HealsTarget]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
       targets: 2
       targetType: Allies
       targetBehaviors:
@@ -57,7 +57,7 @@
 
   techniques:
     - elements: [Earth]
-      attributes: [BypassDefense, HealsTarget]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
       targets: 2
       targetType: Allies
       targetBehaviors:
@@ -70,7 +70,7 @@
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - elements: [Water]
-      attributes: [BypassDefense, HealsTarget]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
       targets: 2
       targetType: Allies
       targetBehaviors:

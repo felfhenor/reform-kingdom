@@ -48,6 +48,7 @@ export const VALID_SKILL_TARGET_BEHAVIORS: EquipmentSkillTargetBehavior[] = [
 export const VALID_AFFIX_POSITIONS: AffixPosition[] = ['Prefix', 'Suffix'];
 export const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'BypassDefense',
+  'NeverMisses',
   'DamagesTarget',
   'AllowPlink',
   'AllowLuckDodge',

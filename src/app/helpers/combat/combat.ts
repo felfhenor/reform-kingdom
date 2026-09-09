@@ -1,6 +1,7 @@
 import {
   combatApplySkillToTarget,
   combatCombatantTakeDamage,
+  techniqueHasAttribute,
 } from '@helpers/combat/combat-damage';
 import {
   combatantIsDead,
@@ -175,10 +176,14 @@ export function combatantTakeTurn(
     targets.forEach((target) => {
       if (isCombatOver(combat)) return;
 
-      const shouldMiss = combatCombatantCombatStatSucceedsChance(
+      let shouldMiss = combatCombatantCombatStatSucceedsChance(
         combatant,
         'missChance',
       );
+
+      if (techniqueHasAttribute(tech, 'AllowLuckDodge')) {
+        shouldMiss = false;
+      }
 
       if (shouldMiss) {
         combatMessageLog(

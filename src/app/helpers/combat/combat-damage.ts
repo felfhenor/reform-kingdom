@@ -33,7 +33,7 @@ import type {
 import { MagicalStats, PhysicalStats } from '@interfaces';
 import { clamp, sum, sumBy } from 'es-toolkit/compat';
 
-function techniqueHasAttribute(
+export function techniqueHasAttribute(
   technique: EquipmentSkillContentTechnique,
   attribute: EquipmentSkillAttribute,
 ): boolean {

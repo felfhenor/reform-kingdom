@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Water]
-      attributes: [BypassDefense, HealsTarget]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
       targets: 4
       targetType: Allies
       targetBehaviors:
@@ -44,7 +44,7 @@
 
   techniques:
     - elements: [Water]
-      attributes: [BypassDefense, HealsTarget]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
       targets: 4
       targetType: Allies
       targetBehaviors:
@@ -73,7 +73,7 @@
 
   techniques:
     - elements: [Water]
-      attributes: [BypassDefense, HealsTarget]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
       targets: 4
       targetType: Allies
       targetBehaviors:

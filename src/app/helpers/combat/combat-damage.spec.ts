@@ -198,7 +198,7 @@ describe('combatApplySkillToTarget healing', () => {
         Strength: 1,
         Vitality: 0,
       },
-      attributes: ['HealsTarget', 'BypassDefense'],
+      attributes: ['HealsTarget', 'NeverMisses', 'BypassDefense'],
     });
 
     combatApplySkillToTarget(
