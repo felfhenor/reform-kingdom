@@ -24,6 +24,7 @@ export function ensureWorker(
     sprite: worker.sprite ?? 'UNKNOWN',
     frames: worker.frames ?? 4,
     baseStats,
+    rarity: worker.rarity ?? 'Common',
     statsPerLevel: ensureWorkerStats(worker.statsPerLevel),
     canUseTeleports: worker.canUseTeleports ?? true,
   };

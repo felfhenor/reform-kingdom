@@ -1,4 +1,5 @@
 import type { HasAnimation } from '@interfaces/artable';
+import type { HasRarity } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
@@ -10,6 +11,7 @@ export type WorkerStatBlock = Record<
 >;
 
 export type WorkerContent = IsContentItem &
+  HasRarity &
   HasDescription &
   HasAnimation & {
     id: WorkerId;

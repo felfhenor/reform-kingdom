@@ -20,6 +20,8 @@ import type {
   JobContent,
   RecipeContent,
   RecipeId,
+  WorkerContent,
+  WorkerId,
 } from '@interfaces';
 
 // Hero names whose job can equip this type, shown in item tooltips.
@@ -54,14 +56,19 @@ export function itemPreviewDisplay(
     );
   }
 
+  if (spritesheet === 'worker') {
+    return base as ItemPreviewDisplay;
+  }
+
   if ('baseStats' in content) {
+    const eqContent = content as EquipmentContent;
     return {
       ...base,
-      stats: content.baseStats,
-      resistances: content.debuffResistances,
-      combatStats: content.combatStats,
-      levelRequirement: content.levelRequirement,
-      equippableHeroNames: equippableHeroNames(content),
+      stats: eqContent.baseStats,
+      resistances: eqContent.debuffResistances,
+      combatStats: eqContent.combatStats,
+      levelRequirement: eqContent.levelRequirement,
+      equippableHeroNames: equippableHeroNames(eqContent),
     } as ItemPreviewDisplay;
   }
 
@@ -81,6 +88,7 @@ export function itemPreviewDisplay(
 export function resolveRewardDisplay(reward: {
   itemId?: ItemId;
   equipmentId?: EquipmentId;
+  workerId?: WorkerId;
   equipmentItem?: EquipmentItem;
   collectibleId?: CollectibleId;
   recipeId?: RecipeId;
@@ -115,6 +123,11 @@ export function resolveRewardDisplay(reward: {
       name: recipe.name,
       backdropSprite: recipeBackdropSprite(),
     };
+  }
+
+  if (reward.workerId) {
+    const worker = getEntry<WorkerContent>(reward.workerId);
+    return worker ? itemPreviewDisplay('worker', worker) : undefined;
   }
 
   return undefined;

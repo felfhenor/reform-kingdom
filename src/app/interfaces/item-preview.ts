@@ -4,15 +4,17 @@ import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
+import type { WorkerContent } from '@interfaces/content-worker';
 import type { DropRarity } from '@interfaces/droppable';
 import type { StatBlock } from '@interfaces/stat';
 
 // The three content kinds a recipe, stored material, or caravan trade can
 // resolve to.
 export type ItemPreviewContent =
-  ItemContent | EquipmentContent | CollectibleContent;
+  ItemContent | EquipmentContent | CollectibleContent | WorkerContent;
 
-export type ItemPreviewSpritesheet = 'item' | 'equipment' | 'collectible';
+export type ItemPreviewSpritesheet =
+  'item' | 'equipment' | 'collectible' | 'worker';
 
 export type ItemPreviewDisplay = {
   name: string;

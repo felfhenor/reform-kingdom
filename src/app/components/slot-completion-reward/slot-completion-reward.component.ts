@@ -4,9 +4,9 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntry } from '@helpers/content/content';
 import {
   isRecipeDiscovered,
@@ -15,6 +15,7 @@ import {
   recipeResultSpritesheet,
 } from '@helpers/crafting/recipes';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { assertNeverReward } from '@helpers/item/loot';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
@@ -41,10 +42,10 @@ type RewardContent = {
   selector: 'app-slot-completion-reward',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IconItemPreviewComponent,
     IconUnknownComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
+    TooltipItemPreviewComponent,
   ],
   templateUrl: './slot-completion-reward.component.html',
   styleUrl: './slot-completion-reward.component.scss',
@@ -114,6 +115,26 @@ export class SlotCompletionRewardComponent {
       }
       case 'Collectible':
         return getEntry<CollectibleContent>(reward.collectibleId);
+      default:
+        return assertNeverReward(reward);
+    }
+  });
+
+  public displayTooltip = computed(() => {
+    const reward = this.reward();
+    switch (reward.kind) {
+      case 'Item':
+        return resolveRewardDisplay({ itemId: reward.itemId });
+      case 'Equipment':
+        return resolveRewardDisplay({ equipmentId: reward.equipmentId });
+      case 'Worker': {
+        return resolveRewardDisplay({ workerId: reward.workerId });
+      }
+      case 'Recipe': {
+        return resolveRewardDisplay({ recipeId: reward.recipeId });
+      }
+      case 'Collectible':
+        return resolveRewardDisplay({ collectibleId: reward.collectibleId });
       default:
         return assertNeverReward(reward);
     }

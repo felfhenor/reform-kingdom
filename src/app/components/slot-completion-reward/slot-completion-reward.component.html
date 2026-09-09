@@ -1,5 +1,7 @@
 @if (isDiscovered() && content(); as contentEntry) {
-  <div [tp]="tooltip" [tpPlacement]="'top'">
+  <app-tooltip-item-preview #preview [display]="displayTooltip()" />
+
+  <div [tp]="preview.template()" [tpPlacement]="'top'">
     <app-slot-rarity-outline
       [entry]="contentEntry"
       [spritesheet]="spritesheet()"
@@ -20,27 +22,6 @@
       }
     </app-slot-rarity-outline>
   </div>
-
-  <ng-template #tooltip>
-    <div class="flex gap-2 p-2 max-w-[400px]">
-      <div class="completion-reward-tooltip-icon">
-        <app-icon-item-preview
-          [sprite]="contentEntry.sprite"
-          [spritesheet]="spritesheet()"
-          [backdropSprite]="backdropSprite()"
-        />
-      </div>
-      <div>
-        <div class="font-bold mb-2 text-{{ contentEntry.rarity }}">
-          {{ contentEntry.name }}
-        </div>
-
-        <div class="italic text-sm">
-          {{ contentEntry.description }}
-        </div>
-      </div>
-    </div>
-  </ng-template>
 } @else {
   <div [tp]="'A reward yet to be discovered.'" [tpPlacement]="'top'">
     <app-icon-unknown />
