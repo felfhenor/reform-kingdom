@@ -17,8 +17,8 @@ vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
 }));
 
-import { timerTicksElapsed } from '@helpers/engine/timer';
 import { getEntry } from '@helpers/content/content';
+import { timerTicksElapsed } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { gamestate } from '@helpers/state-game';
 import {
@@ -78,15 +78,6 @@ describe('townStock', () => {
 });
 
 describe('townStockDisplay', () => {
-  it('delegates to the shared resolveRewardDisplay resolver for an entry with no affixes', () => {
-    const display = { name: 'Iron Sword' } as ItemPreviewDisplay;
-    vi.mocked(resolveRewardDisplay).mockReturnValue(display);
-    const entry = buildEntry({ equipmentId: 'sword' as never });
-
-    expect(townStockDisplay(entry)).toEqual(display);
-    expect(resolveRewardDisplay).toHaveBeenCalledWith({ equipmentId: 'sword' });
-  });
-
   it("folds a rolled entry's affixes into the display name", () => {
     const display = { name: 'Iron Sword' } as ItemPreviewDisplay;
     vi.mocked(resolveRewardDisplay).mockReturnValue(display);

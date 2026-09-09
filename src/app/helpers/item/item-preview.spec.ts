@@ -58,6 +58,7 @@ describe('itemPreviewDisplay', () => {
       spritesheet: 'item',
       rarity: 'Common',
       stats: { Strength: 1 },
+      skills: [],
     });
   });
 
@@ -88,6 +89,7 @@ describe('itemPreviewDisplay', () => {
       stats: { Strength: 5 },
       levelRequirement: 4,
       equippableHeroNames: ['Alice'],
+      skills: [],
     });
   });
 
@@ -171,6 +173,7 @@ describe('itemPreviewDisplay', () => {
       sprite: '0003',
       spritesheet: 'collectible',
       rarity: 'Legendary',
+      skills: [],
     });
   });
 });
