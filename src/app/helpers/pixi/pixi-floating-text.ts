@@ -1,10 +1,10 @@
 import type { GatherVfxEvent } from '@interfaces';
-import { Container, Sprite, Text } from 'pixi.js';
 import type { Texture } from 'pixi.js';
+import { Container, Sprite, Text } from 'pixi.js';
 
 const LIFETIME_MS = 1100;
 const FLOAT_DISTANCE = 40;
-const JITTER_RANGE = 20;
+const JITTER_RANGE = 30;
 
 // Elapsed-time -> visual state. Returns undefined once the effect's lifetime has passed (caller destroys it).
 export function gatherVfxFloatState(
@@ -52,7 +52,11 @@ export function pixiFloatingTextCreate(
   const container = new Container();
   container.cullable = true;
 
-  const qtyText = pixiFloatingTextLabelCreate(`+${event.quantity}`, 0x4ade80, 13);
+  const qtyText = pixiFloatingTextLabelCreate(
+    `+${event.quantity}`,
+    0x4ade80,
+    13,
+  );
   const nameText = pixiFloatingTextLabelCreate(event.name, 0xffffff, 11);
   const iconSize = 16;
   const gap = 4;

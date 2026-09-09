@@ -99,7 +99,7 @@ import type { Subscription } from 'rxjs';
 
 const FADE_DURATION_MS = 300;
 // Minimum time between two floating-text spawns at the same node, so simultaneous gathers stagger instead of stacking.
-const FLOATING_TEXT_STAGGER_MS = 180;
+const FLOATING_TEXT_STAGGER_MS = 360;
 const FLOATING_TEXT_MAX_ACTIVE = 24;
 const FLOATING_TEXT_MAX_PENDING = 40;
 // Countdown/visibility text only needs to read accurately within this window, not every tick.
