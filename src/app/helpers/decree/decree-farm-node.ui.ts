@@ -17,14 +17,15 @@ import {
   worldNodeEncounter,
   worldNodeEncounterRandom,
 } from '@helpers/world-node/world-nodes';
-import type {
-  DroppedReward,
-  ExploreNodeFarmOption,
-  FarmNodeRewardOption,
-  MonsterContent,
-  MonsterId,
-  RewardIdentity,
-  WorldNodeEntry,
+import {
+  type DroppedReward,
+  type EncounterContent,
+  type ExploreNodeFarmOption,
+  type FarmNodeRewardOption,
+  type MonsterContent,
+  type MonsterId,
+  type RewardIdentity,
+  type WorldNodeEntry,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -73,6 +74,9 @@ function worldNodeMonsterIds(entry: WorldNodeEntry): MonsterId[] {
 
 // Discovered kill drops from every monster fought at `entry`, de-duplicated; excludes undiscovered drops and Gold Coin.
 function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
+  const node = getEntry<EncounterContent>(entry.nodeName);
+  if (!node) return [];
+
   const monsterIds = new Set(worldNodeMonsterIds(entry));
 
   const seen = new Set<string>();
@@ -83,6 +87,11 @@ function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
     monster?.drops.forEach((reward) => {
       if (isGoldCoinReward(reward)) return;
       if (!isRewardDiscovered(reward)) return;
+
+      const canDropFromNode =
+        node.levelRange.min >= reward.minLevel &&
+        node.levelRange.max <= reward.maxLevel;
+      if (!canDropFromNode) return;
 
       const key = rewardKey(reward);
       if (seen.has(key)) return;

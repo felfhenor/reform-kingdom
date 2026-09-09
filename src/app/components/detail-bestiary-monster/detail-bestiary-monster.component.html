@@ -95,7 +95,7 @@
           @for (drop of filteredDrops(); track $index) {
             <div class="flex items-center gap-2">
               <app-slot-completion-reward
-                [reward]="drop.reward"
+                [reward]="drop"
                 [rewardTextSmall]="drop.label"
               />
             </div>

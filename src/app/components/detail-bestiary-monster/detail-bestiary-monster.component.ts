@@ -121,10 +121,16 @@ export class DetailBestiaryMonsterComponent {
   );
 
   public filteredDrops = computed(() =>
-    this.entry().drops.map((d) => ({
-      ...d,
-      label: bestiaryDropQuantityLabel(d.reward, this.selectedLevel()),
-    })),
+    this.entry()
+      .monster.drops.filter(
+        (d) =>
+          d.minLevel <= this.selectedLevel() &&
+          d.maxLevel >= this.selectedLevel(),
+      )
+      .map((d) => ({
+        ...d,
+        label: bestiaryDropQuantityLabel(d, this.selectedLevel()),
+      })),
   );
 
   constructor() {

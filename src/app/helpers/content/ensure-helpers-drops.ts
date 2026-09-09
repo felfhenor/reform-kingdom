@@ -1,3 +1,4 @@
+import { CHARACTER_MAX_LEVEL } from '@helpers/hero/party';
 import type {
   DroppedCollectibleReward,
   DroppedEquipmentReward,
@@ -20,6 +21,8 @@ export function ensureDroppedReward(
       kind: 'Equipment',
       equipmentId: reward.equipmentId,
       chance: reward.chance ?? 0,
+      minLevel: reward.minLevel ?? 0,
+      maxLevel: reward.maxLevel ?? CHARACTER_MAX_LEVEL,
     };
   }
 
@@ -28,6 +31,8 @@ export function ensureDroppedReward(
       kind: 'Collectible',
       collectibleId: reward.collectibleId,
       chance: reward.chance ?? 0,
+      minLevel: reward.minLevel ?? 0,
+      maxLevel: reward.maxLevel ?? CHARACTER_MAX_LEVEL,
     };
   }
 
@@ -36,6 +41,8 @@ export function ensureDroppedReward(
       kind: 'Recipe',
       recipeId: reward.recipeId,
       chance: reward.chance ?? 0,
+      minLevel: reward.minLevel ?? 0,
+      maxLevel: reward.maxLevel ?? CHARACTER_MAX_LEVEL,
     };
   }
 
@@ -44,6 +51,8 @@ export function ensureDroppedReward(
       kind: 'Worker',
       workerId: reward.workerId,
       chance: reward.chance ?? 0,
+      minLevel: reward.minLevel ?? 0,
+      maxLevel: reward.maxLevel ?? CHARACTER_MAX_LEVEL,
     };
   }
 
@@ -54,5 +63,7 @@ export function ensureDroppedReward(
     max: reward.max ?? 0,
     bonusPerLevel: reward.bonusPerLevel,
     chance: reward.chance ?? 0,
+    minLevel: reward.minLevel ?? 0,
+    maxLevel: reward.maxLevel ?? CHARACTER_MAX_LEVEL,
   };
 }
