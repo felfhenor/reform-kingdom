@@ -2,6 +2,8 @@
   name: Angry Spirit
   description: An angry spirit that refuses to leave the mortal plane, instead preferring to cause mayhem near where it died.
 
+  types: [Spirit]
+
   sprite: '0068'
   frames: 4
 
@@ -53,6 +55,8 @@
 - id: 0148e305-80ae-4da7-9409-7a15fbb132b7
   name: Banshee
   description: An elder spirit that has refined it's screech to a point of causing terror in a large radius around itself.
+
+  types: [Spirit]
 
   sprite: '0072'
   frames: 4
@@ -107,6 +111,8 @@
   name: Poison Dartfrog
   description: A small green frog known for it's venomous spit that stings like a dart.
 
+  types: [Beast]
+
   sprite: '0076'
   frames: 4
 
@@ -158,6 +164,8 @@
 - id: b1067f91-f48a-4548-a91b-25a5df8fd533
   name: Toxic Toad
   description: A large orange toad, known worldwide for its extremely toxic breath.
+
+  types: [Beast]
 
   sprite: '0080'
   frames: 4

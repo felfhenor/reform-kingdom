@@ -2,6 +2,8 @@
   name: Lesser Fel Demon
   description: A lesser demon, often found serving Fel's commander.
 
+  types: [Demon]
+
   sprite: '0088'
   frames: 4
 

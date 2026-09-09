@@ -12,6 +12,9 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type MonsterId = Branded<string, 'MonsterId'>;
 
+export type MonsterType =
+  'Humanoid' | 'Demon' | 'Amalgamation' | 'Insect' | 'Beast' | 'Spirit';
+
 export type MonsterSkill = {
   skillId: EquipmentSkillId;
   weight: number;
@@ -25,6 +28,8 @@ export type MonsterContent = IsContentItem &
     baseStats: StatBlock;
     statsPerLevel: StatBlock;
     combatStats: Record<CombatStat, number>;
+
+    types: MonsterType[];
 
     // Priority list of targeting modes, tried in order.
     targetting: TargettingPriorityEntry[];

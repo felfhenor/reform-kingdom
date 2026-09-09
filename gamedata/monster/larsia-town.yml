@@ -2,6 +2,8 @@
   name: Larsian Citizen
   description: A faithful citizen of Larsia.
 
+  types: [Humanoid]
+
   sprite: '0112'
   frames: 4
 
@@ -49,6 +51,8 @@
 - id: 117491b9-6f30-481c-b3b3-acecb71aa6bc
   name: Larsian Guard
   description: A faithful guard of Larsia.
+
+  types: [Humanoid]
 
   sprite: '0116'
   frames: 4

@@ -28,7 +28,8 @@
         </div>
 
         <span class="text-xs text-lighter">
-          Lv. {{ levelMin() }}-{{ levelMax() }} · {{ e.kills }} killed
+          Lv. {{ levelMin() }}-{{ levelMax() }}
+          {{ e.monster.types.join('/') }} · {{ e.kills }} killed
         </span>
         @if (e.foundAtNodes.length > 0) {
           <span class="text-xs text-lighter">

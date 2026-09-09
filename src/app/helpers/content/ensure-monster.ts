@@ -1,4 +1,8 @@
-import { ensureArray } from '@helpers/content/ensure-helpers-core';
+import { VALID_MONSTER_TYPES } from '@helpers/content/ensure-helpers-constants';
+import {
+  ensureArray,
+  ensureEnumArray,
+} from '@helpers/content/ensure-helpers-core';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   ensureCombatStats,
@@ -51,5 +55,6 @@ export function ensureMonster(
     xp: monster.xp ?? { min: 0, max: 0 },
     drops: ensureArray(monster.drops, ensureDroppedReward),
     skills: ensureArray(monster.skills, ensureMonsterSkill),
+    types: ensureEnumArray(monster.types, VALID_MONSTER_TYPES),
   };
 }

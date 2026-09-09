@@ -14,6 +14,7 @@ import type {
   EquipmentSkillTargetType,
   GameElement,
   GameStat,
+  MonsterType,
   StatusEffectTag,
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
@@ -53,6 +54,15 @@ export const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'HealsTarget',
   'Buff',
   'Debuff',
+];
+
+export const VALID_MONSTER_TYPES: MonsterType[] = [
+  'Amalgamation',
+  'Beast',
+  'Demon',
+  'Humanoid',
+  'Insect',
+  'Spirit',
 ];
 
 export const VALID_CARAVAN_TRADE_TYPES: CaravanTradeType[] = ['sell', 'buy'];

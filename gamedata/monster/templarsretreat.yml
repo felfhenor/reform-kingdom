@@ -2,6 +2,8 @@
   name: Templar
   description: A spirit channeler that hides from society to practice dark magic.
 
+  types: [Humanoid]
+
   sprite: '0084'
   frames: 4
 
