@@ -13,3 +13,16 @@
     Intelligence: 4.1
     Resistance: 2.1
     Strength: 2.3
+
+- id: 8bf52fce-570a-445f-804d-868c685561f3
+  name: Orcish Whip
+  description: A "whip" made of miremetal. It can be thrown, but... that's not how whips work.
+  levelRequirement: 19
+  rarity: Rare
+  type: Whip
+  sprite: '0148'
+  slots: 2
+  baseStats:
+    Intelligence: -2.1
+    Resistance: 1.9
+    Strength: 8.3

@@ -1,0 +1,12 @@
+- id: 18057267-ded3-44c0-87cc-885c2b4143c2
+  name: Crude Copper Helm
+  description: A goblin-made helm crafted from copper. It has a lot of copper and is really heavy, but very defensive.
+  levelRequirement: 6
+  rarity: Uncommon
+  type: Helm
+  sprite: '0144'
+  slots: 2
+  baseStats:
+    Health: 10
+    Vitality: 3.3
+    Agility: -1.2

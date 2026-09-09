@@ -12,3 +12,15 @@
     Agility: 0.2
     Health: 14
     Energy: 3
+
+- id: 567b64d1-5c83-4ab4-bc28-66399bff7005
+  name: Crude Copper Breastplate
+  description: A breastplate made of copper, crudely by a goblin "artisan".
+  levelRequirement: 9
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0149'
+  slots: 2
+  baseStats:
+    Vitality: 5.1
+    Resistance: 3.9

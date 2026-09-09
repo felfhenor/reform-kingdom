@@ -1,3 +1,16 @@
+- id: 4d779293-471c-439f-97ef-8b2c95a77990
+  name: Scarred Copper Helm
+  description: A goblin-made helm crafted from copper. It's seen a lot of combat.
+  levelRequirement: 10
+  rarity: Uncommon
+  type: Helm
+  sprite: '0145'
+  slots: 2
+  baseStats:
+    Health: 17
+    Vitality: 3.7
+    Agility: 1.1
+
 - id: 300e9062-1b98-4b7b-900e-f9702592d0ee
   name: Miremetal Helm
   description: A helm crafted from miremetal, dented from countless skirmishes in the mire.

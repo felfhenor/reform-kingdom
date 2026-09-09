@@ -1,0 +1,12 @@
+- id: b33cc8b5-1c34-4a81-bde4-7aa2227d8bdc
+  name: Orcish Helm
+  description: A helm crafted from miremetal by orcs. It has decorative horns, so you know it's extra scary.
+  levelRequirement: 19
+  rarity: Rare
+  type: Helm
+  sprite: '0146'
+  slots: 2
+  baseStats:
+    Health: 20
+    Vitality: 4.9
+    Resistance: 3.3

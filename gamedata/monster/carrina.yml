@@ -104,6 +104,16 @@
       max: 1
       chance: 10
 
+    - equipmentId: Crude Copper Helm
+      chance: 10
+      minLevel: 4
+      maxLevel: 9
+
+    - equipmentId: Crude Copper Breastplate
+      chance: 10
+      minLevel: 8
+      maxLevel: 13
+
   skills:
     - skillId: Attack
       weight: 1
@@ -224,6 +234,11 @@
       max: 5
       bonusPerLevel: 1
       chance: 50
+
+    - equipmentId: Scarred Copper Helm
+      chance: 10
+      minLevel: 9
+      maxLevel: 12
 
   skills:
     - skillId: Attack
@@ -598,6 +613,16 @@
       bonusPerLevel: 5
       chance: 50
 
+    - equipmentId: Orcish Helm
+      chance: 5
+      minLevel: 17
+      maxLevel: 22
+
+    - equipmentId: Orcish Mace
+      chance: 5
+      minLevel: 17
+      maxLevel: 22
+
   skills:
     - skillId: Attack
       weight: 1
@@ -655,6 +680,11 @@
       max: 20
       bonusPerLevel: 3
       chance: 50
+
+    - equipmentId: Orcish Whip
+      chance: 10
+      minLevel: 17
+      maxLevel: 22
 
   skills:
     - skillId: Attack
