@@ -254,7 +254,10 @@ export class PlayKingdomWorkersComponent {
           levelRangeLabel: gathering
             ? worldNodeLevelLabel(gathering.workerLevelRange)
             : '?',
-          disabled: !canWorkerReachNode(node.nodeName, stamina, allowTeleport),
+          disabled:
+            !canWorkerReachNode(node.nodeName, stamina, allowTeleport) ||
+            (gathering?.workerLevelRange.min ?? 0) >
+              this.selectedEntry().state.level,
         };
       });
 

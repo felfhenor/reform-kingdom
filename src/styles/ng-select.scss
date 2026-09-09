@@ -34,4 +34,8 @@
   &.ng-option-marked {
     background-color: var(--color-base-300) !important;
   }
+
+  &.ng-option-disabled {
+    opacity: 0.3;
+  }
 }
