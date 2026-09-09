@@ -30,7 +30,7 @@ import {
 } from '@interfaces';
 
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { maxBy, minBy, uniq } from 'es-toolkit/compat';
+import { maxBy, minBy, sortBy, uniq } from 'es-toolkit/compat';
 
 type LevelOption = { value: number; label: string };
 
@@ -71,15 +71,15 @@ export class DetailBestiaryMonsterComponent {
   });
 
   public levelOptions = computed<LevelOption[]>(() => {
-    return uniq(
-      this.filteredSourceNodes().flatMap((node) =>
-        Array(node.levelRange.max - node.levelRange.min)
-          .fill(0)
-          .map((_, i) => i + node.levelRange.min),
+    return sortBy(
+      uniq(
+        this.filteredSourceNodes().flatMap((node) =>
+          Array(node.levelRange.max - node.levelRange.min)
+            .fill(0)
+            .map((_, i) => i + node.levelRange.min),
+        ),
       ),
-    )
-      .sort()
-      .map((x) => ({ value: x, label: `Lv. ${x}` }));
+    ).map((x) => ({ value: x, label: `Lv. ${x}` }));
   });
 
   public sourceNodesAtLevel = computed(() => {
