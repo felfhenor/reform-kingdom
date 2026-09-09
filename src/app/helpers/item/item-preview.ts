@@ -9,7 +9,9 @@ import type {
   CollectibleContent,
   CollectibleId,
   EquipmentContent,
+  EquipmentId,
   ItemContent,
+  ItemId,
   ItemPreviewContent,
   ItemPreviewDisplay,
   ItemPreviewSpritesheet,
@@ -66,8 +68,8 @@ export function itemPreviewDisplay(
 
 // Shared by anything offering a reward/stock pick from this same itemId/equipmentId/collectibleId/recipeId union.
 export function resolveRewardDisplay(reward: {
-  itemId?: ItemContent['id'];
-  equipmentId?: EquipmentContent['id'];
+  itemId?: ItemId;
+  equipmentId?: EquipmentId;
   collectibleId?: CollectibleId;
   recipeId?: RecipeId;
 }): ItemPreviewDisplay | undefined {

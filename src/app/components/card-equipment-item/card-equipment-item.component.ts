@@ -18,14 +18,12 @@ import {
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
 } from '@helpers/item/equipment-display';
-import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import {
   StatShorthand,
   type BaseStat,
   type EquipmentContent,
   type EquipmentItem,
-  type EquipmentSkillContent,
   type StatBlock,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -86,10 +84,6 @@ export class CardEquipmentItemComponent {
   public totalStatValue(stat: BaseStat): number {
     return this.equipment().baseStats[stat] + this.bonusStats()[stat];
   }
-
-  public grantedSkills = computed<EquipmentSkillContent[]>(() =>
-    equipmentItemGrantedSkills(this.equipmentItem(), this.equipment()),
-  );
 
   // Blocked by click rather than the native `disabled` attribute, so the stat-comparison
   // tooltip stays available for inspection (e.g. planning swaps) while equipping is locked.

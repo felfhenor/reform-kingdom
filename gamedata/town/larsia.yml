@@ -67,7 +67,7 @@
     itemExpirationTimer: 1800
 
     markupPercentages:
-      sell: 25
+      sell: 300
       buy: -15
 
   gathering:
