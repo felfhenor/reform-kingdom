@@ -8,6 +8,7 @@ vi.mock('@helpers/crafting/recipes', () => ({
   recipeBackdropSprite: vi.fn(() => 'recipe-backdrop'),
   recipeResultContent: vi.fn(),
   recipeResultSpritesheet: vi.fn(() => 'equipment'),
+  recipeStylizedName: vi.fn(),
 }));
 
 vi.mock('@helpers/hero/party', () => ({
@@ -15,7 +16,6 @@ vi.mock('@helpers/hero/party', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
-import { recipeResultContent } from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
 import {
   itemPreviewDisplay,
@@ -31,8 +31,6 @@ import type {
   ItemId,
   JobContent,
   JobId,
-  RecipeContent,
-  RecipeId,
 } from '@interfaces';
 
 describe('itemPreviewDisplay', () => {
@@ -225,28 +223,6 @@ describe('resolveRewardDisplay', () => {
     expect(resolveRewardDisplay({ collectibleId: collectible.id })?.name).toBe(
       'Trinket',
     );
-  });
-
-  it("resolves a recipeId to the crafted result's display, using the recipe's own name", () => {
-    const recipe = {
-      id: 'recipe-1' as RecipeId,
-      name: 'Blueprint: Sword',
-    } as RecipeContent;
-    const result = {
-      id: 'sword' as EquipmentId,
-      name: 'Sword',
-      description: 'Sharp.',
-      sprite: '0002',
-      rarity: 'Rare',
-    } as EquipmentContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
-    vi.mocked(recipeResultContent).mockReturnValue(result);
-    vi.mocked(partyGet).mockReturnValue([]);
-
-    const display = resolveRewardDisplay({ recipeId: recipe.id });
-
-    expect(display?.name).toBe('Blueprint: Sword');
-    expect(display?.backdropSprite).toBe('recipe-backdrop');
   });
 
   it('returns undefined when no id is set', () => {

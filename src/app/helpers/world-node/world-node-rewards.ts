@@ -3,6 +3,7 @@ import {
   isRecipeDiscovered,
   recipeResultContent,
   recipeResultSpritesheet,
+  recipeStylizedName,
 } from '@helpers/crafting/recipes';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
@@ -83,7 +84,7 @@ export function rewardContentInfo(
   const result = recipeResultContent(recipe);
   return result
     ? {
-        name: recipe.name,
+        name: recipeStylizedName(recipe),
         sprite: result.sprite,
         spritesheet: recipeResultSpritesheet(recipe),
       }
