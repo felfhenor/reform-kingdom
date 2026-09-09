@@ -22,9 +22,9 @@ export function bestiaryDropQuantityLabel(
   reward: DroppedReward,
   level: number,
 ): string {
-  if (!('itemId' in reward)) return '1';
+  if (!('itemId' in reward)) return 'x1';
 
-  return rangeLabelAtLevel(reward, level);
+  return 'x' + rangeLabelAtLevel(reward, level);
 }
 
 // The XP a kill at this level grants, formatted as a single number, or a "min-max" range.

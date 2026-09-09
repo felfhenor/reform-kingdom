@@ -11,6 +11,12 @@
           {{ rewText }}
         </span>
       }
+
+      @if (rewardTextSmall(); as rewText) {
+        <span text-banner-bottom>
+          {{ rewText }}
+        </span>
+      }
     </app-slot-rarity-outline>
   </div>
 
