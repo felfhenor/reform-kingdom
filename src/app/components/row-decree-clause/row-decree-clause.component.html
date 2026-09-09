@@ -1,6 +1,10 @@
 @if (icon(); as item) {
   <div class="min-w-[16px] min-h-[16px]" [tp]="item.name" [tpPlacement]="'top'">
-    <app-atlas-image class="zoom-inline" [spritesheet]="item.spritesheet" [assetName]="item.sprite" />
+    <app-atlas-image
+      class="zoom-inline"
+      [spritesheet]="item.spritesheet"
+      [assetName]="item.sprite"
+    />
   </div>
 }
 
@@ -28,7 +32,23 @@
 </label>
 
 @if (isEditable()) {
-  <button class="btn btn-xs btn-secondary" (click)="edit.emit()">Edit</button>
+  <button
+    class="btn btn-xs btn-secondary"
+    (click)="edit.emit()"
+    appSfx="ui-click"
+    [sfxOffset]="0"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    Edit
+  </button>
 }
 
-<button class="btn btn-xs btn-error" (click)="remove.emit()">Remove</button>
+<button
+  class="btn btn-xs btn-error"
+  (click)="remove.emit()"
+  appSfx="ui-error"
+  [sfxOffset]="1"
+  [sfxTrigger]="['click', 'hover']"
+>
+  Remove
+</button>

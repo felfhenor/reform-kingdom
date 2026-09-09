@@ -10,13 +10,14 @@ import {
 } from '@angular/core';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { SFXDirective } from '@directives/sfx.directive';
 
 const CELL_FOOTPRINT_PX = 72;
 
 @Component({
   selector: 'app-page-paged-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CardPageComponent, ButtonKingdomBackComponent],
+  imports: [CardPageComponent, ButtonKingdomBackComponent, SFXDirective],
   templateUrl: './page-paged-grid.component.html',
   styleUrl: './page-paged-grid.component.scss',
 })

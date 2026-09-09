@@ -9,6 +9,7 @@ import {
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import {
   characterEquipFromArmory,
@@ -20,8 +21,8 @@ import {
   canModifyEquipment,
   isSlotAvailableForJob,
 } from '@helpers/item/equipment';
-import { equipmentAvailableForSlot } from '@helpers/item/equipment.ui';
 import { equipmentItemTotalStats } from '@helpers/item/equipment-display.ui';
+import { equipmentAvailableForSlot } from '@helpers/item/equipment.ui';
 import type {
   Character,
   EquipmentArmoryEntry,
@@ -49,6 +50,7 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
     ScrollingModule,
     IconComponent,
     TippyDirective,
+    SFXDirective,
   ],
   host: {
     class: 'contents',

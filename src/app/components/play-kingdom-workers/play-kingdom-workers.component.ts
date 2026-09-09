@@ -14,6 +14,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
@@ -98,6 +99,7 @@ type EntryStatusDisplay = {
     DecimalPipe,
     TippyDirective,
     SlotIconBlankComponent,
+    SFXDirective,
   ],
   templateUrl: './play-kingdom-workers.component.html',
   styleUrl: './play-kingdom-workers.component.scss',

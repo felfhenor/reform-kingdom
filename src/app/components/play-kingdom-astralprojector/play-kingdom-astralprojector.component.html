@@ -74,6 +74,9 @@
             class="btn btn-xs btn-primary"
             [disabled]="!row.castable"
             (click)="onCastClick(row.content)"
+            appSfx="ui-click"
+            [sfxOffset]="$index"
+            [sfxTrigger]="['click', 'hover']"
           >
             Cast
           </button>

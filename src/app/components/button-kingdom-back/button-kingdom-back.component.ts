@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { SFXDirective } from '@directives/sfx.directive';
 import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
 import { kingdomSubviewClear } from '@helpers/engine/ui';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -7,7 +8,7 @@ import { HotkeysDirective } from '@ngneat/hotkeys';
 @Component({
   selector: 'app-button-kingdom-back',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TippyDirective, HotkeysDirective],
+  imports: [TippyDirective, HotkeysDirective, SFXDirective],
   template: `
     <button
       class="btn btn-sm btn-neutral btn-outline text-neutral-content"
@@ -16,6 +17,9 @@ import { HotkeysDirective } from '@ngneat/hotkeys';
       [hotkeys]="'BACKSPACE'"
       (hotkey)="hotkeyMatches($event, 'BACKSPACE') && back()"
       isGlobal
+      appSfx="ui-error"
+      [sfxOffset]="0"
+      [sfxTrigger]="['click', 'hover']"
     >
       Back
     </button>

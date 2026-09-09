@@ -22,6 +22,9 @@
       class="btn btn-xs btn-primary"
       [disabled]="!modifiable"
       (click)="optimizeEquipment()"
+      appSfx="ui-click"
+      [sfxOffset]="0"
+      [sfxTrigger]="['click', 'hover']"
     >
       Optimize Equipment
     </button>

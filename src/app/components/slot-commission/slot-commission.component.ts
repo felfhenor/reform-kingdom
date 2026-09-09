@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { commissionRarity } from '@helpers/commission/commission-requirement.ui';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
@@ -27,6 +28,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotCompletionRewardComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
+    SFXDirective,
   ],
   templateUrl: './slot-commission.component.html',
 })

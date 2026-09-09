@@ -21,6 +21,9 @@
               class="btn btn-outline btn-neutral justify-start h-auto normal-case font-normal gap-2 text-neutral-content text-start w-full"
               [class.btn-active]="entry.id === selected?.id"
               (click)="selectWorker(entry.id)"
+              appSfx="ui-click"
+              [sfxOffset]="$index"
+              [sfxTrigger]="['click', 'hover']"
             >
               <div class="zoom-row shrink-0">
                 <app-atlas-animation
@@ -96,6 +99,9 @@
                   : 'Costs ' + (levelUpCost() | number) + ' gold'
               "
               (click)="levelUp()"
+              appSfx="ui-success"
+              [sfxOffset]="0"
+              [sfxTrigger]="['click', 'hover']"
             >
               Level Up ({{ levelUpCost() | number }}g)
             </button>
@@ -202,12 +208,21 @@
                 class="btn btn-sm btn-primary w-fit"
                 [disabled]="!canConfirmAssignment()"
                 (click)="confirmAssignment()"
+                appSfx="ui-click"
+                [sfxOffset]="0"
+                [sfxTrigger]="['click', 'hover']"
               >
                 Confirm Assignment
               </button>
 
               @if (canRecall()) {
-                <button class="btn btn-sm btn-error w-fit" (click)="recall()">
+                <button
+                  class="btn btn-sm btn-error w-fit"
+                  (click)="recall()"
+                  appSfx="ui-error"
+                  [sfxOffset]="0"
+                  [sfxTrigger]="['click', 'hover']"
+                >
                   Recall
                 </button>
               }

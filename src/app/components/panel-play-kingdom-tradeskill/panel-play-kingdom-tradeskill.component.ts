@@ -16,6 +16,7 @@ import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-ite
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftQueueTicksRemaining,
@@ -70,6 +71,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     TippyDirective,
     TooltipItemPreviewComponent,
     SlotRarityOutlineComponent,
+    SFXDirective,
   ],
   templateUrl: './panel-play-kingdom-tradeskill.component.html',
 })

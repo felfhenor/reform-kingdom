@@ -4,6 +4,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
 import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -56,6 +57,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     IconComponent,
     TippyDirective,
     PluralizePipe,
+    SFXDirective,
   ],
   templateUrl: './play-kingdom-home.component.html',
 })

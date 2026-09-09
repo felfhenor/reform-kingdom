@@ -6,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { combatOrderClauseSummary } from '@helpers/combat/combat-order.ui';
 import type { CombatOrderClause, EquipmentSkillContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -14,7 +15,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-row-combat-order-clause',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
-  imports: [AtlasImageComponent, TippyDirective],
+  imports: [AtlasImageComponent, TippyDirective, SFXDirective],
   templateUrl: './row-combat-order-clause.component.html',
 })
 export class RowCombatOrderClauseComponent {

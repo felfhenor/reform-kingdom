@@ -28,6 +28,9 @@
               class="btn btn-xs"
               [disabled]="page() === 0"
               (click)="prevPage()"
+              appSfx="ui-error"
+              [sfxOffset]="0"
+              [sfxTrigger]="['click', 'hover']"
             >
               «
             </button>
@@ -40,6 +43,9 @@
               class="btn btn-xs"
               [disabled]="page() >= totalPages() - 1"
               (click)="nextPage()"
+              appSfx="ui-click"
+              [sfxOffset]="0"
+              [sfxTrigger]="['click', 'hover']"
             >
               »
             </button>

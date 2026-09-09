@@ -1,6 +1,14 @@
 @if (icon(); as skill) {
-  <div class="min-w-[16px] min-h-[16px]" [tp]="skill.name" [tpPlacement]="'top'">
-    <app-atlas-image class="zoom-inline" spritesheet="skill" [assetName]="skill.sprite" />
+  <div
+    class="min-w-[16px] min-h-[16px]"
+    [tp]="skill.name"
+    [tpPlacement]="'top'"
+  >
+    <app-atlas-image
+      class="zoom-inline"
+      spritesheet="skill"
+      [assetName]="skill.sprite"
+    />
   </div>
 }
 
@@ -52,6 +60,22 @@
     />
   </label>
 
-  <button class="btn btn-xs btn-secondary" (click)="edit.emit()">Edit</button>
-  <button class="btn btn-xs btn-error" (click)="remove.emit()">Remove</button>
+  <button
+    class="btn btn-xs btn-secondary"
+    (click)="edit.emit()"
+    appSfx="ui-click"
+    [sfxOffset]="0"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    Edit
+  </button>
+  <button
+    class="btn btn-xs btn-error"
+    (click)="remove.emit()"
+    appSfx="ui-error"
+    [sfxOffset]="1"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    Remove
+  </button>
 }

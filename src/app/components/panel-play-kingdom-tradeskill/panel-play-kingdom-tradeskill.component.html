@@ -223,6 +223,9 @@
                   (click)="
                     stepQuantity(entry.recipe.id, entry.maxCraftable, -10)
                   "
+                  appSfx="ui-click"
+                  [sfxOffset]="0"
+                  [sfxTrigger]="['click', 'hover']"
                 >
                   -10
                 </button>
@@ -233,6 +236,9 @@
                   (click)="
                     stepQuantity(entry.recipe.id, entry.maxCraftable, -1)
                   "
+                  appSfx="ui-click"
+                  [sfxOffset]="1"
+                  [sfxTrigger]="['click', 'hover']"
                 >
                   -1
                 </button>
@@ -260,6 +266,9 @@
                     uncraftable || full || quantity === entry.maxCraftable
                   "
                   (click)="stepQuantity(entry.recipe.id, entry.maxCraftable, 1)"
+                  appSfx="ui-click"
+                  [sfxOffset]="2"
+                  [sfxTrigger]="['click', 'hover']"
                 >
                   +1
                 </button>
@@ -272,6 +281,9 @@
                   (click)="
                     stepQuantity(entry.recipe.id, entry.maxCraftable, 10)
                   "
+                  appSfx="ui-click"
+                  [sfxOffset]="3"
+                  [sfxTrigger]="['click', 'hover']"
                 >
                   +10
                 </button>
@@ -288,6 +300,9 @@
                       entry.maxCraftable
                     )
                   "
+                  appSfx="ui-click"
+                  [sfxOffset]="4"
+                  [sfxTrigger]="['click', 'hover']"
                 >
                   Max
                 </button>
@@ -297,6 +312,9 @@
                 class="btn btn-xs btn-primary"
                 [disabled]="uncraftable || full"
                 (click)="craft(entry.recipe.id, entry.maxCraftable)"
+                appSfx="ui-success"
+                [sfxOffset]="$index"
+                [sfxTrigger]="['click', 'hover']"
               >
                 Craft
               </button>

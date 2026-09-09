@@ -27,6 +27,9 @@
               class="bestiary-list-row btn btn-outline btn-neutral justify-start h-auto py-2"
               [class.btn-active]="entry.monster.id === selected?.monster.id"
               (click)="selectMonster(entry.monster.id)"
+              appSfx="ui-click"
+              [sfxOffset]="$index"
+              [sfxTrigger]="['click', 'hover']"
             >
               <div class="zoom-row shrink-0">
                 @if (entry.discovered) {

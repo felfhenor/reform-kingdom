@@ -13,6 +13,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
@@ -56,6 +57,7 @@ type AstralProjectorRowViewModel = {
     SweetAlert2Module,
     TippyDirective,
     SlotRarityOutlineComponent,
+    SFXDirective,
   ],
   templateUrl: './play-kingdom-astralprojector.component.html',
 })

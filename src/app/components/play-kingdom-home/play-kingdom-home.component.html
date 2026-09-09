@@ -10,6 +10,9 @@
           <button
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('storage')"
+            appSfx="ui-click"
+            [sfxOffset]="0"
+            [sfxTrigger]="['click', 'hover']"
           >
             @let count = materialCount();
             <span
@@ -27,6 +30,9 @@
           <button
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('armory')"
+            appSfx="ui-click"
+            [sfxOffset]="1"
+            [sfxTrigger]="['click', 'hover']"
           >
             @let armoryTotal = armoryCount();
             <span
@@ -44,6 +50,9 @@
           <button
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('astralprojector')"
+            appSfx="ui-click"
+            [sfxOffset]="2"
+            [sfxTrigger]="['click', 'hover']"
           >
             @let spellCount = unlockedAstralSpellCount();
             <span
@@ -69,6 +78,9 @@
           <button
             class="btn btn-accent h-32 flex flex-col justify-center gap-2"
             (click)="openSubview('museum')"
+            appSfx="ui-click"
+            [sfxOffset]="3"
+            [sfxTrigger]="['click', 'hover']"
           >
             @let museumEntries = museumCollectibleEntries();
             @let recipeEntries = museumRecipeEntries();
@@ -122,6 +134,9 @@
           <button
             class="btn btn-accent h-32 flex flex-col justify-center gap-2"
             (click)="openSubview('bestiary')"
+            appSfx="ui-click"
+            [sfxOffset]="4"
+            [sfxTrigger]="['click', 'hover']"
           >
             @let bestiaryList = bestiaryEntries();
             @let discovered = bestiaryDiscoveredCount();
@@ -163,6 +178,9 @@
           <button
             class="btn btn-secondary btn-lg h-28 w-full max-w-sm flex flex-col justify-center gap-0"
             (click)="openSubview('workers')"
+            appSfx="ui-click"
+            [sfxOffset]="5"
+            [sfxTrigger]="['click', 'hover']"
           >
             @let levelUpReady = workerLevelUpReadyCount();
             <span
@@ -200,6 +218,9 @@
               tabindex="0"
               (click)="openSubview(tradeskill.subview)"
               (keydown.enter)="openSubview(tradeskill.subview)"
+              appSfx="ui-click"
+              [sfxOffset]="$index + 6"
+              [sfxTrigger]="['click', 'hover']"
             >
               <span class="font-bold flex items-center gap-2 justify-center">
                 <app-atlas-image
@@ -267,6 +288,9 @@
               class="btn btn-warning btn-sm"
               appButtonGlow
               (click)="openRaidDefenseModal()"
+              appSfx="ui-click"
+              [sfxOffset]="0"
+              [sfxTrigger]="['click', 'hover']"
             >
               <app-icon name="gameVibratingShield" size="inline" />
               Requested Defenses
@@ -278,6 +302,9 @@
             class="btn btn-accent btn-sm"
             [disabled]="!canReclass()"
             (click)="openReclassModal()"
+            appSfx="ui-click"
+            [sfxOffset]="1"
+            [sfxTrigger]="['click', 'hover']"
           >
             <app-icon name="gameBodySwapping" size="inline" />
             Reclass Heroes
@@ -295,6 +322,9 @@
             <button
               class="btn btn-accent btn-sm"
               (click)="openSubview('commissions')"
+              appSfx="ui-click"
+              [sfxOffset]="2"
+              [sfxTrigger]="['click', 'hover']"
             >
               <app-icon name="gameContract" size="inline" />
               Commissions
