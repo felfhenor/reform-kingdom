@@ -5,11 +5,13 @@ import {
   recipeResultSpritesheet,
 } from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
+import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import type {
   CollectibleContent,
   CollectibleId,
   EquipmentContent,
   EquipmentId,
+  EquipmentItem,
   ItemContent,
   ItemId,
   ItemPreviewContent,
@@ -32,16 +34,25 @@ function equippableHeroNames(equipment: EquipmentContent): string[] {
 }
 
 export function itemPreviewDisplay(
-  content: ItemPreviewContent,
   spritesheet: ItemPreviewSpritesheet,
+  content: ItemPreviewContent,
+  instance?: EquipmentItem,
 ): ItemPreviewDisplay {
-  const base = {
+  const base: Partial<ItemPreviewDisplay> = {
     name: content.name,
     description: content.description,
     sprite: content.sprite,
     spritesheet,
     rarity: content.rarity,
+    skills: [],
   };
+
+  if (instance) {
+    base.skills = equipmentItemGrantedSkills(
+      instance,
+      content as EquipmentContent,
+    );
+  }
 
   if ('baseStats' in content) {
     return {
@@ -51,7 +62,7 @@ export function itemPreviewDisplay(
       combatStats: content.combatStats,
       levelRequirement: content.levelRequirement,
       equippableHeroNames: equippableHeroNames(content),
-    };
+    } as ItemPreviewDisplay;
   }
 
   if ('infusionStats' in content) {
@@ -60,33 +71,36 @@ export function itemPreviewDisplay(
       stats: content.infusionStats,
       resistances: content.infusionDebuffResistances,
       combatStats: content.infusionCombatStats,
-    };
+    } as ItemPreviewDisplay;
   }
 
-  return base;
+  return base as ItemPreviewDisplay;
 }
 
 // Shared by anything offering a reward/stock pick from this same itemId/equipmentId/collectibleId/recipeId union.
 export function resolveRewardDisplay(reward: {
   itemId?: ItemId;
   equipmentId?: EquipmentId;
+  equipmentItem?: EquipmentItem;
   collectibleId?: CollectibleId;
   recipeId?: RecipeId;
 }): ItemPreviewDisplay | undefined {
   if (reward.itemId) {
     const item = getEntry<ItemContent>(reward.itemId);
-    return item ? itemPreviewDisplay(item, 'item') : undefined;
+    return item ? itemPreviewDisplay('item', item) : undefined;
   }
 
   if (reward.equipmentId) {
     const equipment = getEntry<EquipmentContent>(reward.equipmentId);
-    return equipment ? itemPreviewDisplay(equipment, 'equipment') : undefined;
+    return equipment
+      ? itemPreviewDisplay('equipment', equipment, reward.equipmentItem)
+      : undefined;
   }
 
   if (reward.collectibleId) {
     const collectible = getEntry<CollectibleContent>(reward.collectibleId);
     return collectible
-      ? itemPreviewDisplay(collectible, 'collectible')
+      ? itemPreviewDisplay('collectible', collectible)
       : undefined;
   }
 
@@ -97,7 +111,7 @@ export function resolveRewardDisplay(reward: {
 
     // Recipe's own name, not the crafted item's - it grants the blueprint.
     return {
-      ...itemPreviewDisplay(result, recipeResultSpritesheet(recipe)),
+      ...itemPreviewDisplay(recipeResultSpritesheet(recipe), result),
       name: recipe.name,
       backdropSprite: recipeBackdropSprite(),
     };

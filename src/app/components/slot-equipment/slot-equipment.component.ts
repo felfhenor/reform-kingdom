@@ -21,14 +21,12 @@ import {
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
 } from '@helpers/item/equipment-display';
-import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import {
   EquipmentTypeToSlot,
   type EquipmentContent,
   type EquipmentItem,
-  type EquipmentSkillContent,
   type EquipmentSlot,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -90,7 +88,7 @@ export class SlotEquipmentComponent {
     const content = this.equippedContent();
     if (content) {
       return {
-        ...itemPreviewDisplay(content, 'equipment'),
+        ...itemPreviewDisplay('equipment', content, this.equippedItem()),
         name: this.displayName(),
       };
     }
@@ -103,14 +101,6 @@ export class SlotEquipmentComponent {
   public occupiedPaperdollSlots = computed<EquipmentSlot[]>(() => {
     const content = this.equippedContent();
     return content ? EquipmentTypeToSlot[content.type] : [];
-  });
-
-  public grantedSkills = computed<EquipmentSkillContent[]>(() => {
-    const item = this.equippedItem();
-    const content = this.equippedContent();
-    if (!item || !content) return [];
-
-    return equipmentItemGrantedSkills(item, content);
   });
 
   public isSecondarySlot = computed<boolean>(() => {

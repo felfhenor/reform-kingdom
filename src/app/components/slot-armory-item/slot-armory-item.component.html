@@ -7,18 +7,6 @@
   [bonusResistances]="bonusResistances()"
   [bonusCombatStats]="bonusCombatStats()"
 >
-  @for (skill of grantedSkills(); track skill.id) {
-    <div class="text-xs mb-1 italic text-lighter flex items-center gap-2">
-      Teaches
-      <span class="zoom-inline">
-        <app-slot-icon-blank [showBackground]="false">
-          <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />
-        </app-slot-icon-blank>
-      </span>
-      {{ skill.name }}
-    </div>
-  }
-
   <div class="text-xs my-2 flex items-center gap-2">
     Sell value:
     <app-currency-cost [type]="goldCoinItemId" [amount]="sellValue()" />

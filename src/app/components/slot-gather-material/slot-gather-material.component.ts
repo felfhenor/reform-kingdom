@@ -33,6 +33,6 @@ export class SlotGatherMaterialComponent {
 
   public display = computed(() => {
     const item = this.item();
-    return item ? itemPreviewDisplay(item, 'item') : undefined;
+    return item ? itemPreviewDisplay('item', item) : undefined;
   });
 }

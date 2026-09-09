@@ -41,6 +41,6 @@ export class SlotStorageItemComponent {
   public isInfusable = computed(() => isInfusionMaterial(this.entry().item));
 
   public display = computed(() =>
-    itemPreviewDisplay(this.entry().item, 'item'),
+    itemPreviewDisplay('item', this.entry().item),
   );
 }

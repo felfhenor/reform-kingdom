@@ -18,10 +18,10 @@
           <div class="text-xs mb-2">Lv. {{ item.levelRequirement }}</div>
         }
 
-        @for (skill of grantedSkills(); track skill.id) {
+        @for (skill of item.skills; track skill.id) {
           <div class="text-xs mb-1 italic text-lighter flex items-center gap-2">
             Teaches
-            <span class="equipment-item-row-granted-skill-icon">
+            <span class="zoom-inline">
               <app-slot-icon-blank [showBackground]="false">
                 <app-atlas-image
                   spritesheet="skill"

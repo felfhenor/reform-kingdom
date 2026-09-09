@@ -21,6 +21,7 @@ export function townStockDisplay(
 ): ItemPreviewDisplay | undefined {
   const display = resolveRewardDisplay({
     equipmentId: entry.equipmentItem.equipmentId,
+    equipmentItem: entry.equipmentItem,
   });
   if (!display) return undefined;
 

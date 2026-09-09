@@ -30,18 +30,6 @@
         </div>
       }
 
-      @for (skill of grantedSkills(); track skill.id) {
-        <div class="text-xs mb-2 italic text-lighter flex items-center gap-2">
-          Teaches
-          <span class="zoom-inline">
-            <app-slot-icon-blank [showBackground]="false">
-              <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />
-            </app-slot-icon-blank>
-          </span>
-          {{ skill.name }}
-        </div>
-      }
-
       @if (infusionSlotCount() > 0) {
         <app-row-infused-materials
           [infusedItemIds]="equippedItem()!.infusedItemIds"

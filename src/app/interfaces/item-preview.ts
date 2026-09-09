@@ -2,6 +2,7 @@ import type { CombatStatBlock } from '@interfaces/combat';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
+import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { DropRarity } from '@interfaces/droppable';
 import type { StatBlock } from '@interfaces/stat';
@@ -24,6 +25,7 @@ export type ItemPreviewDisplay = {
   stats?: StatBlock;
   resistances?: StatusEffectBlock;
   combatStats?: CombatStatBlock;
+  skills?: EquipmentSkillContent[];
   // Equipment only.
   levelRequirement?: number;
   // Equipment only - party hero names whose job can equip this item.

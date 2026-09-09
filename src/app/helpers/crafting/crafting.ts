@@ -107,7 +107,7 @@ export function getCraftableRecipeEntries(
         resultContent,
         resultSpritesheet,
         resultDisplay: resultContent
-          ? itemPreviewDisplay(resultContent, resultSpritesheet)
+          ? itemPreviewDisplay(resultSpritesheet, resultContent)
           : undefined,
         resultChance: recipe.result.chance ?? 100,
         backdropSprite,

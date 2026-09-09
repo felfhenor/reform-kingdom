@@ -5,10 +5,8 @@ import {
   input,
   output,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
@@ -17,25 +15,18 @@ import {
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
 } from '@helpers/item/equipment-display';
-import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { goldCoinId } from '@helpers/item/materials';
 import { equipmentSellValue } from '@helpers/kingdom/armory';
-import type {
-  EquipmentContent,
-  EquipmentItem,
-  EquipmentSkillContent,
-} from '@interfaces';
+import type { EquipmentContent, EquipmentItem } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-slot-armory-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
     CurrencyCostComponent,
-    SlotIconBlankComponent,
     RowInfusedMaterialsComponent,
     TooltipItemPreviewComponent,
     TippyDirective,
@@ -59,7 +50,7 @@ export class SlotArmoryItemComponent {
   );
 
   public display = computed(() => ({
-    ...itemPreviewDisplay(this.equipment(), 'equipment'),
+    ...itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),
     name: this.displayName(),
   }));
 
@@ -77,10 +68,6 @@ export class SlotArmoryItemComponent {
 
   public infusionSlotCount = computed(() =>
     equipmentItemSlotCount(this.equipmentItem()),
-  );
-
-  public grantedSkills = computed<EquipmentSkillContent[]>(() =>
-    equipmentItemGrantedSkills(this.equipmentItem(), this.equipment()),
   );
 
   public sellValue = computed(() =>

@@ -51,7 +51,7 @@ describe('itemPreviewDisplay', () => {
       infusionStats: { Strength: 1 },
     } as ItemContent;
 
-    expect(itemPreviewDisplay(item, 'item')).toEqual({
+    expect(itemPreviewDisplay('item', item)).toEqual({
       name: 'Copper Ore',
       description: 'Shiny.',
       sprite: '0001',
@@ -79,7 +79,7 @@ describe('itemPreviewDisplay', () => {
       { name: 'Alice', jobId: 'warrior' as JobId } as never,
     ]);
 
-    expect(itemPreviewDisplay(equipment, 'equipment')).toEqual({
+    expect(itemPreviewDisplay('equipment', equipment)).toEqual({
       name: 'Sword',
       description: 'Sharp.',
       sprite: '0002',
@@ -124,7 +124,7 @@ describe('itemPreviewDisplay', () => {
     ]);
 
     expect(
-      itemPreviewDisplay(equipment, 'equipment').equippableHeroNames,
+      itemPreviewDisplay('equipment', equipment).equippableHeroNames,
     ).toEqual(['Alice']);
   });
 
@@ -151,7 +151,7 @@ describe('itemPreviewDisplay', () => {
     ]);
 
     expect(
-      itemPreviewDisplay(equipment, 'equipment').equippableHeroNames,
+      itemPreviewDisplay('equipment', equipment).equippableHeroNames,
     ).toEqual([]);
   });
 
@@ -165,7 +165,7 @@ describe('itemPreviewDisplay', () => {
       rarity: 'Legendary',
     };
 
-    expect(itemPreviewDisplay(collectible, 'collectible')).toEqual({
+    expect(itemPreviewDisplay('collectible', collectible)).toEqual({
       name: 'Trinket',
       description: 'Curious.',
       sprite: '0003',
