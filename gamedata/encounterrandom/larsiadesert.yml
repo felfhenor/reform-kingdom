@@ -30,5 +30,10 @@
     - collectibleId: Three-Leaf Clover
       chance: 100
 
+    - itemId: Gold Coin
+      min: 10000
+      max: 12500
+      chance: 100
+
     - recipeId: 'Material: Cimmerian Fire Charm'
-      chance: 5
+      chance: 50

@@ -37,8 +37,8 @@
       chance: 100
 
     - itemId: Gold Coin
-      min: 200
-      max: 250
+      min: 2000
+      max: 2500
       chance: 100
 
     - workerId: Dekar Anten

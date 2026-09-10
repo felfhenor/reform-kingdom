@@ -32,5 +32,10 @@
     - collectibleId: Cane of Etheria
       chance: 100
 
+    - itemId: Gold Coin
+      min: 5000
+      max: 6500
+      chance: 100
+
     - workerId: Sefirah Hornacis
       chance: 100
