@@ -33,6 +33,7 @@ import type {
   StatBlock,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { sortBy } from 'es-toolkit/compat';
 
 const PAPERDOLL_ROWS: EquipmentSlot[][] = [
   ['Helmet', 'Accessory'],
@@ -74,8 +75,11 @@ export class PanelHeroEquipmentEquipmentComponent {
     if (!slot) return [];
 
     const character = this.character();
-    return equipmentAvailableForSlot(slot).filter((entry) =>
-      canEquipItem(character, entry.content),
+    return sortBy(
+      equipmentAvailableForSlot(slot).filter((entry) =>
+        canEquipItem(character, entry.content),
+      ),
+      [(item) => -item.content.levelRequirement, (item) => item.content.name],
     );
   });
 
