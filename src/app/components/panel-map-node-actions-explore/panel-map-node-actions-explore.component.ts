@@ -6,10 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
-import {
-  worldNodeExploreRandomIsAvailable,
-  worldNodeExploreRandomTimerText,
-} from '@helpers/world-node/world-node-encounter';
+import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeEncounterRandom } from '@helpers/world-node/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
 
@@ -25,10 +22,6 @@ export class PanelMapNodeActionsExploreComponent {
   public canReExplore = input.required<boolean>();
 
   public reExplore = output<void>();
-
-  public exploreRandomTimerText = computed(() =>
-    worldNodeExploreRandomTimerText(this.entry()),
-  );
 
   public isExploreRandomCleared = computed(() => {
     const entry = this.entry();

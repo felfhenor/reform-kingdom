@@ -6,7 +6,12 @@ import {
   input,
 } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import {
+  worldNodeExploreRandomIsAvailable,
+  worldNodeExploreRandomTimerText,
+} from '@helpers/world-node/world-node-encounter';
 import { worldNodeEncounterProgress } from '@helpers/world-node/world-node-encounter.ui';
+import { worldNodeEncounterRandom } from '@helpers/world-node/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
 
 @Component({
@@ -24,5 +29,17 @@ export class PanelMapNodeStatusEncounterComponent {
   public progressPercent = computed(() => {
     const progress = this.progress();
     return progress ? Math.round(progress.fraction * 100) : 0;
+  });
+
+  public exploreRandomTimerText = computed(() =>
+    worldNodeExploreRandomTimerText(this.entry()),
+  );
+
+  public isExploreRandomCleared = computed(() => {
+    const entry = this.entry();
+    return (
+      !!worldNodeEncounterRandom(entry) &&
+      !worldNodeExploreRandomIsAvailable(entry)
+    );
   });
 }

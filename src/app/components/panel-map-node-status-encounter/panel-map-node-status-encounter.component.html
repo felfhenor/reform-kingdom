@@ -9,3 +9,13 @@
     </div>
   </div>
 }
+
+@if (isExploreRandomCleared()) {
+  <div class="card bg-base-100 shadow-xl pointer-events-auto">
+    <div class="card-body gap-2 p-3">
+      <div class="text-sm text-lighter italic">
+        No monsters remain. Check back in {{ exploreRandomTimerText() }}.
+      </div>
+    </div>
+  </div>
+}

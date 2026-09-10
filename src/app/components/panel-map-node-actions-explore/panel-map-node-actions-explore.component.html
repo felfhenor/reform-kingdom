@@ -1,7 +1,7 @@
 @if (isExploreRandomCleared()) {
-  <div class="text-sm text-lighter">
-    No monsters remain. Check back in {{ exploreRandomTimerText() }}.
-  </div>
+  <button type="button" class="btn btn-sm btn-primary" [disabled]="true">
+    Explore Again
+  </button>
 } @else {
   <button
     type="button"
