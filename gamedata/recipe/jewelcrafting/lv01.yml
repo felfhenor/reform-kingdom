@@ -15,7 +15,7 @@
   craftTime: 3
 
 - id: cea072ef-6365-4b30-b5d6-fd9f205ab676
-  name: 'Equipment: Copper Ring'
+  name: 'Ring: Copper Ring'
   result:
     equipmentId: Copper Ring
 
@@ -30,7 +30,7 @@
   craftTime: 20
 
 - id: 8a4d4e21-7c89-4dd0-86ae-b41c643c7b99
-  name: 'Equipment: Copper Bangle'
+  name: 'Ring: Copper Bangle'
   result:
     equipmentId: Copper Bangle
 

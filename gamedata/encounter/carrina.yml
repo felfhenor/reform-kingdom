@@ -60,7 +60,7 @@
     - collectibleId: Purple Lotus
       chance: 100
 
-    - recipeId: 'Equipment: Bone-Hewn Cloak'
+    - recipeId: 'Armor: Bone-Hewn Cloak'
       chance: 25
 
     - itemId: Gold Coin
@@ -112,7 +112,7 @@
     - equipmentId: Purple Copperslime Ring
       chance: 20
 
-    - recipeId: 'Equipment: Refined Copperslime Ring'
+    - recipeId: 'Ring: Refined Copperslime Ring'
       chance: 10
 
     - itemId: Gold Coin
@@ -202,7 +202,7 @@
     - equipmentId: Purple Copperslime Ring
       chance: 20
 
-    - recipeId: 'Equipment: Refined Copperslime Ring'
+    - recipeId: 'Ring: Refined Copperslime Ring'
       chance: 10
 
     - itemId: Gold Coin
@@ -290,7 +290,7 @@
     - recipeId: 'Material: Azurite'
       chance: 10
 
-    - recipeId: 'Equipment: Copperspun Chain'
+    - recipeId: 'Accessory: Copperspun Chain'
       chance: 10
 
     - itemId: Wergen Wood
@@ -339,10 +339,10 @@
     - collectibleId: Gobweb
       chance: 100
 
-    - recipeId: 'Equipment: Coppersilk Breastplate'
+    - recipeId: 'Armor: Coppersilk Breastplate'
       chance: 10
 
-    - recipeId: 'Equipment: Coppersilk Robe'
+    - recipeId: 'Armor: Coppersilk Robe'
       chance: 10
 
     - itemId: Gold Coin

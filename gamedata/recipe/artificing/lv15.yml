@@ -1,5 +1,5 @@
 - id: f27f5085-96c1-4e35-b2fd-260473f9ed4f
-  name: 'Equipment: Ghostcopper Gear'
+  name: 'Accessory: Ghostcopper Gear'
   result:
     equipmentId: Ghostcopper Gear
 
@@ -17,7 +17,7 @@
   craftTime: 300
 
 - id: 0ce428d5-2d3f-4cdd-87f1-6f8ca3fac0a2
-  name: 'Equipment: Ooze Parchment'
+  name: 'Artifact: Ooze Parchment'
   result:
     equipmentId: Ooze Parchment
 
@@ -56,7 +56,7 @@
   craftTime: 240
 
 - id: ece94284-9446-4a95-a57d-1f9345163e19
-  name: 'Equipment: Larsian Boots'
+  name: 'Artifact: Larsian Boots'
   result:
     equipmentId: Larsian Boots
 
@@ -95,7 +95,7 @@
   craftTime: 240
 
 - id: de32a9e3-897b-420a-8830-6ae646858bcf
-  name: 'Equipment: Cimmerian Bangle'
+  name: 'Offhand: Cimmerian Bangle'
   result:
     equipmentId: Cimmerian Bangle
 
@@ -119,7 +119,7 @@
   craftTime: 240
 
 - id: 88952cbe-231e-429c-ad32-f163ffa847ce
-  name: 'Equipment: Cimmerian Bracer'
+  name: 'Accessory: Cimmerian Bracer'
   result:
     equipmentId: Cimmerian Bracer
 

@@ -97,10 +97,10 @@
     - collectibleId: Mirefrog Tongue
       chance: 75
 
-    - recipeId: 'Equipment: Oozemire Plate'
+    - recipeId: 'Armor: Oozemire Plate'
       chance: 25
 
-    - recipeId: 'Equipment: Oozemire Hat'
+    - recipeId: 'Headgear: Oozemire Hat'
       chance: 25
 
     - recipeId: 'Weapon: Oozemire Rod'
@@ -170,8 +170,8 @@
     - collectibleId: Ghost Orbs
       chance: 75
 
-    - recipeId: 'Equipment: Miremirror Shield'
+    - recipeId: 'Offhand: Miremirror Shield'
       chance: 25
 
-    - recipeId: 'Equipment: Golden Miremetal Pristine Ring'
+    - recipeId: 'Ring: Golden Miremetal Pristine Ring'
       chance: 25

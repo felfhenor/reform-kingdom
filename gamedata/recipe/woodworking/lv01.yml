@@ -33,7 +33,7 @@
   craftTime: 30
 
 - id: 6436437a-3331-4915-a88d-009eda5baf95
-  name: 'Equipment: Wooden Arrow'
+  name: 'Ammo: Wooden Arrow'
   result:
     equipmentId: Wooden Arrow
 
@@ -48,7 +48,7 @@
   craftTime: 20
 
 - id: 1a9ffc55-456d-4cc8-afab-5710705570e6
-  name: 'Equipment: Wooden Arrow (Sharp)'
+  name: 'Ammo: Wooden Arrow (Sharp)'
   result:
     equipmentId: Wooden Arrow (Sharp)
 

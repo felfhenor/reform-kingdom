@@ -1,5 +1,5 @@
 - id: 229b59c9-7aa8-40d6-9253-f0d9cdb52e5a
-  name: 'Equipment: Copperslime Breastplate'
+  name: 'Armor: Copperslime Breastplate'
   result:
     equipmentId: Copperslime Breastplate
 
@@ -35,7 +35,7 @@
   craftTime: 60
 
 - id: 1ac14207-792a-4b60-af76-ace676c7ddde
-  name: 'Equipment: Jelly Dirk'
+  name: 'Offhand: Jelly Dirk'
   result:
     equipmentId: Jelly Dirk
 
@@ -89,7 +89,7 @@
   craftTime: 60
 
 - id: 1593fde0-5aef-4830-aceb-2de345c828cf
-  name: 'Equipment: Copperslime Shield'
+  name: 'Offhand: Copperslime Shield'
   result:
     equipmentId: Copperslime Shield
 

@@ -32,7 +32,7 @@
   craftTime: 180
 
 - id: 8eb26eb6-f5a5-4bf3-a52a-6ab1e3d079ed
-  name: 'Equipment: Miremetal Earrings'
+  name: 'Accessory: Miremetal Earrings'
   result:
     equipmentId: Miremetal Earrings
 
@@ -80,7 +80,7 @@
   craftTime: 15
 
 - id: a62a5151-d96e-424c-9e9d-ec61e7871175
-  name: 'Equipment: Star Charm'
+  name: 'Offhand: Star Charm'
   result:
     equipmentId: Star Charm
 
@@ -98,7 +98,7 @@
   craftTime: 180
 
 - id: c3f7b43d-570e-408e-8490-0eac7e176b77
-  name: 'Equipment: Miremirror Shield'
+  name: 'Offhand: Miremirror Shield'
   result:
     equipmentId: Miremirror Shield
 
@@ -116,7 +116,7 @@
   craftTime: 240
 
 - id: a6cba0cb-1b6e-46db-b55d-de585a4265d3
-  name: 'Equipment: Miremetal Amulet'
+  name: 'Accessory: Miremetal Amulet'
   result:
     equipmentId: Miremetal Amulet
 
@@ -158,7 +158,7 @@
   craftTime: 240
 
 - id: 13374ed9-731a-4eb7-a49a-57ac51477dad
-  name: 'Equipment: Miremetal Bracer'
+  name: 'Accessory: Miremetal Bracer'
   result:
     equipmentId: Miremetal Bracer
 

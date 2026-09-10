@@ -17,7 +17,7 @@
   craftTime: 10
 
 - id: 955b9df0-32e2-4c06-a059-7ee228397700
-  name: 'Equipment: Silkslime Shirt'
+  name: 'Armor: Silkslime Shirt'
   result:
     equipmentId: Silkslime Shirt
 
@@ -35,7 +35,7 @@
   craftTime: 60
 
 - id: ff67ae72-22d1-46c8-8b53-af90d9a8ad99
-  name: 'Equipment: Silkslime Hat'
+  name: 'Headgear: Silkslime Hat'
   result:
     equipmentId: Silkslime Hat
 
@@ -53,7 +53,7 @@
   craftTime: 60
 
 - id: 9e847d23-28e6-46e3-b48b-1ec64989fe7b
-  name: 'Equipment: Silkslime Gloves'
+  name: 'Accessory: Silkslime Gloves'
   result:
     equipmentId: Silkslime Gloves
 
@@ -71,7 +71,7 @@
   craftTime: 60
 
 - id: 07a04938-a898-4ed6-8316-908a854aaf64
-  name: 'Equipment: Elvenwood Broom'
+  name: 'Accessory: Elvenwood Broom'
   result:
     equipmentId: Elvenwood Broom
 

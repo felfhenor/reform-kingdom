@@ -1,5 +1,5 @@
 - id: 7039c0f1-8f2c-4da8-80eb-993c6baf35f9
-  name: 'Equipment: Green Copperslime Ring'
+  name: 'Ring: Green Copperslime Ring'
   result:
     equipmentId: Green Copperslime Ring
 
@@ -38,7 +38,7 @@
   craftTime: 10
 
 - id: 21fd4996-7fe0-44e0-bf63-5e499bb2e2d2
-  name: 'Equipment: Red Copperslime Ring'
+  name: 'Ring: Red Copperslime Ring'
   result:
     equipmentId: Red Copperslime Ring
 
@@ -77,7 +77,7 @@
   craftTime: 10
 
 - id: 461dfeb1-7fbf-44c5-bba4-b4703fe630e6
-  name: 'Equipment: Purple Copperslime Ring'
+  name: 'Ring: Purple Copperslime Ring'
   result:
     equipmentId: Purple Copperslime Ring
 
@@ -116,7 +116,7 @@
   craftTime: 10
 
 - id: 69bdc98e-bfb4-4840-a3cb-c8e24c19c266
-  name: 'Equipment: Refined Copperslime Ring'
+  name: 'Ring: Refined Copperslime Ring'
   result:
     equipmentId: Refined Copperslime Ring
 
@@ -134,7 +134,7 @@
   craftTime: 180
 
 - id: 44aff973-9974-4823-b3ca-d6b2e2e6d12f
-  name: 'Equipment: Elvenwood Malachite Ring'
+  name: 'Ring: Elvenwood Malachite Ring'
   result:
     equipmentId: Elvenwood Malachite Ring
 

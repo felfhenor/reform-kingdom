@@ -17,7 +17,7 @@
   craftTime: 1800
 
 - id: a6c58313-f9c7-4000-9dfb-d5ebb99cdc5b
-  name: 'Equipment: Oozemire Hat'
+  name: 'Headgear: Oozemire Hat'
   result:
     equipmentId: Oozemire Hat
 
@@ -38,7 +38,7 @@
   craftTime: 180
 
 - id: 6f0cbac1-5178-412d-8a55-9332a2c21b4a
-  name: 'Equipment: Ghostly Scroll'
+  name: 'Offhand: Ghostly Scroll'
   result:
     equipmentId: Ghostly Scroll
 
@@ -56,7 +56,7 @@
   craftTime: 300
 
 - id: 7964d5f1-d753-4b85-bae3-9d14824bddaa
-  name: 'Equipment: Larsian Cloak'
+  name: 'Armor: Larsian Cloak'
   result:
     equipmentId: Larsian Cloak
 
@@ -74,7 +74,7 @@
   craftTime: 240
 
 - id: 121ef529-977b-45d8-85fa-8c9d115747cb
-  name: 'Equipment: Larsian Sunhat'
+  name: 'Headgear: Larsian Sunhat'
   result:
     equipmentId: Larsian Sunhat
 
@@ -92,7 +92,7 @@
   craftTime: 240
 
 - id: d175f4a3-092f-4464-878c-c26ecdffed8c
-  name: 'Equipment: Desert Sandals'
+  name: 'Accessory: Desert Sandals'
   result:
     equipmentId: Desert Sandals
 
@@ -110,7 +110,7 @@
   craftTime: 240
 
 - id: 3ea3de9e-cfaf-421c-8154-fac6a9f29017
-  name: 'Equipment: Cimmerian Cloak'
+  name: 'Armor: Cimmerian Cloak'
   result:
     equipmentId: Cimmerian Cloak
 
@@ -134,7 +134,7 @@
   craftTime: 240
 
 - id: 69c1b412-45f5-436b-bb36-693bd2e43e31
-  name: 'Equipment: Cimmerian Darkhat'
+  name: 'Headgear: Cimmerian Darkhat'
   result:
     equipmentId: Cimmerian Darkhat
 

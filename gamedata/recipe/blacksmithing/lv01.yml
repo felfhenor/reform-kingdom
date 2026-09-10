@@ -45,7 +45,7 @@
   craftTime: 20
 
 - id: 6db852f8-54b5-40d2-ad87-e3a66ac86653
-  name: 'Equipment: Coppersilk Breastplate'
+  name: 'Armor: Coppersilk Breastplate'
   result:
     equipmentId: Coppersilk Breastplate
 
@@ -63,7 +63,7 @@
   craftTime: 60
 
 - id: ef512ec9-393d-4944-940a-2b5dffd7ce3a
-  name: 'Equipment: Copper Dirk'
+  name: 'Offhand: Copper Dirk'
   result:
     equipmentId: Copper Dirk
 
@@ -80,7 +80,7 @@
   craftTime: 20
 
 - id: 62f920bf-4086-44d0-8c86-359de5d90481
-  name: 'Equipment: Copper Shield'
+  name: 'Offhand: Copper Shield'
   result:
     equipmentId: Copper Shield
 

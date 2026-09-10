@@ -15,7 +15,7 @@
   craftTime: 3
 
 - id: 91ab444c-21c5-4979-96a9-3f32896215e4
-  name: 'Equipment: Linen Shirt'
+  name: 'Armor: Linen Shirt'
   result:
     equipmentId: Linen Shirt
 
@@ -30,7 +30,7 @@
   craftTime: 20
 
 - id: 8a5ab06a-1ccf-4e74-aaeb-ff04480f3c3c
-  name: 'Equipment: Linen Hat'
+  name: 'Headgear: Linen Hat'
   result:
     equipmentId: Linen Hat
 
@@ -48,7 +48,7 @@
   craftTime: 20
 
 - id: bbcf8a4f-4b7a-4d9e-8607-deab34ac53dd
-  name: 'Equipment: Bone-Hewn Cloak'
+  name: 'Armor: Bone-Hewn Cloak'
   result:
     equipmentId: Bone-Hewn Cloak
 
@@ -69,7 +69,7 @@
   craftTime: 60
 
 - id: bb1911ff-2619-4ec1-8380-16aa51323023
-  name: 'Equipment: Coppersilk Robe'
+  name: 'Armor: Coppersilk Robe'
   result:
     equipmentId: Coppersilk Robe
 

@@ -1,5 +1,5 @@
 - id: e6aa55d6-921e-48b8-b0d5-9abf9dc342c0
-  name: 'Equipment: Wergenslime Bag'
+  name: 'Accessory: Wergenslime Bag'
   result:
     equipmentId: Wergenslime Bag
 
@@ -17,7 +17,7 @@
   craftTime: 60
 
 - id: 87fd5052-e5c0-460f-a0e0-6b8d68135bda
-  name: 'Equipment: Wergenslime Arrow'
+  name: 'Ammo: Wergenslime Arrow'
   result:
     equipmentId: Wergenslime Arrow
 
@@ -77,7 +77,7 @@
   craftTime: 60
 
 - id: fbf16543-a173-43c8-94ea-5d04b6697b72
-  name: 'Equipment: Elven Shield Copycat'
+  name: 'Offhand: Elven Shield Copycat'
   result:
     equipmentId: Elven Shield Copycat
 

@@ -41,7 +41,7 @@
   craftTime: 20
 
 - id: f263a82e-f55b-4127-b8bd-7edec524d66d
-  name: 'Equipment: Copper Gear'
+  name: 'Accessory: Copper Gear'
   result:
     equipmentId: Copper Gear
 
@@ -59,7 +59,7 @@
   craftTime: 10
 
 - id: b9553069-af0c-43b6-83fe-38d57779cd5d
-  name: 'Equipment: Copperspun Chain'
+  name: 'Accessory: Copperspun Chain'
   result:
     equipmentId: Copperspun Chain
 

@@ -26,8 +26,39 @@ const MAIN_HAND_EQUIPMENT_TYPES = new Set<EquipmentItemType>([
   'Whip',
 ]);
 
+const ARMOR_EQUIPMENT_TYPES = new Set<EquipmentItemType>([
+  'Cloth Armor',
+  'Metal Armor',
+]);
+
+const HEAD_EQUIPMENT_TYPES = new Set<EquipmentItemType>(['Helm', 'Hat']);
+
+const OFFHAND_EQUIPMENT_TYPES = new Set<EquipmentItemType>([
+  'Charm',
+  'Dirk',
+  'Shield',
+]);
+
+const ACCESSORY_EQUIPMENT_TYPES = new Set<EquipmentItemType>([
+  'Accessory',
+  'Trinket',
+]);
+
+const ARTIFACT_EQUIPMENT_TYPES = new Set<EquipmentItemType>(['Artifact']);
+
+const AMMO_EQUIPMENT_TYPES = new Set<EquipmentItemType>(['Arrow']);
+
+const RING_EQUIPMENT_TYPES = new Set<EquipmentItemType>(['Ring']);
+
 const PREFIXES = {
   weapon: 'Weapon: ',
+  armor: 'Armor: ',
+  headgear: 'Headgear: ',
+  offhand: 'Offhand: ',
+  accessory: 'Accessory: ',
+  artifact: 'Artifact: ',
+  ring: 'Ring: ',
+  ammo: 'Ammo: ',
   equipment: 'Equipment: ',
   material: 'Material: ',
   collectible: 'Collectible: ',
@@ -42,9 +73,16 @@ function expectedPrefix(
   if ('equipmentId' in result) {
     const type = equipmentTypeById.get(result.equipmentId);
     if (!type) return undefined;
-    return MAIN_HAND_EQUIPMENT_TYPES.has(type)
-      ? PREFIXES.weapon
-      : PREFIXES.equipment;
+    if (MAIN_HAND_EQUIPMENT_TYPES.has(type)) return PREFIXES.weapon;
+    if (ARMOR_EQUIPMENT_TYPES.has(type)) return PREFIXES.armor;
+    if (HEAD_EQUIPMENT_TYPES.has(type)) return PREFIXES.headgear;
+    if (OFFHAND_EQUIPMENT_TYPES.has(type)) return PREFIXES.offhand;
+    if (ACCESSORY_EQUIPMENT_TYPES.has(type)) return PREFIXES.accessory;
+    if (ARTIFACT_EQUIPMENT_TYPES.has(type)) return PREFIXES.artifact;
+    if (AMMO_EQUIPMENT_TYPES.has(type)) return PREFIXES.ammo;
+    if (RING_EQUIPMENT_TYPES.has(type)) return PREFIXES.ring;
+
+    return PREFIXES.equipment;
   }
 
   if ('itemId' in result && itemIds.has(result.itemId))

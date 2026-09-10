@@ -1,5 +1,5 @@
 - id: af80ad1c-eda6-4e23-ae04-1bb540ffd39a
-  name: 'Equipment: Elvenwood Azurite Ring'
+  name: 'Ring: Elvenwood Azurite Ring'
   result:
     equipmentId: Elvenwood Azurite Ring
 
@@ -33,7 +33,7 @@
   craftTime: 5
 
 - id: f2c994d5-39fe-4003-b7fe-bdf6a6ef815f
-  name: 'Equipment: Golden Miremetal Peridot Ring'
+  name: 'Ring: Golden Miremetal Peridot Ring'
   result:
     equipmentId: Golden Miremetal Peridot Ring
 
@@ -51,7 +51,7 @@
   craftTime: 180
 
 - id: 8b369743-0add-4c23-88ec-0e41b8950b8f
-  name: 'Equipment: Miremetal Crown'
+  name: 'Headgear: Miremetal Crown'
   result:
     equipmentId: Miremetal Crown
 
@@ -75,7 +75,7 @@
   craftTime: 180
 
 - id: c0429042-1e94-484f-a761-483c0a6bae3a
-  name: 'Equipment: Golden Miremetal Ghost Peridot Ring'
+  name: 'Ring: Golden Miremetal Ghost Peridot Ring'
   result:
     equipmentId: Golden Miremetal Ghost Peridot Ring
 
@@ -93,7 +93,7 @@
   craftTime: 180
 
 - id: 494da1a0-2620-4cca-882c-5917f777fba0
-  name: 'Equipment: Miremetal Brooch'
+  name: 'Accessory: Miremetal Brooch'
   result:
     equipmentId: Miremetal Brooch
 

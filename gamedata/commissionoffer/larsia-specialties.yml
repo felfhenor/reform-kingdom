@@ -2,7 +2,7 @@
   name: Commission - Larsian Rings
   description: Larsia needs materials to craft a set of its specialty rings.
 
-  specialtyForRecipeId: 'Equipment: Larsian Ring'
+  specialtyForRecipeId: 'Ring: Larsian Ring'
 
   requirements:
     - itemId: Cactspine

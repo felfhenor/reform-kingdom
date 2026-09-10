@@ -45,7 +45,7 @@
         level: 9
 
     uniqueRecipeIds:
-      - 'Equipment: Larsian Ring'
+      - 'Ring: Larsian Ring'
 
   traders:
     sellItemCount:

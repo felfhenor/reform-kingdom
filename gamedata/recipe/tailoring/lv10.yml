@@ -14,7 +14,7 @@
   craftTime: 10
 
 - id: 5912f4ff-6ce8-45e5-9f31-c0c699a6a4c2
-  name: 'Equipment: Miresewn Cloak'
+  name: 'Armor: Miresewn Cloak'
   result:
     equipmentId: Miresewn Cloak
 
@@ -32,7 +32,7 @@
   craftTime: 180
 
 - id: 8311e468-362a-45aa-9afe-e07f93f7157a
-  name: 'Equipment: Miresewn Hat'
+  name: 'Headgear: Miresewn Hat'
   result:
     equipmentId: Miresewn Hat
 
@@ -50,7 +50,7 @@
   craftTime: 180
 
 - id: 10866863-e3c2-4b86-8087-bda8cb9a9172
-  name: 'Equipment: Miresewn Gloves'
+  name: 'Accessory: Miresewn Gloves'
   result:
     equipmentId: Miresewn Gloves
 
@@ -68,7 +68,7 @@
   craftTime: 180
 
 - id: a38e9bb8-2c66-4f28-b1c4-aefca3f81689
-  name: 'Equipment: Oozemire Tunic'
+  name: 'Armor: Oozemire Tunic'
   result:
     equipmentId: Oozemire Tunic
 

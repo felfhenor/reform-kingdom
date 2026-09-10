@@ -32,7 +32,7 @@
   craftTime: 180
 
 - id: fe8c5916-4480-4592-bc8b-1334650b12e4
-  name: 'Equipment: Ghostcopper Dirk'
+  name: 'Offhand: Ghostcopper Dirk'
   result:
     equipmentId: Ghostcopper Dirk
 
@@ -50,7 +50,7 @@
   craftTime: 300
 
 - id: d9ebeb88-6c16-4318-8ce6-1ede4bfff283
-  name: 'Equipment: Larsian Breastplate'
+  name: 'Armor: Larsian Breastplate'
   result:
     equipmentId: Larsian Breastplate
 
@@ -89,7 +89,7 @@
   craftTime: 240
 
 - id: 35f4b607-db60-4350-acbc-efc7243696ff
-  name: 'Equipment: Larsian Dirk'
+  name: 'Offhand: Larsian Dirk'
   result:
     equipmentId: Larsian Dirk
 
@@ -107,7 +107,7 @@
   craftTime: 240
 
 - id: a85142cb-ad84-4be7-a6ba-22f45cfcf4c6
-  name: 'Equipment: Larsian Helm'
+  name: 'Headgear: Larsian Helm'
   result:
     equipmentId: Larsian Helm
 
@@ -125,7 +125,7 @@
   craftTime: 240
 
 - id: fb578f8f-faed-482c-8e73-da68025f4637
-  name: 'Equipment: Larsian Tower Shield'
+  name: 'Offhand: Larsian Tower Shield'
   result:
     equipmentId: Larsian Tower Shield
 

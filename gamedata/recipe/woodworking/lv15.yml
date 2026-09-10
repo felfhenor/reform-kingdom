@@ -71,7 +71,7 @@
   craftTime: 240
 
 - id: 58723ccf-1dda-4fe1-b306-55c4a7ffdcad
-  name: 'Equipment: Larsian Arrow'
+  name: 'Ammo: Larsian Arrow'
   result:
     equipmentId: Larsian Arrow
 

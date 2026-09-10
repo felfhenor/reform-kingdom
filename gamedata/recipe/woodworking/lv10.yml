@@ -1,5 +1,5 @@
 - id: 71be6bc8-6b2a-4e6f-8f7a-4e8122eb49ed
-  name: 'Equipment: Elvenwood Arrow'
+  name: 'Ammo: Elvenwood Arrow'
   result:
     equipmentId: Elvenwood Arrow
 
@@ -29,7 +29,7 @@
   craftTime: 10
 
 - id: d4b24792-4d71-4e32-9830-83d6ddd48d84
-  name: 'Equipment: Mirewood Clogs'
+  name: 'Accessory: Mirewood Clogs'
   result:
     equipmentId: Mirewood Clogs
 
@@ -47,7 +47,7 @@
   craftTime: 180
 
 - id: a7c7827f-83ab-4fb3-ab69-88e8977ad25d
-  name: 'Equipment: Mirewood Arrow'
+  name: 'Ammo: Mirewood Arrow'
   result:
     equipmentId: Mirewood Arrow
 
@@ -104,7 +104,7 @@
   craftTime: 180
 
 - id: 5349222b-0a76-4316-9044-7c4e4b3b94c0
-  name: 'Equipment: Ghostwood Arrow'
+  name: 'Ammo: Ghostwood Arrow'
   result:
     equipmentId: Ghostwood Arrow
 
@@ -125,7 +125,7 @@
   craftTime: 240
 
 - id: 2c3a625b-6f4a-4f90-ac60-b11b0b041532
-  name: 'Equipment: Ghostwood Shield'
+  name: 'Offhand: Ghostwood Shield'
   result:
     equipmentId: Ghostwood Shield
 
