@@ -2,35 +2,37 @@
   <span class="font-semibold text-xl">Skills</span>
 </div>
 
-@for (skill of heroSkills(); track skill.id) {
-  <app-tooltip-skill-preview
-    #preview
-    [display]="skill"
-    [displayCombatant]="heroCombatant()"
-    [displayCharacterWeaponTypes]="equippedWeaponTypes()"
-  />
+<div class="flex flex-col gap-2 min-h-0 flex-1 overflow-y-auto">
+  @for (skill of heroSkills(); track skill.id) {
+    <app-tooltip-skill-preview
+      #preview
+      [display]="skill"
+      [displayCombatant]="heroCombatant()"
+      [displayCharacterWeaponTypes]="equippedWeaponTypes()"
+    />
 
-  <div
-    class="hero-skill-row hover:bg-base-300"
-    [tp]="preview.template()"
-    [tpPlacement]="'left'"
-  >
-    <app-slot-rarity-outline
-      class="hero-skill-row-icon"
-      [entry]="skill"
-      spritesheet="skill"
-    ></app-slot-rarity-outline>
+    <div
+      class="hero-skill-row hover:bg-base-300 shrink-0"
+      [tp]="preview.template()"
+      [tpPlacement]="'left'"
+    >
+      <app-slot-rarity-outline
+        class="hero-skill-row-icon"
+        [entry]="skill"
+        spritesheet="skill"
+      ></app-slot-rarity-outline>
 
-    <div class="hero-skill-row-name">
-      <div class=" text-{{ skill.rarity }}">
-        {{ skill.name }}
+      <div class="hero-skill-row-name">
+        <div class=" text-{{ skill.rarity }}">
+          {{ skill.name }}
+        </div>
+
+        <span class="badge badge-sm badge-info badge-outline">
+          {{ skill.epCost }} EP
+        </span>
       </div>
-
-      <span class="badge badge-sm badge-info badge-outline">
-        {{ skill.epCost }} EP
-      </span>
     </div>
-  </div>
-} @empty {
-  <div class="italic text-sm p-4">No skills learned yet.</div>
-}
+  } @empty {
+    <div class="italic text-sm p-4">No skills learned yet.</div>
+  }
+</div>

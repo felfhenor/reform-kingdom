@@ -27,7 +27,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     TooltipSkillPreviewComponent,
   ],
   host: {
-    class: 'flex flex-col gap-2 overflow-y-auto',
+    class: 'flex flex-col min-h-0 pb-8',
   },
   templateUrl: './panel-hero-equipment-skills.component.html',
   styleUrl: './panel-hero-equipment-skills.component.scss',

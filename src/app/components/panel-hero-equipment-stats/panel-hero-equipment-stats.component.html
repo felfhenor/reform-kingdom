@@ -2,50 +2,52 @@
   <span class="font-semibold text-xl">Stats</span>
 </div>
 
-@for (stat of statKeys; track stat) {
-  @let value = character().stats[stat];
+<div class="flex flex-col gap-2 min-h-0 flex-1 overflow-y-auto pr-2">
+  @for (stat of statKeys; track stat) {
+    @let value = character().stats[stat];
 
-  <div class="flex items-center gap-2">
-    <app-icon-stat [stat]="stat" [tp]="statInformation[stat]" />
-    <span class="text-base">{{ stat }} ({{ statShorthand[stat] }})</span>
-    <span class="ml-auto font-semibold text-lg">
-      {{ value | number: '1.0-1' }}
-    </span>
-  </div>
-}
+    <div class="flex items-center gap-2">
+      <app-icon-stat [stat]="stat" [tp]="statInformation[stat]" />
+      <span class="text-base">{{ stat }} ({{ statShorthand[stat] }})</span>
+      <span class="ml-auto font-semibold text-lg">
+        {{ value | number: '1.0-1' }}
+      </span>
+    </div>
+  }
 
-@if (combatStatRows().length > 0) {
-  <div class="mt-2">
-    <span class="font-semibold text-xl">Combat Stats</span>
-  </div>
-}
+  @if (combatStatRows().length > 0) {
+    <div class="mt-2">
+      <span class="font-semibold text-xl">Combat Stats</span>
+    </div>
+  }
 
-@for (stat of combatStatRows(); track stat) {
-  @let value = combatStats()[stat];
+  @for (stat of combatStatRows(); track stat) {
+    @let value = combatStats()[stat];
 
-  <div class="flex items-center gap-2">
-    <app-icon [name]="combatStatDimension.icon[stat]" size="stat" />
-    <span class="text-base">{{ combatStatDimension.label[stat] }}</span>
-    <span class="ml-auto font-semibold text-lg">
-      {{ value | statDisplay: 0 }}{{ suffix(combatStatDimension, stat) }}
-    </span>
-  </div>
-}
+    <div class="flex items-center gap-2">
+      <app-icon [name]="combatStatDimension.icon[stat]" size="stat" />
+      <span class="text-base">{{ combatStatDimension.label[stat] }}</span>
+      <span class="ml-auto font-semibold text-lg">
+        {{ value | statDisplay: 0 }}{{ suffix(combatStatDimension, stat) }}
+      </span>
+    </div>
+  }
 
-@if (resistanceRows().length > 0) {
-  <div class="mt-2">
-    <span class="font-semibold text-xl">Resistances</span>
-  </div>
-}
+  @if (resistanceRows().length > 0) {
+    <div class="mt-2">
+      <span class="font-semibold text-xl">Resistances</span>
+    </div>
+  }
 
-@for (stat of resistanceRows(); track stat) {
-  @let value = resistances()[stat];
+  @for (stat of resistanceRows(); track stat) {
+    @let value = resistances()[stat];
 
-  <div class="flex items-center gap-2">
-    <app-icon [name]="resistanceDimension.icon[stat]" size="stat" />
-    <span class="text-base">{{ resistanceDimension.label[stat] }}</span>
-    <span class="ml-auto font-semibold text-lg">
-      {{ value | statDisplay: 0 }}{{ suffix(resistanceDimension, stat) }}
-    </span>
-  </div>
-}
+    <div class="flex items-center gap-2">
+      <app-icon [name]="resistanceDimension.icon[stat]" size="stat" />
+      <span class="text-base">{{ resistanceDimension.label[stat] }}</span>
+      <span class="ml-auto font-semibold text-lg">
+        {{ value | statDisplay: 0 }}{{ suffix(resistanceDimension, stat) }}
+      </span>
+    </div>
+  }
+</div>

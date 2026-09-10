@@ -5,8 +5,8 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { IconComponent } from '@components/icon/icon.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { characterTagResistances } from '@helpers/item/equipment';
 import { characterCombatStatTotals } from '@helpers/item/equipment.ui';
 import {
@@ -32,7 +32,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
     StatDisplayPipe,
   ],
   host: {
-    class: 'flex flex-col gap-2',
+    class: 'flex flex-col min-h-0 pb-8',
   },
   templateUrl: './panel-hero-equipment-stats.component.html',
 })
