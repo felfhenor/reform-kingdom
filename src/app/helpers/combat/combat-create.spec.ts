@@ -59,6 +59,8 @@ function zeroStats(): StatBlock {
     Vitality: 0,
     Resistance: 0,
     Agility: 0,
+    Constitution: 0,
+    Spirit: 0,
   };
 }
 
@@ -504,8 +506,8 @@ describe('combatantsFromTownGuardians', () => {
       id: 'larsian-guard' as MonsterId,
       name: 'Larsian Guard',
     };
-    vi.mocked(getEntry).mockImplementation((id) =>
-      (id === citizen.id ? citizen : guard) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === citizen.id ? citizen : guard) as never,
     );
 
     const combatants = combatantsFromTownGuardians(

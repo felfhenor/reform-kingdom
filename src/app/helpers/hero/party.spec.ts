@@ -62,6 +62,8 @@ describe('Party Helper Functions', () => {
       Vitality: 5,
       Resistance: 5,
       Agility: 10,
+      Constitution: 1,
+      Spirit: 1,
     },
     statsPerLevel: {
       Health: 10,
@@ -72,6 +74,8 @@ describe('Party Helper Functions', () => {
       Vitality: 0.3,
       Resistance: 0.4,
       Agility: 0.7,
+      Constitution: 0,
+      Spirit: 0,
     },
     equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
     statPriority: [],
@@ -179,6 +183,8 @@ describe('Party Helper Functions', () => {
         Vitality: 1,
         Resistance: 1,
         Agility: 1,
+        Constitution: 1,
+        Spirit: 1,
       });
     });
   });

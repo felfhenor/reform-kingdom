@@ -76,6 +76,8 @@ describe('Equipment Helper Functions', () => {
       Vitality: 0,
       Resistance: 0,
       Agility: 1,
+      Constitution: 0,
+      Spirit: 0,
     },
     type: 'Sword',
     slots: 1,
@@ -94,6 +96,8 @@ describe('Equipment Helper Functions', () => {
       Vitality: 2,
       Resistance: 1,
       Agility: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     type: 'Hat',
   };
@@ -111,6 +115,8 @@ describe('Equipment Helper Functions', () => {
       Vitality: 0,
       Resistance: 0,
       Agility: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     type: 'Spear',
   };
@@ -141,6 +147,8 @@ describe('Equipment Helper Functions', () => {
         Vitality: 0,
         Resistance: 0,
         Agility: 0,
+        Constitution: 0,
+        Spirit: 0,
       });
       expect(getEntry).not.toHaveBeenCalled();
     });
@@ -165,6 +173,8 @@ describe('Equipment Helper Functions', () => {
         Vitality: 2,
         Resistance: 1,
         Agility: 1,
+        Constitution: 0,
+        Spirit: 0,
       });
     });
 
@@ -185,6 +195,8 @@ describe('Equipment Helper Functions', () => {
         Vitality: 0,
         Resistance: 0,
         Agility: 0,
+        Constitution: 0,
+        Spirit: 0,
       });
     });
 
@@ -218,6 +230,8 @@ describe('Equipment Helper Functions', () => {
           Vitality: 0,
           Resistance: 0,
           Agility: 0,
+          Constitution: 0,
+          Spirit: 0,
         },
       };
       vi.mocked(getEntry).mockImplementation(
