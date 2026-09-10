@@ -1,0 +1,21 @@
+- id: c5f74b9d-3df9-4ab3-9e9b-1502f7e77fb5
+  name: Restorative
+  description: Grants a bonus to Constitution.
+  rarity: Common
+  family: Constitution
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Constitution
+      value: 3
+
+- id: fc5bd10b-460e-4cef-8cc7-efff089684a3
+  name: Spiritual
+  description: Grants a bonus to Spirit.
+  rarity: Common
+  family: Spirit
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Spirit
+      value: 3

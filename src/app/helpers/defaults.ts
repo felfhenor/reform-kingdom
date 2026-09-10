@@ -104,6 +104,8 @@ export function defaultStats(): StatBlock {
     Resistance: 0,
     Strength: 0,
     Vitality: 0,
+    Spirit: 0,
+    Constitution: 0,
   };
 }
 

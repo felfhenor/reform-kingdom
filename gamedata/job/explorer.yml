@@ -13,6 +13,8 @@
     Vitality: 7
     Resistance: 7
     Agility: 10
+    Constitution: 3
+    Spirit: 3
 
   statsPerLevel:
     Health: 5
@@ -23,6 +25,8 @@
     Vitality: 0.3
     Resistance: 0.4
     Agility: 0.7
+    Constitution: 0.1
+    Spirit: 0.1
 
   statPriority:
     - stat: Luck

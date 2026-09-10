@@ -37,3 +37,6 @@
 
     - recipeId: 'Material: Cimmerian Fire Charm'
       chance: 50
+
+    - itemId: Star Fragment
+      chance: 100

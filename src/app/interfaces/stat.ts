@@ -6,7 +6,9 @@ export type BaseStat =
   | 'Agility'
   | 'Health'
   | 'Energy'
-  | 'Luck';
+  | 'Luck'
+  | 'Constitution'
+  | 'Spirit';
 
 export type GameStat = BaseStat;
 
@@ -21,6 +23,8 @@ export const StatOrder: BaseStat[] = [
   'Resistance',
   'Agility',
   'Luck',
+  'Constitution',
+  'Spirit',
 ];
 
 export const StatShorthand: Record<BaseStat, string> = {
@@ -32,6 +36,8 @@ export const StatShorthand: Record<BaseStat, string> = {
   Resistance: 'RES',
   Strength: 'STR',
   Vitality: 'VIT',
+  Spirit: 'SPR',
+  Constitution: 'CON',
 };
 
 export const StatInformation: Record<BaseStat, string> = {
@@ -42,10 +48,13 @@ export const StatInformation: Record<BaseStat, string> = {
   Health:
     'HP determines how many Health Points a hero has when going into an encounter.',
   Intelligence: 'Intelligence is used primarily to scale magical skills.',
+  Strength: 'Strength is used primarily to scale physical skills.',
   Luck: 'Luck is used to mitigate incoming damage, debuffs, get critical hits, and rarely contributes to damage scaling for some skills.',
   Resistance: 'Resistance is used to mitigate incoming magical damage.',
-  Strength: 'Strength is used primarily to scale physical skills.',
   Vitality: 'Vitality is used to mitigate incoming physical damage.',
+  Spirit: 'Spirit is used to regenerate Energy faster when out of combat.',
+  Constitution:
+    'Constitution is used to regenerate Health faster when out of combat.',
 };
 
 export type SkillStatScaling = {

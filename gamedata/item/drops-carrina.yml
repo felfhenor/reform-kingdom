@@ -143,3 +143,13 @@
   rarity: Uncommon
 
   sprite: '0023'
+
+- id: 76d0d5cc-39ed-4f0b-b6a4-3ebac400b963
+  name: Gobslime Tongue
+  description: A slimy tongue that improves the constitution of those that use it.
+  rarity: Rare
+
+  sprite: '0053'
+
+  infusionStats:
+    Constitution: 2

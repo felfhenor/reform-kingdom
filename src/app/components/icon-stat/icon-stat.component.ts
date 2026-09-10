@@ -11,6 +11,8 @@ const icons: Record<BaseStat, Icon> = {
   Health: 'gameGlassHeart',
   Energy: 'gameDrop',
   Luck: 'gameClover',
+  Constitution: 'gameCaduceus',
+  Spirit: 'gameEmbrassedEnergy',
 };
 
 const colors: Record<BaseStat, string> = {
@@ -22,6 +24,8 @@ const colors: Record<BaseStat, string> = {
   Health: 'text-rose-500',
   Energy: 'text-yellow-400',
   Luck: 'text-emerald-400',
+  Spirit: 'text-yellow-600',
+  Constitution: 'text-rose-700',
 };
 
 @Component({

@@ -18,3 +18,13 @@
 
   infusionDebuffResistances:
     StatDown: 2
+
+- id: bf3afa26-347f-4573-879a-36c9b2ba6135
+  name: Spirit Gear
+  description: A mystical gear that increases the spiritual flow of the space around it.
+  rarity: Rare
+
+  sprite: '0054'
+
+  infusionStats:
+    Spirit: 2

@@ -24,3 +24,14 @@
 
   infusionDebuffResistances:
     Accuracy: 10
+
+- id: 50f4b0d1-c186-4547-b0b3-c04a511410e9
+  name: Star Fragment
+  description: A fragment of a fallen star, used by Cimmerians to increase the flow of restorative energies.
+  rarity: Rare
+
+  sprite: '0055'
+
+  infusionStats:
+    Spirit: 2
+    Constitution: 2

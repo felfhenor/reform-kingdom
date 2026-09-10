@@ -42,10 +42,12 @@ function syncIdleGlobalEffect(resting: boolean): void {
   if (idleContent) removeGlobalEffect(idleContent.id);
 }
 
-function restedStat(current: number, max: number): number {
+function restedStat(current: number, max: number, boost = 0): number {
   if (current >= max) return current;
   return clamp(
-    current + Math.max(1, Math.round(max * RESTING_REGEN_PERCENT)),
+    current +
+      Math.floor(boost) +
+      Math.max(1, Math.round(max * RESTING_REGEN_PERCENT)),
     0,
     max,
   );
@@ -60,8 +62,16 @@ export function restingProcessTick(): void {
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => ({
       ...character,
-      hp: restedStat(character.hp, character.stats.Health),
-      ep: restedStat(character.ep, character.stats.Energy),
+      hp: restedStat(
+        character.hp,
+        character.stats.Health,
+        character.stats.Constitution,
+      ),
+      ep: restedStat(
+        character.ep,
+        character.stats.Energy,
+        character.stats.Spirit,
+      ),
     }));
 
     return state;
