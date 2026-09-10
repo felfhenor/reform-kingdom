@@ -305,8 +305,7 @@ describe('Armory Helper Functions', () => {
         },
       };
 
-      // statTotal 5 -> 5*20 + 2*10 = 120, Common multiplier 1x
-      expect(equipmentSellValue(entry)).toBe(120);
+      expect(equipmentSellValue(entry)).toBe(520);
     });
 
     it('adds infusion bonus stats on top of base stats', () => {
@@ -328,8 +327,7 @@ describe('Armory Helper Functions', () => {
         },
       };
 
-      // statTotal 8 -> 8*20 + 2*10 = 180
-      expect(equipmentSellValue(entry)).toBe(180);
+      expect(equipmentSellValue(entry)).toBe(580);
     });
 
     it('never returns less than 1 gold', () => {
@@ -372,8 +370,7 @@ describe('Armory Helper Functions', () => {
         },
       };
 
-      // same base 120 as the bare-item case, plus the flat 250 affix bonus, unscaled by rarity
-      expect(equipmentSellValue(entry)).toBe(370);
+      expect(equipmentSellValue(entry)).toBe(770);
     });
 
     it('adds 50g per point of the equipment content combatStats, unscaled by rarity', () => {

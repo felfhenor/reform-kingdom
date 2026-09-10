@@ -9,6 +9,7 @@ import {
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  BaseStat,
   DropRarity,
   EquipmentArmoryEntry,
   EquipmentContent,
@@ -17,7 +18,7 @@ import type {
   GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
-import { orderBy, sum } from 'es-toolkit/compat';
+import { orderBy, sum, sumBy } from 'es-toolkit/compat';
 
 export function armoryGet(): EquipmentItem[] {
   return gamestate().armory;
@@ -91,13 +92,31 @@ const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
   Legendary: 15,
 };
 
+export const VALUE_MULTIPLIER_PER_STAT: Record<BaseStat, number> = {
+  Agility: 2,
+  Constitution: 3,
+  Energy: 1,
+  Health: 1,
+  Intelligence: 5,
+  Luck: 10,
+  Resistance: 4,
+  Spirit: 3,
+  Strength: 5,
+  Vitality: 4,
+};
+
 // Base stats plus infusion bonus both count - an infused item sells for more, but infusion materials aren't refunded.
 export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
   const affixEffects = equipmentItemAffixEffects(entry.item);
   const affixStatBoost = affixEffectSum(affixEffects, 'Stat');
 
   const statTotal =
-    sum(Object.values(entry.content.baseStats)) +
+    sumBy(
+      Object.keys(entry.content.baseStats),
+      (stat) =>
+        entry.content.baseStats[stat as BaseStat] *
+        VALUE_MULTIPLIER_PER_STAT[stat as BaseStat],
+    ) +
     sum(Object.values(equipmentItemInfusionBonus(entry.item.infusedItemIds))) +
     affixStatBoost;
 
