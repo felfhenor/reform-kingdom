@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import rec from 'recursive-readdir';
+import { sortBy } from 'es-toolkit/compat';
 import fs from 'fs-extra';
-import path from 'path';
-import spritesmith from 'spritesmith';
-import { Jimp } from 'jimp';
-import { maxBy, uniqBy } from 'lodash';
 import imagemin from 'imagemin';
 import webp from 'imagemin-webp';
-
-const assetsToCopy: string[] = [];
+import { Jimp } from 'jimp';
+import rec from 'recursive-readdir';
 
 fs.ensureDirSync('public/art/spritesheets');
 
@@ -26,7 +22,7 @@ const build = async () => {
   for (const sheet of folders) {
     console.log(`Generating spritesheet for ${sheet}...`);
 
-    const files = await rec(`./gameassets/${sheet}`);
+    const files = sortBy(await rec(`./gameassets/${sheet}`));
 
     let animateContent = undefined;
     let copyFiles: string[] = files;
@@ -64,89 +60,51 @@ const build = async () => {
         .map((_, i) => ({ sprite: i * 4, frames: 4 }));
     }
 
-    // if it's not animated, we generate a normal atlas using spritesmith (realistically, we could use jimp, but meh)
-    if (!animateContent) {
-      await new Promise<void>((resolve) => {
-        spritesmith.run({ src: copyFiles }, (e: any, res: any) => {
-          const newCoords: Record<string, any> = {};
-          Object.keys(res.coordinates).forEach((key: string) => {
-            newCoords[key.replaceAll('\\', '/')] = res.coordinates[key];
-          });
+    const divisor = animateContent ? 4 : 10;
 
-          fs.writeJsonSync(`public/art/spritesheets/${sheet}.json`, newCoords);
-          fs.writeFileSync(`public/art/spritesheets/${sheet}.png`, res.image);
+    await new Promise<void>(async (resolve) => {
+      const atlas: Record<
+        string,
+        { x: number; y: number; width: number; height: number }
+      > = {};
 
-          allSpritesheetAtlases[sheet] = newCoords;
+      const widthTiles = divisor;
+      const heightTiles = Math.ceil(files.length / divisor);
 
-          resolve();
-        });
+      const spritesheet = new Jimp({
+        width: 64 * widthTiles,
+        height: 64 * heightTiles,
       });
 
-      // otherwise, we do a lot of extra work to make sure they operate as expected
-    } else {
-      await new Promise<void>(async (resolve) => {
-        const atlas: Record<
-          string,
-          { x: number; y: number; width: number; height: number }
-        > = {};
+      for (let i = 0; i < files.length; i++) {
+        const x = (i % divisor) * 64;
+        const y = Math.floor(i / divisor) * 64;
 
-        const maxFrames = maxBy(animateContent, (c: any) => c.frames).frames;
-        const uniqueAnimations = uniqBy(animateContent, (c: any) => c.sprite);
+        const fileName = files[i].replaceAll('\\', '/');
 
-        const widthTiles = maxFrames;
-        const heightTiles = uniqueAnimations.length;
+        const spriteRef = await Jimp.read(fileName);
 
-        const spritesheet = new Jimp({
-          width: 64 * widthTiles,
-          height: 64 * heightTiles,
-        });
+        spritesheet.blit({ src: spriteRef, x, y });
 
-        for (const anim of uniqueAnimations) {
-          const { sprite, frames } = anim;
-          const allSprites = generateSpriteArray(sprite, frames);
+        atlas[fileName] = {
+          x,
+          y,
+          width: 64,
+          height: 64,
+        };
+      }
 
-          for (const spriteName of allSprites) {
-            const x = allSprites.indexOf(spriteName) * 64;
-            const y = uniqueAnimations.indexOf(anim) * 64;
+      await spritesheet.write(`public/art/spritesheets/${sheet}.png`);
+      await fs.writeJson(`public/art/spritesheets/${sheet}.json`, atlas);
 
-            const spriteRef = await Jimp.read(
-              `./gameassets/${sheet}/${spriteName}.png`,
-            );
+      allSpritesheetAtlases[sheet] = atlas;
 
-            spritesheet.blit({ src: spriteRef, x, y });
-
-            atlas[`gameassets/${sheet}/${spriteName}.png`] = {
-              x,
-              y,
-              width: 64,
-              height: 64,
-            };
-          }
-        }
-
-        await spritesheet.write(`public/art/spritesheets/${sheet}.png`);
-        await fs.writeJson(`public/art/spritesheets/${sheet}.json`, atlas);
-
-        allSpritesheetAtlases[sheet] = atlas;
-
-        resolve();
-      });
-    }
+      resolve();
+    });
   }
 
   console.log(`Generating all.json spritesheet atlas.`);
   fs.writeJsonSync('public/art/spritesheets/all.json', allSpritesheetAtlases);
-};
-
-const copy = async () => {
-  for (const assetGroup of assetsToCopy) {
-    const files = await rec(`./gameassets/${assetGroup}`);
-    fs.ensureDirSync(`public/art/${assetGroup}`);
-
-    files.forEach((file: any) => {
-      fs.copySync(file, `public/art/${assetGroup}/${path.basename(file)}`);
-    });
-  }
 };
 
 const compressImages = async () => {
@@ -164,7 +122,6 @@ const compressImages = async () => {
 
 const doBuild = async () => {
   await build();
-  await copy();
   await compressImages();
 };
 
