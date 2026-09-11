@@ -69,6 +69,11 @@
   max-width: 400px !important;
 }
 
+// Wide enough for the equip-picker's two-column comparison tooltip.
+.tippy-variation-itemComparison .tippy-box {
+  max-width: 700px !important;
+}
+
 .text-shadow-black {
   text-shadow:
     -1px -1px 0 #000,

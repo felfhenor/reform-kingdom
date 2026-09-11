@@ -103,6 +103,7 @@ export const appConfig: ApplicationConfig = {
           ...withContextMenuVariation(popperVariation),
           theme: 'translucent',
         },
+        itemComparison: { ...tooltipVariation },
       },
     }),
     {

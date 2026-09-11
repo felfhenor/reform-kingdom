@@ -5,28 +5,27 @@ import {
   input,
   output,
 } from '@angular/core';
+import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
-import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { defaultStats } from '@helpers/defaults';
-import {
-  equipmentItemDisplayName,
-  equipmentItemMiscAffixDescriptions,
-} from '@helpers/item/affix';
-import {
-  equipmentItemBonusCombatStats,
-  equipmentItemBonusResistances,
-  equipmentItemBonusStats,
-} from '@helpers/item/equipment-display';
+import { equipmentItemDisplayName } from '@helpers/item/affix';
+import { equipmentItemBonusStats } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import {
+  itemPreviewTotalCombatStats,
+  itemPreviewTotalResistances,
+  itemPreviewTotalStats,
+} from '@helpers/item/item-preview.ui';
 import {
   StatShorthand,
   type BaseStat,
   type EquipmentContent,
   type EquipmentItem,
-  type StatBlock,
+  type ItemPreviewDisplay,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
@@ -38,7 +37,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
     SlotRarityOutlineComponent,
     IconStatComponent,
     RowInfusedMaterialsComponent,
-    RowStatSummaryComponent,
+    DetailItemPreviewComponent,
     StatDisplayPipe,
     TippyDirective,
     SFXDirective,
@@ -49,7 +48,9 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 export class CardEquipmentItemComponent {
   public equipment = input.required<EquipmentContent>();
   public equipmentItem = input.required<EquipmentItem>();
-  public comparisonStats = input<StatBlock>();
+  // Undefined (empty slot) falls back to a single-column tooltip, no comparison.
+  public equippedContent = input<EquipmentContent>();
+  public equippedItem = input<EquipmentItem>();
   public disabled = input<boolean>(false);
 
   public equip = output<void>();
@@ -62,24 +63,65 @@ export class CardEquipmentItemComponent {
     equipmentItemDisplayName(this.equipmentItem(), this.equipment().name),
   );
 
-  public bonusStats = computed(() =>
-    equipmentItemBonusStats(this.equipmentItem()),
+  public display = computed<ItemPreviewDisplay>(() => ({
+    ...itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),
+    name: this.displayName(),
+  }));
+
+  public equippedDisplay = computed<ItemPreviewDisplay | undefined>(() => {
+    const content = this.equippedContent();
+    if (!content) return undefined;
+
+    const item = this.equippedItem();
+    return {
+      ...itemPreviewDisplay('equipment', content, item),
+      name: item ? equipmentItemDisplayName(item, content.name) : content.name,
+    };
+  });
+
+  // This item's comparison baseline is the equipped item's totals, and vice versa.
+  public thisItemComparisonStats = computed(() => {
+    const equipped = this.equippedDisplay();
+    return equipped ? itemPreviewTotalStats(equipped) : undefined;
+  });
+
+  public thisItemComparisonResistances = computed(() => {
+    const equipped = this.equippedDisplay();
+    return equipped ? itemPreviewTotalResistances(equipped) : undefined;
+  });
+
+  public thisItemComparisonCombatStats = computed(() => {
+    const equipped = this.equippedDisplay();
+    return equipped ? itemPreviewTotalCombatStats(equipped) : undefined;
+  });
+
+  public equippedComparisonStats = computed(() =>
+    this.equippedDisplay() ? itemPreviewTotalStats(this.display()) : undefined,
   );
 
-  public bonusResistances = computed(() =>
-    equipmentItemBonusResistances(this.equipmentItem()),
+  public equippedComparisonResistances = computed(() =>
+    this.equippedDisplay()
+      ? itemPreviewTotalResistances(this.display())
+      : undefined,
   );
 
-  public bonusCombatStats = computed(() =>
-    equipmentItemBonusCombatStats(this.equipmentItem()),
-  );
-
-  public miscAffixDescriptions = computed(() =>
-    equipmentItemMiscAffixDescriptions(this.equipmentItem()),
+  public equippedComparisonCombatStats = computed(() =>
+    this.equippedDisplay()
+      ? itemPreviewTotalCombatStats(this.display())
+      : undefined,
   );
 
   public infusionSlotCount = computed(() =>
     equipmentItemSlotCount(this.equipmentItem()),
+  );
+
+  public equippedInfusionSlotCount = computed(() => {
+    const item = this.equippedItem();
+    return item ? equipmentItemSlotCount(item) : 0;
+  });
+
+  public bonusStats = computed(() =>
+    equipmentItemBonusStats(this.equipmentItem()),
   );
 
   public rowStatKeys = computed<BaseStat[]>(() =>

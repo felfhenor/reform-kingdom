@@ -7,6 +7,7 @@
   [attr.aria-disabled]="disabled() ? true : null"
   [tp]="tooltip"
   [tpPlacement]="'right'"
+  [tpVariation]="equippedDisplay() ? 'itemComparison' : undefined"
   (click)="onEquipClick()"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
@@ -43,34 +44,60 @@
 </button>
 
 <ng-template #tooltip>
-  <div class="p-3">
-    <div class="font-bold text-base mb-1 text-{{ content.rarity }}">
-      {{ displayName() }}
-    </div>
-
-    <div class="text-sm mb-2">Lv. {{ content.levelRequirement }}</div>
-
-    <app-row-stat-summary
-      [stats]="content.baseStats"
-      [comparisonStats]="comparisonStats()"
-      [bonusStats]="bonusStats()"
-      [resistances]="content.debuffResistances"
-      [bonusResistances]="bonusResistances()"
-      [combatStats]="content.combatStats"
-      [bonusCombatStats]="bonusCombatStats()"
-    />
-
-    @for (desc of miscAffixDescriptions(); track desc) {
-      <div class="text-xs my-1 text-value-positive">{{ desc }}</div>
-    }
-
-    @if (infusionSlotCount() > 0) {
-      <div class="mt-2">
-        <app-row-infused-materials
-          [infusedItemIds]="equipmentItem().infusedItemIds"
-          [maxSlots]="infusionSlotCount()"
-        />
+  @if (equippedDisplay(); as equipped) {
+    <div class="flex gap-4 p-3">
+      <div class="flex-1 min-w-0">
+        <div class="italic text-xs mb-1">Currently Equipped</div>
+        <app-detail-item-preview
+          [display]="equipped"
+          [comparisonStats]="equippedComparisonStats()"
+          [comparisonResistances]="equippedComparisonResistances()"
+          [comparisonCombatStats]="equippedComparisonCombatStats()"
+          [showEquippableBy]="false"
+          [showDescription]="false"
+        >
+          @if (equippedInfusionSlotCount() > 0) {
+            <app-row-infused-materials
+              [infusedItemIds]="equippedItem()!.infusedItemIds"
+              [maxSlots]="equippedInfusionSlotCount()"
+            />
+          }
+        </app-detail-item-preview>
       </div>
-    }
-  </div>
+
+      <div class="flex-1 min-w-0">
+        <div class="italic text-xs mb-1">This Item</div>
+        <app-detail-item-preview
+          [display]="display()"
+          [comparisonStats]="thisItemComparisonStats()"
+          [comparisonResistances]="thisItemComparisonResistances()"
+          [comparisonCombatStats]="thisItemComparisonCombatStats()"
+          [showEquippableBy]="false"
+          [showDescription]="false"
+        >
+          @if (infusionSlotCount() > 0) {
+            <app-row-infused-materials
+              [infusedItemIds]="equipmentItem().infusedItemIds"
+              [maxSlots]="infusionSlotCount()"
+            />
+          }
+        </app-detail-item-preview>
+      </div>
+    </div>
+  } @else {
+    <div class="p-3">
+      <app-detail-item-preview
+        [display]="display()"
+        [showEquippableBy]="false"
+        [showDescription]="false"
+      >
+        @if (infusionSlotCount() > 0) {
+          <app-row-infused-materials
+            [infusedItemIds]="equipmentItem().infusedItemIds"
+            [maxSlots]="infusionSlotCount()"
+          />
+        }
+      </app-detail-item-preview>
+    </div>
+  }
 </ng-template>

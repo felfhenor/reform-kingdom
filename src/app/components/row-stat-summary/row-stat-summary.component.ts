@@ -30,9 +30,11 @@ export class RowStatSummaryComponent {
 
   public resistances = input<StatusEffectBlock>();
   public bonusResistances = input<StatusEffectBlock>();
+  public comparisonResistances = input<StatusEffectBlock>();
 
   public combatStats = input<CombatStatBlock>();
   public bonusCombatStats = input<CombatStatBlock>();
+  public comparisonCombatStats = input<CombatStatBlock>();
 
   // 'column' (default) for tooltips/detail panels; 'row' for compact,
   // space-constrained lists (e.g. a picker row) - mirrors the underlying rows.

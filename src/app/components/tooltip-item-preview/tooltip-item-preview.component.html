@@ -1,75 +1,15 @@
 <ng-template #tooltipContent>
   @if (display(); as item) {
-    <div class="flex gap-2 p-2">
-      <div class="tooltip-item-preview-image">
-        <app-icon-item-preview
-          [sprite]="item.sprite"
-          [spritesheet]="item.spritesheet"
-          [backdropSprite]="item.backdropSprite"
-        />
-      </div>
-
-      <div>
-        <div class="font-bold mb-1 text-{{ item.rarity }}">
-          {{ item.name }}
-        </div>
-
-        @if (item.levelRequirement) {
-          <div class="text-xs my-1">Lv. {{ item.levelRequirement }}</div>
-        }
-
-        @for (skill of item.skills; track skill.id) {
-          <div class="text-xs my-1 italic text-lighter flex items-center gap-2">
-            Teaches
-            <span class="zoom-inline">
-              <app-slot-icon-blank [showBackground]="false">
-                <app-atlas-image
-                  spritesheet="skill"
-                  [assetName]="skill.sprite"
-                />
-              </app-slot-icon-blank>
-            </span>
-            {{ skill.name }}
-          </div>
-        }
-
-        @if (showEquippableBy()) {
-          @if (item.equippableHeroNames; as equippable) {
-            <div class="text-xs mb-2">
-              @if (equippable.length > 0) {
-                Equippable by: {{ equippable.join(', ') }}
-              } @else {
-                <span class="text-warning">
-                  None of your heroes can equip this.
-                </span>
-              }
-            </div>
-          }
-        }
-
-        @if (showDescription()) {
-          <div class="italic text-sm mb-2">
-            {{ item.description }}
-          </div>
-        }
-
-        <app-row-stat-summary
-          class="block my-2"
-          [stats]="item.stats"
-          [bonusStats]="bonusStats() ?? item.bonusStats"
-          [resistances]="item.resistances"
-          [bonusResistances]="bonusResistances() ?? item.bonusResistances"
-          [combatStats]="item.combatStats"
-          [bonusCombatStats]="bonusCombatStats() ?? item.bonusCombatStats"
-        />
-
-        @for (desc of item.miscAffixDescriptions; track desc) {
-          <div class="text-xs my-1 text-value-positive">{{ desc }}</div>
-        }
-
-        <ng-content></ng-content>
-      </div>
-    </div>
+    <app-detail-item-preview
+      [display]="item"
+      [bonusStats]="bonusStats()"
+      [bonusResistances]="bonusResistances()"
+      [bonusCombatStats]="bonusCombatStats()"
+      [showEquippableBy]="showEquippableBy()"
+      [showDescription]="showDescription()"
+    >
+      <ng-content></ng-content>
+    </app-detail-item-preview>
 
     <ng-content select="[preview-footer]"></ng-content>
   }

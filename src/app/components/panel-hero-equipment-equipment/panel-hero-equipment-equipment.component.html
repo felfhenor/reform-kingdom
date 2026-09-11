@@ -76,7 +76,8 @@
           <app-card-equipment-item
             [equipment]="entry.content"
             [equipmentItem]="entry.item"
-            [comparisonStats]="selectedSlotComparisonStats()"
+            [equippedContent]="selectedContent"
+            [equippedItem]="equippedItemFor(selected)"
             [disabled]="!modifiable"
             (equip)="equip(entry.item.id)"
           />

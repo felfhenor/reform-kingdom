@@ -8,13 +8,21 @@
   @for (key of baseRows(); track key) {
     <div
       class="flex items-center gap-2"
-      [class.text-value-positive]="bonusValue(key) > 0"
-      [class.text-value-negative]="bonusValue(key) < 0"
+      [class.text-value-positive]="!hasComparison() && bonusValue(key) > 0"
+      [class.text-value-negative]="!hasComparison() && bonusValue(key) < 0"
     >
       <app-icon class="min-w-[20px]" [name]="icon(key)" size="stat" />
 
       <span>
         {{ label(key) }} {{ totalValue(key) | statDisplay }}{{ suffix(key) }}
+        @if (hasComparison() && deltaValue(key) !== 0) {
+          <span
+            [class.text-value-positive]="deltaValue(key) > 0"
+            [class.text-value-negative]="deltaValue(key) < 0"
+          >
+            ({{ deltaValue(key) | statDisplay: 0 : true }}{{ suffix(key) }})
+          </span>
+        }
       </span>
     </div>
   }

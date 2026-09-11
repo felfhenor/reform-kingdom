@@ -10,14 +10,22 @@
 
     <div
       class="flex items-center gap-2 text-xs"
-      [class.text-value-positive]="isPositive(stat)"
-      [class.text-value-negative]="isNegative(stat)"
+      [class.text-value-positive]="!hasComparison() && isPositive(stat)"
+      [class.text-value-negative]="!hasComparison() && isNegative(stat)"
     >
       <app-icon-stat [stat]="stat" />
       <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
       <span>
         {{ value | statDisplay: maxDecimals() : showSign() }}
       </span>
+      @if (hasComparison() && deltaValue(stat) !== 0) {
+        <span
+          [class.text-value-positive]="isPositive(stat)"
+          [class.text-value-negative]="isNegative(stat)"
+        >
+          ({{ deltaValue(stat) | statDisplay: maxDecimals() : true }})
+        </span>
+      }
     </div>
   }
 </div>

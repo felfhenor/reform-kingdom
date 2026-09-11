@@ -16,9 +16,14 @@ export class RowLabeledValuesComponent {
   // Extra bonus (e.g. from infusions/affixes), merged into the base value
   // it modifies rather than shown as its own row.
   public bonusValues = input<Record<string, number>>();
+  // When set, rows show a colored delta badge against this baseline (base+bonus
+  // total) next to the raw value, e.g. the equip-picker's two-column comparison.
+  public comparisonValues = input<Record<string, number>>();
   // 'column' (default) for tooltips/detail panels, full sentence per row;
   // 'row' for compact space-constrained lists.
   public layout = input<'column' | 'row'>('column');
+
+  public hasComparison = computed(() => !!this.comparisonValues());
 
   public baseRows = computed<string[]>(() =>
     this.dimension().order.filter(
@@ -48,5 +53,10 @@ export class RowLabeledValuesComponent {
 
   public totalValue(key: string): number {
     return this.baseValue(key) + this.bonusValue(key);
+  }
+
+  public deltaValue(key: string): number {
+    const comparison = this.comparisonValues();
+    return comparison ? this.totalValue(key) - (comparison[key] ?? 0) : 0;
   }
 }

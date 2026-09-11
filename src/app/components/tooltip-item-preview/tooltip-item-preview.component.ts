@@ -5,10 +5,7 @@ import {
   input,
   viewChild,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
-import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
 import {
   type CombatStatBlock,
   type ItemPreviewDisplay,
@@ -22,12 +19,7 @@ import {
 @Component({
   selector: 'app-tooltip-item-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    IconItemPreviewComponent,
-    RowStatSummaryComponent,
-    SlotIconBlankComponent,
-    AtlasImageComponent,
-  ],
+  imports: [DetailItemPreviewComponent],
   templateUrl: './tooltip-item-preview.component.html',
   styleUrl: './tooltip-item-preview.component.scss',
 })

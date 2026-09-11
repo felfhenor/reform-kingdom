@@ -1,0 +1,72 @@
+@let item = display();
+
+<div class="flex gap-2 p-2">
+  <div class="detail-item-preview-image">
+    <app-icon-item-preview
+      [sprite]="item.sprite"
+      [spritesheet]="item.spritesheet"
+      [backdropSprite]="item.backdropSprite"
+    />
+  </div>
+
+  <div>
+    <div class="font-bold mb-1 text-{{ item.rarity }}">
+      {{ item.name }}
+    </div>
+
+    @if (item.levelRequirement) {
+      <div class="text-xs my-1">Lv. {{ item.levelRequirement }}</div>
+    }
+
+    @if (showEquippableBy()) {
+      @if (item.equippableHeroNames; as equippable) {
+        <div class="text-xs mb-2">
+          @if (equippable.length > 0) {
+            Equippable by: {{ equippable.join(', ') }}
+          } @else {
+            <span class="text-warning">
+              None of your heroes can equip this.
+            </span>
+          }
+        </div>
+      }
+    }
+
+    @if (showDescription()) {
+      <div class="italic text-sm mb-2">
+        {{ item.description }}
+      </div>
+    }
+
+    <app-row-stat-summary
+      class="block my-2"
+      [stats]="item.stats"
+      [bonusStats]="bonusStats() ?? item.bonusStats"
+      [comparisonStats]="comparisonStats()"
+      [resistances]="item.resistances"
+      [bonusResistances]="bonusResistances() ?? item.bonusResistances"
+      [comparisonResistances]="comparisonResistances()"
+      [combatStats]="item.combatStats"
+      [bonusCombatStats]="bonusCombatStats() ?? item.bonusCombatStats"
+      [comparisonCombatStats]="comparisonCombatStats()"
+    />
+
+    @for (skill of item.skills; track skill.id) {
+      <div class="text-xs my-1 italic text-lighter flex items-center gap-2">
+        Teaches
+        <span class="zoom-inline">
+          <app-slot-icon-blank [showBackground]="false">
+            <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />
+          </app-slot-icon-blank>
+        </span>
+        {{ skill.name }}
+      </div>
+    }
+
+    @for (desc of item.miscAffixDescriptions; track desc) {
+      <div class="text-xs my-1 text-value-positive">{{ desc }}</div>
+    }
+
+    <ng-content></ng-content>
+  </div>
+</div>

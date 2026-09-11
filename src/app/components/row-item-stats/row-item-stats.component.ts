@@ -25,8 +25,8 @@ export class RowItemStatsComponent {
   // Extra flat bonus (e.g. from infusions/affixes), merged into the base
   // value it modifies rather than shown as its own row.
   public bonusStats = input<StatBlock>();
-  // When set, rows show the delta against this baseline (base+bonus total)
-  // instead of the raw value, colored green/rose (equip-picker "compare to equipped").
+  // When set, rows show a colored delta badge against this baseline (base+bonus
+  // total) next to the raw value, e.g. the equip-picker's two-column comparison.
   public comparisonStats = input<StatBlock>();
   public maxDecimals = input(2);
   // 'column' (default) for tooltips/detail panels; 'row' for compact,
@@ -68,7 +68,7 @@ export class RowItemStatsComponent {
   }
 
   public rowValue(stat: BaseStat): number {
-    return this.hasComparison() ? this.deltaValue(stat) : this.totalValue(stat);
+    return this.totalValue(stat);
   }
 
   public isPositive(stat: BaseStat): boolean {
