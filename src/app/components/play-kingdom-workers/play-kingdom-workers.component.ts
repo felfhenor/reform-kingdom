@@ -233,9 +233,6 @@ export class PlayKingdomWorkersComponent {
   public displayedNodeName = computed(
     () => this.draftNodeName() ?? this.currentAssignment()?.nodeName,
   );
-  public displayedItemId = computed(
-    () => this.draftItemId() ?? this.currentAssignment()?.itemId,
-  );
 
   // Every discovered gather node the worker could theoretically be sent to,
   // disabled (not filtered out) when out of stamina range for the selected worker.
@@ -277,6 +274,14 @@ export class PlayKingdomWorkersComponent {
         return info ? { id: itemId, ...info } : undefined;
       })
       .filter((option): option is ItemOption => !!option);
+  });
+
+  public displayedItemId = computed(() => {
+    const itemId = this.draftItemId() ?? this.currentAssignment()?.itemId;
+    if (!itemId) return undefined;
+    return this.itemOptions().some((option) => option.id === itemId)
+      ? itemId
+      : undefined;
   });
 
   public canConfirmAssignment = computed(
