@@ -1,3 +1,7 @@
+import {
+  INDICATOR_PROGRESS_BAR_HEIGHT,
+  INDICATOR_PROGRESS_BAR_OFFSET_Y,
+} from '@helpers/config';
 import type { WorldNodeInteractionKind } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 import type { Texture } from 'pixi.js';
@@ -81,24 +85,24 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
   update: (fraction: number) => void;
 } {
   const barWidth = tileSize * 0.8;
-  const barHeight = 6;
   const offsetX = (tileSize - barWidth) / 2;
-  const offsetY = -40;
 
   const container = new Container();
   container.cullable = true;
   container.visible = false;
 
   const background = new Graphics()
-    .rect(0, 0, barWidth, barHeight)
+    .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
     .fill(0x000000);
   background.alpha = 0.6;
   background.x = offsetX;
-  background.y = offsetY;
+  background.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
 
-  const fill = new Graphics().rect(0, 0, barWidth, barHeight).fill(0x4ade80);
+  const fill = new Graphics()
+    .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
+    .fill(0x4ade80);
   fill.x = offsetX;
-  fill.y = offsetY;
+  fill.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
 
   container.addChild(background, fill);
 
@@ -114,24 +118,24 @@ export function pixiIndicatorEncounterProgressCreate(tileSize: number): {
   update: (fraction: number) => void;
 } {
   const barWidth = tileSize * 0.8;
-  const barHeight = 6;
   const offsetX = (tileSize - barWidth) / 2;
-  const offsetY = -40;
 
   const container = new Container();
   container.cullable = true;
   container.visible = false;
 
   const background = new Graphics()
-    .rect(0, 0, barWidth, barHeight)
+    .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
     .fill(0x000000);
   background.alpha = 0.6;
   background.x = offsetX;
-  background.y = offsetY;
+  background.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
 
-  const fill = new Graphics().rect(0, 0, barWidth, barHeight).fill(0xfb7185);
+  const fill = new Graphics()
+    .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
+    .fill(0xfb7185);
   fill.x = offsetX;
-  fill.y = offsetY;
+  fill.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
 
   container.addChild(background, fill);
 

@@ -5,6 +5,7 @@ import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
 import { combatDoCombatIteration } from '@helpers/combat/combat';
 import { currentCombat } from '@helpers/combat/combat-state';
 import { commissionProcessTick } from '@helpers/commission/commission-tick';
+import { TICKS_PER_YIELD } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { discordUpdateStatus } from '@helpers/engine/discord';
@@ -37,9 +38,6 @@ import { workersProcessTick } from '@helpers/worker/worker-tick';
 import { clamp } from 'es-toolkit/compat';
 
 export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
-
-// Caps how many ticks run before yielding to the browser during a long catch-up (e.g. after the tab was backgrounded), so it doesn't block the main thread for seconds at a time.
-const TICKS_PER_YIELD = 100;
 
 // Guards the loop from a second call landing mid-batch now that it yields - e.g. a manual `window.api.gameloop()` during a catch-up.
 let isProcessingTicks = false;

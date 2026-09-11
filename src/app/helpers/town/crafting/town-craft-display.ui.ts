@@ -1,11 +1,9 @@
+import { RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { gamestate } from '@helpers/state-game';
-import {
-  RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER,
-  townCraftTimeFor,
-} from '@helpers/town/crafting/town-craft-time';
+import { townCraftTimeFor } from '@helpers/town/crafting/town-craft-time';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import type {
   RecipeContent,

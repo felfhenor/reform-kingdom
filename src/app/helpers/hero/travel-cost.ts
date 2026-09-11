@@ -1,12 +1,11 @@
+import {
+  TICKS_PER_STEP_OFF_PATH,
+  TICKS_PER_STEP_ON_PATH,
+} from '@helpers/config';
 import { tileIsOnPath } from '@helpers/pathfinding/pathfinding';
 import { worldNodeAt } from '@helpers/world-node/world-nodes';
 import type { CurrentLocation, TravelStep } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
-
-// Split out so this pure tick-costing math stays free of its gameplay side effects.
-
-export const TICKS_PER_STEP_ON_PATH = 1;
-export const TICKS_PER_STEP_OFF_PATH = 3;
 
 // A node's own tile counts as "on path" so arriving doesn't stutter with the off-path cost.
 function travelTileCountsAsPath(

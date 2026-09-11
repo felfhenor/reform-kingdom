@@ -1,3 +1,9 @@
+import {
+  SELL_GOLD_PER_COMBAT_STAT_POINT,
+  SELL_GOLD_PER_LEVEL,
+  SELL_GOLD_PER_RESISTANCE_POINT,
+  SELL_GOLD_PER_STAT_POINT,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
@@ -77,13 +83,6 @@ export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {
   return !!gamestate().discoveredEquipment[equipmentId]?.foundAt;
 }
 
-// Same rate infusion pricing uses, plus a per-level component so higher-tier drops are worth more.
-const SELL_GOLD_PER_STAT_POINT = 20;
-const SELL_GOLD_PER_LEVEL = 10;
-// Combat stats are rarer/more specialized than a raw base stat point, so they're worth more.
-const SELL_GOLD_PER_COMBAT_STAT_POINT = 50;
-// Same rate infusion pricing uses for a resistance point - the rarest, most specialized bonus.
-const SELL_GOLD_PER_RESISTANCE_POINT = 100;
 const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
   Common: 1,
   Uncommon: 1.5,

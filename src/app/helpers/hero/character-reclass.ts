@@ -1,3 +1,4 @@
+import { RECLASS_GOLD_PER_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment } from '@helpers/defaults';
 import {
@@ -32,8 +33,6 @@ export function characterJobLevel(character: Character, jobId: JobId): number {
   if (character.jobId === jobId) return character.level;
   return character.jobProgress[jobId]?.level ?? 1;
 }
-
-const RECLASS_GOLD_PER_LEVEL = 100;
 
 // Priced by the level the hero lands on, not the one they're leaving - reclassing back into a high-level job costs more than reclassing out of one.
 export function characterReclassCost(

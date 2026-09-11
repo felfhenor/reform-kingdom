@@ -30,10 +30,10 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
-  CHARACTER_MAX_LEVEL,
   characterStatsForLevel,
   characterXpForLevel,
   createCharacter,

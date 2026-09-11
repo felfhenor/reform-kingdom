@@ -1,6 +1,7 @@
 import { combatDoCombatIteration } from '@helpers/combat/combat';
 import { combatLog } from '@helpers/combat/combat-log';
 import { currentCombat } from '@helpers/combat/combat-state';
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { decreeClauses } from '@helpers/decree/decree';
@@ -10,7 +11,7 @@ import {
 } from '@helpers/decree/decree-evaluation';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
 import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
-import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
+import { partyGet } from '@helpers/hero/party';
 import { restingProcessTick } from '@helpers/hero/resting';
 import { travelProcessTick } from '@helpers/hero/travel';
 import { canModifyEquipment } from '@helpers/item/equipment';

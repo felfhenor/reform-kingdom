@@ -1,21 +1,22 @@
+import {
+  GATHER_VFX_FLOAT_DISTANCE,
+  GATHER_VFX_JITTER_RANGE,
+  GATHER_VFX_LIFETIME_MS,
+} from '@helpers/config';
 import type { GatherVfxEvent } from '@interfaces';
 import type { Texture } from 'pixi.js';
 import { Container, Sprite, Text } from 'pixi.js';
-
-const LIFETIME_MS = 1100;
-const FLOAT_DISTANCE = 40;
-const JITTER_RANGE = 30;
 
 // Elapsed-time -> visual state. Returns undefined once the effect's lifetime has passed (caller destroys it).
 export function gatherVfxFloatState(
   elapsedMs: number,
 ): { alpha: number; offsetY: number } | undefined {
-  if (elapsedMs >= LIFETIME_MS) return undefined;
+  if (elapsedMs >= GATHER_VFX_LIFETIME_MS) return undefined;
 
-  const fraction = elapsedMs / LIFETIME_MS;
+  const fraction = elapsedMs / GATHER_VFX_LIFETIME_MS;
   return {
     alpha: 1 - fraction,
-    offsetY: -FLOAT_DISTANCE * fraction,
+    offsetY: -GATHER_VFX_FLOAT_DISTANCE * fraction,
   };
 }
 
@@ -84,7 +85,7 @@ export function pixiFloatingTextCreate(
   container.pivot.set(cursorX / 2, qtyText.height / 2);
 
   // Picked once and held for the popup's whole lifetime, so simultaneous popups at one node don't perfectly overlap.
-  const jitterX = (Math.random() - 0.5) * JITTER_RANGE;
+  const jitterX = (Math.random() - 0.5) * GATHER_VFX_JITTER_RANGE;
 
   const update = (
     elapsedMs: number,

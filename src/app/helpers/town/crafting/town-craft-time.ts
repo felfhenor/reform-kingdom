@@ -1,9 +1,6 @@
-import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting/tradeskill';
+import { TRADESKILL_MAX_LEVEL } from '@helpers/config';
 import { clamp } from 'es-toolkit/compat';
 import type { RecipeContent, TownContent } from '@interfaces';
-
-// Shared with the crafting queue's display, so its remaining-time stays in sync with actual tick processing.
-export const RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER = 2;
 
 // Flat -1%/level (e.g. level 25 crafts 25% faster), floored at 1 tick so a maxed-out level never instant-completes.
 export function townCraftTimeFor(

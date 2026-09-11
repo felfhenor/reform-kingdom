@@ -1,3 +1,9 @@
+import {
+  WORKER_MAX_LEVEL,
+  WORKER_XP_END,
+  WORKER_XP_START,
+  XP_CURVE_EASE,
+} from '@helpers/config';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { hasGold } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
@@ -10,12 +16,6 @@ import type {
   WorkerState,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-
-// The house curve for any leveled system - with its own cap/start/end.
-export const WORKER_MAX_LEVEL = 99;
-const WORKER_XP_START = 10;
-const WORKER_XP_END = 10000;
-const XP_CURVE_EASE = 1.5;
 
 export function workerXpForLevel(level: number): number {
   const progress = (level - 1) / (WORKER_MAX_LEVEL - 1);

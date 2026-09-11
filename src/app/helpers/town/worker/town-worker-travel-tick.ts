@@ -1,3 +1,4 @@
+import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
 import { travelStepTicksCost } from '@helpers/hero/travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
@@ -10,9 +11,6 @@ import type {
   TravelStep,
   WorkerId,
 } from '@interfaces';
-
-// Worker pauses this long between filling up and hauling back
-export const TOWN_WORKER_REST_TICKS = 30;
 
 // Structural fork, not shared state.
 function advancePathOneTick(

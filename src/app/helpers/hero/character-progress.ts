@@ -1,10 +1,14 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
+import {
+  CHARACTER_MAX_LEVEL,
+  HEALING_MINIMUM_SECONDS,
+  HEALING_SECONDS_PER_LEVEL,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { heroSkillsAtLevel } from '@helpers/hero/job';
 import {
-  CHARACTER_MAX_LEVEL,
   characterStatsForLevel,
   characterXpForLevel,
 } from '@helpers/hero/party';
@@ -55,9 +59,6 @@ export function healPartyToFull(): void {
     return state;
   });
 }
-
-const HEALING_MINIMUM_SECONDS = 10;
-const HEALING_SECONDS_PER_LEVEL = 2;
 
 export function healingTicksForLevel(members: { level: number }[]): number {
   const highestLevel = Math.max(...members.map((member) => member.level), 1);

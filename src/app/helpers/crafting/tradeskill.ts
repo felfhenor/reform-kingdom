@@ -1,3 +1,9 @@
+import {
+  TRADESKILL_MAX_LEVEL,
+  TRADESKILL_XP_END,
+  TRADESKILL_XP_START,
+  XP_CURVE_EASE,
+} from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -18,11 +24,6 @@ import type {
   TradeskillLevelRequirementContent,
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
-
-export const TRADESKILL_MAX_LEVEL = 50;
-const TRADESKILL_XP_START = 10;
-const TRADESKILL_XP_END = 5000;
-const XP_CURVE_EASE = 1.5;
 
 // `xp.maximum: 10` matches the level-1 curve value, kept as a literal here to avoid an import cycle.
 const DEFAULT_BUILDING: TradeskillBuildingState = {

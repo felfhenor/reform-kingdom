@@ -1,3 +1,8 @@
+import {
+  TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT,
+  TOWN_PRIORITY_WEIGHT_PER_FAILURE,
+  TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { townMaterialQuantity } from '@helpers/town/town-materials';
 import type {
@@ -9,11 +14,6 @@ import type {
   TownItemPriorityMap,
   TownSpecialtyPriorityEntry,
 } from '@interfaces';
-
-export const TOWN_PRIORITY_WEIGHT_PER_FAILURE = 0.5;
-export const TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT = 20;
-// Uncapped - the dedicated specialty commission should keep escalating for as long as its recipe keeps failing.
-export const TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE = 1;
 
 function priorityMultiplier(
   failureCount: number,

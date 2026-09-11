@@ -1,3 +1,4 @@
+import { TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
@@ -13,8 +14,6 @@ import type {
   TownNodeState,
   TownSpecialtyPriorityEntry,
 } from '@interfaces';
-
-const TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL = 1;
 
 export function townSpecialtyPriority(
   townId: TownId,

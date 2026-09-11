@@ -2,6 +2,11 @@ import {
   combatantsFromTownGuardians,
   combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
+import {
+  CHARACTER_MAX_LEVEL,
+  TRADESKILL_MAX_LEVEL,
+  WORKER_MAX_LEVEL,
+} from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   isRecipeDropGated,
@@ -9,13 +14,11 @@ import {
   recipeUndiscover,
 } from '@helpers/crafting/recipes';
 import {
-  TRADESKILL_MAX_LEVEL,
   tradeskillBuildingIn,
   tradeskillIdForName,
   tradeskillXpForLevel,
 } from '@helpers/crafting/tradeskill';
 import {
-  CHARACTER_MAX_LEVEL,
   characterStatsForLevel,
   characterXpForLevel,
   partyGet,
@@ -35,10 +38,7 @@ import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputa
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { townMarkVisited } from '@helpers/town/town-visit';
 import { workerRescue } from '@helpers/worker/worker-discovery';
-import {
-  WORKER_MAX_LEVEL,
-  workerXpForLevel,
-} from '@helpers/worker/worker-progression';
+import { workerXpForLevel } from '@helpers/worker/worker-progression';
 import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,

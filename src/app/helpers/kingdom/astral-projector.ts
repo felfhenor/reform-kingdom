@@ -1,4 +1,5 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
+import { MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
@@ -12,9 +13,6 @@ import type {
   GameStateDiscoveredAstralProjectorSpells,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
-
-// Only one spell can be active for now - raising this later is a one-line change.
-export const MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS = 1;
 
 export function astralProjectorEntries(): AstralProjectorContent[] {
   return getEntriesByType<AstralProjectorContent>('astralprojector');

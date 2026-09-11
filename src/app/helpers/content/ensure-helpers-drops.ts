@@ -1,4 +1,4 @@
-import { CHARACTER_MAX_LEVEL } from '@helpers/hero/party';
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import type {
   DroppedCollectibleReward,
   DroppedEquipmentReward,

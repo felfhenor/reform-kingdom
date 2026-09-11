@@ -1,5 +1,12 @@
 import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
+import {
+  RAID_LOSS_CRAFT_DEBUFF_TICKS,
+  RAID_LOSS_MATERIAL_STEAL_PERCENT,
+  RAID_LOSS_REPUTATION_AMOUNT,
+  RAID_LOSS_STOCK_MAX_STEAL_PERCENT,
+  RAID_WIN_REPUTATION_AMOUNT,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -29,14 +36,6 @@ import type {
   TownNodeState,
   TownRaidLossSummary,
 } from '@interfaces';
-
-const RAID_WIN_REPUTATION_AMOUNT = 100;
-const RAID_LOSS_REPUTATION_AMOUNT = 50;
-export const RAID_LOSS_CRAFT_DEBUFF_TICKS = 3600;
-// Raiders take 1 to (this % of the town's stock cap, not its current stock count) random stock entries.
-const RAID_LOSS_STOCK_MAX_STEAL_PERCENT = 50;
-// Raiders take this % of every material stack the town is holding.
-const RAID_LOSS_MATERIAL_STEAL_PERCENT = 50;
 
 // Grants the town's raid-only reward table through the same pipeline monster kills use.
 export function raidResolveVictory(combat: Combat, townId: TownId): void {

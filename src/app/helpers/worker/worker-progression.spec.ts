@@ -13,10 +13,10 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   kingdomNodeGet: vi.fn(),
 }));
 
+import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { hasGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
-  WORKER_MAX_LEVEL,
   defaultWorkerState,
   statBlockForLevel,
   workerGainXp,

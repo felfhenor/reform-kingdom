@@ -1,4 +1,8 @@
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
+import {
+  URGENCY_SAFE_MIN_TICKS,
+  URGENCY_WARNING_MIN_TICKS,
+} from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -13,9 +17,6 @@ import type {
   GameStateDiscoveredCaravans,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-
-const URGENCY_SAFE_MIN_TICKS = 1800; // 30 minutes
-const URGENCY_WARNING_MIN_TICKS = 300; // 5 minutes
 
 export function caravanState(
   caravanId: CaravanId,

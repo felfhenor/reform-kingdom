@@ -1,3 +1,4 @@
+import { WORKER_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';
 import {
@@ -11,10 +12,6 @@ import {
   townWorkerTravelProcessTick,
 } from '@helpers/town/worker/town-worker-travel-tick';
 import type { TownContent, WorkerId } from '@interfaces';
-
-// Runs every tick once activated - worker travel/gathering progress continuously.
-// Raising this is a blunt slowdown on the whole worker economy - it advances per-tick progress by +1 regardless of how many real ticks elapsed since the last run.
-const WORKER_TICK_INTERVAL = 1;
 
 function processTownWorker(town: TownContent, workerId: WorkerId): void {
   const worker = gamestate().world.towns[town.id]?.workers[workerId];

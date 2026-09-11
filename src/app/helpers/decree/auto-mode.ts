@@ -1,4 +1,5 @@
 import { currentCombat } from '@helpers/combat/combat-state';
+import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   decreeClauses,
@@ -34,8 +35,6 @@ import type {
   GlobalEffectContent,
   GlobalEffectId,
 } from '@interfaces';
-
-const AUTO_MODE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365;
 
 export function autoModeIsEnabled(): boolean {
   return gamestate().world.autoMode.enabled;
@@ -121,10 +120,7 @@ function syncAutoModeGlobalEffect(enabled: boolean): void {
   if (enabled === isEffectActive) return;
 
   if (enabled) {
-    addGlobalEffect(
-      'Auto Mode' as GlobalEffectId,
-      AUTO_MODE_EFFECT_DURATION_TICKS,
-    );
+    addGlobalEffect('Auto Mode' as GlobalEffectId, ONE_YEAR_TICKS);
     return;
   }
 

@@ -1,3 +1,4 @@
+import { STARTING_GOLD_AMOUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -119,8 +120,6 @@ export function hasGold(amount: number): boolean {
 export function hasTraderTokens(amount: number): boolean {
   return getMaterialQuantity(traderTokenId()) >= amount;
 }
-
-const STARTING_GOLD_AMOUNT = 100;
 
 // Grants the new-game starting gold - only called once, when a fresh world
 // is created, so it never re-applies to an existing save.

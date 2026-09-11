@@ -2,6 +2,7 @@ import {
   eligibleCommissionOffers,
   rollCommissionRequirements,
 } from '@helpers/commission/commission-requirement';
+import { TOWN_COMMISSION_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngChoiceWeighted, rngUuid } from '@helpers/rng';
@@ -28,9 +29,6 @@ import type {
   TownContent,
   TownNodeState,
 } from '@interfaces';
-
-// Same cadence as every other town subsystem (worker/craft/shop).
-const TOWN_COMMISSION_TICK_INTERVAL = 1;
 
 // A shared game-balance curve, not authored per-town.
 const TOWN_COMMISSION_SLOT_COUNTS: Record<number, number> = {

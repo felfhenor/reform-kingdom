@@ -1,3 +1,9 @@
+import {
+  CHARACTER_MAX_LEVEL,
+  CHARACTER_XP_END,
+  CHARACTER_XP_START,
+  XP_CURVE_EASE,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
@@ -21,17 +27,15 @@ import type {
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
-export const CHARACTER_MAX_LEVEL = 99;
-const XP_START = 100;
-const XP_END = XP_START * 1000;
-const XP_CURVE_EASE = 1.5;
 const STARTER_ARMOR_NAME = 'Cloak of Adventuring';
 const STARTER_HAT_NAME = 'Hat of Adventuring';
 
 // `progress ** 1.5` eases in gently at low levels instead of a straight line's constant step dominating a tiny starting value.
 export function characterXpForLevel(level: number): number {
   const progress = (level - 1) / (CHARACTER_MAX_LEVEL - 1);
-  const xp = XP_START + (XP_END - XP_START) * progress ** XP_CURVE_EASE;
+  const xp =
+    CHARACTER_XP_START +
+    (CHARACTER_XP_END - CHARACTER_XP_START) * progress ** XP_CURVE_EASE;
   return roundToNearest10(xp);
 }
 

@@ -60,6 +60,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodesOfType: vi.fn(() => []),
 }));
 
+import { RAID_COOLDOWN_TICKS } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import { notifyError } from '@helpers/engine/notify';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
@@ -68,10 +69,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
-import {
-  RAID_COOLDOWN_TICKS,
-  townRaidProcessTick,
-} from '@helpers/town/raid/town-raid-tick';
+import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,

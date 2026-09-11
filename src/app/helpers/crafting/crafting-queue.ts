@@ -4,6 +4,7 @@ import {
   equipmentDropHtml,
   itemDropHtml,
 } from '@helpers/combat/combat-log';
+import { MAX_CRAFTABLE_CAP } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { isRecipeCraftable } from '@helpers/crafting/recipes';
 import {
@@ -48,8 +49,6 @@ import type {
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-
-const MAX_CRAFTABLE_CAP = 99;
 
 export function requirementAvailable(
   requirement: RecipeRequirementItem | RecipeRequirementEquipment,

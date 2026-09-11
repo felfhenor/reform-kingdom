@@ -34,6 +34,7 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   healingTicksForLevel,
@@ -43,11 +44,7 @@ import {
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
-import {
-  CHARACTER_MAX_LEVEL,
-  characterXpForLevel,
-  createCharacter,
-} from '@helpers/hero/party';
+import { characterXpForLevel, createCharacter } from '@helpers/hero/party';
 import { updateGamestate } from '@helpers/state-game';
 
 describe('Character Progress Helper Functions', () => {

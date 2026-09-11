@@ -1,5 +1,5 @@
+import { TRADESKILL_MAX_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting/tradeskill';
 import { clamp } from 'es-toolkit/compat';
 import type {
   RecipeContent,

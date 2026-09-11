@@ -17,12 +17,12 @@ vi.mock('@helpers/town/town-materials', () => ({
   applyTownMaterialDelta: vi.fn(),
 }));
 
+import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
 import { travelStepTicksCost } from '@helpers/hero/travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import {
-  TOWN_WORKER_REST_TICKS,
   townWorkerRestProcessTick,
   townWorkerTravelProcessTick,
 } from '@helpers/town/worker/town-worker-travel-tick';

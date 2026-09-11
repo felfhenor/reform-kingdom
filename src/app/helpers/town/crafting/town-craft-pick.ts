@@ -1,3 +1,4 @@
+import { SPECIALTY_RECIPE_WEIGHT } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
@@ -13,9 +14,6 @@ import type {
   TownItemPriorityMap,
   TownRecipePick,
 } from '@interfaces';
-
-// No authored weight value exists yet - a specialty recipe is this many times as likely to be picked as a non-specialty one.
-const SPECIALTY_RECIPE_WEIGHT = 3;
 
 function recipeWeight(
   recipe: RecipeContent,

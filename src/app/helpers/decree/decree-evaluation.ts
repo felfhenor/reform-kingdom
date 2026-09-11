@@ -1,4 +1,8 @@
 import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
+import {
+  CHARACTER_MAX_LEVEL,
+  LEVEL_UP_NODE_FAILURE_LIMIT,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   decreeNodeFailureCount,
@@ -8,7 +12,6 @@ import {
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import {
-  CHARACTER_MAX_LEVEL,
   isPartyAtFullEnergy,
   isPartyAtFullHealth,
 } from '@helpers/hero/party';
@@ -35,8 +38,6 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
-
-export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 
 const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
   Low: 0,

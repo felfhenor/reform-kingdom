@@ -36,7 +36,6 @@ vi.mock('@helpers/town/raid/town-raid-state', () => ({
 }));
 
 vi.mock('@helpers/hero/party', () => ({
-  CHARACTER_MAX_LEVEL: 99,
   isPartyAtFullHealth: vi.fn(() => true),
 }));
 
@@ -64,6 +63,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
+import { LEVEL_UP_NODE_FAILURE_LIMIT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   decreeNodeFailureCount,
@@ -73,7 +73,6 @@ import {
   clauseTargetNode,
   isClauseBlockedOnlyByHealth,
   isClauseSatisfiable,
-  LEVEL_UP_NODE_FAILURE_LIMIT,
   mostChallengingExploreNodeForRisk,
   nearestGatherNodeFor,
   nearestUnfinishedExploreNode,

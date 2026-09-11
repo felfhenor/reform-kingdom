@@ -11,6 +11,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
+import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import {
@@ -32,7 +33,6 @@ import {
   decreeSetWaitForFullEnergyBeforeCombat,
   decreeSetWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree.ui';
-import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/engine/risk-band';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery.ui';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';

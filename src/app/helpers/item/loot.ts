@@ -1,6 +1,6 @@
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
-import { CHARACTER_MAX_LEVEL } from '@helpers/hero/party';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { rngNumberRange } from '@helpers/rng';

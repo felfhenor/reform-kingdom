@@ -1,4 +1,5 @@
 import { currentCombat } from '@helpers/combat/combat-state';
+import { ONE_YEAR_TICKS, RESTING_REGEN_PERCENT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   addGlobalEffect,
@@ -9,13 +10,6 @@ import { isGathering } from '@helpers/item/gathering';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { GlobalEffectContent, GlobalEffectId } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-
-const RESTING_REGEN_PERCENT = 0.01;
-
-// Long enough that the Idle global effect never expires on its own during a
-// normal session - it's granted/revoked explicitly based on resting status
-// rather than through the timer-based expiry Deaths Door/Healing rely on.
-const IDLE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365;
 
 // True when the party has nothing else going on - not traveling, gathering, fighting, or recovering.
 export function isPartyResting(): boolean {
@@ -34,7 +28,7 @@ function syncIdleGlobalEffect(resting: boolean): void {
   if (resting === isIdleActive) return;
 
   if (resting) {
-    addGlobalEffect('Idle' as GlobalEffectId, IDLE_EFFECT_DURATION_TICKS);
+    addGlobalEffect('Idle' as GlobalEffectId, ONE_YEAR_TICKS);
     return;
   }
 

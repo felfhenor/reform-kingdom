@@ -1,3 +1,4 @@
+import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
@@ -14,9 +15,6 @@ import type {
   TownContent,
   TownReputationBuffTier,
 } from '@interfaces';
-
-// Indefinite (~100 years of ticks) - removed explicitly on leaving the town's map, not by expiry. Avoids overflow from adding Number.MAX_SAFE_INTEGER to an already-large currentTick.
-const REGIONAL_BUFF_DURATION_TICKS = 60 * 60 * 24 * 365 * 100;
 
 // Flattens a tier's authored stat blocks into GlobalEffectEffect entries, skipping un-authored (zero) values.
 export function townReputationBuffEffects(
@@ -73,7 +71,7 @@ function townReputationBuffEffect(
     effects,
     extendedDescription: globalEffectEffectsDescription(effects),
     startTick: currentTick,
-    expiresAtTick: currentTick + REGIONAL_BUFF_DURATION_TICKS,
+    expiresAtTick: currentTick + ONE_YEAR_TICKS,
   };
 }
 

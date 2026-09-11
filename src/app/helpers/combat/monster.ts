@@ -1,3 +1,8 @@
+import {
+  OVERLEVEL_XP_DEGRADE_PER_LEVEL,
+  OVERLEVEL_XP_HARD_CAP_AMOUNT,
+  OVERLEVEL_XP_HARD_CAP_LEVELS,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { rngNumberRange } from '@helpers/rng';
@@ -28,11 +33,6 @@ export function monsterXpReward(
   const range = rangeAtLevel(monster.xp, level);
   return rngNumberRange(range.min, range.max);
 }
-
-// XP degrades once the party out-levels a node's max, bottoming out at a flat 1 XP - keeps overleveled parties from farming trivial nodes.
-const OVERLEVEL_XP_DEGRADE_PER_LEVEL = 0.25;
-const OVERLEVEL_XP_HARD_CAP_LEVELS = 4;
-const OVERLEVEL_XP_HARD_CAP_AMOUNT = 1;
 
 export function xpForOverLevel(
   rawXp: number,

@@ -2,9 +2,13 @@ import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import {
+  CHARACTER_MAX_LEVEL,
+  TRADESKILL_MAX_LEVEL,
+  WORKER_MAX_LEVEL,
+} from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import { isRecipeDropGated } from '@helpers/crafting/recipes';
-import { TRADESKILL_MAX_LEVEL } from '@helpers/crafting/tradeskill';
 import {
   debugDiscoverAllRecipes,
   debugDiscoverGatherNode,
@@ -24,9 +28,8 @@ import {
   debugTelegraphRaid,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug.ui';
-import { CHARACTER_MAX_LEVEL, partyGet } from '@helpers/hero/party';
+import { partyGet } from '@helpers/hero/party';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
-import { WORKER_MAX_LEVEL } from '@helpers/worker/worker-progression';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type {
   CharacterId,

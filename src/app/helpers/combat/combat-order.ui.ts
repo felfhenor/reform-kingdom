@@ -1,7 +1,5 @@
-import {
-  COMBAT_ORDER_ROW_CAP,
-  combatOrderClauses,
-} from '@helpers/combat/combat-order';
+import { combatOrderClauses } from '@helpers/combat/combat-order';
+import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
 import { partyGet } from '@helpers/hero/party';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';

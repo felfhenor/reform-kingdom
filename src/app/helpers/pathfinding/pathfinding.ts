@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { OFF_PATH_MOVE_COST, ON_PATH_MOVE_COST } from '@helpers/config';
 import { allMaps } from '@helpers/maps';
 import { weightedGridPathFind } from '@helpers/pathfinding/pathfinding-astar';
 import {
@@ -23,10 +24,6 @@ const DENSE_TILE_LAYER_NAME = 'Dense Tiles';
 const DENSE_OBJECT_LAYER_NAME = 'Dense Objects';
 const PATH_TILE_LAYER_NAME = 'Path Tiles';
 const PATH_OBJECT_LAYER_NAME = 'Path Objects';
-
-// Path tiles are cheaper than other open tiles so pathfinding hugs authored paths without blocking off-road.
-const ON_PATH_MOVE_COST = 1;
-const OFF_PATH_MOVE_COST = 4;
 
 // (x, y) is the unrotated bottom-left pivot; rotating the corners
 // around it is what makes a rotated bend tile resolve to the grid cell it's actually drawn into.

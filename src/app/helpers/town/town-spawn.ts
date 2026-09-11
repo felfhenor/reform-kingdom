@@ -1,3 +1,4 @@
+import { TOWN_HOME_MIN_REPUTATION_TIER } from '@helpers/config';
 import { gamestate } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -7,9 +8,6 @@ import {
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type { TownId, WorldNodeEntry } from '@interfaces';
-
-// Honored - the minimum reputation tier at which a town can be designated home.
-export const TOWN_HOME_MIN_REPUTATION_TIER = 2;
 
 // The recall target for Deaths Door and the ReturnToKingdom decree clause - a designated Town, falling back to the Duchy if never set or if its content is later removed.
 export function homeNodeGet(): WorldNodeEntry | undefined {

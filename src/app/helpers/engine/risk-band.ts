@@ -1,7 +1,5 @@
+import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/config';
 import type { ExploreNodeRiskBand, LevelRange } from '@interfaces';
-
-// Beyond this many levels above the party's floor, a range is excluded outright (TooHigh) regardless of risk setting.
-export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
 
 // Judged against both ends of the range, since a roll can land anywhere in it, not just the floor.
 export function riskBandForLevelRange(

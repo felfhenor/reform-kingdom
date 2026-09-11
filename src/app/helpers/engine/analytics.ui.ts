@@ -1,5 +1,4 @@
-const MAX_EVENT_SEGMENTS = 5;
-const MAX_SEGMENT_LENGTH = 32;
+import { MAX_EVENT_SEGMENTS, MAX_SEGMENT_LENGTH } from '@helpers/config';
 
 // GameAnalytics silently rejects ids over these limits, so enforce them centrally rather than per call site.
 export function analyticsBoundEventId(eventId: string): string {

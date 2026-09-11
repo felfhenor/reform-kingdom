@@ -1,3 +1,7 @@
+import {
+  CRAFT_TICK_INTERVAL,
+  RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER,
+} from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
@@ -5,10 +9,7 @@ import { updateGamestate } from '@helpers/state-game';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import { resetTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
-import {
-  RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER,
-  townCraftTimeFor,
-} from '@helpers/town/crafting/town-craft-time';
+import { townCraftTimeFor } from '@helpers/town/crafting/town-craft-time';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
@@ -26,9 +27,6 @@ import type {
   TownId,
   TownNodeState,
 } from '@interfaces';
-
-// Runs every tick once activated - craft progress is continuous.
-const CRAFT_TICK_INTERVAL = 1;
 
 // Grants the result unconditionally (the caller already decided the craft succeeds) - a material result
 // feeds the materials stash directly, only equipment lands in stock.

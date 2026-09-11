@@ -1,3 +1,10 @@
+import {
+  RAID_BASE_WARNING_TICKS,
+  RAID_CHECK_INTERVAL_TICKS,
+  RAID_COOLDOWN_TICKS,
+  RAID_WARNING_TICKS_PER_MAP_HOP,
+  RAID_WARNING_TICKS_PER_REPUTATION_TIER,
+} from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -22,14 +29,6 @@ import {
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type { TownContent } from '@interfaces';
-
-// Re-check cadence, not the actual cap.
-const RAID_CHECK_INTERVAL_TICKS = 60;
-
-export const RAID_COOLDOWN_TICKS = 14400;
-const RAID_BASE_WARNING_TICKS = 300;
-const RAID_WARNING_TICKS_PER_MAP_HOP = 120;
-const RAID_WARNING_TICKS_PER_REPUTATION_TIER = 60;
 
 // Fixed per town (distance + reputation), not the party's position - that would be exploitable.
 function raidWarningWindowTicks(town: TownContent): number {

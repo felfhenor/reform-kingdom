@@ -3,6 +3,7 @@
  * subset.
  */
 
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { filterByNames, round2, statSum } from '@helpers/debug/analysis-utils';
 import type {
@@ -13,8 +14,6 @@ import type {
   MonsterContent,
   StatBlock,
 } from '@interfaces';
-
-const MAX_LEVEL = 99;
 
 const STAT_NAMES = [
   'Intelligence',
@@ -42,9 +41,9 @@ export function runMonsterStatsAnalysis(
   params: AnalysisParams,
 ): AnalysisRunResult {
   const level = Number(params['level'] ?? 50);
-  if (!Number.isInteger(level) || level < 1 || level > MAX_LEVEL) {
+  if (!Number.isInteger(level) || level < 1 || level > CHARACTER_MAX_LEVEL) {
     throw new Error(
-      `"level" must be an integer between 1 and ${MAX_LEVEL}, got ${params['level']}.`,
+      `"level" must be an integer between 1 and ${CHARACTER_MAX_LEVEL}, got ${params['level']}.`,
     );
   }
 

@@ -1,3 +1,8 @@
+import {
+  GOLD_PER_COMBAT_STAT_POINT,
+  GOLD_PER_RESISTANCE_POINT,
+  GOLD_PER_STAT_POINT,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import {
@@ -17,10 +22,6 @@ import type {
   StatusEffectBlock,
 } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
-
-const GOLD_PER_STAT_POINT = 30;
-const GOLD_PER_RESISTANCE_POINT = 100;
-const GOLD_PER_COMBAT_STAT_POINT = 50;
 
 export function equipmentItemInfusionBonus(
   infusedItemIds: (ItemId | null)[],

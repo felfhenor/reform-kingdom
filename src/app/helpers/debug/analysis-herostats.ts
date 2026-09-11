@@ -5,6 +5,7 @@
  */
 
 import { combatDamageMitigationExpectedValue } from '@helpers/combat/combat-damage-mitigation';
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   addStats,
@@ -28,8 +29,6 @@ import type {
   StatusEffectContent,
 } from '@interfaces';
 import { maxBy, sumBy } from 'es-toolkit/compat';
-
-const CHARACTER_MAX_LEVEL = 99;
 
 const STAT_NAMES = [
   'Intelligence',

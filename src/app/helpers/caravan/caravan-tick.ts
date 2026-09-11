@@ -1,4 +1,5 @@
 import { caravanEligibleTraders } from '@helpers/caravan/caravan';
+import { ACTIVE_TRADE_COUNT } from '@helpers/config';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
@@ -14,8 +15,6 @@ import type {
   CaravanTraderId,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
-
-const ACTIVE_TRADE_COUNT = 4;
 
 function isDueForRegeneration(
   content: CaravanContent,

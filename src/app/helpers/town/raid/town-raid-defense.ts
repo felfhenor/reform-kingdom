@@ -1,3 +1,4 @@
+import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { applyGlobalEffectRemove } from '@helpers/hero/global-effect-state';
 import type {
@@ -9,7 +10,6 @@ import type {
   TownId,
 } from '@interfaces';
 
-const RAID_DEFENSE_EFFECT_DURATION_TICKS = 60 * 60 * 24 * 365 * 100;
 const RAID_DEFENSE_GLOBAL_EFFECT_ID =
   'Raid Defense Requested' as GlobalEffectId;
 
@@ -22,7 +22,7 @@ function raidDefenseGlobalEffect(
     ...content,
     extendedDescription: townNames.join(', '),
     startTick: currentTick,
-    expiresAtTick: currentTick + RAID_DEFENSE_EFFECT_DURATION_TICKS,
+    expiresAtTick: currentTick + ONE_YEAR_TICKS,
   };
 }
 

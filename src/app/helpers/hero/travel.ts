@@ -1,6 +1,10 @@
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { currentCombat } from '@helpers/combat/combat-state';
+import {
+  DEATHS_DOOR_MINIMUM_SECONDS,
+  DEATHS_DOOR_SECONDS_PER_MAP,
+} from '@helpers/config';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
@@ -36,14 +40,9 @@ import type { GlobalEffectId, TravelState, TravelStep } from '@interfaces';
 import { clamp, sum } from 'es-toolkit/compat';
 
 export {
-  TICKS_PER_STEP_OFF_PATH,
-  TICKS_PER_STEP_ON_PATH,
   travelPathTotalTicks,
   travelStepTicksCost,
 } from '@helpers/hero/travel-cost';
-
-const DEATHS_DOOR_SECONDS_PER_MAP = 10;
-const DEATHS_DOOR_MINIMUM_SECONDS = 10;
 
 function travelGet(): TravelState {
   return gamestate().world.travel;
