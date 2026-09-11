@@ -54,6 +54,10 @@
       [bonusCombatStats]="bonusCombatStats()"
     />
 
+    @for (desc of miscAffixDescriptions(); track desc) {
+      <div class="text-xs my-1 text-value-positive">{{ desc }}</div>
+    }
+
     @if (infusionSlotCount() > 0) {
       <div class="mt-2">
         <app-row-infused-materials

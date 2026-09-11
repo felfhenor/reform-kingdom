@@ -6,6 +6,12 @@ import {
   recipeStylizedName,
 } from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
+import { equipmentItemMiscAffixDescriptions } from '@helpers/item/affix';
+import {
+  equipmentItemBonusCombatStats,
+  equipmentItemBonusResistances,
+  equipmentItemBonusStats,
+} from '@helpers/item/equipment-display';
 import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
 import {
   type CollectibleContent,
@@ -70,6 +76,12 @@ export function itemPreviewDisplay(
       combatStats: eqContent.combatStats,
       levelRequirement: eqContent.levelRequirement,
       equippableHeroNames: equippableHeroNames(eqContent),
+      ...(instance && {
+        bonusStats: equipmentItemBonusStats(instance),
+        bonusResistances: equipmentItemBonusResistances(instance),
+        bonusCombatStats: equipmentItemBonusCombatStats(instance),
+        miscAffixDescriptions: equipmentItemMiscAffixDescriptions(instance),
+      }),
     } as ItemPreviewDisplay;
   }
 

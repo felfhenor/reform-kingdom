@@ -27,6 +27,12 @@ export type ItemPreviewDisplay = {
   stats?: StatBlock;
   resistances?: StatusEffectBlock;
   combatStats?: CombatStatBlock;
+  // Affix + infusion bonus on top of `stats`/`resistances`/`combatStats` - set only when previewing a specific rolled instance.
+  bonusStats?: StatBlock;
+  bonusResistances?: StatusEffectBlock;
+  bonusCombatStats?: CombatStatBlock;
+  // Affix effects with no dedicated stat/resistance display (gather yield, caravan discounts).
+  miscAffixDescriptions?: string[];
   skills?: EquipmentSkillContent[];
   // Equipment only.
   levelRequirement?: number;

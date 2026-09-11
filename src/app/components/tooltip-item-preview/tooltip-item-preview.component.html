@@ -56,12 +56,16 @@
         <app-row-stat-summary
           class="block my-2"
           [stats]="item.stats"
-          [bonusStats]="bonusStats()"
+          [bonusStats]="bonusStats() ?? item.bonusStats"
           [resistances]="item.resistances"
-          [bonusResistances]="bonusResistances()"
+          [bonusResistances]="bonusResistances() ?? item.bonusResistances"
           [combatStats]="item.combatStats"
-          [bonusCombatStats]="bonusCombatStats()"
+          [bonusCombatStats]="bonusCombatStats() ?? item.bonusCombatStats"
         />
+
+        @for (desc of item.miscAffixDescriptions; track desc) {
+          <div class="text-xs my-1 text-value-positive">{{ desc }}</div>
+        }
 
         <ng-content></ng-content>
       </div>

@@ -10,7 +10,6 @@ import {
   type CombatStat,
   type CombatStatBlock,
   CombatStatDimension,
-  type GameStat,
   type StatBlock,
   type StatusEffectBlock,
   type StatusEffectTag,
@@ -41,23 +40,27 @@ export class RowStatSummaryComponent {
   public maxDecimals = input(2);
   public showSign = input(true);
 
-  public hasAnyStats = computed(() => {
-    const stats = this.stats() ?? ({} as StatBlock);
-    return Object.keys(stats).some((k) => (stats[k as GameStat] ?? 0) > 0);
-  });
-
+  // Bonus-only values (e.g. a combat-stat/resistance affix on an item with
+  // no base value in that dimension) must still trigger the row - checking
+  // only the base block hides them entirely.
   public hasAnyResistances = computed(() => {
     const resistances = this.resistances() ?? ({} as StatusEffectBlock);
-    return Object.keys(resistances).some(
-      (k) => (resistances[k as StatusEffectTag] ?? 0) > 0,
+    const bonus = this.bonusResistances() ?? ({} as StatusEffectBlock);
+    return [...Object.keys(resistances), ...Object.keys(bonus)].some(
+      (k) =>
+        (resistances[k as StatusEffectTag] ?? 0) !== 0 ||
+        (bonus[k as StatusEffectTag] ?? 0) !== 0,
     );
   });
 
   public hasAnyCombatStats = computed(() => {
     const combatStats =
       this.combatStats() ?? ({} as Record<CombatStat, number>);
-    return Object.keys(combatStats).some(
-      (k) => (combatStats[k as CombatStat] ?? 0) > 0,
+    const bonus = this.bonusCombatStats() ?? ({} as Record<CombatStat, number>);
+    return [...Object.keys(combatStats), ...Object.keys(bonus)].some(
+      (k) =>
+        (combatStats[k as CombatStat] ?? 0) !== 0 ||
+        (bonus[k as CombatStat] ?? 0) !== 0,
     );
   });
 

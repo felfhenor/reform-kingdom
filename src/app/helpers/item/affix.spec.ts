@@ -14,6 +14,7 @@ import {
   equipmentItemAffixEffects,
   equipmentItemAffixes,
   equipmentItemDisplayName,
+  equipmentItemMiscAffixDescriptions,
   rollAffixIds,
 } from '@helpers/item/affix';
 import { rngChoiceRarity } from '@helpers/rng';
@@ -348,5 +349,41 @@ describe('affixEffectSum', () => {
 
   it('treats an effect kind without a value field (GrantSkill) as 0', () => {
     expect(affixEffectSum([grantSkillEffect], 'GrantSkill')).toBe(0);
+  });
+});
+
+describe('equipmentItemMiscAffixDescriptions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('includes the description of an affix whose effect has no dedicated display (GatherYield)', () => {
+    const gatherAffix: AffixContent = {
+      ...strengthAffix,
+      id: 'affix-gather' as AffixId,
+      description: 'Yields more Woodworking materials when gathering.',
+      effects: [{ kind: 'GatherYield', tradeskillId: 'Woodworking', value: 1 }],
+    };
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === gatherAffix.id ? gatherAffix : undefined) as never,
+    );
+
+    expect(
+      equipmentItemMiscAffixDescriptions(buildItem([gatherAffix.id])),
+    ).toEqual([gatherAffix.description]);
+  });
+
+  it('excludes an affix whose only effects already have a dedicated display (Stat)', () => {
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
+    );
+
+    expect(
+      equipmentItemMiscAffixDescriptions(buildItem([strengthAffix.id])),
+    ).toEqual([]);
+  });
+
+  it('returns an empty array when the item has no affixes', () => {
+    expect(equipmentItemMiscAffixDescriptions(buildItem([]))).toEqual([]);
   });
 });

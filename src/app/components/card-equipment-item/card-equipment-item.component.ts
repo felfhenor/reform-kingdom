@@ -10,7 +10,10 @@ import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { defaultStats } from '@helpers/defaults';
-import { equipmentItemDisplayName } from '@helpers/item/affix';
+import {
+  equipmentItemDisplayName,
+  equipmentItemMiscAffixDescriptions,
+} from '@helpers/item/affix';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
@@ -67,6 +70,10 @@ export class CardEquipmentItemComponent {
 
   public bonusCombatStats = computed(() =>
     equipmentItemBonusCombatStats(this.equipmentItem()),
+  );
+
+  public miscAffixDescriptions = computed(() =>
+    equipmentItemMiscAffixDescriptions(this.equipmentItem()),
   );
 
   public infusionSlotCount = computed(() =>
