@@ -4,7 +4,7 @@
  * configurable threshold as under-utilized.
  */
 
-import { getEntriesByType } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisParams,
@@ -14,6 +14,7 @@ import type {
   CaravanTraderContent,
   CommissionOfferContent,
   EncounterContent,
+  EncounterRandomContent,
   GatheringContent,
   ItemContent,
   MaterialUtilizationStats,
@@ -21,6 +22,10 @@ import type {
   RecipeContent,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
+
+// Resolved directly (not via `@helpers/item/materials`) since that module
+// transitively imports gamestate/IndexedDB, unsafe for this ts-node script.
+const TRADER_TOKEN_NAME = 'Trader Scrip';
 
 function isInfusionMaterial(item: ItemContent): boolean {
   if (!item.infusionStats) return false;
@@ -43,17 +48,20 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     caravanSells: 0,
     astralCasts: 0,
     commissionRequirements: 0,
+    commissionRewards: 0,
+    traderTokenSinks: 0,
   };
 }
 
-// One point per recipe, caravan buy, astral spell, and commission that
-// consumes it, plus one if infusable.
+// One point per recipe, caravan buy, astral spell, commission, and
+// token-trade/unlock spend that consumes it, plus one if infusable.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
     stats.caravanBuys +
     stats.astralCasts +
     stats.commissionRequirements +
+    stats.traderTokenSinks +
     (stats.infusable ? 1 : 0)
   );
 }
@@ -64,7 +72,8 @@ function productionCount(stats: MaterialUtilizationStats): number {
     stats.monsterDrops +
     stats.encounterRewards +
     stats.gatherSources +
-    stats.caravanSells
+    stats.caravanSells +
+    stats.commissionRewards
   );
 }
 
@@ -83,6 +92,8 @@ export function runMaterialUtilizationAnalysis(
   const recipes = getEntriesByType<RecipeContent>('recipe');
   const monsters = getEntriesByType<MonsterContent>('monster');
   const encounters = getEntriesByType<EncounterContent>('encounter');
+  const randomEncounters =
+    getEntriesByType<EncounterRandomContent>('encounterrandom');
   const gatherings = getEntriesByType<GatheringContent>('gathering');
   const caravanTraders =
     getEntriesByType<CaravanTraderContent>('caravantrader');
@@ -90,6 +101,7 @@ export function runMaterialUtilizationAnalysis(
     getEntriesByType<AstralProjectorContent>('astralprojector');
   const commissionOffers =
     getEntriesByType<CommissionOfferContent>('commissionoffer');
+  const traderTokenId = getEntry<ItemContent>(TRADER_TOKEN_NAME)?.id;
 
   const byId = new Map<string, MaterialUtilizationStats>();
   items
@@ -119,7 +131,9 @@ export function runMaterialUtilizationAnalysis(
     });
   });
 
-  encounters.forEach((encounter) => {
+  // `encounterrandom` (mystical/random nodes) has the same completionRewards
+  // shape as `encounter` and rolls into the same encounterRewards stat.
+  [...encounters, ...randomEncounters].forEach((encounter) => {
     encounter.completionRewards.forEach((reward) => {
       if (!('itemId' in reward)) return;
       const stats = byId.get(reward.itemId);
@@ -144,6 +158,12 @@ export function runMaterialUtilizationAnalysis(
       if (trade.type === 'buy') stats.caravanBuys += 1;
       if (trade.type === 'sell') stats.caravanSells += 1;
     });
+
+    // Token trades are always paid for in Trader Scrip, not `trade.itemId`.
+    if (traderTokenId && trader.tokenTrades.length > 0) {
+      const stats = byId.get(traderTokenId);
+      if (stats) stats.traderTokenSinks += trader.tokenTrades.length;
+    }
   });
 
   astralProjectors.forEach((astralProjector) => {
@@ -159,7 +179,23 @@ export function runMaterialUtilizationAnalysis(
       const stats = byId.get(requirement.itemId);
       if (stats) stats.commissionRequirements += 1;
     });
+
+    offer.rewards.forEach((reward) => {
+      if (!('itemId' in reward)) return;
+      const stats = byId.get(reward.itemId);
+      if (stats) stats.commissionRewards += 1;
+    });
   });
+
+  // Museum recipe unlocks are also always paid for in Trader Scrip.
+  if (traderTokenId) {
+    const stats = byId.get(traderTokenId);
+    if (stats) {
+      stats.traderTokenSinks += recipes.filter(
+        (recipe) => recipe.tokenUnlockCost > 0,
+      ).length;
+    }
+  }
 
   const allStats = sortBy(
     [...byId.values()],
@@ -182,11 +218,13 @@ export function runMaterialUtilizationAnalysis(
             'Caravan Buys': stats.caravanBuys,
             'Astral Casts': stats.astralCasts,
             'Commission Requirements': stats.commissionRequirements,
+            'Trader Token Sinks': stats.traderTokenSinks,
             'Crafted Into': stats.craftedInto,
             'Monster Drops': stats.monsterDrops,
             'Encounter Rewards': stats.encounterRewards,
             'Gather Sources': stats.gatherSources,
             'Caravan Sells': stats.caravanSells,
+            'Commission Rewards': stats.commissionRewards,
             Production: productionCount(stats),
           }
         : { Material: stats.name, Rarity: stats.rarity, Score: score(stats) },
@@ -211,6 +249,8 @@ export function runMaterialUtilizationAnalysis(
       sinks.push(`${stats.astralCasts} astral spell(s)`);
     if (stats.commissionRequirements > 0)
       sinks.push(`${stats.commissionRequirements} commission(s)`);
+    if (stats.traderTokenSinks > 0)
+      sinks.push(`${stats.traderTokenSinks} token trade/unlock(s)`);
     if (stats.infusable) sinks.push('infusable');
     const sinkDescription =
       sinks.length > 0 ? sinks.join(', ') : 'no known sinks';

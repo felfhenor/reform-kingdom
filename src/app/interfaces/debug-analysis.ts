@@ -79,6 +79,8 @@ export type MaterialUtilizationStats = {
   caravanSells: number;
   astralCasts: number;
   commissionRequirements: number;
+  commissionRewards: number;
+  traderTokenSinks: number;
 };
 
 export type NodeLevelCheckEntry = {
