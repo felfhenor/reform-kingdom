@@ -23,7 +23,7 @@
         - behavior: IfNotStatusEffect
           statusEffectId: Disgusted
       damageScaling:
-        Inteligence: 0.5
+        Intelligence: 0.5
         Strength: 0.5
 
       statusEffects:

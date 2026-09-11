@@ -41,7 +41,7 @@
   slots: 1
   baseStats:
     Energy: 15
-    Inteligence: 5.1
+    Intelligence: 5.1
     Resistance: 2.1
 
   debuffResistances:
