@@ -1,0 +1,119 @@
+# Low-rarity Prefix stat boosts, giving the existing single-stat/hybrid families a positive Prefix option at their Common/Uncommon tiers.
+
+- id: 6f3561de-f941-4356-a5a2-c0337cf37608
+  name: Sturdy
+  description: Grants a bonus to Strength.
+  rarity: Common
+  family: Strength
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 1
+
+- id: 53de7cbb-1e8f-4647-8baa-21d10b6a32d1
+  name: Perceptive
+  description: Grants a bonus to Intelligence.
+  rarity: Common
+  family: Intelligence
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 1
+
+- id: 7efc34e4-8e25-4af9-b5ca-00c304ee512f
+  name: Warded
+  description: Grants a bonus to Resistance.
+  rarity: Common
+  family: Resistance
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Resistance
+      value: 1
+
+- id: da011f3e-9ba5-4414-8fbf-27326b8f27c6
+  name: Charmed
+  description: Grants a bonus to Luck.
+  rarity: Common
+  family: Luck
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 1
+
+- id: 324f1e8f-260e-41d8-be19-560a2556884d
+  name: Robust
+  description: Grants a bonus to Vitality.
+  rarity: Uncommon
+  family: Vitality
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 2.5
+
+- id: ca3ce823-af14-493f-83f4-f40d11214dfb
+  name: Nimble
+  description: Grants a bonus to Agility.
+  rarity: Uncommon
+  family: Agility
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: 2.5
+
+- id: 184aca6e-5fc8-4ba2-ae36-48164ac700bb
+  name: Hearty
+  description: Grants a bonus to Health.
+  rarity: Uncommon
+  family: Health
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Health
+      value: 25
+
+- id: 303a7f9f-3d47-41c5-8b9a-3254514b51de
+  name: Spry
+  description: Grants a bonus to Energy.
+  rarity: Uncommon
+  family: Energy
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 10
+
+- id: 5e04df76-6317-42b9-874c-038f7bd5855c
+  name: Resistant
+  description: Grants a bonus to multiple stats.
+  rarity: Common
+  family: HybridStat
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 1
+
+    - kind: Stat
+      stat: Resistance
+      value: 1
+
+- id: 788f0157-6e19-4430-8071-1513758bc1c2
+  name: Rabbit's
+  description: Grants a bonus to multiple stats.
+  rarity: Uncommon
+  family: HybridStat
+  position: Prefix
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 1
+
+    - kind: Stat
+      stat: Agility
+      value: 1
