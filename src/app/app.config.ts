@@ -5,6 +5,7 @@ import {
   ErrorHandler,
   importProvidersFrom,
   inject,
+  isDevMode,
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -14,6 +15,7 @@ import {
   withNavigationErrorHandler,
   withRouterConfig,
 } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 
 import { provideHttpClient } from '@angular/common/http';
 
@@ -46,6 +48,10 @@ import { provideToastr } from 'ngx-toastr';
 export const appConfig: ApplicationConfig = {
   providers: [
     NG_EVENT_PLUGINS,
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
     provideHttpClient(),
     provideZonelessChangeDetection(),
     provideRouter(
