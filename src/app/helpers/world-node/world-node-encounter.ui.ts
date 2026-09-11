@@ -1,10 +1,14 @@
 import { monstersFromFights } from '@helpers/combat/monster';
+import { encounterRandomState } from '@helpers/encounter/encounter-random';
 import { gamestate } from '@helpers/state-game';
 import {
   worldNodeEncounterCount,
   worldNodeExploreRandomFights,
 } from '@helpers/world-node/world-node-encounter';
-import { worldNodeEncounter } from '@helpers/world-node/world-nodes';
+import {
+  worldNodeEncounter,
+  worldNodeEncounterRandom,
+} from '@helpers/world-node/world-nodes';
 import type {
   MonsterContent,
   WorldNodeEncounterProgress,
@@ -39,6 +43,16 @@ export function worldNodeEncounterProgress(
     total,
     fraction: clamp(fightIndex / total, 0, 1),
   };
+}
+
+// Whether an ExploreRandomNode has been cleared for its current cycle - drives the map's beaten/not-beaten badge.
+export function worldNodeExploreRandomIsCompleted(
+  entry: WorldNodeEntry,
+): boolean {
+  const content = worldNodeEncounterRandom(entry);
+  if (!content) return false;
+
+  return !!encounterRandomState(content.id)?.completedThisCycle;
 }
 
 export function worldNodeMonsters(entry: WorldNodeEntry): MonsterContent[] {

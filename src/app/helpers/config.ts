@@ -144,6 +144,7 @@ export const GATHER_VFX_FLOAT_DISTANCE = 40;
 export const GATHER_VFX_JITTER_RANGE = 30;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -40;
+export const NODE_STATUS_ICON_RADIUS = 7;
 
 // Town
 

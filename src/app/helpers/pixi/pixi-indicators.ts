@@ -1,6 +1,7 @@
 import {
   INDICATOR_PROGRESS_BAR_HEIGHT,
   INDICATOR_PROGRESS_BAR_OFFSET_Y,
+  NODE_STATUS_ICON_RADIUS,
 } from '@helpers/config';
 import type { WorldNodeInteractionKind } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
@@ -14,6 +15,9 @@ const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
   Trade: 0xfbbf24,
   Travel: 0x60a5fa,
 };
+
+const NODE_STATUS_BEATEN_COLOR = 0x4ade80;
+const NODE_STATUS_NOT_BEATEN_COLOR = 0xef4444;
 
 export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   graphics: Graphics;
@@ -167,6 +171,45 @@ export function pixiIndicatorNodeLabelCreate(
   label.cullable = true;
 
   return label;
+}
+
+// Small beaten/not-beaten badge for the bottom-right corner of a node's sprite. Position is set
+// by the caller (depends on the node's own object width/height, not a fixed tile size).
+export function pixiIndicatorNodeStatusCreate(): Graphics {
+  const graphics = new Graphics();
+  graphics.cullable = true;
+  pixiIndicatorNodeStatusUpdate(graphics, false);
+  return graphics;
+}
+
+export function pixiIndicatorNodeStatusUpdate(
+  graphics: Graphics,
+  beaten: boolean,
+): void {
+  const radius = NODE_STATUS_ICON_RADIUS;
+  const mark = radius * 0.45;
+
+  graphics
+    .clear()
+    .circle(0, 0, radius)
+    .fill(beaten ? NODE_STATUS_BEATEN_COLOR : NODE_STATUS_NOT_BEATEN_COLOR)
+    .stroke({ width: 1.5, color: 0x000000 });
+
+  if (beaten) {
+    graphics
+      .moveTo(-mark, 0)
+      .lineTo(-mark * 0.2, mark * 0.8)
+      .lineTo(mark, -mark * 0.6)
+      .stroke({ width: 2, color: 0xffffff });
+    return;
+  }
+
+  graphics
+    .moveTo(-mark, -mark)
+    .lineTo(mark, mark)
+    .moveTo(mark, -mark)
+    .lineTo(-mark, mark)
+    .stroke({ width: 2, color: 0xffffff });
 }
 
 export function pixiIndicatorNodeSelectionCreate(tileSize: number): Graphics {

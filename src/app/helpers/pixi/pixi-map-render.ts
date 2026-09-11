@@ -1,8 +1,14 @@
-import { pixiIndicatorNodeLabelCreate } from '@helpers/pixi/pixi-indicators';
+import { NODE_STATUS_ICON_RADIUS } from '@helpers/config';
+import {
+  pixiIndicatorNodeLabelCreate,
+  pixiIndicatorNodeStatusCreate,
+  pixiIndicatorNodeStatusUpdate,
+} from '@helpers/pixi/pixi-indicators';
 import { tiledLayerTileAt } from '@helpers/pixi/tiled-map';
 import type {
   PixiNodeClickHandler,
   PixiNodeLabelResolver,
+  PixiNodeStatusResolver,
   TiledLayer,
   TiledMap,
   TiledObject,
@@ -11,6 +17,7 @@ import type {
 import {
   Container,
   type FederatedPointerEvent,
+  type Graphics,
   Rectangle,
   type Renderer,
   Sprite,
@@ -24,6 +31,8 @@ export type PixiTiledMapRenderResult = {
   nodeLabels: Map<string, Text>;
   // Node-name -> wrapper Container, so callers can toggle visibility/click-ability live.
   nodeWrappers: Map<string, Container>;
+  // Node-name -> beaten/not-beaten badge, so callers can live-update it after render.
+  nodeStatusIcons: Map<string, Graphics>;
 };
 
 const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
@@ -117,6 +126,7 @@ function pixiTiledLayerRunBake(
 type PixiTiledObjectRenderResult = {
   wrapper: Container;
   label?: Text;
+  statusIcon?: Graphics;
 };
 
 function pixiTiledObjectRender(
@@ -124,6 +134,7 @@ function pixiTiledObjectRender(
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
+  resolveNodeStatus?: PixiNodeStatusResolver,
 ): PixiTiledObjectRenderResult | undefined {
   if (!object.gid) return undefined;
 
@@ -173,7 +184,19 @@ function pixiTiledObjectRender(
     wrapper.addChild(label);
   }
 
-  return { wrapper, label };
+  // Same always-created-but-hidden treatment as the label, so discovery/visibility toggling stays in one place.
+  const statusInfo = object.type ? resolveNodeStatus?.(object) : undefined;
+  let statusIcon: Graphics | undefined;
+  if (statusInfo) {
+    statusIcon = pixiIndicatorNodeStatusCreate();
+    statusIcon.x = object.width - NODE_STATUS_ICON_RADIUS;
+    statusIcon.y = -NODE_STATUS_ICON_RADIUS;
+    statusIcon.visible = false;
+    pixiIndicatorNodeStatusUpdate(statusIcon, statusInfo.beaten);
+    wrapper.addChild(statusIcon);
+  }
+
+  return { wrapper, label, statusIcon };
 }
 
 function pixiTiledObjectLayerRender(
@@ -181,15 +204,18 @@ function pixiTiledObjectLayerRender(
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
+  resolveNodeStatus?: PixiNodeStatusResolver,
 ): {
   container: Container;
   nodeLabels: Map<string, Text>;
   nodeWrappers: Map<string, Container>;
+  nodeStatusIcons: Map<string, Graphics>;
 } {
   const container = new Container();
   container.cullable = true;
   const nodeLabels = new Map<string, Text>();
   const nodeWrappers = new Map<string, Container>();
+  const nodeStatusIcons = new Map<string, Graphics>();
 
   (layer.objects ?? []).forEach((object) => {
     const rendered = pixiTiledObjectRender(
@@ -197,6 +223,7 @@ function pixiTiledObjectLayerRender(
       textures,
       onNodeClick,
       resolveNodeLabel,
+      resolveNodeStatus,
     );
     if (!rendered) return;
 
@@ -204,9 +231,11 @@ function pixiTiledObjectLayerRender(
     // Only node objects carry a `type`; decorative/terrain objects are never toggled by name.
     if (object.type) nodeWrappers.set(object.name, rendered.wrapper);
     if (rendered.label) nodeLabels.set(object.name, rendered.label);
+    if (rendered.statusIcon)
+      nodeStatusIcons.set(object.name, rendered.statusIcon);
   });
 
-  return { container, nodeLabels, nodeWrappers };
+  return { container, nodeLabels, nodeWrappers, nodeStatusIcons };
 }
 
 export function pixiTiledMapRender(
@@ -215,10 +244,12 @@ export function pixiTiledMapRender(
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
+  resolveNodeStatus?: PixiNodeStatusResolver,
 ): PixiTiledMapRenderResult {
   const container = new Container();
   const nodeLabels = new Map<string, Text>();
   const nodeWrappers = new Map<string, Container>();
+  const nodeStatusIcons = new Map<string, Graphics>();
 
   let pendingTileRun: Container | undefined;
   const flushTileRun = () => {
@@ -250,6 +281,7 @@ export function pixiTiledMapRender(
       textures,
       onNodeClick,
       resolveNodeLabel,
+      resolveNodeStatus,
     );
     container.addChild(rendered.container);
     rendered.nodeLabels.forEach((label, nodeName) =>
@@ -258,9 +290,12 @@ export function pixiTiledMapRender(
     rendered.nodeWrappers.forEach((wrapper, nodeName) =>
       nodeWrappers.set(nodeName, wrapper),
     );
+    rendered.nodeStatusIcons.forEach((icon, nodeName) =>
+      nodeStatusIcons.set(nodeName, icon),
+    );
   });
 
   flushTileRun();
 
-  return { container, nodeLabels, nodeWrappers };
+  return { container, nodeLabels, nodeWrappers, nodeStatusIcons };
 }

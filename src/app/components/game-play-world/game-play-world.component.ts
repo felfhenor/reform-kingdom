@@ -48,6 +48,7 @@ import {
   pixiIndicatorEncounterProgressCreate,
   pixiIndicatorGatherProgressCreate,
   pixiIndicatorNodeSelectionCreate,
+  pixiIndicatorNodeStatusUpdate,
   pixiIndicatorPlayerAtLocationCreate,
   pixiIndicatorPlayerSpriteCreate,
 } from '@helpers/pixi/pixi-indicators';
@@ -67,6 +68,8 @@ import { workersTravelingTokens } from '@helpers/worker/worker-travel.ui';
 import { currentLocationGet } from '@helpers/world';
 import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate.ui';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
+import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
+import { worldNodeInteractionKind } from '@helpers/world-node/world-node-status';
 import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status.ui';
 import {
   isWorldNodeCollectibleGateMet,
@@ -90,6 +93,7 @@ import type {
   WorkerContent,
   WorkerId,
   WorldNodeLabelInfo,
+  WorldNodeStatusInfo,
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
 import { clamp, maxBy, sumBy } from 'es-toolkit/compat';
@@ -192,6 +196,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private nodeSelectionIndicator?: Graphics;
   private nodeLabels?: Map<string, Text>;
   private nodeWrappers?: Map<string, Container>;
+  private nodeStatusIcons?: Map<string, Graphics>;
   private floatingTextContainer?: Container;
   // Keyed per node (not one global FIFO) so a busy node's stagger gate can't head-of-line-block another node's popups.
   private pendingGatherVfxByNode = new Map<string, GatherVfxEvent[]>();
@@ -409,6 +414,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.nodeSelectionIndicator = undefined;
     this.nodeLabels = undefined;
     this.nodeWrappers = undefined;
+    this.nodeStatusIcons = undefined;
     this.floatingTextContainer = undefined;
     this.resizeObserver = undefined;
     this.canvas = undefined;
@@ -469,12 +475,15 @@ export class GamePlayWorldComponent implements OnDestroy {
       textures,
       (object) => this.onNodeClick(object),
       (object) => this.resolveNodeLabel(object),
+      (object) => this.resolveNodeStatus(object),
     );
     this.mapContainer.addChild(renderedMap.container);
     this.nodeLabels = renderedMap.nodeLabels;
     this.nodeWrappers = renderedMap.nodeWrappers;
+    this.nodeStatusIcons = renderedMap.nodeStatusIcons;
     this.updateNodeLabels();
     this.updateNodeWrapperVisibility();
+    this.updateNodeStatusIcons();
 
     this.gridOverlay = pixiGridOverlayCreate(map);
     this.gridOverlay.visible = getOption('showBackdropGrid');
@@ -535,6 +544,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.lastNodeStatusUpdateAt = now;
     this.updateNodeLabels();
     this.updateNodeWrapperVisibility();
+    this.updateNodeStatusIcons();
   }
 
   // Throttled; a collectible pickup doesn't trigger a map rebuild so this still needs to poll.
@@ -560,6 +570,17 @@ export class GamePlayWorldComponent implements OnDestroy {
     return entry ? worldNodeLabelInfo(entry) : undefined;
   }
 
+  // Only ExploreRandomNode has a per-cycle beaten/not-beaten state worth badging on the map.
+  private resolveNodeStatus(
+    object: TiledObject,
+  ): WorldNodeStatusInfo | undefined {
+    const entry = worldNodeByName(object.name);
+    if (!entry || worldNodeInteractionKind(entry) !== 'ExploreRandom')
+      return undefined;
+
+    return { beaten: worldNodeExploreRandomIsCompleted(entry) };
+  }
+
   // Catches countdown text and hidden-node discovery updates.
   private updateNodeLabels(): void {
     if (!this.nodeLabels) return;
@@ -575,6 +596,25 @@ export class GamePlayWorldComponent implements OnDestroy {
 
       const info = worldNodeLabelInfo(entry);
       if (info) label.text = info.text;
+    });
+  }
+
+  // Hidden alongside the label until discovered, so an un-found node can't leak its cycle state.
+  private updateNodeStatusIcons(): void {
+    if (!this.nodeStatusIcons) return;
+
+    this.nodeStatusIcons.forEach((icon, nodeName) => {
+      const entry = worldNodeByName(nodeName);
+      if (!entry) return;
+
+      const visible = isWorldNodeVisible(entry);
+      icon.visible = visible;
+      if (!visible) return;
+
+      pixiIndicatorNodeStatusUpdate(
+        icon,
+        worldNodeExploreRandomIsCompleted(entry),
+      );
     });
   }
 

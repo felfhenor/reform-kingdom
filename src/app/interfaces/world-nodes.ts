@@ -55,6 +55,15 @@ export type PixiNodeLabelResolver = (
   object: TiledObject,
 ) => WorldNodeLabelInfo | undefined;
 
+export type WorldNodeStatusInfo = {
+  // Whether the node is currently "cleared" for the badge indicator (e.g. an ExploreRandomNode's completedThisCycle).
+  beaten: boolean;
+};
+
+export type PixiNodeStatusResolver = (
+  object: TiledObject,
+) => WorldNodeStatusInfo | undefined;
+
 // Resolved reward display info.
 export type RewardContentInfo = {
   name: string;
