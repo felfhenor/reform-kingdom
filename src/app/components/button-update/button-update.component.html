@@ -3,6 +3,8 @@
     class="btn btn-info btn-xs ms-3"
     (click)="meta.update()"
     appAnalyticsClick="Meta:Update:Click"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
   >
     Update Available ({{ meta.liveVersionString() }})
   </button>

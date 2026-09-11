@@ -202,12 +202,19 @@
           class="btn btn-sm btn-primary"
           [disabled]="!canAddClause()"
           (click)="submitClause()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
         >
           {{ isEditing() ? 'Save' : 'Add' }}
         </button>
 
         @if (isEditing()) {
-          <button class="btn btn-sm btn-ghost" (click)="cancelEditClause()">
+          <button
+            class="btn btn-sm btn-ghost"
+            (click)="cancelEditClause()"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
             Cancel
           </button>
         }

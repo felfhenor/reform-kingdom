@@ -5,6 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { notifySuccess } from '@helpers/engine/notify';
 import { canSetHomeNode, homeNodeGet } from '@helpers/town/town-spawn';
 import { homeNodeSet } from '@helpers/town/town-spawn.ui';
@@ -27,12 +28,14 @@ import { TippyDirective } from '@ngneat/helipopper';
         type="button"
         class="btn btn-outline btn-accent btn-sm w-fit"
         (click)="setHome()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         Set as Home
       </button>
     }
   `,
-  imports: [IconComponent, TippyDirective],
+  imports: [IconComponent, TippyDirective, SFXDirective],
 })
 export class ButtonTownHomeComponent {
   public entry = input.required<WorldNodeEntry>();

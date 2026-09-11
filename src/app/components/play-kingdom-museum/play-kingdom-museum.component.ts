@@ -8,6 +8,7 @@ import {
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotMuseumCollectibleComponent } from '@components/slot-museum-collectible/slot-museum-collectible.component';
 import { SlotMuseumRecipeComponent } from '@components/slot-museum-recipe/slot-museum-recipe.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { recipeUnlockWithTokens } from '@helpers/crafting/recipes.ui';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
@@ -32,6 +33,7 @@ import {
     SlotMuseumCollectibleComponent,
     SlotMuseumRecipeComponent,
     PagePagedGridComponent,
+    SFXDirective,
   ],
   templateUrl: './play-kingdom-museum.component.html',
   styleUrl: './play-kingdom-museum.component.scss',

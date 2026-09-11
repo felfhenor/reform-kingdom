@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { formatDuration } from '@helpers/engine/timer';
 import { travelStart } from '@helpers/hero/travel';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
@@ -15,6 +16,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     AtlasAnimationComponent,
     SlotIconBlankComponent,
     TippyDirective,
+    SFXDirective,
   ],
   templateUrl: './modal-raid-defense.component.html',
   styleUrl: './modal-raid-defense.component.scss',

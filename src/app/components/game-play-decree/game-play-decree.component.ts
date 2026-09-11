@@ -11,6 +11,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
@@ -112,6 +113,7 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
     OptionRewardComponent,
     IconComponent,
     TippyDirective,
+    SFXDirective,
   ],
   templateUrl: './game-play-decree.component.html',
 })

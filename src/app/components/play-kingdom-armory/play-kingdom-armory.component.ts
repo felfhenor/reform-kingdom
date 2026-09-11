@@ -9,6 +9,7 @@ import {
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { goldCoinId } from '@helpers/item/materials';
 import { equipmentSellValue, getArmoryEntries } from '@helpers/kingdom/armory';
 import {
@@ -28,6 +29,7 @@ import { sum } from 'es-toolkit/compat';
     PagePagedGridComponent,
     SweetAlert2Module,
     DecimalPipe,
+    SFXDirective,
   ],
   templateUrl: './play-kingdom-armory.component.html',
   styleUrl: './play-kingdom-armory.component.scss',

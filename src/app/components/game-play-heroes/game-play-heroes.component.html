@@ -14,6 +14,9 @@
             [class.tab-active]="character.id === selectedCharacterId()"
             [class.font-bold]="character.id === selectedCharacterId()"
             (click)="selectCharacter(character.id)"
+            appSfx="ui-click"
+            [sfxOffset]="$index"
+            [sfxTrigger]="['click', 'hover']"
           >
             <div class="hero-tab-icon">
               <app-icon-job [job]="jobFor(character.jobId)" />

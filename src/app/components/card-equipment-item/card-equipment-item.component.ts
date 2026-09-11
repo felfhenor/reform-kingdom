@@ -9,6 +9,7 @@ import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { defaultStats } from '@helpers/defaults';
 import {
   equipmentItemDisplayName,
@@ -40,6 +41,7 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
     RowStatSummaryComponent,
     StatDisplayPipe,
     TippyDirective,
+    SFXDirective,
   ],
   templateUrl: './card-equipment-item.component.html',
   styleUrl: './card-equipment-item.component.scss',

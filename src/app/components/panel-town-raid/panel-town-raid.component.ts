@@ -7,6 +7,7 @@ import {
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { notifyError } from '@helpers/engine/notify';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { setGamePlayView } from '@helpers/engine/ui';
@@ -28,6 +29,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotCompletionRewardComponent,
     SlotIconBlankComponent,
     TippyDirective,
+    SFXDirective,
   ],
   host: { class: 'card bg-base-200 shadow-sm' },
   templateUrl: './panel-town-raid.component.html',

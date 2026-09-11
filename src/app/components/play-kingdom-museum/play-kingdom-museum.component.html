@@ -16,6 +16,8 @@
         role="tab"
         class="tab tab-active"
         (click)="setTab('collectibles')"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         Collectibles ({{ collectibleDiscoveredCount() }}/{{
           collectibleEntries().length
@@ -26,6 +28,8 @@
         role="tab"
         class="tab"
         (click)="setTab('recipes')"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         Recipes ({{ recipeDiscoveredCount() }}/{{ recipeEntries().length }})
       </button>
@@ -51,6 +55,8 @@
         role="tab"
         class="tab"
         (click)="setTab('collectibles')"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         Collectibles ({{ collectibleDiscoveredCount() }}/{{
           collectibleEntries().length
@@ -61,6 +67,8 @@
         role="tab"
         class="tab tab-active"
         (click)="setTab('recipes')"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         Recipes ({{ recipeDiscoveredCount() }}/{{ recipeEntries().length }})
       </button>

@@ -34,6 +34,8 @@
                 class="btn btn-xs btn-secondary"
                 [disabled]="!row.canTravel"
                 (click)="travelTo(row.nodeName)"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
               >
                 Travel Here
               </button>

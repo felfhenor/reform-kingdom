@@ -67,6 +67,8 @@
     class="link link-hover"
     appAnalyticsClick="Meta:Settings:Analytics"
     (click)="openAnalyticsSettings()"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
   >
     Analytics: {{ analyticsEnabled() ? 'On' : 'Off' }}
   </button>

@@ -9,6 +9,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
@@ -40,6 +41,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     RowInfusedMaterialsComponent,
     TippyDirective,
     TooltipItemPreviewComponent,
+    SFXDirective,
   ],
   templateUrl: './slot-equipment.component.html',
   styleUrl: './slot-equipment.component.scss',

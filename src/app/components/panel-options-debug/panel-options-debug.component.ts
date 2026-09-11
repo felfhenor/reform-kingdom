@@ -2,6 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { SFXDirective } from '@directives/sfx.directive';
 import {
   CHARACTER_MAX_LEVEL,
   TRADESKILL_MAX_LEVEL,
@@ -53,7 +54,12 @@ import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-options-debug',
-  imports: [AnalyticsClickDirective, FormsModule, NgSelectComponent],
+  imports: [
+    AnalyticsClickDirective,
+    FormsModule,
+    NgSelectComponent,
+    SFXDirective,
+  ],
   templateUrl: './panel-options-debug.component.html',
   styleUrl: './panel-options-debug.component.scss',
 })

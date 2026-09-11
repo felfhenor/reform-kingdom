@@ -10,6 +10,7 @@ import { PanelOptionsUIComponent } from '@components/panel-options-ui/panel-opti
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { ModalCloseDirective } from '@directives/modal-close.directive';
+import { SFXDirective } from '@directives/sfx.directive';
 import { options } from '@helpers/state-options';
 import type { OptionsTab, OptionsTabLink } from '@interfaces';
 
@@ -26,6 +27,7 @@ import type { OptionsTab, OptionsTabLink } from '@interfaces';
     PanelOptionsUIComponent,
     ButtonCloseComponent,
     ModalCloseDirective,
+    SFXDirective,
   ],
   templateUrl: './panel-options.component.html',
   styleUrl: './panel-options.component.scss',

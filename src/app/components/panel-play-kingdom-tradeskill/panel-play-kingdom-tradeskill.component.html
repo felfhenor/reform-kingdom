@@ -18,6 +18,8 @@
         [tp]="nav.tooltip"
         [tpPlacement]="'top'"
         (click)="kingdomSubviewShow(nav.subview)"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         <div class="zoom-row">
           <app-atlas-image

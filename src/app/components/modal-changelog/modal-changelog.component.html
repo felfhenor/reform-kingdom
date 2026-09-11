@@ -45,7 +45,14 @@
     </div>
 
     <div actions>
-      <button class="btn" appModalClose>Close</button>
+      <button
+        class="btn"
+        appModalClose
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Close
+      </button>
     </div>
   </app-modal>
 </div>

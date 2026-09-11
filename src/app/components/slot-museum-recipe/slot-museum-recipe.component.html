@@ -19,6 +19,8 @@
     [tp]="tooltip"
     [tpPlacement]="'top'"
     (click)="unlock.emit()"
+    appSfx="ui-success"
+    [sfxTrigger]="['click', 'hover']"
   >
     <app-icon-unknown />
   </button>

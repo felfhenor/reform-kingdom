@@ -8,6 +8,8 @@
   [tp]="tooltip"
   [tpPlacement]="'right'"
   (click)="onEquipClick()"
+  appSfx="ui-click"
+  [sfxTrigger]="['click', 'hover']"
 >
   <app-slot-rarity-outline
     class="equipment-item-row-icon"

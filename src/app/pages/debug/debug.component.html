@@ -27,6 +27,8 @@
               [class.tab-active]="activeCategory() === category"
               [class.opacity-50]="activeCategory() !== category"
               (click)="activeCategory.set(category)"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
             >
               {{ category }}
 

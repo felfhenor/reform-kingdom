@@ -19,6 +19,8 @@
         (keydown)="changeActiveTab(tab.link)"
         [appAnalyticsClick]="'Options:Navigate:' + tab.name"
         [class.hidden]="!tab.showIf()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         {{ tab.name }}
       </button>

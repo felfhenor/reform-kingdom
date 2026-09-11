@@ -23,11 +23,19 @@
         class="btn btn-sm btn-success"
         [disabled]="selectedCount() === 0"
         [swal]="sellSwal"
+        appSfx="ui-success"
+        [sfxTrigger]="['click', 'hover']"
       >
         Confirm Sell
       </button>
 
-      <button type="button" class="btn btn-sm" (click)="toggleSellMode()">
+      <button
+        type="button"
+        class="btn btn-sm"
+        (click)="toggleSellMode()"
+        appSfx="ui-error"
+        [sfxTrigger]="['click', 'hover']"
+      >
         Cancel
       </button>
 
@@ -47,6 +55,8 @@
         type="button"
         class="btn btn-sm btn-primary"
         (click)="toggleSellMode()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
       >
         Enter Sell Mode
       </button>

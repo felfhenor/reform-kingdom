@@ -59,6 +59,8 @@
           class="btn btn-xs btn-warning"
           [disabled]="!modifiable"
           (click)="unequip(selected)"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
         >
           Unequip
         </button>

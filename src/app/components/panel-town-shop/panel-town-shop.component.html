@@ -29,6 +29,9 @@
             [tp]="item ? preview.template() : undefined"
             [tpPlacement]="'top'"
             (click)="requestTrade(row)"
+            appSfx="ui-click"
+            [sfxOffset]="row.index"
+            [sfxTrigger]="['click', 'hover']"
           >
             @if (item) {
               <div class="flex flex-col items-center gap-2 shrink-0">

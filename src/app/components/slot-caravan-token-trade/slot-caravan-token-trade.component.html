@@ -13,6 +13,8 @@
   [tp]="item ? preview.template() : undefined"
   [tpPlacement]="'top'"
   (click)="activate.emit()"
+  appSfx="ui-click"
+  [sfxTrigger]="['click', 'hover']"
 >
   @if (item) {
     <div class="flex flex-col items-center gap-2 shrink-0">

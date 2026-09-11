@@ -12,6 +12,7 @@ import {
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { notifySuccess } from '@helpers/engine/notify';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { townStockPrice } from '@helpers/town/shop/town-price';
@@ -40,6 +41,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     TippyDirective,
     TooltipItemPreviewComponent,
     SlotRarityOutlineComponent,
+    SFXDirective,
   ],
   host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-shop.component.html',

@@ -313,6 +313,9 @@
           <button
             class="btn btn-accent btn-sm"
             (click)="openSubview('infusion')"
+            appSfx="ui-click"
+            [sfxOffset]="3"
+            [sfxTrigger]="['click', 'hover']"
           >
             <app-icon name="gameMagicPotion" size="inline" />
             Infusion

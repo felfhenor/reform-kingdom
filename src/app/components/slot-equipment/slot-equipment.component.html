@@ -7,6 +7,8 @@
   }}"
   [class.equipment-slot-selected]="isSelected()"
   (click)="slotClick.emit()"
+  appSfx="ui-click"
+  [sfxTrigger]="['click', 'hover']"
 >
   @if (!content) {
     <app-slot-icon-blank>

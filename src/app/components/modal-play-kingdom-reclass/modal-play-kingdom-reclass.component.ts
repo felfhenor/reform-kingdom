@@ -17,6 +17,7 @@ import {
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { modalIsOpen } from '@helpers/engine/modal-stack';
 import {
@@ -62,6 +63,7 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
     FormField,
     DecimalPipe,
     SweetAlert2Module,
+    SFXDirective,
   ],
   templateUrl: './modal-play-kingdom-reclass.component.html',
 })
