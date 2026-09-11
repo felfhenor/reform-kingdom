@@ -42,3 +42,9 @@ export type TravelGlideState = {
   stepDurationMs: number;
   hasActiveStep: boolean;
 };
+
+// Buffered so trailing party members can render a delayed copy of the leader's path instead of tracking their own travel state.
+export type PartyPositionSample = {
+  time: number;
+  position: CurrentLocation;
+};

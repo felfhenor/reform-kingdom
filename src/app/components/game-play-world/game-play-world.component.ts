@@ -14,6 +14,13 @@ import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node
 import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/status-worker-levelup.component';
+import {
+  PARTY_FORMATION_CATCHUP_MS,
+  PARTY_FORMATION_FOLLOW_DELAY_MS,
+  PARTY_FORMATION_HISTORY_MAX_AGE_MS,
+  PARTY_FORMATION_JITTER_MAX_TILES,
+  PARTY_FORMATION_JITTER_MIN_TILES,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
@@ -54,6 +61,14 @@ import {
 } from '@helpers/pixi/pixi-indicators';
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
 import {
+  partyFollowerCatchUpPosition,
+  partyFollowerCatchUpStart,
+  partyFollowerFormationOffset,
+  partyFollowerJitterPosition,
+  partyPositionHistoryRecord,
+  partyPositionHistorySample,
+} from '@helpers/pixi/pixi-party-formation.ui';
+import {
   pixiSpriteFrameTexturesLoad,
   pixiTiledMapTexturesLoad,
 } from '@helpers/pixi/pixi-texture-loader';
@@ -86,6 +101,7 @@ import type {
   GatherVfxEvent,
   GlobalEffectId,
   JobContent,
+  PartyPositionSample,
   TiledMap,
   TiledObject,
   TravelGlideState,
@@ -173,6 +189,17 @@ export class GamePlayWorldComponent implements OnDestroy {
   private mapContainer?: Container;
   private gridOverlay?: Graphics;
   private playerIndicatorContainer?: Container;
+  private partyFollowerContainer?: Container;
+  private partyFollowerTokens: Container[] = [];
+  // Fixed per-follower tile offset (evenly spread by angle so followers can't overlap each other), re-rolled whenever tokens are (re)created.
+  private followerOffsets: Array<{ x: number; y: number }> = [];
+  // Buffer of the leader's own recent visual positions, so followers can render a delayed copy of its path.
+  private partyPositionHistory: PartyPositionSample[] = [];
+  // Set once the leader visually arrives, so a follower's converge-to-tile tween runs once rather than restarting every frame.
+  private followerCatchUp: Array<
+    { from: CurrentLocation; startTime: number } | undefined
+  > = [];
+  private followerRenderedPosition: CurrentLocation[] = [];
   private workerIndicatorContainer?: Container;
   private workerTokens = new Map<WorkerId, Container>();
   private workerGlideStates = new Map<WorkerId, TravelGlideState>();
@@ -236,7 +263,8 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   // Driven by visual arrival, not the tick-layer `currentLocation`, so the walking token stays visible for the full glide.
   private isShowingAtLocationIndicator = false;
-  private partyTokenTextures: Texture[] = [];
+  // Indexed by party slot (0 = leader); persists across map transitions like other loaded textures.
+  private partyTokenTexturesByIndex: Texture[][] = [];
   private isTransitioningMap = false;
   private wasPartyDead = false;
 
@@ -317,6 +345,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     await this.fadeOut();
     this.visualPosition = { ...target };
     this.hasActiveStep = false;
+    // Cleared so followers don't walk back from their pre-teleport trail positions.
+    this.partyPositionHistory = [];
+    this.followerCatchUp = [];
+    this.followerRenderedPosition = [];
     this.positionCamera();
     await this.fadeIn();
   }
@@ -385,6 +417,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.activeFloatingTexts.forEach((entry) =>
       entry.container.destroy({ children: true }),
     );
+    // Same reasoning - an AnimatedSprite stays registered on Ticker.shared until destroyed, so
+    // removeChildren() alone would leave every follower token ticking forever after teardown.
+    this.partyFollowerTokens.forEach((token) => token.destroy({ children: true }));
     this.app?.destroy(true, { children: true, texture: true });
 
     // Queued/active floating text is map-scoped (positions reference nodes on the map being torn down) -
@@ -400,8 +435,14 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.mapContainer = undefined;
     this.gridOverlay = undefined;
     this.playerIndicatorContainer = undefined;
+    this.partyFollowerContainer = undefined;
     this.workerIndicatorContainer = undefined;
     // Tokens/glide state are per-app-instance; loaded textures persist across map transitions.
+    this.partyFollowerTokens = [];
+    this.followerOffsets = [];
+    this.partyPositionHistory = [];
+    this.followerCatchUp = [];
+    this.followerRenderedPosition = [];
     this.workerTokens.clear();
     this.workerGlideStates.clear();
     this.townWorkerTokens.clear();
@@ -442,6 +483,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const containers = pixiWorldContainersCreate(this.app);
     this.mapContainer = containers.mapContainer;
     this.playerIndicatorContainer = containers.playerIndicatorContainer;
+    this.partyFollowerContainer = containers.partyFollowerContainer;
     this.workerIndicatorContainer = containers.workerIndicatorContainer;
     this.gatherProgressContainer = containers.gatherProgressContainer;
     this.encounterProgressContainer = containers.encounterProgressContainer;
@@ -504,8 +546,10 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.encounterProgressBar.container,
     );
 
-    if (this.partyTokenTextures.length === 0) {
-      this.partyTokenTextures = await this.loadPartyTokenTextures();
+    if (this.partyTokenTexturesByIndex.length === 0) {
+      this.partyTokenTexturesByIndex = await Promise.all(
+        partyGet().map((_, index) => this.loadPartyTokenTextures(index)),
+      );
     }
 
     this.isShowingAtLocationIndicator = isPlayerAtLocation();
@@ -515,11 +559,14 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.checkForMapChange(currentLocationGet().mapName);
       this.checkForDeathsDoorRecall();
       this.updateVisualPosition();
+      // Ahead of updatePlayerIndicatorIfNeeded() so a fresh arrival's catch-up state exists the same frame the indicator-swap check reads it.
+      this.advancePartyFollowerPositions();
       this.updatePlayerIndicatorIfNeeded();
       this.updateGatherProgressIndicator();
       this.updateEncounterProgressIndicator();
       this.maybeUpdateNodeStatus(performance.now());
       this.positionCamera();
+      this.renderPartyFollowerIndicators();
       this.updateWorkerIndicators();
       this.updateTownWorkerIndicators();
       this.updateFloatingTexts();
@@ -713,11 +760,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.positionCamera();
   }
 
-  private async loadPartyTokenTextures(): Promise<Texture[]> {
-    const lead = partyGet()[0];
-    if (!lead) return [];
+  private async loadPartyTokenTextures(heroIndex: number): Promise<Texture[]> {
+    const hero = partyGet()[heroIndex];
+    if (!hero) return [];
 
-    const job = getEntry<JobContent>(lead.jobId);
+    const job = getEntry<JobContent>(hero.jobId);
     if (!job) return [];
 
     const frame =
@@ -750,14 +797,132 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.playerIndicatorTicker = ticker;
       this.app.ticker.add(ticker);
       this.playerIndicatorContainer.addChild(graphics);
+      this.setupPartyFollowerIndicators();
       return;
     }
 
     const sprite = pixiIndicatorPlayerSpriteCreate(
       this.map.tilewidth,
-      this.partyTokenTextures,
+      this.partyTokenTexturesByIndex[0] ?? [],
     );
     this.playerIndicatorContainer.addChild(sprite);
+    this.setupPartyFollowerIndicators();
+  }
+
+  // Trailing party members (slot 1+) are hidden, like the leader, whenever the party is parked at a node.
+  private setupPartyFollowerIndicators(): void {
+    if (!this.partyFollowerContainer || !this.map) return;
+
+    // Destroyed, not just detached - an AnimatedSprite stays registered on Ticker.shared until destroyed.
+    this.partyFollowerTokens.forEach((token) => token.destroy({ children: true }));
+    this.partyFollowerContainer.removeChildren();
+    this.partyFollowerTokens = [];
+    this.followerOffsets = [];
+
+    if (this.isShowingAtLocationIndicator) return;
+
+    const followerCount = Math.max(partyGet().length - 1, 0);
+    for (let index = 1; index <= followerCount; index++) {
+      const sprite = pixiIndicatorPlayerSpriteCreate(
+        this.map.tilewidth,
+        this.partyTokenTexturesByIndex[index] ?? [],
+      );
+      // A per-follower container, positioned at the tile's screen corner like worker tokens, so the
+      // sprite's own centering offset applies unmodified.
+      const token = new Container();
+      token.addChild(sprite);
+      this.partyFollowerContainer.addChild(token);
+      this.partyFollowerTokens.push(token);
+      this.followerOffsets.push(
+        partyFollowerFormationOffset(
+          this.followerOffsets.length,
+          followerCount,
+          PARTY_FORMATION_JITTER_MIN_TILES,
+          PARTY_FORMATION_JITTER_MAX_TILES,
+        ),
+      );
+    }
+  }
+
+  // Pure state advance - screen placement happens later, in renderPartyFollowerIndicators().
+  private advancePartyFollowerPositions(): void {
+    const followerCount = this.partyFollowerTokens.length;
+    if (followerCount === 0) return;
+
+    const now = performance.now();
+    this.partyPositionHistory = partyPositionHistoryRecord(
+      this.partyPositionHistory,
+      this.visualPosition,
+      now,
+      PARTY_FORMATION_HISTORY_MAX_AGE_MS,
+    );
+
+    const leaderArrived = this.isVisuallyAtTarget();
+
+    for (let index = 0; index < followerCount; index++) {
+      const offset = this.followerOffsets[index] ?? { x: 0, y: 0 };
+
+      if (!leaderArrived) {
+        this.followerCatchUp[index] = undefined;
+        const sampled =
+          partyPositionHistorySample(
+            this.partyPositionHistory,
+            now,
+            (index + 1) * PARTY_FORMATION_FOLLOW_DELAY_MS,
+          ) ?? this.visualPosition;
+        this.followerRenderedPosition[index] = partyFollowerJitterPosition(
+          sampled,
+          offset,
+        );
+        continue;
+      }
+
+      const target = partyFollowerJitterPosition(this.visualPosition, offset);
+      const catchUp =
+        this.followerCatchUp[index] ??
+        partyFollowerCatchUpStart(
+          this.followerRenderedPosition[index] ?? target,
+          target,
+          now,
+          PARTY_FORMATION_CATCHUP_MS,
+        );
+      this.followerCatchUp[index] = catchUp;
+      this.followerRenderedPosition[index] = partyFollowerCatchUpPosition(
+        catchUp.from,
+        target,
+        catchUp.startTime,
+        PARTY_FORMATION_CATCHUP_MS,
+        now,
+      );
+    }
+  }
+
+  // Gates the "at location" swap so followers converge before it fires, instead of popping mid-walk.
+  private arePartyFollowersSettled(): boolean {
+    const now = performance.now();
+    return this.followerCatchUp.every(
+      (catchUp) =>
+        !catchUp || now - catchUp.startTime >= PARTY_FORMATION_CATCHUP_MS,
+    );
+  }
+
+  private renderPartyFollowerIndicators(): void {
+    if (!this.partyFollowerContainer || !this.map) return;
+    const map = this.map;
+
+    this.partyFollowerTokens.forEach((token, index) => {
+      const position = this.followerRenderedPosition[index];
+      if (!position) return;
+
+      const screenPosition = tileToScreenPosition(
+        position.x,
+        position.y,
+        this.lastCamera,
+        map.tilewidth,
+        map.tileheight,
+      );
+      token.position.set(screenPosition.x, screenPosition.y);
+    });
   }
 
   // Use for anything gated on visible, not just logical, arrival.
@@ -773,7 +938,9 @@ export class GamePlayWorldComponent implements OnDestroy {
   // Swaps to the "at location" indicator only on visual arrival, so it doesn't flip before the glide finishes.
   private updatePlayerIndicatorIfNeeded(): void {
     const shouldShowAtLocation =
-      this.isVisuallyAtTarget() && isPlayerAtLocation();
+      this.isVisuallyAtTarget() &&
+      isPlayerAtLocation() &&
+      this.arePartyFollowersSettled();
     if (shouldShowAtLocation === this.isShowingAtLocationIndicator) return;
 
     this.isShowingAtLocationIndicator = shouldShowAtLocation;

@@ -50,6 +50,7 @@ export function pixiResponsiveCanvasSetup(
 
 export function pixiWorldContainersCreate(app: Application): {
   mapContainer: Container;
+  partyFollowerContainer: Container;
   playerIndicatorContainer: Container;
   workerIndicatorContainer: Container;
   gatherProgressContainer: Container;
@@ -58,6 +59,7 @@ export function pixiWorldContainersCreate(app: Application): {
   floatingTextContainer: Container;
 } {
   const mapContainer = new Container();
+  const partyFollowerContainer = new Container();
   const playerIndicatorContainer = new Container();
   const workerIndicatorContainer = new Container();
   const gatherProgressContainer = new Container();
@@ -66,6 +68,8 @@ export function pixiWorldContainersCreate(app: Application): {
   const floatingTextContainer = new Container();
 
   app.stage.addChild(mapContainer);
+  // Added before the leader so it renders underneath when the party stacks up on the same tile.
+  app.stage.addChild(partyFollowerContainer);
   app.stage.addChild(playerIndicatorContainer);
   app.stage.addChild(workerIndicatorContainer);
   app.stage.addChild(gatherProgressContainer);
@@ -75,6 +79,8 @@ export function pixiWorldContainersCreate(app: Application): {
   app.stage.addChild(floatingTextContainer);
 
   mapContainer.cullable = true;
+  // Stays at (0,0), unlike playerIndicatorContainer - holds up to 3 follower tokens, each positioned individually.
+  partyFollowerContainer.cullable = false;
   playerIndicatorContainer.cullable = false;
   // Stays at (0,0), unlike playerIndicatorContainer - holds N worker tokens, each positioned individually.
   workerIndicatorContainer.cullable = false;
@@ -86,6 +92,7 @@ export function pixiWorldContainersCreate(app: Application): {
 
   return {
     mapContainer,
+    partyFollowerContainer,
     playerIndicatorContainer,
     workerIndicatorContainer,
     gatherProgressContainer,

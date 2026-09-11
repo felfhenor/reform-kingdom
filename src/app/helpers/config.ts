@@ -146,6 +146,17 @@ export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -40;
 export const NODE_STATUS_ICON_RADIUS = 7;
 
+// How far each trailing party member's screen position lags behind the leader's, in party order (position 2 = 1x, position 3 = 2x, ...).
+export const PARTY_FORMATION_FOLLOW_DELAY_MS = 450;
+// How long a follower takes to converge onto the node tile once the leader visually arrives, so the party doesn't wait out its full follow delay to settle.
+export const PARTY_FORMATION_CATCHUP_MS = 250;
+// Leader-position sample buffer only needs to cover the longest follow delay in use, plus headroom.
+export const PARTY_FORMATION_HISTORY_MAX_AGE_MS = 2400;
+// Followers are placed at a randomized radius (tiles) in this range, spread evenly by angle around the
+// leader - the nonzero minimum is what actually guarantees no two sprites ever land on the same spot.
+export const PARTY_FORMATION_JITTER_MIN_TILES = 0.4;
+export const PARTY_FORMATION_JITTER_MAX_TILES = 0.6;
+
 // Town
 
 // No authored weight value exists yet - a specialty recipe is this many times as likely to be picked as a non-specialty one.
