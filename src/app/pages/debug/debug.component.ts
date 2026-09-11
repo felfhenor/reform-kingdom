@@ -14,6 +14,7 @@ import {
 } from '@helpers/debug/analysis-inputs.ui';
 import { ANALYSIS_SCRIPTS } from '@helpers/debug/analysis-registry.ui';
 import type {
+  AnalysisCheck,
   AnalysisInputDef,
   AnalysisInputValue,
   AnalysisParams,
@@ -217,12 +218,26 @@ export class DebugComponent {
     return result.checks.filter((check) => check.status === 'warning').length;
   }
 
+  public passCount(result: AnalysisRunResult): number {
+    return result.checks.filter((check) => check.status === 'pass').length;
+  }
+
+  // Reuses the existing global "Expanded detail" input rather than a separate toggle.
+  public visibleChecks(result: AnalysisRunResult): AnalysisCheck[] {
+    return this.inputValue('expanded')
+      ? result.checks
+      : result.checks.filter((check) => check.status !== 'pass');
+  }
+
   public supportingScripts(inputKey: string): string {
     const titles = ANALYSIS_SCRIPTS.filter((script) =>
       script.inputKeys.includes(inputKey),
     ).map((script) => script.title);
-    return titles.length > 0
-      ? `Used by: ${titles.join(', ')}`
-      : 'Not used by any script.';
+    const usedBy =
+      titles.length > 0
+        ? `Used by: ${titles.join(', ')}`
+        : 'Not used by any script.';
+    if (inputKey !== 'expanded') return usedBy;
+    return `Shows every passing check in every script's list. Also adds extra detail rows to: ${titles.join(', ')}.`;
   }
 }

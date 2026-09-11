@@ -119,7 +119,7 @@
                 </summary>
 
                 <div class="mt-2 flex flex-col gap-2">
-                  @for (check of state.result.checks; track check.id) {
+                  @for (check of visibleChecks(state.result); track check.id) {
                     <div class="flex flex-row items-start gap-2">
                       <span
                         class="font-bold"
@@ -139,6 +139,14 @@
                         }}
                       </span>
                       <span>{{ check.message }}</span>
+                    </div>
+                  }
+
+                  @let passed = passCount(state.result);
+                  @if (!inputValue('expanded') && passed > 0) {
+                    <div class="flex flex-row items-start gap-2">
+                      <span class="font-bold text-success">✓</span>
+                      <span>{{ passed }} check(s) passed</span>
                     </div>
                   }
 

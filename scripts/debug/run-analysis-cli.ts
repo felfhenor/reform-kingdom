@@ -3,6 +3,7 @@
  * under `scripts/analyze-*.ts` / `scripts/validate-*.ts`. Mirrors the
  * ✓/✗/`::error::`/`process.exit(1)` conventions the pre-dashboard versions
  * of these scripts used, so CI and local usage behave the same.
+ * `--expanded` prints individual `pass` checks (mirrors the `/debug` dashboard's toggle of the same name).
  */
 
 import type { AnalysisRunResult, AnalysisTable } from '@interfaces';
@@ -33,11 +34,19 @@ export function printAnalysisResult(
   result: AnalysisRunResult,
   options: { strict: boolean },
 ): void {
+  const expanded = process.argv.includes('--expanded');
+  const passes = result.checks.filter((check) => check.status === 'pass');
+  const nonPasses = result.checks.filter((check) => check.status !== 'pass');
+
   console.log(`=== ${title} ===\n`);
 
-  result.checks.forEach((check) => {
+  (expanded ? result.checks : nonPasses).forEach((check) => {
     console.log(`  ${STATUS_ICON[check.status]} ${check.message}`);
   });
+
+  if (!expanded && passes.length > 0) {
+    console.log(`  ${STATUS_ICON['pass']} ${passes.length} check(s) passed`);
+  }
 
   (result.tables ?? []).forEach((table) => printTable(table));
 
