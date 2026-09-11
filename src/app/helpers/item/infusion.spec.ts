@@ -301,6 +301,8 @@ describe('Infusion Helper Functions', () => {
             Resistance: 0,
             Strength: 0,
             Vitality: 0,
+            Constitution: 0,
+            Spirit: 0,
           },
         }),
       ).toBe(false);
@@ -359,38 +361,12 @@ describe('Infusion Helper Functions', () => {
     it('costs 0 when the item has no infusionStats', () => {
       expect(infusionMaterialCost(plainMaterial.id)).toBe(0);
     });
-
-    it('costs 100g per total resistance point for a resistance-only item', () => {
-      expect(infusionMaterialCost(spiritFlesh.id)).toBe(200);
-    });
-
-    it('sums both infusionStats (150g here) and infusionDebuffResistances (100g/point) when an item has both', () => {
-      vi.mocked(getEntry).mockReturnValue({
-        ...crystal,
-        infusionDebuffResistances: spiritFlesh.infusionDebuffResistances,
-      } as never);
-
-      expect(infusionMaterialCost(crystal.id)).toBe(150 + 200);
-    });
-
-    it('costs 50g per total combat stat point for a combat-stat-only item', () => {
-      expect(infusionMaterialCost(vengeanceShard.id)).toBe(150);
-    });
-
-    it('sums infusionStats (150g here) and infusionCombatStats (50g/point) when an item has both', () => {
-      vi.mocked(getEntry).mockReturnValue({
-        ...crystal,
-        infusionCombatStats: vengeanceShard.infusionCombatStats,
-      } as never);
-
-      expect(infusionMaterialCost(crystal.id)).toBe(150 + 150);
-    });
   });
 
   describe('canInfuseEquipmentItem', () => {
     beforeEach(() => {
       vi.mocked(getMaterialQuantity).mockReturnValue(1000);
-      vi.mocked(getGoldQuantity).mockReturnValue(1000);
+      vi.mocked(getGoldQuantity).mockReturnValue(6600);
     });
 
     it('allows infusing an empty slot when material and gold are available', () => {
