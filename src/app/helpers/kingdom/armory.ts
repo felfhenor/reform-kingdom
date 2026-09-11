@@ -19,11 +19,13 @@ import {
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
+  AffixId,
   DropRarity,
   EquipmentArmoryEntry,
   EquipmentContent,
   EquipmentId,
   EquipmentItem,
+  GameState,
   GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
@@ -62,6 +64,20 @@ export function pruneInvalidArmoryItems(
   );
 }
 
+// Shared by every armory-add path - appends the items and marks the equipment permanently discovered (first-find timestamp preserved on repeat finds).
+function addArmoryItems(
+  state: GameState,
+  equipmentId: EquipmentId,
+  items: EquipmentItem[],
+): void {
+  state.armory = [...state.armory, ...items];
+
+  const existing = state.discoveredEquipment[equipmentId];
+  state.discoveredEquipment[equipmentId] = {
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+}
+
 export function armoryAdd(equipmentId: EquipmentId, quantity = 1): void {
   if (quantity <= 0) return;
 
@@ -69,12 +85,21 @@ export function armoryAdd(equipmentId: EquipmentId, quantity = 1): void {
     const newItems: EquipmentItem[] = Array.from({ length: quantity }, () =>
       newEquipmentItem(equipmentId),
     );
-    state.armory = [...state.armory, ...newItems];
+    addArmoryItems(state, equipmentId, newItems);
 
-    const existing = state.discoveredEquipment[equipmentId];
-    state.discoveredEquipment[equipmentId] = {
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
+    return state;
+  });
+}
+
+// Debug/testing tool - builds one item with caller-specified affixes instead of a random rarity roll, for testing specific affix combinations without relying on RNG.
+export function armoryAddWithAffixes(
+  equipmentId: EquipmentId,
+  affixIds: AffixId[],
+): void {
+  updateGamestate((state) => {
+    addArmoryItems(state, equipmentId, [
+      newEquipmentItem(equipmentId, affixIds),
+    ]);
 
     return state;
   });

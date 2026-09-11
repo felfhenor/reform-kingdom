@@ -15,6 +15,7 @@ import { heroSkillsWithEquipment } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
   characterTagResistances,
+  equipmentMonsterTypeDamageTotals,
   equippedItemTypes,
 } from '@helpers/item/equipment';
 import { rngUuid } from '@helpers/rng';
@@ -137,6 +138,9 @@ export function combatantFromCharacter(character: Character): Combatant {
     combatOrders: character.combatOrders[character.jobId] ?? [],
 
     combatStats: combatStatsForCharacterEquipment(character.equipment),
+    monsterTypeDamageBonus: equipmentMonsterTypeDamageTotals(
+      character.equipment,
+    ),
 
     affinity: defaultAffinities(),
     resistance: defaultAffinities(),

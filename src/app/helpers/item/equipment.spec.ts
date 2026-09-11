@@ -33,6 +33,7 @@ import {
   equipmentAffixEffects,
   equipmentCombatStatTotals,
   equipmentGrantedSkillIds,
+  equipmentMonsterTypeDamageTotals,
   equipmentStatTotals,
   equipmentTagResistanceTotals,
   equippedItems,
@@ -529,6 +530,88 @@ describe('Equipment Helper Functions', () => {
       });
 
       expect(totals.damageReflectPercent).toBe(17);
+    });
+  });
+
+  describe('equipmentMonsterTypeDamageTotals', () => {
+    const zeroMonsterTypeDamage = {
+      Humanoid: 0,
+      Demon: 0,
+      Amalgamation: 0,
+      Insect: 0,
+      Beast: 0,
+      Spirit: 0,
+    };
+
+    it('should return zeroed bonuses when nothing is equipped', () => {
+      expect(equipmentMonsterTypeDamageTotals(emptyEquipment)).toEqual(
+        zeroMonsterTypeDamage,
+      );
+      expect(getEntry).not.toHaveBeenCalled();
+    });
+
+    it("sums a rolled MonsterTypeDamage affix's value by monster type", () => {
+      const demonSlayingAffix = {
+        id: 'affix-demon-slaying' as never,
+        rarity: 'Uncommon',
+        family: 'DemonSlaying',
+        effects: [
+          { kind: 'MonsterTypeDamage', monsterType: 'Demon', value: 20 },
+        ],
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? sword
+            : id === demonSlayingAffix.id
+              ? demonSlayingAffix
+              : undefined) as never,
+      );
+
+      const totals = equipmentMonsterTypeDamageTotals({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          affixIds: [demonSlayingAffix.id],
+        },
+      });
+
+      expect(totals).toEqual({ ...zeroMonsterTypeDamage, Demon: 20 });
+    });
+
+    it('should additively stack the same monster type across multiple equipped items', () => {
+      const humanoidHurtingAffix = {
+        id: 'affix-humanoid-hurting' as never,
+        rarity: 'Common',
+        family: 'HumanoidSlaying',
+        effects: [
+          { kind: 'MonsterTypeDamage', monsterType: 'Humanoid', value: 10 },
+        ],
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? sword
+            : id === 'helmet'
+              ? helmet
+              : id === humanoidHurtingAffix.id
+                ? humanoidHurtingAffix
+                : undefined) as never,
+      );
+
+      const totals = equipmentMonsterTypeDamageTotals({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(sword.id),
+          affixIds: [humanoidHurtingAffix.id],
+        },
+        Helmet: {
+          ...mockEquipmentItem(helmet.id),
+          affixIds: [humanoidHurtingAffix.id],
+        },
+      });
+
+      expect(totals.Humanoid).toBe(20);
     });
   });
 
@@ -1234,6 +1317,18 @@ describe('Equipment Helper Functions', () => {
 
       const item = newEquipmentItem(sword.id);
       expect(item.affixIds).toEqual([]);
+      expect(getEntriesByType).not.toHaveBeenCalled();
+    });
+
+    it('uses the caller-specified affixIds instead of rolling when provided', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        ...sword,
+        rarity: 'Legendary',
+      } as never);
+
+      const item = newEquipmentItem(sword.id, [strengthAffix.id]);
+
+      expect(item.affixIds).toEqual([strengthAffix.id]);
       expect(getEntriesByType).not.toHaveBeenCalled();
     });
   });

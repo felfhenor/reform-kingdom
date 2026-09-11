@@ -1,7 +1,9 @@
 import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
+import { defaultMonsterTypeDamageBonus } from '@helpers/defaults';
 import {
   affixEffectsOfKind,
+  affixEffectSum,
   equipmentItemAffixEffects,
   rollAffixIds,
 } from '@helpers/item/affix';
@@ -15,6 +17,7 @@ import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { rngUuid } from '@helpers/rng';
 import type {
   AffixEffect,
+  AffixId,
   BaseStat,
   Character,
   CombatStatBlock,
@@ -31,6 +34,7 @@ import type {
   JobContent,
   JobId,
   JobStatPriority,
+  MonsterType,
   StatBlock,
   StatusEffectBlock,
 } from '@interfaces';
@@ -44,14 +48,18 @@ export function canModifyEquipment(): boolean {
 }
 
 // Single construction site for a fresh EquipmentItem - every drop/craft/purchase/starter-gear path should use this instead of an inline literal.
-export function newEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
+// affixIds overrides the normal rarity roll - used by debug tooling to force a specific affix combination.
+export function newEquipmentItem(
+  equipmentId: EquipmentId,
+  affixIds?: AffixId[],
+): EquipmentItem {
   const content = getEntry<EquipmentContent>(equipmentId);
 
   return {
     id: rngUuid() as EquipmentItemId,
     equipmentId,
     infusedItemIds: [],
-    affixIds: content ? rollAffixIds(content.rarity) : [],
+    affixIds: affixIds ?? (content ? rollAffixIds(content.rarity) : []),
   };
 }
 
@@ -214,6 +222,24 @@ export function equipmentAffixEffects(
   equipment: EquipmentBlock,
 ): AffixEffect[] {
   return equippedItems(equipment).flatMap(equipmentItemAffixEffects);
+}
+
+// Affix-only (no base equipment/infusion component, unlike equipmentStatTotals etc.) - summed per MonsterType for the MonsterTypeDamage combat bonus.
+export function equipmentMonsterTypeDamageTotals(
+  equipment: EquipmentBlock,
+): Record<MonsterType, number> {
+  const totals = defaultMonsterTypeDamageBonus();
+  const affixEffects = equipmentAffixEffects(equipment);
+
+  (Object.keys(totals) as MonsterType[]).forEach((type) => {
+    totals[type] = affixEffectSum(
+      affixEffects,
+      'MonsterTypeDamage',
+      (effect) => effect.monsterType === type,
+    );
+  });
+
+  return totals;
 }
 
 // Computed on demand (not baked into persisted `Character.stats`, which is

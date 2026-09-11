@@ -26,7 +26,7 @@ import {
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { addMaterial } from '@helpers/item/materials';
-import { armoryAdd } from '@helpers/kingdom/armory';
+import { armoryAdd, armoryAddWithAffixes } from '@helpers/kingdom/armory';
 import {
   monsterEncounters,
   monsterRecordKill,
@@ -45,6 +45,8 @@ import {
   worldNodeGathering,
 } from '@helpers/world-node/world-nodes';
 import {
+  type AffixContent,
+  type AffixId,
   type CharacterId,
   type CollectibleContent,
   type CollectibleId,
@@ -97,6 +99,33 @@ export function debugGiveEquipment(
   }
 
   armoryAdd(equipment.id, quantity);
+}
+
+// Bypasses the normal rarity-based affix roll so a specific combination can be tested on demand.
+export function debugGiveEquipmentWithAffixes(
+  equipmentId: EquipmentId,
+  affixIds: AffixId[],
+): void {
+  const equipment = getEntry<EquipmentContent>(equipmentId);
+  if (!equipment) {
+    console.warn(`Equipment with ID ${equipmentId} not found.`);
+    return;
+  }
+
+  if (equipment.unobtainable) {
+    console.warn(`Equipment with ID ${equipmentId} not obtainable.`);
+    return;
+  }
+
+  const unknownAffixId = affixIds.find(
+    (affixId) => getEntry<AffixContent>(affixId)?.__type !== 'affix',
+  );
+  if (unknownAffixId) {
+    console.warn(`Affix with ID ${unknownAffixId} not found.`);
+    return;
+  }
+
+  armoryAddWithAffixes(equipment.id, affixIds);
 }
 
 export function debugSetCharacterLevel(

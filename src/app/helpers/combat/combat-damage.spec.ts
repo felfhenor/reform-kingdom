@@ -660,3 +660,114 @@ describe('combatApplySkillToTarget combat message rendering', () => {
     );
   });
 });
+
+describe('combatApplySkillToTarget monster type damage bonus', () => {
+  const zeroStats = {
+    Agility: 0,
+    Energy: 0,
+    Health: 0,
+    Intelligence: 0,
+    Luck: 0,
+    Resistance: 0,
+    Strength: 0,
+    Vitality: 0,
+    Constitution: 0,
+    Spirit: 0,
+  };
+
+  it("boosts damage by the attacker's MonsterTypeDamage affix bonus when it matches one of the target's monster types", () => {
+    vi.mocked(getEntry).mockImplementation(
+      (id) =>
+        (id === 'demon-1'
+          ? { id: 'demon-1', types: ['Demon'] }
+          : undefined) as never,
+    );
+
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats, Strength: 100 },
+      monsterTypeDamageBonus: { Demon: 20 },
+    });
+    const target = buildCombatant({
+      hp: 1000,
+      monsterId: 'demon-1',
+      totalStats: { ...zeroStats, Health: 1000 },
+    });
+    const skill = buildSkill();
+    const technique = buildTechnique({
+      damageScaling: { ...zeroStats, Strength: 1 },
+      attributes: ['DamagesTarget', 'BypassDefense'],
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      skill,
+      technique,
+    );
+
+    // baseDamage = Strength(100) * 1 = 100, boosted 20% for the Demon match -> 120.
+    expect(target.hp).toBe(1000 - 120);
+  });
+
+  it('leaves damage unmodified when none of the bonus types match the target', () => {
+    vi.mocked(getEntry).mockImplementation(
+      (id) =>
+        (id === 'beast-1'
+          ? { id: 'beast-1', types: ['Beast'] }
+          : undefined) as never,
+    );
+
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats, Strength: 100 },
+      monsterTypeDamageBonus: { Demon: 20 },
+    });
+    const target = buildCombatant({
+      hp: 1000,
+      monsterId: 'beast-1',
+      totalStats: { ...zeroStats, Health: 1000 },
+    });
+    const skill = buildSkill();
+    const technique = buildTechnique({
+      damageScaling: { ...zeroStats, Strength: 1 },
+      attributes: ['DamagesTarget', 'BypassDefense'],
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      skill,
+      technique,
+    );
+
+    expect(target.hp).toBe(1000 - 100);
+  });
+
+  it('leaves damage unmodified against a target with no monsterId (e.g. a hero)', () => {
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats, Strength: 100 },
+      monsterTypeDamageBonus: { Demon: 20 },
+    });
+    const target = buildCombatant({
+      hp: 1000,
+      totalStats: { ...zeroStats, Health: 1000 },
+    });
+    const skill = buildSkill();
+    const technique = buildTechnique({
+      damageScaling: { ...zeroStats, Strength: 1 },
+      attributes: ['DamagesTarget', 'BypassDefense'],
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      skill,
+      technique,
+    );
+
+    expect(getEntry).not.toHaveBeenCalled();
+    expect(target.hp).toBe(1000 - 100);
+  });
+});

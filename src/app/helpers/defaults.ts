@@ -8,6 +8,7 @@ import type {
   GameState,
   GameStateTradeskills,
   GatheringState,
+  MonsterType,
   StatBlock,
   StatusEffectBlock,
   TravelState,
@@ -149,6 +150,17 @@ export function defaultTagResistances(): StatusEffectBlock {
     DamageOverTime: 0,
     Poison: 0,
     Burn: 0,
+  };
+}
+
+export function defaultMonsterTypeDamageBonus(): Record<MonsterType, number> {
+  return {
+    Humanoid: 0,
+    Demon: 0,
+    Amalgamation: 0,
+    Insect: 0,
+    Beast: 0,
+    Spirit: 0,
   };
 }
 

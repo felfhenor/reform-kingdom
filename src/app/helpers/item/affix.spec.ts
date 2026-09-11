@@ -373,6 +373,22 @@ describe('equipmentItemMiscAffixDescriptions', () => {
     ).toEqual([gatherAffix.description]);
   });
 
+  it('includes the description of an affix whose effect has no dedicated display (MonsterTypeDamage)', () => {
+    const slayingAffix: AffixContent = {
+      ...strengthAffix,
+      id: 'affix-slaying' as AffixId,
+      description: 'Increases damage dealt to Demon enemies by 20%.',
+      effects: [{ kind: 'MonsterTypeDamage', monsterType: 'Demon', value: 20 }],
+    };
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === slayingAffix.id ? slayingAffix : undefined) as never,
+    );
+
+    expect(
+      equipmentItemMiscAffixDescriptions(buildItem([slayingAffix.id])),
+    ).toEqual([slayingAffix.description]);
+  });
+
   it('excludes an affix whose only effects already have a dedicated display (Stat)', () => {
     vi.mocked(getEntry).mockImplementation(
       (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,

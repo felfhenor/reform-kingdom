@@ -2,6 +2,7 @@ import {
   VALID_AFFIX_POSITIONS,
   VALID_COMBAT_STATS,
   VALID_GAME_STATS,
+  VALID_MONSTER_TYPES,
   VALID_STATUS_EFFECT_TAGS,
 } from '@helpers/content/ensure-helpers-constants';
 import {
@@ -63,6 +64,16 @@ function ensureAffixEffect(effect: Record<string, unknown> = {}): AffixEffect {
       return { kind: 'CaravanBuyDiscount', value };
     case 'CaravanSellBonus':
       return { kind: 'CaravanSellBonus', value };
+    case 'MonsterTypeDamage':
+      return {
+        kind: 'MonsterTypeDamage',
+        monsterType: ensureEnumValue(
+          effect['monsterType'],
+          VALID_MONSTER_TYPES,
+          'Humanoid',
+        ),
+        value,
+      };
     case 'Stat':
     default:
       return {

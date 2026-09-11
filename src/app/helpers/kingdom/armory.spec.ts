@@ -1,5 +1,6 @@
 import { defaultStats } from '@helpers/defaults';
 import type {
+  AffixId,
   EquipmentContent,
   EquipmentId,
   EquipmentItemId,
@@ -25,6 +26,7 @@ import { getEntry } from '@helpers/content/content';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import {
   armoryAdd,
+  armoryAddWithAffixes,
   armoryGet,
   equipmentSellValue,
   getArmoryEntries,
@@ -143,6 +145,42 @@ describe('Armory Helper Functions', () => {
       } as unknown as GameState);
 
       expect(result.discoveredEquipment['sword']).toEqual({ foundAt: 1000 });
+    });
+  });
+
+  describe('armoryAddWithAffixes', () => {
+    it('appends one item carrying exactly the given affixIds, not a random roll', () => {
+      const affixIds = ['affix-str', 'affix-vit'] as AffixId[];
+
+      armoryAddWithAffixes('sword' as EquipmentId, affixIds);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        armory: [{ equipmentId: 'shield' as EquipmentId }],
+        discoveredEquipment: {},
+      } as unknown as GameState);
+
+      expect(result.armory).toEqual([
+        { equipmentId: 'shield' },
+        {
+          id: expect.any(String),
+          equipmentId: 'sword',
+          infusedItemIds: [],
+          affixIds,
+        },
+      ]);
+    });
+
+    it('marks the equipment as permanently discovered', () => {
+      armoryAddWithAffixes('sword' as EquipmentId, []);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        armory: [],
+        discoveredEquipment: {},
+      } as unknown as GameState);
+
+      expect(result.discoveredEquipment['sword'].foundAt).toBeGreaterThan(0);
     });
   });
 

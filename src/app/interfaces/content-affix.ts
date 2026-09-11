@@ -1,4 +1,5 @@
 import type { CombatStat } from '@interfaces/combat';
+import type { MonsterType } from '@interfaces/content-monster';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
@@ -58,6 +59,12 @@ export type AffixEffectCaravanSellBonus = {
   value: number; // percent bonus on caravan sale gold
 };
 
+export type AffixEffectMonsterTypeDamage = {
+  kind: 'MonsterTypeDamage';
+  monsterType: MonsterType;
+  value: number; // percent damage bonus against monsters of this type
+};
+
 export type AffixEffect =
   | AffixEffectStat
   | AffixEffectCombatStat
@@ -67,7 +74,8 @@ export type AffixEffect =
   | AffixEffectGatherYield
   | AffixEffectSellValue
   | AffixEffectCaravanBuyDiscount
-  | AffixEffectCaravanSellBonus;
+  | AffixEffectCaravanSellBonus
+  | AffixEffectMonsterTypeDamage;
 
 // Where this affix's name sits relative to the base item name when composing a display name, e.g. "Weakening" (Prefix) Copper Ring vs Copper Ring "of Strength" (Suffix).
 export type AffixPosition = 'Prefix' | 'Suffix';

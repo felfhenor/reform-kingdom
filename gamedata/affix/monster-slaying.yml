@@ -1,0 +1,133 @@
+# Damage-vs-monster-type prefixes. Each MonsterType gets a Common "-Hurting" (+10%) and an Uncommon "-Slaying" (+20%) tier sharing a family, so an item rolls at most one of the pair.
+
+- id: 624daff5-3f7c-4691-9cb8-d47514390d8d
+  name: Humanoid-harming
+  description: Increases damage dealt to Humanoid enemies by 10%.
+  rarity: Common
+  family: HumanoidSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Humanoid
+      value: 10
+
+- id: 884d7672-0964-49fd-8821-250ba55ac2b3
+  name: Humanoid-slaying
+  description: Increases damage dealt to Humanoid enemies by 20%.
+  rarity: Uncommon
+  family: HumanoidSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Humanoid
+      value: 20
+
+- id: 60931860-1aaa-4ded-8477-9db8b7e0f9ca
+  name: Demon-harming
+  description: Increases damage dealt to Demon enemies by 10%.
+  rarity: Common
+  family: DemonSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Demon
+      value: 10
+
+- id: 986c2c8f-cc70-4595-b270-a18377c33d68
+  name: Demon-slaying
+  description: Increases damage dealt to Demon enemies by 20%.
+  rarity: Uncommon
+  family: DemonSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Demon
+      value: 20
+
+- id: 3ddee140-33b0-4c5c-ba2d-24bab498c312
+  name: Amalgamation-harming
+  description: Increases damage dealt to Amalgamation enemies by 10%.
+  rarity: Common
+  family: AmalgamationSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Amalgamation
+      value: 10
+
+- id: 75938678-8243-426a-aeee-3195d094951c
+  name: Amalgamation-slaying
+  description: Increases damage dealt to Amalgamation enemies by 20%.
+  rarity: Uncommon
+  family: AmalgamationSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Amalgamation
+      value: 20
+
+- id: 061a546f-bef7-4098-8319-6a4de8ae49e2
+  name: Insect-harming
+  description: Increases damage dealt to Insect enemies by 10%.
+  rarity: Common
+  family: InsectSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Insect
+      value: 10
+
+- id: 883eee69-afcf-420d-9d0c-b00ed39e8c70
+  name: Insect-slaying
+  description: Increases damage dealt to Insect enemies by 20%.
+  rarity: Uncommon
+  family: InsectSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Insect
+      value: 20
+
+- id: 910d517a-64b0-4a05-9608-22f17fb67306
+  name: Beast-harming
+  description: Increases damage dealt to Beast enemies by 10%.
+  rarity: Common
+  family: BeastSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Beast
+      value: 10
+
+- id: d06ed37d-d19b-4901-b852-c24cf15d2320
+  name: Beast-slaying
+  description: Increases damage dealt to Beast enemies by 20%.
+  rarity: Uncommon
+  family: BeastSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Beast
+      value: 20
+
+- id: efb9c530-b6a1-467a-b0c2-c6b246cdf444
+  name: Spirit-harming
+  description: Increases damage dealt to Spirit enemies by 10%.
+  rarity: Common
+  family: SpiritSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Spirit
+      value: 10
+
+- id: 36d84b1e-02dd-4eb6-80ea-bdc55ced4b92
+  name: Spirit-slaying
+  description: Increases damage dealt to Spirit enemies by 20%.
+  rarity: Uncommon
+  family: SpiritSlaying
+  position: Prefix
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Spirit
+      value: 20

@@ -119,6 +119,9 @@ export type Combatant = HasAnimation & {
   // Enemy-only MonsterId source for post-combat rewards; untyped to avoid a circular import.
   monsterId?: string;
 
+  // Percent damage bonus per MonsterType (keyed by string, same reasoning as `monsterId`, to avoid a circular import with content-monster.ts). Only heroes populate this, from equipped-gear affixes.
+  monsterTypeDamageBonus?: Record<string, number>;
+
   level: number;
   hp: number;
   ep: number;

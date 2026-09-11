@@ -27,6 +27,7 @@ import type {
   EquipmentSkillAttribute,
   EquipmentSkillContentTechnique,
   GameStat,
+  MonsterContent,
   StatBlock,
   StatusEffectContent,
 } from '@interfaces';
@@ -95,6 +96,22 @@ export function getCombatantBaseStatDamageForTechnique(
 function getDeadlockPreventionDamageMultiplier(rounds: number): number {
   const multiplierTiers = Math.floor(rounds / 25);
   return 1 + 0.25 * multiplierTiers;
+}
+
+// Sums the attacker's MonsterTypeDamage affix bonuses across every type the target's monster content carries - 0 for non-monster targets or gearless attackers (e.g. monsters).
+function attackerMonsterTypeDamageBonusPercent(
+  attacker: Combatant,
+  target: Combatant,
+): number {
+  if (!target.monsterId || !attacker.monsterTypeDamageBonus) return 0;
+
+  const monster = getEntry<MonsterContent>(target.monsterId);
+  if (!monster) return 0;
+
+  return sumBy(
+    monster.types,
+    (type) => attacker.monsterTypeDamageBonus?.[type] ?? 0,
+  );
 }
 
 export function combatCombatantTakeDamage(
@@ -187,6 +204,16 @@ export function combatApplySkillToTarget(
 
     if (isCriticalHit) {
       effectiveDamage *= 2;
+    }
+
+    if (techniqueHasAttribute(technique, 'DamagesTarget')) {
+      const monsterTypeBonusPercent = attackerMonsterTypeDamageBonusPercent(
+        combatant,
+        target,
+      );
+      if (monsterTypeBonusPercent !== 0) {
+        effectiveDamage *= 1 + monsterTypeBonusPercent / 100;
+      }
     }
 
     // Apply deadlock prevention damage multiplier (only for damage, not healing)
