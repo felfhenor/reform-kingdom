@@ -13,22 +13,17 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 export class RowLabeledValuesComponent {
   public dimension = input.required<StatDisplayDimension>();
   public values = input<Record<string, number>>();
-  // Extra bonus (e.g. from infusions/affixes) shown as its own set of rows,
-  // always in green/rose, below the base rows.
+  // Extra bonus (e.g. from infusions/affixes), merged into the base value
+  // it modifies rather than shown as its own row.
   public bonusValues = input<Record<string, number>>();
   // 'column' (default) for tooltips/detail panels, full sentence per row;
   // 'row' for compact space-constrained lists.
   public layout = input<'column' | 'row'>('column');
 
-  private sortedNonzero(values: Record<string, number> | undefined): string[] {
-    if (!values) return [];
-    return this.dimension().order.filter((key) => (values[key] ?? 0) !== 0);
-  }
-
-  public baseRows = computed<string[]>(() => this.sortedNonzero(this.values()));
-
-  public bonusRows = computed<string[]>(() =>
-    this.sortedNonzero(this.bonusValues()),
+  public baseRows = computed<string[]>(() =>
+    this.dimension().order.filter(
+      (key) => this.baseValue(key) !== 0 || this.bonusValue(key) !== 0,
+    ),
   );
 
   public label(key: string): string {
@@ -49,5 +44,9 @@ export class RowLabeledValuesComponent {
 
   public bonusValue(key: string): number {
     return this.bonusValues()?.[key] ?? 0;
+  }
+
+  public totalValue(key: string): number {
+    return this.baseValue(key) + this.bonusValue(key);
   }
 }

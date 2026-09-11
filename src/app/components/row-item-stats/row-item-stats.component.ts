@@ -22,11 +22,11 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 })
 export class RowItemStatsComponent {
   public stats = input.required<StatBlock>();
-  // Extra flat bonus (e.g. from infusions) shown as its own set of rows,
-  // always in green, below the base rows.
+  // Extra flat bonus (e.g. from infusions/affixes), merged into the base
+  // value it modifies rather than shown as its own row.
   public bonusStats = input<StatBlock>();
-  // When set, base rows show the delta against this baseline instead of
-  // the raw value, colored green/rose (equip-picker "compare to equipped").
+  // When set, rows show the delta against this baseline (base+bonus total)
+  // instead of the raw value, colored green/rose (equip-picker "compare to equipped").
   public comparisonStats = input<StatBlock>();
   public maxDecimals = input(2);
   // 'column' (default) for tooltips/detail panels; 'row' for compact,
@@ -43,30 +43,43 @@ export class RowItemStatsComponent {
 
   public baseRows = computed<BaseStat[]>(() =>
     this.statKeys.filter(
-      (stat) => this.baseValue(stat) !== 0 || this.deltaValue(stat) !== 0,
+      (stat) =>
+        this.baseValue(stat) !== 0 ||
+        this.bonusValue(stat) !== 0 ||
+        this.deltaValue(stat) !== 0,
     ),
   );
 
-  public bonusRows = computed<BaseStat[]>(() => {
-    const bonus = this.bonusStats();
-    if (!bonus) return [];
-    return this.statKeys.filter((stat) => bonus[stat] !== 0);
-  });
-
   public baseValue(stat: BaseStat): number {
     return this.stats()[stat];
-  }
-
-  public deltaValue(stat: BaseStat): number {
-    const comparison = this.comparisonStats();
-    return comparison ? this.baseValue(stat) - comparison[stat] : 0;
   }
 
   public bonusValue(stat: BaseStat): number {
     return this.bonusStats()?.[stat] ?? 0;
   }
 
+  public totalValue(stat: BaseStat): number {
+    return this.baseValue(stat) + this.bonusValue(stat);
+  }
+
+  public deltaValue(stat: BaseStat): number {
+    const comparison = this.comparisonStats();
+    return comparison ? this.totalValue(stat) - comparison[stat] : 0;
+  }
+
   public rowValue(stat: BaseStat): number {
-    return this.hasComparison() ? this.deltaValue(stat) : this.baseValue(stat);
+    return this.hasComparison() ? this.deltaValue(stat) : this.totalValue(stat);
+  }
+
+  public isPositive(stat: BaseStat): boolean {
+    return this.hasComparison()
+      ? this.deltaValue(stat) > 0
+      : this.bonusValue(stat) > 0;
+  }
+
+  public isNegative(stat: BaseStat): boolean {
+    return this.hasComparison()
+      ? this.deltaValue(stat) < 0
+      : this.bonusValue(stat) < 0;
   }
 }

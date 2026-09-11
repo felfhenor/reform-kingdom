@@ -26,7 +26,11 @@
       @for (stat of rowStatKeys(); track stat) {
         @let equipStatValue = totalStatValue(stat);
 
-        <span class="equipment-item-row-stat">
+        <span
+          class="equipment-item-row-stat"
+          [class.text-value-positive]="bonusStats()[stat] > 0"
+          [class.text-value-negative]="bonusStats()[stat] < 0"
+        >
           <app-icon-stat [stat]="stat" />
           <span>{{ statShorthand[stat] }}</span>
           <span>{{ equipStatValue | statDisplay: 1 }}</span>

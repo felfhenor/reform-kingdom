@@ -10,27 +10,13 @@
 
     <div
       class="flex items-center gap-2 text-xs"
-      [class.text-value-positive]="hasComparison() && value > 0"
-      [class.text-value-negative]="hasComparison() && value < 0"
-    >
-      <app-icon-stat [stat]="stat" />
-      <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
-      <span [class.text-value-negative]="value < 0">
-        {{ value | statDisplay: maxDecimals() : showSign() }}
-      </span>
-    </div>
-  }
-
-  @for (stat of bonusRows(); track stat) {
-    <div
-      class="flex items-center gap-2 text-xs"
-      [class.text-value-positive]="bonusValue(stat) > 0"
-      [class.text-value-negative]="bonusValue(stat) < 0"
+      [class.text-value-positive]="isPositive(stat)"
+      [class.text-value-negative]="isNegative(stat)"
     >
       <app-icon-stat [stat]="stat" />
       <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
       <span>
-        {{ bonusValue(stat) | statDisplay: maxDecimals() }}
+        {{ value | statDisplay: maxDecimals() : showSign() }}
       </span>
     </div>
   }
