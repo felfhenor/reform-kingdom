@@ -3,6 +3,9 @@ import {
   SELL_GOLD_PER_LEVEL,
   SELL_GOLD_PER_RESISTANCE_POINT,
   SELL_GOLD_PER_STAT_POINT,
+  VALUE_MULTIPLIER_PER_COMBAT_STAT,
+  VALUE_MULTIPLIER_PER_RESISTANCE,
+  VALUE_MULTIPLIER_PER_STAT,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
@@ -11,11 +14,11 @@ import {
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
   RESISTANCE_BONUS,
+  weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
-  BaseStat,
   DropRarity,
   EquipmentArmoryEntry,
   EquipmentContent,
@@ -24,7 +27,7 @@ import type {
   GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
-import { orderBy, sum, sumBy } from 'es-toolkit/compat';
+import { orderBy } from 'es-toolkit/compat';
 
 export function armoryGet(): EquipmentItem[] {
   return gamestate().armory;
@@ -91,32 +94,17 @@ const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
   Legendary: 15,
 };
 
-export const VALUE_MULTIPLIER_PER_STAT: Record<BaseStat, number> = {
-  Agility: 2,
-  Constitution: 3,
-  Energy: 1,
-  Health: 1,
-  Intelligence: 5,
-  Luck: 10,
-  Resistance: 4,
-  Spirit: 3,
-  Strength: 5,
-  Vitality: 4,
-};
-
 // Base stats plus infusion bonus both count - an infused item sells for more, but infusion materials aren't refunded.
 export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
   const affixEffects = equipmentItemAffixEffects(entry.item);
   const affixStatBoost = affixEffectSum(affixEffects, 'Stat');
 
   const statTotal =
-    sumBy(
-      Object.keys(entry.content.baseStats),
-      (stat) =>
-        entry.content.baseStats[stat as BaseStat] *
-        VALUE_MULTIPLIER_PER_STAT[stat as BaseStat],
+    weightedBlockTotal(entry.content.baseStats, VALUE_MULTIPLIER_PER_STAT) +
+    weightedBlockTotal(
+      equipmentItemInfusionBonus(entry.item.infusedItemIds),
+      VALUE_MULTIPLIER_PER_STAT,
     ) +
-    sum(Object.values(equipmentItemInfusionBonus(entry.item.infusedItemIds))) +
     affixStatBoost;
 
   const base =
@@ -128,13 +116,25 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
 
   // Combat stats (base + infusion + affix) are also a flat bonus, unscaled by rarity - same treatment as SellValue.
   const combatStatTotal =
-    sum(Object.values(COMBAT_STAT_BONUS.equipmentBlock(entry.content) ?? {})) +
-    sum(Object.values(equipmentItemBonusTotals(entry.item, COMBAT_STAT_BONUS)));
+    weightedBlockTotal(
+      COMBAT_STAT_BONUS.equipmentBlock(entry.content),
+      VALUE_MULTIPLIER_PER_COMBAT_STAT,
+    ) +
+    weightedBlockTotal(
+      equipmentItemBonusTotals(entry.item, COMBAT_STAT_BONUS),
+      VALUE_MULTIPLIER_PER_COMBAT_STAT,
+    );
 
   // Debuff resistances (base + infusion + affix) get the same flat treatment.
   const resistanceTotal =
-    sum(Object.values(RESISTANCE_BONUS.equipmentBlock(entry.content) ?? {})) +
-    sum(Object.values(equipmentItemBonusTotals(entry.item, RESISTANCE_BONUS)));
+    weightedBlockTotal(
+      RESISTANCE_BONUS.equipmentBlock(entry.content),
+      VALUE_MULTIPLIER_PER_RESISTANCE,
+    ) +
+    weightedBlockTotal(
+      equipmentItemBonusTotals(entry.item, RESISTANCE_BONUS),
+      VALUE_MULTIPLIER_PER_RESISTANCE,
+    );
 
   return Math.max(
     1,

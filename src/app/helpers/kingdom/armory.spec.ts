@@ -308,7 +308,8 @@ describe('Armory Helper Functions', () => {
       expect(equipmentSellValue(entry)).toBe(520);
     });
 
-    it('adds infusion bonus stats on top of base stats', () => {
+    // Base Strength 5 + infusion Strength 3, both weighted x5 (VALUE_MULTIPLIER_PER_STAT.Strength): (5*5 + 3*5)*20 + 2*10 = 820.
+    it('adds infusion bonus stats on top of base stats, weighted the same as base stats', () => {
       vi.mocked(equipmentItemInfusionBonus).mockReturnValue({
         ...defaultStats(),
         Strength: 3,
@@ -327,7 +328,7 @@ describe('Armory Helper Functions', () => {
         },
       };
 
-      expect(equipmentSellValue(entry)).toBe(580);
+      expect(equipmentSellValue(entry)).toBe(820);
     });
 
     it('never returns less than 1 gold', () => {

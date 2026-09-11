@@ -332,17 +332,28 @@ describe('Infusion Helper Functions', () => {
   });
 
   describe('infusionMaterialCost', () => {
-    it('costs 30g per total stat point', () => {
-      expect(infusionMaterialCost(crystal.id)).toBe(30);
+    // crystal grants +1 Strength; Strength's VALUE_MULTIPLIER_PER_STAT is 5, so 30g * 1 * 5 = 150g.
+    it('costs 30g per stat point, scaled by VALUE_MULTIPLIER_PER_STAT for the stat', () => {
+      expect(infusionMaterialCost(crystal.id)).toBe(150);
     });
 
-    it('scales up to 300g for +10 total', () => {
+    it('scales up to 1500g for +10 total', () => {
       vi.mocked(getEntry).mockReturnValue({
         ...crystal,
         infusionStats: { ...crystal.infusionStats, Strength: 10 },
       } as never);
 
-      expect(infusionMaterialCost(crystal.id)).toBe(300);
+      expect(infusionMaterialCost(crystal.id)).toBe(1500);
+    });
+
+    // Strength (x5) + Luck (x10): 30g * (1*5 + 2*10) = 30g * 25 = 750g.
+    it('weights each stat independently when a material grants more than one', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        ...crystal,
+        infusionStats: { ...crystal.infusionStats, Strength: 1, Luck: 2 },
+      } as never);
+
+      expect(infusionMaterialCost(crystal.id)).toBe(750);
     });
 
     it('costs 0 when the item has no infusionStats', () => {
@@ -353,26 +364,26 @@ describe('Infusion Helper Functions', () => {
       expect(infusionMaterialCost(spiritFlesh.id)).toBe(200);
     });
 
-    it('sums both infusionStats (30g/point) and infusionDebuffResistances (100g/point) when an item has both', () => {
+    it('sums both infusionStats (150g here) and infusionDebuffResistances (100g/point) when an item has both', () => {
       vi.mocked(getEntry).mockReturnValue({
         ...crystal,
         infusionDebuffResistances: spiritFlesh.infusionDebuffResistances,
       } as never);
 
-      expect(infusionMaterialCost(crystal.id)).toBe(30 + 200);
+      expect(infusionMaterialCost(crystal.id)).toBe(150 + 200);
     });
 
     it('costs 50g per total combat stat point for a combat-stat-only item', () => {
       expect(infusionMaterialCost(vengeanceShard.id)).toBe(150);
     });
 
-    it('sums infusionStats (30g/point) and infusionCombatStats (50g/point) when an item has both', () => {
+    it('sums infusionStats (150g here) and infusionCombatStats (50g/point) when an item has both', () => {
       vi.mocked(getEntry).mockReturnValue({
         ...crystal,
         infusionCombatStats: vengeanceShard.infusionCombatStats,
       } as never);
 
-      expect(infusionMaterialCost(crystal.id)).toBe(30 + 150);
+      expect(infusionMaterialCost(crystal.id)).toBe(150 + 150);
     });
   });
 

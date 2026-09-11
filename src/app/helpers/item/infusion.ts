@@ -2,6 +2,9 @@ import {
   GOLD_PER_COMBAT_STAT_POINT,
   GOLD_PER_RESISTANCE_POINT,
   GOLD_PER_STAT_POINT,
+  VALUE_MULTIPLIER_PER_COMBAT_STAT,
+  VALUE_MULTIPLIER_PER_RESISTANCE,
+  VALUE_MULTIPLIER_PER_STAT,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
@@ -10,6 +13,7 @@ import {
   equipmentItemInfusionTotals,
   RESISTANCE_BONUS,
   STAT_BONUS,
+  weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
 import { getGoldQuantity, getMaterialQuantity } from '@helpers/item/materials';
 import type {
@@ -21,7 +25,6 @@ import type {
   StatBlock,
   StatusEffectBlock,
 } from '@interfaces';
-import { sum } from 'es-toolkit/compat';
 
 export function equipmentItemInfusionBonus(
   infusedItemIds: (ItemId | null)[],
@@ -65,23 +68,29 @@ export function isInfusionMaterial(item: ItemContent): boolean {
   return hasStatBonus || hasResistanceBonus || hasCombatStatBonus;
 }
 
-// ~30g per total stat point, ~100g per total resistance point, ~50g per
-// total combat stat point (a resistance percent is worth more than a raw
-// stat point since it's a rarer, more specialized bonus - +1 stat -> 30g,
-// +1% resistance -> 100g, +1 combat stat -> 50g).
+// Each dimension's flat GOLD_PER_*_POINT rate is weighted per-key by the matching VALUE_MULTIPLIER_PER_* table (same tables armory sell value uses).
 export function infusionMaterialCost(itemId: ItemId): number {
   const content = getEntry<ItemContent>(itemId);
   if (!content) return 0;
 
   const statCost =
     GOLD_PER_STAT_POINT *
-    sum(Object.values(STAT_BONUS.infusionBlock(content) ?? {}));
+    weightedBlockTotal(
+      STAT_BONUS.infusionBlock(content),
+      VALUE_MULTIPLIER_PER_STAT,
+    );
   const resistanceCost =
     GOLD_PER_RESISTANCE_POINT *
-    sum(Object.values(RESISTANCE_BONUS.infusionBlock(content) ?? {}));
+    weightedBlockTotal(
+      RESISTANCE_BONUS.infusionBlock(content),
+      VALUE_MULTIPLIER_PER_RESISTANCE,
+    );
   const combatStatCost =
     GOLD_PER_COMBAT_STAT_POINT *
-    sum(Object.values(COMBAT_STAT_BONUS.infusionBlock(content) ?? {}));
+    weightedBlockTotal(
+      COMBAT_STAT_BONUS.infusionBlock(content),
+      VALUE_MULTIPLIER_PER_COMBAT_STAT,
+    );
 
   return Math.round(statCost + resistanceCost + combatStatCost);
 }

@@ -7,6 +7,7 @@ import {
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
   equipmentItemInfusionTotals,
+  weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
 import type {
   AffixContent,
@@ -121,5 +122,31 @@ describe('equipmentItemBonusTotals', () => {
 
     const bonus = equipmentItemBonusTotals(buildItem(), COMBAT_STAT_BONUS);
     expect(bonus.damageReflectPercent).toBe(0);
+  });
+});
+
+describe('weightedBlockTotal', () => {
+  it('sums each key weighted by the matching multiplier', () => {
+    const total = weightedBlockTotal({ a: 2, b: 3 }, { a: 5, b: 10 } as Record<
+      'a' | 'b',
+      number
+    >);
+    expect(total).toBe(2 * 5 + 3 * 10);
+  });
+
+  it('treats a missing block key as 0', () => {
+    const total = weightedBlockTotal({ a: 2 }, { a: 5, b: 10 } as Record<
+      'a' | 'b',
+      number
+    >);
+    expect(total).toBe(2 * 5);
+  });
+
+  it('is 0 for an undefined block', () => {
+    const total = weightedBlockTotal(undefined, {
+      a: 5,
+      b: 10,
+    } as Record<'a' | 'b', number>);
+    expect(total).toBe(0);
   });
 });

@@ -14,6 +14,7 @@ import type {
   StatBlock,
   StatusEffectTag,
 } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
 
 // One `EquipmentBonusDimension` per keyed numeric block gear can grant - a
 // new dimension is just a new constant here, every function below is generic.
@@ -66,6 +67,17 @@ export function equipmentItemInfusionTotals<K extends string>(
   });
 
   return bonus;
+}
+
+// Weights a (possibly partial) dimension block by a same-keyed multiplier table, e.g. VALUE_MULTIPLIER_PER_STAT - used by both infusion cost and armory sell value.
+export function weightedBlockTotal<K extends string>(
+  block: Partial<Record<K, number>> | undefined,
+  multiplierPerKey: Record<K, number>,
+): number {
+  return sumBy(
+    Object.keys(multiplierPerKey) as K[],
+    (key) => (block?.[key] ?? 0) * multiplierPerKey[key],
+  );
 }
 
 // Infusion + affix only, no base equipment content - the "green bonus rows" UI shows under an item's base stats.

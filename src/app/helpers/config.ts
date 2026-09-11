@@ -1,9 +1,10 @@
 // Every tunable scalar/numeric game-balance constant lives here, grouped by the domain that consumes it.
-// This is NOT the place for: signals/state, content-derived lookup tables (VALID_* etc.), debug-tool
+// This is NOT the place for: signals/state, debug-tool
 // definitions, icon/UI maps, string identifiers that reference content by name/type, or fixed constants
 // dictated by an external format/protocol (e.g. the Tiled map format's GID bitmask flags, IndexedDB
-// connection details) rather than authored game balance - those stay next to the logic that uses them.
-// See `.claude/rules/helpers.md` for the full rule.
+// connection details) rather than authored game balance
+
+import type { BaseStat, CombatStat, StatusEffectTag } from '@interfaces';
 
 // Caravan
 
@@ -77,6 +78,43 @@ export const GOLD_PER_STAT_POINT = 30;
 export const GOLD_PER_RESISTANCE_POINT = 100;
 export const GOLD_PER_COMBAT_STAT_POINT = 50;
 export const STARTING_GOLD_AMOUNT = 100;
+
+// a rarer stat (Luck) costs/sells for more per point than a common one (Health).
+export const VALUE_MULTIPLIER_PER_STAT: Record<BaseStat, number> = {
+  Agility: 2,
+  Constitution: 3,
+  Energy: 1,
+  Health: 1,
+  Intelligence: 5,
+  Luck: 10,
+  Resistance: 4,
+  Spirit: 3,
+  Strength: 5,
+  Vitality: 4,
+};
+
+export const VALUE_MULTIPLIER_PER_RESISTANCE: Record<StatusEffectTag, number> =
+  {
+    Stun: 6,
+    StatDown: 7,
+    Accuracy: 3,
+    DamageOverTime: 10,
+    Poison: 3,
+    Burn: 5,
+  };
+
+export const VALUE_MULTIPLIER_PER_COMBAT_STAT: Record<CombatStat, number> = {
+  repeatActionChance: 5,
+  skillStrikeAgainChance: 6,
+  redirectionChance: 1,
+  missChance: 1,
+  debuffIgnoreChance: 7,
+  damageReflectPercent: 3,
+  healingIgnorePercent: 1,
+  reviveChance: 10,
+  stunChance: 1,
+  agroValue: 2,
+};
 
 // Kingdom
 
