@@ -1,16 +1,15 @@
 import {
   adventureLogMessageHtml,
   combatLogHealthColor,
-  ITEM_ICON_TOKEN,
+  ICON_TOKEN_PATTERN,
 } from '@helpers/combat/combat-log';
-import type { CombatLog } from '@interfaces';
+import type { AtlasedImage, CombatLog } from '@interfaces';
 
 const COMBATANT_TOKEN_PATTERN = /@@([^@]+)@@/g;
 
-export type AdventureLogMessageParts = {
-  before: string;
-  after: string;
-};
+export type AdventureLogMessagePart =
+  | { kind: 'text'; html: string }
+  | { kind: 'icon'; sprite: string; spritesheet: AtlasedImage };
 
 // Swaps each `@@id@@` token for that combatant's HP-colored name.
 export function adventureLogEntryHtml(entry: CombatLog): string {
@@ -33,18 +32,45 @@ export function adventureLogEntryHtml(entry: CombatLog): string {
   return adventureLogMessageHtml(coloredMessage);
 }
 
-// Splits the rendered message around the reward-icon token so the icon can render as a live component between the two text fragments.
+// Splits the rendered message around every icon token (the reward icon and/or a per-combatant portrait) so each can render as a live component between text fragments.
 export function adventureLogMessageParts(
   entry: CombatLog,
-): AdventureLogMessageParts {
+): AdventureLogMessagePart[] {
   const html = adventureLogEntryHtml(entry);
-  const tokenIndex = html.indexOf(ITEM_ICON_TOKEN);
-  if (tokenIndex === -1) return { before: html, after: '' };
+  const combatantsById = new Map(
+    (entry.combatants ?? []).map((c) => [c.id, c]),
+  );
 
-  return {
-    before: html.slice(0, tokenIndex),
-    after: html.slice(tokenIndex + ITEM_ICON_TOKEN.length),
-  };
+  const parts: AdventureLogMessagePart[] = [];
+  let lastIndex = 0;
+
+  for (const match of html.matchAll(ICON_TOKEN_PATTERN)) {
+    const [token, combatantId] = match;
+    const index = match.index ?? 0;
+
+    const icon = combatantId
+      ? combatantsById.get(combatantId)
+      : entry.itemSprite && entry.itemSpritesheet
+        ? { sprite: entry.itemSprite, spritesheet: entry.itemSpritesheet }
+        : undefined;
+
+    if (!icon?.sprite) continue;
+
+    const text = html.slice(lastIndex, index);
+    if (text) parts.push({ kind: 'text', html: text });
+
+    parts.push({
+      kind: 'icon',
+      sprite: icon.sprite,
+      spritesheet: icon.spritesheet,
+    });
+    lastIndex = index + token.length;
+  }
+
+  const tail = html.slice(lastIndex);
+  if (tail || parts.length === 0) parts.push({ kind: 'text', html: tail });
+
+  return parts;
 }
 
 export function adventureLogTimestampTooltip(timestamp: number): string {

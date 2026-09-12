@@ -3,6 +3,7 @@ import { localStorageSignal } from '@helpers/engine/signal';
 import { rngUuid } from '@helpers/rng';
 import type {
   AdventureLogEntryKind,
+  AtlasedImage,
   CollectibleContent,
   Combat,
   CombatLog,
@@ -46,6 +47,16 @@ export function combatFormatMessage(template: string, props: unknown): string {
   return mustache.render(template, props);
 }
 
+// A bolded name token - icon goes outside the `**` so splitting on it can't bisect the resulting <strong> tag.
+const BOLD_NAME_TOKEN_PATTERN = /\*\*@@([^@]+)@@\*\*/g;
+
+function hoistCombatantIconTokens(message: string): string {
+  return message.replace(
+    BOLD_NAME_TOKEN_PATTERN,
+    (boldToken, id: string) => `@@icon-${id}@@${boldToken}`,
+  );
+}
+
 export function combatMessageLog(
   combat: Combat,
   message: string,
@@ -61,6 +72,8 @@ export function combatMessageLog(
     name: combatant.name,
     hp: combatant.hp,
     maxHp: combatant.totalStats.Health,
+    sprite: combatant.sprite ?? '',
+    spritesheet: (combatant.monsterId ? 'monster' : 'job') as AtlasedImage,
   }));
 
   pushLogEntry({
@@ -69,7 +82,7 @@ export function combatMessageLog(
     messageId: rngUuid(),
     timestamp: Date.now(),
     locationName: combat.locationName,
-    message,
+    message: hoistCombatantIconTokens(message),
     spritesheet: actor?.isEnemy ? 'guardian' : 'hero',
     sprite: actor?.sprite,
     combatants,
@@ -85,6 +98,9 @@ export function combatantMessageToken(combatant: Combatant): string {
 
 // Marks where a reward icon renders inline, next to the item text it labels - the UI layer splits the message on this token to slot in a live sprite component.
 export const ITEM_ICON_TOKEN = '@@icon@@';
+
+// Matches the bare item-icon token or a per-combatant one (`@@icon-<id>@@`), so the UI layer can find every icon anchor in one pass.
+export const ICON_TOKEN_PATTERN = /@@icon(?:-([^@]+))?@@/g;
 
 export function categoryMessageLog(
   category: AdventureLogEntryKind,

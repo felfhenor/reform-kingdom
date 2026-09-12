@@ -12,18 +12,20 @@
           {{ entry.timestamp | timeago }}
         </span>
         <span class="text-lighter shrink-0">[{{ entry.locationName }}]</span>
-        <span [innerHTML]="parts.before"></span>
-        @if (entry.itemSprite && entry.itemSpritesheet) {
-          <span class="zoom-inline shrink-0">
-            <app-slot-icon-blank [showBackground]="false">
-              <app-atlas-image
-                [spritesheet]="entry.itemSpritesheet"
-                [assetName]="entry.itemSprite"
-              />
-            </app-slot-icon-blank>
-          </span>
+        @for (part of parts; track $index) {
+          @if (part.kind === 'icon') {
+            <span class="zoom-inline shrink-0">
+              <app-slot-icon-blank [showBackground]="false">
+                <app-atlas-image
+                  [spritesheet]="part.spritesheet"
+                  [assetName]="part.sprite"
+                />
+              </app-slot-icon-blank>
+            </span>
+          } @else {
+            <span [innerHTML]="part.html"></span>
+          }
         }
-        <span [innerHTML]="parts.after"></span>
       </div>
     } @empty {
       <div class="p-4 italic text-lighter">Nothing has happened yet.</div>

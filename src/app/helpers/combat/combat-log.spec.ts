@@ -28,7 +28,7 @@ describe('combatMessageLog', () => {
     combatLogReset();
   });
 
-  it('snapshots every hero/guardian id+name+hp+maxHp onto the entry, not just the actor', () => {
+  it('snapshots every hero/guardian id+name+hp+maxHp+sprite onto the entry, not just the actor', () => {
     const hero = {
       id: 'hero-1',
       name: 'Jala',
@@ -41,6 +41,8 @@ describe('combatMessageLog', () => {
       id: 'guardian-1',
       name: 'Goblin',
       isEnemy: true,
+      monsterId: 'goblin-monster',
+      sprite: '0011',
       hp: 2,
       totalStats: { Health: 10 },
     } as unknown as Combatant;
@@ -58,10 +60,69 @@ describe('combatMessageLog', () => {
     expect(combatLog()[0]).toMatchObject({
       spritesheet: 'hero',
       combatants: [
-        { id: 'hero-1', name: 'Jala', hp: 12, maxHp: 20 },
-        { id: 'guardian-1', name: 'Goblin', hp: 2, maxHp: 10 },
+        {
+          id: 'hero-1',
+          name: 'Jala',
+          hp: 12,
+          maxHp: 20,
+          sprite: '0000',
+          spritesheet: 'job',
+        },
+        {
+          id: 'guardian-1',
+          name: 'Goblin',
+          hp: 2,
+          maxHp: 10,
+          sprite: '0011',
+          spritesheet: 'monster',
+        },
       ],
     });
+  });
+
+  it('hoists an icon token in front of every bolded `@@id@@` name token in the message', () => {
+    const hero = {
+      id: 'hero-1',
+      name: 'Jala',
+      totalStats: { Health: 20 },
+    } as unknown as Combatant;
+    const guardian = {
+      id: 'guardian-1',
+      name: 'Goblin',
+      totalStats: { Health: 10 },
+    } as unknown as Combatant;
+    const combat = {
+      id: 'combat-1',
+      locationName: 'Field Ruins',
+      heroes: [hero],
+      guardians: [guardian],
+    } as unknown as Combat;
+
+    beginCombatLogCommits();
+    combatMessageLog(
+      combat,
+      `**${combatantMessageToken(hero)}** attacks **${combatantMessageToken(guardian)}** for 8 damage.`,
+    );
+    endCombatLogCommits();
+
+    expect(combatLog()[0].message).toBe(
+      '@@icon-hero-1@@**@@hero-1@@** attacks @@icon-guardian-1@@**@@guardian-1@@** for 8 damage.',
+    );
+  });
+
+  it('leaves a non-tokenized bold segment (e.g. a skill name) untouched by the icon hoist', () => {
+    const combat = {
+      id: 'combat-1',
+      locationName: 'Field Ruins',
+      heroes: [],
+      guardians: [],
+    } as unknown as Combat;
+
+    beginCombatLogCommits();
+    combatMessageLog(combat, '**Slash** strikes again!');
+    endCombatLogCommits();
+
+    expect(combatLog()[0].message).toBe('**Slash** strikes again!');
   });
 
   it('still snapshots the roster when there is no actor', () => {
@@ -83,7 +144,14 @@ describe('combatMessageLog', () => {
     endCombatLogCommits();
 
     expect(combatLog()[0].combatants).toEqual([
-      { id: 'hero-1', name: 'Jala', hp: 12, maxHp: 20 },
+      {
+        id: 'hero-1',
+        name: 'Jala',
+        hp: 12,
+        maxHp: 20,
+        sprite: '',
+        spritesheet: 'job',
+      },
     ]);
   });
 

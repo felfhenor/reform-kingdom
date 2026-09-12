@@ -100,10 +100,11 @@ describe('combatApplyStatusEffectToTarget combat message rendering', () => {
 
     combatApplyStatusEffectToTarget(combat, combatant, statusEffect);
 
-    // Proves the id token (not the raw name) is embedded, and that
-    // combatant.hp reflects the just-applied burn damage, not a stale snapshot.
+    // Proves the id token (not the raw name) is embedded, that combatant.hp
+    // reflects the just-applied burn damage rather than a stale snapshot, and
+    // that the bolded id token got its icon token hoisted in front of it.
     expect(combatLog()[0].message).toBe(
-      `**${combatantMessageToken(combatant)}** is burning for 10 damage (90/100 HP remaining).`,
+      `@@icon-combatant-1@@**${combatantMessageToken(combatant)}** is burning for 10 damage (90/100 HP remaining).`,
     );
   });
 });

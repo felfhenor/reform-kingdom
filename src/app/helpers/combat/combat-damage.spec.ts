@@ -691,10 +691,11 @@ describe('combatApplySkillToTarget combat message rendering', () => {
       technique,
     );
 
-    // Proves the id tokens (not raw names) are embedded, and that target.hp
-    // reflects the just-applied damage rather than a stale pre-damage snapshot.
+    // Proves the id tokens (not raw names) are embedded, that target.hp
+    // reflects the just-applied damage rather than a stale pre-damage snapshot,
+    // and that each bolded id token got its icon token hoisted in front of it.
     expect(combatLog()[0].message).toBe(
-      `**${combatantMessageToken(attacker)}** hits **${combatantMessageToken(target)}** for 30 damage (70/100 HP remaining).`,
+      `@@icon-attacker@@**${combatantMessageToken(attacker)}** hits @@icon-target@@**${combatantMessageToken(target)}** for 30 damage (70/100 HP remaining).`,
     );
   });
 });
