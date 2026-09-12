@@ -2,7 +2,7 @@
   name: Duchy Trading Caravan - Carrina
   description: The Carrina branch of the Duchy Trading Caravan. The Duchy's personal mercantile group.
 
-  traderResetTime: 10800
+  traderResetTime: 3600
 
   level:
     min: 1
@@ -39,7 +39,7 @@
   name: Elfheim Merchants - Carrina
   description: The Carrina branch of the Elfheim Merchants Caravan. They rarely extend trade with others, so their high quality goods are often kept to themselves.
 
-  traderResetTime: 21600
+  traderResetTime: 5400
 
   level:
     min: 1
@@ -72,7 +72,7 @@
   name: Goblin Group Company - Carrina
   description: The Carrina branch of the Goblin Group Company Caravan. They're a crafty group of goblins looking to get ahead.
 
-  traderResetTime: 21600
+  traderResetTime: 5400
 
   level:
     min: 1

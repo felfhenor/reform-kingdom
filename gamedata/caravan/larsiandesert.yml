@@ -2,7 +2,7 @@
   name: Larsian Lizards - Larsia
   description: An intrepid group of Akroki that go around peddling wares and buying things they find useful.
 
-  traderResetTime: 10800
+  traderResetTime: 3600
 
   level:
     min: 15
