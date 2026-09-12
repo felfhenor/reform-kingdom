@@ -67,10 +67,13 @@ function grantCollectible(
 }
 
 // Grants whichever reward type `trade` sells, `quantity` times - always 1 for a collectible, recipe, or token trade.
+// `previewedEquipment` (the caravan's pre-rolled instance, if any) is granted as the first equipment unit so a
+// purchase matches what the trade preview showed; any additional units are freshly rolled.
 function grantCaravanReward(
   state: GameState,
   trade: CaravanTrade | CaravanTokenTrade,
   quantity: number,
+  previewedEquipment?: EquipmentItem,
 ): void {
   if (trade.itemId) {
     applyMaterialDelta(state, trade.itemId, quantity);
@@ -78,10 +81,12 @@ function grantCaravanReward(
   }
 
   if (trade.equipmentId) {
-    const newItems: EquipmentItem[] = Array.from({ length: quantity }, () =>
-      newEquipmentItem(trade.equipmentId!),
+    const firstItem = previewedEquipment ?? newEquipmentItem(trade.equipmentId);
+    const extraItems: EquipmentItem[] = Array.from(
+      { length: quantity - 1 },
+      () => newEquipmentItem(trade.equipmentId!),
     );
-    state.armory = [...state.armory, ...newItems];
+    state.armory = [...state.armory, firstItem, ...extraItems];
 
     const existing = state.discoveredEquipment[trade.equipmentId];
     state.discoveredEquipment[trade.equipmentId] = {
@@ -173,7 +178,14 @@ export async function caravanExecuteTrade(
     if (quantity > liveMax) return s;
 
     if (trade.type === 'sell') {
-      grantCaravanReward(s, trade, quantity);
+      const previewedEquipment = nodeState.rolledEquipment?.[tradeIndex];
+      grantCaravanReward(s, trade, quantity, previewedEquipment);
+      if (trade.equipmentId) {
+        nodeState.rolledEquipment = {
+          ...nodeState.rolledEquipment,
+          [tradeIndex]: newEquipmentItem(trade.equipmentId),
+        };
+      }
       spendGold(s, totalPrice);
     } else {
       takeCaravanPayment(s, trade, quantity);

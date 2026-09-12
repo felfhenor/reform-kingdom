@@ -34,7 +34,9 @@ export class SlotCaravanTradeComponent {
 
   public goldCoinItemId = goldCoinId();
 
-  public display = computed(() => caravanTradeDisplay(this.row().trade));
+  public display = computed(() =>
+    caravanTradeDisplay(this.row().trade, this.row().equipmentItem),
+  );
 
   public hasEnoughGoldToBuy = computed(
     () => this.isPartyBuying() && !hasGold(this.row().price),

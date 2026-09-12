@@ -12,6 +12,15 @@ vi.mock('@helpers/item/collectibles', () => ({
   isCollectibleDiscovered: vi.fn(),
 }));
 
+vi.mock('@helpers/item/equipment', () => ({
+  newEquipmentItem: vi.fn((equipmentId: string) => ({
+    id: 'rolled-equipment-item',
+    equipmentId,
+    infusedItemIds: [],
+    affixIds: ['some-affix'],
+  })),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -45,6 +54,7 @@ import type {
   CaravanTraderContent,
   CaravanTraderId,
   CollectibleId,
+  EquipmentId,
   GameState,
   ItemId,
   RecipeId,
@@ -156,6 +166,7 @@ describe('caravanProcessTick', () => {
     expect(result.world.caravans[caravan.id]).toEqual({
       traderId: 'trader-a',
       activeTradeIndices: [],
+      rolledEquipment: {},
       tradeCounts: {},
       generatedAtTick: 1000,
     });
@@ -267,5 +278,64 @@ describe('caravanProcessTick', () => {
     } as unknown as GameState);
 
     expect(result.world.caravans[caravan.id].activeTradeIndices).toEqual([1]);
+  });
+
+  it('pre-rolls an equipment instance for an active equipment-sell trade', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    withCaravanState({});
+
+    const withEquipment = trader({
+      trades: [
+        {
+          type: 'sell',
+          value: 500,
+          equipmentId: 'copper-helm' as EquipmentId,
+          weight: 1,
+        },
+      ],
+    });
+    vi.mocked(caravanEligibleTraders).mockReturnValue([withEquipment]);
+
+    caravanProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { caravans: {} },
+    } as unknown as GameState);
+
+    expect(result.world.caravans[caravan.id].rolledEquipment).toEqual({
+      0: {
+        id: 'rolled-equipment-item',
+        equipmentId: 'copper-helm',
+        infusedItemIds: [],
+        affixIds: ['some-affix'],
+      },
+    });
+  });
+
+  it('does not pre-roll equipment for a buy trade', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    withCaravanState({});
+
+    const withEquipment = trader({
+      trades: [
+        {
+          type: 'buy',
+          value: 50,
+          equipmentId: 'copper-helm' as EquipmentId,
+          weight: 1,
+        },
+      ],
+    });
+    vi.mocked(caravanEligibleTraders).mockReturnValue([withEquipment]);
+
+    caravanProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { caravans: {} },
+    } as unknown as GameState);
+
+    expect(result.world.caravans[caravan.id].rolledEquipment).toEqual({});
   });
 });

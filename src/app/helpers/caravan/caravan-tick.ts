@@ -3,6 +3,7 @@ import { ACTIVE_TRADE_COUNT } from '@helpers/config';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { newEquipmentItem } from '@helpers/item/equipment';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   worldNodeCaravan,
@@ -13,6 +14,7 @@ import type {
   CaravanNodeState,
   CaravanTraderContent,
   CaravanTraderId,
+  EquipmentItem,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -79,17 +81,40 @@ function pickActiveTradeIndices(trader: CaravanTraderContent): number[] {
   );
 }
 
+// Pre-rolls a specific equipment instance (affixes included) for every active
+// equipment-sell trade, so the trade preview matches what a purchase grants.
+function rollEquipmentForActiveTrades(
+  trader: CaravanTraderContent,
+  activeTradeIndices: number[],
+): Partial<Record<number, EquipmentItem>> {
+  const rolled: Partial<Record<number, EquipmentItem>> = {};
+
+  activeTradeIndices.forEach((index) => {
+    const trade = trader.trades[index];
+    if (trade?.type === 'sell' && trade.equipmentId) {
+      rolled[index] = newEquipmentItem(trade.equipmentId);
+    }
+  });
+
+  return rolled;
+}
+
 function regenerateCaravanNode(
   content: CaravanContent,
   previousTraderId: CaravanTraderId | undefined,
   nowTick: number,
 ): void {
   const trader = pickTrader(content, previousTraderId);
+  const activeTradeIndices = trader ? pickActiveTradeIndices(trader) : [];
+  const rolledEquipment = trader
+    ? rollEquipmentForActiveTrades(trader, activeTradeIndices)
+    : {};
 
   updateGamestate((state) => {
     state.world.caravans[content.id] = {
       traderId: trader?.id,
-      activeTradeIndices: trader ? pickActiveTradeIndices(trader) : [],
+      activeTradeIndices,
+      rolledEquipment,
       tradeCounts: {},
       generatedAtTick: nowTick,
     };

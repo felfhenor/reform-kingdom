@@ -120,6 +120,7 @@ export class ModalCaravanTradeComponent {
       .map(({ index, trade }) => ({
         index,
         trade,
+        equipmentItem: state.rolledEquipment?.[index],
         price: caravanTradePrice(caravan, trade),
         remaining: caravanTradeRemaining(trade, state.tradeCounts, index),
         soldOut: caravanIsTradeSoldOut(trade, state.tradeCounts, index),
@@ -157,7 +158,8 @@ export class ModalCaravanTradeComponent {
     if (row.soldOut || row.maxQuantity <= 0) return;
 
     this.pendingRow.set(row);
-    const name = caravanTradeDisplay(row.trade)?.name ?? 'this';
+    const name =
+      caravanTradeDisplay(row.trade, row.equipmentItem)?.name ?? 'this';
     const verb = row.trade.type === 'sell' ? 'Buy' : 'Sell';
 
     if (row.maxQuantity === 1) {
@@ -207,7 +209,11 @@ export class ModalCaravanTradeComponent {
     const entry = this.entry();
     if (!entry) return;
 
-    const name = caravanTradeDisplay(row.trade)?.name ?? 'item';
+    // A bulk equipment buy only gets the previewed roll for the first unit
+    // (the rest are freshly rolled) - use the plain content name so the
+    // toast doesn't imply every unit shares that one roll's affixes.
+    const previewedItem = quantity === 1 ? row.equipmentItem : undefined;
+    const name = caravanTradeDisplay(row.trade, previewedItem)?.name ?? 'item';
     if (!(await caravanExecuteTrade(entry, row.index, quantity))) return;
 
     const qtyLabel = quantity > 1 ? ` x${quantity}` : '';
