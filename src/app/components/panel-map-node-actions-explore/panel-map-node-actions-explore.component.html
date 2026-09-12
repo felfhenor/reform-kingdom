@@ -9,7 +9,7 @@
     (click)="reExplore.emit()"
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
-    [disabled]="!canReExplore()"
+    [disabled]="!canReExplore() || isInCombat()"
   >
     Explore Again
   </button>

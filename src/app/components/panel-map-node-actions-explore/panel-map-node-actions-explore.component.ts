@@ -6,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
+import { gamestate } from '@helpers/state-game';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeEncounterRandom } from '@helpers/world-node/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
@@ -30,4 +31,6 @@ export class PanelMapNodeActionsExploreComponent {
       !worldNodeExploreRandomIsAvailable(entry)
     );
   });
+
+  public isInCombat = computed(() => !!gamestate().world.combat);
 }
