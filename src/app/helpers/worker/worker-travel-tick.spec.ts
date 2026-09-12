@@ -11,6 +11,7 @@ vi.mock('@helpers/content/content', () => ({
 
 vi.mock('@helpers/combat/combat-log', () => ({
   categoryMessageLog: vi.fn(),
+  ITEM_ICON_TOKEN: '@@icon@@',
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) => `${quantity} ${item.name}`,
   ),
@@ -29,7 +30,7 @@ vi.mock('@helpers/worker/worker-travel', () => ({
   workerBeginOutboundTrip: vi.fn(),
 }));
 
-import { itemDropHtml } from '@helpers/combat/combat-log';
+import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { addMaterial } from '@helpers/item/materials';
@@ -68,7 +69,11 @@ const workerContent: WorkerContent = ensureWorker({
   canUseTeleports: true,
 });
 
-const copperContent = { id: COPPER_ID, name: 'Copper Ore' } as ItemContent;
+const copperContent = {
+  id: COPPER_ID,
+  name: 'Copper Ore',
+  sprite: 'copper-ore-sprite',
+} as ItemContent;
 
 function buildReturningWorker(
   overrides: Partial<WorkerState> = {},
@@ -108,6 +113,12 @@ describe('workerTravelProcessTick - TravelingBack arrival', () => {
 
     expect(addMaterial).toHaveBeenCalledWith(COPPER_ID, 5);
     expect(itemDropHtml).toHaveBeenCalledWith(copperContent, 5);
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Gather',
+      'Worker Resources',
+      expect.stringContaining('@@icon@@'),
+      { sprite: 'copper-ore-sprite', spritesheet: 'item' },
+    );
 
     const result = applyLastUpdate({
       workers: { [WORKER_ID]: buildReturningWorker() },

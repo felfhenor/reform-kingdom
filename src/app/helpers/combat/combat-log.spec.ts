@@ -1,6 +1,7 @@
 import {
   adventureLogMessageHtml,
   beginCombatLogCommits,
+  categoryMessageLog,
   combatantMessageToken,
   combatLog,
   combatLogReset,
@@ -84,6 +85,68 @@ describe('combatMessageLog', () => {
     expect(combatLog()[0].combatants).toEqual([
       { id: 'hero-1', name: 'Jala', hp: 12, maxHp: 20 },
     ]);
+  });
+
+  it('stores the icon sprite/spritesheet onto the entry when given', () => {
+    const combat = {
+      id: 'combat-1',
+      locationName: 'Field Ruins',
+      heroes: [],
+      guardians: [],
+    } as unknown as Combat;
+
+    beginCombatLogCommits();
+    combatMessageLog(combat, 'The party found copper ore!', undefined, {
+      sprite: 'copper-ore',
+      spritesheet: 'item',
+    });
+    endCombatLogCommits();
+
+    expect(combatLog()[0]).toMatchObject({
+      itemSprite: 'copper-ore',
+      itemSpritesheet: 'item',
+    });
+  });
+
+  it('leaves the icon fields undefined without one', () => {
+    const combat = {
+      id: 'combat-1',
+      locationName: 'Field Ruins',
+      heroes: [],
+      guardians: [],
+    } as unknown as Combat;
+
+    beginCombatLogCommits();
+    combatMessageLog(combat, 'Combat is over.');
+    endCombatLogCommits();
+
+    expect(combatLog()[0].itemSprite).toBeUndefined();
+    expect(combatLog()[0].itemSpritesheet).toBeUndefined();
+  });
+});
+
+describe('categoryMessageLog', () => {
+  beforeEach(() => {
+    combatLogReset();
+  });
+
+  it('stores the icon sprite/spritesheet onto the entry when given', () => {
+    categoryMessageLog('Gather', 'Wergen Woods', 'The party found wood!', {
+      sprite: 'wood',
+      spritesheet: 'item',
+    });
+
+    expect(combatLog()[0]).toMatchObject({
+      itemSprite: 'wood',
+      itemSpritesheet: 'item',
+    });
+  });
+
+  it('leaves the icon fields undefined without one', () => {
+    categoryMessageLog('Travel', 'Wergen Woods', 'The party left.');
+
+    expect(combatLog()[0].itemSprite).toBeUndefined();
+    expect(combatLog()[0].itemSpritesheet).toBeUndefined();
   });
 });
 

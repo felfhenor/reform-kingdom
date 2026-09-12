@@ -2,6 +2,7 @@ import {
   categoryMessageLog,
   collectibleDropHtml,
   equipmentDropHtml,
+  ITEM_ICON_TOKEN,
   itemDropHtml,
 } from '@helpers/combat/combat-log';
 import { MAX_CRAFTABLE_CAP } from '@helpers/config';
@@ -253,7 +254,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
       categoryMessageLog(
         'Craft',
         tradeskill,
-        `${tradeskill} crafted ${itemDropHtml(item, quantity)}!`,
+        `${tradeskill} crafted ${ITEM_ICON_TOKEN}${itemDropHtml(item, quantity)}!`,
+        { sprite: item.sprite, spritesheet: 'item' },
       );
     }
     return;
@@ -269,7 +271,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
       categoryMessageLog(
         'Craft',
         tradeskill,
-        `${tradeskill} crafted ${equipmentDropHtml(equipment)}!`,
+        `${tradeskill} crafted ${ITEM_ICON_TOKEN}${equipmentDropHtml(equipment)}!`,
+        { sprite: equipment.sprite, spritesheet: 'equipment' },
       );
     }
     return;
@@ -283,7 +286,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
     categoryMessageLog(
       'Craft',
       tradeskill,
-      `${tradeskill} crafted ${collectibleDropHtml(collectible)}!`,
+      `${tradeskill} crafted ${ITEM_ICON_TOKEN}${collectibleDropHtml(collectible)}!`,
+      { sprite: collectible.sprite, spritesheet: 'collectible' },
     );
   }
 }

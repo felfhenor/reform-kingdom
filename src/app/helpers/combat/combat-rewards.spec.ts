@@ -4,6 +4,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
   collectibleDropHtml: vi.fn(() => 'collectible-html'),
   combatMessageLog: vi.fn(),
   equipmentDropHtml: vi.fn(() => 'equipment-html'),
+  ITEM_ICON_TOKEN: '@@icon@@',
   itemDropHtml: vi.fn(() => 'item-html'),
   recipeDropHtml: vi.fn(() => 'recipe-html'),
 }));
@@ -94,7 +95,9 @@ describe('grantResolvedDrops - Worker rewards', () => {
     expect(workerRescue).toHaveBeenCalledWith(WORKER_ID);
     expect(combatMessageLog).toHaveBeenCalledWith(
       COMBAT,
-      'The party rescued Weaver Nell!',
+      'The party rescued @@icon@@Weaver Nell!',
+      undefined,
+      { name: 'Weaver Nell', sprite: '0000', spritesheet: 'worker' },
     );
     expect(gatherVfxEmit).toHaveBeenCalledWith({
       nodeName: 'Wergen Woods',
@@ -142,6 +145,12 @@ describe('grantResolvedDrops - VFX per drop kind', () => {
       sprite: 'iron-sword',
       spritesheet: 'equipment',
     });
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      COMBAT,
+      'The party found @@icon@@equipment-html!',
+      undefined,
+      { name: 'Iron Sword', sprite: 'iron-sword', spritesheet: 'equipment' },
+    );
   });
 
   it('emits a gather VFX event for a Collectible drop', () => {
@@ -163,6 +172,12 @@ describe('grantResolvedDrops - VFX per drop kind', () => {
       sprite: 'old-coin',
       spritesheet: 'collectible',
     });
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      COMBAT,
+      'The party found @@icon@@collectible-html!',
+      undefined,
+      { name: 'Old Coin', sprite: 'old-coin', spritesheet: 'collectible' },
+    );
   });
 
   it('emits a gather VFX event for a Recipe drop', () => {
@@ -184,6 +199,16 @@ describe('grantResolvedDrops - VFX per drop kind', () => {
       sprite: 'iron-sword',
       spritesheet: 'equipment',
     });
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      COMBAT,
+      'The party found @@icon@@recipe-html!',
+      undefined,
+      {
+        name: 'Recipe: Iron Sword',
+        sprite: 'iron-sword',
+        spritesheet: 'equipment',
+      },
+    );
   });
 
   it('does not emit when rewardContentInfo cannot resolve the drop', () => {
@@ -227,5 +252,11 @@ describe('grantResolvedDrops - Item rewards', () => {
       sprite: 'copper-ore',
       spritesheet: 'item',
     });
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      COMBAT,
+      'The party found @@icon@@item-html!',
+      undefined,
+      { name: 'Copper Ore', sprite: 'copper-ore', spritesheet: 'item' },
+    );
   });
 });

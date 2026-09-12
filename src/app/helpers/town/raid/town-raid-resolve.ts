@@ -1,4 +1,8 @@
-import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import {
+  categoryMessageLog,
+  ITEM_ICON_TOKEN,
+  itemDropHtml,
+} from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import {
   RAID_LOSS_CRAFT_DEBUFF_TICKS,
@@ -140,13 +144,16 @@ function logRaidLossMessages(
   }
 
   if (summary.lostMaterials.length > 0) {
-    const descriptions = summary.lostMaterials.map(({ item, quantity }) =>
-      itemDropHtml(item, quantity),
-    );
+    const [first, ...rest] = summary.lostMaterials;
+    const descriptions = [
+      `${ITEM_ICON_TOKEN}${itemDropHtml(first.item, first.quantity)}`,
+      ...rest.map(({ item, quantity }) => itemDropHtml(item, quantity)),
+    ];
     categoryMessageLog(
       'Raid',
       townName,
       `${townName} lost these resources: ${descriptions.join(', ')}`,
+      { sprite: first.item.sprite, spritesheet: 'item' },
     );
   }
 

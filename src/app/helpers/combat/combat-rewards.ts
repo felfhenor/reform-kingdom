@@ -2,6 +2,7 @@ import {
   collectibleDropHtml,
   combatMessageLog,
   equipmentDropHtml,
+  ITEM_ICON_TOKEN,
   itemDropHtml,
   recipeDropHtml,
 } from '@helpers/combat/combat-log';
@@ -25,15 +26,15 @@ import type {
   ItemId,
   RecipeContent,
   ResolvedDrop,
+  RewardContentInfo,
   WorkerContent,
 } from '@interfaces';
 
 function emitRewardVfx(
   combat: Combat,
-  drop: ResolvedDrop,
+  info: RewardContentInfo | undefined,
   quantity: number,
 ): void {
-  const info = rewardContentInfo(drop);
   if (!info) return;
 
   gatherVfxEmit({ nodeName: combat.locationName, quantity, ...info });
@@ -54,11 +55,14 @@ export function grantResolvedDrops(
         const equipment = getEntry<EquipmentContent>(drop.equipmentId);
         if (!equipment) return;
 
+        const info = rewardContentInfo(drop);
         combatMessageLog(
           combat,
-          `The party found ${equipmentDropHtml(equipment)}!`,
+          `The party found ${ITEM_ICON_TOKEN}${equipmentDropHtml(equipment)}!`,
+          undefined,
+          info,
         );
-        emitRewardVfx(combat, drop, 1);
+        emitRewardVfx(combat, info, 1);
         return;
       }
 
@@ -68,11 +72,14 @@ export function grantResolvedDrops(
         const collectible = getEntry<CollectibleContent>(drop.collectibleId);
         if (!collectible) return;
 
+        const info = rewardContentInfo(drop);
         combatMessageLog(
           combat,
-          `The party found ${collectibleDropHtml(collectible)}!`,
+          `The party found ${ITEM_ICON_TOKEN}${collectibleDropHtml(collectible)}!`,
+          undefined,
+          info,
         );
-        emitRewardVfx(combat, drop, 1);
+        emitRewardVfx(combat, info, 1);
         return;
       }
 
@@ -82,8 +89,14 @@ export function grantResolvedDrops(
         const recipe = getEntry<RecipeContent>(drop.recipeId);
         if (!recipe) return;
 
-        combatMessageLog(combat, `The party found ${recipeDropHtml(recipe)}!`);
-        emitRewardVfx(combat, drop, 1);
+        const info = rewardContentInfo(drop);
+        combatMessageLog(
+          combat,
+          `The party found ${ITEM_ICON_TOKEN}${recipeDropHtml(recipe)}!`,
+          undefined,
+          info,
+        );
+        emitRewardVfx(combat, info, 1);
         return;
       }
 
@@ -95,8 +108,14 @@ export function grantResolvedDrops(
         const worker = getEntry<WorkerContent>(drop.workerId);
         if (!worker) return;
 
-        combatMessageLog(combat, `The party rescued ${worker.name}!`);
-        emitRewardVfx(combat, drop, 1);
+        const info = rewardContentInfo(drop);
+        combatMessageLog(
+          combat,
+          `The party rescued ${ITEM_ICON_TOKEN}${worker.name}!`,
+          undefined,
+          info,
+        );
+        emitRewardVfx(combat, info, 1);
         return;
       }
 
@@ -120,14 +139,13 @@ export function grantResolvedDrops(
     const item = getEntry<ItemContent>(itemId);
     if (!item) return;
 
+    const info = rewardContentInfo({ itemId: itemId as ItemId });
     combatMessageLog(
       combat,
-      `The party found ${itemDropHtml(item, quantity)}!`,
+      `The party found ${ITEM_ICON_TOKEN}${itemDropHtml(item, quantity)}!`,
+      undefined,
+      info,
     );
-    emitRewardVfx(
-      combat,
-      { kind: 'Item', itemId: itemId as ItemId, quantity },
-      quantity,
-    );
+    emitRewardVfx(combat, info, quantity);
   });
 }

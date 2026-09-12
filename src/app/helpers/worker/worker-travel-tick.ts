@@ -1,4 +1,8 @@
-import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import {
+  categoryMessageLog,
+  ITEM_ICON_TOKEN,
+  itemDropHtml,
+} from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { travelStepTicksCost } from '@helpers/hero/travel';
 import { addMaterial } from '@helpers/item/materials';
@@ -131,7 +135,8 @@ function logWorkerReturn(
   categoryMessageLog(
     'Gather',
     'Worker Resources',
-    `${worker.name} returned with ${itemDropHtml(item, quantity)}.`,
+    `${worker.name} returned with ${ITEM_ICON_TOKEN}${itemDropHtml(item, quantity)}.`,
+    { sprite: item.sprite, spritesheet: 'item' },
   );
 }
 

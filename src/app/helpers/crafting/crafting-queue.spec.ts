@@ -22,6 +22,7 @@ vi.mock('@helpers/item/collectibles', () => ({
 
 vi.mock('@helpers/combat/combat-log', () => ({
   categoryMessageLog: vi.fn(),
+  ITEM_ICON_TOKEN: '@@icon@@',
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) =>
       `${quantity} <colored>${item.name}</colored>`,
@@ -61,6 +62,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
@@ -446,7 +448,7 @@ describe('craftProcessTick', () => {
     } as unknown as GameState);
     mockGetEntry({
       'recipe-1': recipe,
-      'copper-ingot': { name: 'Copper Ingot' },
+      'copper-ingot': { name: 'Copper Ingot', sprite: 'copper-ingot-sprite' },
     });
 
     craftProcessTick();
@@ -454,6 +456,12 @@ describe('craftProcessTick', () => {
     expect(addMaterial).toHaveBeenCalledWith('copper-ingot', 2);
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Kingdom:Craft:Complete:Material Copper Ingot',
+    );
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Craft',
+      'Blacksmithing',
+      expect.stringContaining('@@icon@@'),
+      { sprite: 'copper-ingot-sprite', spritesheet: 'item' },
     );
 
     // Call 0: XP grant (rngSucceedsChance mocked true, recipe.tradeskillXP = 1).
@@ -489,12 +497,18 @@ describe('craftProcessTick', () => {
     } as unknown as GameState);
     mockGetEntry({
       'recipe-1': recipe,
-      'copper-dagger': { name: 'Copper Dagger' },
+      'copper-dagger': { name: 'Copper Dagger', sprite: 'copper-dagger-sprite' },
     });
 
     craftProcessTick();
 
     expect(armoryAdd).toHaveBeenCalledWith('copper-dagger');
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Craft',
+      'Blacksmithing',
+      expect.stringContaining('@@icon@@'),
+      { sprite: 'copper-dagger-sprite', spritesheet: 'equipment' },
+    );
   });
 
   it('completes a collectible craft via collectiblesAdd', () => {
@@ -509,7 +523,10 @@ describe('craftProcessTick', () => {
     } as unknown as GameState);
     mockGetEntry({
       'recipe-1': recipe,
-      'minor-blacksmithing-effigy': { name: 'Minor Blacksmithing Effigy' },
+      'minor-blacksmithing-effigy': {
+        name: 'Minor Blacksmithing Effigy',
+        sprite: 'effigy-sprite',
+      },
     });
 
     craftProcessTick();
@@ -517,6 +534,12 @@ describe('craftProcessTick', () => {
     expect(collectiblesAdd).toHaveBeenCalledWith(
       'minor-blacksmithing-effigy',
       1,
+    );
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Craft',
+      'Blacksmithing',
+      expect.stringContaining('@@icon@@'),
+      { sprite: 'effigy-sprite', spritesheet: 'collectible' },
     );
   });
 

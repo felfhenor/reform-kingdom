@@ -10,6 +10,7 @@ vi.mock('@helpers/content/content', () => ({
 
 vi.mock('@helpers/combat/combat-log', () => ({
   categoryMessageLog: vi.fn(),
+  ITEM_ICON_TOKEN: '@@icon@@',
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) =>
       `${quantity} <colored>${item.name}</colored>`,
@@ -56,6 +57,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
   worldNodeLevel: vi.fn(() => 0),
 }));
 
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
@@ -440,11 +442,65 @@ describe('gatheringProcessTick', () => {
       spritesheet: 'item',
       quantity: 2,
     });
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Gather',
+      'Wergen Woods',
+      expect.any(String),
+      { sprite: 'wergen-wood', spritesheet: 'item' },
+    );
 
     const result = applyLastUpdate({
       world: { gathering: { ticksIntoGather: 4 } },
     } as unknown as GameState);
     expect(result.world.gathering.ticksIntoGather).toBe(0);
+  });
+
+  it('uses the first granted item line as the log icon when a result grants multiple item types', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 4,
+        },
+      },
+    } as unknown as GameState);
+
+    const gathering = buildGathering({
+      gatherTime: 5,
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherResults: [
+        ensureGatherResult({
+          chance: 100,
+          items: [
+            { itemId: 'wood' as ItemId, quantity: 2 },
+            { itemId: 'stick' as ItemId, quantity: 1 },
+          ],
+        }),
+      ],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === 'gather-1') return gathering as never;
+      if (id === 'wood')
+        return { name: 'Wergen Wood', sprite: 'wergen-wood' } as never;
+      if (id === 'stick')
+        return { name: 'Wergen Stick', sprite: 'wergen-stick' } as never;
+      return undefined;
+    });
+    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+
+    gatheringProcessTick();
+
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Gather',
+      'Wergen Woods',
+      expect.any(String),
+      { sprite: 'wergen-wood', spritesheet: 'item' },
+    );
   });
 
   it('doubles item quantities on a successful luck roll', () => {

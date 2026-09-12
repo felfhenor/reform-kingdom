@@ -10,6 +10,7 @@ import type {
   EquipmentContent,
   ItemContent,
   RecipeContent,
+  RewardContentInfo,
 } from '@interfaces';
 import { parseInline } from 'marked';
 import mustache from 'mustache';
@@ -49,6 +50,7 @@ export function combatMessageLog(
   combat: Combat,
   message: string,
   actor?: Combatant,
+  icon?: Pick<RewardContentInfo, 'sprite' | 'spritesheet'>,
 ): void {
   const combatants = [
     ...(combat.heroes ?? []),
@@ -71,6 +73,8 @@ export function combatMessageLog(
     spritesheet: actor?.isEnemy ? 'guardian' : 'hero',
     sprite: actor?.sprite,
     combatants,
+    itemSprite: icon?.sprite,
+    itemSpritesheet: icon?.spritesheet,
   });
 }
 
@@ -79,10 +83,14 @@ export function combatantMessageToken(combatant: Combatant): string {
   return `@@${combatant.id}@@`;
 }
 
+// Marks where a reward icon renders inline, next to the item text it labels - the UI layer splits the message on this token to slot in a live sprite component.
+export const ITEM_ICON_TOKEN = '@@icon@@';
+
 export function categoryMessageLog(
   category: AdventureLogEntryKind,
   locationName: string,
   message: string,
+  icon?: Pick<RewardContentInfo, 'sprite' | 'spritesheet'>,
 ): void {
   pushLogEntry({
     kind: category,
@@ -90,6 +98,8 @@ export function categoryMessageLog(
     timestamp: Date.now(),
     locationName,
     message,
+    itemSprite: icon?.sprite,
+    itemSpritesheet: icon?.spritesheet,
   });
 }
 

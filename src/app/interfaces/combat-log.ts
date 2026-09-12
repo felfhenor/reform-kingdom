@@ -1,3 +1,4 @@
+import type { AtlasedImage } from '@interfaces/artable';
 import type { CombatId } from '@interfaces/combat';
 
 export type AdventureLogEntryKind =
@@ -22,4 +23,7 @@ export type CombatLog = {
   spritesheet?: 'guardian' | 'hero';
   sprite?: string;
   combatants?: CombatLogCombatantSnapshot[];
+  // Reward icon rendered inline next to the item name (see `ITEM_ICON_TOKEN`), when this entry represents a gain/loss.
+  itemSprite?: string;
+  itemSpritesheet?: AtlasedImage;
 };

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/combat/combat-log', () => ({
   categoryMessageLog: vi.fn(),
+  ITEM_ICON_TOKEN: '@@icon@@',
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) => `${quantity}x ${item.name}`,
   ),
@@ -63,7 +64,7 @@ vi.mock('@helpers/town/town-materials', () => ({
   applyTownMaterialDelta: vi.fn(),
 }));
 
-import { itemDropHtml } from '@helpers/combat/combat-log';
+import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
@@ -282,7 +283,10 @@ describe('raidResolveDefeat', () => {
 
   it('takes 50% of every material stack and logs the loss', () => {
     vi.mocked(getEntry).mockImplementation(
-      (id) => (id === townId ? buildTown() : { id, name: id }) as never,
+      (id) =>
+        (id === townId
+          ? buildTown()
+          : { id, name: id, sprite: `${id}-sprite` }) as never,
     );
     const state = {
       world: {
@@ -310,8 +314,15 @@ describe('raidResolveDefeat', () => {
       -1,
     );
     expect(itemDropHtml).toHaveBeenCalledWith(
-      { id: 'iron-ore', name: 'iron-ore' },
+      { id: 'iron-ore', name: 'iron-ore', sprite: 'iron-ore-sprite' },
       5,
+    );
+    // Icon is keyed off the first lost material - `iron-ore` here, since Object.keys preserves insertion order.
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Raid',
+      'Larsia',
+      expect.stringContaining('@@icon@@'),
+      { sprite: 'iron-ore-sprite', spritesheet: 'item' },
     );
   });
 

@@ -47,6 +47,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
   collectibleDropHtml: vi.fn(),
   combatMessageLog: vi.fn(),
   equipmentDropHtml: vi.fn(),
+  ITEM_ICON_TOKEN: '@@icon@@',
   itemDropHtml: vi.fn(),
   recipeDropHtml: vi.fn(),
 }));

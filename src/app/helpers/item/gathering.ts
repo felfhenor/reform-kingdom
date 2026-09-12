@@ -1,4 +1,8 @@
-import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import {
+  categoryMessageLog,
+  ITEM_ICON_TOKEN,
+  itemDropHtml,
+} from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
@@ -137,7 +141,7 @@ function grantGatherItems(
 ): void {
   const yieldBonus = partyGatherYieldBonus(result.tradeskillIds);
 
-  const descriptions = result.items
+  const grants = result.items
     .filter(({ quantity }) => quantity > 0)
     .map(({ itemId, quantity }, index) => {
       // Bonus is flat per gather cycle, not per item line - only the first line gets it.
@@ -156,16 +160,23 @@ function grantGatherItems(
         quantity: grantedQuantity,
       });
 
-      return itemDropHtml(item, grantedQuantity);
+      return { description: itemDropHtml(item, grantedQuantity), item };
     })
-    .filter((description): description is string => !!description);
+    .filter((grant): grant is NonNullable<typeof grant> => !!grant);
 
-  if (descriptions.length === 0) return;
+  if (grants.length === 0) return;
+
+  const [first, ...rest] = grants;
+  const descriptions = [
+    `${ITEM_ICON_TOKEN}${first.description}`,
+    ...rest.map(({ description }) => description),
+  ];
 
   categoryMessageLog(
     'Gather',
     nodeName,
     `The party found ${descriptions.join(', ')}!`,
+    { sprite: first.item.sprite, spritesheet: 'item' },
   );
 }
 
