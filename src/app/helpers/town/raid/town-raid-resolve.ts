@@ -25,10 +25,13 @@ import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defen
 import {
   townReputationGain,
   townReputationLose,
+  townReputationTier,
 } from '@helpers/town/reputation/town-reputation';
+import { townReputationBuffRefresh } from '@helpers/town/reputation/town-reputation-buff';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { townStockDisplay } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
+import { currentLocationGet } from '@helpers/world';
 import type {
   Combat,
   GameState,
@@ -51,7 +54,13 @@ export function raidResolveVictory(combat: Combat, townId: TownId): void {
   const drops = rollDroppedRewards(town.defense.rewards, town.level);
   grantResolvedDrops(combat, drops);
 
+  // Not awaited: this always runs inside a tick, where updateGamestate mutates synchronously,
+  // so the tier read right below already sees the change without needing the returned promise.
+  const previousTier = townReputationTier(townId);
   townReputationGain(townId, RAID_WIN_REPUTATION_AMOUNT, 'RaidDefense');
+  if (townReputationTier(townId) !== previousTier) {
+    townReputationBuffRefresh(currentLocationGet().mapName);
+  }
 
   updateGamestate((state) => {
     const target = state.world.towns[townId];
@@ -171,7 +180,12 @@ export function raidResolveDefeat(townId: TownId): void {
 
   analyticsSendDesignEvent(`Town:Raid:Loss:${analyticsSafeSegment(town.name)}`);
 
+  // Not awaited - see the matching comment in raidResolveVictory.
+  const previousTier = townReputationTier(townId);
   townReputationLose(townId, RAID_LOSS_REPUTATION_AMOUNT, 'RaidDefense');
+  if (townReputationTier(townId) !== previousTier) {
+    townReputationBuffRefresh(currentLocationGet().mapName);
+  }
 
   const now = timerTicksElapsed();
   let summary: TownRaidLossSummary | undefined;

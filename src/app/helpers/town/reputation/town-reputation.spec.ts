@@ -86,7 +86,7 @@ describe('townReputationTier', () => {
 });
 
 describe('townReputationGain', () => {
-  it("adds the amount to the town's reputation", () => {
+  it("adds the amount to the town's reputation", async () => {
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
     } as unknown as GameState;
@@ -94,45 +94,71 @@ describe('townReputationGain', () => {
       fn(state);
     });
 
-    townReputationGain(townId, 50, 'Trade');
+    await townReputationGain(townId, 50, 'Trade');
 
     expect(state.world.towns[townId].reputation).toBe(150);
   });
 
-  it('fires an analytics event tagged with the source', () => {
+  it('fires an analytics event tagged with the source', async () => {
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn({
         world: { towns: { [townId]: { reputation: 0 } } },
       } as unknown as GameState);
     });
 
-    townReputationGain(townId, 10, 'RaidDefense');
+    await townReputationGain(townId, 10, 'RaidDefense');
 
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Town:Reputation:RaidDefense',
     );
   });
 
-  it('is a no-op for a zero or negative amount', () => {
-    townReputationGain(townId, 0, 'Trade');
-    townReputationGain(townId, -5, 'Trade');
+  it('is a no-op for a zero or negative amount', async () => {
+    await townReputationGain(townId, 0, 'Trade');
+    await townReputationGain(townId, -5, 'Trade');
 
     expect(updateGamestate).not.toHaveBeenCalled();
     expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
   });
 
-  it('does not throw when the town has no state entry', () => {
+  it('does not throw when the town has no state entry', async () => {
     const state = { world: { towns: {} } } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
-    expect(() => townReputationGain(townId, 10, 'Trade')).not.toThrow();
+    await expect(
+      townReputationGain(townId, 10, 'Trade'),
+    ).resolves.not.toThrow();
+  });
+
+  it('returns true when the gain crosses a tier threshold', async () => {
+    const state = {
+      world: { towns: { [townId]: { reputation: 90 } } },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    await expect(townReputationGain(townId, 20, 'Trade')).resolves.toBe(true);
+  });
+
+  it('returns false when the gain stays within the same tier', async () => {
+    const state = {
+      world: { towns: { [townId]: { reputation: 0 } } },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    await expect(townReputationGain(townId, 20, 'Trade')).resolves.toBe(
+      false,
+    );
   });
 });
 
 describe('townReputationLose', () => {
-  it("subtracts the amount from the town's reputation", () => {
+  it("subtracts the amount from the town's reputation", async () => {
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
     } as unknown as GameState;
@@ -140,12 +166,12 @@ describe('townReputationLose', () => {
       fn(state);
     });
 
-    townReputationLose(townId, 30, 'RaidDefense');
+    await townReputationLose(townId, 30, 'RaidDefense');
 
     expect(state.world.towns[townId].reputation).toBe(70);
   });
 
-  it('clamps at 0 rather than going negative', () => {
+  it('clamps at 0 rather than going negative', async () => {
     const state = {
       world: { towns: { [townId]: { reputation: 20 } } },
     } as unknown as GameState;
@@ -153,40 +179,68 @@ describe('townReputationLose', () => {
       fn(state);
     });
 
-    townReputationLose(townId, 50, 'RaidDefense');
+    await townReputationLose(townId, 50, 'RaidDefense');
 
     expect(state.world.towns[townId].reputation).toBe(0);
   });
 
-  it('fires a distinct Lose analytics event tagged with the source', () => {
+  it('fires a distinct Lose analytics event tagged with the source', async () => {
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn({
         world: { towns: { [townId]: { reputation: 100 } } },
       } as unknown as GameState);
     });
 
-    townReputationLose(townId, 10, 'RaidDefense');
+    await townReputationLose(townId, 10, 'RaidDefense');
 
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Town:Reputation:Lose:RaidDefense',
     );
   });
 
-  it('is a no-op for a zero or negative amount', () => {
-    townReputationLose(townId, 0, 'RaidDefense');
-    townReputationLose(townId, -5, 'RaidDefense');
+  it('is a no-op for a zero or negative amount', async () => {
+    await townReputationLose(townId, 0, 'RaidDefense');
+    await townReputationLose(townId, -5, 'RaidDefense');
 
     expect(updateGamestate).not.toHaveBeenCalled();
     expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
   });
 
-  it('does not throw when the town has no state entry', () => {
+  it('does not throw when the town has no state entry', async () => {
     const state = { world: { towns: {} } } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
-    expect(() => townReputationLose(townId, 10, 'RaidDefense')).not.toThrow();
+    await expect(
+      townReputationLose(townId, 10, 'RaidDefense'),
+    ).resolves.not.toThrow();
+  });
+
+  it('returns true when the loss crosses a tier threshold', async () => {
+    const state = {
+      world: { towns: { [townId]: { reputation: 110 } } },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    await expect(townReputationLose(townId, 20, 'RaidDefense')).resolves.toBe(
+      true,
+    );
+  });
+
+  it('returns false when the loss stays within the same tier', async () => {
+    const state = {
+      world: { towns: { [townId]: { reputation: 110 } } },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    await expect(townReputationLose(townId, 5, 'RaidDefense')).resolves.toBe(
+      false,
+    );
   });
 });
 

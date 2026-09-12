@@ -41,41 +41,60 @@ export function townReputationTier(townId: TownId): number {
   return townReputationTierForAmount(townReputation(townId));
 }
 
-export function townReputationGain(
+// Returns whether the gain crossed a tier threshold, so callers can re-sync the town's buff immediately.
+// Awaits its own updateGamestate call so a non-tick caller sees the mutation land before checking the result.
+export async function townReputationGain(
   townId: TownId,
   amount: number,
   source: TownReputationGainSource,
-): void {
-  if (amount <= 0) return;
+): Promise<boolean> {
+  if (amount <= 0) return false;
 
-  updateGamestate((state) => {
+  let tierChanged = false;
+
+  await updateGamestate((state) => {
     const town = state.world.towns[townId];
     if (!town) return state;
 
+    const previousTier = townReputationTierForAmount(town.reputation);
     town.reputation += amount;
+    tierChanged =
+      townReputationTierForAmount(town.reputation) !== previousTier;
+
     return state;
   });
 
   analyticsSendDesignEvent(`Town:Reputation:${source}`);
+
+  return tierChanged;
 }
 
 // The sole subtraction path - reputation is otherwise cumulative-only, reserved for a raid loss.
-export function townReputationLose(
+// Returns whether the loss crossed a tier threshold - see townReputationGain for the async/tick-safety note.
+export async function townReputationLose(
   townId: TownId,
   amount: number,
   source: TownReputationGainSource,
-): void {
-  if (amount <= 0) return;
+): Promise<boolean> {
+  if (amount <= 0) return false;
 
-  updateGamestate((state) => {
+  let tierChanged = false;
+
+  await updateGamestate((state) => {
     const town = state.world.towns[townId];
     if (!town) return state;
 
+    const previousTier = townReputationTierForAmount(town.reputation);
     town.reputation = Math.max(0, town.reputation - amount);
+    tierChanged =
+      townReputationTierForAmount(town.reputation) !== previousTier;
+
     return state;
   });
 
   analyticsSendDesignEvent(`Town:Reputation:Lose:${source}`);
+
+  return tierChanged;
 }
 
 // Highest-defined tier at or below the current one - lets a table author only some tiers and still resolve sensibly below that.

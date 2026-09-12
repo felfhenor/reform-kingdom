@@ -26,6 +26,7 @@ import {
 import { updateGamestate } from '@helpers/state-game';
 import {
   townReputationBuffEffects,
+  townReputationBuffRefresh,
   townReputationBuffSync,
 } from '@helpers/town/reputation/town-reputation-buff';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
@@ -216,5 +217,32 @@ describe('townReputationBuffSync', () => {
     townReputationBuffSync('Carrina', 'LarsianDesert');
 
     expect(state.globalEffects).toEqual([]);
+  });
+});
+
+describe('townReputationBuffRefresh', () => {
+  it('re-derives the buff against the given map even without a map transition', () => {
+    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
+    vi.mocked(worldNodeByName).mockReturnValue({
+      mapName: 'LarsianDesert',
+      x: 5,
+      y: 9,
+    } as WorldNodeEntry);
+    const state = {
+      world: { towns: { [townId]: { reputation: 100 } } },
+      globalEffects: [{ id: buffId, name: 'Larsian Influence' }],
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    townReputationBuffRefresh('LarsianDesert');
+
+    expect(state.globalEffects).toEqual([
+      expect.objectContaining({
+        id: buffId,
+        extendedDescription: 'Strength: +1',
+      }),
+    ]);
   });
 });

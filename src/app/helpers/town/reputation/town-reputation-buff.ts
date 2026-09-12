@@ -75,18 +75,16 @@ function townReputationBuffEffect(
   };
 }
 
-// Regional, not per-tile: a town's buff is active while the party is anywhere on the
-// same map its node sits on.
-export function townReputationBuffSync(
-  previousMapName: string,
+// Re-derives every town's buff from scratch against `currentMapName`, unconditionally.
+// Async and awaits its own updateGamestate call so a non-tick caller can await the mutation landing
+// before doing anything that depends on it - see the matching note on townReputationGain.
+export async function townReputationBuffRefresh(
   currentMapName: string,
-): void {
-  if (previousMapName === currentMapName) return;
-
+): Promise<void> {
   const towns = getEntriesByType<TownContent>('town');
   const currentTick = timerTicksElapsed();
 
-  updateGamestate((state) => {
+  await updateGamestate((state) => {
     towns.forEach((town) => {
       const buffId = town.reputation.buff.globalEffectId;
       applyGlobalEffectRemove(state, buffId);
@@ -107,4 +105,14 @@ export function townReputationBuffSync(
 
     return state;
   });
+}
+
+// Regional, not per-tile: a town's buff is active while the party is anywhere on the
+// same map its node sits on.
+export function townReputationBuffSync(
+  previousMapName: string,
+  currentMapName: string,
+): void {
+  if (previousMapName === currentMapName) return;
+  townReputationBuffRefresh(currentMapName);
 }

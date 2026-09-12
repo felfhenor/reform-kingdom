@@ -50,6 +50,15 @@ vi.mock('@helpers/town/raid/town-raid-defense', () => ({
 vi.mock('@helpers/town/reputation/town-reputation', () => ({
   townReputationGain: vi.fn(),
   townReputationLose: vi.fn(),
+  townReputationTier: vi.fn(() => 0),
+}));
+
+vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
+  townReputationBuffRefresh: vi.fn(),
+}));
+
+vi.mock('@helpers/world', () => ({
+  currentLocationGet: vi.fn(() => ({ mapName: 'LarsianDesert' })),
 }));
 
 vi.mock('@helpers/town/shop/town-shop-access', () => ({
@@ -79,7 +88,9 @@ import {
 import {
   townReputationGain,
   townReputationLose,
+  townReputationTier,
 } from '@helpers/town/reputation/town-reputation';
+import { townReputationBuffRefresh } from '@helpers/town/reputation/town-reputation-buff';
 import { townStockDisplay } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import type {
@@ -149,6 +160,22 @@ describe('raidResolveVictory', () => {
     expect(townReputationGain).toHaveBeenCalledWith(townId, 100, 'RaidDefense');
   });
 
+  it('re-syncs the town buff immediately when the reputation gain crosses a tier', () => {
+    vi.mocked(townReputationTier).mockReturnValueOnce(0).mockReturnValueOnce(1);
+
+    raidResolveVictory({} as Combat, townId);
+
+    expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
+  });
+
+  it('does not re-sync the town buff when the reputation gain stays within a tier', () => {
+    vi.mocked(townReputationTier).mockReturnValue(0);
+
+    raidResolveVictory({} as Combat, townId);
+
+    expect(townReputationBuffRefresh).not.toHaveBeenCalled();
+  });
+
   it('sets lastRaidResolvedAtTick', () => {
     raidResolveVictory({} as Combat, townId);
 
@@ -180,6 +207,26 @@ describe('raidResolveDefeat', () => {
     // Must run from inside the updateGamestate callback, not after it - updateGamestate is a bare
     // mock here, so nothing else could have called it yet.
     expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
+  });
+
+  it('re-syncs the town buff immediately when the reputation loss crosses a tier', () => {
+    vi.mocked(townReputationTier).mockReturnValueOnce(1).mockReturnValueOnce(0);
+
+    raidResolveDefeat(townId);
+
+    expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
+  });
+
+  it('does not re-sync the town buff when the reputation loss stays within a tier', () => {
+    vi.mocked(townReputationTier).mockReturnValue(1);
+
+    raidResolveDefeat(townId);
+
+    expect(townReputationBuffRefresh).not.toHaveBeenCalled();
+  });
+
+  it('applies the raid-loss state updates', () => {
+    raidResolveDefeat(townId);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const state = {
