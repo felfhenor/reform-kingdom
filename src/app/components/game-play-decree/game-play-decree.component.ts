@@ -157,7 +157,7 @@ export class GamePlayDecreeComponent {
   public draftMaterialId = signal<MaterialId | undefined>(undefined);
   public draftNodeName = signal<string | undefined>(undefined);
   public draftRewardKey = signal<string | undefined>(undefined);
-  public draftTargetQuantity = signal<number>(1);
+  public draftTargetQuantity = signal<number>(100);
   public draftRiskTolerance = signal<DecreeRiskLevel>('Medium');
   // Undefined = "any town"
   public draftTownName = signal<string | undefined>(undefined);
@@ -344,7 +344,7 @@ export class GamePlayDecreeComponent {
     this.draftMaterialId.set(undefined);
     this.draftNodeName.set(undefined);
     this.draftRewardKey.set(undefined);
-    this.draftTargetQuantity.set(1);
+    this.draftTargetQuantity.set(100);
     this.draftRiskTolerance.set('Medium');
     this.draftTownName.set(undefined);
   }
