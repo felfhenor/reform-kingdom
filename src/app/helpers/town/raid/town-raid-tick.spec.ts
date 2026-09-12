@@ -62,6 +62,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 
 import { RAID_COOLDOWN_TICKS } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { notifyError } from '@helpers/engine/notify';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { timerTicksElapsed } from '@helpers/engine/timer';
@@ -85,7 +86,7 @@ import type {
 const townId = 'larsia' as TownId;
 
 function buildTown(): TownContent {
-  return {
+  return ensureTown({
     id: townId,
     name: 'Larsia',
     level: 25,
@@ -99,7 +100,7 @@ function buildTown(): TownContent {
       },
       quests: { commissions: [] },
     },
-  } as TownContent;
+  });
 }
 
 function buildTownState(overrides: Partial<TownNodeState> = {}): TownNodeState {
@@ -113,6 +114,8 @@ function buildTownState(overrides: Partial<TownNodeState> = {}): TownNodeState {
     tradeskills: {},
     craftQueue: [],
     firstVisitedAtTick: 0,
+    commissionSlots: [],
+    specialtyPriority: [],
     ...overrides,
   };
 }

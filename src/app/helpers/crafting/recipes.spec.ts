@@ -45,6 +45,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   applyRecipeDiscovery,
@@ -86,6 +87,8 @@ const boneHewnCloak: EquipmentContent = {
   levelRequirement: 4,
   baseStats: {} as never,
   type: 'Cloth Armor',
+  slots: 0,
+  grantedSkillIds: [],
 };
 
 const itemRecipe: RecipeContent = {
@@ -148,7 +151,10 @@ const forestRuinsEncounter: EncounterContent = {
   levelRange: { min: 1, max: 3 },
   fights: [],
   completionRewards: [
-    { kind: 'Recipe', recipeId: equipmentRecipe.id, chance: 0.25 },
+    ensureDroppedReward({
+      recipeId: equipmentRecipe.id,
+      chance: 0.25,
+    }),
   ],
 };
 

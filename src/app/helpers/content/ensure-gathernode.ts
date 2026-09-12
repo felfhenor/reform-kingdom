@@ -16,7 +16,9 @@ function ensureGatherResultItem(
   };
 }
 
-function ensureGatherResult(result: Partial<GatherResult> = {}): GatherResult {
+export function ensureGatherResult(
+  result: Partial<GatherResult> = {},
+): GatherResult {
   return {
     chance: result.chance ?? 0,
     items: ensureArray(result.items, ensureGatherResultItem),

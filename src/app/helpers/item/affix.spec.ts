@@ -25,6 +25,7 @@ import type {
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
+  TradeskillId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -291,7 +292,7 @@ const stunResistEffect: AffixEffect = {
 };
 const slowResistEffect: AffixEffect = {
   kind: 'Resistance',
-  tag: 'Slow',
+  tag: 'StatDown',
   value: 2,
 };
 const strengthStatEffect: AffixEffect = {
@@ -362,7 +363,13 @@ describe('equipmentItemMiscAffixDescriptions', () => {
       ...strengthAffix,
       id: 'affix-gather' as AffixId,
       description: 'Yields more Woodworking materials when gathering.',
-      effects: [{ kind: 'GatherYield', tradeskillId: 'Woodworking', value: 1 }],
+      effects: [
+        {
+          kind: 'GatherYield',
+          tradeskillId: 'Woodworking' as TradeskillId,
+          value: 1,
+        },
+      ],
     };
     vi.mocked(getEntry).mockImplementation(
       (id) => (id === gatherAffix.id ? gatherAffix : undefined) as never,

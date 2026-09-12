@@ -45,6 +45,7 @@ import {
   commissionRequirementEntries,
   commissionRewards,
 } from '@helpers/commission/commission-fulfill';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
@@ -78,13 +79,12 @@ const offer: CommissionOfferContent = {
     { itemId: 'wergen-stick' as ItemId, quantityMin: 100, quantityMax: 100 },
   ],
   rewards: [
-    {
-      kind: 'Item',
+    ensureDroppedReward({
       itemId: 'trader-token' as ItemId,
       chance: 100,
       min: 2,
       max: 2,
-    },
+    }),
   ],
   townReputationReward: 0,
   specialtyForRecipeId: 'UNKNOWN' as RecipeId,

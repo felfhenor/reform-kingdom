@@ -3,6 +3,7 @@ import type {
   CaravanId,
   EncounterContent,
   GameMap,
+  GlobalEffectId,
   NodeOverrideContent,
   NodeOverrideId,
   TiledLayer,
@@ -252,6 +253,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     },
     traders: {
       sellItemCount: [{ tier: 0, value: 0 }],
+      itemExpirationTimer: 0,
       markupPercentages: { sell: 0, buy: 0 },
     },
     gathering: {
@@ -260,7 +262,9 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
       materialThresholds: [],
       workers: [],
     },
-    reputation: { buff: { name: 'UNKNOWN', tiers: [] } },
+    reputation: {
+      buff: { globalEffectId: 'UNKNOWN' as GlobalEffectId, tiers: [] },
+    },
     defense: {
       rewards: [],
       guardian: { reputationTiers: [] },

@@ -77,6 +77,7 @@ describe('Astral Projector Helper Functions', () => {
     duration: 60,
     requiredCollectibles: [{ collectibleId }],
     requiredMaterials: [{ itemId, quantity: 5 }],
+    rarity: 'Common',
   };
 
   const otherSpellContent: AstralProjectorContent = {
@@ -87,6 +88,7 @@ describe('Astral Projector Helper Functions', () => {
     duration: 30,
     requiredCollectibles: [],
     requiredMaterials: [],
+    rarity: 'Common',
   };
 
   function mockGetEntry(...entries: AstralProjectorContent[]): void {

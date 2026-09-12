@@ -31,6 +31,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
@@ -62,6 +63,8 @@ const goblin: MonsterContent = {
     Vitality: 0,
     Resistance: 0,
     Agility: 1,
+    Constitution: 0,
+    Spirit: 0,
   },
   statsPerLevel: {
     Health: 0,
@@ -72,21 +75,23 @@ const goblin: MonsterContent = {
     Vitality: 0,
     Resistance: 0,
     Agility: 0,
+    Constitution: 0,
+    Spirit: 0,
   },
   combatStats: defaultCombatStats(),
   targetting: [{ type: 'Random' }],
   xp: { min: 3, max: 5, bonusPerLevel: 1 },
   drops: [
-    {
-      kind: 'Item',
+    ensureDroppedReward({
       itemId: 'gold-coin' as ItemId,
       min: 3,
       max: 10,
       bonusPerLevel: 1,
       chance: 100,
-    },
+    }),
   ],
   skills: [],
+  types: [],
 };
 
 const fieldRuinsEncounter: EncounterContent = {

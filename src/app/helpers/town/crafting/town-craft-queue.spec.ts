@@ -28,7 +28,9 @@ vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
 
 // Reputation-tier scaling is tested elsewhere - here it just echoes back crafting.maxQueueSize.
 vi.mock('@helpers/town/crafting/town-craft-queue-size', () => ({
-  townCraftQueueSize: vi.fn((town) => town.crafting.maxQueueSize),
+  townCraftQueueSize: vi.fn(
+    (town) => town.crafting.maxQueueSize[0]?.value ?? 0,
+  ),
 }));
 
 vi.mock('@helpers/town/raid/town-raid-state', () => ({
@@ -88,7 +90,7 @@ function buildTown(
   return {
     id: townId,
     crafting: {
-      maxQueueSize: 12,
+      maxQueueSize: [{ tier: 0, value: 12 }],
       craftingDurationMultiplier: 1,
       craftingChanceOnTick: 100,
       craftingChanceItemThreshold: 4,
@@ -655,7 +657,7 @@ describe('townCraftProcessTick - queueing new crafts', () => {
   it('never queues past maxQueueSize', () => {
     vi.mocked(getEntriesByType).mockReturnValue([
       buildTown({
-        maxQueueSize: 1,
+        maxQueueSize: [{ tier: 0, value: 1 }],
         craftingChanceItemThreshold: 1,
         craftingChanceOnTick: 100,
       }),

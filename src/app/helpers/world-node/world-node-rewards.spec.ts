@@ -13,6 +13,7 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import {
   rewardContentInfo,
@@ -75,7 +76,7 @@ describe('worldNodeCompletionRewards', () => {
 
   it('excludes Gold Coin and de-dupes rewards by identity', () => {
     const goldCoin: ItemContent = {
-      id: 'gold-coin',
+      id: 'gold-coin' as ItemId,
       name: 'Gold Coin',
       __type: 'item',
       description: 'Currency.',
@@ -83,7 +84,7 @@ describe('worldNodeCompletionRewards', () => {
       rarity: 'Common',
     };
     const bone: ItemContent = {
-      id: 'bone',
+      id: 'bone' as ItemId,
       name: 'Bone',
       __type: 'item',
       description: 'A bone.',
@@ -91,7 +92,7 @@ describe('worldNodeCompletionRewards', () => {
       rarity: 'Common',
     };
     const clam: CollectibleContent = {
-      id: 'swamp-clam',
+      id: 'swamp-clam' as CollectibleId,
       name: 'Swamp Clam',
       __type: 'collectible',
       description: 'A clam.',
@@ -101,10 +102,28 @@ describe('worldNodeCompletionRewards', () => {
 
     const encounter = buildEncounter({
       completionRewards: [
-        { kind: 'Item', itemId: goldCoin.id, min: 1, max: 1, chance: 100 },
-        { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 100 },
-        { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 50 },
-        { kind: 'Collectible', collectibleId: clam.id, chance: 50 },
+        ensureDroppedReward({
+          itemId: goldCoin.id,
+          min: 1,
+          max: 1,
+          chance: 100,
+        }),
+        ensureDroppedReward({
+          itemId: bone.id,
+          min: 1,
+          max: 1,
+          chance: 100,
+        }),
+        ensureDroppedReward({
+          itemId: bone.id,
+          min: 1,
+          max: 1,
+          chance: 50,
+        }),
+        ensureDroppedReward({
+          collectibleId: clam.id,
+          chance: 50,
+        }),
       ],
     });
 
@@ -114,8 +133,16 @@ describe('worldNodeCompletionRewards', () => {
     seedContent([goldCoin, bone, clam, encounter]);
 
     expect(worldNodeCompletionRewards(buildEntry())).toEqual([
-      { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 100 },
-      { kind: 'Collectible', collectibleId: clam.id, chance: 50 },
+      ensureDroppedReward({
+        itemId: bone.id,
+        min: 1,
+        max: 1,
+        chance: 100,
+      }),
+      ensureDroppedReward({
+        collectibleId: clam.id,
+        chance: 50,
+      }),
     ]);
   });
 
@@ -125,7 +152,7 @@ describe('worldNodeCompletionRewards', () => {
 
   it('includes recipe rewards alongside the other reward types', () => {
     const recipe: RecipeContent = {
-      id: 'equipment-bone-hewn-cloak',
+      id: 'equipment-bone-hewn-cloak' as RecipeId,
       name: 'Equipment: Bone-Hewn Cloak',
       __type: 'recipe',
       result: { equipmentId: 'bone-hewn-cloak' as never },
@@ -135,16 +162,25 @@ describe('worldNodeCompletionRewards', () => {
       maxTradeskillLevel: 5,
       tradeskillXP: 1,
       craftTime: 60,
+      tokenUnlockCost: 0,
     };
 
     const encounter = buildEncounter({
-      completionRewards: [{ kind: 'Recipe', recipeId: recipe.id, chance: 25 }],
+      completionRewards: [
+        ensureDroppedReward({
+          recipeId: recipe.id,
+          chance: 25,
+        }),
+      ],
     });
 
     seedContent([recipe, encounter]);
 
     expect(worldNodeCompletionRewards(buildEntry())).toEqual([
-      { kind: 'Recipe', recipeId: recipe.id, chance: 25 },
+      ensureDroppedReward({
+        recipeId: recipe.id,
+        chance: 25,
+      }),
     ]);
   });
 });
@@ -157,7 +193,7 @@ describe('worldNodeCompletionRewardProgress', () => {
 
   it('reports 0/total when nothing has been discovered yet', () => {
     const bone: ItemContent = {
-      id: 'bone',
+      id: 'bone' as ItemId,
       name: 'Bone',
       __type: 'item',
       description: 'A bone.',
@@ -165,7 +201,7 @@ describe('worldNodeCompletionRewardProgress', () => {
       rarity: 'Common',
     };
     const equipment: EquipmentContent = {
-      id: 'goblin-skull',
+      id: 'goblin-skull' as EquipmentId,
       name: 'Goblin Skull',
       __type: 'equipment',
       description: 'A skull.',
@@ -174,12 +210,22 @@ describe('worldNodeCompletionRewardProgress', () => {
       levelRequirement: 1,
       type: 'Artifact',
       baseStats: {} as never,
+      slots: 0,
+      grantedSkillIds: [],
     };
 
     const encounter = buildEncounter({
       completionRewards: [
-        { kind: 'Item', itemId: bone.id, min: 1, max: 1, chance: 100 },
-        { kind: 'Equipment', equipmentId: equipment.id, chance: 10 },
+        ensureDroppedReward({
+          itemId: bone.id,
+          min: 1,
+          max: 1,
+          chance: 100,
+        }),
+        ensureDroppedReward({
+          equipmentId: equipment.id,
+          chance: 10,
+        }),
       ],
     });
 

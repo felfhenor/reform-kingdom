@@ -65,6 +65,7 @@ const town: TownContent = {
   },
   traders: {
     sellItemCount: [{ tier: 0, value: 10 }],
+    itemExpirationTimer: 0,
     markupPercentages: { sell: 25, buy: -15 },
   },
   gathering: {
@@ -151,7 +152,9 @@ describe('markTownSubsystemProcessed', () => {
         towns: { [townId]: { lastProcessedTick: { worker: 1 } } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     markTownSubsystemProcessed(townId, 'craft');
 
@@ -163,7 +166,9 @@ describe('markTownSubsystemProcessed', () => {
 
   it('no-ops when the town has no state entry', () => {
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     expect(() => markTownSubsystemProcessed(townId, 'craft')).not.toThrow();
     expect(state.world.towns).toEqual({});
@@ -203,6 +208,8 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
+        specialtyPriority: [],
       },
     };
 
@@ -243,6 +250,8 @@ describe('pruneInvalidTowns', () => {
         materials: { [oreId]: 8 },
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
+        specialtyPriority: [],
       },
     };
 
@@ -266,6 +275,8 @@ describe('pruneInvalidTowns', () => {
         materials: { [oreId]: 5 },
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
+        specialtyPriority: [],
       },
     };
 
@@ -292,6 +303,8 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
+        specialtyPriority: [],
       },
     };
 
@@ -327,6 +340,8 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
+        specialtyPriority: [],
       },
     };
 
@@ -361,6 +376,8 @@ describe('pruneInvalidTowns', () => {
         materials: {},
         tradeskills: {},
         craftQueue: [],
+        commissionSlots: [],
+        specialtyPriority: [],
       },
     };
 

@@ -173,7 +173,6 @@ function buildCombat(overrides: Partial<Combat>): Combat {
     heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
     helpers: [],
     guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
-    elementalModifiers: {} as never,
     ...overrides,
   };
 }

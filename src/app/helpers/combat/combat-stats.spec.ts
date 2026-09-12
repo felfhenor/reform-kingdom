@@ -76,10 +76,13 @@ describe('combatStatsForCharacterEquipment', () => {
         Vitality: 0,
         Resistance: 0,
         Agility: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
       combatStats: { ...defaultCombatStats(), damageReflectPercent: 10 },
       type: 'Sword',
       slots: 0,
+      grantedSkillIds: [],
     };
     vi.mocked(getEntry).mockReturnValue(reflectiveSword);
 

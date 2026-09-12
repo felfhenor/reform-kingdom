@@ -74,12 +74,12 @@ import type {
   GameState,
   ItemId,
   RecipeId,
-  TownCommissionOfferSlot,
+  CommissionOfferSlot,
   TownContent,
   TownId,
 } from '@interfaces';
 
-function buildTown(commissions: TownCommissionOfferSlot[]): TownContent {
+function buildTown(commissions: CommissionOfferSlot[]): TownContent {
   return {
     id: 'larsia' as TownId,
     name: 'Larsia',

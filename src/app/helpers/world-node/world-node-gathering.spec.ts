@@ -1,4 +1,5 @@
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
+import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
 import { setAllMaps } from '@helpers/maps';
 import {
   allGatherableMaterialIds,
@@ -77,10 +78,10 @@ describe('gatheringResultsAtLevel', () => {
   }
 
   it('always includes results with no levelRequirement, regardless of level', () => {
-    const unrestricted = {
+    const unrestricted = ensureGatherResult({
       chance: 40,
       items: [{ itemId: 'wood' as ItemId, quantity: 1 }],
-    };
+    });
     const gathering = buildGathering({ gatherResults: [unrestricted] });
 
     expect(gatheringResultsAtLevel(gathering, 0)).toEqual([unrestricted]);
@@ -88,16 +89,16 @@ describe('gatheringResultsAtLevel', () => {
   });
 
   it('only includes a level-gated result at its exact level, not earlier or later ones', () => {
-    const levelOne = {
+    const levelOne = ensureGatherResult({
       chance: 7,
       items: [{ itemId: 'ore' as ItemId, quantity: 1 }],
       levelRequirement: 0,
-    };
-    const levelTwo = {
+    });
+    const levelTwo = ensureGatherResult({
       chance: 4,
       items: [{ itemId: 'azurite' as ItemId, quantity: 1 }],
       levelRequirement: 1,
-    };
+    });
     const gathering = buildGathering({ gatherResults: [levelOne, levelTwo] });
 
     expect(gatheringResultsAtLevel(gathering, 0)).toEqual([levelOne]);
@@ -119,10 +120,10 @@ describe('allGatherableMaterialIds', () => {
       xpGainedIfInLevelRange: 3,
       gatherTime: 10,
       gatherResults: [
-        {
+        ensureGatherResult({
           chance: 100,
           items: [{ itemId: 'wood' as ItemId, quantity: 1 }],
-        },
+        }),
       ],
       ...overrides,
     } as GatheringContent;
@@ -151,12 +152,15 @@ describe('allGatherableMaterialIds', () => {
   it("includes a level-gated material regardless of the node's current development level - pruneInvalidDecreeGatherClauses relies on this to not delete a clause for a material that is just not unlocked yet", () => {
     const gathering = buildGathering({
       gatherResults: [
-        { chance: 50, items: [{ itemId: 'wood' as ItemId, quantity: 1 }] },
-        {
+        ensureGatherResult({
+          chance: 50,
+          items: [{ itemId: 'wood' as ItemId, quantity: 1 }],
+        }),
+        ensureGatherResult({
           chance: 50,
           items: [{ itemId: 'azurite' as ItemId, quantity: 1 }],
           levelRequirement: 3,
-        },
+        }),
       ],
     });
 

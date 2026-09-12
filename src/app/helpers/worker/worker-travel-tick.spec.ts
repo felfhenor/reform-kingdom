@@ -31,6 +31,7 @@ vi.mock('@helpers/worker/worker-travel', () => ({
 
 import { itemDropHtml } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import { addMaterial } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -56,17 +57,16 @@ function applyLastUpdate(state: GameState): GameState {
 const WORKER_ID = 'weaver-nell' as WorkerId;
 const COPPER_ID = 'copper-ore' as ItemId;
 
-const workerContent: WorkerContent = {
+const workerContent: WorkerContent = ensureWorker({
   id: WORKER_ID,
   name: 'Weaver Nell',
-  __type: 'worker',
   description: 'test',
   sprite: '0000',
   frames: 4,
   baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
   statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
   canUseTeleports: true,
-};
+});
 
 const copperContent = { id: COPPER_ID, name: 'Copper Ore' } as ItemContent;
 

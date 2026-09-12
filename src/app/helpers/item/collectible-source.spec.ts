@@ -20,6 +20,7 @@ vi.mock('@helpers/engine/logging', () => ({
   error: vi.fn(),
 }));
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType } from '@helpers/content/content';
 import { error } from '@helpers/engine/logging';
 import { collectibleSourceMapBuild } from '@helpers/item/collectible-source';
@@ -37,7 +38,10 @@ const fieldRuinsEncounter: EncounterContent = {
   levelRange: { min: 1, max: 5 },
   fights: [],
   completionRewards: [
-    { kind: 'Collectible', collectibleId: goblinRuby, chance: 0.1 },
+    ensureDroppedReward({
+      collectibleId: goblinRuby,
+      chance: 0.1,
+    }),
   ],
 };
 
@@ -53,7 +57,10 @@ const gobslimeShrine: EncounterRandomContent = {
   creaturePool: [],
   fights: [],
   completionRewards: [
-    { kind: 'Collectible', collectibleId: gobslimeFlower, chance: 1 },
+    ensureDroppedReward({
+      collectibleId: gobslimeFlower,
+      chance: 1,
+    }),
   ],
 };
 

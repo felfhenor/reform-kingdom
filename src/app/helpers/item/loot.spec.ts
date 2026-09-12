@@ -19,6 +19,7 @@ vi.mock('@helpers/worker/worker-progression', () => ({
   })),
 }));
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   applyResolvedDropToState,
   rewardDisplayOrder,
@@ -46,7 +47,12 @@ describe('Loot Helper Functions', () => {
   describe('rollDroppedRewards', () => {
     it('should roll a quantity within range for an item drop', () => {
       const rewards: DroppedReward[] = [
-        { kind: 'Item', itemId: goldCoinId, min: 3, max: 10, chance: 100 },
+        ensureDroppedReward({
+          itemId: goldCoinId,
+          min: 3,
+          max: 10,
+          chance: 100,
+        }),
       ];
 
       for (let i = 0; i < 50; i++) {
@@ -61,14 +67,13 @@ describe('Loot Helper Functions', () => {
 
     it('should scale the item drop range by level * bonusPerLevel', () => {
       const rewards: DroppedReward[] = [
-        {
-          kind: 'Item',
+        ensureDroppedReward({
           itemId: goldCoinId,
           min: 3,
           max: 10,
           bonusPerLevel: 1,
           chance: 100,
-        },
+        }),
       ];
 
       for (let i = 0; i < 50; i++) {
@@ -81,7 +86,10 @@ describe('Loot Helper Functions', () => {
 
     it('should always return an equipment drop with no quantity when chance hits', () => {
       const rewards: DroppedReward[] = [
-        { kind: 'Equipment', equipmentId: cloakId, chance: 100 },
+        ensureDroppedReward({
+          equipmentId: cloakId,
+          chance: 100,
+        }),
       ];
 
       for (let i = 0; i < 50; i++) {
@@ -92,7 +100,10 @@ describe('Loot Helper Functions', () => {
 
     it('should always return a collectible drop with no quantity when chance hits', () => {
       const rewards: DroppedReward[] = [
-        { kind: 'Collectible', collectibleId: swampClamId, chance: 100 },
+        ensureDroppedReward({
+          collectibleId: swampClamId,
+          chance: 100,
+        }),
       ];
 
       for (let i = 0; i < 50; i++) {
@@ -105,7 +116,10 @@ describe('Loot Helper Functions', () => {
 
     it('should always return a recipe drop with no quantity when chance hits', () => {
       const rewards: DroppedReward[] = [
-        { kind: 'Recipe', recipeId: boneHewnCloakRecipeId, chance: 100 },
+        ensureDroppedReward({
+          recipeId: boneHewnCloakRecipeId,
+          chance: 100,
+        }),
       ];
 
       for (let i = 0; i < 50; i++) {
@@ -118,7 +132,10 @@ describe('Loot Helper Functions', () => {
 
     it('should always return a worker drop with no quantity when chance hits', () => {
       const rewards: DroppedReward[] = [
-        { kind: 'Worker', workerId: weaverNellId, chance: 100 },
+        ensureDroppedReward({
+          workerId: weaverNellId,
+          chance: 100,
+        }),
       ];
 
       for (let i = 0; i < 50; i++) {
@@ -129,11 +146,28 @@ describe('Loot Helper Functions', () => {
 
     it('should never drop when chance is 0', () => {
       const rewards: DroppedReward[] = [
-        { kind: 'Item', itemId: goldCoinId, min: 3, max: 10, chance: 0 },
-        { kind: 'Equipment', equipmentId: cloakId, chance: 0 },
-        { kind: 'Collectible', collectibleId: swampClamId, chance: 0 },
-        { kind: 'Recipe', recipeId: boneHewnCloakRecipeId, chance: 0 },
-        { kind: 'Worker', workerId: weaverNellId, chance: 0 },
+        ensureDroppedReward({
+          itemId: goldCoinId,
+          min: 3,
+          max: 10,
+          chance: 0,
+        }),
+        ensureDroppedReward({
+          equipmentId: cloakId,
+          chance: 0,
+        }),
+        ensureDroppedReward({
+          collectibleId: swampClamId,
+          chance: 0,
+        }),
+        ensureDroppedReward({
+          recipeId: boneHewnCloakRecipeId,
+          chance: 0,
+        }),
+        ensureDroppedReward({
+          workerId: weaverNellId,
+          chance: 0,
+        }),
       ];
 
       const drops = rollDroppedRewards(rewards, 1);
@@ -147,33 +181,28 @@ describe('Loot Helper Functions', () => {
 
   describe('rewardDisplayOrder', () => {
     it('should order workers before collectibles, equipment, recipes, then items', () => {
-      const item: DroppedReward = {
-        kind: 'Item',
+      const item: DroppedReward = ensureDroppedReward({
         itemId: goldCoinId,
         min: 1,
         max: 1,
         chance: 100,
-      };
-      const equipment: DroppedReward = {
-        kind: 'Equipment',
+      });
+      const equipment: DroppedReward = ensureDroppedReward({
         equipmentId: cloakId,
         chance: 100,
-      };
-      const collectible: DroppedReward = {
-        kind: 'Collectible',
+      });
+      const collectible: DroppedReward = ensureDroppedReward({
         collectibleId: swampClamId,
         chance: 100,
-      };
-      const recipe: DroppedReward = {
-        kind: 'Recipe',
+      });
+      const recipe: DroppedReward = ensureDroppedReward({
         recipeId: boneHewnCloakRecipeId,
         chance: 100,
-      };
-      const worker: DroppedReward = {
-        kind: 'Worker',
+      });
+      const worker: DroppedReward = ensureDroppedReward({
         workerId: weaverNellId,
         chance: 100,
-      };
+      });
 
       const sorted = sortBy(
         [item, equipment, collectible, recipe, worker],
@@ -228,7 +257,7 @@ describe('Loot Helper Functions', () => {
       expect(state.discoveredEquipment[cloakId]?.foundAt).toBeDefined();
     });
 
-    it('preserves an equipment drop\'s original discovery date on a repeat find', () => {
+    it("preserves an equipment drop's original discovery date on a repeat find", () => {
       const state = fakeState();
       state.discoveredEquipment[cloakId] = { foundAt: 1000 };
       const drop: ResolvedDrop = { kind: 'Equipment', equipmentId: cloakId };
@@ -263,7 +292,9 @@ describe('Loot Helper Functions', () => {
 
       applyResolvedDropToState(state, drop);
 
-      expect(state.discoveredRecipes[boneHewnCloakRecipeId]?.foundAt).toBeDefined();
+      expect(
+        state.discoveredRecipes[boneHewnCloakRecipeId]?.foundAt,
+      ).toBeDefined();
     });
 
     it('rescues a worker and seeds its default state', () => {

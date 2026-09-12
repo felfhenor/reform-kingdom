@@ -47,6 +47,8 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     combatStats: {} as never,
     resistance: {} as never,

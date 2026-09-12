@@ -50,6 +50,8 @@ const crystal: ItemContent = {
     Resistance: 0,
     Strength: 1,
     Vitality: 0,
+    Constitution: 0,
+    Spirit: 0,
   },
 };
 
@@ -128,9 +130,12 @@ const sword: EquipmentContent = {
     Resistance: 0,
     Strength: 5,
     Vitality: 0,
+    Constitution: 0,
+    Spirit: 0,
   },
   type: 'Sword',
   slots: 2,
+  grantedSkillIds: [],
 };
 
 const swordItem: EquipmentItem = {

@@ -220,7 +220,7 @@ describe('combatGetTargetsFromListBasedOnType', () => {
     ).toEqual([critical]);
   });
 
-  it('always includes an agro\'d combatant in a partial AoE selection, even if hp ordering would exclude them', () => {
+  it("always includes an agro'd combatant in a partial AoE selection, even if hp ordering would exclude them", () => {
     const agroed = buildCombatant({
       id: 'agroed',
       hp: 100,
@@ -354,13 +354,10 @@ describe('combatSkillHasValidTargetsForMode', () => {
     const context: CombatTargetModeContext = { combatant: caster };
 
     expect(
-      combatSkillHasValidTargetsForMode(
-        combat,
-        caster,
-        skill,
-        'SpecificHero',
-        { ...context, targetCharacterId: helper.id },
-      ),
+      combatSkillHasValidTargetsForMode(combat, caster, skill, 'SpecificHero', {
+        ...context,
+        targetCharacterId: helper.id as never,
+      }),
     ).toBe(true);
   });
 

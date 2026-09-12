@@ -2,6 +2,7 @@ import type {
   Character,
   CollectibleId,
   EquipmentId,
+  EquipmentItemId,
   GameState,
   MaterialId,
   RecipeId,
@@ -211,7 +212,14 @@ describe('migrateGameState', () => {
       world: { party: [] },
     } as unknown as GameState);
 
-    const prunedArmory = [{ equipmentId: 'sword' as EquipmentId }];
+    const prunedArmory = [
+      {
+        id: 'sword-1' as EquipmentItemId,
+        equipmentId: 'sword' as EquipmentId,
+        infusedItemIds: [],
+        affixIds: [],
+      },
+    ];
     const prunedMaterials = {
       ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
     };

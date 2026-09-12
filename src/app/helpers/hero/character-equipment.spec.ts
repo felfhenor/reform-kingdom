@@ -61,6 +61,8 @@ describe('Character Equipment Helper Functions', () => {
       Vitality: 5,
       Resistance: 5,
       Agility: 10,
+      Constitution: 0,
+      Spirit: 0,
     },
     statsPerLevel: {
       Health: 10,
@@ -71,6 +73,8 @@ describe('Character Equipment Helper Functions', () => {
       Vitality: 0.3,
       Resistance: 0.4,
       Agility: 0.7,
+      Constitution: 0,
+      Spirit: 0,
     },
     equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
     statPriority: [],
@@ -86,9 +90,9 @@ describe('Character Equipment Helper Functions', () => {
     rarity: 'Common',
     levelRequirement: 1,
     baseStats: { ...defaultStats(), Agility: 0.2, Resistance: 0.2 },
-    statsPerLevel: defaultStats(),
     type: 'Cloth Armor',
     slots: 1,
+    grantedSkillIds: [],
   };
 
   const mockHelmet: EquipmentContent = {
@@ -332,7 +336,7 @@ describe('Character Equipment Helper Functions', () => {
     const optimizingJob: JobContent = {
       ...mockJob,
       equippableTypes: ['Sword'],
-      statPriority: ['Strength'],
+      statPriority: [{ stat: 'Strength', multiplier: 1 }],
     };
 
     it('equips the best available armory item for each eligible slot', () => {

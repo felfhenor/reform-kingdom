@@ -53,6 +53,7 @@ import type {
   ItemId,
   TownContent,
   TownId,
+  TownWorkerStatusGathering,
   WorkerContent,
   WorkerId,
 } from '@interfaces';
@@ -209,7 +210,10 @@ describe('townWorkerGatheringProcessTick', () => {
       },
     } as unknown as GameState);
     expect(
-      state.world.towns[townId].workers[workerId].status.ticksIntoGather,
+      (
+        state.world.towns[townId].workers[workerId]
+          .status as TownWorkerStatusGathering
+      ).ticksIntoGather,
     ).toBe(1);
   });
 

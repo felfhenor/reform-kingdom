@@ -32,6 +32,8 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     } as StatBlock,
     combatStats: {} as never,
     resistance: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
@@ -92,6 +94,8 @@ function buildTechnique(
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     elements: [],
     attributes: ['DamagesTarget'],
@@ -113,6 +117,8 @@ describe('skillTechniquePreviewValue', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 40,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const skill = buildSkill();
@@ -126,6 +132,8 @@ describe('skillTechniquePreviewValue', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 0.25,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
 
@@ -144,6 +152,8 @@ describe('skillTechniquePreviewValue', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const skill = buildSkill();
@@ -157,6 +167,8 @@ describe('skillTechniquePreviewValue', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
 
@@ -185,6 +197,8 @@ describe('skillDescriptionWithPreview', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const skill = buildSkill({
@@ -200,6 +214,8 @@ describe('skillDescriptionWithPreview', () => {
             Resistance: 0,
             Strength: 0,
             Vitality: 0,
+            Constitution: 0,
+            Spirit: 0,
           },
         }),
       ],

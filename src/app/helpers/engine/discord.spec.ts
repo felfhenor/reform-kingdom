@@ -3,6 +3,7 @@ import type {
   CaravanTraderContent,
   CaravanTraderId,
   Character,
+  CharacterId,
   Combat,
   CombatId,
   GameState,
@@ -107,7 +108,7 @@ function buildNode(type: string, nodeName: string): WorldNodeEntry {
 
 function buildCharacter(overrides: Partial<Character> = {}): Character {
   return {
-    id: 'char-1',
+    id: 'char-1' as CharacterId,
     name: 'Hero',
     level: 1,
     xp: { current: 0, maximum: 100 },

@@ -57,6 +57,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
+import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
@@ -88,6 +89,7 @@ import type {
   GameState,
   GatheringContent,
   GatheringId,
+  ItemId,
   TradeskillId,
   WorldNodeEntry,
 } from '@interfaces';
@@ -269,8 +271,8 @@ describe('gatheringRollResult', () => {
 
   it('delegates to rngChoiceWeighted over the results available at the given level', () => {
     const results = [
-      { chance: 40, items: [] },
-      { chance: 10, items: [] },
+      ensureGatherResult({ chance: 40, items: [] }),
+      ensureGatherResult({ chance: 10, items: [] }),
     ];
     vi.mocked(rngChoiceWeighted).mockReturnValue(results[1]);
 
@@ -406,7 +408,10 @@ describe('gatheringProcessTick', () => {
       levelRange: { min: 1, max: 5 },
       xpGainedIfInLevelRange: 3,
       gatherResults: [
-        { chance: 100, items: [{ itemId: 'wood', quantity: 2 }] },
+        ensureGatherResult({
+          chance: 100,
+          items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
+        }),
       ],
     });
     vi.mocked(getEntry).mockImplementation((id: string) => {
@@ -459,7 +464,10 @@ describe('gatheringProcessTick', () => {
       levelRange: { min: 1, max: 5 },
       xpGainedIfInLevelRange: 3,
       gatherResults: [
-        { chance: 100, items: [{ itemId: 'wood', quantity: 2 }] },
+        ensureGatherResult({
+          chance: 100,
+          items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
+        }),
       ],
     });
     vi.mocked(getEntry).mockImplementation((id: string) => {
@@ -502,7 +510,7 @@ describe('gatheringProcessTick', () => {
         {
           chance: 100,
           tradeskillIds: ['Woodworking' as TradeskillId],
-          items: [{ itemId: 'wood', quantity: 2 }],
+          items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
         },
       ],
     });
@@ -557,7 +565,7 @@ describe('gatheringProcessTick', () => {
             'Woodworking' as TradeskillId,
             'Tailoring' as TradeskillId,
           ],
-          items: [{ itemId: 'hide', quantity: 1 }],
+          items: [{ itemId: 'hide' as ItemId, quantity: 1 }],
         },
       ],
     });
@@ -597,12 +605,12 @@ describe('gatheringProcessTick', () => {
     const woodResult = {
       chance: 50,
       tradeskillIds: ['Woodworking' as TradeskillId],
-      items: [{ itemId: 'wood', quantity: 2 }],
+      items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
     };
     const hideResult = {
       chance: 50,
       tradeskillIds: ['Tailoring' as TradeskillId],
-      items: [{ itemId: 'hide', quantity: 1 }],
+      items: [{ itemId: 'hide' as ItemId, quantity: 1 }],
     };
     const gathering = buildGathering({
       gatherTime: 5,
@@ -652,8 +660,8 @@ describe('gatheringProcessTick', () => {
           chance: 100,
           tradeskillIds: ['Woodworking' as TradeskillId],
           items: [
-            { itemId: 'wood', quantity: 2 },
-            { itemId: 'stick', quantity: 1 },
+            { itemId: 'wood' as ItemId, quantity: 2 },
+            { itemId: 'stick' as ItemId, quantity: 1 },
           ],
         },
       ],

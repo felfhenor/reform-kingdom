@@ -82,6 +82,7 @@ describe('Equipment Helper Functions', () => {
     },
     type: 'Sword',
     slots: 1,
+    grantedSkillIds: [],
   };
 
   const helmet: EquipmentContent = {
@@ -1257,7 +1258,10 @@ describe('Equipment Helper Functions', () => {
       const winners = planEquipmentOptimization(
         character,
         [armoryItem],
-        ['Strength', 'Agility'],
+        [
+          { stat: 'Strength', multiplier: 1 },
+          { stat: 'Agility', multiplier: 1 },
+        ],
       );
 
       expect(winners).toEqual([]);
@@ -1295,6 +1299,7 @@ describe('Equipment Helper Functions', () => {
       description: '',
       rarity: 'Common',
       family: 'Strength',
+      position: 'Suffix',
       effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
     };
 
@@ -1353,6 +1358,7 @@ describe('Equipment Helper Functions', () => {
       description: '',
       rarity: 'Common',
       family: 'Strength',
+      position: 'Suffix',
       effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
     };
 

@@ -3,6 +3,7 @@ import type {
   AffixId,
   EquipmentContent,
   EquipmentId,
+  EquipmentItem,
   EquipmentItemId,
   GameState,
   ItemId,
@@ -47,6 +48,7 @@ const sword: EquipmentContent = {
   baseStats: defaultStats(),
   type: 'Sword',
   slots: 1,
+  grantedSkillIds: [],
 };
 
 const shield: EquipmentContent = {
@@ -57,6 +59,15 @@ const shield: EquipmentContent = {
   rarity: 'Rare',
   type: 'Shield',
 };
+
+function buildArmoryItem(equipmentId: EquipmentId): EquipmentItem {
+  return {
+    id: `${equipmentId}-item` as EquipmentItemId,
+    equipmentId,
+    infusedItemIds: [],
+    affixIds: [],
+  };
+}
 
 describe('Armory Helper Functions', () => {
   beforeEach(() => {
@@ -132,7 +143,9 @@ describe('Armory Helper Functions', () => {
         discoveredEquipment: {},
       } as unknown as GameState);
 
-      expect(result.discoveredEquipment['sword'].foundAt).toBeGreaterThan(0);
+      expect(
+        result.discoveredEquipment['sword' as EquipmentId].foundAt,
+      ).toBeGreaterThan(0);
     });
 
     it('preserves the original discovery timestamp on repeat finds', () => {
@@ -144,7 +157,9 @@ describe('Armory Helper Functions', () => {
         discoveredEquipment: { sword: { foundAt: 1000 } },
       } as unknown as GameState);
 
-      expect(result.discoveredEquipment['sword']).toEqual({ foundAt: 1000 });
+      expect(result.discoveredEquipment['sword' as EquipmentId]).toEqual({
+        foundAt: 1000,
+      });
     });
   });
 
@@ -180,7 +195,9 @@ describe('Armory Helper Functions', () => {
         discoveredEquipment: {},
       } as unknown as GameState);
 
-      expect(result.discoveredEquipment['sword'].foundAt).toBeGreaterThan(0);
+      expect(
+        result.discoveredEquipment['sword' as EquipmentId].foundAt,
+      ).toBeGreaterThan(0);
     });
   });
 
@@ -232,14 +249,14 @@ describe('Armory Helper Functions', () => {
   describe('pruneInvalidArmoryItems', () => {
     it('keeps entries that resolve to real equipment content', () => {
       vi.mocked(getEntry).mockReturnValue({ id: 'sword' } as EquipmentContent);
-      const armory = [{ equipmentId: 'sword' as EquipmentId }];
+      const armory = [buildArmoryItem('sword' as EquipmentId)];
 
       expect(pruneInvalidArmoryItems(armory)).toEqual(armory);
     });
 
     it('drops entries whose equipmentId no longer resolves to real content', () => {
       vi.mocked(getEntry).mockReturnValue(undefined);
-      const armory = [{ equipmentId: 'sword' as EquipmentId }];
+      const armory = [buildArmoryItem('sword' as EquipmentId)];
 
       expect(pruneInvalidArmoryItems(armory)).toEqual([]);
     });
@@ -249,12 +266,12 @@ describe('Armory Helper Functions', () => {
         (id) => (id === 'sword' ? { id: 'sword' } : undefined) as never,
       );
       const armory = [
-        { equipmentId: 'sword' as EquipmentId },
-        { equipmentId: 'stale-gear' as EquipmentId },
+        buildArmoryItem('sword' as EquipmentId),
+        buildArmoryItem('stale-gear' as EquipmentId),
       ];
 
       expect(pruneInvalidArmoryItems(armory)).toEqual([
-        { equipmentId: 'sword' },
+        buildArmoryItem('sword' as EquipmentId),
       ]);
     });
 

@@ -10,6 +10,7 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType } from '@helpers/content/content';
 import { recipeSourceNodeNames } from '@helpers/kingdom/museum';
 
@@ -49,7 +50,10 @@ const fieldRuinsEncounter: EncounterContent = {
   levelRange: { min: 1, max: 5 },
   fights: [],
   completionRewards: [
-    { kind: 'Recipe', recipeId: boneHewnCloakRecipe.id, chance: 0.25 },
+    ensureDroppedReward({
+      recipeId: boneHewnCloakRecipe.id,
+      chance: 0.25,
+    }),
   ],
 };
 

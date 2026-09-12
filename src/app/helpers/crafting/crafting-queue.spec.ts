@@ -80,6 +80,7 @@ import type {
   CraftQueueEntry,
   CraftQueueEntryId,
   EquipmentId,
+  EquipmentItemId,
   GameState,
   GameStateTradeskills,
   ItemId,
@@ -225,8 +226,18 @@ describe('craftMaxCraftableQuantity', () => {
 
   it('counts equipment requirements from the armory', () => {
     vi.mocked(armoryGet).mockReturnValue([
-      { equipmentId: 'dagger' as EquipmentId },
-      { equipmentId: 'dagger' as EquipmentId },
+      {
+        id: 'a' as EquipmentItemId,
+        equipmentId: 'dagger' as EquipmentId,
+        infusedItemIds: [],
+        affixIds: [],
+      },
+      {
+        id: 'b' as EquipmentItemId,
+        equipmentId: 'dagger' as EquipmentId,
+        infusedItemIds: [],
+        affixIds: [],
+      },
     ]);
 
     const recipe = buildRecipe({

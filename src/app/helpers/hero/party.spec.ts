@@ -91,9 +91,9 @@ describe('Party Helper Functions', () => {
     rarity: 'Common',
     levelRequirement: 1,
     baseStats: { ...defaultStats(), Agility: 0.2, Resistance: 0.2 },
-    statsPerLevel: defaultStats(),
     type: 'Cloth Armor',
     slots: 1,
+    grantedSkillIds: [],
   };
 
   const mockHelmet: EquipmentContent = {
@@ -420,6 +420,7 @@ describe('Party Helper Functions', () => {
         baseStats: { ...defaultStats(), Strength: 5 },
         type: 'Sword',
         slots: 1,
+        grantedSkillIds: [],
       };
 
       mockGetEntry(mockJob, sword);
@@ -452,6 +453,7 @@ describe('Party Helper Functions', () => {
         baseStats: { ...defaultStats(), Vitality: -50, Health: -1000 },
         type: 'Ring',
         slots: 1,
+        grantedSkillIds: [],
       };
 
       mockGetEntry(mockJob, cursedRing);
@@ -496,6 +498,7 @@ describe('Party Helper Functions', () => {
       description: '',
       rarity: 'Common',
       family: 'Strength',
+      position: 'Suffix',
       effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
     };
 

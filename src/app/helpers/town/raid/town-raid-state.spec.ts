@@ -59,6 +59,8 @@ function buildTownState(overrides: Partial<TownNodeState> = {}): TownNodeState {
     materials: {},
     tradeskills: {},
     craftQueue: [],
+    commissionSlots: [],
+    specialtyPriority: [],
     ...overrides,
   };
 }
@@ -211,7 +213,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
 
 describe('raidAssaulterMonsterIds', () => {
   it('draws numMonsters entries, each sampled from monsterIds', () => {
-    vi.mocked(sample).mockReturnValue(citizenId);
+    vi.mocked(sample).mockReturnValue(citizenId as never);
     const assaulter: TownDefenseAssaulterConfig = {
       numMonsters: 5,
       monsterIds: [citizenId, guardId],

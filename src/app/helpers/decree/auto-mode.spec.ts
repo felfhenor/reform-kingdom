@@ -280,8 +280,8 @@ describe('autoModeRecordNodeFailure', () => {
     autoModeRecordNodeFailure('A');
 
     const result = applyLastUpdate(buildState({ nodeFailureCounts }));
-    expect(result.world.autoMode.nodeFailureCounts.A).toBe(2);
-    expect(result.world.autoMode.nodeFailureCounts.B).toBe(4);
+    expect(result.world.autoMode.nodeFailureCounts['A']).toBe(2);
+    expect(result.world.autoMode.nodeFailureCounts['B']).toBe(4);
   });
 
   it('starts a node at 1 the first time it fails', () => {
@@ -290,7 +290,7 @@ describe('autoModeRecordNodeFailure', () => {
     autoModeRecordNodeFailure('New');
 
     const result = applyLastUpdate(buildState({}));
-    expect(result.world.autoMode.nodeFailureCounts.New).toBe(1);
+    expect(result.world.autoMode.nodeFailureCounts['New']).toBe(1);
   });
 });
 
@@ -302,8 +302,8 @@ describe('autoModeRecordNodeSuccess', () => {
     autoModeRecordNodeSuccess('A');
 
     const result = applyLastUpdate(buildState({ nodeFailureCounts }));
-    expect(result.world.autoMode.nodeFailureCounts.A).toBe(0);
-    expect(result.world.autoMode.nodeFailureCounts.B).toBe(4);
+    expect(result.world.autoMode.nodeFailureCounts['A']).toBe(0);
+    expect(result.world.autoMode.nodeFailureCounts['B']).toBe(4);
   });
 });
 

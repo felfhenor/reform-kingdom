@@ -228,7 +228,8 @@ describe('encounterRandomHandleVictory', () => {
       },
     } as unknown as GameState);
     expect(
-      result.world.exploreRandom['gobslime-shrine'].completedThisCycle,
+      result.world.exploreRandom['gobslime-shrine' as EncounterRandomId]
+        .completedThisCycle,
     ).toBe(true);
   });
 });

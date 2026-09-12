@@ -123,7 +123,9 @@ describe('townReputationBuffSync', () => {
       world: { towns: { [townId]: { reputation: 100 } } },
       globalEffects: [],
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationBuffSync('Carrina', 'LarsianDesert');
 
@@ -150,7 +152,9 @@ describe('townReputationBuffSync', () => {
       world: { towns: { [townId]: { reputation: 100 } } },
       globalEffects: [{ id: buffId, name: 'Larsian Influence' }],
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationBuffSync('LarsianDesert', 'Carrina');
 
@@ -168,7 +172,9 @@ describe('townReputationBuffSync', () => {
       world: { towns: { [townId]: { reputation: 0 } } },
       globalEffects: [],
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationBuffSync('Carrina', 'LarsianDesert');
 
@@ -182,7 +188,9 @@ describe('townReputationBuffSync', () => {
       world: { towns: { [townId]: { reputation: 100 } } },
       globalEffects: [],
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationBuffSync('Carrina', 'LarsianDesert');
 
@@ -201,7 +209,9 @@ describe('townReputationBuffSync', () => {
       world: { towns: { [townId]: { reputation: 100 } } },
       globalEffects: [],
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationBuffSync('Carrina', 'LarsianDesert');
 

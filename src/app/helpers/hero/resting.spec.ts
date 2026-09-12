@@ -1,8 +1,10 @@
 import type {
   Character,
+  CharacterId,
   GameState,
   GlobalEffectContent,
   GlobalEffectId,
+  JobId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -46,15 +48,17 @@ const idleContent: GlobalEffectContent = {
   name: 'Idle',
   __type: 'globaleffect',
   description: 'Heroes are idle and resting.',
+  sprite: '0000',
+  effects: [],
 };
 
 function buildCharacter(overrides: Partial<Character> = {}): Character {
   return {
-    id: 'char-1',
+    id: 'char-1' as CharacterId,
     name: 'Hero',
     level: 1,
     xp: { current: 0, maximum: 100 },
-    jobId: 'job-1',
+    jobId: 'job-1' as JobId,
     jobProgress: {},
     hp: 50,
     ep: 20,

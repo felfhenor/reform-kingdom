@@ -44,6 +44,7 @@ vi.mock('@helpers/world-node/world-node-rewards', () => ({
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content/content';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { addMaterial } from '@helpers/item/materials';
 import {
@@ -62,17 +63,16 @@ import type {
 const WORKER_ID = 'weaver-nell' as WorkerId;
 const COMBAT = { locationName: 'Wergen Woods' } as Combat;
 
-const workerContent: WorkerContent = {
+const workerContent: WorkerContent = ensureWorker({
   id: WORKER_ID,
   name: 'Weaver Nell',
-  __type: 'worker',
   description: 'test',
   sprite: '0000',
   frames: 4,
   baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
   statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
   canUseTeleports: true,
-};
+});
 
 describe('grantResolvedDrops - Worker rewards', () => {
   beforeEach(() => {

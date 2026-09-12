@@ -16,6 +16,7 @@ import type {
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
+  EquipmentSkillId,
   ItemContent,
   ItemId,
 } from '@interfaces';
@@ -51,7 +52,7 @@ const grantAffix: AffixContent = {
   rarity: 'Mystical',
   family: 'GrantAttack',
   position: 'Suffix',
-  effects: [{ kind: 'GrantSkill', skillId: 'attack' }],
+  effects: [{ kind: 'GrantSkill', skillId: 'attack' as EquipmentSkillId }],
 };
 
 const reflectAffix: AffixContent = {
@@ -102,6 +103,8 @@ const crystal: ItemContent = {
     Resistance: 0,
     Strength: 2,
     Vitality: 0,
+    Constitution: 0,
+    Spirit: 0,
   },
 };
 
@@ -222,10 +225,12 @@ describe('equipmentItemGrantedSkillIds', () => {
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     type: 'Sword',
     slots: 0,
-    grantedSkillIds: ['starshine-2'],
+    grantedSkillIds: ['starshine-2' as EquipmentSkillId],
   };
 
   beforeEach(() => {
@@ -245,7 +250,9 @@ describe('equipmentItemGrantedSkillIds', () => {
   it('dedupes a skill granted by both content and an affix', () => {
     const duplicateGrantAffix: AffixContent = {
       ...grantAffix,
-      effects: [{ kind: 'GrantSkill', skillId: 'starshine-2' }],
+      effects: [
+        { kind: 'GrantSkill', skillId: 'starshine-2' as EquipmentSkillId },
+      ],
     };
     mockContent(duplicateGrantAffix);
 

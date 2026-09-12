@@ -68,6 +68,8 @@ describe('characterReclass', () => {
       Vitality: 5,
       Resistance: 5,
       Agility: 10,
+      Constitution: 0,
+      Spirit: 0,
     },
     statsPerLevel: {
       Health: 10,
@@ -78,6 +80,8 @@ describe('characterReclass', () => {
       Vitality: 0.3,
       Resistance: 0.4,
       Agility: 0.7,
+      Constitution: 0,
+      Spirit: 0,
     },
     equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
     statPriority: [],
@@ -93,9 +97,9 @@ describe('characterReclass', () => {
     rarity: 'Common',
     levelRequirement: 1,
     baseStats: { ...defaultStats(), Agility: 0.2, Resistance: 0.2 },
-    statsPerLevel: defaultStats(),
     type: 'Cloth Armor',
     slots: 1,
+    grantedSkillIds: [],
   };
 
   const mockStarterHat: EquipmentContent = {
@@ -493,7 +497,7 @@ describe('characterReclass', () => {
       id: 'job-warrior' as JobId,
       name: 'Warrior',
       equippableTypes: ['Sword', 'Spear'],
-      statPriority: ['Strength'],
+      statPriority: [{ stat: 'Strength', multiplier: 1 }],
     };
 
     it('equips the best available armory item into the new job right after reclassing', () => {

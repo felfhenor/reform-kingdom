@@ -64,6 +64,8 @@ describe('Character Progress Helper Functions', () => {
       Vitality: 5,
       Resistance: 5,
       Agility: 10,
+      Constitution: 0,
+      Spirit: 0,
     },
     statsPerLevel: {
       Health: 10,
@@ -74,6 +76,8 @@ describe('Character Progress Helper Functions', () => {
       Vitality: 0.3,
       Resistance: 0.4,
       Agility: 0.7,
+      Constitution: 0,
+      Spirit: 0,
     },
     equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
     statPriority: [],

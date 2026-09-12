@@ -90,7 +90,9 @@ describe('townReputationGain', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationGain(townId, 50, 'Trade');
 
@@ -98,11 +100,11 @@ describe('townReputationGain', () => {
   });
 
   it('fires an analytics event tagged with the source', () => {
-    vi.mocked(updateGamestate).mockImplementation(async (fn) =>
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn({
         world: { towns: { [townId]: { reputation: 0 } } },
-      } as unknown as GameState),
-    );
+      } as unknown as GameState);
+    });
 
     townReputationGain(townId, 10, 'RaidDefense');
 
@@ -121,7 +123,9 @@ describe('townReputationGain', () => {
 
   it('does not throw when the town has no state entry', () => {
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     expect(() => townReputationGain(townId, 10, 'Trade')).not.toThrow();
   });
@@ -132,7 +136,9 @@ describe('townReputationLose', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationLose(townId, 30, 'RaidDefense');
 
@@ -143,7 +149,9 @@ describe('townReputationLose', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 20 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townReputationLose(townId, 50, 'RaidDefense');
 
@@ -151,11 +159,11 @@ describe('townReputationLose', () => {
   });
 
   it('fires a distinct Lose analytics event tagged with the source', () => {
-    vi.mocked(updateGamestate).mockImplementation(async (fn) =>
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn({
         world: { towns: { [townId]: { reputation: 100 } } },
-      } as unknown as GameState),
-    );
+      } as unknown as GameState);
+    });
 
     townReputationLose(townId, 10, 'RaidDefense');
 
@@ -174,7 +182,9 @@ describe('townReputationLose', () => {
 
   it('does not throw when the town has no state entry', () => {
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     expect(() => townReputationLose(townId, 10, 'RaidDefense')).not.toThrow();
   });

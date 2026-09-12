@@ -5,6 +5,7 @@ import {
   monsterXpReward,
   xpForOverLevel,
 } from '@helpers/combat/monster';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { defaultCombatStats } from '@helpers/defaults';
 import type { EquipmentSkillId, ItemId, MonsterContent } from '@interfaces';
@@ -30,6 +31,8 @@ describe('Monster Helper Functions', () => {
       Vitality: 0,
       Resistance: 0,
       Agility: 1,
+      Constitution: 0,
+      Spirit: 0,
     },
     statsPerLevel: {
       Health: 0,
@@ -40,21 +43,23 @@ describe('Monster Helper Functions', () => {
       Vitality: 0,
       Resistance: 0,
       Agility: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     combatStats: defaultCombatStats(),
     targetting: [{ type: 'Random' }],
     xp: { min: 3, max: 5, bonusPerLevel: 1 },
     drops: [
-      {
-        kind: 'Item',
+      ensureDroppedReward({
         itemId: goldCoinId,
         min: 3,
         max: 10,
         bonusPerLevel: 1,
         chance: 100,
-      },
+      }),
     ],
     skills: [{ skillId: 'Attack' as EquipmentSkillId, weight: 1 }],
+    types: [],
   };
 
   describe('monsterStatsAtLevel', () => {

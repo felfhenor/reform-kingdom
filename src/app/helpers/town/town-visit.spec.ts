@@ -59,7 +59,9 @@ describe('townMarkVisited', () => {
     } as unknown as GameState);
     vi.mocked(timerTicksElapsed).mockReturnValue(500);
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -83,9 +85,9 @@ describe('townMarkVisited', () => {
       world: { towns: {} },
     } as unknown as GameState);
     vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    vi.mocked(updateGamestate).mockImplementation(async (fn) =>
-      fn({ world: { towns: {} } } as unknown as GameState),
-    );
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn({ world: { towns: {} } } as unknown as GameState);
+    });
     vi.mocked(getEntry).mockReturnValue({ name: 'Larsia' } as TownContent);
 
     townMarkVisited(townId);
@@ -105,7 +107,9 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: { worker: 42 } } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -140,7 +144,9 @@ describe('townMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -159,7 +165,9 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, reputation: 250 } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -178,7 +186,9 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, hiddenGold: 1200 } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -198,7 +208,9 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, materials } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -218,7 +230,9 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, tradeskills } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -238,7 +252,9 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, craftQueue } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -266,7 +282,9 @@ describe('townMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 
@@ -292,7 +310,9 @@ describe('townMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => fn(state));
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
 
     townMarkVisited(townId);
 

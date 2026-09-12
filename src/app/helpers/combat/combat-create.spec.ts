@@ -29,6 +29,7 @@ import {
   combatantFromMonster,
   combatantsFromTownGuardians,
 } from '@helpers/combat/combat-create';
+import { ensureEquipment } from '@helpers/content/ensure-item';
 import { getEntry } from '@helpers/content/content';
 import { defaultCombatStats } from '@helpers/defaults';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
@@ -38,6 +39,7 @@ import type {
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
+  EquipmentItemId,
   EquipmentSkillContent,
   EquipmentSkillId,
   GlobalEffect,
@@ -98,17 +100,16 @@ const snipeSkill: EquipmentSkillContent = {
   requiredWeaponTypes: ['Bow'],
 };
 
-const bow: EquipmentContent = {
+const bow: EquipmentContent = ensureEquipment({
   id: 'bow' as EquipmentId,
   name: 'Bow',
-  __type: 'equipment',
   description: '',
   sprite: '0000',
   rarity: 'Common',
   levelRequirement: 1,
   baseStats: zeroStats(),
   type: 'Bow',
-};
+});
 
 const rangerJob: JobContent = {
   id: 'ranger' as JobId,
@@ -175,7 +176,7 @@ describe('combatantFromCharacter', () => {
         equipment: {
           ...emptyEquipment,
           Weapon: {
-            id: 'bow-1',
+            id: 'bow-1' as EquipmentItemId,
             equipmentId: bow.id,
             infusedItemIds: [],
             affixIds: [],
@@ -341,7 +342,7 @@ describe('combatantFromCharacter', () => {
         equipment: {
           ...emptyEquipment,
           Weapon: {
-            id: 'bow-1',
+            id: 'bow-1' as EquipmentItemId,
             equipmentId: bow.id,
             infusedItemIds: [],
             affixIds: [],
@@ -449,7 +450,8 @@ describe('combatantFromMonster', () => {
       statsPerLevel: zeroStats(),
       combatStats: defaultCombatStats(),
       skills: [],
-    } as MonsterContent;
+      types: [],
+    };
 
     const combatant = combatantFromMonster(monster, 1, 0);
 
@@ -468,12 +470,16 @@ describe('combatantsFromTownGuardians', () => {
     description: '',
     sprite: '0000',
     frames: 4,
+    rarity: 'Common',
     targetting: [{ type: 'Random' }],
     baseStats: zeroStats(),
     statsPerLevel: zeroStats(),
     combatStats: defaultCombatStats(),
     skills: [],
-  } as MonsterContent;
+    types: [],
+    xp: { min: 0, max: 0 },
+    drops: [],
+  };
 
   it('spawns one combatant per entry quantity', () => {
     vi.mocked(getEntry).mockReturnValue(citizen as never);

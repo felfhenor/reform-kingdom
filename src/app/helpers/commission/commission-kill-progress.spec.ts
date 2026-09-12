@@ -10,6 +10,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CaravanId,
   CommissionOfferId,
+  CommissionRequirementMonsterKill,
   GameState,
   MonsterId,
   TownCommissionSlotId,
@@ -98,9 +99,7 @@ describe('commissionRecordMonsterKill', () => {
         commissions: {
           [caravanId]: {
             commissionOfferId: offerId,
-            requirements: [
-              { monsterId: sandWormId, quantity: 5, progress: 1 },
-            ],
+            requirements: [{ monsterId: sandWormId, quantity: 5, progress: 1 }],
             completed: false,
             generatedAt: 1000,
           },
@@ -110,9 +109,11 @@ describe('commissionRecordMonsterKill', () => {
     } as unknown as GameState;
     const result = updateFn(state);
 
-    expect(
-      result.world.commissions[caravanId].requirements[0],
-    ).toEqual({ monsterId: sandWormId, quantity: 5, progress: 2 });
+    expect(result.world.commissions[caravanId].requirements[0]).toEqual({
+      monsterId: sandWormId,
+      quantity: 5,
+      progress: 2,
+    });
   });
 
   it('caps progress at the requirement quantity instead of overflowing', () => {
@@ -133,9 +134,7 @@ describe('commissionRecordMonsterKill', () => {
         commissions: {
           [caravanId]: {
             commissionOfferId: offerId,
-            requirements: [
-              { monsterId: sandWormId, quantity: 5, progress: 4 },
-            ],
+            requirements: [{ monsterId: sandWormId, quantity: 5, progress: 4 }],
             completed: false,
             generatedAt: 1000,
           },
@@ -146,7 +145,10 @@ describe('commissionRecordMonsterKill', () => {
     const result = updateFn(state);
 
     expect(
-      result.world.commissions[caravanId].requirements[0].progress,
+      (
+        result.world.commissions[caravanId]
+          .requirements[0] as CommissionRequirementMonsterKill
+      ).progress,
     ).toBe(5);
   });
 

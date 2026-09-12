@@ -65,6 +65,8 @@ describe('Global Effect Helper Functions', () => {
     name: 'Healing',
     __type: 'globaleffect',
     description: 'The party is recovering.',
+    sprite: '0000',
+    effects: [],
   };
 
   beforeEach(() => {
@@ -182,6 +184,8 @@ describe('Global Effect Helper Functions', () => {
       name: 'Deaths Door',
       __type: 'globaleffect',
       description: 'The fallen party awaits recall.',
+      sprite: '0000',
+      effects: [],
     };
 
     function mockContentLookup(): void {

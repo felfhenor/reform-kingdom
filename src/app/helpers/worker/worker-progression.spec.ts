@@ -14,6 +14,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { WORKER_MAX_LEVEL } from '@helpers/config';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import { hasGold } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -73,17 +74,16 @@ describe('workerXpForLevel', () => {
 });
 
 describe('workerStatsForLevel', () => {
-  const worker: WorkerContent = {
+  const worker: WorkerContent = ensureWorker({
     id: WORKER_ID,
     name: 'Weaver Nell',
-    __type: 'worker',
     description: 'test',
     sprite: '0000',
     frames: 4,
     baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
     statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
     canUseTeleports: true,
-  };
+  });
 
   it('returns exactly baseStats at level 1', () => {
     expect(workerStatsForLevel(worker, 1)).toEqual({
@@ -115,17 +115,16 @@ describe('statBlockForLevel', () => {
 });
 
 describe('workerMinLevelForStamina', () => {
-  const worker: WorkerContent = {
+  const worker: WorkerContent = ensureWorker({
     id: WORKER_ID,
     name: 'Weaver Nell',
-    __type: 'worker',
     description: 'test',
     sprite: '0000',
     frames: 4,
     baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
     statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
     canUseTeleports: true,
-  };
+  });
 
   it('is 1 when base stamina already covers the requirement', () => {
     expect(workerMinLevelForStamina(worker, 30)).toBe(1);

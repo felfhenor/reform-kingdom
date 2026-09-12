@@ -91,13 +91,24 @@ describe('farmNodeRewardQuantity', () => {
   it('counts owned armory entries for equipment rewards', () => {
     const cloak = 'bone-hewn-cloak' as EquipmentId;
     const owned: EquipmentItem[] = [
-      { id: 'a' as EquipmentItemId, equipmentId: cloak, infusedItemIds: [] },
+      {
+        id: 'a' as EquipmentItemId,
+        equipmentId: cloak,
+        infusedItemIds: [],
+        affixIds: [],
+      },
       {
         id: 'b' as EquipmentItemId,
         equipmentId: 'other' as EquipmentId,
         infusedItemIds: [],
+        affixIds: [],
       },
-      { id: 'c' as EquipmentItemId, equipmentId: cloak, infusedItemIds: [] },
+      {
+        id: 'c' as EquipmentItemId,
+        equipmentId: cloak,
+        infusedItemIds: [],
+        affixIds: [],
+      },
     ];
     vi.mocked(armoryGet).mockReturnValue(owned);
 

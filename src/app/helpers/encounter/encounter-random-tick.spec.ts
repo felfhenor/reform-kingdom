@@ -68,7 +68,9 @@ describe('encounterRandomProcessTick', () => {
     const result = updateFn({
       world: { exploreRandom: {} },
     } as unknown as GameState);
-    expect(result.world.exploreRandom['gobslime-shrine']).toEqual({
+    expect(
+      result.world.exploreRandom['gobslime-shrine' as EncounterRandomId],
+    ).toEqual({
       fights: [],
       generatedAtTick: 1000,
       completedThisCycle: false,

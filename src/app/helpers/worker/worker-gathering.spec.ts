@@ -37,6 +37,11 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
+import {
+  ensureGatherResult,
+  ensureGathering,
+} from '@helpers/content/ensure-gathernode';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -77,37 +82,41 @@ const WORKER_ID = 'weaver-nell' as WorkerId;
 const COPPER_ID = 'copper-ore' as ItemId;
 const MALACHITE_ID = 'malachite' as ItemId;
 
-const workerContent: WorkerContent = {
+const workerContent: WorkerContent = ensureWorker({
   id: WORKER_ID,
   name: 'Weaver Nell',
-  __type: 'worker',
   description: 'test',
   sprite: '0000',
   frames: 4,
   baseStats: { capacity: 6, gatherSpeed: 2, stamina: 30 },
   statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
   canUseTeleports: true,
-};
+});
 
 function buildGathering(
   overrides: Partial<GatheringContent> = {},
 ): GatheringContent {
-  return {
+  return ensureGathering({
     id: 'gathering-1' as never,
     name: 'Wergen Woods',
-    __type: 'gathering',
     description: 'test',
     levelRange: { min: 1, max: 10 },
     xpGainedIfInLevelRange: 5,
     gatherTime: 10,
     gatherResults: [
-      { chance: 80, items: [{ itemId: COPPER_ID, quantity: 1 }] },
-      { chance: 20, items: [{ itemId: MALACHITE_ID, quantity: 1 }] },
+      ensureGatherResult({
+        chance: 80,
+        items: [{ itemId: COPPER_ID, quantity: 1 }],
+      }),
+      ensureGatherResult({
+        chance: 20,
+        items: [{ itemId: MALACHITE_ID, quantity: 1 }],
+      }),
     ],
     hidden: false,
     workerLevelRange: { min: 1, max: 999 },
     ...overrides,
-  };
+  });
 }
 
 describe('workerGatherRate', () => {
@@ -161,7 +170,10 @@ describe('workerGatherRate', () => {
       stamina: 30,
     });
     vi.mocked(gatheringResultsAtLevel).mockReturnValueOnce([
-      { chance: 80, items: [{ itemId: COPPER_ID, quantity: 1 }] },
+      ensureGatherResult({
+        chance: 80,
+        items: [{ itemId: COPPER_ID, quantity: 1 }],
+      }),
     ]);
 
     const gathering = buildGathering();

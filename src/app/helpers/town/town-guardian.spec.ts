@@ -41,6 +41,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     },
     traders: {
       sellItemCount: [{ tier: 0, value: 0 }],
+      itemExpirationTimer: 0,
       markupPercentages: { sell: 0, buy: 0 },
     },
     gathering: {

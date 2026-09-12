@@ -9,6 +9,7 @@ vi.mock('@helpers/item/loot', () => ({
   rollDroppedRewards: vi.fn(() => []),
 }));
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   grantCommissionRewards,
   spendCommissionRequirements,
@@ -24,6 +25,7 @@ import type {
   CommissionRequirement,
   EquipmentId,
   EquipmentItem,
+  EquipmentItemId,
   GameState,
   ItemId,
   RecipeId,
@@ -52,9 +54,24 @@ describe('spendCommissionRequirements', () => {
   it('consumes an equipment requirement from the armory', () => {
     const swordId = 'sword' as EquipmentId;
     const armory: EquipmentItem[] = [
-      { equipmentId: swordId, id: 'a', infusedItemIds: [] },
-      { equipmentId: swordId, id: 'b', infusedItemIds: [] },
-      { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
+      {
+        equipmentId: swordId,
+        id: 'a' as EquipmentItemId,
+        infusedItemIds: [],
+        affixIds: [],
+      },
+      {
+        equipmentId: swordId,
+        id: 'b' as EquipmentItemId,
+        infusedItemIds: [],
+        affixIds: [],
+      },
+      {
+        equipmentId: 'other' as EquipmentId,
+        id: 'c' as EquipmentItemId,
+        infusedItemIds: [],
+        affixIds: [],
+      },
     ];
     const state = { armory } as unknown as GameState;
     const requirements: CommissionRequirement[] = [
@@ -64,7 +81,12 @@ describe('spendCommissionRequirements', () => {
     spendCommissionRequirements(state, requirements);
 
     expect(state.armory).toEqual([
-      { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
+      {
+        equipmentId: 'other' as EquipmentId,
+        id: 'c',
+        infusedItemIds: [],
+        affixIds: [],
+      },
     ]);
   });
 
@@ -93,13 +115,12 @@ describe('grantCommissionRewards', () => {
       description: 'A commission.',
       requirements: [],
       rewards: [
-        {
-          kind: 'Item',
+        ensureDroppedReward({
           itemId: 'trader-token' as ItemId,
           chance: 100,
           min: 2,
           max: 2,
-        },
+        }),
       ],
       townReputationReward: 0,
       specialtyForRecipeId: 'UNKNOWN' as RecipeId,

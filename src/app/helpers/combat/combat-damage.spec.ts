@@ -70,6 +70,8 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     combatStats: {
       repeatActionChance: 0,
@@ -132,6 +134,8 @@ function buildTechnique(
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     elements: [],
     attributes: ['DamagesTarget'],
@@ -159,6 +163,8 @@ describe('combatApplySkillToTarget healing', () => {
         Resistance: 0,
         Strength: 100,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const target = buildCombatant({
@@ -172,6 +178,8 @@ describe('combatApplySkillToTarget healing', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
       combatStats: {
         repeatActionChance: 0,
@@ -197,6 +205,8 @@ describe('combatApplySkillToTarget healing', () => {
         Resistance: 0,
         Strength: 1,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
       attributes: ['HealsTarget', 'NeverMisses', 'BypassDefense'],
     });
@@ -226,6 +236,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 0,
         Strength: 100,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const target = buildCombatant({
@@ -239,6 +251,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 100,
         Strength: 0,
         Vitality: 20,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const skill = buildSkill();
@@ -252,6 +266,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 0,
         Strength: 1,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
 
@@ -279,6 +295,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const target = buildCombatant({
@@ -292,6 +310,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 20,
         Strength: 0,
         Vitality: 100,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const skill = buildSkill();
@@ -305,6 +325,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
 
@@ -332,6 +354,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 0,
         Strength: 100,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const target = buildCombatant({
@@ -344,6 +368,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 100,
         Strength: 0,
         Vitality: 300,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const skill = buildSkill();
@@ -359,6 +385,8 @@ describe('combatApplySkillToTarget defense', () => {
         Resistance: 0,
         Strength: 0.75,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
 
@@ -388,6 +416,8 @@ describe('combatApplySkillToTarget mitigation roll', () => {
         Resistance: 0,
         Strength: 100,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const target = buildCombatant({
@@ -401,6 +431,8 @@ describe('combatApplySkillToTarget mitigation roll', () => {
         Resistance: 0,
         Strength: 0,
         Vitality: 40,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
     const skill = buildSkill();
@@ -414,6 +446,8 @@ describe('combatApplySkillToTarget mitigation roll', () => {
         Resistance: 0,
         Strength: 1,
         Vitality: 0,
+        Constitution: 0,
+        Spirit: 0,
       },
     });
 
@@ -515,6 +549,8 @@ describe('combatApplySkillToTarget status effect resistance', () => {
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     },
     useTargetStats: false,
   };
@@ -626,6 +662,8 @@ describe('combatApplySkillToTarget combat message rendering', () => {
       Resistance: 0,
       Strength: 0,
       Vitality: 0,
+      Constitution: 0,
+      Spirit: 0,
     };
     const attacker = buildCombatant({
       id: 'attacker',
