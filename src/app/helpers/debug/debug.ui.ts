@@ -25,6 +25,7 @@ import {
 } from '@helpers/hero/party';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
+import { gatheringStop } from '@helpers/item/gathering';
 import { addMaterial } from '@helpers/item/materials';
 import { armoryAdd, armoryAddWithAffixes } from '@helpers/kingdom/armory';
 import {
@@ -35,10 +36,12 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
+import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { townMarkVisited } from '@helpers/town/town-visit';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
+import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
@@ -364,6 +367,27 @@ export function debugTelegraphRaid(townId: TownId): void {
   }
 
   telegraphRaid(town);
+}
+
+// Instant relocation, bypassing travel time/pathing entirely - does not trigger arrival
+// side effects (encounters, gathering) since it's a debug jump, not a real arrival.
+export function debugTeleportToNode(nodeName: string): void {
+  const node = worldNodeByName(nodeName);
+  if (!node) {
+    console.warn(`Node "${nodeName}" not found.`);
+    return;
+  }
+
+  const previousMapName = currentLocationGet().mapName;
+
+  gatheringStop();
+  currentLocationSet({ mapName: node.mapName, x: node.x, y: node.y });
+  townReputationBuffSync(previousMapName, node.mapName);
+
+  updateGamestate((state) => {
+    state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
+    return state;
+  });
 }
 
 export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
