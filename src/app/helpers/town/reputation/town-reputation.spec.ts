@@ -155,6 +155,19 @@ describe('townReputationGain', () => {
       false,
     );
   });
+
+  it('clamps at the max tier threshold rather than climbing past it', async () => {
+    const state = {
+      world: { towns: { [townId]: { reputation: 7050 } } },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    await townReputationGain(townId, 500, 'Trade');
+
+    expect(state.world.towns[townId].reputation).toBe(7100);
+  });
 });
 
 describe('townReputationLose', () => {

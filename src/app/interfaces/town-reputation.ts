@@ -8,6 +8,7 @@ export type TownReputationGainSource =
 export type TownReputationDisplay = {
   reputation: number;
   tierName: string;
+  isMaxed: boolean;
   nextThreshold?: number;
   nextTierName?: string;
 };

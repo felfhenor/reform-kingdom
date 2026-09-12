@@ -17,11 +17,15 @@ import type { TownId } from '@interfaces';
       <app-bar-progress
         color="secondary"
         [value]="repDisplay.reputation"
-        [max]="repDisplay.nextThreshold ?? 100"
+        [max]="repDisplay.nextThreshold ?? repDisplay.reputation"
       >
-        {{ repDisplay.tierName }} [{{ repDisplay.reputation }}/{{
-          repDisplay.nextThreshold ?? 100
-        }}]
+        @if (repDisplay.isMaxed) {
+          {{ repDisplay.tierName }}
+        } @else {
+          {{ repDisplay.tierName }} [{{ repDisplay.reputation }}/{{
+            repDisplay.nextThreshold
+          }}]
+        }
       </app-bar-progress>
     }
   `,

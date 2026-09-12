@@ -14,6 +14,7 @@ export function townReputationDisplay(townId: TownId): TownReputationDisplay {
   return {
     reputation,
     tierName: townReputationTierName(tier),
+    isMaxed: tier >= 4,
     nextThreshold:
       nextTier !== undefined ? TOWN_REPUTATION_THRESHOLDS[nextTier] : undefined,
     nextTierName:

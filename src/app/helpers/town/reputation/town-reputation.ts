@@ -1,6 +1,7 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type { TownId, TownReputationGainSource } from '@interfaces';
+import { clamp } from 'es-toolkit/compat';
 
 // Cumulative reputation needed to reach each tier (0 = Neutral .. 4 = Renowned) - a shared game-balance curve, not authored per-town.
 export const TOWN_REPUTATION_THRESHOLDS: Record<number, number> = {
@@ -10,6 +11,8 @@ export const TOWN_REPUTATION_THRESHOLDS: Record<number, number> = {
   3: 2100,
   4: 7100,
 };
+
+export const TOWN_REPUTATION_MAX = TOWN_REPUTATION_THRESHOLDS[4];
 
 export const TOWN_REPUTATION_TIER_NAMES: Record<number, string> = {
   0: 'Neutral',
@@ -57,7 +60,7 @@ export async function townReputationGain(
     if (!town) return state;
 
     const previousTier = townReputationTierForAmount(town.reputation);
-    town.reputation += amount;
+    town.reputation = clamp(town.reputation + amount, 0, TOWN_REPUTATION_MAX);
     tierChanged =
       townReputationTierForAmount(town.reputation) !== previousTier;
 
@@ -85,7 +88,7 @@ export async function townReputationLose(
     if (!town) return state;
 
     const previousTier = townReputationTierForAmount(town.reputation);
-    town.reputation = Math.max(0, town.reputation - amount);
+    town.reputation = clamp(town.reputation - amount, 0, TOWN_REPUTATION_MAX);
     tierChanged =
       townReputationTierForAmount(town.reputation) !== previousTier;
 
