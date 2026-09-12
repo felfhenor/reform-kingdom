@@ -52,8 +52,8 @@
             @if (repDisplay.isMaxed) {
               {{ repDisplay.tierName }}
             } @else {
-              {{ repDisplay.tierName }} [{{ repDisplay.reputation }}/{{
-                repDisplay.nextThreshold
+              {{ repDisplay.tierName }} [{{ repDisplay.reputation | number }}/{{
+                repDisplay.nextThreshold | number
               }}]
             }
           </app-bar-progress>

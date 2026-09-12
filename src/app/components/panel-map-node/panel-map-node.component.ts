@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
@@ -63,6 +64,7 @@ import { sortBy, sum } from 'es-toolkit/compat';
   selector: 'app-panel-map-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     ButtonCloseComponent,
     SlotCompletionRewardComponent,
     SlotGatherMaterialComponent,

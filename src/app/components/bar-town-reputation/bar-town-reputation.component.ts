@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,7 +12,7 @@ import type { TownId } from '@interfaces';
 @Component({
   selector: 'app-bar-town-reputation',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BarProgressComponent],
+  imports: [BarProgressComponent, DecimalPipe],
   template: `
     @if (display(); as repDisplay) {
       <app-bar-progress
@@ -22,8 +23,8 @@ import type { TownId } from '@interfaces';
         @if (repDisplay.isMaxed) {
           {{ repDisplay.tierName }}
         } @else {
-          {{ repDisplay.tierName }} [{{ repDisplay.reputation }}/{{
-            repDisplay.nextThreshold
+          {{ repDisplay.tierName }} [{{ repDisplay.reputation | number }}/{{
+            repDisplay.nextThreshold | number
           }}]
         }
       </app-bar-progress>

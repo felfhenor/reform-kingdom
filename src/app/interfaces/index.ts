@@ -61,6 +61,7 @@ export * from './storage';
 export * from './tiled-map';
 export * from './timer';
 export * from './town-reputation';
+export * from './town-reputation.ui';
 export * from './town-state';
 export * from './town-worker-state';
 export * from './tradeskill';
