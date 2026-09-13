@@ -1,0 +1,44 @@
+- id: c9b82f94-ba4c-4849-8ce5-4ff0f51277ed
+  name: Victor's Harvest I
+  sprite: '0013'
+  description: +3% chance of item drops from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCombatItemDropRateBoost
+      value: 3
+
+- id: 67f99e60-f542-43e2-a24f-1432fffa5515
+  name: Victor's Harvest II
+  sprite: '0013'
+  description: +6% chance of item drops from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCombatItemDropRateBoost
+      value: 6
+
+- id: ccd3ca2d-e919-4ece-8ba1-8715a4930b5a
+  name: Victor's Harvest III
+  sprite: '0013'
+  description: +9% chance of item drops from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCombatItemDropRateBoost
+      value: 9
+
+- id: 6f0f0736-0f2a-4655-b3a6-a7fa33d80693
+  name: Victor's Harvest IV
+  sprite: '0013'
+  description: +12% chance of item drops from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCombatItemDropRateBoost
+      value: 12
+
+- id: 01a1a9fe-f5b6-485e-9810-731bb443fa98
+  name: Victor's Harvest V
+  sprite: '0013'
+  description: +15% chance of item drops from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCombatItemDropRateBoost
+      value: 15

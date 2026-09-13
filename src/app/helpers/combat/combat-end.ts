@@ -22,7 +22,10 @@ import {
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
-import { rollDroppedRewards } from '@helpers/item/loot';
+import {
+  combatItemDropRateBoost,
+  rollDroppedRewards,
+} from '@helpers/item/loot';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
 import {
   raidResolveDefeat,
@@ -119,8 +122,9 @@ function grantVictoryRewards(combat: Combat): void {
     if (leveledUp) autoModeResetNodeFailureCounts();
   }
 
+  const dropRateBoost = combatItemDropRateBoost();
   const drops = monsters.flatMap(({ monster, level }) =>
-    rollDroppedRewards(monster.drops, level),
+    rollDroppedRewards(monster.drops, level, dropRateBoost),
   );
   grantResolvedDrops(combat, drops);
 }
@@ -139,7 +143,11 @@ function grantEncounterCompletionRewards(combat: Combat): void {
   // The encounter's level is rolled once and applied to every guardian,
   // so the first guardian's level represents it.
   const level = combat.guardians[0]?.level ?? 1;
-  const drops = rollDroppedRewards(encounter.completionRewards, level);
+  const drops = rollDroppedRewards(
+    encounter.completionRewards,
+    level,
+    combatItemDropRateBoost(),
+  );
   grantResolvedDrops(combat, drops);
 }
 

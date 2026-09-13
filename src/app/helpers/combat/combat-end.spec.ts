@@ -61,6 +61,7 @@ vi.mock('@helpers/encounter/encounter', () => ({
 }));
 
 vi.mock('@helpers/item/loot', () => ({
+  combatItemDropRateBoost: vi.fn(() => 0),
   rollDroppedRewards: vi.fn(() => []),
 }));
 
@@ -248,6 +249,7 @@ describe('combatCheckIfOver', () => {
     expect(rollDroppedRewards).toHaveBeenCalledWith(
       encounter.completionRewards,
       1,
+      0,
     );
   });
 

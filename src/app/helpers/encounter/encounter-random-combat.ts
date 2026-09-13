@@ -8,7 +8,10 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { partyGet } from '@helpers/hero/party';
-import { rollDroppedRewards } from '@helpers/item/loot';
+import {
+  combatItemDropRateBoost,
+  rollDroppedRewards,
+} from '@helpers/item/loot';
 import { updateGamestate } from '@helpers/state-game';
 import {
   worldNodeByName,
@@ -82,7 +85,11 @@ function grantEncounterRandomCompletionRewards(combat: Combat): void {
   // guardian at `encounterRandomStartFight` time, so the first guardian's
   // level represents it - same convention as the static-encounter path.
   const level = combat.guardians[0]?.level ?? 1;
-  const drops = rollDroppedRewards(content.completionRewards, level);
+  const drops = rollDroppedRewards(
+    content.completionRewards,
+    level,
+    combatItemDropRateBoost(),
+  );
   grantResolvedDrops(combat, drops);
 
   markEncounterRandomCompleted(combat.encounterRandomId);

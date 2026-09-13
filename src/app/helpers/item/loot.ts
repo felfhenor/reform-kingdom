@@ -1,6 +1,7 @@
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
+import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { rngNumberRange } from '@helpers/rng';
@@ -13,6 +14,16 @@ import type {
   ResolvedEquipmentDrop,
   ResolvedWorkerDrop,
 } from '@interfaces';
+import { clamp, sumBy } from 'es-toolkit/compat';
+
+// Sums every active `GlobalCombatItemDropRateBoost` effect into one flat percent - 0 with none active.
+export function combatItemDropRateBoost(): number {
+  return sumBy(
+    activeGlobalEffects().flatMap((effect) => effect.effects),
+    (effect) =>
+      effect.effectType === 'GlobalCombatItemDropRateBoost' ? effect.value : 0,
+  );
+}
 
 // Shared exhaustiveness helper for `switch (x.kind)` blocks over
 // DroppedReward/ResolvedDrop - a missing case fails to compile here (via the
@@ -44,8 +55,10 @@ export function rewardDisplayOrder(reward: DroppedReward): number {
 function resolveDrop(
   drop: DroppedReward,
   level: number,
+  bonusChancePercent: number,
 ): ResolvedDrop | undefined {
-  const shouldDrop = rngNumberRange(0, 100) < drop.chance;
+  const chance = clamp(drop.chance + bonusChancePercent, 0, 100);
+  const shouldDrop = rngNumberRange(0, 100) < chance;
   if (!shouldDrop) return undefined;
 
   switch (drop.kind) {
@@ -71,6 +84,7 @@ function resolveDrop(
 export function rollDroppedRewards(
   rewards: DroppedReward[],
   level: number,
+  bonusChancePercent = 0,
 ): ResolvedDrop[] {
   return rewards
     .filter(
@@ -78,7 +92,7 @@ export function rollDroppedRewards(
         (drop.minLevel ?? 0) <= level &&
         (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level,
     )
-    .map((drop) => resolveDrop(drop, level))
+    .map((drop) => resolveDrop(drop, level, bonusChancePercent))
     .filter((drop): drop is ResolvedDrop => !!drop);
 }
 

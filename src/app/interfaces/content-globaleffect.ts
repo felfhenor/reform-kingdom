@@ -43,13 +43,20 @@ export type GlobalEffectEffectDebuffResistanceTag = {
   value: number;
 };
 
+// Adds `value` (a flat percent) to item drop chance rolls from combat sources only.
+export type GlobalEffectEffectCombatItemDropRateBoost = {
+  effectType: 'GlobalCombatItemDropRateBoost';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainCombatStat
   | GlobalEffectEffectXPGainMultiplier
   | GlobalEffectEffectGoldGainMultiplier
   | GlobalEffectEffectDebuffResistance
-  | GlobalEffectEffectDebuffResistanceTag;
+  | GlobalEffectEffectDebuffResistanceTag
+  | GlobalEffectEffectCombatItemDropRateBoost;
 
 export type GlobalEffectContent = IsContentItem &
   HasDescription &

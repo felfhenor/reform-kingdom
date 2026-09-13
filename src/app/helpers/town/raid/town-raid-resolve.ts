@@ -18,7 +18,10 @@ import {
 } from '@helpers/engine/analytics';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
-import { rollDroppedRewards } from '@helpers/item/loot';
+import {
+  combatItemDropRateBoost,
+  rollDroppedRewards,
+} from '@helpers/item/loot';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
@@ -52,7 +55,11 @@ export function raidResolveVictory(combat: Combat, townId: TownId): void {
 
   analyticsSendDesignEvent(`Town:Raid:Win:${analyticsSafeSegment(town.name)}`);
 
-  const drops = rollDroppedRewards(town.defense.rewards, town.level);
+  const drops = rollDroppedRewards(
+    town.defense.rewards,
+    town.level,
+    combatItemDropRateBoost(),
+  );
   grantResolvedDrops(combat, drops);
 
   // Not awaited: this always runs inside a tick, where updateGamestate mutates synchronously,

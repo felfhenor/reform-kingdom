@@ -31,6 +31,8 @@ export function globalEffectEffectsDescription(
           return `All Debuff Resist: +${effect.value}%`;
         case 'DebuffResistanceTag':
           return `${StatusEffectTagDimension.label[effect.tag]}: +${effect.value}%`;
+        case 'GlobalCombatItemDropRateBoost':
+          return `Item Drop Chance: +${effect.value}%`;
       }
     })
     .join(', ');

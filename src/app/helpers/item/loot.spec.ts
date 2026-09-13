@@ -19,9 +19,15 @@ vi.mock('@helpers/worker/worker-progression', () => ({
   })),
 }));
 
+vi.mock('@helpers/hero/global-effects', () => ({
+  activeGlobalEffects: vi.fn(() => []),
+}));
+
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import {
   applyResolvedDropToState,
+  combatItemDropRateBoost,
   rewardDisplayOrder,
   rollDroppedRewards,
 } from '@helpers/item/loot';
@@ -30,6 +36,7 @@ import type {
   DroppedReward,
   EquipmentId,
   GameState,
+  GlobalEffect,
   ItemId,
   RecipeId,
   ResolvedDrop,
@@ -176,6 +183,62 @@ describe('Loot Helper Functions', () => {
 
     it('should return an empty array for an empty reward list', () => {
       expect(rollDroppedRewards([], 1)).toEqual([]);
+    });
+
+    it('should add bonusChancePercent to the drop chance before rolling', () => {
+      const rewards: DroppedReward[] = [
+        ensureDroppedReward({
+          equipmentId: cloakId,
+          chance: 0,
+        }),
+      ];
+
+      const drops = rollDroppedRewards(rewards, 5, 100);
+      expect(drops).toEqual([{ equipmentId: cloakId, kind: 'Equipment' }]);
+    });
+
+    it('should clamp a boosted chance at 100', () => {
+      const rewards: DroppedReward[] = [
+        ensureDroppedReward({
+          equipmentId: cloakId,
+          chance: 50,
+        }),
+      ];
+
+      for (let i = 0; i < 50; i++) {
+        const drops = rollDroppedRewards(rewards, 5, 500);
+        expect(drops).toEqual([{ equipmentId: cloakId, kind: 'Equipment' }]);
+      }
+    });
+  });
+
+  describe('combatItemDropRateBoost', () => {
+    it('returns 0 with no active effects', () => {
+      vi.mocked(activeGlobalEffects).mockReturnValue([]);
+      expect(combatItemDropRateBoost()).toBe(0);
+    });
+
+    it('sums active GlobalCombatItemDropRateBoost effect values', () => {
+      vi.mocked(activeGlobalEffects).mockReturnValue([
+        {
+          effects: [{ effectType: 'GlobalCombatItemDropRateBoost', value: 3 }],
+        } as GlobalEffect,
+        {
+          effects: [{ effectType: 'GlobalCombatItemDropRateBoost', value: 6 }],
+        } as GlobalEffect,
+      ]);
+
+      expect(combatItemDropRateBoost()).toBe(9);
+    });
+
+    it('ignores active effects of other types', () => {
+      vi.mocked(activeGlobalEffects).mockReturnValue([
+        {
+          effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
+        } as GlobalEffect,
+      ]);
+
+      expect(combatItemDropRateBoost()).toBe(0);
     });
   });
 

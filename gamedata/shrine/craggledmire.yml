@@ -1,0 +1,66 @@
+- id: b5a20feb-f212-439d-a333-ceef70b84705
+  name: Shrine of Parcilyte
+  description: A shrine dedicated to a war hero whose origins are lost to time. It's said that orcs come here to pray for battle spoils.
+
+  levels:
+    - costs:
+        - itemId: Miremetal Ore
+          required: 50
+
+        - itemId: Mirewood
+          required: 100
+
+        - itemId: Mireweed
+          required: 100
+
+      globalEffectId: Victor's Harvest I
+      globalEffectDuration: 1800
+
+    - costs:
+        - itemId: Peridot
+          required: 50
+
+        - itemId: Spirit Flesh
+          required: 50
+
+        - itemId: Oozehide
+          required: 50
+
+      globalEffectId: Victor's Harvest II
+      globalEffectDuration: 3600
+
+    - costs:
+        - itemId: Miremetal Ingot
+          required: 150
+
+        - itemId: Mirethread
+          required: 150
+
+      globalEffectId: Victor's Harvest III
+      globalEffectDuration: 7200
+
+    - costs:
+        - itemId: Mirewood
+          required: 200
+
+        - itemId: Peridot
+          required: 75
+
+        - itemId: Oozehide
+          required: 75
+
+      globalEffectId: Victor's Harvest IV
+      globalEffectDuration: 14400
+
+    - costs:
+        - itemId: Ghostcopper Dust
+          required: 100
+
+        - itemId: Ghost Peridot
+          required: 250
+
+        - itemId: Ghostwood
+          required: 250
+
+      globalEffectId: Victor's Harvest V
+      globalEffectDuration: 31536000

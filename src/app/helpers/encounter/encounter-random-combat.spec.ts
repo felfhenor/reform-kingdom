@@ -21,6 +21,7 @@ vi.mock('@helpers/encounter/encounter-random', () => ({
 }));
 
 vi.mock('@helpers/item/loot', () => ({
+  combatItemDropRateBoost: vi.fn(() => 0),
   rollDroppedRewards: vi.fn(),
 }));
 
@@ -210,6 +211,7 @@ describe('encounterRandomHandleVictory', () => {
     expect(rollDroppedRewards).toHaveBeenCalledWith(
       content.completionRewards,
       16,
+      0,
     );
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, [
       { collectibleId: 'gobslime-flower' },

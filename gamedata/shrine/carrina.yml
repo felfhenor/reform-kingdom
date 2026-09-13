@@ -1,5 +1,5 @@
 - id: 8e7cc8d1-ffce-4ec9-876e-a194713bf08a
-  name: Founder's Shrine
+  name: Shrine of the Founder
   description: A shrine dedicated to the founder of the Duchy of Carrina. It helps new adventurers and old ones alike to recognize their experiences and learn more from them.
 
   levels:
@@ -75,7 +75,7 @@
       globalEffectDuration: 31536000
 
 - id: 21a576a8-b4d2-467c-8a06-d7020757ec25
-  name: Merchant's Shrine
+  name: Shrine of Izchak
   description: A shrine erected by local merchants. They say that praying here increases your wealth.
 
   levels:

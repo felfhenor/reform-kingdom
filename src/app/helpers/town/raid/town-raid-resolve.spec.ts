@@ -31,6 +31,7 @@ vi.mock('@helpers/item/item-preview', () => ({
 }));
 
 vi.mock('@helpers/item/loot', () => ({
+  combatItemDropRateBoost: vi.fn(() => 0),
   rollDroppedRewards: vi.fn(() => []),
 }));
 
@@ -155,6 +156,7 @@ describe('raidResolveVictory', () => {
     expect(rollDroppedRewards).toHaveBeenCalledWith(
       buildTown().defense.rewards,
       25,
+      0,
     );
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, drops);
     expect(townReputationGain).toHaveBeenCalledWith(townId, 100, 'RaidDefense');
