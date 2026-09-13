@@ -14,6 +14,10 @@
     Accuracy: 10
     Stun: 5
 
+  gatherYieldBonuses:
+    - tradeskillId: Tailoring
+      value: 1
+
 - id: 8fa9341d-fa92-448c-a5fe-539e711cfd75
   name: Desert Heatcharm
   description: A small charm containing firmwater that helps the wearer stay hydrated in the scorching heat.
@@ -29,3 +33,7 @@
 
   debuffResistances:
     Burn: 15
+
+  gatherYieldBonuses:
+    - tradeskillId: Woodworking
+      value: 1
