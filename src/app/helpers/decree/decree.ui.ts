@@ -1,7 +1,7 @@
 import { getEntry } from '@helpers/content/content';
 import { decreeClauseConflicts, decreeClauses } from '@helpers/decree/decree';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { updateGamestate } from '@helpers/state-game';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   DecreeClause,
@@ -9,6 +9,10 @@ import type {
   DecreeClauseId,
   ItemContent,
 } from '@interfaces';
+
+export function decreeActiveClauseId(): DecreeClauseId | undefined {
+  return gamestate().world.autoMode.activeClauseId;
+}
 
 export function decreeSetWaitForFullHealthBeforeCombat(value: boolean): void {
   updateGamestate((state) => {

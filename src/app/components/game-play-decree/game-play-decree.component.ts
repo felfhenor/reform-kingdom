@@ -29,6 +29,7 @@ import {
   farmNodeRewardOptions,
 } from '@helpers/decree/decree-farm-node.ui';
 import {
+  decreeActiveClauseId,
   decreeClauseRemove,
   decreeClauseUpdate,
   decreeSetWaitForFullEnergyBeforeCombat,
@@ -129,6 +130,7 @@ export class GamePlayDecreeComponent {
     decreeWaitForFullEnergyBeforeCombat(),
   );
   public clauses = computed(() => decreeClauses());
+  public activeClauseId = computed(() => decreeActiveClauseId());
 
   public homeDisplayName = computed(() => {
     const home = homeNodeGet();
