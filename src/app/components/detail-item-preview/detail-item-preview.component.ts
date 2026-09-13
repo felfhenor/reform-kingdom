@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
+import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import {
   type CombatStatBlock,
   type ItemPreviewDisplay,
+  type MonsterType,
   type StatBlock,
   type StatusEffectBlock,
 } from '@interfaces';
@@ -19,6 +21,7 @@ import {
     RowStatSummaryComponent,
     SlotIconBlankComponent,
     AtlasImageComponent,
+    RowGatherYieldBonusesComponent,
   ],
   templateUrl: './detail-item-preview.component.html',
   styleUrl: './detail-item-preview.component.scss',
@@ -29,12 +32,14 @@ export class DetailItemPreviewComponent {
   public bonusStats = input<StatBlock>();
   public bonusResistances = input<StatusEffectBlock>();
   public bonusCombatStats = input<CombatStatBlock>();
+  public bonusMonsterTypeDamage = input<Record<MonsterType, number>>();
 
   // When set, stat/resistance/combat-stat rows show a colored delta badge
   // against this baseline (equip-picker's two-column comparison).
   public comparisonStats = input<StatBlock>();
   public comparisonResistances = input<StatusEffectBlock>();
   public comparisonCombatStats = input<CombatStatBlock>();
+  public comparisonMonsterTypeDamage = input<Record<MonsterType, number>>();
 
   public showEquippableBy = input<boolean>(true);
   public showDescription = input<boolean>(true);

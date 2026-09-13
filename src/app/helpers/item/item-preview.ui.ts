@@ -1,11 +1,13 @@
 import {
   defaultCombatStats,
+  defaultMonsterTypeDamageBonus,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
 import type {
   CombatStatBlock,
   ItemPreviewDisplay,
+  MonsterType,
   StatBlock,
   StatusEffectBlock,
 } from '@interfaces';
@@ -42,5 +44,14 @@ export function itemPreviewTotalCombatStats(
   return mergeBlock(
     display.combatStats ?? defaultCombatStats(),
     display.bonusCombatStats,
+  );
+}
+
+export function itemPreviewTotalMonsterTypeDamage(
+  display: ItemPreviewDisplay,
+): Record<MonsterType, number> {
+  return mergeBlock(
+    display.monsterTypeDamage ?? defaultMonsterTypeDamageBonus(),
+    display.bonusMonsterTypeDamage,
   );
 }

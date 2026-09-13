@@ -9,6 +9,7 @@ import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
 import {
   equipmentAffixEffects,
+  equipmentGatherYieldBonuses,
   equipmentStatTotals,
   newEquipmentItem,
   pruneInvalidEquippedItems,
@@ -21,6 +22,7 @@ import type {
   CharacterId,
   EquipmentBlock,
   EquipmentContent,
+  GatherYieldBonus,
   JobContent,
   JobId,
   StatBlock,
@@ -114,6 +116,13 @@ export function partyGet(): Character[] {
 export function partyAffixEffects(): AffixEffect[] {
   return partyGet().flatMap((character) =>
     equipmentAffixEffects(character.equipment),
+  );
+}
+
+// Base + infusion + affix gather yield bonuses across the whole party's equipped gear.
+export function partyGatherYieldBonuses(): GatherYieldBonus[] {
+  return partyGet().flatMap((character) =>
+    equipmentGatherYieldBonuses(character.equipment),
   );
 }
 

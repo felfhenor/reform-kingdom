@@ -1,20 +1,28 @@
 import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
+  defaultMonsterTypeDamageBonus,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
+import {
+  affixEffectsOfKind,
+  affixEffectSum,
+  equipmentItemAffixEffects,
+} from '@helpers/item/affix';
 import type {
   CombatStatBlock,
   EquipmentBonusDimension,
+  EquipmentContent,
   EquipmentItem,
+  GatherYieldBonus,
   ItemContent,
   ItemId,
+  MonsterType,
   StatBlock,
   StatusEffectTag,
 } from '@interfaces';
-import { sumBy } from 'es-toolkit/compat';
+import { groupBy, sumBy } from 'es-toolkit/compat';
 
 // One `EquipmentBonusDimension` per keyed numeric block gear can grant - a
 // new dimension is just a new constant here, every function below is generic.
@@ -47,6 +55,18 @@ export const COMBAT_STAT_BONUS: EquipmentBonusDimension<keyof CombatStatBlock> =
       ),
   };
 
+export const MONSTER_TYPE_DAMAGE_BONUS: EquipmentBonusDimension<MonsterType> = {
+  defaultBlock: defaultMonsterTypeDamageBonus,
+  equipmentBlock: (content) => content.monsterTypeDamage,
+  infusionBlock: (content) => content.infusionMonsterTypeDamage,
+  affixBonusFor: (affixEffects, key) =>
+    affixEffectSum(
+      affixEffects,
+      'MonsterTypeDamage',
+      (effect) => effect.monsterType === key,
+    ),
+};
+
 // Sums one dimension's infusion bonus across every non-empty slot.
 export function equipmentItemInfusionTotals<K extends string>(
   infusedItemIds: (ItemId | null)[],
@@ -67,6 +87,38 @@ export function equipmentItemInfusionTotals<K extends string>(
   });
 
   return bonus;
+}
+
+// GatherYield isn't a fixed-key dimension (TradeskillId is dynamic content), so it can't reuse `equipmentItemInfusionTotals` above.
+export function equipmentItemInfusionGatherYieldBonuses(
+  infusedItemIds: (ItemId | null)[],
+): GatherYieldBonus[] {
+  return infusedItemIds.flatMap((itemId) => {
+    if (!itemId) return [];
+    return getEntry<ItemContent>(itemId)?.infusionGatherYieldBonuses ?? [];
+  });
+}
+
+// Base (equipment content) plus infusion plus any rolled affix, merged by tradeskill - same "everything this item grants" shape as `equipmentItemBonusTotals` below, just array-based since GatherYield can't key off a fixed enum/`EquipmentBonusDimension`.
+export function equipmentItemGatherYieldBonuses(
+  content: EquipmentContent,
+  item?: EquipmentItem,
+): GatherYieldBonus[] {
+  const infusionBonuses = item
+    ? equipmentItemInfusionGatherYieldBonuses(item.infusedItemIds)
+    : [];
+  const affixBonuses = item
+    ? affixEffectsOfKind(equipmentItemAffixEffects(item), 'GatherYield')
+    : [];
+  const grouped = groupBy(
+    [...(content.gatherYieldBonuses ?? []), ...infusionBonuses, ...affixBonuses],
+    (bonus) => bonus.tradeskillId,
+  );
+
+  return Object.entries(grouped).map(([tradeskillId, bonuses]) => ({
+    tradeskillId: tradeskillId as GatherYieldBonus['tradeskillId'],
+    value: sumBy(bonuses, (bonus) => bonus.value),
+  }));
 }
 
 // Weights a (possibly partial) dimension block by a same-keyed multiplier table, e.g. VALUE_MULTIPLIER_PER_STAT - used by both infusion cost and armory sell value.

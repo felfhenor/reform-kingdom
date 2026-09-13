@@ -5,6 +5,7 @@ import {
 import {
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
+  MONSTER_TYPE_DAMAGE_BONUS,
   RESISTANCE_BONUS,
   STAT_BONUS,
 } from '@helpers/item/equipment-bonus';
@@ -13,6 +14,7 @@ import type {
   EquipmentContent,
   EquipmentItem,
   EquipmentSkillId,
+  MonsterType,
   StatBlock,
   StatusEffectBlock,
 } from '@interfaces';
@@ -33,6 +35,12 @@ export function equipmentItemBonusCombatStats(
   item: EquipmentItem,
 ): CombatStatBlock {
   return equipmentItemBonusTotals(item, COMBAT_STAT_BONUS);
+}
+
+export function equipmentItemBonusMonsterTypeDamage(
+  item: EquipmentItem,
+): Record<MonsterType, number> {
+  return equipmentItemBonusTotals(item, MONSTER_TYPE_DAMAGE_BONUS);
 }
 
 // Content-granted skills plus any GrantSkill affix rolled on this specific item, deduped.

@@ -1,5 +1,7 @@
+import { ensureArray } from '@helpers/content/ensure-helpers-core';
 import {
   ensureCombatStats,
+  ensureMonsterTypeDamage,
   ensureStats,
   ensureTagResistances,
 } from '@helpers/content/ensure-helpers-stats';
@@ -8,9 +10,21 @@ import type {
   CollectibleId,
   EquipmentContent,
   EquipmentId,
+  GatherYieldBonus,
   ItemContent,
   ItemId,
+  TradeskillId,
 } from '@interfaces';
+
+function ensureGatherYieldBonus(
+  bonus: Record<string, unknown> = {},
+): GatherYieldBonus {
+  return {
+    tradeskillId:
+      (bonus['tradeskillId'] as TradeskillId) ?? ('UNKNOWN' as TradeskillId),
+    value: (bonus['value'] as number) ?? 0,
+  };
+}
 
 export function ensureCollectible(
   collectible: Partial<CollectibleContent>,
@@ -39,6 +53,11 @@ export function ensureEquipment(
     baseStats: ensureStats(equipment.baseStats),
     debuffResistances: ensureTagResistances(equipment.debuffResistances),
     combatStats: ensureCombatStats(equipment.combatStats),
+    monsterTypeDamage: ensureMonsterTypeDamage(equipment.monsterTypeDamage),
+    gatherYieldBonuses: ensureArray(
+      equipment.gatherYieldBonuses,
+      ensureGatherYieldBonus,
+    ),
     sprite: equipment.sprite ?? 'UNKNOWN',
     type: equipment.type ?? 'Accessory',
     // Defaults to 0, not 1 - infusion slots must always be explicitly
@@ -63,6 +82,13 @@ export function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
       item.infusionDebuffResistances,
     ),
     infusionCombatStats: ensureCombatStats(item.infusionCombatStats),
+    infusionMonsterTypeDamage: ensureMonsterTypeDamage(
+      item.infusionMonsterTypeDamage,
+    ),
+    infusionGatherYieldBonuses: ensureArray(
+      item.infusionGatherYieldBonuses,
+      ensureGatherYieldBonus,
+    ),
     unobtainable: item.unobtainable ?? false,
   };
 }

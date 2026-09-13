@@ -32,6 +32,7 @@ import {
   characterTagResistances,
   equipmentAffixEffects,
   equipmentCombatStatTotals,
+  equipmentGatherYieldBonuses,
   equipmentGrantedSkillIds,
   equipmentMonsterTypeDamageTotals,
   equipmentStatTotals,
@@ -613,6 +614,78 @@ describe('Equipment Helper Functions', () => {
       });
 
       expect(totals.Humanoid).toBe(20);
+    });
+
+    it("sums a base equipment monsterTypeDamage bonus alongside a rolled affix's value", () => {
+      const humanoidSlayerSword: EquipmentContent = {
+        ...sword,
+        monsterTypeDamage: { ...zeroMonsterTypeDamage, Humanoid: 25 },
+      };
+      const humanoidHurtingAffix = {
+        id: 'affix-humanoid-hurting' as never,
+        rarity: 'Common',
+        family: 'HumanoidSlaying',
+        effects: [
+          { kind: 'MonsterTypeDamage', monsterType: 'Humanoid', value: 10 },
+        ],
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) =>
+          (id === 'sword'
+            ? humanoidSlayerSword
+            : id === humanoidHurtingAffix.id
+              ? humanoidHurtingAffix
+              : undefined) as never,
+      );
+
+      const totals = equipmentMonsterTypeDamageTotals({
+        ...emptyEquipment,
+        Weapon: {
+          ...mockEquipmentItem(humanoidSlayerSword.id),
+          affixIds: [humanoidHurtingAffix.id],
+        },
+      });
+
+      expect(totals.Humanoid).toBe(35);
+    });
+  });
+
+  describe('equipmentGatherYieldBonuses', () => {
+    it('returns an empty array when nothing is equipped', () => {
+      expect(equipmentGatherYieldBonuses(emptyEquipment)).toEqual([]);
+    });
+
+    it("collects each equipped item's base gatherYieldBonuses", () => {
+      const woodworkingTrinket: EquipmentContent = {
+        ...sword,
+        id: 'trinket' as EquipmentId,
+        gatherYieldBonuses: [
+          { tradeskillId: 'Woodworking' as never, value: 1 },
+        ],
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) => (id === 'trinket' ? woodworkingTrinket : undefined) as never,
+      );
+
+      expect(
+        equipmentGatherYieldBonuses({
+          ...emptyEquipment,
+          Ring: mockEquipmentItem(woodworkingTrinket.id),
+        }),
+      ).toEqual([{ tradeskillId: 'Woodworking', value: 1 }]);
+    });
+
+    it('ignores equipped items with no gatherYieldBonuses', () => {
+      vi.mocked(getEntry).mockImplementation(
+        (id) => (id === 'sword' ? sword : undefined) as never,
+      );
+
+      expect(
+        equipmentGatherYieldBonuses({
+          ...emptyEquipment,
+          Weapon: mockEquipmentItem(sword.id),
+        }),
+      ).toEqual([]);
     });
   });
 

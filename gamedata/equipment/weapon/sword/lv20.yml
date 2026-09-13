@@ -12,3 +12,5 @@
   baseStats:
     Strength: 9.7
     Agility: 9.7
+  monsterTypeDamage:
+    Humanoid: 15

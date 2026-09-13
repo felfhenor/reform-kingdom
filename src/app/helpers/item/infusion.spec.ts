@@ -6,6 +6,7 @@ import type {
   EquipmentItemId,
   ItemContent,
   ItemId,
+  TradeskillId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -113,6 +114,37 @@ const vengeanceShard: ItemContent = {
   },
 };
 
+// MonsterTypeDamage-only material - no infusionStats at all, only infusionMonsterTypeDamage.
+const fangShard: ItemContent = {
+  id: 'fang-shard' as ItemId,
+  name: 'Fang Shard',
+  __type: 'item',
+  description: '',
+  sprite: '0033',
+  rarity: 'Common',
+  infusionMonsterTypeDamage: {
+    Humanoid: 0,
+    Demon: 0,
+    Amalgamation: 0,
+    Insect: 0,
+    Beast: 10,
+    Spirit: 0,
+  },
+};
+
+// GatherYield-only material - no infusionStats at all, only infusionGatherYieldBonuses.
+const woodShard: ItemContent = {
+  id: 'wood-shard' as ItemId,
+  name: 'Wood Shard',
+  __type: 'item',
+  description: '',
+  sprite: '0034',
+  rarity: 'Common',
+  infusionGatherYieldBonuses: [
+    { tradeskillId: 'Woodworking' as TradeskillId, value: 1 },
+  ],
+};
+
 const sword: EquipmentContent = {
   id: 'sword' as EquipmentId,
   name: 'Sword',
@@ -151,6 +183,8 @@ function mockContentEntry(id: string) {
   if (id === plainMaterial.id) return plainMaterial;
   if (id === spiritFlesh.id) return spiritFlesh;
   if (id === vengeanceShard.id) return vengeanceShard;
+  if (id === fangShard.id) return fangShard;
+  if (id === woodShard.id) return woodShard;
   if (id === sword.id) return sword;
   return undefined;
 }
@@ -336,6 +370,41 @@ describe('Infusion Helper Functions', () => {
         }),
       ).toBe(false);
     });
+
+    it('is true when only infusionMonsterTypeDamage has a nonzero value (no infusionStats at all)', () => {
+      expect(isInfusionMaterial(fangShard)).toBe(true);
+    });
+
+    it('is false when infusionMonsterTypeDamage is present but all zero', () => {
+      expect(
+        isInfusionMaterial({
+          ...plainMaterial,
+          infusionMonsterTypeDamage: {
+            Humanoid: 0,
+            Demon: 0,
+            Amalgamation: 0,
+            Insect: 0,
+            Beast: 0,
+            Spirit: 0,
+          },
+        }),
+      ).toBe(false);
+    });
+
+    it('is true when only infusionGatherYieldBonuses has a nonzero value (no infusionStats at all)', () => {
+      expect(isInfusionMaterial(woodShard)).toBe(true);
+    });
+
+    it('is false when infusionGatherYieldBonuses is present but all zero', () => {
+      expect(
+        isInfusionMaterial({
+          ...plainMaterial,
+          infusionGatherYieldBonuses: [
+            { tradeskillId: 'Woodworking' as TradeskillId, value: 0 },
+          ],
+        }),
+      ).toBe(false);
+    });
   });
 
   describe('infusionMaterialCost', () => {
@@ -365,6 +434,16 @@ describe('Infusion Helper Functions', () => {
 
     it('costs 0 when the item has no infusionStats', () => {
       expect(infusionMaterialCost(plainMaterial.id)).toBe(0);
+    });
+
+    // fangShard grants +10 Beast damage; VALUE_MULTIPLIER_PER_MONSTER_TYPE.Beast is 5, GOLD_PER_MONSTER_TYPE_DAMAGE_POINT is 50: 50 * 10 * 5 = 2500g.
+    it('costs GOLD_PER_MONSTER_TYPE_DAMAGE_POINT per point, scaled by VALUE_MULTIPLIER_PER_MONSTER_TYPE for the type', () => {
+      expect(infusionMaterialCost(fangShard.id)).toBe(2500);
+    });
+
+    // woodShard grants +1 Woodworking yield; GOLD_PER_GATHER_YIELD_POINT is 200, no per-tradeskill weighting: 200 * 1 = 200g.
+    it('costs GOLD_PER_GATHER_YIELD_POINT per point of GatherYield value, unweighted', () => {
+      expect(infusionMaterialCost(woodShard.id)).toBe(200);
     });
   });
 
@@ -408,6 +487,14 @@ describe('Infusion Helper Functions', () => {
       expect(canInfuseEquipmentItem(swordItem, 0, vengeanceShard.id)).toBe(
         true,
       );
+    });
+
+    it('allows a monster-type-damage-only material (no infusionStats)', () => {
+      expect(canInfuseEquipmentItem(swordItem, 0, fangShard.id)).toBe(true);
+    });
+
+    it('allows a gather-yield-only material (no infusionStats)', () => {
+      expect(canInfuseEquipmentItem(swordItem, 0, woodShard.id)).toBe(true);
     });
 
     it('rejects when the player does not own the material', () => {

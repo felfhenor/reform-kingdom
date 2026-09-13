@@ -9,3 +9,6 @@
   baseStats:
     Health: 35
     Energy: 15
+  gatherYieldBonuses:
+    - tradeskillId: Blacksmithing
+      value: 1

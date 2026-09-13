@@ -44,6 +44,8 @@ export type AffixEffectGatherYield = {
   value: number; // flat bonus quantity per successful gather
 };
 
+export type GatherYieldBonus = Omit<AffixEffectGatherYield, 'kind'>;
+
 export type AffixEffectSellValue = {
   kind: 'SellValue';
   value: number; // flat gold added to armory sell price

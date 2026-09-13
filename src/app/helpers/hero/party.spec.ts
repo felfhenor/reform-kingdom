@@ -39,6 +39,7 @@ import {
   createCharacter,
   isPartyAtFullHealth,
   partyAffixEffects,
+  partyGatherYieldBonuses,
   partyGet,
   pruneInvalidPartyEquipment,
   setParty,
@@ -529,6 +530,48 @@ describe('Party Helper Functions', () => {
       } as unknown as GameState);
 
       expect(partyAffixEffects()).toEqual([]);
+    });
+  });
+
+  describe('partyGatherYieldBonuses', () => {
+    const woodworkingTrinket: EquipmentContent = {
+      id: 'trinket' as EquipmentId,
+      name: 'Trinket',
+      __type: 'equipment',
+      description: '',
+      sprite: '0000',
+      rarity: 'Common',
+      levelRequirement: 1,
+      baseStats: defaultStats(),
+      type: 'Trinket',
+      slots: 0,
+      grantedSkillIds: [],
+      gatherYieldBonuses: [{ tradeskillId: 'Woodworking' as never, value: 1 }],
+    };
+
+    it('collects base gatherYieldBonuses across every party member', () => {
+      mockGetEntry(mockJob, woodworkingTrinket);
+      const hero = createCharacterStub('Jala');
+      hero.equipment = {
+        ...defaultEquipment(),
+        Ring: mockEquipmentItem(woodworkingTrinket.id),
+      };
+
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [hero] },
+      } as unknown as GameState);
+
+      expect(partyGatherYieldBonuses()).toEqual(
+        woodworkingTrinket.gatherYieldBonuses,
+      );
+    });
+
+    it('returns an empty array for an empty party', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        world: { party: [] },
+      } as unknown as GameState);
+
+      expect(partyGatherYieldBonuses()).toEqual([]);
     });
   });
 });

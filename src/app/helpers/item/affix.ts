@@ -63,7 +63,7 @@ export function equipmentItemDisplayName(
   return [...prefixNames, baseName, ...suffixNames].join(' ');
 }
 
-// Effect kinds already shown elsewhere in item UI (stat/resistance/combat-stat blocks, granted-skill list, infusion slot count, armory sell value) - their affix's own description would be redundant.
+// Effect kinds already shown elsewhere in item UI (stat/resistance/combat-stat/monster-type-damage blocks, granted-skill list, infusion slot count, armory sell value, gather yield rows) - their affix's own description would be redundant.
 const AFFIX_KINDS_WITH_OWN_DISPLAY = new Set<AffixEffect['kind']>([
   'Stat',
   'CombatStat',
@@ -71,9 +71,11 @@ const AFFIX_KINDS_WITH_OWN_DISPLAY = new Set<AffixEffect['kind']>([
   'GrantSkill',
   'InfusionSlot',
   'SellValue',
+  'MonsterTypeDamage',
+  'GatherYield',
 ]);
 
-// Affix descriptions for effects with no dedicated display elsewhere (gather yield, caravan discounts) - shown as plain text in the item tooltip.
+// Affix descriptions for effects with no dedicated display elsewhere (caravan discounts) - shown as plain text in the item tooltip.
 export function equipmentItemMiscAffixDescriptions(
   item: EquipmentItem,
 ): string[] {

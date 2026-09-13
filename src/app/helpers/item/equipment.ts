@@ -1,15 +1,15 @@
 import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
-import { defaultMonsterTypeDamageBonus } from '@helpers/defaults';
 import {
   affixEffectsOfKind,
-  affixEffectSum,
   equipmentItemAffixEffects,
   rollAffixIds,
 } from '@helpers/item/affix';
 import {
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
+  equipmentItemGatherYieldBonuses,
+  MONSTER_TYPE_DAMAGE_BONUS,
   RESISTANCE_BONUS,
   STAT_BONUS,
 } from '@helpers/item/equipment-bonus';
@@ -31,6 +31,7 @@ import type {
   EquipmentItemType,
   EquipmentSkillId,
   EquipmentSlot,
+  GatherYieldBonus,
   JobContent,
   JobId,
   JobStatPriority,
@@ -224,22 +225,21 @@ export function equipmentAffixEffects(
   return equippedItems(equipment).flatMap(equipmentItemAffixEffects);
 }
 
-// Affix-only (no base equipment/infusion component, unlike equipmentStatTotals etc.) - summed per MonsterType for the MonsterTypeDamage combat bonus.
+// Base equipment content plus affixes, summed per MonsterType for the MonsterTypeDamage combat bonus.
 export function equipmentMonsterTypeDamageTotals(
   equipment: EquipmentBlock,
 ): Record<MonsterType, number> {
-  const totals = defaultMonsterTypeDamageBonus();
-  const affixEffects = equipmentAffixEffects(equipment);
+  return equipmentDimensionTotals(equipment, MONSTER_TYPE_DAMAGE_BONUS);
+}
 
-  (Object.keys(totals) as MonsterType[]).forEach((type) => {
-    totals[type] = affixEffectSum(
-      affixEffects,
-      'MonsterTypeDamage',
-      (effect) => effect.monsterType === type,
-    );
+// Base + infusion + affix gather yield bonuses across every equipped item - TradeskillId is dynamic content, so this can't be a fixed-key `EquipmentBonusDimension` like the others.
+export function equipmentGatherYieldBonuses(
+  equipment: EquipmentBlock,
+): GatherYieldBonus[] {
+  return equippedItems(equipment).flatMap((item) => {
+    const content = getEntry<EquipmentContent>(item.equipmentId);
+    return content ? equipmentItemGatherYieldBonuses(content, item) : [];
   });
-
-  return totals;
 }
 
 // Computed on demand (not baked into persisted `Character.stats`, which is

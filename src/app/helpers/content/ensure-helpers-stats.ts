@@ -1,10 +1,12 @@
 import {
   defaultCombatStats,
+  defaultMonsterTypeDamageBonus,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
 import type {
   CombatStatBlock,
+  MonsterType,
   StatBlock,
   StatusEffectBlock,
 } from '@interfaces';
@@ -25,4 +27,10 @@ export function ensureCombatStats(
   combatStats: Partial<CombatStatBlock> = {},
 ): Required<CombatStatBlock> {
   return Object.assign({}, defaultCombatStats(), combatStats);
+}
+
+export function ensureMonsterTypeDamage(
+  bonus: Partial<Record<MonsterType, number>> = {},
+): Record<MonsterType, number> {
+  return Object.assign({}, defaultMonsterTypeDamageBonus(), bonus);
 }

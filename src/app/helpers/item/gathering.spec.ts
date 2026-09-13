@@ -32,7 +32,7 @@ vi.mock('@helpers/item/materials', () => ({
 
 vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(),
-  partyAffixEffects: vi.fn(() => []),
+  partyGatherYieldBonuses: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/rng', () => ({
@@ -63,7 +63,7 @@ import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
-import { partyAffixEffects, partyGet } from '@helpers/hero/party';
+import { partyGatherYieldBonuses, partyGet } from '@helpers/hero/party';
 import {
   canEnterGatherNode,
   currentGatheringContent,
@@ -86,7 +86,6 @@ import {
   worldNodeGathering,
 } from '@helpers/world-node/world-nodes';
 import type {
-  AffixEffect,
   Character,
   GameState,
   GatheringContent,
@@ -357,6 +356,8 @@ describe('gatheringStop', () => {
 describe('gatheringProcessTick', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // `vi.clearAllMocks()` doesn't undo a `mockReturnValue` set by an earlier test, so reset this one explicitly.
+    vi.mocked(partyGatherYieldBonuses).mockReturnValue([]);
   });
 
   it('does nothing when not gathering', () => {
@@ -546,7 +547,7 @@ describe('gatheringProcessTick', () => {
     );
   });
 
-  it("adds a party-wide GatherYield affix bonus matching the node's tradeskill", () => {
+  it("adds a party-wide GatherYield bonus matching the node's tradeskill", () => {
     vi.mocked(gamestate).mockReturnValue({
       world: {
         gathering: {
@@ -579,26 +580,19 @@ describe('gatheringProcessTick', () => {
     vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(partyAffixEffects).mockReturnValue([
-      {
-        kind: 'GatherYield',
-        tradeskillId: 'Woodworking' as TradeskillId,
-        value: 3,
-      },
+    // partyGatherYieldBonuses already combines base equipment + infusion + affix - gathering itself no longer distinguishes the source.
+    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
+      { tradeskillId: 'Woodworking' as TradeskillId, value: 3 },
       // A different tradeskill's bonus must not apply to this result.
-      {
-        kind: 'GatherYield',
-        tradeskillId: 'Blacksmithing' as TradeskillId,
-        value: 100,
-      },
-    ] as AffixEffect[]);
+      { tradeskillId: 'Blacksmithing' as TradeskillId, value: 100 },
+    ]);
 
     gatheringProcessTick();
 
     expect(addMaterial).toHaveBeenCalledWith('wood', 5);
   });
 
-  it("matches a GatherYield affix against any of a single result's multiple tradeskills", () => {
+  it("matches a GatherYield bonus against any of a single result's multiple tradeskills", () => {
     vi.mocked(gamestate).mockReturnValue({
       world: {
         gathering: {
@@ -632,14 +626,10 @@ describe('gatheringProcessTick', () => {
     vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    // The result lists Woodworking first, but the affix targets Tailoring - its second tag - and must still match.
-    vi.mocked(partyAffixEffects).mockReturnValue([
-      {
-        kind: 'GatherYield',
-        tradeskillId: 'Tailoring' as TradeskillId,
-        value: 4,
-      },
-    ] as AffixEffect[]);
+    // The result lists Woodworking first, but the bonus targets Tailoring - its second tag - and must still match.
+    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
+      { tradeskillId: 'Tailoring' as TradeskillId, value: 4 },
+    ]);
 
     gatheringProcessTick();
 
@@ -682,13 +672,9 @@ describe('gatheringProcessTick', () => {
     // The Woodworking result is the one that actually rolls this cycle.
     vi.mocked(rngChoiceWeighted).mockReturnValue(woodResult);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(partyAffixEffects).mockReturnValue([
-      {
-        kind: 'GatherYield',
-        tradeskillId: 'Tailoring' as TradeskillId,
-        value: 100,
-      },
-    ] as AffixEffect[]);
+    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
+      { tradeskillId: 'Tailoring' as TradeskillId, value: 100 },
+    ]);
 
     gatheringProcessTick();
 
@@ -729,13 +715,9 @@ describe('gatheringProcessTick', () => {
     vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(partyAffixEffects).mockReturnValue([
-      {
-        kind: 'GatherYield',
-        tradeskillId: 'Woodworking' as TradeskillId,
-        value: 3,
-      },
-    ] as AffixEffect[]);
+    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
+      { tradeskillId: 'Woodworking' as TradeskillId, value: 3 },
+    ]);
 
     gatheringProcessTick();
 

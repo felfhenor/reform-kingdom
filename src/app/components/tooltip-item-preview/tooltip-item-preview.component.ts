@@ -9,6 +9,7 @@ import { DetailItemPreviewComponent } from '@components/detail-item-preview/deta
 import {
   type CombatStatBlock,
   type ItemPreviewDisplay,
+  type MonsterType,
   type StatBlock,
   type StatusEffectBlock,
 } from '@interfaces';
@@ -31,6 +32,7 @@ export class TooltipItemPreviewComponent {
   public bonusStats = input<StatBlock>();
   public bonusResistances = input<StatusEffectBlock>();
   public bonusCombatStats = input<CombatStatBlock>();
+  public bonusMonsterTypeDamage = input<Record<MonsterType, number>>();
 
   public showEquippableBy = input<boolean>(true);
   public showDescription = input<boolean>(true);

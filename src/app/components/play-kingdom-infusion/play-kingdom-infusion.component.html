@@ -105,6 +105,12 @@
                 [bonusResistances]="selectedItemResistanceBonus()"
                 [combatStats]="content.combatStats"
                 [bonusCombatStats]="selectedItemCombatStatBonus()"
+                [monsterTypeDamage]="content.monsterTypeDamage"
+                [bonusMonsterTypeDamage]="selectedItemMonsterTypeDamageBonus()"
+              />
+
+              <app-row-gather-yield-bonuses
+                [bonuses]="selectedItemGatherYieldBonuses()"
               />
             </div>
           </div>
@@ -162,13 +168,22 @@
                           {{ entry.item.name }} (x{{ entry.quantity }})
                         </span>
 
-                        <app-row-stat-summary
-                          [stats]="entry.item.infusionStats!"
-                          [resistances]="entry.item.infusionDebuffResistances"
-                          [combatStats]="entry.item.infusionCombatStats"
-                          [layout]="'row'"
-                          [maxDecimals]="1"
-                        />
+                        <div>
+                          <app-row-stat-summary
+                            [stats]="entry.item.infusionStats!"
+                            [resistances]="entry.item.infusionDebuffResistances"
+                            [combatStats]="entry.item.infusionCombatStats"
+                            [monsterTypeDamage]="
+                              entry.item.infusionMonsterTypeDamage
+                            "
+                            [layout]="'row'"
+                            [maxDecimals]="1"
+                          />
+
+                          <app-row-gather-yield-bonuses
+                            [bonuses]="materialGatherYieldBonuses(entry.item)"
+                          />
+                        </div>
                       </div>
 
                       <div class="flex flex-1 justify-end">

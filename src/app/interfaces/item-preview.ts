@@ -2,6 +2,7 @@ import type { CombatStatBlock } from '@interfaces/combat';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
+import type { MonsterType } from '@interfaces/content-monster';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { WorkerContent } from '@interfaces/content-worker';
@@ -27,11 +28,19 @@ export type ItemPreviewDisplay = {
   stats?: StatBlock;
   resistances?: StatusEffectBlock;
   combatStats?: CombatStatBlock;
+  monsterTypeDamage?: Record<MonsterType, number>;
   // Affix + infusion bonus on top of `stats`/`resistances`/`combatStats` - set only when previewing a specific rolled instance.
   bonusStats?: StatBlock;
   bonusResistances?: StatusEffectBlock;
   bonusCombatStats?: CombatStatBlock;
-  // Affix effects with no dedicated stat/resistance display (gather yield, caravan discounts).
+  bonusMonsterTypeDamage?: Record<MonsterType, number>;
+  // Equipment only - base content plus any rolled GatherYield affix, merged by tradeskill and resolved to a display name/icon.
+  gatherYieldBonuses?: {
+    tradeskillName: string;
+    tradeskillSprite: string;
+    value: number;
+  }[];
+  // Affix effects with no dedicated display elsewhere (caravan discounts).
   miscAffixDescriptions?: string[];
   skills?: EquipmentSkillContent[];
   // Equipment only.

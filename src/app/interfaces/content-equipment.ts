@@ -1,5 +1,7 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { CombatStatBlock } from '@interfaces/combat';
+import type { GatherYieldBonus } from '@interfaces/content-affix';
+import type { MonsterType } from '@interfaces/content-monster';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
@@ -20,6 +22,10 @@ export type EquipmentContent = IsContentItem &
     debuffResistances?: StatusEffectBlock;
     // flat combat-stat bonus granted to the wearer at combat start
     combatStats?: CombatStatBlock;
+    // percent damage bonus dealt to monsters of the given type, same as the MonsterTypeDamage affix
+    monsterTypeDamage?: Record<MonsterType, number>;
+    // flat bonus quantity per successful gather for the given tradeskill, same as the GatherYield affix
+    gatherYieldBonuses?: GatherYieldBonus[];
     type: EquipmentItemType;
     slots: number;
 

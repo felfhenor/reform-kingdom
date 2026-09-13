@@ -17,6 +17,7 @@ import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import {
   itemPreviewTotalCombatStats,
+  itemPreviewTotalMonsterTypeDamage,
   itemPreviewTotalResistances,
   itemPreviewTotalStats,
 } from '@helpers/item/item-preview.ui';
@@ -95,6 +96,11 @@ export class CardEquipmentItemComponent {
     return equipped ? itemPreviewTotalCombatStats(equipped) : undefined;
   });
 
+  public thisItemComparisonMonsterTypeDamage = computed(() => {
+    const equipped = this.equippedDisplay();
+    return equipped ? itemPreviewTotalMonsterTypeDamage(equipped) : undefined;
+  });
+
   public equippedComparisonStats = computed(() =>
     this.equippedDisplay() ? itemPreviewTotalStats(this.display()) : undefined,
   );
@@ -108,6 +114,12 @@ export class CardEquipmentItemComponent {
   public equippedComparisonCombatStats = computed(() =>
     this.equippedDisplay()
       ? itemPreviewTotalCombatStats(this.display())
+      : undefined,
+  );
+
+  public equippedComparisonMonsterTypeDamage = computed(() =>
+    this.equippedDisplay()
+      ? itemPreviewTotalMonsterTypeDamage(this.display())
       : undefined,
   );
 

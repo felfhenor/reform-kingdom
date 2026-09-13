@@ -4,7 +4,12 @@
 // dictated by an external format/protocol (e.g. the Tiled map format's GID bitmask flags, IndexedDB
 // connection details) rather than authored game balance
 
-import type { BaseStat, CombatStat, StatusEffectTag } from '@interfaces';
+import type {
+  BaseStat,
+  CombatStat,
+  MonsterType,
+  StatusEffectTag,
+} from '@interfaces';
 
 // Caravan
 
@@ -115,6 +120,18 @@ export const VALUE_MULTIPLIER_PER_COMBAT_STAT: Record<CombatStat, number> = {
   stunChance: 1,
   agroValue: 2,
 };
+
+export const GOLD_PER_MONSTER_TYPE_DAMAGE_POINT = 50;
+export const VALUE_MULTIPLIER_PER_MONSTER_TYPE: Record<MonsterType, number> = {
+  Humanoid: 5,
+  Demon: 5,
+  Amalgamation: 5,
+  Insect: 5,
+  Beast: 5,
+  Spirit: 5,
+};
+
+export const GOLD_PER_GATHER_YIELD_POINT = 200;
 
 // Kingdom
 

@@ -1,0 +1,16 @@
+@for (bonus of bonuses(); track bonus.tradeskillName) {
+  <div class="text-xs my-2 flex items-center gap-2">
+    <span class="zoom-inline">
+      <app-slot-icon-blank [showBackground]="false">
+        <app-atlas-image
+          spritesheet="tradeskill"
+          [assetName]="bonus.tradeskillSprite"
+        />
+      </app-slot-icon-blank>
+    </span>
+
+    <span class="ml-[4px]">
+      {{ bonus.tradeskillName }} Yield +{{ bonus.value | number }}
+    </span>
+  </div>
+}

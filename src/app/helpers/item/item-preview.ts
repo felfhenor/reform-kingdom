@@ -7,8 +7,10 @@ import {
 } from '@helpers/crafting/recipes';
 import { partyGet } from '@helpers/hero/party';
 import { equipmentItemMiscAffixDescriptions } from '@helpers/item/affix';
+import { equipmentItemGatherYieldBonuses } from '@helpers/item/equipment-bonus';
 import {
   equipmentItemBonusCombatStats,
+  equipmentItemBonusMonsterTypeDamage,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
 } from '@helpers/item/equipment-display';
@@ -19,6 +21,7 @@ import {
   type EquipmentContent,
   type EquipmentId,
   type EquipmentItem,
+  type GatherYieldBonus,
   type ItemContent,
   type ItemId,
   type ItemPreviewContent,
@@ -27,6 +30,7 @@ import {
   type JobContent,
   type RecipeContent,
   type RecipeId,
+  type TradeskillContent,
   type WorkerContent,
   type WorkerId,
 } from '@interfaces';
@@ -40,6 +44,32 @@ function equippableHeroNames(equipment: EquipmentContent): string[] {
       ),
     )
     .map((hero) => hero.name);
+}
+
+// Resolves each tradeskillId to its display name/icon - shared by the equipment tooltip and the infusion screen (a raw, uncombined material's own infusionGatherYieldBonuses).
+export function resolveGatherYieldBonusDisplay(
+  bonuses: GatherYieldBonus[],
+): NonNullable<ItemPreviewDisplay['gatherYieldBonuses']> {
+  return bonuses.map((bonus) => {
+    const tradeskill = getEntry<TradeskillContent>(bonus.tradeskillId);
+    return {
+      tradeskillName: tradeskill?.name ?? bonus.tradeskillId,
+      tradeskillSprite: tradeskill?.sprite ?? '',
+      value: bonus.value,
+    };
+  });
+}
+
+// undefined (not []) when there's nothing to show, matching how resistances/combatStats stay undefined for gear with no bonus in that dimension.
+function gatherYieldBonusDisplay(
+  content: EquipmentContent,
+  instance?: EquipmentItem,
+): ItemPreviewDisplay['gatherYieldBonuses'] {
+  const bonuses = resolveGatherYieldBonusDisplay(
+    equipmentItemGatherYieldBonuses(content, instance),
+  );
+
+  return bonuses.length > 0 ? bonuses : undefined;
 }
 
 export function itemPreviewDisplay(
@@ -74,23 +104,35 @@ export function itemPreviewDisplay(
       stats: eqContent.baseStats,
       resistances: eqContent.debuffResistances,
       combatStats: eqContent.combatStats,
+      monsterTypeDamage: eqContent.monsterTypeDamage,
+      gatherYieldBonuses: gatherYieldBonusDisplay(eqContent, instance),
       levelRequirement: eqContent.levelRequirement,
       equippableHeroNames: equippableHeroNames(eqContent),
       ...(instance && {
         bonusStats: equipmentItemBonusStats(instance),
         bonusResistances: equipmentItemBonusResistances(instance),
         bonusCombatStats: equipmentItemBonusCombatStats(instance),
+        bonusMonsterTypeDamage: equipmentItemBonusMonsterTypeDamage(instance),
         miscAffixDescriptions: equipmentItemMiscAffixDescriptions(instance),
       }),
     } as ItemPreviewDisplay;
   }
 
   if ('infusionStats' in content) {
+    const infusionGatherYieldBonuses = resolveGatherYieldBonusDisplay(
+      content.infusionGatherYieldBonuses ?? [],
+    );
+
     return {
       ...base,
       stats: content.infusionStats,
       resistances: content.infusionDebuffResistances,
       combatStats: content.infusionCombatStats,
+      monsterTypeDamage: content.infusionMonsterTypeDamage,
+      gatherYieldBonuses:
+        infusionGatherYieldBonuses.length > 0
+          ? infusionGatherYieldBonuses
+          : undefined,
     } as ItemPreviewDisplay;
   }
 

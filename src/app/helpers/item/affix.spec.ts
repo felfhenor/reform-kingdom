@@ -358,7 +358,33 @@ describe('equipmentItemMiscAffixDescriptions', () => {
     vi.clearAllMocks();
   });
 
-  it('includes the description of an affix whose effect has no dedicated display (GatherYield)', () => {
+  it('includes the description of an affix whose effect has no dedicated display (CaravanBuyDiscount)', () => {
+    const discountAffix: AffixContent = {
+      ...strengthAffix,
+      id: 'affix-discount' as AffixId,
+      description: 'Discounts caravan purchases.',
+      effects: [{ kind: 'CaravanBuyDiscount', value: 10 }],
+    };
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === discountAffix.id ? discountAffix : undefined) as never,
+    );
+
+    expect(
+      equipmentItemMiscAffixDescriptions(buildItem([discountAffix.id])),
+    ).toEqual([discountAffix.description]);
+  });
+
+  it('excludes an affix whose only effects already have a dedicated display (Stat)', () => {
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
+    );
+
+    expect(
+      equipmentItemMiscAffixDescriptions(buildItem([strengthAffix.id])),
+    ).toEqual([]);
+  });
+
+  it('excludes an affix whose only effect now has a dedicated display (GatherYield)', () => {
     const gatherAffix: AffixContent = {
       ...strengthAffix,
       id: 'affix-gather' as AffixId,
@@ -377,10 +403,10 @@ describe('equipmentItemMiscAffixDescriptions', () => {
 
     expect(
       equipmentItemMiscAffixDescriptions(buildItem([gatherAffix.id])),
-    ).toEqual([gatherAffix.description]);
+    ).toEqual([]);
   });
 
-  it('includes the description of an affix whose effect has no dedicated display (MonsterTypeDamage)', () => {
+  it('excludes an affix whose only effect now has a dedicated display (MonsterTypeDamage)', () => {
     const slayingAffix: AffixContent = {
       ...strengthAffix,
       id: 'affix-slaying' as AffixId,
@@ -393,16 +419,6 @@ describe('equipmentItemMiscAffixDescriptions', () => {
 
     expect(
       equipmentItemMiscAffixDescriptions(buildItem([slayingAffix.id])),
-    ).toEqual([slayingAffix.description]);
-  });
-
-  it('excludes an affix whose only effects already have a dedicated display (Stat)', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
-    );
-
-    expect(
-      equipmentItemMiscAffixDescriptions(buildItem([strengthAffix.id])),
     ).toEqual([]);
   });
 

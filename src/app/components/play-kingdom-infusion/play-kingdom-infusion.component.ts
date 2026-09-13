@@ -10,6 +10,7 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
@@ -18,6 +19,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
+  defaultMonsterTypeDamageBonus,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
@@ -28,8 +30,10 @@ import {
   canModifyEquipment,
   equippedItemsByPrimarySlot,
 } from '@helpers/item/equipment';
+import { equipmentItemGatherYieldBonuses } from '@helpers/item/equipment-bonus';
 import {
   equipmentItemBonusCombatStats,
+  equipmentItemBonusMonsterTypeDamage,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
 } from '@helpers/item/equipment-display';
@@ -39,6 +43,7 @@ import {
   infusionMaterialCost,
   isInfusionMaterial,
 } from '@helpers/item/infusion';
+import { resolveGatherYieldBonusDisplay } from '@helpers/item/item-preview';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { getStorageMaterials } from '@helpers/kingdom/storage.ui';
 import {
@@ -67,6 +72,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     IconJobComponent,
     RowInfusedMaterialsComponent,
     RowStatSummaryComponent,
+    RowGatherYieldBonusesComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
     TippyDirective,
@@ -128,6 +134,24 @@ export class PlayKingdomInfusionComponent {
     return item ? equipmentItemBonusCombatStats(item) : defaultCombatStats();
   });
 
+  public selectedItemMonsterTypeDamageBonus = computed(() => {
+    const item = this.selectedItem();
+    return item
+      ? equipmentItemBonusMonsterTypeDamage(item)
+      : defaultMonsterTypeDamageBonus();
+  });
+
+  // Base + infusion + affix, resolved to display name/icon - same shape the equipment tooltip shows.
+  public selectedItemGatherYieldBonuses = computed(() => {
+    const item = this.selectedItem();
+    const content = this.selectedItemContent();
+    return content
+      ? resolveGatherYieldBonusDisplay(
+          equipmentItemGatherYieldBonuses(content, item),
+        )
+      : [];
+  });
+
   public selectedItemSlotCount = computed(() => {
     const item = this.selectedItem();
     return item ? equipmentItemSlotCount(item) : 0;
@@ -166,6 +190,13 @@ export class PlayKingdomInfusionComponent {
 
   public materialCost(itemId: ItemId): number {
     return infusionMaterialCost(itemId);
+  }
+
+  // Raw, uncombined - just this one material's own infusion grant, same treatment as its infusionStats/infusionDebuffResistances/infusionCombatStats above.
+  public materialGatherYieldBonuses(material: ItemContent) {
+    return resolveGatherYieldBonusDisplay(
+      material.infusionGatherYieldBonuses ?? [],
+    );
   }
 
   // Never disabled for "slot already infused" - overwriting is allowed.

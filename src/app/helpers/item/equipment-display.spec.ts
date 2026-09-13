@@ -5,6 +5,7 @@ vi.mock('@helpers/content/content', () => ({
 import { getEntry } from '@helpers/content/content';
 import {
   equipmentItemBonusCombatStats,
+  equipmentItemBonusMonsterTypeDamage,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
   equipmentItemGrantedSkillIds,
@@ -204,6 +205,36 @@ describe('equipmentItemBonusCombatStats', () => {
       }),
     );
     expect(bonus.damageReflectPercent).toBe(8);
+  });
+});
+
+const demonSlayingAffix: AffixContent = {
+  id: 'affix-demon-slaying' as AffixId,
+  name: 'Demon-slaying',
+  __type: 'affix',
+  description: '',
+  rarity: 'Uncommon',
+  family: 'DemonSlaying',
+  position: 'Prefix',
+  effects: [{ kind: 'MonsterTypeDamage', monsterType: 'Demon', value: 20 }],
+};
+
+describe('equipmentItemBonusMonsterTypeDamage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('is zeroed when the item has no affixes', () => {
+    expect(equipmentItemBonusMonsterTypeDamage(buildItem()).Demon).toBe(0);
+  });
+
+  it('includes an affix MonsterTypeDamage bonus', () => {
+    mockContent(demonSlayingAffix);
+
+    const bonus = equipmentItemBonusMonsterTypeDamage(
+      buildItem({ affixIds: [demonSlayingAffix.id] }),
+    );
+    expect(bonus.Demon).toBe(20);
   });
 });
 

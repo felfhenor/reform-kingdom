@@ -8,8 +8,7 @@ import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
-import { partyAffixEffects, partyGet } from '@helpers/hero/party';
-import { affixEffectSum } from '@helpers/item/affix';
+import { partyGatherYieldBonuses, partyGet } from '@helpers/hero/party';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -25,7 +24,7 @@ import type {
   ItemContent,
   TradeskillId,
 } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
+import { clamp, sumBy } from 'es-toolkit/compat';
 
 export function partyMinLevel(): number {
   const party = partyGet();
@@ -127,10 +126,13 @@ function grantGatherXpIfInRange(content: GatheringContent): void {
   partyGainXp(content.xpGainedIfInLevelRange);
 }
 
-// Tradeskills come from the rolled GatherResult, not the node, so a Tailoring affix can't boost a Woodworking-only roll at a mixed node.
+// Tradeskills come from the rolled GatherResult, not the node, so a Tailoring bonus can't boost a Woodworking-only roll at a mixed node.
 function partyGatherYieldBonus(tradeskillIds: TradeskillId[]): number {
-  return affixEffectSum(partyAffixEffects(), 'GatherYield', (effect) =>
-    tradeskillIds.includes(effect.tradeskillId),
+  return sumBy(
+    partyGatherYieldBonuses().filter((bonus) =>
+      tradeskillIds.includes(bonus.tradeskillId),
+    ),
+    (bonus) => bonus.value,
   );
 }
 

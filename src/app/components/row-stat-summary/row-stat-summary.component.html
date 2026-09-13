@@ -32,3 +32,15 @@
     [layout]="layout()"
   />
 }
+
+@if (hasAnyMonsterTypeDamage()) {
+  <app-row-labeled-values
+    class="block text-xs"
+    [class.mt-2]="layout() === 'column'"
+    [dimension]="monsterTypeDamageDimension"
+    [values]="monsterTypeDamage()"
+    [bonusValues]="bonusMonsterTypeDamage()"
+    [comparisonValues]="comparisonMonsterTypeDamage()"
+    [layout]="layout()"
+  />
+}

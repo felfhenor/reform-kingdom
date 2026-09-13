@@ -91,6 +91,35 @@ describe('itemPreviewDisplay', () => {
     });
   });
 
+  it('resolves gatherYieldBonuses to their tradeskill display name and sprite', () => {
+    const equipment: EquipmentContent = {
+      id: 'trinket' as EquipmentId,
+      __type: 'equipment',
+      name: 'Trinket',
+      description: 'Handy.',
+      sprite: '0002',
+      rarity: 'Uncommon',
+      levelRequirement: 1,
+      baseStats: {},
+      type: 'Trinket',
+      gatherYieldBonuses: [
+        { tradeskillId: 'woodworking' as never, value: 1 },
+      ],
+    } as EquipmentContent;
+    vi.mocked(getEntry).mockImplementation((id: unknown) =>
+      id === 'woodworking'
+        ? ({ name: 'Woodworking', sprite: '0009' } as never)
+        : undefined,
+    );
+    vi.mocked(partyGet).mockReturnValue([]);
+
+    expect(
+      itemPreviewDisplay('equipment', equipment).gatherYieldBonuses,
+    ).toEqual([
+      { tradeskillName: 'Woodworking', tradeskillSprite: '0009', value: 1 },
+    ]);
+  });
+
   it('names only the party heroes whose job can equip the equipment type', () => {
     const equipment = {
       id: 'sword' as EquipmentId,

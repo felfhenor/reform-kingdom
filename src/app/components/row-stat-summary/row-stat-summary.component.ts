@@ -10,6 +10,8 @@ import {
   type CombatStat,
   type CombatStatBlock,
   CombatStatDimension,
+  type MonsterType,
+  MonsterTypeDimension,
   type StatBlock,
   type StatusEffectBlock,
   type StatusEffectTag,
@@ -35,6 +37,10 @@ export class RowStatSummaryComponent {
   public combatStats = input<CombatStatBlock>();
   public bonusCombatStats = input<CombatStatBlock>();
   public comparisonCombatStats = input<CombatStatBlock>();
+
+  public monsterTypeDamage = input<Record<MonsterType, number>>();
+  public bonusMonsterTypeDamage = input<Record<MonsterType, number>>();
+  public comparisonMonsterTypeDamage = input<Record<MonsterType, number>>();
 
   // 'column' (default) for tooltips/detail panels; 'row' for compact,
   // space-constrained lists (e.g. a picker row) - mirrors the underlying rows.
@@ -66,6 +72,19 @@ export class RowStatSummaryComponent {
     );
   });
 
+  public hasAnyMonsterTypeDamage = computed(() => {
+    const monsterTypeDamage =
+      this.monsterTypeDamage() ?? ({} as Record<MonsterType, number>);
+    const bonus =
+      this.bonusMonsterTypeDamage() ?? ({} as Record<MonsterType, number>);
+    return [...Object.keys(monsterTypeDamage), ...Object.keys(bonus)].some(
+      (k) =>
+        (monsterTypeDamage[k as MonsterType] ?? 0) !== 0 ||
+        (bonus[k as MonsterType] ?? 0) !== 0,
+    );
+  });
+
   public resistanceDimension = StatusEffectTagDimension;
   public combatStatDimension = CombatStatDimension;
+  public monsterTypeDamageDimension = MonsterTypeDimension;
 }

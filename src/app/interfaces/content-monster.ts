@@ -8,12 +8,33 @@ import type {
 } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
+import type { StatDisplayDimension } from '@interfaces/stat-display';
 import type { HasDescription } from '@interfaces/traits';
 
 export type MonsterId = Branded<string, 'MonsterId'>;
 
 export type MonsterType =
   'Humanoid' | 'Demon' | 'Amalgamation' | 'Insect' | 'Beast' | 'Spirit';
+
+export const MonsterTypeDimension: StatDisplayDimension<MonsterType> = {
+  order: ['Humanoid', 'Demon', 'Amalgamation', 'Insect', 'Beast', 'Spirit'],
+  label: {
+    Humanoid: 'Humanoid Damage',
+    Demon: 'Demon Damage',
+    Amalgamation: 'Amalgamation Damage',
+    Insect: 'Insect Damage',
+    Beast: 'Beast Damage',
+    Spirit: 'Spirit Damage',
+  },
+  icon: {
+    Humanoid: 'gamePerson',
+    Demon: 'gameDevilMask',
+    Amalgamation: 'gameSlime',
+    Insect: 'gameFlyingBeetle',
+    Beast: 'gameWolfHead',
+    Spirit: 'gameGhost',
+  },
+};
 
 export type MonsterSkill = {
   skillId: EquipmentSkillId;

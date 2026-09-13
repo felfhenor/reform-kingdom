@@ -49,10 +49,17 @@
       [combatStats]="item.combatStats"
       [bonusCombatStats]="bonusCombatStats() ?? item.bonusCombatStats"
       [comparisonCombatStats]="comparisonCombatStats()"
+      [monsterTypeDamage]="item.monsterTypeDamage"
+      [bonusMonsterTypeDamage]="
+        bonusMonsterTypeDamage() ?? item.bonusMonsterTypeDamage
+      "
+      [comparisonMonsterTypeDamage]="comparisonMonsterTypeDamage()"
     />
 
+    <app-row-gather-yield-bonuses [bonuses]="item.gatherYieldBonuses" />
+
     @for (skill of item.skills; track skill.id) {
-      <div class="text-xs my-1 italic text-lighter flex items-center gap-2">
+      <div class="text-xs my-2 italic text-lighter flex items-center gap-2">
         Teaches
         <span class="zoom-inline">
           <app-slot-icon-blank [showBackground]="false">
@@ -64,7 +71,7 @@
     }
 
     @for (desc of item.miscAffixDescriptions; track desc) {
-      <div class="text-xs my-1 text-value-positive">{{ desc }}</div>
+      <div class="text-xs my-2 text-value-positive">{{ desc }}</div>
     }
 
     <ng-content></ng-content>
