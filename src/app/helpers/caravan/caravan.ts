@@ -14,6 +14,7 @@ import type {
   CaravanNodeState,
   CaravanTimerUrgency,
   CaravanTraderContent,
+  CaravanTraderId,
   GameStateDiscoveredCaravans,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
@@ -39,6 +40,24 @@ export function caravanEligibleTraders(
       trader.level >= content.level.min &&
       trader.level <= content.level.max,
   );
+}
+
+// Trader ids currently staffing any OTHER caravan node, so a reroll never
+// stations the same merchant at two camps at once.
+export function caravanBusyTraderIds(
+  excludingCaravanId: CaravanId,
+): Set<CaravanTraderId> {
+  const caravans = gamestate().world.caravans;
+  const busy = new Set<CaravanTraderId>();
+
+  (Object.keys(caravans) as CaravanId[]).forEach((caravanId) => {
+    if (caravanId === excludingCaravanId) return;
+
+    const traderId = caravans[caravanId]?.traderId;
+    if (traderId) busy.add(traderId);
+  });
+
+  return busy;
 }
 
 export function caravanTicksUntilReset(

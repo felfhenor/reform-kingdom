@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/caravan/caravan', () => ({
+  caravanBusyTraderIds: vi.fn(),
   caravanEligibleTraders: vi.fn(),
 }));
 
@@ -35,7 +36,10 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodesOfType: vi.fn(),
 }));
 
-import { caravanEligibleTraders } from '@helpers/caravan/caravan';
+import {
+  caravanBusyTraderIds,
+  caravanEligibleTraders,
+} from '@helpers/caravan/caravan';
 import {
   caravanProcessTick,
   caravanWeightedSample,
@@ -135,6 +139,7 @@ describe('caravanProcessTick', () => {
     vi.mocked(timerTicksElapsed).mockReturnValue(1000);
     vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
     vi.mocked(isRecipeDiscovered).mockReturnValue(false);
+    vi.mocked(caravanBusyTraderIds).mockReturnValue(new Set());
   });
 
   afterEach(() => {
@@ -222,6 +227,47 @@ describe('caravanProcessTick', () => {
     } as unknown as GameState);
 
     expect(result.world.caravans[caravan.id].traderId).toBe('trader-b');
+  });
+
+  it('does not pick a trader who is already staffing another camp', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    withCaravanState({
+      [caravan.id]: { generatedAtTick: 800, traderId: 'trader-a' },
+    });
+    const traderA = trader({ id: 'trader-a' as CaravanTraderId });
+    const traderB = trader({ id: 'trader-b' as CaravanTraderId });
+    vi.mocked(caravanEligibleTraders).mockReturnValue([traderA, traderB]);
+    vi.mocked(caravanBusyTraderIds).mockReturnValue(
+      new Set(['trader-b' as CaravanTraderId]),
+    );
+
+    caravanProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { caravans: {} },
+    } as unknown as GameState);
+
+    expect(result.world.caravans[caravan.id].traderId).toBe('trader-a');
+  });
+
+  it('leaves the caravan unstaffed when every eligible trader is busy elsewhere', () => {
+    withCaravanState({
+      [caravan.id]: { generatedAtTick: 800, traderId: 'trader-a' },
+    });
+    vi.mocked(caravanEligibleTraders).mockReturnValue([trader()]);
+    vi.mocked(caravanBusyTraderIds).mockReturnValue(
+      new Set(['trader-a' as CaravanTraderId]),
+    );
+
+    caravanProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { caravans: {} },
+    } as unknown as GameState);
+
+    expect(result.world.caravans[caravan.id].traderId).toBeUndefined();
   });
 
   it('excludes an already-discovered unique collectible sell from the active trades', () => {

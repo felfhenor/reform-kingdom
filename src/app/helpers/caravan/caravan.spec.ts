@@ -29,6 +29,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 
 import {
   caravanBrandName,
+  caravanBusyTraderIds,
   caravanEligibleTraders,
   caravanMarkDiscovered,
   caravanMarkVisited,
@@ -130,6 +131,48 @@ describe('caravanEligibleTraders', () => {
     vi.mocked(getEntriesByType).mockReturnValue([tooHigh]);
 
     expect(caravanEligibleTraders(caravan)).toEqual([]);
+  });
+});
+
+describe('caravanBusyTraderIds', () => {
+  it('collects trader ids staffing other caravans', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        caravans: {
+          [caravan.id]: { traderId: 'trader-a' as CaravanTraderId },
+          'other-caravan': { traderId: 'trader-b' as CaravanTraderId },
+        },
+      },
+    } as unknown as GameState);
+
+    expect(caravanBusyTraderIds('some-other-id' as CaravanId)).toEqual(
+      new Set(['trader-a', 'trader-b']),
+    );
+  });
+
+  it('excludes the given caravan itself from the busy set', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        caravans: {
+          [caravan.id]: { traderId: 'trader-a' as CaravanTraderId },
+          'other-caravan': { traderId: 'trader-b' as CaravanTraderId },
+        },
+      },
+    } as unknown as GameState);
+
+    expect(caravanBusyTraderIds(caravan.id)).toEqual(new Set(['trader-b']));
+  });
+
+  it('ignores caravans with no trader currently assigned', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        caravans: {
+          'other-caravan': { traderId: undefined },
+        },
+      },
+    } as unknown as GameState);
+
+    expect(caravanBusyTraderIds(caravan.id)).toEqual(new Set());
   });
 });
 

@@ -1,4 +1,7 @@
-import { caravanEligibleTraders } from '@helpers/caravan/caravan';
+import {
+  caravanBusyTraderIds,
+  caravanEligibleTraders,
+} from '@helpers/caravan/caravan';
 import { ACTIVE_TRADE_COUNT } from '@helpers/config';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
@@ -50,12 +53,16 @@ export function caravanWeightedSample<T extends { weight: number }>(
 }
 
 // A different trader than last cycle, unless only one is eligible - in
-// which case it's reused.
+// which case it's reused. Traders already staffing another camp right now
+// are excluded so the same merchant can never be in two camps at once.
 function pickTrader(
   content: CaravanContent,
   previousTraderId: CaravanTraderId | undefined,
+  busyTraderIds: Set<CaravanTraderId>,
 ): CaravanTraderContent | undefined {
-  const eligible = caravanEligibleTraders(content);
+  const eligible = caravanEligibleTraders(content).filter(
+    (trader) => !busyTraderIds.has(trader.id),
+  );
   if (eligible.length <= 1) return eligible[0];
 
   const candidates = eligible.filter(
@@ -104,7 +111,8 @@ function regenerateCaravanNode(
   previousTraderId: CaravanTraderId | undefined,
   nowTick: number,
 ): void {
-  const trader = pickTrader(content, previousTraderId);
+  const busyTraderIds = caravanBusyTraderIds(content.id);
+  const trader = pickTrader(content, previousTraderId, busyTraderIds);
   const activeTradeIndices = trader ? pickActiveTradeIndices(trader) : [];
   const rolledEquipment = trader
     ? rollEquipmentForActiveTrades(trader, activeTradeIndices)
