@@ -3,6 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { notifyError } from '@helpers/engine/notify';
 import {
   getGoldQuantity,
   goldCoinId,
@@ -14,6 +15,7 @@ import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
 import { townStockAffordable } from '@helpers/town/shop/town-trade';
 import type {
+  EquipmentItemId,
   GameState,
   TownContent,
   TownId,
@@ -28,20 +30,27 @@ function grantStockEntry(state: GameState, entry: TownStockEntry): void {
   };
 }
 
-function stockEntriesMatch(a: TownStockEntry, b: TownStockEntry): boolean {
-  return a.equipmentItem.id === b.equipmentItem.id;
+function findStockEntry(
+  stock: TownStockEntry[],
+  itemId: EquipmentItemId,
+): TownStockEntry | undefined {
+  return stock.find((entry) => entry.equipmentItem.id === itemId);
 }
 
+// Keyed by itemId, not index - stock can shift while a confirm dialog is open.
 // Fast path only - re-validated against live state inside the callback.
 export async function townExecuteTrade(
   townId: TownId,
-  stockIndex: number,
+  itemId: EquipmentItemId,
 ): Promise<boolean> {
   const town = getEntry<TownContent>(townId);
   if (!town) return false;
 
-  const entry = townStock(townId)[stockIndex];
-  if (!entry) return false;
+  const entry = findStockEntry(townStock(townId), itemId);
+  if (!entry) {
+    notifyError('That item has disappeared from the shop.');
+    return false;
+  }
 
   const price = townStockPrice(town, entry);
   if (price === undefined) return false;
@@ -49,23 +58,33 @@ export async function townExecuteTrade(
   if (!hasGold(price)) return false;
 
   let executed = false;
+  let vanished = false;
 
   await updateGamestate((state) => {
     const target = state.world.towns[townId];
-    const liveEntry = target?.stock[stockIndex];
-    if (!target || !liveEntry) return state;
-    if (!stockEntriesMatch(liveEntry, entry)) return state;
+    const liveEntry = target ? findStockEntry(target.stock, itemId) : undefined;
+    if (!target || !liveEntry) {
+      vanished = true;
+      return state;
+    }
 
     const liveGold = state.materials[goldCoinId()]?.quantity ?? 0;
     if (!townStockAffordable(price, liveGold)) return state;
 
     grantStockEntry(state, liveEntry);
     spendGold(state, price);
-    target.stock = target.stock.filter((_, i) => i !== stockIndex);
+    target.stock = target.stock.filter(
+      (stockEntry) => stockEntry.equipmentItem.id !== itemId,
+    );
     executed = true;
 
     return state;
   });
+
+  if (vanished) {
+    notifyError('That item has disappeared from the shop.');
+    return false;
+  }
 
   if (executed) {
     const name = townStockDisplay(entry)?.name;

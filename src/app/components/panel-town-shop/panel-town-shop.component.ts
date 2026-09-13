@@ -13,7 +13,7 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { notifySuccess } from '@helpers/engine/notify';
+import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
@@ -114,7 +114,14 @@ export class PanelTownShopComponent {
 
     const town = this.town();
     const name = this.stockEntryName(row.entry);
-    if (!(await townExecuteTrade(town.id, row.index))) return;
+
+    try {
+      if (!(await townExecuteTrade(town.id, row.entry.equipmentItem.id)))
+        return;
+    } catch (err) {
+      notifyError(err instanceof Error ? err.message : String(err));
+      return;
+    }
 
     notifySuccess(`You bought ${name}!`);
   }
