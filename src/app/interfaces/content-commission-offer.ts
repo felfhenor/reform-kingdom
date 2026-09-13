@@ -2,6 +2,7 @@ import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
+import type { TownReputationTierValue } from '@interfaces/content-town';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
@@ -42,4 +43,6 @@ export type CommissionOfferContent = IsContentItem &
     townReputationReward: number;
     // Links to the specialty recipe this offer unblocks - 'UNKNOWN' otherwise, per the UNKNOWN-sentinel convention for optional ids.
     specialtyForRecipeId: RecipeId;
+    // Scales requirements and townReputationReward together by town reputation tier (empty = 1x) - caravans ignore this, having no tier to resolve.
+    reputationTierMultipliers: TownReputationTierValue[];
   };

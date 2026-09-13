@@ -16,8 +16,13 @@ vi.mock('@helpers/rng', () => ({
   rngNumberRange: vi.fn((min: number) => min),
 }));
 
+vi.mock('@helpers/town/reputation/town-reputation-tier-value', () => ({
+  townReputationTierValueResolve: vi.fn(),
+}));
+
 import {
   buildCommissionRequirementEntries,
+  commissionOfferReputationReward,
   commissionRequirementOwnedQuantity,
   commissionRequirementsSatisfied,
   eligibleCommissionOffers,
@@ -26,6 +31,7 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
+import { townReputationTierValueResolve } from '@helpers/town/reputation/town-reputation-tier-value';
 import type {
   CommissionOfferContent,
   CommissionOfferId,
@@ -39,6 +45,7 @@ import type {
   MonsterContent,
   MonsterId,
   RecipeId,
+  TownId,
 } from '@interfaces';
 
 const offer: CommissionOfferContent = {
@@ -52,6 +59,7 @@ const offer: CommissionOfferContent = {
   rewards: [],
   townReputationReward: 0,
   specialtyForRecipeId: 'UNKNOWN' as RecipeId,
+  reputationTierMultipliers: [],
 };
 
 const wergenStick: ItemContent = {
@@ -138,6 +146,64 @@ describe('rollCommissionRequirements', () => {
     expect(rollCommissionRequirements(killOffer)).toEqual([
       { monsterId: sandWorm.id, quantity: 5, progress: 0 },
     ]);
+  });
+
+  it('ignores reputationTierMultipliers when no townId is given', () => {
+    const scaledOffer: CommissionOfferContent = {
+      ...offer,
+      reputationTierMultipliers: [{ tier: 0, value: 5 }],
+    };
+
+    expect(rollCommissionRequirements(scaledOffer)).toEqual([
+      { itemId: 'wergen-stick', quantity: 10 },
+    ]);
+    expect(townReputationTierValueResolve).not.toHaveBeenCalled();
+  });
+
+  it('scales the rolled quantity by the town reputation tier multiplier', () => {
+    const townId = 'larsia' as TownId;
+    const scaledOffer: CommissionOfferContent = {
+      ...offer,
+      reputationTierMultipliers: [
+        { tier: 0, value: 1 },
+        { tier: 2, value: 15 },
+      ],
+    };
+    vi.mocked(townReputationTierValueResolve).mockReturnValue(15);
+
+    expect(rollCommissionRequirements(scaledOffer, townId)).toEqual([
+      { itemId: 'wergen-stick', quantity: 150 },
+    ]);
+    expect(townReputationTierValueResolve).toHaveBeenCalledWith(
+      townId,
+      scaledOffer.reputationTierMultipliers,
+    );
+  });
+});
+
+describe('commissionOfferReputationReward', () => {
+  it('returns the base reward when no tier multipliers are authored', () => {
+    const rewardOffer: CommissionOfferContent = {
+      ...offer,
+      townReputationReward: 10,
+    };
+
+    expect(
+      commissionOfferReputationReward(rewardOffer, 'larsia' as TownId),
+    ).toBe(10);
+  });
+
+  it('scales the reward by the resolved tier multiplier', () => {
+    const rewardOffer: CommissionOfferContent = {
+      ...offer,
+      townReputationReward: 10,
+      reputationTierMultipliers: [{ tier: 1, value: 5 }],
+    };
+    vi.mocked(townReputationTierValueResolve).mockReturnValue(5);
+
+    expect(
+      commissionOfferReputationReward(rewardOffer, 'larsia' as TownId),
+    ).toBe(50);
   });
 });
 

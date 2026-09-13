@@ -37,6 +37,7 @@ import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { townMarkVisited } from '@helpers/town/town-visit';
 import { workerRescue } from '@helpers/worker/worker-discovery';
@@ -288,10 +289,10 @@ export function debugSetWorkerLevel(workerId: WorkerId, level: number): void {
   });
 }
 
-export function debugSetTownReputation(
+export async function debugSetTownReputation(
   townId: TownId,
   reputation: number,
-): void {
+): Promise<void> {
   const realTown = getEntry<TownContent>(townId);
   if (!realTown) {
     console.warn(`Could not find a town with matching id ${townId}.`);
@@ -306,13 +307,16 @@ export function debugSetTownReputation(
     TOWN_REPUTATION_THRESHOLDS[4],
   );
 
-  updateGamestate((state) => {
+  await updateGamestate((state) => {
     const town = state.world.towns[realTownId];
     if (!town) return state;
 
     town.reputation = clamped;
     return state;
   });
+
+  // Debug-set reputation skips townReputationGain/Lose, so tier-scaled persistent commissions need an explicit refresh here too.
+  await townCommissionRefreshTierScaledSlots(realTownId);
 }
 
 // Raid combat from anywhere, no telegraph/standing-at-town required.

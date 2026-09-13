@@ -60,6 +60,7 @@ import { updateGamestate } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import {
   townCommissionProcessTick,
+  townCommissionRefreshTierScaledSlots,
   townCommissionSlotCount,
 } from '@helpers/town/town-commission-generate';
 import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
@@ -113,6 +114,7 @@ const offer: CommissionOfferContent = {
   rewards: [],
   townReputationReward: 0,
   specialtyForRecipeId: 'UNKNOWN' as RecipeId,
+  reputationTierMultipliers: [],
 };
 
 const persistentOffer: CommissionOfferContent = {
@@ -480,5 +482,126 @@ describe('townCommissionProcessTick', () => {
         expect.any(Function),
       );
     });
+  });
+});
+
+describe('townCommissionRefreshTierScaledSlots', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("re-rolls a slot whose offer scales with the town's reputation tier", async () => {
+    const scaledOffer: CommissionOfferContent = {
+      ...persistentOffer,
+      reputationTierMultipliers: [{ tier: 0, value: 1 }],
+    };
+    vi.mocked(getEntry).mockReturnValue(scaledOffer);
+    vi.mocked(rollCommissionRequirements).mockReturnValue([
+      { itemId: 'wergen-stick' as ItemId, quantity: 500 },
+    ]);
+
+    await townCommissionRefreshTierScaledSlots(town.id);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = {
+      world: {
+        towns: {
+          [town.id]: {
+            commissionSlots: [
+              {
+                id: 'slot-1',
+                commissionOfferId: scaledOffer.id,
+                requirements: [
+                  { itemId: 'wergen-stick', quantity: 100 },
+                ],
+                generatedAtTick: 0,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState;
+    updateFn(state);
+
+    expect(
+      state.world.towns[town.id].commissionSlots[0].requirements,
+    ).toEqual([{ itemId: 'wergen-stick', quantity: 500 }]);
+  });
+
+  it('leaves a slot untouched when its offer has no tier multipliers', async () => {
+    vi.mocked(getEntry).mockReturnValue(offer);
+
+    await townCommissionRefreshTierScaledSlots(town.id);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = {
+      world: {
+        towns: {
+          [town.id]: {
+            commissionSlots: [
+              {
+                id: 'slot-1',
+                commissionOfferId: offer.id,
+                requirements: [
+                  { itemId: 'wergen-stick', quantity: 100 },
+                ],
+                generatedAtTick: 0,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState;
+    updateFn(state);
+
+    expect(rollCommissionRequirements).not.toHaveBeenCalled();
+    expect(
+      state.world.towns[town.id].commissionSlots[0].requirements,
+    ).toEqual([{ itemId: 'wergen-stick', quantity: 100 }]);
+  });
+
+  it('no-ops when the town has no state entry', async () => {
+    await townCommissionRefreshTierScaledSlots(town.id);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = { world: { towns: {} } } as unknown as GameState;
+
+    expect(() => updateFn(state)).not.toThrow();
+  });
+
+  it('leaves a slot with kill progress untouched even when its offer scales with tier', async () => {
+    const scaledOffer: CommissionOfferContent = {
+      ...persistentOffer,
+      reputationTierMultipliers: [{ tier: 0, value: 1 }],
+    };
+    vi.mocked(getEntry).mockReturnValue(scaledOffer);
+
+    await townCommissionRefreshTierScaledSlots(town.id);
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const state = {
+      world: {
+        towns: {
+          [town.id]: {
+            commissionSlots: [
+              {
+                id: 'slot-1',
+                commissionOfferId: scaledOffer.id,
+                requirements: [
+                  { monsterId: 'sand-worm', quantity: 5, progress: 3 },
+                ],
+                generatedAtTick: 0,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as GameState;
+    updateFn(state);
+
+    expect(rollCommissionRequirements).not.toHaveBeenCalled();
+    expect(
+      state.world.towns[town.id].commissionSlots[0].requirements,
+    ).toEqual([{ monsterId: 'sand-worm', quantity: 5, progress: 3 }]);
   });
 });

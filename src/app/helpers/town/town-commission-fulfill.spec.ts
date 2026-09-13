@@ -3,6 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/commission/commission-requirement', () => ({
   buildCommissionRequirementEntries: vi.fn(() => []),
   commissionRequirementsSatisfied: vi.fn(),
+  commissionOfferReputationReward: vi.fn(
+    (offer: { townReputationReward: number }) => offer.townReputationReward,
+  ),
 }));
 
 vi.mock('@helpers/content/content', () => ({
@@ -52,6 +55,7 @@ const offer: CommissionOfferContent = {
   rewards: [],
   townReputationReward: 25,
   specialtyForRecipeId: 'UNKNOWN' as RecipeId,
+  reputationTierMultipliers: [],
 };
 
 function withTownState(state: unknown): void {

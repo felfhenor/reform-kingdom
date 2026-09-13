@@ -1,4 +1,7 @@
-import { commissionRequirementsSatisfied } from '@helpers/commission/commission-requirement';
+import {
+  commissionOfferReputationReward,
+  commissionRequirementsSatisfied,
+} from '@helpers/commission/commission-requirement';
 import { spendCommissionRequirements } from '@helpers/commission/commission-turn-in';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -15,6 +18,7 @@ import {
   townCommissionReputationReward,
   townCommissionRequirementEntries,
 } from '@helpers/town/town-commission-fulfill';
+import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { depositCommissionRequirementsToTown } from '@helpers/town/town-materials';
 import { isPartyAtTown } from '@helpers/town/town-visit';
 import { currentLocationGet } from '@helpers/world';
@@ -100,7 +104,9 @@ export async function townCommissionFulfill(
 
     const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
     offerName = offer?.name;
-    reputationAmount = offer?.townReputationReward ?? 0;
+    reputationAmount = offer
+      ? commissionOfferReputationReward(offer, townId)
+      : 0;
 
     spendCommissionRequirements(s, slot.requirements);
     depositCommissionRequirementsToTown(s, townId, slot.requirements);
@@ -124,6 +130,7 @@ export async function townCommissionFulfill(
     );
     if (tierChanged) {
       await townReputationBuffRefresh(currentLocationGet().mapName);
+      await townCommissionRefreshTierScaledSlots(townId);
     }
     if (offerName) {
       analyticsSendDesignEvent(

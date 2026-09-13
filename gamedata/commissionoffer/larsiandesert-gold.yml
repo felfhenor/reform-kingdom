@@ -10,3 +10,16 @@
   rewards: []
 
   townReputationReward: 10
+
+  reputationTierMultipliers:
+    - tier: 0
+      value: 1
+
+    - tier: 1
+      value: 5
+
+    - tier: 2
+      value: 15
+
+    - tier: 3
+      value: 50

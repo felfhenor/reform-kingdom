@@ -75,6 +75,7 @@ const offer: CommissionOfferContent = {
   rewards: [],
   townReputationReward: 0,
   specialtyForRecipeId: 'UNKNOWN' as RecipeId,
+  reputationTierMultipliers: [],
 };
 
 function withCommissionState(commissions: Record<string, unknown>): void {

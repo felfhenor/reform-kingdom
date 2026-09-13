@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content/content';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
+import { townReputationTierValueResolve } from '@helpers/town/reputation/town-reputation-tier-value';
 import type {
   CommissionOfferContent,
   CommissionOfferSlot,
@@ -12,6 +13,7 @@ import type {
   GameState,
   ItemContent,
   MonsterContent,
+  TownId,
 } from '@interfaces';
 
 // Shared by caravan and town commission generation - both draw from the same weighted CommissionOfferSlot[] pool shape.
@@ -26,13 +28,37 @@ export function eligibleCommissionOffers(
     .filter((slot): slot is EligibleCommissionOffer => !!slot);
 }
 
+function commissionOfferTierMultiplier(
+  offer: CommissionOfferContent,
+  townId?: TownId,
+): number {
+  if (!townId || offer.reputationTierMultipliers.length === 0) return 1;
+
+  // Falls back to 1, not the resolver's own 0-if-unmatched, so an offer that forgets to author tier 0 doesn't become free.
+  return (
+    townReputationTierValueResolve(townId, offer.reputationTierMultipliers) || 1
+  );
+}
+
+export function commissionOfferReputationReward(
+  offer: CommissionOfferContent,
+  townId?: TownId,
+): number {
+  return Math.round(
+    offer.townReputationReward * commissionOfferTierMultiplier(offer, townId),
+  );
+}
+
 export function rollCommissionRequirements(
   offer: CommissionOfferContent,
+  townId?: TownId,
 ): CommissionRequirement[] {
+  const multiplier = commissionOfferTierMultiplier(offer, townId);
+
   return offer.requirements.map((requirement) => {
-    const quantity = rngNumberRange(
-      requirement.quantityMin,
-      requirement.quantityMax,
+    const quantity = Math.round(
+      rngNumberRange(requirement.quantityMin, requirement.quantityMax) *
+        multiplier,
     );
 
     if ('equipmentId' in requirement) {

@@ -124,6 +124,7 @@ describe('grantCommissionRewards', () => {
       ],
       townReputationReward: 0,
       specialtyForRecipeId: 'UNKNOWN' as RecipeId,
+      reputationTierMultipliers: [],
     };
     vi.mocked(rollDroppedRewards).mockReturnValue([
       { kind: 'Item', itemId: 'trader-token' as ItemId, quantity: 2 },

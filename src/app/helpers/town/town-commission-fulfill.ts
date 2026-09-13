@@ -1,5 +1,6 @@
 import {
   buildCommissionRequirementEntries,
+  commissionOfferReputationReward,
   commissionRequirementsSatisfied,
 } from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
@@ -46,7 +47,7 @@ export function townCommissionReputationReward(
     ? getEntry<CommissionOfferContent>(slot.commissionOfferId)
     : undefined;
 
-  return offer?.townReputationReward ?? 0;
+  return offer ? commissionOfferReputationReward(offer, townId) : 0;
 }
 
 export function townCommissionCanFulfill(

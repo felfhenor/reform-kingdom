@@ -41,7 +41,7 @@ function ensureTownTradeskillLevelSeed(
   };
 }
 
-function ensureTownReputationTierValue(
+export function ensureTownReputationTierValue(
   tier: Partial<TownReputationTierValue> = {},
 ): TownReputationTierValue {
   return {

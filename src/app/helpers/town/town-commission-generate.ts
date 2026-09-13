@@ -27,6 +27,7 @@ import type {
   CommissionOfferSlot,
   TownCommissionSlotId,
   TownContent,
+  TownId,
   TownNodeState,
 } from '@interfaces';
 
@@ -47,16 +48,46 @@ export function townCommissionSlotCount(town: TownContent): number {
 function addCommissionSlot(
   target: TownNodeState,
   offer: CommissionOfferContent,
+  townId: TownId,
 ): void {
   target.commissionSlots = [
     ...target.commissionSlots,
     {
       id: rngUuid() as TownCommissionSlotId,
       commissionOfferId: offer.id,
-      requirements: rollCommissionRequirements(offer),
+      requirements: rollCommissionRequirements(offer, townId),
       generatedAtTick: timerTicksElapsed(),
     },
   ];
+}
+
+// Re-rolls every persistent slot whose offer scales with reputation tier, so it reflects a tier change immediately rather than at next regeneration.
+export async function townCommissionRefreshTierScaledSlots(
+  townId: TownId,
+): Promise<void> {
+  await updateGamestate((state) => {
+    const target = state.world.towns[townId];
+    if (!target) return state;
+
+    target.commissionSlots = target.commissionSlots.map((slot) => {
+      const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
+      // A kill requirement tracks real progress on the slot itself - re-rolling would wipe it, so leave those slots alone.
+      const hasKillProgress = slot.requirements.some((r) => 'monsterId' in r);
+      if (
+        !offer ||
+        offer.reputationTierMultipliers.length === 0 ||
+        hasKillProgress
+      ) {
+        return slot;
+      }
+      return {
+        ...slot,
+        requirements: rollCommissionRequirements(offer, townId),
+      };
+    });
+
+    return state;
+  });
 }
 
 function persistentSlotDefs(town: TownContent): CommissionOfferSlot[] {
@@ -83,10 +114,11 @@ function missingPersistentDefs(
 function addMissingPersistentSlots(
   target: TownNodeState,
   defs: CommissionOfferSlot[],
+  townId: TownId,
 ): void {
   defs.forEach((def) => {
     const offer = getEntry<CommissionOfferContent>(def.commissionOfferId);
-    if (offer) addCommissionSlot(target, offer);
+    if (offer) addCommissionSlot(target, offer, townId);
   });
 }
 
@@ -138,7 +170,7 @@ function addOneRolledCommission(
   );
   if (!picked) return;
 
-  addCommissionSlot(target, picked.offer);
+  addCommissionSlot(target, picked.offer, town.id);
 }
 
 export function townCommissionProcessTick(): void {
@@ -163,7 +195,7 @@ export function townCommissionProcessTick(): void {
       // Nothing to add this tick - skip every content resolution below entirely, not just the weighted pick.
       if (missingPersistent.length === 0 && !needsRolledFill) return state;
 
-      addMissingPersistentSlots(target, missingPersistent);
+      addMissingPersistentSlots(target, missingPersistent, town.id);
 
       if (needsRolledFill) {
         const activeOfferIds = new Set(

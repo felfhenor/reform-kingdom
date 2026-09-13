@@ -88,6 +88,7 @@ const offer: CommissionOfferContent = {
   ],
   townReputationReward: 0,
   specialtyForRecipeId: 'UNKNOWN' as RecipeId,
+  reputationTierMultipliers: [],
 };
 
 const wergenStick: ItemContent = {

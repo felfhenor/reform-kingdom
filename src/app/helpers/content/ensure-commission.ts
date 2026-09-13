@@ -1,5 +1,6 @@
 import { ensureArray } from '@helpers/content/ensure-helpers-core';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { ensureTownReputationTierValue } from '@helpers/content/ensure-town';
 import type {
   CommissionOfferContent,
   CommissionOfferId,
@@ -55,5 +56,9 @@ export function ensureCommissionOffer(
     townReputationReward: offer.townReputationReward ?? 0,
     specialtyForRecipeId:
       offer.specialtyForRecipeId ?? ('UNKNOWN' as RecipeId),
+    reputationTierMultipliers: ensureArray(
+      offer.reputationTierMultipliers,
+      ensureTownReputationTierValue,
+    ),
   };
 }
