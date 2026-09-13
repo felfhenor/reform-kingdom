@@ -78,8 +78,8 @@ describe('worldNodeShrineLevel', () => {
 });
 
 describe('worldNodeShrineMaxAchievableLevel', () => {
-  it('is levels.length - 1', () => {
-    expect(worldNodeShrineMaxAchievableLevel(buildShrine())).toBe(2);
+  it('is levels.length', () => {
+    expect(worldNodeShrineMaxAchievableLevel(buildShrine())).toBe(3);
   });
 });
 
@@ -90,7 +90,7 @@ describe('worldNodeShrineIsMaxLevel', () => {
 
   it('is false below the max achievable level', () => {
     vi.mocked(gamestate).mockReturnValue({
-      shrines: { Node: { level: 1 } },
+      shrines: { Node: { level: 2 } },
     } as unknown as GameState);
 
     expect(worldNodeShrineIsMaxLevel(buildShrine(), 'Node')).toBe(false);
@@ -98,7 +98,7 @@ describe('worldNodeShrineIsMaxLevel', () => {
 
   it('is true at or above the max achievable level', () => {
     vi.mocked(gamestate).mockReturnValue({
-      shrines: { Node: { level: 2 } },
+      shrines: { Node: { level: 3 } },
     } as unknown as GameState);
 
     expect(worldNodeShrineIsMaxLevel(buildShrine(), 'Node')).toBe(true);
@@ -134,9 +134,19 @@ describe('worldNodeShrineCurrentTier', () => {
     vi.clearAllMocks();
   });
 
-  it('resolves tier I at level 0, with no offset', () => {
+  it('is undefined at level 0 - no investment made, so not prayable', () => {
     vi.mocked(gamestate).mockReturnValue({
       shrines: { Node: { level: 0 } },
+    } as unknown as GameState);
+
+    expect(
+      worldNodeShrineCurrentTier(buildShrine(), 'Node'),
+    ).toBeUndefined();
+  });
+
+  it('resolves tier I at level 1', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      shrines: { Node: { level: 1 } },
     } as unknown as GameState);
 
     expect(worldNodeShrineCurrentTier(buildShrine(), 'Node')?.globalEffectId).toBe(
@@ -144,9 +154,9 @@ describe('worldNodeShrineCurrentTier', () => {
     );
   });
 
-  it('resolves tier V at the max level', () => {
+  it('resolves tier III at the max level', () => {
     vi.mocked(gamestate).mockReturnValue({
-      shrines: { Node: { level: 2 } },
+      shrines: { Node: { level: 3 } },
     } as unknown as GameState);
 
     expect(worldNodeShrineCurrentTier(buildShrine(), 'Node')?.globalEffectId).toBe(
@@ -204,6 +214,6 @@ describe('pruneInvalidShrineLevels', () => {
       () => buildShrine({ levels: [{ costs: [] }] as ShrineLevel[] }),
     );
 
-    expect(result).toEqual({ "Founder's Shrine": { level: 0 } });
+    expect(result).toEqual({ "Founder's Shrine": { level: 1 } });
   });
 });

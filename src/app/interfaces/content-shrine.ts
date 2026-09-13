@@ -18,7 +18,7 @@ export type ShrineContent = IsContentItem &
     id: ShrineId;
     __type: 'shrine';
 
-    // Level N grants levels[N]'s buff (level 0 -> tier I is free); levels[N].costs is
-    // the price to reach level N+1 - the last entry's costs are unused once maxed.
+    // Level 0 = no investment (not prayable); level N (1..levels.length) grants
+    // levels[N-1]'s buff, unlocked by paying levels[N-1].costs.
     levels: ShrineLevel[];
   };

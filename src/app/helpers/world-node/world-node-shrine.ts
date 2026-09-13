@@ -12,10 +12,11 @@ export function worldNodeShrineLevel(nodeName: string): number {
   return gamestate().shrines?.[nodeName]?.level ?? 0;
 }
 
+// Level 0 means no investment made yet (not a tier); levels.length is the highest tier obtainable.
 export function worldNodeShrineMaxAchievableLevel(
   shrine: ShrineContent,
 ): number {
-  return shrine.levels.length - 1;
+  return shrine.levels.length;
 }
 
 export function worldNodeShrineIsMaxLevel(
@@ -27,7 +28,7 @@ export function worldNodeShrineIsMaxLevel(
   );
 }
 
-// Leveling N -> N+1 costs whatever's authored at levels[N] (levels[length-1]'s own costs are unused once maxed).
+// Leveling N -> N+1 costs whatever's authored at levels[N] - every entry's cost gets used, since levels.length is the max achievable level.
 export function worldNodeShrineLevelUpCost(
   shrine: ShrineContent,
   nodeName: string,
@@ -35,12 +36,12 @@ export function worldNodeShrineLevelUpCost(
   return shrine.levels[worldNodeShrineLevel(nodeName)]?.costs ?? [];
 }
 
-// Level N directly grants levels[N]'s buff - level 0 already grants tier I for free.
+// Level N grants levels[N-1]'s buff - level 0 has no tier, so the shrine requires an initial investment before it's prayable.
 export function worldNodeShrineCurrentTier(
   shrine: ShrineContent,
   nodeName: string,
 ): ShrineLevel | undefined {
-  return shrine.levels[worldNodeShrineLevel(nodeName)];
+  return shrine.levels[worldNodeShrineLevel(nodeName) - 1];
 }
 
 // developing/praying requires physically standing at the node.
