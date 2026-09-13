@@ -6,6 +6,7 @@ import {
   worldNodeEncounterRandom,
   worldNodeGathering,
   worldNodeOverride,
+  worldNodeShrine,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -23,6 +24,7 @@ export function worldNodeDescription(
     worldNodeGathering(entry)?.description ??
     worldNodeEncounterRandom(entry)?.description ??
     worldNodeCaravan(entry)?.description ??
+    worldNodeShrine(entry)?.description ??
     worldNodeTown(entry)?.description
   );
 }

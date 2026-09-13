@@ -14,6 +14,7 @@ const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
   ExploreRandom: 0xc084fc,
   Trade: 0xfbbf24,
   Travel: 0x60a5fa,
+  Shrine: 0x22d3ee,
 };
 
 const NODE_STATUS_BEATEN_COLOR = 0x4ade80;

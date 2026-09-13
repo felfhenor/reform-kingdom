@@ -61,9 +61,11 @@ import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node/world-node-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { pruneInvalidGatherNodeLevels } from '@helpers/world-node/world-node-level';
+import { pruneInvalidShrineLevels } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeByName,
   worldNodeGathering,
+  worldNodeShrine,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -170,6 +172,10 @@ export function migrateGameState() {
       return node ? worldNodeGathering(node) : undefined;
     },
   );
+  newState.shrines = pruneInvalidShrineLevels(newState.shrines, (nodeName) => {
+    const node = worldNodeByName(nodeName);
+    return node ? worldNodeShrine(node) : undefined;
+  });
   newState.worldDiscoveries = pruneInvalidWorldDiscoveries(
     newState.worldDiscoveries,
     (nodeName) => !!worldNodeByName(nodeName),

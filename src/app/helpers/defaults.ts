@@ -52,6 +52,7 @@ export function defaultGameState(): GameState {
     discoveredRecipes: {},
     discoveredGatherNodes: {},
     gatherNodeLevels: {},
+    shrines: {},
     worldDiscoveries: {},
     bestiary: {},
     workers: {},

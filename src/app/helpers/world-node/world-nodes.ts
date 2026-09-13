@@ -12,6 +12,7 @@ import type {
   GameMap,
   GatheringContent,
   NodeOverrideContent,
+  ShrineContent,
   TiledMap,
   TiledObject,
   TownContent,
@@ -130,6 +131,13 @@ export function worldNodeCaravan(
   return content?.__type === 'caravan' ? content : undefined;
 }
 
+export function worldNodeShrine(
+  entry: WorldNodeEntry,
+): ShrineContent | undefined {
+  const content = getEntry<ShrineContent>(entry.nodeName);
+  return content?.__type === 'shrine' ? content : undefined;
+}
+
 export function worldNodeTown(entry: WorldNodeEntry): TownContent | undefined {
   const content = getEntry<TownContent>(entry.nodeName);
   return content?.__type === 'town' ? content : undefined;
@@ -151,6 +159,7 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
     worldNodeEncounterRandom(entry)?.hidden ??
     worldNodeOverride(entry)?.hidden ??
     worldNodeTown(entry)?.hidden ??
+    worldNodeShrine(entry)?.hidden ??
     false
   );
 }
@@ -166,6 +175,7 @@ export function worldNodeCollectibleGateIds(
     worldNodeCaravan(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeOverride(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeTown(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeShrine(entry)?.invisibleUntilCollectibleIdsFound ??
     []
   );
 }

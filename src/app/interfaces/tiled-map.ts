@@ -38,6 +38,7 @@ export type WorldNodeType =
   | 'ExploreNode'
   | 'ExploreRandomNode'
   | 'GatherNode'
+  | 'Shrine'
   | 'TeleportNode';
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
@@ -50,6 +51,7 @@ export type ExploreRandomNodeObject = TiledObject & {
   type: 'ExploreRandomNode';
 };
 export type GatherNodeObject = TiledObject & { type: 'GatherNode' };
+export type ShrineNodeObject = TiledObject & { type: 'Shrine' };
 
 export type TeleportNodeProperty =
   | { name: 'tag'; type: 'string'; value: string }
@@ -67,6 +69,7 @@ export type WorldNodeObject =
   | ExploreNodeObject
   | ExploreRandomNodeObject
   | GatherNodeObject
+  | ShrineNodeObject
   | TeleportNodeObject;
 
 export type TiledObjectSpriteFrame = {

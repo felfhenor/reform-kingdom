@@ -15,6 +15,7 @@ export type ContentType =
   | 'monster'
   | 'nodeoverride'
   | 'recipe'
+  | 'shrine'
   | 'skill'
   | 'statuseffect'
   | 'town'

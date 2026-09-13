@@ -1,0 +1,115 @@
+- id: 8e7cc8d1-ffce-4ec9-876e-a194713bf08a
+  name: Founder's Shrine
+  description: A shrine dedicated to the founder of the Duchy of Carrina. It helps new adventurers and old ones alike to recognize their experiences and learn more from them.
+
+  levels:
+    - costs:
+        - itemId: Gold Coin
+          required: 500
+
+      globalEffectId: Wisdom of the Founder I
+      globalEffectDuration: 1800
+
+    - costs:
+        - itemId: Gold Coin
+          required: 10000
+
+        - itemId: Wergen Wood
+          required: 25
+
+        - itemId: Copper Ingot
+          required: 25
+
+        - itemId: Malachite
+          required: 25
+
+      globalEffectId: Wisdom of the Founder II
+      globalEffectDuration: 3600
+
+    - costs:
+        - itemId: Gold Coin
+          required: 25000
+
+        - itemId: Tattered Hide
+          required: 25
+
+        - itemId: Small Goblin Bone
+          required: 25
+
+        - itemId: Goblin Teeth
+          required: 25
+
+      globalEffectId: Wisdom of the Founder III
+      globalEffectDuration: 7200
+
+    - costs:
+        - itemId: Gold Coin
+          required: 65000
+
+        - itemId: Weak Spider Silk
+          required: 25
+
+        - itemId: Azurite
+          required: 25
+
+        - itemId: Pumpkin Gem
+          required: 5
+
+      globalEffectId: Wisdom of the Founder IV
+      globalEffectDuration: 14400
+
+    - costs:
+        - itemId: Gold Coin
+          required: 150000
+
+        - itemId: Orc Bone
+          required: 25
+
+        - itemId: Small Asura Tendon
+          required: 25
+
+        - itemId: Trislime Core
+          required: 5
+
+      globalEffectId: Wisdom of the Founder V
+      globalEffectDuration: 31536000
+
+- id: 21a576a8-b4d2-467c-8a06-d7020757ec25
+  name: Merchant's Shrine
+  description: A shrine erected by local merchants. They say that praying here increases your wealth.
+
+  levels:
+    - costs:
+        - itemId: Gold Coin
+          required: 500
+
+      globalEffectId: Triumph of the Merchants I
+      globalEffectDuration: 1800
+
+    - costs:
+        - itemId: Gold Coin
+          required: 25000
+
+      globalEffectId: Triumph of the Merchants II
+      globalEffectDuration: 3600
+
+    - costs:
+        - itemId: Gold Coin
+          required: 100000
+
+      globalEffectId: Triumph of the Merchants III
+      globalEffectDuration: 7200
+
+    - costs:
+        - itemId: Gold Coin
+          required: 250000
+
+      globalEffectId: Triumph of the Merchants IV
+      globalEffectDuration: 14400
+
+    - costs:
+        - itemId: Gold Coin
+          required: 1000000
+
+      globalEffectId: Triumph of the Merchants V
+      globalEffectDuration: 31536000

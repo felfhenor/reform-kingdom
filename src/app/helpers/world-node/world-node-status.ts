@@ -43,6 +43,8 @@ export function worldNodeInteractionKind(
       return 'ExploreRandom';
     case 'CaravanNode':
       return 'Trade';
+    case 'Shrine':
+      return 'Shrine';
     case 'TeleportNode':
     case 'Kingdom':
     case 'NonPlayerKingdom':

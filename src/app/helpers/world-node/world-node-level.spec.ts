@@ -8,26 +8,15 @@ vi.mock('@helpers/world', () => ({
   worldNodeAtCurrentLocation: vi.fn(),
 }));
 
-vi.mock('@helpers/item/materials', () => ({
-  getMaterialQuantity: vi.fn(),
-  applyMaterialDelta: vi.fn(),
-}));
-
-import {
-  applyMaterialDelta,
-  getMaterialQuantity,
-} from '@helpers/item/materials';
 import { gamestate } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import {
   isPartyAtGatherNode,
   pruneInvalidGatherNodeLevels,
-  worldNodeCanAffordLevelUpCost,
   worldNodeIsMaxLevel,
   worldNodeLevel,
   worldNodeLevelUpCost,
   worldNodeMaxAchievableLevel,
-  worldNodeSpendLevelUpCost,
 } from '@helpers/world-node/world-node-level';
 import type {
   GameState,
@@ -145,58 +134,6 @@ describe('worldNodeLevelUpCost', () => {
     } as unknown as GameState);
 
     expect(worldNodeLevelUpCost(buildGathering(), 'Node')).toEqual([]);
-  });
-});
-
-describe('worldNodeCanAffordLevelUpCost', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('is true when every cost is affordable', () => {
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-
-    expect(
-      worldNodeCanAffordLevelUpCost([
-        { itemId: 'Gold Coin' as ItemId, required: 50 },
-        { itemId: 'Wergen Stick' as ItemId, required: 50 },
-      ]),
-    ).toBe(true);
-  });
-
-  it('is false when any single cost is unaffordable', () => {
-    vi.mocked(getMaterialQuantity).mockImplementation((itemId) =>
-      itemId === 'Gold Coin' ? 100 : 0,
-    );
-
-    expect(
-      worldNodeCanAffordLevelUpCost([
-        { itemId: 'Gold Coin' as ItemId, required: 50 },
-        { itemId: 'Wergen Stick' as ItemId, required: 50 },
-      ]),
-    ).toBe(false);
-  });
-
-  it('is true for an empty cost list', () => {
-    expect(worldNodeCanAffordLevelUpCost([])).toBe(true);
-  });
-});
-
-describe('worldNodeSpendLevelUpCost', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('applies a negative delta for every cost entry', () => {
-    const state = {} as GameState;
-
-    worldNodeSpendLevelUpCost(state, [
-      { itemId: 'Gold Coin' as ItemId, required: 50 },
-      { itemId: 'Wergen Stick' as ItemId, required: 10 },
-    ]);
-
-    expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'Gold Coin', -50);
-    expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'Wergen Stick', -10);
   });
 });
 

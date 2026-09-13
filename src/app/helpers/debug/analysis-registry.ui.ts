@@ -14,6 +14,7 @@ import { runObtainabilityAnalysis } from '@helpers/debug/analysis-obtainability'
 import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipeingredientorder';
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
+import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
@@ -161,7 +162,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'fieldnodes',
     title: 'Field Nodes',
     description:
-      'Every field node has a matching encounter, random encounter, or gathering entry.',
+      'Every field node has a matching encounter, random encounter, gathering, or shrine entry.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],
@@ -176,6 +177,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runGatherDevelopmentLevelsAnalysis,
+  },
+  {
+    id: 'shrines',
+    title: 'Shrines',
+    description:
+      'Every shrine has at least one level, each isShrineBuff-flagged, and no globalEffectId shared across shrine levels.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runShrinesAnalysis,
   },
   {
     id: 'workerstamina',

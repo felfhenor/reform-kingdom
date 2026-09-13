@@ -24,6 +24,11 @@ export type GlobalEffectEffectXPGainMultiplier = {
   value: number;
 };
 
+export type GlobalEffectEffectGoldGainMultiplier = {
+  effectType: 'GlobalGoldGainMultiplier';
+  value: number;
+};
+
 // Adds `value` (a flat percent) to every status effect tag's resistance,
 // unlike gear which targets specific tags.
 export type GlobalEffectEffectDebuffResistance = {
@@ -42,6 +47,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainCombatStat
   | GlobalEffectEffectXPGainMultiplier
+  | GlobalEffectEffectGoldGainMultiplier
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag;
 
@@ -52,6 +58,9 @@ export type GlobalEffectContent = IsContentItem &
     __type: 'globaleffect';
     effects: GlobalEffectEffect[];
     hideDuration?: boolean;
+
+    // Flags a buff as shrine-granted, so praying at any shrine clears every other one.
+    isShrineBuff?: boolean;
   };
 
 export type GlobalEffect = GlobalEffectContent & {

@@ -3,12 +3,28 @@ import { worldNodeCaravanTimerText } from '@helpers/world-node/world-node-carava
 import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-encounter';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeInteractionKind,
   worldNodeLevelLabel,
   worldNodeLevelRange,
 } from '@helpers/world-node/world-node-status';
-import type { WorldNodeEntry, WorldNodeLabelInfo } from '@interfaces';
+import type {
+  WorldNodeEntry,
+  WorldNodeInteractionKind,
+  WorldNodeLabelInfo,
+} from '@interfaces';
+
+// Each leveled node type gets its own branch, so a future one is a one-line addition.
+function nodeNameSuffixLevel(
+  kind: WorldNodeInteractionKind,
+  entry: WorldNodeEntry,
+): number {
+  let level = 0;
+  if (kind === 'Gather') level = worldNodeLevel(entry.nodeName);
+  if (kind === 'Shrine') level = worldNodeShrineLevel(entry.nodeName);
+  return level;
+}
 
 // `(obtained/total)` suffix for the map label, hidden once every reward's been found (or if there are none).
 function nodeRewardProgressSuffix(entry: WorldNodeEntry): string {
@@ -26,9 +42,9 @@ export function worldNodeLabelInfo(
 
   const levelRange = worldNodeLevelRange(entry);
   // Caravan names are authored as "<Brand> - <Branch>"; the branch is just the map, so drop it here.
-  const gatherLevel = kind === 'Gather' ? worldNodeLevel(entry.nodeName) : 0;
+  const suffixLevel = nodeNameSuffixLevel(kind, entry);
   const nodeNameLine =
-    (gatherLevel > 0 ? `${entry.nodeName} +${gatherLevel}` : entry.nodeName) +
+    (suffixLevel > 0 ? `${entry.nodeName} +${suffixLevel}` : entry.nodeName) +
     nodeRewardProgressSuffix(entry);
   const lines =
     kind === 'Trade' ? [caravanBrandName(entry.nodeName)] : [nodeNameLine];

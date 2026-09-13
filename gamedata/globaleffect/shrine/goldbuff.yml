@@ -1,0 +1,45 @@
+- id: 952be6e8-a4f4-4386-8630-c0cfe4739833
+  name: Triumph of the Merchants I
+  sprite: '0012'
+  description: +10% gold dropped from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.1
+
+- id: e8fc1557-c0e1-4958-b5c1-6624f7f44ed8
+  name: Triumph of the Merchants II
+  sprite: '0012'
+  description: +20% gold dropped from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.2
+
+- id: a07a143e-d226-4201-972a-65fbb644e3c8
+  name: Triumph of the Merchants III
+  sprite: '0012'
+  description: +30% gold dropped from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.3
+
+- id: dd672582-0a45-4646-80a0-f4d37ebbfb7d
+  name: Triumph of the Merchants IV
+  sprite: '0012'
+  description: +40% gold dropped from adventuring.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.4
+
+- id: f4341948-bf53-4ca6-bafe-8f5bf156dcd5
+  name: Triumph of the Merchants V
+  sprite: '0012'
+  description: +50% gold dropped from adventuring.
+  isShrineBuff: true
+  hideDuration: true
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.5

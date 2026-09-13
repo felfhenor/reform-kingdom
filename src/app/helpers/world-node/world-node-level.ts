@@ -1,14 +1,9 @@
-import {
-  applyMaterialDelta,
-  getMaterialQuantity,
-} from '@helpers/item/materials';
 import { gamestate } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
-  GameState,
+  CostItem,
   GameStateGatherNodeLevels,
   GatheringContent,
-  GatherLevelCostItem,
 } from '@interfaces';
 
 // Absent entry (or a missing gatherNodeLevels, e.g. mid-migration on an old save) means level 0.
@@ -34,26 +29,8 @@ export function worldNodeIsMaxLevel(
 export function worldNodeLevelUpCost(
   gathering: GatheringContent,
   nodeName: string,
-): GatherLevelCostItem[] {
+): CostItem[] {
   return gathering.levelCost[worldNodeLevel(nodeName)]?.costs ?? [];
-}
-
-export function worldNodeCanAffordLevelUpCost(
-  costs: GatherLevelCostItem[],
-): boolean {
-  return costs.every(
-    (cost) => getMaterialQuantity(cost.itemId) >= cost.required,
-  );
-}
-
-// Mutates `state` directly - call only from inside an `updateGamestate` callback.
-export function worldNodeSpendLevelUpCost(
-  state: GameState,
-  costs: GatherLevelCostItem[],
-): void {
-  costs.forEach((cost) => {
-    applyMaterialDelta(state, cost.itemId, -cost.required);
-  });
 }
 
 // Mirrors isPartyAtCaravan (caravan.ts) - leveling requires physically standing at the node.

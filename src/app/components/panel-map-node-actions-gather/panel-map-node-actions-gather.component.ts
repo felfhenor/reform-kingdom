@@ -7,9 +7,9 @@ import {
 } from '@angular/core';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { worldNodeCanAffordCost } from '@helpers/world-node/world-node-cost';
 import {
   isPartyAtGatherNode,
-  worldNodeCanAffordLevelUpCost,
   worldNodeIsMaxLevel,
   worldNodeLevelUpCost,
 } from '@helpers/world-node/world-node-level';
@@ -42,16 +42,12 @@ export class PanelMapNodeActionsGatherComponent {
     return worldNodeLevelUpCost(gathering, this.entry().nodeName);
   });
 
-  public costRow = computed(() =>
-    this.cost().map((cost) => ({ type: cost.itemId, amount: cost.required })),
-  );
-
   public canDevelop = computed(() => {
     if (this.isMaxLevel()) return false;
 
     return (
       isPartyAtGatherNode(this.entry().nodeName) &&
-      worldNodeCanAffordLevelUpCost(this.cost())
+      worldNodeCanAffordCost(this.cost())
     );
   });
 }

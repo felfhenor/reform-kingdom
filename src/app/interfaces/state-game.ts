@@ -98,8 +98,11 @@ export type GameStateDiscoveredGatherNodes = {
   [key: string]: { foundAt: number };
 };
 
-// Gold-funded development level per GatherNode - a progress value, not a discovery ledger, so an absent key means level 0.
 export type GameStateGatherNodeLevels = {
+  [key: string]: { level: number };
+};
+
+export type GameStateShrineLevels = {
   [key: string]: { level: number };
 };
 
@@ -145,6 +148,7 @@ export type GameState = {
   discoveredRecipes: GameStateDiscoveredRecipes;
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;
   gatherNodeLevels: GameStateGatherNodeLevels;
+  shrines: GameStateShrineLevels;
   worldDiscoveries: GameStateWorldDiscoveries;
   bestiary: GameStateBestiary;
   workers: GameStateWorkers;

@@ -21,12 +21,14 @@
         </div>
 
         <div class="flex flex-wrap gap-2 text-sm">
-          <div
-            class="badge badge-outline"
-            [class.badge-error]="!meetsGatherLevelRequirement()"
-          >
-            Level {{ levelLabel() }}
-          </div>
+          @if (!isShrineNode()) {
+            <div
+              class="badge badge-outline"
+              [class.badge-error]="!meetsGatherLevelRequirement()"
+            >
+              Level {{ levelLabel() }}
+            </div>
+          }
 
           @if (isExploreNode()) {
             <app-panel-map-node-badges-explore [entry]="entry" />
@@ -106,6 +108,12 @@
           <app-panel-map-node-actions-gather
             [entry]="entry"
             (develop)="develop()"
+          />
+        } @else if (isShrineNode()) {
+          <app-panel-map-node-actions-shrine
+            [entry]="entry"
+            (develop)="developShrine()"
+            (pray)="prayShrine()"
           />
         } @else if (isTownNode()) {
           <app-panel-map-node-actions-town (openTown)="openTown()" />

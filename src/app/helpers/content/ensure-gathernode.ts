@@ -1,9 +1,8 @@
-import { ensureArray } from '@helpers/content/ensure-helpers-core';
+import { ensureArray, ensureCostItem } from '@helpers/content/ensure-helpers-core';
 import type {
   GatheringContent,
   GatheringId,
   GatherLevelCost,
-  GatherLevelCostItem,
   GatherResult,
   GatherResultItem,
   ItemId,
@@ -29,20 +28,11 @@ export function ensureGatherResult(
   };
 }
 
-function ensureGatherLevelCostItem(
-  item: Partial<GatherLevelCostItem> = {},
-): GatherLevelCostItem {
-  return {
-    itemId: item.itemId ?? ('UNKNOWN' as ItemId),
-    required: item.required ?? 0,
-  };
-}
-
 export function ensureGatherLevelCost(
   levelCost: Partial<GatherLevelCost> = {},
 ): GatherLevelCost {
   return {
-    costs: ensureArray(levelCost.costs, ensureGatherLevelCostItem),
+    costs: ensureArray(levelCost.costs, ensureCostItem),
   };
 }
 

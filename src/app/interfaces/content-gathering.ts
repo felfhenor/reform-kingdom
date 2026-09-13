@@ -1,5 +1,6 @@
 import type { ItemId } from '@interfaces/content-item';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
+import type { CostItem } from '@interfaces/cost';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
@@ -23,13 +24,8 @@ export type GatherResult = {
   tradeskillIds: TradeskillId[];
 };
 
-export type GatherLevelCostItem = {
-  itemId: ItemId;
-  required: number;
-};
-
 export type GatherLevelCost = {
-  costs: GatherLevelCostItem[];
+  costs: CostItem[];
 };
 
 export type GatheringContent = IsContentItem &

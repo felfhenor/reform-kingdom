@@ -4,11 +4,13 @@ import {
 } from '@helpers/engine/analytics';
 import { updateGamestate } from '@helpers/state-game';
 import {
+  worldNodeCanAffordCost,
+  worldNodeSpendCost,
+} from '@helpers/world-node/world-node-cost';
+import {
   isPartyAtGatherNode,
-  worldNodeCanAffordLevelUpCost,
   worldNodeIsMaxLevel,
   worldNodeLevelUpCost,
-  worldNodeSpendLevelUpCost,
 } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
@@ -26,10 +28,10 @@ export function gatherNodeLevelUp(nodeName: string): boolean {
   if (!isPartyAtGatherNode(nodeName)) return false;
 
   const cost = worldNodeLevelUpCost(gathering, nodeName);
-  if (!worldNodeCanAffordLevelUpCost(cost)) return false;
+  if (!worldNodeCanAffordCost(cost)) return false;
 
   updateGamestate((state) => {
-    worldNodeSpendLevelUpCost(state, cost);
+    worldNodeSpendCost(state, cost);
 
     const existing = state.gatherNodeLevels[nodeName];
     state.gatherNodeLevels[nodeName] = { level: (existing?.level ?? 0) + 1 };

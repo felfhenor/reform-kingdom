@@ -27,6 +27,11 @@ vi.mock('@helpers/item/collectibles', () => ({
 
 vi.mock('@helpers/item/materials', () => ({
   addMaterial: vi.fn(),
+  goldCoinId: vi.fn(() => 'Gold Coin'),
+}));
+
+vi.mock('@helpers/hero/global-effects', () => ({
+  activeGlobalEffects: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/kingdom/armory', () => ({
@@ -47,6 +52,7 @@ import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content/content';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
+import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { addMaterial } from '@helpers/item/materials';
 import {
   isWorkerRescued,
@@ -55,6 +61,8 @@ import {
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   Combat,
+  EncounterId,
+  GlobalEffect,
   ItemId,
   ResolvedDrop,
   WorkerContent,
@@ -258,5 +266,71 @@ describe('grantResolvedDrops - Item rewards', () => {
       undefined,
       { name: 'Copper Ore', sprite: 'copper-ore', spritesheet: 'item' },
     );
+  });
+});
+
+describe('grantResolvedDrops - gold gain multiplier', () => {
+  const EXPLORE_COMBAT = {
+    ...COMBAT,
+    encounterId: 'some-encounter' as EncounterId,
+  } as Combat;
+  const RAID_COMBAT = { ...COMBAT, raidTownId: 'larsia' } as Combat;
+
+  const goldGainEffect = {
+    effects: [{ effectType: 'GlobalGoldGainMultiplier', value: 0.2 }],
+  } as GlobalEffect;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getEntry).mockReturnValue({ name: 'Gold Coin' } as never);
+    vi.mocked(rewardContentInfo).mockReturnValue({
+      name: 'Gold Coin',
+      sprite: 'gold-coin',
+      spritesheet: 'item',
+    });
+  });
+
+  it('boosts Gold Coin quantity from an Explore/ExploreRandom combat when a gold buff is active', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([goldGainEffect]);
+
+    const drops: ResolvedDrop[] = [
+      { kind: 'Item', itemId: 'Gold Coin' as ItemId, quantity: 100 },
+    ];
+    grantResolvedDrops(EXPLORE_COMBAT, drops);
+
+    expect(addMaterial).toHaveBeenCalledWith('Gold Coin', 120);
+  });
+
+  it('does not boost Gold Coin quantity from a town raid, even with a gold buff active', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([goldGainEffect]);
+
+    const drops: ResolvedDrop[] = [
+      { kind: 'Item', itemId: 'Gold Coin' as ItemId, quantity: 100 },
+    ];
+    grantResolvedDrops(RAID_COMBAT, drops);
+
+    expect(addMaterial).toHaveBeenCalledWith('Gold Coin', 100);
+  });
+
+  it('leaves Gold Coin quantity unchanged from Explore combat when no gold buff is active', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([]);
+
+    const drops: ResolvedDrop[] = [
+      { kind: 'Item', itemId: 'Gold Coin' as ItemId, quantity: 100 },
+    ];
+    grantResolvedDrops(EXPLORE_COMBAT, drops);
+
+    expect(addMaterial).toHaveBeenCalledWith('Gold Coin', 100);
+  });
+
+  it('never applies the multiplier to a non-Gold-Coin item', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([goldGainEffect]);
+
+    const drops: ResolvedDrop[] = [
+      { kind: 'Item', itemId: 'Copper Ore' as ItemId, quantity: 100 },
+    ];
+    grantResolvedDrops(EXPLORE_COMBAT, drops);
+
+    expect(addMaterial).toHaveBeenCalledWith('Copper Ore', 100);
   });
 });

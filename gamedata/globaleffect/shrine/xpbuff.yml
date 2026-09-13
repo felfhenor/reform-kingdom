@@ -1,0 +1,45 @@
+- id: acbc8890-5252-4691-b98c-20e0ddc7d9d0
+  name: Wisdom of the Founder I
+  sprite: '0008'
+  description: +5% XP gain for all heroes.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.05
+
+- id: d596131f-496b-4f40-817c-8386d99f7f90
+  name: Wisdom of the Founder II
+  sprite: '0008'
+  description: +10% XP gain for all heroes.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.1
+
+- id: 86e6bc24-024d-4cb8-913e-a34b6a44b116
+  name: Wisdom of the Founder III
+  sprite: '0008'
+  description: +15% XP gain for all heroes.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.15
+
+- id: e49589f9-5052-42ef-8599-225a58d2a255
+  name: Wisdom of the Founder IV
+  sprite: '0008'
+  description: +20% XP gain for all heroes.
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.2
+
+- id: 0d154b25-a247-4ae3-bf68-aeaf12d664c7
+  name: Wisdom of the Founder V
+  sprite: '0008'
+  description: +25% XP gain for all heroes.
+  isShrineBuff: true
+  hideDuration: true
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.25

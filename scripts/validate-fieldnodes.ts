@@ -1,6 +1,6 @@
 /**
  * Validates that every field node has a matching encounter, random
- * encounter, or gathering entry. Thin CLI wrapper - logic lives in
+ * encounter, gathering, or shrine entry. Thin CLI wrapper - logic lives in
  * `src/app/helpers/debug/analysis-fieldnodes.ts`, shared with the `/debug`
  * dashboard. Requires compiled content and maps (`npm run build`).
  */

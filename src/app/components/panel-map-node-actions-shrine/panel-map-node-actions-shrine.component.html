@@ -1,0 +1,32 @@
+<div class="flex flex-col gap-2">
+  <button
+    type="button"
+    class="btn btn-sm btn-primary"
+    [disabled]="!canDevelop()"
+    (click)="develop.emit()"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    @if (isMaxLevel()) {
+      This shrine is fully developed
+    } @else {
+      Develop for
+      <app-row-currency-cost [costs]="cost()" />
+    }
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-sm btn-secondary"
+    [disabled]="!canPray()"
+    (click)="pray.emit()"
+    appSfx="ui-success"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    @if (currentBuffName(); as buffName) {
+      Pray for {{ buffName }}
+    } @else {
+      No buff available to pray for
+    }
+  </button>
+</div>

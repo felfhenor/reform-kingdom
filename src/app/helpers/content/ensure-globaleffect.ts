@@ -8,6 +8,7 @@ import type {
   GlobalEffectEffectDebuffResistanceTag,
   GlobalEffectEffectGainCombatStat,
   GlobalEffectEffectGainStats,
+  GlobalEffectEffectGoldGainMultiplier,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
   StatusEffectTag,
@@ -17,11 +18,19 @@ function ensureGlobalEffectEffect(
   effect: Partial<GlobalEffectEffectGainStats> &
     Partial<GlobalEffectEffectGainCombatStat> &
     Partial<GlobalEffectEffectXPGainMultiplier> &
+    Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'GlobalGoldGainMultiplier') {
+    return {
+      effectType: 'GlobalGoldGainMultiplier',
+      value: effect.value ?? 0,
+    };
   }
 
   if (effect.effectType === 'DebuffResistance') {
@@ -62,5 +71,6 @@ export function ensureGlobalEffect(
     description: effect.description ?? 'UNKNOWN',
     effects: ensureArray(effect.effects, ensureGlobalEffectEffect),
     hideDuration: effect.hideDuration ?? false,
+    isShrineBuff: effect.isShrineBuff ?? false,
   };
 }

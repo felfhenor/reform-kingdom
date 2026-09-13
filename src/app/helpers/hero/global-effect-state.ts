@@ -25,6 +25,8 @@ export function globalEffectEffectsDescription(
         }
         case 'GlobalXPGainMultiplier':
           return `XP Gain: +${effect.value * 100}%`;
+        case 'GlobalGoldGainMultiplier':
+          return `Gold Gain: +${effect.value * 100}%`;
         case 'DebuffResistance':
           return `All Debuff Resist: +${effect.value}%`;
         case 'DebuffResistanceTag':

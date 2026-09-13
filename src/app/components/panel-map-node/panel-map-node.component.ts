@@ -5,6 +5,7 @@ import { ButtonCloseComponent } from '@components/button-close/button-close.comp
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
 import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
+import { PanelMapNodeActionsShrineComponent } from '@components/panel-map-node-actions-shrine/panel-map-node-actions-shrine.component';
 import { PanelMapNodeActionsTownComponent } from '@components/panel-map-node-actions-town/panel-map-node-actions-town.component';
 import { PanelMapNodeBadgesCaravanComponent } from '@components/panel-map-node-badges-caravan/panel-map-node-badges-caravan.component';
 import { PanelMapNodeBadgesExploreComponent } from '@components/panel-map-node-badges-explore/panel-map-node-badges-explore.component';
@@ -47,6 +48,11 @@ import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathe
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import { gatherNodeLevelUp } from '@helpers/world-node/world-node-level.ui';
 import { worldNodeCompletionRewards } from '@helpers/world-node/world-node-rewards';
+import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
+import {
+  shrineLevelUp,
+  shrinePray,
+} from '@helpers/world-node/world-node-shrine.ui';
 import {
   worldNodeLevelLabel,
   worldNodeLevelRange,
@@ -56,6 +62,7 @@ import {
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeGathering,
+  worldNodeShrine,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import { sortBy, sum } from 'es-toolkit/compat';
@@ -71,6 +78,7 @@ import { sortBy, sum } from 'es-toolkit/compat';
     PanelMapNodeActionsCaravanComponent,
     PanelMapNodeActionsExploreComponent,
     PanelMapNodeActionsGatherComponent,
+    PanelMapNodeActionsShrineComponent,
     PanelMapNodeActionsTownComponent,
     PanelMapNodeBadgesCaravanComponent,
     PanelMapNodeBadgesExploreComponent,
@@ -93,6 +101,13 @@ export class PanelMapNodeComponent {
     return entry && this.isGatherNode() ? worldNodeLevel(entry.nodeName) : 0;
   });
 
+  public shrineLevel = computed(() => {
+    const entry = this.node();
+    return entry && this.isShrineNode()
+      ? worldNodeShrineLevel(entry.nodeName)
+      : 0;
+  });
+
   public displayName = computed(() => {
     const entry = this.node();
     if (!entry) return '';
@@ -100,7 +115,9 @@ export class PanelMapNodeComponent {
     if (this.isCaravanNode()) return caravanBrandName(entry.nodeName);
     if (this.isTownNode()) return worldNodeTown(entry)?.name ?? entry.nodeName;
 
-    const level = this.gatherNodeLevel();
+    let level = 0;
+    if (this.isGatherNode()) level = this.gatherNodeLevel();
+    if (this.isShrineNode()) level = this.shrineLevel();
     return level > 0 ? `${entry.nodeName} +${level}` : entry.nodeName;
   });
 
@@ -140,6 +157,11 @@ export class PanelMapNodeComponent {
   public isGatherNode = computed(() => {
     const entry = this.node();
     return !!entry && !!worldNodeGathering(entry);
+  });
+
+  public isShrineNode = computed(() => {
+    const entry = this.node();
+    return !!entry && !!worldNodeShrine(entry);
   });
 
   public isExploreNode = computed(() => {
@@ -283,6 +305,20 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     gatherNodeLevelUp(entry.nodeName);
+  }
+
+  public developShrine(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    shrineLevelUp(entry.nodeName);
+  }
+
+  public prayShrine(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    shrinePray(entry.nodeName);
   }
 
   public close(): void {

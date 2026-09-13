@@ -32,7 +32,12 @@ export type WorldNodeLookup = {
 };
 
 export type WorldNodeInteractionKind =
-  'Gather' | 'Explore' | 'ExploreRandom' | 'Trade' | 'Travel';
+  | 'Gather'
+  | 'Explore'
+  | 'ExploreRandom'
+  | 'Trade'
+  | 'Travel'
+  | 'Shrine';
 
 export type WorldNodeCompletionRewardProgress = {
   obtained: number;

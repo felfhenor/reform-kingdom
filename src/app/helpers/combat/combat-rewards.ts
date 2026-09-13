@@ -9,9 +9,10 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { recipeDiscover } from '@helpers/crafting/recipes';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
+import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
-import { addMaterial } from '@helpers/item/materials';
+import { addMaterial, goldCoinId } from '@helpers/item/materials';
 import { armoryAdd } from '@helpers/kingdom/armory';
 import {
   isWorkerRescued,
@@ -29,6 +30,7 @@ import type {
   RewardContentInfo,
   WorkerContent,
 } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
 
 function emitRewardVfx(
   combat: Combat,
@@ -38,6 +40,20 @@ function emitRewardVfx(
   if (!info) return;
 
   gatherVfxEmit({ nodeName: combat.locationName, quantity, ...info });
+}
+
+function goldGainMultiplier(): number {
+  const bonus = sumBy(
+    activeGlobalEffects().flatMap((effect) => effect.effects),
+    (effect) =>
+      effect.effectType === 'GlobalGoldGainMultiplier' ? effect.value : 0,
+  );
+  return 1 + bonus;
+}
+
+// Only Explore/ExploreRandom combat sets encounterId/encounterRandomId - raids (raidTownId) never do.
+function isExploreCombat(combat: Combat): boolean {
+  return !!combat.encounterId || !!combat.encounterRandomId;
 }
 
 // A worker reward always rolls its chance but only ever grants once - the already-rescued check is here.
@@ -131,8 +147,12 @@ export function grantResolvedDrops(
   });
 
   Object.keys(itemsFound).forEach((itemId) => {
-    const quantity = itemsFound[itemId as ItemId];
+    let quantity = itemsFound[itemId as ItemId];
     if (quantity <= 0) return;
+
+    if (itemId === goldCoinId() && isExploreCombat(combat)) {
+      quantity = Math.round(quantity * goldGainMultiplier());
+    }
 
     addMaterial(itemId as ItemId, quantity);
 

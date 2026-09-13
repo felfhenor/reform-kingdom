@@ -101,6 +101,7 @@ vi.mock('@helpers/defaults', () => ({
     discoveredRecipes: {},
     discoveredGatherNodes: {},
     gatherNodeLevels: {},
+    shrines: {},
     worldDiscoveries: {},
     bestiary: {},
     workers: {},
@@ -119,6 +120,7 @@ vi.mock('@helpers/item/gather-node-discovery', () => ({
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
   worldNodeGathering: vi.fn(),
+  worldNodeShrine: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
 }));
 
@@ -132,6 +134,10 @@ vi.mock('@helpers/world-node/world-node-gathering', () => ({
 
 vi.mock('@helpers/world-node/world-node-level', () => ({
   pruneInvalidGatherNodeLevels: vi.fn((levels) => levels),
+}));
+
+vi.mock('@helpers/world-node/world-node-shrine', () => ({
+  pruneInvalidShrineLevels: vi.fn((levels) => levels),
 }));
 
 vi.mock('@helpers/worker/worker-discovery', () => ({

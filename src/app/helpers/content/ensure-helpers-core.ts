@@ -1,3 +1,14 @@
+import type { CostItem, ItemId } from '@interfaces';
+
+// Shared by every content type that gates a purchase/upgrade behind spending
+// materials (gather node development, shrine development, etc).
+export function ensureCostItem(item: Partial<CostItem> = {}): CostItem {
+  return {
+    itemId: item.itemId ?? ('UNKNOWN' as ItemId),
+    required: item.required ?? 0,
+  };
+}
+
 // `ensureItemFn` is typed with `any` so every concrete `ensure*` helper can
 // keep its own narrow `Partial<...>` (or union-of-partials) parameter type
 // without fighting function parameter variance here.

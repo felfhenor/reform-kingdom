@@ -73,14 +73,6 @@
       stat: Energy
       value: 25
 
-- id: 8ca328f6-a57c-4f16-8aa8-d0935ebc11c6
-  name: Wisdom of the Founder I
-  sprite: '0008'
-  description: +10% XP gain for all heroes.
-  effects:
-    - effectType: GlobalXPGainMultiplier
-      value: 0.1
-
 - id: 1a6f4a0e-2c53-4e2c-8e5f-5f2f2e4c8a19
   name: Fortitude of the Warden I
   sprite: '0009'
