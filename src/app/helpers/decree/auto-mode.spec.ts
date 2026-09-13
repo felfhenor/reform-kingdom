@@ -564,6 +564,69 @@ describe('autoModeProcessTick', () => {
     expect(result.world.autoMode.activeClauseId).toBe('copper-clause');
   });
 
+  it('does not adopt a clause pinned to a different location, even if the current node yields the same material', () => {
+    const pinnedElsewhere = buildClause({
+      id: 'copper-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      nodeName: 'Other Copper Mines',
+      targetQuantity: 1000,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [pinnedElsewhere],
+        activeClauseId: undefined,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Carrina Copper Mines',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(worldNodeByName).mockReturnValue({
+      nodeName: 'Carrina Copper Mines',
+    } as WorldNodeEntry);
+    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
+      'copper-ore' as MaterialId,
+    ]);
+
+    autoModeProcessTick();
+
+    // No matching clause to adopt, so it's treated as orphaned and stopped instead.
+    expect(gatheringStop).toHaveBeenCalled();
+  });
+
+  it('adopts a clause pinned to the exact node currently being gathered', () => {
+    const pinnedHere = buildClause({
+      id: 'copper-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'copper-ore' as MaterialId,
+      nodeName: 'Carrina Copper Mines',
+      targetQuantity: 1000,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        enabled: true,
+        clauses: [pinnedHere],
+        activeClauseId: undefined,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Carrina Copper Mines',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(worldNodeByName).mockReturnValue({
+      nodeName: 'Carrina Copper Mines',
+    } as WorldNodeEntry);
+    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
+      'copper-ore' as MaterialId,
+    ]);
+
+    autoModeProcessTick();
+
+    const firstUpdateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = firstUpdateFn(buildState({ activeClauseId: undefined }));
+    expect(result.world.autoMode.activeClauseId).toBe('copper-clause');
+  });
+
   it('stops an in-progress gather with no matching enabled clause instead of leaving it stuck forever', () => {
     const disabledClause = buildClause({
       id: 'copper-clause' as DecreeClauseId,

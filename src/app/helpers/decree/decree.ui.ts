@@ -79,7 +79,10 @@ export function decreeClauseSummary(clause: DecreeClause): string {
   switch (clause.type) {
     case 'GatherMaterial': {
       const item = getEntry<ItemContent>(clause.materialId);
-      return `Gather ${item?.name ?? 'materials'} until ${clause.targetQuantity.toLocaleString()} in storage`;
+      const itemName = item?.name ?? 'materials';
+      return clause.nodeName
+        ? `Gather ${itemName} from ${clause.nodeName} until ${clause.targetQuantity.toLocaleString()} in storage`
+        : `Gather ${itemName} until ${clause.targetQuantity.toLocaleString()} in storage`;
     }
     case 'FarmNode': {
       const reward = rewardContentInfo(clause.reward);

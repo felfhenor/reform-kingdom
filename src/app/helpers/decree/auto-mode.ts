@@ -144,7 +144,8 @@ function adoptInProgressGatherClause(): void {
     (clause) =>
       clause.enabled &&
       clause.type === 'GatherMaterial' &&
-      nodeMaterialIds.includes(clause.materialId),
+      nodeMaterialIds.includes(clause.materialId) &&
+      (!clause.nodeName || clause.nodeName === gathering.nodeName),
   );
   if (!matchingClause) return;
 

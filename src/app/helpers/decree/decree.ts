@@ -48,7 +48,10 @@ export function decreeClauseConflicts(
   return existing.some((clause) => {
     if (clause.type !== action.type) return false;
     if (action.type === 'GatherMaterial' && clause.type === 'GatherMaterial') {
-      return clause.materialId === action.materialId;
+      return (
+        clause.materialId === action.materialId &&
+        clause.nodeName === action.nodeName
+      );
     }
     if (action.type === 'FarmNode' && clause.type === 'FarmNode') {
       return (

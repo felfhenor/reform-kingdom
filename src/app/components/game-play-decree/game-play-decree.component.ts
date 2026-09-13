@@ -35,7 +35,10 @@ import {
   decreeSetWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree.ui';
 import { homeNodeGet } from '@helpers/town/town-spawn';
-import { gatherableMaterialIds } from '@helpers/world-node/world-node-gathering-discovery.ui';
+import {
+  gatherNodeFarmOptions,
+  gatherNodeMaterialIds,
+} from '@helpers/world-node/world-node-gathering-discovery.ui';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
@@ -136,9 +139,18 @@ export class GamePlayDecreeComponent {
   public readonly clauseTypeOptions = CLAUSE_TYPE_OPTIONS;
   public readonly riskToleranceOptions = RISK_TOLERANCE_OPTIONS;
 
-  public materialOptions = computed<MaterialOption[]>(() =>
-    sortBy(
-      gatherableMaterialIds()
+  public materialOptions = computed<MaterialOption[]>(() => {
+    const nodeName = this.draftNodeName();
+    const currentMaterialId = this.draftMaterialId();
+
+    const ids = nodeName ? gatherNodeMaterialIds(nodeName) : [];
+    const scopedIds =
+      currentMaterialId && !ids.includes(currentMaterialId)
+        ? [...ids, currentMaterialId]
+        : ids;
+
+    return sortBy(
+      scopedIds
         .map((id) => getEntry<ItemContent>(id))
         .filter((item): item is ItemContent => !!item)
         .map((item) => ({
@@ -148,10 +160,11 @@ export class GamePlayDecreeComponent {
           spritesheet: 'item',
         })),
       (item) => item.name,
-    ),
-  );
+    );
+  });
 
   public exploreNodeOptions = computed(() => exploreNodeFarmOptions());
+  public gatherNodeOptions = computed(() => gatherNodeFarmOptions());
 
   public draftType = signal<DecreeClauseAction['type']>('GatherMaterial');
   public draftMaterialId = signal<MaterialId | undefined>(undefined);
@@ -185,10 +198,12 @@ export class GamePlayDecreeComponent {
     switch (this.draftType()) {
       case 'GatherMaterial': {
         const materialId = this.draftMaterialId();
-        return materialId
+        const nodeName = this.draftNodeName();
+        return materialId && nodeName
           ? {
               type: 'GatherMaterial',
               materialId,
+              nodeName,
               targetQuantity: this.draftTargetQuantity(),
             }
           : undefined;
@@ -271,6 +286,9 @@ export class GamePlayDecreeComponent {
 
   public setDraftType(option: { value: DecreeClauseAction['type'] }): void {
     this.draftType.set(option.value);
+    this.draftNodeName.set(undefined);
+    this.draftMaterialId.set(undefined);
+    this.draftRewardKey.set(undefined);
   }
 
   public setDraftMaterialId(option: MaterialOption | null): void {
@@ -280,6 +298,7 @@ export class GamePlayDecreeComponent {
   public setDraftNodeName(option: { nodeName: string } | null): void {
     this.draftNodeName.set(option ? option.nodeName : undefined);
     this.draftRewardKey.set(undefined);
+    this.draftMaterialId.set(undefined);
   }
 
   public setDraftReward(option: FarmNodeRewardOption | null): void {
@@ -307,6 +326,7 @@ export class GamePlayDecreeComponent {
     if (clause.type === 'GatherMaterial') {
       this.editingClauseId.set(clause.id);
       this.draftType.set('GatherMaterial');
+      this.draftNodeName.set(clause.nodeName);
       this.draftMaterialId.set(clause.materialId);
       this.draftTargetQuantity.set(clause.targetQuantity);
       return;

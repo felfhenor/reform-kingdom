@@ -482,6 +482,95 @@ describe('nearestGatherNodeFor', () => {
   });
 });
 
+describe('clauseTargetNode - GatherMaterial with a pinned location', () => {
+  it('targets its stored node when reachable, without consulting worldNodeGatherMaterialIds', () => {
+    const node = buildNode('Grove');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'GatherMaterial',
+          materialId: 'wood' as MaterialId,
+          nodeName: 'Grove',
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBe(node);
+    expect(worldNodeGatherMaterialIds).not.toHaveBeenCalled();
+  });
+
+  it('has no target when its pinned node no longer exists', () => {
+    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'GatherMaterial',
+          materialId: 'wood' as MaterialId,
+          nodeName: 'Gone',
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('has no target when its pinned node is unreachable', () => {
+    const node = buildNode('Grove');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue(undefined);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'GatherMaterial',
+          materialId: 'wood' as MaterialId,
+          nodeName: 'Grove',
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('has no target when its pinned node is hidden and undiscovered', () => {
+    const node = buildNode('Grove');
+    vi.mocked(worldNodeByName).mockReturnValue(node);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'GatherMaterial',
+          materialId: 'wood' as MaterialId,
+          nodeName: 'Grove',
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('falls back to the nearest reachable node when no location is pinned (legacy clause)', () => {
+    const node = buildNode('Grove');
+    vi.mocked(worldNodesOfType).mockReturnValue([node]);
+    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
+      'wood' as MaterialId,
+    ]);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+
+    expect(
+      clauseTargetNode(
+        buildClause({
+          type: 'GatherMaterial',
+          materialId: 'wood' as MaterialId,
+          targetQuantity: 10,
+        }),
+      ),
+    ).toBe(node);
+  });
+});
+
 describe('isClauseSatisfiable', () => {
   it('is always false for a disabled clause', () => {
     expect(

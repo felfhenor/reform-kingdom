@@ -8,7 +8,13 @@ export type DecreeRiskLevel = 'Low' | 'Medium' | 'High';
 export type ExploreNodeRiskBand = DecreeRiskLevel | 'TooHigh';
 
 export type DecreeClauseAction =
-  | { type: 'GatherMaterial'; materialId: ItemId; targetQuantity: number }
+  | {
+      type: 'GatherMaterial';
+      materialId: ItemId;
+      // Undefined on clauses saved before per-node targeting existed - falls back to the nearest reachable node that drops the material.
+      nodeName?: string;
+      targetQuantity: number;
+    }
   | {
       type: 'FarmNode';
       nodeName: string;

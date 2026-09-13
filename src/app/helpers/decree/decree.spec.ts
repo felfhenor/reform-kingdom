@@ -182,6 +182,52 @@ describe('decreeClauseConflicts', () => {
     ).toBe(true);
   });
 
+  it('does not flag GatherMaterial clauses for the same material at different pinned locations', () => {
+    const existing = [
+      buildClause({
+        type: 'GatherMaterial',
+        materialId: 'wood' as MaterialId,
+        nodeName: 'Grove',
+        targetQuantity: 100,
+      }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        {
+          type: 'GatherMaterial',
+          materialId: 'wood' as MaterialId,
+          nodeName: 'Old Forest',
+          targetQuantity: 20,
+        },
+        existing,
+      ),
+    ).toBe(false);
+  });
+
+  it('flags two GatherMaterial clauses for the same material at the same pinned location', () => {
+    const existing = [
+      buildClause({
+        type: 'GatherMaterial',
+        materialId: 'wood' as MaterialId,
+        nodeName: 'Grove',
+        targetQuantity: 100,
+      }),
+    ];
+
+    expect(
+      decreeClauseConflicts(
+        {
+          type: 'GatherMaterial',
+          materialId: 'wood' as MaterialId,
+          nodeName: 'Grove',
+          targetQuantity: 20,
+        },
+        existing,
+      ),
+    ).toBe(true);
+  });
+
   it('does not flag GatherMaterial clauses for different materials', () => {
     const existing = [
       buildClause({

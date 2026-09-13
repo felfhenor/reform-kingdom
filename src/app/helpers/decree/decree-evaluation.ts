@@ -182,6 +182,13 @@ function acceptableRaidTowns(riskTolerance: DecreeRiskLevel): TownContent[] {
     );
 }
 
+// Common target-resolution for clauses that pin a specific nodeName (FarmNode always; GatherMaterial when a location was chosen).
+function reachableVisibleNode(nodeName: string): WorldNodeEntry | undefined {
+  const entry = worldNodeByName(nodeName);
+  if (!entry || !isWorldNodeVisible(entry)) return undefined;
+  return travelPathTo(entry.nodeName) ? entry : undefined;
+}
+
 function defendTownsTargetNode(
   clause: Extract<DecreeClause, { type: 'DefendTowns' }>,
 ): WorldNodeEntry | undefined {
@@ -211,12 +218,11 @@ export function clauseTargetNode(
 ): WorldNodeEntry | undefined {
   switch (clause.type) {
     case 'GatherMaterial':
-      return nearestGatherNodeFor(clause.materialId);
-    case 'FarmNode': {
-      const entry = worldNodeByName(clause.nodeName);
-      if (!entry || !isWorldNodeVisible(entry)) return undefined;
-      return travelPathTo(entry.nodeName) ? entry : undefined;
-    }
+      return clause.nodeName
+        ? reachableVisibleNode(clause.nodeName)
+        : nearestGatherNodeFor(clause.materialId);
+    case 'FarmNode':
+      return reachableVisibleNode(clause.nodeName);
     case 'FinishUnfinishedAreas':
       return nearestUnfinishedExploreNode(clause.riskTolerance);
     case 'LevelUpParty':

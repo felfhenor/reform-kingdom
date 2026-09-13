@@ -71,11 +71,42 @@
 
         @if (draftType() === 'GatherMaterial') {
           <ng-select
+            class="w-64"
+            [items]="gatherNodeOptions()"
+            bindLabel="nodeName"
+            bindValue="nodeName"
+            [clearable]="false"
+            placeholder="Location"
+            [ngModel]="draftNodeName()"
+            (change)="setDraftNodeName($event)"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <div class="flex items-center gap-2">
+                <app-sprite-node class="zoom-row" [entry]="item.entry" />
+                <div>
+                  <div class="font-semibold text-sm">{{ item.nodeName }}</div>
+                  <div class="text-xs text-lighter">
+                    Lv. {{ item.levelLabel }}
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template ng-label-tmp let-item="item">
+              <div class="flex items-center gap-2">
+                <app-sprite-node class="zoom-row" [entry]="item.entry" />
+                {{ item.nodeName }}
+              </div>
+            </ng-template>
+          </ng-select>
+
+          <ng-select
             class="w-56"
             [items]="materialOptions()"
             bindLabel="name"
             bindValue="id"
             [clearable]="false"
+            [disabled]="!draftNodeName()"
             placeholder="Material"
             [ngModel]="draftMaterialId()"
             (change)="setDraftMaterialId($event)"
