@@ -26,6 +26,10 @@ vi.mock('@helpers/hero/luck', () => ({
   partyMaxLuck: vi.fn(),
 }));
 
+vi.mock('@helpers/hero/global-effects', () => ({
+  activeGlobalEffects: vi.fn(() => []),
+}));
+
 vi.mock('@helpers/item/materials', () => ({
   addMaterial: vi.fn(),
 }));
@@ -37,6 +41,7 @@ vi.mock('@helpers/hero/party', () => ({
 
 vi.mock('@helpers/rng', () => ({
   rngChoiceWeighted: vi.fn(),
+  rngSucceedsChance: vi.fn(() => false),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -62,11 +67,13 @@ import { getEntry } from '@helpers/content/content';
 import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
+import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses, partyGet } from '@helpers/hero/party';
 import {
   canEnterGatherNode,
   currentGatheringContent,
+  gatheringItemDropRateBoost,
   gatheringProcessTick,
   gatheringProgressFraction,
   gatheringRollResult,
@@ -77,7 +84,7 @@ import {
   partyMinLevel,
 } from '@helpers/item/gathering';
 import { addMaterial } from '@helpers/item/materials';
-import { rngChoiceWeighted } from '@helpers/rng';
+import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
@@ -90,6 +97,7 @@ import type {
   GameState,
   GatheringContent,
   GatheringId,
+  GlobalEffect,
   ItemId,
   TradeskillId,
   WorldNodeEntry,
@@ -356,8 +364,9 @@ describe('gatheringStop', () => {
 describe('gatheringProcessTick', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // `vi.clearAllMocks()` doesn't undo a `mockReturnValue` set by an earlier test, so reset this one explicitly.
+    // `vi.clearAllMocks()` doesn't undo a `mockReturnValue` set by an earlier test, so reset these explicitly.
     vi.mocked(partyGatherYieldBonuses).mockReturnValue([]);
+    vi.mocked(rngSucceedsChance).mockReturnValue(false);
   });
 
   it('does nothing when not gathering', () => {
@@ -751,5 +760,92 @@ describe('gatheringProcessTick', () => {
 
     expect(partyGainXp).not.toHaveBeenCalled();
     expect(addMaterial).not.toHaveBeenCalled();
+  });
+
+  it('grants +1 of the first item line on a successful GlobalGatheringItemDropRateBoost roll', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 4,
+        },
+      },
+    } as unknown as GameState);
+
+    const gathering = buildGathering({
+      gatherTime: 5,
+      levelRange: { min: 1, max: 5 },
+      xpGainedIfInLevelRange: 3,
+      gatherResults: [
+        ensureGatherResult({
+          chance: 100,
+          items: [
+            { itemId: 'wood' as ItemId, quantity: 2 },
+            { itemId: 'stick' as ItemId, quantity: 1 },
+          ],
+        }),
+      ],
+    });
+    vi.mocked(getEntry).mockImplementation((id: string) => {
+      if (id === 'gather-1') return gathering as never;
+      return { name: id, rarity: 'Common' } as never;
+    });
+    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        effects: [
+          { effectType: 'GlobalGatheringItemDropRateBoost', value: 20 },
+        ],
+      } as GlobalEffect,
+    ]);
+    vi.mocked(rngSucceedsChance).mockReturnValue(true);
+
+    gatheringProcessTick();
+
+    expect(rngSucceedsChance).toHaveBeenCalledWith(20);
+    expect(addMaterial).toHaveBeenCalledWith('wood', 3);
+    expect(addMaterial).toHaveBeenCalledWith('stick', 1);
+  });
+});
+
+describe('gatheringItemDropRateBoost', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns 0 with no active effects', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([]);
+    expect(gatheringItemDropRateBoost()).toBe(0);
+  });
+
+  it('sums active GlobalGatheringItemDropRateBoost effect values', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        effects: [
+          { effectType: 'GlobalGatheringItemDropRateBoost', value: 10 },
+        ],
+      } as GlobalEffect,
+      {
+        effects: [
+          { effectType: 'GlobalGatheringItemDropRateBoost', value: 20 },
+        ],
+      } as GlobalEffect,
+    ]);
+
+    expect(gatheringItemDropRateBoost()).toBe(30);
+  });
+
+  it('ignores active effects of other types', () => {
+    vi.mocked(activeGlobalEffects).mockReturnValue([
+      {
+        effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
+      } as GlobalEffect,
+    ]);
+
+    expect(gatheringItemDropRateBoost()).toBe(0);
   });
 });

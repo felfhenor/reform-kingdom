@@ -608,6 +608,19 @@
                  "width":64,
                  "x":256,
                  "y":448
+                }, 
+                {
+                 "gid":380,
+                 "height":64,
+                 "id":189,
+                 "name":"Shrine of Medina",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Shrine",
+                 "visible":true,
+                 "width":64,
+                 "x":2496,
+                 "y":1024
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -616,7 +629,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":189,
+ "nextobjectid":190,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

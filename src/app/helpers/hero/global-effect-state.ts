@@ -33,6 +33,8 @@ export function globalEffectEffectsDescription(
           return `${StatusEffectTagDimension.label[effect.tag]}: +${effect.value}%`;
         case 'GlobalCombatItemDropRateBoost':
           return `Item Drop Chance: +${effect.value}%`;
+        case 'GlobalGatheringItemDropRateBoost':
+          return `Extra Gather Item Chance: +${effect.value}%`;
       }
     })
     .join(', ');

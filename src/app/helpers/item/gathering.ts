@@ -7,10 +7,11 @@ import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
+import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses, partyGet } from '@helpers/hero/party';
 import { addMaterial } from '@helpers/item/materials';
-import { rngChoiceWeighted } from '@helpers/rng';
+import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
@@ -136,19 +137,31 @@ function partyGatherYieldBonus(tradeskillIds: TradeskillId[]): number {
   );
 }
 
+// Gather yields are whole numbers, so a percent boost can't scale a quantity directly - it's rolled instead as a chance of +1.
+export function gatheringItemDropRateBoost(): number {
+  return sumBy(
+    activeGlobalEffects().flatMap((effect) => effect.effects),
+    (effect) =>
+      effect.effectType === 'GlobalGatheringItemDropRateBoost'
+        ? effect.value
+        : 0,
+  );
+}
+
 function grantGatherItems(
   result: GatherResult,
   nodeName: string,
   yieldMultiplier: number,
 ): void {
   const yieldBonus = partyGatherYieldBonus(result.tradeskillIds);
+  const bonusItem = rngSucceedsChance(gatheringItemDropRateBoost()) ? 1 : 0;
 
   const grants = result.items
     .filter(({ quantity }) => quantity > 0)
     .map(({ itemId, quantity }, index) => {
       // Bonus is flat per gather cycle, not per item line - only the first line gets it.
       const grantedQuantity =
-        quantity * yieldMultiplier + (index === 0 ? yieldBonus : 0);
+        quantity * yieldMultiplier + (index === 0 ? yieldBonus + bonusItem : 0);
       addMaterial(itemId, grantedQuantity);
 
       const item = getEntry<ItemContent>(itemId);

@@ -1,0 +1,66 @@
+- id: 71835f9c-3ecc-4da8-a519-d15c24cfccec
+  name: Shrine of Medina
+  description: A shrine dedicated to a legendary farmer who was said to turn sand into soil.
+
+  levels:
+    - costs:
+        - itemId: Cactspine
+          required: 100
+
+        - itemId: Timberfuzz
+          required: 100
+
+        - itemId: Petrifiwood
+          required: 100
+
+      globalEffectId: Bountiful Gathering I
+      globalEffectDuration: 1800
+
+    - costs:
+        - itemId: Gold Coin
+          required: 50000
+
+        - itemId: Firmwater
+          required: 300
+
+      globalEffectId: Bountiful Gathering II
+      globalEffectDuration: 3600
+
+    - costs:
+        - itemId: Gold Coin
+          required: 100000
+
+        - itemId: Brightwisp Core
+          required: 50
+
+        - itemId: Preserved Bloodmoth
+          required: 50
+
+        - itemId: Amber
+          required: 50
+
+      globalEffectId: Bountiful Gathering III
+      globalEffectDuration: 7200
+
+    - costs:
+        - itemId: Gold Coin
+          required: 200000
+
+        - itemId: Cimmerian Dust
+          required: 50
+
+        - itemId: Strongreed
+          required: 200
+
+      globalEffectId: Bountiful Gathering IV
+      globalEffectDuration: 14400
+
+    - costs:
+        - itemId: Gold Coin
+          required: 350000
+
+        - itemId: Star Fragment
+          required: 3
+
+      globalEffectId: Bountiful Gathering V
+      globalEffectDuration: 31536000

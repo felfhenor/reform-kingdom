@@ -9,6 +9,7 @@ import type {
   GlobalEffectEffectDebuffResistanceTag,
   GlobalEffectEffectGainCombatStat,
   GlobalEffectEffectGainStats,
+  GlobalEffectEffectGatheringItemDropRateBoost,
   GlobalEffectEffectGoldGainMultiplier,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -22,7 +23,8 @@ function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> &
-    Partial<GlobalEffectEffectCombatItemDropRateBoost> = {},
+    Partial<GlobalEffectEffectCombatItemDropRateBoost> &
+    Partial<GlobalEffectEffectGatheringItemDropRateBoost> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
@@ -38,6 +40,13 @@ function ensureGlobalEffectEffect(
   if (effect.effectType === 'GlobalCombatItemDropRateBoost') {
     return {
       effectType: 'GlobalCombatItemDropRateBoost',
+      value: effect.value ?? 0,
+    };
+  }
+
+  if (effect.effectType === 'GlobalGatheringItemDropRateBoost') {
+    return {
+      effectType: 'GlobalGatheringItemDropRateBoost',
       value: effect.value ?? 0,
     };
   }

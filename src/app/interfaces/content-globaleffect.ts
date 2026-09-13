@@ -49,6 +49,12 @@ export type GlobalEffectEffectCombatItemDropRateBoost = {
   value: number;
 };
 
+// `value` (a flat percent) is the chance of +1 extra item on a gather cycle
+export type GlobalEffectEffectGatheringItemDropRateBoost = {
+  effectType: 'GlobalGatheringItemDropRateBoost';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainCombatStat
@@ -56,7 +62,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectGoldGainMultiplier
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
-  | GlobalEffectEffectCombatItemDropRateBoost;
+  | GlobalEffectEffectCombatItemDropRateBoost
+  | GlobalEffectEffectGatheringItemDropRateBoost;
 
 export type GlobalEffectContent = IsContentItem &
   HasDescription &

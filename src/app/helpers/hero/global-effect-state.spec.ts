@@ -12,10 +12,11 @@ describe('globalEffectEffectsDescription', () => {
       { effectType: 'GlobalXPGainMultiplier', value: 0.1 },
       { effectType: 'DebuffResistance', value: 10 },
       { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
+      { effectType: 'GlobalGatheringItemDropRateBoost', value: 20 },
     ];
 
     expect(globalEffectEffectsDescription(effects)).toBe(
-      'Strength: +5, Revive Chance: +2%, Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%',
+      'Strength: +5, Revive Chance: +2%, Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%',
     );
   });
 
