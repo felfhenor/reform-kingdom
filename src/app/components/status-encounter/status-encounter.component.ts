@@ -7,6 +7,7 @@ import {
 import { StatusHelperComponent } from '@components/status-helper/status-helper.component';
 import { StatusHeroComponent } from '@components/status-hero/status-hero.component';
 import { StatusMonsterComponent } from '@components/status-monster/status-monster.component';
+import { currentCombat } from '@helpers/combat/combat-state';
 import { getOption } from '@helpers/state-options';
 
 @Component({
@@ -20,8 +21,14 @@ import { getOption } from '@helpers/state-options';
       (mouseleave)="setHovered(false)"
     >
       <app-status-hero [expanded]="isExpanded()"></app-status-hero>
-      <app-status-helper [expanded]="isExpanded()"></app-status-helper>
-      <app-status-monster [expanded]="isExpanded()"></app-status-monster>
+
+      @if (hasHelpers()) {
+        <app-status-helper [expanded]="isExpanded()"></app-status-helper>
+      }
+
+      @if (hasEnemies()) {
+        <app-status-monster [expanded]="isExpanded()"></app-status-monster>
+      }
     </div>
   `,
   styles: `
@@ -47,6 +54,13 @@ export class StatusEncounterComponent {
 
   public isExpanded = computed(
     () => getOption('partyViewAlwaysExpand') || this.isHovered(),
+  );
+
+  public hasEnemies = computed(
+    () => (currentCombat()?.guardians ?? []).length > 0,
+  );
+  public hasHelpers = computed(
+    () => (currentCombat()?.helpers ?? []).length > 0,
   );
 
   public setHovered(hovered: boolean): void {
