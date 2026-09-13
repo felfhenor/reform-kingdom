@@ -8,24 +8,46 @@ vi.mock('@helpers/world', () => ({
   worldNodeAtCurrentLocation: vi.fn(),
 }));
 
+vi.mock('@helpers/item/materials', () => ({
+  getMaterialQuantity: vi.fn(),
+  applyMaterialDelta: vi.fn(),
+}));
+
+import {
+  applyMaterialDelta,
+  getMaterialQuantity,
+} from '@helpers/item/materials';
 import { gamestate } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import {
   isPartyAtGatherNode,
   pruneInvalidGatherNodeLevels,
+  worldNodeCanAffordLevelUpCost,
   worldNodeIsMaxLevel,
   worldNodeLevel,
   worldNodeLevelUpCost,
   worldNodeMaxAchievableLevel,
+  worldNodeSpendLevelUpCost,
 } from '@helpers/world-node/world-node-level';
-import type { GameState, GatheringContent, WorldNodeEntry } from '@interfaces';
+import type {
+  GameState,
+  GatheringContent,
+  GatherLevelCost,
+  ItemId,
+  WorldNodeEntry,
+} from '@interfaces';
 
 function buildGathering(
   overrides: Partial<GatheringContent> = {},
 ): GatheringContent {
   return {
-    maxLevel: 5,
-    levelCostScalar: 10000,
+    levelCost: [
+      { costs: [{ itemId: 'Gold Coin' as ItemId, required: 10000 }] },
+      { costs: [{ itemId: 'Gold Coin' as ItemId, required: 20000 }] },
+      { costs: [{ itemId: 'Gold Coin' as ItemId, required: 30000 }] },
+      { costs: [{ itemId: 'Gold Coin' as ItemId, required: 40000 }] },
+      { costs: [{ itemId: 'Gold Coin' as ItemId, required: 50000 }] },
+    ] as GatherLevelCost[],
     ...overrides,
   } as GatheringContent;
 }
@@ -59,10 +81,18 @@ describe('worldNodeLevel', () => {
 });
 
 describe('worldNodeMaxAchievableLevel', () => {
-  it('is maxLevel - 1, since gatherResults are authored 0..maxLevel-1', () => {
-    expect(worldNodeMaxAchievableLevel(buildGathering({ maxLevel: 5 }))).toBe(
-      4,
-    );
+  it('is levelCost.length - 1, since gatherResults are authored 0..length-1', () => {
+    expect(
+      worldNodeMaxAchievableLevel(
+        buildGathering({
+          levelCost: [
+            { costs: [] },
+            { costs: [] },
+            { costs: [] },
+          ] as GatherLevelCost[],
+        }),
+      ),
+    ).toBe(2);
   });
 });
 
@@ -71,24 +101,20 @@ describe('worldNodeIsMaxLevel', () => {
     vi.clearAllMocks();
   });
 
-  it('is false below the max achievable level (maxLevel - 1)', () => {
+  it('is false below the max achievable level (levelCost.length - 1)', () => {
     vi.mocked(gamestate).mockReturnValue({
       gatherNodeLevels: { Node: { level: 3 } },
     } as unknown as GameState);
 
-    expect(worldNodeIsMaxLevel(buildGathering({ maxLevel: 5 }), 'Node')).toBe(
-      false,
-    );
+    expect(worldNodeIsMaxLevel(buildGathering(), 'Node')).toBe(false);
   });
 
-  it('is true at or above the max achievable level (maxLevel - 1)', () => {
+  it('is true at or above the max achievable level (levelCost.length - 1)', () => {
     vi.mocked(gamestate).mockReturnValue({
       gatherNodeLevels: { Node: { level: 4 } },
     } as unknown as GameState);
 
-    expect(worldNodeIsMaxLevel(buildGathering({ maxLevel: 5 }), 'Node')).toBe(
-      true,
-    );
+    expect(worldNodeIsMaxLevel(buildGathering(), 'Node')).toBe(true);
   });
 });
 
@@ -97,20 +123,80 @@ describe('worldNodeLevelUpCost', () => {
     vi.clearAllMocks();
   });
 
-  it('costs levelCostScalar * (currentLevel + 1)', () => {
+  it('returns the costs authored at the current level tier', () => {
     vi.mocked(gamestate).mockReturnValue({
       gatherNodeLevels: { Node: { level: 0 } },
     } as unknown as GameState);
-    expect(
-      worldNodeLevelUpCost(buildGathering({ levelCostScalar: 10000 }), 'Node'),
-    ).toBe(10000);
+    expect(worldNodeLevelUpCost(buildGathering(), 'Node')).toEqual([
+      { itemId: 'Gold Coin', required: 10000 },
+    ]);
 
     vi.mocked(gamestate).mockReturnValue({
       gatherNodeLevels: { Node: { level: 1 } },
     } as unknown as GameState);
+    expect(worldNodeLevelUpCost(buildGathering(), 'Node')).toEqual([
+      { itemId: 'Gold Coin', required: 20000 },
+    ]);
+  });
+
+  it('returns an empty array once past the last authored tier', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      gatherNodeLevels: { Node: { level: 99 } },
+    } as unknown as GameState);
+
+    expect(worldNodeLevelUpCost(buildGathering(), 'Node')).toEqual([]);
+  });
+});
+
+describe('worldNodeCanAffordLevelUpCost', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('is true when every cost is affordable', () => {
+    vi.mocked(getMaterialQuantity).mockReturnValue(100);
+
     expect(
-      worldNodeLevelUpCost(buildGathering({ levelCostScalar: 10000 }), 'Node'),
-    ).toBe(20000);
+      worldNodeCanAffordLevelUpCost([
+        { itemId: 'Gold Coin' as ItemId, required: 50 },
+        { itemId: 'Wergen Stick' as ItemId, required: 50 },
+      ]),
+    ).toBe(true);
+  });
+
+  it('is false when any single cost is unaffordable', () => {
+    vi.mocked(getMaterialQuantity).mockImplementation((itemId) =>
+      itemId === 'Gold Coin' ? 100 : 0,
+    );
+
+    expect(
+      worldNodeCanAffordLevelUpCost([
+        { itemId: 'Gold Coin' as ItemId, required: 50 },
+        { itemId: 'Wergen Stick' as ItemId, required: 50 },
+      ]),
+    ).toBe(false);
+  });
+
+  it('is true for an empty cost list', () => {
+    expect(worldNodeCanAffordLevelUpCost([])).toBe(true);
+  });
+});
+
+describe('worldNodeSpendLevelUpCost', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('applies a negative delta for every cost entry', () => {
+    const state = {} as GameState;
+
+    worldNodeSpendLevelUpCost(state, [
+      { itemId: 'Gold Coin' as ItemId, required: 50 },
+      { itemId: 'Wergen Stick' as ItemId, required: 10 },
+    ]);
+
+    expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'Gold Coin', -50);
+    expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'Wergen Stick', -10);
   });
 });
 
@@ -147,18 +233,19 @@ describe('pruneInvalidGatherNodeLevels', () => {
     const result = pruneInvalidGatherNodeLevels(
       { 'Carrina Copper Mines': { level: 2 }, Removed: { level: 1 } },
       (nodeName) =>
-        nodeName === 'Carrina Copper Mines'
-          ? buildGathering({ maxLevel: 5 })
-          : undefined,
+        nodeName === 'Carrina Copper Mines' ? buildGathering() : undefined,
     );
 
     expect(result).toEqual({ 'Carrina Copper Mines': { level: 2 } });
   });
 
-  it('clamps a stored level down to the current authored max achievable level (maxLevel - 1)', () => {
+  it('clamps a stored level down to the current authored max achievable level (levelCost.length - 1)', () => {
     const result = pruneInvalidGatherNodeLevels(
       { 'Carrina Copper Mines': { level: 5 } },
-      () => buildGathering({ maxLevel: 2 }),
+      () =>
+        buildGathering({
+          levelCost: [{ costs: [] }, { costs: [] }] as GatherLevelCost[],
+        }),
     );
 
     expect(result).toEqual({ 'Carrina Copper Mines': { level: 1 } });

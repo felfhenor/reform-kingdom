@@ -50,11 +50,12 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     commissionRequirements: 0,
     commissionRewards: 0,
     traderTokenSinks: 0,
+    nodeUpgradeCosts: 0,
   };
 }
 
-// One point per recipe, caravan buy, astral spell, commission, and
-// token-trade/unlock spend that consumes it, plus one if infusable.
+// One point per recipe, caravan buy, astral spell, commission, node-upgrade
+// tier, and token-trade/unlock spend that consumes it, plus one if infusable.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
@@ -62,6 +63,7 @@ function score(stats: MaterialUtilizationStats): number {
     stats.astralCasts +
     stats.commissionRequirements +
     stats.traderTokenSinks +
+    stats.nodeUpgradeCosts +
     (stats.infusable ? 1 : 0)
   );
 }
@@ -148,6 +150,13 @@ export function runMaterialUtilizationAnalysis(
         if (stats) stats.gatherSources += 1;
       });
     });
+
+    gathering.levelCost.forEach((tier) => {
+      tier.costs.forEach((cost) => {
+        const stats = byId.get(cost.itemId);
+        if (stats) stats.nodeUpgradeCosts += 1;
+      });
+    });
   });
 
   caravanTraders.forEach((trader) => {
@@ -219,6 +228,7 @@ export function runMaterialUtilizationAnalysis(
             'Astral Casts': stats.astralCasts,
             'Commission Requirements': stats.commissionRequirements,
             'Trader Token Sinks': stats.traderTokenSinks,
+            'Node Upgrade Costs': stats.nodeUpgradeCosts,
             'Crafted Into': stats.craftedInto,
             'Monster Drops': stats.monsterDrops,
             'Encounter Rewards': stats.encounterRewards,
@@ -251,6 +261,8 @@ export function runMaterialUtilizationAnalysis(
       sinks.push(`${stats.commissionRequirements} commission(s)`);
     if (stats.traderTokenSinks > 0)
       sinks.push(`${stats.traderTokenSinks} token trade/unlock(s)`);
+    if (stats.nodeUpgradeCosts > 0)
+      sinks.push(`${stats.nodeUpgradeCosts} node upgrade tier(s)`);
     if (stats.infusable) sinks.push('infusable');
     const sinkDescription =
       sinks.length > 0 ? sinks.join(', ') : 'no known sinks';

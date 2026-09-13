@@ -13,8 +13,39 @@
   xpGainedIfInLevelRange: 10
   gatherTime: 20
 
-  maxLevel: 3
-  levelCostScalar: 20000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 20000
+
+        - itemId: Firmwater
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 40000
+
+        - itemId: Firmwater
+          required: 100
+
+        - itemId: Cactspine
+          required: 25
+
+        - itemId: Flax Flower
+          required: 25
+
+    - costs:
+        - itemId: Gold Coin
+          required: 60000
+
+        - itemId: Firmwater
+          required: 100
+
+        - itemId: Petrifiwood
+          required: 25
+
+        - itemId: Timberfuzz
+          required: 25
 
   gatherResults:
     # level 1
@@ -70,8 +101,45 @@
   xpGainedIfInLevelRange: 10
   gatherTime: 20
 
-  maxLevel: 3
-  levelCostScalar: 20000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 40000
+
+        - itemId: Firmwater
+          required: 50
+
+        - itemId: Timberfuzz
+          required: 50
+
+        - itemId: Purple Slime Crystal
+          required: 25
+
+    - costs:
+        - itemId: Gold Coin
+          required: 80000
+
+        - itemId: Firmwater
+          required: 25
+
+        - itemId: Elven Wood
+          required: 25
+
+        - itemId: Red Slime Crystal
+          required: 25
+
+    - costs:
+        - itemId: Gold Coin
+          required: 120000
+
+        - itemId: Firmwater
+          required: 25
+
+        - itemId: Mireweed
+          required: 25
+
+        - itemId: Green Slime Crystal
+          required: 25
 
   gatherResults:
     # level 1
@@ -152,8 +220,42 @@
   xpGainedIfInLevelRange: 10
   gatherTime: 20
 
-  maxLevel: 3
-  levelCostScalar: 20000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 60000
+
+        - itemId: Firmwater
+          required: 50
+
+        - itemId: Strongreed
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 120000
+
+        - itemId: Ghostwood
+          required: 75
+
+        - itemId: Oozehide
+          required: 50
+
+        - itemId: Mireweed
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 180000
+
+        - itemId: Petrifiwood
+          required: 75
+
+        - itemId: Flax Flower
+          required: 50
+
+        - itemId: Weak Spider Silk
+          required: 50
 
   gatherResults:
     # level 1

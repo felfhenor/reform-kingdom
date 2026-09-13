@@ -5,22 +5,21 @@ import {
   input,
   output,
 } from '@angular/core';
-import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { goldCoinId, hasGold } from '@helpers/item/materials';
 import {
   isPartyAtGatherNode,
+  worldNodeCanAffordLevelUpCost,
   worldNodeIsMaxLevel,
   worldNodeLevelUpCost,
 } from '@helpers/world-node/world-node-level';
 import { worldNodeGathering } from '@helpers/world-node/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-map-node-actions-gather',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective, CurrencyCostComponent, TippyDirective],
+  imports: [SFXDirective, RowCurrencyCostComponent],
   templateUrl: './panel-map-node-actions-gather.component.html',
   styleUrl: './panel-map-node-actions-gather.component.scss',
 })
@@ -28,8 +27,6 @@ export class PanelMapNodeActionsGatherComponent {
   public entry = input.required<WorldNodeEntry>();
 
   public develop = output<void>();
-
-  public goldItemId = goldCoinId();
 
   private gathering = computed(() => worldNodeGathering(this.entry()));
 
@@ -40,16 +37,21 @@ export class PanelMapNodeActionsGatherComponent {
 
   public cost = computed(() => {
     const gathering = this.gathering();
-    if (!gathering) return 0;
+    if (!gathering) return [];
 
     return worldNodeLevelUpCost(gathering, this.entry().nodeName);
   });
+
+  public costRow = computed(() =>
+    this.cost().map((cost) => ({ type: cost.itemId, amount: cost.required })),
+  );
 
   public canDevelop = computed(() => {
     if (this.isMaxLevel()) return false;
 
     return (
-      isPartyAtGatherNode(this.entry().nodeName) && hasGold(this.cost())
+      isPartyAtGatherNode(this.entry().nodeName) &&
+      worldNodeCanAffordLevelUpCost(this.cost())
     );
   });
 }

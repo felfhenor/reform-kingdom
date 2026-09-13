@@ -1,17 +1,26 @@
+import {
+  applyMaterialDelta,
+  getMaterialQuantity,
+} from '@helpers/item/materials';
 import { gamestate } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
-import type { GameStateGatherNodeLevels, GatheringContent } from '@interfaces';
+import type {
+  GameState,
+  GameStateGatherNodeLevels,
+  GatheringContent,
+  GatherLevelCostItem,
+} from '@interfaces';
 
 // Absent entry (or a missing gatherNodeLevels, e.g. mid-migration on an old save) means level 0.
 export function worldNodeLevel(nodeName: string): number {
   return gamestate().gatherNodeLevels?.[nodeName]?.level ?? 0;
 }
 
-// maxLevel is a tier count (levelRequirement is authored 0..maxLevel-1), not a level value itself.
+// levelCost.length is the tier count (levelRequirement is authored 0..length-1), not a level value itself.
 export function worldNodeMaxAchievableLevel(
   gathering: GatheringContent,
 ): number {
-  return gathering.maxLevel - 1;
+  return gathering.levelCost.length - 1;
 }
 
 export function worldNodeIsMaxLevel(
@@ -21,12 +30,30 @@ export function worldNodeIsMaxLevel(
   return worldNodeLevel(nodeName) >= worldNodeMaxAchievableLevel(gathering);
 }
 
-// Leveling N -> N+1 costs levelCostScalar * (N+1).
+// Leveling N -> N+1 costs whatever's authored at levelCost[N] (gold + zone materials).
 export function worldNodeLevelUpCost(
   gathering: GatheringContent,
   nodeName: string,
-): number {
-  return gathering.levelCostScalar * (worldNodeLevel(nodeName) + 1);
+): GatherLevelCostItem[] {
+  return gathering.levelCost[worldNodeLevel(nodeName)]?.costs ?? [];
+}
+
+export function worldNodeCanAffordLevelUpCost(
+  costs: GatherLevelCostItem[],
+): boolean {
+  return costs.every(
+    (cost) => getMaterialQuantity(cost.itemId) >= cost.required,
+  );
+}
+
+// Mutates `state` directly - call only from inside an `updateGamestate` callback.
+export function worldNodeSpendLevelUpCost(
+  state: GameState,
+  costs: GatherLevelCostItem[],
+): void {
+  costs.forEach((cost) => {
+    applyMaterialDelta(state, cost.itemId, -cost.required);
+  });
 }
 
 // Mirrors isPartyAtCaravan (caravan.ts) - leveling requires physically standing at the node.

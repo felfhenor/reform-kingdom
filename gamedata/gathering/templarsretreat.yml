@@ -13,8 +13,33 @@
   xpGainedIfInLevelRange: 6
   gatherTime: 15
 
-  maxLevel: 3
-  levelCostScalar: 75000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 75000
+
+        - itemId: Copper Ingot
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 15000
+
+        - itemId: Copper Ingot
+          required: 75
+
+        - itemId: Elven Wood
+          required: 75
+
+    - costs:
+        - itemId: Gold Coin
+          required: 225000
+
+        - itemId: Elven Wood
+          required: 75
+
+        - itemId: Ghostcopper Dust
+          required: 25
 
   gatherResults:
     # level 1

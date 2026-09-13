@@ -15,8 +15,9 @@ import type {
 } from '@interfaces';
 
 function checkGathering(gathering: GatheringContent): AnalysisCheck {
+  const maxLevel = gathering.levelCost.length;
   const gapLevels: number[] = [];
-  for (let level = 0; level < gathering.maxLevel; level += 1) {
+  for (let level = 0; level < maxLevel; level += 1) {
     if (gatheringResultsAtLevel(gathering, level).length === 0) {
       gapLevels.push(level);
     }
@@ -27,7 +28,7 @@ function checkGathering(gathering: GatheringContent): AnalysisCheck {
       id: `gatherdevelopmentlevels:${gathering.id}`,
       label: gathering.name,
       status: 'fail',
-      message: `${gathering.name} has no gatherResults available at level(s) ${gapLevels.join(', ')} (checked 0..${gathering.maxLevel - 1}) - gathering there would yield nothing once developed to that level.`,
+      message: `${gathering.name} has no gatherResults available at level(s) ${gapLevels.join(', ')} (checked 0..${maxLevel - 1}) - gathering there would yield nothing once developed to that level.`,
     };
   }
 
@@ -35,7 +36,7 @@ function checkGathering(gathering: GatheringContent): AnalysisCheck {
     id: `gatherdevelopmentlevels:${gathering.id}`,
     label: gathering.name,
     status: 'pass',
-    message: `${gathering.name}: every level 0..${gathering.maxLevel - 1} has at least one available gatherResults entry.`,
+    message: `${gathering.name}: every level 0..${maxLevel - 1} has at least one available gatherResults entry.`,
   };
 }
 

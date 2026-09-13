@@ -13,8 +13,45 @@
   xpGainedIfInLevelRange: 3
   gatherTime: 5
 
-  maxLevel: 3
-  levelCostScalar: 10000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 10000
+
+        - itemId: Wergen Stick
+          required: 50
+
+        - itemId: Wergen Wood
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 20000
+
+        - itemId: Wergen Stick
+          required: 75
+
+        - itemId: Wergen Wood
+          required: 75
+
+        - itemId: Tattered Hide
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 30000
+
+        - itemId: Wergen Stick
+          required: 100
+
+        - itemId: Wergen Wood
+          required: 100
+
+        - itemId: Tattered Hide
+          required: 50
+
+        - itemId: Elven Wood
+          required: 50
 
   gatherResults:
     # level 1
@@ -118,8 +155,30 @@
   xpGainedIfInLevelRange: 3
   gatherTime: 5
 
-  maxLevel: 3
-  levelCostScalar: 10000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 10000
+
+        - itemId: Flax Flower
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 20000
+
+        - itemId: Flax Flower
+          required: 200
+
+    - costs:
+        - itemId: Gold Coin
+          required: 30000
+
+        - itemId: Flax Flower
+          required: 200
+
+        - itemId: Wergen Stick
+          required: 100
 
   gatherResults:
     - chance: 1
@@ -158,8 +217,56 @@
   xpGainedIfInLevelRange: 3
   gatherTime: 5
 
-  maxLevel: 5
-  levelCostScalar: 15000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 15000
+
+        - itemId: Copper Ore
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 30000
+
+        - itemId: Copper Ore
+          required: 75
+
+        - itemId: Copper Ingot
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 45000
+
+        - itemId: Copper Ore
+          required: 100
+
+        - itemId: Wergen Wood
+          required: 50
+
+        - itemId: Azurite
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 60000
+
+        - itemId: Miremetal Ore
+          required: 100
+
+        - itemId: Elven Wood
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 75000
+
+        - itemId: Miremetal Ingot
+          required: 100
+
+        - itemId: Mirewood
+          required: 100
 
   gatherResults:
     # level 1
@@ -268,8 +375,33 @@
   xpGainedIfInLevelRange: 10
   gatherTime: 10
 
-  maxLevel: 3
-  levelCostScalar: 35000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 35000
+
+        - itemId: Elven Wood
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 70000
+
+        - itemId: Elven Wood
+          required: 100
+
+        - itemId: Wergen Wood
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 105000
+
+        - itemId: Elven Wood
+          required: 100
+
+        - itemId: Mirewood
+          required: 100
 
   gatherResults:
     # level 1

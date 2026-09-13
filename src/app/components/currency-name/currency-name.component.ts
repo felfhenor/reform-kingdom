@@ -5,7 +5,6 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { pluralize } from '@boringnode/pluralize';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { getEntry } from '@helpers/content/content';
 import type { ItemContent, ItemId } from '@interfaces';
@@ -51,5 +50,5 @@ export class CurrencyNameComponent {
 
   public itemData = computed(() => getEntry<ItemContent>(this.type())!);
   public icon = computed(() => this.itemData().sprite);
-  public label = computed(() => pluralize(this.itemData().name));
+  public label = computed(() => this.itemData().name);
 }

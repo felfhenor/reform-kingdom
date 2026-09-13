@@ -2,6 +2,8 @@ import { ensureArray } from '@helpers/content/ensure-helpers-core';
 import type {
   GatheringContent,
   GatheringId,
+  GatherLevelCost,
+  GatherLevelCostItem,
   GatherResult,
   GatherResultItem,
   ItemId,
@@ -27,6 +29,23 @@ export function ensureGatherResult(
   };
 }
 
+function ensureGatherLevelCostItem(
+  item: Partial<GatherLevelCostItem> = {},
+): GatherLevelCostItem {
+  return {
+    itemId: item.itemId ?? ('UNKNOWN' as ItemId),
+    required: item.required ?? 0,
+  };
+}
+
+export function ensureGatherLevelCost(
+  levelCost: Partial<GatherLevelCost> = {},
+): GatherLevelCost {
+  return {
+    costs: ensureArray(levelCost.costs, ensureGatherLevelCostItem),
+  };
+}
+
 export function ensureGathering(
   gathering: Partial<GatheringContent>,
 ): Required<GatheringContent> {
@@ -43,7 +62,6 @@ export function ensureGathering(
     invisibleUntilCollectibleIdsFound:
       gathering.invisibleUntilCollectibleIdsFound ?? [],
     workerLevelRange: gathering.workerLevelRange ?? { min: 1, max: 99 },
-    maxLevel: gathering.maxLevel ?? 1,
-    levelCostScalar: gathering.levelCostScalar ?? 0,
+    levelCost: ensureArray(gathering.levelCost, ensureGatherLevelCost),
   };
 }

@@ -23,6 +23,15 @@ export type GatherResult = {
   tradeskillIds: TradeskillId[];
 };
 
+export type GatherLevelCostItem = {
+  itemId: ItemId;
+  required: number;
+};
+
+export type GatherLevelCost = {
+  costs: GatherLevelCostItem[];
+};
+
 export type GatheringContent = IsContentItem &
   HasDescription &
   WorldNodeHideable & {
@@ -39,10 +48,6 @@ export type GatheringContent = IsContentItem &
     // Gates whether a worker gains XP gathering here.
     workerLevelRange: LevelRange;
 
-    // Tier count for gold-funded leveling - never factored into
-    // levelRange/workerLevelRange eligibility checks.
-    maxLevel: number;
-
-    // Gold cost to level up from level N to N+1 is levelCostScalar * (N+1).
-    levelCostScalar: number;
+    // Tier count is levelCost.length; gatherResults' levelRequirement values are authored 0..levelCost.length-1.
+    levelCost: GatherLevelCost[];
   };

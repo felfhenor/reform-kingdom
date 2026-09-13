@@ -81,6 +81,7 @@ export type MaterialUtilizationStats = {
   commissionRequirements: number;
   commissionRewards: number;
   traderTokenSinks: number;
+  nodeUpgradeCosts: number;
 };
 
 export type NodeLevelCheckEntry = {

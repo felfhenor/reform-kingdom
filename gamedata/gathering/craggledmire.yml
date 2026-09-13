@@ -13,8 +13,36 @@
   xpGainedIfInLevelRange: 5
   gatherTime: 10
 
-  maxLevel: 3
-  levelCostScalar: 50000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 50000
+
+        - itemId: Miremetal Ore
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 100000
+
+        - itemId: Miremetal Ore
+          required: 75
+
+        - itemId: Mirewood
+          required: 75
+
+    - costs:
+        - itemId: Gold Coin
+          required: 150000
+
+        - itemId: Miremetal Ingot
+          required: 75
+
+        - itemId: Mirewood
+          required: 50
+
+        - itemId: Elven Wood
+          required: 75
 
   gatherResults:
     # level 1
@@ -77,8 +105,33 @@
   xpGainedIfInLevelRange: 5
   gatherTime: 10
 
-  maxLevel: 3
-  levelCostScalar: 45000
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 45000
+
+        - itemId: Mirewood
+          required: 100
+
+    - costs:
+        - itemId: Gold Coin
+          required: 90000
+
+        - itemId: Mirewood
+          required: 100
+
+        - itemId: Tattered Hide
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 135000
+
+        - itemId: Mirewood
+          required: 100
+
+        - itemId: Mireweed
+          required: 100
 
   gatherResults:
     # level 1

@@ -2,12 +2,13 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { hasGold, spendGold } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
 import {
   isPartyAtGatherNode,
+  worldNodeCanAffordLevelUpCost,
   worldNodeIsMaxLevel,
   worldNodeLevelUpCost,
+  worldNodeSpendLevelUpCost,
 } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
@@ -25,10 +26,10 @@ export function gatherNodeLevelUp(nodeName: string): boolean {
   if (!isPartyAtGatherNode(nodeName)) return false;
 
   const cost = worldNodeLevelUpCost(gathering, nodeName);
-  if (!hasGold(cost)) return false;
+  if (!worldNodeCanAffordLevelUpCost(cost)) return false;
 
   updateGamestate((state) => {
-    spendGold(state, cost);
+    worldNodeSpendLevelUpCost(state, cost);
 
     const existing = state.gatherNodeLevels[nodeName];
     state.gatherNodeLevels[nodeName] = { level: (existing?.level ?? 0) + 1 };
