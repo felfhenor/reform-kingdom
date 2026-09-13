@@ -32,6 +32,19 @@ export function worldNodeCaravanTraderLevel(
   return worldNodeCaravanTrader(entry)?.level;
 }
 
+// Hidden until the party visits this trader; goes stale again on reroll.
+export function worldNodeCaravanVisitedTraderName(
+  entry: WorldNodeEntry,
+): string | undefined {
+  const content = worldNodeCaravan(entry);
+  const state = content ? caravanState(content.id) : undefined;
+  if (!state?.traderId || state.visitedTraderId !== state.traderId) {
+    return undefined;
+  }
+
+  return worldNodeCaravanTrader(entry)?.name;
+}
+
 // A preview of the caravan's active stock, shown on the map node panel
 // before the player opens the full trade modal.
 export function worldNodeCaravanTradeCounts(

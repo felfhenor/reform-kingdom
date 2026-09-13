@@ -109,12 +109,15 @@ export function caravanMarkDiscovered(caravanId: CaravanId): void {
   });
 }
 
-// Every "party is engaging with this caravan" call site (travel arrival,
-// opening trade while already there) should go through this, not the two
-// halves separately - otherwise one gets forgotten.
 export function caravanMarkVisited(caravanId: CaravanId): void {
   caravanMarkDiscovered(caravanId);
   commissionGenerateIfMissing(caravanId);
+
+  updateGamestate((state) => {
+    const caravan = state.world.caravans[caravanId];
+    if (caravan) caravan.visitedTraderId = caravan.traderId;
+    return state;
+  });
 }
 
 // Drops any discovery entries whose caravanId no longer resolves to real

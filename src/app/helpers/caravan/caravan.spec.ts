@@ -370,4 +370,47 @@ describe('caravanMarkVisited', () => {
     expect(updateGamestate).toHaveBeenCalled();
     expect(commissionGenerateIfMissing).toHaveBeenCalledWith(caravan.id);
   });
+
+  it('records the current trader as visited', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: {},
+    } as unknown as GameState);
+
+    caravanMarkVisited(caravan.id);
+
+    const state = {
+      world: {
+        caravans: {
+          [caravan.id]: {
+            traderId: 'trader-a' as CaravanTraderId,
+            activeTradeIndices: [],
+            tradeCounts: {},
+            generatedAtTick: 1000,
+          },
+        },
+      },
+    } as unknown as GameState;
+
+    const mutate = vi.mocked(updateGamestate).mock.calls.at(-1)![0];
+    mutate(state);
+
+    expect(state.world.caravans[caravan.id].visitedTraderId).toBe('trader-a');
+  });
+
+  it('does nothing when the caravan has no state yet', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: {},
+    } as unknown as GameState);
+
+    caravanMarkVisited(caravan.id);
+
+    const state = {
+      world: { caravans: {} },
+    } as unknown as GameState;
+
+    const mutate = vi.mocked(updateGamestate).mock.calls.at(-1)![0];
+
+    expect(() => mutate(state)).not.toThrow();
+    expect(state.world.caravans[caravan.id]).toBeUndefined();
+  });
 });

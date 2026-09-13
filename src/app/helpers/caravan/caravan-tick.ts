@@ -108,19 +108,25 @@ function rollEquipmentForActiveTrades(
 
 function regenerateCaravanNode(
   content: CaravanContent,
-  previousTraderId: CaravanTraderId | undefined,
+  previousState: CaravanNodeState | undefined,
   nowTick: number,
 ): void {
   const busyTraderIds = caravanBusyTraderIds(content.id);
-  const trader = pickTrader(content, previousTraderId, busyTraderIds);
+  const trader = pickTrader(content, previousState?.traderId, busyTraderIds);
   const activeTradeIndices = trader ? pickActiveTradeIndices(trader) : [];
   const rolledEquipment = trader
     ? rollEquipmentForActiveTrades(trader, activeTradeIndices)
     : {};
+  // Same trader reassigned (the only-eligible-candidate case) keeps its visit record.
+  const visitedTraderId =
+    trader?.id === previousState?.traderId
+      ? previousState?.visitedTraderId
+      : undefined;
 
   updateGamestate((state) => {
     state.world.caravans[content.id] = {
       traderId: trader?.id,
+      visitedTraderId,
       activeTradeIndices,
       rolledEquipment,
       tradeCounts: {},
@@ -140,6 +146,6 @@ export function caravanProcessTick(): void {
     const state = gamestate().world.caravans[content.id];
     if (!isDueForRegeneration(content, state, nowTick)) return;
 
-    regenerateCaravanNode(content, state?.traderId, nowTick);
+    regenerateCaravanNode(content, state, nowTick);
   });
 }

@@ -41,7 +41,10 @@ import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate } from '@helpers/state-game';
 import { townReputationDisplay } from '@helpers/town/reputation/town-reputation.ui';
 import { currentLocationGet } from '@helpers/world';
-import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-caravan.ui';
+import {
+  worldNodeCaravanIsAvailable,
+  worldNodeCaravanVisitedTraderName,
+} from '@helpers/world-node/world-node-caravan.ui';
 import { worldNodeDescription } from '@helpers/world-node/world-node-content.ui';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
@@ -152,6 +155,13 @@ export class PanelMapNodeComponent {
   public isCaravanNode = computed(() => {
     const entry = this.node();
     return !!entry && !!worldNodeCaravan(entry);
+  });
+
+  public caravanTraderName = computed(() => {
+    const entry = this.node();
+    return entry && this.isCaravanNode()
+      ? worldNodeCaravanVisitedTraderName(entry)
+      : undefined;
   });
 
   public isGatherNode = computed(() => {

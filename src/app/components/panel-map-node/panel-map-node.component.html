@@ -14,7 +14,13 @@
           <div class="flex items-center gap-2">
             <app-sprite-node [entry]="entry" />
 
-            <h2 class="card-title text-lg">{{ displayName() }}</h2>
+            <div class="flex flex-col">
+              <h2 class="card-title text-lg">{{ displayName() }}</h2>
+
+              @if (caravanTraderName(); as traderName) {
+                <span class="text-sm text-lighter">{{ traderName }}</span>
+              }
+            </div>
           </div>
 
           <app-button-close (click)="close()"></app-button-close>

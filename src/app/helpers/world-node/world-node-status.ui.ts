@@ -1,5 +1,6 @@
 import { caravanBrandName } from '@helpers/caravan/caravan';
 import { worldNodeCaravanTimerText } from '@helpers/world-node/world-node-caravan';
+import { worldNodeCaravanVisitedTraderName } from '@helpers/world-node/world-node-caravan.ui';
 import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-encounter';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
@@ -61,6 +62,9 @@ export function worldNodeLabelInfo(
   if (kind === 'Trade') {
     const timerText = worldNodeCaravanTimerText(entry);
     if (timerText) lines.unshift(timerText);
+
+    const traderName = worldNodeCaravanVisitedTraderName(entry);
+    if (traderName) lines.push(traderName);
   }
 
   return { kind, text: lines.join('\n') };

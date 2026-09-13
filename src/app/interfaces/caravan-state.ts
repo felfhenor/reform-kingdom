@@ -10,6 +10,9 @@ export type CaravanNodeState = {
   // Undefined when no eligible trader currently exists for this caravan.
   traderId?: CaravanTraderId;
 
+  // Set on visit; mismatching `traderId` (post-reroll) hides the merchant's name in UI again.
+  visitedTraderId?: CaravanTraderId;
+
   // Indices into the assigned trader's `trades` array that are in stock
   // this cycle - always length <= 4.
   activeTradeIndices: number[];

@@ -210,6 +210,54 @@ describe('caravanProcessTick', () => {
     expect(result.world.caravans[caravan.id].traderId).toBe('trader-a');
   });
 
+  it('keeps the visit record when the same trader is reassigned', () => {
+    withCaravanState({
+      [caravan.id]: {
+        generatedAtTick: 800,
+        traderId: 'trader-a',
+        visitedTraderId: 'trader-a',
+      },
+    });
+    vi.mocked(caravanEligibleTraders).mockReturnValue([trader()]);
+
+    caravanProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { caravans: {} },
+    } as unknown as GameState);
+
+    expect(result.world.caravans[caravan.id].visitedTraderId).toBe(
+      'trader-a',
+    );
+  });
+
+  it('clears the visit record when a different trader is assigned', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    withCaravanState({
+      [caravan.id]: {
+        generatedAtTick: 800,
+        traderId: 'trader-a',
+        visitedTraderId: 'trader-a',
+      },
+    });
+    const traderA = trader({ id: 'trader-a' as CaravanTraderId });
+    const traderB = trader({ id: 'trader-b' as CaravanTraderId });
+    vi.mocked(caravanEligibleTraders).mockReturnValue([traderA, traderB]);
+
+    caravanProcessTick();
+
+    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const result = updateFn({
+      world: { caravans: {} },
+    } as unknown as GameState);
+
+    expect(result.world.caravans[caravan.id].traderId).toBe('trader-b');
+    expect(
+      result.world.caravans[caravan.id].visitedTraderId,
+    ).toBeUndefined();
+  });
+
   it('picks a different trader than last cycle when more than one is eligible', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     withCaravanState({
