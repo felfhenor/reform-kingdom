@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,7 +9,9 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
+import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import { decreeClauseSummary } from '@helpers/decree/decree.ui';
+import { getMaterialQuantity } from '@helpers/item/materials';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type { DecreeClause, ItemContent, RewardContentInfo } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -29,7 +32,7 @@ const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   selector: 'app-row-decree-clause',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
-  imports: [AtlasImageComponent, TippyDirective, SFXDirective],
+  imports: [AtlasImageComponent, TippyDirective, SFXDirective, DecimalPipe],
   templateUrl: './row-decree-clause.component.html',
 })
 export class RowDecreeClauseComponent {
@@ -61,6 +64,20 @@ export class RowDecreeClauseComponent {
     }
 
     if (clause.type === 'FarmNode') return rewardContentInfo(clause.reward);
+
+    return undefined;
+  });
+
+  // GatherMaterial/FarmNode target a specific reward, so "how many do I already have" is meaningful; other clause types have no single item to count.
+  public ownedQuantity = computed<number | undefined>(() => {
+    const clause = this.clause();
+
+    if (clause.type === 'GatherMaterial') {
+      return getMaterialQuantity(clause.materialId);
+    }
+
+    if (clause.type === 'FarmNode')
+      return farmNodeRewardQuantity(clause.reward);
 
     return undefined;
   });

@@ -10,6 +10,10 @@
 
 <span class="flex-1 truncate" [class.opacity-50]="!clause().enabled">
   {{ summary() }}
+  @let owned = ownedQuantity();
+  @if (owned !== undefined) {
+    <span class="text-lighter italic">(you have {{ owned | number }})</span>
+  }
 </span>
 
 @if (isFailing()) {
