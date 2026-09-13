@@ -71,6 +71,9 @@
         - itemId: Trislime Core
           required: 5
 
+        - itemId: Gobslime Tongue
+          required: 3
+
       globalEffectId: Wisdom of the Founder V
       globalEffectDuration: 31536000
 

@@ -62,5 +62,8 @@
         - itemId: Ghostwood
           required: 250
 
+        - itemId: Spirit Gear
+          required: 3
+
       globalEffectId: Victor's Harvest V
       globalEffectDuration: 31536000
