@@ -47,20 +47,22 @@
             </span>
           </button>
 
+          @let spellCount = unlockedAstralSpellCount();
           <button
             class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
             (click)="openSubview('astralprojector')"
             appSfx="ui-click"
             [sfxOffset]="2"
             [sfxTrigger]="['click', 'hover']"
+            [disabled]="spellCount === 0"
           >
-            @let spellCount = unlockedAstralSpellCount();
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
               <app-icon name="gameCrystalBall" size="row" />
               Astral Projector
             </span>
+
             <span class="text-xs text-lighter">
               {{ spellCount | number }}
               {{ 'spell' | pluralize: spellCount > 1 }} learned
