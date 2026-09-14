@@ -4,12 +4,18 @@ vi.mock('@helpers/town/town-materials', () => ({
   townMaterialQuantity: vi.fn(),
 }));
 
+vi.mock('@helpers/town/town-resource-thresholds', () => ({
+  townMaterialAtOrAboveThreshold: vi.fn(() => false),
+}));
+
 import { townMaterialQuantity } from '@helpers/town/town-materials';
+import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
-import type { ItemId, RecipeContent, TownId } from '@interfaces';
+import type { ItemId, RecipeContent, TownContent, TownId } from '@interfaces';
 
 const townId = 'larsia' as TownId;
 const oreId = 'ore' as ItemId;
+const town = { id: townId } as unknown as TownContent;
 
 function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
   return {
@@ -32,14 +38,14 @@ describe('isRecipeCraftableByTown', () => {
     vi.mocked(townMaterialQuantity).mockReturnValue(5);
 
     expect(
-      isRecipeCraftableByTown(buildRecipe({ minTradeskillLevel: 50 }), townId),
+      isRecipeCraftableByTown(buildRecipe({ minTradeskillLevel: 50 }), town),
     ).toBe(true);
   });
 
   it('is not craftable when the town lacks enough of a required item', () => {
     vi.mocked(townMaterialQuantity).mockReturnValue(1);
 
-    expect(isRecipeCraftableByTown(buildRecipe(), townId)).toBe(false);
+    expect(isRecipeCraftableByTown(buildRecipe(), town)).toBe(false);
   });
 
   it('is never craftable if any requirement is equipment or a collectible', () => {
@@ -52,8 +58,8 @@ describe('isRecipeCraftableByTown', () => {
       requirements: [{ collectibleId: 'trophy' as never }],
     });
 
-    expect(isRecipeCraftableByTown(equipmentGated, townId)).toBe(false);
-    expect(isRecipeCraftableByTown(collectibleGated, townId)).toBe(false);
+    expect(isRecipeCraftableByTown(equipmentGated, town)).toBe(false);
+    expect(isRecipeCraftableByTown(collectibleGated, town)).toBe(false);
   });
 
   it('is never craftable if the result is a collectible', () => {
@@ -64,6 +70,25 @@ describe('isRecipeCraftableByTown', () => {
       result: { collectibleId: 'trophy' as never },
     });
 
-    expect(isRecipeCraftableByTown(recipe, townId)).toBe(false);
+    expect(isRecipeCraftableByTown(recipe, town)).toBe(false);
+  });
+
+  it('is not craftable when the resulting material is already at or above its town threshold', () => {
+    vi.mocked(townMaterialQuantity).mockReturnValue(999);
+    vi.mocked(townMaterialAtOrAboveThreshold).mockReturnValue(true);
+
+    expect(isRecipeCraftableByTown(buildRecipe(), town)).toBe(false);
+  });
+
+  it('is craftable when the result is equipment, regardless of material thresholds', () => {
+    vi.mocked(townMaterialQuantity).mockReturnValue(999);
+    vi.mocked(townMaterialAtOrAboveThreshold).mockReturnValue(true);
+
+    const recipe = buildRecipe({
+      requirements: [],
+      result: { equipmentId: 'sword' as never },
+    });
+
+    expect(isRecipeCraftableByTown(recipe, town)).toBe(true);
   });
 });

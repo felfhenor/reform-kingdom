@@ -1,7 +1,10 @@
 import { TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
+import {
+  isRecipeCraftableByTown,
+  isRecipeResultAtOrAboveThreshold,
+} from '@helpers/town/crafting/town-craft-eligibility';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -72,13 +75,15 @@ export function resetTownSpecialtyPriority(
 }
 
 // Craftable-but-not-yet-picked is left alone - only an actual inability to craft counts as a failure.
+// A capped output isn't a shortage either - more gathering can never unblock it, so it must not accumulate failures.
 function evaluateSpecialtyRecipe(
   target: TownNodeState,
-  townId: TownId,
+  town: TownContent,
   recipe: RecipeContent,
 ): void {
   if (isBeingCraftedOrForSale(target, recipe)) return;
-  if (isRecipeCraftableByTown(recipe, townId)) return;
+  if (isRecipeResultAtOrAboveThreshold(recipe, town)) return;
+  if (isRecipeCraftableByTown(recipe, town)) return;
 
   target.specialtyPriority = upsertFailure(
     target.specialtyPriority ?? [],
@@ -92,7 +97,7 @@ function processTownSpecialtyPriority(town: TownContent): void {
     if (!target) return state;
 
     specialtyRecipesForTown(town).forEach((recipe) =>
-      evaluateSpecialtyRecipe(target, town.id, recipe),
+      evaluateSpecialtyRecipe(target, town, recipe),
     );
     return state;
   });

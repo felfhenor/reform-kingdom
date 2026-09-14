@@ -78,9 +78,10 @@ describe('townPickRecipeToQueue', () => {
     );
     vi.mocked(rngChoiceWeighted).mockImplementation((choices) => choices[0]);
 
-    const result = townPickRecipeToQueue(buildTown(blacksmithingId));
+    const town = buildTown(blacksmithingId);
+    const result = townPickRecipeToQueue(town);
 
-    expect(isRecipeCraftableByTown).toHaveBeenCalledWith(eligible, townId);
+    expect(isRecipeCraftableByTown).toHaveBeenCalledWith(eligible, town);
     expect(rngChoiceWeighted).toHaveBeenCalledWith([eligible], expect.any(Function));
     expect(result).toEqual({ tradeskillId: woodworkingId, recipe: eligible });
   });

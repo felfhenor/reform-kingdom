@@ -12,6 +12,7 @@ vi.mock('@helpers/state-game', () => ({
 
 vi.mock('@helpers/town/crafting/town-craft-eligibility', () => ({
   isRecipeCraftableByTown: vi.fn(),
+  isRecipeResultAtOrAboveThreshold: vi.fn(() => false),
 }));
 
 vi.mock('@helpers/town/town-tick', () => ({
@@ -27,7 +28,10 @@ import {
   townSpecialtyPriority,
   townSpecialtyPriorityProcessTick,
 } from '@helpers/town/crafting/town-craft-priority-state';
-import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
+import {
+  isRecipeCraftableByTown,
+  isRecipeResultAtOrAboveThreshold,
+} from '@helpers/town/crafting/town-craft-eligibility';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -78,6 +82,7 @@ function buildTarget(overrides: Partial<TownNodeState> = {}): TownNodeState {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(isTownDueForUpdate).mockReturnValue(true);
+  vi.mocked(isRecipeResultAtOrAboveThreshold).mockReturnValue(false);
 });
 
 describe('townSpecialtyPriority', () => {
@@ -226,6 +231,15 @@ describe('townSpecialtyPriorityProcessTick', () => {
         ],
       }),
     );
+
+    expect(result.specialtyPriority).toEqual([]);
+  });
+
+  it('does not increment while the recipe result is capped at its material threshold - more gathering cannot fix that', () => {
+    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
+    vi.mocked(isRecipeResultAtOrAboveThreshold).mockReturnValue(true);
+
+    const result = applyTick(buildTarget());
 
     expect(result.specialtyPriority).toEqual([]);
   });

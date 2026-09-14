@@ -44,7 +44,7 @@ export function townPickRecipeToQueue(
   const priorityMap = townItemPriorityMap(townSpecialtyPriority(town.id));
   const eligible = getEntriesByType<RecipeContent>('recipe').filter(
     (recipe) =>
-      isRecipeCraftableByTown(recipe, town.id) &&
+      isRecipeCraftableByTown(recipe, town) &&
       townRecipeRespectsReservationsFromMap(priorityMap, town.id, recipe),
   );
   if (eligible.length === 0) return undefined;

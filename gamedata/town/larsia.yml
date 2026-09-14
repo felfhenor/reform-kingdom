@@ -105,6 +105,21 @@
       - itemId: Preserved Bloodmoth
         maxQuantity: 300
 
+      - itemId: Cimmerian Fire Charm
+        maxQuantity: 5
+
+      - itemId: Cimmerian Water Charm
+        maxQuantity: 5
+
+      - itemId: Cimmerian Holy Charm
+        maxQuantity: 5
+
+      - itemId: Cimmerian Lightning Charm
+        maxQuantity: 5
+
+      - itemId: Cimmerian Skull Charm
+        maxQuantity: 5
+
     workers:
       - workerId: Darwin Nork
         level: 1
