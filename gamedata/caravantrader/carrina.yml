@@ -124,169 +124,90 @@
       limit: 5
       weight: 1
 
-- id: 787b86ba-c0b8-49bb-8c39-4dc0918f4fd8
-  name: Graagnus
-  description: Humans! Buy stuff!
-  category: Goblem
-  level: 3
+- id: 55b17ce9-1178-4e33-a50c-fdd226613610
+  name: Alekia Figaro
+  description: Greetings, Duchy heroes. I deal in mystical recipes.
+  category: Carrina
+  level: 15
 
   tokenTrades:
-    - collectibleId: Crude Treasure Map
+    - collectibleId: Blank Templar Scroll
       tokenCost: 3
 
   trades:
     - type: sell
       value: 500
-      equipmentId: Coppergob Dagger
-      limit: 2
-      weight: 2
-
-    - type: sell
-      value: 500
-      equipmentId: Coppergob Dirk
-      limit: 2
-      weight: 2
-
-    # base game items
-    - type: sell
-      value: 50
-      itemId: Copper Ore
-      limit: 100
-      weight: 2
-
-    - type: buy
-      value: 150
-      itemId: Malachite
-      limit: 5
+      itemId: Spirit Flesh
+      limit: 15
       weight: 1
 
-    - type: buy
-      value: 50
-      equipmentId: Pan Board
-      limit: 50
-      weight: 1
-
-- id: 1503d413-a38b-4759-856c-a9b234cec813
-  name: Bart
-  description: Humans! Buy stuff!
-  category: Goblem
-  level: 5
-
-  tokenTrades:
-    - collectibleId: Gobsweet
-      tokenCost: 3
-
-  trades:
     - type: sell
-      value: 500
-      itemId: Goblin Teeth
-      limit: 5
-      weight: 2
-
-    - type: sell
-      value: 500
-      itemId: Goblin Nail
-      limit: 5
-      weight: 2
-
-    # base game items
-    - type: buy
-      value: 250
-      itemId: Azurite
-      limit: 5
-      weight: 1
-
-    - type: buy
-      value: 500
-      equipmentId: Jelly Dirk
-      limit: 2
-      weight: 1
-
-- id: 383dbb28-cc21-47ca-afee-bd088dc127e4
-  name: Pondias Albel
-  description: Humans. I have crafting materials that you might find useful. If you want to look, anyway.
-  category: Elfheim
-  level: 5
-
-  tokenTrades:
-    - collectibleId: Elvish Boomerang
-      tokenCost: 3
-
-  trades:
-    - type: sell
-      value: 3500
-      equipmentId: Ace of Spades
+      value: 25000
+      recipeId: 'Accessory: Ghostcopper Gear'
       limit: 1
-      weight: 3
-
-    - type: sell
-      value: 3500
-      equipmentId: Mysterious Die
-      limit: 1
-      weight: 3
-
-    # base game items
-    - type: sell
-      value: 150
-      itemId: Silk Spool
-      limit: 100
-      weight: 2
-
-    - type: sell
-      value: 25
-      itemId: Linen Thread
-      limit: 100
-      weight: 2
-
-    - type: buy
-      value: 10
-      itemId: Linen Thread
-      limit: 100
       weight: 1
 
     - type: sell
-      value: 1500
-      itemId: Trislime Core
+      value: 25000
+      recipeId: 'Artifact: Ghostcopper Chain'
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 35000
+      recipeId: 'Weapon: Ghostcopper Spear'
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 35000
+      recipeId: 'Offhand: Ghostcopper Dirk'
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 50000
+      recipeId: 'Offhand: Ghostly Scroll'
+      limit: 1
+      weight: 1
+
+- id: a64d21fc-e83a-442e-803d-53df239d701d
+  name: Stori Kesan
+  description: Hello, sweet friends of the Duchy! I'm collecting rare charms!
+  category: Carrina
+  level: 23
+
+  tokenTrades:
+    - collectibleId: Stuffed Panda Bear Plushie
+      tokenCost: 3
+
+  trades:
+    - type: buy
+      value: 15000
+      itemId: Cimmerian Fire Charm
       limit: 3
-      weight: 2
+      weight: 1
 
-- id: 5cd7a8a6-1030-49cc-891e-c67e2f4ac74c
-  name: Renaud Hall
-  description: I deal in elvish equipment. You might find some good items here.
-  category: Elfheim
-  level: 7
+    - type: buy
+      value: 15000
+      itemId: Cimmerian Holy Charm
+      limit: 3
+      weight: 1
 
-  tokenTrades:
-    - collectibleId: Elven Staffrune Book
-      tokenCost: 3
+    - type: buy
+      value: 15000
+      itemId: Cimmerian Lightning Charm
+      limit: 3
+      weight: 1
 
-  trades:
-    - type: sell
-      value: 2500
-      equipmentId: Elfsilk Hat
-      limit: 2
-      weight: 3
+    - type: buy
+      value: 15000
+      itemId: Cimmerian Skull Charm
+      limit: 3
+      weight: 1
 
-    - type: sell
-      value: 2500
-      equipmentId: Elfsilk Shirt
-      limit: 2
-      weight: 3
-
-    - type: sell
-      value: 5000
-      equipmentId: Elvenwood Mace
-      limit: 2
-      weight: 3
-
-    - type: sell
-      value: 5000
-      equipmentId: Elvenwood Harpoon
-      limit: 2
-      weight: 3
-
-    - type: sell
-      value: 7500
-      equipmentId: Elven Aiming Artifact
-      limit: 2
-      weight: 3
+    - type: buy
+      value: 15000
+      itemId: Cimmerian Water Charm
+      limit: 3
+      weight: 1

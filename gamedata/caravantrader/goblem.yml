@@ -1,0 +1,130 @@
+- id: 787b86ba-c0b8-49bb-8c39-4dc0918f4fd8
+  name: Graagnus
+  description: Humans! Buy stuff!
+  category: Goblem
+  level: 3
+
+  tokenTrades:
+    - collectibleId: Crude Treasure Map
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 500
+      equipmentId: Coppergob Dagger
+      limit: 2
+      weight: 2
+
+    - type: sell
+      value: 500
+      equipmentId: Coppergob Dirk
+      limit: 2
+      weight: 2
+
+    # base game items
+    - type: sell
+      value: 50
+      itemId: Copper Ore
+      limit: 100
+      weight: 2
+
+    - type: buy
+      value: 150
+      itemId: Malachite
+      limit: 5
+      weight: 1
+
+    - type: buy
+      value: 50
+      equipmentId: Pan Board
+      limit: 50
+      weight: 1
+
+- id: 1503d413-a38b-4759-856c-a9b234cec813
+  name: Bart
+  description: Humans! Buy stuff!
+  category: Goblem
+  level: 5
+
+  tokenTrades:
+    - collectibleId: Gobsweet
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 500
+      itemId: Goblin Teeth
+      limit: 5
+      weight: 2
+
+    - type: sell
+      value: 500
+      itemId: Goblin Nail
+      limit: 5
+      weight: 2
+
+    # base game items
+    - type: buy
+      value: 250
+      itemId: Azurite
+      limit: 5
+      weight: 1
+
+    - type: buy
+      value: 500
+      equipmentId: Jelly Dirk
+      limit: 2
+      weight: 1
+
+- id: ecd19499-69dd-4603-8cb2-b05803c4cf60
+  name: Galt
+  description: Humans! Sell slime cores! Need!
+  category: Goblem
+  level: 10
+
+  tokenTrades:
+    - collectibleId: Slime Eggs
+      tokenCost: 3
+
+  trades:
+    - type: buy
+      value: 1000
+      itemId: Green Slime Core
+      limit: 5
+      weight: 1
+
+    - type: buy
+      value: 500
+      itemId: Purple Slime Core
+      limit: 5
+      weight: 1
+
+    - type: buy
+      value: 500
+      itemId: Red Slime Core
+      limit: 5
+      weight: 1
+
+    - type: buy
+      value: 1000
+      itemId: Green Slime Crystal
+      limit: 5
+      weight: 2
+
+    - type: buy
+      value: 500
+      itemId: Purple Slime Crystal
+      limit: 5
+      weight: 2
+
+    - type: buy
+      value: 500
+      itemId: Red Slime Crystal
+      limit: 5
+      weight: 2
+
+    - type: buy
+      value: 3500
+      itemId: Trislime Core
+      limit: 2
+      weight: 1

@@ -1,0 +1,88 @@
+- id: 383dbb28-cc21-47ca-afee-bd088dc127e4
+  name: Pondias Albel
+  description: Humans. I have crafting materials that you might find useful. If you want to look, anyway.
+  category: Elfheim
+  level: 5
+
+  tokenTrades:
+    - collectibleId: Elvish Boomerang
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 3500
+      equipmentId: Ace of Spades
+      limit: 1
+      weight: 3
+
+    - type: sell
+      value: 3500
+      equipmentId: Mysterious Die
+      limit: 1
+      weight: 3
+
+    # base game items
+    - type: sell
+      value: 150
+      itemId: Silk Spool
+      limit: 100
+      weight: 2
+
+    - type: sell
+      value: 25
+      itemId: Linen Thread
+      limit: 100
+      weight: 2
+
+    - type: buy
+      value: 10
+      itemId: Linen Thread
+      limit: 100
+      weight: 1
+
+    - type: sell
+      value: 1500
+      itemId: Trislime Core
+      limit: 3
+      weight: 2
+
+- id: 5cd7a8a6-1030-49cc-891e-c67e2f4ac74c
+  name: Renaud Hall
+  description: I deal in elvish equipment. You might find some good items here.
+  category: Elfheim
+  level: 7
+
+  tokenTrades:
+    - collectibleId: Elven Staffrune Book
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 2500
+      equipmentId: Elfsilk Hat
+      limit: 2
+      weight: 3
+
+    - type: sell
+      value: 2500
+      equipmentId: Elfsilk Shirt
+      limit: 2
+      weight: 3
+
+    - type: sell
+      value: 5000
+      equipmentId: Elvenwood Mace
+      limit: 2
+      weight: 3
+
+    - type: sell
+      value: 5000
+      equipmentId: Elvenwood Harpoon
+      limit: 2
+      weight: 3
+
+    - type: sell
+      value: 7500
+      equipmentId: Elven Aiming Artifact
+      limit: 2
+      weight: 3

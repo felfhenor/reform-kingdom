@@ -1,0 +1,11 @@
+- id: 3f5e6244-3721-475b-83b1-856b32bd29f6
+  name: Elvish Boomerang
+  rarity: Rare
+  description: A rare entertainment tool given to some young elves to practice their dexterity.
+  sprite: '0022'
+
+- id: a2c511ac-e1d8-4e33-bf95-9bc570b5566e
+  name: Elven Staffrune Book
+  rarity: Rare
+  description: A book that teaches the reader to use staves the elven way.
+  sprite: '0023'
