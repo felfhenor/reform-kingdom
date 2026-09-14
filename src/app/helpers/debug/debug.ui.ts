@@ -244,6 +244,12 @@ export function debugGiveCollectible(
   collectiblesAdd(collectible.id, quantity);
 }
 
+export function debugDiscoverAllCollectibles(): void {
+  getEntriesByType<CollectibleContent>('collectible').forEach((collectible) => {
+    collectiblesAdd(collectible.id, 1);
+  });
+}
+
 // Discovers every drop-gated recipe so it becomes craftable; non-drop-gated
 // recipes need no discovery record.
 export function debugDiscoverAllRecipes(): void {
