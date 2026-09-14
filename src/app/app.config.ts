@@ -75,6 +75,12 @@ export const appConfig: ApplicationConfig = {
               reverseButtons: true,
               showCancelButton: true,
               focusCancel: true,
+              buttonsStyling: false,
+              customClass: {
+                confirmButton: 'btn btn-primary',
+                denyButton: 'btn btn-error',
+                cancelButton: 'btn btn-neutral',
+              },
             }),
           ),
       }),

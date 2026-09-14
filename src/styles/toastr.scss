@@ -1,5 +1,4 @@
-// Recolors ngx-toastr (loaded via angular.json's global toastr.css) to match
-// the game's parchment/plaque look instead of ngx-toastr's flat default colors.
+// Recolors ngx-toastr to match the game's parchment/plaque look instead of ngx-toastr's flat default colors.
 $toast-types: (
   ('success', '✦'),
   ('error', '⚔'),
