@@ -12,6 +12,7 @@ import {
   type GlobalEffectEffect,
   type GlobalEffectId,
   type GlobalEffectSums,
+  type TradeskillContent,
 } from '@interfaces';
 
 // Renders one effect as a short "Label: +N[%]" fragment.
@@ -40,6 +41,12 @@ export function globalEffectEffectDescription(
       return `Extra Gather Item Chance: +${effect.value}%`;
     case 'GlobalArmorySizeBoost':
       return `Armory Size: +${effect.value}`;
+    case 'GlobalTradeskillQueueSizeBoost': {
+      const tradeskillName =
+        getEntry<TradeskillContent>(effect.tradeskillId)?.name ??
+        'Unknown Tradeskill';
+      return `${tradeskillName} Queue Size: +${effect.value}`;
+    }
   }
 }
 
@@ -87,14 +94,17 @@ function accumulateGlobalEffectEffect(
     case 'GlobalArmorySizeBoost':
       sums.armorySizeBoost += effect.value;
       return;
+    case 'GlobalTradeskillQueueSizeBoost':
+      sums.tradeskillQueueSizeBoosts[effect.tradeskillId] =
+        (sums.tradeskillQueueSizeBoosts[effect.tradeskillId] ?? 0) +
+        effect.value;
+      return;
     default:
       assertNeverGlobalEffectEffect(effect);
   }
 }
 
-// Rebuilds `state.globalEffectSums` from scratch - every active (non-expired)
-// global effect, plus every owned collectible's effects counted once each
-// regardless of quantity (collectibles never stack). Called from the few
+// Rebuilds `state.globalEffectSums` from scratch. Called from the few
 // choke points that actually change either source: `applyGlobalEffectPush`,
 // `applyGlobalEffectRemove`, and `applyCollectibleGrant`.
 export function recomputeGlobalEffectSums(state: GameState): void {

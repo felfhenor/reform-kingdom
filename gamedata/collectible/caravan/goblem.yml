@@ -10,8 +10,18 @@
   description: A crudely-drawn treasure map that seems to lead... to exactly where you bought it.
   sprite: '0024'
 
+  effects:
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Jewelcrafting
+      value: 1
+
 - id: 8f06f3bd-f947-4b44-86a9-5cf4c21bb2c5
   name: Slime Eggs
   rarity: Rare
   description: The goblin you bought this from insists that slimes lay eggs, and that these are unhatched slimes.
   sprite: '0048'
+
+  effects:
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Artificing
+      value: 1

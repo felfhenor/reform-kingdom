@@ -12,9 +12,11 @@ import type {
   GlobalEffectEffectGainStats,
   GlobalEffectEffectGatheringItemDropRateBoost,
   GlobalEffectEffectGoldGainMultiplier,
+  GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
   StatusEffectTag,
+  TradeskillId,
 } from '@interfaces';
 
 export function ensureGlobalEffectEffect(
@@ -26,7 +28,8 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectDebuffResistanceTag> &
     Partial<GlobalEffectEffectCombatItemDropRateBoost> &
     Partial<GlobalEffectEffectGatheringItemDropRateBoost> &
-    Partial<GlobalEffectEffectArmorySizeBoost> = {},
+    Partial<GlobalEffectEffectArmorySizeBoost> &
+    Partial<GlobalEffectEffectTradeskillQueueSizeBoost> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
@@ -34,6 +37,14 @@ export function ensureGlobalEffectEffect(
 
   if (effect.effectType === 'GlobalArmorySizeBoost') {
     return { effectType: 'GlobalArmorySizeBoost', value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'GlobalTradeskillQueueSizeBoost') {
+    return {
+      effectType: 'GlobalTradeskillQueueSizeBoost',
+      tradeskillId: (effect.tradeskillId ?? 'UNKNOWN') as TradeskillId,
+      value: effect.value ?? 0,
+    };
   }
 
   if (effect.effectType === 'GlobalGoldGainMultiplier') {

@@ -332,6 +332,7 @@ describe('craftQueueStart', () => {
     mockGetEntry({ 'recipe-1': buildRecipe({ minTradeskillLevel: 5 }) });
     vi.mocked(gamestate).mockReturnValue({
       tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
     } as unknown as GameState);
 
     expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1)).toBe(
@@ -352,6 +353,7 @@ describe('craftQueueStart', () => {
           ],
         }),
       },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
     } as unknown as GameState);
 
     expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1)).toBe(
@@ -369,6 +371,7 @@ describe('craftQueueStart', () => {
     });
     vi.mocked(gamestate).mockReturnValue({
       tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
     } as unknown as GameState);
 
     expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 10)).toBe(
@@ -398,6 +401,7 @@ describe('craftQueueStart', () => {
     mockGetEntry({ 'recipe-1': buildRecipe({ name: 'Copper Ingot' }) });
     vi.mocked(gamestate).mockReturnValue({
       tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
     } as unknown as GameState);
 
     craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1);

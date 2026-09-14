@@ -21,3 +21,8 @@
   rarity: Rare
   description: A well-kept stuffed panda bear plushie. It's as fuzzy as it is adorable!
   sprite: '0047'
+
+  effects:
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Tailoring
+      value: 1

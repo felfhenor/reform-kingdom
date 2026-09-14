@@ -4,6 +4,11 @@
   description: A rare entertainment tool given to some young elves to practice their dexterity.
   sprite: '0022'
 
+  effects:
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Woodworking
+      value: 1
+
 - id: a2c511ac-e1d8-4e33-bf95-9bc570b5566e
   name: Elven Staffrune Book
   rarity: Rare

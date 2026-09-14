@@ -167,6 +167,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,
+    tradeskillQueueSizeBoosts: {},
   };
 }
 

@@ -1,6 +1,7 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { CombatStat } from '@interfaces/combat';
 import type { StatusEffectTag } from '@interfaces/content-statuseffect';
+import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { GameStat } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
@@ -61,6 +62,13 @@ export type GlobalEffectEffectArmorySizeBoost = {
   value: number;
 };
 
+// Adds `value` (a flat count) to one tradeskill's craft queue slot count.
+export type GlobalEffectEffectTradeskillQueueSizeBoost = {
+  effectType: 'GlobalTradeskillQueueSizeBoost';
+  tradeskillId: TradeskillId;
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainCombatStat
@@ -70,7 +78,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost
   | GlobalEffectEffectGatheringItemDropRateBoost
-  | GlobalEffectEffectArmorySizeBoost;
+  | GlobalEffectEffectArmorySizeBoost
+  | GlobalEffectEffectTradeskillQueueSizeBoost;
 
 export type GlobalEffectContent = IsContentItem &
   HasDescription &

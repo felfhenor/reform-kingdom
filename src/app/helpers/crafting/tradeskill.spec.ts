@@ -9,12 +9,17 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/hero/global-effects', () => ({
+  globalEffectSums: vi.fn(() => ({ tradeskillQueueSizeBoosts: {} })),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
 }));
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import {
   craftXpChance,
   craftXpChanceTier,
@@ -187,20 +192,57 @@ describe('retrofitTradeskillXp', () => {
 });
 
 describe('tradeskillMaxQueueSize', () => {
+  beforeEach(() => {
+    mockTradeskillContentLookup(blacksmithingContent);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      tradeskillQueueSizeBoosts: {},
+    } as never);
+  });
+
   it('defaults to 2 below level 5', () => {
-    expect(tradeskillMaxQueueSize(1)).toBe(2);
-    expect(tradeskillMaxQueueSize(4)).toBe(2);
+    expect(tradeskillMaxQueueSize(1, 'Blacksmithing')).toBe(2);
+    expect(tradeskillMaxQueueSize(4, 'Blacksmithing')).toBe(2);
   });
 
   it('gains 1 slot every 5 levels', () => {
-    expect(tradeskillMaxQueueSize(5)).toBe(3);
-    expect(tradeskillMaxQueueSize(10)).toBe(4);
-    expect(tradeskillMaxQueueSize(20)).toBe(6);
+    expect(tradeskillMaxQueueSize(5, 'Blacksmithing')).toBe(3);
+    expect(tradeskillMaxQueueSize(10, 'Blacksmithing')).toBe(4);
+    expect(tradeskillMaxQueueSize(20, 'Blacksmithing')).toBe(6);
   });
 
   it('caps at 10', () => {
-    expect(tradeskillMaxQueueSize(40)).toBe(10);
-    expect(tradeskillMaxQueueSize(50)).toBe(10);
+    expect(tradeskillMaxQueueSize(40, 'Blacksmithing')).toBe(10);
+    expect(tradeskillMaxQueueSize(50, 'Blacksmithing')).toBe(10);
+  });
+
+  it("adds any active boost for that tradeskill's queue size", () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      tradeskillQueueSizeBoosts: { [BLACKSMITHING_ID]: 2 },
+    } as never);
+
+    expect(tradeskillMaxQueueSize(1, 'Blacksmithing')).toBe(4);
+  });
+
+  it("ignores another tradeskill's boost", () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      tradeskillQueueSizeBoosts: { [WOODWORKING_ID]: 5 },
+    } as never);
+
+    expect(tradeskillMaxQueueSize(1, 'Blacksmithing')).toBe(2);
+  });
+
+  it('still caps the total at 10 even with a boost active', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      tradeskillQueueSizeBoosts: { [BLACKSMITHING_ID]: 5 },
+    } as never);
+
+    expect(tradeskillMaxQueueSize(50, 'Blacksmithing')).toBe(10);
+  });
+
+  it('treats an unresolvable tradeskill name as no boost', () => {
+    vi.mocked(getEntry).mockReturnValue(undefined as never);
+
+    expect(tradeskillMaxQueueSize(1, 'Blacksmithing')).toBe(2);
   });
 });
 

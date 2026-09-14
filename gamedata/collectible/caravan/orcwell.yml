@@ -3,3 +3,8 @@
   rarity: Rare
   description: A golden orc skull. It raises the question of whether orcs are graverobbers or artisans.
   sprite: '0036'
+
+  effects:
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Blacksmithing
+      value: 1

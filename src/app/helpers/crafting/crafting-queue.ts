@@ -190,7 +190,9 @@ export function craftQueueStart(
 
   const building = tradeskillBuilding(tradeskill);
   if (building.level < recipe.minTradeskillLevel) return false;
-  if (building.queue.length >= tradeskillMaxQueueSize(building.level)) {
+  if (
+    building.queue.length >= tradeskillMaxQueueSize(building.level, tradeskill)
+  ) {
     return false;
   }
 

@@ -10,6 +10,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { roundToNearest10 } from '@helpers/engine/number';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -56,9 +57,17 @@ export function tradeskillXpForLevel(level: number): number {
   return roundToNearest10(xp);
 }
 
-// Default 2 (1 active + 1 queued), +1 every 5 levels, capped at 10.
-export function tradeskillMaxQueueSize(level: number): number {
-  return Math.min(10, 2 + Math.floor(level / 5));
+// Default 2 (1 active + 1 queued), +1 every 5 levels, plus any active
+// per-tradeskill collectible/buff boost - still capped at 16 overall.
+export function tradeskillMaxQueueSize(
+  level: number,
+  tradeskill: Tradeskill,
+): number {
+  const tradeskillId = tradeskillIdForName(tradeskill);
+  const boost = tradeskillId
+    ? (globalEffectSums().tradeskillQueueSizeBoosts[tradeskillId] ?? 0)
+    : 0;
+  return Math.min(16, 2 + Math.floor(level / 5) + boost);
 }
 
 export function tradeskillBuilding(

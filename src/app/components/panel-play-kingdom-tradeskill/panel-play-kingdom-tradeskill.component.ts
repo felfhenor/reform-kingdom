@@ -145,10 +145,12 @@ export class PanelPlayKingdomTradeskillComponent {
   public isQueueFull = computed(
     () =>
       this.building().queue.length >=
-      tradeskillMaxQueueSize(this.building().level),
+      tradeskillMaxQueueSize(this.building().level, this.tradeskill()),
   );
   public queueSize = computed(() =>
-    Array(tradeskillMaxQueueSize(this.building().level)).fill(null),
+    Array(
+      tradeskillMaxQueueSize(this.building().level, this.tradeskill()),
+    ).fill(null),
   );
 
   public xpPercent = computed(() => {
