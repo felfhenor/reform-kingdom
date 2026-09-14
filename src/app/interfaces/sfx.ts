@@ -7,5 +7,3 @@ export type SFX =
   | 'ui-hover'
   | 'ui-success'
   | 'victory';
-
-export type BGM = 'menu' | 'game-casual' | 'game-threatened' | 'game-explore';

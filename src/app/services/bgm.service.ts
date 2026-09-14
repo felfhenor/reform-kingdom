@@ -3,7 +3,7 @@ import type { Event } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
 import { gameloopShouldRun } from '@helpers/gameloop';
 import { getOption } from '@helpers/state-options';
-import type { BGM } from '@interfaces/sfx';
+import type { BGM } from '@interfaces/sfx.ui';
 import { SoundService } from '@services/sound.service';
 
 @Injectable({

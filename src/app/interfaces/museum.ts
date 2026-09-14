@@ -2,8 +2,6 @@ import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { RecipeContent } from '@interfaces/content-recipe';
 import type { CollectibleSource } from '@interfaces/collectible-source';
 
-export type MuseumTab = 'collectibles' | 'recipes';
-
 export type MuseumCollectibleEntry = {
   collectible: CollectibleContent;
   discovered: boolean;
