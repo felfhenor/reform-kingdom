@@ -10,14 +10,16 @@ import { LoadingService } from '@services/loading.service';
     @let progress = loadingService.progress();
 
     <div
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-base-100"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-base-100 p-8"
     >
       <span class="loading loading-spinner loading-lg text-primary"></span>
+
       <app-bar-progress
-        class="w-64"
+        class="w-[50%]"
         color="primary"
         [value]="progress.percent"
       />
+
       <p class="text-sm text-lighter">{{ progress.label }}</p>
     </div>
   `,
