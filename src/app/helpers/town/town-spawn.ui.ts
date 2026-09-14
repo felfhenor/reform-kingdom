@@ -20,3 +20,12 @@ export function homeNodeSet(townId: TownId): void {
 
   analyticsSendDesignEvent(`Town:Home:Set:${analyticsSafeSegment(town.name)}`);
 }
+
+export function homeNodeResetToDuchy(): void {
+  updateGamestate((state) => {
+    state.world.homeNodeName = undefined;
+    return state;
+  });
+
+  analyticsSendDesignEvent(`Town:Home:Set:Duchy`);
+}

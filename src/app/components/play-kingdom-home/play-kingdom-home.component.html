@@ -321,7 +321,7 @@
             class="btn btn-accent btn-sm"
             (click)="openSubview('infusion')"
             appSfx="ui-click"
-            [sfxOffset]="3"
+            [sfxOffset]="2"
             [sfxTrigger]="['click', 'hover']"
           >
             <app-icon name="gameMagicPotion" size="inline" />
@@ -333,11 +333,24 @@
               class="btn btn-accent btn-sm"
               (click)="openSubview('commissions')"
               appSfx="ui-click"
-              [sfxOffset]="2"
+              [sfxOffset]="3"
               [sfxTrigger]="['click', 'hover']"
             >
               <app-icon name="gameContract" size="inline" />
               Commissions
+            </button>
+          }
+
+          @if (!isKingdomHome()) {
+            <button
+              class="btn btn-accent btn-sm"
+              (click)="resetHome()"
+              appSfx="ui-click"
+              [sfxOffset]="4"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon name="gameHouse" size="inline" />
+              Set Home
             </button>
           }
         </div>

@@ -16,6 +16,7 @@ import {
 } from '@helpers/crafting/crafting.ui';
 import { tradeskillBuilding } from '@helpers/crafting/tradeskill';
 import { modalOpen } from '@helpers/engine/modal-stack';
+import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
 import {
   kingdomSubviewForTradeskill,
@@ -32,6 +33,7 @@ import {
 } from '@helpers/kingdom/museum.ui';
 import { gamestate } from '@helpers/state-game';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
+import { homeNodeResetToDuchy } from '@helpers/town/town-spawn.ui';
 import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression.ui';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
@@ -198,6 +200,8 @@ export class PlayKingdomHomeComponent {
     });
   });
 
+  public isKingdomHome = computed(() => !gamestate().world.homeNodeName);
+
   public openSubview(subview: KingdomSubview): void {
     kingdomSubviewShow(subview);
   }
@@ -209,5 +213,10 @@ export class PlayKingdomHomeComponent {
 
   public openRaidDefenseModal(): void {
     modalOpen('raid-defense');
+  }
+
+  public resetHome(): void {
+    homeNodeResetToDuchy();
+    notifySuccess('The Duchy is your home once again!');
   }
 }
