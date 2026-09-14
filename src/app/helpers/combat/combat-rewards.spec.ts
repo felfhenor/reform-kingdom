@@ -35,7 +35,7 @@ vi.mock('@helpers/hero/global-effects', () => ({
 }));
 
 vi.mock('@helpers/kingdom/armory', () => ({
-  armoryAdd: vi.fn(),
+  armoryAdd: vi.fn(() => 1),
 }));
 
 vi.mock('@helpers/worker/worker-discovery', () => ({
@@ -54,6 +54,7 @@ import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { addMaterial } from '@helpers/item/materials';
+import { armoryAdd } from '@helpers/kingdom/armory';
 import {
   isWorkerRescued,
   workerRescue,
@@ -159,6 +160,22 @@ describe('grantResolvedDrops - VFX per drop kind', () => {
       undefined,
       { name: 'Iron Sword', sprite: 'iron-sword', spritesheet: 'equipment' },
     );
+  });
+
+  it('logs a lost-item message and skips the found-message/VFX when the armory is full', () => {
+    vi.mocked(armoryAdd).mockReturnValueOnce(0);
+
+    const drops: ResolvedDrop[] = [
+      { kind: 'Equipment', equipmentId: 'iron-sword' as never },
+    ];
+    grantResolvedDrops(COMBAT, drops);
+
+    expect(armoryAdd).toHaveBeenCalledWith('iron-sword', 1, true);
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      COMBAT,
+      'Your armory is full. An item drop was lost.',
+    );
+    expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
   it('emits a gather VFX event for a Collectible drop', () => {

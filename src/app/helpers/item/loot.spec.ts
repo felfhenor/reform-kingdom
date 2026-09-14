@@ -330,6 +330,36 @@ describe('Loot Helper Functions', () => {
       expect(state.discoveredEquipment[cloakId]?.foundAt).toBe(1000);
     });
 
+    it('still admits an equipment drop past the strict 50-item cap, up to the 125% overflow allowance', () => {
+      const state = fakeState();
+      state.armory = Array.from({ length: 55 }, () => ({
+        id: 'existing-item',
+        equipmentId: 'shield' as EquipmentId,
+        infusedItemIds: [],
+        affixIds: [],
+      }));
+      const drop: ResolvedDrop = { kind: 'Equipment', equipmentId: cloakId };
+
+      applyResolvedDropToState(state, drop);
+
+      expect(state.armory).toHaveLength(56);
+    });
+
+    it('rejects an equipment drop once the 125% overflow allowance is exhausted', () => {
+      const state = fakeState();
+      state.armory = Array.from({ length: 62 }, () => ({
+        id: 'existing-item',
+        equipmentId: 'shield' as EquipmentId,
+        infusedItemIds: [],
+        affixIds: [],
+      }));
+      const drop: ResolvedDrop = { kind: 'Equipment', equipmentId: cloakId };
+
+      applyResolvedDropToState(state, drop);
+
+      expect(state.armory).toHaveLength(62);
+    });
+
     it('increments an existing collectible quantity and keeps its discovery date', () => {
       const state = fakeState();
       state.collectibles[swampClamId] = { quantity: 2, foundAt: 1000 };

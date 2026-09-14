@@ -26,9 +26,14 @@ vi.mock('@helpers/state-game', () => ({
 import { getEntry } from '@helpers/content/content';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import {
+  addArmoryItems,
   armoryAdd,
   armoryAddWithAffixes,
+  armoryCap,
   armoryGet,
+  armoryHasRoom,
+  armoryHasRoomFor,
+  armoryOverflowCap,
   equipmentSellValue,
   getArmoryEntries,
   isEquipmentDiscovered,
@@ -71,7 +76,7 @@ function buildArmoryItem(equipmentId: EquipmentId): EquipmentItem {
 
 describe('Armory Helper Functions', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('armoryGet', () => {
@@ -80,6 +85,46 @@ describe('Armory Helper Functions', () => {
       vi.mocked(gamestate).mockReturnValue({ armory } as unknown as GameState);
 
       expect(armoryGet()).toBe(armory);
+    });
+  });
+
+  describe('armoryCap / armoryOverflowCap', () => {
+    it('caps the armory at 50 items', () => {
+      expect(armoryCap()).toBe(50);
+    });
+
+    it('allows drops to overshoot the cap by 25%, floored', () => {
+      expect(armoryOverflowCap()).toBe(62);
+    });
+  });
+
+  describe('armoryHasRoomFor / armoryHasRoom', () => {
+    it('has room under the strict cap', () => {
+      expect(armoryHasRoomFor(49)).toBe(true);
+    });
+
+    it('has no room at the strict cap', () => {
+      expect(armoryHasRoomFor(50)).toBe(false);
+    });
+
+    it('allows overflow up to the overflow cap when requested', () => {
+      expect(armoryHasRoomFor(50, 1, true)).toBe(true);
+      expect(armoryHasRoomFor(61, 1, true)).toBe(true);
+      expect(armoryHasRoomFor(62, 1, true)).toBe(false);
+    });
+
+    it('accounts for a multi-item quantity', () => {
+      expect(armoryHasRoomFor(45, 5)).toBe(true);
+      expect(armoryHasRoomFor(45, 6)).toBe(false);
+    });
+
+    it('reads the live armory length via armoryHasRoom', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        armory: Array.from({ length: 50 }),
+      } as unknown as GameState);
+
+      expect(armoryHasRoom()).toBe(false);
+      expect(armoryHasRoom(1, true)).toBe(true);
     });
   });
 
@@ -160,6 +205,128 @@ describe('Armory Helper Functions', () => {
       expect(result.discoveredEquipment['sword' as EquipmentId]).toEqual({
         foundAt: 1000,
       });
+    });
+
+    it('rejects everything once the strict cap is already reached', () => {
+      armoryAdd('sword' as EquipmentId, 3);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        armory: Array.from({ length: 50 }, () => ({
+          equipmentId: 'shield' as EquipmentId,
+        })),
+        discoveredEquipment: {},
+      } as unknown as GameState);
+
+      expect(result.armory).toHaveLength(50);
+    });
+  });
+
+  describe('addArmoryItems - cap clamping', () => {
+    function buildItems(
+      equipmentId: EquipmentId,
+      count: number,
+    ): EquipmentItem[] {
+      return Array.from({ length: count }, () => buildArmoryItem(equipmentId));
+    }
+
+    it('admits only as many as fit under the strict cap', () => {
+      const state = {
+        armory: buildItems('shield' as EquipmentId, 48),
+        discoveredEquipment: {},
+      } as unknown as GameState;
+
+      const admitted = addArmoryItems(
+        state,
+        'sword' as EquipmentId,
+        buildItems('sword' as EquipmentId, 5),
+      );
+
+      expect(state.armory).toHaveLength(50);
+      expect(admitted).toHaveLength(2);
+    });
+
+    it('rejects everything once the strict cap is already reached', () => {
+      const state = {
+        armory: buildItems('shield' as EquipmentId, 50),
+        discoveredEquipment: {},
+      } as unknown as GameState;
+
+      const admitted = addArmoryItems(
+        state,
+        'sword' as EquipmentId,
+        buildItems('sword' as EquipmentId, 3),
+      );
+
+      expect(state.armory).toHaveLength(50);
+      expect(admitted).toHaveLength(0);
+    });
+
+    it('admits up to the overflow cap when allowOverflow is set', () => {
+      const state = {
+        armory: buildItems('shield' as EquipmentId, 60),
+        discoveredEquipment: {},
+      } as unknown as GameState;
+
+      const admitted = addArmoryItems(
+        state,
+        'sword' as EquipmentId,
+        buildItems('sword' as EquipmentId, 5),
+        true,
+      );
+
+      expect(state.armory).toHaveLength(62);
+      expect(admitted).toHaveLength(2);
+    });
+
+    it('ignores the cap entirely when bypassCap is set', () => {
+      const state = {
+        armory: buildItems('shield' as EquipmentId, 60),
+        discoveredEquipment: {},
+      } as unknown as GameState;
+
+      const admitted = addArmoryItems(
+        state,
+        'sword' as EquipmentId,
+        buildItems('sword' as EquipmentId, 5),
+        false,
+        true,
+      );
+
+      expect(state.armory).toHaveLength(65);
+      expect(admitted).toHaveLength(5);
+    });
+
+    it('syncs the armory-fullness global effect when an add crosses a tier boundary', () => {
+      const overburdened = {
+        id: 'armory-overburdened-id' as never,
+        name: 'Overburdened',
+        __type: 'globaleffect',
+        description: 'The armory is full.',
+        sprite: '0000',
+        effects: [],
+      };
+      vi.mocked(getEntry).mockImplementation((key) =>
+        key === 'Overburdened' || key === overburdened.id
+          ? (overburdened as never)
+          : undefined,
+      );
+      vi.mocked(gamestate).mockReturnValue({
+        clock: { numTicks: 500 },
+      } as unknown as GameState);
+
+      const state = {
+        armory: buildItems('shield' as EquipmentId, 49),
+        discoveredEquipment: {},
+        globalEffects: [],
+      } as unknown as GameState;
+
+      addArmoryItems(state, 'sword' as EquipmentId, [
+        buildArmoryItem('sword' as EquipmentId),
+      ]);
+
+      expect(state.armory).toHaveLength(50);
+      expect(state.globalEffects.map((e) => e.id)).toEqual([overburdened.id]);
     });
   });
 

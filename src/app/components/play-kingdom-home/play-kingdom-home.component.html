@@ -28,7 +28,7 @@
           </button>
 
           <button
-            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-2"
             (click)="openSubview('armory')"
             appSfx="ui-click"
             [sfxOffset]="1"
@@ -41,10 +41,15 @@
               <app-icon name="gameCrossedSwords" size="row" />
               Armory
             </span>
-            <span class="text-xs text-lighter">
-              {{ armoryTotal }}
-              {{ 'item' | pluralize: armoryTotal > 1 }} stored
-            </span>
+
+            <app-bar-progress
+              class="w-full"
+              [value]="armoryTotal"
+              [max]="armoryCapValue"
+              [color]="armoryColor()"
+            >
+              {{ armoryTotal }}/{{ armoryCapValue }} items
+            </app-bar-progress>
           </button>
 
           @let spellCount = unlockedAstralSpellCount();

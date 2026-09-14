@@ -13,6 +13,7 @@ vi.mock('@helpers/engine/analytics', async (importOriginal) => {
 vi.mock('@helpers/kingdom/armory', () => ({
   armoryAdd: vi.fn(),
   armoryGet: vi.fn(() => []),
+  armoryHasRoom: vi.fn(() => true),
 }));
 
 vi.mock('@helpers/item/collectibles', () => ({
@@ -75,7 +76,7 @@ import {
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
 import { addMaterial, getMaterialQuantity } from '@helpers/item/materials';
-import { armoryAdd, armoryGet } from '@helpers/kingdom/armory';
+import { armoryAdd, armoryGet, armoryHasRoom } from '@helpers/kingdom/armory';
 import { rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -497,7 +498,10 @@ describe('craftProcessTick', () => {
     } as unknown as GameState);
     mockGetEntry({
       'recipe-1': recipe,
-      'copper-dagger': { name: 'Copper Dagger', sprite: 'copper-dagger-sprite' },
+      'copper-dagger': {
+        name: 'Copper Dagger',
+        sprite: 'copper-dagger-sprite',
+      },
     });
 
     craftProcessTick();
@@ -604,6 +608,117 @@ describe('craftProcessTick', () => {
     craftProcessTick();
 
     expect(addMaterial).toHaveBeenCalledWith('malachite', 1);
+  });
+
+  it('holds an equipment craft at 0 ticks remaining when the armory is full', () => {
+    const recipe = buildRecipe({
+      craftTime: 5,
+      result: { equipmentId: 'copper-dagger' as EquipmentId },
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
+      ),
+    } as unknown as GameState);
+    mockGetEntry({
+      'recipe-1': recipe,
+      'copper-dagger': {
+        name: 'Copper Dagger',
+        sprite: 'copper-dagger-sprite',
+      },
+    });
+    vi.mocked(armoryHasRoom).mockReturnValue(false);
+
+    craftProcessTick();
+
+    expect(armoryAdd).not.toHaveBeenCalled();
+
+    const state: GameState = {
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
+      ),
+    } as unknown as GameState;
+    const result = applyUpdateAt(0, state);
+    expect(result.tradeskills[BLACKSMITHING_ID].queue[0].ticksIntoCraft).toBe(
+      5,
+    );
+  });
+
+  it('keeps holding an already-held equipment craft at exactly craftTime, never past it', () => {
+    const recipe = buildRecipe({
+      craftTime: 5,
+      result: { equipmentId: 'copper-dagger' as EquipmentId },
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 5 })] }),
+      ),
+    } as unknown as GameState);
+    mockGetEntry({
+      'recipe-1': recipe,
+      'copper-dagger': {
+        name: 'Copper Dagger',
+        sprite: 'copper-dagger-sprite',
+      },
+    });
+    vi.mocked(armoryHasRoom).mockReturnValue(false);
+
+    craftProcessTick();
+
+    const state: GameState = {
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 5 })] }),
+      ),
+    } as unknown as GameState;
+    const result = applyUpdateAt(0, state);
+    expect(result.tradeskills[BLACKSMITHING_ID].queue[0].ticksIntoCraft).toBe(
+      5,
+    );
+  });
+
+  it('resumes and completes a held equipment craft once armory room frees up', () => {
+    const recipe = buildRecipe({
+      craftTime: 5,
+      result: { equipmentId: 'copper-dagger' as EquipmentId },
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 5 })] }),
+      ),
+    } as unknown as GameState);
+    mockGetEntry({
+      'recipe-1': recipe,
+      'copper-dagger': {
+        name: 'Copper Dagger',
+        sprite: 'copper-dagger-sprite',
+      },
+    });
+    vi.mocked(armoryHasRoom).mockReturnValue(true);
+
+    craftProcessTick();
+
+    expect(armoryAdd).toHaveBeenCalledWith('copper-dagger');
+  });
+
+  it('does not consult armory room for a non-equipment result', () => {
+    const recipe = buildRecipe({
+      craftTime: 5,
+      result: { itemId: 'copper-ingot' as ItemId, quantity: 1 },
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 4 })] }),
+      ),
+    } as unknown as GameState);
+    mockGetEntry({
+      'recipe-1': recipe,
+      'copper-ingot': { name: 'Copper Ingot' },
+    });
+    vi.mocked(armoryHasRoom).mockReturnValue(false);
+
+    craftProcessTick();
+
+    expect(addMaterial).toHaveBeenCalledWith('copper-ingot', 1);
   });
 
   it('keeps the entry active and resets ticks when more units remain in the batch', () => {

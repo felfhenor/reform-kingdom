@@ -4,6 +4,7 @@ import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { activeGlobalEffects } from '@helpers/hero/global-effects';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
+import { addArmoryItems } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
@@ -100,11 +101,12 @@ function applyEquipmentDrop(
   state: GameState,
   drop: ResolvedEquipmentDrop,
 ): void {
-  state.armory = [...state.armory, newEquipmentItem(drop.equipmentId)];
-  const existing = state.discoveredEquipment[drop.equipmentId];
-  state.discoveredEquipment[drop.equipmentId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
+  addArmoryItems(
+    state,
+    drop.equipmentId,
+    [newEquipmentItem(drop.equipmentId)],
+    true,
+  );
 }
 
 function applyCollectibleDrop(

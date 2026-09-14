@@ -135,6 +135,12 @@ export const GOLD_PER_GATHER_YIELD_POINT = 200;
 
 // Kingdom
 
+export const ARMORY_CAP = 50;
+// Drop hard-stop AND the "Over Capacity" warning tier threshold - same ratio, one constant.
+export const ARMORY_OVERFLOW_MULTIPLIER = 1.25;
+// "Overburdened" tier is just ratio >= 1 (no separate constant needed).
+export const ARMORY_ENCUMBERED_THRESHOLD = 0.75;
+
 // Same rate infusion pricing uses, plus a per-level component so higher-tier drops are worth more.
 export const SELL_GOLD_PER_STAT_POINT = 20;
 export const SELL_GOLD_PER_LEVEL = 10;

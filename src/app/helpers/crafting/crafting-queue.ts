@@ -30,7 +30,7 @@ import {
   applyMaterialDelta,
   getMaterialQuantity,
 } from '@helpers/item/materials';
-import { armoryAdd, armoryGet } from '@helpers/kingdom/armory';
+import { armoryAdd, armoryGet, armoryHasRoom } from '@helpers/kingdom/armory';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import type {
@@ -333,6 +333,12 @@ function advanceQueueEntry(
   });
 }
 
+// An equipment-result craft that's ready to deliver holds instead, once the armory has no room left - the strict cap, same rule as a purchase, not the drop-overflow allowance.
+// Note: gates on the recipe having an equipment result at all, not on whether this particular roll would hit - a chance-gated equipment recipe (none exist today) would hold even on ticks its own roll would have whiffed.
+function craftResultBlockedByArmory(recipe: RecipeContent): boolean {
+  return 'equipmentId' in recipe.result && !armoryHasRoom(1);
+}
+
 export function craftProcessTick(): void {
   ALL_TRADESKILLS.forEach((tradeskill) => {
     const entry = tradeskillBuilding(tradeskill).queue[0];
@@ -344,9 +350,13 @@ export function craftProcessTick(): void {
     const tradeskillId = tradeskillIdForName(tradeskill);
     if (!tradeskillId) return;
 
-    const ticksIntoCraft = entry.ticksIntoCraft + 1;
+    // Clamped, not just incremented - so a held craft reads exactly 0 ticks remaining instead of counting past it.
+    const ticksIntoCraft = Math.min(entry.ticksIntoCraft + 1, recipe.craftTime);
 
-    if (ticksIntoCraft < recipe.craftTime) {
+    if (
+      ticksIntoCraft < recipe.craftTime ||
+      craftResultBlockedByArmory(recipe)
+    ) {
       updateGamestate((state) => {
         const building = tradeskillBuildingIn(state, tradeskillId);
         const index = building.queue.findIndex(

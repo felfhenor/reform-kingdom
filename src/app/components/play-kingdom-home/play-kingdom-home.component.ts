@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -21,7 +22,8 @@ import {
   kingdomSubviewShow,
   uiClockTick,
 } from '@helpers/engine/ui';
-import { armoryGet } from '@helpers/kingdom/armory';
+import { armoryCap, armoryGet } from '@helpers/kingdom/armory';
+import { armoryFillColor } from '@helpers/kingdom/armory.ui';
 import { unlockedAstralProjectorEntries } from '@helpers/kingdom/astral-projector.ui';
 import { getBestiaryEntries } from '@helpers/kingdom/bestiary.ui';
 import {
@@ -58,6 +60,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     TippyDirective,
     PluralizePipe,
     SFXDirective,
+    BarProgressComponent,
   ],
   templateUrl: './play-kingdom-home.component.html',
 })
@@ -69,6 +72,10 @@ export class PlayKingdomHomeComponent {
   );
 
   public armoryCount = computed(() => armoryGet().length);
+  public armoryCapValue = armoryCap();
+  public armoryColor = computed(() =>
+    armoryFillColor(this.armoryCount(), this.armoryCapValue),
+  );
 
   public unlockedAstralSpellCount = computed(
     () => unlockedAstralProjectorEntries().length,

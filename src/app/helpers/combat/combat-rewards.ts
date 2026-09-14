@@ -66,7 +66,14 @@ export function grantResolvedDrops(
   drops.forEach((drop) => {
     switch (drop.kind) {
       case 'Equipment': {
-        armoryAdd(drop.equipmentId);
+        const admittedCount = armoryAdd(drop.equipmentId, 1, true);
+        if (admittedCount === 0) {
+          combatMessageLog(
+            combat,
+            'Your armory is full. An item drop was lost.',
+          );
+          return;
+        }
 
         const equipment = getEntry<EquipmentContent>(drop.equipmentId);
         if (!equipment) return;

@@ -1,4 +1,6 @@
 import {
+  ARMORY_CAP,
+  ARMORY_OVERFLOW_MULTIPLIER,
   SELL_GOLD_PER_COMBAT_STAT_POINT,
   SELL_GOLD_PER_LEVEL,
   SELL_GOLD_PER_RESISTANCE_POINT,
@@ -17,6 +19,7 @@ import {
   weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
+import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   AffixId,
@@ -33,6 +36,28 @@ import { orderBy } from 'es-toolkit/compat';
 
 export function armoryGet(): EquipmentItem[] {
   return gamestate().armory;
+}
+
+export function armoryCap(): number {
+  return ARMORY_CAP;
+}
+
+// Drops/loot get to overshoot the cap by this much before hard-stopping.
+export function armoryOverflowCap(): number {
+  return Math.floor(ARMORY_CAP * ARMORY_OVERFLOW_MULTIPLIER);
+}
+
+export function armoryHasRoomFor(
+  currentCount: number,
+  quantity = 1,
+  allowOverflow = false,
+): boolean {
+  const cap = allowOverflow ? armoryOverflowCap() : ARMORY_CAP;
+  return currentCount + quantity <= cap;
+}
+
+export function armoryHasRoom(quantity = 1, allowOverflow = false): boolean {
+  return armoryHasRoomFor(armoryGet().length, quantity, allowOverflow);
 }
 
 // One entry per owned item (duplicates never merged), carrying the instance alongside its content for per-instance infusion state.
@@ -64,42 +89,77 @@ export function pruneInvalidArmoryItems(
   );
 }
 
-// Shared by every armory-add path - appends the items and marks the equipment permanently discovered (first-find timestamp preserved on repeat finds).
-function addArmoryItems(
+// Clamps to available room (or skips the check for debug tooling) and returns what was actually admitted - a full armory can mean fewer items landed than requested.
+export function addArmoryItems(
   state: GameState,
   equipmentId: EquipmentId,
   items: EquipmentItem[],
-): void {
-  state.armory = [...state.armory, ...items];
+  allowOverflow = false,
+  bypassCap = false,
+): EquipmentItem[] {
+  const room = bypassCap
+    ? items.length
+    : Math.max(
+        0,
+        (allowOverflow ? armoryOverflowCap() : ARMORY_CAP) -
+          state.armory.length,
+      );
+  const admitted = items.slice(0, room);
+  if (admitted.length === 0) return admitted;
+
+  state.armory = [...state.armory, ...admitted];
+  syncArmoryGlobalEffects(state);
 
   const existing = state.discoveredEquipment[equipmentId];
   state.discoveredEquipment[equipmentId] = {
     foundAt: existing?.foundAt ?? Date.now(),
   };
+
+  return admitted;
 }
 
-export function armoryAdd(equipmentId: EquipmentId, quantity = 1): void {
-  if (quantity <= 0) return;
+// Returns the admitted count, which may be less than `quantity` (or 0) once the relevant cap is reached - only reliable when called from a tick-guaranteed context, since `updateGamestate` runs its callback synchronously there (see game-state-conventions.md).
+export function armoryAdd(
+  equipmentId: EquipmentId,
+  quantity = 1,
+  allowOverflow = false,
+  bypassCap = false,
+): number {
+  if (quantity <= 0) return 0;
+
+  let admittedCount = 0;
 
   updateGamestate((state) => {
     const newItems: EquipmentItem[] = Array.from({ length: quantity }, () =>
       newEquipmentItem(equipmentId),
     );
-    addArmoryItems(state, equipmentId, newItems);
+    admittedCount = addArmoryItems(
+      state,
+      equipmentId,
+      newItems,
+      allowOverflow,
+      bypassCap,
+    ).length;
 
     return state;
   });
+
+  return admittedCount;
 }
 
-// Debug/testing tool - builds one item with caller-specified affixes instead of a random rarity roll, for testing specific affix combinations without relying on RNG.
+// Debug tool - builds one item with caller-specified affixes instead of a random rarity roll, and always bypasses the cap.
 export function armoryAddWithAffixes(
   equipmentId: EquipmentId,
   affixIds: AffixId[],
 ): void {
   updateGamestate((state) => {
-    addArmoryItems(state, equipmentId, [
-      newEquipmentItem(equipmentId, affixIds),
-    ]);
+    addArmoryItems(
+      state,
+      equipmentId,
+      [newEquipmentItem(equipmentId, affixIds)],
+      false,
+      true,
+    );
 
     return state;
   });

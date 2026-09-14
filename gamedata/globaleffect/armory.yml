@@ -1,0 +1,20 @@
+- id: e3a1c2d4-5b6f-47a8-9c0d-1e2f3a4b5c6d
+  name: Encumbered
+  sprite: '0015'
+  description: The armory is nearing capacity. Sell some items to make space for others.
+
+  hideDuration: true
+
+- id: f4b2d3e5-6c7a-48b9-ad1e-2f3a4b5c6d7e
+  name: Overburdened
+  sprite: '0016'
+  description: The armory is full, but some random monster drops can still be added.
+
+  hideDuration: true
+
+- id: a5c3e4f6-7d8b-49ca-be2f-3a4b5c6d7e8f
+  name: Over Capacity
+  sprite: '0017'
+  description: Your armory is beyond capacity and can no longer accept new items.
+
+  hideDuration: true

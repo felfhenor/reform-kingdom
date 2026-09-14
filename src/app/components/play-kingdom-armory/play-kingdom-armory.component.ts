@@ -10,8 +10,14 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { ARMORY_ENCUMBERED_THRESHOLD } from '@helpers/config';
 import { goldCoinId } from '@helpers/item/materials';
-import { equipmentSellValue, getArmoryEntries } from '@helpers/kingdom/armory';
+import {
+  armoryCap,
+  armoryGet,
+  equipmentSellValue,
+  getArmoryEntries,
+} from '@helpers/kingdom/armory';
 import {
   filterArmoryEntries,
   sellEquipmentItems,
@@ -42,6 +48,15 @@ export class PlayKingdomArmoryComponent {
   public filterFn = filterArmoryEntries;
 
   public goldCoinItemId = goldCoinId();
+
+  public armorySize = computed(() => armoryGet().length);
+  public armoryCapValue = armoryCap();
+  public badgeColor = computed(() => {
+    const ratio = this.armorySize() / armoryCap();
+    if (ratio < ARMORY_ENCUMBERED_THRESHOLD) return 'badge-info';
+    if (ratio < 1) return 'badge-warning';
+    return 'badge-error';
+  });
 
   public sellMode = signal(false);
   public selectedIds = signal<Set<EquipmentItemId>>(new Set());

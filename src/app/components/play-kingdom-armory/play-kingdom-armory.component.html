@@ -8,6 +8,10 @@
   <span header>Armory</span>
 
   <div toolbar-actions class="flex items-center gap-4">
+    <span class="badge {{ badgeColor() }}">
+      {{ armorySize() }}/{{ armoryCapValue }}
+    </span>
+
     @if (sellMode()) {
       <span class="text-sm min-w-[80px]">{{ selectedCount() }} selected</span>
 

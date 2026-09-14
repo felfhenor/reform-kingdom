@@ -1,10 +1,23 @@
+import { ARMORY_ENCUMBERED_THRESHOLD } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { gainGold } from '@helpers/item/materials';
 import { equipmentSellValue, getArmoryEntries } from '@helpers/kingdom/armory';
+import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
 import { updateGamestate } from '@helpers/state-game';
-import type { EquipmentArmoryEntry, EquipmentItemId } from '@interfaces';
+import type {
+  DaisyColor,
+  EquipmentArmoryEntry,
+  EquipmentItemId,
+} from '@interfaces';
 import { sum } from 'es-toolkit/compat';
+
+export function armoryFillColor(armorySize: number, cap: number): DaisyColor {
+  const ratio = armorySize / cap;
+  if (ratio >= 1) return 'error';
+  if (ratio >= ARMORY_ENCUMBERED_THRESHOLD) return 'warning';
+  return 'info';
+}
 
 export function filterArmoryEntries(
   entries: EquipmentArmoryEntry[],
@@ -36,6 +49,7 @@ export function sellEquipmentItems(
 
   updateGamestate((state) => {
     state.armory = state.armory.filter((item) => !idsToSell.has(item.id));
+    syncArmoryGlobalEffects(state);
     gainGold(state, totalGold);
     return state;
   });

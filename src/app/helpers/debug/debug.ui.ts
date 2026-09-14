@@ -102,7 +102,7 @@ export function debugGiveEquipment(
     return;
   }
 
-  armoryAdd(equipment.id, quantity);
+  armoryAdd(equipment.id, quantity, false, true);
 }
 
 // Bypasses the normal rarity-based affix roll so a specific combination can be tested on demand.

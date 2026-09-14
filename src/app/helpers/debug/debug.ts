@@ -35,7 +35,7 @@ export function debugGiveAllEquipment(quantity = 1): void {
   getEntriesByType<EquipmentContent>('equipment')
     .filter((equipment) => !equipment.unobtainable)
     .forEach((equipment) => {
-      armoryAdd(equipment.id, quantity);
+      armoryAdd(equipment.id, quantity, false, true);
     });
 }
 

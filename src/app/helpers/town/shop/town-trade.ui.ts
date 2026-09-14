@@ -10,6 +10,11 @@ import {
   hasGold,
   spendGold,
 } from '@helpers/item/materials';
+import {
+  addArmoryItems,
+  armoryHasRoom,
+  armoryHasRoomFor,
+} from '@helpers/kingdom/armory';
 import { updateGamestate } from '@helpers/state-game';
 import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
@@ -23,11 +28,7 @@ import type {
 } from '@interfaces';
 
 function grantStockEntry(state: GameState, entry: TownStockEntry): void {
-  state.armory = [...state.armory, entry.equipmentItem];
-  const existing = state.discoveredEquipment[entry.equipmentItem.equipmentId];
-  state.discoveredEquipment[entry.equipmentItem.equipmentId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
+  addArmoryItems(state, entry.equipmentItem.equipmentId, [entry.equipmentItem]);
 }
 
 function findStockEntry(
@@ -57,8 +58,14 @@ export async function townExecuteTrade(
   if (!townStockAffordable(price, getGoldQuantity())) return false;
   if (!hasGold(price)) return false;
 
+  if (!armoryHasRoom(1)) {
+    notifyError('Your armory is full.');
+    return false;
+  }
+
   let executed = false;
   let vanished = false;
+  let armoryFull = false;
 
   await updateGamestate((state) => {
     const target = state.world.towns[townId];
@@ -70,6 +77,11 @@ export async function townExecuteTrade(
 
     const liveGold = state.materials[goldCoinId()]?.quantity ?? 0;
     if (!townStockAffordable(price, liveGold)) return state;
+
+    if (!armoryHasRoomFor(state.armory.length, 1)) {
+      armoryFull = true;
+      return state;
+    }
 
     grantStockEntry(state, liveEntry);
     spendGold(state, price);
@@ -83,6 +95,11 @@ export async function townExecuteTrade(
 
   if (vanished) {
     notifyError('That item has disappeared from the shop.');
+    return false;
+  }
+
+  if (armoryFull) {
+    notifyError('Your armory is full.');
     return false;
   }
 
