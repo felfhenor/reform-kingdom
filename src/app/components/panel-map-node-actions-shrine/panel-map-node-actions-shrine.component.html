@@ -19,7 +19,7 @@
     type="button"
     class="btn btn-sm btn-secondary"
     [disabled]="!canPray()"
-    (click)="pray.emit()"
+    (click)="doPray()"
     appSfx="ui-success"
     [sfxTrigger]="['click', 'hover']"
   >

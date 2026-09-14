@@ -8,6 +8,7 @@ import {
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
+import { notifySuccess } from '@helpers/engine/notify';
 import { worldNodeCanAffordCost } from '@helpers/world-node/world-node-cost';
 import {
   isPartyAtShrine,
@@ -55,8 +56,7 @@ export class PanelMapNodeActionsShrineComponent {
   });
 
   public canPray = computed(
-    () =>
-      isPartyAtShrine(this.entry().nodeName) && !!this.currentBuffName(),
+    () => isPartyAtShrine(this.entry().nodeName) && !!this.currentBuffName(),
   );
 
   public currentBuffName = computed(() => {
@@ -68,4 +68,10 @@ export class PanelMapNodeActionsShrineComponent {
 
     return getEntry<GlobalEffectContent>(tier.globalEffectId)?.name;
   });
+
+  doPray() {
+    this.pray.emit();
+
+    notifySuccess('You pray at the shrine!');
+  }
 }
