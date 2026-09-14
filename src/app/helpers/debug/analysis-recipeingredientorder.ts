@@ -72,24 +72,45 @@ function checkLevelRequirementOrder(
   entries: EquipmentResultRecipeCheck[],
 ): AnalysisCheck[] {
   const checks: AnalysisCheck[] = [];
-  const sorted = sortBy(entries, [
-    (entry: EquipmentResultRecipeCheck) => entry.minTradeskillLevel,
+
+  // Recipes sharing a minTradeskillLevel unlock simultaneously, so they're compared only
+  // against strictly earlier tiers, never against each other.
+  const tiersByLevel = new Map<number, EquipmentResultRecipeCheck[]>();
+  entries.forEach((entry) => {
+    const tier = tiersByLevel.get(entry.minTradeskillLevel) ?? [];
+    tier.push(entry);
+    tiersByLevel.set(entry.minTradeskillLevel, tier);
+  });
+  const levels = sortBy(Array.from(tiersByLevel.keys()), [
+    (level: number) => level,
   ]);
 
-  let highestSoFar = sorted[0];
-  sorted.slice(1).forEach((entry) => {
-    if (entry.levelRequirement < highestSoFar.levelRequirement) {
-      checks.push({
-        id: `level-order:${groupLabel}:${entry.name}`,
-        label: groupLabel,
-        status: 'fail',
-        message: `${groupLabel}: recipe "${entry.name}" (minTradeskillLevel ${entry.minTradeskillLevel}) produces equipment with levelRequirement ${entry.levelRequirement}, lower than recipe "${highestSoFar.name}" (minTradeskillLevel ${highestSoFar.minTradeskillLevel}, levelRequirement ${highestSoFar.levelRequirement}) - a recipe unlocked later shouldn't produce weaker gear.`,
+  let highestSoFar: EquipmentResultRecipeCheck | undefined;
+  levels.forEach((level) => {
+    const tierEntries = tiersByLevel.get(level) as EquipmentResultRecipeCheck[];
+
+    if (highestSoFar) {
+      const knownHighest = highestSoFar;
+      tierEntries.forEach((entry) => {
+        if (entry.levelRequirement < knownHighest.levelRequirement) {
+          checks.push({
+            id: `level-order:${groupLabel}:${entry.name}`,
+            label: groupLabel,
+            status: 'fail',
+            message: `${groupLabel}: recipe "${entry.name}" (minTradeskillLevel ${entry.minTradeskillLevel}) produces equipment with levelRequirement ${entry.levelRequirement}, lower than recipe "${knownHighest.name}" (minTradeskillLevel ${knownHighest.minTradeskillLevel}, levelRequirement ${knownHighest.levelRequirement}) - a recipe unlocked later shouldn't produce weaker gear.`,
+          });
+        }
       });
-      return;
     }
 
-    if (entry.levelRequirement > highestSoFar.levelRequirement) {
-      highestSoFar = entry;
+    const tierBest = sortBy(tierEntries, [
+      (entry: EquipmentResultRecipeCheck) => -entry.levelRequirement,
+    ])[0];
+    if (
+      !highestSoFar ||
+      tierBest.levelRequirement > highestSoFar.levelRequirement
+    ) {
+      highestSoFar = tierBest;
     }
   });
 
