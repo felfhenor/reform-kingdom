@@ -1,0 +1,83 @@
+// Recolors ngx-toastr (loaded via angular.json's global toastr.css) to match
+// the game's parchment/plaque look instead of ngx-toastr's flat default colors.
+$toast-types: (
+  ('success', '✦'),
+  ('error', '⚔'),
+  ('warning', '⚠'),
+  ('info', 'ℹ')
+);
+
+.toast-container .ngx-toastr {
+  --toast-accent: var(--color-base-content);
+
+  position: relative;
+  width: 320px;
+  padding: 16px 16px 16px 54px;
+  border: 2px solid color-mix(in oklab, var(--toast-accent) 70%, black);
+  border-radius: 0.5rem;
+  background-color: var(--color-base-300);
+  background-image: url(/asset/texture-bg.png);
+  background-position: 0 0;
+  background-repeat: repeat;
+  background-size: auto;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 10px 1px color-mix(in oklab, var(--toast-accent) 55%, transparent);
+  color: var(--color-base-content);
+
+  &:hover {
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.65),
+      0 0 14px 2px color-mix(in oklab, var(--toast-accent) 65%, transparent);
+  }
+
+  &::before {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--toast-accent);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.toast-title {
+  font-family: 'FancyText', cursive;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.toast-message {
+  opacity: 0.9;
+}
+
+.toast-close-button {
+  color: var(--color-base-content);
+  text-shadow: none;
+  opacity: 0.6;
+
+  &:hover,
+  &:focus {
+    color: var(--color-base-content);
+    opacity: 1;
+  }
+}
+
+.toast-progress {
+  height: 3px;
+  background-color: var(--toast-accent, var(--color-base-content));
+  opacity: 0.8;
+}
+
+@each $type, $glyph in $toast-types {
+  .toast-container .ngx-toastr.toast-#{$type} {
+    --toast-accent: var(--color-#{$type});
+
+    &::before {
+      content: '#{$glyph}';
+    }
+  }
+}
