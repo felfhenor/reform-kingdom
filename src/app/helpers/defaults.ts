@@ -166,6 +166,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     goldGainMultiplierBonus: 0,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
+    armorySizeBoost: 0,
   };
 }
 

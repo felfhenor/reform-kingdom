@@ -22,6 +22,10 @@
   description: A small satchel filled with water, rations, and other simple adventuring goods. It doesn't do anyone any good left in the desert.
   sprite: '0043'
 
+  effects:
+    - effectType: GlobalArmorySizeBoost
+      value: 5
+
 - id: f3596c4f-2150-4458-a603-9af14f9d9da5
   name: Deadwoods Sunflower
   rarity: Uncommon
@@ -33,3 +37,7 @@
   rarity: Mystical
   description: A small model of a Larsian house made of a special material found only in mines protected by the Larsian king.
   sprite: '0046'
+
+  effects:
+    - effectType: GlobalArmorySizeBoost
+      value: 5

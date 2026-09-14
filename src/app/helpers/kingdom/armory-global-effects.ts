@@ -22,6 +22,14 @@ const ARMORY_WARNING_NAMES = [
   'Over Capacity',
 ] as const;
 
+export function armoryCapForState(state: GameState): number {
+  return ARMORY_CAP + state.globalEffectSums.armorySizeBoost;
+}
+
+export function armoryOverflowCapForState(state: GameState): number {
+  return Math.floor(armoryCapForState(state) * ARMORY_OVERFLOW_MULTIPLIER);
+}
+
 function currentArmoryWarningTier(
   ratio: number,
 ): (typeof ARMORY_WARNING_NAMES)[number] | undefined {
@@ -33,7 +41,9 @@ function currentArmoryWarningTier(
 
 // Call whenever the armory changes (add or remove) - folds into the caller's own state mutation, atomic whether or not that happens inside a tick.
 export function syncArmoryGlobalEffects(state: GameState): void {
-  const activeTier = currentArmoryWarningTier(state.armory.length / ARMORY_CAP);
+  const activeTier = currentArmoryWarningTier(
+    state.armory.length / armoryCapForState(state),
+  );
 
   ARMORY_WARNING_NAMES.forEach((name) => {
     const content = getEntry<GlobalEffectContent>(name as GlobalEffectId);

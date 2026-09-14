@@ -49,6 +49,7 @@ const CONTENT_BY_KEY: Record<string, GlobalEffectContent> = {
 function buildState(
   armorySize: number,
   activeIds: GlobalEffectId[] = [],
+  armorySizeBoost = 0,
 ): GameState {
   return {
     armory: Array.from({ length: armorySize }),
@@ -59,6 +60,7 @@ function buildState(
       startTick: 0,
       expiresAtTick: 999999,
     })),
+    globalEffectSums: { armorySizeBoost },
   } as unknown as GameState;
 }
 
@@ -124,5 +126,23 @@ describe('syncArmoryGlobalEffects', () => {
     syncArmoryGlobalEffects(state);
 
     expect(state.globalEffects).toEqual([]);
+  });
+
+  it('shifts the tier thresholds when an armory size boost is active', () => {
+    // 38/50 is already Encumbered (76%) at the base cap, but a +10 boost
+    // (38/60 = 63%) puts the ratio back under the Encumbered threshold.
+    const state = buildState(38, [], 10);
+
+    syncArmoryGlobalEffects(state);
+
+    expect(state.globalEffects).toEqual([]);
+  });
+
+  it('still activates a tier past a boosted cap', () => {
+    const state = buildState(60, [], 10); // 60/60 = 100%
+
+    syncArmoryGlobalEffects(state);
+
+    expect(state.globalEffects.map((e) => e.id)).toEqual([overburdenedId]);
   });
 });

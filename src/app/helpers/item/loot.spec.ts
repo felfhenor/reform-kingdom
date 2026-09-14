@@ -276,6 +276,8 @@ describe('Loot Helper Functions', () => {
         armory: [],
         discoveredEquipment: {},
         collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
         discoveredRecipes: {},
         discoveredWorkers: {},
         workers: {},

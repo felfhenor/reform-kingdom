@@ -55,6 +55,12 @@ export type GlobalEffectEffectGatheringItemDropRateBoost = {
   value: number;
 };
 
+// Adds `value` (a flat count) to the Armory's item capacity.
+export type GlobalEffectEffectArmorySizeBoost = {
+  effectType: 'GlobalArmorySizeBoost';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainCombatStat
@@ -63,7 +69,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost
-  | GlobalEffectEffectGatheringItemDropRateBoost;
+  | GlobalEffectEffectGatheringItemDropRateBoost
+  | GlobalEffectEffectArmorySizeBoost;
 
 export type GlobalEffectContent = IsContentItem &
   HasDescription &

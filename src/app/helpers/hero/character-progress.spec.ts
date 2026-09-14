@@ -111,6 +111,7 @@ describe('Character Progress Helper Functions', () => {
       goldGainMultiplierBonus: 0,
       combatItemDropRateBoost: 0,
       gatheringItemDropRateBoost: 0,
+      armorySizeBoost: 0,
     };
   }
 

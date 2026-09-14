@@ -137,7 +137,7 @@ describe('townReputationBuffSync', () => {
         name: 'Larsian Influence',
         sprite: '0010',
         description: 'The influence of Larsia, the kingdom in the desert.',
-        extendedDescription: 'Strength: +1',
+        extendedDescription: 'Hero Combat Strength: +1',
         effects: [{ effectType: 'GainStats', stat: 'Strength', value: 1 }],
       }),
     ]);
@@ -247,7 +247,7 @@ describe('townReputationBuffRefresh', () => {
     expect(state.globalEffects).toEqual([
       expect.objectContaining({
         id: buffId,
-        extendedDescription: 'Strength: +1',
+        extendedDescription: 'Hero Combat Strength: +1',
       }),
     ]);
   });

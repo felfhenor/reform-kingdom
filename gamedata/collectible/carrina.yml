@@ -60,6 +60,8 @@
     - effectType: GainStats
       stat: Health
       value: 5
+    - effectType: GlobalArmorySizeBoost
+      value: 5
 
 - id: 8c6193c1-760f-466f-b658-12769b937f30
   name: Gobweb

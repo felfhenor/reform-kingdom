@@ -44,10 +44,10 @@
 
             <app-bar-progress
               [value]="armoryTotal"
-              [max]="armoryCapValue"
+              [max]="armoryCapValue()"
               [color]="armoryColor()"
             >
-              {{ armoryTotal }}/{{ armoryCapValue }} items
+              {{ armoryTotal }}/{{ armoryCapValue() }} items
             </app-bar-progress>
           </button>
 

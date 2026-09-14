@@ -4,6 +4,7 @@ import type {
   GameStat,
   GlobalEffectContent,
   GlobalEffectEffect,
+  GlobalEffectEffectArmorySizeBoost,
   GlobalEffectEffectCombatItemDropRateBoost,
   GlobalEffectEffectDebuffResistance,
   GlobalEffectEffectDebuffResistanceTag,
@@ -24,10 +25,15 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> &
     Partial<GlobalEffectEffectCombatItemDropRateBoost> &
-    Partial<GlobalEffectEffectGatheringItemDropRateBoost> = {},
+    Partial<GlobalEffectEffectGatheringItemDropRateBoost> &
+    Partial<GlobalEffectEffectArmorySizeBoost> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'GlobalArmorySizeBoost') {
+    return { effectType: 'GlobalArmorySizeBoost', value: effect.value ?? 0 };
   }
 
   if (effect.effectType === 'GlobalGoldGainMultiplier') {

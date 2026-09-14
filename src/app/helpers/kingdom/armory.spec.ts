@@ -88,17 +88,37 @@ describe('Armory Helper Functions', () => {
     });
   });
 
+  function mockZeroArmoryBoost(): void {
+    vi.mocked(gamestate).mockReturnValue({
+      globalEffectSums: { armorySizeBoost: 0 },
+    } as unknown as GameState);
+  }
+
   describe('armoryCap / armoryOverflowCap', () => {
     it('caps the armory at 50 items', () => {
+      mockZeroArmoryBoost();
       expect(armoryCap()).toBe(50);
     });
 
     it('allows drops to overshoot the cap by 25%, floored', () => {
+      mockZeroArmoryBoost();
       expect(armoryOverflowCap()).toBe(62);
+    });
+
+    it('adds any active armory size boost on top of the base cap', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        globalEffectSums: { armorySizeBoost: 15 },
+      } as unknown as GameState);
+
+      expect(armoryCap()).toBe(65);
     });
   });
 
   describe('armoryHasRoomFor / armoryHasRoom', () => {
+    beforeEach(() => {
+      mockZeroArmoryBoost();
+    });
+
     it('has room under the strict cap', () => {
       expect(armoryHasRoomFor(49)).toBe(true);
     });
@@ -121,6 +141,7 @@ describe('Armory Helper Functions', () => {
     it('reads the live armory length via armoryHasRoom', () => {
       vi.mocked(gamestate).mockReturnValue({
         armory: Array.from({ length: 50 }),
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(armoryHasRoom()).toBe(false);
@@ -136,6 +157,9 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [{ equipmentId: 'shield' as EquipmentId }],
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(result.armory).toEqual([
@@ -156,6 +180,9 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [],
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(result.armory).toHaveLength(3);
@@ -186,6 +213,9 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [],
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(
@@ -200,6 +230,9 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [],
         discoveredEquipment: { sword: { foundAt: 1000 } },
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(result.discoveredEquipment['sword' as EquipmentId]).toEqual({
@@ -216,6 +249,9 @@ describe('Armory Helper Functions', () => {
           equipmentId: 'shield' as EquipmentId,
         })),
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(result.armory).toHaveLength(50);
@@ -234,6 +270,9 @@ describe('Armory Helper Functions', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 48),
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState;
 
       const admitted = addArmoryItems(
@@ -250,6 +289,7 @@ describe('Armory Helper Functions', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 50),
         discoveredEquipment: {},
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState;
 
       const admitted = addArmoryItems(
@@ -266,6 +306,9 @@ describe('Armory Helper Functions', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 60),
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState;
 
       const admitted = addArmoryItems(
@@ -283,6 +326,9 @@ describe('Armory Helper Functions', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 60),
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState;
 
       const admitted = addArmoryItems(
@@ -320,6 +366,7 @@ describe('Armory Helper Functions', () => {
         discoveredEquipment: {},
         collectibles: {},
         globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState;
 
       addArmoryItems(state, 'sword' as EquipmentId, [
@@ -341,6 +388,9 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [{ equipmentId: 'shield' as EquipmentId }],
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(result.armory).toEqual([
@@ -361,6 +411,9 @@ describe('Armory Helper Functions', () => {
       const result = updateFn({
         armory: [],
         discoveredEquipment: {},
+        collectibles: {},
+        globalEffects: [],
+        globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState);
 
       expect(

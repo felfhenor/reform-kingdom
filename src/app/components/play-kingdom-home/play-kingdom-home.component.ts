@@ -74,9 +74,9 @@ export class PlayKingdomHomeComponent {
   );
 
   public armoryCount = computed(() => armoryGet().length);
-  public armoryCapValue = armoryCap();
+  public armoryCapValue = computed(() => armoryCap());
   public armoryColor = computed(() =>
-    armoryFillColor(this.armoryCount(), this.armoryCapValue),
+    armoryFillColor(this.armoryCount(), this.armoryCapValue()),
   );
 
   public unlockedAstralSpellCount = computed(

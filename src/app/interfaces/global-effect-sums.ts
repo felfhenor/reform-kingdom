@@ -13,4 +13,5 @@ export type GlobalEffectSums = {
   goldGainMultiplierBonus: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
+  armorySizeBoost: number;
 };

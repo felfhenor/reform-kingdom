@@ -1,6 +1,4 @@
 import {
-  ARMORY_CAP,
-  ARMORY_OVERFLOW_MULTIPLIER,
   SELL_GOLD_PER_COMBAT_STAT_POINT,
   SELL_GOLD_PER_LEVEL,
   SELL_GOLD_PER_RESISTANCE_POINT,
@@ -19,7 +17,11 @@ import {
   weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
-import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
+import {
+  armoryCapForState,
+  armoryOverflowCapForState,
+  syncArmoryGlobalEffects,
+} from '@helpers/kingdom/armory-global-effects';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   AffixId,
@@ -39,12 +41,12 @@ export function armoryGet(): EquipmentItem[] {
 }
 
 export function armoryCap(): number {
-  return ARMORY_CAP;
+  return armoryCapForState(gamestate());
 }
 
 // Drops/loot get to overshoot the cap by this much before hard-stopping.
 export function armoryOverflowCap(): number {
-  return Math.floor(ARMORY_CAP * ARMORY_OVERFLOW_MULTIPLIER);
+  return armoryOverflowCapForState(gamestate());
 }
 
 export function armoryHasRoomFor(
@@ -52,7 +54,7 @@ export function armoryHasRoomFor(
   quantity = 1,
   allowOverflow = false,
 ): boolean {
-  const cap = allowOverflow ? armoryOverflowCap() : ARMORY_CAP;
+  const cap = allowOverflow ? armoryOverflowCap() : armoryCap();
   return currentCount + quantity <= cap;
 }
 
@@ -101,8 +103,9 @@ export function addArmoryItems(
     ? items.length
     : Math.max(
         0,
-        (allowOverflow ? armoryOverflowCap() : ARMORY_CAP) -
-          state.armory.length,
+        (allowOverflow
+          ? armoryOverflowCapForState(state)
+          : armoryCapForState(state)) - state.armory.length,
       );
   const admitted = items.slice(0, room);
   if (admitted.length === 0) return admitted;

@@ -38,6 +38,8 @@ export function globalEffectEffectDescription(
       return `Item Drop Chance: +${effect.value}%`;
     case 'GlobalGatheringItemDropRateBoost':
       return `Extra Gather Item Chance: +${effect.value}%`;
+    case 'GlobalArmorySizeBoost':
+      return `Armory Size: +${effect.value}`;
   }
 }
 
@@ -81,6 +83,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalGatheringItemDropRateBoost':
       sums.gatheringItemDropRateBoost += effect.value;
+      return;
+    case 'GlobalArmorySizeBoost':
+      sums.armorySizeBoost += effect.value;
       return;
     default:
       assertNeverGlobalEffectEffect(effect);

@@ -50,7 +50,7 @@ export class PlayKingdomArmoryComponent {
   public goldCoinItemId = goldCoinId();
 
   public armorySize = computed(() => armoryGet().length);
-  public armoryCapValue = armoryCap();
+  public armoryCapValue = computed(() => armoryCap());
   public badgeColor = computed(() => {
     const ratio = this.armorySize() / armoryCap();
     if (ratio < ARMORY_ENCUMBERED_THRESHOLD) return 'badge-info';
