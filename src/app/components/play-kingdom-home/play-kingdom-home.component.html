@@ -43,7 +43,6 @@
             </span>
 
             <app-bar-progress
-              class="w-full"
               [value]="armoryTotal"
               [max]="armoryCapValue"
               [color]="armoryColor()"
@@ -101,41 +100,19 @@
               Museum
             </span>
 
-            <div
-              class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+            <app-bar-progress
+              [value]="foundCollectibles"
+              [max]="museumEntries.length"
             >
-              <div
-                class="absolute inset-y-0 left-0 bg-primary"
-                [style.width.%]="
-                  museumEntries.length > 0
-                    ? (foundCollectibles / museumEntries.length) * 100
-                    : 0
-                "
-              ></div>
-              <div
-                class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
-              >
-                {{ foundCollectibles }}/{{ museumEntries.length }} collectibles
-              </div>
-            </div>
+              {{ foundCollectibles }}/{{ museumEntries.length }} items
+            </app-bar-progress>
 
-            <div
-              class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+            <app-bar-progress
+              [value]="foundRecipes"
+              [max]="recipeEntries.length"
             >
-              <div
-                class="absolute inset-y-0 left-0 bg-primary"
-                [style.width.%]="
-                  recipeEntries.length > 0
-                    ? (foundRecipes / recipeEntries.length) * 100
-                    : 0
-                "
-              ></div>
-              <div
-                class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
-              >
-                {{ foundRecipes }}/{{ recipeEntries.length }} recipes
-              </div>
-            </div>
+              {{ foundRecipes }}/{{ recipeEntries.length }} recipes
+            </app-bar-progress>
           </button>
 
           <button
@@ -155,23 +132,9 @@
               Bestiary
             </span>
 
-            <div
-              class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
-            >
-              <div
-                class="absolute inset-y-0 left-0 bg-primary"
-                [style.width.%]="
-                  bestiaryList.length > 0
-                    ? (discovered / bestiaryList.length) * 100
-                    : 0
-                "
-              ></div>
-              <div
-                class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
-              >
-                {{ discovered }}/{{ bestiaryList.length }} discovered
-              </div>
-            </div>
+            <app-bar-progress [value]="discovered" [max]="bestiaryList.length">
+              {{ discovered }}/{{ bestiaryList.length }} discovered
+            </app-bar-progress>
           </button>
         </div>
       </div>
@@ -238,41 +201,29 @@
                 {{ tradeskill.label }} Lv. {{ tradeskill.level }}
               </span>
 
-              <div
-                class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+              <app-bar-progress
+                [value]="tradeskill.xpCurrent"
+                [max]="tradeskill.xpMaximum"
               >
-                <div
-                  class="absolute inset-y-0 left-0 bg-primary"
-                  [style.width.%]="tradeskill.xpPercent"
-                ></div>
-                <div
-                  class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
-                >
-                  {{ tradeskill.xpCurrent }}/{{ tradeskill.xpMaximum }}
-                </div>
-              </div>
+                {{ tradeskill.xpCurrent }}/{{ tradeskill.xpMaximum }}
+              </app-bar-progress>
 
               @if (tradeskill.hasQueue) {
-                <div
-                  class="relative w-full h-4 rounded bg-black/30 overflow-hidden"
+                <app-bar-progress
+                  color="accent"
+                  [value]="tradeskill.overallPercent"
+                  [max]="tradeskill.activePercent"
                 >
-                  <div
-                    class="absolute inset-y-0 left-0 bg-accent"
-                    [style.width.%]="tradeskill.overallPercent"
-                  ></div>
                   <div
                     class="absolute inset-y-0 w-0.5 bg-white"
                     [style.left.%]="tradeskill.activePercent"
                   ></div>
-                  <div
-                    class="absolute inset-0 flex items-center justify-center text-[10px] text-shadow-black"
-                  >
-                    {{ tradeskill.queueUnitsRemaining }}
-                    {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
-                    ·
-                    {{ tradeskill.totalRemainingLabel }}
-                  </div>
-                </div>
+
+                  {{ tradeskill.queueUnitsRemaining }}
+                  {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
+                  ·
+                  {{ tradeskill.totalRemainingLabel }}
+                </app-bar-progress>
               } @else {
                 <div class="relative w-full h-4 italic text-xs">
                   Not currently crafting

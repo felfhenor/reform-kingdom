@@ -24,7 +24,7 @@ const PROGRESS_COLOR_CLASSES: Record<DaisyColor, string> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './bar-progress.component.html',
   host: {
-    class: 'relative block',
+    class: 'relative block w-full',
   },
 })
 export class BarProgressComponent {
