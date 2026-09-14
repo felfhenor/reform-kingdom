@@ -46,6 +46,10 @@ vi.mock('@helpers/hero/character-progress', () => ({
   retrofitPartyXp: vi.fn((party) => party),
 }));
 
+vi.mock('@helpers/hero/global-effect-state', () => ({
+  recomputeGlobalEffectSums: vi.fn(),
+}));
+
 vi.mock('@helpers/crafting/crafting', () => ({
   pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
 }));

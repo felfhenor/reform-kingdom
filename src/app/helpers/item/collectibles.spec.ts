@@ -19,6 +19,10 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('@helpers/hero/global-effect-state', () => ({
+  recomputeGlobalEffectSums: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
@@ -26,7 +30,9 @@ vi.mock('@helpers/state-game', () => ({
 
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import {
+  applyCollectibleGrant,
   collectiblesAdd,
   discoveredCollectibleCount,
   getCollectibleQuantity,
@@ -43,6 +49,7 @@ const foundingStone: CollectibleContent = {
   description: 'A stone that was used to found the kingdom.',
   sprite: '0000',
   rarity: 'Legendary',
+  effects: [],
 };
 
 describe('Collectibles Helper Functions', () => {
@@ -104,6 +111,40 @@ describe('Collectibles Helper Functions', () => {
       } as unknown as GameState);
 
       expect(discoveredCollectibleCount()).toBe(0);
+    });
+  });
+
+  describe('applyCollectibleGrant', () => {
+    it('creates a new entry with the current timestamp', () => {
+      const state = { collectibles: {} } as unknown as GameState;
+
+      applyCollectibleGrant(state, foundingStone.id, 1);
+
+      expect(state.collectibles[foundingStone.id].quantity).toBe(1);
+      expect(state.collectibles[foundingStone.id].foundAt).toBeGreaterThan(0);
+    });
+
+    it('merges quantity and preserves the original foundAt', () => {
+      const state = {
+        collectibles: {
+          [foundingStone.id]: { quantity: 1, foundAt: 1000 },
+        },
+      } as unknown as GameState;
+
+      applyCollectibleGrant(state, foundingStone.id, 2);
+
+      expect(state.collectibles[foundingStone.id]).toEqual({
+        quantity: 3,
+        foundAt: 1000,
+      });
+    });
+
+    it('recomputes the global effect sums cache', () => {
+      const state = { collectibles: {} } as unknown as GameState;
+
+      applyCollectibleGrant(state, foundingStone.id, 1);
+
+      expect(recomputeGlobalEffectSums).toHaveBeenCalledWith(state);
     });
   });
 

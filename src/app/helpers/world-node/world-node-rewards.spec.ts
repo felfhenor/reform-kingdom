@@ -98,6 +98,7 @@ describe('worldNodeCompletionRewards', () => {
       description: 'A clam.',
       sprite: '0003',
       rarity: 'Uncommon',
+      effects: [],
     };
 
     const encounter = buildEncounter({
@@ -300,6 +301,7 @@ describe('rewardContentInfo', () => {
       description: 'A clam.',
       sprite: '0003',
       rarity: 'Uncommon',
+      effects: [],
     };
     seedContent([clam]);
 

@@ -4,8 +4,7 @@ import type {
   EquipmentSkillContent,
   EquipmentSkillId,
   GameState,
-  GlobalEffect,
-  GlobalEffectId,
+  GlobalEffectSums,
   IsContentItem,
   JobContent,
   JobId,
@@ -25,7 +24,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
 }));
 
 vi.mock('@helpers/hero/global-effects', () => ({
-  activeGlobalEffects: vi.fn(() => []),
+  globalEffectSums: vi.fn(),
 }));
 
 vi.mock('@helpers/state-game', () => ({
@@ -37,13 +36,18 @@ import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
+import {
   healingTicksForLevel,
   healPartyToFull,
   partyGainXp,
   retrofitPartyXp,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
-import { activeGlobalEffects } from '@helpers/hero/global-effects';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import { characterXpForLevel, createCharacter } from '@helpers/hero/party';
 import { updateGamestate } from '@helpers/state-game';
 
@@ -97,9 +101,23 @@ describe('Character Progress Helper Functions', () => {
     return createCharacter(name, 'job-explorer' as JobId);
   }
 
+  function zeroGlobalEffectSums(): GlobalEffectSums {
+    return {
+      stats: defaultStats(),
+      combatStats: defaultCombatStats(),
+      debuffResistanceTags: defaultTagResistances(),
+      debuffResistanceFlat: 0,
+      xpGainMultiplierBonus: 0,
+      goldGainMultiplierBonus: 0,
+      combatItemDropRateBoost: 0,
+      gatheringItemDropRateBoost: 0,
+    };
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetEntry(mockJob);
+    vi.mocked(globalEffectSums).mockReturnValue(zeroGlobalEffectSums());
   });
 
   describe('healingTicksForLevel', () => {
@@ -325,18 +343,10 @@ describe('Character Progress Helper Functions', () => {
     });
 
     it('scales the granted xp by any active GlobalXPGainMultiplier effect(s)', () => {
-      vi.mocked(activeGlobalEffects).mockReturnValue([
-        {
-          id: 'wisdom' as GlobalEffectId,
-          name: 'Wisdom of the Founder I',
-          __type: 'globaleffect',
-          description: '',
-          sprite: '0000',
-          startTick: 0,
-          expiresAtTick: 100,
-          effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.5 }],
-        },
-      ] as GlobalEffect[]);
+      vi.mocked(globalEffectSums).mockReturnValue({
+        ...zeroGlobalEffectSums(),
+        xpGainMultiplierBonus: 0.5,
+      });
 
       const jala = createCharacterStub('Jala');
 
@@ -351,28 +361,10 @@ describe('Character Progress Helper Functions', () => {
     });
 
     it('sums multiple active GlobalXPGainMultiplier effects together', () => {
-      vi.mocked(activeGlobalEffects).mockReturnValue([
-        {
-          id: 'wisdom-1' as GlobalEffectId,
-          name: 'Wisdom I',
-          __type: 'globaleffect',
-          description: '',
-          sprite: '0000',
-          startTick: 0,
-          expiresAtTick: 100,
-          effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.5 }],
-        },
-        {
-          id: 'wisdom-2' as GlobalEffectId,
-          name: 'Wisdom II',
-          __type: 'globaleffect',
-          description: '',
-          sprite: '0000',
-          startTick: 0,
-          expiresAtTick: 100,
-          effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.25 }],
-        },
-      ] as GlobalEffect[]);
+      vi.mocked(globalEffectSums).mockReturnValue({
+        ...zeroGlobalEffectSums(),
+        xpGainMultiplierBonus: 0.75,
+      });
 
       const jala = createCharacterStub('Jala');
 
@@ -389,18 +381,10 @@ describe('Character Progress Helper Functions', () => {
     });
 
     it('ignores active GainStats effects when computing the xp multiplier', () => {
-      vi.mocked(activeGlobalEffects).mockReturnValue([
-        {
-          id: 'strength' as GlobalEffectId,
-          name: 'Strength of the Duchy I',
-          __type: 'globaleffect',
-          description: '',
-          sprite: '0000',
-          startTick: 0,
-          expiresAtTick: 100,
-          effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
-        },
-      ] as GlobalEffect[]);
+      vi.mocked(globalEffectSums).mockReturnValue({
+        ...zeroGlobalEffectSums(),
+        stats: { ...defaultStats(), Strength: 5 },
+      });
 
       const jala = createCharacterStub('Jala');
 

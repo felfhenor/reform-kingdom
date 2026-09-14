@@ -17,7 +17,7 @@ vi.mock('@helpers/content/content', () => ({
 }));
 
 vi.mock('@helpers/hero/global-effects', () => ({
-  activeGlobalEffects: vi.fn(() => []),
+  globalEffectSums: vi.fn(),
 }));
 
 vi.mock('@helpers/rng', () => ({
@@ -31,8 +31,8 @@ import {
 } from '@helpers/combat/combat-create';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { getEntry } from '@helpers/content/content';
-import { defaultCombatStats } from '@helpers/defaults';
-import { activeGlobalEffects } from '@helpers/hero/global-effects';
+import { defaultCombatStats, defaultTagResistances } from '@helpers/defaults';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import type {
   Character,
   CharacterId,
@@ -42,8 +42,7 @@ import type {
   EquipmentItemId,
   EquipmentSkillContent,
   EquipmentSkillId,
-  GlobalEffect,
-  GlobalEffectId,
+  GlobalEffectSums,
   JobContent,
   JobId,
   MonsterContent,
@@ -63,6 +62,19 @@ function zeroStats(): StatBlock {
     Agility: 0,
     Constitution: 0,
     Spirit: 0,
+  };
+}
+
+function zeroGlobalEffectSums(): GlobalEffectSums {
+  return {
+    stats: zeroStats(),
+    combatStats: defaultCombatStats(),
+    debuffResistanceTags: defaultTagResistances(),
+    debuffResistanceFlat: 0,
+    xpGainMultiplierBonus: 0,
+    goldGainMultiplierBonus: 0,
+    combatItemDropRateBoost: 0,
+    gatheringItemDropRateBoost: 0,
   };
 }
 
@@ -151,6 +163,7 @@ function buildCharacter(overrides: Partial<Character> = {}): Character {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(globalEffectSums).mockReturnValue(zeroGlobalEffectSums());
 });
 
 describe('combatantFromCharacter', () => {
@@ -192,21 +205,10 @@ describe('combatantFromCharacter', () => {
   });
 
   it('applies active GainStats global effects to statBoosts and totalStats', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        id: 'strength' as GlobalEffectId,
-        name: 'Strength of the Duchy I',
-        __type: 'globaleffect',
-        description: '',
-        sprite: '0000',
-        startTick: 0,
-        expiresAtTick: 100,
-        effects: [
-          { effectType: 'GainStats', stat: 'Strength', value: 5 },
-          { effectType: 'GainStats', stat: 'Vitality', value: 5 },
-        ],
-      },
-    ] as GlobalEffect[]);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      ...zeroGlobalEffectSums(),
+      stats: { ...zeroStats(), Strength: 5, Vitality: 5 },
+    });
 
     const combatant = combatantFromCharacter(buildCharacter());
 
@@ -217,21 +219,10 @@ describe('combatantFromCharacter', () => {
   });
 
   it('tops up current hp/ep by a Health/Energy GainStats bonus, even when not at full health', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        id: 'invigoration' as GlobalEffectId,
-        name: 'Invigoration of the Zelks I',
-        __type: 'globaleffect',
-        description: '',
-        sprite: '0000',
-        startTick: 0,
-        expiresAtTick: 100,
-        effects: [
-          { effectType: 'GainStats', stat: 'Health', value: 25 },
-          { effectType: 'GainStats', stat: 'Energy', value: 25 },
-        ],
-      },
-    ] as GlobalEffect[]);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      ...zeroGlobalEffectSums(),
+      stats: { ...zeroStats(), Health: 25, Energy: 25 },
+    });
 
     const combatant = combatantFromCharacter(buildCharacter({ hp: 6, ep: 4 }));
 
@@ -242,18 +233,10 @@ describe('combatantFromCharacter', () => {
   });
 
   it('ignores active GlobalXPGainMultiplier effects when applying stat boosts', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        id: 'wisdom' as GlobalEffectId,
-        name: 'Wisdom of the Founder I',
-        __type: 'globaleffect',
-        description: '',
-        sprite: '0000',
-        startTick: 0,
-        expiresAtTick: 100,
-        effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.1 }],
-      },
-    ] as GlobalEffect[]);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      ...zeroGlobalEffectSums(),
+      xpGainMultiplierBonus: 0.1,
+    });
 
     const combatant = combatantFromCharacter(buildCharacter());
 
@@ -261,24 +244,10 @@ describe('combatantFromCharacter', () => {
   });
 
   it('applies active GainCombatStat global effects to combatStats', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        id: 'larsian-influence' as GlobalEffectId,
-        name: 'Larsian Influence',
-        __type: 'globaleffect',
-        description: '',
-        sprite: '0000',
-        startTick: 0,
-        expiresAtTick: 100,
-        effects: [
-          {
-            effectType: 'GainCombatStat',
-            combatStat: 'reviveChance',
-            value: 2,
-          },
-        ],
-      },
-    ] as GlobalEffect[]);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      ...zeroGlobalEffectSums(),
+      combatStats: { ...defaultCombatStats(), reviveChance: 2 },
+    });
 
     const combatant = combatantFromCharacter(buildCharacter());
 
@@ -286,20 +255,10 @@ describe('combatantFromCharacter', () => {
   });
 
   it('applies active DebuffResistanceTag global effects to only the targeted tag', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        id: 'larsian-influence' as GlobalEffectId,
-        name: 'Larsian Influence',
-        __type: 'globaleffect',
-        description: '',
-        sprite: '0000',
-        startTick: 0,
-        expiresAtTick: 100,
-        effects: [
-          { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
-        ],
-      },
-    ] as GlobalEffect[]);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      ...zeroGlobalEffectSums(),
+      debuffResistanceTags: { ...defaultTagResistances(), Accuracy: 5 },
+    });
 
     const combatant = combatantFromCharacter(buildCharacter());
 
@@ -402,18 +361,10 @@ describe('combatantFromMonster', () => {
   });
 
   it('is not affected by active GainStats global effects - those only apply to heroes', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        id: 'strength' as GlobalEffectId,
-        name: 'Strength of the Duchy I',
-        __type: 'globaleffect',
-        description: '',
-        sprite: '0000',
-        startTick: 0,
-        expiresAtTick: 100,
-        effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
-      },
-    ] as GlobalEffect[]);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      ...zeroGlobalEffectSums(),
+      stats: { ...zeroStats(), Strength: 5 },
+    });
 
     const monster: MonsterContent = {
       id: 'goblin' as MonsterId,

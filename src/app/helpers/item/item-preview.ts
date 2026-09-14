@@ -136,6 +136,17 @@ export function itemPreviewDisplay(
     } as ItemPreviewDisplay;
   }
 
+  if (spritesheet === 'collectible') {
+    const collectibleContent = content as CollectibleContent;
+    return {
+      ...base,
+      collectibleEffects:
+        collectibleContent.effects.length > 0
+          ? collectibleContent.effects
+          : undefined,
+    } as ItemPreviewDisplay;
+  }
+
   return base as ItemPreviewDisplay;
 }
 

@@ -134,6 +134,7 @@ describe('Global Effect Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         globalEffects: [],
+        collectibles: {},
       } as unknown as GameState);
 
       expect(result.globalEffects).toEqual([
@@ -170,6 +171,7 @@ describe('Global Effect Helper Functions', () => {
             expiresAtTick: 20,
           },
         ],
+        collectibles: {},
       } as unknown as GameState);
 
       expect(result.globalEffects).toHaveLength(1);
@@ -202,7 +204,10 @@ describe('Global Effect Helper Functions', () => {
     // These are real functions (not mocked), so their effect is only observable via the `updateGamestate` updaters they pass along.
     function healingWasGranted(): boolean {
       return vi.mocked(updateGamestate).mock.calls.some(([updateFn]) => {
-        const result = updateFn({ globalEffects: [] } as unknown as GameState);
+        const result = updateFn({
+          globalEffects: [],
+          collectibles: {},
+        } as unknown as GameState);
         return result.globalEffects.some((effect) => effect.id === healingId);
       });
     }
@@ -221,6 +226,7 @@ describe('Global Effect Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         globalEffects: [{ ...healingContent, startTick: 0, expiresAtTick: 20 }],
+        collectibles: {},
       } as unknown as GameState);
       expect(result.globalEffects).toHaveLength(0);
     });

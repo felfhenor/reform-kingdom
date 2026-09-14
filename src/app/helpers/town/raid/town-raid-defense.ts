@@ -1,6 +1,9 @@
 import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { applyGlobalEffectRemove } from '@helpers/hero/global-effect-state';
+import {
+  applyGlobalEffectPush,
+  applyGlobalEffectRemove,
+} from '@helpers/hero/global-effect-state';
 import type {
   GameState,
   GlobalEffect,
@@ -52,7 +55,8 @@ export function raidDefenseGlobalEffectApply(
     .filter((name): name is string => !!name);
   if (townNames.length === 0) return;
 
-  state.globalEffects.push(
+  applyGlobalEffectPush(
+    state,
     raidDefenseGlobalEffect(content, townNames, currentTick),
   );
 }

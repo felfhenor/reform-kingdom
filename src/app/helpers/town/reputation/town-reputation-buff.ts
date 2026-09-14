@@ -2,6 +2,7 @@ import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
+  applyGlobalEffectPush,
   applyGlobalEffectRemove,
   globalEffectEffectsDescription,
 } from '@helpers/hero/global-effect-state';
@@ -100,7 +101,7 @@ export async function townReputationBuffRefresh(
       const effect = tierConfig
         ? townReputationBuffEffect(town, tierConfig, currentTick)
         : undefined;
-      if (effect) state.globalEffects.push(effect);
+      if (effect) applyGlobalEffectPush(state, effect);
     });
 
     return state;

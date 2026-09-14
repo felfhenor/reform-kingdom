@@ -16,7 +16,7 @@ import type {
   StatusEffectTag,
 } from '@interfaces';
 
-function ensureGlobalEffectEffect(
+export function ensureGlobalEffectEffect(
   effect: Partial<GlobalEffectEffectGainStats> &
     Partial<GlobalEffectEffectGainCombatStat> &
     Partial<GlobalEffectEffectXPGainMultiplier> &

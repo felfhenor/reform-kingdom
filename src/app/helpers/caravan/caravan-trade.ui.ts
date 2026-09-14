@@ -13,7 +13,10 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { notifyError } from '@helpers/engine/notify';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import {
+  applyCollectibleGrant,
+  isCollectibleDiscovered,
+} from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import {
   applyMaterialDelta,
@@ -35,7 +38,6 @@ import type {
   CaravanTrade,
   CaravanTraderContent,
   CollectibleContent,
-  CollectibleId,
   EquipmentContent,
   EquipmentItem,
   GameState,
@@ -57,19 +59,6 @@ function caravanTradeName(
   }
   if (trade.recipeId) return getEntry<RecipeContent>(trade.recipeId)?.name;
   return undefined;
-}
-
-// Shared by both the gold-trade and token-trade collectible-grant paths.
-function grantCollectible(
-  state: GameState,
-  collectibleId: CollectibleId,
-  quantity: number,
-): void {
-  const existing = state.collectibles[collectibleId];
-  state.collectibles[collectibleId] = {
-    quantity: (existing?.quantity ?? 0) + quantity,
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
 }
 
 // Grants whichever reward type `trade` sells, `quantity` times - always 1 for a collectible, recipe, or token trade.
@@ -98,7 +87,7 @@ function grantCaravanReward(
   }
 
   if (trade.collectibleId) {
-    grantCollectible(state, trade.collectibleId, quantity);
+    applyCollectibleGrant(state, trade.collectibleId, quantity);
     return;
   }
 

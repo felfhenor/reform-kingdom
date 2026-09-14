@@ -20,11 +20,15 @@ vi.mock('@helpers/worker/worker-progression', () => ({
 }));
 
 vi.mock('@helpers/hero/global-effects', () => ({
-  activeGlobalEffects: vi.fn(() => []),
+  globalEffectSums: vi.fn(),
+}));
+
+vi.mock('@helpers/hero/global-effect-state', () => ({
+  recomputeGlobalEffectSums: vi.fn(),
 }));
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { activeGlobalEffects } from '@helpers/hero/global-effects';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import {
   applyResolvedDropToState,
   combatItemDropRateBoost,
@@ -36,7 +40,7 @@ import type {
   DroppedReward,
   EquipmentId,
   GameState,
-  GlobalEffect,
+  GlobalEffectSums,
   ItemId,
   RecipeId,
   ResolvedDrop,
@@ -213,30 +217,18 @@ describe('Loot Helper Functions', () => {
   });
 
   describe('combatItemDropRateBoost', () => {
-    it('returns 0 with no active effects', () => {
-      vi.mocked(activeGlobalEffects).mockReturnValue([]);
-      expect(combatItemDropRateBoost()).toBe(0);
-    });
-
-    it('sums active GlobalCombatItemDropRateBoost effect values', () => {
-      vi.mocked(activeGlobalEffects).mockReturnValue([
-        {
-          effects: [{ effectType: 'GlobalCombatItemDropRateBoost', value: 3 }],
-        } as GlobalEffect,
-        {
-          effects: [{ effectType: 'GlobalCombatItemDropRateBoost', value: 6 }],
-        } as GlobalEffect,
-      ]);
+    it('reads the flat percent from the global effect sums cache', () => {
+      vi.mocked(globalEffectSums).mockReturnValue({
+        combatItemDropRateBoost: 9,
+      } as GlobalEffectSums);
 
       expect(combatItemDropRateBoost()).toBe(9);
     });
 
-    it('ignores active effects of other types', () => {
-      vi.mocked(activeGlobalEffects).mockReturnValue([
-        {
-          effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
-        } as GlobalEffect,
-      ]);
+    it('returns 0 when nothing is active/owned', () => {
+      vi.mocked(globalEffectSums).mockReturnValue({
+        combatItemDropRateBoost: 0,
+      } as GlobalEffectSums);
 
       expect(combatItemDropRateBoost()).toBe(0);
     });

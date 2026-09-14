@@ -15,6 +15,7 @@ import type { AutoModeState } from '@interfaces/decree';
 import type { EquipmentItem } from '@interfaces/equipment';
 import type { GameStateExploreRandom } from '@interfaces/explore-random';
 import type { GatheringState } from '@interfaces/gathering';
+import type { GlobalEffectSums } from '@interfaces/global-effect-sums';
 import type { Branded } from '@interfaces/identifiable';
 import type { GameStateTowns } from '@interfaces/town-state';
 import type { TravelState } from '@interfaces/travel';
@@ -154,6 +155,7 @@ export type GameState = {
   workers: GameStateWorkers;
   discoveredWorkers: GameStateDiscoveredWorkers;
   globalEffects: GlobalEffect[];
+  globalEffectSums: GlobalEffectSums;
   tradeskills: GameStateTradeskills;
   discoveredAstralProjectorSpells: GameStateDiscoveredAstralProjectorSpells;
   activeAstralProjectorSpells: GameStateActiveAstralProjectorSpell[];

@@ -1,4 +1,8 @@
-import type { GameState, GlobalEffectContent, GlobalEffectId } from '@interfaces';
+import type {
+  GameState,
+  GlobalEffectContent,
+  GlobalEffectId,
+} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content/content', () => ({
@@ -48,8 +52,10 @@ function buildState(
 ): GameState {
   return {
     armory: Array.from({ length: armorySize }),
+    collectibles: {},
     globalEffects: activeIds.map((id) => ({
       id,
+      effects: [],
       startTick: 0,
       expiresAtTick: 999999,
     })),

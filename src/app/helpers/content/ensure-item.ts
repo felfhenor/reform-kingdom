@@ -5,6 +5,7 @@ import {
   ensureStats,
   ensureTagResistances,
 } from '@helpers/content/ensure-helpers-stats';
+import { ensureGlobalEffectEffect } from '@helpers/content/ensure-globaleffect';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -37,6 +38,7 @@ export function ensureCollectible(
     sprite: collectible.sprite ?? 'UNKNOWN',
     rarity: collectible.rarity ?? 'Common',
     unobtainable: collectible.unobtainable ?? false,
+    effects: ensureArray(collectible.effects, ensureGlobalEffectEffect),
   };
 }
 

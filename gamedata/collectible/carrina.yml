@@ -22,6 +22,10 @@
   description: A rock encased entirely in viscious slime.
   sprite: '0004'
 
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.03
+
 - id: f534cc92-e391-42fc-86c7-8ffc0fee3d24
   name: Venom Orb
   rarity: Common
@@ -51,6 +55,11 @@
   rarity: Common
   description: A barrel containing an enormous amount of salt.
   sprite: '0014'
+
+  effects:
+    - effectType: GainStats
+      stat: Health
+      value: 5
 
 - id: 8c6193c1-760f-466f-b658-12769b937f30
   name: Gobweb

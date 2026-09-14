@@ -6,7 +6,7 @@ import {
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { activeGlobalEffects } from '@helpers/hero/global-effects';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import { heroSkillsAtLevel } from '@helpers/hero/job';
 import {
   characterStatsForLevel,
@@ -19,16 +19,11 @@ import type {
   EquipmentSkillContent,
   JobContent,
 } from '@interfaces';
-import { clamp, sumBy } from 'es-toolkit/compat';
+import { clamp } from 'es-toolkit/compat';
 
-// Sums every active `GlobalXPGainMultiplier` effect into one multiplier - 1x with none active.
+// Bonus from the precomputed global effect sums cache - 1x with nothing active/owned.
 function xpGainMultiplier(): number {
-  const bonus = sumBy(
-    activeGlobalEffects().flatMap((effect) => effect.effects),
-    (effect) =>
-      effect.effectType === 'GlobalXPGainMultiplier' ? effect.value : 0,
-  );
-  return 1 + bonus;
+  return 1 + globalEffectSums().xpGainMultiplierBonus;
 }
 
 export function syncPartyHpFromCombat(heroes: Combatant[]): void {

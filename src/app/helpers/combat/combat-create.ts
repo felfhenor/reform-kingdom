@@ -10,7 +10,7 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import { activeGlobalEffects } from '@helpers/hero/global-effects';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import { heroSkillsWithEquipment } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
@@ -24,8 +24,10 @@ import type {
   Combat,
   Combatant,
   CombatId,
+  CombatStat,
   EquipmentSkillContent,
   EquipmentSkillId,
+  GameStat,
   JobContent,
   MonsterContent,
   StatusEffectTag,
@@ -49,56 +51,47 @@ function heroUsableSkillIds(
 // Applied once here rather than read live, so the buff holds for the whole encounter even if its timer expires mid-fight.
 // Health/Energy also tops up current hp/ep (not just max), so it's felt immediately even if not at full health.
 function applyActiveGainStatsEffects(combatant: Combatant): void {
-  activeGlobalEffects().forEach((effect) => {
-    (effect.effects ?? []).forEach((effectEntry) => {
-      if (effectEntry.effectType !== 'GainStats') return;
-      combatApplyStatDeltaToCombatant(
-        combatant,
-        effectEntry.stat,
-        effectEntry.value,
-      );
+  const { stats } = globalEffectSums();
 
-      if (effectEntry.stat === 'Health') combatant.hp += effectEntry.value;
-      if (effectEntry.stat === 'Energy') combatant.ep += effectEntry.value;
-    });
+  (Object.keys(stats) as GameStat[]).forEach((stat) => {
+    const value = stats[stat];
+    if (value === 0) return;
+
+    combatApplyStatDeltaToCombatant(combatant, stat, value);
+
+    if (stat === 'Health') combatant.hp += value;
+    if (stat === 'Energy') combatant.ep += value;
   });
 }
 
 // The Astral Projector's DebuffResistance spells add a flat percent to
 // every tag, on top of whatever gear already grants.
 function applyActiveDebuffResistanceEffects(combatant: Combatant): void {
-  activeGlobalEffects().forEach((effect) => {
-    (effect.effects ?? []).forEach((effectEntry) => {
-      if (effectEntry.effectType !== 'DebuffResistance') return;
+  const { debuffResistanceFlat } = globalEffectSums();
+  if (debuffResistanceFlat === 0) return;
 
-      (Object.keys(combatant.tagResistance) as StatusEffectTag[]).forEach(
-        (tag) => {
-          combatant.tagResistance[tag] += effectEntry.value;
-        },
-      );
-    });
+  (Object.keys(combatant.tagResistance) as StatusEffectTag[]).forEach((tag) => {
+    combatant.tagResistance[tag] += debuffResistanceFlat;
   });
 }
 
 function applyActiveDebuffResistanceTagEffects(combatant: Combatant): void {
-  activeGlobalEffects().forEach((effect) => {
-    (effect.effects ?? []).forEach((effectEntry) => {
-      if (effectEntry.effectType !== 'DebuffResistanceTag') return;
-      combatant.tagResistance[effectEntry.tag] += effectEntry.value;
-    });
+  const { debuffResistanceTags } = globalEffectSums();
+
+  (Object.keys(debuffResistanceTags) as StatusEffectTag[]).forEach((tag) => {
+    const value = debuffResistanceTags[tag];
+    if (value === 0) return;
+    combatant.tagResistance[tag] += value;
   });
 }
 
 function applyActiveGainCombatStatEffects(combatant: Combatant): void {
-  activeGlobalEffects().forEach((effect) => {
-    (effect.effects ?? []).forEach((effectEntry) => {
-      if (effectEntry.effectType !== 'GainCombatStat') return;
-      combatApplyCombatStatNumberDeltaToCombatant(
-        combatant,
-        effectEntry.combatStat,
-        effectEntry.value,
-      );
-    });
+  const { combatStats } = globalEffectSums();
+
+  (Object.keys(combatStats) as CombatStat[]).forEach((combatStat) => {
+    const value = combatStats[combatStat];
+    if (value === 0) return;
+    combatApplyCombatStatNumberDeltaToCombatant(combatant, combatStat, value);
   });
 }
 

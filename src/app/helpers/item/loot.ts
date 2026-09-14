@@ -1,7 +1,8 @@
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
-import { activeGlobalEffects } from '@helpers/hero/global-effects';
+import { globalEffectSums } from '@helpers/hero/global-effects';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { addArmoryItems } from '@helpers/kingdom/armory';
@@ -15,15 +16,11 @@ import type {
   ResolvedEquipmentDrop,
   ResolvedWorkerDrop,
 } from '@interfaces';
-import { clamp, sumBy } from 'es-toolkit/compat';
+import { clamp } from 'es-toolkit/compat';
 
-// Sums every active `GlobalCombatItemDropRateBoost` effect into one flat percent - 0 with none active.
+// Flat percent from the precomputed global effect sums cache - 0 with nothing active/owned.
 export function combatItemDropRateBoost(): number {
-  return sumBy(
-    activeGlobalEffects().flatMap((effect) => effect.effects),
-    (effect) =>
-      effect.effectType === 'GlobalCombatItemDropRateBoost' ? effect.value : 0,
-  );
+  return globalEffectSums().combatItemDropRateBoost;
 }
 
 // Shared exhaustiveness helper for `switch (x.kind)` blocks over
@@ -113,11 +110,7 @@ function applyCollectibleDrop(
   state: GameState,
   drop: ResolvedCollectibleDrop,
 ): void {
-  const existing = state.collectibles[drop.collectibleId];
-  state.collectibles[drop.collectibleId] = {
-    quantity: (existing?.quantity ?? 0) + 1,
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
+  applyCollectibleGrant(state, drop.collectibleId, 1);
 }
 
 function applyWorkerDrop(state: GameState, drop: ResolvedWorkerDrop): void {

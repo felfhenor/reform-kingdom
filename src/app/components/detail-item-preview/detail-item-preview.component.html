@@ -38,6 +38,10 @@
       </div>
     }
 
+    @if (item.collectibleEffects; as effects) {
+      <app-detail-collectible-effects [effects]="effects" />
+    }
+
     <app-row-stat-summary
       class="block my-2"
       [stats]="item.stats"

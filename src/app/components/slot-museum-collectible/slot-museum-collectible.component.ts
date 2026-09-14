@@ -5,6 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { DetailCollectibleEffectsComponent } from '@components/detail-collectible-effects/detail-collectible-effects.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import type { MuseumCollectibleEntry } from '@interfaces';
@@ -20,6 +21,7 @@ const MAX_DISPLAY_QUANTITY = 9999;
     IconUnknownComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
+    DetailCollectibleEffectsComponent,
   ],
   templateUrl: './slot-museum-collectible.component.html',
   styleUrl: './slot-museum-collectible.component.scss',

@@ -318,6 +318,7 @@ describe('Armory Helper Functions', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 49),
         discoveredEquipment: {},
+        collectibles: {},
         globalEffects: [],
       } as unknown as GameState;
 

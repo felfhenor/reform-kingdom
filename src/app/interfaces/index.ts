@@ -45,6 +45,7 @@ export * from './equipment-bonus';
 export * from './explore-random';
 export * from './gather-vfx';
 export * from './gathering';
+export * from './global-effect-sums';
 export * from './identifiable';
 export * from './item-preview';
 export * from './level-range';

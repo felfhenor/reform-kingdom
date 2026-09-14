@@ -122,6 +122,7 @@ describe('townReputationBuffSync', () => {
     } as WorldNodeEntry);
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
+      collectibles: {},
       globalEffects: [],
     } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
@@ -151,6 +152,7 @@ describe('townReputationBuffSync', () => {
     } as WorldNodeEntry);
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
+      collectibles: {},
       globalEffects: [{ id: buffId, name: 'Larsian Influence' }],
     } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
@@ -171,6 +173,7 @@ describe('townReputationBuffSync', () => {
     } as WorldNodeEntry);
     const state = {
       world: { towns: { [townId]: { reputation: 0 } } },
+      collectibles: {},
       globalEffects: [],
     } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
@@ -187,6 +190,7 @@ describe('townReputationBuffSync', () => {
     vi.mocked(worldNodeByName).mockReturnValue(undefined);
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
+      collectibles: {},
       globalEffects: [],
     } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
@@ -208,6 +212,7 @@ describe('townReputationBuffSync', () => {
     } as WorldNodeEntry);
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
+      collectibles: {},
       globalEffects: [],
     } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
@@ -230,6 +235,7 @@ describe('townReputationBuffRefresh', () => {
     } as WorldNodeEntry);
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
+      collectibles: {},
       globalEffects: [{ id: buffId, name: 'Larsian Influence' }],
     } as unknown as GameState;
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {

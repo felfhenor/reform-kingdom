@@ -33,6 +33,13 @@
           {{ e.collectible.description }}
         </div>
 
+        @if (e.collectible.effects.length > 0) {
+          <app-detail-collectible-effects
+            [effects]="e.collectible.effects"
+            class="block mb-2"
+          />
+        }
+
         <div class="text-xs">Found: {{ displayQuantity() }}</div>
 
         @if (source?.type === 'crafting') {

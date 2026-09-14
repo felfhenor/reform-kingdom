@@ -127,6 +127,7 @@ const minorEffigy: CollectibleContent = {
     'A small figurine stitched together from scraps of thread and cloth.',
   sprite: '0000',
   rarity: 'Uncommon',
+  effects: [],
 };
 
 const collectibleRecipe: RecipeContent = {

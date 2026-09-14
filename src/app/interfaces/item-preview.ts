@@ -1,6 +1,7 @@
 import type { CombatStatBlock } from '@interfaces/combat';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
+import type { GlobalEffectEffect } from '@interfaces/content-globaleffect';
 import type { ItemContent } from '@interfaces/content-item';
 import type { MonsterType } from '@interfaces/content-monster';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
@@ -42,6 +43,8 @@ export type ItemPreviewDisplay = {
   }[];
   // Affix effects with no dedicated display elsewhere (caravan discounts).
   miscAffixDescriptions?: string[];
+  // Collectible only - set only when the collectible has at least one effect.
+  collectibleEffects?: GlobalEffectEffect[];
   skills?: EquipmentSkillContent[];
   // Equipment only.
   levelRequirement?: number;

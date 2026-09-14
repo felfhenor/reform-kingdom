@@ -6,6 +6,9 @@ vi.mock('@helpers/content/content', () => ({
 }));
 
 vi.mock('@helpers/hero/global-effect-state', () => ({
+  applyGlobalEffectPush: vi.fn((state, effect) => {
+    state.globalEffects.push(effect);
+  }),
   applyGlobalEffectRemove: vi.fn(),
 }));
 

@@ -102,9 +102,7 @@ describe('itemPreviewDisplay', () => {
       levelRequirement: 1,
       baseStats: {},
       type: 'Trinket',
-      gatherYieldBonuses: [
-        { tradeskillId: 'woodworking' as never, value: 1 },
-      ],
+      gatherYieldBonuses: [{ tradeskillId: 'woodworking' as never, value: 1 }],
     } as EquipmentContent;
     vi.mocked(getEntry).mockImplementation((id: unknown) =>
       id === 'woodworking'
@@ -192,6 +190,7 @@ describe('itemPreviewDisplay', () => {
       description: 'Curious.',
       sprite: '0003',
       rarity: 'Legendary',
+      effects: [],
     };
 
     expect(itemPreviewDisplay('collectible', collectible)).toEqual({
@@ -202,6 +201,22 @@ describe('itemPreviewDisplay', () => {
       rarity: 'Legendary',
       skills: [],
     });
+  });
+
+  it('carries a collectible effects list when the collectible has one', () => {
+    const collectible: CollectibleContent = {
+      id: 'trinket' as CollectibleId,
+      __type: 'collectible',
+      name: 'Trinket',
+      description: 'Curious.',
+      sprite: '0003',
+      rarity: 'Legendary',
+      effects: [{ effectType: 'GainStats', stat: 'Health', value: 5 }],
+    };
+
+    expect(
+      itemPreviewDisplay('collectible', collectible).collectibleEffects,
+    ).toEqual([{ effectType: 'GainStats', stat: 'Health', value: 5 }]);
   });
 });
 
@@ -242,10 +257,12 @@ describe('resolveRewardDisplay', () => {
   it('resolves a collectibleId to its display', () => {
     const collectible = {
       id: 'trinket' as CollectibleId,
+      __type: 'collectible',
       name: 'Trinket',
       description: 'Curious.',
       sprite: '0003',
       rarity: 'Legendary',
+      effects: [],
     } as CollectibleContent;
     vi.mocked(getEntry).mockReturnValue(collectible);
 

@@ -12,6 +12,7 @@ import {
 } from '@helpers/decree/decree';
 import { defaultGameState } from '@helpers/defaults';
 import { retrofitPartyXp } from '@helpers/hero/character-progress';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
 import {
   grantFoundingStoneIfMissing,
@@ -215,6 +216,10 @@ export function migrateGameState() {
     pruneInvalidActiveAstralProjectorSpells(
       newState.activeAstralProjectorSpells,
     );
+
+  // Always recomputed fresh on load - guards against saves predating this field, and
+  // against authored effects changing on content the save already owns/has active.
+  recomputeGlobalEffectSums(newState);
 
   setGameState(newState);
   gamestateTickStart();

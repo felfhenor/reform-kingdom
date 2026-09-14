@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { DetailCollectibleEffectsComponent } from '@components/detail-collectible-effects/detail-collectible-effects.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
@@ -22,6 +23,7 @@ import {
     SlotIconBlankComponent,
     AtlasImageComponent,
     RowGatherYieldBonusesComponent,
+    DetailCollectibleEffectsComponent,
   ],
   templateUrl: './detail-item-preview.component.html',
   styleUrl: './detail-item-preview.component.scss',

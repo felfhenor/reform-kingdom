@@ -8,6 +8,7 @@ import type {
   GameState,
   GameStateTradeskills,
   GatheringState,
+  GlobalEffectSums,
   MonsterType,
   StatBlock,
   StatusEffectBlock,
@@ -58,6 +59,7 @@ export function defaultGameState(): GameState {
     workers: {},
     discoveredWorkers: {},
     globalEffects: [],
+    globalEffectSums: defaultGlobalEffectSums(),
     tradeskills: defaultTradeskills(),
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
@@ -151,6 +153,19 @@ export function defaultTagResistances(): StatusEffectBlock {
     DamageOverTime: 0,
     Poison: 0,
     Burn: 0,
+  };
+}
+
+export function defaultGlobalEffectSums(): GlobalEffectSums {
+  return {
+    stats: defaultStats(),
+    combatStats: defaultCombatStats(),
+    debuffResistanceTags: defaultTagResistances(),
+    debuffResistanceFlat: 0,
+    xpGainMultiplierBonus: 0,
+    goldGainMultiplierBonus: 0,
+    combatItemDropRateBoost: 0,
+    gatheringItemDropRateBoost: 0,
   };
 }
 

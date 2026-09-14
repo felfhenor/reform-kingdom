@@ -27,7 +27,7 @@ vi.mock('@helpers/hero/luck', () => ({
 }));
 
 vi.mock('@helpers/hero/global-effects', () => ({
-  activeGlobalEffects: vi.fn(() => []),
+  globalEffectSums: vi.fn(() => ({ gatheringItemDropRateBoost: 0 })),
 }));
 
 vi.mock('@helpers/item/materials', () => ({
@@ -67,7 +67,7 @@ import { getEntry } from '@helpers/content/content';
 import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
-import { activeGlobalEffects } from '@helpers/hero/global-effects';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses, partyGet } from '@helpers/hero/party';
 import {
@@ -97,7 +97,7 @@ import type {
   GameState,
   GatheringContent,
   GatheringId,
-  GlobalEffect,
+  GlobalEffectSums,
   ItemId,
   TradeskillId,
   WorldNodeEntry,
@@ -795,13 +795,9 @@ describe('gatheringProcessTick', () => {
     vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        effects: [
-          { effectType: 'GlobalGatheringItemDropRateBoost', value: 20 },
-        ],
-      } as GlobalEffect,
-    ]);
+    vi.mocked(globalEffectSums).mockReturnValue({
+      gatheringItemDropRateBoost: 20,
+    } as GlobalEffectSums);
     vi.mocked(rngSucceedsChance).mockReturnValue(true);
 
     gatheringProcessTick();
@@ -817,35 +813,18 @@ describe('gatheringItemDropRateBoost', () => {
     vi.clearAllMocks();
   });
 
-  it('returns 0 with no active effects', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([]);
+  it('returns 0 when nothing is active/owned', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      gatheringItemDropRateBoost: 0,
+    } as GlobalEffectSums);
     expect(gatheringItemDropRateBoost()).toBe(0);
   });
 
-  it('sums active GlobalGatheringItemDropRateBoost effect values', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        effects: [
-          { effectType: 'GlobalGatheringItemDropRateBoost', value: 10 },
-        ],
-      } as GlobalEffect,
-      {
-        effects: [
-          { effectType: 'GlobalGatheringItemDropRateBoost', value: 20 },
-        ],
-      } as GlobalEffect,
-    ]);
+  it('reads the flat percent from the global effect sums cache', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      gatheringItemDropRateBoost: 30,
+    } as GlobalEffectSums);
 
     expect(gatheringItemDropRateBoost()).toBe(30);
-  });
-
-  it('ignores active effects of other types', () => {
-    vi.mocked(activeGlobalEffects).mockReturnValue([
-      {
-        effects: [{ effectType: 'GainStats', stat: 'Strength', value: 5 }],
-      } as GlobalEffect,
-    ]);
-
-    expect(gatheringItemDropRateBoost()).toBe(0);
   });
 });

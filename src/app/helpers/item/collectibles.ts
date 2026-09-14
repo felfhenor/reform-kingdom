@@ -3,10 +3,12 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CollectibleContent,
   CollectibleId,
+  GameState,
   GameStateCollectibles,
 } from '@interfaces';
 
@@ -40,6 +42,21 @@ export function discoveredCollectibleCount(): number {
   ).length;
 }
 
+// Shared raw mutator - callers already inside their own `updateGamestate`/tick
+// draft (loot, caravan trades) call this directly instead of `collectiblesAdd`.
+export function applyCollectibleGrant(
+  state: GameState,
+  collectibleId: CollectibleId,
+  quantity: number,
+): void {
+  const existing = state.collectibles[collectibleId];
+  state.collectibles[collectibleId] = {
+    quantity: (existing?.quantity ?? 0) + quantity,
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+  recomputeGlobalEffectSums(state);
+}
+
 export function collectiblesAdd(
   collectibleId: CollectibleId,
   quantity = 1,
@@ -49,13 +66,7 @@ export function collectiblesAdd(
   const alreadyDiscovered = isCollectibleDiscovered(collectibleId);
 
   updateGamestate((state) => {
-    const existing = state.collectibles[collectibleId];
-    const current = existing?.quantity ?? 0;
-    const foundAt = existing?.foundAt ?? Date.now();
-    state.collectibles[collectibleId] = {
-      quantity: current + quantity,
-      foundAt,
-    };
+    applyCollectibleGrant(state, collectibleId, quantity);
     return state;
   });
 
