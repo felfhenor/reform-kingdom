@@ -75,6 +75,7 @@ vi.mock('@helpers/combat/monster', () => ({
 }));
 
 vi.mock('@helpers/crafting/recipes', () => ({
+  isRecipeDiscovered: vi.fn(() => false),
   recipeDiscover: vi.fn(),
 }));
 

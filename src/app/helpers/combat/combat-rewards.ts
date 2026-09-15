@@ -7,7 +7,7 @@ import {
   recipeDropHtml,
 } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
-import { recipeDiscover } from '@helpers/crafting/recipes';
+import { isRecipeDiscovered, recipeDiscover } from '@helpers/crafting/recipes';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { collectiblesAdd } from '@helpers/item/collectibles';
@@ -113,6 +113,8 @@ export function grantResolvedDrops(
       }
 
       case 'Recipe': {
+        if (isRecipeDiscovered(drop.recipeId)) return; // already found, no duplicate log entry
+
         recipeDiscover(drop.recipeId);
 
         const recipe = getEntry<RecipeContent>(drop.recipeId);

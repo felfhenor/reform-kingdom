@@ -14,6 +14,7 @@ vi.mock('@helpers/content/content', () => ({
 }));
 
 vi.mock('@helpers/crafting/recipes', () => ({
+  isRecipeDiscovered: vi.fn(() => false),
   recipeDiscover: vi.fn(),
 }));
 
@@ -54,6 +55,7 @@ import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content/content';
 import { ensureWorker } from '@helpers/content/ensure-worker';
+import { isRecipeDiscovered, recipeDiscover } from '@helpers/crafting/recipes';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { addMaterial } from '@helpers/item/materials';
@@ -264,6 +266,19 @@ describe('grantResolvedDrops - VFX per drop kind', () => {
         spritesheet: 'equipment',
       },
     );
+  });
+
+  it('is a silent no-op when the recipe was already discovered', () => {
+    vi.mocked(isRecipeDiscovered).mockReturnValueOnce(true);
+
+    const drops: ResolvedDrop[] = [
+      { kind: 'Recipe', recipeId: 'recipe-iron-sword' as never },
+    ];
+    grantResolvedDrops(COMBAT, drops);
+
+    expect(recipeDiscover).not.toHaveBeenCalled();
+    expect(combatMessageLog).not.toHaveBeenCalled();
+    expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
   it('does not emit when rewardContentInfo cannot resolve the drop', () => {

@@ -1,3 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/crafting/recipes', () => ({
+  recipeStylizedName: vi.fn(
+    (recipe: { name: string }) => `Stylized: ${recipe.name}`,
+  ),
+}));
+
 import {
   adventureLogMessageHtml,
   beginCombatLogCommits,
@@ -21,7 +29,6 @@ import type {
   ItemContent,
   RecipeContent,
 } from '@interfaces';
-import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('combatMessageLog', () => {
   beforeEach(() => {
@@ -308,11 +315,11 @@ describe('equipmentDropHtml', () => {
 });
 
 describe('recipeNameHtml', () => {
-  it('wraps the recipe name in a plain span, with no rarity color', () => {
+  it('wraps the recipe stylized name in a plain span, with no rarity color', () => {
     const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
 
     expect(recipeNameHtml(recipe)).toBe(
-      '<span class="font-semibold">Recipe - Equipment: Bone-Hewn Cloak</span>',
+      '<span class="font-semibold">Stylized: Equipment: Bone-Hewn Cloak</span>',
     );
   });
 });
@@ -322,7 +329,7 @@ describe('recipeDropHtml', () => {
     const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
 
     expect(recipeDropHtml(recipe)).toBe(
-      '<span class="font-semibold">Recipe - Equipment: Bone-Hewn Cloak</span>',
+      '<span class="font-semibold">Stylized: Equipment: Bone-Hewn Cloak</span>',
     );
   });
 });

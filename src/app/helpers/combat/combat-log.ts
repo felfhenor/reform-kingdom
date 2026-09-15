@@ -1,4 +1,5 @@
 import { pluralize } from '@boringnode/pluralize';
+import { recipeStylizedName } from '@helpers/crafting/recipes';
 import { localStorageSignal } from '@helpers/engine/signal';
 import { rngUuid } from '@helpers/rng';
 import type {
@@ -156,7 +157,7 @@ export function collectibleDropHtml(collectible: CollectibleContent): string {
 // Recipes have no rarity of their own (their icon borrows their result's),
 // so the name isn't tinted, unlike the other reward types above.
 export function recipeNameHtml(recipe: RecipeContent): string {
-  return `<span class="font-semibold">Recipe - ${recipe.name}</span>`;
+  return `<span class="font-semibold">${recipeStylizedName(recipe)}</span>`;
 }
 
 // Recipe drops are always a single piece, same as equipment/collectibles.
