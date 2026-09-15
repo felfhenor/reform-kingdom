@@ -79,7 +79,6 @@ export function collectibleSourceMapBuild(): Map<
   return sources;
 }
 
-// Memoized on content signals - rebuilds only on content change, not every tick.
 export const collectibleSourceLookup = computed(() =>
   collectibleSourceMapBuild(),
 );
