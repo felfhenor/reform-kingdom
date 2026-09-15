@@ -84,6 +84,7 @@ describe('itemPreviewDisplay', () => {
       sprite: '0002',
       spritesheet: 'equipment',
       rarity: 'Rare',
+      type: 'Sword',
       stats: { Strength: 5 },
       levelRequirement: 4,
       equippableHeroNames: ['Alice'],
