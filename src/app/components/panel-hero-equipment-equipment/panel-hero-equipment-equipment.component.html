@@ -26,7 +26,7 @@
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"
     >
-      Optimize Equipment
+      Optimize
     </button>
   </div>
 
@@ -67,27 +67,22 @@
       }
     </div>
 
-    @if (items.length > 0) {
-      <cdk-virtual-scroll-viewport
-        itemSize="72"
-        class="equipment-item-list flex-1 min-h-0 !overflow-x-hidden"
-      >
-        <div *cdkVirtualFor="let entry of items; trackBy: trackByItemId">
-          <app-card-equipment-item
-            [equipment]="entry.content"
-            [equipmentItem]="entry.item"
-            [equippedContent]="selectedContent"
-            [equippedItem]="equippedItemFor(selected)"
-            [disabled]="!modifiable"
-            (equip)="equip(entry.item.id)"
-          />
+    <div class="flex flex-1 h-full !overflow-x-hidden mb-4 gap-2 flex-col">
+      @for (entry of items; track $index) {
+        <app-card-equipment-item
+          [equipment]="entry.content"
+          [equipmentItem]="entry.item"
+          [equippedContent]="selectedContent"
+          [equippedItem]="equippedItemFor(selected)"
+          [disabled]="!modifiable"
+          (equip)="equip(entry.item.id)"
+        />
+      } @empty {
+        <div class="italic text-sm p-4">
+          No equippable items available for this slot.
         </div>
-      </cdk-virtual-scroll-viewport>
-    } @else {
-      <div class="italic text-sm p-4">
-        No equippable items available for this slot.
-      </div>
-    }
+      }
+    </div>
   } @else {
     <div class="italic text-sm p-4">Select a slot to see available gear.</div>
   }

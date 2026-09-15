@@ -6,23 +6,22 @@
   [class.equipment-item-row-disabled]="disabled()"
   [attr.aria-disabled]="disabled() ? true : null"
   [tp]="tooltip"
-  [tpPlacement]="'right'"
   [tpVariation]="equippedDisplay() ? 'itemComparison' : undefined"
   (click)="onEquipClick()"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
 >
-  <app-slot-rarity-outline
-    class="equipment-item-row-icon"
-    [entry]="content"
-    spritesheet="equipment"
-  ></app-slot-rarity-outline>
+  <div class="mt-1">
+    <app-slot-rarity-outline
+      class="equipment-item-row-icon"
+      [entry]="content"
+      spritesheet="equipment"
+    ></app-slot-rarity-outline>
+  </div>
 
   <span class="equipment-item-row-info">
     <span class="equipment-item-row-name text-{{ content.rarity }}">
       {{ displayName() }}
-      <span class="equipment-item-row-level text-lighter"></span>
-      (Lv. {{ content.levelRequirement }})
     </span>
 
     <span class="equipment-item-row-stats">
@@ -35,7 +34,6 @@
           [class.text-value-negative]="bonusStats()[stat] < 0"
         >
           <app-icon-stat [stat]="stat" />
-          <span>{{ statShorthand[stat] }}</span>
           <span>{{ equipStatValue | statDisplay: 1 }}</span>
         </span>
       }

@@ -4,10 +4,8 @@
   @apply block;
 }
 
-// Fixed height so the CDK virtual-scroll viewport (which assumes uniform
-// row sizes for its offset math) can lay these out correctly.
 .equipment-item-row {
-  @apply flex items-center gap-2 w-full h-[72px] px-2 text-left cursor-pointer rounded overflow-hidden;
+  @apply flex gap-2 w-full px-2 text-left cursor-pointer rounded overflow-hidden;
 }
 
 .equipment-item-row-disabled {
@@ -19,23 +17,19 @@
 }
 
 .equipment-item-row-info {
-  @apply flex flex-col gap-2 min-w-0 overflow-hidden;
+  @apply flex flex-col items-start gap-1 min-w-0 overflow-hidden;
 }
 
 .equipment-item-row-name {
   @apply text-base font-semibold whitespace-nowrap overflow-hidden text-ellipsis;
 }
 
-.equipment-item-row-level {
-  @apply text-sm font-normal;
-}
-
 .equipment-item-row-stats {
-  @apply flex flex-wrap gap-2 text-sm overflow-hidden;
+  @apply flex flex-wrap gap-4 text-sm overflow-hidden;
 }
 
 .equipment-item-row-stat {
-  @apply flex items-center gap-2;
+  @apply flex items-center gap-1;
 }
 
 // Very small inline rendering of a granted skill's icon next to "Teaches" -
