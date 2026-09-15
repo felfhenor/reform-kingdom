@@ -2,6 +2,7 @@ import {
   TICKS_PER_STEP_OFF_PATH,
   TICKS_PER_STEP_ON_PATH,
 } from '@helpers/config';
+import { globalEffectSums } from '@helpers/hero/global-effects';
 import { tileIsOnPath } from '@helpers/pathfinding/pathfinding';
 import { worldNodeAt } from '@helpers/world-node/world-nodes';
 import type { CurrentLocation, TravelStep } from '@interfaces';
@@ -14,6 +15,12 @@ function travelTileCountsAsPath(
   y: number,
 ): boolean {
   return tileIsOnPath(mapName, x, y) || !!worldNodeAt(mapName, x, y);
+}
+
+function offPathStepTicksCost(): number {
+  const reduction = globalEffectSums().offPathTravelSpeedBonus;
+  const reduced = Math.round(TICKS_PER_STEP_OFF_PATH * (1 - reduction));
+  return Math.max(TICKS_PER_STEP_ON_PATH, reduced);
 }
 
 // Teleport is instant. Move is cheap entering a path/node tile, or leaving a node tile -
@@ -37,7 +44,7 @@ export function travelStepTicksCost(
 
   return enteringPathOrNode || exitingNode
     ? TICKS_PER_STEP_ON_PATH
-    : TICKS_PER_STEP_OFF_PATH;
+    : offPathStepTicksCost();
 }
 
 // Sums a path's tick cost, threading each completed step as the next origin - mirrors the

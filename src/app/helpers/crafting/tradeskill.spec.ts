@@ -210,9 +210,10 @@ describe('tradeskillMaxQueueSize', () => {
     expect(tradeskillMaxQueueSize(20, 'Blacksmithing')).toBe(6);
   });
 
-  it('caps at 10', () => {
+  it('caps at 16', () => {
     expect(tradeskillMaxQueueSize(40, 'Blacksmithing')).toBe(10);
-    expect(tradeskillMaxQueueSize(50, 'Blacksmithing')).toBe(10);
+    expect(tradeskillMaxQueueSize(70, 'Blacksmithing')).toBe(16);
+    expect(tradeskillMaxQueueSize(100, 'Blacksmithing')).toBe(16);
   });
 
   it("adds any active boost for that tradeskill's queue size", () => {
@@ -231,12 +232,12 @@ describe('tradeskillMaxQueueSize', () => {
     expect(tradeskillMaxQueueSize(1, 'Blacksmithing')).toBe(2);
   });
 
-  it('still caps the total at 10 even with a boost active', () => {
+  it('still caps the total at 16 even with a boost active', () => {
     vi.mocked(globalEffectSums).mockReturnValue({
       tradeskillQueueSizeBoosts: { [BLACKSMITHING_ID]: 5 },
     } as never);
 
-    expect(tradeskillMaxQueueSize(50, 'Blacksmithing')).toBe(10);
+    expect(tradeskillMaxQueueSize(50, 'Blacksmithing')).toBe(16);
   });
 
   it('treats an unresolvable tradeskill name as no boost', () => {

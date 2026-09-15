@@ -52,10 +52,11 @@ describe('globalEffectEffectsDescription', () => {
         tradeskillId: jewelcraftingId,
         value: 1,
       },
+      { effectType: 'GlobalOffPathTravelSpeedBoost', value: 0.1 },
     ];
 
     expect(globalEffectEffectsDescription(effects)).toBe(
-      'Hero Combat Strength: +5, Hero Combat Revive Chance: +2%, Hero Combat Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1',
+      'Hero Combat Strength: +5, Hero Combat Revive Chance: +2%, Hero Combat Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1, Off-Path Travel Speed: +10%',
     );
   });
 
@@ -215,5 +216,28 @@ describe('recomputeGlobalEffectSums', () => {
     expect(
       state.globalEffectSums.tradeskillQueueSizeBoosts['other-id' as never],
     ).toBeUndefined();
+  });
+
+  it('sums an off-path travel speed boost additively', () => {
+    const bangleId = 'bangle' as CollectibleId;
+    const bangle: CollectibleContent = {
+      id: bangleId,
+      name: 'Elven Dowsing Bangle',
+      __type: 'collectible',
+      description: '',
+      sprite: '0000',
+      rarity: 'Common',
+      effects: [{ effectType: 'GlobalOffPathTravelSpeedBoost', value: 0.1 }],
+    };
+    vi.mocked(getEntry).mockImplementation((id) =>
+      id === bangleId ? (bangle as never) : undefined,
+    );
+    const state = buildState({
+      collectibles: { [bangleId]: { quantity: 1, foundAt: 0 } },
+    });
+
+    recomputeGlobalEffectSums(state);
+
+    expect(state.globalEffectSums.offPathTravelSpeedBonus).toBeCloseTo(0.1);
   });
 });

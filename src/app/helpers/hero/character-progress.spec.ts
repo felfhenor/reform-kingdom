@@ -113,6 +113,7 @@ describe('Character Progress Helper Functions', () => {
       gatheringItemDropRateBoost: 0,
       armorySizeBoost: 0,
       tradeskillQueueSizeBoosts: {},
+      offPathTravelSpeedBonus: 0,
     };
   }
 

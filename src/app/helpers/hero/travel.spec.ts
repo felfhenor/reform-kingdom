@@ -16,6 +16,7 @@ vi.mock('@helpers/decree/auto-mode', () => ({
 vi.mock('@helpers/hero/global-effects', () => ({
   addGlobalEffect: vi.fn(),
   isGlobalEffectActive: vi.fn(() => false),
+  globalEffectSums: vi.fn(() => ({ offPathTravelSpeedBonus: 0 })),
 }));
 
 vi.mock('@helpers/encounter/encounter', () => ({

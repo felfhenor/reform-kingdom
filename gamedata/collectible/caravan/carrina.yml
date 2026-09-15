@@ -4,6 +4,10 @@
   description: A floatation device used by many to swim in the Carrina Rapids.
   sprite: '0021'
 
+  effects:
+    - effectType: GlobalOffPathTravelSpeedBoost
+      value: 0.1
+
 - id: 9b4d466a-6041-4bb5-9ceb-f61d004113ee
   name: Blank Playing Card
   rarity: Rare

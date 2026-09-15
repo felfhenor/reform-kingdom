@@ -77,6 +77,7 @@ function zeroGlobalEffectSums(): GlobalEffectSums {
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,
     tradeskillQueueSizeBoosts: {},
+    offPathTravelSpeedBonus: 0,
   };
 }
 

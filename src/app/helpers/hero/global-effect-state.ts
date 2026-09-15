@@ -47,6 +47,8 @@ export function globalEffectEffectDescription(
         'Unknown Tradeskill';
       return `${tradeskillName} Queue Size: +${effect.value}`;
     }
+    case 'GlobalOffPathTravelSpeedBoost':
+      return `Off-Path Travel Speed: +${effect.value * 100}%`;
   }
 }
 
@@ -98,6 +100,9 @@ function accumulateGlobalEffectEffect(
       sums.tradeskillQueueSizeBoosts[effect.tradeskillId] =
         (sums.tradeskillQueueSizeBoosts[effect.tradeskillId] ?? 0) +
         effect.value;
+      return;
+    case 'GlobalOffPathTravelSpeedBoost':
+      sums.offPathTravelSpeedBonus += effect.value;
       return;
     default:
       assertNeverGlobalEffectEffect(effect);

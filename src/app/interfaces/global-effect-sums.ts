@@ -17,4 +17,6 @@ export type GlobalEffectSums = {
   armorySizeBoost: number;
   // Sparse - only tradeskills with an active boost have an entry.
   tradeskillQueueSizeBoosts: Partial<Record<TradeskillId, number>>;
+  // Fraction (0.1 = 10%), summed additively - never applies to on-path travel.
+  offPathTravelSpeedBonus: number;
 };
