@@ -8,6 +8,7 @@ import type {
   GlobalEffectEffectCombatItemDropRateBoost,
   GlobalEffectEffectDebuffResistance,
   GlobalEffectEffectDebuffResistanceTag,
+  GlobalEffectEffectDecreeClauseCapBoost,
   GlobalEffectEffectGainCombatStat,
   GlobalEffectEffectGainStats,
   GlobalEffectEffectGatheringItemDropRateBoost,
@@ -31,10 +32,18 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectGatheringItemDropRateBoost> &
     Partial<GlobalEffectEffectArmorySizeBoost> &
     Partial<GlobalEffectEffectTradeskillQueueSizeBoost> &
-    Partial<GlobalEffectEffectOffPathTravelSpeedBoost> = {},
+    Partial<GlobalEffectEffectOffPathTravelSpeedBoost> &
+    Partial<GlobalEffectEffectDecreeClauseCapBoost> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'GlobalDecreeClauseCapBoost') {
+    return {
+      effectType: 'GlobalDecreeClauseCapBoost',
+      value: effect.value ?? 0,
+    };
   }
 
   if (effect.effectType === 'GlobalArmorySizeBoost') {

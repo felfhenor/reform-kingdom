@@ -1,5 +1,6 @@
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -17,6 +18,7 @@ import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import {
   decreeClauseAdd,
+  decreeClauseCap,
   decreeClauseConflicts,
   decreeClauseReorder,
   decreeClauses,
@@ -107,6 +109,7 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   selector: 'app-game-play-decree',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     FormsModule,
     NgSelectComponent,
     NgOptionTemplateDirective,
@@ -130,6 +133,10 @@ export class GamePlayDecreeComponent {
     decreeWaitForFullEnergyBeforeCombat(),
   );
   public clauses = computed(() => decreeClauses());
+  public clauseCap = computed(() => decreeClauseCap());
+  public isClauseCapReached = computed(
+    () => this.clauses().length >= this.clauseCap(),
+  );
   public activeClauseId = computed(() => decreeActiveClauseId());
 
   public homeDisplayName = computed(() => {
@@ -262,6 +269,7 @@ export class GamePlayDecreeComponent {
     ) {
       return false;
     }
+    if (!this.isEditing() && this.isClauseCapReached()) return false;
     return !this.isDuplicateDraft();
   });
 

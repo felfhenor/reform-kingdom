@@ -69,6 +69,12 @@ export type GlobalEffectEffectTradeskillQueueSizeBoost = {
   value: number;
 };
 
+// Adds `value` (a flat count) to the Decree's clause cap.
+export type GlobalEffectEffectDecreeClauseCapBoost = {
+  effectType: 'GlobalDecreeClauseCapBoost';
+  value: number;
+};
+
 // Adds `value` (a flat percent) to travel speed while off the authored path,
 // stacking additively across sources.
 export type GlobalEffectEffectOffPathTravelSpeedBoost = {
@@ -87,7 +93,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectGatheringItemDropRateBoost
   | GlobalEffectEffectArmorySizeBoost
   | GlobalEffectEffectTradeskillQueueSizeBoost
-  | GlobalEffectEffectOffPathTravelSpeedBoost;
+  | GlobalEffectEffectOffPathTravelSpeedBoost
+  | GlobalEffectEffectDecreeClauseCapBoost;
 
 export type GlobalEffectContent = IsContentItem &
   HasDescription &

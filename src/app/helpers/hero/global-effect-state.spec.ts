@@ -53,10 +53,11 @@ describe('globalEffectEffectsDescription', () => {
         value: 1,
       },
       { effectType: 'GlobalOffPathTravelSpeedBoost', value: 0.1 },
+      { effectType: 'GlobalDecreeClauseCapBoost', value: 1 },
     ];
 
     expect(globalEffectEffectsDescription(effects)).toBe(
-      'Hero Combat Strength: +5, Hero Combat Revive Chance: +2%, Hero Combat Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1, Off-Path Travel Speed: +10%',
+      'Hero Combat Strength: +5, Hero Combat Revive Chance: +2%, Hero Combat Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1, Off-Path Travel Speed: +10%, Decree Clause Cap: +1',
     );
   });
 
@@ -239,5 +240,28 @@ describe('recomputeGlobalEffectSums', () => {
     recomputeGlobalEffectSums(state);
 
     expect(state.globalEffectSums.offPathTravelSpeedBonus).toBeCloseTo(0.1);
+  });
+
+  it('sums a decree clause cap boost', () => {
+    const bookId = 'staffrune-book' as CollectibleId;
+    const book: CollectibleContent = {
+      id: bookId,
+      name: 'Elven Staffrune Book',
+      __type: 'collectible',
+      description: '',
+      sprite: '0000',
+      rarity: 'Rare',
+      effects: [{ effectType: 'GlobalDecreeClauseCapBoost', value: 1 }],
+    };
+    vi.mocked(getEntry).mockImplementation((id) =>
+      id === bookId ? (book as never) : undefined,
+    );
+    const state = buildState({
+      collectibles: { [bookId]: { quantity: 1, foundAt: 0 } },
+    });
+
+    recomputeGlobalEffectSums(state);
+
+    expect(state.globalEffectSums.decreeClauseCapBoost).toBe(1);
   });
 });

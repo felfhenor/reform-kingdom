@@ -19,4 +19,5 @@ export type GlobalEffectSums = {
   tradeskillQueueSizeBoosts: Partial<Record<TradeskillId, number>>;
   // Fraction (0.1 = 10%), summed additively - never applies to on-path travel.
   offPathTravelSpeedBonus: number;
+  decreeClauseCapBoost: number;
 };

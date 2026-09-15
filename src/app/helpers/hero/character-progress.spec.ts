@@ -114,6 +114,7 @@ describe('Character Progress Helper Functions', () => {
       armorySizeBoost: 0,
       tradeskillQueueSizeBoosts: {},
       offPathTravelSpeedBonus: 0,
+      decreeClauseCapBoost: 0,
     };
   }
 

@@ -14,3 +14,7 @@
   rarity: Rare
   description: A book that teaches the reader to use staves the elven way.
   sprite: '0023'
+
+  effects:
+    - effectType: GlobalDecreeClauseCapBoost
+      value: 1

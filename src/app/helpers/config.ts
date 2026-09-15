@@ -154,6 +154,10 @@ export const SELL_GOLD_PER_RESISTANCE_POINT = 100;
 // Only one spell can be active for now - raising this later is a one-line change.
 export const MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS = 1;
 
+// Decree
+
+export const DECREE_CLAUSE_CAP = 7;
+
 // Pathfinding
 
 // Path tiles are cheaper than other open tiles so pathfinding hugs authored paths without blocking off-road.

@@ -250,7 +250,11 @@
           </button>
         }
 
-        @if (isDuplicateDraft()) {
+        @if (!isEditing() && isClauseCapReached()) {
+          <span class="text-xs text-warning">
+            The Decree is full. You must remove clauses to add more.
+          </span>
+        } @else if (isDuplicateDraft()) {
           <span class="text-xs text-warning">
             The Decree already has a clause like this.
           </span>
@@ -263,7 +267,12 @@
     class="card bg-base-100 foreground shadow-xl flex-1 min-h-0 flex flex-col"
   >
     <div class="card-body gap-2 flex-1 min-h-0 flex flex-col">
-      <div class="card-title">Decree</div>
+      <div class="card-title justify-between">
+        Decree
+        <span class="badge badge-sm badge-info">
+          {{ clauses().length | number }}/{{ clauseCap() | number }}
+        </span>
+      </div>
 
       <ul
         cdkDropList

@@ -14,6 +14,10 @@
   description: A tricksters best friend - a blank playing card to manipulate those you play games with.
   sprite: '0025'
 
+  effects:
+    - effectType: GlobalDecreeClauseCapBoost
+      value: 1
+
 - id: 542bd345-9cf0-4527-8d12-32e120ece7cf
   name: Blank Templar Scroll
   rarity: Rare

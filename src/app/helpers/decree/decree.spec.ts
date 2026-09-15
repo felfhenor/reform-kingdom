@@ -18,9 +18,11 @@ vi.mock('@helpers/world-node/world-node-rewards', () => ({
   }),
 }));
 
+import { DECREE_CLAUSE_CAP } from '@helpers/config';
 import {
   backfillDecreeClauseRiskTolerance,
   decreeClauseAdd,
+  decreeClauseCap,
   decreeClauseConflicts,
   decreeClauseReorder,
   decreeClauseSetEnabled,
@@ -51,6 +53,7 @@ function stateWithAutoMode(
   clauses: DecreeClause[],
   waitForFullHealthBeforeCombat = false,
   nodeFailureCounts: Partial<Record<string, number>> = {},
+  decreeClauseCapBoost = 0,
 ): GameState {
   return {
     world: {
@@ -61,6 +64,7 @@ function stateWithAutoMode(
         nodeFailureCounts,
       },
     },
+    globalEffectSums: { decreeClauseCapBoost },
   } as unknown as GameState;
 }
 
@@ -86,6 +90,24 @@ describe('decree read accessors', () => {
     vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([], true));
 
     expect(decreeWaitForFullHealthBeforeCombat()).toBe(true);
+  });
+});
+
+describe('decreeClauseCap', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns the base cap with no boost', () => {
+    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([]));
+
+    expect(decreeClauseCap()).toBe(DECREE_CLAUSE_CAP);
+  });
+
+  it('adds the global effect sum boost to the base cap', () => {
+    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode([], false, {}, 2));
+
+    expect(decreeClauseCap()).toBe(DECREE_CLAUSE_CAP + 2);
   });
 });
 
@@ -131,6 +153,37 @@ describe('decreeClauseAdd', () => {
 
     expect(decreeClauseAdd({ type: 'ReturnToKingdom' })).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('refuses to add a clause once the clause cap is reached and returns false', () => {
+    const existing = Array.from({ length: DECREE_CLAUSE_CAP }, (_, i) =>
+      buildClause({
+        id: `clause-${i}` as DecreeClauseId,
+        type: 'DefendTowns',
+        riskTolerance: 'Low',
+        townName: `Town ${i}`,
+      }),
+    );
+    vi.mocked(gamestate).mockReturnValue(stateWithAutoMode(existing));
+
+    expect(decreeClauseAdd({ type: 'ReturnToKingdom' })).toBe(false);
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('allows adding a clause when a global effect boost raises the cap above the base', () => {
+    const existing = Array.from({ length: DECREE_CLAUSE_CAP }, (_, i) =>
+      buildClause({
+        id: `clause-${i}` as DecreeClauseId,
+        type: 'DefendTowns',
+        riskTolerance: 'Low',
+        townName: `Town ${i}`,
+      }),
+    );
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithAutoMode(existing, false, {}, 1),
+    );
+
+    expect(decreeClauseAdd({ type: 'ReturnToKingdom' })).toBe(true);
   });
 });
 
