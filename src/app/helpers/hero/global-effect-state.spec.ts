@@ -57,7 +57,7 @@ describe('globalEffectEffectsDescription', () => {
     ];
 
     expect(globalEffectEffectsDescription(effects)).toBe(
-      'Hero Combat Strength: +5, Hero Combat Revive Chance: +2%, Hero Combat Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1, Off-Path Travel Speed: +10%, Decree Clause Cap: +1',
+      'Hero Strength: +5, Hero Revive Chance: +2%, Hero Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1, Off-Path Travel Speed: +10%, Decree Clause Cap: +1',
     );
   });
 
