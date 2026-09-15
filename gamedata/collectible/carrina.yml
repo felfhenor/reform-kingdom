@@ -28,9 +28,14 @@
 
 - id: f534cc92-e391-42fc-86c7-8ffc0fee3d24
   name: Venom Orb
-  rarity: Common
+  rarity: Uncommon
   description: An orb protected feverishly by spiders, seemingly powering their venomous abilities.
   sprite: '0005'
+
+  effects:
+    - effectType: GainCombatStat
+      combatStat: debuffIgnoreChance
+      value: 0.01
 
 - id: 6a67b594-4bf3-4345-a09b-9798a7abc460
   name: Jelly Flower
@@ -40,9 +45,14 @@
 
 - id: cfe5aa1b-b5c3-4fa4-892f-946f938d9bf7
   name: Gobslime Flower
-  rarity: Common
+  rarity: Uncommon
   description: A flower named after the Gobslime Shrine, the only place it grows.
   sprite: '0012'
+
+  effects:
+    - effectType: GainStats
+      stat: Spirit
+      value: 1
 
 - id: f1f9898f-9bde-43a3-8645-1e10190d7358
   name: Copper Catcher
@@ -52,7 +62,7 @@
 
 - id: 7da75143-2511-46ed-8fd5-79384b50afd5
   name: Salt Barrel
-  rarity: Common
+  rarity: Uncommon
   description: A barrel containing an enormous amount of salt.
   sprite: '0014'
 
@@ -71,7 +81,7 @@
 
 - id: 1afafc1d-480f-46a7-a565-575bb9c471db
   name: Copper Pickaxe
-  rarity: Common
+  rarity: Uncommon
   description: A pickaxe made of copper, for the simple purpose of getting more copper.
   sprite: '0016'
 
@@ -87,7 +97,7 @@
 
 - id: 9945c3ba-0403-4a23-a026-835ddab17f28
   name: Elven Dowsing Bangle
-  rarity: Common
+  rarity: Uncommon
   description: A bangle used by elven scouts to help find their way.
   sprite: '0018'
 
@@ -100,6 +110,11 @@
   rarity: Uncommon
   description: Feathers from a hawk trained by elves in their secret training grounds.
   sprite: '0019'
+
+  effects:
+    - effectType: GainStats
+      stat: Agility
+      value: 1
 
 - id: 28517507-04e5-452d-81b0-c909d67ebd6d
   name: Fel Demon Feather

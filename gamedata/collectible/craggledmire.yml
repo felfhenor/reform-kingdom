@@ -10,6 +10,10 @@
   description: A red cane emanating magical energy. In another world, holding it would create tangible energy.
   sprite: '0026'
 
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.03
+
 - id: aa56310d-bc6d-4dd7-a5eb-1db1421da48d
   name: Craggle Pebble
   rarity: Common
@@ -24,12 +28,22 @@
 
 - id: ad16c486-0b93-4146-89cf-230c8d46c4f0
   name: Cyclops Skull
-  rarity: Common
+  rarity: Uncommon
   description: A large skull with one eye hole, found in a Craggled Mire mausoleum.
   sprite: '0029'
+
+  effects:
+    - effectType: GainStats
+      stat: Energy
+      value: 5
 
 - id: 443d1ae8-d3d1-4d8c-9009-fc64a7af7bff
   name: Ghost Orbs
   rarity: Common
   description: A set of ethereal orbs. These are made by condensing ghostly essence with artificing tools, and are then made tangible as a result.
   sprite: '0030'
+
+  effects:
+    - effectType: GainStats
+      stat: Intelligence
+      value: 1

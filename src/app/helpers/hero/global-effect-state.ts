@@ -21,11 +21,11 @@ export function globalEffectEffectDescription(
 ): string {
   switch (effect.effectType) {
     case 'GainStats':
-      return `Hero Combat ${effect.stat}: +${effect.value}`;
+      return `Hero ${effect.stat}: +${effect.value}`;
     case 'GainCombatStat': {
       const isPercent =
         CombatStatDimension.isPercent?.[effect.combatStat] ?? true;
-      return `Hero Combat ${CombatStatDimension.label[effect.combatStat]}: +${effect.value}${isPercent ? '%' : ''}`;
+      return `Hero ${CombatStatDimension.label[effect.combatStat]}: +${effect.value}${isPercent ? '%' : ''}`;
     }
     case 'GlobalXPGainMultiplier':
       return `XP Gain: +${effect.value * 100}%`;
