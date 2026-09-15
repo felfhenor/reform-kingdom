@@ -7,10 +7,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { ModalLootFiltersComponent } from '@components/modal-loot-filters/modal-loot-filters.component';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { ARMORY_ENCUMBERED_THRESHOLD } from '@helpers/config';
+import { modalOpen } from '@helpers/engine/modal-stack';
 import { goldCoinId } from '@helpers/item/materials';
 import {
   armoryCap,
@@ -22,6 +24,10 @@ import {
   filterArmoryEntries,
   sellEquipmentItems,
 } from '@helpers/kingdom/armory.ui';
+import {
+  isLootFilterActive,
+  lootFilterSettings,
+} from '@helpers/kingdom/loot-filter.ui';
 import type { EquipmentArmoryEntry, EquipmentItemId } from '@interfaces';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sum } from 'es-toolkit/compat';
@@ -32,6 +38,7 @@ import { sum } from 'es-toolkit/compat';
   imports: [
     SlotArmoryItemComponent,
     CurrencyCostComponent,
+    ModalLootFiltersComponent,
     PagePagedGridComponent,
     SweetAlert2Module,
     DecimalPipe,
@@ -57,6 +64,14 @@ export class PlayKingdomArmoryComponent {
     if (ratio < 1) return 'badge-warning';
     return 'badge-error';
   });
+
+  public lootFilterActive = computed(() =>
+    isLootFilterActive(lootFilterSettings()),
+  );
+
+  public openLootFilters(): void {
+    modalOpen('loot-filters');
+  }
 
   public sellMode = signal(false);
   public selectedIds = signal<Set<EquipmentItemId>>(new Set());

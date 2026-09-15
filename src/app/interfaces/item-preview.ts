@@ -8,6 +8,7 @@ import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { WorkerContent } from '@interfaces/content-worker';
 import type { DropRarity } from '@interfaces/droppable';
+import type { EquipmentItemType } from '@interfaces/equipment';
 import type { StatBlock } from '@interfaces/stat';
 
 // The three content kinds a recipe, stored material, or caravan trade can
@@ -24,6 +25,7 @@ export type ItemPreviewDisplay = {
   sprite: string;
   spritesheet: ItemPreviewSpritesheet;
   rarity: DropRarity;
+  type?: EquipmentItemType;
   // Infusion stats for an item, base stats for equipment - undefined for a
   // collectible, or an item with no infusion stats to show.
   stats?: StatBlock;

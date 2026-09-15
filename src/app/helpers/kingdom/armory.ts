@@ -91,6 +91,18 @@ export function pruneInvalidArmoryItems(
   );
 }
 
+// Permanent "ever found" flag - separate from armory possession, so it still
+// applies to equipment the player never actually keeps (e.g. auto-sold loot).
+export function markEquipmentDiscovered(
+  state: GameState,
+  equipmentId: EquipmentId,
+): void {
+  const existing = state.discoveredEquipment[equipmentId];
+  state.discoveredEquipment[equipmentId] = {
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
+}
+
 // Clamps to available room (or skips the check for debug tooling) and returns what was actually admitted - a full armory can mean fewer items landed than requested.
 export function addArmoryItems(
   state: GameState,
@@ -112,11 +124,7 @@ export function addArmoryItems(
 
   state.armory = [...state.armory, ...admitted];
   syncArmoryGlobalEffects(state);
-
-  const existing = state.discoveredEquipment[equipmentId];
-  state.discoveredEquipment[equipmentId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
+  markEquipmentDiscovered(state, equipmentId);
 
   return admitted;
 }

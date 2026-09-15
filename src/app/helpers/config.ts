@@ -154,6 +154,11 @@ export const SELL_GOLD_PER_RESISTANCE_POINT = 100;
 // Only one spell can be active for now - raising this later is a one-line change.
 export const MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS = 1;
 
+// Loot filter: a dropped item that fails the player's filters is auto-sold
+// for this fraction of its normal sell value instead of entering the armory.
+export const LOOT_FILTER_AUTO_SELL_PERCENT = 0.8;
+export const LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL = 1;
+
 // Decree
 
 export const DECREE_CLAUSE_CAP = 7;

@@ -61,28 +61,48 @@
   @apply text-black;
   --bg-color: var(--color-white) !important;
   --btn-color: var(--color-white) !important;
+
+  &.btn-outline {
+    @apply text-white;
+  }
 }
 
 .bg-Uncommon {
   @apply text-black;
   --bg-color: var(--color-green-400) !important;
   --btn-color: var(--color-green-400) !important;
+
+  &.btn-outline {
+    @apply text-white;
+  }
 }
 
 .bg-Rare {
   @apply text-black;
   --bg-color: var(--color-blue-400) !important;
   --btn-color: var(--color-blue-400) !important;
+
+  &.btn-outline {
+    @apply text-white;
+  }
 }
 
 .bg-Mystical {
   @apply text-black;
   --bg-color: var(--color-purple-400) !important;
   --btn-color: var(--color-purple-400) !important;
+
+  &.btn-outline {
+    @apply text-white;
+  }
 }
 
 .bg-Legendary {
   @apply text-black;
   --bg-color: var(--color-yellow-400) !important;
   --btn-color: var(--color-yellow-400) !important;
+
+  &.btn-outline {
+    @apply text-white;
+  }
 }

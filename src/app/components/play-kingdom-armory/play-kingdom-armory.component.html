@@ -64,6 +64,18 @@
       >
         Enter Sell Mode
       </button>
+
+      <button
+        type="button"
+        class="btn btn-sm"
+        [class.btn-info]="!lootFilterActive()"
+        [class.btn-warning]="lootFilterActive()"
+        (click)="openLootFilters()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Auto Sell
+      </button>
     }
   </div>
 
@@ -77,3 +89,5 @@
     />
   }
 </app-page-paged-grid>
+
+<app-modal-loot-filters />

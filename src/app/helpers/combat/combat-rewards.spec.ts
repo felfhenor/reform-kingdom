@@ -34,8 +34,11 @@ vi.mock('@helpers/hero/global-effects', () => ({
   globalEffectSums: vi.fn(() => ({ goldGainMultiplierBonus: 0 })),
 }));
 
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryAdd: vi.fn(() => 1),
+vi.mock('@helpers/kingdom/loot-filter', () => ({
+  armoryAddLootDrop: vi.fn(() => ({
+    kind: 'Kept',
+    content: { name: 'Reward' },
+  })),
 }));
 
 vi.mock('@helpers/worker/worker-discovery', () => ({
@@ -54,7 +57,7 @@ import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { addMaterial } from '@helpers/item/materials';
-import { armoryAdd } from '@helpers/kingdom/armory';
+import { armoryAddLootDrop } from '@helpers/kingdom/loot-filter';
 import {
   isWorkerRescued,
   workerRescue,
@@ -163,17 +166,44 @@ describe('grantResolvedDrops - VFX per drop kind', () => {
   });
 
   it('logs a lost-item message and skips the found-message/VFX when the armory is full', () => {
-    vi.mocked(armoryAdd).mockReturnValueOnce(0);
+    vi.mocked(armoryAddLootDrop).mockReturnValueOnce({ kind: 'NoRoom' });
 
     const drops: ResolvedDrop[] = [
       { kind: 'Equipment', equipmentId: 'iron-sword' as never },
     ];
     grantResolvedDrops(COMBAT, drops);
 
-    expect(armoryAdd).toHaveBeenCalledWith('iron-sword', 1, true);
+    expect(armoryAddLootDrop).toHaveBeenCalledWith('iron-sword');
     expect(combatMessageLog).toHaveBeenCalledWith(
       COMBAT,
       'Your armory is full. An item drop was lost.',
+    );
+    expect(gatherVfxEmit).not.toHaveBeenCalled();
+  });
+
+  it('logs an auto-sold message and skips the found-message/VFX when the drop fails the loot filter', () => {
+    vi.mocked(armoryAddLootDrop).mockReturnValueOnce({
+      kind: 'AutoSold',
+      content: { name: 'Iron Sword' } as never,
+      goldEarned: 42,
+    });
+    vi.mocked(getEntry).mockReturnValue({ name: 'Gold Coin' } as never);
+    vi.mocked(rewardContentInfo).mockReturnValue({
+      name: 'Iron Sword',
+      sprite: 'iron-sword',
+      spritesheet: 'equipment',
+    });
+
+    const drops: ResolvedDrop[] = [
+      { kind: 'Equipment', equipmentId: 'iron-sword' as never },
+    ];
+    grantResolvedDrops(COMBAT, drops);
+
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      COMBAT,
+      'You automatically sold @@icon@@equipment-html for item-html.',
+      undefined,
+      { name: 'Iron Sword', sprite: 'iron-sword', spritesheet: 'equipment' },
     );
     expect(gatherVfxEmit).not.toHaveBeenCalled();
   });

@@ -1,3 +1,4 @@
+export * from './content/content';
 export * from './defaults';
 export * from './game-init';
 export * from './gameloop';

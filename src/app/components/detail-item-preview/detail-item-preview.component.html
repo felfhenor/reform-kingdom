@@ -15,7 +15,9 @@
     </div>
 
     @if (item.levelRequirement) {
-      <div class="text-xs my-1">Lv. {{ item.levelRequirement }}</div>
+      <div class="text-xs my-1">
+        Lv. {{ item.levelRequirement }} {{ item.type ?? 'item' }}
+      </div>
     }
 
     @if (showEquippableBy()) {

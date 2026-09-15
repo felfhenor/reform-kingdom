@@ -17,6 +17,7 @@ import type { GameStateExploreRandom } from '@interfaces/explore-random';
 import type { GatheringState } from '@interfaces/gathering';
 import type { GlobalEffectSums } from '@interfaces/global-effect-sums';
 import type { Branded } from '@interfaces/identifiable';
+import type { LootFilterSettings } from '@interfaces/loot-filter';
 import type { GameStateTowns } from '@interfaces/town-state';
 import type { TravelState } from '@interfaces/travel';
 import type {
@@ -144,6 +145,7 @@ export type GameState = {
   discoveredMaterials: GameStateDiscoveredMaterials;
   collectibles: GameStateCollectibles;
   armory: EquipmentItem[];
+  lootFilters: LootFilterSettings;
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredCaravans: GameStateDiscoveredCaravans;
   discoveredRecipes: GameStateDiscoveredRecipes;

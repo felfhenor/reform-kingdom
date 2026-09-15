@@ -101,6 +101,7 @@ export function itemPreviewDisplay(
     const eqContent = content as EquipmentContent;
     return {
       ...base,
+      type: eqContent.type,
       stats: eqContent.baseStats,
       resistances: eqContent.debuffResistances,
       combatStats: eqContent.combatStats,

@@ -13,7 +13,7 @@ import { globalEffectSums } from '@helpers/hero/global-effects';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
 import { addMaterial, goldCoinId } from '@helpers/item/materials';
-import { armoryAdd } from '@helpers/kingdom/armory';
+import { armoryAddLootDrop } from '@helpers/kingdom/loot-filter';
 import {
   isWorkerRescued,
   workerRescue,
@@ -22,7 +22,6 @@ import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   CollectibleContent,
   Combat,
-  EquipmentContent,
   ItemContent,
   ItemId,
   RecipeContent,
@@ -60,22 +59,35 @@ export function grantResolvedDrops(
   drops.forEach((drop) => {
     switch (drop.kind) {
       case 'Equipment': {
-        const admittedCount = armoryAdd(drop.equipmentId, 1, true);
-        if (admittedCount === 0) {
+        const outcome = armoryAddLootDrop(drop.equipmentId);
+
+        if (outcome.kind === 'NoRoom') {
           combatMessageLog(
             combat,
             'Your armory is full. An item drop was lost.',
           );
           return;
         }
-
-        const equipment = getEntry<EquipmentContent>(drop.equipmentId);
-        if (!equipment) return;
+        if (outcome.kind === 'UnknownContent') return;
 
         const info = rewardContentInfo(drop);
+
+        if (outcome.kind === 'AutoSold') {
+          const goldItem = getEntry<ItemContent>(goldCoinId());
+          if (!goldItem) return;
+
+          combatMessageLog(
+            combat,
+            `You automatically sold ${ITEM_ICON_TOKEN}${equipmentDropHtml(outcome.content)} for ${itemDropHtml(goldItem, outcome.goldEarned)}.`,
+            undefined,
+            info,
+          );
+          return;
+        }
+
         combatMessageLog(
           combat,
-          `The party found ${ITEM_ICON_TOKEN}${equipmentDropHtml(equipment)}!`,
+          `The party found ${ITEM_ICON_TOKEN}${equipmentDropHtml(outcome.content)}!`,
           undefined,
           info,
         );

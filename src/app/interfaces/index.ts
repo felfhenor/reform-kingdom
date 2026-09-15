@@ -50,6 +50,7 @@ export * from './identifiable';
 export * from './item-preview';
 export * from './level-range';
 export * from './loading';
+export * from './loot-filter';
 export * from './meta';
 export * from './modal';
 export * from './museum';

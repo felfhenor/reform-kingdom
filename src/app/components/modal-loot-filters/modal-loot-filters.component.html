@@ -1,0 +1,73 @@
+<app-modal
+  modalId="loot-filters"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+  widthClass="max-w-2xl"
+>
+  <span title>Loot Filters</span>
+
+  <div body class="flex flex-col gap-4">
+    <p class="text-sm text-lighter italic text-center">
+      Equipment that doesn't match these filters is automatically sold.
+    </p>
+
+    <div>
+      <div class="font-semibold mb-2">Rarity</div>
+      <div class="flex gap-2 flex-wrap">
+        @for (rarity of rarities; track rarity) {
+          <button
+            type="button"
+            class="btn btn-sm bg-{{ rarity }}"
+            [class.btn-outline]="!filters().keepRarities[rarity]"
+            (click)="toggleRarity(rarity)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            {{ rarity }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div>
+      <div class="font-semibold mb-2">Minimum Item Level</div>
+      <input
+        type="number"
+        min="1"
+        class="input input-bordered input-sm w-24"
+        [value]="filters().minimumItemLevel"
+        (change)="setMinimumItemLevel($any($event.target).valueAsNumber)"
+      />
+    </div>
+
+    <div>
+      <div class="font-semibold mb-2">Item Types</div>
+      <div class="grid grid-cols-4 gap-2">
+        @for (type of equipmentTypes; track type) {
+          <button
+            type="button"
+            class="btn btn-info btn-sm justify-center"
+            [class.btn-outline]="!filters().keepEquipmentTypes[type]"
+            (click)="toggleType(type)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            {{ type }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div actions>
+    <button
+      type="button"
+      class="btn"
+      appModalClose
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Close
+    </button>
+  </div>
+</app-modal>

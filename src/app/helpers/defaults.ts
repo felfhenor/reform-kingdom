@@ -1,14 +1,18 @@
+import { LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL } from '@helpers/config';
+import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { rngUuid } from '@helpers/rng';
 import type {
   AutoModeState,
   CombatStatBlock,
   ElementBlock,
   EquipmentBlock,
+  EquipmentItemType,
   GameId,
   GameState,
   GameStateTradeskills,
   GatheringState,
   GlobalEffectSums,
+  LootFilterSettings,
   MonsterType,
   StatBlock,
   StatusEffectBlock,
@@ -48,6 +52,7 @@ export function defaultGameState(): GameState {
     discoveredMaterials: {},
     collectibles: {},
     armory: [],
+    lootFilters: defaultLootFilterSettings(),
     discoveredEquipment: {},
     discoveredCaravans: {},
     discoveredRecipes: {},
@@ -85,6 +90,22 @@ export function defaultGatheringState(): GatheringState {
   return {
     status: 'Idle',
     ticksIntoGather: 0,
+  };
+}
+
+export function defaultLootFilterSettings(): LootFilterSettings {
+  return {
+    keepRarities: {
+      Common: true,
+      Uncommon: true,
+      Rare: true,
+      Mystical: true,
+      Legendary: true,
+    },
+    minimumItemLevel: LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL,
+    keepEquipmentTypes: Object.fromEntries(
+      allEquipmentItemTypes().map((type) => [type, true]),
+    ) as Record<EquipmentItemType, boolean>,
   };
 }
 
