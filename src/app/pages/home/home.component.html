@@ -6,17 +6,6 @@
   <div
     class="flex flex-col gap-2 min-w-[300px] max-w-[300px] items-center justify-center flex-1"
   >
-    <button
-      class="btn btn-primary btn-block"
-      (click)="newGame()"
-      appAnalyticsClick="Meta:Play:New"
-      appSfx="ui-click"
-      [sfxOffset]="0"
-      [sfxTrigger]="['click']"
-    >
-      New Game
-    </button>
-
     @if (hasStartedGame()) {
       <button
         class="btn btn-primary btn-block"
@@ -29,6 +18,17 @@
         Resume Game
       </button>
     }
+
+    <button
+      class="btn btn-primary btn-block"
+      (click)="newGame()"
+      appAnalyticsClick="Meta:Play:New"
+      appSfx="ui-click"
+      [sfxOffset]="0"
+      [sfxTrigger]="['click']"
+    >
+      New Game
+    </button>
 
     <app-panel-debug-buttons></app-panel-debug-buttons>
 
