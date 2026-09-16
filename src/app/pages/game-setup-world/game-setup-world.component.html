@@ -2,10 +2,10 @@
   <div class="w-full lg:max-w-[800px]">
     <div class="card bg-base-100">
       <div class="card-body items-center justify-between">
-        <div class="card-title w-full flex justify-between items-center relative min-h-8">
-          <div
-            class="absolute flex justify-center w-full pointer-events-none"
-          >
+        <div
+          class="card-title w-full flex justify-between items-center relative min-h-8"
+        >
+          <div class="absolute flex justify-center w-full pointer-events-none">
             Choose Your Party
           </div>
 
@@ -49,14 +49,14 @@
                 </div>
 
                 @if (jobData) {
-                  <div class="grid grid-cols-4 md:grid-cols-8 gap-2 my-2">
+                  <div class="grid grid-cols-4 md:grid-cols-5 gap-2 my-2">
                     @for (stat of statOrder; track stat) {
                       <div class="flex items-center gap-2 text-xs">
                         <app-icon-stat [stat]="stat" />
-                        <span class="inline-block min-w-[24px]">
+                        <span class="inline-block min-w-[28px]">
                           {{ statShorthand[stat] }}
                         </span>
-                        <span>
+                        <span class="tabular-nums">
                           {{ jobData.baseStats[stat] | statDisplay: 0 : false }}
                         </span>
                       </div>
