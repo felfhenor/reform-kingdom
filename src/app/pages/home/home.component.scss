@@ -1,3 +1,16 @@
 .social-icon:hover {
   --icon-color: var(--social-color);
 }
+
+.homescreen {
+  width: 100vw;
+  height: 100vh;
+
+  background:
+    linear-gradient(to bottom, rgba(35, 25, 45, 0.85), rgba(20, 15, 30, 0.45)),
+    url(/asset/splash-game.png);
+  background-size: cover;
+  background-position: center;
+
+  backdrop-filter: saturate(60%) blur(2px);
+}

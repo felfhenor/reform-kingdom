@@ -1,57 +1,44 @@
-<div class="flex justify-center items-center page-size">
+<div class="homescreen flex flex-col page-size items-center space-between">
+  <div class="w-full text-center pt-20">
+    <span class="title text-8xl">re:Form Kingdom</span>
+  </div>
+
   <div
-    class="card card-side bg-base-100 shadow-xl min-h-[300px] max-h-[600px] w-3/4"
+    class="flex flex-col gap-2 min-w-[300px] max-w-[300px] items-center justify-center flex-1"
   >
-    <figure class="card-image !hidden md:!flex">
-      <img
-        src="favicon/web-app-manifest-512x512.png"
-        alt="re:Form Kingdom Logo"
-      />
-    </figure>
+    <button
+      class="btn btn-primary btn-block"
+      (click)="newGame()"
+      appAnalyticsClick="Meta:Play:New"
+      appSfx="ui-click"
+      [sfxOffset]="0"
+      [sfxTrigger]="['click']"
+    >
+      New Game
+    </button>
 
-    <div class="card-body flex flex-col justify-around items-center relative">
-      <div class="flex-1 card-title text-center">
-        <span class="title text-4xl">re:Form Kingdom</span>
-      </div>
+    @if (hasStartedGame()) {
+      <button
+        class="btn btn-primary btn-block"
+        (click)="resumeGame()"
+        appAnalyticsClick="Meta:Play:Resume"
+        appSfx="ui-click"
+        [sfxOffset]="1"
+        [sfxTrigger]="['hover', 'click']"
+      >
+        Resume Game
+      </button>
+    }
 
-      <div class="flex-3 card-actions flex flex-col gap-2 w-1/2 max-w-[300px]">
-        <button
-          class="btn btn-primary btn-block"
-          (click)="newGame()"
-          appAnalyticsClick="Meta:Play:New"
-          appSfx="ui-click"
-          [sfxOffset]="0"
-          [sfxTrigger]="['click']"
-        >
-          New Game
-        </button>
+    <app-panel-debug-buttons></app-panel-debug-buttons>
 
-        @if (hasStartedGame()) {
-          <button
-            class="btn btn-primary btn-block"
-            (click)="resumeGame()"
-            appAnalyticsClick="Meta:Play:Resume"
-            appSfx="ui-click"
-            [sfxOffset]="1"
-            [sfxTrigger]="['hover', 'click']"
-          >
-            Resume Game
-          </button>
-        }
+    <app-button-settings></app-button-settings>
 
-        <app-panel-debug-buttons></app-panel-debug-buttons>
+    <app-button-quit></app-button-quit>
+  </div>
 
-        <app-button-settings></app-button-settings>
-
-        <app-button-quit></app-button-quit>
-      </div>
-
-      <div class="min-h-[48px]"></div>
-
-      <div class="card-actions absolute bottom-0 left-0 right-0 p-2">
-        <app-button-connect></app-button-connect>
-      </div>
-    </div>
+  <div class="left-0 right-0 pb-[48px]">
+    <app-button-connect></app-button-connect>
   </div>
 </div>
 
