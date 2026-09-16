@@ -6,11 +6,10 @@ import {
   output,
 } from '@angular/core';
 import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
-import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
+import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { defaultStats } from '@helpers/defaults';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { equipmentItemBonusStats } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
@@ -21,25 +20,21 @@ import {
   itemPreviewTotalResistances,
   itemPreviewTotalStats,
 } from '@helpers/item/item-preview.ui';
-import {
-  StatShorthand,
-  type BaseStat,
-  type EquipmentContent,
-  type EquipmentItem,
-  type ItemPreviewDisplay,
+import type {
+  EquipmentContent,
+  EquipmentItem,
+  ItemPreviewDisplay,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-card-equipment-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SlotRarityOutlineComponent,
-    IconStatComponent,
     RowInfusedMaterialsComponent,
+    RowItemStatsComponent,
     DetailItemPreviewComponent,
-    StatDisplayPipe,
     TippyDirective,
     SFXDirective,
   ],
@@ -55,10 +50,6 @@ export class CardEquipmentItemComponent {
   public disabled = input<boolean>(false);
 
   public equip = output<void>();
-
-  public statShorthand = StatShorthand;
-
-  private statKeys = Object.keys(defaultStats()) as BaseStat[];
 
   public displayName = computed(() =>
     equipmentItemDisplayName(this.equipmentItem(), this.equipment().name),
@@ -135,14 +126,6 @@ export class CardEquipmentItemComponent {
   public bonusStats = computed(() =>
     equipmentItemBonusStats(this.equipmentItem()),
   );
-
-  public rowStatKeys = computed<BaseStat[]>(() =>
-    this.statKeys.filter((stat) => this.totalStatValue(stat) !== 0),
-  );
-
-  public totalStatValue(stat: BaseStat): number {
-    return this.equipment().baseStats[stat] + this.bonusStats()[stat];
-  }
 
   // Blocked by click rather than the native `disabled` attribute, so the stat-comparison
   // tooltip stays available for inspection (e.g. planning swaps) while equipping is locked.

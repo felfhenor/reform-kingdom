@@ -35,6 +35,11 @@ export class RowItemStatsComponent {
   // Off for a plain stat readout (e.g. a bestiary entry) where every value
   // is already known-positive and a leading "+" would just be noise.
   public showSign = input(true);
+  // Off for very compact rows (e.g. an equipment card) where the icon alone
+  // identifies the stat and the shorthand label would just add clutter.
+  public showShorthand = input(true);
+
+  public containerClasses = input<string[]>(['flex', 'gap-2']);
 
   public statShorthand = StatShorthand;
   private statKeys = StatOrder;

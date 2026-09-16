@@ -19,6 +19,7 @@
           <span
             [class.text-value-positive]="deltaValue(key) > 0"
             [class.text-value-negative]="deltaValue(key) < 0"
+            class="tabular-nums"
           >
             ({{ deltaValue(key) | statDisplay: 0 : true }}{{ suffix(key) }})
           </span>

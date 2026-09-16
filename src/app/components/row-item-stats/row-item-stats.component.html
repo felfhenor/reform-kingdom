@@ -1,9 +1,9 @@
 <div
-  class="flex gap-2"
+  class="{{ containerClasses().join(' ') }}"
   [class.flex-col]="layout() === 'column'"
   [class.flex-row]="layout() === 'row'"
   [class.flex-wrap]="layout() === 'row'"
-  [class.gap-x-3]="layout() === 'row'"
+  [class.gap-x-2]="layout() === 'row'"
 >
   @for (stat of baseRows(); track $index) {
     @let value = rowValue(stat);
@@ -14,8 +14,10 @@
       [class.text-value-negative]="!hasComparison() && isNegative(stat)"
     >
       <app-icon-stat [stat]="stat" />
-      <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
-      <span>
+      @if (showShorthand()) {
+        <span class="inline-block min-w-[30px]">{{ statShorthand[stat] }}</span>
+      }
+      <span class="tabular-nums">
         {{ value | statDisplay: maxDecimals() : showSign() }}
       </span>
       @if (hasComparison() && deltaValue(stat) !== 0) {

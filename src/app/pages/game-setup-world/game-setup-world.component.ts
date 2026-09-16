@@ -11,7 +11,7 @@ import {
 } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
-import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
+import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -23,9 +23,7 @@ import { getUnlockedJobs } from '@helpers/hero/job';
 import { createCharacter, setParty } from '@helpers/hero/party';
 import { rngChoiceIdentifiable } from '@helpers/rng';
 import type { JobContent, JobId } from '@interfaces';
-import { StatOrder, StatShorthand } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -50,10 +48,9 @@ const heroPickSchema = schema<HeroPick>((hero) => {
     SweetAlert2Module,
     SFXDirective,
     IconJobComponent,
-    IconStatComponent,
+    RowItemStatsComponent,
     NgSelectComponent,
     FormField,
-    StatDisplayPipe,
   ],
   templateUrl: './game-setup-world.component.html',
   styleUrl: './game-setup-world.component.scss',
@@ -64,9 +61,6 @@ export class GameSetupWorldComponent implements OnInit {
   public unlockedJobs = computed(() =>
     sortBy(getUnlockedJobs(), (job) => job.name),
   );
-
-  public statOrder = StatOrder;
-  public statShorthand = StatShorthand;
 
   private heroesModel = signal<HeroPick[]>(
     STARTING_HERO_NAMES.map((name) => ({ name, jobId: '' as JobId })),

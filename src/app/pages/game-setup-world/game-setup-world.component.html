@@ -49,18 +49,14 @@
                 </div>
 
                 @if (jobData) {
-                  <div class="grid grid-cols-4 md:grid-cols-5 gap-2 my-2">
-                    @for (stat of statOrder; track stat) {
-                      <div class="flex items-center gap-2 text-xs">
-                        <app-icon-stat [stat]="stat" />
-                        <span class="inline-block min-w-[28px]">
-                          {{ statShorthand[stat] }}
-                        </span>
-                        <span class="tabular-nums">
-                          {{ jobData.baseStats[stat] | statDisplay: 0 : false }}
-                        </span>
-                      </div>
-                    }
+                  <div class="my-2">
+                    <app-row-item-stats
+                      [containerClasses]="['grid', 'grid-cols-5', 'gap-2']"
+                      [stats]="jobData.baseStats"
+                      layout="row"
+                      [maxDecimals]="0"
+                      [showSign]="false"
+                    />
                   </div>
                 }
 

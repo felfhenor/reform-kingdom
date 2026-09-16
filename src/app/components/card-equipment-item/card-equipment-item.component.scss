@@ -24,14 +24,6 @@
   @apply text-base font-semibold whitespace-nowrap overflow-hidden text-ellipsis;
 }
 
-.equipment-item-row-stats {
-  @apply flex flex-wrap gap-4 text-sm overflow-hidden;
-}
-
-.equipment-item-row-stat {
-  @apply flex items-center gap-1;
-}
-
 // Very small inline rendering of a granted skill's icon next to "Teaches" -
 // shrinks the shared 64px icon-blank-slot box down via scale.
 .equipment-item-row-granted-skill-icon {

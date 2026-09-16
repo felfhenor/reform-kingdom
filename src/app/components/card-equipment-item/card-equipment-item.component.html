@@ -24,20 +24,13 @@
       {{ displayName() }}
     </span>
 
-    <span class="equipment-item-row-stats">
-      @for (stat of rowStatKeys(); track stat) {
-        @let equipStatValue = totalStatValue(stat);
-
-        <span
-          class="equipment-item-row-stat"
-          [class.text-value-positive]="bonusStats()[stat] > 0"
-          [class.text-value-negative]="bonusStats()[stat] < 0"
-        >
-          <app-icon-stat [stat]="stat" />
-          <span>{{ equipStatValue | statDisplay: 1 }}</span>
-        </span>
-      }
-    </span>
+    <app-row-item-stats
+      [stats]="equipment().baseStats"
+      [bonusStats]="bonusStats()"
+      layout="row"
+      [showShorthand]="false"
+      [maxDecimals]="1"
+    />
   </span>
 </button>
 
