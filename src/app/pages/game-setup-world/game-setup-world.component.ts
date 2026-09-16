@@ -25,10 +25,36 @@ import { rngChoiceIdentifiable } from '@helpers/rng';
 import type { JobContent, JobId } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { sortBy } from 'es-toolkit/compat';
+import { sampleSize, sortBy } from 'es-toolkit/compat';
 
 const STARTING_JOB_NAMES = ['Warrior', 'Magician', 'Healer', 'Ranger'];
-const STARTING_HERO_NAMES = ['Jala', 'Spoorle', 'Jacks', 'Pertil'];
+const STARTING_HERO_NAMES = [
+  'Jala',
+  'Spoorle',
+  'Jacks',
+  'Pertil',
+  'Matango',
+  'Chaed',
+  'Loen',
+  'Feysac',
+  'Guy',
+  'Artea',
+  'Cecil',
+  'Talinar',
+  'Koss',
+  'Regas',
+  'Drevigo',
+  'Ashur',
+  'Klein',
+  'Spoodles',
+  'Leon',
+  'Laeticia',
+  'Sophia',
+  'Moore',
+  'Wendel',
+  'Gaur',
+  'Jad',
+];
 
 type HeroPick = {
   name: string;
@@ -63,7 +89,10 @@ export class GameSetupWorldComponent implements OnInit {
   );
 
   private heroesModel = signal<HeroPick[]>(
-    STARTING_HERO_NAMES.map((name) => ({ name, jobId: '' as JobId })),
+    sampleSize(STARTING_HERO_NAMES, 4).map((name) => ({
+      name,
+      jobId: '' as JobId,
+    })),
   );
 
   public partyForm = form(this.heroesModel, (heroes) => {
@@ -102,13 +131,16 @@ export class GameSetupWorldComponent implements OnInit {
     return getEntry<JobContent>(jobId);
   }
 
-  public randomizeJobs() {
+  public randomize() {
     const jobs = this.unlockedJobs();
     if (jobs.length === 0) return;
 
+    const names = sampleSize(STARTING_HERO_NAMES, 4);
+
     this.heroesModel.update((heroes) =>
-      heroes.map((hero) => ({
+      heroes.map((hero, i) => ({
         ...hero,
+        name: names[i],
         jobId: (rngChoiceIdentifiable(jobs) ?? hero.jobId) as JobId,
       })),
     );
