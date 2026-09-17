@@ -1,7 +1,10 @@
 import { Component, computed } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { getEntry } from '@helpers/content/content';
-import { getMaterialQuantity } from '@helpers/item/materials';
+import {
+  getMaterialQuantity,
+  isMaterialDiscovered,
+} from '@helpers/item/materials';
 import type { ItemContent } from '@interfaces';
 
 @Component({
@@ -12,10 +15,12 @@ import type { ItemContent } from '@interfaces';
 export class BarResourceComponent {
   public resources = computed(() => {
     const goldCoinEntry = getEntry<ItemContent>('Gold Coin')!;
+    const crimsonLucre = getEntry<ItemContent>('Crimson Lucre')!;
 
     return [
       { itemRef: goldCoinEntry, total: getMaterialQuantity(goldCoinEntry.id) },
-    ];
+      { itemRef: crimsonLucre, total: getMaterialQuantity(crimsonLucre.id) },
+    ].filter((r) => isMaterialDiscovered(r.itemRef.id));
   });
 
   public areAnyGreaterThanZero = computed(() => {
