@@ -1,0 +1,215 @@
+- id: eb61005a-96c4-4378-b206-717e3045fea7
+  name: Elven Slash
+  description: A clearcutting field where elves gather wood en masse to support their excessive crafting and building operations.
+
+  levelRange:
+    min: 32
+    max: 33
+
+  workerLevelRange:
+    min: 18
+    max: 24
+
+  xpGainedIfInLevelRange: 15
+  gatherTime: 25
+
+  levelCost:
+    - costs:
+        - itemId: Crimson Lucre
+          required: 1000
+
+        - itemId: Elven Wood
+          required: 100
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 2500
+
+        - itemId: Elven Corewood
+          required: 100
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 5000
+
+        - itemId: Elven Corewood
+          required: 100
+
+        - itemId: Strong Spider Silk
+          required: 50
+
+  gatherResults:
+    # level 1
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Wood
+          quantity: 1
+
+        - itemId: Elven Corewood
+          quantity: 1
+
+    # level 2
+    - chance: 3
+      levelRequirement: 1
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Wood
+          quantity: 2
+
+        - itemId: Elven Corewood
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Corewood
+          quantity: 4
+
+    # level 3
+    - chance: 3
+      levelRequirement: 2
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Wood
+          quantity: 3
+
+        - itemId: Elven Corewood
+          quantity: 4
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Corewood
+          quantity: 6
+
+- id: 8fdca3eb-c076-406b-ac59-04c01ff40461
+  name: Elfheim Royal Mines
+  description: Ruled by the marquis of Elfheim, these mines are always busy gathering ore to support Elfheim.
+
+  levelRange:
+    min: 33
+    max: 34
+
+  workerLevelRange:
+    min: 20
+    max: 26
+
+  xpGainedIfInLevelRange: 20
+  gatherTime: 15
+
+  levelCost:
+    - costs:
+        - itemId: Crimson Lucre
+          required: 500
+
+        - itemId: Crimson Ore
+          required: 50
+
+        - itemId: Gold Ore
+          required: 25
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 1500
+
+        - itemId: Crimson Ingot
+          required: 50
+
+        - itemId: Gold Ingot
+          required: 25
+
+        - itemId: Elven Wood
+          required: 100
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 3000
+
+        - itemId: Demon Horn
+          required: 25
+
+        - itemId: Bat Wing
+          required: 25
+
+        - itemId: Elven Corewood
+          required: 100
+
+  gatherResults:
+    # level 1
+    - chance: 3
+      levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Crimson Ore
+          quantity: 1
+
+    - chance: 2
+      levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Gold Ore
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Crimson Ore
+          quantity: 1
+
+        - itemId: Gold Ore
+          quantity: 1
+
+    # level 2
+    - chance: 3
+      levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Crimson Ore
+          quantity: 2
+
+    - chance: 2
+      levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Gold Ore
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Crimson Ore
+          quantity: 2
+
+        - itemId: Gold Ore
+          quantity: 2
+
+    # level 3
+    - chance: 3
+      levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Crimson Ore
+          quantity: 3
+
+    - chance: 2
+      levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Gold Ore
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Crimson Ore
+          quantity: 3
+
+        - itemId: Gold Ore
+          quantity: 3
