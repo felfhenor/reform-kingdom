@@ -16,8 +16,7 @@
 
             <app-icon
               name="gameHelp"
-              size="inline"
-              class="zoom-tooltip text-lighter"
+              class="text-lighter"
               [tp]="'Auto mode will execute your Decree (seen below). This lets you automate certain aspects of gameplay. By default, it will only go to your kingdom and heal you. You can make it do more by adding Clauses to your Decree.'"
               [tpPlacement]="'top'"
             />
@@ -248,6 +247,14 @@
           >
             Cancel
           </button>
+        }
+
+        @if (draftType() === 'LevelUpParty') {
+          <app-icon
+            name="gameHelp"
+            class="text-lighter"
+            [tp]="'Your party will explore nodes that match the specified difficulty. If they fail enough times, they will go to an easier node. They will do this until they get to the easiest node that still gives them XP. If there are none, this clause will be skipped.'"
+          />
         }
 
         @if (!isEditing() && isClauseCapReached()) {
