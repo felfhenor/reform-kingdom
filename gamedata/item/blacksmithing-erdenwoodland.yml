@@ -1,0 +1,27 @@
+- id: 47c4ae43-de49-4962-8bb1-525e6d4c8765
+  name: Crimson Ore
+  description: A blood-red chunk of ore. It comes with many impurities that must be removed during the refinement process.
+  rarity: Common
+
+  sprite: '0065'
+
+- id: e6ad7119-5e83-4534-9983-d1875894c833
+  name: Crimson Ingot
+  description: A deep crimson ingot, glowing and pulsing as if it has a life of its own.
+  rarity: Uncommon
+
+  sprite: '0066'
+
+- id: 0c02cbea-7fa0-4e0c-b44e-eff66d2a9d3f
+  name: Gold Ore
+  description: A raw chunk of unrefined gold. It holds no value until it's properly refined.
+  rarity: Common
+
+  sprite: '0063'
+
+- id: d7d285a3-3812-4866-86c6-bd24cd2384a7
+  name: Gold Ingot
+  description: A sparkling, radiant ingot of pure gold.
+  rarity: Uncommon
+
+  sprite: '0064'

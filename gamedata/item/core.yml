@@ -5,6 +5,13 @@
 
   sprite: '0000'
 
+- id: b598a008-a538-4089-ab60-a7382bd0d795
+  name: Crimson Lucre
+  description: A currency used primarily by elves. As a mix of two valuable materials, it's extremely valuable.
+  rarity: Uncommon
+
+  sprite: '0067'
+
 - id: b59b89fa-063a-49d6-b3c4-6a6cd9a05d92
   name: Trader Scrip
   description: Earned by fulfilling caravan commissions. Traders will universally take these and exchange some of their most prized possessions.

@@ -32,3 +32,14 @@
 - id: 21755fe5-4c56-4967-9b9e-9eec98768250
   name: Larsian Traverse
   description: A caveway that helps travelers get from the Craggled Mire to the Larsian Desert.
+
+- id: 87914c7b-614c-4852-8aad-84f9997fe509
+  name: Elfway Entrance
+  description: A teleportation circle hidden deep within the elven woods. Without help, it'd be impossible to find.
+
+  invisibleUntilCollectibleIdsFound:
+    - Elven Satchel
+
+- id: 07a664f1-597b-4861-90d2-1f0ec395d79c
+  name: Elfway Exit
+  description: A teleportation circle leading to Carrina from the Erden Woodland.

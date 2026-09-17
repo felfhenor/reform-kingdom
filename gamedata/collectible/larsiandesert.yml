@@ -26,9 +26,9 @@
       value: 1
 
 - id: 45ca2ac3-d748-4976-8676-cb0d29192934
-  name: Adventurer's Satchel
+  name: Elven Satchel
   rarity: Uncommon
-  description: A small satchel filled with water, rations, and other simple adventuring goods. It doesn't do anyone any good left in the desert.
+  description: A small elven satchel filled with water, rations, and other simple adventuring goods. It doesn't do anyone any good left in the desert.
   sprite: '0043'
 
   effects:

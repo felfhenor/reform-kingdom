@@ -1,0 +1,53 @@
+- id: 5fea89ba-17fd-43b3-95e4-f924b3a11d59
+  name: Strong Spider Silk
+  description: A dense thread of silk taken from an Erden spider. It has an immense amount of tensile strength!
+  rarity: Common
+
+  sprite: '0061'
+
+  infusionStats:
+    Agility: 3.6
+
+- id: 0468f598-4053-402b-9cb6-fab63ea484a1
+  name: Bat Wing
+  description: A dark wing taken from an Erden bat.
+  rarity: Uncommon
+
+  sprite: '0059'
+
+  infusionStats:
+    Intelligence: 2.2
+    Vitality: 1.1
+
+- id: 897f2762-8a76-4191-9f23-d6a0fa024863
+  name: Wolf Pelt
+  description: A wolf pelt taken from an Erden wolf. It's as stretchy as it is resilient.
+  rarity: Uncommon
+
+  sprite: '0058'
+
+  infusionStats:
+    Resitance: 2.4
+    Vitality: 1.9
+
+- id: 2f09811f-a4db-4ba0-aef4-903639d8fa85
+  name: Demon Horn
+  description: A horn taken from a demon. It's still sharp!
+  rarity: Uncommon
+
+  sprite: '0057'
+
+  infusionStats:
+    Stength: 2.1
+    Vitality: 1.2
+
+- id: 5bd71230-ee06-48eb-8565-cdd66d1ea981
+  name: Hawk Feather
+  description: A feather taken from an Erden hawk, often used by elves to move like the wind.
+  rarity: Uncommon
+
+  sprite: '0060'
+
+  infusionStats:
+    Agility: 2.3
+    Resistance: 1.7
