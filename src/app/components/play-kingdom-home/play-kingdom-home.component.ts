@@ -46,7 +46,6 @@ import type {
   Tradeskill,
   TradeskillContent,
 } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
 import { clamp, sortBy } from 'es-toolkit/compat';
 
@@ -59,7 +58,6 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     CardPageComponent,
     DecimalPipe,
     IconComponent,
-    TippyDirective,
     PluralizePipe,
     SFXDirective,
     BarProgressComponent,

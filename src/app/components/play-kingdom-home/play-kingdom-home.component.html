@@ -307,33 +307,5 @@
         </div>
       </div>
     </div>
-
-    <div class="card bg-base-200 shadow-sm">
-      <div class="card-body p-3 gap-2">
-        <h2 class="card-title text-base">Progression</h2>
-
-        <div class="flex flex-wrap gap-2">
-          <button
-            [disabled]="true"
-            class="btn btn-accent btn-sm"
-            [tp]="'Not yet available'"
-            (click)="openSubview('achievements')"
-          >
-            <app-icon name="gameMedal" size="inline" />
-            Achievements
-          </button>
-
-          <button
-            [disabled]="true"
-            class="btn btn-accent btn-sm"
-            [tp]="'Not yet available'"
-            (click)="openSubview('prestige')"
-          >
-            <app-icon name="gameCrown" size="inline" />
-            Prestige
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </app-card-page>
