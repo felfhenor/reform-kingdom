@@ -213,3 +213,105 @@
 
         - itemId: Gold Ore
           quantity: 3
+
+- id: 78ec4331-651a-46d0-8252-053959dc8939
+  name: Silkleaf Glade
+  description: A hidden glade where spider silk is often left behind for elves to collect.
+
+  hidden: true
+
+  levelRange:
+    min: 34
+    max: 35
+
+  workerLevelRange:
+    min: 19
+    max: 25
+
+  xpGainedIfInLevelRange: 15
+  gatherTime: 25
+
+  levelCost:
+    - costs:
+        - itemId: Crimson Lucre
+          required: 1000
+
+        - itemId: Weak Spider Silk
+          required: 50
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 2500
+
+        - itemId: Elven Corewood
+          required: 75
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 5000
+
+        - itemId: Elven Corewood
+          required: 100
+
+        - itemId: Hawk Feather
+          required: 50
+
+  gatherResults:
+    # level 1
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Corewood
+          quantity: 2
+
+    - chance: 2
+      levelRequirement: 0
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Weak Spider Silk
+          quantity: 2
+
+    # level 2
+    - chance: 2
+      levelRequirement: 1
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Corewood
+          quantity: 4
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Strong Spider Silk
+          quantity: 2
+
+    - chance: 2
+      levelRequirement: 1
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Weak Spider Silk
+          quantity: 3
+
+    # level 3
+    - chance: 2
+      levelRequirement: 2
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Elven Corewood
+          quantity: 6
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Strong Spider Silk
+          quantity: 3
+
+    - chance: 2
+      levelRequirement: 2
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Weak Spider Silk
+          quantity: 4
