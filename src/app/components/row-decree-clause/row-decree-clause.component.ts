@@ -7,6 +7,7 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
@@ -32,7 +33,13 @@ const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   selector: 'app-row-decree-clause',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
-  imports: [AtlasImageComponent, TippyDirective, SFXDirective, DecimalPipe],
+  imports: [
+    AtlasImageComponent,
+    TippyDirective,
+    SFXDirective,
+    DecimalPipe,
+    IconComponent,
+  ],
   templateUrl: './row-decree-clause.component.html',
 })
 export class RowDecreeClauseComponent {

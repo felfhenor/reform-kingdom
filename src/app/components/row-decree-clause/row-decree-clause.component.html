@@ -8,11 +8,22 @@
   </div>
 }
 
-<span class="flex-1 truncate" [class.opacity-50]="!clause().enabled">
+<span
+  class="flex-1 truncate flex items-center gap-2"
+  [class.opacity-50]="!clause().enabled"
+>
   {{ summary() }}
   @let owned = ownedQuantity();
   @if (owned !== undefined) {
     <span class="text-lighter italic">(you have {{ owned | number }})</span>
+  }
+
+  @if (clause().type === 'LevelUpParty') {
+    <app-icon
+      name="gameHelp"
+      class="text-lighter"
+      [tp]="'Your party will explore nodes that match the specified difficulty. If they fail enough times, they will go to an easier node. They will do this until they get to the easiest node that still gives them XP. If there are none, this clause will be skipped.'"
+    />
   }
 </span>
 
@@ -25,6 +36,8 @@
     !
   </span>
 }
+
+{{ clause().type }}
 
 <label class="label cursor-pointer label-checkbox">
   <input
