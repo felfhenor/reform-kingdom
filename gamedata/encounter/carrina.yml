@@ -507,8 +507,8 @@
   description: A waystation that leads to the Felway, the path towards Fel. It's infested with demons and their minions.
 
   levelRange:
-    min: 37
-    max: 40
+    min: 41
+    max: 44
 
   fights:
     - monsters:

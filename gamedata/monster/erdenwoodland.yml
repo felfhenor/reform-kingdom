@@ -1,0 +1,152 @@
+- id: 119d4b03-d812-4af6-81bd-0f314261886d
+  name: Woodspider
+  description: An intrepid spider that is usually found hitchhiking with Woodwolves. They cast a wide web and are particularly dangerous when fighting together.
+
+  types: [Insect]
+
+  sprite: '0124'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 50
+    max: 55
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Weak Spider Silk
+      min: 2
+      max: 4
+      chance: 75
+
+    - itemId: Strong Spider Silk
+      min: 1
+      max: 2
+      chance: 25
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Slow Web II
+      weight: 4
+    - skillId: Venom Bite II
+      weight: 2
+
+  baseStats:
+    Health: 200
+    Energy: 55
+    Luck: 1
+    Intelligence: 10
+    Strength: 25
+    Vitality: 10
+    Resistance: 10
+    Agility: 5
+
+  statsPerLevel:
+    Health: 3
+    Energy: 1
+    Luck: 0.05
+    Intelligence: 0.4
+    Strength: 0.7
+    Vitality: 0.1
+    Resistance: 0.3
+    Agility: 0.8
+
+- id: 6bf11f29-73af-4713-852d-65720ddb173b
+  name: Darkbat
+  description: A highly intelligent species of bat often utilized by elves for it's survivability and offensive capabilities.
+
+  types: [Beast]
+
+  sprite: '0120'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 45
+    max: 50
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Bat Wing
+      min: 1
+      max: 1
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+  baseStats:
+    Health: 300
+    Energy: 45
+    Luck: 5
+    Intelligence: 10
+    Strength: 15
+    Vitality: 25
+    Resistance: 10
+    Agility: 35
+
+  statsPerLevel:
+    Health: 2
+    Energy: 1
+    Luck: 0.05
+    Intelligence: 0.4
+    Strength: 0.6
+    Vitality: 0.8
+    Resistance: 0.3
+    Agility: 0.6
+
+- id: c7bc7139-2ad2-486b-839a-1e0a479cecdc
+  name: Woodwolf
+  description: A symbiotic pair with Woodspiders. They're particularly ferocious when they corner their prey.
+
+  types: [Beast]
+
+  sprite: '0128'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 55
+    max: 60
+    bonusPerLevel: 2
+
+  drops:
+    - itemId: Wolf Pelt
+      min: 1
+      max: 1
+      chance: 75
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+  baseStats:
+    Health: 350
+    Energy: 35
+    Luck: 1
+    Intelligence: 20
+    Strength: 25
+    Vitality: 20
+    Resistance: 25
+    Agility: 20
+
+  statsPerLevel:
+    Health: 6
+    Energy: 2
+    Luck: 0.1
+    Intelligence: 0.7
+    Strength: 0.5
+    Vitality: 0.4
+    Resistance: 0.6
+    Agility: 0.7
