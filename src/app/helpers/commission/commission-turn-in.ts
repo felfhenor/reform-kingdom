@@ -43,7 +43,7 @@ export function grantCommissionRewards(
   state: GameState,
   offer: CommissionOfferContent,
 ): void {
-  rollDroppedRewards(offer.rewards, 1).forEach((drop) =>
+  rollDroppedRewards(offer.rewards, 1, 0, state).forEach((drop) =>
     applyResolvedDropToState(state, drop),
   );
 }

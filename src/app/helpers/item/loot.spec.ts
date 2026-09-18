@@ -23,11 +23,16 @@ vi.mock('@helpers/hero/global-effects', () => ({
   globalEffectSums: vi.fn(),
 }));
 
+vi.mock('@helpers/content/content', () => ({
+  getEntry: vi.fn(),
+}));
+
 vi.mock('@helpers/hero/global-effect-state', () => ({
   recomputeGlobalEffectSums: vi.fn(),
 }));
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { getEntry } from '@helpers/content/content';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import {
   applyResolvedDropToState,
@@ -42,8 +47,10 @@ import type {
   GameState,
   GlobalEffectSums,
   ItemId,
+  RecipeContent,
   RecipeId,
   ResolvedDrop,
+  TradeskillId,
   WorkerId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
@@ -139,6 +146,57 @@ describe('Loot Helper Functions', () => {
           { recipeId: boneHewnCloakRecipeId, kind: 'Recipe' },
         ]);
       }
+    });
+
+    it('should still allow a recipe drop when its content cannot be resolved', () => {
+      vi.mocked(getEntry).mockReturnValueOnce(undefined);
+      const rewards: DroppedReward[] = [
+        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
+      ];
+
+      const drops = rollDroppedRewards(rewards, 5, 0, {} as GameState);
+
+      expect(drops).toEqual([
+        { recipeId: boneHewnCloakRecipeId, kind: 'Recipe' },
+      ]);
+    });
+
+    it('should filter out a recipe drop when the tradeskill level requirement is not met', () => {
+      const tradeskillId = 'artificing' as TradeskillId;
+      vi.mocked(getEntry).mockReturnValueOnce({
+        tradeskillId,
+        minTradeskillLevel: 5,
+      } as RecipeContent);
+      const state = {
+        tradeskills: { [tradeskillId]: { level: 4 } },
+      } as unknown as GameState;
+      const rewards: DroppedReward[] = [
+        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
+      ];
+
+      const drops = rollDroppedRewards(rewards, 5, 0, state);
+
+      expect(drops).toEqual([]);
+    });
+
+    it('should allow a recipe drop once the tradeskill level requirement is met', () => {
+      const tradeskillId = 'artificing' as TradeskillId;
+      vi.mocked(getEntry).mockReturnValueOnce({
+        tradeskillId,
+        minTradeskillLevel: 5,
+      } as RecipeContent);
+      const state = {
+        tradeskills: { [tradeskillId]: { level: 5 } },
+      } as unknown as GameState;
+      const rewards: DroppedReward[] = [
+        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
+      ];
+
+      const drops = rollDroppedRewards(rewards, 5, 0, state);
+
+      expect(drops).toEqual([
+        { recipeId: boneHewnCloakRecipeId, kind: 'Recipe' },
+      ]);
     });
 
     it('should always return a worker drop with no quantity when chance hits', () => {

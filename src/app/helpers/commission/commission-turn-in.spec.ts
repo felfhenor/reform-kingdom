@@ -133,7 +133,7 @@ describe('grantCommissionRewards', () => {
 
     grantCommissionRewards(state, offer);
 
-    expect(rollDroppedRewards).toHaveBeenCalledWith(offer.rewards, 1);
+    expect(rollDroppedRewards).toHaveBeenCalledWith(offer.rewards, 1, 0, state);
     expect(applyResolvedDropToState).toHaveBeenCalledWith(state, {
       kind: 'Item',
       itemId: 'trader-token',

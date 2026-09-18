@@ -1,5 +1,7 @@
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
+import { getEntry } from '@helpers/content/content';
 import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
+import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
@@ -7,10 +9,12 @@ import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { addArmoryItems } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
+import { gamestate } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   DroppedReward,
   GameState,
+  RecipeContent,
   ResolvedCollectibleDrop,
   ResolvedDrop,
   ResolvedEquipmentDrop,
@@ -79,16 +83,31 @@ function resolveDrop(
   }
 }
 
+// A recipe below the player's current tradeskill level for it can't be crafted yet, so it shouldn't drop.
+function isRecipeUsable(drop: DroppedReward, state: GameState): boolean {
+  if (drop.kind !== 'Recipe') return true;
+
+  const recipe = getEntry<RecipeContent>(drop.recipeId);
+  if (!recipe) return true;
+
+  return (
+    tradeskillBuildingIn(state, recipe.tradeskillId).level >=
+    recipe.minTradeskillLevel
+  );
+}
+
 export function rollDroppedRewards(
   rewards: DroppedReward[],
   level: number,
   bonusChancePercent = 0,
+  state: GameState = gamestate(),
 ): ResolvedDrop[] {
   return rewards
     .filter(
       (drop) =>
         (drop.minLevel ?? 0) <= level &&
-        (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level,
+        (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level &&
+        isRecipeUsable(drop, state),
     )
     .map((drop) => resolveDrop(drop, level, bonusChancePercent))
     .filter((drop): drop is ResolvedDrop => !!drop);
