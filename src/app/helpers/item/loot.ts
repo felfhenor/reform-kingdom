@@ -1,6 +1,9 @@
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
+import {
+  applyRecipeDiscovery,
+  isRecipeTownUnique,
+} from '@helpers/crafting/recipes';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { globalEffectSums } from '@helpers/hero/global-effects';
@@ -83,9 +86,11 @@ function resolveDrop(
   }
 }
 
-// A recipe below the player's current tradeskill level for it can't be crafted yet, so it shouldn't drop.
+// A recipe the player can never personally craft (town-exclusive), or that's
+// below their current tradeskill level for it, isn't usable yet
 function isRecipeUsable(drop: DroppedReward, state: GameState): boolean {
   if (drop.kind !== 'Recipe') return true;
+  if (isRecipeTownUnique(drop.recipeId)) return false;
 
   const recipe = getEntry<RecipeContent>(drop.recipeId);
   if (!recipe) return true;

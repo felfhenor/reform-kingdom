@@ -102,7 +102,8 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
   {
     id: 'reciperewards',
     title: 'Recipe Rewards',
-    description: 'Every recipeId completion reward resolves to a real recipe.',
+    description:
+      'Every recipe reward (monster drop, encounter, raid, commission) resolves to a player-obtainable recipe.',
     category: 'Tradeskills & Recipes',
     strict: true,
     inputKeys: [],
@@ -112,7 +113,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'tradeskillxpgaps',
     title: 'Tradeskill XP Gaps',
     description:
-      'Every tradeskill has an unbroken XP path to its highest authored level.',
+      'Every tradeskill has an unbroken XP path to its highest level.',
     category: 'Tradeskills & Recipes',
     strict: true,
     inputKeys: [],

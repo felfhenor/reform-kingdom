@@ -25,6 +25,7 @@ vi.mock('@helpers/hero/global-effects', () => ({
 
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/hero/global-effect-state', () => ({
@@ -32,7 +33,7 @@ vi.mock('@helpers/hero/global-effect-state', () => ({
 }));
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { getEntry } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import {
   applyResolvedDropToState,
@@ -159,6 +160,19 @@ describe('Loot Helper Functions', () => {
       expect(drops).toEqual([
         { recipeId: boneHewnCloakRecipeId, kind: 'Recipe' },
       ]);
+    });
+
+    it('should filter out a recipe drop that is exclusively sold by a town', () => {
+      vi.mocked(getEntriesByType).mockReturnValueOnce([
+        { crafting: { uniqueRecipeIds: [boneHewnCloakRecipeId] } },
+      ] as never);
+      const rewards: DroppedReward[] = [
+        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
+      ];
+
+      const drops = rollDroppedRewards(rewards, 5, 0, {} as GameState);
+
+      expect(drops).toEqual([]);
     });
 
     it('should filter out a recipe drop when the tradeskill level requirement is not met', () => {
