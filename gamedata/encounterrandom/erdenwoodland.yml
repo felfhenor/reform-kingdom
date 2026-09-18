@@ -1,0 +1,44 @@
+- id: 89c773c3-b775-4237-8ae9-830f947a7171
+  name: Kor'ratha
+  description: A temple buried in the depths of the Erden Woodland. Elves come here to pray, and pursue all sorts of ritualistic endeavours.
+
+  levelRange:
+    min: 41
+    max: 42
+
+  encounterRange:
+    min: 2
+    max: 3
+
+  combatantRange:
+    min: 2
+    max: 4
+
+  creaturePool:
+    - monsterId: Lesser Fel Demon
+      weight: 1
+    - monsterId: Hawk
+      weight: 2
+    - monsterId: Darkbat
+      weight: 2
+    - monsterId: Woodspider
+      weight: 2
+    - monsterId: Woodwolf
+      weight: 2
+    - monsterId: Elf Scout
+      weight: 3
+    - monsterId: Elf Archer
+      weight: 3
+    - monsterId: Elf Druid
+      weight: 3
+    - monsterId: Elf Ritualist
+      weight: 3
+
+  completionRewards:
+    - collectibleId: Ritual Crown
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 23000
+      max: 25000
+      chance: 100

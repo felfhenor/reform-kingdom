@@ -1,0 +1,108 @@
+- id: 9d2e1a40-bf0b-4ed5-bcbc-58d59ed81d94
+  name: Spiderwolf Forest
+  description: Deceptively named, here is a place for spiders and wolves, but not a wolf/spider hybrid.
+  levelRange:
+    min: 32
+    max: 34
+
+  fights:
+    - monsters:
+        - monsterId: Woodspider
+        - monsterId: Woodwolf
+
+    - monsters:
+        - monsterId: Woodspider
+        - monsterId: Woodspider
+        - monsterId: Woodwolf
+
+    - monsters:
+        - monsterId: Woodspider
+        - monsterId: Woodspider
+        - monsterId: Woodwolf
+        - monsterId: Woodwolf
+
+  completionRewards:
+    - collectibleId: Woodwolf Skull
+      chance: 25
+
+- id: d3d0f964-ff09-481e-81ee-9470ac6c4e2b
+  name: Windwood Training
+  description: An elven training facility. Here, elves receive instruction on how to resist demonic influences and combat training most effective against them.
+  levelRange:
+    min: 33
+    max: 36
+
+  fights:
+    - monsters:
+        - monsterId: Elf Scout
+        - monsterId: Elf Druid
+        - monsterId: Darkbat
+    - monsters:
+        - monsterId: Elf Scout
+        - monsterId: Hawk
+        - monsterId: Elf Druid
+        - monsterId: Elf Archer
+    - monsters:
+        - monsterId: Elf Scout
+        - monsterId: Elf Druid
+        - monsterId: Elf Archer
+        - monsterId: Darkbat
+        - monsterId: Hawk
+
+  completionRewards:
+    - collectibleId: Weapon Claim Tag
+      chance: 25
+
+- id: 3c362132-eb38-483f-9670-60a91511ec62
+  name: Demonelf Hideaway
+  description: A small hideout for elves and demons that cohabitate and seek harmony with each other.
+  levelRange:
+    min: 35
+    max: 38
+
+  fights:
+    - monsters:
+        - monsterId: Lesser Fel Demon
+        - monsterId: Elf Druid
+        - monsterId: Darkbat
+
+    - monsters:
+        - monsterId: Lesser Fel Demon
+        - monsterId: Elf Ritualist
+        - monsterId: Elf Ritualist
+
+    - monsters:
+        - monsterId: Elf Ritualist
+        - monsterId: Elf Ritualist
+        - monsterId: Elf Druid
+
+  completionRewards:
+    - collectibleId: Outlaw Flag
+      chance: 25
+
+- id: 550e4813-163d-47a9-8467-1af243008eb8
+  name: Demon's Den
+  description: A twisted place of darkness, this cave is primarily inhabited by demons and the elves they corrupted.
+  levelRange:
+    min: 37
+    max: 40
+
+  fights:
+    - monsters:
+        - monsterId: Lesser Fel Demon
+        - monsterId: Lesser Fel Demon
+        - monsterId: Elf Ritualist
+
+    - monsters:
+        - monsterId: Lesser Fel Demon
+        - monsterId: Elf Ritualist
+        - monsterId: Darkbat
+
+    - monsters:
+        - monsterId: Elf Ritualist
+        - monsterId: Darkbat
+        - monsterId: Darkbat
+
+  completionRewards:
+    - collectibleId: Darkway Torch
+      chance: 25

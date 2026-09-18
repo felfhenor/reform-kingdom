@@ -150,3 +150,62 @@
     Vitality: 0.4
     Resistance: 0.6
     Agility: 0.7
+
+- id: c8cbbcdc-1160-473f-a7ca-512583830f03
+  name: Elf Ritualist
+  description: An elf that has been corrupted by dark, demonic magic. They're beyond saving.
+
+  types: [Humanoid, Demon]
+
+  sprite: '0132'
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 35
+    max: 45
+    bonusPerLevel: 2
+
+  drops:
+    - itemId: Elven Wood
+      min: 1
+      max: 2
+      chance: 100
+
+    - itemId: Elven Corewood
+      min: 1
+      max: 1
+      chance: 50
+
+    - itemId: Gold Coin
+      min: 25
+      max: 35
+      bonusPerLevel: 5
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+  baseStats:
+    Health: 95
+    Energy: 50
+    Luck: 1
+    Intelligence: 25
+    Strength: 5
+    Vitality: 15
+    Resistance: 30
+    Agility: 10
+
+  statsPerLevel:
+    Health: 10
+    Energy: 7
+    Luck: 0.5
+    Intelligence: 0.9
+    Strength: 0.25
+    Vitality: 0.6
+    Resistance: 0.55
+    Agility: 0.3
