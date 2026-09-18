@@ -50,6 +50,12 @@ export class SoundService {
   private hasInteracted = signal<boolean>(false);
   public allowAudioInteractions = this.hasInteracted.asReadonly();
 
+  private hasLoadedSFX = signal<boolean>(false);
+  private hasLoadedBGM = signal<boolean>(false);
+  public hasLoadedAudio = computed(
+    () => this.hasLoadedSFX() && this.hasLoadedBGM(),
+  );
+
   private lastBGMVolume = signal<number>(0);
 
   private bgmVolume = computed(() =>
@@ -124,6 +130,8 @@ export class SoundService {
     zipped.forEach(([name, buffer]) => {
       this.audioRefs[name as SFX] = buffer;
     });
+
+    this.hasLoadedSFX.set(true);
   }
 
   private async loadBGM() {
@@ -139,6 +147,8 @@ export class SoundService {
     zipped.forEach(([name, buffer]) => {
       this.audioRefs[name as BGM] = buffer;
     });
+
+    this.hasLoadedBGM.set(true);
   }
 
   private async loadSound(url: string) {

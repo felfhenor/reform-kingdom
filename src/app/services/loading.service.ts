@@ -3,6 +3,7 @@ import { loadingProgressCalculate } from '@helpers/engine/loading.ui';
 import { hasGameStateLoaded } from '@helpers/state-game';
 import { ContentService } from '@services/content.service';
 import { GamestateService } from '@services/gamestate.service';
+import { SoundService } from '@services/sound.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,7 @@ import { GamestateService } from '@services/gamestate.service';
 export class LoadingService {
   private contentService = inject(ContentService);
   private gamestateService = inject(GamestateService);
+  private soundService = inject(SoundService);
 
   public progress = computed(() =>
     loadingProgressCalculate([
@@ -22,6 +24,7 @@ export class LoadingService {
         isDone: this.contentService.hasLoadedArt(),
       },
       { label: 'Loading maps...', isDone: this.contentService.hasLoadedMaps() },
+      { label: 'Loading music...', isDone: this.soundService.hasLoadedAudio() },
       { label: 'Loading your save...', isDone: hasGameStateLoaded() },
       {
         label: 'Preparing your kingdom...',
