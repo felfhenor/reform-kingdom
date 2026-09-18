@@ -120,8 +120,7 @@ export class TutorialOverlayComponent {
       tutorialCheckAutoTrigger();
     });
 
-    // Restarts the settle timer every time the raw (unsettled) step changes - a new tutorial, a
-    // new step within one, or a different one picked via the corner icon all count.
+    // Restarts the settle timer whenever the raw (unsettled) step changes - new tutorial, new step, or a different one picked via the corner icon.
     effect((onCleanup) => {
       const raw = this.rawStepView();
       if (!raw) {

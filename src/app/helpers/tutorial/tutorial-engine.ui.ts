@@ -137,7 +137,8 @@ let hasCheckedViewBefore = false;
 let lastCheckedView: GamePlayView | undefined;
 let lastCheckedSubview: KingdomSubview | undefined;
 
-// Only the catalog-first pending tutorial is ever eligible, and (except the immediate game-start intro) only on an actual navigation transition, not merely sitting on a matching screen when it becomes eligible.
+// Matches the whole pending list, not just the catalog-first entry - landing on a screen should always show that screen's own tutorial, even if an unrelated one is still unseen elsewhere (catalog order only governs the corner icon's "next" suggestion).
+// Still requires an actual navigation transition (except the immediate game-start intro), not merely sitting on a matching screen when it becomes eligible.
 export function tutorialCheckAutoTrigger(): void {
   if (
     !isGameStateReady() ||
@@ -156,17 +157,17 @@ export function tutorialCheckAutoTrigger(): void {
   lastCheckedView = view;
   lastCheckedSubview = subview;
 
-  const next = tutorialsPending()[0];
-  if (!next) return;
+  const match = tutorialsPending().find((t) => {
+    const firstStep = t.steps[0];
+    return (
+      firstStep.view === view &&
+      (firstStep.view !== 'kingdom' || firstStep.subview === subview)
+    );
+  });
+  if (!match) return;
 
-  const firstStep = next.steps[0];
-  const matchesCurrentView =
-    firstStep.view === view &&
-    (firstStep.view !== 'kingdom' || firstStep.subview === subview);
-  if (!matchesCurrentView) return;
-
-  const firesImmediately = next.trigger.kind === 'game-start';
+  const firesImmediately = match.trigger.kind === 'game-start';
   if (!firesImmediately && !isNavigationTransition) return;
 
-  tutorialStart(next.id);
+  tutorialStart(match.id);
 }
