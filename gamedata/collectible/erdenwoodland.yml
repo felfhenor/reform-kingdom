@@ -1,0 +1,29 @@
+- id: 4d85742d-d12c-49f0-8004-a10a1df4459b
+  name: Woodwolf Skull
+  rarity: Common
+  description: A woodwolf skull picked clean by woodland inhabitants.
+  sprite: '0050'
+
+- id: 43ba9fed-f7f5-466b-903c-8dc490ee361b
+  name: Weapon Claim Tag
+  rarity: Common
+  description: A claim tag left behind by an elf who left their weapon behind and might want it back. Oops!
+  sprite: '0051'
+
+- id: 103bc0ba-24b1-4cc5-a7dd-26dd07e6ada5
+  name: Outlaw Flag
+  rarity: Common
+  description: A flag used by rebellious elves to find one another in the wild.
+  sprite: '0049'
+
+- id: 256c0b78-f2bd-4b98-9e74-1ea93cd7ecb2
+  name: Darkway Torch
+  rarity: Common
+  description: A torch taken from the walls of a demonic cave. It lights the way forward into the unknown.
+  sprite: '0052'
+
+- id: fd1cdfb2-393f-4a24-a90c-10a343af0b1a
+  name: Ritual Crown
+  rarity: Common
+  description: A crown worn by elves conducting rituals in sacred or demonic places.
+  sprite: '0053'
