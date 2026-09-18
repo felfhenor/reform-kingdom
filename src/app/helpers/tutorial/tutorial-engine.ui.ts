@@ -10,7 +10,10 @@ import {
 import { gameloopShouldRun } from '@helpers/gameloop';
 import { isGameStateReady } from '@helpers/state-game';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
-import { isTutorialSeen, tutorialMarkSeen } from '@helpers/tutorial/tutorial-seen';
+import {
+  isTutorialSeen,
+  tutorialMarkSeen,
+} from '@helpers/tutorial/tutorial-seen';
 import { tutorialTriggerSatisfied } from '@helpers/tutorial/tutorial-triggers.ui';
 import type {
   GamePlayView,
@@ -102,7 +105,10 @@ export async function tutorialAdvance(): Promise<void> {
     return;
   }
 
-  activeTutorial.set({ tutorialId: active.tutorialId, stepIndex: nextStepIndex });
+  activeTutorial.set({
+    tutorialId: active.tutorialId,
+    stepIndex: nextStepIndex,
+  });
   navigateToStep(tutorial.steps[nextStepIndex]);
 }
 
@@ -129,13 +135,15 @@ export function tutorialTargetUnregister(key: string): void {
 export function tutorialTargetRect(key: string): DOMRect | undefined {
   tutorialTargetRegistryVersion();
   const elementRef = tutorialTargets.get(key);
-  return (elementRef?.nativeElement as HTMLElement | undefined)?.getBoundingClientRect();
+  return (
+    elementRef?.nativeElement as HTMLElement | undefined
+  )?.getBoundingClientRect();
 }
 
 // Tracks the last-checked view/subview, to tell "just navigated here" apart from "was already sitting here" below.
 let hasCheckedViewBefore = false;
 let lastCheckedView: GamePlayView | undefined;
-let lastCheckedSubview: KingdomSubview | undefined;
+let lastCheckedSubview: KingdomSubview | string;
 
 // Matches the whole pending list, not just the catalog-first entry - landing on a screen should always show that screen's own tutorial, even if an unrelated one is still unseen elsewhere (catalog order only governs the corner icon's "next" suggestion).
 // Still requires an actual navigation transition (except the immediate game-start intro), not merely sitting on a matching screen when it becomes eligible.

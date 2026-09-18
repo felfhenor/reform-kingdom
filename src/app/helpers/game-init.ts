@@ -1,3 +1,4 @@
+import { kingdomSubviewClear, setGamePlayView } from '@helpers/engine/ui';
 import { grantStartingGold } from '@helpers/item/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { setupFinish } from '@helpers/setup';
@@ -30,4 +31,7 @@ export function gameReset(): void {
   // The pause option lives outside game state (it's a persisted user
   // option), so a paused prior session would otherwise carry over here.
   setOption('gameloopPaused', false);
+
+  setGamePlayView('world');
+  kingdomSubviewClear();
 }

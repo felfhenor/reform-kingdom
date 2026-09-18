@@ -37,9 +37,9 @@ export function setGamePlayView(view: GamePlayView): void {
   gamePlayView.set(view);
 }
 
-export const kingdomSubview = localStorageSignal<KingdomSubview | undefined>(
+export const kingdomSubview = localStorageSignal<KingdomSubview | string>(
   'kingdomSubview',
-  undefined,
+  '',
 );
 
 export function kingdomSubviewShow(subview: KingdomSubview): void {
@@ -47,7 +47,7 @@ export function kingdomSubviewShow(subview: KingdomSubview): void {
 }
 
 export function kingdomSubviewClear(): void {
-  kingdomSubview.set(undefined);
+  kingdomSubview.set('');
 }
 
 const TRADESKILL_SUBVIEWS: Record<Tradeskill, KingdomSubview> = {
