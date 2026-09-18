@@ -7,7 +7,10 @@
 @let materials = infusionMaterials();
 @let modifiable = equipmentModifiable();
 
-<app-card-page heightProfile="full" appTutorialTarget="kingdom-subview-infusion">
+<app-card-page
+  heightProfile="full"
+  appTutorialTarget="kingdom-subview-infusion"
+>
   <span header class="flex items-center gap-2">
     Infusion
     @if (!modifiable) {
@@ -70,9 +73,16 @@
                   spritesheet="equipment"
                 ></app-slot-rarity-outline>
 
-                <span class="text-sm text-{{ equippedContent.rarity }}">
-                  {{ displayNameFor(equippedItem, equippedContent) }}
-                </span>
+                <div class="flex flex-col">
+                  <span class="text-sm text-{{ equippedContent.rarity }}">
+                    {{ displayNameFor(equippedItem, equippedContent) }}
+                  </span>
+
+                  <span class="text-lighter italic">
+                    {{ equippedContent.slotsTaken }}/{{ equippedContent.slots }}
+                    infusion slots used
+                  </span>
+                </div>
               </button>
             }
           }

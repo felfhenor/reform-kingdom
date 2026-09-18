@@ -175,8 +175,14 @@ export class PlayKingdomInfusionComponent {
 
   public equipmentContentFor(
     item: EquipmentItem,
-  ): EquipmentContent | undefined {
-    return getEntry<EquipmentContent>(item.equipmentId);
+  ): (EquipmentContent & { slotsTaken: number }) | undefined {
+    const eq = getEntry<EquipmentContent>(item.equipmentId);
+    if (!eq) return undefined;
+
+    return {
+      ...eq,
+      slotsTaken: item.infusedItemIds.filter(Boolean).length,
+    };
   }
 
   public displayNameFor(
