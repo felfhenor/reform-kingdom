@@ -3,10 +3,10 @@
 @let items = pickerItems();
 @let modifiable = equipmentModifiable();
 
-<div class="flex flex-col gap-3 items-center overflow-y-auto">
+<div class="flex flex-col gap-3 ps-2 overflow-y-auto">
   <div class="flex items-center justify-between w-full">
     <span class="font-semibold text-xl flex items-center gap-2">
-      Equipment
+      Gear
       @if (!modifiable) {
         <app-icon
           name="gameCrossedSwords"
@@ -17,6 +17,7 @@
         />
       }
     </span>
+
     <button
       type="button"
       class="btn btn-xs btn-primary"
@@ -30,9 +31,9 @@
     </button>
   </div>
 
-  @for (row of paperdollRows; track $index) {
-    @if (rowHasVisibleSlot(row)) {
-      <div class="flex gap-4">
+  <div class="flex flex-col gap-4">
+    @for (row of paperdollRows; track $index) {
+      @if (rowHasVisibleSlot(row)) {
         @for (slot of row; track slot) {
           @if (isSlotVisible(slot)) {
             <app-slot-equipment
@@ -44,9 +45,9 @@
             />
           }
         }
-      </div>
+      }
     }
-  }
+  </div>
 </div>
 
 <div class="flex flex-col gap-2 h-full min-h-0">
