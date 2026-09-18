@@ -6,6 +6,79 @@
 
   level: 25
 
+  materialThresholds:
+    - itemId: Gold Coin
+      maxQuantity: 25000
+
+    - itemId: Cactspine
+      maxQuantity: 300
+      value: 30
+      sellAtQuantity: 200
+
+    - itemId: Petrifiwood
+      maxQuantity: 300
+      value: 25
+      sellAtQuantity: 200
+
+    - itemId: Firmwater
+      maxQuantity: 300
+      # they will never sell firmwater
+
+    - itemId: Timberfuzz
+      maxQuantity: 300
+      value: 35
+      sellAtQuantity: 200
+
+    - itemId: Strongreed
+      maxQuantity: 300
+      value: 50
+      sellAtQuantity: 200
+
+    - itemId: Amber
+      maxQuantity: 200
+      value: 40
+      sellAtQuantity: 125
+
+    - itemId: Brightwisp Core
+      maxQuantity: 50
+      value: 300
+      sellAtQuantity: 30
+
+    - itemId: Cimmerian Dust
+      maxQuantity: 50
+      value: 600
+      sellAtQuantity: 30
+
+    - itemId: Preserved Bloodmoth
+      maxQuantity: 50
+      value: 350
+      sellAtQuantity: 30
+
+    - itemId: Cimmerian Fire Charm
+      maxQuantity: 5
+      value: 4000
+      sellAtQuantity: 4
+
+    - itemId: Cimmerian Water Charm
+      maxQuantity: 5
+      value: 3500
+      sellAtQuantity: 4
+
+    - itemId: Cimmerian Holy Charm
+      maxQuantity: 5
+      value: 6000
+      sellAtQuantity: 4
+
+    - itemId: Cimmerian Lightning Charm
+      maxQuantity: 5
+      value: 5000
+      sellAtQuantity: 4
+
+    - itemId: Cimmerian Skull Charm
+      maxQuantity: 5
+      value: 3000
+      sellAtQuantity: 4
+
   crafting:
     maxQueueSize:
       - tier: 0
@@ -73,52 +146,6 @@
   gathering:
     gatherRateMultiplier: 5
     goldGatheredPerMaterial: 5
-
-    materialThresholds:
-      - itemId: Gold Coin
-        maxQuantity: 25000
-
-      - itemId: Cactspine
-        maxQuantity: 300
-
-      - itemId: Petrifiwood
-        maxQuantity: 300
-
-      - itemId: Brightwisp Core
-        maxQuantity: 300
-
-      - itemId: Firmwater
-        maxQuantity: 300
-
-      - itemId: Timberfuzz
-        maxQuantity: 300
-
-      - itemId: Strongreed
-        maxQuantity: 300
-
-      - itemId: Amber
-        maxQuantity: 300
-
-      - itemId: Cimmerian Dust
-        maxQuantity: 300
-
-      - itemId: Preserved Bloodmoth
-        maxQuantity: 300
-
-      - itemId: Cimmerian Fire Charm
-        maxQuantity: 5
-
-      - itemId: Cimmerian Water Charm
-        maxQuantity: 5
-
-      - itemId: Cimmerian Holy Charm
-        maxQuantity: 5
-
-      - itemId: Cimmerian Lightning Charm
-        maxQuantity: 5
-
-      - itemId: Cimmerian Skull Charm
-        maxQuantity: 5
 
     workers:
       - workerId: Darwin Nork

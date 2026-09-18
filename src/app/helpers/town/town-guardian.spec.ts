@@ -30,6 +30,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     invisibleUntilCollectibleIdsFound: [],
     scaleType: 'City',
     level: 25,
+    materialThresholds: [],
     crafting: {
       maxQueueSize: [{ tier: 0, value: 1 }],
       specialtyTradeskillId: 'jewelcrafting' as never,
@@ -47,7 +48,6 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     gathering: {
       gatherRateMultiplier: 1,
       goldGatheredPerMaterial: 0,
-      materialThresholds: [],
       workers: [],
     },
     reputation: { buff: { globalEffectId: 'unknown' as never, tiers: [] } },

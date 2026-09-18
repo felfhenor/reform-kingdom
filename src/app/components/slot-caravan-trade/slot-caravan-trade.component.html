@@ -5,8 +5,8 @@
   <div preview-footer class="mt-2 italic text-center">
     {{
       isPartyBuying()
-        ? 'This caravan is selling this item to you.'
-        : 'This caravan is buying this item from you.'
+        ? 'This ' + merchantLabel() + ' is selling this item to you.'
+        : 'This ' + merchantLabel() + ' is buying this item from you.'
     }}
   </div>
 </app-tooltip-item-preview>

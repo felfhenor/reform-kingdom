@@ -25,7 +25,7 @@ function buildTown(
 ): TownContent {
   return {
     id: townId,
-    gathering: { materialThresholds },
+    materialThresholds,
   } as unknown as TownContent;
 }
 

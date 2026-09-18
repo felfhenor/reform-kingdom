@@ -13,6 +13,7 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { modalOpen } from '@helpers/engine/modal-stack';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { townStockPrice } from '@helpers/town/shop/town-price';
@@ -70,6 +71,10 @@ export class PanelTownShopComponent {
       };
     });
   });
+
+  public openMaterialsModal(): void {
+    modalOpen('town-materials');
+  }
 
   public stockEntryName(entry: TownStockEntry): string {
     return townStockDisplay(entry)?.name ?? 'Unknown Item';

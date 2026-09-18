@@ -234,7 +234,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'townmaterialthresholds',
     title: 'Town Material Thresholds',
     description:
-      "Every item a town's assigned commissions request has a materialThresholds entry for that town.",
+      "Every item a town's assigned commissions request has a materialThresholds entry for that town, and every sellable material's sellAtQuantity is below its maxQuantity.",
     category: 'Caravans & Commissions',
     strict: true,
     inputKeys: [],

@@ -242,6 +242,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     description: 'A town at the edge of the forest.',
     scaleType: 'Outpost',
     level: 5,
+    materialThresholds: [],
     crafting: {
       maxQueueSize: [{ tier: 0, value: 1 }],
       specialtyTradeskillId: 'UNKNOWN' as never,
@@ -259,7 +260,6 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     gathering: {
       gatherRateMultiplier: 1,
       goldGatheredPerMaterial: 0,
-      materialThresholds: [],
       workers: [],
     },
     reputation: {

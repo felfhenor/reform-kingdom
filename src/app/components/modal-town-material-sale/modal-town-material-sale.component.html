@@ -1,0 +1,39 @@
+<app-modal
+  modalId="town-materials"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+>
+  <span title>{{ town()?.name ?? 'Town' }} Material Sales</span>
+
+  <div body class="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-2">
+    @for (row of rows(); track row.index) {
+      <app-slot-caravan-trade
+        [row]="row"
+        merchantLabel="town"
+        (activate)="requestTrade(row)"
+      />
+    } @empty {
+      <div class="text-sm text-lighter">
+        This town has nothing to sell right now.
+      </div>
+    }
+  </div>
+</app-modal>
+
+<swal
+  #confirmSwal
+  icon="question"
+  confirmButtonText="Yes"
+  cancelButtonText="Cancel"
+  (confirm)="confirmSingle()"
+></swal>
+
+<swal
+  #quantitySwal
+  icon="question"
+  input="number"
+  confirmButtonText="Confirm"
+  cancelButtonText="Cancel"
+  (confirm)="confirmQuantity($event)"
+></swal>

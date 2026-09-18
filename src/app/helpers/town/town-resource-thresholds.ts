@@ -16,7 +16,7 @@ export function townMaterialThresholdHash(
   if (cached) return cached;
 
   const hash: TownMaterialThresholdHash = {};
-  town.gathering.materialThresholds.forEach((threshold) => {
+  town.materialThresholds.forEach((threshold) => {
     hash[threshold.itemId] = threshold.maxQuantity;
   });
 

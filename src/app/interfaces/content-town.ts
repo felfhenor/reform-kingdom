@@ -65,6 +65,10 @@ export type TownGatheringWorker = {
 export type TownMaterialThreshold = {
   itemId: ItemId;
   maxQuantity: number;
+  // Base gold price before traders.markupPercentages.sell is applied. 0 (default) = not for sale
+  value: number;
+  // Town only sells this material once its coffers reach this quantity - ignored unless value > 0.
+  sellAtQuantity: number;
 };
 
 // A town's materialThresholds array flattened to a hash for O(1) per-item lookup.
@@ -74,7 +78,6 @@ export type TownGatheringConfig = {
   gatherRateMultiplier: number;
   // Hidden gold accrual rate: gold += goldGatheredPerMaterial per material gathered, capped via materialThresholds.
   goldGatheredPerMaterial: number;
-  materialThresholds: TownMaterialThreshold[];
   workers: TownGatheringWorker[];
 };
 
@@ -134,6 +137,8 @@ export type TownContent = IsContentItem &
 
     scaleType: TownScaleType;
     level: number;
+
+    materialThresholds: TownMaterialThreshold[];
 
     crafting: TownCraftingConfig;
     traders: TownTradersConfig;

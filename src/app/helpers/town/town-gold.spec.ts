@@ -12,11 +12,9 @@ const goldCoinItemId = 'gold-coin' as ItemId;
 
 function buildTown(goldRequiredBeforeCutoff = 1000): TownContent {
   return {
-    gathering: {
-      materialThresholds: [
-        { itemId: goldCoinItemId, maxQuantity: goldRequiredBeforeCutoff },
-      ],
-    },
+    materialThresholds: [
+      { itemId: goldCoinItemId, maxQuantity: goldRequiredBeforeCutoff },
+    ],
   } as unknown as TownContent;
 }
 

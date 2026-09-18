@@ -4,6 +4,7 @@ export type ModalId =
   | 'loot-filters'
   | 'reclass-heroes'
   | 'raid-defense'
+  | 'town-materials'
   | 'changelog'
   | 'pause-menu'
   | 'settings';

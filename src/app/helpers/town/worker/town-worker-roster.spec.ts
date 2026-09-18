@@ -31,10 +31,10 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     id: townId,
     name: 'Larsia',
     __type: 'town',
+    materialThresholds: [],
     gathering: {
       gatherRateMultiplier: 1,
       goldGatheredPerMaterial: 1,
-      materialThresholds: [],
       workers: [
         { workerId: darwinId, level: 1 },
         { workerId: talbotId, level: 2 },

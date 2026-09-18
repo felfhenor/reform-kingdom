@@ -29,6 +29,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class SlotCaravanTradeComponent {
   public row = input.required<CaravanTradeRow>();
+  public merchantLabel = input('caravan');
 
   public activate = output<void>();
 

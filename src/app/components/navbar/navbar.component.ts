@@ -6,6 +6,7 @@ import { ButtonSettingsComponent } from '@components/button-settings/button-sett
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalCaravanTradeComponent } from '@components/modal-caravan-trade/modal-caravan-trade.component';
+import { ModalTownMaterialSaleComponent } from '@components/modal-town-material-sale/modal-town-material-sale.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
@@ -64,6 +65,7 @@ import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/pane
     ButtonGlowComponent,
     BarResourceComponent,
     ModalCaravanTradeComponent,
+    ModalTownMaterialSaleComponent,
     PanelDebugButtonsComponent,
   ],
   templateUrl: './navbar.component.html',

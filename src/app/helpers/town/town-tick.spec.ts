@@ -54,6 +54,7 @@ const town: TownContent = {
   invisibleUntilCollectibleIdsFound: [],
   scaleType: 'City',
   level: 25,
+  materialThresholds: [],
   crafting: {
     maxQueueSize: [{ tier: 0, value: 12 }],
     specialtyTradeskillId: 'jewelcrafting' as never,
@@ -71,7 +72,6 @@ const town: TownContent = {
   gathering: {
     gatherRateMultiplier: 5,
     goldGatheredPerMaterial: 5,
-    materialThresholds: [],
     workers: [{ workerId: darwinId, level: 1 }],
   },
   reputation: {

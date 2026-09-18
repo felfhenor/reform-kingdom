@@ -99,6 +99,8 @@ function ensureTownMaterialThreshold(
   return {
     itemId: threshold.itemId ?? ('UNKNOWN' as ItemId),
     maxQuantity: threshold.maxQuantity ?? 0,
+    value: threshold.value ?? 0,
+    sellAtQuantity: threshold.sellAtQuantity ?? 0,
   };
 }
 
@@ -108,10 +110,6 @@ function ensureTownGathering(
   return {
     gatherRateMultiplier: gathering.gatherRateMultiplier ?? 1,
     goldGatheredPerMaterial: gathering.goldGatheredPerMaterial ?? 0,
-    materialThresholds: ensureArray(
-      gathering.materialThresholds,
-      ensureTownMaterialThreshold,
-    ),
     workers: ensureArray(gathering.workers, ensureTownGatheringWorker),
   };
 }
@@ -219,6 +217,10 @@ export function ensureTown(town: Partial<TownContent>): Required<TownContent> {
       town.invisibleUntilCollectibleIdsFound ?? [],
     scaleType: town.scaleType ?? 'Outpost',
     level: town.level ?? 1,
+    materialThresholds: ensureArray(
+      town.materialThresholds,
+      ensureTownMaterialThreshold,
+    ),
     crafting: ensureTownCrafting(town.crafting),
     traders: ensureTownTraders(town.traders),
     gathering: ensureTownGathering(town.gathering),
