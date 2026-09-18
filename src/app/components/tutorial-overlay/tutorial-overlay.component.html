@@ -1,0 +1,83 @@
+@if (stepView(); as view) {
+  @if (isReadyToRender()) {
+    @let rect = targetRect()!;
+    @let position = calloutPosition();
+
+    <div class="tutorial-backdrop">
+      <div
+        class="spot-frame"
+        [style.top.px]="0"
+        [style.height.px]="rect.top"
+        [style.left.px]="0"
+        [style.right.px]="0"
+      ></div>
+      <div
+        class="spot-frame"
+        [style.top.px]="rect.bottom"
+        [style.bottom.px]="0"
+        [style.left.px]="0"
+        [style.right.px]="0"
+      ></div>
+      <div
+        class="spot-frame"
+        [style.top.px]="rect.top"
+        [style.height.px]="rect.height"
+        [style.left.px]="0"
+        [style.width.px]="rect.left"
+      ></div>
+      <div
+        class="spot-frame"
+        [style.top.px]="rect.top"
+        [style.height.px]="rect.height"
+        [style.left.px]="rect.right"
+        [style.right.px]="0"
+      ></div>
+      <div
+        class="spot-outline"
+        [style.top.px]="rect.top"
+        [style.left.px]="rect.left"
+        [style.width.px]="rect.width"
+        [style.height.px]="rect.height"
+      ></div>
+
+      <div
+        class="tutorial-callout"
+        [style.top.px]="position.top"
+        [style.left.px]="position.left"
+      >
+        <p class="callout-title">{{ view.step.title }}</p>
+        <p class="callout-body">{{ view.step.body }}</p>
+        <div class="callout-footer">
+          <span class="callout-progress text-lighter">
+            @if (view.totalSteps !== 1) {
+              Step {{ view.stepIndex + 1 }} of {{ view.totalSteps }}
+            }
+          </span>
+          <div class="callout-actions">
+            @if (view.totalSteps !== 1) {
+              <button
+                type="button"
+                class="btn btn-xs btn-ghost"
+                (click)="skip()"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                Skip
+              </button>
+            }
+
+            <button
+              type="button"
+              class="btn btn-xs btn-primary"
+              (click)="next()"
+              appSfx="ui-success"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              {{ view.stepIndex + 1 === view.totalSteps ? 'Done' : 'Next' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

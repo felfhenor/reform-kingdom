@@ -45,6 +45,8 @@ import {
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
 import { pruneInvalidTowns } from '@helpers/town/town-tick';
+import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
+import { pruneInvalidTutorials } from '@helpers/tutorial/tutorial-seen';
 import {
   gamestate,
   gamestateTickEnd,
@@ -194,6 +196,9 @@ export function migrateGameState() {
   newState.discoveredWorkers = pruneInvalidDiscoveredWorkers(
     newState.discoveredWorkers,
     isWorkerContentKnown,
+  );
+  newState.tutorials = pruneInvalidTutorials(newState.tutorials, (id) =>
+    TUTORIAL_CATALOG.some((t) => t.id === id),
   );
   newState.workers = pruneInvalidWorkerStates(
     newState.workers,

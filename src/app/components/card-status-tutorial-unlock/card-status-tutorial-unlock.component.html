@@ -1,0 +1,25 @@
+@let isExpanded = expanded();
+@let data = entry();
+
+<div
+  class="status-entry select-none"
+  [class.expanded]="isExpanded"
+  role="button"
+  tabindex="0"
+  appButtonGlow
+  (click)="select()"
+  (keydown.enter)="select()"
+  appSfx="ui-click"
+  [sfxTrigger]="['click', 'hover']"
+>
+  <div class="entry-icon">
+    <app-icon name="gameHelp" size="nav" />
+  </div>
+
+  @if (isExpanded) {
+    <div class="entry-details">
+      <span class="entry-subtitle text-lighter">New feature unlocked</span>
+      <span class="entry-name truncate">{{ data.name }}</span>
+    </div>
+  }
+</div>

@@ -68,6 +68,7 @@ export function defaultGameState(): GameState {
     tradeskills: defaultTradeskills(),
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
+    tutorials: {},
   };
 }
 

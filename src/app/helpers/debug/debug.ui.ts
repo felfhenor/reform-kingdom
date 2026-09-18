@@ -1,3 +1,4 @@
+import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import {
   combatantsFromTownGuardians,
   combatCreateForEncounter,
@@ -40,6 +41,7 @@ import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation
 import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { townMarkVisited } from '@helpers/town/town-visit';
+import { tutorialUnmarkSeen } from '@helpers/tutorial/tutorial-seen';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
@@ -51,6 +53,7 @@ import {
 import {
   type AffixContent,
   type AffixId,
+  type CaravanId,
   type CharacterId,
   type CollectibleContent,
   type CollectibleId,
@@ -64,6 +67,7 @@ import {
   type TownContent,
   type TownId,
   type Tradeskill,
+  type TutorialId,
   type WorkerContent,
   type WorkerId,
 } from '@interfaces';
@@ -215,6 +219,17 @@ export function debugFillBestiary(): void {
 export function debugResetCommissions(): void {
   updateGamestate((state) => {
     state.world.commissions = {};
+    return state;
+  });
+}
+
+export function debugResetTutorial(tutorialId: TutorialId): void {
+  tutorialUnmarkSeen(tutorialId);
+}
+
+export function debugResetAllTutorials(): void {
+  updateGamestate((state) => {
+    state.tutorials = {};
     return state;
   });
 }
@@ -418,4 +433,12 @@ export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
     state.gatherNodeLevels[nodeName] = { level: clampedLevel };
     return state;
   });
+}
+
+export function debugMarkTownVisited(townId: TownId): void {
+  townMarkVisited(townId);
+}
+
+export function debugMarkCaravanVisited(caravanId: CaravanId): void {
+  caravanMarkVisited(caravanId);
 }

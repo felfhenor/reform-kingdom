@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotCommissionComponent } from '@components/slot-commission/slot-commission.component';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { commissionFulfill } from '@helpers/commission/commission-fulfill';
 import { commissionRowViewModel } from '@helpers/commission/commission-fulfill.ui';
 import { nextCommissionResetAt } from '@helpers/commission/commission-reset.ui';
@@ -25,6 +26,7 @@ import type {
     CardPageComponent,
     ButtonKingdomBackComponent,
     SlotCommissionComponent,
+    TutorialTargetDirective,
   ],
   templateUrl: './play-kingdom-commissions.component.html',
 })

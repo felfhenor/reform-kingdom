@@ -76,6 +76,7 @@ export * from './town-worker-state';
 export * from './tradeskill';
 export * from './traits';
 export * from './travel';
+export * from './tutorial';
 export * from './ui';
 export * from './worker-state';
 export * from './world-nodes';

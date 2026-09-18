@@ -454,6 +454,50 @@
           >
             Telegraph Raid
           </button>
+
+          <span></span>
+          <span></span>
+          <span></span>
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:MarkTownVisited"
+            (click)="markTownVisited()"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Mark Visited
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 foreground shadow-xl mt-3">
+      <div class="card-body">
+        <div class="card-title">Caravans</div>
+
+        <div class="debug-give-grid">
+          <span class="label-text text-right">Caravan</span>
+          <ng-select
+            class="debug-give-select"
+            [items]="debugCaravans()"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            placeholder="Select a caravan..."
+            [(ngModel)]="selectedCaravanId"
+          ></ng-select>
+          <span></span>
+          <button
+            type="button"
+            class="btn btn-secondary debug-give-btn"
+            appAnalyticsClick="Options:Debug:MarkCaravanVisited"
+            (click)="markCaravanVisited()"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Mark Visited
+          </button>
         </div>
       </div>
     </div>
@@ -481,6 +525,16 @@
           [sfxTrigger]="['click', 'hover']"
         >
           Reset Commissions
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning btn-sm"
+          appAnalyticsClick="Options:Debug:ResetAllTutorials"
+          (click)="resetAllTutorials()"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Reset All Tutorials
         </button>
         <button
           type="button"

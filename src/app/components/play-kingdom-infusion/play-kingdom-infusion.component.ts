@@ -16,6 +16,7 @@ import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-s
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
@@ -78,6 +79,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     TippyDirective,
     SlotRarityOutlineComponent,
     SFXDirective,
+    TutorialTargetDirective,
   ],
   templateUrl: './play-kingdom-infusion.component.html',
   styleUrl: './play-kingdom-infusion.component.scss',

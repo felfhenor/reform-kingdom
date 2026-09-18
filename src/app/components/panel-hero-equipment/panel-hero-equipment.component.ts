@@ -13,6 +13,7 @@ import { PanelHeroEquipmentEquipmentComponent } from '@components/panel-hero-equ
 import { PanelHeroEquipmentSkillsComponent } from '@components/panel-hero-equipment-skills/panel-hero-equipment-skills.component';
 import { PanelHeroEquipmentStatsComponent } from '@components/panel-hero-equipment-stats/panel-hero-equipment-stats.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { HideUntilLevelDirective } from '@directives/hide-until-level.directive';
 import { getEntry } from '@helpers/content/content';
 import type { Character, JobContent } from '@interfaces';
 
@@ -29,6 +30,7 @@ import type { Character, JobContent } from '@interfaces';
     ModalHeroCombatOrdersComponent,
     BarProgressComponent,
     SlotIconBlankComponent,
+    HideUntilLevelDirective,
   ],
   templateUrl: './panel-hero-equipment.component.html',
   styleUrl: './panel-hero-equipment.component.scss',

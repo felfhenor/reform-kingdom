@@ -113,6 +113,11 @@ export type GameStateWorldDiscoveries = {
   [key: string]: { foundAt: number };
 };
 
+// One-time ledger of tutorials already shown to the player.
+export type GameStateTutorials = {
+  [key: string]: { foundAt: number };
+};
+
 // `kills` keeps counting past the first kill (unlike other discovery slices) for the bestiary's running count. `minLevelFound`/`maxLevelFound` are actual fought levels, not encounter data's theoretical range.
 export type GameStateBestiary = {
   [key: MonsterId]: {
@@ -161,4 +166,5 @@ export type GameState = {
   tradeskills: GameStateTradeskills;
   discoveredAstralProjectorSpells: GameStateDiscoveredAstralProjectorSpells;
   activeAstralProjectorSpells: GameStateActiveAstralProjectorSpell[];
+  tutorials: GameStateTutorials;
 };

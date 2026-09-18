@@ -1,0 +1,62 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block;
+}
+
+.tutorial-backdrop {
+  @apply fixed inset-0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.spot-frame {
+  @apply absolute bg-black/70;
+  pointer-events: auto;
+}
+
+.spot-full {
+  @apply inset-0;
+}
+
+.spot-outline {
+  @apply absolute rounded pointer-events-none;
+  box-shadow: 0 0 0 3px rgb(251 191 36 / 90%);
+  transition:
+    top 150ms ease,
+    left 150ms ease,
+    width 150ms ease,
+    height 150ms ease;
+}
+
+.tutorial-callout {
+  @apply absolute bg-black/90 border border-black/50 rounded text-white;
+  width: 320px;
+  padding: 12px 14px;
+  pointer-events: auto;
+  transition:
+    top 150ms ease,
+    left 150ms ease;
+}
+
+.callout-title {
+  @apply font-semibold text-sm;
+}
+
+.callout-body {
+  @apply text-xs;
+  margin-top: 6px;
+}
+
+.callout-footer {
+  @apply flex items-center justify-between;
+  margin-top: 10px;
+}
+
+.callout-progress {
+  font-size: 0.7rem;
+}
+
+.callout-actions {
+  @apply flex gap-2;
+}

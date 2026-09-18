@@ -8,9 +8,11 @@ import { IconComponent } from '@components/icon/icon.component';
 import { ModalCaravanTradeComponent } from '@components/modal-caravan-trade/modal-caravan-trade.component';
 import { ModalTownMaterialSaleComponent } from '@components/modal-town-material-sale/modal-town-material-sale.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { HideUntilLevelDirective } from '@directives/hide-until-level.directive';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
 import {
   modalClose,
@@ -67,6 +69,8 @@ import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/pane
     ModalCaravanTradeComponent,
     ModalTownMaterialSaleComponent,
     PanelDebugButtonsComponent,
+    HideUntilLevelDirective,
+    TutorialTargetDirective,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',

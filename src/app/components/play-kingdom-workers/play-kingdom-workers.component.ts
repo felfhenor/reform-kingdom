@@ -15,6 +15,7 @@ import { OptionRewardComponent } from '@components/option-reward/option-reward.c
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
@@ -100,6 +101,7 @@ type EntryStatusDisplay = {
     TippyDirective,
     SlotIconBlankComponent,
     SFXDirective,
+    TutorialTargetDirective,
   ],
   templateUrl: './play-kingdom-workers.component.html',
   styleUrl: './play-kingdom-workers.component.scss',

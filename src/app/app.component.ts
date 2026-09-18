@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angul
 import { RouterOutlet } from '@angular/router';
 import { BannerAnalyticsConsentComponent } from '@components/banner-analytics-consent/banner-analytics-consent.component';
 import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
+import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { LoadingService } from '@services/loading.service';
 
@@ -13,6 +14,7 @@ import { LoadingService } from '@services/loading.service';
     ScreenLoadingComponent,
     TeleportOutletDirective,
     BannerAnalyticsConsentComponent,
+    TutorialOverlayComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

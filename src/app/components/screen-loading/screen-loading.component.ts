@@ -10,7 +10,7 @@ import { LoadingService } from '@services/loading.service';
     @let progress = loadingService.progress();
 
     <div
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-base-100 p-8"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-base-100 p-8 px-[30%]"
     >
       <span class="loading loading-spinner loading-lg text-primary"></span>
 

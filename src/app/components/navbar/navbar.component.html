@@ -13,6 +13,7 @@
           [hotkeys]="'1'"
           (hotkey)="hotkeyMatches($event, '1') && changeGamePlayView('kingdom')"
           isGlobal
+          appTutorialTarget="nav-kingdom"
         >
           Kingdom
         </button>
@@ -28,6 +29,7 @@
           [hotkeys]="'2'"
           (hotkey)="hotkeyMatches($event, '2') && changeGamePlayView('world')"
           isGlobal
+          appTutorialTarget="nav-world"
         >
           World
         </button>
@@ -43,6 +45,7 @@
           [hotkeys]="'3'"
           (hotkey)="hotkeyMatches($event, '3') && changeGamePlayView('heroes')"
           isGlobal
+          appTutorialTarget="nav-heroes"
         >
           Heroes
         </button>
@@ -60,6 +63,7 @@
             hotkeyMatches($event, '4') && changeGamePlayView('adventurelog')
           "
           isGlobal
+          appTutorialTarget="nav-adventurelog"
         >
           Adventure Log
         </button>
@@ -75,6 +79,8 @@
           [hotkeys]="'5'"
           (hotkey)="hotkeyMatches($event, '5') && changeGamePlayView('decree')"
           isGlobal
+          [appHideUntilLevel]="5"
+          appTutorialTarget="nav-decree"
         >
           Decree
         </button>

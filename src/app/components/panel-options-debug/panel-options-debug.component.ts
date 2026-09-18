@@ -17,7 +17,10 @@ import {
   debugGiveCollectible,
   debugGiveEquipment,
   debugGiveItem,
+  debugMarkCaravanVisited,
+  debugMarkTownVisited,
   debugRescueWorker,
+  debugResetAllTutorials,
   debugResetBestiary,
   debugResetCommissions,
   debugSetCharacterLevel,
@@ -33,6 +36,8 @@ import { partyGet } from '@helpers/hero/party';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type {
+  CaravanContent,
+  CaravanId,
   CharacterId,
   CollectibleContent,
   CollectibleId,
@@ -143,6 +148,11 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedTownId = signal<TownId | undefined>(undefined);
   public townReputationValue = signal<number>(0);
 
+  public debugCaravans = computed(() =>
+    sortBy(getEntriesByType<CaravanContent>('caravan'), (c) => c.name),
+  );
+  public selectedCaravanId = signal<CaravanId | undefined>(undefined);
+
   public giveItem(): void {
     const itemId = this.selectedItemId();
     if (!itemId) return;
@@ -184,6 +194,10 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public resetCommissions(): void {
     debugResetCommissions();
+  }
+
+  public resetAllTutorials(): void {
+    debugResetAllTutorials();
   }
 
   public fillBestiary(): void {
@@ -248,5 +262,19 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     if (!townId) return;
 
     debugTelegraphRaid(townId);
+  }
+
+  public markTownVisited(): void {
+    const townId = this.selectedTownId();
+    if (!townId) return;
+
+    debugMarkTownVisited(townId);
+  }
+
+  public markCaravanVisited(): void {
+    const caravanId = this.selectedCaravanId();
+    if (!caravanId) return;
+
+    debugMarkCaravanVisited(caravanId);
   }
 }

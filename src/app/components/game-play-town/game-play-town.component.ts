@@ -14,6 +14,7 @@ import { PanelTownQuestsComponent } from '@components/panel-town-quests/panel-to
 import { PanelTownRaidComponent } from '@components/panel-town-raid/panel-town-raid.component';
 import { PanelTownShopComponent } from '@components/panel-town-shop/panel-town-shop.component';
 import { PanelTownWorkersComponent } from '@components/panel-town-workers/panel-town-workers.component';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { activeTownNode, setGamePlayView } from '@helpers/engine/ui';
 
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
@@ -32,6 +33,7 @@ import { ContentService } from '@services/content.service';
     PanelTownWorkersComponent,
     PanelTownQuestsComponent,
     PanelTownRaidComponent,
+    TutorialTargetDirective,
   ],
   templateUrl: './game-play-town.component.html',
 })

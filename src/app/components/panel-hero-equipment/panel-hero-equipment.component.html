@@ -25,7 +25,10 @@
       </app-bar-progress>
     </div>
 
-    <app-button-hero-combat-orders [characterId]="char.id" />
+    <app-button-hero-combat-orders
+      [characterId]="char.id"
+      [appHideUntilLevel]="3"
+    />
   </div>
 
   <app-modal-hero-combat-orders />

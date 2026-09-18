@@ -112,8 +112,17 @@ vi.mock('@helpers/defaults', () => ({
     discoveredWorkers: {},
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
+    tutorials: {},
     world: { party: [], autoMode: { clauses: [] }, commissions: {} },
   })),
+}));
+
+vi.mock('@helpers/tutorial/tutorial-catalog', () => ({
+  TUTORIAL_CATALOG: [],
+}));
+
+vi.mock('@helpers/tutorial/tutorial-seen', () => ({
+  pruneInvalidTutorials: vi.fn((tutorials) => tutorials),
 }));
 
 vi.mock('@helpers/item/gather-node-discovery', () => ({
