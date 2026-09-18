@@ -32,7 +32,7 @@
     - monsterId: Elf Druid
       weight: 3
     - monsterId: Elf Ritualist
-      weight: 3
+      weight: 1
 
   completionRewards:
     - collectibleId: Ritual Crown
