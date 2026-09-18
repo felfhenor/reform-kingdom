@@ -348,8 +348,11 @@ describe('craftQueueStart', () => {
         [BLACKSMITHING_ID]: buildBuilding({
           level: 1,
           queue: [
-            buildQueueEntry(),
-            buildQueueEntry({ id: 'queue-entry-2' as CraftQueueEntryId }),
+            buildQueueEntry({ recipeId: 'recipe-2' as RecipeId }),
+            buildQueueEntry({
+              id: 'queue-entry-2' as CraftQueueEntryId,
+              recipeId: 'recipe-3' as RecipeId,
+            }),
           ],
         }),
       },
@@ -360,6 +363,293 @@ describe('craftQueueStart', () => {
       false,
     );
     expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('still queues onto an already-queued recipe even when the queue is otherwise full', () => {
+    mockGetEntry({ 'recipe-1': buildRecipe() });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [
+            buildQueueEntry(),
+            buildQueueEntry({
+              id: 'queue-entry-2' as CraftQueueEntryId,
+              recipeId: 'recipe-3' as RecipeId,
+            }),
+          ],
+        }),
+      },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1)).toBe(
+      true,
+    );
+    expect(updateGamestate).toHaveBeenCalledTimes(1);
+  });
+
+  it('adds to an existing entry for the same recipe instead of queuing a separate one', () => {
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      }),
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [buildQueueEntry({ quantityTotal: 2, quantityCompleted: 1 })],
+        }),
+      },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 3)).toBe(
+      true,
+    );
+
+    const state: GameState = {
+      materials: { ore: { quantity: 100, foundAt: 1000 } },
+      discoveredMaterials: {},
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [buildQueueEntry({ quantityTotal: 2, quantityCompleted: 1 })],
+        }),
+      },
+    } as unknown as GameState;
+    const result = applyUpdateAt(0, state);
+
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([
+      {
+        id: 'queue-entry-1',
+        recipeId: 'recipe-1',
+        quantityTotal: 5,
+        quantityCompleted: 1,
+        ticksIntoCraft: 0,
+      },
+    ]);
+  });
+
+  it('caps a stacked entry at 99 and overflows the remainder into a new entry', () => {
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      }),
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [buildQueueEntry({ quantityTotal: 90, quantityCompleted: 1 })],
+        }),
+      },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 20)).toBe(
+      true,
+    );
+
+    const state: GameState = {
+      materials: { ore: { quantity: 1000, foundAt: 1000 } },
+      discoveredMaterials: {},
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [buildQueueEntry({ quantityTotal: 90, quantityCompleted: 1 })],
+        }),
+      },
+    } as unknown as GameState;
+    const result = applyUpdateAt(0, state);
+
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([
+      {
+        id: 'queue-entry-1',
+        recipeId: 'recipe-1',
+        quantityTotal: 99,
+        quantityCompleted: 1,
+        ticksIntoCraft: 0,
+      },
+      {
+        id: 'queue-entry-1',
+        recipeId: 'recipe-1',
+        quantityTotal: 11,
+        quantityCompleted: 0,
+        ticksIntoCraft: 0,
+      },
+    ]);
+  });
+
+  it('queues only what fits on the existing stack when the queue has no room for an overflow entry', () => {
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      }),
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [
+            buildQueueEntry({ quantityTotal: 90, quantityCompleted: 1 }),
+            buildQueueEntry({
+              id: 'queue-entry-2' as CraftQueueEntryId,
+              recipeId: 'recipe-2' as RecipeId,
+            }),
+          ],
+        }),
+      },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 20)).toBe(
+      true,
+    );
+
+    const state: GameState = {
+      materials: { ore: { quantity: 1000, foundAt: 1000 } },
+      discoveredMaterials: {},
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [
+            buildQueueEntry({ quantityTotal: 90, quantityCompleted: 1 }),
+            buildQueueEntry({
+              id: 'queue-entry-2' as CraftQueueEntryId,
+              recipeId: 'recipe-2' as RecipeId,
+            }),
+          ],
+        }),
+      },
+    } as unknown as GameState;
+    const result = applyUpdateAt(0, state);
+
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([
+      {
+        id: 'queue-entry-1',
+        recipeId: 'recipe-1',
+        quantityTotal: 99,
+        quantityCompleted: 1,
+        ticksIntoCraft: 0,
+      },
+      {
+        id: 'queue-entry-2',
+        recipeId: 'recipe-2',
+        quantityTotal: 1,
+        quantityCompleted: 0,
+        ticksIntoCraft: 0,
+      },
+    ]);
+  });
+
+  it('fails outright when the queue is full and the recipe has no stackable entry at all', () => {
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      }),
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 1,
+          queue: [
+            buildQueueEntry({ recipeId: 'recipe-2' as RecipeId }),
+            buildQueueEntry({
+              id: 'queue-entry-2' as CraftQueueEntryId,
+              recipeId: 'recipe-3' as RecipeId,
+            }),
+          ],
+        }),
+      },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 20)).toBe(
+      false,
+    );
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('fails when nothing is craftable, even though clamp() alone would let the request through as 1', () => {
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      }),
+    });
+    vi.mocked(getMaterialQuantity).mockReturnValue(0);
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 1)).toBe(
+      false,
+    );
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('skips a full entry and stacks onto a later entry for the same recipe that has room', () => {
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      }),
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 16,
+          queue: [
+            buildQueueEntry({ quantityTotal: 99 }),
+            buildQueueEntry({
+              id: 'queue-entry-2' as CraftQueueEntryId,
+              quantityTotal: 1,
+            }),
+          ],
+        }),
+      },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 5)).toBe(
+      true,
+    );
+
+    const state: GameState = {
+      materials: { ore: { quantity: 1000, foundAt: 1000 } },
+      discoveredMaterials: {},
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({
+          level: 16,
+          queue: [
+            buildQueueEntry({ quantityTotal: 99 }),
+            buildQueueEntry({
+              id: 'queue-entry-2' as CraftQueueEntryId,
+              quantityTotal: 1,
+            }),
+          ],
+        }),
+      },
+    } as unknown as GameState;
+    const result = applyUpdateAt(0, state);
+
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([
+      {
+        id: 'queue-entry-1',
+        recipeId: 'recipe-1',
+        quantityTotal: 99,
+        quantityCompleted: 0,
+        ticksIntoCraft: 0,
+      },
+      {
+        id: 'queue-entry-2',
+        recipeId: 'recipe-1',
+        quantityTotal: 6,
+        quantityCompleted: 0,
+        ticksIntoCraft: 0,
+      },
+    ]);
   });
 
   it('clamps the requested quantity to what is craftable and reserves materials', () => {

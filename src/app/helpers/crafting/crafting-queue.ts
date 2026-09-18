@@ -47,6 +47,7 @@ import type {
   RecipeRequirementEquipment,
   RecipeRequirementItem,
   Tradeskill,
+  TradeskillBuildingState,
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
@@ -173,6 +174,76 @@ export function applyRequirementQuantity(
   });
 }
 
+// A recipe can have a later entry with room even if an earlier one is already capped.
+export function findStackableEntryIndex(
+  queue: CraftQueueEntry[],
+  recipeId: RecipeId,
+): number {
+  return queue.findIndex(
+    (entry) =>
+      entry.recipeId === recipeId && entry.quantityTotal < MAX_CRAFTABLE_CAP,
+  );
+}
+
+// Once the queue has no open slot, only a stack (not a new entry) can be queued - 0 means it can't.
+function queueableQuantity(
+  building: TradeskillBuildingState,
+  tradeskill: Tradeskill,
+  recipeId: RecipeId,
+  quantity: number,
+  maxCraftable: number,
+): number {
+  const requested = clamp(Math.floor(quantity), 1, maxCraftable);
+
+  const hasOpenSlot =
+    building.queue.length < tradeskillMaxQueueSize(building.level, tradeskill);
+  if (hasOpenSlot) return requested;
+
+  const existingIndex = findStackableEntryIndex(building.queue, recipeId);
+  if (existingIndex === -1) return 0;
+
+  const headroom =
+    MAX_CRAFTABLE_CAP - building.queue[existingIndex].quantityTotal;
+  return Math.min(requested, headroom);
+}
+
+// Splits across two entries when a single stack would cross MAX_CRAFTABLE_CAP.
+function applyQueueStack(
+  queue: CraftQueueEntry[],
+  recipeId: RecipeId,
+  quantity: number,
+): CraftQueueEntry[] {
+  const existingIndex = findStackableEntryIndex(queue, recipeId);
+  const headroom =
+    existingIndex === -1
+      ? 0
+      : MAX_CRAFTABLE_CAP - queue[existingIndex].quantityTotal;
+  const stacked = Math.min(quantity, headroom);
+  const overflow = quantity - stacked;
+
+  const stackedQueue =
+    stacked > 0
+      ? queue.map((entry, i) =>
+          i === existingIndex
+            ? { ...entry, quantityTotal: entry.quantityTotal + stacked }
+            : entry,
+        )
+      : queue;
+
+  if (overflow <= 0) return stackedQueue;
+
+  return [
+    ...stackedQueue,
+    {
+      id: rngUuid() as CraftQueueEntryId,
+      recipeId,
+      quantityTotal: overflow,
+      quantityCompleted: 0,
+      ticksIntoCraft: 0,
+    } satisfies CraftQueueEntry,
+  ];
+}
+
 // Reserves materials/equipment for the full batch up front (so a queued
 // craft can never fail mid-way through for lack of resources), then queues
 // the entry. `quantity` is clamped to what's actually craftable.
@@ -190,16 +261,16 @@ export function craftQueueStart(
 
   const building = tradeskillBuilding(tradeskill);
   if (building.level < recipe.minTradeskillLevel) return false;
-  if (
-    building.queue.length >= tradeskillMaxQueueSize(building.level, tradeskill)
-  ) {
-    return false;
-  }
 
-  const clampedQuantity = clamp(
-    Math.floor(quantity),
-    1,
-    craftMaxCraftableQuantity(recipe, tradeskill),
+  const maxCraftable = craftMaxCraftableQuantity(recipe, tradeskill);
+  if (maxCraftable <= 0) return false;
+
+  const clampedQuantity = queueableQuantity(
+    building,
+    tradeskill,
+    recipeId,
+    quantity,
+    maxCraftable,
   );
   if (clampedQuantity <= 0) return false;
 
@@ -208,18 +279,10 @@ export function craftQueueStart(
       applyRequirementQuantity(state, requirement, clampedQuantity, -1);
     });
 
-    const entry: CraftQueueEntry = {
-      id: rngUuid() as CraftQueueEntryId,
-      recipeId,
-      quantityTotal: clampedQuantity,
-      quantityCompleted: 0,
-      ticksIntoCraft: 0,
-    };
-
     const building = tradeskillBuildingIn(state, tradeskillId);
     state.tradeskills[tradeskillId] = {
       ...building,
-      queue: [...building.queue, entry],
+      queue: applyQueueStack(building.queue, recipeId, clampedQuantity),
     };
 
     return state;

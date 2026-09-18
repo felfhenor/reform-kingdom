@@ -1,7 +1,6 @@
 @let buildingData = building();
 @let entries = visibleRecipeEntries();
 @let queue = queueViewModels();
-@let full = isQueueFull();
 @let uncraftableTotal = uncraftableCount();
 
 <app-card-page heightProfile="full">
@@ -107,6 +106,7 @@
       @for (entry of entries; track entry.recipe.id) {
         @let quantity = displayQuantity(entry.recipe.id, entry.maxCraftable);
         @let uncraftable = entry.maxCraftable === 0;
+        @let full = isQueueFullForRecipe(entry.recipe.id);
 
         <div
           class="flex items-center gap-2 p-2 rounded bg-base-200 min-h-[72px] max-h-[72px]"

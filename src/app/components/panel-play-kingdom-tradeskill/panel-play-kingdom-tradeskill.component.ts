@@ -22,7 +22,10 @@ import {
   craftQueueTicksRemaining,
   getCraftableRecipeEntries,
 } from '@helpers/crafting/crafting';
-import { craftQueueStart } from '@helpers/crafting/crafting-queue';
+import {
+  craftQueueStart,
+  findStackableEntryIndex,
+} from '@helpers/crafting/crafting-queue';
 import { craftQueueRemove } from '@helpers/crafting/crafting-queue.ui';
 import { craftQueueUnitsRemaining } from '@helpers/crafting/crafting.ui';
 import {
@@ -142,11 +145,14 @@ export class PanelPlayKingdomTradeskillComponent {
       ? this.recipeEntries().filter((entry) => entry.maxCraftable > 0)
       : this.recipeEntries(),
   );
-  public isQueueFull = computed(
-    () =>
-      this.building().queue.length >=
-      tradeskillMaxQueueSize(this.building().level, this.tradeskill()),
-  );
+
+  public isQueueFullForRecipe(recipeId: RecipeId): boolean {
+    const building = this.building();
+    const maxSize = tradeskillMaxQueueSize(building.level, this.tradeskill());
+    if (building.queue.length < maxSize) return false;
+
+    return findStackableEntryIndex(building.queue, recipeId) === -1;
+  }
   public queueSize = computed(() =>
     Array(
       tradeskillMaxQueueSize(this.building().level, this.tradeskill()),
