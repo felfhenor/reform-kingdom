@@ -3,21 +3,19 @@ import fs from 'fs-extra';
 import path from 'path';
 
 fs.ensureDirSync('./public/json');
-fs.ensureDirSync('./public/maps');
 
 const mapFiles = fs
   .readdirSync('./gamemaps')
   .filter((file: string) => file.endsWith('.json'));
 
-const mapNames = mapFiles.map((file: string) => path.basename(file, '.json'));
-
 const GAMEMAPS_DIR = path.resolve('./gamemaps');
+// Not an actual output dir anymore - kept as the fixed anchor tileset image paths are computed relative to.
 const PUBLIC_MAPS_DIR = path.resolve('./public/maps');
 
 // image paths in tileset data are authored relative to wherever that data lives
 // (the map file for an embedded tileset, or the .tsj file for an external one).
-// once the map is copied into `public/maps/`, the path needs to instead be relative
-// to `public/maps/`, eg. `../mapdata/foo.png`, so the client can resolve it.
+// rewrite them to be relative to `PUBLIC_MAPS_DIR` instead, eg. `../mapdata/foo.png`,
+// which is the base path the client resolves tileset images against at runtime.
 const rewriteTilesetImagePath = (tileset: any, imageBaseDir: string) => {
   if (typeof tileset.image !== 'string') return tileset;
 
@@ -48,6 +46,9 @@ const resolveTileset = (tileset: any, mapDir: string) => {
   );
 };
 
+// Object.create(null) so a map literally named "__proto__" can't silently vanish into the prototype instead of becoming an own key.
+const allMaps: Record<string, unknown> = Object.create(null);
+
 mapFiles.forEach((file: string) => {
   const map = fs.readJsonSync(`./gamemaps/${file}`);
 
@@ -55,10 +56,11 @@ mapFiles.forEach((file: string) => {
     resolveTileset(tileset, GAMEMAPS_DIR),
   );
 
-  fs.writeJsonSync(`./public/maps/${file}`, map);
+  allMaps[path.basename(file, '.json')] = map;
 });
 
-fs.writeJsonSync('./public/json/maps.json', mapNames);
+// Bundled into one file (rather than fetched per-map) so the client makes a single request at load instead of one per map.
+fs.writeJsonSync('./public/json/all-maps.json', allMaps);
 console.info(
-  `Copied ${mapFiles.length} map file(s) to public/maps/ and wrote public/json/maps.json`,
+  `Wrote ${mapFiles.length} map(s) to public/json/all-maps.json`,
 );

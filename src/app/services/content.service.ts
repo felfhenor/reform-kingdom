@@ -98,27 +98,23 @@ export class ContentService {
   }
 
   private async loadMaps() {
-    const namesReq = this.http.get<string[]>(
-      this.toCacheBustURL(`./json/maps.json`),
+    const req = this.http.get<Record<string, unknown>>(
+      this.toCacheBustURL(`./json/all-maps.json`),
     );
 
-    const mapNames = await lastValueFrom(namesReq);
+    const allMaps = await lastValueFrom(req);
 
     const maps = new Map<string, GameMap>();
-
-    await Promise.all(
-      mapNames.map(async (name) => {
-        const mapReq = this.http.get(
-          this.toCacheBustURL(`./maps/${name}.json`),
-        );
-        const data = await lastValueFrom(mapReq);
-        maps.set(name, { name, data });
-      }),
-    );
+    Object.entries(allMaps).forEach(([name, data]) => {
+      maps.set(name, { name, data });
+    });
 
     setAllMaps(maps);
 
-    this.logger.info('Content:LoadMaps', `Maps loaded: ${mapNames.join(', ')}`);
+    this.logger.info(
+      'Content:LoadMaps',
+      `Maps loaded: ${Object.keys(allMaps).join(', ')}`,
+    );
     this.hasLoadedMaps.set(true);
   }
 }

@@ -47,18 +47,17 @@ function loadContent(): void {
 }
 
 function loadMaps(): void {
-  const mapNamesPath = path.join(PUBLIC_DIR, 'json/maps.json');
-  if (!fs.existsSync(mapNamesPath)) {
+  const allMapsPath = path.join(PUBLIC_DIR, 'json/all-maps.json');
+  if (!fs.existsSync(allMapsPath)) {
     throw new Error(
-      `Missing ${mapNamesPath} - run \`npm run build:maps\` first.`,
+      `Missing ${allMapsPath} - run \`npm run build:maps\` first.`,
     );
   }
 
-  const mapNames = fs.readJsonSync(mapNamesPath) as string[];
+  const allMaps = fs.readJsonSync(allMapsPath) as Record<string, unknown>;
   const maps = new Map<string, GameMap>();
 
-  mapNames.forEach((name) => {
-    const data = fs.readJsonSync(path.join(PUBLIC_DIR, `maps/${name}.json`));
+  Object.entries(allMaps).forEach(([name, data]) => {
     maps.set(name, { name, data });
   });
 

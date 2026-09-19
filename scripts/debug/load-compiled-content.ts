@@ -1,10 +1,10 @@
 /**
- * Loads the compiled `public/json/*.json` / `public/maps/*.json` output
- * (produced by `npm run gamedata:build` / `npm run build:maps`) from disk
- * and populates the same `@helpers/content` / `@helpers/maps` signals that
- * `ContentService` populates in the browser - so the analysis functions
- * under `src/app/helpers/debug/` behave identically whether they're called
- * from a CLI script or the `/debug` dashboard.
+ * Loads the compiled `public/json/*.json` output (produced by
+ * `npm run gamedata:build` / `npm run build:maps`) from disk and populates
+ * the same `@helpers/content` / `@helpers/maps` signals that `ContentService`
+ * populates in the browser - so the analysis functions under
+ * `src/app/helpers/debug/` behave identically whether they're called from a
+ * CLI script or the `/debug` dashboard.
  */
 
 import { unfurlContent } from '@helpers/content/content';
@@ -15,7 +15,6 @@ import path from 'path';
 
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
 const JSON_DIR = path.join(ROOT_DIR, 'public', 'json');
-const MAPS_DIR = path.join(ROOT_DIR, 'public', 'maps');
 
 function requireJson(filePath: string, description: string): unknown {
   if (!fs.existsSync(filePath)) {
@@ -34,17 +33,13 @@ export function loadCompiledContentFromDisk(): void {
   ) as Record<string, IsContentItem[]>;
   unfurlContent(assets, (message) => console.warn(`[Content] ${message}`));
 
-  const mapNames = requireJson(
-    path.join(JSON_DIR, 'maps.json'),
-    'the compiled map list (public/json/maps.json)',
-  ) as string[];
+  const allMaps = requireJson(
+    path.join(JSON_DIR, 'all-maps.json'),
+    'the compiled map bundle (public/json/all-maps.json)',
+  ) as Record<string, unknown>;
 
   const maps = new Map<string, GameMap>();
-  mapNames.forEach((name) => {
-    const data = requireJson(
-      path.join(MAPS_DIR, `${name}.json`),
-      `compiled map "${name}" (public/maps/${name}.json)`,
-    );
+  Object.entries(allMaps).forEach(([name, data]) => {
     maps.set(name, { name, data });
   });
   setAllMaps(maps);
