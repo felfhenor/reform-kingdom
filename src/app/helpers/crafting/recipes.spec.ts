@@ -36,10 +36,6 @@ vi.mock('@helpers/item/materials', () => ({
   traderTokenId: vi.fn(() => 'trader-token'),
 }));
 
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(() => []),
-}));
-
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
@@ -47,6 +43,7 @@ vi.mock('@helpers/state-game', () => {
     updateGamestate: vi.fn(),
     discoveredRecipesState: () => gamestate().discoveredRecipes,
     materialsState: () => gamestate().materials,
+    worldPartyState: vi.fn(() => []),
   };
 });
 
@@ -67,12 +64,15 @@ import {
   recipeResultSpritesheet,
   recipeUndiscover,
 } from '@helpers/crafting/recipes';
-import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldPartyState,
+} from '@helpers/state-game';
 
 const copperIngot: ItemContent = {
   id: 'copper-ingot' as ItemId,
@@ -481,7 +481,7 @@ describe('Recipes Helper Functions', () => {
         { content: boneHewnCloak } as never,
         { content: { ...boneHewnCloak, id: 'other' as EquipmentId } } as never,
       ]);
-      vi.mocked(partyGet).mockReturnValue([
+      vi.mocked(worldPartyState).mockReturnValue([
         { equipment: {} } as never,
         { equipment: {} } as never,
       ]);
@@ -494,7 +494,7 @@ describe('Recipes Helper Functions', () => {
 
     it('returns 0 for equipment with none stored or equipped', () => {
       vi.mocked(getArmoryEntries).mockReturnValue([]);
-      vi.mocked(partyGet).mockReturnValue([]);
+      vi.mocked(worldPartyState).mockReturnValue([]);
 
       expect(recipeResultOwnedQuantity(equipmentRecipe)).toBe(0);
     });

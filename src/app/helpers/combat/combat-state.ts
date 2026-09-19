@@ -1,9 +1,4 @@
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { Combat } from '@interfaces';
-
-export function currentCombat(): Combat | undefined {
-  return gamestate().world.combat;
-}
+import { updateGamestate } from '@helpers/state-game';
 
 export function combatReset(): void {
   updateGamestate((state) => {

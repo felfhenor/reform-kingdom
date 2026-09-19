@@ -32,7 +32,7 @@ import {
   debugTelegraphRaid,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug.ui';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type {
@@ -111,7 +111,7 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
   public selectedRecipeId = signal<RecipeId | undefined>(undefined);
 
   public party = computed(() =>
-    sortBy(partyGet(), (character) => character.name),
+    sortBy(worldPartyState(), (character) => character.name),
   );
 
   public characterMaxLevel = CHARACTER_MAX_LEVEL;

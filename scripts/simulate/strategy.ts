@@ -6,7 +6,10 @@ import {
 } from '@helpers/hero/character-equipment';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { getCraftableRecipeEntries } from '@helpers/crafting/crafting';
-import { craftMaxCraftableQuantity, craftQueueStart } from '@helpers/crafting/crafting-queue';
+import {
+  craftMaxCraftableQuantity,
+  craftQueueStart,
+} from '@helpers/crafting/crafting-queue';
 import {
   decreeClauseAdd,
   decreeClauseReorder,
@@ -15,12 +18,18 @@ import {
 } from '@helpers/decree/decree';
 import { equippedItems, isSlotAvailableForJob } from '@helpers/item/equipment';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
-import { gatheringStop, isGathering, partyMinLevel } from '@helpers/item/gathering';
-import { canInfuseEquipmentItem, isInfusionMaterial } from '@helpers/item/infusion';
+import {
+  gatheringStop,
+  isGathering,
+  partyMinLevel,
+} from '@helpers/item/gathering';
+import {
+  canInfuseEquipmentItem,
+  isInfusionMaterial,
+} from '@helpers/item/infusion';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { partyGet } from '@helpers/hero/party';
 import { isRecipeCraftable } from '@helpers/crafting/recipes';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, worldPartyState } from '@helpers/state-game';
 import {
   tradeskillActiveGate,
   tradeskillBuilding,
@@ -146,7 +155,8 @@ function equipmentRecipeIndex(): Map<EquipmentId, RecipeContent[]> {
     getEntriesByType<RecipeContent>('recipe').forEach((recipe) => {
       if (!('equipmentId' in recipe.result)) return;
 
-      const list = equipmentRecipeIndexCache!.get(recipe.result.equipmentId) ?? [];
+      const list =
+        equipmentRecipeIndexCache!.get(recipe.result.equipmentId) ?? [];
       list.push(recipe);
       equipmentRecipeIndexCache!.set(recipe.result.equipmentId, list);
     });
@@ -186,8 +196,13 @@ function recipeProducingItem(
   );
 }
 
-function isRecipeAlreadyQueued(tradeskill: Tradeskill, recipeId: RecipeId): boolean {
-  return tradeskillBuilding(tradeskill).queue.some((entry) => entry.recipeId === recipeId);
+function isRecipeAlreadyQueued(
+  tradeskill: Tradeskill,
+  recipeId: RecipeId,
+): boolean {
+  return tradeskillBuilding(tradeskill).queue.some(
+    (entry) => entry.recipeId === recipeId,
+  );
 }
 
 // Attempts to queue `recipe`. If a required item is short, recurses into
@@ -216,7 +231,8 @@ function attemptCraftRecipeChain(
   visited.add(recipe.id);
 
   if (!isRecipeCraftable(recipe.id)) return false;
-  if (tradeskillBuilding(tradeskill).level < recipe.minTradeskillLevel) return false;
+  if (tradeskillBuilding(tradeskill).level < recipe.minTradeskillLevel)
+    return false;
   if (isRecipeAlreadyQueued(tradeskill, recipe.id)) return false;
 
   if (craftMaxCraftableQuantity(recipe, tradeskill) > 0) {
@@ -234,7 +250,8 @@ function attemptCraftRecipeChain(
   return attemptCraftRecipeChain(
     tradeskill,
     prereqRecipe,
-    shortRequirement.quantity * quantity - getMaterialQuantity(shortRequirement.itemId),
+    shortRequirement.quantity * quantity -
+      getMaterialQuantity(shortRequirement.itemId),
     visited,
     depth + 1,
   );
@@ -255,7 +272,10 @@ function attemptCapstoneCraft(tradeskill: Tradeskill): boolean {
 // Whether `jobId` can actually wear `equipment` - ignores the character-level
 // gate `canEquipItem` (equipment.ts) checks, since crafting should get ahead
 // of need rather than wait for a hero to reach the level requirement first.
-function jobCanUseEquipment(jobId: JobId, equipment: EquipmentContent): boolean {
+function jobCanUseEquipment(
+  jobId: JobId,
+  equipment: EquipmentContent,
+): boolean {
   const job = getEntry<JobContent>(jobId);
   if (!job || !job.equippableTypes.includes(equipment.type)) return false;
 
@@ -265,17 +285,21 @@ function jobCanUseEquipment(jobId: JobId, equipment: EquipmentContent): boolean 
 // How many current party members could actually wear this - naturally caps
 // at party size, and is 0 for anything nobody in the party can use at all.
 function partyEquipmentTargetQuantity(equipment: EquipmentContent): number {
-  return partyGet().filter((character) => jobCanUseEquipment(character.jobId, equipment))
-    .length;
+  return worldPartyState().filter((character) =>
+    jobCanUseEquipment(character.jobId, equipment),
+  ).length;
 }
 
 function ownedEquipmentCount(equipmentId: EquipmentId): number {
-  const armoryCount = armoryGet().filter((item) => item.equipmentId === equipmentId).length;
-  const equippedCount = partyGet().reduce(
+  const armoryCount = armoryGet().filter(
+    (item) => item.equipmentId === equipmentId,
+  ).length;
+  const equippedCount = worldPartyState().reduce(
     (total, character) =>
       total +
-      equippedItems(character.equipment).filter((item) => item.equipmentId === equipmentId)
-        .length,
+      equippedItems(character.equipment).filter(
+        (item) => item.equipmentId === equipmentId,
+      ).length,
     0,
   );
 
@@ -297,7 +321,10 @@ function rebuildPartyEquipmentTargets(): void {
   const index = equipmentRecipeIndex();
 
   partyEquipmentTargets = getEntriesByType<EquipmentContent>('equipment')
-    .filter((equipment) => index.has(equipment.id) && partyEquipmentTargetQuantity(equipment) > 0)
+    .filter(
+      (equipment) =>
+        index.has(equipment.id) && partyEquipmentTargetQuantity(equipment) > 0,
+    )
     .map((equipment) => {
       const recipesByTradeskill = new Map<Tradeskill, RecipeContent>();
 
@@ -306,7 +333,10 @@ function rebuildPartyEquipmentTargets(): void {
         if (!name) return;
 
         const existing = recipesByTradeskill.get(name);
-        if (!existing || recipe.minTradeskillLevel > existing.minTradeskillLevel) {
+        if (
+          !existing ||
+          recipe.minTradeskillLevel > existing.minTradeskillLevel
+        ) {
           recipesByTradeskill.set(name, recipe);
         }
       });
@@ -342,7 +372,13 @@ function collectGatherableRequirementIds(
 
     const prereqRecipe = recipeProducingItem(name, requirement.itemId);
     if (prereqRecipe) {
-      collectGatherableRequirementIds(prereqRecipe, gatherable, found, visited, depth + 1);
+      collectGatherableRequirementIds(
+        prereqRecipe,
+        gatherable,
+        found,
+        visited,
+        depth + 1,
+      );
     }
   });
 }
@@ -387,7 +423,9 @@ function rebuildPartyRelevantMaterialIds(): void {
   const visited = new Set<RecipeId>();
 
   const recipesToSearch: RecipeContent[] = [
-    ...partyEquipmentTargets.flatMap((target) => [...target.recipesByTradeskill.values()]),
+    ...partyEquipmentTargets.flatMap((target) => [
+      ...target.recipesByTradeskill.values(),
+    ]),
     ...collectibleRecipeIndex().values(),
   ];
 
@@ -525,7 +563,9 @@ function enforceGatherTimeBudget(tick: number, tickBudget: number): void {
   if (gatherTimeBudgetExhausted) return;
 
   const activeClauseId = gamestate().world.autoMode.activeClauseId;
-  const activeClause = decreeClauses().find((clause) => clause.id === activeClauseId);
+  const activeClause = decreeClauses().find(
+    (clause) => clause.id === activeClauseId,
+  );
 
   if (!activeClause || activeClause.type !== 'GatherMaterial') {
     timedGatherClauseId = undefined;
@@ -565,7 +605,14 @@ function attemptPartyEquipmentCraft(tradeskill: Tradeskill): boolean {
     const owned = ownedEquipmentCount(target.equipment.id);
     if (owned >= targetQuantity) continue;
 
-    if (attemptCraftRecipeChain(tradeskill, recipe, targetQuantity - owned, new Set())) {
+    if (
+      attemptCraftRecipeChain(
+        tradeskill,
+        recipe,
+        targetQuantity - owned,
+        new Set(),
+      )
+    ) {
       return true;
     }
   }
@@ -581,10 +628,16 @@ function attemptPartyEquipmentCraft(tradeskill: Tradeskill): boolean {
 // targeted is actionable but *something* still is ("even a random crafted
 // item would be better").
 export function attemptTargetedCrafting(): CraftAttemptResult {
-  const result: CraftAttemptResult = { anyRecipeUnlocked: false, anyQueued: false };
+  const result: CraftAttemptResult = {
+    anyRecipeUnlocked: false,
+    anyQueued: false,
+  };
 
   ALL_TRADESKILLS.forEach((tradeskill) => {
-    if (attemptCapstoneCraft(tradeskill) || attemptPartyEquipmentCraft(tradeskill)) {
+    if (
+      attemptCapstoneCraft(tradeskill) ||
+      attemptPartyEquipmentCraft(tradeskill)
+    ) {
       result.anyRecipeUnlocked = true;
       result.anyQueued = true;
       return;
@@ -619,12 +672,16 @@ function attemptInfusion(): void {
   });
   if (infusionMaterialIds.length === 0) return;
 
-  for (const character of partyGet()) {
+  for (const character of worldPartyState()) {
     for (const slot of Object.keys(character.equipment) as EquipmentSlot[]) {
       const item = character.equipment[slot];
       if (!item) continue;
 
-      for (let slotIndex = 0; slotIndex < item.infusedItemIds.length; slotIndex++) {
+      for (
+        let slotIndex = 0;
+        slotIndex < item.infusedItemIds.length;
+        slotIndex++
+      ) {
         const materialId = infusionMaterialIds.find((id) =>
           canInfuseEquipmentItem(item, slotIndex, id as ItemId),
         );
@@ -648,7 +705,9 @@ function attemptInfusion(): void {
 // call whenever new equipment is acquired - see `runScenario`'s
 // armory-diff check.
 export function reoptimizeAllEquipment(): void {
-  partyGet().forEach((character) => optimizeCharacterEquipment(character.id));
+  worldPartyState().forEach((character) =>
+    optimizeCharacterEquipment(character.id),
+  );
 }
 
 // Called every tick by the driver - internally no-ops except on each

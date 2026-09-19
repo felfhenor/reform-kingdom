@@ -1,15 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  worldCombatState: vi.fn(),
+}));
+
 vi.mock('@helpers/kingdom/armory', () => ({
   armoryGet: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/combat/combat', () => ({
-  currentCombat: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(),
+  worldCombatState: vi.fn(),
 }));
 
 vi.mock('@helpers/content/content', () => ({

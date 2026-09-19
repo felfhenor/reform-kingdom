@@ -44,6 +44,14 @@ import {
   tradeskillsState,
   updateGamestate,
   workersState,
+  worldAutoModeState,
+  worldCombatState,
+  worldCurrentLocationState,
+  worldExploreRandomState,
+  worldGatheringState,
+  worldHomeNodeNameState,
+  worldPartyState,
+  worldTravelState,
 } from '@helpers/state-game';
 import type { GameState, WorkerId, WorkerState } from '@interfaces';
 
@@ -254,5 +262,62 @@ describe('workersState', () => {
     const state = seedState();
 
     expect(selector()).toBe(state[key]);
+  });
+
+  it.each([
+    ['party', worldPartyState],
+    ['combat', worldCombatState],
+    ['currentLocation', worldCurrentLocationState],
+    ['travel', worldTravelState],
+    ['gathering', worldGatheringState],
+    ['autoMode', worldAutoModeState],
+    ['exploreRandom', worldExploreRandomState],
+    ['homeNodeName', worldHomeNodeNameState],
+  ] as const)('exposes the world.%s slice', (key, selector) => {
+    const state = seedState();
+
+    expect(selector()).toBe(state.world[key]);
+  });
+
+  it('notifies a world sub-slice consumer after an in-tick leaf reassignment', () => {
+    seedState();
+    const status = computed(() => worldTravelState().status);
+    expect(status()).toBe('Idle');
+
+    gamestateTickStart();
+    updateGamestate((state) => {
+      state.world.travel = {
+        status: 'Traveling',
+        destinationNodeName: 'Somewhere',
+        path: [],
+        ticksIntoStep: 0,
+      };
+      return state;
+    });
+    gamestateTickEnd();
+
+    expect(status()).toBe('Traveling');
+  });
+
+  it('does not re-evaluate a world sub-slice consumer when a sibling leaf changes', () => {
+    seedState();
+    let evaluations = 0;
+    const status = computed(() => {
+      evaluations += 1;
+      return worldTravelState().status;
+    });
+    const downstream = computed(() => status().length);
+    downstream();
+    const before = evaluations;
+
+    gamestateTickStart();
+    updateGamestate((state) => {
+      state.world.gathering = { ...state.world.gathering, ticksIntoGather: 9 };
+      return state;
+    });
+    gamestateTickEnd();
+    downstream();
+
+    expect(evaluations).toBe(before);
   });
 });

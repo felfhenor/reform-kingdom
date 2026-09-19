@@ -13,13 +13,16 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(() => undefined),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTravelState: () => gamestate().world.travel,
+    worldGatheringState: () => gamestate().world.gathering,
+    worldPartyState: vi.fn(() => []),
+    worldCombatState: vi.fn(() => undefined),
+  };
+});
 
 vi.mock('@helpers/world', () => ({
   worldNodeAtCurrentLocation: vi.fn(() => undefined),
@@ -38,20 +41,18 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(() => undefined),
 }));
 
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(() => []),
-}));
-
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
 import {
   discordSetMainStatus,
   discordUpdateStatus,
   isInElectron,
 } from '@helpers/engine/discord';
-import { partyGet } from '@helpers/hero/party';
-import { gamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  worldPartyState,
+  worldCombatState,
+} from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 
@@ -134,11 +135,11 @@ describe('discord status', () => {
     vi.clearAllMocks();
     discordSetMainStatus('');
     mockElectron(true);
-    vi.mocked(currentCombat).mockReturnValue(undefined);
+    vi.mocked(worldCombatState).mockReturnValue(undefined);
     vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
     vi.mocked(worldNodeCaravan).mockReturnValue(undefined);
     vi.mocked(caravanState).mockReturnValue(undefined);
-    vi.mocked(partyGet).mockReturnValue([]);
+    vi.mocked(worldPartyState).mockReturnValue([]);
     mockGamestate();
   });
 
@@ -157,7 +158,7 @@ describe('discord status', () => {
   describe('discordUpdateStatus', () => {
     it('does nothing outside electron', () => {
       mockElectron(false);
-      vi.mocked(currentCombat).mockReturnValue(buildCombat());
+      vi.mocked(worldCombatState).mockReturnValue(buildCombat());
 
       discordUpdateStatus();
 
@@ -166,7 +167,7 @@ describe('discord status', () => {
     });
 
     it('shows Exploring when in combat, regardless of other state', () => {
-      vi.mocked(currentCombat).mockReturnValue(
+      vi.mocked(worldCombatState).mockReturnValue(
         buildCombat({ locationName: 'Whispering Woods' }),
       );
       mockGamestate({ status: 'Traveling', destinationNodeName: 'Elsewhere' });
@@ -248,7 +249,7 @@ describe('discord status', () => {
     });
 
     it('sets the party roster as the persistent details line', () => {
-      vi.mocked(partyGet).mockReturnValue([
+      vi.mocked(worldPartyState).mockReturnValue([
         buildCharacter({ jobId: 'warrior' as JobId, level: 5 }),
         buildCharacter({ jobId: 'magician' as JobId, level: 3 }),
       ]);

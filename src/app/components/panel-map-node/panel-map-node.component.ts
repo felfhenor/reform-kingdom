@@ -38,9 +38,13 @@ import {
 } from '@helpers/item/gathering';
 import { rewardDisplayOrder } from '@helpers/item/loot';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
-import { gamestate } from '@helpers/state-game';
+import {
+  worldCombatState,
+  worldGatheringState,
+  worldTravelState,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { townReputationDisplay } from '@helpers/town/reputation/town-reputation.ui';
-import { currentLocationGet } from '@helpers/world';
 import {
   worldNodeCaravanIsAvailable,
   worldNodeCaravanVisitedTraderName,
@@ -202,7 +206,7 @@ export class PanelMapNodeComponent {
 
   public isGatheringHere = computed(() => {
     const entry = this.node();
-    const gathering = gamestate().world.gathering;
+    const gathering = worldGatheringState();
     return (
       !!entry &&
       gathering.status === 'Gathering' &&
@@ -223,7 +227,7 @@ export class PanelMapNodeComponent {
     const path = this.travelPath();
     if (!path) return undefined;
 
-    let origin = currentLocationGet();
+    let origin = worldCurrentLocationState();
     const costs = path.map((step) => {
       const cost = travelStepTicksCost(step, origin);
       origin = step;
@@ -233,14 +237,14 @@ export class PanelMapNodeComponent {
     return sum(costs);
   });
 
-  private travelState = computed(() => gamestate().world.travel);
+  private travelState = computed(() => worldTravelState());
 
   public isAtNode = computed(
     () =>
       this.travelPath()?.length === 0 && this.travelState().status === 'Idle',
   );
 
-  private isInCombat = computed(() => !!gamestate().world.combat);
+  private isInCombat = computed(() => !!worldCombatState());
 
   public canReExplore = computed(() => {
     const entry = this.node();

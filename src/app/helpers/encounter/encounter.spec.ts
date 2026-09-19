@@ -8,10 +8,6 @@ vi.mock('@helpers/combat/combat-create', () => ({
   combatCreateForEncounter: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(),
-}));
-
 vi.mock('@helpers/rng', () => ({
   rngNumberRange: vi.fn(),
   rngUuid: vi.fn(),
@@ -19,14 +15,14 @@ vi.mock('@helpers/rng', () => ({
 
 vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
+  worldPartyState: vi.fn(),
 }));
 
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { encounterStartFight } from '@helpers/encounter/encounter';
-import { partyGet } from '@helpers/hero/party';
 import { rngNumberRange } from '@helpers/rng';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
   Character,
   Combat,
@@ -60,7 +56,7 @@ describe('encounterStartFight', () => {
       if (id === 'Goblin') return goblin as never;
       return undefined;
     });
-    vi.mocked(partyGet).mockReturnValue(party);
+    vi.mocked(worldPartyState).mockReturnValue(party);
     vi.mocked(rngNumberRange).mockReturnValue(2);
 
     const builtCombat = {

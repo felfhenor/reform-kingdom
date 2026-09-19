@@ -5,14 +5,19 @@ import {
 } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
-import { partyGatherYieldBonuses, partyGet } from '@helpers/hero/party';
+import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  updateGamestate,
+  worldGatheringState,
+  worldPartyState,
+} from '@helpers/state-game';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -28,7 +33,7 @@ import type {
 import { clamp, sumBy } from 'es-toolkit/compat';
 
 export function partyMinLevel(): number {
-  const party = partyGet();
+  const party = worldPartyState();
   if (party.length === 0) return 1;
 
   return Math.min(...party.map((character) => character.level));
@@ -36,7 +41,7 @@ export function partyMinLevel(): number {
 
 // Strongest hero represents the party for over-level XP scaling.
 export function partyMaxLevel(): number {
-  const party = partyGet();
+  const party = worldPartyState();
   if (party.length === 0) return 1;
 
   return Math.max(...party.map((character) => character.level));
@@ -53,18 +58,18 @@ export function canEnterGatherNode(nodeName: string): boolean {
 }
 
 export function isGathering(): boolean {
-  return gamestate().world.gathering.status === 'Gathering';
+  return worldGatheringState().status === 'Gathering';
 }
 
 export function currentGatheringContent(): GatheringContent | undefined {
-  const gatheringId = gamestate().world.gathering.gatheringId;
+  const gatheringId = worldGatheringState().gatheringId;
   if (!gatheringId) return undefined;
 
   return getEntry<GatheringContent>(gatheringId);
 }
 
 export function gatheringProgressFraction(): number {
-  const gathering = gamestate().world.gathering;
+  const gathering = worldGatheringState();
   if (gathering.status !== 'Gathering') return 0;
 
   const content = currentGatheringContent();
@@ -199,13 +204,17 @@ function resolveGatherCycle(content: GatheringContent, nodeName: string): void {
   }
 
   updateGamestate((state) => {
-    state.world.gathering.ticksIntoGather = 0;
+    state.world.gathering = dictionaryWith(
+      state.world.gathering,
+      'ticksIntoGather',
+      0,
+    );
     return state;
   });
 }
 
 export function gatheringProcessTick(): void {
-  const gathering = gamestate().world.gathering;
+  const gathering = worldGatheringState();
   if (gathering.status !== 'Gathering' || !gathering.nodeName) return;
 
   const content = currentGatheringContent();
@@ -215,7 +224,11 @@ export function gatheringProcessTick(): void {
 
   if (ticksIntoGather < content.gatherTime) {
     updateGamestate((state) => {
-      state.world.gathering.ticksIntoGather = ticksIntoGather;
+      state.world.gathering = dictionaryWith(
+        state.world.gathering,
+        'ticksIntoGather',
+        ticksIntoGather,
+      );
       return state;
     });
     return;

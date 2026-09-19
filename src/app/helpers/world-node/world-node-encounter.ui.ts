@@ -1,6 +1,6 @@
 import { monstersFromFights } from '@helpers/combat/monster';
 import { encounterRandomState } from '@helpers/encounter/encounter-random';
-import { gamestate } from '@helpers/state-game';
+import { worldCombatState } from '@helpers/state-game';
 import {
   worldNodeEncounterCount,
   worldNodeExploreRandomFights,
@@ -31,7 +31,7 @@ export function worldNodeMonsterCount(
 export function worldNodeEncounterProgress(
   entry: WorldNodeEntry,
 ): WorldNodeEncounterProgress | undefined {
-  const combat = gamestate().world.combat;
+  const combat = worldCombatState();
   if (!combat || combat.locationName !== entry.nodeName) return undefined;
 
   const total = worldNodeEncounterCount(entry);

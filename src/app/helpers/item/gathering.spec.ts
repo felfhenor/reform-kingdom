@@ -35,7 +35,6 @@ vi.mock('@helpers/item/materials', () => ({
 }));
 
 vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(),
   partyGatherYieldBonuses: vi.fn(() => []),
 }));
 
@@ -44,10 +43,15 @@ vi.mock('@helpers/rng', () => ({
   rngSucceedsChance: vi.fn(() => false),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldGatheringState: () => gamestate().world.gathering,
+    worldPartyState: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
@@ -69,7 +73,7 @@ import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
-import { partyGatherYieldBonuses, partyGet } from '@helpers/hero/party';
+import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import {
   canEnterGatherNode,
   currentGatheringContent,
@@ -85,7 +89,12 @@ import {
 } from '@helpers/item/gathering';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
+import {
+  gamestate,
+  updateGamestate,
+  worldPartyState,
+} from '@helpers/state-game';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -128,6 +137,8 @@ function buildCharacter(level: number, luck = 0): Character {
 }
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world?.gathering);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);
@@ -139,7 +150,7 @@ describe('partyMinLevel', () => {
   });
 
   it('returns the lowest level among party members', () => {
-    vi.mocked(partyGet).mockReturnValue([
+    vi.mocked(worldPartyState).mockReturnValue([
       buildCharacter(5),
       buildCharacter(2),
       buildCharacter(9),
@@ -149,7 +160,7 @@ describe('partyMinLevel', () => {
   });
 
   it('defaults to 1 when the party is empty', () => {
-    vi.mocked(partyGet).mockReturnValue([]);
+    vi.mocked(worldPartyState).mockReturnValue([]);
 
     expect(partyMinLevel()).toBe(1);
   });
@@ -161,7 +172,7 @@ describe('partyMaxLevel', () => {
   });
 
   it('returns the highest level among party members', () => {
-    vi.mocked(partyGet).mockReturnValue([
+    vi.mocked(worldPartyState).mockReturnValue([
       buildCharacter(5),
       buildCharacter(2),
       buildCharacter(9),
@@ -171,7 +182,7 @@ describe('partyMaxLevel', () => {
   });
 
   it('defaults to 1 when the party is empty', () => {
-    vi.mocked(partyGet).mockReturnValue([]);
+    vi.mocked(worldPartyState).mockReturnValue([]);
 
     expect(partyMaxLevel()).toBe(1);
   });
@@ -200,7 +211,7 @@ describe('canEnterGatherNode', () => {
     vi.mocked(worldNodeGathering).mockReturnValue(
       buildGathering({ levelRange: { min: 3, max: 5 } }),
     );
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
 
     expect(canEnterGatherNode('Wergen Woods')).toBe(true);
   });
@@ -210,7 +221,7 @@ describe('canEnterGatherNode', () => {
     vi.mocked(worldNodeGathering).mockReturnValue(
       buildGathering({ levelRange: { min: 3, max: 5 } }),
     );
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(2)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(2)]);
 
     expect(canEnterGatherNode('Wergen Woods')).toBe(false);
   });
@@ -220,7 +231,7 @@ describe('canEnterGatherNode', () => {
     vi.mocked(worldNodeGathering).mockReturnValue(
       buildGathering({ levelRange: { min: 3, max: 5 } }),
     );
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(99)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(99)]);
 
     expect(canEnterGatherNode('Wergen Woods')).toBe(true);
   });
@@ -321,7 +332,7 @@ describe('gatheringStart', () => {
     vi.mocked(worldNodeGathering).mockReturnValue(
       buildGathering({ levelRange: { min: 5, max: 10 } }),
     );
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(1)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(1)]);
 
     expect(gatheringStart('Wergen Woods')).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
@@ -335,7 +346,7 @@ describe('gatheringStart', () => {
         levelRange: { min: 1, max: 5 },
       }),
     );
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(1)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(1)]);
 
     expect(gatheringStart('Wergen Woods')).toBe(true);
 
@@ -436,7 +447,7 @@ describe('gatheringProcessTick', () => {
         } as never;
       return undefined;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
 
@@ -499,7 +510,7 @@ describe('gatheringProcessTick', () => {
         return { name: 'Wergen Stick', sprite: 'wergen-stick' } as never;
       return undefined;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
 
@@ -542,7 +553,7 @@ describe('gatheringProcessTick', () => {
         return { name: 'Wergen Wood', rarity: 'Common' } as never;
       return undefined;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(partyMaxLuck).mockReturnValue(50);
     vi.mocked(luckRollSucceeds).mockReturnValue(true);
@@ -586,7 +597,7 @@ describe('gatheringProcessTick', () => {
         return { name: 'Wergen Wood', rarity: 'Common' } as never;
       return undefined;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
     // partyGatherYieldBonuses already combines base equipment + infusion + affix - gathering itself no longer distinguishes the source.
@@ -632,7 +643,7 @@ describe('gatheringProcessTick', () => {
       if (id === 'gather-1') return gathering as never;
       return { name: id, rarity: 'Common' } as never;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
     // The result lists Woodworking first, but the bonus targets Tailoring - its second tag - and must still match.
@@ -677,7 +688,7 @@ describe('gatheringProcessTick', () => {
       if (id === 'gather-1') return gathering as never;
       return { name: id, rarity: 'Common' } as never;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     // The Woodworking result is the one that actually rolls this cycle.
     vi.mocked(rngChoiceWeighted).mockReturnValue(woodResult);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
@@ -721,7 +732,7 @@ describe('gatheringProcessTick', () => {
       if (id === 'gather-1') return gathering as never;
       return { name: id, rarity: 'Common' } as never;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
     vi.mocked(partyGatherYieldBonuses).mockReturnValue([
@@ -753,7 +764,7 @@ describe('gatheringProcessTick', () => {
       gatherResults: [],
     });
     vi.mocked(getEntry).mockReturnValue(gathering as never);
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(99)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(99)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
 
     gatheringProcessTick();
@@ -792,7 +803,7 @@ describe('gatheringProcessTick', () => {
       if (id === 'gather-1') return gathering as never;
       return { name: id, rarity: 'Common' } as never;
     });
-    vi.mocked(partyGet).mockReturnValue([buildCharacter(3)]);
+    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
     vi.mocked(globalEffectSums).mockReturnValue({

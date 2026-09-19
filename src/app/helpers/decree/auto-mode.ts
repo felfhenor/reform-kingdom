@@ -1,6 +1,6 @@
-import { currentCombat } from '@helpers/combat/combat-state';
 import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { autoModePatch } from '@helpers/decree/auto-mode-state';
 import {
   decreeClauses,
   decreeWaitForFullHealthBeforeCombat,
@@ -21,7 +21,13 @@ import { isPartyAtFullHealth } from '@helpers/hero/party';
 import { travelStart } from '@helpers/hero/travel';
 import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  updateGamestate,
+  worldAutoModeState,
+  worldGatheringState,
+  worldTravelState,
+  worldCombatState,
+} from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -38,20 +44,22 @@ import type {
 } from '@interfaces';
 
 export function autoModeIsEnabled(): boolean {
-  return gamestate().world.autoMode.enabled;
+  return worldAutoModeState().enabled;
 }
 
 export function autoModeToggle(enabled: boolean): void {
   updateGamestate((state) => {
-    state.world.autoMode.enabled = enabled;
-    if (!enabled) state.world.autoMode.activeClauseId = undefined;
+    autoModePatch(
+      state,
+      enabled ? { enabled } : { enabled, activeClauseId: undefined },
+    );
     return state;
   });
 }
 
 function setActiveClause(clauseId?: DecreeClauseId): void {
   updateGamestate((state) => {
-    state.world.autoMode.activeClauseId = clauseId;
+    autoModePatch(state, { activeClauseId: clauseId });
     return state;
   });
 }
@@ -59,15 +67,17 @@ function setActiveClause(clauseId?: DecreeClauseId): void {
 function updateActiveClauseFailureCount(
   nextFailureCount: (current: number) => number,
 ): void {
-  const activeClauseId = gamestate().world.autoMode.activeClauseId;
+  const activeClauseId = worldAutoModeState().activeClauseId;
   if (!activeClauseId) return;
 
   updateGamestate((state) => {
-    state.world.autoMode.clauses = state.world.autoMode.clauses.map((clause) =>
-      clause.id === activeClauseId
-        ? { ...clause, failureCount: nextFailureCount(clause.failureCount) }
-        : clause,
-    );
+    autoModePatch(state, {
+      clauses: state.world.autoMode.clauses.map((clause) =>
+        clause.id === activeClauseId
+          ? { ...clause, failureCount: nextFailureCount(clause.failureCount) }
+          : clause,
+      ),
+    });
     return state;
   });
 }
@@ -88,11 +98,9 @@ export function autoModeRecordNodeFailure(nodeName: string): void {
   updateGamestate((state) => {
     const counts = state.world.autoMode.nodeFailureCounts;
     newFailureCount = (counts[nodeName] ?? 0) + 1;
-    state.world.autoMode.nodeFailureCounts = dictionaryWith(
-      counts,
-      nodeName,
-      newFailureCount,
-    );
+    autoModePatch(state, {
+      nodeFailureCounts: dictionaryWith(counts, nodeName, newFailureCount),
+    });
     return state;
   });
 
@@ -101,11 +109,13 @@ export function autoModeRecordNodeFailure(nodeName: string): void {
 
 export function autoModeRecordNodeSuccess(nodeName: string): void {
   updateGamestate((state) => {
-    state.world.autoMode.nodeFailureCounts = dictionaryWith(
-      state.world.autoMode.nodeFailureCounts,
-      nodeName,
-      0,
-    );
+    autoModePatch(state, {
+      nodeFailureCounts: dictionaryWith(
+        state.world.autoMode.nodeFailureCounts,
+        nodeName,
+        0,
+      ),
+    });
     return state;
   });
 }
@@ -113,7 +123,7 @@ export function autoModeRecordNodeSuccess(nodeName: string): void {
 // Called on level-up so a stronger party gets a fresh try at nodes previously written off.
 export function autoModeResetNodeFailureCounts(): void {
   updateGamestate((state) => {
-    state.world.autoMode.nodeFailureCounts = {};
+    autoModePatch(state, { nodeFailureCounts: {} });
     return state;
   });
 }
@@ -133,10 +143,10 @@ function syncAutoModeGlobalEffect(enabled: boolean): void {
 
 // Adopts any in-progress gather matching an enabled GatherMaterial clause so the stop-check always has a clause to work with.
 function adoptInProgressGatherClause(): void {
-  const autoMode = gamestate().world.autoMode;
+  const autoMode = worldAutoModeState();
   if (autoMode.activeClauseId) return;
 
-  const gathering = gamestate().world.gathering;
+  const gathering = worldGatheringState();
   if (gathering.status !== 'Gathering' || !gathering.nodeName) return;
 
   const node = worldNodeByName(gathering.nodeName);
@@ -157,9 +167,9 @@ function adoptInProgressGatherClause(): void {
 
 // Gathering loops forever on its own; this ends it once the target is reached and hands control back to clause re-evaluation.
 function stopGatherIfTargetReached(): void {
-  const autoMode = gamestate().world.autoMode;
+  const autoMode = worldAutoModeState();
   if (!autoMode.activeClauseId) return;
-  if (gamestate().world.gathering.status !== 'Gathering') return;
+  if (worldGatheringState().status !== 'Gathering') return;
 
   const clause = autoMode.clauses.find(
     (candidate) => candidate.id === autoMode.activeClauseId,
@@ -173,15 +183,15 @@ function stopGatherIfTargetReached(): void {
 
 function isPartyIdleForAutoMode(): boolean {
   return (
-    gamestate().world.travel.status === 'Idle' &&
+    worldTravelState().status === 'Idle' &&
     !isGathering() &&
-    !currentCombat()
+    !worldCombatState()
   );
 }
 
 // An orphaned gather (no clause tracking it, e.g. started manually or its clause got disabled) never stops on its own, leaving Auto Mode stuck at that node. Ends it so per-tick evaluation resumes.
 function stopOrphanedGather(): boolean {
-  const autoMode = gamestate().world.autoMode;
+  const autoMode = worldAutoModeState();
   if (!isGathering()) return false;
 
   const activeClause = autoMode.clauses.find(
@@ -240,10 +250,11 @@ function advanceToNextClause(): void {
 
 // Where the party is currently headed for the active clause - not just idle-vs-not, so it can be compared against a freshly re-picked clause's target below.
 function activeDestinationNodeName(): string | undefined {
-  const world = gamestate().world;
-  if (world.gathering.status === 'Gathering') return world.gathering.nodeName;
-  if (world.travel.status === 'Traveling')
-    return world.travel.destinationNodeName;
+  const gathering = worldGatheringState();
+  if (gathering.status === 'Gathering') return gathering.nodeName;
+
+  const travel = worldTravelState();
+  if (travel.status === 'Traveling') return travel.destinationNodeName;
   return undefined;
 }
 
@@ -258,9 +269,9 @@ let lastCheckedDecreeClauses: DecreeClause[] | undefined;
 
 // Editing the decree should preempt an in-progress clause, not wait for it to finish; combat can't be redirected mid-fight.
 function interruptForPriorityChange(): boolean {
-  if (currentCombat()) return false;
+  if (worldCombatState()) return false;
 
-  const autoMode = gamestate().world.autoMode;
+  const autoMode = worldAutoModeState();
   if (!autoMode.activeClauseId) return false;
 
   const currentTarget = activeDestinationNodeName();
@@ -296,7 +307,7 @@ function interruptForPriorityChange(): boolean {
 
 // Unlike every other clause, arriving at a DefendTowns target means "engage", not "done".
 function attemptDefendTownsEngage(): boolean {
-  const autoMode = gamestate().world.autoMode;
+  const autoMode = worldAutoModeState();
   const clause = autoMode.clauses.find(
     (candidate) => candidate.id === autoMode.activeClauseId,
   );

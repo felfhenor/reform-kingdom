@@ -42,6 +42,7 @@ vi.mock('@helpers/rng', () => ({
 
 vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
+  worldCurrentLocationState: vi.fn(() => ({ mapName: 'LarsianDesert' })),
 }));
 
 vi.mock('@helpers/town/raid/town-raid-defense', () => ({
@@ -56,10 +57,6 @@ vi.mock('@helpers/town/reputation/town-reputation', () => ({
 
 vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
   townReputationBuffRefresh: vi.fn(),
-}));
-
-vi.mock('@helpers/world', () => ({
-  currentLocationGet: vi.fn(() => ({ mapName: 'LarsianDesert' })),
 }));
 
 vi.mock('@helpers/town/shop/town-shop-access', () => ({

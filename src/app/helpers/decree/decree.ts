@@ -2,7 +2,8 @@ import { DECREE_CLAUSE_CAP } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { rngUuid } from '@helpers/rng';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { autoModePatch } from '@helpers/decree/auto-mode-state';
+import { updateGamestate, worldAutoModeState } from '@helpers/state-game';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import type {
   DecreeClause,
@@ -13,7 +14,7 @@ import type {
 } from '@interfaces';
 
 export function decreeClauses(): DecreeClause[] {
-  return gamestate().world.autoMode.clauses;
+  return worldAutoModeState().clauses;
 }
 
 export function decreeClauseCap(): number {
@@ -35,15 +36,15 @@ export function pruneInvalidDecreeGatherClauses(
 }
 
 export function decreeWaitForFullHealthBeforeCombat(): boolean {
-  return gamestate().world.autoMode.waitForFullHealthBeforeCombat;
+  return worldAutoModeState().waitForFullHealthBeforeCombat;
 }
 
 export function decreeWaitForFullEnergyBeforeCombat(): boolean {
-  return gamestate().world.autoMode.waitForFullEnergyBeforeCombat;
+  return worldAutoModeState().waitForFullEnergyBeforeCombat;
 }
 
 export function decreeNodeFailureCount(nodeName: string): number {
-  return gamestate().world.autoMode.nodeFailureCounts[nodeName] ?? 0;
+  return worldAutoModeState().nodeFailureCounts[nodeName] ?? 0;
 }
 
 // Two clauses conflict if they target the same thing regardless of quantity (e.g. a lower "gather until 20" is dead weight behind a "gather until 100").
@@ -84,7 +85,9 @@ export function decreeClauseAdd(action: DecreeClauseAction): boolean {
   };
 
   updateGamestate((state) => {
-    state.world.autoMode.clauses = [clause, ...state.world.autoMode.clauses];
+    autoModePatch(state, {
+      clauses: [clause, ...state.world.autoMode.clauses],
+    });
     return state;
   });
 
@@ -97,9 +100,11 @@ export function decreeClauseSetEnabled(
   enabled: boolean,
 ): void {
   updateGamestate((state) => {
-    state.world.autoMode.clauses = state.world.autoMode.clauses.map((clause) =>
-      clause.id === clauseId ? { ...clause, enabled } : clause,
-    );
+    autoModePatch(state, {
+      clauses: state.world.autoMode.clauses.map((clause) =>
+        clause.id === clauseId ? { ...clause, enabled } : clause,
+      ),
+    });
     return state;
   });
 }
@@ -116,7 +121,7 @@ export function decreeClauseReorder(
     if (!moved) return state;
 
     clauses.splice(newIndex, 0, moved);
-    state.world.autoMode.clauses = clauses;
+    autoModePatch(state, { clauses });
     return state;
   });
 }

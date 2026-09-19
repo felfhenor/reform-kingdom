@@ -2,10 +2,6 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(),
-}));
-
 vi.mock('@helpers/kingdom/armory', () => ({
   armoryGet: vi.fn(() => []),
 }));
@@ -13,6 +9,7 @@ vi.mock('@helpers/kingdom/armory', () => ({
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
+  worldCombatState: vi.fn(),
 }));
 
 import {

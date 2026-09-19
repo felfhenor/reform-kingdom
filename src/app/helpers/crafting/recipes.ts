@@ -1,11 +1,14 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
-import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
 import { getMaterialQuantity, traderTokenId } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
-import { discoveredRecipesState, updateGamestate } from '@helpers/state-game';
+import {
+  discoveredRecipesState,
+  updateGamestate,
+  worldPartyState,
+} from '@helpers/state-game';
 import type {
   CaravanTraderContent,
   CollectibleContent,
@@ -166,7 +169,7 @@ function ownedEquipmentQuantity(equipmentId: EquipmentId): number {
     (entry) => entry.content.id === equipmentId,
   ).length;
   const equipped = sumBy(
-    partyGet(),
+    worldPartyState(),
     (character) =>
       equippedItems(character.equipment).filter(
         (item) => item.equipmentId === equipmentId,

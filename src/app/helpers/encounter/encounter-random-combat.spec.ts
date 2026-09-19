@@ -25,12 +25,9 @@ vi.mock('@helpers/item/loot', () => ({
   rollDroppedRewards: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(),
-}));
-
 vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
+  worldPartyState: vi.fn(),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
@@ -46,9 +43,9 @@ import {
   encounterRandomHandleVictory,
   encounterRandomStartFight,
 } from '@helpers/encounter/encounter-random-combat';
-import { partyGet } from '@helpers/hero/party';
 import { rollDroppedRewards } from '@helpers/item/loot';
-import { updateGamestate } from '@helpers/state-game';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import {
   worldNodeByName,
   worldNodeEncounterRandom,
@@ -90,7 +87,7 @@ describe('encounterRandomStartFight', () => {
       completedThisCycle: false,
     } as EncounterRandomNodeState);
     const party: Character[] = [];
-    vi.mocked(partyGet).mockReturnValue(party);
+    vi.mocked(worldPartyState).mockReturnValue(party);
 
     const builtCombat = {
       id: 'combat-1' as CombatId,
@@ -165,7 +162,7 @@ describe('encounterRandomHandleVictory', () => {
     vi.mocked(worldNodeByName).mockReturnValue(entry);
     vi.mocked(worldNodeEncounterRandom).mockReturnValue(content);
     vi.mocked(getEntry).mockReturnValue({ id: 'Goblin' } as never);
-    vi.mocked(partyGet).mockReturnValue([]);
+    vi.mocked(worldPartyState).mockReturnValue([]);
     vi.mocked(combatCreateForEncounter).mockReturnValue({
       id: 'combat-2' as CombatId,
       locationName: entry.nodeName,
@@ -218,7 +215,7 @@ describe('encounterRandomHandleVictory', () => {
     ]);
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const result = updateFn({
+    const state = {
       world: {
         exploreRandom: {
           'gobslime-shrine': {
@@ -228,7 +225,10 @@ describe('encounterRandomHandleVictory', () => {
           },
         },
       },
-    } as unknown as GameState);
+    } as unknown as GameState;
+    const previousDict = deepFreeze(state.world.exploreRandom);
+    const result = updateFn(state);
+    expect(result.world.exploreRandom).not.toBe(previousDict);
     expect(
       result.world.exploreRandom['gobslime-shrine' as EncounterRandomId]
         .completedThisCycle,

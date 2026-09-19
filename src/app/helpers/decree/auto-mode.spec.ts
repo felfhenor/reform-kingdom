@@ -1,9 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(() => undefined),
-}));
-
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
@@ -38,10 +34,17 @@ vi.mock('@helpers/hero/party', () => ({
   isPartyAtFullHealth: vi.fn(() => true),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldAutoModeState: () => gamestate().world.autoMode,
+    worldGatheringState: () => gamestate().world.gathering,
+    worldTravelState: () => gamestate().world.travel,
+    worldCombatState: vi.fn(() => undefined),
+  };
+});
 
 vi.mock('@helpers/hero/travel', () => ({
   travelStart: vi.fn(),
@@ -69,7 +72,6 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeTown: vi.fn(() => undefined),
 }));
 
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
 import {
   autoModeIsEnabled,
@@ -99,7 +101,12 @@ import { isPartyAtFullHealth } from '@helpers/hero/party';
 import { travelStart } from '@helpers/hero/travel';
 import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
+import {
+  gamestate,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -165,6 +172,8 @@ function buildState(overrides: {
 }
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world?.autoMode);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);
@@ -172,7 +181,7 @@ function applyLastUpdate(state: GameState): GameState {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(currentCombat).mockReturnValue(undefined);
+  vi.mocked(worldCombatState).mockReturnValue(undefined);
   vi.mocked(isGathering).mockReturnValue(false);
   vi.mocked(isGlobalEffectActive).mockReturnValue(false);
   vi.mocked(isPlayerAtHome).mockReturnValue(false);
@@ -357,8 +366,8 @@ describe('autoModeProcessTick', () => {
 
   it('does not act while the party is mid-combat', () => {
     vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(currentCombat).mockReturnValue(
-      {} as ReturnType<typeof currentCombat>,
+    vi.mocked(worldCombatState).mockReturnValue(
+      {} as ReturnType<typeof worldCombatState>,
     );
 
     autoModeProcessTick();
@@ -1017,8 +1026,8 @@ describe('autoModeProcessTick', () => {
         activeClauseId: woodClause.id,
       }),
     );
-    vi.mocked(currentCombat).mockReturnValue(
-      {} as ReturnType<typeof currentCombat>,
+    vi.mocked(worldCombatState).mockReturnValue(
+      {} as ReturnType<typeof worldCombatState>,
     );
     vi.mocked(decreeClauses).mockReturnValue([copperClause, woodClause]);
     vi.mocked(pickNextClause).mockReturnValue(copperClause);

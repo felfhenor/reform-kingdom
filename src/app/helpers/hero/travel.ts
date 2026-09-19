@@ -1,6 +1,5 @@
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
-import { currentCombat } from '@helpers/combat/combat-state';
 import {
   DEATHS_DOOR_MINIMUM_SECONDS,
   DEATHS_DOOR_SECONDS_PER_MAP,
@@ -12,6 +11,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
 import {
   addGlobalEffect,
@@ -22,10 +22,15 @@ import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  updateGamestate,
+  worldCombatState,
+  worldCurrentLocationState,
+  worldTravelState,
+} from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
-import { currentLocationGet, currentLocationSet } from '@helpers/world';
+import { currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import {
   isWorldNodeCollectibleGateMet,
@@ -36,7 +41,7 @@ import {
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
-import type { GlobalEffectId, TravelState, TravelStep } from '@interfaces';
+import type { GlobalEffectId, TravelStep } from '@interfaces';
 import { clamp, sum } from 'es-toolkit/compat';
 
 export {
@@ -44,14 +49,10 @@ export {
   travelStepTicksCost,
 } from '@helpers/hero/travel-cost';
 
-function travelGet(): TravelState {
-  return gamestate().world.travel;
-}
-
 // Remaining seconds until arrival if actively traveling toward this node,
 // else undefined - drives a disabled "mm:ss" travel button in the UI.
 export function travelEtaSecondsTo(nodeName: string): number | undefined {
-  const travel = travelGet();
+  const travel = worldTravelState();
   if (
     travel.status !== 'Traveling' ||
     travel.destinationNodeName !== nodeName
@@ -59,7 +60,7 @@ export function travelEtaSecondsTo(nodeName: string): number | undefined {
     return undefined;
   }
 
-  let origin = currentLocationGet();
+  let origin = worldCurrentLocationState();
   const costs = travel.path.map((step, index) => {
     const cost = travelStepTicksCost(step, origin);
     origin = step;
@@ -75,13 +76,13 @@ export function canPartyTravel(): boolean {
   return (
     !isGlobalEffectActive('Deaths Door' as GlobalEffectId) &&
     !isGlobalEffectActive('Healing' as GlobalEffectId) &&
-    !currentCombat()
+    !worldCombatState()
   );
 }
 
 // Settles the party as arrived without moving - used when a redirect targets the tile they're already on.
 function travelArriveWithoutMoving(destinationNodeName: string): void {
-  const location = currentLocationGet();
+  const location = worldCurrentLocationState();
 
   updateGamestate((state) => {
     state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
@@ -93,7 +94,7 @@ function travelArriveWithoutMoving(destinationNodeName: string): void {
 
 // Safety net for an unroutable tile (e.g. walled off by a map edit): recall to kingdom and log where it happened.
 function travelRecoverFromPathingFailure(destinationNodeName: string): void {
-  const location = currentLocationGet();
+  const location = worldCurrentLocationState();
   const kingdom = worldNodesOfType('Kingdom')[0];
 
   if (kingdom) {
@@ -131,7 +132,7 @@ export function travelStart(
     return false;
   }
 
-  const travel = travelGet();
+  const travel = worldTravelState();
   const wasTraveling = travel.status === 'Traveling';
   if (wasTraveling && travel.destinationNodeName === destinationNodeName) {
     return false;
@@ -168,7 +169,7 @@ export function travelStart(
 
   categoryMessageLog(
     'Travel',
-    currentLocationGet().mapName,
+    worldCurrentLocationState().mapName,
     wasTraveling
       ? `The party changed course for ${destinationNodeName}.`
       : `The party left for ${destinationNodeName}.`,
@@ -182,7 +183,10 @@ function deathsDoorDurationTicks(): number {
   const home = homeNodeGet();
   if (!home) return DEATHS_DOOR_MINIMUM_SECONDS;
 
-  const hops = mapHopsBetween(currentLocationGet().mapName, home.mapName);
+  const hops = mapHopsBetween(
+    worldCurrentLocationState().mapName,
+    home.mapName,
+  );
   return Math.max(
     DEATHS_DOOR_MINIMUM_SECONDS,
     hops * DEATHS_DOOR_SECONDS_PER_MAP,
@@ -195,7 +199,7 @@ export function travelBeginDeathsDoor(): void {
 
   categoryMessageLog(
     'Travel',
-    currentLocationGet().mapName,
+    worldCurrentLocationState().mapName,
     'The fallen party awaits recall home.',
   );
 }
@@ -247,7 +251,7 @@ function travelCompleteStep(
   completedStep: TravelStep,
   remainingPath: TravelStep[],
 ): void {
-  const previousLocation = currentLocationGet();
+  const previousLocation = worldCurrentLocationState();
   currentLocationSet({
     mapName: completedStep.mapName,
     x: completedStep.x,
@@ -272,23 +276,33 @@ function travelCompleteStep(
   }
 
   updateGamestate((state) => {
-    state.world.travel.path = remainingPath;
-    state.world.travel.ticksIntoStep = 0;
+    state.world.travel = dictionaryWith(
+      dictionaryWith(state.world.travel, 'path', remainingPath),
+      'ticksIntoStep',
+      0,
+    );
     return state;
   });
 }
 
 export function travelProcessTick(): void {
-  const travel = travelGet();
+  const travel = worldTravelState();
   if (travel.status === 'Idle' || travel.path.length === 0) return;
 
   const [currentStep, ...restOfPath] = travel.path;
-  const stepCost = travelStepTicksCost(currentStep, currentLocationGet());
+  const stepCost = travelStepTicksCost(
+    currentStep,
+    worldCurrentLocationState(),
+  );
   const ticksIntoStep = travel.ticksIntoStep + 1;
 
   if (stepCost > 0 && ticksIntoStep < stepCost) {
     updateGamestate((state) => {
-      state.world.travel.ticksIntoStep = ticksIntoStep;
+      state.world.travel = dictionaryWith(
+        state.world.travel,
+        'ticksIntoStep',
+        ticksIntoStep,
+      );
       return state;
     });
     return;

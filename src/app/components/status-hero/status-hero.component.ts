@@ -5,9 +5,8 @@ import {
   input,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState, worldCombatState } from '@helpers/state-game';
 import type { Combatant, JobContent, StatusCardEntry } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -25,13 +24,13 @@ export class StatusHeroComponent {
     // HP lives on the live `Combatant` during a fight - `Character.hp` only
     // resyncs once combat ends, so it'd show stale HP for the whole fight.
     const liveCombatantsById = new Map<string, Combatant>(
-      (currentCombat()?.heroes ?? []).map((combatant) => [
+      (worldCombatState()?.heroes ?? []).map((combatant) => [
         combatant.id,
         combatant,
       ]),
     );
 
-    return partyGet().map((character) => {
+    return worldPartyState().map((character) => {
       const live = liveCombatantsById.get(character.id);
       const hp = live?.hp ?? character.hp;
       const maxHp = Math.max(

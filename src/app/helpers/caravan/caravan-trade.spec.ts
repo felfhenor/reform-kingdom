@@ -51,7 +51,6 @@ vi.mock('@helpers/item/materials', async (importOriginal) => {
 });
 
 vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(),
   partyAffixEffects: vi.fn(() => []),
 }));
 
@@ -61,6 +60,7 @@ vi.mock('@helpers/rng', () => ({
 
 vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
+  worldPartyState: vi.fn(),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
@@ -416,4 +416,3 @@ describe('caravanTradeMaxQuantity', () => {
     expect(caravanTradeMaxQuantity(caravan, trade, {}, 0)).toBe(0);
   });
 });
-

@@ -25,10 +25,14 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldPartyState: () => gamestate().world.party,
+  };
+});
 
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
@@ -40,7 +44,6 @@ import {
   isPartyAtFullHealth,
   partyAffixEffects,
   partyGatherYieldBonuses,
-  partyGet,
   pruneInvalidPartyEquipment,
   setParty,
 } from '@helpers/hero/party';
@@ -210,18 +213,6 @@ describe('Party Helper Functions', () => {
       const result = updateFn(fakeState);
 
       expect(result.world.party).toEqual(party);
-    });
-  });
-
-  describe('partyGet', () => {
-    it('should return the party from state', () => {
-      mockGetEntry(mockJob);
-      const party: Character[] = [createCharacterStub('Jala')];
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party },
-      } as unknown as GameState);
-
-      expect(partyGet()).toBe(party);
     });
   });
 

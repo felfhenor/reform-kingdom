@@ -1,15 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  worldCurrentLocationState: vi.fn(),
+}));
+
 vi.mock('@helpers/item/collectibles', () => ({
   discoveredCollectibleCount: vi.fn(() => 0),
 }));
 
 vi.mock('@helpers/maps', () => ({
   allMaps: vi.fn(),
-}));
-
-vi.mock('@helpers/world', () => ({
-  currentLocationGet: vi.fn(),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
@@ -26,7 +27,7 @@ import {
   travelPathFrom,
   travelPathTo,
 } from '@helpers/pathfinding/pathfinding-travel';
-import { currentLocationGet } from '@helpers/world';
+import { worldCurrentLocationState } from '@helpers/state-game';
 import {
   isWorldNodeCollectibleGateMet,
   worldNodeByName,
@@ -89,7 +90,7 @@ describe('travelPathTo', () => {
   });
 
   it('returns an empty path when already at the destination', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 2,
       y: 2,
@@ -107,7 +108,7 @@ describe('travelPathTo', () => {
   });
 
   it('returns an in-map Move path on an open grid', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -139,7 +140,7 @@ describe('travelPathTo', () => {
     };
     const walledMap: TiledMap = { ...buildOpenMap(3, 3), layers: [wallLayer] };
 
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 1,
@@ -163,7 +164,7 @@ describe('travelPathTo', () => {
   });
 
   it('composes a cross-map path through a matching TeleportNode pair', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -223,7 +224,7 @@ describe('travelPathTo', () => {
   });
 
   it('refuses to cross maps at all when allowTeleport is false, even through an unlocked pair', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -274,7 +275,7 @@ describe('travelPathTo', () => {
   });
 
   it('does not route through a TeleportNode pair that is still locked behind a collectible gate', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -329,7 +330,7 @@ describe('travelPathTo', () => {
   });
 
   it('routes through a locked TeleportNode pair when ignoreCollectibleGate is set', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -387,7 +388,7 @@ describe('travelPathTo', () => {
   });
 
   it('travels through a TeleportNode when it is the destination itself, not just a waypoint', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -436,7 +437,7 @@ describe('travelPathTo', () => {
   });
 
   it('refuses to travel directly to a TeleportNode at all when allowTeleport is false', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -468,7 +469,7 @@ describe('travelPathTo', () => {
   });
 
   it('refuses to travel directly to a TeleportNode that is still locked behind a collectible gate', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -501,7 +502,7 @@ describe('travelPathTo', () => {
   });
 
   it('routes around a node tile that is not the destination', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 1,
@@ -552,7 +553,7 @@ describe('travelPathTo', () => {
     };
     const map: TiledMap = { ...buildOpenMap(5, 5), layers: [pathTilesLayer] };
 
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -573,7 +574,7 @@ describe('travelPathTo', () => {
   it('chains through two teleport hops when no single hop reaches the destination', () => {
     // Mirrors the real Carrina -> CraggledMire -> Larsian Desert route: Larsian Desert only
     // pairs with CraggledMire, not with the Kingdom's own map, so this needs two hops.
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -661,7 +662,7 @@ describe('travelPathTo', () => {
   });
 
   it('picks the cheaper of two competing teleport routes, not just the first one found', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -726,7 +727,7 @@ describe('travelPathTo', () => {
   });
 
   it('returns undefined when no teleport chain connects to the destination map at all', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -805,7 +806,7 @@ describe('travelPathFrom', () => {
       { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
       { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
     ]);
-    expect(currentLocationGet).not.toHaveBeenCalled();
+    expect(worldCurrentLocationState).not.toHaveBeenCalled();
   });
 
   it('returns undefined when the destination node does not exist', () => {

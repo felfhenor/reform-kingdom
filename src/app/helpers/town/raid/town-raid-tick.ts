@@ -15,7 +15,11 @@ import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { partyMinLevel } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
@@ -71,7 +75,7 @@ function processTownRaid(town: TownContent): void {
   const state = gamestate().world.towns[town.id];
   if (!state || state.firstVisitedAtTick === undefined) return;
   // Its raid is actively being fought - without this the checks below would re-telegraph mid-fight.
-  if (gamestate().world.combat?.raidTownId === town.id) return;
+  if (worldCombatState()?.raidTownId === town.id) return;
 
   const now = timerTicksElapsed();
 

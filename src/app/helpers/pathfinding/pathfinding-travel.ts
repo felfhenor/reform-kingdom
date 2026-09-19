@@ -8,7 +8,7 @@ import {
   travelPathViaTeleport,
   unlockedTeleportNodes,
 } from '@helpers/pathfinding/pathfinding';
-import { currentLocationGet } from '@helpers/world';
+import { worldCurrentLocationState } from '@helpers/state-game';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type { CurrentLocation, TravelStep, WorldNodeEntry } from '@interfaces';
 import { minBy } from 'es-toolkit/compat';
@@ -206,7 +206,7 @@ export function travelPathTo(
   ignoreCollectibleGate = false,
 ): TravelStep[] | undefined {
   return travelPathFrom(
-    currentLocationGet(),
+    worldCurrentLocationState(),
     destinationNodeName,
     allowTeleport,
     ignoreCollectibleGate,

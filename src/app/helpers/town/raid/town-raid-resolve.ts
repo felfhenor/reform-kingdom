@@ -23,7 +23,10 @@ import {
   rollDroppedRewards,
 } from '@helpers/item/loot';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
-import { updateGamestate } from '@helpers/state-game';
+import {
+  updateGamestate,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import {
   townReputationGain,
@@ -35,7 +38,6 @@ import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commiss
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { townStockDisplay } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
-import { currentLocationGet } from '@helpers/world';
 import type {
   Combat,
   GameState,
@@ -67,7 +69,7 @@ export function raidResolveVictory(combat: Combat, townId: TownId): void {
   const previousTier = townReputationTier(townId);
   townReputationGain(townId, RAID_WIN_REPUTATION_AMOUNT, 'RaidDefense');
   if (townReputationTier(townId) !== previousTier) {
-    townReputationBuffRefresh(currentLocationGet().mapName);
+    townReputationBuffRefresh(worldCurrentLocationState().mapName);
     townCommissionRefreshTierScaledSlots(townId);
   }
 
@@ -193,7 +195,7 @@ export function raidResolveDefeat(townId: TownId): void {
   const previousTier = townReputationTier(townId);
   townReputationLose(townId, RAID_LOSS_REPUTATION_AMOUNT, 'RaidDefense');
   if (townReputationTier(townId) !== previousTier) {
-    townReputationBuffRefresh(currentLocationGet().mapName);
+    townReputationBuffRefresh(worldCurrentLocationState().mapName);
     townCommissionRefreshTierScaledSlots(townId);
   }
 

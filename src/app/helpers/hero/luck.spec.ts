@@ -1,17 +1,18 @@
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(),
-}));
-
 import {
   luckReducedChance,
   luckRollSucceeds,
   partyMaxLuck,
 } from '@helpers/hero/luck';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { rngSeeded } from '@helpers/rng';
 import type { Character } from '@interfaces';
 import type { PRNG } from 'seedrandom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  worldPartyState: vi.fn(),
+}));
 
 function buildCharacter(luck: number): Character {
   return { stats: { Luck: luck } } as unknown as Character;
@@ -56,7 +57,7 @@ describe('partyMaxLuck', () => {
   });
 
   it('returns the highest luck among party members', () => {
-    vi.mocked(partyGet).mockReturnValue([
+    vi.mocked(worldPartyState).mockReturnValue([
       buildCharacter(5),
       buildCharacter(25),
       buildCharacter(10),
@@ -66,7 +67,7 @@ describe('partyMaxLuck', () => {
   });
 
   it('defaults to 0 when the party is empty', () => {
-    vi.mocked(partyGet).mockReturnValue([]);
+    vi.mocked(worldPartyState).mockReturnValue([]);
 
     expect(partyMaxLuck()).toBe(0);
   });

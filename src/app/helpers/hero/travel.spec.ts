@@ -4,10 +4,6 @@ vi.mock('@helpers/caravan/caravan', () => ({
   caravanMarkVisited: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(() => undefined),
-}));
-
 vi.mock('@helpers/decree/auto-mode', () => ({
   autoModeIsEnabled: vi.fn(() => false),
   autoModeToggle: vi.fn(),
@@ -49,13 +45,18 @@ vi.mock('@helpers/town/town-spawn', () => ({
   homeNodeGet: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldTravelState: () => gamestate().world.travel,
+    worldCombatState: vi.fn(() => undefined),
+    worldCurrentLocationState: vi.fn(),
+  };
+});
 
 vi.mock('@helpers/world', () => ({
-  currentLocationGet: vi.fn(),
   currentLocationSet: vi.fn(),
 }));
 
@@ -83,7 +84,6 @@ vi.mock('@helpers/engine/ui', () => ({
 }));
 
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
@@ -103,10 +103,16 @@ import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween, tileIsOnPath } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
+import {
+  gamestate,
+  updateGamestate,
+  worldCombatState,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
-import { currentLocationGet, currentLocationSet } from '@helpers/world';
+import { currentLocationSet } from '@helpers/world';
 import {
   isWorldNodeCollectibleGateMet,
   worldNodeAt,
@@ -131,6 +137,8 @@ function stateWithTravel(travel: TravelState): GameState {
 }
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world?.travel);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);
@@ -175,7 +183,7 @@ describe('canPartyTravel', () => {
       stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
     );
     vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-    vi.mocked(currentCombat).mockReturnValue({} as never);
+    vi.mocked(worldCombatState).mockReturnValue({} as never);
 
     expect(canPartyTravel()).toBe(false);
   });
@@ -184,7 +192,7 @@ describe('canPartyTravel', () => {
 describe('travelEtaSecondsTo', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -278,8 +286,8 @@ describe('travelStart', () => {
       stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
     );
     vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-    vi.mocked(currentCombat).mockReturnValue(undefined);
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCombatState).mockReturnValue(undefined);
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -320,7 +328,7 @@ describe('travelStart', () => {
 
   it('recalls the party to the kingdom and logs the error when pathfinding fails entirely', () => {
     vi.mocked(travelPathTo).mockReturnValue(undefined);
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'CraggledMire',
       x: 3,
       y: 7,
@@ -531,7 +539,7 @@ describe('travelStart', () => {
 describe('travelBeginDeathsDoor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'CraggledMire',
       x: 3,
       y: 3,
@@ -585,7 +593,7 @@ describe('travelBeginDeathsDoor', () => {
 describe('travelProcessTick', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 0,
       y: 0,
@@ -666,7 +674,7 @@ describe('travelProcessTick', () => {
 
   it('syncs the town reputation buff with the map before/after a completed step', () => {
     vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 2,
       y: 0,
@@ -753,7 +761,7 @@ describe('travelProcessTick', () => {
 
   it('completes a step off of an off-path node tile at the 1-tick cost, so departure never stutters', () => {
     vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 1,
       y: 0,
@@ -782,7 +790,7 @@ describe('travelProcessTick', () => {
   });
 
   it('still charges the off-path cost leaving an ordinary (non-node) path tile onto an off-path tile', () => {
-    vi.mocked(currentLocationGet).mockReturnValue({
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
       mapName: 'Carrina',
       x: 1,
       y: 0,

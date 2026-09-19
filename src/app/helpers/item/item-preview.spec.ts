@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  worldPartyState: vi.fn(),
+}));
+
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
@@ -11,12 +16,8 @@ vi.mock('@helpers/crafting/recipes', () => ({
   recipeStylizedName: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(),
-}));
-
 import { getEntry } from '@helpers/content/content';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import {
   itemPreviewDisplay,
   resolveRewardDisplay,
@@ -74,7 +75,7 @@ describe('itemPreviewDisplay', () => {
     } as EquipmentContent;
     const warriorJob = { equippableTypes: ['Sword'] } as JobContent;
     vi.mocked(getEntry).mockReturnValue(warriorJob);
-    vi.mocked(partyGet).mockReturnValue([
+    vi.mocked(worldPartyState).mockReturnValue([
       { name: 'Alice', jobId: 'warrior' as JobId } as never,
     ]);
 
@@ -110,7 +111,7 @@ describe('itemPreviewDisplay', () => {
         ? ({ name: 'Woodworking', sprite: '0009' } as never)
         : undefined,
     );
-    vi.mocked(partyGet).mockReturnValue([]);
+    vi.mocked(worldPartyState).mockReturnValue([]);
 
     expect(
       itemPreviewDisplay('equipment', equipment).gatherYieldBonuses,
@@ -138,7 +139,7 @@ describe('itemPreviewDisplay', () => {
       if (id === 'magician') return staffJob as never;
       return undefined;
     });
-    vi.mocked(partyGet).mockReturnValue([
+    vi.mocked(worldPartyState).mockReturnValue([
       {
         id: 'a' as CharacterId,
         name: 'Alice',
@@ -170,7 +171,7 @@ describe('itemPreviewDisplay', () => {
     const staffJob = { equippableTypes: ['Staff'] } as JobContent;
 
     vi.mocked(getEntry).mockReturnValue(staffJob);
-    vi.mocked(partyGet).mockReturnValue([
+    vi.mocked(worldPartyState).mockReturnValue([
       {
         id: 'b' as CharacterId,
         name: 'Bob',
@@ -248,7 +249,7 @@ describe('resolveRewardDisplay', () => {
       rarity: 'Rare',
     } as EquipmentContent;
     vi.mocked(getEntry).mockReturnValue(equipment);
-    vi.mocked(partyGet).mockReturnValue([]);
+    vi.mocked(worldPartyState).mockReturnValue([]);
 
     expect(resolveRewardDisplay({ equipmentId: equipment.id })?.name).toBe(
       'Sword',

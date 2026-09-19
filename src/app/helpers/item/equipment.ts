@@ -1,4 +1,4 @@
-import { currentCombat } from '@helpers/combat/combat-state';
+import { worldCombatState } from '@helpers/state-game';
 import { getEntry } from '@helpers/content/content';
 import {
   affixEffectsOfKind,
@@ -45,7 +45,7 @@ import { orderBy, sumBy, uniq } from 'es-toolkit/compat';
 
 // Gear can be swapped freely while gathering, but not mid-fight.
 export function canModifyEquipment(): boolean {
-  return !currentCombat();
+  return !worldCombatState();
 }
 
 // Single construction site for a fresh EquipmentItem - every drop/craft/purchase/starter-gear path should use this instead of an inline literal.

@@ -9,10 +9,6 @@ vi.mock('@helpers/combat/combat-log', () => ({
   combatMessageLog: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(),
-}));
-
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
@@ -26,13 +22,11 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(() => 1000),
 }));
 
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(() => []),
-}));
-
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
+  worldPartyState: vi.fn(() => []),
+  worldCombatState: vi.fn(),
 }));
 
 vi.mock('@helpers/town/raid/town-raid-defense', () => ({
@@ -52,9 +46,12 @@ import {
   combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -103,7 +100,7 @@ function mockTownState(
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(currentCombat).mockReturnValue(undefined);
+  vi.mocked(worldCombatState).mockReturnValue(undefined);
   vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
     nodeName: 'Larsia',
   } as never);
@@ -124,7 +121,7 @@ describe('raidEngageCombat', () => {
 
   it('returns false when combat is already in progress', () => {
     vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    vi.mocked(currentCombat).mockReturnValue({} as Combat);
+    vi.mocked(worldCombatState).mockReturnValue({} as Combat);
 
     expect(raidEngageCombat(townId)).toBe(false);
   });

@@ -7,7 +7,7 @@ import {
 import { StatusHelperComponent } from '@components/status-helper/status-helper.component';
 import { StatusHeroComponent } from '@components/status-hero/status-hero.component';
 import { StatusMonsterComponent } from '@components/status-monster/status-monster.component';
-import { currentCombat } from '@helpers/combat/combat-state';
+import { worldCombatState } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 
 @Component({
@@ -57,10 +57,10 @@ export class StatusEncounterComponent {
   );
 
   public hasEnemies = computed(
-    () => (currentCombat()?.guardians ?? []).length > 0,
+    () => (worldCombatState()?.guardians ?? []).length > 0,
   );
   public hasHelpers = computed(
-    () => (currentCombat()?.helpers ?? []).length > 0,
+    () => (worldCombatState()?.helpers ?? []).length > 0,
   );
 
   public setHovered(hovered: boolean): void {

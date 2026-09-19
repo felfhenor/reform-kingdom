@@ -1,7 +1,8 @@
 import { getEntry } from '@helpers/content/content';
 import { decreeClauseConflicts, decreeClauses } from '@helpers/decree/decree';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { autoModePatch } from '@helpers/decree/auto-mode-state';
+import { updateGamestate, worldAutoModeState } from '@helpers/state-game';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
   DecreeClause,
@@ -11,19 +12,19 @@ import type {
 } from '@interfaces';
 
 export function decreeActiveClauseId(): DecreeClauseId | undefined {
-  return gamestate().world.autoMode.activeClauseId;
+  return worldAutoModeState().activeClauseId;
 }
 
 export function decreeSetWaitForFullHealthBeforeCombat(value: boolean): void {
   updateGamestate((state) => {
-    state.world.autoMode.waitForFullHealthBeforeCombat = value;
+    autoModePatch(state, { waitForFullHealthBeforeCombat: value });
     return state;
   });
 }
 
 export function decreeSetWaitForFullEnergyBeforeCombat(value: boolean): void {
   updateGamestate((state) => {
-    state.world.autoMode.waitForFullEnergyBeforeCombat = value;
+    autoModePatch(state, { waitForFullEnergyBeforeCombat: value });
     return state;
   });
 }
@@ -41,16 +42,18 @@ export function decreeClauseUpdate(
   if (decreeClauseConflicts(action, otherClauses)) return false;
 
   updateGamestate((state) => {
-    state.world.autoMode.clauses = state.world.autoMode.clauses.map((clause) =>
-      clause.id === clauseId
-        ? {
-            ...action,
-            id: clause.id,
-            enabled: clause.enabled,
-            failureCount: clause.failureCount,
-          }
-        : clause,
-    );
+    autoModePatch(state, {
+      clauses: state.world.autoMode.clauses.map((clause) =>
+        clause.id === clauseId
+          ? {
+              ...action,
+              id: clause.id,
+              enabled: clause.enabled,
+              failureCount: clause.failureCount,
+            }
+          : clause,
+      ),
+    });
     return state;
   });
 
@@ -67,11 +70,13 @@ export function decreeClauseRemove(clauseId: DecreeClauseId): void {
     if (!existedBefore) return state;
     didRemove = true;
 
-    state.world.autoMode.clauses = state.world.autoMode.clauses.filter(
-      (clause) => clause.id !== clauseId,
-    );
+    autoModePatch(state, {
+      clauses: state.world.autoMode.clauses.filter(
+        (clause) => clause.id !== clauseId,
+      ),
+    });
     if (state.world.autoMode.activeClauseId === clauseId) {
-      state.world.autoMode.activeClauseId = undefined;
+      autoModePatch(state, { activeClauseId: undefined });
     }
     return state;
   });

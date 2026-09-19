@@ -8,10 +8,6 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(() => undefined),
-}));
-
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
@@ -26,13 +22,18 @@ vi.mock('@helpers/hero/global-effects', () => ({
   removeGlobalEffect: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldTravelState: () => gamestate().world.travel,
+    worldCombatState: vi.fn(() => undefined),
+  };
+});
 
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   addGlobalEffect,
   isGlobalEffectActive,
@@ -40,7 +41,11 @@ import {
 } from '@helpers/hero/global-effects';
 import { isPartyResting, restingProcessTick } from '@helpers/hero/resting';
 import { isGathering } from '@helpers/item/gathering';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 
 const idleId = 'idle-1' as GlobalEffectId;
 const idleContent: GlobalEffectContent = {
@@ -81,10 +86,17 @@ function mockState(
   } as unknown as GameState);
 }
 
+function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world.party);
+
+  const calls = vi.mocked(updateGamestate).mock.calls;
+  return calls[calls.length - 1][0](state);
+}
+
 describe('Resting Helper Functions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(currentCombat).mockReturnValue(undefined);
+    vi.mocked(worldCombatState).mockReturnValue(undefined);
     vi.mocked(isGathering).mockReturnValue(false);
     vi.mocked(isGlobalEffectActive).mockReturnValue(false);
     vi.mocked(getEntry).mockReturnValue(idleContent);
@@ -112,8 +124,8 @@ describe('Resting Helper Functions', () => {
 
     it('is false while in combat', () => {
       mockState([]);
-      vi.mocked(currentCombat).mockReturnValue(
-        {} as ReturnType<typeof currentCombat>,
+      vi.mocked(worldCombatState).mockReturnValue(
+        {} as ReturnType<typeof worldCombatState>,
       );
 
       expect(isPartyResting()).toBe(false);
@@ -176,6 +188,41 @@ describe('Resting Helper Functions', () => {
 
       expect(result.world.party[0].hp).toBe(51);
       expect(result.world.party[0].ep).toBe(21);
+    });
+
+    it('reassigns the party and only the characters that regenerated', () => {
+      const rested = buildCharacter({
+        id: 'a' as CharacterId,
+        hp: 100,
+        ep: 40,
+      });
+      const hurt = buildCharacter({ id: 'b' as CharacterId, hp: 50, ep: 20 });
+      mockState([rested, hurt]);
+
+      restingProcessTick();
+
+      const state = {
+        world: { party: [rested, hurt] },
+      } as unknown as GameState;
+      const previousParty = state.world.party;
+      const result = applyLastUpdate(state);
+
+      expect(result.world.party).not.toBe(previousParty);
+      expect(result.world.party[0]).toBe(rested);
+      expect(result.world.party[1]).not.toBe(hurt);
+    });
+
+    it('leaves the party reference untouched when nobody has anything to regenerate', () => {
+      const rested = buildCharacter({ hp: 100, ep: 40 });
+      mockState([rested]);
+
+      restingProcessTick();
+
+      const state = { world: { party: [rested] } } as unknown as GameState;
+      const previousParty = state.world.party;
+      const result = applyLastUpdate(state);
+
+      expect(result.world.party).toBe(previousParty);
     });
 
     it('regen never exceeds the stat maximum', () => {

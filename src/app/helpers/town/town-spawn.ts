@@ -1,5 +1,5 @@
 import { TOWN_HOME_MIN_REPUTATION_TIER } from '@helpers/config';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, worldHomeNodeNameState } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import {
@@ -11,7 +11,7 @@ import type { TownId, WorldNodeEntry } from '@interfaces';
 
 // The recall target for Deaths Door and the ReturnToKingdom decree clause - a designated Town, falling back to the Duchy if never set or if its content is later removed.
 export function homeNodeGet(): WorldNodeEntry | undefined {
-  const homeNodeName = gamestate().world.homeNodeName;
+  const homeNodeName = worldHomeNodeNameState();
   if (homeNodeName) {
     const entry = worldNodeByName(homeNodeName);
     if (entry && worldNodeTown(entry)) return entry;

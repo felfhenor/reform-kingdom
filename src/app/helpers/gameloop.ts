@@ -3,7 +3,6 @@ import { LoggerTimer } from 'logger-timer';
 import { computed } from '@angular/core';
 import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
 import { combatDoCombatIteration } from '@helpers/combat/combat';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { commissionProcessTick } from '@helpers/commission/commission-tick';
 import { TICKS_PER_YIELD } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
@@ -25,6 +24,7 @@ import {
   isGameStateReady,
   saveGameState,
   updateGamestate,
+  worldCombatState,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { townCommissionProcessTick } from '@helpers/town/town-commission-generate';
@@ -92,7 +92,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       townRaidProcessTick();
       townCommissionProcessTick();
 
-      if (currentCombat()) {
+      if (worldCombatState()) {
         combatDoCombatIteration();
       }
 

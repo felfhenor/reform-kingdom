@@ -32,7 +32,6 @@ import {
   worldCameraRecenterRequest,
 } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
-import { partyGet } from '@helpers/hero/party';
 import {
   gatheringProgressFraction,
   isGathering,
@@ -77,11 +76,17 @@ import {
   defaultTravelGlideState,
   travelGlideAdvance,
 } from '@helpers/pixi/pixi-travel-glide.ui';
-import { gamestate, workersState } from '@helpers/state-game';
+import {
+  gamestate,
+  workersState,
+  worldCombatState,
+  worldTravelState,
+  worldPartyState,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-travel.ui';
 import { workersTravelingTokens } from '@helpers/worker/worker-travel.ui';
-import { currentLocationGet } from '@helpers/world';
 import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate.ui';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
 import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
@@ -274,7 +279,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   constructor() {
     // Bootstraps the first map load; later map changes are re-checked via the Pixi ticker instead (zoneless CD isn't guaranteed to wake for background ticks).
     effect(() => {
-      const mapName = currentLocationGet().mapName;
+      const mapName = worldCurrentLocationState().mapName;
       this.checkForMapChange(mapName);
     });
 
@@ -335,7 +340,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.wasPartyDead = isDead;
     if (!justRecalled || this.isTransitioningMap) return;
 
-    const target = currentLocationGet();
+    const target = worldCurrentLocationState();
     if (target.mapName !== this.loadedMapName) return;
 
     this.isTransitioningMap = true;
@@ -422,7 +427,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     // Same reasoning - an AnimatedSprite stays registered on Ticker.shared until destroyed, so
     // removeChildren() alone would leave every follower token ticking forever after teardown.
-    this.partyFollowerTokens.forEach((token) => token.destroy({ children: true }));
+    this.partyFollowerTokens.forEach((token) =>
+      token.destroy({ children: true }),
+    );
     this.app?.destroy(true, { children: true, texture: true });
 
     // Queued/active floating text is map-scoped (positions reference nodes on the map being torn down) -
@@ -469,7 +476,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!element) return;
 
     this.map = map;
-    this.visualPosition = { ...currentLocationGet() };
+    this.visualPosition = { ...worldCurrentLocationState() };
     this.hasActiveStep = false;
     mapNodeDeselect();
 
@@ -551,7 +558,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     if (this.partyTokenTexturesByIndex.length === 0) {
       this.partyTokenTexturesByIndex = await Promise.all(
-        partyGet().map((_, index) => this.loadPartyTokenTextures(index)),
+        worldPartyState().map((_, index) => this.loadPartyTokenTextures(index)),
       );
     }
 
@@ -559,7 +566,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.setupPlayerIndicator();
 
     this.visualPositionTicker = () => {
-      this.checkForMapChange(currentLocationGet().mapName);
+      this.checkForMapChange(worldCurrentLocationState().mapName);
       this.checkForDeathsDoorRecall();
       this.updateVisualPosition();
       // Ahead of updatePlayerIndicatorIfNeeded() so a fresh arrival's catch-up state exists the same frame the indicator-swap check reads it.
@@ -764,7 +771,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   }
 
   private async loadPartyTokenTextures(heroIndex: number): Promise<Texture[]> {
-    const hero = partyGet()[heroIndex];
+    const hero = worldPartyState()[heroIndex];
     if (!hero) return [];
 
     const job = getEntry<JobContent>(hero.jobId);
@@ -817,14 +824,16 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!this.partyFollowerContainer || !this.map) return;
 
     // Destroyed, not just detached - an AnimatedSprite stays registered on Ticker.shared until destroyed.
-    this.partyFollowerTokens.forEach((token) => token.destroy({ children: true }));
+    this.partyFollowerTokens.forEach((token) =>
+      token.destroy({ children: true }),
+    );
     this.partyFollowerContainer.removeChildren();
     this.partyFollowerTokens = [];
     this.followerOffsets = [];
 
     if (this.isShowingAtLocationIndicator) return;
 
-    const followerCount = Math.max(partyGet().length - 1, 0);
+    const followerCount = Math.max(worldPartyState().length - 1, 0);
     for (let index = 1; index <= followerCount; index++) {
       const sprite = pixiIndicatorPlayerSpriteCreate(
         this.map.tilewidth,
@@ -930,7 +939,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   // Use for anything gated on visible, not just logical, arrival.
   private isVisuallyAtTarget(): boolean {
-    const target = currentLocationGet();
+    const target = worldCurrentLocationState();
     return (
       this.visualPosition.mapName === target.mapName &&
       Math.abs(this.visualPosition.x - target.x) < 0.001 &&
@@ -963,7 +972,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private updateEncounterProgressIndicator(): void {
     if (!this.encounterProgressBar) return;
 
-    const combat = gamestate().world.combat;
+    const combat = worldCombatState();
     const entry = combat ? worldNodeByName(combat.locationName) : undefined;
     const total = entry ? worldNodeEncounterCount(entry) : undefined;
 
@@ -980,8 +989,8 @@ export class GamePlayWorldComponent implements OnDestroy {
   private updateVisualPosition(): void {
     if (!this.map) return;
 
-    const location = currentLocationGet();
-    const travel = gamestate().world.travel;
+    const location = worldCurrentLocationState();
+    const travel = worldTravelState();
     const inFlightStep =
       travel.status === 'Traveling' ? travel.path[0] : undefined;
 

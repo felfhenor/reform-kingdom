@@ -29,10 +29,14 @@ vi.mock('@helpers/pathfinding/pathfinding', () => ({
   mapHopsBetween: vi.fn(() => 0),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldCombatState: () => gamestate().world.combat,
+  };
+});
 
 vi.mock('@helpers/town/reputation/town-reputation', () => ({
   townReputationTier: vi.fn(() => 0),

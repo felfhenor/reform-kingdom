@@ -7,12 +7,12 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { partyGet } from '@helpers/hero/party';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   combatItemDropRateBoost,
   rollDroppedRewards,
 } from '@helpers/item/loot';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import {
   worldNodeByName,
   worldNodeEncounterRandom,
@@ -42,7 +42,7 @@ export function encounterRandomStartFight(
 
   const combat: Combat = {
     ...combatCreateForEncounter(
-      partyGet(),
+      worldPartyState(),
       monsters,
       fight.level,
       entry.nodeName,
@@ -65,7 +65,13 @@ function markEncounterRandomCompleted(
 ): void {
   updateGamestate((state) => {
     const nodeState = state.world.exploreRandom[encounterRandomId];
-    if (nodeState) nodeState.completedThisCycle = true;
+    if (!nodeState) return state;
+
+    state.world.exploreRandom = dictionaryWith(
+      state.world.exploreRandom,
+      encounterRandomId,
+      { ...nodeState, completedThisCycle: true },
+    );
     return state;
   });
 }

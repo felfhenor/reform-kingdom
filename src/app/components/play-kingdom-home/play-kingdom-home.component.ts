@@ -33,9 +33,9 @@ import {
 } from '@helpers/kingdom/museum.ui';
 import {
   discoveredWorkersState,
-  gamestate,
   materialsState,
   workersState,
+  worldHomeNodeNameState,
 } from '@helpers/state-game';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
 import { homeNodeResetToDuchy } from '@helpers/town/town-spawn.ui';
@@ -197,7 +197,7 @@ export class PlayKingdomHomeComponent {
     });
   });
 
-  public isKingdomHome = computed(() => !gamestate().world.homeNodeName);
+  public isKingdomHome = computed(() => !worldHomeNodeNameState());
 
   public openSubview(subview: KingdomSubview): void {
     kingdomSubviewShow(subview);

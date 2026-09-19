@@ -16,7 +16,6 @@ import {
 } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
-import { currentCombat } from '@helpers/combat/combat-state';
 import {
   combatCanTakeTurn,
   combatHandleCombatantStatusEffects,
@@ -28,7 +27,7 @@ import {
   combatGetPossibleCombatantTargetsForSkillTechnique,
   combatGetTargetsFromPriorityList,
 } from '@helpers/combat/combat-targetting';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldCombatState } from '@helpers/state-game';
 
 import { clamp, sortBy } from 'es-toolkit/compat';
 
@@ -248,10 +247,13 @@ export function combatantTakeTurn(
 }
 
 export function combatDoCombatIteration(): void {
-  const combat = currentCombat();
-  if (!combat) return;
+  const current = worldCombatState();
+  if (!current) return;
 
-  if (combatCheckIfOver(combat)) return;
+  if (combatCheckIfOver(current)) return;
+
+  // Combatants mutate in place, so a fresh top-level reference each round is what notifies subscribers.
+  const combat = { ...current };
 
   beginCombatLogCommits();
 

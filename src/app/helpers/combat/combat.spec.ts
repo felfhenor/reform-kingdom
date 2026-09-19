@@ -53,9 +53,13 @@ vi.mock('@helpers/hero/skill', () => ({
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
   updateGamestate: vi.fn(),
+  worldCombatState: vi.fn(),
 }));
 
-import { combatantTakeTurn } from '@helpers/combat/combat';
+import {
+  combatDoCombatIteration,
+  combatantTakeTurn,
+} from '@helpers/combat/combat';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
 import {
@@ -64,11 +68,13 @@ import {
   combatGetTargetsFromPriorityList,
 } from '@helpers/combat/combat-targetting';
 import { rngChoiceWeighted } from '@helpers/rng';
+import { updateGamestate, worldCombatState } from '@helpers/state-game';
 import type {
   Combat,
   Combatant,
   CombatOrderClauseId,
   EquipmentSkill,
+  GameState,
 } from '@interfaces';
 
 function buildCombat(): Combat {
@@ -134,6 +140,43 @@ function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
 beforeEach(() => {
   vi.clearAllMocks();
   combatantSkillCastEvents.set([]);
+});
+
+describe('combatDoCombatIteration', () => {
+  function commitRound(previous: Combat): Combat | undefined {
+    vi.mocked(worldCombatState).mockReturnValue(previous);
+    combatDoCombatIteration();
+
+    const state = { world: { combat: previous } } as unknown as GameState;
+    return vi.mocked(updateGamestate).mock.calls[0][0](state).world.combat;
+  }
+
+  it('commits a new top-level Combat reference each round so worldCombatState consumers update', () => {
+    const previous = buildCombat();
+
+    const committed = commitRound(previous);
+
+    expect(committed).not.toBe(previous);
+    expect(committed?.rounds).toBe(2);
+    expect(previous.rounds).toBe(1);
+  });
+
+  it('shares combatants with the previous round, since they mutate in place', () => {
+    const previous = buildCombat();
+
+    const committed = commitRound(previous);
+
+    expect(committed?.heroes).toBe(previous.heroes);
+    expect(committed?.guardians).toBe(previous.guardians);
+  });
+
+  it('does not start a round when there is no combat', () => {
+    vi.mocked(worldCombatState).mockReturnValue(undefined);
+
+    combatDoCombatIteration();
+
+    expect(updateGamestate).not.toHaveBeenCalled();
+  });
 });
 
 describe('combatantTakeTurn skill selection', () => {

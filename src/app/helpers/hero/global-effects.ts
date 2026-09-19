@@ -9,16 +9,17 @@ import {
   applyGlobalEffectAdd,
   applyGlobalEffectRemove,
 } from '@helpers/hero/global-effect-state';
-import { partyGet } from '@helpers/hero/party';
 import {
   gamestate,
   globalEffectsState,
   globalEffectSumsState,
   updateGamestate,
+  worldPartyState,
+  worldCurrentLocationState,
 } from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
-import { currentLocationGet, currentLocationSet } from '@helpers/world';
+import { currentLocationSet } from '@helpers/world';
 import type {
   GlobalEffect,
   GlobalEffectContent,
@@ -68,7 +69,7 @@ export function removeGlobalEffect(id: GlobalEffectId): void {
 
 // Deaths Door is a pure timer; on expiry the party teleports home (a designated Town, or the Duchy) before healing begins there.
 function handleDeathsDoorExpiry(): void {
-  const previousMapName = currentLocationGet().mapName;
+  const previousMapName = worldCurrentLocationState().mapName;
   const home = homeNodeGet();
   if (home) {
     currentLocationSet({
@@ -82,7 +83,7 @@ function handleDeathsDoorExpiry(): void {
   miscellaneousMessageLog('The party has been recalled home.');
   addGlobalEffect(
     'Healing' as GlobalEffectId,
-    healingTicksForLevel(partyGet()),
+    healingTicksForLevel(worldPartyState()),
   );
 }
 

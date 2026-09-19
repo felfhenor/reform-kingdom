@@ -17,12 +17,16 @@ export function gamestate() {
 }
 
 // Mid-tick reads return the draft, but still read the slice so a computed first evaluated mid-tick keeps a signal dependency.
-function gamestateSlice<K extends keyof GameState>(key: K): () => GameState[K] {
-  const slice = computed(() => _liveGameState()[key]);
+function gamestateSelect<T>(pick: (state: GameState) => T): () => T {
+  const slice = computed(() => pick(_liveGameState()));
   return () => {
     const committed = slice();
-    return tickGamestate ? tickGamestate[key] : committed;
+    return tickGamestate ? pick(tickGamestate) : committed;
   };
+}
+
+function gamestateSlice<K extends keyof GameState>(key: K): () => GameState[K] {
+  return gamestateSelect((state) => state[key]);
 }
 
 export const workersState = gamestateSlice('workers');
@@ -40,6 +44,24 @@ export const gatherNodeLevelsState = gamestateSlice('gatherNodeLevels');
 export const worldDiscoveriesState = gamestateSlice('worldDiscoveries');
 export const bestiaryState = gamestateSlice('bestiary');
 export const tradeskillsState = gamestateSlice('tradeskills');
+export const worldPartyState = gamestateSelect((state) => state.world.party);
+export const worldCombatState = gamestateSelect((state) => state.world.combat);
+export const worldCurrentLocationState = gamestateSelect(
+  (state) => state.world.currentLocation,
+);
+export const worldTravelState = gamestateSelect((state) => state.world.travel);
+export const worldGatheringState = gamestateSelect(
+  (state) => state.world.gathering,
+);
+export const worldAutoModeState = gamestateSelect(
+  (state) => state.world.autoMode,
+);
+export const worldExploreRandomState = gamestateSelect(
+  (state) => state.world.exploreRandom,
+);
+export const worldHomeNodeNameState = gamestateSelect(
+  (state) => state.world.homeNodeName,
+);
 export const shrinesState = gamestateSlice('shrines');
 export const tutorialsState = gamestateSlice('tutorials');
 export const lootFiltersState = gamestateSlice('lootFilters');

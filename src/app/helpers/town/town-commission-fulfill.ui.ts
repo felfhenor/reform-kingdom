@@ -9,7 +9,10 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
-import { updateGamestate } from '@helpers/state-game';
+import {
+  updateGamestate,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { townReputationGain } from '@helpers/town/reputation/town-reputation';
 import { townReputationBuffRefresh } from '@helpers/town/reputation/town-reputation-buff';
 import {
@@ -21,7 +24,6 @@ import {
 import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { depositCommissionRequirementsToTown } from '@helpers/town/town-materials';
 import { isPartyAtTown } from '@helpers/town/town-visit';
-import { currentLocationGet } from '@helpers/world';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
   CommissionOfferContent,
@@ -129,7 +131,7 @@ export async function townCommissionFulfill(
       'Commission',
     );
     if (tierChanged) {
-      await townReputationBuffRefresh(currentLocationGet().mapName);
+      await townReputationBuffRefresh(worldCurrentLocationState().mapName);
       await townCommissionRefreshTierScaledSlots(townId);
     }
     if (offerName) {

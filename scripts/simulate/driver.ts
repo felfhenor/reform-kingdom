@@ -1,6 +1,5 @@
 import { combatDoCombatIteration } from '@helpers/combat/combat';
 import { combatLog } from '@helpers/combat/combat-log';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
@@ -11,7 +10,6 @@ import {
 } from '@helpers/decree/decree-evaluation';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
 import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
-import { partyGet } from '@helpers/hero/party';
 import { restingProcessTick } from '@helpers/hero/resting';
 import { travelProcessTick } from '@helpers/hero/travel';
 import { canModifyEquipment } from '@helpers/item/equipment';
@@ -23,6 +21,8 @@ import {
   gamestateTickEnd,
   gamestateTickStart,
   updateGamestate,
+  worldPartyState,
+  worldCombatState,
 } from '@helpers/state-game';
 import { isPlayerAtKingdom, worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeEncounter } from '@helpers/world-node/world-nodes';
@@ -107,7 +107,7 @@ function processOneTick(): void {
   craftProcessTick();
   restingProcessTick();
 
-  if (currentCombat()) {
+  if (worldCombatState()) {
     combatDoCombatIteration();
   }
 }
@@ -213,7 +213,7 @@ function checkSupplyStall(
 // `canModifyEquipment`) rather than marking newly-seen items as seen anyway:
 // a multi-fight encounter grants rewards after each fight it wins, not just
 // the last one (`combat-end.ts`), so gear can land in the armory while
-// `currentCombat()` is still truthy for the remaining fights. Leaving those
+// `worldCombatState()` is still truthy for the remaining fights. Leaving those
 // ids unseen means the first tick after combat actually ends will pick them
 // up correctly, instead of the id being marked "seen" now and the party
 // silently never getting a real chance to equip it.
@@ -252,19 +252,19 @@ function logVerboseStatus(label: string, tick: number): void {
 
   console.log(
     `[${label}] tick ${tick} (${simulatedHours}h): level ${partyMinLevel()}, ` +
-      `${describePartyLocation()}, ${currentCombat() ? 'in combat' : 'not in combat'}, ` +
+      `${describePartyLocation()}, ${worldCombatState() ? 'in combat' : 'not in combat'}, ` +
       `gold ${getGoldQuantity()}, pursuing ${activeClause?.type ?? 'nothing (idle)'}`,
   );
 }
 
 // `--verbose`-only per-character level-up notice, checked every tick against
-// a snapshot taken at scenario start. Cheap even every tick - `partyGet()` is
+// a snapshot taken at scenario start. Cheap even every tick - `worldPartyState()` is
 // a handful of characters, not a scan of anything large.
 function logLevelUps(
   label: string,
   previousLevels: Map<CharacterId, number>,
 ): void {
-  partyGet().forEach((character) => {
+  worldPartyState().forEach((character) => {
     const previous = previousLevels.get(character.id);
     if (previous !== undefined && character.level > previous) {
       console.log(
@@ -346,7 +346,7 @@ export function runScenario(
 
   const label = `${scenario.comp.label} (${scenario.strategy} trial ${scenario.trial})`;
   const previousLevels = new Map(
-    partyGet().map((character) => [character.id, character.level]),
+    worldPartyState().map((character) => [character.id, character.level]),
   );
   const seenArmoryItemIds = new Set(armoryGet().map((item) => item.id));
   const dumpIntervalLevels =

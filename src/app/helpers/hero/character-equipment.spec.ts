@@ -25,10 +25,6 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(),
-}));
-
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
@@ -36,10 +32,11 @@ vi.mock('@helpers/state-game', () => {
     updateGamestate: vi.fn(),
     armoryState: () => gamestate().armory,
     globalEffectSumsState: () => gamestate().globalEffectSums,
+    worldPartyState: () => gamestate().world.party,
+    worldCombatState: vi.fn(),
   };
 });
 
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
 import { defaultStats } from '@helpers/defaults';
 import {
@@ -47,7 +44,11 @@ import {
   optimizeCharacterEquipment,
 } from '@helpers/hero/character-equipment';
 import { createCharacter } from '@helpers/hero/party';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 
 describe('Character Equipment Helper Functions', () => {
   const mockJob: JobContent = {
@@ -129,7 +130,7 @@ describe('Character Equipment Helper Functions', () => {
   beforeEach(() => {
     mockUuidCounter = 0;
     vi.clearAllMocks();
-    vi.mocked(currentCombat).mockReturnValue(undefined);
+    vi.mocked(worldCombatState).mockReturnValue(undefined);
   });
 
   function createCharacterStub(name: string): Character {
@@ -202,7 +203,7 @@ describe('Character Equipment Helper Functions', () => {
     it('returns false without mutating state while the party is in combat', () => {
       mockGetEntry(mockJob, mockHelmet);
       const jala = createCharacterStub('Jala');
-      vi.mocked(currentCombat).mockReturnValue({} as never);
+      vi.mocked(worldCombatState).mockReturnValue({} as never);
 
       const result = characterEquipFromArmory(
         jala.id,

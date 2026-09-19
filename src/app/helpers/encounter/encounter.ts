@@ -1,9 +1,8 @@
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
-import { partyGet } from '@helpers/hero/party';
 import { rngNumberRange } from '@helpers/rng';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
   Combat,
   EncounterContent,
@@ -33,7 +32,7 @@ export function encounterStartFight(
 
   const combat: Combat = {
     ...combatCreateForEncounter(
-      partyGet(),
+      worldPartyState(),
       monsters,
       encounterLevel,
       locationName,

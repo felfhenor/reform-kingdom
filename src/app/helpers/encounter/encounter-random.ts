@@ -1,5 +1,5 @@
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate } from '@helpers/state-game';
+import { worldExploreRandomState } from '@helpers/state-game';
 import type {
   EncounterRandomContent,
   EncounterRandomId,
@@ -10,7 +10,7 @@ import { clamp } from 'es-toolkit/compat';
 export function encounterRandomState(
   id: EncounterRandomId,
 ): EncounterRandomNodeState | undefined {
-  return gamestate().world.exploreRandom[id];
+  return worldExploreRandomState()[id];
 }
 
 export function encounterRandomTicksUntilReset(

@@ -1,9 +1,8 @@
 import { combatOrderClauses } from '@helpers/combat/combat-order';
 import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
 import { dictionaryWith } from '@helpers/engine/dictionary';
-import { partyGet } from '@helpers/hero/party';
 import { rngUuid } from '@helpers/rng';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
   CharacterId,
   CombatOrderAction,
@@ -23,7 +22,9 @@ const COMPARATOR_SYMBOLS: Record<CombatOrderComparator, string> = {
 };
 
 function heroName(characterId: CharacterId): string {
-  return partyGet().find((c) => c.id === characterId)?.name ?? 'Unknown Hero';
+  return (
+    worldPartyState().find((c) => c.id === characterId)?.name ?? 'Unknown Hero'
+  );
 }
 
 // A short, stock-independent description of when a clause fires - used on

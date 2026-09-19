@@ -1,6 +1,11 @@
 import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  worldCombatState: vi.fn(),
+}));
+
 vi.mock('@helpers/engine/analytics', async (importOriginal) => {
   const actual = await importOriginal<typeof AnalyticsHelper>();
   return {
@@ -36,7 +41,6 @@ vi.mock('@helpers/hero/character-progress', () => ({
 
 vi.mock('@helpers/combat/combat-state', () => ({
   combatReset: vi.fn(),
-  currentCombat: vi.fn(),
 }));
 
 vi.mock('@helpers/item/collectibles', () => ({

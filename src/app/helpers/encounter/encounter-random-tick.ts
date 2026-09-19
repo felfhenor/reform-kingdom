@@ -1,6 +1,11 @@
 import { generateEncounterRandomFights } from '@helpers/encounter/encounter-random-generate';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  updateGamestate,
+  worldCombatState,
+  worldExploreRandomState,
+} from '@helpers/state-game';
 import {
   worldNodeEncounterRandom,
   worldNodesOfType,
@@ -24,11 +29,15 @@ function regenerateEncounterRandomNode(
   nowTick: number,
 ): void {
   updateGamestate((state) => {
-    state.world.exploreRandom[content.id] = {
-      fights: generateEncounterRandomFights(content),
-      generatedAtTick: nowTick,
-      completedThisCycle: false,
-    };
+    state.world.exploreRandom = dictionaryWith(
+      state.world.exploreRandom,
+      content.id,
+      {
+        fights: generateEncounterRandomFights(content),
+        generatedAtTick: nowTick,
+        completedThisCycle: false,
+      },
+    );
     return state;
   });
 }
@@ -36,14 +45,14 @@ function regenerateEncounterRandomNode(
 // Skips a node with active combat so regeneration is deferred, not lost, rather than rewriting a mid-fight's monsters.
 export function encounterRandomProcessTick(): void {
   const nowTick = timerTicksElapsed();
-  const activeEncounterRandomId = gamestate().world.combat?.encounterRandomId;
+  const activeEncounterRandomId = worldCombatState()?.encounterRandomId;
 
   worldNodesOfType('ExploreRandomNode').forEach((entry) => {
     const content = worldNodeEncounterRandom(entry);
     if (!content) return;
     if (content.id === activeEncounterRandomId) return;
 
-    const state = gamestate().world.exploreRandom[content.id];
+    const state = worldExploreRandomState()[content.id];
     if (!isDueForRegeneration(content, state, nowTick)) return;
 
     regenerateEncounterRandomNode(content, nowTick);

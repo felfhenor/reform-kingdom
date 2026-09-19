@@ -1,6 +1,7 @@
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
-import { combatReset, currentCombat } from '@helpers/combat/combat-state';
+import { combatReset } from '@helpers/combat/combat-state';
+import { worldCombatState } from '@helpers/state-game';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import { getEntry } from '@helpers/content/content';
@@ -44,7 +45,7 @@ import type {
 import { sumBy } from 'es-toolkit/compat';
 
 export function combatHasGuardiansAlive(): boolean {
-  const combat = currentCombat();
+  const combat = worldCombatState();
   if (!combat) return false;
   return combat.guardians.some((guardian) => !combatantIsDead(guardian));
 }

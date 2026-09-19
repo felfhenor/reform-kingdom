@@ -30,7 +30,7 @@ import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
 import { heroSkillsAtLevel, heroSkillsWithEquipment } from '@helpers/hero/job';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
@@ -131,7 +131,7 @@ export class ModalHeroCombatOrdersComponent {
   public readonly healthDirectionOptions = HEALTH_DIRECTION_OPTIONS;
   public readonly alwaysRandomClause = ALWAYS_RANDOM_CLAUSE;
 
-  public party = computed<Character[]>(() => partyGet());
+  public party = computed<Character[]>(() => worldPartyState());
 
   // Carries each hero's job so the picker can show a portrait + "Lv. X ClassName".
   public heroOptions = computed<HeroOption[]>(() =>
@@ -144,7 +144,7 @@ export class ModalHeroCombatOrdersComponent {
   );
 
   public character = computed<Character | undefined>(() =>
-    partyGet().find((c) => c.id === combatOrdersModalCharacterId()),
+    worldPartyState().find((c) => c.id === combatOrdersModalCharacterId()),
   );
 
   public job = computed<JobContent | undefined>(() => {

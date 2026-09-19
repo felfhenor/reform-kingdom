@@ -6,7 +6,7 @@ import {
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import { isPartyAtFullEnergy, isPartyAtFullHealth } from '@helpers/hero/party';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { gamestate } from '@helpers/state-game';
+import { worldAutoModeState } from '@helpers/state-game';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type { DecreeClause, ItemContent } from '@interfaces';
 
@@ -36,7 +36,7 @@ function clauseStatusLabel(clause: DecreeClause): string {
 }
 
 export function autoModeStatusLabel(): string | undefined {
-  const autoMode = gamestate().world.autoMode;
+  const autoMode = worldAutoModeState();
   if (!autoMode.enabled) return undefined;
 
   const clause = autoMode.clauses.find(

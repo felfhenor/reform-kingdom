@@ -25,7 +25,7 @@ import {
   defaultTagResistances,
 } from '@helpers/defaults';
 import { characterInfuseEquipment } from '@helpers/hero/character-equipment';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   canModifyEquipment,
@@ -85,7 +85,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   styleUrl: './play-kingdom-infusion.component.scss',
 })
 export class PlayKingdomInfusionComponent {
-  public party = computed(() => partyGet());
+  public party = computed(() => worldPartyState());
   public goldCoinId = goldCoinId;
 
   public selectedCharacterId = signal<CharacterId | undefined>(undefined);

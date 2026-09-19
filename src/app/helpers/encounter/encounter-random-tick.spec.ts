@@ -4,10 +4,15 @@ vi.mock('@helpers/encounter/encounter-random-generate', () => ({
   generateEncounterRandomFights: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldCombatState: () => gamestate().world.combat,
+    worldExploreRandomState: () => gamestate().world.exploreRandom,
+  };
+});
 
 vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
@@ -21,6 +26,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 import { generateEncounterRandomFights } from '@helpers/encounter/encounter-random-generate';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
 import { timerTicksElapsed } from '@helpers/engine/timer';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   worldNodeEncounterRandom,
@@ -65,9 +71,10 @@ describe('encounterRandomProcessTick', () => {
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const result = updateFn({
-      world: { exploreRandom: {} },
-    } as unknown as GameState);
+    const state = { world: { exploreRandom: {} } } as unknown as GameState;
+    const previousDict = deepFreeze(state.world.exploreRandom);
+    const result = updateFn(state);
+    expect(result.world.exploreRandom).not.toBe(previousDict);
     expect(
       result.world.exploreRandom['gobslime-shrine' as EncounterRandomId],
     ).toEqual({

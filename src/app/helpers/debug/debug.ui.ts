@@ -23,7 +23,6 @@ import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   characterStatsForLevel,
   characterXpForLevel,
-  partyGet,
 } from '@helpers/hero/party';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
@@ -34,7 +33,12 @@ import {
   monsterEncounters,
   monsterRecordKill,
 } from '@helpers/kingdom/bestiary';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldPartyState,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
@@ -46,7 +50,7 @@ import { tutorialUnmarkSeen } from '@helpers/tutorial/tutorial-seen';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
 import { updateWorkerRecord } from '@helpers/worker/worker-record';
-import { currentLocationGet, currentLocationSet } from '@helpers/world';
+import { currentLocationSet } from '@helpers/world';
 import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
@@ -364,7 +368,7 @@ export function debugStartTownDefenseCombat(townId: TownId): void {
 
   const combat = {
     ...combatCreateForEncounter(
-      partyGet(),
+      worldPartyState(),
       enemies,
       town.defense.assaulter.level.max,
       town.name,
@@ -403,7 +407,7 @@ export function debugTeleportToNode(nodeName: string): void {
     return;
   }
 
-  const previousMapName = currentLocationGet().mapName;
+  const previousMapName = worldCurrentLocationState().mapName;
 
   gatheringStop();
   currentLocationSet({ mapName: node.mapName, x: node.x, y: node.y });

@@ -1,4 +1,4 @@
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { rngSeeded, rngSucceedsChance, rngUuid } from '@helpers/rng';
 import type { PRNG } from 'seedrandom';
 
@@ -21,7 +21,7 @@ export function luckReducedChance(baseChance: number, luck: number): number {
 // Bonus material yield rolls against the luckiest hero in the party, not
 // everyone's luck combined.
 export function partyMaxLuck(): number {
-  const party = partyGet();
+  const party = worldPartyState();
   if (party.length === 0) return 0;
 
   return Math.max(...party.map((character) => character.stats.Luck));

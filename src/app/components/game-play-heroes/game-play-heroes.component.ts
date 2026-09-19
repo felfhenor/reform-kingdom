@@ -10,7 +10,7 @@ import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/panel-hero-equipment.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import type { CharacterId, JobContent, JobId } from '@interfaces';
 
 @Component({
@@ -27,7 +27,7 @@ import type { CharacterId, JobContent, JobId } from '@interfaces';
   styleUrl: './game-play-heroes.component.scss',
 })
 export class GamePlayHeroesComponent {
-  public party = computed(() => partyGet());
+  public party = computed(() => worldPartyState());
 
   private explicitSelectedId = signal<CharacterId | undefined>(undefined);
 

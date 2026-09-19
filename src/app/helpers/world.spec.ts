@@ -1,38 +1,27 @@
 import type { CurrentLocation, GameState } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldCurrentLocationState: () => gamestate().world.currentLocation,
+  };
+});
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeAt: vi.fn(),
 }));
 
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import {
-  currentLocationGet,
-  currentLocationSet,
-  isPlayerAtKingdom,
-} from '@helpers/world';
+import { currentLocationSet, isPlayerAtKingdom } from '@helpers/world';
 import { worldNodeAt } from '@helpers/world-node/world-nodes';
 
 describe('World Helper Functions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe('currentLocationGet', () => {
-    it('should return the current location from state', () => {
-      const location: CurrentLocation = { mapName: 'Carrina', x: 24, y: 24 };
-
-      vi.mocked(gamestate).mockReturnValue({
-        world: { currentLocation: location },
-      } as unknown as GameState);
-
-      expect(currentLocationGet()).toEqual(location);
-    });
   });
 
   describe('currentLocationSet', () => {
@@ -42,11 +31,14 @@ describe('World Helper Functions', () => {
       currentLocationSet(location);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
+      const state = {
         world: { currentLocation: { mapName: 'Carrina', x: 24, y: 24 } },
-      } as unknown as GameState);
+      } as unknown as GameState;
+      const previousLocation = deepFreeze(state.world.currentLocation);
+      const result = updateFn(state);
 
       expect(result.world.currentLocation).toEqual(location);
+      expect(result.world.currentLocation).not.toBe(previousLocation);
     });
   });
 

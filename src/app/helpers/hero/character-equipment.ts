@@ -3,7 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { characterStatsForLevel, partyGet } from '@helpers/hero/party';
+import { characterStatsForLevel } from '@helpers/hero/party';
 import {
   canEquipItem,
   canModifyEquipment,
@@ -16,7 +16,7 @@ import {
 } from '@helpers/item/infusion';
 import { applyMaterialDelta, spendGold } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import {
   EquipmentTypeToSlot,
   type Character,
@@ -60,7 +60,7 @@ export function characterEquipFromArmory(
 ): boolean {
   if (!canModifyEquipment()) return false;
 
-  const character = partyGet().find((c) => c.id === characterId);
+  const character = worldPartyState().find((c) => c.id === characterId);
   if (!character) return false;
 
   const armoryItem = armoryGet().find((item) => item.id === equipmentItemId);
@@ -126,7 +126,7 @@ export function characterEquipFromArmory(
 
 // Backs the manual "Optimize Equipment" button; reclassing runs its own pass instead, to stay atomic with the job swap.
 export function optimizeCharacterEquipment(characterId: CharacterId): void {
-  const character = partyGet().find((c) => c.id === characterId);
+  const character = worldPartyState().find((c) => c.id === characterId);
   if (!character) return;
 
   const job = getEntry<JobContent>(character.jobId);
@@ -151,7 +151,7 @@ export function characterInfuseEquipment(
 ): boolean {
   if (!canModifyEquipment()) return false;
 
-  const character = partyGet().find((c) => c.id === characterId);
+  const character = worldPartyState().find((c) => c.id === characterId);
   if (!character) return false;
 
   const occupiedSlots = (

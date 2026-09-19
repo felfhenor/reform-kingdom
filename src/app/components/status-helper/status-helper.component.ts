@@ -5,7 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
-import { currentCombat } from '@helpers/combat/combat-state';
+import { worldCombatState } from '@helpers/state-game';
 import type { StatusCardEntry } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -23,7 +23,7 @@ export class StatusHelperComponent {
   public expanded = input<boolean>(false);
 
   public entries = computed<StatusCardEntry[]>(() =>
-    (currentCombat()?.helpers ?? []).map((combatant) => {
+    (worldCombatState()?.helpers ?? []).map((combatant) => {
       const maxHp = Math.max(combatant.totalStats.Health, 1);
 
       return {

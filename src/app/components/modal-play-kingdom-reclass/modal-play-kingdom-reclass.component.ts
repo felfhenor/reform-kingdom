@@ -26,7 +26,7 @@ import {
   charactersReclass,
 } from '@helpers/hero/character-reclass';
 import { getUnlockedJobs } from '@helpers/hero/job';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { goldCoinId, hasGold } from '@helpers/item/materials';
 import type {
   Character,
@@ -69,7 +69,7 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
 })
 export class ModalPlayKingdomReclassComponent {
   public isVisible = computed(() => modalIsOpen('reclass-heroes'));
-  public party = computed(() => partyGet());
+  public party = computed(() => worldPartyState());
 
   public unlockedJobs = computed(() =>
     sortBy(getUnlockedJobs(), (job) => job.name),

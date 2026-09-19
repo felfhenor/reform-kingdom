@@ -15,7 +15,7 @@ import {
   pruneInvalidEquippedItems,
 } from '@helpers/item/equipment';
 import { rngUuid } from '@helpers/rng';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
   AffixEffect,
   Character,
@@ -108,32 +108,28 @@ export function createCharacter(name: string, jobId: JobId): Character {
   };
 }
 
-export function partyGet(): Character[] {
-  return gamestate().world.party;
-}
-
 // Party-wide passive affix effects (GatherYield, CaravanBuyDiscount, etc.) from every hero's equipped gear, regardless of who's "doing" the action.
 export function partyAffixEffects(): AffixEffect[] {
-  return partyGet().flatMap((character) =>
+  return worldPartyState().flatMap((character) =>
     equipmentAffixEffects(character.equipment),
   );
 }
 
 // Base + infusion + affix gather yield bonuses across the whole party's equipped gear.
 export function partyGatherYieldBonuses(): GatherYieldBonus[] {
-  return partyGet().flatMap((character) =>
+  return worldPartyState().flatMap((character) =>
     equipmentGatherYieldBonuses(character.equipment),
   );
 }
 
 export function isPartyAtFullHealth(): boolean {
-  return partyGet().every(
+  return worldPartyState().every(
     (character) => character.hp >= character.stats.Health,
   );
 }
 
 export function isPartyAtFullEnergy(): boolean {
-  return partyGet().every(
+  return worldPartyState().every(
     (character) => character.ep >= character.stats.Energy,
   );
 }

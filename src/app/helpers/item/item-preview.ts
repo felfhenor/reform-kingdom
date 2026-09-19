@@ -5,7 +5,7 @@ import {
   recipeResultSpritesheet,
   recipeStylizedName,
 } from '@helpers/crafting/recipes';
-import { partyGet } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { equipmentItemMiscAffixDescriptions } from '@helpers/item/affix';
 import { equipmentItemGatherYieldBonuses } from '@helpers/item/equipment-bonus';
 import {
@@ -37,7 +37,7 @@ import {
 
 // Hero names whose job can equip this type, shown in item tooltips.
 function equippableHeroNames(equipment: EquipmentContent): string[] {
-  return partyGet()
+  return worldPartyState()
     .filter((hero) =>
       getEntry<JobContent>(hero.jobId)?.equippableTypes.includes(
         equipment.type,

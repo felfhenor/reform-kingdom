@@ -4,13 +4,12 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { applyEquipmentToCharacter } from '@helpers/hero/character-equipment';
-import { partyGet } from '@helpers/hero/party';
 import {
   canModifyEquipment,
   newEquipmentItem,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
   Character,
   CharacterId,
@@ -74,7 +73,7 @@ export function characterUnequipToArmory(
 ): boolean {
   if (!canModifyEquipment()) return false;
 
-  const character = partyGet().find((c) => c.id === characterId);
+  const character = worldPartyState().find((c) => c.id === characterId);
   const previousItem = character?.equipment[slot];
   if (!character || !previousItem) return false;
 

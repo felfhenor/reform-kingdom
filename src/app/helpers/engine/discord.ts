@@ -1,8 +1,11 @@
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
-import { partyGet } from '@helpers/hero/party';
-import { gamestate } from '@helpers/state-game';
+import {
+  worldGatheringState,
+  worldTravelState,
+  worldPartyState,
+  worldCombatState,
+} from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
@@ -30,12 +33,12 @@ export function discordSetStatus(status: DiscordPresenceOpts) {
 }
 
 function discordCombatState(): string | undefined {
-  const combat = currentCombat();
+  const combat = worldCombatState();
   return combat ? `Exploring ${combat.locationName}` : undefined;
 }
 
 function discordTravelState(): string | undefined {
-  const travel = gamestate().world.travel;
+  const travel = worldTravelState();
   if (travel.status !== 'Traveling' || !travel.destinationNodeName) {
     return undefined;
   }
@@ -44,7 +47,7 @@ function discordTravelState(): string | undefined {
 }
 
 function discordGatherState(): string | undefined {
-  const gathering = gamestate().world.gathering;
+  const gathering = worldGatheringState();
   if (gathering.status !== 'Gathering' || !gathering.nodeName) {
     return undefined;
   }
@@ -88,7 +91,7 @@ function discordActivityState(): string {
 }
 
 function discordPartyDetails(): string {
-  return partyGet()
+  return worldPartyState()
     .map((character) => {
       const job = getEntry<JobContent>(character.jobId);
       return `${job?.name ?? 'Adventurer'} Lv${character.level}`;

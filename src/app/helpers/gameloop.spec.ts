@@ -8,10 +8,6 @@ vi.mock('@helpers/combat/combat', () => ({
   combatDoCombatIteration: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(() => undefined),
-}));
-
 vi.mock('@helpers/commission/commission-tick', () => ({
   commissionProcessTick: vi.fn(),
 }));
@@ -76,6 +72,7 @@ vi.mock('@helpers/state-game', () => ({
   isGameStateReady: vi.fn(() => true),
   saveGameState: vi.fn(),
   updateGamestate: vi.fn(),
+  worldCombatState: vi.fn(() => undefined),
 }));
 
 vi.mock('@helpers/state-options', () => ({

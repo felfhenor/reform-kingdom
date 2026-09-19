@@ -3,15 +3,18 @@ import {
   combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
-import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { partyGet } from '@helpers/hero/party';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldPartyState,
+  worldCombatState,
+} from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -26,7 +29,7 @@ function partyIsAtTown(town: TownContent): boolean {
 export function raidEngageCombat(townId: TownId): boolean {
   const town = getEntry<TownContent>(townId);
   if (!town) return false;
-  if (currentCombat()) return false;
+  if (worldCombatState()) return false;
 
   const state = gamestate().world.towns[townId];
   if (state?.raidTelegraphedAtTick === undefined) return false;
@@ -45,7 +48,7 @@ export function raidEngageCombat(townId: TownId): boolean {
 
   const combat: Combat = {
     ...combatCreateForEncounter(
-      partyGet(),
+      worldPartyState(),
       enemies,
       town.defense.assaulter.level.max,
       town.name,

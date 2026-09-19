@@ -14,16 +14,17 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  worldCombatState: vi.fn(),
+}));
+
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(),
 }));
 
-vi.mock('@helpers/combat/combat-state', () => ({
-  currentCombat: vi.fn(),
-}));
-
-import { currentCombat } from '@helpers/combat/combat-state';
+import { worldCombatState } from '@helpers/state-game';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   backfillEquipmentItem,
@@ -991,13 +992,13 @@ describe('Equipment Helper Functions', () => {
 
   describe('canModifyEquipment', () => {
     it('allows equipment changes when there is no active combat', () => {
-      vi.mocked(currentCombat).mockReturnValue(undefined);
+      vi.mocked(worldCombatState).mockReturnValue(undefined);
 
       expect(canModifyEquipment()).toBe(true);
     });
 
     it('blocks equipment changes while a combat is active', () => {
-      vi.mocked(currentCombat).mockReturnValue({} as Combat);
+      vi.mocked(worldCombatState).mockReturnValue({} as Combat);
 
       expect(canModifyEquipment()).toBe(false);
     });

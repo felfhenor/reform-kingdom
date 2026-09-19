@@ -10,6 +10,7 @@ vi.mock('@helpers/state-game', () => {
     gamestate,
     updateGamestate: vi.fn(),
     globalEffectSumsState: () => gamestate().globalEffectSums,
+    worldAutoModeState: () => gamestate().world.autoMode,
   };
 });
 
@@ -34,6 +35,7 @@ import {
   decreeWaitForFullHealthBeforeCombat,
   pruneInvalidDecreeGatherClauses,
 } from '@helpers/decree/decree';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   DecreeClause,
@@ -73,6 +75,8 @@ function stateWithAutoMode(
 }
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world?.autoMode);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

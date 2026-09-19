@@ -15,10 +15,6 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/party', () => ({
-  partyGet: vi.fn(() => []),
-}));
-
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
@@ -26,6 +22,12 @@ vi.mock('@helpers/state-game', () => {
     updateGamestate: vi.fn(),
     globalEffectsState: () => gamestate().globalEffects,
     globalEffectSumsState: () => gamestate().globalEffectSums,
+    worldPartyState: vi.fn(() => []),
+    worldCurrentLocationState: vi.fn(() => ({
+      mapName: 'Carrina',
+      x: 0,
+      y: 0,
+    })),
   };
 });
 
@@ -42,7 +44,6 @@ vi.mock('@helpers/town/town-spawn', () => ({
 }));
 
 vi.mock('@helpers/world', () => ({
-  currentLocationGet: vi.fn(() => ({ mapName: 'Carrina', x: 0, y: 0 })),
   currentLocationSet: vi.fn(),
 }));
 
@@ -57,10 +58,14 @@ import {
   isGlobalEffectActive,
   removeGlobalEffect,
 } from '@helpers/hero/global-effects';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
-import { currentLocationGet, currentLocationSet } from '@helpers/world';
+import { currentLocationSet } from '@helpers/world';
 
 describe('Global Effect Helper Functions', () => {
   const healingId = 'healing-1' as GlobalEffectId;
@@ -239,7 +244,7 @@ describe('Global Effect Helper Functions', () => {
     it('teleports the party home, resyncs the regional buff, and grants Healing when Deaths Door expires', () => {
       vi.mocked(timerTicksElapsed).mockReturnValue(20);
       mockContentLookup();
-      vi.mocked(currentLocationGet).mockReturnValue({
+      vi.mocked(worldCurrentLocationState).mockReturnValue({
         mapName: 'CraggledMire',
         x: 3,
         y: 3,
