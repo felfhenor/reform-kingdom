@@ -23,11 +23,16 @@ vi.mock('@helpers/hero/global-effect-state', () => ({
   recomputeGlobalEffectSums: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    collectiblesState: () => gamestate().collectibles,
+  };
+});
 
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
@@ -60,7 +65,9 @@ describe('Collectibles Helper Functions', () => {
   describe('getCollectibleQuantity', () => {
     it('returns the stored quantity', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: { [foundingStone.id]: { quantity: 3, foundAt: 1000 } },
+        collectibles: deepFreeze({
+          [foundingStone.id]: { quantity: 3, foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(getCollectibleQuantity(foundingStone.id)).toBe(3);
@@ -68,7 +75,7 @@ describe('Collectibles Helper Functions', () => {
 
     it('returns 0 when the collectible has never been found', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: {},
+        collectibles: deepFreeze({}),
       } as unknown as GameState);
 
       expect(getCollectibleQuantity(foundingStone.id)).toBe(0);
@@ -78,7 +85,9 @@ describe('Collectibles Helper Functions', () => {
   describe('isCollectibleDiscovered', () => {
     it('returns true when foundAt is set', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: { [foundingStone.id]: { quantity: 1, foundAt: 1000 } },
+        collectibles: deepFreeze({
+          [foundingStone.id]: { quantity: 1, foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(isCollectibleDiscovered(foundingStone.id)).toBe(true);
@@ -86,7 +95,7 @@ describe('Collectibles Helper Functions', () => {
 
     it('returns false when the collectible has never been found', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: {},
+        collectibles: deepFreeze({}),
       } as unknown as GameState);
 
       expect(isCollectibleDiscovered(foundingStone.id)).toBe(false);
@@ -96,10 +105,10 @@ describe('Collectibles Helper Functions', () => {
   describe('discoveredCollectibleCount', () => {
     it('counts only entries with foundAt set', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: {
+        collectibles: deepFreeze({
           [foundingStone.id]: { quantity: 1, foundAt: 1000 },
           ['other-id' as CollectibleId]: { quantity: 1, foundAt: 0 },
-        },
+        }),
       } as unknown as GameState);
 
       expect(discoveredCollectibleCount()).toBe(1);
@@ -107,7 +116,7 @@ describe('Collectibles Helper Functions', () => {
 
     it('returns 0 when nothing has been found', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: {},
+        collectibles: deepFreeze({}),
       } as unknown as GameState);
 
       expect(discoveredCollectibleCount()).toBe(0);
@@ -116,7 +125,7 @@ describe('Collectibles Helper Functions', () => {
 
   describe('applyCollectibleGrant', () => {
     it('creates a new entry with the current timestamp', () => {
-      const state = { collectibles: {} } as unknown as GameState;
+      const state = { collectibles: deepFreeze({}) } as unknown as GameState;
 
       applyCollectibleGrant(state, foundingStone.id, 1);
 
@@ -126,9 +135,9 @@ describe('Collectibles Helper Functions', () => {
 
     it('merges quantity and preserves the original foundAt', () => {
       const state = {
-        collectibles: {
+        collectibles: deepFreeze({
           [foundingStone.id]: { quantity: 1, foundAt: 1000 },
-        },
+        }),
       } as unknown as GameState;
 
       applyCollectibleGrant(state, foundingStone.id, 2);
@@ -140,7 +149,7 @@ describe('Collectibles Helper Functions', () => {
     });
 
     it('recomputes the global effect sums cache', () => {
-      const state = { collectibles: {} } as unknown as GameState;
+      const state = { collectibles: deepFreeze({}) } as unknown as GameState;
 
       applyCollectibleGrant(state, foundingStone.id, 1);
 
@@ -154,7 +163,7 @@ describe('Collectibles Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        collectibles: {},
+        collectibles: deepFreeze({}),
       } as unknown as GameState);
 
       expect(result.collectibles[foundingStone.id].quantity).toBe(1);
@@ -166,7 +175,9 @@ describe('Collectibles Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        collectibles: { [foundingStone.id]: { quantity: 1, foundAt: 1000 } },
+        collectibles: deepFreeze({
+          [foundingStone.id]: { quantity: 1, foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(result.collectibles[foundingStone.id]).toEqual({
@@ -184,7 +195,7 @@ describe('Collectibles Helper Functions', () => {
 
     it('sends an analytics event with the collectible name only the first time it is found', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: {},
+        collectibles: deepFreeze({}),
       } as unknown as GameState);
       vi.mocked(getEntry).mockReturnValue(foundingStone);
 
@@ -197,7 +208,9 @@ describe('Collectibles Helper Functions', () => {
 
     it('does not send an analytics event again once already discovered', () => {
       vi.mocked(gamestate).mockReturnValue({
-        collectibles: { [foundingStone.id]: { quantity: 1, foundAt: 1000 } },
+        collectibles: deepFreeze({
+          [foundingStone.id]: { quantity: 1, foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       collectiblesAdd(foundingStone.id, 2);

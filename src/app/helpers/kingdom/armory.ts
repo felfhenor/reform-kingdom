@@ -26,7 +26,7 @@ import {
 } from '@helpers/kingdom/armory-global-effects';
 import {
   armoryState,
-  gamestate,
+  discoveredEquipmentState,
   globalEffectSumsState,
   updateGamestate,
 } from '@helpers/state-game';
@@ -117,8 +117,9 @@ export function markEquipmentDiscovered(
   equipmentId: EquipmentId,
 ): void {
   const existing = state.discoveredEquipment[equipmentId];
-  state.discoveredEquipment[equipmentId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
+  state.discoveredEquipment = {
+    ...state.discoveredEquipment,
+    [equipmentId]: { foundAt: existing?.foundAt ?? Date.now() },
   };
 }
 
@@ -198,7 +199,7 @@ export function armoryAddWithAffixes(
 // Whether this equipment has ever been found - unlike armory ownership, this
 // is permanent and survives equipping, selling, or breaking the gear down.
 export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {
-  return !!gamestate().discoveredEquipment[equipmentId]?.foundAt;
+  return !!discoveredEquipmentState()[equipmentId]?.foundAt;
 }
 
 const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {

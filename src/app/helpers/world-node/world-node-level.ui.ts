@@ -34,7 +34,10 @@ export function gatherNodeLevelUp(nodeName: string): boolean {
     worldNodeSpendCost(state, cost);
 
     const existing = state.gatherNodeLevels[nodeName];
-    state.gatherNodeLevels[nodeName] = { level: (existing?.level ?? 0) + 1 };
+    state.gatherNodeLevels = {
+      ...state.gatherNodeLevels,
+      [nodeName]: { level: (existing?.level ?? 0) + 1 },
+    };
     return state;
   });
 

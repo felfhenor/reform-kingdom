@@ -4,7 +4,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { collectiblesState, updateGamestate } from '@helpers/state-game';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -29,17 +29,16 @@ export function pruneInvalidCollectibles(
 }
 
 export function getCollectibleQuantity(collectibleId: CollectibleId): number {
-  return gamestate().collectibles[collectibleId]?.quantity ?? 0;
+  return collectiblesState()[collectibleId]?.quantity ?? 0;
 }
 
 export function isCollectibleDiscovered(collectibleId: CollectibleId): boolean {
-  return !!gamestate().collectibles[collectibleId]?.foundAt;
+  return !!collectiblesState()[collectibleId]?.foundAt;
 }
 
 export function discoveredCollectibleCount(): number {
-  return Object.values(gamestate().collectibles).filter(
-    (entry) => !!entry?.foundAt,
-  ).length;
+  return Object.values(collectiblesState()).filter((entry) => !!entry?.foundAt)
+    .length;
 }
 
 // Shared raw mutator - callers already inside their own `updateGamestate`/tick
@@ -50,9 +49,12 @@ export function applyCollectibleGrant(
   quantity: number,
 ): void {
   const existing = state.collectibles[collectibleId];
-  state.collectibles[collectibleId] = {
-    quantity: (existing?.quantity ?? 0) + quantity,
-    foundAt: existing?.foundAt ?? Date.now(),
+  state.collectibles = {
+    ...state.collectibles,
+    [collectibleId]: {
+      quantity: (existing?.quantity ?? 0) + quantity,
+      foundAt: existing?.foundAt ?? Date.now(),
+    },
   };
   recomputeGlobalEffectSums(state);
 }

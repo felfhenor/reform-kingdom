@@ -5,7 +5,11 @@ import {
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  discoveredCaravansState,
+  gamestate,
+  updateGamestate,
+} from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
@@ -92,7 +96,7 @@ export function caravanTimerUrgency(
 }
 
 export function isCaravanDiscovered(caravanId: CaravanId): boolean {
-  return !!gamestate().discoveredCaravans[caravanId]?.foundAt;
+  return !!discoveredCaravansState()[caravanId]?.foundAt;
 }
 
 export function isPartyAtCaravan(caravanId: CaravanId): boolean {
@@ -104,7 +108,10 @@ export function caravanMarkDiscovered(caravanId: CaravanId): void {
   if (isCaravanDiscovered(caravanId)) return;
 
   updateGamestate((state) => {
-    state.discoveredCaravans[caravanId] = { foundAt: Date.now() };
+    state.discoveredCaravans = {
+      ...state.discoveredCaravans,
+      [caravanId]: { foundAt: Date.now() },
+    };
     return state;
   });
 }

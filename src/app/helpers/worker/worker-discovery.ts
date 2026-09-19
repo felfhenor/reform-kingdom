@@ -3,6 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWithout } from '@helpers/engine/dictionary';
 import { notifySuccess } from '@helpers/engine/notify';
 import { discoveredWorkersState, updateGamestate } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
@@ -46,10 +47,11 @@ export function workerRescue(workerId: WorkerId): void {
 // Debug tool: reverts a worker back to unrescued.
 export function workerUndiscover(workerId: WorkerId): void {
   updateGamestate((state) => {
-    state.discoveredWorkers = { ...state.discoveredWorkers };
-    state.workers = { ...state.workers };
-    delete state.discoveredWorkers[workerId];
-    delete state.workers[workerId];
+    state.discoveredWorkers = dictionaryWithout(
+      state.discoveredWorkers,
+      workerId,
+    );
+    state.workers = dictionaryWithout(state.workers, workerId);
     return state;
   });
 }

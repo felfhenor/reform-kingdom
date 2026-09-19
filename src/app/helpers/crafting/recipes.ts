@@ -1,10 +1,11 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { dictionaryWithout } from '@helpers/engine/dictionary';
 import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
 import { getMaterialQuantity, traderTokenId } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { discoveredRecipesState, updateGamestate } from '@helpers/state-game';
 import type {
   CaravanTraderContent,
   CollectibleContent,
@@ -26,9 +27,10 @@ import { sumBy } from 'es-toolkit/compat';
 // this way.
 export function isRecipeDiscovered(
   recipeId: RecipeId,
-  state: GameState = gamestate(),
+  state?: GameState,
 ): boolean {
-  return !!state.discoveredRecipes[recipeId]?.foundAt;
+  const discovered = state ? state.discoveredRecipes : discoveredRecipesState();
+  return !!discovered[recipeId]?.foundAt;
 }
 
 // Whether this recipe is gated behind a world drop or a caravan trader sale -
@@ -71,8 +73,9 @@ export function applyRecipeDiscovery(
   recipeId: RecipeId,
 ): void {
   const existing = state.discoveredRecipes[recipeId];
-  state.discoveredRecipes[recipeId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
+  state.discoveredRecipes = {
+    ...state.discoveredRecipes,
+    [recipeId]: { foundAt: existing?.foundAt ?? Date.now() },
   };
 }
 
@@ -87,7 +90,10 @@ export function recipeDiscover(recipeId: RecipeId): void {
 // not something normal play ever triggers.
 export function recipeUndiscover(recipeId: RecipeId): void {
   updateGamestate((state) => {
-    delete state.discoveredRecipes[recipeId];
+    state.discoveredRecipes = dictionaryWithout(
+      state.discoveredRecipes,
+      recipeId,
+    );
     return state;
   });
 }
@@ -96,12 +102,14 @@ export function recipeUndiscover(recipeId: RecipeId): void {
 // already discovered or was never drop-gated has nothing to unlock.
 export function recipeCanUnlockWithTokens(
   recipeId: RecipeId,
-  state: GameState = gamestate(),
+  state?: GameState,
 ): boolean {
   const recipe = getEntry<RecipeContent>(recipeId);
   if (!recipe) return false;
 
-  const tokenQuantity = state.materials[traderTokenId()]?.quantity ?? 0;
+  const tokenQuantity = state
+    ? (state.materials[traderTokenId()]?.quantity ?? 0)
+    : getMaterialQuantity(traderTokenId());
 
   return (
     isRecipeDropGated(recipeId) &&

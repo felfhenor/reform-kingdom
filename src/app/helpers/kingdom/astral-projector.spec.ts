@@ -50,6 +50,7 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
 }));
 
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
@@ -187,7 +188,7 @@ describe('Astral Projector Helper Functions', () => {
       vi.mocked(getEntriesByType).mockReturnValue([spellContent]);
       vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
       vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: {},
+        discoveredAstralProjectorSpells: deepFreeze({}),
         activeAstralProjectorSpells: [],
       } as unknown as GameState);
       vi.mocked(timerTicksElapsed).mockReturnValue(0);
@@ -203,7 +204,7 @@ describe('Astral Projector Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        discoveredAstralProjectorSpells: {},
+        discoveredAstralProjectorSpells: deepFreeze({}),
       } as unknown as GameState);
       expect(result.discoveredAstralProjectorSpells[spellId]).toBeDefined();
     });
@@ -212,7 +213,9 @@ describe('Astral Projector Helper Functions', () => {
       vi.mocked(getEntriesByType).mockReturnValue([spellContent]);
       vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
       vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: { [spellId]: { foundAt: 0 } },
+        discoveredAstralProjectorSpells: deepFreeze({
+          [spellId]: { foundAt: 0 },
+        }),
         activeAstralProjectorSpells: [],
       } as unknown as GameState);
       vi.mocked(timerTicksElapsed).mockReturnValue(0);
@@ -227,7 +230,7 @@ describe('Astral Projector Helper Functions', () => {
       vi.mocked(getEntriesByType).mockReturnValue([]);
       mockGetEntry(spellContent);
       vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: {},
+        discoveredAstralProjectorSpells: deepFreeze({}),
         activeAstralProjectorSpells: [
           { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
         ],
@@ -252,7 +255,7 @@ describe('Astral Projector Helper Functions', () => {
     it('leaves an active spell alone before it expires', () => {
       vi.mocked(getEntriesByType).mockReturnValue([]);
       vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: {},
+        discoveredAstralProjectorSpells: deepFreeze({}),
         activeAstralProjectorSpells: [
           { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
         ],

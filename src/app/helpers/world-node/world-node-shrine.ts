@@ -1,4 +1,4 @@
-import { gamestate } from '@helpers/state-game';
+import { shrinesState } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
   CostItem,
@@ -9,7 +9,7 @@ import type {
 
 // Absent entry (or a missing shrines slice, e.g. mid-migration on an old save) means level 0.
 export function worldNodeShrineLevel(nodeName: string): number {
-  return gamestate().shrines?.[nodeName]?.level ?? 0;
+  return shrinesState()?.[nodeName]?.level ?? 0;
 }
 
 // Level 0 means no investment made yet (not a tier); levels.length is the highest tier obtainable.

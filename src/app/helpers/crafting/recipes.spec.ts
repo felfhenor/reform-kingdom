@@ -40,11 +40,17 @@ vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    discoveredRecipesState: () => gamestate().discoveredRecipes,
+    materialsState: () => gamestate().materials,
+  };
+});
 
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
@@ -195,7 +201,9 @@ describe('Recipes Helper Functions', () => {
   describe('isRecipeDiscovered', () => {
     it('returns true when foundAt is set', () => {
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+        discoveredRecipes: deepFreeze({
+          [equipmentRecipe.id]: { foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(true);
@@ -203,10 +211,21 @@ describe('Recipes Helper Functions', () => {
 
     it('returns false when the recipe has never been found', () => {
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(false);
+    });
+
+    it('reads an explicit state instead of the live slice', () => {
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: deepFreeze({}),
+      } as unknown as GameState);
+      const explicit = {
+        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+      } as unknown as GameState;
+
+      expect(isRecipeDiscovered(equipmentRecipe.id, explicit)).toBe(true);
     });
   });
 
@@ -240,7 +259,9 @@ describe('Recipes Helper Functions', () => {
     it('is true once a drop-gated recipe has been discovered', () => {
       mockEntriesByType();
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+        discoveredRecipes: deepFreeze({
+          [equipmentRecipe.id]: { foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(isRecipeCraftable(equipmentRecipe.id)).toBe(true);
@@ -249,7 +270,7 @@ describe('Recipes Helper Functions', () => {
     it('is false for a drop-gated recipe that has not been found', () => {
       mockEntriesByType();
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
@@ -258,7 +279,7 @@ describe('Recipes Helper Functions', () => {
     it('is true for a recipe that never drops from a location', () => {
       mockEntriesByType();
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(isRecipeCraftable(itemRecipe.id)).toBe(true);
@@ -271,7 +292,9 @@ describe('Recipes Helper Functions', () => {
         [{ crafting: { uniqueRecipeIds: [equipmentRecipe.id] } }],
       );
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+        discoveredRecipes: deepFreeze({
+          [equipmentRecipe.id]: { foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
@@ -305,7 +328,7 @@ describe('Recipes Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        discoveredRecipes: {},
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(
@@ -318,7 +341,9 @@ describe('Recipes Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+        discoveredRecipes: deepFreeze({
+          [equipmentRecipe.id]: { foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBe(1000);
@@ -327,7 +352,9 @@ describe('Recipes Helper Functions', () => {
 
   describe('applyRecipeDiscovery', () => {
     it('mutates the passed-in state directly, without opening its own updateGamestate', () => {
-      const state = { discoveredRecipes: {} } as unknown as GameState;
+      const state = {
+        discoveredRecipes: deepFreeze({}),
+      } as unknown as GameState;
 
       applyRecipeDiscovery(state, equipmentRecipe.id);
 
@@ -339,7 +366,9 @@ describe('Recipes Helper Functions', () => {
 
     it('preserves the original foundAt on repeat finds', () => {
       const state = {
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+        discoveredRecipes: deepFreeze({
+          [equipmentRecipe.id]: { foundAt: 1000 },
+        }),
       } as unknown as GameState;
 
       applyRecipeDiscovery(state, equipmentRecipe.id);
@@ -354,7 +383,9 @@ describe('Recipes Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
+        discoveredRecipes: deepFreeze({
+          [equipmentRecipe.id]: { foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(result.discoveredRecipes[equipmentRecipe.id]).toBeUndefined();
@@ -365,7 +396,7 @@ describe('Recipes Helper Functions', () => {
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
-        discoveredRecipes: {},
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(result.discoveredRecipes).toEqual({});
@@ -476,52 +507,62 @@ describe('Recipes Helper Functions', () => {
     });
 
     it('is true for a drop-gated, undiscovered recipe the player can afford', () => {
+      vi.mocked(getMaterialQuantity).mockReturnValue(
+        equipmentRecipe.tokenUnlockCost,
+      );
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-        materials: {
-          ['trader-token' as ItemId]: {
-            quantity: equipmentRecipe.tokenUnlockCost,
-            foundAt: 1,
-          },
-        },
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(true);
     });
 
     it('is false once the recipe is already discovered', () => {
+      vi.mocked(getMaterialQuantity).mockReturnValue(
+        equipmentRecipe.tokenUnlockCost,
+      );
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
-        materials: {
-          ['trader-token' as ItemId]: {
-            quantity: equipmentRecipe.tokenUnlockCost,
-            foundAt: 1,
-          },
-        },
+        discoveredRecipes: deepFreeze({
+          [equipmentRecipe.id]: { foundAt: 1000 },
+        }),
       } as unknown as GameState);
 
       expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);
     });
 
     it('is false for a recipe that is not drop-gated', () => {
+      vi.mocked(getMaterialQuantity).mockReturnValue(
+        itemRecipe.tokenUnlockCost,
+      );
       vi.mocked(getEntry).mockReturnValue(itemRecipe);
       vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-        materials: {
-          ['trader-token' as ItemId]: {
-            quantity: itemRecipe.tokenUnlockCost,
-            foundAt: 1,
-          },
-        },
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(recipeCanUnlockWithTokens(itemRecipe.id)).toBe(false);
     });
 
-    it('is false when the player cannot afford the token cost', () => {
+    it('validates against an explicit state instead of the live slices', () => {
+      vi.mocked(getMaterialQuantity).mockReturnValue(
+        equipmentRecipe.tokenUnlockCost,
+      );
       vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: deepFreeze({}),
+      } as unknown as GameState);
+      const spentState = {
         discoveredRecipes: {},
         materials: {},
+      } as unknown as GameState;
+
+      expect(recipeCanUnlockWithTokens(equipmentRecipe.id, spentState)).toBe(
+        false,
+      );
+    });
+
+    it('is false when the player cannot afford the token cost', () => {
+      vi.mocked(getMaterialQuantity).mockReturnValue(0);
+      vi.mocked(gamestate).mockReturnValue({
+        discoveredRecipes: deepFreeze({}),
       } as unknown as GameState);
 
       expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);

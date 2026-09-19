@@ -1,5 +1,5 @@
 import { LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL } from '@helpers/config';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { lootFiltersState, updateGamestate } from '@helpers/state-game';
 import type {
   DropRarity,
   EquipmentItemType,
@@ -7,7 +7,7 @@ import type {
 } from '@interfaces';
 
 export function lootFilterSettings(): LootFilterSettings {
-  return gamestate().lootFilters;
+  return lootFiltersState();
 }
 
 export function isLootFilterActive(filters: LootFilterSettings): boolean {
@@ -26,7 +26,10 @@ export function lootFilterSetRarityKept(
   keep: boolean,
 ): void {
   updateGamestate((state) => {
-    state.lootFilters.keepRarities[rarity] = keep;
+    state.lootFilters = {
+      ...state.lootFilters,
+      keepRarities: { ...state.lootFilters.keepRarities, [rarity]: keep },
+    };
     return state;
   });
 }
@@ -36,14 +39,23 @@ export function lootFilterSetEquipmentTypeKept(
   keep: boolean,
 ): void {
   updateGamestate((state) => {
-    state.lootFilters.keepEquipmentTypes[type] = keep;
+    state.lootFilters = {
+      ...state.lootFilters,
+      keepEquipmentTypes: {
+        ...state.lootFilters.keepEquipmentTypes,
+        [type]: keep,
+      },
+    };
     return state;
   });
 }
 
 export function lootFilterSetMinimumItemLevel(level: number): void {
   updateGamestate((state) => {
-    state.lootFilters.minimumItemLevel = Math.floor(Math.max(1, level));
+    state.lootFilters = {
+      ...state.lootFilters,
+      minimumItemLevel: Math.floor(Math.max(1, level)),
+    };
     return state;
   });
 }

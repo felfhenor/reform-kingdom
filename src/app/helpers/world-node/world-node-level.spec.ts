@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    gatherNodeLevelsState: () => gamestate().gatherNodeLevels,
+  };
+});
 
 vi.mock('@helpers/world', () => ({
   worldNodeAtCurrentLocation: vi.fn(),

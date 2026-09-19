@@ -87,7 +87,10 @@ export async function shrineLevelUp(nodeName: string): Promise<boolean> {
     worldNodeSpendCost(state, cost);
 
     const existing = state.shrines[nodeName];
-    state.shrines[nodeName] = { level: (existing?.level ?? 0) + 1 };
+    state.shrines = {
+      ...state.shrines,
+      [nodeName]: { level: (existing?.level ?? 0) + 1 },
+    };
     return state;
   });
 

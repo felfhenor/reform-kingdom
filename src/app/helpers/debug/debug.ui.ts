@@ -429,7 +429,10 @@ export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
   );
 
   updateGamestate((state) => {
-    state.gatherNodeLevels[nodeName] = { level: clampedLevel };
+    state.gatherNodeLevels = {
+      ...state.gatherNodeLevels,
+      [nodeName]: { level: clampedLevel },
+    };
     return state;
   });
 }

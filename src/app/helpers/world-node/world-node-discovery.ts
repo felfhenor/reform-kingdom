@@ -2,12 +2,13 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWithout } from '@helpers/engine/dictionary';
 import { notifySuccess } from '@helpers/engine/notify';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldDiscoveriesState } from '@helpers/state-game';
 import type { GameStateWorldDiscoveries } from '@interfaces';
 
 export function isWorldNodeDiscovered(nodeName: string): boolean {
-  return !!gamestate().worldDiscoveries[nodeName]?.foundAt;
+  return !!worldDiscoveriesState()[nodeName]?.foundAt;
 }
 
 // Marks a hidden node as revealed - only notifies the player on the first
@@ -17,8 +18,9 @@ export function worldNodeDiscover(nodeName: string): void {
 
   updateGamestate((state) => {
     const existing = state.worldDiscoveries[nodeName];
-    state.worldDiscoveries[nodeName] = {
-      foundAt: existing?.foundAt ?? Date.now(),
+    state.worldDiscoveries = {
+      ...state.worldDiscoveries,
+      [nodeName]: { foundAt: existing?.foundAt ?? Date.now() },
     };
     return state;
   });
@@ -34,7 +36,10 @@ export function worldNodeDiscover(nodeName: string): void {
 // Debug tool: reverts a node back to undiscovered.
 export function worldNodeUndiscover(nodeName: string): void {
   updateGamestate((state) => {
-    delete state.worldDiscoveries[nodeName];
+    state.worldDiscoveries = dictionaryWithout(
+      state.worldDiscoveries,
+      nodeName,
+    );
     return state;
   });
 }

@@ -67,8 +67,9 @@ function astralProjectorProcessUnlocks(): void {
     if (!isAstralProjectorCollectiblesMet(content)) return;
 
     updateGamestate((state) => {
-      state.discoveredAstralProjectorSpells[content.id] = {
-        foundAt: Date.now(),
+      state.discoveredAstralProjectorSpells = {
+        ...state.discoveredAstralProjectorSpells,
+        [content.id]: { foundAt: Date.now() },
       };
       return state;
     });

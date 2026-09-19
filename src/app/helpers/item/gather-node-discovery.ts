@@ -2,11 +2,14 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  discoveredGatherNodesState,
+  updateGamestate,
+} from '@helpers/state-game';
 import type { GameStateDiscoveredGatherNodes } from '@interfaces';
 
 export function isGatherNodeDiscovered(nodeName: string): boolean {
-  return !!gamestate().discoveredGatherNodes[nodeName]?.foundAt;
+  return !!discoveredGatherNodesState()[nodeName]?.foundAt;
 }
 
 export function gatherNodeDiscover(nodeName: string): void {
@@ -14,8 +17,9 @@ export function gatherNodeDiscover(nodeName: string): void {
 
   updateGamestate((state) => {
     const existing = state.discoveredGatherNodes[nodeName];
-    state.discoveredGatherNodes[nodeName] = {
-      foundAt: existing?.foundAt ?? Date.now(),
+    state.discoveredGatherNodes = {
+      ...state.discoveredGatherNodes,
+      [nodeName]: { foundAt: existing?.foundAt ?? Date.now() },
     };
     return state;
   });

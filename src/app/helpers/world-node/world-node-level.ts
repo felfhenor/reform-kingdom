@@ -1,4 +1,4 @@
-import { gamestate } from '@helpers/state-game';
+import { gatherNodeLevelsState } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
   CostItem,
@@ -8,7 +8,7 @@ import type {
 
 // Absent entry (or a missing gatherNodeLevels, e.g. mid-migration on an old save) means level 0.
 export function worldNodeLevel(nodeName: string): number {
-  return gamestate().gatherNodeLevels?.[nodeName]?.level ?? 0;
+  return gatherNodeLevelsState()?.[nodeName]?.level ?? 0;
 }
 
 // levelCost.length is the tier count (levelRequirement is authored 0..length-1), not a level value itself.

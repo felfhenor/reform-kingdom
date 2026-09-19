@@ -1,12 +1,13 @@
+import { dictionaryWithout } from '@helpers/engine/dictionary';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { tutorialsState, updateGamestate } from '@helpers/state-game';
 import type { GameStateTutorials, TutorialId } from '@interfaces';
 
 export function isTutorialSeen(tutorialId: TutorialId): boolean {
-  return !!gamestate().tutorials[tutorialId]?.foundAt;
+  return !!tutorialsState()[tutorialId]?.foundAt;
 }
 
 // Awaits the write (updateGamestate defers outside a tick) so a caller checking isTutorialSeen right after sees it committed.
@@ -14,7 +15,10 @@ export async function tutorialMarkSeen(tutorialId: TutorialId): Promise<void> {
   if (isTutorialSeen(tutorialId)) return;
 
   await updateGamestate((state) => {
-    state.tutorials[tutorialId] = { foundAt: Date.now() };
+    state.tutorials = {
+      ...state.tutorials,
+      [tutorialId]: { foundAt: Date.now() },
+    };
     return state;
   });
 
@@ -24,7 +28,7 @@ export async function tutorialMarkSeen(tutorialId: TutorialId): Promise<void> {
 // Debug tool: reverts a tutorial back to unseen.
 export function tutorialUnmarkSeen(tutorialId: TutorialId): void {
   updateGamestate((state) => {
-    delete state.tutorials[tutorialId];
+    state.tutorials = dictionaryWithout(state.tutorials, tutorialId);
     return state;
   });
 }

@@ -25,9 +25,11 @@ vi.mock('@helpers/state-game', () => {
     updateGamestate: vi.fn(),
     armoryState: () => gamestate().armory,
     globalEffectSumsState: () => gamestate().globalEffectSums,
+    discoveredEquipmentState: () => gamestate().discoveredEquipment,
   };
 });
 
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { getEntry } from '@helpers/content/content';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import {
@@ -186,7 +188,7 @@ describe('Armory Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         armory: [{ equipmentId: 'shield' as EquipmentId }],
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -209,7 +211,7 @@ describe('Armory Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         armory: [],
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -242,7 +244,7 @@ describe('Armory Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         armory: [],
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -259,7 +261,7 @@ describe('Armory Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         armory: [],
-        discoveredEquipment: { sword: { foundAt: 1000 } },
+        discoveredEquipment: deepFreeze({ sword: { foundAt: 1000 } }),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -278,7 +280,7 @@ describe('Armory Helper Functions', () => {
         armory: Array.from({ length: 50 }, () => ({
           equipmentId: 'shield' as EquipmentId,
         })),
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -299,7 +301,7 @@ describe('Armory Helper Functions', () => {
     it('admits only as many as fit under the strict cap', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 48),
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -318,7 +320,7 @@ describe('Armory Helper Functions', () => {
     it('rejects everything once the strict cap is already reached', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 50),
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         globalEffectSums: { armorySizeBoost: 0 },
       } as unknown as GameState;
 
@@ -335,7 +337,7 @@ describe('Armory Helper Functions', () => {
     it('admits up to the overflow cap when allowOverflow is set', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 60),
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -355,7 +357,7 @@ describe('Armory Helper Functions', () => {
     it('ignores the cap entirely when bypassCap is set', () => {
       const state = {
         armory: buildItems('shield' as EquipmentId, 60),
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -393,7 +395,7 @@ describe('Armory Helper Functions', () => {
 
       const state = {
         armory: buildItems('shield' as EquipmentId, 49),
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -417,7 +419,7 @@ describe('Armory Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         armory: [{ equipmentId: 'shield' as EquipmentId }],
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -440,7 +442,7 @@ describe('Armory Helper Functions', () => {
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
         armory: [],
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
         collectibles: {},
         globalEffects: [],
         globalEffectSums: { armorySizeBoost: 0 },
@@ -455,7 +457,7 @@ describe('Armory Helper Functions', () => {
   describe('isEquipmentDiscovered', () => {
     it('returns true once the equipment has ever been found', () => {
       vi.mocked(gamestate).mockReturnValue({
-        discoveredEquipment: { sword: { foundAt: 1000 } },
+        discoveredEquipment: deepFreeze({ sword: { foundAt: 1000 } }),
       } as unknown as GameState);
 
       expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(true);
@@ -464,7 +466,7 @@ describe('Armory Helper Functions', () => {
     it('returns true even if the equipment is no longer in the armory', () => {
       vi.mocked(gamestate).mockReturnValue({
         armory: [],
-        discoveredEquipment: { sword: { foundAt: 1000 } },
+        discoveredEquipment: deepFreeze({ sword: { foundAt: 1000 } }),
       } as unknown as GameState);
 
       expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(true);
@@ -472,7 +474,7 @@ describe('Armory Helper Functions', () => {
 
     it('returns false when the equipment has never been found', () => {
       vi.mocked(gamestate).mockReturnValue({
-        discoveredEquipment: {},
+        discoveredEquipment: deepFreeze({}),
       } as unknown as GameState);
 
       expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(false);

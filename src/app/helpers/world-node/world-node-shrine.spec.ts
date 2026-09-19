@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    shrinesState: () => gamestate().shrines,
+  };
+});
 
 vi.mock('@helpers/world', () => ({
   worldNodeAtCurrentLocation: vi.fn(),
@@ -57,7 +61,9 @@ describe('worldNodeShrineLevel', () => {
   });
 
   it('defaults to 0 when the node has no stored level', () => {
-    vi.mocked(gamestate).mockReturnValue({ shrines: {} } as unknown as GameState);
+    vi.mocked(gamestate).mockReturnValue({
+      shrines: {},
+    } as unknown as GameState);
 
     expect(worldNodeShrineLevel("Founder's Shrine")).toBe(0);
   });
@@ -139,9 +145,7 @@ describe('worldNodeShrineCurrentTier', () => {
       shrines: { Node: { level: 0 } },
     } as unknown as GameState);
 
-    expect(
-      worldNodeShrineCurrentTier(buildShrine(), 'Node'),
-    ).toBeUndefined();
+    expect(worldNodeShrineCurrentTier(buildShrine(), 'Node')).toBeUndefined();
   });
 
   it('resolves tier I at level 1', () => {
@@ -149,9 +153,9 @@ describe('worldNodeShrineCurrentTier', () => {
       shrines: { Node: { level: 1 } },
     } as unknown as GameState);
 
-    expect(worldNodeShrineCurrentTier(buildShrine(), 'Node')?.globalEffectId).toBe(
-      'Wisdom of the Founder I',
-    );
+    expect(
+      worldNodeShrineCurrentTier(buildShrine(), 'Node')?.globalEffectId,
+    ).toBe('Wisdom of the Founder I');
   });
 
   it('resolves tier III at the max level', () => {
@@ -159,9 +163,9 @@ describe('worldNodeShrineCurrentTier', () => {
       shrines: { Node: { level: 3 } },
     } as unknown as GameState);
 
-    expect(worldNodeShrineCurrentTier(buildShrine(), 'Node')?.globalEffectId).toBe(
-      'Wisdom of the Founder III',
-    );
+    expect(
+      worldNodeShrineCurrentTier(buildShrine(), 'Node')?.globalEffectId,
+    ).toBe('Wisdom of the Founder III');
   });
 
   it('is undefined when the shrine has no authored levels', () => {

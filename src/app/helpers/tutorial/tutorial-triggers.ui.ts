@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content/content';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { isInfusionMaterial } from '@helpers/item/infusion';
 import {
+  discoveredCaravansState,
   discoveredMaterialsState,
   discoveredWorkersState,
   gamestate,
@@ -26,6 +27,6 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
         (town) => town.firstVisitedAtTick !== undefined,
       );
     case 'first-caravan-visit':
-      return Object.keys(gamestate().discoveredCaravans).length > 0;
+      return Object.keys(discoveredCaravansState()).length > 0;
   }
 }
