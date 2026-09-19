@@ -4,6 +4,7 @@ import {
   URGENCY_WARNING_MIN_TICKS,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import {
   discoveredCaravansState,
@@ -108,10 +109,11 @@ export function caravanMarkDiscovered(caravanId: CaravanId): void {
   if (isCaravanDiscovered(caravanId)) return;
 
   updateGamestate((state) => {
-    state.discoveredCaravans = {
-      ...state.discoveredCaravans,
-      [caravanId]: { foundAt: Date.now() },
-    };
+    state.discoveredCaravans = dictionaryWith(
+      state.discoveredCaravans,
+      caravanId,
+      { foundAt: Date.now() },
+    );
     return state;
   });
 }

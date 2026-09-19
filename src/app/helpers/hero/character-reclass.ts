@@ -5,6 +5,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   characterStatsForLevel,
   characterXpForLevel,
@@ -51,10 +52,10 @@ function characterJobProgressSwap(
   level: number;
   xp: Character['xp'];
 } {
-  const jobProgress: Character['jobProgress'] = {
-    ...character.jobProgress,
-    [character.jobId]: { level: character.level, xp: character.xp },
-  };
+  const jobProgress = dictionaryWith(character.jobProgress, character.jobId, {
+    level: character.level,
+    xp: character.xp,
+  });
 
   const savedProgress = jobProgress[jobId];
   delete jobProgress[jobId];

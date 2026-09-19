@@ -4,6 +4,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
@@ -87,10 +88,9 @@ export async function shrineLevelUp(nodeName: string): Promise<boolean> {
     worldNodeSpendCost(state, cost);
 
     const existing = state.shrines[nodeName];
-    state.shrines = {
-      ...state.shrines,
-      [nodeName]: { level: (existing?.level ?? 0) + 1 },
-    };
+    state.shrines = dictionaryWith(state.shrines, nodeName, {
+      level: (existing?.level ?? 0) + 1,
+    });
     return state;
   });
 

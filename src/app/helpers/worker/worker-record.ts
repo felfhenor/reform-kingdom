@@ -1,3 +1,4 @@
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import type { GameState, WorkerId, WorkerState } from '@interfaces';
 
 // The draft is a shallow copy: reassign nested fields (`status`, `xp`) instead of mutating them in place.
@@ -11,6 +12,6 @@ export function updateWorkerRecord(
 
   const draft = { ...existing };
   fn(draft);
-  state.workers = { ...state.workers, [workerId]: draft };
+  state.workers = dictionaryWith(state.workers, workerId, draft);
   return state;
 }

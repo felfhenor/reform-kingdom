@@ -19,6 +19,7 @@ import {
   tradeskillIdForName,
   tradeskillXpForLevel,
 } from '@helpers/crafting/tradeskill';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   characterStatsForLevel,
   characterXpForLevel,
@@ -429,10 +430,9 @@ export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
   );
 
   updateGamestate((state) => {
-    state.gatherNodeLevels = {
-      ...state.gatherNodeLevels,
-      [nodeName]: { level: clampedLevel },
-    };
+    state.gatherNodeLevels = dictionaryWith(state.gatherNodeLevels, nodeName, {
+      level: clampedLevel,
+    });
     return state;
   });
 }

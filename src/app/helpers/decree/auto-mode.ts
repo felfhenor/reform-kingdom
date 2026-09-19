@@ -11,6 +11,7 @@ import {
   pickNextClause,
 } from '@helpers/decree/decree-evaluation';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   addGlobalEffect,
   isGlobalEffectActive,
@@ -87,10 +88,11 @@ export function autoModeRecordNodeFailure(nodeName: string): void {
   updateGamestate((state) => {
     const counts = state.world.autoMode.nodeFailureCounts;
     newFailureCount = (counts[nodeName] ?? 0) + 1;
-    state.world.autoMode.nodeFailureCounts = {
-      ...counts,
-      [nodeName]: newFailureCount,
-    };
+    state.world.autoMode.nodeFailureCounts = dictionaryWith(
+      counts,
+      nodeName,
+      newFailureCount,
+    );
     return state;
   });
 
@@ -99,10 +101,11 @@ export function autoModeRecordNodeFailure(nodeName: string): void {
 
 export function autoModeRecordNodeSuccess(nodeName: string): void {
   updateGamestate((state) => {
-    state.world.autoMode.nodeFailureCounts = {
-      ...state.world.autoMode.nodeFailureCounts,
-      [nodeName]: 0,
-    };
+    state.world.autoMode.nodeFailureCounts = dictionaryWith(
+      state.world.autoMode.nodeFailureCounts,
+      nodeName,
+      0,
+    );
     return state;
   });
 }

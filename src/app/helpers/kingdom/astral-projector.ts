@@ -1,6 +1,7 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
@@ -67,10 +68,11 @@ function astralProjectorProcessUnlocks(): void {
     if (!isAstralProjectorCollectiblesMet(content)) return;
 
     updateGamestate((state) => {
-      state.discoveredAstralProjectorSpells = {
-        ...state.discoveredAstralProjectorSpells,
-        [content.id]: { foundAt: Date.now() },
-      };
+      state.discoveredAstralProjectorSpells = dictionaryWith(
+        state.discoveredAstralProjectorSpells,
+        content.id,
+        { foundAt: Date.now() },
+      );
       return state;
     });
 

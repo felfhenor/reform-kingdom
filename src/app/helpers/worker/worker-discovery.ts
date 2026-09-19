@@ -3,7 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWithout } from '@helpers/engine/dictionary';
+import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import { notifySuccess } from '@helpers/engine/notify';
 import { discoveredWorkersState, updateGamestate } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
@@ -30,11 +30,16 @@ export function workerRescue(workerId: WorkerId): void {
   if (!worker) return;
 
   updateGamestate((state) => {
-    state.discoveredWorkers = {
-      ...state.discoveredWorkers,
-      [workerId]: { foundAt: Date.now() },
-    };
-    state.workers = { ...state.workers, [workerId]: defaultWorkerState() };
+    state.discoveredWorkers = dictionaryWith(
+      state.discoveredWorkers,
+      workerId,
+      { foundAt: Date.now() },
+    );
+    state.workers = dictionaryWith(
+      state.workers,
+      workerId,
+      defaultWorkerState(),
+    );
     return state;
   });
 

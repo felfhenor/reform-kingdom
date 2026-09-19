@@ -5,6 +5,7 @@ import {
   isRecipeTownUnique,
 } from '@helpers/crafting/recipes';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
@@ -140,14 +141,16 @@ function applyCollectibleDrop(
 function applyWorkerDrop(state: GameState, drop: ResolvedWorkerDrop): void {
   if (state.discoveredWorkers[drop.workerId]) return;
 
-  state.discoveredWorkers = {
-    ...state.discoveredWorkers,
-    [drop.workerId]: { foundAt: Date.now() },
-  };
-  state.workers = {
-    ...state.workers,
-    [drop.workerId]: defaultWorkerState(),
-  };
+  state.discoveredWorkers = dictionaryWith(
+    state.discoveredWorkers,
+    drop.workerId,
+    { foundAt: Date.now() },
+  );
+  state.workers = dictionaryWith(
+    state.workers,
+    drop.workerId,
+    defaultWorkerState(),
+  );
 }
 
 // Mutates `state` directly with no side effects, for callers already inside their own `updateGamestate`.

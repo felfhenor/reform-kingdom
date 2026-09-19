@@ -1,5 +1,6 @@
 import { combatOrderClauses } from '@helpers/combat/combat-order';
 import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { partyGet } from '@helpers/hero/party';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
@@ -99,7 +100,10 @@ function updateCombatOrderClauses(
       const clauses = transform(c.combatOrders[jobId] ?? []);
       if (!clauses) return c;
 
-      return { ...c, combatOrders: { ...c.combatOrders, [jobId]: clauses } };
+      return {
+        ...c,
+        combatOrders: dictionaryWith(c.combatOrders, jobId, clauses),
+      };
     });
     return state;
   });

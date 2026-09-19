@@ -2,7 +2,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWithout } from '@helpers/engine/dictionary';
+import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import { notifySuccess } from '@helpers/engine/notify';
 import { updateGamestate, worldDiscoveriesState } from '@helpers/state-game';
 import type { GameStateWorldDiscoveries } from '@interfaces';
@@ -18,10 +18,9 @@ export function worldNodeDiscover(nodeName: string): void {
 
   updateGamestate((state) => {
     const existing = state.worldDiscoveries[nodeName];
-    state.worldDiscoveries = {
-      ...state.worldDiscoveries,
-      [nodeName]: { foundAt: existing?.foundAt ?? Date.now() },
-    };
+    state.worldDiscoveries = dictionaryWith(state.worldDiscoveries, nodeName, {
+      foundAt: existing?.foundAt ?? Date.now(),
+    });
     return state;
   });
 

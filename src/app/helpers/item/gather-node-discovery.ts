@@ -2,6 +2,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   discoveredGatherNodesState,
   updateGamestate,
@@ -17,10 +18,11 @@ export function gatherNodeDiscover(nodeName: string): void {
 
   updateGamestate((state) => {
     const existing = state.discoveredGatherNodes[nodeName];
-    state.discoveredGatherNodes = {
-      ...state.discoveredGatherNodes,
-      [nodeName]: { foundAt: existing?.foundAt ?? Date.now() },
-    };
+    state.discoveredGatherNodes = dictionaryWith(
+      state.discoveredGatherNodes,
+      nodeName,
+      { foundAt: existing?.foundAt ?? Date.now() },
+    );
     return state;
   });
 

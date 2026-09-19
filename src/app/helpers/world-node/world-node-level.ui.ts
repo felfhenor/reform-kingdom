@@ -2,6 +2,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { updateGamestate } from '@helpers/state-game';
 import {
   worldNodeCanAffordCost,
@@ -34,10 +35,9 @@ export function gatherNodeLevelUp(nodeName: string): boolean {
     worldNodeSpendCost(state, cost);
 
     const existing = state.gatherNodeLevels[nodeName];
-    state.gatherNodeLevels = {
-      ...state.gatherNodeLevels,
-      [nodeName]: { level: (existing?.level ?? 0) + 1 },
-    };
+    state.gatherNodeLevels = dictionaryWith(state.gatherNodeLevels, nodeName, {
+      level: (existing?.level ?? 0) + 1,
+    });
     return state;
   });
 

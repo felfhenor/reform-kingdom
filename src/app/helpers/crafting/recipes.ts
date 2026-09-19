@@ -1,5 +1,5 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { dictionaryWithout } from '@helpers/engine/dictionary';
+import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import { partyGet } from '@helpers/hero/party';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
@@ -73,10 +73,9 @@ export function applyRecipeDiscovery(
   recipeId: RecipeId,
 ): void {
   const existing = state.discoveredRecipes[recipeId];
-  state.discoveredRecipes = {
-    ...state.discoveredRecipes,
-    [recipeId]: { foundAt: existing?.foundAt ?? Date.now() },
-  };
+  state.discoveredRecipes = dictionaryWith(state.discoveredRecipes, recipeId, {
+    foundAt: existing?.foundAt ?? Date.now(),
+  });
 }
 
 export function recipeDiscover(recipeId: RecipeId): void {
