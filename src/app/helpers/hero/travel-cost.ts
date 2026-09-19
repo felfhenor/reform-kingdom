@@ -1,4 +1,5 @@
 import {
+  TICKS_PER_STEP_MIN_DIFF,
   TICKS_PER_STEP_OFF_PATH,
   TICKS_PER_STEP_ON_PATH,
 } from '@helpers/config';
@@ -17,10 +18,28 @@ function travelTileCountsAsPath(
   return tileIsOnPath(mapName, x, y) || !!worldNodeAt(mapName, x, y);
 }
 
+function reducedStepTicksCost(
+  baseTicks: number,
+  reduction: number,
+  floor: number,
+): number {
+  return Math.max(floor, Math.round(baseTicks * (1 - reduction)));
+}
+
 function offPathStepTicksCost(): number {
-  const reduction = globalEffectSums().offPathTravelSpeedBonus;
-  const reduced = Math.round(TICKS_PER_STEP_OFF_PATH * (1 - reduction));
-  return Math.max(TICKS_PER_STEP_ON_PATH, reduced);
+  return reducedStepTicksCost(
+    TICKS_PER_STEP_OFF_PATH,
+    globalEffectSums().offPathTravelSpeedBonus,
+    TICKS_PER_STEP_ON_PATH + TICKS_PER_STEP_MIN_DIFF,
+  );
+}
+
+function onPathStepTicksCost(): number {
+  return reducedStepTicksCost(
+    TICKS_PER_STEP_ON_PATH,
+    globalEffectSums().onPathTravelSpeedBonus,
+    TICKS_PER_STEP_MIN_DIFF,
+  );
 }
 
 // Teleport is instant. Move is cheap entering a path/node tile, or leaving a node tile -
@@ -43,7 +62,7 @@ export function travelStepTicksCost(
   );
 
   return enteringPathOrNode || exitingNode
-    ? TICKS_PER_STEP_ON_PATH
+    ? onPathStepTicksCost()
     : offPathStepTicksCost();
 }
 

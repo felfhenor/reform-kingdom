@@ -49,6 +49,8 @@ export function globalEffectEffectDescription(
     }
     case 'GlobalOffPathTravelSpeedBoost':
       return `Off-Path Travel Speed: +${effect.value * 100}%`;
+    case 'GlobalOnPathTravelSpeedBoost':
+      return `On-Path Travel Speed: +${effect.value * 100}%`;
     case 'GlobalDecreeClauseCapBoost':
       return `Decree Clause Cap: +${effect.value}`;
   }
@@ -105,6 +107,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalOffPathTravelSpeedBoost':
       sums.offPathTravelSpeedBonus += effect.value;
+      return;
+    case 'GlobalOnPathTravelSpeedBoost':
+      sums.onPathTravelSpeedBonus += effect.value;
       return;
     case 'GlobalDecreeClauseCapBoost':
       sums.decreeClauseCapBoost += effect.value;

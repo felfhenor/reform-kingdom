@@ -53,11 +53,12 @@ describe('globalEffectEffectsDescription', () => {
         value: 1,
       },
       { effectType: 'GlobalOffPathTravelSpeedBoost', value: 0.1 },
+      { effectType: 'GlobalOnPathTravelSpeedBoost', value: 0.05 },
       { effectType: 'GlobalDecreeClauseCapBoost', value: 1 },
     ];
 
     expect(globalEffectEffectsDescription(effects)).toBe(
-      'Hero Strength: +5, Hero Revive Chance: +2%, Hero Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1, Off-Path Travel Speed: +10%, Decree Clause Cap: +1',
+      'Hero Strength: +5, Hero Revive Chance: +2%, Hero Aggro: +3, XP Gain: +10%, All Debuff Resist: +10%, Accuracy Down Resist: +5%, Extra Gather Item Chance: +20%, Armory Size: +5, Jewelcrafting Queue Size: +1, Off-Path Travel Speed: +10%, On-Path Travel Speed: +5%, Decree Clause Cap: +1',
     );
   });
 
@@ -240,6 +241,29 @@ describe('recomputeGlobalEffectSums', () => {
     recomputeGlobalEffectSums(state);
 
     expect(state.globalEffectSums.offPathTravelSpeedBonus).toBeCloseTo(0.1);
+  });
+
+  it('sums an on-path travel speed boost additively', () => {
+    const bootsId = 'boots' as CollectibleId;
+    const boots: CollectibleContent = {
+      id: bootsId,
+      name: 'Explorer Boots',
+      __type: 'collectible',
+      description: '',
+      sprite: '0000',
+      rarity: 'Common',
+      effects: [{ effectType: 'GlobalOnPathTravelSpeedBoost', value: 0.05 }],
+    };
+    vi.mocked(getEntry).mockImplementation((id) =>
+      id === bootsId ? (boots as never) : undefined,
+    );
+    const state = buildState({
+      collectibles: { [bootsId]: { quantity: 1, foundAt: 0 } },
+    });
+
+    recomputeGlobalEffectSums(state);
+
+    expect(state.globalEffectSums.onPathTravelSpeedBonus).toBeCloseTo(0.05);
   });
 
   it('sums a decree clause cap boost', () => {

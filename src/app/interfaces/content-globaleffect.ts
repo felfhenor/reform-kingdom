@@ -82,6 +82,13 @@ export type GlobalEffectEffectOffPathTravelSpeedBoost = {
   value: number;
 };
 
+// Adds `value` (a flat percent) to travel speed while on the authored path,
+// stacking additively across sources.
+export type GlobalEffectEffectOnPathTravelSpeedBoost = {
+  effectType: 'GlobalOnPathTravelSpeedBoost';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainCombatStat
@@ -94,6 +101,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectArmorySizeBoost
   | GlobalEffectEffectTradeskillQueueSizeBoost
   | GlobalEffectEffectOffPathTravelSpeedBoost
+  | GlobalEffectEffectOnPathTravelSpeedBoost
   | GlobalEffectEffectDecreeClauseCapBoost;
 
 export type GlobalEffectContent = IsContentItem &

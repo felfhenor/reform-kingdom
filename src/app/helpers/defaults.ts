@@ -192,6 +192,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     armorySizeBoost: 0,
     tradeskillQueueSizeBoosts: {},
     offPathTravelSpeedBonus: 0,
+    onPathTravelSpeedBonus: 0,
     decreeClauseCapBoost: 0,
   };
 }

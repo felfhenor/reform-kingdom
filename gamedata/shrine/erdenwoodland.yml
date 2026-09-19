@@ -1,0 +1,75 @@
+- id: 577ebd9d-0a3e-43d4-b54e-c887d4795bc9
+  name: Shrine of Culcula
+  description: A shrine dedicated to Culcula, the explorer. They were known for their extraordinary mobility.
+
+  levels:
+    - costs:
+        - itemId: Crimson Lucre
+          required: 500
+
+      globalEffectId: Mobility of the Explorer I
+      globalEffectDuration: 1800
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 2000
+
+        - itemId: Elven Corewood
+          required: 25
+
+        - itemId: Crimson Ore
+          required: 25
+
+        - itemId: Crimson Ruby
+          required: 25
+
+      globalEffectId: Mobility of the Explorer II
+      globalEffectDuration: 3600
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 4500
+
+        - itemId: Gold Ore
+          required: 25
+
+        - itemId: Wolf Pelt
+          required: 25
+
+        - itemId: Strong Spider Silk
+          required: 25
+
+      globalEffectId: Mobility of the Explorer III
+      globalEffectDuration: 7200
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 10000
+
+        - itemId: Demon Horn
+          required: 25
+
+        - itemId: Crimson Ingot
+          required: 25
+
+        - itemId: Hawk Feather
+          required: 25
+
+      globalEffectId: Mobility of the Explorer IV
+      globalEffectDuration: 14400
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 25000
+
+        - itemId: Elfsilk
+          required: 25
+
+        - itemId: Bat Wing
+          required: 25
+
+        - itemId: Gold Ingot
+          required: 25
+
+      globalEffectId: Mobility of the Explorer V
+      globalEffectDuration: 31536000

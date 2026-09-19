@@ -14,6 +14,7 @@ import type {
   GlobalEffectEffectGatheringItemDropRateBoost,
   GlobalEffectEffectGoldGainMultiplier,
   GlobalEffectEffectOffPathTravelSpeedBoost,
+  GlobalEffectEffectOnPathTravelSpeedBoost,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -33,6 +34,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectArmorySizeBoost> &
     Partial<GlobalEffectEffectTradeskillQueueSizeBoost> &
     Partial<GlobalEffectEffectOffPathTravelSpeedBoost> &
+    Partial<GlobalEffectEffectOnPathTravelSpeedBoost> &
     Partial<GlobalEffectEffectDecreeClauseCapBoost> = {},
 ): GlobalEffectEffect {
   if (effect.effectType === 'GlobalXPGainMultiplier') {
@@ -53,6 +55,13 @@ export function ensureGlobalEffectEffect(
   if (effect.effectType === 'GlobalOffPathTravelSpeedBoost') {
     return {
       effectType: 'GlobalOffPathTravelSpeedBoost',
+      value: effect.value ?? 0,
+    };
+  }
+
+  if (effect.effectType === 'GlobalOnPathTravelSpeedBoost') {
+    return {
+      effectType: 'GlobalOnPathTravelSpeedBoost',
       value: effect.value ?? 0,
     };
   }

@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(() => ({ offPathTravelSpeedBonus: 0 })),
+  globalEffectSums: vi.fn(() => ({
+    offPathTravelSpeedBonus: 0,
+    onPathTravelSpeedBonus: 0,
+  })),
 }));
 
 vi.mock('@helpers/pathfinding/pathfinding', () => ({
@@ -34,6 +37,7 @@ describe('travelStepTicksCost', () => {
     vi.clearAllMocks();
     vi.mocked(globalEffectSums).mockReturnValue({
       offPathTravelSpeedBonus: 0,
+      onPathTravelSpeedBonus: 0,
     } as never);
     vi.mocked(tileIsOnPath).mockReturnValue(false);
     vi.mocked(worldNodeAt).mockReturnValue(undefined);
@@ -67,6 +71,7 @@ describe('travelStepTicksCost', () => {
   it('never applies the off-path boost to on-path movement', () => {
     vi.mocked(globalEffectSums).mockReturnValue({
       offPathTravelSpeedBonus: 0.5,
+      onPathTravelSpeedBonus: 0,
     } as never);
     vi.mocked(tileIsOnPath).mockReturnValue(true);
     expect(travelStepTicksCost(offPathStep, origin)).toBe(1);
@@ -75,16 +80,55 @@ describe('travelStepTicksCost', () => {
   it('reduces the off-path cost by 10% per stacked boost, rounded to the nearest tick', () => {
     vi.mocked(globalEffectSums).mockReturnValue({
       offPathTravelSpeedBonus: 0.2,
+      onPathTravelSpeedBonus: 0,
     } as never);
     // 3 * (1 - 0.2) = 2.4 -> rounds to 2
     expect(travelStepTicksCost(offPathStep, origin)).toBe(2);
   });
 
-  it('never reduces off-path travel below the on-path cost, even with an extreme boost', () => {
+  it('never reduces off-path travel below the on-path cost (+TICKS_PER_STEP_MIN_DIFF), even with an extreme boost', () => {
     vi.mocked(globalEffectSums).mockReturnValue({
       offPathTravelSpeedBonus: 5,
+      onPathTravelSpeedBonus: 0,
     } as never);
+    expect(travelStepTicksCost(offPathStep, origin)).toBe(1.25);
+  });
+
+  it('never applies the on-path boost to off-path movement', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      offPathTravelSpeedBonus: 0,
+      onPathTravelSpeedBonus: 0.5,
+    } as never);
+    expect(travelStepTicksCost(offPathStep, origin)).toBe(3);
+  });
+
+  it('reduces the on-path cost, rounded to the nearest tick', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      offPathTravelSpeedBonus: 0,
+      onPathTravelSpeedBonus: 0.4,
+    } as never);
+    vi.mocked(tileIsOnPath).mockReturnValue(true);
+    // 1 * (1 - 0.4) = 0.6 -> rounds to 1
     expect(travelStepTicksCost(offPathStep, origin)).toBe(1);
+  });
+
+  it('can reduce the on-path cost to TICKS_PER_STEP_MIN_DIFF with a large enough boost', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      offPathTravelSpeedBonus: 0,
+      onPathTravelSpeedBonus: 0.6,
+    } as never);
+    vi.mocked(tileIsOnPath).mockReturnValue(true);
+    // 1 * (1 - 0.6) = 0.4 -> rounds to 0
+    expect(travelStepTicksCost(offPathStep, origin)).toBe(0.25);
+  });
+
+  it('never reduces the on-path cost below TICKS_PER_STEP_MIN_DIFF, even with an extreme boost', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      offPathTravelSpeedBonus: 0,
+      onPathTravelSpeedBonus: 5,
+    } as never);
+    vi.mocked(tileIsOnPath).mockReturnValue(true);
+    expect(travelStepTicksCost(offPathStep, origin)).toBe(0.25);
   });
 });
 
