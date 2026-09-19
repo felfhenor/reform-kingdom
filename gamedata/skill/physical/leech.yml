@@ -7,7 +7,7 @@
 
   rarity: Common
 
-  epCost: 0
+  epCost: 25
   usesPerCombat: -1
 
   statusEffectDurationBoost: {}
