@@ -32,8 +32,8 @@
     - skillId: Double Strike III
       weight: 4
 
-    - skillId: Sweep III
-      weight: 4
+    - skillId: Broil I
+      weight: 2
 
   baseStats:
     Health: 350
