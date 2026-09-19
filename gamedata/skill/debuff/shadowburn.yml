@@ -1,0 +1,35 @@
+- id: c0c62d38-611b-4367-9ac2-2bd26ee27e5c
+  name: Shadowburn I
+  family: Shadowburn
+  description: Scorch an enemy with dark fire for {{ value }} damage, with a chance to inflict Burning and Blind.
+
+  sprite: '0036'
+
+  rarity: Common
+
+  epCost: 35
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.5
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 50
+          duration: 3
+
+        - statusEffectId: Blind I
+          chance: 75
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
