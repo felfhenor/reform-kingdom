@@ -345,3 +345,59 @@
     - type: TakeCombatStatNumber
       combatStat: missChance
       value: 50
+
+- id: 5e9359c3-ddbf-4b7e-9a12-e5cda377315a
+  name: Hexed I
+
+  effectType: Debuff
+  elements: [Earth]
+  tags: [StatDown]
+
+  trigger: TurnEnd
+
+  statScaling:
+    Intelligence: 0.2
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** has been hexed, their stats plummeting!'
+
+    - type: TakeDamageFromStat
+      modifyStat: Strength
+
+    - type: TakeDamageFromStat
+      modifyStat: Vitality
+
+    - type: TakeDamageFromStat
+      modifyStat: Intelligence
+
+    - type: TakeDamageFromStat
+      modifyStat: Agility
+
+    - type: TakeDamageFromStat
+      modifyStat: Resistance
+
+    - type: TakeDamageFromStat
+      modifyStat: Luck
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is no longer hexed!'
+
+    - type: AddDamageToStat
+      modifyStat: Strength
+
+    - type: AddDamageToStat
+      modifyStat: Vitality
+
+    - type: AddDamageToStat
+      modifyStat: Intelligence
+
+    - type: AddDamageToStat
+      modifyStat: Agility
+
+    - type: AddDamageToStat
+      modifyStat: Resistance
+
+    - type: AddDamageToStat
+      modifyStat: Luck

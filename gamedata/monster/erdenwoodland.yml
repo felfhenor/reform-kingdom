@@ -194,6 +194,8 @@
     - skillId: Attack
       weight: 1
     - skillId: Shadowburn I
+      weight: 3
+    - skillId: Hex I
       weight: 2
 
   baseStats:

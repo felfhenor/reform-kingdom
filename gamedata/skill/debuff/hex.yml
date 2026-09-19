@@ -1,0 +1,31 @@
+- id: 60745a4c-c647-4111-aafd-89798d806ac7
+  name: Hex I
+  family: Hex
+  description: Curse an enemy, lowering their Strength, Vitality, Intelligence, Agility, Resistance, and Luck by 20%.
+
+  sprite: '0037'
+
+  rarity: Common
+
+  epCost: 75
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Hexed I
+
+      statusEffects:
+        - statusEffectId: Hexed I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}**.'
