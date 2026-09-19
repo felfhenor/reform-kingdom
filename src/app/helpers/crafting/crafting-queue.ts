@@ -20,6 +20,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   collectiblesAdd,
   isCollectibleDiscovered,
@@ -280,10 +281,10 @@ export function craftQueueStart(
     });
 
     const building = tradeskillBuildingIn(state, tradeskillId);
-    state.tradeskills[tradeskillId] = {
+    state.tradeskills = dictionaryWith(state.tradeskills, tradeskillId, {
       ...building,
       queue: applyQueueStack(building.queue, recipeId, clampedQuantity),
-    };
+    });
 
     return state;
   });
@@ -393,7 +394,10 @@ function advanceQueueEntry(
               : queued,
           );
 
-    state.tradeskills[tradeskillId] = { ...building, queue };
+    state.tradeskills = dictionaryWith(state.tradeskills, tradeskillId, {
+      ...building,
+      queue,
+    });
     return state;
   });
 }
@@ -429,12 +433,12 @@ export function craftProcessTick(): void {
         );
         if (index === -1) return state;
 
-        state.tradeskills[tradeskillId] = {
+        state.tradeskills = dictionaryWith(state.tradeskills, tradeskillId, {
           ...building,
           queue: building.queue.map((queued, i) =>
             i === index ? { ...queued, ticksIntoCraft } : queued,
           ),
-        };
+        });
         return state;
       });
       return;

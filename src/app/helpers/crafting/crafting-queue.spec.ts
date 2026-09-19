@@ -65,6 +65,7 @@ vi.mock('@helpers/state-game', () => {
     updateGamestate: vi.fn(),
     armoryState: () => gamestate().armory,
     globalEffectSumsState: () => gamestate().globalEffectSums,
+    tradeskillsState: () => gamestate().tradeskills,
   };
 });
 
@@ -76,6 +77,7 @@ import {
   craftQueueStart,
 } from '@helpers/crafting/crafting-queue';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   collectiblesAdd,
   isCollectibleDiscovered,
@@ -194,6 +196,8 @@ function buildQueueEntry(
 }
 
 function applyUpdateAt(index: number, state: GameState): GameState {
+  deepFreeze(state.tradeskills);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[index][0];
   return updateFn(state);
@@ -734,6 +738,29 @@ describe('craftProcessTick', () => {
     expect(result.tradeskills[BLACKSMITHING_ID].queue[0].ticksIntoCraft).toBe(
       3,
     );
+  });
+
+  it('reassigns the tradeskills dict and the building so slice selectors see the change', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 2 })] }),
+      ),
+    } as unknown as GameState);
+    mockGetEntry({ 'recipe-1': buildRecipe({ craftTime: 5 }) });
+
+    craftProcessTick();
+
+    const state = {
+      tradeskills: buildAllTradeskills(
+        buildBuilding({ queue: [buildQueueEntry({ ticksIntoCraft: 2 })] }),
+      ),
+    } as unknown as GameState;
+    const previousDict = state.tradeskills;
+    const previousBuilding = state.tradeskills[BLACKSMITHING_ID];
+    const result = applyUpdateAt(0, state);
+
+    expect(result.tradeskills).not.toBe(previousDict);
+    expect(result.tradeskills[BLACKSMITHING_ID]).not.toBe(previousBuilding);
   });
 
   it('completes an item craft: grants the item, logs it, and advances the queue', () => {

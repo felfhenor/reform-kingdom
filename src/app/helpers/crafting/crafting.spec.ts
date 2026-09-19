@@ -22,9 +22,13 @@ vi.mock('@helpers/crafting/recipes', () => ({
   recipeResultSpritesheet: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    tradeskillsState: () => gamestate().tradeskills,
+  };
+});
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {

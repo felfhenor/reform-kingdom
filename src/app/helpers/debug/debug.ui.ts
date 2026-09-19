@@ -178,11 +178,11 @@ export function debugSetTradeskillLevel(
   const clampedLevel = clamp(Math.round(level), 1, TRADESKILL_MAX_LEVEL);
 
   updateGamestate((state) => {
-    state.tradeskills[tradeskillId] = {
+    state.tradeskills = dictionaryWith(state.tradeskills, tradeskillId, {
       ...tradeskillBuildingIn(state, tradeskillId),
       level: clampedLevel,
       xp: { current: 0, maximum: tradeskillXpForLevel(clampedLevel) },
-    };
+    });
 
     return state;
   });

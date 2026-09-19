@@ -41,6 +41,7 @@ import {
   globalEffectsState,
   materialsState,
   setGameState,
+  tradeskillsState,
   updateGamestate,
   workersState,
 } from '@helpers/state-game';
@@ -241,6 +242,7 @@ describe('workersState', () => {
     ['gatherNodeLevels', gatherNodeLevelsState],
     ['worldDiscoveries', worldDiscoveriesState],
     ['bestiary', bestiaryState],
+    ['tradeskills', tradeskillsState],
     ['shrines', shrinesState],
     ['tutorials', tutorialsState],
     ['lootFilters', lootFiltersState],

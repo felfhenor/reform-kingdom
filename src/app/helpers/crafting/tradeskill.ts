@@ -9,10 +9,11 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { tradeskillsState, updateGamestate } from '@helpers/state-game';
 import type {
   ChanceTier,
   GameState,
@@ -75,7 +76,7 @@ export function tradeskillBuilding(
 ): TradeskillBuildingState {
   const id = tradeskillIdForName(tradeskill);
   if (!id) return DEFAULT_BUILDING;
-  return gamestate().tradeskills[id] ?? DEFAULT_BUILDING;
+  return tradeskillsState()[id] ?? DEFAULT_BUILDING;
 }
 
 // For `updateGamestate` callbacks - they must read the draft `state` they
@@ -173,10 +174,14 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   let newLevel = previousLevel;
 
   updateGamestate((state) => {
-    state.tradeskills[tradeskillId] = tradeskillLeveledUp(
-      tradeskillBuildingIn(state, tradeskillId),
-      tradeskill,
-      amount,
+    state.tradeskills = dictionaryWith(
+      state.tradeskills,
+      tradeskillId,
+      tradeskillLeveledUp(
+        tradeskillBuildingIn(state, tradeskillId),
+        tradeskill,
+        amount,
+      ),
     );
     newLevel = state.tradeskills[tradeskillId].level;
     return state;

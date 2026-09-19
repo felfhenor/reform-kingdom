@@ -136,9 +136,7 @@ export class PlayKingdomHomeComponent {
     sortBy(getEntriesByType<TradeskillContent>('tradeskill'), (t) => t.name),
   );
 
-  // Recomputes whenever `gamestate()` changes AND once a second regardless
-  // (via `uiClockTick`), so the progress bars never look frozen even if the
-  // gameloop itself is skipping ticks (e.g. tab backgrounded).
+  // Also recomputes once a second so the progress bars never look frozen while the gameloop skips ticks (e.g. tab backgrounded).
   public tradeskillButtonViewModels = computed(() => {
     uiClockTick();
 

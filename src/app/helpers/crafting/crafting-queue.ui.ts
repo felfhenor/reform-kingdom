@@ -4,12 +4,9 @@ import {
   tradeskillBuildingIn,
   tradeskillIdForName,
 } from '@helpers/crafting/tradeskill';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { updateGamestate } from '@helpers/state-game';
-import type {
-  CraftQueueEntryId,
-  RecipeContent,
-  Tradeskill,
-} from '@interfaces';
+import type { CraftQueueEntryId, RecipeContent, Tradeskill } from '@interfaces';
 
 // Refunds only the unconsumed remainder of the batch - units already
 // crafted keep the materials/equipment they used.
@@ -34,10 +31,10 @@ export function craftQueueRemove(
       });
     }
 
-    state.tradeskills[tradeskillId] = {
+    state.tradeskills = dictionaryWith(state.tradeskills, tradeskillId, {
       ...building,
       queue: building.queue.filter((queued) => queued.id !== queueEntryId),
-    };
+    });
 
     return state;
   });

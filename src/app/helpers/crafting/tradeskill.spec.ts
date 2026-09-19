@@ -13,10 +13,14 @@ vi.mock('@helpers/hero/global-effects', () => ({
   globalEffectSums: vi.fn(() => ({ tradeskillQueueSizeBoosts: {} })),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    tradeskillsState: () => gamestate().tradeskills,
+  };
+});
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { globalEffectSums } from '@helpers/hero/global-effects';
@@ -35,6 +39,7 @@ import {
   tradeskillNameForId,
   tradeskillXpForLevel,
 } from '@helpers/crafting/tradeskill';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
@@ -113,6 +118,8 @@ function buildAllTradeskills(
 }
 
 function applyUpdateAt(index: number, state: GameState): GameState {
+  deepFreeze(state.tradeskills);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[index][0];
   return updateFn(state);
@@ -487,6 +494,25 @@ describe('tradeskillGainXp', () => {
       xp: { current: 10, maximum: 10 },
       queue: [],
     });
+  });
+
+  it('reassigns the tradeskills dict and the building so slice selectors see the change', () => {
+    vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding() },
+    } as unknown as GameState);
+
+    tradeskillGainXp('Blacksmithing', 1);
+
+    const state = {
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding() },
+    } as unknown as GameState;
+    const previousDict = state.tradeskills;
+    const previousBuilding = state.tradeskills[BLACKSMITHING_ID];
+    const result = applyUpdateAt(0, state);
+
+    expect(result.tradeskills).not.toBe(previousDict);
+    expect(result.tradeskills[BLACKSMITHING_ID]).not.toBe(previousBuilding);
   });
 
   it('releases through the gate once the collectible is found', () => {

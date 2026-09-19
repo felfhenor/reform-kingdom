@@ -175,9 +175,7 @@ export class PanelPlayKingdomTradeskillComponent {
 
   public gateNextLevel = computed(() => this.building().level + 1);
 
-  // Recomputes whenever `gamestate()` changes AND once a second regardless
-  // (via `uiClockTick`), so the remaining-time text never looks frozen even
-  // if the gameloop itself is skipping ticks (e.g. tab backgrounded).
+  // Also recomputes once a second so the remaining-time text never looks frozen while the gameloop skips ticks (e.g. tab backgrounded).
   public queueViewModels = computed(() => {
     uiClockTick();
 
