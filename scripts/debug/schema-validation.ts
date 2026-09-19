@@ -32,7 +32,7 @@ import * as yaml from 'js-yaml';
 import rec from 'recursive-readdir';
 import Ajv from 'ajv';
 
-const ROOT_DIR = path.resolve(__dirname, '..');
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
 const GAMEDATA_DIR = path.join(ROOT_DIR, 'gamedata');
 const SCHEMAS_DIR = path.join(ROOT_DIR, 'schemas');
 
@@ -195,7 +195,7 @@ async function validateContentType(
   return problems;
 }
 
-async function main(): Promise<void> {
+export async function runSchemaValidation(): Promise<string[]> {
   console.log('=== validate:schemas ===');
   console.log(
     'Checking every gamedata YAML entry against its generated JSON schema for invalid enum/const values (typos).\n',
@@ -225,16 +225,14 @@ async function main(): Promise<void> {
       console.log(`  - ${message}`);
       console.log(`::error::${message}`);
     });
-
     console.error(
       `\n[validate:schemas] FAILED: ${problems.length} invalid enum/const value(s) found.`,
     );
-    process.exit(1);
+  } else {
+    console.log(
+      '\n[validate:schemas] PASSED: every gamedata entry has valid enum/const values.',
+    );
   }
 
-  console.log(
-    '\n[validate:schemas] PASSED: every gamedata entry has valid enum/const values.',
-  );
+  return problems;
 }
-
-main();

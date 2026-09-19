@@ -20,8 +20,6 @@
  *
  * Runs against the raw `gamedata/` YAML sources and `gameassets/` art rather
  * than compiled output, so it needs no build step first.
- *
- * Usage: ts-node scripts/validate-unusedsprites
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -31,7 +29,7 @@ import path from 'path';
 import * as yaml from 'js-yaml';
 import rec from 'recursive-readdir';
 
-const ROOT_DIR = path.resolve(__dirname, '..');
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
 const GAMEDATA_DIR = path.join(ROOT_DIR, 'gamedata');
 const GAMEASSETS_DIR = path.join(ROOT_DIR, 'gameassets');
 
@@ -127,7 +125,7 @@ async function validateType(type: string): Promise<UnusedSprite[]> {
   return unused;
 }
 
-async function main(): Promise<void> {
+export async function runUnusedSpriteValidation(): Promise<UnusedSprite[]> {
   console.log('=== validate:unusedsprites ===');
   console.log(
     'Checking that every sprite PNG under gameassets/ is referenced by a gamedata entry.\n',
@@ -151,16 +149,14 @@ async function main(): Promise<void> {
       console.log(`  - ${message}`);
       console.log(`::error::${message}`);
     });
-
     console.error(
       `\n[validate:unusedsprites] FAILED: ${allUnused.length} unused sprite(s) found.`,
     );
-    process.exit(1);
+  } else {
+    console.log(
+      '\n[validate:unusedsprites] PASSED: every sprite in gameassets/ is referenced by content.',
+    );
   }
 
-  console.log(
-    '\n[validate:unusedsprites] PASSED: every sprite in gameassets/ is referenced by content.',
-  );
+  return allUnused;
 }
-
-main();
