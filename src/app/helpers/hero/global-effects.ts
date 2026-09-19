@@ -10,7 +10,12 @@ import {
   applyGlobalEffectRemove,
 } from '@helpers/hero/global-effect-state';
 import { partyGet } from '@helpers/hero/party';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  globalEffectsState,
+  globalEffectSumsState,
+  updateGamestate,
+} from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
@@ -23,13 +28,13 @@ import type {
 
 export function activeGlobalEffects(): GlobalEffect[] {
   const currentTick = timerTicksElapsed();
-  return gamestate().globalEffects.filter(
+  return globalEffectsState().filter(
     (effect) => effect.expiresAtTick > currentTick,
   );
 }
 
 export function globalEffectSums(): GlobalEffectSums {
-  return gamestate().globalEffectSums;
+  return globalEffectSumsState();
 }
 
 export function isGlobalEffectActive(globalEffectId: GlobalEffectId): boolean {

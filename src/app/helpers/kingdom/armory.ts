@@ -18,11 +18,18 @@ import {
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import {
+  armoryCapForBoost,
   armoryCapForState,
+  armoryOverflowCapForBoost,
   armoryOverflowCapForState,
   syncArmoryGlobalEffects,
 } from '@helpers/kingdom/armory-global-effects';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  armoryState,
+  gamestate,
+  globalEffectSumsState,
+  updateGamestate,
+} from '@helpers/state-game';
 import type {
   AffixId,
   DropRarity,
@@ -37,16 +44,16 @@ import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
 export function armoryGet(): EquipmentItem[] {
-  return gamestate().armory;
+  return armoryState();
 }
 
 export function armoryCap(): number {
-  return armoryCapForState(gamestate());
+  return armoryCapForBoost(globalEffectSumsState().armorySizeBoost);
 }
 
 // Drops/loot get to overshoot the cap by this much before hard-stopping.
 export function armoryOverflowCap(): number {
-  return armoryOverflowCapForState(gamestate());
+  return armoryOverflowCapForBoost(globalEffectSumsState().armorySizeBoost);
 }
 
 export function armoryHasRoomFor(
@@ -56,6 +63,18 @@ export function armoryHasRoomFor(
 ): boolean {
   const cap = allowOverflow ? armoryOverflowCap() : armoryCap();
   return currentCount + quantity <= cap;
+}
+
+// For use inside an `updateGamestate` callback, where a slice selector would return the stale pre-mutation value.
+export function armoryHasRoomForState(
+  state: GameState,
+  quantity = 1,
+  allowOverflow = false,
+): boolean {
+  const cap = allowOverflow
+    ? armoryOverflowCapForState(state)
+    : armoryCapForState(state);
+  return state.armory.length + quantity <= cap;
 }
 
 export function armoryHasRoom(quantity = 1, allowOverflow = false): boolean {

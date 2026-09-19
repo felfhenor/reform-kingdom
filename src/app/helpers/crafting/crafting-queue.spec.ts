@@ -58,10 +58,15 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'queue-entry-1'),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    armoryState: () => gamestate().armory,
+    globalEffectSumsState: () => gamestate().globalEffectSums,
+  };
+});
 
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';

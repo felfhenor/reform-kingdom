@@ -19,9 +19,13 @@ vi.mock('@helpers/engine/logging', () => ({
 
 import { defaultGameState } from '@helpers/defaults';
 import {
+  activeAstralProjectorSpellsState,
+  armoryState,
   discoveredWorkersState,
   gamestateTickEnd,
   gamestateTickStart,
+  globalEffectSumsState,
+  globalEffectsState,
   setGameState,
   updateGamestate,
   workersState,
@@ -147,5 +151,16 @@ describe('workersState', () => {
     setGameState(state, false);
 
     expect(discoveredWorkersState()).toBe(state.discoveredWorkers);
+  });
+
+  it.each([
+    ['armory', armoryState],
+    ['globalEffects', globalEffectsState],
+    ['globalEffectSums', globalEffectSumsState],
+    ['activeAstralProjectorSpells', activeAstralProjectorSpellsState],
+  ] as const)('exposes the %s slice', (key, selector) => {
+    const state = seedState();
+
+    expect(selector()).toBe(state[key]);
   });
 });

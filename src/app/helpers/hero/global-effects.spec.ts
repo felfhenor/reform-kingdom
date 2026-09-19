@@ -19,10 +19,15 @@ vi.mock('@helpers/hero/party', () => ({
   partyGet: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    globalEffectsState: () => gamestate().globalEffects,
+    globalEffectSumsState: () => gamestate().globalEffectSums,
+  };
+});
 
 vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),

@@ -68,20 +68,19 @@ export function astralProjectorCast(id: AstralProjectorId): void {
       currentTick,
     );
 
-    const existing = state.activeAstralProjectorSpells.find(
+    const isActive = state.activeAstralProjectorSpells.some(
       (spell) => spell.astralProjectorId === id,
     );
     const expiresAtTick = currentTick + content.duration;
 
-    if (existing) {
-      existing.expiresAtTick = expiresAtTick;
-    } else {
-      state.activeAstralProjectorSpells.push({
-        astralProjectorId: id,
-        startedAtTick: currentTick,
-        expiresAtTick,
-      });
-    }
+    state.activeAstralProjectorSpells = isActive
+      ? state.activeAstralProjectorSpells.map((spell) =>
+          spell.astralProjectorId === id ? { ...spell, expiresAtTick } : spell,
+        )
+      : [
+          ...state.activeAstralProjectorSpells,
+          { astralProjectorId: id, startedAtTick: currentTick, expiresAtTick },
+        ];
 
     return state;
   });

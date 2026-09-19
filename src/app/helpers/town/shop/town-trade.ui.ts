@@ -13,7 +13,7 @@ import {
 import {
   addArmoryItems,
   armoryHasRoom,
-  armoryHasRoomFor,
+  armoryHasRoomForState,
 } from '@helpers/kingdom/armory';
 import { updateGamestate } from '@helpers/state-game';
 import { townStockPrice } from '@helpers/town/shop/town-price';
@@ -78,7 +78,7 @@ export async function townExecuteTrade(
     const liveGold = state.materials[goldCoinId()]?.quantity ?? 0;
     if (!townStockAffordable(price, liveGold)) return state;
 
-    if (!armoryHasRoomFor(state.armory.length, 1)) {
+    if (!armoryHasRoomForState(state, 1)) {
       armoryFull = true;
       return state;
     }

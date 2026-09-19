@@ -22,12 +22,22 @@ const ARMORY_WARNING_NAMES = [
   'Over Capacity',
 ] as const;
 
+export function armoryCapForBoost(armorySizeBoost: number): number {
+  return ARMORY_CAP + armorySizeBoost;
+}
+
+export function armoryOverflowCapForBoost(armorySizeBoost: number): number {
+  return Math.floor(
+    armoryCapForBoost(armorySizeBoost) * ARMORY_OVERFLOW_MULTIPLIER,
+  );
+}
+
 export function armoryCapForState(state: GameState): number {
-  return ARMORY_CAP + state.globalEffectSums.armorySizeBoost;
+  return armoryCapForBoost(state.globalEffectSums.armorySizeBoost);
 }
 
 export function armoryOverflowCapForState(state: GameState): number {
-  return Math.floor(armoryCapForState(state) * ARMORY_OVERFLOW_MULTIPLIER);
+  return armoryOverflowCapForBoost(state.globalEffectSums.armorySizeBoost);
 }
 
 function currentArmoryWarningTier(

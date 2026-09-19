@@ -19,8 +19,11 @@ vi.mock('@helpers/engine/timer', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
+  applyGlobalEffectPush,
+  applyGlobalEffectRemove,
   globalEffectEffectsDescription,
   recomputeGlobalEffectSums,
 } from '@helpers/hero/global-effect-state';
@@ -287,5 +290,46 @@ describe('recomputeGlobalEffectSums', () => {
     recomputeGlobalEffectSums(state);
 
     expect(state.globalEffectSums.decreeClauseCapBoost).toBe(1);
+  });
+});
+
+describe('applyGlobalEffectPush / applyGlobalEffectRemove', () => {
+  const effect = {
+    id: 'blessing' as GlobalEffectId,
+    startTick: 0,
+    expiresAtTick: 5000,
+    effects: [],
+  } as unknown as GlobalEffect;
+
+  function buildFrozenState(globalEffects: GlobalEffect[]): GameState {
+    return {
+      globalEffects: deepFreeze(globalEffects),
+      collectibles: {},
+    } as unknown as GameState;
+  }
+
+  beforeEach(() => {
+    vi.mocked(timerTicksElapsed).mockReturnValue(1000);
+  });
+
+  it('appends the effect by reassigning globalEffects, never mutating the old array', () => {
+    const state = buildFrozenState([]);
+    const previous = state.globalEffects;
+
+    applyGlobalEffectPush(state, effect);
+
+    expect(state.globalEffects).not.toBe(previous);
+    expect(state.globalEffects).toEqual([effect]);
+    expect(previous).toEqual([]);
+  });
+
+  it('removes an effect by reassigning globalEffects', () => {
+    const state = buildFrozenState([effect]);
+    const previous = state.globalEffects;
+
+    applyGlobalEffectRemove(state, effect.id);
+
+    expect(state.globalEffects).not.toBe(previous);
+    expect(state.globalEffects).toEqual([]);
   });
 });

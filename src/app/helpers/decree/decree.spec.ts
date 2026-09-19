@@ -4,10 +4,14 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'clause-1'),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    globalEffectSumsState: () => gamestate().globalEffectSums,
+  };
+});
 
 vi.mock('@helpers/world-node/world-node-rewards', () => ({
   rewardKey: vi.fn((reward) => {

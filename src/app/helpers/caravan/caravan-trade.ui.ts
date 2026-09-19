@@ -29,7 +29,7 @@ import {
 import {
   addArmoryItems,
   armoryHasRoom,
-  armoryHasRoomFor,
+  armoryHasRoomForState,
 } from '@helpers/kingdom/armory';
 import { updateGamestate } from '@helpers/state-game';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
@@ -175,7 +175,7 @@ export async function caravanExecuteTrade(
     );
     if (quantity > liveMax) return s;
 
-    if (isEquipmentPurchase && !armoryHasRoomFor(s.armory.length, quantity)) {
+    if (isEquipmentPurchase && !armoryHasRoomForState(s, quantity)) {
       armoryFull = true;
       return s;
     }
@@ -272,7 +272,7 @@ export async function caravanExecuteTokenTrade(
     const tokenQuantity = s.materials[traderTokenId()]?.quantity ?? 0;
     if (tokenQuantity < trade.tokenCost) return s;
 
-    if (trade.equipmentId && !armoryHasRoomFor(s.armory.length, 1)) {
+    if (trade.equipmentId && !armoryHasRoomForState(s, 1)) {
       armoryFull = true;
       return s;
     }

@@ -18,10 +18,15 @@ vi.mock('@helpers/item/infusion', () => ({
   equipmentItemInfusionBonus: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    armoryState: () => gamestate().armory,
+    globalEffectSumsState: () => gamestate().globalEffectSums,
+  };
+});
 
 import { getEntry } from '@helpers/content/content';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
@@ -33,6 +38,7 @@ import {
   armoryGet,
   armoryHasRoom,
   armoryHasRoomFor,
+  armoryHasRoomForState,
   armoryOverflowCap,
   equipmentSellValue,
   getArmoryEntries,
@@ -111,6 +117,30 @@ describe('Armory Helper Functions', () => {
       } as unknown as GameState);
 
       expect(armoryCap()).toBe(65);
+    });
+  });
+
+  describe('armoryHasRoomForState', () => {
+    function stateWith(count: number, armorySizeBoost = 0): GameState {
+      return {
+        armory: Array.from({ length: count }),
+        globalEffectSums: { armorySizeBoost },
+      } as unknown as GameState;
+    }
+
+    it('uses the passed state cap, including a boost applied earlier in the same callback', () => {
+      expect(armoryHasRoomForState(stateWith(50), 1)).toBe(false);
+      expect(armoryHasRoomForState(stateWith(50, 5), 1)).toBe(true);
+    });
+
+    it('allows overflow up to the state overflow cap when requested', () => {
+      expect(armoryHasRoomForState(stateWith(61), 1, true)).toBe(true);
+      expect(armoryHasRoomForState(stateWith(62), 1, true)).toBe(false);
+    });
+
+    it('accounts for a multi-item quantity', () => {
+      expect(armoryHasRoomForState(stateWith(45), 5)).toBe(true);
+      expect(armoryHasRoomForState(stateWith(45), 6)).toBe(false);
     });
   });
 

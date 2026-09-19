@@ -146,7 +146,7 @@ export function applyGlobalEffectPush(
   state: GameState,
   effect: GlobalEffect,
 ): void {
-  state.globalEffects.push(effect);
+  state.globalEffects = [...state.globalEffects, effect];
   recomputeGlobalEffectSums(state);
 }
 

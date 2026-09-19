@@ -5,7 +5,11 @@ import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  activeAstralProjectorSpellsState,
+  gamestate,
+  updateGamestate,
+} from '@helpers/state-game';
 import type {
   AstralProjectorContent,
   AstralProjectorId,
@@ -39,7 +43,7 @@ export function isAstralProjectorCastable(
 }
 
 export function activeAstralProjectorSpells(): GameStateActiveAstralProjectorSpell[] {
-  return gamestate().activeAstralProjectorSpells;
+  return activeAstralProjectorSpellsState();
 }
 
 // Undefined when there's room, or the only active entry already *is* `id` - a recast is a refresh, not an overwrite.

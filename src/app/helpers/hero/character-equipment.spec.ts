@@ -29,10 +29,15 @@ vi.mock('@helpers/combat/combat-state', () => ({
   currentCombat: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    armoryState: () => gamestate().armory,
+    globalEffectSumsState: () => gamestate().globalEffectSums,
+  };
+});
 
 import { currentCombat } from '@helpers/combat/combat-state';
 import { getEntry } from '@helpers/content/content';
