@@ -34,6 +34,7 @@ vi.mock('@helpers/encounter/encounter-random-tick', () => ({
 
 vi.mock('@helpers/engine/logging', () => ({
   debug: vi.fn(),
+  error: vi.fn(),
 }));
 
 vi.mock('@helpers/engine/scheduler', () => ({
@@ -85,9 +86,16 @@ vi.mock('@helpers/worker/worker-tick', () => ({
   workersProcessTick: vi.fn(),
 }));
 
+import { error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { gameloop } from '@helpers/gameloop';
-import { updateGamestate } from '@helpers/state-game';
+import { travelProcessTick } from '@helpers/hero/travel';
+import {
+  gamestateTickEnd,
+  gamestateTickStart,
+  saveGameState,
+  updateGamestate,
+} from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import type { GameState } from '@interfaces';
 
@@ -164,5 +172,62 @@ describe('gameloop', () => {
     releaseFirstYield();
     await firstRun;
     expect(mockClockState.clock.numTicks).toBe(200);
+  });
+
+  describe('when a tick subsystem throws', () => {
+    const failure = new Error('boom');
+
+    beforeEach(() => {
+      vi.mocked(travelProcessTick).mockImplementation(() => {
+        throw failure;
+      });
+    });
+
+    afterEach(() => {
+      vi.mocked(travelProcessTick).mockReset();
+    });
+
+    it('closes the tick draft so gamestate() is not left stuck, and logs the error', async () => {
+      await gameloop(1);
+
+      expect(gamestateTickStart).toHaveBeenCalledTimes(1);
+      expect(gamestateTickEnd).toHaveBeenCalledTimes(1);
+      expect(error).toHaveBeenCalledWith(
+        'Gameloop:Tick',
+        expect.any(String),
+        failure,
+      );
+    });
+
+    it('resolves rather than rejecting so the caller still repaints', async () => {
+      await expect(gameloop(1)).resolves.toBeUndefined();
+    });
+
+    it('skips the save for the failed tick', async () => {
+      vi.mocked(getOption).mockImplementation(((key: string) =>
+        key === 'debugSaveInterval'
+          ? 0
+          : key === 'debugTickMultiplier'
+            ? 1
+            : false) as never);
+
+      await gameloop(1);
+      expect(saveGameState).not.toHaveBeenCalled();
+
+      // Control: with the interval at 0, a healthy tick does save.
+      vi.mocked(travelProcessTick).mockReset();
+      await gameloop(1);
+      expect(saveGameState).toHaveBeenCalledTimes(1);
+    });
+
+    it('releases the reentrancy guard so the next call runs', async () => {
+      await gameloop(1);
+      vi.mocked(travelProcessTick).mockReset();
+
+      await gameloop(1);
+
+      expect(gamestateTickStart).toHaveBeenCalledTimes(2);
+      expect(gamestateTickEnd).toHaveBeenCalledTimes(2);
+    });
   });
 });

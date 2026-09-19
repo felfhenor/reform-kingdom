@@ -19,6 +19,7 @@ vi.mock('@helpers/engine/logging', () => ({
 
 import { defaultGameState } from '@helpers/defaults';
 import {
+  gamestate,
   activeAstralProjectorSpellsState,
   collectiblesState,
   discoveredEquipmentState,
@@ -74,6 +75,69 @@ function setLevelViaTick(level: number): void {
   });
   gamestateTickEnd();
 }
+
+describe('a tick left open by a failed subsystem', () => {
+  afterEach(() => gamestateTickEnd());
+
+  it('does not notify dependents of a non-tick update until the tick is closed', async () => {
+    seedState();
+    const level = computed(() => workersState()[WORKER_ID].level);
+    expect(level()).toBe(1);
+
+    gamestateTickStart();
+    await updateGamestate((state) => {
+      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(3) };
+      return state;
+    });
+    expect(level()).toBe(1);
+
+    gamestateTickEnd();
+    expect(level()).toBe(3);
+  });
+
+  it('commits the top-level writes made before the failure when closed', () => {
+    seedState();
+    const level = computed(() => workersState()[WORKER_ID].level);
+    expect(level()).toBe(1);
+
+    gamestateTickStart();
+    updateGamestate((state) => {
+      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(9) };
+      return state;
+    });
+    gamestateTickEnd();
+
+    expect(level()).toBe(9);
+    expect(gamestate().workers[WORKER_ID].level).toBe(9);
+  });
+
+  it('keeps in-place writes under a nested key visible in live state regardless of commit', () => {
+    const state = seedState();
+
+    gamestateTickStart();
+    updateGamestate((draft) => {
+      draft.clock.numTicks += 5;
+      return draft;
+    });
+
+    expect(state.clock.numTicks).toBe(5);
+  });
+
+  it('lets later non-tick updates commit and notify once the tick is closed', async () => {
+    seedState();
+    const level = computed(() => workersState()[WORKER_ID].level);
+    expect(level()).toBe(1);
+
+    gamestateTickStart();
+    gamestateTickEnd();
+    await updateGamestate((state) => {
+      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(3) };
+      return state;
+    });
+
+    expect(level()).toBe(3);
+  });
+});
 
 describe('workersState', () => {
   afterEach(() => gamestateTickEnd());

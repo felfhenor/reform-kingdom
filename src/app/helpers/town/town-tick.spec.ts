@@ -238,6 +238,24 @@ describe('pruneInvalidTowns', () => {
     });
   });
 
+  it('backfills a missing lastProcessedTick so the town tick gate does not throw', () => {
+    vi.mocked(getEntry).mockReturnValue(town);
+    const towns = { [townId]: {} } as unknown as GameStateTowns;
+
+    expect(pruneInvalidTowns(towns)[townId].lastProcessedTick).toEqual({});
+  });
+
+  it('preserves existing lastProcessedTick progress', () => {
+    vi.mocked(getEntry).mockReturnValue(town);
+    const towns = {
+      [townId]: { lastProcessedTick: { worker: 42 } },
+    } as unknown as GameStateTowns;
+
+    expect(pruneInvalidTowns(towns)[townId].lastProcessedTick).toEqual({
+      worker: 42,
+    });
+  });
+
   it('preserves existing reputation, hiddenGold, and materials', () => {
     vi.mocked(getEntry).mockReturnValue(town);
     const towns: GameStateTowns = {

@@ -10,7 +10,7 @@ import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { discordUpdateStatus } from '@helpers/engine/discord';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
-import { debug } from '@helpers/engine/logging';
+import { debug, error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { timerLastSaveTick, timerTicksElapsed } from '@helpers/engine/timer';
 import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
@@ -119,6 +119,15 @@ export async function gameloop(totalTicks: number): Promise<void> {
       saveGameState();
       debug('Gameloop:Save', `Saving @ tick ${currentTick}`);
     }
+  } catch (e) {
+    // Commit, not discard: the draft is a shallow copy so in-place writes already leaked, and dropping the rest would desync them.
+    gamestateTickEnd();
+    error(
+      'Gameloop:Tick',
+      'Gameloop failed; committed progress up to the failure.',
+      e,
+    );
+    // Not rethrown, so the caller's post-loop repaint still runs.
   } finally {
     isProcessingTicks = false;
   }

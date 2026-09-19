@@ -66,6 +66,7 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
 
       pruned[townId] = {
         ...towns[townId],
+        lastProcessedTick: towns[townId].lastProcessedTick ?? {},
         stock: pruneInvalidTownStock(towns[townId].stock ?? []),
         workers,
         reputation: towns[townId].reputation ?? 0,
