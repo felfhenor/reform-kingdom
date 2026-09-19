@@ -1,4 +1,4 @@
-import { caravanState } from '@helpers/caravan/caravan';
+import { caravanNodeAfterTrade, caravanState } from '@helpers/caravan/caravan';
 import {
   caravanTradeMaxQuantity,
   caravanTradePrice,
@@ -12,6 +12,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { notifyError } from '@helpers/engine/notify';
 import {
   applyCollectibleGrant,
@@ -180,14 +181,16 @@ export async function caravanExecuteTrade(
       return s;
     }
 
+    let rolledEquipment = nodeState.rolledEquipment;
+
     if (trade.type === 'sell') {
-      const previewedEquipment = nodeState.rolledEquipment?.[tradeIndex];
-      grantCaravanReward(s, trade, quantity, previewedEquipment);
+      grantCaravanReward(s, trade, quantity, rolledEquipment?.[tradeIndex]);
       if (trade.equipmentId) {
-        nodeState.rolledEquipment = {
-          ...nodeState.rolledEquipment,
-          [tradeIndex]: newEquipmentItem(trade.equipmentId),
-        };
+        rolledEquipment = dictionaryWith(
+          rolledEquipment ?? {},
+          tradeIndex,
+          newEquipmentItem(trade.equipmentId),
+        );
       }
       spendGold(s, totalPrice);
     } else {
@@ -195,8 +198,11 @@ export async function caravanExecuteTrade(
       gainGold(s, totalPrice);
     }
 
-    nodeState.tradeCounts[tradeIndex] =
-      (nodeState.tradeCounts[tradeIndex] ?? 0) + quantity;
+    s.world.caravans = dictionaryWith(
+      s.world.caravans,
+      caravan.id,
+      caravanNodeAfterTrade(nodeState, tradeIndex, quantity, rolledEquipment),
+    );
     executed = true;
 
     return s;

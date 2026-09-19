@@ -45,7 +45,9 @@ import {
   updateGamestate,
   workersState,
   worldAutoModeState,
+  worldCaravansState,
   worldCombatState,
+  worldCommissionsState,
   worldCurrentLocationState,
   worldExploreRandomState,
   worldGatheringState,
@@ -273,6 +275,8 @@ describe('workersState', () => {
     ['autoMode', worldAutoModeState],
     ['exploreRandom', worldExploreRandomState],
     ['homeNodeName', worldHomeNodeNameState],
+    ['caravans', worldCaravansState],
+    ['commissions', worldCommissionsState],
   ] as const)('exposes the world.%s slice', (key, selector) => {
     const state = seedState();
 

@@ -13,10 +13,14 @@ vi.mock('@helpers/rng', () => ({
   rngNumberRange: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldCommissionsState: () => gamestate().world.commissions,
+  };
+});
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeCaravan: vi.fn(),
@@ -31,6 +35,7 @@ import {
 } from '@helpers/commission/commission-tick';
 import { getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted, rngNumberRange } from '@helpers/rng';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   worldNodeCaravan,
@@ -84,6 +89,15 @@ function withCommissionState(commissions: Record<string, unknown>): void {
   } as unknown as GameState);
 }
 
+function frozenUpdate(index: number): (state: GameState) => GameState {
+  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
+
+  return (state) => {
+    deepFreeze(state.world?.commissions);
+    return updateFn(state);
+  };
+}
+
 describe('commissionProcessTick', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -120,7 +134,7 @@ describe('commissionProcessTick', () => {
     commissionProcessTick();
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { commissions: {} },
     } as unknown as GameState);
@@ -181,7 +195,7 @@ describe('commissionProcessTick', () => {
 
     commissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { commissions: {} },
     } as unknown as GameState);
@@ -300,7 +314,7 @@ describe('commissionGenerateIfMissing', () => {
     commissionGenerateIfMissing(caravan.id);
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { commissions: {} },
     } as unknown as GameState);

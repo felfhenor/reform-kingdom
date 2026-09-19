@@ -62,6 +62,12 @@ export const worldExploreRandomState = gamestateSelect(
 export const worldHomeNodeNameState = gamestateSelect(
   (state) => state.world.homeNodeName,
 );
+export const worldCaravansState = gamestateSelect(
+  (state) => state.world.caravans,
+);
+export const worldCommissionsState = gamestateSelect(
+  (state) => state.world.commissions,
+);
 export const shrinesState = gamestateSlice('shrines');
 export const tutorialsState = gamestateSlice('tutorials');
 export const lootFiltersState = gamestateSlice('lootFilters');

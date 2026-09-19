@@ -1,6 +1,12 @@
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { CommissionRequirement, GameState, MonsterId } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
+import type {
+  CaravanId,
+  CommissionNodeState,
+  CommissionRequirement,
+  GameState,
+  MonsterId,
+} from '@interfaces';
+import { clamp, mapValues } from 'es-toolkit/compat';
 
 function hasUnsatisfiedRequirement(
   requirements: CommissionRequirement[],
@@ -29,22 +35,67 @@ function hasMatchingKill(state: GameState, monsterId: MonsterId): boolean {
   );
 }
 
-function incrementProgress(
+function requirementWithKillProgress(
+  requirement: CommissionRequirement,
+  monsterId: MonsterId,
+  count: number,
+): CommissionRequirement {
+  if (!('monsterId' in requirement) || requirement.monsterId !== monsterId) {
+    return requirement;
+  }
+
+  const progress = clamp(requirement.progress + count, 0, requirement.quantity);
+  return progress === requirement.progress
+    ? requirement
+    : { ...requirement, progress };
+}
+
+// Returns the same array when no requirement changes, so untouched commissions keep their references.
+function requirementsWithKillProgress(
   requirements: CommissionRequirement[],
   monsterId: MonsterId,
   count: number,
-): void {
-  requirements.forEach((requirement) => {
-    if (!('monsterId' in requirement) || requirement.monsterId !== monsterId) {
-      return;
-    }
+): CommissionRequirement[] {
+  const updated = requirements.map((requirement) =>
+    requirementWithKillProgress(requirement, monsterId, count),
+  );
 
-    requirement.progress = clamp(
-      requirement.progress + count,
-      0,
-      requirement.quantity,
-    );
-  });
+  return updated.some((requirement, i) => requirement !== requirements[i])
+    ? updated
+    : requirements;
+}
+
+function commissionNodeWithKillProgress(
+  nodeState: CommissionNodeState,
+  monsterId: MonsterId,
+  count: number,
+): CommissionNodeState {
+  if (nodeState.completed) return nodeState;
+
+  const requirements = requirementsWithKillProgress(
+    nodeState.requirements,
+    monsterId,
+    count,
+  );
+  return requirements === nodeState.requirements
+    ? nodeState
+    : { ...nodeState, requirements };
+}
+
+function incrementCaravanCommissions(
+  state: GameState,
+  monsterId: MonsterId,
+  count: number,
+): void {
+  const before = state.world.commissions;
+  const after = mapValues(before, (nodeState) =>
+    commissionNodeWithKillProgress(nodeState, monsterId, count),
+  );
+
+  const changed = (Object.keys(after) as CaravanId[]).some(
+    (caravanId) => after[caravanId] !== before[caravanId],
+  );
+  if (changed) state.world.commissions = after;
 }
 
 // Kill-quest commissions can be rolled by either system, so both need updating.
@@ -53,15 +104,16 @@ function incrementKillProgress(
   monsterId: MonsterId,
   count: number,
 ): void {
-  Object.values(state.world.commissions).forEach((nodeState) => {
-    if (nodeState.completed) return;
-    incrementProgress(nodeState.requirements, monsterId, count);
-  });
+  incrementCaravanCommissions(state, monsterId, count);
 
   Object.values(state.world.towns).forEach((town) => {
-    town.commissionSlots.forEach((slot) =>
-      incrementProgress(slot.requirements, monsterId, count),
-    );
+    town.commissionSlots.forEach((slot) => {
+      slot.requirements = requirementsWithKillProgress(
+        slot.requirements,
+        monsterId,
+        count,
+      );
+    });
   });
 }
 

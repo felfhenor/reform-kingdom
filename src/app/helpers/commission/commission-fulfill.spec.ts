@@ -32,10 +32,14 @@ vi.mock('@helpers/rng', () => ({
   rngNumberRange: vi.fn((min: number) => min),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldCommissionsState: () => gamestate().world.commissions,
+  };
+});
 
 import { isPartyAtCaravan } from '@helpers/caravan/caravan';
 import {
@@ -53,6 +57,7 @@ import {
   getMaterialQuantity,
 } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CaravanId,
@@ -127,6 +132,15 @@ function withCommissionState(state: unknown): void {
   vi.mocked(gamestate).mockReturnValue({
     world: { commissions: { [caravanId]: state } },
   } as unknown as GameState);
+}
+
+function frozenUpdate(index: number): (state: GameState) => GameState {
+  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
+
+  return (state) => {
+    deepFreeze(state.world?.commissions);
+    return updateFn(state);
+  };
 }
 
 describe('commissionRequirementEntries', () => {
@@ -387,7 +401,7 @@ describe('commissionFulfill', () => {
     // before the outer promise is awaited.
     const resultPromise = commissionFulfill(caravanId);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       materials: { [wergenStick.id]: { quantity: 100, foundAt: 1 } },
       armory: [],
@@ -433,7 +447,7 @@ describe('commissionFulfill', () => {
 
     const resultPromise = commissionFulfill(caravanId);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       materials: {},
       armory: [
@@ -471,7 +485,7 @@ describe('commissionFulfill', () => {
 
     const resultPromise = commissionFulfill(caravanId);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       materials: {},
       armory: [],

@@ -6,6 +6,7 @@ vi.mock('@helpers/state-game', () => ({
 }));
 
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CaravanId,
@@ -29,6 +30,15 @@ function withState(
   vi.mocked(gamestate).mockReturnValue({
     world: { commissions, towns },
   } as unknown as GameState);
+}
+
+function frozenUpdate(index: number): (state: GameState) => GameState {
+  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
+
+  return (state) => {
+    deepFreeze(state.world?.commissions);
+    return updateFn(state);
+  };
 }
 
 describe('commissionRecordMonsterKill', () => {
@@ -93,7 +103,7 @@ describe('commissionRecordMonsterKill', () => {
 
     commissionRecordMonsterKill(sandWormId);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         commissions: {
@@ -116,6 +126,99 @@ describe('commissionRecordMonsterKill', () => {
     });
   });
 
+  it('replaces only the commissions that changed and keeps the rest by reference', () => {
+    const matching = {
+      commissionOfferId: offerId,
+      requirements: [{ monsterId: sandWormId, quantity: 5, progress: 1 }],
+      completed: false,
+      generatedAt: 1000,
+    };
+    const unrelated = {
+      commissionOfferId: offerId,
+      requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
+      completed: false,
+      generatedAt: 1000,
+    };
+    const otherCaravanId = 'other-caravan' as CaravanId;
+    withState({ [caravanId]: matching, [otherCaravanId]: unrelated });
+
+    commissionRecordMonsterKill(sandWormId);
+
+    const state = {
+      world: {
+        commissions: { [caravanId]: matching, [otherCaravanId]: unrelated },
+        towns: {},
+      },
+    } as unknown as GameState;
+    const previous = state.world.commissions;
+    const result = frozenUpdate(0)(state);
+
+    expect(result.world.commissions).not.toBe(previous);
+    expect(result.world.commissions[caravanId]).not.toBe(matching);
+    expect(result.world.commissions[otherCaravanId]).toBe(unrelated);
+  });
+
+  it('does not reassign the commissions dict when only a town slot matched', () => {
+    const unrelated = {
+      commissionOfferId: offerId,
+      requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
+      completed: false,
+      generatedAt: 1000,
+    };
+    const slot = {
+      id: 'slot-1' as TownCommissionSlotId,
+      commissionOfferId: offerId,
+      requirements: [{ monsterId: sandWormId, quantity: 5, progress: 1 }],
+      generatedAtTick: 0,
+    };
+    withState(
+      { [caravanId]: unrelated },
+      { [townId]: { commissionSlots: [slot] } },
+    );
+
+    commissionRecordMonsterKill(sandWormId);
+
+    const state = {
+      world: {
+        commissions: { [caravanId]: unrelated },
+        towns: { [townId]: { commissionSlots: [{ ...slot }] } },
+      },
+    } as unknown as GameState;
+    const previous = state.world.commissions;
+    const result = frozenUpdate(0)(state);
+
+    expect(result.world.commissions).toBe(previous);
+  });
+
+  it('replaces a town slot requirement instead of mutating the original object', () => {
+    const slotId = 'slot-1' as TownCommissionSlotId;
+    const requirement = { monsterId: sandWormId, quantity: 5, progress: 1 };
+    withState(
+      {},
+      {
+        [townId]: {
+          commissionSlots: [{ id: slotId, requirements: [requirement] }],
+        },
+      },
+    );
+
+    commissionRecordMonsterKill(sandWormId);
+
+    const originalRequirements = deepFreeze([{ ...requirement }]);
+    const slot = { id: slotId, requirements: originalRequirements };
+    const state = {
+      world: {
+        commissions: {},
+        towns: { [townId]: { commissionSlots: [slot] } },
+      },
+    } as unknown as GameState;
+    frozenUpdate(0)(state);
+
+    expect(slot.requirements).not.toBe(originalRequirements);
+    expect(slot.requirements[0].progress).toBe(2);
+    expect(originalRequirements[0].progress).toBe(1);
+  });
+
   it('caps progress at the requirement quantity instead of overflowing', () => {
     withState({
       [caravanId]: {
@@ -128,7 +231,7 @@ describe('commissionRecordMonsterKill', () => {
 
     commissionRecordMonsterKill(sandWormId, 10);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         commissions: {
@@ -192,7 +295,7 @@ describe('commissionRecordMonsterKill', () => {
     commissionRecordMonsterKill(sandWormId);
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         commissions: {},

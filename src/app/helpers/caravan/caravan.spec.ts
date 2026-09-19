@@ -15,6 +15,7 @@ vi.mock('@helpers/state-game', () => {
     gamestate,
     updateGamestate: vi.fn(),
     discoveredCaravansState: () => gamestate().discoveredCaravans,
+    worldCaravansState: () => gamestate().world.caravans,
   };
 });
 
@@ -38,6 +39,7 @@ import {
   caravanEligibleTraders,
   caravanMarkDiscovered,
   caravanMarkVisited,
+  caravanNodeAfterTrade,
   caravanState,
   caravanTicksUntilReset,
   caravanTimerLabel,
@@ -55,6 +57,7 @@ import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanContent,
   CaravanId,
+  CaravanNodeState,
   CaravanTraderContent,
   CaravanTraderId,
   GameState,
@@ -360,6 +363,48 @@ describe('pruneInvalidDiscoveredCaravans', () => {
   });
 });
 
+describe('caravanNodeAfterTrade', () => {
+  function frozenNode(): CaravanNodeState {
+    return deepFreeze({
+      traderId: 'trader-a' as CaravanTraderId,
+      activeTradeIndices: [0, 1],
+      tradeCounts: { 1: 2 },
+      generatedAtTick: 1000,
+    } as CaravanNodeState);
+  }
+
+  it('adds to an existing trade count without touching the original node', () => {
+    const node = frozenNode();
+
+    const result = caravanNodeAfterTrade(node, 1, 3, undefined);
+
+    expect(result).not.toBe(node);
+    expect(result.tradeCounts).toEqual({ 1: 5 });
+    expect(node.tradeCounts).toEqual({ 1: 2 });
+  });
+
+  it('starts a count for a trade that has not been made yet', () => {
+    expect(
+      caravanNodeAfterTrade(frozenNode(), 0, 1, undefined).tradeCounts,
+    ).toEqual({
+      0: 1,
+      1: 2,
+    });
+  });
+
+  it('stores the rolled equipment and keeps every other field', () => {
+    const rolled = {
+      0: { id: 'item-1' },
+    } as unknown as CaravanNodeState['rolledEquipment'];
+
+    const result = caravanNodeAfterTrade(frozenNode(), 0, 1, rolled);
+
+    expect(result.rolledEquipment).toBe(rolled);
+    expect(result.traderId).toBe('trader-a');
+    expect(result.generatedAtTick).toBe(1000);
+  });
+});
+
 describe('caravanMarkVisited', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -395,11 +440,40 @@ describe('caravanMarkVisited', () => {
         },
       },
     } as unknown as GameState;
+    const previousDict = deepFreeze(state.world.caravans);
 
     const mutate = vi.mocked(updateGamestate).mock.calls.at(-1)![0];
     mutate(state);
 
+    expect(state.world.caravans).not.toBe(previousDict);
     expect(state.world.caravans[caravan.id].visitedTraderId).toBe('trader-a');
+  });
+
+  it('leaves the caravans dict untouched when the trader was already recorded as visited', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      discoveredCaravans: deepFreeze({}),
+    } as unknown as GameState);
+
+    caravanMarkVisited(caravan.id);
+
+    const state = {
+      world: {
+        caravans: {
+          [caravan.id]: {
+            traderId: 'trader-a' as CaravanTraderId,
+            visitedTraderId: 'trader-a' as CaravanTraderId,
+            activeTradeIndices: [],
+            tradeCounts: {},
+            generatedAtTick: 1000,
+          },
+        },
+      },
+    } as unknown as GameState;
+    const previousDict = deepFreeze(state.world.caravans);
+
+    vi.mocked(updateGamestate).mock.calls.at(-1)![0](state);
+
+    expect(state.world.caravans).toBe(previousDict);
   });
 
   it('does nothing when the caravan has no state yet', () => {

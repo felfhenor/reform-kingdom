@@ -4,10 +4,11 @@ import {
 } from '@helpers/caravan/caravan';
 import { ACTIVE_TRADE_COUNT } from '@helpers/config';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldCaravansState } from '@helpers/state-game';
 import {
   worldNodeCaravan,
   worldNodesOfType,
@@ -124,14 +125,14 @@ function regenerateCaravanNode(
       : undefined;
 
   updateGamestate((state) => {
-    state.world.caravans[content.id] = {
+    state.world.caravans = dictionaryWith(state.world.caravans, content.id, {
       traderId: trader?.id,
       visitedTraderId,
       activeTradeIndices,
       rolledEquipment,
       tradeCounts: {},
       generatedAtTick: nowTick,
-    };
+    });
     return state;
   });
 }
@@ -143,7 +144,7 @@ export function caravanProcessTick(): void {
     const content = worldNodeCaravan(entry);
     if (!content) return;
 
-    const state = gamestate().world.caravans[content.id];
+    const state = worldCaravansState()[content.id];
     if (!isDueForRegeneration(content, state, nowTick)) return;
 
     regenerateCaravanNode(content, state, nowTick);

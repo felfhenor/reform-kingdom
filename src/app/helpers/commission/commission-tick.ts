@@ -4,8 +4,9 @@ import {
   rollCommissionRequirements,
 } from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { rngChoiceWeighted } from '@helpers/rng';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldCommissionsState } from '@helpers/state-game';
 import {
   worldNodeCaravan,
   worldNodesOfType,
@@ -38,19 +39,23 @@ function regenerateCommissionNode(caravan: CaravanContent, now: number): void {
   if (!offer) return;
 
   updateGamestate((state) => {
-    state.world.commissions[caravan.id] = {
-      commissionOfferId: offer.id,
-      requirements: rollCommissionRequirements(offer),
-      completed: false,
-      generatedAt: now,
-    };
+    state.world.commissions = dictionaryWith(
+      state.world.commissions,
+      caravan.id,
+      {
+        commissionOfferId: offer.id,
+        requirements: rollCommissionRequirements(offer),
+        completed: false,
+        generatedAt: now,
+      },
+    );
     return state;
   });
 }
 
 // No-ops if a commission already exists, even a stale one.
 export function commissionGenerateIfMissing(caravanId: CaravanId): void {
-  if (gamestate().world.commissions[caravanId]) return;
+  if (worldCommissionsState()[caravanId]) return;
 
   const caravan = getEntry<CaravanContent>(caravanId);
   if (!caravan) return;
@@ -67,7 +72,7 @@ export function commissionProcessTick(): void {
     const content = worldNodeCaravan(entry);
     if (!content) return;
 
-    const state = gamestate().world.commissions[content.id];
+    const state = worldCommissionsState()[content.id];
     if (!isDueForRegeneration(state, now)) return;
 
     regenerateCommissionNode(content, now);

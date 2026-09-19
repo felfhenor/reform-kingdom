@@ -22,10 +22,14 @@ vi.mock('@helpers/item/equipment', () => ({
   })),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldCaravansState: () => gamestate().world.caravans,
+  };
+});
 
 vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
@@ -47,6 +51,7 @@ import {
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   worldNodeCaravan,
@@ -64,6 +69,15 @@ import type {
   RecipeId,
   WorldNodeEntry,
 } from '@interfaces';
+
+function frozenUpdate(index: number): (state: GameState) => GameState {
+  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
+
+  return (state) => {
+    deepFreeze(state.world?.caravans);
+    return updateFn(state);
+  };
+}
 
 describe('caravanWeightedSample', () => {
   it('returns every item when count exceeds the pool size', () => {
@@ -163,7 +177,7 @@ describe('caravanProcessTick', () => {
     caravanProcessTick();
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -185,7 +199,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -202,7 +216,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -222,14 +236,12 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
 
-    expect(result.world.caravans[caravan.id].visitedTraderId).toBe(
-      'trader-a',
-    );
+    expect(result.world.caravans[caravan.id].visitedTraderId).toBe('trader-a');
   });
 
   it('clears the visit record when a different trader is assigned', () => {
@@ -247,15 +259,13 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
 
     expect(result.world.caravans[caravan.id].traderId).toBe('trader-b');
-    expect(
-      result.world.caravans[caravan.id].visitedTraderId,
-    ).toBeUndefined();
+    expect(result.world.caravans[caravan.id].visitedTraderId).toBeUndefined();
   });
 
   it('picks a different trader than last cycle when more than one is eligible', () => {
@@ -269,7 +279,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -291,7 +301,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -310,7 +320,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -338,7 +348,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -366,7 +376,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -392,7 +402,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -425,7 +435,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);

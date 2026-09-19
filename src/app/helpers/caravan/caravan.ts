@@ -8,8 +8,8 @@ import { dictionaryWith } from '@helpers/engine/dictionary';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import {
   discoveredCaravansState,
-  gamestate,
   updateGamestate,
+  worldCaravansState,
 } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
@@ -27,7 +27,7 @@ import { clamp } from 'es-toolkit/compat';
 export function caravanState(
   caravanId: CaravanId,
 ): CaravanNodeState | undefined {
-  return gamestate().world.caravans[caravanId];
+  return worldCaravansState()[caravanId];
 }
 
 // Node names are authored "<Brand> - <Branch>"; the branch (map name) is redundant in UI.
@@ -52,7 +52,7 @@ export function caravanEligibleTraders(
 export function caravanBusyTraderIds(
   excludingCaravanId: CaravanId,
 ): Set<CaravanTraderId> {
-  const caravans = gamestate().world.caravans;
+  const caravans = worldCaravansState();
   const busy = new Set<CaravanTraderId>();
 
   (Object.keys(caravans) as CaravanId[]).forEach((caravanId) => {
@@ -118,13 +118,35 @@ export function caravanMarkDiscovered(caravanId: CaravanId): void {
   });
 }
 
+export function caravanNodeAfterTrade(
+  nodeState: CaravanNodeState,
+  tradeIndex: number,
+  quantity: number,
+  rolledEquipment: CaravanNodeState['rolledEquipment'],
+): CaravanNodeState {
+  return {
+    ...nodeState,
+    rolledEquipment,
+    tradeCounts: dictionaryWith(
+      nodeState.tradeCounts,
+      tradeIndex,
+      (nodeState.tradeCounts[tradeIndex] ?? 0) + quantity,
+    ),
+  };
+}
+
 export function caravanMarkVisited(caravanId: CaravanId): void {
   caravanMarkDiscovered(caravanId);
   commissionGenerateIfMissing(caravanId);
 
   updateGamestate((state) => {
     const caravan = state.world.caravans[caravanId];
-    if (caravan) caravan.visitedTraderId = caravan.traderId;
+    if (caravan && caravan.visitedTraderId !== caravan.traderId) {
+      state.world.caravans = dictionaryWith(state.world.caravans, caravanId, {
+        ...caravan,
+        visitedTraderId: caravan.traderId,
+      });
+    }
     return state;
   });
 }

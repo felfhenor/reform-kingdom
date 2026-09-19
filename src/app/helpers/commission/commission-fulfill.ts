@@ -12,7 +12,8 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { dictionaryWith } from '@helpers/engine/dictionary';
+import { updateGamestate, worldCommissionsState } from '@helpers/state-game';
 import type {
   CaravanId,
   CommissionNodeState,
@@ -24,9 +25,9 @@ import type {
 
 export function commissionState(
   caravanId: CaravanId,
-  state: GameState = gamestate(),
+  state?: GameState,
 ): CommissionNodeState | undefined {
-  return state.world.commissions[caravanId];
+  return (state ? state.world.commissions : worldCommissionsState())[caravanId];
 }
 
 // Both UI surfaces (the Commissions panel and a caravan's trade modal) can
@@ -92,7 +93,10 @@ export async function commissionFulfill(
 
     spendCommissionRequirements(s, nodeState.requirements);
     if (offer) grantCommissionRewards(s, offer);
-    nodeState.completed = true;
+    s.world.commissions = dictionaryWith(s.world.commissions, caravanId, {
+      ...nodeState,
+      completed: true,
+    });
     fulfilled = true;
 
     return s;
