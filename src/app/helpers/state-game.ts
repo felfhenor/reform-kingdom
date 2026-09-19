@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { defaultGameState } from '@helpers/defaults';
 import { debug, error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
@@ -15,6 +15,18 @@ const _liveGameState = signal<GameState>(defaultGameState());
 export function gamestate() {
   return tickGamestate ?? _liveGameState();
 }
+
+// Mid-tick reads return the draft, but still read the slice so a computed first evaluated mid-tick keeps a signal dependency.
+function gamestateSlice<K extends keyof GameState>(key: K): () => GameState[K] {
+  const slice = computed(() => _liveGameState()[key]);
+  return () => {
+    const committed = slice();
+    return tickGamestate ? tickGamestate[key] : committed;
+  };
+}
+
+export const workersState = gamestateSlice('workers');
+export const discoveredWorkersState = gamestateSlice('discoveredWorkers');
 
 const _savedGamestate = indexedDbSignal<GameState>(
   'gamestate',

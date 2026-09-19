@@ -44,6 +44,7 @@ import { townMarkVisited } from '@helpers/town/town-visit';
 import { tutorialUnmarkSeen } from '@helpers/tutorial/tutorial-seen';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
+import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import { currentLocationGet, currentLocationSet } from '@helpers/world';
 import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -300,14 +301,12 @@ export function debugRescueWorker(workerId: WorkerId): void {
 export function debugSetWorkerLevel(workerId: WorkerId, level: number): void {
   const clampedLevel = clamp(Math.round(level), 1, WORKER_MAX_LEVEL);
 
-  updateGamestate((state) => {
-    const worker = state.workers[workerId];
-    if (!worker) return state;
-
-    worker.level = clampedLevel;
-    worker.xp = { current: 0, maximum: workerXpForLevel(clampedLevel) };
-    return state;
-  });
+  updateGamestate((state) =>
+    updateWorkerRecord(state, workerId, (worker) => {
+      worker.level = clampedLevel;
+      worker.xp = { current: 0, maximum: workerXpForLevel(clampedLevel) };
+    }),
+  );
 }
 
 export async function debugSetTownReputation(

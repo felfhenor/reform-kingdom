@@ -1,7 +1,7 @@
 import type { Signal } from '@angular/core';
 import { computed } from '@angular/core';
 import { travelStepTicksCost } from '@helpers/hero/travel';
-import { gamestate } from '@helpers/state-game';
+import { workersState } from '@helpers/state-game';
 import type { TravelStep, WorkerId } from '@interfaces';
 import { clamp, sum } from 'es-toolkit/compat';
 
@@ -10,7 +10,7 @@ import { clamp, sum } from 'es-toolkit/compat';
 export function workerTravelRemainingTicks(
   workerId: WorkerId,
 ): number | undefined {
-  const worker = gamestate().workers[workerId];
+  const worker = workersState()[workerId];
   if (!worker) return undefined;
   if (
     worker.status.kind !== 'TravelingTo' &&
@@ -41,7 +41,7 @@ export const workersTravelingTokens: Signal<
     ticksIntoStep: number;
   }[]
 > = computed(() => {
-  const workers = gamestate().workers;
+  const workers = workersState();
 
   return (Object.keys(workers) as WorkerId[])
     .map((workerId) => {

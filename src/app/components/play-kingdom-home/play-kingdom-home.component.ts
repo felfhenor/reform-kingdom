@@ -31,7 +31,11 @@ import {
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum.ui';
-import { gamestate } from '@helpers/state-game';
+import {
+  discoveredWorkersState,
+  gamestate,
+  workersState,
+} from '@helpers/state-game';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
 import { homeNodeResetToDuchy } from '@helpers/town/town-spawn.ui';
 import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression.ui';
@@ -102,14 +106,12 @@ export class PlayKingdomHomeComponent {
 
   // Hidden until the player has rescued at least one worker.
   public workersUnlocked = computed(
-    () => Object.keys(gamestate().discoveredWorkers).length > 0,
+    () => Object.keys(discoveredWorkersState()).length > 0,
   );
-  public workerTotalCount = computed(
-    () => Object.keys(gamestate().workers).length,
-  );
+  public workerTotalCount = computed(() => Object.keys(workersState()).length);
   public workerBusyCount = computed(
     () =>
-      Object.values(gamestate().workers).filter(
+      Object.values(workersState()).filter(
         (worker) => worker.status.kind !== 'AtDuchy',
       ).length,
   );

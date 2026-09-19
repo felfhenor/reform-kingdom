@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
+  discoveredWorkersState: vi.fn(),
   updateGamestate: vi.fn(),
 }));
 
@@ -28,11 +28,12 @@ vi.mock('@helpers/worker/worker-progression', () => ({
   })),
 }));
 
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { getEntry } from '@helpers/content/content';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { discoveredWorkersState, updateGamestate } from '@helpers/state-game';
 import {
   isWorkerRescued,
   pruneInvalidDiscoveredWorkers,
@@ -50,6 +51,9 @@ import type {
 } from '@interfaces';
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.workers);
+  deepFreeze(state.discoveredWorkers);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);
@@ -70,17 +74,15 @@ const workerContent: WorkerContent = ensureWorker({
 
 describe('isWorkerRescued', () => {
   it('is true once the worker has a foundAt timestamp', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredWorkers: { [WORKER_ID]: { foundAt: 1000 } },
-    } as unknown as GameState);
+    vi.mocked(discoveredWorkersState).mockReturnValue({
+      [WORKER_ID]: { foundAt: 1000 },
+    });
 
     expect(isWorkerRescued(WORKER_ID)).toBe(true);
   });
 
   it('is false for a worker never rescued', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredWorkers: {},
-    } as unknown as GameState);
+    vi.mocked(discoveredWorkersState).mockReturnValue({});
 
     expect(isWorkerRescued(WORKER_ID)).toBe(false);
   });
@@ -105,11 +107,15 @@ describe('workerRescue', () => {
 
     workerRescue(WORKER_ID);
 
+    const previousDiscovered = {};
+    const previousWorkers = {};
     const result = applyLastUpdate({
-      discoveredWorkers: {},
-      workers: {},
+      discoveredWorkers: previousDiscovered,
+      workers: previousWorkers,
     } as unknown as GameState);
 
+    expect(result.discoveredWorkers).not.toBe(previousDiscovered);
+    expect(result.workers).not.toBe(previousWorkers);
     expect(result.discoveredWorkers[WORKER_ID].foundAt).toEqual(
       expect.any(Number),
     );
@@ -128,11 +134,15 @@ describe('workerUndiscover', () => {
   it('deletes both the ledger entry and the live state', () => {
     workerUndiscover(WORKER_ID);
 
+    const previousDiscovered = { [WORKER_ID]: { foundAt: 1000 } };
+    const previousWorkers = { [WORKER_ID]: {} };
     const result = applyLastUpdate({
-      discoveredWorkers: { [WORKER_ID]: { foundAt: 1000 } },
-      workers: { [WORKER_ID]: {} },
+      discoveredWorkers: previousDiscovered,
+      workers: previousWorkers,
     } as unknown as GameState);
 
+    expect(result.discoveredWorkers).not.toBe(previousDiscovered);
+    expect(result.workers).not.toBe(previousWorkers);
     expect(result.discoveredWorkers[WORKER_ID]).toBeUndefined();
     expect(result.workers[WORKER_ID]).toBeUndefined();
   });

@@ -34,6 +34,7 @@ vi.mock('@helpers/hero/global-effect-state', () => ({
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import {
   applyResolvedDropToState,
@@ -458,10 +459,14 @@ describe('Loot Helper Functions', () => {
 
     it('rescues a worker and seeds its default state', () => {
       const state = fakeState();
+      const previousWorkers = deepFreeze(state.workers);
+      const previousDiscovered = deepFreeze(state.discoveredWorkers);
       const drop: ResolvedDrop = { kind: 'Worker', workerId: weaverNellId };
 
       applyResolvedDropToState(state, drop);
 
+      expect(state.workers).not.toBe(previousWorkers);
+      expect(state.discoveredWorkers).not.toBe(previousDiscovered);
       expect(state.discoveredWorkers[weaverNellId]?.foundAt).toBeDefined();
       expect(state.workers[weaverNellId]).toEqual({
         level: 1,

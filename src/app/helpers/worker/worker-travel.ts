@@ -8,6 +8,7 @@ import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
+import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -90,19 +91,17 @@ export function workerBeginOutboundTrip(
   const path = travelPathFrom(kingdom, assignment.nodeName, canUseTeleports);
   if (!path) return;
 
-  updateGamestate((state) => {
-    const target = state.workers[workerId];
-    if (!target) return state;
-
-    target.status = {
-      kind: 'TravelingTo',
-      nodeName: assignment.nodeName,
-      itemId: assignment.itemId,
-      path,
-      ticksIntoStep: 0,
-    };
-    return state;
-  });
+  updateGamestate((state) =>
+    updateWorkerRecord(state, workerId, (target) => {
+      target.status = {
+        kind: 'TravelingTo',
+        nodeName: assignment.nodeName,
+        itemId: assignment.itemId,
+        path,
+        ticksIntoStep: 0,
+      };
+    }),
+  );
 }
 
 // Starts a return trip from the worker's current location, recomputed fresh each time.
@@ -123,22 +122,20 @@ export function workerBeginReturnTrip(
       ? travelPathFrom(worker.location, kingdom.nodeName, canUseTeleports)
       : undefined;
 
-  updateGamestate((state) => {
-    const target = state.workers[workerId];
-    if (!target) return state;
-
-    // No route home resolves - park in place rather than leaving the worker stuck.
-    target.status = path
-      ? {
-          kind: 'TravelingBack',
-          path,
-          ticksIntoStep: 0,
-          carriedItemId,
-          carriedQuantity,
-        }
-      : { kind: 'AtDuchy' };
-    return state;
-  });
+  updateGamestate((state) =>
+    updateWorkerRecord(state, workerId, (target) => {
+      // No route home resolves - park in place rather than leaving the worker stuck.
+      target.status = path
+        ? {
+            kind: 'TravelingBack',
+            path,
+            ticksIntoStep: 0,
+            carriedItemId,
+            carriedQuantity,
+          }
+        : { kind: 'AtDuchy' };
+    }),
+  );
 
   return !!path;
 }
@@ -157,13 +154,11 @@ export function workerAssign(
   if (!workerAssignmentIsValid(workerId, worker.level, assignment))
     return false;
 
-  updateGamestate((state) => {
-    const target = state.workers[workerId];
-    if (!target) return state;
-
-    target.assignment = assignment;
-    return state;
-  });
+  updateGamestate((state) =>
+    updateWorkerRecord(state, workerId, (target) => {
+      target.assignment = assignment;
+    }),
+  );
 
   // Only kicks off a trip immediately if the worker is idle at the Duchy -
   // changing assignment mid-trip takes effect on the next loop, not this one.
@@ -183,13 +178,11 @@ export function workerAssign(
 // Always safe to clear the assignment. Only TravelingTo/Gathering actually get
 // interrupted - the UI hides Recall for TravelingBack/AtDuchy.
 export function workerRecall(workerId: WorkerId): void {
-  updateGamestate((state) => {
-    const target = state.workers[workerId];
-    if (!target) return state;
-
-    target.assignment = null;
-    return state;
-  });
+  updateGamestate((state) =>
+    updateWorkerRecord(state, workerId, (target) => {
+      target.assignment = null;
+    }),
+  );
 
   const worker = gamestate().workers[workerId];
   if (!worker) return;

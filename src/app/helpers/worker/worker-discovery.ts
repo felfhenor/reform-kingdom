@@ -4,7 +4,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { discoveredWorkersState, updateGamestate } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   GameStateDiscoveredWorkers,
@@ -15,7 +15,7 @@ import type {
 } from '@interfaces';
 
 export function isWorkerRescued(workerId: WorkerId): boolean {
-  return !!gamestate().discoveredWorkers[workerId]?.foundAt;
+  return !!discoveredWorkersState()[workerId]?.foundAt;
 }
 
 // Content-existence check (not gamestate).
@@ -29,8 +29,11 @@ export function workerRescue(workerId: WorkerId): void {
   if (!worker) return;
 
   updateGamestate((state) => {
-    state.discoveredWorkers[workerId] = { foundAt: Date.now() };
-    state.workers[workerId] = defaultWorkerState();
+    state.discoveredWorkers = {
+      ...state.discoveredWorkers,
+      [workerId]: { foundAt: Date.now() },
+    };
+    state.workers = { ...state.workers, [workerId]: defaultWorkerState() };
     return state;
   });
 
@@ -43,6 +46,8 @@ export function workerRescue(workerId: WorkerId): void {
 // Debug tool: reverts a worker back to unrescued.
 export function workerUndiscover(workerId: WorkerId): void {
   updateGamestate((state) => {
+    state.discoveredWorkers = { ...state.discoveredWorkers };
+    state.workers = { ...state.workers };
     delete state.discoveredWorkers[workerId];
     delete state.workers[workerId];
     return state;

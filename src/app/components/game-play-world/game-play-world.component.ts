@@ -77,7 +77,7 @@ import {
   defaultTravelGlideState,
   travelGlideAdvance,
 } from '@helpers/pixi/pixi-travel-glide.ui';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, workersState } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-travel.ui';
 import { workersTravelingTokens } from '@helpers/worker/worker-travel.ui';
@@ -1136,7 +1136,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const speedMultiplier = getOption('debugTickMultiplier');
 
     tokens.forEach((token) => {
-      const workerLocation = gamestate().workers[token.workerId]?.location;
+      const workerLocation = workersState()[token.workerId]?.location;
       if (!workerLocation) return;
 
       if (

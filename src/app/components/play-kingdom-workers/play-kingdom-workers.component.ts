@@ -20,7 +20,7 @@ import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
-import { gamestate } from '@helpers/state-game';
+import { discoveredWorkersState, workersState } from '@helpers/state-game';
 import {
   workerIsReadyToLevelUp,
   workerLevelUpCost,
@@ -114,8 +114,8 @@ export class PlayKingdomWorkersComponent {
   public draftItemId = signal<ItemId | undefined>(undefined);
 
   public entries = computed<WorkerEntry[]>(() => {
-    const discovered = gamestate().discoveredWorkers;
-    const workers = gamestate().workers;
+    const discovered = discoveredWorkersState();
+    const workers = workersState();
 
     return (Object.keys(discovered) as WorkerId[])
       .map((id) => {

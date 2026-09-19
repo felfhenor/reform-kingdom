@@ -139,8 +139,15 @@ function applyCollectibleDrop(
 
 function applyWorkerDrop(state: GameState, drop: ResolvedWorkerDrop): void {
   if (state.discoveredWorkers[drop.workerId]) return;
-  state.discoveredWorkers[drop.workerId] = { foundAt: Date.now() };
-  state.workers[drop.workerId] = defaultWorkerState();
+
+  state.discoveredWorkers = {
+    ...state.discoveredWorkers,
+    [drop.workerId]: { foundAt: Date.now() },
+  };
+  state.workers = {
+    ...state.workers,
+    [drop.workerId]: defaultWorkerState(),
+  };
 }
 
 // Mutates `state` directly with no side effects, for callers already inside their own `updateGamestate`.

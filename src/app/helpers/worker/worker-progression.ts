@@ -7,6 +7,7 @@ import {
 import { roundToNearest10 } from '@helpers/engine/number';
 import { hasGold } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
+import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
   CurrentLocation,
@@ -80,13 +81,14 @@ export function defaultWorkerState(): WorkerState {
 export function workerGainXp(workerId: WorkerId, amount: number): void {
   if (amount <= 0) return;
 
-  updateGamestate((state) => {
-    const worker = state.workers[workerId];
-    if (!worker) return state;
-
-    worker.xp.current = clamp(worker.xp.current + amount, 0, worker.xp.maximum);
-    return state;
-  });
+  updateGamestate((state) =>
+    updateWorkerRecord(state, workerId, (worker) => {
+      worker.xp = {
+        ...worker.xp,
+        current: clamp(worker.xp.current + amount, 0, worker.xp.maximum),
+      };
+    }),
+  );
 }
 
 export function workerLevelUpCost(currentLevel: number): number {
