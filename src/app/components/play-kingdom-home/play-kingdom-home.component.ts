@@ -34,6 +34,7 @@ import {
 import {
   discoveredWorkersState,
   gamestate,
+  materialsState,
   workersState,
 } from '@helpers/state-game';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
@@ -71,9 +72,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
 export class PlayKingdomHomeComponent {
   public canReclass = computed(() => isPlayerAtKingdom());
 
-  public materialCount = computed(
-    () => Object.keys(gamestate().materials).length,
-  );
+  public materialCount = computed(() => Object.keys(materialsState()).length);
 
   public armoryCount = computed(() => armoryGet().length);
   public armoryCapValue = computed(() => armoryCap());

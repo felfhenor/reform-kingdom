@@ -1,5 +1,5 @@
 import { getEntry } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
+import { discoveredMaterialsState, materialsState } from '@helpers/state-game';
 import type {
   ItemContent,
   MaterialId,
@@ -8,9 +8,8 @@ import type {
 import { orderBy } from 'es-toolkit/compat';
 
 export function getStorageMaterials(): StorageMaterialEntry[] {
-  const state = gamestate();
-  const materials = state.materials;
-  const discoveredMaterials = state.discoveredMaterials;
+  const materials = materialsState();
+  const discoveredMaterials = discoveredMaterialsState();
 
   const entries = Object.keys(materials)
     .map((id) => {

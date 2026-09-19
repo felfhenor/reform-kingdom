@@ -27,6 +27,8 @@ function gamestateSlice<K extends keyof GameState>(key: K): () => GameState[K] {
 
 export const workersState = gamestateSlice('workers');
 export const discoveredWorkersState = gamestateSlice('discoveredWorkers');
+export const materialsState = gamestateSlice('materials');
+export const discoveredMaterialsState = gamestateSlice('discoveredMaterials');
 export const armoryState = gamestateSlice('armory');
 export const globalEffectsState = gamestateSlice('globalEffects');
 export const globalEffectSumsState = gamestateSlice('globalEffectSums');

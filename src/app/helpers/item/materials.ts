@@ -1,6 +1,10 @@
 import { STARTING_GOLD_AMOUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  discoveredMaterialsState,
+  materialsState,
+  updateGamestate,
+} from '@helpers/state-game';
 import type {
   GameState,
   GameStateDiscoveredMaterials,
@@ -39,12 +43,12 @@ export function pruneInvalidMaterials(
 }
 
 export function getMaterialQuantity(materialId: MaterialId): number {
-  return gamestate().materials[materialId]?.quantity ?? 0;
+  return materialsState()[materialId]?.quantity ?? 0;
 }
 
 // Reads the permanent `discoveredMaterials` record, not live stock - it survives being spent down to 0.
 export function isMaterialDiscovered(materialId: MaterialId): boolean {
-  return !!gamestate().discoveredMaterials[materialId]?.foundAt;
+  return !!discoveredMaterialsState()[materialId]?.foundAt;
 }
 
 // Drops any invalid discoveredMaterials entries whose id no longer resolves to real content.
@@ -62,6 +66,24 @@ export function pruneInvalidDiscoveredMaterials(
   return pruned;
 }
 
+function setMaterialEntry(
+  state: GameState,
+  materialId: MaterialId,
+  quantity: number,
+  foundAt: number,
+): void {
+  if (quantity > 0) {
+    state.materials = {
+      ...state.materials,
+      [materialId]: { quantity, foundAt },
+    };
+    return;
+  }
+
+  state.materials = { ...state.materials };
+  delete state.materials[materialId];
+}
+
 // Shared mutator for material quantity - clamps at 0, drops the entry once depleted. All state.materials mutators (gold included) should go through this.
 export function applyMaterialDelta(
   state: GameState,
@@ -70,18 +92,24 @@ export function applyMaterialDelta(
 ): void {
   const existing = state.materials[materialId];
   const quantity = Math.max(0, (existing?.quantity ?? 0) + delta);
+  const unchanged = existing
+    ? quantity > 0 && existing.quantity === quantity
+    : quantity === 0;
 
-  if (quantity === 0) {
-    delete state.materials[materialId];
-  } else {
-    state.materials[materialId] = {
+  if (!unchanged) {
+    setMaterialEntry(
+      state,
+      materialId,
       quantity,
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
+      existing?.foundAt ?? Date.now(),
+    );
   }
 
   if (delta > 0 && !state.discoveredMaterials[materialId]) {
-    state.discoveredMaterials[materialId] = { foundAt: Date.now() };
+    state.discoveredMaterials = {
+      ...state.discoveredMaterials,
+      [materialId]: { foundAt: Date.now() },
+    };
   }
 }
 

@@ -1,7 +1,11 @@
 import { getEntry } from '@helpers/content/content';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { isInfusionMaterial } from '@helpers/item/infusion';
-import { discoveredWorkersState, gamestate } from '@helpers/state-game';
+import {
+  discoveredMaterialsState,
+  discoveredWorkersState,
+  gamestate,
+} from '@helpers/state-game';
 import type { ItemContent, ItemId, TutorialTrigger } from '@interfaces';
 
 export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
@@ -11,7 +15,7 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
     case 'first-worker':
       return Object.keys(discoveredWorkersState()).length > 0;
     case 'first-infusion-material':
-      return Object.keys(gamestate().discoveredMaterials).some((id) => {
+      return Object.keys(discoveredMaterialsState()).some((id) => {
         const item = getEntry<ItemContent>(id as ItemId);
         return !!item && isInfusionMaterial(item);
       });

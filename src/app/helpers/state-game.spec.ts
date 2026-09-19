@@ -21,11 +21,13 @@ import { defaultGameState } from '@helpers/defaults';
 import {
   activeAstralProjectorSpellsState,
   armoryState,
+  discoveredMaterialsState,
   discoveredWorkersState,
   gamestateTickEnd,
   gamestateTickStart,
   globalEffectSumsState,
   globalEffectsState,
+  materialsState,
   setGameState,
   updateGamestate,
   workersState,
@@ -154,6 +156,8 @@ describe('workersState', () => {
   });
 
   it.each([
+    ['materials', materialsState],
+    ['discoveredMaterials', discoveredMaterialsState],
     ['armory', armoryState],
     ['globalEffects', globalEffectsState],
     ['globalEffectSums', globalEffectSumsState],
