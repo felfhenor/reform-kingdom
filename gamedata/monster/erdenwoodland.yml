@@ -82,6 +82,8 @@
   skills:
     - skillId: Attack
       weight: 1
+    - skillId: Leech
+      weight: 2
 
   baseStats:
     Health: 300

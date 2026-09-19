@@ -1,0 +1,39 @@
+- id: 6143d797-5030-40e4-aaf4-a7a870642f10
+  name: Leech
+  family: Leech
+  description: Bite an enemy for {{ value }} damage, then heal self.
+
+  sprite: '0034'
+
+  rarity: Common
+
+  epCost: 0
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Agility: 1
+        Strength: 1
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** bites **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [BypassDefense, NeverMisses, HealsTarget]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Vitality: 0.5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** drains life force, healing for {{ absdamage }} HP ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
