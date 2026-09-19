@@ -45,6 +45,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
       DamageOverTime: 0,
       Poison: 0,
       Burn: 0,
+      Bleed: 0,
     },
     skillIds: [],
     skillRefs: [],

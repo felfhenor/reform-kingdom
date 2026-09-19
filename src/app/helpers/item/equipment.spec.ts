@@ -293,6 +293,7 @@ describe('Equipment Helper Functions', () => {
       DamageOverTime: 0,
       Poison: 0,
       Burn: 0,
+      Bleed: 0,
     };
 
     it('should return zeroed resistances when nothing is equipped', () => {
@@ -701,6 +702,7 @@ describe('Equipment Helper Functions', () => {
         DamageOverTime: 0,
         Poison: 0,
         Burn: 0,
+        Bleed: 0,
       });
     });
   });

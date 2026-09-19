@@ -1,0 +1,33 @@
+- id: a46e873b-bdcf-493c-93b8-d9a8c8677ad8
+  name: Gnash I
+  family: Gnash
+  description: Bite an enemy for {{ value }} damage, inflicting Bleed on them.
+
+  sprite: '0035'
+
+  rarity: Common
+
+  epCost: 35
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Bleeding
+      damageScaling:
+        Strength: 1.5
+
+      statusEffects:
+        - statusEffectId: Bleeding
+          chance: 45
+          duration: 5
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -175,6 +175,7 @@ export function defaultTagResistances(): StatusEffectBlock {
     DamageOverTime: 0,
     Poison: 0,
     Burn: 0,
+    Bleed: 0,
   };
 }
 

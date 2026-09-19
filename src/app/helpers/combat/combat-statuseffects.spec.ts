@@ -25,6 +25,7 @@ function buildTagResistance(
     DamageOverTime: 0,
     Poison: 0,
     Burn: 0,
+    Bleed: 0,
     ...overrides,
   };
 }

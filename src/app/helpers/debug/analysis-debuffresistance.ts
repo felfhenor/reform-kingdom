@@ -25,6 +25,7 @@ const ALL_STATUS_EFFECT_TAGS: StatusEffectTag[] = [
   'DamageOverTime',
   'Poison',
   'Burn',
+  'Bleed',
 ];
 
 export function runDebuffResistanceAnalysis(

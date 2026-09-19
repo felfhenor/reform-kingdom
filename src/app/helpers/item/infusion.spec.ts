@@ -89,6 +89,7 @@ const spiritFlesh: ItemContent = {
     DamageOverTime: 0,
     Poison: 0,
     Burn: 0,
+    Bleed: 0,
   },
 };
 
@@ -366,6 +367,7 @@ describe('Infusion Helper Functions', () => {
             DamageOverTime: 0,
             Poison: 0,
             Burn: 0,
+            Bleed: 0,
           },
         }),
       ).toBe(false);

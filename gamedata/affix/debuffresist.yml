@@ -50,3 +50,13 @@
     - kind: Resistance
       tag: StatDown
       value: 10
+
+- id: b0f3cddc-f595-431e-ad38-cf10f0206f94
+  name: of Clotting
+  description: Grants resistance to Bleed.
+  rarity: Rare
+  family: BleedResist
+  effects:
+    - kind: Resistance
+      tag: Bleed
+      value: 10

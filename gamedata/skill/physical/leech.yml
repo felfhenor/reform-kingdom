@@ -1,5 +1,5 @@
 - id: 6143d797-5030-40e4-aaf4-a7a870642f10
-  name: Leech
+  name: Leech I
   family: Leech
   description: Bite an enemy for {{ value }} damage, then heal self.
 

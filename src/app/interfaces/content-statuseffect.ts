@@ -12,12 +12,26 @@ export type StatusEffectId = Branded<string, 'StatusEffectId'>;
 export type StatusEffectTrigger = 'TurnStart' | 'TurnEnd';
 
 export type StatusEffectTag =
-  'Stun' | 'StatDown' | 'Accuracy' | 'DamageOverTime' | 'Poison' | 'Burn';
+  | 'Stun'
+  | 'StatDown'
+  | 'Accuracy'
+  | 'DamageOverTime'
+  | 'Poison'
+  | 'Burn'
+  | 'Bleed';
 
 export type StatusEffectBlock = Record<StatusEffectTag, number>;
 
 export const StatusEffectTagDimension: StatDisplayDimension<StatusEffectTag> = {
-  order: ['Accuracy', 'Burn', 'DamageOverTime', 'Poison', 'StatDown', 'Stun'],
+  order: [
+    'Accuracy',
+    'Bleed',
+    'Burn',
+    'DamageOverTime',
+    'Poison',
+    'StatDown',
+    'Stun',
+  ],
   label: {
     Stun: 'Stun Resist',
     StatDown: 'Stat Down Resist',
@@ -25,6 +39,7 @@ export const StatusEffectTagDimension: StatDisplayDimension<StatusEffectTag> = {
     DamageOverTime: 'Damage Over Time Resist',
     Poison: 'Poison Resist',
     Burn: 'Burn Resist',
+    Bleed: 'Bleed Resist',
   },
   icon: {
     Stun: 'gameGooeyImpact',
@@ -33,6 +48,7 @@ export const StatusEffectTagDimension: StatDisplayDimension<StatusEffectTag> = {
     DamageOverTime: 'gameBleedingWound',
     Poison: 'gamePoison',
     Burn: 'gameFlame',
+    Bleed: 'gameDrop',
   },
 };
 

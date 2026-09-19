@@ -106,6 +106,7 @@ export const VALUE_MULTIPLIER_PER_RESISTANCE: Record<StatusEffectTag, number> =
     DamageOverTime: 10,
     Poison: 3,
     Burn: 5,
+    Bleed: 3,
   };
 
 export const VALUE_MULTIPLIER_PER_COMBAT_STAT: Record<CombatStat, number> = {

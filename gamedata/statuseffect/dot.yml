@@ -61,3 +61,23 @@
   onTick:
     - type: TakeDamage
       combatMessage: '**{{ combatant.name }}** is suffering from venom for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
+
+- id: 15f98906-5f1b-402c-94cd-4bf1c2d14874
+  name: Bleeding
+
+  effectType: Debuff
+  elements: [Earth]
+  tags: [DamageOverTime, Bleed]
+
+  trigger: TurnEnd
+
+  statScaling:
+    Strength: 0.2
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is bleeding!'
+
+  onTick:
+    - type: TakeDamage
+      combatMessage: '**{{ combatant.name }}** takes {{ damage }} damage from bleeding ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
