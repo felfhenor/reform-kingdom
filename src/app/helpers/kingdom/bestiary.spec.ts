@@ -26,14 +26,19 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    bestiaryState: () => gamestate().bestiary,
+  };
+});
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   getMonsterFoundAtNodes,
   getMonsterKillCount,
@@ -127,6 +132,13 @@ const wildsEncounterRandom: EncounterRandomContent = {
   fights: [],
   completionRewards: [],
 };
+
+function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.bestiary);
+
+  const calls = vi.mocked(updateGamestate).mock.calls;
+  return calls[calls.length - 1][0](state);
+}
 
 describe('Bestiary Helper Functions', () => {
   beforeEach(() => {
@@ -241,11 +253,16 @@ describe('Bestiary Helper Functions', () => {
   });
 
   describe('monsterRecordKill', () => {
+    beforeEach(() => {
+      vi.mocked(gamestate).mockReturnValue({
+        bestiary: {},
+      } as unknown as GameState);
+    });
+
     it('creates a new entry on the first kill', () => {
       monsterRecordKill(goblin.id, 3, 'Field Ruins');
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({ bestiary: {} } as unknown as GameState);
+      const result = applyLastUpdate({ bestiary: {} } as unknown as GameState);
 
       expect(result.bestiary[goblin.id]).toEqual({
         foundAt: expect.any(Number),
@@ -256,11 +273,33 @@ describe('Bestiary Helper Functions', () => {
       });
     });
 
+    it('reassigns the bestiary dict and the entry so slice selectors see the change', () => {
+      monsterRecordKill(goblin.id, 3, 'Field Ruins');
+
+      const input = {
+        bestiary: {
+          [goblin.id]: {
+            foundAt: 1000,
+            kills: 1,
+            minLevelFound: 3,
+            maxLevelFound: 3,
+            foundAtNodes: ['Field Ruins'],
+          },
+        },
+      } as unknown as GameState;
+      const previousDict = input.bestiary;
+      const previousEntry = input.bestiary[goblin.id];
+
+      const result = applyLastUpdate(input);
+
+      expect(result.bestiary).not.toBe(previousDict);
+      expect(result.bestiary[goblin.id]).not.toBe(previousEntry);
+    });
+
     it('increments kills and expands the min/max level found', () => {
       monsterRecordKill(goblin.id, 7, 'Swamp');
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
+      const result = applyLastUpdate({
         bestiary: {
           [goblin.id]: {
             foundAt: 1000,
@@ -284,8 +323,7 @@ describe('Bestiary Helper Functions', () => {
     it('narrows the min level when killed at a lower level than before', () => {
       monsterRecordKill(goblin.id, 1);
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
+      const result = applyLastUpdate({
         bestiary: {
           [goblin.id]: {
             foundAt: 1000,
@@ -304,8 +342,7 @@ describe('Bestiary Helper Functions', () => {
     it('treats a corrupted (NaN) existing range as unset instead of propagating NaN', () => {
       monsterRecordKill(goblin.id, 4);
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
+      const result = applyLastUpdate({
         bestiary: {
           [goblin.id]: {
             foundAt: 1000,
@@ -324,8 +361,7 @@ describe('Bestiary Helper Functions', () => {
     it('treats a pre-level-tracking entry (missing min/max) as unset instead of propagating NaN', () => {
       monsterRecordKill(goblin.id, 4);
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
+      const result = applyLastUpdate({
         bestiary: {
           [goblin.id]: { foundAt: 1000, kills: 1 },
         },
@@ -338,8 +374,7 @@ describe('Bestiary Helper Functions', () => {
     it('does not duplicate a location it has already been found at', () => {
       monsterRecordKill(goblin.id, 3, 'Field Ruins');
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
+      const result = applyLastUpdate({
         bestiary: {
           [goblin.id]: {
             foundAt: 1000,

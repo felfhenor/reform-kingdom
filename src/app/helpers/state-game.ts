@@ -38,6 +38,7 @@ export const discoveredGatherNodesState = gamestateSlice(
 );
 export const gatherNodeLevelsState = gamestateSlice('gatherNodeLevels');
 export const worldDiscoveriesState = gamestateSlice('worldDiscoveries');
+export const bestiaryState = gamestateSlice('bestiary');
 export const shrinesState = gamestateSlice('shrines');
 export const tutorialsState = gamestateSlice('tutorials');
 export const lootFiltersState = gamestateSlice('lootFilters');

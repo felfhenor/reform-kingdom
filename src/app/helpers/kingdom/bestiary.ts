@@ -3,7 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { bestiaryState, updateGamestate } from '@helpers/state-game';
 import type {
   EncounterContent,
   EncounterRandomContent,
@@ -14,15 +14,15 @@ import type {
 } from '@interfaces';
 
 export function isMonsterDiscovered(monsterId: MonsterId): boolean {
-  return !!gamestate().bestiary[monsterId]?.foundAt;
+  return !!bestiaryState()[monsterId]?.foundAt;
 }
 
 export function getMonsterKillCount(monsterId: MonsterId): number {
-  return gamestate().bestiary[monsterId]?.kills ?? 0;
+  return bestiaryState()[monsterId]?.kills ?? 0;
 }
 
 export function getMonsterFoundAtNodes(monsterId: MonsterId): string[] {
-  return gamestate().bestiary[monsterId]?.foundAtNodes ?? [];
+  return bestiaryState()[monsterId]?.foundAtNodes ?? [];
 }
 
 // The actual min/max level the party has fought this monster at -
@@ -30,7 +30,7 @@ export function getMonsterFoundAtNodes(monsterId: MonsterId): string[] {
 export function getMonsterLevelRangeFound(
   monsterId: MonsterId,
 ): LevelRange | undefined {
-  const entry = gamestate().bestiary[monsterId];
+  const entry = bestiaryState()[monsterId];
   if (!entry) return undefined;
 
   return { min: entry.minLevelFound, max: entry.maxLevelFound };
@@ -52,16 +52,19 @@ export function monsterRecordKill(
     const existingMin = existing?.minLevelFound;
     const existingMax = existing?.maxLevelFound;
 
-    state.bestiary[monsterId] = {
-      foundAt: existing?.foundAt ?? Date.now(),
-      kills: (existing?.kills ?? 0) + 1,
-      minLevelFound: Number.isFinite(existingMin)
-        ? Math.min(existingMin as number, level)
-        : level,
-      maxLevelFound: Number.isFinite(existingMax)
-        ? Math.max(existingMax as number, level)
-        : level,
-      foundAtNodes: [...foundAtNodes],
+    state.bestiary = {
+      ...state.bestiary,
+      [monsterId]: {
+        foundAt: existing?.foundAt ?? Date.now(),
+        kills: (existing?.kills ?? 0) + 1,
+        minLevelFound: Number.isFinite(existingMin)
+          ? Math.min(existingMin as number, level)
+          : level,
+        maxLevelFound: Number.isFinite(existingMax)
+          ? Math.max(existingMax as number, level)
+          : level,
+        foundAtNodes: [...foundAtNodes],
+      },
     };
     return state;
   });

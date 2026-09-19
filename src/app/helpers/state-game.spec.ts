@@ -21,6 +21,7 @@ import { defaultGameState } from '@helpers/defaults';
 import {
   gamestate,
   activeAstralProjectorSpellsState,
+  bestiaryState,
   collectiblesState,
   discoveredEquipmentState,
   discoveredRecipesState,
@@ -239,6 +240,7 @@ describe('workersState', () => {
     ['discoveredGatherNodes', discoveredGatherNodesState],
     ['gatherNodeLevels', gatherNodeLevelsState],
     ['worldDiscoveries', worldDiscoveriesState],
+    ['bestiary', bestiaryState],
     ['shrines', shrinesState],
     ['tutorials', tutorialsState],
     ['lootFilters', lootFiltersState],
