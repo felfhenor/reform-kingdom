@@ -27,7 +27,7 @@
 
 - id: 6fbb85ba-8029-48ea-8774-d44f15111696
   name: Cimmerian Ring
-  description: A ring
+  description: A ring forged with cimmerian dust, giving it an irresistibly strong glow.
   levelRequirement: 28
   rarity: Uncommon
   type: Ring
