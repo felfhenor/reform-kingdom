@@ -10,7 +10,6 @@ import {
   workerLevelUpCost,
   workerXpForLevel,
 } from '@helpers/worker/worker-progression';
-import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import type {
   WorkerContent,
   WorkerId,
@@ -52,10 +51,13 @@ export function workerLevelUp(workerId: WorkerId): boolean {
   updateGamestate((state) => {
     spendGold(state, cost);
 
-    return updateWorkerRecord(state, workerId, (target) => {
-      target.level += 1;
-      target.xp = { current: 0, maximum: workerXpForLevel(target.level) };
-    });
+    const target = state.workers[workerId];
+    if (!target) return state;
+
+    target.level += 1;
+    target.xp = { current: 0, maximum: workerXpForLevel(target.level) };
+
+    return state;
   });
 
   const workerName = getEntry<WorkerContent>(workerId)?.name;

@@ -2,7 +2,6 @@ import { DECREE_CLAUSE_CAP } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { rngUuid } from '@helpers/rng';
-import { autoModePatch } from '@helpers/decree/auto-mode-state';
 import { updateGamestate, worldAutoModeState } from '@helpers/state-game';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import type {
@@ -85,9 +84,7 @@ export function decreeClauseAdd(action: DecreeClauseAction): boolean {
   };
 
   updateGamestate((state) => {
-    autoModePatch(state, {
-      clauses: [clause, ...state.world.autoMode.clauses],
-    });
+    state.world.autoMode.clauses.unshift(clause);
     return state;
   });
 
@@ -100,10 +97,8 @@ export function decreeClauseSetEnabled(
   enabled: boolean,
 ): void {
   updateGamestate((state) => {
-    autoModePatch(state, {
-      clauses: state.world.autoMode.clauses.map((clause) =>
-        clause.id === clauseId ? { ...clause, enabled } : clause,
-      ),
+    state.world.autoMode.clauses.forEach((clause) => {
+      if (clause.id === clauseId) clause.enabled = enabled;
     });
     return state;
   });
@@ -116,12 +111,11 @@ export function decreeClauseReorder(
   newIndex: number,
 ): void {
   updateGamestate((state) => {
-    const clauses = [...state.world.autoMode.clauses];
+    const clauses = state.world.autoMode.clauses;
     const [moved] = clauses.splice(previousIndex, 1);
     if (!moved) return state;
 
     clauses.splice(newIndex, 0, moved);
-    autoModePatch(state, { clauses });
     return state;
   });
 }

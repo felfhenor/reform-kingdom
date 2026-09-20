@@ -1,7 +1,6 @@
 import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
 import { travelStepTicksCost } from '@helpers/hero/travel';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
-import { updateTownWorker } from '@helpers/town/town-node';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import type {
@@ -59,22 +58,22 @@ function advanceTownWorkerTravelStatus(
 ): PathAdvanceResult {
   const result = advancePathOneTick(path, ticksIntoStep, location);
 
-  updateGamestate((state) =>
-    updateTownWorker(state, townId, workerId, (target) => {
-      target.location = result.location;
-      if (
-        !result.arrived &&
-        (target.status.kind === 'TravelingTo' ||
-          target.status.kind === 'TravelingBack')
-      ) {
-        target.status = {
-          ...target.status,
-          path: result.path,
-          ticksIntoStep: result.ticksIntoStep,
-        };
-      }
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.world.towns[townId]?.workers[workerId];
+    if (!target) return state;
+
+    target.location = result.location;
+    if (
+      !result.arrived &&
+      (target.status.kind === 'TravelingTo' ||
+        target.status.kind === 'TravelingBack')
+    ) {
+      target.status.path = result.path;
+      target.status.ticksIntoStep = result.ticksIntoStep;
+    }
+
+    return state;
+  });
 
   return result;
 }
@@ -93,17 +92,20 @@ function processTravelingTo(townId: TownId, workerId: WorkerId): void {
   );
   if (!result.arrived) return;
 
-  updateGamestate((state) =>
-    updateTownWorker(state, townId, workerId, (target) => {
-      target.status = {
-        kind: 'Gathering',
-        nodeName,
-        itemId,
-        itemsGathered: 0,
-        ticksIntoGather: 0,
-      };
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.world.towns[townId]?.workers[workerId];
+    if (!target) return state;
+
+    target.status = {
+      kind: 'Gathering',
+      nodeName,
+      itemId,
+      itemsGathered: 0,
+      ticksIntoGather: 0,
+    };
+
+    return state;
+  });
 }
 
 function processTravelingBack(
@@ -139,10 +141,13 @@ function processTravelingBack(
       applyTownMaterialDelta(state, townId, carriedItemId, carriedQuantity);
     }
 
-    return updateTownWorker(state, townId, workerId, (target) => {
-      target.status = { kind: 'Resting', ticksIntoRest: 0 };
-      target.assignment = null;
-    });
+    const target = state.world.towns[townId]?.workers[workerId];
+    if (!target) return state;
+
+    target.status = { kind: 'Resting', ticksIntoRest: 0 };
+    target.assignment = null;
+
+    return state;
   });
 }
 
@@ -172,14 +177,17 @@ export function townWorkerRestProcessTick(
 
   const ticksIntoRest = worker.status.ticksIntoRest + 1;
 
-  updateGamestate((state) =>
-    updateTownWorker(state, town.id, workerId, (target) => {
-      if (target.status.kind !== 'Resting') return;
+  updateGamestate((state) => {
+    const target = state.world.towns[town.id]?.workers[workerId];
+    if (!target) return state;
 
-      target.status =
-        ticksIntoRest < TOWN_WORKER_REST_TICKS
-          ? { kind: 'Resting', ticksIntoRest }
-          : { kind: 'AtTown' };
-    }),
-  );
+    if (target.status.kind !== 'Resting') return state;
+
+    target.status =
+      ticksIntoRest < TOWN_WORKER_REST_TICKS
+        ? { kind: 'Resting', ticksIntoRest }
+        : { kind: 'AtTown' };
+
+    return state;
+  });
 }

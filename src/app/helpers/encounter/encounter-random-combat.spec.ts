@@ -44,7 +44,6 @@ import {
   encounterRandomStartFight,
 } from '@helpers/encounter/encounter-random-combat';
 import { rollDroppedRewards } from '@helpers/item/loot';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import {
   worldNodeByName,
@@ -226,9 +225,7 @@ describe('encounterRandomHandleVictory', () => {
         },
       },
     } as unknown as GameState;
-    const previousDict = deepFreeze(state.world.exploreRandom);
     const result = updateFn(state);
-    expect(result.world.exploreRandom).not.toBe(previousDict);
     expect(
       result.world.exploreRandom['gobslime-shrine' as EncounterRandomId]
         .completedThisCycle,

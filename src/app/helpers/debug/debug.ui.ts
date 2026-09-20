@@ -19,7 +19,6 @@ import {
   tradeskillIdForName,
   tradeskillXpForLevel,
 } from '@helpers/crafting/tradeskill';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   characterStatsForLevel,
   characterXpForLevel,
@@ -39,7 +38,6 @@ import {
   worldPartyState,
   worldTownsState,
 } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
@@ -50,7 +48,6 @@ import { townMarkVisited } from '@helpers/town/town-visit';
 import { tutorialUnmarkSeen } from '@helpers/tutorial/tutorial-seen';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
-import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -183,11 +180,11 @@ export function debugSetTradeskillLevel(
   const clampedLevel = clamp(Math.round(level), 1, TRADESKILL_MAX_LEVEL);
 
   updateGamestate((state) => {
-    state.tradeskills = dictionaryWith(state.tradeskills, tradeskillId, {
+    state.tradeskills[tradeskillId] = {
       ...tradeskillBuildingIn(state, tradeskillId),
       level: clampedLevel,
       xp: { current: 0, maximum: tradeskillXpForLevel(clampedLevel) },
-    });
+    };
 
     return state;
   });
@@ -307,12 +304,15 @@ export function debugRescueWorker(workerId: WorkerId): void {
 export function debugSetWorkerLevel(workerId: WorkerId, level: number): void {
   const clampedLevel = clamp(Math.round(level), 1, WORKER_MAX_LEVEL);
 
-  updateGamestate((state) =>
-    updateWorkerRecord(state, workerId, (worker) => {
-      worker.level = clampedLevel;
-      worker.xp = { current: 0, maximum: workerXpForLevel(clampedLevel) };
-    }),
-  );
+  updateGamestate((state) => {
+    const worker = state.workers[workerId];
+    if (!worker) return state;
+
+    worker.level = clampedLevel;
+    worker.xp = { current: 0, maximum: workerXpForLevel(clampedLevel) };
+
+    return state;
+  });
 }
 
 export async function debugSetTownReputation(
@@ -333,11 +333,14 @@ export async function debugSetTownReputation(
     TOWN_REPUTATION_THRESHOLDS[4],
   );
 
-  await updateGamestate((state) =>
-    updateTownNode(state, realTownId, (town) => {
-      town.reputation = clamped;
-    }),
-  );
+  await updateGamestate((state) => {
+    const town = state.world.towns[realTownId];
+    if (!town) return state;
+
+    town.reputation = clamped;
+
+    return state;
+  });
 
   // Debug-set reputation skips townReputationGain/Lose, so tier-scaled persistent commissions need an explicit refresh here too.
   await townCommissionRefreshTierScaledSlots(realTownId);
@@ -433,9 +436,9 @@ export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
   );
 
   updateGamestate((state) => {
-    state.gatherNodeLevels = dictionaryWith(state.gatherNodeLevels, nodeName, {
+    state.gatherNodeLevels[nodeName] = {
       level: clampedLevel,
-    });
+    };
     return state;
   });
 }

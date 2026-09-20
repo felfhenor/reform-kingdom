@@ -38,7 +38,6 @@ import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commiss
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { townStockDisplay } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
-import { updateTownNode } from '@helpers/town/town-node';
 import type {
   Combat,
   GameState,
@@ -73,16 +72,20 @@ export function raidResolveVictory(combat: Combat, townId: TownId): void {
     townCommissionRefreshTierScaledSlots(townId);
   }
 
-  updateGamestate((state) =>
-    updateTownNode(state, townId, (target) => {
-      target.lastRaidResolvedAtTick = timerTicksElapsed();
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.world.towns[townId];
+    if (!target) return state;
+
+    target.lastRaidResolvedAtTick = timerTicksElapsed();
+
+    return state;
+  });
 }
 
 // 1 to 50% of the stock cap (not the current stock count) - picked randomly from whatever stock actually exists.
 function stealTownStock(state: GameState, townId: TownId): string[] {
-  const { stock } = state.world.towns[townId];
+  const town = state.world.towns[townId];
+  const { stock } = town;
   if (stock.length === 0) return [];
 
   const maxSlots = Math.max(
@@ -94,9 +97,7 @@ function stealTownStock(state: GameState, townId: TownId): string[] {
   const stolenCount = Math.min(stock.length, rngNumberRange(1, maxSlots + 1));
   const stolenEntries = rngShuffle(stock).slice(0, stolenCount);
 
-  updateTownNode(state, townId, (town) => {
-    town.stock = town.stock.filter((entry) => !stolenEntries.includes(entry));
-  });
+  town.stock = town.stock.filter((entry) => !stolenEntries.includes(entry));
 
   return stolenEntries
     .map((entry) => townStockDisplay(entry)?.name)
@@ -105,7 +106,8 @@ function stealTownStock(state: GameState, townId: TownId): string[] {
 
 // The whole queue is scrapped - materials already consumed for it are gone too, not refunded.
 function cancelTownCraftQueue(state: GameState, townId: TownId): string[] {
-  const { craftQueue } = state.world.towns[townId];
+  const town = state.world.towns[townId];
+  const { craftQueue } = town;
   if (craftQueue.length === 0) return [];
 
   const names = craftQueue
@@ -115,9 +117,7 @@ function cancelTownCraftQueue(state: GameState, townId: TownId): string[] {
     })
     .filter((name): name is string => !!name);
 
-  updateTownNode(state, townId, (town) => {
-    town.craftQueue = [];
-  });
+  town.craftQueue = [];
 
   return names;
 }
@@ -215,13 +215,12 @@ export function raidResolveDefeat(townId: TownId): void {
       lostMaterials: stealTownMaterials(state, townId),
     };
 
-    updateTownNode(state, townId, (target) => {
-      target.lastRaidResolvedAtTick = now;
-      target.craftSpeedDebuffExpiresAtTick = now + RAID_LOSS_CRAFT_DEBUFF_TICKS;
-      target.raidTelegraphedAtTick = undefined;
-      target.raidEngageWindowExpiresAtTick = undefined;
-      target.raidTelegraphedAssaulterIds = undefined;
-    });
+    const target = state.world.towns[townId];
+    target.lastRaidResolvedAtTick = now;
+    target.craftSpeedDebuffExpiresAtTick = now + RAID_LOSS_CRAFT_DEBUFF_TICKS;
+    target.raidTelegraphedAtTick = undefined;
+    target.raidEngageWindowExpiresAtTick = undefined;
+    target.raidTelegraphedAssaulterIds = undefined;
     raidDefenseGlobalEffectApply(state, now);
     return state;
   });

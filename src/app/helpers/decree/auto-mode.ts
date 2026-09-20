@@ -1,6 +1,5 @@
 import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { autoModePatch } from '@helpers/decree/auto-mode-state';
 import {
   decreeClauses,
   decreeWaitForFullHealthBeforeCombat,
@@ -11,7 +10,6 @@ import {
   pickNextClause,
 } from '@helpers/decree/decree-evaluation';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   addGlobalEffect,
   isGlobalEffectActive,
@@ -49,17 +47,15 @@ export function autoModeIsEnabled(): boolean {
 
 export function autoModeToggle(enabled: boolean): void {
   updateGamestate((state) => {
-    autoModePatch(
-      state,
-      enabled ? { enabled } : { enabled, activeClauseId: undefined },
-    );
+    state.world.autoMode.enabled = enabled;
+    if (!enabled) state.world.autoMode.activeClauseId = undefined;
     return state;
   });
 }
 
 function setActiveClause(clauseId?: DecreeClauseId): void {
   updateGamestate((state) => {
-    autoModePatch(state, { activeClauseId: clauseId });
+    state.world.autoMode.activeClauseId = clauseId;
     return state;
   });
 }
@@ -71,12 +67,10 @@ function updateActiveClauseFailureCount(
   if (!activeClauseId) return;
 
   updateGamestate((state) => {
-    autoModePatch(state, {
-      clauses: state.world.autoMode.clauses.map((clause) =>
-        clause.id === activeClauseId
-          ? { ...clause, failureCount: nextFailureCount(clause.failureCount) }
-          : clause,
-      ),
+    state.world.autoMode.clauses.forEach((clause) => {
+      if (clause.id === activeClauseId) {
+        clause.failureCount = nextFailureCount(clause.failureCount);
+      }
     });
     return state;
   });
@@ -98,9 +92,7 @@ export function autoModeRecordNodeFailure(nodeName: string): void {
   updateGamestate((state) => {
     const counts = state.world.autoMode.nodeFailureCounts;
     newFailureCount = (counts[nodeName] ?? 0) + 1;
-    autoModePatch(state, {
-      nodeFailureCounts: dictionaryWith(counts, nodeName, newFailureCount),
-    });
+    counts[nodeName] = newFailureCount;
     return state;
   });
 
@@ -109,13 +101,7 @@ export function autoModeRecordNodeFailure(nodeName: string): void {
 
 export function autoModeRecordNodeSuccess(nodeName: string): void {
   updateGamestate((state) => {
-    autoModePatch(state, {
-      nodeFailureCounts: dictionaryWith(
-        state.world.autoMode.nodeFailureCounts,
-        nodeName,
-        0,
-      ),
-    });
+    state.world.autoMode.nodeFailureCounts[nodeName] = 0;
     return state;
   });
 }
@@ -123,7 +109,7 @@ export function autoModeRecordNodeSuccess(nodeName: string): void {
 // Called on level-up so a stronger party gets a fresh try at nodes previously written off.
 export function autoModeResetNodeFailureCounts(): void {
   updateGamestate((state) => {
-    autoModePatch(state, { nodeFailureCounts: {} });
+    state.world.autoMode.nodeFailureCounts = {};
     return state;
   });
 }

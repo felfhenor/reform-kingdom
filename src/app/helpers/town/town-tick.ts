@@ -1,8 +1,6 @@
 import { getEntry } from '@helpers/content/content';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import { pruneInvalidTownStock } from '@helpers/town/shop/town-stock';
 import {
   pruneInvalidTownCraftQueue,
@@ -49,15 +47,14 @@ export function markTownSubsystemProcessed(
 
   const nowTick = timerTicksElapsed();
 
-  updateGamestate((state) =>
-    updateTownNode(state, townId, (town) => {
-      town.lastProcessedTick = dictionaryWith(
-        town.lastProcessedTick,
-        subsystem,
-        nowTick,
-      );
-    }),
-  );
+  updateGamestate((state) => {
+    const town = state.world.towns[townId];
+    if (!town) return state;
+
+    town.lastProcessedTick[subsystem] = nowTick;
+
+    return state;
+  });
 }
 
 export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {

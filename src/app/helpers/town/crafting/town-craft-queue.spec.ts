@@ -61,7 +61,6 @@ vi.mock('@helpers/town/town-tick', () => ({
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance } from '@helpers/rng';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate } from '@helpers/state-game';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import { resetTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
@@ -105,8 +104,6 @@ function buildTown(
 }
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world?.towns);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

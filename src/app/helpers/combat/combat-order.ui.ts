@@ -1,6 +1,5 @@
 import { combatOrderClauses } from '@helpers/combat/combat-order';
 import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
@@ -95,17 +94,12 @@ function updateCombatOrderClauses(
   transform: (clauses: CombatOrderClause[]) => CombatOrderClause[] | undefined,
 ): void {
   updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) => {
-      if (c.id !== characterId) return c;
+    const character = state.world.party.find((c) => c.id === characterId);
+    if (!character) return state;
 
-      const clauses = transform(c.combatOrders[jobId] ?? []);
-      if (!clauses) return c;
+    const clauses = transform(character.combatOrders[jobId] ?? []);
+    if (clauses) character.combatOrders[jobId] = clauses;
 
-      return {
-        ...c,
-        combatOrders: dictionaryWith(c.combatOrders, jobId, clauses),
-      };
-    });
     return state;
   });
 }

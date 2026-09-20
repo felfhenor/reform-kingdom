@@ -7,7 +7,6 @@ import { getEntry } from '@helpers/content/content';
 import { travelStepTicksCost } from '@helpers/hero/travel';
 import { addMaterial } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import {
   workerAssignmentIsValid,
   workerBeginOutboundTrip,
@@ -77,22 +76,22 @@ function advanceWorkerTravelStatus(
 ): PathAdvanceResult {
   const result = advancePathOneTick(path, ticksIntoStep, location);
 
-  updateGamestate((state) =>
-    updateWorkerRecord(state, workerId, (target) => {
-      target.location = result.location;
-      if (
-        !result.arrived &&
-        (target.status.kind === 'TravelingTo' ||
-          target.status.kind === 'TravelingBack')
-      ) {
-        target.status = {
-          ...target.status,
-          path: result.path,
-          ticksIntoStep: result.ticksIntoStep,
-        };
-      }
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.workers[workerId];
+    if (!target) return state;
+
+    target.location = result.location;
+    if (
+      !result.arrived &&
+      (target.status.kind === 'TravelingTo' ||
+        target.status.kind === 'TravelingBack')
+    ) {
+      target.status.path = result.path;
+      target.status.ticksIntoStep = result.ticksIntoStep;
+    }
+
+    return state;
+  });
 
   return result;
 }
@@ -110,17 +109,20 @@ function processTravelingTo(workerId: WorkerId): void {
   );
   if (!result.arrived) return;
 
-  updateGamestate((state) =>
-    updateWorkerRecord(state, workerId, (target) => {
-      target.status = {
-        kind: 'Gathering',
-        nodeName,
-        itemId,
-        itemsGathered: 0,
-        ticksIntoGather: 0,
-      };
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.workers[workerId];
+    if (!target) return state;
+
+    target.status = {
+      kind: 'Gathering',
+      nodeName,
+      itemId,
+      itemsGathered: 0,
+      ticksIntoGather: 0,
+    };
+
+    return state;
+  });
 }
 
 function logWorkerReturn(
@@ -156,11 +158,14 @@ function processTravelingBack(workerId: WorkerId): void {
 
   const pendingAssignment = worker.assignment;
 
-  updateGamestate((state) =>
-    updateWorkerRecord(state, workerId, (target) => {
-      target.status = { kind: 'AtDuchy' };
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.workers[workerId];
+    if (!target) return state;
+
+    target.status = { kind: 'AtDuchy' };
+
+    return state;
+  });
 
   if (carriedItemId && carriedQuantity > 0) {
     addMaterial(carriedItemId, carriedQuantity);
@@ -176,11 +181,14 @@ function processTravelingBack(workerId: WorkerId): void {
     return;
   }
 
-  updateGamestate((state) =>
-    updateWorkerRecord(state, workerId, (target) => {
-      target.assignment = null;
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.workers[workerId];
+    if (!target) return state;
+
+    target.assignment = null;
+
+    return state;
+  });
 }
 
 export function workerTravelProcessTick(workerId: WorkerId): void {

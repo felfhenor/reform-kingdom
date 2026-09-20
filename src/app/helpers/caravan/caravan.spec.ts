@@ -32,14 +32,12 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeCaravan: vi.fn(),
 }));
 
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   caravanBrandName,
   caravanBusyTraderIds,
   caravanEligibleTraders,
   caravanMarkDiscovered,
   caravanMarkVisited,
-  caravanNodeAfterTrade,
   caravanState,
   caravanTicksUntilReset,
   caravanTimerLabel,
@@ -57,7 +55,6 @@ import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanContent,
   CaravanId,
-  CaravanNodeState,
   CaravanTraderContent,
   CaravanTraderId,
   GameState,
@@ -263,7 +260,7 @@ describe('caravanBrandName', () => {
 describe('isCaravanDiscovered', () => {
   it('is true once a foundAt is recorded', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({ [caravan.id]: { foundAt: 1000 } }),
+      discoveredCaravans: { [caravan.id]: { foundAt: 1000 } },
     } as unknown as GameState);
 
     expect(isCaravanDiscovered(caravan.id)).toBe(true);
@@ -271,7 +268,7 @@ describe('isCaravanDiscovered', () => {
 
   it('is false when never visited', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({}),
+      discoveredCaravans: {},
     } as unknown as GameState);
 
     expect(isCaravanDiscovered(caravan.id)).toBe(false);
@@ -316,7 +313,7 @@ describe('caravanMarkDiscovered', () => {
 
   it('does nothing when already discovered', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({ [caravan.id]: { foundAt: 1000 } }),
+      discoveredCaravans: { [caravan.id]: { foundAt: 1000 } },
     } as unknown as GameState);
 
     caravanMarkDiscovered(caravan.id);
@@ -326,7 +323,7 @@ describe('caravanMarkDiscovered', () => {
 
   it('records a fresh foundAt when visited for the first time', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({}),
+      discoveredCaravans: {},
     } as unknown as GameState);
     vi.spyOn(Date, 'now').mockReturnValue(5000);
 
@@ -334,7 +331,7 @@ describe('caravanMarkDiscovered', () => {
 
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
     const result = updateFn({
-      discoveredCaravans: deepFreeze({}),
+      discoveredCaravans: {},
     } as unknown as GameState);
 
     expect(result.discoveredCaravans[caravan.id]).toEqual({ foundAt: 5000 });
@@ -363,48 +360,6 @@ describe('pruneInvalidDiscoveredCaravans', () => {
   });
 });
 
-describe('caravanNodeAfterTrade', () => {
-  function frozenNode(): CaravanNodeState {
-    return deepFreeze({
-      traderId: 'trader-a' as CaravanTraderId,
-      activeTradeIndices: [0, 1],
-      tradeCounts: { 1: 2 },
-      generatedAtTick: 1000,
-    } as CaravanNodeState);
-  }
-
-  it('adds to an existing trade count without touching the original node', () => {
-    const node = frozenNode();
-
-    const result = caravanNodeAfterTrade(node, 1, 3, undefined);
-
-    expect(result).not.toBe(node);
-    expect(result.tradeCounts).toEqual({ 1: 5 });
-    expect(node.tradeCounts).toEqual({ 1: 2 });
-  });
-
-  it('starts a count for a trade that has not been made yet', () => {
-    expect(
-      caravanNodeAfterTrade(frozenNode(), 0, 1, undefined).tradeCounts,
-    ).toEqual({
-      0: 1,
-      1: 2,
-    });
-  });
-
-  it('stores the rolled equipment and keeps every other field', () => {
-    const rolled = {
-      0: { id: 'item-1' },
-    } as unknown as CaravanNodeState['rolledEquipment'];
-
-    const result = caravanNodeAfterTrade(frozenNode(), 0, 1, rolled);
-
-    expect(result.rolledEquipment).toBe(rolled);
-    expect(result.traderId).toBe('trader-a');
-    expect(result.generatedAtTick).toBe(1000);
-  });
-});
-
 describe('caravanMarkVisited', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -412,7 +367,7 @@ describe('caravanMarkVisited', () => {
 
   it('marks discovered and backfills the commission', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({}),
+      discoveredCaravans: {},
     } as unknown as GameState);
 
     caravanMarkVisited(caravan.id);
@@ -423,7 +378,7 @@ describe('caravanMarkVisited', () => {
 
   it('records the current trader as visited', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({}),
+      discoveredCaravans: {},
     } as unknown as GameState);
 
     caravanMarkVisited(caravan.id);
@@ -440,18 +395,15 @@ describe('caravanMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    const previousDict = deepFreeze(state.world.caravans);
-
     const mutate = vi.mocked(updateGamestate).mock.calls.at(-1)![0];
     mutate(state);
 
-    expect(state.world.caravans).not.toBe(previousDict);
     expect(state.world.caravans[caravan.id].visitedTraderId).toBe('trader-a');
   });
 
-  it('leaves the caravans dict untouched when the trader was already recorded as visited', () => {
+  it('leaves the visit record alone when the trader was already recorded as visited', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({}),
+      discoveredCaravans: {},
     } as unknown as GameState);
 
     caravanMarkVisited(caravan.id);
@@ -469,16 +421,20 @@ describe('caravanMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    const previousDict = deepFreeze(state.world.caravans);
-
     vi.mocked(updateGamestate).mock.calls.at(-1)![0](state);
 
-    expect(state.world.caravans).toBe(previousDict);
+    expect(state.world.caravans[caravan.id]).toEqual({
+      traderId: 'trader-a',
+      visitedTraderId: 'trader-a',
+      activeTradeIndices: [],
+      tradeCounts: {},
+      generatedAtTick: 1000,
+    });
   });
 
   it('does nothing when the caravan has no state yet', () => {
     vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: deepFreeze({}),
+      discoveredCaravans: {},
     } as unknown as GameState);
 
     caravanMarkVisited(caravan.id);

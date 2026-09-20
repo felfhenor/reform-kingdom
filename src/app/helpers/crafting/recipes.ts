@@ -1,5 +1,4 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
 import { getMaterialQuantity, traderTokenId } from '@helpers/item/materials';
@@ -76,9 +75,9 @@ export function applyRecipeDiscovery(
   recipeId: RecipeId,
 ): void {
   const existing = state.discoveredRecipes[recipeId];
-  state.discoveredRecipes = dictionaryWith(state.discoveredRecipes, recipeId, {
+  state.discoveredRecipes[recipeId] = {
     foundAt: existing?.foundAt ?? Date.now(),
-  });
+  };
 }
 
 export function recipeDiscover(recipeId: RecipeId): void {
@@ -92,10 +91,7 @@ export function recipeDiscover(recipeId: RecipeId): void {
 // not something normal play ever triggers.
 export function recipeUndiscover(recipeId: RecipeId): void {
   updateGamestate((state) => {
-    state.discoveredRecipes = dictionaryWithout(
-      state.discoveredRecipes,
-      recipeId,
-    );
+    delete state.discoveredRecipes[recipeId];
     return state;
   });
 }

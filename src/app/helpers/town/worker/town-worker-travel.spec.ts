@@ -37,7 +37,6 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 import { getEntry } from '@helpers/content/content';
 import { travelPathTotalTicks } from '@helpers/hero/travel';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate } from '@helpers/state-game';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import {
@@ -65,8 +64,6 @@ const workerId = 'darwin' as WorkerId;
 const oreId = 'copper-ore' as ItemId;
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world?.towns);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

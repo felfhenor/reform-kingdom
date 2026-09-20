@@ -1,4 +1,3 @@
-import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
@@ -15,9 +14,9 @@ export async function tutorialMarkSeen(tutorialId: TutorialId): Promise<void> {
   if (isTutorialSeen(tutorialId)) return;
 
   await updateGamestate((state) => {
-    state.tutorials = dictionaryWith(state.tutorials, tutorialId, {
+    state.tutorials[tutorialId] = {
       foundAt: Date.now(),
-    });
+    };
     return state;
   });
 
@@ -27,7 +26,7 @@ export async function tutorialMarkSeen(tutorialId: TutorialId): Promise<void> {
 // Debug tool: reverts a tutorial back to unseen.
 export function tutorialUnmarkSeen(tutorialId: TutorialId): void {
   updateGamestate((state) => {
-    state.tutorials = dictionaryWithout(state.tutorials, tutorialId);
+    delete state.tutorials[tutorialId];
     return state;
   });
 }

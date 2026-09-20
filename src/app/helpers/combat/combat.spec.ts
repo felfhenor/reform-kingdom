@@ -60,7 +60,6 @@ import {
   combatDoCombatIteration,
   combatantTakeTurn,
 } from '@helpers/combat/combat';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
 import {
@@ -162,17 +161,18 @@ describe('combatDoCombatIteration', () => {
     expect(previous.rounds).toBe(1);
   });
 
-  it('works on a copy so a frozen previous round is never mutated', () => {
+  it('plays the round on a copy, leaving the previous round untouched', () => {
     vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([]);
-    const previous = deepFreeze({
+    const previous = {
       ...buildCombat(),
       heroes: [buildCombatant()],
-    });
+    };
+    const snapshot = structuredClone(previous);
 
     const committed = commitRound(previous);
 
-    expect(committed?.heroes).not.toBe(previous.heroes);
     expect(committed?.heroes[0]).not.toBe(previous.heroes[0]);
+    expect(previous).toEqual(snapshot);
   });
 
   it('does not start a round when there is no combat', () => {

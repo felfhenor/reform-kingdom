@@ -19,7 +19,6 @@ vi.mock('@helpers/engine/timer', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   applyGlobalEffectPush,
@@ -301,9 +300,9 @@ describe('applyGlobalEffectPush / applyGlobalEffectRemove', () => {
     effects: [],
   } as unknown as GlobalEffect;
 
-  function buildFrozenState(globalEffects: GlobalEffect[]): GameState {
+  function buildState(globalEffects: GlobalEffect[]): GameState {
     return {
-      globalEffects: deepFreeze(globalEffects),
+      globalEffects: globalEffects,
       collectibles: {},
     } as unknown as GameState;
   }
@@ -313,7 +312,7 @@ describe('applyGlobalEffectPush / applyGlobalEffectRemove', () => {
   });
 
   it('appends the effect by reassigning globalEffects, never mutating the old array', () => {
-    const state = buildFrozenState([]);
+    const state = buildState([]);
     const previous = state.globalEffects;
 
     applyGlobalEffectPush(state, effect);
@@ -324,7 +323,7 @@ describe('applyGlobalEffectPush / applyGlobalEffectRemove', () => {
   });
 
   it('removes an effect by reassigning globalEffects', () => {
-    const state = buildFrozenState([effect]);
+    const state = buildState([effect]);
     const previous = state.globalEffects;
 
     applyGlobalEffectRemove(state, effect.id);

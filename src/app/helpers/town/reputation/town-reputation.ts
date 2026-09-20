@@ -1,6 +1,5 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import type { GameState, TownId, TownReputationGainSource } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -67,9 +66,12 @@ export async function townReputationGain(
       townReputationTierForAmount(reputation) !==
       townReputationTierForAmount(town.reputation);
 
-    return updateTownNode(state, townId, (node) => {
-      node.reputation = reputation;
-    });
+    const node = state.world.towns[townId];
+    if (!node) return state;
+
+    node.reputation = reputation;
+
+    return state;
   });
 
   analyticsSendDesignEvent(`Town:Reputation:${source}`);
@@ -97,9 +99,12 @@ export async function townReputationLose(
       townReputationTierForAmount(reputation) !==
       townReputationTierForAmount(town.reputation);
 
-    return updateTownNode(state, townId, (node) => {
-      node.reputation = reputation;
-    });
+    const node = state.world.towns[townId];
+    if (!node) return state;
+
+    node.reputation = reputation;
+
+    return state;
   });
 
   analyticsSendDesignEvent(`Town:Reputation:Lose:${source}`);

@@ -89,7 +89,6 @@ import {
 } from '@helpers/item/gathering';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   gamestate,
   updateGamestate,
@@ -137,8 +136,6 @@ function buildCharacter(level: number, luck = 0): Character {
 }
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world?.gathering);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

@@ -4,7 +4,6 @@ import {
   URGENCY_WARNING_MIN_TICKS,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import {
   discoveredCaravansState,
@@ -109,30 +108,9 @@ export function caravanMarkDiscovered(caravanId: CaravanId): void {
   if (isCaravanDiscovered(caravanId)) return;
 
   updateGamestate((state) => {
-    state.discoveredCaravans = dictionaryWith(
-      state.discoveredCaravans,
-      caravanId,
-      { foundAt: Date.now() },
-    );
+    state.discoveredCaravans[caravanId] = { foundAt: Date.now() };
     return state;
   });
-}
-
-export function caravanNodeAfterTrade(
-  nodeState: CaravanNodeState,
-  tradeIndex: number,
-  quantity: number,
-  rolledEquipment: CaravanNodeState['rolledEquipment'],
-): CaravanNodeState {
-  return {
-    ...nodeState,
-    rolledEquipment,
-    tradeCounts: dictionaryWith(
-      nodeState.tradeCounts,
-      tradeIndex,
-      (nodeState.tradeCounts[tradeIndex] ?? 0) + quantity,
-    ),
-  };
 }
 
 export function caravanMarkVisited(caravanId: CaravanId): void {
@@ -142,10 +120,7 @@ export function caravanMarkVisited(caravanId: CaravanId): void {
   updateGamestate((state) => {
     const caravan = state.world.caravans[caravanId];
     if (caravan && caravan.visitedTraderId !== caravan.traderId) {
-      state.world.caravans = dictionaryWith(state.world.caravans, caravanId, {
-        ...caravan,
-        visitedTraderId: caravan.traderId,
-      });
+      caravan.visitedTraderId = caravan.traderId;
     }
     return state;
   });

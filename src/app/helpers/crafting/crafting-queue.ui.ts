@@ -4,7 +4,6 @@ import {
   tradeskillBuildingIn,
   tradeskillIdForName,
 } from '@helpers/crafting/tradeskill';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { updateGamestate } from '@helpers/state-game';
 import type { CraftQueueEntryId, RecipeContent, Tradeskill } from '@interfaces';
 
@@ -31,10 +30,10 @@ export function craftQueueRemove(
       });
     }
 
-    state.tradeskills = dictionaryWith(state.tradeskills, tradeskillId, {
+    state.tradeskills[tradeskillId] = {
       ...building,
       queue: building.queue.filter((queued) => queued.id !== queueEntryId),
-    });
+    };
 
     return state;
   });

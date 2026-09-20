@@ -2,7 +2,6 @@ import { getEntry } from '@helpers/content/content';
 import { travelPathTotalTicks } from '@helpers/hero/travel';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { updateGamestate } from '@helpers/state-game';
-import { updateTownWorker } from '@helpers/town/town-node';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
@@ -81,18 +80,21 @@ export function townWorkerBeginOutboundTrip(
   const path = travelPathFrom(townNode, assignment.nodeName, canUseTeleports);
   if (!path) return;
 
-  updateGamestate((state) =>
-    updateTownWorker(state, townId, workerId, (target) => {
-      target.assignment = assignment;
-      target.status = {
-        kind: 'TravelingTo',
-        nodeName: assignment.nodeName,
-        itemId: assignment.itemId,
-        path,
-        ticksIntoStep: 0,
-      };
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.world.towns[townId]?.workers[workerId];
+    if (!target) return state;
+
+    target.assignment = assignment;
+    target.status = {
+      kind: 'TravelingTo',
+      nodeName: assignment.nodeName,
+      itemId: assignment.itemId,
+      path,
+      ticksIntoStep: 0,
+    };
+
+    return state;
+  });
 }
 
 // Starts the trip home from the worker's current location - parks AtTown with cargo discarded if no route resolves.
@@ -106,19 +108,22 @@ export function townWorkerBeginReturnTrip(
   const canUseTeleports =
     getEntry<WorkerContent>(workerId)?.canUseTeleports ?? true;
 
-  updateGamestate((state) =>
-    updateTownWorker(state, townId, workerId, (target) => {
-      const path = travelPathFrom(target.location, town.name, canUseTeleports);
+  updateGamestate((state) => {
+    const target = state.world.towns[townId]?.workers[workerId];
+    if (!target) return state;
 
-      target.status = path
-        ? {
-            kind: 'TravelingBack',
-            path,
-            ticksIntoStep: 0,
-            carriedItemId,
-            carriedQuantity,
-          }
-        : { kind: 'AtTown' };
-    }),
-  );
+    const path = travelPathFrom(target.location, town.name, canUseTeleports);
+
+    target.status = path
+      ? {
+          kind: 'TravelingBack',
+          path,
+          ticksIntoStep: 0,
+          carriedItemId,
+          carriedQuantity,
+        }
+      : { kind: 'AtTown' };
+
+    return state;
+  });
 }

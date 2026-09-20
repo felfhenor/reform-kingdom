@@ -5,7 +5,6 @@ import {
 } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { globalEffectSums } from '@helpers/hero/global-effects';
@@ -204,11 +203,7 @@ function resolveGatherCycle(content: GatheringContent, nodeName: string): void {
   }
 
   updateGamestate((state) => {
-    state.world.gathering = dictionaryWith(
-      state.world.gathering,
-      'ticksIntoGather',
-      0,
-    );
+    state.world.gathering.ticksIntoGather = 0;
     return state;
   });
 }
@@ -224,11 +219,7 @@ export function gatheringProcessTick(): void {
 
   if (ticksIntoGather < content.gatherTime) {
     updateGamestate((state) => {
-      state.world.gathering = dictionaryWith(
-        state.world.gathering,
-        'ticksIntoGather',
-        ticksIntoGather,
-      );
+      state.world.gathering.ticksIntoGather = ticksIntoGather;
       return state;
     });
     return;

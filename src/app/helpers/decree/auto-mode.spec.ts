@@ -101,7 +101,6 @@ import { isPartyAtFullHealth } from '@helpers/hero/party';
 import { travelStart } from '@helpers/hero/travel';
 import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   gamestate,
   updateGamestate,
@@ -172,8 +171,6 @@ function buildState(overrides: {
 }
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world?.autoMode);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

@@ -5,7 +5,6 @@ import {
   workerGainXp,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
-import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import {
   workerAssignmentIsValid,
   workerBeginReturnTrip,
@@ -69,12 +68,15 @@ export function workerGatherXpGateSatisfied(
 
 // Defensive re-check (gamedata can change mid-session in dev) - parks AtDuchy on failure.
 function abandonInvalidGather(workerId: WorkerId): void {
-  updateGamestate((state) =>
-    updateWorkerRecord(state, workerId, (target) => {
-      target.status = { kind: 'AtDuchy' };
-      target.assignment = null;
-    }),
-  );
+  updateGamestate((state) => {
+    const target = state.workers[workerId];
+    if (!target) return state;
+
+    target.status = { kind: 'AtDuchy' };
+    target.assignment = null;
+
+    return state;
+  });
 }
 
 function emitWorkerGatherUnitVfx(nodeName: string, itemId: ItemId): void {
@@ -105,13 +107,17 @@ function completeGatherUnit(
 
   emitWorkerGatherUnitVfx(nodeName, itemId);
 
-  updateGamestate((state) =>
-    updateWorkerRecord(state, workerId, (target) => {
-      if (target.status.kind !== 'Gathering') return;
+  updateGamestate((state) => {
+    const target = state.workers[workerId];
+    if (!target) return state;
 
-      target.status = { ...target.status, itemsGathered, ticksIntoGather: 0 };
-    }),
-  );
+    if (target.status.kind !== 'Gathering') return state;
+
+    target.status.itemsGathered = itemsGathered;
+    target.status.ticksIntoGather = 0;
+
+    return state;
+  });
 }
 
 export function workerGatheringProcessTick(workerId: WorkerId): void {
@@ -146,13 +152,16 @@ export function workerGatheringProcessTick(workerId: WorkerId): void {
   const ticksIntoGather = status.ticksIntoGather + 1;
 
   if (ticksIntoGather < ticksPerUnit) {
-    updateGamestate((state) =>
-      updateWorkerRecord(state, workerId, (target) => {
-        if (target.status.kind !== 'Gathering') return;
+    updateGamestate((state) => {
+      const target = state.workers[workerId];
+      if (!target) return state;
 
-        target.status = { ...target.status, ticksIntoGather };
-      }),
-    );
+      if (target.status.kind !== 'Gathering') return state;
+
+      target.status.ticksIntoGather = ticksIntoGather;
+
+      return state;
+    });
     return;
   }
 

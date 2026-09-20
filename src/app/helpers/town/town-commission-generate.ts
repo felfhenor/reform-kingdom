@@ -7,7 +7,6 @@ import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngChoiceWeighted, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import { townSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import {
   townCommissionPriorityWeightFromMap,
@@ -52,16 +51,11 @@ function addCommissionSlot(
   offer: CommissionOfferContent,
   townId: TownId,
 ): void {
-  updateTownNode(state, townId, (target) => {
-    target.commissionSlots = [
-      ...target.commissionSlots,
-      {
-        id: rngUuid() as TownCommissionSlotId,
-        commissionOfferId: offer.id,
-        requirements: rollCommissionRequirements(offer, townId, state),
-        generatedAtTick: timerTicksElapsed(),
-      },
-    ];
+  state.world.towns[townId]?.commissionSlots.push({
+    id: rngUuid() as TownCommissionSlotId,
+    commissionOfferId: offer.id,
+    requirements: rollCommissionRequirements(offer, townId, state),
+    generatedAtTick: timerTicksElapsed(),
   });
 }
 
@@ -69,26 +63,29 @@ function addCommissionSlot(
 export async function townCommissionRefreshTierScaledSlots(
   townId: TownId,
 ): Promise<void> {
-  await updateGamestate((state) =>
-    updateTownNode(state, townId, (target) => {
-      target.commissionSlots = target.commissionSlots.map((slot) => {
-        const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
-        // A kill requirement tracks real progress on the slot itself - re-rolling would wipe it, so leave those slots alone.
-        const hasKillProgress = slot.requirements.some((r) => 'monsterId' in r);
-        if (
-          !offer ||
-          offer.reputationTierMultipliers.length === 0 ||
-          hasKillProgress
-        ) {
-          return slot;
-        }
-        return {
-          ...slot,
-          requirements: rollCommissionRequirements(offer, townId, state),
-        };
-      });
-    }),
-  );
+  await updateGamestate((state) => {
+    const target = state.world.towns[townId];
+    if (!target) return state;
+
+    target.commissionSlots = target.commissionSlots.map((slot) => {
+      const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
+      // A kill requirement tracks real progress on the slot itself - re-rolling would wipe it, so leave those slots alone.
+      const hasKillProgress = slot.requirements.some((r) => 'monsterId' in r);
+      if (
+        !offer ||
+        offer.reputationTierMultipliers.length === 0 ||
+        hasKillProgress
+      ) {
+        return slot;
+      }
+      return {
+        ...slot,
+        requirements: rollCommissionRequirements(offer, townId, state),
+      };
+    });
+
+    return state;
+  });
 }
 
 function persistentSlotDefs(town: TownContent): CommissionOfferSlot[] {

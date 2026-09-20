@@ -1,6 +1,5 @@
 import { STARTING_GOLD_AMOUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import {
   discoveredMaterialsState,
   materialsState,
@@ -74,14 +73,14 @@ function setMaterialEntry(
   foundAt: number,
 ): void {
   if (quantity > 0) {
-    state.materials = dictionaryWith(state.materials, materialId, {
+    state.materials[materialId] = {
       quantity,
       foundAt,
-    });
+    };
     return;
   }
 
-  state.materials = dictionaryWithout(state.materials, materialId);
+  delete state.materials[materialId];
 }
 
 // Shared mutator for material quantity - clamps at 0, drops the entry once depleted. All state.materials mutators (gold included) should go through this.
@@ -106,11 +105,7 @@ export function applyMaterialDelta(
   }
 
   if (delta > 0 && !state.discoveredMaterials[materialId]) {
-    state.discoveredMaterials = dictionaryWith(
-      state.discoveredMaterials,
-      materialId,
-      { foundAt: Date.now() },
-    );
+    state.discoveredMaterials[materialId] = { foundAt: Date.now() };
   }
 }
 

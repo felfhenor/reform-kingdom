@@ -39,7 +39,6 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { getEntry } from '@helpers/content/content';
 import { travelPathTotalTicks } from '@helpers/hero/travel';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
@@ -60,9 +59,6 @@ import {
 import type { GameState, ItemId, WorkerId, WorldNodeEntry } from '@interfaces';
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.workers);
-  deepFreeze(state.discoveredWorkers);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

@@ -22,7 +22,6 @@ vi.mock('@helpers/engine/analytics', async (importOriginal) => {
   };
 });
 
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -35,8 +34,6 @@ import {
 import type { GameState, GameStateWorldDiscoveries } from '@interfaces';
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.worldDiscoveries);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

@@ -13,7 +13,6 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   kingdomNodeGet: vi.fn(),
 }));
 
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { hasGold } from '@helpers/item/materials';
@@ -37,9 +36,6 @@ import type {
 } from '@interfaces';
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.workers);
-  deepFreeze(state.discoveredWorkers);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

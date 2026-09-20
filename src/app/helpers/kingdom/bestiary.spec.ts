@@ -38,7 +38,6 @@ vi.mock('@helpers/state-game', () => {
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   getMonsterFoundAtNodes,
   getMonsterKillCount,
@@ -134,8 +133,6 @@ const wildsEncounterRandom: EncounterRandomContent = {
 };
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.bestiary);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   return calls[calls.length - 1][0](state);
 }
@@ -271,29 +268,6 @@ describe('Bestiary Helper Functions', () => {
         maxLevelFound: 3,
         foundAtNodes: ['Field Ruins'],
       });
-    });
-
-    it('reassigns the bestiary dict and the entry so slice selectors see the change', () => {
-      monsterRecordKill(goblin.id, 3, 'Field Ruins');
-
-      const input = {
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 1,
-            minLevelFound: 3,
-            maxLevelFound: 3,
-            foundAtNodes: ['Field Ruins'],
-          },
-        },
-      } as unknown as GameState;
-      const previousDict = input.bestiary;
-      const previousEntry = input.bestiary[goblin.id];
-
-      const result = applyLastUpdate(input);
-
-      expect(result.bestiary).not.toBe(previousDict);
-      expect(result.bestiary[goblin.id]).not.toBe(previousEntry);
     });
 
     it('increments kills and expands the min/max level found', () => {

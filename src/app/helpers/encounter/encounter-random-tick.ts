@@ -1,5 +1,4 @@
 import { generateEncounterRandomFights } from '@helpers/encounter/encounter-random-generate';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   updateGamestate,
@@ -29,15 +28,11 @@ function regenerateEncounterRandomNode(
   nowTick: number,
 ): void {
   updateGamestate((state) => {
-    state.world.exploreRandom = dictionaryWith(
-      state.world.exploreRandom,
-      content.id,
-      {
-        fights: generateEncounterRandomFights(content),
-        generatedAtTick: nowTick,
-        completedThisCycle: false,
-      },
-    );
+    state.world.exploreRandom[content.id] = {
+      fights: generateEncounterRandomFights(content),
+      generatedAtTick: nowTick,
+      completedThisCycle: false,
+    };
     return state;
   });
 }

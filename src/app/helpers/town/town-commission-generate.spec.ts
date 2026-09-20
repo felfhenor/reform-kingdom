@@ -56,7 +56,6 @@ import {
 } from '@helpers/commission/commission-requirement';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import {
@@ -141,13 +140,8 @@ function stubEligibleOffers(offers: CommissionOfferContent[]): void {
   );
 }
 
-function frozenUpdate(index: number): (state: GameState) => GameState {
-  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
-
-  return (state) => {
-    deepFreeze(state.world?.towns);
-    return updateFn(state);
-  };
+function updateFnAt(index: number): (state: GameState) => GameState {
+  return vi.mocked(updateGamestate).mock.calls[index][0];
 }
 
 describe('townCommissionSlotCount', () => {
@@ -190,7 +184,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {
@@ -220,7 +214,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {
@@ -265,7 +259,7 @@ describe('townCommissionProcessTick', () => {
     } as unknown as GameState;
 
     townCommissionProcessTick();
-    frozenUpdate(0)(state);
+    updateFnAt(0)(state);
 
     expect(
       state.world.towns[twoSlotTown.id].commissionSlots.map(
@@ -274,7 +268,7 @@ describe('townCommissionProcessTick', () => {
     ).toEqual([offer.id]);
 
     townCommissionProcessTick();
-    frozenUpdate(1)(state);
+    updateFnAt(1)(state);
 
     expect(
       state.world.towns[twoSlotTown.id].commissionSlots.map(
@@ -288,7 +282,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {
@@ -329,7 +323,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {
@@ -359,7 +353,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {
@@ -378,7 +372,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: { towns: { [town.id]: { commissionSlots: [] } } },
     } as unknown as GameState;
@@ -390,7 +384,7 @@ describe('townCommissionProcessTick', () => {
   it('no-ops when the town has no state entry yet', () => {
     townCommissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = { world: { towns: {} } } as unknown as GameState;
 
     expect(() => updateFn(state)).not.toThrow();
@@ -413,7 +407,7 @@ describe('townCommissionProcessTick', () => {
 
       townCommissionProcessTick();
 
-      const updateFn = frozenUpdate(0);
+      const updateFn = updateFnAt(0);
       const state = {
         world: { towns: { [persistentTown.id]: { commissionSlots: [] } } },
       } as unknown as GameState;
@@ -434,7 +428,7 @@ describe('townCommissionProcessTick', () => {
 
       townCommissionProcessTick();
 
-      const updateFn = frozenUpdate(0);
+      const updateFn = updateFnAt(0);
       const state = {
         world: {
           towns: {
@@ -472,7 +466,7 @@ describe('townCommissionProcessTick', () => {
 
       townCommissionProcessTick();
 
-      const updateFn = frozenUpdate(0);
+      const updateFn = updateFnAt(0);
       const state = {
         world: {
           towns: {
@@ -516,7 +510,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
 
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {
@@ -545,7 +539,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
 
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {
@@ -573,7 +567,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
   it('no-ops when the town has no state entry', async () => {
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = { world: { towns: {} } } as unknown as GameState;
 
     expect(() => updateFn(state)).not.toThrow();
@@ -588,7 +582,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
 
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {

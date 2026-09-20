@@ -24,7 +24,6 @@ vi.mock('@helpers/state-game', () => {
 import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate } from '@helpers/state-game';
 import {
   applyTownStockAdd,
@@ -149,7 +148,6 @@ describe('applyTownStockAdd', () => {
     const state = {
       world: { towns: { [townId]: { stock } } },
     } as unknown as GameState;
-    deepFreeze(state.world.towns);
     return state;
   }
 

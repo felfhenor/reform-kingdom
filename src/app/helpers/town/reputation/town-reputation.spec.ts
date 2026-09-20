@@ -14,7 +14,6 @@ vi.mock('@helpers/state-game', () => {
 });
 
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   townReputation,
@@ -32,15 +31,6 @@ const townId = 'larsia' as TownId;
 beforeEach(() => {
   vi.clearAllMocks();
 });
-
-function withFrozenTowns(
-  fn: (state: GameState) => GameState,
-): (state: GameState) => GameState {
-  return (state) => {
-    deepFreeze(state.world?.towns);
-    return fn(state);
-  };
-}
 
 describe('townReputationTierForAmount', () => {
   it.each([
@@ -116,8 +106,7 @@ describe('townReputationGain', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -127,8 +116,7 @@ describe('townReputationGain', () => {
   });
 
   it('fires an analytics event tagged with the source', async () => {
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn({
         world: { towns: { [townId]: { reputation: 0 } } },
       } as unknown as GameState);
@@ -151,8 +139,7 @@ describe('townReputationGain', () => {
 
   it('does not throw when the town has no state entry', async () => {
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -165,8 +152,7 @@ describe('townReputationGain', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 90 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -177,8 +163,7 @@ describe('townReputationGain', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 0 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -189,8 +174,7 @@ describe('townReputationGain', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 7050 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -205,8 +189,7 @@ describe('townReputationLose', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 100 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -219,8 +202,7 @@ describe('townReputationLose', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 20 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -230,8 +212,7 @@ describe('townReputationLose', () => {
   });
 
   it('fires a distinct Lose analytics event tagged with the source', async () => {
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn({
         world: { towns: { [townId]: { reputation: 100 } } },
       } as unknown as GameState);
@@ -254,8 +235,7 @@ describe('townReputationLose', () => {
 
   it('does not throw when the town has no state entry', async () => {
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -268,8 +248,7 @@ describe('townReputationLose', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 110 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 
@@ -282,8 +261,7 @@ describe('townReputationLose', () => {
     const state = {
       world: { towns: { [townId]: { reputation: 110 } } },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
-      const fn = withFrozenTowns(updateFn);
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn(state);
     });
 

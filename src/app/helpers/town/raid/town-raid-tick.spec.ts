@@ -71,7 +71,6 @@ import { ensureTown } from '@helpers/content/ensure-town';
 import { notifyError } from '@helpers/engine/notify';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
@@ -150,13 +149,8 @@ beforeEach(() => {
   vi.mocked(raidAssaulterMonsterIds).mockReturnValue([]);
 });
 
-function frozenUpdate(index: number): (state: GameState) => GameState {
-  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
-
-  return (state) => {
-    deepFreeze(state.world?.towns);
-    return updateFn(state);
-  };
+function updateFnAt(index: number): (state: GameState) => GameState {
+  return vi.mocked(updateGamestate).mock.calls[index][0];
 }
 
 describe('townRaidProcessTick', () => {
@@ -254,7 +248,7 @@ describe('townRaidProcessTick', () => {
     // Must run from inside the updateGamestate callback (against the mutation-in-progress state),
     // not after it - updateGamestate is a bare mock here, so nothing else could have called it yet.
     expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: { towns: { [townId]: buildTownState() } },
     } as unknown as GameState;

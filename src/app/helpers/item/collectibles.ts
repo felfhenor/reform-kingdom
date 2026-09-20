@@ -3,7 +3,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { collectiblesState, updateGamestate } from '@helpers/state-game';
 import type {
@@ -50,10 +49,10 @@ export function applyCollectibleGrant(
   quantity: number,
 ): void {
   const existing = state.collectibles[collectibleId];
-  state.collectibles = dictionaryWith(state.collectibles, collectibleId, {
+  state.collectibles[collectibleId] = {
     quantity: (existing?.quantity ?? 0) + quantity,
     foundAt: existing?.foundAt ?? Date.now(),
-  });
+  };
   recomputeGlobalEffectSums(state);
 }
 
@@ -94,8 +93,8 @@ export function grantFoundingStoneIfMissing(
 
   if (collectibles[foundingStone.id]) return collectibles;
 
-  return dictionaryWith(collectibles, foundingStone.id, {
-    quantity: 1,
-    foundAt: Date.now(),
-  });
+  return {
+    ...collectibles,
+    [foundingStone.id]: { quantity: 1, foundAt: Date.now() },
+  };
 }

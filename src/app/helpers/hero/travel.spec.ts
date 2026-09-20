@@ -103,7 +103,6 @@ import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween, tileIsOnPath } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   gamestate,
   updateGamestate,
@@ -137,8 +136,6 @@ function stateWithTravel(travel: TravelState): GameState {
 }
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world?.travel);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

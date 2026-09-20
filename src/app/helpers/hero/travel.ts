@@ -11,7 +11,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
 import {
   addGlobalEffect,
@@ -276,11 +275,8 @@ function travelCompleteStep(
   }
 
   updateGamestate((state) => {
-    state.world.travel = dictionaryWith(
-      dictionaryWith(state.world.travel, 'path', remainingPath),
-      'ticksIntoStep',
-      0,
-    );
+    state.world.travel.path = remainingPath;
+    state.world.travel.ticksIntoStep = 0;
     return state;
   });
 }
@@ -298,11 +294,7 @@ export function travelProcessTick(): void {
 
   if (stepCost > 0 && ticksIntoStep < stepCost) {
     updateGamestate((state) => {
-      state.world.travel = dictionaryWith(
-        state.world.travel,
-        'ticksIntoStep',
-        ticksIntoStep,
-      );
+      state.world.travel.ticksIntoStep = ticksIntoStep;
       return state;
     });
     return;

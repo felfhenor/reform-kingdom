@@ -7,7 +7,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   combatItemDropRateBoost,
   rollDroppedRewards,
@@ -67,11 +66,7 @@ function markEncounterRandomCompleted(
     const nodeState = state.world.exploreRandom[encounterRandomId];
     if (!nodeState) return state;
 
-    state.world.exploreRandom = dictionaryWith(
-      state.world.exploreRandom,
-      encounterRandomId,
-      { ...nodeState, completedThisCycle: true },
-    );
+    nodeState.completedThisCycle = true;
     return state;
   });
 }

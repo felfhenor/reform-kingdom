@@ -51,7 +51,6 @@ import {
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   worldNodeCaravan,
@@ -70,13 +69,8 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 
-function frozenUpdate(index: number): (state: GameState) => GameState {
-  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
-
-  return (state) => {
-    deepFreeze(state.world?.caravans);
-    return updateFn(state);
-  };
+function updateFnAt(index: number): (state: GameState) => GameState {
+  return vi.mocked(updateGamestate).mock.calls[index][0];
 }
 
 describe('caravanWeightedSample', () => {
@@ -177,7 +171,7 @@ describe('caravanProcessTick', () => {
     caravanProcessTick();
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -199,7 +193,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -216,7 +210,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -236,7 +230,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -259,7 +253,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -279,7 +273,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -301,7 +295,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -320,7 +314,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -348,7 +342,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -376,7 +370,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -402,7 +396,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);
@@ -435,7 +429,7 @@ describe('caravanProcessTick', () => {
 
     caravanProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { caravans: {} },
     } as unknown as GameState);

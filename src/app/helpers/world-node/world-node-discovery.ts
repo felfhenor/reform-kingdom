@@ -2,7 +2,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import { notifySuccess } from '@helpers/engine/notify';
 import { updateGamestate, worldDiscoveriesState } from '@helpers/state-game';
 import type { GameStateWorldDiscoveries } from '@interfaces';
@@ -18,9 +17,9 @@ export function worldNodeDiscover(nodeName: string): void {
 
   updateGamestate((state) => {
     const existing = state.worldDiscoveries[nodeName];
-    state.worldDiscoveries = dictionaryWith(state.worldDiscoveries, nodeName, {
+    state.worldDiscoveries[nodeName] = {
       foundAt: existing?.foundAt ?? Date.now(),
-    });
+    };
     return state;
   });
 
@@ -35,10 +34,7 @@ export function worldNodeDiscover(nodeName: string): void {
 // Debug tool: reverts a node back to undiscovered.
 export function worldNodeUndiscover(nodeName: string): void {
   updateGamestate((state) => {
-    state.worldDiscoveries = dictionaryWithout(
-      state.worldDiscoveries,
-      nodeName,
-    );
+    delete state.worldDiscoveries[nodeName];
     return state;
   });
 }

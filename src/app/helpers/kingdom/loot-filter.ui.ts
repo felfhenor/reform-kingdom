@@ -1,5 +1,4 @@
 import { LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL } from '@helpers/config';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { lootFiltersState, updateGamestate } from '@helpers/state-game';
 import type {
   DropRarity,
@@ -27,14 +26,7 @@ export function lootFilterSetRarityKept(
   keep: boolean,
 ): void {
   updateGamestate((state) => {
-    state.lootFilters = {
-      ...state.lootFilters,
-      keepRarities: dictionaryWith(
-        state.lootFilters.keepRarities,
-        rarity,
-        keep,
-      ),
-    };
+    state.lootFilters.keepRarities[rarity] = keep;
     return state;
   });
 }
@@ -44,14 +36,7 @@ export function lootFilterSetEquipmentTypeKept(
   keep: boolean,
 ): void {
   updateGamestate((state) => {
-    state.lootFilters = {
-      ...state.lootFilters,
-      keepEquipmentTypes: dictionaryWith(
-        state.lootFilters.keepEquipmentTypes,
-        type,
-        keep,
-      ),
-    };
+    state.lootFilters.keepEquipmentTypes[type] = keep;
     return state;
   });
 }

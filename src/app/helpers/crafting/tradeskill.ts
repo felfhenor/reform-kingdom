@@ -9,7 +9,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
@@ -174,14 +173,10 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   let newLevel = previousLevel;
 
   updateGamestate((state) => {
-    state.tradeskills = dictionaryWith(
-      state.tradeskills,
-      tradeskillId,
-      tradeskillLeveledUp(
-        tradeskillBuildingIn(state, tradeskillId),
-        tradeskill,
-        amount,
-      ),
+    state.tradeskills[tradeskillId] = tradeskillLeveledUp(
+      tradeskillBuildingIn(state, tradeskillId),
+      tradeskill,
+      amount,
     );
     newLevel = state.tradeskills[tradeskillId].level;
     return state;

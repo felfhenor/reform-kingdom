@@ -51,7 +51,6 @@ import {
 } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   gamestate,
   updateGamestate,
@@ -117,13 +116,8 @@ beforeEach(() => {
   } as unknown as Combat);
 });
 
-function frozenUpdate(index: number): (state: GameState) => GameState {
-  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
-
-  return (state) => {
-    deepFreeze(state.world?.towns);
-    return updateFn(state);
-  };
+function updateFnAt(index: number): (state: GameState) => GameState {
+  return vi.mocked(updateGamestate).mock.calls[index][0];
 }
 
 describe('raidEngageCombat', () => {
@@ -197,7 +191,7 @@ describe('raidEngageCombat', () => {
     // deferred outside-tick commit leaves it reading stale gamestate.
     expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         combat: undefined,

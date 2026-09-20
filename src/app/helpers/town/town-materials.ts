@@ -1,7 +1,5 @@
 import { getEntry } from '@helpers/content/content';
-import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import { worldTownsState } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import type {
   CommissionRequirement,
   GameState,
@@ -24,12 +22,8 @@ export function applyTownMaterialDelta(
   const quantity = Math.max(0, current + delta);
   if (quantity === current) return;
 
-  updateTownNode(state, townId, (town) => {
-    town.materials =
-      quantity === 0
-        ? dictionaryWithout(town.materials, itemId)
-        : dictionaryWith(town.materials, itemId, quantity);
-  });
+  if (quantity === 0) delete target.materials[itemId];
+  else target.materials[itemId] = quantity;
 }
 
 export function townMaterialQuantity(townId: TownId, itemId: ItemId): number {

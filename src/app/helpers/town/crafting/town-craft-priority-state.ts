@@ -5,7 +5,6 @@ import {
   isRecipeCraftableByTown,
   isRecipeResultAtOrAboveThreshold,
 } from '@helpers/town/crafting/town-craft-eligibility';
-import { updateTownNode } from '@helpers/town/town-node';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -72,14 +71,14 @@ export function resetTownSpecialtyPriority(
   townId: TownId,
   recipeId: RecipeId,
 ): void {
-  updateTownNode(state, townId, (target) => {
-    const priority = target.specialtyPriority ?? [];
-    const remaining = priority.filter((entry) => entry.recipeId !== recipeId);
+  const target = state.world.towns[townId];
+  if (!target) return;
 
-    if (target.specialtyPriority && remaining.length === priority.length)
-      return;
-    target.specialtyPriority = remaining;
-  });
+  const priority = target.specialtyPriority ?? [];
+  const remaining = priority.filter((entry) => entry.recipeId !== recipeId);
+
+  if (target.specialtyPriority && remaining.length === priority.length) return;
+  target.specialtyPriority = remaining;
 }
 
 // Craftable-but-not-yet-picked is left alone - only an actual inability to craft counts as a failure.
@@ -89,16 +88,15 @@ function evaluateSpecialtyRecipe(
   town: TownContent,
   recipe: RecipeContent,
 ): void {
-  if (isBeingCraftedOrForSale(state.world.towns[town.id], recipe)) return;
+  const target = state.world.towns[town.id];
+  if (isBeingCraftedOrForSale(target, recipe)) return;
   if (isRecipeResultAtOrAboveThreshold(recipe, town)) return;
   if (isRecipeCraftableByTown(recipe, town)) return;
 
-  updateTownNode(state, town.id, (target) => {
-    target.specialtyPriority = upsertFailure(
-      target.specialtyPriority ?? [],
-      recipe.id,
-    );
-  });
+  target.specialtyPriority = upsertFailure(
+    target.specialtyPriority ?? [],
+    recipe.id,
+  );
 }
 
 function processTownSpecialtyPriority(town: TownContent): void {

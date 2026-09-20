@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(() => ({ id: goldCoinItemId })),
@@ -23,7 +22,6 @@ function buildState(hiddenGold: number): GameState {
   const state = {
     world: { towns: { [townId]: { hiddenGold } } },
   } as unknown as GameState;
-  deepFreeze(state.world.towns);
   return state;
 }
 

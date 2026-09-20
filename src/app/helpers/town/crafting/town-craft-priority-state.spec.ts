@@ -25,7 +25,6 @@ vi.mock('@helpers/town/town-tick', () => ({
 }));
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   pruneInvalidTownSpecialtyPriority,
@@ -115,7 +114,6 @@ function buildState(target: TownNodeState): GameState {
   const state = {
     world: { towns: { [townId]: target } },
   } as unknown as GameState;
-  deepFreeze(state.world.towns);
   return state;
 }
 
@@ -209,7 +207,6 @@ describe('townSpecialtyPriorityProcessTick', () => {
     vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
     const target = { craftQueue: [], stock: [] } as unknown as TownNodeState;
 
-    expect(() => applyTick(target)).not.toThrow();
     expect(applyTick(target).specialtyPriority).toEqual([
       { recipeId: ringRecipeId, failureCount: 1 },
     ]);

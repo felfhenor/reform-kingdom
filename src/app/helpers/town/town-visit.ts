@@ -3,7 +3,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import { townTradeskillsMaterialize } from '@helpers/town/crafting/town-craft-tradeskills';
@@ -27,7 +26,7 @@ export function townMarkVisited(townId: TownId): void {
     const existing = state.world.towns[townId];
     if (existing?.firstVisitedAtTick !== undefined) return state;
 
-    state.world.towns = dictionaryWith(state.world.towns, townId, {
+    state.world.towns[townId] = {
       lastProcessedTick: existing?.lastProcessedTick ?? {},
       stock: existing?.stock ?? [],
       workers: town
@@ -44,7 +43,7 @@ export function townMarkVisited(townId: TownId): void {
       commissionSlots: existing?.commissionSlots ?? [],
       specialtyPriority: existing?.specialtyPriority ?? [],
       firstVisitedAtTick: timerTicksElapsed(),
-    });
+    };
     return state;
   });
 

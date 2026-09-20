@@ -4,7 +4,6 @@ import {
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { newEquipmentItem } from '@helpers/item/equipment';
-import { isSameValue } from '@helpers/engine/shallow-equal';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
@@ -15,7 +14,6 @@ import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
-import { updateTownNode } from '@helpers/town/town-node';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -105,18 +103,17 @@ function advanceQueueEntry(
 // All queue entries advance/complete together in one pass - a town has multiple workers crafting in tandem, not one at a time.
 function processExistingQueue(state: GameState, town: TownContent): void {
   const nextQueue: TownCraftQueueEntry[] = [];
-  const currentQueue = state.world.towns[town.id].craftQueue;
+  const target = state.world.towns[town.id];
+  const currentQueue = target.craftQueue;
 
   currentQueue.forEach((entry) => {
     const kept = advanceQueueEntry(state, town, entry);
     if (kept) nextQueue.push(kept);
   });
 
-  if (isSameValue(nextQueue, currentQueue)) return;
+  if (nextQueue.length === 0 && currentQueue.length === 0) return;
 
-  updateTownNode(state, town.id, (target) => {
-    target.craftQueue = nextQueue;
-  });
+  target.craftQueue = nextQueue;
 }
 
 // Below craftingChanceItemThreshold (or the queue is empty), queue every chance it can, materials permitting;
@@ -146,16 +143,11 @@ function maybeQueueNewCraft(state: GameState, town: TownContent): void {
     }
   });
 
-  updateTownNode(state, town.id, (target) => {
-    target.craftQueue = [
-      ...target.craftQueue,
-      {
-        id: rngUuid() as CraftQueueEntryId,
-        tradeskillId: pick.tradeskillId,
-        recipeId: pick.recipe.id,
-        ticksIntoCraft: 0,
-      },
-    ];
+  state.world.towns[town.id].craftQueue.push({
+    id: rngUuid() as CraftQueueEntryId,
+    tradeskillId: pick.tradeskillId,
+    recipeId: pick.recipe.id,
+    ticksIntoCraft: 0,
   });
 }
 

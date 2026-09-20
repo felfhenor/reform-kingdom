@@ -4,7 +4,6 @@ import {
 } from '@helpers/caravan/caravan';
 import { ACTIVE_TRADE_COUNT } from '@helpers/config';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
@@ -125,14 +124,14 @@ function regenerateCaravanNode(
       : undefined;
 
   updateGamestate((state) => {
-    state.world.caravans = dictionaryWith(state.world.caravans, content.id, {
+    state.world.caravans[content.id] = {
       traderId: trader?.id,
       visitedTraderId,
       activeTradeIndices,
       rolledEquipment,
       tradeCounts: {},
       generatedAtTick: nowTick,
-    });
+    };
     return state;
   });
 }

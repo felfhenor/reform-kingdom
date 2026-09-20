@@ -36,7 +36,6 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   townWorkerGatherRate,
@@ -75,8 +74,6 @@ function buildTown(gatherRateMultiplier = 1): TownContent {
 }
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world?.towns);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

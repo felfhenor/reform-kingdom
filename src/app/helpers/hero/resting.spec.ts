@@ -33,7 +33,6 @@ vi.mock('@helpers/state-game', () => {
 });
 
 import { getEntry } from '@helpers/content/content';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   addGlobalEffect,
   isGlobalEffectActive,
@@ -87,8 +86,6 @@ function mockState(
 }
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world.party);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   return calls[calls.length - 1][0](state);
 }

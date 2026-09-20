@@ -12,7 +12,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { updateGamestate, worldCommissionsState } from '@helpers/state-game';
 import type {
   CaravanId,
@@ -93,10 +92,7 @@ export async function commissionFulfill(
 
     spendCommissionRequirements(s, nodeState.requirements);
     if (offer) grantCommissionRewards(s, offer);
-    s.world.commissions = dictionaryWith(s.world.commissions, caravanId, {
-      ...nodeState,
-      completed: true,
-    });
+    nodeState.completed = true;
     fulfilled = true;
 
     return s;

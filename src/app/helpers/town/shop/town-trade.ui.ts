@@ -16,7 +16,6 @@ import {
   armoryHasRoomForState,
 } from '@helpers/kingdom/armory';
 import { updateGamestate } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
 import { townStockAffordable } from '@helpers/town/shop/town-trade';
@@ -86,11 +85,9 @@ export async function townExecuteTrade(
 
     grantStockEntry(state, liveEntry);
     spendGold(state, price);
-    updateTownNode(state, townId, (town) => {
-      town.stock = town.stock.filter(
-        (stockEntry) => stockEntry.equipmentItem.id !== itemId,
-      );
-    });
+    target.stock = target.stock.filter(
+      (stockEntry) => stockEntry.equipmentItem.id !== itemId,
+    );
     executed = true;
 
     return state;

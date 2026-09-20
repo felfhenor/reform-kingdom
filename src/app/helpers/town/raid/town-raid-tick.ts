@@ -20,7 +20,6 @@ import {
   worldCombatState,
   worldTownsState,
 } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
@@ -61,11 +60,12 @@ export function telegraphRaid(town: TownContent): void {
   );
 
   updateGamestate((state) => {
-    updateTownNode(state, town.id, (target) => {
+    const target = state.world.towns[town.id];
+    if (target) {
       target.raidTelegraphedAtTick = now;
       target.raidEngageWindowExpiresAtTick = now + windowTicks;
       target.raidTelegraphedAssaulterIds = assaulterMonsterIds;
-    });
+    }
     raidDefenseGlobalEffectApply(state, now);
     return state;
   });

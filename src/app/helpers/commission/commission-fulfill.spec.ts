@@ -57,7 +57,6 @@ import {
   getMaterialQuantity,
 } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   CaravanId,
@@ -134,13 +133,8 @@ function withCommissionState(state: unknown): void {
   } as unknown as GameState);
 }
 
-function frozenUpdate(index: number): (state: GameState) => GameState {
-  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
-
-  return (state) => {
-    deepFreeze(state.world?.commissions);
-    return updateFn(state);
-  };
+function updateFnAt(index: number): (state: GameState) => GameState {
+  return vi.mocked(updateGamestate).mock.calls[index][0];
 }
 
 describe('commissionRequirementEntries', () => {
@@ -401,7 +395,7 @@ describe('commissionFulfill', () => {
     // before the outer promise is awaited.
     const resultPromise = commissionFulfill(caravanId);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       materials: { [wergenStick.id]: { quantity: 100, foundAt: 1 } },
       armory: [],
@@ -447,7 +441,7 @@ describe('commissionFulfill', () => {
 
     const resultPromise = commissionFulfill(caravanId);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       materials: {},
       armory: [
@@ -485,7 +479,7 @@ describe('commissionFulfill', () => {
 
     const resultPromise = commissionFulfill(caravanId);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       materials: {},
       armory: [],

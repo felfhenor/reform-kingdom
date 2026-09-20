@@ -22,7 +22,6 @@ vi.mock('@helpers/state-game', () => {
 });
 
 import { getEntry } from '@helpers/content/content';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   addMaterial,
   applyMaterialDelta,
@@ -201,79 +200,6 @@ describe('Material Helper Functions', () => {
       applyMaterialDelta(state, goldCoinId, -4);
 
       expect(state.discoveredMaterials[goldCoinId]).toBeUndefined();
-    });
-  });
-
-  describe('applyMaterialDelta copy-on-write', () => {
-    function frozenState(
-      materials: GameStateMaterials,
-      discoveredMaterials: GameStateDiscoveredMaterials = {},
-    ): GameState {
-      return {
-        materials: deepFreeze(materials),
-        discoveredMaterials: deepFreeze(discoveredMaterials),
-      } as unknown as GameState;
-    }
-
-    it('replaces materials and discoveredMaterials when a new material is added', () => {
-      const state = frozenState({});
-      const previousMaterials = state.materials;
-      const previousDiscovered = state.discoveredMaterials;
-
-      applyMaterialDelta(state, goldCoinId, 3);
-
-      expect(state.materials).not.toBe(previousMaterials);
-      expect(state.discoveredMaterials).not.toBe(previousDiscovered);
-    });
-
-    it('replaces only materials when topping up an already-discovered material', () => {
-      const state = frozenState(
-        { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-        { [goldCoinId]: { foundAt: 1000 } },
-      );
-      const previousMaterials = state.materials;
-      const previousDiscovered = state.discoveredMaterials;
-
-      applyMaterialDelta(state, goldCoinId, 2);
-
-      expect(state.materials).not.toBe(previousMaterials);
-      expect(state.discoveredMaterials).toBe(previousDiscovered);
-    });
-
-    it('replaces materials when partially subtracting or depleting', () => {
-      const state = frozenState({ [goldCoinId]: { quantity: 5, foundAt: 1 } });
-      const beforePartial = state.materials;
-
-      applyMaterialDelta(state, goldCoinId, -2);
-      const afterPartial = state.materials;
-      applyMaterialDelta(state, goldCoinId, -100);
-
-      expect(afterPartial).not.toBe(beforePartial);
-      expect(state.materials).not.toBe(afterPartial);
-      expect(state.materials[goldCoinId]).toBeUndefined();
-    });
-
-    it('leaves materials reference-stable when nothing changes', () => {
-      const state = frozenState({ [goldCoinId]: { quantity: 5, foundAt: 1 } });
-      const previous = state.materials;
-
-      applyMaterialDelta(state, goldCoinId, 0);
-      applyMaterialDelta(state, 'absent' as MaterialId, -3);
-
-      expect(state.materials).toBe(previous);
-    });
-
-    it('leaves other materials reference-stable', () => {
-      const otherId = 'copper-ore' as MaterialId;
-      const state = frozenState({
-        [goldCoinId]: { quantity: 5, foundAt: 1 },
-        [otherId]: { quantity: 9, foundAt: 2 },
-      });
-      const previousOther = state.materials[otherId];
-
-      applyMaterialDelta(state, goldCoinId, 1);
-
-      expect(state.materials[otherId]).toBe(previousOther);
     });
   });
 

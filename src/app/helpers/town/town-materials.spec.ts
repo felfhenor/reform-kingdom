@@ -13,7 +13,6 @@ vi.mock('@helpers/state-game', () => {
 });
 
 import { getEntry } from '@helpers/content/content';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate } from '@helpers/state-game';
 import {
   applyTownMaterialDelta,
@@ -30,7 +29,6 @@ function buildState(materials: Partial<Record<ItemId, number>>): GameState {
   const state = {
     world: { towns: { [townId]: { materials } } },
   } as unknown as GameState;
-  deepFreeze(state.world.towns);
   return state;
 }
 

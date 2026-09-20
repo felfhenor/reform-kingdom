@@ -77,7 +77,6 @@ import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { rollDroppedRewards } from '@helpers/item/loot';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate } from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import {
@@ -133,7 +132,6 @@ function buildTownNodeState(
 // tests that need the post-update loss messages must make the mock do the same against a state fixture.
 function mockUpdateGamestateWith(state: GameState): void {
   vi.mocked(updateGamestate).mockImplementation((fn) => {
-    deepFreeze(state.world?.towns);
     fn(state);
     return Promise.resolve();
   });
@@ -144,13 +142,8 @@ beforeEach(() => {
   vi.mocked(getEntry).mockReturnValue(buildTown() as never);
 });
 
-function frozenUpdate(index: number): (state: GameState) => GameState {
-  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
-
-  return (state) => {
-    deepFreeze(state.world?.towns);
-    return updateFn(state);
-  };
+function updateFnAt(index: number): (state: GameState) => GameState {
+  return vi.mocked(updateGamestate).mock.calls[index][0];
 }
 
 describe('raidResolveVictory', () => {
@@ -189,7 +182,7 @@ describe('raidResolveVictory', () => {
   it('sets lastRaidResolvedAtTick', () => {
     raidResolveVictory({} as Combat, townId);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: { towns: { [townId]: { lastRaidResolvedAtTick: undefined } } },
     } as unknown as GameState;
@@ -238,7 +231,7 @@ describe('raidResolveDefeat', () => {
   it('applies the raid-loss state updates', () => {
     raidResolveDefeat(townId);
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const state = {
       world: {
         towns: {

@@ -8,7 +8,6 @@ import {
   VALUE_MULTIPLIER_PER_STAT,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import {
@@ -118,11 +117,9 @@ export function markEquipmentDiscovered(
   equipmentId: EquipmentId,
 ): void {
   const existing = state.discoveredEquipment[equipmentId];
-  state.discoveredEquipment = dictionaryWith(
-    state.discoveredEquipment,
-    equipmentId,
-    { foundAt: existing?.foundAt ?? Date.now() },
-  );
+  state.discoveredEquipment[equipmentId] = {
+    foundAt: existing?.foundAt ?? Date.now(),
+  };
 }
 
 // Clamps to available room (or skips the check for debug tooling) and returns what was actually admitted - a full armory can mean fewer items landed than requested.

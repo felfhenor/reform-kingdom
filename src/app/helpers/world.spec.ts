@@ -14,7 +14,6 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeAt: vi.fn(),
 }));
 
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { currentLocationSet, isPlayerAtKingdom } from '@helpers/world';
 import { worldNodeAt } from '@helpers/world-node/world-nodes';
@@ -34,7 +33,7 @@ describe('World Helper Functions', () => {
       const state = {
         world: { currentLocation: { mapName: 'Carrina', x: 24, y: 24 } },
       } as unknown as GameState;
-      const previousLocation = deepFreeze(state.world.currentLocation);
+      const previousLocation = state.world.currentLocation;
       const result = updateFn(state);
 
       expect(result.world.currentLocation).toEqual(location);

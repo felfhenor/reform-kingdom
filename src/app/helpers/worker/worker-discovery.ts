@@ -3,7 +3,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
 import { notifySuccess } from '@helpers/engine/notify';
 import { discoveredWorkersState, updateGamestate } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
@@ -30,16 +29,8 @@ export function workerRescue(workerId: WorkerId): void {
   if (!worker) return;
 
   updateGamestate((state) => {
-    state.discoveredWorkers = dictionaryWith(
-      state.discoveredWorkers,
-      workerId,
-      { foundAt: Date.now() },
-    );
-    state.workers = dictionaryWith(
-      state.workers,
-      workerId,
-      defaultWorkerState(),
-    );
+    state.discoveredWorkers[workerId] = { foundAt: Date.now() };
+    state.workers[workerId] = defaultWorkerState();
     return state;
   });
 
@@ -52,11 +43,8 @@ export function workerRescue(workerId: WorkerId): void {
 // Debug tool: reverts a worker back to unrescued.
 export function workerUndiscover(workerId: WorkerId): void {
   updateGamestate((state) => {
-    state.discoveredWorkers = dictionaryWithout(
-      state.discoveredWorkers,
-      workerId,
-    );
-    state.workers = dictionaryWithout(state.workers, workerId);
+    delete state.discoveredWorkers[workerId];
+    delete state.workers[workerId];
     return state;
   });
 }

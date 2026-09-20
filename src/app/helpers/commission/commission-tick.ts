@@ -4,7 +4,6 @@ import {
   rollCommissionRequirements,
 } from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { updateGamestate, worldCommissionsState } from '@helpers/state-game';
 import {
@@ -39,16 +38,12 @@ function regenerateCommissionNode(caravan: CaravanContent, now: number): void {
   if (!offer) return;
 
   updateGamestate((state) => {
-    state.world.commissions = dictionaryWith(
-      state.world.commissions,
-      caravan.id,
-      {
-        commissionOfferId: offer.id,
-        requirements: rollCommissionRequirements(offer),
-        completed: false,
-        generatedAt: now,
-      },
-    );
+    state.world.commissions[caravan.id] = {
+      commissionOfferId: offer.id,
+      requirements: rollCommissionRequirements(offer),
+      completed: false,
+      generatedAt: now,
+    };
     return state;
   });
 }

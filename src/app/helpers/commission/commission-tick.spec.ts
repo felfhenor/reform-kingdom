@@ -35,7 +35,6 @@ import {
 } from '@helpers/commission/commission-tick';
 import { getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted, rngNumberRange } from '@helpers/rng';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   worldNodeCaravan,
@@ -89,13 +88,8 @@ function withCommissionState(commissions: Record<string, unknown>): void {
   } as unknown as GameState);
 }
 
-function frozenUpdate(index: number): (state: GameState) => GameState {
-  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
-
-  return (state) => {
-    deepFreeze(state.world?.commissions);
-    return updateFn(state);
-  };
+function updateFnAt(index: number): (state: GameState) => GameState {
+  return vi.mocked(updateGamestate).mock.calls[index][0];
 }
 
 describe('commissionProcessTick', () => {
@@ -134,7 +128,7 @@ describe('commissionProcessTick', () => {
     commissionProcessTick();
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { commissions: {} },
     } as unknown as GameState);
@@ -195,7 +189,7 @@ describe('commissionProcessTick', () => {
 
     commissionProcessTick();
 
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { commissions: {} },
     } as unknown as GameState);
@@ -314,7 +308,7 @@ describe('commissionGenerateIfMissing', () => {
     commissionGenerateIfMissing(caravan.id);
 
     expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = frozenUpdate(0);
+    const updateFn = updateFnAt(0);
     const result = updateFn({
       world: { commissions: {} },
     } as unknown as GameState);

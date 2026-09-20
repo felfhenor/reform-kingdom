@@ -23,7 +23,6 @@ vi.mock('@helpers/town/town-materials', () => ({
 
 import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
 import { travelStepTicksCost } from '@helpers/hero/travel';
-import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
@@ -52,8 +51,6 @@ function buildTown(): TownContent {
 }
 
 function applyLastUpdate(state: GameState): GameState {
-  deepFreeze(state.world?.towns);
-
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

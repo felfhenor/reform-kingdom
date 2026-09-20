@@ -3,7 +3,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { dictionaryWith } from '@helpers/engine/dictionary';
 import { bestiaryState, updateGamestate } from '@helpers/state-game';
 import type {
   EncounterContent,
@@ -53,7 +52,7 @@ export function monsterRecordKill(
     const existingMin = existing?.minLevelFound;
     const existingMax = existing?.maxLevelFound;
 
-    state.bestiary = dictionaryWith(state.bestiary, monsterId, {
+    state.bestiary[monsterId] = {
       foundAt: existing?.foundAt ?? Date.now(),
       kills: (existing?.kills ?? 0) + 1,
       minLevelFound: Number.isFinite(existingMin)
@@ -63,7 +62,7 @@ export function monsterRecordKill(
         ? Math.max(existingMax as number, level)
         : level,
       foundAtNodes: [...foundAtNodes],
-    });
+    };
     return state;
   });
 

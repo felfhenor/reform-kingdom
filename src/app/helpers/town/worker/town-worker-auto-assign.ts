@@ -15,11 +15,7 @@ import {
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
-import type {
-  TownContent,
-  TownWorkerAssignment,
-  WorkerId,
-} from '@interfaces';
+import type { TownContent, TownWorkerAssignment, WorkerId } from '@interfaces';
 
 // One candidate per (reachable GatherNode, gatherable item) pair - weighted by that
 // result's authored chance, so richer nodes/results are picked more often.
@@ -47,7 +43,8 @@ function candidateAssignments(
             return;
 
           const weight =
-            result.chance * townItemPriorityWeightFromMap(priorityMap, item.itemId);
+            result.chance *
+            townItemPriorityWeightFromMap(priorityMap, item.itemId);
           candidates.push({ ...assignment, weight });
         });
       },
@@ -65,7 +62,9 @@ export function townPickGatherAssignment(
 ): TownWorkerAssignment | undefined {
   const candidates = candidateAssignments(town, workerId, level);
   const picked = rngChoiceWeighted(candidates, (candidate) => candidate.weight);
-  return picked ? { nodeName: picked.nodeName, itemId: picked.itemId } : undefined;
+  return picked
+    ? { nodeName: picked.nodeName, itemId: picked.itemId }
+    : undefined;
 }
 
 export function townWorkerAutoAssign(

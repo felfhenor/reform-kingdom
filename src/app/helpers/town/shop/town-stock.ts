@@ -3,7 +3,6 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { worldTownsState } from '@helpers/state-game';
-import { updateTownNode } from '@helpers/town/town-node';
 import type {
   EquipmentContent,
   GameState,
@@ -65,7 +64,5 @@ export function applyTownStockAdd(
     ...addition,
     addedAtTick: timerTicksElapsed(),
   };
-  updateTownNode(state, townId, (town) => {
-    town.stock = [...town.stock, entry];
-  });
+  target.stock.push(entry);
 }

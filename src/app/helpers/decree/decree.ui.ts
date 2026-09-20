@@ -1,7 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { decreeClauseConflicts, decreeClauses } from '@helpers/decree/decree';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { autoModePatch } from '@helpers/decree/auto-mode-state';
 import { updateGamestate, worldAutoModeState } from '@helpers/state-game';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
@@ -17,14 +16,14 @@ export function decreeActiveClauseId(): DecreeClauseId | undefined {
 
 export function decreeSetWaitForFullHealthBeforeCombat(value: boolean): void {
   updateGamestate((state) => {
-    autoModePatch(state, { waitForFullHealthBeforeCombat: value });
+    state.world.autoMode.waitForFullHealthBeforeCombat = value;
     return state;
   });
 }
 
 export function decreeSetWaitForFullEnergyBeforeCombat(value: boolean): void {
   updateGamestate((state) => {
-    autoModePatch(state, { waitForFullEnergyBeforeCombat: value });
+    state.world.autoMode.waitForFullEnergyBeforeCombat = value;
     return state;
   });
 }
@@ -42,18 +41,12 @@ export function decreeClauseUpdate(
   if (decreeClauseConflicts(action, otherClauses)) return false;
 
   updateGamestate((state) => {
-    autoModePatch(state, {
-      clauses: state.world.autoMode.clauses.map((clause) =>
-        clause.id === clauseId
-          ? {
-              ...action,
-              id: clause.id,
-              enabled: clause.enabled,
-              failureCount: clause.failureCount,
-            }
-          : clause,
-      ),
-    });
+    const clauses = state.world.autoMode.clauses;
+    const index = clauses.findIndex((clause) => clause.id === clauseId);
+    if (index === -1) return state;
+
+    const { enabled, failureCount } = clauses[index];
+    clauses[index] = { ...action, id: clauseId, enabled, failureCount };
     return state;
   });
 
@@ -70,13 +63,11 @@ export function decreeClauseRemove(clauseId: DecreeClauseId): void {
     if (!existedBefore) return state;
     didRemove = true;
 
-    autoModePatch(state, {
-      clauses: state.world.autoMode.clauses.filter(
-        (clause) => clause.id !== clauseId,
-      ),
-    });
+    state.world.autoMode.clauses = state.world.autoMode.clauses.filter(
+      (clause) => clause.id !== clauseId,
+    );
     if (state.world.autoMode.activeClauseId === clauseId) {
-      autoModePatch(state, { activeClauseId: undefined });
+      state.world.autoMode.activeClauseId = undefined;
     }
     return state;
   });
