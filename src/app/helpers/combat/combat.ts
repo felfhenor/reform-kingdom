@@ -252,8 +252,8 @@ export function combatDoCombatIteration(): void {
 
   if (combatCheckIfOver(current)) return;
 
-  // Combatants mutate in place, so a fresh top-level reference each round is what notifies subscribers.
-  const combat = { ...current };
+  // The engine mutates combatants in place and committed state is frozen, so each round works on its own copy.
+  const combat = structuredClone(current);
 
   beginCombatLogCommits();
 

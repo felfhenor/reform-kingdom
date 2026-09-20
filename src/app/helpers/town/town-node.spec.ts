@@ -7,6 +7,7 @@ import type {
   TownWorkerState,
   WorkerId,
 } from '@interfaces';
+import { produce } from 'immer';
 import { describe, expect, it } from 'vitest';
 
 const townId = 'larsia' as TownId;
@@ -167,5 +168,69 @@ describe('updateTownWorker', () => {
     });
 
     expect(state.world.towns).toBe(previousDict);
+  });
+});
+
+describe('inside an Immer draft', () => {
+  it('updateTownNode edits the draft, replacing only the touched node', () => {
+    const base = buildState();
+
+    const next = produce(base, (draft) => {
+      updateTownNode(draft, townId, (town) => {
+        town.hiddenGold = 5;
+      });
+    });
+
+    expect(next.world.towns[townId].hiddenGold).toBe(5);
+    expect(next.world.towns[otherTownId]).toBe(base.world.towns[otherTownId]);
+    expect(base.world.towns[townId].hiddenGold).toBe(0);
+  });
+
+  it('a callback that changes nothing leaves the state reference alone', () => {
+    const base = buildState();
+
+    const next = produce(base, (draft) => {
+      updateTownNode(draft, townId, (town) => {
+        town.hiddenGold += 0;
+      });
+    });
+
+    expect(next).toBe(base);
+  });
+
+  it('updateTownWorker edits the worker and keeps its siblings by reference', () => {
+    const base = buildState();
+    base.world.towns[townId] = buildTown({
+      workers: {
+        [workerId]: buildWorker(),
+        other: buildWorker(),
+      } as never,
+    });
+
+    const next = produce(base, (draft) => {
+      updateTownWorker(draft, townId, workerId, (worker) => {
+        worker.level = 4;
+      });
+    });
+
+    expect(next.world.towns[townId].workers[workerId].level).toBe(4);
+    expect(next.world.towns[townId].workers['other' as WorkerId]).toBe(
+      base.world.towns[townId].workers['other' as WorkerId],
+    );
+  });
+
+  it('keeps entry identity between a draft read and a later filter in the node', () => {
+    const entries = [{ id: 'a' }, { id: 'b' }] as never[];
+    const base = buildState();
+    base.world.towns[townId] = buildTown({ stock: entries });
+
+    const next = produce(base, (draft) => {
+      const stolen = [draft.world.towns[townId].stock[0]];
+      updateTownNode(draft, townId, (town) => {
+        town.stock = town.stock.filter((entry) => !stolen.includes(entry));
+      });
+    });
+
+    expect(next.world.towns[townId].stock).toEqual([{ id: 'b' }]);
   });
 });

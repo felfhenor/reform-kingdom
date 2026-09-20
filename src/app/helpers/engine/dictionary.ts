@@ -1,10 +1,17 @@
 import { mapValues } from 'es-toolkit/compat';
+import { isDraft } from 'immer';
 
 export function dictionaryWith<T extends object, K extends keyof T>(
   dictionary: T,
   key: K,
   value: T[K],
 ): T {
+  // Mutates a draft argument in place (and returns it) - spreading one would create a proxy per entry.
+  if (isDraft(dictionary)) {
+    dictionary[key] = value;
+    return dictionary;
+  }
+
   return { ...dictionary, [key]: value };
 }
 
@@ -26,6 +33,11 @@ export function dictionaryWithout<T extends object>(
   key: keyof T,
 ): T {
   if (!(key in dictionary)) return dictionary;
+
+  if (isDraft(dictionary)) {
+    delete dictionary[key];
+    return dictionary;
+  }
 
   const copy = { ...dictionary };
   delete copy[key];

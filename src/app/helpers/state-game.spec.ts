@@ -124,16 +124,25 @@ describe('a tick left open by a failed subsystem', () => {
     expect(gamestate().workers[WORKER_ID].level).toBe(9);
   });
 
-  it('keeps in-place writes under a nested key visible in live state regardless of commit', () => {
-    const state = seedState();
+  it('discards the writes of a callback that throws, keeping earlier ones', async () => {
+    seedState();
+    const level = computed(() => workersState()[WORKER_ID].level);
+    level();
 
     gamestateTickStart();
-    updateGamestate((draft) => {
-      draft.clock.numTicks += 5;
-      return draft;
+    updateGamestate((state) => {
+      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(4) };
+      return state;
     });
+    await expect(
+      updateGamestate((state) => {
+        state.workers[WORKER_ID].level = 99;
+        throw new Error('boom');
+      }),
+    ).rejects.toThrow('boom');
+    gamestateTickEnd();
 
-    expect(state.clock.numTicks).toBe(5);
+    expect(level()).toBe(4);
   });
 
   it('lets later non-tick updates commit and notify once the tick is closed', async () => {
@@ -357,5 +366,94 @@ describe('workersState', () => {
     downstream();
 
     expect(evaluations).toBe(before);
+  });
+});
+
+describe('updateGamestate with Immer drafts', () => {
+  afterEach(() => gamestateTickEnd());
+
+  it('lets a callback mutate the draft in place and commits a new state', async () => {
+    const state = seedState();
+
+    await updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 7;
+      return draft;
+    });
+
+    expect(gamestate().workers[WORKER_ID].level).toBe(7);
+    expect(state.workers[WORKER_ID].level).toBe(1);
+    expect(workersState()).not.toBe(state.workers);
+  });
+
+  it('freezes committed state so a stray in-place write throws', async () => {
+    seedState();
+
+    await updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 7;
+      return draft;
+    });
+
+    expect(() => {
+      gamestate().workers[WORKER_ID].level = 9;
+    }).toThrow();
+  });
+
+  it('shows a callback its own earlier writes through gamestate() and slice selectors', async () => {
+    seedState();
+    let seenByGamestate = 0;
+    let seenBySelector = 0;
+
+    await updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 5;
+      seenByGamestate = gamestate().workers[WORKER_ID].level;
+      seenBySelector = workersState()[WORKER_ID].level;
+      return draft;
+    });
+
+    expect(seenByGamestate).toBe(5);
+    expect(seenBySelector).toBe(5);
+  });
+
+  it('joins a nested in-tick update into the running callback', () => {
+    seedState();
+
+    gamestateTickStart();
+    updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 3;
+      updateGamestate((inner) => {
+        inner.workers[WORKER_ID].level += 1;
+        return inner;
+      });
+      return draft;
+    });
+    gamestateTickEnd();
+
+    expect(gamestate().workers[WORKER_ID].level).toBe(4);
+  });
+
+  it('applies a non-tick update that resumes after a tick opened to that tick', async () => {
+    seedState();
+
+    const pending = updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 6;
+      return draft;
+    });
+    gamestateTickStart();
+    await pending;
+    gamestateTickEnd();
+
+    expect(gamestate().workers[WORKER_ID].level).toBe(6);
+  });
+
+  it('keeps the previous state when a callback returns nothing', async () => {
+    const state = seedState();
+
+    await updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 8;
+      return undefined as unknown as GameState;
+    });
+
+    expect(gamestate().workers[WORKER_ID].level).toBe(1);
+    expect(workersState()).toBe(state.workers);
   });
 });

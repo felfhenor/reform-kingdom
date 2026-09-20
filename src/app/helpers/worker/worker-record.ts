@@ -1,7 +1,8 @@
 import { dictionaryWith } from '@helpers/engine/dictionary';
 import type { GameState, WorkerId, WorkerState } from '@interfaces';
+import { isDraft } from 'immer';
 
-// The draft is a shallow copy: reassign nested fields (`status`, `xp`) instead of mutating them in place.
+// Outside Immer the draft is a shallow copy, so reassign nested fields (`status`, `xp`) instead of mutating them in place.
 export function updateWorkerRecord(
   state: GameState,
   workerId: WorkerId,
@@ -9,6 +10,11 @@ export function updateWorkerRecord(
 ): GameState {
   const existing = state.workers[workerId];
   if (!existing) return state;
+
+  if (isDraft(existing)) {
+    fn(existing);
+    return state;
+  }
 
   const draft = { ...existing };
   fn(draft);

@@ -4,6 +4,7 @@ import {
   dictionaryWith,
   dictionaryWithout,
 } from '@helpers/engine/dictionary';
+import { produce } from 'immer';
 import { describe, expect, it } from 'vitest';
 
 describe('dictionaryMapValues', () => {
@@ -71,5 +72,30 @@ describe('dictionaryWithout', () => {
     const original: Record<string, { n: number }> = deepFreeze({ a: { n: 1 } });
 
     expect(dictionaryWithout(original, 'missing')).toBe(original);
+  });
+});
+
+describe('inside an Immer draft', () => {
+  it('dictionaryWith writes through the draft and keeps other entries by reference', () => {
+    const base = { a: { n: 1 }, b: { n: 2 } };
+
+    const next = produce(base, (draft) => {
+      expect(dictionaryWith(draft, 'a', { n: 9 })).toBe(draft);
+    });
+
+    expect(next.a).toEqual({ n: 9 });
+    expect(next.b).toBe(base.b);
+    expect(base.a).toEqual({ n: 1 });
+  });
+
+  it('dictionaryWithout deletes through the draft', () => {
+    const base: Record<string, { n: number }> = { a: { n: 1 }, b: { n: 2 } };
+
+    const next = produce(base, (draft) => {
+      expect(dictionaryWithout(draft, 'a')).toBe(draft);
+    });
+
+    expect(next).toEqual({ b: { n: 2 } });
+    expect(base.a).toEqual({ n: 1 });
   });
 });

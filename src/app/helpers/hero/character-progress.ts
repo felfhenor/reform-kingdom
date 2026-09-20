@@ -88,15 +88,15 @@ function characterLeveledUp(character: Character, amount: number): Character {
 }
 
 // Skills are derived from job + level, not tracked as "known" state, so diffing before/after ids also announces rank upgrades (e.g. Double Strike I -> II).
-function logCharacterProgress(before: Character, after: Character): void {
-  if (after.level === before.level) return;
+function logCharacterProgress(beforeLevel: number, after: Character): void {
+  if (after.level === beforeLevel) return;
 
   miscellaneousMessageLog(`**${after.name}** reached level ${after.level}!`);
 
   const job = getEntry<JobContent>(after.jobId);
   if (!job) return;
 
-  const previousSkillIds = new Set(heroSkillsAtLevel(job, before.level));
+  const previousSkillIds = new Set(heroSkillsAtLevel(job, beforeLevel));
   const newSkillIds = heroSkillsAtLevel(job, after.level).filter(
     (skillId) => !previousSkillIds.has(skillId),
   );
@@ -140,24 +140,25 @@ export function retrofitPartyXp(party: Character[]): Character[] {
 // The return value tells callers when to retry nodes previously given up on.
 export function partyGainXp(amount: number): boolean {
   const boostedAmount = Math.round(amount * xpGainMultiplier());
-  const progress: { before: Character; after: Character }[] = [];
+  // Only the level is kept from the pre-update character - the character itself is a draft and is revoked after the callback.
+  const progress: { beforeLevel: number; after: Character }[] = [];
 
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => {
       const updated = characterLeveledUp(character, boostedAmount);
-      progress.push({ before: character, after: updated });
+      progress.push({ beforeLevel: character.level, after: updated });
       return updated;
     });
 
     return state;
   });
 
-  progress.forEach(({ before, after }) => {
-    if (after.level > before.level) {
+  progress.forEach(({ beforeLevel, after }) => {
+    if (after.level > beforeLevel) {
       analyticsSendDesignEvent('Hero:LevelUp', after.level);
     }
-    logCharacterProgress(before, after);
+    logCharacterProgress(beforeLevel, after);
   });
 
-  return progress.some((p) => p.after.level > p.before.level);
+  return progress.some((p) => p.after.level > p.beforeLevel);
 }

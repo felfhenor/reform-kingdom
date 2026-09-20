@@ -1,6 +1,7 @@
 import { defaultGameState } from '@helpers/defaults';
 import { updateWorkerRecord } from '@helpers/worker/worker-record';
 import type { GameState, WorkerId, WorkerState } from '@interfaces';
+import { produce } from 'immer';
 import { describe, expect, it } from 'vitest';
 
 const WORKER_ID = 'weaver-nell' as WorkerId;
@@ -78,5 +79,21 @@ describe('updateWorkerRecord', () => {
     });
 
     expect(state.workers).toBe(previousWorkers);
+  });
+});
+
+describe('updateWorkerRecord inside an Immer draft', () => {
+  it('edits the draft record and keeps the other worker by reference', () => {
+    const base = buildState();
+
+    const next = produce(base, (draft) => {
+      updateWorkerRecord(draft, WORKER_ID, (worker) => {
+        worker.level = 6;
+      });
+    });
+
+    expect(next.workers[WORKER_ID].level).toBe(6);
+    expect(next.workers[OTHER_WORKER_ID]).toBe(base.workers[OTHER_WORKER_ID]);
+    expect(base.workers[WORKER_ID].level).toBe(1);
   });
 });

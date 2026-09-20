@@ -125,7 +125,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       debug('Gameloop:Save', `Saving @ tick ${currentTick}`);
     }
   } catch (e) {
-    // Commit, not discard: the draft is a shallow copy so in-place writes already leaked, and dropping the rest would desync them.
+    // Commit, not discard: every completed update is already in the tick state, and dropping it would desync the subsystems that ran.
     gamestateTickEnd();
     error(
       'Gameloop:Tick',

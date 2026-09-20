@@ -4,24 +4,29 @@ import { debug, error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { indexedDbSignal } from '@helpers/engine/signal';
 import { type GameState } from '@interfaces';
+import { produce } from 'immer';
 
 export const isGameStateReady = signal<boolean>(false);
 export const hasGameStateLoaded = signal<boolean>(false);
 
 let tickGamestate: GameState | undefined = undefined;
 
+// The Immer draft of the callback currently running, so reads inside it see the callback's own earlier writes.
+let activeDraft: GameState | undefined = undefined;
+
 const _liveGameState = signal<GameState>(defaultGameState());
 
 export function gamestate() {
-  return tickGamestate ?? _liveGameState();
+  return activeDraft ?? tickGamestate ?? _liveGameState();
 }
 
-// Mid-tick reads return the draft, but still read the slice so a computed first evaluated mid-tick keeps a signal dependency.
+// Mid-tick / mid-callback reads return the in-flight state, but still read the slice so a computed first evaluated then keeps a signal dependency.
 function gamestateSelect<T>(pick: (state: GameState) => T): () => T {
   const slice = computed(() => pick(_liveGameState()));
   return () => {
     const committed = slice();
-    return tickGamestate ? pick(tickGamestate) : committed;
+    const inFlight = activeDraft ?? tickGamestate;
+    return inFlight ? pick(inFlight) : committed;
   };
 }
 
@@ -100,40 +105,61 @@ export function setGameState(state: GameState, commit = true): void {
   }
 }
 
+class FalsyUpdateResult extends Error {}
+
+function updateFailed(stack?: string): void {
+  error(
+    'GameState:Update',
+    `Failed to update game state. Would be set to a falsy value.`,
+    stack,
+  );
+}
+
+// A throwing callback aborts its whole draft, so no partial writes leak into the state.
+function produceUpdate(
+  base: GameState,
+  func: (state: GameState) => GameState,
+): GameState | undefined {
+  try {
+    return produce(base, (draft) => {
+      activeDraft = draft as unknown as GameState;
+      if (!func(activeDraft)) throw new FalsyUpdateResult();
+    });
+  } catch (e) {
+    if (e instanceof FalsyUpdateResult) return undefined;
+    throw e;
+  } finally {
+    activeDraft = undefined;
+  }
+}
+
 export async function updateGamestate(
   func: (state: GameState) => GameState,
 ): Promise<void> {
+  if (!tickGamestate) await schedulerYield();
+
+  // Checked after the yield too - a tick that opened meanwhile would otherwise overwrite this update when it commits.
   if (tickGamestate) {
-    const uncommitted = tickGamestate;
-    const res = func(uncommitted);
-    if (!res) {
-      error(
-        'GameState:Update',
-        `Failed to update game state. Would be set to a falsy value.`,
-        new Error(),
-      );
+    // Nested in a running callback: join its draft, like a shared in-place state used to.
+    if (activeDraft) {
+      if (!func(activeDraft)) updateFailed(new Error().stack);
       return;
     }
 
-    tickGamestate = res;
+    const res = produceUpdate(tickGamestate, func);
+    if (res) tickGamestate = res;
+    else updateFailed(new Error().stack);
 
     return;
   }
 
-  await schedulerYield();
-  const uncommitted = _liveGameState();
-  const res = func(uncommitted);
+  const res = produceUpdate(_liveGameState(), func);
   if (!res) {
-    error(
-      'GameState:Update',
-      `Failed to update game state. Would be set to a falsy value.`,
-      new Error().stack,
-    );
+    updateFailed(new Error().stack);
     return;
   }
 
-  // Shallow root copy, not a deep clone - untouched keys keep their reference so slice selectors don't fire; the save path still deep-clones.
-  setGameState({ ...res });
+  setGameState(res);
 }
 
 export function resetGameState(): void {
@@ -150,7 +176,7 @@ export function formatGameStateForSave(gameState: GameState): GameState {
 }
 
 export function gamestateTickStart(): void {
-  tickGamestate = Object.assign({}, _liveGameState());
+  tickGamestate = _liveGameState();
 }
 
 export function gamestateTickEnd(): void {

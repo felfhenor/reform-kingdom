@@ -4,6 +4,7 @@ import {
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { newEquipmentItem } from '@helpers/item/equipment';
+import { isSameValue } from '@helpers/engine/shallow-equal';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
@@ -104,11 +105,14 @@ function advanceQueueEntry(
 // All queue entries advance/complete together in one pass - a town has multiple workers crafting in tandem, not one at a time.
 function processExistingQueue(state: GameState, town: TownContent): void {
   const nextQueue: TownCraftQueueEntry[] = [];
+  const currentQueue = state.world.towns[town.id].craftQueue;
 
-  state.world.towns[town.id].craftQueue.forEach((entry) => {
+  currentQueue.forEach((entry) => {
     const kept = advanceQueueEntry(state, town, entry);
     if (kept) nextQueue.push(kept);
   });
+
+  if (isSameValue(nextQueue, currentQueue)) return;
 
   updateTownNode(state, town.id, (target) => {
     target.craftQueue = nextQueue;

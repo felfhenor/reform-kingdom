@@ -1,5 +1,6 @@
 import { dictionaryWith } from '@helpers/engine/dictionary';
 import { isUnchanged } from '@helpers/engine/shallow-equal';
+import { isDraft } from 'immer';
 import type {
   GameState,
   TownId,
@@ -17,6 +18,11 @@ export function updateTownNode(
   const existing = state.world.towns[townId];
   if (!existing) return state;
 
+  if (isDraft(existing)) {
+    fn(existing);
+    return state;
+  }
+
   const draft = { ...existing };
   fn(draft);
   if (isUnchanged(draft, existing)) return state;
@@ -33,6 +39,11 @@ export function updateTownWorker(
 ): GameState {
   const existing = state.world.towns[townId]?.workers[workerId];
   if (!existing) return state;
+
+  if (isDraft(existing)) {
+    fn(existing);
+    return state;
+  }
 
   const draft = { ...existing };
   fn(draft);
