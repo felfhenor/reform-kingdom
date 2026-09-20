@@ -1,7 +1,7 @@
 - id: a2b6fd51-642a-4147-aa28-f41da85643e8
   name: Regrowth I
   family: Regrowth
-  description: Heal 2+ living allies for a total of {{ value }} HP.
+  description: Heal multiple allies, healing a total of {{ value }} HP.
 
   sprite: '0031'
 
@@ -43,7 +43,7 @@
 - id: a1d5adcd-f7f8-4add-8c78-25f6ab973d83
   name: Regrowth II
   family: Regrowth
-  description: Heal 2+ living allies for a total of {{ value }} HP.
+  description: Heal multiple allies, healing a total of {{ value }} HP.
 
   sprite: '0031'
 

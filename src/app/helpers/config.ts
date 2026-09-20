@@ -20,6 +20,7 @@ export const URGENCY_WARNING_MIN_TICKS = 300; // 5 minutes
 // Combat
 
 export const COMBAT_ORDER_ROW_CAP = 10;
+export const SKILL_MAX_ALLY_TARGETS = 4;
 
 // XP degrades once the party out-levels a node's max, bottoming out at a flat 1 XP - keeps overleveled parties from farming trivial nodes.
 export const OVERLEVEL_XP_DEGRADE_PER_LEVEL = 0.25;

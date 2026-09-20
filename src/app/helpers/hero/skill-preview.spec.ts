@@ -1,6 +1,10 @@
+import { getEntry } from '@helpers/content/content';
 import {
   skillDescriptionWithPreview,
+  skillTechniqueKind,
+  skillTechniquePreviews,
   skillTechniquePreviewValue,
+  skillTechniqueTargeting,
 } from '@helpers/hero/skill-preview';
 import type {
   Combatant,
@@ -8,7 +12,9 @@ import type {
   EquipmentSkillContentTechnique,
   StatBlock,
 } from '@interfaces';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/content/content', () => ({ getEntry: vi.fn() }));
 
 function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
   return {
@@ -244,5 +250,195 @@ describe('skillDescriptionWithPreview', () => {
     const skill = buildSkill({ description: 'No effect.', techniques: [] });
 
     expect(skillDescriptionWithPreview(combatant, skill)).toBe('No effect.');
+  });
+});
+
+function statBlock(overrides: Partial<StatBlock>): StatBlock {
+  return { ...buildTechnique().damageScaling, ...overrides };
+}
+
+const leechSkill = buildSkill({
+  description: 'Bite an enemy for {{ value }} damage, then heal self.',
+  techniques: [
+    buildTechnique({ damageScaling: statBlock({ Strength: 1, Agility: 1 }) }),
+    buildTechnique({
+      attributes: ['BypassDefense', 'NeverMisses', 'HealsTarget'],
+      targetType: 'Self',
+      targetBehaviors: [{ behavior: 'NotMaxHealth' }],
+      damageScaling: statBlock({ Vitality: 0.5 }),
+    }),
+  ],
+});
+
+const leechCombatant = buildCombatant({
+  totalStats: {
+    ...buildCombatant().totalStats,
+    Strength: 20,
+    Agility: 10,
+    Vitality: 40,
+  },
+});
+
+describe('skillTechniqueKind', () => {
+  it.each([
+    [['DamagesTarget', 'Debuff'], 'Damage'],
+    [['HealsTarget'], 'Heal'],
+    [['Buff'], 'Buff'],
+    [['Debuff'], 'Debuff'],
+    [[], 'Effect'],
+  ] as const)('classifies %j as %s', (attributes, expected) => {
+    const technique = buildTechnique({ attributes: [...attributes] });
+
+    expect(skillTechniqueKind(technique)).toBe(expected);
+  });
+
+  it('treats a debuff with non-zero scaling as damage, matching combat', () => {
+    const technique = buildTechnique({
+      attributes: ['Debuff'],
+      damageScaling: statBlock({ Resistance: 1 }),
+    });
+
+    expect(skillTechniqueKind(technique)).toBe('Damage');
+  });
+});
+
+describe('skillTechniqueTargeting', () => {
+  const skill = buildSkill();
+
+  it('names a single enemy and pluralizes multiples', () => {
+    expect(
+      skillTechniqueTargeting(skill, buildTechnique({ targets: 1 })),
+    ).toEqual({ count: 1, noun: 'enemy' });
+    expect(
+      skillTechniqueTargeting(skill, buildTechnique({ targets: 3 })),
+    ).toEqual({ count: 3, noun: 'enemies' });
+  });
+
+  it('describes self and all-combatant techniques without a count', () => {
+    expect(
+      skillTechniqueTargeting(skill, buildTechnique({ targetType: 'Self' })),
+    ).toEqual({ noun: 'self' });
+    expect(
+      skillTechniqueTargeting(
+        skill,
+        buildTechnique({ targetType: 'All', targets: 25 }),
+      ),
+    ).toEqual({ noun: 'all combatants' });
+  });
+
+  it('treats a full-party ally technique as all allies', () => {
+    expect(
+      skillTechniqueTargeting(
+        skill,
+        buildTechnique({ targetType: 'Allies', targets: 4 }),
+      ),
+    ).toEqual({ noun: 'all allies' });
+    expect(
+      skillTechniqueTargeting(
+        skill,
+        buildTechnique({ targetType: 'Allies', targets: 2 }),
+      ),
+    ).toEqual({ count: 2, noun: 'allies' });
+  });
+});
+
+describe('skillTechniquePreviews', () => {
+  it('lists each technique in order with its own amount, target and scaling', () => {
+    const previews = skillTechniquePreviews(leechCombatant, leechSkill);
+
+    expect(previews).toHaveLength(2);
+    expect(previews[0]).toMatchObject({
+      kind: 'Damage',
+      amount: 30,
+      targeting: { count: 1, noun: 'enemy' },
+      scaling: [
+        { stat: 'Strength', multiplier: 1 },
+        { stat: 'Agility', multiplier: 1 },
+      ],
+    });
+    expect(previews[1]).toMatchObject({
+      kind: 'Heal',
+      amount: 20,
+      targeting: { noun: 'self' },
+      conditions: ['Only if wounded'],
+      scaling: [{ stat: 'Vitality', multiplier: 0.5 }],
+    });
+  });
+
+  it('resolves status effect names with chance and duration', () => {
+    vi.mocked(getEntry).mockReturnValue({ name: 'Burning' } as never);
+    const skill = buildSkill({
+      techniques: [
+        buildTechnique({
+          statusEffects: [
+            { statusEffectId: 'burning' as never, chance: 40, duration: 3 },
+          ],
+        }),
+      ],
+    });
+
+    expect(
+      skillTechniquePreviews(buildCombatant(), skill)[0].statusEffects,
+    ).toEqual([{ name: 'Burning', chance: 40, duration: 3 }]);
+  });
+
+  it('describes target-status conditions by status effect name', () => {
+    vi.mocked(getEntry).mockReturnValue({ name: 'Weakspot' } as never);
+    const skill = buildSkill({
+      techniques: [
+        buildTechnique({
+          attributes: ['Debuff'],
+          targetBehaviors: [
+            { behavior: 'NotZeroHealth' },
+            {
+              behavior: 'IfNotStatusEffect',
+              statusEffectId: 'weakspot' as never,
+            },
+          ],
+        }),
+      ],
+    });
+
+    expect(
+      skillTechniquePreviews(buildCombatant(), skill)[0].conditions,
+    ).toEqual(['Only if it lacks Weakspot']);
+  });
+
+  it('reports no amount for a buff technique', () => {
+    const skill = buildSkill({
+      techniques: [buildTechnique({ attributes: ['Buff'] })],
+    });
+
+    expect(skillTechniquePreviews(buildCombatant(), skill)[0]).toMatchObject({
+      kind: 'Buff',
+      amount: 0,
+    });
+  });
+});
+
+describe('skillDescriptionWithPreview with mixed techniques', () => {
+  it('counts a scaled debuff technique as damage', () => {
+    const skill = buildSkill({
+      description: 'Scream for {{ value }} magical damage.',
+      techniques: [
+        buildTechnique({
+          attributes: ['Debuff'],
+          damageScaling: statBlock({ Resistance: 1 }),
+        }),
+      ],
+    });
+    const combatant = buildCombatant({
+      totalStats: { ...buildCombatant().totalStats, Resistance: 12 },
+    });
+
+    expect(skillDescriptionWithPreview(combatant, skill)).toBe(
+      'Scream for 12 magical damage.',
+    );
+  });
+
+  it('uses only the damage total when a skill also heals', () => {
+    expect(skillDescriptionWithPreview(leechCombatant, leechSkill)).toBe(
+      'Bite an enemy for 30 damage, then heal self.',
+    );
   });
 });

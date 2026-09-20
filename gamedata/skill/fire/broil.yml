@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 1
       targetType: Enemies
       targetBehaviors:

@@ -13,7 +13,7 @@
   techniques:
     - elements: [Air]
       attributes: [Buff]
-      targets: 1
+      targets: 4
       targetType: Allies
       targetBehaviors:
         - behavior: NotZeroHealth

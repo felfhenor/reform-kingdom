@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 1
       targetType: Enemies
       targetBehaviors:
@@ -31,7 +31,7 @@
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - elements: [Water]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 1
       targetType: Enemies
       targetBehaviors:
@@ -63,7 +63,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 1
       targetType: Enemies
       targetBehaviors:
@@ -79,7 +79,7 @@
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - elements: [Water]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 1
       targetType: Enemies
       targetBehaviors:

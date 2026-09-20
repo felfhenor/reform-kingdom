@@ -15,7 +15,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
       elements: []
       targets: 1
       targetType: Enemies
@@ -49,7 +49,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
       elements: []
       targets: 1
       targetType: Enemies
@@ -83,7 +83,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
       elements: []
       targets: 1
       targetType: Enemies

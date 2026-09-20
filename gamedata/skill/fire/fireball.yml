@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 3
       targetType: Enemies
       targetBehaviors:
@@ -47,7 +47,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 3
       targetType: Enemies
       targetBehaviors:
@@ -79,7 +79,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
       targets: 3
       targetType: Enemies
       targetBehaviors:

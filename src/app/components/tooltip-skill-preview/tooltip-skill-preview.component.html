@@ -13,7 +13,22 @@
 
       <div class="text-sm">{{ skillDescription() }}</div>
 
-      <app-row-skill-stat-scaling class="block mt-2" [skill]="skillData" />
+      @let techniques = skillTechniques();
+
+      @if (techniques.length > 0) {
+        <div class="flex flex-col gap-2 mt-2">
+          @for (technique of techniques; track $index) {
+            <div class="flex gap-2">
+              @if (techniques.length > 1) {
+                <span class="text-sm text-lighter">
+                  {{ $index + 1 | number }}.
+                </span>
+              }
+              <app-row-skill-technique [technique]="technique" />
+            </div>
+          }
+        </div>
+      }
 
       @if (
         displayCharacterWeaponTypes().length > 0 &&

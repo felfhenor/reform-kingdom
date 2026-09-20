@@ -14,7 +14,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [Debuff]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
       elements: []
       targets: 1
       targetType: Enemies

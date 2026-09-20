@@ -58,6 +58,7 @@ export * from './museum.ui';
 export * from './pixi-config';
 export * from './roman-numerals';
 export * from './sfx';
+export * from './skill-preview.ui';
 export * from './sfx.ui';
 export * from './stat';
 export * from './stat-display';

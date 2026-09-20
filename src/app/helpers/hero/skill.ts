@@ -7,8 +7,8 @@ import type {
   GameElement,
   GameStat,
   SkillStatScaling,
-  StatBlock,
 } from '@interfaces';
+import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
 import { ROMAN_NUMERAL_TIERS, StatOrder } from '@interfaces';
 
 import { clamp, uniq } from 'es-toolkit/compat';
@@ -38,7 +38,9 @@ export function skillTechniqueNumTargets(
 ): number {
   const numTargets = technique.targets;
   if (technique.targetType === 'Self') return 1;
-  if (technique.targetType === 'Allies') return clamp(numTargets, 1, 4);
+  if (technique.targetType === 'Allies') {
+    return clamp(numTargets, 1, SKILL_MAX_ALLY_TARGETS);
+  }
   return numTargets;
 }
 
@@ -50,22 +52,12 @@ export function skillTechniqueDamageScalingStat(
   return technique.damageScaling[stat];
 }
 
-// Which stats a skill's damage/healing scales from and by how much; multi-technique skills sum multipliers across techniques.
-export function skillStatScaling(
-  skill: EquipmentSkillContent,
+export function skillTechniqueStatScaling(
+  technique: EquipmentSkillContentTechnique,
 ): SkillStatScaling[] {
-  const totals = {} as StatBlock;
-
-  skill.techniques.forEach((technique) => {
-    (Object.keys(technique.damageScaling) as GameStat[]).forEach((stat) => {
-      totals[stat] = (totals[stat] ?? 0) + technique.damageScaling[stat];
-    });
-  });
-
-  return StatOrder.filter((stat) => totals[stat]).map((stat) => ({
-    stat,
-    multiplier: totals[stat],
-  }));
+  return StatOrder.filter((stat) => technique.damageScaling[stat]).map(
+    (stat) => ({ stat, multiplier: technique.damageScaling[stat] }),
+  );
 }
 
 export function skillTechniqueStatusEffectChance(

@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -13,9 +14,12 @@ import type {
 } from '@interfaces';
 
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
-import { RowSkillStatScalingComponent } from '@components/row-skill-stat-scaling/row-skill-stat-scaling.component';
+import { RowSkillTechniqueComponent } from '@components/row-skill-technique/row-skill-technique.component';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
-import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
+import {
+  skillDescriptionWithPreview,
+  skillTechniquePreviews,
+} from '@helpers/hero/skill-preview';
 
 // Headless: renders only an `ng-template` and exposes it via `template()`,
 // for callers to hand to `[tp]` on whatever icon markup they render
@@ -23,7 +27,7 @@ import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
 @Component({
   selector: 'app-tooltip-skill-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RowSkillStatScalingComponent, IconItemPreviewComponent],
+  imports: [DecimalPipe, RowSkillTechniqueComponent, IconItemPreviewComponent],
   templateUrl: './tooltip-skill-preview.component.html',
   styleUrl: './tooltip-skill-preview.component.scss',
 })
@@ -36,6 +40,9 @@ export class TooltipSkillPreviewComponent {
 
   public skillDescription = computed(() =>
     skillDescriptionWithPreview(this.displayCombatant(), this.display()),
+  );
+  public skillTechniques = computed(() =>
+    skillTechniquePreviews(this.displayCombatant(), this.display()),
   );
   public skillUsable = computed(() =>
     skillIsUsableWithEquippedWeapons(

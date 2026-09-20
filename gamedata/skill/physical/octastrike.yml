@@ -1,7 +1,7 @@
 - id: 37f8f343-c32b-47b0-87c0-d9e8d542c58a
   name: Octa Strike I
   family: Octa Strike
-  description: Strike 8 times for {{ value }} damage each.
+  description: Strike 8 times for {{ value }} damage total.
 
   rarity: Uncommon
   sprite: '0011'
@@ -15,7 +15,84 @@
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
-      targets: 8
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.2
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth

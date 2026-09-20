@@ -67,7 +67,7 @@
 - id: efe273da-1fc3-44a8-bee7-46a9aec6a72c
   name: Earthshake III
   family: Earthshake
-  description: Make the earth tremble, hitting 4 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
+  description: Make the earth tremble, hitting 5 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
 
   sprite: '0017'
 

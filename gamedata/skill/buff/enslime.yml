@@ -17,7 +17,7 @@
     - attributes: [Buff]
       elements: []
       targets: 2
-      targetType: Enemies
+      targetType: Allies
       targetBehaviors:
         - behavior: NotZeroHealth
         - behavior: IfNotStatusEffect

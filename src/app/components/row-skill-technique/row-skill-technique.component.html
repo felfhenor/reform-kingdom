@@ -1,0 +1,43 @@
+@let t = technique();
+
+<div class="flex flex-col">
+  <div class="flex flex-wrap items-baseline gap-x-1 text-sm">
+    <span class="font-semibold {{ kindClass() }}">{{ kindLabel() }}</span>
+
+    @if (t.amount > 0) {
+      <span class="font-semibold">{{ t.amount | number }}</span>
+    }
+
+    <span class="text-lighter">
+      to
+      @if (t.targeting.count !== undefined) {
+        {{ t.targeting.count | number }}
+      }
+      {{ t.targeting.noun }}
+    </span>
+  </div>
+
+  @if (t.scaling.length > 0) {
+    <div class="italic text-xs text-lighter">
+      @for (entry of t.scaling; track entry.stat; let last = $last) {
+        {{ entry.multiplier | number: '1.2-2' }}x {{ statShorthand[entry.stat]
+        }}{{ last ? '' : ' + ' }}
+      }
+    </div>
+  }
+
+  @for (effect of t.statusEffects; track effect.name) {
+    <div class="text-xs">
+      {{ statusVerb() }} {{ effect.name }} for
+      {{ effect.duration | number }}
+      {{ effect.duration === 1 ? 'turn' : 'turns' }}
+      @if (effect.chance < 100) {
+        <span class="text-lighter">({{ effect.chance | number }}% chance)</span>
+      }
+    </div>
+  }
+
+  @for (condition of t.conditions; track condition) {
+    <div class="italic text-xs text-lighter">{{ condition }}</div>
+  }
+</div>
