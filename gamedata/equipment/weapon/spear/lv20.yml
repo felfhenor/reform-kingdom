@@ -37,3 +37,6 @@
   baseStats:
     Strength: 13.4
     Agility: 7.2
+
+  monsterTypeDamage:
+    Demon: 10

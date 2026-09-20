@@ -9,3 +9,6 @@
   baseStats:
     Intelligence: 22.1
     Vitality: 14.8
+
+  monsterTypeDamage:
+    Demon: 10

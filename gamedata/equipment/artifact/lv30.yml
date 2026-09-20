@@ -9,3 +9,6 @@
   baseStats:
     Intelligence: 8.4
     Resistance: 1.2
+
+  monsterTypeDamage:
+    Demon: 10
