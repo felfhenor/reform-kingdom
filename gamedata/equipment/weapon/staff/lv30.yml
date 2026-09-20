@@ -1,0 +1,11 @@
+- id: 61635db7-790c-4963-a68e-2cdbbe81d2b2
+  name: Angelf Staff
+  description: A staff made of the finest elven wood.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Staff
+  sprite: '0171'
+  slots: 3
+  baseStats:
+    Intelligence: 22.1
+    Vitality: 14.8

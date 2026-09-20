@@ -1,0 +1,14 @@
+- id: 429f6bdc-6e77-4d35-9972-75bebee43f1f
+  name: Crimgold Platemail
+  description: A beautifully-crafted set of platemail made of crimson and gold.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0160'
+  slots: 2
+  baseStats:
+    Vitality: 20.9
+    Resistance: 15.2
+
+  debuffResistances:
+    Bleed: 25

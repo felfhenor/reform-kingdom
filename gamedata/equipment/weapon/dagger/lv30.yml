@@ -1,0 +1,11 @@
+- id: 4bd8513a-1040-497b-bc43-de8e73c2d68c
+  name: Crimson Baselard
+  description: A powerful dagger made of crimson.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0182'
+  slots: 1
+  baseStats:
+    Agility: 12.2
+    Strength: 13.1

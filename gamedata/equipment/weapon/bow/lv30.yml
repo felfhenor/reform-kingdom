@@ -1,0 +1,23 @@
+- id: 5999bf1d-bab6-45e6-883f-9f7953945eed
+  name: Crimwood Bow
+  description: A bow made of both crimson and elven corewood. The construction is so solid and lightweight it's hard to remember that it's there.
+  levelRequirement: 30
+  rarity: Uncommon
+  type: Bow
+  sprite: '0190'
+  slots: 1
+  baseStats:
+    Strength: 18.8
+    Agility: 5.2
+
+- id: fe5d30b0-4ca6-410f-a80d-a869cfa5a253
+  name: Angelf Crossbow
+  description: A highly-customizable crossbow that elven hunters love for its flexibility.
+  levelRequirement: 34
+  rarity: Uncommon
+  type: Bow
+  sprite: '0154'
+  slots: 4
+  baseStats:
+    Strength: 15.4
+    Agility: 7.4

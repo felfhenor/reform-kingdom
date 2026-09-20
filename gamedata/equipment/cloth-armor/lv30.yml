@@ -1,0 +1,22 @@
+- id: da7ccd97-613a-4fd3-ae54-1b6dcbeae98a
+  name: Crimsilk Cloak
+  description: A fancy elven cloak spun with crimson, utilizing their signature elfsilk. It provides decent protection from both weaponry and the elements.
+  levelRequirement: 30
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0186'
+  slots: 1
+  baseStats:
+    Vitality: 12.1
+    Resistance: 16.2
+
+- id: 54c6d5bc-c4f3-4d88-a27c-c97f982ab2f4
+  name: Crimsilk Shroud
+  description: A shroud spun of the finest elfsilk and crimson. It protects the wearer from harsh elements, increasing their vitality.
+  levelRequirement: 34
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0187'
+  slots: 1
+  baseStats:
+    Vitality: 26.3

@@ -13,3 +13,16 @@
     Intelligence: 9.3
     Resistance: 4.7
     Strength: 3.3
+
+- id: c91b6c7f-ba0a-4ad8-b768-700d1d08643c
+  name: Crimson Whip
+  description: A whip made of spun crimson. It increases the strength of its user as well as their intelligence.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Whip
+  sprite: '0153'
+  slots: 1
+  baseStats:
+    Intelligence: 15.9
+    Resistance: 7.3
+    Strength: 8.1

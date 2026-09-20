@@ -1,0 +1,11 @@
+- id: edb3cfcb-1e0f-4821-a826-d4740e146fcb
+  name: Angelf Hunting Spear
+  description: A spear preferred by elven hunters.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Spear
+  sprite: '0170'
+  slots: 3
+  baseStats:
+    Strength: 15.2
+    Agility: 9.1

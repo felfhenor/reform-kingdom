@@ -12,3 +12,18 @@
   baseStats:
     Vitality: 10.3
     Resistance: 3.8
+
+- id: 98731fca-4409-4199-9380-b492067b2954
+  name: Crimson Shield
+  description: A simple protective shield made of crimson.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Shield
+  sprite: '0155'
+  slots: 1
+  baseStats:
+    Vitality: 11.3
+    Resistance: 7.3
+
+  debuffResistances:
+    Bleed: 5

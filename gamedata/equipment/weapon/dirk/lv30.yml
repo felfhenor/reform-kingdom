@@ -1,0 +1,11 @@
+- id: 8af8ef2e-8041-43fb-bcbb-b94aa3d3b4bf
+  name: Crimson Shank
+  description: An unconvential dirk that give the wearer extra thrusting power rather than mobility.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0181'
+  slots: 1
+  baseStats:
+    Agility: 5.2
+    Strength: 14.3

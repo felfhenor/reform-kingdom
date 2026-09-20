@@ -14,3 +14,15 @@
     Agility: 9.7
   monsterTypeDamage:
     Humanoid: 15
+
+- id: 15797c92-3a58-460f-80d0-4817184a965c
+  name: Crimson Sword
+  description: A sword crafted with petrifiwood and timberfuzz, making a sturdy weapon that's also easy to use.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Sword
+  sprite: '0150'
+  slots: 1
+  baseStats:
+    Strength: 12.7
+    Vitality: 12.7

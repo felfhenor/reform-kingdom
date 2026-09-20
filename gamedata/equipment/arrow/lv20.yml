@@ -10,3 +10,16 @@
     Strength: 4.3
     Agility: 3.2
     Energy: 8
+
+- id: b52ff635-1add-4efd-a97d-e970317cfae3
+  name: Crimson-tipped Arrow
+  description: An arrow made of the finest elven wood and tipped with crimson. The intensity and sharpness is hardly felt with how effective it is.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Arrow
+  sprite: '0158'
+  slots: 1
+  baseStats:
+    Strength: 7.3
+    Agility: 5.2
+    Vitality: 2.5

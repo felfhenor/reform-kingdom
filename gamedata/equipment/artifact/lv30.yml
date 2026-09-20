@@ -1,0 +1,11 @@
+- id: d4d84b80-838d-4f46-9cfa-2eaa600016c3
+  name: Angelf Spellaimer
+  description: A malleable elven artifact that allows the user to heavily customize their magic.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Artifact
+  sprite: '0173'
+  slots: 3
+  baseStats:
+    Intelligence: 8.4
+    Resistance: 1.2

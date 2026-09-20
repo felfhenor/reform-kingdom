@@ -26,3 +26,15 @@
   baseStats:
     Intelligence: 8.2
     Agility: 4.9
+
+- id: e62c5285-bf87-4dc7-9444-f098b57daeb8
+  name: Crimson Spellaimer
+  description: A modern elven artifact that helps aim spells using the magical power of crimson.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Artifact
+  sprite: '0172'
+  slots: 1
+  baseStats:
+    Intelligence: 12.7
+    Resistance: 3.6

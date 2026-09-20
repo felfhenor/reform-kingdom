@@ -1,0 +1,16 @@
+- id: cb556b72-0452-45ce-a98b-b236fc0e94e8
+  name: Angelf Bracer
+  description: A beautiful bracer made of elven wood. It allows the wearers gathering potential to shine.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Trinket
+  sprite: '0184'
+  slots: 1
+  baseStats:
+    Luck: 8
+
+  gatherYieldBonuses:
+    - tradeskillId: Woodworking
+      value: 1
+    - tradeskillId: Blacksmithing
+      value: 1

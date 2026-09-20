@@ -1,0 +1,23 @@
+- id: 09505a4c-d4fe-434a-9134-d4ee03e3f86c
+  name: Crimsilk Hat
+  description: A simple but elegant hat made of crimson and elfsilk. It increases the physical prowess of the wearer.
+  levelRequirement: 30
+  rarity: Uncommon
+  type: Hat
+  sprite: '0188'
+  slots: 1
+  baseStats:
+    Vitality: 7.1
+    Health: 28
+
+- id: 2cc05e7d-87d8-4968-b199-4d9b12683649
+  name: Crimsilk Cap
+  description: A magically-infused cap made of crimson and elfsilk. It increases the magical prowess of the wearer.
+  levelRequirement: 34
+  rarity: Uncommon
+  type: Hat
+  sprite: '0189'
+  slots: 1
+  baseStats:
+    Resistance: 9.1
+    Energy: 37

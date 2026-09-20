@@ -12,3 +12,17 @@
 
   debuffResistances:
     Burn: 5
+
+- id: 852f6203-63bc-4a63-8506-635486803d35
+  name: Crimson Breastplate
+  description: A breastplate made of crimson. It does a good job of keeping the wearers blood on the inside!
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0161'
+  slots: 1
+  baseStats:
+    Vitality: 28.9
+
+  debuffResistances:
+    Bleed: 25

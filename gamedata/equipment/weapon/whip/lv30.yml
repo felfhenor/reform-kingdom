@@ -1,0 +1,12 @@
+- id: e8003eae-aab8-46ed-a54e-337b23454662
+  name: Crimgold Whip
+  description: A whip made of spun crimson, and set with gold. It's more malleable than the average whip, and it still stings!
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Whip
+  sprite: '0183'
+  slots: 2
+  baseStats:
+    Intelligence: 13.2
+    Resistance: 9.3
+    Strength: 10.3

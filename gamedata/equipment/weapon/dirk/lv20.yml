@@ -23,3 +23,15 @@
   slots: 1
   baseStats:
     Agility: 15.2
+
+- id: 2dbe1f4d-c52c-4f2b-a15d-4b001cca45eb
+  name: Crimson Dirk
+  description: A simple dirk made of crimson.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0151'
+  slots: 1
+  baseStats:
+    Agility: 11.2
+    Vitality: 6.8

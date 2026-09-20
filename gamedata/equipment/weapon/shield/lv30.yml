@@ -1,0 +1,11 @@
+- id: e584f86a-16de-422d-b69a-8c168132de0b
+  name: Angelf Buckler
+  description: A lightweight buckler made of the finest elven wood, set with a ruby.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Shield
+  sprite: '0174'
+  slots: 3
+  baseStats:
+    Vitality: 8.1
+    Resistance: 6.6

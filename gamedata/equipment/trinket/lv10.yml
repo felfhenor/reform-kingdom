@@ -11,5 +11,5 @@
     Energy: 15
 
   gatherYieldBonuses:
-    - tradeskillId: Jewelcrafting
+    - tradeskillId: Artificing
       value: 1

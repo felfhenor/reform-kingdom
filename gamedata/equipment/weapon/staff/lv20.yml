@@ -12,3 +12,15 @@
   baseStats:
     Intelligence: 15.2
     Vitality: 7.1
+
+- id: 87e8d1c7-55d5-4de9-b95e-1f89aa23c7b5
+  name: Crimson Staff
+  description: A staff made purely of crimson.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Staff
+  sprite: '0152'
+  slots: 1
+  baseStats:
+    Intelligence: 19.5
+    Vitality: 10.3

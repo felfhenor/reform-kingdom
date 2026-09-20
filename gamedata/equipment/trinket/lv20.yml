@@ -35,5 +35,25 @@
     Burn: 15
 
   gatherYieldBonuses:
+    - tradeskillId: Jewelcrafting
+      value: 1
+
+- id: fbad43f1-7966-4674-9eb3-92d66ba4b371
+  name: Crimson Bracer
+  description: A bracer that, when worn, makes it easier to chop wood.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Trinket
+  sprite: '0185'
+  slots: 2
+  baseStats:
+    Resistance: 9.1
+    Health: 25
+    Vitality: 8.3
+
+  debuffResistances:
+    Bleed: 15
+
+  gatherYieldBonuses:
     - tradeskillId: Woodworking
       value: 1

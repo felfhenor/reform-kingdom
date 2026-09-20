@@ -1,0 +1,42 @@
+- id: 3324af3c-8840-4a61-953c-f6e0a8d5d646
+  name: Crimson Course
+  description: A pair of earrings made of crimson that helps the wearer resist external blood flow.
+  rarity: Uncommon
+  levelRequirement: 30
+  type: Accessory
+  sprite: '0165'
+  slots: 1
+  baseStats:
+    Resistance: 1.2
+    Vitality: 0.5
+
+  debuffResistances:
+    Bleed: 45
+
+- id: c68a0ecb-0473-4c11-a629-2fa98404a57a
+  name: Crimgold Gauntlets
+  description: A pair of gauntlets that help regulate blood flow and give the wearer strength and circulation.
+  rarity: Uncommon
+  levelRequirement: 34
+  type: Accessory
+  sprite: '0163'
+  slots: 3
+  baseStats:
+    Strength: 4.4
+    Vitality: 4.8
+
+  debuffResistances:
+    Bleed: 3
+
+- id: cfbef018-d4b4-43a5-ba8a-903f87917c49
+  name: Angelf Earrings
+  description: A pair of earrings that absorbs magical energy from the air and condenses it for the wearer's use.
+  rarity: Uncommon
+  levelRequirement: 38
+  type: Accessory
+  sprite: '0166'
+  slots: 4
+  baseStats:
+    Luck: 2.3
+    Intelligence: 2.1
+    Resistance: 1.3

@@ -1,0 +1,12 @@
+- id: da75711c-6822-4a71-93d2-d1eecf88ab8e
+  name: Crimson Bastard Sword
+  description: A powerful sword made of crimson.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Sword
+  sprite: '0180'
+  slots: 1
+  baseStats:
+    Strength: 15.4
+    Vitality: 15.4
+    Resistance: 4.5

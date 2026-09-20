@@ -1,0 +1,11 @@
+- id: c6e3c1dc-c067-423c-a37a-e76dc968db61
+  name: Gold-tipped Arrow
+  description: An arrow made of the finest elven wood and tipped with gold. It's extremely malleable to the whims of the user.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Arrow
+  sprite: '0157'
+  slots: 3
+  baseStats:
+    Strength: 8.3
+    Agility: 7.2

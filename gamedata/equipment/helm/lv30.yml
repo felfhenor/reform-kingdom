@@ -1,0 +1,11 @@
+- id: d9a63417-3113-4799-93f4-ac22a1b126e4
+  name: Crimgold Helm
+  description: A helm made with the elven craftsmanship that fuses crimson and gold. It makes the wearer feel more healthy.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Helm
+  sprite: '0162'
+  slots: 2
+  baseStats:
+    Health: 70
+    Vitality: 15.7

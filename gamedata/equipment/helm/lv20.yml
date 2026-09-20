@@ -9,3 +9,14 @@
   baseStats:
     Health: 40
     Vitality: 8.5
+
+- id: c932b40f-5bc5-4c45-b1a7-5e973206949c
+  name: Crimson Helm
+  description: A helm crafted from crimson, it massively increases the lifespan of the wearer.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Helm
+  sprite: '0159'
+  slots: 1
+  baseStats:
+    Health: 120

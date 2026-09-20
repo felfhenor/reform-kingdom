@@ -12,3 +12,15 @@
   baseStats:
     Agility: 8.7
     Strength: 5.4
+
+- id: b2a894d9-539c-415e-8035-29c5c9de03b6
+  name: Crimson Dagger
+  description: A simple dagger made of crimson.
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0156'
+  slots: 1
+  baseStats:
+    Agility: 14.7
+    Strength: 8.4

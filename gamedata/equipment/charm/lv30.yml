@@ -1,0 +1,25 @@
+- id: 5335eaac-adbf-4397-a2c5-1f2270bfd466
+  name: Tailored Ruby Bracelet
+  description: A bracelet made primarily of rubies spun into threads via elf magic.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Charm
+  sprite: '0176'
+  slots: 1
+  baseStats:
+    Energy: 25
+    Intelligence: 8.1
+
+- id: ad44fc7e-ad54-480d-8405-466852132602
+  name: Crimson Bangle
+  description: A bangle made of crimson that ensures the wearer is more alert.
+  levelRequirement: 36
+  rarity: Uncommon
+  type: Charm
+  sprite: '0179'
+  slots: 1
+  baseStats:
+    Vitality: 9.9
+
+  debuffResistances:
+    Stun: 25

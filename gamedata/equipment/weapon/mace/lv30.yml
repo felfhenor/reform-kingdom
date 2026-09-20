@@ -1,0 +1,11 @@
+- id: 56b4bcae-091c-49ed-9eda-5cbbf674a434
+  name: Angelf Magiclub
+  description: An elegant elven construction made of crimson and elven wood. It's lightweight, but packs a punch.
+  levelRequirement: 32
+  rarity: Uncommon
+  type: Mace
+  sprite: '0168'
+  slots: 3
+  baseStats:
+    Strength: 14.2
+    Intelligence: 13.6

@@ -15,3 +15,15 @@
 
   grantedSkillIds:
     - Spiked Smash I
+
+- id: b30a480c-7ee0-4c6b-8c99-3e9099152ce7
+  name: Crimson Greatmace
+  description: An oversized mace made of crimson. It hurts!
+  levelRequirement: 28
+  rarity: Uncommon
+  type: Mace
+  sprite: '0167'
+  slots: 1
+  baseStats:
+    Strength: 13.6
+    Intelligence: 12.1
