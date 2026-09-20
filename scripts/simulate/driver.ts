@@ -334,7 +334,7 @@ function logAdventureLogTail(
 // level, or a hard stonewall is confirmed) against whatever `GameState` is
 // already live - the caller is responsible for `gameReset`/`setParty`/
 // `gameStart` beforehand. Must run inside the process that already imported
-// `./shims` and called `bootstrapContent()`.
+// `./shims` and called `loadCompiledContentFromDisk()`.
 export function runScenario(
   scenario: ScenarioConfig,
   onStonewall?: StonewallHandler,

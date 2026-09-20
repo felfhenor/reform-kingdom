@@ -2,7 +2,7 @@
 // Must be the first import - installs shims before any `@helpers` import.
 import { settle } from './shims';
 
-import { getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content/content';
 import { gameReset, gameStart } from '@helpers/game-init';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
 import { migrateGameState } from '@helpers/migrate';

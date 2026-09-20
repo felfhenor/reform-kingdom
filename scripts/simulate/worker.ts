@@ -3,7 +3,7 @@
 // Must be the first import - installs shims before any `@helpers` import.
 import { settle, silenceDebugLogging } from './shims';
 
-import { bootstrapContent } from './bootstrap';
+import { loadCompiledContentFromDisk } from '../debug/load-compiled-content';
 import { executeScenario } from './scenario-runner';
 import type { WorkerRequest, WorkerResponse } from './worker-protocol';
 
@@ -46,5 +46,5 @@ process.on('message', (message: WorkerRequest) => {
 });
 
 console.log(`Bootstrapping content...`);
-bootstrapContent();
+loadCompiledContentFromDisk();
 send({ type: 'ready' });

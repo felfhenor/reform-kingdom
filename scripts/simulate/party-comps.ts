@@ -1,11 +1,11 @@
-import { getEntriesByType } from '@helpers/content';
+import { getEntriesByType } from '@helpers/content/content';
 import type { JobContent } from '@interfaces';
 import { PARTY_SIZE } from './constants';
 import type { PartyComp } from './types';
 
 // Pulled live from loaded content (gamedata/job/*.yml) rather than a
 // hardcoded list, so a new job added to the game shows up here with no code
-// change required. Must run after `bootstrapContent()`.
+// change required. Must run after `loadCompiledContentFromDisk()`.
 export function jobNames(): string[] {
   return getEntriesByType<JobContent>('job').map((job) => job.name);
 }

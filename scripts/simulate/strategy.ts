@@ -4,7 +4,7 @@ import {
   characterInfuseEquipment,
   optimizeCharacterEquipment,
 } from '@helpers/hero/character-equipment';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { getCraftableRecipeEntries } from '@helpers/crafting/crafting';
 import {
   craftMaxCraftableQuantity,

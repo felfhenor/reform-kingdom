@@ -7,7 +7,7 @@ import { fork, type ChildProcess } from 'child_process';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
-import { bootstrapContent } from './bootstrap';
+import { loadCompiledContentFromDisk } from '../debug/load-compiled-content';
 import {
   DEFAULT_SEED_CHECKPOINT_LEVELS,
   DEFAULT_TICK_BUDGET,
@@ -368,7 +368,7 @@ async function main(): Promise<void> {
   if (!options.verbose) silenceDebugLogging();
 
   console.log(`Bootstrapping content...`);
-  bootstrapContent();
+  loadCompiledContentFromDisk();
 
   const runId = new Date().toISOString().replace(/[:.]/g, '-');
   const logger = createRunLogger(runId, options.verbose);
