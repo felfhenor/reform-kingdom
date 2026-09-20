@@ -45,6 +45,7 @@ export type AnalysisScriptCategory =
   | 'Tradeskills & Recipes'
   | 'World & Maps'
   | 'Caravans & Commissions'
+  | 'Skills'
   | 'Hero Stats'
   | 'Monster Stats';
 
@@ -151,3 +152,11 @@ export type EquipmentResultRecipeCheck = {
 };
 
 export type SpritedContentEntry = IsContentItem & HasSprite;
+
+export type AnalysisIssue = { status: 'fail' | 'warning'; message: string };
+
+export type SkillSourceKind = 'Job' | 'Monster' | 'Equipment' | 'Affix';
+
+export type SkillSource = { kind: SkillSourceKind; name: string };
+
+export type SkillReference = { skillRef: string; source: SkillSource };

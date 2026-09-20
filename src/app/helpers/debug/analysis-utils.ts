@@ -1,5 +1,7 @@
 import { allMaps } from '@helpers/maps';
 import type {
+  AnalysisCheck,
+  AnalysisIssue,
   AnalysisLevelWindow,
   BaseStat,
   StatBlock,
@@ -111,3 +113,24 @@ export function filterByNames<T extends { name: string }>(
 }
 
 export { STATS as BASE_STATS };
+
+export function analysisFail(message: string): AnalysisIssue {
+  return { status: 'fail', message };
+}
+
+export function analysisWarn(message: string): AnalysisIssue {
+  return { status: 'warning', message };
+}
+
+export function analysisIssueCheck(
+  id: string,
+  label: string,
+  issue: AnalysisIssue,
+): AnalysisCheck {
+  return {
+    id,
+    label,
+    status: issue.status,
+    message: `${label}: ${issue.message}`,
+  };
+}

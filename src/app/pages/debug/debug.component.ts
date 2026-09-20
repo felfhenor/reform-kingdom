@@ -44,6 +44,7 @@ const CATEGORIES: AnalysisScriptCategory[] = [
   'Tradeskills & Recipes',
   'World & Maps',
   'Caravans & Commissions',
+  'Skills',
   'Hero Stats',
   'Monster Stats',
 ];

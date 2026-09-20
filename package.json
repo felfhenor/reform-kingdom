@@ -36,6 +36,7 @@
     "analyze:debuffresistance": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-debuffresistance",
     "analyze:workerstamina": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-workerstamina",
     "analyze:workerreachability": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-workerreachability",
+    "analyze:skills": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-skills",
     "util:changelog:generate": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "util:changelog:generate:current": "conventional-changelog -p angular -o CHANGELOG-current.md -r 2",
     "util:changelog:commit": "git commit CHANGELOG.md CHANGELOG-current.md -m \"Update changelog\" || true",

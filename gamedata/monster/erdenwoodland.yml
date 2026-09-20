@@ -34,6 +34,8 @@
       weight: 4
     - skillId: Venom Bite II
       weight: 2
+    - skillId: Venom Spit II
+      weight: 2
 
   baseStats:
     Health: 200

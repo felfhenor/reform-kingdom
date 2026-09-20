@@ -254,7 +254,7 @@
 
   baseStats:
     Health: 75
-    Energy: 5
+    Energy: 10
     Luck: 5
     Intelligence: 1
     Strength: 15

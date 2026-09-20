@@ -89,7 +89,7 @@ export function skillElements(skill: EquipmentSkill): GameElement[] {
 }
 
 // Splits a display name into upgrade family and rank, e.g. "Starshine II" -> { family: 'Starshine', tier: 2 }.
-function skillNameTier(name: string): { family: string; tier: number } {
+export function skillNameTier(name: string): { family: string; tier: number } {
   const match = name.match(/^(.*) (I{1,3}|IV|V|VI{1,3}|IX|X)$/);
   if (!match) return { family: name, tier: 1 };
 

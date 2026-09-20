@@ -15,6 +15,7 @@ import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipe
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
+import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
@@ -240,6 +241,18 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runTownMaterialThresholdsAnalysis,
+  },
+
+  // --- Skills ---
+  {
+    id: 'skills',
+    title: 'Skills',
+    description:
+      'Technique tagging, family/tier consistency, and that every skill is assigned to a job path, monster, equipment, or affix.',
+    category: 'Skills',
+    strict: true,
+    inputKeys: ['expanded'],
+    run: runSkillsAnalysis,
   },
 
   // --- Hero Stats ---

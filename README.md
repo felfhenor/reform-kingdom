@@ -63,6 +63,15 @@ npm run analyze:contentgaps -- --expanded
 
 This will examine all content in the game (at the time of writing: items, tradeskills, infusions) and look for excessive gaps in utilization (default of 4)
 
+### Skills
+
+```
+npm run analyze:skills
+npm run analyze:skills -- --expanded
+```
+
+This will audit every skill: technique tags (Buff/Debuff/DamagesTarget/HealsTarget vs. what the technique actually does), family/tier consistency, and that each skill is assigned to a job path, monster, equipment, or affix. Also runs as part of `npm run validate`. In expanded mode, it prints an inventory of every skill and where it comes from.
+
 ### Node Levels
 
 ```
