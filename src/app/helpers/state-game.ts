@@ -132,7 +132,8 @@ export async function updateGamestate(
     return;
   }
 
-  setGameState(structuredClone(res));
+  // Shallow root copy, not a deep clone - untouched keys keep their reference so slice selectors don't fire; the save path still deep-clones.
+  setGameState({ ...res });
 }
 
 export function resetGameState(): void {

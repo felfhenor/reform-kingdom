@@ -1,3 +1,4 @@
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 
 export function isSetup(): boolean {
@@ -6,7 +7,7 @@ export function isSetup(): boolean {
 
 export function setupFinish(): void {
   updateGamestate((state) => {
-    state.meta.isSetup = true;
+    state.meta = dictionaryWith(state.meta, 'isSetup', true);
     return state;
   });
 }

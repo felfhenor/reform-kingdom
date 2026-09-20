@@ -7,6 +7,7 @@ import { commissionProcessTick } from '@helpers/commission/commission-tick';
 import { TICKS_PER_YIELD } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { discordUpdateStatus } from '@helpers/engine/discord';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
 import { debug, error } from '@helpers/engine/logging';
@@ -70,7 +71,11 @@ export async function gameloop(totalTicks: number): Promise<void> {
     // Tick one at a time (not one bulk +=) so tick-driven systems see an accurate timerTicksElapsed() each iteration.
     for (let i = 0; i < numTicks; i++) {
       updateGamestate((state) => {
-        state.clock.numTicks += 1;
+        state.clock = dictionaryWith(
+          state.clock,
+          'numTicks',
+          state.clock.numTicks + 1,
+        );
         return state;
       });
 
@@ -111,7 +116,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     const nextSaveTick = timerLastSaveTick() + getOption('debugSaveInterval');
     if (currentTick >= nextSaveTick) {
       updateGamestate((state) => {
-        state.clock.lastSaveTick = currentTick;
+        state.clock = dictionaryWith(state.clock, 'lastSaveTick', currentTick);
         return state;
       });
 

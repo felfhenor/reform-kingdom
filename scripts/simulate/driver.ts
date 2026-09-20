@@ -4,6 +4,7 @@ import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { decreeClauses } from '@helpers/decree/decree';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import {
   mostChallengingExploreNodeForRisk,
   pickNextClause,
@@ -95,7 +96,11 @@ function bestReachableChallengeLevel(): number | undefined {
 // artifact with no headless equivalent).
 function processOneTick(): void {
   updateGamestate((state) => {
-    state.clock.numTicks += 1;
+    state.clock = dictionaryWith(
+      state.clock,
+      'numTicks',
+      state.clock.numTicks + 1,
+    );
     return state;
   });
 

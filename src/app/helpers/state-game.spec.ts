@@ -174,6 +174,38 @@ describe('workersState', () => {
     expect(level()).toBe(3);
   });
 
+  it('keeps an untouched slice by reference across a non-tick update', async () => {
+    const state = seedState();
+    const rootBefore = gamestate();
+
+    await updateGamestate((draft) => {
+      draft.lootFilters = { ...draft.lootFilters };
+      return draft;
+    });
+
+    expect(workersState()).toBe(state.workers);
+    expect(gamestate()).not.toBe(rootBefore);
+  });
+
+  it('does not re-evaluate a slice consumer when a non-tick update touches another key', async () => {
+    seedState();
+    let evaluations = 0;
+    const level = computed(() => {
+      evaluations += 1;
+      return workersState()[WORKER_ID].level;
+    });
+    level();
+    const before = evaluations;
+
+    await updateGamestate((draft) => {
+      draft.lootFilters = { ...draft.lootFilters };
+      return draft;
+    });
+    level();
+
+    expect(evaluations).toBe(before);
+  });
+
   it('returns the in-flight draft mid-tick', () => {
     seedState();
 
