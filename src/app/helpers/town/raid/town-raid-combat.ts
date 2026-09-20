@@ -10,13 +10,14 @@ import {
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
-  gamestate,
   updateGamestate,
-  worldPartyState,
   worldCombatState,
+  worldPartyState,
+  worldTownsState,
 } from '@helpers/state-game';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
+import { updateTownNode } from '@helpers/town/town-node';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type { Combat, MonsterContent, TownContent, TownId } from '@interfaces';
 
@@ -31,7 +32,7 @@ export function raidEngageCombat(townId: TownId): boolean {
   if (!town) return false;
   if (worldCombatState()) return false;
 
-  const state = gamestate().world.towns[townId];
+  const state = worldTownsState()[townId];
   if (state?.raidTelegraphedAtTick === undefined) return false;
   if (!partyIsAtTown(town)) return false;
 
@@ -64,12 +65,11 @@ export function raidEngageCombat(townId: TownId): boolean {
 
   updateGamestate((gs) => {
     gs.world.combat = combat;
-    const target = gs.world.towns[townId];
-    if (target) {
+    updateTownNode(gs, townId, (target) => {
       target.raidTelegraphedAtTick = undefined;
       target.raidEngageWindowExpiresAtTick = undefined;
       target.raidTelegraphedAssaulterIds = undefined;
-    }
+    });
     raidDefenseGlobalEffectApply(gs, timerTicksElapsed());
     return gs;
   });

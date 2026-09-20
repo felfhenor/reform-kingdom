@@ -19,6 +19,7 @@ vi.mock('@helpers/town/town-tick', () => ({
 
 import { getEntriesByType } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate } from '@helpers/state-game';
 import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
 import {
@@ -37,6 +38,8 @@ function buildTown(itemExpirationTimer: number): TownContent {
 }
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world?.towns);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);

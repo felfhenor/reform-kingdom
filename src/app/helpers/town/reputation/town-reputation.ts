@@ -1,5 +1,6 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldTownsState } from '@helpers/state-game';
+import { updateTownNode } from '@helpers/town/town-node';
 import type { TownId, TownReputationGainSource } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -37,7 +38,7 @@ export function townReputationTierName(tier: number): string {
 }
 
 export function townReputation(townId: TownId): number {
-  return gamestate().world.towns[townId]?.reputation ?? 0;
+  return worldTownsState()[townId]?.reputation ?? 0;
 }
 
 export function townReputationTier(townId: TownId): number {
@@ -59,12 +60,14 @@ export async function townReputationGain(
     const town = state.world.towns[townId];
     if (!town) return state;
 
-    const previousTier = townReputationTierForAmount(town.reputation);
-    town.reputation = clamp(town.reputation + amount, 0, TOWN_REPUTATION_MAX);
+    const reputation = clamp(town.reputation + amount, 0, TOWN_REPUTATION_MAX);
     tierChanged =
-      townReputationTierForAmount(town.reputation) !== previousTier;
+      townReputationTierForAmount(reputation) !==
+      townReputationTierForAmount(town.reputation);
 
-    return state;
+    return updateTownNode(state, townId, (node) => {
+      node.reputation = reputation;
+    });
   });
 
   analyticsSendDesignEvent(`Town:Reputation:${source}`);
@@ -87,12 +90,14 @@ export async function townReputationLose(
     const town = state.world.towns[townId];
     if (!town) return state;
 
-    const previousTier = townReputationTierForAmount(town.reputation);
-    town.reputation = clamp(town.reputation - amount, 0, TOWN_REPUTATION_MAX);
+    const reputation = clamp(town.reputation - amount, 0, TOWN_REPUTATION_MAX);
     tierChanged =
-      townReputationTierForAmount(town.reputation) !== previousTier;
+      townReputationTierForAmount(reputation) !==
+      townReputationTierForAmount(town.reputation);
 
-    return state;
+    return updateTownNode(state, townId, (node) => {
+      node.reputation = reputation;
+    });
   });
 
   analyticsSendDesignEvent(`Town:Reputation:Lose:${source}`);

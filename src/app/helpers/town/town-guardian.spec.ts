@@ -4,9 +4,13 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 import { getEntriesByType } from '@helpers/content/content';
 import { gamestate } from '@helpers/state-game';

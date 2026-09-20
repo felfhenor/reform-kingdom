@@ -23,6 +23,7 @@ import {
 } from '@helpers/town/town-commission-fulfill';
 import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { depositCommissionRequirementsToTown } from '@helpers/town/town-materials';
+import { updateTownNode } from '@helpers/town/town-node';
 import { isPartyAtTown } from '@helpers/town/town-visit';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
@@ -96,10 +97,9 @@ export async function townCommissionFulfill(
   let reputationAmount = 0;
 
   await updateGamestate((s) => {
-    const target = s.world.towns[townId];
-    if (!target) return s;
-
-    const slot = target.commissionSlots.find((entry) => entry.id === slotId);
+    const slot = s.world.towns[townId]?.commissionSlots.find(
+      (entry) => entry.id === slotId,
+    );
     if (!slot || !commissionRequirementsSatisfied(slot.requirements, s)) {
       return s;
     }
@@ -114,9 +114,11 @@ export async function townCommissionFulfill(
     depositCommissionRequirementsToTown(s, townId, slot.requirements);
 
     if (!isSlotPersistent(townData, slot)) {
-      target.commissionSlots = target.commissionSlots.filter(
-        (entry) => entry.id !== slotId,
-      );
+      updateTownNode(s, townId, (target) => {
+        target.commissionSlots = target.commissionSlots.filter(
+          (entry) => entry.id !== slotId,
+        );
+      });
     }
 
     fulfilled = true;

@@ -5,7 +5,7 @@ import {
   discoveredCaravansState,
   discoveredMaterialsState,
   discoveredWorkersState,
-  gamestate,
+  worldTownsState,
 } from '@helpers/state-game';
 import type { ItemContent, ItemId, TutorialTrigger } from '@interfaces';
 
@@ -23,7 +23,7 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
     case 'party-level':
       return partyMaxLevel() >= trigger.level;
     case 'first-town-visit':
-      return Object.values(gamestate().world.towns).some(
+      return Object.values(worldTownsState()).some(
         (town) => town.firstVisitedAtTick !== undefined,
       );
     case 'first-caravan-visit':

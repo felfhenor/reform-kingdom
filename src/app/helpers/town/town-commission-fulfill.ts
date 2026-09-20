@@ -4,7 +4,7 @@ import {
   commissionRequirementsSatisfied,
 } from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import type {
   CommissionOfferContent,
   CommissionRequirementEntry,
@@ -16,9 +16,12 @@ import type {
 
 export function commissionSlots(
   townId: TownId,
-  state: GameState = gamestate(),
+  state?: GameState,
 ): TownCommissionSlotState[] {
-  return state.world.towns[townId]?.commissionSlots ?? [];
+  return (
+    (state ? state.world.towns : worldTownsState())[townId]?.commissionSlots ??
+    []
+  );
 }
 
 function findSlot(

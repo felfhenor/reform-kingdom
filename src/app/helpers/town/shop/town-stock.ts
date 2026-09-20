@@ -2,7 +2,8 @@ import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
+import { updateTownNode } from '@helpers/town/town-node';
 import type {
   EquipmentContent,
   GameState,
@@ -13,7 +14,7 @@ import type {
 } from '@interfaces';
 
 export function townStock(townId: TownId): TownStockEntry[] {
-  return gamestate().world.towns[townId]?.stock ?? [];
+  return worldTownsState()[townId]?.stock ?? [];
 }
 
 export function townStockDisplay(
@@ -64,5 +65,7 @@ export function applyTownStockAdd(
     ...addition,
     addedAtTick: timerTicksElapsed(),
   };
-  target.stock = [...target.stock, entry];
+  updateTownNode(state, townId, (town) => {
+    town.stock = [...town.stock, entry];
+  });
 }

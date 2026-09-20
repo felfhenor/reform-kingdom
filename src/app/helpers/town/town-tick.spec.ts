@@ -6,10 +6,14 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
@@ -25,6 +29,7 @@ vi.mock('@helpers/town/worker/town-worker-roster', async (importOriginal) => {
 
 import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   isTownDueForUpdate,
@@ -96,6 +101,15 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+function withFrozenTowns(
+  fn: (state: GameState) => GameState,
+): (state: GameState) => GameState {
+  return (state) => {
+    deepFreeze(state.world?.towns);
+    return fn(state);
+  };
+}
+
 describe('isTownDueForUpdate', () => {
   it('is due when the subsystem has never been processed', () => {
     vi.mocked(gamestate).mockReturnValue({
@@ -152,7 +166,8 @@ describe('markTownSubsystemProcessed', () => {
         towns: { [townId]: { lastProcessedTick: { worker: 1 } } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -166,7 +181,8 @@ describe('markTownSubsystemProcessed', () => {
 
   it('no-ops when the town has no state entry', () => {
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 

@@ -1,12 +1,13 @@
+import { dictionaryMapValues } from '@helpers/engine/dictionary';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
-  CaravanId,
   CommissionNodeState,
   CommissionRequirement,
   GameState,
   MonsterId,
+  TownNodeState,
 } from '@interfaces';
-import { clamp, mapValues } from 'es-toolkit/compat';
+import { clamp } from 'es-toolkit/compat';
 
 function hasUnsatisfiedRequirement(
   requirements: CommissionRequirement[],
@@ -82,20 +83,25 @@ function commissionNodeWithKillProgress(
     : { ...nodeState, requirements };
 }
 
-function incrementCaravanCommissions(
-  state: GameState,
+function townNodeWithKillProgress(
+  town: TownNodeState,
   monsterId: MonsterId,
   count: number,
-): void {
-  const before = state.world.commissions;
-  const after = mapValues(before, (nodeState) =>
-    commissionNodeWithKillProgress(nodeState, monsterId, count),
-  );
+): TownNodeState {
+  const commissionSlots = town.commissionSlots.map((slot) => {
+    const requirements = requirementsWithKillProgress(
+      slot.requirements,
+      monsterId,
+      count,
+    );
+    return requirements === slot.requirements
+      ? slot
+      : { ...slot, requirements };
+  });
 
-  const changed = (Object.keys(after) as CaravanId[]).some(
-    (caravanId) => after[caravanId] !== before[caravanId],
-  );
-  if (changed) state.world.commissions = after;
+  return commissionSlots.some((slot, i) => slot !== town.commissionSlots[i])
+    ? { ...town, commissionSlots }
+    : town;
 }
 
 // Kill-quest commissions can be rolled by either system, so both need updating.
@@ -104,17 +110,13 @@ function incrementKillProgress(
   monsterId: MonsterId,
   count: number,
 ): void {
-  incrementCaravanCommissions(state, monsterId, count);
-
-  Object.values(state.world.towns).forEach((town) => {
-    town.commissionSlots.forEach((slot) => {
-      slot.requirements = requirementsWithKillProgress(
-        slot.requirements,
-        monsterId,
-        count,
-      );
-    });
-  });
+  state.world.commissions = dictionaryMapValues(
+    state.world.commissions,
+    (nodeState) => commissionNodeWithKillProgress(nodeState, monsterId, count),
+  );
+  state.world.towns = dictionaryMapValues(state.world.towns, (town) =>
+    townNodeWithKillProgress(town, monsterId, count),
+  );
 }
 
 // Skips updateGamestate unless a commission actually needs this kill - called on every combat victory in the game.

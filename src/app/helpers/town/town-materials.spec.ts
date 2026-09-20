@@ -4,11 +4,16 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 import { getEntry } from '@helpers/content/content';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate } from '@helpers/state-game';
 import {
   applyTownMaterialDelta,
@@ -22,9 +27,11 @@ const townId = 'larsia' as TownId;
 const oreId = 'copper-ore' as ItemId;
 
 function buildState(materials: Partial<Record<ItemId, number>>): GameState {
-  return {
+  const state = {
     world: { towns: { [townId]: { materials } } },
   } as unknown as GameState;
+  deepFreeze(state.world.towns);
+  return state;
 }
 
 beforeEach(() => {

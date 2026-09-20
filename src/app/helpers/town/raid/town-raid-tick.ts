@@ -16,10 +16,11 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import { partyMinLevel } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import {
-  gamestate,
   updateGamestate,
   worldCombatState,
+  worldTownsState,
 } from '@helpers/state-game';
+import { updateTownNode } from '@helpers/town/town-node';
 import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
@@ -60,19 +61,18 @@ export function telegraphRaid(town: TownContent): void {
   );
 
   updateGamestate((state) => {
-    const target = state.world.towns[town.id];
-    if (target) {
+    updateTownNode(state, town.id, (target) => {
       target.raidTelegraphedAtTick = now;
       target.raidEngageWindowExpiresAtTick = now + windowTicks;
       target.raidTelegraphedAssaulterIds = assaulterMonsterIds;
-    }
+    });
     raidDefenseGlobalEffectApply(state, now);
     return state;
   });
 }
 
 function processTownRaid(town: TownContent): void {
-  const state = gamestate().world.towns[town.id];
+  const state = worldTownsState()[town.id];
   if (!state || state.firstVisitedAtTick === undefined) return;
   // Its raid is actively being fought - without this the checks below would re-telegraph mid-fight.
   if (worldCombatState()?.raidTownId === town.id) return;

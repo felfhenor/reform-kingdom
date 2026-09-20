@@ -4,9 +4,13 @@ vi.mock('@helpers/item/materials', () => ({
   goldCoinId: vi.fn(() => goldCoinItemId),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 import { gamestate } from '@helpers/state-game';
 import {

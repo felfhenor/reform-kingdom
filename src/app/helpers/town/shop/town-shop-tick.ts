@@ -2,6 +2,7 @@ import { SHOP_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { updateGamestate } from '@helpers/state-game';
+import { updateTownNode } from '@helpers/town/town-node';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -17,10 +18,14 @@ function expireTownStock(town: TownContent): void {
     if (!target) return state;
 
     const nowTick = timerTicksElapsed();
-    target.stock = target.stock.filter(
+    const stock = target.stock.filter(
       (entry) => nowTick - entry.addedAtTick < itemExpirationTimer,
     );
-    return state;
+    if (stock.length === target.stock.length) return state;
+
+    return updateTownNode(state, town.id, (node) => {
+      node.stock = stock;
+    });
   });
 }
 

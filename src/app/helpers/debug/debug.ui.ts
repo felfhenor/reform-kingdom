@@ -34,11 +34,12 @@ import {
   monsterRecordKill,
 } from '@helpers/kingdom/bestiary';
 import {
-  gamestate,
   updateGamestate,
-  worldPartyState,
   worldCurrentLocationState,
+  worldPartyState,
+  worldTownsState,
 } from '@helpers/state-game';
+import { updateTownNode } from '@helpers/town/town-node';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
@@ -332,13 +333,11 @@ export async function debugSetTownReputation(
     TOWN_REPUTATION_THRESHOLDS[4],
   );
 
-  await updateGamestate((state) => {
-    const town = state.world.towns[realTownId];
-    if (!town) return state;
-
-    town.reputation = clamped;
-    return state;
-  });
+  await updateGamestate((state) =>
+    updateTownNode(state, realTownId, (town) => {
+      town.reputation = clamped;
+    }),
+  );
 
   // Debug-set reputation skips townReputationGain/Lose, so tier-scaled persistent commissions need an explicit refresh here too.
   await townCommissionRefreshTierScaledSlots(realTownId);
@@ -391,7 +390,7 @@ export function debugTelegraphRaid(townId: TownId): void {
     return;
   }
 
-  if (gamestate().world.towns[townId]?.firstVisitedAtTick === undefined) {
+  if (worldTownsState()[townId]?.firstVisitedAtTick === undefined) {
     townMarkVisited(townId);
   }
 

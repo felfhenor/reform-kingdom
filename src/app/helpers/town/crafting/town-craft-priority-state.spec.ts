@@ -5,10 +5,14 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/town/crafting/town-craft-eligibility', () => ({
   isRecipeCraftableByTown: vi.fn(),
@@ -21,6 +25,7 @@ vi.mock('@helpers/town/town-tick', () => ({
 }));
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   pruneInvalidTownSpecialtyPriority,
@@ -106,35 +111,52 @@ describe('townSpecialtyPriority', () => {
   });
 });
 
+function buildState(target: TownNodeState): GameState {
+  const state = {
+    world: { towns: { [townId]: target } },
+  } as unknown as GameState;
+  deepFreeze(state.world.towns);
+  return state;
+}
+
 describe('resetTownSpecialtyPriority', () => {
   it('removes the entry for the given recipe', () => {
-    const target = buildTarget({
-      specialtyPriority: [
-        { recipeId: ringRecipeId, failureCount: 3 },
-        { recipeId: 'other' as RecipeId, failureCount: 1 },
-      ],
-    });
+    const state = buildState(
+      buildTarget({
+        specialtyPriority: [
+          { recipeId: ringRecipeId, failureCount: 3 },
+          { recipeId: 'other' as RecipeId, failureCount: 1 },
+        ],
+      }),
+    );
 
-    resetTownSpecialtyPriority(target, ringRecipeId);
+    resetTownSpecialtyPriority(state, townId, ringRecipeId);
 
-    expect(target.specialtyPriority).toEqual([
+    expect(state.world.towns[townId].specialtyPriority).toEqual([
       { recipeId: 'other', failureCount: 1 },
     ]);
   });
 
-  it('is a no-op when the recipe has no entry', () => {
-    const target = buildTarget();
+  it('writes nothing when the recipe has no entry', () => {
+    const state = buildState(buildTarget());
+    const previous = state.world.towns;
 
-    resetTownSpecialtyPriority(target, ringRecipeId);
+    resetTownSpecialtyPriority(state, townId, ringRecipeId);
 
-    expect(target.specialtyPriority).toEqual([]);
+    expect(state.world.towns).toBe(previous);
+    expect(state.world.towns[townId].specialtyPriority).toEqual([]);
   });
 
   it('does not throw when specialtyPriority is missing on a not-yet-migrated town state', () => {
-    const target = { craftQueue: [], stock: [] } as unknown as TownNodeState;
+    const state = buildState({
+      craftQueue: [],
+      stock: [],
+    } as unknown as TownNodeState);
 
-    expect(() => resetTownSpecialtyPriority(target, ringRecipeId)).not.toThrow();
-    expect(target.specialtyPriority).toEqual([]);
+    expect(() =>
+      resetTownSpecialtyPriority(state, townId, ringRecipeId),
+    ).not.toThrow();
+    expect(state.world.towns[townId].specialtyPriority).toEqual([]);
   });
 });
 
@@ -143,20 +165,18 @@ describe('townSpecialtyPriorityProcessTick', () => {
   const recipe = buildRecipe();
 
   beforeEach(() => {
-    vi.mocked(getEntriesByType).mockImplementation((type) =>
-      (type === 'town' ? [town] : []) as never,
+    vi.mocked(getEntriesByType).mockImplementation(
+      (type) => (type === 'town' ? [town] : []) as never,
     );
-    vi.mocked(getEntry).mockImplementation((id) =>
-      (id === ringRecipeId ? recipe : undefined) as never,
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === ringRecipeId ? recipe : undefined) as never,
     );
   });
 
   function applyTick(target: TownNodeState): TownNodeState {
     townSpecialtyPriorityProcessTick();
     const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const state = {
-      world: { towns: { [townId]: target } },
-    } as unknown as GameState;
+    const state = buildState(target);
     updateFn(state);
     return state.world.towns[townId];
   }
@@ -189,7 +209,7 @@ describe('townSpecialtyPriorityProcessTick', () => {
     const target = { craftQueue: [], stock: [] } as unknown as TownNodeState;
 
     expect(() => applyTick(target)).not.toThrow();
-    expect(target.specialtyPriority).toEqual([
+    expect(applyTick(target).specialtyPriority).toEqual([
       { recipeId: ringRecipeId, failureCount: 1 },
     ]);
   });

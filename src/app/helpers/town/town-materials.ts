@@ -1,5 +1,7 @@
 import { getEntry } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
+import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
+import { worldTownsState } from '@helpers/state-game';
+import { updateTownNode } from '@helpers/town/town-node';
 import type {
   CommissionRequirement,
   GameState,
@@ -18,17 +20,20 @@ export function applyTownMaterialDelta(
   const target = state.world.towns[townId];
   if (!target) return;
 
-  const quantity = Math.max(0, (target.materials[itemId] ?? 0) + delta);
+  const current = target.materials[itemId] ?? 0;
+  const quantity = Math.max(0, current + delta);
+  if (quantity === current) return;
 
-  if (quantity === 0) {
-    delete target.materials[itemId];
-  } else {
-    target.materials[itemId] = quantity;
-  }
+  updateTownNode(state, townId, (town) => {
+    town.materials =
+      quantity === 0
+        ? dictionaryWithout(town.materials, itemId)
+        : dictionaryWith(town.materials, itemId, quantity);
+  });
 }
 
 export function townMaterialQuantity(townId: TownId, itemId: ItemId): number {
-  return gamestate().world.towns[townId]?.materials[itemId] ?? 0;
+  return worldTownsState()[townId]?.materials[itemId] ?? 0;
 }
 
 // Item requirements only - a town has no armory or kill tally to credit equipment/monster-kill requirements to.
@@ -39,7 +44,12 @@ export function depositCommissionRequirementsToTown(
 ): void {
   requirements.forEach((requirement) => {
     if (!('itemId' in requirement)) return;
-    applyTownMaterialDelta(state, townId, requirement.itemId, requirement.quantity);
+    applyTownMaterialDelta(
+      state,
+      townId,
+      requirement.itemId,
+      requirement.quantity,
+    );
   });
 }
 

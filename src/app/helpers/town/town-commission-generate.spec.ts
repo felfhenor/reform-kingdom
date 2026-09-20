@@ -56,6 +56,7 @@ import {
 } from '@helpers/commission/commission-requirement';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import {
@@ -140,6 +141,15 @@ function stubEligibleOffers(offers: CommissionOfferContent[]): void {
   );
 }
 
+function frozenUpdate(index: number): (state: GameState) => GameState {
+  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
+
+  return (state) => {
+    deepFreeze(state.world?.towns);
+    return updateFn(state);
+  };
+}
+
 describe('townCommissionSlotCount', () => {
   it.each([
     [0, 1],
@@ -180,7 +190,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -206,7 +216,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -251,7 +261,7 @@ describe('townCommissionProcessTick', () => {
     } as unknown as GameState;
 
     townCommissionProcessTick();
-    vi.mocked(updateGamestate).mock.calls[0][0](state);
+    frozenUpdate(0)(state);
 
     expect(
       state.world.towns[twoSlotTown.id].commissionSlots.map(
@@ -260,7 +270,7 @@ describe('townCommissionProcessTick', () => {
     ).toEqual([offer.id]);
 
     townCommissionProcessTick();
-    vi.mocked(updateGamestate).mock.calls[1][0](state);
+    frozenUpdate(1)(state);
 
     expect(
       state.world.towns[twoSlotTown.id].commissionSlots.map(
@@ -274,7 +284,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -315,7 +325,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -345,7 +355,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -364,7 +374,7 @@ describe('townCommissionProcessTick', () => {
 
     townCommissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: { towns: { [town.id]: { commissionSlots: [] } } },
     } as unknown as GameState;
@@ -376,7 +386,7 @@ describe('townCommissionProcessTick', () => {
   it('no-ops when the town has no state entry yet', () => {
     townCommissionProcessTick();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = { world: { towns: {} } } as unknown as GameState;
 
     expect(() => updateFn(state)).not.toThrow();
@@ -399,7 +409,7 @@ describe('townCommissionProcessTick', () => {
 
       townCommissionProcessTick();
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const updateFn = frozenUpdate(0);
       const state = {
         world: { towns: { [persistentTown.id]: { commissionSlots: [] } } },
       } as unknown as GameState;
@@ -420,7 +430,7 @@ describe('townCommissionProcessTick', () => {
 
       townCommissionProcessTick();
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const updateFn = frozenUpdate(0);
       const state = {
         world: {
           towns: {
@@ -458,7 +468,7 @@ describe('townCommissionProcessTick', () => {
 
       townCommissionProcessTick();
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const updateFn = frozenUpdate(0);
       const state = {
         world: {
           towns: {
@@ -502,7 +512,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
 
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -511,9 +521,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
               {
                 id: 'slot-1',
                 commissionOfferId: scaledOffer.id,
-                requirements: [
-                  { itemId: 'wergen-stick', quantity: 100 },
-                ],
+                requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
                 generatedAtTick: 0,
               },
             ],
@@ -523,9 +531,9 @@ describe('townCommissionRefreshTierScaledSlots', () => {
     } as unknown as GameState;
     updateFn(state);
 
-    expect(
-      state.world.towns[town.id].commissionSlots[0].requirements,
-    ).toEqual([{ itemId: 'wergen-stick', quantity: 500 }]);
+    expect(state.world.towns[town.id].commissionSlots[0].requirements).toEqual([
+      { itemId: 'wergen-stick', quantity: 500 },
+    ]);
   });
 
   it('leaves a slot untouched when its offer has no tier multipliers', async () => {
@@ -533,7 +541,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
 
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -542,9 +550,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
               {
                 id: 'slot-1',
                 commissionOfferId: offer.id,
-                requirements: [
-                  { itemId: 'wergen-stick', quantity: 100 },
-                ],
+                requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
                 generatedAtTick: 0,
               },
             ],
@@ -555,15 +561,15 @@ describe('townCommissionRefreshTierScaledSlots', () => {
     updateFn(state);
 
     expect(rollCommissionRequirements).not.toHaveBeenCalled();
-    expect(
-      state.world.towns[town.id].commissionSlots[0].requirements,
-    ).toEqual([{ itemId: 'wergen-stick', quantity: 100 }]);
+    expect(state.world.towns[town.id].commissionSlots[0].requirements).toEqual([
+      { itemId: 'wergen-stick', quantity: 100 },
+    ]);
   });
 
   it('no-ops when the town has no state entry', async () => {
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = { world: { towns: {} } } as unknown as GameState;
 
     expect(() => updateFn(state)).not.toThrow();
@@ -578,7 +584,7 @@ describe('townCommissionRefreshTierScaledSlots', () => {
 
     await townCommissionRefreshTierScaledSlots(town.id);
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         towns: {
@@ -600,8 +606,8 @@ describe('townCommissionRefreshTierScaledSlots', () => {
     updateFn(state);
 
     expect(rollCommissionRequirements).not.toHaveBeenCalled();
-    expect(
-      state.world.towns[town.id].commissionSlots[0].requirements,
-    ).toEqual([{ monsterId: 'sand-worm', quantity: 5, progress: 3 }]);
+    expect(state.world.towns[town.id].commissionSlots[0].requirements).toEqual([
+      { monsterId: 'sand-worm', quantity: 5, progress: 3 },
+    ]);
   });
 });

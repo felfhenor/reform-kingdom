@@ -16,9 +16,13 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/town/town-guardian', () => ({
   townGuardiansForCurrentReputation: vi.fn(() => []),

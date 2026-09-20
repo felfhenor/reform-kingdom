@@ -10,10 +10,14 @@ vi.mock('@helpers/engine/analytics', () => ({
   analyticsSendDesignEvent: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
@@ -34,6 +38,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { isPartyAtTown, townMarkVisited } from '@helpers/town/town-visit';
 import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
@@ -52,6 +57,15 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+function withFrozenTowns(
+  fn: (state: GameState) => GameState,
+): (state: GameState) => GameState {
+  return (state) => {
+    deepFreeze(state.world?.towns);
+    return fn(state);
+  };
+}
+
 describe('townMarkVisited', () => {
   it('creates a state entry stamped with the current tick on first visit', () => {
     vi.mocked(gamestate).mockReturnValue({
@@ -59,7 +73,8 @@ describe('townMarkVisited', () => {
     } as unknown as GameState);
     vi.mocked(timerTicksElapsed).mockReturnValue(500);
     const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -85,7 +100,8 @@ describe('townMarkVisited', () => {
       world: { towns: {} },
     } as unknown as GameState);
     vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn({ world: { towns: {} } } as unknown as GameState);
     });
     vi.mocked(getEntry).mockReturnValue({ name: 'Larsia' } as TownContent);
@@ -107,7 +123,8 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: { worker: 42 } } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -144,7 +161,8 @@ describe('townMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -165,7 +183,8 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, reputation: 250 } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -186,7 +205,8 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, hiddenGold: 1200 } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -208,7 +228,8 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, materials } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -230,7 +251,8 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, tradeskills } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -252,7 +274,8 @@ describe('townMarkVisited', () => {
         towns: { [townId]: { lastProcessedTick: {}, craftQueue } },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -282,7 +305,8 @@ describe('townMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 
@@ -310,7 +334,8 @@ describe('townMarkVisited', () => {
         },
       },
     } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+    vi.mocked(updateGamestate).mockImplementation(async (updateFn) => {
+      const fn = withFrozenTowns(updateFn);
       fn(state);
     });
 

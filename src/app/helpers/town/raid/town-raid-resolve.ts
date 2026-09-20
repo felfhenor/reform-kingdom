@@ -38,6 +38,7 @@ import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commiss
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { townStockDisplay } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
+import { updateTownNode } from '@helpers/town/town-node';
 import type {
   Combat,
   GameState,
@@ -46,7 +47,6 @@ import type {
   RecipeContent,
   TownContent,
   TownId,
-  TownNodeState,
   TownRaidLossSummary,
 } from '@interfaces';
 
@@ -73,16 +73,17 @@ export function raidResolveVictory(combat: Combat, townId: TownId): void {
     townCommissionRefreshTierScaledSlots(townId);
   }
 
-  updateGamestate((state) => {
-    const target = state.world.towns[townId];
-    if (target) target.lastRaidResolvedAtTick = timerTicksElapsed();
-    return state;
-  });
+  updateGamestate((state) =>
+    updateTownNode(state, townId, (target) => {
+      target.lastRaidResolvedAtTick = timerTicksElapsed();
+    }),
+  );
 }
 
 // 1 to 50% of the stock cap (not the current stock count) - picked randomly from whatever stock actually exists.
-function stealTownStock(target: TownNodeState, townId: TownId): string[] {
-  if (target.stock.length === 0) return [];
+function stealTownStock(state: GameState, townId: TownId): string[] {
+  const { stock } = state.world.towns[townId];
+  if (stock.length === 0) return [];
 
   const maxSlots = Math.max(
     1,
@@ -90,13 +91,12 @@ function stealTownStock(target: TownNodeState, townId: TownId): string[] {
       townShopItemCap(townId) * (RAID_LOSS_STOCK_MAX_STEAL_PERCENT / 100),
     ),
   );
-  const stolenCount = Math.min(
-    target.stock.length,
-    rngNumberRange(1, maxSlots + 1),
-  );
-  const stolenEntries = rngShuffle(target.stock).slice(0, stolenCount);
+  const stolenCount = Math.min(stock.length, rngNumberRange(1, maxSlots + 1));
+  const stolenEntries = rngShuffle(stock).slice(0, stolenCount);
 
-  target.stock = target.stock.filter((entry) => !stolenEntries.includes(entry));
+  updateTownNode(state, townId, (town) => {
+    town.stock = town.stock.filter((entry) => !stolenEntries.includes(entry));
+  });
 
   return stolenEntries
     .map((entry) => townStockDisplay(entry)?.name)
@@ -104,17 +104,20 @@ function stealTownStock(target: TownNodeState, townId: TownId): string[] {
 }
 
 // The whole queue is scrapped - materials already consumed for it are gone too, not refunded.
-function cancelTownCraftQueue(target: TownNodeState): string[] {
-  if (target.craftQueue.length === 0) return [];
+function cancelTownCraftQueue(state: GameState, townId: TownId): string[] {
+  const { craftQueue } = state.world.towns[townId];
+  if (craftQueue.length === 0) return [];
 
-  const names = target.craftQueue
+  const names = craftQueue
     .map((entry) => {
       const recipe = getEntry<RecipeContent>(entry.recipeId);
       return recipe ? resolveRewardDisplay(recipe.result)?.name : undefined;
     })
     .filter((name): name is string => !!name);
 
-  target.craftQueue = [];
+  updateTownNode(state, townId, (town) => {
+    town.craftQueue = [];
+  });
 
   return names;
 }
@@ -123,13 +126,14 @@ function cancelTownCraftQueue(target: TownNodeState): string[] {
 function stealTownMaterials(
   state: GameState,
   townId: TownId,
-  target: TownNodeState,
 ): TownRaidLossSummary['lostMaterials'] {
-  return (Object.keys(target.materials) as ItemId[])
+  // A snapshot is safe: each stack is only decremented once, by its own loop pass.
+  const { materials } = state.world.towns[townId];
+
+  return (Object.keys(materials) as ItemId[])
     .map((itemId) => {
       const stolen = Math.floor(
-        (target.materials[itemId] ?? 0) *
-          (RAID_LOSS_MATERIAL_STEAL_PERCENT / 100),
+        (materials[itemId] ?? 0) * (RAID_LOSS_MATERIAL_STEAL_PERCENT / 100),
       );
       if (stolen <= 0) return undefined;
 
@@ -203,20 +207,21 @@ export function raidResolveDefeat(townId: TownId): void {
   let summary: TownRaidLossSummary | undefined;
 
   updateGamestate((state) => {
-    const target = state.world.towns[townId];
-    if (!target) return state;
+    if (!state.world.towns[townId]) return state;
 
     summary = {
-      stolenItemNames: stealTownStock(target, townId),
-      cancelledCraftNames: cancelTownCraftQueue(target),
-      lostMaterials: stealTownMaterials(state, townId, target),
+      stolenItemNames: stealTownStock(state, townId),
+      cancelledCraftNames: cancelTownCraftQueue(state, townId),
+      lostMaterials: stealTownMaterials(state, townId),
     };
 
-    target.lastRaidResolvedAtTick = now;
-    target.craftSpeedDebuffExpiresAtTick = now + RAID_LOSS_CRAFT_DEBUFF_TICKS;
-    target.raidTelegraphedAtTick = undefined;
-    target.raidEngageWindowExpiresAtTick = undefined;
-    target.raidTelegraphedAssaulterIds = undefined;
+    updateTownNode(state, townId, (target) => {
+      target.lastRaidResolvedAtTick = now;
+      target.craftSpeedDebuffExpiresAtTick = now + RAID_LOSS_CRAFT_DEBUFF_TICKS;
+      target.raidTelegraphedAtTick = undefined;
+      target.raidEngageWindowExpiresAtTick = undefined;
+      target.raidTelegraphedAssaulterIds = undefined;
+    });
     raidDefenseGlobalEffectApply(state, now);
     return state;
   });

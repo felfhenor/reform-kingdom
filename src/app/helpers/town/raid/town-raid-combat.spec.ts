@@ -22,12 +22,16 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(() => 1000),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-  worldPartyState: vi.fn(() => []),
-  worldCombatState: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldPartyState: vi.fn(() => []),
+    worldCombatState: vi.fn(),
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/town/raid/town-raid-defense', () => ({
   raidDefenseGlobalEffectApply: vi.fn(),
@@ -47,6 +51,7 @@ import {
 } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import {
   gamestate,
   updateGamestate,
@@ -111,6 +116,15 @@ beforeEach(() => {
     guardians: [],
   } as unknown as Combat);
 });
+
+function frozenUpdate(index: number): (state: GameState) => GameState {
+  const updateFn = vi.mocked(updateGamestate).mock.calls[index][0];
+
+  return (state) => {
+    deepFreeze(state.world?.towns);
+    return updateFn(state);
+  };
+}
 
 describe('raidEngageCombat', () => {
   it('returns false when the town does not resolve', () => {
@@ -183,7 +197,7 @@ describe('raidEngageCombat', () => {
     // deferred outside-tick commit leaves it reading stale gamestate.
     expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+    const updateFn = frozenUpdate(0);
     const state = {
       world: {
         combat: undefined,

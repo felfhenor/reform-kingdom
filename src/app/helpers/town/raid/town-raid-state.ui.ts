@@ -1,4 +1,4 @@
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import type { TownId } from '@interfaces';
 
@@ -6,7 +6,7 @@ import type { TownId } from '@interfaces';
 export function townCraftDebuffExpiresAtTick(
   townId: TownId,
 ): number | undefined {
-  const state = gamestate().world.towns[townId];
+  const state = worldTownsState()[townId];
   if (!state || !isTownCraftDebuffActive(state)) return undefined;
 
   return state.craftSpeedDebuffExpiresAtTick;

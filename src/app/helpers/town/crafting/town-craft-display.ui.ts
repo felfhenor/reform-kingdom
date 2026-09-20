@@ -2,7 +2,7 @@ import { RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import { townCraftTimeFor } from '@helpers/town/crafting/town-craft-time';
 import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import type {
@@ -21,7 +21,7 @@ export function townTradeskillLevelRows(
   const town = getEntry<TownContent>(townId);
   if (!town) return [];
 
-  const state = gamestate().world.towns[townId];
+  const state = worldTownsState()[townId];
 
   return ALL_TRADESKILLS.flatMap((tradeskillName) => {
     const content = getEntry<TradeskillContent>(tradeskillName);
@@ -43,7 +43,7 @@ export function townTradeskillLevelRows(
 
 export function townCraftQueueRows(townId: TownId): TownCraftQueueRow[] {
   const town = getEntry<TownContent>(townId);
-  const state = gamestate().world.towns[townId];
+  const state = worldTownsState()[townId];
   if (!town || !state) return [];
 
   return state.craftQueue.flatMap((entry) => {

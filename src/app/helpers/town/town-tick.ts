@@ -1,6 +1,8 @@
 import { getEntry } from '@helpers/content/content';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldTownsState } from '@helpers/state-game';
+import { updateTownNode } from '@helpers/town/town-node';
 import { pruneInvalidTownStock } from '@helpers/town/shop/town-stock';
 import {
   pruneInvalidTownCraftQueue,
@@ -28,7 +30,7 @@ export function isTownDueForUpdate(
   subsystem: TownTickSubsystem,
   interval: number,
 ): boolean {
-  const state = gamestate().world.towns[townId];
+  const state = worldTownsState()[townId];
   if (!state) return false;
 
   const lastProcessed = state.lastProcessedTick[subsystem];
@@ -43,13 +45,15 @@ export function markTownSubsystemProcessed(
 ): void {
   const nowTick = timerTicksElapsed();
 
-  updateGamestate((state) => {
-    const target = state.world.towns[townId];
-    if (!target) return state;
-
-    target.lastProcessedTick[subsystem] = nowTick;
-    return state;
-  });
+  updateGamestate((state) =>
+    updateTownNode(state, townId, (town) => {
+      town.lastProcessedTick = dictionaryWith(
+        town.lastProcessedTick,
+        subsystem,
+        nowTick,
+      );
+    }),
+  );
 }
 
 export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {

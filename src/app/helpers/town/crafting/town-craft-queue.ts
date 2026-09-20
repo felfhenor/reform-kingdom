@@ -14,6 +14,7 @@ import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
+import { updateTownNode } from '@helpers/town/town-node';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -25,7 +26,6 @@ import type {
   TownContent,
   TownCraftQueueEntry,
   TownId,
-  TownNodeState,
 } from '@interfaces';
 
 // Grants the result unconditionally (the caller already decided the craft succeeds) - a material result
@@ -60,10 +60,10 @@ function grantCraftedResult(
 function resolveQueueEntryCompletion(
   state: GameState,
   town: TownContent,
-  target: TownNodeState,
   entry: TownCraftQueueEntry,
   recipe: RecipeContent,
 ): boolean {
+  const target = state.world.towns[town.id];
   if (!target.tradeskills[entry.tradeskillId]) return true; // orphaned tradeskill - drop the entry defensively
 
   if (
@@ -74,7 +74,7 @@ function resolveQueueEntryCompletion(
   }
 
   grantCraftedResult(state, town.id, recipe);
-  resetTownSpecialtyPriority(target, recipe.id);
+  resetTownSpecialtyPriority(state, town.id, recipe.id);
 
   return true;
 }
@@ -83,12 +83,12 @@ function resolveQueueEntryCompletion(
 function advanceQueueEntry(
   state: GameState,
   town: TownContent,
-  target: TownNodeState,
   entry: TownCraftQueueEntry,
 ): TownCraftQueueEntry | undefined {
   const recipe = getEntry<RecipeContent>(entry.recipeId);
   if (!recipe) return undefined; // unresolvable - drop defensively
 
+  const target = state.world.towns[town.id];
   const debuffMultiplier = isTownCraftDebuffActive(target)
     ? RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER
     : 1;
@@ -97,30 +97,22 @@ function advanceQueueEntry(
   const ticksIntoCraft = entry.ticksIntoCraft + 1;
   if (ticksIntoCraft < craftTime) return { ...entry, ticksIntoCraft };
 
-  const completed = resolveQueueEntryCompletion(
-    state,
-    town,
-    target,
-    entry,
-    recipe,
-  );
+  const completed = resolveQueueEntryCompletion(state, town, entry, recipe);
   return completed ? undefined : { ...entry, ticksIntoCraft };
 }
 
 // All queue entries advance/complete together in one pass - a town has multiple workers crafting in tandem, not one at a time.
-function processExistingQueue(
-  state: GameState,
-  town: TownContent,
-  target: TownNodeState,
-): void {
+function processExistingQueue(state: GameState, town: TownContent): void {
   const nextQueue: TownCraftQueueEntry[] = [];
 
-  target.craftQueue.forEach((entry) => {
-    const kept = advanceQueueEntry(state, town, target, entry);
+  state.world.towns[town.id].craftQueue.forEach((entry) => {
+    const kept = advanceQueueEntry(state, town, entry);
     if (kept) nextQueue.push(kept);
   });
 
-  target.craftQueue = nextQueue;
+  updateTownNode(state, town.id, (target) => {
+    target.craftQueue = nextQueue;
+  });
 }
 
 // Below craftingChanceItemThreshold (or the queue is empty), queue every chance it can, materials permitting;
@@ -131,13 +123,10 @@ function shouldAttemptQueue(town: TownContent, queueLength: number): boolean {
   return rngSucceedsChance(town.crafting.craftingChanceOnTick);
 }
 
-function maybeQueueNewCraft(
-  state: GameState,
-  town: TownContent,
-  target: TownNodeState,
-): void {
-  if (target.craftQueue.length >= townCraftQueueSize(town)) return;
-  if (!shouldAttemptQueue(town, target.craftQueue.length)) return;
+function maybeQueueNewCraft(state: GameState, town: TownContent): void {
+  const queueLength = state.world.towns[town.id].craftQueue.length;
+  if (queueLength >= townCraftQueueSize(town)) return;
+  if (!shouldAttemptQueue(town, queueLength)) return;
 
   const pick = townPickRecipeToQueue(town);
   if (!pick) return;
@@ -153,24 +142,25 @@ function maybeQueueNewCraft(
     }
   });
 
-  target.craftQueue = [
-    ...target.craftQueue,
-    {
-      id: rngUuid() as CraftQueueEntryId,
-      tradeskillId: pick.tradeskillId,
-      recipeId: pick.recipe.id,
-      ticksIntoCraft: 0,
-    },
-  ];
+  updateTownNode(state, town.id, (target) => {
+    target.craftQueue = [
+      ...target.craftQueue,
+      {
+        id: rngUuid() as CraftQueueEntryId,
+        tradeskillId: pick.tradeskillId,
+        recipeId: pick.recipe.id,
+        ticksIntoCraft: 0,
+      },
+    ];
+  });
 }
 
 function processTownCraftQueue(town: TownContent): void {
   updateGamestate((state) => {
-    const target = state.world.towns[town.id];
-    if (!target) return state;
+    if (!state.world.towns[town.id]) return state;
 
-    processExistingQueue(state, town, target);
-    maybeQueueNewCraft(state, town, target);
+    processExistingQueue(state, town);
+    maybeQueueNewCraft(state, town);
 
     return state;
   });

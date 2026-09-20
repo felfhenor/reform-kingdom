@@ -1,5 +1,5 @@
 import { TOWN_HOME_MIN_REPUTATION_TIER } from '@helpers/config';
-import { gamestate, worldHomeNodeNameState } from '@helpers/state-game';
+import { worldHomeNodeNameState, worldTownsState } from '@helpers/state-game';
 import { townReputationTier } from '@helpers/town/reputation/town-reputation';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import {
@@ -28,7 +28,7 @@ export function isPlayerAtHome(): boolean {
 
 // Visited + Honored+ reputation - once set, home stays sticky even if reputation later drops.
 export function canSetHomeNode(townId: TownId): boolean {
-  const town = gamestate().world.towns[townId];
+  const town = worldTownsState()[townId];
   if (!town || town.firstVisitedAtTick === undefined) return false;
 
   return townReputationTier(townId) >= TOWN_HOME_MIN_REPUTATION_TIER;

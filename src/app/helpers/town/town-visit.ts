@@ -3,8 +3,9 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { dictionaryWith } from '@helpers/engine/dictionary';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import { townTradeskillsMaterialize } from '@helpers/town/crafting/town-craft-tradeskills';
 import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -19,14 +20,14 @@ export function isPartyAtTown(townId: TownId): boolean {
 // Activates a town's crafting/workers/commissions on first visit - inert until then. Idempotent, and only fires analytics on the actual first visit.
 export function townMarkVisited(townId: TownId): void {
   const alreadyVisited =
-    gamestate().world.towns[townId]?.firstVisitedAtTick !== undefined;
+    worldTownsState()[townId]?.firstVisitedAtTick !== undefined;
   const town = getEntry<TownContent>(townId);
 
   updateGamestate((state) => {
     const existing = state.world.towns[townId];
     if (existing?.firstVisitedAtTick !== undefined) return state;
 
-    state.world.towns[townId] = {
+    state.world.towns = dictionaryWith(state.world.towns, townId, {
       lastProcessedTick: existing?.lastProcessedTick ?? {},
       stock: existing?.stock ?? [],
       workers: town
@@ -43,7 +44,7 @@ export function townMarkVisited(townId: TownId): void {
       commissionSlots: existing?.commissionSlots ?? [],
       specialtyPriority: existing?.specialtyPriority ?? [],
       firstVisitedAtTick: timerTicksElapsed(),
-    };
+    });
     return state;
   });
 

@@ -16,9 +16,13 @@ vi.mock('@helpers/combat/combat-log', () => ({
   categoryMessageLog: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 import {
   buildCommissionRequirementEntries,

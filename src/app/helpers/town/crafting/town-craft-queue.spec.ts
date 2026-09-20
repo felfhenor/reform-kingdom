@@ -14,9 +14,13 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'queue-entry-1'),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    updateGamestate: vi.fn(),
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/town/crafting/town-craft-pick', () => ({
   townPickRecipeToQueue: vi.fn(),
@@ -57,6 +61,7 @@ vi.mock('@helpers/town/town-tick', () => ({
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance } from '@helpers/rng';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { updateGamestate } from '@helpers/state-game';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import { resetTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
@@ -100,6 +105,8 @@ function buildTown(
 }
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world?.towns);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);
@@ -352,7 +359,8 @@ describe('townCraftProcessTick - completing the queue', () => {
     expect(applyTownStockAdd).not.toHaveBeenCalled();
     expect(state.world.towns[townId].craftQueue).toEqual([]);
     expect(resetTownSpecialtyPriority).toHaveBeenCalledWith(
-      state.world.towns[townId],
+      expect.anything(),
+      townId,
       'recipe-1',
     );
   });

@@ -68,6 +68,7 @@ export const worldCaravansState = gamestateSelect(
 export const worldCommissionsState = gamestateSelect(
   (state) => state.world.commissions,
 );
+export const worldTownsState = gamestateSelect((state) => state.world.towns);
 export const shrinesState = gamestateSlice('shrines');
 export const tutorialsState = gamestateSlice('tutorials');
 export const lootFiltersState = gamestateSlice('lootFilters');

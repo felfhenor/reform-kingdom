@@ -13,13 +13,18 @@ vi.mock('@helpers/item/item-preview', () => ({
   resolveRewardDisplay: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate } from '@helpers/state-game';
 import {
   applyTownStockAdd,
@@ -141,9 +146,11 @@ describe('pruneInvalidTownStock', () => {
 
 describe('applyTownStockAdd', () => {
   function buildState(stock: unknown[]): GameState {
-    return {
+    const state = {
       world: { towns: { [townId]: { stock } } },
     } as unknown as GameState;
+    deepFreeze(state.world.towns);
+    return state;
   }
 
   it('always appends as its own new entry, stamped with the current tick', () => {

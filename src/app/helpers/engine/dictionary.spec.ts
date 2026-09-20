@@ -1,6 +1,30 @@
 import { deepFreeze } from '@helpers/engine/deep-freeze';
-import { dictionaryWith, dictionaryWithout } from '@helpers/engine/dictionary';
+import {
+  dictionaryMapValues,
+  dictionaryWith,
+  dictionaryWithout,
+} from '@helpers/engine/dictionary';
 import { describe, expect, it } from 'vitest';
+
+describe('dictionaryMapValues', () => {
+  it('returns the same dictionary when no value changes', () => {
+    const original = deepFreeze({ a: { n: 1 }, b: { n: 2 } });
+
+    expect(dictionaryMapValues(original, (value) => value)).toBe(original);
+  });
+
+  it('returns a new dictionary with only the changed values replaced', () => {
+    const original = deepFreeze({ a: { n: 1 }, b: { n: 2 } });
+
+    const result = dictionaryMapValues(original, (value) =>
+      value.n === 1 ? { n: 9 } : value,
+    );
+
+    expect(result).not.toBe(original);
+    expect(result.a).toEqual({ n: 9 });
+    expect(result.b).toBe(original.b);
+  });
+});
 
 describe('dictionaryWith', () => {
   it('returns a new dictionary with the entry added, leaving the original untouched', () => {

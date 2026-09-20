@@ -1,15 +1,17 @@
 import { TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import {
   isRecipeCraftableByTown,
   isRecipeResultAtOrAboveThreshold,
 } from '@helpers/town/crafting/town-craft-eligibility';
+import { updateTownNode } from '@helpers/town/town-node';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
 } from '@helpers/town/town-tick';
 import type {
+  GameState,
   RecipeContent,
   RecipeId,
   TownContent,
@@ -21,7 +23,7 @@ import type {
 export function townSpecialtyPriority(
   townId: TownId,
 ): TownSpecialtyPriorityEntry[] {
-  return gamestate().world.towns[townId]?.specialtyPriority ?? [];
+  return worldTownsState()[townId]?.specialtyPriority ?? [];
 }
 
 // "Specialty" = uniqueRecipeIds only, not the whole specialty tradeskill - the latter is a large ordinary recipe pool that would perpetually fail.
@@ -66,38 +68,45 @@ function upsertFailure(
 }
 
 export function resetTownSpecialtyPriority(
-  target: TownNodeState,
+  state: GameState,
+  townId: TownId,
   recipeId: RecipeId,
 ): void {
-  target.specialtyPriority = (target.specialtyPriority ?? []).filter(
-    (entry) => entry.recipeId !== recipeId,
-  );
+  updateTownNode(state, townId, (target) => {
+    const priority = target.specialtyPriority ?? [];
+    const remaining = priority.filter((entry) => entry.recipeId !== recipeId);
+
+    if (target.specialtyPriority && remaining.length === priority.length)
+      return;
+    target.specialtyPriority = remaining;
+  });
 }
 
 // Craftable-but-not-yet-picked is left alone - only an actual inability to craft counts as a failure.
 // A capped output isn't a shortage either - more gathering can never unblock it, so it must not accumulate failures.
 function evaluateSpecialtyRecipe(
-  target: TownNodeState,
+  state: GameState,
   town: TownContent,
   recipe: RecipeContent,
 ): void {
-  if (isBeingCraftedOrForSale(target, recipe)) return;
+  if (isBeingCraftedOrForSale(state.world.towns[town.id], recipe)) return;
   if (isRecipeResultAtOrAboveThreshold(recipe, town)) return;
   if (isRecipeCraftableByTown(recipe, town)) return;
 
-  target.specialtyPriority = upsertFailure(
-    target.specialtyPriority ?? [],
-    recipe.id,
-  );
+  updateTownNode(state, town.id, (target) => {
+    target.specialtyPriority = upsertFailure(
+      target.specialtyPriority ?? [],
+      recipe.id,
+    );
+  });
 }
 
 function processTownSpecialtyPriority(town: TownContent): void {
   updateGamestate((state) => {
-    const target = state.world.towns[town.id];
-    if (!target) return state;
+    if (!state.world.towns[town.id]) return state;
 
     specialtyRecipesForTown(town).forEach((recipe) =>
-      evaluateSpecialtyRecipe(target, town, recipe),
+      evaluateSpecialtyRecipe(state, town, recipe),
     );
     return state;
   });

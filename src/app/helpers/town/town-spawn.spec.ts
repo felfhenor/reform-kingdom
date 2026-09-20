@@ -5,6 +5,7 @@ vi.mock('@helpers/state-game', () => {
   return {
     gamestate,
     worldHomeNodeNameState: () => gamestate().world.homeNodeName,
+    worldTownsState: () => gamestate().world.towns,
   };
 });
 

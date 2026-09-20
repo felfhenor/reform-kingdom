@@ -1,6 +1,6 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import type {
   MonsterContent,
@@ -18,7 +18,7 @@ import { sample } from 'es-toolkit/compat';
 export function townRaidTelegraph(
   townId: TownId,
 ): TownRaidTelegraph | undefined {
-  const state = gamestate().world.towns[townId];
+  const state = worldTownsState()[townId];
   if (!state?.raidTelegraphedAtTick || !state.raidEngageWindowExpiresAtTick) {
     return undefined;
   }

@@ -77,12 +77,12 @@ import {
   travelGlideAdvance,
 } from '@helpers/pixi/pixi-travel-glide.ui';
 import {
-  gamestate,
   workersState,
   worldCombatState,
-  worldTravelState,
-  worldPartyState,
   worldCurrentLocationState,
+  worldPartyState,
+  worldTownsState,
+  worldTravelState,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-travel.ui';
@@ -1245,8 +1245,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     tokens.forEach((token) => {
       const key = `${token.townId}:${token.workerId}`;
       const workerLocation =
-        gamestate().world.towns[token.townId]?.workers[token.workerId]
-          ?.location;
+        worldTownsState()[token.townId]?.workers[token.workerId]?.location;
       if (!workerLocation) return;
 
       if (

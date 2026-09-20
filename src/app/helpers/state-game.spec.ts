@@ -53,6 +53,7 @@ import {
   worldGatheringState,
   worldHomeNodeNameState,
   worldPartyState,
+  worldTownsState,
   worldTravelState,
 } from '@helpers/state-game';
 import type { GameState, WorkerId, WorkerState } from '@interfaces';
@@ -277,6 +278,7 @@ describe('workersState', () => {
     ['homeNodeName', worldHomeNodeNameState],
     ['caravans', worldCaravansState],
     ['commissions', worldCommissionsState],
+    ['towns', worldTownsState],
   ] as const)('exposes the world.%s slice', (key, selector) => {
     const state = seedState();
 

@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldTownsState } from '@helpers/state-game';
+import { updateTownWorker } from '@helpers/town/town-node';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
 import {
   townWorkerAssignmentIsValid,
@@ -55,14 +56,12 @@ export function townWorkerGatherRate(
 
 // Defensive re-check (gamedata can change mid-session in dev) - parks AtTown on failure.
 function abandonInvalidGather(townId: TownId, workerId: WorkerId): void {
-  updateGamestate((state) => {
-    const target = state.world.towns[townId]?.workers[workerId];
-    if (!target) return state;
-
-    target.status = { kind: 'AtTown' };
-    target.assignment = null;
-    return state;
-  });
+  updateGamestate((state) =>
+    updateTownWorker(state, townId, workerId, (target) => {
+      target.status = { kind: 'AtTown' };
+      target.assignment = null;
+    }),
+  );
 }
 
 function completeGatherUnit(
@@ -78,21 +77,20 @@ function completeGatherUnit(
     return;
   }
 
-  updateGamestate((state) => {
-    const target = state.world.towns[town.id]?.workers[workerId];
-    if (!target || target.status.kind !== 'Gathering') return state;
+  updateGamestate((state) =>
+    updateTownWorker(state, town.id, workerId, (target) => {
+      if (target.status.kind !== 'Gathering') return;
 
-    target.status.itemsGathered = itemsGathered;
-    target.status.ticksIntoGather = 0;
-    return state;
-  });
+      target.status = { ...target.status, itemsGathered, ticksIntoGather: 0 };
+    }),
+  );
 }
 
 export function townWorkerGatheringProcessTick(
   town: TownContent,
   workerId: WorkerId,
 ): void {
-  const worker = gamestate().world.towns[town.id]?.workers[workerId];
+  const worker = worldTownsState()[town.id]?.workers[workerId];
   const status = worker?.status;
   if (!worker || !status || status.kind !== 'Gathering') return;
 
@@ -124,13 +122,13 @@ export function townWorkerGatheringProcessTick(
   const ticksIntoGather = status.ticksIntoGather + 1;
 
   if (ticksIntoGather < ticksPerUnit) {
-    updateGamestate((state) => {
-      const target = state.world.towns[town.id]?.workers[workerId];
-      if (!target || target.status.kind !== 'Gathering') return state;
+    updateGamestate((state) =>
+      updateTownWorker(state, town.id, workerId, (target) => {
+        if (target.status.kind !== 'Gathering') return;
 
-      target.status.ticksIntoGather = ticksIntoGather;
-      return state;
-    });
+        target.status = { ...target.status, ticksIntoGather };
+      }),
+    );
     return;
   }
 
