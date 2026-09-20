@@ -31,29 +31,37 @@ export function eligibleCommissionOffers(
 function commissionOfferTierMultiplier(
   offer: CommissionOfferContent,
   townId?: TownId,
+  state?: GameState,
 ): number {
   if (!townId || offer.reputationTierMultipliers.length === 0) return 1;
 
   // Falls back to 1, not the resolver's own 0-if-unmatched, so an offer that forgets to author tier 0 doesn't become free.
   return (
-    townReputationTierValueResolve(townId, offer.reputationTierMultipliers) || 1
+    townReputationTierValueResolve(
+      townId,
+      offer.reputationTierMultipliers,
+      state,
+    ) || 1
   );
 }
 
 export function commissionOfferReputationReward(
   offer: CommissionOfferContent,
   townId?: TownId,
+  state?: GameState,
 ): number {
   return Math.round(
-    offer.townReputationReward * commissionOfferTierMultiplier(offer, townId),
+    offer.townReputationReward *
+      commissionOfferTierMultiplier(offer, townId, state),
   );
 }
 
 export function rollCommissionRequirements(
   offer: CommissionOfferContent,
   townId?: TownId,
+  state?: GameState,
 ): CommissionRequirement[] {
-  const multiplier = commissionOfferTierMultiplier(offer, townId);
+  const multiplier = commissionOfferTierMultiplier(offer, townId, state);
 
   return offer.requirements.map((requirement) => {
     const quantity = Math.round(

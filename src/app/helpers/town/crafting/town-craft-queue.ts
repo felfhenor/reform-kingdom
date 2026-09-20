@@ -171,6 +171,6 @@ export function townCraftProcessTick(): void {
     if (!isTownDueForUpdate(town.id, 'craft', CRAFT_TICK_INTERVAL)) return;
 
     processTownCraftQueue(town);
-    markTownSubsystemProcessed(town.id, 'craft');
+    markTownSubsystemProcessed(town.id, 'craft', CRAFT_TICK_INTERVAL);
   });
 }

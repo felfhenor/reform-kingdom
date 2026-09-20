@@ -200,7 +200,11 @@ describe('townRaidProcessTick', () => {
 
     expect(notifyError).toHaveBeenCalled();
     expect(raidResolveDefeat).toHaveBeenCalledWith(townId);
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(townId, 'raid');
+    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
+      townId,
+      'raid',
+      expect.any(Number),
+    );
   });
 
   it('does nothing while telegraphed but still within the engage window', () => {
@@ -264,6 +268,10 @@ describe('townRaidProcessTick', () => {
     expect(result.world.towns[townId].raidTelegraphedAssaulterIds).toBe(
       rolledIds,
     );
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(townId, 'raid');
+    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
+      townId,
+      'raid',
+      expect.any(Number),
+    );
   });
 });

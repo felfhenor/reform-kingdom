@@ -58,7 +58,7 @@ function addCommissionSlot(
       {
         id: rngUuid() as TownCommissionSlotId,
         commissionOfferId: offer.id,
-        requirements: rollCommissionRequirements(offer, townId),
+        requirements: rollCommissionRequirements(offer, townId, state),
         generatedAtTick: timerTicksElapsed(),
       },
     ];
@@ -84,7 +84,7 @@ export async function townCommissionRefreshTierScaledSlots(
         }
         return {
           ...slot,
-          requirements: rollCommissionRequirements(offer, townId),
+          requirements: rollCommissionRequirements(offer, townId, state),
         };
       });
     }),
@@ -209,6 +209,6 @@ export function townCommissionProcessTick(): void {
 
       return state;
     });
-    markTownSubsystemProcessed(town.id, 'quest');
+    markTownSubsystemProcessed(town.id, 'quest', TOWN_COMMISSION_TICK_INTERVAL);
   });
 }

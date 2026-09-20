@@ -87,6 +87,18 @@ describe('townReputation', () => {
 
     expect(townReputation(townId)).toBe(0);
   });
+
+  it('reads the passed state instead of the selector', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: { towns: { [townId]: { reputation: 250 } } },
+    } as unknown as GameState);
+    const state = {
+      world: { towns: { [townId]: { reputation: 900 } } },
+    } as unknown as GameState;
+
+    expect(townReputation(townId, state)).toBe(900);
+    expect(townReputationTier(townId, state)).toBe(2);
+  });
 });
 
 describe('townReputationTier', () => {

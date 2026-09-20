@@ -39,10 +39,14 @@ export function isTownDueForUpdate(
   return timerTicksElapsed() - lastProcessed >= interval;
 }
 
+// An every-tick subsystem is always due on the next tick, so recording it would only churn the towns slice.
 export function markTownSubsystemProcessed(
   townId: TownId,
   subsystem: TownTickSubsystem,
+  interval: number,
 ): void {
+  if (interval <= 1) return;
+
   const nowTick = timerTicksElapsed();
 
   updateGamestate((state) =>

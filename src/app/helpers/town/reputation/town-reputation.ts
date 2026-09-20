@@ -1,7 +1,7 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import { updateTownNode } from '@helpers/town/town-node';
-import type { TownId, TownReputationGainSource } from '@interfaces';
+import type { GameState, TownId, TownReputationGainSource } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
 // Cumulative reputation needed to reach each tier (0 = Neutral .. 4 = Renowned) - a shared game-balance curve, not authored per-town.
@@ -37,12 +37,14 @@ export function townReputationTierName(tier: number): string {
   return TOWN_REPUTATION_TIER_NAMES[tier] ?? 'Neutral';
 }
 
-export function townReputation(townId: TownId): number {
-  return worldTownsState()[townId]?.reputation ?? 0;
+// Pass `state` from inside an updateGamestate callback - the selector can be stale there.
+export function townReputation(townId: TownId, state?: GameState): number {
+  const towns = state ? state.world.towns : worldTownsState();
+  return towns[townId]?.reputation ?? 0;
 }
 
-export function townReputationTier(townId: TownId): number {
-  return townReputationTierForAmount(townReputation(townId));
+export function townReputationTier(townId: TownId, state?: GameState): number {
+  return townReputationTierForAmount(townReputation(townId, state));
 }
 
 // Returns whether the gain crossed a tier threshold, so callers can re-sync the town's buff immediately.

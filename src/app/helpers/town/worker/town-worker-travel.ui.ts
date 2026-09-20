@@ -1,6 +1,6 @@
 import type { Signal } from '@angular/core';
 import { computed } from '@angular/core';
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import type { TownId, TravelStep, WorkerId } from '@interfaces';
 
 // Read every animation frame by the PIXI map-rendering layer - a separate signal
@@ -14,7 +14,7 @@ export const townWorkersTravelingTokens: Signal<
     ticksIntoStep: number;
   }[]
 > = computed(() => {
-  const towns = gamestate().world.towns;
+  const towns = worldTownsState();
 
   return (Object.keys(towns) as TownId[]).flatMap((townId) => {
     const workers = towns[townId].workers;

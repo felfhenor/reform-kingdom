@@ -171,12 +171,18 @@ describe('markTownSubsystemProcessed', () => {
       fn(state);
     });
 
-    markTownSubsystemProcessed(townId, 'craft');
+    markTownSubsystemProcessed(townId, 'craft', 60);
 
     expect(state.world.towns[townId].lastProcessedTick).toEqual({
       worker: 1,
       craft: 1234,
     });
+  });
+
+  it('writes nothing for an every-tick subsystem (interval 1)', () => {
+    markTownSubsystemProcessed(townId, 'craft', 1);
+
+    expect(updateGamestate).not.toHaveBeenCalled();
   });
 
   it('no-ops when the town has no state entry', () => {
@@ -186,7 +192,7 @@ describe('markTownSubsystemProcessed', () => {
       fn(state);
     });
 
-    expect(() => markTownSubsystemProcessed(townId, 'craft')).not.toThrow();
+    expect(() => markTownSubsystemProcessed(townId, 'craft', 60)).not.toThrow();
     expect(state.world.towns).toEqual({});
   });
 });

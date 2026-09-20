@@ -107,7 +107,7 @@ export async function townCommissionFulfill(
     const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
     offerName = offer?.name;
     reputationAmount = offer
-      ? commissionOfferReputationReward(offer, townId)
+      ? commissionOfferReputationReward(offer, townId, s)
       : 0;
 
     spendCommissionRequirements(s, slot.requirements);

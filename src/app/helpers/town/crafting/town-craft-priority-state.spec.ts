@@ -201,6 +201,7 @@ describe('townSpecialtyPriorityProcessTick', () => {
     expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
       townId,
       'specialty',
+      expect.any(Number),
     );
   });
 

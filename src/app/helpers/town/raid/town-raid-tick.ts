@@ -111,6 +111,6 @@ export function townRaidProcessTick(): void {
     if (!isTownDueForUpdate(town.id, 'raid', RAID_CHECK_INTERVAL_TICKS)) return;
 
     processTownRaid(town);
-    markTownSubsystemProcessed(town.id, 'raid');
+    markTownSubsystemProcessed(town.id, 'raid', RAID_CHECK_INTERVAL_TICKS);
   });
 }

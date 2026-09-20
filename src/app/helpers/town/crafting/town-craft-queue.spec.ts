@@ -135,7 +135,11 @@ describe('townCraftProcessTick - due-gate', () => {
   it('marks the subsystem processed for a due town', () => {
     townCraftProcessTick();
 
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(townId, 'craft');
+    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
+      townId,
+      'craft',
+      expect.any(Number),
+    );
   });
 });
 

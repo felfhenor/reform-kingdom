@@ -90,6 +90,33 @@ describe('updateTownNode', () => {
     expect(state.world.towns).toBe(previousDict);
   });
 
+  it('writes nothing when a rebuilt array holds the same elements', () => {
+    const entry = { id: 'q1' } as never;
+    const state = buildState();
+    state.world.towns[townId] = buildTown({ craftQueue: [entry] });
+    const previousDict = deepFreeze(state.world.towns);
+
+    updateTownNode(state, townId, (town) => {
+      town.craftQueue = [...town.craftQueue];
+    });
+
+    expect(state.world.towns).toBe(previousDict);
+  });
+
+  it('writes when a rebuilt array differs by an element', () => {
+    const state = buildState();
+    state.world.towns[townId] = buildTown({
+      craftQueue: [{ id: 'q1' } as never],
+    });
+    const previousDict = deepFreeze(state.world.towns);
+
+    updateTownNode(state, townId, (town) => {
+      town.craftQueue = [{ id: 'q1' } as never];
+    });
+
+    expect(state.world.towns).not.toBe(previousDict);
+  });
+
   it('does nothing for a town with no state', () => {
     const state = buildState();
     const previousDict = state.world.towns;

@@ -1,5 +1,5 @@
 import { getEntry } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   TownContent,
@@ -14,7 +14,7 @@ import type {
 export function townWorkerRosterEntries(
   townId: TownId,
 ): TownWorkerRosterEntry[] {
-  const workers = gamestate().world.towns[townId]?.workers ?? {};
+  const workers = worldTownsState()[townId]?.workers ?? {};
 
   return (Object.keys(workers) as WorkerId[])
     .map((workerId) => {

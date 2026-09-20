@@ -67,7 +67,11 @@ describe('townShopProcessTick', () => {
     townShopProcessTick();
 
     expect(updateGamestate).not.toHaveBeenCalled();
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(townId, 'shop');
+    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
+      townId,
+      'shop',
+      expect.any(Number),
+    );
   });
 
   it('drops stock entries that have aged past itemExpirationTimer', () => {
@@ -92,7 +96,11 @@ describe('townShopProcessTick', () => {
     expect(state.world.towns[townId].stock).toEqual([
       { itemId: 'fresh', quantity: 1, addedAtTick: 450 },
     ]);
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(townId, 'shop');
+    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
+      townId,
+      'shop',
+      expect.any(Number),
+    );
   });
 
   it('keeps an entry exactly at the boundary (age strictly less than the timer to survive)', () => {

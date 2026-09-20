@@ -4,10 +4,14 @@ vi.mock('@helpers/hero/travel', () => ({
   travelStepTicksCost: vi.fn(() => 5),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    updateGamestate: vi.fn(),
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/town/town-gold', () => ({
   applyTownAccrueHiddenGold: vi.fn(),
@@ -19,6 +23,7 @@ vi.mock('@helpers/town/town-materials', () => ({
 
 import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
 import { travelStepTicksCost } from '@helpers/hero/travel';
+import { deepFreeze } from '@helpers/engine/deep-freeze';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
@@ -47,6 +52,8 @@ function buildTown(): TownContent {
 }
 
 function applyLastUpdate(state: GameState): GameState {
+  deepFreeze(state.world?.towns);
+
   const calls = vi.mocked(updateGamestate).mock.calls;
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);
@@ -99,9 +106,7 @@ describe('townWorkerTravelProcessTick', () => {
         },
       },
     } as unknown as GameState);
-    expect(
-      state.world.towns[townId].workers[workerId].status,
-    ).toMatchObject({
+    expect(state.world.towns[townId].workers[workerId].status).toMatchObject({
       kind: 'Gathering',
       nodeName: 'Wergen Woods',
       itemId: oreId,
@@ -152,9 +157,9 @@ describe('townWorkerTravelProcessTick', () => {
         },
       },
     } as unknown as GameState);
-    expect(
-      state.world.towns[townId].workers[workerId].status.kind,
-    ).toBe('TravelingTo');
+    expect(state.world.towns[townId].workers[workerId].status.kind).toBe(
+      'TravelingTo',
+    );
   });
 
   it('accrues hidden gold and rests on TravelingBack arrival', () => {

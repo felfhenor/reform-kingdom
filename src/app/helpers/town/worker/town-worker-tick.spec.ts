@@ -4,9 +4,13 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-}));
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
 
 vi.mock('@helpers/town/town-tick', () => ({
   isTownDueForUpdate: vi.fn(),
@@ -87,7 +91,11 @@ describe('townWorkerProcessTick', () => {
       workerId,
       undefined,
     );
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(townId, 'worker');
+    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
+      townId,
+      'worker',
+      expect.any(Number),
+    );
   });
 
   it('does not auto-assign an AtTown worker that already has an assignment', () => {

@@ -177,6 +177,7 @@ describe('rollCommissionRequirements', () => {
     expect(townReputationTierValueResolve).toHaveBeenCalledWith(
       townId,
       scaledOffer.reputationTierMultipliers,
+      undefined,
     );
   });
 });

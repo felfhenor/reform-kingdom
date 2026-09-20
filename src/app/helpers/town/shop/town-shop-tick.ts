@@ -34,6 +34,6 @@ export function townShopProcessTick(): void {
     if (!isTownDueForUpdate(town.id, 'shop', SHOP_TICK_INTERVAL)) return;
 
     expireTownStock(town);
-    markTownSubsystemProcessed(town.id, 'shop');
+    markTownSubsystemProcessed(town.id, 'shop', SHOP_TICK_INTERVAL);
   });
 }

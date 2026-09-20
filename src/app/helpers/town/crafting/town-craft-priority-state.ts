@@ -125,7 +125,11 @@ export function townSpecialtyPriorityProcessTick(): void {
     }
 
     processTownSpecialtyPriority(town);
-    markTownSubsystemProcessed(town.id, 'specialty');
+    markTownSubsystemProcessed(
+      town.id,
+      'specialty',
+      TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL,
+    );
   });
 }
 

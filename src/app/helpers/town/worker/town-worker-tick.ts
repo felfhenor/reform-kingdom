@@ -1,6 +1,6 @@
 import { WORKER_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
@@ -14,7 +14,7 @@ import {
 import type { TownContent, WorkerId } from '@interfaces';
 
 function processTownWorker(town: TownContent, workerId: WorkerId): void {
-  const worker = gamestate().world.towns[town.id]?.workers[workerId];
+  const worker = worldTownsState()[town.id]?.workers[workerId];
   if (!worker) return;
 
   switch (worker.status.kind) {
@@ -40,11 +40,11 @@ export function townWorkerProcessTick(): void {
   getEntriesByType<TownContent>('town').forEach((town) => {
     if (!isTownDueForUpdate(town.id, 'worker', WORKER_TICK_INTERVAL)) return;
 
-    const workers = gamestate().world.towns[town.id]?.workers ?? {};
+    const workers = worldTownsState()[town.id]?.workers ?? {};
     (Object.keys(workers) as WorkerId[]).forEach((workerId) => {
       processTownWorker(town, workerId);
     });
 
-    markTownSubsystemProcessed(town.id, 'worker');
+    markTownSubsystemProcessed(town.id, 'worker', WORKER_TICK_INTERVAL);
   });
 }

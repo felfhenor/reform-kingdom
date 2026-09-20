@@ -208,7 +208,11 @@ describe('townCommissionProcessTick', () => {
         generatedAtTick: 0,
       },
     ]);
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(town.id, 'quest');
+    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
+      town.id,
+      'quest',
+      expect.any(Number),
+    );
   });
 
   it('does not add slots beyond the reputation-tier slot count', () => {
