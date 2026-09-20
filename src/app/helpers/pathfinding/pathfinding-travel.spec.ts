@@ -5,6 +5,17 @@ vi.mock('@helpers/state-game', async (importOriginal) => ({
   worldCurrentLocationState: vi.fn(),
 }));
 
+// Route selection must use unboosted costs so cached routes never swing with a timed buff.
+vi.mock('@helpers/hero/travel-cost', () => {
+  const boostedCostUsed = vi.fn(() => {
+    throw new Error('route selection used a buff-aware travel cost');
+  });
+  return {
+    travelStepTicksCost: boostedCostUsed,
+    travelPathTotalTicks: boostedCostUsed,
+  };
+});
+
 vi.mock('@helpers/item/collectibles', () => ({
   discoveredCollectibleCount: vi.fn(() => 0),
 }));

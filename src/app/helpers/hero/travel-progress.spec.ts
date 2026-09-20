@@ -2,18 +2,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/hero/travel-cost', () => ({
   travelStepTicksCost: vi.fn(),
-  travelPathTotalTicks: vi.fn(),
 }));
 
-import {
-  travelPathTotalTicks,
-  travelStepTicksCost,
-} from '@helpers/hero/travel-cost';
+vi.mock('@helpers/pathfinding/pathfinding', () => ({
+  tileIsOnPath: vi.fn(),
+}));
+
+vi.mock('@helpers/world-node/world-nodes', () => ({
+  worldNodeAt: vi.fn(),
+}));
+
+import { travelStepTicksCost } from '@helpers/hero/travel-cost';
 import {
   travelPathAdvanceTick,
-  travelProgressCovers,
-  travelProgressSurplus,
+  travelStepUnitsCost,
   travelTicksRemaining,
+  travelTicksToUnits,
+  travelUnitsToTicks,
 } from '@helpers/hero/travel-progress';
 import type {
   CurrentLocation,
@@ -53,28 +58,33 @@ function ticksToArrive(path: TravelStep[], maxTicks = 100): number {
   return maxTicks;
 }
 
-describe('travelProgressCovers', () => {
-  it('is always true for a zero-cost step', () => {
-    expect(travelProgressCovers(0, 0)).toBe(true);
+describe('travelTicksToUnits / travelUnitsToTicks', () => {
+  it('scales ticks to whole sub-ticks', () => {
+    expect(travelTicksToUnits(2.7)).toBe(270);
+    expect(travelTicksToUnits(3)).toBe(300);
   });
 
-  it('is true once progress reaches the cost, and false before', () => {
-    expect(travelProgressCovers(2.69, 2.7)).toBe(false);
-    expect(travelProgressCovers(2.7, 2.7)).toBe(true);
+  it('snaps float noise to the exact sub-tick', () => {
+    expect(travelTicksToUnits(0.1 + 0.2)).toBe(30);
   });
 
-  it('tolerates float error on an exactly-paid cost', () => {
-    expect(travelProgressCovers(0.1 + 0.2, 0.3)).toBe(true);
+  it('round-trips a saved progress value exactly', () => {
+    expect(travelUnitsToTicks(travelTicksToUnits(0.3))).toBe(0.3);
+    expect(travelUnitsToTicks(30)).toBe(0.3);
   });
 });
 
-describe('travelProgressSurplus', () => {
-  it('returns what is left after paying the cost', () => {
-    expect(travelProgressSurplus(3, 2.7)).toBeCloseTo(0.3);
+describe('travelStepUnitsCost', () => {
+  it('is the step tick cost in whole sub-ticks', () => {
+    vi.mocked(travelStepTicksCost).mockReturnValue(2.7);
+
+    expect(travelStepUnitsCost(moveSteps(1)[0], origin)).toBe(270);
   });
 
-  it('never goes negative when float error makes the cost marginally larger', () => {
-    expect(travelProgressSurplus(0.3, 0.1 + 0.2)).toBe(0);
+  it('is 0 for an instant step', () => {
+    vi.mocked(travelStepTicksCost).mockReturnValue(0);
+
+    expect(travelStepUnitsCost(moveSteps(1)[0], origin)).toBe(0);
   });
 });
 
@@ -103,17 +113,16 @@ describe('travelPathAdvanceTick', () => {
     });
   });
 
-  it('completes the step and carries the surplus into the next one', () => {
+  it('completes the step and carries the exact surplus into the next one', () => {
     vi.mocked(travelStepTicksCost).mockReturnValue(2.7);
     const path = moveSteps(2);
 
-    const result = travelPathAdvanceTick(path, 2, origin);
-
-    expect(result.arrived).toBe(false);
-    if (result.arrived) return;
-    expect(result.path).toEqual([path[1]]);
-    expect(result.location).toEqual({ mapName: 'Carrina', x: 1, y: 0 });
-    expect(result.ticksIntoStep).toBeCloseTo(0.3);
+    expect(travelPathAdvanceTick(path, 2, origin)).toEqual({
+      arrived: false,
+      path: [path[1]],
+      ticksIntoStep: 0.3,
+      location: { mapName: 'Carrina', x: 1, y: 0 },
+    });
   });
 
   it('honors a fractional cost across a path: 10 steps at 2.7 ticks take 27 ticks, not 30', () => {
@@ -127,11 +136,12 @@ describe('travelPathAdvanceTick', () => {
 
     const result = travelPathAdvanceTick(moveSteps(6), 0, origin);
 
-    expect(result.arrived).toBe(false);
-    if (result.arrived) return;
-    expect(result.location).toEqual({ mapName: 'Carrina', x: 4, y: 0 });
-    expect(result.path).toHaveLength(2);
-    expect(result.ticksIntoStep).toBeCloseTo(0);
+    expect(result).toEqual({
+      arrived: false,
+      path: moveSteps(6).slice(4),
+      ticksIntoStep: 0,
+      location: { mapName: 'Carrina', x: 4, y: 0 },
+    });
   });
 
   it('chains an instant Teleport in the same tick as the step before it', () => {
@@ -166,6 +176,17 @@ describe('travelPathAdvanceTick', () => {
 
     expect(ticksToArrive(moveSteps(10))).toBe(1);
   });
+
+  it('carries a float-noisy cost without drift', () => {
+    vi.mocked(travelStepTicksCost).mockReturnValue(0.1 + 0.2);
+
+    const result = travelPathAdvanceTick(moveSteps(4), 0, origin);
+
+    expect(result.arrived).toBe(false);
+    if (result.arrived) return;
+    expect(result.ticksIntoStep).toBe(0.1);
+    expect(result.path).toHaveLength(1);
+  });
 });
 
 describe('travelTicksRemaining', () => {
@@ -174,42 +195,37 @@ describe('travelTicksRemaining', () => {
   });
 
   it('rounds a fractional total up to the tick the party actually arrives on', () => {
-    vi.mocked(travelPathTotalTicks).mockReturnValue(13.5);
+    vi.mocked(travelStepTicksCost).mockReturnValue(2.7);
 
     expect(travelTicksRemaining(moveSteps(5), origin)).toBe(14);
   });
 
   it('subtracts progress already banked on the current step', () => {
-    vi.mocked(travelPathTotalTicks).mockReturnValue(6);
+    vi.mocked(travelStepTicksCost).mockReturnValue(3);
 
     expect(travelTicksRemaining(moveSteps(2), origin, 1)).toBe(5);
   });
 
-  it('does not round an exact total up because of float noise', () => {
-    vi.mocked(travelPathTotalTicks).mockReturnValue(2.7 * 10);
+  it('does not round an exact total up', () => {
+    vi.mocked(travelStepTicksCost).mockReturnValue(2.7);
 
     expect(travelTicksRemaining(moveSteps(10), origin)).toBe(27);
   });
 
   it('is 0 for an empty path and never negative', () => {
-    vi.mocked(travelPathTotalTicks).mockReturnValue(0);
-
     expect(travelTicksRemaining([], origin, 2)).toBe(0);
   });
 
   it('is at least 1 for a non-empty path, since even an all-Teleport path takes a tick', () => {
-    vi.mocked(travelPathTotalTicks).mockReturnValue(0);
+    vi.mocked(travelStepTicksCost).mockReturnValue(0);
 
     expect(travelTicksRemaining(moveSteps(1), origin)).toBe(1);
   });
 
-  it.each([0.25, 0.75, 1, 1.25, 2.7, 3])(
+  it.each([0.25, 0.75, 0.95, 1, 1.25, 2.7, 3])(
     'agrees with the tick the engine actually arrives on for a %s-tick step',
     (cost) => {
       vi.mocked(travelStepTicksCost).mockReturnValue(cost);
-      vi.mocked(travelPathTotalTicks).mockImplementation(
-        (path) => path.length * cost,
-      );
 
       for (let count = 1; count <= 12; count++) {
         const path = moveSteps(count);

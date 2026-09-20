@@ -93,18 +93,6 @@ describe('travelStepTicksCost', () => {
     expect(travelStepTicksCost(offPathStep, origin)).toBe(1.25);
   });
 
-  it('ignores every active boost when asked for the unboosted cost', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
-      offPathTravelSpeedBonus: 0.5,
-      onPathTravelSpeedBonus: 0.5,
-    } as never);
-
-    expect(travelStepTicksCost(offPathStep, origin, false)).toBe(3);
-
-    vi.mocked(tileIsOnPath).mockReturnValue(true);
-    expect(travelStepTicksCost(offPathStep, origin, false)).toBe(1);
-  });
-
   it('never applies the on-path boost to off-path movement', () => {
     vi.mocked(globalEffectSums).mockReturnValue({
       offPathTravelSpeedBonus: 0,
@@ -159,17 +147,5 @@ describe('travelPathTotalTicks', () => {
 
     // 2 off-path steps at the reduced 1.5 ticks each = 3
     expect(travelPathTotalTicks(path, origin)).toBe(3);
-  });
-
-  it('sums the base cost when unboosted, so stamina gates do not swing with a timed buff', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
-      offPathTravelSpeedBonus: 0.5,
-    } as never);
-    const path: TravelStep[] = [
-      offPathStep,
-      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-    ];
-
-    expect(travelPathTotalTicks(path, origin, false)).toBe(6);
   });
 });

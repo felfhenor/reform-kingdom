@@ -1,23 +1,26 @@
-import {
-  travelPathTotalTicks,
-  travelStepTicksCost,
-} from '@helpers/hero/travel-cost';
+import { TRAVEL_UNITS_PER_TICK } from '@helpers/config';
+import { travelStepTicksCost } from '@helpers/hero/travel-cost';
+import { travelPathSumTicks } from '@helpers/hero/travel-cost-base';
 import type {
   CurrentLocation,
   PathAdvanceResult,
   TravelStep,
 } from '@interfaces';
 
-// Absorbs float error so a step that is exactly paid for never slips a tick.
-const TRAVEL_PROGRESS_EPSILON = 1e-9;
-
-export function travelProgressCovers(progress: number, cost: number): boolean {
-  return cost <= 0 || progress + TRAVEL_PROGRESS_EPSILON >= cost;
+// Progress is counted in whole sub-ticks so carrying fractional costs is exact; saved state stays in plain ticks.
+export function travelTicksToUnits(ticks: number): number {
+  return Math.round(ticks * TRAVEL_UNITS_PER_TICK);
 }
 
-// Surplus progress carries into the next step, so fractional step costs average out over a path.
-export function travelProgressSurplus(progress: number, cost: number): number {
-  return Math.max(0, progress - cost);
+export function travelUnitsToTicks(units: number): number {
+  return units / TRAVEL_UNITS_PER_TICK;
+}
+
+export function travelStepUnitsCost(
+  step: TravelStep,
+  originTile: CurrentLocation,
+): number {
+  return travelTicksToUnits(travelStepTicksCost(step, originTile));
 }
 
 // One tick of progress, spent across as many steps as it covers (0-cost Teleports chain).
@@ -28,14 +31,14 @@ export function travelPathAdvanceTick(
 ): PathAdvanceResult {
   let remaining = path;
   let position = location;
-  let progress = ticksIntoStep + 1;
+  let progress = travelTicksToUnits(ticksIntoStep) + TRAVEL_UNITS_PER_TICK;
 
   while (remaining.length > 0) {
     const [step, ...rest] = remaining;
-    const cost = travelStepTicksCost(step, position);
-    if (!travelProgressCovers(progress, cost)) break;
+    const cost = travelStepUnitsCost(step, position);
+    if (progress < cost) break;
 
-    progress = travelProgressSurplus(progress, cost);
+    progress -= cost;
     position = { mapName: step.mapName, x: step.x, y: step.y };
     remaining = rest;
   }
@@ -45,7 +48,7 @@ export function travelPathAdvanceTick(
   return {
     arrived: false,
     path: remaining,
-    ticksIntoStep: progress,
+    ticksIntoStep: travelUnitsToTicks(progress),
     location: position,
   };
 }
@@ -56,7 +59,9 @@ export function travelTicksRemaining(
   origin: CurrentLocation,
   ticksIntoStep = 0,
 ): number {
-  const remaining = travelPathTotalTicks(path, origin) - ticksIntoStep;
-  const ticks = Math.ceil(remaining - TRAVEL_PROGRESS_EPSILON);
+  const totalUnits = travelPathSumTicks(path, origin, travelStepUnitsCost);
+  const remainingUnits = totalUnits - travelTicksToUnits(ticksIntoStep);
+  const ticks = Math.ceil(remainingUnits / TRAVEL_UNITS_PER_TICK);
+
   return Math.max(path.length > 0 ? 1 : 0, ticks);
 }

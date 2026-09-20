@@ -3,6 +3,7 @@ import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   DEATHS_DOOR_MINIMUM_SECONDS,
   DEATHS_DOOR_SECONDS_PER_MAP,
+  TRAVEL_UNITS_PER_TICK,
 } from '@helpers/config';
 import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
@@ -16,11 +17,11 @@ import {
   addGlobalEffect,
   isGlobalEffectActive,
 } from '@helpers/hero/global-effects';
-import { travelStepTicksCost } from '@helpers/hero/travel-cost';
 import {
-  travelProgressCovers,
-  travelProgressSurplus,
+  travelStepUnitsCost,
   travelTicksRemaining,
+  travelTicksToUnits,
+  travelUnitsToTicks,
 } from '@helpers/hero/travel-progress';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
@@ -250,7 +251,7 @@ function travelCompleteStep(
   destinationNodeName: string | undefined,
   completedStep: TravelStep,
   remainingPath: TravelStep[],
-  carriedProgress: number,
+  carriedUnits: number,
 ): void {
   const previousLocation = worldCurrentLocationState();
   currentLocationSet({
@@ -271,20 +272,20 @@ function travelCompleteStep(
   }
 
   const [nextStep, ...restOfPath] = remainingPath;
-  const nextCost = travelStepTicksCost(nextStep, completedStep);
-  if (travelProgressCovers(carriedProgress, nextCost)) {
+  const nextCost = travelStepUnitsCost(nextStep, completedStep);
+  if (carriedUnits >= nextCost) {
     travelCompleteStep(
       destinationNodeName,
       nextStep,
       restOfPath,
-      travelProgressSurplus(carriedProgress, nextCost),
+      carriedUnits - nextCost,
     );
     return;
   }
 
   updateGamestate((state) => {
     state.world.travel.path = remainingPath;
-    state.world.travel.ticksIntoStep = carriedProgress;
+    state.world.travel.ticksIntoStep = travelUnitsToTicks(carriedUnits);
     return state;
   });
 }
@@ -294,15 +295,16 @@ export function travelProcessTick(): void {
   if (travel.status === 'Idle' || travel.path.length === 0) return;
 
   const [currentStep, ...restOfPath] = travel.path;
-  const stepCost = travelStepTicksCost(
+  const stepCost = travelStepUnitsCost(
     currentStep,
     worldCurrentLocationState(),
   );
-  const progress = travel.ticksIntoStep + 1;
+  const progress =
+    travelTicksToUnits(travel.ticksIntoStep) + TRAVEL_UNITS_PER_TICK;
 
-  if (!travelProgressCovers(progress, stepCost)) {
+  if (progress < stepCost) {
     updateGamestate((state) => {
-      state.world.travel.ticksIntoStep = progress;
+      state.world.travel.ticksIntoStep = travelUnitsToTicks(progress);
       return state;
     });
     return;
@@ -312,6 +314,6 @@ export function travelProcessTick(): void {
     travel.destinationNodeName,
     currentStep,
     restOfPath,
-    travelProgressSurplus(progress, stepCost),
+    progress - stepCost,
   );
 }

@@ -4,8 +4,8 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/travel', () => ({
-  travelPathTotalTicks: vi.fn(),
+vi.mock('@helpers/hero/travel-cost-base', () => ({
+  travelPathBaseTotalTicks: vi.fn(),
 }));
 
 vi.mock('@helpers/item/gather-node-discovery', () => ({
@@ -40,7 +40,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
-import { travelPathTotalTicks } from '@helpers/hero/travel';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -93,7 +93,7 @@ describe('workerAssignmentIsValid', () => {
     vi.mocked(travelPathFrom).mockReturnValue([
       { kind: 'Move', mapName: 'Carrina', x: 6, y: 5 },
     ] as never);
-    vi.mocked(travelPathTotalTicks).mockReturnValue(10);
+    vi.mocked(travelPathBaseTotalTicks).mockReturnValue(10);
   });
 
   it('is valid when the worker can use teleports and stamina covers the trip', () => {

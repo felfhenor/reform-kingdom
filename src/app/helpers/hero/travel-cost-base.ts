@@ -8,7 +8,7 @@ import { worldNodeAt } from '@helpers/world-node/world-nodes';
 import type { CurrentLocation, TravelStep } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
 
-// Content-only (no gamestate/global effects) so CLI analysis scripts can import it.
+// Takes buff bonuses as arguments and never reads global effects, so CLI analysis scripts can import it.
 
 // A node's own tile counts as "on path" so arriving doesn't stutter with the off-path cost.
 function travelTileCountsAsPath(

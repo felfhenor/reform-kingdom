@@ -72,6 +72,7 @@ export const RESTING_REGEN_PERCENT = 0.01;
 export const TICKS_PER_STEP_ON_PATH = 1;
 export const TICKS_PER_STEP_OFF_PATH = 3;
 export const TICKS_PER_STEP_MIN_DIFF = 0.25;
+export const TRAVEL_UNITS_PER_TICK = 100;
 export const DEATHS_DOOR_SECONDS_PER_MAP = 10;
 export const DEATHS_DOOR_MINIMUM_SECONDS = 10;
 

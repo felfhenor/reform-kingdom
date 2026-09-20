@@ -4,8 +4,8 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/travel', () => ({
-  travelPathTotalTicks: vi.fn(),
+vi.mock('@helpers/hero/travel-cost-base', () => ({
+  travelPathBaseTotalTicks: vi.fn(),
 }));
 
 vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
@@ -35,7 +35,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
-import { travelPathTotalTicks } from '@helpers/hero/travel';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { updateGamestate } from '@helpers/state-game';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
@@ -108,7 +108,7 @@ describe('townWorkerStaminaCostToNode', () => {
     vi.mocked(travelPathFrom).mockReturnValue([
       { kind: 'Move', mapName: 'Carrina', x: 6, y: 5 },
     ] as never);
-    vi.mocked(travelPathTotalTicks).mockReturnValue(12);
+    vi.mocked(travelPathBaseTotalTicks).mockReturnValue(12);
 
     expect(townWorkerStaminaCostToNode(buildTown(), 'Wergen Woods')).toBe(12);
   });
@@ -136,7 +136,7 @@ describe('townWorkerAssignmentIsValid', () => {
     vi.mocked(travelPathFrom).mockReturnValue([
       { kind: 'Move', mapName: 'Carrina', x: 6, y: 5 },
     ] as never);
-    vi.mocked(travelPathTotalTicks).mockReturnValue(10);
+    vi.mocked(travelPathBaseTotalTicks).mockReturnValue(10);
   });
 
   it('is valid when the node has the item and stamina covers the trip', () => {
@@ -164,7 +164,7 @@ describe('townWorkerAssignmentIsValid', () => {
   });
 
   it('is invalid when the trip cost exceeds stamina', () => {
-    vi.mocked(travelPathTotalTicks).mockReturnValue(999);
+    vi.mocked(travelPathBaseTotalTicks).mockReturnValue(999);
 
     expect(
       townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment),
