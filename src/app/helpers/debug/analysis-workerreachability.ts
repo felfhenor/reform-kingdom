@@ -3,7 +3,7 @@
 import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
-import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import {
   workerMinLevelForStamina,
@@ -38,7 +38,7 @@ function buildNodes(
       nodeName: gathering.name,
       mapName: nodeNameToMap.get(gathering.name) ?? '(unplaced)',
       oneWayTicks:
-        kingdom && path ? travelPathTotalTicks(path, kingdom) : undefined,
+        kingdom && path ? travelPathBaseTotalTicks(path, kingdom) : undefined,
       levelRange: gathering.workerLevelRange,
     };
   });

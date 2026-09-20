@@ -3,7 +3,7 @@
 
 import { getEntriesByType } from '@helpers/content/content';
 import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
-import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
@@ -26,7 +26,7 @@ export function runWorkerStaminaAnalysis(): AnalysisRunResult {
       ? travelPathFrom(kingdom, gathering.name, true, true)
       : undefined;
     const oneWayTicks =
-      kingdom && path ? travelPathTotalTicks(path, kingdom) : undefined;
+      kingdom && path ? travelPathBaseTotalTicks(path, kingdom) : undefined;
 
     return {
       name: gathering.name,

@@ -1,4 +1,4 @@
-import { travelPathTotalTicks } from '@helpers/hero/travel-cost';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { discoveredCollectibleCount } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import {
@@ -28,7 +28,7 @@ function routeWaypoints(
   return waypoints;
 }
 
-// Cost uses real tick cost, not the A* search weight, so "cheapest chain" means the actual cheapest trip.
+// Cost uses base tick cost (not the A* search weight, and not buff-boosted, so routes stay cache-stable).
 function teleportHop(
   from: CurrentLocation,
   teleport: WorldNodeEntry,
@@ -54,7 +54,7 @@ function teleportHop(
   return {
     arrivalKey: arrival.nodeName,
     steps,
-    cost: travelPathTotalTicks(steps, from),
+    cost: travelPathBaseTotalTicks(steps, from),
   };
 }
 
@@ -112,7 +112,8 @@ function travelPathAcrossMaps(
     const finalLegSteps = findInMapPath(destination.mapName, pos, destination);
     if (!finalLegSteps) return;
 
-    const totalCost = waypointDist + travelPathTotalTicks(finalLegSteps, pos);
+    const totalCost =
+      waypointDist + travelPathBaseTotalTicks(finalLegSteps, pos);
     if (totalCost < bestCost) {
       bestCost = totalCost;
       bestSteps = [...stepsFromStart.get(key)!, ...finalLegSteps];

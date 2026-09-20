@@ -27,11 +27,8 @@ import {
   townOpen,
 } from '@helpers/engine/ui';
 
-import {
-  canPartyTravel,
-  travelStart,
-  travelStepTicksCost,
-} from '@helpers/hero/travel';
+import { canPartyTravel, travelStart } from '@helpers/hero/travel';
+import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import {
   canEnterGatherNode,
   gatheringProgressFraction,
@@ -72,7 +69,7 @@ import {
   worldNodeShrine,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
-import { sortBy, sum } from 'es-toolkit/compat';
+import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-map-node',
@@ -227,14 +224,7 @@ export class PanelMapNodeComponent {
     const path = this.travelPath();
     if (!path) return undefined;
 
-    let origin = worldCurrentLocationState();
-    const costs = path.map((step) => {
-      const cost = travelStepTicksCost(step, origin);
-      origin = step;
-      return cost;
-    });
-
-    return sum(costs);
+    return travelTicksRemaining(path, worldCurrentLocationState());
   });
 
   private travelState = computed(() => worldTravelState());

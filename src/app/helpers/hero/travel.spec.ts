@@ -12,7 +12,10 @@ vi.mock('@helpers/decree/auto-mode', () => ({
 vi.mock('@helpers/hero/global-effects', () => ({
   addGlobalEffect: vi.fn(),
   isGlobalEffectActive: vi.fn(() => false),
-  globalEffectSums: vi.fn(() => ({ offPathTravelSpeedBonus: 0 })),
+  globalEffectSums: vi.fn(() => ({
+    offPathTravelSpeedBonus: 0,
+    onPathTravelSpeedBonus: 0,
+  })),
 }));
 
 vi.mock('@helpers/encounter/encounter', () => ({
@@ -89,6 +92,7 @@ import { encounterStartFight } from '@helpers/encounter/encounter';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
 import {
   addGlobalEffect,
+  globalEffectSums,
   isGlobalEffectActive,
 } from '@helpers/hero/global-effects';
 import {
@@ -140,6 +144,13 @@ function applyLastUpdate(state: GameState): GameState {
   const updateFn = calls[calls.length - 1][0];
   return updateFn(state);
 }
+
+beforeEach(() => {
+  vi.mocked(globalEffectSums).mockReturnValue({
+    offPathTravelSpeedBonus: 0,
+    onPathTravelSpeedBonus: 0,
+  } as never);
+});
 
 describe('canPartyTravel', () => {
   beforeEach(() => {
@@ -236,6 +247,27 @@ describe('travelEtaSecondsTo', () => {
 
     // Off-path Move steps cost 3 ticks each; the first
     // step already has 1 tick of progress, so 2 remain, plus 3 for the second.
+    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBe(5);
+  });
+
+  it('rounds a fractional remaining time up to the tick the party arrives on', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      offPathTravelSpeedBonus: 0.1,
+      onPathTravelSpeedBonus: 0,
+    } as never);
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Duchy Trading Caravan - Carrina',
+        path: [
+          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+        ],
+        ticksIntoStep: 1,
+      }),
+    );
+
+    // Two 2.7-tick steps with 1 tick banked = 4.4 remaining, arriving on the 5th tick.
     expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBe(5);
   });
 });
@@ -632,6 +664,36 @@ describe('travelProcessTick', () => {
       }),
     );
     expect(result.world.travel.ticksIntoStep).toBe(2);
+  });
+
+  it('carries surplus progress into the next step when a boost makes a step cost under a tick', () => {
+    vi.mocked(globalEffectSums).mockReturnValue({
+      offPathTravelSpeedBonus: 0,
+      onPathTravelSpeedBonus: 0.25,
+    } as never);
+    vi.mocked(tileIsOnPath).mockReturnValue(true);
+    vi.mocked(gamestate).mockReturnValue(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Field Ruins',
+        path: [
+          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+        ],
+        ticksIntoStep: 0,
+      }),
+    );
+
+    travelProcessTick();
+
+    expect(currentLocationSet).toHaveBeenCalledTimes(1);
+    const result = applyLastUpdate(
+      stateWithTravel({ status: 'Traveling', path: [], ticksIntoStep: 0 }),
+    );
+    expect(result.world.travel.path).toEqual([
+      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+    ]);
+    expect(result.world.travel.ticksIntoStep).toBeCloseTo(0.25);
   });
 
   it('completes an off-path step at the 3-tick cost, moving to the next tile', () => {

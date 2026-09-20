@@ -3,7 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { travelPathTotalTicks } from '@helpers/hero/travel';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -46,7 +46,7 @@ export function workerStaminaCostToNode(
   const path = travelPathFrom(kingdom, nodeName, allowTeleport);
   if (!path) return undefined;
 
-  return travelPathTotalTicks(path, kingdom);
+  return travelPathBaseTotalTicks(path, kingdom);
 }
 
 export function canWorkerReachNode(

@@ -17,8 +17,9 @@ vi.mock('@helpers/combat/combat-log', () => ({
   ),
 }));
 
-vi.mock('@helpers/hero/travel', () => ({
+vi.mock('@helpers/hero/travel-cost', () => ({
   travelStepTicksCost: vi.fn(() => 1),
+  travelPathTotalTicks: vi.fn(() => 1),
 }));
 
 vi.mock('@helpers/item/materials', () => ({

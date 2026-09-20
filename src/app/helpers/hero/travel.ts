@@ -17,6 +17,11 @@ import {
   isGlobalEffectActive,
 } from '@helpers/hero/global-effects';
 import { travelStepTicksCost } from '@helpers/hero/travel-cost';
+import {
+  travelProgressCovers,
+  travelProgressSurplus,
+  travelTicksRemaining,
+} from '@helpers/hero/travel-progress';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
@@ -41,7 +46,6 @@ import {
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type { GlobalEffectId, TravelStep } from '@interfaces';
-import { clamp, sum } from 'es-toolkit/compat';
 
 export {
   travelPathTotalTicks,
@@ -59,14 +63,11 @@ export function travelEtaSecondsTo(nodeName: string): number | undefined {
     return undefined;
   }
 
-  let origin = worldCurrentLocationState();
-  const costs = travel.path.map((step, index) => {
-    const cost = travelStepTicksCost(step, origin);
-    origin = step;
-    return index === 0 ? clamp(cost - travel.ticksIntoStep, 0, cost) : cost;
-  });
-
-  return sum(costs);
+  return travelTicksRemaining(
+    travel.path,
+    worldCurrentLocationState(),
+    travel.ticksIntoStep,
+  );
 }
 
 // Deaths Door/Healing/active combat are the only true blockers - being mid-Travel is not,
@@ -244,11 +245,12 @@ function travelArriveAtNode(
   }
 }
 
-// Chains through instant (0-tick) steps immediately so a run of Teleports never waits on ticks.
+// Chains into every following step the carried progress covers (incl. instant Teleports) within the same tick.
 function travelCompleteStep(
   destinationNodeName: string | undefined,
   completedStep: TravelStep,
   remainingPath: TravelStep[],
+  carriedProgress: number,
 ): void {
   const previousLocation = worldCurrentLocationState();
   currentLocationSet({
@@ -269,14 +271,20 @@ function travelCompleteStep(
   }
 
   const [nextStep, ...restOfPath] = remainingPath;
-  if (travelStepTicksCost(nextStep, completedStep) === 0) {
-    travelCompleteStep(destinationNodeName, nextStep, restOfPath);
+  const nextCost = travelStepTicksCost(nextStep, completedStep);
+  if (travelProgressCovers(carriedProgress, nextCost)) {
+    travelCompleteStep(
+      destinationNodeName,
+      nextStep,
+      restOfPath,
+      travelProgressSurplus(carriedProgress, nextCost),
+    );
     return;
   }
 
   updateGamestate((state) => {
     state.world.travel.path = remainingPath;
-    state.world.travel.ticksIntoStep = 0;
+    state.world.travel.ticksIntoStep = carriedProgress;
     return state;
   });
 }
@@ -290,15 +298,20 @@ export function travelProcessTick(): void {
     currentStep,
     worldCurrentLocationState(),
   );
-  const ticksIntoStep = travel.ticksIntoStep + 1;
+  const progress = travel.ticksIntoStep + 1;
 
-  if (stepCost > 0 && ticksIntoStep < stepCost) {
+  if (!travelProgressCovers(progress, stepCost)) {
     updateGamestate((state) => {
-      state.world.travel.ticksIntoStep = ticksIntoStep;
+      state.world.travel.ticksIntoStep = progress;
       return state;
     });
     return;
   }
 
-  travelCompleteStep(travel.destinationNodeName, currentStep, restOfPath);
+  travelCompleteStep(
+    travel.destinationNodeName,
+    currentStep,
+    restOfPath,
+    travelProgressSurplus(progress, stepCost),
+  );
 }

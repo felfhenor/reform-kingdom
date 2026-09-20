@@ -1,5 +1,5 @@
 import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
-import { travelStepTicksCost } from '@helpers/hero/travel';
+import { travelPathAdvanceTick } from '@helpers/hero/travel-progress';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
@@ -12,43 +12,6 @@ import type {
   WorkerId,
 } from '@interfaces';
 
-// Structural fork, not shared state.
-function advancePathOneTick(
-  path: TravelStep[],
-  ticksIntoStep: number,
-  currentLocation: CurrentLocation,
-): PathAdvanceResult {
-  if (path.length === 0) return { arrived: true, location: currentLocation };
-
-  const [currentStep, ...restOfPath] = path;
-  const stepCost = travelStepTicksCost(currentStep, currentLocation);
-  const newTicksIntoStep = ticksIntoStep + 1;
-
-  if (stepCost > 0 && newTicksIntoStep < stepCost) {
-    return {
-      arrived: false,
-      path,
-      ticksIntoStep: newTicksIntoStep,
-      location: currentLocation,
-    };
-  }
-
-  const newLocation: CurrentLocation = {
-    mapName: currentStep.mapName,
-    x: currentStep.x,
-    y: currentStep.y,
-  };
-
-  if (restOfPath.length === 0) return { arrived: true, location: newLocation };
-
-  return {
-    arrived: false,
-    path: restOfPath,
-    ticksIntoStep: 0,
-    location: newLocation,
-  };
-}
-
 function advanceTownWorkerTravelStatus(
   townId: TownId,
   workerId: WorkerId,
@@ -56,7 +19,7 @@ function advanceTownWorkerTravelStatus(
   ticksIntoStep: number,
   location: CurrentLocation,
 ): PathAdvanceResult {
-  const result = advancePathOneTick(path, ticksIntoStep, location);
+  const result = travelPathAdvanceTick(path, ticksIntoStep, location);
 
   updateGamestate((state) => {
     const target = state.world.towns[townId]?.workers[workerId];

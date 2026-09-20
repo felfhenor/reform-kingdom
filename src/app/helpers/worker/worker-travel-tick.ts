@@ -4,7 +4,7 @@ import {
   itemDropHtml,
 } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
-import { travelStepTicksCost } from '@helpers/hero/travel';
+import { travelPathAdvanceTick } from '@helpers/hero/travel-progress';
 import { addMaterial } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
@@ -15,58 +15,11 @@ import type {
   CurrentLocation,
   ItemContent,
   ItemId,
+  PathAdvanceResult,
   TravelStep,
   WorkerContent,
   WorkerId,
 } from '@interfaces';
-
-type PathAdvanceResult =
-  | { arrived: true; location: CurrentLocation }
-  | {
-      arrived: false;
-      path: TravelStep[];
-      ticksIntoStep: number;
-      location: CurrentLocation;
-    };
-
-// Doesn't chase consecutive 0-tick (Teleport) steps in one tick.
-function advancePathOneTick(
-  path: TravelStep[],
-  ticksIntoStep: number,
-  currentLocation: CurrentLocation,
-): PathAdvanceResult {
-  if (path.length === 0) return { arrived: true, location: currentLocation };
-
-  const [currentStep, ...restOfPath] = path;
-  const stepCost = travelStepTicksCost(currentStep, currentLocation);
-  const newTicksIntoStep = ticksIntoStep + 1;
-
-  if (stepCost > 0 && newTicksIntoStep < stepCost) {
-    return {
-      arrived: false,
-      path,
-      ticksIntoStep: newTicksIntoStep,
-      location: currentLocation,
-    };
-  }
-
-  const newLocation: CurrentLocation = {
-    mapName: currentStep.mapName,
-    x: currentStep.x,
-    y: currentStep.y,
-  };
-
-  if (restOfPath.length === 0) {
-    return { arrived: true, location: newLocation };
-  }
-
-  return {
-    arrived: false,
-    path: restOfPath,
-    ticksIntoStep: 0,
-    location: newLocation,
-  };
-}
 
 function advanceWorkerTravelStatus(
   workerId: WorkerId,
@@ -74,7 +27,7 @@ function advanceWorkerTravelStatus(
   ticksIntoStep: number,
   location: CurrentLocation,
 ): PathAdvanceResult {
-  const result = advancePathOneTick(path, ticksIntoStep, location);
+  const result = travelPathAdvanceTick(path, ticksIntoStep, location);
 
   updateGamestate((state) => {
     const target = state.workers[workerId];

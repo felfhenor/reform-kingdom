@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/hero/travel', () => ({
+vi.mock('@helpers/hero/travel-cost', () => ({
   travelStepTicksCost: vi.fn(() => 5),
+  travelPathTotalTicks: vi.fn(() => 5),
 }));
 
 vi.mock('@helpers/state-game', () => {
@@ -22,7 +23,7 @@ vi.mock('@helpers/town/town-materials', () => ({
 }));
 
 import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
-import { travelStepTicksCost } from '@helpers/hero/travel';
+import { travelStepTicksCost } from '@helpers/hero/travel-cost';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';

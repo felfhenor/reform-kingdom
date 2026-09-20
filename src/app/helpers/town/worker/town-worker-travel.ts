@@ -1,5 +1,5 @@
 import { getEntry } from '@helpers/content/content';
-import { travelPathTotalTicks } from '@helpers/hero/travel';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { updateGamestate } from '@helpers/state-game';
 import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
@@ -38,7 +38,7 @@ export function townWorkerStaminaCostToNode(
   if (!townNode) return undefined;
 
   const path = travelPathFrom(townNode, nodeName, allowTeleport);
-  return path ? travelPathTotalTicks(path, townNode) : undefined;
+  return path ? travelPathBaseTotalTicks(path, townNode) : undefined;
 }
 
 // No discovery check - town workers are NPC-run, not player exploration.

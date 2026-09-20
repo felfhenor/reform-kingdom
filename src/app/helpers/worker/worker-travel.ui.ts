@@ -1,9 +1,8 @@
 import type { Signal } from '@angular/core';
 import { computed } from '@angular/core';
-import { travelStepTicksCost } from '@helpers/hero/travel';
+import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import { workersState } from '@helpers/state-game';
 import type { TravelStep, WorkerId } from '@interfaces';
-import { clamp, sum } from 'es-toolkit/compat';
 
 // Remaining ticks for a TravelingTo/TravelingBack worker, else undefined - drives the
 // "mm:ss remaining" status line.
@@ -20,15 +19,8 @@ export function workerTravelRemainingTicks(
   }
 
   const { path, ticksIntoStep } = worker.status;
-  let origin = worker.location;
 
-  const costs = path.map((step, index) => {
-    const cost = travelStepTicksCost(step, origin);
-    origin = { mapName: step.mapName, x: step.x, y: step.y };
-    return index === 0 ? clamp(cost - ticksIntoStep, 0, cost) : cost;
-  });
-
-  return sum(costs);
+  return travelTicksRemaining(path, worker.location, ticksIntoStep);
 }
 
 // Read every animation frame by the PIXI map-rendering layer - memoized so an unchanged
