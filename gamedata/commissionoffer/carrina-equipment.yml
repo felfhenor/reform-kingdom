@@ -1,6 +1,6 @@
 - id: c8f509e3-c05d-44d9-b7eb-0583be2257d8
   name: Commission - Simple Weaponry
-  description: The caravan needs to restock their basic weaponry.
+  description: The trader needs to restock their basic weaponry.
 
   requirements:
     - equipmentId: Copper Whip
@@ -35,7 +35,7 @@
 
 - id: b53a7d22-0155-4934-a0c8-aa3ec43fc979
   name: Commission - Simple Armor
-  description: The caravan needs to restock their basic armor.
+  description: The trader needs to restock their basic armor.
 
   requirements:
     - equipmentId: Coppersilk Robe

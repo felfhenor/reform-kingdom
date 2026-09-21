@@ -1,6 +1,6 @@
 - id: 5098c23f-6aa7-4b5d-a53e-9f5629942714
   name: Commission - Vessels of Ghostcopper Dust
-  description: The caravan needs a bundle of ghostcopper dust to engage in mystic arts.
+  description: The trader needs a bundle of ghostcopper dust to engage in mystic arts.
 
   requirements:
     - itemId: Ghostcopper Dust

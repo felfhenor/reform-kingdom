@@ -1,6 +1,6 @@
 - id: a95ceeca-ec97-4dc5-a931-b56d2f51a11d
   name: Commission - Akroki Bounty
-  description: The caravan wants the local Akroki groups thinned out before they raid another shipment.
+  description: The trader wants the local Akroki groups thinned out before they raid another shipment.
 
   requirements:
     - monsterId: Akroki Swashbuckler
@@ -25,7 +25,7 @@
 
 - id: 33642805-018a-461a-a67f-7bc82d639b6b
   name: Commission - Flying Bounty
-  description: The caravan wants to thin out local magical creatures before they cause more problems with travelers.
+  description: The trader wants to thin out local magical creatures before they cause more problems with travelers.
 
   requirements:
     - monsterId: Brightwisp
