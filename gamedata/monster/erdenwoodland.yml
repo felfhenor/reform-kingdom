@@ -199,13 +199,15 @@
       weight: 3
     - skillId: Hex I
       weight: 2
+    - skillId: Rake I
+      weight: 2
 
   baseStats:
     Health: 95
     Energy: 50
     Luck: 1
     Intelligence: 25
-    Strength: 5
+    Strength: 25
     Vitality: 15
     Resistance: 30
     Agility: 10
@@ -215,7 +217,7 @@
     Energy: 7
     Luck: 0.5
     Intelligence: 0.9
-    Strength: 0.25
+    Strength: 0.75
     Vitality: 0.6
     Resistance: 0.55
     Agility: 0.3

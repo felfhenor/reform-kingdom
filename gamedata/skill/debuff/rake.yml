@@ -1,0 +1,31 @@
+- id: 70552b7e-df24-4544-9b76-a1bf21feeeea
+  name: Rake I
+  family: Rake
+  description: Rake at 2 enemies, inflicting Bleed on them.
+
+  sprite: '0039'
+
+  rarity: Common
+
+  epCost: 40
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [Debuff]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Bleeding
+
+      statusEffects:
+        - statusEffectId: Bleeding
+          chance: 100
+          duration: 4
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}**.'
