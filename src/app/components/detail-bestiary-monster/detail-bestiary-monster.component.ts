@@ -77,7 +77,7 @@ export class DetailBestiaryMonsterComponent {
     return sortBy(
       uniq(
         this.filteredSourceNodes().flatMap((node) =>
-          Array(node.levelRange.max - node.levelRange.min)
+          Array(node.levelRange.max - node.levelRange.min + 1)
             .fill(0)
             .map((_, i) => i + node.levelRange.min),
         ),
