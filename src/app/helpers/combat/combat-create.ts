@@ -21,6 +21,7 @@ import {
   equipmentMonsterTypeDamageTotals,
   equippedItemTypes,
 } from '@helpers/item/equipment';
+import { equipmentSkillStatBonuses } from '@helpers/item/equipment-skill-bonus';
 import { rngUuid } from '@helpers/rng';
 import type {
   Character,
@@ -137,6 +138,7 @@ export function combatantFromCharacter(character: Character): Combatant {
     monsterTypeDamageBonus: equipmentMonsterTypeDamageTotals(
       character.equipment,
     ),
+    skillStatBonuses: equipmentSkillStatBonuses(character.equipment),
 
     affinity: defaultAffinities(),
     resistance: defaultAffinities(),

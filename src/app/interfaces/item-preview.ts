@@ -9,7 +9,15 @@ import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { WorkerContent } from '@interfaces/content-worker';
 import type { DropRarity } from '@interfaces/droppable';
 import type { EquipmentItemType } from '@interfaces/equipment';
-import type { StatBlock } from '@interfaces/stat';
+import type { GameStat, StatBlock } from '@interfaces/stat';
+
+// A skill-family stat bonus resolved to the family's display name and icon.
+export type SkillStatBonusDisplay = {
+  skillName: string;
+  skillSprite: string;
+  stat: GameStat;
+  value: number;
+};
 
 // The three content kinds a recipe, stored material, or caravan trade can
 // resolve to.
@@ -43,6 +51,8 @@ export type ItemPreviewDisplay = {
     tradeskillSprite: string;
     value: number;
   }[];
+  // Base content, infusion and rolled affix skill stat bonuses, merged per skill family and stat.
+  skillStatBonuses?: SkillStatBonusDisplay[];
   // Affix effects with no dedicated display elsewhere (caravan discounts).
   miscAffixDescriptions?: string[];
   // Collectible only - set only when the collectible has at least one effect.

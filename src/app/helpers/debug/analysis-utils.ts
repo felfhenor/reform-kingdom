@@ -134,3 +134,21 @@ export function analysisIssueCheck(
     message: `${label}: ${issue.message}`,
   };
 }
+
+// One check per issue, or a single passing check when there are none.
+export function analysisIssueChecks(
+  idPrefix: string,
+  label: string,
+  issues: AnalysisIssue[],
+  passMessage: string,
+): AnalysisCheck[] {
+  if (issues.length === 0) {
+    return [
+      { id: `${idPrefix}:ok`, label, status: 'pass', message: passMessage },
+    ];
+  }
+
+  return issues.map((issue, i) =>
+    analysisIssueCheck(`${idPrefix}:${i}`, label, issue),
+  );
+}

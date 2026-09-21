@@ -1,0 +1,49 @@
+# Adds extra stat scaling to every tier of one skill family. All share one family, so an item rolls at most one.
+
+- id: 8d97b5b2-e9cb-445f-ace6-33ad144dce67
+  name: Sanctified
+  description: Adds +25% Resistance scaling to Holy Smite.
+  rarity: Rare
+  family: Skill Enhancement
+  position: Prefix
+  effects:
+    - kind: SkillStatBonus
+      skillFamily: Holy Smite
+      stat: Resistance
+      value: 0.25
+
+- id: 8496193f-d917-4a90-8b36-94518f4fadbe
+  name: Rumbling
+  description: Adds +50% Agility scaling to Earthshake.
+  rarity: Rare
+  family: Skill Enhancement
+  position: Prefix
+  effects:
+    - kind: SkillStatBonus
+      skillFamily: Earthshake
+      stat: Agility
+      value: 0.5
+
+- id: e6843069-a04b-4fb2-a09d-1793e2e745a1
+  name: Deadeye
+  description: Adds +50% Agility scaling to Snipe.
+  rarity: Rare
+  family: Skill Enhancement
+  position: Prefix
+  effects:
+    - kind: SkillStatBonus
+      skillFamily: Snipe
+      stat: Agility
+      value: 0.5
+
+- id: bfd7a2ea-2f40-4413-9d0d-c6c5ae06d3ab
+  name: Dueling
+  description: Adds +25% Agility scaling to Double Strike.
+  rarity: Rare
+  family: Skill Enhancement
+  position: Prefix
+  effects:
+    - kind: SkillStatBonus
+      skillFamily: Double Strike
+      stat: Agility
+      value: 0.25

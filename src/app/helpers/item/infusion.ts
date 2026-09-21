@@ -3,6 +3,7 @@ import {
   GOLD_PER_GATHER_YIELD_POINT,
   GOLD_PER_MONSTER_TYPE_DAMAGE_POINT,
   GOLD_PER_RESISTANCE_POINT,
+  GOLD_PER_SKILL_STAT_BONUS_POINT,
   GOLD_PER_STAT_POINT,
   VALUE_MULTIPLIER_PER_COMBAT_STAT,
   VALUE_MULTIPLIER_PER_MONSTER_TYPE,
@@ -60,7 +61,7 @@ export function equipmentItemSlotCount(item: EquipmentItem): number {
   return baseSlots + affixBonus;
 }
 
-// Every fixed-key dimension's infusion getter - GatherYield is checked separately below since TradeskillId is dynamic content, not a fixed key.
+// Every fixed-key dimension's infusion getter - GatherYield/SkillStatBonus are checked separately below since their keys are dynamic content.
 const INFUSION_BLOCKS: ((
   content: ItemContent,
 ) => Partial<Record<string, number>> | undefined)[] = [
@@ -77,8 +78,11 @@ export function isInfusionMaterial(item: ItemContent): boolean {
   const hasGatherYieldBonus = (item.infusionGatherYieldBonuses ?? []).some(
     (bonus) => bonus.value !== 0,
   );
+  const hasSkillStatBonus = (item.infusionSkillStatBonuses ?? []).some(
+    (bonus) => bonus.value !== 0,
+  );
 
-  return hasDimensionBonus || hasGatherYieldBonus;
+  return hasDimensionBonus || hasGatherYieldBonus || hasSkillStatBonus;
 }
 
 // Each dimension's flat GOLD_PER_*_POINT rate is weighted per-key by the matching VALUE_MULTIPLIER_PER_* table (same tables armory sell value uses).
@@ -115,12 +119,20 @@ export function infusionMaterialCost(itemId: ItemId): number {
     GOLD_PER_GATHER_YIELD_POINT *
     sumBy(content.infusionGatherYieldBonuses ?? [], (bonus) => bonus.value);
 
+  const skillStatBonusCost =
+    GOLD_PER_SKILL_STAT_BONUS_POINT *
+    sumBy(
+      content.infusionSkillStatBonuses ?? [],
+      (bonus) => bonus.value * VALUE_MULTIPLIER_PER_STAT[bonus.stat],
+    );
+
   return Math.round(
     statCost +
       resistanceCost +
       combatStatCost +
       monsterTypeDamageCost +
-      gatherYieldCost,
+      gatherYieldCost +
+      skillStatBonusCost,
   );
 }
 

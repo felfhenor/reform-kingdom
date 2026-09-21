@@ -137,6 +137,9 @@ export const VALUE_MULTIPLIER_PER_MONSTER_TYPE: Record<MonsterType, number> = {
 
 export const GOLD_PER_GATHER_YIELD_POINT = 200;
 
+// Per 1.0x of extra scaling, weighted per boosted stat.
+export const GOLD_PER_SKILL_STAT_BONUS_POINT = 250;
+
 // Kingdom
 
 export const ARMORY_CAP = 50;

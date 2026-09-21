@@ -122,6 +122,10 @@
               <app-row-gather-yield-bonuses
                 [bonuses]="selectedItemGatherYieldBonuses()"
               />
+
+              <app-row-skill-stat-bonuses
+                [bonuses]="selectedItemSkillStatBonuses()"
+              />
             </div>
           </div>
         </div>
@@ -192,6 +196,10 @@
 
                           <app-row-gather-yield-bonuses
                             [bonuses]="materialGatherYieldBonuses(entry.item)"
+                          />
+
+                          <app-row-skill-stat-bonuses
+                            [bonuses]="materialSkillStatBonuses(entry.item)"
                           />
                         </div>
                       </div>

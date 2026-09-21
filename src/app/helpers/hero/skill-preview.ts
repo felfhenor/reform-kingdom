@@ -1,5 +1,5 @@
 import {
-  getCombatantBaseStatDamageForTechnique,
+  getCombatantBaseDamageForTechnique,
   techniqueHasAttribute,
 } from '@helpers/combat/combat-damage';
 import { combatFormatMessage } from '@helpers/combat/combat-log';
@@ -10,20 +10,20 @@ import {
   skillTechniqueStatScaling,
   skillTechniqueStatusEffectChance,
   skillTechniqueStatusEffectDuration,
+  skillTechniqueWithStatBonuses,
 } from '@helpers/hero/skill';
 import type {
   Combatant,
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   EquipmentSkillTargetBehaviorData,
-  GameStat,
   SkillTechniqueKind,
   SkillTechniquePreview,
   SkillTechniqueStatusPreview,
   SkillTechniqueTargeting,
   StatusEffectContent,
 } from '@interfaces';
-import { sum, sumBy } from 'es-toolkit/compat';
+import { sumBy } from 'es-toolkit/compat';
 
 // Mirrors the live combat formula but skips target-side mitigation (no target chosen yet); for tooltip previews only.
 export function skillTechniquePreviewValue(
@@ -31,11 +31,7 @@ export function skillTechniquePreviewValue(
   skill: EquipmentSkillContent,
   technique: EquipmentSkillContentTechnique,
 ): number {
-  const total = sum(
-    (Object.keys(technique.damageScaling) as GameStat[]).map((stat) =>
-      getCombatantBaseStatDamageForTechnique(combatant, skill, technique, stat),
-    ),
-  );
+  const total = getCombatantBaseDamageForTechnique(combatant, skill, technique);
 
   return Math.max(0, Math.floor(total));
 }
@@ -121,7 +117,13 @@ function skillTechniquePreview(
       : 0,
     targeting: skillTechniqueTargeting(skill, technique),
     conditions: technique.targetBehaviors.flatMap(skillTargetBehaviorCondition),
-    scaling: skillTechniqueStatScaling(technique),
+    scaling: skillTechniqueStatScaling(
+      skillTechniqueWithStatBonuses(
+        skill,
+        technique,
+        combatant.skillStatBonuses,
+      ),
+    ),
     elements: technique.elements,
     statusEffects: skillTechniqueStatusPreviews(skill, technique),
   };

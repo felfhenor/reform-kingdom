@@ -12,6 +12,7 @@ import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
+import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
@@ -31,7 +32,10 @@ import {
   canModifyEquipment,
   equippedItemsByPrimarySlot,
 } from '@helpers/item/equipment';
-import { equipmentItemGatherYieldBonuses } from '@helpers/item/equipment-bonus';
+import {
+  equipmentItemGatherYieldBonuses,
+  equipmentItemSkillStatBonuses,
+} from '@helpers/item/equipment-bonus';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusMonsterTypeDamage,
@@ -44,7 +48,10 @@ import {
   infusionMaterialCost,
   isInfusionMaterial,
 } from '@helpers/item/infusion';
-import { resolveGatherYieldBonusDisplay } from '@helpers/item/item-preview';
+import {
+  resolveGatherYieldBonusDisplay,
+  resolveSkillStatBonusDisplay,
+} from '@helpers/item/item-preview';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { getStorageMaterials } from '@helpers/kingdom/storage.ui';
 import {
@@ -74,6 +81,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     RowInfusedMaterialsComponent,
     RowStatSummaryComponent,
     RowGatherYieldBonusesComponent,
+    RowSkillStatBonusesComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
     TippyDirective,
@@ -198,6 +206,22 @@ export class PlayKingdomInfusionComponent {
 
   public materialCost(itemId: ItemId): number {
     return infusionMaterialCost(itemId);
+  }
+
+  public selectedItemSkillStatBonuses = computed(() => {
+    const item = this.selectedItem();
+    const content = this.selectedItemContent();
+    return content
+      ? resolveSkillStatBonusDisplay(
+          equipmentItemSkillStatBonuses(content, item),
+        )
+      : [];
+  });
+
+  public materialSkillStatBonuses(material: ItemContent) {
+    return resolveSkillStatBonusDisplay(
+      material.infusionSkillStatBonuses ?? [],
+    );
   }
 
   // Raw, uncombined - just this one material's own infusion grant, same treatment as its infusionStats/infusionDebuffResistances/infusionCombatStats above.

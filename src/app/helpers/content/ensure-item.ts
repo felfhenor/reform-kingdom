@@ -2,6 +2,7 @@ import { ensureArray } from '@helpers/content/ensure-helpers-core';
 import {
   ensureCombatStats,
   ensureMonsterTypeDamage,
+  ensureSkillStatBonus,
   ensureStats,
   ensureTagResistances,
 } from '@helpers/content/ensure-helpers-stats';
@@ -60,6 +61,10 @@ export function ensureEquipment(
       equipment.gatherYieldBonuses,
       ensureGatherYieldBonus,
     ),
+    skillStatBonuses: ensureArray(
+      equipment.skillStatBonuses,
+      ensureSkillStatBonus,
+    ),
     sprite: equipment.sprite ?? 'UNKNOWN',
     type: equipment.type ?? 'Accessory',
     // Defaults to 0, not 1 - infusion slots must always be explicitly
@@ -90,6 +95,10 @@ export function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     infusionGatherYieldBonuses: ensureArray(
       item.infusionGatherYieldBonuses,
       ensureGatherYieldBonus,
+    ),
+    infusionSkillStatBonuses: ensureArray(
+      item.infusionSkillStatBonuses,
+      ensureSkillStatBonus,
     ),
     unobtainable: item.unobtainable ?? false,
   };

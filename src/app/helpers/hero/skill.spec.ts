@@ -3,6 +3,7 @@ import {
   skillEpCost,
   skillIsUsableWithEquippedWeapons,
   skillTechniqueStatScaling,
+  skillTechniqueWithStatBonuses,
 } from '@helpers/hero/skill';
 import type {
   EquipmentSkill,
@@ -183,5 +184,67 @@ describe('skillTechniqueStatScaling', () => {
 
   it('returns an empty array for a technique with no scaling', () => {
     expect(skillTechniqueStatScaling(buildTechnique({}))).toEqual([]);
+  });
+});
+
+describe('skillTechniqueWithStatBonuses', () => {
+  const fireball = buildSkill({ family: 'Fireball' });
+
+  it('adds the bonus onto the matching stat of a scaling technique', () => {
+    const technique = buildTechnique({ Intelligence: 0.85 });
+
+    const scaled = skillTechniqueWithStatBonuses(fireball, technique, [
+      { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+      { skillFamily: 'Fireball', stat: 'Intelligence', value: 0.15 },
+    ]);
+
+    expect(scaled.damageScaling.Vitality).toBe(2);
+    expect(scaled.damageScaling.Intelligence).toBeCloseTo(1);
+  });
+
+  it('does not mutate the source technique', () => {
+    const technique = buildTechnique({ Intelligence: 0.85 });
+
+    skillTechniqueWithStatBonuses(fireball, technique, [
+      { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+    ]);
+
+    expect(technique.damageScaling.Vitality).toBeUndefined();
+  });
+
+  it('ignores bonuses for other skill families', () => {
+    const technique = buildTechnique({ Intelligence: 0.85 });
+
+    expect(
+      skillTechniqueWithStatBonuses(fireball, technique, [
+        { skillFamily: 'Snipe', stat: 'Agility', value: 0.5 },
+      ]),
+    ).toBe(technique);
+  });
+
+  it('leaves techniques with no stat scaling untouched', () => {
+    const technique = buildTechnique({}, { attributes: ['Buff'] });
+
+    expect(
+      skillTechniqueWithStatBonuses(fireball, technique, [
+        { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+      ]),
+    ).toBe(technique);
+  });
+
+  it('returns the technique unchanged when there are no bonuses', () => {
+    const technique = buildTechnique({ Intelligence: 0.85 });
+
+    expect(skillTechniqueWithStatBonuses(fireball, technique)).toBe(technique);
+  });
+
+  it('never drops a stat below zero scaling', () => {
+    const technique = buildTechnique({ Intelligence: 0.5 });
+
+    const scaled = skillTechniqueWithStatBonuses(fireball, technique, [
+      { skillFamily: 'Fireball', stat: 'Intelligence', value: -2 },
+    ]);
+
+    expect(scaled.damageScaling.Intelligence).toBe(0);
   });
 });

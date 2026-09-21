@@ -64,6 +64,8 @@
 
     <app-row-gather-yield-bonuses [bonuses]="item.gatherYieldBonuses" />
 
+    <app-row-skill-stat-bonuses [bonuses]="item.skillStatBonuses" />
+
     @for (skill of item.skills; track skill.id) {
       <div class="text-xs my-2 italic text-lighter flex items-center gap-2">
         Teaches

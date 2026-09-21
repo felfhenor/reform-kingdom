@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   recipeBackdropSprite,
   recipeResultContent,
@@ -7,7 +7,10 @@ import {
 } from '@helpers/crafting/recipes';
 import { worldPartyState } from '@helpers/state-game';
 import { equipmentItemMiscAffixDescriptions } from '@helpers/item/affix';
-import { equipmentItemGatherYieldBonuses } from '@helpers/item/equipment-bonus';
+import {
+  equipmentItemGatherYieldBonuses,
+  equipmentItemSkillStatBonuses,
+} from '@helpers/item/equipment-bonus';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusMonsterTypeDamage,
@@ -21,6 +24,7 @@ import {
   type EquipmentContent,
   type EquipmentId,
   type EquipmentItem,
+  type EquipmentSkillContent,
   type GatherYieldBonus,
   type ItemContent,
   type ItemId,
@@ -30,6 +34,8 @@ import {
   type JobContent,
   type RecipeContent,
   type RecipeId,
+  type SkillStatBonus,
+  type SkillStatBonusDisplay,
   type TradeskillContent,
   type WorkerContent,
   type WorkerId,
@@ -72,6 +78,32 @@ function gatherYieldBonusDisplay(
   return bonuses.length > 0 ? bonuses : undefined;
 }
 
+// Any skill in the family supplies the icon.
+export function resolveSkillStatBonusDisplay(
+  bonuses: SkillStatBonus[],
+): SkillStatBonusDisplay[] {
+  const skills = getEntriesByType<EquipmentSkillContent>('skill');
+
+  return bonuses.map((bonus) => ({
+    skillName: bonus.skillFamily,
+    skillSprite:
+      skills.find((skill) => skill.family === bonus.skillFamily)?.sprite ?? '',
+    stat: bonus.stat,
+    value: bonus.value,
+  }));
+}
+
+function skillStatBonusDisplay(
+  content: EquipmentContent,
+  instance?: EquipmentItem,
+): ItemPreviewDisplay['skillStatBonuses'] {
+  const bonuses = resolveSkillStatBonusDisplay(
+    equipmentItemSkillStatBonuses(content, instance),
+  );
+
+  return bonuses.length > 0 ? bonuses : undefined;
+}
+
 export function itemPreviewDisplay(
   spritesheet: ItemPreviewSpritesheet,
   content: ItemPreviewContent,
@@ -107,6 +139,7 @@ export function itemPreviewDisplay(
       combatStats: eqContent.combatStats,
       monsterTypeDamage: eqContent.monsterTypeDamage,
       gatherYieldBonuses: gatherYieldBonusDisplay(eqContent, instance),
+      skillStatBonuses: skillStatBonusDisplay(eqContent, instance),
       levelRequirement: eqContent.levelRequirement,
       equippableHeroNames: equippableHeroNames(eqContent),
       ...(instance && {
@@ -124,6 +157,10 @@ export function itemPreviewDisplay(
       content.infusionGatherYieldBonuses ?? [],
     );
 
+    const infusionSkillStatBonuses = resolveSkillStatBonusDisplay(
+      content.infusionSkillStatBonuses ?? [],
+    );
+
     return {
       ...base,
       stats: content.infusionStats,
@@ -133,6 +170,10 @@ export function itemPreviewDisplay(
       gatherYieldBonuses:
         infusionGatherYieldBonuses.length > 0
           ? infusionGatherYieldBonuses
+          : undefined,
+      skillStatBonuses:
+        infusionSkillStatBonuses.length > 0
+          ? infusionSkillStatBonuses
           : undefined,
     } as ItemPreviewDisplay;
   }

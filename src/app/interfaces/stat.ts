@@ -62,6 +62,13 @@ export type SkillStatScaling = {
   multiplier: number;
 };
 
+// Extra damageScaling gear adds to every stat-scaling technique of a skill family, e.g. +2 Vitality on Fireball = +2.00x VIT.
+export type SkillStatBonus = {
+  skillFamily: string;
+  stat: GameStat;
+  value: number;
+};
+
 export const PhysicalStats: GameStat[] = [
   'Strength',
   'Vitality',

@@ -3,6 +3,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { DetailCollectibleEffectsComponent } from '@components/detail-collectible-effects/detail-collectible-effects.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
+import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import {
@@ -23,6 +24,7 @@ import {
     SlotIconBlankComponent,
     AtlasImageComponent,
     RowGatherYieldBonusesComponent,
+    RowSkillStatBonusesComponent,
     DetailCollectibleEffectsComponent,
   ],
   templateUrl: './detail-item-preview.component.html',

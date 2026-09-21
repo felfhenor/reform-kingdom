@@ -9,6 +9,7 @@ import {
   equipmentItemGatherYieldBonuses,
   equipmentItemInfusionGatherYieldBonuses,
   equipmentItemInfusionTotals,
+  equipmentItemSkillStatBonuses,
   MONSTER_TYPE_DAMAGE_BONUS,
   weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
@@ -387,5 +388,117 @@ describe('weightedBlockTotal', () => {
       b: 10,
     } as Record<'a' | 'b', number>);
     expect(total).toBe(0);
+  });
+});
+
+describe('equipmentItemSkillStatBonuses', () => {
+  const fireballStaff: EquipmentContent = {
+    id: 'staff' as EquipmentId,
+    name: 'Staff',
+    __type: 'equipment',
+    description: '',
+    sprite: '0000',
+    rarity: 'Common',
+    levelRequirement: 1,
+    baseStats: {} as never,
+    type: 'Staff',
+    slots: 1,
+    grantedSkillIds: [],
+    skillStatBonuses: [{ skillFamily: 'Fireball', stat: 'Vitality', value: 2 }],
+  };
+
+  const fireballAffix: AffixContent = {
+    id: 'affix-fireball' as AffixId,
+    name: 'Blazing',
+    __type: 'affix',
+    description: '',
+    rarity: 'Uncommon',
+    family: 'Skill Enhancement',
+    position: 'Prefix',
+    effects: [
+      {
+        kind: 'SkillStatBonus',
+        skillFamily: 'Fireball',
+        stat: 'Vitality',
+        value: 0.5,
+      },
+      {
+        kind: 'SkillStatBonus',
+        skillFamily: 'Fireball',
+        stat: 'Agility',
+        value: 0.25,
+      },
+    ],
+  };
+
+  const fireballShard: ItemContent = {
+    id: 'fireball-shard' as ItemId,
+    name: 'Fireball Shard',
+    __type: 'item',
+    description: '',
+    sprite: '0000',
+    rarity: 'Common',
+    infusionSkillStatBonuses: [
+      { skillFamily: 'Fireball', stat: 'Vitality', value: 1 },
+    ],
+  };
+
+  function buildStaffItem(
+    overrides: Partial<EquipmentItem> = {},
+  ): EquipmentItem {
+    return {
+      id: 'item-1' as EquipmentItemId,
+      equipmentId: fireballStaff.id,
+      infusedItemIds: [],
+      affixIds: [],
+      ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns just the base bonuses for a bare content entry', () => {
+    expect(equipmentItemSkillStatBonuses(fireballStaff)).toEqual([
+      { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+    ]);
+  });
+
+  it('merges base, infusion and affix grants of the same family and stat into one entry', () => {
+    mockContent(fireballShard, fireballAffix);
+
+    const bonuses = equipmentItemSkillStatBonuses(
+      fireballStaff,
+      buildStaffItem({
+        infusedItemIds: [fireballShard.id],
+        affixIds: [fireballAffix.id],
+      }),
+    );
+
+    expect(bonuses).toEqual([
+      { skillFamily: 'Fireball', stat: 'Vitality', value: 3.5 },
+      { skillFamily: 'Fireball', stat: 'Agility', value: 0.25 },
+    ]);
+  });
+
+  it('keeps different stats of one family as separate entries', () => {
+    mockContent(fireballAffix);
+
+    const bonuses = equipmentItemSkillStatBonuses(
+      { ...fireballStaff, skillStatBonuses: [] },
+      buildStaffItem({ affixIds: [fireballAffix.id] }),
+    );
+
+    expect(bonuses.map((bonus) => bonus.stat)).toEqual(['Vitality', 'Agility']);
+  });
+
+  it('returns an empty list when nothing grants a bonus', () => {
+    expect(
+      equipmentItemSkillStatBonuses({
+        ...fireballStaff,
+        skillStatBonuses: undefined,
+      }),
+    ).toEqual([]);
   });
 });

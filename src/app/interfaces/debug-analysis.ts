@@ -1,6 +1,10 @@
 import type { HasSprite } from '@interfaces/artable';
+import type { EquipmentSkillContent } from '@interfaces/content-skill';
+import type { JobContent } from '@interfaces/content-job';
+import type { EquipmentItemType } from '@interfaces/equipment';
 import type { IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
+import type { SkillStatBonus } from '@interfaces/stat';
 import type { TiledObject } from '@interfaces/tiled-map';
 
 export type AnalysisInputType =
@@ -154,6 +158,23 @@ export type EquipmentResultRecipeCheck = {
 export type SpritedContentEntry = IsContentItem & HasSprite;
 
 export type AnalysisIssue = { status: 'fail' | 'warning'; message: string };
+
+// Anything that can carry skill stat bonuses.
+export type SkillStatBonusSource = {
+  id: string;
+  label: string;
+  bonuses: SkillStatBonus[];
+  // Gear only - its bonuses help only jobs that can equip the type.
+  equipment?: { type: EquipmentItemType; grantedSkillIds: string[] };
+  // Affix `family`, set only for affixes.
+  affixFamily?: string;
+};
+
+export type SkillStatBonusContext = {
+  skillsByFamily: Map<string, EquipmentSkillContent[]>;
+  heroFamilies: Set<string>;
+  jobs: JobContent[];
+};
 
 export type SkillSourceKind = 'Job' | 'Monster' | 'Equipment' | 'Affix';
 

@@ -5,7 +5,7 @@ import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { DropRarity, HasRarity } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
-import type { BaseStat } from '@interfaces/stat';
+import type { BaseStat, SkillStatBonus } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
 
 export type AffixId = Branded<string, 'AffixId'>;
@@ -67,6 +67,10 @@ export type AffixEffectMonsterTypeDamage = {
   value: number; // percent damage bonus against monsters of this type
 };
 
+export type AffixEffectSkillStatBonus = SkillStatBonus & {
+  kind: 'SkillStatBonus';
+};
+
 export type AffixEffect =
   | AffixEffectStat
   | AffixEffectCombatStat
@@ -77,7 +81,8 @@ export type AffixEffect =
   | AffixEffectSellValue
   | AffixEffectCaravanBuyDiscount
   | AffixEffectCaravanSellBonus
-  | AffixEffectMonsterTypeDamage;
+  | AffixEffectMonsterTypeDamage
+  | AffixEffectSkillStatBonus;
 
 // Where this affix's name sits relative to the base item name when composing a display name, e.g. "Weakening" (Prefix) Copper Ring vs Copper Ring "of Strength" (Suffix).
 export type AffixPosition = 'Prefix' | 'Suffix';

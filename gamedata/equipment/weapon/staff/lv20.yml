@@ -24,3 +24,8 @@
   baseStats:
     Intelligence: 19.5
     Vitality: 10.3
+
+  skillStatBonuses:
+    - skillFamily: Fireball
+      stat: Vitality
+      value: 2

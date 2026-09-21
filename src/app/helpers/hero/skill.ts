@@ -6,6 +6,7 @@ import type {
   EquipmentSkillTechniqueStatusEffectApplication,
   GameElement,
   GameStat,
+  SkillStatBonus,
   SkillStatScaling,
 } from '@interfaces';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
@@ -58,6 +59,30 @@ export function skillTechniqueStatScaling(
   return StatOrder.filter((stat) => technique.damageScaling[stat]).map(
     (stat) => ({ stat, multiplier: technique.damageScaling[stat] }),
   );
+}
+
+// Only techniques that already scale off a stat gain the bonus, so buff/debuff-only techniques are untouched.
+export function skillTechniqueWithStatBonuses(
+  skill: EquipmentSkill,
+  technique: EquipmentSkillContentTechnique,
+  bonuses: SkillStatBonus[] = [],
+): EquipmentSkillContentTechnique {
+  const applicable = bonuses.filter(
+    (bonus) => bonus.skillFamily === skill.family,
+  );
+  if (
+    applicable.length === 0 ||
+    skillTechniqueStatScaling(technique).length === 0
+  ) {
+    return technique;
+  }
+
+  const damageScaling = { ...technique.damageScaling };
+  applicable.forEach(({ stat, value }) => {
+    damageScaling[stat] = Math.max(0, (damageScaling[stat] ?? 0) + value);
+  });
+
+  return { ...technique, damageScaling };
 }
 
 export function skillTechniqueStatusEffectChance(

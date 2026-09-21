@@ -442,3 +442,33 @@ describe('skillDescriptionWithPreview with mixed techniques', () => {
     );
   });
 });
+
+describe('gear skill stat bonuses', () => {
+  const fireball = buildSkill({
+    family: 'Fireball',
+    techniques: [
+      buildTechnique({ damageScaling: statBlock({ Intelligence: 1 }) }),
+    ],
+  });
+  const caster = buildCombatant({
+    totalStats: {
+      ...buildCombatant().totalStats,
+      Intelligence: 100,
+      Vitality: 40,
+    },
+    skillStatBonuses: [{ skillFamily: 'Fireball', stat: 'Vitality', value: 2 }],
+  });
+
+  it('folds the bonus into the previewed amount', () => {
+    expect(
+      skillTechniquePreviewValue(caster, fireball, fireball.techniques[0]),
+    ).toBe(180);
+  });
+
+  it('lists the bonus stat in the previewed scaling', () => {
+    expect(skillTechniquePreviews(caster, fireball)[0].scaling).toEqual([
+      { stat: 'Intelligence', multiplier: 1 },
+      { stat: 'Vitality', multiplier: 2 },
+    ]);
+  });
+});

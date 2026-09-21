@@ -319,6 +319,40 @@ describe('combatantFromCharacter', () => {
 
     expect(combatant.combatStats.damageReflectPercent).toBe(10);
   });
+
+  it("carries an equipped item's skillStatBonuses onto the combatant", () => {
+    const fireballBow: EquipmentContent = {
+      ...bow,
+      skillStatBonuses: [
+        { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+      ],
+    };
+    vi.mocked(getEntry).mockImplementation((id) => {
+      if (id === rangerJob.id) return rangerJob as never;
+      if (id === attackSkill.id) return attackSkill as never;
+      if (id === snipeSkill.id) return snipeSkill as never;
+      if (id === bow.id) return fireballBow as never;
+      return undefined as never;
+    });
+
+    const combatant = combatantFromCharacter(
+      buildCharacter({
+        equipment: {
+          ...emptyEquipment,
+          Weapon: {
+            id: 'bow-1' as EquipmentItemId,
+            equipmentId: bow.id,
+            infusedItemIds: [],
+            affixIds: [],
+          },
+        },
+      }),
+    );
+
+    expect(combatant.skillStatBonuses).toEqual([
+      { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+    ]);
+  });
 });
 
 describe('combatantFromMonster', () => {

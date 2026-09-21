@@ -810,3 +810,95 @@ describe('combatApplySkillToTarget monster type damage bonus', () => {
     expect(target.hp).toBe(1000 - 100);
   });
 });
+
+describe('combatApplySkillToTarget skill stat bonuses', () => {
+  beforeEach(() => {
+    vi.mocked(rngUniform).mockReturnValue(1);
+  });
+
+  const zeroStats = {
+    Agility: 0,
+    Energy: 0,
+    Health: 0,
+    Intelligence: 0,
+    Luck: 0,
+    Resistance: 0,
+    Strength: 0,
+    Vitality: 0,
+    Constitution: 0,
+    Spirit: 0,
+  };
+
+  function castFireball(
+    attacker: Combatant,
+    target: Combatant,
+    attributes: EquipmentSkillContentTechnique['attributes'],
+  ) {
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill({ family: 'Fireball' }),
+      buildTechnique({
+        damageScaling: { ...zeroStats, Intelligence: 1 },
+        attributes,
+      }),
+    );
+  }
+
+  it('adds damage from a bonus stat the technique did not scale off', () => {
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats, Intelligence: 100, Vitality: 50 },
+      skillStatBonuses: [
+        { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+      ],
+    });
+    const target = buildCombatant({
+      hp: 1000,
+      totalStats: { ...zeroStats, Health: 1000 },
+    });
+
+    castFireball(attacker, target, ['DamagesTarget', 'BypassDefense']);
+
+    // Intelligence(100) * 1 + Vitality(50) * 2 = 200.
+    expect(target.hp).toBe(1000 - 200);
+  });
+
+  it('ignores bonuses granted to a different skill family', () => {
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats, Intelligence: 100, Vitality: 50 },
+      skillStatBonuses: [{ skillFamily: 'Snipe', stat: 'Vitality', value: 2 }],
+    });
+    const target = buildCombatant({
+      hp: 1000,
+      totalStats: { ...zeroStats, Health: 1000 },
+    });
+
+    castFireball(attacker, target, ['DamagesTarget', 'BypassDefense']);
+
+    expect(target.hp).toBe(1000 - 100);
+  });
+
+  it('keeps mitigating against the base technique, so a physical-stat bonus does not shift a magic skill onto Vitality', () => {
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats, Intelligence: 100, Vitality: 100 },
+      skillStatBonuses: [
+        { skillFamily: 'Fireball', stat: 'Vitality', value: 1 },
+      ],
+    });
+    const target = buildCombatant({
+      hp: 1000,
+      totalStats: {
+        ...zeroStats,
+        Health: 1000,
+        Resistance: 50,
+        Vitality: 1000,
+      },
+    });
+
+    castFireball(attacker, target, ['DamagesTarget']);
+
+    // baseDamage 200; the technique is Intelligence-only, so defense is Resistance(50), not a Vitality blend.
+    expect(target.hp).toBe(1000 - 150);
+  });
+});

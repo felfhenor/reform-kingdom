@@ -18,6 +18,7 @@ import {
 } from '@helpers/debug/analysis-skills-sources';
 import {
   analysisIssueCheck,
+  analysisIssueChecks,
   analysisWarn,
 } from '@helpers/debug/analysis-utils';
 import type {
@@ -37,23 +38,6 @@ import type {
   TownContent,
 } from '@interfaces';
 import { groupBy, sortBy } from 'es-toolkit/compat';
-
-function toChecks(
-  idPrefix: string,
-  label: string,
-  issues: AnalysisIssue[],
-  passMessage: string,
-): AnalysisCheck[] {
-  if (issues.length === 0) {
-    return [
-      { id: `${idPrefix}:ok`, label, status: 'pass', message: passMessage },
-    ];
-  }
-
-  return issues.map((issue, i) =>
-    analysisIssueCheck(`${idPrefix}:${i}`, label, issue),
-  );
-}
 
 function skillAllIssues(
   skill: EquipmentSkillContent,
@@ -157,7 +141,7 @@ export function runSkillsAnalysis(
 
   const checks: AnalysisCheck[] = [
     ...skills.flatMap((skill) =>
-      toChecks(
+      analysisIssueChecks(
         `skill:${skill.id}`,
         skill.name,
         skillAllIssues(skill, sources.get(skill.id) ?? [], jobs),
@@ -166,7 +150,7 @@ export function runSkillsAnalysis(
     ),
     ...Object.entries(groupBy(skills, (skill) => skill.family)).flatMap(
       ([family, list]) =>
-        toChecks(
+        analysisIssueChecks(
           `family:${family}`,
           `Family ${family}`,
           familyIssues(list),
@@ -174,7 +158,7 @@ export function runSkillsAnalysis(
         ),
     ),
     ...jobs.flatMap((job) =>
-      toChecks(
+      analysisIssueChecks(
         `job:${job.id}`,
         `Job ${job.name}`,
         jobIssues(job),
@@ -182,7 +166,7 @@ export function runSkillsAnalysis(
       ),
     ),
     ...monsters.flatMap((monster) =>
-      toChecks(
+      analysisIssueChecks(
         `monster:${monster.id}`,
         `Monster ${monster.name}`,
         monsterIssues(monster, spawnRanges.get(monster.id)),

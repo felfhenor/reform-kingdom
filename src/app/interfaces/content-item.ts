@@ -5,7 +5,7 @@ import type { MonsterType } from '@interfaces/content-monster';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
-import type { StatBlock } from '@interfaces/stat';
+import type { SkillStatBonus, StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
 
 export type ItemId = Branded<string, 'ItemId'>;
@@ -27,6 +27,7 @@ export type ItemContent = IsContentItem &
 
     infusionMonsterTypeDamage?: Record<MonsterType, number>;
     infusionGatherYieldBonuses?: GatherYieldBonus[];
+    infusionSkillStatBonuses?: SkillStatBonus[];
 
     unobtainable?: boolean;
   };

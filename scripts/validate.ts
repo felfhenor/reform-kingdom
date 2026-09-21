@@ -21,6 +21,7 @@ import { runCommissionRewardsAnalysis } from '@helpers/debug/analysis-commission
 import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gatherdevelopmentlevels';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
+import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
 import { printAnalysisResult } from './debug/run-analysis-cli';
@@ -53,6 +54,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> = 
   },
   { title: 'validate:shrines', run: runShrinesAnalysis },
   { title: 'validate:skills', run: runSkillsAnalysis },
+  { title: 'validate:skillbonuses', run: runSkillBonusesAnalysis },
 ];
 
 async function main(): Promise<void> {

@@ -9,6 +9,7 @@ import {
   ensureArray,
   ensureEnumValue,
 } from '@helpers/content/ensure-helpers-core';
+import { ensureSkillStatBonus } from '@helpers/content/ensure-helpers-stats';
 import type {
   AffixContent,
   AffixEffect,
@@ -74,6 +75,8 @@ function ensureAffixEffect(effect: Record<string, unknown> = {}): AffixEffect {
         ),
         value,
       };
+    case 'SkillStatBonus':
+      return { kind: 'SkillStatBonus', ...ensureSkillStatBonus(effect) };
     case 'Stat':
     default:
       return {

@@ -7,6 +7,7 @@ vi.mock('@helpers/state-game', async (importOriginal) => ({
 
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
+  getEntriesByType: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/crafting/recipes', () => ({
@@ -16,7 +17,7 @@ vi.mock('@helpers/crafting/recipes', () => ({
   recipeStylizedName: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { worldPartyState } from '@helpers/state-game';
 import {
   itemPreviewDisplay,
@@ -117,6 +118,60 @@ describe('itemPreviewDisplay', () => {
       itemPreviewDisplay('equipment', equipment).gatherYieldBonuses,
     ).toEqual([
       { tradeskillName: 'Woodworking', tradeskillSprite: '0009', value: 1 },
+    ]);
+  });
+
+  it('resolves skillStatBonuses to their skill family name and icon', () => {
+    const equipment = {
+      id: 'staff' as EquipmentId,
+      __type: 'equipment',
+      name: 'Staff',
+      description: 'Handy.',
+      sprite: '0002',
+      rarity: 'Uncommon',
+      levelRequirement: 1,
+      baseStats: {},
+      type: 'Staff',
+      skillStatBonuses: [
+        { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
+      ],
+    } as EquipmentContent;
+    vi.mocked(getEntriesByType).mockReturnValue([
+      { family: 'Fireball', sprite: '0003' },
+    ] as never);
+    vi.mocked(worldPartyState).mockReturnValue([]);
+
+    expect(itemPreviewDisplay('equipment', equipment).skillStatBonuses).toEqual(
+      [
+        {
+          skillName: 'Fireball',
+          skillSprite: '0003',
+          stat: 'Vitality',
+          value: 2,
+        },
+      ],
+    );
+  });
+
+  it('surfaces skillStatBonuses for an infusion material', () => {
+    const item = {
+      id: 'shard' as ItemId,
+      __type: 'item',
+      name: 'Shard',
+      description: '',
+      sprite: '0001',
+      rarity: 'Common',
+      infusionStats: {},
+      infusionSkillStatBonuses: [
+        { skillFamily: 'Snipe', stat: 'Agility', value: 0.5 },
+      ],
+    } as ItemContent;
+    vi.mocked(getEntriesByType).mockReturnValue([
+      { family: 'Snipe', sprite: '0004' },
+    ] as never);
+
+    expect(itemPreviewDisplay('item', item).skillStatBonuses).toEqual([
+      { skillName: 'Snipe', skillSprite: '0004', stat: 'Agility', value: 0.5 },
     ]);
   });
 

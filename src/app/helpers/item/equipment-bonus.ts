@@ -19,6 +19,7 @@ import type {
   ItemContent,
   ItemId,
   MonsterType,
+  SkillStatBonus,
   StatBlock,
   StatusEffectTag,
 } from '@interfaces';
@@ -89,17 +90,39 @@ export function equipmentItemInfusionTotals<K extends string>(
   return bonus;
 }
 
-// GatherYield isn't a fixed-key dimension (TradeskillId is dynamic content), so it can't reuse `equipmentItemInfusionTotals` above.
-export function equipmentItemInfusionGatherYieldBonuses(
+// GatherYield/SkillStatBonus aren't fixed-key dimensions (TradeskillId/skill family are dynamic content), so they can't reuse `equipmentItemInfusionTotals` above.
+function equipmentItemInfusionListBonuses<T>(
   infusedItemIds: (ItemId | null)[],
-): GatherYieldBonus[] {
+  listOf: (content: ItemContent) => T[] | undefined,
+): T[] {
   return infusedItemIds.flatMap((itemId) => {
     if (!itemId) return [];
-    return getEntry<ItemContent>(itemId)?.infusionGatherYieldBonuses ?? [];
+    const content = getEntry<ItemContent>(itemId);
+    return (content && listOf(content)) ?? [];
   });
 }
 
-// Base (equipment content) plus infusion plus any rolled affix, merged by tradeskill - same "everything this item grants" shape as `equipmentItemBonusTotals` below, just array-based since GatherYield can't key off a fixed enum/`EquipmentBonusDimension`.
+// Sums same-key entries so base, infusion and affix grants show as one row; callers strip the affix `kind` the spread carries over.
+function mergeBonusesByKey<T extends { value: number }>(
+  bonuses: T[],
+  keyOf: (bonus: T) => string,
+): T[] {
+  return Object.values(groupBy(bonuses, keyOf)).map((group) => ({
+    ...group[0],
+    value: sumBy(group, (bonus) => bonus.value),
+  }));
+}
+
+export function equipmentItemInfusionGatherYieldBonuses(
+  infusedItemIds: (ItemId | null)[],
+): GatherYieldBonus[] {
+  return equipmentItemInfusionListBonuses(
+    infusedItemIds,
+    (content) => content.infusionGatherYieldBonuses,
+  );
+}
+
+// Base (equipment content) plus infusion plus any rolled affix, merged by tradeskill - same "everything this item grants" shape as `equipmentItemBonusTotals` below, just array-based.
 export function equipmentItemGatherYieldBonuses(
   content: EquipmentContent,
   item?: EquipmentItem,
@@ -110,15 +133,42 @@ export function equipmentItemGatherYieldBonuses(
   const affixBonuses = item
     ? affixEffectsOfKind(equipmentItemAffixEffects(item), 'GatherYield')
     : [];
-  const grouped = groupBy(
-    [...(content.gatherYieldBonuses ?? []), ...infusionBonuses, ...affixBonuses],
-    (bonus) => bonus.tradeskillId,
-  );
 
-  return Object.entries(grouped).map(([tradeskillId, bonuses]) => ({
-    tradeskillId: tradeskillId as GatherYieldBonus['tradeskillId'],
-    value: sumBy(bonuses, (bonus) => bonus.value),
-  }));
+  return mergeBonusesByKey(
+    [
+      ...(content.gatherYieldBonuses ?? []),
+      ...infusionBonuses,
+      ...affixBonuses,
+    ],
+    (bonus) => bonus.tradeskillId,
+  ).map(({ tradeskillId, value }) => ({ tradeskillId, value }));
+}
+
+export function equipmentItemInfusionSkillStatBonuses(
+  infusedItemIds: (ItemId | null)[],
+): SkillStatBonus[] {
+  return equipmentItemInfusionListBonuses(
+    infusedItemIds,
+    (content) => content.infusionSkillStatBonuses,
+  );
+}
+
+// Merged per skill family and stat.
+export function equipmentItemSkillStatBonuses(
+  content: EquipmentContent,
+  item?: EquipmentItem,
+): SkillStatBonus[] {
+  const infusionBonuses = item
+    ? equipmentItemInfusionSkillStatBonuses(item.infusedItemIds)
+    : [];
+  const affixBonuses = item
+    ? affixEffectsOfKind(equipmentItemAffixEffects(item), 'SkillStatBonus')
+    : [];
+
+  return mergeBonusesByKey(
+    [...(content.skillStatBonuses ?? []), ...infusionBonuses, ...affixBonuses],
+    (bonus) => `${bonus.skillFamily}|${bonus.stat}`,
+  ).map(({ skillFamily, stat, value }) => ({ skillFamily, stat, value }));
 }
 
 // Weights a (possibly partial) dimension block by a same-keyed multiplier table, e.g. VALUE_MULTIPLIER_PER_STAT - used by both infusion cost and armory sell value.

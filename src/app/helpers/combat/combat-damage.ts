@@ -18,6 +18,7 @@ import {
   skillTechniqueDamageScalingStat,
   skillTechniqueStatusEffectChance,
   skillTechniqueStatusEffectDuration,
+  skillTechniqueWithStatBonuses,
 } from '@helpers/hero/skill';
 import { rngSucceedsChance } from '@helpers/rng';
 import type {
@@ -93,6 +94,25 @@ export function getCombatantBaseStatDamageForTechnique(
   return baseStatWithoutMultiplier * totalMultiplier;
 }
 
+// Defense weighting stays on the base technique, so a bonus adds damage without changing which defense applies.
+export function getCombatantBaseDamageForTechnique(
+  combatant: Combatant,
+  skill: EquipmentSkill,
+  technique: EquipmentSkillContentTechnique,
+): number {
+  const scaled = skillTechniqueWithStatBonuses(
+    skill,
+    technique,
+    combatant.skillStatBonuses,
+  );
+
+  return sum(
+    (Object.keys(scaled.damageScaling) as GameStat[]).map((stat) =>
+      getCombatantBaseStatDamageForTechnique(combatant, skill, scaled, stat),
+    ),
+  );
+}
+
 function getDeadlockPreventionDamageMultiplier(rounds: number): number {
   const multiplierTiers = Math.floor(rounds / 25);
   return 1 + 0.25 * multiplierTiers;
@@ -146,10 +166,10 @@ export function combatApplySkillToTarget(
     return;
   }
 
-  const baseDamage = sum(
-    (Object.keys(technique.damageScaling) as GameStat[]).map((stat) =>
-      getCombatantBaseStatDamageForTechnique(combatant, skill, technique, stat),
-    ),
+  const baseDamage = getCombatantBaseDamageForTechnique(
+    combatant,
+    skill,
+    technique,
   );
 
   const templateData = {

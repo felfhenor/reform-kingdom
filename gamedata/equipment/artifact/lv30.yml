@@ -12,3 +12,8 @@
 
   monsterTypeDamage:
     Demon: 10
+
+  skillStatBonuses:
+    - skillFamily: Frostfire Bolt
+      stat: Resistance
+      value: 0.25

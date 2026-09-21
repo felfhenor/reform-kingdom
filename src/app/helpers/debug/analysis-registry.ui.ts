@@ -15,6 +15,7 @@ import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipe
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
+import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
@@ -253,6 +254,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: ['expanded'],
     run: runSkillsAnalysis,
+  },
+  {
+    id: 'skillbonuses',
+    title: 'Skill Stat Bonuses',
+    description:
+      'Gear, infusion and affix skill stat bonuses target a real, usable skill family with a non-zero value, and skill-stat affixes share one family.',
+    category: 'Skills',
+    strict: true,
+    inputKeys: [],
+    run: runSkillBonusesAnalysis,
   },
 
   // --- Hero Stats ---

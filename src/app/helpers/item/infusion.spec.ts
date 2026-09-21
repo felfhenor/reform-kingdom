@@ -23,6 +23,10 @@ vi.mock('@helpers/item/materials', async (importOriginal) => {
   };
 });
 
+import {
+  GOLD_PER_SKILL_STAT_BONUS_POINT,
+  VALUE_MULTIPLIER_PER_STAT,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   canInfuseEquipmentItem,
@@ -397,6 +401,28 @@ describe('Infusion Helper Functions', () => {
       expect(isInfusionMaterial(woodShard)).toBe(true);
     });
 
+    it('is true when only infusionSkillStatBonuses has a nonzero value', () => {
+      expect(
+        isInfusionMaterial({
+          ...plainMaterial,
+          infusionSkillStatBonuses: [
+            { skillFamily: 'Fireball', stat: 'Vitality', value: 0.5 },
+          ],
+        }),
+      ).toBe(true);
+    });
+
+    it('is false when infusionSkillStatBonuses is present but all zero', () => {
+      expect(
+        isInfusionMaterial({
+          ...plainMaterial,
+          infusionSkillStatBonuses: [
+            { skillFamily: 'Fireball', stat: 'Vitality', value: 0 },
+          ],
+        }),
+      ).toBe(false);
+    });
+
     it('is false when infusionGatherYieldBonuses is present but all zero', () => {
       expect(
         isInfusionMaterial({
@@ -432,6 +458,21 @@ describe('Infusion Helper Functions', () => {
       } as never);
 
       expect(infusionMaterialCost(crystal.id)).toBe(750);
+    });
+
+    it('costs GOLD_PER_SKILL_STAT_BONUS_POINT per 1.0x of scaling, weighted by the boosted stat', () => {
+      vi.mocked(getEntry).mockReturnValue({
+        ...plainMaterial,
+        infusionSkillStatBonuses: [
+          { skillFamily: 'Fireball', stat: 'Vitality', value: 0.5 },
+        ],
+      } as never);
+
+      expect(infusionMaterialCost(plainMaterial.id)).toBe(
+        GOLD_PER_SKILL_STAT_BONUS_POINT *
+          0.5 *
+          VALUE_MULTIPLIER_PER_STAT.Vitality,
+      );
     });
 
     it('costs 0 when the item has no infusionStats', () => {

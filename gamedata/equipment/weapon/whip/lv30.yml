@@ -10,3 +10,8 @@
     Intelligence: 13.2
     Resistance: 9.3
     Strength: 10.3
+
+  skillStatBonuses:
+    - skillFamily: Earthshake
+      stat: Intelligence
+      value: 0.5

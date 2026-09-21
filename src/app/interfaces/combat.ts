@@ -14,7 +14,7 @@ import type {
 } from '@interfaces/content-statuseffect';
 import type { ElementBlock } from '@interfaces/element';
 import type { Branded } from '@interfaces/identifiable';
-import type { StatBlock } from '@interfaces/stat';
+import type { SkillStatBonus, StatBlock } from '@interfaces/stat';
 import type { StatDisplayDimension } from '@interfaces/stat-display';
 
 export type CombatId = Branded<string, 'CombatId'>;
@@ -121,6 +121,9 @@ export type Combatant = HasAnimation & {
 
   // Percent damage bonus per MonsterType (keyed by string, same reasoning as `monsterId`, to avoid a circular import with content-monster.ts). Only heroes populate this, from equipped-gear affixes.
   monsterTypeDamageBonus?: Record<string, number>;
+
+  // Gear-granted extra damageScaling per skill family. Only heroes populate this.
+  skillStatBonuses?: SkillStatBonus[];
 
   level: number;
   hp: number;

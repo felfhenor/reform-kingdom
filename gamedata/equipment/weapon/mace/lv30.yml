@@ -12,3 +12,8 @@
 
   monsterTypeDamage:
     Demon: 10
+
+  skillStatBonuses:
+    - skillFamily: Holy Smite
+      stat: Strength
+      value: 0.5
