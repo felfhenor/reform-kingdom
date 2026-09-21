@@ -1,0 +1,41 @@
+- id: 3a1150b8-e529-4533-8e80-350acc8f50a9
+  name: Commission - Woods Extermination
+  description: The trader wants the local wooded creatures population thinned to minimize risk of supply route problems.
+
+  requirements:
+    - monsterId: Woodspider
+      quantityMin: 5
+      quantityMax: 10
+
+    - monsterId: Woodwolf
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 30
+
+- id: e5a5017c-d829-4a28-8b92-41ceec895df1
+  name: Commission - Demonic Ritual Slowing
+  description: The trader wants to slow down the demonic rituals that take place across the woodland.
+
+  requirements:
+    - monsterId: Elf Ritualist
+      quantityMin: 5
+      quantityMax: 10
+
+    - monsterId: Lesser Fel Demon
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 30

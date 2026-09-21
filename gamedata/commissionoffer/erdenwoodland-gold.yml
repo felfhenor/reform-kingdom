@@ -1,0 +1,25 @@
+- id: 8b0fe60b-347b-4b12-aa23-420050f6db41
+  name: Commission - Elfheim Coffers
+  description: The town treasury is always happy to take a generous crimson lucre donation off your hands.
+
+  requirements:
+    - itemId: Crimson Lucre
+      quantityMin: 500
+      quantityMax: 500
+
+  rewards: []
+
+  townReputationReward: 10
+
+  reputationTierMultipliers:
+    - tier: 0
+      value: 1
+
+    - tier: 1
+      value: 5
+
+    - tier: 2
+      value: 15
+
+    - tier: 3
+      value: 50

@@ -270,11 +270,37 @@
         - Woodspider
         - Woodwolf
         - Elf Ritualist
-        - Akroki Vanguard
 
       level:
         min: 25
         max: 32
 
     quests:
-      commissions: []
+      commissions:
+        - commissionOfferId: Commission - Elfheim Coffers
+          weight: 1
+          persistent: true
+
+        - commissionOfferId: Commission - Demonic Ritual Slowing
+          weight: 1
+
+        - commissionOfferId: Commission - Woods Extermination
+          weight: 1
+
+        - commissionOfferId: Commission - Batch of Raw Metals
+          weight: 3
+
+        - commissionOfferId: Commission - Batch of Refined Metals
+          weight: 3
+
+        - commissionOfferId: Commission - Animal Product Supplies
+          weight: 3
+
+        - commissionOfferId: Commission - Demon Proof
+          weight: 4
+
+        - commissionOfferId: Commission - Batch of Crimson Materials
+          weight: 3
+
+        - commissionOfferId: Commission - Spindles of Thread
+          weight: 3

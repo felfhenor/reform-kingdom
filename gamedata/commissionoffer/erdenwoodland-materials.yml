@@ -1,0 +1,129 @@
+- id: 5ef506f6-220d-418f-8bb3-bd5aa25f259f
+  name: Commission - Batch of Raw Metals
+  description: The trader needs a lot of raw metals for refining operations.
+
+  requirements:
+    - itemId: Crimson Ore
+      quantityMin: 50
+      quantityMax: 50
+
+    - itemId: Gold Ore
+      quantityMin: 50
+      quantityMax: 50
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 15
+
+- id: 0fe59943-d6a0-4280-aec5-47c9d6ce3346
+  name: Commission - Batch of Refined Metals
+  description: The trader needs a lot of refined metals for crafting.
+
+  requirements:
+    - itemId: Crimson Ore
+      quantityMin: 50
+      quantityMax: 50
+
+    - itemId: Gold Ore
+      quantityMin: 50
+      quantityMax: 50
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 15
+
+- id: 69f34638-e3de-452c-b904-17f95b2f879b
+  name: Commission - Animal Product Supplies
+  description: The trader needs raw animal products for equipment crafting.
+
+  requirements:
+    - itemId: Strong Spider Silk
+      quantityMin: 5
+      quantityMax: 10
+
+    - itemId: Hawk Feather
+      quantityMin: 5
+      quantityMax: 10
+
+    - itemId: Wolf Pelt
+      quantityMin: 5
+      quantityMax: 10
+
+    - itemId: Bat Wing
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 15
+
+- id: 479e80f3-232a-4755-b729-42c0182bc764
+  name: Commission - Demon Proof
+  description: The trader needs raw demon horns for reinforcing their defenses.
+
+  requirements:
+    - itemId: Demon Horn
+      quantityMin: 15
+      quantityMax: 25
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 10
+
+- id: a3738bc0-303a-4ff9-b9bd-06c2719e1b13
+  name: Commission - Batch of Crimson Materials
+  description: The trader needs a lot of crimson materials to resupply their caches.
+
+  requirements:
+    - itemId: Crimson Ore
+      quantityMin: 25
+      quantityMax: 50
+
+    - itemId: Crimson Ruby
+      quantityMin: 10
+      quantityMax: 25
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 15
+
+- id: 930f6d17-b451-42a2-98bf-9f9dc980d546
+  name: Commission - Spindles of Thread
+  description: The trader needs to restock their tailoring materials.
+
+  requirements:
+    - itemId: Strong Spider Silk
+      quantityMin: 25
+      quantityMax: 50
+
+    - itemId: Elfsilk
+      quantityMin: 10
+      quantityMax: 25
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 15
