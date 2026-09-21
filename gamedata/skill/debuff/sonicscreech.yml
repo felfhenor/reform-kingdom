@@ -1,0 +1,33 @@
+- id: e81fd1bd-05ed-49c9-8208-1547f6ea2c74
+  name: Sonic Screech I
+  family: Sonic Screech
+  description: Screech at a foe, dealing {{ value }} damage and potentially stunning them.
+
+  sprite: '0040'
+
+  rarity: Common
+
+  epCost: 20
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Stunned
+      damageScaling:
+        Vitality: 1
+
+      statusEffects:
+        - statusEffectId: Stunned
+          chance: 65
+          duration: 1
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
