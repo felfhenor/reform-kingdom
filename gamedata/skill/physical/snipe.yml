@@ -34,7 +34,7 @@
   rarity: Uncommon
   sprite: '0005'
 
-  epCost: 9
+  epCost: 12
   usesPerCombat: 1
 
   requiredWeaponTypes: [Bow]
@@ -62,7 +62,7 @@
   rarity: Rare
   sprite: '0005'
 
-  epCost: 14
+  epCost: 34
   usesPerCombat: 1
 
   requiredWeaponTypes: [Bow]

@@ -1,0 +1,35 @@
+- id: 5872b64a-1d8e-4197-9eed-c292a3f27624
+  name: Barbed Shot I
+  family: Barbed Shot
+  description: Fire a barbed arrow at an enemy for {{ value }} damage, with a chance of inflicting Bleed on them.
+
+  rarity: Common
+  sprite: '0038'
+
+  epCost: 15
+  usesPerCombat: 1
+
+  requiredWeaponTypes: [Bow]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Bleeding
+      damageScaling:
+        Agility: 2
+        Strength: 1
+
+      statusEffects:
+        - statusEffectId: Bleeding
+          chance: 50
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -810,6 +810,9 @@
       weight: 2
     - skillId: Arrow Rain I
       weight: 2
+    - skillId: Barbed Shot I
+      weight: 2
+      minLevel: 30
 
   baseStats:
     Health: 45
@@ -915,7 +918,11 @@
 
   skills:
     - skillId: Attack
+      weight: 5
+
+    - skillId: Gnash I
       weight: 1
+      minLevel: 30
 
   baseStats:
     Health: 35

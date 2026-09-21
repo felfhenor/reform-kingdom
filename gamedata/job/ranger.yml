@@ -94,3 +94,8 @@
 
         - level: 29
           skillId: Regrowth II
+
+    - pathName: Barbed Shot
+      levels:
+        - level: 28
+          skillId: Barbed Shot I

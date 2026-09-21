@@ -1,7 +1,7 @@
 - id: a46e873b-bdcf-493c-93b8-d9a8c8677ad8
   name: Gnash I
   family: Gnash
-  description: Bite an enemy for {{ value }} damage, with a chance of inflicting Bleed on them.
+  description: Gnash an enemy for {{ value }} damage, with a chance of inflicting Bleed on them.
 
   sprite: '0035'
 
