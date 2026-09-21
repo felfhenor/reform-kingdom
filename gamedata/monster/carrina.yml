@@ -916,6 +916,10 @@
     - equipmentId: Hawk Charm
       chance: 5
 
+    - itemId: Hawk Feather
+      chance: 25
+      minLevel: 30
+
   skills:
     - skillId: Attack
       weight: 5
