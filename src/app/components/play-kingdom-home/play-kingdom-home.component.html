@@ -205,7 +205,9 @@
                 [value]="tradeskill.xpCurrent"
                 [max]="tradeskill.xpMaximum"
               >
-                {{ tradeskill.xpCurrent }}/{{ tradeskill.xpMaximum }}
+                {{ tradeskill.xpCurrent | number }}/{{
+                  tradeskill.xpMaximum | number
+                }}
               </app-bar-progress>
 
               @if (tradeskill.hasQueue) {

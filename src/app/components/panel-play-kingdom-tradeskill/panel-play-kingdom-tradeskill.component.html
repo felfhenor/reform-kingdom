@@ -63,7 +63,8 @@
         <div
           class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black"
         >
-          {{ buildingData.xp.current }} / {{ buildingData.xp.maximum }} XP
+          {{ buildingData.xp.current | number }} /
+          {{ buildingData.xp.maximum | number }} XP
         </div>
       </div>
     </div>
