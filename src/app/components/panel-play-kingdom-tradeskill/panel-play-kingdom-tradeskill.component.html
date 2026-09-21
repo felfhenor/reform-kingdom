@@ -141,6 +141,9 @@
                 }}"
               >
                 {{ entry.recipe.name }}
+                @if (entry.resultQuantity > 1) {
+                  (x{{ entry.resultQuantity | number }})
+                }
               </span>
 
               <div class="flex items-center gap-2 flex-wrap">

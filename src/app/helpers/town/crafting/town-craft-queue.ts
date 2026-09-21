@@ -3,6 +3,7 @@ import {
   RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
@@ -39,7 +40,7 @@ function grantCraftedResult(
       state,
       townId,
       recipe.result.itemId,
-      recipe.result.quantity ?? 1,
+      recipeResultQuantity(recipe),
     );
     return;
   }

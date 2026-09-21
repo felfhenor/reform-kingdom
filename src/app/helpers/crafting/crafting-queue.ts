@@ -7,6 +7,7 @@ import {
 } from '@helpers/combat/combat-log';
 import { MAX_CRAFTABLE_CAP } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import { isRecipeCraftable } from '@helpers/crafting/recipes';
 import {
   craftXpChance,
@@ -310,7 +311,7 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
 
   if ('itemId' in recipe.result) {
     const { itemId } = recipe.result;
-    const quantity = recipe.result.quantity ?? 1;
+    const quantity = recipeResultQuantity(recipe);
 
     addMaterial(itemId, quantity);
 

@@ -3,6 +3,7 @@ import {
   craftMaxCraftableQuantity,
   requirementAvailable,
 } from '@helpers/crafting/crafting-queue';
+import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import {
   isRecipeCraftable,
   recipeBackdropSprite,
@@ -110,6 +111,7 @@ export function getCraftableRecipeEntries(
           ? itemPreviewDisplay(resultSpritesheet, resultContent)
           : undefined,
         resultChance: recipe.result.chance ?? 100,
+        resultQuantity: recipeResultQuantity(recipe),
         backdropSprite,
         maxCraftable: craftMaxCraftableQuantity(recipe, tradeskill),
         ownedQuantity: recipeResultOwnedQuantity(recipe),

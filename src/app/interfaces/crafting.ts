@@ -61,6 +61,7 @@ export type CraftRecipeEntry = {
   resultSpritesheet: 'item' | 'equipment' | 'collectible';
   resultDisplay?: ItemPreviewDisplay;
   resultChance: number;
+  resultQuantity: number;
   backdropSprite?: string;
   maxCraftable: number;
   ownedQuantity: number;
