@@ -4,6 +4,16 @@
   description: A woodwolf skull picked clean by woodland inhabitants.
   sprite: '0050'
 
+- id: f47373db-bab4-4667-b05c-2d9c7e3f0c79
+  name: Demon Supply Pouch
+  rarity: Uncommon
+  description: A small pouch filled with demonic summoning and corrupting supplies.
+  sprite: '0054'
+
+  effects:
+    - effectType: GlobalArmorySizeBoost
+      value: 5
+
 - id: 43ba9fed-f7f5-466b-903c-8dc490ee361b
   name: Weapon Claim Tag
   rarity: Common

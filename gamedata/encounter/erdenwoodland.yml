@@ -1,3 +1,29 @@
+- id: 1ebbb90e-8a9f-412b-ab29-269b037f220c
+  name: Demon Foray
+  description: A forward scouting base, set up by demons to spy on elves and adventurers.
+  levelRange:
+    min: 28
+    max: 31
+
+  fights:
+    - monsters:
+        - monsterId: Lesser Fel Demon
+        - monsterId: Lesser Fel Demon
+
+    - monsters:
+        - monsterId: Lesser Fel Demon
+        - monsterId: Lesser Fel Demon
+        - monsterId: Lesser Fel Demon
+
+    - monsters:
+        - monsterId: Lesser Fel Demon
+        - monsterId: Lesser Fel Demon
+        - monsterId: Lesser Fel Demon
+
+  completionRewards:
+    - collectibleId: Demon Supply Pouch
+      chance: 25
+
 - id: 9d2e1a40-bf0b-4ed5-bcbc-58d59ed81d94
   name: Spiderwolf Forest
   description: Deceptively named, here is a place for spiders and wolves, but not a wolf/spider hybrid.
