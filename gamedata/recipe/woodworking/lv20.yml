@@ -76,6 +76,27 @@
   tradeskillXP: 155
   craftTime: 330
 
+- id: 433efa70-1948-4bab-9e78-d2603db3334d
+  name: 'Offhand: Angelf Buckler'
+  result:
+    equipmentId: Angelf Buckler
+
+  requirements:
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Demon Horn
+      quantity: 1
+
+    - itemId: Crimson Ruby
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 30
+
 - id: 612b9981-d2e4-4cd2-9dec-c6adcda65fe7
   name: 'Weapon: Angelf Crossbow'
   result:
@@ -130,26 +151,5 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 23
   maxTradeskillLevel: 26
-  tradeskillXP: 160
-  craftTime: 360
-
-- id: 433efa70-1948-4bab-9e78-d2603db3334d
-  name: 'Offhand: Angelf Buckler'
-  result:
-    equipmentId: Angelf Buckler
-
-  requirements:
-    - itemId: Elven Corewood
-      quantity: 4
-
-    - itemId: Demon Horn
-      quantity: 1
-
-    - itemId: Crimson Ruby
-      quantity: 1
-
-  tradeskillId: Woodworking
-  minTradeskillLevel: 23
-  maxTradeskillLevel: 26
-  tradeskillXP: 160
-  craftTime: 360
+  tradeskillXP: 165
+  craftTime: 390
