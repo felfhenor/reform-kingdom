@@ -86,6 +86,7 @@
   description: Grants a bonus to Strength.
   rarity: Uncommon
   family: Strength
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Strength
@@ -96,6 +97,7 @@
   description: Grants a bonus to Intelligence.
   rarity: Uncommon
   family: Intelligence
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Intelligence
@@ -106,6 +108,7 @@
   description: Grants a bonus to Vitality.
   rarity: Uncommon
   family: Vitality
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Vitality
@@ -116,6 +119,7 @@
   description: Grants a bonus to Resistance.
   rarity: Uncommon
   family: Resistance
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Resistance
@@ -126,6 +130,7 @@
   description: Grants a bonus to Agility.
   rarity: Uncommon
   family: Agility
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Agility
@@ -136,6 +141,7 @@
   description: Grants a bonus to Luck.
   rarity: Uncommon
   family: Luck
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Luck
@@ -146,6 +152,7 @@
   description: Grants a bonus to Health.
   rarity: Uncommon
   family: Health
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Health
@@ -156,6 +163,7 @@
   description: Grants a bonus to Energy.
   rarity: Uncommon
   family: Energy
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Energy
@@ -167,6 +175,7 @@
   description: Grants a bonus to Strength.
   rarity: Rare
   family: Strength
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Strength
@@ -177,6 +186,7 @@
   description: Grants a bonus to Intelligence.
   rarity: Rare
   family: Intelligence
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Intelligence
@@ -187,6 +197,7 @@
   description: Grants a bonus to Vitality.
   rarity: Rare
   family: Vitality
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Vitality
@@ -197,6 +208,7 @@
   description: Grants a bonus to Resistance.
   rarity: Rare
   family: Resistance
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Resistance
@@ -207,6 +219,7 @@
   description: Grants a bonus to Agility.
   rarity: Rare
   family: Agility
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Agility
@@ -217,6 +230,7 @@
   description: Grants a bonus to Luck.
   rarity: Rare
   family: Luck
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Luck
@@ -227,6 +241,7 @@
   description: Grants a bonus to Health.
   rarity: Rare
   family: Health
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Health
@@ -237,6 +252,7 @@
   description: Grants a bonus to Energy.
   rarity: Rare
   family: Energy
+  levelRequirement: 9
   effects:
     - kind: Stat
       stat: Energy

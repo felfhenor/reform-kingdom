@@ -33,6 +33,7 @@ const strengthAffix: AffixContent = {
   id: 'affix-str' as AffixId,
   name: 'of Strength',
   __type: 'affix',
+  levelRequirement: 1,
   description: '',
   rarity: 'Common',
   family: 'Strength',
@@ -44,6 +45,7 @@ const luckAffix: AffixContent = {
   id: 'affix-luck' as AffixId,
   name: 'of Luck',
   __type: 'affix',
+  levelRequirement: 1,
   description: '',
   rarity: 'Common',
   family: 'Luck',
@@ -55,6 +57,7 @@ const weakeningAffix: AffixContent = {
   id: 'affix-weak' as AffixId,
   name: 'Weakening',
   __type: 'affix',
+  levelRequirement: 1,
   description: '',
   rarity: 'Common',
   family: 'Strength',
@@ -66,6 +69,7 @@ const agilityPrefixAffix: AffixContent = {
   id: 'affix-agi' as AffixId,
   name: 'Swift',
   __type: 'affix',
+  levelRequirement: 1,
   description: '',
   rarity: 'Common',
   family: 'Agility',
@@ -83,14 +87,14 @@ describe('rollAffixIds', () => {
   });
 
   it('rolls zero affixes for Common rarity', () => {
-    expect(rollAffixIds('Common')).toEqual([]);
+    expect(rollAffixIds('Common', 1)).toEqual([]);
     expect(rngChoiceRarity).not.toHaveBeenCalled();
   });
 
   it('rolls one affix for Uncommon rarity', () => {
     vi.mocked(rngChoiceRarity).mockReturnValueOnce(strengthAffix);
 
-    expect(rollAffixIds('Uncommon')).toEqual([strengthAffix.id]);
+    expect(rollAffixIds('Uncommon', 1)).toEqual([strengthAffix.id]);
     expect(rngChoiceRarity).toHaveBeenCalledTimes(1);
   });
 
@@ -103,7 +107,7 @@ describe('rollAffixIds', () => {
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(agilityPrefixAffix);
 
-    expect(rollAffixIds('Rare')).toEqual([
+    expect(rollAffixIds('Rare', 1)).toEqual([
       strengthAffix.id,
       agilityPrefixAffix.id,
     ]);
@@ -119,7 +123,7 @@ describe('rollAffixIds', () => {
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(undefined);
 
-    expect(rollAffixIds('Legendary')).toEqual([strengthAffix.id]);
+    expect(rollAffixIds('Legendary', 1)).toEqual([strengthAffix.id]);
     expect(rngChoiceRarity).toHaveBeenCalledTimes(2);
   });
 
@@ -132,9 +136,31 @@ describe('rollAffixIds', () => {
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(undefined);
 
-    expect(rollAffixIds('Legendary')).toEqual([strengthAffix.id]);
+    expect(rollAffixIds('Legendary', 1)).toEqual([strengthAffix.id]);
     // luckAffix is a different family but still a Suffix, so the second roll's eligible pool is empty.
     expect(rngChoiceRarity).toHaveBeenNthCalledWith(2, []);
+  });
+
+  it('leaves affixes gated above the item level out of the pool', () => {
+    const gatedAffix = {
+      ...agilityPrefixAffix,
+      id: 'affix-gated' as AffixId,
+      levelRequirement: 10,
+    };
+    vi.mocked(getEntriesByType).mockReturnValue([
+      strengthAffix,
+      gatedAffix,
+    ] as never);
+    vi.mocked(rngChoiceRarity).mockReturnValue(strengthAffix);
+
+    rollAffixIds('Uncommon', 9);
+    expect(rngChoiceRarity).toHaveBeenLastCalledWith([strengthAffix]);
+
+    rollAffixIds('Uncommon', 10);
+    expect(rngChoiceRarity).toHaveBeenLastCalledWith([
+      strengthAffix,
+      gatedAffix,
+    ]);
   });
 
   it('keeps rolling Prefix affixes normally after the one Suffix slot is filled', () => {
@@ -146,7 +172,7 @@ describe('rollAffixIds', () => {
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(agilityPrefixAffix);
 
-    expect(rollAffixIds('Rare')).toEqual([
+    expect(rollAffixIds('Rare', 1)).toEqual([
       strengthAffix.id,
       agilityPrefixAffix.id,
     ]);

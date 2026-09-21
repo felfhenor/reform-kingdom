@@ -24,7 +24,7 @@ import type {
   SkillStatBonusContext,
   SkillStatBonusSource,
 } from '@interfaces';
-import { groupBy } from 'es-toolkit/compat';
+import { groupBy, min, sortBy } from 'es-toolkit/compat';
 
 const SKILL_ENHANCEMENT_AFFIX_FAMILY = 'Skill Enhancement';
 
@@ -52,6 +52,7 @@ function skillStatBonusSources(
         effect.kind === 'SkillStatBonus' ? [effect] : [],
       ),
       affixFamily: entry.family,
+      affixLevelRequirement: entry.levelRequirement,
     })),
   ];
 
@@ -192,6 +193,42 @@ function affixGroupIssues(source: SkillStatBonusSource): AnalysisIssue[] {
   return [];
 }
 
+// Earliest level any job learns the second tier of a family.
+function tierTwoLearnLevel(
+  jobs: JobContent[],
+  family: string,
+): number | undefined {
+  const levels = jobs.flatMap((job) =>
+    job.skillPath.flatMap((path) => {
+      const tiers = path.levels.filter((entry) =>
+        familyOfSkill(entry.skillId).includes(family),
+      );
+      return tiers.length > 1 ? [sortBy(tiers, 'level')[1].level] : [];
+    }),
+  );
+
+  return min(levels);
+}
+
+function affixLevelIssues(
+  source: SkillStatBonusSource,
+  context: SkillStatBonusContext,
+): AnalysisIssue[] {
+  if (source.affixLevelRequirement === undefined) return [];
+  const requirement = source.affixLevelRequirement;
+
+  return source.bonuses.flatMap(({ skillFamily }) => {
+    const learnedAt = tierTwoLearnLevel(context.jobs, skillFamily);
+    if (learnedAt === undefined || requirement >= learnedAt) return [];
+
+    return [
+      analysisWarn(
+        `can roll at level ${requirement}, before any job learns tier II of "${skillFamily}" (level ${learnedAt}).`,
+      ),
+    ];
+  });
+}
+
 function sourceIssues(
   source: SkillStatBonusSource,
   context: SkillStatBonusContext,
@@ -200,6 +237,7 @@ function sourceIssues(
     ...source.bonuses.flatMap((bonus) => bonusIssues(bonus, source, context)),
     ...duplicateBonusIssues(source.bonuses),
     ...affixGroupIssues(source),
+    ...affixLevelIssues(source, context),
   ];
 }
 

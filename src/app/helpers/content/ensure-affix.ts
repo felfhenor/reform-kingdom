@@ -98,6 +98,7 @@ export function ensureAffix(
     rarity: affix.rarity ?? 'Common',
     family: affix.family ?? 'UNKNOWN',
     position: ensureEnumValue(affix.position, VALID_AFFIX_POSITIONS, 'Suffix'),
+    levelRequirement: affix.levelRequirement ?? 1,
     effects: ensureArray(affix.effects, ensureAffixEffect),
   };
 }

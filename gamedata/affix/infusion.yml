@@ -3,6 +3,7 @@
   description: Grants an additional infusion slot.
   rarity: Rare
   family: InfusionSlot
+  levelRequirement: 10
   effects:
     - kind: InfusionSlot
       value: 1
@@ -12,6 +13,7 @@
   description: Grants two additional infusion slots.
   rarity: Legendary
   family: InfusionSlot
+  levelRequirement: 25
   effects:
     - kind: InfusionSlot
       value: 2

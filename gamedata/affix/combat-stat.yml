@@ -4,6 +4,7 @@
   rarity: Rare
   family: ExtraTurn
   position: Prefix
+  levelRequirement: 15
   effects:
     - kind: CombatStat
       stat: repeatActionChance
@@ -14,6 +15,7 @@
   description: Reflects a portion of incoming damage back at the attacker.
   rarity: Rare
   family: DamageReflect
+  levelRequirement: 15
   effects:
     - kind: CombatStat
       stat: damageReflectPercent

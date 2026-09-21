@@ -98,6 +98,9 @@ export type AffixContent = IsContentItem &
 
     position: AffixPosition;
 
+    // Only rolls on items whose base level requirement is at least this.
+    levelRequirement: number;
+
     // Multiple effects let one affix do several things at once (e.g. a stat bonus plus a curse elsewhere).
     effects: AffixEffect[];
   };

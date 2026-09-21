@@ -1,4 +1,5 @@
 # Adds extra stat scaling to every tier of one skill family. All share one family, so an item rolls at most one.
+# levelRequirement is at least the level a job learns tier II of the family (see validate:skillbonuses).
 
 - id: 8d97b5b2-e9cb-445f-ace6-33ad144dce67
   name: Sanctified
@@ -6,6 +7,7 @@
   rarity: Rare
   family: Skill Enhancement
   position: Prefix
+  levelRequirement: 6
   effects:
     - kind: SkillStatBonus
       skillFamily: Holy Smite
@@ -18,6 +20,7 @@
   rarity: Rare
   family: Skill Enhancement
   position: Prefix
+  levelRequirement: 12
   effects:
     - kind: SkillStatBonus
       skillFamily: Earthshake
@@ -30,6 +33,7 @@
   rarity: Rare
   family: Skill Enhancement
   position: Prefix
+  levelRequirement: 8
   effects:
     - kind: SkillStatBonus
       skillFamily: Snipe
@@ -42,6 +46,7 @@
   rarity: Rare
   family: Skill Enhancement
   position: Prefix
+  levelRequirement: 8
   effects:
     - kind: SkillStatBonus
       skillFamily: Double Strike

@@ -4,6 +4,7 @@
   rarity: Rare
   family: StunResist
   position: Prefix
+  levelRequirement: 10
   effects:
     - kind: Resistance
       tag: Stun
@@ -14,6 +15,7 @@
   description: Grants resistance to Poison.
   rarity: Rare
   family: PoisonResist
+  levelRequirement: 10
   effects:
     - kind: Resistance
       tag: Poison
@@ -24,6 +26,7 @@
   description: Grants resistance to Burning.
   rarity: Rare
   family: BurnResist
+  levelRequirement: 10
   effects:
     - kind: Resistance
       tag: Burn
@@ -35,6 +38,7 @@
   rarity: Rare
   family: AccuracyResist
   position: Prefix
+  levelRequirement: 10
   effects:
     - kind: Resistance
       tag: Accuracy
@@ -46,6 +50,7 @@
   rarity: Rare
   family: StatDownResist
   position: Prefix
+  levelRequirement: 10
   effects:
     - kind: Resistance
       tag: StatDown
@@ -56,6 +61,7 @@
   description: Grants resistance to Bleed.
   rarity: Rare
   family: BleedResist
+  levelRequirement: 30
   effects:
     - kind: Resistance
       tag: Bleed

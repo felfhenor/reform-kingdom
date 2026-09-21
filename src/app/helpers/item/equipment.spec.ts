@@ -1372,6 +1372,7 @@ describe('Equipment Helper Functions', () => {
       id: 'affix-str' as AffixId,
       name: 'of Strength',
       __type: 'affix',
+      levelRequirement: 1,
       description: '',
       rarity: 'Common',
       family: 'Strength',
@@ -1391,6 +1392,19 @@ describe('Equipment Helper Functions', () => {
       expect(item.equipmentId).toBe(sword.id);
       expect(item.infusedItemIds).toEqual([]);
       expect(item.affixIds).toEqual([strengthAffix.id]);
+    });
+
+    it("never rolls an affix gated above the base item's level requirement", () => {
+      vi.mocked(getEntry).mockReturnValue({
+        ...sword,
+        rarity: 'Legendary',
+        levelRequirement: 5,
+      } as never);
+      vi.mocked(getEntriesByType).mockReturnValue([
+        { ...strengthAffix, levelRequirement: 6 },
+      ] as never);
+
+      expect(newEquipmentItem(sword.id).affixIds).toEqual([]);
     });
 
     it('rolls no affixes when the content cannot be found', () => {
@@ -1431,6 +1445,7 @@ describe('Equipment Helper Functions', () => {
       id: 'affix-str' as AffixId,
       name: 'of Strength',
       __type: 'affix',
+      levelRequirement: 1,
       description: '',
       rarity: 'Common',
       family: 'Strength',

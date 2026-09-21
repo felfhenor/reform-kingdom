@@ -12,8 +12,11 @@ import { sumBy } from 'es-toolkit/compat';
 
 // Item rarity controls how many affixes roll; each roll is independently weighted by the affix's own rarity, so a Common item can still land a rarer affix - it just gets fewer rolls overall.
 // At most one Suffix-position affix total; Prefix affixes are otherwise uncapped.
-export function rollAffixIds(rarity: DropRarity): AffixId[] {
-  const pool = getEntriesByType<AffixContent>('affix');
+// itemLevel is the base item's level requirement; affixes gated above it stay out of the pool.
+export function rollAffixIds(rarity: DropRarity, itemLevel: number): AffixId[] {
+  const pool = getEntriesByType<AffixContent>('affix').filter(
+    (affix) => affix.levelRequirement <= itemLevel,
+  );
   const rolledFamilies = new Set<string>();
   const rolledIds: AffixId[] = [];
   let hasRolledSuffix = false;

@@ -3,6 +3,7 @@
   description: Grants a bonus to multiple stats.
   rarity: Uncommon
   family: HybridStat
+  levelRequirement: 7
   effects:
     - kind: Stat
       stat: Strength
@@ -17,6 +18,7 @@
   description: Grants a bonus to multiple stats.
   rarity: Uncommon
   family: HybridStat
+  levelRequirement: 7
   effects:
     - kind: Stat
       stat: Energy
@@ -31,6 +33,7 @@
   description: Grants a bonus to multiple stats.
   rarity: Uncommon
   family: HybridStat
+  levelRequirement: 7
   effects:
     - kind: Stat
       stat: Intelligence
@@ -45,6 +48,7 @@
   description: Grants a bonus to multiple stats.
   rarity: Uncommon
   family: HybridStat
+  levelRequirement: 7
   effects:
     - kind: Stat
       stat: Luck
@@ -59,6 +63,7 @@
   description: Grants a bonus to multiple stats.
   rarity: Uncommon
   family: HybridStat
+  levelRequirement: 7
   effects:
     - kind: Stat
       stat: Vitality
@@ -73,6 +78,7 @@
   description: Grants a bonus to multiple stats.
   rarity: Uncommon
   family: HybridStat
+  levelRequirement: 7
   effects:
     - kind: Stat
       stat: Vitality

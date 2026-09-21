@@ -168,6 +168,8 @@ export type SkillStatBonusSource = {
   equipment?: { type: EquipmentItemType; grantedSkillIds: string[] };
   // Affix `family`, set only for affixes.
   affixFamily?: string;
+  // Set only for affixes.
+  affixLevelRequirement?: number;
 };
 
 export type SkillStatBonusContext = {

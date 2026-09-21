@@ -28,6 +28,7 @@
   rarity: Common
   family: DemonSlaying
   position: Prefix
+  levelRequirement: 30
   effects:
     - kind: MonsterTypeDamage
       monsterType: Demon
@@ -39,6 +40,7 @@
   rarity: Uncommon
   family: DemonSlaying
   position: Prefix
+  levelRequirement: 30
   effects:
     - kind: MonsterTypeDamage
       monsterType: Demon
@@ -116,6 +118,7 @@
   rarity: Common
   family: SpiritSlaying
   position: Prefix
+  levelRequirement: 13
   effects:
     - kind: MonsterTypeDamage
       monsterType: Spirit
@@ -127,6 +130,7 @@
   rarity: Uncommon
   family: SpiritSlaying
   position: Prefix
+  levelRequirement: 13
   effects:
     - kind: MonsterTypeDamage
       monsterType: Spirit

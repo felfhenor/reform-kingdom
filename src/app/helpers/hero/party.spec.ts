@@ -487,6 +487,7 @@ describe('Party Helper Functions', () => {
       id: 'affix-str' as AffixId,
       name: 'of Strength',
       __type: 'affix',
+      levelRequirement: 1,
       description: '',
       rarity: 'Common',
       family: 'Strength',
