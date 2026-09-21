@@ -60,6 +60,16 @@
       stat: Luck
       value: 5
 
+- id: 0f71e6ac-9cb7-480d-a002-28cb5c946d94
+  name: Luck of the Elvish II
+  sprite: '0006'
+  description: +10 LUK for all heroes.
+
+  effects:
+    - effectType: GainStats
+      stat: Luck
+      value: 10
+
 - id: 512154e2-b4f3-4e87-a246-cb6551b79b7d
   name: Invigoration of the Zelks I
   sprite: '0007'

@@ -101,6 +101,20 @@
     - itemId: Azurite
       quantity: 5
 
+- id: a8bde680-c420-43c5-808a-a0cf08575228
+  name: 'Enhance: Luck of the Elvish II'
+  globalEffectId: Luck of the Elvish II
+  rarity: Uncommon
+
+  duration: 2700
+
+  requiredCollectibles:
+    - collectibleId: Weapon Claim Tag
+
+  requiredMaterials:
+    - itemId: Crimson Lucre
+      quantity: 500
+
 - id: ce0c9c0e-642a-4637-9b70-6710c175ca51
   name: 'Enhance: Invigoration of the Zelks I'
   globalEffectId: Invigoration of the Zelks I
