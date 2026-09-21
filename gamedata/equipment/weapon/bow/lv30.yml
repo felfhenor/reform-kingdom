@@ -4,7 +4,7 @@
   levelRequirement: 30
   rarity: Uncommon
   type: Bow
-  sprite: '0190'
+  sprite: '0164'
   slots: 1
   baseStats:
     Strength: 18.8
