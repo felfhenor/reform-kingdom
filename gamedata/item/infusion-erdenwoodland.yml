@@ -1,0 +1,29 @@
+- id: 66e0413d-86dc-4563-8794-7371dda7fb93
+  name: Wooden Scales
+  description: A set of wooden scales from Erden Woodlands insects.
+  rarity: Uncommon
+
+  sprite: '0070'
+
+  infusionMonsterTypeDamage:
+    Insect: 5
+
+- id: cd8da49b-892f-43a5-bff4-8da7058ab188
+  name: Woodwolf Teeth
+  description: A set of teeth from woodwolves. They're especially good at ripping through wood.
+  rarity: Uncommon
+
+  sprite: '0069'
+
+  infusionMonsterTypeDamage:
+    Beast: 5
+
+- id: 8b875a1d-dade-48bf-baf0-850de8c0473b
+  name: Demon-slaying Nail
+  description: A nail used with primitive blowpipe weapons. It's particularly effective against demons.
+  rarity: Uncommon
+
+  sprite: '0071'
+
+  infusionMonsterTypeDamage:
+    Demon: 5
