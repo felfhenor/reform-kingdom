@@ -1,0 +1,198 @@
+- id: 171b403e-d663-4f8a-a5e4-0534040edf74
+  name: 'Material: Crimson Lucre'
+  result:
+    itemId: Crimson Lucre
+    quantity: 100
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 1
+
+    - itemId: Gold Ingot
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: 9497cf19-5d89-4c26-a3ef-605b3c0e111d
+  name: 'Weapon: Crimson Staff'
+  result:
+    equipmentId: Crimson Staff
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 2
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Crimson Ruby
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: 2506e6fb-2140-4cd2-82cc-402c79d29251
+  name: 'Weapon: Crimson Whip'
+  result:
+    equipmentId: Crimson Whip
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 4
+
+    - itemId: Gold Ingot
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: e04b97dc-1f70-4a41-b0e6-10a7eef81021
+  name: 'Weapon: Crimgold Greatmace'
+  result:
+    equipmentId: Crimgold Greatmace
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 4
+
+    - itemId: Gold Ingot
+      quantity: 2
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 9f1f6330-0bdc-40cf-a3ec-35971a5834f7
+  name: 'Artifact: Crimson Spellaimer'
+  result:
+    equipmentId: Crimson Spellaimer
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 2
+
+    - itemId: Elven Corewood
+      quantity: 1
+
+    - itemId: Crimson Ruby
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 34dd33c0-168e-42ce-9ffa-afbb8dfb130b
+  name: 'Weapon: Angelf Staff'
+  result:
+    equipmentId: Angelf Staff
+
+  requirements:
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Demon Horn
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: b646ddcf-b43a-4493-babd-a7267e0d2861
+  name: 'Weapon: Crimgold Whip'
+  result:
+    equipmentId: Crimgold Whip
+
+  requirements:
+    - itemId: Gold Ingot
+      quantity: 4
+
+    - itemId: Crimson Ingot
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: 081ba31d-d20e-432e-b64f-ee7709312759
+  name: 'Weapon: Angelf Magiclub'
+  result:
+    equipmentId: Angelf Magiclub
+
+  requirements:
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Gold Ingot
+      quantity: 2
+
+    - itemId: Demon Horn
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 165
+  craftTime: 390
+
+- id: 5517b5a4-5b7d-4e16-9163-e9b6e2fc1b6f
+  name: 'Artifact: Angelf Spellaimer'
+  result:
+    equipmentId: Angelf Spellaimer
+
+  requirements:
+    - itemId: Elven Corewood
+      quantity: 2
+
+    - itemId: Gold Ingot
+      quantity: 2
+
+    - itemId: Crimson Ruby
+      quantity: 1
+
+    - itemId: Demon Horn
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 165
+  craftTime: 390
+
+- id: d985b38f-b7f0-4d0f-8973-0ca59bd81182
+  name: 'Offhand: Crimson Bangle'
+  result:
+    equipmentId: Crimson Bangle
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 3
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420

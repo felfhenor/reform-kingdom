@@ -1,0 +1,155 @@
+- id: 9be27fb0-326b-4e0a-834a-339783717abc
+  name: 'Material: Elven Corewood'
+  result:
+    itemId: Elven Corewood
+
+  requirements:
+    - itemId: Weak Spider Silk
+      quantity: 1
+
+    - itemId: Elven Wood
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: db39ce09-e8fe-4198-90fd-5088648d5bc9
+  name: 'Weapon: Crimwood Bow'
+  result:
+    equipmentId: Crimwood Bow
+
+  requirements:
+    - itemId: Crimson Ore
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Strong Spider Silk
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: fde2f773-b5b5-40db-bf6a-33d73841dde7
+  name: 'Ammo: Crimson-tipped Arrow'
+  result:
+    equipmentId: Crimson-tipped Arrow
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: b17bbf7b-07b4-4cdf-a361-399d5956bfb6
+  name: 'Weapon: Angelf Pike'
+  result:
+    equipmentId: Angelf Pike
+
+  requirements:
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Demon Horn
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 612b9981-d2e4-4cd2-9dec-c6adcda65fe7
+  name: 'Weapon: Angelf Crossbow'
+  result:
+    equipmentId: Angelf Crossbow
+
+  requirements:
+    - itemId: Strong Spider Silk
+      quantity: 2
+
+    - itemId: Elven Corewood
+      quantity: 5
+
+    - itemId: Demon Horn
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: 652e958a-cd54-449e-98f4-8448ccf72315
+  name: 'Ammo: Gold-tipped Arrow'
+  result:
+    equipmentId: Gold-tipped Arrow
+
+  requirements:
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: 2d18747c-e066-4871-b2fa-656777c2504b
+  name: 'Weapon: Angelf Hunting Spear'
+  result:
+    equipmentId: Angelf Hunting Spear
+
+  requirements:
+    - itemId: Elven Corewood
+      quantity: 6
+
+    - itemId: Demon Horn
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: 433efa70-1948-4bab-9e78-d2603db3334d
+  name: 'Offhand: Angelf Buckler'
+  result:
+    equipmentId: Angelf Buckler
+
+  requirements:
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Demon Horn
+      quantity: 1
+
+    - itemId: Crimson Ruby
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 160
+  craftTime: 360

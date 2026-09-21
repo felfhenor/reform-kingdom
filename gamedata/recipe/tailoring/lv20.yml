@@ -1,0 +1,173 @@
+- id: 5d163f35-f60c-43f7-bbd4-2c55c555a6ac
+  name: 'Material: Strong Spider Silk'
+  result:
+    itemId: Strong Spider Silk
+
+  requirements:
+    - itemId: Weak Spider Silk
+      quantity: 4
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: e28c93b1-483c-4993-9161-0d7a07268ed7
+  name: 'Material: Elfsilk'
+  result:
+    itemId: Elfsilk
+
+  requirements:
+    - itemId: Strong Spider Silk
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: 28bf1080-ed05-41c3-b0e5-b5510261e3d9
+  name: 'Accessory: Crimson Bracer'
+  result:
+    equipmentId: Crimson Bracer
+
+  requirements:
+    - itemId: Crimson Ore
+      quantity: 1
+
+    - itemId: Elfsilk
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: 33ce25e6-5969-4273-a5f7-35bce8494e15
+  name: 'Armor: Crimsilk Cloak'
+  result:
+    equipmentId: Crimsilk Cloak
+
+  requirements:
+    - itemId: Crimson Ore
+      quantity: 1
+
+    - itemId: Elfsilk
+      quantity: 4
+
+    - itemId: Wolf Pelt
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 3f0ec24e-7415-442b-94c9-b5b45fe29bcd
+  name: 'Headgear: Crimsilk Hat'
+  result:
+    equipmentId: Crimsilk Hat
+
+  requirements:
+    - itemId: Crimson Ore
+      quantity: 1
+
+    - itemId: Elfsilk
+      quantity: 2
+
+    - itemId: Wolf Pelt
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 7061fcd6-70ed-4b17-8ec1-1189d1f49b49
+  name: 'Offhand: Tailored Ruby Bracelet'
+  result:
+    equipmentId: Tailored Ruby Bracelet
+
+  requirements:
+    - itemId: Elfsilk
+      quantity: 1
+
+    - itemId: Crimson Ruby
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 8426d07c-1665-4238-bd9f-99955dbb8130
+  name: 'Accessory: Angelf Bracer'
+  result:
+    equipmentId: Angelf Bracer
+
+  requirements:
+    - itemId: Elfsilk
+      quantity: 3
+
+    - itemId: Demon Horn
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: 1e8ba115-e7ac-41ab-afca-cc77418ceeb8
+  name: 'Headgear: Crimsilk Cap'
+  result:
+    equipmentId: Crimsilk Cap
+
+  requirements:
+    - itemId: Crimson Ore
+      quantity: 1
+
+    - itemId: Elfsilk
+      quantity: 4
+
+    - itemId: Bat Wing
+      quantity: 1
+
+    - itemId: Wolf Pelt
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 165
+  craftTime: 390
+
+- id: 83fc902b-c901-4f7e-ace9-91203e83578a
+  name: 'Armor: Crimsilk Shroud'
+  result:
+    equipmentId: Crimsilk Shroud
+
+  requirements:
+    - itemId: Crimson Ore
+      quantity: 1
+
+    - itemId: Elfsilk
+      quantity: 8
+
+    - itemId: Bat Wing
+      quantity: 2
+
+    - itemId: Wolf Pelt
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 165
+  craftTime: 390

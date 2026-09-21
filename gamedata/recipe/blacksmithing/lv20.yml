@@ -1,0 +1,206 @@
+- id: 80c01e6d-5a2d-4441-9201-74fa8b854d3f
+  name: 'Material: Crimson Ingot'
+  result:
+    itemId: Crimson Ingot
+
+  requirements:
+    - itemId: Crimson Ore
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 10
+  craftTime: 10
+
+- id: 55f81843-73e6-46be-b21b-98903b93391b
+  name: 'Material: Gold Ingot'
+  result:
+    itemId: Gold Ingot
+
+  requirements:
+    - itemId: Gold Ore
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 10
+  craftTime: 20
+
+- id: 5d712b43-080c-41ef-8520-7332f2c6a56a
+  name: 'Weapon: Crimson Sword'
+  result:
+    equipmentId: Crimson Sword
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 3
+
+    - itemId: Elven Corewood
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: b18f0068-1536-437a-b55d-7a104fce4492
+  name: 'Weapon: Crimson Dagger'
+  result:
+    equipmentId: Crimson Dagger
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: e7ba5181-b2c4-4f3a-9d7b-6a20df12ee6d
+  name: 'Headgear: Crimson Helm'
+  result:
+    equipmentId: Crimson Helm
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 150
+  craftTime: 300
+
+- id: e996ccb3-a9b6-4655-a0d4-054846455f5e
+  name: 'Offhand: Crimson Dirk'
+  result:
+    equipmentId: Crimson Dirk
+
+  requirements:
+    - equipmentId: Crimson Dagger
+      quantity: 1
+
+    - itemId: Crimson Ingot
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 00462590-afad-448f-96c0-a05580ae3c08
+  name: 'Offhand: Crimson Shield'
+  result:
+    equipmentId: Crimson Shield
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 5
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: ad89aecb-d289-4b2e-8617-c038f5509c99
+  name: 'Armor: Crimson Breastplate'
+  result:
+    equipmentId: Crimson Breastplate
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 8
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 21
+  maxTradeskillLevel: 24
+  tradeskillXP: 155
+  craftTime: 330
+
+- id: 26f90c7b-5441-41b2-9317-4d4541203e16
+  name: 'Headgear: Crimgold Helm'
+  result:
+    equipmentId: Crimgold Helm
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 4
+
+    - itemId: Gold Ingot
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: b2403e70-dc15-473f-9baa-2c360b7f61c8
+  name: 'Weapon: Crimson Bastard Sword'
+  result:
+    equipmentId: Crimson Bastard Sword
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 6
+
+    - itemId: Elven Corewood
+      quantity: 3
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 160
+  craftTime: 360
+
+- id: d95b3d0c-5961-4a38-8f20-3ee9bb75f52b
+  name: 'Offhand: Crimson Shank'
+  result:
+    equipmentId: Crimson Shank
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 4
+
+    - itemId: Elven Corewood
+      quantity: 2
+
+    - itemId: Hawk Feather
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 165
+  craftTime: 330
+
+- id: 05c12be4-0d8e-4724-876c-e41bd4d1c3c1
+  name: 'Weapon: Crimson Baselard'
+  result:
+    equipmentId: Crimson Baselard
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 6
+
+    - itemId: Elven Corewood
+      quantity: 2
+
+    - itemId: Hawk Feather
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 165
+  craftTime: 330
