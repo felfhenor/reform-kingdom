@@ -2,6 +2,7 @@ import type { HasAnimation } from '@interfaces/artable';
 import type { CombatStat, TargettingPriorityEntry } from '@interfaces/combat';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type {
+  DropLevelRange,
   DroppedReward,
   HasRarity,
   LeveledRange,
@@ -36,7 +37,7 @@ export const MonsterTypeDimension: StatDisplayDimension<MonsterType> = {
   },
 };
 
-export type MonsterSkill = {
+export type MonsterSkill = DropLevelRange & {
   skillId: EquipmentSkillId;
   weight: number;
 };

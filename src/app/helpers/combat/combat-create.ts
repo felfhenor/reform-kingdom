@@ -3,7 +3,10 @@ import {
   combatApplyCombatStatNumberDeltaToCombatant,
   combatApplyStatDeltaToCombatant,
 } from '@helpers/combat/combat-statuseffects';
-import { monsterStatsAtLevel } from '@helpers/combat/monster';
+import {
+  monsterSkillsAtLevel,
+  monsterStatsAtLevel,
+} from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultAffinities,
@@ -158,6 +161,7 @@ export function combatantFromMonster(
   index: number,
 ): Combatant {
   const stats = monsterStatsAtLevel(monster, level);
+  const skills = monsterSkillsAtLevel(monster, level);
 
   return {
     id: rngUuid(),
@@ -176,10 +180,10 @@ export function combatantFromMonster(
     sprite: monster.sprite,
     frames: monster.frames,
 
-    skillIds: monster.skills.map((skill) => skill.skillId),
+    skillIds: skills.map((skill) => skill.skillId),
     skillRefs: [],
     skillWeights: Object.fromEntries(
-      monster.skills.map((skill) => [skill.skillId, skill.weight]),
+      skills.map((skill) => [skill.skillId, skill.weight]),
     ),
 
     combatOrders: [],

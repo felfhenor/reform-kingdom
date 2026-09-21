@@ -1,11 +1,13 @@
 import {
   isXpTrivialAtOverLevel,
+  monsterSkillsAtLevel,
   monstersFromFights,
   monsterStatsAtLevel,
   monsterXpReward,
   xpForOverLevel,
 } from '@helpers/combat/monster';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { ensureMonsterSkill } from '@helpers/content/ensure-monster';
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { defaultCombatStats } from '@helpers/defaults';
 import type { EquipmentSkillId, ItemId, MonsterContent } from '@interfaces';
@@ -58,7 +60,7 @@ describe('Monster Helper Functions', () => {
         chance: 100,
       }),
     ],
-    skills: [{ skillId: 'Attack' as EquipmentSkillId, weight: 1 }],
+    skills: [ensureMonsterSkill({ skillId: 'Attack' as EquipmentSkillId })],
     types: [],
   };
 
@@ -79,6 +81,41 @@ describe('Monster Helper Functions', () => {
 
       expect(stats.Health).toBe(mockMonster.baseStats.Health + 5 * 2);
       expect(stats.Strength).toBe(mockMonster.baseStats.Strength + 2 * 2);
+    });
+  });
+
+  describe('monsterSkillsAtLevel', () => {
+    const gnash = 'Gnash I' as EquipmentSkillId;
+    const monster: MonsterContent = {
+      ...mockMonster,
+      skills: [
+        ensureMonsterSkill({ skillId: 'Attack' as EquipmentSkillId }),
+        ensureMonsterSkill({ skillId: gnash, minLevel: 10, maxLevel: 20 }),
+      ],
+    };
+
+    it('includes ungated skills at every level', () => {
+      expect(monsterSkillsAtLevel(monster, 1)).toHaveLength(1);
+      expect(monsterSkillsAtLevel(monster, 99)).toHaveLength(1);
+    });
+
+    it('returns nothing when no skill covers the level', () => {
+      const gated: MonsterContent = {
+        ...mockMonster,
+        skills: [ensureMonsterSkill({ skillId: gnash, minLevel: 10 })],
+      };
+
+      expect(monsterSkillsAtLevel(gated, 9)).toEqual([]);
+    });
+
+    it('includes a gated skill on both bounds and excludes it outside them', () => {
+      const ids = (level: number) =>
+        monsterSkillsAtLevel(monster, level).map((s) => s.skillId);
+
+      expect(ids(9)).not.toContain(gnash);
+      expect(ids(10)).toContain(gnash);
+      expect(ids(20)).toContain(gnash);
+      expect(ids(21)).not.toContain(gnash);
     });
   });
 

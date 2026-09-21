@@ -1,5 +1,8 @@
 import { getEntry } from '@helpers/content/content';
-import { monsterStatsAtLevel } from '@helpers/combat/monster';
+import {
+  monsterSkillsAtLevel,
+  monsterStatsAtLevel,
+} from '@helpers/combat/monster';
 import { analysisFail, analysisWarn } from '@helpers/debug/analysis-utils';
 import { skillNameTier } from '@helpers/hero/skill';
 import type {
@@ -11,10 +14,11 @@ import type {
   JobSkillPath,
   LevelRange,
   MonsterContent,
+  MonsterSkill,
   SkillReference,
   SkillSource,
 } from '@interfaces';
-import { intersection, uniq } from 'es-toolkit/compat';
+import { intersection, max, range, uniq } from 'es-toolkit/compat';
 
 export function resolveSkill(ref: string): Skill | undefined {
   const entry = getEntry<Skill>(ref);
@@ -240,23 +244,71 @@ export function unequippableWeaponIssues(
   ];
 }
 
+function skillWindows(
+  entry: MonsterSkill,
+  spawnRanges: LevelRange[],
+): LevelRange[] {
+  return spawnRanges
+    .map((r) => ({
+      min: Math.max(r.min, entry.minLevel),
+      max: Math.min(r.max, entry.maxLevel),
+    }))
+    .filter((window) => window.min <= window.max);
+}
+
 function monsterEnergyIssues(
   monster: MonsterContent,
-  spawnRange?: LevelRange,
+  spawnRanges: LevelRange[],
 ): AnalysisIssue[] {
-  if (!spawnRange) return [];
-
-  const energy = monsterStatsAtLevel(monster, spawnRange.max).Energy;
   return monster.skills.flatMap((entry) => {
     const skill = resolveSkill(entry.skillId);
-    if (!skill || skill.epCost <= energy) return [];
+    const activeMax = max(skillWindows(entry, spawnRanges).map((w) => w.max));
+    if (!skill || activeMax === undefined) return [];
+
+    const energy = monsterStatsAtLevel(monster, activeMax).Energy;
+    if (skill.epCost <= energy) return [];
 
     return [
       analysisWarn(
-        `can never cast "${skill.name}" (${skill.epCost} EP) - it has ${energy} Energy at its highest spawn level (${spawnRange.max}).`,
+        `can never cast "${skill.name}" (${skill.epCost} EP) - it has ${energy} Energy at its highest level with that skill (${activeMax}).`,
       ),
     ];
   });
+}
+
+function monsterSkillLevelIssues(
+  monster: MonsterContent,
+  spawnRanges: LevelRange[],
+): AnalysisIssue[] {
+  const issues = monster.skills
+    .filter((s) => s.minLevel > s.maxLevel)
+    .map((s) =>
+      analysisFail(`has skill "${s.skillId}" with minLevel above maxLevel.`),
+    );
+  if (spawnRanges.length === 0 || monster.skills.length === 0) return issues;
+
+  monster.skills
+    .filter((s) => skillWindows(s, spawnRanges).length === 0)
+    .forEach((s) =>
+      issues.push(
+        analysisWarn(
+          `skill "${s.skillId}" is never active at any spawn level.`,
+        ),
+      ),
+    );
+
+  spawnRanges.forEach((spawn) => {
+    const bareLevel = range(spawn.min, spawn.max + 1).find(
+      (level) => monsterSkillsAtLevel(monster, level).length === 0,
+    );
+    if (bareLevel === undefined) return;
+
+    issues.push(
+      analysisFail(`has no active skills at spawn level ${bareLevel}.`),
+    );
+  });
+
+  return issues;
 }
 
 function monsterListIssues(monster: MonsterContent): AnalysisIssue[] {
@@ -264,12 +316,25 @@ function monsterListIssues(monster: MonsterContent): AnalysisIssue[] {
   const ids = monster.skills.map(
     (s) => resolveSkill(s.skillId)?.id ?? s.skillId,
   );
+  const overlapsEarlier = monster.skills.some((s, i) =>
+    monster.skills.some(
+      (other, j) =>
+        j < i &&
+        ids[i] === ids[j] &&
+        s.minLevel <= other.maxLevel &&
+        other.minLevel <= s.maxLevel,
+    ),
+  );
 
   if (monster.skills.length === 0) {
     issues.push(analysisWarn('has no skills.'));
   }
-  if (uniq(ids).length !== ids.length) {
-    issues.push(analysisFail('lists the same skill more than once.'));
+  if (overlapsEarlier) {
+    issues.push(
+      analysisFail(
+        'lists the same skill more than once at overlapping levels.',
+      ),
+    );
   }
   if (monster.skills.some((s) => !(s.weight > 0))) {
     issues.push(analysisFail('has a skill with a non-positive weight.'));
@@ -280,10 +345,11 @@ function monsterListIssues(monster: MonsterContent): AnalysisIssue[] {
 
 export function monsterIssues(
   monster: MonsterContent,
-  spawnRange?: LevelRange,
+  spawnRanges: LevelRange[] = [],
 ): AnalysisIssue[] {
   return [
     ...monsterListIssues(monster),
-    ...monsterEnergyIssues(monster, spawnRange),
+    ...monsterSkillLevelIssues(monster, spawnRanges),
+    ...monsterEnergyIssues(monster, spawnRanges),
   ];
 }

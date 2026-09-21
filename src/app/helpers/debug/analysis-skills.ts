@@ -1,7 +1,7 @@
 // Audits skills: technique tagging, family/tier consistency, and assignment to a job, monster, equipment, or affix.
 
 import { getEntriesByType } from '@helpers/content/content';
-import { buildMonsterLevels } from '@helpers/debug/analysis-item-sources';
+import { buildMonsterSpawnRanges } from '@helpers/debug/analysis-item-sources';
 import { techniqueIssues } from '@helpers/debug/analysis-skills-technique';
 import {
   familyIssues,
@@ -34,6 +34,7 @@ import type {
   JobContent,
   MonsterContent,
   SkillSource,
+  TownContent,
 } from '@interfaces';
 import { groupBy, sortBy } from 'es-toolkit/compat';
 
@@ -148,9 +149,10 @@ export function runSkillsAnalysis(
     getEntriesByType<AffixContent>('affix'),
   );
   const sources = buildSkillSourceMap(references);
-  const monsterLevels = buildMonsterLevels(
+  const spawnRanges = buildMonsterSpawnRanges(
     getEntriesByType<EncounterContent>('encounter'),
     getEntriesByType<EncounterRandomContent>('encounterrandom'),
+    getEntriesByType<TownContent>('town'),
   );
 
   const checks: AnalysisCheck[] = [
@@ -183,7 +185,7 @@ export function runSkillsAnalysis(
       toChecks(
         `monster:${monster.id}`,
         `Monster ${monster.name}`,
-        monsterIssues(monster, monsterLevels.get(monster.id)),
+        monsterIssues(monster, spawnRanges.get(monster.id)),
         'Skill list is valid and affordable.',
       ),
     ),

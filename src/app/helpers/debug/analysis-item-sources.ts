@@ -18,49 +18,77 @@ import type {
   RecipeContent,
   TownContent,
 } from '@interfaces';
+import { max, min } from 'es-toolkit/compat';
 
-function noteMonsterLevel(
-  monsterLevels: Map<string, LevelRange>,
+function noteSpawn(
+  spawns: Map<string, LevelRange[]>,
   monsterId?: string,
   range?: LevelRange,
 ): void {
   if (!monsterId || !range) return;
 
-  const existing = monsterLevels.get(monsterId);
-  if (!existing) {
-    monsterLevels.set(monsterId, { min: range.min, max: range.max });
-    return;
-  }
-
-  existing.min = Math.min(existing.min, range.min);
-  existing.max = Math.max(existing.max, range.max);
+  spawns.set(monsterId, [...(spawns.get(monsterId) ?? []), range]);
 }
 
-export function buildMonsterLevels(
+function townSpawns(
+  spawns: Map<string, LevelRange[]>,
+  town: TownContent,
+): void {
+  const { assaulter, guardian } = town.defense;
+  const assaulterLevel = { min: assaulter.level.max, max: assaulter.level.max };
+  const guardianLevel = { min: town.level, max: town.level };
+
+  assaulter.monsterIds.forEach((id) => noteSpawn(spawns, id, assaulterLevel));
+  guardian.reputationTiers
+    .flatMap((tier) => tier.guardians)
+    .forEach((entry) => noteSpawn(spawns, entry.monsterId, guardianLevel));
+}
+
+// Each entry is one place the monster actually spawns, so skill level gates can be checked per window rather than over a lossy min-max hull.
+export function buildMonsterSpawnRanges(
   encounters: EncounterContent[],
   encounterRandoms: EncounterRandomContent[],
-): Map<string, LevelRange> {
-  const monsterLevels = new Map<string, LevelRange>();
+  towns: TownContent[] = [],
+): Map<string, LevelRange[]> {
+  const spawns = new Map<string, LevelRange[]>();
 
   encounters.forEach((encounter) => {
     encounter.fights.forEach((fight) => {
       fight.monsters.forEach((m) =>
-        noteMonsterLevel(monsterLevels, m.monsterId, encounter.levelRange),
+        noteSpawn(spawns, m.monsterId, encounter.levelRange),
       );
     });
   });
   encounterRandoms.forEach((encounter) => {
     encounter.fights.forEach((fight) => {
       fight.monsters.forEach((m) =>
-        noteMonsterLevel(monsterLevels, m.monsterId, encounter.levelRange),
+        noteSpawn(spawns, m.monsterId, encounter.levelRange),
       );
     });
     encounter.creaturePool.forEach((m) =>
-      noteMonsterLevel(monsterLevels, m.monsterId, encounter.levelRange),
+      noteSpawn(spawns, m.monsterId, encounter.levelRange),
     );
   });
+  towns.forEach((town) => townSpawns(spawns, town));
 
-  return monsterLevels;
+  return spawns;
+}
+
+export function buildMonsterLevels(
+  encounters: EncounterContent[],
+  encounterRandoms: EncounterRandomContent[],
+): Map<string, LevelRange> {
+  const spawns = buildMonsterSpawnRanges(encounters, encounterRandoms);
+
+  return new Map(
+    [...spawns].map(([monsterId, ranges]) => [
+      monsterId,
+      {
+        min: min(ranges.map((r) => r.min)) ?? 0,
+        max: max(ranges.map((r) => r.max)) ?? 0,
+      },
+    ]),
+  );
 }
 
 function addSource(

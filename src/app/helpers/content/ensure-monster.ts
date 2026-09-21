@@ -1,3 +1,4 @@
+import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { VALID_MONSTER_TYPES } from '@helpers/content/ensure-helpers-constants';
 import {
   ensureArray,
@@ -16,10 +17,14 @@ import type {
   TargettingPriorityEntry,
 } from '@interfaces';
 
-function ensureMonsterSkill(skill: Partial<MonsterSkill> = {}): MonsterSkill {
+export function ensureMonsterSkill(
+  skill: Partial<MonsterSkill> = {},
+): MonsterSkill {
   return {
     skillId: skill.skillId ?? ('UNKNOWN' as EquipmentSkillId),
     weight: skill.weight ?? 1,
+    minLevel: skill.minLevel ?? 0,
+    maxLevel: skill.maxLevel ?? CHARACTER_MAX_LEVEL,
   };
 }
 

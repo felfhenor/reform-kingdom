@@ -9,6 +9,7 @@ import { rngNumberRange } from '@helpers/rng';
 import type {
   EncounterFightMonster,
   MonsterContent,
+  MonsterSkill,
   StatBlock,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
@@ -24,6 +25,15 @@ export function monsterStatsAtLevel(
   });
 
   return stats;
+}
+
+export function monsterSkillsAtLevel(
+  monster: MonsterContent,
+  level: number,
+): MonsterSkill[] {
+  return monster.skills.filter(
+    (skill) => skill.minLevel <= level && skill.maxLevel >= level,
+  );
 }
 
 export function monsterXpReward(

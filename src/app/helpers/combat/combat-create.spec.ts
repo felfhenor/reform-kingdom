@@ -31,6 +31,7 @@ import {
   combatantsFromTownGuardians,
 } from '@helpers/combat/combat-create';
 import { ensureEquipment } from '@helpers/content/ensure-item';
+import { ensureMonsterSkill } from '@helpers/content/ensure-monster';
 import { getEntry } from '@helpers/content/content';
 import { defaultCombatStats, defaultTagResistances } from '@helpers/defaults';
 import { globalEffectSums } from '@helpers/hero/global-effects';
@@ -332,7 +333,7 @@ describe('combatantFromMonster', () => {
       targetting: [{ type: 'Random' }],
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
-      skills: [{ skillId: snipeSkill.id, weight: 1 }],
+      skills: [ensureMonsterSkill({ skillId: snipeSkill.id })],
     } as MonsterContent;
 
     const combatant = combatantFromMonster(monster, 1, 0);
@@ -353,8 +354,8 @@ describe('combatantFromMonster', () => {
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
       skills: [
-        { skillId: attackSkill.id, weight: 1 },
-        { skillId: snipeSkill.id, weight: 3 },
+        ensureMonsterSkill({ skillId: attackSkill.id }),
+        ensureMonsterSkill({ skillId: snipeSkill.id, weight: 3 }),
       ],
     } as MonsterContent;
 
@@ -364,6 +365,42 @@ describe('combatantFromMonster', () => {
       [attackSkill.id]: 1,
       [snipeSkill.id]: 3,
     });
+  });
+
+  it('only carries skills whose level range covers the monster level', () => {
+    const monster = {
+      id: 'hawk' as MonsterId,
+      name: 'Hawk',
+      __type: 'monster',
+      description: '',
+      sprite: '0000',
+      frames: 4,
+      targetting: [{ type: 'Random' }],
+      baseStats: zeroStats(),
+      statsPerLevel: zeroStats(),
+      skills: [
+        ensureMonsterSkill({ skillId: attackSkill.id, weight: 5 }),
+        ensureMonsterSkill({ skillId: snipeSkill.id, minLevel: 30 }),
+      ],
+    } as MonsterContent;
+
+    const low = combatantFromMonster(monster, 29, 0);
+    const high = combatantFromMonster(monster, 30, 0);
+
+    const none = combatantFromMonster(
+      {
+        ...monster,
+        skills: [ensureMonsterSkill({ skillId: snipeSkill.id, minLevel: 30 })],
+      },
+      1,
+      0,
+    );
+
+    expect(low.skillIds).toEqual([attackSkill.id]);
+    expect(low.skillWeights).toEqual({ [attackSkill.id]: 5 });
+    expect(high.skillIds).toEqual([attackSkill.id, snipeSkill.id]);
+    expect(none.skillIds).toEqual([]);
+    expect(none.skillWeights).toEqual({});
   });
 
   it('is not affected by active GainStats global effects - those only apply to heroes', () => {
@@ -383,7 +420,7 @@ describe('combatantFromMonster', () => {
       baseStats: zeroStats(),
       statsPerLevel: zeroStats(),
       combatStats: defaultCombatStats(),
-      skills: [{ skillId: attackSkill.id, weight: 1 }],
+      skills: [ensureMonsterSkill({ skillId: attackSkill.id })],
     } as MonsterContent;
 
     const combatant = combatantFromMonster(monster, 1, 0);
