@@ -1,6 +1,6 @@
 import type { HasSprite } from '@interfaces/artable';
-import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { JobContent } from '@interfaces/content-job';
+import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';

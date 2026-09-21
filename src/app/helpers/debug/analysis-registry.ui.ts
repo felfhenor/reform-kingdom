@@ -6,6 +6,7 @@ import { runDebuffResistanceAnalysis } from '@helpers/debug/analysis-debuffresis
 import { runFieldNodesAnalysis } from '@helpers/debug/analysis-fieldnodes';
 import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gatherdevelopmentlevels';
 import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
+import { runInfusionGapsAnalysis } from '@helpers/debug/analysis-infusiongaps';
 import { runMaterialUtilizationAnalysis } from '@helpers/debug/analysis-materialutilization';
 import { runMonsterStatsAnalysis } from '@helpers/debug/analysis-monsterstats';
 import { runNodeLevelsAnalysis } from '@helpers/debug/analysis-nodelevels';
@@ -20,6 +21,7 @@ import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
+import { runTradeskillGapsAnalysis } from '@helpers/debug/analysis-tradeskillgaps';
 import { runTradeskillXpGapsAnalysis } from '@helpers/debug/analysis-tradeskillxpgaps';
 import { runWorkerReachabilityAnalysis } from '@helpers/debug/analysis-workerreachability';
 import { runWorkerStaminaAnalysis } from '@helpers/debug/analysis-workerstamina';
@@ -33,13 +35,23 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
   // --- Equipment & Items ---
   {
     id: 'contentgaps',
-    title: 'Content Gaps',
+    title: 'Equipment Level Gaps',
     description:
-      'Equipment/infusion/tradeskill recipe coverage across the level range the game spans.',
+      'Equipment-type coverage across the level range the game spans.',
     category: 'Equipment & Items',
     strict: false,
     inputKeys: ['gap', 'expanded', 'level'],
     run: runContentGapsAnalysis,
+  },
+  {
+    id: 'infusiongaps',
+    title: 'Infusion Gaps',
+    description:
+      'Infusion-material coverage per stat across the level range the game spans, plus duplicate stat blocks.',
+    category: 'Equipment & Items',
+    strict: false,
+    inputKeys: ['gap', 'expanded', 'level'],
+    run: runInfusionGapsAnalysis,
   },
   {
     id: 'debuffresistance',
@@ -82,6 +94,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
   },
 
   // --- Tradeskills & Recipes ---
+  {
+    id: 'tradeskillgaps',
+    title: 'Tradeskill Gaps',
+    description:
+      'Tradeskill levels with no newly-introduced recipe, up to the tradeskill level (defaults to the highest recipe unlock level).',
+    category: 'Tradeskills & Recipes',
+    strict: false,
+    inputKeys: ['expanded', 'tradeskillLevel'],
+    run: runTradeskillGapsAnalysis,
+  },
   {
     id: 'recipeingredientorder',
     title: 'Recipe Ingredient Order',

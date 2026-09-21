@@ -1,15 +1,38 @@
+import { getEntriesByType } from '@helpers/content/content';
 import { allMaps } from '@helpers/maps';
 import type {
   AnalysisCheck,
   AnalysisIssue,
   AnalysisLevelWindow,
+  AnalysisParams,
   BaseStat,
+  EncounterContent,
+  EncounterRandomContent,
+  GatheringContent,
   StatBlock,
   TiledMap,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
 const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
+
+// The `level` param if given, else the highest level any world node spans.
+export function resolveMaxContentLevel(params: AnalysisParams): number {
+  if (params['level'] !== undefined) return Number(params['level']);
+
+  const nodes = [
+    ...getEntriesByType<EncounterContent>('encounter'),
+    ...getEntriesByType<EncounterRandomContent>('encounterrandom'),
+    ...getEntriesByType<GatheringContent>('gathering'),
+  ];
+  return Math.max(
+    0,
+    ...nodes
+      .map((n) => n.levelRange)
+      .filter(Boolean)
+      .map((r) => r.max),
+  );
+}
 
 // Node name -> map name, from every map's Explore/Other Nodes Tiled layers.
 // Shared by analyses that need to place a content entry (by its `name`,

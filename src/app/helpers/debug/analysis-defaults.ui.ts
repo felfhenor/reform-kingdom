@@ -1,14 +1,17 @@
-// Computes a content-derived default for the shared `level` input - the higher of the top monster level (unioned across every encounter/random encounter it's assigned to) and the top node level.
+// Content-derived defaults for inputs whose sensible starting value depends on the content, keyed by input key.
 
 import { getEntriesByType } from '@helpers/content/content';
 import { buildMonsterLevels } from '@helpers/debug/analysis-item-sources';
+import { highestTradeskillMinLevel } from '@helpers/debug/analysis-tradeskillgaps';
 import type {
   EncounterContent,
   EncounterRandomContent,
   GatheringContent,
   LevelRange,
+  RecipeContent,
 } from '@interfaces';
 
+// The higher of the top monster level (unioned across every encounter/random encounter it's assigned to) and the top node level.
 export function computeDefaultLevel(): number {
   const encounters = getEntriesByType<EncounterContent>('encounter');
   const encounterRandoms =
@@ -32,3 +35,12 @@ export function computeDefaultLevel(): number {
 
   return Math.max(maxMonsterLevel, maxNodeLevel, 1);
 }
+
+export function computeDefaultTradeskillLevel(): number {
+  return highestTradeskillMinLevel(getEntriesByType<RecipeContent>('recipe'));
+}
+
+export const CONTENT_DERIVED_DEFAULTS: Record<string, () => number> = {
+  level: computeDefaultLevel,
+  tradeskillLevel: computeDefaultTradeskillLevel,
+};

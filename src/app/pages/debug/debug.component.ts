@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { InputAnalysisComponent } from '@components/input-analysis/input-analysis.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { computeDefaultLevel } from '@helpers/debug/analysis-defaults.ui';
+import { CONTENT_DERIVED_DEFAULTS } from '@helpers/debug/analysis-defaults.ui';
 import {
   ALL_ANALYSIS_INPUTS,
   GLOBAL_ANALYSIS_INPUTS,
@@ -22,9 +22,10 @@ import type {
   AnalysisScriptCategory,
   AnalysisScriptDefinition,
 } from '@interfaces';
-import { linkedQueryParam } from 'ngxtension/linked-query-param';
 import { TippyDirective } from '@ngneat/helipopper';
 import { ContentService } from '@services/content.service';
+import { mapValues } from 'es-toolkit/compat';
+import { linkedQueryParam } from 'ngxtension/linked-query-param';
 
 type ScriptResultState = {
   result: AnalysisRunResult | null;
@@ -49,10 +50,10 @@ const CATEGORIES: AnalysisScriptCategory[] = [
   'Monster Stats',
 ];
 
-// `level` has a content-derived default, so its
-// query param is left `null` (rather than baking a static fallback into
-// `parse`) when absent - `inputValue()` below resolves that case specially.
-// Every other input's static `defaultValue` is baked into `parse` directly.
+// Inputs in `CONTENT_DERIVED_DEFAULTS` leave their query param `null` (rather
+// than baking a static fallback into `parse`) when absent - `inputValue()`
+// below resolves that case. Every other input's static `defaultValue` is
+// baked into `parse` directly.
 function paramParse(
   input: AnalysisInputDef,
 ): (raw: string | null) => AnalysisInputValue | null {
@@ -60,7 +61,9 @@ function paramParse(
     case 'number':
       return (raw) => {
         const fallback =
-          input.key === 'level' ? null : (input.defaultValue as number);
+          input.key in CONTENT_DERIVED_DEFAULTS
+            ? null
+            : (input.defaultValue as number);
         if (raw === null) return fallback;
         const value = Number(raw);
         return Number.isFinite(value) ? value : fallback;
@@ -137,10 +140,10 @@ export class DebugComponent {
     ]),
   );
 
-  private defaultLevel = computed(() =>
+  private derivedDefaults = computed<Record<string, number>>(() =>
     this.isReady()
-      ? computeDefaultLevel()
-      : (ALL_ANALYSIS_INPUTS.find((i) => i.key === 'level')?.defaultValue ?? 1),
+      ? mapValues(CONTENT_DERIVED_DEFAULTS, (derive) => derive())
+      : {},
   );
 
   public params = computed<AnalysisParams>(() => {
@@ -203,8 +206,10 @@ export class DebugComponent {
   public inputValue(key: string): AnalysisInputValue {
     const fromUrl = this.paramSignals[key]();
     if (fromUrl !== null) return fromUrl;
-    if (key === 'level') return this.defaultLevel();
-    return ALL_ANALYSIS_INPUTS.find((input) => input.key === key)!.defaultValue;
+    return (
+      this.derivedDefaults()[key] ??
+      ALL_ANALYSIS_INPUTS.find((input) => input.key === key)!.defaultValue
+    );
   }
 
   public setInput(key: string, value: AnalysisInputValue): void {

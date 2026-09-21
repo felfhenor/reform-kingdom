@@ -32,6 +32,8 @@
     "analyze:monsterstats": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-monsterstats",
     "analyze:materialutilization": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-materialutilization",
     "analyze:contentgaps": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-contentgaps",
+    "analyze:infusiongaps": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-infusiongaps",
+    "analyze:tradeskillgaps": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-tradeskillgaps",
     "analyze:nodelevels": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-nodelevels",
     "analyze:debuffresistance": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-debuffresistance",
     "analyze:workerstamina": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/analyze-workerstamina",

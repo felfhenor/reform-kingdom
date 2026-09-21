@@ -61,7 +61,27 @@ npm run analyze:contentgaps -- --gap=<x>
 npm run analyze:contentgaps -- --expanded
 ```
 
-This will examine all content in the game (at the time of writing: items, tradeskills, infusions) and look for excessive gaps in utilization (default of 4)
+This will examine equipment types across the level range and look for excessive gaps in utilization (default of 4)
+
+### Infusion Gaps
+
+```
+npm run analyze:infusiongaps
+npm run analyze:infusiongaps -- --gap=<x>
+npm run analyze:infusiongaps -- --expanded
+```
+
+This will examine infusion materials per stat across the level range and look for excessive gaps in utilization (default of 4), as well as duplicate infusion stat blocks.
+
+### Tradeskill Gaps
+
+```
+npm run analyze:tradeskillgaps
+npm run analyze:tradeskillgaps -- --level=<x>
+npm run analyze:tradeskillgaps -- --expanded
+```
+
+This will look for tradeskill levels with no newly-introduced recipe, up to a tradeskill level (default: the highest level any recipe unlocks at).
 
 ### Skills
 

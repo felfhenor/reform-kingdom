@@ -1,3 +1,4 @@
+import { TRADESKILL_MAX_LEVEL } from '@helpers/config';
 import type { AnalysisInputDef } from '@interfaces';
 
 // Shared across every script that reads it - one value, applied everywhere it's supported.
@@ -47,6 +48,15 @@ export const THRESHOLD_INPUT: AnalysisInputDef = {
   min: 0,
 };
 
+export const TRADESKILL_LEVEL_INPUT: AnalysisInputDef = {
+  key: 'tradeskillLevel',
+  label: 'Tradeskill level',
+  type: 'number',
+  defaultValue: 1,
+  min: 1,
+  max: TRADESKILL_MAX_LEVEL,
+};
+
 export const GLOBAL_ANALYSIS_INPUTS: AnalysisInputDef[] = [
   GAP_INPUT,
   LEVEL_INPUT,
@@ -57,6 +67,7 @@ export const SCRIPT_ANALYSIS_INPUTS: AnalysisInputDef[] = [
   CLASS_FILTER_INPUT,
   MONSTER_FILTER_INPUT,
   THRESHOLD_INPUT,
+  TRADESKILL_LEVEL_INPUT,
 ];
 
 export const ALL_ANALYSIS_INPUTS: AnalysisInputDef[] = [
