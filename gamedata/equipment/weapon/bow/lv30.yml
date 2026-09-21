@@ -10,11 +10,6 @@
     Strength: 18.8
     Agility: 5.2
 
-  skillStatBonuses:
-    - skillFamily: Barbed Shot
-      stat: Strength
-      value: 0.5
-
 - id: fe5d30b0-4ca6-410f-a80d-a869cfa5a253
   name: Angelf Crossbow
   description: A highly-customizable crossbow that elven hunters love for its flexibility.
@@ -30,7 +25,23 @@
   monsterTypeDamage:
     Demon: 10
 
+- id: 77c6562d-0e50-4f93-82d8-0684f7221fef
+  name: Ancestral Crossbow
+  description: A crossbow made by the original elves, whose production method is highly classified. It sharpens the eyes of the wielder.
+  levelRequirement: 37
+  rarity: Uncommon
+  type: Bow
+  sprite: '0193'
+  slots: 4
+  baseStats:
+    Strength: 19.4
+    Agility: 13.4
+
   skillStatBonuses:
     - skillFamily: Snipe
       stat: Agility
       value: 0.25
+
+    - skillFamily: Barbed Shot
+      stat: Strength
+      value: 0.5

@@ -15,6 +15,6 @@
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 16
-  maxTradeskillLevel: 20
-  tradeskillXP: 200
+  maxTradeskillLevel: 16
+  tradeskillXP: 0
   craftTime: 300

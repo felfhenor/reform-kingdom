@@ -24,8 +24,3 @@
   baseStats:
     Agility: 14.7
     Strength: 8.4
-
-  skillStatBonuses:
-    - skillFamily: Double Strike
-      stat: Agility
-      value: 0.5

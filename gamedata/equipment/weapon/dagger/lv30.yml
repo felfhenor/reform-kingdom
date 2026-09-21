@@ -9,3 +9,20 @@
   baseStats:
     Agility: 12.2
     Strength: 13.1
+
+- id: 5cdf05a3-7a6a-4fb8-9091-9b0b62ad3458
+  name: Ancestral Kukri
+  description: A kukri made by the original elves, whose production method is highly classified. It vibrates as if seeking blood.
+  levelRequirement: 37
+  rarity: Mystical
+  type: Dagger
+  sprite: '0194'
+  slots: 1
+  baseStats:
+    Agility: 19.2
+    Strength: 16.1
+
+  skillStatBonuses:
+    - skillFamily: Double Strike
+      stat: Agility
+      value: 0.5

@@ -17,3 +17,20 @@
     - skillFamily: Holy Smite
       stat: Strength
       value: 0.5
+
+- id: d13e1917-3927-4133-adb0-05344c8a785e
+  name: Ancestral Longclub
+  description: A longclub made by the original elves, whose production method is highly classified. It exudes holiness.
+  levelRequirement: 37
+  rarity: Mystical
+  type: Mace
+  sprite: '0195'
+  slots: 3
+  baseStats:
+    Strength: 18.2
+    Intelligence: 16.6
+
+  skillStatBonuses:
+    - skillFamily: Holy Smite
+      stat: Strength
+      value: 0.5

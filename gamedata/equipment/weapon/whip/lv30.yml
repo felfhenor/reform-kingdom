@@ -11,6 +11,19 @@
     Resistance: 9.3
     Strength: 10.3
 
+- id: 8a221cb2-54d7-4042-868e-b4968d8da1b5
+  name: Ancestral Whip
+  description: A whip made by the original elves, whose production method is highly classified. Holding it makes the ground quiver.
+  levelRequirement: 37
+  rarity: Mystical
+  type: Whip
+  sprite: '0191'
+  slots: 1
+  baseStats:
+    Intelligence: 18.2
+    Resistance: 13.3
+    Strength: 14.3
+
   skillStatBonuses:
     - skillFamily: Earthshake
       stat: Intelligence

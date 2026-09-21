@@ -9,3 +9,20 @@
   baseStats:
     Vitality: 8.1
     Resistance: 6.6
+
+- id: 73f9f9f6-beff-446d-b843-5725ca32a23c
+  name: Ancestral Greatshield
+  description: A greatshield made by the original elves, whose production method is highly classified. It gives the wielder the urge to smash.
+  levelRequirement: 37
+  rarity: Mystical
+  type: Shield
+  sprite: '0196'
+  slots: 3
+  baseStats:
+    Vitality: 14.1
+    Resistance: 9.6
+
+  skillStatBonuses:
+    - skillFamily: Smashing Board
+      stat: Vitality
+      value: 0.5

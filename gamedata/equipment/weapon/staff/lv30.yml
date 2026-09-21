@@ -12,3 +12,20 @@
 
   monsterTypeDamage:
     Demon: 10
+
+- id: c3a2de54-26f0-40d3-926a-fccf63d9012d
+  name: Ancestral Staff
+  description: A staff made by the original elves, whose production method is highly classified. It's hot to the touch.
+  levelRequirement: 37
+  rarity: Mystical
+  type: Staff
+  sprite: '0190'
+  slots: 1
+  baseStats:
+    Intelligence: 26.1
+    Vitality: 19.8
+
+  skillStatBonuses:
+    - skillFamily: Fireball
+      stat: Vitality
+      value: 2

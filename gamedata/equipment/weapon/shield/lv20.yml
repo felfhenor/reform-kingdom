@@ -27,8 +27,3 @@
 
   debuffResistances:
     Bleed: 5
-
-  skillStatBonuses:
-    - skillFamily: Smashing Board
-      stat: Vitality
-      value: 0.5

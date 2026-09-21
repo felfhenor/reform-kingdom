@@ -37,3 +37,13 @@
   rarity: Common
   description: A crown worn by elves conducting rituals in sacred or demonic places.
   sprite: '0053'
+
+- id: 8ac6b409-bf7a-452f-8f25-06c32edb82bc
+  name: Griffin Feather
+  rarity: Mystical
+  description: A magical feather taken from a mystical griffin. These are treasured by elves, and having one makes wealth mysteriously appear.
+  sprite: '0055'
+
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 5

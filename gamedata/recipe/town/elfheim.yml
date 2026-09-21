@@ -1,0 +1,164 @@
+- id: ed615233-6c95-4bbc-a135-1b0f05693ff2
+  name: 'Weapon: Ancestral Staff'
+  result:
+    equipmentId: Ancestral Staff
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 2
+
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Demon Horn
+      quantity: 4
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 24
+  tradeskillXP: 0
+  craftTime: 600
+
+- id: 4b05c9d1-7b06-4150-9a17-7af746201174
+  name: 'Artifact: Ancestral Aimer'
+  result:
+    equipmentId: Ancestral Aimer
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 2
+
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Demon Horn
+      quantity: 3
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 24
+  tradeskillXP: 0
+  craftTime: 600
+
+- id: 1cd8d6f4-4874-4db1-afbb-70f1f8d961fa
+  name: 'Weapon: Ancestral Crossbow'
+  result:
+    equipmentId: Ancestral Crossbow
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 2
+
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Strong Spider Silk
+      quantity: 3
+
+    - itemId: Demon Horn
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 24
+  tradeskillXP: 0
+  craftTime: 600
+
+- id: b249e8f1-6036-4349-b621-3c775382b2d8
+  name: 'Weapon: Ancestral Longclub'
+  result:
+    equipmentId: Ancestral Longclub
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 4
+
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 4
+
+    - itemId: Demon Horn
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 24
+  tradeskillXP: 0
+  craftTime: 600
+
+- id: 9fc56baf-b0bd-4d85-9401-b34334ef475c
+  name: 'Weapon: Ancestral Kukri'
+  result:
+    equipmentId: Ancestral Kukri
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 2
+
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Elven Corewood
+      quantity: 2
+
+    - itemId: Demon Horn
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 24
+  tradeskillXP: 0
+  craftTime: 600
+
+- id: 5ff6703d-3d07-4293-9651-d9ee886db722
+  name: 'Offhand: Ancestral Greatshield'
+  result:
+    equipmentId: Ancestral Greatshield
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 6
+
+    - itemId: Gold Ingot
+      quantity: 3
+
+    - itemId: Demon Horn
+      quantity: 4
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 24
+  tradeskillXP: 0
+  craftTime: 600
+
+- id: 3e1ca241-3ed0-46e4-89e3-a72603bb6bea
+  name: 'Weapon: Ancestral Whip'
+  result:
+    equipmentId: Ancestral Whip
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 2
+
+    - itemId: Gold Ingot
+      quantity: 1
+
+    - itemId: Demon Horn
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 24
+  tradeskillXP: 0
+  craftTime: 600

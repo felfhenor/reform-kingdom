@@ -13,6 +13,18 @@
   monsterTypeDamage:
     Demon: 10
 
+- id: 2512c853-9bac-455c-9dbf-8cf5f13c6368
+  name: Ancestral Aimer
+  description: An aimer made by the original elves, whose production method is highly classified. It fluctuates in temperature.
+  levelRequirement: 37
+  rarity: Mystical
+  type: Artifact
+  sprite: '0192'
+  slots: 1
+  baseStats:
+    Intelligence: 12.4
+    Resistance: 4.2
+
   skillStatBonuses:
     - skillFamily: Frostfire Bolt
       stat: Resistance

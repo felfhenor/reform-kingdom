@@ -4,3 +4,10 @@
   description: The power of Larsia, the kingdom in the desert.
 
   hideDuration: true
+
+- id: ac55a556-7443-4f58-9cd6-b227a1548415
+  name: Elven Influence
+  sprite: '0019'
+  description: The power of Elfheim, the kingdom in the forest.
+
+  hideDuration: true

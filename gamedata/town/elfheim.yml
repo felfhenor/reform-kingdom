@@ -1,0 +1,280 @@
+- id: 7363754b-b2bd-496a-b870-35e666524be2
+  name: Elfheim
+  description: The kingdom of elves, nestled away in the deep Erden Woodland. Vigilant guards keep watch at all times.
+
+  scaleType: City
+
+  level: 35
+
+  materialThresholds:
+    - itemId: Gold Coin
+      maxQuantity: 25000
+
+    - itemId: Crimson Lucre
+      sellAtQuantity: 1500
+      value: 25
+      maxQuantity: 2000
+
+    - itemId: Crimson Ore
+      maxQuantity: 300
+      value: 30
+      sellAtQuantity: 200
+
+    - itemId: Crimson Ingot
+      maxQuantity: 300
+      value: 70
+      sellAtQuantity: 200
+
+    - itemId: Gold Ore
+      maxQuantity: 300
+      value: 40
+      sellAtQuantity: 200
+
+    - itemId: Gold Ingot
+      maxQuantity: 300
+      value: 90
+      sellAtQuantity: 200
+
+    - itemId: Crimson Ruby
+      maxQuantity: 300
+      value: 150
+      sellAtQuantity: 125
+
+    - itemId: Elfsilk
+      maxQuantity: 300
+      value: 45
+      sellAtQuantity: 200
+
+    - itemId: Strong Spider Silk
+      maxQuantity: 50
+      value: 50
+      sellAtQuantity: 30
+
+    - itemId: Hawk Feather
+      maxQuantity: 50
+      value: 100
+      sellAtQuantity: 30
+
+    - itemId: Wolf Pelt
+      maxQuantity: 50
+      value: 150
+      sellAtQuantity: 30
+
+    - itemId: Bat Wing
+      maxQuantity: 50
+      value: 125
+      sellAtQuantity: 30
+
+    - itemId: Demon Horn
+      maxQuantity: 50
+      value: 350
+      sellAtQuantity: 30
+
+  crafting:
+    maxQueueSize:
+      - tier: 0
+        value: 12
+
+      - tier: 1
+        value: 14
+
+      - tier: 2
+        value: 16
+
+      - tier: 3
+        value: 18
+
+      - tier: 4
+        value: 20
+
+    specialtyTradeskillId: Woodworking
+    craftingDurationMultiplier: 3
+    craftingChanceOnTick: 3
+    craftingChanceItemThreshold: 4
+
+    tradeskillLevels:
+      - tradeskillId: Jewelcrafting
+        level: 14
+
+      - tradeskillId: Blacksmithing
+        level: 16
+
+      - tradeskillId: Tailoring
+        level: 12
+
+      - tradeskillId: Woodworking
+        level: 20
+
+      - tradeskillId: Artificing
+        level: 18
+
+    uniqueRecipeIds:
+      - 'Weapon: Ancestral Staff'
+      - 'Artifact: Ancestral Aimer'
+      - 'Weapon: Ancestral Crossbow'
+      - 'Weapon: Ancestral Longclub'
+      - 'Weapon: Ancestral Kukri'
+      - 'Offhand: Ancestral Greatshield'
+      - 'Weapon: Ancestral Whip'
+
+  traders:
+    sellItemCount:
+      - tier: 0
+        value: 7
+
+      - tier: 1
+        value: 9
+
+      - tier: 2
+        value: 11
+
+      - tier: 3
+        value: 13
+
+      - tier: 4
+        value: 15
+
+    itemExpirationTimer: 1800
+
+    markupPercentages:
+      sell: 200
+      buy: -25
+
+  gathering:
+    gatherRateMultiplier: 6
+    goldGatheredPerMaterial: 2
+
+    workers:
+      - workerId: Elena Jadd
+        level: 1
+
+      - workerId: Sasha Rosago
+        level: 1
+
+  reputation:
+    buff:
+      globalEffectId: Elven Influence
+
+      tiers:
+        - tier: 1
+          stats:
+            Intelligence: 1
+
+          debuffResistances:
+            Bleed: 5
+            Stun: 5
+
+        - tier: 2
+          stats:
+            Intelligence: 3
+
+          debuffResistances:
+            Bleed: 10
+            Stun: 10
+
+        - tier: 3
+          stats:
+            Intelligence: 5
+
+          debuffResistances:
+            Bleed: 15
+            Stun: 15
+
+        - tier: 4
+          stats:
+            Intelligence: 10
+
+          debuffResistances:
+            Bleed: 25
+            Stun: 25
+
+  defense:
+    rewards:
+      - collectibleId: Griffin Feather
+        chance: 100
+
+      - itemId: Gold Coin
+        chance: 100
+        min: 7500
+        max: 9500
+
+      - itemId: Crimson Lucre
+        chance: 100
+        min: 2500
+        max: 3000
+
+    guardian:
+      reputationTiers:
+        - tier: 0
+          guardians:
+            - monsterId: Elf Druid
+              quantity: 1
+
+            - monsterId: Elf Scout
+              quantity: 1
+
+            - monsterId: Elf Archer
+              quantity: 1
+
+        - tier: 1
+          guardians:
+            - monsterId: Elf Druid
+              quantity: 2
+
+            - monsterId: Elf Scout
+              quantity: 1
+
+            - monsterId: Elf Archer
+              quantity: 2
+
+        - tier: 2
+          guardians:
+            - monsterId: Elf Captain
+              quantity: 1
+
+            - monsterId: Elf Druid
+              quantity: 1
+
+            - monsterId: Elf Scout
+              quantity: 1
+
+            - monsterId: Elf Archer
+              quantity: 1
+
+        - tier: 3
+          guardians:
+            - monsterId: Elf Captain
+              quantity: 2
+
+            - monsterId: Elf Druid
+              quantity: 2
+
+            - monsterId: Elf Scout
+              quantity: 1
+
+        - tier: 4
+          guardians:
+            - monsterId: Elf Captain
+              quantity: 3
+
+            - monsterId: Elf Druid
+              quantity: 1
+
+            - monsterId: Elf Scout
+              quantity: 1
+
+    assaulter:
+      numMonsters: 12
+      monsterIds:
+        - Lesser Fel Demon
+        - Woodspider
+        - Woodwolf
+        - Elf Ritualist
+        - Akroki Vanguard
+
+      level:
+        min: 25
+        max: 32
+
+    quests:
+      commissions: []
