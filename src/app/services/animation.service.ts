@@ -76,6 +76,41 @@ export class AnimationService {
     anim.then(() => span.remove());
     return anim;
   }
+
+  // Clones `source`'s visuals into a fixed-position ghost that flies to `target`'s
+  // position, then removes itself and pops `target` to sell the "arrival".
+  flyTo(source: Element, target: Element): JSAnimation {
+    const from = source.getBoundingClientRect();
+    const to = target.getBoundingClientRect();
+
+    const ghost = source.cloneNode(true) as HTMLElement;
+    ghost.style.position = 'fixed';
+    ghost.style.left = `${from.left}px`;
+    ghost.style.top = `${from.top}px`;
+    ghost.style.width = `${from.width}px`;
+    ghost.style.height = `${from.height}px`;
+    ghost.style.margin = '0';
+    ghost.style.zIndex = '9999';
+    ghost.style.pointerEvents = 'none';
+    document.body.appendChild(ghost);
+
+    const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+    const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+
+    const anim = animate(ghost, {
+      translateX: [0, dx],
+      translateY: [0, dy],
+      scale: [1, 0.5],
+      opacity: [1, 0.7],
+      duration: 500,
+      ease: 'inOutQuad',
+    });
+    anim.then(() => {
+      ghost.remove();
+      this.popIn(target);
+    });
+    return anim;
+  }
 }
 
 // Snaps to `source()` on first read, tweens to it on every change after, and cancels

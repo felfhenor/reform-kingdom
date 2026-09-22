@@ -161,7 +161,7 @@
                       type="button"
                       class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 py-0 ps-0 text-neutral-content"
                       [disabled]="!affordable || !modifiable"
-                      (click)="requestInfuse(entry.item.id)"
+                      (click)="requestInfuse(entry.item.id, $event)"
                       appSfx="ui-click"
                       [sfxOffset]="$index"
                       [sfxTrigger]="['click', 'hover']"

@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
+  inject,
   signal,
   viewChild,
 } from '@angular/core';
@@ -26,7 +28,6 @@ import {
   defaultTagResistances,
 } from '@helpers/defaults';
 import { characterInfuseEquipment } from '@helpers/hero/character-equipment';
-import { worldPartyState } from '@helpers/state-game';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   canModifyEquipment,
@@ -54,6 +55,7 @@ import {
 } from '@helpers/item/item-preview';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { getStorageMaterials } from '@helpers/kingdom/storage.ui';
+import { worldPartyState } from '@helpers/state-game';
 import {
   type Character,
   type CharacterId,
@@ -66,6 +68,7 @@ import {
   type StorageMaterialEntry,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { AnimationService } from '@services/animation.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -93,6 +96,11 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   styleUrl: './play-kingdom-infusion.component.scss',
 })
 export class PlayKingdomInfusionComponent {
+  private anim = inject(AnimationService);
+  private materialsRowEl = viewChild(RowInfusedMaterialsComponent, {
+    read: ElementRef,
+  });
+
   public party = computed(() => worldPartyState());
   public goldCoinId = goldCoinId;
 
@@ -258,6 +266,7 @@ export class PlayKingdomInfusionComponent {
 
   private infuseSwal = viewChild<SwalComponent>('infuseSwal');
   private pendingMaterialId = signal<ItemId | undefined>(undefined);
+  private pendingSourceEl?: HTMLElement;
 
   private isOverwritingSelectedSlot(): boolean {
     const item = this.selectedItem();
@@ -277,13 +286,15 @@ export class PlayKingdomInfusionComponent {
       : base;
   }
 
-  public requestInfuse(materialItemId: ItemId): void {
+  public requestInfuse(materialItemId: ItemId, event: MouseEvent): void {
     const swal = this.infuseSwal();
     if (!swal) return;
 
     // `swalOptions` is a plain setter, unlike `[text]` which needs an Angular flush - too late for a synchronous `.fire()` right after.
     swal.swalOptions = { text: this.buildInfuseConfirmText(materialItemId) };
     this.pendingMaterialId.set(materialItemId);
+    this.pendingSourceEl =
+      (event.currentTarget as HTMLElement).querySelector('img') ?? undefined;
     swal.fire();
   }
 
@@ -296,7 +307,17 @@ export class PlayKingdomInfusionComponent {
       return;
     }
 
+    const sourceEl = this.pendingSourceEl;
+    const targetEl = this.materialsRowEl()?.nativeElement.querySelector(
+      `[data-slot-index="${slotIndex}"]`,
+    );
+
     characterInfuseEquipment(character.id, item.id, slotIndex, materialItemId);
     this.pendingMaterialId.set(undefined);
+    this.pendingSourceEl = undefined;
+
+    if (sourceEl && targetEl) {
+      this.anim.flyTo(sourceEl, targetEl);
+    }
   }
 }
