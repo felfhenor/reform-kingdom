@@ -300,6 +300,8 @@
                 class="flex flex-row items-center gap-2 p-2 rounded"
                 [class.bg-base-300]="editingClauseId() !== clause.id"
                 [class.bg-neutral]="editingClauseId() === clause.id"
+                (animate.enter)="onClauseEnter($event)"
+                (animate.leave)="onClauseLeave($event)"
               >
                 <span cdkDragHandle class="cursor-move text-lighter">::</span>
 

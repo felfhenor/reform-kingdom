@@ -2,14 +2,19 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
+  ElementRef,
+  inject,
   input,
   output,
+  untracked,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatOrderClauseSummary } from '@helpers/combat/combat-order.ui';
 import type { CombatOrderClause, EquipmentSkillContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { AnimationService } from '@services/animation.service';
 
 @Component({
   selector: 'app-row-combat-order-clause',
@@ -19,7 +24,26 @@ import { TippyDirective } from '@ngneat/helipopper';
   templateUrl: './row-combat-order-clause.component.html',
 })
 export class RowCombatOrderClauseComponent {
+  private anim = inject(AnimationService);
+  private el = inject(ElementRef<HTMLElement>);
+  private hasInitialized = false;
+
   public clause = input.required<CombatOrderClause>();
+
+  constructor() {
+    // Same clause id, new params - combatOrderClauseUpdate replaces the clause object in
+    // place, so this only fires on a real edit, not on the row's initial mount/add.
+    effect(() => {
+      this.clause();
+      untracked(() => {
+        if (!this.hasInitialized) {
+          this.hasInitialized = true;
+          return;
+        }
+        this.anim.pulse(this.el.nativeElement);
+      });
+    });
+  }
 
   // Used for the mandatory trailing "always random skill" row, which reads
   // like any other row but isn't a real stored clause - no toggle/edit/remove.

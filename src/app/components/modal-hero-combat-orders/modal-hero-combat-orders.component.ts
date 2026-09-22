@@ -1,9 +1,11 @@
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -51,6 +53,7 @@ import {
   NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
+import { AnimationService } from '@services/animation.service';
 import { sortBy, uniq } from 'es-toolkit/compat';
 
 type SelectOption<T> = { value: T; label: string };
@@ -125,6 +128,8 @@ const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
   templateUrl: './modal-hero-combat-orders.component.html',
 })
 export class ModalHeroCombatOrdersComponent {
+  private anim = inject(AnimationService);
+
   public readonly rowCap = COMBAT_ORDER_ROW_CAP;
   public readonly conditionTypeOptions = CONDITION_TYPE_OPTIONS;
   public readonly comparatorOptions = COMPARATOR_OPTIONS;
@@ -412,6 +417,17 @@ export class ModalHeroCombatOrdersComponent {
       event.previousIndex,
       event.currentIndex,
     );
+  }
+
+  public onClauseEnter(event: AnimationCallbackEvent): void {
+    this.anim.slideIn(event.target);
+  }
+
+  public onClauseLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 
   public startEditClause(clause: CombatOrderClause): void {
