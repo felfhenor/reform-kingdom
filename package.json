@@ -71,6 +71,7 @@
     "@sweetalert2/ngx-sweetalert2": "^15.0.0",
     "@taiga-ui/event-plugins": "^5.0.0",
     "@tailwindcss/postcss": "^4.3.3",
+    "animejs": "^4.5.0",
     "console-log-colors": "^0.5.0",
     "es-toolkit": "^1.50.0",
     "gameanalytics": "^4.4.7",

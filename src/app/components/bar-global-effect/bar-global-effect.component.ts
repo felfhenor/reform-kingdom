@@ -1,9 +1,9 @@
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
-  signal,
-  untracked,
+  computed,
+  inject,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { autoModeStatusLabel } from '@helpers/decree/auto-mode.ui';
@@ -13,11 +13,7 @@ import {
 } from '@helpers/hero/global-effects';
 import type { GlobalEffect } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-
-const FADE_DURATION_MS = 300;
-
-type EffectPhase = 'entering' | 'visible' | 'leaving';
-type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
+import { AnimationService } from '@services/animation.service';
 
 @Component({
   selector: 'app-bar-global-effect',
@@ -29,10 +25,10 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
         @for (effect of displayedEffects(); track effect.id) {
           <li
             class="global-effect-box tooltip tooltip-bottom"
-            [class.entering]="effect.phase === 'entering'"
-            [class.leaving]="effect.phase === 'leaving'"
             [tp]="effectTooltip"
             [tpPlacement]="'bottom'"
+            (animate.enter)="onEnter($event)"
+            (animate.leave)="onLeave($event)"
           >
             <app-atlas-image
               class="absolute w-full h-full"
@@ -41,7 +37,7 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
             />
 
             @if (!effect.hideDuration) {
-              <div class="duration z-15 text-lg">
+              <div class="duration z-15 text-lg tabular-nums">
                 {{ durationLabel(effect) }}
               </div>
             }
@@ -76,13 +72,7 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
       border-radius: 0.25rem;
       opacity: 0.85;
       background: transparent;
-      transition: opacity 300ms ease;
       contain: content;
-
-      &.entering,
-      &.leaving {
-        opacity: 0;
-      }
     }
 
     .duration {
@@ -95,7 +85,9 @@ type DisplayedEffect = GlobalEffect & { phase: EffectPhase };
   `,
 })
 export class BarGlobalEffectComponent {
-  public displayedEffects = signal<DisplayedEffect[]>([]);
+  private anim = inject(AnimationService);
+
+  public displayedEffects = computed(() => activeGlobalEffects());
   public durationLabel = globalEffectDurationLabel;
 
   // Auto Mode's description is live status text, computed at render time rather than stored in gamestate since it changes often.
@@ -104,63 +96,14 @@ export class BarGlobalEffectComponent {
     return autoModeStatusLabel() ?? effect.description;
   }
 
-  constructor() {
-    // `untracked` avoids self-retrigger.
-    effect(() => {
-      const active = activeGlobalEffects();
-      untracked(() => this.syncDisplayedEffects(active));
-    });
+  public onEnter(event: AnimationCallbackEvent): void {
+    this.anim.popIn(event.target);
   }
 
-  // Keeps expiring effects mounted for one fade cycle and fades new ones in, so a same-tick swap (e.g. Deaths Door -> Healing) reads as a hand-off, not a jump cut.
-  private syncDisplayedEffects(active: GlobalEffect[]): void {
-    const activeIds = new Set(active.map((effect) => effect.id));
-    const current = this.displayedEffects();
-    const currentIds = new Set(current.map((effect) => effect.id));
-
-    const kept = active
-      .filter((effect) => currentIds.has(effect.id))
-      .map((effect) => ({ ...effect, phase: 'visible' as const }));
-
-    const stillLeaving = current.filter(
-      (effect) => !activeIds.has(effect.id) && effect.phase === 'leaving',
-    );
-
-    const arriving = active
-      .filter((effect) => !currentIds.has(effect.id))
-      .map((effect) => ({ ...effect, phase: 'entering' as const }));
-
-    const newlyLeaving = current
-      .filter(
-        (effect) => !activeIds.has(effect.id) && effect.phase !== 'leaving',
-      )
-      .map((effect) => ({ ...effect, phase: 'leaving' as const }));
-
-    this.displayedEffects.set([
-      ...kept,
-      ...arriving,
-      ...stillLeaving,
-      ...newlyLeaving,
-    ]);
-
-    if (arriving.length > 0) {
-      requestAnimationFrame(() => {
-        this.displayedEffects.update((effects) =>
-          effects.map((effect) =>
-            effect.phase === 'entering'
-              ? { ...effect, phase: 'visible' }
-              : effect,
-          ),
-        );
-      });
-    }
-
-    if (newlyLeaving.length > 0) {
-      setTimeout(() => {
-        this.displayedEffects.update((effects) =>
-          effects.filter((effect) => effect.phase !== 'leaving'),
-        );
-      }, FADE_DURATION_MS);
-    }
+  public onLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 }
