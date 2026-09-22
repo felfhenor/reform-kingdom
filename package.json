@@ -10,6 +10,7 @@
     "start:app": "ng serve --open --port 9766",
     "setup": "npm run gamedata:build",
     "lint": "ng lint",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest --ui --api 9899",
     "build:copychangelog": "cpy CHANGELOG.md CHANGELOG-current.md dist/reformkingdom/browser",
