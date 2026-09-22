@@ -78,8 +78,11 @@ function recipeRequirementEntries(
 ): CraftRequirementEntry[] {
   return orderBy(
     recipe.requirements.map(buildRequirementEntry),
-    [(entry) => REQUIREMENT_KIND_ORDER[entry.kind]],
-    ['asc'],
+    [
+      (entry) => REQUIREMENT_KIND_ORDER[entry.kind],
+      (entry) => entry.content?.name ?? '',
+    ],
+    ['asc', 'asc'],
   );
 }
 
