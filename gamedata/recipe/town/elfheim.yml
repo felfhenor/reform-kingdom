@@ -7,14 +7,11 @@
     - itemId: Crimson Ingot
       quantity: 2
 
-    - itemId: Gold Ingot
-      quantity: 1
-
     - itemId: Elven Corewood
       quantity: 4
 
     - itemId: Demon Horn
-      quantity: 4
+      quantity: 2
 
     - itemId: Elven Purity Water
       quantity: 5
@@ -34,14 +31,11 @@
     - itemId: Crimson Ingot
       quantity: 2
 
-    - itemId: Gold Ingot
-      quantity: 1
-
     - itemId: Elven Corewood
       quantity: 4
 
     - itemId: Demon Horn
-      quantity: 3
+      quantity: 1
 
     - itemId: Elven Purity Water
       quantity: 4
@@ -60,9 +54,6 @@
   requirements:
     - itemId: Crimson Ingot
       quantity: 2
-
-    - itemId: Gold Ingot
-      quantity: 1
 
     - itemId: Elven Corewood
       quantity: 4
@@ -91,9 +82,6 @@
     - itemId: Crimson Ingot
       quantity: 4
 
-    - itemId: Gold Ingot
-      quantity: 1
-
     - itemId: Elven Corewood
       quantity: 4
 
@@ -117,9 +105,6 @@
   requirements:
     - itemId: Crimson Ingot
       quantity: 2
-
-    - itemId: Gold Ingot
-      quantity: 1
 
     - itemId: Elven Corewood
       quantity: 2
@@ -145,11 +130,8 @@
     - itemId: Crimson Ingot
       quantity: 6
 
-    - itemId: Gold Ingot
-      quantity: 3
-
     - itemId: Demon Horn
-      quantity: 4
+      quantity: 2
 
     - itemId: Elven Purity Water
       quantity: 8
@@ -169,11 +151,8 @@
     - itemId: Crimson Ingot
       quantity: 2
 
-    - itemId: Gold Ingot
-      quantity: 1
-
     - itemId: Demon Horn
-      quantity: 2
+      quantity: 1
 
     - itemId: Elven Purity Water
       quantity: 4

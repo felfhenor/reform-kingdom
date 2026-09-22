@@ -15,7 +15,10 @@ import type { ItemId, RecipeContent, TownContent, TownId } from '@interfaces';
 
 const townId = 'larsia' as TownId;
 const oreId = 'ore' as ItemId;
-const town = { id: townId } as unknown as TownContent;
+const town = {
+  id: townId,
+  crafting: { bannedRecipeIds: [] },
+} as unknown as TownContent;
 
 function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
   return {
@@ -90,5 +93,18 @@ describe('isRecipeCraftableByTown', () => {
     });
 
     expect(isRecipeCraftableByTown(recipe, town)).toBe(true);
+  });
+
+  it("is never craftable if the recipe is in the town's bannedRecipeIds, even with materials to spare", () => {
+    vi.mocked(townMaterialQuantity).mockReturnValue(999);
+    const recipeId = 'banned-recipe' as RecipeContent['id'];
+    const bannedTown = {
+      id: townId,
+      crafting: { bannedRecipeIds: [recipeId] },
+    } as unknown as TownContent;
+
+    expect(
+      isRecipeCraftableByTown(buildRecipe({ id: recipeId }), bannedTown),
+    ).toBe(false);
   });
 });

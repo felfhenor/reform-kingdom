@@ -2,6 +2,8 @@ import {
   TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT,
   TOWN_PRIORITY_WEIGHT_PER_FAILURE,
   TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE,
+  TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD,
+  TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { townMaterialQuantity } from '@helpers/town/town-materials';
@@ -10,7 +12,7 @@ import type {
   ItemId,
   RecipeContent,
   RecipeId,
-  TownId,
+  TownContent,
   TownItemPriorityMap,
   TownSpecialtyPriorityEntry,
 } from '@interfaces';
@@ -35,7 +37,13 @@ export function townItemPriorityMap(
   priority: TownSpecialtyPriorityEntry[],
 ): TownItemPriorityMap {
   const weightByItem: Partial<Record<ItemId, number>> = {};
-  const reservedByItem: Partial<Record<ItemId, { total: number; byRecipe: Partial<Record<RecipeId, number>> }>> = {};
+  const reservedByItem: Partial<
+    Record<
+      ItemId,
+      { total: number; byRecipe: Partial<Record<RecipeId, number>> }
+    >
+  > = {};
+  const heldByItem: Partial<Record<ItemId, RecipeId[]>> = {};
 
   activeEntries(priority).forEach((entry) => {
     const recipe = getEntry<RecipeContent>(entry.recipeId);
@@ -45,6 +53,7 @@ export function townItemPriorityMap(
       entry.failureCount,
       TOWN_PRIORITY_WEIGHT_PER_FAILURE,
     );
+    const isHeld = entry.failureCount > TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD;
 
     recipe.requirements.forEach((requirement) => {
       if (!('itemId' in requirement)) return;
@@ -61,10 +70,14 @@ export function townItemPriorityMap(
       bucket.total += requirement.quantity;
       bucket.byRecipe[recipe.id] =
         (bucket.byRecipe[recipe.id] ?? 0) + requirement.quantity;
+
+      if (isHeld) {
+        (heldByItem[requirement.itemId] ??= []).push(recipe.id);
+      }
     });
   });
 
-  return { weightByItem, reservedByItem };
+  return { weightByItem, reservedByItem, heldByItem };
 }
 
 export function townItemPriorityWeightFromMap(
@@ -109,11 +122,24 @@ export function townReservedMaterialQuantity(
 }
 
 // Blocks other recipes from spending a struggling specialty recipe's reserved materials, not the recipe itself.
+// Specialty recipes are exempt outright - excluding only self still counts every other active specialty entry as
+// reserved, so several sharing one material would otherwise deadlock each other needing the full combined pool.
 export function townRecipeRespectsReservationsFromMap(
   map: TownItemPriorityMap,
-  townId: TownId,
+  town: TownContent,
   recipe: RecipeContent,
 ): boolean {
+  // Own active entry (not just current uniqueRecipeIds) exempts too - a recipe dropped from the list mid-save must still never deadlock on itself.
+  const isSpecialty =
+    town.crafting.uniqueRecipeIds.includes(recipe.id) ||
+    recipe.requirements.some(
+      (requirement) =>
+        'itemId' in requirement &&
+        map.reservedByItem[requirement.itemId]?.byRecipe[recipe.id] !==
+          undefined,
+    );
+  if (isSpecialty) return true;
+
   return recipe.requirements.every((requirement) => {
     if (!('itemId' in requirement)) return true;
 
@@ -124,19 +150,50 @@ export function townRecipeRespectsReservationsFromMap(
     );
     if (reserved <= 0) return true;
 
-    const have = townMaterialQuantity(townId, requirement.itemId);
+    const have = townMaterialQuantity(town.id, requirement.itemId);
     return have - requirement.quantity >= reserved;
   });
 }
 
 export function townRecipeRespectsReservations(
   priority: TownSpecialtyPriorityEntry[],
-  townId: TownId,
+  town: TownContent,
   recipe: RecipeContent,
 ): boolean {
   return townRecipeRespectsReservationsFromMap(
     townItemPriorityMap(priority),
-    townId,
+    town,
+    recipe,
+  );
+}
+
+// Specialty recipes are always full weight; a deprioritized (not blocked) recipe can still occasionally win the pick.
+// Held-by is keyed to the holding entry, not current uniqueRecipeIds, so a recipe dropped mid-save can't deprioritize itself.
+export function townFailureHoldWeightFromMap(
+  map: TownItemPriorityMap,
+  town: TownContent,
+  recipe: RecipeContent,
+): number {
+  if (town.crafting.uniqueRecipeIds.includes(recipe.id)) return 1;
+
+  const heldByOther = recipe.requirements.some((requirement) => {
+    if (!('itemId' in requirement)) return false;
+
+    const holders = map.heldByItem[requirement.itemId];
+    return !!holders && holders.some((holderId) => holderId !== recipe.id);
+  });
+
+  return heldByOther ? TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY : 1;
+}
+
+export function townFailureHoldWeight(
+  priority: TownSpecialtyPriorityEntry[],
+  town: TownContent,
+  recipe: RecipeContent,
+): number {
+  return townFailureHoldWeightFromMap(
+    townItemPriorityMap(priority),
+    town,
     recipe,
   );
 }
@@ -162,7 +219,9 @@ export function townCommissionPriorityWeightFromMap(
 
   const itemWeights = offer.requirements
     .filter((requirement) => 'itemId' in requirement)
-    .map((requirement) => townItemPriorityWeightFromMap(map, requirement.itemId));
+    .map((requirement) =>
+      townItemPriorityWeightFromMap(map, requirement.itemId),
+    );
 
   return itemWeights.length === 0 ? 1 : Math.max(1, ...itemWeights);
 }

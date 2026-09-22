@@ -46,6 +46,8 @@ export type TownCraftingConfig = {
   tradeskillLevels: TownTradeskillLevelSeed[];
   // Never appears in the player's own tradeskill craft list - exclusively obtainable through this town.
   uniqueRecipeIds: RecipeId[];
+  // This town will never craft these recipes, even if otherwise eligible.
+  bannedRecipeIds: RecipeId[];
 };
 
 export type TownTradersConfig = {

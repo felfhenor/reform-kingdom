@@ -204,6 +204,11 @@ export const TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL = 1;
 export const TOWN_PRIORITY_WEIGHT_PER_FAILURE = 0.5;
 export const TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT = 20;
 
+// Past this many failures, a specialty recipe's materials are heavily deprioritized (not blocked) for everything but other specialty recipes.
+export const TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD = 100;
+// A deprioritized recipe is picked at roughly this fraction of its normal weight - still able to drain the pile, just rarely, so the struggling recipe gets first crack at its own materials without starving forever if it never succeeds.
+export const TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY = 0.1;
+
 // Uncapped - the dedicated specialty commission should keep escalating for as long as its recipe keeps failing.
 export const TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE = 1;
 

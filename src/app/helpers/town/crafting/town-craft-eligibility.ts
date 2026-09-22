@@ -20,7 +20,9 @@ function townHasRequirement(
   requirement: RecipeRequirement,
 ): boolean {
   if (!isTownSatisfiableRequirement(requirement)) return false;
-  return townMaterialQuantity(townId, requirement.itemId) >= requirement.quantity;
+  return (
+    townMaterialQuantity(townId, requirement.itemId) >= requirement.quantity
+  );
 }
 
 // Exported so callers (e.g. specialty-priority failure tracking) can tell "output capped" apart from "missing ingredients" -
@@ -39,6 +41,8 @@ export function isRecipeCraftableByTown(
   recipe: RecipeContent,
   town: TownContent,
 ): boolean {
+  if (town.crafting.bannedRecipeIds.includes(recipe.id)) return false;
+
   // TownStockEntry has no collectible variant to sell one as.
   if ('collectibleId' in recipe.result) return false;
 

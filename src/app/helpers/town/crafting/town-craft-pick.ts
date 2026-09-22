@@ -3,6 +3,7 @@ import { getEntriesByType } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
 import {
+  townFailureHoldWeightFromMap,
   townItemPriorityWeightFromMap,
   townItemPriorityMap,
   townRecipeRespectsReservationsFromMap,
@@ -33,7 +34,13 @@ function recipeWeight(
   const priorityMultiplier =
     itemWeights.length === 0 ? 1 : Math.max(1, ...itemWeights);
 
-  return specialtyMultiplier * priorityMultiplier;
+  const failureHoldMultiplier = townFailureHoldWeightFromMap(
+    priorityMap,
+    town,
+    recipe,
+  );
+
+  return specialtyMultiplier * priorityMultiplier * failureHoldMultiplier;
 }
 
 // Weighted pick over every eligible recipe across ALL tradeskills (one shared queue, not one pick per tradeskill) - favors the town's own specialty.
@@ -45,7 +52,7 @@ export function townPickRecipeToQueue(
   const eligible = getEntriesByType<RecipeContent>('recipe').filter(
     (recipe) =>
       isRecipeCraftableByTown(recipe, town) &&
-      townRecipeRespectsReservationsFromMap(priorityMap, town.id, recipe),
+      townRecipeRespectsReservationsFromMap(priorityMap, town, recipe),
   );
   if (eligible.length === 0) return undefined;
 

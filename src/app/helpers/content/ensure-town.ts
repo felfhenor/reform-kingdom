@@ -68,6 +68,7 @@ function ensureTownCrafting(
       ensureTownTradeskillLevelSeed,
     ),
     uniqueRecipeIds: crafting.uniqueRecipeIds ?? [],
+    bannedRecipeIds: crafting.bannedRecipeIds ?? [],
   };
 }
 

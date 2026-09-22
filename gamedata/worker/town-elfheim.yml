@@ -5,7 +5,7 @@
   frames: 4
 
   baseStats:
-    capacity: 10
+    capacity: 20
     gatherSpeed: 0.5
     stamina: 100
 
@@ -23,7 +23,7 @@
   frames: 4
 
   baseStats:
-    capacity: 10
+    capacity: 20
     gatherSpeed: 0.5
     stamina: 100
 

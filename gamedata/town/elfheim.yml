@@ -40,6 +40,11 @@
       value: 150
       sellAtQuantity: 125
 
+    - itemId: Elven Corewood
+      maxQuantity: 300
+      value: 45
+      sellAtQuantity: 200
+
     - itemId: Elfsilk
       maxQuantity: 300
       value: 45
@@ -119,6 +124,11 @@
       - 'Weapon: Ancestral Kukri'
       - 'Offhand: Ancestral Greatshield'
       - 'Weapon: Ancestral Whip'
+
+    bannedRecipeIds:
+      - 'Offhand: Elven Shield Copycat'
+      - 'Ammo: Elvenwood Arrow'
+      - 'Weapon: Elvenwood Whip'
 
   traders:
     sellItemCount:

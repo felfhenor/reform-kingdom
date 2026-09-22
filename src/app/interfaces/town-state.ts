@@ -61,6 +61,8 @@ export type TownItemPriorityMap = {
       { total: number; byRecipe: Partial<Record<RecipeId, number>> }
     >
   >;
+  // Items reserved past the failure threshold, keyed by holding recipe (not a flat flag) so a holder never deprioritizes itself.
+  heldByItem: Partial<Record<ItemId, RecipeId[]>>;
 };
 
 export type TownCommissionSlotId = Branded<string, 'TownCommissionSlotId'>;
