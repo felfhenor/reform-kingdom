@@ -296,6 +296,8 @@
             [class.bg-base-300]="editingClauseId() === clause.id"
             [class.outline-2]="isActiveClause"
             [class.outline-success]="isActiveClause"
+            (animate.enter)="onClauseEnter($event)"
+            (animate.leave)="onClauseLeave($event)"
           >
             <span cdkDragHandle class="cursor-move text-lighter">::</span>
 

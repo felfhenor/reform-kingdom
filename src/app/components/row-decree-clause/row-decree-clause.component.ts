@@ -3,8 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
+  ElementRef,
+  inject,
   input,
   output,
+  untracked,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -16,6 +20,7 @@ import { getMaterialQuantity } from '@helpers/item/materials';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type { DecreeClause, ItemContent, RewardContentInfo } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { AnimationService } from '@services/animation.service';
 
 const FAILURE_WARNING_THRESHOLD = 3;
 
@@ -43,11 +48,30 @@ const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   templateUrl: './row-decree-clause.component.html',
 })
 export class RowDecreeClauseComponent {
+  private anim = inject(AnimationService);
+  private el = inject(ElementRef<HTMLElement>);
+  private hasInitialized = false;
+
   public clause = input.required<DecreeClause>();
 
   public toggleEnabled = output<void>();
   public remove = output<void>();
   public edit = output<void>();
+
+  constructor() {
+    // Same clause id, new params - decreeClauseUpdate replaces the clause object in place,
+    // so this only fires on a real edit, not on the row's initial mount/add.
+    effect(() => {
+      this.clause();
+      untracked(() => {
+        if (!this.hasInitialized) {
+          this.hasInitialized = true;
+          return;
+        }
+        this.anim.pulse(this.el.nativeElement);
+      });
+    });
+  }
 
   public summary = computed(() => decreeClauseSummary(this.clause()));
   public isFailing = computed(

@@ -1,10 +1,12 @@
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { DecimalPipe } from '@angular/common';
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -61,6 +63,7 @@ import {
   NgSelectComponent,
 } from '@ng-select/ng-select';
 import { TippyDirective } from '@ngneat/helipopper';
+import { AnimationService } from '@services/animation.service';
 import { sortBy } from 'es-toolkit/compat';
 
 const CLAUSE_TYPE_OPTIONS: {
@@ -125,6 +128,8 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   templateUrl: './game-play-decree.component.html',
 })
 export class GamePlayDecreeComponent {
+  private anim = inject(AnimationService);
+
   public autoModeEnabled = computed(() => autoModeIsEnabled());
   public waitForFullHealthBeforeCombat = computed(() =>
     decreeWaitForFullHealthBeforeCombat(),
@@ -330,6 +335,17 @@ export class GamePlayDecreeComponent {
 
   public onDrop(event: CdkDragDrop<DecreeClause[]>): void {
     decreeClauseReorder(event.previousIndex, event.currentIndex);
+  }
+
+  public onClauseEnter(event: AnimationCallbackEvent): void {
+    this.anim.slideIn(event.target);
+  }
+
+  public onClauseLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 
   public startEditClause(clause: DecreeClause): void {

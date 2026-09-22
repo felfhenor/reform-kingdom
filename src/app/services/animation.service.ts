@@ -113,6 +113,17 @@ export class AnimationService {
     return anim;
   }
 
+  // Bounces `target` without touching opacity - unlike popIn (which fades in from 0),
+  // this is for drawing attention to an already-visible element that just changed.
+  pulse(target: Element): JSAnimation {
+    return animate(target as DOMTarget, {
+      scale: [
+        { to: 0.95, duration: 200, ease: 'outQuad' },
+        { to: 1, duration: 250, ease: 'outBack' },
+      ],
+    });
+  }
+
   // Confetti-style particle burst centered on `target`, plus a scale-pop on `target` itself.
   burst(target: Element): JSAnimation {
     const rect = target.getBoundingClientRect();
@@ -148,12 +159,7 @@ export class AnimationService {
       }).then(() => particle.remove());
     }
 
-    return animate(target as DOMTarget, {
-      scale: [
-        { to: 1.3, duration: 200, ease: 'outQuad' },
-        { to: 1, duration: 250, ease: 'outBack' },
-      ],
-    });
+    return this.pulse(target);
   }
 }
 
