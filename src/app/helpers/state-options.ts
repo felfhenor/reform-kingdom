@@ -30,7 +30,7 @@ export function defaultOptions(): GameOptions {
 
     mapZoom: 1,
 
-    partyViewAlwaysExpand: false,
+    partyViewAlwaysExpand: true,
     craftingViewAlwaysExpand: false,
   };
 }
