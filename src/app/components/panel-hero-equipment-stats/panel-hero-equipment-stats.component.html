@@ -4,7 +4,7 @@
 
 <div class="flex flex-col gap-2 min-h-0 flex-1 overflow-y-auto pr-2 mt-2">
   @for (stat of statKeys; track stat) {
-    @let value = character().stats[stat];
+    @let value = tweenedStatValue(stat);
 
     <div class="flex items-center gap-2">
       <app-icon-stat [stat]="stat" [tp]="statInformation[stat]" />
@@ -22,7 +22,7 @@
   }
 
   @for (stat of combatStatRows(); track stat) {
-    @let value = combatStats()[stat];
+    @let value = tweenedCombatStatValue(stat);
 
     <div class="flex items-center gap-2">
       <app-icon [name]="combatStatDimension.icon[stat]" size="stat" />
@@ -40,7 +40,7 @@
   }
 
   @for (stat of resistanceRows(); track stat) {
-    @let value = resistances()[stat];
+    @let value = tweenedResistanceValue(stat);
 
     <div class="flex items-center gap-2">
       <app-icon [name]="resistanceDimension.icon[stat]" size="stat" />

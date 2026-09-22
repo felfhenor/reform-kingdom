@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   input,
+  type Signal,
 } from '@angular/core';
 import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -15,11 +16,15 @@ import {
   StatOrder,
   StatShorthand,
   StatusEffectTagDimension,
+  type BaseStat,
   type Character,
+  type CombatStat,
   type StatDisplayDimension,
+  type StatusEffectTag,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
+import { injectTweenedNumber } from '@services/animation.service';
 
 @Component({
   selector: 'app-panel-hero-equipment-stats',
@@ -62,6 +67,41 @@ export class PanelHeroEquipmentStatsComponent {
   public combatStatRows = computed(() =>
     this.nonzeroRows(this.combatStatDimension, this.combatStats()),
   );
+
+  // Fixed key sets, so each stat's tween is created once here rather than per
+  // @for row - injectTweenedNumber needs a stable injection context to attach to.
+  private tweenedStats = Object.fromEntries(
+    StatOrder.map((stat) => [
+      stat,
+      injectTweenedNumber(() => this.character().stats[stat]),
+    ]),
+  ) as Record<BaseStat, Signal<number>>;
+
+  private tweenedCombatStats = Object.fromEntries(
+    CombatStatDimension.order.map((stat) => [
+      stat,
+      injectTweenedNumber(() => this.combatStats()[stat] ?? 0),
+    ]),
+  ) as Record<CombatStat, Signal<number>>;
+
+  private tweenedResistances = Object.fromEntries(
+    StatusEffectTagDimension.order.map((stat) => [
+      stat,
+      injectTweenedNumber(() => this.resistances()[stat] ?? 0),
+    ]),
+  ) as Record<StatusEffectTag, Signal<number>>;
+
+  public tweenedStatValue(stat: BaseStat): number {
+    return this.tweenedStats[stat]();
+  }
+
+  public tweenedCombatStatValue(stat: CombatStat): number {
+    return this.tweenedCombatStats[stat]();
+  }
+
+  public tweenedResistanceValue(stat: StatusEffectTag): number {
+    return this.tweenedResistances[stat]();
+  }
 
   public suffix(dimension: StatDisplayDimension, key: string): string {
     return (dimension.isPercent?.[key] ?? true) ? '%' : '';
