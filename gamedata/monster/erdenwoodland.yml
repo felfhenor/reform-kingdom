@@ -194,6 +194,13 @@
       bonusPerLevel: 5
       chance: 50
 
+    - itemId: Crimson Lucre
+      min: 10
+      max: 20
+      bonusPerLevel: 2
+      chance: 100
+      minLevel: 25
+
   skills:
     - skillId: Attack
       weight: 1

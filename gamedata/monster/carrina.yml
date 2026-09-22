@@ -738,12 +738,27 @@
       min: 1
       max: 2
       chance: 100
+      maxLevel: 24
+
+    - itemId: Elven Corewood
+      min: 1
+      max: 2
+      chance: 100
+      minLevel: 25
 
     - itemId: Gold Coin
       min: 50
       max: 65
       bonusPerLevel: 5
       chance: 75
+      maxLevel: 24
+
+    - itemId: Crimson Lucre
+      min: 10
+      max: 20
+      bonusPerLevel: 2
+      chance: 100
+      minLevel: 25
 
   skills:
     - skillId: Attack
@@ -796,12 +811,27 @@
       min: 1
       max: 2
       chance: 100
+      maxLevel: 24
+
+    - itemId: Elven Corewood
+      min: 1
+      max: 2
+      chance: 100
+      minLevel: 25
 
     - itemId: Gold Coin
       min: 25
       max: 35
       bonusPerLevel: 10
       chance: 50
+      maxLevel: 24
+
+    - itemId: Crimson Lucre
+      min: 10
+      max: 20
+      bonusPerLevel: 2
+      chance: 100
+      minLevel: 25
 
   skills:
     - skillId: Attack
@@ -857,12 +887,27 @@
       min: 1
       max: 2
       chance: 100
+      maxLevel: 24
+
+    - itemId: Elven Corewood
+      min: 1
+      max: 2
+      chance: 100
+      minLevel: 25
 
     - itemId: Gold Coin
       min: 25
       max: 35
       bonusPerLevel: 10
       chance: 50
+      maxLevel: 24
+
+    - itemId: Crimson Lucre
+      min: 10
+      max: 20
+      bonusPerLevel: 2
+      chance: 100
+      minLevel: 25
 
   skills:
     - skillId: Attack
