@@ -112,6 +112,49 @@ export class AnimationService {
     });
     return anim;
   }
+
+  // Confetti-style particle burst centered on `target`, plus a scale-pop on `target` itself.
+  burst(target: Element): JSAnimation {
+    const rect = target.getBoundingClientRect();
+    const originX = rect.left + rect.width / 2;
+    const originY = rect.top + rect.height / 2;
+    const colors = ['#fbbf24', '#34d399', '#60a5fa', '#f472b6', '#a78bfa'];
+    const particleCount = 14;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('span');
+      particle.style.position = 'fixed';
+      particle.style.left = `${originX}px`;
+      particle.style.top = `${originY}px`;
+      particle.style.width = '6px';
+      particle.style.height = '6px';
+      particle.style.borderRadius = i % 3 === 0 ? '9999px' : '2px';
+      particle.style.background = colors[i % colors.length];
+      particle.style.zIndex = '9999';
+      particle.style.pointerEvents = 'none';
+      document.body.appendChild(particle);
+
+      const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
+      const distance = 40 + Math.random() * 40;
+
+      animate(particle, {
+        translateX: [0, Math.cos(angle) * distance],
+        translateY: [0, Math.sin(angle) * distance],
+        rotate: [0, Math.random() * 360],
+        opacity: [1, 0],
+        scale: [1, 0.3],
+        duration: 700 + Math.random() * 300,
+        ease: 'outQuad',
+      }).then(() => particle.remove());
+    }
+
+    return animate(target as DOMTarget, {
+      scale: [
+        { to: 1.3, duration: 200, ease: 'outQuad' },
+        { to: 1, duration: 250, ease: 'outBack' },
+      ],
+    });
+  }
 }
 
 // Snaps to `source()` on first read, tweens to it on every change after, and cancels

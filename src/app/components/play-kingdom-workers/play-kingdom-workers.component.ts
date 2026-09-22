@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +13,7 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
+import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -20,6 +22,7 @@ import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
+import { goldCoinId } from '@helpers/item/materials';
 import { discoveredWorkersState, workersState } from '@helpers/state-game';
 import {
   workerIsReadyToLevelUp,
@@ -44,6 +47,7 @@ import {
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
+  CostItem,
   ItemContent,
   ItemId,
   RewardContentInfo,
@@ -59,6 +63,7 @@ import {
   NgSelectComponent,
 } from '@ng-select/ng-select';
 import { TippyDirective } from '@ngneat/helipopper';
+import { AnimationService } from '@services/animation.service';
 import { sortBy } from 'es-toolkit/compat';
 
 type WorkerEntry = {
@@ -102,11 +107,14 @@ type EntryStatusDisplay = {
     SlotIconBlankComponent,
     SFXDirective,
     TutorialTargetDirective,
+    RowCurrencyCostComponent,
   ],
   templateUrl: './play-kingdom-workers.component.html',
   styleUrl: './play-kingdom-workers.component.scss',
 })
 export class PlayKingdomWorkersComponent {
+  private anim = inject(AnimationService);
+
   public readonly workerMaxLevel = WORKER_MAX_LEVEL;
 
   public selectedWorkerId = signal<WorkerId | undefined>(undefined);
@@ -218,6 +226,13 @@ export class PlayKingdomWorkersComponent {
     return !!entry && workerIsReadyToLevelUp(entry.state);
   });
 
+  public levelUpCostDisplay = computed<CostItem[]>(() => [
+    {
+      itemId: goldCoinId(),
+      required: this.levelUpCost(),
+    },
+  ]);
+
   // Live status while traveling/gathering, else the stored assignment (`state.assignment` may
   // already point at a different, not-yet-started job even mid-trip).
   public currentAssignment = computed<WorkerAssignment | null>(() => {
@@ -325,9 +340,10 @@ export class PlayKingdomWorkersComponent {
     workerRecall(entry.id);
   }
 
-  public levelUp(): void {
+  public levelUp(event: MouseEvent): void {
     const entry = this.selectedEntry();
     if (!entry) return;
     workerLevelUp(entry.id);
+    this.anim.burst(event.currentTarget as HTMLElement);
   }
 }

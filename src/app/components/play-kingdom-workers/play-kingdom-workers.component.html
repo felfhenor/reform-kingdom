@@ -101,17 +101,13 @@
             <button
               class="btn btn-sm btn-accent w-fit"
               [disabled]="!canLevelUp()"
-              [tp]="
-                entry.state.level >= workerMaxLevel
-                  ? 'Already at max level'
-                  : 'Costs ' + (levelUpCost() | number) + ' gold'
-              "
-              (click)="levelUp()"
+              (click)="levelUp($event)"
               appSfx="ui-success"
               [sfxOffset]="0"
               [sfxTrigger]="['click', 'hover']"
             >
-              Level Up ({{ levelUpCost() | number }}g)
+              Level Up
+              <app-row-currency-cost [costs]="levelUpCostDisplay()" />
             </button>
           </div>
 
