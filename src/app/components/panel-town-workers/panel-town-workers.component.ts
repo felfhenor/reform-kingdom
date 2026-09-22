@@ -38,6 +38,6 @@ export class PanelTownWorkersComponent {
   public workerStatusDisplay(
     entry: TownWorkerRosterEntry,
   ): TownWorkerStatusDisplay {
-    return townWorkerStatusDisplay(this.town(), entry.status);
+    return townWorkerStatusDisplay(this.town(), entry.workerId, entry.status);
   }
 }

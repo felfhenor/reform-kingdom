@@ -1,5 +1,7 @@
 import { getEntry } from '@helpers/content/content';
+import { formatDuration } from '@helpers/engine/timer';
 import { worldTownsState } from '@helpers/state-game';
+import { townWorkerTravelRemainingTicks } from '@helpers/town/worker/town-worker-travel.ui';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   TownContent,
@@ -37,16 +39,19 @@ export function townWorkerRosterEntries(
 // A label plus the node the worker is currently at (or heading to/returning to).
 export function townWorkerStatusDisplay(
   town: TownContent,
+  workerId: WorkerId,
   status: TownWorkerStatus,
 ): TownWorkerStatusDisplay {
   const atTownEntry = worldNodeByName(town.name);
 
   switch (status.kind) {
-    case 'TravelingTo':
+    case 'TravelingTo': {
+      const remaining = townWorkerTravelRemainingTicks(town.id, workerId);
       return {
-        label: `Traveling to ${status.nodeName}`,
+        label: `Traveling to ${status.nodeName} (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`,
         locationEntry: worldNodeByName(status.nodeName),
       };
+    }
     case 'Gathering':
       return {
         label: `Gathering at ${status.nodeName}`,
@@ -54,8 +59,13 @@ export function townWorkerStatusDisplay(
       };
     case 'Resting':
       return { label: 'Resting', locationEntry: atTownEntry };
-    case 'TravelingBack':
-      return { label: 'Returning to town', locationEntry: atTownEntry };
+    case 'TravelingBack': {
+      const remaining = townWorkerTravelRemainingTicks(town.id, workerId);
+      return {
+        label: `Returning to town (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`,
+        locationEntry: atTownEntry,
+      };
+    }
     case 'AtTown':
       return { label: 'At Town', locationEntry: atTownEntry };
   }
