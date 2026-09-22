@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { FloatDeltaDirective } from '@directives/float-delta.directive';
 import { getEntry } from '@helpers/content/content';
 import type { ItemContent, ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -13,7 +14,12 @@ import { injectTweenedNumber } from '@services/animation.service';
 
 @Component({
   selector: 'app-currency-name',
-  imports: [DecimalPipe, AtlasImageComponent, TippyDirective],
+  imports: [
+    DecimalPipe,
+    AtlasImageComponent,
+    TippyDirective,
+    FloatDeltaDirective,
+  ],
   host: {
     class: 'inline-flex gap-2 align-baseline',
   },
@@ -29,8 +35,9 @@ import { injectTweenedNumber } from '@services/animation.service';
 
       @if (short()) {
         <span
-          class="inline-block text-right tabular-nums"
+          class="inline-block text-right tabular-nums relative"
           [style.min-width]="minWidth()"
+          [appFloatDelta]="amount()"
         >
           {{ displayAmount() | number: numberFormat() }}
         </span>

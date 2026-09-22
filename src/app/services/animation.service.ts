@@ -1,7 +1,9 @@
+import { formatNumber } from '@angular/common';
 import {
   effect,
   inject,
   Injectable,
+  LOCALE_ID,
   signal,
   untracked,
   type Signal,
@@ -12,6 +14,8 @@ import { animate, type DOMTarget, type JSAnimation } from 'animejs';
   providedIn: 'root',
 })
 export class AnimationService {
+  private locale = inject(LOCALE_ID);
+
   popIn(target: Element): JSAnimation {
     return animate(target as DOMTarget, {
       opacity: [0, 0.85],
@@ -50,6 +54,27 @@ export class AnimationService {
       ease: 'outQuad',
       onUpdate: () => onUpdate(target.value),
     });
+  }
+
+  // Spawns a temporary "+N"/"-N" span inside `container` that floats up and fades out, then removes itself.
+  floatDelta(container: Element, delta: number): JSAnimation {
+    const sign = delta > 0 ? '+' : '-';
+    const formatted = formatNumber(Math.abs(delta), this.locale, '1.0-0');
+    const colorClass = delta > 0 ? 'text-success' : 'text-error';
+
+    const span = document.createElement('span');
+    span.textContent = `${sign}${formatted}`;
+    span.className = `absolute left-1/2 -top-1 -translate-x-1/2 text-xs font-bold pointer-events-none whitespace-nowrap ${colorClass}`;
+    container.appendChild(span);
+
+    const anim = animate(span, {
+      opacity: [1, 0],
+      translateY: [0, -16],
+      duration: 900,
+      ease: 'outQuad',
+    });
+    anim.then(() => span.remove());
+    return anim;
   }
 }
 
