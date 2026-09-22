@@ -8,10 +8,26 @@ vi.mock('@helpers/town/town-resource-thresholds', () => ({
   townMaterialAtOrAboveThreshold: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/state-game', () => {
+  const gamestate = vi.fn();
+  return {
+    gamestate,
+    worldTownsState: () => gamestate().world.towns,
+  };
+});
+
+import { gamestate } from '@helpers/state-game';
 import { townMaterialQuantity } from '@helpers/town/town-materials';
 import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
-import type { ItemId, RecipeContent, TownContent, TownId } from '@interfaces';
+import type {
+  GameState,
+  ItemId,
+  RecipeContent,
+  TownContent,
+  TownId,
+  TownNodeState,
+} from '@interfaces';
 
 const townId = 'larsia' as TownId;
 const oreId = 'ore' as ItemId;
@@ -32,8 +48,19 @@ function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
   } as RecipeContent;
 }
 
+function mockTownState(overrides: Partial<TownNodeState> = {}): void {
+  vi.mocked(gamestate).mockReturnValue({
+    world: {
+      towns: {
+        [townId]: { stock: [], craftQueue: [], ...overrides },
+      },
+    },
+  } as unknown as GameState);
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
+  mockTownState();
 });
 
 describe('isRecipeCraftableByTown', () => {
@@ -106,5 +133,53 @@ describe('isRecipeCraftableByTown', () => {
     expect(
       isRecipeCraftableByTown(buildRecipe({ id: recipeId }), bannedTown),
     ).toBe(false);
+  });
+
+  it('is craftable when combined shop+queue copies of an equipment result are below the duplicate cap', () => {
+    vi.mocked(townMaterialQuantity).mockReturnValue(999);
+    mockTownState({
+      stock: [
+        { equipmentItem: { equipmentId: 'sword' }, addedAtTick: 0 },
+      ] as never,
+      craftQueue: [{ recipeId: 'other-recipe' }] as never,
+    });
+    const recipe = buildRecipe({
+      requirements: [],
+      result: { equipmentId: 'sword' as never },
+    });
+
+    expect(isRecipeCraftableByTown(recipe, town)).toBe(true);
+  });
+
+  it('is not craftable once combined shop+queue copies of an equipment result reach the duplicate cap', () => {
+    vi.mocked(townMaterialQuantity).mockReturnValue(999);
+    const recipe = buildRecipe({
+      id: 'sword-recipe' as RecipeContent['id'],
+      requirements: [],
+      result: { equipmentId: 'sword' as never },
+    });
+    mockTownState({
+      stock: [
+        { equipmentItem: { equipmentId: 'sword' }, addedAtTick: 0 },
+        { equipmentItem: { equipmentId: 'sword' }, addedAtTick: 0 },
+      ] as never,
+      craftQueue: [{ recipeId: recipe.id }] as never,
+    });
+
+    expect(isRecipeCraftableByTown(recipe, town)).toBe(false);
+  });
+
+  it('counts only the queue (not the shop) toward the duplicate cap for a material result', () => {
+    vi.mocked(townMaterialQuantity).mockReturnValue(999);
+    const recipe = buildRecipe({ id: 'ingot-recipe' as RecipeContent['id'] });
+    mockTownState({
+      craftQueue: [
+        { recipeId: recipe.id },
+        { recipeId: recipe.id },
+        { recipeId: recipe.id },
+      ] as never,
+    });
+
+    expect(isRecipeCraftableByTown(recipe, town)).toBe(false);
   });
 });

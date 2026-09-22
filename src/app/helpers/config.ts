@@ -209,6 +209,9 @@ export const TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD = 100;
 // A deprioritized recipe is picked at roughly this fraction of its normal weight - still able to drain the pile, just rarely, so the struggling recipe gets first crack at its own materials without starving forever if it never succeeds.
 export const TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY = 0.1;
 
+// A recipe stops being picked once this many combined copies of its result already sit in shop stock + the craft queue - keeps one recipe from flooding both.
+export const TOWN_RECIPE_OUTPUT_DUPLICATE_CAP = 3;
+
 // Uncapped - the dedicated specialty commission should keep escalating for as long as its recipe keeps failing.
 export const TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE = 1;
 

@@ -55,12 +55,13 @@ const townId = 'larsia' as TownId;
 const specialtyId = 'jewelcrafting' as TradeskillId;
 const ringRecipeId = 'ring-recipe' as RecipeId;
 
-function buildTown(): TownContent {
+function buildTown(bannedRecipeIds: RecipeId[] = []): TownContent {
   return {
     id: townId,
     crafting: {
       specialtyTradeskillId: specialtyId,
       uniqueRecipeIds: [ringRecipeId],
+      bannedRecipeIds,
     },
   } as unknown as TownContent;
 }
@@ -256,6 +257,18 @@ describe('townSpecialtyPriorityProcessTick', () => {
   it('does not increment while the recipe result is capped at its material threshold - more gathering cannot fix that', () => {
     vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
     vi.mocked(isRecipeResultAtOrAboveThreshold).mockReturnValue(true);
+
+    const result = applyTick(buildTarget());
+
+    expect(result.specialtyPriority).toEqual([]);
+  });
+
+  it('does not increment for a recipe banned by the town, even if also (contradictorily) one of its own specialties', () => {
+    const bannedTown = buildTown([ringRecipeId]);
+    vi.mocked(getEntriesByType).mockImplementation(
+      (type) => (type === 'town' ? [bannedTown] : []) as never,
+    );
+    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
 
     const result = applyTick(buildTarget());
 

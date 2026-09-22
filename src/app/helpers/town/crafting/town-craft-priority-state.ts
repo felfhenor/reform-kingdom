@@ -83,6 +83,7 @@ export function resetTownSpecialtyPriority(
 
 // Craftable-but-not-yet-picked is left alone - only an actual inability to craft counts as a failure.
 // A capped output isn't a shortage either - more gathering can never unblock it, so it must not accumulate failures.
+// Same for a banned recipe (content-author overlap with uniqueRecipeIds) - it can never succeed, so it must not either.
 function evaluateSpecialtyRecipe(
   state: GameState,
   town: TownContent,
@@ -91,6 +92,7 @@ function evaluateSpecialtyRecipe(
   const target = state.world.towns[town.id];
   if (isBeingCraftedOrForSale(target, recipe)) return;
   if (isRecipeResultAtOrAboveThreshold(recipe, town)) return;
+  if (town.crafting.bannedRecipeIds.includes(recipe.id)) return;
   if (isRecipeCraftableByTown(recipe, town)) return;
 
   target.specialtyPriority = upsertFailure(
