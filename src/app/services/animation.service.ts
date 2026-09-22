@@ -29,6 +29,15 @@ export class AnimationService {
     });
   }
 
+  slideIn(target: Element): JSAnimation {
+    return animate(target as DOMTarget, {
+      opacity: [0, 1],
+      translateY: [-8, 0],
+      duration: 220,
+      ease: 'outQuad',
+    });
+  }
+
   tweenNumber(
     from: number,
     to: number,
