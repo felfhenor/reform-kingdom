@@ -22,12 +22,12 @@
           class="btn btn-xs btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'kingdom'"
           tp="Kingdom [2]"
-          (click)="changeGamePlayView('kingdom')"
+          (click)="setKingdomPlayView()"
           appSfx="ui-click"
           [sfxOffset]="1"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'2'"
-          (hotkey)="hotkeyMatches($event, '2') && changeGamePlayView('kingdom')"
+          (hotkey)="hotkeyMatches($event, '2') && setKingdomPlayView()"
           isGlobal
           appTutorialTarget="nav-kingdom"
         >

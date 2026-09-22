@@ -27,6 +27,8 @@ import {
   closeAllMenus,
   gamePlayView,
   isWorldCameraPanned,
+  kingdomSubview,
+  kingdomSubviewClear,
   setGamePlayView,
   townOpen,
   worldCameraRecenter,
@@ -135,6 +137,14 @@ export class NavbarComponent {
 
   public changeGamePlayView(view: GamePlayView): void {
     setGamePlayView(view);
+  }
+
+  public setKingdomPlayView(): void {
+    if (gamePlayView() === 'kingdom' && kingdomSubview()) {
+      kingdomSubviewClear();
+    }
+
+    this.changeGamePlayView('kingdom');
   }
 
   public readonly panelConfigs: Array<{
