@@ -4,34 +4,34 @@
       <li class="flex gap-2 flex-row" appRequireSetup>
         <button
           class="btn btn-xs btn-info"
-          [class.btn-outline]="activeGamePlayView() !== 'kingdom'"
-          tp="Kingdom [1]"
-          (click)="changeGamePlayView('kingdom')"
-          appSfx="ui-click"
-          [sfxOffset]="1"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'1'"
-          (hotkey)="hotkeyMatches($event, '1') && changeGamePlayView('kingdom')"
-          isGlobal
-          appTutorialTarget="nav-kingdom"
-        >
-          Kingdom
-        </button>
-
-        <button
-          class="btn btn-xs btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'world'"
-          tp="World [2]"
+          tp="World [1]"
           (click)="changeGamePlayView('world')"
           appSfx="ui-click"
           [sfxOffset]="0"
           [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'2'"
-          (hotkey)="hotkeyMatches($event, '2') && changeGamePlayView('world')"
+          [hotkeys]="'1'"
+          (hotkey)="hotkeyMatches($event, '1') && changeGamePlayView('world')"
           isGlobal
           appTutorialTarget="nav-world"
         >
           World
+        </button>
+
+        <button
+          class="btn btn-xs btn-info"
+          [class.btn-outline]="activeGamePlayView() !== 'kingdom'"
+          tp="Kingdom [2]"
+          (click)="changeGamePlayView('kingdom')"
+          appSfx="ui-click"
+          [sfxOffset]="1"
+          [sfxTrigger]="['click', 'hover']"
+          [hotkeys]="'2'"
+          (hotkey)="hotkeyMatches($event, '2') && changeGamePlayView('kingdom')"
+          isGlobal
+          appTutorialTarget="nav-kingdom"
+        >
+          Kingdom
         </button>
 
         <button
