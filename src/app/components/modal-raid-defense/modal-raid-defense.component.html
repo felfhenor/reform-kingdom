@@ -17,7 +17,7 @@
           <div class="flex items-center justify-between gap-2">
             <span class="flex gap-2">
               <span class="font-semibold">{{ row.townName }}</span>
-              <span class="badge badge-sm badge-warning">
+              <span class="badge badge-sm badge-warning tabular-nums">
                 {{ row.remainingLabel }}
               </span>
             </span>
@@ -25,7 +25,11 @@
             @if (row.isPartyHere) {
               <span class="badge badge-sm badge-success">You are here</span>
             } @else if (row.travelEtaSeconds !== undefined) {
-              <button type="button" class="btn btn-xs btn-secondary" disabled>
+              <button
+                type="button"
+                class="btn btn-xs btn-secondary tabular-nums"
+                disabled
+              >
                 {{ etaLabel(row.travelEtaSeconds) }}
               </button>
             } @else {

@@ -10,14 +10,19 @@
       />
     </div>
     @if (!isExpanded) {
-      <span class="entry-timer">{{ formatDuration(data.remainingTicks) }}</span>
+      <span class="entry-timer tabular-nums">
+        {{ formatDuration(data.remainingTicks) }}
+      </span>
     }
   </div>
 
   @if (isExpanded) {
     <div class="entry-details">
       <span class="entry-subtitle text-lighter">
-        {{ formatDuration(data.remainingTicks) }} remaining
+        <span class="tabular-nums">
+          {{ formatDuration(data.remainingTicks) }}
+        </span>
+        remaining
       </span>
       <span class="entry-name truncate">{{ data.itemName }}</span>
     </div>

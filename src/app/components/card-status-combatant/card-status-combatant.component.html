@@ -11,7 +11,7 @@
     <div class="damage-numbers">
       @for (num of damageNumbers; track num.event.id) {
         <span
-          class="damage-number"
+          class="damage-number tabular-nums"
           [class.heal]="num.event.amount > 0"
           [class.damage]="num.event.amount < 0"
           [style.left.%]="xOffsetPercent(num.xOffsetSeed)"
@@ -36,7 +36,9 @@
         <span class="entry-name">{{ data.name }}</span>
         @if (data.subtitleLabel) {
           <span class="entry-subtitle text-lighter">
-            Lv. {{ data.subtitleLevel | number }} {{ data.subtitleLabel }}
+            Lv.
+            <span class="tabular-nums">{{ data.subtitleLevel | number }}</span>
+            {{ data.subtitleLabel }}
           </span>
         }
 
@@ -69,7 +71,7 @@
       >
         <div class="bar-inner" [style.width.%]="bar.percent"></div>
         @if (isExpanded) {
-          <span class="bar-label">
+          <span class="bar-label tabular-nums">
             {{ bar.current | number }} / {{ bar.max | number }}
             {{ bar.variant | uppercase }}
           </span>

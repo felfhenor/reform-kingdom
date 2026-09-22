@@ -74,7 +74,11 @@
       <div class="flex gap-2">
         @if (!isInLocationModal() && !r.isPartyHere) {
           @if (r.travelEtaSeconds !== undefined) {
-            <button type="button" class="btn btn-xs btn-secondary" disabled>
+            <button
+              type="button"
+              class="btn btn-xs btn-secondary tabular-nums"
+              disabled
+            >
               {{ etaLabel(r.travelEtaSeconds) }}
             </button>
           } @else {

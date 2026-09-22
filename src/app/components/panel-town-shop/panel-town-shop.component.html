@@ -4,7 +4,7 @@
   <h2 class="card-title text-base justify-between shrink-0">
     Shop
     <span class="flex items-center gap-2">
-      <span class="badge badge-sm badge-info">
+      <span class="badge badge-sm badge-info tabular-nums">
         {{ shopStockRows.length | number }} / {{ stockCap() | number }}
       </span>
 
@@ -52,7 +52,7 @@
                   [spritesheet]="item.spritesheet"
                 >
                   @if (row.expiresIn) {
-                    <span text-banner-top>
+                    <span text-banner-top class="tabular-nums">
                       {{ row.expiresIn }}
                     </span>
                   }

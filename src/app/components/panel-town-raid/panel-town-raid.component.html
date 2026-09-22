@@ -2,7 +2,9 @@
   <h2 class="card-title text-base justify-between">
     Raid
     @if (raidCountdown(); as countdown) {
-      <span class="badge badge-sm badge-warning">{{ countdown }}</span>
+      <span class="badge badge-sm badge-warning tabular-nums">
+        {{ countdown }}
+      </span>
     }
   </h2>
 

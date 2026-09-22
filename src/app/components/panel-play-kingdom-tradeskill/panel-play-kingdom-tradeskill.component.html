@@ -61,7 +61,7 @@
           [style.width.%]="xpPercent()"
         ></div>
         <div
-          class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black"
+          class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black tabular-nums"
         >
           {{ buildingData.xp.current | number }} /
           {{ buildingData.xp.maximum | number }} XP
@@ -83,11 +83,11 @@
                 [entry]="q.resultContent"
                 [spritesheet]="q.resultSpritesheet"
               >
-                <span text-banner-top>
+                <span text-banner-top class="tabular-nums">
                   {{ q.remaining }}
                 </span>
 
-                <span text-banner-bottom>
+                <span text-banner-bottom class="tabular-nums">
                   {{ q.entry.quantityCompleted }}/{{ q.entry.quantityTotal }}
                 </span>
               </app-slot-rarity-outline>
@@ -216,7 +216,7 @@
             </span>
 
             <span
-              class="text-xs text-lighter lg:w-20 lg:shrink-0 lg:text-center"
+              class="text-xs text-lighter lg:w-20 lg:shrink-0 lg:text-center tabular-nums"
             >
               {{ formatDuration(entry.recipe.craftTime * quantity) }}
             </span>

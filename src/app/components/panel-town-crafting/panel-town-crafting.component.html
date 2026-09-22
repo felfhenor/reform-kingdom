@@ -25,7 +25,7 @@
             </span>
           }
           <span
-            class="absolute bottom-0 inset-x-0 text-center text-xs text-shadow-black"
+            class="absolute bottom-0 inset-x-0 text-center text-xs text-shadow-black tabular-nums"
           >
             Lv {{ row.level | number }}
           </span>
@@ -39,7 +39,7 @@
   <div class="card-body p-3 gap-2">
     <h2 class="card-title text-base justify-between">
       Crafting Queue
-      <span class="badge badge-sm badge-info">
+      <span class="badge badge-sm badge-info tabular-nums">
         {{ craftQueueRows().length | number }} /
         {{ craftQueueSlots().length | number }}
       </span>
@@ -60,7 +60,7 @@
               [entry]="item"
               [spritesheet]="item.spritesheet"
             >
-              <span text-banner-top>
+              <span text-banner-top class="tabular-nums">
                 {{ row.remaining }}
               </span>
             </app-slot-rarity-outline>
