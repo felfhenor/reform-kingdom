@@ -18,6 +18,7 @@ vi.mock('@helpers/crafting/recipes', () => ({
 }));
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { defaultStats } from '@helpers/defaults';
 import { worldPartyState } from '@helpers/state-game';
 import {
   itemPreviewDisplay,
@@ -103,8 +104,10 @@ describe('itemPreviewDisplay', () => {
       sprite: '0002',
       rarity: 'Uncommon',
       levelRequirement: 1,
-      baseStats: {},
+      baseStats: defaultStats(),
       type: 'Trinket',
+      slots: 1,
+      grantedSkillIds: [],
       gatherYieldBonuses: [{ tradeskillId: 'woodworking' as never, value: 1 }],
     } as EquipmentContent;
     vi.mocked(getEntry).mockImplementation((id: unknown) =>

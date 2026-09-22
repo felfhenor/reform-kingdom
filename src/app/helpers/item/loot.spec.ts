@@ -45,6 +45,7 @@ import type {
   CollectibleId,
   DroppedReward,
   EquipmentId,
+  EquipmentItemId,
   GameState,
   GlobalEffectSums,
   ItemId,
@@ -399,7 +400,7 @@ describe('Loot Helper Functions', () => {
     it('still admits an equipment drop past the strict 50-item cap, up to the 125% overflow allowance', () => {
       const state = fakeState();
       state.armory = Array.from({ length: 55 }, () => ({
-        id: 'existing-item',
+        id: 'existing-item' as EquipmentItemId,
         equipmentId: 'shield' as EquipmentId,
         infusedItemIds: [],
         affixIds: [],
@@ -414,7 +415,7 @@ describe('Loot Helper Functions', () => {
     it('rejects an equipment drop once the 125% overflow allowance is exhausted', () => {
       const state = fakeState();
       state.armory = Array.from({ length: 62 }, () => ({
-        id: 'existing-item',
+        id: 'existing-item' as EquipmentItemId,
         equipmentId: 'shield' as EquipmentId,
         infusedItemIds: [],
         affixIds: [],

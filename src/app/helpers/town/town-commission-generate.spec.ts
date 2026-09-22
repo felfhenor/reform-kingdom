@@ -90,6 +90,7 @@ function buildTown(commissions: CommissionOfferSlot[]): TownContent {
     invisibleUntilCollectibleIdsFound: [],
     scaleType: 'City',
     level: 25,
+    materialThresholds: [],
     crafting: {} as never,
     traders: {} as never,
     gathering: {} as never,

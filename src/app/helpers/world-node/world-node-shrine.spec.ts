@@ -215,7 +215,16 @@ describe('pruneInvalidShrineLevels', () => {
   it('clamps a stored level down to the current authored max achievable level', () => {
     const result = pruneInvalidShrineLevels(
       { "Founder's Shrine": { level: 5 } },
-      () => buildShrine({ levels: [{ costs: [] }] as ShrineLevel[] }),
+      () =>
+        buildShrine({
+          levels: [
+            {
+              costs: [],
+              globalEffectId: 'Wisdom of the Founder I' as GlobalEffectId,
+              globalEffectDuration: 1800,
+            },
+          ],
+        }),
     );
 
     expect(result).toEqual({ "Founder's Shrine": { level: 1 } });

@@ -108,9 +108,9 @@ describe('armoryAddLootDrop', () => {
   });
 
   function runWith(state: GameState): void {
-    vi.mocked(updateGamestate).mockImplementation(async (fn) =>
-      fn(state as GameState),
-    );
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state as GameState);
+    });
   }
 
   it('reports NoRoom without touching gold when a kept drop has no space', () => {
