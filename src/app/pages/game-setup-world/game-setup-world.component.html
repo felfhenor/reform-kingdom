@@ -48,18 +48,6 @@
                   ></ng-select>
                 </div>
 
-                @if (jobData) {
-                  <div class="my-2">
-                    <app-row-item-stats
-                      [containerClasses]="['grid', 'grid-cols-5', 'gap-2']"
-                      [stats]="jobData.baseStats"
-                      layout="row"
-                      [maxDecimals]="0"
-                      [showSign]="false"
-                    />
-                  </div>
-                }
-
                 <div class="text-sm text-lighter">
                   {{ jobData?.description }}
                 </div>

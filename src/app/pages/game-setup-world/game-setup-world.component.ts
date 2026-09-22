@@ -11,7 +11,6 @@ import {
 } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -74,7 +73,6 @@ const heroPickSchema = schema<HeroPick>((hero) => {
     SweetAlert2Module,
     SFXDirective,
     IconJobComponent,
-    RowItemStatsComponent,
     NgSelectComponent,
     FormField,
   ],
