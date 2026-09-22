@@ -70,6 +70,9 @@
       value: 350
       sellAtQuantity: 30
 
+    - itemId: Elven Purity Water
+      maxQuantity: 50
+
   crafting:
     maxQueueSize:
       - tier: 0
@@ -303,4 +306,7 @@
           weight: 3
 
         - commissionOfferId: Commission - Spindles of Thread
+          weight: 3
+
+        - commissionOfferId: Commission - Vials of Purity Water
           weight: 3

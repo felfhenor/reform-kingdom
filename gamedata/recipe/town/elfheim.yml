@@ -16,6 +16,9 @@
     - itemId: Demon Horn
       quantity: 4
 
+    - itemId: Elven Purity Water
+      quantity: 5
+
   tradeskillId: Artificing
   minTradeskillLevel: 24
   maxTradeskillLevel: 24
@@ -39,6 +42,9 @@
 
     - itemId: Demon Horn
       quantity: 3
+
+    - itemId: Elven Purity Water
+      quantity: 4
 
   tradeskillId: Artificing
   minTradeskillLevel: 24
@@ -67,6 +73,9 @@
     - itemId: Demon Horn
       quantity: 2
 
+    - itemId: Elven Purity Water
+      quantity: 8
+
   tradeskillId: Woodworking
   minTradeskillLevel: 24
   maxTradeskillLevel: 24
@@ -90,6 +99,9 @@
 
     - itemId: Demon Horn
       quantity: 2
+
+    - itemId: Elven Purity Water
+      quantity: 5
 
   tradeskillId: Woodworking
   minTradeskillLevel: 24
@@ -115,6 +127,9 @@
     - itemId: Demon Horn
       quantity: 1
 
+    - itemId: Elven Purity Water
+      quantity: 3
+
   tradeskillId: Blacksmithing
   minTradeskillLevel: 24
   maxTradeskillLevel: 24
@@ -136,6 +151,9 @@
     - itemId: Demon Horn
       quantity: 4
 
+    - itemId: Elven Purity Water
+      quantity: 8
+
   tradeskillId: Blacksmithing
   minTradeskillLevel: 24
   maxTradeskillLevel: 24
@@ -156,6 +174,9 @@
 
     - itemId: Demon Horn
       quantity: 2
+
+    - itemId: Elven Purity Water
+      quantity: 4
 
   tradeskillId: Artificing
   minTradeskillLevel: 24

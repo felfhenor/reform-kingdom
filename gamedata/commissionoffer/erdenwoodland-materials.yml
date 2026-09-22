@@ -127,3 +127,20 @@
       max: 1
 
   townReputationReward: 15
+
+- id: 304ede44-77d9-43bd-856d-316e6d7d5abb
+  name: Commission - Vials of Purity Water
+  description: The trader needs to restock their purity water for Ancestral gear crafting.
+
+  requirements:
+    - itemId: Elven Purity Water
+      quantityMin: 25
+      quantityMax: 50
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 20

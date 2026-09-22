@@ -99,6 +99,12 @@
 
   trades:
     - type: sell
+      value: 100
+      itemId: Elven Purity Water
+      limit: 50
+      weight: 5
+
+    - type: sell
       value: 1000
       itemId: Wooden Scales
       limit: 5
@@ -169,6 +175,12 @@
       tokenCost: 3
 
   trades:
+    - type: sell
+      value: 100
+      itemId: Elven Purity Water
+      limit: 50
+      weight: 5
+
     - type: sell
       value: 60000
       equipmentId: Demongold Plate
