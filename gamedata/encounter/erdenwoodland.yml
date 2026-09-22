@@ -106,6 +106,9 @@
     - collectibleId: Outlaw Flag
       chance: 25
 
+    - recipeId: 'Material: Crimson Lucre Forgery'
+      chance: 5
+
 - id: 550e4813-163d-47a9-8467-1af243008eb8
   name: Demon's Den
   description: A twisted place of darkness, this cave is primarily inhabited by demons and the elves they corrupted.

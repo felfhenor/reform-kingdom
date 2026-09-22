@@ -17,6 +17,25 @@
   tradeskillXP: 10
   craftTime: 10
 
+- id: 9be164ae-9119-467d-926e-3e90806a4b8d
+  name: 'Material: Crimson Lucre Forgery'
+  result:
+    itemId: Crimson Lucre
+    quantity: 1000
+
+  requirements:
+    - itemId: Crimson Ingot
+      quantity: 5
+
+    - itemId: Gold Coin
+      quantity: 1000
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 5
+  craftTime: 20
+
 - id: 9497cf19-5d89-4c26-a3ef-605b3c0e111d
   name: 'Weapon: Crimson Staff'
   result:
