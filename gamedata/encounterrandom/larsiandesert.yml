@@ -40,3 +40,6 @@
 
     - itemId: Star Fragment
       chance: 100
+
+    - workerId: Selan Rose
+      chance: 100

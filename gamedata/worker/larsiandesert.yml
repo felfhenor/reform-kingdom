@@ -1,0 +1,15 @@
+- id: 5786e080-fd9e-4967-bb16-d386b522d6f9
+  name: Selan Rose
+  description: A traveler at heart with impossibly high stamina, but very slow movements.
+  sprite: '0008'
+  frames: 4
+
+  baseStats:
+    capacity: 3
+    gatherSpeed: 0.5
+    stamina: 130
+
+  statsPerLevel:
+    capacity: 1.2
+    gatherSpeed: 0.1
+    stamina: 3.5
