@@ -1,8 +1,13 @@
 - id: 4d85742d-d12c-49f0-8004-a10a1df4459b
   name: Woodwolf Skull
-  rarity: Common
+  rarity: Uncommon
   description: A woodwolf skull picked clean by woodland inhabitants.
   sprite: '0050'
+
+  effects:
+    - effectType: GainStats
+      stat: Strength
+      value: 1
 
 - id: f47373db-bab4-4667-b05c-2d9c7e3f0c79
   name: Demon Supply Pouch
@@ -34,9 +39,13 @@
 
 - id: fd1cdfb2-393f-4a24-a90c-10a343af0b1a
   name: Ritual Crown
-  rarity: Common
+  rarity: Uncommon
   description: A crown worn by elves conducting rituals in sacred or demonic places.
   sprite: '0053'
+
+  effects:
+    - effectType: GlobalDecreeClauseCapBoost
+      value: 1
 
 - id: 8ac6b409-bf7a-452f-8f25-06c32edb82bc
   name: Griffin Feather
