@@ -17,7 +17,7 @@
   levelRequirement: 35
   rarity: Rare
   type: Whip
-  sprite: '0206'
+  sprite: '0205'
   slots: 2
   baseStats:
     Strength: 27.2

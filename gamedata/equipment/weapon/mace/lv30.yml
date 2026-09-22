@@ -24,7 +24,7 @@
   levelRequirement: 35
   rarity: Rare
   type: Mace
-  sprite: '0202'
+  sprite: '0203'
   slots: 2
   baseStats:
     Intelligence: 23.1
