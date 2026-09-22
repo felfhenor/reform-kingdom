@@ -1,4 +1,58 @@
 
+# [0.8.0](https://github.com/felfhenor/reform-kingdom/compare/v0.7.0...v0.8.0) (2026-09-22)
+
+
+### Bug Fixes
+
+* **bestiary:** allow all ranges of all nodes to be selected ([a7dea2e](https://github.com/felfhenor/reform-kingdom/commit/a7dea2e9e435e65c05d658fbe7a0ff8e15e0ca55))
+* **core:** better error handling for gameloop ([524d255](https://github.com/felfhenor/reform-kingdom/commit/524d2553d2d5e9d26ae264fa0e8da6ac48348f5a))
+* **core:** load sound as part of the loading process, rather than later, randomly ([710fa09](https://github.com/felfhenor/reform-kingdom/commit/710fa09a6d76a212856e701e49eef68a4a18fe3c))
+* **core:** reset ui state when resetting game ([481d723](https://github.com/felfhenor/reform-kingdom/commit/481d723bda212bc442d8822d4069cea9cb0771a7))
+* **kingdom:** kingdom can only set home if you're there ([b0813d2](https://github.com/felfhenor/reform-kingdom/commit/b0813d24bf70731bcb80e289a07e14e9eccb4bcf))
+* **perf:** make maps load all at once instead of one at a time ([83c1a31](https://github.com/felfhenor/reform-kingdom/commit/83c1a3140ebe37970d3d7c0ae185cc02f4419152))
+* **recipe:** actually block town recipes from being obtainable ([b392842](https://github.com/felfhenor/reform-kingdom/commit/b392842c55039e4f28a7eda8e15432a1cd808c8f))
+* **recipe:** recipe drops won't happen unless you can use the recipe ([1ae8c3f](https://github.com/felfhenor/reform-kingdom/commit/1ae8c3fea1bfb6291c23a2154f7eeb2d761c3890))
+* **setup:** stat display in world setup looks good again ([6b1eff0](https://github.com/felfhenor/reform-kingdom/commit/6b1eff0c2aecbecef1ed0c5456793a90795be6a5))
+* **simulator:** sim works again ([5ec4782](https://github.com/felfhenor/reform-kingdom/commit/5ec4782d3dbbfe1d9f5d92e074e0d937d3344fde))
+* **town:** button resizing should not jitter the ui ([0466aca](https://github.com/felfhenor/reform-kingdom/commit/0466aca9910b42bb8e5b0b91a1dda694eeb2079b))
+* **town:** limit output of a similar equipment item so it can't flood the same item out ([fa49e14](https://github.com/felfhenor/reform-kingdom/commit/fa49e14623c58680720d0517a34e1307b26c7736))
+* **ui:** swap kingdom/world in navbar ([77f1cf4](https://github.com/felfhenor/reform-kingdom/commit/77f1cf4a4300f4b9517df81d4b84e5331bca77d8))
+* **validation:** condense validation scripts into one rather than having a dozen ([ef85ab2](https://github.com/felfhenor/reform-kingdom/commit/ef85ab2ff6b033cd1e2a0dac61bacd8284bfe4be))
+
+
+### Features
+
+* **affix:** affixes can now limit themselves by item level ([e6578c5](https://github.com/felfhenor/reform-kingdom/commit/e6578c53b66af2a2c7b9a4f527f69b4e97b044c4))
+* **analysis:** add skill analysis script, make sure all content passes it ([1b6d666](https://github.com/felfhenor/reform-kingdom/commit/1b6d666ec6965e4229d6b5fb17bf0728639badf5))
+* **crafting:** queuing an item will add it to an existing entry or split, if possible ([afee2f7](https://github.com/felfhenor/reform-kingdom/commit/afee2f700858076f2158db2cfae9ab29f6552e59))
+* **debug:** reorganize debug output to make content gaps easier to sort through ([c7f4189](https://github.com/felfhenor/reform-kingdom/commit/c7f418903a7ec7f20f2f0117917928ebeb5332af))
+* **decree:** add help info for level up party clause ([abd38a4](https://github.com/felfhenor/reform-kingdom/commit/abd38a40d44097b0774e6d476e21a1fbe7646bf5))
+* **hero:** better use of space for equipment ([dfb8390](https://github.com/felfhenor/reform-kingdom/commit/dfb839087147d74d8d3ccf46decec4f21371f986))
+* **home:** add a nicer home screen ([d1ada3e](https://github.com/felfhenor/reform-kingdom/commit/d1ada3e0940e191c31aefc3b717569247056933c))
+* **infusion:** add infusion animation ([11e60be](https://github.com/felfhenor/reform-kingdom/commit/11e60be976af57638d9060eabb6953dfb695a37c))
+* **infusion:** show # slots on infusion equipment ([80d3294](https://github.com/felfhenor/reform-kingdom/commit/80d329425527a9205687b72e27b6fab0a5c421bf))
+* **items:** affixes can now improve specific spells ([4ee08a0](https://github.com/felfhenor/reform-kingdom/commit/4ee08a0d9b82046e0172b3e204d2a04a583ff83e))
+* **monster:** support monsters having min/max levels on skills like they do with item drops ([b107b47](https://github.com/felfhenor/reform-kingdom/commit/b107b471b92d8a66ec4187a84ef35b743a6c02f2))
+* **navbar:** highlight town separately so it doesn't blend in with the rest of the nav entries ([31d6cc7](https://github.com/felfhenor/reform-kingdom/commit/31d6cc7ddef4d0fa38cfe951cb808bc721ff0238))
+* **npe:** expand heroes by default ([16737ed](https://github.com/felfhenor/reform-kingdom/commit/16737ed1ea258aa5d0a714d52130498da0648568))
+* **setup:** hide stats on new run screen ([3a66cb5](https://github.com/felfhenor/reform-kingdom/commit/3a66cb509115508da36ab17734bc079fcbe95296))
+* **setup:** more random hero names ([1adace5](https://github.com/felfhenor/reform-kingdom/commit/1adace5178ff1cb670c1ca3c876d912724eadc29))
+* **shrine:** add mobility of the explorer so it really works ([233f29b](https://github.com/felfhenor/reform-kingdom/commit/233f29b8581d6ce0bf6a65abde5841d912653a76))
+* **town:** show ETA for workers ([0eeb1e1](https://github.com/felfhenor/reform-kingdom/commit/0eeb1e1f782849410624a63e22aa00f280054a05))
+* **town:** towns will sell excess materials to the player ([303bbeb](https://github.com/felfhenor/reform-kingdom/commit/303bbeb6941fb033a6d313dc20e4658dae8ddbb5))
+* **tradeskill:** item recipes can now give >1 ([41178fd](https://github.com/felfhenor/reform-kingdom/commit/41178fdaf886940749b3c0d54ae5d55f2ea2b4bc))
+* **tradeskill:** tradeskill ui alphabetizes resources in crafting requirements ([3e61108](https://github.com/felfhenor/reform-kingdom/commit/3e6110862f7e19cc309c973129313527fb343388))
+* **ui:** add anime.js to remove some cumbersome animations ([42293f9](https://github.com/felfhenor/reform-kingdom/commit/42293f96dfb563930a384dd1c41cece5ae9e7633))
+* **ui:** add more animations for bars, etc ([37e48f9](https://github.com/felfhenor/reform-kingdom/commit/37e48f9abc3e81a5460623be4f9494adaf3f9813))
+* **ui:** add tutorial popups for simpler features/callouts ([0c221b1](https://github.com/felfhenor/reform-kingdom/commit/0c221b1e0e58c4070cb939b86ac3010ebaf5fc93))
+* **ui:** adventure log fades in chunks at a time ([379a0e7](https://github.com/felfhenor/reform-kingdom/commit/379a0e71bef81b42e7995bd27cd2e8416e31b67c))
+* **ui:** improve display of skills/techniques. fix some skill tagging. ([20029d3](https://github.com/felfhenor/reform-kingdom/commit/20029d338f7cb93ddd5ea33ddde6a525d50a3b77))
+* **ui:** improve hero equipment screen layout/consistency ([17c36cd](https://github.com/felfhenor/reform-kingdom/commit/17c36cd9e15b45d6b5eb0c5e62542ba82919df45))
+* **ui:** kingdom button/hotkey will go back to main kingdom page if it's the active subview ([e4def01](https://github.com/felfhenor/reform-kingdom/commit/e4def014b31ca9cbfadaeb0a27cef8928f2a4d77))
+* **ui:** make more areas tabular-nums so they don't jitter as much ([3991f40](https://github.com/felfhenor/reform-kingdom/commit/3991f40fe6327bfc1b5d6b7b79f93bc2a3d91ff4))
+* **ui:** show currency gains with a floating number ([c9d41e2](https://github.com/felfhenor/reform-kingdom/commit/c9d41e2e919bd8ce8507f20b8b6319141680baaf))
+* **worker:** show level up icon on the worker card ([780b674](https://github.com/felfhenor/reform-kingdom/commit/780b674447abc5d0ec933513e214a494bf8894f2))
+
 # [0.7.0](https://github.com/felfhenor/reform-kingdom/compare/v0.6.2...v0.7.0) (2026-09-15)
 
 
