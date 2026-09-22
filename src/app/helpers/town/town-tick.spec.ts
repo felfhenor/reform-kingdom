@@ -67,6 +67,7 @@ const town: TownContent = {
     craftingChanceItemThreshold: 4,
     tradeskillLevels: [],
     uniqueRecipeIds: [],
+    bannedRecipeIds: [],
   },
   traders: {
     sellItemCount: [{ tier: 0, value: 10 }],

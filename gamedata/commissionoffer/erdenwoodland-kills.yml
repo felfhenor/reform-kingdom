@@ -24,13 +24,9 @@
   description: The trader wants to slow down the demonic rituals that take place across the woodland.
 
   requirements:
-    - monsterId: Elf Ritualist
-      quantityMin: 5
-      quantityMax: 10
-
     - monsterId: Lesser Fel Demon
-      quantityMin: 5
-      quantityMax: 10
+      quantityMin: 10
+      quantityMax: 20
 
   rewards:
     - itemId: Trader Scrip

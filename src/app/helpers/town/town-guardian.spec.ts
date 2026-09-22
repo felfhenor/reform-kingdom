@@ -43,6 +43,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
       craftingChanceItemThreshold: 1,
       tradeskillLevels: [],
       uniqueRecipeIds: [],
+      bannedRecipeIds: [],
     },
     traders: {
       sellItemCount: [{ tier: 0, value: 0 }],
