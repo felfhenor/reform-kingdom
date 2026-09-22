@@ -70,7 +70,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
   templateUrl: './play-kingdom-home.component.html',
 })
 export class PlayKingdomHomeComponent {
-  public canReclass = computed(() => isPlayerAtKingdom());
+  public isAtKingdomCurrently = computed(() => isPlayerAtKingdom());
 
   public materialCount = computed(() => Object.keys(materialsState()).length);
 
@@ -204,7 +204,7 @@ export class PlayKingdomHomeComponent {
   }
 
   public openReclassModal(): void {
-    if (!this.canReclass()) return;
+    if (!this.isAtKingdomCurrently()) return;
     modalOpen('reclass-heroes');
   }
 
