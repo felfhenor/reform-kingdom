@@ -1,0 +1,35 @@
+- id: f20e84a3-a33e-443d-abe4-f34a2a020ac1
+  name: Elfheim Merchants - Erden Woodland
+  description: The Erden Woodland branch of the Elfheim Merchants Caravan. They rarely extend trade with others, so their high quality goods are often kept to themselves.
+
+  traderResetTime: 3600
+
+  level:
+    min: 20
+    max: 35
+
+  markupPercentages:
+    sell: 100
+    buy: -10
+
+  traderCategories:
+    - Elfheim
+
+  commissionOffers:
+    - commissionOfferId: Commission - Batch of Raw Metals
+      weight: 1
+
+    - commissionOfferId: Commission - Batch of Refined Metals
+      weight: 1
+
+    - commissionOfferId: Commission - Animal Product Supplies
+      weight: 1
+
+    - commissionOfferId: Commission - Demon Proof
+      weight: 2
+
+    - commissionOfferId: Commission - Batch of Crimson Materials
+      weight: 1
+
+    - commissionOfferId: Commission - Spindles of Thread
+      weight: 1

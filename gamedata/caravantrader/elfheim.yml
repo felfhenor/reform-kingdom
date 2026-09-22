@@ -86,3 +86,115 @@
       equipmentId: Elven Aiming Artifact
       limit: 2
       weight: 3
+
+- id: d35a7b17-177f-47dd-bf7a-7a957187827c
+  name: Audrey Hall
+  description: Hello, humans. I have some wonderful things for sale that my father found for me. Please buy them so I can support my father's mercantile activites!
+  category: Elfheim
+  level: 25
+
+  tokenTrades:
+    - collectibleId: Sister Figurine
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 1000
+      itemId: Wooden Scales
+      limit: 5
+      weight: 3
+
+    - type: sell
+      value: 1200
+      itemId: Woodwolf Teeth
+      limit: 5
+      weight: 3
+
+    - type: sell
+      value: 1500
+      itemId: Demon-slaying Nail
+      limit: 5
+      weight: 3
+
+    - type: sell
+      value: 500
+      itemId: Bat Wing
+      limit: 10
+      weight: 1
+
+    - type: sell
+      value: 500
+      itemId: Wolf Pelt
+      limit: 10
+      weight: 1
+
+    - type: sell
+      value: 500
+      itemId: Hawk Feather
+      limit: 10
+      weight: 1
+
+    - type: sell
+      value: 100
+      itemId: Strong Spider Silk
+      limit: 50
+      weight: 1
+
+    - type: buy
+      value: 300
+      itemId: Elfsilk
+      limit: 50
+      weight: 1
+
+    - type: buy
+      value: 250
+      itemId: Elven Corewood
+      limit: 50
+      weight: 1
+
+    - type: buy
+      value: 350
+      itemId: Crimson Ingot
+      limit: 50
+      weight: 1
+
+- id: 350a54ab-6087-49d1-ab35-0ae3abbdebae
+  name: Alger Hall
+  description: Hello, humans. I have some wonderful things for sale that I found on the side of the road. Please buy them so I can support my father's mercantile activites!
+  category: Elfheim
+  level: 30
+
+  tokenTrades:
+    - collectibleId: Brother Figurine
+      tokenCost: 3
+
+  trades:
+    - type: sell
+      value: 60000
+      equipmentId: Demongold Cleaver
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 55000
+      equipmentId: Demongold Gauntlets
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 50000
+      equipmentId: Demongold Plate
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 45000
+      equipmentId: Demongold Cleaver
+      limit: 1
+      weight: 1
+
+    - type: sell
+      value: 40000
+      equipmentId: Demongold Defender
+      limit: 1
+      weight: 1

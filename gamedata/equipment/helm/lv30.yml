@@ -9,3 +9,14 @@
   baseStats:
     Health: 70
     Vitality: 15.7
+
+- id: 376e6137-dbd5-4c7b-a31c-cf7631673b47
+  name: Demongold Protector
+  description: A helmet emitting demonic and crimson energies. It seems to be made of corrupted crimson.
+  levelRequirement: 35
+  rarity: Rare
+  type: Helm
+  sprite: '0200'
+  slots: 2
+  baseStats:
+    Vitality: 26.9

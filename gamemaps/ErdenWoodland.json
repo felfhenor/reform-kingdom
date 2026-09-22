@@ -519,6 +519,19 @@
                  "width":64,
                  "x":192,
                  "y":2112
+                }, 
+                {
+                 "gid":407,
+                 "height":64,
+                 "id":209,
+                 "name":"Elfheim Merchants - Erden Woodland",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"CaravanNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1984,
+                 "y":192
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -527,7 +540,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":208,
+ "nextobjectid":210,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

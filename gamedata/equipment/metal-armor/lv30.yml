@@ -12,3 +12,17 @@
 
   debuffResistances:
     Bleed: 25
+
+- id: b22b9526-f5b4-4dba-ba76-c0ecc0e3ae1b
+  name: Demongold Plate
+  description: A breastplate emitting demonic and crimson energies. It seems to be made of corrupted crimson.
+  levelRequirement: 35
+  rarity: Rare
+  type: Metal Armor
+  sprite: '0197'
+  slots: 2
+  baseStats:
+    Vitality: 35.3
+
+  monsterTypeDamage:
+    Humanoid: 10

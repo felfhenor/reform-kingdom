@@ -18,3 +18,23 @@
   effects:
     - effectType: GlobalDecreeClauseCapBoost
       value: 1
+
+- id: e997a21f-72c5-46da-a70e-9521a7a833f2
+  name: Brother Figurine
+  rarity: Rare
+  description: A figurine gifted from a sister to a brother. He walks the path set forth for him.
+  sprite: '0057'
+
+  effects:
+    - effectType: GlobalOnPathTravelSpeedBoost
+      value: 0.05
+
+- id: ebcc384d-4c93-48d6-8093-b9628e2c4904
+  name: Sister Figurine
+  rarity: Rare
+  description: A figurine gifted from a brother to a sister. She travels an unconvential path.
+  sprite: '0057'
+
+  effects:
+    - effectType: GlobalOffPathTravelSpeedBoost
+      value: 0.05

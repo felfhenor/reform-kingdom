@@ -14,3 +14,21 @@
       value: 1
     - tradeskillId: Blacksmithing
       value: 1
+
+- id: 9a480edc-7b72-4928-a531-302e52467bc0
+  name: Demongold Gauntlets
+  description: A pair of gauntlets emitting demonic and crimson energies. It seems to be made of corrupted crimson. It improves the wearer's fine-movement dexterity substantially.
+  levelRequirement: 35
+  rarity: Rare
+  type: Trinket
+  sprite: '0198'
+  slots: 2
+  baseStats:
+    Luck: 5.2
+    Agility: 8.7
+
+  gatherYieldBonuses:
+    - tradeskillId: Artificing
+      value: 1
+    - tradeskillId: Tailoring
+      value: 1

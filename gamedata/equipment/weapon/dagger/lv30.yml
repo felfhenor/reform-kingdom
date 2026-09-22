@@ -10,6 +10,17 @@
     Agility: 12.2
     Strength: 13.1
 
+- id: 51c5a826-1715-4677-b01d-94eee9d20129
+  name: Demongold Cleaver
+  description: A cleaver emitting demonic and crimson energies. It seems to be made of corrupted crimson.
+  levelRequirement: 35
+  rarity: Rare
+  type: Dagger
+  sprite: '0201'
+  slots: 2
+  baseStats:
+    Agility: 35.1
+
 - id: 5cdf05a3-7a6a-4fb8-9091-9b0b62ad3458
   name: Ancestral Kukri
   description: A kukri made by the original elves, whose production method is highly classified. It vibrates as if seeking blood.
