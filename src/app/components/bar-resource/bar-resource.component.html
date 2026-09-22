@@ -8,7 +8,11 @@
         (animate.enter)="onEnter($event)"
         (animate.leave)="onLeave($event)"
       >
-        <app-currency-cost [type]="res.itemRef.id" [amount]="res.total" />
+        <app-currency-cost
+          [type]="res.itemRef.id"
+          [amount]="res.total"
+          [animate]="true"
+        />
       </div>
     }
   </div>

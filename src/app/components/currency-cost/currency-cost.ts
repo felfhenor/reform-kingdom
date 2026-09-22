@@ -12,6 +12,7 @@ import type { ItemId } from '@interfaces';
       [amount]="amount()"
       [minWidth]="minWidth()"
       [numberFormat]="numberFormat()"
+      [animate]="animate()"
     />
   `,
   host: {
@@ -24,4 +25,5 @@ export class CurrencyCostComponent {
   public amount = input.required<number>();
   public minWidth = input('');
   public numberFormat = input('1.0-0');
+  public animate = input(false);
 }

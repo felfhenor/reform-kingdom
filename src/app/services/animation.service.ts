@@ -1,5 +1,6 @@
 import { formatNumber } from '@angular/common';
 import {
+  DestroyRef,
   effect,
   inject,
   Injectable,
@@ -116,17 +117,23 @@ export class AnimationService {
 // Snaps to `source()` on first read, tweens to it on every change after, and cancels
 // an in-flight tween before starting the next so a rapid re-trigger can't race it.
 // Must be called from an injection context (a field initializer or constructor).
-export function injectTweenedNumber(source: () => number): Signal<number> {
+export function injectTweenedNumber(
+  source: () => number,
+  enabled: () => boolean = () => true,
+): Signal<number> {
   const anim = inject(AnimationService);
   const display = signal(0);
   let hasInitialized = false;
   let currentTween: JSAnimation | undefined;
 
+  inject(DestroyRef).onDestroy(() => currentTween?.pause());
+
   effect(() => {
     const target = source();
     untracked(() => {
-      if (!hasInitialized) {
+      if (!hasInitialized || !enabled()) {
         hasInitialized = true;
+        currentTween?.pause();
         display.set(target);
         return;
       }

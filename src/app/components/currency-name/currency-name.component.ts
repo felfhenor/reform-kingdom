@@ -38,6 +38,7 @@ import { injectTweenedNumber } from '@services/animation.service';
           class="inline-block text-right tabular-nums relative"
           [style.min-width]="minWidth()"
           [appFloatDelta]="amount()"
+          [appFloatDeltaEnabled]="animate()"
         >
           {{ displayAmount() | number: numberFormat() }}
         </span>
@@ -55,9 +56,13 @@ export class CurrencyNameComponent {
   public amount = input(0);
   public minWidth = input('');
   public numberFormat = input('1.0-0');
+  public animate = input(false);
 
   public itemData = computed(() => getEntry<ItemContent>(this.type())!);
   public icon = computed(() => this.itemData().sprite);
   public label = computed(() => this.itemData().name);
-  public displayAmount = injectTweenedNumber(() => this.amount());
+  public displayAmount = injectTweenedNumber(
+    () => this.amount(),
+    () => this.animate(),
+  );
 }
