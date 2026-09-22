@@ -5,6 +5,7 @@ import {
   input,
 } from '@angular/core';
 import type { DaisyColor } from '@interfaces';
+import { injectTweenedNumber } from '@services/animation.service';
 
 // Tailwind's class scanner only picks up literal strings, so the color->class
 // mapping can't be built with a template literal - it would purge every progress-* class.
@@ -33,4 +34,5 @@ export class BarProgressComponent {
   public color = input<DaisyColor>('primary');
 
   public colorClass = computed(() => PROGRESS_COLOR_CLASSES[this.color()]);
+  public displayValue = injectTweenedNumber(() => this.value());
 }

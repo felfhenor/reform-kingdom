@@ -2,9 +2,11 @@
   <div
     class="bg-base-100 inline-flex items-center gap-2 px-2 py-1 rounded-b-lg backdrop-blur-sm"
   >
-    @for (res of resources(); track $index) {
+    @for (res of resources(); track res.itemRef.id) {
       <div
         class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded tabular-nums whitespace-nowrap text-xs"
+        (animate.enter)="onEnter($event)"
+        (animate.leave)="onLeave($event)"
       >
         <app-currency-cost [type]="res.itemRef.id" [amount]="res.total" />
       </div>

@@ -9,6 +9,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { getEntry } from '@helpers/content/content';
 import type { ItemContent, ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { injectTweenedNumber } from '@services/animation.service';
 
 @Component({
   selector: 'app-currency-name',
@@ -31,7 +32,7 @@ import { TippyDirective } from '@ngneat/helipopper';
           class="inline-block text-right tabular-nums"
           [style.min-width]="minWidth()"
         >
-          {{ amount() | number: numberFormat() }}
+          {{ displayAmount() | number: numberFormat() }}
         </span>
       } @else {
         <span>{{ label() }}</span>
@@ -51,4 +52,5 @@ export class CurrencyNameComponent {
   public itemData = computed(() => getEntry<ItemContent>(this.type())!);
   public icon = computed(() => this.itemData().sprite);
   public label = computed(() => this.itemData().name);
+  public displayAmount = injectTweenedNumber(() => this.amount());
 }
