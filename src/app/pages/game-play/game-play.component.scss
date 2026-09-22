@@ -8,6 +8,10 @@
   position: absolute;
 }
 
+.view-panel {
+  @apply absolute inset-0 max-w-[1500px] mx-auto;
+}
+
 .game-container {
   width: 100vw;
   height: calc(100vh - 40px);
