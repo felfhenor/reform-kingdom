@@ -760,6 +760,11 @@
       chance: 100
       minLevel: 25
 
+    - equipmentId: Demongold Stiletto
+      chance: 5
+      minLevel: 30
+      maxLevel: 41
+
   skills:
     - skillId: Attack
       weight: 1
@@ -908,6 +913,11 @@
       bonusPerLevel: 2
       chance: 100
       minLevel: 25
+
+    - equipmentId: Demongold Hammer
+      chance: 5
+      minLevel: 30
+      maxLevel: 41
 
   skills:
     - skillId: Attack

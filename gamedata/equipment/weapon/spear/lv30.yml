@@ -12,3 +12,17 @@
 
   monsterTypeDamage:
     Demon: 10
+
+- id: 779a96ad-9365-452e-8d72-be56551b493a
+  name: Demongold Trident
+  description: A trident emitting demonic and crimson energies. It seems to be made of corrupted crimson.
+  levelRequirement: 35
+  rarity: Rare
+  type: Spear
+  sprite: '0204'
+  slots: 2
+  baseStats:
+    Strength: 28.2
+
+  monsterTypeDamage:
+    Humanoid: 15

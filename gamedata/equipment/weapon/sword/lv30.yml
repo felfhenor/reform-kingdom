@@ -10,3 +10,17 @@
     Strength: 15.4
     Vitality: 15.4
     Resistance: 4.5
+
+- id: 1f027164-4dc3-482f-a278-df06a00a52c8
+  name: Demongold Flyssa
+  description: A flyssa emitting demonic and crimson energies. It seems to be made of corrupted crimson.
+  levelRequirement: 35
+  rarity: Rare
+  type: Sword
+  sprite: '0206'
+  slots: 2
+  baseStats:
+    Strength: 35.2
+
+  monsterTypeDamage:
+    Humanoid: 15

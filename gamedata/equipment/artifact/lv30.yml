@@ -13,6 +13,25 @@
   monsterTypeDamage:
     Demon: 10
 
+- id: 66642e56-b702-437d-a30d-4f1666698181
+  name: Animalistic Conglomeration
+  description: A conglomeration of animal parts, increasing effectiveness against all manner of foes.
+  levelRequirement: 35
+  rarity: Rare
+  type: Artifact
+  sprite: '0208'
+  slots: 1
+  baseStats:
+    Intelligence: 9.1
+
+  monsterTypeDamage:
+    Demon: 5
+    Amalgamation: 5
+    Beast: 5
+    Humanoid: 5
+    Insect: 5
+    Spirit: 5
+
 - id: 2512c853-9bac-455c-9dbf-8cf5f13c6368
   name: Ancestral Aimer
   description: An aimer made by the original elves, whose production method is highly classified. It fluctuates in temperature.

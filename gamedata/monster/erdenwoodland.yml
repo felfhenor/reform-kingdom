@@ -201,6 +201,11 @@
       chance: 100
       minLevel: 25
 
+    - equipmentId: Demongold Chainscythe
+      chance: 5
+      minLevel: 30
+      maxLevel: 41
+
   skills:
     - skillId: Attack
       weight: 1

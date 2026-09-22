@@ -215,3 +215,33 @@
   maxTradeskillLevel: 27
   tradeskillXP: 170
   craftTime: 420
+
+- id: eeaa9c7d-df52-4ab2-ad80-489c96da363e
+  name: 'Artifact: Animalistic Conglomeration'
+  result:
+    equipmentId: Animalistic Conglomeration
+
+  requirements:
+    - itemId: Crimson Ruby
+      quantity: 1
+
+    - itemId: Bat Wing
+      quantity: 5
+
+    - itemId: Oozehide
+      quantity: 5
+
+    - itemId: Spirit Flesh
+      quantity: 5
+
+    - itemId: Wolf Pelt
+      quantity: 5
+
+    - itemId: Demon Horn
+      quantity: 5
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 340
+  craftTime: 840

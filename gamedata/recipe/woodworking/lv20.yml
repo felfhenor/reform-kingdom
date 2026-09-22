@@ -136,6 +136,36 @@
   tradeskillXP: 160
   craftTime: 360
 
+- id: 58aad5d7-fe3d-49d3-99c6-7f159e189228
+  name: "Ammo: Slayer's Arrow"
+  result:
+    equipmentId: Slayer's Arrow
+
+  requirements:
+    - itemId: Elven Corewood
+      quantity: 5
+
+    - itemId: Bat Wing
+      quantity: 5
+
+    - itemId: Oozehide
+      quantity: 5
+
+    - itemId: Spirit Flesh
+      quantity: 5
+
+    - itemId: Wolf Pelt
+      quantity: 5
+
+    - itemId: Demon Horn
+      quantity: 5
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 22
+  maxTradeskillLevel: 25
+  tradeskillXP: 320
+  craftTime: 720
+
 - id: 2d18747c-e066-4871-b2fa-656777c2504b
   name: 'Weapon: Angelf Hunting Spear'
   result:

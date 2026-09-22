@@ -9,3 +9,22 @@
   baseStats:
     Strength: 8.3
     Agility: 7.2
+
+- id: f5e375c6-b81c-4deb-8155-1f9c6490bf8c
+  name: Slayer's Arrow
+  description: An arrow made with a tip that pierces all manner of armor, flesh, scales, and even the ethereal.
+  levelRequirement: 35
+  rarity: Rare
+  type: Arrow
+  sprite: '0209'
+  slots: 1
+  baseStats:
+    Strength: 12.1
+
+  monsterTypeDamage:
+    Amalgamation: 5
+    Beast: 5
+    Demon: 5
+    Humanoid: 5
+    Insect: 5
+    Spirit: 5

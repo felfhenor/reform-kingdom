@@ -51,6 +51,9 @@
     - collectibleId: Woodwolf Skull
       chance: 25
 
+    - recipeId: "Ammo: Slayer's Arrow"
+      chance: 10
+
 - id: d3d0f964-ff09-481e-81ee-9470ac6c4e2b
   name: Windwood Training
   description: An elven training facility. Here, elves receive instruction on how to resist demonic influences and combat training most effective against them.
@@ -78,6 +81,12 @@
   completionRewards:
     - collectibleId: Weapon Claim Tag
       chance: 25
+
+    - equipmentId: Demongold Trident
+      chance: 15
+
+    - equipmentId: Demongold Flyssa
+      chance: 15
 
 - id: 3c362132-eb38-483f-9670-60a91511ec62
   name: Demonelf Hideaway
@@ -135,3 +144,9 @@
   completionRewards:
     - collectibleId: Darkway Torch
       chance: 25
+
+    - recipeId: 'Artifact: Animalistic Conglomeration'
+      chance: 10
+
+    - equipmentId: Demongold Orbstaff
+      chance: 15

@@ -13,6 +13,20 @@
   monsterTypeDamage:
     Demon: 10
 
+- id: 7518bea1-ade5-46e0-a4e4-786da2f16830
+  name: Demongold Orbstaff
+  description: An orbstaff emitting demonic and crimson energies. It seems to be made of corrupted crimson.
+  levelRequirement: 35
+  rarity: Rare
+  type: Staff
+  sprite: '0207'
+  slots: 2
+  baseStats:
+    Intelligence: 29.9
+
+  monsterTypeDamage:
+    Humanoid: 15
+
 - id: c3a2de54-26f0-40d3-926a-fccf63d9012d
   name: Ancestral Staff
   description: A staff made by the original elves, whose production method is highly classified. It's hot to the touch.

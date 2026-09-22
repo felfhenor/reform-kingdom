@@ -11,6 +11,20 @@
     Resistance: 9.3
     Strength: 10.3
 
+- id: 07507fae-4ef8-4e24-b9a5-e181eb545294
+  name: Demongold Chainscythe
+  description: A chainscythe emitting demonic and crimson energies. It seems to be made of corrupted crimson.
+  levelRequirement: 35
+  rarity: Rare
+  type: Whip
+  sprite: '0206'
+  slots: 2
+  baseStats:
+    Strength: 27.2
+
+  monsterTypeDamage:
+    Humanoid: 15
+
 - id: 8a221cb2-54d7-4042-868e-b4968d8da1b5
   name: Ancestral Whip
   description: A whip made by the original elves, whose production method is highly classified. Holding it makes the ground quiver.
