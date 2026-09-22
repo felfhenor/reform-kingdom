@@ -171,7 +171,7 @@
   trades:
     - type: sell
       value: 60000
-      equipmentId: Demongold Cleaver
+      equipmentId: Demongold Plate
       limit: 1
       weight: 1
 
@@ -183,7 +183,7 @@
 
     - type: sell
       value: 50000
-      equipmentId: Demongold Plate
+      equipmentId: Demongold Protector
       limit: 1
       weight: 1
 

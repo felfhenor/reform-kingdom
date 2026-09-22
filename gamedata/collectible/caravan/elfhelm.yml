@@ -33,7 +33,7 @@
   name: Sister Figurine
   rarity: Rare
   description: A figurine gifted from a brother to a sister. She travels an unconvential path.
-  sprite: '0057'
+  sprite: '0056'
 
   effects:
     - effectType: GlobalOffPathTravelSpeedBoost
