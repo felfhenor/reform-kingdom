@@ -1,6 +1,12 @@
 <app-card-page heightProfile="full">
   <span header>Heroes</span>
 
+  <span pageactions>
+    <button class="btn btn-primary btn-xs" (click)="optimizeAll()">
+      Optimize All
+    </button>
+  </span>
+
   <div class="h-full flex flex-col gap-4">
     @if (party().length === 0) {
       <app-blank-slate>No heroes yet.</app-blank-slate>

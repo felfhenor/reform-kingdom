@@ -10,6 +10,7 @@ import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/panel-hero-equipment.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
+import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
 import { worldPartyState } from '@helpers/state-game';
 import type { CharacterId, JobContent, JobId } from '@interfaces';
 
@@ -47,5 +48,11 @@ export class GamePlayHeroesComponent {
 
   public selectCharacter(characterId: CharacterId): void {
     this.explicitSelectedId.set(characterId);
+  }
+
+  optimizeAll() {
+    worldPartyState().forEach((p) => {
+      optimizeCharacterEquipment(p.id);
+    });
   }
 }
