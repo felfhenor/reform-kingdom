@@ -18,11 +18,15 @@
             [sfxOffset]="$index"
             [sfxTrigger]="['click', 'hover']"
           >
+            @let job = jobFor(character.jobId);
+
             <div class="hero-tab-icon">
-              <app-icon-job [job]="jobFor(character.jobId)" />
+              <app-icon-job [job]="job" />
             </div>
             {{ character.name }}
-            <span class="text-lighter">Lv. {{ character.level }}</span>
+            <span class="text-lighter">
+              Lv. {{ character.level }} {{ job?.shorthand ?? 'JOB' }}
+            </span>
           </button>
         }
       </div>

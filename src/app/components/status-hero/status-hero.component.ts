@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { getEntry } from '@helpers/content/content';
-import { worldPartyState, worldCombatState } from '@helpers/state-game';
+import { worldCombatState, worldPartyState } from '@helpers/state-game';
 import type { Combatant, JobContent, StatusCardEntry } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -49,7 +49,7 @@ export class StatusHeroComponent {
         combatantId: character.id,
         name: character.name,
         subtitleLevel: character.level,
-        subtitleLabel: job?.name ?? '',
+        subtitleLabel: job?.shorthand ?? '',
         spritesheet: 'job',
         spriteAssetName: job?.sprite ?? '',
         spriteFrames: job?.frames ?? 4,

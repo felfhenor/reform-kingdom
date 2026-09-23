@@ -40,10 +40,19 @@
           [sfxOffset]="$index"
           [sfxTrigger]="['click', 'hover']"
         >
+          @let job = jobFor(hero);
+
           <app-slot-icon-blank>
-            <app-icon-job [job]="jobFor(hero)" />
+            <app-icon-job [job]="job" />
           </app-slot-icon-blank>
-          {{ hero.name }}
+
+          <div class="ms-2 flex flex-col items-start">
+            <div>{{ hero.name }}</div>
+
+            <div class="font-normal">
+              Lv. {{ hero.level }} {{ job?.shorthand ?? 'JOB' }}
+            </div>
+          </div>
         </button>
       } @empty {
         <div class="italic text-sm p-2">No heroes recruited yet.</div>
