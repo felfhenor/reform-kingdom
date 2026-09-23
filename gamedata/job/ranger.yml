@@ -1,5 +1,6 @@
 - id: 359069e6-e133-4984-9b8f-78d524d762e5
   name: Ranger
+  shorthand: RNG
   description: A job for heroes who hunt and tracks their prey. They have incredible physical single target damage and can repeatedly hit their foes with physical splash damage. They have very consistent physical strength and agility growth, but lack in all defensive areas.
   sprite: '0016'
   frames: 4

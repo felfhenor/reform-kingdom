@@ -5,7 +5,6 @@ import {
   recipeResultSpritesheet,
   recipeStylizedName,
 } from '@helpers/crafting/recipes';
-import { worldPartyState } from '@helpers/state-game';
 import { equipmentItemMiscAffixDescriptions } from '@helpers/item/affix';
 import {
   equipmentItemGatherYieldBonuses,
@@ -42,14 +41,10 @@ import {
 } from '@interfaces';
 
 // Hero names whose job can equip this type, shown in item tooltips.
-function equippableHeroNames(equipment: EquipmentContent): string[] {
-  return worldPartyState()
-    .filter((hero) =>
-      getEntry<JobContent>(hero.jobId)?.equippableTypes.includes(
-        equipment.type,
-      ),
-    )
-    .map((hero) => hero.name);
+function equippableJobNames(equipment: EquipmentContent): string[] {
+  return getEntriesByType<JobContent>('job')
+    .filter((j) => j.equippableTypes.includes(equipment.type))
+    .map((j) => j.shorthand);
 }
 
 // Resolves each tradeskillId to its display name/icon - shared by the equipment tooltip and the infusion screen (a raw, uncombined material's own infusionGatherYieldBonuses).
@@ -141,7 +136,7 @@ export function itemPreviewDisplay(
       gatherYieldBonuses: gatherYieldBonusDisplay(eqContent, instance),
       skillStatBonuses: skillStatBonusDisplay(eqContent, instance),
       levelRequirement: eqContent.levelRequirement,
-      equippableHeroNames: equippableHeroNames(eqContent),
+      equippableHeroNames: equippableJobNames(eqContent),
       ...(instance && {
         bonusStats: equipmentItemBonusStats(instance),
         bonusResistances: equipmentItemBonusResistances(instance),

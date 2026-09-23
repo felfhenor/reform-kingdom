@@ -33,6 +33,7 @@ export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     id: job.id ?? ('UNKNOWN' as JobId),
     name: job.name ?? 'UNKNOWN',
     __type: 'job',
+    shorthand: job.shorthand ?? 'JOB',
     description: job.description ?? 'UNKNOWN',
     baseStats: ensureStats(job.baseStats),
     statsPerLevel: ensureStats(job.statsPerLevel),

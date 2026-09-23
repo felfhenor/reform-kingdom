@@ -27,6 +27,8 @@ export type JobContent = IsContentItem &
   HasAnimation & {
     id: JobId;
 
+    shorthand: string;
+
     baseStats: StatBlock;
     statsPerLevel: StatBlock;
 
