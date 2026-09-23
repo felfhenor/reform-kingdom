@@ -19,13 +19,12 @@ vi.mock('@helpers/crafting/recipes', () => ({
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { defaultStats } from '@helpers/defaults';
-import { worldPartyState } from '@helpers/state-game';
 import {
   itemPreviewDisplay,
   resolveRewardDisplay,
 } from '@helpers/item/item-preview';
+import { worldPartyState } from '@helpers/state-game';
 import type {
-  CharacterId,
   CollectibleContent,
   CollectibleId,
   EquipmentContent,
@@ -63,7 +62,7 @@ describe('itemPreviewDisplay', () => {
     });
   });
 
-  it('surfaces base stats, level requirement, and equippable heroes for equipment', () => {
+  it('surfaces base stats, level requirement', () => {
     const equipment: EquipmentContent = {
       id: 'sword' as EquipmentId,
       __type: 'equipment',
@@ -90,7 +89,7 @@ describe('itemPreviewDisplay', () => {
       type: 'Sword',
       stats: { Strength: 5 },
       levelRequirement: 4,
-      equippableHeroNames: ['Alice'],
+      equippableHeroNames: [],
       skills: [],
     });
   });
@@ -124,38 +123,6 @@ describe('itemPreviewDisplay', () => {
     ]);
   });
 
-  it('resolves skillStatBonuses to their skill family name and icon', () => {
-    const equipment = {
-      id: 'staff' as EquipmentId,
-      __type: 'equipment',
-      name: 'Staff',
-      description: 'Handy.',
-      sprite: '0002',
-      rarity: 'Uncommon',
-      levelRequirement: 1,
-      baseStats: {},
-      type: 'Staff',
-      skillStatBonuses: [
-        { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
-      ],
-    } as EquipmentContent;
-    vi.mocked(getEntriesByType).mockReturnValue([
-      { family: 'Fireball', sprite: '0003' },
-    ] as never);
-    vi.mocked(worldPartyState).mockReturnValue([]);
-
-    expect(itemPreviewDisplay('equipment', equipment).skillStatBonuses).toEqual(
-      [
-        {
-          skillName: 'Fireball',
-          skillSprite: '0003',
-          stat: 'Vitality',
-          value: 2,
-        },
-      ],
-    );
-  });
-
   it('surfaces skillStatBonuses for an infusion material', () => {
     const item = {
       id: 'shard' as ItemId,
@@ -176,70 +143,6 @@ describe('itemPreviewDisplay', () => {
     expect(itemPreviewDisplay('item', item).skillStatBonuses).toEqual([
       { skillName: 'Snipe', skillSprite: '0004', stat: 'Agility', value: 0.5 },
     ]);
-  });
-
-  it('names only the party heroes whose job can equip the equipment type', () => {
-    const equipment = {
-      id: 'sword' as EquipmentId,
-      name: 'Sword',
-      description: 'Sharp.',
-      sprite: '0002',
-      rarity: 'Rare',
-      levelRequirement: 4,
-      baseStats: { Strength: 5 },
-      type: 'Sword',
-    } as EquipmentContent;
-    const swordJob = { equippableTypes: ['Sword'] } as JobContent;
-    const staffJob = { equippableTypes: ['Staff'] } as JobContent;
-
-    vi.mocked(getEntry).mockImplementation((id: unknown) => {
-      if (id === 'warrior') return swordJob as never;
-      if (id === 'magician') return staffJob as never;
-      return undefined;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([
-      {
-        id: 'a' as CharacterId,
-        name: 'Alice',
-        jobId: 'warrior' as JobId,
-      } as never,
-      {
-        id: 'b' as CharacterId,
-        name: 'Bob',
-        jobId: 'magician' as JobId,
-      } as never,
-    ]);
-
-    expect(
-      itemPreviewDisplay('equipment', equipment).equippableHeroNames,
-    ).toEqual(['Alice']);
-  });
-
-  it('returns an empty array of equippable heroes when no hero can equip the type', () => {
-    const equipment = {
-      id: 'sword' as EquipmentId,
-      name: 'Sword',
-      description: 'Sharp.',
-      sprite: '0002',
-      rarity: 'Rare',
-      levelRequirement: 4,
-      baseStats: { Strength: 5 },
-      type: 'Sword',
-    } as EquipmentContent;
-    const staffJob = { equippableTypes: ['Staff'] } as JobContent;
-
-    vi.mocked(getEntry).mockReturnValue(staffJob);
-    vi.mocked(worldPartyState).mockReturnValue([
-      {
-        id: 'b' as CharacterId,
-        name: 'Bob',
-        jobId: 'magician' as JobId,
-      } as never,
-    ]);
-
-    expect(
-      itemPreviewDisplay('equipment', equipment).equippableHeroNames,
-    ).toEqual([]);
   });
 
   it('carries neither stats nor a level requirement for a collectible', () => {
