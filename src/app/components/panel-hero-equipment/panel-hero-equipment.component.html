@@ -2,6 +2,34 @@
 
 <div class="hero-equipment-panel flex flex-col gap-4 h-full min-h-0">
   <div class="hero-summary flex items-center justify-center gap-4 shrink-0">
+    <div [appHideUntilLevel]="3" class="flex flex-col gap-2">
+      <app-slot-button-container
+        [disabled]="!isAtKingdomCurrently()"
+        [helpText]="'This must be done at the Duchy.'"
+      >
+        <button
+          class="btn btn-accent btn-xs w-full"
+          [disabled]="!isAtKingdomCurrently() || !canPromote()"
+          (click)="promote()"
+        >
+          Promote
+        </button>
+      </app-slot-button-container>
+
+      <app-slot-button-container
+        [disabled]="!isAtKingdomCurrently()"
+        [helpText]="'This must be done at the Duchy.'"
+      >
+        <button
+          class="btn btn-accent btn-xs w-full"
+          [disabled]="!isAtKingdomCurrently() || !canDemote()"
+          (click)="demote()"
+        >
+          Demote
+        </button>
+      </app-slot-button-container>
+    </div>
+
     <div class="hero-summary-icon">
       <app-slot-icon-blank>
         <app-icon-job [job]="job()" />
@@ -15,6 +43,7 @@
           Lv. {{ char.level }} {{ job()?.name }} ({{ job()?.shorthand }})
         </span>
       </div>
+
       <app-bar-progress
         class="w-56"
         color="primary"

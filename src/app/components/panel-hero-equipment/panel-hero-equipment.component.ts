@@ -12,9 +12,12 @@ import { ModalHeroCombatOrdersComponent } from '@components/modal-hero-combat-or
 import { PanelHeroEquipmentEquipmentComponent } from '@components/panel-hero-equipment-equipment/panel-hero-equipment-equipment.component';
 import { PanelHeroEquipmentSkillsComponent } from '@components/panel-hero-equipment-skills/panel-hero-equipment-skills.component';
 import { PanelHeroEquipmentStatsComponent } from '@components/panel-hero-equipment-stats/panel-hero-equipment-stats.component';
+import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { HideUntilLevelDirective } from '@directives/hide-until-level.directive';
 import { getEntry } from '@helpers/content/content';
+import { demoteHero, promoteHero } from '@helpers/hero/position-swapping';
+import { isPlayerAtKingdom, worldPartyState } from '@helpers/index';
 import type { Character, JobContent } from '@interfaces';
 
 @Component({
@@ -31,14 +34,31 @@ import type { Character, JobContent } from '@interfaces';
     BarProgressComponent,
     SlotIconBlankComponent,
     HideUntilLevelDirective,
+    SlotButtonContainerComponent,
   ],
   templateUrl: './panel-hero-equipment.component.html',
   styleUrl: './panel-hero-equipment.component.scss',
 })
 export class PanelHeroEquipmentComponent {
+  public isAtKingdomCurrently = computed(() => isPlayerAtKingdom());
+  public canPromote = computed(
+    () => worldPartyState()[0].id !== this.character().id,
+  );
+  public canDemote = computed(
+    () => worldPartyState()[3].id !== this.character().id,
+  );
+
   public character = input.required<Character>();
 
   public job = computed<JobContent | undefined>(() =>
     getEntry<JobContent>(this.character().jobId),
   );
+
+  promote() {
+    promoteHero(this.character());
+  }
+
+  demote() {
+    demoteHero(this.character());
+  }
 }
