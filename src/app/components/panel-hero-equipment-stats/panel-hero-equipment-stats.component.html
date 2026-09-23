@@ -28,7 +28,7 @@
       <app-icon [name]="combatStatDimension.icon[stat]" size="stat" />
       <span class="text-base">{{ combatStatDimension.label[stat] }}</span>
       <span class="ml-auto font-semibold text-lg tabular-nums">
-        {{ value | statDisplay: 0 }}{{ suffix(combatStatDimension, stat) }}
+        {{ value | number: '1.0-0' }}{{ suffix(combatStatDimension, stat) }}
       </span>
     </div>
   }
@@ -46,7 +46,7 @@
       <app-icon [name]="resistanceDimension.icon[stat]" size="stat" />
       <span class="text-base">{{ resistanceDimension.label[stat] }}</span>
       <span class="ml-auto font-semibold text-lg tabular-nums">
-        {{ value | statDisplay: 0 }}{{ suffix(resistanceDimension, stat) }}
+        {{ value | number: '1.0-0' }}{{ suffix(resistanceDimension, stat) }}
       </span>
     </div>
   }
