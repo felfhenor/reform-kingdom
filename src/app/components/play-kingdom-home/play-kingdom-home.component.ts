@@ -5,6 +5,7 @@ import { BarProgressComponent } from '@components/bar-progress/bar-progress.comp
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
 import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
@@ -66,6 +67,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     PluralizePipe,
     SFXDirective,
     BarProgressComponent,
+    SlotButtonContainerComponent,
   ],
   templateUrl: './play-kingdom-home.component.html',
 })

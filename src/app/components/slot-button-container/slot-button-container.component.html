@@ -1,0 +1,7 @@
+<span
+  class="pointer-events-auto"
+  [class.cursor-not-allowed]="disabled()"
+  [tp]="disabled() ? helpText() : ''"
+>
+  <ng-content></ng-content>
+</span>

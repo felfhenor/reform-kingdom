@@ -18,17 +18,22 @@
       }
     </span>
 
-    <button
-      type="button"
-      class="btn btn-xs btn-primary"
+    <app-slot-button-container
       [disabled]="!modifiable"
-      (click)="optimizeEquipment()"
-      appSfx="ui-click"
-      [sfxOffset]="0"
-      [sfxTrigger]="['click', 'hover']"
+      [helpText]="'This cannot be done in combat.'"
     >
-      Optimize
-    </button>
+      <button
+        type="button"
+        class="btn btn-xs btn-primary"
+        [disabled]="!modifiable"
+        (click)="optimizeEquipment()"
+        appSfx="ui-click"
+        [sfxOffset]="0"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Optimize
+      </button>
+    </app-slot-button-container>
   </div>
 
   <div class="flex flex-col gap-4">
@@ -55,29 +60,39 @@
     <div class="flex justify-between items-center shrink-0">
       <span class="font-semibold text-xl">{{ selected }}</span>
       @if (selectedContent) {
-        <button
-          type="button"
-          class="btn btn-xs btn-warning"
+        <app-slot-button-container
           [disabled]="!modifiable"
-          (click)="unequip(selected)"
-          appSfx="ui-error"
-          [sfxTrigger]="['click', 'hover']"
+          [helpText]="'This cannot be done in combat.'"
         >
-          Unequip
-        </button>
+          <button
+            type="button"
+            class="btn btn-xs btn-warning"
+            [disabled]="!modifiable"
+            (click)="unequip(selected)"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Unequip
+          </button>
+        </app-slot-button-container>
       }
     </div>
 
     <div class="flex flex-1 h-full !overflow-x-hidden mb-4 gap-2 flex-col">
       @for (entry of items; track $index) {
-        <app-card-equipment-item
-          [equipment]="entry.content"
-          [equipmentItem]="entry.item"
-          [equippedContent]="selectedContent"
-          [equippedItem]="equippedItemFor(selected)"
+        <app-slot-button-container
           [disabled]="!modifiable"
-          (equip)="equip(entry.item.id)"
-        />
+          [helpText]="'This cannot be done in combat.'"
+        >
+          <app-card-equipment-item
+            [equipment]="entry.content"
+            [equipmentItem]="entry.item"
+            [equippedContent]="selectedContent"
+            [equippedItem]="equippedItemFor(selected)"
+            [disabled]="!modifiable"
+            (equip)="equip(entry.item.id)"
+          />
+        </app-slot-button-container>
       } @empty {
         <div class="italic text-sm p-4">
           No equippable items available for this slot.

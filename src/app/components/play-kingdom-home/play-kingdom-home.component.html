@@ -258,30 +258,40 @@
             </button>
           }
 
-          <button
-            class="btn btn-accent btn-sm"
+          <app-slot-button-container
             [disabled]="!isAtKingdomCurrently()"
-            (click)="openReclassModal()"
-            appSfx="ui-click"
-            [sfxOffset]="1"
-            [sfxTrigger]="['click', 'hover']"
+            [helpText]="'This must be done at the Duchy.'"
           >
-            <app-icon name="gameBodySwapping" size="inline" />
-            Reclass Heroes
-          </button>
-
-          @if (!isKingdomHome()) {
             <button
               class="btn btn-accent btn-sm"
               [disabled]="!isAtKingdomCurrently()"
-              (click)="resetHome()"
+              (click)="openReclassModal()"
               appSfx="ui-click"
-              [sfxOffset]="4"
+              [sfxOffset]="1"
               [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameHouse" size="inline" />
-              Set Home
+              <app-icon name="gameBodySwapping" size="inline" />
+              Reclass Heroes
             </button>
+          </app-slot-button-container>
+
+          @if (!isKingdomHome()) {
+            <app-slot-button-container
+              [disabled]="!isAtKingdomCurrently()"
+              [helpText]="'This must be done at the Duchy.'"
+            >
+              <button
+                class="btn btn-accent btn-sm"
+                [disabled]="!isAtKingdomCurrently()"
+                (click)="resetHome()"
+                appSfx="ui-click"
+                [sfxOffset]="4"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                <app-icon name="gameHouse" size="inline" />
+                Set Home
+              </button>
+            </app-slot-button-container>
           }
 
           <button

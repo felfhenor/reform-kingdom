@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
@@ -50,6 +51,7 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
     IconComponent,
     TippyDirective,
     SFXDirective,
+    SlotButtonContainerComponent,
   ],
   host: {
     class: 'contents',
