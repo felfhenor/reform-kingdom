@@ -23,19 +23,12 @@ import {
   type StatusEffectTag,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 import { injectTweenedNumber } from '@services/animation.service';
 
 @Component({
   selector: 'app-panel-hero-equipment-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    DecimalPipe,
-    IconComponent,
-    IconStatComponent,
-    TippyDirective,
-    StatDisplayPipe,
-  ],
+  imports: [DecimalPipe, IconComponent, IconStatComponent, TippyDirective],
   host: {
     class: 'flex flex-col min-h-0 pb-8',
   },
