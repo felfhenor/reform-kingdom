@@ -532,6 +532,19 @@
                  "width":64,
                  "x":1984,
                  "y":192
+                }, 
+                {
+                 "gid":424,
+                 "height":64,
+                 "id":210,
+                 "name":"Elfen Ledi",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Trainer",
+                 "visible":true,
+                 "width":64,
+                 "x":1920,
+                 "y":768
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -540,7 +553,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":210,
+ "nextobjectid":211,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

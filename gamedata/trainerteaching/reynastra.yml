@@ -1,0 +1,44 @@
+- id: 83a5a1c5-7146-4e78-a462-e9e82785bedb
+  name: 'Stat: Basic Health'
+
+  effects:
+    - type: Stat
+      stat: Health
+      value: 10
+
+  requiredLevel: 3
+
+  costs:
+    - itemId: Gold Coin
+      value: 500
+
+  jobIds:
+    - Explorer
+    - Magician
+    - Warrior
+    - Ranger
+    - Healer
+
+- id: eae71325-b673-4042-aa49-db6488150c32
+  name: 'Stat: Goblin Energy'
+
+  effects:
+    - type: Stat
+      stat: Energy
+      value: 5
+
+  requiredLevel: 3
+
+  costs:
+    - itemId: Gold Coin
+      value: 1000
+
+  jobIds:
+    - Explorer
+    - Magician
+    - Warrior
+    - Ranger
+    - Healer
+
+  requiredCollectibleIds:
+    - Goblin Ruby

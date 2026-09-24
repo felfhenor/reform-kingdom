@@ -1,0 +1,91 @@
+- id: 7957eaf8-016b-4ff6-8a9f-5e71fc70271a
+  name: 'Combat Stat: Basic Damage Reflection'
+
+  effects:
+    - type: CombatStat
+      combatStat: damageReflectPercent
+      value: 1
+
+  requiredLevel: 33
+
+  costs:
+    - itemId: Gold Coin
+      value: 500000
+
+    - itemId: Gobslime Tongue
+      value: 1
+
+    - itemId: Spirit Gear
+      value: 1
+
+  jobIds:
+    - Warrior
+
+- id: eca10df9-50e5-4a3a-a2a9-bc92e4dc5c19
+  name: 'Combat Stat: Basic Action Repeat'
+
+  effects:
+    - type: CombatStat
+      combatStat: repeatActionChance
+      value: 1
+
+  requiredLevel: 33
+
+  costs:
+    - itemId: Gold Coin
+      value: 500000
+
+    - itemId: Star Fragment
+      value: 1
+
+    - itemId: Spirit Gear
+      value: 1
+
+  jobIds:
+    - Ranger
+
+- id: d255eb94-799d-41cb-9d5d-5a7baeaebded
+  name: 'Combat Stat: Basic Double Strike'
+
+  effects:
+    - type: CombatStat
+      combatStat: skillStrikeAgainChance
+      value: 1
+
+  requiredLevel: 33
+
+  costs:
+    - itemId: Gold Coin
+      value: 500000
+
+    - itemId: Gobslime Tongue
+      value: 1
+
+    - itemId: Spirit Gear
+      value: 1
+
+  jobIds:
+    - Magician
+
+- id: cd59a5bc-6019-405f-940e-8c77dbfe6a6b
+  name: 'Combat Stat: Basic Debuff Resistance'
+
+  effects:
+    - type: CombatStat
+      combatStat: debuffIgnoreChance
+      value: 1
+
+  requiredLevel: 33
+
+  costs:
+    - itemId: Gold Coin
+      value: 500000
+
+    - itemId: Gobslime Tongue
+      value: 1
+
+    - itemId: Spirit Gear
+      value: 1
+
+  jobIds:
+    - Healer

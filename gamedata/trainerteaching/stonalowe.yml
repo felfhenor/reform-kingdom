@@ -1,0 +1,371 @@
+## Healer / Magician
+
+- id: c8ad21be-3c88-4f0a-ba11-a2e10822c2fe
+  name: 'Magical: Basic Intelligence Training'
+
+  effects:
+    - type: Stat
+      stat: Intelligence
+      value: 2
+
+    - type: Stat
+      stat: Energy
+      value: 5
+
+  requiredLevel: 5
+
+  costs:
+    - itemId: Gold Coin
+      value: 2000
+
+    - itemId: Malachite
+      value: 3
+
+  jobIds:
+    - Magician
+    - Healer
+
+- id: c88363e7-fa73-44cb-9919-09d3b90cf199
+  name: 'Magical: Basic Spirit Training'
+
+  effects:
+    - type: Stat
+      stat: Spirit
+      value: 1
+
+  requiredLevel: 8
+
+  costs:
+    - itemId: Gold Coin
+      value: 3000
+
+    - itemId: Azurite
+      value: 3
+
+  jobIds:
+    - Magician
+    - Healer
+
+- id: 4301e4e3-e745-414d-929e-165b75323fdc
+  name: 'Magical: Basic Resistance Training'
+
+  effects:
+    - type: Stat
+      stat: Resistance
+      value: 2
+
+    - type: Stat
+      stat: Energy
+      value: 10
+
+  requiredLevel: 12
+
+  costs:
+    - itemId: Gold Coin
+      value: 5000
+
+    - itemId: Wergen Stick
+      value: 25
+
+  jobIds:
+    - Magician
+    - Healer
+
+- id: dcd2e393-94c8-461d-bbe5-202889dd094d
+  name: 'Magical: Fortuitous Training'
+
+  effects:
+    - type: Stat
+      stat: Intelligence
+      value: 5
+
+    - type: Stat
+      stat: Vitality
+      value: 3
+
+  requiredLevel: 17
+
+  costs:
+    - itemId: Gold Coin
+      value: 7500
+
+    - itemId: Wergen Wood
+      value: 25
+
+  jobIds:
+    - Magician
+    - Healer
+
+## Explorer
+
+- id: ba905272-f1f1-431a-b4ff-e335b96eb754
+  name: 'Explorer: Basic Health Training'
+
+  effects:
+    - type: Stat
+      stat: Health
+      value: 10
+
+  requiredLevel: 5
+
+  costs:
+    - itemId: Gold Coin
+      value: 2000
+
+    - itemId: Goblin Teeth
+      value: 3
+
+  jobIds:
+    - Explorer
+
+- id: faff5ebc-0233-40c5-bdea-7c8d4f48597a
+  name: 'Explorer: Basic Strength Training'
+
+  effects:
+    - type: Stat
+      stat: Strength
+      value: 1
+
+  requiredLevel: 8
+
+  costs:
+    - itemId: Gold Coin
+      value: 3000
+
+    - itemId: Copper Ore
+      value: 5
+
+  jobIds:
+    - Explorer
+
+- id: eda303e7-2259-4846-a197-f9cc248d0b59
+  name: 'Explorer: Fortuitous Training'
+
+  effects:
+    - type: Stat
+      stat: Constitution
+      value: 2
+
+    - type: Stat
+      stat: Energy
+      value: 10
+
+  requiredLevel: 12
+
+  costs:
+    - itemId: Gold Coin
+      value: 5000
+
+    - itemId: Copper Ingot
+      value: 25
+
+  jobIds:
+    - Explorer
+
+- id: 4e80e642-c92a-4d5f-8f21-2159b8efd5ae
+  name: 'Explorer: Basic Vitality Training'
+
+  effects:
+    - type: Stat
+      stat: Vitality
+      value: 3
+
+  requiredLevel: 17
+
+  costs:
+    - itemId: Gold Coin
+      value: 7500
+
+    - itemId: Ghostwood
+      value: 15
+
+  jobIds:
+    - Explorer
+
+## Warrior
+
+- id: 4dcfcff3-36b1-442f-97df-6570952eec34
+  name: 'Warrior: Basic Strength Training'
+
+  effects:
+    - type: Stat
+      stat: Strength
+      value: 2
+
+    - type: Stat
+      stat: Health
+      value: 5
+
+  requiredLevel: 5
+
+  costs:
+    - itemId: Gold Coin
+      value: 2000
+
+    - itemId: Goblin Nail
+      value: 3
+
+  jobIds:
+    - Warrior
+
+- id: afce920d-d340-4ee2-91ba-050307eb919f
+  name: 'Warrior: Basic Constitution Training'
+
+  effects:
+    - type: Stat
+      stat: Constitution
+      value: 1
+
+  requiredLevel: 8
+
+  costs:
+    - itemId: Gold Coin
+      value: 3000
+
+    - itemId: Tattered Hide
+      value: 3
+
+  jobIds:
+    - Warrior
+
+- id: 03910017-d1d0-4c15-8771-67a43d5d4474
+  name: 'Warrior: Basic Vitality Training'
+
+  effects:
+    - type: Stat
+      stat: Vitality
+      value: 2
+
+    - type: Stat
+      stat: Health
+      value: 10
+
+  requiredLevel: 12
+
+  costs:
+    - itemId: Gold Coin
+      value: 5000
+
+    - itemId: Red Slime Core
+      value: 5
+
+  jobIds:
+    - Warrior
+
+- id: 986c0f6a-ba9b-4412-837c-4eec0fa89689
+  name: 'Warrior: Fortuitous Training'
+
+  effects:
+    - type: Stat
+      stat: Strength
+      value: 5
+
+    - type: Stat
+      stat: Resistance
+      value: 3
+
+  requiredLevel: 17
+
+  costs:
+    - itemId: Gold Coin
+      value: 7500
+
+    - itemId: Orc Bone
+      value: 10
+
+  jobIds:
+    - Warrior
+
+# Ranger
+
+- id: ba19ac91-01c7-4dc7-a24c-9f3036c00e12
+  name: 'Ranger: Basic Agility Training'
+
+  effects:
+    - type: Stat
+      stat: Agility
+      value: 2
+
+    - type: Stat
+      stat: Health
+      value: 5
+
+  requiredLevel: 5
+
+  costs:
+    - itemId: Gold Coin
+      value: 2000
+
+    - itemId: Small Goblin Bone
+      value: 3
+
+  jobIds:
+    - Ranger
+
+- id: 3a116e02-4b3d-46ca-95dc-71d06726b362
+  name: 'Ranger: Basic Constitution Training'
+
+  effects:
+    - type: Stat
+      stat: Constitution
+      value: 1
+
+  requiredLevel: 8
+
+  costs:
+    - itemId: Gold Coin
+      value: 3000
+
+    - itemId: Small Asura Tendon
+      value: 3
+
+  jobIds:
+    - Ranger
+
+- id: 00dc7a66-43b6-4d28-8a81-ae22baf08c08
+  name: 'Ranger: Basic Vitality Training'
+
+  effects:
+    - type: Stat
+      stat: Vitality
+      value: 2
+
+    - type: Stat
+      stat: Energy
+      value: 10
+
+  requiredLevel: 12
+
+  costs:
+    - itemId: Gold Coin
+      value: 5000
+
+    - itemId: Green Slime Core
+      value: 5
+
+  jobIds:
+    - Ranger
+
+- id: fa67e4a9-4749-4e63-9d32-0e76622b8b26
+  name: 'Ranger: Fortuitous Training'
+
+  effects:
+    - type: Stat
+      stat: Strength
+      value: 5
+
+    - type: Stat
+      stat: Agility
+      value: 3
+
+  requiredLevel: 17
+
+  costs:
+    - itemId: Gold Coin
+      value: 7500
+
+    - itemId: Oozehide
+      value: 10
+
+  jobIds:
+    - Ranger

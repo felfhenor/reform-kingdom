@@ -1,0 +1,202 @@
+- id: 45d0bbab-b67c-47ff-b5fb-84e1458197b9
+  name: 'Magical: Intense Training'
+
+  effects:
+    - type: Stat
+      stat: Intelligence
+      value: 7
+
+    - type: Stat
+      stat: Resistance
+      value: 5
+
+    - type: Stat
+      stat: Spirit
+      value: 3
+
+  requiredLevel: 30
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 1000
+
+    - itemId: Strong Spider Silk
+      value: 5
+
+  jobIds:
+    - Magician
+    - Healer
+
+- id: 97a65cee-641c-4aaf-90fe-f88dc6b6505d
+  name: 'Magical: Intense Body & Mind Training'
+
+  effects:
+    - type: Stat
+      stat: Resistance
+      value: 7
+
+    - type: Stat
+      stat: Vitality
+      value: 5
+
+  requiredLevel: 38
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 2000
+
+    - itemId: Elven Purity Water
+      value: 5
+
+  jobIds:
+    - Magician
+    - Healer
+
+- id: 348f6e46-8842-49e8-a9ae-6f92a8172a9a
+  name: 'Explorer: Intense Training'
+
+  effects:
+    - type: Stat
+      stat: Agility
+      value: 7
+
+    - type: Stat
+      stat: Health
+      value: 15
+
+    - type: Stat
+      stat: Spirit
+      value: 3
+
+  requiredLevel: 30
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 1000
+
+    - itemId: Wolf Pelt
+      value: 5
+
+  jobIds:
+    - Explorer
+
+- id: ebbbd9e2-06f8-437c-a82c-090973de493e
+  name: 'Explorer: Intense Luck Training'
+
+  effects:
+    - type: Stat
+      stat: Luck
+      value: 1
+
+  requiredLevel: 38
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 2500
+
+  jobIds:
+    - Explorer
+
+- id: 4e85469a-5af9-4703-b6c0-0c2edb5d0867
+  name: 'Warrior: Intense Training'
+
+  effects:
+    - type: Stat
+      stat: Strength
+      value: 7
+
+    - type: Stat
+      stat: Vitality
+      value: 5
+
+    - type: Stat
+      stat: Constitution
+      value: 3
+
+  requiredLevel: 30
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 1000
+
+    - itemId: Bat Wing
+      value: 5
+
+  jobIds:
+    - Warrior
+
+- id: af717597-3c88-484c-b954-53906214cc29
+  name: 'Warrior: Intense Body & Mind Training'
+
+  effects:
+    - type: Stat
+      stat: Vitality
+      value: 7
+
+    - type: Stat
+      stat: Resistance
+      value: 5
+
+  requiredLevel: 38
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 2500
+
+    - itemId: Wooden Scales
+      value: 5
+
+  jobIds:
+    - Warrior
+
+- id: 9e67659f-b8b9-4c6d-863e-9320b160b2b2
+  name: 'Ranger: Intense Training'
+
+  effects:
+    - type: Stat
+      stat: Agility
+      value: 7
+
+    - type: Stat
+      stat: Resistance
+      value: 5
+
+    - type: Stat
+      stat: Constitution
+      value: 3
+
+  requiredLevel: 30
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 1000
+
+    - itemId: Hawk Feather
+      value: 5
+
+  jobIds:
+    - Ranger
+
+- id: 426af71c-8b20-4e17-b3d4-dde7bff26c41
+  name: 'Ranger: Intense Body & Mind Training'
+
+  effects:
+    - type: Stat
+      stat: Vitality
+      value: 6
+
+    - type: Stat
+      stat: Resistance
+      value: 6
+
+  requiredLevel: 38
+
+  costs:
+    - itemId: Crimson Lucre
+      value: 2500
+
+    - itemId: Woodwolf Teeth
+      value: 5
+
+  jobIds:
+    - Ranger

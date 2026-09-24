@@ -1,0 +1,99 @@
+- id: 79d8ced8-29c3-4638-9550-edcfae8b28c7
+  name: 'Healer: Holy Stun Resistance'
+
+  effects:
+    - type: StatusEffect
+      statusEffect: Stun
+      value: 3
+
+  requiredLevel: 25
+
+  costs:
+    - itemId: Gold Coin
+      value: 25000
+
+    - itemId: Cimmerian Holy Charm
+      value: 1
+
+  jobIds:
+    - Healer
+
+- id: 66773afe-ac53-414e-a8aa-f12c021f81f0
+  name: 'Magician: Ancient Fire Resistance'
+
+  effects:
+    - type: StatusEffect
+      statusEffect: Burn
+      value: 3
+
+  requiredLevel: 25
+
+  costs:
+    - itemId: Gold Coin
+      value: 25000
+
+    - itemId: Cimmerian Fire Charm
+      value: 1
+
+  jobIds:
+    - Magician
+
+- id: 819b8f24-079e-4d3a-8bee-a57aeecf4b65
+  name: 'Warrior: Steelskin Bleed Resistance'
+
+  effects:
+    - type: StatusEffect
+      statusEffect: Bleed
+      value: 3
+
+  requiredLevel: 25
+
+  costs:
+    - itemId: Gold Coin
+      value: 25000
+
+    - itemId: Cimmerian Water Charm
+      value: 1
+
+  jobIds:
+    - Warrior
+
+- id: fed4d93c-00ac-4adc-96bb-eff3214ed5ea
+  name: 'Ranger: Focuseye Accuracy Resistance'
+
+  effects:
+    - type: StatusEffect
+      statusEffect: Accuracy
+      value: 3
+
+  requiredLevel: 25
+
+  costs:
+    - itemId: Gold Coin
+      value: 25000
+
+    - itemId: Cimmerian Lightning Charm
+      value: 1
+
+  jobIds:
+    - Ranger
+
+- id: d3ebff69-bb4e-46cb-a3ed-916788466d25
+  name: 'Explorer: Abnormal Parameter Resistance'
+
+  effects:
+    - type: StatusEffect
+      statusEffect: StatDown
+      value: 3
+
+  requiredLevel: 25
+
+  costs:
+    - itemId: Gold Coin
+      value: 25000
+
+    - itemId: Cimmerian Skull Charm
+      value: 1
+
+  jobIds:
+    - Explorer

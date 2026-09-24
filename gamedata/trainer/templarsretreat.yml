@@ -1,0 +1,7 @@
+- id: 8c4c2374-8f7c-41cd-96c2-13726284b4c8
+  name: Fio Kaipo
+  description: An explorer at heart. This trainer explores every nook and cranny everywhere possible, often getting into unpredictable and uncomfortable situations.
+
+  trainingIds:
+    - 'Skill: Slow Web I'
+    - 'Skill: Slow Web II'

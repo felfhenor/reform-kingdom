@@ -450,6 +450,19 @@
                  "width":64,
                  "x":256,
                  "y":1536
+                }, 
+                {
+                 "gid":431,
+                 "height":64,
+                 "id":162,
+                 "name":"Maxim Tasnica",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Trainer",
+                 "visible":true,
+                 "width":64,
+                 "x":1792,
+                 "y":384
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -458,7 +471,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":162,
+ "nextobjectid":163,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

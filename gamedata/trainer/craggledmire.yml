@@ -1,0 +1,10 @@
+- id: 8891ac18-f72c-4397-822c-629df9bf8241
+  name: Maxim Tasnica
+  description: A fervent treasure hunter and artifact seeker. He can give mysterious training benefits that help ailment resistance in exchange for rare artifacts.
+
+  trainingIds:
+    - 'Healer: Holy Stun Resistance'
+    - 'Magician: Ancient Fire Resistance'
+    - 'Warrior: Steelskin Bleed Resistance'
+    - 'Ranger: Focuseye Accuracy Resistance'
+    - 'Explorer: Abnormal Parameter Resistance'

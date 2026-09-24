@@ -1,0 +1,13 @@
+- id: b7543dd0-2b16-49dc-ab3d-bff2507e4072
+  name: Elfen Ledi
+  description: An elfen trainer that's known for being extremely intense and strict. She spares no effort to be on the track of continuous improvement.
+
+  trainingIds:
+    - 'Magical: Intense Training'
+    - 'Magical: Intense Body & Mind Training'
+    - 'Explorer: Intense Training'
+    - 'Explorer: Intense Luck Training'
+    - 'Warrior: Intense Training'
+    - 'Warrior: Intense Body & Mind Training'
+    - 'Ranger: Intense Training'
+    - 'Ranger: Intense Body & Mind Training'

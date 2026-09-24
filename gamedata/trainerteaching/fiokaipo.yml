@@ -1,0 +1,38 @@
+- id: 53568b9d-6c26-4ae3-ab31-df035e848d24
+  name: 'Skill: Slow Web I'
+
+  effects:
+    - type: Skill
+      skillId: Slow Web I
+
+  requiredLevel: 15
+
+  costs:
+    - itemId: Gold Coin
+      value: 25000
+
+    - itemId: Weak Spider Silk
+      value: 25
+
+  jobIds:
+    - Explorer
+
+- id: efaf5f7e-3839-4930-b3a4-20fa57b2e7de
+  name: 'Skill: Slow Web II'
+  requiresTeacherTrainingId: 'Skill: Slow Web I'
+
+  effects:
+    - type: Skill
+      skillId: Slow Web II
+
+  requiredLevel: 30
+
+  costs:
+    - itemId: Gold Coin
+      value: 55000
+
+    - itemId: Strong Spider Silk
+      value: 25
+
+  jobIds:
+    - Explorer

@@ -18,6 +18,7 @@ Content comes from a few different categories that can call on these improvement
 - Infusions
 - Shrines
 - Town Buffs
+- Trainers
 
 ## Duchy Upgrades
 
@@ -52,5 +53,6 @@ Combat stats includes anything that is not a pure stat, that is to say, things l
 | Collectibles     | x              | x            | x       | x                | x          |             |
 | Equipment        |                | x            |         | x                | x          | x           |
 | Infusions        |                | x            |         | x                | x          |             |
-| Town Buffs       |                | x            |         |                  | x          |             |
 | Shrines          |                |              | x       | x                |            |             |
+| Town Buffs       |                | x            |         |                  | x          |             |
+| Trainers         |                | x            |         |                  | x          |             |

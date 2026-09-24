@@ -1,0 +1,20 @@
+- id: 7597e1fc-7c44-47c6-86d5-9bc9589f6a34
+  name: 'Stat: Basic Luck'
+
+  effects:
+    - type: Stat
+      stat: Luck
+      value: 1
+
+  requiredLevel: 30
+
+  costs:
+    - itemId: Gold Coin
+      value: 25000
+
+  jobIds:
+    - Explorer
+    - Magician
+    - Warrior
+    - Ranger
+    - Healer

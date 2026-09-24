@@ -28,6 +28,7 @@ The most massive type of content, requiring a lot of design and sub-content piec
 - [ ] Equipment
 - [ ] Monsters
 - [ ] Tradeskill Recipes
+- [ ] Trainers
 
 ## Combat Nodes
 
@@ -68,6 +69,7 @@ Adding a new job requires adding:
 - [ ] New equipment (if needed)
 - [ ] New equipment slots (if there needs to be one)
 - [ ] New skills & skill paths
+- [ ] New trainers/training
 
 ## Skills
 

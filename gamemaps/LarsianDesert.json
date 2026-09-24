@@ -621,6 +621,32 @@
                  "width":64,
                  "x":2496,
                  "y":1024
+                }, 
+                {
+                 "gid":560,
+                 "height":64,
+                 "id":190,
+                 "name":"Lucky Leaper",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Trainer",
+                 "visible":true,
+                 "width":64,
+                 "x":2432,
+                 "y":1408
+                }, 
+                {
+                 "gid":424,
+                 "height":64,
+                 "id":191,
+                 "name":"Bairan Faust",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Trainer",
+                 "visible":true,
+                 "width":64,
+                 "x":2432,
+                 "y":2304
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -629,7 +655,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":190,
+ "nextobjectid":192,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
