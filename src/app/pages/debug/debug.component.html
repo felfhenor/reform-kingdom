@@ -27,8 +27,6 @@
               [class.tab-active]="activeCategory() === category"
               [class.opacity-50]="activeCategory() !== category"
               (click)="activeCategory.set(category)"
-              appSfx="ui-click"
-              [sfxTrigger]="['click', 'hover']"
             >
               {{ category }}
 
@@ -37,24 +35,27 @@
                   class="text-success"
                   [tp]="status.pass + ' successful check(s)'"
                   [tpPlacement]="'top'"
-                  >✓</span
                 >
+                  ✓
+                </span>
               }
               @if (status.warning > 0) {
                 <span
                   class="text-warning"
                   [tp]="status.warning + ' warning(s)'"
                   [tpPlacement]="'top'"
-                  >⚠</span
                 >
+                  ⚠
+                </span>
               }
               @if (status.fail > 0) {
                 <span
                   class="text-error"
                   [tp]="status.fail + ' error(s)'"
                   [tpPlacement]="'top'"
-                  >✗</span
                 >
+                  ✗
+                </span>
               }
             </button>
           }

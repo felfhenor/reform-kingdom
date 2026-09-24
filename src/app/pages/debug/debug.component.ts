@@ -6,7 +6,6 @@ import {
   inject,
 } from '@angular/core';
 import { InputAnalysisComponent } from '@components/input-analysis/input-analysis.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { CONTENT_DERIVED_DEFAULTS } from '@helpers/debug/analysis-defaults.ui';
 import {
   ALL_ANALYSIS_INPUTS,
@@ -101,7 +100,7 @@ function paramStringify(
 @Component({
   selector: 'app-debug',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [InputAnalysisComponent, TippyDirective, SFXDirective],
+  imports: [InputAnalysisComponent, TippyDirective],
   templateUrl: './debug.component.html',
   styleUrl: './debug.component.scss',
 })
