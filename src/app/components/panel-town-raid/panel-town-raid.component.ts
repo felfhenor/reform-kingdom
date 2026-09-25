@@ -4,10 +4,9 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { RowRaidCombatantsComponent } from '@components/row-raid-combatants/row-raid-combatants.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
-import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { notifyError } from '@helpers/engine/notify';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
@@ -20,22 +19,18 @@ import {
 } from '@helpers/town/raid/town-raid-state';
 import { townCraftDebuffExpiresAtTick } from '@helpers/town/raid/town-raid-state.ui';
 import type { TownContent, TownRaidCombatantRow } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-town-raid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    RowRaidCombatantsComponent,
     BlankSlateComponent,
-    AtlasAnimationComponent,
     SlotCompletionRewardComponent,
-    SlotIconBlankComponent,
-    TippyDirective,
     SFXDirective,
   ],
   host: { class: 'card shadow-sm' },
   templateUrl: './panel-town-raid.component.html',
-  styleUrl: './panel-town-raid.component.scss',
 })
 export class PanelTownRaidComponent {
   public town = input.required<TownContent>();

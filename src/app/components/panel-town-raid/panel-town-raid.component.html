@@ -19,52 +19,12 @@
     <div class="flex flex-col gap-2">
       @let assaulters = raidAssaulters();
       @if (assaulters.length > 0) {
-        <div class="flex flex-col gap-2">
-          <div class="text-sm font-semibold">Assaulters</div>
-          <div class="flex flex-wrap gap-2">
-            @for (row of assaulters; track row.monster.id) {
-              <div
-                class="raid-combatant-slot"
-                [tp]="row.monster.name"
-                [tpPlacement]="'top'"
-              >
-                <app-slot-icon-blank>
-                  <app-atlas-animation
-                    spritesheet="monster"
-                    [assetName]="row.monster.sprite"
-                    [frames]="row.monster.frames"
-                  />
-                  <span text-br>x{{ row.quantity }}</span>
-                </app-slot-icon-blank>
-              </div>
-            }
-          </div>
-        </div>
+        <app-row-raid-combatants label="Assaulters" [combatants]="assaulters" />
       }
 
       @let defenders = raidDefenders();
       @if (defenders.length > 0) {
-        <div class="flex flex-col gap-2">
-          <div class="text-sm font-semibold">Defenders</div>
-          <div class="flex flex-wrap gap-2">
-            @for (row of defenders; track row.monster.id) {
-              <div
-                class="raid-combatant-slot"
-                [tp]="row.monster.name"
-                [tpPlacement]="'top'"
-              >
-                <app-slot-icon-blank>
-                  <app-atlas-animation
-                    spritesheet="monster"
-                    [assetName]="row.monster.sprite"
-                    [frames]="row.monster.frames"
-                  />
-                  <span text-br>x{{ row.quantity }}</span>
-                </app-slot-icon-blank>
-              </div>
-            }
-          </div>
-        </div>
+        <app-row-raid-combatants label="Defenders" [combatants]="defenders" />
       }
 
       @let rewards = raidRewards();

@@ -8,11 +8,10 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
@@ -35,7 +34,6 @@ import type {
   HasRarity,
   HasSprite,
 } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -51,13 +49,11 @@ type AstralProjectorRowViewModel = {
   selector: 'app-play-kingdom-astralprojector',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SlotRequirementComponent,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,
-    IconUnknownComponent,
-    SlotIconBlankComponent,
     SweetAlert2Module,
-    TippyDirective,
     SlotRarityOutlineComponent,
     SFXDirective,
   ],

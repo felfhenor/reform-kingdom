@@ -1,0 +1,20 @@
+<div class="text-sm font-semibold">{{ label() }}</div>
+
+<div class="flex flex-wrap gap-2">
+  @for (row of combatants(); track row.monster.id) {
+    <div
+      class="relative w-16 h-16"
+      [tp]="row.monster.name"
+      [tpPlacement]="'top'"
+    >
+      <app-slot-icon-blank>
+        <app-atlas-animation
+          spritesheet="monster"
+          [assetName]="row.monster.sprite"
+          [frames]="row.monster.frames"
+        />
+        <span text-br>x{{ row.quantity }}</span>
+      </app-slot-icon-blank>
+    </div>
+  }
+</div>

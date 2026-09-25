@@ -1,27 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { RowRaidCombatantsComponent } from '@components/row-raid-combatants/row-raid-combatants.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
-import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { ModalComponent } from '@components/modal/modal.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { formatDuration } from '@helpers/engine/timer';
 import { travelStart } from '@helpers/hero/travel';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
-import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-modal-raid-defense',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    RowRaidCombatantsComponent,
     BlankSlateComponent,
     ModalComponent,
-    AtlasAnimationComponent,
-    SlotIconBlankComponent,
-    TippyDirective,
     SFXDirective,
   ],
   templateUrl: './modal-raid-defense.component.html',
-  styleUrl: './modal-raid-defense.component.scss',
 })
 export class ModalRaidDefenseComponent {
   public rows = computed(() => raidDefenseRowViewModels());

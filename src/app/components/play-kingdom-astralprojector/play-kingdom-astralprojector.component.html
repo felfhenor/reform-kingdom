@@ -31,34 +31,13 @@
 
           <div class="flex flex-wrap gap-2 lg:flex-1">
             @for (material of row.materialEntries; track $index) {
-              <div
-                class="relative w-8 h-8 shrink-0"
-                [tp]="materialTooltip(material)"
-                [tpPlacement]="'top'"
-              >
-                <div class="zoom-row">
-                  @if (material.discovered && material.content) {
-                    <app-slot-rarity-outline
-                      [entry]="material.content"
-                      spritesheet="item"
-                    >
-                      @if (material.owned >= material.quantity) {
-                        <span badge-br>
-                          {{ material.quantity }}
-                        </span>
-                      } @else {
-                        <span badge-br-unmet>
-                          {{ material.quantity }}
-                        </span>
-                      }
-                    </app-slot-rarity-outline>
-                  } @else {
-                    <app-slot-icon-blank>
-                      <app-icon-unknown />
-                    </app-slot-icon-blank>
-                  }
-                </div>
-              </div>
+              <app-slot-requirement
+                [content]="material.discovered ? material.content : undefined"
+                spritesheet="item"
+                [owned]="material.owned"
+                [quantity]="material.quantity"
+                [tooltip]="materialTooltip(material)"
+              />
             }
           </div>
         </div>

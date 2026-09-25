@@ -1,6 +1,5 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
@@ -43,7 +42,6 @@ import {
   worldTravelState,
   worldCurrentLocationState,
 } from '@helpers/state-game';
-import { townReputationDisplay } from '@helpers/town/reputation/town-reputation.ui';
 import {
   worldNodeCaravanIsAvailable,
   worldNodeCaravanVisitedTraderName,
@@ -78,7 +76,7 @@ import { sortBy } from 'es-toolkit/compat';
   selector: 'app-panel-map-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    DecimalPipe,
+    BarTownReputationComponent,
     ButtonCloseComponent,
     SlotCompletionRewardComponent,
     SlotGatherMaterialComponent,
@@ -96,7 +94,6 @@ import { sortBy } from 'es-toolkit/compat';
     PanelMapNodeStatusGatherComponent,
     SpriteNodeComponent,
     SFXDirective,
-    BarProgressComponent,
   ],
   templateUrl: './panel-map-node.component.html',
   styleUrl: './panel-map-node.component.scss',
@@ -197,10 +194,9 @@ export class PanelMapNodeComponent {
     return !!entry && !!worldNodeTown(entry);
   });
 
-  public townReputation = computed(() => {
+  public townId = computed(() => {
     const entry = this.node();
-    const town = entry ? worldNodeTown(entry) : undefined;
-    return town ? townReputationDisplay(town.id) : undefined;
+    return entry ? worldNodeTown(entry)?.id : undefined;
   });
 
   public meetsCaravanAvailability = computed(() => {

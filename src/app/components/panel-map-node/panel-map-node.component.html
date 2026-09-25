@@ -51,20 +51,8 @@
           {{ description() ?? 'No information available yet.' }}
         </p>
 
-        @if (townReputation(); as repDisplay) {
-          <app-bar-progress
-            color="secondary"
-            [value]="repDisplay.reputation"
-            [max]="repDisplay.nextThreshold ?? repDisplay.reputation"
-          >
-            @if (repDisplay.isMaxed) {
-              {{ repDisplay.tierName }}
-            } @else {
-              {{ repDisplay.tierName }} [{{ repDisplay.reputation | number }}/{{
-                repDisplay.nextThreshold | number
-              }}]
-            }
-          </app-bar-progress>
+        @if (townId(); as id) {
+          <app-bar-town-reputation [townId]="id" />
         }
 
         @let materialIds = gatherMaterialIds();

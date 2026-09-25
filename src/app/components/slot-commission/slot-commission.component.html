@@ -19,30 +19,13 @@
     } @else {
       <div class="flex flex-wrap gap-2">
         @for (req of r.requirementEntries; track $index) {
-          <div
-            class="relative w-8 h-8 shrink-0"
-            [tp]="requirementTooltip(req)"
-            [tpPlacement]="'top'"
-          >
-            <div class="zoom-row">
-              @if (req.content) {
-                <app-slot-rarity-outline
-                  [entry]="req.content"
-                  [spritesheet]="req.spritesheet"
-                >
-                  @if (req.owned >= req.quantity) {
-                    <span badge-br>
-                      {{ req.quantity }}
-                    </span>
-                  } @else {
-                    <span badge-br-unmet>
-                      {{ req.quantity }}
-                    </span>
-                  }
-                </app-slot-rarity-outline>
-              }
-            </div>
-          </div>
+          <app-slot-requirement
+            [content]="req.content"
+            [spritesheet]="req.spritesheet"
+            [owned]="req.owned"
+            [quantity]="req.quantity"
+            [tooltip]="requirementTooltip(req)"
+          />
         }
       </div>
 

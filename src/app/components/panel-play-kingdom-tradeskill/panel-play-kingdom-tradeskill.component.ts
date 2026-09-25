@@ -9,6 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
@@ -66,6 +67,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
   selector: 'app-panel-play-kingdom-tradeskill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SlotRequirementComponent,
     BlankSlateComponent,
     BarProgressComponent,
     AtlasImageComponent,

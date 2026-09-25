@@ -47,49 +47,14 @@
           </div>
 
           <div class="flex flex-wrap gap-4">
-            <div class="flex flex-col gap-2">
-              <div class="text-sm font-semibold">Assaulters</div>
-              <div class="flex flex-wrap gap-2">
-                @for (combatant of row.assaulters; track combatant.monster.id) {
-                  <div
-                    class="raid-combatant-slot"
-                    [tp]="combatant.monster.name"
-                    [tpPlacement]="'top'"
-                  >
-                    <app-slot-icon-blank>
-                      <app-atlas-animation
-                        spritesheet="monster"
-                        [assetName]="combatant.monster.sprite"
-                        [frames]="combatant.monster.frames"
-                      />
-                      <span text-br>x{{ combatant.quantity }}</span>
-                    </app-slot-icon-blank>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <div class="text-sm font-semibold">Defenders</div>
-              <div class="flex flex-wrap gap-2">
-                @for (combatant of row.defenders; track combatant.monster.id) {
-                  <div
-                    class="raid-combatant-slot"
-                    [tp]="combatant.monster.name"
-                    [tpPlacement]="'top'"
-                  >
-                    <app-slot-icon-blank>
-                      <app-atlas-animation
-                        spritesheet="monster"
-                        [assetName]="combatant.monster.sprite"
-                        [frames]="combatant.monster.frames"
-                      />
-                      <span text-br>x{{ combatant.quantity }}</span>
-                    </app-slot-icon-blank>
-                  </div>
-                }
-              </div>
-            </div>
+            <app-row-raid-combatants
+              label="Assaulters"
+              [combatants]="row.assaulters"
+            />
+            <app-row-raid-combatants
+              label="Defenders"
+              [combatants]="row.defenders"
+            />
           </div>
         </div>
       }

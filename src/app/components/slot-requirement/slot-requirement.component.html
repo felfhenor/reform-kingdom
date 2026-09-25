@@ -1,0 +1,13 @@
+<div class="zoom-row" [tp]="tooltip()" [tpPlacement]="'top'">
+  @if (content(); as entry) {
+    <app-slot-rarity-outline [entry]="entry" [spritesheet]="spritesheet()">
+      @if (owned() >= quantity()) {
+        <span badge-br>{{ quantity() }}</span>
+      } @else {
+        <span badge-br-unmet>{{ quantity() }}</span>
+      }
+    </app-slot-rarity-outline>
+  } @else {
+    <app-icon-unknown />
+  }
+</div>
