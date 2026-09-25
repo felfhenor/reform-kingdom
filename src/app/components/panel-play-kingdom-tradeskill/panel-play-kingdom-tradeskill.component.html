@@ -4,7 +4,7 @@
 @let uncraftableTotal = uncraftableCount();
 
 <app-card-page heightProfile="full">
-  <span header>{{ tradeskill() }} - Lv. {{ buildingData.level }}</span>
+  <span header>{{ tradeskill() }} Lv. {{ buildingData.level }}</span>
 
   <div pageactions class="flex items-center gap-2">
     @for (nav of tradeskillNav(); track nav.content.id) {

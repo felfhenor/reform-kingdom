@@ -12,7 +12,7 @@
     </p>
 
     <div>
-      <div class="font-semibold mb-2">Rarity</div>
+      <div class="text-sm font-semibold mb-2">Rarity</div>
       <div class="flex gap-2 flex-wrap">
         @for (rarity of rarities; track rarity) {
           <button
@@ -30,7 +30,7 @@
     </div>
 
     <div>
-      <div class="font-semibold mb-2">Minimum Item Level</div>
+      <div class="text-sm font-semibold mb-2">Minimum Item Level</div>
       <input
         type="number"
         min="1"
@@ -41,7 +41,7 @@
     </div>
 
     <div>
-      <div class="font-semibold mb-2">Item Types</div>
+      <div class="text-sm font-semibold mb-2">Item Types</div>
       <div class="grid grid-cols-4 gap-2">
         @for (type of equipmentTypes; track type) {
           <button

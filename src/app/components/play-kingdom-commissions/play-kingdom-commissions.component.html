@@ -1,4 +1,7 @@
-<app-card-page heightProfile="full" appTutorialTarget="kingdom-subview-commissions">
+<app-card-page
+  heightProfile="full"
+  appTutorialTarget="kingdom-subview-commissions"
+>
   <span header>Commissions</span>
 
   <div pageactions class="flex items-center gap-2">
@@ -8,7 +11,7 @@
   <div class="flex flex-col gap-4 p-4 h-full overflow-y-auto">
     <div class="flex flex-col gap-2">
       <div class="flex items-center justify-between">
-        <span class="font-semibold">Caravans</span>
+        <span class="card-title text-base">Caravans</span>
         <span class="text-sm text-lighter">
           Next commissions in {{ resetLabel() }}
         </span>
@@ -29,7 +32,7 @@
 
     @if (townRows().length > 0) {
       <div class="flex flex-col gap-2">
-        <span class="font-semibold">Towns</span>
+        <span class="card-title text-base">Towns</span>
 
         @for (row of townRows(); track row.slotId) {
           <app-slot-commission

@@ -20,7 +20,7 @@
       @let assaulters = raidAssaulters();
       @if (assaulters.length > 0) {
         <div class="flex flex-col gap-2">
-          <div class="font-bold text-neutral-content">Assaulters</div>
+          <div class="text-sm font-semibold">Assaulters</div>
           <div class="flex flex-wrap gap-2">
             @for (row of assaulters; track row.monster.id) {
               <div
@@ -45,7 +45,7 @@
       @let defenders = raidDefenders();
       @if (defenders.length > 0) {
         <div class="flex flex-col gap-2">
-          <div class="font-bold text-neutral-content">Defenders</div>
+          <div class="text-sm font-semibold">Defenders</div>
           <div class="flex flex-wrap gap-2">
             @for (row of defenders; track row.monster.id) {
               <div
@@ -70,7 +70,7 @@
       @let rewards = raidRewards();
       @if (rewards.length > 0) {
         <div class="flex flex-col gap-2">
-          <div class="font-bold text-neutral-content">Rewards</div>
+          <div class="text-sm font-semibold">Rewards</div>
           <div class="flex flex-wrap gap-2">
             @for (reward of rewards; track $index) {
               <app-slot-completion-reward [reward]="reward" />

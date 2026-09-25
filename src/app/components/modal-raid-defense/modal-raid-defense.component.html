@@ -48,9 +48,7 @@
 
           <div class="flex flex-wrap gap-4">
             <div class="flex flex-col gap-2">
-              <div class="font-bold text-neutral-content text-sm">
-                Attackers
-              </div>
+              <div class="text-sm font-semibold">Assaulters</div>
               <div class="flex flex-wrap gap-2">
                 @for (combatant of row.assaulters; track combatant.monster.id) {
                   <div
@@ -72,9 +70,7 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <div class="font-bold text-neutral-content text-sm">
-                Defenders
-              </div>
+              <div class="text-sm font-semibold">Defenders</div>
               <div class="flex flex-wrap gap-2">
                 @for (combatant of row.defenders; track combatant.monster.id) {
                   <div

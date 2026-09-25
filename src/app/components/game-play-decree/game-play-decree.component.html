@@ -1,7 +1,7 @@
 <div class="p-4 flex flex-col gap-4 h-full">
   <div class="card bg-base-100 foreground shadow-xl">
     <div class="card-body gap-4">
-      <div class="card-title">Auto Mode</div>
+      <div class="card-title text-base">Auto Mode</div>
 
       <div class="form-control">
         <label class="label cursor-pointer label-checkbox">
@@ -53,7 +53,7 @@
 
   <div class="card bg-base-100 foreground shadow-xl">
     <div class="card-body gap-2">
-      <div class="card-title">
+      <div class="card-title text-base">
         {{ isEditing() ? 'Edit Clause' : 'Add Clause' }}
       </div>
 
@@ -276,7 +276,7 @@
     class="card bg-base-100 foreground shadow-xl flex-1 min-h-0 flex flex-col"
   >
     <div class="card-body gap-2 flex-1 min-h-0 flex flex-col">
-      <div class="card-title justify-between">
+      <div class="card-title text-base justify-between">
         Decree
         <span class="badge badge-sm badge-info tabular-nums">
           {{ clauses().length | number }}/{{ clauseCap() | number }}
