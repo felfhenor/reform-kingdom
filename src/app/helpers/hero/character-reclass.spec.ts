@@ -55,6 +55,7 @@ describe('characterReclass', () => {
   const mockJob: JobContent = {
     id: 'job-explorer' as JobId,
     name: 'Explorer',
+    shorthand: 'EXP',
     __type: 'job',
     description: 'A person who seeks out new lands and experiences.',
     sprite: '0000',

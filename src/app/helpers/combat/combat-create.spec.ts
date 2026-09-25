@@ -30,9 +30,9 @@ import {
   combatantFromMonster,
   combatantsFromTownGuardians,
 } from '@helpers/combat/combat-create';
+import { getEntry } from '@helpers/content/content';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureMonsterSkill } from '@helpers/content/ensure-monster';
-import { getEntry } from '@helpers/content/content';
 import { defaultCombatStats, defaultTagResistances } from '@helpers/defaults';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import type {
@@ -133,6 +133,7 @@ const bow: EquipmentContent = ensureEquipment({
 const rangerJob: JobContent = {
   id: 'ranger' as JobId,
   name: 'Ranger',
+  shorthand: 'RNG',
   __type: 'job',
   description: '',
   baseStats: zeroStats(),
