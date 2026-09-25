@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
@@ -112,6 +113,7 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   selector: 'app-game-play-decree',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    CardPageComponent,
     DecimalPipe,
     FormsModule,
     NgSelectComponent,

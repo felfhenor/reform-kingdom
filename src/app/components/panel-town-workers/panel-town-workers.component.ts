@@ -29,7 +29,7 @@ import type {
     SlotIconBlankComponent,
     SpriteNodeComponent,
   ],
-  host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
+  host: { class: 'card shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-workers.component.html',
 })
 export class PanelTownWorkersComponent {

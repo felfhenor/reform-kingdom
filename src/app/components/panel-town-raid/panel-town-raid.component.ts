@@ -33,7 +33,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     TippyDirective,
     SFXDirective,
   ],
-  host: { class: 'card bg-base-200 shadow-sm' },
+  host: { class: 'card shadow-sm' },
   templateUrl: './panel-town-raid.component.html',
   styleUrl: './panel-town-raid.component.scss',
 })

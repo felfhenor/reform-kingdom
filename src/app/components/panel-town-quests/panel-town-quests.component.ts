@@ -18,7 +18,7 @@ import type { TownCommissionRowViewModel, WorldNodeEntry } from '@interfaces';
   selector: 'app-panel-town-quests',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BlankSlateComponent, DecimalPipe, SlotCommissionComponent],
-  host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
+  host: { class: 'card shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-quests.component.html',
 })
 export class PanelTownQuestsComponent {

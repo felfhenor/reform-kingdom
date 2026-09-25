@@ -48,7 +48,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ListRowDirective,
     SFXDirective,
   ],
-  host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },
+  host: { class: 'card shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-shop.component.html',
 })
 export class PanelTownShopComponent {
