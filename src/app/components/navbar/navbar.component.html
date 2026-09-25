@@ -186,7 +186,8 @@
       </li>
 
       <li class="action-button" appRequireNotSetup>
-        <a
+        <button
+          type="button"
           class="btn btn-xs btn-warning"
           [swal]="leaveSwal"
           [tp]="'Go Back [Q]'"
@@ -198,7 +199,7 @@
           isGlobal
         >
           <app-icon name="gameExitDoor" size="nav" color="#000"></app-icon>
-        </a>
+        </button>
       </li>
 
       <li class="action-button" appRequireSetup>
@@ -250,7 +251,8 @@
       The game is currently paused.
     </div>
 
-    <a
+    <button
+      type="button"
       class="btn btn-info"
       (click)="closePauseMenu()"
       appSfx="ui-click"
@@ -258,13 +260,14 @@
       [sfxTrigger]="['click', 'hover']"
     >
       Resume
-    </a>
+    </button>
 
     <app-panel-debug-buttons></app-panel-debug-buttons>
 
     <app-button-settings></app-button-settings>
 
-    <a
+    <button
+      type="button"
       class="btn btn-warning"
       [swal]="leaveSwal"
       appSfx="ui-error"
@@ -272,7 +275,7 @@
       [sfxTrigger]="['click', 'hover']"
     >
       Quit to Main Menu
-    </a>
+    </button>
 
     <app-button-quit></app-button-quit>
   </div>

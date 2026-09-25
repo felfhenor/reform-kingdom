@@ -20,17 +20,28 @@
   }
 </app-tooltip-item-preview>
 
-<div
-  class="armory-item-slot"
-  [class.armory-item-slot-sellable]="sellMode()"
-  [class.armory-item-slot-dimmed]="sellMode() && !selected()"
-  [class.armory-item-slot-selected]="sellMode() && selected()"
-  [tp]="preview.template()"
-  [tpPlacement]="'top'"
-  (click)="onClick($event)"
->
-  <app-slot-rarity-outline
-    [entry]="item"
-    spritesheet="equipment"
-  ></app-slot-rarity-outline>
-</div>
+@if (sellMode()) {
+  <button
+    type="button"
+    class="armory-item-slot armory-item-slot-sellable"
+    [class.armory-item-slot-dimmed]="!selected()"
+    [class.armory-item-slot-selected]="selected()"
+    [tp]="preview.template()"
+    [tpPlacement]="'top'"
+    (click)="toggleSelect.emit($event)"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <app-slot-rarity-outline
+      [entry]="item"
+      spritesheet="equipment"
+    ></app-slot-rarity-outline>
+  </button>
+} @else {
+  <div class="armory-item-slot" [tp]="preview.template()" [tpPlacement]="'top'">
+    <app-slot-rarity-outline
+      [entry]="item"
+      spritesheet="equipment"
+    ></app-slot-rarity-outline>
+  </div>
+}

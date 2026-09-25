@@ -1,25 +1,47 @@
 <div class="flex flex-wrap gap-2">
   @for (slot of slots(); track slot.index) {
-    <div
-      class="relative w-8 h-8 shrink-0 cursor-pointer"
-      [class.ring-2]="selectedSlotIndex() === slot.index"
-      [class.ring-primary]="selectedSlotIndex() === slot.index"
-      [attr.data-slot-index]="slot.index"
-      [tp]="slotTooltip"
-      [tpPlacement]="'top'"
-      (click)="slotClick.emit(slot.index)"
-    >
-      <div class="zoom-row">
-        <app-slot-icon-blank>
-          @if (slot.content) {
-            <app-atlas-image
-              spritesheet="item"
-              [assetName]="slot.content.sprite"
-            />
-          }
-        </app-slot-icon-blank>
+    @if (selectable()) {
+      <button
+        type="button"
+        class="relative w-8 h-8 shrink-0 cursor-pointer rounded"
+        [class.ring-2]="selectedSlotIndex() === slot.index"
+        [class.ring-primary]="selectedSlotIndex() === slot.index"
+        [attr.data-slot-index]="slot.index"
+        [tp]="slotTooltip"
+        [tpPlacement]="'top'"
+        (click)="slotClick.emit(slot.index)"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        <div class="zoom-row">
+          <app-slot-icon-blank>
+            @if (slot.content) {
+              <app-atlas-image
+                spritesheet="item"
+                [assetName]="slot.content.sprite"
+              />
+            }
+          </app-slot-icon-blank>
+        </div>
+      </button>
+    } @else {
+      <div
+        class="relative w-8 h-8 shrink-0"
+        [tp]="slotTooltip"
+        [tpPlacement]="'top'"
+      >
+        <div class="zoom-row">
+          <app-slot-icon-blank>
+            @if (slot.content) {
+              <app-atlas-image
+                spritesheet="item"
+                [assetName]="slot.content.sprite"
+              />
+            }
+          </app-slot-icon-blank>
+        </div>
       </div>
-    </div>
+    }
 
     <ng-template #slotTooltip>
       @if (slot.content) {

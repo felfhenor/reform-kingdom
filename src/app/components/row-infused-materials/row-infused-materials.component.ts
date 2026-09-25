@@ -8,6 +8,7 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { isInfusionMaterial } from '@helpers/item/infusion';
 import { type ItemContent, type ItemId } from '@interfaces';
@@ -21,6 +22,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotIconBlankComponent,
     RowStatSummaryComponent,
     TippyDirective,
+    SFXDirective,
   ],
   templateUrl: './row-infused-materials.component.html',
   styleUrl: './row-infused-materials.component.scss',
@@ -28,8 +30,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 export class RowInfusedMaterialsComponent {
   public infusedItemIds = input.required<(ItemId | null)[]>();
   public maxSlots = input.required<number>();
-  // Optional - set to make slots clickable (used by the Infusion page to
-  // pick a target slot). Purely visual/read-only when left unset.
+  public selectable = input<boolean>(false);
   public selectedSlotIndex = input<number>();
   public slotClick = output<number>();
 

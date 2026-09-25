@@ -38,6 +38,12 @@
           [maxSlots]="infusionSlotCount()"
         />
       }
+
+      @if (showUnequipHint()) {
+        <div class="text-xs mt-2 italic text-lighter">
+          Right-click to unequip.
+        </div>
+      }
     </app-tooltip-item-preview>
 
     <app-atlas-image

@@ -269,7 +269,7 @@ export class PanelPlayKingdomTradeskillComponent {
     craftQueueStart(this.tradeskill(), recipeId, quantity);
   }
 
-  public onQueueEntryContextMenu(
+  public requestRemoveQueueEntry(
     event: MouseEvent,
     entryId: CraftQueueEntryId,
   ): void {

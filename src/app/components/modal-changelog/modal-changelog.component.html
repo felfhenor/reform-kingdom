@@ -17,25 +17,31 @@
     <span title>Changelog</span>
 
     <div body>
-      <div class="tabs tabs-boxed justify-center mt-1">
-        <a
+      <div role="tablist" class="tabs tabs-boxed justify-center mt-1">
+        <button
+          type="button"
+          role="tab"
           class="tab"
           [class.tab-active]="currentView() === 'recent'"
+          [attr.aria-selected]="currentView() === 'recent'"
           (click)="currentView.set('recent')"
-          (keydown.enter)="currentView.set('recent')"
-          tabindex="1"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
         >
           Recent
-        </a>
-        <a
+        </button>
+        <button
+          type="button"
+          role="tab"
           class="tab"
           [class.tab-active]="currentView() === 'all'"
+          [attr.aria-selected]="currentView() === 'all'"
           (click)="currentView.set('all')"
-          (keydown.enter)="currentView.set('all')"
-          tabindex="1"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
         >
           All
-        </a>
+        </button>
       </div>
 
       <div

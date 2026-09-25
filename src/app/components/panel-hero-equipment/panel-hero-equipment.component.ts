@@ -17,6 +17,7 @@ import { PanelHeroEquipmentStatsComponent } from '@components/panel-hero-equipme
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { HideUntilLevelDirective } from '@directives/hide-until-level.directive';
+import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { demoteHero, promoteHero } from '@helpers/hero/position-swapping';
 import { isPlayerAtKingdom, worldPartyState } from '@helpers/index';
@@ -40,6 +41,7 @@ import type { Character, JobContent } from '@interfaces';
     SlotIconBlankComponent,
     HideUntilLevelDirective,
     SlotButtonContainerComponent,
+    SFXDirective,
   ],
   templateUrl: './panel-hero-equipment.component.html',
   styleUrl: './panel-hero-equipment.component.scss',

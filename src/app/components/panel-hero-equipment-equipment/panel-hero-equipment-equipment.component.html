@@ -34,6 +34,7 @@
               [slot]="slot"
               [equippedItem]="equippedItemFor(slot)"
               [isSelected]="selected === slot"
+              [showUnequipHint]="modifiable"
               (slotClick)="selectSlot(slot)"
               (contextmenu)="unequip(slot)"
             />

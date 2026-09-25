@@ -9,6 +9,7 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { SFXDirective } from '@directives/sfx.directive';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   equipmentItemBonusCombatStats,
@@ -31,6 +32,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     TooltipItemPreviewComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
+    SFXDirective,
   ],
   templateUrl: './slot-armory-item.component.html',
   styleUrl: './slot-armory-item.component.scss',
@@ -76,9 +78,4 @@ export class SlotArmoryItemComponent {
       content: this.equipment(),
     }),
   );
-
-  public onClick(event: MouseEvent): void {
-    if (!this.sellMode()) return;
-    this.toggleSelect.emit(event);
-  }
 }

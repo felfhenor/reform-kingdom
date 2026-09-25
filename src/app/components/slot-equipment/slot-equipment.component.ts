@@ -50,6 +50,7 @@ export class SlotEquipmentComponent {
   public slot = input.required<EquipmentSlot>();
   public equippedItem = input<EquipmentItem>();
   public isSelected = input<boolean>(false);
+  public showUnequipHint = input<boolean>(false);
 
   public slotClick = output<void>();
 

@@ -74,9 +74,14 @@
         @let q = queue[$index];
 
         @if (q) {
-          <div
-            class="cursor-pointer"
-            (contextmenu)="onQueueEntryContextMenu($event, q.entry.id)"
+          <button
+            type="button"
+            [tp]="'Click to remove from the queue'"
+            [tpPlacement]="'top'"
+            (click)="requestRemoveQueueEntry($event, q.entry.id)"
+            (contextmenu)="requestRemoveQueueEntry($event, q.entry.id)"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
           >
             @if (q.resultContent) {
               <app-slot-rarity-outline
@@ -94,7 +99,7 @@
             } @else {
               <app-slot-icon-blank />
             }
-          </div>
+          </button>
         } @else {
           <div class="relative w-16 h-16 flex-shrink-0 rounded">
             <app-slot-icon-blank></app-slot-icon-blank>

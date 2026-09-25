@@ -2,7 +2,13 @@
   <span header>Heroes</span>
 
   <span pageactions>
-    <button class="btn btn-primary btn-xs" (click)="optimizeAll()">
+    <button
+      type="button"
+      class="btn btn-primary btn-xs"
+      (click)="optimizeAll()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
       Optimize All
     </button>
   </span>
