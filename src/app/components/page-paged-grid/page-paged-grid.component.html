@@ -25,14 +25,16 @@
         @if (totalPages() > 1) {
           <div class="paged-grid-pagination">
             <button
+              type="button"
               class="btn btn-xs"
+              aria-label="Previous page"
               [disabled]="page() === 0"
               (click)="prevPage()"
-              appSfx="ui-error"
+              appSfx="ui-click"
               [sfxOffset]="0"
               [sfxTrigger]="['click', 'hover']"
             >
-              «
+              <app-icon name="tablerChevronLeft" size="row" />
             </button>
 
             <span class="min-w-[100px]">
@@ -40,14 +42,16 @@
             </span>
 
             <button
+              type="button"
               class="btn btn-xs"
+              aria-label="Next page"
               [disabled]="page() >= totalPages() - 1"
               (click)="nextPage()"
               appSfx="ui-click"
               [sfxOffset]="0"
               [sfxTrigger]="['click', 'hover']"
             >
-              »
+              <app-icon name="tablerChevronRight" size="row" />
             </button>
           </div>
         }

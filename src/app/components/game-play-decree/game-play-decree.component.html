@@ -16,6 +16,7 @@
 
             <app-icon
               name="gameHelp"
+              size="inline"
               class="text-lighter"
               [tp]="'Auto mode will execute your Decree (seen below). This lets you automate certain aspects of gameplay. By default, it will only go to your kingdom and heal you. You can make it do more by adding Clauses to your Decree.'"
               [tpPlacement]="'top'"
@@ -252,6 +253,7 @@
         @if (draftType() === 'LevelUpParty') {
           <app-icon
             name="gameHelp"
+            size="inline"
             class="text-lighter"
             [tp]="'Your party will explore nodes that match the specified difficulty. If they fail enough times, they will go to an easier node. They will do this until they get to the easiest node that still gives them XP. If there are none, this clause will be skipped.'"
           />
@@ -299,7 +301,12 @@
             (animate.enter)="onClauseEnter($event)"
             (animate.leave)="onClauseLeave($event)"
           >
-            <span cdkDragHandle class="cursor-move text-lighter">::</span>
+            <app-icon
+              cdkDragHandle
+              name="tablerGripVertical"
+              size="row"
+              class="cursor-move text-lighter shrink-0"
+            />
 
             <app-row-decree-clause
               [clause]="clause"
@@ -310,9 +317,8 @@
           </li>
         }
 
-        <li
-          class="flex flex-row items-center gap-2 p-2 rounded bg-base-200 pl-[20px]"
-        >
+        <li class="flex flex-row items-center gap-2 p-2 rounded bg-base-200">
+          <span class="w-[1.2em] shrink-0"></span>
           Return home ({{ homeDisplayName() }}) and heal
         </li>
       </ul>

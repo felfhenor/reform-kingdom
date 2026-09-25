@@ -77,8 +77,11 @@ import {
 } from '@ng-icons/game-icons';
 import {
   tablerCheck,
+  tablerChevronLeft,
+  tablerChevronRight,
   tablerExclamationCircle,
   tablerFocus,
+  tablerGripVertical,
   tablerInfoCircle,
   tablerPlus,
   tablerSettings,
@@ -167,6 +170,9 @@ export const ALL_ICONS = {
   tablerExclamationCircle,
   tablerFocus,
   tablerInfoCircle,
+  tablerChevronLeft,
+  tablerChevronRight,
+  tablerGripVertical,
 };
 
 export const ICON_SIZE_VALUES: Record<IconSize, string> = {

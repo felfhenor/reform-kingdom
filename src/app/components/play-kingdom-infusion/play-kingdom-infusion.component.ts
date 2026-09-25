@@ -11,11 +11,11 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
-import { IconComponent } from '@components/icon/icon.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
+import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { ListRowDirective } from '@directives/list-row.directive';
@@ -68,7 +68,6 @@ import {
   type JobContent,
   type StorageMaterialEntry,
 } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -77,9 +76,9 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-play-kingdom-infusion',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SlotButtonContainerComponent,
     CardPageComponent,
     CurrencyCostComponent,
-    IconComponent,
     SlotIconBlankComponent,
     IconJobComponent,
     RowInfusedMaterialsComponent,
@@ -88,7 +87,6 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     RowSkillStatBonusesComponent,
     ButtonKingdomBackComponent,
     SweetAlert2Module,
-    TippyDirective,
     SlotRarityOutlineComponent,
     ListRowDirective,
     SFXDirective,

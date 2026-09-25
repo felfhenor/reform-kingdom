@@ -21,6 +21,7 @@
   @if (clause().type === 'LevelUpParty') {
     <app-icon
       name="gameHelp"
+      size="inline"
       class="text-lighter"
       [tp]="'Your party will explore nodes that match the specified difficulty. If they fail enough times, they will go to an easier node. They will do this until they get to the easiest node that still gives them XP. If there are none, this clause will be skipped.'"
     />

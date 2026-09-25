@@ -13,6 +13,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RowCombatOrderClauseComponent } from '@components/row-combat-order-clause/row-combat-order-clause.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatOrderClauses } from '@helpers/combat/combat-order';
 import {
@@ -115,6 +116,7 @@ const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
   selector: 'app-modal-hero-combat-orders',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    IconComponent,
     ModalComponent,
     RowCombatOrderClauseComponent,
     DragDropModule,
