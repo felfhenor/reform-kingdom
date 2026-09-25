@@ -38,6 +38,8 @@ import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
+  characterRecalculateStats,
+  characterStats,
   characterStatsForLevel,
   characterXpForLevel,
   createCharacter,
@@ -374,6 +376,29 @@ describe('Party Helper Functions', () => {
       const earlyGap = characterXpForLevel(10) - characterXpForLevel(9);
       const lateGap = characterXpForLevel(90) - characterXpForLevel(89);
       expect(lateGap).toBeGreaterThan(earlyGap);
+    });
+  });
+
+  describe('characterStats', () => {
+    it('reads job, level and gear off the hero, so an override previews the change', () => {
+      mockGetEntry(mockJob);
+      const jala = createCharacterStub('Jala');
+
+      expect(characterStats({ ...jala, level: 3 })).toEqual(
+        characterStatsForLevel(jala.jobId, 3, jala.equipment, []),
+      );
+    });
+  });
+
+  describe('characterRecalculateStats', () => {
+    it('clamps current hp/ep to the recomputed maximums', () => {
+      mockGetEntry(mockJob);
+      const jala = { ...createCharacterStub('Jala'), hp: 99999, ep: 99999 };
+
+      const recalculated = characterRecalculateStats(jala);
+
+      expect(recalculated.hp).toBe(recalculated.stats.Health);
+      expect(recalculated.ep).toBe(recalculated.stats.Energy);
     });
   });
 

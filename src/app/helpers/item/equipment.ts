@@ -16,10 +16,7 @@ import {
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { rngUuid } from '@helpers/rng';
 import { worldCombatState } from '@helpers/state-game';
-import {
-  characterAllTeachingIds,
-  trainerTeachingEffects,
-} from '@helpers/trainer/trainer-teaching';
+import { characterTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   AffixEffect,
   AffixId,
@@ -254,7 +251,7 @@ export function characterTagResistances(
 ): StatusEffectBlock {
   return affixEffectsAddToBlock(
     equipmentTagResistanceTotals(character.equipment),
-    trainerTeachingEffects(characterAllTeachingIds(character)),
+    characterTeachingEffects(character),
     RESISTANCE_BONUS,
   );
 }
@@ -265,7 +262,7 @@ export function characterCombatStatBonusTotals(
 ): CombatStatBlock {
   return affixEffectsAddToBlock(
     equipmentCombatStatTotals(character.equipment),
-    trainerTeachingEffects(characterAllTeachingIds(character)),
+    characterTeachingEffects(character),
     COMBAT_STAT_BONUS,
   );
 }

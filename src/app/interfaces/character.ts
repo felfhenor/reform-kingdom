@@ -41,6 +41,12 @@ export type Character = {
   equipment: EquipmentBlock;
 };
 
+// Everything a hero's stats and skills are derived from - spread over a hero to preview a change, e.g. `{ ...character, level }`.
+export type CharacterStatSource = Pick<
+  Character,
+  'jobId' | 'level' | 'equipment' | 'teachings'
+>;
+
 // One hero's chosen new job, as batched by the reclass modal so a multi-hero
 // "Reclass All" applies (and prices) every swap within a single state update.
 export type CharacterReclassPick = {

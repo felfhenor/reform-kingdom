@@ -1,8 +1,12 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { mergeGrantedSkills } from '@helpers/hero/skill';
 import { equipmentGrantedSkillIds } from '@helpers/item/equipment';
-import { trainerTeachingGrantedSkillIds } from '@helpers/trainer/trainer-teaching';
+import {
+  characterAllTeachingIds,
+  trainerTeachingGrantedSkillIds,
+} from '@helpers/trainer/trainer-teaching';
 import type {
+  CharacterStatSource,
   EquipmentBlock,
   EquipmentSkillContent,
   EquipmentSkillId,
@@ -48,4 +52,19 @@ export function heroSkillsWithEquipment(
   ]);
 
   return mergeGrantedSkills(baseSkills, grantedSkills);
+}
+
+// A hero's full skill list from their own job, level, gear and every job's teachings.
+export function characterSkills(
+  character: CharacterStatSource,
+): EquipmentSkillContent[] {
+  const job = getEntry<JobContent>(character.jobId);
+  if (!job) return [];
+
+  return heroSkillsWithEquipment(
+    job,
+    character.level,
+    character.equipment,
+    characterAllTeachingIds(character),
+  );
 }

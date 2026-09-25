@@ -3,7 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { characterStatsForLevel } from '@helpers/hero/party';
+import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   canEquipItem,
   canModifyEquipment,
@@ -17,12 +17,9 @@ import {
 import { applyMaterialDelta, spendGold } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import {
   EquipmentTypeToSlot,
-  type Character,
   type CharacterId,
-  type EquipmentBlock,
   type EquipmentContent,
   type EquipmentItem,
   type EquipmentItemId,
@@ -31,28 +28,6 @@ import {
   type ItemId,
   type JobContent,
 } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
-
-// Recomputes derived stats after an equipment change and clamps current hp/ep to the new max.
-export function applyEquipmentToCharacter(
-  character: Character,
-  equipment: EquipmentBlock,
-): Character {
-  const stats = characterStatsForLevel(
-    character.jobId,
-    character.level,
-    equipment,
-    characterAllTeachingIds(character),
-  );
-
-  return {
-    ...character,
-    equipment,
-    stats,
-    hp: clamp(character.hp, 0, stats.Health),
-    ep: clamp(character.ep, 0, stats.Energy),
-  };
-}
 
 // Equips into every slot the item's type declares (e.g. two-handed fills Weapon+Offhand),
 // fully displacing whatever occupied those slots (and any other slots they held) back to the armory as whole items.
@@ -114,7 +89,7 @@ export function characterEquipFromArmory(
         equipment[slot] = armoryItem;
       });
 
-      return applyEquipmentToCharacter(c, equipment);
+      return characterRecalculateStats({ ...c, equipment });
     });
 
     return state;
@@ -181,7 +156,7 @@ export function characterInfuseEquipment(
         equipment[slot] = infusedItem;
       });
 
-      return applyEquipmentToCharacter(c, equipment);
+      return characterRecalculateStats({ ...c, equipment });
     });
 
     applyMaterialDelta(state, materialItemId, -1);

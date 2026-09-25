@@ -20,7 +20,7 @@ import {
   tradeskillXpForLevel,
 } from '@helpers/crafting/tradeskill';
 import {
-  characterStatsForLevel,
+  characterRecalculateStats,
   characterXpForLevel,
 } from '@helpers/hero/party';
 import { collectiblesAdd } from '@helpers/item/collectibles';
@@ -45,7 +45,6 @@ import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation
 import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { townMarkVisited } from '@helpers/town/town-visit';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { tutorialUnmarkSeen } from '@helpers/tutorial/tutorial-seen';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
@@ -151,21 +150,11 @@ export function debugSetCharacterLevel(
     state.world.party = state.world.party.map((character) => {
       if (character.id !== characterId) return character;
 
-      const stats = characterStatsForLevel(
-        character.jobId,
-        clampedLevel,
-        character.equipment,
-        characterAllTeachingIds(character),
-      );
-
-      return {
+      return characterRecalculateStats({
         ...character,
         level: clampedLevel,
         xp: { current: 0, maximum: characterXpForLevel(clampedLevel) },
-        stats,
-        hp: clamp(character.hp, 0, stats.Health),
-        ep: clamp(character.ep, 0, stats.Energy),
-      };
+      });
     });
 
     return state;
@@ -205,17 +194,9 @@ export function debugResetBestiary(): void {
 // Clears every hero's teachings for every job; stats are recomputed so the lost bonuses come off immediately.
 export function debugResetHeroTeachings(): void {
   updateGamestate((state) => {
-    state.world.party.forEach((character) => {
-      character.teachings = {};
-      character.stats = characterStatsForLevel(
-        character.jobId,
-        character.level,
-        character.equipment,
-        [],
-      );
-      character.hp = clamp(character.hp, 0, character.stats.Health);
-      character.ep = clamp(character.ep, 0, character.stats.Energy);
-    });
+    state.world.party = state.world.party.map((character) =>
+      characterRecalculateStats({ ...character, teachings: {} }),
+    );
 
     return state;
   });

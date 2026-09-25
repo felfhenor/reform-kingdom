@@ -8,12 +8,8 @@ import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { heroSkillsAtLevel } from '@helpers/hero/job';
-import {
-  characterStatsForLevel,
-  characterXpForLevel,
-} from '@helpers/hero/party';
+import { characterStats, characterXpForLevel } from '@helpers/hero/party';
 import { updateGamestate } from '@helpers/state-game';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   Combatant,
@@ -84,12 +80,7 @@ function characterLeveledUp(character: Character, amount: number): Character {
     ...character,
     level,
     xp: { current, maximum },
-    stats: characterStatsForLevel(
-      character.jobId,
-      level,
-      character.equipment,
-      characterAllTeachingIds(character),
-    ),
+    stats: characterStats({ ...character, level }),
   };
 }
 

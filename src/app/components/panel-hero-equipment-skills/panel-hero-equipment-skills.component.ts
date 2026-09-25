@@ -8,8 +8,7 @@ import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
-import { heroSkillsWithEquipment } from '@helpers/hero/job';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
+import { characterSkills } from '@helpers/hero/job';
 import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
@@ -40,17 +39,9 @@ export class PanelHeroEquipmentSkillsComponent {
     getEntry<JobContent>(this.character().jobId),
   );
 
-  public heroSkills = computed<EquipmentSkillContent[]>(() => {
-    const job = this.job();
-    if (!job) return [];
-
-    return heroSkillsWithEquipment(
-      job,
-      this.character().level,
-      this.character().equipment,
-      characterAllTeachingIds(this.character()),
-    );
-  });
+  public heroSkills = computed<EquipmentSkillContent[]>(() =>
+    characterSkills(this.character()),
+  );
 
   public heroCombatant = computed(() =>
     combatantFromCharacter(this.character()),

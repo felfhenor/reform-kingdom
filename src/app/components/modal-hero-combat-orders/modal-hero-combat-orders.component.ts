@@ -32,9 +32,8 @@ import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
 import { defaultEquipment } from '@helpers/defaults';
-import { heroSkillsWithEquipment } from '@helpers/hero/job';
+import { characterSkills } from '@helpers/hero/job';
 import { worldPartyState } from '@helpers/state-game';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
@@ -170,29 +169,16 @@ export class ModalHeroCombatOrdersComponent {
 
   public heroSkills = computed<EquipmentSkillContent[]>(() => {
     const character = this.character();
-    const job = this.job();
-    if (!character || !job) return [];
-    return heroSkillsWithEquipment(
-      job,
-      character.level,
-      character.equipment,
-      characterAllTeachingIds(character),
-    );
+    return character ? characterSkills(character) : [];
   });
 
   // The gear-free skill list (job path + teachings) - used to flag rows whose
   // family only exists because of currently-equipped gear.
   public jobOnlySkills = computed<EquipmentSkillContent[]>(() => {
     const character = this.character();
-    const job = this.job();
-    if (!character || !job) return [];
-
-    return heroSkillsWithEquipment(
-      job,
-      character.level,
-      defaultEquipment(),
-      characterAllTeachingIds(character),
-    );
+    return character
+      ? characterSkills({ ...character, equipment: defaultEquipment() })
+      : [];
   });
 
   // One option per known family, carrying a representative skill's sprite

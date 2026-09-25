@@ -3,7 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { applyEquipmentToCharacter } from '@helpers/hero/character-equipment';
+import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   canModifyEquipment,
   newEquipmentItem,
@@ -29,10 +29,10 @@ function applyCharacterEquipment(
     state.world.party = state.world.party.map((character) => {
       if (character.id !== characterId) return character;
 
-      return applyEquipmentToCharacter(
-        character,
-        equipmentForCharacter(character),
-      );
+      return characterRecalculateStats({
+        ...character,
+        equipment: equipmentForCharacter(character),
+      });
     });
 
     return state;
@@ -94,7 +94,7 @@ export function characterUnequipToArmory(
         equipment[occupiedSlot] = undefined;
       });
 
-      return applyEquipmentToCharacter(c, equipment);
+      return characterRecalculateStats({ ...c, equipment });
     });
 
     return state;

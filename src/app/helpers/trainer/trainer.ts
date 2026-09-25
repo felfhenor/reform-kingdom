@@ -1,12 +1,9 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { characterStatsForLevel } from '@helpers/hero/party';
+import { characterStats } from '@helpers/hero/party';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { discoveredTrainersState, updateGamestate } from '@helpers/state-game';
 import { characterJobLevel } from '@helpers/hero/character-reclass';
-import {
-  characterAllTeachingIds,
-  characterTeachingIds,
-} from '@helpers/trainer/trainer-teaching';
+import { characterTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeTrainer } from '@helpers/world-node/world-nodes';
 import type {
@@ -128,12 +125,7 @@ export function characterApplyTeaching(
     teaching.id,
   ];
 
-  const stats = characterStatsForLevel(
-    character.jobId,
-    character.level,
-    character.equipment,
-    characterAllTeachingIds(character),
-  );
+  const stats = characterStats(character);
   const healthGain = stats.Health - character.stats.Health;
   const energyGain = stats.Energy - character.stats.Energy;
 

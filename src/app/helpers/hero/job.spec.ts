@@ -1,5 +1,6 @@
 import { setAllContentById } from '@helpers/content/content';
 import {
+  characterSkills,
   getUnlockedJobs,
   heroSkillsAtLevel,
   heroSkillsWithEquipment,
@@ -13,6 +14,7 @@ import type {
   EquipmentSkillId,
   IsContentItem,
   JobContent,
+  JobId,
   TrainerTeachingContent,
   TrainerTeachingId,
 } from '@interfaces';
@@ -230,6 +232,17 @@ describe('Job Helper Functions', () => {
           ['teach-sweep', sweepTeaching],
         ]),
       );
+    });
+
+    it("returns nothing for a hero whose job doesn't resolve", () => {
+      expect(
+        characterSkills({
+          jobId: 'job-missing' as JobId,
+          level: 1,
+          equipment: emptyEquipment,
+          teachings: {},
+        }),
+      ).toEqual([]);
     });
 
     it('merges teaching-granted skills alongside equipment grants', () => {

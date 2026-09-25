@@ -198,6 +198,13 @@ export function affixEffectsAddToBlock<K extends string>(
   return combined;
 }
 
+export function affixEffectsBlock<K extends string>(
+  effects: AffixEffect[],
+  dimension: EquipmentBonusDimension<K>,
+): Record<K, number> {
+  return affixEffectsAddToBlock(dimension.defaultBlock(), effects, dimension);
+}
+
 // Infusion + affix only, no base equipment content - the "green bonus rows" UI shows under an item's base stats.
 export function equipmentItemBonusTotals<K extends string>(
   item: EquipmentItem,

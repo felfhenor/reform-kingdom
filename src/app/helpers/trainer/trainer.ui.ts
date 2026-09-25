@@ -1,11 +1,6 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
-  defaultCombatStats,
-  defaultStats,
-  defaultTagResistances,
-} from '@helpers/defaults';
-import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
@@ -14,7 +9,7 @@ import { characterJobLevel } from '@helpers/hero/character-reclass';
 import { getUnlockedJobs } from '@helpers/hero/job';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
-  affixEffectsAddToBlock,
+  affixEffectsBlock,
   COMBAT_STAT_BONUS,
   RESISTANCE_BONUS,
   STAT_BONUS,
@@ -133,17 +128,9 @@ export function trainerTeachingRow(
     prerequisites: teaching.requiredTrainerTeachingIds.map((teachingId) =>
       trainerTeachingPrerequisite(character, teachingId, jobId),
     ),
-    stats: affixEffectsAddToBlock(defaultStats(), teaching.effects, STAT_BONUS),
-    combatStats: affixEffectsAddToBlock(
-      defaultCombatStats(),
-      teaching.effects,
-      COMBAT_STAT_BONUS,
-    ),
-    resistances: affixEffectsAddToBlock(
-      defaultTagResistances(),
-      teaching.effects,
-      RESISTANCE_BONUS,
-    ),
+    stats: affixEffectsBlock(teaching.effects, STAT_BONUS),
+    combatStats: affixEffectsBlock(teaching.effects, COMBAT_STAT_BONUS),
+    resistances: affixEffectsBlock(teaching.effects, RESISTANCE_BONUS),
     grantedSkills: teachingGrantedSkills(teaching),
   };
 }

@@ -14,7 +14,7 @@ import {
   defaultTagResistances,
 } from '@helpers/defaults';
 import { globalEffectSums } from '@helpers/hero/global-effects';
-import { heroSkillsWithEquipment } from '@helpers/hero/job';
+import { characterSkills } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
   characterTagResistances,
@@ -23,7 +23,6 @@ import {
 } from '@helpers/item/equipment';
 import { equipmentSkillStatBonuses } from '@helpers/item/equipment-skill-bonus';
 import { rngUuid } from '@helpers/rng';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   Combat,
@@ -123,12 +122,7 @@ export function combatantFromCharacter(character: Character): Combatant {
     skillIds: job
       ? heroUsableSkillIds(
           character,
-          heroSkillsWithEquipment(
-            job,
-            character.level,
-            character.equipment,
-            characterAllTeachingIds(character),
-          ).map((skill) => skill.id),
+          characterSkills(character).map((skill) => skill.id),
         )
       : ['Attack' as EquipmentSkillId],
     skillRefs: [],

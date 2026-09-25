@@ -28,6 +28,7 @@ import type {
   AffixEffect,
   Character,
   CharacterId,
+  CharacterStatSource,
   EquipmentBlock,
   EquipmentContent,
   GatherYieldBonus,
@@ -82,6 +83,27 @@ export function characterStatsForLevel(
   });
 
   return stats;
+}
+
+export function characterStats(character: CharacterStatSource): StatBlock {
+  return characterStatsForLevel(
+    character.jobId,
+    character.level,
+    character.equipment,
+    characterAllTeachingIds(character),
+  );
+}
+
+// Clamps current hp/ep to the recomputed max, since a change can shrink max Health/Energy.
+export function characterRecalculateStats(character: Character): Character {
+  const stats = characterStats(character);
+
+  return {
+    ...character,
+    stats,
+    hp: clamp(character.hp, 0, stats.Health),
+    ep: clamp(character.ep, 0, stats.Energy),
+  };
 }
 
 function starterEquipment(): EquipmentBlock {
@@ -156,23 +178,11 @@ export function setParty(party: Character[]): void {
   });
 }
 
-// Recalculates stats/hp/ep after pruning, since it can shrink max Health/Energy.
 export function pruneInvalidPartyEquipment(party: Character[]): Character[] {
-  return party.map((character) => {
-    const equipment = pruneInvalidEquippedItems(character.equipment);
-    const stats = characterStatsForLevel(
-      character.jobId,
-      character.level,
-      equipment,
-      characterAllTeachingIds(character),
-    );
-
-    return {
+  return party.map((character) =>
+    characterRecalculateStats({
       ...character,
-      equipment,
-      stats,
-      hp: clamp(character.hp, 0, stats.Health),
-      ep: clamp(character.ep, 0, stats.Energy),
-    };
-  });
+      equipment: pruneInvalidEquippedItems(character.equipment),
+    }),
+  );
 }

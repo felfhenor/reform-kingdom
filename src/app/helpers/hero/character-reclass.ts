@@ -5,17 +5,13 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import {
-  characterStatsForLevel,
-  characterXpForLevel,
-} from '@helpers/hero/party';
+import { characterStats, characterXpForLevel } from '@helpers/hero/party';
 import {
   equippedItems,
   planEquipmentOptimization,
 } from '@helpers/item/equipment';
 import { applyMaterialDelta, goldCoinId } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   CharacterId,
@@ -118,12 +114,7 @@ function reclassCharacterInState(
   const { equipment, armory } = applyOptimizationWinners(state.armory, winners);
   state.armory = armory;
 
-  const stats = characterStatsForLevel(
-    jobId,
-    level,
-    equipment,
-    characterAllTeachingIds(character),
-  );
+  const stats = characterStats({ ...character, jobId, level, equipment });
 
   state.world.party = state.world.party.map((c) =>
     c.id === characterId
