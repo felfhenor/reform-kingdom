@@ -6,11 +6,11 @@
 >
   <span title>{{ trader()?.name ?? 'Trader' }}</span>
 
-  <div body class="flex flex-col gap-2">
-    @if (trader(); as traderContent) {
-      <p class="text-sm text-lighter italic">{{ traderContent.description }}</p>
-    }
+  @if (trader(); as traderContent) {
+    <p subtitle>{{ traderContent.description }}</p>
+  }
 
+  <div body class="flex flex-col gap-2">
     @if (commission(); as activeCommission) {
       <app-slot-commission
         [row]="activeCommission"

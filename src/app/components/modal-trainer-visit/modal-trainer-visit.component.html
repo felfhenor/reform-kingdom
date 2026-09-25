@@ -7,13 +7,11 @@
 >
   <span title>{{ trainer()?.name ?? 'Trainer' }}</span>
 
-  <div body class="flex flex-col gap-4">
-    @if (trainer(); as trainerContent) {
-      <p class="text-sm text-lighter italic text-center">
-        {{ trainerContent.description }}
-      </p>
-    }
+  @if (trainer(); as trainerContent) {
+    <p subtitle>{{ trainerContent.description }}</p>
+  }
 
+  <div body class="flex flex-col gap-4">
     <div class="grid grid-cols-[220px_minmax(0,1fr)] gap-4">
       <div class="flex flex-col gap-2">
         @for (character of party(); track character.id) {
