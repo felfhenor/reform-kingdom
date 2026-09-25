@@ -3,37 +3,3 @@
 :host {
   @apply block;
 }
-
-.equipment-item-row {
-  @apply flex gap-2 w-full px-2 text-left cursor-pointer rounded overflow-hidden;
-}
-
-.equipment-item-row-disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-
-.equipment-item-row-icon {
-  @apply relative shrink-0;
-}
-
-.equipment-item-row-info {
-  @apply flex flex-col items-start gap-1 min-w-0 overflow-hidden;
-}
-
-.equipment-item-row-name {
-  @apply text-base font-semibold whitespace-nowrap overflow-hidden text-ellipsis;
-}
-
-// Very small inline rendering of a granted skill's icon next to "Teaches" -
-// shrinks the shared 64px icon-blank-slot box down via scale.
-.equipment-item-row-granted-skill-icon {
-  @apply relative overflow-hidden shrink-0 inline-block align-middle;
-  width: 16px;
-  height: 16px;
-
-  app-icon-blank-slot {
-    display: block;
-    transform: scale(0.25);
-    transform-origin: top left;
-  }
-}

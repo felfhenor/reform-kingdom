@@ -7,9 +7,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
@@ -18,6 +18,7 @@ import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
@@ -76,8 +77,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-play-kingdom-infusion',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
     CardPageComponent,
+    CurrencyCostComponent,
     IconComponent,
     SlotIconBlankComponent,
     IconJobComponent,
@@ -89,6 +90,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SweetAlert2Module,
     TippyDirective,
     SlotRarityOutlineComponent,
+    ListRowDirective,
     SFXDirective,
     TutorialTargetDirective,
   ],
@@ -102,7 +104,7 @@ export class PlayKingdomInfusionComponent {
   });
 
   public party = computed(() => worldPartyState());
-  public goldCoinId = goldCoinId;
+  public goldCoinItemId = goldCoinId();
 
   public selectedCharacterId = signal<CharacterId | undefined>(undefined);
   public selectedEquipmentItemId = signal<EquipmentItemId | undefined>(
@@ -184,10 +186,6 @@ export class PlayKingdomInfusionComponent {
   public equipmentModifiable = computed(() => canModifyEquipment());
 
   public goldCoinQuantity = computed(() => getGoldQuantity());
-
-  public goldCoinSprite = computed(
-    () => getEntry<ItemContent>(goldCoinId())?.sprite ?? '',
-  );
 
   public equipmentContentFor(
     item: EquipmentItem,

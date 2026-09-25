@@ -20,9 +20,8 @@
           @let job = jobFor(character);
 
           <button
-            type="button"
-            class="btn btn-outline btn-neutral justify-start h-auto normal-case font-normal gap-2 text-neutral-content text-start w-full ps-0"
-            [class.btn-active]="selectedCharacter()?.id === character.id"
+            appListRow
+            [listRowSelected]="selectedCharacter()?.id === character.id"
             (click)="selectCharacter(character)"
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
@@ -31,8 +30,8 @@
               <app-icon-job [job]="job" />
             </app-slot-icon-blank>
 
-            <div class="flex flex-col ms-2">
-              <span class="font-semibold">{{ character.name }}</span>
+            <div class="flex flex-col min-w-0">
+              <span class="font-semibold truncate">{{ character.name }}</span>
               <span class="text-xs text-lighter">
                 Lv. {{ character.level }} {{ job?.shorthand }}
               </span>

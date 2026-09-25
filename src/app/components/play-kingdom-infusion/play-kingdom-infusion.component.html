@@ -32,9 +32,8 @@
 
       @for (hero of heroes; track hero.id) {
         <button
-          type="button"
-          class="btn btn-lg btn-neutral btn-outline h-auto justify-start gap-2 py-0 ps-0 text-neutral-content text-sm"
-          [class.btn-active]="character?.id === hero.id"
+          appListRow
+          [listRowSelected]="character?.id === hero.id"
           (click)="selectCharacter(hero.id)"
           appSfx="ui-click"
           [sfxOffset]="$index"
@@ -46,12 +45,11 @@
             <app-icon-job [job]="job" />
           </app-slot-icon-blank>
 
-          <div class="ms-2 flex flex-col items-start">
-            <div>{{ hero.name }}</div>
-
-            <div class="font-normal">
+          <div class="flex flex-col min-w-0">
+            <span class="font-semibold truncate">{{ hero.name }}</span>
+            <span class="text-xs text-lighter">
               Lv. {{ hero.level }} {{ job?.shorthand ?? 'JOB' }}
-            </div>
+            </span>
           </div>
         </button>
       } @empty {
@@ -69,9 +67,8 @@
 
             @if (equippedContent) {
               <button
-                type="button"
-                class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 text-neutral-content text-left ps-0"
-                [class.btn-active]="item?.id === equippedItem.id"
+                appListRow
+                [listRowSelected]="item?.id === equippedItem.id"
                 (click)="selectItem(equippedItem.id)"
                 appSfx="ui-click"
                 [sfxOffset]="$index"
@@ -82,12 +79,16 @@
                   spritesheet="equipment"
                 ></app-slot-rarity-outline>
 
-                <div class="flex flex-col">
-                  <span class="text-sm text-{{ equippedContent.rarity }}">
+                <div class="flex flex-col min-w-0">
+                  <span
+                    class="font-semibold truncate text-{{
+                      equippedContent.rarity
+                    }}"
+                  >
                     {{ displayNameFor(equippedItem, equippedContent) }}
                   </span>
 
-                  <span class="text-lighter italic">
+                  <span class="text-xs text-lighter">
                     {{ equippedContent.slotsTaken }}/{{ equippedContent.slots }}
                     infusion slots used
                   </span>
@@ -167,26 +168,24 @@
                     @let affordable = canAffordMaterial(entry.item.id);
 
                     <button
-                      type="button"
-                      class="btn btn-outline btn-neutral justify-start h-auto w-full normal-case font-normal gap-2 py-0 ps-0 text-neutral-content"
+                      appListRow
                       [disabled]="!affordable || !modifiable"
                       (click)="requestInfuse(entry.item.id, $event)"
                       appSfx="ui-click"
                       [sfxOffset]="$index"
                       [sfxTrigger]="['click', 'hover']"
                     >
-                      <div class="flex items-center gap-2">
-                        <app-slot-rarity-outline
-                          [entry]="entry.item"
-                          spritesheet="item"
-                        ></app-slot-rarity-outline>
-                      </div>
+                      <app-slot-rarity-outline
+                        class="shrink-0"
+                        [entry]="entry.item"
+                        spritesheet="item"
+                      ></app-slot-rarity-outline>
 
-                      <div class="pl-4 flex flex-col gap-2">
+                      <div class="flex flex-col gap-2 min-w-0">
                         <span
-                          class="text-{{
+                          class="font-semibold truncate text-{{
                             entry.item.rarity
-                          }} font-semibold text-xs text-left"
+                          }}"
                         >
                           {{ entry.item.name }} (x{{ entry.quantity }})
                         </span>
@@ -213,21 +212,11 @@
                         </div>
                       </div>
 
-                      <div class="flex flex-1 justify-end">
-                        <span
-                          class="ml-auto mr-3 flex items-center gap-2 shrink-0"
-                        >
-                          <div class="zoom-row">
-                            <app-slot-icon-blank [showBackground]="false">
-                              <app-atlas-image
-                                spritesheet="item"
-                                [assetName]="goldCoinSprite()"
-                              />
-                            </app-slot-icon-blank>
-                          </div>
-                          <span class="text-xs">{{ cost }}</span>
-                        </span>
-                      </div>
+                      <app-currency-cost
+                        [type]="goldCoinItemId"
+                        [amount]="cost"
+                        class="ml-auto mr-2 shrink-0"
+                      />
                     </button>
                   }
                 </div>

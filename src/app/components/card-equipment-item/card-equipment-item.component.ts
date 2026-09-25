@@ -9,6 +9,7 @@ import { DetailItemPreviewComponent } from '@components/detail-item-preview/deta
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { equipmentItemBonusStats } from '@helpers/item/equipment-display';
@@ -36,6 +37,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     RowItemStatsComponent,
     DetailItemPreviewComponent,
     TippyDirective,
+    ListRowDirective,
     SFXDirective,
   ],
   templateUrl: './card-equipment-item.component.html',
@@ -126,11 +128,4 @@ export class CardEquipmentItemComponent {
   public bonusStats = computed(() =>
     equipmentItemBonusStats(this.equipmentItem()),
   );
-
-  // Blocked by click rather than the native `disabled` attribute, so the stat-comparison
-  // tooltip stays available for inspection (e.g. planning swaps) while equipping is locked.
-  public onEquipClick(): void {
-    if (this.disabled()) return;
-    this.equip.emit();
-  }
 }

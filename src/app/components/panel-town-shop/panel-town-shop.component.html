@@ -35,8 +35,7 @@
           />
 
           <button
-            type="button"
-            class="btn btn-outline btn-neutral h-auto w-full normal-case font-normal gap-2 text-neutral-content text-start ps-0"
+            appListRow
             [disabled]="row.price === undefined || !row.affordable"
             [tp]="item ? preview.template() : undefined"
             [tpPlacement]="'top'"
@@ -60,7 +59,7 @@
               </div>
 
               <div class="flex flex-col flex-1 min-w-0 gap-2">
-                <span class="font-bold text-{{ item.rarity }} truncate">
+                <span class="font-semibold text-{{ item.rarity }} truncate">
                   {{ item.name }}
                 </span>
               </div>

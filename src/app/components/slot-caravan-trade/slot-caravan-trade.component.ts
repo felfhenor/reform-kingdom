@@ -8,6 +8,7 @@ import {
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { caravanTradeDisplay } from '@helpers/caravan/caravan-trade-display.ui';
 import { goldCoinId, hasGold } from '@helpers/item/materials';
@@ -22,6 +23,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     TooltipItemPreviewComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
+    ListRowDirective,
     SFXDirective,
   ],
   templateUrl: './slot-caravan-trade.component.html',

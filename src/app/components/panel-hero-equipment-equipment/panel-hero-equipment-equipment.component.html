@@ -5,18 +5,7 @@
 
 <div class="flex flex-col gap-3 ps-2 overflow-y-auto">
   <div class="flex items-center justify-between w-full">
-    <span class="font-semibold text-xl flex items-center gap-2">
-      Gear
-      @if (!modifiable) {
-        <app-icon
-          name="gameCrossedSwords"
-          size="row"
-          class="text-error"
-          [tp]="'Equipment cannot be changed during combat.'"
-          [tpPlacement]="'right'"
-        />
-      }
-    </span>
+    <span class="font-semibold text-xl flex items-center gap-2">Gear</span>
 
     <app-slot-button-container
       [disabled]="!modifiable"

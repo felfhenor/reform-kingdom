@@ -17,9 +17,8 @@
             @let display = entryStatusDisplay(entry);
 
             <button
-              type="button"
-              class="btn btn btn-lg btn-neutral btn-outline h-auto justify-start gap-2 py-0 ps-0 text-neutral-content text-sm"
-              [class.btn-active]="entry.id === selected?.id"
+              appListRow
+              [listRowSelected]="entry.id === selected?.id"
               (click)="selectWorker(entry.id)"
               appSfx="ui-click"
               [sfxOffset]="$index"
@@ -41,9 +40,12 @@
                 }
               </app-slot-icon-blank>
 
-              <div class="flex flex-col gap-2 min-w-0">
-                <span class="truncate">
-                  {{ entry.content.name }} (Lv. {{ entry.state.level }})
+              <div class="flex flex-col min-w-0">
+                <span class="font-semibold truncate">
+                  {{ entry.content.name }}
+                </span>
+                <span class="text-xs text-lighter">
+                  Lv. {{ entry.state.level }}
                 </span>
                 <span class="flex items-center gap-2 text-xs text-lighter">
                   @if (display.locationEntry) {

@@ -12,6 +12,7 @@ import {
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
@@ -42,6 +43,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     TippyDirective,
     TooltipItemPreviewComponent,
     SlotRarityOutlineComponent,
+    ListRowDirective,
     SFXDirective,
   ],
   host: { class: 'card bg-base-200 shadow-sm flex flex-col min-h-0' },

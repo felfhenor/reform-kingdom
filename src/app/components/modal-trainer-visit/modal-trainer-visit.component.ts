@@ -10,6 +10,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { RowTrainerTeachingComponent } from '@components/row-trainer-teaching/row-trainer-teaching.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { activeTrainerNode } from '@helpers/engine/ui';
@@ -32,6 +33,7 @@ import type {
     ModalComponent,
     RowCurrencyCostComponent,
     RowTrainerTeachingComponent,
+    ListRowDirective,
     SFXDirective,
     SlotIconBlankComponent,
     BlankSlateComponent,

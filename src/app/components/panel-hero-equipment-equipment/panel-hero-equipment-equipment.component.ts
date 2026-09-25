@@ -7,7 +7,6 @@ import {
   signal,
 } from '@angular/core';
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
-import { IconComponent } from '@components/icon/icon.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -31,7 +30,6 @@ import type {
   EquipmentItemId,
   EquipmentSlot,
 } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 const PAPERDOLL_ROWS: EquipmentSlot[][] = [
@@ -48,8 +46,6 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
     SlotEquipmentComponent,
     CardEquipmentItemComponent,
     ScrollingModule,
-    IconComponent,
-    TippyDirective,
     SFXDirective,
     SlotButtonContainerComponent,
   ],

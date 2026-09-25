@@ -3,9 +3,3 @@
 :host {
   @apply block;
 }
-
-// Overrides daisyUI's `.btn` default inline padding so the sprite sits flush
-// against the row's left edge instead of floating in from it.
-.caravan-trade-slot {
-  padding-inline-start: 0;
-}

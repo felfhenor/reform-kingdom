@@ -1,26 +1,22 @@
 @let content = equipment();
 
 <button
-  type="button"
-  class="equipment-item-row hover:bg-base-300"
-  [class.equipment-item-row-disabled]="disabled()"
-  [attr.aria-disabled]="disabled() ? true : null"
+  appListRow
+  [disabled]="disabled()"
   [tp]="tooltip"
   [tpVariation]="equippedDisplay() ? 'itemComparison' : undefined"
-  (click)="onEquipClick()"
+  (click)="equip.emit()"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
 >
-  <div class="mt-1">
-    <app-slot-rarity-outline
-      class="equipment-item-row-icon"
-      [entry]="content"
-      spritesheet="equipment"
-    ></app-slot-rarity-outline>
-  </div>
+  <app-slot-rarity-outline
+    class="shrink-0"
+    [entry]="content"
+    spritesheet="equipment"
+  ></app-slot-rarity-outline>
 
-  <span class="equipment-item-row-info">
-    <span class="equipment-item-row-name text-{{ content.rarity }}">
+  <span class="flex flex-col items-start gap-2 min-w-0">
+    <span class="font-semibold truncate max-w-full text-{{ content.rarity }}">
       {{ displayName() }}
     </span>
 

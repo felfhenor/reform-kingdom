@@ -16,6 +16,7 @@ import { OptionRewardComponent } from '@components/option-reward/option-reward.c
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
+import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { WORKER_MAX_LEVEL } from '@helpers/config';
@@ -105,6 +106,7 @@ type EntryStatusDisplay = {
     DecimalPipe,
     TippyDirective,
     SlotIconBlankComponent,
+    ListRowDirective,
     SFXDirective,
     TutorialTargetDirective,
     RowCurrencyCostComponent,
