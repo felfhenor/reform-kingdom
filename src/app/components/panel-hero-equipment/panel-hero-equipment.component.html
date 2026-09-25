@@ -8,7 +8,7 @@
         [helpText]="'This must be done at the Duchy.'"
       >
         <button
-          class="btn btn-accent btn-xs w-full"
+          class="btn btn-accent btn-sm w-full"
           [disabled]="!isAtKingdomCurrently() || !canPromote()"
           (click)="promote()"
           appSfx="ui-click"
@@ -23,7 +23,7 @@
         [helpText]="'This must be done at the Duchy.'"
       >
         <button
-          class="btn btn-accent btn-xs w-full"
+          class="btn btn-accent btn-sm w-full"
           [disabled]="!isAtKingdomCurrently() || !canDemote()"
           (click)="demote()"
           appSfx="ui-click"

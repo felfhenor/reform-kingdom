@@ -8,7 +8,7 @@
 
         <div class="grid grid-cols-3 gap-2">
           <button
-            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            class="btn btn-primary flex flex-col justify-center gap-2 h-28"
             (click)="openSubview('storage')"
             appSfx="ui-click"
             [sfxOffset]="0"
@@ -28,7 +28,7 @@
           </button>
 
           <button
-            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-2"
+            class="btn btn-primary flex flex-col justify-center gap-2 h-28"
             (click)="openSubview('armory')"
             appSfx="ui-click"
             [sfxOffset]="1"
@@ -53,7 +53,7 @@
 
           @let spellCount = unlockedAstralSpellCount();
           <button
-            class="btn btn-primary btn-lg h-28 flex flex-col justify-center gap-0"
+            class="btn btn-primary flex flex-col justify-center gap-2 h-28"
             (click)="openSubview('astralprojector')"
             appSfx="ui-click"
             [sfxOffset]="2"
@@ -82,7 +82,7 @@
 
         <div class="grid grid-cols-2 gap-2">
           <button
-            class="btn btn-accent h-32 flex flex-col justify-center gap-2"
+            class="btn btn-accent flex flex-col justify-center gap-2 h-28"
             (click)="openSubview('museum')"
             appSfx="ui-click"
             [sfxOffset]="3"
@@ -116,7 +116,7 @@
           </button>
 
           <button
-            class="btn btn-accent h-32 flex flex-col justify-center gap-2"
+            class="btn btn-accent flex flex-col justify-center gap-2 h-28"
             (click)="openSubview('bestiary')"
             appSfx="ui-click"
             [sfxOffset]="4"
@@ -145,30 +145,32 @@
         <div class="card-body p-3 gap-2">
           <h2 class="card-title text-base">Workforce</h2>
 
-          <button
-            class="btn btn-secondary btn-lg h-28 w-full max-w-sm flex flex-col justify-center gap-0"
-            (click)="openSubview('workers')"
-            appSfx="ui-click"
-            [sfxOffset]="5"
-            [sfxTrigger]="['click', 'hover']"
-          >
-            @let levelUpReady = workerLevelUpReadyCount();
-            <span
-              class="text-base font-bold flex items-center gap-2 justify-center"
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="btn btn-secondary flex flex-col justify-center gap-2 h-28"
+              (click)="openSubview('workers')"
+              appSfx="ui-click"
+              [sfxOffset]="5"
+              [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameMeepleGroup" size="row" />
-              Quartermaster's Annex
-            </span>
-            <span class="text-xs text-lighter">
-              {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
-            </span>
-            @if (levelUpReady > 0) {
-              <span class="text-xs text-lighter">
-                {{ levelUpReady }}
-                {{ 'worker' | pluralize: levelUpReady > 1 }} ready to level up
+              @let levelUpReady = workerLevelUpReadyCount();
+              <span
+                class="text-base font-bold flex items-center gap-2 justify-center"
+              >
+                <app-icon name="gameMeepleGroup" size="row" />
+                Quartermaster's Annex
               </span>
-            }
-          </button>
+              <span class="text-xs text-lighter">
+                {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
+              </span>
+              @if (levelUpReady > 0) {
+                <span class="text-xs text-lighter">
+                  {{ levelUpReady }}
+                  {{ 'worker' | pluralize: levelUpReady > 1 }} ready to level up
+                </span>
+              }
+            </button>
+          </div>
         </div>
       </div>
     }
@@ -184,13 +186,15 @@
           ) {
             <button
               type="button"
-              class="btn btn-secondary h-auto py-2 px-2 flex flex-col justify-center gap-2"
+              class="btn btn-secondary px-2 flex flex-col justify-center gap-2 h-28"
               (click)="openSubview(tradeskill.subview)"
               appSfx="ui-click"
               [sfxOffset]="$index + 6"
               [sfxTrigger]="['click', 'hover']"
             >
-              <span class="font-bold flex items-center gap-2 justify-center">
+              <span
+                class="text-base font-bold flex items-center gap-2 justify-center"
+              >
                 <app-atlas-image
                   spritesheet="tradeskill"
                   [assetName]="tradeskill.sprite"

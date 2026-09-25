@@ -1,7 +1,6 @@
 - id: c25f4e9d-95be-4b17-b362-a86b9821edee
   name: Bairan Faust
   description: An intermediate-level trainer that's often found training by an oasis.
-  hidden: true
 
   trainerTeachingIds:
     - 'Magical: Desert Survival'

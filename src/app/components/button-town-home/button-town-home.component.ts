@@ -26,7 +26,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     } @else if (canSetHome()) {
       <button
         type="button"
-        class="btn btn-outline btn-accent btn-xs w-fit"
+        class="btn btn-outline btn-accent btn-sm w-fit"
         (click)="setHome()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
