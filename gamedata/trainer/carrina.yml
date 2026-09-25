@@ -2,15 +2,15 @@
   name: Reyn Astra
   description: A recent graduate of the Carrina Trainer's Academy, he has knowledge to teach, but not a lot of it.
 
-  trainingIds:
-    - 'Stats: Basic Health'
-    - 'Stats: Goblin Energy'
+  trainerTeachingIds:
+    - 'Stat: Basic Health'
+    - 'Stat: Goblin Energy'
 
 - id: 94d1100f-826e-4681-bd2d-883dc2a63690
   name: Stona Lowe
   description: A generalist trainer that knows a little bit about everything. She can often be found training in the meadows.
 
-  trainingIds:
+  trainerTeachingIds:
     - 'Magical: Basic Intelligence Training'
     - 'Magical: Basic Spirit Training'
     - 'Magical: Basic Resistance Training'
@@ -20,11 +20,11 @@
     - 'Explorer: Fortuitous Training'
     - 'Explorer: Basic Vitality Training'
     - 'Warrior: Basic Strength Training'
-    - 'Warrior: Basic Constutition Training'
+    - 'Warrior: Basic Constitution Training'
     - 'Warrior: Basic Vitality Training'
     - 'Warrior: Fortuitous Training'
     - 'Ranger: Basic Agility Training'
-    - 'Ranger: Basic Constutition Training'
+    - 'Ranger: Basic Constitution Training'
     - 'Ranger: Basic Vitality Training'
     - 'Ranger: Fortuitous Training'
 
@@ -32,7 +32,7 @@
   name: Gaius Reinhardt
   description: A mysterious and magical monk that resides in the Carrina mountains.
 
-  trainingIds:
+  trainerTeachingIds:
     - 'Combat Stat: Basic Damage Reflection'
     - 'Combat Stat: Basic Action Repeat'
     - 'Combat Stat: Basic Double Strike'

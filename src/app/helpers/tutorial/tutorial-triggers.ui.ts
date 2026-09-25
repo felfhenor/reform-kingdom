@@ -1,6 +1,7 @@
 import { getEntry } from '@helpers/content/content';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { isInfusionMaterial } from '@helpers/item/infusion';
+import { isAnyTrainerDiscovered } from '@helpers/trainer/trainer';
 import {
   discoveredCaravansState,
   discoveredMaterialsState,
@@ -28,5 +29,7 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
       );
     case 'first-caravan-visit':
       return Object.keys(discoveredCaravansState()).length > 0;
+    case 'first-trainer-visit':
+      return isAnyTrainerDiscovered();
   }
 }

@@ -278,6 +278,11 @@ const program = TJS.getProgramFromFiles(
       __dirname,
       '../src/app/interfaces/content-tradeskill-level-requirement.ts',
     ),
+    path.resolve(__dirname, '../src/app/interfaces/content-trainer.ts'),
+    path.resolve(
+      __dirname,
+      '../src/app/interfaces/content-trainer-teaching.ts',
+    ),
     path.resolve(__dirname, '../src/app/interfaces/content-worker.ts'),
   ],
   {
@@ -324,6 +329,8 @@ const contentTypeMap = {
   town: 'TownContent',
   tradeskill: 'TradeskillContent',
   tradeskilllevelrequirement: 'TradeskillLevelRequirementContent',
+  trainer: 'TrainerContent',
+  trainerteaching: 'TrainerTeachingContent',
   worker: 'WorkerContent',
 };
 

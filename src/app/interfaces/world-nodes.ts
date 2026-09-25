@@ -37,7 +37,8 @@ export type WorldNodeInteractionKind =
   | 'ExploreRandom'
   | 'Trade'
   | 'Travel'
-  | 'Shrine';
+  | 'Shrine'
+  | 'Trainer';
 
 export type WorldNodeCompletionRewardProgress = {
   obtained: number;

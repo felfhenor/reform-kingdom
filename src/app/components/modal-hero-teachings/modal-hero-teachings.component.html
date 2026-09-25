@@ -1,0 +1,57 @@
+<app-modal
+  modalId="hero-teachings"
+  widthClass="max-w-4xl"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+>
+  <span title>
+    {{ character()?.name }}'s Teachings
+    <span class="badge badge-info">
+      {{ learnedTotal() | number }}/{{ teachingTotal() | number }}
+    </span>
+  </span>
+
+  <div body class="flex flex-col gap-2">
+    <p class="text-sm text-lighter text-center italic">
+      Teachings apply no matter which class this hero is.
+    </p>
+
+    <div role="tablist" class="tabs tabs-boxed">
+      @for (tab of tabs(); track tab.job.id) {
+        <button
+          type="button"
+          role="tab"
+          class="tab gap-2"
+          [class.font-bold]="tab.job.id === selectedJobId()"
+          [class.tab-active]="tab.job.id === selectedJobId()"
+          (click)="selectJob(tab.job.id)"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          <div class="zoom-row">
+            <app-icon-job [job]="tab.job" />
+          </div>
+          {{ tab.job.shorthand }}
+          <span class="badge badge-sm badge-info">
+            {{ tab.learned | number }}/{{ tab.total | number }}
+          </span>
+        </button>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
+      @for (row of rows(); track row.teaching.id) {
+        <app-row-trainer-teaching [row]="row" mode="teachings">
+          <span class="text-xs text-lighter italic" actionslot>
+            Taught by {{ row.trainerDisplayName }}
+          </span>
+        </app-row-trainer-teaching>
+      } @empty {
+        <div class="text-sm text-lighter">
+          No trainer teaches {{ selectedJob()?.name }} heroes yet.
+        </div>
+      }
+    </div>
+  </div>
+</app-modal>

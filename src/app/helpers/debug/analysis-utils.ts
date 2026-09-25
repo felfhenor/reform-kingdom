@@ -14,7 +14,7 @@ import type {
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
-const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
+const NODE_LAYER_NAMES = ['Explore Nodes'];
 
 // The `level` param if given, else the highest level any world node spans.
 export function resolveMaxContentLevel(params: AnalysisParams): number {
@@ -34,7 +34,7 @@ export function resolveMaxContentLevel(params: AnalysisParams): number {
   );
 }
 
-// Node name -> map name, from every map's Explore/Other Nodes Tiled layers.
+// Node name -> map name, from every map's Explore Nodes Tiled layer.
 // Shared by analyses that need to place a content entry (by its `name`,
 // which doubles as the node name) on a specific map.
 export function buildNodeNameToMap(): Map<string, string> {

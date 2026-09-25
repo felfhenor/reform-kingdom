@@ -4,11 +4,11 @@
   name: 'Magical: Basic Intelligence Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Intelligence
       value: 2
 
-    - type: Stat
+    - kind: Stat
       stat: Energy
       value: 5
 
@@ -16,10 +16,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 2000
+      required: 2000
 
     - itemId: Malachite
-      value: 3
+      required: 3
 
   jobIds:
     - Magician
@@ -29,7 +29,7 @@
   name: 'Magical: Basic Spirit Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Spirit
       value: 1
 
@@ -37,10 +37,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 3000
+      required: 3000
 
     - itemId: Azurite
-      value: 3
+      required: 3
 
   jobIds:
     - Magician
@@ -50,11 +50,11 @@
   name: 'Magical: Basic Resistance Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Resistance
       value: 2
 
-    - type: Stat
+    - kind: Stat
       stat: Energy
       value: 10
 
@@ -62,10 +62,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 5000
+      required: 5000
 
     - itemId: Wergen Stick
-      value: 25
+      required: 25
 
   jobIds:
     - Magician
@@ -75,11 +75,11 @@
   name: 'Magical: Fortuitous Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Intelligence
       value: 5
 
-    - type: Stat
+    - kind: Stat
       stat: Vitality
       value: 3
 
@@ -87,10 +87,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 7500
+      required: 7500
 
     - itemId: Wergen Wood
-      value: 25
+      required: 25
 
   jobIds:
     - Magician
@@ -102,7 +102,7 @@
   name: 'Explorer: Basic Health Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Health
       value: 10
 
@@ -110,10 +110,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 2000
+      required: 2000
 
     - itemId: Goblin Teeth
-      value: 3
+      required: 3
 
   jobIds:
     - Explorer
@@ -122,7 +122,7 @@
   name: 'Explorer: Basic Strength Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Strength
       value: 1
 
@@ -130,10 +130,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 3000
+      required: 3000
 
     - itemId: Copper Ore
-      value: 5
+      required: 5
 
   jobIds:
     - Explorer
@@ -142,11 +142,11 @@
   name: 'Explorer: Fortuitous Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Constitution
       value: 2
 
-    - type: Stat
+    - kind: Stat
       stat: Energy
       value: 10
 
@@ -154,10 +154,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 5000
+      required: 5000
 
     - itemId: Copper Ingot
-      value: 25
+      required: 25
 
   jobIds:
     - Explorer
@@ -166,7 +166,7 @@
   name: 'Explorer: Basic Vitality Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Vitality
       value: 3
 
@@ -174,10 +174,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 7500
+      required: 7500
 
     - itemId: Ghostwood
-      value: 15
+      required: 15
 
   jobIds:
     - Explorer
@@ -188,11 +188,11 @@
   name: 'Warrior: Basic Strength Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Strength
       value: 2
 
-    - type: Stat
+    - kind: Stat
       stat: Health
       value: 5
 
@@ -200,10 +200,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 2000
+      required: 2000
 
     - itemId: Goblin Nail
-      value: 3
+      required: 3
 
   jobIds:
     - Warrior
@@ -212,7 +212,7 @@
   name: 'Warrior: Basic Constitution Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Constitution
       value: 1
 
@@ -220,10 +220,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 3000
+      required: 3000
 
     - itemId: Tattered Hide
-      value: 3
+      required: 3
 
   jobIds:
     - Warrior
@@ -232,11 +232,11 @@
   name: 'Warrior: Basic Vitality Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Vitality
       value: 2
 
-    - type: Stat
+    - kind: Stat
       stat: Health
       value: 10
 
@@ -244,10 +244,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 5000
+      required: 5000
 
     - itemId: Red Slime Core
-      value: 5
+      required: 5
 
   jobIds:
     - Warrior
@@ -256,11 +256,11 @@
   name: 'Warrior: Fortuitous Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Strength
       value: 5
 
-    - type: Stat
+    - kind: Stat
       stat: Resistance
       value: 3
 
@@ -268,10 +268,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 7500
+      required: 7500
 
     - itemId: Orc Bone
-      value: 10
+      required: 10
 
   jobIds:
     - Warrior
@@ -282,11 +282,11 @@
   name: 'Ranger: Basic Agility Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Agility
       value: 2
 
-    - type: Stat
+    - kind: Stat
       stat: Health
       value: 5
 
@@ -294,10 +294,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 2000
+      required: 2000
 
     - itemId: Small Goblin Bone
-      value: 3
+      required: 3
 
   jobIds:
     - Ranger
@@ -306,7 +306,7 @@
   name: 'Ranger: Basic Constitution Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Constitution
       value: 1
 
@@ -314,10 +314,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 3000
+      required: 3000
 
     - itemId: Small Asura Tendon
-      value: 3
+      required: 3
 
   jobIds:
     - Ranger
@@ -326,11 +326,11 @@
   name: 'Ranger: Basic Vitality Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Vitality
       value: 2
 
-    - type: Stat
+    - kind: Stat
       stat: Energy
       value: 10
 
@@ -338,10 +338,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 5000
+      required: 5000
 
     - itemId: Green Slime Core
-      value: 5
+      required: 5
 
   jobIds:
     - Ranger
@@ -350,11 +350,11 @@
   name: 'Ranger: Fortuitous Training'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Strength
       value: 5
 
-    - type: Stat
+    - kind: Stat
       stat: Agility
       value: 3
 
@@ -362,10 +362,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 7500
+      required: 7500
 
     - itemId: Oozehide
-      value: 10
+      required: 10
 
   jobIds:
     - Ranger

@@ -42,6 +42,7 @@ export const collectiblesState = gamestateSlice('collectibles');
 export const discoveredEquipmentState = gamestateSlice('discoveredEquipment');
 export const discoveredRecipesState = gamestateSlice('discoveredRecipes');
 export const discoveredCaravansState = gamestateSlice('discoveredCaravans');
+export const discoveredTrainersState = gamestateSlice('discoveredTrainers');
 export const discoveredGatherNodesState = gamestateSlice(
   'discoveredGatherNodes',
 );

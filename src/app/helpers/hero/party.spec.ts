@@ -144,7 +144,12 @@ describe('Party Helper Functions', () => {
       expect(character.xp).toEqual({ current: 0, maximum: 100 });
       expect(character.jobId).toBe('job-explorer');
       expect(character.stats).toEqual(
-        characterStatsForLevel('job-explorer' as JobId, 1, character.equipment),
+        characterStatsForLevel(
+          'job-explorer' as JobId,
+          1,
+          character.equipment,
+          [],
+        ),
       );
     });
 
@@ -287,6 +292,7 @@ describe('Party Helper Functions', () => {
           'job-explorer' as JobId,
           withStaleGear.level,
           pruned.equipment,
+          [],
         ),
       );
     });
@@ -305,6 +311,7 @@ describe('Party Helper Functions', () => {
         'job-explorer' as JobId,
         equippedJala.level,
         equippedJala.equipment,
+        [],
       );
       const overHealedJala: Character = {
         ...equippedJala,
@@ -378,6 +385,7 @@ describe('Party Helper Functions', () => {
         'job-explorer' as JobId,
         1,
         defaultEquipment(),
+        [],
       );
 
       expect(stats).toEqual(mockJob.baseStats);
@@ -390,6 +398,7 @@ describe('Party Helper Functions', () => {
         'job-explorer' as JobId,
         3,
         defaultEquipment(),
+        [],
       );
 
       expect(stats.Health).toBe(
@@ -426,6 +435,7 @@ describe('Party Helper Functions', () => {
         'job-explorer' as JobId,
         5,
         equipment,
+        [],
       );
 
       expect(stats.Strength).toBe(
@@ -459,6 +469,7 @@ describe('Party Helper Functions', () => {
         'job-explorer' as JobId,
         1,
         equipment,
+        [],
       );
 
       expect(stats.Vitality).toBe(1);

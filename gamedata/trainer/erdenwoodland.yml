@@ -2,7 +2,7 @@
   name: Elfen Ledi
   description: An elfen trainer that's known for being extremely intense and strict. She spares no effort to be on the track of continuous improvement.
 
-  trainingIds:
+  trainerTeachingIds:
     - 'Magical: Intense Training'
     - 'Magical: Intense Body & Mind Training'
     - 'Explorer: Intense Training'

@@ -2,7 +2,7 @@
   name: 'Stat: Basic Luck'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Luck
       value: 1
 
@@ -10,7 +10,7 @@
 
   costs:
     - itemId: Gold Coin
-      value: 25000
+      required: 25000
 
   jobIds:
     - Explorer

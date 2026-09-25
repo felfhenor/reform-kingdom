@@ -10,6 +10,7 @@ import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
+import type { TrainerId } from '@interfaces/content-trainer';
 import type { GameStateTradeskills } from '@interfaces/crafting';
 import type { AutoModeState } from '@interfaces/decree';
 import type { EquipmentItem } from '@interfaces/equipment';
@@ -77,6 +78,11 @@ export type GameStateDiscoveredEquipment = {
 // traders don't map 1:1 to a caravan brand.
 export type GameStateDiscoveredCaravans = {
   [key: CaravanId]: { foundAt: number };
+};
+
+// Marked when the player opens a trainer's Visit modal - unlocks the heroes' Teachings list.
+export type GameStateDiscoveredTrainers = {
+  [key: TrainerId]: { foundAt: number };
 };
 
 // Level-learned recipes never appear here. No stored location.
@@ -153,6 +159,7 @@ export type GameState = {
   lootFilters: LootFilterSettings;
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredCaravans: GameStateDiscoveredCaravans;
+  discoveredTrainers: GameStateDiscoveredTrainers;
   discoveredRecipes: GameStateDiscoveredRecipes;
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;
   gatherNodeLevels: GameStateGatherNodeLevels;

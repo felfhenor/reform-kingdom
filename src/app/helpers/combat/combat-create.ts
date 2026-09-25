@@ -1,4 +1,4 @@
-import { combatStatsForCharacterEquipment } from '@helpers/combat/combat-stats';
+import { combatStatsForCharacter } from '@helpers/combat/combat-stats';
 import {
   combatApplyCombatStatNumberDeltaToCombatant,
   combatApplyStatDeltaToCombatant,
@@ -23,6 +23,7 @@ import {
 } from '@helpers/item/equipment';
 import { equipmentSkillStatBonuses } from '@helpers/item/equipment-skill-bonus';
 import { rngUuid } from '@helpers/rng';
+import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   Combat,
@@ -126,6 +127,7 @@ export function combatantFromCharacter(character: Character): Combatant {
             job,
             character.level,
             character.equipment,
+            characterAllTeachingIds(character),
           ).map((skill) => skill.id),
         )
       : ['Attack' as EquipmentSkillId],
@@ -134,7 +136,7 @@ export function combatantFromCharacter(character: Character): Combatant {
 
     combatOrders: character.combatOrders[character.jobId] ?? [],
 
-    combatStats: combatStatsForCharacterEquipment(character.equipment),
+    combatStats: combatStatsForCharacter(character),
     monsterTypeDamageBonus: equipmentMonsterTypeDamageTotals(
       character.equipment,
     ),

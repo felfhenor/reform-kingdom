@@ -519,6 +519,16 @@
         <button
           type="button"
           class="btn btn-warning btn-sm"
+          appAnalyticsClick="Options:Debug:ResetHeroTeachings"
+          (click)="resetHeroTeachings()"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Reset Hero Teachings
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning btn-sm"
           appAnalyticsClick="Options:Debug:ResetCommissions"
           (click)="resetCommissions()"
           appSfx="ui-error"

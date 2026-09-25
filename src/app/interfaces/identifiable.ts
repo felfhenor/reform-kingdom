@@ -21,6 +21,8 @@ export type ContentType =
   | 'town'
   | 'tradeskill'
   | 'tradeskilllevelrequirement'
+  | 'trainer'
+  | 'trainerteaching'
   | 'worker';
 
 export type Identifiable = {

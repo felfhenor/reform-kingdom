@@ -207,17 +207,6 @@
          "draworder":"topdown",
          "id":4,
          "name":"Explore Nodes",
-         "objects":[],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":5,
-         "name":"Other Nodes",
          "objects":[
                 {
                  "gid":409,

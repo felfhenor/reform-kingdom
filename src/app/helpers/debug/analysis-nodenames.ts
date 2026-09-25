@@ -1,6 +1,6 @@
 /**
  * Validates that every node object placed on the world maps (on the
- * "Explore Nodes" or "Other Nodes" layers) has a name that's unique across
+ * "Explore Nodes" layer) has a name that's unique across
  * *all* maps, regardless of node type.
  */
 
@@ -12,7 +12,7 @@ import type {
   TiledMap,
 } from '@interfaces';
 
-const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
+const NODE_LAYER_NAMES = ['Explore Nodes'];
 
 export function runNodeNamesAnalysis(): AnalysisRunResult {
   const checks: AnalysisCheck[] = [];

@@ -2,11 +2,11 @@
   name: 'Magical: Desert Survival'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Health
       value: 20
 
-    - type: Stat
+    - kind: Stat
       stat: Energy
       value: 10
 
@@ -14,10 +14,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 15000
+      required: 15000
 
     - itemId: Petrifiwood
-      value: 25
+      required: 25
 
   jobIds:
     - Magician
@@ -27,22 +27,22 @@
   name: 'Physical: Desert Energy'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Energy
       value: 20
 
-    - type: Stat
-      stat: Physical
+    - kind: Stat
+      stat: Health
       value: 10
 
   requiredLevel: 23
 
   costs:
     - itemId: Gold Coin
-      value: 15000
+      required: 15000
 
     - itemId: Cactspine
-      value: 25
+      required: 25
 
   jobIds:
     - Explorer
@@ -53,7 +53,7 @@
   name: 'Explorer: Luck of the Desert'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Luck
       value: 1
 
@@ -61,10 +61,10 @@
 
   costs:
     - itemId: Gold Coin
-      value: 20000
+      required: 20000
 
     - itemId: Firmwater
-      value: 100
+      required: 100
 
   jobIds:
     - Explorer

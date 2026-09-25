@@ -8,6 +8,7 @@ import {
   worldNodeOverride,
   worldNodeShrine,
   worldNodeTown,
+  worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
 import type {
   TiledMap,
@@ -25,6 +26,7 @@ export function worldNodeDescription(
     worldNodeEncounterRandom(entry)?.description ??
     worldNodeCaravan(entry)?.description ??
     worldNodeShrine(entry)?.description ??
+    worldNodeTrainer(entry)?.description ??
     worldNodeTown(entry)?.description
   );
 }

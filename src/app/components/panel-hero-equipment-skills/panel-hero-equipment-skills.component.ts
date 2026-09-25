@@ -9,6 +9,7 @@ import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { heroSkillsWithEquipment } from '@helpers/hero/job';
+import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
@@ -47,6 +48,7 @@ export class PanelHeroEquipmentSkillsComponent {
       job,
       this.character().level,
       this.character().equipment,
+      characterAllTeachingIds(this.character()),
     );
   });
 

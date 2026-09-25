@@ -7,9 +7,11 @@ import {
 } from '@helpers/engine/modal-stack';
 import { localStorageSignal } from '@helpers/engine/signal';
 import { townMarkVisited } from '@helpers/town/town-visit';
+import { trainerMarkDiscovered } from '@helpers/trainer/trainer';
 import {
   worldNodeCaravan,
   worldNodeTown,
+  worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
 import type {
   CharacterId,
@@ -74,6 +76,16 @@ export function combatOrdersModalOpen(characterId: CharacterId): void {
   modalOpen('combat-orders');
 }
 
+// Not cleared on close - clearing it would collapse the modal's DOM mid-transition.
+export const heroTeachingsModalCharacterId = signal<CharacterId | undefined>(
+  undefined,
+);
+
+export function heroTeachingsModalOpen(characterId: CharacterId): void {
+  heroTeachingsModalCharacterId.set(characterId);
+  modalOpen('hero-teachings');
+}
+
 export const isWorldCameraPanned = signal<boolean>(false);
 
 // Incremented to signal a recenter request; the navbar's button has no direct reference to the map component, so this bridges them.
@@ -109,6 +121,17 @@ export function caravanTradeOpen(entry: WorldNodeEntry): void {
 
   activeCaravanNode.set(entry);
   modalOpen('caravan-trade');
+}
+
+// Not cleared on close - would collapse the modal's DOM mid-transition; overwritten next open instead.
+export const activeTrainerNode = signal<WorldNodeEntry | undefined>(undefined);
+
+export function trainerVisitOpen(entry: WorldNodeEntry): void {
+  const trainer = worldNodeTrainer(entry);
+  if (trainer) trainerMarkDiscovered(trainer.id);
+
+  activeTrainerNode.set(entry);
+  modalOpen('trainer-visit');
 }
 
 // Persisted (not just in-memory) so a page reload while on the Town view can restore it.

@@ -10,6 +10,8 @@ import type {
   TiledMap,
   TiledObject,
   TownContent,
+  TrainerContent,
+  TrainerId,
   TownId,
   WorldNodeEntry,
   CollectibleId,
@@ -40,6 +42,7 @@ import {
   worldNodeMapsBuild,
   worldNodeOverride,
   worldNodeTown,
+  worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
@@ -56,10 +59,7 @@ function buildObject(overrides: Partial<TiledObject>): TiledObject {
   };
 }
 
-function buildMap(objects: {
-  exploreNodes?: TiledObject[];
-  otherNodes?: TiledObject[];
-}): TiledMap {
+function buildMap(objects: { exploreNodes?: TiledObject[] }): TiledMap {
   const layers: TiledLayer[] = [
     {
       id: 1,
@@ -67,13 +67,6 @@ function buildMap(objects: {
       type: 'objectgroup',
       visible: true,
       objects: objects.exploreNodes ?? [],
-    },
-    {
-      id: 2,
-      name: 'Other Nodes',
-      type: 'objectgroup',
-      visible: true,
-      objects: objects.otherNodes ?? [],
     },
   ];
 
@@ -99,7 +92,7 @@ describe('worldNodeMapsBuild', () => {
     const maps = new Map<string, GameMap>([
       [
         'Carrina',
-        { name: 'Carrina', data: buildMap({ otherNodes: [kingdom] }) },
+        { name: 'Carrina', data: buildMap({ exploreNodes: [kingdom] }) },
       ],
     ]);
 
@@ -121,7 +114,7 @@ describe('worldNodeMapsBuild', () => {
     });
   });
 
-  it('reads objects from both node layers', () => {
+  it('reads every node type from the Explore Nodes layer', () => {
     const explore = buildObject({
       id: 2,
       name: 'Forest Ruins',
@@ -143,8 +136,7 @@ describe('worldNodeMapsBuild', () => {
         {
           name: 'Carrina',
           data: buildMap({
-            exploreNodes: [explore],
-            otherNodes: [teleport],
+            exploreNodes: [explore, teleport],
           }),
         },
       ],
@@ -453,6 +445,50 @@ describe('encounter-backed node accessors', () => {
 
       expect(worldNodeTown(buildEntry())).toBeUndefined();
     });
+  });
+});
+
+describe('trainer-backed node accessors', () => {
+  const trainer = (
+    overrides: Partial<TrainerContent> = {},
+  ): TrainerContent => ({
+    id: 'trainer-forest-ruins' as TrainerId,
+    name: 'Forest Ruins',
+    __type: 'trainer',
+    description: '',
+    trainerTeachingIds: [],
+    ...overrides,
+  });
+
+  beforeEach(() => {
+    setAllIdsByName(new Map());
+    setAllContentById(new Map());
+    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+    vi.mocked(isCollectibleDiscovered).mockReset().mockReturnValue(true);
+  });
+
+  it('reads the matching trainer', () => {
+    seedContent([trainer()]);
+
+    expect(worldNodeTrainer(buildEntry())?.id).toBe('trainer-forest-ruins');
+  });
+
+  it('hides a trainer authored hidden until discovered', () => {
+    seedContent([trainer({ hidden: true })]);
+
+    expect(isWorldNodeHidden(buildEntry())).toBe(true);
+    expect(isWorldNodeVisible(buildEntry())).toBe(false);
+  });
+
+  it('gates a trainer behind its collectibles', () => {
+    seedContent([
+      trainer({
+        invisibleUntilCollectibleIdsFound: ['ruby' as CollectibleId],
+      }),
+    ]);
+    vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+
+    expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
   });
 });
 

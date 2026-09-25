@@ -13,6 +13,7 @@ import {
   characterXpForLevel,
 } from '@helpers/hero/party';
 import { updateGamestate } from '@helpers/state-game';
+import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   Combatant,
@@ -83,7 +84,12 @@ function characterLeveledUp(character: Character, amount: number): Character {
     ...character,
     level,
     xp: { current, maximum },
-    stats: characterStatsForLevel(character.jobId, level, character.equipment),
+    stats: characterStatsForLevel(
+      character.jobId,
+      level,
+      character.equipment,
+      characterAllTeachingIds(character),
+    ),
   };
 }
 

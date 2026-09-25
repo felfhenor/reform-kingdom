@@ -1,4 +1,3 @@
-import { worldCombatState } from '@helpers/state-game';
 import { getEntry } from '@helpers/content/content';
 import {
   affixEffectsOfKind,
@@ -6,6 +5,7 @@ import {
   rollAffixIds,
 } from '@helpers/item/affix';
 import {
+  affixEffectsAddToBlock,
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
   equipmentItemGatherYieldBonuses,
@@ -15,6 +15,11 @@ import {
 } from '@helpers/item/equipment-bonus';
 import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { rngUuid } from '@helpers/rng';
+import { worldCombatState } from '@helpers/state-game';
+import {
+  characterAllTeachingIds,
+  trainerTeachingEffects,
+} from '@helpers/trainer/trainer-teaching';
 import type {
   AffixEffect,
   AffixId,
@@ -244,12 +249,25 @@ export function equipmentGatherYieldBonuses(
   });
 }
 
-// Computed on demand (not baked into persisted `Character.stats`, which is
-// a fixed 8-key `StatBlock` shape unrelated to this keyspace).
 export function characterTagResistances(
   character: Character,
 ): StatusEffectBlock {
-  return equipmentTagResistanceTotals(character.equipment);
+  return affixEffectsAddToBlock(
+    equipmentTagResistanceTotals(character.equipment),
+    trainerTeachingEffects(characterAllTeachingIds(character)),
+    RESISTANCE_BONUS,
+  );
+}
+
+// Excludes the in-combat baseline, which is meaningless outside a combatant.
+export function characterCombatStatBonusTotals(
+  character: Character,
+): CombatStatBlock {
+  return affixEffectsAddToBlock(
+    equipmentCombatStatTotals(character.equipment),
+    trainerTeachingEffects(characterAllTeachingIds(character)),
+    COMBAT_STAT_BONUS,
+  );
 }
 
 // Merging these into known skills is handled separately, which needs skill content, not just ids.

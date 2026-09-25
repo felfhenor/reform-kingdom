@@ -22,6 +22,7 @@ import {
   debugRescueWorker,
   debugResetAllTutorials,
   debugResetBestiary,
+  debugResetHeroTeachings,
   debugResetCommissions,
   debugSetCharacterLevel,
   debugSetGatherNodeLevel,
@@ -190,6 +191,10 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public resetBestiary(): void {
     debugResetBestiary();
+  }
+
+  public resetHeroTeachings(): void {
+    debugResetHeroTeachings();
   }
 
   public resetCommissions(): void {

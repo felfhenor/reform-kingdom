@@ -7,6 +7,7 @@ import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-
 import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
 import { PanelMapNodeActionsShrineComponent } from '@components/panel-map-node-actions-shrine/panel-map-node-actions-shrine.component';
 import { PanelMapNodeActionsTownComponent } from '@components/panel-map-node-actions-town/panel-map-node-actions-town.component';
+import { PanelMapNodeActionsTrainerComponent } from '@components/panel-map-node-actions-trainer/panel-map-node-actions-trainer.component';
 import { PanelMapNodeBadgesCaravanComponent } from '@components/panel-map-node-badges-caravan/panel-map-node-badges-caravan.component';
 import { PanelMapNodeBadgesExploreComponent } from '@components/panel-map-node-badges-explore/panel-map-node-badges-explore.component';
 import { PanelMapNodeBadgesGatherComponent } from '@components/panel-map-node-badges-gather/panel-map-node-badges-gather.component';
@@ -25,6 +26,7 @@ import {
   mapNodeDeselect,
   selectedMapNode,
   townOpen,
+  trainerVisitOpen,
 } from '@helpers/engine/ui';
 
 import { canPartyTravel, travelStart } from '@helpers/hero/travel';
@@ -68,6 +70,7 @@ import {
   worldNodeGathering,
   worldNodeShrine,
   worldNodeTown,
+  worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -84,6 +87,7 @@ import { sortBy } from 'es-toolkit/compat';
     PanelMapNodeActionsGatherComponent,
     PanelMapNodeActionsShrineComponent,
     PanelMapNodeActionsTownComponent,
+    PanelMapNodeActionsTrainerComponent,
     PanelMapNodeBadgesCaravanComponent,
     PanelMapNodeBadgesExploreComponent,
     PanelMapNodeBadgesGatherComponent,
@@ -173,6 +177,11 @@ export class PanelMapNodeComponent {
   public isShrineNode = computed(() => {
     const entry = this.node();
     return !!entry && !!worldNodeShrine(entry);
+  });
+
+  public isTrainerNode = computed(() => {
+    const entry = this.node();
+    return !!entry && !!worldNodeTrainer(entry);
   });
 
   public isExploreNode = computed(() => {
@@ -295,6 +304,13 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     caravanTradeOpen(entry);
+  }
+
+  public visitTrainer(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    trainerVisitOpen(entry);
   }
 
   public openTown(): void {

@@ -18,7 +18,9 @@ import type {
   TradeskillId,
 } from '@interfaces';
 
-function ensureAffixEffect(effect: Record<string, unknown> = {}): AffixEffect {
+export function ensureAffixEffect(
+  effect: Record<string, unknown> = {},
+): AffixEffect {
   const kind = effect['kind'] as AffixEffect['kind'];
   const value = (effect['value'] as number) ?? 0;
 

@@ -1,16 +1,14 @@
 import { defaultCombatStats } from '@helpers/defaults';
-import { equipmentCombatStatTotals } from '@helpers/item/equipment';
+import { characterCombatStatBonusTotals } from '@helpers/item/equipment';
 import { rngSucceedsChance } from '@helpers/rng';
+import type { Character } from '@interfaces/character';
 import type { Combatant, CombatStatBlock } from '@interfaces/combat';
-import type { EquipmentBlock } from '@interfaces/equipment';
 
-// Applied once at combat creation - gear's combat-stat bonuses are added to
-// the wearer's base value for the whole encounter.
-export function combatStatsForCharacterEquipment(
-  equipment: EquipmentBlock,
-): CombatStatBlock {
+// Applied once at combat creation - gear and teaching combat-stat bonuses are
+// added to the hero's base value for the whole encounter.
+export function combatStatsForCharacter(character: Character): CombatStatBlock {
   const stats = defaultCombatStats();
-  const bonus = equipmentCombatStatTotals(equipment);
+  const bonus = characterCombatStatBonusTotals(character);
 
   (Object.keys(stats) as Array<keyof CombatStatBlock>).forEach((stat) => {
     stats[stat] += bonus[stat];

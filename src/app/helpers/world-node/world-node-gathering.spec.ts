@@ -29,10 +29,7 @@ function buildObject(overrides: Partial<TiledObject>): TiledObject {
   };
 }
 
-function buildMap(objects: {
-  exploreNodes?: TiledObject[];
-  otherNodes?: TiledObject[];
-}): TiledMap {
+function buildMap(objects: { exploreNodes?: TiledObject[] }): TiledMap {
   const layers: TiledLayer[] = [
     {
       id: 1,
@@ -40,13 +37,6 @@ function buildMap(objects: {
       type: 'objectgroup',
       visible: true,
       objects: objects.exploreNodes ?? [],
-    },
-    {
-      id: 2,
-      name: 'Other Nodes',
-      type: 'objectgroup',
-      visible: true,
-      objects: objects.otherNodes ?? [],
     },
   ];
 
@@ -136,7 +126,7 @@ describe('allGatherableMaterialIds', () => {
     setAllContentById(new Map([['gather-1', woodGathering]]));
 
     const map = buildMap({
-      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+      exploreNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
     });
     setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
 
@@ -168,7 +158,7 @@ describe('allGatherableMaterialIds', () => {
     setAllContentById(new Map([['gather-1', gathering]]));
 
     const map = buildMap({
-      otherNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
+      exploreNodes: [buildObject({ name: 'Wergen Woods', type: 'GatherNode' })],
     });
     setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
 

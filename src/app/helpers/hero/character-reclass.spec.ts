@@ -180,6 +180,7 @@ describe('characterReclass', () => {
       'job-warrior' as JobId,
       1,
       defaultEquipment(),
+      [],
     );
 
     expect(result.world.party[0].jobId).toBe('job-warrior');

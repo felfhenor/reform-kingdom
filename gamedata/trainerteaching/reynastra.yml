@@ -2,15 +2,15 @@
   name: 'Stat: Basic Health'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Health
-      value: 10
+      value: 3
 
   requiredLevel: 3
 
   costs:
     - itemId: Gold Coin
-      value: 500
+      required: 500
 
   jobIds:
     - Explorer
@@ -23,15 +23,15 @@
   name: 'Stat: Goblin Energy'
 
   effects:
-    - type: Stat
+    - kind: Stat
       stat: Energy
-      value: 5
+      value: 2
 
   requiredLevel: 3
 
   costs:
     - itemId: Gold Coin
-      value: 1000
+      required: 1000
 
   jobIds:
     - Explorer

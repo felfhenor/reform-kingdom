@@ -15,6 +15,7 @@ import {
 } from '@helpers/item/equipment';
 import { applyMaterialDelta, goldCoinId } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
+import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   CharacterId,
@@ -117,7 +118,12 @@ function reclassCharacterInState(
   const { equipment, armory } = applyOptimizationWinners(state.armory, winners);
   state.armory = armory;
 
-  const stats = characterStatsForLevel(jobId, level, equipment);
+  const stats = characterStatsForLevel(
+    jobId,
+    level,
+    equipment,
+    characterAllTeachingIds(character),
+  );
 
   state.world.party = state.world.party.map((c) =>
     c.id === characterId

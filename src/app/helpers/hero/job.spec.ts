@@ -13,6 +13,8 @@ import type {
   EquipmentSkillId,
   IsContentItem,
   JobContent,
+  TrainerTeachingContent,
+  TrainerTeachingId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -208,6 +210,11 @@ describe('Job Helper Functions', () => {
       'ring-double-strike-1' as EquipmentId,
       [doubleStrike1.id],
     );
+    const sweepTeaching = {
+      id: 'teach-sweep' as TrainerTeachingId,
+      __type: 'trainerteaching',
+      effects: [{ kind: 'GrantSkill', skillId: sweep1.id }],
+    } as TrainerTeachingContent;
 
     beforeEach(() => {
       setAllContentById(
@@ -220,8 +227,20 @@ describe('Job Helper Functions', () => {
           ['wergen-staff', wergenStaff],
           ['ring-double-strike-2', ringOfDoubleStrike2],
           ['ring-double-strike-1', ringOfDoubleStrike1],
+          ['teach-sweep', sweepTeaching],
         ]),
       );
+    });
+
+    it('merges teaching-granted skills alongside equipment grants', () => {
+      const skills = heroSkillsWithEquipment(
+        mockJobExplorer,
+        1,
+        emptyEquipment,
+        [sweepTeaching.id],
+      );
+
+      expect(skills.map((skill) => skill.id)).toContain('Sweep I');
     });
 
     it('appends a granted skill the hero has no matching family for', () => {
@@ -235,7 +254,7 @@ describe('Job Helper Functions', () => {
         },
       };
 
-      const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment);
+      const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment, []);
 
       expect(skills.map((skill) => skill.id)).toEqual([
         'Attack',
@@ -255,7 +274,7 @@ describe('Job Helper Functions', () => {
         },
       };
 
-      const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment);
+      const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment, []);
 
       expect(skills.map((skill) => skill.id)).toEqual([
         'Attack',
@@ -274,7 +293,7 @@ describe('Job Helper Functions', () => {
         },
       };
 
-      const skills = heroSkillsWithEquipment(mockJobExplorer, 6, equipment);
+      const skills = heroSkillsWithEquipment(mockJobExplorer, 6, equipment, []);
 
       expect(skills.map((skill) => skill.id)).toEqual([
         'Attack',

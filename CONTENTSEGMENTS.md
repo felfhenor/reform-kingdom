@@ -55,4 +55,4 @@ Combat stats includes anything that is not a pure stat, that is to say, things l
 | Infusions        |                | x            |         | x                | x          |             |
 | Shrines          |                |              | x       | x                |            |             |
 | Town Buffs       |                | x            |         |                  | x          |             |
-| Trainers         |                | x            |         |                  | x          |             |
+| Trainers         |                | x            |         |                  | x          | x           |

@@ -16,7 +16,8 @@ export type TutorialTrigger =
   | { kind: 'first-infusion-material' }
   | { kind: 'party-level'; level: number }
   | { kind: 'first-town-visit' }
-  | { kind: 'first-caravan-visit' };
+  | { kind: 'first-caravan-visit' }
+  | { kind: 'first-trainer-visit' };
 
 export type TutorialDefinition = {
   id: TutorialId;

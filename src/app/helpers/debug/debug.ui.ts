@@ -45,6 +45,7 @@ import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation
 import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import { townMarkVisited } from '@helpers/town/town-visit';
+import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { tutorialUnmarkSeen } from '@helpers/tutorial/tutorial-seen';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
@@ -154,6 +155,7 @@ export function debugSetCharacterLevel(
         character.jobId,
         clampedLevel,
         character.equipment,
+        characterAllTeachingIds(character),
       );
 
       return {
@@ -196,6 +198,25 @@ export function debugSetTradeskillLevel(
 export function debugResetBestiary(): void {
   updateGamestate((state) => {
     state.bestiary = {};
+    return state;
+  });
+}
+
+// Clears every hero's teachings for every job; stats are recomputed so the lost bonuses come off immediately.
+export function debugResetHeroTeachings(): void {
+  updateGamestate((state) => {
+    state.world.party.forEach((character) => {
+      character.teachings = {};
+      character.stats = characterStatsForLevel(
+        character.jobId,
+        character.level,
+        character.equipment,
+        [],
+      );
+      character.hp = clamp(character.hp, 0, character.stats.Health);
+      character.ep = clamp(character.ep, 0, character.stats.Energy);
+    });
+
     return state;
   });
 }

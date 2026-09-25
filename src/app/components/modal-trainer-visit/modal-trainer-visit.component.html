@@ -1,0 +1,71 @@
+<app-modal
+  modalId="trainer-visit"
+  widthClass="max-w-5xl"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+>
+  <span title>{{ trainer()?.name ?? 'Trainer' }}</span>
+
+  <div body class="flex flex-col gap-4">
+    @if (trainer(); as trainerContent) {
+      <p class="text-sm text-lighter italic text-center">
+        {{ trainerContent.description }}
+      </p>
+    }
+
+    <div class="grid grid-cols-[220px_minmax(0,1fr)] gap-4">
+      <div class="flex flex-col gap-2">
+        @for (character of party(); track character.id) {
+          @let job = jobFor(character);
+
+          <button
+            type="button"
+            class="btn btn-outline btn-neutral justify-start h-auto normal-case font-normal gap-2 text-neutral-content text-start w-full ps-0"
+            [class.btn-active]="selectedCharacter()?.id === character.id"
+            (click)="selectCharacter(character)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-slot-icon-blank>
+              <app-icon-job [job]="job" />
+            </app-slot-icon-blank>
+
+            <div class="flex flex-col ms-2">
+              <span class="font-semibold">{{ character.name }}</span>
+              <span class="text-xs text-lighter">
+                Lv. {{ character.level }} {{ job?.shorthand }}
+              </span>
+            </div>
+          </button>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
+        @for (row of rows(); track row.teaching.id) {
+          <app-row-trainer-teaching [row]="row" mode="visit">
+            <div actionslot>
+              @if (!row.isLearned) {
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  [disabled]="!canTrain(row)"
+                  (click)="train(row)"
+                  appSfx="ui-success"
+                  [sfxTrigger]="['click', 'hover']"
+                >
+                  Train
+                  <app-row-currency-cost [costs]="row.teaching.costs" />
+                </button>
+              }
+            </div>
+          </app-row-trainer-teaching>
+        } @empty {
+          <app-blank-slate>
+            This trainer doesn't teach {{ selectedJobName() }} heroes.
+          </app-blank-slate>
+        }
+      </div>
+    </div>
+  </div>
+</app-modal>

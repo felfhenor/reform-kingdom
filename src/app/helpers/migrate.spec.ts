@@ -153,6 +153,11 @@ vi.mock('@helpers/world-node/world-node-shrine', () => ({
   pruneInvalidShrineLevels: vi.fn((levels) => levels),
 }));
 
+vi.mock('@helpers/trainer/trainer', () => ({
+  pruneInvalidCharacterTeachings: vi.fn((teachings) => teachings),
+  pruneInvalidDiscoveredTrainers: vi.fn((discovered) => discovered),
+}));
+
 vi.mock('@helpers/worker/worker-discovery', () => ({
   isWorkerContentKnown: vi.fn(() => true),
   pruneInvalidDiscoveredWorkers: vi.fn((discovered) => discovered),
@@ -204,6 +209,10 @@ import {
 import { migrateGameState } from '@helpers/migrate';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
+import {
+  pruneInvalidCharacterTeachings,
+  pruneInvalidDiscoveredTrainers,
+} from '@helpers/trainer/trainer';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 
@@ -344,6 +353,39 @@ describe('migrateGameState', () => {
 
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.world.party).toEqual(prunedParty);
+  });
+
+  it('prunes party teachings and discovered trainers before committing', () => {
+    const staleTeachings = { ['job-warrior']: ['gone'] };
+    const staleDiscovered = { ['trainer-gone']: { foundAt: 1 } };
+
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      discoveredTrainers: staleDiscovered,
+      world: {
+        party: [{ id: 'jala', combatOrders: {}, teachings: staleTeachings }],
+      },
+    } as unknown as GameState);
+    vi.mocked(pruneInvalidCharacterTeachings).mockReturnValueOnce({});
+    vi.mocked(pruneInvalidDiscoveredTrainers).mockReturnValueOnce({});
+
+    migrateGameState();
+
+    expect(pruneInvalidCharacterTeachings).toHaveBeenCalledWith(staleTeachings);
+    expect(pruneInvalidDiscoveredTrainers).toHaveBeenCalledWith(
+      staleDiscovered,
+    );
+
+    const partyAfterBackfill = vi.mocked(pruneInvalidPartyEquipment).mock
+      .calls[0][0];
+    expect(partyAfterBackfill[0].teachings).toEqual({});
+
+    const committed = vi.mocked(setGameState).mock.calls[0][0];
+    expect(committed.discoveredTrainers).toEqual({});
   });
 
   it('retrofits party and tradeskill xp to the current curve before committing', () => {

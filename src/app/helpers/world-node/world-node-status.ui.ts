@@ -4,6 +4,7 @@ import { worldNodeCaravanVisitedTraderName } from '@helpers/world-node/world-nod
 import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-encounter';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeInteractionKind,
@@ -14,6 +15,7 @@ import type {
   WorldNodeEntry,
   WorldNodeInteractionKind,
   WorldNodeLabelInfo,
+  WorldNodeStatusInfo,
 } from '@interfaces';
 
 // Each leveled node type gets its own branch, so a future one is a one-line addition.
@@ -68,4 +70,13 @@ export function worldNodeLabelInfo(
   }
 
   return { kind, text: lines.join('\n') };
+}
+
+// Only ExploreRandomNode has a per-cycle beaten/not-beaten state worth badging on the map.
+export function worldNodeStatusInfo(
+  entry: WorldNodeEntry,
+): WorldNodeStatusInfo | undefined {
+  if (worldNodeInteractionKind(entry) !== 'ExploreRandom') return undefined;
+
+  return { beaten: worldNodeExploreRandomIsCompleted(entry) };
 }

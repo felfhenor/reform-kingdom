@@ -27,7 +27,7 @@
         </div>
 
         <div class="flex flex-wrap gap-2 text-sm">
-          @if (!isShrineNode()) {
+          @if (!isShrineNode() && !isTrainerNode()) {
             <div
               class="badge badge-outline"
               [class.badge-error]="!meetsGatherLevelRequirement()"
@@ -123,6 +123,8 @@
           />
         } @else if (isTownNode()) {
           <app-panel-map-node-actions-town (openTown)="openTown()" />
+        } @else if (isTrainerNode()) {
+          <app-panel-map-node-actions-trainer (visit)="visitTrainer()" />
         }
       </div>
     </div>

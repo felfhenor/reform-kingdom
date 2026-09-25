@@ -3,7 +3,7 @@
   description: An intermediate-level trainer that's often found training by an oasis.
   hidden: true
 
-  trainingIds:
+  trainerTeachingIds:
     - 'Magical: Desert Survival'
     - 'Physical: Desert Energy'
     - 'Explorer: Luck of the Desert'
@@ -13,5 +13,5 @@
   description: A secretive trainer who hides in plain sight. He trains those that find him to be more lucky.
   hidden: true
 
-  trainingIds:
-    - 'Stats: Basic Luck'
+  trainerTeachingIds:
+    - 'Stat: Basic Luck'

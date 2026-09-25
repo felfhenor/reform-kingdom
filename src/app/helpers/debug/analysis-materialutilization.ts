@@ -21,6 +21,7 @@ import type {
   MonsterContent,
   RecipeContent,
   ShrineContent,
+  TrainerTeachingContent,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -53,11 +54,12 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     traderTokenSinks: 0,
     nodeUpgradeCosts: 0,
     shrineCosts: 0,
+    trainerCosts: 0,
   };
 }
 
 // One point per recipe, caravan buy, astral spell, commission, node-upgrade
-// tier, shrine tier, and token-trade/unlock spend that consumes it, plus one if infusable.
+// tier, shrine tier, trainer teaching, and token-trade/unlock spend that consumes it, plus one if infusable.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
@@ -67,6 +69,7 @@ function score(stats: MaterialUtilizationStats): number {
     stats.traderTokenSinks +
     stats.nodeUpgradeCosts +
     stats.shrineCosts +
+    stats.trainerCosts +
     (stats.infusable ? 1 : 0)
   );
 }
@@ -101,6 +104,8 @@ export function runMaterialUtilizationAnalysis(
     getEntriesByType<EncounterRandomContent>('encounterrandom');
   const gatherings = getEntriesByType<GatheringContent>('gathering');
   const shrines = getEntriesByType<ShrineContent>('shrine');
+  const trainerTeachings =
+    getEntriesByType<TrainerTeachingContent>('trainerteaching');
   const caravanTraders =
     getEntriesByType<CaravanTraderContent>('caravantrader');
   const astralProjectors =
@@ -169,6 +174,13 @@ export function runMaterialUtilizationAnalysis(
         const stats = byId.get(cost.itemId);
         if (stats) stats.shrineCosts += 1;
       });
+    });
+  });
+
+  trainerTeachings.forEach((teaching) => {
+    teaching.costs.forEach((cost) => {
+      const stats = byId.get(cost.itemId);
+      if (stats) stats.trainerCosts += 1;
     });
   });
 
@@ -243,6 +255,7 @@ export function runMaterialUtilizationAnalysis(
             'Trader Token Sinks': stats.traderTokenSinks,
             'Node Upgrade Costs': stats.nodeUpgradeCosts,
             'Shrine Costs': stats.shrineCosts,
+            'Trainer Costs': stats.trainerCosts,
             'Crafted Into': stats.craftedInto,
             'Monster Drops': stats.monsterDrops,
             'Encounter Rewards': stats.encounterRewards,
@@ -279,6 +292,8 @@ export function runMaterialUtilizationAnalysis(
       sinks.push(`${stats.nodeUpgradeCosts} node upgrade tier(s)`);
     if (stats.shrineCosts > 0)
       sinks.push(`${stats.shrineCosts} shrine tier(s)`);
+    if (stats.trainerCosts > 0)
+      sinks.push(`${stats.trainerCosts} trainer teaching(s)`);
     if (stats.infusable) sinks.push('infusable');
     const sinkDescription =
       sinks.length > 0 ? sinks.join(', ') : 'no known sinks';

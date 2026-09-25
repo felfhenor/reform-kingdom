@@ -28,6 +28,10 @@ import {
   ensureTradeskill,
   ensureTradeskillLevelRequirement,
 } from '@helpers/content/ensure-tradeskill';
+import {
+  ensureTrainer,
+  ensureTrainerTeaching,
+} from '@helpers/content/ensure-trainer';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import type { ContentType, IsContentItem } from '@interfaces';
 
@@ -56,6 +60,8 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   town: ensureTown,
   tradeskill: ensureTradeskill,
   tradeskilllevelrequirement: ensureTradeskillLevelRequirement,
+  trainer: ensureTrainer,
+  trainerteaching: ensureTrainerTeaching,
   worker: ensureWorker,
 };
 

@@ -17,6 +17,7 @@ import {
 import { applyMaterialDelta, spendGold } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import {
   EquipmentTypeToSlot,
   type Character,
@@ -41,6 +42,7 @@ export function applyEquipmentToCharacter(
     character.jobId,
     character.level,
     equipment,
+    characterAllTeachingIds(character),
   );
 
   return {

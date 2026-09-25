@@ -3,7 +3,9 @@ vi.mock('@helpers/content/content', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
+import { defaultCombatStats } from '@helpers/defaults';
 import {
+  affixEffectsAddToBlock,
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
   equipmentItemGatherYieldBonuses,
@@ -503,5 +505,23 @@ describe('equipmentItemSkillStatBonuses', () => {
         skillStatBonuses: undefined,
       }),
     ).toEqual([]);
+  });
+});
+
+describe('affixEffectsAddToBlock', () => {
+  it('adds matching effects onto a copy of the block', () => {
+    const block = { ...defaultCombatStats(), damageReflectPercent: 2 };
+
+    const combined = affixEffectsAddToBlock(
+      block,
+      [
+        { kind: 'CombatStat', stat: 'damageReflectPercent', value: 1 },
+        { kind: 'Stat', stat: 'Luck', value: 5 },
+      ],
+      COMBAT_STAT_BONUS,
+    );
+
+    expect(combined.damageReflectPercent).toBe(3);
+    expect(block.damageReflectPercent).toBe(2);
   });
 });

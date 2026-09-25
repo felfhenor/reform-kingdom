@@ -36,6 +36,8 @@
     "./schemas/town.schema.json": "gamedata/town/**/*.yml",
     "./schemas/tradeskill.schema.json": "gamedata/tradeskill/**/*.yml",
     "./schemas/tradeskilllevelrequirement.schema.json": "gamedata/tradeskilllevelrequirement/**/*.yml",
+    "./schemas/trainer.schema.json": "gamedata/trainer/**/*.yml",
+    "./schemas/trainerteaching.schema.json": "gamedata/trainerteaching/**/*.yml",
     "./schemas/worker.schema.json": "gamedata/worker/**/*.yml"
   },
   "exportall.config.relExclusion": [

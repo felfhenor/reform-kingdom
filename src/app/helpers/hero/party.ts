@@ -14,8 +14,16 @@ import {
   newEquipmentItem,
   pruneInvalidEquippedItems,
 } from '@helpers/item/equipment';
+import {
+  affixEffectsAddToBlock,
+  STAT_BONUS,
+} from '@helpers/item/equipment-bonus';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import {
+  characterAllTeachingIds,
+  trainerTeachingEffects,
+} from '@helpers/trainer/trainer-teaching';
 import type {
   AffixEffect,
   Character,
@@ -26,6 +34,7 @@ import type {
   JobContent,
   JobId,
   StatBlock,
+  TrainerTeachingId,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -53,14 +62,19 @@ function jobStatsAtLevel(jobId: JobId, level: number): StatBlock {
   return stats;
 }
 
-// Equipment stat bonuses are flat (no per-level scaling on gear).
+// Equipment and teaching stat bonuses are flat (no per-level scaling). `teachingIds` spans every job, not just `jobId`.
 export function characterStatsForLevel(
   jobId: JobId,
   level: number,
   equipment: EquipmentBlock,
+  teachingIds: TrainerTeachingId[],
 ): StatBlock {
   const stats = jobStatsAtLevel(jobId, level);
-  const equipmentStats = equipmentStatTotals(equipment);
+  const equipmentStats = affixEffectsAddToBlock(
+    equipmentStatTotals(equipment),
+    trainerTeachingEffects(teachingIds),
+    STAT_BONUS,
+  );
 
   // Floored at 1 - a stat at or below 0 (Health/Energy especially) breaks max-pool clamping downstream.
   (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
@@ -88,7 +102,7 @@ function starterEquipment(): EquipmentBlock {
 
 export function createCharacter(name: string, jobId: JobId): Character {
   const equipment = starterEquipment();
-  const stats = characterStatsForLevel(jobId, 1, equipment);
+  const stats = characterStatsForLevel(jobId, 1, equipment, []);
 
   return {
     id: rngUuid() as CharacterId,
@@ -101,6 +115,7 @@ export function createCharacter(name: string, jobId: JobId): Character {
     jobId,
     jobProgress: {},
     combatOrders: {},
+    teachings: {},
     hp: stats.Health,
     ep: stats.Energy,
     stats,
@@ -149,6 +164,7 @@ export function pruneInvalidPartyEquipment(party: Character[]): Character[] {
       character.jobId,
       character.level,
       equipment,
+      characterAllTeachingIds(character),
     );
 
     return {

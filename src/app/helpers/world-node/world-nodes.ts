@@ -16,6 +16,7 @@ import type {
   TiledMap,
   TiledObject,
   TownContent,
+  TrainerContent,
   WorldNodeEntry,
   WorldNodeLookup,
   WorldNodeNameMap,
@@ -23,7 +24,7 @@ import type {
   WorldNodeType,
 } from '@interfaces';
 
-const NODE_LAYER_NAMES = ['Explore Nodes', 'Other Nodes'];
+const NODE_LAYER_NAMES = ['Explore Nodes'];
 
 function tiledObjectTilePosition(
   map: TiledMap,
@@ -138,6 +139,13 @@ export function worldNodeShrine(
   return content?.__type === 'shrine' ? content : undefined;
 }
 
+export function worldNodeTrainer(
+  entry: WorldNodeEntry,
+): TrainerContent | undefined {
+  const content = getEntry<TrainerContent>(entry.nodeName);
+  return content?.__type === 'trainer' ? content : undefined;
+}
+
 export function worldNodeTown(entry: WorldNodeEntry): TownContent | undefined {
   const content = getEntry<TownContent>(entry.nodeName);
   return content?.__type === 'town' ? content : undefined;
@@ -160,6 +168,7 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
     worldNodeOverride(entry)?.hidden ??
     worldNodeTown(entry)?.hidden ??
     worldNodeShrine(entry)?.hidden ??
+    worldNodeTrainer(entry)?.hidden ??
     false
   );
 }
@@ -176,6 +185,7 @@ export function worldNodeCollectibleGateIds(
     worldNodeOverride(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeTown(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeShrine(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeTrainer(entry)?.invisibleUntilCollectibleIdsFound ??
     []
   );
 }

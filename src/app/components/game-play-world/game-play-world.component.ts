@@ -89,9 +89,10 @@ import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-tra
 import { workersTravelingTokens } from '@helpers/worker/worker-travel.ui';
 import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate.ui';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
-import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
-import { worldNodeInteractionKind } from '@helpers/world-node/world-node-status';
-import { worldNodeLabelInfo } from '@helpers/world-node/world-node-status.ui';
+import {
+  worldNodeLabelInfo,
+  worldNodeStatusInfo,
+} from '@helpers/world-node/world-node-status.ui';
 import {
   isWorldNodeCollectibleGateMet,
   isWorldNodeVisible,
@@ -627,15 +628,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     return entry ? worldNodeLabelInfo(entry) : undefined;
   }
 
-  // Only ExploreRandomNode has a per-cycle beaten/not-beaten state worth badging on the map.
   private resolveNodeStatus(
     object: TiledObject,
   ): WorldNodeStatusInfo | undefined {
     const entry = worldNodeByName(object.name);
-    if (!entry || worldNodeInteractionKind(entry) !== 'ExploreRandom')
-      return undefined;
-
-    return { beaten: worldNodeExploreRandomIsCompleted(entry) };
+    return entry ? worldNodeStatusInfo(entry) : undefined;
   }
 
   // Catches countdown text and hidden-node discovery updates.
@@ -668,10 +665,8 @@ export class GamePlayWorldComponent implements OnDestroy {
       icon.visible = visible;
       if (!visible) return;
 
-      pixiIndicatorNodeStatusUpdate(
-        icon,
-        worldNodeExploreRandomIsCompleted(entry),
-      );
+      const info = worldNodeStatusInfo(entry);
+      if (info) pixiIndicatorNodeStatusUpdate(icon, info.beaten);
     });
   }
 

@@ -21,6 +21,7 @@ import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
+import { runTrainersAnalysis } from '@helpers/debug/analysis-trainers';
 import { runTradeskillGapsAnalysis } from '@helpers/debug/analysis-tradeskillgaps';
 import { runTradeskillXpGapsAnalysis } from '@helpers/debug/analysis-tradeskillxpgaps';
 import { runWorkerReachabilityAnalysis } from '@helpers/debug/analysis-workerreachability';
@@ -187,7 +188,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'fieldnodes',
     title: 'Field Nodes',
     description:
-      'Every field node has a matching encounter, random encounter, gathering, or shrine entry.',
+      'Every field node has a matching encounter, random encounter, gathering, shrine, or trainer entry.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],
@@ -212,6 +213,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runShrinesAnalysis,
+  },
+  {
+    id: 'trainers',
+    title: 'Trainers',
+    description:
+      'Every trainer is placed once, every teaching is allocated to exactly one trainer, and every teaching is satisfiable (jobs, costs, effects, collectibles, prerequisites).',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runTrainersAnalysis,
   },
   {
     id: 'workerstamina',

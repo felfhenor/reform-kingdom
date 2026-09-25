@@ -21,6 +21,7 @@ import { runCommissionRewardsAnalysis } from '@helpers/debug/analysis-commission
 import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gatherdevelopmentlevels';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
+import { runTrainersAnalysis } from '@helpers/debug/analysis-trainers';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
@@ -28,34 +29,36 @@ import { printAnalysisResult } from './debug/run-analysis-cli';
 import { runSchemaValidation } from './debug/schema-validation';
 import { runUnusedSpriteValidation } from './debug/unused-sprite-validation';
 
-const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> = [
-  { title: 'validate:fieldnodes', run: runFieldNodesAnalysis },
-  { title: 'validate:teleportnodes', run: runTeleportNodesAnalysis },
-  { title: 'validate:nodenames', run: runNodeNamesAnalysis },
-  { title: 'validate:completionrewards', run: runCompletionRewardsAnalysis },
-  { title: 'validate:reciperewards', run: runRecipeRewardsAnalysis },
-  { title: 'validate:recipenames', run: runRecipeNamesAnalysis },
-  { title: 'validate:obtainability', run: runObtainabilityAnalysis },
-  { title: 'validate:tradeskillxpgaps', run: runTradeskillXpGapsAnalysis },
-  {
-    title: 'validate:recipeingredientorder',
-    run: runRecipeIngredientOrderAnalysis,
-  },
-  { title: 'validate:sprites', run: runSpritesAnalysis },
-  { title: 'validate:commissionusage', run: runCommissionUsageAnalysis },
-  { title: 'validate:commissionrewards', run: runCommissionRewardsAnalysis },
-  {
-    title: 'validate:gatherdevelopmentlevels',
-    run: runGatherDevelopmentLevelsAnalysis,
-  },
-  {
-    title: 'validate:townmaterialthresholds',
-    run: runTownMaterialThresholdsAnalysis,
-  },
-  { title: 'validate:shrines', run: runShrinesAnalysis },
-  { title: 'validate:skills', run: runSkillsAnalysis },
-  { title: 'validate:skillbonuses', run: runSkillBonusesAnalysis },
-];
+const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
+  [
+    { title: 'validate:fieldnodes', run: runFieldNodesAnalysis },
+    { title: 'validate:teleportnodes', run: runTeleportNodesAnalysis },
+    { title: 'validate:nodenames', run: runNodeNamesAnalysis },
+    { title: 'validate:completionrewards', run: runCompletionRewardsAnalysis },
+    { title: 'validate:reciperewards', run: runRecipeRewardsAnalysis },
+    { title: 'validate:recipenames', run: runRecipeNamesAnalysis },
+    { title: 'validate:obtainability', run: runObtainabilityAnalysis },
+    { title: 'validate:tradeskillxpgaps', run: runTradeskillXpGapsAnalysis },
+    {
+      title: 'validate:recipeingredientorder',
+      run: runRecipeIngredientOrderAnalysis,
+    },
+    { title: 'validate:sprites', run: runSpritesAnalysis },
+    { title: 'validate:commissionusage', run: runCommissionUsageAnalysis },
+    { title: 'validate:commissionrewards', run: runCommissionRewardsAnalysis },
+    {
+      title: 'validate:gatherdevelopmentlevels',
+      run: runGatherDevelopmentLevelsAnalysis,
+    },
+    {
+      title: 'validate:townmaterialthresholds',
+      run: runTownMaterialThresholdsAnalysis,
+    },
+    { title: 'validate:shrines', run: runShrinesAnalysis },
+    { title: 'validate:trainers', run: runTrainersAnalysis },
+    { title: 'validate:skills', run: runSkillsAnalysis },
+    { title: 'validate:skillbonuses', run: runSkillBonusesAnalysis },
+  ];
 
 async function main(): Promise<void> {
   let failed = false;
@@ -63,7 +66,9 @@ async function main(): Promise<void> {
   try {
     loadCompiledContentFromDisk();
   } catch (err) {
-    console.error(`[validate] FATAL: ${err instanceof Error ? err.message : err}`);
+    console.error(
+      `[validate] FATAL: ${err instanceof Error ? err.message : err}`,
+    );
     process.exit(1);
   }
 
@@ -77,7 +82,9 @@ async function main(): Promise<void> {
   if ((await runUnusedSpriteValidation()).length > 0) failed = true;
 
   if (failed) {
-    console.error('\n[validate] FAILED: one or more checks reported problems above.');
+    console.error(
+      '\n[validate] FAILED: one or more checks reported problems above.',
+    );
     process.exit(1);
   }
 

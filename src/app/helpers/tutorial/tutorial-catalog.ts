@@ -113,4 +113,17 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
       },
     ],
   },
+  {
+    id: 'teachings',
+    name: 'Teachings',
+    trigger: { kind: 'first-trainer-visit' },
+    steps: [
+      {
+        targetKey: 'hero-teachings',
+        view: 'heroes',
+        title: 'Teachings',
+        body: 'Trainers around the world teach permanent upgrades to your heroes. Each teaching is learned per hero, per job, and applies to every job the hero has unlocked.',
+      },
+    ],
+  },
 ];

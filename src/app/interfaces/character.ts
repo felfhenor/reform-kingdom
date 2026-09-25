@@ -1,5 +1,6 @@
 import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { JobId } from '@interfaces/content-job';
+import type { TrainerTeachingId } from '@interfaces/content-trainer-teaching';
 import type { EquipmentBlock } from '@interfaces/equipment';
 import type { Branded } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
@@ -30,6 +31,8 @@ export type Character = {
   // Combat Orders rule lists, keyed by job id, so switching jobs and back
   // restores the orders configured for that job.
   combatOrders: Partial<Record<JobId, CombatOrderClause[]>>;
+  // Trainer teachings, bought once per job; every job's teachings apply regardless of the current job.
+  teachings: Partial<Record<JobId, TrainerTeachingId[]>>;
 
   hp: number;
   ep: number;

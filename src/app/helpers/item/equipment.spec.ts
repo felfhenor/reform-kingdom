@@ -706,6 +706,26 @@ describe('Equipment Helper Functions', () => {
         Bleed: 0,
       });
     });
+
+    it('adds teaching resistances from every job on top of gear', () => {
+      const teaching = {
+        id: 'steelskin',
+        effects: [{ kind: 'Resistance', tag: 'Bleed', value: 3 }],
+      };
+      vi.mocked(getEntry).mockImplementation(
+        (id) => (id === 'steelskin' ? teaching : undefined) as never,
+      );
+
+      const character = {
+        jobId: 'job-warrior',
+        equipment: emptyEquipment,
+        teachings: { 'job-warrior': ['steelskin'], 'job-ranger': [] },
+      } as unknown as Character;
+      const asRanger = { ...character, jobId: 'job-ranger' } as Character;
+
+      expect(characterTagResistances(character).Bleed).toBe(3);
+      expect(characterTagResistances(asRanger).Bleed).toBe(3);
+    });
   });
 
   describe('equipmentGrantedSkillIds', () => {

@@ -11,6 +11,7 @@ import {
   equipmentItemAffixEffects,
 } from '@helpers/item/affix';
 import type {
+  AffixEffect,
   CombatStatBlock,
   EquipmentBonusDimension,
   EquipmentContent,
@@ -180,6 +181,21 @@ export function weightedBlockTotal<K extends string>(
     Object.keys(multiplierPerKey) as K[],
     (key) => (block?.[key] ?? 0) * multiplierPerKey[key],
   );
+}
+
+// Non-gear sources (e.g. trainer teachings) share affix effect shapes, so they fold onto a gear total through the same dimension.
+export function affixEffectsAddToBlock<K extends string>(
+  block: Record<K, number>,
+  effects: AffixEffect[],
+  dimension: EquipmentBonusDimension<K>,
+): Record<K, number> {
+  const combined = { ...block };
+
+  (Object.keys(combined) as K[]).forEach((key) => {
+    combined[key] += dimension.affixBonusFor(effects, key);
+  });
+
+  return combined;
 }
 
 // Infusion + affix only, no base equipment content - the "green bonus rows" UI shows under an item's base stats.

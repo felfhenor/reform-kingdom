@@ -1,11 +1,13 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { mergeGrantedSkills } from '@helpers/hero/skill';
 import { equipmentGrantedSkillIds } from '@helpers/item/equipment';
+import { trainerTeachingGrantedSkillIds } from '@helpers/trainer/trainer-teaching';
 import type {
   EquipmentBlock,
   EquipmentSkillContent,
   EquipmentSkillId,
   JobContent,
+  TrainerTeachingId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -32,14 +34,18 @@ function resolveSkills(skillIds: EquipmentSkillId[]): EquipmentSkillContent[] {
 }
 
 // A hero's full skill list: their job-path skills at the given level, with
-// any equipment-granted skills merged in.
+// any equipment- or teaching-granted skills merged in.
 export function heroSkillsWithEquipment(
   job: JobContent,
   level: number,
   equipment: EquipmentBlock,
+  teachingIds: TrainerTeachingId[],
 ): EquipmentSkillContent[] {
   const baseSkills = resolveSkills(heroSkillsAtLevel(job, level));
-  const grantedSkills = resolveSkills(equipmentGrantedSkillIds(equipment));
+  const grantedSkills = resolveSkills([
+    ...equipmentGrantedSkillIds(equipment),
+    ...trainerTeachingGrantedSkillIds(teachingIds),
+  ]);
 
   return mergeGrantedSkills(baseSkills, grantedSkills);
 }

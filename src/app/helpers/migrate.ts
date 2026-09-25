@@ -45,6 +45,10 @@ import {
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
 import { pruneInvalidTowns } from '@helpers/town/town-tick';
+import {
+  pruneInvalidCharacterTeachings,
+  pruneInvalidDiscoveredTrainers,
+} from '@helpers/trainer/trainer';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
 import { pruneInvalidTutorials } from '@helpers/tutorial/tutorial-seen';
 import {
@@ -131,6 +135,7 @@ export function migrateGameState() {
     ...character,
     equipment: backfillEquipmentBlock(character.equipment),
     combatOrders: character.combatOrders ?? {},
+    teachings: pruneInvalidCharacterTeachings(character.teachings),
   }));
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
@@ -147,6 +152,9 @@ export function migrateGameState() {
   );
   newState.discoveredCaravans = pruneInvalidDiscoveredCaravans(
     newState.discoveredCaravans,
+  );
+  newState.discoveredTrainers = pruneInvalidDiscoveredTrainers(
+    newState.discoveredTrainers,
   );
   newState.world.commissions = pruneInvalidCommissions(
     newState.world.commissions,
