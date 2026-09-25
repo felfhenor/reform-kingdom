@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
@@ -64,6 +65,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
   selector: 'app-panel-play-kingdom-tradeskill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BarProgressComponent,
     AtlasImageComponent,
     CardPageComponent,
     DecimalPipe,
@@ -158,13 +160,6 @@ export class PanelPlayKingdomTradeskillComponent {
       tradeskillMaxQueueSize(this.building().level, this.tradeskill()),
     ).fill(null),
   );
-
-  public xpPercent = computed(() => {
-    const { current, maximum } = this.building().xp;
-    return maximum > 0
-      ? Math.min(100, Math.round((current / maximum) * 100))
-      : 0;
-  });
 
   public gateCollectible = computed(() => {
     const gate = tradeskillActiveGate(this.tradeskill());

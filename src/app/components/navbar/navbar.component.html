@@ -87,7 +87,7 @@
 
         @if (currentTownEntry()) {
           <button
-            class="btn btn-xs btn-warning"
+            class="btn btn-xs btn-info"
             [class.btn-outline]="activeGamePlayView() !== 'town'"
             [tp]="currentTownName() + ' [6]'"
             (click)="openCurrentTown()"
@@ -122,7 +122,7 @@
             [sfxOffset]="$index"
             [sfxTrigger]="['click', 'hover']"
           >
-            <app-icon [name]="panel.icon" size="nav" color="#000"></app-icon>
+            <app-icon [name]="panel.icon" size="nav"></app-icon>
           </button>
         </li>
       }
@@ -130,7 +130,7 @@
       @if (showCaravanTradeButton()) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-xs btn-warning"
+            class="btn btn-xs btn-secondary"
             appButtonGlow
             tp="Trade with the Caravan [T]"
             (click)="openCaravanTrade()"
@@ -141,7 +141,7 @@
             (hotkey)="hotkeyMatches($event, 't') && openCaravanTrade()"
             isGlobal
           >
-            <app-icon name="gameSwapBag" size="nav" color="#000"></app-icon>
+            <app-icon name="gameSwapBag" size="nav"></app-icon>
           </button>
         </li>
       }
@@ -160,7 +160,7 @@
             (hotkey)="hotkeyMatches($event, 'r') && recenterCamera()"
             isGlobal
           >
-            <app-icon name="tablerFocus" size="nav" color="#000"></app-icon>
+            <app-icon name="tablerFocus" size="nav"></app-icon>
           </button>
         </li>
       }
@@ -180,7 +180,6 @@
           <app-icon
             [name]="isPaused() ? 'gamePlayButton' : 'gamePauseButton'"
             size="nav"
-            color="#000"
           ></app-icon>
         </button>
       </li>
@@ -198,7 +197,7 @@
           (hotkey)="hotkeyMatches($event, 'q') && leaveSwal.fire()"
           isGlobal
         >
-          <app-icon name="gameExitDoor" size="nav" color="#000"></app-icon>
+          <app-icon name="gameExitDoor" size="nav"></app-icon>
         </button>
       </li>
 
@@ -214,11 +213,7 @@
           (hotkey)="hotkeyMatches($event, 'ESCAPE') && closeAllMenus()"
           isGlobal
         >
-          <app-icon
-            [name]="'tablerSettings'"
-            size="nav"
-            color="#000"
-          ></app-icon>
+          <app-icon [name]="'tablerSettings'" size="nav"></app-icon>
         </button>
       </li>
     </ul>

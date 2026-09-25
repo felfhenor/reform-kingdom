@@ -15,9 +15,8 @@
         }
 
         <span
-          class="badge badge-sm"
+          class="badge badge-sm badge-outline"
           [class.badge-error]="!teachingRow.meetsLevel"
-          [class.badge-success]="teachingRow.meetsLevel"
         >
           Lv. {{ teachingRow.teaching.requiredLevel | number }}
         </span>
@@ -47,14 +46,14 @@
             <span class="text-lighter">Requires:</span>
 
             @for (prerequisite of unmetPrerequisites(); track $index) {
-              <span class="text-value-negative">{{ prerequisite.name }}</span>
+              <span class="text-error">{{ prerequisite.name }}</span>
             }
 
             @for (
               collectible of missingCollectibles();
               track collectible.collectibleId
             ) {
-              <div class="flex items-center gap-2 text-value-negative">
+              <div class="flex items-center gap-2 text-error">
                 @if (collectible.content; as content) {
                   <div class="zoom-inline">
                     <app-slot-rarity-outline

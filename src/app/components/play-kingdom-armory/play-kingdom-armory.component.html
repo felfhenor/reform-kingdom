@@ -24,7 +24,7 @@
 
       <button
         type="button"
-        class="btn btn-sm btn-success"
+        class="btn btn-sm btn-primary"
         [disabled]="selectedCount() === 0"
         [swal]="sellSwal"
         appSfx="ui-success"
@@ -35,7 +35,7 @@
 
       <button
         type="button"
-        class="btn btn-sm"
+        class="btn btn-sm btn-neutral"
         (click)="toggleSellMode()"
         appSfx="ui-error"
         [sfxTrigger]="['click', 'hover']"
@@ -67,9 +67,8 @@
 
       <button
         type="button"
-        class="btn btn-sm"
-        [class.btn-info]="!lootFilterActive()"
-        [class.btn-warning]="lootFilterActive()"
+        class="btn btn-sm btn-info"
+        [class.btn-outline]="!lootFilterActive()"
         (click)="openLootFilters()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"

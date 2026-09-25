@@ -55,18 +55,16 @@
         </div>
       }
 
-      <div class="relative w-full h-5 rounded overflow-hidden bg-black/30">
-        <div
-          class="absolute inset-y-0 left-0 bg-primary"
-          [style.width.%]="xpPercent()"
-        ></div>
-        <div
-          class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black tabular-nums"
-        >
-          {{ buildingData.xp.current | number }} /
-          {{ buildingData.xp.maximum | number }} XP
-        </div>
-      </div>
+      <app-bar-progress
+        color="primary"
+        [value]="buildingData.xp.current"
+        [max]="buildingData.xp.maximum"
+      >
+        {{ buildingData.xp.current | number }}/{{
+          buildingData.xp.maximum | number
+        }}
+        XP
+      </app-bar-progress>
     </div>
 
     <div class="flex gap-2 overflow-x-auto p-2 flex-shrink-0">
@@ -157,7 +155,7 @@
                 </span>
 
                 @if (entry.ownedQuantity > 0) {
-                  <span class="badge badge-sm badge-success badge-outline">
+                  <span class="badge badge-sm badge-info badge-outline">
                     Owned: {{ entry.ownedQuantity }}
                   </span>
                 }
