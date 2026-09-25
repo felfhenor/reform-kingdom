@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
@@ -12,6 +13,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-modal-raid-defense',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     ModalComponent,
     AtlasAnimationComponent,
     SlotIconBlankComponent,

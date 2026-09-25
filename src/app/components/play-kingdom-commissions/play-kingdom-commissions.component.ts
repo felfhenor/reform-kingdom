@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotCommissionComponent } from '@components/slot-commission/slot-commission.component';
@@ -23,6 +24,7 @@ import type {
   selector: 'app-play-kingdom-commissions',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     CardPageComponent,
     ButtonKingdomBackComponent,
     SlotCommissionComponent,

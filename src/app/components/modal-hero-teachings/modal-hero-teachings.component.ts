@@ -6,6 +6,7 @@ import {
   linkedSignal,
   untracked,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RowTrainerTeachingComponent } from '@components/row-trainer-teaching/row-trainer-teaching.component';
@@ -23,6 +24,7 @@ import { sumBy } from 'es-toolkit/compat';
   selector: 'app-modal-hero-teachings',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     DecimalPipe,
     IconJobComponent,
     ModalComponent,

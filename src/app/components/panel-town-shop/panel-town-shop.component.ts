@@ -9,6 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
@@ -37,6 +38,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-panel-town-shop',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     CurrencyCostComponent,
     DecimalPipe,
     SweetAlert2Module,

@@ -1,9 +1,17 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import type { BlankSlateSize } from '@interfaces';
 
 @Component({
   selector: 'app-blank-slate',
-  imports: [],
-  templateUrl: './blank-slate.component.html',
-  styleUrl: './blank-slate.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <ng-content></ng-content>
+  `,
+  host: {
+    '[class]':
+      "size() === 'page' ? 'flex justify-center items-center w-full h-full text-2xl italic text-lighter' : 'block text-sm italic text-lighter p-2 text-center'",
+  },
 })
-export class BlankSlateComponent {}
+export class BlankSlateComponent {
+  public size = input<BlankSlateSize>('inline');
+}

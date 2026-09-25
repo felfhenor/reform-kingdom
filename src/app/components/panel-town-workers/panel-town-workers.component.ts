@@ -5,6 +5,7 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
@@ -22,6 +23,7 @@ import type {
   selector: 'app-panel-town-workers',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     AtlasAnimationComponent,
     DecimalPipe,
     SlotIconBlankComponent,

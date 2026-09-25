@@ -34,9 +34,9 @@
       @for (row of trades(); track row.index) {
         <app-slot-caravan-trade [row]="row" (activate)="requestTrade(row)" />
       } @empty {
-        <div class="text-sm text-lighter">
+        <app-blank-slate>
           This trader has nothing in stock right now.
-        </div>
+        </app-blank-slate>
       }
     </div>
 

@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SlotCaravanTradeComponent } from '@components/slot-caravan-trade/slot-caravan-trade.component';
 import { caravanTradeDisplay } from '@helpers/caravan/caravan-trade-display.ui';
@@ -28,7 +29,12 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 @Component({
   selector: 'app-modal-town-material-sale',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SlotCaravanTradeComponent, ModalComponent, SweetAlert2Module],
+  imports: [
+    BlankSlateComponent,
+    SlotCaravanTradeComponent,
+    ModalComponent,
+    SweetAlert2Module,
+  ],
   templateUrl: './modal-town-material-sale.component.html',
 })
 export class ModalTownMaterialSaleComponent {

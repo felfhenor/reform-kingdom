@@ -24,9 +24,9 @@
           (travel)="travelTo(row.nodeName)"
         />
       } @empty {
-        <div class="text-sm text-lighter italic">
-          You have no active caravan commissions (somehow).
-        </div>
+        <app-blank-slate>
+          You have no active caravan commissions.
+        </app-blank-slate>
       }
     </div>
 

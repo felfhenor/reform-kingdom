@@ -8,6 +8,8 @@ export type DaisyColor =
   | 'warning'
   | 'error';
 
+export type BlankSlateSize = 'inline' | 'page';
+
 export type GamePlayView =
   'world' | 'kingdom' | 'adventurelog' | 'heroes' | 'decree' | 'town';
 

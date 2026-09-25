@@ -10,7 +10,7 @@
 
   <div body class="flex flex-col gap-4">
     @if (!character() || !job()) {
-      <div class="italic text-lighter">No hero selected.</div>
+      <app-blank-slate>No hero selected.</app-blank-slate>
     } @else {
       <div class="card bg-base-300 border border-primary/30 shadow">
         <div class="card-body gap-2">

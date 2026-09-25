@@ -4,6 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
@@ -22,6 +23,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-hero-equipment-skills',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
     TooltipSkillPreviewComponent,

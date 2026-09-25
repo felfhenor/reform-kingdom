@@ -5,6 +5,7 @@ import {
   computed,
   inject,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
@@ -21,6 +22,7 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-play-adventurelog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     AtlasImageComponent,
     CardPageComponent,
     SlotIconBlankComponent,

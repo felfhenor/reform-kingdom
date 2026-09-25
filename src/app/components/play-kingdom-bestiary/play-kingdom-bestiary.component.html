@@ -54,7 +54,7 @@
               }
             </button>
           } @empty {
-            <div class="text-sm text-lighter p-2">No monsters found.</div>
+            <app-blank-slate>No monsters found.</app-blank-slate>
           }
         </div>
       </div>
@@ -63,7 +63,7 @@
         @if (selectedEntry(); as entry) {
           <app-detail-bestiary-monster [entry]="entry" />
         } @else {
-          <div class="text-sm text-lighter">No monster selected.</div>
+          <app-blank-slate>No monster selected.</app-blank-slate>
         }
       </div>
     </div>

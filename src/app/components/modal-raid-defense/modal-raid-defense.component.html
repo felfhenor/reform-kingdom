@@ -10,7 +10,7 @@
     @let defenseRows = rows();
 
     @if (defenseRows.length === 0) {
-      <p class="italic text-lighter">No towns currently need defending.</p>
+      <app-blank-slate>No towns currently need defending.</app-blank-slate>
     } @else {
       @for (row of defenseRows; track row.townId) {
         <div class="flex flex-col gap-2 p-4 rounded bg-base-200">

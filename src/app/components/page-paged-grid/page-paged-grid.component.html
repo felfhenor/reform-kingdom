@@ -61,7 +61,9 @@
     <div class="paged-grid-grid p-2" #gridContainer>
       @if (showGrid()) {
         @if (pagedEntries().length === 0) {
-          <div class="paged-grid-empty text-lighter">{{ emptyMessage() }}</div>
+          <app-blank-slate class="paged-grid-empty">
+            {{ emptyMessage() }}
+          </app-blank-slate>
         }
 
         <ng-content />

@@ -4,6 +4,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
@@ -22,6 +23,7 @@ import type { MonsterId } from '@interfaces';
   selector: 'app-play-kingdom-bestiary',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     AtlasAnimationComponent,
     DetailBestiaryMonsterComponent,
     CardPageComponent,

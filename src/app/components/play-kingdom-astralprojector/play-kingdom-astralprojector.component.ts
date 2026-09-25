@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
@@ -50,6 +51,7 @@ type AstralProjectorRowViewModel = {
   selector: 'app-play-kingdom-astralprojector',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,
     IconUnknownComponent,

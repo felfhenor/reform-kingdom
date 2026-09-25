@@ -5,6 +5,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SlotCaravanTokenTradeComponent } from '@components/slot-caravan-token-trade/slot-caravan-token-trade.component';
 import { SlotCaravanTradeComponent } from '@components/slot-caravan-trade/slot-caravan-trade.component';
@@ -50,6 +51,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-modal-caravan-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     SlotCaravanTradeComponent,
     SlotCaravanTokenTradeComponent,
     SlotCommissionComponent,

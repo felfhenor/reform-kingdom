@@ -15,7 +15,7 @@
 
   <div class="h-full flex flex-col gap-4">
     @if (party().length === 0) {
-      <app-blank-slate>No heroes yet.</app-blank-slate>
+      <app-blank-slate size="page">No heroes yet.</app-blank-slate>
     } @else {
       <div role="tablist" class="tabs tabs-boxed">
         @for (character of party(); track character.id) {

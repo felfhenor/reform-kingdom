@@ -6,6 +6,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CardEquipmentItemComponent } from '@components/card-equipment-item/card-equipment-item.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
@@ -43,6 +44,7 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
   selector: 'app-panel-hero-equipment-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     SlotEquipmentComponent,
     CardEquipmentItemComponent,
     ScrollingModule,

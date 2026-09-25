@@ -331,13 +331,13 @@
           </div>
         </div>
       } @empty {
-        <div class="text-xs italic text-lighter">
+        <app-blank-slate>
           @if (hideUncraftable() && uncraftableTotal > 0) {
             All available recipes are currently uncraftable.
           } @else {
             No recipes available yet.
           }
-        </div>
+        </app-blank-slate>
       }
     </div>
   </div>

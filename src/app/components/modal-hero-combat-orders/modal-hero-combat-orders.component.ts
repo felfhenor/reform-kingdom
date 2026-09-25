@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -116,6 +117,7 @@ const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
   selector: 'app-modal-hero-combat-orders',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     IconComponent,
     ModalComponent,
     RowCombatOrderClauseComponent,

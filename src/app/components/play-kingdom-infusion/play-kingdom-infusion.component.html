@@ -42,7 +42,7 @@
           </div>
         </button>
       } @empty {
-        <div class="italic text-sm p-2">No heroes recruited yet.</div>
+        <app-blank-slate>No heroes recruited yet.</app-blank-slate>
       }
     </div>
 
@@ -86,10 +86,10 @@
             }
           }
         } @else {
-          <div class="italic text-sm p-2">This hero has nothing equipped.</div>
+          <app-blank-slate>This hero has nothing equipped.</app-blank-slate>
         }
       } @else {
-        <div class="italic text-sm p-2">Select a hero to see their gear.</div>
+        <app-blank-slate>Select a hero to see their gear.</app-blank-slate>
       }
     </div>
 
@@ -220,18 +220,16 @@
                   }
                 </div>
               } @else {
-                <div class="italic text-sm">No infusable materials owned.</div>
+                <app-blank-slate>No infusable materials owned.</app-blank-slate>
               }
             </div>
           }
         } @else {
-          <div class="italic text-sm">This item has no infusion slots.</div>
+          <app-blank-slate>This item has no infusion slots.</app-blank-slate>
         }
       } @else {
         <div class="min-h-[20px]"></div>
-        <div class="italic text-sm p-2 pt-4">
-          Select an equipped item to infuse it.
-        </div>
+        <app-blank-slate>Select an equipped item to infuse it.</app-blank-slate>
       }
     </div>
   </div>

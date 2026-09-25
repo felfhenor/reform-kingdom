@@ -84,12 +84,12 @@
           />
         </app-slot-button-container>
       } @empty {
-        <div class="italic text-sm p-4">
+        <app-blank-slate>
           No equippable items available for this slot.
-        </div>
+        </app-blank-slate>
       }
     </div>
   } @else {
-    <div class="italic text-sm p-4">Select a slot to see available gear.</div>
+    <app-blank-slate>Select a slot to see available gear.</app-blank-slate>
   }
 </div>

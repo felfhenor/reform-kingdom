@@ -48,9 +48,9 @@
           </span>
         </app-row-trainer-teaching>
       } @empty {
-        <div class="text-sm text-lighter">
+        <app-blank-slate>
           No trainer teaches {{ selectedJob()?.name }} heroes yet.
-        </div>
+        </app-blank-slate>
       }
     </div>
   </div>

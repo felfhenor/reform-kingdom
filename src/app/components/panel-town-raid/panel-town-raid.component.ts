@@ -4,6 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
@@ -25,6 +26,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-town-raid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BlankSlateComponent,
     AtlasAnimationComponent,
     SlotCompletionRewardComponent,
     SlotIconBlankComponent,
