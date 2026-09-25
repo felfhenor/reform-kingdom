@@ -27,7 +27,7 @@
           <span
             class="absolute bottom-0 inset-x-0 text-center text-xs text-shadow-black tabular-nums"
           >
-            Lv {{ row.level | number }}
+            Lv. {{ row.level | number }}
           </span>
         </div>
       }
@@ -40,8 +40,9 @@
     <h2 class="card-title text-base justify-between">
       Crafting Queue
       <span class="badge badge-sm badge-info tabular-nums">
-        {{ craftQueueRows().length | number }} /
-        {{ craftQueueSlots().length | number }}
+        {{ craftQueueRows().length | number }}/{{
+          craftQueueSlots().length | number
+        }}
       </span>
     </h2>
 

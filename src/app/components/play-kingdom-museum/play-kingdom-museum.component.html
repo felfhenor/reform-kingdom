@@ -14,28 +14,35 @@
       <button
         type="button"
         role="tab"
-        class="tab tab-active"
+        class="tab tab-active gap-2"
         (click)="setTab('collectibles')"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Collectibles ({{ collectibleDiscoveredCount() }}/{{
-          collectibleEntries().length
-        }})
+        Collectibles
+        <span class="badge badge-sm badge-info tabular-nums">
+          {{ collectibleDiscoveredCount() }}/{{ collectibleEntries().length }}
+        </span>
       </button>
       <button
         type="button"
         role="tab"
-        class="tab"
+        class="tab gap-2"
         (click)="setTab('recipes')"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Recipes ({{ recipeDiscoveredCount() }}/{{ recipeEntries().length }})
+        Recipes
+        <span class="badge badge-sm badge-info tabular-nums">
+          {{ recipeDiscoveredCount() }}/{{ recipeEntries().length }}
+        </span>
       </button>
     </div>
 
-    @for (entry of collectiblesGrid.pagedEntries(); track entry.collectible.id) {
+    @for (
+      entry of collectiblesGrid.pagedEntries();
+      track entry.collectible.id
+    ) {
       <app-slot-museum-collectible [entry]="entry" />
     }
   </app-page-paged-grid>
@@ -53,24 +60,28 @@
       <button
         type="button"
         role="tab"
-        class="tab"
+        class="tab gap-2"
         (click)="setTab('collectibles')"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Collectibles ({{ collectibleDiscoveredCount() }}/{{
-          collectibleEntries().length
-        }})
+        Collectibles
+        <span class="badge badge-sm badge-info tabular-nums">
+          {{ collectibleDiscoveredCount() }}/{{ collectibleEntries().length }}
+        </span>
       </button>
       <button
         type="button"
         role="tab"
-        class="tab tab-active"
+        class="tab tab-active gap-2"
         (click)="setTab('recipes')"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Recipes ({{ recipeDiscoveredCount() }}/{{ recipeEntries().length }})
+        Recipes
+        <span class="badge badge-sm badge-info tabular-nums">
+          {{ recipeDiscoveredCount() }}/{{ recipeEntries().length }}
+        </span>
       </button>
     </div>
 

@@ -5,12 +5,12 @@
     Shop
     <span class="flex items-center gap-2">
       <span class="badge badge-sm badge-info tabular-nums">
-        {{ shopStockRows.length | number }} / {{ stockCap() | number }}
+        {{ shopStockRows.length | number }}/{{ stockCap() | number }}
       </span>
 
       <button
         type="button"
-        class="btn btn-sm btn-outline btn-accent"
+        class="btn btn-sm btn-accent"
         (click)="openMaterialsModal()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"

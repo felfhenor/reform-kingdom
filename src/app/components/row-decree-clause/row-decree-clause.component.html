@@ -28,13 +28,13 @@
 </span>
 
 @if (isFailing()) {
-  <span
-    class="badge badge-warning"
+  <app-icon
+    name="tablerExclamationCircle"
+    size="row"
+    class="text-warning shrink-0"
     [tp]="clause().failureCount + ' failures in a row'"
     [tpPlacement]="'top'"
-  >
-    !
-  </span>
+  />
 }
 
 <label class="label cursor-pointer label-checkbox">

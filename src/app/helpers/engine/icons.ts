@@ -79,6 +79,7 @@ import {
   tablerCheck,
   tablerExclamationCircle,
   tablerFocus,
+  tablerInfoCircle,
   tablerPlus,
   tablerSettings,
   tablerX,
@@ -165,6 +166,7 @@ export const ALL_ICONS = {
   tablerCheck,
   tablerExclamationCircle,
   tablerFocus,
+  tablerInfoCircle,
 };
 
 export const ICON_SIZE_VALUES: Record<IconSize, string> = {

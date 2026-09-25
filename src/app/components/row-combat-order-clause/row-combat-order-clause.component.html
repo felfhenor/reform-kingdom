@@ -17,37 +17,37 @@
 </span>
 
 @if (!isFamilyKnown()) {
-  <span
-    class="badge badge-error"
+  <app-icon
+    name="tablerExclamationCircle"
+    size="row"
+    class="text-error shrink-0"
     [tp]="'This hero no longer knows this skill family.'"
     [tpPlacement]="'top'"
-  >
-    !
-  </span>
+  />
 } @else if (!isFamilyUsable()) {
-  <span
-    class="badge badge-warning"
+  <app-icon
+    name="tablerExclamationCircle"
+    size="row"
+    class="text-warning shrink-0"
     [tp]="'Not usable with the currently equipped weapon.'"
     [tpPlacement]="'top'"
-  >
-    !
-  </span>
+  />
 } @else if (isFamilyEquipmentOnly()) {
-  <span
-    class="badge badge-info"
+  <app-icon
+    name="tablerInfoCircle"
+    size="row"
+    class="text-info shrink-0"
     [tp]="'Depends on currently equipped gear.'"
     [tpPlacement]="'top'"
-  >
-    i
-  </span>
+  />
 } @else if (!isTargetModeUsable()) {
-  <span
-    class="badge badge-error"
+  <app-icon
+    name="tablerExclamationCircle"
+    size="row"
+    class="text-error shrink-0"
     [tp]="'This skill can never reach a valid target with this targeting - it will always be skipped.'"
     [tpPlacement]="'top'"
-  >
-    !
-  </span>
+  />
 }
 
 @if (!readOnly()) {

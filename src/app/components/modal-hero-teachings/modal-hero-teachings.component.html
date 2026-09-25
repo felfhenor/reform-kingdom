@@ -7,7 +7,7 @@
 >
   <span title>
     {{ character()?.name }}'s Teachings
-    <span class="badge badge-info">
+    <span class="badge badge-sm badge-info tabular-nums">
       {{ learnedTotal() | number }}/{{ teachingTotal() | number }}
     </span>
   </span>
@@ -33,7 +33,7 @@
             <app-icon-job [job]="tab.job" />
           </div>
           {{ tab.job.shorthand }}
-          <span class="badge badge-sm badge-info">
+          <span class="badge badge-sm badge-info tabular-nums">
             {{ tab.learned | number }}/{{ tab.total | number }}
           </span>
         </button>

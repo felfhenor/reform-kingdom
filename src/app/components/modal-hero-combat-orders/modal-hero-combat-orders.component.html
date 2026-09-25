@@ -287,7 +287,12 @@
 
       <div class="card bg-base-200 flex-1 min-h-0 flex flex-col">
         <div class="card-body gap-2 flex-1 min-h-0 flex flex-col py-0">
-          <div class="card-title text-sm">Orders</div>
+          <div class="card-title text-sm justify-between">
+            Orders
+            <span class="badge badge-sm badge-info tabular-nums">
+              {{ clauses().length }}/{{ rowCap }}
+            </span>
+          </div>
 
           <ul
             cdkDropList

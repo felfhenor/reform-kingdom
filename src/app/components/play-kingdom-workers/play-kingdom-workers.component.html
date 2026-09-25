@@ -1,13 +1,14 @@
 <app-card-page heightProfile="full" appTutorialTarget="kingdom-subview-workers">
-  <span header>Quartermaster's Annex</span>
+  <span header class="flex items-center gap-2">
+    Quartermaster's Annex
+    <span class="badge badge-sm badge-info tabular-nums">
+      {{ busyCount() }}/{{ entries().length }} busy
+    </span>
+  </span>
 
   <app-button-kingdom-back pageactions />
 
   <div class="workers-page">
-    <div class="text-xs text-center text-lighter pt-2">
-      {{ busyCount() }}/{{ entries().length }} workers busy
-    </div>
-
     <div class="workers-layout">
       <div class="workers-list">
         <div class="workers-list-scroll">

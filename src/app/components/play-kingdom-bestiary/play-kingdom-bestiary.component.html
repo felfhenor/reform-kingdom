@@ -1,13 +1,14 @@
 <app-card-page heightProfile="full">
-  <span header>Bestiary</span>
+  <span header class="flex items-center gap-2">
+    Bestiary
+    <span class="badge badge-sm badge-info tabular-nums">
+      {{ discoveredCount() }}/{{ entries().length }}
+    </span>
+  </span>
 
   <app-button-kingdom-back pageactions />
 
   <div class="bestiary-page">
-    <div class="text-xs text-center text-lighter pt-2">
-      {{ discoveredCount() }}/{{ entries().length }} discovered
-    </div>
-
     <div class="bestiary-layout">
       <div class="bestiary-list">
         <input

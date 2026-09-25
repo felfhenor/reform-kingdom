@@ -87,7 +87,7 @@
 
         @if (currentTownEntry()) {
           <button
-            class="btn btn-xs btn-info"
+            class="btn btn-xs btn-secondary"
             [class.btn-outline]="activeGamePlayView() !== 'town'"
             [tp]="currentTownName() + ' [6]'"
             (click)="openCurrentTown()"
