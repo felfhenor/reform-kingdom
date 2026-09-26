@@ -1,7 +1,7 @@
 @reference 'tailwindcss';
 
 .hero-skill-row {
-  @apply flex items-center gap-2 w-full px-2 py-1 text-left cursor-default rounded overflow-hidden;
+  @apply flex items-center gap-2 w-full px-2 py-1 text-left cursor-default rounded overflow-hidden max-h-[66px];
 }
 
 .hero-skill-row-icon {

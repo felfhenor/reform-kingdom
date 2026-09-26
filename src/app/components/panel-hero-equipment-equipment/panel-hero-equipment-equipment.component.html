@@ -3,7 +3,7 @@
 @let items = pickerItems();
 @let modifiable = equipmentModifiable();
 
-<div class="flex flex-col gap-3 ps-2 overflow-y-auto">
+<div class="flex flex-col gap-2 ps-2 overflow-y-auto">
   <div class="flex items-center justify-between w-full">
     <span class="type-section-title">Gear</span>
 
@@ -25,12 +25,13 @@
     </app-slot-button-container>
   </div>
 
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2">
     @for (row of paperdollRows; track $index) {
       @if (rowHasVisibleSlot(row)) {
         @for (slot of row; track slot) {
           @if (isSlotVisible(slot)) {
             <app-slot-equipment
+              class="min-h-[66px]"
               [slot]="slot"
               [equippedItem]="equippedItemFor(slot)"
               [isSelected]="selected === slot"
