@@ -32,14 +32,14 @@
             [frames]="monster.frames"
             class="zoom-tooltip"
           />
-          <span class="font-bold text-{{ monster.rarity }}">
+          <span class="type-entity-name text-{{ monster.rarity }}">
             {{ monster.name }}
           </span>
         } @else {
           <div class="zoom-tooltip">
             <app-icon-unknown />
           </div>
-          <span class="font-bold text-lighter">???</span>
+          <span class="type-unknown">???</span>
         }
       </div>
     }

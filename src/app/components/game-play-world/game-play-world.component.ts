@@ -148,7 +148,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
     @if (isMapLoading()) {
       <div class="map-loading-overlay bg-base-100">
         <span class="loading loading-spinner loading-lg text-primary"></span>
-        <p class="text-sm text-lighter">Loading map...</p>
+        <p class="type-muted">Loading map...</p>
       </div>
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>

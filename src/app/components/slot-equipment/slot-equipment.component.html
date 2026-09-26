@@ -27,7 +27,7 @@
       [showDescription]="false"
     >
       @if (occupiedPaperdollSlots().length > 1) {
-        <div class="text-xs mb-1 italic text-lighter">
+        <div class="type-hint mb-1">
           Occupies: {{ occupiedPaperdollSlots().join(' + ') }}
         </div>
       }
@@ -40,9 +40,7 @@
       }
 
       @if (showUnequipHint()) {
-        <div class="text-xs mt-2 italic text-lighter">
-          Right-click to unequip.
-        </div>
+        <div class="type-hint mt-2">Right-click to unequip.</div>
       }
     </app-tooltip-item-preview>
 

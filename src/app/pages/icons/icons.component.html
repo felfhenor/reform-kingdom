@@ -7,7 +7,7 @@
 
   <div class="card bg-base-100 foreground shadow-xl">
     <div class="card-body gap-4">
-      <div class="card-title">Stats</div>
+      <div class="type-section-title">Stats</div>
 
       <div class="grid grid-cols-4 gap-4">
         @for (stat of stats; track stat) {
@@ -32,7 +32,7 @@
   @for (category of iconCategories; track category.title) {
     <div class="card bg-base-100 foreground shadow-xl">
       <div class="card-body gap-4">
-        <div class="card-title">{{ category.title }}</div>
+        <div class="type-section-title">{{ category.title }}</div>
 
         <div class="grid grid-cols-4 gap-4">
           @for (entry of category.entries; track entry.name) {

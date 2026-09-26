@@ -257,7 +257,7 @@ describe('itemNameHtml', () => {
     const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
 
     expect(itemNameHtml(item)).toBe(
-      '<span class="text-Uncommon font-semibold">Copper Ore</span>',
+      '<span class="text-Uncommon type-entity-name">Copper Ore</span>',
     );
   });
 
@@ -265,7 +265,7 @@ describe('itemNameHtml', () => {
     const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
 
     expect(itemNameHtml(item, 'copper ores')).toBe(
-      '<span class="text-Uncommon font-semibold">copper ores</span>',
+      '<span class="text-Uncommon type-entity-name">copper ores</span>',
     );
   });
 });
@@ -275,7 +275,7 @@ describe('itemDropHtml', () => {
     const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
 
     expect(itemDropHtml(item, 1)).toBe(
-      '1 <span class="text-Uncommon font-semibold">copper ore</span>',
+      '1 <span class="text-Uncommon type-entity-name">copper ore</span>',
     );
   });
 
@@ -283,7 +283,7 @@ describe('itemDropHtml', () => {
     const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
 
     expect(itemDropHtml(item, 3)).toBe(
-      '3 <span class="text-Uncommon font-semibold">copper ores</span>',
+      '3 <span class="text-Uncommon type-entity-name">copper ores</span>',
     );
   });
 });
@@ -296,7 +296,7 @@ describe('equipmentNameHtml', () => {
     } as EquipmentContent;
 
     expect(equipmentNameHtml(equipment)).toBe(
-      '<span class="text-Uncommon font-semibold">Goblin Skull</span>',
+      '<span class="text-Uncommon type-entity-name">Goblin Skull</span>',
     );
   });
 });
@@ -309,7 +309,7 @@ describe('equipmentDropHtml', () => {
     } as EquipmentContent;
 
     expect(equipmentDropHtml(equipment)).toBe(
-      '<span class="text-Uncommon font-semibold">Goblin Skull</span>',
+      '<span class="text-Uncommon type-entity-name">Goblin Skull</span>',
     );
   });
 });
@@ -319,7 +319,7 @@ describe('recipeNameHtml', () => {
     const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
 
     expect(recipeNameHtml(recipe)).toBe(
-      '<span class="font-semibold">Stylized: Equipment: Bone-Hewn Cloak</span>',
+      '<span class="type-entity-name">Stylized: Equipment: Bone-Hewn Cloak</span>',
     );
   });
 });
@@ -329,7 +329,7 @@ describe('recipeDropHtml', () => {
     const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
 
     expect(recipeDropHtml(recipe)).toBe(
-      '<span class="font-semibold">Stylized: Equipment: Bone-Hewn Cloak</span>',
+      '<span class="type-entity-name">Stylized: Equipment: Bone-Hewn Cloak</span>',
     );
   });
 });

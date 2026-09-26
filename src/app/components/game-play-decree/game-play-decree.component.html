@@ -4,7 +4,7 @@
   <div class="flex flex-col gap-4 p-4 h-full min-h-0">
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
-        <div class="card-title text-base">Auto Mode</div>
+        <div class="type-section-title">Auto Mode</div>
 
         <div class="form-control">
           <label class="label cursor-pointer label-checkbox">
@@ -56,7 +56,7 @@
 
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
-        <div class="card-title text-base">
+        <div class="type-section-title">
           {{ isEditing() ? 'Edit Clause' : 'Add Clause' }}
         </div>
 
@@ -87,10 +87,8 @@
                 <div class="flex items-center gap-2">
                   <app-sprite-node class="zoom-row" [entry]="item.entry" />
                   <div>
-                    <div class="font-semibold text-sm">{{ item.nodeName }}</div>
-                    <div class="text-xs text-lighter">
-                      Lv. {{ item.levelLabel }}
-                    </div>
+                    <div class="type-label">{{ item.nodeName }}</div>
+                    <div class="type-meta">Lv. {{ item.levelLabel }}</div>
                   </div>
                 </div>
               </ng-template>
@@ -149,10 +147,8 @@
                 <div class="flex items-center gap-2">
                   <app-sprite-node class="zoom-row" [entry]="item.entry" />
                   <div>
-                    <div class="font-semibold text-sm">{{ item.nodeName }}</div>
-                    <div class="text-xs text-lighter">
-                      Lv. {{ item.levelLabel }}
-                    </div>
+                    <div class="type-label">{{ item.nodeName }}</div>
+                    <div class="type-meta">Lv. {{ item.levelLabel }}</div>
                   </div>
                 </div>
               </ng-template>
@@ -224,8 +220,8 @@
               (change)="setDraftRiskTolerance($event)"
             >
               <ng-template ng-option-tmp let-item="item">
-                <div class="font-sembold text-sm">{{ item.label }}</div>
-                <div class="text-xs text-lighter whitespace-normal">
+                <div class="type-label">{{ item.label }}</div>
+                <div class="type-meta whitespace-normal">
                   {{ item.description }}
                 </div>
               </ng-template>
@@ -277,7 +273,7 @@
 
     <div class="card shadow-sm flex-1 min-h-0 flex flex-col">
       <div class="card-body p-3 gap-2 flex-1 min-h-0 flex flex-col">
-        <div class="card-title text-base justify-between">
+        <div class="type-section-title justify-between">
           Decree
           <span class="badge badge-sm badge-info tabular-nums">
             {{ clauses().length | number }}/{{ clauseCap() | number }}

@@ -1,7 +1,7 @@
 @let roster = workers();
 
 <div class="card-body p-3 gap-2 flex-1 min-h-0">
-  <h2 class="card-title text-base justify-between shrink-0">
+  <h2 class="type-section-title justify-between shrink-0">
     Workers
     <span class="badge badge-sm badge-info tabular-nums">
       {{ roster.length | number }}
@@ -24,9 +24,9 @@
             </app-slot-icon-blank>
 
             <div class="flex flex-col min-w-0 gap-2">
-              <span class="font-bold">{{ worker.name }}</span>
+              <span class="type-entity-name">{{ worker.name }}</span>
 
-              <div class="flex gap-2 text-xs text-lighter">
+              <div class="flex gap-2 type-meta">
                 @if (statusDisplay.locationEntry) {
                   <app-sprite-node
                     class="zoom-inline shrink-0"

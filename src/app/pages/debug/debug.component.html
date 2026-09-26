@@ -73,7 +73,9 @@
         <div class="card bg-base-100 foreground shadow-xl">
           <div class="card-body">
             <div class="flex flex-row items-center gap-2">
-              <div class="card-title">{{ script.definition.title }}</div>
+              <div class="type-section-title">
+                {{ script.definition.title }}
+              </div>
 
               @if (state.error) {
                 <span class="badge badge-error">Error</span>

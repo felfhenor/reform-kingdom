@@ -13,7 +13,7 @@
 
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-lg font-semibold text-{{ e.monster.rarity }}">
+          <span class="type-entity-heading text-{{ e.monster.rarity }}">
             {{ e.monster.name }}
           </span>
 
@@ -27,17 +27,17 @@
           ></ng-select>
         </div>
 
-        <span class="text-xs text-lighter">
+        <span class="type-meta">
           Lv. {{ levelMin() }}-{{ levelMax() }}
           {{ e.monster.types.join('/') }} · {{ e.kills }} killed
         </span>
         @if (e.foundAtNodes.length > 0) {
-          <span class="text-xs text-lighter">
+          <span class="type-meta">
             Found in:
             {{ nodeNameString() }}
           </span>
         }
-        <span class="text-xs text-lighter">XP: {{ xpLabel() }}</span>
+        <span class="type-meta">XP: {{ xpLabel() }}</span>
       </div>
     } @else {
       <div class="zoom-header">
@@ -45,34 +45,30 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-lighter">???</span>
+        <span class="type-entity-heading type-unknown">???</span>
 
         @if (e.sourceNodeNames.length > 0) {
-          <span class="text-xs text-lighter">
+          <span class="type-meta">
             Discoverable in: {{ e.sourceNodeNames.join(', ') }}
           </span>
         } @else {
-          <span class="text-xs italic text-lighter">Location unknown</span>
+          <span class="type-hint">Location unknown</span>
         }
       </div>
     }
   </div>
 
   @if (e.discovered) {
-    <p class="text-sm italic text-lighter">{{ e.monster.description }}</p>
+    <p class="type-flavor">{{ e.monster.description }}</p>
 
     <div class="flex gap-4">
       <div class="flex flex-col gap-2 min-w-[150px]">
-        <span class="text-sm font-semibold">
-          Stats at Lv. {{ selectedLevel() }}
-        </span>
+        <span class="type-label">Stats at Lv. {{ selectedLevel() }}</span>
         <app-row-stat-summary [stats]="stats()" [showSign]="false" />
       </div>
 
       <div class="flex flex-col gap-2 w-64 shrink-0">
-        <span class="text-sm font-semibold">
-          Skills at Lv. {{ selectedLevel() }}
-        </span>
+        <span class="type-label">Skills at Lv. {{ selectedLevel() }}</span>
 
         <div class="flex flex-col gap-2">
           @for (skill of skills(); track skill.id) {
@@ -81,7 +77,7 @@
               [usingCombatant]="combatantAtSelectedLevel()"
             />
           } @empty {
-            <span class="text-xs italic text-lighter">No skills.</span>
+            <span class="type-hint">No skills.</span>
           }
         </div>
       </div>
@@ -89,7 +85,7 @@
 
     @if (filteredDrops().length > 0) {
       <div class="flex flex-col gap-2">
-        <span class="text-sm font-semibold">Drops</span>
+        <span class="type-label">Drops</span>
 
         <div class="flex flex-row gap-2 pl-1">
           @for (drop of filteredDrops(); track $index) {

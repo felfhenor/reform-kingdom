@@ -18,7 +18,7 @@
   </div>
 
   @if (t.scaling.length > 0) {
-    <div class="italic text-xs text-lighter">
+    <div class="type-hint">
       @for (entry of t.scaling; track entry.stat; let last = $last) {
         {{ entry.multiplier | number: '1.2-2' }}x {{ statShorthand[entry.stat]
         }}{{ last ? '' : ' + ' }}
@@ -38,6 +38,6 @@
   }
 
   @for (condition of t.conditions; track condition) {
-    <div class="italic text-xs text-lighter">{{ condition }}</div>
+    <div class="type-hint">{{ condition }}</div>
   }
 </div>

@@ -45,12 +45,14 @@
 
               @if (entry.discovered) {
                 <span
-                  class="font-semibold truncate text-{{ entry.monster.rarity }}"
+                  class="type-entity-name truncate text-{{
+                    entry.monster.rarity
+                  }}"
                 >
                   {{ entry.monster.name }}
                 </span>
               } @else {
-                <span class="font-semibold truncate text-lighter">???</span>
+                <span class="type-unknown truncate">???</span>
               }
             </button>
           } @empty {

@@ -16,7 +16,9 @@
   ></app-slot-rarity-outline>
 
   <span class="flex flex-col items-start gap-2 min-w-0">
-    <span class="font-semibold truncate max-w-full text-{{ content.rarity }}">
+    <span
+      class="type-entity-name truncate max-w-full text-{{ content.rarity }}"
+    >
       {{ displayName() }}
     </span>
 
@@ -34,7 +36,7 @@
   @if (equippedDisplay(); as equipped) {
     <div class="flex gap-4 p-3">
       <div class="flex-1 min-w-0">
-        <div class="italic text-xs mb-1">Currently Equipped</div>
+        <div class="type-hint mb-1">Currently Equipped</div>
         <app-detail-item-preview
           [display]="equipped"
           [comparisonStats]="equippedComparisonStats()"
@@ -54,7 +56,7 @@
       </div>
 
       <div class="flex-1 min-w-0">
-        <div class="italic text-xs mb-1">This Item</div>
+        <div class="type-hint mb-1">This Item</div>
         <app-detail-item-preview
           [display]="display()"
           [comparisonStats]="thisItemComparisonStats()"

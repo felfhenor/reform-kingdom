@@ -11,10 +11,8 @@
   <div class="flex flex-col gap-4 p-4 h-full overflow-y-auto">
     <div class="flex flex-col gap-2">
       <div class="flex items-center justify-between">
-        <span class="card-title text-base">Caravans</span>
-        <span class="text-sm text-lighter">
-          Next commissions in {{ resetLabel() }}
-        </span>
+        <span class="type-section-title">Caravans</span>
+        <span class="type-muted">Next commissions in {{ resetLabel() }}</span>
       </div>
 
       @for (row of caravanRows(); track row.caravanId) {
@@ -32,7 +30,7 @@
 
     @if (townRows().length > 0) {
       <div class="flex flex-col gap-2">
-        <span class="card-title text-base">Towns</span>
+        <span class="type-section-title">Towns</span>
 
         @for (row of townRows(); track row.slotId) {
           <app-slot-commission

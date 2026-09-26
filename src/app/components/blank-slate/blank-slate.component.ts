@@ -9,7 +9,7 @@ import type { BlankSlateSize } from '@interfaces';
   `,
   host: {
     '[class]':
-      "size() === 'page' ? 'flex justify-center items-center w-full h-full text-2xl italic text-lighter' : 'block text-sm italic text-lighter p-2 text-center'",
+      "size() === 'page' ? 'flex justify-center items-center w-full h-full text-2xl italic text-lighter' : 'block type-flavor p-2 text-center'",
   },
 })
 export class BlankSlateComponent {

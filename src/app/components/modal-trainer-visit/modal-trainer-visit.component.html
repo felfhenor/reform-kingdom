@@ -29,8 +29,10 @@
             </app-slot-icon-blank>
 
             <div class="flex flex-col min-w-0">
-              <span class="font-semibold truncate">{{ character.name }}</span>
-              <span class="text-xs text-lighter">
+              <span class="type-entity-name truncate">
+                {{ character.name }}
+              </span>
+              <span class="type-meta">
                 Lv. {{ character.level }} {{ job?.shorthand }}
               </span>
             </div>

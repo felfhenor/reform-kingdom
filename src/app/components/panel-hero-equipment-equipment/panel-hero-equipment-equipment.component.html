@@ -5,7 +5,7 @@
 
 <div class="flex flex-col gap-3 ps-2 overflow-y-auto">
   <div class="flex items-center justify-between w-full">
-    <span class="card-title text-base">Gear</span>
+    <span class="type-section-title">Gear</span>
 
     <app-slot-button-container
       [disabled]="!modifiable"
@@ -48,7 +48,7 @@
 <div class="flex flex-col gap-2 h-full min-h-0">
   @if (selected) {
     <div class="flex justify-between items-center shrink-0">
-      <span class="card-title text-base">{{ selected }}</span>
+      <span class="type-section-title">{{ selected }}</span>
       @if (selectedContent) {
         <app-slot-button-container
           [disabled]="!modifiable"

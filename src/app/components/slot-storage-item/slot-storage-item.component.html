@@ -1,9 +1,7 @@
 @let item = entry().item;
 
 <app-tooltip-item-preview #preview [display]="display()">
-  <div class="text-xs mt-2 italic">
-    Quantity: {{ entry().quantity | number }}
-  </div>
+  <div class="type-hint mt-2">Quantity: {{ entry().quantity | number }}</div>
 </app-tooltip-item-preview>
 
 <div class="storage-item-slot" [tp]="preview.template()" [tpPlacement]="'top'">

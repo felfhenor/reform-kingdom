@@ -15,10 +15,10 @@
             <app-sprite-node [entry]="entry" />
 
             <div class="flex flex-col">
-              <h2 class="card-title text-lg">{{ displayName() }}</h2>
+              <h2 class="type-page-title">{{ displayName() }}</h2>
 
               @if (caravanTraderName(); as traderName) {
-                <span class="text-sm text-lighter">{{ traderName }}</span>
+                <span class="type-muted">{{ traderName }}</span>
               }
             </div>
           </div>
@@ -47,7 +47,7 @@
           }
         </div>
 
-        <p class="text-sm text-lighter my-4">
+        <p class="type-muted my-4">
           {{ description() ?? 'No information available yet.' }}
         </p>
 

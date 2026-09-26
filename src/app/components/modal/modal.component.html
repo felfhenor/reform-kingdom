@@ -16,7 +16,7 @@
       [class.hidden]="isInReplacementMode"
     >
       <div class="card-body">
-        <div class="card-title flex justify-center relative">
+        <div class="type-page-title flex justify-center relative">
           <ng-content select="[title]"></ng-content>
 
           @if (showCloseButton()) {
@@ -27,7 +27,7 @@
           }
         </div>
 
-        <div class="text-sm text-lighter italic text-center empty:hidden">
+        <div class="type-flavor text-center empty:hidden">
           <ng-content select="[subtitle]"></ng-content>
         </div>
 

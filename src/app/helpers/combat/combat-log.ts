@@ -124,7 +124,7 @@ export function itemNameHtml(
   item: ItemContent,
   displayName = item.name,
 ): string {
-  return `<span class="text-${item.rarity} font-semibold">${displayName}</span>`;
+  return `<span class="text-${item.rarity} type-entity-name">${displayName}</span>`;
 }
 
 // "1 wergen stick" vs "3 wergen sticks" - only pluralize when the quantity
@@ -137,7 +137,7 @@ export function itemDropHtml(item: ItemContent, quantity: number): string {
 }
 
 export function equipmentNameHtml(equipment: EquipmentContent): string {
-  return `<span class="text-${equipment.rarity} font-semibold">${equipment.name}</span>`;
+  return `<span class="text-${equipment.rarity} type-entity-name">${equipment.name}</span>`;
 }
 
 // Equipment drops are always a single piece, so there's no quantity/plural to handle here.
@@ -146,7 +146,7 @@ export function equipmentDropHtml(equipment: EquipmentContent): string {
 }
 
 export function collectibleNameHtml(collectible: CollectibleContent): string {
-  return `<span class="text-${collectible.rarity} font-semibold">${collectible.name}</span>`;
+  return `<span class="text-${collectible.rarity} type-entity-name">${collectible.name}</span>`;
 }
 
 // Collectible drops are always a single piece, same as equipment.
@@ -157,7 +157,7 @@ export function collectibleDropHtml(collectible: CollectibleContent): string {
 // Recipes have no rarity of their own (their icon borrows their result's),
 // so the name isn't tinted, unlike the other reward types above.
 export function recipeNameHtml(recipe: RecipeContent): string {
-  return `<span class="font-semibold">${recipeStylizedName(recipe)}</span>`;
+  return `<span class="type-entity-name">${recipeStylizedName(recipe)}</span>`;
 }
 
 // Recipe drops are always a single piece, same as equipment/collectibles.

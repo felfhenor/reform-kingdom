@@ -41,7 +41,7 @@
     <div class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
       @for (row of rows(); track row.teaching.id) {
         <app-row-trainer-teaching [row]="row" mode="teachings">
-          <span class="text-xs text-lighter italic" actionslot>
+          <span class="type-hint" actionslot>
             Taught by {{ row.trainerDisplayName }}
           </span>
         </app-row-trainer-teaching>

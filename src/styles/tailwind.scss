@@ -98,6 +98,48 @@
   opacity: 0.7;
 }
 
+// Typography roles; use these over raw size/weight combos so the design language stays consistent.
+@utility type-page-title {
+  @apply card-title;
+}
+
+@utility type-section-title {
+  @apply card-title text-base;
+}
+
+@utility type-label {
+  @apply text-sm font-semibold;
+}
+
+@utility type-entity-heading {
+  @apply text-lg font-semibold;
+}
+
+@utility type-entity-name {
+  @apply font-semibold;
+}
+
+// Size is left to the slot it fills (row name, detail heading, etc).
+@utility type-unknown {
+  @apply font-semibold text-lighter;
+}
+
+@utility type-muted {
+  @apply text-sm text-lighter;
+}
+
+@utility type-meta {
+  @apply text-xs text-lighter;
+}
+
+@utility type-hint {
+  @apply text-xs italic text-lighter;
+}
+
+@utility type-flavor {
+  @apply text-sm italic text-lighter;
+}
+
 // Icon zoom sizes, named for where they're applied rather than their raw
 // percentage, so usage sites read as intent instead of a magic number.
 @utility zoom-inline {

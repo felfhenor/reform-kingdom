@@ -25,11 +25,11 @@
 
     <div>
       @if (e.discovered) {
-        <div class="font-bold mb-1 text-{{ e.collectible.rarity }}">
+        <div class="type-entity-name mb-1 text-{{ e.collectible.rarity }}">
           {{ e.collectible.name }}
         </div>
 
-        <div class="italic text-sm mb-2">
+        <div class="type-flavor mb-2">
           {{ e.collectible.description }}
         </div>
 
@@ -50,7 +50,7 @@
           <div class="text-xs">Found in: {{ source.name }}</div>
         }
       } @else {
-        <div class="font-bold mb-1 text-lighter">???</div>
+        <div class="type-unknown mb-1">???</div>
 
         @if (source?.type === 'crafting') {
           <div class="text-xs">Source: Crafting</div>
@@ -61,7 +61,7 @@
         } @else if (source?.type === 'raid') {
           <div class="text-xs">From defending: {{ source.name }}</div>
         } @else {
-          <div class="text-xs italic text-lighter">Source unknown</div>
+          <div class="type-hint">Source unknown</div>
         }
       }
     </div>

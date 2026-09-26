@@ -137,7 +137,7 @@
           >
             <div class="flex flex-col gap-2 min-w-0 lg:w-128 lg:shrink-0">
               <span
-                class="font-semibold truncate {{
+                class="type-entity-name truncate {{
                   entry.resultContent
                     ? 'text-' + entry.resultContent.rarity
                     : ''
@@ -202,7 +202,7 @@
             </span>
 
             <span
-              class="text-xs text-lighter lg:w-20 lg:shrink-0 lg:text-center tabular-nums"
+              class="type-meta lg:w-20 lg:shrink-0 lg:text-center tabular-nums"
             >
               {{ formatDuration(entry.recipe.craftTime * quantity) }}
             </span>

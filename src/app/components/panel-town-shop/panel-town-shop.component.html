@@ -1,7 +1,7 @@
 @let shopStockRows = stockRows();
 
 <div class="card-body p-3 gap-2 flex-1 min-h-0">
-  <h2 class="card-title text-base justify-between shrink-0">
+  <h2 class="type-section-title justify-between shrink-0">
     Shop
     <span class="flex items-center gap-2">
       <span class="badge badge-sm badge-info tabular-nums">
@@ -59,7 +59,7 @@
               </div>
 
               <div class="flex flex-col flex-1 min-w-0 gap-2">
-                <span class="font-semibold text-{{ item.rarity }} truncate">
+                <span class="type-entity-name truncate text-{{ item.rarity }}">
                   {{ item.name }}
                 </span>
               </div>

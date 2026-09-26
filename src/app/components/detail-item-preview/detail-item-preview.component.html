@@ -10,7 +10,7 @@
   </div>
 
   <div>
-    <div class="font-bold mb-1 text-{{ item.rarity }}">
+    <div class="type-entity-name mb-1 text-{{ item.rarity }}">
       {{ item.name }}
     </div>
 
@@ -35,7 +35,7 @@
     }
 
     @if (showDescription()) {
-      <div class="italic text-sm mb-2">
+      <div class="type-flavor mb-2">
         {{ item.description }}
       </div>
     }
@@ -67,7 +67,7 @@
     <app-row-skill-stat-bonuses [bonuses]="item.skillStatBonuses" />
 
     @for (skill of item.skills; track skill.id) {
-      <div class="text-xs my-2 italic text-lighter flex items-center gap-2">
+      <div class="type-hint my-2 flex items-center gap-2">
         Teaches
         <span class="zoom-inline">
           <app-slot-icon-blank [showBackground]="false">

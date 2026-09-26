@@ -7,7 +7,7 @@
     </div>
 
     <div>
-      <div class="font-bold mb-1 text-{{ skillData.rarity }}">
+      <div class="type-entity-name mb-1 text-{{ skillData.rarity }}">
         {{ skillData.name }}
       </div>
 
@@ -20,9 +20,7 @@
           @for (technique of techniques; track $index) {
             <div class="flex gap-2">
               @if (techniques.length > 1) {
-                <span class="text-sm text-lighter">
-                  {{ $index + 1 | number }}.
-                </span>
+                <span class="type-muted">{{ $index + 1 | number }}.</span>
               }
               <app-row-skill-technique [technique]="technique" />
             </div>

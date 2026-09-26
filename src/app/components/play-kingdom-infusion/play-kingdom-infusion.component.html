@@ -17,7 +17,7 @@
 
   <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0 p-4">
     <div class="flex flex-col gap-2 overflow-y-auto">
-      <span class="card-title text-base">Heroes</span>
+      <span class="type-section-title">Heroes</span>
 
       @for (hero of heroes; track hero.id) {
         <button
@@ -35,8 +35,8 @@
           </app-slot-icon-blank>
 
           <div class="flex flex-col min-w-0">
-            <span class="font-semibold truncate">{{ hero.name }}</span>
-            <span class="text-xs text-lighter">
+            <span class="type-entity-name truncate">{{ hero.name }}</span>
+            <span class="type-meta">
               Lv. {{ hero.level }} {{ job?.shorthand ?? 'JOB' }}
             </span>
           </div>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="flex flex-col gap-2 overflow-y-auto">
-      <span class="card-title text-base">Equipped Items</span>
+      <span class="type-section-title">Equipped Items</span>
 
       @if (character) {
         @if (items.length > 0) {
@@ -70,14 +70,14 @@
 
                 <div class="flex flex-col min-w-0">
                   <span
-                    class="font-semibold truncate text-{{
+                    class="type-entity-name truncate text-{{
                       equippedContent.rarity
                     }}"
                   >
                     {{ displayNameFor(equippedItem, equippedContent) }}
                   </span>
 
-                  <span class="text-xs text-lighter">
+                  <span class="type-meta">
                     {{ equippedContent.slotsTaken }}/{{ equippedContent.slots }}
                     infusion slots used
                   </span>
@@ -95,7 +95,7 @@
 
     <div class="flex flex-col gap-2 h-full min-h-0">
       @if (item && content) {
-        <div class="font-semibold text-lg text-{{ content.rarity }}">
+        <div class="type-entity-heading text-{{ content.rarity }}">
           {{ selectedItemDisplayName() }}
         </div>
 
@@ -131,8 +131,8 @@
 
         @if (selectedItemSlotCount() > 0) {
           <div class="shrink-0">
-            <div class="text-sm font-semibold mb-2">Infusion Slots</div>
-            <div class="text-xs text-lighter mb-2 italic">
+            <div class="type-label mb-2">Infusion Slots</div>
+            <div class="type-hint mb-2">
               Click a slot to choose what to infuse into it.
             </div>
 
@@ -147,7 +147,7 @@
 
           @if (slotIndex !== undefined) {
             <div class="flex flex-col flex-1 min-h-0">
-              <div class="text-sm font-semibold mb-2 shrink-0">
+              <div class="type-label mb-2 shrink-0">
                 Infuse Slot {{ slotIndex + 1 }}
               </div>
 
@@ -179,7 +179,7 @@
 
                         <div class="flex flex-col gap-2 min-w-0">
                           <span
-                            class="font-semibold truncate text-{{
+                            class="type-entity-name truncate text-{{
                               entry.item.rarity
                             }}"
                           >

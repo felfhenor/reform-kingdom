@@ -20,7 +20,7 @@ import { LoadingService } from '@services/loading.service';
         [value]="progress.percent"
       />
 
-      <p class="text-sm text-lighter">{{ progress.label }}</p>
+      <p class="type-muted">{{ progress.label }}</p>
     </div>
   `,
 })

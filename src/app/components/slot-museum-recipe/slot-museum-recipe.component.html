@@ -44,11 +44,15 @@
 
     <div>
       @if (e.discovered) {
-        <div class="font-bold mb-1 {{ result ? 'text-' + result.rarity : '' }}">
+        <div
+          class="type-entity-name mb-1 {{
+            result ? 'text-' + result.rarity : ''
+          }}"
+        >
           {{ recipeName() }}
         </div>
       } @else {
-        <div class="font-bold mb-1 text-lighter">???</div>
+        <div class="type-unknown mb-1">???</div>
       }
 
       @if (e.sourceNodeNames.length > 0) {
@@ -59,7 +63,7 @@
       }
 
       @if (e.tokenUnlockCost !== undefined) {
-        <div class="text-xs flex items-center gap-2 mt-1 italic">
+        <div class="type-hint flex items-center gap-2 mt-1">
           {{ canUnlock() ? 'Click to unlock for' : 'Unlock for' }}
           <app-currency-cost
             [type]="traderTokenItemId"

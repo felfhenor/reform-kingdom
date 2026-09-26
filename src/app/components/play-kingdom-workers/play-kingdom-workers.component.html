@@ -42,13 +42,11 @@
               </app-slot-icon-blank>
 
               <div class="flex flex-col min-w-0">
-                <span class="font-semibold truncate">
+                <span class="type-entity-name truncate">
                   {{ entry.content.name }}
                 </span>
-                <span class="text-xs text-lighter">
-                  Lv. {{ entry.state.level }}
-                </span>
-                <span class="flex items-center gap-2 text-xs text-lighter">
+                <span class="type-meta">Lv. {{ entry.state.level }}</span>
+                <span class="flex items-center gap-2 type-meta">
                   @if (display.locationEntry) {
                     <app-sprite-node
                       class="zoom-inline shrink-0"
@@ -82,9 +80,9 @@
             </div>
 
             <div class="flex flex-col items-start gap-2">
-              <div class="font-semibold text-lg">
+              <div class="type-entity-heading">
                 {{ entry.content.name }}
-                <span class="text-sm text-lighter font-normal">
+                <span class="type-muted font-normal">
                   Lv. {{ entry.state.level }}
                 </span>
               </div>
@@ -143,14 +141,14 @@
             </div>
           }
 
-          <p class="text-sm italic text-lighter">
+          <p class="type-flavor">
             {{ entry.content.description }}
           </p>
 
           <div class="divider my-1"></div>
 
           <div class="flex flex-col gap-2">
-            <span class="text-sm font-semibold">Current Assignment</span>
+            <span class="type-label">Current Assignment</span>
 
             <div class="flex flex-row gap-2">
               <ng-select
@@ -167,10 +165,10 @@
                   <div class="flex items-center gap-2">
                     <app-sprite-node class="zoom-row" [entry]="item.entry" />
                     <div>
-                      <div class="font-semibold text-sm">
+                      <div class="type-label">
                         {{ item.nodeName }}
                       </div>
-                      <div class="text-xs text-lighter">
+                      <div class="type-meta">
                         Lv. {{ item.levelRangeLabel }}
                         @if (item.staminaCost !== undefined) {
                           · {{ item.staminaCost | number }} stamina

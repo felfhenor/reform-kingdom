@@ -45,12 +45,12 @@ import { AnimationService } from '@services/animation.service';
 
           <ng-template #effectTooltip>
             <div class="p-2">
-              <div class="font-bold mb-2">{{ effect.name }}</div>
+              <div class="type-entity-name mb-2">{{ effect.name }}</div>
 
               <p class="italic">{{ effectDescription(effect) }}</p>
 
               @if (effect.extendedDescription) {
-                <p class="italic mt-2 text-xs">
+                <p class="type-hint mt-2">
                   {{ effect.extendedDescription }}
                 </p>
               }
