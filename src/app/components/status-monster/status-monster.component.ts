@@ -1,12 +1,15 @@
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { worldCombatState } from '@helpers/state-game';
 import type { StatusCardEntry } from '@interfaces';
+import { AnimationService } from '@services/animation.service';
 import { clamp } from 'es-toolkit/compat';
 
 // Max monster cards per row - extras wrap onto a new row above.
@@ -20,6 +23,8 @@ const MONSTERS_PER_ROW = 4;
   styleUrl: './status-monster.component.scss',
 })
 export class StatusMonsterComponent {
+  private anim = inject(AnimationService);
+
   public expanded = input<boolean>(false);
 
   public entries = computed<StatusCardEntry[]>(() =>
@@ -55,4 +60,13 @@ export class StatusMonsterComponent {
     }
     return rows;
   });
+
+  // Transform is dropped afterwards so it doesn't leave a stacking context that hides neighbours' damage numbers.
+  public onEnter(event: AnimationCallbackEvent): void {
+    this.anim
+      .slideIn(event.target)
+      .then(() =>
+        (event.target as HTMLElement).style.removeProperty('transform'),
+      );
+  }
 }
