@@ -67,7 +67,7 @@
 
   completionRewards:
     - collectibleId: Elven Satchel
-      chance: 5
+      chance: 75
 
     - itemId: Cactspine
       chance: 50
