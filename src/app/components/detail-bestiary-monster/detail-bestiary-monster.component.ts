@@ -1,8 +1,10 @@
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   effect,
+  inject,
   input,
   signal,
 } from '@angular/core';
@@ -33,6 +35,7 @@ import {
 } from '@interfaces';
 
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { AnimationService } from '@services/animation.service';
 import { maxBy, minBy, sortBy, uniq } from 'es-toolkit/compat';
 
 type LevelOption = { value: number; label: string };
@@ -54,6 +57,8 @@ type LevelOption = { value: number; label: string };
   styleUrl: './detail-bestiary-monster.component.scss',
 })
 export class DetailBestiaryMonsterComponent {
+  private anim = inject(AnimationService);
+
   public entry = input.required<BestiaryEntry>();
 
   public selectedLevel = signal(1);
@@ -133,6 +138,10 @@ export class DetailBestiaryMonsterComponent {
         label: bestiaryDropQuantityLabel(d, this.selectedLevel()),
       })),
   );
+
+  public onSkillEnter(event: AnimationCallbackEvent, index: number): void {
+    this.anim.staggerIn(event.target, index);
+  }
 
   constructor() {
     effect(() => {

@@ -71,13 +71,17 @@
         <span class="type-label">Skills at Lv. {{ selectedLevel() }}</span>
 
         <div class="flex flex-col gap-2">
-          @for (skill of skills(); track skill.id) {
-            <app-row-bestiary-skill
-              [skill]="skill"
-              [usingCombatant]="combatantAtSelectedLevel()"
-            />
-          } @empty {
-            <span class="type-hint">No skills.</span>
+          <!-- Outer loop rebuilds every row per monster; a track key using outer state is re-evaluated for existing rows too. -->
+          @for (monsterId of [entry().monster.id]; track monsterId) {
+            @for (skill of skills(); track skill.id) {
+              <app-row-bestiary-skill
+                [skill]="skill"
+                [usingCombatant]="combatantAtSelectedLevel()"
+                (animate.enter)="onSkillEnter($event, $index)"
+              />
+            } @empty {
+              <span class="type-hint">No skills.</span>
+            }
           }
         </div>
       </div>

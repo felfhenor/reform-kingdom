@@ -174,6 +174,18 @@ export class AnimationService {
     });
   }
 
+  // Opacity is zeroed up front so a delayed item doesn't sit visible until its turn.
+  staggerIn(target: Element, index: number): JSAnimation {
+    (target as HTMLElement).style.opacity = '0';
+    return animate(target as DOMTarget, {
+      opacity: [0, 1],
+      translateY: [8, 0],
+      duration: 220,
+      delay: Math.min(index, 8) * 45,
+      ease: 'outQuad',
+    });
+  }
+
   levelUp(target: Element): JSAnimation {
     this.burst(target);
     return this.goldGlow(target);
