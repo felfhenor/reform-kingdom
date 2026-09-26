@@ -14,10 +14,11 @@ type DisplayedDamageNumber = {
   xOffsetSeed: number;
 };
 
-// Must match the CSS animation durations in the status-hero/status-monster
-// stylesheets so numbers/flashes don't pop out mid-fade.
-const DAMAGE_NUMBER_LIFETIME_MS = 1100;
+// Must match the skill-cast-fade CSS duration so the flash doesn't pop out mid-fade.
 const SKILL_CAST_LIFETIME_MS = 1500;
+const DAMAGE_NUMBER_LIFETIME_MS = 1100;
+// A backgrounded tab can dump a huge backlog of hits at once - only the newest are worth animating.
+const DAMAGE_NUMBER_MAX_PER_BATCH = 24;
 
 // Drains the shared damage/skill-cast event buses (hero + monster ids
 // mixed) into per-combatant display state, shared by both status bars.
@@ -25,6 +26,8 @@ const SKILL_CAST_LIFETIME_MS = 1500;
   providedIn: 'root',
 })
 export class CombatStatusPlaybackService {
+  public readonly damageNumberLifetimeMs = DAMAGE_NUMBER_LIFETIME_MS;
+
   private displayedDamageNumbers = signal<DisplayedDamageNumber[]>([]);
   private displayedSkillCasts = signal<CombatantSkillCastEvent[]>([]);
 
@@ -65,10 +68,13 @@ export class CombatStatusPlaybackService {
   private showDamageEvents(events: CombatantDamageEvent[]): void {
     combatantDamageEventsClear(events.map((event) => event.id));
 
-    const displayEntries: DisplayedDamageNumber[] = events.map((event) => ({
-      event,
-      xOffsetSeed: Math.random() * 2 - 1,
-    }));
+    const shownEvents = events.slice(-DAMAGE_NUMBER_MAX_PER_BATCH);
+    const displayEntries: DisplayedDamageNumber[] = shownEvents.map(
+      (event) => ({
+        event,
+        xOffsetSeed: Math.random() * 2 - 1,
+      }),
+    );
 
     this.displayedDamageNumbers.update((current) => [
       ...current,
@@ -76,7 +82,7 @@ export class CombatStatusPlaybackService {
     ]);
 
     setTimeout(() => {
-      const ids = new Set(events.map((event) => event.id));
+      const ids = new Set(shownEvents.map((event) => event.id));
       this.displayedDamageNumbers.update((current) =>
         current.filter((entry) => !ids.has(entry.event.id)),
       );

@@ -1,5 +1,5 @@
 import { DecimalPipe, UpperCasePipe } from '@angular/common';
-import type { ElementRef } from '@angular/core';
+import type { ElementRef, AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { damageNumberScale } from '@helpers/combat/combat-damage-events.ui';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
 import type { StatusCardEntry } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
@@ -18,8 +19,8 @@ import { CombatStatusPlaybackService } from '@services/combat-status-playback.se
 
 // Random X jitter so a burst of hits doesn't stream from one spot - smaller
 // range when collapsed since the card itself is narrower.
-const EXPANDED_X_JITTER_PERCENT = 30;
-const COLLAPSED_X_JITTER_PERCENT = 12;
+const EXPANDED_X_JITTER_PERCENT = 36;
+const COLLAPSED_X_JITTER_PERCENT = 18;
 
 @Component({
   selector: 'app-card-status-combatant',
@@ -56,6 +57,21 @@ export class CardStatusCombatantComponent {
       this.levelUpAnimation = this.anim.levelUp(card);
     });
     inject(DestroyRef).onDestroy(() => levelUpSubscription.unsubscribe());
+  }
+
+  public onDamageNumberEnter(
+    event: AnimationCallbackEvent,
+    amount: number,
+  ): void {
+    const maxHp =
+      this.entry().bars.find((bar) => bar.variant === 'hp')?.max ?? 0;
+
+    this.anim.damageNumber(
+      event.target,
+      this.playback.damageNumberLifetimeMs,
+      amount > 0,
+      damageNumberScale(amount, maxHp),
+    );
   }
 
   public xOffsetPercent(seed: number): number {

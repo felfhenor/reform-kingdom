@@ -16,6 +16,7 @@
           [class.heal]="num.event.amount > 0"
           [class.damage]="num.event.amount < 0"
           [style.left.%]="xOffsetPercent(num.xOffsetSeed)"
+          (animate.enter)="onDamageNumberEnter($event, num.event.amount)"
         >
           {{ num.event.amount > 0 ? '+' : '' }}{{ num.event.amount | number }}
         </span>

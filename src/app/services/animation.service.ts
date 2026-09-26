@@ -186,6 +186,49 @@ export class AnimationService {
     });
   }
 
+  // Duration is capped at `lifetimeMs` since the playback service removes the element on its own timer.
+  damageNumber(
+    target: Element,
+    lifetimeMs: number,
+    isHeal: boolean,
+    scale: number,
+  ): JSAnimation {
+    const el = target as HTMLElement;
+    el.style.opacity = '0';
+
+    const duration = lifetimeMs * (0.8 + Math.random() * 0.2);
+    const holdMs = duration * 0.45;
+    const startY = (Math.random() - 0.5) * 12;
+    const rise = (isHeal ? 30 : 24) * (0.75 + Math.random() * 0.5);
+    const tilt = isHeal ? 0 : (Math.random() - 0.5) * 24;
+
+    return animate(el as DOMTarget, {
+      opacity: [
+        { from: 0, to: 1, duration: 80, ease: 'outQuad' },
+        { to: 1, duration: holdMs },
+        { to: 0, duration: duration - 80 - holdMs, ease: 'inQuad' },
+      ],
+      scale: isHeal
+        ? [{ from: 0.8, to: scale, duration: 160, ease: 'outQuad' }]
+        : [
+            { from: 0.4, to: scale * 1.25, duration: 110, ease: 'outQuad' },
+            { to: scale, duration: 110, ease: 'inOutQuad' },
+          ],
+      translateY: [
+        { from: startY, to: startY - rise, duration, ease: 'outQuad' },
+      ],
+      translateX: [
+        {
+          from: 0,
+          to: (Math.random() - 0.5) * 20,
+          duration,
+          ease: 'inOutSine',
+        },
+      ],
+      rotate: [{ from: tilt, to: tilt * 0.3, duration, ease: 'outQuad' }],
+    });
+  }
+
   levelUp(target: Element): JSAnimation {
     this.burst(target);
     return this.goldGlow(target);

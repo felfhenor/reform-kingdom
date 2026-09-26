@@ -136,14 +136,13 @@
   // flex-col-reverse instead of overlapping at the same spot.
   position: relative;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.55rem;
   white-space: nowrap;
   text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
-  animation: damage-number-float 1100ms ease-out forwards;
 
   &.damage {
     color: #ef4444;
@@ -154,19 +153,8 @@
   }
 }
 
-@keyframes damage-number-float {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  15% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-24px);
-  }
+.status-entry.expanded .damage-number {
+  font-size: 0.8rem;
 }
 
 @keyframes skill-cast-fade {
