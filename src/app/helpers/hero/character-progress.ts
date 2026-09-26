@@ -6,6 +6,7 @@ import {
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { heroSkillsAtLevel } from '@helpers/hero/job';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
@@ -154,6 +155,7 @@ export function partyGainXp(amount: number): boolean {
   progress.forEach(({ beforeLevel, after }) => {
     if (after.level > beforeLevel) {
       analyticsSendDesignEvent('Hero:LevelUp', after.level);
+      heroLevelUpVfxEmit(after.id);
     }
     logCharacterProgress(beforeLevel, after);
   });

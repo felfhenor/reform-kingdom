@@ -1,13 +1,19 @@
 import { DecimalPipe, UpperCasePipe } from '@angular/common';
+import type { ElementRef } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   input,
+  viewChild,
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
 import type { StatusCardEntry } from '@interfaces';
+import { AnimationService } from '@services/animation.service';
+import type { JSAnimation } from 'animejs';
 import { CombatStatusPlaybackService } from '@services/combat-status-playback.service';
 
 // Random X jitter so a burst of hits doesn't stream from one spot - smaller
@@ -29,12 +35,28 @@ const COLLAPSED_X_JITTER_PERCENT = 12;
 })
 export class CardStatusCombatantComponent {
   private playback = inject(CombatStatusPlaybackService);
+  private anim = inject(AnimationService);
+
+  private card = viewChild<ElementRef<HTMLElement>>('card');
+  private levelUpAnimation?: JSAnimation;
 
   public entry = input.required<StatusCardEntry>();
   public expanded = input<boolean>(false);
 
   public damageNumbersByCombatant = this.playback.damageNumbersByCombatant;
   public skillCastByCombatant = this.playback.skillCastByCombatant;
+
+  constructor() {
+    const levelUpSubscription = heroLevelUpVfx$.subscribe((characterId) => {
+      if (characterId !== this.entry().combatantId) return;
+
+      const card = this.card()?.nativeElement;
+      if (!card || this.levelUpAnimation?.completed === false) return;
+
+      this.levelUpAnimation = this.anim.levelUp(card);
+    });
+    inject(DestroyRef).onDestroy(() => levelUpSubscription.unsubscribe());
+  }
 
   public xOffsetPercent(seed: number): number {
     const range = this.expanded()

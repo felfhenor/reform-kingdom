@@ -36,6 +36,10 @@ vi.mock('@helpers/combat/combat-log', () => ({
   miscellaneousMessageLog: vi.fn(),
 }));
 
+vi.mock('@helpers/engine/hero-level-up-vfx', () => ({
+  heroLevelUpVfxEmit: vi.fn(),
+}));
+
 vi.mock('@helpers/hero/global-effects', () => ({
   globalEffectSums: vi.fn(),
 }));
@@ -60,6 +64,7 @@ import {
   retrofitPartyXp,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
+import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { characterXpForLevel, createCharacter } from '@helpers/hero/party';
 import { updateGamestate } from '@helpers/state-game';
@@ -282,6 +287,19 @@ describe('Character Progress Helper Functions', () => {
       partyGainXp(30);
 
       expect(miscellaneousMessageLog).not.toHaveBeenCalled();
+    });
+
+    it('emits a level-up vfx event only for characters that leveled up', () => {
+      const jala = createCharacterStub('Jala');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
+
+      partyGainXp(30);
+      expect(heroLevelUpVfxEmit).not.toHaveBeenCalled();
+
+      partyGainXp(100);
+      expect(heroLevelUpVfxEmit).toHaveBeenCalledWith(jala.id);
     });
 
     it('logs a level-up message when the character levels up', () => {

@@ -161,6 +161,23 @@ export class AnimationService {
 
     return this.pulse(target);
   }
+
+  goldGlow(target: Element): JSAnimation {
+    return animate(target as DOMTarget, {
+      boxShadow: [
+        '0 0 0 2px rgba(251, 191, 36, 0)',
+        '0 0 10px 2px rgba(251, 191, 36, 0.95)',
+        '0 0 0 2px rgba(251, 191, 36, 0)',
+      ],
+      duration: 1200,
+      ease: 'outQuad',
+    });
+  }
+
+  levelUp(target: Element): JSAnimation {
+    this.burst(target);
+    return this.goldGlow(target);
+  }
 }
 
 // Snaps to `source()` on first read, tweens to it on every change after, and cancels
