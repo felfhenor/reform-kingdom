@@ -1,6 +1,7 @@
 import { pluralize } from '@boringnode/pluralize';
 import { recipeStylizedName } from '@helpers/crafting/recipes';
 import { localStorageSignal } from '@helpers/engine/signal';
+import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngUuid } from '@helpers/rng';
 import type {
   AdventureLogEntryKind,
@@ -35,7 +36,9 @@ export function endCombatLogCommits() {
   combatLog.update((logs) => [...batch, ...logs].slice(0, 500));
 }
 
-function pushLogEntry(entry: CombatLog): void {
+function pushLogEntry(unstampedEntry: CombatLog): void {
+  const entry: CombatLog = { ...unstampedEntry, tick: timerTicksElapsed() };
+
   if (pendingCombatLogMessages) {
     pendingCombatLogMessages.unshift(entry);
     return;

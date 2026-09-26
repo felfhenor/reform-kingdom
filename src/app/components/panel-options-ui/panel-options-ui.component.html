@@ -51,6 +51,41 @@
             <span class="label-text">Always Expand Crafting View</span>
           </label>
         </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
+              [checked]="getOption('adventureLogOverlay')"
+              class="checkbox checkbox-secondary"
+              (click)="
+                setOption(
+                  'adventureLogOverlay',
+                  !getOption('adventureLogOverlay')
+                )
+              "
+            />
+            <span class="label-text">Adventure Log Overlay</span>
+          </label>
+        </div>
+
+        @if (getOption('adventureLogOverlay')) {
+          <div class="flex flex-col gap-1 pl-6">
+            @for (kind of adventureLogKinds; track kind) {
+              <div class="form-control">
+                <label class="label cursor-pointer label-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="getOption('adventureLogOverlayKinds')[kind]"
+                    class="checkbox checkbox-secondary checkbox-sm"
+                    (click)="toggleAdventureLogOverlayKind(kind)"
+                  />
+                  <span class="label-text">Show {{ kind }} Messages</span>
+                </label>
+              </div>
+            }
+          </div>
+        }
       </div>
     </div>
 

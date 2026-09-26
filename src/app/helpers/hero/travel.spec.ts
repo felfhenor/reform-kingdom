@@ -48,6 +48,10 @@ vi.mock('@helpers/town/town-spawn', () => ({
   homeNodeGet: vi.fn(),
 }));
 
+vi.mock('@helpers/engine/timer', () => ({
+  timerTicksElapsed: vi.fn(() => 0),
+}));
+
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {

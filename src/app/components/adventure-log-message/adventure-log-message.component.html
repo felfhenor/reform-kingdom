@@ -1,0 +1,14 @@
+@for (part of parts(); track $index) {
+  @if (part.kind === 'icon') {
+    <span class="zoom-inline shrink-0">
+      <app-slot-icon-blank [showBackground]="false">
+        <app-atlas-image
+          [spritesheet]="part.spritesheet"
+          [assetName]="part.sprite"
+        />
+      </app-slot-icon-blank>
+    </span>
+  } @else {
+    <span [innerHTML]="part.html"></span>
+  }
+}

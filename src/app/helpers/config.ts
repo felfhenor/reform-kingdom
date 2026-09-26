@@ -57,6 +57,10 @@ export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
 // Caps how many ticks run before yielding to the browser during a long catch-up (e.g. after the tab was backgrounded), so it doesn't block the main thread for seconds at a time.
 export const TICKS_PER_YIELD = 100;
 
+export const ADVENTURE_LOG_OVERLAY_MAX_LINES = 15;
+// Ticks, not wall-clock time, so lines don't expire while the game is paused.
+export const ADVENTURE_LOG_OVERLAY_LIFETIME_TICKS = 20;
+
 // A "practically forever" duration for a global effect that's removed explicitly (on a state change or leaving a map), not by natural expiry - long enough it never lapses on its own during normal play. Used by the Idle and Auto Mode effects.
 export const ONE_YEAR_TICKS = 60 * 60 * 24 * 365;
 

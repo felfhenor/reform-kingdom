@@ -30,9 +30,18 @@
   }
 }
 
-.global-effect-bar {
-  @apply absolute top-0 left-0 right-0;
+.top-left-layer {
+  @apply absolute top-0 left-0 right-0 flex flex-col pointer-events-none;
   z-index: 11;
+}
+
+.global-effect-bar {
+  pointer-events: auto;
+}
+
+// Stacked under the effect bar in flow, since the bar's height depends on whether any effects are active.
+.adventure-log-overlay-layer {
+  @apply mx-2 mt-2 w-[32rem] max-w-[calc(100%-2rem)];
 }
 
 .encounter-status-layer {

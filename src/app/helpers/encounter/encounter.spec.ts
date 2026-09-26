@@ -18,6 +18,10 @@ vi.mock('@helpers/state-game', () => ({
   worldPartyState: vi.fn(),
 }));
 
+vi.mock('@helpers/engine/timer', () => ({
+  timerTicksElapsed: vi.fn(() => 0),
+}));
+
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { encounterStartFight } from '@helpers/encounter/encounter';

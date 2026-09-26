@@ -32,6 +32,16 @@ export function defaultOptions(): GameOptions {
 
     partyViewAlwaysExpand: true,
     craftingViewAlwaysExpand: false,
+
+    adventureLogOverlay: true,
+    adventureLogOverlayKinds: {
+      Combat: false,
+      Travel: true,
+      Gather: true,
+      Craft: true,
+      Raid: true,
+      Miscellaneous: true,
+    },
   };
 }
 

@@ -3,7 +3,15 @@ import {
   combatLogHealthColor,
   ICON_TOKEN_PATTERN,
 } from '@helpers/combat/combat-log';
-import type { AtlasedImage, CombatLog } from '@interfaces';
+import {
+  ADVENTURE_LOG_OVERLAY_LIFETIME_TICKS,
+  ADVENTURE_LOG_OVERLAY_MAX_LINES,
+} from '@helpers/config';
+import type {
+  AdventureLogEntryKind,
+  AtlasedImage,
+  CombatLog,
+} from '@interfaces';
 
 const COMBATANT_TOKEN_PATTERN = /@@([^@]+)@@/g;
 
@@ -78,4 +86,27 @@ export function adventureLogTimestampTooltip(timestamp: number): string {
   const pad = (value: number) => value.toString().padStart(2, '0');
 
   return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+// Expects the log newest-first (as stored); returns oldest-first so new lines append at the bottom.
+export function adventureLogOverlayEntries(
+  entries: CombatLog[],
+  currentTick: number,
+  kinds: Record<AdventureLogEntryKind, boolean>,
+): CombatLog[] {
+  const visible: CombatLog[] = [];
+
+  for (const entry of entries) {
+    if (entry.tick === undefined) break;
+
+    // Negative age means the entry predates a New Game / lower-tick import, so everything past it is stale too.
+    const age = currentTick - entry.tick;
+    if (age < 0 || age >= ADVENTURE_LOG_OVERLAY_LIFETIME_TICKS) break;
+    if (!kinds[entry.kind] || entry.message.trim() === '') continue;
+
+    visible.push(entry);
+    if (visible.length >= ADVENTURE_LOG_OVERLAY_MAX_LINES) break;
+  }
+
+  return visible.reverse();
 }

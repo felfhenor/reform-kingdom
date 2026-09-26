@@ -1,0 +1,12 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply flex flex-col items-start gap-1;
+  pointer-events: none;
+}
+
+.overlay-line {
+  @apply flex items-center gap-1 flex-wrap text-xs rounded px-2 py-0.5 max-w-full;
+  background-color: color-mix(in oklab, var(--color-base-300) 70%, transparent);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
+}

@@ -1,3 +1,5 @@
+import type { AdventureLogEntryKind } from '@interfaces/combat-log';
+
 export type GameOption =
   | 'showDebug'
   | 'debugConsoleLogStateUpdates'
@@ -10,7 +12,8 @@ export type GameOption =
   | 'analyticsEnabled'
   | 'analyticsOptInDismissed'
   | 'partyViewAlwaysExpand'
-  | 'craftingViewAlwaysExpand';
+  | 'craftingViewAlwaysExpand'
+  | 'adventureLogOverlay';
 
 export type NotificationCategory = 'Error' | 'Success';
 
@@ -24,4 +27,5 @@ export type GameOptions = Record<GameOption, boolean> & {
   debugSaveInterval: number;
   optionsTab: OptionsTab;
   mapZoom: number;
+  adventureLogOverlayKinds: Record<AdventureLogEntryKind, boolean>;
 };

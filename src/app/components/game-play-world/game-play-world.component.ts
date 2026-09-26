@@ -9,6 +9,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { AdventureLogOverlayComponent } from '@components/adventure-log-overlay/adventure-log-overlay.component';
 import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-global-effect.component';
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
 import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
@@ -136,6 +137,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
   selector: 'app-game-play-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AdventureLogOverlayComponent,
     PanelMapNodeComponent,
     BarGlobalEffectComponent,
     StatusEncounterComponent,
@@ -153,7 +155,12 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
     <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
-    <app-bar-global-effect class="global-effect-bar"></app-bar-global-effect>
+    <div class="top-left-layer">
+      <app-bar-global-effect class="global-effect-bar"></app-bar-global-effect>
+      <app-adventure-log-overlay
+        class="adventure-log-overlay-layer"
+      ></app-adventure-log-overlay>
+    </div>
     <app-panel-map-node></app-panel-map-node>
 
     <app-status-encounter class="encounter-status-layer"></app-status-encounter>

@@ -20,6 +20,8 @@ export type CombatLog = {
   combatId?: CombatId;
   messageId: string;
   timestamp: number;
+  // Game tick at log time; missing on entries saved before it existed.
+  tick?: number;
   locationName: string;
   message: string;
   spritesheet?: 'guardian' | 'hero';

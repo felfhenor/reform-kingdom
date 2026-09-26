@@ -5,15 +5,11 @@ import {
   computed,
   inject,
 } from '@angular/core';
+import { AdventureLogMessageComponent } from '@components/adventure-log-message/adventure-log-message.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { combatLog } from '@helpers/combat/combat-log';
-import {
-  adventureLogMessageParts,
-  adventureLogTimestampTooltip,
-} from '@helpers/combat/combat-log.ui';
+import { adventureLogTimestampTooltip } from '@helpers/combat/combat-log.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 import { TimeagoPipe } from 'ngx-timeago';
 import { AnimationService } from '@services/animation.service';
@@ -22,10 +18,9 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-play-adventurelog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AdventureLogMessageComponent,
     BlankSlateComponent,
-    AtlasImageComponent,
     CardPageComponent,
-    SlotIconBlankComponent,
     TimeagoPipe,
     TippyDirective,
   ],
@@ -45,7 +40,6 @@ export class PlayAdventureLogComponent {
     combatLog().filter((entry) => entry.message.trim() !== ''),
   );
 
-  public messageParts = adventureLogMessageParts;
   public timestampTooltip = adventureLogTimestampTooltip;
 
   public onEnter(event: AnimationCallbackEvent, messageId: string): void {
