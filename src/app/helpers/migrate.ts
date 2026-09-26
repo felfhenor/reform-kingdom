@@ -49,6 +49,7 @@ import {
   pruneInvalidCharacterTeachings,
   pruneInvalidDiscoveredTrainers,
 } from '@helpers/trainer/trainer';
+import { pruneInvalidTasks, retrofitTasks } from '@helpers/task/task-migrate';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
 import { pruneInvalidTutorials } from '@helpers/tutorial/tutorial-seen';
 import {
@@ -229,6 +230,9 @@ export function migrateGameState() {
     pruneInvalidActiveAstralProjectorSpells(
       newState.activeAstralProjectorSpells,
     );
+
+  newState.tasks = pruneInvalidTasks(newState.tasks);
+  newState.tasks = retrofitTasks(newState);
 
   // Always recomputed fresh on load - guards against saves predating this field, and
   // against authored effects changing on content the save already owns/has active.

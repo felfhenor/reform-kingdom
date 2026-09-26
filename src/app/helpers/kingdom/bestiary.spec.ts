@@ -1,4 +1,17 @@
 import { defaultCombatStats } from '@helpers/defaults';
+
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventCollectibleGained: vi.fn(),
+  taskEventEquipmentInfused: vi.fn(),
+  taskEventLevelReached: vi.fn(),
+  taskEventMonsterKilled: vi.fn(),
+  taskEventShrineLevel: vi.fn(),
+  taskEventTeachingLearned: vi.fn(),
+  taskEventTownReputationTier: vi.fn(),
+  taskEventTownVisited: vi.fn(),
+  taskEventTradeskillLevel: vi.fn(),
+  taskEventWorkerRescued: vi.fn(),
+}));
 import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import type {
   EncounterContent,
@@ -30,7 +43,7 @@ vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
     gamestate,
-    updateGamestate: vi.fn(),
+    updateGamestate: vi.fn(() => Promise.resolve()),
     bestiaryState: () => gamestate().bestiary,
   };
 });
@@ -49,6 +62,7 @@ import {
   repairInvalidBestiaryLevels,
 } from '@helpers/kingdom/bestiary';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { taskEventMonsterKilled } from '@helpers/task/task-events';
 
 const goblin: MonsterContent = {
   id: 'goblin' as MonsterId,
@@ -268,6 +282,48 @@ describe('Bestiary Helper Functions', () => {
         maxLevelFound: 3,
         foundAtNodes: ['Field Ruins'],
       });
+    });
+
+    it('reports the new lifetime kill total to the task system', () => {
+      vi.mocked(updateGamestate).mockImplementationOnce(async (fn) => {
+        fn({
+          bestiary: {
+            [goblin.id]: {
+              foundAt: 1,
+              kills: 4,
+              minLevelFound: 1,
+              maxLevelFound: 1,
+              foundAtNodes: [],
+            },
+          },
+        } as unknown as GameState);
+      });
+
+      monsterRecordKill(goblin.id, 3);
+
+      expect(taskEventMonsterKilled).toHaveBeenCalledWith(goblin.id, 5);
+    });
+
+    it('waits for a deferred write before reporting the kill total', async () => {
+      let flush: () => void = () => undefined;
+      vi.mocked(updateGamestate).mockImplementationOnce(
+        (fn) =>
+          new Promise<void>((resolve) => {
+            flush = () => {
+              fn({ bestiary: {} } as unknown as GameState);
+              resolve();
+            };
+          }),
+      );
+
+      monsterRecordKill(goblin.id, 3);
+      expect(taskEventMonsterKilled).not.toHaveBeenCalled();
+
+      flush();
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(taskEventMonsterKilled).toHaveBeenCalledWith(goblin.id, 1);
     });
 
     it('increments kills and expands the min/max level found', () => {

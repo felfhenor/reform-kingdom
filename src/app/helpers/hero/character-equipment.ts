@@ -28,6 +28,7 @@ import {
   type ItemId,
   type JobContent,
 } from '@interfaces';
+import { taskEventEquipmentInfused } from '@helpers/task/task-events';
 
 // Equips into every slot the item's type declares (e.g. two-handed fills Weapon+Offhand),
 // fully displacing whatever occupied those slots (and any other slots they held) back to the armory as whole items.
@@ -170,5 +171,6 @@ export function characterInfuseEquipment(
       ? `Hero:Infuse:Item:${analyticsSafeSegment(materialContent.name)}`
       : 'Hero:Infuse:Item',
   );
+  void taskEventEquipmentInfused();
   return true;
 }

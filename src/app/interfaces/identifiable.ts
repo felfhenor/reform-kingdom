@@ -18,6 +18,7 @@ export type ContentType =
   | 'shrine'
   | 'skill'
   | 'statuseffect'
+  | 'task'
   | 'town'
   | 'tradeskill'
   | 'tradeskilllevelrequirement'

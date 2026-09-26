@@ -12,6 +12,7 @@ import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
+import { taskRecordGather } from '@helpers/task/task-progress';
 import {
   updateGamestate,
   worldGatheringState,
@@ -24,6 +25,7 @@ import {
   worldNodeGathering,
 } from '@helpers/world-node/world-nodes';
 import type {
+  Character,
   GatherResult,
   GatheringContent,
   ItemContent,
@@ -39,8 +41,7 @@ export function partyMinLevel(): number {
 }
 
 // Strongest hero represents the party for over-level XP scaling.
-export function partyMaxLevel(): number {
-  const party = worldPartyState();
+export function partyMaxLevel(party: Character[] = worldPartyState()): number {
   if (party.length === 0) return 1;
 
   return Math.max(...party.map((character) => character.level));
@@ -161,6 +162,7 @@ function grantGatherItems(
       const grantedQuantity =
         quantity * yieldMultiplier + (index === 0 ? yieldBonus + bonusItem : 0);
       addMaterial(itemId, grantedQuantity);
+      taskRecordGather(nodeName, itemId, grantedQuantity);
 
       const item = getEntry<ItemContent>(itemId);
       if (!item) return undefined;

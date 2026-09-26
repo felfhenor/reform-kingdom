@@ -33,6 +33,7 @@ import {
   debugTelegraphRaid,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug.ui';
+import { debugResetTasks } from '@helpers/debug/debug-tasks.ui';
 import { worldPartyState } from '@helpers/state-game';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
@@ -199,6 +200,10 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public resetCommissions(): void {
     debugResetCommissions();
+  }
+
+  public resetTasks(): void {
+    debugResetTasks();
   }
 
   public resetAllTutorials(): void {

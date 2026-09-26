@@ -1,4 +1,4 @@
-:host {
+:host(.button-glow-active) {
   animation: app-button-glow-pulse 1.5s ease-in-out infinite;
 }
 

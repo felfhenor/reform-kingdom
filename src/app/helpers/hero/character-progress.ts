@@ -17,6 +17,7 @@ import type {
   JobContent,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
+import { taskEventLevelReached } from '@helpers/task/task-events';
 
 // Bonus from the precomputed global effect sums cache - 1x with nothing active/owned.
 function xpGainMultiplier(): number {
@@ -157,5 +158,11 @@ export function partyGainXp(amount: number): boolean {
     logCharacterProgress(beforeLevel, after);
   });
 
-  return progress.some((p) => p.after.level > p.beforeLevel);
+  const leveledUp = progress.some((p) => p.after.level > p.beforeLevel);
+  if (leveledUp) {
+    void taskEventLevelReached(
+      Math.max(...progress.map(({ after }) => after.level)),
+    );
+  }
+  return leveledUp;
 }

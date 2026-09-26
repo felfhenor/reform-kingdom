@@ -12,6 +12,7 @@ import type {
   MonsterContent,
   MonsterId,
 } from '@interfaces';
+import { taskEventMonsterKilled } from '@helpers/task/task-events';
 
 export function isMonsterDiscovered(monsterId: MonsterId): boolean {
   return !!bestiaryState()[monsterId]?.foundAt;
@@ -43,8 +44,9 @@ export function monsterRecordKill(
   foundAtNode?: string,
 ): void {
   const alreadyDiscovered = isMonsterDiscovered(monsterId);
+  let totalKills = undefined as number | undefined;
 
-  updateGamestate((state) => {
+  const write = updateGamestate((state) => {
     const existing = state.bestiary[monsterId];
     const foundAtNodes = new Set(existing?.foundAtNodes ?? []);
     if (foundAtNode) foundAtNodes.add(foundAtNode);
@@ -63,8 +65,16 @@ export function monsterRecordKill(
         : level,
       foundAtNodes: [...foundAtNodes],
     };
+    totalKills = state.bestiary[monsterId].kills;
     return state;
   });
+
+  // Outside a tick the write lands later, so the new total isn't known until then.
+  if (totalKills !== undefined) {
+    void taskEventMonsterKilled(monsterId, totalKills);
+  } else {
+    void write.then(() => taskEventMonsterKilled(monsterId, totalKills ?? 0));
+  }
 
   if (!alreadyDiscovered) {
     const monsterName = getEntry<MonsterContent>(monsterId)?.name;

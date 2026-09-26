@@ -32,6 +32,7 @@ import {
   armoryHasRoomForState,
 } from '@helpers/kingdom/armory';
 import { updateGamestate } from '@helpers/state-game';
+import { taskEventCollectibleGained } from '@helpers/task/task-events';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanTokenTrade,
@@ -218,6 +219,9 @@ export async function caravanExecuteTrade(
         ? `Kingdom:Caravan:Trade:${analyticsSafeSegment(tradeName)}`
         : 'Kingdom:Caravan:Trade',
     );
+    if (trade.type === 'sell' && trade.collectibleId) {
+      void taskEventCollectibleGained(trade.collectibleId);
+    }
   }
   return executed;
 }
@@ -300,6 +304,9 @@ export async function caravanExecuteTokenTrade(
         ? `Kingdom:Caravan:TokenTrade:${analyticsSafeSegment(tradeName)}`
         : 'Kingdom:Caravan:TokenTrade',
     );
+    if (trade.collectibleId) {
+      void taskEventCollectibleGained(trade.collectibleId);
+    }
   }
   return executed;
 }

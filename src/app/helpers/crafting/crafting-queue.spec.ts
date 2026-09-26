@@ -58,6 +58,12 @@ vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'queue-entry-1'),
 }));
 
+vi.mock('@helpers/task/task-progress', () => ({
+  taskRecordCraft: vi.fn(),
+  taskRecordEncounterClear: vi.fn(),
+  taskRecordGather: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
@@ -85,6 +91,7 @@ import { addMaterial, getMaterialQuantity } from '@helpers/item/materials';
 import { armoryAdd, armoryGet, armoryHasRoom } from '@helpers/kingdom/armory';
 import { rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { taskRecordCraft } from '@helpers/task/task-progress';
 import type {
   CraftQueueEntry,
   CraftQueueEntryId,
@@ -755,6 +762,7 @@ describe('craftProcessTick', () => {
     craftProcessTick();
 
     expect(addMaterial).toHaveBeenCalledWith('copper-ingot', 2);
+    expect(taskRecordCraft).toHaveBeenCalledWith(recipe.id);
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Kingdom:Craft:Complete:Material Copper Ingot',
     );
@@ -863,6 +871,7 @@ describe('craftProcessTick', () => {
     craftProcessTick();
 
     expect(addMaterial).not.toHaveBeenCalled();
+    expect(taskRecordCraft).not.toHaveBeenCalled();
     // No XP roll succeeded either (same mocked false), so only the
     // queue-advance update fires.
     expect(updateGamestate).toHaveBeenCalledTimes(1);

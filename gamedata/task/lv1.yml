@@ -1,0 +1,332 @@
+- id: 5671c1ac-eab2-4f1a-a676-4439f66a9c92
+  name: Gather 5 Wergen Sticks
+  description: Travel to Wergen Woods and gather until you have collected 5 Wergen Sticks.
+  order: 10
+  requirement:
+    kind: GatherItem
+    nodeName: Wergen Woods
+    itemId: Wergen Stick
+    quantity: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 100
+
+- id: 7a5fe5a5-05f9-432b-93e8-81fab89c6207
+  name: Gather 5 Copper Ore
+  description: Travel to the Carrina Copper Mines and gather until you have collected 5 Copper Ore.
+  order: 20
+  requirement:
+    kind: GatherItem
+    nodeName: Carrina Copper Mines
+    itemId: Copper Ore
+    quantity: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 100
+
+- id: b2089603-5e42-4d01-b418-f79e1f1ff928
+  name: Craft a Copper Ingot
+  description: Head to the Kingdom and craft a Copper Ingot in the Blacksmithing building.
+  order: 30
+  requirement:
+    kind: CraftRecipe
+    recipeId: 'Material: Copper Ingot'
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 100
+
+- id: e02c1d53-de57-4fa3-9014-3a06a43725b2
+  name: Reach Level 3
+  description: Fight encounters around the Duchy of Carrina or gather materials until a hero reaches level 3.
+  order: 40
+  requirement:
+    kind: ReachLevel
+    level: 3
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500
+
+- id: 8145fd37-d9d0-42ba-bed0-cf7a3920b028
+  name: Acquire the Goblin Ruby
+  description: Defeat the Goblins of the Field Ruins, near the Duchy of Carrina, to recover the Goblin Ruby.
+  order: 50
+  requirement:
+    kind: OwnCollectible
+    collectibleId: Goblin Ruby
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500
+
+    - itemId: Small Goblin Bone
+      quantity: 5
+
+- id: 62ff0ee5-fe27-44a0-8138-6aeb6a5b6fdb
+  name: Train with Reyn Astra
+  description: Visit Reyn Astra and have a hero learn one of his teachings.
+  order: 60
+  requirement:
+    kind: LearnTeaching
+    trainerId: Reyn Astra
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500
+
+- id: 5f6105b3-3e3a-4b7d-92c2-25e0c4bf6d4d
+  name: Upgrade the Shrine of the Founder
+  description: Make an offering at the Shrine of the Founder to raise it to level 1, then pray there for its blessing.
+  order: 70
+  requirement:
+    kind: ShrineLevel
+    nodeName: Shrine of the Founder
+    level: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500
+
+    - itemId: Wergen Wood
+      quantity: 15
+
+- id: 7ec4cd0b-57f3-4bde-a2a9-310656822529
+  name: Defeat 25 Goblins
+  description: Defeat 25 of the Goblins roaming the ruins and caves around the Duchy of Carrina.
+  order: 80
+  requirement:
+    kind: DefeatMonster
+    monsterId: Goblin
+    quantity: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500
+
+    - itemId: Goblin Teeth
+      quantity: 10
+
+- id: 210f1d0e-1d82-4a09-94bd-c9fc9f33f768
+  name: Cast Strength of the Duchy
+  description: 'The Goblin Ruby unlocks a spell in the Astral Projector. Use it to cast Strength of the Duchy I.'
+  order: 90
+  requirement:
+    kind: CastAstralSpell
+    astralProjectorId: 'Power: Strength of the Duchy I'
+    quantity: 1
+  rewards:
+    - itemId: Goblin Nail
+      quantity: 5
+
+- id: cf616a33-bb6b-4457-b90b-ef48f3f123e0
+  name: Gather 15 Flax Flowers
+  description: Travel to Fieren Fields and gather until you have collected 15 Flax Flowers.
+  order: 100
+  requirement:
+    kind: GatherItem
+    nodeName: Fieren Fields
+    itemId: Flax Flower
+    quantity: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500
+
+    - itemId: Linen Thread
+      quantity: 5
+
+- id: 31fd3210-22ee-4143-b513-c25cc577a47a
+  name: Reach Level 5
+  description: Keep adventuring until a hero reaches level 5.
+  order: 110
+  requirement:
+    kind: ReachLevel
+    level: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 1000
+
+- id: 3ec17ee6-be08-4118-8d66-fe3708c85425
+  name: Train with Stona Lowe
+  description: Visit Stona Lowe and have a hero learn one of her teachings.
+  order: 120
+  requirement:
+    kind: LearnTeaching
+    trainerId: Stona Lowe
+  rewards:
+    - itemId: Malachite
+      quantity: 5
+
+- id: ffa82301-bd37-4d72-87b9-fdf0ca484bfc
+  name: Infuse Your Equipment
+  description: Use Infusion in the Kingdom to infuse a material into a piece of equipment.
+  order: 130
+  requirement:
+    kind: InfuseEquipment
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500
+
+    - itemId: Pumpkin Gem
+      quantity: 5
+
+- id: 8a2d3500-f2e0-4bf8-8a78-683b6b235999
+  name: Clear the Forest Ruins
+  description: Defeat every Goblin in the Forest Ruins, located near the Duchy of Carrina.
+  order: 140
+  requirement:
+    kind: ClearEncounter
+    nodeName: Forest Ruins
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 1000
+
+    - itemId: Tattered Hide
+      quantity: 10
+
+- id: c7885e54-e6d0-4881-affb-27d08d80af29
+  name: Clear Gobsilk Forest
+  description: Defeat the vicious Goblin & Spider teams in the Gobsilk Forest, located in the northwest forest of the Duchy of Carrina.
+  order: 150
+  requirement:
+    kind: ClearEncounter
+    nodeName: Gobsilk Forest
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 1000
+
+    - itemId: Weak Spider Silk
+      quantity: 10
+
+- id: 1cebb314-0bf9-43ff-ad03-9d74287826d6
+  name: Rescue Weaver Welch
+  description: Weaver Welch is held captive in the Spider Tower. Rescue her to obtain your first worker.
+  order: 165
+  requirement:
+    kind: RescueWorker
+    workerId: Weaver Welch
+  rewards:
+    - itemId: Gold Coin
+      quantity: 1500
+
+    - itemId: Silk Spool
+      quantity: 25
+
+- id: 7fd35377-1083-46ef-9b4e-3f05779e124f
+  name: Reach Blacksmithing Level 5
+  description: Craft Blacksmithing recipes until the building reaches level 5.
+  order: 170
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Blacksmithing
+    level: 5
+  rewards:
+    - itemId: Copper Ore
+      quantity: 25
+
+- id: 2a257934-4bc9-4be2-9b25-1a3fc2ddea11
+  name: Craft a Minor Blacksmithing Effigy
+  description: Craft a Minor Blacksmithing Effigy so Blacksmithing can grow past level 5.
+  order: 180
+  requirement:
+    kind: CraftRecipe
+    recipeId: 'Collectible: Minor Blacksmithing Effigy'
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Azurite
+      quantity: 5
+
+- id: de52abad-2f73-4ee4-b4af-180109c1193e
+  name: Reach Tailoring Level 5
+  description: Craft Tailoring recipes until the building reaches level 5.
+  order: 190
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Tailoring
+    level: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Flax Flower
+      quantity: 25
+
+- id: 7ab5ef89-0fc5-425e-b5a1-0800f454cbd7
+  name: Clear Jelly Fields
+  description: Cull the vicious slimes of the Jelly Fields, located south of the Duchy of Carrina.
+  order: 200
+  requirement:
+    kind: ClearEncounter
+    nodeName: Jelly Fields
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2000
+
+    - itemId: Green Slime Core
+      quantity: 10
+
+- id: 751b0706-1eb2-4de5-8819-b10233387d33
+  name: Cast Magic of the Cimmerians
+  description: 'The Jelly Flower unlocks another Astral Projector spell. Use it to cast Magic of the Cimmerians I.'
+  order: 210
+  requirement:
+    kind: CastAstralSpell
+    astralProjectorId: 'Power: Magic of the Cimmerians I'
+    quantity: 1
+  rewards:
+    - itemId: Purple Slime Core
+      quantity: 5
+
+- id: da3649a0-5fc9-454b-b7a7-56865d5fd28f
+  name: Reach Level 10
+  description: Keep adventuring until a hero reaches level 10.
+  order: 220
+  requirement:
+    kind: ReachLevel
+    level: 10
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+- id: 4cf75da2-bd07-48ba-bbe6-d2a540e78e0b
+  name: Reach Woodworking Level 5
+  description: Craft Woodworking recipes until the building reaches level 5.
+  order: 175
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Woodworking
+    level: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 1000
+    - itemId: Wergen Stick
+      quantity: 15
+
+- id: 5a5952c0-b03c-48b5-816e-e441da42644f
+  name: Reach Jewelcrafting Level 5
+  description: Craft Jewelcrafting recipes until the building reaches level 5.
+  order: 185
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Jewelcrafting
+    level: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 1000
+    - itemId: Malachite
+      quantity: 15
+
+- id: 43c956f2-0e2a-430a-aeab-2f306d4d80e1
+  name: Reach Artificing Level 5
+  description: Craft Artificing recipes until the building reaches level 5.
+  order: 195
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Artificing
+    level: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 1000
+    - itemId: Trislime Core
+      quantity: 5

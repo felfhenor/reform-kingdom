@@ -1,6 +1,5 @@
-import type { ItemId } from '@interfaces/content-item';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
-import type { CostItem } from '@interfaces/cost';
+import type { CostItem, ItemQuantity } from '@interfaces/cost';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
@@ -8,10 +7,7 @@ import type { WorldNodeHideable } from '@interfaces/world-nodes';
 
 export type GatheringId = Branded<string, 'GatheringId'>;
 
-export type GatherResultItem = {
-  itemId: ItemId;
-  quantity: number;
-};
+export type GatherResultItem = ItemQuantity;
 
 export type GatherResult = {
   chance: number;

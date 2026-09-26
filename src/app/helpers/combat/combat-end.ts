@@ -2,6 +2,7 @@ import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset } from '@helpers/combat/combat-state';
 import { worldCombatState } from '@helpers/state-game';
+import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import { getEntry } from '@helpers/content/content';
@@ -140,6 +141,7 @@ function grantEncounterCompletionRewards(combat: Combat): void {
   analyticsSendDesignEvent(
     `World:Node:Complete:${analyticsSafeSegment(combat.locationName)}`,
   );
+  taskRecordEncounterClear(combat.locationName);
 
   // The encounter's level is rolled once and applied to every guardian,
   // so the first guardian's level represents it.

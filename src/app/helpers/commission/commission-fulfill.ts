@@ -13,6 +13,11 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { updateGamestate, worldCommissionsState } from '@helpers/state-game';
+import {
+  taskEventCollectibleGained,
+  taskEventWorkerRescued,
+} from '@helpers/task/task-events';
+import { taskRecordCommissionFulfilled } from '@helpers/task/task-progress';
 import type {
   CaravanId,
   CommissionNodeState,
@@ -20,6 +25,7 @@ import type {
   CommissionRequirementEntry,
   DroppedReward,
   GameState,
+  ResolvedDrop,
 } from '@interfaces';
 
 export function commissionState(
@@ -71,6 +77,16 @@ export function commissionCanFulfill(
   );
 }
 
+function commissionRecordTaskEvents(drops: ResolvedDrop[]): void {
+  void taskRecordCommissionFulfilled();
+  drops.forEach((drop) => {
+    if (drop.kind === 'Collectible') {
+      void taskEventCollectibleGained(drop.collectibleId);
+    }
+    if (drop.kind === 'Worker') void taskEventWorkerRescued(drop.workerId);
+  });
+}
+
 export async function commissionFulfill(
   caravanId: CaravanId,
 ): Promise<boolean> {
@@ -80,6 +96,7 @@ export async function commissionFulfill(
 
   let fulfilled = false;
   let offerName: string | undefined;
+  const grantedDrops: ResolvedDrop[] = [];
 
   await updateGamestate((s) => {
     if (!commissionCanFulfill(caravanId, s)) return s;
@@ -91,7 +108,7 @@ export async function commissionFulfill(
     offerName = offer?.name;
 
     spendCommissionRequirements(s, nodeState.requirements);
-    if (offer) grantCommissionRewards(s, offer);
+    if (offer) grantedDrops.push(...grantCommissionRewards(s, offer));
     nodeState.completed = true;
     fulfilled = true;
 
@@ -103,5 +120,6 @@ export async function commissionFulfill(
       `Kingdom:Commission:Fulfill:${analyticsSafeSegment(offerName)}`,
     );
   }
+  if (fulfilled) commissionRecordTaskEvents(grantedDrops);
   return fulfilled;
 }

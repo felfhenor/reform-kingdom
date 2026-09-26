@@ -1,0 +1,75 @@
+<app-modal
+  modalId="tasks"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+  widthClass="max-w-3xl"
+>
+  <span title>Tasks</span>
+  <p subtitle>Complete tasks to earn rewards.</p>
+
+  <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
+    @for (row of rows(); track row.taskId) {
+      <div
+        class="flex items-center gap-4 p-3 rounded bg-base-200"
+        [class.opacity-50]="row.isClaimed"
+      >
+        @if (row.isComplete) {
+          <app-icon name="tablerCheck" size="row" class="text-success" />
+        } @else {
+          <app-icon name="tablerX" size="row" class="text-error" />
+        }
+
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="type-entity-name">{{ row.name }}</span>
+          <span class="type-hint">{{ row.description }}</span>
+          @if (row.progress; as progress) {
+            <span class="type-meta tabular-nums">
+              {{ progress.current | number }}/{{ progress.target | number }}
+            </span>
+          }
+        </div>
+
+        <div class="flex flex-col items-end gap-2 shrink-0">
+          @for (reward of row.rewards; track reward.itemId) {
+            <app-currency-cost
+              [type]="reward.itemId"
+              [amount]="reward.quantity"
+            />
+          }
+        </div>
+
+        <div class="w-20 flex justify-end shrink-0">
+          @if (row.isClaimed) {
+            <span class="type-meta">Claimed</span>
+          } @else if (row.isComplete) {
+            <button
+              type="button"
+              class="btn btn-xs btn-success"
+              (click)="claim([row.taskId])"
+              appSfx="ui-success"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Claim
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div actions>
+    @let claimableIds = claimableTaskIds();
+    @if (claimableIds.length > 0) {
+      <button
+        type="button"
+        class="btn btn-sm btn-success"
+        (click)="claim(claimableIds)"
+        appSfx="ui-success"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Claim All
+      </button>
+    }
+  </div>
+</app-modal>

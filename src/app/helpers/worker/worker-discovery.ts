@@ -13,6 +13,7 @@ import type {
   WorkerContent,
   WorkerId,
 } from '@interfaces';
+import { taskEventWorkerRescued } from '@helpers/task/task-events';
 
 export function isWorkerRescued(workerId: WorkerId): boolean {
   return !!discoveredWorkersState()[workerId]?.foundAt;
@@ -34,6 +35,7 @@ export function workerRescue(workerId: WorkerId): void {
     return state;
   });
 
+  void taskEventWorkerRescued(workerId);
   notifySuccess(`You rescued ${worker.name}!`);
   analyticsSendDesignEvent(
     `Worker:Rescue:${analyticsSafeSegment(worker.name)}`,

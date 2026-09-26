@@ -11,6 +11,19 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventCollectibleGained: vi.fn(),
+  taskEventEquipmentInfused: vi.fn(),
+  taskEventLevelReached: vi.fn(),
+  taskEventMonsterKilled: vi.fn(),
+  taskEventShrineLevel: vi.fn(),
+  taskEventTeachingLearned: vi.fn(),
+  taskEventTownReputationTier: vi.fn(),
+  taskEventTownVisited: vi.fn(),
+  taskEventTradeskillLevel: vi.fn(),
+  taskEventWorkerRescued: vi.fn(),
+}));
+
 vi.mock('uuid', () => ({
   v4: vi.fn(() => `mock-uuid-${Math.random()}`),
 }));
@@ -50,6 +63,7 @@ import {
 import { globalEffectSums } from '@helpers/hero/global-effects';
 import { characterXpForLevel, createCharacter } from '@helpers/hero/party';
 import { updateGamestate } from '@helpers/state-game';
+import { taskEventLevelReached } from '@helpers/task/task-events';
 
 describe('Character Progress Helper Functions', () => {
   const mockJob: JobContent = {
@@ -337,6 +351,7 @@ describe('Character Progress Helper Functions', () => {
       });
 
       expect(partyGainXp(100)).toBe(true);
+      expect(taskEventLevelReached).toHaveBeenCalledWith(2);
     });
 
     it('returns false when the gain does not level up any character', () => {
@@ -346,6 +361,7 @@ describe('Character Progress Helper Functions', () => {
       });
 
       expect(partyGainXp(30)).toBe(false);
+      expect(taskEventLevelReached).not.toHaveBeenCalled();
     });
 
     it('scales the granted xp by any active GlobalXPGainMultiplier effect(s)', () => {

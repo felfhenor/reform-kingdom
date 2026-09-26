@@ -200,7 +200,13 @@ export const PARTY_FORMATION_HISTORY_MAX_AGE_MS = 2400;
 export const PARTY_FORMATION_JITTER_MIN_TILES = 0.4;
 export const PARTY_FORMATION_JITTER_MAX_TILES = 0.6;
 
+// Tasks
+
+export const TASK_WIDGET_ENTRY_COUNT = 3;
+
 // Town
+
+export const TOWN_REPUTATION_MAX_TIER = 4;
 
 // No authored weight value exists yet - a specialty recipe is this many times as likely to be picked as a non-specialty one.
 export const SPECIALTY_RECIPE_WEIGHT = 3;

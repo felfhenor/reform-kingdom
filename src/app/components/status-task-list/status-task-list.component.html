@@ -1,0 +1,35 @@
+@let rows = entries();
+
+@if (rows.length > 0) {
+  <button
+    type="button"
+    class="task-list-header"
+    (click)="openTasks()"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <span class="type-label">Tasks</span>
+  </button>
+
+  @for (row of rows; track row.taskId) {
+    <div
+      class="task-row"
+      [tp]="row.name + ': ' + row.description"
+      [tpPlacement]="'left'"
+    >
+      @if (row.isComplete) {
+        <app-icon name="tablerSquareCheck" size="inline" class="text-success" />
+      } @else {
+        <app-icon name="tablerSquare" size="inline" />
+      }
+
+      <span class="truncate flex-1">{{ row.name }}</span>
+
+      @if (row.progress; as progress) {
+        <span class="tabular-nums text-lighter shrink-0">
+          {{ progress.current | number }}/{{ progress.target | number }}
+        </span>
+      }
+    </div>
+  }
+}

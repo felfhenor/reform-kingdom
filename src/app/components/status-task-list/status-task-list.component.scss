@@ -1,0 +1,22 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply flex flex-col gap-2 w-72 text-xs;
+  pointer-events: none;
+}
+
+.task-list-header,
+.task-row {
+  @apply flex items-center gap-2 rounded px-2 py-0.5;
+  background-color: color-mix(in oklab, var(--color-base-300) 70%, transparent);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
+  pointer-events: auto;
+}
+
+.task-list-header {
+  @apply justify-between cursor-pointer text-start pr-0;
+}
+
+.task-row {
+  pointer-events: none;
+}

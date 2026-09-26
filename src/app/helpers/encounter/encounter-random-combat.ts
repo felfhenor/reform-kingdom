@@ -12,6 +12,7 @@ import {
   rollDroppedRewards,
 } from '@helpers/item/loot';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import {
   worldNodeByName,
   worldNodeEncounterRandom,
@@ -107,6 +108,7 @@ export function encounterRandomHandleVictory(combat: Combat): boolean {
 
   if (!nextFight) {
     grantEncounterRandomCompletionRewards(combat);
+    taskRecordEncounterClear(combat.locationName);
     return false;
   }
 

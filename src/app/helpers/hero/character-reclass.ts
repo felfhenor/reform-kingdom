@@ -24,6 +24,8 @@ import type {
   JobId,
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
+import { partyMaxLevel } from '@helpers/item/gathering';
+import { taskEventLevelReached } from '@helpers/task/task-events';
 
 // Level the hero would resume a job at: their current level if it's the active job, else their saved progress, else 1 for a job never held.
 export function characterJobLevel(character: Character, jobId: JobId): number {
@@ -161,6 +163,7 @@ export async function charactersReclass(
 
   if (reclassedJobNames.length > 0) {
     analyticsSendDesignEvent('Hero:Reclass:Start', reclassedJobNames.length);
+    void taskEventLevelReached(partyMaxLevel());
   }
 }
 

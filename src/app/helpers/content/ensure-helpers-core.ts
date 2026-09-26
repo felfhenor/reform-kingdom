@@ -1,4 +1,4 @@
-import type { CostItem, ItemId } from '@interfaces';
+import type { CostItem, ItemId, ItemQuantity } from '@interfaces';
 
 // Shared by every content type that gates a purchase/upgrade behind spending
 // materials (gather node development, shrine development, etc).
@@ -6,6 +6,15 @@ export function ensureCostItem(item: Partial<CostItem> = {}): CostItem {
   return {
     itemId: item.itemId ?? ('UNKNOWN' as ItemId),
     required: item.required ?? 0,
+  };
+}
+
+export function ensureItemQuantity(
+  item: Partial<ItemQuantity> = {},
+): ItemQuantity {
+  return {
+    itemId: item.itemId ?? ('UNKNOWN' as ItemId),
+    quantity: item.quantity ?? 1,
   };
 }
 

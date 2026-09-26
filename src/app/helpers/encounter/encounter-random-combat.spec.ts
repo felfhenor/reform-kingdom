@@ -25,6 +25,12 @@ vi.mock('@helpers/item/loot', () => ({
   rollDroppedRewards: vi.fn(),
 }));
 
+vi.mock('@helpers/task/task-progress', () => ({
+  taskRecordCraft: vi.fn(),
+  taskRecordEncounterClear: vi.fn(),
+  taskRecordGather: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
   worldPartyState: vi.fn(),
@@ -45,6 +51,7 @@ import {
 } from '@helpers/encounter/encounter-random-combat';
 import { rollDroppedRewards } from '@helpers/item/loot';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import {
   worldNodeByName,
   worldNodeEncounterRandom,
@@ -204,6 +211,7 @@ describe('encounterRandomHandleVictory', () => {
 
     expect(encounterRandomHandleVictory(combat)).toBe(false);
 
+    expect(taskRecordEncounterClear).toHaveBeenCalledWith(entry.nodeName);
     expect(rollDroppedRewards).toHaveBeenCalledWith(
       content.completionRewards,
       16,

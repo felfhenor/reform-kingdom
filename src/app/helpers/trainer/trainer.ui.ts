@@ -47,6 +47,7 @@ import type {
   TrainerTeachingRow,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
+import { taskEventTeachingLearned } from '@helpers/task/task-events';
 
 const UNKNOWN_NAME = '???';
 
@@ -226,6 +227,7 @@ export async function trainerTeach(
   miscellaneousMessageLog(
     `**${characterName}** learned **${teaching.name}** from **${trainer.name}**.`,
   );
+  void taskEventTeachingLearned(teachingId);
   analyticsSendDesignEvent('Hero:Trainer:Teach');
   analyticsSendDesignEvent(
     `Hero:Trainer:Teach:${analyticsSafeSegment(teaching.name)}`,

@@ -17,6 +17,7 @@ import {
   isAstralProjectorCollectiblesMet,
 } from '@helpers/kingdom/astral-projector';
 import { updateGamestate } from '@helpers/state-game';
+import { taskRecordAstralCast } from '@helpers/task/task-progress';
 import type {
   AstralProjectorContent,
   AstralProjectorId,
@@ -92,4 +93,5 @@ export function astralProjectorCast(id: AstralProjectorId): void {
   }
 
   miscellaneousMessageLog(`**${content.name}** has been cast.`);
+  void taskRecordAstralCast(id);
 }

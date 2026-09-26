@@ -1,28 +1,21 @@
-import { ensureArray, ensureCostItem } from '@helpers/content/ensure-helpers-core';
+import {
+  ensureArray,
+  ensureCostItem,
+  ensureItemQuantity,
+} from '@helpers/content/ensure-helpers-core';
 import type {
   GatheringContent,
   GatheringId,
   GatherLevelCost,
   GatherResult,
-  GatherResultItem,
-  ItemId,
 } from '@interfaces';
-
-function ensureGatherResultItem(
-  item: Partial<GatherResultItem> = {},
-): GatherResultItem {
-  return {
-    itemId: item.itemId ?? ('UNKNOWN' as ItemId),
-    quantity: item.quantity ?? 1,
-  };
-}
 
 export function ensureGatherResult(
   result: Partial<GatherResult> = {},
 ): GatherResult {
   return {
     chance: result.chance ?? 0,
-    items: ensureArray(result.items, ensureGatherResultItem),
+    items: ensureArray(result.items, ensureItemQuantity),
     levelRequirement: result.levelRequirement,
     tradeskillIds: result.tradeskillIds ?? [],
   };

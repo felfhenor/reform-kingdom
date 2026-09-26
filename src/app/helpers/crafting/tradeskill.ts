@@ -25,6 +25,7 @@ import type {
   TradeskillLevelRequirementContent,
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
+import { taskEventTradeskillLevel } from '@helpers/task/task-events';
 
 // `xp.maximum: 10` matches the level-1 curve value, kept as a literal here to avoid an import cycle.
 const DEFAULT_BUILDING: TradeskillBuildingState = {
@@ -187,6 +188,7 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
       `Kingdom:Building:LevelUp:${analyticsSafeSegment(tradeskill)}`,
       newLevel,
     );
+    void taskEventTradeskillLevel(tradeskillId, newLevel);
   }
 }
 

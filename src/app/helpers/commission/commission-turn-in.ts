@@ -1,4 +1,7 @@
-import { applyResolvedDropToState, rollDroppedRewards } from '@helpers/item/loot';
+import {
+  applyResolvedDropToState,
+  rollDroppedRewards,
+} from '@helpers/item/loot';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
   CommissionOfferContent,
@@ -6,6 +9,7 @@ import type {
   CommissionRequirementEquipment,
   EquipmentItem,
   GameState,
+  ResolvedDrop,
 } from '@interfaces';
 
 function consumeEquipmentRequirement(
@@ -39,11 +43,12 @@ export function spendCommissionRequirements(
   });
 }
 
+// Returns the drops so callers can react to them once the callback has committed.
 export function grantCommissionRewards(
   state: GameState,
   offer: CommissionOfferContent,
-): void {
-  rollDroppedRewards(offer.rewards, 1, 0, state).forEach((drop) =>
-    applyResolvedDropToState(state, drop),
-  );
+): ResolvedDrop[] {
+  const drops = rollDroppedRewards(offer.rewards, 1, 0, state);
+  drops.forEach((drop) => applyResolvedDropToState(state, drop));
+  return drops;
 }

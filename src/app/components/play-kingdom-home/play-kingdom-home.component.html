@@ -260,6 +260,49 @@
             </button>
           }
 
+          @let claimableTasks = claimableTaskCount();
+          <button
+            class="btn btn-accent btn-sm"
+            appButtonGlow
+            [buttonGlowActive]="claimableTasks > 0"
+            (click)="openTasksModal()"
+            appSfx="ui-click"
+            [sfxOffset]="5"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-icon name="tablerChecklist" size="inline" />
+            Tasks
+            @if (claimableTasks > 0) {
+              <span class="badge badge-sm badge-secondary">
+                {{ claimableTasks | number }}
+              </span>
+            }
+          </button>
+
+          <button
+            class="btn btn-accent btn-sm"
+            (click)="openSubview('infusion')"
+            appSfx="ui-click"
+            [sfxOffset]="2"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-icon name="gameMagicPotion" size="inline" />
+            Infusion
+          </button>
+
+          @if (commissionsUnlocked()) {
+            <button
+              class="btn btn-accent btn-sm"
+              (click)="openSubview('commissions')"
+              appSfx="ui-click"
+              [sfxOffset]="3"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon name="gameContract" size="inline" />
+              Commissions
+            </button>
+          }
+
           <app-slot-button-container
             [disabled]="!isAtKingdomCurrently()"
             [helpText]="'This must be done at the Duchy.'"
@@ -294,30 +337,6 @@
                 Set Home
               </button>
             </app-slot-button-container>
-          }
-
-          <button
-            class="btn btn-accent btn-sm"
-            (click)="openSubview('infusion')"
-            appSfx="ui-click"
-            [sfxOffset]="2"
-            [sfxTrigger]="['click', 'hover']"
-          >
-            <app-icon name="gameMagicPotion" size="inline" />
-            Infusion
-          </button>
-
-          @if (commissionsUnlocked()) {
-            <button
-              class="btn btn-accent btn-sm"
-              (click)="openSubview('commissions')"
-              appSfx="ui-click"
-              [sfxOffset]="3"
-              [sfxTrigger]="['click', 'hover']"
-            >
-              <app-icon name="gameContract" size="inline" />
-              Commissions
-            </button>
           }
         </div>
       </div>

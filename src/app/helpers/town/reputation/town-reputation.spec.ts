@@ -1,5 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventCollectibleGained: vi.fn(),
+  taskEventEquipmentInfused: vi.fn(),
+  taskEventLevelReached: vi.fn(),
+  taskEventMonsterKilled: vi.fn(),
+  taskEventShrineLevel: vi.fn(),
+  taskEventTeachingLearned: vi.fn(),
+  taskEventTownReputationTier: vi.fn(),
+  taskEventTownVisited: vi.fn(),
+  taskEventTradeskillLevel: vi.fn(),
+  taskEventWorkerRescued: vi.fn(),
+}));
+
 vi.mock('@helpers/engine/analytics', () => ({
   analyticsSendDesignEvent: vi.fn(),
 }));

@@ -1,0 +1,274 @@
+- id: 584911eb-7c95-4b0f-8285-25200e95662f
+  name: Clear Copperorc Retreat
+  description: Defeat every fight in Copperorc Retreat, nestled in the mountain range in the northeast of the Duchy of Carrina.
+  order: 240
+  requirement:
+    kind: ClearEncounter
+    nodeName: Copperorc Retreat
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2000
+
+    - itemId: Small Asura Tendon
+      quantity: 10
+
+- id: 94a595ce-1afb-4405-a227-9434501f50e9
+  name: Clear the Mired Ruins
+  description: Pass through Craggled Cave, west of the Duchy of Carrina, into the Craggled Mire and defeat every fight in the Mired Ruins.
+  order: 250
+  requirement:
+    kind: ClearEncounter
+    nodeName: Mired Ruins
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Mirewood
+      quantity: 25
+
+- id: 516816c1-f019-44d9-b577-ef57b7c4ced4
+  name: Clear the Elven River Camp
+  description: Defeat every fight in the Elven River Camp, northeast of the Duchy of Carrina.
+  order: 260
+  requirement:
+    kind: ClearEncounter
+    nodeName: Elven River Camp
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Elven Wood
+      quantity: 25
+
+- id: 53c33e60-c85b-4076-b6e4-24d2df98fd6c
+  name: Defeat 25 Toxic Toads
+  description: Defeat 25 of the Toxic Toads that lurk across the Craggled Mire.
+  order: 270
+  requirement:
+    kind: DefeatMonster
+    monsterId: Toxic Toad
+    quantity: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 3500
+
+    - itemId: Oozehide
+      quantity: 10
+
+- id: 5c2c439c-bd79-4e5a-8c17-3e0a7e10c0b4
+  name: Reach Level 15
+  description: Keep adventuring until a hero reaches level 15.
+  order: 280
+  requirement:
+    kind: ReachLevel
+    level: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+
+- id: 98caeb6a-55f1-4565-8aa2-7e874943324b
+  name: Gather 25 Miremetal Ore
+  description: Travel to the Miremetal Mines and gather until you have collected 25 Miremetal Ore.
+  order: 290
+  requirement:
+    kind: GatherItem
+    nodeName: Miremetal Mines
+    itemId: Miremetal Ore
+    quantity: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Peridot
+      quantity: 15
+
+- id: 51752971-87c2-475b-bbd9-4cc03fd42585
+  name: Gather 50 Mireweed
+  description: Travel to Swampfields and gather until you have collected 50 Mireweed.
+  order: 300
+  requirement:
+    kind: GatherItem
+    nodeName: Swampfields
+    itemId: Mireweed
+    quantity: 50
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Mirewood
+      quantity: 25
+
+- id: b8ebde24-8742-4f4d-aaed-84ed98b137ee
+  name: Upgrade the Shrine of Parcilyte
+  description: Make an offering at the Shrine of Parcilyte to raise it to level 1, then pray there for its blessing.
+  order: 310
+  requirement:
+    kind: ShrineLevel
+    nodeName: Shrine of Parcilyte
+    level: 1
+  rewards:
+    - itemId: Ghost Peridot
+      quantity: 10
+
+- id: 04646d29-e5d6-4f31-a724-c1a1c87411ed
+  name: Rescue Dekar Anten
+  description: Clear the Mystical Gobslime Shrine to rescue Dekar Anten.
+  order: 320
+  requirement:
+    kind: RescueWorker
+    workerId: Dekar Anten
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+
+    - itemId: Trislime Core
+      quantity: 5
+
+- id: 883535da-f8a5-4d93-a0ef-78b238a5a14c
+  name: Earn Your First Trader Scrip
+  description: Fulfill a caravan commission to earn Trader Scrip.
+  order: 330
+  requirement:
+    kind: FulfillCommission
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+- id: c77c7c58-9278-4902-b2ce-423ab753cd9c
+  name: Reach Jewelcrafting Level 10
+  description: Craft Jewelcrafting recipes until the building reaches level 10. It needs a Minor Jewelcrafting Effigy to grow past level 5.
+  order: 340
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Jewelcrafting
+    level: 10
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Peridot
+      quantity: 5
+
+- id: 4ad83639-4c88-4480-a836-2937312d7663
+  name: Clear Craggleorc Bluff
+  description: Defeat every fight on Craggleorc Bluff, located in the Craggled Mire.
+  order: 350
+  requirement:
+    kind: ClearEncounter
+    nodeName: Craggleorc Bluff
+    quantity: 1
+  rewards:
+    - itemId: Miremetal Ingot
+      quantity: 15
+
+- id: 0e0a4066-ecc7-4714-99ec-d8e95e022059
+  name: Defeat 25 Angry Spirits
+  description: Defeat 25 of the Angry Spirits that haunt the Ghostyard in the Craggled Mire.
+  order: 360
+  requirement:
+    kind: DefeatMonster
+    monsterId: Angry Spirit
+    quantity: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 3500
+
+    - itemId: Spirit Flesh
+      quantity: 10
+
+- id: 281395c0-8664-4468-b1cb-b1cb14ee4075
+  name: Acquire the Ghost Orbs
+  description: Head to the Craggled Mire and seek the Ghost Orbs at the Spirit Nexus.
+  order: 370
+  requirement:
+    kind: OwnCollectible
+    collectibleId: Ghost Orbs
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+
+    - itemId: Ghostwood
+      quantity: 15
+
+- id: f4dbc374-58e6-4b34-bc27-3d7845429106
+  name: Cast Fortitude of the Warden
+  description: 'Ghost Orbs from the Spirit Nexus unlock a warding spell. Cast Fortitude of the Warden I.'
+  order: 380
+  requirement:
+    kind: CastAstralSpell
+    astralProjectorId: 'Ward: Fortitude of the Warden I'
+    quantity: 1
+  rewards:
+    - itemId: Spirit Gear
+      quantity: 5
+
+- id: 2a69de63-0b51-4ff0-9de3-1ffa886ef853
+  name: Reach Level 20
+  description: Keep adventuring until a hero reaches level 20.
+  order: 390
+  requirement:
+    kind: ReachLevel
+    level: 20
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+
+- id: b3139f3b-8b83-45f5-95cb-ee47c3f3cd3c
+  name: Reach Blacksmithing Level 10
+  description: Craft Blacksmithing recipes until the building reaches level 10.
+  order: 255
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Blacksmithing
+    level: 10
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+    - itemId: Miremetal Ingot
+      quantity: 15
+
+- id: 6b896c57-9b90-4152-8792-bea47a55f761
+  name: Reach Tailoring Level 10
+  description: Craft Tailoring recipes until the building reaches level 10. It needs a Minor Tailoring Effigy to grow past level 5.
+  order: 265
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Tailoring
+    level: 10
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+    - itemId: Mirethread
+      quantity: 15
+
+- id: 36352784-ee2c-4ff1-a2ac-5c24f4b37c09
+  name: Reach Woodworking Level 10
+  description: Craft Woodworking recipes until the building reaches level 10. It needs a Minor Woodworking Effigy to grow past level 5.
+  order: 285
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Woodworking
+    level: 10
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+    - itemId: Ghostwood
+      quantity: 5
+
+- id: e9f86b4e-61e3-42b6-9329-d14fa16064f2
+  name: Reach Artificing Level 10
+  description: Craft Artificing recipes until the building reaches level 10. It needs a Minor Artificing Effigy to grow past level 5.
+  order: 305
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Artificing
+    level: 10
+  rewards:
+    - itemId: Gold Coin
+      quantity: 2500
+    - itemId: Oozehide
+      quantity: 5

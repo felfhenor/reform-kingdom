@@ -3,6 +3,7 @@ import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { ItemQuantity } from '@interfaces/cost';
 
 export type RecipeId = Branded<string, 'RecipeId'>;
 
@@ -27,10 +28,7 @@ export type RecipeResultCollectible = {
 export type RecipeResult =
   RecipeResultItem | RecipeResultEquipment | RecipeResultCollectible;
 
-export type RecipeRequirementItem = {
-  itemId: ItemId;
-  quantity: number;
-};
+export type RecipeRequirementItem = ItemQuantity;
 
 export type RecipeRequirementEquipment = {
   equipmentId: EquipmentId;

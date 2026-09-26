@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import * as helpers from '@helpers';
 import * as debug from '@helpers/debug/debug';
+import * as debugTasksUi from '@helpers/debug/debug-tasks.ui';
 import * as debugUi from '@helpers/debug/debug.ui';
 
 @Injectable({
@@ -14,6 +15,7 @@ export class APIService {
       ...helpers,
       ...debug,
       ...debugUi,
+      ...debugTasksUi,
     };
   }
 }

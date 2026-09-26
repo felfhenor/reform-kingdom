@@ -40,7 +40,10 @@ import {
 } from '@helpers/state-game';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
-import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
+import {
+  TOWN_REPUTATION_THRESHOLDS,
+  townReputationTierForAmount,
+} from '@helpers/town/reputation/town-reputation';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
@@ -76,6 +79,11 @@ import {
   type WorkerId,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
+import {
+  taskEventLevelReached,
+  taskEventTownReputationTier,
+  taskEventTradeskillLevel,
+} from '@helpers/task/task-events';
 
 export function debugGiveItem(itemId: ItemId, quantity: number): void {
   if (quantity <= 0) return;
@@ -145,6 +153,9 @@ export function debugSetCharacterLevel(
   level: number,
 ): void {
   const clampedLevel = clamp(Math.round(level), 1, CHARACTER_MAX_LEVEL);
+  if (!worldPartyState().some((character) => character.id === characterId)) {
+    return;
+  }
 
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => {
@@ -159,6 +170,7 @@ export function debugSetCharacterLevel(
 
     return state;
   });
+  void taskEventLevelReached(clampedLevel);
 }
 
 export function debugSetTradeskillLevel(
@@ -179,6 +191,7 @@ export function debugSetTradeskillLevel(
 
     return state;
   });
+  void taskEventTradeskillLevel(tradeskillId, clampedLevel);
 }
 
 // Wipes every bestiary discovery/kill record - primarily a recovery tool
@@ -346,6 +359,10 @@ export async function debugSetTownReputation(
 
   // Debug-set reputation skips townReputationGain/Lose, so tier-scaled persistent commissions need an explicit refresh here too.
   await townCommissionRefreshTierScaledSlots(realTownId);
+  void taskEventTownReputationTier(
+    realTownId,
+    townReputationTierForAmount(clamped),
+  );
 }
 
 // Raid combat from anywhere, no telegraph/standing-at-town required.

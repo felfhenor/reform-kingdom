@@ -10,6 +10,7 @@ import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
+import type { TaskId } from '@interfaces/content-task';
 import type { TrainerId } from '@interfaces/content-trainer';
 import type { GameStateTradeskills } from '@interfaces/crafting';
 import type { AutoModeState } from '@interfaces/decree';
@@ -119,6 +120,11 @@ export type GameStateWorldDiscoveries = {
   [key: string]: { foundAt: number };
 };
 
+// Created per task on load; `completedAt` latches so spending the gathered items can't undo a task.
+export type GameStateTasks = {
+  [key: TaskId]: { progress: number; completedAt?: number; claimedAt?: number };
+};
+
 // One-time ledger of tutorials already shown to the player.
 export type GameStateTutorials = {
   [key: string]: { foundAt: number };
@@ -174,4 +180,5 @@ export type GameState = {
   discoveredAstralProjectorSpells: GameStateDiscoveredAstralProjectorSpells;
   activeAstralProjectorSpells: GameStateActiveAstralProjectorSpell[];
   tutorials: GameStateTutorials;
+  tasks: GameStateTasks;
 };

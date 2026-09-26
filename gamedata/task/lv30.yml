@@ -1,0 +1,209 @@
+- id: ec0094e8-859b-4b3e-bac6-1786b9347f6f
+  name: Find the Elven Satchel
+  description: In the Larsian Desert, search the Rolling Sands until you find the Elven Satchel. It reveals a hidden path to the Erden Woodland, northeast of the Duchy of Carrina.
+  order: 520
+  requirement:
+    kind: OwnCollectible
+    collectibleId: Elven Satchel
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+
+- id: 4d4351eb-41af-40c8-84c6-0d5db1f5ae5a
+  name: Clear the Ghostmirage Wreck
+  description: Defeat every ghost, crab, and Akroki in the Ghostmirage Wreck in the Larsian Desert.
+  order: 590
+  requirement:
+    kind: ClearEncounter
+    nodeName: Ghostmirage Wreck
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+
+    - itemId: Brightwisp Core
+      quantity: 5
+
+- id: 84998488-d177-4eb6-8f2b-e80d6090148d
+  name: Rescue Selan Rose
+  description: Enter Sandhenge and seek Selan Rose, a Larsian citizen captured by the Akroki.
+  order: 600
+  requirement:
+    kind: RescueWorker
+    workerId: Selan Rose
+  rewards:
+    - itemId: Gold Coin
+      quantity: 25000
+
+    - itemId: Amber
+      quantity: 15
+
+- id: f45c1eda-8ad3-44e7-892f-9652af83c1e5
+  name: Clear the Demon Foray
+  description: Take the Elfway into the Erden Woodland and defeat the demons of the Demon Foray.
+  order: 530
+  requirement:
+    kind: ClearEncounter
+    nodeName: Demon Foray
+    quantity: 1
+  rewards:
+    - itemId: Crimson Lucre
+      quantity: 250
+
+- id: e74f748c-e2a0-456b-8856-544937dfab0e
+  name: Visit Elfheim
+  description: Visit the elven town of Elfheim in the Erden Woodland.
+  order: 540
+  requirement:
+    kind: VisitTown
+    townId: Elfheim
+  rewards:
+    - itemId: Elfsilk
+      quantity: 5
+
+- id: e83cdc90-f449-4e59-9a49-1b39e5b8b5d2
+  name: Upgrade the Shrine of Culcula
+  description: Make an offering at the Shrine of Culcula to raise it to level 1, then pray there for its blessing.
+  order: 550
+  requirement:
+    kind: ShrineLevel
+    nodeName: Shrine of Culcula
+    level: 1
+  rewards:
+    - itemId: Elven Corewood
+      quantity: 25
+
+- id: 12dda465-2cf5-4f1d-87fa-eff43a86128d
+  name: Defeat 25 Woodwolves
+  description: Defeat 25 of the Woodwolves that plague the Erden Woodland.
+  order: 560
+  requirement:
+    kind: DefeatMonster
+    monsterId: Woodwolf
+    quantity: 25
+  rewards:
+    - itemId: Crimson Lucre
+      quantity: 250
+
+    - itemId: Wolf Pelt
+      quantity: 15
+
+- id: 4f4dd276-f156-49bd-9b00-e346ef392d00
+  name: Train with Elfen Ledi
+  description: Visit Elfen Ledi and have a hero learn one of her teachings.
+  order: 570
+  requirement:
+    kind: LearnTeaching
+    trainerId: Elfen Ledi
+  rewards:
+    - itemId: Strong Spider Silk
+      quantity: 5
+
+- id: c0a9bb1e-facb-4191-a1dd-6bc626c47149
+  name: Clear Spiderwolf Forest
+  description: Clear out the wolves and spiders of the Spiderwolf Forest.
+  order: 580
+  requirement:
+    kind: ClearEncounter
+    nodeName: Spiderwolf Forest
+    quantity: 1
+  rewards:
+    - itemId: Crimson Lucre
+      quantity: 250
+
+    - itemId: Bat Wing
+      quantity: 10
+
+- id: 613d6128-d9b0-47b6-9cdd-72ec6a368959
+  name: Reach Level 35
+  description: Keep adventuring until a hero reaches level 35.
+  order: 610
+  requirement:
+    kind: ReachLevel
+    level: 35
+  rewards:
+    - itemId: Gold Coin
+      quantity: 50000
+
+- id: 0be50d27-99f7-4e81-8115-9ec78c0571e7
+  name: Gather 25 Crimson Ore
+  description: Travel to the Elfheim Royal Mines and gather until you have collected 25 Crimson Ore.
+  order: 620
+  requirement:
+    kind: GatherItem
+    nodeName: Elfheim Royal Mines
+    itemId: Crimson Ore
+    quantity: 25
+  rewards:
+    - itemId: Crimson Lucre
+      quantity: 500
+
+- id: 5c6c2ce4-613b-4801-8b9b-c4cacf7a8f5e
+  name: Reach Blacksmithing Level 20
+  description: Craft Blacksmithing recipes until the building reaches level 20. It needs a Finely-made Sharp Star to grow past level 15.
+  order: 525
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Blacksmithing
+    level: 20
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+    - itemId: Crimson Ore
+      quantity: 15
+
+- id: e1168718-30b9-47f6-a6ad-2fee8102af07
+  name: Reach Tailoring Level 20
+  description: Craft Tailoring recipes until the building reaches level 20. It needs a Fluff-filled Plushy Creature to grow past level 15.
+  order: 535
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Tailoring
+    level: 20
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+    - itemId: Elfsilk
+      quantity: 10
+
+- id: fe499810-cef8-47aa-a41c-064d44b64c5b
+  name: Reach Jewelcrafting Level 20
+  description: Craft Jewelcrafting recipes until the building reaches level 20. It needs an Artistically-crafted Miremetal Ring to grow past level 15.
+  order: 545
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Jewelcrafting
+    level: 20
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+    - itemId: Crimson Ruby
+      quantity: 5
+
+- id: 90d68426-637f-412f-9dea-a3859c9d77b3
+  name: Reach Woodworking Level 20
+  description: Craft Woodworking recipes until the building reaches level 20. It needs an Ooze-filled Drawing Tool to grow past level 15.
+  order: 565
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Woodworking
+    level: 20
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+    - itemId: Elven Corewood
+      quantity: 15
+
+- id: 87cf77b4-e9c1-4d37-beed-3e4f5c3b7565
+  name: Reach Artificing Level 20
+  description: Craft Artificing recipes until the building reaches level 20. It needs an Ooze-coated Miremetal to grow past level 15.
+  order: 575
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Artificing
+    level: 20
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+    - itemId: Demon Horn
+      quantity: 5

@@ -70,6 +70,7 @@ export function defaultGameState(): GameState {
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
     tutorials: {},
+    tasks: {},
   };
 }
 

@@ -30,6 +30,12 @@ vi.mock('@helpers/kingdom/bestiary', () => ({
   monsterRecordKill: vi.fn(),
 }));
 
+vi.mock('@helpers/task/task-progress', () => ({
+  taskRecordCraft: vi.fn(),
+  taskRecordEncounterClear: vi.fn(),
+  taskRecordGather: vi.fn(),
+}));
+
 vi.mock('@helpers/commission/commission-kill-progress', () => ({
   commissionRecordMonsterKill: vi.fn(),
 }));
@@ -108,6 +114,7 @@ import {
 import { combatReset } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
+import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import { getEntry } from '@helpers/content/content';
 import { recipeDiscover } from '@helpers/crafting/recipes';
 import {
@@ -230,6 +237,7 @@ describe('combatCheckIfOver', () => {
     // Mid-encounter: no completion rewards roll yet (there are also no
     // resolvable monsters in this fixture, so no kill-drop roll either).
     expect(rollDroppedRewards).not.toHaveBeenCalled();
+    expect(taskRecordEncounterClear).not.toHaveBeenCalled();
   });
 
   it('resets combat on victory when there is no next fight', () => {
@@ -276,6 +284,7 @@ describe('combatCheckIfOver', () => {
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'World:Node:Complete:Field Ruins',
     );
+    expect(taskRecordEncounterClear).toHaveBeenCalledWith('Field Ruins');
   });
 
   it('grants a rolled collectible completion reward and logs it', () => {

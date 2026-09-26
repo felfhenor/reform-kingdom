@@ -11,6 +11,7 @@ import type {
   GameState,
   GameStateCollectibles,
 } from '@interfaces';
+import { taskEventCollectibleGained } from '@helpers/task/task-events';
 
 // Drops any storage entries whose id no longer resolves to real content -
 // e.g. after a collectible is renamed/removed from gamedata.
@@ -68,6 +69,7 @@ export function collectiblesAdd(
     applyCollectibleGrant(state, collectibleId, quantity);
     return state;
   });
+  void taskEventCollectibleGained(collectibleId);
 
   if (!alreadyDiscovered) {
     const collectibleName = getEntry<CollectibleContent>(collectibleId)?.name;

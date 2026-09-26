@@ -34,6 +34,7 @@ import {
 import { armoryAdd, armoryGet, armoryHasRoom } from '@helpers/kingdom/armory';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
+import { taskRecordCraft } from '@helpers/task/task-progress';
 import type {
   CollectibleContent,
   CraftQueueEntry,
@@ -308,6 +309,8 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
     );
     return;
   }
+
+  taskRecordCraft(recipe.id);
 
   if ('itemId' in recipe.result) {
     const { itemId } = recipe.result;

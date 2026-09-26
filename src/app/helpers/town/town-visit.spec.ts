@@ -1,5 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventCollectibleGained: vi.fn(),
+  taskEventEquipmentInfused: vi.fn(),
+  taskEventLevelReached: vi.fn(),
+  taskEventMonsterKilled: vi.fn(),
+  taskEventShrineLevel: vi.fn(),
+  taskEventTeachingLearned: vi.fn(),
+  taskEventTownReputationTier: vi.fn(),
+  taskEventTownVisited: vi.fn(),
+  taskEventTradeskillLevel: vi.fn(),
+  taskEventWorkerRescued: vi.fn(),
+}));
+
 vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
   getEntriesByType: vi.fn(() => []),
@@ -49,6 +62,7 @@ import type {
   TownId,
   WorldNodeEntry,
 } from '@interfaces';
+import { taskEventTownVisited } from '@helpers/task/task-events';
 
 const townId = 'larsia' as TownId;
 
@@ -97,6 +111,7 @@ describe('townMarkVisited', () => {
     townMarkVisited(townId);
 
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith('Town:Visit:Larsia');
+    expect(taskEventTownVisited).toHaveBeenCalledWith(townId);
   });
 
   it('preserves existing lastProcessedTick progress when activating', () => {

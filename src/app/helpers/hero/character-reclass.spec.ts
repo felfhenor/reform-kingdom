@@ -1,4 +1,21 @@
 import type * as AnalyticsHelper from '@helpers/engine/analytics';
+
+vi.mock('@helpers/item/gathering', () => ({
+  partyMaxLevel: vi.fn(() => 1),
+}));
+
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventCollectibleGained: vi.fn(),
+  taskEventEquipmentInfused: vi.fn(),
+  taskEventLevelReached: vi.fn(),
+  taskEventMonsterKilled: vi.fn(),
+  taskEventShrineLevel: vi.fn(),
+  taskEventTeachingLearned: vi.fn(),
+  taskEventTownReputationTier: vi.fn(),
+  taskEventTownVisited: vi.fn(),
+  taskEventTradeskillLevel: vi.fn(),
+  taskEventWorkerRescued: vi.fn(),
+}));
 import type {
   Character,
   CharacterId,

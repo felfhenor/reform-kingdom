@@ -9,4 +9,5 @@ export type ModalId =
   | 'trainer-visit'
   | 'changelog'
   | 'pause-menu'
-  | 'settings';
+  | 'settings'
+  | 'tasks';

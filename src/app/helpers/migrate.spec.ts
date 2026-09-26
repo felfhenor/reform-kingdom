@@ -121,6 +121,11 @@ vi.mock('@helpers/tutorial/tutorial-catalog', () => ({
   TUTORIAL_CATALOG: [],
 }));
 
+vi.mock('@helpers/task/task-migrate', () => ({
+  pruneInvalidTasks: vi.fn((tasks) => tasks),
+  retrofitTasks: vi.fn((state) => state.tasks),
+}));
+
 vi.mock('@helpers/tutorial/tutorial-seen', () => ({
   pruneInvalidTutorials: vi.fn((tutorials) => tutorials),
 }));

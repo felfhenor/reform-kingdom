@@ -548,6 +548,16 @@
         </button>
         <button
           type="button"
+          class="btn btn-warning btn-sm"
+          appAnalyticsClick="Options:Debug:ResetTasks"
+          (click)="resetTasks()"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Reset Tasks
+        </button>
+        <button
+          type="button"
           class="btn btn-secondary btn-sm"
           appAnalyticsClick="Options:Debug:FillBestiary"
           (click)="fillBestiary()"

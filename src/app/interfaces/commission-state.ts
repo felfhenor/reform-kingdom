@@ -4,14 +4,14 @@ import type {
   CommissionOfferId,
 } from '@interfaces/content-commission-offer';
 import type { EquipmentId } from '@interfaces/content-equipment';
-import type { ItemId } from '@interfaces/content-item';
 import type { MonsterContent, MonsterId } from '@interfaces/content-monster';
 import type { TownId } from '@interfaces/content-town';
 import type { CraftRequirementEntry } from '@interfaces/crafting';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { TownCommissionSlotId } from '@interfaces/town-state';
+import type { ItemQuantity } from '@interfaces/cost';
 
-export type CommissionRequirementItem = { itemId: ItemId; quantity: number };
+export type CommissionRequirementItem = ItemQuantity;
 export type CommissionRequirementEquipment = {
   equipmentId: EquipmentId;
   quantity: number;

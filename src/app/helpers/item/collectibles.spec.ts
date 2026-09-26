@@ -1,4 +1,17 @@
 import type * as AnalyticsHelper from '@helpers/engine/analytics';
+
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventCollectibleGained: vi.fn(),
+  taskEventEquipmentInfused: vi.fn(),
+  taskEventLevelReached: vi.fn(),
+  taskEventMonsterKilled: vi.fn(),
+  taskEventShrineLevel: vi.fn(),
+  taskEventTeachingLearned: vi.fn(),
+  taskEventTownReputationTier: vi.fn(),
+  taskEventTownVisited: vi.fn(),
+  taskEventTradeskillLevel: vi.fn(),
+  taskEventWorkerRescued: vi.fn(),
+}));
 import type {
   CollectibleContent,
   CollectibleId,
@@ -45,6 +58,7 @@ import {
   pruneInvalidCollectibles,
 } from '@helpers/item/collectibles';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { taskEventCollectibleGained } from '@helpers/task/task-events';
 
 const foundingStone: CollectibleContent = {
   id: 'founding-stone' as CollectibleId,
@@ -167,6 +181,7 @@ describe('Collectibles Helper Functions', () => {
 
       expect(result.collectibles[foundingStone.id].quantity).toBe(1);
       expect(result.collectibles[foundingStone.id].foundAt).toBeGreaterThan(0);
+      expect(taskEventCollectibleGained).toHaveBeenCalledWith(foundingStone.id);
     });
 
     it('accumulates quantity and preserves the original foundAt', () => {

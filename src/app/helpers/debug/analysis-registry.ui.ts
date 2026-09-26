@@ -21,6 +21,7 @@ import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
+import { runTasksAnalysis } from '@helpers/debug/analysis-tasks';
 import { runTrainersAnalysis } from '@helpers/debug/analysis-trainers';
 import { runTradeskillGapsAnalysis } from '@helpers/debug/analysis-tradeskillgaps';
 import { runTradeskillXpGapsAnalysis } from '@helpers/debug/analysis-tradeskillxpgaps';
@@ -223,6 +224,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runTrainersAnalysis,
+  },
+  {
+    id: 'tasks',
+    title: 'Tasks',
+    description:
+      'Every task references real content, points at a node the player can find without secrets, and is not gated behind a level an earlier task has not reached.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runTasksAnalysis,
   },
   {
     id: 'workerstamina',

@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventWorkerRescued: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => ({
   discoveredWorkersState: vi.fn(),
   updateGamestate: vi.fn(),
@@ -48,6 +52,7 @@ import type {
   WorkerId,
   WorkerState,
 } from '@interfaces';
+import { taskEventWorkerRescued } from '@helpers/task/task-events';
 
 function applyLastUpdate(state: GameState): GameState {
   const calls = vi.mocked(updateGamestate).mock.calls;
@@ -116,6 +121,7 @@ describe('workerRescue', () => {
       status: { kind: 'AtDuchy' },
     });
     expect(notifySuccess).toHaveBeenCalledWith('You rescued Weaver Nell!');
+    expect(taskEventWorkerRescued).toHaveBeenCalledTimes(1);
     expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
       'Worker:Rescue:WeaverNell',
     );

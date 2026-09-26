@@ -23,6 +23,7 @@ import {
   worldNodeShrine,
 } from '@helpers/world-node/world-nodes';
 import type { GlobalEffectContent } from '@interfaces';
+import { taskEventShrineLevel } from '@helpers/task/task-events';
 
 // Every isShrineBuff effect is removed first (not just this shrine's), so re-praying refreshes rather than duplicates.
 export function shrinePray(nodeName: string): boolean {
@@ -83,15 +84,16 @@ export async function shrineLevelUp(nodeName: string): Promise<boolean> {
   const hadActiveBuffFromThisShrine =
     !!currentTier && isGlobalEffectActive(currentTier.globalEffectId);
 
+  let newLevel = 0;
   await updateGamestate((state) => {
     worldNodeSpendCost(state, cost);
 
     const existing = state.shrines[nodeName];
-    state.shrines[nodeName] = {
-      level: (existing?.level ?? 0) + 1,
-    };
+    newLevel = (existing?.level ?? 0) + 1;
+    state.shrines[nodeName] = { level: newLevel };
     return state;
   });
+  void taskEventShrineLevel(nodeName, newLevel);
 
   analyticsSendDesignEvent(
     `World:Shrine:LevelUp:${analyticsSafeSegment(nodeName)}`,

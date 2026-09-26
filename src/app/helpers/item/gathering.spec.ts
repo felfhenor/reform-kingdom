@@ -43,6 +43,12 @@ vi.mock('@helpers/rng', () => ({
   rngSucceedsChance: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/task/task-progress', () => ({
+  taskRecordCraft: vi.fn(),
+  taskRecordEncounterClear: vi.fn(),
+  taskRecordGather: vi.fn(),
+}));
+
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
@@ -66,6 +72,7 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
   worldNodeLevel: vi.fn(() => 0),
 }));
 
+import { taskRecordGather } from '@helpers/task/task-progress';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
@@ -453,6 +460,7 @@ describe('gatheringProcessTick', () => {
     expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
     expect(partyGainXp).toHaveBeenCalledWith(3);
     expect(addMaterial).toHaveBeenCalledWith('wood', 2);
+    expect(taskRecordGather).toHaveBeenCalledWith('Wergen Woods', 'wood', 2);
     expect(gatherVfxEmit).toHaveBeenCalledWith({
       nodeName: 'Wergen Woods',
       name: 'Wergen Wood',

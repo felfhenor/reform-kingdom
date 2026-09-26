@@ -1,4 +1,21 @@
 import type * as AnalyticsHelper from '@helpers/engine/analytics';
+
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventCollectibleGained: vi.fn(),
+  taskEventEquipmentInfused: vi.fn(),
+  taskEventLevelReached: vi.fn(),
+  taskEventMonsterKilled: vi.fn(),
+  taskEventShrineLevel: vi.fn(),
+  taskEventTeachingLearned: vi.fn(),
+  taskEventTownReputationTier: vi.fn(),
+  taskEventTownVisited: vi.fn(),
+  taskEventTradeskillLevel: vi.fn(),
+  taskEventWorkerRescued: vi.fn(),
+}));
+
+vi.mock('@helpers/task/task-progress', () => ({
+  taskRecordCommissionFulfilled: vi.fn(),
+}));
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/caravan/caravan', () => ({
@@ -71,6 +88,7 @@ import type {
   MonsterId,
   RecipeId,
 } from '@interfaces';
+import { taskRecordCommissionFulfilled } from '@helpers/task/task-progress';
 
 const caravanId = 'carrina-duchy' as CaravanId;
 
@@ -413,6 +431,7 @@ describe('commissionFulfill', () => {
     const result = updateFn(state);
 
     expect(await resultPromise).toBe(true);
+    expect(taskRecordCommissionFulfilled).toHaveBeenCalledTimes(1);
     expect(applyMaterialDelta).toHaveBeenCalledWith(
       state,
       wergenStick.id,

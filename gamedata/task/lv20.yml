@@ -1,0 +1,245 @@
+- id: c5e9753a-b7a7-450d-8c57-f37c4ee5ca1c
+  name: Rescue Sefirah Hornacis
+  description: Head to the Craggled Mire and rescue Sefirah Hornacis from the Miserable Mire.
+  order: 400
+  requirement:
+    kind: RescueWorker
+    workerId: Sefirah Hornacis
+  rewards:
+    - itemId: Gold Coin
+      quantity: 6500
+
+    - itemId: Mirethread
+      quantity: 25
+
+- id: 0f6a82b2-f809-494c-bbbf-91306ae053a8
+  name: Visit Larsia
+  description: Cross the Larsian Traverse into the Larsian Desert and visit the town of Larsia.
+  order: 410
+  requirement:
+    kind: VisitTown
+    townId: Larsia
+  rewards:
+    - itemId: Firmwater
+      quantity: 15
+
+- id: 9cd83551-0455-4bba-8693-ac64a3b33f78
+  name: Earn the Respect of Larsia
+  description: Fulfill commissions for Larsia until you reach reputation tier 1.
+  order: 420
+  requirement:
+    kind: TownReputationTier
+    townId: Larsia
+    tier: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+
+    - itemId: Amber
+      quantity: 5
+
+- id: 426673a0-b8f6-4ac1-adc5-719ce0956543
+  name: Reach Level 25
+  description: Keep adventuring until a hero reaches level 25.
+  order: 430
+  requirement:
+    kind: ReachLevel
+    level: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 15000
+
+- id: bbecb33f-a0b5-4c10-b0a5-758f91739905
+  name: Gather 50 Cactspine
+  description: Travel to the Mescalin Expanse in the Larsian Desert and gather until you have collected 50 Cactspine.
+  order: 440
+  requirement:
+    kind: GatherItem
+    nodeName: Mescalin Expanse
+    itemId: Cactspine
+    quantity: 50
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+
+    - itemId: Timberfuzz
+      quantity: 25
+
+- id: df440f08-e595-4b96-a341-a7b5a698402b
+  name: Gather 25 Timberfuzz
+  description: Travel to the Oasis Wellspring in the Larsian Desert and gather until you have collected 25 Timberfuzz.
+  order: 450
+  requirement:
+    kind: GatherItem
+    nodeName: Oasis Wellspring
+    itemId: Timberfuzz
+    quantity: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+
+    - itemId: Petrifiwood
+      quantity: 25
+
+- id: 6123abae-0362-4726-aae0-b681b46bc6e2
+  name: Upgrade the Shrine of Medina
+  description: Make an offering at the Shrine of Medina to raise it to level 1, then pray there for its blessing.
+  order: 460
+  requirement:
+    kind: ShrineLevel
+    nodeName: Shrine of Medina
+    level: 1
+  rewards:
+    - itemId: Brightwisp Core
+      quantity: 5
+
+- id: f9b36974-36d3-450b-b027-5bf7501cc77a
+  name: Defeat 30 Akroki Vanguards
+  description: Defeat 30 Akroki Vanguards that patrol the Larsian Desert, threatening the peace of Larsia.
+  order: 470
+  requirement:
+    kind: DefeatMonster
+    monsterId: Akroki Vanguard
+    quantity: 30
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+
+    - itemId: Preserved Bloodmoth
+      quantity: 5
+
+- id: 5cdc874a-4e6c-41a7-8170-aff1829c7477
+  name: Become Honored in Larsia
+  description: Keep fulfilling commissions for Larsia until you reach reputation tier 2.
+  order: 480
+  requirement:
+    kind: TownReputationTier
+    townId: Larsia
+    tier: 2
+  rewards:
+    - itemId: Gold Coin
+      quantity: 12000
+
+    - itemId: Cimmerian Dust
+      quantity: 15
+
+- id: 9fbf204a-1cfc-48bf-8f34-37475fb9e3b8
+  name: Clear the Cimmerian Temple
+  description: Defeat every Akroki and magical creature in the Cimmerian Temple in the Larsian Desert.
+  order: 490
+  requirement:
+    kind: ClearEncounter
+    nodeName: Cimmerian Temple
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 10000
+
+    - itemId: Amber
+      quantity: 5
+
+- id: 031b5227-4c8e-4e53-b604-4925db632a89
+  name: Train with Maxim Tasnica
+  description: Bring a Cimmerian charm to Maxim Tasnica in the Craggled Mire and have a hero learn one of his teachings.
+  order: 500
+  requirement:
+    kind: LearnTeaching
+    trainerId: Maxim Tasnica
+  rewards:
+    - itemId: Star Fragment
+      quantity: 3
+
+- id: 8c85121b-465a-4e8a-bfa2-4d3a32bc2253
+  name: Reach Level 30
+  description: Keep adventuring until a hero reaches level 30.
+  order: 510
+  requirement:
+    kind: ReachLevel
+    level: 30
+  rewards:
+    - itemId: Gold Coin
+      quantity: 25000
+
+- id: 6cebb582-9a4a-45d7-835e-983c3d8a8ee6
+  name: Reach Blacksmithing Level 15
+  description: Craft Blacksmithing recipes until the building reaches level 15.
+  order: 405
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Blacksmithing
+    level: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+    - itemId: Petrifiwood
+      quantity: 15
+
+- id: a2cd7f3f-3c35-4a7d-9a50-69a507215cf2
+  name: Reach Tailoring Level 15
+  description: Craft Tailoring recipes until the building reaches level 15.
+  order: 415
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Tailoring
+    level: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+    - itemId: Strongreed
+      quantity: 15
+
+- id: a2cd36a6-0c7f-4689-90aa-c79799a02476
+  name: Reach Jewelcrafting Level 15
+  description: Craft Jewelcrafting recipes until the building reaches level 15.
+  order: 425
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Jewelcrafting
+    level: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+    - itemId: Amber
+      quantity: 10
+
+- id: 8e826d98-ae82-4a84-bc7d-fb470c1ffb53
+  name: Reach Woodworking Level 15
+  description: Craft Woodworking recipes until the building reaches level 15.
+  order: 445
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Woodworking
+    level: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+    - itemId: Timberfuzz
+      quantity: 15
+
+- id: 75f61153-84ad-454a-87ea-08e7d71d276d
+  name: Reach Artificing Level 15
+  description: Craft Artificing recipes until the building reaches level 15.
+  order: 455
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Artificing
+    level: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000
+    - itemId: Firmwater
+      quantity: 15
+
+- id: be9854b5-7e69-4a05-88b6-a6a4999431ab
+  name: Craft a Finely-made Sharp Star
+  description: Craft a Finely-made Sharp Star so Blacksmithing can grow past level 15.
+  order: 465
+  requirement:
+    kind: CraftRecipe
+    recipeId: 'Collectible: Finely-made Sharp Star'
+    quantity: 1
+  rewards:
+    - itemId: Gold Coin
+      quantity: 7500
+    - itemId: Cimmerian Dust
+      quantity: 10

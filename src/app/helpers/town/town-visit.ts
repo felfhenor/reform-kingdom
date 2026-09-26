@@ -10,6 +10,7 @@ import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-ro
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type { TownContent, TownId } from '@interfaces';
+import { taskEventTownVisited } from '@helpers/task/task-events';
 
 export function isPartyAtTown(townId: TownId): boolean {
   const entry = worldNodeAtCurrentLocation();
@@ -48,6 +49,7 @@ export function townMarkVisited(townId: TownId): void {
   });
 
   if (!alreadyVisited) {
+    void taskEventTownVisited(townId);
     analyticsSendDesignEvent(
       `Town:Visit:${analyticsSafeSegment(town?.name ?? townId)}`,
     );

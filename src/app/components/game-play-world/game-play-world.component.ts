@@ -14,6 +14,7 @@ import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-glob
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
 import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
+import { StatusTaskListComponent } from '@components/status-task-list/status-task-list.component';
 import { StatusTutorialUnlockComponent } from '@components/status-tutorial-unlock/status-tutorial-unlock.component';
 import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/status-worker-levelup.component';
 import {
@@ -144,6 +145,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
     StatusCraftingComponent,
     StatusWorkerLevelupComponent,
     StatusTutorialUnlockComponent,
+    StatusTaskListComponent,
   ],
   template: `
     <div #pixiContainer class="h-full w-full"></div>
@@ -169,6 +171,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
       <app-status-crafting></app-status-crafting>
       <app-status-tutorial-unlock></app-status-tutorial-unlock>
     </div>
+    <app-status-task-list class="task-list-layer"></app-status-task-list>
   `,
   styleUrl: './game-play-world.component.scss',
 })

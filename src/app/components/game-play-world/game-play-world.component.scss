@@ -2,6 +2,7 @@
 
 :host {
   @apply block w-full h-full relative;
+  --status-bubble-expanded-height: 48px;
 }
 
 .fade-overlay {
@@ -51,5 +52,12 @@
 
 .top-right-status-layer {
   @apply absolute top-4 right-4 flex gap-2;
+  z-index: 20;
+}
+
+// Pinned below the bubbles' expanded height so it doesn't shift as bubbles appear or expand on hover.
+.task-list-layer {
+  @apply absolute right-4;
+  top: calc(1rem + var(--status-bubble-expanded-height) + 2rem);
   z-index: 20;
 }

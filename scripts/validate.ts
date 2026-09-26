@@ -21,6 +21,7 @@ import { runCommissionRewardsAnalysis } from '@helpers/debug/analysis-commission
 import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gatherdevelopmentlevels';
 import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townmaterialthresholds';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
+import { runTasksAnalysis } from '@helpers/debug/analysis-tasks';
 import { runTrainersAnalysis } from '@helpers/debug/analysis-trainers';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
@@ -56,6 +57,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     },
     { title: 'validate:shrines', run: runShrinesAnalysis },
     { title: 'validate:trainers', run: runTrainersAnalysis },
+    { title: 'validate:tasks', run: runTasksAnalysis },
     { title: 'validate:skills', run: runSkillsAnalysis },
     { title: 'validate:skillbonuses', run: runSkillBonusesAnalysis },
   ];
