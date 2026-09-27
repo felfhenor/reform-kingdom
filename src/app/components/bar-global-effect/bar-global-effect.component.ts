@@ -19,6 +19,9 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-bar-global-effect',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AtlasImageComponent, TippyDirective],
+  host: {
+    class: 'min-h-[80px]',
+  },
   template: `
     @if (displayedEffects().length > 0) {
       <ul class="flex gap-2 items-center p-2 bg-transparent">
