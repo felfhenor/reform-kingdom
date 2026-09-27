@@ -33,7 +33,8 @@ export class SlotCaravanTradeComponent {
   public row = input.required<CaravanTradeRow>();
   public merchantLabel = input('caravan');
 
-  public activate = output<void>();
+  // Emits whether the confirmation should be skipped (shift-click).
+  public activate = output<boolean>();
 
   public goldCoinItemId = goldCoinId();
 

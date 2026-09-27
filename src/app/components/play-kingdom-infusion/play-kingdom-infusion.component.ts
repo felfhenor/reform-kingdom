@@ -286,15 +286,24 @@ export class PlayKingdomInfusionComponent {
       : base;
   }
 
-  public requestInfuse(materialItemId: ItemId, event: MouseEvent): void {
+  public requestInfuse(
+    materialItemId: ItemId,
+    event: Event,
+    skipConfirm = false,
+  ): void {
+    this.pendingMaterialId.set(materialItemId);
+    this.pendingSourceEl =
+      (event.currentTarget as HTMLElement).querySelector('img') ?? undefined;
+    if (skipConfirm) {
+      this.confirmInfuse();
+      return;
+    }
+
     const swal = this.infuseSwal();
     if (!swal) return;
 
     // `swalOptions` is a plain setter, unlike `[text]` which needs an Angular flush - too late for a synchronous `.fire()` right after.
     swal.swalOptions = { text: this.buildInfuseConfirmText(materialItemId) };
-    this.pendingMaterialId.set(materialItemId);
-    this.pendingSourceEl =
-      (event.currentTarget as HTMLElement).querySelector('img') ?? undefined;
     swal.fire();
   }
 

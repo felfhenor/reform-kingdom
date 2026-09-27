@@ -8,6 +8,7 @@ import {
   isDevMode,
   provideZonelessChangeDetection,
 } from '@angular/core';
+import { EVENT_MANAGER_PLUGINS } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   provideRouter,
@@ -32,6 +33,7 @@ import { routes } from '@routes/app.routes';
 import { AnalyticsService } from '@services/analytics.service';
 import { APIService } from '@services/api.service';
 import { BGMService } from '@services/bgm.service';
+import { ClickModifiersPlugin } from '@services/click-modifiers.plugin';
 import { ContentService } from '@services/content.service';
 import { GamestateService } from '@services/gamestate.service';
 import { LoggerService, RollbarErrorHandler } from '@services/logger.service';
@@ -49,6 +51,11 @@ import { provideToastr } from 'ngx-toastr';
 export const appConfig: ApplicationConfig = {
   providers: [
     NG_EVENT_PLUGINS,
+    {
+      provide: EVENT_MANAGER_PLUGINS,
+      useClass: ClickModifiersPlugin,
+      multi: true,
+    },
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

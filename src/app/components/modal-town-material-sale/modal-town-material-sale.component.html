@@ -11,7 +11,7 @@
       <app-slot-caravan-trade
         [row]="row"
         merchantLabel="town"
-        (activate)="requestTrade(row)"
+        (activate)="requestTrade(row, $event)"
       />
     } @empty {
       <app-blank-slate>

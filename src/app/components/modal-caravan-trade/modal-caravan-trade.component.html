@@ -32,7 +32,10 @@
 
     <div class="flex flex-col gap-2">
       @for (row of trades(); track row.index) {
-        <app-slot-caravan-trade [row]="row" (activate)="requestTrade(row)" />
+        <app-slot-caravan-trade
+          [row]="row"
+          (activate)="requestTrade(row, $event)"
+        />
       } @empty {
         <app-blank-slate>
           This trader has nothing in stock right now.

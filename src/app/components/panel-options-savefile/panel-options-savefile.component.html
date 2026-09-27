@@ -45,7 +45,8 @@
         <div class="card-actions">
           <button
             class="btn btn-error"
-            [swal]="deleteSwal"
+            (click)="$event.shiftKey || deleteSwal.fire()"
+            (click.shift)="deleteSavefile()"
             appAnalyticsClick="Savefile:Delete"
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"

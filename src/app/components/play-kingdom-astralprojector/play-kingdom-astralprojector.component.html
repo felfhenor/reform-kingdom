@@ -54,7 +54,8 @@
           <button
             class="btn btn-xs btn-primary"
             [disabled]="!row.castable"
-            (click)="onCastClick(row.content)"
+            (click)="$event.shiftKey || onCastClick(row.content)"
+            (click.shift)="onCastClick(row.content, true)"
             appSfx="ui-click"
             [sfxOffset]="$index"
             [sfxTrigger]="['click', 'hover']"

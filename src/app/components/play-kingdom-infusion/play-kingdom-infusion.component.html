@@ -167,7 +167,13 @@
                       <button
                         appListRow
                         [disabled]="!affordable || !modifiable"
-                        (click)="requestInfuse(entry.item.id, $event)"
+                        (click)="
+                          $event.shiftKey ||
+                            requestInfuse(entry.item.id, $event)
+                        "
+                        (click.shift)="
+                          requestInfuse(entry.item.id, $event, true)
+                        "
                         appSfx="ui-click"
                         [sfxOffset]="$index"
                         [sfxTrigger]="['click', 'hover']"

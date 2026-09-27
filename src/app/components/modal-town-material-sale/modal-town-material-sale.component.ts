@@ -86,10 +86,15 @@ export class ModalTownMaterialSaleComponent {
   private quantitySwal = viewChild<SwalComponent>('quantitySwal');
   private pendingRow = signal<CaravanTradeRow | undefined>(undefined);
 
-  public requestTrade(row: CaravanTradeRow): void {
+  public requestTrade(row: CaravanTradeRow, skipConfirm = false): void {
     if (row.soldOut || row.maxQuantity <= 0) return;
 
     this.pendingRow.set(row);
+    if (skipConfirm) {
+      this.confirmSingle();
+      return;
+    }
+
     const name = caravanTradeDisplay(row.trade)?.name ?? 'this';
     const price = formatNumber(row.price, this.locale);
 

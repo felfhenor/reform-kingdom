@@ -304,11 +304,17 @@ export class PanelPlayKingdomTradeskillComponent {
   }
 
   public requestRemoveQueueEntry(
-    event: MouseEvent,
+    event: Event,
     entryId: CraftQueueEntryId,
+    skipConfirm = false,
   ): void {
     event.preventDefault();
     this.pendingRemoveEntryId.set(entryId);
+    if (skipConfirm) {
+      this.confirmRemoveQueueEntry();
+      return;
+    }
+
     this.removeSwal()?.fire();
   }
 

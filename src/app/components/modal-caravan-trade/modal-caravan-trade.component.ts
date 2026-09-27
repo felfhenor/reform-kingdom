@@ -156,10 +156,15 @@ export class ModalCaravanTradeComponent {
 
   // A trade with only one unit available skips straight to a plain yes/no
   // confirm; anything more prompts for how many (0 = cancel).
-  public requestTrade(row: CaravanTradeRow): void {
+  public requestTrade(row: CaravanTradeRow, skipConfirm = false): void {
     if (row.soldOut || row.maxQuantity <= 0) return;
 
     this.pendingRow.set(row);
+    if (skipConfirm) {
+      this.confirmSingle();
+      return;
+    }
+
     const name =
       caravanTradeDisplay(row.trade, row.equipmentItem)?.name ?? 'this';
     const verb = row.trade.type === 'sell' ? 'Buy' : 'Sell';

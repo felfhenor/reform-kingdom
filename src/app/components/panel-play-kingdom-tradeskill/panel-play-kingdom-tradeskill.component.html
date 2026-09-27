@@ -84,7 +84,10 @@
               type="button"
               [tp]="'Click to remove from the queue'"
               [tpPlacement]="'top'"
-              (click)="requestRemoveQueueEntry($event, q.entry.id)"
+              (click)="
+                $event.shiftKey || requestRemoveQueueEntry($event, q.entry.id)
+              "
+              (click.shift)="requestRemoveQueueEntry($event, q.entry.id, true)"
               (contextmenu)="requestRemoveQueueEntry($event, q.entry.id)"
               appSfx="ui-error"
               [sfxTrigger]="['click', 'hover']"

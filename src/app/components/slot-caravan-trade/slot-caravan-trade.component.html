@@ -16,7 +16,8 @@
   [disabled]="entry.soldOut || entry.maxQuantity === 0 || hasEnoughGoldToBuy()"
   [tp]="item ? preview.template() : undefined"
   [tpPlacement]="'top'"
-  (click)="activate.emit()"
+  (click)="$event.shiftKey || activate.emit(false)"
+  (click.shift)="activate.emit(true)"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
 >

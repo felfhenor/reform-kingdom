@@ -27,7 +27,8 @@
         type="button"
         class="btn btn-sm btn-primary"
         [disabled]="selectedCount() === 0"
-        [swal]="sellSwal"
+        (click)="$event.shiftKey || sellSwal.fire()"
+        (click.shift)="confirmSell()"
         appSfx="ui-success"
         [sfxTrigger]="['click', 'hover']"
       >

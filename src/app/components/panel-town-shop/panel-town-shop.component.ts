@@ -103,10 +103,15 @@ export class PanelTownShopComponent {
   private confirmSwal = viewChild<SwalComponent>('confirmSwal');
   private pendingRow = signal<TownStockRow | undefined>(undefined);
 
-  public requestTrade(row: TownStockRow): void {
+  public requestTrade(row: TownStockRow, skipConfirm = false): void {
     if (row.price === undefined || !row.affordable) return;
 
     this.pendingRow.set(row);
+    if (skipConfirm) {
+      void this.confirmSingle();
+      return;
+    }
+
     const name = this.stockEntryName(row.entry);
     const price = formatNumber(row.price, this.locale);
 

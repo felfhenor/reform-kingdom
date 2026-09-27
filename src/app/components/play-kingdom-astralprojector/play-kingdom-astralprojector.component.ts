@@ -80,10 +80,13 @@ export class PlayKingdomAstralProjectorComponent {
   private pendingCastId = signal<AstralProjectorId | undefined>(undefined);
   public overwriteTargetName = signal<string | undefined>(undefined);
 
-  public onCastClick(content: AstralProjectorContent): void {
+  public onCastClick(
+    content: AstralProjectorContent,
+    skipConfirm = false,
+  ): void {
     const overwritten = astralProjectorSpellToBeOverwritten(content.id);
 
-    if (overwritten) {
+    if (overwritten && !skipConfirm) {
       this.pendingCastId.set(content.id);
       this.overwriteTargetName.set(overwritten.name);
       this.overwriteSwal()?.fire();
