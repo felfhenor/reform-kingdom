@@ -26,6 +26,11 @@ function xpGainMultiplier(): number {
   return 1 + globalEffectSums().xpGainMultiplierBonus;
 }
 
+// What each hero actually receives, so anything reporting an XP gain should show this rather than the raw amount.
+export function partyXpGainAmount(amount: number): number {
+  return Math.round(amount * xpGainMultiplier());
+}
+
 export function syncPartyHpFromCombat(heroes: Combatant[]): void {
   updateGamestate((state) => {
     state.world.party = state.world.party.map((character) => {
@@ -139,7 +144,7 @@ export function retrofitPartyXp(party: Character[]): Character[] {
 
 // The return value tells callers when to retry nodes previously given up on.
 export function partyGainXp(amount: number): boolean {
-  const boostedAmount = Math.round(amount * xpGainMultiplier());
+  const boostedAmount = partyXpGainAmount(amount);
   // Only the level is kept from the pre-update character - the character itself is a draft and is revoked after the callback.
   const progress: { beforeLevel: number; after: Character }[] = [];
 

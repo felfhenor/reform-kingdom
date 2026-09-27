@@ -66,6 +66,7 @@ import {
   healingTicksForLevel,
   healPartyToFull,
   partyGainXp,
+  partyXpGainAmount,
   retrofitPartyXp,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
@@ -211,6 +212,20 @@ describe('Character Progress Helper Functions', () => {
           maximum: characterXpForLevel(5),
         },
       });
+    });
+  });
+
+  describe('partyXpGainAmount', () => {
+    it('returns the raw amount when there is no xp gain bonus', () => {
+      expect(partyXpGainAmount(152)).toBe(152);
+    });
+
+    it('applies the xp gain multiplier bonus and rounds, matching what partyGainXp grants', () => {
+      vi.mocked(globalEffectSums).mockReturnValue({
+        xpGainMultiplierBonus: 0.0921,
+      } as GlobalEffectSums);
+
+      expect(partyXpGainAmount(152)).toBe(166);
     });
   });
 

@@ -42,6 +42,7 @@ vi.mock('@helpers/commission/commission-kill-progress', () => ({
 
 vi.mock('@helpers/hero/character-progress', () => ({
   partyGainXp: vi.fn(),
+  partyXpGainAmount: vi.fn((amount: number) => amount),
   syncPartyHpFromCombat: vi.fn(),
 }));
 
@@ -109,6 +110,7 @@ vi.mock('@helpers/town/raid/town-raid-resolve', () => ({
 import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
 import {
   collectibleDropHtml,
+  combatMessageLog,
   recipeDropHtml,
 } from '@helpers/combat/combat-log';
 import { combatReset } from '@helpers/combat/combat-state';
@@ -126,7 +128,10 @@ import {
 } from '@helpers/decree/auto-mode';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { partyGainXp } from '@helpers/hero/character-progress';
+import {
+  partyGainXp,
+  partyXpGainAmount,
+} from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { rollDroppedRewards } from '@helpers/item/loot';
@@ -451,6 +456,45 @@ describe('combatCheckIfOver', () => {
     // Uses the highest hero level (7) against the node's max (5).
     expect(xpForOverLevel).toHaveBeenCalledWith(100, 7, 5);
     expect(partyGainXp).toHaveBeenCalledWith(50);
+  });
+
+  it('logs the XP the party actually received after the gain multiplier, not the raw amount', () => {
+    const monster = { id: 'monster-1' } as MonsterContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [],
+      levelRange: { min: 3, max: 5 },
+    } as unknown as EncounterContent;
+
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : monster) as never,
+    );
+    vi.mocked(monsterXpReward).mockReturnValue(100);
+    vi.mocked(xpForOverLevel).mockReturnValue(50);
+    vi.mocked(partyXpGainAmount).mockReturnValueOnce(60);
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      heroes: [buildCombatant({ id: 'hero-1', level: 4, hp: 10 })],
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+          level: 5,
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(partyXpGainAmount).toHaveBeenCalledWith(50);
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      combat,
+      'The party gained 60 XP!',
+    );
   });
 
   it("grants over-level-scaled XP for a raid win, using the town's assaulter max level", () => {

@@ -21,6 +21,7 @@ import {
 } from '@helpers/engine/analytics';
 import {
   partyGainXp,
+  partyXpGainAmount,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
@@ -120,7 +121,10 @@ function grantVictoryRewards(combat: Combat): void {
   });
   if (totalXp > 0) {
     const leveledUp = partyGainXp(totalXp);
-    combatMessageLog(combat, `The party gained ${totalXp} XP!`);
+    combatMessageLog(
+      combat,
+      `The party gained ${partyXpGainAmount(totalXp)} XP!`,
+    );
     if (leveledUp) autoModeResetNodeFailureCounts();
   }
 
