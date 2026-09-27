@@ -171,35 +171,31 @@
       tiers:
         - tier: 1
           stats:
-            Intelligence: 1
+            Intelligence: 3
+
+        - tier: 2
+          stats:
+            Intelligence: 5
 
           debuffResistances:
             Bleed: 5
             Stun: 5
 
-        - tier: 2
+        - tier: 3
           stats:
-            Intelligence: 3
+            Intelligence: 7
 
           debuffResistances:
             Bleed: 10
             Stun: 10
-
-        - tier: 3
-          stats:
-            Intelligence: 5
-
-          debuffResistances:
-            Bleed: 15
-            Stun: 15
 
         - tier: 4
           stats:
             Intelligence: 10
 
           debuffResistances:
-            Bleed: 25
-            Stun: 25
+            Bleed: 15
+            Stun: 15
 
   defense:
     rewards:

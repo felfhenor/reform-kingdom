@@ -162,43 +162,31 @@
       tiers:
         - tier: 1
           stats:
-            Strength: 1
+            Strength: 3
 
-          combatStats:
-            reviveChance: 1
+        - tier: 2
+          stats:
+            Strength: 5
 
           debuffResistances:
             Accuracy: 5
 
-        - tier: 2
+        - tier: 3
           stats:
-            Strength: 3
-
-          combatStats:
-            reviveChance: 2
+            Strength: 7
 
           debuffResistances:
             Accuracy: 10
-
-        - tier: 3
-          stats:
-            Strength: 5
-
-          combatStats:
-            reviveChance: 3
-
-          debuffResistances:
-            Accuracy: 15
 
         - tier: 4
           stats:
             Strength: 10
 
           combatStats:
-            reviveChance: 5
+            reviveChance: 1
 
           debuffResistances:
-            Accuracy: 25
+            Accuracy: 15
 
   defense:
     rewards:
