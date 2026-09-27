@@ -2,10 +2,12 @@ import {
   afterNextRender,
   DestroyRef,
   Directive,
+  effect,
   ElementRef,
   inject,
   Injector,
   input,
+  untracked,
 } from '@angular/core';
 import { AnimationService } from '@services/animation.service';
 import { clamp } from 'es-toolkit/compat';
@@ -31,24 +33,56 @@ export class ListReflowDirective {
   private running = new Map<Element, Animation>();
   private fading = new Map<Element, Animation>();
   private isOffsetParent = false;
+  private isBaselined = false;
+  private isDestroyed = false;
+  private stopObserving?: () => void;
   private resizes = new ResizeObserver(() => this.rebaseline());
 
   constructor() {
+    effect(() => {
+      if (this.appListReflowEnabled()) untracked(() => this.start());
+      else this.stop();
+    });
+
+    inject(DestroyRef).onDestroy(() => {
+      this.isDestroyed = true;
+      this.stop();
+    });
+  }
+
+  // Observers only exist while enabled, so a grid that opts out pays nothing and keeps its own positioning.
+  private start(): void {
+    if (this.stopObserving) return;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const mutations = new MutationObserver(() => this.reflow());
     const onScroll = () => (this.scroll = this.currentScroll());
+    // Mutations before this fires are the initial population; later ones, including into an empty list, glide.
+    const baselineTimer = setTimeout(() => {
+      this.isBaselined = true;
+      this.rebaseline();
+    });
 
     mutations.observe(this.container, { childList: true });
     this.container.addEventListener('scroll', onScroll, { passive: true });
     this.observeSizes();
 
-    inject(DestroyRef).onDestroy(() => {
+    this.stopObserving = () => {
       mutations.disconnect();
       this.resizes.disconnect();
       this.container.removeEventListener('scroll', onScroll);
-      this.running.forEach((animation) => animation.cancel());
-      this.fading.forEach((animation) => animation.cancel());
+      clearTimeout(baselineTimer);
+    };
+  }
+
+  private stop(): void {
+    this.stopObserving?.();
+    this.stopObserving = undefined;
+    this.isBaselined = false;
+    this.positions.clear();
+    [this.running, this.fading].forEach((animations) => {
+      animations.forEach((animation) => animation.cancel());
+      animations.clear();
     });
   }
 
@@ -69,6 +103,8 @@ export class ListReflowDirective {
 
   // Waits out the render and observer pass a drop triggers, or the reorder it caused would still glide.
   public release(): void {
+    if (this.isDestroyed) return;
+
     afterNextRender(() => queueMicrotask(() => (this.isHeld = false)), {
       injector: this.injector,
     });
@@ -120,11 +156,7 @@ export class ListReflowDirective {
       }),
     );
 
-    if (
-      this.positions.size > 0 &&
-      this.appListReflowEnabled() &&
-      !this.isHeld
-    ) {
+    if (this.isBaselined && !this.isHeld) {
       next.forEach((position, child) =>
         this.glide(child as HTMLElement, position, nextScroll),
       );

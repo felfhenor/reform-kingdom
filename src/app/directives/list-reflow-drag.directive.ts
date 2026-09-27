@@ -10,13 +10,22 @@ export class ListReflowDragDirective {
   constructor() {
     const drag = inject(CdkDrag);
     const reflow = inject(ListReflowDirective);
+    let isDragging = false;
     const subscriptions = [
-      drag.started.subscribe(() => reflow.hold()),
-      drag.ended.subscribe(() => reflow.release()),
+      drag.started.subscribe(() => {
+        isDragging = true;
+        reflow.hold();
+      }),
+      drag.ended.subscribe(() => {
+        isDragging = false;
+        reflow.release();
+      }),
     ];
 
-    inject(DestroyRef).onDestroy(() =>
-      subscriptions.forEach((subscription) => subscription.unsubscribe()),
-    );
+    // CDK never emits `ended` for a row destroyed mid-drag, which would leave the list held for good.
+    inject(DestroyRef).onDestroy(() => {
+      subscriptions.forEach((subscription) => subscription.unsubscribe());
+      if (isDragging) reflow.release();
+    });
   }
 }
