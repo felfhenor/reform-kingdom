@@ -1,3 +1,4 @@
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -18,6 +19,7 @@ import {
   tutorialTargetRect,
 } from '@helpers/tutorial/tutorial-engine.ui';
 import type { TutorialId } from '@interfaces';
+import { AnimationService } from '@services/animation.service';
 import { LoadingService } from '@services/loading.service';
 import { clamp } from 'es-toolkit/compat';
 
@@ -45,6 +47,7 @@ const STEP_SETTLE_DELAY_MS = 250;
 export class TutorialOverlayComponent {
   private router = inject(Router);
   private loadingService = inject(LoadingService);
+  private anim = inject(AnimationService);
 
   private resizeTick = signal(0);
 
@@ -135,6 +138,21 @@ export class TutorialOverlayComponent {
       );
       onCleanup(() => clearTimeout(timeoutId));
     });
+  }
+
+  public onBackdropEnter(event: AnimationCallbackEvent): void {
+    this.anim.fadeIn(event.target, 220);
+  }
+
+  public onBackdropLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target, 150)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
+  }
+
+  public onCalloutEnter(event: AnimationCallbackEvent): void {
+    this.anim.slideIn(event.target);
   }
 
   public bumpResizeTick(): void {

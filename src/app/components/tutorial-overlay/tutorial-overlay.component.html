@@ -3,7 +3,11 @@
     @let rect = targetRect()!;
     @let position = calloutPosition();
 
-    <div class="tutorial-backdrop">
+    <div
+      class="tutorial-backdrop"
+      (animate.enter)="onBackdropEnter($event)"
+      (animate.leave)="onBackdropLeave($event)"
+    >
       <div
         class="spot-frame"
         [style.top.px]="0"
@@ -42,6 +46,7 @@
 
       <div
         class="tutorial-callout"
+        (animate.enter)="onCalloutEnter($event)"
         [style.top.px]="position.top"
         [style.left.px]="position.left"
       >

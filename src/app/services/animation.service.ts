@@ -41,10 +41,10 @@ export class AnimationService {
     });
   }
 
-  fadeOut(target: Element): JSAnimation {
+  fadeOut(target: Element, duration = 250): JSAnimation {
     return animate(target as DOMTarget, {
       opacity: [1, 0],
-      duration: 250,
+      duration,
       ease: 'inQuad',
     });
   }
@@ -84,13 +84,16 @@ export class AnimationService {
   }
 
   // Opacity only and cleared afterwards: a lingering transform would become the containing block for fixed descendants.
-  fadeIn(target: Element): JSAnimation {
-    const anim = animate(target as DOMTarget, {
+  // Opacity is zeroed up front so the target doesn't paint once at full opacity before the first frame.
+  fadeIn(target: Element, duration = 300): JSAnimation {
+    const el = target as HTMLElement;
+    el.style.opacity = '0';
+    const anim = animate(el as DOMTarget, {
       opacity: [0, 1],
-      duration: 300,
+      duration,
       ease: 'outQuad',
     });
-    anim.then(() => (target as HTMLElement).style.removeProperty('opacity'));
+    anim.then(() => el.style.removeProperty('opacity'));
     return anim;
   }
 

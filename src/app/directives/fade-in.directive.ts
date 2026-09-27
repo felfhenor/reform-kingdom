@@ -6,9 +6,9 @@ import { AnimationService } from '@services/animation.service';
 })
 export class FadeInDirective {
   constructor() {
-    const el = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-    el.style.opacity = '0';
-    const anim = inject(AnimationService).fadeIn(el);
+    const anim = inject(AnimationService).fadeIn(
+      inject<ElementRef<HTMLElement>>(ElementRef).nativeElement,
+    );
     inject(DestroyRef).onDestroy(() => anim.pause());
   }
 }
