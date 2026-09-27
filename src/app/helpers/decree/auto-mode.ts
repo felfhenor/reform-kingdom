@@ -1,6 +1,10 @@
 import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
+  autoModeIsEnabled,
+  autoModeSetActiveClause,
+} from '@helpers/decree/auto-mode-state';
+import {
   decreeClauses,
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree';
@@ -9,7 +13,6 @@ import {
   isClauseBlockedOnlyByHealth,
   pickNextClause,
 } from '@helpers/decree/decree-evaluation';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
   addGlobalEffect,
   isGlobalEffectActive,
@@ -20,7 +23,6 @@ import { travelStart } from '@helpers/hero/travel';
 import { gatheringStop, isGathering } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import {
-  updateGamestate,
   worldAutoModeState,
   worldGatheringState,
   worldTravelState,
@@ -36,83 +38,9 @@ import {
 } from '@helpers/world-node/world-nodes';
 import type {
   DecreeClause,
-  DecreeClauseId,
   GlobalEffectContent,
   GlobalEffectId,
 } from '@interfaces';
-
-export function autoModeIsEnabled(): boolean {
-  return worldAutoModeState().enabled;
-}
-
-export function autoModeToggle(enabled: boolean): void {
-  updateGamestate((state) => {
-    state.world.autoMode.enabled = enabled;
-    if (!enabled) state.world.autoMode.activeClauseId = undefined;
-    return state;
-  });
-}
-
-function setActiveClause(clauseId?: DecreeClauseId): void {
-  updateGamestate((state) => {
-    state.world.autoMode.activeClauseId = clauseId;
-    return state;
-  });
-}
-
-function updateActiveClauseFailureCount(
-  nextFailureCount: (current: number) => number,
-): void {
-  const activeClauseId = worldAutoModeState().activeClauseId;
-  if (!activeClauseId) return;
-
-  updateGamestate((state) => {
-    state.world.autoMode.clauses.forEach((clause) => {
-      if (clause.id === activeClauseId) {
-        clause.failureCount = nextFailureCount(clause.failureCount);
-      }
-    });
-    return state;
-  });
-}
-
-export function autoModeRecordClauseFailure(): void {
-  updateActiveClauseFailureCount((count) => count + 1);
-}
-
-// A won fight proves the clause works again, so its failure streak shouldn't keep tripping the UI's warning forever.
-export function autoModeRecordClauseSuccess(): void {
-  updateActiveClauseFailureCount(() => 0);
-}
-
-// Recorded for every lost fight regardless of clause.
-export function autoModeRecordNodeFailure(nodeName: string): void {
-  let newFailureCount = 0;
-
-  updateGamestate((state) => {
-    const counts = state.world.autoMode.nodeFailureCounts;
-    newFailureCount = (counts[nodeName] ?? 0) + 1;
-    counts[nodeName] = newFailureCount;
-    return state;
-  });
-
-  analyticsSendDesignEvent('World:Node:Fail', newFailureCount);
-}
-
-export function autoModeRecordNodeSuccess(nodeName: string): void {
-  updateGamestate((state) => {
-    state.world.autoMode.nodeFailureCounts[nodeName] = 0;
-    return state;
-  });
-}
-
-// Called on level-up so a stronger party gets a fresh try at nodes previously written off.
-export function autoModeResetNodeFailureCounts(): void {
-  updateGamestate((state) => {
-    state.world.autoMode.nodeFailureCounts = {};
-    return state;
-  });
-}
 
 function syncAutoModeGlobalEffect(enabled: boolean): void {
   const isEffectActive = isGlobalEffectActive('Auto Mode' as GlobalEffectId);
@@ -148,7 +76,7 @@ function adoptInProgressGatherClause(): void {
   );
   if (!matchingClause) return;
 
-  setActiveClause(matchingClause.id);
+  autoModeSetActiveClause(matchingClause.id);
 }
 
 // Gathering loops forever on its own; this ends it once the target is reached and hands control back to clause re-evaluation.
@@ -164,7 +92,7 @@ function stopGatherIfTargetReached(): void {
   if (getMaterialQuantity(clause.materialId) < clause.targetQuantity) return;
 
   gatheringStop();
-  setActiveClause(undefined);
+  autoModeSetActiveClause(undefined);
 }
 
 function isPartyIdleForAutoMode(): boolean {
@@ -196,7 +124,7 @@ function stopOrphanedGather(): boolean {
 }
 
 function runClause(clause: DecreeClause): void {
-  setActiveClause(clause.id);
+  autoModeSetActiveClause(clause.id);
 
   if (clause.type === 'ReturnToKingdom') {
     const home = homeNodeGet();
@@ -210,7 +138,7 @@ function runClause(clause: DecreeClause): void {
 
 // Parks at home when no clause is satisfiable, rather than leaving the party stuck. Not tracked as an active clause, so it never accrues failures.
 function returnToKingdomFallback(): void {
-  setActiveClause(undefined);
+  autoModeSetActiveClause(undefined);
   if (isPlayerAtHome()) return;
 
   const home = homeNodeGet();
@@ -227,7 +155,7 @@ function advanceToNextClause(): void {
 
   // Blocked only by the health gate - stay put and heal in place, instead of trekking back home.
   if (clauses.some(isClauseBlockedOnlyByHealth)) {
-    setActiveClause(undefined);
+    autoModeSetActiveClause(undefined);
     return;
   }
 
@@ -282,7 +210,7 @@ function interruptForPriorityChange(): boolean {
   // role to the real top-priority clause, so quantity/failure tracking follows it, without
   // restarting an already-correct gather/travel.
   if (nextTarget === currentTarget) {
-    setActiveClause(nextClause.id);
+    autoModeSetActiveClause(nextClause.id);
     return false;
   }
 

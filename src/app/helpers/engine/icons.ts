@@ -1,4 +1,4 @@
-import type { IconSize } from '@interfaces/artable';
+import type { IconSize } from '@interfaces/icon-size';
 import {
   gameAges,
   gameAngelWings,

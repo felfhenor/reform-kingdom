@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(() => ({
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  globalEffectSumsState: vi.fn(() => ({
     offPathTravelSpeedBonus: 0,
     onPathTravelSpeedBonus: 0,
   })),
@@ -15,7 +16,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeAt: vi.fn(() => undefined),
 }));
 
-import { globalEffectSums } from '@helpers/hero/global-effects';
+import { globalEffectSumsState } from '@helpers/state-game';
 import {
   travelPathTotalTicks,
   travelStepTicksCost,
@@ -35,7 +36,7 @@ const offPathStep: TravelStep = {
 describe('travelStepTicksCost', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0,
       onPathTravelSpeedBonus: 0,
     } as never);
@@ -69,7 +70,7 @@ describe('travelStepTicksCost', () => {
   });
 
   it('never applies the off-path boost to on-path movement', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0.5,
       onPathTravelSpeedBonus: 0,
     } as never);
@@ -78,7 +79,7 @@ describe('travelStepTicksCost', () => {
   });
 
   it('reduces the off-path cost proportionally, without rounding to a whole tick', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0.1,
       onPathTravelSpeedBonus: 0,
     } as never);
@@ -86,7 +87,7 @@ describe('travelStepTicksCost', () => {
   });
 
   it('never reduces off-path travel below the on-path cost (+TICKS_PER_STEP_MIN_DIFF), even with an extreme boost', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 5,
       onPathTravelSpeedBonus: 0,
     } as never);
@@ -94,7 +95,7 @@ describe('travelStepTicksCost', () => {
   });
 
   it('never applies the on-path boost to off-path movement', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0,
       onPathTravelSpeedBonus: 0.5,
     } as never);
@@ -102,7 +103,7 @@ describe('travelStepTicksCost', () => {
   });
 
   it('reduces the on-path cost proportionally, so even a small boost has an effect', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0,
       onPathTravelSpeedBonus: 0.05,
     } as never);
@@ -111,7 +112,7 @@ describe('travelStepTicksCost', () => {
   });
 
   it('clamps the on-path cost to TICKS_PER_STEP_MIN_DIFF once the boost passes 75%', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0,
       onPathTravelSpeedBonus: 0.9,
     } as never);
@@ -120,7 +121,7 @@ describe('travelStepTicksCost', () => {
   });
 
   it('never reduces the on-path cost below TICKS_PER_STEP_MIN_DIFF, even with an extreme boost', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0,
       onPathTravelSpeedBonus: 5,
     } as never);
@@ -137,7 +138,7 @@ describe('travelPathTotalTicks', () => {
   });
 
   it('sums each step, applying an active off-path speed boost to every off-path step', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0.5,
     } as never);
     const path: TravelStep[] = [

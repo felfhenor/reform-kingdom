@@ -86,7 +86,7 @@ vi.mock('@helpers/crafting/tradeskill', () => ({
   retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
 }));
 
-vi.mock('@helpers/town/town-tick', () => ({
+vi.mock('@helpers/town/town-prune', () => ({
   pruneInvalidTowns: vi.fn((towns) => towns),
 }));
 

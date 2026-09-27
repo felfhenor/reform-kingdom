@@ -4,7 +4,7 @@ vi.mock('@helpers/caravan/caravan', () => ({
   caravanMarkVisited: vi.fn(),
 }));
 
-vi.mock('@helpers/decree/auto-mode', () => ({
+vi.mock('@helpers/decree/auto-mode-state', () => ({
   autoModeIsEnabled: vi.fn(() => false),
   autoModeToggle: vi.fn(),
 }));
@@ -12,10 +12,6 @@ vi.mock('@helpers/decree/auto-mode', () => ({
 vi.mock('@helpers/hero/global-effects', () => ({
   addGlobalEffect: vi.fn(),
   isGlobalEffectActive: vi.fn(() => false),
-  globalEffectSums: vi.fn(() => ({
-    offPathTravelSpeedBonus: 0,
-    onPathTravelSpeedBonus: 0,
-  })),
 }));
 
 vi.mock('@helpers/encounter/encounter', () => ({
@@ -57,6 +53,10 @@ vi.mock('@helpers/state-game', () => {
   return {
     gamestate,
     updateGamestate: vi.fn(),
+    globalEffectSumsState: vi.fn(() => ({
+      offPathTravelSpeedBonus: 0,
+      onPathTravelSpeedBonus: 0,
+    })),
     worldTravelState: () => gamestate().world.travel,
     worldCombatState: vi.fn(() => undefined),
     worldCurrentLocationState: vi.fn(),
@@ -91,12 +91,14 @@ vi.mock('@helpers/engine/ui', () => ({
 }));
 
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
-import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
+import {
+  autoModeIsEnabled,
+  autoModeToggle,
+} from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
 import {
   addGlobalEffect,
-  globalEffectSums,
   isGlobalEffectActive,
 } from '@helpers/hero/global-effects';
 import {
@@ -113,6 +115,7 @@ import { mapHopsBetween, tileIsOnPath } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import {
   gamestate,
+  globalEffectSumsState,
   updateGamestate,
   worldCombatState,
   worldCurrentLocationState,
@@ -150,7 +153,7 @@ function applyLastUpdate(state: GameState): GameState {
 }
 
 beforeEach(() => {
-  vi.mocked(globalEffectSums).mockReturnValue({
+  vi.mocked(globalEffectSumsState).mockReturnValue({
     offPathTravelSpeedBonus: 0,
     onPathTravelSpeedBonus: 0,
   } as never);
@@ -255,7 +258,7 @@ describe('travelEtaSecondsTo', () => {
   });
 
   it('rounds a fractional remaining time up to the tick the party arrives on', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0.1,
       onPathTravelSpeedBonus: 0,
     } as never);
@@ -671,7 +674,7 @@ describe('travelProcessTick', () => {
   });
 
   it('carries surplus progress into the next step when a boost makes a step cost under a tick', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       offPathTravelSpeedBonus: 0,
       onPathTravelSpeedBonus: 0.25,
     } as never);

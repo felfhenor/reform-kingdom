@@ -10,9 +10,12 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { roundToNearest10 } from '@helpers/engine/number';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { tradeskillsState, updateGamestate } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  tradeskillsState,
+  updateGamestate,
+} from '@helpers/state-game';
 import type {
   ChanceTier,
   GameState,
@@ -66,7 +69,7 @@ export function tradeskillMaxQueueSize(
 ): number {
   const tradeskillId = tradeskillIdForName(tradeskill);
   const boost = tradeskillId
-    ? (globalEffectSums().tradeskillQueueSizeBoosts[tradeskillId] ?? 0)
+    ? (globalEffectSumsState().tradeskillQueueSizeBoosts[tradeskillId] ?? 0)
     : 0;
   return Math.min(16, 2 + Math.floor(level / 5) + boost);
 }

@@ -44,7 +44,7 @@ import {
 } from '@helpers/kingdom/bestiary';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
-import { pruneInvalidTowns } from '@helpers/town/town-tick';
+import { pruneInvalidTowns } from '@helpers/town/town-prune';
 import {
   pruneInvalidCharacterTeachings,
   pruneInvalidDiscoveredTrainers,

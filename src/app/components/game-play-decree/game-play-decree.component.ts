@@ -20,7 +20,10 @@ import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive'
 import { SFXDirective } from '@directives/sfx.directive';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
+import {
+  autoModeIsEnabled,
+  autoModeToggle,
+} from '@helpers/decree/auto-mode-state';
 import {
   decreeClauseAdd,
   decreeClauseCap,

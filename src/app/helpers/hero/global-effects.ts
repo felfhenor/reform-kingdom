@@ -12,7 +12,6 @@ import {
 import {
   gamestate,
   globalEffectsState,
-  globalEffectSumsState,
   updateGamestate,
   worldPartyState,
   worldCurrentLocationState,
@@ -24,7 +23,6 @@ import type {
   GlobalEffect,
   GlobalEffectContent,
   GlobalEffectId,
-  GlobalEffectSums,
 } from '@interfaces';
 
 export function activeGlobalEffects(): GlobalEffect[] {
@@ -32,10 +30,6 @@ export function activeGlobalEffects(): GlobalEffect[] {
   return globalEffectsState().filter(
     (effect) => effect.expiresAtTick > currentTick,
   );
-}
-
-export function globalEffectSums(): GlobalEffectSums {
-  return globalEffectSumsState();
 }
 
 export function isGlobalEffectActive(globalEffectId: GlobalEffectId): boolean {

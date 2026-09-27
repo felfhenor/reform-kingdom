@@ -26,10 +26,6 @@ vi.mock('@helpers/hero/luck', () => ({
   partyMaxLuck: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(() => ({ gatheringItemDropRateBoost: 0 })),
-}));
-
 vi.mock('@helpers/item/materials', () => ({
   addMaterial: vi.fn(),
 }));
@@ -54,6 +50,7 @@ vi.mock('@helpers/state-game', () => {
   return {
     gamestate,
     updateGamestate: vi.fn(),
+    globalEffectSumsState: vi.fn(() => ({ gatheringItemDropRateBoost: 0 })),
     worldGatheringState: () => gamestate().world.gathering,
     worldPartyState: vi.fn(),
   };
@@ -78,7 +75,6 @@ import { getEntry } from '@helpers/content/content';
 import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import {
@@ -98,6 +94,7 @@ import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import {
   gamestate,
+  globalEffectSumsState,
   updateGamestate,
   worldPartyState,
 } from '@helpers/state-game';
@@ -811,7 +808,7 @@ describe('gatheringProcessTick', () => {
     vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
     vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
     vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       gatheringItemDropRateBoost: 20,
     } as GlobalEffectSums);
     vi.mocked(rngSucceedsChance).mockReturnValue(true);
@@ -830,14 +827,14 @@ describe('gatheringItemDropRateBoost', () => {
   });
 
   it('returns 0 when nothing is active/owned', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       gatheringItemDropRateBoost: 0,
     } as GlobalEffectSums);
     expect(gatheringItemDropRateBoost()).toBe(0);
   });
 
   it('reads the flat percent from the global effect sums cache', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       gatheringItemDropRateBoost: 30,
     } as GlobalEffectSums);
 

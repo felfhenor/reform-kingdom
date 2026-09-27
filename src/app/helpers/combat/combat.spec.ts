@@ -1,13 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@helpers/combat/combat-combatant-hp', () => ({
+  combatantIsDead: vi.fn(() => false),
+  combatCombatantTakeDamage: vi.fn(),
+}));
+
 vi.mock('@helpers/combat/combat-damage', () => ({
   combatApplySkillToTarget: vi.fn(),
-  combatCombatantTakeDamage: vi.fn(),
   techniqueHasAttribute: vi.fn(() => false),
 }));
 
 vi.mock('@helpers/combat/combat-end', () => ({
-  combatantIsDead: vi.fn(() => false),
   combatCheckIfOver: vi.fn(),
   combatHandleDefeat: vi.fn(),
   isCombatOver: vi.fn(() => false),

@@ -18,7 +18,7 @@ vi.mock('@helpers/kingdom/armory', () => ({
   armoryAdd: vi.fn(),
 }));
 
-vi.mock('@helpers/decree/auto-mode', () => ({
+vi.mock('@helpers/decree/auto-mode-state', () => ({
   autoModeRecordClauseFailure: vi.fn(),
   autoModeRecordClauseSuccess: vi.fn(),
   autoModeRecordNodeFailure: vi.fn(),
@@ -125,7 +125,7 @@ import {
   autoModeRecordNodeFailure,
   autoModeRecordNodeSuccess,
   autoModeResetNodeFailureCounts,
-} from '@helpers/decree/auto-mode';
+} from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {

@@ -13,7 +13,7 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import { globalEffectSums } from '@helpers/hero/global-effects';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { characterSkills } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
@@ -55,7 +55,7 @@ function heroUsableSkillIds(
 // Applied once here rather than read live, so the buff holds for the whole encounter even if its timer expires mid-fight.
 // Health/Energy also tops up current hp/ep (not just max), so it's felt immediately even if not at full health.
 function applyActiveGainStatsEffects(combatant: Combatant): void {
-  const { stats } = globalEffectSums();
+  const { stats } = globalEffectSumsState();
 
   (Object.keys(stats) as GameStat[]).forEach((stat) => {
     const value = stats[stat];
@@ -71,7 +71,7 @@ function applyActiveGainStatsEffects(combatant: Combatant): void {
 // The Astral Projector's DebuffResistance spells add a flat percent to
 // every tag, on top of whatever gear already grants.
 function applyActiveDebuffResistanceEffects(combatant: Combatant): void {
-  const { debuffResistanceFlat } = globalEffectSums();
+  const { debuffResistanceFlat } = globalEffectSumsState();
   if (debuffResistanceFlat === 0) return;
 
   (Object.keys(combatant.tagResistance) as StatusEffectTag[]).forEach((tag) => {
@@ -80,7 +80,7 @@ function applyActiveDebuffResistanceEffects(combatant: Combatant): void {
 }
 
 function applyActiveDebuffResistanceTagEffects(combatant: Combatant): void {
-  const { debuffResistanceTags } = globalEffectSums();
+  const { debuffResistanceTags } = globalEffectSumsState();
 
   (Object.keys(debuffResistanceTags) as StatusEffectTag[]).forEach((tag) => {
     const value = debuffResistanceTags[tag];
@@ -90,7 +90,7 @@ function applyActiveDebuffResistanceTagEffects(combatant: Combatant): void {
 }
 
 function applyActiveGainCombatStatEffects(combatant: Combatant): void {
-  const { combatStats } = globalEffectSums();
+  const { combatStats } = globalEffectSumsState();
 
   (Object.keys(combatStats) as CombatStat[]).forEach((combatStat) => {
     const value = combatStats[combatStat];

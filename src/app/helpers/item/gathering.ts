@@ -7,13 +7,13 @@ import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import { taskRecordGather } from '@helpers/task/task-progress';
 import {
+  globalEffectSumsState,
   updateGamestate,
   worldGatheringState,
   worldPartyState,
@@ -144,7 +144,7 @@ function partyGatherYieldBonus(tradeskillIds: TradeskillId[]): number {
 
 // Gather yields are whole numbers, so a percent boost can't scale a quantity directly - it's rolled instead as a chance of +1.
 export function gatheringItemDropRateBoost(): number {
-  return globalEffectSums().gatheringItemDropRateBoost;
+  return globalEffectSumsState().gatheringItemDropRateBoost;
 }
 
 function grantGatherItems(

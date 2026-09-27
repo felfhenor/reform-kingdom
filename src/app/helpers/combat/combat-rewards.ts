@@ -9,7 +9,7 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { isRecipeDiscovered, recipeDiscover } from '@helpers/crafting/recipes';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
-import { globalEffectSums } from '@helpers/hero/global-effects';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
 import { addMaterial, goldCoinId } from '@helpers/item/materials';
@@ -41,7 +41,7 @@ function emitRewardVfx(
 }
 
 function goldGainMultiplier(): number {
-  return 1 + globalEffectSums().goldGainMultiplierBonus;
+  return 1 + globalEffectSumsState().goldGainMultiplierBonus;
 }
 
 // Only Explore/ExploreRandom combat sets encounterId/encounterRandomId - raids (raidTownId) never do.

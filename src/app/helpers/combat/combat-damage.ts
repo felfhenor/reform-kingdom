@@ -1,6 +1,9 @@
+import {
+  combatantIsDead,
+  combatCombatantTakeDamage,
+} from '@helpers/combat/combat-combatant-hp';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitigation';
-import { combatantIsDead } from '@helpers/combat/combat-end';
 import {
   combatantMessageToken,
   combatFormatMessage,
@@ -24,7 +27,6 @@ import { rngSucceedsChance } from '@helpers/rng';
 import type {
   Combat,
   Combatant,
-  DamageEventVariant,
   EquipmentSkill,
   EquipmentSkillAttribute,
   EquipmentSkillContentTechnique,
@@ -34,7 +36,7 @@ import type {
   StatusEffectContent,
 } from '@interfaces';
 import { MagicalStats, PhysicalStats } from '@interfaces';
-import { clamp, sum, sumBy } from 'es-toolkit/compat';
+import { sum, sumBy } from 'es-toolkit/compat';
 
 export function techniqueHasAttribute(
   technique: EquipmentSkillContentTechnique,
@@ -133,23 +135,6 @@ function attackerMonsterTypeDamageBonusPercent(
     monster.types,
     (type) => attacker.monsterTypeDamageBonus?.[type] ?? 0,
   );
-}
-
-export function combatCombatantTakeDamage(
-  combatant: Combatant,
-  damage: number,
-  variant?: DamageEventVariant,
-) {
-  combatant.hp = clamp(combatant.hp - damage, 0, combatant.totalStats.Health);
-
-  // Sign flipped so positive damage shows as "-".
-  if (damage !== 0) {
-    combatantDamageEventEmit(
-      combatant.id,
-      -damage,
-      damage > 0 ? variant : undefined,
-    );
-  }
 }
 
 export function combatApplySkillToTarget(

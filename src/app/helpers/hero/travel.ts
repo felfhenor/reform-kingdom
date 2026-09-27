@@ -5,7 +5,10 @@ import {
   DEATHS_DOOR_SECONDS_PER_MAP,
   TRAVEL_UNITS_PER_TICK,
 } from '@helpers/config';
-import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree/auto-mode';
+import {
+  autoModeIsEnabled,
+  autoModeToggle,
+} from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
 import {

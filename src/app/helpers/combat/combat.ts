@@ -1,13 +1,12 @@
 import {
-  combatApplySkillToTarget,
+  combatantIsDead,
   combatCombatantTakeDamage,
+} from '@helpers/combat/combat-combatant-hp';
+import {
+  combatApplySkillToTarget,
   techniqueHasAttribute,
 } from '@helpers/combat/combat-damage';
-import {
-  combatantIsDead,
-  combatCheckIfOver,
-  isCombatOver,
-} from '@helpers/combat/combat-end';
+import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
 import {
   beginCombatLogCommits,
   combatantMessageToken,

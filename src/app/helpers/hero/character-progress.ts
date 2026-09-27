@@ -8,10 +8,9 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import { heroSkillsAtLevel } from '@helpers/hero/job';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
-import { updateGamestate } from '@helpers/state-game';
+import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import type {
   Character,
   Combatant,
@@ -23,7 +22,7 @@ import { taskEventLevelReached } from '@helpers/task/task-events';
 
 // Bonus from the precomputed global effect sums cache - 1x with nothing active/owned.
 function xpGainMultiplier(): number {
-  return 1 + globalEffectSums().xpGainMultiplierBonus;
+  return 1 + globalEffectSumsState().xpGainMultiplierBonus;
 }
 
 // What each hero actually receives, so anything reporting an XP gain should show this rather than the raw amount.

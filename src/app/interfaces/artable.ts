@@ -2,8 +2,6 @@ import type { ALL_ICONS } from '@helpers/engine/icons';
 
 export type Icon = keyof typeof ALL_ICONS;
 
-export type IconSize = 'badge' | 'inline' | 'row' | 'stat' | 'nav';
-
 export type HasSprite = {
   sprite: string;
 };

@@ -9,21 +9,17 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(() => ({ tradeskillQueueSizeBoosts: {} })),
-}));
-
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
     gamestate,
     updateGamestate: vi.fn(),
+    globalEffectSumsState: vi.fn(() => ({ tradeskillQueueSizeBoosts: {} })),
     tradeskillsState: () => gamestate().tradeskills,
   };
 });
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import {
   craftXpChance,
   craftXpChanceTier,
@@ -40,7 +36,11 @@ import {
   tradeskillXpForLevel,
 } from '@helpers/crafting/tradeskill';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  gamestate,
+  globalEffectSumsState,
+  updateGamestate,
+} from '@helpers/state-game';
 import type {
   GameState,
   GameStateTradeskills,
@@ -198,7 +198,7 @@ describe('retrofitTradeskillXp', () => {
 describe('tradeskillMaxQueueSize', () => {
   beforeEach(() => {
     mockTradeskillContentLookup(blacksmithingContent);
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       tradeskillQueueSizeBoosts: {},
     } as never);
   });
@@ -221,7 +221,7 @@ describe('tradeskillMaxQueueSize', () => {
   });
 
   it("adds any active boost for that tradeskill's queue size", () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       tradeskillQueueSizeBoosts: { [BLACKSMITHING_ID]: 2 },
     } as never);
 
@@ -229,7 +229,7 @@ describe('tradeskillMaxQueueSize', () => {
   });
 
   it("ignores another tradeskill's boost", () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       tradeskillQueueSizeBoosts: { [WOODWORKING_ID]: 5 },
     } as never);
 
@@ -237,7 +237,7 @@ describe('tradeskillMaxQueueSize', () => {
   });
 
   it('still caps the total at 16 even with a boost active', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       tradeskillQueueSizeBoosts: { [BLACKSMITHING_ID]: 5 },
     } as never);
 

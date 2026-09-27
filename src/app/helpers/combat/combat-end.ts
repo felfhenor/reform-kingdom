@@ -1,3 +1,4 @@
+import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset } from '@helpers/combat/combat-state';
@@ -12,7 +13,7 @@ import {
   autoModeRecordNodeFailure,
   autoModeRecordNodeSuccess,
   autoModeResetNodeFailureCounts,
-} from '@helpers/decree/auto-mode';
+} from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomHandleVictory } from '@helpers/encounter/encounter-random-combat';
 import {
@@ -36,7 +37,6 @@ import {
 } from '@helpers/town/raid/town-raid-resolve';
 import type {
   Combat,
-  Combatant,
   EncounterContent,
   EncounterId,
   EncounterRandomContent,
@@ -50,10 +50,6 @@ export function combatHasGuardiansAlive(): boolean {
   const combat = worldCombatState();
   if (!combat) return false;
   return combat.guardians.some((guardian) => !combatantIsDead(guardian));
-}
-
-export function combatantIsDead(combatant: Combatant): boolean {
-  return combatant.hp <= 0;
 }
 
 export function isCombatOver(combat: Combat): boolean {

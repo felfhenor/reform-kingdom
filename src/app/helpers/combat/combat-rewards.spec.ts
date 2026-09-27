@@ -31,8 +31,9 @@ vi.mock('@helpers/item/materials', () => ({
   goldCoinId: vi.fn(() => 'Gold Coin'),
 }));
 
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(() => ({ goldGainMultiplierBonus: 0 })),
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  globalEffectSumsState: vi.fn(() => ({ goldGainMultiplierBonus: 0 })),
 }));
 
 vi.mock('@helpers/kingdom/loot-filter', () => ({
@@ -57,7 +58,7 @@ import { getEntry } from '@helpers/content/content';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { isRecipeDiscovered, recipeDiscover } from '@helpers/crafting/recipes';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
-import { globalEffectSums } from '@helpers/hero/global-effects';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { addMaterial } from '@helpers/item/materials';
 import { armoryAddLootDrop } from '@helpers/kingdom/loot-filter';
 import {
@@ -349,7 +350,7 @@ describe('grantResolvedDrops - gold gain multiplier', () => {
   });
 
   it('boosts Gold Coin quantity from an Explore/ExploreRandom combat when a gold buff is active', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       goldGainMultiplierBonus: 0.2,
     } as GlobalEffectSums);
 
@@ -362,7 +363,7 @@ describe('grantResolvedDrops - gold gain multiplier', () => {
   });
 
   it('does not boost Gold Coin quantity from a town raid, even with a gold buff active', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       goldGainMultiplierBonus: 0.2,
     } as GlobalEffectSums);
 
@@ -375,7 +376,7 @@ describe('grantResolvedDrops - gold gain multiplier', () => {
   });
 
   it('leaves Gold Coin quantity unchanged from Explore combat when no gold buff is active', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       goldGainMultiplierBonus: 0,
     } as GlobalEffectSums);
 
@@ -388,7 +389,7 @@ describe('grantResolvedDrops - gold gain multiplier', () => {
   });
 
   it('never applies the multiplier to a non-Gold-Coin item', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       goldGainMultiplierBonus: 0.2,
     } as GlobalEffectSums);
 

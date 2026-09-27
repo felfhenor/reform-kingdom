@@ -1,8 +1,11 @@
 import { DECREE_CLAUSE_CAP } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import { rngUuid } from '@helpers/rng';
-import { updateGamestate, worldAutoModeState } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  updateGamestate,
+  worldAutoModeState,
+} from '@helpers/state-game';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import type {
   DecreeClause,
@@ -17,7 +20,7 @@ export function decreeClauses(): DecreeClause[] {
 }
 
 export function decreeClauseCap(): number {
-  return DECREE_CLAUSE_CAP + globalEffectSums().decreeClauseCapBoost;
+  return DECREE_CLAUSE_CAP + globalEffectSumsState().decreeClauseCapBoost;
 }
 
 // Drops clauses whose material no GatherNode produces anymore (post-rebalance) - unlike an

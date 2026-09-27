@@ -44,12 +44,9 @@ vi.mock('@helpers/engine/hero-level-up-vfx', () => ({
   heroLevelUpVfxEmit: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(),
-}));
-
 vi.mock('@helpers/state-game', () => ({
   gamestate: vi.fn(),
+  globalEffectSumsState: vi.fn(),
   updateGamestate: vi.fn(),
 }));
 
@@ -71,9 +68,8 @@ import {
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
 import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import { characterXpForLevel, createCharacter } from '@helpers/hero/party';
-import { updateGamestate } from '@helpers/state-game';
+import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import { taskEventLevelReached } from '@helpers/task/task-events';
 
 describe('Character Progress Helper Functions', () => {
@@ -148,7 +144,7 @@ describe('Character Progress Helper Functions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetEntry(mockJob);
-    vi.mocked(globalEffectSums).mockReturnValue(zeroGlobalEffectSums());
+    vi.mocked(globalEffectSumsState).mockReturnValue(zeroGlobalEffectSums());
   });
 
   describe('healingTicksForLevel', () => {
@@ -221,7 +217,7 @@ describe('Character Progress Helper Functions', () => {
     });
 
     it('applies the xp gain multiplier bonus and rounds, matching what partyGainXp grants', () => {
-      vi.mocked(globalEffectSums).mockReturnValue({
+      vi.mocked(globalEffectSumsState).mockReturnValue({
         xpGainMultiplierBonus: 0.0921,
       } as GlobalEffectSums);
 
@@ -431,7 +427,7 @@ describe('Character Progress Helper Functions', () => {
     });
 
     it('scales the granted xp by any active GlobalXPGainMultiplier effect(s)', () => {
-      vi.mocked(globalEffectSums).mockReturnValue({
+      vi.mocked(globalEffectSumsState).mockReturnValue({
         ...zeroGlobalEffectSums(),
         xpGainMultiplierBonus: 0.5,
       });
@@ -449,7 +445,7 @@ describe('Character Progress Helper Functions', () => {
     });
 
     it('sums multiple active GlobalXPGainMultiplier effects together', () => {
-      vi.mocked(globalEffectSums).mockReturnValue({
+      vi.mocked(globalEffectSumsState).mockReturnValue({
         ...zeroGlobalEffectSums(),
         xpGainMultiplierBonus: 0.75,
       });
@@ -469,7 +465,7 @@ describe('Character Progress Helper Functions', () => {
     });
 
     it('ignores active GainStats effects when computing the xp multiplier', () => {
-      vi.mocked(globalEffectSums).mockReturnValue({
+      vi.mocked(globalEffectSumsState).mockReturnValue({
         ...zeroGlobalEffectSums(),
         stats: { ...defaultStats(), Strength: 5 },
       });

@@ -19,8 +19,9 @@ vi.mock('@helpers/worker/worker-progression', () => ({
   })),
 }));
 
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(),
+vi.mock('@helpers/state-game', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  globalEffectSumsState: vi.fn(),
 }));
 
 vi.mock('@helpers/content/content', () => ({
@@ -34,7 +35,7 @@ vi.mock('@helpers/hero/global-effect-state', () => ({
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { globalEffectSums } from '@helpers/hero/global-effects';
+import { globalEffectSumsState } from '@helpers/state-game';
 import {
   applyResolvedDropToState,
   combatItemDropRateBoost,
@@ -291,7 +292,7 @@ describe('Loot Helper Functions', () => {
 
   describe('combatItemDropRateBoost', () => {
     it('reads the flat percent from the global effect sums cache', () => {
-      vi.mocked(globalEffectSums).mockReturnValue({
+      vi.mocked(globalEffectSumsState).mockReturnValue({
         combatItemDropRateBoost: 9,
       } as GlobalEffectSums);
 
@@ -299,7 +300,7 @@ describe('Loot Helper Functions', () => {
     });
 
     it('returns 0 when nothing is active/owned', () => {
-      vi.mocked(globalEffectSums).mockReturnValue({
+      vi.mocked(globalEffectSumsState).mockReturnValue({
         combatItemDropRateBoost: 0,
       } as GlobalEffectSums);
 

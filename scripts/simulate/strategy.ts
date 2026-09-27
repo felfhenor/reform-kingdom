@@ -1,5 +1,5 @@
 import { armoryGet } from '@helpers/kingdom/armory';
-import { autoModeToggle } from '@helpers/decree/auto-mode';
+import { autoModeToggle } from '@helpers/decree/auto-mode-state';
 import {
   characterInfuseEquipment,
   optimizeCharacterEquipment,

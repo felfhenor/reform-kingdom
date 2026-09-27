@@ -6,13 +6,12 @@ import {
 } from '@helpers/crafting/recipes';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
-import { globalEffectSums } from '@helpers/hero/global-effects';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { addArmoryItems } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, globalEffectSumsState } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   DroppedReward,
@@ -27,7 +26,7 @@ import { clamp } from 'es-toolkit/compat';
 
 // Flat percent from the precomputed global effect sums cache - 0 with nothing active/owned.
 export function combatItemDropRateBoost(): number {
-  return globalEffectSums().combatItemDropRateBoost;
+  return globalEffectSumsState().combatItemDropRateBoost;
 }
 
 // Shared exhaustiveness helper for `switch (x.kind)` blocks over

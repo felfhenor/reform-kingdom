@@ -49,6 +49,7 @@ export * from './explore-random';
 export * from './gather-vfx';
 export * from './gathering';
 export * from './global-effect-sums';
+export * from './icon-size';
 export * from './identifiable';
 export * from './item-preview';
 export * from './level-range';

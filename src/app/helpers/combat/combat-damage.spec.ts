@@ -22,10 +22,7 @@ vi.mock('@helpers/rng', async (importOriginal) => {
   };
 });
 
-import {
-  combatApplySkillToTarget,
-  combatCombatantTakeDamage,
-} from '@helpers/combat/combat-damage';
+import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import {
   combatantMessageToken,
@@ -481,68 +478,6 @@ describe('combatApplySkillToTarget mitigation roll', () => {
     // Same rngUniform draw, but 50 Luck (diceEquivalent 7) skews closer to
     // the ceiling than 0 Luck (diceEquivalent 2) - higher HP remaining.
     expect(hpAtHighLuck).toBeGreaterThan(hpAtZeroLuck);
-  });
-});
-
-describe('combatCombatantTakeDamage', () => {
-  beforeEach(() => {
-    combatantDamageEvents.set([]);
-  });
-
-  it('emits a damage event with the sign flipped for a hero taking damage', () => {
-    const hero = buildCombatant({ isEnemy: false, hp: 100 });
-
-    combatCombatantTakeDamage(hero, 25);
-
-    expect(combatantDamageEvents()).toMatchObject([
-      { combatantId: hero.id, amount: -25 },
-    ]);
-  });
-
-  it('emits a positive amount for a hero being healed', () => {
-    const hero = buildCombatant({ isEnemy: false, hp: 50 });
-
-    combatCombatantTakeDamage(hero, -25);
-
-    expect(combatantDamageEvents()).toMatchObject([
-      { combatantId: hero.id, amount: 25 },
-    ]);
-  });
-
-  it('emits a damage event for an enemy combatant too', () => {
-    const enemy = buildCombatant({ isEnemy: true, hp: 100 });
-
-    combatCombatantTakeDamage(enemy, 25);
-
-    expect(combatantDamageEvents()).toMatchObject([
-      { combatantId: enemy.id, amount: -25 },
-    ]);
-  });
-
-  it('tags the event with the given variant for a damaging hit', () => {
-    const hero = buildCombatant({ isEnemy: false, hp: 100 });
-
-    combatCombatantTakeDamage(hero, 25, 'critical');
-
-    expect(combatantDamageEvents()).toMatchObject([
-      { combatantId: hero.id, amount: -25, variant: 'critical' },
-    ]);
-  });
-
-  it('drops the variant on a heal', () => {
-    const hero = buildCombatant({ isEnemy: false, hp: 50 });
-
-    combatCombatantTakeDamage(hero, -25, 'critical');
-
-    expect(combatantDamageEvents()[0].variant).toBeUndefined();
-  });
-
-  it('does not emit an event when the amount is zero', () => {
-    const hero = buildCombatant({ isEnemy: false, hp: 100 });
-
-    combatCombatantTakeDamage(hero, 0);
-
-    expect(combatantDamageEvents()).toHaveLength(0);
   });
 });
 

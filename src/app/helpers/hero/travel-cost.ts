@@ -1,4 +1,4 @@
-import { globalEffectSums } from '@helpers/hero/global-effects';
+import { globalEffectSumsState } from '@helpers/state-game';
 import {
   travelPathSumTicks,
   travelStepTicksCostWithBonus,
@@ -10,7 +10,7 @@ export function travelStepTicksCost(
   originTile: CurrentLocation,
 ): number {
   const { onPathTravelSpeedBonus, offPathTravelSpeedBonus } =
-    globalEffectSums();
+    globalEffectSumsState();
 
   return travelStepTicksCostWithBonus(
     step,

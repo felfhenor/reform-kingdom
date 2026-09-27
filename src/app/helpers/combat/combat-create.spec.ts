@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/state-game', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
+  globalEffectSumsState: vi.fn(),
   worldCombatState: vi.fn(),
 }));
 
@@ -17,10 +18,6 @@ vi.mock('@helpers/content/content', () => ({
   getEntry: vi.fn(),
 }));
 
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectSums: vi.fn(),
-}));
-
 vi.mock('@helpers/rng', () => ({
   rngUuid: vi.fn(() => 'rng-id'),
 }));
@@ -34,7 +31,7 @@ import { getEntry } from '@helpers/content/content';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureMonsterSkill } from '@helpers/content/ensure-monster';
 import { defaultCombatStats, defaultTagResistances } from '@helpers/defaults';
-import { globalEffectSums } from '@helpers/hero/global-effects';
+import { globalEffectSumsState } from '@helpers/state-game';
 import type {
   Character,
   CharacterId,
@@ -171,7 +168,7 @@ function buildCharacter(overrides: Partial<Character> = {}): Character {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(globalEffectSums).mockReturnValue(zeroGlobalEffectSums());
+  vi.mocked(globalEffectSumsState).mockReturnValue(zeroGlobalEffectSums());
 });
 
 describe('combatantFromCharacter', () => {
@@ -213,7 +210,7 @@ describe('combatantFromCharacter', () => {
   });
 
   it('applies active GainStats global effects to statBoosts and totalStats', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       ...zeroGlobalEffectSums(),
       stats: { ...zeroStats(), Strength: 5, Vitality: 5 },
     });
@@ -227,7 +224,7 @@ describe('combatantFromCharacter', () => {
   });
 
   it('tops up current hp/ep by a Health/Energy GainStats bonus, even when not at full health', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       ...zeroGlobalEffectSums(),
       stats: { ...zeroStats(), Health: 25, Energy: 25 },
     });
@@ -241,7 +238,7 @@ describe('combatantFromCharacter', () => {
   });
 
   it('ignores active GlobalXPGainMultiplier effects when applying stat boosts', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       ...zeroGlobalEffectSums(),
       xpGainMultiplierBonus: 0.1,
     });
@@ -252,7 +249,7 @@ describe('combatantFromCharacter', () => {
   });
 
   it('applies active GainCombatStat global effects to combatStats', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       ...zeroGlobalEffectSums(),
       combatStats: { ...defaultCombatStats(), reviveChance: 2 },
     });
@@ -263,7 +260,7 @@ describe('combatantFromCharacter', () => {
   });
 
   it('applies active DebuffResistanceTag global effects to only the targeted tag', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       ...zeroGlobalEffectSums(),
       debuffResistanceTags: { ...defaultTagResistances(), Accuracy: 5 },
     });
@@ -439,7 +436,7 @@ describe('combatantFromMonster', () => {
   });
 
   it('is not affected by active GainStats global effects - those only apply to heroes', () => {
-    vi.mocked(globalEffectSums).mockReturnValue({
+    vi.mocked(globalEffectSumsState).mockReturnValue({
       ...zeroGlobalEffectSums(),
       stats: { ...zeroStats(), Strength: 5 },
     });

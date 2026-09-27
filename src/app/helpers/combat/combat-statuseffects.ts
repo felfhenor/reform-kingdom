@@ -1,4 +1,4 @@
-import { combatCombatantTakeDamage } from '@helpers/combat/combat-damage';
+import { combatCombatantTakeDamage } from '@helpers/combat/combat-combatant-hp';
 import {
   combatantMessageToken,
   combatFormatMessage,

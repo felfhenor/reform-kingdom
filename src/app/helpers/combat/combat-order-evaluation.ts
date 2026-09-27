@@ -1,4 +1,4 @@
-import { combatantIsDead } from '@helpers/combat/combat-end';
+import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { combatSkillHasValidTargetsForMode } from '@helpers/combat/combat-targetting';
 import { rngChoice } from '@helpers/rng';
 import type {
