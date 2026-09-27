@@ -44,10 +44,11 @@
         </button>
       </div>
 
-      <div
-        class="changelog p-1 my-4 overflow-hidden overflow-y-auto max-h-72"
-        [innerHTML]="safeHtml()"
-      ></div>
+      <div class="changelog p-1 my-4 overflow-hidden overflow-y-auto max-h-72">
+        @for (section of sections(); track section.key) {
+          <section #section [innerHTML]="section.html"></section>
+        }
+      </div>
     </div>
 
     <div actions>
