@@ -18,7 +18,8 @@ import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
 import {
   combatCanTakeTurn,
-  combatHandleCombatantStatusEffects,
+  combatExpireCombatantStatusEffects,
+  combatTickCombatantStatusEffects,
   combatUnapplyAllStatusEffects,
 } from '@helpers/combat/combat-statuseffects';
 import {
@@ -61,47 +62,24 @@ function combatantMarkSkillUse(
   );
 }
 
-export function combatantTakeTurn(
-  combat: Combat,
-  combatant: Combatant,
-): CombatTurnResult {
-  if (combatantIsDead(combatant)) {
-    if (rngSucceedsChance(combatant.combatStats.reviveChance)) {
-      combatMessageLog(
-        combat,
-        `**${combatantMessageToken(combatant)}** has sprung to life!`,
-        combatant,
-      );
+function combatantLogIfDefeated(combat: Combat, combatant: Combatant): boolean {
+  if (!combatantIsDead(combatant)) return false;
 
-      combatCombatantTakeDamage(combatant, -combatant.totalStats.Health);
+  combatMessageLog(
+    combat,
+    `**${combatantMessageToken(combatant)}** has been defeated!`,
+    combatant,
+  );
+  return true;
+}
 
-      combatUnapplyAllStatusEffects(combat, combatant);
-    } else {
-      combatMessageLog(
-        combat,
-        `**${combatantMessageToken(combatant)}** is dead, skipping turn.`,
-      );
-      return {};
-    }
-  }
-
-  combatHandleCombatantStatusEffects(combat, combatant, 'TurnStart');
-
-  if (combatantIsDead(combatant)) {
-    combatMessageLog(
-      combat,
-      `**${combatantMessageToken(combatant)}** has been defeated!`,
-      combatant,
-    );
-    return {};
-  }
-
+function combatantCanAct(combat: Combat, combatant: Combatant): boolean {
   if (!combatCanTakeTurn(combatant)) {
     combatMessageLog(
       combat,
       `**${combatantMessageToken(combatant)}** lost their turn!`,
     );
-    return {};
+    return false;
   }
 
   const isStunned = combatCombatantCombatStatSucceedsChance(
@@ -114,8 +92,15 @@ export function combatantTakeTurn(
       combat,
       `**${combatantMessageToken(combatant)}** is stunned and loses their turn!`,
     );
-    return {};
+    return false;
   }
+
+  return true;
+}
+
+// Returns whether the combatant actually acted, which gates an extra turn.
+function combatantAct(combat: Combat, combatant: Combatant): boolean {
+  if (!combatantCanAct(combat, combatant)) return false;
 
   const skills = combatAvailableSkillsForCombatant(combatant).filter(
     (s) =>
@@ -132,9 +117,7 @@ export function combatantTakeTurn(
   const chosenSkill =
     combatOrderPick?.skill ??
     rngChoiceWeighted(skills, (skill) => combatant.skillWeights[skill.id] ?? 1);
-  if (!chosenSkill) {
-    return {};
-  }
+  if (!chosenSkill) return false;
 
   combatantMarkSkillUse(combatant, chosenSkill);
   combatantSkillCastEventEmit(
@@ -222,16 +205,45 @@ export function combatantTakeTurn(
     });
   });
 
-  combatHandleCombatantStatusEffects(combat, combatant, 'TurnEnd');
+  return true;
+}
 
+export function combatantTakeTurn(
+  combat: Combat,
+  combatant: Combatant,
+): CombatTurnResult {
   if (combatantIsDead(combatant)) {
-    combatMessageLog(
-      combat,
-      `**${combatantMessageToken(combatant)}** has been defeated!`,
-      combatant,
-    );
-    return {};
+    if (rngSucceedsChance(combatant.combatStats.reviveChance)) {
+      combatMessageLog(
+        combat,
+        `**${combatantMessageToken(combatant)}** has sprung to life!`,
+        combatant,
+      );
+
+      combatCombatantTakeDamage(combatant, -combatant.totalStats.Health);
+
+      combatUnapplyAllStatusEffects(combat, combatant);
+    } else {
+      combatMessageLog(
+        combat,
+        `**${combatantMessageToken(combatant)}** is dead, skipping turn.`,
+      );
+      return {};
+    }
   }
+
+  combatTickCombatantStatusEffects(combat, combatant, 'TurnStart');
+
+  if (combatantLogIfDefeated(combat, combatant)) return {};
+
+  const acted = combatantAct(combat, combatant);
+
+  combatTickCombatantStatusEffects(combat, combatant, 'TurnEnd');
+  combatExpireCombatantStatusEffects(combat, combatant);
+
+  if (combatantLogIfDefeated(combat, combatant)) return {};
+
+  if (!acted) return {};
 
   const shouldGoAgain = combatCombatantCombatStatSucceedsChance(
     combatant,

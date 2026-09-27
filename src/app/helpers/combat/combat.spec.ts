@@ -29,7 +29,8 @@ vi.mock('@helpers/combat/combat-order-evaluation', () => ({
 
 vi.mock('@helpers/combat/combat-statuseffects', () => ({
   combatCanTakeTurn: vi.fn(() => true),
-  combatHandleCombatantStatusEffects: vi.fn(),
+  combatExpireCombatantStatusEffects: vi.fn(),
+  combatTickCombatantStatusEffects: vi.fn(),
   combatUnapplyAllStatusEffects: vi.fn(),
 }));
 
@@ -65,11 +66,17 @@ import {
   combatDoCombatIteration,
   combatantTakeTurn,
 } from '@helpers/combat/combat';
+import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
+import {
+  combatCanTakeTurn,
+  combatExpireCombatantStatusEffects,
+  combatTickCombatantStatusEffects,
+} from '@helpers/combat/combat-statuseffects';
 import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkillTechnique,
@@ -77,6 +84,7 @@ import {
 } from '@helpers/combat/combat-targetting';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { updateGamestate, worldCombatState } from '@helpers/state-game';
+import { sortBy } from 'es-toolkit/compat';
 import type {
   Combat,
   Combatant,
@@ -401,6 +409,102 @@ describe('combatantTakeTurn targeting', () => {
     expect(combatApplySkillToTarget).not.toHaveBeenCalled();
     expect(combatantDamageEvents()).toMatchObject([
       { combatantId: 'target-1', amount: 0, variant: 'miss' },
+    ]);
+  });
+});
+
+describe('combatantTakeTurn status effect timing', () => {
+  function callOrder(): string[] {
+    const calls = [
+      ...vi
+        .mocked(combatTickCombatantStatusEffects)
+        .mock.calls.map((call, i) => ({
+          name: `tick:${call[2]}`,
+          order: vi.mocked(combatTickCombatantStatusEffects).mock
+            .invocationCallOrder[i],
+        })),
+      ...vi
+        .mocked(combatCombatantCombatStatSucceedsChance)
+        .mock.calls.map((call, i) => ({
+          name: `roll:${call[1]}`,
+          order: vi.mocked(combatCombatantCombatStatSucceedsChance).mock
+            .invocationCallOrder[i],
+        })),
+      ...vi
+        .mocked(combatExpireCombatantStatusEffects)
+        .mock.calls.map((_, i) => ({
+          name: 'expire',
+          order: vi.mocked(combatExpireCombatantStatusEffects).mock
+            .invocationCallOrder[i],
+        })),
+    ];
+    return sortBy(calls, (c) => c.order).map((c) => c.name);
+  }
+
+  it('expires effects only after the stun roll, so a final-turn stun still lands', () => {
+    vi.mocked(combatCombatantCombatStatSucceedsChance).mockReturnValueOnce(
+      true,
+    );
+
+    combatantTakeTurn(buildCombat(), buildCombatant());
+
+    expect(callOrder()).toEqual([
+      'tick:TurnStart',
+      'roll:stunChance',
+      'tick:TurnEnd',
+      'expire',
+    ]);
+  });
+
+  it('still ticks TurnEnd effects when frozen, without rolling for an extra turn', () => {
+    vi.mocked(combatCanTakeTurn).mockReturnValueOnce(false);
+
+    const result = combatantTakeTurn(buildCombat(), buildCombatant());
+
+    expect(callOrder()).toEqual(['tick:TurnStart', 'tick:TurnEnd', 'expire']);
+    expect(result).toEqual({});
+  });
+
+  it('still ticks TurnEnd effects when no skill can be chosen', () => {
+    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
+
+    combatantTakeTurn(buildCombat(), buildCombatant());
+
+    expect(callOrder()).toEqual([
+      'tick:TurnStart',
+      'roll:stunChance',
+      'tick:TurnEnd',
+      'expire',
+    ]);
+  });
+
+  it('skips TurnEnd and expiry when the TurnStart tick kills the combatant', () => {
+    vi.mocked(combatantIsDead)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+
+    combatantTakeTurn(buildCombat(), buildCombatant());
+
+    expect(callOrder()).toEqual(['tick:TurnStart']);
+  });
+
+  it('does not roll for an extra turn when the TurnEnd tick kills the combatant', () => {
+    const skill = buildSkill();
+    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([skill]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(skill);
+    vi.mocked(combatantIsDead)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+
+    combatantTakeTurn(buildCombat(), buildCombatant());
+
+    expect(callOrder()).toEqual([
+      'tick:TurnStart',
+      'roll:stunChance',
+      'tick:TurnEnd',
+      'expire',
     ]);
   });
 });

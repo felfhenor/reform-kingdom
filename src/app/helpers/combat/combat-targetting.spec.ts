@@ -374,11 +374,37 @@ describe('combatSkillHasValidTargetsForMode', () => {
     ).toBe(true);
   });
 
+  it('treats an effect in its final turn as absent, so a self-buff can be refreshed', () => {
+    const caster = buildCombatant({
+      id: 'caster',
+      statusEffects: [{ id: 'Invigorated', duration: 0 } as never],
+    });
+    const combat = buildCombat({ heroes: [caster] });
+    const skill = buildSkill({
+      techniques: [
+        buildTechnique({
+          targetType: 'Allies',
+          targetBehaviors: [
+            {
+              behavior: 'IfNotStatusEffect',
+              statusEffectId: 'Invigorated' as never,
+            },
+          ],
+        }),
+      ],
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatSkillHasValidTargetsForMode(combat, caster, skill, 'Self', context),
+    ).toBe(true);
+  });
+
   // Mirrors "target self with Fortify, skip if already buffed" via IfNotStatusEffect.
   it('is false when the caster has been filtered out of every technique pool', () => {
     const caster = buildCombatant({
       id: 'caster',
-      statusEffects: [{ id: 'Invigorated' } as never],
+      statusEffects: [{ id: 'Invigorated', duration: 2 } as never],
     });
     const combat = buildCombat({ heroes: [caster] });
     const skill = buildSkill({

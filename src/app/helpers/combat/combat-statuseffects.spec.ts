@@ -4,14 +4,20 @@ import {
   combatLogReset,
 } from '@helpers/combat/combat-log';
 import {
+  combatantHasActiveStatusEffect,
   combatApplyStatusEffectToTarget,
+  combatExpireCombatantStatusEffects,
+  combatTickCombatantStatusEffects,
+  combatUnapplyAllStatusEffects,
   statusEffectTagResistance,
 } from '@helpers/combat/combat-statuseffects';
+import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
 import type {
   Combat,
   Combatant,
   StatusEffect,
   StatusEffectBlock,
+  StatusEffectId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -107,5 +113,105 @@ describe('combatApplyStatusEffectToTarget combat message rendering', () => {
     expect(combatLog()[0].message).toBe(
       `@@icon-combatant-1@@**${combatantMessageToken(combatant)}** is burning for 10 damage (90/100 HP remaining).`,
     );
+  });
+});
+
+describe('status effect ticking and expiry', () => {
+  function buildStunned(duration: number): StatusEffect {
+    return {
+      ...ensureStatusEffect({
+        id: 'stunned' as StatusEffectId,
+        name: 'Stunned',
+        effectType: 'Debuff',
+        onApply: [
+          { type: 'AddCombatStatNumber', combatStat: 'stunChance', value: 100 },
+        ],
+        onUnapply: [
+          {
+            type: 'TakeCombatStatNumber',
+            combatStat: 'stunChance',
+            value: 100,
+          },
+        ],
+      }),
+      duration,
+      creatorStats: {} as StatusEffect['creatorStats'],
+      targetStats: {} as StatusEffect['targetStats'],
+    };
+  }
+
+  function buildCombatant(): Combatant {
+    return {
+      id: 'combatant-1',
+      name: 'Ashen',
+      hp: 100,
+      totalStats: { Health: 100 },
+      combatStats: { debuffIgnoreChance: 0, stunChance: 0 },
+      statusEffects: [],
+      statusEffectData: {},
+    } as unknown as Combatant;
+  }
+
+  const combat = {
+    id: 'combat-1',
+    heroes: [],
+    guardians: [],
+  } as unknown as Combat;
+
+  it('keeps a 1-turn effect applied through its final turn until it expires', () => {
+    const combatant = buildCombatant();
+    combatApplyStatusEffectToTarget(combat, combatant, buildStunned(1));
+
+    combatTickCombatantStatusEffects(combat, combatant, 'TurnStart');
+
+    expect(combatant.combatStats.stunChance).toBe(100);
+    expect(combatantHasActiveStatusEffect(combatant, 'stunned')).toBe(false);
+
+    combatExpireCombatantStatusEffects(combat, combatant);
+
+    expect(combatant.combatStats.stunChance).toBe(0);
+    expect(combatant.statusEffects).toEqual([]);
+  });
+
+  it('only ticks effects matching the trigger', () => {
+    const combatant = buildCombatant();
+    combatApplyStatusEffectToTarget(combat, combatant, buildStunned(2));
+
+    combatTickCombatantStatusEffects(combat, combatant, 'TurnEnd');
+
+    expect(combatant.statusEffects[0].duration).toBe(2);
+  });
+
+  it('replaces an effect in its final turn instead of refusing the reapplication', () => {
+    const combatant = buildCombatant();
+    combatApplyStatusEffectToTarget(combat, combatant, buildStunned(1));
+    combatTickCombatantStatusEffects(combat, combatant, 'TurnStart');
+
+    combatApplyStatusEffectToTarget(combat, combatant, buildStunned(3));
+    combatExpireCombatantStatusEffects(combat, combatant);
+
+    expect(combatant.statusEffects.map((s) => s.duration)).toEqual([3]);
+    expect(combatant.combatStats.stunChance).toBe(100);
+  });
+
+  it('refuses to stack an effect that is still active', () => {
+    const combatant = buildCombatant();
+    combatApplyStatusEffectToTarget(combat, combatant, buildStunned(2));
+    combatApplyStatusEffectToTarget(combat, combatant, buildStunned(3));
+
+    expect(combatant.statusEffects.map((s) => s.duration)).toEqual([2]);
+    expect(combatant.combatStats.stunChance).toBe(100);
+  });
+
+  it('clears effects when unapplying all, so they cannot be unapplied twice', () => {
+    const combatant = buildCombatant();
+    combatApplyStatusEffectToTarget(combat, combatant, buildStunned(1));
+
+    combatUnapplyAllStatusEffects(combat, combatant);
+    combatTickCombatantStatusEffects(combat, combatant, 'TurnStart');
+    combatExpireCombatantStatusEffects(combat, combatant);
+
+    expect(combatant.statusEffects).toEqual([]);
+    expect(combatant.combatStats.stunChance).toBe(0);
   });
 });

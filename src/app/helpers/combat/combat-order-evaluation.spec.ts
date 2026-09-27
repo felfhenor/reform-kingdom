@@ -492,7 +492,7 @@ describe('pickSkillFromCombatOrders', () => {
 
     const combatant = buildCombatant({
       id: 'caster',
-      statusEffects: [{ id: 'Invigorated' } as never],
+      statusEffects: [{ id: 'Invigorated', duration: 2 } as never],
       combatOrders: [
         {
           id: 'c1' as never,

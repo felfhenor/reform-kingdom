@@ -51,28 +51,47 @@ export function statusEffectDamage(effect: StatusEffect): number {
   );
 }
 
-export function combatHandleCombatantStatusEffects(
+// An effect at 0 duration is in its final turn and is removed once that turn ends.
+export function combatantHasActiveStatusEffect(
+  combatant: Combatant,
+  statusEffectId: string,
+): boolean {
+  return combatant.statusEffects.some(
+    (s) => s.id === statusEffectId && s.duration > 0,
+  );
+}
+
+export function combatTickCombatantStatusEffects(
   combat: Combat,
   combatant: Combatant,
   trigger: StatusEffectTrigger,
 ): void {
-  const triggeredEffects = combatant.statusEffects.filter(
-    (s) => s.trigger === trigger,
-  );
-  if (triggeredEffects.length === 0) return;
+  combatant.statusEffects
+    .filter((s) => s.trigger === trigger)
+    .forEach((eff) => {
+      combatTriggerTickStatusEffect(combat, combatant, eff);
+      eff.duration--;
+    });
+}
 
-  triggeredEffects.forEach((eff) => {
-    combatTriggerTickStatusEffect(combat, combatant, eff);
+// Deferred to turn end so a TurnStart effect's last turn still counts for that turn's stun/frozen checks.
+export function combatExpireCombatantStatusEffects(
+  combat: Combat,
+  combatant: Combatant,
+): void {
+  combatant.statusEffects
+    .filter((s) => s.duration <= 0)
+    .forEach((eff) => combatRemoveStatusEffect(combat, combatant, eff));
+}
 
-    eff.duration--;
-
-    if (eff.duration <= 0) {
-      combatTriggerUnapplyStatusEffect(combat, combatant, eff);
-    }
-  });
-
+function combatRemoveStatusEffect(
+  combat: Combat,
+  combatant: Combatant,
+  statusEffect: StatusEffect,
+): void {
+  combatTriggerUnapplyStatusEffect(combat, combatant, statusEffect);
   combatant.statusEffects = combatant.statusEffects.filter(
-    (s) => s.duration > 0,
+    (s) => s !== statusEffect,
   );
 }
 
@@ -100,10 +119,7 @@ export function combatApplyStatusEffectToTarget(
   combatant: Combatant,
   statusEffect: StatusEffect,
 ): void {
-  const existingEffect = combatant.statusEffects.find(
-    (s) => s.id === statusEffect.id,
-  );
-  if (existingEffect) return;
+  if (combatantHasActiveStatusEffect(combatant, statusEffect.id)) return;
 
   const shouldIgnoreDebuff = combatCombatantCombatStatSucceedsChance(
     combatant,
@@ -117,6 +133,14 @@ export function combatApplyStatusEffectToTarget(
       combatant,
     );
     return;
+  }
+
+  const expiringEffect = combatant.statusEffects.find(
+    (s) => s.id === statusEffect.id,
+  );
+
+  if (expiringEffect) {
+    combatRemoveStatusEffect(combat, combatant, expiringEffect);
   }
 
   combatant.statusEffects.push(statusEffect);
@@ -279,4 +303,6 @@ export function combatUnapplyAllStatusEffects(
       ),
     );
   });
+
+  combatant.statusEffects = [];
 }

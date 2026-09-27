@@ -1,4 +1,5 @@
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
+import { combatantHasActiveStatusEffect } from '@helpers/combat/combat-statuseffects';
 import { getEntry } from '@helpers/content/content';
 import {
   skillEpCost,
@@ -47,12 +48,12 @@ function filterCombatantTargetListForSkillTechniqueBehavior(
     NotZeroHealth: (list) => list.filter((c) => c.hp > 0),
     IfStatusEffect: (list) =>
       list.filter((c) =>
-        c.statusEffects.find((s) => s.id === behaviorData.statusEffectId),
+        combatantHasActiveStatusEffect(c, behaviorData.statusEffectId ?? ''),
       ),
     IfNotStatusEffect: (list) =>
       list.filter(
         (c) =>
-          !c.statusEffects.find((s) => s.id === behaviorData.statusEffectId),
+          !combatantHasActiveStatusEffect(c, behaviorData.statusEffectId ?? ''),
       ),
   };
 

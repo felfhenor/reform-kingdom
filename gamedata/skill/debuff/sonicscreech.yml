@@ -27,7 +27,7 @@
 
       statusEffects:
         - statusEffectId: Stunned
-          chance: 65
+          chance: 25
           duration: 1
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
