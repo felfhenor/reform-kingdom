@@ -70,38 +70,40 @@
       @for (_ of queueSize(); track $index) {
         @let q = queue[$index];
 
-        @if (q) {
-          <button
-            type="button"
-            [tp]="'Click to remove from the queue'"
-            [tpPlacement]="'top'"
-            (click)="requestRemoveQueueEntry($event, q.entry.id)"
-            (contextmenu)="requestRemoveQueueEntry($event, q.entry.id)"
-            appSfx="ui-error"
-            [sfxTrigger]="['click', 'hover']"
-          >
-            @if (q.resultContent) {
-              <app-slot-rarity-outline
-                [entry]="q.resultContent"
-                [spritesheet]="q.resultSpritesheet"
-              >
-                <span text-banner-top class="tabular-nums">
-                  {{ q.remaining }}
-                </span>
+        <div class="flex flex-shrink-0" [attr.data-queue-slot]="$index">
+          @if (q) {
+            <button
+              type="button"
+              [tp]="'Click to remove from the queue'"
+              [tpPlacement]="'top'"
+              (click)="requestRemoveQueueEntry($event, q.entry.id)"
+              (contextmenu)="requestRemoveQueueEntry($event, q.entry.id)"
+              appSfx="ui-error"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              @if (q.resultContent) {
+                <app-slot-rarity-outline
+                  [entry]="q.resultContent"
+                  [spritesheet]="q.resultSpritesheet"
+                >
+                  <span text-banner-top class="tabular-nums">
+                    {{ q.remaining }}
+                  </span>
 
-                <span text-banner-bottom class="tabular-nums">
-                  {{ q.entry.quantityCompleted }}/{{ q.entry.quantityTotal }}
-                </span>
-              </app-slot-rarity-outline>
-            } @else {
-              <app-slot-icon-blank />
-            }
-          </button>
-        } @else {
-          <div class="relative w-16 h-16 flex-shrink-0 rounded">
-            <app-slot-icon-blank></app-slot-icon-blank>
-          </div>
-        }
+                  <span text-banner-bottom class="tabular-nums">
+                    {{ q.entry.quantityCompleted }}/{{ q.entry.quantityTotal }}
+                  </span>
+                </app-slot-rarity-outline>
+              } @else {
+                <app-slot-icon-blank />
+              }
+            </button>
+          } @else {
+            <div class="relative w-16 h-16 flex-shrink-0 rounded">
+              <app-slot-icon-blank></app-slot-icon-blank>
+            </div>
+          }
+        </div>
       }
     </div>
 
@@ -118,6 +120,7 @@
           <app-tooltip-item-preview #preview [display]="entry.resultDisplay" />
 
           <div
+            #recipeIcon
             class="w-16 h-16 relative flex-shrink-0 overflow-hidden"
             [tp]="entry.resultDisplay ? preview.template() : undefined"
             [tpPlacement]="'top'"
@@ -302,7 +305,7 @@
               <button
                 class="btn btn-xs btn-primary"
                 [disabled]="uncraftable || full"
-                (click)="craft(entry.recipe.id, entry.maxCraftable)"
+                (click)="craft(entry.recipe.id, entry.maxCraftable, recipeIcon)"
                 appSfx="ui-success"
                 [sfxOffset]="$index"
                 [sfxTrigger]="['click', 'hover']"

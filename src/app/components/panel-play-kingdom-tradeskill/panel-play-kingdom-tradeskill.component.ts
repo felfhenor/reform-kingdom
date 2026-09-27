@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
   inject,
   input,
   LOCALE_ID,
@@ -60,6 +61,7 @@ import type {
   TradeskillContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { AnimationService } from '@services/animation.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { clamp, sortBy } from 'es-toolkit/compat';
@@ -88,6 +90,8 @@ import { clamp, sortBy } from 'es-toolkit/compat';
 })
 export class PanelPlayKingdomTradeskillComponent {
   private locale = inject(LOCALE_ID);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private anim = inject(AnimationService);
 
   public tradeskill = input.required<Tradeskill>();
 
@@ -265,9 +269,26 @@ export class PanelPlayKingdomTradeskillComponent {
     return `${Math.round(xpChance)}% chance to gain tradeskill XP`;
   }
 
-  public craft(recipeId: RecipeId, maxCraftable: number): void {
+  public craft(
+    recipeId: RecipeId,
+    maxCraftable: number,
+    sourceEl: HTMLElement,
+  ): void {
     const quantity = this.displayQuantity(recipeId, maxCraftable);
-    craftQueueStart(this.tradeskill(), recipeId, quantity);
+    const slotIndex = this.queueSlotIndexFor(recipeId);
+    if (!craftQueueStart(this.tradeskill(), recipeId, quantity)) return;
+
+    const targetEl = this.host.nativeElement.querySelector(
+      `[data-queue-slot="${slotIndex}"]`,
+    );
+    if (targetEl) this.anim.flyTo(sourceEl, targetEl, 'pulse');
+  }
+
+  // Mirrors where the queue will put the craft: onto an existing stack, else the first free slot.
+  private queueSlotIndexFor(recipeId: RecipeId): number {
+    const { queue } = this.building();
+    const stackIndex = findStackableEntryIndex(queue, recipeId);
+    return stackIndex === -1 ? queue.length : stackIndex;
   }
 
   public requestRemoveQueueEntry(

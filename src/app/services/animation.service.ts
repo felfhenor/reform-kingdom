@@ -139,8 +139,13 @@ export class AnimationService {
   }
 
   // Clones `source`'s visuals into a fixed-position ghost that flies to `target`'s
-  // position, then removes itself and pops `target` to sell the "arrival".
-  flyTo(source: Element, target: Element): JSAnimation {
+  // position, then removes itself and signals the "arrival" on `target`: `popIn` fades it up from
+  // nothing, `pulse` bounces a target that is already visible.
+  flyTo(
+    source: Element,
+    target: Element,
+    arrival: 'popIn' | 'pulse' = 'popIn',
+  ): JSAnimation {
     const from = source.getBoundingClientRect();
     const to = target.getBoundingClientRect();
 
@@ -168,7 +173,7 @@ export class AnimationService {
     });
     anim.then(() => {
       ghost.remove();
-      this.popIn(target);
+      this[arrival](target);
     });
     return anim;
   }
