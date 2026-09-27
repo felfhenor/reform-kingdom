@@ -34,6 +34,7 @@ import {
 } from '@helpers/crafting/crafting-queue';
 import { craftQueueRemove } from '@helpers/crafting/crafting-queue.ui';
 import { craftQueueUnitsRemaining } from '@helpers/crafting/crafting.ui';
+import { filterCraftRecipeEntries } from '@helpers/crafting/recipe-filter.ui';
 import {
   recipeResultContent,
   recipeResultSpritesheet,
@@ -154,11 +155,20 @@ export class PanelPlayKingdomTradeskillComponent {
       this.recipeEntries().filter((entry) => entry.maxCraftable === 0).length,
   );
 
+  public searchText = signal('');
+
   public visibleRecipeEntries = computed(() =>
-    this.hideUncraftable()
-      ? this.recipeEntries().filter((entry) => entry.maxCraftable > 0)
-      : this.recipeEntries(),
+    filterCraftRecipeEntries(
+      this.hideUncraftable()
+        ? this.recipeEntries().filter((entry) => entry.maxCraftable > 0)
+        : this.recipeEntries(),
+      this.searchText(),
+    ),
   );
+
+  public onSearchInput(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
 
   public isQueueFullForRecipe(recipeId: RecipeId): boolean {
     const building = this.building();

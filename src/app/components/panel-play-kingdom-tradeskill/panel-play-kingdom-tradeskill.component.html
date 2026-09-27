@@ -31,7 +31,15 @@
     <app-button-kingdom-back />
   </div>
 
-  <div pageactionsleft>
+  <div pageactionsleft class="flex items-center gap-4">
+    <input
+      type="text"
+      placeholder="Search by item or material..."
+      class="input input-sm input-bordered w-64"
+      [value]="searchText()"
+      (input)="onSearchInput($event)"
+    />
+
     <label class="label cursor-pointer label-checkbox gap-2 self-start">
       <input
         type="checkbox"
@@ -317,7 +325,9 @@
         </div>
       } @empty {
         <app-blank-slate>
-          @if (hideUncraftable() && uncraftableTotal > 0) {
+          @if (searchText().trim() !== '') {
+            No recipes match your search.
+          } @else if (hideUncraftable() && uncraftableTotal > 0) {
             All available recipes are currently uncraftable.
           } @else {
             No recipes available yet.
