@@ -350,6 +350,6 @@ export class PlayKingdomWorkersComponent {
     const entry = this.selectedEntry();
     if (!entry) return;
     workerLevelUp(entry.id);
-    this.anim.burst(event.currentTarget as HTMLElement);
+    this.anim.levelUp(event.currentTarget as HTMLElement);
   }
 }
