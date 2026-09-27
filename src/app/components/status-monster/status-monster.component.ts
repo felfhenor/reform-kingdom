@@ -10,7 +10,6 @@ import { CardStatusCombatantComponent } from '@components/card-status-combatant/
 import { worldCombatState } from '@helpers/state-game';
 import type { StatusCardEntry } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
-import { clamp } from 'es-toolkit/compat';
 
 // Max monster cards per row - extras wrap onto a new row above.
 const MONSTERS_PER_ROW = 4;
@@ -41,7 +40,6 @@ export class StatusMonsterComponent {
         bars: [
           {
             variant: 'hp',
-            percent: clamp((combatant.hp / maxHp) * 100, 0, 100),
             current: combatant.hp,
             max: maxHp,
           },

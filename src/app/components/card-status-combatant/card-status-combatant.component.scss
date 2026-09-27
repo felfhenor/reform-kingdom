@@ -83,30 +83,11 @@
 .entry-bars {
   @apply flex flex-col w-full;
   gap: 2px;
-}
 
-.bar {
-  @apply relative w-full bg-black/70 rounded-sm overflow-hidden;
-  height: 10px;
-
-  &.small {
-    height: 4px;
+  // The inline <progress> otherwise leaves a line-box descender gap under each bar.
+  app-bar-progress {
+    @apply flex;
   }
-}
-
-.bar-inner {
-  @apply h-full;
-  transition: width 200ms ease;
-}
-
-.bar-label {
-  @apply absolute inset-0 flex items-center justify-center text-white;
-  font-size: 0.6rem;
-  text-shadow:
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
 }
 
 // Spans the full card width (not just the sprite) so each number's `left`

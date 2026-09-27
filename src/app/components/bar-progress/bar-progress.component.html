@@ -1,6 +1,6 @@
 <progress
   class="progress w-full"
-  [class]="colorClass()"
+  [class]="[colorClass(), sizeClass()]"
   [value]="displayValue()"
   [max]="max()"
 ></progress>

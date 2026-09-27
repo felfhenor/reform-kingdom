@@ -7,7 +7,6 @@ import {
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { worldCombatState } from '@helpers/state-game';
 import type { StatusCardEntry } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
 
 // Max helper cards per row - extras wrap onto a new row.
 const HELPERS_PER_ROW = 4;
@@ -36,7 +35,6 @@ export class StatusHelperComponent {
         bars: [
           {
             variant: 'hp',
-            percent: clamp((combatant.hp / maxHp) * 100, 0, 100),
             current: combatant.hp,
             max: maxHp,
           },

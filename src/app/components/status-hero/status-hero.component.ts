@@ -18,7 +18,6 @@ import type {
   JobContent,
   StatusCardEntry,
 } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-status-hero',
@@ -78,19 +77,16 @@ export class StatusHeroComponent {
         bars: [
           {
             variant: 'hp',
-            percent: clamp((hp / maxHp) * 100, 0, 100),
             current: hp,
             max: maxHp,
           },
           {
             variant: 'ep',
-            percent: clamp((ep / maxEp) * 100, 0, 100),
             current: ep,
             max: maxEp,
           },
           {
             variant: 'xp',
-            percent: clamp((character.xp.current / maxXp) * 100, 0, 100),
             current: character.xp.current,
             max: maxXp,
           },

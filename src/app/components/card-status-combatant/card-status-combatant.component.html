@@ -88,23 +88,19 @@
 
   <div class="entry-bars">
     @for (bar of data.bars; track $index) {
-      <div class="bar" [class.small]="!isExpanded">
-        <div
-          class="bar-inner"
-          [class.bg-hp]="bar.variant === 'hp'"
-          [class.bg-ep]="bar.variant === 'ep'"
-          [class.bg-xp]="bar.variant === 'xp'"
-          [style.width.%]="bar.percent"
-        ></div>
+      <app-bar-progress
+        [color]="bar.variant"
+        [size]="isExpanded ? 'md' : 'sm'"
+        [value]="bar.current"
+        [max]="bar.max"
+      >
         @if (isExpanded) {
-          <span class="bar-label tabular-nums">
-            <span>
-              <app-text-number-tween [value]="bar.current" />
-              / {{ bar.max | number }} {{ bar.variant | uppercase }}
-            </span>
+          <span class="text-[0.6rem] text-white">
+            <app-text-number-tween [value]="bar.current" />
+            / {{ bar.max | number }} {{ bar.variant | uppercase }}
           </span>
         }
-      </div>
+      </app-bar-progress>
     }
   </div>
 </div>

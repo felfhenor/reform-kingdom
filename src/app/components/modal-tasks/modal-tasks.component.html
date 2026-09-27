@@ -24,13 +24,17 @@
           <span class="type-entity-name">{{ row.name }}</span>
           <span class="type-hint">{{ row.description }}</span>
           @if (row.progress; as progress) {
-            <span class="type-meta tabular-nums">
-              {{ progress.current | number }}/{{ progress.target | number }}
-            </span>
+            <app-bar-progress
+              [value]="progress.current"
+              [max]="progress.target"
+            >
+              <app-text-number-tween [value]="progress.current" />
+              /{{ progress.target | number }}
+            </app-bar-progress>
           }
         </div>
 
-        <div class="flex flex-col items-end gap-2 shrink-0">
+        <div class="flex flex-col gap-2 shrink-0 min-w-[100px]">
           @for (reward of row.rewards; track reward.itemId) {
             <app-currency-cost
               [type]="reward.itemId"

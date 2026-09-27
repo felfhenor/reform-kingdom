@@ -4,12 +4,16 @@ import {
   computed,
   input,
 } from '@angular/core';
-import type { DaisyColor } from '@interfaces';
+import type {
+  DaisyColor,
+  ProgressBarSize,
+  ResourceBarColor,
+} from '@interfaces';
 import { injectTweenedNumber } from '@services/animation.service';
 
 // Tailwind's class scanner only picks up literal strings, so the color->class
 // mapping can't be built with a template literal - it would purge every progress-* class.
-const PROGRESS_COLOR_CLASSES: Record<DaisyColor, string> = {
+const PROGRESS_COLOR_CLASSES: Record<DaisyColor | ResourceBarColor, string> = {
   primary: 'progress-primary',
   secondary: 'progress-secondary',
   accent: 'progress-accent',
@@ -18,6 +22,15 @@ const PROGRESS_COLOR_CLASSES: Record<DaisyColor, string> = {
   success: 'progress-success',
   warning: 'progress-warning',
   error: 'progress-error',
+  hp: 'text-hp',
+  ep: 'text-ep',
+  xp: 'text-xp',
+};
+
+const PROGRESS_SIZE_CLASSES: Record<ProgressBarSize, string> = {
+  default: '',
+  sm: 'h-1',
+  md: 'h-2.5',
 };
 
 @Component({
@@ -31,8 +44,10 @@ const PROGRESS_COLOR_CLASSES: Record<DaisyColor, string> = {
 export class BarProgressComponent {
   public value = input.required<number>();
   public max = input(100);
-  public color = input<DaisyColor>('primary');
+  public color = input<DaisyColor | ResourceBarColor>('primary');
+  public size = input<ProgressBarSize>('default');
 
   public colorClass = computed(() => PROGRESS_COLOR_CLASSES[this.color()]);
+  public sizeClass = computed(() => PROGRESS_SIZE_CLASSES[this.size()]);
   public displayValue = injectTweenedNumber(() => this.value());
 }

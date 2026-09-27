@@ -2,7 +2,6 @@ import type { AtlasedImage } from '@interfaces/artable';
 
 export type StatusCardBar = {
   variant: 'hp' | 'xp' | 'ep';
-  percent: number;
   current: number;
   max: number;
 };

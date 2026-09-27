@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { damageNumberScale } from '@helpers/combat/combat-damage-events.ui';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
@@ -31,6 +32,7 @@ const COLLAPSED_X_JITTER_PERCENT = 18;
     TextNumberTweenComponent,
     AtlasAnimationComponent,
     AtlasImageComponent,
+    BarProgressComponent,
     UpperCasePipe,
   ],
   templateUrl: './card-status-combatant.component.html',

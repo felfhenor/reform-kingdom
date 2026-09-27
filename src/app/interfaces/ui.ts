@@ -8,6 +8,10 @@ export type DaisyColor =
   | 'warning'
   | 'error';
 
+export type ResourceBarColor = 'hp' | 'ep' | 'xp';
+
+export type ProgressBarSize = 'default' | 'sm' | 'md';
+
 export type BlankSlateSize = 'inline' | 'page';
 
 export type GamePlayView =
