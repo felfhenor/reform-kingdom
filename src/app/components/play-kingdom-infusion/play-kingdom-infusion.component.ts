@@ -19,6 +19,7 @@ import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-s
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
@@ -78,6 +79,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     BlankSlateComponent,
+    ListReflowDirective,
     SlotButtonContainerComponent,
     CardPageComponent,
     CurrencyCostComponent,

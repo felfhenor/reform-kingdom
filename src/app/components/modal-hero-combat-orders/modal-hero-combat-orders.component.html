@@ -297,15 +297,16 @@
           <ul
             cdkDropList
             class="flex flex-col gap-2 max-h-96 overflow-y-auto p-1"
+            appListReflow
             (cdkDropListDropped)="onDrop($event)"
           >
             @for (clause of clauses(); track clause.id) {
               <li
                 cdkDrag
+                appListReflowDrag
                 class="flex flex-row items-center gap-2 p-2 rounded bg-base-200"
                 [class.outline-2]="editingClauseId() === clause.id"
                 [class.outline-primary]="editingClauseId() === clause.id"
-                (animate.enter)="onClauseEnter($event)"
                 (animate.leave)="onClauseLeave($event)"
               >
                 <app-icon

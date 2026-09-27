@@ -4,6 +4,7 @@
   [filterFn]="filterFn"
   searchPlaceholder="Search by name or description..."
   emptyMessage="No equipment found."
+  [reflow]="true"
 >
   <span header>Armory</span>
 
@@ -78,7 +79,7 @@
     }
   </div>
 
-  @for (entry of grid.pagedEntries(); track $index + ' ' + entry.item.id) {
+  @for (entry of grid.pagedEntries(); track entry.item.id) {
     <app-slot-armory-item
       [equipment]="entry.content"
       [equipmentItem]="entry.item"

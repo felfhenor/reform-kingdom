@@ -8,7 +8,11 @@
   <span title>Tasks</span>
   <p subtitle>Complete tasks to earn rewards.</p>
 
-  <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
+  <div
+    body
+    class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto"
+    appListReflow
+  >
     @for (row of rows(); track row.taskId) {
       <div
         class="flex items-center gap-4 p-3 rounded bg-base-200"

@@ -4,10 +4,11 @@
   [filterFn]="filterFn"
   searchPlaceholder="Search by name or description..."
   emptyMessage="No materials found."
+  [reflow]="true"
 >
   <span header>Storage</span>
 
-  @for (entry of grid.pagedEntries(); track $index + ' ' + entry.item.id) {
+  @for (entry of grid.pagedEntries(); track entry.item.id) {
     <app-slot-storage-item [entry]="entry" />
   }
 </app-page-paged-grid>

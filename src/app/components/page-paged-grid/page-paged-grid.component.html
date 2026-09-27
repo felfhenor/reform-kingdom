@@ -58,7 +58,12 @@
       </div>
     }
 
-    <div class="paged-grid-grid p-2" #gridContainer>
+    <div
+      class="paged-grid-grid p-2"
+      #gridContainer
+      appListReflow
+      [appListReflowEnabled]="reflow()"
+    >
       @if (showGrid()) {
         @if (pagedEntries().length === 0) {
           <app-blank-slate class="paged-grid-empty">

@@ -15,6 +15,8 @@ import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
+import { ListReflowDirective } from '@directives/list-reflow.directive';
+import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -114,6 +116,8 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CardPageComponent,
+    ListReflowDirective,
+    ListReflowDragDirective,
     DecimalPipe,
     FormsModule,
     NgSelectComponent,
@@ -337,10 +341,6 @@ export class GamePlayDecreeComponent {
 
   public onDrop(event: CdkDragDrop<DecreeClause[]>): void {
     decreeClauseReorder(event.previousIndex, event.currentIndex);
-  }
-
-  public onClauseEnter(event: AnimationCallbackEvent): void {
-    this.anim.slideIn(event.target);
   }
 
   public onClauseLeave(event: AnimationCallbackEvent): void {

@@ -21,6 +21,7 @@ import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-ite
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
@@ -70,6 +71,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
   selector: 'app-panel-play-kingdom-tradeskill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ListReflowDirective,
     SlotRequirementComponent,
     BlankSlateComponent,
     BarProgressComponent,

@@ -12,6 +12,7 @@ import { BlankSlateComponent } from '@components/blank-slate/blank-slate.compone
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 
 const CELL_FOOTPRINT_PX = 72;
@@ -24,6 +25,7 @@ const CELL_FOOTPRINT_PX = 72;
     CardPageComponent,
     ButtonKingdomBackComponent,
     IconComponent,
+    ListReflowDirective,
     SFXDirective,
   ],
   templateUrl: './page-paged-grid.component.html',
@@ -40,6 +42,7 @@ export class PagePagedGridComponent<T> implements OnDestroy {
   public emptyMessage = input('No results found.');
   public showToolbar = input(true);
   public showGrid = input(true);
+  public reflow = input(false);
 
   public searchText = signal('');
   public currentPage = signal(0);

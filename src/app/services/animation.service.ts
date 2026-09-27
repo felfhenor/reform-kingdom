@@ -242,6 +242,22 @@ export class AnimationService {
     });
   }
 
+  // Plays an element from its old layout position (dx, dy away) to where it now sits, on the compositor.
+  reflow(target: Element, dx: number, dy: number): Animation {
+    return target.animate(
+      [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }],
+      { duration: 260, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
+    );
+  }
+
+  // A lone `from` keyframe fades up to the element's own resting opacity, so dimmed rows don't flash to full and snap back.
+  reflowEnter(target: Element): Animation {
+    return target.animate([{ opacity: 0, offset: 0 }], {
+      duration: 200,
+      easing: 'ease-out',
+    });
+  }
+
   // Native WAAPI on `transform` runs on the compositor, so it keeps moving through the main-thread stalls of a loading screen (anime's waapi animates a CSS variable instead, which does not).
   // Loops forever, so the caller must cancel it on teardown. Percent translates are relative to the stripe's own width.
   shimmer(target: Element): Animation {

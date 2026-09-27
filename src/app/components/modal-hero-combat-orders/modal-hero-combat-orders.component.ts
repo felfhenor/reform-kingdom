@@ -15,6 +15,8 @@ import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RowCombatOrderClauseComponent } from '@components/row-combat-order-clause/row-combat-order-clause.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { ListReflowDirective } from '@directives/list-reflow.directive';
+import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatOrderClauses } from '@helpers/combat/combat-order';
 import {
@@ -118,6 +120,8 @@ const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     BlankSlateComponent,
+    ListReflowDirective,
+    ListReflowDragDirective,
     IconComponent,
     ModalComponent,
     RowCombatOrderClauseComponent,
@@ -417,10 +421,6 @@ export class ModalHeroCombatOrdersComponent {
       event.previousIndex,
       event.currentIndex,
     );
-  }
-
-  public onClauseEnter(event: AnimationCallbackEvent): void {
-    this.anim.slideIn(event.target);
   }
 
   public onClauseLeave(event: AnimationCallbackEvent): void {

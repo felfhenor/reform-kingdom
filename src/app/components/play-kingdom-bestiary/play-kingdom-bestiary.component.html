@@ -19,7 +19,7 @@
           (input)="onSearchInput($event)"
         />
 
-        <div class="bestiary-list-scroll">
+        <div class="bestiary-list-scroll" appListReflow>
           @let selected = selectedEntry();
 
           @for (entry of filteredEntries(); track entry.monster.id) {
