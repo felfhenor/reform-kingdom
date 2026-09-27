@@ -84,6 +84,7 @@ import {
   tablerFocus,
   tablerGripVertical,
   tablerInfoCircle,
+  tablerList,
   tablerPlus,
   tablerSettings,
   tablerSquare,
@@ -179,6 +180,7 @@ export const ALL_ICONS = {
   tablerGripVertical,
   tablerSquare,
   tablerSquareCheck,
+  tablerList,
 };
 
 export const ICON_SIZE_VALUES: Record<IconSize, string> = {

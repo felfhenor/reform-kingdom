@@ -8,7 +8,11 @@
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >
-    <span class="type-label">Tasks</span>
+    <span class="type-label flex gap-2 items-center">
+      <app-icon name="tablerList"></app-icon>
+
+      Tasks
+    </span>
   </button>
 
   @for (row of rows; track row.taskId) {

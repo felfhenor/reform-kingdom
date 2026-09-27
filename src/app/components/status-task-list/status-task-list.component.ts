@@ -9,7 +9,13 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-status-task-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, IconComponent, SFXDirective, TippyDirective],
+  imports: [
+    DecimalPipe,
+    IconComponent,
+    SFXDirective,
+    TippyDirective,
+    IconComponent,
+  ],
   templateUrl: './status-task-list.component.html',
   styleUrl: './status-task-list.component.scss',
 })
