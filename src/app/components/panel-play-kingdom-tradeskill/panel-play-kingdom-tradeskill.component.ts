@@ -13,6 +13,7 @@ import { SlotRequirementComponent } from '@components/slot-requirement/slot-requ
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
@@ -70,6 +71,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     SlotRequirementComponent,
     BlankSlateComponent,
     BarProgressComponent,
+    TextNumberTweenComponent,
     AtlasImageComponent,
     CardPageComponent,
     DecimalPipe,

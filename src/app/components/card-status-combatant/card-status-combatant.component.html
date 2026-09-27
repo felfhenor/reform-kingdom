@@ -98,8 +98,10 @@
         ></div>
         @if (isExpanded) {
           <span class="bar-label tabular-nums">
-            {{ bar.current | number }} / {{ bar.max | number }}
-            {{ bar.variant | uppercase }}
+            <span>
+              <app-text-number-tween [value]="bar.current" />
+              / {{ bar.max | number }} {{ bar.variant | uppercase }}
+            </span>
           </span>
         }
       </div>

@@ -2,6 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -68,6 +69,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     PluralizePipe,
     SFXDirective,
     BarProgressComponent,
+    TextNumberTweenComponent,
     SlotButtonContainerComponent,
   ],
   templateUrl: './play-kingdom-home.component.html',

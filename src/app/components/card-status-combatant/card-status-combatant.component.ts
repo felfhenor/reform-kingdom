@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { damageNumberScale } from '@helpers/combat/combat-damage-events.ui';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
 import type { DamageEventVariant, StatusCardEntry } from '@interfaces';
@@ -27,6 +28,7 @@ const COLLAPSED_X_JITTER_PERCENT = 18;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DecimalPipe,
+    TextNumberTweenComponent,
     AtlasAnimationComponent,
     AtlasImageComponent,
     UpperCasePipe,

@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ButtonHeroCombatOrdersComponent } from '@components/button-hero-combat-orders/button-hero-combat-orders.component';
 import { ButtonHeroTeachingsComponent } from '@components/button-hero-teachings/button-hero-teachings.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
@@ -38,6 +39,7 @@ import type { Character, JobContent } from '@interfaces';
     ModalHeroCombatOrdersComponent,
     ModalHeroTeachingsComponent,
     BarProgressComponent,
+    TextNumberTweenComponent,
     SlotIconBlankComponent,
     HideUntilLevelDirective,
     SlotButtonContainerComponent,

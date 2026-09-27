@@ -54,7 +54,8 @@
         [value]="char.xp.current"
         [max]="char.xp.maximum"
       >
-        {{ char.xp.current | number }}/{{ char.xp.maximum | number }}
+        <app-text-number-tween [value]="char.xp.current" />
+        /{{ char.xp.maximum | number }}
       </app-bar-progress>
     </div>
 

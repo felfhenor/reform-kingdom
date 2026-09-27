@@ -60,9 +60,8 @@
         [value]="buildingData.xp.current"
         [max]="buildingData.xp.maximum"
       >
-        {{ buildingData.xp.current | number }}/{{
-          buildingData.xp.maximum | number
-        }}
+        <app-text-number-tween [value]="buildingData.xp.current" />
+        /{{ buildingData.xp.maximum | number }}
         XP
       </app-bar-progress>
     </div>
