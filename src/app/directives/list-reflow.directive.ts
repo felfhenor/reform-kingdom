@@ -35,6 +35,7 @@ export class ListReflowDirective {
   private isOffsetParent = false;
   private isBaselined = false;
   private isDestroyed = false;
+  private observed = new Set<Element>();
   private stopObserving?: () => void;
   private resizes = new ResizeObserver(() => this.rebaseline());
 
@@ -58,18 +59,18 @@ export class ListReflowDirective {
     const mutations = new MutationObserver(() => this.reflow());
     const onScroll = () => (this.scroll = this.currentScroll());
     // Mutations before this fires are the initial population; later ones, including into an empty list, glide.
-    const baselineTimer = setTimeout(() => {
-      this.isBaselined = true;
-      this.rebaseline();
-    });
+    const baselineTimer = setTimeout(() => (this.isBaselined = true));
 
+    // Nothing here reads layout: doing so mid-render resolves styles early and starts CSS transitions on buttons still being updated.
+    // The first baseline comes from the ResizeObserver, which reports after the browser has laid the page out.
     mutations.observe(this.container, { childList: true });
     this.container.addEventListener('scroll', onScroll, { passive: true });
-    this.observeSizes();
+    this.resizes.observe(this.container);
 
     this.stopObserving = () => {
       mutations.disconnect();
       this.resizes.disconnect();
+      this.observed.clear();
       this.container.removeEventListener('scroll', onScroll);
       clearTimeout(baselineTimer);
     };
@@ -131,19 +132,31 @@ export class ListReflowDirective {
   }
 
   // Row sizes can change without the container resizing (a sprite loads, text wraps), which would leave old positions stale.
-  private observeSizes(): void {
-    this.resizes.disconnect();
-    this.resizes.observe(this.container);
-    this.children().forEach((child) => this.resizes.observe(child));
+  private observeSizes(children: Iterable<Element>): void {
+    const current = new Set(children);
+
+    this.observed.forEach((child) => {
+      if (current.has(child)) return;
+      this.resizes.unobserve(child);
+      this.observed.delete(child);
+    });
+    current.forEach((child) => {
+      if (this.observed.has(child)) return;
+      this.resizes.observe(child);
+      this.observed.add(child);
+    });
   }
 
   private rebaseline(): void {
     this.ensureOffsetParent();
     this.positions = this.measure();
     this.scroll = this.currentScroll();
+    this.observeSizes(this.positions.keys());
   }
 
   private reflow(): void {
+    if (!this.isBaselined) return;
+
     this.ensureOffsetParent();
     const next = this.measure();
     const nextScroll = this.currentScroll();
@@ -164,7 +177,7 @@ export class ListReflowDirective {
 
     this.positions = next;
     this.scroll = nextScroll;
-    this.observeSizes();
+    this.observeSizes(next.keys());
   }
 
   // A child mid-glide is visually offset by its current transform, so a fresh glide starts from there rather than jumping.
