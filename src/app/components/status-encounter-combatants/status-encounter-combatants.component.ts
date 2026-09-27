@@ -7,6 +7,7 @@ import {
   input,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
+import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import type { Combatant, StatusCardEntry } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
 import { chunk } from 'es-toolkit/compat';
@@ -43,6 +44,7 @@ export class StatusEncounterCombatantsComponent {
           max: Math.max(combatant.totalStats.Health, 1),
         },
       ],
+      statusEffects: combatantStatusEffectPreviews(combatant),
     })),
   );
 

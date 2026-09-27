@@ -1,3 +1,4 @@
+import type { HasSprite } from '@interfaces/artable';
 import type {
   CombatStatBlock,
   CombatantStatusEffectData,
@@ -120,23 +121,24 @@ export type StatusEffectBehavior =
   | StatusEffectAddCombatStatNumber
   | StatusEffectTakeCombatStatNumber;
 
-export type StatusEffectContent = IsContentItem & {
-  id: StatusEffectId;
-  __type: 'statuseffect';
+export type StatusEffectContent = IsContentItem &
+  HasSprite & {
+    id: StatusEffectId;
+    __type: 'statuseffect';
 
-  effectType: 'Buff' | 'Debuff';
-  elements: GameElement[];
-  tags: StatusEffectTag[];
+    effectType: 'Buff' | 'Debuff';
+    elements: GameElement[];
+    tags: StatusEffectTag[];
 
-  trigger: StatusEffectTrigger;
+    trigger: StatusEffectTrigger;
 
-  onApply: StatusEffectBehavior[];
-  onTick: StatusEffectBehavior[];
-  onUnapply: StatusEffectBehavior[];
+    onApply: StatusEffectBehavior[];
+    onTick: StatusEffectBehavior[];
+    onUnapply: StatusEffectBehavior[];
 
-  statScaling: StatBlock;
-  useTargetStats: boolean;
-};
+    statScaling: StatBlock;
+    useTargetStats: boolean;
+  };
 
 export type StatusEffect = StatusEffectContent & {
   duration: number;

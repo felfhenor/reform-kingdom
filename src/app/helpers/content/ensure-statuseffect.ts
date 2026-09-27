@@ -77,6 +77,7 @@ export function ensureStatusEffect(
     id: effect.id ?? ('UNKNOWN' as StatusEffectId),
     name: effect.name ?? 'UNKNOWN',
     __type: 'statuseffect',
+    sprite: effect.sprite ?? 'UNKNOWN',
     effectType: effect.effectType ?? 'Buff',
     elements: ensureEnumArray(effect.elements, VALID_GAME_ELEMENTS),
     tags: ensureEnumArray(effect.tags, VALID_STATUS_EFFECT_TAGS),

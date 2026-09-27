@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
+import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntry } from '@helpers/content/content';
 import { isPageVisible } from '@helpers/engine/page-visibility';
 import { characterVitalsGain } from '@helpers/hero/resting.ui';
@@ -91,6 +92,7 @@ export class StatusHeroComponent {
             max: maxXp,
           },
         ],
+        statusEffects: live ? combatantStatusEffectPreviews(live) : undefined,
       };
     });
   });

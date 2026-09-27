@@ -1,5 +1,6 @@
 - id: 8257c648-a378-4213-83d1-94f10fdc9258
   name: Burning
+  sprite: '0001'
 
   effectType: Debuff
   elements: [Fire]
@@ -20,6 +21,7 @@
 
 - id: 3b675904-61f4-4102-a642-58a7981e6e46
   name: Venom I
+  sprite: '0002'
 
   effectType: Debuff
   elements: [Earth]
@@ -42,6 +44,7 @@
 
 - id: 7fa166e2-9fb2-4f00-990b-fdff7aa7a3f1
   name: Venom II
+  sprite: '0002'
 
   effectType: Debuff
   elements: [Earth]
@@ -64,6 +67,7 @@
 
 - id: 15f98906-5f1b-402c-94cd-4bf1c2d14874
   name: Bleeding
+  sprite: '0000'
 
   effectType: Debuff
   elements: [Earth]

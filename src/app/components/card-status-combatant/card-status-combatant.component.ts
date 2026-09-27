@@ -11,6 +11,7 @@ import {
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import { IconStatusEffectComponent } from '@components/icon-statuseffect/icon-statuseffect.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { damageNumberScale } from '@helpers/combat/combat-damage-events.ui';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
@@ -33,6 +34,7 @@ const COLLAPSED_X_JITTER_PERCENT = 18;
     AtlasAnimationComponent,
     AtlasImageComponent,
     BarProgressComponent,
+    IconStatusEffectComponent,
     UpperCasePipe,
   ],
   templateUrl: './card-status-combatant.component.html',
@@ -77,6 +79,17 @@ export class CardStatusCombatantComponent {
       variant,
       scale: damageNumberScale(amount, maxHp),
     });
+  }
+
+  public onStatusEffectEnter(event: AnimationCallbackEvent): void {
+    this.anim.fadeIn(event.target, 200);
+  }
+
+  public onStatusEffectLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target, 150)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 
   public xOffsetPercent(seed: number): number {

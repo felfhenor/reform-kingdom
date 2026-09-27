@@ -30,6 +30,7 @@ import {
   combatLogReset,
 } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
+import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
 import { rngSucceedsChance, rngUniform } from '@helpers/rng';
 
 function buildCombat(overrides: Partial<Combat> = {}): Combat {
@@ -611,31 +612,12 @@ describe('combatApplySkillToTarget block and dodge events', () => {
 });
 
 describe('combatApplySkillToTarget status effect resistance', () => {
-  const stunEffect: StatusEffectContent = {
+  const stunEffect: StatusEffectContent = ensureStatusEffect({
     id: 'stun-effect' as StatusEffectId,
     name: 'Test Stun',
-    __type: 'statuseffect',
     effectType: 'Debuff',
-    elements: [],
     tags: ['Stun'],
-    trigger: 'TurnStart',
-    onApply: [],
-    onTick: [],
-    onUnapply: [],
-    statScaling: {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    useTargetStats: false,
-  };
+  });
 
   beforeEach(() => {
     vi.mocked(getEntry).mockReturnValue(stunEffect as never);

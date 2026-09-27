@@ -70,6 +70,7 @@ export * from './state-game';
 export * from './state-options';
 export * from './state-options.ui';
 export * from './status-card.ui';
+export * from './statuseffect-preview.ui';
 export * from './task.ui';
 export * from './storage';
 export * from './tiled-map';

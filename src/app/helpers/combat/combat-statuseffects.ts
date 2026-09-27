@@ -38,7 +38,7 @@ export function statusEffectTagResistance(
   return Math.max(0, ...tags.map((tag) => combatant.tagResistance?.[tag] ?? 0));
 }
 
-function statusEffectDamage(effect: StatusEffect): number {
+export function statusEffectDamage(effect: StatusEffect): number {
   const statBlock = effect.useTargetStats
     ? effect.targetStats
     : effect.creatorStats;

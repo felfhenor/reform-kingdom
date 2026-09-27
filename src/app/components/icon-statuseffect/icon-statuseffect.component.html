@@ -1,0 +1,110 @@
+@let e = effect();
+@let buff = isBuff();
+
+<ng-template #tooltip>
+  <div class="flex flex-col gap-2 p-2 max-w-[300px]">
+    <div class="flex items-center gap-2">
+      <app-atlas-image
+        class="zoom-row shrink-0"
+        spritesheet="statuseffect"
+        [assetName]="e.sprite"
+      />
+      <div class="flex flex-col">
+        <span
+          class="type-entity-name"
+          [class.text-success]="buff"
+          [class.text-error]="!buff"
+        >
+          {{ e.name }}
+        </span>
+        <span class="type-meta">{{ typeLabel() }}</span>
+      </div>
+    </div>
+
+    <div class="text-xs">
+      <span class="font-semibold tabular-nums">
+        {{ e.turnsRemaining | number }}
+      </span>
+      {{ 'turn' | pluralize: e.turnsRemaining !== 1 }} remaining
+    </div>
+
+    @if (e.damagePerTurn > 0) {
+      <div class="text-xs">
+        Takes
+        <span class="font-semibold text-error tabular-nums">
+          {{ e.damagePerTurn | number }}
+        </span>
+        damage per turn
+        <span class="text-lighter">
+          ({{ e.damagePerTurn * e.turnsRemaining | number }} total)
+        </span>
+      </div>
+    }
+
+    @if (e.healingPerTurn > 0) {
+      <div class="text-xs">
+        Heals
+        <span class="font-semibold text-success tabular-nums">
+          {{ e.healingPerTurn | number }}
+        </span>
+        HP per turn
+        <span class="text-lighter">
+          ({{ e.healingPerTurn * e.turnsRemaining | number }} total)
+        </span>
+      </div>
+    }
+
+    @if (e.modifiers.length > 0) {
+      <div class="flex flex-col">
+        @for (mod of e.modifiers; track $index) {
+          <div class="flex items-center gap-2 text-xs">
+            @if (mod.stat) {
+              <app-icon-stat [stat]="mod.stat" size="inline" />
+            } @else if (mod.icon) {
+              <app-icon [name]="mod.icon" size="inline" />
+            }
+            <span>{{ mod.label }}</span>
+            @if (mod.amount !== undefined) {
+              <span class="font-semibold tabular-nums">
+                {{ mod.amount > 0 ? '+' : '' }}{{ mod.amount | number
+                }}{{ mod.isPercent ? '%' : '' }}
+              </span>
+            }
+            @if (mod.timing === 'PerTurn') {
+              <span class="text-lighter">per turn</span>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (e.tags.length > 0) {
+      <div class="flex flex-wrap items-center gap-2 type-hint">
+        Resisted by
+        @for (tag of e.tags; track tag) {
+          <span class="flex items-center gap-2 not-italic">
+            <app-icon [name]="tagIcons[tag]" size="inline" />
+            {{ tagLabels[tag] }}
+          </span>
+        }
+      </div>
+    }
+  </div>
+</ng-template>
+
+<div
+  class="statuseffect-icon border rounded-sm"
+  [class.border-success]="buff"
+  [class.border-error]="!buff"
+  [tp]="tooltip"
+  [tpPlacement]="'top'"
+>
+  <app-atlas-image
+    class="zoom-inline"
+    spritesheet="statuseffect"
+    [assetName]="e.sprite"
+  />
+  <span class="statuseffect-turns tabular-nums">
+    {{ e.turnsRemaining | number }}
+  </span>
+</div>

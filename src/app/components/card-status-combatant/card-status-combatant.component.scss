@@ -28,6 +28,15 @@
   }
 }
 
+// Zero width + min-width 100% wraps at the card's width instead of widening the host past it.
+.status-effects {
+  @apply flex flex-wrap items-end gap-2;
+  width: 0;
+  min-width: 100%;
+  min-height: 18px;
+  margin-bottom: 2px;
+}
+
 .entry-top {
   @apply flex flex-row items-center;
   gap: 6px;

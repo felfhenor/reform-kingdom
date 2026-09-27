@@ -1,4 +1,5 @@
 import type { AtlasedImage } from '@interfaces/artable';
+import type { StatusEffectPreview } from '@interfaces/statuseffect-preview.ui';
 
 export type StatusCardBar = {
   variant: 'hp' | 'xp' | 'ep';
@@ -19,4 +20,6 @@ export type StatusCardEntry = {
   spriteFrames: number;
   isDead: boolean;
   bars: StatusCardBar[];
+  // Only set while the combatant is in a fight.
+  statusEffects?: StatusEffectPreview[];
 };

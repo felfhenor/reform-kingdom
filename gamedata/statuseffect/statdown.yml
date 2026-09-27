@@ -1,5 +1,6 @@
 - id: cf8baffe-4366-4f9d-951c-d051adeaccf4
   name: Weakspot
+  sprite: '0003'
 
   effectType: Debuff
   elements: [Earth]
@@ -24,6 +25,7 @@
 
 - id: 32678967-cbd0-4b08-9eb3-089254ec9bb9
   name: Slimed
+  sprite: '0004'
 
   effectType: Debuff
   elements: [Earth]
@@ -48,6 +50,7 @@
 
 - id: 6ea3bc57-6376-4abf-abf6-5d508c68f628
   name: Chilled
+  sprite: '0005'
 
   effectType: Debuff
   elements: [Water]
@@ -80,6 +83,7 @@
 
 - id: b3b9516b-6f93-493a-a42d-b5764d5c0370
   name: Slowed
+  sprite: '0006'
 
   effectType: Debuff
   elements: [Air]
@@ -112,6 +116,7 @@
 
 - id: 6ef89a56-5348-4368-89eb-a02df02d0c27
   name: Dazed I
+  sprite: '0007'
 
   effectType: Debuff
   elements: [Earth]
@@ -131,6 +136,7 @@
 
 - id: af210184-83bb-4e84-8060-e614642ace48
   name: Dazed II
+  sprite: '0007'
 
   effectType: Debuff
   elements: [Earth]
@@ -150,6 +156,7 @@
 
 - id: 8ab6330d-c4c1-4a60-bccb-e0e28b8ae72a
   name: Stunned
+  sprite: '0008'
 
   effectType: Debuff
   elements: [Air]
@@ -169,6 +176,7 @@
 
 - id: a469aaf3-5542-4191-a751-dd75d07773c8
   name: Stopped
+  sprite: '0009'
 
   effectType: Debuff
   elements: [Air]
@@ -201,6 +209,7 @@
 
 - id: 7392cbab-cf6c-44d7-8ce2-c9a869548504
   name: Trembling
+  sprite: '0010'
 
   effectType: Debuff
   elements: [Earth]
@@ -226,6 +235,7 @@
 
 - id: 473b3b78-9531-49db-9c60-11b2924cf34f
   name: Brittle I
+  sprite: '0011'
 
   effectType: Debuff
   elements: [Water]
@@ -250,6 +260,7 @@
 
 - id: 46e3db32-3cb9-45b9-b506-01b5b0b1ce68
   name: Brittle II
+  sprite: '0011'
 
   effectType: Debuff
   elements: [Water]
@@ -274,6 +285,7 @@
 
 - id: 313d488f-ea69-4b8e-ac66-7ce3fda0218b
   name: Disgusted
+  sprite: '0012'
 
   effectType: Debuff
   elements: [Earth]
@@ -305,6 +317,7 @@
 
 - id: 88812a39-580f-466e-98ff-ca495550f925
   name: Scorched
+  sprite: '0013'
 
   effectType: Debuff
   elements: [Fire]
@@ -329,6 +342,7 @@
 
 - id: cb65b76b-adb4-4a88-a2e1-d450cfb9b18d
   name: Blind I
+  sprite: '0014'
 
   effectType: Debuff
   elements: [Water]
@@ -348,6 +362,7 @@
 
 - id: 5e9359c3-ddbf-4b7e-9a12-e5cda377315a
   name: Hexed I
+  sprite: '0015'
 
   effectType: Debuff
   elements: [Earth]

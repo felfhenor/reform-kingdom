@@ -1,6 +1,19 @@
 @let isExpanded = expanded();
 @let data = entry();
 
+@if (isExpanded && data.statusEffects) {
+  <!-- Always rendered in combat (min height) so the first effect landing doesn't nudge the card down. -->
+  <div class="status-effects">
+    @for (effect of data.statusEffects; track effect.id) {
+      <app-icon-statuseffect
+        [effect]="effect"
+        (animate.enter)="onStatusEffectEnter($event)"
+        (animate.leave)="onStatusEffectLeave($event)"
+      />
+    }
+  </div>
+}
+
 <div
   #card
   class="status-entry select-none"
