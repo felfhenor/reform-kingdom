@@ -36,9 +36,9 @@ export class AppComponent {
   }
 
   public onLoadingLeave(event: AnimationCallbackEvent): void {
-    this.anim
-      .fadeOut(event.target)
-      .then(() => event.animationComplete())
-      .catch(() => event.animationComplete());
+    this.anim.dismissOverlay(event.target as HTMLElement).finished.then(
+      () => event.animationComplete(),
+      () => event.animationComplete(),
+    );
   }
 }

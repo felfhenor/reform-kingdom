@@ -9,6 +9,6 @@ export class ShimmerDirective {
     const anim = inject(AnimationService).shimmer(
       inject(ElementRef<HTMLElement>).nativeElement,
     );
-    inject(DestroyRef).onDestroy(() => anim.pause());
+    inject(DestroyRef).onDestroy(() => anim.cancel());
   }
 }

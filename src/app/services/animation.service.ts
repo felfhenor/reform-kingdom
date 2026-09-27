@@ -200,14 +200,22 @@ export class AnimationService {
     });
   }
 
-  // Loops forever, so the caller must pause it on teardown. Percent translates are relative to the stripe's own width.
-  shimmer(target: Element): JSAnimation {
-    return animate(target as DOMTarget, {
-      translateX: ['-100%', '300%'],
-      duration: 1400,
-      ease: 'inOutSine',
-      loop: true,
-      loopDelay: 400,
+  // Native WAAPI on `transform` runs on the compositor, so it keeps moving through the main-thread stalls of a loading screen (anime's waapi animates a CSS variable instead, which does not).
+  // Loops forever, so the caller must cancel it on teardown. Percent translates are relative to the stripe's own width.
+  shimmer(target: Element): Animation {
+    return target.animate(
+      [{ transform: 'translateX(-100%)' }, { transform: 'translateX(300%)' }],
+      { duration: 1600, easing: 'ease-in-out', iterations: Infinity },
+    );
+  }
+
+  // Holds fully opaque first so the bar can finish and the burst of first-render work behind the overlay lands unseen.
+  dismissOverlay(target: Element): Animation {
+    return target.animate([{ opacity: 1 }, { opacity: 0 }], {
+      delay: 450,
+      duration: 400,
+      easing: 'ease-in-out',
+      fill: 'both',
     });
   }
 
