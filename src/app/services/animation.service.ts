@@ -22,6 +22,8 @@ const DAMAGE_NUMBER_PROFILES: Record<
   critical: { hold: 0.6, rise: 29, tilt: 8 },
   miss: { hold: 0.3, rise: 8, tilt: 0 },
   block: { hold: 0.4, rise: 12, tilt: 0 },
+  energy: { hold: 0.45, rise: 30, tilt: 0 },
+  xp: { hold: 0.5, rise: 26, tilt: 0 },
 };
 
 @Injectable({

@@ -55,6 +55,15 @@
   --color-error-content: oklch(96% 0.105 12.094);
 }
 
+// Resource colors shared by the status bars and their floating numbers, so a number always matches its bar.
+// `static` keeps the variables in the output even when only component styles reference them.
+@theme static {
+  --color-hp: #dc2626;
+  --color-heal: #4ade80;
+  --color-ep: #978d00;
+  --color-xp: #009b65;
+}
+
 .navbar {
   padding: 0;
   min-height: 2rem;

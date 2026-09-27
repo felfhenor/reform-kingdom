@@ -36,6 +36,10 @@ vi.mock('@helpers/combat/combat-log', () => ({
   miscellaneousMessageLog: vi.fn(),
 }));
 
+vi.mock('@helpers/combat/combat-damage-events', () => ({
+  combatantDamageEventEmit: vi.fn(),
+}));
+
 vi.mock('@helpers/engine/hero-level-up-vfx', () => ({
   heroLevelUpVfxEmit: vi.fn(),
 }));
@@ -49,6 +53,7 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
+import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
@@ -287,6 +292,34 @@ describe('Character Progress Helper Functions', () => {
       partyGainXp(30);
 
       expect(miscellaneousMessageLog).not.toHaveBeenCalled();
+    });
+
+    it('emits an xp event for each character that gains xp', () => {
+      const jala = createCharacterStub('Jala');
+      const bo = createCharacterStub('Bo');
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala, bo] } } as unknown as GameState);
+      });
+
+      partyGainXp(30);
+
+      expect(combatantDamageEventEmit).toHaveBeenCalledWith(jala.id, 30, 'xp');
+      expect(combatantDamageEventEmit).toHaveBeenCalledWith(bo.id, 30, 'xp');
+    });
+
+    it('skips the xp event for characters already at the max level', () => {
+      const jala = {
+        ...createCharacterStub('Jala'),
+        level: CHARACTER_MAX_LEVEL,
+        xp: { current: 0, maximum: characterXpForLevel(CHARACTER_MAX_LEVEL) },
+      };
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala] } } as unknown as GameState);
+      });
+
+      partyGainXp(30);
+
+      expect(combatantDamageEventEmit).not.toHaveBeenCalled();
     });
 
     it('emits a level-up vfx event only for characters that leveled up', () => {

@@ -18,6 +18,8 @@
           [class.crit]="num.event.variant === 'critical'"
           [class.miss]="num.event.variant === 'miss'"
           [class.block]="num.event.variant === 'block'"
+          [class.energy]="num.event.variant === 'energy'"
+          [class.xp]="num.event.variant === 'xp'"
           [style.left.%]="xOffsetPercent(num.xOffsetSeed)"
           (animate.enter)="
             onDamageNumberEnter($event, num.event.amount, num.event.variant)
@@ -29,6 +31,12 @@
             }
             @case ('block') {
               Block
+            }
+            @case ('energy') {
+              +{{ num.event.amount | number }} EP
+            }
+            @case ('xp') {
+              +{{ num.event.amount | number }} EXP
             }
             @default {
               {{ num.event.amount > 0 ? '+' : '' }}{{ num.event.amount | number
@@ -80,14 +88,14 @@
 
   <div class="entry-bars">
     @for (bar of data.bars; track $index) {
-      <div
-        class="bar"
-        [class.small]="!isExpanded"
-        [class.bar-hp]="bar.variant === 'hp'"
-        [class.bar-xp]="bar.variant === 'xp'"
-        [class.bar-ep]="bar.variant === 'ep'"
-      >
-        <div class="bar-inner" [style.width.%]="bar.percent"></div>
+      <div class="bar" [class.small]="!isExpanded">
+        <div
+          class="bar-inner"
+          [class.bg-hp]="bar.variant === 'hp'"
+          [class.bg-ep]="bar.variant === 'ep'"
+          [class.bg-xp]="bar.variant === 'xp'"
+          [style.width.%]="bar.percent"
+        ></div>
         @if (isExpanded) {
           <span class="bar-label tabular-nums">
             {{ bar.current | number }} / {{ bar.max | number }}

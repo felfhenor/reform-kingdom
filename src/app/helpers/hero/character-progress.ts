@@ -1,3 +1,4 @@
+import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
   CHARACTER_MAX_LEVEL,
@@ -153,6 +154,9 @@ export function partyGainXp(amount: number): boolean {
   });
 
   progress.forEach(({ beforeLevel, after }) => {
+    if (boostedAmount > 0 && beforeLevel < CHARACTER_MAX_LEVEL) {
+      combatantDamageEventEmit(after.id, boostedAmount, 'xp');
+    }
     if (after.level > beforeLevel) {
       analyticsSendDesignEvent('Hero:LevelUp', after.level);
       heroLevelUpVfxEmit(after.id);

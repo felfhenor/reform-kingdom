@@ -2,12 +2,22 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
+  untracked,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
+import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { getEntry } from '@helpers/content/content';
+import { isPageVisible } from '@helpers/engine/page-visibility';
+import { characterVitalsGain } from '@helpers/hero/resting.ui';
 import { worldCombatState, worldPartyState } from '@helpers/state-game';
-import type { Combatant, JobContent, StatusCardEntry } from '@interfaces';
+import type {
+  Character,
+  Combatant,
+  JobContent,
+  StatusCardEntry,
+} from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
 @Component({
@@ -18,7 +28,18 @@ import { clamp } from 'es-toolkit/compat';
   styleUrl: './status-hero.component.scss',
 })
 export class StatusHeroComponent {
+  private lastVitals = new Map<string, Pick<Character, 'hp' | 'ep'>>();
+  private wasInCombat = false;
+
   public expanded = input<boolean>(false);
+
+  constructor() {
+    effect(() => {
+      const party = worldPartyState();
+      const inCombat = !!worldCombatState();
+      untracked(() => this.emitVitalsGains(party, inCombat));
+    });
+  }
 
   public entries = computed<StatusCardEntry[]>(() => {
     // HP lives on the live `Combatant` during a fight - `Character.hp` only
@@ -77,4 +98,26 @@ export class StatusHeroComponent {
       };
     });
   });
+
+  // Combat HP already has its own events, and the sync at combat end isn't a gain worth showing.
+  private emitVitalsGains(party: Character[], inCombat: boolean): void {
+    const canEmit = !inCombat && !this.wasInCombat && isPageVisible();
+
+    party.forEach((character) => {
+      if (canEmit) {
+        const gain = characterVitalsGain(
+          this.lastVitals.get(character.id),
+          character,
+        );
+        if (gain.hp > 0) combatantDamageEventEmit(character.id, gain.hp);
+        if (gain.ep > 0) {
+          combatantDamageEventEmit(character.id, gain.ep, 'energy');
+        }
+      }
+
+      this.lastVitals.set(character.id, { hp: character.hp, ep: character.ep });
+    });
+
+    this.wasInCombat = inCombat;
+  }
 }

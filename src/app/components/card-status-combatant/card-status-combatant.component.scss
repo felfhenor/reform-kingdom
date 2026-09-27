@@ -99,18 +99,6 @@
   transition: width 200ms ease;
 }
 
-.bar-hp .bar-inner {
-  background-color: #dc2626;
-}
-
-.bar-ep .bar-inner {
-  background-color: #978d00;
-}
-
-.bar-xp .bar-inner {
-  background-color: #16a34a;
-}
-
 .bar-label {
   @apply absolute inset-0 flex items-center justify-center text-white;
   font-size: 0.6rem;
@@ -145,11 +133,11 @@
     1px 1px 0 #000;
 
   &.damage {
-    color: #ef4444;
+    color: var(--color-hp);
   }
 
   &.heal {
-    color: #4ade80;
+    color: var(--color-heal);
   }
 
   &.miss {
@@ -159,6 +147,14 @@
 
   &.block {
     color: #93c5fd;
+  }
+
+  &.energy {
+    color: var(--color-ep);
+  }
+
+  &.xp {
+    color: var(--color-xp);
   }
 
   &.crit {
