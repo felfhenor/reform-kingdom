@@ -49,6 +49,40 @@ export class AnimationService {
     });
   }
 
+  // Slides in from the right edge, for widgets docked on that side; transform is cleared afterwards so it can't become a containing block.
+  slideInSide(target: Element, index = 0): JSAnimation {
+    const el = target as HTMLElement;
+    el.style.opacity = '0';
+    const anim = animate(el as DOMTarget, {
+      opacity: [0, 1],
+      translateX: [20, 0],
+      duration: 240,
+      delay: Math.min(index, 8) * 60,
+      ease: 'outQuad',
+    });
+    anim.then(() => {
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('transform');
+    });
+    return anim;
+  }
+
+  // Slides out then collapses the row's height (offsetting the parent's flex gap) so siblings close up instead of jumping.
+  slideOutCollapse(target: Element): JSAnimation {
+    const el = target as HTMLElement;
+    const height = el.offsetHeight;
+    const gap = parseFloat(getComputedStyle(el.parentElement!).rowGap) || 0;
+    el.style.overflow = 'hidden';
+    return animate(el as DOMTarget, {
+      opacity: [1, 0],
+      translateX: [0, 24],
+      height: { from: height, to: 0, delay: 120, duration: 180 },
+      marginBottom: { from: 0, to: -gap, delay: 120, duration: 180 },
+      duration: 200,
+      ease: 'inQuad',
+    });
+  }
+
   // Opacity only and cleared afterwards: a lingering transform would become the containing block for fixed descendants.
   fadeIn(target: Element): JSAnimation {
     const anim = animate(target as DOMTarget, {

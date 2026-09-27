@@ -7,9 +7,7 @@ import { injectTweenedNumber } from '@services/animation.service';
   imports: [DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'tabular-nums' },
-  template: `
-    {{ displayValue() | number: format() }}
-  `,
+  template: '{{ displayValue() | number: format() }}',
 })
 export class TextNumberTweenComponent {
   public value = input.required<number>();

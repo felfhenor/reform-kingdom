@@ -1,0 +1,16 @@
+@let r = row();
+
+@if (r.isComplete) {
+  <app-icon name="tablerSquareCheck" size="inline" class="text-success" />
+} @else {
+  <app-icon name="tablerSquare" size="inline" />
+}
+
+<span class="truncate flex-1">{{ r.name }}</span>
+
+@if (r.progress; as progress) {
+  <span class="tabular-nums text-lighter shrink-0">
+    <app-text-number-tween [value]="progress.current" />
+    /{{ progress.target | number }}
+  </span>
+}
