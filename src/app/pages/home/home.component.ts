@@ -7,9 +7,13 @@ import { ButtonSettingsComponent } from '@components/button-settings/button-sett
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/panel-debug-buttons.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { FadeInDirective } from '@directives/fade-in.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
-import { discordSetMainStatus, discordSetStatus } from '@helpers/engine/discord';
+import {
+  discordSetMainStatus,
+  discordSetStatus,
+} from '@helpers/engine/discord';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { gameReset } from '@helpers/game-init';
 import { isSetup } from '@helpers/setup';
@@ -32,6 +36,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     PanelDebugButtonsComponent,
   ],
   providers: [],
+  hostDirectives: [FadeInDirective],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

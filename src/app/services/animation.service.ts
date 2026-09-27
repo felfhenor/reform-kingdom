@@ -49,6 +49,17 @@ export class AnimationService {
     });
   }
 
+  // Opacity only and cleared afterwards: a lingering transform would become the containing block for fixed descendants.
+  fadeIn(target: Element): JSAnimation {
+    const anim = animate(target as DOMTarget, {
+      opacity: [0, 1],
+      duration: 300,
+      ease: 'outQuad',
+    });
+    anim.then(() => (target as HTMLElement).style.removeProperty('opacity'));
+    return anim;
+  }
+
   slideIn(target: Element): JSAnimation {
     return animate(target as DOMTarget, {
       opacity: [0, 1],

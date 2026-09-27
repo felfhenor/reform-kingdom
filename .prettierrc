@@ -1,6 +1,7 @@
 {
   "singleQuote": true,
   "trailingComma": "all",
+  "endOfLine": "auto",
   "htmlWhitespaceSensitivity": "ignore",
   "overrides": [
     {

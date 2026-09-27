@@ -2,11 +2,13 @@ import type { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '@components/navbar/navbar.component';
+import { FadeInDirective } from '@directives/fade-in.directive';
 import { discordUpdateStatus } from '@helpers/engine/discord';
 
 @Component({
   selector: 'app-game',
   imports: [RouterOutlet, NavbarComponent],
+  hostDirectives: [FadeInDirective],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
 })

@@ -5,16 +5,11 @@ import { requireSetupGuard } from '@guards/require-setup.guard';
 import { GameComponent } from '@pages/game/game.component';
 import { HomeComponent } from '@pages/home/home.component';
 import { SetupComponent } from '@pages/setup/setup.component';
-import { TransitionComponent } from '@pages/transition/transition.component';
 
 export const routes: Routes = [
   {
     component: HomeComponent,
     path: '',
-  },
-  {
-    component: TransitionComponent,
-    path: 'transition',
   },
   {
     path: 'debug',
