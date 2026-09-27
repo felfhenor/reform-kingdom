@@ -8,31 +8,14 @@ import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
-import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import {
-  kingdomNodeGet,
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
+import { workerGatherNodeHasItem } from '@helpers/worker/worker-shared';
+import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
   ItemId,
   WorkerAssignment,
   WorkerContent,
   WorkerId,
 } from '@interfaces';
-
-function gatherNodeHasItem(nodeName: string, itemId: ItemId): boolean {
-  const node = worldNodeByName(nodeName);
-  if (!node) return false;
-
-  const gathering = worldNodeGathering(node);
-  if (!gathering) return false;
-
-  return gatheringResultsAtLevel(gathering, worldNodeLevel(nodeName)).some(
-    (result) => result.items.some((item) => item.itemId === itemId),
-  );
-}
 
 // One-way only - the return trip is never stamina-gated (deliberate design
 // decision: stamina is a one-way "how far can this worker be sent" budget).
@@ -71,7 +54,7 @@ export function workerAssignmentIsValid(
 
   return (
     isGatherNodeDiscovered(assignment.nodeName) &&
-    gatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
+    workerGatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
     canWorkerReachNode(assignment.nodeName, stamina, content.canUseTeleports)
   );
 }

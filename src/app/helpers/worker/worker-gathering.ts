@@ -6,15 +6,17 @@ import {
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import {
+  applyWorkerGatherProgress,
+  applyWorkerGatherUnit,
+  workerGatherNodeContent,
+  workerGatherRate,
+  workerGatherTickOutcome,
+} from '@helpers/worker/worker-shared';
+import {
   workerAssignmentIsValid,
   workerBeginReturnTrip,
 } from '@helpers/worker/worker-travel';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
 import type {
   GatheringContent,
   ItemContent,
@@ -22,41 +24,6 @@ import type {
   WorkerContent,
   WorkerId,
 } from '@interfaces';
-import { sumBy } from 'es-toolkit/compat';
-
-function gatheringContentForNode(
-  nodeName: string,
-): GatheringContent | undefined {
-  const node = worldNodeByName(nodeName);
-  if (!node) return undefined;
-
-  return worldNodeGathering(node);
-}
-
-// Rate scales with this item's share of the node's weighted gatherResults table,
-// restricted to results available at the node's current development level.
-export function workerGatherRate(
-  worker: WorkerContent,
-  level: number,
-  gathering: GatheringContent,
-  itemId: ItemId,
-  nodeLevel: number,
-): number {
-  const resultsAtLevel = gatheringResultsAtLevel(gathering, nodeLevel);
-
-  const itemWeight = sumBy(
-    resultsAtLevel.filter((result) =>
-      result.items.some((item) => item.itemId === itemId),
-    ),
-    (result) => result.chance,
-  );
-  const totalWeight = sumBy(resultsAtLevel, (result) => result.chance);
-
-  if (itemWeight <= 0 || totalWeight <= 0) return 0;
-
-  const gatherSpeed = workerStatsForLevel(worker, level).gatherSpeed;
-  return gatherSpeed * (itemWeight / totalWeight);
-}
 
 export function workerGatherXpGateSatisfied(
   gathering: GatheringContent,
@@ -109,13 +76,7 @@ function completeGatherUnit(
 
   updateGamestate((state) => {
     const target = state.workers[workerId];
-    if (!target) return state;
-
-    if (target.status.kind !== 'Gathering') return state;
-
-    target.status.itemsGathered = itemsGathered;
-    target.status.ticksIntoGather = 0;
-
+    if (target) applyWorkerGatherUnit(target, itemsGathered);
     return state;
   });
 }
@@ -136,7 +97,7 @@ export function workerGatheringProcessTick(workerId: WorkerId): void {
   }
 
   const content = getEntry<WorkerContent>(workerId);
-  const gathering = gatheringContentForNode(status.nodeName);
+  const gathering = workerGatherNodeContent(status.nodeName);
   if (!content || !gathering) return;
 
   const rate = workerGatherRate(
@@ -148,18 +109,11 @@ export function workerGatheringProcessTick(workerId: WorkerId): void {
   );
   if (rate <= 0) return;
 
-  const ticksPerUnit = gathering.gatherTime / rate;
-  const ticksIntoGather = status.ticksIntoGather + 1;
-
-  if (ticksIntoGather < ticksPerUnit) {
+  const outcome = workerGatherTickOutcome(status, rate, gathering.gatherTime);
+  if (outcome.kind === 'Progress') {
     updateGamestate((state) => {
       const target = state.workers[workerId];
-      if (!target) return state;
-
-      if (target.status.kind !== 'Gathering') return state;
-
-      target.status.ticksIntoGather = ticksIntoGather;
-
+      if (target) applyWorkerGatherProgress(target, outcome.ticksIntoGather);
       return state;
     });
     return;
@@ -174,7 +128,7 @@ export function workerGatheringProcessTick(workerId: WorkerId): void {
     workerId,
     status.nodeName,
     status.itemId,
-    status.itemsGathered + 1,
+    outcome.itemsGathered,
     capacity,
   );
 }

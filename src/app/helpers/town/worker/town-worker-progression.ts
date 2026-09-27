@@ -1,19 +1,9 @@
-import { statBlockForLevel } from '@helpers/worker/worker-progression';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   CurrentLocation,
   TownContent,
   TownWorkerState,
-  WorkerContent,
-  WorkerStatBlock,
 } from '@interfaces';
-
-export function townWorkerStatsForLevel(
-  worker: WorkerContent,
-  level: number,
-): WorkerStatBlock {
-  return statBlockForLevel(worker.baseStats, worker.statsPerLevel, level);
-}
 
 // The town is its own "home base" instead of the Duchy.
 export function defaultTownWorkerState(

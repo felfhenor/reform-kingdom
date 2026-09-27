@@ -13,8 +13,8 @@ vi.mock('@helpers/state-game', () => {
   };
 });
 
-vi.mock('@helpers/town/worker/town-worker-progression', () => ({
-  townWorkerStatsForLevel: vi.fn(),
+vi.mock('@helpers/worker/worker-progression', () => ({
+  workerStatsForLevel: vi.fn(),
 }));
 
 vi.mock('@helpers/town/worker/town-worker-travel', () => ({
@@ -41,7 +41,7 @@ import {
   townWorkerGatherRate,
   townWorkerGatheringProcessTick,
 } from '@helpers/town/worker/town-worker-gathering';
-import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
+import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import {
   townWorkerAssignmentIsValid,
   townWorkerBeginReturnTrip,
@@ -86,7 +86,7 @@ beforeEach(() => {
 
 describe('townWorkerGatherRate', () => {
   it("scales the base rate by the town's gatherRateMultiplier", () => {
-    vi.mocked(townWorkerStatsForLevel).mockReturnValue({
+    vi.mocked(workerStatsForLevel).mockReturnValue({
       capacity: 5,
       gatherSpeed: 2,
       stamina: 20,
@@ -158,7 +158,7 @@ describe('townWorkerGatheringProcessTick', () => {
     vi.mocked(gatheringResultsAtLevel).mockReturnValue([
       { chance: 10, items: [{ itemId: oreId, quantity: 1 }] },
     ] as never);
-    vi.mocked(townWorkerStatsForLevel).mockReturnValue({
+    vi.mocked(workerStatsForLevel).mockReturnValue({
       capacity: 2,
       gatherSpeed: 1,
       stamina: 20,

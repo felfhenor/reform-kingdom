@@ -54,8 +54,7 @@ import {
 import { pixiFloatingTextCreate } from '@helpers/pixi/pixi-floating-text';
 import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid.ui';
 import {
-  pixiIndicatorEncounterProgressCreate,
-  pixiIndicatorGatherProgressCreate,
+  pixiIndicatorProgressBarCreate,
   pixiIndicatorNodeSelectionCreate,
   pixiIndicatorNodeStatusUpdate,
   pixiIndicatorPlayerAtLocationCreate,
@@ -557,11 +556,15 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.nodeSelectionContainer.addChild(this.nodeSelectionIndicator);
 
-    this.gatherProgressBar = pixiIndicatorGatherProgressCreate(map.tilewidth);
+    this.gatherProgressBar = pixiIndicatorProgressBarCreate(
+      map.tilewidth,
+      'Gather',
+    );
     this.gatherProgressContainer.addChild(this.gatherProgressBar.container);
 
-    this.encounterProgressBar = pixiIndicatorEncounterProgressCreate(
+    this.encounterProgressBar = pixiIndicatorProgressBarCreate(
       map.tilewidth,
+      'Explore',
     );
     this.encounterProgressContainer.addChild(
       this.encounterProgressBar.container,

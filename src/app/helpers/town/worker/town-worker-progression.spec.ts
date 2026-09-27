@@ -4,30 +4,12 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeByName: vi.fn(),
 }));
 
-import {
-  defaultTownWorkerState,
-  townWorkerStatsForLevel,
-} from '@helpers/town/worker/town-worker-progression';
+import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
-import type { TownContent, WorkerContent, WorldNodeEntry } from '@interfaces';
+import type { TownContent, WorldNodeEntry } from '@interfaces';
 
 beforeEach(() => {
   vi.clearAllMocks();
-});
-
-describe('townWorkerStatsForLevel', () => {
-  it('applies base + perLevel * (level - 1)', () => {
-    const worker = {
-      baseStats: { capacity: 10, gatherSpeed: 0.5, stamina: 100 },
-      statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 1 },
-    } as WorkerContent;
-
-    expect(townWorkerStatsForLevel(worker, 3)).toEqual({
-      capacity: 11,
-      gatherSpeed: 0.7,
-      stamina: 102,
-    });
-  });
 });
 
 describe('defaultTownWorkerState', () => {

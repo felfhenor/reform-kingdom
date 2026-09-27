@@ -3,6 +3,10 @@ import { travelPathAdvanceTick } from '@helpers/hero/travel-progress';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
+import {
+  applyWorkerTravelAdvance,
+  workerGatheringStatusStart,
+} from '@helpers/worker/worker-shared';
 import type {
   CurrentLocation,
   PathAdvanceResult,
@@ -23,18 +27,7 @@ function advanceTownWorkerTravelStatus(
 
   updateGamestate((state) => {
     const target = state.world.towns[townId]?.workers[workerId];
-    if (!target) return state;
-
-    target.location = result.location;
-    if (
-      !result.arrived &&
-      (target.status.kind === 'TravelingTo' ||
-        target.status.kind === 'TravelingBack')
-    ) {
-      target.status.path = result.path;
-      target.status.ticksIntoStep = result.ticksIntoStep;
-    }
-
+    if (target) applyWorkerTravelAdvance(target, result);
     return state;
   });
 
@@ -57,16 +50,7 @@ function processTravelingTo(townId: TownId, workerId: WorkerId): void {
 
   updateGamestate((state) => {
     const target = state.world.towns[townId]?.workers[workerId];
-    if (!target) return state;
-
-    target.status = {
-      kind: 'Gathering',
-      nodeName,
-      itemId,
-      itemsGathered: 0,
-      ticksIntoGather: 0,
-    };
-
+    if (target) target.status = workerGatheringStatusStart(nodeName, itemId);
     return state;
   });
 }

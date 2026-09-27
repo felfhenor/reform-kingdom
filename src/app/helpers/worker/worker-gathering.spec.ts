@@ -45,7 +45,6 @@ import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
-  workerGatherRate,
   workerGatherXpGateSatisfied,
   workerGatheringProcessTick,
 } from '@helpers/worker/worker-gathering';
@@ -57,7 +56,6 @@ import {
   workerAssignmentIsValid,
   workerBeginReturnTrip,
 } from '@helpers/worker/worker-travel';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
@@ -118,70 +116,6 @@ function buildGathering(
     ...overrides,
   });
 }
-
-describe('workerGatherRate', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('scales gatherSpeed by the item share of the weighted table', () => {
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 6,
-      gatherSpeed: 2,
-      stamina: 30,
-    });
-
-    const gathering = buildGathering();
-
-    // Copper is 80/100 of the table weight, so its rate is 80% of gatherSpeed.
-    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 0)).toBe(
-      1.6,
-    );
-    // Malachite is rarer (20/100), so it's gathered proportionally slower.
-    expect(workerGatherRate(workerContent, 1, gathering, MALACHITE_ID, 0)).toBe(
-      0.4,
-    );
-  });
-
-  it('is 0 for an item not present in the gather table', () => {
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 6,
-      gatherSpeed: 2,
-      stamina: 30,
-    });
-
-    const gathering = buildGathering();
-
-    expect(
-      workerGatherRate(
-        workerContent,
-        1,
-        gathering,
-        'unknown-item' as ItemId,
-        0,
-      ),
-    ).toBe(0);
-  });
-
-  it('restricts the weighted table to results available at the given node level', () => {
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 6,
-      gatherSpeed: 2,
-      stamina: 30,
-    });
-    vi.mocked(gatheringResultsAtLevel).mockReturnValueOnce([
-      ensureGatherResult({
-        chance: 80,
-        items: [{ itemId: COPPER_ID, quantity: 1 }],
-      }),
-    ]);
-
-    const gathering = buildGathering();
-
-    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 2)).toBe(2);
-    expect(gatheringResultsAtLevel).toHaveBeenCalledWith(gathering, 2);
-  });
-});
 
 describe('workerGatherXpGateSatisfied', () => {
   it('is true within the workerLevelRange window', () => {

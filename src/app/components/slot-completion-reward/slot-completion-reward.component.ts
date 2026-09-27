@@ -9,17 +9,13 @@ import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { getEntry } from '@helpers/content/content';
 import {
-  isRecipeDiscovered,
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultSpritesheet,
 } from '@helpers/crafting/recipes';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { assertNeverReward } from '@helpers/item/loot';
-import { isMaterialDiscovered } from '@helpers/item/materials';
-import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
-import { isWorkerRescued } from '@helpers/worker/worker-discovery';
+import { isRewardDiscovered } from '@helpers/world-node/world-node-rewards';
 import type {
   CollectibleContent,
   DropRarity,
@@ -120,41 +116,7 @@ export class SlotCompletionRewardComponent {
     }
   });
 
-  public displayTooltip = computed(() => {
-    const reward = this.reward();
-    switch (reward.kind) {
-      case 'Item':
-        return resolveRewardDisplay({ itemId: reward.itemId });
-      case 'Equipment':
-        return resolveRewardDisplay({ equipmentId: reward.equipmentId });
-      case 'Worker': {
-        return resolveRewardDisplay({ workerId: reward.workerId });
-      }
-      case 'Recipe': {
-        return resolveRewardDisplay({ recipeId: reward.recipeId });
-      }
-      case 'Collectible':
-        return resolveRewardDisplay({ collectibleId: reward.collectibleId });
-      default:
-        return assertNeverReward(reward);
-    }
-  });
+  public displayTooltip = computed(() => resolveRewardDisplay(this.reward()));
 
-  public isDiscovered = computed(() => {
-    const reward = this.reward();
-    switch (reward.kind) {
-      case 'Item':
-        return isMaterialDiscovered(reward.itemId);
-      case 'Equipment':
-        return isEquipmentDiscovered(reward.equipmentId);
-      case 'Recipe':
-        return isRecipeDiscovered(reward.recipeId);
-      case 'Worker':
-        return isWorkerRescued(reward.workerId);
-      case 'Collectible':
-        return isCollectibleDiscovered(reward.collectibleId);
-      default:
-        return assertNeverReward(reward);
-    }
-  });
+  public isDiscovered = computed(() => isRewardDiscovered(this.reward()));
 }

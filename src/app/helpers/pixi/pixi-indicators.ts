@@ -84,9 +84,11 @@ export function pixiIndicatorPlayerSpriteCreate(
   return sprite;
 }
 
-// Progress bar above the party's tile while gathering. The float-above offset lives in the graphics'
-// transform, not their drawn rect, so scaling the fill doesn't drag it sideways.
-export function pixiIndicatorGatherProgressCreate(tileSize: number): {
+// Tinted to match the activity's node label. The float-above offset lives in the transform, so scaling the fill doesn't drag it sideways.
+export function pixiIndicatorProgressBarCreate(
+  tileSize: number,
+  kind: WorldNodeInteractionKind,
+): {
   container: Container;
   update: (fraction: number) => void;
 } {
@@ -106,40 +108,7 @@ export function pixiIndicatorGatherProgressCreate(tileSize: number): {
 
   const fill = new Graphics()
     .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
-    .fill(0x4ade80);
-  fill.x = offsetX;
-  fill.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
-
-  container.addChild(background, fill);
-
-  const update = (fraction: number) => {
-    fill.scale.x = clamp(fraction, 0, 1);
-  };
-
-  return { container, update };
-}
-
-export function pixiIndicatorEncounterProgressCreate(tileSize: number): {
-  container: Container;
-  update: (fraction: number) => void;
-} {
-  const barWidth = tileSize * 0.8;
-  const offsetX = (tileSize - barWidth) / 2;
-
-  const container = new Container();
-  container.cullable = true;
-  container.visible = false;
-
-  const background = new Graphics()
-    .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
-    .fill(0x000000);
-  background.alpha = 0.6;
-  background.x = offsetX;
-  background.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
-
-  const fill = new Graphics()
-    .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
-    .fill(0xfb7185);
+    .fill(NODE_LABEL_COLOR_BY_KIND[kind]);
   fill.x = offsetX;
   fill.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
 

@@ -17,8 +17,8 @@ vi.mock('@helpers/state-game', () => ({
   updateGamestate: vi.fn(),
 }));
 
-vi.mock('@helpers/town/worker/town-worker-progression', () => ({
-  townWorkerStatsForLevel: vi.fn(),
+vi.mock('@helpers/worker/worker-progression', () => ({
+  workerStatsForLevel: vi.fn(),
 }));
 
 vi.mock('@helpers/world-node/world-node-gathering', () => ({
@@ -38,7 +38,7 @@ import { getEntry } from '@helpers/content/content';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { updateGamestate } from '@helpers/state-game';
-import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
+import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import {
   townWorkerAssignmentIsValid,
   townWorkerBeginOutboundTrip,
@@ -119,7 +119,7 @@ describe('townWorkerAssignmentIsValid', () => {
 
   beforeEach(() => {
     vi.mocked(getEntry).mockReturnValue({} as never);
-    vi.mocked(townWorkerStatsForLevel).mockReturnValue({
+    vi.mocked(workerStatsForLevel).mockReturnValue({
       capacity: 5,
       gatherSpeed: 1,
       stamina: 20,

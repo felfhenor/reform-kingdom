@@ -2,13 +2,9 @@ import { getEntry } from '@helpers/content/content';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { updateGamestate } from '@helpers/state-game';
-import { townWorkerStatsForLevel } from '@helpers/town/worker/town-worker-progression';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
-import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
+import { workerStatsForLevel } from '@helpers/worker/worker-progression';
+import { workerGatherNodeHasItem } from '@helpers/worker/worker-shared';
+import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   ItemId,
   TownContent,
@@ -17,16 +13,6 @@ import type {
   WorkerContent,
   WorkerId,
 } from '@interfaces';
-
-function gatherNodeHasItem(nodeName: string, itemId: ItemId): boolean {
-  const node = worldNodeByName(nodeName);
-  const gathering = node ? worldNodeGathering(node) : undefined;
-  if (!gathering) return false;
-
-  return gatheringResultsAtLevel(gathering, worldNodeLevel(nodeName)).some(
-    (result) => result.items.some((item) => item.itemId === itemId),
-  );
-}
 
 // Cost from the town's own node, not the Kingdom.
 export function townWorkerStaminaCostToNode(
@@ -51,7 +37,7 @@ export function townWorkerAssignmentIsValid(
   const content = getEntry<WorkerContent>(workerId);
   if (!content) return false;
 
-  const stamina = townWorkerStatsForLevel(content, level).stamina;
+  const stamina = workerStatsForLevel(content, level).stamina;
   const cost = townWorkerStaminaCostToNode(
     town,
     assignment.nodeName,
@@ -59,7 +45,7 @@ export function townWorkerAssignmentIsValid(
   );
 
   return (
-    gatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
+    workerGatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
     cost !== undefined &&
     cost <= stamina
   );

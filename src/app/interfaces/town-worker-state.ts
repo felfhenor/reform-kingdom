@@ -2,6 +2,7 @@ import type { ItemId } from '@interfaces/content-item';
 import type { WorkerId } from '@interfaces/content-worker';
 import type { CurrentLocation } from '@interfaces/state-game';
 import type { TravelStep } from '@interfaces/travel';
+import type { WorkerStatus } from '@interfaces/worker-state';
 import type { WorldNodeEntry } from '@interfaces/world-nodes';
 
 export type TownWorkerAssignment = {
@@ -57,6 +58,12 @@ export type TownWorkerState = {
 
   status: TownWorkerStatus;
   assignment: TownWorkerAssignment | null;
+};
+
+// Readonly status: shared tick logic may edit one in place but never swap it, since the two status unions differ.
+export type AnyWorkerState = {
+  location: CurrentLocation;
+  readonly status: WorkerStatus | TownWorkerStatus;
 };
 
 // Display-only shape for one roster row - rendered by the Workers tab.

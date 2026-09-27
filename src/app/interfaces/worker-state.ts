@@ -46,6 +46,10 @@ export type WorkerStatus =
   | WorkerStatusGathering
   | WorkerStatusTravelingBack;
 
+export type WorkerGatherTickOutcome =
+  | { kind: 'Progress'; ticksIntoGather: number }
+  | { kind: 'UnitGathered'; itemsGathered: number };
+
 export type WorkerState = {
   level: number;
   xp: { current: number; maximum: number };
