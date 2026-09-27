@@ -152,21 +152,27 @@ describe('raidResolveVictory', () => {
     const drops = [{ itemId: 'gold-coin' as never, quantity: 500 }];
     vi.mocked(rollDroppedRewards).mockReturnValue(drops as never);
 
-    raidResolveVictory(combat, townId);
+    const killDrops = [{ itemId: 'gold-coin' as never, quantity: 20 }];
+
+    raidResolveVictory(combat, townId, killDrops as never);
 
     expect(rollDroppedRewards).toHaveBeenCalledWith(
       buildTown().defense.rewards,
       25,
       0,
     );
-    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, drops);
+    expect(grantResolvedDrops).toHaveBeenCalledTimes(1);
+    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, [
+      ...killDrops,
+      ...drops,
+    ]);
     expect(townReputationGain).toHaveBeenCalledWith(townId, 100, 'RaidDefense');
   });
 
   it('re-syncs the town buff immediately when the reputation gain crosses a tier', () => {
     vi.mocked(townReputationTier).mockReturnValueOnce(0).mockReturnValueOnce(1);
 
-    raidResolveVictory({} as Combat, townId);
+    raidResolveVictory({} as Combat, townId, []);
 
     expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
   });
@@ -174,13 +180,13 @@ describe('raidResolveVictory', () => {
   it('does not re-sync the town buff when the reputation gain stays within a tier', () => {
     vi.mocked(townReputationTier).mockReturnValue(0);
 
-    raidResolveVictory({} as Combat, townId);
+    raidResolveVictory({} as Combat, townId, []);
 
     expect(townReputationBuffRefresh).not.toHaveBeenCalled();
   });
 
   it('sets lastRaidResolvedAtTick', () => {
-    raidResolveVictory({} as Combat, townId);
+    raidResolveVictory({} as Combat, townId, []);
 
     const updateFn = updateFnAt(0);
     const state = {
@@ -191,12 +197,15 @@ describe('raidResolveVictory', () => {
     expect(result.world.towns[townId].lastRaidResolvedAtTick).toBe(1000);
   });
 
-  it('does nothing when the town no longer resolves', () => {
+  it('only grants kill drops when the town no longer resolves', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
+    const combat = {} as Combat;
+    const killDrops = [{ itemId: 'gold-coin', quantity: 20 }] as never;
 
-    raidResolveVictory({} as Combat, townId);
+    raidResolveVictory(combat, townId, killDrops);
 
-    expect(grantResolvedDrops).not.toHaveBeenCalled();
+    expect(rollDroppedRewards).not.toHaveBeenCalled();
+    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
     expect(townReputationGain).not.toHaveBeenCalled();
     expect(updateGamestate).not.toHaveBeenCalled();
   });

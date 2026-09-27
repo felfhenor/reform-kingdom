@@ -22,6 +22,7 @@ import type {
   EncounterRandomContent,
   EncounterRandomId,
   MonsterContent,
+  ResolvedDrop,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -73,11 +74,17 @@ function markEncounterRandomCompleted(
 }
 
 // Fires once the last generated fight has been won - rolled fresh every cycle.
-function grantEncounterRandomCompletionRewards(combat: Combat): void {
-  if (!combat.encounterRandomId) return;
-
-  const content = getEntry<EncounterRandomContent>(combat.encounterRandomId);
-  if (!content) return;
+function grantEncounterRandomCompletionRewards(
+  combat: Combat,
+  monsterDrops: ResolvedDrop[],
+): void {
+  const content = combat.encounterRandomId
+    ? getEntry<EncounterRandomContent>(combat.encounterRandomId)
+    : undefined;
+  if (!content) {
+    grantResolvedDrops(combat, monsterDrops);
+    return;
+  }
 
   analyticsSendDesignEvent(
     `World:Event:Complete:${analyticsSafeSegment(content.name)}`,
@@ -92,25 +99,33 @@ function grantEncounterRandomCompletionRewards(combat: Combat): void {
     level,
     combatItemDropRateBoost(),
   );
-  grantResolvedDrops(combat, drops);
+  grantResolvedDrops(combat, [...monsterDrops, ...drops]);
 
-  markEncounterRandomCompleted(combat.encounterRandomId);
+  markEncounterRandomCompleted(content.id);
 }
 
 // Returns true if another generated fight was started - callers must not
 // reset combat state in that case.
-export function encounterRandomHandleVictory(combat: Combat): boolean {
-  if (!combat.encounterRandomId) return false;
+export function encounterRandomHandleVictory(
+  combat: Combat,
+  monsterDrops: ResolvedDrop[],
+): boolean {
+  if (!combat.encounterRandomId) {
+    grantResolvedDrops(combat, monsterDrops);
+    return false;
+  }
 
   const nodeState = encounterRandomState(combat.encounterRandomId);
   const nextFightIndex = (combat.fightIndex ?? 0) + 1;
   const nextFight = nodeState?.fights[nextFightIndex];
 
   if (!nextFight) {
-    grantEncounterRandomCompletionRewards(combat);
+    grantEncounterRandomCompletionRewards(combat, monsterDrops);
     taskRecordEncounterClear(combat.locationName);
     return false;
   }
+
+  grantResolvedDrops(combat, monsterDrops);
 
   const entry = worldNodeByName(combat.locationName);
   if (!entry) return false;

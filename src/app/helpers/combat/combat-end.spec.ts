@@ -78,6 +78,7 @@ vi.mock('@helpers/item/loot', () => ({
 
 vi.mock('@helpers/item/materials', () => ({
   addMaterial: vi.fn(),
+  goldCoinId: vi.fn(() => 'gold-coin'),
 }));
 
 vi.mock('@helpers/combat/monster', () => ({
@@ -135,6 +136,7 @@ import {
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { rollDroppedRewards } from '@helpers/item/loot';
+import { addMaterial } from '@helpers/item/materials';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
 import {
   raidResolveDefeat,
@@ -348,6 +350,82 @@ describe('combatCheckIfOver', () => {
     expect(recipeDiscover).toHaveBeenCalledWith(recipe.id);
   });
 
+  it('merges final-fight kill drops with completion rewards into one grant per material', () => {
+    const monster = { id: 'monster-1', drops: [] } as unknown as MonsterContent;
+    const encounter = {
+      fights: [{ monsters: [] }],
+      completionRewards: [],
+    } as unknown as EncounterContent;
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : monster) as never,
+    );
+    vi.mocked(rollDroppedRewards)
+      .mockReturnValueOnce([
+        { kind: 'Item', itemId: 'ore' as never, quantity: 3 },
+      ])
+      .mockReturnValueOnce([
+        { kind: 'Item', itemId: 'ore' as never, quantity: 4 },
+      ]);
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(addMaterial).toHaveBeenCalledTimes(1);
+    expect(addMaterial).toHaveBeenCalledWith('ore', 7);
+    // Task completion logs after the drops, matching the ExploreRandom path.
+    expect(vi.mocked(addMaterial).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(taskRecordEncounterClear).mock.invocationCallOrder[0],
+    );
+  });
+
+  it('grants kill drops before starting the next fight mid-encounter', () => {
+    const monster = { id: 'monster-1', drops: [] } as unknown as MonsterContent;
+    const encounter = {
+      fights: [{ monsters: [] }, { monsters: [] }],
+      completionRewards: [],
+    } as unknown as EncounterContent;
+    vi.mocked(getEntry).mockImplementation(
+      (id) => (id === 'enc-1' ? encounter : monster) as never,
+    );
+    vi.mocked(rollDroppedRewards).mockReturnValueOnce([
+      { kind: 'Item', itemId: 'ore' as never, quantity: 3 },
+    ]);
+
+    const combat = buildCombat({
+      encounterId: 'enc-1' as EncounterId,
+      fightIndex: 0,
+      guardians: [
+        buildCombatant({
+          id: 'guardian-1',
+          isEnemy: true,
+          hp: 0,
+          monsterId: 'monster-1',
+        }),
+      ],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(addMaterial).toHaveBeenCalledWith('ore', 3);
+    expect(vi.mocked(addMaterial).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(encounterStartFight).mock.invocationCallOrder[0],
+    );
+    expect(rollDroppedRewards).toHaveBeenCalledTimes(1);
+    expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 1, 'Field Ruins');
+  });
+
   it('resets combat on victory when the combat has no encounter (e.g. a bare fight)', () => {
     const combat = buildCombat({});
 
@@ -390,7 +468,7 @@ describe('combatCheckIfOver', () => {
     const result = combatCheckIfOver(combat);
 
     expect(result).toBe(true);
-    expect(raidResolveVictory).toHaveBeenCalledWith(combat, 'larsia');
+    expect(raidResolveVictory).toHaveBeenCalledWith(combat, 'larsia', []);
     expect(encounterStartFight).not.toHaveBeenCalled();
     expect(combatReset).toHaveBeenCalled();
   });

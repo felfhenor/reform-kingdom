@@ -44,15 +44,23 @@ import type {
   ItemContent,
   ItemId,
   RecipeContent,
+  ResolvedDrop,
   TownContent,
   TownId,
   TownRaidLossSummary,
 } from '@interfaces';
 
 // Grants the town's raid-only reward table through the same pipeline monster kills use.
-export function raidResolveVictory(combat: Combat, townId: TownId): void {
+export function raidResolveVictory(
+  combat: Combat,
+  townId: TownId,
+  monsterDrops: ResolvedDrop[],
+): void {
   const town = getEntry<TownContent>(townId);
-  if (!town) return;
+  if (!town) {
+    grantResolvedDrops(combat, monsterDrops);
+    return;
+  }
 
   analyticsSendDesignEvent(`Town:Raid:Win:${analyticsSafeSegment(town.name)}`);
 
@@ -61,7 +69,7 @@ export function raidResolveVictory(combat: Combat, townId: TownId): void {
     town.level,
     combatItemDropRateBoost(),
   );
-  grantResolvedDrops(combat, drops);
+  grantResolvedDrops(combat, [...monsterDrops, ...drops]);
 
   // Not awaited: this always runs inside a tick, where updateGamestate mutates synchronously,
   // so the tier read right below already sees the change without needing the returned promise.

@@ -152,8 +152,32 @@ describe('encounterRandomHandleVictory', () => {
   });
 
   it('returns false when the combat has no encounterRandomId', () => {
-    expect(encounterRandomHandleVictory({} as Combat)).toBe(false);
+    const combat = {} as Combat;
+    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }] as never;
+
+    expect(encounterRandomHandleVictory(combat, killDrops)).toBe(false);
     expect(updateGamestate).not.toHaveBeenCalled();
+    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
+  });
+
+  it('still grants kill drops when the last fight is won but the content no longer resolves', () => {
+    vi.mocked(encounterRandomState).mockReturnValue({
+      fights: [{ level: 1, monsters: [] }],
+      generatedAtTick: 0,
+      completedThisCycle: false,
+    } as EncounterRandomNodeState);
+    vi.mocked(getEntry).mockReturnValue(undefined);
+    const combat = {
+      encounterRandomId: 'gobslime-shrine' as EncounterRandomId,
+      fightIndex: 0,
+      locationName: entry.nodeName,
+      guardians: [{ level: 16 }],
+    } as unknown as Combat;
+    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }] as never;
+
+    expect(encounterRandomHandleVictory(combat, killDrops)).toBe(false);
+    expect(rollDroppedRewards).not.toHaveBeenCalled();
+    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
   });
 
   it('starts the next generated fight when one remains', () => {
@@ -186,8 +210,10 @@ describe('encounterRandomHandleVictory', () => {
       guardians: [{ level: 12 }],
     } as unknown as Combat;
 
-    expect(encounterRandomHandleVictory(combat)).toBe(true);
-    expect(grantResolvedDrops).not.toHaveBeenCalled();
+    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }] as never;
+    expect(encounterRandomHandleVictory(combat, killDrops)).toBe(true);
+    expect(rollDroppedRewards).not.toHaveBeenCalled();
+    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
     expect(updateGamestate).toHaveBeenCalledTimes(1);
   });
 
@@ -209,7 +235,10 @@ describe('encounterRandomHandleVictory', () => {
       guardians: [{ level: 16 }],
     } as unknown as Combat;
 
-    expect(encounterRandomHandleVictory(combat)).toBe(false);
+    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }];
+    expect(encounterRandomHandleVictory(combat, killDrops as never)).toBe(
+      false,
+    );
 
     expect(taskRecordEncounterClear).toHaveBeenCalledWith(entry.nodeName);
     expect(rollDroppedRewards).toHaveBeenCalledWith(
@@ -217,7 +246,9 @@ describe('encounterRandomHandleVictory', () => {
       16,
       0,
     );
+    expect(grantResolvedDrops).toHaveBeenCalledTimes(1);
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, [
+      ...killDrops,
       { collectibleId: 'gobslime-flower' },
     ]);
 

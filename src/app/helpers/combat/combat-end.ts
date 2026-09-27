@@ -41,6 +41,7 @@ import type {
   EncounterId,
   EncounterRandomContent,
   MonsterContent,
+  ResolvedDrop,
   TownContent,
   TownId,
 } from '@interfaces';
@@ -123,35 +124,42 @@ function grantVictoryRewards(combat: Combat): void {
     );
     if (leveledUp) autoModeResetNodeFailureCounts();
   }
+}
 
+function rollMonsterDrops(combat: Combat): ResolvedDrop[] {
   const dropRateBoost = combatItemDropRateBoost();
-  const drops = monsters.flatMap(({ monster, level }) =>
+  return defeatedMonsters(combat).flatMap(({ monster, level }) =>
     rollDroppedRewards(monster.drops, level, dropRateBoost),
   );
-  grantResolvedDrops(combat, drops);
+}
+
+function completedEncounter(combat: Combat): EncounterContent | undefined {
+  if (combat.encounterId === undefined) return undefined;
+  return getEntry<EncounterContent>(combat.encounterId);
 }
 
 // Fires once the encounter's last fight is won; rolled fresh each clear.
-function grantEncounterCompletionRewards(combat: Combat): void {
-  if (combat.encounterId === undefined) return;
+function rollEncounterCompletionRewards(combat: Combat): ResolvedDrop[] {
+  const encounter = completedEncounter(combat);
+  if (!encounter) return [];
 
-  const encounter = getEntry<EncounterContent>(combat.encounterId);
-  if (!encounter) return;
+  // The encounter's level is rolled once and applied to every guardian,
+  // so the first guardian's level represents it.
+  const level = combat.guardians[0]?.level ?? 1;
+  return rollDroppedRewards(
+    encounter.completionRewards,
+    level,
+    combatItemDropRateBoost(),
+  );
+}
+
+function recordEncounterClear(combat: Combat): void {
+  if (!completedEncounter(combat)) return;
 
   analyticsSendDesignEvent(
     `World:Node:Complete:${analyticsSafeSegment(combat.locationName)}`,
   );
   taskRecordEncounterClear(combat.locationName);
-
-  // The encounter's level is rolled once and applied to every guardian,
-  // so the first guardian's level represents it.
-  const level = combat.guardians[0]?.level ?? 1;
-  const drops = rollDroppedRewards(
-    encounter.completionRewards,
-    level,
-    combatItemDropRateBoost(),
-  );
-  grantResolvedDrops(combat, drops);
 }
 
 // The fight after this one within the same encounter, if there is one -
@@ -182,21 +190,29 @@ function handleCombatVictory(combat: Combat): boolean {
   autoModeRecordNodeSuccess(combat.locationName);
   grantVictoryRewards(combat);
 
+  // Final-fight kill drops are granted together with completion rewards so duplicate materials log once.
+  const monsterDrops = rollMonsterDrops(combat);
+
   if (combat.raidTownId) {
-    raidResolveVictory(combat, combat.raidTownId as TownId);
+    raidResolveVictory(combat, combat.raidTownId as TownId, monsterDrops);
     return false;
   }
 
   if (combat.encounterRandomId) {
-    return encounterRandomHandleVictory(combat);
+    return encounterRandomHandleVictory(combat, monsterDrops);
   }
 
   const nextFight = nextFightFor(combat);
   if (!nextFight) {
-    grantEncounterCompletionRewards(combat);
+    grantResolvedDrops(combat, [
+      ...monsterDrops,
+      ...rollEncounterCompletionRewards(combat),
+    ]);
+    recordEncounterClear(combat);
     return false;
   }
 
+  grantResolvedDrops(combat, monsterDrops);
   encounterStartFight(
     nextFight.encounterId,
     nextFight.fightIndex,
