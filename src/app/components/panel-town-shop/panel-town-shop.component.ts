@@ -1,16 +1,14 @@
-import { DecimalPipe, formatNumber } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
-  LOCALE_ID,
-  signal,
   viewChild,
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { ModalTradeQuantityComponent } from '@components/modal-trade-quantity/modal-trade-quantity.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { ListRowDirective } from '@directives/list-row.directive';
@@ -31,8 +29,6 @@ import { townStockAffordable } from '@helpers/town/shop/town-trade';
 import { townExecuteTrade } from '@helpers/town/shop/town-trade.ui';
 import type { TownContent, TownStockEntry, TownStockRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-panel-town-shop',
@@ -41,7 +37,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     BlankSlateComponent,
     CurrencyCostComponent,
     DecimalPipe,
-    SweetAlert2Module,
+    ModalTradeQuantityComponent,
     TippyDirective,
     TooltipItemPreviewComponent,
     SlotRarityOutlineComponent,
@@ -52,7 +48,6 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   templateUrl: './panel-town-shop.component.html',
 })
 export class PanelTownShopComponent {
-  private locale = inject(LOCALE_ID);
   public town = input.required<TownContent>();
 
   public goldCoinItemId = goldCoinId();
@@ -100,34 +95,25 @@ export class PanelTownShopComponent {
     return townStockBonusCombatStats(entry);
   }
 
-  private confirmSwal = viewChild<SwalComponent>('confirmSwal');
-  private pendingRow = signal<TownStockRow | undefined>(undefined);
+  private quantityPrompt = viewChild(ModalTradeQuantityComponent);
 
-  public requestTrade(row: TownStockRow, skipConfirm = false): void {
+  public async requestTrade(
+    row: TownStockRow,
+    skipConfirm = false,
+  ): Promise<void> {
     if (row.price === undefined || !row.affordable) return;
 
-    this.pendingRow.set(row);
-    if (skipConfirm) {
-      void this.confirmSingle();
-      return;
-    }
-
     const name = this.stockEntryName(row.entry);
-    const price = formatNumber(row.price, this.locale);
-
-    const swal = this.confirmSwal();
-    if (!swal) return;
-    swal.swalOptions = { text: `Buy ${name} for ${price}g?` };
-    swal.fire();
+    const quantity =
+      (await this.quantityPrompt()?.ask(
+        { verb: 'Buy', name, price: row.price, maxQuantity: 1 },
+        skipConfirm,
+      )) ?? 0;
+    if (quantity > 0) await this.buy(row, name);
   }
 
-  public async confirmSingle(): Promise<void> {
-    const row = this.pendingRow();
-    this.pendingRow.set(undefined);
-    if (!row) return;
-
+  private async buy(row: TownStockRow, name: string): Promise<void> {
     const town = this.town();
-    const name = this.stockEntryName(row.entry);
 
     try {
       if (!(await townExecuteTrade(town.id, row.entry.equipmentItem.id)))

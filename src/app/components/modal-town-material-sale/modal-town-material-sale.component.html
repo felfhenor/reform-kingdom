@@ -21,19 +21,4 @@
   </div>
 </app-modal>
 
-<swal
-  #confirmSwal
-  icon="question"
-  confirmButtonText="Yes"
-  cancelButtonText="Cancel"
-  (confirm)="confirmSingle()"
-></swal>
-
-<swal
-  #quantitySwal
-  icon="question"
-  input="number"
-  confirmButtonText="Confirm"
-  cancelButtonText="Cancel"
-  (confirm)="confirmQuantity($event)"
-></swal>
+<app-modal-trade-quantity />

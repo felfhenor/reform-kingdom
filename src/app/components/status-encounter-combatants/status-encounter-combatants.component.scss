@@ -5,10 +5,10 @@
 }
 
 // `column-reverse` stacks row 0 (nearest the hero row) at the bottom.
-.monster-rows {
+.combatant-rows {
   @apply flex flex-col-reverse gap-2 pointer-events-auto;
 }
 
-.monster-row {
+.combatant-row {
   @apply flex gap-2;
 }

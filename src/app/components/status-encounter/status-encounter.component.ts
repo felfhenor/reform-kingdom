@@ -4,16 +4,15 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { StatusHelperComponent } from '@components/status-helper/status-helper.component';
+import { StatusEncounterCombatantsComponent } from '@components/status-encounter-combatants/status-encounter-combatants.component';
 import { StatusHeroComponent } from '@components/status-hero/status-hero.component';
-import { StatusMonsterComponent } from '@components/status-monster/status-monster.component';
 import { worldCombatState } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 
 @Component({
   selector: 'app-status-encounter',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StatusHeroComponent, StatusHelperComponent, StatusMonsterComponent],
+  imports: [StatusHeroComponent, StatusEncounterCombatantsComponent],
   template: `
     <div
       class="encounter-status"
@@ -22,12 +21,19 @@ import { getOption } from '@helpers/state-options';
     >
       <app-status-hero [expanded]="isExpanded()"></app-status-hero>
 
-      @if (hasHelpers()) {
-        <app-status-helper [expanded]="isExpanded()"></app-status-helper>
+      @if (helpers().length > 0) {
+        <app-status-encounter-combatants
+          [combatants]="helpers()"
+          [expanded]="isExpanded()"
+        ></app-status-encounter-combatants>
       }
 
-      @if (hasEnemies()) {
-        <app-status-monster [expanded]="isExpanded()"></app-status-monster>
+      @if (guardians().length > 0) {
+        <app-status-encounter-combatants
+          [combatants]="guardians()"
+          [expanded]="isExpanded()"
+          [slideIn]="true"
+        ></app-status-encounter-combatants>
       }
     </div>
   `,
@@ -56,12 +62,8 @@ export class StatusEncounterComponent {
     () => getOption('partyViewAlwaysExpand') || this.isHovered(),
   );
 
-  public hasEnemies = computed(
-    () => (worldCombatState()?.guardians ?? []).length > 0,
-  );
-  public hasHelpers = computed(
-    () => (worldCombatState()?.helpers ?? []).length > 0,
-  );
+  public guardians = computed(() => worldCombatState()?.guardians ?? []);
+  public helpers = computed(() => worldCombatState()?.helpers ?? []);
 
   public setHovered(hovered: boolean): void {
     this.isHovered.set(hovered);

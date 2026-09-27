@@ -1,11 +1,12 @@
 @if (rows().length > 0) {
-  <div class="helper-rows">
+  <div class="combatant-rows">
     @for (row of rows(); track $index) {
-      <div class="helper-row">
+      <div class="combatant-row">
         @for (entry of row; track entry.combatantId) {
           <app-card-status-combatant
             [entry]="entry"
             [expanded]="expanded()"
+            (animate.enter)="onEnter($event)"
           ></app-card-status-combatant>
         }
       </div>

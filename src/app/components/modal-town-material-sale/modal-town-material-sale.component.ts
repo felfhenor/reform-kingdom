@@ -1,15 +1,12 @@
-import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
-  LOCALE_ID,
-  signal,
   viewChild,
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { ModalTradeQuantityComponent } from '@components/modal-trade-quantity/modal-trade-quantity.component';
 import { SlotCaravanTradeComponent } from '@components/slot-caravan-trade/slot-caravan-trade.component';
 import { caravanTradeDisplay } from '@helpers/caravan/caravan-trade-display.ui';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
@@ -23,8 +20,6 @@ import {
 import { townExecuteMaterialSale } from '@helpers/town/shop/town-material-sale.ui';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type { CaravanTradeRow } from '@interfaces';
-import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-modal-town-material-sale',
@@ -33,13 +28,11 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     BlankSlateComponent,
     SlotCaravanTradeComponent,
     ModalComponent,
-    SweetAlert2Module,
+    ModalTradeQuantityComponent,
   ],
   templateUrl: './modal-town-material-sale.component.html',
 })
 export class ModalTownMaterialSaleComponent {
-  private locale = inject(LOCALE_ID);
-
   public entry = computed(() => activeTownNode());
 
   public town = computed(() => {
@@ -82,58 +75,21 @@ export class ModalTownMaterialSaleComponent {
       });
   });
 
-  private confirmSwal = viewChild<SwalComponent>('confirmSwal');
-  private quantitySwal = viewChild<SwalComponent>('quantitySwal');
-  private pendingRow = signal<CaravanTradeRow | undefined>(undefined);
+  private quantityPrompt = viewChild(ModalTradeQuantityComponent);
 
-  public requestTrade(row: CaravanTradeRow, skipConfirm = false): void {
-    if (row.soldOut || row.maxQuantity <= 0) return;
-
-    this.pendingRow.set(row);
-    if (skipConfirm) {
-      this.confirmSingle();
-      return;
-    }
+  public async requestTrade(
+    row: CaravanTradeRow,
+    skipConfirm = false,
+  ): Promise<void> {
+    if (row.soldOut) return;
 
     const name = caravanTradeDisplay(row.trade)?.name ?? 'this';
-    const price = formatNumber(row.price, this.locale);
-
-    if (row.maxQuantity === 1) {
-      const swal = this.confirmSwal();
-      if (!swal) return;
-      swal.swalOptions = { text: `Buy ${name} for ${price}g?` };
-      swal.fire();
-      return;
-    }
-
-    const swal = this.quantitySwal();
-    if (!swal) return;
-    swal.swalOptions = {
-      text: `How many ${name} would you like to buy? (${price}g each)`,
-      inputValue: 1,
-      inputAttributes: { min: '0', max: `${row.maxQuantity}` },
-    };
-    swal.fire();
-  }
-
-  public confirmSingle(): void {
-    const row = this.pendingRow();
-    this.pendingRow.set(undefined);
-    if (row) this.commitTrade(row, 1);
-  }
-
-  public confirmQuantity(value: unknown): void {
-    const row = this.pendingRow();
-    this.pendingRow.set(undefined);
-    if (!row) return;
-
-    const requested = Math.floor(Number(value));
-    const quantity = Number.isFinite(requested)
-      ? Math.min(Math.max(requested, 0), row.maxQuantity)
-      : 0;
-    if (quantity <= 0) return;
-
-    this.commitTrade(row, quantity);
+    const quantity =
+      (await this.quantityPrompt()?.ask(
+        { verb: 'Buy', name, price: row.price, maxQuantity: row.maxQuantity },
+        skipConfirm,
+      )) ?? 0;
+    if (quantity > 0) await this.commitTrade(row, quantity);
   }
 
   private async commitTrade(

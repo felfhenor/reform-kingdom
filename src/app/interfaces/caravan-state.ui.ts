@@ -19,6 +19,13 @@ export type CaravanTradeRow = {
   ownedQuantity: number;
 };
 
+export type TradeQuantityPrompt = {
+  verb: 'Buy' | 'Sell';
+  name: string;
+  price: number;
+  maxQuantity: number;
+};
+
 // Index into the trader's `tokenTrades` array - kept alongside the trade
 // itself so a caller can execute the trade after filtering the display list.
 export type CaravanTokenTradeRow = {
