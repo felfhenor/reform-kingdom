@@ -15,6 +15,7 @@ import {
   endCombatLogCommits,
 } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
+import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
 import {
   combatCanTakeTurn,
@@ -189,6 +190,7 @@ export function combatantTakeTurn(
           combat,
           `**${combatantMessageToken(combatant)}**'s **${chosenSkill.name}** misses **${combatantMessageToken(target)}**!`,
         );
+        combatantDamageEventEmit(target.id, 0, 'miss');
         return;
       }
 

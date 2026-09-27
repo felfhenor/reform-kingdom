@@ -519,12 +519,159 @@ describe('combatCombatantTakeDamage', () => {
     ]);
   });
 
+  it('tags the event with the given variant for a damaging hit', () => {
+    const hero = buildCombatant({ isEnemy: false, hp: 100 });
+
+    combatCombatantTakeDamage(hero, 25, 'critical');
+
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: hero.id, amount: -25, variant: 'critical' },
+    ]);
+  });
+
+  it('drops the variant on a heal', () => {
+    const hero = buildCombatant({ isEnemy: false, hp: 50 });
+
+    combatCombatantTakeDamage(hero, -25, 'critical');
+
+    expect(combatantDamageEvents()[0].variant).toBeUndefined();
+  });
+
   it('does not emit an event when the amount is zero', () => {
     const hero = buildCombatant({ isEnemy: false, hp: 100 });
 
     combatCombatantTakeDamage(hero, 0);
 
     expect(combatantDamageEvents()).toHaveLength(0);
+  });
+});
+
+describe('combatApplySkillToTarget critical hit event', () => {
+  function applyStrengthHit(): Combatant {
+    const attacker = buildCombatant({
+      totalStats: { ...buildCombatant().totalStats!, Strength: 100 },
+    });
+    const target = buildCombatant({
+      id: 'target-1',
+      hp: 1000,
+      totalStats: { ...buildCombatant().totalStats!, Health: 1000 },
+    });
+    const technique = buildTechnique({
+      damageScaling: {
+        ...buildTechnique().damageScaling,
+        Strength: 1,
+      },
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill(),
+      technique,
+    );
+
+    return target;
+  }
+
+  beforeEach(() => {
+    combatantDamageEvents.set([]);
+  });
+
+  it('tags the damage event as critical and doubles the damage when the luck roll succeeds', () => {
+    vi.mocked(rngSucceedsChance).mockReturnValueOnce(true);
+
+    const target = applyStrengthHit();
+
+    expect(target.hp).toBe(1000 - 200);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: 'target-1', amount: -200, variant: 'critical' },
+    ]);
+  });
+
+  it('leaves the damage event untagged when the luck roll fails', () => {
+    const target = applyStrengthHit();
+
+    expect(target.hp).toBe(1000 - 100);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: 'target-1', amount: -100 },
+    ]);
+    expect(combatantDamageEvents()[0].variant).toBeUndefined();
+  });
+});
+
+describe('combatApplySkillToTarget block and dodge events', () => {
+  const zeroStats = () => buildCombatant().totalStats!;
+  const strengthScaling = () => ({
+    ...buildTechnique().damageScaling,
+    Strength: 1,
+  });
+
+  beforeEach(() => {
+    combatantDamageEvents.set([]);
+  });
+
+  it('emits a block event when defense absorbs the whole hit', () => {
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats(), Strength: 30 },
+    });
+    const target = buildCombatant({
+      id: 'target-1',
+      hp: 1000,
+      totalStats: { ...zeroStats(), Health: 1000, Vitality: 50 },
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill(),
+      buildTechnique({ damageScaling: strengthScaling() }),
+    );
+
+    expect(target.hp).toBe(1000);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: 'target-1', amount: 0, variant: 'block' },
+    ]);
+  });
+
+  it('does not emit a block event when a technique never had damage to deal', () => {
+    const attacker = buildCombatant();
+    const target = buildCombatant({ id: 'target-1', hp: 1000 });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill(),
+      buildTechnique(),
+    );
+
+    expect(combatantDamageEvents()).toHaveLength(0);
+  });
+
+  it('emits a miss event on the target when it luck-dodges the technique', () => {
+    vi.mocked(rngSucceedsChance).mockReturnValueOnce(true);
+    const attacker = buildCombatant({
+      totalStats: { ...zeroStats(), Strength: 100 },
+    });
+    const target = buildCombatant({ id: 'target-1', hp: 1000 });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill(),
+      buildTechnique({
+        attributes: ['DamagesTarget', 'AllowLuckDodge'],
+        damageScaling: strengthScaling(),
+      }),
+    );
+
+    expect(target.hp).toBe(1000);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: 'target-1', amount: 0, variant: 'miss' },
+    ]);
   });
 });
 

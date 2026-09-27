@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/combat/combat-damage', () => ({
   combatApplySkillToTarget: vi.fn(),
   combatCombatantTakeDamage: vi.fn(),
+  techniqueHasAttribute: vi.fn(() => false),
 }));
 
 vi.mock('@helpers/combat/combat-end', () => ({
@@ -14,6 +15,7 @@ vi.mock('@helpers/combat/combat-end', () => ({
 
 vi.mock('@helpers/combat/combat-log', () => ({
   beginCombatLogCommits: vi.fn(),
+  combatantMessageToken: vi.fn(() => 'token'),
   combatMessageLog: vi.fn(),
   endCombatLogCommits: vi.fn(),
 }));
@@ -60,7 +62,10 @@ import {
   combatDoCombatIteration,
   combatantTakeTurn,
 } from '@helpers/combat/combat';
+import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
+import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
+import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
 import {
   combatAvailableSkillsForCombatant,
@@ -370,5 +375,29 @@ describe('combatantTakeTurn targeting', () => {
       1,
       expect.anything(),
     );
+  });
+
+  it('emits a miss event on the target and skips the technique when the missChance roll succeeds', () => {
+    const skill = buildTargetingSkill();
+    const target = buildCombatant({ id: 'target-1' });
+
+    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([skill]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(skill);
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValueOnce([target]);
+    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
+      (_combatant, stat) => stat === 'missChance',
+    );
+    combatantDamageEvents.set([]);
+
+    combatantTakeTurn(buildCombat(), buildCombatant());
+
+    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
+      () => false,
+    );
+
+    expect(combatApplySkillToTarget).not.toHaveBeenCalled();
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: 'target-1', amount: 0, variant: 'miss' },
+    ]);
   });
 });

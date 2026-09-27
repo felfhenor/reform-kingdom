@@ -12,7 +12,7 @@ import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-anima
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { damageNumberScale } from '@helpers/combat/combat-damage-events.ui';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
-import type { StatusCardEntry } from '@interfaces';
+import type { DamageEventVariant, StatusCardEntry } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
 import type { JSAnimation } from 'animejs';
 import { CombatStatusPlaybackService } from '@services/combat-status-playback.service';
@@ -62,22 +62,23 @@ export class CardStatusCombatantComponent {
   public onDamageNumberEnter(
     event: AnimationCallbackEvent,
     amount: number,
+    variant?: DamageEventVariant,
   ): void {
     const maxHp =
       this.entry().bars.find((bar) => bar.variant === 'hp')?.max ?? 0;
 
-    this.anim.damageNumber(
-      event.target,
-      this.playback.damageNumberLifetimeMs,
-      amount > 0,
-      damageNumberScale(amount, maxHp),
-    );
+    this.anim.damageNumber(event.target, {
+      lifetimeMs: this.playback.damageNumberLifetimeMs(variant),
+      isHeal: amount > 0,
+      variant,
+      scale: damageNumberScale(amount, maxHp),
+    });
   }
 
   public xOffsetPercent(seed: number): number {
     const range = this.expanded()
       ? EXPANDED_X_JITTER_PERCENT
       : COLLAPSED_X_JITTER_PERCENT;
-    return 50 + seed * range;
+    return seed * range;
   }
 }

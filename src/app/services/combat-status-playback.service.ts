@@ -6,7 +6,9 @@ import { combatantSkillCastEventsClear } from '@helpers/combat/combat-skill-even
 import type {
   CombatantDamageEvent,
   CombatantSkillCastEvent,
+  DamageEventVariant,
 } from '@interfaces';
+import { groupBy } from 'es-toolkit/compat';
 
 type DisplayedDamageNumber = {
   event: CombatantDamageEvent;
@@ -17,6 +19,11 @@ type DisplayedDamageNumber = {
 // Must match the skill-cast-fade CSS duration so the flash doesn't pop out mid-fade.
 const SKILL_CAST_LIFETIME_MS = 1500;
 const DAMAGE_NUMBER_LIFETIME_MS = 1100;
+const DAMAGE_NUMBER_LIFETIME_BY_VARIANT: Record<DamageEventVariant, number> = {
+  critical: 1700,
+  miss: 800,
+  block: 900,
+};
 // A backgrounded tab can dump a huge backlog of hits at once - only the newest are worth animating.
 const DAMAGE_NUMBER_MAX_PER_BATCH = 24;
 
@@ -26,8 +33,6 @@ const DAMAGE_NUMBER_MAX_PER_BATCH = 24;
   providedIn: 'root',
 })
 export class CombatStatusPlaybackService {
-  public readonly damageNumberLifetimeMs = DAMAGE_NUMBER_LIFETIME_MS;
-
   private displayedDamageNumbers = signal<DisplayedDamageNumber[]>([]);
   private displayedSkillCasts = signal<CombatantSkillCastEvent[]>([]);
 
@@ -81,12 +86,32 @@ export class CombatStatusPlaybackService {
       ...displayEntries,
     ]);
 
+    const byLifetime = groupBy(shownEvents, (event) =>
+      this.damageNumberLifetimeMs(event.variant),
+    );
+    Object.entries(byLifetime).forEach(([lifetimeMs, group]) =>
+      this.removeDamageNumbersAfter(group, Number(lifetimeMs)),
+    );
+  }
+
+  public damageNumberLifetimeMs(variant?: DamageEventVariant): number {
+    return variant
+      ? DAMAGE_NUMBER_LIFETIME_BY_VARIANT[variant]
+      : DAMAGE_NUMBER_LIFETIME_MS;
+  }
+
+  private removeDamageNumbersAfter(
+    events: CombatantDamageEvent[],
+    lifetimeMs: number,
+  ): void {
+    if (events.length === 0) return;
+
     setTimeout(() => {
-      const ids = new Set(shownEvents.map((event) => event.id));
+      const ids = new Set(events.map((event) => event.id));
       this.displayedDamageNumbers.update((current) =>
         current.filter((entry) => !ids.has(entry.event.id)),
       );
-    }, DAMAGE_NUMBER_LIFETIME_MS);
+    }, lifetimeMs);
   }
 
   private showSkillCastEvents(events: CombatantSkillCastEvent[]): void {

@@ -176,10 +176,14 @@ export type Combat = {
 };
 
 // A combatant HP change; amount is signed for display (positive = heal).
+export type DamageEventVariant = 'critical' | 'miss' | 'block';
+
+// Miss/block events carry an amount of 0; the variant tells the card what to show instead of a number.
 export type CombatantDamageEvent = {
   id: string;
   combatantId: string;
   amount: number;
+  variant?: DamageEventVariant;
 };
 
 // Pushed when a combatant resolves which skill to use for their turn, to flash the skill's icon/name on their status card.

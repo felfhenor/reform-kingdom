@@ -17,6 +17,22 @@ describe('combatantDamageEventEmit', () => {
     expect(events[0]).toMatchObject({ combatantId: 'hero-1', amount: -25 });
   });
 
+  it('leaves the variant unset by default', () => {
+    combatantDamageEventEmit('hero-1', -25);
+
+    expect(combatantDamageEvents()[0].variant).toBeUndefined();
+  });
+
+  it('carries the given variant, including on a zero-amount event', () => {
+    combatantDamageEventEmit('hero-1', -25, 'critical');
+    combatantDamageEventEmit('hero-1', 0, 'miss');
+
+    expect(combatantDamageEvents()).toMatchObject([
+      { amount: -25, variant: 'critical' },
+      { amount: 0, variant: 'miss' },
+    ]);
+  });
+
   it('assigns each emitted event a unique id', () => {
     combatantDamageEventEmit('hero-1', -25);
     combatantDamageEventEmit('hero-1', -10);

@@ -9,7 +9,20 @@ import {
   untracked,
   type Signal,
 } from '@angular/core';
+import type { DamageEventVariant } from '@interfaces';
 import { animate, type DOMTarget, type JSAnimation } from 'animejs';
+
+// hold: fraction of the lifetime spent fully opaque; rise: px travelled; tilt: total random rotation range in degrees.
+const DAMAGE_NUMBER_PROFILES: Record<
+  'normal' | 'heal' | DamageEventVariant,
+  { hold: number; rise: number; tilt: number }
+> = {
+  normal: { hold: 0.45, rise: 24, tilt: 24 },
+  heal: { hold: 0.45, rise: 30, tilt: 0 },
+  critical: { hold: 0.6, rise: 29, tilt: 8 },
+  miss: { hold: 0.3, rise: 8, tilt: 0 },
+  block: { hold: 0.4, rise: 12, tilt: 0 },
+};
 
 @Injectable({
   providedIn: 'root',
@@ -189,18 +202,24 @@ export class AnimationService {
   // Duration is capped at `lifetimeMs` since the playback service removes the element on its own timer.
   damageNumber(
     target: Element,
-    lifetimeMs: number,
-    isHeal: boolean,
-    scale: number,
+    options: {
+      lifetimeMs: number;
+      isHeal: boolean;
+      variant?: DamageEventVariant;
+      scale: number;
+    },
   ): JSAnimation {
+    const { lifetimeMs, isHeal, variant, scale } = options;
     const el = target as HTMLElement;
     el.style.opacity = '0';
 
+    const profile =
+      DAMAGE_NUMBER_PROFILES[variant ?? (isHeal ? 'heal' : 'normal')];
     const duration = lifetimeMs * (0.8 + Math.random() * 0.2);
-    const holdMs = duration * 0.45;
+    const holdMs = duration * profile.hold;
     const startY = (Math.random() - 0.5) * 12;
-    const rise = (isHeal ? 30 : 24) * (0.75 + Math.random() * 0.5);
-    const tilt = isHeal ? 0 : (Math.random() - 0.5) * 24;
+    const rise = profile.rise * (0.75 + Math.random() * 0.5);
+    const tilt = (Math.random() - 0.5) * profile.tilt;
 
     return animate(el as DOMTarget, {
       opacity: [
@@ -208,25 +227,83 @@ export class AnimationService {
         { to: 1, duration: holdMs },
         { to: 0, duration: duration - 80 - holdMs, ease: 'inQuad' },
       ],
-      scale: isHeal
-        ? [{ from: 0.8, to: scale, duration: 160, ease: 'outQuad' }]
-        : [
-            { from: 0.4, to: scale * 1.25, duration: 110, ease: 'outQuad' },
-            { to: scale, duration: 110, ease: 'inOutQuad' },
-          ],
+      scale: this.damageNumberScaleKeyframes(scale, isHeal, variant),
       translateY: [
         { from: startY, to: startY - rise, duration, ease: 'outQuad' },
       ],
-      translateX: [
-        {
-          from: 0,
-          to: (Math.random() - 0.5) * 20,
-          duration,
-          ease: 'inOutSine',
-        },
-      ],
+      translateX: this.damageNumberShiftKeyframes(duration, variant),
       rotate: [{ from: tilt, to: tilt * 0.3, duration, ease: 'outQuad' }],
+      ...(variant === 'critical' && { color: this.critFlashKeyframes() }),
     });
+  }
+
+  private damageNumberScaleKeyframes(
+    scale: number,
+    isHeal: boolean,
+    variant?: DamageEventVariant,
+  ) {
+    if (variant === 'critical') {
+      return [
+        { from: 0.3, to: scale * 1.7, duration: 110, ease: 'outQuad' },
+        { to: scale * 1.3, duration: 140, ease: 'inOutQuad' },
+      ];
+    }
+
+    if (variant === 'miss') {
+      return [{ from: 0.6, to: 0.95, duration: 120, ease: 'outQuad' }];
+    }
+
+    if (variant === 'block') {
+      return [
+        { from: 0.5, to: 1.2, duration: 90, ease: 'outQuad' },
+        { to: 1, duration: 120, ease: 'outBack' },
+      ];
+    }
+
+    if (isHeal) {
+      return [{ from: 0.8, to: scale, duration: 160, ease: 'outQuad' }];
+    }
+
+    return [
+      { from: 0.4, to: scale * 1.25, duration: 110, ease: 'outQuad' },
+      { to: scale, duration: 110, ease: 'inOutQuad' },
+    ];
+  }
+
+  // Crits shake before drifting, and a miss slides sideways like the target stepped aside.
+  private damageNumberShiftKeyframes(
+    duration: number,
+    variant?: DamageEventVariant,
+  ) {
+    const drift = (Math.random() - 0.5) * 20;
+
+    if (variant === 'critical') {
+      return [
+        { from: 0, to: -4, duration: 40 },
+        { to: 4, duration: 60 },
+        { to: -3, duration: 60 },
+        { to: 3, duration: 60 },
+        { to: drift, duration: duration - 220, ease: 'inOutSine' },
+      ];
+    }
+
+    if (variant === 'miss') {
+      const direction = Math.random() < 0.5 ? -1 : 1;
+      return [{ from: 0, to: direction * 22, duration, ease: 'outQuad' }];
+    }
+
+    return [{ from: 0, to: drift, duration, ease: 'inOutSine' }];
+  }
+
+  private critFlashKeyframes() {
+    return [
+      { from: '#fbbf24', to: '#ffffff', duration: 70 },
+      { to: '#fbbf24', duration: 70 },
+      { to: '#ffffff', duration: 70 },
+      { to: '#fbbf24', duration: 70 },
+      { to: '#ffffff', duration: 70 },
+      { to: '#fbbf24', duration: 70 },
+    ];
   }
 
   levelUp(target: Element): JSAnimation {

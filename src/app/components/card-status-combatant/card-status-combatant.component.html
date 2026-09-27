@@ -15,10 +15,26 @@
           class="damage-number tabular-nums"
           [class.heal]="num.event.amount > 0"
           [class.damage]="num.event.amount < 0"
+          [class.crit]="num.event.variant === 'critical'"
+          [class.miss]="num.event.variant === 'miss'"
+          [class.block]="num.event.variant === 'block'"
           [style.left.%]="xOffsetPercent(num.xOffsetSeed)"
-          (animate.enter)="onDamageNumberEnter($event, num.event.amount)"
+          (animate.enter)="
+            onDamageNumberEnter($event, num.event.amount, num.event.variant)
+          "
         >
-          {{ num.event.amount > 0 ? '+' : '' }}{{ num.event.amount | number }}
+          @switch (num.event.variant) {
+            @case ('miss') {
+              Miss
+            }
+            @case ('block') {
+              Block
+            }
+            @default {
+              {{ num.event.amount > 0 ? '+' : '' }}{{ num.event.amount | number
+              }}{{ num.event.variant === 'critical' ? '!' : '' }}
+            }
+          }
         </span>
       }
     </div>

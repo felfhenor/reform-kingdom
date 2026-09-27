@@ -24,6 +24,7 @@ import { rngSucceedsChance } from '@helpers/rng';
 import type {
   Combat,
   Combatant,
+  DamageEventVariant,
   EquipmentSkill,
   EquipmentSkillAttribute,
   EquipmentSkillContentTechnique,
@@ -137,12 +138,17 @@ function attackerMonsterTypeDamageBonusPercent(
 export function combatCombatantTakeDamage(
   combatant: Combatant,
   damage: number,
+  variant?: DamageEventVariant,
 ) {
   combatant.hp = clamp(combatant.hp - damage, 0, combatant.totalStats.Health);
 
   // Sign flipped so positive damage shows as "-".
   if (damage !== 0) {
-    combatantDamageEventEmit(combatant.id, -damage);
+    combatantDamageEventEmit(
+      combatant.id,
+      -damage,
+      damage > 0 ? variant : undefined,
+    );
   }
 }
 
@@ -163,6 +169,7 @@ export function combatApplySkillToTarget(
       `**${combatantMessageToken(target)}** dodges **${combatantMessageToken(combatant)}**'s **${skill.name}**!`,
       target,
     );
+    combatantDamageEventEmit(target.id, 0, 'miss');
     return;
   }
 
@@ -247,7 +254,18 @@ export function combatApplySkillToTarget(
     effectiveDamage *= deadlockPreventionMultiplier;
     effectiveDamage = Math.floor(effectiveDamage);
 
-    combatCombatantTakeDamage(target, effectiveDamage);
+    combatCombatantTakeDamage(
+      target,
+      effectiveDamage,
+      isCriticalHit ? 'critical' : undefined,
+    );
+
+    if (
+      effectiveDamage === 0 &&
+      techniqueHasAttribute(technique, 'DamagesTarget')
+    ) {
+      combatantDamageEventEmit(target.id, 0, 'block');
+    }
 
     templateData.damage = effectiveDamage;
     templateData.absdamage = Math.abs(effectiveDamage);
