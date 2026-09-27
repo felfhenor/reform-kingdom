@@ -59,10 +59,6 @@ body {
   }
 }
 
-progress::-webkit-progress-value {
-  transition: 250ms width;
-}
-
 app-game {
   display: block;
   height: 100vh;

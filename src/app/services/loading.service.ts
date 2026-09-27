@@ -1,4 +1,15 @@
-import { computed, inject, Injectable } from '@angular/core';
+import {
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  Injectable,
+  signal,
+} from '@angular/core';
+import {
+  LOADING_FILL_FALLBACK_MS,
+  LOADING_FULL_HOLD_MS,
+} from '@helpers/config';
 import { loadingProgressCalculate } from '@helpers/engine/loading.ui';
 import { hasGameStateLoaded } from '@helpers/state-game';
 import { ContentService } from '@services/content.service';
@@ -12,6 +23,18 @@ export class LoadingService {
   private contentService = inject(ContentService);
   private gamestateService = inject(GamestateService);
   private soundService = inject(SoundService);
+
+  private hasHeldFull = signal(false);
+  private holdTimer?: ReturnType<typeof setTimeout>;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.holdTimer));
+
+    // Hidden tabs never run the bar's tween, so it can't be relied on to report as filled.
+    effect(() => {
+      if (this.progress().isComplete) this.startHold(LOADING_FILL_FALLBACK_MS);
+    });
+  }
 
   public progress = computed(() =>
     loadingProgressCalculate([
@@ -33,5 +56,17 @@ export class LoadingService {
     ]),
   );
 
-  public isReady = computed(() => this.progress().isComplete);
+  public isReady = computed(
+    () => this.progress().isComplete && this.hasHeldFull(),
+  );
+
+  // Called by the loading screen once its bar visually reaches the end.
+  public onBarFilled(): void {
+    if (this.progress().isComplete) this.startHold(LOADING_FULL_HOLD_MS);
+  }
+
+  private startHold(ms: number): void {
+    clearTimeout(this.holdTimer);
+    this.holdTimer = setTimeout(() => this.hasHeldFull.set(true), ms);
+  }
 }

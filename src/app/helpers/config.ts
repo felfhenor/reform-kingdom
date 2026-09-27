@@ -50,6 +50,9 @@ export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 
 export const MAX_EVENT_SEGMENTS = 5;
 export const MAX_SEGMENT_LENGTH = 32;
+// How long the full loading bar stays on screen before the overlay fades.
+export const LOADING_FULL_HOLD_MS = 500;
+export const LOADING_FILL_FALLBACK_MS = 2000;
 
 // Beyond this many levels above the party's floor, a range is excluded outright (TooHigh) regardless of risk setting.
 export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;

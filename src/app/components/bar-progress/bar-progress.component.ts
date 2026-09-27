@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
+  output,
 } from '@angular/core';
 import { ShimmerDirective } from '@directives/shimmer.directive';
 import type {
@@ -14,16 +16,16 @@ import { injectTweenedNumber } from '@services/animation.service';
 import { clamp } from 'es-toolkit/compat';
 
 // Tailwind's class scanner only picks up literal strings, so the color->class
-// mapping can't be built with a template literal - it would purge every progress-* class.
+// mapping can't be built with a template literal - it would purge every text-* class.
 const PROGRESS_COLOR_CLASSES: Record<DaisyColor | ResourceBarColor, string> = {
-  primary: 'progress-primary',
-  secondary: 'progress-secondary',
-  accent: 'progress-accent',
-  neutral: 'progress-neutral',
-  info: 'progress-info',
-  success: 'progress-success',
-  warning: 'progress-warning',
-  error: 'progress-error',
+  primary: 'text-primary',
+  secondary: 'text-secondary',
+  accent: 'text-accent',
+  neutral: 'text-neutral',
+  info: 'text-info',
+  success: 'text-success',
+  warning: 'text-warning',
+  error: 'text-error',
   hp: 'text-hp',
   ep: 'text-ep',
   xp: 'text-xp',
@@ -50,6 +52,7 @@ export class BarProgressComponent {
   public color = input<DaisyColor | ResourceBarColor>('primary');
   public size = input<ProgressBarSize>('default');
   public shimmer = input(false);
+  public filled = output();
 
   public colorClass = computed(() => PROGRESS_COLOR_CLASSES[this.color()]);
   public sizeClass = computed(() => PROGRESS_SIZE_CLASSES[this.size()]);
@@ -57,4 +60,10 @@ export class BarProgressComponent {
   public fillPercent = computed(() =>
     clamp((this.displayValue() / this.max()) * 100, 0, 100),
   );
+
+  constructor() {
+    effect(() => {
+      if (this.displayValue() >= this.max()) this.filled.emit();
+    });
+  }
 }

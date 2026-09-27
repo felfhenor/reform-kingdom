@@ -18,6 +18,7 @@ import { LoadingService } from '@services/loading.service';
         color="primary"
         [shimmer]="true"
         [value]="progress.percent"
+        (filled)="loadingService.onBarFilled()"
       />
 
       @for (label of [progress.label]; track label) {

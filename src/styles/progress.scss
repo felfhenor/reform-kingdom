@@ -1,5 +1,0 @@
-@supports (color: color-mix(in lab, red, red)) {
-  .progress {
-    background-color: color-mix(in oklab, #000 30%, transparent);
-  }
-}

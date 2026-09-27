@@ -230,10 +230,8 @@ export class AnimationService {
     );
   }
 
-  // Holds fully opaque first so the bar can finish and the burst of first-render work behind the overlay lands unseen.
   dismissOverlay(target: Element): Animation {
     return target.animate([{ opacity: 1 }, { opacity: 0 }], {
-      delay: 450,
       duration: 400,
       easing: 'ease-in-out',
       fill: 'both',

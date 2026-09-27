@@ -1,6 +1,8 @@
 import type { LoadingProgress, LoadingStep } from '@interfaces';
 
-export function loadingProgressCalculate(steps: LoadingStep[]): LoadingProgress {
+export function loadingProgressCalculate(
+  steps: LoadingStep[],
+): LoadingProgress {
   if (steps.length === 0) {
     return { percent: 100, label: 'Ready', isComplete: true };
   }
@@ -10,7 +12,7 @@ export function loadingProgressCalculate(steps: LoadingStep[]): LoadingProgress 
 
   return {
     percent: Math.round((doneCount / steps.length) * 100),
-    label: activeStep?.label ?? 'Ready',
+    label: (activeStep ?? steps[steps.length - 1]).label,
     isComplete: doneCount === steps.length,
   };
 }
