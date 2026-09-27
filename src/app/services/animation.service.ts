@@ -189,6 +189,17 @@ export class AnimationService {
     });
   }
 
+  // Loops forever, so the caller must pause it on teardown. Percent translates are relative to the stripe's own width.
+  shimmer(target: Element): JSAnimation {
+    return animate(target as DOMTarget, {
+      translateX: ['-100%', '300%'],
+      duration: 1400,
+      ease: 'inOutSine',
+      loop: true,
+      loopDelay: 400,
+    });
+  }
+
   // Opacity is zeroed up front so a delayed item doesn't sit visible until its turn.
   staggerIn(target: Element, index: number): JSAnimation {
     (target as HTMLElement).style.opacity = '0';

@@ -1,9 +1,24 @@
-<progress
-  class="progress w-full"
-  [class]="[colorClass(), sizeClass()]"
-  [value]="displayValue()"
-  [max]="max()"
-></progress>
+<div class="relative inline-block w-full">
+  <progress
+    class="progress block w-full"
+    [class]="[colorClass(), sizeClass()]"
+    [value]="displayValue()"
+    [max]="max()"
+  ></progress>
+
+  @if (shimmer()) {
+    <div
+      class="absolute top-0 left-0 overflow-hidden rounded-box pointer-events-none"
+      [class]="sizeClass()"
+      [style.width.%]="fillPercent()"
+    >
+      <div
+        appShimmer
+        class="h-full w-1/3 bg-linear-to-r from-transparent via-white/40 to-transparent"
+      ></div>
+    </div>
+  }
+</div>
 
 <span
   class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black pointer-events-none tabular-nums"
