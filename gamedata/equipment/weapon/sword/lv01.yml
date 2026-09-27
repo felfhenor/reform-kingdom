@@ -12,3 +12,15 @@
   baseStats:
     Strength: 0.8
     Vitality: 0.3
+
+- id: 0d97622a-3cb8-4254-b5d7-cb0f146db20f
+  name: Copperslime Sword
+  description: A sword made of copperslime, the blade never quite losing its shine.
+  levelRequirement: 6
+  rarity: Common
+  type: Sword
+  sprite: '0028'
+  slots: 1
+  baseStats:
+    Strength: 1.8
+    Vitality: 1.6

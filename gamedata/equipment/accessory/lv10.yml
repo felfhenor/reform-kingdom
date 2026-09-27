@@ -9,3 +9,53 @@
   baseStats:
     Health: 20
     Energy: 5
+
+- id: 52f455db-43e8-4f32-80fe-be917f70d1a9
+  name: Miremetal Amulet
+  description: An amulet set with a peridot that enhances the user's magical capabilities, said to hum when danger draws near.
+  rarity: Uncommon
+  levelRequirement: 15
+  type: Accessory
+  sprite: '0081'
+  slots: 1
+  baseStats:
+    Intelligence: 1.3
+    Energy: 9
+    Resistance: 1.1
+
+- id: 568c362d-c361-4797-b727-dc76bd5229f1
+  name: Mirewood Clogs
+  description: A pair of clogs that boosts the wearer's speed, though they clatter loudly with every step, leaving the wearer exposed.
+  rarity: Common
+  levelRequirement: 16
+  type: Accessory
+  sprite: '0106'
+  slots: 1
+  baseStats:
+    Agility: 3.1
+    Vitality: -1.5
+
+- id: 9df4d947-91d4-4a3e-af9a-128447b8b5d9
+  name: Miresewn Gloves
+  description: A pair of gloves made with mirethread, stitched together by mire-dwelling artisans.
+  rarity: Common
+  levelRequirement: 16
+  type: Accessory
+  sprite: '0103'
+  slots: 1
+  baseStats:
+    Vitality: 1.7
+    Resistance: 2.1
+
+- id: 45b0a60b-ffcd-44ed-bb63-c33b3d1737b4
+  name: Miremetal Brooch
+  description: A brooch set with a peridot that enhances the user's physical capabilities, favored by mire militia.
+  rarity: Common
+  levelRequirement: 17
+  type: Accessory
+  sprite: '0099'
+  slots: 1
+  baseStats:
+    Strength: 2.1
+    Health: 10
+    Vitality: 1.7
