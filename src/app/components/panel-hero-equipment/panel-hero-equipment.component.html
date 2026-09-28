@@ -50,12 +50,12 @@
 
       <app-bar-progress
         class="w-56"
-        color="primary"
+        color="xp"
         [value]="char.xp.current"
         [max]="char.xp.maximum"
       >
         <app-text-number-tween [value]="char.xp.current" />
-        /{{ char.xp.maximum | number }}
+        /{{ char.xp.maximum | number }} XP
       </app-bar-progress>
     </div>
 
