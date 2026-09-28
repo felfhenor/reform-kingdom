@@ -36,6 +36,7 @@ import { discoveredCollectibleCount } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import {
   travelPathFrom,
+  travelPathThroughNodesTo,
   travelPathTo,
 } from '@helpers/pathfinding/pathfinding-travel';
 import { worldCurrentLocationState } from '@helpers/state-game';
@@ -166,6 +167,72 @@ describe('travelPathTo', () => {
     );
 
     expect(travelPathTo('Field Ruins')).toBeUndefined();
+  });
+
+  describe('a node walled in behind another node', () => {
+    const gate = buildEntry({ x: 1, y: 1, nodeName: 'Gate' });
+
+    function mockGatedMap(wall: number[]): void {
+      const wallLayer = {
+        id: 1,
+        name: 'Dense Tiles',
+        type: 'tilelayer' as const,
+        visible: true,
+        width: 3,
+        height: 3,
+        data: wall,
+      };
+      vi.mocked(worldCurrentLocationState).mockReturnValue({
+        mapName: 'Carrina',
+        x: 0,
+        y: 1,
+      });
+      vi.mocked(worldNodeByName).mockReturnValue(
+        buildEntry({ x: 2, y: 1, nodeName: 'Behind' }),
+      );
+      vi.mocked(worldNodeLookup).mockReturnValue({
+        byPosition: { Carrina: { 1: { 1: gate } } },
+        byName: { Gate: gate },
+      });
+      vi.mocked(allMaps).mockReturnValue(
+        new Map<string, GameMap>([
+          [
+            'Carrina',
+            {
+              name: 'Carrina',
+              data: { ...buildOpenMap(3, 3), layers: [wallLayer] },
+            },
+          ],
+        ]),
+      );
+    }
+
+    it('has no normal route past the gate node', () => {
+      mockGatedMap([0, 1, 0, 0, 0, 0, 0, 1, 0]);
+
+      expect(travelPathTo('Behind')).toBeUndefined();
+    });
+
+    it('crosses the gate node when passing through nodes is allowed', () => {
+      mockGatedMap([0, 1, 0, 0, 0, 0, 0, 1, 0]);
+      travelPathTo('Behind');
+
+      expect(travelPathThroughNodesTo('Behind')).toEqual([
+        { kind: 'Move', mapName: 'Carrina', x: 1, y: 1 },
+        { kind: 'Move', mapName: 'Carrina', x: 2, y: 1 },
+      ]);
+    });
+
+    it('still walks around a node when a route around it exists', () => {
+      mockGatedMap([0, 0, 0, 0, 0, 0, 0, 1, 0]);
+
+      expect(travelPathThroughNodesTo('Behind')).not.toContainEqual({
+        kind: 'Move',
+        mapName: 'Carrina',
+        x: 1,
+        y: 1,
+      });
+    });
   });
 
   it('returns undefined when the destination node does not exist', () => {

@@ -10,25 +10,28 @@ import {
   decreeWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
+import { decreeRouteTo } from '@helpers/decree/decree-route';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { isPartyAtFullEnergy, isPartyAtFullHealth } from '@helpers/hero/party';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
-import { isPlayerAtHome } from '@helpers/town/town-spawn';
+import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import {
   isWorldNodeVisible,
   worldNodeByName,
   worldNodeEncounter,
+  worldNodeEncounterRandom,
+  worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
   DecreeClause,
   DecreeRiskLevel,
+  DecreeRoute,
   ExploreNodeRiskBand,
   MaterialId,
   TownContent,
@@ -59,44 +62,66 @@ export function riskLevelSatisfies(
   return RISK_ORDINAL[band] <= RISK_ORDINAL[ceiling];
 }
 
+// A gateway's fight happens on arrival, so it has to fit the risk too; a gather would start one no clause tracks.
+function canStopEnRoute(
+  entry: WorldNodeEntry,
+  riskTolerance: DecreeRiskLevel,
+): boolean {
+  if (!isWorldNodeVisible(entry)) return false;
+  if (worldNodeGathering(entry) || worldNodeEncounterRandom(entry)) {
+    return false;
+  }
+  if (!worldNodeEncounter(entry)) return true;
+
+  return riskLevelSatisfies(riskLevelOfExploreNode(entry), riskTolerance);
+}
+
+function routeTo(
+  entry: WorldNodeEntry,
+  riskTolerance: DecreeRiskLevel,
+): DecreeRoute | undefined {
+  return decreeRouteTo(entry, (gateway) =>
+    canStopEnRoute(gateway, riskTolerance),
+  );
+}
+
+// Clauses with no risk setting of their own still have to fight through a gateway to get anywhere past it.
+function clauseRiskTolerance(clause: DecreeClause): DecreeRiskLevel {
+  return 'riskTolerance' in clause ? clause.riskTolerance : 'High';
+}
+
 // Nearest reachable node by fewest pathfinding steps - only called while idle or stationary (path cache hits), never mid-travel.
 function nearestReachableNode(
   candidates: WorldNodeEntry[],
+  riskTolerance: DecreeRiskLevel,
 ): WorldNodeEntry | undefined {
   let nearest: WorldNodeEntry | undefined;
   let nearestSteps = Infinity;
 
   candidates.forEach((candidate) => {
-    const path = travelPathTo(candidate.nodeName);
-    if (!path) return;
-    if (path.length >= nearestSteps) return;
+    const steps = routeTo(candidate, riskTolerance)?.steps;
+    if (steps === undefined || steps >= nearestSteps) return;
 
     nearest = candidate;
-    nearestSteps = path.length;
+    nearestSteps = steps;
   });
 
   return nearest;
 }
 
-function nearestReachableExploreNode(
-  predicate: (entry: WorldNodeEntry) => boolean,
-): WorldNodeEntry | undefined {
-  return nearestReachableNode(
-    worldNodesOfType('ExploreNode')
-      .filter(isWorldNodeVisible)
-      .filter(predicate),
-  );
-}
-
 export function nearestUnfinishedExploreNode(
   riskTolerance: DecreeRiskLevel,
 ): WorldNodeEntry | undefined {
-  return nearestReachableExploreNode((entry) => {
-    const { obtained, total } = worldNodeCompletionRewardProgress(entry);
-    if (obtained >= total) return false;
+  const candidates = worldNodesOfType('ExploreNode')
+    .filter(isWorldNodeVisible)
+    .filter((entry) => {
+      const { obtained, total } = worldNodeCompletionRewardProgress(entry);
+      if (obtained >= total) return false;
 
-    return riskLevelSatisfies(riskLevelOfExploreNode(entry), riskTolerance);
-  });
+      return riskLevelSatisfies(riskLevelOfExploreNode(entry), riskTolerance);
+    });
+
+  return nearestReachableNode(candidates, riskTolerance);
 }
 
 // Toughest fight a node can throw at the party; used to rank by challenge rather than distance.
@@ -104,11 +129,24 @@ function worldNodeChallengeLevel(entry: WorldNodeEntry): number {
   return worldNodeEncounter(entry)?.levelRange.max ?? -Infinity;
 }
 
+// A loss at the gateway counts against the node behind it, or LevelUpParty would never give up on that node.
+function routeFailureCount(
+  entry: WorldNodeEntry,
+  ceiling: DecreeRiskLevel,
+): number {
+  const hop = routeTo(entry, ceiling)?.hop ?? entry;
+  return Math.max(
+    decreeNodeFailureCount(entry.nodeName),
+    decreeNodeFailureCount(hop.nodeName),
+  );
+}
+
 // Shortest current losing streak; ties keep entries' existing order for deterministic results.
 function leastFailedNodeIn(
   entries: WorldNodeEntry[],
+  ceiling: DecreeRiskLevel,
 ): WorldNodeEntry | undefined {
-  return sortBy(entries, (entry) => decreeNodeFailureCount(entry.nodeName))[0];
+  return sortBy(entries, (entry) => routeFailureCount(entry, ceiling))[0];
 }
 
 // Ranked by challenge (not proximity) within the clause's risk tolerance; steps down a tier once it's lost LEVEL_UP_NODE_FAILURE_LIMIT+ fights in a row, so the party settles where it can actually win.
@@ -126,7 +164,7 @@ export function mostChallengingExploreNodeForRisk(
       (entry) =>
         !isXpTrivialAtOverLevel(partyLevel, worldNodeChallengeLevel(entry)),
     )
-    .filter((entry) => !!travelPathTo(entry.nodeName));
+    .filter((entry) => !!routeTo(entry, ceiling));
   if (candidates.length === 0) return undefined;
 
   const challengeTiers = sortBy(
@@ -138,17 +176,17 @@ export function mostChallengingExploreNodeForRisk(
     const tierNodes = candidates.filter(
       (entry) => worldNodeChallengeLevel(entry) === tier,
     );
-    const best = leastFailedNodeIn(tierNodes);
+    const best = leastFailedNodeIn(tierNodes, ceiling);
     if (
       best &&
-      decreeNodeFailureCount(best.nodeName) < LEVEL_UP_NODE_FAILURE_LIMIT
+      routeFailureCount(best, ceiling) < LEVEL_UP_NODE_FAILURE_LIMIT
     ) {
       return best;
     }
   }
 
   // Every tier losing too often - fall back to whatever's failed least overall.
-  return leastFailedNodeIn(candidates);
+  return leastFailedNodeIn(candidates, ceiling);
 }
 
 export function nearestGatherNodeFor(
@@ -161,7 +199,7 @@ export function nearestGatherNodeFor(
       worldNodeGatherMaterialIds(entry).includes(materialId),
   );
 
-  return nearestReachableNode(candidates);
+  return nearestReachableNode(candidates, 'High');
 }
 
 function acceptableRaidTowns(riskTolerance: DecreeRiskLevel): TownContent[] {
@@ -178,11 +216,13 @@ function acceptableRaidTowns(riskTolerance: DecreeRiskLevel): TownContent[] {
     );
 }
 
-// Common target-resolution for clauses that pin a specific nodeName (FarmNode always; GatherMaterial when a location was chosen).
-function reachableVisibleNode(nodeName: string): WorldNodeEntry | undefined {
+function reachableVisibleNode(
+  nodeName: string,
+  riskTolerance: DecreeRiskLevel,
+): WorldNodeEntry | undefined {
   const entry = worldNodeByName(nodeName);
   if (!entry || !isWorldNodeVisible(entry)) return undefined;
-  return travelPathTo(entry.nodeName) ? entry : undefined;
+  return routeTo(entry, riskTolerance) ? entry : undefined;
 }
 
 function defendTownsTargetNode(
@@ -194,9 +234,7 @@ function defendTownsTargetNode(
     if (!acceptable.some((town) => town.name === clause.townName)) {
       return undefined;
     }
-    const entry = worldNodeByName(clause.townName);
-    if (!entry || !isWorldNodeVisible(entry)) return undefined;
-    return travelPathTo(entry.nodeName) ? entry : undefined;
+    return reachableVisibleNode(clause.townName, clause.riskTolerance);
   }
 
   const candidates = acceptable
@@ -204,7 +242,7 @@ function defendTownsTargetNode(
     .filter(
       (entry): entry is WorldNodeEntry => !!entry && isWorldNodeVisible(entry),
     );
-  return nearestReachableNode(candidates);
+  return nearestReachableNode(candidates, clause.riskTolerance);
 }
 
 // The node a clause would travel to if run right now, or undefined if it has
@@ -215,10 +253,10 @@ export function clauseTargetNode(
   switch (clause.type) {
     case 'GatherMaterial':
       return clause.nodeName
-        ? reachableVisibleNode(clause.nodeName)
+        ? reachableVisibleNode(clause.nodeName, 'High')
         : nearestGatherNodeFor(clause.materialId);
     case 'FarmNode':
-      return reachableVisibleNode(clause.nodeName);
+      return reachableVisibleNode(clause.nodeName, 'High');
     case 'FinishUnfinishedAreas':
       return nearestUnfinishedExploreNode(clause.riskTolerance);
     case 'LevelUpParty':
@@ -228,6 +266,26 @@ export function clauseTargetNode(
     case 'DefendTowns':
       return defendTownsTargetNode(clause);
   }
+}
+
+// Falls back to the target so an unroutable one still hits travel's pathing-failure recovery.
+export function decreeTravelHopTo(
+  target: WorldNodeEntry,
+  riskTolerance: DecreeRiskLevel = 'High',
+): WorldNodeEntry {
+  return routeTo(target, riskTolerance)?.hop ?? target;
+}
+
+export function clauseTravelNode(
+  clause: DecreeClause,
+): WorldNodeEntry | undefined {
+  const target =
+    clause.type === 'ReturnToKingdom'
+      ? homeNodeGet()
+      : clauseTargetNode(clause);
+  if (!target) return undefined;
+
+  return decreeTravelHopTo(target, clauseRiskTolerance(clause));
 }
 
 // Only gates clause types that travel to an ExploreNode; GatherMaterial/ReturnToKingdom never risk combat.

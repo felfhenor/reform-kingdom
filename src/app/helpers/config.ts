@@ -195,6 +195,8 @@ export const DECREE_PRIORITY_RECHECK_INTERVAL_TICKS = 5;
 // Path tiles are cheaper than other open tiles so pathfinding hugs authored paths without blocking off-road.
 export const ON_PATH_MOVE_COST = 1;
 export const OFF_PATH_MOVE_COST = 4;
+// Dwarfs any real walk, so a pass-through route only crosses a node when no route around it exists.
+export const NODE_PASS_THROUGH_MOVE_COST = 100_000;
 
 // Pixi
 

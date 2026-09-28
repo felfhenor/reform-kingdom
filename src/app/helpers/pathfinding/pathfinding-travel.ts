@@ -33,6 +33,7 @@ function teleportHop(
   from: CurrentLocation,
   teleport: WorldNodeEntry,
   ignoreCollectibleGate: boolean,
+  passThroughNodes: boolean,
 ): { arrivalKey: string; steps: TravelStep[]; cost: number } | undefined {
   const toTag = teleportNodeProperty(teleport, 'toTag');
   const arrival = toTag
@@ -40,7 +41,12 @@ function teleportHop(
     : undefined;
   if (!arrival) return undefined;
 
-  const walkSteps = findInMapPath(from.mapName, from, teleport);
+  const walkSteps = findInMapPath(
+    from.mapName,
+    from,
+    teleport,
+    passThroughNodes,
+  );
   if (!walkSteps) return undefined;
 
   const teleportStep: TravelStep = {
@@ -64,6 +70,7 @@ function travelPathAcrossMaps(
   location: CurrentLocation,
   destination: WorldNodeEntry,
   ignoreCollectibleGate: boolean,
+  passThroughNodes: boolean,
 ): TravelStep[] | undefined {
   const teleportNodes = unlockedTeleportNodes(ignoreCollectibleGate);
   const waypoints = routeWaypoints(location, teleportNodes);
@@ -88,7 +95,12 @@ function travelPathAcrossMaps(
     teleportNodes
       .filter((node) => node.mapName === currentPos.mapName)
       .forEach((teleport) => {
-        const hop = teleportHop(currentPos, teleport, ignoreCollectibleGate);
+        const hop = teleportHop(
+          currentPos,
+          teleport,
+          ignoreCollectibleGate,
+          passThroughNodes,
+        );
         if (!hop) return;
 
         const candidateDist = currentDist + hop.cost;
@@ -109,7 +121,12 @@ function travelPathAcrossMaps(
     const waypointDist = dist.get(key);
     if (waypointDist === undefined) return;
 
-    const finalLegSteps = findInMapPath(destination.mapName, pos, destination);
+    const finalLegSteps = findInMapPath(
+      destination.mapName,
+      pos,
+      destination,
+      passThroughNodes,
+    );
     if (!finalLegSteps) return;
 
     const totalCost =
@@ -134,8 +151,9 @@ function pathFromCacheKey(
   destinationNodeName: string,
   allowTeleport: boolean,
   ignoreCollectibleGate: boolean,
+  passThroughNodes: boolean,
 ): string {
-  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}::${allowTeleport}:${ignoreCollectibleGate}`;
+  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}::${allowTeleport}:${ignoreCollectibleGate}:${passThroughNodes}`;
 }
 
 // Pure by-location variant, so non-party travelers (workers) can path from an arbitrary origin, not just the hero
@@ -145,6 +163,7 @@ export function travelPathFrom(
   destinationNodeName: string,
   allowTeleport = true,
   ignoreCollectibleGate = false,
+  passThroughNodes = false,
 ): TravelStep[] | undefined {
   const currentMaps = allMaps();
   const currentDiscoveredCollectibleCount = discoveredCollectibleCount();
@@ -162,6 +181,7 @@ export function travelPathFrom(
     destinationNodeName,
     allowTeleport,
     ignoreCollectibleGate,
+    passThroughNodes,
   );
   if (pathFromCache.has(key)) return pathFromCache.get(key);
 
@@ -170,6 +190,7 @@ export function travelPathFrom(
     destinationNodeName,
     allowTeleport,
     ignoreCollectibleGate,
+    passThroughNodes,
   );
   pathFromCache.set(key, path);
   return path;
@@ -180,6 +201,7 @@ function computeTravelPathFrom(
   destinationNodeName: string,
   allowTeleport: boolean,
   ignoreCollectibleGate: boolean,
+  passThroughNodes: boolean,
 ): TravelStep[] | undefined {
   const destination = worldNodeByName(destinationNodeName);
   if (!destination) return undefined;
@@ -188,16 +210,31 @@ function computeTravelPathFrom(
   // to it - so the jump to its paired arrival tile is part of this path.
   if (destination.nodeData.type === 'TeleportNode') {
     return allowTeleport
-      ? travelPathViaTeleport(location, destination, ignoreCollectibleGate)
+      ? travelPathViaTeleport(
+          location,
+          destination,
+          ignoreCollectibleGate,
+          passThroughNodes,
+        )
       : undefined;
   }
 
   if (location.mapName === destination.mapName) {
-    return findInMapPath(location.mapName, location, destination);
+    return findInMapPath(
+      location.mapName,
+      location,
+      destination,
+      passThroughNodes,
+    );
   }
 
   return allowTeleport
-    ? travelPathAcrossMaps(location, destination, ignoreCollectibleGate)
+    ? travelPathAcrossMaps(
+        location,
+        destination,
+        ignoreCollectibleGate,
+        passThroughNodes,
+      )
     : undefined;
 }
 
@@ -211,5 +248,18 @@ export function travelPathTo(
     destinationNodeName,
     allowTeleport,
     ignoreCollectibleGate,
+  );
+}
+
+// Last-resort route for a node walled in behind other nodes; only the first node it crosses is actually reachable.
+export function travelPathThroughNodesTo(
+  destinationNodeName: string,
+): TravelStep[] | undefined {
+  return travelPathFrom(
+    worldCurrentLocationState(),
+    destinationNodeName,
+    true,
+    false,
+    true,
   );
 }

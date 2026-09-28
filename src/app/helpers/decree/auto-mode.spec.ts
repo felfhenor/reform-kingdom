@@ -11,6 +11,8 @@ vi.mock('@helpers/decree/decree', () => ({
 
 vi.mock('@helpers/decree/decree-evaluation', () => ({
   clauseTargetNode: vi.fn(),
+  clauseTravelNode: vi.fn(),
+  decreeTravelHopTo: vi.fn(),
   isClauseSatisfiable: vi.fn(() => true),
   pickTopPriorityClause: vi.fn(),
 }));
@@ -85,6 +87,8 @@ import {
 } from '@helpers/decree/decree';
 import {
   clauseTargetNode,
+  clauseTravelNode,
+  decreeTravelHopTo,
   isClauseSatisfiable,
   pickTopPriorityClause,
 } from '@helpers/decree/decree-evaluation';
@@ -173,6 +177,12 @@ function applyLastUpdate(state: GameState): GameState {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(clauseTravelNode).mockImplementation((clause) =>
+    clause.type === 'ReturnToKingdom'
+      ? homeNodeGet()
+      : clauseTargetNode(clause),
+  );
+  vi.mocked(decreeTravelHopTo).mockImplementation((target) => target);
   vi.mocked(worldCombatState).mockReturnValue(undefined);
   vi.mocked(isGathering).mockReturnValue(false);
   vi.mocked(isGlobalEffectActive).mockReturnValue(false);
@@ -252,6 +262,25 @@ describe('autoModeProcessTick', () => {
     autoModeProcessTick();
 
     expect(travelStart).toHaveBeenCalledWith('Old Ruins', true);
+  });
+
+  it('travels to the gateway node when the target is walled in behind it', () => {
+    const clause = buildClause({ type: 'FinishUnfinishedAreas' });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({ enabled: true, clauses: [clause] }),
+    );
+    vi.mocked(decreeClauses).mockReturnValue([clause]);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
+    vi.mocked(clauseTargetNode).mockReturnValue({
+      nodeName: 'Spider Tower',
+    } as WorldNodeEntry);
+    vi.mocked(clauseTravelNode).mockReturnValue({
+      nodeName: 'Slimed Waystation',
+    } as WorldNodeEntry);
+
+    autoModeProcessTick();
+
+    expect(travelStart).toHaveBeenCalledWith('Slimed Waystation', true);
   });
 
   it('engages the raid instead of re-dispatching travel when idle at the DefendTowns target', () => {

@@ -40,10 +40,12 @@ vi.mock('@helpers/hero/party', () => ({
 }));
 
 vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
+  travelPathThroughNodesTo: vi.fn(),
   travelPathTo: vi.fn(),
 }));
 
 vi.mock('@helpers/town/town-spawn', () => ({
+  homeNodeGet: vi.fn(),
   isPlayerAtHome: vi.fn(() => false),
 }));
 
@@ -57,8 +59,11 @@ vi.mock('@helpers/world-node/world-node-rewards', () => ({
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   isWorldNodeVisible: vi.fn(() => true),
+  worldNodeAt: vi.fn(),
   worldNodeByName: vi.fn(),
   worldNodeEncounter: vi.fn(),
+  worldNodeEncounterRandom: vi.fn(),
+  worldNodeGathering: vi.fn(),
   worldNodesOfType: vi.fn(() => []),
 }));
 
@@ -71,6 +76,7 @@ import {
 } from '@helpers/decree/decree';
 import {
   clauseTargetNode,
+  clauseTravelNode,
   isClauseBlockedOnlyByHealth,
   isClauseSatisfiable,
   mostChallengingExploreNodeForRisk,
@@ -85,15 +91,20 @@ import { isPartyAtFullHealth } from '@helpers/hero/party';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
-import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
+import {
+  travelPathThroughNodesTo,
+  travelPathTo,
+} from '@helpers/pathfinding/pathfinding-travel';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
-import { isPlayerAtHome } from '@helpers/town/town-spawn';
+import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import {
   isWorldNodeVisible,
+  worldNodeAt,
   worldNodeByName,
   worldNodeEncounter,
+  worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -138,6 +149,9 @@ beforeEach(() => {
   vi.mocked(isWorldNodeVisible).mockReturnValue(true);
   vi.mocked(travelPathTo).mockReturnValue(undefined);
   vi.mocked(isPlayerAtHome).mockReturnValue(false);
+  vi.mocked(travelPathThroughNodesTo).mockReturnValue(undefined);
+  vi.mocked(worldNodeAt).mockReturnValue(undefined);
+  vi.mocked(worldNodeGathering).mockReturnValue(undefined);
   vi.mocked(getMaterialQuantity).mockReturnValue(0);
   vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
@@ -272,6 +286,134 @@ describe('nearestUnfinishedExploreNode', () => {
     vi.mocked(isWorldNodeVisible).mockReturnValue(false);
 
     expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+});
+
+// Spider Tower is only reachable by walking through the Slimed Waystation tile.
+function mockWalledInTower(gatewayMaxLevel: number): {
+  tower: WorldNodeEntry;
+  gateway: WorldNodeEntry;
+} {
+  const tower = buildNode('Spider Tower');
+  const gateway = buildNode('Slimed Waystation');
+  vi.mocked(worldNodesOfType).mockReturnValue([tower]);
+  vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
+    obtained: 0,
+    total: 1,
+  });
+  vi.mocked(worldNodeEncounter).mockImplementation((entry) => {
+    const max = entry === gateway ? gatewayMaxLevel : 10;
+    return { levelRange: { min: max, max } } as EncounterContent;
+  });
+  vi.mocked(travelPathThroughNodesTo).mockReturnValue([
+    { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+    { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+    { kind: 'Move', mapName: 'Carrina', x: 3, y: 0 },
+  ]);
+  vi.mocked(worldNodeAt).mockImplementation((_, x) =>
+    x === 2 ? gateway : undefined,
+  );
+  return { tower, gateway };
+}
+
+describe('decree routing to a node walled in behind another node', () => {
+  it('still picks the walled-in node as an unfinished area', () => {
+    const { tower } = mockWalledInTower(10);
+
+    expect(nearestUnfinishedExploreNode('Medium')).toBe(tower);
+  });
+
+  it('heads for the gateway node first', () => {
+    const { gateway } = mockWalledInTower(10);
+
+    expect(
+      clauseTravelNode(buildClause({ type: 'FinishUnfinishedAreas' })),
+    ).toBe(gateway);
+  });
+
+  it('skips the node when the gateway fight exceeds the risk tolerance', () => {
+    mockWalledInTower(30);
+
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  it('skips the node when the gateway would start a gather', () => {
+    mockWalledInTower(10);
+    vi.mocked(worldNodeGathering).mockReturnValue({} as never);
+
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  it('skips the node when the gateway is still hidden', () => {
+    const { gateway } = mockWalledInTower(10);
+    vi.mocked(isWorldNodeVisible).mockImplementation(
+      (entry) => entry !== gateway,
+    );
+
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  it('lets LevelUpParty reach the walled-in node too', () => {
+    const { tower, gateway } = mockWalledInTower(10);
+
+    expect(mostChallengingExploreNodeForRisk('High')).toBe(tower);
+    expect(
+      clauseTravelNode(
+        buildClause({ type: 'LevelUpParty', riskTolerance: 'High' }),
+      ),
+    ).toBe(gateway);
+  });
+
+  it('leaves through the gateway when returning home from inside', () => {
+    const { tower: home, gateway } = mockWalledInTower(10);
+    vi.mocked(homeNodeGet).mockReturnValue(home);
+
+    expect(clauseTravelNode(buildClause({ type: 'ReturnToKingdom' }))).toBe(
+      gateway,
+    );
+  });
+
+  it('lets a clause with no risk setting fight through the gateway', () => {
+    const { tower, gateway } = mockWalledInTower(10);
+    vi.mocked(worldNodeByName).mockReturnValue(tower);
+
+    expect(
+      clauseTravelNode(
+        buildClause({
+          type: 'GatherMaterial',
+          materialId: 'Ore' as MaterialId,
+          nodeName: 'Spider Tower',
+          targetQuantity: 5,
+        }),
+      ),
+    ).toBe(gateway);
+  });
+
+  it('counts gateway losses against the walled-in node for LevelUpParty', () => {
+    const { tower, gateway } = mockWalledInTower(10);
+    const other = buildNode('Open Field');
+    vi.mocked(worldNodesOfType).mockReturnValue([tower, other]);
+    vi.mocked(travelPathTo).mockImplementation((name) =>
+      name === 'Open Field' ? [] : undefined,
+    );
+    vi.mocked(worldNodeEncounter).mockImplementation((entry) => {
+      const max = entry === other ? 5 : 10;
+      return { levelRange: { min: max, max } } as EncounterContent;
+    });
+    vi.mocked(decreeNodeFailureCount).mockImplementation((name) =>
+      name === gateway.nodeName ? LEVEL_UP_NODE_FAILURE_LIMIT : 0,
+    );
+
+    expect(mostChallengingExploreNodeForRisk('High')).toBe(other);
+  });
+
+  it('travels straight to a directly reachable target', () => {
+    const { tower } = mockWalledInTower(10);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+
+    expect(
+      clauseTravelNode(buildClause({ type: 'FinishUnfinishedAreas' })),
+    ).toBe(tower);
   });
 });
 

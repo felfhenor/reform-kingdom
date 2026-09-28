@@ -1,6 +1,7 @@
 import type { ItemId } from '@interfaces/content-item';
 import type { RewardIdentity } from '@interfaces/droppable';
 import type { Branded } from '@interfaces/identifiable';
+import type { WorldNodeEntry } from '@interfaces/world-nodes';
 
 export type DecreeClauseId = Branded<string, 'DecreeClauseId'>;
 
@@ -25,6 +26,12 @@ export type DecreeClauseAction =
   | { type: 'LevelUpParty'; riskTolerance: DecreeRiskLevel }
   | { type: 'ReturnToKingdom' }
   | { type: 'DefendTowns'; riskTolerance: DecreeRiskLevel; townName?: string };
+
+// `hop` is the target itself, or the node it's walled in behind that must be visited first.
+export type DecreeRoute = {
+  hop: WorldNodeEntry;
+  steps: number;
+};
 
 export type DecreeClause = DecreeClauseAction & {
   id: DecreeClauseId;

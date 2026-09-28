@@ -1,5 +1,9 @@
 import { computed } from '@angular/core';
-import { OFF_PATH_MOVE_COST, ON_PATH_MOVE_COST } from '@helpers/config';
+import {
+  NODE_PASS_THROUGH_MOVE_COST,
+  OFF_PATH_MOVE_COST,
+  ON_PATH_MOVE_COST,
+} from '@helpers/config';
 import { allMaps } from '@helpers/maps';
 import { weightedGridPathFind } from '@helpers/pathfinding/pathfinding-astar';
 import {
@@ -179,11 +183,15 @@ export function tileIsOnPath(mapName: string, x: number, y: number): boolean {
 function moveCostMatrixForQuery(
   mapName: string,
   allowedTiles: { x: number; y: number }[],
+  passThroughNodes: boolean,
 ): number[][] | undefined {
   const baseMatrix = mapMoveCostMatrices().get(mapName);
   if (!baseMatrix) return undefined;
 
   const matrix = baseMatrix.map((row) => [...row]);
+  const nodeCost = passThroughNodes
+    ? NODE_PASS_THROUGH_MOVE_COST
+    : Number.POSITIVE_INFINITY;
   const nodesByX = worldNodeLookup().byPosition[mapName] ?? {};
 
   Object.entries(nodesByX).forEach(([xKey, byY]) => {
@@ -193,21 +201,23 @@ function moveCostMatrixForQuery(
       const y = Number(yKey);
       if (allowedTiles.some((tile) => tile.x === x && tile.y === y)) return;
 
-      matrix[y][x] = Number.POSITIVE_INFINITY;
+      matrix[y][x] = Math.max(matrix[y][x], nodeCost);
     });
   });
 
   return matrix;
 }
 
+// `passThroughNodes` lets the route cross other nodes as a last resort instead of failing outright.
 export function findInMapPath(
   mapName: string,
   from: { x: number; y: number },
   to: { x: number; y: number },
+  passThroughNodes = false,
 ): TravelStep[] | undefined {
   if (from.x === to.x && from.y === to.y) return [];
 
-  const matrix = moveCostMatrixForQuery(mapName, [from, to]);
+  const matrix = moveCostMatrixForQuery(mapName, [from, to], passThroughNodes);
   if (!matrix) return undefined;
 
   const rawPath = weightedGridPathFind(matrix, from, to);
@@ -249,6 +259,7 @@ export function travelPathViaTeleport(
   location: CurrentLocation,
   teleportNode: WorldNodeEntry,
   ignoreCollectibleGate = false,
+  passThroughNodes = false,
 ): TravelStep[] | undefined {
   if (location.mapName !== teleportNode.mapName) return undefined;
   if (!ignoreCollectibleGate && !isWorldNodeCollectibleGateMet(teleportNode)) {
@@ -265,6 +276,7 @@ export function travelPathViaTeleport(
     location.mapName,
     location,
     teleportNode,
+    passThroughNodes,
   );
   if (!toTeleportSteps) return undefined;
 

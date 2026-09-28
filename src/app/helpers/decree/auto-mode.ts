@@ -13,6 +13,8 @@ import {
 } from '@helpers/decree/decree';
 import {
   clauseTargetNode,
+  clauseTravelNode,
+  decreeTravelHopTo,
   isClauseSatisfiable,
   pickTopPriorityClause,
 } from '@helpers/decree/decree-evaluation';
@@ -130,13 +132,7 @@ function stopOrphanedGather(): boolean {
 function runClause(clause: DecreeClause): void {
   autoModeSetActiveClause(clause.id);
 
-  if (clause.type === 'ReturnToKingdom') {
-    const home = homeNodeGet();
-    if (home) travelStart(home.nodeName, true);
-    return;
-  }
-
-  const target = clauseTargetNode(clause);
+  const target = clauseTravelNode(clause);
   if (target) travelStart(target.nodeName, true);
 }
 
@@ -146,7 +142,7 @@ function returnToKingdomFallback(): void {
   if (isPlayerAtHome()) return;
 
   const home = homeNodeGet();
-  if (home) travelStart(home.nodeName, true);
+  if (home) travelStart(decreeTravelHopTo(home).nodeName, true);
 }
 
 function advanceToNextClause(): void {
@@ -173,13 +169,6 @@ function activeDestinationNodeName(): string | undefined {
   const travel = worldTravelState();
   if (travel.status === 'Traveling') return travel.destinationNodeName;
   return undefined;
-}
-
-function clauseDispatchTarget(clause: DecreeClause): string | undefined {
-  if (clause.type === 'ReturnToKingdom') {
-    return homeNodeGet()?.nodeName;
-  }
-  return clauseTargetNode(clause)?.nodeName;
 }
 
 let lastCheckedDecreeClauses: DecreeClause[] | undefined;
@@ -234,7 +223,7 @@ function redirectToClause(
     return nextClause.id !== activeClauseId && pauseGatherToHeal();
   }
 
-  const nextTarget = clauseDispatchTarget(nextClause);
+  const nextTarget = clauseTravelNode(nextClause)?.nodeName;
   if (nextClause.id === activeClauseId && nextTarget === currentTarget) {
     return false;
   }
