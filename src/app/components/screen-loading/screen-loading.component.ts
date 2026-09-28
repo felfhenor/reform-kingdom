@@ -21,7 +21,7 @@ import { LoadingService } from '@services/loading.service';
         (filled)="loadingService.onBarFilled()"
       />
 
-      @for (label of [progress.label]; track label) {
+      @for (label of [progress.label]; track $index) {
         <p class="type-muted" (animate.enter)="anim.slideIn($event.target)">
           {{ label }}
         </p>
