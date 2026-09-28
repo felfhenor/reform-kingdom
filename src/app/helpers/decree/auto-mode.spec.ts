@@ -11,8 +11,8 @@ vi.mock('@helpers/decree/decree', () => ({
 
 vi.mock('@helpers/decree/decree-evaluation', () => ({
   clauseTargetNode: vi.fn(),
-  isClauseBlockedOnlyByHealth: vi.fn(() => false),
-  pickNextClause: vi.fn(),
+  isClauseSatisfiable: vi.fn(() => true),
+  pickTopPriorityClause: vi.fn(),
 }));
 
 vi.mock('@helpers/item/gathering', () => ({
@@ -59,6 +59,10 @@ vi.mock('@helpers/town/town-spawn', () => ({
   isPlayerAtHome: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/engine/timer', () => ({
+  timerTicksElapsed: vi.fn(() => 0),
+}));
+
 vi.mock('@helpers/world', () => ({
   worldNodeAtCurrentLocation: vi.fn(() => undefined),
 }));
@@ -73,6 +77,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
+import { timerTicksElapsed } from '@helpers/engine/timer';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import {
   decreeClauses,
@@ -80,8 +85,8 @@ import {
 } from '@helpers/decree/decree';
 import {
   clauseTargetNode,
-  isClauseBlockedOnlyByHealth,
-  pickNextClause,
+  isClauseSatisfiable,
+  pickTopPriorityClause,
 } from '@helpers/decree/decree-evaluation';
 import {
   addGlobalEffect,
@@ -173,8 +178,8 @@ beforeEach(() => {
   vi.mocked(isGlobalEffectActive).mockReturnValue(false);
   vi.mocked(isPlayerAtHome).mockReturnValue(false);
   vi.mocked(homeNodeGet).mockReturnValue(undefined);
-  vi.mocked(pickNextClause).mockReturnValue(undefined);
-  vi.mocked(isClauseBlockedOnlyByHealth).mockReturnValue(false);
+  vi.mocked(pickTopPriorityClause).mockReturnValue(undefined);
+  vi.mocked(isClauseSatisfiable).mockReturnValue(true);
   vi.mocked(worldNodeByName).mockReturnValue(undefined);
   vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([]);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
@@ -183,6 +188,7 @@ beforeEach(() => {
   vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
   vi.mocked(worldNodeTown).mockReturnValue(undefined);
   vi.mocked(clauseTargetNode).mockReturnValue(undefined);
+  vi.mocked(timerTicksElapsed).mockReturnValue(0);
 });
 
 describe('autoModeProcessTick', () => {
@@ -238,7 +244,7 @@ describe('autoModeProcessTick', () => {
       buildState({ enabled: true, clauses: [clause] }),
     );
     vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Old Ruins',
     } as WorldNodeEntry);
@@ -289,7 +295,7 @@ describe('autoModeProcessTick', () => {
       }),
     );
     vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
     vi.mocked(clauseTargetNode).mockReturnValue(node);
     vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
 
@@ -312,7 +318,7 @@ describe('autoModeProcessTick', () => {
       }),
     );
     vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
 
     autoModeProcessTick();
 
@@ -321,7 +327,7 @@ describe('autoModeProcessTick', () => {
 
   it('falls back home when no clause is satisfiable and not already there', () => {
     vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(pickNextClause).mockReturnValue(undefined);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(undefined);
     vi.mocked(isPlayerAtHome).mockReturnValue(false);
     vi.mocked(homeNodeGet).mockReturnValue({
       nodeName: 'Kingdom',
@@ -334,7 +340,7 @@ describe('autoModeProcessTick', () => {
 
   it('does not travel when the fallback is already satisfied at home', () => {
     vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(pickNextClause).mockReturnValue(undefined);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(undefined);
     vi.mocked(isPlayerAtHome).mockReturnValue(true);
 
     autoModeProcessTick();
@@ -347,8 +353,8 @@ describe('autoModeProcessTick', () => {
     vi.mocked(gamestate).mockReturnValue(
       buildState({ enabled: true, clauses: [clause] }),
     );
-    vi.mocked(pickNextClause).mockReturnValue(undefined);
-    vi.mocked(isClauseBlockedOnlyByHealth).mockReturnValue(true);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
+    vi.mocked(isClauseSatisfiable).mockReturnValue(false);
     vi.mocked(isPlayerAtHome).mockReturnValue(false);
 
     autoModeProcessTick();
@@ -576,7 +582,7 @@ describe('autoModeProcessTick', () => {
     );
     vi.mocked(getMaterialQuantity).mockReturnValue(2);
     vi.mocked(decreeClauses).mockReturnValue([disabledClause, farmClause]);
-    vi.mocked(pickNextClause).mockReturnValue(farmClause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Jelly Fields',
     } as WorldNodeEntry);
@@ -624,7 +630,7 @@ describe('autoModeProcessTick', () => {
       () => vi.mocked(gatheringStop).mock.calls.length === 0,
     );
     vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Old Ruins',
     } as WorldNodeEntry);
@@ -714,7 +720,7 @@ describe('autoModeProcessTick', () => {
     vi.mocked(isGathering).mockReturnValue(true);
     vi.mocked(getMaterialQuantity).mockReturnValue(10);
     vi.mocked(decreeClauses).mockReturnValue([copperClause, woodClause]);
-    vi.mocked(pickNextClause).mockReturnValue(copperClause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(copperClause);
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Carrina Copper Mines',
     } as WorldNodeEntry);
@@ -750,7 +756,7 @@ describe('autoModeProcessTick', () => {
     vi.mocked(isGathering).mockReturnValue(true);
     vi.mocked(getMaterialQuantity).mockReturnValue(5);
     vi.mocked(decreeClauses).mockReturnValue([newClause, oldClause]);
-    vi.mocked(pickNextClause).mockReturnValue(newClause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(newClause);
     // Both clauses are gatherable at the same node - a multi-material GatherNode.
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Wergen Woods',
@@ -787,7 +793,7 @@ describe('autoModeProcessTick', () => {
     vi.mocked(isGathering).mockReturnValue(true);
     vi.mocked(getMaterialQuantity).mockReturnValue(10);
     vi.mocked(decreeClauses).mockReturnValue([editedClause]);
-    vi.mocked(pickNextClause).mockReturnValue(editedClause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(editedClause);
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Carrina Copper Mines',
     } as WorldNodeEntry);
@@ -822,7 +828,7 @@ describe('autoModeProcessTick', () => {
       }),
     );
     vi.mocked(decreeClauses).mockReturnValue([newClause, oldClause]);
-    vi.mocked(pickNextClause).mockReturnValue(newClause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(newClause);
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Carrina Copper Mines',
     } as WorldNodeEntry);
@@ -852,7 +858,7 @@ describe('autoModeProcessTick', () => {
     vi.mocked(isGathering).mockReturnValue(true);
     vi.mocked(getMaterialQuantity).mockReturnValue(10);
     vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickNextClause).mockReturnValue(clause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
     vi.mocked(clauseTargetNode).mockReturnValue({
       nodeName: 'Wergen Woods',
     } as WorldNodeEntry);
@@ -887,7 +893,7 @@ describe('autoModeProcessTick', () => {
       {} as ReturnType<typeof worldCombatState>,
     );
     vi.mocked(decreeClauses).mockReturnValue([copperClause, woodClause]);
-    vi.mocked(pickNextClause).mockReturnValue(copperClause);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(copperClause);
 
     autoModeProcessTick();
 
@@ -923,5 +929,178 @@ describe('autoModeProcessTick', () => {
 
     // No enabled clause targets this material, so it's orphaned.
     expect(gatheringStop).toHaveBeenCalled();
+  });
+  describe('priority recheck without a decree edit', () => {
+    const gatherClause = buildClause({
+      id: 'gather-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'mirewood' as MaterialId,
+      targetQuantity: 500,
+    });
+    const farmClause = buildClause({
+      id: 'farm-clause' as DecreeClauseId,
+      type: 'FarmNode',
+      nodeName: 'Jelly Fields',
+      reward: { itemId: 'red-slime-core' as ItemId },
+      targetQuantity: 100,
+    });
+
+    function setupGathering(clauses: DecreeClause[]): void {
+      vi.mocked(gamestate).mockReturnValue(
+        buildState({
+          clauses,
+          activeClauseId: gatherClause.id,
+          gatheringStatus: 'Gathering',
+          gatheringNodeName: 'Swampfields',
+        }),
+      );
+      vi.mocked(isGathering).mockReturnValue(true);
+      vi.mocked(getMaterialQuantity).mockReturnValue(131);
+      vi.mocked(decreeClauses).mockReturnValue(clauses);
+    }
+
+    // First tick consumes the "decree edited" check, so later ticks exercise the periodic recheck alone.
+    function tickOnceUnchanged(): void {
+      vi.mocked(pickTopPriorityClause).mockReturnValueOnce(gatherClause);
+      vi.mocked(clauseTargetNode).mockReturnValueOnce({
+        nodeName: 'Swampfields',
+      } as WorldNodeEntry);
+      autoModeProcessTick();
+      vi.clearAllMocks();
+      vi.mocked(isClauseSatisfiable).mockReturnValue(true);
+      vi.mocked(isGathering).mockReturnValue(true);
+    }
+
+    it('abandons a gather once a higher clause becomes actionable', () => {
+      const clauses = [farmClause, gatherClause];
+      setupGathering(clauses);
+      tickOnceUnchanged();
+
+      vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
+      vi.mocked(clauseTargetNode).mockReturnValue({
+        nodeName: 'Jelly Fields',
+      } as WorldNodeEntry);
+      autoModeProcessTick();
+
+      expect(gatheringStop).toHaveBeenCalled();
+      expect(travelStart).toHaveBeenCalledWith('Jelly Fields', true);
+    });
+
+    it('skips the recheck between intervals', () => {
+      const clauses = [farmClause, gatherClause];
+      setupGathering(clauses);
+      tickOnceUnchanged();
+
+      vi.mocked(timerTicksElapsed).mockReturnValue(1);
+      vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
+      autoModeProcessTick();
+
+      expect(pickTopPriorityClause).not.toHaveBeenCalled();
+      expect(gatheringStop).not.toHaveBeenCalled();
+    });
+
+    it('skips the recheck while traveling', () => {
+      const clauses = [farmClause, gatherClause];
+      setupGathering(clauses);
+      tickOnceUnchanged();
+
+      vi.mocked(gamestate).mockReturnValue(
+        buildState({
+          clauses,
+          activeClauseId: gatherClause.id,
+          travelStatus: 'Traveling',
+          travelDestinationNodeName: 'Swampfields',
+        }),
+      );
+      vi.mocked(isGathering).mockReturnValue(false);
+      vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
+      autoModeProcessTick();
+
+      expect(pickTopPriorityClause).not.toHaveBeenCalled();
+      expect(travelStart).not.toHaveBeenCalled();
+    });
+
+    it('ignores the active clause re-resolving to a different target', () => {
+      const clauses = [gatherClause];
+      setupGathering(clauses);
+      tickOnceUnchanged();
+
+      vi.mocked(pickTopPriorityClause).mockReturnValue(gatherClause);
+      vi.mocked(clauseTargetNode).mockReturnValue({
+        nodeName: 'Other Swamp',
+      } as WorldNodeEntry);
+      autoModeProcessTick();
+
+      expect(gatheringStop).not.toHaveBeenCalled();
+      expect(travelStart).not.toHaveBeenCalled();
+    });
+  });
+
+  it('stops gathering to heal in place when a higher clause is blocked only by health', () => {
+    const gatherClause = buildClause({
+      id: 'gather-clause' as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId: 'mirewood' as MaterialId,
+      targetQuantity: 500,
+    });
+    const farmClause = buildClause({
+      id: 'farm-clause' as DecreeClauseId,
+      type: 'FarmNode',
+      nodeName: 'Jelly Fields',
+      reward: { itemId: 'red-slime-core' as ItemId },
+      targetQuantity: 100,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        clauses: [farmClause, gatherClause],
+        activeClauseId: gatherClause.id,
+        gatheringStatus: 'Gathering',
+        gatheringNodeName: 'Swampfields',
+      }),
+    );
+    vi.mocked(isGathering).mockReturnValue(true);
+    vi.mocked(getMaterialQuantity).mockReturnValue(131);
+    vi.mocked(decreeClauses).mockReturnValue([farmClause, gatherClause]);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
+    vi.mocked(isClauseSatisfiable).mockReturnValue(false);
+
+    autoModeProcessTick();
+
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(travelStart).not.toHaveBeenCalled();
+    const result = applyLastUpdate(
+      buildState({ activeClauseId: gatherClause.id }),
+    );
+    expect(result.world.autoMode.activeClauseId).toBeUndefined();
+  });
+
+  it('keeps traveling when a higher clause is blocked only by health', () => {
+    const levelClause = buildClause({
+      id: 'level-clause' as DecreeClauseId,
+      type: 'LevelUpParty',
+    });
+    const farmClause = buildClause({
+      id: 'farm-clause' as DecreeClauseId,
+      type: 'FarmNode',
+      nodeName: 'Jelly Fields',
+      reward: { itemId: 'red-slime-core' as ItemId },
+      targetQuantity: 100,
+    });
+    vi.mocked(gamestate).mockReturnValue(
+      buildState({
+        clauses: [farmClause, levelClause],
+        activeClauseId: levelClause.id,
+        travelStatus: 'Traveling',
+        travelDestinationNodeName: 'Old Ruins',
+      }),
+    );
+    vi.mocked(decreeClauses).mockReturnValue([farmClause, levelClause]);
+    vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
+    vi.mocked(isClauseSatisfiable).mockReturnValue(false);
+
+    autoModeProcessTick();
+
+    expect(travelStart).not.toHaveBeenCalled();
+    expect(updateGamestate).not.toHaveBeenCalled();
   });
 });

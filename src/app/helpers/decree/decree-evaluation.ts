@@ -11,10 +11,7 @@ import {
 } from '@helpers/decree/decree';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
-import {
-  isPartyAtFullEnergy,
-  isPartyAtFullHealth,
-} from '@helpers/hero/party';
+import { isPartyAtFullEnergy, isPartyAtFullHealth } from '@helpers/hero/party';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
@@ -62,8 +59,7 @@ export function riskLevelSatisfies(
   return RISK_ORDINAL[band] <= RISK_ORDINAL[ceiling];
 }
 
-// Nearest reachable node by fewest pathfinding steps - only ever called on
-// idle transitions, never per-tick.
+// Nearest reachable node by fewest pathfinding steps - only called while idle or stationary (path cache hits), never mid-travel.
 function nearestReachableNode(
   candidates: WorldNodeEntry[],
 ): WorldNodeEntry | undefined {
@@ -295,8 +291,12 @@ export function isClauseBlockedOnlyByHealth(clause: DecreeClause): boolean {
   }
 }
 
-export function pickNextClause(
+// A clause waiting on health still outranks everything below it, so the party heals for it instead of drifting to a lower clause.
+export function pickTopPriorityClause(
   clauses: DecreeClause[],
 ): DecreeClause | undefined {
-  return clauses.find(isClauseSatisfiable);
+  return clauses.find(
+    (clause) =>
+      isClauseSatisfiable(clause) || isClauseBlockedOnlyByHealth(clause),
+  );
 }

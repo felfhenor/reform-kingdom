@@ -6,7 +6,7 @@ import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { decreeClauses } from '@helpers/decree/decree';
 import {
   mostChallengingExploreNodeForRisk,
-  pickNextClause,
+  pickTopPriorityClause,
 } from '@helpers/decree/decree-evaluation';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
 import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
@@ -113,7 +113,7 @@ function processOneTick(): void {
 }
 
 function checkHardStonewall(tracker: TrackerState): boolean {
-  const nothingSatisfiable = !pickNextClause(decreeClauses());
+  const nothingSatisfiable = !pickTopPriorityClause(decreeClauses());
   const idleAtKingdom = isPlayerAtKingdom();
 
   if (nothingSatisfiable && idleAtKingdom) {
@@ -248,7 +248,7 @@ function describePartyLocation(): string {
 // otherwise go for hundreds of thousands of silent ticks.
 function logVerboseStatus(label: string, tick: number): void {
   const simulatedHours = Math.round((tick / TICKS_PER_HOUR) * 100) / 100;
-  const activeClause = pickNextClause(decreeClauses());
+  const activeClause = pickTopPriorityClause(decreeClauses());
 
   console.log(
     `[${label}] tick ${tick} (${simulatedHours}h): level ${partyMinLevel()}, ` +

@@ -179,6 +179,9 @@ export const LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL = 1;
 
 export const DECREE_CLAUSE_CAP = 7;
 
+// How often an in-progress clause checks whether a higher-priority one has become actionable.
+export const DECREE_PRIORITY_RECHECK_INTERVAL_TICKS = 5;
+
 // Pathfinding
 
 // Path tiles are cheaper than other open tiles so pathfinding hugs authored paths without blocking off-road.

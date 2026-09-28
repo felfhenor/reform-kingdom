@@ -76,7 +76,7 @@ import {
   mostChallengingExploreNodeForRisk,
   nearestGatherNodeFor,
   nearestUnfinishedExploreNode,
-  pickNextClause,
+  pickTopPriorityClause,
   riskLevelOfExploreNode,
   riskLevelSatisfies,
 } from '@helpers/decree/decree-evaluation';
@@ -715,7 +715,7 @@ describe('isClauseSatisfiable', () => {
   });
 });
 
-describe('pickNextClause', () => {
+describe('pickTopPriorityClause', () => {
   it('returns the first satisfiable clause in priority order', () => {
     vi.mocked(isPlayerAtHome).mockReturnValue(true); // ReturnToKingdom unsatisfiable
 
@@ -733,14 +733,14 @@ describe('pickNextClause', () => {
     } as EncounterContent);
     vi.mocked(travelPathTo).mockReturnValue([]);
 
-    expect(pickNextClause(clauses)?.id).toBe('b');
+    expect(pickTopPriorityClause(clauses)?.id).toBe('b');
   });
 
   it('returns undefined when nothing is satisfiable', () => {
     vi.mocked(isPlayerAtHome).mockReturnValue(true);
 
     expect(
-      pickNextClause([buildClause({ type: 'ReturnToKingdom' })]),
+      pickTopPriorityClause([buildClause({ type: 'ReturnToKingdom' })]),
     ).toBeUndefined();
   });
 });
@@ -1066,5 +1066,45 @@ describe('isClauseBlockedOnlyByHealth - FarmNode', () => {
         }),
       ),
     ).toBe(false);
+  });
+});
+
+describe('pickTopPriorityClause - health gate', () => {
+  const farmClause = buildClause({
+    id: 'farm' as DecreeClauseId,
+    type: 'FarmNode',
+    nodeName: 'Forest Ruins',
+    reward: { itemId: 'bone' as ItemId },
+    targetQuantity: 5,
+  });
+  const gatherClause = buildClause({
+    id: 'gather' as DecreeClauseId,
+    type: 'GatherMaterial',
+    materialId: 'copper-ore' as MaterialId,
+    nodeName: 'Forest Ruins',
+    targetQuantity: 50,
+  });
+
+  beforeEach(() => {
+    vi.mocked(worldNodeByName).mockReturnValue(buildNode('Forest Ruins'));
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
+    vi.mocked(getMaterialQuantity).mockReturnValue(0);
+    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+  });
+
+  it('keeps a health-blocked clause ahead of a satisfiable lower one', () => {
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+
+    expect(pickTopPriorityClause([farmClause, gatherClause])?.id).toBe('farm');
+  });
+
+  it('skips a clause that is unsatisfiable for reasons other than health', () => {
+    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+    vi.mocked(farmNodeRewardQuantity).mockReturnValue(5);
+
+    expect(pickTopPriorityClause([farmClause, gatherClause])?.id).toBe(
+      'gather',
+    );
   });
 });

@@ -1,4 +1,7 @@
-import { ONE_YEAR_TICKS } from '@helpers/config';
+import {
+  DECREE_PRIORITY_RECHECK_INTERVAL_TICKS,
+  ONE_YEAR_TICKS,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   autoModeIsEnabled,
@@ -10,9 +13,10 @@ import {
 } from '@helpers/decree/decree';
 import {
   clauseTargetNode,
-  isClauseBlockedOnlyByHealth,
-  pickNextClause,
+  isClauseSatisfiable,
+  pickTopPriorityClause,
 } from '@helpers/decree/decree-evaluation';
+import { timerTicksElapsed } from '@helpers/engine/timer';
 import {
   addGlobalEffect,
   isGlobalEffectActive,
@@ -146,20 +150,19 @@ function returnToKingdomFallback(): void {
 }
 
 function advanceToNextClause(): void {
-  const clauses = decreeClauses();
-  const clause = pickNextClause(clauses);
-  if (clause) {
-    runClause(clause);
+  const clause = pickTopPriorityClause(decreeClauses());
+  if (!clause) {
+    returnToKingdomFallback();
     return;
   }
 
   // Blocked only by the health gate - stay put and heal in place, instead of trekking back home.
-  if (clauses.some(isClauseBlockedOnlyByHealth)) {
+  if (!isClauseSatisfiable(clause)) {
     autoModeSetActiveClause(undefined);
     return;
   }
 
-  returnToKingdomFallback();
+  runClause(clause);
 }
 
 // Where the party is currently headed for the active clause - not just idle-vs-not, so it can be compared against a freshly re-picked clause's target below.
@@ -181,7 +184,24 @@ function clauseDispatchTarget(clause: DecreeClause): string | undefined {
 
 let lastCheckedDecreeClauses: DecreeClause[] | undefined;
 
-// Editing the decree should preempt an in-progress clause, not wait for it to finish; combat can't be redirected mid-fight.
+// Gathering doesn't regen, so a gather can never outlast a higher clause's health gate - stop it so the party rests instead.
+function pauseGatherToHeal(): boolean {
+  if (!isGathering()) return false;
+
+  gatheringStop();
+  autoModeSetActiveClause(undefined);
+  return true;
+}
+
+// Travel re-resolves on arrival anyway, and rechecking mid-travel would miss the path cache on every step.
+function isPeriodicRecheckDue(): boolean {
+  return (
+    isGathering() &&
+    timerTicksElapsed() % DECREE_PRIORITY_RECHECK_INTERVAL_TICKS === 0
+  );
+}
+
+// Preempts an in-progress clause on a decree edit, or when a higher-priority clause becomes actionable mid-gather; combat can't be redirected mid-fight.
 function interruptForPriorityChange(): boolean {
   if (worldCombatState()) return false;
 
@@ -192,17 +212,30 @@ function interruptForPriorityChange(): boolean {
   if (!currentTarget) return false;
 
   const clauses = decreeClauses();
-  if (clauses === lastCheckedDecreeClauses) return false;
+  const decreeEdited = clauses !== lastCheckedDecreeClauses;
+  if (!decreeEdited && !isPeriodicRecheckDue()) return false;
   lastCheckedDecreeClauses = clauses;
 
-  const nextClause = pickNextClause(clauses);
+  const nextClause = pickTopPriorityClause(clauses);
   if (!nextClause) return false;
 
+  // Without an edit, only a higher clause counts - not the active clause's own target drifting as the party moves.
+  if (!decreeEdited && nextClause.id === autoMode.activeClauseId) return false;
+
+  return redirectToClause(nextClause, currentTarget);
+}
+
+function redirectToClause(
+  nextClause: DecreeClause,
+  currentTarget: string,
+): boolean {
+  const activeClauseId = worldAutoModeState().activeClauseId;
+  if (!isClauseSatisfiable(nextClause)) {
+    return nextClause.id !== activeClauseId && pauseGatherToHeal();
+  }
+
   const nextTarget = clauseDispatchTarget(nextClause);
-  if (
-    nextClause.id === autoMode.activeClauseId &&
-    nextTarget === currentTarget
-  ) {
+  if (nextClause.id === activeClauseId && nextTarget === currentTarget) {
     return false;
   }
 
