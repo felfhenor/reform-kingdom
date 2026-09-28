@@ -3,9 +3,51 @@
     <span class="title text-8xl">re:Form Kingdom</span>
   </div>
 
+  <div class="mt-8">
+    @if (savefileFailureText(); as failText) {
+      <div
+        role="alert"
+        class="alert alert-error flex flex-col gap-2 w-full min-w-[400px]"
+      >
+        <span>{{ failText }}</span>
+        <span class="text-sm">It has not been overwritten.</span>
+      </div>
+    }
+
+    @if (showBackupsAvailable()) {
+      <div role="alert" class="alert alert-info w-full">
+        <span>No savefile is active, but backups of an earlier one exist.</span>
+      </div>
+    }
+  </div>
+
   <div
     class="flex flex-col gap-2 min-w-[300px] max-w-[300px] items-center justify-center flex-1"
   >
+    @if (savefileFailureText()) {
+      <button
+        class="btn btn-warning btn-block mt-2"
+        (click)="openSavefileSettings()"
+        appAnalyticsClick="Meta:Play:RecoverSavefile"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Recover Savefile
+      </button>
+    }
+
+    @if (showBackupsAvailable()) {
+      <button
+        class="btn btn-warning btn-block mt-2"
+        (click)="openSavefileSettings()"
+        appAnalyticsClick="Meta:Play:RestoreBackup"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Restore a Backup
+      </button>
+    }
+
     @if (hasStartedGame()) {
       <button
         class="btn btn-primary btn-block"
@@ -68,6 +110,15 @@
   title="Reset your game?"
   icon="warning"
   confirmButtonText="Yes, reset game"
+  cancelButtonText="No, cancel"
+></swal>
+
+<swal
+  #replaceUnloadableSwal
+  title="Replace your savefile?"
+  text="Your existing savefile couldn't be loaded. Starting a new game will overwrite it - try Recover Savefile first."
+  icon="warning"
+  confirmButtonText="Yes, start a new game"
   cancelButtonText="No, cancel"
 ></swal>
 

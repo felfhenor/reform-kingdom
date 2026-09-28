@@ -1,60 +1,199 @@
-<div class="flex flex-row gap-4">
-  <div class="flex-1 flex flex-col gap-4">
-    <div class="card shadow-sm">
-      <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Savefile Metadata</div>
+@let failure = loadFailure();
 
-        <p class="mb-3">
-          You started playing this savefile {{ startedAt() | date }}.
-          <br />
-          A total of {{ elapsedDurationText() }} have elapsed since you started
-          playing.
-        </p>
+<div class="flex flex-col gap-4">
+  @if (failure) {
+    <div role="alert" class="alert alert-error flex flex-col items-start gap-2">
+      <div class="font-bold">{{ loadFailureMessage() }}</div>
+
+      <div>
+        Your savefile has not been overwritten.
+        @if (failure.reason === 'storage') {
+          This can be temporary, so try reloading the game first.
+        }
+        Recover will restore the newest backup that loads successfully.
+        @if (failure.data !== undefined) {
+          Export the unloadable savefile first if you want to keep a copy or
+          send it in with a bug report.
+        }
+      </div>
+
+      <ul class="list-disc list-inside text-sm opacity-80">
+        @for (detail of failure.details; track $index) {
+          <li>{{ detail }}</li>
+        }
+      </ul>
+
+      <div class="flex gap-2">
+        <button
+          class="btn btn-sm btn-warning"
+          [disabled]="isBusy()"
+          (click)="recoverSavefile()"
+          appAnalyticsClick="Savefile:Recover"
+          appSfx="ui-success"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Recover
+        </button>
+
+        @if (failure.reason === 'storage') {
+          <button
+            class="btn btn-sm btn-primary"
+            (click)="reloadGame()"
+            appAnalyticsClick="Savefile:Reload"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Reload Game
+          </button>
+        }
+
+        @if (failure.data !== undefined) {
+          <button
+            class="btn btn-sm btn-info"
+            (click)="exportUnloadableSavefile()"
+            appAnalyticsClick="Savefile:ExportUnloadable"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Export Unloadable Savefile
+          </button>
+        }
       </div>
     </div>
-  </div>
+  }
 
-  <div class="flex-1 flex flex-col gap-4">
-    <div class="card shadow-sm">
-      <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Savefile Management</div>
+  <div class="flex flex-row gap-4">
+    <div class="flex-1 flex flex-col gap-4">
+      <div class="card shadow-sm">
+        <div class="card-body p-3 gap-2">
+          <div class="type-section-title">Savefile Metadata</div>
 
-        <p class="mb-3">
-          Export and import your savefile to create backups, or share to help
-          establish bug reports.
-        </p>
+          <p class="mb-3">
+            You started playing this savefile {{ startedAt() | date }}.
+            <br />
+            A total of {{ elapsedDurationText() }} have elapsed since you
+            started playing.
+          </p>
+        </div>
+      </div>
+    </div>
 
-        <div class="card-actions">
-          <app-button-savefile-export></app-button-savefile-export>
-          <app-button-savefile-import></app-button-savefile-import>
+    <div class="flex-1 flex flex-col gap-4">
+      <div class="card shadow-sm">
+        <div class="card-body p-3 gap-2">
+          <div class="type-section-title">Savefile Management</div>
+
+          <p class="mb-3">
+            Export and import your savefile to create backups, or share to help
+            establish bug reports.
+          </p>
+
+          <div class="card-actions">
+            @if (!failure) {
+              <app-button-savefile-export></app-button-savefile-export>
+            }
+            <app-button-savefile-import></app-button-savefile-import>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 flex flex-col gap-4">
+      <div class="card shadow-sm">
+        <div class="card-body p-3 gap-2">
+          <div class="type-section-title">Delete Savefile</div>
+
+          <p class="mb-3">
+            Deleting your savefile is permanent, irreversible, and most
+            certainly should be done with caution!
+          </p>
+
+          <div class="card-actions">
+            <button
+              class="btn btn-error"
+              (click)="$event.shiftKey || deleteSwal.fire()"
+              (click.shift)="deleteSavefile()"
+              appAnalyticsClick="Savefile:Delete"
+              appSfx="ui-error"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="flex-1 flex flex-col gap-4">
-    <div class="card shadow-sm">
-      <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Delete Savefile</div>
+  <div class="card shadow-sm">
+    <div class="card-body p-3 gap-2">
+      <div class="type-section-title">Automatic Backups</div>
 
-        <p class="mb-3">
-          Deleting your savefile is permanent, irreversible, and most certainly
-          should be done with caution!
-        </p>
+      <p>
+        The last {{ maxBackups | number }} distinct versions of your savefile
+        are backed up automatically before it is loaded, imported, or restored.
+        @if (writesToDisk) {
+          Backups are also written to disk.
+        }
+      </p>
 
-        <div class="card-actions">
+      @if (backupsReadFailed()) {
+        <div role="alert" class="alert alert-warning flex flex-col items-start">
+          <span>
+            Some backups could not be read from storage, so no new backups can
+            be made until they are reset.
+          </span>
+
           <button
-            class="btn btn-error"
-            (click)="$event.shiftKey || deleteSwal.fire()"
-            (click.shift)="deleteSavefile()"
-            appAnalyticsClick="Savefile:Delete"
+            class="btn btn-sm btn-error"
+            [disabled]="isBusy()"
+            (click)="confirmResetBackups()"
+            appAnalyticsClick="Savefile:ResetBackups"
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            Delete
+            Reset Unreadable Backups
           </button>
         </div>
-      </div>
+      }
+
+      @if (!hasLoadedBackups()) {
+        <p class="opacity-70">Looking for backups...</p>
+      } @else if (backups().length === 0) {
+        <p class="opacity-70">No backups yet.</p>
+      } @else {
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Backed Up</th>
+              <th>Reason</th>
+              <th>Play Time</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (backup of backups(); track backup.id) {
+              <tr>
+                <td>{{ backup.createdAt | date: 'medium' }}</td>
+                <td>{{ reasonLabels[backup.reason] }}</td>
+                <td>{{ durationText(backup.numTicks) }}</td>
+                <td class="text-right">
+                  <button
+                    class="btn btn-sm btn-warning"
+                    [disabled]="isBusy()"
+                    (click)="confirmRestore(backup)"
+                    appAnalyticsClick="Savefile:Restore"
+                    appSfx="ui-click"
+                    [sfxTrigger]="['click', 'hover']"
+                  >
+                    Restore
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
     </div>
   </div>
 </div>
@@ -65,4 +204,22 @@
   text="This cannot be undone. You really want to make sure you want to do this. You will not be able to get this back!"
   icon="warning"
   (confirm)="deleteSavefile()"
+></swal>
+
+<swal
+  #resetBackupsSwal
+  title="Reset Unreadable Backups?"
+  text="Backups that can't be read will be permanently cleared so new ones can be made. Backups that can still be read are kept."
+  icon="warning"
+  confirmButtonText="Reset"
+  (confirm)="resetUnreadableBackups()"
+></swal>
+
+<swal
+  #restoreSwal
+  title="Restore Backup?"
+  text="Your current savefile will be backed up first, then replaced with this backup."
+  icon="warning"
+  confirmButtonText="Restore"
+  (confirm)="restorePendingBackup()"
 ></swal>

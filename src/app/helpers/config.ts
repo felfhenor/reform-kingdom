@@ -54,6 +54,14 @@ export const MAX_SEGMENT_LENGTH = 32;
 export const LOADING_FULL_HOLD_MS = 500;
 export const LOADING_FILL_FALLBACK_MS = 2000;
 
+// Savefile
+
+export const SAVEFILE_BACKUP_MAX = 3;
+export const SAVEFILE_READ_ATTEMPTS = 3;
+export const SAVEFILE_MIGRATE_ATTEMPTS = 3;
+export const SAVEFILE_RETRY_DELAY_MS = 250;
+export const SAVEFILE_SAVE_ERROR_NOTIFY_INTERVAL_MS = 60_000;
+
 // Beyond this many levels above the party's floor, a range is excluded outright (TooHigh) regardless of risk setting.
 export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
 

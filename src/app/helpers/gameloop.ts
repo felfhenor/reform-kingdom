@@ -42,6 +42,10 @@ export const isGameloopPaused = computed(() => getOption('gameloopPaused'));
 // Guards the loop from a second call landing mid-batch now that it yields - e.g. a manual `window.api.gameloop()` during a catch-up.
 let isProcessingTicks = false;
 
+export function gameloopIsProcessing(): boolean {
+  return isProcessingTicks;
+}
+
 export function gameloopShouldRun(): boolean {
   return window.location.toString().includes('/game');
 }

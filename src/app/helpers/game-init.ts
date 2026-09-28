@@ -1,6 +1,7 @@
 import { kingdomSubviewClear, setGamePlayView } from '@helpers/engine/ui';
 import { grantStartingGold } from '@helpers/item/materials';
 import { migrateGameState } from '@helpers/migrate';
+import { savefileMarkFresh } from '@helpers/savefile/savefile-load';
 import { setupFinish } from '@helpers/setup';
 import { resetGameState, updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
@@ -25,6 +26,7 @@ export async function gameStart(): Promise<void> {
 }
 
 export function gameReset(): void {
+  savefileMarkFresh();
   resetGameState();
   migrateGameState();
 

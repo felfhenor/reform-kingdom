@@ -20,6 +20,11 @@ export function notifyError(message: string): void {
   notification.next({ message, type: 'error', category: 'Error' });
 }
 
+export function notifyWarning(message: string): void {
+  if (!isPageVisible()) return;
+  notification.next({ message, type: 'warning', category: 'Warning' });
+}
+
 export function notifySuccess(message: string): void {
   if (!isPageVisible()) return;
   notification.next({ message, type: 'success', category: 'Success' });

@@ -1,6 +1,8 @@
 import { computed, signal } from '@angular/core';
 import { defaultGameState } from '@helpers/defaults';
+import { SAVEFILE_SAVE_ERROR_NOTIFY_INTERVAL_MS } from '@helpers/config';
 import { debug, error } from '@helpers/engine/logging';
+import { notifyError } from '@helpers/engine/notify';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { indexedDbSignal } from '@helpers/engine/signal';
 import { type GameState } from '@interfaces';
@@ -87,8 +89,21 @@ export const activeAstralProjectorSpellsState = gamestateSlice(
   'activeAstralProjectorSpells',
 );
 
+export const gameStateLoadError = signal<unknown>(undefined);
+
+// Held while a save is unloadable or mid-migration, so nothing can overwrite the stored copy.
+let isSavingBlocked = false;
+
+export function setGameStateSavingBlocked(blocked: boolean): void {
+  isSavingBlocked = blocked;
+}
+
+export const GAMESTATE_STORAGE_KEY = 'gamestate';
+
+let lastSaveErrorNotifyAt = -Infinity;
+
 const _savedGamestate = indexedDbSignal<GameState>(
-  'gamestate',
+  GAMESTATE_STORAGE_KEY,
   defaultGameState(),
   (state: GameState) => {
     if (hasGameStateLoaded()) return;
@@ -96,6 +111,21 @@ const _savedGamestate = indexedDbSignal<GameState>(
     _liveGameState.set(state);
 
     hasGameStateLoaded.set(true);
+  },
+  (e: unknown) => {
+    error('GameState:Load', 'Could not read the savefile from storage.', e);
+    isSavingBlocked = true;
+    gameStateLoadError.set(e ?? new Error('Unknown storage error'));
+    hasGameStateLoaded.set(true);
+  },
+  () => {
+    const now = Date.now();
+    if (now - lastSaveErrorNotifyAt < SAVEFILE_SAVE_ERROR_NOTIFY_INTERVAL_MS) {
+      return;
+    }
+
+    lastSaveErrorNotifyAt = now;
+    notifyError('Your game could not be saved to storage.');
   },
 );
 
@@ -170,6 +200,7 @@ export function resetGameState(): void {
 }
 
 export function saveGameState(): void {
+  if (isSavingBlocked) return;
   _savedGamestate.set(formatGameStateForSave(_liveGameState()));
 }
 

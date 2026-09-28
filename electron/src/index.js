@@ -5,6 +5,7 @@ const url = require('url');
 const rpc = require('discord-rpc');
 
 const Config = require('electron-config');
+const { registerSavefileBackupHandlers } = require('./savefile-backups');
 const config = new Config();
 
 const showDevTools = process.argv.includes('--dev');
@@ -39,6 +40,7 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       autoplayPolicy: 'no-user-gesture-required',
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
@@ -88,7 +90,10 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+  registerSavefileBackupHandlers();
+  createWindow();
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

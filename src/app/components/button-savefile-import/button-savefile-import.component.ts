@@ -2,11 +2,9 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { notifySuccess } from '@helpers/engine/notify';
+import { notifyError } from '@helpers/engine/notify';
 import { closeAllMenus } from '@helpers/engine/ui';
-import { migrateGameState } from '@helpers/migrate';
-import { setGameState } from '@helpers/state-game';
-import type { GameState } from '@interfaces';
+import { savefileImportJson } from '@helpers/savefile/savefile-load.ui';
 
 @Component({
   selector: 'app-button-savefile-import',
@@ -19,30 +17,23 @@ export class ButtonSavefileImportComponent {
 
   importSavefile(e: Event) {
     const fileInput = e.target as HTMLInputElement;
-    if (!e || !e.target || !fileInput.files) {
-      return;
-    }
-
-    const file = fileInput.files[0];
+    const file = fileInput?.files?.[0];
+    if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      const charFile = JSON.parse(
+    reader.onerror = () => {
+      fileInput.value = '';
+      notifyError('Could not read that file.');
+    };
+    reader.onload = async (ev) => {
+      fileInput.value = '';
+
+      const imported = await savefileImportJson(
         (ev.target as FileReader).result as string,
-      ) as GameState;
+      );
+      if (!imported) return;
 
-      const finish = () => {
-        fileInput.value = '';
-      };
-
-      setGameState(charFile);
-      migrateGameState();
       closeAllMenus();
-
-      finish();
-
-      notifySuccess(`Successfully imported savefile!`);
-
       this.router.navigate(['/game']);
     };
 

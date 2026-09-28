@@ -4,10 +4,12 @@ import {
   inject,
   Injectable,
   signal,
+  untracked,
 } from '@angular/core';
 import { isPageVisible } from '@helpers/engine/page-visibility';
 import { gameloop } from '@helpers/gameloop';
-import { migrateGameState, migrateOptionsState } from '@helpers/migrate';
+import { migrateOptionsState } from '@helpers/migrate';
+import { savefileLoad } from '@helpers/savefile/savefile-load';
 import {
   gamestate,
   hasGameStateLoaded,
@@ -29,25 +31,20 @@ export class GamestateService {
 
   public hasLoaded = signal<boolean>(false);
 
+  private isLoadingSavefile = false;
+
   constructor() {
     effect(() => {
       if (
         !this.contentService.hasLoaded() ||
         this.hasLoaded() ||
-        !hasGameStateLoaded()
+        !hasGameStateLoaded() ||
+        this.isLoadingSavefile
       )
         return;
-      this.logger.info('GameState', 'Migrating gamestate...');
 
-      migrateGameState();
-      migrateOptionsState();
-
-      // The normal sync hook never runs on load, so town-region buffs need re-deriving here.
-      townReputationBuffReconcile(gamestate().world.currentLocation.mapName);
-
-      this.logger.info('GameState', 'Gamestate migrated & loaded.');
-      this.hasLoaded.set(true);
-      isGameStateReady.set(true);
+      this.isLoadingSavefile = true;
+      untracked(() => void this.loadSavefile());
     });
 
     effect(() => {
@@ -59,6 +56,20 @@ export class GamestateService {
         this.logger.debug('GameState Update', state);
       }
     });
+  }
+
+  private async loadSavefile() {
+    this.logger.info('GameState', 'Migrating gamestate...');
+
+    await savefileLoad();
+    migrateOptionsState();
+
+    // The normal sync hook never runs on load, so town-region buffs need re-deriving here.
+    townReputationBuffReconcile(gamestate().world.currentLocation.mapName);
+
+    this.logger.info('GameState', 'Gamestate loaded.');
+    this.hasLoaded.set(true);
+    isGameStateReady.set(true);
   }
 
   init() {

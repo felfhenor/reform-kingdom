@@ -15,7 +15,7 @@ export type GameOption =
   | 'craftingViewAlwaysExpand'
   | 'adventureLogOverlay';
 
-export type NotificationCategory = 'Error' | 'Success';
+export type NotificationCategory = 'Error' | 'Success' | 'Warning';
 
 export type OptionsTab = 'UI' | 'Accessibility' | 'Savefile' | 'Misc' | 'Debug';
 

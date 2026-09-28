@@ -1,6 +1,12 @@
 import type { WritableSignal } from '@angular/core';
 import { signal } from '@angular/core';
+import {
+  SAVEFILE_READ_ATTEMPTS,
+  SAVEFILE_RETRY_DELAY_MS,
+} from '@helpers/config';
+import { idbGet, idbIsAvailable, idbPut } from '@helpers/engine/idb';
 import { error } from '@helpers/engine/logging';
+import { delay } from 'es-toolkit';
 
 export function localStorageSignal<T>(
   localStorageKey: string,
@@ -44,118 +50,53 @@ export function indexedDbSignal<T>(
   indexedDbKey: string,
   initialValue: T,
   onLoad?: (value: T) => void,
+  onError?: (e: unknown) => void,
+  onSaveError?: (e: unknown) => void,
 ): WritableSignal<T> {
-  const DB_NAME = 'gamestorage';
-  const STORE_NAME = 'gamestate';
-  const DB_VERSION = 1;
-
-  let db: IDBDatabase | null = null;
   let isInitialized = false;
 
   const writableSignal = signal(initialValue);
+  const originalSet = writableSignal.set;
 
-  const initDB = (): Promise<IDBDatabase> => {
-    return new Promise((resolve, reject) => {
-      if (db) {
-        resolve(db);
-        return;
+  const readWithRetry = async (): Promise<T | undefined> => {
+    for (let attempt = 1; ; attempt++) {
+      try {
+        return await idbGet<T>(indexedDbKey);
+      } catch (e) {
+        error('IndexedDbSignal', `Load attempt ${attempt} failed:`, e);
+        if (attempt >= SAVEFILE_READ_ATTEMPTS) throw e;
+        await delay(SAVEFILE_RETRY_DELAY_MS);
       }
-
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-      request.onerror = () => {
-        error('IndexedDbSignal', 'Failed to open database:', request.error);
-        reject(request.error);
-      };
-
-      request.onsuccess = () => {
-        db = request.result;
-        resolve(db);
-      };
-
-      request.onupgradeneeded = () => {
-        const database = request.result;
-        if (!database.objectStoreNames.contains(STORE_NAME)) {
-          database.createObjectStore(STORE_NAME);
-        }
-      };
-    });
+    }
   };
 
   const loadFromDB = async (): Promise<void> => {
     // Not an error - just no IndexedDB in this environment (e.g. scripts/analyze-*, scripts/validate-*).
-    if (typeof indexedDB === 'undefined') {
+    if (!idbIsAvailable()) {
       isInitialized = true;
       return;
     }
 
     try {
-      const database = await initDB();
-      const transaction = database.transaction([STORE_NAME], 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.get(indexedDbKey);
-
-      return new Promise((resolve) => {
-        request.onsuccess = () => {
-          if (request.result !== undefined) {
-            try {
-              const loadedValue = request.result;
-              writableSignal.set(loadedValue);
-              onLoad?.(loadedValue);
-            } catch {
-              error(
-                'IndexedDbSignal',
-                'Failed to parse stored value for key:',
-                indexedDbKey,
-              );
-            }
-          } else {
-            saveToDBSync(initialValue);
-          }
-
-          onLoad?.(initialValue);
-          isInitialized = true;
-          resolve();
-        };
-
-        request.onerror = () => {
-          error(
-            'IndexedDbSignal',
-            'Failed to load value for key:',
-            indexedDbKey,
-            request.error,
-          );
-          isInitialized = true;
-          resolve();
-        };
-      });
-    } catch (e) {
-      error('IndexedDbSignal', 'Failed to initialize database:', e);
+      const loadedValue = await readWithRetry();
+      if (loadedValue !== undefined) originalSet(loadedValue);
       isInitialized = true;
+      onLoad?.(loadedValue ?? initialValue);
+    } catch (e) {
+      isInitialized = true;
+      onError?.(e);
     }
   };
 
   const saveToDBSync = (value: T): void => {
-    if (!isInitialized || typeof indexedDB === 'undefined') return;
+    if (!isInitialized || !idbIsAvailable()) return;
 
-    saveToDB(value).catch((e) => {
+    idbPut(indexedDbKey, value).catch((e) => {
       error('IndexedDbSignal', 'Failed to save value:', e);
+      onSaveError?.(e);
     });
   };
 
-  const saveToDB = async (value: T): Promise<void> => {
-    const database = await initDB();
-    const transaction = database.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.put(value, indexedDbKey);
-
-    return new Promise((resolve, reject) => {
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  };
-
-  const originalSet = writableSignal.set;
   writableSignal.set = (value: T) => {
     originalSet(value);
     saveToDBSync(value);
@@ -167,7 +108,7 @@ export function indexedDbSignal<T>(
     saveToDBSync(value);
   };
 
-  loadFromDB();
+  void loadFromDB();
 
   return writableSignal;
 }

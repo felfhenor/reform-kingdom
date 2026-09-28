@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, computed, inject, viewChild } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonConnectComponent } from '@components/button-connect/button-connect.component';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
@@ -16,6 +16,11 @@ import {
 } from '@helpers/engine/discord';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { gameReset } from '@helpers/game-init';
+import { savefileBackupsRead } from '@helpers/savefile/savefile-backup-storage';
+import {
+  savefileFailureMessage,
+  savefileLoadStatus,
+} from '@helpers/savefile/savefile-load';
 import { isSetup } from '@helpers/setup';
 import { getOption, setOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';
@@ -45,10 +50,35 @@ export class HomeComponent implements OnInit {
   private router = inject(Router);
 
   public resetGameSwal = viewChild<SwalComponent>('newGameSwal');
+  public replaceUnloadableSwal = viewChild<SwalComponent>(
+    'replaceUnloadableSwal',
+  );
 
   public hasStartedGame = computed(() => isSetup());
 
   public analyticsEnabled = computed(() => getOption('analyticsEnabled'));
+
+  public savefileFailureText = computed(() => {
+    const status = savefileLoadStatus();
+    return status.state === 'failed'
+      ? savefileFailureMessage(status.reason)
+      : '';
+  });
+
+  private hasBackups = signal(false);
+
+  // A missing save with backups around is exactly what a silently lost save looks like.
+  public showBackupsAvailable = computed(
+    () =>
+      this.hasBackups() &&
+      !this.hasStartedGame() &&
+      !this.savefileFailureText(),
+  );
+
+  openSavefileSettings(): void {
+    setOption('optionsTab', 'Savefile');
+    modalOpen('settings');
+  }
 
   openAnalyticsSettings(): void {
     setOption('optionsTab', 'Misc');
@@ -56,6 +86,10 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    void savefileBackupsRead().then(({ backups }) =>
+      this.hasBackups.set(backups.length > 0),
+    );
+
     discordSetMainStatus('');
     discordSetStatus({
       state: 'In Main Menu',
@@ -63,6 +97,15 @@ export class HomeComponent implements OnInit {
   }
 
   async newGame() {
+    if (this.savefileFailureText()) {
+      const res = await this.replaceUnloadableSwal()?.fire();
+      if (!res?.isConfirmed) return;
+
+      gameReset();
+      this.router.navigate(['/setup']);
+      return;
+    }
+
     if (isSetup()) {
       const res = await this.resetGameSwal()?.fire();
       if (!res) return;
