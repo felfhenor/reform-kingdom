@@ -57,6 +57,14 @@
     }
   }
 
+  @case ('reforge') {
+    @defer (on immediate) {
+      <app-play-kingdom-reforge></app-play-kingdom-reforge>
+    } @placeholder {
+      <app-page-blank></app-page-blank>
+    }
+  }
+
   @case ('tradeskill-artificing') {
     <app-play-kingdom-tradeskill-artificing></app-play-kingdom-tradeskill-artificing>
   }

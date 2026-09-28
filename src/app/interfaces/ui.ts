@@ -25,6 +25,7 @@ export type KingdomSubview =
   | 'commissions'
   | 'astralprojector'
   | 'infusion'
+  | 'reforge'
   | 'tradeskill-artificing'
   | 'tradeskill-blacksmithing'
   | 'tradeskill-jewelcrafting'

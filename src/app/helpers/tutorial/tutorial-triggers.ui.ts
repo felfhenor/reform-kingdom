@@ -1,6 +1,10 @@
 import { getEntry } from '@helpers/content/content';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { isInfusionMaterial } from '@helpers/item/infusion';
+import {
+  isMaterialDiscovered,
+  reforgeReagentId,
+} from '@helpers/item/materials';
 import { isAnyTrainerDiscovered } from '@helpers/trainer/trainer';
 import {
   discoveredCaravansState,
@@ -21,6 +25,8 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
         const item = getEntry<ItemContent>(id as ItemId);
         return !!item && isInfusionMaterial(item);
       });
+    case 'first-reforge-reagent':
+      return isMaterialDiscovered(reforgeReagentId());
     case 'party-level':
       return partyMaxLevel() >= trigger.level;
     case 'first-town-visit':

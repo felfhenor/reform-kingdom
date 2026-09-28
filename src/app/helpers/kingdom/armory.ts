@@ -201,7 +201,7 @@ export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {
   return !!discoveredEquipmentState()[equipmentId]?.foundAt;
 }
 
-const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
+export const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
   Common: 1,
   Uncommon: 1.5,
   Rare: 3,

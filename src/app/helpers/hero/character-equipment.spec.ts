@@ -42,6 +42,7 @@ import { defaultStats } from '@helpers/defaults';
 import {
   characterEquipFromArmory,
   optimizeCharacterEquipment,
+  replaceEquippedItemInstance,
 } from '@helpers/hero/character-equipment';
 import { createCharacter } from '@helpers/hero/party';
 import {
@@ -328,6 +329,46 @@ describe('Character Equipment Helper Functions', () => {
       expect(state.world.party[0].equipment.Offhand).toEqual(armoryOffhandItem);
       expect(state.world.party[0].equipment.Weapon).toBeUndefined();
       expect(state.armory).toEqual([equippedSpear]);
+    });
+  });
+
+  describe('replaceEquippedItemInstance', () => {
+    const mockSpear: EquipmentContent = {
+      ...mockCloak,
+      id: 'equip-spear' as EquipmentId,
+      name: 'Copper Spear',
+      type: 'Spear',
+    };
+
+    it('swaps every slot holding the instance and recalculates stats', () => {
+      const strongSpear = {
+        ...mockSpear,
+        baseStats: { ...defaultStats(), Strength: 4 },
+      };
+      mockGetEntry(mockJob, strongSpear);
+      const jala = createCharacterStub('Jala');
+      const spear = mockEquipmentItem(strongSpear.id);
+      jala.equipment.Weapon = spear;
+      jala.equipment.Offhand = spear;
+      const updatedSpear = { ...spear, affixIds: [] };
+
+      const result = replaceEquippedItemInstance(jala, updatedSpear);
+
+      expect(result.equipment.Weapon).toBe(updatedSpear);
+      expect(result.equipment.Offhand).toBe(updatedSpear);
+      expect(result.stats.Strength).toBe(jala.stats.Strength + 4);
+    });
+
+    it('leaves other slots alone', () => {
+      mockGetEntry(mockJob, mockHelmet);
+      const jala = createCharacterStub('Jala');
+      const helmet = mockEquipmentItem(mockHelmet.id);
+      const armor = jala.equipment.Armor;
+
+      const result = replaceEquippedItemInstance(jala, helmet);
+
+      expect(result.equipment.Helmet).toBe(jala.equipment.Helmet);
+      expect(result.equipment.Armor).toBe(armor);
     });
   });
 

@@ -16,7 +16,6 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
@@ -61,12 +60,6 @@ export class SlotEquipmentComponent {
     return getEntry<EquipmentContent>(equipmentId);
   });
 
-  public displayName = computed(() => {
-    const item = this.equippedItem();
-    const content = this.equippedContent();
-    return item && content ? equipmentItemDisplayName(item, content.name) : '';
-  });
-
   public bonusStats = computed(() => {
     const item = this.equippedItem();
     return item ? equipmentItemBonusStats(item) : defaultStats();
@@ -90,10 +83,7 @@ export class SlotEquipmentComponent {
   public display = computed(() => {
     const content = this.equippedContent();
     if (content) {
-      return {
-        ...itemPreviewDisplay('equipment', content, this.equippedItem()),
-        name: this.displayName(),
-      };
+      return itemPreviewDisplay('equipment', content, this.equippedItem());
     }
 
     return undefined;

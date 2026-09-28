@@ -1,6 +1,7 @@
 import type { IconSize } from '@interfaces/icon-size';
 import {
   gameAges,
+  gameAnvilImpact,
   gameAngelWings,
   gameArmorDowngrade,
   gameBallGlow,
@@ -93,6 +94,7 @@ import {
 } from '@ng-icons/tabler-icons';
 
 export const ALL_ICONS = {
+  gameAnvilImpact,
   gameExitDoor,
   gameHumanTarget,
   gameAges,

@@ -74,6 +74,7 @@ export type MaterialUtilizationStats = {
   rarity: string;
   unobtainable: boolean;
   infusable: boolean;
+  reforgeReagent: boolean;
   craftedFrom: number;
   craftedFromQuantity: number;
   craftedInto: number;

@@ -32,7 +32,6 @@ import {
   townStockDisplay,
 } from '@helpers/town/shop/town-stock';
 import type {
-  AffixContent,
   EquipmentContent,
   GameState,
   ItemPreviewDisplay,
@@ -82,18 +81,15 @@ describe('townStock', () => {
 });
 
 describe('townStockDisplay', () => {
-  it("folds a rolled entry's affixes into the display name", () => {
-    const display = { name: 'Iron Sword' } as ItemPreviewDisplay;
+  it('resolves the rolled instance so its affixes shape the display', () => {
+    const display = { name: 'Flaming Iron Sword' } as ItemPreviewDisplay;
     vi.mocked(resolveRewardDisplay).mockReturnValue(display);
-    vi.mocked(getEntry).mockReturnValue({
-      name: 'Flaming',
-      position: 'Prefix',
-    } as AffixContent);
     const entry = buildEntry({ affixIds: ['flaming' as never] });
 
-    expect(townStockDisplay(entry)).toEqual({
-      ...display,
-      name: 'Flaming Iron Sword',
+    expect(townStockDisplay(entry)).toBe(display);
+    expect(resolveRewardDisplay).toHaveBeenCalledWith({
+      equipmentId: entry.equipmentItem.equipmentId,
+      equipmentItem: entry.equipmentItem,
     });
   });
 

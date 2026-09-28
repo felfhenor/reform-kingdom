@@ -11,41 +11,25 @@ import { BlankSlateComponent } from '@components/blank-slate/blank-slate.compone
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
+import { RowEquipmentItemSummaryComponent } from '@components/row-equipment-item-summary/row-equipment-item-summary.component';
+import { RowHeroSummaryComponent } from '@components/row-hero-summary/row-hero-summary.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
-import {
-  defaultCombatStats,
-  defaultMonsterTypeDamageBonus,
-  defaultStats,
-  defaultTagResistances,
-} from '@helpers/defaults';
 import { characterInfuseEquipment } from '@helpers/hero/character-equipment';
-import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   canModifyEquipment,
   equippedItemsByPrimarySlot,
 } from '@helpers/item/equipment';
-import {
-  equipmentItemGatherYieldBonuses,
-  equipmentItemSkillStatBonuses,
-} from '@helpers/item/equipment-bonus';
-import {
-  equipmentItemBonusCombatStats,
-  equipmentItemBonusMonsterTypeDamage,
-  equipmentItemBonusResistances,
-  equipmentItemBonusStats,
-} from '@helpers/item/equipment-display';
 import {
   canInfuseEquipmentItem,
   equipmentItemSlotCount,
@@ -56,18 +40,17 @@ import {
   resolveGatherYieldBonusDisplay,
   resolveSkillStatBonusDisplay,
 } from '@helpers/item/item-preview';
+import { equipmentItemPreviewDisplay } from '@helpers/item/item-preview.ui';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { getStorageMaterials } from '@helpers/kingdom/storage.ui';
 import { worldPartyState } from '@helpers/state-game';
 import {
-  type Character,
   type CharacterId,
   type EquipmentContent,
   type EquipmentItem,
   type EquipmentItemId,
   type ItemContent,
   type ItemId,
-  type JobContent,
   type StorageMaterialEntry,
 } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
@@ -83,9 +66,10 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SlotButtonContainerComponent,
     CardPageComponent,
     CurrencyCostComponent,
-    SlotIconBlankComponent,
-    IconJobComponent,
     RowInfusedMaterialsComponent,
+    DetailItemPreviewComponent,
+    RowEquipmentItemSummaryComponent,
+    RowHeroSummaryComponent,
     RowStatSummaryComponent,
     RowGatherYieldBonusesComponent,
     RowSkillStatBonusesComponent,
@@ -130,48 +114,9 @@ export class PlayKingdomInfusionComponent {
     ),
   );
 
-  public selectedItemContent = computed<EquipmentContent | undefined>(() => {
+  public selectedItemDisplay = computed(() => {
     const item = this.selectedItem();
-    return item ? getEntry<EquipmentContent>(item.equipmentId) : undefined;
-  });
-
-  public selectedItemDisplayName = computed(() => {
-    const item = this.selectedItem();
-    const content = this.selectedItemContent();
-    return item && content ? equipmentItemDisplayName(item, content.name) : '';
-  });
-
-  public selectedItemBonus = computed(() => {
-    const item = this.selectedItem();
-    return item ? equipmentItemBonusStats(item) : defaultStats();
-  });
-
-  public selectedItemResistanceBonus = computed(() => {
-    const item = this.selectedItem();
-    return item ? equipmentItemBonusResistances(item) : defaultTagResistances();
-  });
-
-  public selectedItemCombatStatBonus = computed(() => {
-    const item = this.selectedItem();
-    return item ? equipmentItemBonusCombatStats(item) : defaultCombatStats();
-  });
-
-  public selectedItemMonsterTypeDamageBonus = computed(() => {
-    const item = this.selectedItem();
-    return item
-      ? equipmentItemBonusMonsterTypeDamage(item)
-      : defaultMonsterTypeDamageBonus();
-  });
-
-  // Base + infusion + affix, resolved to display name/icon - same shape the equipment tooltip shows.
-  public selectedItemGatherYieldBonuses = computed(() => {
-    const item = this.selectedItem();
-    const content = this.selectedItemContent();
-    return content
-      ? resolveGatherYieldBonusDisplay(
-          equipmentItemGatherYieldBonuses(content, item),
-        )
-      : [];
+    return item ? equipmentItemPreviewDisplay(item) : undefined;
   });
 
   public selectedItemSlotCount = computed(() => {
@@ -201,30 +146,9 @@ export class PlayKingdomInfusionComponent {
     };
   }
 
-  public displayNameFor(
-    item: EquipmentItem,
-    content: EquipmentContent,
-  ): string {
-    return equipmentItemDisplayName(item, content.name);
-  }
-
-  public jobFor(character: Character): JobContent | undefined {
-    return getEntry<JobContent>(character.jobId);
-  }
-
   public materialCost(itemId: ItemId): number {
     return infusionMaterialCost(itemId);
   }
-
-  public selectedItemSkillStatBonuses = computed(() => {
-    const item = this.selectedItem();
-    const content = this.selectedItemContent();
-    return content
-      ? resolveSkillStatBonusDisplay(
-          equipmentItemSkillStatBonuses(content, item),
-        )
-      : [];
-  });
 
   public materialSkillStatBonuses(material: ItemContent) {
     return resolveSkillStatBonusDisplay(

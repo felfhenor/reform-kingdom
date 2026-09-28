@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { DetailCollectibleEffectsComponent } from '@components/detail-collectible-effects/detail-collectible-effects.component';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
+import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import {
   type CombatStatBlock,
   type ItemPreviewDisplay,
@@ -19,7 +19,7 @@ import {
   selector: 'app-detail-item-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IconItemPreviewComponent,
+    SlotRarityOutlineComponent,
     RowStatSummaryComponent,
     SlotIconBlankComponent,
     AtlasImageComponent,
@@ -28,7 +28,6 @@ import {
     DetailCollectibleEffectsComponent,
   ],
   templateUrl: './detail-item-preview.component.html',
-  styleUrl: './detail-item-preview.component.scss',
 })
 export class DetailItemPreviewComponent {
   public display = input.required<ItemPreviewDisplay>();

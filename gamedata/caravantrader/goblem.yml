@@ -87,6 +87,12 @@
       tokenCost: 3
 
   trades:
+    - type: sell
+      value: 200
+      itemId: Duskhall Flux
+      limit: 4
+      weight: 2
+
     - type: buy
       value: 1000
       itemId: Green Slime Core

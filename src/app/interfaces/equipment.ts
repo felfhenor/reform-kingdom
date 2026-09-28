@@ -69,7 +69,7 @@ export type EquipmentItem = {
   // there; there is no way to empty a slot back out.
   infusedItemIds: (ItemId | null)[];
 
-  // Rolled once at find/craft time - fixed thereafter, unlike infusion which can be reapplied.
+  // Rolled at find/craft time; only reforging rerolls them.
   affixIds: AffixId[];
 };
 
@@ -82,3 +82,6 @@ export type EquipmentArmoryEntry = {
   item: EquipmentItem;
   content: EquipmentContent;
 };
+
+export type EquipmentReforgeResult =
+  'ok' | 'missing' | 'unaffordable' | 'in-combat' | 'not-reforgeable';

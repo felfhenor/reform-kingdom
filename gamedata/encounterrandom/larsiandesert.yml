@@ -27,6 +27,11 @@
       weight: 1
 
   completionRewards:
+    - itemId: Duskhall Flux
+      min: 9
+      max: 13
+      chance: 100
+
     - collectibleId: Three-Leaf Clover
       chance: 100
 

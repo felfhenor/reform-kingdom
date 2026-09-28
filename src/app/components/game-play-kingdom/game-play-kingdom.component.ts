@@ -9,6 +9,7 @@ import { PlayKingdomBestiaryComponent } from '@components/play-kingdom-bestiary/
 import { PlayKingdomCommissionsComponent } from '@components/play-kingdom-commissions/play-kingdom-commissions.component';
 import { PlayKingdomHomeComponent } from '@components/play-kingdom-home/play-kingdom-home.component';
 import { PlayKingdomInfusionComponent } from '@components/play-kingdom-infusion/play-kingdom-infusion.component';
+import { PlayKingdomReforgeComponent } from '@components/play-kingdom-reforge/play-kingdom-reforge.component';
 import { PlayKingdomMuseumComponent } from '@components/play-kingdom-museum/play-kingdom-museum.component';
 import { PlayKingdomPrestigeComponent } from '@components/play-kingdom-prestige/play-kingdom-prestige.component';
 import { PlayKingdomStorageComponent } from '@components/play-kingdom-storage/play-kingdom-storage.component';
@@ -32,6 +33,7 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomBestiaryComponent,
     PlayKingdomCommissionsComponent,
     PlayKingdomInfusionComponent,
+    PlayKingdomReforgeComponent,
     PlayKingdomTradeskillArtificingComponent,
     PlayKingdomTradeskillBlacksmithingComponent,
     PlayKingdomTradeskillJewelcraftingComponent,

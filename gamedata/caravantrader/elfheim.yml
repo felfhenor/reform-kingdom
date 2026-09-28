@@ -99,6 +99,12 @@
 
   trades:
     - type: sell
+      value: 800
+      itemId: Duskhall Flux
+      limit: 6
+      weight: 2
+
+    - type: sell
       value: 100
       itemId: Elven Purity Water
       limit: 50

@@ -61,6 +61,20 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
     ],
   },
   {
+    id: 'reforge',
+    name: 'Reforge',
+    trigger: { kind: 'first-reforge-reagent' },
+    steps: [
+      {
+        targetKey: 'kingdom-subview-reforge',
+        view: 'kingdom',
+        subview: 'reforge',
+        title: 'Reforge',
+        body: 'Spend gold and Duskhall Flux to reroll the affixes on a piece of equipment.',
+      },
+    ],
+  },
+  {
     id: 'decree',
     name: 'Decree',
     trigger: { kind: 'party-level', level: 5 },

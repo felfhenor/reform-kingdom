@@ -18,3 +18,10 @@
   rarity: Rare
 
   sprite: '0037'
+
+- id: 7dd1f364-c9ed-49d8-b2b9-79a9936ff6c7
+  name: Duskhall Flux
+  description: A shimmering reagent that loosens the enchantments bound to a piece of gear, letting a smith reforge them anew.
+  rarity: Uncommon
+
+  sprite: '0073'

@@ -1,6 +1,5 @@
 import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { worldTownsState } from '@helpers/state-game';
 import type {
@@ -19,17 +18,10 @@ export function townStock(townId: TownId): TownStockEntry[] {
 export function townStockDisplay(
   entry: TownStockEntry,
 ): ItemPreviewDisplay | undefined {
-  const display = resolveRewardDisplay({
+  return resolveRewardDisplay({
     equipmentId: entry.equipmentItem.equipmentId,
     equipmentItem: entry.equipmentItem,
   });
-  if (!display) return undefined;
-
-  // Rolled affixes change the display name (e.g. "Flaming Wergen Staff") - the base content alone doesn't know this specific instance's roll.
-  return {
-    ...display,
-    name: equipmentItemDisplayName(entry.equipmentItem, display.name),
-  };
 }
 
 // Drops entries whose equipmentId no longer resolves

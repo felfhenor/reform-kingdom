@@ -19,6 +19,7 @@ import { armoryGet } from '@helpers/kingdom/armory';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import {
   EquipmentTypeToSlot,
+  type Character,
   type CharacterId,
   type EquipmentContent,
   type EquipmentItem,
@@ -120,6 +121,19 @@ export function optimizeCharacterEquipment(characterId: CharacterId): void {
   );
 }
 
+// A two-hander fills several slots with the same instance.
+export function replaceEquippedItemInstance(
+  character: Character,
+  item: EquipmentItem,
+): Character {
+  const equipment = { ...character.equipment };
+  (Object.keys(equipment) as EquipmentSlot[]).forEach((slot) => {
+    if (equipment[slot]?.id === item.id) equipment[slot] = item;
+  });
+
+  return characterRecalculateStats({ ...character, equipment });
+}
+
 // Infuses a specific slot index (not "next open"); overwriting an already-filled slot is allowed with no refund for what was displaced.
 export function characterInfuseEquipment(
   characterId: CharacterId,
@@ -149,16 +163,9 @@ export function characterInfuseEquipment(
   const materialContent = getEntry<ItemContent>(materialItemId);
 
   updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) => {
-      if (c.id !== characterId) return c;
-
-      const equipment = { ...c.equipment };
-      occupiedSlots.forEach((slot) => {
-        equipment[slot] = infusedItem;
-      });
-
-      return characterRecalculateStats({ ...c, equipment });
-    });
+    state.world.party = state.world.party.map((c) =>
+      c.id === characterId ? replaceEquippedItemInstance(c, infusedItem) : c,
+    );
 
     applyMaterialDelta(state, materialItemId, -1);
     spendGold(state, cost);

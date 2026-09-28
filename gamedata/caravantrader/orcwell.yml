@@ -9,6 +9,12 @@
       tokenCost: 3
 
   trades:
+    - type: sell
+      value: 400
+      itemId: Duskhall Flux
+      limit: 5
+      weight: 2
+
     # base game items
     - type: sell
       value: 350

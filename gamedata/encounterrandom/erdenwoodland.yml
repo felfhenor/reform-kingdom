@@ -35,6 +35,11 @@
       weight: 1
 
   completionRewards:
+    - itemId: Duskhall Flux
+      min: 11
+      max: 17
+      chance: 100
+
     - collectibleId: Ritual Crown
       chance: 100
 

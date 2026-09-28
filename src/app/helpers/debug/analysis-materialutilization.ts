@@ -28,6 +28,7 @@ import { sortBy } from 'es-toolkit/compat';
 // Resolved directly (not via `@helpers/item/materials`) since that module
 // transitively imports gamestate/IndexedDB, unsafe for this ts-node script.
 const TRADER_TOKEN_NAME = 'Trader Scrip';
+const REFORGE_REAGENT_NAME = 'Duskhall Flux';
 
 function isInfusionMaterial(item: ItemContent): boolean {
   if (!item.infusionStats) return false;
@@ -40,6 +41,7 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     rarity: item.rarity,
     unobtainable: !!item.unobtainable,
     infusable: isInfusionMaterial(item),
+    reforgeReagent: item.name === REFORGE_REAGENT_NAME,
     craftedFrom: 0,
     craftedFromQuantity: 0,
     craftedInto: 0,
@@ -59,7 +61,7 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
 }
 
 // One point per recipe, caravan buy, astral spell, commission, node-upgrade
-// tier, shrine tier, trainer teaching, and token-trade/unlock spend that consumes it, plus one if infusable.
+// tier, shrine tier, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
@@ -70,7 +72,8 @@ function score(stats: MaterialUtilizationStats): number {
     stats.nodeUpgradeCosts +
     stats.shrineCosts +
     stats.trainerCosts +
-    (stats.infusable ? 1 : 0)
+    (stats.infusable ? 1 : 0) +
+    (stats.reforgeReagent ? 1 : 0)
   );
 }
 
@@ -249,6 +252,7 @@ export function runMaterialUtilizationAnalysis(
             'Crafted From (recipes)': stats.craftedFrom,
             'Crafted From (qty)': stats.craftedFromQuantity,
             Infusable: stats.infusable ? 'Yes' : 'No',
+            'Reforge Reagent': stats.reforgeReagent ? 'Yes' : 'No',
             'Caravan Buys': stats.caravanBuys,
             'Astral Casts': stats.astralCasts,
             'Commission Requirements': stats.commissionRequirements,
@@ -295,6 +299,7 @@ export function runMaterialUtilizationAnalysis(
     if (stats.trainerCosts > 0)
       sinks.push(`${stats.trainerCosts} trainer teaching(s)`);
     if (stats.infusable) sinks.push('infusable');
+    if (stats.reforgeReagent) sinks.push('reforge reagent');
     const sinkDescription =
       sinks.length > 0 ? sinks.join(', ') : 'no known sinks';
     const sources = productionCount(stats);

@@ -14,6 +14,7 @@ export type TutorialTrigger =
   | { kind: 'game-start' }
   | { kind: 'first-worker' }
   | { kind: 'first-infusion-material' }
+  | { kind: 'first-reforge-reagent' }
   | { kind: 'party-level'; level: number }
   | { kind: 'first-town-visit' }
   | { kind: 'first-caravan-visit' }

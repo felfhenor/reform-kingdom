@@ -1,13 +1,12 @@
 @let item = display();
 
 <div class="flex gap-2 p-2">
-  <div class="detail-item-preview-image">
-    <app-icon-item-preview
-      [sprite]="item.sprite"
-      [spritesheet]="item.spritesheet"
-      [backdropSprite]="item.backdropSprite"
-    />
-  </div>
+  <app-slot-rarity-outline
+    class="shrink-0 self-start"
+    [entry]="item"
+    [spritesheet]="item.spritesheet"
+    [backdropSprite]="item.backdropSprite"
+  />
 
   <div>
     <div class="type-entity-name mb-1 text-{{ item.rarity }}">

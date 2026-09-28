@@ -29,6 +29,11 @@
       weight: 1
 
   completionRewards:
+    - itemId: Duskhall Flux
+      min: 7
+      max: 10
+      chance: 100
+
     - collectibleId: Cane of Etheria
       chance: 100
 

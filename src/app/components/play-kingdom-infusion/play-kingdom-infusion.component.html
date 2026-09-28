@@ -2,7 +2,7 @@
 @let character = selectedCharacter();
 @let items = selectedCharacterEquippedItems();
 @let item = selectedItem();
-@let content = selectedItemContent();
+@let itemDisplay = selectedItemDisplay();
 @let slotIndex = selectedSlotIndex();
 @let materials = infusionMaterials();
 @let modifiable = equipmentModifiable();
@@ -28,18 +28,7 @@
           [sfxOffset]="$index"
           [sfxTrigger]="['click', 'hover']"
         >
-          @let job = jobFor(hero);
-
-          <app-slot-icon-blank>
-            <app-icon-job [job]="job" />
-          </app-slot-icon-blank>
-
-          <div class="flex flex-col min-w-0">
-            <span class="type-entity-name truncate">{{ hero.name }}</span>
-            <span class="type-meta">
-              Lv. {{ hero.level }} {{ job?.shorthand ?? 'JOB' }}
-            </span>
-          </div>
+          <app-row-hero-summary [hero]="hero" />
         </button>
       } @empty {
         <app-blank-slate>No heroes recruited yet.</app-blank-slate>
@@ -63,25 +52,10 @@
                 [sfxOffset]="$index"
                 [sfxTrigger]="['click', 'hover']"
               >
-                <app-slot-rarity-outline
-                  [entry]="equippedContent"
-                  spritesheet="equipment"
-                ></app-slot-rarity-outline>
-
-                <div class="flex flex-col min-w-0">
-                  <span
-                    class="type-entity-name truncate text-{{
-                      equippedContent.rarity
-                    }}"
-                  >
-                    {{ displayNameFor(equippedItem, equippedContent) }}
-                  </span>
-
-                  <span class="type-meta">
-                    {{ equippedContent.slotsTaken }}/{{ equippedContent.slots }}
-                    infusion slots used
-                  </span>
-                </div>
+                <app-row-equipment-item-summary [item]="equippedItem">
+                  {{ equippedContent.slotsTaken }}/{{ equippedContent.slots }}
+                  infusion slots used
+                </app-row-equipment-item-summary>
               </button>
             }
           }
@@ -94,44 +68,13 @@
     </div>
 
     <div class="flex flex-col gap-2 h-full min-h-0">
-      @if (item && content) {
-        <div class="type-entity-heading text-{{ content.rarity }}">
-          {{ selectedItemDisplayName() }}
-        </div>
-
-        <div class="flex flex-row items-start gap-4">
-          <app-slot-rarity-outline
-            [entry]="content"
-            spritesheet="equipment"
-          ></app-slot-rarity-outline>
-
-          <div class="flex-1">
-            <div class="shrink-0">
-              <app-row-stat-summary
-                [stats]="content.baseStats"
-                [bonusStats]="selectedItemBonus()"
-                [resistances]="content.debuffResistances"
-                [bonusResistances]="selectedItemResistanceBonus()"
-                [combatStats]="content.combatStats"
-                [bonusCombatStats]="selectedItemCombatStatBonus()"
-                [monsterTypeDamage]="content.monsterTypeDamage"
-                [bonusMonsterTypeDamage]="selectedItemMonsterTypeDamageBonus()"
-              />
-
-              <app-row-gather-yield-bonuses
-                [bonuses]="selectedItemGatherYieldBonuses()"
-              />
-
-              <app-row-skill-stat-bonuses
-                [bonuses]="selectedItemSkillStatBonuses()"
-              />
-            </div>
-          </div>
-        </div>
-
-        @if (selectedItemSlotCount() > 0) {
-          <div class="shrink-0">
-            <div class="type-label mb-2">Infusion Slots</div>
+      @if (item && itemDisplay) {
+        <app-detail-item-preview
+          class="shrink-0"
+          [display]="itemDisplay"
+          [showEquippableBy]="false"
+        >
+          @if (selectedItemSlotCount() > 0) {
             <div class="type-hint mb-2">
               Click a slot to choose what to infuse into it.
             </div>
@@ -143,8 +86,10 @@
               [selectedSlotIndex]="slotIndex"
               (slotClick)="selectSlot($event)"
             />
-          </div>
+          }
+        </app-detail-item-preview>
 
+        @if (selectedItemSlotCount() > 0) {
           @if (slotIndex !== undefined) {
             <div class="flex flex-col flex-1 min-h-0">
               <div class="type-label mb-2 shrink-0">

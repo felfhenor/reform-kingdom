@@ -1,4 +1,5 @@
 import type { CombatStatBlock } from '@interfaces/combat';
+import type { AffixId, AffixPosition } from '@interfaces/content-affix';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { GlobalEffectEffect } from '@interfaces/content-globaleffect';
@@ -64,4 +65,21 @@ export type ItemPreviewDisplay = {
   equippableHeroNames?: string[];
   // Recipe trades only - composited behind `sprite`.
   backdropSprite?: string;
+};
+
+// One rolled affix's own contribution, for listing affixes individually.
+export type AffixDisplay = {
+  id: AffixId;
+  name: string;
+  rarity: DropRarity;
+  position: AffixPosition;
+  stats: StatBlock;
+  resistances: StatusEffectBlock;
+  combatStats: CombatStatBlock;
+  monsterTypeDamage: Record<MonsterType, number>;
+  hasStatRow: boolean;
+  gatherYieldBonuses: NonNullable<ItemPreviewDisplay['gatherYieldBonuses']>;
+  skillStatBonuses: SkillStatBonusDisplay[];
+  // Set when an effect has no stat row to show it (infusion slot, granted skill, sell value, caravan pricing).
+  description?: string;
 };

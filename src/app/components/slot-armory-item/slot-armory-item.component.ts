@@ -10,7 +10,6 @@ import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { equipmentItemDisplayName } from '@helpers/item/affix';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
@@ -47,14 +46,9 @@ export class SlotArmoryItemComponent {
 
   public goldCoinItemId = goldCoinId();
 
-  public displayName = computed(() =>
-    equipmentItemDisplayName(this.equipmentItem(), this.equipment().name),
+  public display = computed(() =>
+    itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),
   );
-
-  public display = computed(() => ({
-    ...itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),
-    name: this.displayName(),
-  }));
 
   public bonusStats = computed(() =>
     equipmentItemBonusStats(this.equipmentItem()),

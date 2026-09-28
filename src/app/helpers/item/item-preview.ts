@@ -5,7 +5,10 @@ import {
   recipeResultSpritesheet,
   recipeStylizedName,
 } from '@helpers/crafting/recipes';
-import { equipmentItemMiscAffixDescriptions } from '@helpers/item/affix';
+import {
+  equipmentItemDisplayName,
+  equipmentItemMiscAffixDescriptions,
+} from '@helpers/item/affix';
 import {
   equipmentItemGatherYieldBonuses,
   equipmentItemSkillStatBonuses,
@@ -114,6 +117,7 @@ export function itemPreviewDisplay(
   };
 
   if (instance) {
+    base.name = equipmentItemDisplayName(instance, content.name);
     base.skills = equipmentItemGrantedSkills(
       instance,
       content as EquipmentContent,

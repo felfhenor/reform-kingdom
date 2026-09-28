@@ -18,6 +18,8 @@ vi.mock('@helpers/crafting/recipes', () => ({
 }));
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureEquipment } from '@helpers/content/ensure-item';
 import { defaultStats } from '@helpers/defaults';
 import {
   itemPreviewDisplay,
@@ -25,7 +27,9 @@ import {
 } from '@helpers/item/item-preview';
 import { worldPartyState } from '@helpers/state-game';
 import type {
+  AffixId,
   CollectibleContent,
+  EquipmentItemId,
   CollectibleId,
   EquipmentContent,
   EquipmentId,
@@ -36,6 +40,31 @@ import type {
 } from '@interfaces';
 
 describe('itemPreviewDisplay', () => {
+  it('uses the affixed name when previewing a rolled instance', () => {
+    const spear = ensureEquipment({
+      id: 'spear' as EquipmentId,
+      name: 'Spear',
+    });
+    const prefix = ensureAffix({
+      id: 'sharp' as AffixId,
+      name: 'Sharp',
+      position: 'Prefix',
+    });
+    vi.mocked(getEntry).mockImplementation(
+      (id: unknown) => [spear, prefix].find((e) => e.id === id) as never,
+    );
+    vi.mocked(worldPartyState).mockReturnValue([]);
+
+    const display = itemPreviewDisplay('equipment', spear, {
+      id: 'spear-1' as EquipmentItemId,
+      equipmentId: spear.id,
+      infusedItemIds: [],
+      affixIds: [prefix.id],
+    });
+
+    expect(display.name).toBe('Sharp Spear');
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
   });

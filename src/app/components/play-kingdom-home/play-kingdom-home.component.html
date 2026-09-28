@@ -289,6 +289,19 @@
             Infusion
           </button>
 
+          @if (reforgeUnlocked()) {
+            <button
+              class="btn btn-accent btn-sm"
+              (click)="openSubview('reforge')"
+              appSfx="ui-click"
+              [sfxOffset]="2"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon name="gameAnvilImpact" size="inline" />
+              Reforge
+            </button>
+          }
+
           @if (commissionsUnlocked()) {
             <button
               class="btn btn-accent btn-sm"

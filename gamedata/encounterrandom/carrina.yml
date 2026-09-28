@@ -33,6 +33,11 @@
   fights: []
 
   completionRewards:
+    - itemId: Duskhall Flux
+      min: 5
+      max: 7
+      chance: 100
+
     - collectibleId: Gobslime Flower
       chance: 100
 

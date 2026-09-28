@@ -1,11 +1,15 @@
+import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
   defaultMonsterTypeDamageBonus,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import type {
   CombatStatBlock,
+  EquipmentContent,
+  EquipmentItem,
   ItemPreviewDisplay,
   MonsterType,
   StatBlock,
@@ -54,4 +58,11 @@ export function itemPreviewTotalMonsterTypeDamage(
     display.monsterTypeDamage ?? defaultMonsterTypeDamageBonus(),
     display.bonusMonsterTypeDamage,
   );
+}
+
+export function equipmentItemPreviewDisplay(
+  item: EquipmentItem,
+): ItemPreviewDisplay | undefined {
+  const content = getEntry<EquipmentContent>(item.equipmentId);
+  return content ? itemPreviewDisplay('equipment', content, item) : undefined;
 }

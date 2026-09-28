@@ -165,6 +165,8 @@ export const SELL_GOLD_PER_COMBAT_STAT_POINT = 50;
 // Same rate infusion pricing uses for a resistance point - the rarest, most specialized bonus.
 export const SELL_GOLD_PER_RESISTANCE_POINT = 100;
 
+export const REFORGE_GOLD_PER_LEVEL = 25;
+
 // Only one spell can be active for now - raising this later is a one-line change.
 export const MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS = 1;
 

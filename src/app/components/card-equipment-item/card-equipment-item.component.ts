@@ -11,7 +11,6 @@ import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { equipmentItemBonusStats } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
@@ -53,24 +52,15 @@ export class CardEquipmentItemComponent {
 
   public equip = output<void>();
 
-  public displayName = computed(() =>
-    equipmentItemDisplayName(this.equipmentItem(), this.equipment().name),
+  public display = computed<ItemPreviewDisplay>(() =>
+    itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),
   );
-
-  public display = computed<ItemPreviewDisplay>(() => ({
-    ...itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),
-    name: this.displayName(),
-  }));
 
   public equippedDisplay = computed<ItemPreviewDisplay | undefined>(() => {
     const content = this.equippedContent();
     if (!content) return undefined;
 
-    const item = this.equippedItem();
-    return {
-      ...itemPreviewDisplay('equipment', content, item),
-      name: item ? equipmentItemDisplayName(item, content.name) : content.name,
-    };
+    return itemPreviewDisplay('equipment', content, this.equippedItem());
   });
 
   // This item's comparison baseline is the equipped item's totals, and vice versa.

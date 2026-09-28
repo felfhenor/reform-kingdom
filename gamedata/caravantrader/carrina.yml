@@ -88,6 +88,12 @@
 
   trades:
     - type: sell
+      value: 600
+      itemId: Duskhall Flux
+      limit: 3
+      weight: 2
+
+    - type: sell
       value: 500
       equipmentId: Copper Greatmace
       limit: 2
