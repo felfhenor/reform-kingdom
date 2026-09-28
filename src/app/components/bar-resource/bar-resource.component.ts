@@ -18,12 +18,16 @@ export class BarResourceComponent {
   private anim = inject(AnimationService);
 
   public resources = computed(() => {
-    const goldCoinEntry = getEntry<ItemContent>('Gold Coin')!;
-    const crimsonLucre = getEntry<ItemContent>('Crimson Lucre')!;
+    const goldCoinEntry = getEntry<ItemContent>('Gold Coin');
+    const crimsonLucreEntry = getEntry<ItemContent>('Crimson Lucre');
+    if (!goldCoinEntry || !crimsonLucreEntry) return [];
 
     return [
       { itemRef: goldCoinEntry, total: getMaterialQuantity(goldCoinEntry.id) },
-      { itemRef: crimsonLucre, total: getMaterialQuantity(crimsonLucre.id) },
+      {
+        itemRef: crimsonLucreEntry,
+        total: getMaterialQuantity(crimsonLucreEntry.id),
+      },
     ].filter((r) => isMaterialDiscovered(r.itemRef.id));
   });
 
