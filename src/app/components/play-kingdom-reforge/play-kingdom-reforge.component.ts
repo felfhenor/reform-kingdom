@@ -93,7 +93,7 @@ export class PlayKingdomReforgeComponent {
 
   public selectedItemDisplay = computed(() => {
     const item = this.selectedItem();
-    const display = item && equipmentItemPreviewDisplay(item);
+    const display = item ? equipmentItemPreviewDisplay(item) : undefined;
     // The affix rows below already show these.
     return display
       ? { ...display, miscAffixDescriptions: undefined }

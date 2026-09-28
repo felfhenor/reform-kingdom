@@ -80,7 +80,7 @@ export function equipmentItemInfusionTotals<K extends string>(
     if (!itemId) return;
 
     const content = getEntry<ItemContent>(itemId);
-    const block = content && dimension.infusionBlock(content);
+    const block = content ? dimension.infusionBlock(content) : undefined;
     if (!block) return;
 
     (Object.keys(bonus) as K[]).forEach((key) => {
@@ -99,7 +99,7 @@ function equipmentItemInfusionListBonuses<T>(
   return infusedItemIds.flatMap((itemId) => {
     if (!itemId) return [];
     const content = getEntry<ItemContent>(itemId);
-    return (content && listOf(content)) ?? [];
+    return (content ? listOf(content) : undefined) ?? [];
   });
 }
 

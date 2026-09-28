@@ -58,7 +58,7 @@ export class ModalTrainerVisitComponent {
 
   public selectedJobName = computed(() => {
     const character = this.selectedCharacter();
-    return (character && this.jobFor(character)?.name) ?? 'hero';
+    return (character ? this.jobFor(character)?.name : undefined) ?? 'hero';
   });
 
   public isAtTrainer = computed(() => {

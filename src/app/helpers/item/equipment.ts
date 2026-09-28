@@ -372,7 +372,9 @@ function currentEquipmentEntry(
   slot: EquipmentSlot,
 ): EquipmentArmoryEntry | undefined {
   const item = equipment[slot];
-  const content = item && getEntry<EquipmentContent>(item.equipmentId);
+  const content = item
+    ? getEntry<EquipmentContent>(item.equipmentId)
+    : undefined;
   return item && content ? { item, content } : undefined;
 }
 

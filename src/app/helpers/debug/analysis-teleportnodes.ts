@@ -16,8 +16,13 @@ import type {
 
 const TELEPORT_NODE_TYPE = 'TeleportNode';
 
-function propertyValue(object: TiledObject, propertyName: string): string | undefined {
-  const property = (object.properties ?? []).find((p) => p.name === propertyName);
+function propertyValue(
+  object: TiledObject,
+  propertyName: string,
+): string | undefined {
+  const property = (object.properties ?? []).find(
+    (p) => p.name === propertyName,
+  );
   if (typeof property?.value !== 'string' || property.value.trim() === '') {
     return undefined;
   }
@@ -32,7 +37,9 @@ export function runTeleportNodesAnalysis(): AnalysisRunResult {
   allMaps().forEach((gameMap) => {
     const map = gameMap.data as TiledMap;
     const teleportNodes = map.layers.flatMap((layer) =>
-      (layer.objects ?? []).filter((object) => object.type === TELEPORT_NODE_TYPE),
+      (layer.objects ?? []).filter(
+        (object) => object.type === TELEPORT_NODE_TYPE,
+      ),
     );
 
     teleportNodes.forEach((node) => {
@@ -82,7 +89,7 @@ export function runTeleportNodesAnalysis(): AnalysisRunResult {
   });
 
   allTeleportNodes
-    .filter((ref) => ref.toTag && !tagOwners.has(ref.toTag))
+    .filter((ref) => !!ref.toTag && !tagOwners.has(ref.toTag))
     .forEach((ref) => {
       checks.push({
         id: `${ref.mapName}:${ref.nodeName}:unresolved-totag`,

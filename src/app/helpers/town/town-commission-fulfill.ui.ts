@@ -43,7 +43,8 @@ function isSlotPersistent(
 ): boolean {
   return town.defense.quests.commissions.some(
     (entry) =>
-      entry.commissionOfferId === slot.commissionOfferId && entry.persistent,
+      entry.commissionOfferId === slot.commissionOfferId &&
+      entry.persistent === true,
   );
 }
 

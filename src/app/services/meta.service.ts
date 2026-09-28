@@ -32,7 +32,7 @@ export class MetaService {
 
   public versionMismatch = computed(
     () =>
-      this.liveVersionString() &&
+      !!this.liveVersionString() &&
       this.versionString() !== this.liveVersionString(),
   );
 
@@ -40,7 +40,7 @@ export class MetaService {
   public changelogAll = signal<string>('');
 
   public hasChangelogs = computed(
-    () => this.changelogAll() && this.changelogCurrent(),
+    () => !!this.changelogAll() && !!this.changelogCurrent(),
   );
 
   private get renderer() {

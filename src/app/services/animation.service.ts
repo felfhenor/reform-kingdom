@@ -284,7 +284,7 @@ export class AnimationService {
       ],
       translateX: this.damageNumberShiftKeyframes(duration, variant),
       rotate: [{ from: tilt, to: tilt * 0.3, duration, ease: 'outQuad' }],
-      ...(variant === 'critical' && { color: this.critFlashKeyframes() }),
+      ...(variant === 'critical' ? { color: this.critFlashKeyframes() } : {}),
     });
   }
 

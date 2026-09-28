@@ -80,7 +80,7 @@ function stripInjectedFields(schema: any): any {
       return obj.map(traverse).filter((item) => {
         if (item && typeof item === 'object' && item.type === 'object') {
           const hasProps =
-            item.properties && Object.keys(item.properties).length > 0;
+            !!item.properties && Object.keys(item.properties).length > 0;
           return hasProps;
         }
         return true;

@@ -141,13 +141,16 @@ export function itemPreviewDisplay(
       skillStatBonuses: skillStatBonusDisplay(eqContent, instance),
       levelRequirement: eqContent.levelRequirement,
       equippableHeroNames: equippableJobNames(eqContent),
-      ...(instance && {
-        bonusStats: equipmentItemBonusStats(instance),
-        bonusResistances: equipmentItemBonusResistances(instance),
-        bonusCombatStats: equipmentItemBonusCombatStats(instance),
-        bonusMonsterTypeDamage: equipmentItemBonusMonsterTypeDamage(instance),
-        miscAffixDescriptions: equipmentItemMiscAffixDescriptions(instance),
-      }),
+      ...(instance
+        ? {
+            bonusStats: equipmentItemBonusStats(instance),
+            bonusResistances: equipmentItemBonusResistances(instance),
+            bonusCombatStats: equipmentItemBonusCombatStats(instance),
+            bonusMonsterTypeDamage:
+              equipmentItemBonusMonsterTypeDamage(instance),
+            miscAffixDescriptions: equipmentItemMiscAffixDescriptions(instance),
+          }
+        : {}),
     } as ItemPreviewDisplay;
   }
 

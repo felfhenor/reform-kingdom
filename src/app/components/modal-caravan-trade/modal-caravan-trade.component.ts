@@ -107,9 +107,10 @@ export class ModalCaravanTradeComponent {
     if (!caravan || !trader || !state) return [];
 
     return state.activeTradeIndices
-      .map(
-        (index) =>
-          trader.trades[index] && { index, trade: trader.trades[index] },
+      .map((index) =>
+        trader.trades[index]
+          ? { index, trade: trader.trades[index] }
+          : undefined,
       )
       .filter(
         (

@@ -668,7 +668,7 @@ function attemptInfusion(): void {
   const materialIds = Object.keys(gamestate().materials) as MaterialId[];
   const infusionMaterialIds = materialIds.filter((id) => {
     const item = getEntry<ItemContent>(id);
-    return item && isInfusionMaterial(item);
+    return !!item && isInfusionMaterial(item);
   });
   if (infusionMaterialIds.length === 0) return;
 

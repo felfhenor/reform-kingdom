@@ -71,6 +71,8 @@ export function tasksWidgetEntries(): TaskRowViewModel[] {
 export function tasksClaimableIds(): TaskId[] {
   const tasks = tasksState();
   return tasksOrdered()
-    .filter((task) => tasks[task.id]?.completedAt && !tasks[task.id]?.claimedAt)
+    .filter(
+      (task) => !!tasks[task.id]?.completedAt && !tasks[task.id]?.claimedAt,
+    )
     .map((task) => task.id);
 }
