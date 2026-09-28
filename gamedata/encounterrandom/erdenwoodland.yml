@@ -40,6 +40,11 @@
       max: 17
       chance: 100
 
+    - itemId: Demonic Crimson Ingot
+      min: 1
+      max: 1
+      chance: 100
+
     - collectibleId: Ritual Crown
       chance: 100
 

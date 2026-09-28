@@ -27,3 +27,16 @@
 
   infusionMonsterTypeDamage:
     Demon: 5
+
+- id: 5a6a8d26-59b7-4228-b9a8-b10a97e91472
+  name: Demonic Crimson Ingot
+  description: A perfect crimson ingot, radiating demonic energy.
+  rarity: Rare
+
+  sprite: '0074'
+
+  infusionStats:
+    Intelligence: 3.1
+    Strength: 4.2
+    Vitality: 2.6
+    Resistance: 8.3
