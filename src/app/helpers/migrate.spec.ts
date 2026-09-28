@@ -51,6 +51,7 @@ vi.mock('@helpers/hero/global-effect-state', () => ({
 }));
 
 vi.mock('@helpers/crafting/crafting', () => ({
+  craftQueueOrphanedEquipment: vi.fn(() => []),
   pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
 }));
 
@@ -187,6 +188,10 @@ vi.mock('@helpers/state-options', () => ({
   setOptions: vi.fn(),
 }));
 
+import {
+  craftQueueOrphanedEquipment,
+  pruneInvalidCraftQueues,
+} from '@helpers/crafting/crafting';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/crafting/recipes';
 import {
   migrateTradeskillStateKeys,
@@ -428,6 +433,34 @@ describe('migrateGameState', () => {
     const committed = vi.mocked(setGameState).mock.calls[0][0];
     expect(committed.world.party).toEqual(retrofittedParty);
     expect(committed.tradeskills).toEqual(retrofittedTradeskills);
+  });
+
+  it('returns gear held by pruned craft entries to the armory before the entries are dropped', () => {
+    vi.mocked(pruneInvalidArmoryItems).mockImplementation((armory) => armory);
+    const orphan = {
+      id: 'dagger-1' as EquipmentItemId,
+      equipmentId: 'dagger' as EquipmentId,
+      infusedItemIds: [],
+      affixIds: [],
+    };
+    vi.mocked(craftQueueOrphanedEquipment).mockReturnValueOnce([orphan]);
+    vi.mocked(gamestate).mockReturnValue({
+      armory: [],
+      materials: {},
+      collectibles: {},
+      discoveredEquipment: {},
+      discoveredRecipes: {},
+      world: { party: [] },
+    } as unknown as GameState);
+
+    migrateGameState();
+
+    expect(
+      vi.mocked(craftQueueOrphanedEquipment).mock.invocationCallOrder[0],
+    ).toBeLessThan(
+      vi.mocked(pruneInvalidCraftQueues).mock.invocationCallOrder[0],
+    );
+    expect(vi.mocked(setGameState).mock.calls[0][0].armory).toEqual([orphan]);
   });
 
   it('grandfathers gather-node discoveries for a save with material progress but no recorded visits', () => {

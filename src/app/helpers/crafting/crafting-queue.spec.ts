@@ -93,6 +93,7 @@ import { rngSucceedsChance } from '@helpers/rng';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { taskRecordCraft } from '@helpers/task/task-progress';
 import type {
+  AffixId,
   CraftQueueEntry,
   CraftQueueEntryId,
   EquipmentId,
@@ -197,6 +198,7 @@ function buildQueueEntry(
     quantityTotal: 1,
     quantityCompleted: 0,
     ticksIntoCraft: 0,
+    reservedEquipment: [],
     ...overrides,
   };
 }
@@ -441,6 +443,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 5,
         quantityCompleted: 1,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
     ]);
   });
@@ -484,6 +487,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 99,
         quantityCompleted: 1,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
       {
         id: 'queue-entry-1',
@@ -491,6 +495,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 11,
         quantityCompleted: 0,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
     ]);
   });
@@ -546,6 +551,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 99,
         quantityCompleted: 1,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
       {
         id: 'queue-entry-2',
@@ -553,6 +559,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 1,
         quantityCompleted: 0,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
     ]);
   });
@@ -654,6 +661,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 99,
         quantityCompleted: 0,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
       {
         id: 'queue-entry-2',
@@ -661,6 +669,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 6,
         quantityCompleted: 0,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
     ]);
   });
@@ -696,6 +705,7 @@ describe('craftQueueStart', () => {
         quantityTotal: 3,
         quantityCompleted: 0,
         ticksIntoCraft: 0,
+        reservedEquipment: [],
       },
     ]);
   });
@@ -1073,5 +1083,142 @@ describe('craftProcessTick', () => {
         quantityCompleted: 1,
       }),
     ]);
+  });
+});
+
+describe('reserved equipment', () => {
+  const infusedDagger = {
+    id: 'dagger-1' as EquipmentItemId,
+    equipmentId: 'dagger' as EquipmentId,
+    infusedItemIds: ['ember' as ItemId],
+    affixIds: ['sharp' as AffixId],
+  };
+  const plainDagger = {
+    id: 'dagger-2' as EquipmentItemId,
+    equipmentId: 'dagger' as EquipmentId,
+    infusedItemIds: [],
+    affixIds: [],
+  };
+  const sword = {
+    id: 'sword-1' as EquipmentItemId,
+    equipmentId: 'sword' as EquipmentId,
+    infusedItemIds: [],
+    affixIds: [],
+  };
+  const upgradeRecipe = buildRecipe({
+    requirements: [
+      { equipmentId: 'dagger' as EquipmentId },
+      { itemId: 'ore' as ItemId, quantity: 2 },
+    ],
+    result: { equipmentId: 'steel-dagger' as EquipmentId },
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetEntry({ 'recipe-1': upgradeRecipe });
+  });
+
+  it('queuing moves the exact armory instances onto the entry', () => {
+    vi.mocked(armoryGet).mockReturnValue([infusedDagger, plainDagger]);
+    vi.mocked(getMaterialQuantity).mockReturnValue(100);
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding() },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 2)).toBe(
+      true,
+    );
+
+    const result = applyUpdateAt(0, {
+      armory: [infusedDagger, sword, plainDagger],
+      materials: { ore: { quantity: 100, foundAt: 1000 } },
+      discoveredMaterials: {},
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding() },
+    } as unknown as GameState);
+
+    expect(result.armory).toEqual([sword]);
+    expect(
+      result.tradeskills[BLACKSMITHING_ID].queue[0].reservedEquipment,
+    ).toEqual([infusedDagger, plainDagger]);
+  });
+
+  it('completing a unit drops only that unit’s reserved gear', () => {
+    const entry = buildQueueEntry({
+      ticksIntoCraft: 4,
+      quantityTotal: 2,
+      reservedEquipment: [infusedDagger, plainDagger],
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding({ queue: [entry] })),
+    } as unknown as GameState);
+
+    vi.mocked(armoryHasRoom).mockReturnValue(true);
+
+    craftProcessTick();
+
+    const lastCall = vi.mocked(updateGamestate).mock.calls.length - 1;
+    const result = applyUpdateAt(lastCall, {
+      tradeskills: buildAllTradeskills(buildBuilding({ queue: [entry] })),
+    } as unknown as GameState);
+    expect(
+      result.tradeskills[BLACKSMITHING_ID].queue[0].reservedEquipment,
+    ).toEqual([plainDagger]);
+  });
+
+  it('consumes the last unit’s reserved gear when the batch finishes', () => {
+    const entry = buildQueueEntry({
+      ticksIntoCraft: 4,
+      reservedEquipment: [infusedDagger],
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding({ queue: [entry] })),
+    } as unknown as GameState);
+    vi.mocked(armoryHasRoom).mockReturnValue(true);
+
+    craftProcessTick();
+
+    const lastCall = vi.mocked(updateGamestate).mock.calls.length - 1;
+    const result = applyUpdateAt(lastCall, {
+      armory: [sword],
+      tradeskills: buildAllTradeskills(buildBuilding({ queue: [entry] })),
+    } as unknown as GameState);
+    expect(result.tradeskills[BLACKSMITHING_ID].queue).toEqual([]);
+    expect(result.armory).toEqual([sword]);
+  });
+
+  it('splits reserved gear between a capped stack and its overflow entry', () => {
+    const heldDagger = { ...plainDagger, id: 'dagger-0' as EquipmentItemId };
+    const existing = buildQueueEntry({
+      quantityTotal: 98,
+      reservedEquipment: [heldDagger],
+    });
+    vi.mocked(armoryGet).mockReturnValue([infusedDagger, plainDagger]);
+    vi.mocked(getMaterialQuantity).mockReturnValue(100);
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({ queue: [existing] }),
+      },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 2)).toBe(
+      true,
+    );
+
+    const result = applyUpdateAt(0, {
+      armory: [infusedDagger, plainDagger],
+      materials: { ore: { quantity: 100, foundAt: 1000 } },
+      discoveredMaterials: {},
+      tradeskills: {
+        [BLACKSMITHING_ID]: buildBuilding({ queue: [existing] }),
+      },
+    } as unknown as GameState);
+
+    const [stacked, overflow] = result.tradeskills[BLACKSMITHING_ID].queue;
+    expect(stacked.quantityTotal).toBe(99);
+    expect(stacked.reservedEquipment).toEqual([heldDagger, infusedDagger]);
+    expect(overflow.quantityTotal).toBe(1);
+    expect(overflow.reservedEquipment).toEqual([plainDagger]);
   });
 });

@@ -1,6 +1,7 @@
 import type { ChanceTier } from '@interfaces/chance-tier';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
+import type { EquipmentItem } from '@interfaces/equipment';
 import type { ItemContent } from '@interfaces/content-item';
 import type { RecipeContent, RecipeId } from '@interfaces/content-recipe';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
@@ -16,6 +17,13 @@ export type CraftQueueEntry = {
   quantityTotal: number;
   quantityCompleted: number;
   ticksIntoCraft: number;
+  // The exact armory instances held for the not-yet-crafted units, so a cancel returns them as-is.
+  reservedEquipment: EquipmentItem[];
+};
+
+export type ReservedEquipmentSplit = {
+  taken: EquipmentItem[];
+  rest: EquipmentItem[];
 };
 
 export type TradeskillBuildingState = {

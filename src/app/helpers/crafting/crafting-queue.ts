@@ -7,6 +7,11 @@ import {
 } from '@helpers/combat/combat-log';
 import { MAX_CRAFTABLE_CAP } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import {
+  consumeRequirement,
+  reservedEquipmentIdsFor,
+  splitReservedEquipment,
+} from '@helpers/crafting/crafting-reserved-equipment';
 import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import { isRecipeCraftable } from '@helpers/crafting/recipes';
 import {
@@ -25,12 +30,7 @@ import {
   collectiblesAdd,
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
-import { newEquipmentItem } from '@helpers/item/equipment';
-import {
-  addMaterial,
-  applyMaterialDelta,
-  getMaterialQuantity,
-} from '@helpers/item/materials';
+import { addMaterial, getMaterialQuantity } from '@helpers/item/materials';
 import { armoryAdd, armoryGet, armoryHasRoom } from '@helpers/kingdom/armory';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
@@ -41,7 +41,6 @@ import type {
   CraftQueueEntryId,
   EquipmentContent,
   EquipmentItem,
-  GameState,
   ItemContent,
   RecipeContent,
   RecipeId,
@@ -138,44 +137,6 @@ export function craftMaxCraftableQuantity(
   return safeResourceLimit;
 }
 
-// Mutates `state` directly - only ever called from inside a single
-// `updateGamestate` callback, so every requirement in a batch is applied
-// atomically in one state commit.
-export function applyRequirementQuantity(
-  state: GameState,
-  requirement: RecipeRequirement,
-  quantity: number,
-  sign: 1 | -1,
-): void {
-  if ('collectibleId' in requirement) return; // possession gate, never consumed
-
-  if ('itemId' in requirement) {
-    applyMaterialDelta(
-      state,
-      requirement.itemId,
-      sign * requirement.quantity * quantity,
-    );
-    return;
-  }
-
-  if (sign > 0) {
-    const added: EquipmentItem[] = Array.from({ length: quantity }, () =>
-      newEquipmentItem(requirement.equipmentId),
-    );
-    state.armory = [...state.armory, ...added];
-    return;
-  }
-
-  let remaining = quantity;
-  state.armory = state.armory.filter((item) => {
-    if (item.equipmentId !== requirement.equipmentId || remaining <= 0) {
-      return true;
-    }
-    remaining -= 1;
-    return false;
-  });
-}
-
 // A recipe can have a later entry with room even if an earlier one is already capped.
 export function findStackableEntryIndex(
   queue: CraftQueueEntry[],
@@ -212,22 +173,31 @@ function queueableQuantity(
 // Splits across two entries when a single stack would cross MAX_CRAFTABLE_CAP.
 function applyQueueStack(
   queue: CraftQueueEntry[],
-  recipeId: RecipeId,
+  recipe: RecipeContent,
   quantity: number,
+  reserved: EquipmentItem[],
 ): CraftQueueEntry[] {
-  const existingIndex = findStackableEntryIndex(queue, recipeId);
+  const existingIndex = findStackableEntryIndex(queue, recipe.id);
   const headroom =
     existingIndex === -1
       ? 0
       : MAX_CRAFTABLE_CAP - queue[existingIndex].quantityTotal;
   const stacked = Math.min(quantity, headroom);
   const overflow = quantity - stacked;
+  const { taken, rest } = splitReservedEquipment(
+    reserved,
+    reservedEquipmentIdsFor(recipe, stacked),
+  );
 
   const stackedQueue =
     stacked > 0
       ? queue.map((entry, i) =>
           i === existingIndex
-            ? { ...entry, quantityTotal: entry.quantityTotal + stacked }
+            ? {
+                ...entry,
+                quantityTotal: entry.quantityTotal + stacked,
+                reservedEquipment: [...entry.reservedEquipment, ...taken],
+              }
             : entry,
         )
       : queue;
@@ -238,10 +208,11 @@ function applyQueueStack(
     ...stackedQueue,
     {
       id: rngUuid() as CraftQueueEntryId,
-      recipeId,
+      recipeId: recipe.id,
       quantityTotal: overflow,
       quantityCompleted: 0,
       ticksIntoCraft: 0,
+      reservedEquipment: rest,
     } satisfies CraftQueueEntry,
   ];
 }
@@ -277,14 +248,14 @@ export function craftQueueStart(
   if (clampedQuantity <= 0) return false;
 
   updateGamestate((state) => {
-    recipe.requirements.forEach((requirement) => {
-      applyRequirementQuantity(state, requirement, clampedQuantity, -1);
-    });
+    const reserved = recipe.requirements.flatMap((requirement) =>
+      consumeRequirement(state, requirement, clampedQuantity),
+    );
 
     const building = tradeskillBuildingIn(state, tradeskillId);
     state.tradeskills[tradeskillId] = {
       ...building,
-      queue: applyQueueStack(building.queue, recipeId, clampedQuantity),
+      queue: applyQueueStack(building.queue, recipe, clampedQuantity, reserved),
     };
 
     return state;
@@ -375,6 +346,7 @@ function resolveCraftUnit(tradeskill: Tradeskill, recipe: RecipeContent): void {
 
 function advanceQueueEntry(
   tradeskill: Tradeskill,
+  recipe: RecipeContent,
   entryId: CraftQueueEntryId,
 ): void {
   const tradeskillId = tradeskillIdForName(tradeskill);
@@ -387,13 +359,22 @@ function advanceQueueEntry(
 
     const completedEntry = building.queue[index];
     const quantityCompleted = completedEntry.quantityCompleted + 1;
+    const { rest: reservedEquipment } = splitReservedEquipment(
+      completedEntry.reservedEquipment,
+      reservedEquipmentIdsFor(recipe, 1),
+    );
 
     const queue =
       quantityCompleted >= completedEntry.quantityTotal
         ? building.queue.filter((queued) => queued.id !== entryId)
         : building.queue.map((queued, i) =>
             i === index
-              ? { ...queued, quantityCompleted, ticksIntoCraft: 0 }
+              ? {
+                  ...queued,
+                  quantityCompleted,
+                  ticksIntoCraft: 0,
+                  reservedEquipment,
+                }
               : queued,
           );
 
@@ -448,6 +429,6 @@ export function craftProcessTick(): void {
     }
 
     resolveCraftUnit(tradeskill, recipe);
-    advanceQueueEntry(tradeskill, entry.id);
+    advanceQueueEntry(tradeskill, recipe, entry.id);
   });
 }

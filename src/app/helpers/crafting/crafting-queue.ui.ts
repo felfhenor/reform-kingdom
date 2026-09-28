@@ -1,5 +1,5 @@
 import { getEntry } from '@helpers/content/content';
-import { applyRequirementQuantity } from '@helpers/crafting/crafting-queue';
+import { refundQueueEntry } from '@helpers/crafting/crafting-reserved-equipment';
 import {
   tradeskillBuildingIn,
   tradeskillIdForName,
@@ -21,14 +21,7 @@ export function craftQueueRemove(
     const entry = building.queue.find((queued) => queued.id === queueEntryId);
     if (!entry) return state;
 
-    const recipe = getEntry<RecipeContent>(entry.recipeId);
-    const remaining = entry.quantityTotal - entry.quantityCompleted;
-
-    if (recipe && remaining > 0) {
-      recipe.requirements.forEach((requirement) => {
-        applyRequirementQuantity(state, requirement, remaining, 1);
-      });
-    }
+    refundQueueEntry(state, entry, getEntry<RecipeContent>(entry.recipeId));
 
     state.tradeskills[tradeskillId] = {
       ...building,

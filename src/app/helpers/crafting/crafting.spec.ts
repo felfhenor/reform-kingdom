@@ -32,6 +32,7 @@ vi.mock('@helpers/state-game', () => {
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
+  craftQueueOrphanedEquipment,
   craftQueueTicksRemaining,
   getCraftableRecipeEntries,
   pruneInvalidCraftQueues,
@@ -48,6 +49,7 @@ import type {
   CraftQueueEntry,
   CraftQueueEntryId,
   EquipmentId,
+  EquipmentItemId,
   GameState,
   GameStateTradeskills,
   ItemId,
@@ -121,6 +123,7 @@ function buildQueueEntry(
     quantityTotal: 1,
     quantityCompleted: 0,
     ticksIntoCraft: 0,
+    reservedEquipment: [],
     ...overrides,
   };
 }
@@ -377,5 +380,43 @@ describe('pruneInvalidCraftQueues', () => {
 
     const result = pruneInvalidCraftQueues(tradeskills);
     expect(result[BLACKSMITHING_ID].queue).toEqual([]);
+  });
+
+  it('backfills reservedEquipment on entries saved before it existed', () => {
+    vi.mocked(getEntry).mockReturnValue(buildRecipe());
+    const legacyEntry = {
+      ...buildQueueEntry(),
+      reservedEquipment: undefined,
+    } as unknown as CraftQueueEntry;
+
+    const result = pruneInvalidCraftQueues(
+      buildAllTradeskills(buildBuilding({ queue: [legacyEntry] })),
+    );
+
+    expect(result[BLACKSMITHING_ID].queue[0].reservedEquipment).toEqual([]);
+  });
+});
+
+describe('craftQueueOrphanedEquipment', () => {
+  it('returns gear reserved by entries whose recipe no longer exists', () => {
+    const dagger = {
+      id: 'dagger-1' as EquipmentItemId,
+      equipmentId: 'dagger' as EquipmentId,
+      infusedItemIds: ['ember' as ItemId],
+      affixIds: [],
+    };
+    vi.mocked(getEntry).mockImplementation((key: string) =>
+      key === 'dagger' ? ({ id: 'dagger' } as never) : (undefined as never),
+    );
+
+    const result = craftQueueOrphanedEquipment(
+      buildAllTradeskills(
+        buildBuilding({
+          queue: [buildQueueEntry({ reservedEquipment: [dagger] })],
+        }),
+      ),
+    );
+
+    expect(result).toEqual([dagger]);
   });
 });

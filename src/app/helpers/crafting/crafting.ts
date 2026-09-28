@@ -3,6 +3,7 @@ import {
   craftMaxCraftableQuantity,
   requirementAvailable,
 } from '@helpers/crafting/crafting-queue';
+import { backfillReservedEquipment } from '@helpers/crafting/crafting-reserved-equipment';
 import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import {
   isRecipeCraftable,
@@ -18,12 +19,15 @@ import {
   tradeskillIdForName,
 } from '@helpers/crafting/tradeskill';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { backfillEquipmentItem } from '@helpers/item/equipment';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
 import type {
   CollectibleContent,
   CraftRecipeEntry,
   CraftRequirementEntry,
   EquipmentContent,
+  EquipmentItem,
   GameStateTradeskills,
   ItemContent,
   RecipeContent,
@@ -151,6 +155,18 @@ export function craftQueueTicksRemaining(tradeskill: Tradeskill): number {
   });
 }
 
+// Gear held by queued crafts whose recipe no longer exists, so pruning those entries doesn't destroy it.
+export function craftQueueOrphanedEquipment(
+  tradeskills: GameStateTradeskills,
+): EquipmentItem[] {
+  const orphaned = Object.values(tradeskills).flatMap((building) =>
+    building.queue
+      .filter((entry) => !getEntry<RecipeContent>(entry.recipeId))
+      .flatMap((entry) => entry.reservedEquipment ?? []),
+  );
+  return pruneInvalidArmoryItems(orphaned.map(backfillEquipmentItem));
+}
+
 // Drops any queued crafts whose recipeId no longer resolves to real content
 // - e.g. after a recipe is renamed/removed from gamedata.
 export function pruneInvalidCraftQueues(
@@ -162,9 +178,20 @@ export function pruneInvalidCraftQueues(
     const building = pruned[tradeskillId];
     pruned[tradeskillId] = {
       ...building,
-      queue: building.queue.filter(
-        (entry) => !!getEntry<RecipeContent>(entry.recipeId),
-      ),
+      queue: building.queue.flatMap((entry) => {
+        const recipe = getEntry<RecipeContent>(entry.recipeId);
+        if (!recipe) return [];
+
+        const reserved = backfillReservedEquipment(entry, recipe);
+        return [
+          {
+            ...entry,
+            reservedEquipment: pruneInvalidArmoryItems(
+              reserved.map(backfillEquipmentItem),
+            ),
+          },
+        ];
+      }),
     };
   });
 

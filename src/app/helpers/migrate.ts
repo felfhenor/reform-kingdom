@@ -1,6 +1,9 @@
 import { pruneInvalidDiscoveredCaravans } from '@helpers/caravan/caravan';
 import { pruneInvalidCommissions } from '@helpers/commission/commission-tick';
-import { pruneInvalidCraftQueues } from '@helpers/crafting/crafting';
+import {
+  craftQueueOrphanedEquipment,
+  pruneInvalidCraftQueues,
+} from '@helpers/crafting/crafting';
 import { pruneInvalidDiscoveredRecipes } from '@helpers/crafting/recipes';
 import {
   migrateTradeskillStateKeys,
@@ -213,6 +216,10 @@ export function migrateGameState() {
     newState.workers,
     workerAssignmentIsValid,
   );
+  newState.armory = [
+    ...newState.armory,
+    ...craftQueueOrphanedEquipment(newState.tradeskills),
+  ];
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
   newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
   newState.world.currentLocation = repairUnwalkableCurrentLocation(
