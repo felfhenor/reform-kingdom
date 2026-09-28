@@ -54,11 +54,11 @@ import {
 import { pixiFloatingTextCreate } from '@helpers/pixi/pixi-floating-text';
 import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid.ui';
 import {
-  pixiIndicatorProgressBarCreate,
   pixiIndicatorNodeSelectionCreate,
   pixiIndicatorNodeStatusUpdate,
   pixiIndicatorPlayerAtLocationCreate,
   pixiIndicatorPlayerSpriteCreate,
+  pixiIndicatorProgressBarCreate,
 } from '@helpers/pixi/pixi-indicators';
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
 import {
@@ -786,7 +786,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!job) return [];
 
     const frame =
-      this.contentService.artAtlases()['job']?.[
+      this.contentService.artAtlases()?.['job']?.[
         `gameassets/job/${job.sprite}.png`
       ];
     if (!frame) return [];
