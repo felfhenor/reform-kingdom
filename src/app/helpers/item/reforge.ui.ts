@@ -6,10 +6,8 @@ import {
 } from '@helpers/engine/analytics';
 import { notifyError } from '@helpers/engine/notify';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
-import {
-  applyEquipmentReforge,
-  stateOwnedEquipmentItem,
-} from '@helpers/item/reforge';
+import { stateOwnedEquipmentItem } from '@helpers/hero/character-equipment';
+import { applyEquipmentReforge } from '@helpers/item/reforge';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   EquipmentContent,

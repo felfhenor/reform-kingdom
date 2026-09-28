@@ -7,6 +7,7 @@ import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   canEquipItem,
   canModifyEquipment,
+  equippedItems,
   planEquipmentOptimization,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
@@ -16,7 +17,11 @@ import {
 } from '@helpers/item/infusion';
 import { applyMaterialDelta, spendGold } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
-import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldPartyState,
+} from '@helpers/state-game';
 import {
   EquipmentTypeToSlot,
   type Character,
@@ -25,6 +30,7 @@ import {
   type EquipmentItem,
   type EquipmentItemId,
   type EquipmentSlot,
+  type GameState,
   type ItemContent,
   type ItemId,
   type JobContent,
@@ -134,50 +140,79 @@ export function replaceEquippedItemInstance(
   return characterRecalculateStats({ ...character, equipment });
 }
 
-// Infuses a specific slot index (not "next open"); overwriting an already-filled slot is allowed with no refund for what was displaced.
-export function characterInfuseEquipment(
-  characterId: CharacterId,
+export function stateEquippedItem(
+  state: GameState,
   equipmentItemId: EquipmentItemId,
-  slotIndex: number,
-  materialItemId: ItemId,
-): boolean {
-  if (!canModifyEquipment()) return false;
+): EquipmentItem | undefined {
+  return state.world.party
+    .flatMap((character) => equippedItems(character.equipment))
+    .find((item) => item.id === equipmentItemId);
+}
 
-  const character = worldPartyState().find((c) => c.id === characterId);
-  if (!character) return false;
+export function stateOwnedEquipmentItem(
+  state: GameState,
+  equipmentItemId: EquipmentItemId,
+): EquipmentItem | undefined {
+  return (
+    state.armory.find((item) => item.id === equipmentItemId) ??
+    stateEquippedItem(state, equipmentItemId)
+  );
+}
 
-  const occupiedSlots = (
-    Object.keys(character.equipment) as EquipmentSlot[]
-  ).filter((slot) => character.equipment[slot]?.id === equipmentItemId);
-  if (occupiedSlots.length === 0) return false;
-
-  const item = character.equipment[occupiedSlots[0]];
-  if (!item || !canInfuseEquipmentItem(item, slotIndex, materialItemId)) {
-    return false;
+// Mutates `state` - swaps the armory copy, or every hero slot holding the instance.
+export function stateReplaceOwnedEquipmentItem(
+  state: GameState,
+  item: EquipmentItem,
+): void {
+  const armoryIndex = state.armory.findIndex((owned) => owned.id === item.id);
+  if (armoryIndex !== -1) {
+    state.armory[armoryIndex] = item;
+    return;
   }
 
-  const infusedItemIds = [...item.infusedItemIds];
-  infusedItemIds[slotIndex] = materialItemId;
-  const infusedItem: EquipmentItem = { ...item, infusedItemIds };
-  const cost = infusionMaterialCost(materialItemId);
+  state.world.party = state.world.party.map((character) =>
+    equippedItems(character.equipment).some((owned) => owned.id === item.id)
+      ? replaceEquippedItemInstance(character, item)
+      : character,
+  );
+}
+
+function sendInfuseAnalytics(materialItemId: ItemId): void {
   const materialContent = getEntry<ItemContent>(materialItemId);
-
-  updateGamestate((state) => {
-    state.world.party = state.world.party.map((c) =>
-      c.id === characterId ? replaceEquippedItemInstance(c, infusedItem) : c,
-    );
-
-    applyMaterialDelta(state, materialItemId, -1);
-    spendGold(state, cost);
-
-    return state;
-  });
-
   analyticsSendDesignEvent(
     materialContent
       ? `Hero:Infuse:Item:${analyticsSafeSegment(materialContent.name)}`
       : 'Hero:Infuse:Item',
   );
+}
+
+// Infuses a specific slot index (not "next open"); overwriting an already-filled slot is allowed with no refund for what was displaced.
+export function equipmentInfuse(
+  equipmentItemId: EquipmentItemId,
+  slotIndex: number,
+  materialItemId: ItemId,
+): boolean {
+  const state = gamestate();
+  const item = stateOwnedEquipmentItem(state, equipmentItemId);
+  if (!item) return false;
+  if (stateEquippedItem(state, equipmentItemId) && !canModifyEquipment()) {
+    return false;
+  }
+  if (!canInfuseEquipmentItem(item, slotIndex, materialItemId)) return false;
+
+  const infusedItemIds = [...item.infusedItemIds];
+  infusedItemIds[slotIndex] = materialItemId;
+  const infusedItem: EquipmentItem = { ...item, infusedItemIds };
+  const cost = infusionMaterialCost(materialItemId);
+
+  updateGamestate((draft) => {
+    stateReplaceOwnedEquipmentItem(draft, infusedItem);
+    applyMaterialDelta(draft, materialItemId, -1);
+    spendGold(draft, cost);
+    return draft;
+  });
+
+  sendInfuseAnalytics(materialItemId);
   void taskEventEquipmentInfused();
   return true;
 }

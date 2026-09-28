@@ -1,3 +1,4 @@
+import type { CharacterId } from '@interfaces/character';
 import type { AffixId } from '@interfaces/content-affix';
 import type {
   EquipmentContent,
@@ -85,3 +86,11 @@ export type EquipmentArmoryEntry = {
 
 export type EquipmentReforgeResult =
   'ok' | 'missing' | 'unaffordable' | 'in-combat' | 'not-reforgeable';
+
+// A hero's equipped gear, or the armory's unequipped gear.
+export type EquipmentPickerSource = CharacterId | 'armory';
+
+export type EquipmentPickerMetaContext = {
+  $implicit: EquipmentItem;
+  enabled: boolean;
+};

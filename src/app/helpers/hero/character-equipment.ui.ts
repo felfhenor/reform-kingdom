@@ -6,9 +6,11 @@ import {
 import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   canModifyEquipment,
+  equippedItems,
   newEquipmentItem,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
+import { armoryGet } from '@helpers/kingdom/armory';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
   Character,
@@ -16,6 +18,8 @@ import type {
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
+  EquipmentItem,
+  EquipmentItemId,
   EquipmentSlot,
 } from '@interfaces';
 
@@ -106,4 +110,17 @@ export function characterUnequipToArmory(
       : 'Hero:Unequip:Item',
   );
   return true;
+}
+
+export function ownedEquipmentItem(
+  equipmentItemId?: EquipmentItemId,
+): EquipmentItem | undefined {
+  if (!equipmentItemId) return undefined;
+
+  return (
+    armoryGet().find((item) => item.id === equipmentItemId) ??
+    worldPartyState()
+      .flatMap((character) => equippedItems(character.equipment))
+      .find((item) => item.id === equipmentItemId)
+  );
 }

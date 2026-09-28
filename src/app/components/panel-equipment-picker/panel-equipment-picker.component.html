@@ -1,0 +1,97 @@
+@let heroes = party();
+@let currentSource = source();
+@let armorySelected = isArmorySelected();
+@let sourceItems = items();
+@let selectedId = selectedItemId();
+@let enabledFn = itemEnabled();
+
+<div class="flex flex-col gap-2 overflow-y-auto">
+  <span class="type-section-title">Heroes</span>
+
+  @for (hero of heroes; track hero.id) {
+    <button
+      appListRow
+      [listRowSelected]="currentSource === hero.id"
+      (click)="selectSource(hero.id)"
+      appSfx="ui-click"
+      [sfxOffset]="$index"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      <app-row-hero-summary [hero]="hero" />
+    </button>
+  }
+
+  <button
+    appListRow
+    [listRowSelected]="armorySelected"
+    (click)="selectSource('armory')"
+    appSfx="ui-click"
+    [sfxOffset]="heroes.length"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <app-slot-icon-blank>
+      <app-icon name="gameCrossedSwords" size="nav" />
+    </app-slot-icon-blank>
+
+    <div class="flex flex-col min-w-0">
+      <span class="type-entity-name truncate">Armory</span>
+      <span class="type-meta">Unequipped gear</span>
+    </div>
+  </button>
+</div>
+
+<div class="flex flex-col gap-2 min-h-0">
+  <span class="type-section-title">
+    {{ armorySelected ? 'Armory Items' : 'Equipped Items' }}
+  </span>
+
+  @if (armorySelected) {
+    <input
+      type="text"
+      placeholder="Search by name or description..."
+      class="input input-sm input-bordered w-full shrink-0"
+      [value]="armorySearch()"
+      (input)="onArmorySearch($event)"
+    />
+  }
+
+  @if (currentSource) {
+    @if (sourceItems.length > 0) {
+      <div
+        class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto"
+        appListReflow
+        [appListReflowEnabled]="armorySelected"
+      >
+        @for (sourceItem of sourceItems; track sourceItem.id) {
+          @let enabled = enabledFn(sourceItem);
+
+          <button
+            appListRow
+            [listRowSelected]="selectedId === sourceItem.id"
+            [disabled]="!enabled"
+            (click)="selectedItemId.set(sourceItem.id)"
+            appSfx="ui-click"
+            [sfxOffset]="$index"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-row-equipment-item-summary [item]="sourceItem">
+              <ng-container
+                [ngTemplateOutlet]="itemMeta()"
+                [ngTemplateOutletContext]="{
+                  $implicit: sourceItem,
+                  enabled: enabled,
+                }"
+              />
+            </app-row-equipment-item-summary>
+          </button>
+        }
+      </div>
+    } @else if (armorySelected) {
+      <app-blank-slate>{{ emptyArmoryText() }}</app-blank-slate>
+    } @else {
+      <app-blank-slate>This hero has nothing equipped.</app-blank-slate>
+    }
+  } @else {
+    <app-blank-slate>Select a hero or the armory.</app-blank-slate>
+  }
+</div>

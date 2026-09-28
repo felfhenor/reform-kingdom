@@ -7,6 +7,7 @@ import type {
   EquipmentItemId,
   GameState,
   IsContentItem,
+  ItemId,
   JobContent,
   JobId,
 } from '@interfaces';
@@ -25,6 +26,16 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(() => []),
 }));
 
+vi.mock('@helpers/task/task-events', () => ({
+  taskEventEquipmentInfused: vi.fn(),
+}));
+
+vi.mock('@helpers/item/infusion', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  canInfuseEquipmentItem: vi.fn(() => true),
+  infusionMaterialCost: vi.fn(() => 10),
+}));
+
 vi.mock('@helpers/state-game', () => {
   const gamestate = vi.fn();
   return {
@@ -38,12 +49,15 @@ vi.mock('@helpers/state-game', () => {
 });
 
 import { getEntry } from '@helpers/content/content';
-import { defaultStats } from '@helpers/defaults';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { defaultGameState, defaultStats } from '@helpers/defaults';
 import {
   characterEquipFromArmory,
+  equipmentInfuse,
   optimizeCharacterEquipment,
   replaceEquippedItemInstance,
 } from '@helpers/hero/character-equipment';
+import { canInfuseEquipmentItem } from '@helpers/item/infusion';
 import { createCharacter } from '@helpers/hero/party';
 import {
   gamestate,
@@ -329,6 +343,69 @@ describe('Character Equipment Helper Functions', () => {
       expect(state.world.party[0].equipment.Offhand).toEqual(armoryOffhandItem);
       expect(state.world.party[0].equipment.Weapon).toBeUndefined();
       expect(state.armory).toEqual([equippedSpear]);
+    });
+  });
+
+  describe('equipmentInfuse', () => {
+    const gemId = 'gem' as ItemId;
+    const goldCoin = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });
+
+    function infuseState(armory: EquipmentItem[], party: Character[] = []) {
+      const state = defaultGameState();
+      state.armory = armory;
+      state.world.party = party;
+      vi.mocked(gamestate).mockReturnValue(state);
+      return state;
+    }
+
+    function applyUpdate(state: GameState): GameState {
+      return vi.mocked(updateGamestate).mock.calls[0][0](state) as GameState;
+    }
+
+    it('infuses an armory item in place', () => {
+      mockGetEntry(mockJob, mockHelmet, goldCoin);
+      const helmet = mockEquipmentItem(mockHelmet.id);
+      const state = infuseState([helmet]);
+
+      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(true);
+      expect(applyUpdate(state).armory[0].infusedItemIds).toEqual([gemId]);
+    });
+
+    it('infuses armory gear even mid-combat', () => {
+      mockGetEntry(mockJob, mockHelmet, goldCoin);
+      const helmet = mockEquipmentItem(mockHelmet.id);
+      infuseState([helmet]);
+      vi.mocked(worldCombatState).mockReturnValue({} as never);
+
+      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(true);
+    });
+
+    it('infuses equipped gear, but not mid-combat', () => {
+      mockGetEntry(mockJob, mockHelmet, goldCoin);
+      const jala = createCharacterStub('Jala');
+      const helmet = mockEquipmentItem(mockHelmet.id);
+      jala.equipment.Helmet = helmet;
+      const state = infuseState([], [jala]);
+
+      vi.mocked(worldCombatState).mockReturnValue({} as never);
+      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(false);
+
+      vi.mocked(worldCombatState).mockReturnValue(undefined);
+      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(true);
+      expect(
+        applyUpdate(state).world.party[0].equipment.Helmet?.infusedItemIds,
+      ).toEqual([gemId]);
+    });
+
+    it('does nothing for an unowned item or an invalid infusion', () => {
+      mockGetEntry(mockJob, mockHelmet, goldCoin);
+      const helmet = mockEquipmentItem(mockHelmet.id);
+      infuseState([helmet]);
+
+      expect(equipmentInfuse('gone' as EquipmentItemId, 0, gemId)).toBe(false);
+      vi.mocked(canInfuseEquipmentItem).mockReturnValueOnce(false);
+      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(false);
+      expect(updateGamestate).not.toHaveBeenCalled();
     });
   });
 

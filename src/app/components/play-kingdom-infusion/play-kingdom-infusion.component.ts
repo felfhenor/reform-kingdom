@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -17,19 +18,16 @@ import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { PanelEquipmentPickerComponent } from '@components/panel-equipment-picker/panel-equipment-picker.component';
 import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
-import { RowEquipmentItemSummaryComponent } from '@components/row-equipment-item-summary/row-equipment-item-summary.component';
-import { RowHeroSummaryComponent } from '@components/row-hero-summary/row-hero-summary.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
-import { characterInfuseEquipment } from '@helpers/hero/character-equipment';
-import {
-  canModifyEquipment,
-  equippedItemsByPrimarySlot,
-} from '@helpers/item/equipment';
+import { equipmentInfuse } from '@helpers/hero/character-equipment';
+import { ownedEquipmentItem } from '@helpers/hero/character-equipment.ui';
+import { canModifyEquipment } from '@helpers/item/equipment';
 import {
   canInfuseEquipmentItem,
   equipmentItemSlotCount,
@@ -43,12 +41,11 @@ import {
 import { equipmentItemPreviewDisplay } from '@helpers/item/item-preview.ui';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
 import { getStorageMaterials } from '@helpers/kingdom/storage.ui';
-import { worldPartyState } from '@helpers/state-game';
 import {
-  type CharacterId,
-  type EquipmentContent,
+  type EquipmentArmoryEntry,
   type EquipmentItem,
   type EquipmentItemId,
+  type EquipmentPickerSource,
   type ItemContent,
   type ItemId,
   type StorageMaterialEntry,
@@ -68,8 +65,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     CurrencyCostComponent,
     RowInfusedMaterialsComponent,
     DetailItemPreviewComponent,
-    RowEquipmentItemSummaryComponent,
-    RowHeroSummaryComponent,
+    PanelEquipmentPickerComponent,
+    DecimalPipe,
     RowStatSummaryComponent,
     RowGatherYieldBonusesComponent,
     RowSkillStatBonusesComponent,
@@ -89,29 +86,19 @@ export class PlayKingdomInfusionComponent {
     read: ElementRef,
   });
 
-  public party = computed(() => worldPartyState());
   public goldCoinItemId = goldCoinId();
 
-  public selectedCharacterId = signal<CharacterId | undefined>(undefined);
   public selectedEquipmentItemId = signal<EquipmentItemId | undefined>(
     undefined,
   );
+  public selectedSource = signal<EquipmentPickerSource | undefined>(undefined);
   public selectedSlotIndex = signal<number | undefined>(undefined);
 
-  public selectedCharacter = computed(() =>
-    this.party().find((c) => c.id === this.selectedCharacterId()),
-  );
+  public armoryFilter = (entry: EquipmentArmoryEntry) =>
+    equipmentItemSlotCount(entry.item) > 0;
 
-  // Keyed by primary slot, not instance id, so a two-handed item never shows up twice.
-  public selectedCharacterEquippedItems = computed<EquipmentItem[]>(() => {
-    const character = this.selectedCharacter();
-    return character ? equippedItemsByPrimarySlot(character.equipment) : [];
-  });
-
-  public selectedItem = computed<EquipmentItem | undefined>(() =>
-    this.selectedCharacterEquippedItems().find(
-      (item) => item.id === this.selectedEquipmentItemId(),
-    ),
+  public selectedItem = computed(() =>
+    ownedEquipmentItem(this.selectedEquipmentItemId()),
   );
 
   public selectedItemDisplay = computed(() => {
@@ -129,21 +116,19 @@ export class PlayKingdomInfusionComponent {
     getStorageMaterials().filter((entry) => isInfusionMaterial(entry.item)),
   );
 
-  // Gear can't be infused mid-fight; drives disabling the material list and the header warning icon.
-  public equipmentModifiable = computed(() => canModifyEquipment());
+  // Only equipped gear is locked mid-fight; drives disabling the material list.
+  public equipmentModifiable = computed(
+    () => this.selectedSource() === 'armory' || canModifyEquipment(),
+  );
 
   public goldCoinQuantity = computed(() => getGoldQuantity());
 
-  public equipmentContentFor(
-    item: EquipmentItem,
-  ): (EquipmentContent & { slotsTaken: number }) | undefined {
-    const eq = getEntry<EquipmentContent>(item.equipmentId);
-    if (!eq) return undefined;
+  public filledSlotCount(item: EquipmentItem): number {
+    return item.infusedItemIds.filter(Boolean).length;
+  }
 
-    return {
-      ...eq,
-      slotsTaken: item.infusedItemIds.filter(Boolean).length,
-    };
+  public slotCountFor(item: EquipmentItem): number {
+    return equipmentItemSlotCount(item);
   }
 
   public materialCost(itemId: ItemId): number {
@@ -173,13 +158,7 @@ export class PlayKingdomInfusionComponent {
     return canInfuseEquipmentItem(item, slotIndex, itemId);
   }
 
-  public selectCharacter(characterId: CharacterId): void {
-    this.selectedCharacterId.set(characterId);
-    this.selectedEquipmentItemId.set(undefined);
-    this.selectedSlotIndex.set(undefined);
-  }
-
-  public selectItem(itemId: EquipmentItemId): void {
+  public selectItem(itemId?: EquipmentItemId): void {
     this.selectedEquipmentItemId.set(itemId);
     this.selectedSlotIndex.set(undefined);
   }
@@ -232,20 +211,17 @@ export class PlayKingdomInfusionComponent {
   }
 
   public confirmInfuse(): void {
-    const character = this.selectedCharacter();
     const item = this.selectedItem();
     const slotIndex = this.selectedSlotIndex();
     const materialItemId = this.pendingMaterialId();
-    if (!character || !item || slotIndex === undefined || !materialItemId) {
-      return;
-    }
+    if (!item || slotIndex === undefined || !materialItemId) return;
 
     const sourceEl = this.pendingSourceEl;
     const targetEl = this.materialsRowEl()?.nativeElement.querySelector(
       `[data-slot-index="${slotIndex}"]`,
     );
 
-    characterInfuseEquipment(character.id, item.id, slotIndex, materialItemId);
+    equipmentInfuse(item.id, slotIndex, materialItemId);
     this.pendingMaterialId.set(undefined);
     this.pendingSourceEl = undefined;
 

@@ -1,6 +1,3 @@
-@let heroes = party();
-@let character = selectedCharacter();
-@let items = selectedCharacterEquippedItems();
 @let item = selectedItem();
 @let itemDisplay = selectedItemDisplay();
 @let slotIndex = selectedSlotIndex();
@@ -16,56 +13,21 @@
   <app-button-kingdom-back pageactions />
 
   <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0 p-4">
-    <div class="flex flex-col gap-2 overflow-y-auto">
-      <span class="type-section-title">Heroes</span>
+    <app-panel-equipment-picker
+      [(source)]="selectedSource"
+      [selectedItemId]="selectedEquipmentItemId()"
+      (selectedItemIdChange)="selectItem($event)"
+      [armoryFilter]="armoryFilter"
+      [itemMeta]="infusionMeta"
+      emptyArmoryText="No gear with infusion slots in the armory."
+    />
 
-      @for (hero of heroes; track hero.id) {
-        <button
-          appListRow
-          [listRowSelected]="character?.id === hero.id"
-          (click)="selectCharacter(hero.id)"
-          appSfx="ui-click"
-          [sfxOffset]="$index"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          <app-row-hero-summary [hero]="hero" />
-        </button>
-      } @empty {
-        <app-blank-slate>No heroes recruited yet.</app-blank-slate>
-      }
-    </div>
-
-    <div class="flex flex-col gap-2 overflow-y-auto">
-      <span class="type-section-title">Equipped Items</span>
-
-      @if (character) {
-        @if (items.length > 0) {
-          @for (equippedItem of items; track equippedItem.id) {
-            @let equippedContent = equipmentContentFor(equippedItem);
-
-            @if (equippedContent) {
-              <button
-                appListRow
-                [listRowSelected]="item?.id === equippedItem.id"
-                (click)="selectItem(equippedItem.id)"
-                appSfx="ui-click"
-                [sfxOffset]="$index"
-                [sfxTrigger]="['click', 'hover']"
-              >
-                <app-row-equipment-item-summary [item]="equippedItem">
-                  {{ equippedContent.slotsTaken }}/{{ equippedContent.slots }}
-                  infusion slots used
-                </app-row-equipment-item-summary>
-              </button>
-            }
-          }
-        } @else {
-          <app-blank-slate>This hero has nothing equipped.</app-blank-slate>
-        }
-      } @else {
-        <app-blank-slate>Select a hero to see their gear.</app-blank-slate>
-      }
-    </div>
+    <ng-template #infusionMeta let-sourceItem>
+      {{ filledSlotCount(sourceItem) | number }}/{{
+        slotCountFor(sourceItem) | number
+      }}
+      infusion slots used
+    </ng-template>
 
     <div class="flex flex-col gap-2 h-full min-h-0">
       @if (item && itemDisplay) {

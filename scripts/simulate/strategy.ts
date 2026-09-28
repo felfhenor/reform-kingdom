@@ -1,7 +1,7 @@
 import { armoryGet } from '@helpers/kingdom/armory';
 import { autoModeToggle } from '@helpers/decree/auto-mode-state';
 import {
-  characterInfuseEquipment,
+  equipmentInfuse,
   optimizeCharacterEquipment,
 } from '@helpers/hero/character-equipment';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -687,12 +687,7 @@ function attemptInfusion(): void {
         );
         if (!materialId) continue;
 
-        characterInfuseEquipment(
-          character.id,
-          item.id,
-          slotIndex,
-          materialId as ItemId,
-        );
+        equipmentInfuse(item.id, slotIndex, materialId as ItemId);
         return;
       }
     }

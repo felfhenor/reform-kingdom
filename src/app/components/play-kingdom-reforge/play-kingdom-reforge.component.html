@@ -1,7 +1,3 @@
-@let heroes = party();
-@let source = selectedSource();
-@let armorySelected = isArmorySelected();
-@let items = sourceItems();
 @let item = selectedItem();
 @let itemDisplay = selectedItemDisplay();
 @let affixes = affixDisplays();
@@ -15,96 +11,24 @@
   <app-button-kingdom-back pageactions />
 
   <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0 p-4">
-    <div class="flex flex-col gap-2 overflow-y-auto">
-      <span class="type-section-title">Heroes</span>
+    <app-panel-equipment-picker
+      [(source)]="selectedSource"
+      [(selectedItemId)]="selectedEquipmentItemId"
+      [armoryFilter]="armoryFilter"
+      [itemEnabled]="itemReforgeable"
+      [itemMeta]="reforgeMeta"
+      emptyArmoryText="No reforgeable gear in the armory."
+    />
 
-      @for (hero of heroes; track hero.id) {
-        <button
-          appListRow
-          [listRowSelected]="source === hero.id"
-          (click)="selectSource(hero.id)"
-          appSfx="ui-click"
-          [sfxOffset]="$index"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          <app-row-hero-summary [hero]="hero" />
-        </button>
-      }
-
-      <button
-        appListRow
-        [listRowSelected]="armorySelected"
-        (click)="selectSource(armorySource)"
-        appSfx="ui-click"
-        [sfxOffset]="heroes.length"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        <app-slot-icon-blank>
-          <app-icon name="gameCrossedSwords" size="nav" />
-        </app-slot-icon-blank>
-
-        <div class="flex flex-col min-w-0">
-          <span class="type-entity-name truncate">Armory</span>
-          <span class="type-meta">Unequipped gear</span>
-        </div>
-      </button>
-    </div>
-
-    <div class="flex flex-col gap-2 min-h-0">
-      <span class="type-section-title">
-        {{ armorySelected ? 'Armory Items' : 'Equipped Items' }}
-      </span>
-
-      @if (armorySelected) {
-        <input
-          type="text"
-          placeholder="Search by name or description..."
-          class="input input-sm input-bordered w-full shrink-0"
-          [value]="armorySearch()"
-          (input)="onArmorySearch($event)"
-        />
-      }
-
-      @if (source) {
-        @if (items.length > 0) {
-          <div
-            class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto"
-            appListReflow
-            [appListReflowEnabled]="armorySelected"
-          >
-            @for (sourceItem of items; track sourceItem.id) {
-              @let reforgeable = itemReforgeable(sourceItem);
-
-              <button
-                appListRow
-                [listRowSelected]="item?.id === sourceItem.id"
-                [disabled]="!reforgeable"
-                (click)="selectItem(sourceItem.id)"
-                appSfx="ui-click"
-                [sfxOffset]="$index"
-                [sfxTrigger]="['click', 'hover']"
-              >
-                <app-row-equipment-item-summary [item]="sourceItem">
-                  @if (reforgeable) {
-                    @let affixCount = sourceItem.affixIds.length;
-                    {{ affixCount | number }}
-                    {{ 'affix' | pluralize: affixCount !== 1 }}
-                  } @else {
-                    <span class="italic">Common gear cannot be reforged</span>
-                  }
-                </app-row-equipment-item-summary>
-              </button>
-            }
-          </div>
-        } @else if (armorySelected) {
-          <app-blank-slate>No reforgeable gear in the armory.</app-blank-slate>
-        } @else {
-          <app-blank-slate>This hero has nothing equipped.</app-blank-slate>
-        }
+    <ng-template #reforgeMeta let-sourceItem let-enabled="enabled">
+      @if (enabled) {
+        @let affixCount = sourceItem.affixIds.length;
+        {{ affixCount | number }}
+        {{ 'affix' | pluralize: affixCount !== 1 }}
       } @else {
-        <app-blank-slate>Select a hero or the armory.</app-blank-slate>
+        <span class="italic">Common gear cannot be reforged</span>
       }
-    </div>
+    </ng-template>
 
     <div class="flex flex-col gap-2 h-full min-h-0 pl-2">
       <div class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto">

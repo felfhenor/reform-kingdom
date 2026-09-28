@@ -1,8 +1,11 @@
 import { REFORGE_GOLD_PER_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { replaceEquippedItemInstance } from '@helpers/hero/character-equipment';
+import {
+  stateEquippedItem,
+  stateOwnedEquipmentItem,
+  stateReplaceOwnedEquipmentItem,
+} from '@helpers/hero/character-equipment';
 import { rollAffixIds } from '@helpers/item/affix';
-import { equippedItems } from '@helpers/item/equipment';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { goldCoinId, reforgeReagentId } from '@helpers/item/materials';
 import { RARITY_SELL_MULTIPLIER } from '@helpers/kingdom/armory';
@@ -66,36 +69,9 @@ export function reforgedEquipmentItem(item: EquipmentItem): EquipmentItem {
   return rerolled;
 }
 
-function replaceInParty(state: GameState, reforged: EquipmentItem): void {
-  state.world.party = state.world.party.map((character) =>
-    equippedItems(character.equipment).some((item) => item.id === reforged.id)
-      ? replaceEquippedItemInstance(character, reforged)
-      : character,
-  );
-}
-
 function stateCanAffordCost(state: GameState, cost: CostItem[]): boolean {
   return cost.every(
     (entry) => (state.materials[entry.itemId]?.quantity ?? 0) >= entry.required,
-  );
-}
-
-function stateEquippedItem(
-  state: GameState,
-  equipmentItemId: EquipmentItemId,
-): EquipmentItem | undefined {
-  return state.world.party
-    .flatMap((character) => equippedItems(character.equipment))
-    .find((item) => item.id === equipmentItemId);
-}
-
-export function stateOwnedEquipmentItem(
-  state: GameState,
-  equipmentItemId: EquipmentItemId,
-): EquipmentItem | undefined {
-  return (
-    state.armory.find((item) => item.id === equipmentItemId) ??
-    stateEquippedItem(state, equipmentItemId)
   );
 }
 
@@ -104,24 +80,17 @@ export function applyEquipmentReforge(
   state: GameState,
   equipmentItemId: EquipmentItemId,
 ): EquipmentReforgeResult {
-  const armoryIndex = state.armory.findIndex(
-    (item) => item.id === equipmentItemId,
-  );
-  const equipped = stateEquippedItem(state, equipmentItemId);
-  const item = armoryIndex !== -1 ? state.armory[armoryIndex] : equipped;
+  const item = stateOwnedEquipmentItem(state, equipmentItemId);
   if (!item) return 'missing';
-  if (equipped && state.world.combat) return 'in-combat';
+  if (stateEquippedItem(state, equipmentItemId) && state.world.combat) {
+    return 'in-combat';
+  }
 
   const cost = equipmentItemReforgeCost(item);
   if (cost.length === 0) return 'not-reforgeable';
   if (!stateCanAffordCost(state, cost)) return 'unaffordable';
 
-  const reforged = reforgedEquipmentItem(item);
-  if (armoryIndex !== -1) {
-    state.armory[armoryIndex] = reforged;
-  } else {
-    replaceInParty(state, reforged);
-  }
+  stateReplaceOwnedEquipmentItem(state, reforgedEquipmentItem(item));
 
   worldNodeSpendCost(state, cost);
   return 'ok';
