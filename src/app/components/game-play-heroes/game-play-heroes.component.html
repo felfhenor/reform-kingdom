@@ -7,6 +7,7 @@
       class="btn btn-primary btn-sm"
       (click)="optimizeAll()"
       appSfx="ui-click"
+      [disabled]="!equipmentModifiable()"
       [sfxTrigger]="['click', 'hover']"
     >
       Optimize All

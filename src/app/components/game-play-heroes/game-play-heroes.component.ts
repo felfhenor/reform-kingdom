@@ -11,6 +11,7 @@ import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/pa
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
+import { canModifyEquipment } from '@helpers/item/equipment';
 import { worldPartyState } from '@helpers/state-game';
 import type { CharacterId, JobContent, JobId } from '@interfaces';
 
@@ -41,6 +42,8 @@ export class GamePlayHeroesComponent {
       (character) => character.id === this.selectedCharacterId(),
     ),
   );
+
+  public equipmentModifiable = computed(() => canModifyEquipment());
 
   public jobFor(jobId: JobId): JobContent | undefined {
     return getEntry<JobContent>(jobId);
