@@ -51,17 +51,19 @@
     </label>
   </div>
 
-  <div class="flex flex-col gap-4 p-4 h-full min-h-0">
+  <div class="flex flex-col gap-4 p-4 pt-0 h-full min-h-0">
     <div class="flex flex-col gap-2 flex-shrink-0">
-      @if (gateCollectible(); as collectible) {
-        <div class="text-xs font-semibold text-error italic text-center">
+      <div
+        class="text-xs font-semibold text-error italic text-center mb-2 min-h-4"
+      >
+        @if (gateCollectible(); as collectible) {
           You will not be able to progress to {{ tradeskill() }} Lv.
           {{ gateNextLevel() }} unless you acquire
           <span class="text-{{ collectible.rarity }}">
             {{ collectible.name }}.
           </span>
-        </div>
-      }
+        }
+      </div>
 
       <app-bar-progress
         color="primary"
