@@ -39,6 +39,7 @@ export type WorldNodeType =
   | 'ExploreRandomNode'
   | 'GatherNode'
   | 'Shrine'
+  | 'Outpost'
   | 'Trainer'
   | 'TeleportNode';
 
@@ -53,6 +54,7 @@ export type ExploreRandomNodeObject = TiledObject & {
 };
 export type GatherNodeObject = TiledObject & { type: 'GatherNode' };
 export type ShrineNodeObject = TiledObject & { type: 'Shrine' };
+export type OutpostNodeObject = TiledObject & { type: 'Outpost' };
 export type TrainerNodeObject = TiledObject & { type: 'Trainer' };
 
 export type TeleportNodeProperty =
@@ -72,6 +74,7 @@ export type WorldNodeObject =
   | ExploreRandomNodeObject
   | GatherNodeObject
   | ShrineNodeObject
+  | OutpostNodeObject
   | TrainerNodeObject
   | TeleportNodeObject;
 

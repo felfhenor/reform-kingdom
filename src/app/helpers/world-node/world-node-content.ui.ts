@@ -5,6 +5,7 @@ import {
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeGathering,
+  worldNodeOutpost,
   worldNodeOverride,
   worldNodeShrine,
   worldNodeTown,
@@ -26,6 +27,7 @@ export function worldNodeDescription(
     worldNodeEncounterRandom(entry)?.description ??
     worldNodeCaravan(entry)?.description ??
     worldNodeShrine(entry)?.description ??
+    worldNodeOutpost(entry)?.description ??
     worldNodeTrainer(entry)?.description ??
     worldNodeTown(entry)?.description
   );

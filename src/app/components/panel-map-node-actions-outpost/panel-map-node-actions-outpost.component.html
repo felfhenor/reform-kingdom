@@ -1,0 +1,49 @@
+@let reduction = reductionPercent();
+@let built = isBuilt();
+
+<div class="flex flex-col gap-2">
+  @if (reduction > 0) {
+    <p class="text-sm italic">
+      While this is your home, Deaths Door and Healing are
+      {{ reduction | number }}% shorter.
+    </p>
+  } @else {
+    <p class="text-sm text-lighter italic">
+      Each development after building shortens Deaths Door and Healing by
+      {{ reductionPerLevelPercent | number }}% while this is your home.
+    </p>
+  }
+
+  <button
+    type="button"
+    class="btn btn-sm btn-primary"
+    [disabled]="!canDevelop()"
+    (click)="develop.emit()"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    @if (isMaxLevel()) {
+      This outpost is fully developed
+    } @else {
+      {{ built ? 'Develop' : 'Build' }} for
+      <app-row-currency-cost [costs]="cost()" />
+    }
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-sm btn-secondary"
+    [disabled]="!canSetHome()"
+    (click)="setHome.emit()"
+    appSfx="ui-success"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    @if (isHome()) {
+      This outpost is your home
+    } @else if (built) {
+      Set as Home
+    } @else {
+      Build to set home here
+    }
+  </button>
+</div>

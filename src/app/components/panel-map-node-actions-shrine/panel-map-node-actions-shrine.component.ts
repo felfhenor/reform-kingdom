@@ -9,12 +9,15 @@ import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-curr
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
+import { isPartyAtNode } from '@helpers/world';
 import { worldNodeCanAffordCost } from '@helpers/world-node/world-node-cost';
 import {
-  isPartyAtShrine,
+  worldNodeDevelopmentIsMaxLevel,
+  worldNodeDevelopmentLevelUpCost,
+} from '@helpers/world-node/world-node-development';
+import {
   worldNodeShrineCurrentTier,
-  worldNodeShrineIsMaxLevel,
-  worldNodeShrineLevelUpCost,
+  worldNodeShrineLevel,
 } from '@helpers/world-node/world-node-shrine';
 import { worldNodeShrine } from '@helpers/world-node/world-nodes';
 import type { GlobalEffectContent, WorldNodeEntry } from '@interfaces';
@@ -34,29 +37,31 @@ export class PanelMapNodeActionsShrineComponent {
 
   private shrine = computed(() => worldNodeShrine(this.entry()));
 
+  private level = computed(() => worldNodeShrineLevel(this.entry().nodeName));
+
   public isMaxLevel = computed(() => {
     const shrine = this.shrine();
-    return !shrine || worldNodeShrineIsMaxLevel(shrine, this.entry().nodeName);
+    return !shrine || worldNodeDevelopmentIsMaxLevel(shrine, this.level());
   });
 
   public cost = computed(() => {
     const shrine = this.shrine();
     if (!shrine) return [];
 
-    return worldNodeShrineLevelUpCost(shrine, this.entry().nodeName);
+    return worldNodeDevelopmentLevelUpCost(shrine, this.level());
   });
 
   public canDevelop = computed(() => {
     if (this.isMaxLevel()) return false;
 
     return (
-      isPartyAtShrine(this.entry().nodeName) &&
+      isPartyAtNode(this.entry().nodeName) &&
       worldNodeCanAffordCost(this.cost())
     );
   });
 
   public canPray = computed(
-    () => isPartyAtShrine(this.entry().nodeName) && !!this.currentBuffName(),
+    () => isPartyAtNode(this.entry().nodeName) && !!this.currentBuffName(),
   );
 
   public currentBuffName = computed(() => {

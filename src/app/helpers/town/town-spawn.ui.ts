@@ -1,24 +1,24 @@
-import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { updateGamestate } from '@helpers/state-game';
 import { canSetHomeNode } from '@helpers/town/town-spawn';
-import type { TownContent, TownId } from '@interfaces';
+import { worldNodeTown } from '@helpers/world-node/world-nodes';
+import type { WorldNodeEntry } from '@interfaces';
 
-export function homeNodeSet(townId: TownId): void {
-  if (!canSetHomeNode(townId)) return;
-
-  const town = getEntry<TownContent>(townId);
-  if (!town) return;
+export function homeNodeSet(entry: WorldNodeEntry): void {
+  if (!canSetHomeNode(entry)) return;
 
   updateGamestate((state) => {
-    state.world.homeNodeName = town.name;
+    state.world.homeNodeName = entry.nodeName;
     return state;
   });
 
-  analyticsSendDesignEvent(`Town:Home:Set:${analyticsSafeSegment(town.name)}`);
+  const category = worldNodeTown(entry) ? 'Town' : 'Outpost';
+  analyticsSendDesignEvent(
+    `${category}:Home:Set:${analyticsSafeSegment(entry.nodeName)}`,
+  );
 }
 
 export function homeNodeResetToDuchy(): void {

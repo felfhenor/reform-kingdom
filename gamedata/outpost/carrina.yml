@@ -1,0 +1,56 @@
+- id: 729b0388-a8c7-4da6-91d9-55743c67c98f
+  name: Carrina Outpost
+  description: A lightly-traveled outpost near the elves of the Duchy of Carrina. It can provide great boon to any adventurer tenacious enough to repair it.
+
+  levels:
+    - costs:
+        - itemId: Gold Coin
+          required: 1000
+
+        - itemId: Wergen Stick
+          required: 50
+
+        - itemId: Tattered Hide
+          required: 25
+
+        - itemId: Copper Ingot
+          required: 10
+
+    - costs:
+        - itemId: Gold Coin
+          required: 2500
+
+        - itemId: Wergen Wood
+          required: 50
+
+        - itemId: Tattered Hide
+          required: 50
+
+        - itemId: Copper Ingot
+          required: 25
+
+    - costs:
+        - itemId: Gold Coin
+          required: 5000
+
+        - itemId: Wergen Wood
+          required: 150
+
+        - itemId: Tattered Hide
+          required: 100
+
+        - itemId: Copper Ingot
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 15000
+
+        - itemId: Wergen Wood
+          required: 500
+
+        - itemId: Copper Ingot
+          required: 250
+
+        - itemId: Tattered Hide
+          required: 150

@@ -47,6 +47,10 @@ vi.mock('@helpers/world', () => ({
   currentLocationSet: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node/world-node-outpost', () => ({
+  outpostDeathPenaltyMultiplier: vi.fn(() => 1),
+}));
+
 import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { healPartyToFull } from '@helpers/hero/character-progress';
@@ -66,6 +70,7 @@ import {
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
+import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 
 describe('Global Effect Helper Functions', () => {
   const healingId = 'healing-1' as GlobalEffectId;
@@ -212,14 +217,22 @@ describe('Global Effect Helper Functions', () => {
     }
 
     // These are real functions (not mocked), so their effect is only observable via the `updateGamestate` updaters they pass along.
-    function healingWasGranted(): boolean {
-      return vi.mocked(updateGamestate).mock.calls.some(([updateFn]) => {
+    function grantedHealingTicks(): number | undefined {
+      for (const [updateFn] of vi.mocked(updateGamestate).mock.calls) {
         const result = updateFn({
           globalEffects: [],
           collectibles: {},
         } as unknown as GameState);
-        return result.globalEffects.some((effect) => effect.id === healingId);
-      });
+        const healing = result.globalEffects.find(
+          (effect) => effect.id === healingId,
+        );
+        if (healing) return healing.expiresAtTick - healing.startTick;
+      }
+      return undefined;
+    }
+
+    function healingWasGranted(): boolean {
+      return grantedHealingTicks() !== undefined;
     }
 
     it('heals the party to full and removes the effect when Healing expires', () => {
@@ -273,6 +286,30 @@ describe('Global Effect Helper Functions', () => {
       );
       expect(healingWasGranted()).toBe(true);
       expect(healPartyToFull).not.toHaveBeenCalled();
+    });
+
+    it('shortens Healing by the home outpost multiplier, rounding up', () => {
+      vi.mocked(timerTicksElapsed).mockReturnValue(20);
+      mockContentLookup();
+      vi.mocked(homeNodeGet).mockReturnValue({
+        mapName: 'Carrina',
+        nodeName: 'Carrina Outpost',
+        x: 24,
+        y: 24,
+      } as unknown as WorldNodeEntry);
+      vi.mocked(outpostDeathPenaltyMultiplier).mockReturnValue(0.5);
+      vi.mocked(gamestate).mockReturnValue({
+        globalEffects: [
+          { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
+        ],
+      } as unknown as GameState);
+
+      globalEffectsProcessTick();
+
+      expect(outpostDeathPenaltyMultiplier).toHaveBeenCalledWith(
+        'Carrina Outpost',
+      );
+      expect(grantedHealingTicks()).toBe(2);
     });
 
     it('does not touch the current location or resync buffs when there is no home node at all', () => {

@@ -1,7 +1,7 @@
 /**
  * Validates that every "field node" (a Tiled `ExploreNode`, `ExploreRandomNode`,
- * `GatherNode`, `Shrine`, or `Trainer` object placed on a world map) has a matching
- * `Encounter`, `EncounterRandom`, `Gathering`, `Shrine`, or `Trainer` content entry,
+ * `GatherNode`, `Shrine`, `Outpost`, or `Trainer` object placed on a world map) has a matching
+ * `Encounter`, `EncounterRandom`, `Gathering`, `Shrine`, `Outpost`, or `Trainer` content entry,
  * matched by name.
  */
 
@@ -13,6 +13,7 @@ import type {
   EncounterContent,
   EncounterRandomContent,
   GatheringContent,
+  OutpostContent,
   ShrineContent,
   TiledMap,
   TrainerContent,
@@ -24,6 +25,7 @@ const FIELD_NODE_TYPES = [
   'ExploreRandomNode',
   'GatherNode',
   'Shrine',
+  'Outpost',
   'Trainer',
 ];
 
@@ -42,6 +44,9 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
   const shrineNames = new Set(
     getEntriesByType<ShrineContent>('shrine').map((s) => s.name),
   );
+  const outpostNames = new Set(
+    getEntriesByType<OutpostContent>('outpost').map((o) => o.name),
+  );
   const trainerNames = new Set(
     getEntriesByType<TrainerContent>('trainer').map((t) => t.name),
   );
@@ -50,6 +55,7 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
     ...encounterRandomNames,
     ...gatheringNames,
     ...shrineNames,
+    ...outpostNames,
     ...trainerNames,
   ]);
 
@@ -74,6 +80,7 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
         if (encounterNames.has(node.name)) kind = 'encounter';
         if (encounterRandomNames.has(node.name)) kind = 'random encounter';
         if (shrineNames.has(node.name)) kind = 'shrine';
+        if (outpostNames.has(node.name)) kind = 'outpost';
         if (trainerNames.has(node.name)) kind = 'trainer';
 
         checks.push({
@@ -89,7 +96,7 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
         id,
         label: node.name,
         status: 'fail',
-        message: `Field node "${node.name}" on map "${gameMap.name}" (tile x=${node.x}, y=${node.y}) has no Encounter, EncounterRandom, Gathering, Shrine, or Trainer entry whose "name" is "${node.name}". Add one, then rerun "npm run gamedata:build".`,
+        message: `Field node "${node.name}" on map "${gameMap.name}" (tile x=${node.x}, y=${node.y}) has no Encounter, EncounterRandom, Gathering, Shrine, Outpost, or Trainer entry whose "name" is "${node.name}". Add one, then rerun "npm run gamedata:build".`,
       });
     });
   });
@@ -101,6 +108,6 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
     summary:
       failures === 0
         ? `Every field node (${total} checked) has a corresponding content entry.`
-        : `${failures} of ${total} field node(s) have no matching encounter, random encounter, gathering, shrine, or trainer entry.`,
+        : `${failures} of ${total} field node(s) have no matching encounter, random encounter, gathering, shrine, outpost, or trainer entry.`,
   };
 }

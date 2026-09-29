@@ -72,10 +72,11 @@ import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node/world-node-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { pruneInvalidGatherNodeLevels } from '@helpers/world-node/world-node-level';
-import { pruneInvalidShrineLevels } from '@helpers/world-node/world-node-shrine';
+import { pruneInvalidWorldNodeDevelopmentLevels } from '@helpers/world-node/world-node-development';
 import {
   worldNodeByName,
   worldNodeGathering,
+  worldNodeOutpost,
   worldNodeShrine,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
@@ -187,10 +188,20 @@ export function migrateGameState() {
       return node ? worldNodeGathering(node) : undefined;
     },
   );
-  newState.shrines = pruneInvalidShrineLevels(newState.shrines, (nodeName) => {
-    const node = worldNodeByName(nodeName);
-    return node ? worldNodeShrine(node) : undefined;
-  });
+  newState.shrines = pruneInvalidWorldNodeDevelopmentLevels(
+    newState.shrines,
+    (nodeName) => {
+      const node = worldNodeByName(nodeName);
+      return node ? worldNodeShrine(node) : undefined;
+    },
+  );
+  newState.outposts = pruneInvalidWorldNodeDevelopmentLevels(
+    newState.outposts,
+    (nodeName) => {
+      const node = worldNodeByName(nodeName);
+      return node ? worldNodeOutpost(node) : undefined;
+    },
+  );
   newState.worldDiscoveries = pruneInvalidWorldDiscoveries(
     newState.worldDiscoveries,
     (nodeName) => !!worldNodeByName(nodeName),

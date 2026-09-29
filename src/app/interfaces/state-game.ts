@@ -107,13 +107,16 @@ export type GameStateDiscoveredGatherNodes = {
   [key: string]: { foundAt: number };
 };
 
-export type GameStateGatherNodeLevels = {
+// Keyed by Tiled node name; shared by every developable node type.
+export type GameStateWorldNodeLevels = {
   [key: string]: { level: number };
 };
 
-export type GameStateShrineLevels = {
-  [key: string]: { level: number };
-};
+export type GameStateGatherNodeLevels = GameStateWorldNodeLevels;
+
+export type GameStateShrineLevels = GameStateWorldNodeLevels;
+
+export type GameStateOutpostLevels = GameStateWorldNodeLevels;
 
 // Unlike `discoveredGatherNodes` (GatherNodes only, recorded on arrival), this covers every node type, recorded on click.
 export type GameStateWorldDiscoveries = {
@@ -170,6 +173,7 @@ export type GameState = {
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;
   gatherNodeLevels: GameStateGatherNodeLevels;
   shrines: GameStateShrineLevels;
+  outposts: GameStateOutpostLevels;
   worldDiscoveries: GameStateWorldDiscoveries;
   bestiary: GameStateBestiary;
   workers: GameStateWorkers;

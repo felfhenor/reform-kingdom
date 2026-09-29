@@ -15,6 +15,7 @@ const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
   Trade: 0xfbbf24,
   Travel: 0x60a5fa,
   Shrine: 0x22d3ee,
+  Outpost: 0xf97316,
   Trainer: 0x7777ff,
 };
 

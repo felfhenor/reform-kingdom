@@ -28,6 +28,10 @@ export function worldNodeAtCurrentLocation(): WorldNodeEntry | undefined {
   return worldNodeAt(location.mapName, location.x, location.y);
 }
 
+export function isPartyAtNode(nodeName: string): boolean {
+  return worldNodeAtCurrentLocation()?.nodeName === nodeName;
+}
+
 export function isPlayerAtKingdom(): boolean {
   const location = worldCurrentLocationState();
   const node = worldNodeAt(location.mapName, location.x, location.y);

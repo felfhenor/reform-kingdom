@@ -3,12 +3,12 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { updateGamestate } from '@helpers/state-game';
+import { isPartyAtNode } from '@helpers/world';
 import {
   worldNodeCanAffordCost,
   worldNodeSpendCost,
 } from '@helpers/world-node/world-node-cost';
 import {
-  isPartyAtGatherNode,
   worldNodeIsMaxLevel,
   worldNodeLevelUpCost,
 } from '@helpers/world-node/world-node-level';
@@ -25,7 +25,7 @@ export function gatherNodeLevelUp(nodeName: string): boolean {
   if (!gathering) return false;
 
   if (worldNodeIsMaxLevel(gathering, nodeName)) return false;
-  if (!isPartyAtGatherNode(nodeName)) return false;
+  if (!isPartyAtNode(nodeName)) return false;
 
   const cost = worldNodeLevelUpCost(gathering, nodeName);
   if (!worldNodeCanAffordCost(cost)) return false;

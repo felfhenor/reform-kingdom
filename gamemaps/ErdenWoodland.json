@@ -545,6 +545,19 @@
                  "width":64,
                  "x":1920,
                  "y":768
+                }, 
+                {
+                 "gid":380,
+                 "height":64,
+                 "id":211,
+                 "name":"Erden Outpost",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Outpost",
+                 "visible":true,
+                 "width":64,
+                 "x":1280,
+                 "y":832
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -553,7 +566,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":211,
+ "nextobjectid":212,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

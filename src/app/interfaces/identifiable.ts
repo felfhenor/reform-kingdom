@@ -14,6 +14,7 @@ export type ContentType =
   | 'job'
   | 'monster'
   | 'nodeoverride'
+  | 'outpost'
   | 'recipe'
   | 'shrine'
   | 'skill'

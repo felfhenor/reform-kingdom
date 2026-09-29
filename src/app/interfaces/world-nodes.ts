@@ -1,5 +1,6 @@
 import type { AtlasedImage } from '@interfaces/artable';
 import type { CollectibleId } from '@interfaces/content-collectible';
+import type { CostItem } from '@interfaces/cost';
 import type { RewardIdentity } from '@interfaces/droppable';
 import type { TiledObject } from '@interfaces/tiled-map';
 
@@ -9,6 +10,15 @@ export type WorldNodeHideable = {
 
   // Node is fully unrendered/unclickable/unnavigable until every listed collectible has been found.
   invisibleUntilCollectibleIdsFound?: CollectibleId[];
+};
+
+export type WorldNodeDevelopmentLevel = {
+  costs: CostItem[];
+};
+
+// Level 0 = undeveloped; reaching level N (1..levels.length) pays levels[N-1].costs.
+export type WorldNodeDevelopable = {
+  levels: WorldNodeDevelopmentLevel[];
 };
 
 export type WorldNodeEntry = {
@@ -38,6 +48,7 @@ export type WorldNodeInteractionKind =
   | 'Trade'
   | 'Travel'
   | 'Shrine'
+  | 'Outpost'
   | 'Trainer';
 
 export type WorldNodeCompletionRewardProgress = {

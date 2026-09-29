@@ -19,6 +19,7 @@ import type {
   ItemContent,
   MaterialUtilizationStats,
   MonsterContent,
+  OutpostContent,
   RecipeContent,
   ShrineContent,
   TrainerTeachingContent,
@@ -56,12 +57,13 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     traderTokenSinks: 0,
     nodeUpgradeCosts: 0,
     shrineCosts: 0,
+    outpostCosts: 0,
     trainerCosts: 0,
   };
 }
 
 // One point per recipe, caravan buy, astral spell, commission, node-upgrade
-// tier, shrine tier, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
+// tier, shrine/outpost tier, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
@@ -71,6 +73,7 @@ function score(stats: MaterialUtilizationStats): number {
     stats.traderTokenSinks +
     stats.nodeUpgradeCosts +
     stats.shrineCosts +
+    stats.outpostCosts +
     stats.trainerCosts +
     (stats.infusable ? 1 : 0) +
     (stats.reforgeReagent ? 1 : 0)
@@ -107,6 +110,7 @@ export function runMaterialUtilizationAnalysis(
     getEntriesByType<EncounterRandomContent>('encounterrandom');
   const gatherings = getEntriesByType<GatheringContent>('gathering');
   const shrines = getEntriesByType<ShrineContent>('shrine');
+  const outposts = getEntriesByType<OutpostContent>('outpost');
   const trainerTeachings =
     getEntriesByType<TrainerTeachingContent>('trainerteaching');
   const caravanTraders =
@@ -176,6 +180,15 @@ export function runMaterialUtilizationAnalysis(
       level.costs.forEach((cost) => {
         const stats = byId.get(cost.itemId);
         if (stats) stats.shrineCosts += 1;
+      });
+    });
+  });
+
+  outposts.forEach((outpost) => {
+    outpost.levels.forEach((level) => {
+      level.costs.forEach((cost) => {
+        const stats = byId.get(cost.itemId);
+        if (stats) stats.outpostCosts += 1;
       });
     });
   });
@@ -259,6 +272,7 @@ export function runMaterialUtilizationAnalysis(
             'Trader Token Sinks': stats.traderTokenSinks,
             'Node Upgrade Costs': stats.nodeUpgradeCosts,
             'Shrine Costs': stats.shrineCosts,
+            'Outpost Costs': stats.outpostCosts,
             'Trainer Costs': stats.trainerCosts,
             'Crafted Into': stats.craftedInto,
             'Monster Drops': stats.monsterDrops,
@@ -296,6 +310,8 @@ export function runMaterialUtilizationAnalysis(
       sinks.push(`${stats.nodeUpgradeCosts} node upgrade tier(s)`);
     if (stats.shrineCosts > 0)
       sinks.push(`${stats.shrineCosts} shrine tier(s)`);
+    if (stats.outpostCosts > 0)
+      sinks.push(`${stats.outpostCosts} outpost tier(s)`);
     if (stats.trainerCosts > 0)
       sinks.push(`${stats.trainerCosts} trainer teaching(s)`);
     if (stats.infusable) sinks.push('infusable');

@@ -1,0 +1,56 @@
+- id: c36c8348-3807-4070-b0f8-58b31704ea7e
+  name: Erden Outpost
+  description: An abandoned outpost near the demoniacs of the Erden Woodland. It can provide great boon to any adventurer tenacious enough to repair it.
+
+  levels:
+    - costs:
+        - itemId: Crimson Lucre
+          required: 500
+
+        - itemId: Elven Corewood
+          required: 25
+
+        - itemId: Crimson Ingot
+          required: 15
+
+        - itemId: Wolf Pelt
+          required: 5
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 1000
+
+        - itemId: Elven Corewood
+          required: 50
+
+        - itemId: Crimson Ingot
+          required: 25
+
+        - itemId: Wolf Pelt
+          required: 10
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 2000
+
+        - itemId: Elven Corewood
+          required: 75
+
+        - itemId: Crimson Ingot
+          required: 35
+
+        - itemId: Wolf Pelt
+          required: 15
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 3500
+
+        - itemId: Elven Corewood
+          required: 125
+
+        - itemId: Crimson Ingot
+          required: 50
+
+        - itemId: Wolf Pelt
+          required: 25

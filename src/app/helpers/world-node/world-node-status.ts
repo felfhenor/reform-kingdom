@@ -45,6 +45,8 @@ export function worldNodeInteractionKind(
       return 'Trade';
     case 'Shrine':
       return 'Shrine';
+    case 'Outpost':
+      return 'Outpost';
     case 'Trainer':
       return 'Trainer';
     case 'TeleportNode':

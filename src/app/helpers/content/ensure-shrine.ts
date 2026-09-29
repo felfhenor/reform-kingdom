@@ -1,6 +1,6 @@
 import {
   ensureArray,
-  ensureCostItem,
+  ensureWorldNodeDevelopmentLevel,
 } from '@helpers/content/ensure-helpers-core';
 import type {
   GlobalEffectId,
@@ -13,7 +13,7 @@ export function ensureShrineLevel(
   level: Partial<ShrineLevel> = {},
 ): ShrineLevel {
   return {
-    costs: ensureArray(level.costs, ensureCostItem),
+    ...ensureWorldNodeDevelopmentLevel(level),
     globalEffectId: level.globalEffectId ?? ('UNKNOWN' as GlobalEffectId),
     globalEffectDuration: level.globalEffectDuration ?? 0,
   };

@@ -5,6 +5,7 @@ import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
+import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeInteractionKind,
@@ -26,6 +27,7 @@ function nodeNameSuffixLevel(
   let level = 0;
   if (kind === 'Gather') level = worldNodeLevel(entry.nodeName);
   if (kind === 'Shrine') level = worldNodeShrineLevel(entry.nodeName);
+  if (kind === 'Outpost') level = worldNodeOutpostLevel(entry.nodeName);
   return level;
 }
 

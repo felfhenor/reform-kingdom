@@ -1,6 +1,10 @@
 import { getEntry } from '@helpers/content/content';
 import { equipmentSellValue } from '@helpers/kingdom/armory';
-import type { EquipmentContent, TownContent, TownStockEntry } from '@interfaces';
+import type {
+  EquipmentContent,
+  TownContent,
+  TownStockEntry,
+} from '@interfaces';
 
 // Undefined if the entry's content no longer resolves.
 export function townStockPrice(

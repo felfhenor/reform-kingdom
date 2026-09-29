@@ -1,4 +1,4 @@
-import type { CurrentLocation, GameState } from '@interfaces';
+import type { CurrentLocation, GameState, WorldNodeEntry } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/state-game', () => {
@@ -15,7 +15,11 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { gamestate, updateGamestate } from '@helpers/state-game';
-import { currentLocationSet, isPlayerAtKingdom } from '@helpers/world';
+import {
+  currentLocationSet,
+  isPartyAtNode,
+  isPlayerAtKingdom,
+} from '@helpers/world';
 import { worldNodeAt } from '@helpers/world-node/world-nodes';
 
 describe('World Helper Functions', () => {
@@ -38,6 +42,36 @@ describe('World Helper Functions', () => {
 
       expect(result.world.currentLocation).toEqual(location);
       expect(result.world.currentLocation).not.toBe(previousLocation);
+    });
+  });
+
+  describe('isPartyAtNode', () => {
+    beforeEach(() => {
+      vi.mocked(gamestate).mockReturnValue({
+        world: { currentLocation: { mapName: 'Carrina', x: 1, y: 1 } },
+      } as unknown as GameState);
+    });
+
+    it('is true when the party is standing on that node', () => {
+      vi.mocked(worldNodeAt).mockReturnValue({
+        nodeName: 'Carrina Outpost',
+      } as WorldNodeEntry);
+
+      expect(isPartyAtNode('Carrina Outpost')).toBe(true);
+    });
+
+    it('is false when the party is on a different node', () => {
+      vi.mocked(worldNodeAt).mockReturnValue({
+        nodeName: 'Forest Ruins',
+      } as WorldNodeEntry);
+
+      expect(isPartyAtNode('Carrina Outpost')).toBe(false);
+    });
+
+    it('is false when the party is not standing on any node', () => {
+      vi.mocked(worldNodeAt).mockReturnValue(undefined);
+
+      expect(isPartyAtNode('Carrina Outpost')).toBe(false);
     });
   });
 

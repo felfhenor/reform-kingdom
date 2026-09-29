@@ -1,13 +1,14 @@
-import type { CostItem } from '@interfaces/cost';
 import type { GlobalEffectId } from '@interfaces/content-globaleffect';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
-import type { WorldNodeHideable } from '@interfaces/world-nodes';
+import type {
+  WorldNodeDevelopmentLevel,
+  WorldNodeHideable,
+} from '@interfaces/world-nodes';
 
 export type ShrineId = Branded<string, 'ShrineId'>;
 
-export type ShrineLevel = {
-  costs: CostItem[];
+export type ShrineLevel = WorldNodeDevelopmentLevel & {
   globalEffectId: GlobalEffectId;
   globalEffectDuration: number;
 };

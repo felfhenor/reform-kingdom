@@ -12,6 +12,7 @@ import type {
   GameMap,
   GatheringContent,
   NodeOverrideContent,
+  OutpostContent,
   ShrineContent,
   TiledMap,
   TiledObject,
@@ -139,6 +140,13 @@ export function worldNodeShrine(
   return content?.__type === 'shrine' ? content : undefined;
 }
 
+export function worldNodeOutpost(
+  entry: WorldNodeEntry,
+): OutpostContent | undefined {
+  const content = getEntry<OutpostContent>(entry.nodeName);
+  return content?.__type === 'outpost' ? content : undefined;
+}
+
 export function worldNodeTrainer(
   entry: WorldNodeEntry,
 ): TrainerContent | undefined {
@@ -168,6 +176,7 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
     worldNodeOverride(entry)?.hidden ??
     worldNodeTown(entry)?.hidden ??
     worldNodeShrine(entry)?.hidden ??
+    worldNodeOutpost(entry)?.hidden ??
     worldNodeTrainer(entry)?.hidden ??
     false
   );
@@ -185,6 +194,7 @@ export function worldNodeCollectibleGateIds(
     worldNodeOverride(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeTown(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeShrine(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeOutpost(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeTrainer(entry)?.invisibleUntilCollectibleIdsFound ??
     []
   );

@@ -19,6 +19,7 @@ import {
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
+import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
   GlobalEffect,
   GlobalEffectContent,
@@ -61,7 +62,7 @@ export function removeGlobalEffect(id: GlobalEffectId): void {
   });
 }
 
-// Deaths Door is a pure timer; on expiry the party teleports home (a designated Town, or the Duchy) before healing begins there.
+// Deaths Door is a pure timer; on expiry the party teleports home (a designated Town/Outpost, or the Duchy) before healing begins there.
 function handleDeathsDoorExpiry(): void {
   const previousMapName = worldCurrentLocationState().mapName;
   const home = homeNodeGet();
@@ -75,9 +76,10 @@ function handleDeathsDoorExpiry(): void {
   }
 
   miscellaneousMessageLog('The party has been recalled home.');
+  const multiplier = home ? outpostDeathPenaltyMultiplier(home.nodeName) : 1;
   addGlobalEffect(
     'Healing' as GlobalEffectId,
-    healingTicksForLevel(worldPartyState()),
+    Math.ceil(healingTicksForLevel(worldPartyState()) * multiplier),
   );
 }
 

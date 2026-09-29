@@ -4,6 +4,7 @@ import { ButtonCloseComponent } from '@components/button-close/button-close.comp
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
 import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
+import { PanelMapNodeActionsOutpostComponent } from '@components/panel-map-node-actions-outpost/panel-map-node-actions-outpost.component';
 import { PanelMapNodeActionsShrineComponent } from '@components/panel-map-node-actions-shrine/panel-map-node-actions-shrine.component';
 import { PanelMapNodeActionsTownComponent } from '@components/panel-map-node-actions-town/panel-map-node-actions-town.component';
 import { PanelMapNodeActionsTrainerComponent } from '@components/panel-map-node-actions-trainer/panel-map-node-actions-trainer.component';
@@ -20,6 +21,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { caravanBrandName } from '@helpers/caravan/caravan';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
+import { notifySuccess } from '@helpers/engine/notify';
 import {
   caravanTradeOpen,
   mapNodeDeselect,
@@ -42,6 +44,7 @@ import {
   worldTravelState,
   worldCurrentLocationState,
 } from '@helpers/state-game';
+import { homeNodeSet } from '@helpers/town/town-spawn.ui';
 import {
   worldNodeCaravanIsAvailable,
   worldNodeCaravanVisitedTraderName,
@@ -52,6 +55,8 @@ import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathe
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import { gatherNodeLevelUp } from '@helpers/world-node/world-node-level.ui';
 import { worldNodeCompletionRewards } from '@helpers/world-node/world-node-rewards';
+import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
+import { outpostLevelUp } from '@helpers/world-node/world-node-outpost.ui';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   shrineLevelUp,
@@ -66,6 +71,7 @@ import {
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeGathering,
+  worldNodeOutpost,
   worldNodeShrine,
   worldNodeTown,
   worldNodeTrainer,
@@ -83,6 +89,7 @@ import { sortBy } from 'es-toolkit/compat';
     PanelMapNodeActionsCaravanComponent,
     PanelMapNodeActionsExploreComponent,
     PanelMapNodeActionsGatherComponent,
+    PanelMapNodeActionsOutpostComponent,
     PanelMapNodeActionsShrineComponent,
     PanelMapNodeActionsTownComponent,
     PanelMapNodeActionsTrainerComponent,
@@ -113,6 +120,13 @@ export class PanelMapNodeComponent {
       : 0;
   });
 
+  public outpostLevel = computed(() => {
+    const entry = this.node();
+    return entry && this.isOutpostNode()
+      ? worldNodeOutpostLevel(entry.nodeName)
+      : 0;
+  });
+
   public displayName = computed(() => {
     const entry = this.node();
     if (!entry) return '';
@@ -123,6 +137,7 @@ export class PanelMapNodeComponent {
     let level = 0;
     if (this.isGatherNode()) level = this.gatherNodeLevel();
     if (this.isShrineNode()) level = this.shrineLevel();
+    if (this.isOutpostNode()) level = this.outpostLevel();
     return level > 0 ? `${entry.nodeName} +${level}` : entry.nodeName;
   });
 
@@ -174,6 +189,11 @@ export class PanelMapNodeComponent {
   public isShrineNode = computed(() => {
     const entry = this.node();
     return !!entry && !!worldNodeShrine(entry);
+  });
+
+  public isOutpostNode = computed(() => {
+    const entry = this.node();
+    return !!entry && !!worldNodeOutpost(entry);
   });
 
   public isTrainerNode = computed(() => {
@@ -335,6 +355,21 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     shrinePray(entry.nodeName);
+  }
+
+  public developOutpost(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    void outpostLevelUp(entry.nodeName);
+  }
+
+  public setOutpostHome(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    homeNodeSet(entry);
+    notifySuccess(`${entry.nodeName} is now your home.`);
   }
 
   public close(): void {

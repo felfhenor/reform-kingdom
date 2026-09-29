@@ -46,12 +46,12 @@ export class ButtonTownHomeComponent {
   );
 
   public canSetHome = computed(
-    () => !this.isHomeNode() && canSetHomeNode(this.town().id),
+    () => !this.isHomeNode() && canSetHomeNode(this.entry()),
   );
 
   public setHome(): void {
     const town = this.town();
-    homeNodeSet(town.id);
+    homeNodeSet(this.entry());
     notifySuccess(`${town.name} is now your home.`);
   }
 }

@@ -8,14 +8,8 @@ vi.mock('@helpers/state-game', () => {
   };
 });
 
-vi.mock('@helpers/world', () => ({
-  worldNodeAtCurrentLocation: vi.fn(),
-}));
-
 import { gamestate } from '@helpers/state-game';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
 import {
-  isPartyAtGatherNode,
   pruneInvalidGatherNodeLevels,
   worldNodeIsMaxLevel,
   worldNodeLevel,
@@ -27,7 +21,6 @@ import type {
   GatheringContent,
   GatherLevelCost,
   ItemId,
-  WorldNodeEntry,
 } from '@interfaces';
 
 function buildGathering(
@@ -138,34 +131,6 @@ describe('worldNodeLevelUpCost', () => {
     } as unknown as GameState);
 
     expect(worldNodeLevelUpCost(buildGathering(), 'Node')).toEqual([]);
-  });
-});
-
-describe('isPartyAtGatherNode', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('is true when the party is standing on that node', () => {
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-
-    expect(isPartyAtGatherNode('Carrina Copper Mines')).toBe(true);
-  });
-
-  it('is false when the party is elsewhere', () => {
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
-      nodeName: 'Wergen Woods',
-    } as WorldNodeEntry);
-
-    expect(isPartyAtGatherNode('Carrina Copper Mines')).toBe(false);
-  });
-
-  it('is false when the party is not standing on any node', () => {
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
-
-    expect(isPartyAtGatherNode('Carrina Copper Mines')).toBe(false);
   });
 });
 

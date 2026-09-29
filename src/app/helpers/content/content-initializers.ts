@@ -19,6 +19,7 @@ import {
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
+import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureShrine } from '@helpers/content/ensure-shrine';
 import { ensureSkill } from '@helpers/content/ensure-skill';
@@ -54,6 +55,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   job: ensureJob,
   monster: ensureMonster,
   nodeoverride: ensureNodeOverride,
+  outpost: ensureOutpost,
   recipe: ensureRecipe,
   shrine: ensureShrine,
   skill: ensureSkill,

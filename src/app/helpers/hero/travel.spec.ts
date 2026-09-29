@@ -71,6 +71,10 @@ vi.mock('@helpers/world-node/world-node-encounter', () => ({
   worldNodeExploreRandomIsAvailable: vi.fn(),
 }));
 
+vi.mock('@helpers/world-node/world-node-outpost', () => ({
+  outpostDeathPenaltyMultiplier: vi.fn(() => 1),
+}));
+
 vi.mock('@helpers/world-node/world-nodes', () => ({
   isWorldNodeCollectibleGateMet: vi.fn(() => true),
   worldNodeAt: vi.fn(() => undefined),
@@ -123,6 +127,7 @@ import {
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
+import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import {
   isWorldNodeCollectibleGateMet,
   worldNodeAt,
@@ -582,7 +587,21 @@ describe('travelBeginDeathsDoor', () => {
     });
     vi.mocked(homeNodeGet).mockReturnValue({
       mapName: 'Carrina',
+      nodeName: 'Carrina Outpost',
     } as unknown as WorldNodeEntry);
+    vi.mocked(outpostDeathPenaltyMultiplier).mockReturnValue(1);
+  });
+
+  it('scales the duration by the home outpost multiplier, rounding up', () => {
+    vi.mocked(mapHopsBetween).mockReturnValue(0);
+    vi.mocked(outpostDeathPenaltyMultiplier).mockReturnValue(0.25);
+
+    travelBeginDeathsDoor();
+
+    expect(outpostDeathPenaltyMultiplier).toHaveBeenCalledWith(
+      'Carrina Outpost',
+    );
+    expect(addGlobalEffect).toHaveBeenCalledWith('Deaths Door', 3);
   });
 
   it('does not touch travel state - it is a pure timer, not a walk home', () => {

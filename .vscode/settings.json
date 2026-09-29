@@ -29,6 +29,7 @@
     "./schemas/job.schema.json": "gamedata/job/**/*.yml",
     "./schemas/monster.schema.json": "gamedata/monster/**/*.yml",
     "./schemas/nodeoverride.schema.json": "gamedata/nodeoverride/**/*.yml",
+    "./schemas/outpost.schema.json": "gamedata/outpost/**/*.yml",
     "./schemas/recipe.schema.json": "gamedata/recipe/**/*.yml",
     "./schemas/shrine.schema.json": "gamedata/shrine/**/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/**/*.yml",

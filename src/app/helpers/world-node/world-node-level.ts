@@ -1,5 +1,4 @@
 import { gatherNodeLevelsState } from '@helpers/state-game';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
   CostItem,
   GameStateGatherNodeLevels,
@@ -31,11 +30,6 @@ export function worldNodeLevelUpCost(
   nodeName: string,
 ): CostItem[] {
   return gathering.levelCost[worldNodeLevel(nodeName)]?.costs ?? [];
-}
-
-// Mirrors isPartyAtCaravan (caravan.ts) - leveling requires physically standing at the node.
-export function isPartyAtGatherNode(nodeName: string): boolean {
-  return worldNodeAtCurrentLocation()?.nodeName === nodeName;
 }
 
 // Drops entries whose node no longer resolves, and clamps to the current max achievable level.

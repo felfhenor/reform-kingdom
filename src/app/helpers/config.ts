@@ -90,6 +90,10 @@ export const TICKS_PER_STEP_MIN_DIFF = 0.25;
 export const TRAVEL_UNITS_PER_TICK = 100;
 export const DEATHS_DOOR_SECONDS_PER_MAP = 10;
 export const DEATHS_DOOR_MINIMUM_SECONDS = 10;
+// Per home-outpost level past the build (+1), applied to both Deaths Door and Healing.
+export const OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL = 0.25;
+// Build (+1) plus three upgrades; enforced on content by validate:outposts.
+export const OUTPOST_MAX_LEVEL = 4;
 
 // Shared exponent for the house XP-curve shape (start + (end - start) * progress^EASE) used by character,
 // tradeskill, and worker leveling - see patterns.md's "shared XP-curve shape" note.

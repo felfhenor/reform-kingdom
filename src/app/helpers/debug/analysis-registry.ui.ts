@@ -12,6 +12,7 @@ import { runMonsterStatsAnalysis } from '@helpers/debug/analysis-monsterstats';
 import { runNodeLevelsAnalysis } from '@helpers/debug/analysis-nodelevels';
 import { runNodeNamesAnalysis } from '@helpers/debug/analysis-nodenames';
 import { runObtainabilityAnalysis } from '@helpers/debug/analysis-obtainability';
+import { runOutpostsAnalysis } from '@helpers/debug/analysis-outposts';
 import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipeingredientorder';
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
@@ -189,7 +190,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'fieldnodes',
     title: 'Field Nodes',
     description:
-      'Every field node has a matching encounter, random encounter, gathering, shrine, or trainer entry.',
+      'Every field node has a matching encounter, random encounter, gathering, shrine, outpost, or trainer entry.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],
@@ -214,6 +215,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runShrinesAnalysis,
+  },
+  {
+    id: 'outposts',
+    title: 'Outposts',
+    description:
+      'Every outpost has exactly 4 levels (build + 3 upgrades), each with at least one cost.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runOutpostsAnalysis,
   },
   {
     id: 'trainers',

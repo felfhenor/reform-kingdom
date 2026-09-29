@@ -647,6 +647,19 @@
                  "width":64,
                  "x":2432,
                  "y":2304
+                }, 
+                {
+                 "gid":387,
+                 "height":64,
+                 "id":192,
+                 "name":"Larsian Outpost",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Outpost",
+                 "visible":true,
+                 "width":64,
+                 "x":1600,
+                 "y":2560
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -655,7 +668,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":192,
+ "nextobjectid":193,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

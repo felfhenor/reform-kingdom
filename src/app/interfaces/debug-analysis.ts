@@ -89,6 +89,7 @@ export type MaterialUtilizationStats = {
   traderTokenSinks: number;
   nodeUpgradeCosts: number;
   shrineCosts: number;
+  outpostCosts: number;
   trainerCosts: number;
 };
 

@@ -8,15 +8,18 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
 import { updateGamestate } from '@helpers/state-game';
+import { isPartyAtNode } from '@helpers/world';
 import {
   worldNodeCanAffordCost,
   worldNodeSpendCost,
 } from '@helpers/world-node/world-node-cost';
 import {
-  isPartyAtShrine,
+  worldNodeDevelopmentIsMaxLevel,
+  worldNodeDevelopmentLevelUpCost,
+} from '@helpers/world-node/world-node-development';
+import {
   worldNodeShrineCurrentTier,
-  worldNodeShrineIsMaxLevel,
-  worldNodeShrineLevelUpCost,
+  worldNodeShrineLevel,
 } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeByName,
@@ -32,7 +35,7 @@ export function shrinePray(nodeName: string): boolean {
 
   const shrine = worldNodeShrine(node);
   if (!shrine) return false;
-  if (!isPartyAtShrine(nodeName)) return false;
+  if (!isPartyAtNode(nodeName)) return false;
 
   const tier = worldNodeShrineCurrentTier(shrine, nodeName);
   if (!tier) return false;
@@ -73,10 +76,11 @@ export async function shrineLevelUp(nodeName: string): Promise<boolean> {
   const shrine = worldNodeShrine(node);
   if (!shrine) return false;
 
-  if (worldNodeShrineIsMaxLevel(shrine, nodeName)) return false;
-  if (!isPartyAtShrine(nodeName)) return false;
+  const level = worldNodeShrineLevel(nodeName);
+  if (worldNodeDevelopmentIsMaxLevel(shrine, level)) return false;
+  if (!isPartyAtNode(nodeName)) return false;
 
-  const cost = worldNodeShrineLevelUpCost(shrine, nodeName);
+  const cost = worldNodeDevelopmentLevelUpCost(shrine, level);
   if (!worldNodeCanAffordCost(cost)) return false;
 
   // Matches by effect id, so no two shrines should ever share a globalEffectId (unenforced).

@@ -79,6 +79,7 @@ export const worldCommissionsState = gamestateSelect(
 );
 export const worldTownsState = gamestateSelect((state) => state.world.towns);
 export const shrinesState = gamestateSlice('shrines');
+export const outpostsState = gamestateSlice('outposts');
 export const tutorialsState = gamestateSlice('tutorials');
 export const tasksState = gamestateSlice('tasks');
 export const lootFiltersState = gamestateSlice('lootFilters');

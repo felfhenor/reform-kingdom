@@ -25,6 +25,7 @@ export * from './content-item';
 export * from './content-job';
 export * from './content-monster';
 export * from './content-node-override';
+export * from './content-outpost';
 export * from './content-recipe';
 export * from './content-shrine';
 export * from './content-skill';

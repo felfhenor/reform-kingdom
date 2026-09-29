@@ -463,6 +463,19 @@
                  "width":64,
                  "x":1792,
                  "y":384
+                }, 
+                {
+                 "gid":380,
+                 "height":64,
+                 "id":163,
+                 "name":"Mired Outpost",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Outpost",
+                 "visible":true,
+                 "width":64,
+                 "x":832,
+                 "y":1152
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -471,7 +484,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":163,
+ "nextobjectid":164,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

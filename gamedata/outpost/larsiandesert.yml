@@ -1,0 +1,68 @@
+- id: 7b4ced28-3d71-4a59-aadc-1721596ec0a7
+  name: Larsian Outpost
+  description: An outpost overtaken by the desert sands near the deadwoods of the Larsian Desert. It can provide great boon to any adventurer tenacious enough to repair it.
+
+  levels:
+    - costs:
+        - itemId: Gold Coin
+          required: 7500
+
+        - itemId: Petrifiwood
+          required: 50
+
+        - itemId: Firmwater
+          required: 50
+
+        - itemId: Timberfuzz
+          required: 25
+
+        - itemId: Cactspine
+          required: 10
+
+    - costs:
+        - itemId: Gold Coin
+          required: 20000
+
+        - itemId: Petrifiwood
+          required: 100
+
+        - itemId: Firmwater
+          required: 100
+
+        - itemId: Timberfuzz
+          required: 50
+
+        - itemId: Cactspine
+          required: 25
+
+    - costs:
+        - itemId: Gold Coin
+          required: 35000
+
+        - itemId: Petrifiwood
+          required: 225
+
+        - itemId: Firmwater
+          required: 225
+
+        - itemId: Timberfuzz
+          required: 100
+
+        - itemId: Strongreed
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 65000
+
+        - itemId: Petrifiwood
+          required: 375
+
+        - itemId: Firmwater
+          required: 325
+
+        - itemId: Timberfuzz
+          required: 150
+
+        - itemId: Strongreed
+          required: 75

@@ -1,0 +1,56 @@
+- id: bc79532c-0965-4178-a9e2-039bf4f9f544
+  name: Mired Outpost
+  description: A run-down outpost in the heart of the Craggled Mire. It can provide great boon to any adventurer tenacious enough to repair it.
+
+  levels:
+    - costs:
+        - itemId: Gold Coin
+          required: 2500
+
+        - itemId: Mirewood
+          required: 50
+
+        - itemId: Oozehide
+          required: 15
+
+        - itemId: Miremetal Ingot
+          required: 10
+
+    - costs:
+        - itemId: Gold Coin
+          required: 7500
+
+        - itemId: Mirewood
+          required: 100
+
+        - itemId: Oozehide
+          required: 30
+
+        - itemId: Miremetal Ingot
+          required: 25
+
+    - costs:
+        - itemId: Gold Coin
+          required: 15000
+
+        - itemId: Mirewood
+          required: 225
+
+        - itemId: Mirethread
+          required: 50
+
+        - itemId: Miremetal Ingot
+          required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 25000
+
+        - itemId: Mirewood
+          required: 500
+
+        - itemId: Miremetal Ingot
+          required: 150
+
+        - itemId: Ghostwood
+          required: 50

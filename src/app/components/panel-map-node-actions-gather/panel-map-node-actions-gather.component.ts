@@ -7,9 +7,9 @@ import {
 } from '@angular/core';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { isPartyAtNode } from '@helpers/world';
 import { worldNodeCanAffordCost } from '@helpers/world-node/world-node-cost';
 import {
-  isPartyAtGatherNode,
   worldNodeIsMaxLevel,
   worldNodeLevelUpCost,
 } from '@helpers/world-node/world-node-level';
@@ -46,7 +46,7 @@ export class PanelMapNodeActionsGatherComponent {
     if (this.isMaxLevel()) return false;
 
     return (
-      isPartyAtGatherNode(this.entry().nodeName) &&
+      isPartyAtNode(this.entry().nodeName) &&
       worldNodeCanAffordCost(this.cost())
     );
   });
