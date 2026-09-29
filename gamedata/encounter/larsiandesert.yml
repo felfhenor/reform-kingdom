@@ -52,17 +52,14 @@
     - monsters:
         - monsterId: Akroki Swashbuckler
         - monsterId: Akroki Mage
-        - monsterId: Akroki Swashbuckler
 
     - monsters:
         - monsterId: Akroki Vanguard
         - monsterId: Akroki Mage
-        - monsterId: Akroki Swashbuckler
 
     - monsters:
         - monsterId: Akroki Vanguard
         - monsterId: Akroki Mage
-        - monsterId: Akroki Swashbuckler
         - monsterId: Akroki Swashbuckler
 
   completionRewards:
