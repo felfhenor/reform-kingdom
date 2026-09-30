@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { formatDuration } from '@helpers/engine/timer';
-import type { CraftingStatusEntry } from '@interfaces';
+import { kingdomSubviewShow, setGamePlayView } from '@helpers/engine/ui';
+import type { CraftingStatusEntry, KingdomSubview } from '@interfaces';
 
 @Component({
   selector: 'app-card-status-crafting',
@@ -15,4 +16,11 @@ export class CardStatusCraftingComponent {
   public expanded = input<boolean>(false);
 
   public formatDuration = formatDuration;
+
+  public goToTradeskill() {
+    setGamePlayView('kingdom');
+    kingdomSubviewShow(
+      `tradeskill-${this.entry().tradeskill.toLowerCase()}` as KingdomSubview,
+    );
+  }
 }

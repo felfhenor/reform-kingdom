@@ -1,7 +1,11 @@
 @let isExpanded = expanded();
 @let data = entry();
 
-<div class="status-entry select-none" [class.expanded]="isExpanded">
+<div
+  class="status-entry select-none cursor-pointer"
+  [class.expanded]="isExpanded"
+  (click)="goToTradeskill()"
+>
   <div class="entry-icon">
     <div class="zoom-row">
       <app-atlas-image
