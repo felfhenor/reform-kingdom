@@ -11,7 +11,7 @@
     max: 20
 
   xpGainedIfInLevelRange: 10
-  gatherTime: 20
+  gatherTime: 10
 
   levelCost:
     - costs:
@@ -99,7 +99,7 @@
     max: 19
 
   xpGainedIfInLevelRange: 10
-  gatherTime: 20
+  gatherTime: 10
 
   levelCost:
     - costs:
@@ -218,7 +218,7 @@
     max: 17
 
   xpGainedIfInLevelRange: 10
-  gatherTime: 20
+  gatherTime: 10
 
   levelCost:
     - costs:
