@@ -13,7 +13,8 @@ import type { CombatLog } from '@interfaces';
   selector: 'app-adventure-log-message',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AtlasImageComponent, SlotIconBlankComponent],
-  host: { class: 'contents inline-flex flex-1 gap-1' },
+  // Inline flow, not flex, so a message with many icons wraps like text instead of overflowing.
+  host: { class: 'block flex-1 min-w-0' },
   templateUrl: './adventure-log-message.component.html',
 })
 export class AdventureLogMessageComponent {

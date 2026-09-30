@@ -144,8 +144,8 @@ export type TownRaidLostMaterial = {
 };
 
 export type TownRaidLossSummary = {
-  stolenItemNames: string[];
-  cancelledCraftNames: string[];
+  stolenItems: ItemPreviewDisplay[];
+  cancelledCrafts: ItemPreviewDisplay[];
   lostMaterials: TownRaidLostMaterial[];
 };
 

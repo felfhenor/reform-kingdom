@@ -10,10 +10,11 @@ import type {
   Combat,
   CombatLog,
   Combatant,
+  CombatLogIcon,
+  DropRarity,
   EquipmentContent,
   ItemContent,
   RecipeContent,
-  RewardContentInfo,
 } from '@interfaces';
 import { parseInline } from 'marked';
 import mustache from 'mustache';
@@ -65,7 +66,7 @@ export function combatMessageLog(
   combat: Combat,
   message: string,
   actor?: Combatant,
-  icon?: Pick<RewardContentInfo, 'sprite' | 'spritesheet'>,
+  icons?: CombatLogIcon | CombatLogIcon[],
 ): void {
   const combatants = [
     ...(combat.heroes ?? []),
@@ -90,8 +91,7 @@ export function combatMessageLog(
     spritesheet: actor?.isEnemy ? 'guardian' : 'hero',
     sprite: actor?.sprite,
     combatants,
-    itemSprite: icon?.sprite,
-    itemSpritesheet: icon?.spritesheet,
+    itemIcons: logIconList(icons),
   });
 }
 
@@ -110,7 +110,7 @@ export function categoryMessageLog(
   category: AdventureLogEntryKind,
   locationName: string,
   message: string,
-  icon?: Pick<RewardContentInfo, 'sprite' | 'spritesheet'>,
+  icons?: CombatLogIcon | CombatLogIcon[],
 ): void {
   pushLogEntry({
     kind: category,
@@ -118,16 +118,26 @@ export function categoryMessageLog(
     timestamp: Date.now(),
     locationName,
     message,
-    itemSprite: icon?.sprite,
-    itemSpritesheet: icon?.spritesheet,
+    itemIcons: logIconList(icons),
   });
+}
+
+function logIconList(
+  icons: CombatLogIcon | CombatLogIcon[] | undefined,
+): CombatLogIcon[] | undefined {
+  if (!icons) return undefined;
+  return Array.isArray(icons) ? icons : [icons];
+}
+
+export function rarityNameHtml(name: string, rarity: DropRarity): string {
+  return `<span class="text-${rarity} type-entity-name">${name}</span>`;
 }
 
 export function itemNameHtml(
   item: ItemContent,
   displayName = item.name,
 ): string {
-  return `<span class="text-${item.rarity} type-entity-name">${displayName}</span>`;
+  return rarityNameHtml(displayName, item.rarity);
 }
 
 // "1 wergen stick" vs "3 wergen sticks" - only pluralize when the quantity
@@ -140,7 +150,7 @@ export function itemDropHtml(item: ItemContent, quantity: number): string {
 }
 
 export function equipmentNameHtml(equipment: EquipmentContent): string {
-  return `<span class="text-${equipment.rarity} type-entity-name">${equipment.name}</span>`;
+  return rarityNameHtml(equipment.name, equipment.rarity);
 }
 
 // Equipment drops are always a single piece, so there's no quantity/plural to handle here.
@@ -149,7 +159,7 @@ export function equipmentDropHtml(equipment: EquipmentContent): string {
 }
 
 export function collectibleNameHtml(collectible: CollectibleContent): string {
-  return `<span class="text-${collectible.rarity} type-entity-name">${collectible.name}</span>`;
+  return rarityNameHtml(collectible.name, collectible.rarity);
 }
 
 // Collectible drops are always a single piece, same as equipment.

@@ -177,10 +177,9 @@ describe('combatMessageLog', () => {
     });
     endCombatLogCommits();
 
-    expect(combatLog()[0]).toMatchObject({
-      itemSprite: 'copper-ore',
-      itemSpritesheet: 'item',
-    });
+    expect(combatLog()[0].itemIcons).toEqual([
+      { sprite: 'copper-ore', spritesheet: 'item' },
+    ]);
   });
 
   it('leaves the icon fields undefined without one', () => {
@@ -195,8 +194,7 @@ describe('combatMessageLog', () => {
     combatMessageLog(combat, 'Combat is over.');
     endCombatLogCommits();
 
-    expect(combatLog()[0].itemSprite).toBeUndefined();
-    expect(combatLog()[0].itemSpritesheet).toBeUndefined();
+    expect(combatLog()[0].itemIcons).toBeUndefined();
   });
 });
 
@@ -211,17 +209,25 @@ describe('categoryMessageLog', () => {
       spritesheet: 'item',
     });
 
-    expect(combatLog()[0]).toMatchObject({
-      itemSprite: 'wood',
-      itemSpritesheet: 'item',
-    });
+    expect(combatLog()[0].itemIcons).toEqual([
+      { sprite: 'wood', spritesheet: 'item' },
+    ]);
+  });
+
+  it('stores every icon when given a list', () => {
+    const icons = [
+      { sprite: 'wood', spritesheet: 'item' as const },
+      { sprite: 'stone', spritesheet: 'item' as const },
+    ];
+    categoryMessageLog('Raid', 'Larsia', 'Larsia lost stuff', icons);
+
+    expect(combatLog()[0].itemIcons).toEqual(icons);
   });
 
   it('leaves the icon fields undefined without one', () => {
     categoryMessageLog('Travel', 'Wergen Woods', 'The party left.');
 
-    expect(combatLog()[0].itemSprite).toBeUndefined();
-    expect(combatLog()[0].itemSpritesheet).toBeUndefined();
+    expect(combatLog()[0].itemIcons).toBeUndefined();
   });
 });
 

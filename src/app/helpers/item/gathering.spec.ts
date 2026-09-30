@@ -469,7 +469,7 @@ describe('gatheringProcessTick', () => {
       'Gather',
       'Wergen Woods',
       expect.any(String),
-      { sprite: 'wergen-wood', spritesheet: 'item' },
+      [{ sprite: 'wergen-wood', spritesheet: 'item' }],
     );
 
     const result = applyLastUpdate({
@@ -478,7 +478,7 @@ describe('gatheringProcessTick', () => {
     expect(result.world.gathering.ticksIntoGather).toBe(0);
   });
 
-  it('uses the first granted item line as the log icon when a result grants multiple item types', () => {
+  it('gives every granted item line its own log icon', () => {
     vi.mocked(gamestate).mockReturnValue({
       world: {
         gathering: {
@@ -521,8 +521,11 @@ describe('gatheringProcessTick', () => {
     expect(categoryMessageLog).toHaveBeenCalledWith(
       'Gather',
       'Wergen Woods',
-      expect.any(String),
-      { sprite: 'wergen-wood', spritesheet: 'item' },
+      'The party found @@icon@@2 <colored>Wergen Wood</colored>, @@icon@@1 <colored>Wergen Stick</colored>!',
+      [
+        { sprite: 'wergen-wood', spritesheet: 'item' },
+        { sprite: 'wergen-stick', spritesheet: 'item' },
+      ],
     );
   });
 

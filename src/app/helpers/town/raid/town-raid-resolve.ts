@@ -1,4 +1,9 @@
-import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import {
+  categoryMessageLog,
+  ITEM_ICON_TOKEN,
+  itemDropHtml,
+  rarityNameHtml,
+} from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import {
   RAID_LOSS_CRAFT_DEBUFF_TICKS,
@@ -39,6 +44,7 @@ import type {
   GameState,
   ItemContent,
   ItemId,
+  ItemPreviewDisplay,
   RecipeContent,
   ResolvedDrop,
   TownContent,
@@ -87,7 +93,10 @@ export function raidResolveVictory(
 }
 
 // 1 to 50% of the stock cap (not the current stock count) - picked randomly from whatever stock actually exists.
-function stealTownStock(state: GameState, townId: TownId): string[] {
+function stealTownStock(
+  state: GameState,
+  townId: TownId,
+): ItemPreviewDisplay[] {
   const town = state.world.towns[townId];
   const { stock } = town;
   if (stock.length === 0) return [];
@@ -104,26 +113,29 @@ function stealTownStock(state: GameState, townId: TownId): string[] {
   town.stock = town.stock.filter((entry) => !stolenEntries.includes(entry));
 
   return stolenEntries
-    .map((entry) => townStockDisplay(entry)?.name)
-    .filter((name): name is string => !!name);
+    .map((entry) => townStockDisplay(entry))
+    .filter((display): display is ItemPreviewDisplay => !!display);
 }
 
 // The whole queue is scrapped - materials already consumed for it are gone too, not refunded.
-function cancelTownCraftQueue(state: GameState, townId: TownId): string[] {
+function cancelTownCraftQueue(
+  state: GameState,
+  townId: TownId,
+): ItemPreviewDisplay[] {
   const town = state.world.towns[townId];
   const { craftQueue } = town;
   if (craftQueue.length === 0) return [];
 
-  const names = craftQueue
+  const displays = craftQueue
     .map((entry) => {
       const recipe = getEntry<RecipeContent>(entry.recipeId);
-      return recipe ? resolveRewardDisplay(recipe.result)?.name : undefined;
+      return recipe ? resolveRewardDisplay(recipe.result) : undefined;
     })
-    .filter((name): name is string => !!name);
+    .filter((display): display is ItemPreviewDisplay => !!display);
 
   town.craftQueue = [];
 
-  return names;
+  return displays;
 }
 
 // A flat % of every material stack the town holds, rounded down.
@@ -151,36 +163,45 @@ function stealTownMaterials(
     );
 }
 
+function displayNamesHtml(displays: ItemPreviewDisplay[]): string {
+  return displays
+    .map(({ name, rarity }) => rarityNameHtml(name, rarity))
+    .join(', ');
+}
+
 function logRaidLossMessages(
   townName: string,
   summary: TownRaidLossSummary,
 ): void {
-  if (summary.stolenItemNames.length > 0) {
+  if (summary.stolenItems.length > 0) {
     categoryMessageLog(
       'Raid',
       townName,
-      `${townName} lost the following items: ${summary.stolenItemNames.join(', ')}`,
+      `${townName} lost the following items: ${displayNamesHtml(summary.stolenItems)}`,
     );
   }
 
-  if (summary.cancelledCraftNames.length > 0) {
+  if (summary.cancelledCrafts.length > 0) {
     categoryMessageLog(
       'Raid',
       townName,
-      `${townName} lost the following in-progress crafts: ${summary.cancelledCraftNames.join(', ')}`,
+      `${townName} lost the following in-progress crafts: ${displayNamesHtml(summary.cancelledCrafts)}`,
     );
   }
 
   if (summary.lostMaterials.length > 0) {
-    const [first, ...rest] = summary.lostMaterials;
-    const descriptions = [
-      `${itemDropHtml(first.item, first.quantity)}`,
-      ...rest.map(({ item, quantity }) => itemDropHtml(item, quantity)),
-    ];
+    const descriptions = summary.lostMaterials.map(
+      ({ item, quantity }) =>
+        `${ITEM_ICON_TOKEN}${itemDropHtml(item, quantity)}`,
+    );
     categoryMessageLog(
       'Raid',
       townName,
       `${townName} lost the following resources: ${descriptions.join(', ')}`,
+      summary.lostMaterials.map(({ item }) => ({
+        sprite: item.sprite,
+        spritesheet: 'item',
+      })),
     );
   }
 
@@ -213,8 +234,8 @@ export function raidResolveDefeat(townId: TownId): void {
     if (!state.world.towns[townId]) return state;
 
     summary = {
-      stolenItemNames: stealTownStock(state, townId),
-      cancelledCraftNames: cancelTownCraftQueue(state, townId),
+      stolenItems: stealTownStock(state, townId),
+      cancelledCrafts: cancelTownCraftQueue(state, townId),
       lostMaterials: stealTownMaterials(state, townId),
     };
 

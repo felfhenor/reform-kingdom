@@ -181,17 +181,15 @@ function grantGatherItems(
 
   if (grants.length === 0) return;
 
-  const [first, ...rest] = grants;
-  const descriptions = [
-    `${ITEM_ICON_TOKEN}${first.description}`,
-    ...rest.map(({ description }) => description),
-  ];
+  const descriptions = grants.map(
+    ({ description }) => `${ITEM_ICON_TOKEN}${description}`,
+  );
 
   categoryMessageLog(
     'Gather',
     nodeName,
     `The party found ${descriptions.join(', ')}!`,
-    { sprite: first.item.sprite, spritesheet: 'item' },
+    grants.map(({ item }) => ({ sprite: item.sprite, spritesheet: 'item' })),
   );
 }
 

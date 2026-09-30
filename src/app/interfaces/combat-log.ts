@@ -15,6 +15,11 @@ export type CombatLogCombatantSnapshot = {
   spritesheet: AtlasedImage;
 };
 
+export type CombatLogIcon = {
+  sprite: string;
+  spritesheet: AtlasedImage;
+};
+
 export type CombatLog = {
   kind: AdventureLogEntryKind;
   combatId?: CombatId;
@@ -27,7 +32,9 @@ export type CombatLog = {
   spritesheet?: 'guardian' | 'hero';
   sprite?: string;
   combatants?: CombatLogCombatantSnapshot[];
-  // Reward icon rendered inline next to the item name (see `ITEM_ICON_TOKEN`), when this entry represents a gain/loss.
+  // The Nth `ITEM_ICON_TOKEN` in the message renders the Nth icon here.
+  itemIcons?: CombatLogIcon[];
+  // Legacy single-icon fields - still read so entries saved before `itemIcons` keep their icon.
   itemSprite?: string;
   itemSpritesheet?: AtlasedImage;
 };

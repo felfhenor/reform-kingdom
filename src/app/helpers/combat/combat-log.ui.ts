@@ -11,6 +11,7 @@ import type {
   AdventureLogEntryKind,
   AtlasedImage,
   CombatLog,
+  CombatLogIcon,
 } from '@interfaces';
 
 const COMBATANT_TOKEN_PATTERN = /@@([^@]+)@@/g;
@@ -40,7 +41,14 @@ export function adventureLogEntryHtml(entry: CombatLog): string {
   return adventureLogMessageHtml(coloredMessage);
 }
 
-// Splits the rendered message around every icon token (the reward icon and/or a per-combatant portrait) so each can render as a live component between text fragments.
+function adventureLogItemIcons(entry: CombatLog): CombatLogIcon[] {
+  if (entry.itemIcons) return entry.itemIcons;
+  return entry.itemSprite && entry.itemSpritesheet
+    ? [{ sprite: entry.itemSprite, spritesheet: entry.itemSpritesheet }]
+    : [];
+}
+
+// Splits the rendered message around every icon token (reward icons and/or per-combatant portraits) so each can render as a live component between text fragments.
 export function adventureLogMessageParts(
   entry: CombatLog,
 ): AdventureLogMessagePart[] {
@@ -48,9 +56,11 @@ export function adventureLogMessageParts(
   const combatantsById = new Map(
     (entry.combatants ?? []).map((c) => [c.id, c]),
   );
+  const itemIcons = adventureLogItemIcons(entry);
 
   const parts: AdventureLogMessagePart[] = [];
   let lastIndex = 0;
+  let itemIconIndex = 0;
 
   for (const match of html.matchAll(ICON_TOKEN_PATTERN)) {
     const [token, combatantId] = match;
@@ -58,9 +68,7 @@ export function adventureLogMessageParts(
 
     const icon = combatantId
       ? combatantsById.get(combatantId)
-      : entry.itemSprite && entry.itemSpritesheet
-        ? { sprite: entry.itemSprite, spritesheet: entry.itemSpritesheet }
-        : undefined;
+      : itemIcons[itemIconIndex++];
 
     if (!icon?.sprite) continue;
 

@@ -6,6 +6,7 @@ vi.mock('@helpers/combat/combat-log', () => ({
   itemDropHtml: vi.fn(
     (item: { name: string }, quantity: number) => `${quantity}x ${item.name}`,
   ),
+  rarityNameHtml: vi.fn((name: string, rarity: string) => `[${rarity}]${name}`),
 }));
 
 vi.mock('@helpers/combat/combat-rewards', () => ({
@@ -277,7 +278,8 @@ describe('raidResolveDefeat', () => {
       { equipmentItem: { equipmentId: 'bow-1' }, addedAtTick: 0 },
     ] as TownNodeState['stock'];
     vi.mocked(townStockDisplay).mockImplementation(
-      (entry) => ({ name: entry.equipmentItem.equipmentId }) as never,
+      (entry) =>
+        ({ name: entry.equipmentItem.equipmentId, rarity: 'Rare' }) as never,
     );
     const state = {
       world: { towns: { [townId]: buildTownNodeState({ stock }) } },
@@ -288,6 +290,11 @@ describe('raidResolveDefeat', () => {
 
     // rngNumberRange is mocked to 2 and rngShuffle is identity, so the first 2 (in order) are stolen.
     expect(state.world.towns[townId].stock).toEqual([stock[2]]);
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Raid',
+      'Larsia',
+      'Larsia lost the following items: [Rare]sword-1, [Rare]shield-1',
+    );
   });
 
   it('does not log a stolen-items message when stock is empty', () => {
@@ -297,6 +304,12 @@ describe('raidResolveDefeat', () => {
     mockUpdateGamestateWith(state);
 
     raidResolveDefeat(townId);
+
+    expect(categoryMessageLog).not.toHaveBeenCalledWith(
+      'Raid',
+      'Larsia',
+      expect.stringContaining('lost the following items'),
+    );
   });
 
   it('cancels the entire craft queue and logs what was being crafted', () => {
@@ -321,7 +334,11 @@ describe('raidResolveDefeat', () => {
           : { id, result: { equipmentId: id } }) as never,
     );
     vi.mocked(resolveRewardDisplay).mockImplementation(
-      (reward) => ({ name: `Crafted ${reward.equipmentId}` }) as never,
+      (reward) =>
+        ({
+          name: `Crafted ${reward.equipmentId}`,
+          rarity: 'Uncommon',
+        }) as never,
     );
     const state = {
       world: { towns: { [townId]: buildTownNodeState({ craftQueue }) } },
@@ -331,6 +348,11 @@ describe('raidResolveDefeat', () => {
     raidResolveDefeat(townId);
 
     expect(state.world.towns[townId].craftQueue).toEqual([]);
+    expect(categoryMessageLog).toHaveBeenCalledWith(
+      'Raid',
+      'Larsia',
+      'Larsia lost the following in-progress crafts: [Uncommon]Crafted recipe-sword, [Uncommon]Crafted recipe-shield',
+    );
   });
 
   it('takes 50% of every material stack and logs the loss', () => {
@@ -369,11 +391,14 @@ describe('raidResolveDefeat', () => {
       { id: 'iron-ore', name: 'iron-ore', sprite: 'iron-ore-sprite' },
       5,
     );
-    // Icon is keyed off the first lost material - `iron-ore` here, since Object.keys preserves insertion order.
     expect(categoryMessageLog).toHaveBeenCalledWith(
       'Raid',
       'Larsia',
-      'Larsia lost the following resources: 5x iron-ore, 1x wood',
+      'Larsia lost the following resources: @@icon@@5x iron-ore, @@icon@@1x wood',
+      [
+        { sprite: 'iron-ore-sprite', spritesheet: 'item' },
+        { sprite: 'wood-sprite', spritesheet: 'item' },
+      ],
     );
   });
 
