@@ -23,6 +23,7 @@ import type {
   EquipmentContent,
   ItemContent,
   RecipeContent,
+  TradeskillContent,
   WorkerContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -63,6 +64,7 @@ export class SlotCompletionRewardComponent {
     'item' | 'equipment' | 'collectible' | 'worker'
   >(() => {
     const reward = this.reward();
+
     switch (reward.kind) {
       case 'Item':
         return 'item';
@@ -119,4 +121,25 @@ export class SlotCompletionRewardComponent {
   public displayTooltip = computed(() => resolveRewardDisplay(this.reward()));
 
   public isDiscovered = computed(() => isRewardDiscovered(this.reward()));
+
+  public unknownTooltip = computed(() => {
+    const reward = this.reward();
+    switch (reward.kind) {
+      case 'Recipe': {
+        const recipe = this.recipeContent();
+        if (!recipe) return 'A reward yet to be discovered.';
+
+        const tradeskillName = getEntry<TradeskillContent>(
+          recipe.tradeskillId,
+        )?.name;
+        if (!tradeskillName) return 'A reward yet to be discovered.';
+
+        return `A reward that requires ${tradeskillName} Lv. ${recipe.minTradeskillLevel} to decipher.`;
+      }
+
+      default: {
+        return 'A reward yet to be discovered';
+      }
+    }
+  });
 }

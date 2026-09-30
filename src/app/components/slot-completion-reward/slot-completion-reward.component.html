@@ -1,4 +1,6 @@
-@if (isDiscovered() && content(); as contentEntry) {
+@let contentEntry = content();
+
+@if (isDiscovered() && contentEntry) {
   <app-tooltip-item-preview #preview [display]="displayTooltip()" />
 
   <div [tp]="preview.template()" [tpPlacement]="'top'">
@@ -23,7 +25,7 @@
     </app-slot-rarity-outline>
   </div>
 } @else {
-  <div [tp]="'A reward yet to be discovered.'" [tpPlacement]="'top'">
+  <div [tp]="unknownTooltip()" [tpPlacement]="'top'">
     <app-icon-unknown />
   </div>
 }
