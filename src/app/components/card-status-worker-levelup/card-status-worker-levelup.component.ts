@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
+import { kingdomSubviewShow, setGamePlayView } from '@helpers/engine/ui';
 import type { WorkerLevelUpStatusEntry } from '@interfaces';
 
 @Component({
@@ -12,4 +13,9 @@ import type { WorkerLevelUpStatusEntry } from '@interfaces';
 export class CardStatusWorkerLevelupComponent {
   public entry = input.required<WorkerLevelUpStatusEntry>();
   public expanded = input<boolean>(false);
+
+  public goToWorker() {
+    setGamePlayView('kingdom');
+    kingdomSubviewShow('workers');
+  }
 }
