@@ -1,8 +1,4 @@
-import {
-  categoryMessageLog,
-  ITEM_ICON_TOKEN,
-  itemDropHtml,
-} from '@helpers/combat/combat-log';
+import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import {
   RAID_LOSS_CRAFT_DEBUFF_TICKS,
@@ -34,9 +30,9 @@ import {
   townReputationTier,
 } from '@helpers/town/reputation/town-reputation';
 import { townReputationBuffRefresh } from '@helpers/town/reputation/town-reputation-buff';
-import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { townStockDisplay } from '@helpers/town/shop/town-stock';
+import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import type {
   Combat,
@@ -178,14 +174,13 @@ function logRaidLossMessages(
   if (summary.lostMaterials.length > 0) {
     const [first, ...rest] = summary.lostMaterials;
     const descriptions = [
-      `${ITEM_ICON_TOKEN}${itemDropHtml(first.item, first.quantity)}`,
+      `${itemDropHtml(first.item, first.quantity)}`,
       ...rest.map(({ item, quantity }) => itemDropHtml(item, quantity)),
     ];
     categoryMessageLog(
       'Raid',
       townName,
-      `${townName} lost these resources: ${descriptions.join(', ')}`,
-      { sprite: first.item.sprite, spritesheet: 'item' },
+      `${townName} lost the following resources: ${descriptions.join(', ')}`,
     );
   }
 

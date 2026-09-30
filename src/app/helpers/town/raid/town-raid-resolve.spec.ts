@@ -373,8 +373,7 @@ describe('raidResolveDefeat', () => {
     expect(categoryMessageLog).toHaveBeenCalledWith(
       'Raid',
       'Larsia',
-      expect.stringContaining('@@icon@@'),
-      { sprite: 'iron-ore-sprite', spritesheet: 'item' },
+      'Larsia lost the following resources: 5x iron-ore, 1x wood',
     );
   });
 

@@ -13,7 +13,7 @@ import type { CombatLog } from '@interfaces';
   selector: 'app-adventure-log-message',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AtlasImageComponent, SlotIconBlankComponent],
-  host: { class: 'contents' },
+  host: { class: 'contents inline-flex flex-1 gap-1' },
   templateUrl: './adventure-log-message.component.html',
 })
 export class AdventureLogMessageComponent {
