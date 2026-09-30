@@ -250,6 +250,22 @@
         min: 15
         max: 22
 
+    buyoff:
+      tributeGoldScalar: 70
+
+      fortifyMaterials:
+        - itemId: Timberfuzz
+          quantityPerAssaulter: 3
+
+        - itemId: Petrifiwood
+          quantityPerAssaulter: 5
+
+        - itemId: Cactspine
+          quantityPerAssaulter: 4
+
+        - itemId: Amber
+          quantityPerAssaulter: 2
+
     quests:
       commissions:
         - commissionOfferId: Commission - Larsian Coffers

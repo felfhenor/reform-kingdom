@@ -14,7 +14,10 @@ vi.mock('@helpers/hero/global-effect-state', () => ({
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { applyGlobalEffectRemove } from '@helpers/hero/global-effect-state';
-import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
+import {
+  raidDefenseGlobalEffectApply,
+  raidTelegraphClear,
+} from '@helpers/town/raid/town-raid-defense';
 import type {
   GameState,
   GlobalEffectContent,
@@ -169,5 +172,47 @@ describe('raidDefenseGlobalEffectApply', () => {
 
     expect(applyGlobalEffectRemove).not.toHaveBeenCalled();
     expect(state.globalEffects).toEqual([]);
+  });
+});
+
+describe('raidTelegraphClear', () => {
+  it('clears all three telegraph fields and re-syncs the global effect', () => {
+    vi.mocked(getEntry).mockReturnValue({
+      id: 'raid-defense-requested',
+    } as never);
+    const state = {
+      world: {
+        towns: {
+          [larsiaId]: buildTownState({
+            raidTelegraphedAtTick: 100,
+            raidEngageWindowExpiresAtTick: 500,
+            raidTelegraphedAssaulterIds: ['Bloodmoth' as never],
+            lastRaidResolvedAtTick: 50,
+          }),
+        },
+      },
+      globalEffects: [],
+    } as unknown as GameState;
+
+    raidTelegraphClear(state, larsiaId, 1000);
+
+    const town = state.world.towns[larsiaId];
+    expect(town.raidTelegraphedAtTick).toBeUndefined();
+    expect(town.raidEngageWindowExpiresAtTick).toBeUndefined();
+    expect(town.raidTelegraphedAssaulterIds).toBeUndefined();
+    expect(town.lastRaidResolvedAtTick).toBe(50);
+    expect(applyGlobalEffectRemove).toHaveBeenCalledWith(
+      state,
+      'raid-defense-requested',
+    );
+  });
+
+  it('tolerates a town with no state', () => {
+    const state = {
+      world: { towns: {} },
+      globalEffects: [],
+    } as unknown as GameState;
+
+    expect(() => raidTelegraphClear(state, larsiaId, 1000)).not.toThrow();
   });
 });

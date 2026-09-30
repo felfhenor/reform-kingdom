@@ -1,2 +1,2 @@
 export type TownReputationGainSource =
-  'Trade' | 'Craft' | 'Commission' | 'RaidDefense';
+  'Trade' | 'Craft' | 'Commission' | 'RaidDefense' | 'RaidBuyoff';

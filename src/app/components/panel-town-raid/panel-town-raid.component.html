@@ -48,6 +48,25 @@
       >
         Engage Raid
       </button>
+
+      @for (option of buyoffOptions(); track option.kind) {
+        <div class="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            class="btn btn-sm btn-block btn-secondary shrink-0"
+            [disabled]="!option.canBuyoff || isBuyoffPending()"
+            (click)="buyoff(option.kind)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            {{ option.label }}
+
+            <app-row-currency-cost
+              [costs]="option.requirementEntries"
+            ></app-row-currency-cost>
+          </button>
+        </div>
+      }
     </div>
   } @else {
     <app-blank-slate>

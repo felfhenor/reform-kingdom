@@ -20,6 +20,7 @@ import type {
   MaterialUtilizationStats,
   MonsterContent,
   OutpostContent,
+  TownContent,
   RecipeContent,
   ShrineContent,
   TrainerTeachingContent,
@@ -58,12 +59,13 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     nodeUpgradeCosts: 0,
     shrineCosts: 0,
     outpostCosts: 0,
+    raidFortifyCosts: 0,
     trainerCosts: 0,
   };
 }
 
 // One point per recipe, caravan buy, astral spell, commission, node-upgrade
-// tier, shrine/outpost tier, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
+// tier, shrine/outpost tier, raid fortification, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
@@ -74,6 +76,7 @@ function score(stats: MaterialUtilizationStats): number {
     stats.nodeUpgradeCosts +
     stats.shrineCosts +
     stats.outpostCosts +
+    stats.raidFortifyCosts +
     stats.trainerCosts +
     (stats.infusable ? 1 : 0) +
     (stats.reforgeReagent ? 1 : 0)
@@ -111,6 +114,7 @@ export function runMaterialUtilizationAnalysis(
   const gatherings = getEntriesByType<GatheringContent>('gathering');
   const shrines = getEntriesByType<ShrineContent>('shrine');
   const outposts = getEntriesByType<OutpostContent>('outpost');
+  const towns = getEntriesByType<TownContent>('town');
   const trainerTeachings =
     getEntriesByType<TrainerTeachingContent>('trainerteaching');
   const caravanTraders =
@@ -223,6 +227,13 @@ export function runMaterialUtilizationAnalysis(
     });
   });
 
+  towns.forEach((town) => {
+    town.defense.buyoff.fortifyMaterials.forEach((material) => {
+      const stats = byId.get(material.itemId);
+      if (stats) stats.raidFortifyCosts += 1;
+    });
+  });
+
   commissionOffers.forEach((offer) => {
     offer.requirements.forEach((requirement) => {
       if (!('itemId' in requirement)) return;
@@ -273,6 +284,7 @@ export function runMaterialUtilizationAnalysis(
             'Node Upgrade Costs': stats.nodeUpgradeCosts,
             'Shrine Costs': stats.shrineCosts,
             'Outpost Costs': stats.outpostCosts,
+            'Raid Fortify Costs': stats.raidFortifyCosts,
             'Trainer Costs': stats.trainerCosts,
             'Crafted Into': stats.craftedInto,
             'Monster Drops': stats.monsterDrops,
@@ -312,6 +324,8 @@ export function runMaterialUtilizationAnalysis(
       sinks.push(`${stats.shrineCosts} shrine tier(s)`);
     if (stats.outpostCosts > 0)
       sinks.push(`${stats.outpostCosts} outpost tier(s)`);
+    if (stats.raidFortifyCosts > 0)
+      sinks.push(`${stats.raidFortifyCosts} raid fortification(s)`);
     if (stats.trainerCosts > 0)
       sinks.push(`${stats.trainerCosts} trainer teaching(s)`);
     if (stats.infusable) sinks.push('infusable');

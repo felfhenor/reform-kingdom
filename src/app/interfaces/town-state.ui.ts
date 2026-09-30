@@ -1,4 +1,8 @@
-import type { TownStockEntry } from '@interfaces/town-state';
+import type { CostItem } from '@interfaces/cost';
+import type {
+  TownRaidBuyoffKind,
+  TownStockEntry,
+} from '@interfaces/town-state';
 
 // Pre-computed display state for one stock row - keeps helper-call derivations out of the component.
 export type TownStockRow = {
@@ -9,4 +13,11 @@ export type TownStockRow = {
   affordable: boolean;
   // Pre-formatted time left before this entry cycles out - undefined when the town has expiration disabled.
   expiresIn?: string;
+};
+
+export type TownRaidBuyoffOption = {
+  kind: TownRaidBuyoffKind;
+  label: string;
+  requirementEntries: CostItem[];
+  canBuyoff: boolean;
 };

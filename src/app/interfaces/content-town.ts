@@ -124,11 +124,23 @@ export type TownDefenseQuestsConfig = {
   commissions: CommissionOfferSlot[];
 };
 
+export type TownDefenseFortifyMaterial = {
+  itemId: ItemId;
+  quantityPerAssaulter: number;
+};
+
+export type TownDefenseBuyoffConfig = {
+  // Tribute gold = this x assaulter count x assaulter level.
+  tributeGoldScalar: number;
+  fortifyMaterials: TownDefenseFortifyMaterial[];
+};
+
 export type TownDefenseConfig = {
   rewards: DroppedReward[];
   guardian: TownDefenseGuardianConfig;
   assaulter: TownDefenseAssaulterConfig;
   quests: TownDefenseQuestsConfig;
+  buyoff: TownDefenseBuyoffConfig;
 };
 
 export type TownContent = IsContentItem &

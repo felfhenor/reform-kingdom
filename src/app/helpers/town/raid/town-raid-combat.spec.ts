@@ -34,7 +34,7 @@ vi.mock('@helpers/state-game', () => {
 });
 
 vi.mock('@helpers/town/raid/town-raid-defense', () => ({
-  raidDefenseGlobalEffectApply: vi.fn(),
+  raidTelegraphClear: vi.fn(),
 }));
 
 vi.mock('@helpers/town/town-guardian', () => ({
@@ -57,7 +57,7 @@ import {
   worldCombatState,
 } from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
-import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
+import { raidTelegraphClear } from '@helpers/town/raid/town-raid-defense';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
   Combat,
@@ -189,7 +189,7 @@ describe('raidEngageCombat', () => {
     // raidEngageCombat runs from a UI click, never a game tick - the sync must happen inside the
     // updateGamestate callback (against the mutation-in-progress state), not after it, or the
     // deferred outside-tick commit leaves it reading stale gamestate.
-    expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
+    expect(raidTelegraphClear).not.toHaveBeenCalled();
 
     const updateFn = updateFnAt(0);
     const state = {
@@ -206,14 +206,7 @@ describe('raidEngageCombat', () => {
     } as unknown as GameState;
     const result = updateFn(state);
 
-    expect(raidDefenseGlobalEffectApply).toHaveBeenCalledWith(state, 1000);
+    expect(raidTelegraphClear).toHaveBeenCalledWith(state, townId, 1000);
     expect(result.world.combat?.raidTownId).toBe(townId);
-    expect(result.world.towns[townId].raidTelegraphedAtTick).toBeUndefined();
-    expect(
-      result.world.towns[townId].raidEngageWindowExpiresAtTick,
-    ).toBeUndefined();
-    expect(
-      result.world.towns[townId].raidTelegraphedAssaulterIds,
-    ).toBeUndefined();
   });
 });

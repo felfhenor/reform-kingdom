@@ -83,6 +83,7 @@ const town: TownContent = {
     },
     assaulter: { numMonsters: 15, monsterIds: [], level: { min: 20, max: 25 } },
     quests: { commissions: [] },
+    buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
   },
 };
 

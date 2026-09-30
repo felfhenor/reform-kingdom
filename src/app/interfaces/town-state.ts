@@ -135,6 +135,8 @@ export type RaidDefenseRowViewModel = {
   travelEtaSeconds?: number;
 };
 
+export type TownRaidBuyoffKind = 'Tribute' | 'Fortify';
+
 // One lost material row for the raid-loss adventure-log message - full content (not just name).
 export type TownRaidLostMaterial = {
   item: ItemContent;

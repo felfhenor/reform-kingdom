@@ -90,6 +90,7 @@ export type MaterialUtilizationStats = {
   nodeUpgradeCosts: number;
   shrineCosts: number;
   outpostCosts: number;
+  raidFortifyCosts: number;
   trainerCosts: number;
 };
 

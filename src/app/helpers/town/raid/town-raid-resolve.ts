@@ -27,7 +27,7 @@ import {
   updateGamestate,
   worldCurrentLocationState,
 } from '@helpers/state-game';
-import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
+import { raidTelegraphClear } from '@helpers/town/raid/town-raid-defense';
 import {
   townReputationGain,
   townReputationLose,
@@ -226,10 +226,7 @@ export function raidResolveDefeat(townId: TownId): void {
     const target = state.world.towns[townId];
     target.lastRaidResolvedAtTick = now;
     target.craftSpeedDebuffExpiresAtTick = now + RAID_LOSS_CRAFT_DEBUFF_TICKS;
-    target.raidTelegraphedAtTick = undefined;
-    target.raidEngageWindowExpiresAtTick = undefined;
-    target.raidTelegraphedAssaulterIds = undefined;
-    raidDefenseGlobalEffectApply(state, now);
+    raidTelegraphClear(state, townId, now);
     return state;
   });
 

@@ -284,6 +284,22 @@
         min: 25
         max: 32
 
+    buyoff:
+      tributeGoldScalar: 90
+
+      fortifyMaterials:
+        - itemId: Elven Corewood
+          quantityPerAssaulter: 4
+
+        - itemId: Elfsilk
+          quantityPerAssaulter: 2
+
+        - itemId: Crimson Ingot
+          quantityPerAssaulter: 3
+
+        - itemId: Gold Ingot
+          quantityPerAssaulter: 1
+
     quests:
       commissions:
         - commissionOfferId: Commission - Elfheim Coffers

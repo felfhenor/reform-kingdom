@@ -72,6 +72,7 @@ function buildTown(overrides: Partial<TownContent> = {}): TownContent {
       },
       assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
       quests: { commissions: [] },
+      buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
     },
     ...overrides,
   };
@@ -122,6 +123,7 @@ describe('townGuardiansForCurrentReputation', () => {
           level: { min: 1, max: 1 },
         },
         quests: { commissions: [] },
+        buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
       },
     });
 

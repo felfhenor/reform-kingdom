@@ -14,7 +14,9 @@ import type {
   TownContent,
   TownCraftingConfig,
   TownDefenseAssaulterConfig,
+  TownDefenseBuyoffConfig,
   TownDefenseConfig,
+  TownDefenseFortifyMaterial,
   TownDefenseGuardianConfig,
   TownDefenseGuardianEntry,
   TownDefenseGuardianReputationTier,
@@ -196,6 +198,27 @@ function ensureTownDefenseQuests(
   };
 }
 
+function ensureTownDefenseFortifyMaterial(
+  material: Partial<TownDefenseFortifyMaterial> = {},
+): TownDefenseFortifyMaterial {
+  return {
+    itemId: material.itemId ?? ('UNKNOWN' as ItemId),
+    quantityPerAssaulter: material.quantityPerAssaulter ?? 1,
+  };
+}
+
+function ensureTownDefenseBuyoff(
+  buyoff: Partial<TownDefenseBuyoffConfig> = {},
+): TownDefenseBuyoffConfig {
+  return {
+    tributeGoldScalar: buyoff.tributeGoldScalar ?? 0,
+    fortifyMaterials: ensureArray(
+      buyoff.fortifyMaterials,
+      ensureTownDefenseFortifyMaterial,
+    ),
+  };
+}
+
 function ensureTownDefense(
   defense: Partial<TownDefenseConfig> = {},
 ): TownDefenseConfig {
@@ -204,6 +227,7 @@ function ensureTownDefense(
     guardian: ensureTownDefenseGuardian(defense.guardian),
     assaulter: ensureTownDefenseAssaulter(defense.assaulter),
     quests: ensureTownDefenseQuests(defense.quests),
+    buyoff: ensureTownDefenseBuyoff(defense.buyoff),
   };
 }
 

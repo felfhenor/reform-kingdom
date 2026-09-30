@@ -3,14 +3,20 @@ import {
   Component,
   computed,
   input,
+  signal,
 } from '@angular/core';
-import { RowRaidCombatantsComponent } from '@components/row-raid-combatants/row-raid-combatants.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
+import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
+import { RowRaidCombatantsComponent } from '@components/row-raid-combatants/row-raid-combatants.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { notifyError } from '@helpers/engine/notify';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { setGamePlayView } from '@helpers/engine/ui';
+import {
+  raidBuyoff,
+  raidBuyoffOptions,
+} from '@helpers/town/raid/town-raid-buyoff.ui';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import {
   raidAssaulterPreview,
@@ -18,7 +24,12 @@ import {
   townRaidTelegraph,
 } from '@helpers/town/raid/town-raid-state';
 import { townCraftDebuffExpiresAtTick } from '@helpers/town/raid/town-raid-state.ui';
-import type { TownContent, TownRaidCombatantRow } from '@interfaces';
+import type {
+  TownContent,
+  TownRaidBuyoffKind,
+  TownRaidBuyoffOption,
+  TownRaidCombatantRow,
+} from '@interfaces';
 
 @Component({
   selector: 'app-panel-town-raid',
@@ -28,6 +39,7 @@ import type { TownContent, TownRaidCombatantRow } from '@interfaces';
     BlankSlateComponent,
     SlotCompletionRewardComponent,
     SFXDirective,
+    RowCurrencyCostComponent,
   ],
   host: { class: 'card shadow-sm' },
   templateUrl: './panel-town-raid.component.html',
@@ -62,6 +74,25 @@ export class PanelTownRaidComponent {
   public raidDefenders = computed<TownRaidCombatantRow[]>(() =>
     raidDefenderPreview(this.town()),
   );
+
+  public buyoffOptions = computed<TownRaidBuyoffOption[]>(() =>
+    raidBuyoffOptions(this.town()),
+  );
+
+  public isBuyoffPending = signal(false);
+
+  public async buyoff(kind: TownRaidBuyoffKind): Promise<void> {
+    const town = this.town();
+
+    this.isBuyoffPending.set(true);
+    try {
+      if (!(await raidBuyoff(town.id, kind))) {
+        notifyError(`Could not mitigate the raid on ${town.name}.`);
+      }
+    } finally {
+      this.isBuyoffPending.set(false);
+    }
+  }
 
   public engageRaid(): void {
     const town = this.town();

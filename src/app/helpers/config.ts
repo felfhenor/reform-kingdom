@@ -252,6 +252,8 @@ export const CRAFT_TICK_INTERVAL = 1;
 export const RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER = 2;
 export const RAID_WIN_REPUTATION_AMOUNT = 100;
 export const RAID_LOSS_REPUTATION_AMOUNT = 50;
+// Paying off a raid (tribute/fortify) is a lesser win than actually fighting it.
+export const RAID_BUYOFF_REPUTATION_AMOUNT = 25;
 export const RAID_LOSS_CRAFT_DEBUFF_TICKS = 3600;
 
 // Raiders take 1 to (this % of the town's stock cap, not its current stock count) random stock entries.

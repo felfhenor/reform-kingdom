@@ -111,6 +111,21 @@ describe('townRaidTelegraph', () => {
     expect(townRaidTelegraph(townId)?.assaulterMonsterIds).toEqual([]);
   });
 
+  it('treats a raid telegraphed on tick 0 as pending', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        towns: {
+          [townId]: buildTownState({
+            raidTelegraphedAtTick: 0,
+            raidEngageWindowExpiresAtTick: 300,
+          }),
+        },
+      },
+    } as unknown as GameState);
+
+    expect(townRaidTelegraph(townId)?.telegraphedAtTick).toBe(0);
+  });
+
   it('is undefined when no raid is telegraphed', () => {
     vi.mocked(gamestate).mockReturnValue({
       world: { towns: { [townId]: buildTownState() } },

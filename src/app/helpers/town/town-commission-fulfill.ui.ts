@@ -9,19 +9,14 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { canPartyTravel, travelEtaSecondsTo } from '@helpers/hero/travel';
-import {
-  updateGamestate,
-  worldCurrentLocationState,
-} from '@helpers/state-game';
-import { townReputationGain } from '@helpers/town/reputation/town-reputation';
-import { townReputationBuffRefresh } from '@helpers/town/reputation/town-reputation-buff';
+import { updateGamestate } from '@helpers/state-game';
+import { townReputationGainAndRefresh } from '@helpers/town/reputation/town-reputation-grant';
 import {
   commissionSlots,
   townCommissionCanFulfill,
   townCommissionReputationReward,
   townCommissionRequirementEntries,
 } from '@helpers/town/town-commission-fulfill';
-import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import { depositCommissionRequirementsToTown } from '@helpers/town/town-materials';
 import { isPartyAtTown } from '@helpers/town/town-visit';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
@@ -126,15 +121,7 @@ export async function townCommissionFulfill(
   });
 
   if (fulfilled) {
-    const tierChanged = await townReputationGain(
-      townId,
-      reputationAmount,
-      'Commission',
-    );
-    if (tierChanged) {
-      await townReputationBuffRefresh(worldCurrentLocationState().mapName);
-      await townCommissionRefreshTierScaledSlots(townId);
-    }
+    await townReputationGainAndRefresh(townId, reputationAmount, 'Commission');
     if (offerName) {
       analyticsSendDesignEvent(
         `Town:Commission:Fulfill:${analyticsSafeSegment(offerName)}`,

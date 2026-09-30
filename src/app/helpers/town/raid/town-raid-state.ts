@@ -19,7 +19,10 @@ export function townRaidTelegraph(
   townId: TownId,
 ): TownRaidTelegraph | undefined {
   const state = worldTownsState()[townId];
-  if (!state?.raidTelegraphedAtTick || !state.raidEngageWindowExpiresAtTick) {
+  if (
+    state?.raidTelegraphedAtTick === undefined ||
+    state.raidEngageWindowExpiresAtTick === undefined
+  ) {
     return undefined;
   }
 

@@ -104,6 +104,7 @@ function buildTown(): TownContent {
         level: { min: 20, max: 25 },
       },
       quests: { commissions: [] },
+      buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
     },
   });
 }

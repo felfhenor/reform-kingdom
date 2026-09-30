@@ -60,3 +60,18 @@ export function raidDefenseGlobalEffectApply(
     raidDefenseGlobalEffect(content, townNames, currentTick),
   );
 }
+
+// Every way a raid ends (engage, loss, buy-off) drops the telegraph the same way.
+export function raidTelegraphClear(
+  state: GameState,
+  townId: TownId,
+  currentTick: number,
+): void {
+  const target = state.world.towns[townId];
+  if (target) {
+    target.raidTelegraphedAtTick = undefined;
+    target.raidEngageWindowExpiresAtTick = undefined;
+    target.raidTelegraphedAssaulterIds = undefined;
+  }
+  raidDefenseGlobalEffectApply(state, currentTick);
+}
