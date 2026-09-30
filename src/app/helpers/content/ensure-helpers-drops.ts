@@ -59,8 +59,8 @@ export function ensureDroppedReward(
   return {
     kind: 'Item',
     itemId: reward.itemId ?? ('UNKNOWN' as ItemId),
-    min: reward.min ?? 0,
-    max: reward.max ?? 0,
+    min: reward.min ?? 1,
+    max: reward.max ?? 1,
     bonusPerLevel: reward.bonusPerLevel,
     chance: reward.chance ?? 0,
     minLevel: reward.minLevel ?? 0,
