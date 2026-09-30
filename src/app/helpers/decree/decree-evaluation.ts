@@ -19,7 +19,7 @@ import { getMaterialQuantity } from '@helpers/item/materials';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
 import {
   isWorldNodeVisible,
   worldNodeByName,
@@ -115,8 +115,7 @@ export function nearestUnfinishedExploreNode(
   const candidates = worldNodesOfType('ExploreNode')
     .filter(isWorldNodeVisible)
     .filter((entry) => {
-      const { obtained, total } = worldNodeCompletionRewardProgress(entry);
-      if (obtained >= total) return false;
+      if (worldNodeObtainableMissingRewards(entry).length === 0) return false;
 
       return riskLevelSatisfies(riskLevelOfExploreNode(entry), riskTolerance);
     });

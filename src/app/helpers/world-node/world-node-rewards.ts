@@ -6,7 +6,7 @@ import {
   recipeStylizedName,
 } from '@helpers/crafting/recipes';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { assertNeverReward } from '@helpers/item/loot';
+import { assertNeverReward, isRecipeUsable } from '@helpers/item/loot';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { isWorkerRescued } from '@helpers/worker/worker-discovery';
@@ -148,4 +148,13 @@ export function worldNodeCompletionRewardProgress(
     obtained: rewards.filter(isRewardDiscovered).length,
     total: rewards.length,
   };
+}
+
+// Excludes rewards that can't roll yet (e.g. recipes above the tradeskill level), so a node isn't chased for nothing.
+export function worldNodeObtainableMissingRewards(
+  entry: WorldNodeEntry,
+): DroppedReward[] {
+  return worldNodeCompletionRewards(entry).filter(
+    (reward) => !isRewardDiscovered(reward) && isRecipeUsable(reward),
+  );
 }

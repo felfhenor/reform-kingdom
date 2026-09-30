@@ -54,7 +54,7 @@ vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
 }));
 
 vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
+  worldNodeObtainableMissingRewards: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
@@ -70,6 +70,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
 import { LEVEL_UP_NODE_FAILURE_LIMIT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   decreeNodeFailureCount,
   decreeWaitForFullHealthBeforeCombat,
@@ -98,7 +99,7 @@ import {
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
 import {
   isWorldNodeVisible,
   worldNodeAt,
@@ -108,6 +109,7 @@ import {
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
+  CollectibleId,
   DecreeClause,
   DecreeClauseId,
   EncounterContent,
@@ -117,6 +119,11 @@ import type {
   TownId,
   WorldNodeEntry,
 } from '@interfaces';
+
+const MISSING_REWARD = ensureDroppedReward({
+  collectibleId: 'lotus' as CollectibleId,
+  chance: 1,
+});
 
 function buildNode(nodeName: string): WorldNodeEntry {
   return {
@@ -231,10 +238,9 @@ describe('nearestUnfinishedExploreNode', () => {
     const near = buildNode('Near');
     const far = buildNode('Far');
     vi.mocked(worldNodesOfType).mockReturnValue([far, near]);
-    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-      obtained: 0,
-      total: 1,
-    });
+    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+      MISSING_REWARD,
+    ]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 1, max: 1 },
     } as EncounterContent);
@@ -248,10 +254,7 @@ describe('nearestUnfinishedExploreNode', () => {
   it('ignores fully-looted nodes', () => {
     const node = buildNode('Done');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-      obtained: 2,
-      total: 2,
-    });
+    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([]);
     vi.mocked(travelPathTo).mockReturnValue([]);
 
     expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
@@ -260,10 +263,9 @@ describe('nearestUnfinishedExploreNode', () => {
   it('excludes candidates outside the given risk tolerance', () => {
     const node = buildNode('TooRisky');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-      obtained: 0,
-      total: 1,
-    });
+    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+      MISSING_REWARD,
+    ]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 30, max: 30 },
     } as EncounterContent);
@@ -275,10 +277,9 @@ describe('nearestUnfinishedExploreNode', () => {
   it('excludes a hidden node that has not been discovered', () => {
     const node = buildNode('Hidden');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-      obtained: 0,
-      total: 1,
-    });
+    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+      MISSING_REWARD,
+    ]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 1, max: 1 },
     } as EncounterContent);
@@ -297,10 +298,9 @@ function mockWalledInTower(gatewayMaxLevel: number): {
   const tower = buildNode('Spider Tower');
   const gateway = buildNode('Slimed Waystation');
   vi.mocked(worldNodesOfType).mockReturnValue([tower]);
-  vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-    obtained: 0,
-    total: 1,
-  });
+  vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+    MISSING_REWARD,
+  ]);
   vi.mocked(worldNodeEncounter).mockImplementation((entry) => {
     const max = entry === gateway ? gatewayMaxLevel : 10;
     return { levelRange: { min: max, max } } as EncounterContent;
@@ -781,10 +781,9 @@ describe('isClauseSatisfiable', () => {
   it('FinishUnfinishedAreas is blocked while waiting for full health', () => {
     const node = buildNode('Anywhere');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-      obtained: 0,
-      total: 1,
-    });
+    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+      MISSING_REWARD,
+    ]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 1, max: 1 },
     } as EncounterContent);
@@ -840,10 +839,9 @@ describe('isClauseSatisfiable', () => {
   it('a healthy party is unaffected by the wait-for-health setting', () => {
     const node = buildNode('Anywhere');
     vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-      obtained: 0,
-      total: 1,
-    });
+    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+      MISSING_REWARD,
+    ]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 1, max: 1 },
     } as EncounterContent);
@@ -866,10 +864,9 @@ describe('pickTopPriorityClause', () => {
       buildClause({ id: 'b' as DecreeClauseId, type: 'FinishUnfinishedAreas' }),
     ];
     vi.mocked(worldNodesOfType).mockReturnValue([buildNode('Somewhere')]);
-    vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-      obtained: 0,
-      total: 1,
-    });
+    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+      MISSING_REWARD,
+    ]);
     vi.mocked(worldNodeEncounter).mockReturnValue({
       levelRange: { min: 1, max: 1 },
     } as EncounterContent);

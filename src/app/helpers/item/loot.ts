@@ -87,7 +87,10 @@ function resolveDrop(
 
 // A recipe the player can never personally craft (town-exclusive), or that's
 // below their current tradeskill level for it, isn't usable yet
-function isRecipeUsable(drop: DroppedReward, state: GameState): boolean {
+export function isRecipeUsable(
+  drop: DroppedReward,
+  state: GameState = gamestate(),
+): boolean {
   if (drop.kind !== 'Recipe') return true;
   if (isRecipeTownUnique(drop.recipeId)) return false;
 

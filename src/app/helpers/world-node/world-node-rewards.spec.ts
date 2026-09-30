@@ -9,16 +9,21 @@ import type {
   RecipeContent,
   RecipeId,
   TiledObject,
+  TradeskillId,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { defaultGameState } from '@helpers/defaults';
+import { setGameState } from '@helpers/state-game';
 import {
   rewardContentInfo,
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
+  worldNodeObtainableMissingRewards,
 } from '@helpers/world-node/world-node-rewards';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
@@ -243,6 +248,67 @@ describe('worldNodeCompletionRewardProgress', () => {
       obtained: 0,
       total: 0,
     });
+  });
+});
+
+describe('worldNodeObtainableMissingRewards', () => {
+  const tradeskillId = 'tailoring-id' as TradeskillId;
+  const recipe = ensureRecipe({
+    id: 'recipe-cloak' as RecipeId,
+    name: 'Equipment: Cloak',
+    tradeskillId,
+    minTradeskillLevel: 5,
+  });
+  const clam = {
+    id: 'swamp-clam' as CollectibleId,
+    name: 'Swamp Clam',
+    __type: 'collectible',
+  };
+
+  function withTailoringLevel(level: number, recipeFound = false): void {
+    const state = defaultGameState();
+    state.tradeskills[tradeskillId] = {
+      level,
+      xp: { current: 0, maximum: 10 },
+      queue: [],
+    };
+    if (recipeFound) state.discoveredRecipes[recipe.id] = { foundAt: 1 };
+    setGameState(state, false);
+  }
+
+  beforeEach(() => {
+    seedContent([
+      recipe,
+      clam,
+      buildEncounter({
+        completionRewards: [
+          ensureDroppedReward({ recipeId: recipe.id, chance: 10 }),
+          ensureDroppedReward({ collectibleId: clam.id, chance: 10 }),
+        ],
+      }),
+    ]);
+  });
+
+  it('skips a recipe the tradeskill is too low to drop', () => {
+    withTailoringLevel(4);
+
+    expect(worldNodeObtainableMissingRewards(buildEntry())).toEqual([
+      ensureDroppedReward({ collectibleId: clam.id, chance: 10 }),
+    ]);
+  });
+
+  it('includes the recipe once the tradeskill level is met', () => {
+    withTailoringLevel(5);
+
+    expect(worldNodeObtainableMissingRewards(buildEntry())).toHaveLength(2);
+  });
+
+  it('skips rewards already discovered', () => {
+    withTailoringLevel(5, true);
+
+    expect(worldNodeObtainableMissingRewards(buildEntry())).toEqual([
+      ensureDroppedReward({ collectibleId: clam.id, chance: 10 }),
+    ]);
   });
 });
 
