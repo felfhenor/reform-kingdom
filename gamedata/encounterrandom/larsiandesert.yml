@@ -44,6 +44,8 @@
       chance: 50
 
     - itemId: Star Fragment
+      min: 1
+      max: 1
       chance: 100
 
     - workerId: Selan Rose

@@ -46,4 +46,6 @@
       chance: 100
 
     - itemId: Spirit Gear
+      min: 1
+      max: 1
       chance: 100
