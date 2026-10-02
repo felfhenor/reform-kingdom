@@ -597,6 +597,43 @@ describe('characterReclass', () => {
       expect(result.armory).not.toContainEqual(armorySpear);
     });
 
+    it('keeps every item when a one-hander plus shield beats a two-hander', () => {
+      const mockShield: EquipmentContent = {
+        ...mockCloak,
+        id: 'equip-shield' as EquipmentId,
+        name: 'Buckler',
+        type: 'Shield',
+        baseStats: { ...defaultStats(), Strength: 2 },
+      };
+      mockGetEntry(
+        mockJob,
+        {
+          ...optimizingWarriorJob,
+          equippableTypes: ['Sword', 'Spear', 'Shield'],
+        } as JobContent,
+        mockSword,
+        mockSpear,
+        mockShield,
+      );
+      const jala = createCharacterStub('Jala');
+      const armorySword = mockEquipmentItem(mockSword.id);
+      const armorySpear = mockEquipmentItem(mockSpear.id);
+      const armoryShield = mockEquipmentItem(mockShield.id);
+
+      characterReclass(jala.id, 'job-warrior' as JobId);
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala] },
+        armory: [armorySpear, armorySword, armoryShield],
+        materials: richMaterials(),
+      } as unknown as GameState);
+
+      expect(result.world.party[0].equipment.Weapon).toEqual(armorySword);
+      expect(result.world.party[0].equipment.Offhand).toEqual(armoryShield);
+      expect(result.armory).toContainEqual(armorySpear);
+    });
+
     it('leaves equipment empty and does not crash when the new job cannot be found', () => {
       mockGetEntry(mockJob, mockSword);
       const jala = createCharacterStub('Jala');

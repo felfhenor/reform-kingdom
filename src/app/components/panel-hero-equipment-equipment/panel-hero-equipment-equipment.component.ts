@@ -130,7 +130,7 @@ export class PanelHeroEquipmentEquipmentComponent {
   }
 
   public optimizeEquipment(): void {
-    optimizeCharacterEquipment(this.character().id);
+    void optimizeCharacterEquipment(this.character().id);
     this.selectedSlot.set(undefined);
   }
 }

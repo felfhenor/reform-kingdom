@@ -700,8 +700,8 @@ function attemptInfusion(): void {
 // call whenever new equipment is acquired - see `runScenario`'s
 // armory-diff check.
 export function reoptimizeAllEquipment(): void {
-  worldPartyState().forEach((character) =>
-    optimizeCharacterEquipment(character.id),
+  worldPartyState().forEach(
+    (character) => void optimizeCharacterEquipment(character.id),
   );
 }
 

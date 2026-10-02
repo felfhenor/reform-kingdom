@@ -6,10 +6,8 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
-import {
-  equippedItems,
-  planEquipmentOptimization,
-} from '@helpers/item/equipment';
+import { equippedItems } from '@helpers/item/equipment';
+import { planEquipmentOptimization } from '@helpers/item/equipment-optimize';
 import { applyMaterialDelta, goldCoinId } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
 import type {

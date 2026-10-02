@@ -8,9 +8,9 @@ import {
   canEquipItem,
   canModifyEquipment,
   equippedItems,
-  planEquipmentOptimization,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
+import { planEquipmentOptimization } from '@helpers/item/equipment-optimize';
 import {
   canInfuseEquipmentItem,
   infusionMaterialCost,
@@ -26,6 +26,7 @@ import {
   EquipmentTypeToSlot,
   type Character,
   type CharacterId,
+  type EquipmentBlock,
   type EquipmentContent,
   type EquipmentItem,
   type EquipmentItemId,
@@ -36,6 +37,62 @@ import {
   type JobContent,
 } from '@interfaces';
 import { taskEventEquipmentInfused } from '@helpers/task/task-events';
+
+import { compact, uniqBy } from 'es-toolkit/compat';
+
+function equipmentClearedSlots(
+  equipment: EquipmentBlock,
+  targetSlots: EquipmentSlot[],
+  displacedItems: EquipmentItem[],
+): Set<EquipmentSlot> {
+  const clearedSlots = new Set<EquipmentSlot>(targetSlots);
+  displacedItems.forEach((displacedItem) => {
+    slotsHoldingEquipment(equipment, displacedItem.equipmentId).forEach(
+      (slot) => clearedSlots.add(slot),
+    );
+  });
+  return clearedSlots;
+}
+
+// Mutates `state`; reads displacement from it too, so chained equips in one callback see each other.
+function stateEquipFromArmory(
+  state: GameState,
+  characterId: CharacterId,
+  armoryItem: EquipmentItem,
+  content: EquipmentContent,
+): void {
+  const character = state.world.party.find((c) => c.id === characterId);
+  if (!character) return;
+
+  const targetSlots = EquipmentTypeToSlot[content.type];
+  // Deduped by instance id so the exact displaced item, infusions included, goes back to the armory once.
+  const displacedItems = uniqBy(
+    compact(targetSlots.map((slot) => character.equipment[slot])).filter(
+      (item) => item.id !== armoryItem.id,
+    ),
+    'id',
+  );
+
+  const equipment = { ...character.equipment };
+  equipmentClearedSlots(equipment, targetSlots, displacedItems).forEach(
+    (slot) => (equipment[slot] = undefined),
+  );
+  targetSlots.forEach((slot) => (equipment[slot] = armoryItem));
+
+  state.armory = [
+    ...state.armory.filter((item) => item.id !== armoryItem.id),
+    ...displacedItems,
+  ];
+  state.world.party = state.world.party.map((c) =>
+    c.id === characterId ? characterRecalculateStats({ ...c, equipment }) : c,
+  );
+}
+
+function sendEquipAnalytics(content: EquipmentContent): void {
+  analyticsSendDesignEvent(
+    `Hero:Equip:Item:${analyticsSafeSegment(content.name)}`,
+  );
+}
 
 // Equips into every slot the item's type declares (e.g. two-handed fills Weapon+Offhand),
 // fully displacing whatever occupied those slots (and any other slots they held) back to the armory as whole items.
@@ -56,75 +113,40 @@ export function characterEquipFromArmory(
     return false;
   }
 
-  const targetSlots = EquipmentTypeToSlot[equipmentContent.type];
-
-  // Keyed by instance id so the exact displaced item, infusions included, goes back to the armory.
-  const displacedItems = new Map<EquipmentItemId, EquipmentItem>();
-  targetSlots.forEach((slot) => {
-    const existing = character.equipment[slot];
-    if (existing && existing.id !== armoryItem.id) {
-      displacedItems.set(existing.id, existing);
-    }
-  });
-
-  const clearedSlots = new Set<EquipmentSlot>(targetSlots);
-  displacedItems.forEach((displacedItem) => {
-    slotsHoldingEquipment(
-      character.equipment,
-      displacedItem.equipmentId,
-    ).forEach((slot) => clearedSlots.add(slot));
-  });
-
   updateGamestate((state) => {
-    const armoryIndex = state.armory.findIndex(
-      (item) => item.id === equipmentItemId,
-    );
-    if (armoryIndex === -1) return state;
-
-    state.armory = [
-      ...state.armory.filter((_, index) => index !== armoryIndex),
-      ...Array.from(displacedItems.values()),
-    ];
-
-    state.world.party = state.world.party.map((c) => {
-      if (c.id !== characterId) return c;
-
-      const equipment = { ...c.equipment };
-      clearedSlots.forEach((slot) => {
-        equipment[slot] = undefined;
-      });
-      targetSlots.forEach((slot) => {
-        equipment[slot] = armoryItem;
-      });
-
-      return characterRecalculateStats({ ...c, equipment });
-    });
-
+    const item = state.armory.find((owned) => owned.id === equipmentItemId);
+    if (item) stateEquipFromArmory(state, characterId, item, equipmentContent);
     return state;
   });
 
-  analyticsSendDesignEvent(
-    `Hero:Equip:Item:${analyticsSafeSegment(equipmentContent.name)}`,
-  );
+  sendEquipAnalytics(equipmentContent);
   return true;
 }
 
-// Backs the manual "Optimize Equipment" button; reclassing runs its own pass instead, to stay atomic with the job swap.
-export function optimizeCharacterEquipment(characterId: CharacterId): void {
-  const character = worldPartyState().find((c) => c.id === characterId);
-  if (!character) return;
+// Plans inside the callback so every winner is applied against the same up-to-date draft.
+export async function optimizeCharacterEquipment(
+  characterId: CharacterId,
+): Promise<void> {
+  if (!canModifyEquipment()) return;
 
-  const job = getEntry<JobContent>(character.jobId);
-  if (!job) return;
+  const equipped: EquipmentContent[] = [];
+  await updateGamestate((state) => {
+    const character = state.world.party.find((c) => c.id === characterId);
+    const job = character ? getEntry<JobContent>(character.jobId) : undefined;
+    if (!character || !job) return state;
 
-  const winners = planEquipmentOptimization(
-    character,
-    armoryGet(),
-    job.statPriority,
-  );
-  winners.forEach((winner) =>
-    characterEquipFromArmory(characterId, winner.item.id),
-  );
+    planEquipmentOptimization(
+      character,
+      state.armory,
+      job.statPriority,
+    ).forEach(({ item, content }) => {
+      stateEquipFromArmory(state, characterId, item, content);
+      equipped.push(content);
+    });
+    return state;
+  });
+
+  equipped.forEach(sendEquipAnalytics);
 }
 
 // A two-hander fills several slots with the same instance.

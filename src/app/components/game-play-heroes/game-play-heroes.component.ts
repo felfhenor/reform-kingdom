@@ -55,7 +55,7 @@ export class GamePlayHeroesComponent {
 
   optimizeAll() {
     worldPartyState().forEach((p) => {
-      optimizeCharacterEquipment(p.id);
+      void optimizeCharacterEquipment(p.id);
     });
   }
 }

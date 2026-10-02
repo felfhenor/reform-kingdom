@@ -13,14 +13,12 @@ import {
   RESISTANCE_BONUS,
   STAT_BONUS,
 } from '@helpers/item/equipment-bonus';
-import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
 import { rngUuid } from '@helpers/rng';
 import { worldCombatState } from '@helpers/state-game';
 import { characterTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   AffixEffect,
   AffixId,
-  BaseStat,
   Character,
   CombatStatBlock,
   EquipmentArmoryEntry,
@@ -36,14 +34,13 @@ import type {
   GatherYieldBonus,
   JobContent,
   JobId,
-  JobStatPriority,
   MonsterType,
   StatBlock,
   StatusEffectBlock,
 } from '@interfaces';
-import { EquipmentTypeToSlot, StatOrder } from '@interfaces';
+import { EquipmentTypeToSlot } from '@interfaces';
 
-import { orderBy, sumBy, uniq } from 'es-toolkit/compat';
+import { orderBy, uniq } from 'es-toolkit/compat';
 
 // Gear can be swapped freely while gathering, but not mid-fight.
 export function canModifyEquipment(): boolean {
@@ -309,115 +306,4 @@ export function backfillEquipmentBlock(
   });
 
   return backfilled;
-}
-
-// Two-handed-capable slots go first so they claim their secondary slot (e.g. Offhand) before anything else is chosen for it.
-const SLOT_OPTIMIZATION_ORDER: EquipmentSlot[] = [
-  'Weapon',
-  'Offhand',
-  'Armor',
-  'Helmet',
-  'Ring',
-  'Accessory',
-  'Artifact',
-  'Ammo',
-];
-
-// A candidate's value for one stat, including its infusion bonus - used to
-// rank candidates against a job's statPriority.
-function candidateStatValue(
-  entry: EquipmentArmoryEntry,
-  stat: BaseStat,
-): number {
-  return (
-    entry.content.baseStats[stat] +
-    equipmentItemInfusionBonus(entry.item.infusedItemIds)[stat] +
-    sumBy(
-      affixEffectsOfKind(equipmentItemAffixEffects(entry.item), 'Stat'),
-      (effect) => (effect.stat === stat ? effect.value : 0),
-    )
-  );
-}
-
-// Ranks by statPriority with the multipliers as well as all the non-priority stats (at a rate of x1).
-function bestBySlotPriority(
-  entries: EquipmentArmoryEntry[],
-  statPriority: JobStatPriority[],
-): EquipmentArmoryEntry | undefined {
-  if (entries.length === 0) return undefined;
-
-  const nonPriorityStats = StatOrder.filter(
-    (prio) => !statPriority.some((sp) => sp.stat === prio),
-  );
-
-  return orderBy(
-    entries,
-    (item) => {
-      const priorityTotal = sumBy(
-        statPriority,
-        (prio) => candidateStatValue(item, prio.stat) * prio.multiplier,
-      );
-      const nonPriorityTotal = sumBy(nonPriorityStats, (stat) =>
-        candidateStatValue(item, stat),
-      );
-
-      return priorityTotal + nonPriorityTotal;
-    },
-    'desc',
-  )[0];
-}
-
-function currentEquipmentEntry(
-  equipment: EquipmentBlock,
-  slot: EquipmentSlot,
-): EquipmentArmoryEntry | undefined {
-  const item = equipment[slot];
-  const content = item
-    ? getEntry<EquipmentContent>(item.equipmentId)
-    : undefined;
-  return item && content ? { item, content } : undefined;
-}
-
-// Only returns slots that should change - a slot is omitted when nothing in the armory beats what's already equipped there.
-export function planEquipmentOptimization(
-  character: Character,
-  armory: EquipmentItem[],
-  statPriority: JobStatPriority[],
-): EquipmentArmoryEntry[] {
-  const claimedSlots = new Set<EquipmentSlot>();
-  const usedItemIds = new Set<EquipmentItemId>();
-  const winners: EquipmentArmoryEntry[] = [];
-
-  SLOT_OPTIMIZATION_ORDER.forEach((slot) => {
-    if (
-      claimedSlots.has(slot) ||
-      !isSlotAvailableForJob(slot, character.jobId)
-    ) {
-      return;
-    }
-
-    const current = currentEquipmentEntry(character.equipment, slot);
-    const candidates = equipmentEntriesForSlot(armory, slot).filter(
-      (entry) =>
-        !usedItemIds.has(entry.item.id) &&
-        canEquipItem(character, entry.content),
-    );
-    // current goes first so a stat-for-stat tie keeps it equipped (stable sort favors earlier entries).
-    const winner = bestBySlotPriority(
-      current ? [current, ...candidates] : candidates,
-      statPriority,
-    );
-    if (!winner) return;
-
-    EquipmentTypeToSlot[winner.content.type].forEach((s) =>
-      claimedSlots.add(s),
-    );
-
-    if (winner.item.id !== current?.item.id) {
-      winners.push(winner);
-      usedItemIds.add(winner.item.id);
-    }
-  });
-
-  return winners;
 }

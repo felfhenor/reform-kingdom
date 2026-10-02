@@ -464,20 +464,21 @@ describe('Character Equipment Helper Functions', () => {
       statPriority: [{ stat: 'Strength', multiplier: 1 }],
     };
 
+    function runOptimize(
+      characterId: CharacterId,
+      state: GameState,
+    ): GameState {
+      void optimizeCharacterEquipment(characterId);
+      expect(updateGamestate).toHaveBeenCalledTimes(1);
+      return vi.mocked(updateGamestate).mock.calls[0][0](state);
+    }
+
     it('equips the best available armory item for each eligible slot', () => {
       mockGetEntry(optimizingJob, mockSword);
       const jala = createCharacterStub('Jala');
       const armorySword = mockEquipmentItem(mockSword.id);
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [jala] },
-        armory: [armorySword],
-      } as unknown as GameState);
 
-      optimizeCharacterEquipment(jala.id);
-
-      expect(updateGamestate).toHaveBeenCalledTimes(1);
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const state = updateFn({
+      const state = runOptimize(jala.id, {
         world: { party: [jala] },
         armory: [armorySword],
       } as unknown as GameState);
@@ -486,40 +487,73 @@ describe('Character Equipment Helper Functions', () => {
       expect(state.armory).toEqual([]);
     });
 
-    it('does nothing when nothing in the armory beats what is already equipped', () => {
+    it('swaps a two-hander for a one-hander plus offhand without losing or duplicating either', () => {
+      const mockStaff: EquipmentContent = {
+        ...mockSword,
+        id: 'equip-staff' as EquipmentId,
+        type: 'Spear',
+        baseStats: { ...defaultStats(), Strength: 8 },
+      };
+      const mockShield: EquipmentContent = {
+        ...mockSword,
+        id: 'equip-shield' as EquipmentId,
+        type: 'Shield',
+        baseStats: { ...defaultStats(), Strength: 4 },
+      };
+      mockGetEntry(
+        {
+          ...optimizingJob,
+          equippableTypes: ['Sword', 'Spear', 'Shield'],
+        } as JobContent,
+        mockSword,
+        mockStaff,
+        mockShield,
+      );
+      const staff = mockEquipmentItem(mockStaff.id);
+      const sword = mockEquipmentItem(mockSword.id);
+      const shield = mockEquipmentItem(mockShield.id);
+      const jala = createCharacterStub('Jala');
+      jala.equipment = { ...jala.equipment, Weapon: staff, Offhand: staff };
+
+      const state = runOptimize(jala.id, {
+        world: { party: [jala] },
+        armory: [sword, shield],
+      } as unknown as GameState);
+
+      expect(state.world.party[0].equipment.Weapon).toEqual(sword);
+      expect(state.world.party[0].equipment.Offhand).toEqual(shield);
+      expect(state.armory).toEqual([staff]);
+    });
+
+    it('leaves state untouched when nothing in the armory beats what is already equipped', () => {
       mockGetEntry(optimizingJob);
       const jala = createCharacterStub('Jala');
-      vi.mocked(gamestate).mockReturnValue({
+
+      const state = runOptimize(jala.id, {
         world: { party: [jala] },
         armory: [],
       } as unknown as GameState);
 
-      optimizeCharacterEquipment(jala.id);
-
-      expect(updateGamestate).not.toHaveBeenCalled();
+      expect(state.world.party[0]).toBe(jala);
     });
 
-    it('does nothing when the character cannot be found', () => {
-      mockGetEntry(optimizingJob);
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [] },
-        armory: [],
-      } as unknown as GameState);
-
-      optimizeCharacterEquipment('missing-character' as CharacterId);
-
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('does nothing when the job cannot be found', () => {
-      mockGetEntry();
+    it('leaves state untouched when the job cannot be found', () => {
+      mockGetEntry(mockSword);
       const jala = createCharacterStub('Jala');
-      vi.mocked(gamestate).mockReturnValue({
+      const armorySword = mockEquipmentItem(mockSword.id);
+
+      const state = runOptimize(jala.id, {
         world: { party: [jala] },
-        armory: [],
+        armory: [armorySword],
       } as unknown as GameState);
 
-      optimizeCharacterEquipment(jala.id);
+      expect(state.armory).toEqual([armorySword]);
+    });
+
+    it('does nothing mid-combat', () => {
+      vi.mocked(worldCombatState).mockReturnValue({} as never);
+
+      void optimizeCharacterEquipment('char' as CharacterId);
 
       expect(updateGamestate).not.toHaveBeenCalled();
     });
