@@ -8,14 +8,37 @@ vi.mock('@helpers/state-game', () => {
   };
 });
 
+vi.mock('@helpers/world-node/world-nodes', () => ({
+  isWorldNodeVisible: vi.fn(() => true),
+  worldNodesOfType: vi.fn(() => []),
+}));
+
 import { gamestate } from '@helpers/state-game';
 import {
   isOutpostBuilt,
+  isOutpostTeleportListed,
   isOutpostTeleportUnlocked,
   outpostDeathPenaltyMultiplier,
+  outpostsWithTeleportUnlocked,
   worldNodeOutpostLevel,
 } from '@helpers/world-node/world-node-outpost';
-import type { GameState } from '@interfaces';
+import {
+  isWorldNodeVisible,
+  worldNodesOfType,
+} from '@helpers/world-node/world-nodes';
+import type { GameState, WorldNodeEntry } from '@interfaces';
+
+function outpostEntry(nodeName: string): WorldNodeEntry {
+  return { nodeName, mapName: nodeName, x: 0, y: 0 } as WorldNodeEntry;
+}
+
+function mockOutpostLevels(levels: Record<string, number>): void {
+  vi.mocked(gamestate).mockReturnValue({
+    outposts: Object.fromEntries(
+      Object.entries(levels).map(([nodeName, level]) => [nodeName, { level }]),
+    ),
+  } as unknown as GameState);
+}
 
 function mockOutpostLevel(level: number | undefined): void {
   vi.mocked(gamestate).mockReturnValue({
@@ -25,6 +48,7 @@ function mockOutpostLevel(level: number | undefined): void {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(isWorldNodeVisible).mockReturnValue(true);
 });
 
 describe('worldNodeOutpostLevel', () => {
@@ -100,5 +124,45 @@ describe('isOutpostTeleportUnlocked', () => {
     mockOutpostLevel(level);
 
     expect(isOutpostTeleportUnlocked('Carrina Outpost')).toBe(unlocked);
+  });
+});
+
+describe('isOutpostTeleportListed', () => {
+  it('lists a visible, built outpost', () => {
+    mockOutpostLevel(1);
+
+    expect(isOutpostTeleportListed(outpostEntry('Carrina Outpost'))).toBe(true);
+  });
+
+  it('hides an unbuilt outpost', () => {
+    mockOutpostLevel(0);
+
+    expect(isOutpostTeleportListed(outpostEntry('Carrina Outpost'))).toBe(
+      false,
+    );
+  });
+
+  it('hides an outpost that is not visible', () => {
+    mockOutpostLevel(1);
+    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
+
+    expect(isOutpostTeleportListed(outpostEntry('Carrina Outpost'))).toBe(
+      false,
+    );
+  });
+});
+
+describe('outpostsWithTeleportUnlocked', () => {
+  it('keeps only visible outposts at +5', () => {
+    vi.mocked(worldNodesOfType).mockReturnValue([
+      outpostEntry('Carrina Outpost'),
+      outpostEntry('Larsian Outpost'),
+      outpostEntry('Mire Outpost'),
+    ]);
+    mockOutpostLevels({ 'Carrina Outpost': 5, 'Larsian Outpost': 4 });
+
+    expect(
+      outpostsWithTeleportUnlocked().map((entry) => entry.nodeName),
+    ).toEqual(['Carrina Outpost']);
   });
 });

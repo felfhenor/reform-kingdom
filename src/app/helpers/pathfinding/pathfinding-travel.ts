@@ -9,71 +9,85 @@ import {
   unlockedTeleportNodes,
 } from '@helpers/pathfinding/pathfinding';
 import { worldCurrentLocationState } from '@helpers/state-game';
+import { outpostsWithTeleportUnlocked } from '@helpers/world-node/world-node-outpost';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
-import type { CurrentLocation, TravelStep, WorldNodeEntry } from '@interfaces';
+import type {
+  CurrentLocation,
+  TravelRouteEdge,
+  TravelStep,
+  WorldNodeEntry,
+} from '@interfaces';
 import { minBy } from 'es-toolkit/compat';
 
-// Dijkstra node id: '' is the origin, or a TeleportNode's own nodeName (globally unique) - landing
-// on that tile is exactly what a teleport hop does, so it doubles as a waypoint key.
+// Dijkstra node id: '' is the origin, or a gateway arrival's own nodeName (globally unique) - landing
+// on that tile is exactly what a hop does, so it doubles as a waypoint key.
 const ROUTE_START_KEY = '';
+
+// One edge per gateway, so the walk to it is pathed once however many arrivals it fans out to.
+function teleportNodeEdges(ignoreCollectibleGate: boolean): TravelRouteEdge[] {
+  return unlockedTeleportNodes(ignoreCollectibleGate).flatMap(
+    (gateway): TravelRouteEdge[] => {
+      const toTag = teleportNodeProperty(gateway, 'toTag');
+      const arrival = toTag
+        ? findTeleportArrivalByTag(toTag, ignoreCollectibleGate)
+        : undefined;
+      return arrival ? [{ gateway, arrivals: [arrival] }] : [];
+    },
+  );
+}
+
+function outpostEdges(outposts: WorldNodeEntry[]): TravelRouteEdge[] {
+  return outposts.map((gateway) => ({
+    gateway,
+    arrivals: outposts.filter(
+      (arrival) => arrival.nodeName !== gateway.nodeName,
+    ),
+  }));
+}
 
 function routeWaypoints(
   location: CurrentLocation,
-  teleportNodes: WorldNodeEntry[],
+  edges: TravelRouteEdge[],
 ): Map<string, CurrentLocation> {
   const waypoints = new Map<string, CurrentLocation>([
     [ROUTE_START_KEY, location],
   ]);
-  teleportNodes.forEach((node) => waypoints.set(node.nodeName, node));
+  edges.forEach(({ arrivals }) =>
+    arrivals.forEach((arrival) => waypoints.set(arrival.nodeName, arrival)),
+  );
   return waypoints;
 }
 
-// Cost uses base tick cost (not the A* search weight, and not buff-boosted, so routes stay cache-stable).
-function teleportHop(
+// Cost uses base tick cost (not the A* search weight, and not buff-boosted, so routes stay cache-stable); the jump itself is free.
+function routeWalkToGateway(
   from: CurrentLocation,
-  teleport: WorldNodeEntry,
-  ignoreCollectibleGate: boolean,
+  gateway: WorldNodeEntry,
   passThroughNodes: boolean,
-): { arrivalKey: string; steps: TravelStep[]; cost: number } | undefined {
-  const toTag = teleportNodeProperty(teleport, 'toTag');
-  const arrival = toTag
-    ? findTeleportArrivalByTag(toTag, ignoreCollectibleGate)
+): { steps: TravelStep[]; cost: number } | undefined {
+  const steps = findInMapPath(from.mapName, from, gateway, passThroughNodes);
+  return steps
+    ? { steps, cost: travelPathBaseTotalTicks(steps, from) }
     : undefined;
-  if (!arrival) return undefined;
+}
 
-  const walkSteps = findInMapPath(
-    from.mapName,
-    from,
-    teleport,
-    passThroughNodes,
-  );
-  if (!walkSteps) return undefined;
-
-  const teleportStep: TravelStep = {
+function teleportStepTo(arrival: WorldNodeEntry): TravelStep {
+  return {
     kind: 'Teleport',
     mapName: arrival.mapName,
     x: arrival.x,
     y: arrival.y,
   };
-  const steps = [...walkSteps, teleportStep];
-
-  return {
-    arrivalKey: arrival.nodeName,
-    steps,
-    cost: travelPathBaseTotalTicks(steps, from),
-  };
 }
 
-// Dijkstra over every TeleportNode (plus the origin) so a destination behind multiple hops still
+// Dijkstra over every hop arrival (plus the origin) so a destination behind multiple hops still
 // resolves via the cheapest chain, not just the first one found; linear-scan min-pick is fine since the graph is tiny.
-function travelPathAcrossMaps(
+function travelPathViaHops(
   location: CurrentLocation,
   destination: WorldNodeEntry,
-  ignoreCollectibleGate: boolean,
+  edges: TravelRouteEdge[],
   passThroughNodes: boolean,
 ): TravelStep[] | undefined {
-  const teleportNodes = unlockedTeleportNodes(ignoreCollectibleGate);
-  const waypoints = routeWaypoints(location, teleportNodes);
+  const waypoints = routeWaypoints(location, edges);
 
   const dist = new Map<string, number>([[ROUTE_START_KEY, 0]]);
   const stepsFromStart = new Map<string, TravelStep[]>([[ROUTE_START_KEY, []]]);
@@ -92,24 +106,27 @@ function travelPathAcrossMaps(
     const currentPos = waypoints.get(currentKey)!;
     const currentSteps = stepsFromStart.get(currentKey)!;
 
-    teleportNodes
-      .filter((node) => node.mapName === currentPos.mapName)
-      .forEach((teleport) => {
-        const hop = teleportHop(
-          currentPos,
-          teleport,
-          ignoreCollectibleGate,
-          passThroughNodes,
-        );
-        if (!hop) return;
+    edges
+      .filter(({ gateway }) => gateway.mapName === currentPos.mapName)
+      .forEach(({ gateway, arrivals }) => {
+        const walk = routeWalkToGateway(currentPos, gateway, passThroughNodes);
+        if (!walk) return;
 
-        const candidateDist = currentDist + hop.cost;
-        if (
-          candidateDist < (dist.get(hop.arrivalKey) ?? Number.POSITIVE_INFINITY)
-        ) {
-          dist.set(hop.arrivalKey, candidateDist);
-          stepsFromStart.set(hop.arrivalKey, [...currentSteps, ...hop.steps]);
-        }
+        const candidateDist = currentDist + walk.cost;
+        arrivals.forEach((arrival) => {
+          if (
+            candidateDist >=
+            (dist.get(arrival.nodeName) ?? Number.POSITIVE_INFINITY)
+          ) {
+            return;
+          }
+          dist.set(arrival.nodeName, candidateDist);
+          stepsFromStart.set(arrival.nodeName, [
+            ...currentSteps,
+            ...walk.steps,
+            teleportStepTo(arrival),
+          ]);
+        });
       });
   }
 
@@ -140,10 +157,11 @@ function travelPathAcrossMaps(
   return bestSteps;
 }
 
-// Cleared when maps reload or a collectible is found (can flip a gated TeleportNode - see
-// unlockedTeleportNodes); otherwise (origin, destination) always resolves the same.
+// Cleared when maps reload, a collectible is found (can flip a gated TeleportNode - see
+// unlockedTeleportNodes) or the +5 outpost set changes; otherwise (origin, destination) always resolves the same.
 let cachedMapsRef: ReturnType<typeof allMaps> | undefined;
 let cachedDiscoveredCollectibleCount: number | undefined;
+let cachedOutpostTeleportKey: string | undefined;
 const pathFromCache = new Map<string, TravelStep[] | undefined>();
 
 function pathFromCacheKey(
@@ -152,27 +170,34 @@ function pathFromCacheKey(
   allowTeleport: boolean,
   ignoreCollectibleGate: boolean,
   passThroughNodes: boolean,
+  useOutposts: boolean,
 ): string {
-  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}::${allowTeleport}:${ignoreCollectibleGate}:${passThroughNodes}`;
+  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}::${allowTeleport}:${ignoreCollectibleGate}:${passThroughNodes}:${useOutposts}`;
 }
 
 // Pure by-location variant, so non-party travelers (workers) can path from an arbitrary origin, not just the hero
-// party's current tile. `ignoreCollectibleGate` is for content-only debug/analysis tooling.
+// party's current tile. `ignoreCollectibleGate` is for content-only debug/analysis tooling; NPC town workers pass `useOutposts = false`.
 export function travelPathFrom(
   location: CurrentLocation,
   destinationNodeName: string,
   allowTeleport = true,
   ignoreCollectibleGate = false,
   passThroughNodes = false,
+  useOutposts = true,
 ): TravelStep[] | undefined {
   const currentMaps = allMaps();
   const currentDiscoveredCollectibleCount = discoveredCollectibleCount();
+  const currentOutpostTeleportKey = outpostsWithTeleportUnlocked()
+    .map((entry) => entry.nodeName)
+    .join('|');
   if (
     currentMaps !== cachedMapsRef ||
-    currentDiscoveredCollectibleCount !== cachedDiscoveredCollectibleCount
+    currentDiscoveredCollectibleCount !== cachedDiscoveredCollectibleCount ||
+    currentOutpostTeleportKey !== cachedOutpostTeleportKey
   ) {
     cachedMapsRef = currentMaps;
     cachedDiscoveredCollectibleCount = currentDiscoveredCollectibleCount;
+    cachedOutpostTeleportKey = currentOutpostTeleportKey;
     pathFromCache.clear();
   }
 
@@ -182,6 +207,7 @@ export function travelPathFrom(
     allowTeleport,
     ignoreCollectibleGate,
     passThroughNodes,
+    useOutposts,
   );
   if (pathFromCache.has(key)) return pathFromCache.get(key);
 
@@ -191,6 +217,7 @@ export function travelPathFrom(
     allowTeleport,
     ignoreCollectibleGate,
     passThroughNodes,
+    useOutposts,
   );
   pathFromCache.set(key, path);
   return path;
@@ -202,6 +229,7 @@ function computeTravelPathFrom(
   allowTeleport: boolean,
   ignoreCollectibleGate: boolean,
   passThroughNodes: boolean,
+  useOutposts: boolean,
 ): TravelStep[] | undefined {
   const destination = worldNodeByName(destinationNodeName);
   if (!destination) return undefined;
@@ -219,7 +247,20 @@ function computeTravelPathFrom(
       : undefined;
   }
 
-  if (location.mapName === destination.mapName) {
+  const isSameMap = location.mapName === destination.mapName;
+  if (!allowTeleport) {
+    return isSameMap
+      ? findInMapPath(location.mapName, location, destination, passThroughNodes)
+      : undefined;
+  }
+
+  // Outpost levels are save state, so content-only tooling (ignoreCollectibleGate) never hops through them.
+  const outposts =
+    useOutposts && !ignoreCollectibleGate ? outpostsWithTeleportUnlocked() : [];
+  const outpostHopStartsHere =
+    outposts.length > 1 &&
+    outposts.some((outpost) => outpost.mapName === location.mapName);
+  if (isSameMap && !outpostHopStartsHere) {
     return findInMapPath(
       location.mapName,
       location,
@@ -228,14 +269,11 @@ function computeTravelPathFrom(
     );
   }
 
-  return allowTeleport
-    ? travelPathAcrossMaps(
-        location,
-        destination,
-        ignoreCollectibleGate,
-        passThroughNodes,
-      )
-    : undefined;
+  const edges = [
+    ...teleportNodeEdges(ignoreCollectibleGate),
+    ...outpostEdges(outposts),
+  ];
+  return travelPathViaHops(location, destination, edges, passThroughNodes);
 }
 
 export function travelPathTo(

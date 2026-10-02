@@ -20,18 +20,21 @@ vi.mock('@helpers/item/collectibles', () => ({
   discoveredCollectibleCount: vi.fn(() => 0),
 }));
 
-vi.mock('@helpers/maps', () => ({
+vi.mock('@helpers/maps', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   allMaps: vi.fn(),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   isWorldNodeCollectibleGateMet: vi.fn(() => true),
+  isWorldNodeVisible: vi.fn(() => true),
   worldNodeAt: vi.fn(() => undefined),
   worldNodeByName: vi.fn(),
   worldNodeLookup: vi.fn(),
   worldNodesOfType: vi.fn(),
 }));
 
+import { seedGamestate } from '@/testing/gamestate';
 import { discoveredCollectibleCount } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import {
@@ -99,6 +102,8 @@ describe('travelPathTo', () => {
     vi.clearAllMocks();
     vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
     vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(true);
+    vi.mocked(worldNodesOfType).mockReturnValue([]);
+    seedGamestate();
   });
 
   it('returns an empty path when already at the destination', () => {
@@ -865,6 +870,8 @@ describe('travelPathFrom', () => {
     vi.clearAllMocks();
     vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
     vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(true);
+    vi.mocked(worldNodesOfType).mockReturnValue([]);
+    seedGamestate();
   });
 
   // Confirms a non-party origin works too, which is what worker travel relies on.
@@ -962,6 +969,117 @@ describe('travelPathFrom', () => {
 
     expect(vi.mocked(worldNodeByName).mock.calls.length).toBeGreaterThan(
       callsAfterFirst,
+    );
+  });
+});
+
+describe('travelPathFrom via +5 outposts', () => {
+  const carrinaOutpost = buildEntry({
+    mapName: 'Carrina',
+    x: 1,
+    y: 0,
+    nodeName: 'Carrina Outpost',
+    nodeData: buildObject({ name: 'Carrina Outpost', type: 'Outpost' }),
+  });
+  const mireOutpost = buildEntry({
+    mapName: 'CraggledMire',
+    x: 1,
+    y: 0,
+    nodeName: 'Mire Outpost',
+    nodeData: buildObject({ name: 'Mire Outpost', type: 'Outpost' }),
+  });
+
+  function seedOutpostLevels(carrina: number, mire: number): void {
+    seedGamestate((state) => {
+      state.outposts = {
+        'Carrina Outpost': { level: carrina },
+        'Mire Outpost': { level: mire },
+      };
+    });
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
+    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(true);
+    vi.mocked(worldNodesOfType).mockImplementation((type) =>
+      type === 'Outpost' ? [carrinaOutpost, mireOutpost] : [],
+    );
+    vi.mocked(allMaps).mockReturnValue(
+      new Map<string, GameMap>([
+        ['Carrina', { name: 'Carrina', data: buildOpenMap(20, 3) }],
+        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(20, 3) }],
+      ]),
+    );
+  });
+
+  it('hops between maps through two +5 outposts with no TeleportNode pair', () => {
+    seedOutpostLevels(5, 5);
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'CraggledMire', x: 2, y: 0, nodeName: 'Bog' }),
+    );
+
+    expect(travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Bog')).toEqual([
+      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+      { kind: 'Teleport', mapName: 'CraggledMire', x: 1, y: 0 },
+      { kind: 'Move', mapName: 'CraggledMire', x: 2, y: 0 },
+    ]);
+  });
+
+  it('ignores an outpost below +5, and the cache picks it up once it levels', () => {
+    seedOutpostLevels(5, 4);
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'CraggledMire', x: 2, y: 0, nodeName: 'Bog' }),
+    );
+    const origin = { mapName: 'Carrina', x: 0, y: 0 };
+
+    expect(travelPathFrom(origin, 'Bog')).toBeUndefined();
+
+    seedOutpostLevels(5, 5);
+    expect(travelPathFrom(origin, 'Bog')).toHaveLength(3);
+  });
+
+  it('never hops when teleports are disallowed, for content-only tooling, or with useOutposts off', () => {
+    seedOutpostLevels(5, 5);
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'CraggledMire', x: 2, y: 0, nodeName: 'Bog' }),
+    );
+    const origin = { mapName: 'Carrina', x: 0, y: 0 };
+
+    expect(travelPathFrom(origin, 'Bog', false)).toBeUndefined();
+    expect(travelPathFrom(origin, 'Bog', true, true)).toBeUndefined();
+    expect(
+      travelPathFrom(origin, 'Bog', true, false, false, false),
+    ).toBeUndefined();
+  });
+
+  it('takes an outpost hop within one map when it beats walking', () => {
+    const farOutpost = buildEntry({
+      mapName: 'Carrina',
+      x: 18,
+      y: 0,
+      nodeName: 'Far Outpost',
+      nodeData: buildObject({ name: 'Far Outpost', type: 'Outpost' }),
+    });
+    vi.mocked(worldNodesOfType).mockImplementation((type) =>
+      type === 'Outpost' ? [carrinaOutpost, farOutpost] : [],
+    );
+    seedGamestate((state) => {
+      state.outposts = {
+        'Carrina Outpost': { level: 5 },
+        'Far Outpost': { level: 5 },
+      };
+    });
+    vi.mocked(worldNodeByName).mockReturnValue(
+      buildEntry({ mapName: 'Carrina', x: 19, y: 0, nodeName: 'Cliff' }),
+    );
+
+    expect(travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Cliff')).toEqual(
+      [
+        { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+        { kind: 'Teleport', mapName: 'Carrina', x: 18, y: 0 },
+        { kind: 'Move', mapName: 'Carrina', x: 19, y: 0 },
+      ],
     );
   });
 });

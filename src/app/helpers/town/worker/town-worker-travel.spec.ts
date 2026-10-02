@@ -180,6 +180,9 @@ describe('townWorkerAssignmentIsValid', () => {
       expect.anything(),
       assignment.nodeName,
       false,
+      false,
+      false,
+      false,
     );
   });
 });
@@ -258,6 +261,9 @@ describe('townWorkerBeginOutboundTrip', () => {
     expect(travelPathFrom).toHaveBeenCalledWith(
       expect.anything(),
       'Wergen Woods',
+      false,
+      false,
+      false,
       false,
     );
   });

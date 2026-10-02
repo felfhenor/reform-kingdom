@@ -1,4 +1,5 @@
 import type { CurrentLocation } from '@interfaces/state-game';
+import type { WorldNodeEntry } from '@interfaces/world-nodes';
 
 export type TravelStatus = 'Idle' | 'Traveling';
 
@@ -9,6 +10,12 @@ export type TravelStep = {
   mapName: string;
   x: number;
   y: number;
+};
+
+// Route-graph hop: walk onto `gateway`, then land on any one of `arrivals`.
+export type TravelRouteEdge = {
+  gateway: WorldNodeEntry;
+  arrivals: WorldNodeEntry[];
 };
 
 export type TravelState = {

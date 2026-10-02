@@ -14,7 +14,7 @@ import type {
   WorkerId,
 } from '@interfaces';
 
-// Cost from the town's own node, not the Kingdom.
+// Cost from the town's own node, not the Kingdom; NPC workers never use the player's outposts.
 export function townWorkerStaminaCostToNode(
   town: TownContent,
   nodeName: string,
@@ -23,7 +23,14 @@ export function townWorkerStaminaCostToNode(
   const townNode = worldNodeByName(town.name);
   if (!townNode) return undefined;
 
-  const path = travelPathFrom(townNode, nodeName, allowTeleport);
+  const path = travelPathFrom(
+    townNode,
+    nodeName,
+    allowTeleport,
+    false,
+    false,
+    false,
+  );
   return path ? travelPathBaseTotalTicks(path, townNode) : undefined;
 }
 
@@ -63,7 +70,14 @@ export function townWorkerBeginOutboundTrip(
 
   const canUseTeleports =
     getEntry<WorkerContent>(workerId)?.canUseTeleports ?? true;
-  const path = travelPathFrom(townNode, assignment.nodeName, canUseTeleports);
+  const path = travelPathFrom(
+    townNode,
+    assignment.nodeName,
+    canUseTeleports,
+    false,
+    false,
+    false,
+  );
   if (!path) return;
 
   updateGamestate((state) => {
@@ -98,7 +112,14 @@ export function townWorkerBeginReturnTrip(
     const target = state.world.towns[townId]?.workers[workerId];
     if (!target) return state;
 
-    const path = travelPathFrom(target.location, town.name, canUseTeleports);
+    const path = travelPathFrom(
+      target.location,
+      town.name,
+      canUseTeleports,
+      false,
+      false,
+      false,
+    );
 
     target.status = path
       ? {

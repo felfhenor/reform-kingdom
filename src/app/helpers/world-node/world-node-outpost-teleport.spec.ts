@@ -8,25 +8,15 @@ vi.mock('@helpers/world', () => ({
   isPartyAtNode: vi.fn(),
 }));
 
-vi.mock('@helpers/world-node/world-node-outpost', () => ({
-  isOutpostBuilt: vi.fn(),
-  isOutpostTeleportUnlocked: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
+vi.mock('@helpers/world-node/world-nodes', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   isWorldNodeVisible: vi.fn(() => true),
 }));
 
+import { seedGamestate } from '@/testing/gamestate';
 import { canPartyTravel } from '@helpers/hero/travel';
 import { isPartyAtNode } from '@helpers/world';
-import {
-  isOutpostBuilt,
-  isOutpostTeleportUnlocked,
-} from '@helpers/world-node/world-node-outpost';
-import {
-  isOutpostTeleportListed,
-  outpostCanTeleport,
-} from '@helpers/world-node/world-node-outpost-teleport';
+import { outpostCanTeleport } from '@helpers/world-node/world-node-outpost-teleport';
 import { isWorldNodeVisible } from '@helpers/world-node/world-nodes';
 import type { WorldNodeEntry } from '@interfaces';
 
@@ -38,12 +28,11 @@ const carrina = outpostEntry('Carrina Outpost');
 const larsian = outpostEntry('Larsian Outpost');
 
 function mockLevels(levels: Record<string, number>): void {
-  vi.mocked(isOutpostBuilt).mockImplementation(
-    (nodeName) => (levels[nodeName] ?? 0) >= 1,
-  );
-  vi.mocked(isOutpostTeleportUnlocked).mockImplementation(
-    (nodeName) => (levels[nodeName] ?? 0) >= 5,
-  );
+  seedGamestate((state) => {
+    state.outposts = Object.fromEntries(
+      Object.entries(levels).map(([nodeName, level]) => [nodeName, { level }]),
+    );
+  });
 }
 
 beforeEach(() => {
@@ -54,26 +43,6 @@ beforeEach(() => {
     (nodeName) => nodeName === carrina.nodeName,
   );
   mockLevels({ 'Carrina Outpost': 5, 'Larsian Outpost': 5 });
-});
-
-describe('isOutpostTeleportListed', () => {
-  it('lists a visible, built outpost', () => {
-    mockLevels({ 'Larsian Outpost': 1 });
-
-    expect(isOutpostTeleportListed(larsian)).toBe(true);
-  });
-
-  it('hides an unbuilt outpost', () => {
-    mockLevels({});
-
-    expect(isOutpostTeleportListed(larsian)).toBe(false);
-  });
-
-  it('hides an outpost that is not visible', () => {
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
-
-    expect(isOutpostTeleportListed(larsian)).toBe(false);
-  });
 });
 
 describe('outpostCanTeleport', () => {

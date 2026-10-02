@@ -22,13 +22,11 @@ import {
   worldNodeDevelopmentLevelUpCost,
 } from '@helpers/world-node/world-node-development';
 import {
+  isOutpostTeleportListed,
   isOutpostTeleportUnlocked,
   worldNodeOutpostLevel,
 } from '@helpers/world-node/world-node-outpost';
-import {
-  isOutpostTeleportListed,
-  outpostCanTeleport,
-} from '@helpers/world-node/world-node-outpost-teleport';
+import { outpostCanTeleport } from '@helpers/world-node/world-node-outpost-teleport';
 import {
   worldNodeByName,
   worldNodeOutpost,
