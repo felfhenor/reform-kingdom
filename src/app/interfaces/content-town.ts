@@ -71,6 +71,8 @@ export type TownMaterialThreshold = {
   value: number;
   // Town only sells this material once its coffers reach this quantity - ignored unless value > 0.
   sellAtQuantity: number;
+  // Quantity seeded into the town's coffers on first visit.
+  default: number;
 };
 
 // A town's materialThresholds array flattened to a hash for O(1) per-item lookup.

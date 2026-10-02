@@ -8,16 +8,19 @@
 
   materialThresholds:
     - itemId: Gold Coin
+      default: 5000
       maxQuantity: 25000
 
     - itemId: Cactspine
       maxQuantity: 300
       value: 30
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Petrifiwood
       maxQuantity: 300
       value: 25
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Firmwater
@@ -27,16 +30,19 @@
     - itemId: Timberfuzz
       maxQuantity: 300
       value: 35
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Strongreed
       maxQuantity: 300
       value: 50
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Amber
       maxQuantity: 200
       value: 40
+      default: 10
       sellAtQuantity: 125
 
     - itemId: Brightwisp Core

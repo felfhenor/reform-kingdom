@@ -8,51 +8,61 @@
 
   materialThresholds:
     - itemId: Gold Coin
+      default: 5000
       maxQuantity: 25000
 
     - itemId: Crimson Lucre
       sellAtQuantity: 1500
       value: 25
+      default: 500
       maxQuantity: 2000
 
     - itemId: Crimson Ore
       maxQuantity: 300
       value: 30
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Crimson Ingot
       maxQuantity: 300
       value: 70
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Gold Ore
       maxQuantity: 300
       value: 40
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Gold Ingot
       maxQuantity: 300
       value: 90
+      default: 30
       sellAtQuantity: 200
 
     - itemId: Crimson Ruby
       maxQuantity: 300
       value: 150
+      default: 10
       sellAtQuantity: 125
 
     - itemId: Elven Corewood
       maxQuantity: 300
       value: 45
+      default: 100
       sellAtQuantity: 200
 
     - itemId: Elfsilk
       maxQuantity: 300
       value: 45
+      default: 100
       sellAtQuantity: 200
 
     - itemId: Strong Spider Silk
       maxQuantity: 50
       value: 50
+      default: 30
       sellAtQuantity: 30
 
     - itemId: Hawk Feather

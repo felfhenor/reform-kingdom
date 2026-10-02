@@ -6,6 +6,7 @@ import {
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import { townTradeskillsMaterialize } from '@helpers/town/crafting/town-craft-tradeskills';
+import { townDefaultMaterials } from '@helpers/town/town-materials';
 import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeTown } from '@helpers/world-node/world-nodes';
@@ -35,7 +36,10 @@ export function townMarkVisited(townId: TownId): void {
         : (existing?.workers ?? {}),
       reputation: existing?.reputation ?? 0,
       hiddenGold: existing?.hiddenGold ?? 0,
-      materials: existing?.materials ?? {},
+      materials: {
+        ...(town ? townDefaultMaterials(town) : {}),
+        ...existing?.materials,
+      },
       tradeskills: townTradeskillsMaterialize(
         townId,
         existing?.tradeskills ?? {},

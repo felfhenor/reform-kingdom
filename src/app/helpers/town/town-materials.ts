@@ -5,6 +5,7 @@ import type {
   GameState,
   ItemContent,
   ItemId,
+  TownContent,
   TownId,
   TownMaterials,
 } from '@interfaces';
@@ -28,6 +29,14 @@ export function applyTownMaterialDelta(
 
 export function townMaterialQuantity(townId: TownId, itemId: ItemId): number {
   return worldTownsState()[townId]?.materials[itemId] ?? 0;
+}
+
+export function townDefaultMaterials(town: TownContent): TownMaterials {
+  const materials: TownMaterials = {};
+  town.materialThresholds.forEach((threshold) => {
+    if (threshold.default > 0) materials[threshold.itemId] = threshold.default;
+  });
+  return materials;
 }
 
 // Item requirements only - a town has no armory or kill tally to credit equipment/monster-kill requirements to.

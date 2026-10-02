@@ -104,6 +104,7 @@ function ensureTownMaterialThreshold(
     maxQuantity: threshold.maxQuantity ?? 0,
     value: threshold.value ?? 0,
     sellAtQuantity: threshold.sellAtQuantity ?? 0,
+    default: threshold.default ?? 0,
   };
 }
 

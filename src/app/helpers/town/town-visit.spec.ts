@@ -49,6 +49,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -106,7 +107,7 @@ describe('townMarkVisited', () => {
     vi.mocked(updateGamestate).mockImplementation(async (fn) => {
       fn({ world: { towns: {} } } as unknown as GameState);
     });
-    vi.mocked(getEntry).mockReturnValue({ name: 'Larsia' } as TownContent);
+    vi.mocked(getEntry).mockReturnValue(ensureTown({ name: 'Larsia' }));
 
     townMarkVisited(townId);
 
@@ -236,6 +237,39 @@ describe('townMarkVisited', () => {
     expect(state.world.towns[townId].materials).toEqual(materials);
   });
 
+  it('seeds materials from threshold defaults, letting existing quantities win', () => {
+    vi.mocked(getEntry).mockReturnValue(
+      ensureTown({
+        materialThresholds: [
+          { itemId: 'gold-coin', default: 5000 },
+          { itemId: 'copper-ore', default: 30 },
+          { itemId: 'amber' },
+        ] as TownContent['materialThresholds'],
+      }),
+    );
+    vi.mocked(gamestate).mockReturnValue({
+      world: { towns: {} },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: {
+          [townId]: { lastProcessedTick: {}, materials: { 'copper-ore': 8 } },
+        },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].materials).toEqual({
+      'gold-coin': 5000,
+      'copper-ore': 8,
+    });
+  });
+
   it('preserves existing tradeskills when activating', () => {
     const tradeskills = { blacksmithing: { level: 3 } };
     vi.mocked(gamestate).mockReturnValue({
@@ -281,7 +315,7 @@ describe('townMarkVisited', () => {
   });
 
   it('materializes the worker roster via townWorkerRosterMaterialize when the town resolves', () => {
-    const town = { name: 'Larsia' } as TownContent;
+    const town = ensureTown({ name: 'Larsia' });
     vi.mocked(getEntry).mockReturnValue(town);
     vi.mocked(gamestate).mockReturnValue({
       world: {

@@ -13,14 +13,22 @@ vi.mock('@helpers/state-game', () => {
 });
 
 import { getEntry } from '@helpers/content/content';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { gamestate } from '@helpers/state-game';
 import {
   applyTownMaterialDelta,
   depositCommissionRequirementsToTown,
   pruneInvalidTownMaterials,
+  townDefaultMaterials,
   townMaterialQuantity,
 } from '@helpers/town/town-materials';
-import type { EquipmentId, GameState, ItemId, TownId } from '@interfaces';
+import type {
+  EquipmentId,
+  GameState,
+  ItemId,
+  TownContent,
+  TownId,
+} from '@interfaces';
 
 const townId = 'larsia' as TownId;
 const oreId = 'copper-ore' as ItemId;
@@ -119,5 +127,18 @@ describe('pruneInvalidTownMaterials', () => {
     vi.mocked(getEntry).mockReturnValue(undefined);
 
     expect(pruneInvalidTownMaterials({ [oreId]: 5 })).toEqual({});
+  });
+});
+
+describe('townDefaultMaterials', () => {
+  it('maps each threshold with a positive default and skips the rest', () => {
+    const town = ensureTown({
+      materialThresholds: [
+        { itemId: oreId, default: 30 },
+        { itemId: 'amber' as ItemId },
+      ] as TownContent['materialThresholds'],
+    });
+
+    expect(townDefaultMaterials(town)).toEqual({ [oreId]: 30 });
   });
 });
