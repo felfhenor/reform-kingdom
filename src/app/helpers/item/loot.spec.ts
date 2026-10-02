@@ -39,6 +39,7 @@ import { globalEffectSumsState } from '@helpers/state-game';
 import {
   applyResolvedDropToState,
   combatItemDropRateBoost,
+  isClearProofReward,
   rewardDisplayOrder,
   rollDroppedRewards,
 } from '@helpers/item/loot';
@@ -483,6 +484,28 @@ describe('Loot Helper Functions', () => {
       applyResolvedDropToState(state, drop);
 
       expect(state.workers[weaverNellId]).toBe('already-progressed');
+    });
+  });
+
+  describe('isClearProofReward', () => {
+    it('accepts guaranteed collectibles and workers only', () => {
+      const collectibleId = 'relic' as CollectibleId;
+      const workerId = 'nell' as WorkerId;
+
+      expect(
+        isClearProofReward(ensureDroppedReward({ collectibleId, chance: 100 })),
+      ).toBe(true);
+      expect(
+        isClearProofReward(ensureDroppedReward({ workerId, chance: 100 })),
+      ).toBe(true);
+      expect(
+        isClearProofReward(ensureDroppedReward({ collectibleId, chance: 50 })),
+      ).toBe(false);
+      expect(
+        isClearProofReward(
+          ensureDroppedReward({ itemId: 'flux' as ItemId, chance: 100 }),
+        ),
+      ).toBe(false);
     });
   });
 });

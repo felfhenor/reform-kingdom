@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
+import { isClearProofReward } from '@helpers/item/loot';
 import { traderTokenId } from '@helpers/item/materials';
 import { isTaskRequirementCounter } from '@helpers/task/task';
 import { taskStateRequirementSatisfied } from '@helpers/task/task-requirement-state';
@@ -41,7 +42,7 @@ function encounterGuaranteedRewardFound(
     nodeName,
   );
   return (encounter?.completionRewards ?? []).some((reward) => {
-    if (reward.chance < 100) return false;
+    if (!isClearProofReward(reward)) return false;
     if ('collectibleId' in reward)
       return !!state.collectibles[reward.collectibleId];
     if ('workerId' in reward) return !!state.discoveredWorkers[reward.workerId];

@@ -19,7 +19,6 @@ import {
 } from '@helpers/world-node/world-nodes';
 import {
   type DroppedReward,
-  type EncounterContent,
   type ExploreNodeFarmOption,
   type FarmNodeRewardOption,
   type MonsterContent,
@@ -28,6 +27,13 @@ import {
   type WorldNodeEntry,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
+
+export function farmNodeActiveWarning(nodeName: string): string | undefined {
+  const entry = worldNodeByName(nodeName);
+  if (!entry || !worldNodeEncounterRandom(entry)) return undefined;
+
+  return 'This is a mystical node, it will only be visited while it is active.';
+}
 
 export function exploreNodeFarmOptions(): ExploreNodeFarmOption[] {
   return sortBy(
@@ -74,8 +80,8 @@ function worldNodeMonsterIds(entry: WorldNodeEntry): MonsterId[] {
 
 // Discovered kill drops from every monster fought at `entry`, de-duplicated; excludes undiscovered drops and Gold Coin.
 function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
-  const node = getEntry<EncounterContent>(entry.nodeName);
-  if (!node) return [];
+  const levelRange = worldNodeLevelRange(entry);
+  if (!levelRange) return [];
 
   const monsterIds = new Set(worldNodeMonsterIds(entry));
 
@@ -89,8 +95,7 @@ function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
       if (!isRewardDiscovered(reward)) return;
 
       const canDropFromNode =
-        node.levelRange.min >= reward.minLevel &&
-        node.levelRange.max <= reward.maxLevel;
+        levelRange.min >= reward.minLevel && levelRange.max <= reward.maxLevel;
       if (!canDropFromNode) return;
 
       const key = rewardKey(reward);

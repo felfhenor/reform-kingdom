@@ -15,6 +15,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
+import { farmNodeActiveWarning } from '@helpers/decree/decree-farm-node.ui';
 import { decreeClauseSummary } from '@helpers/decree/decree.ui';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
@@ -77,6 +78,13 @@ export class RowDecreeClauseComponent {
   public isFailing = computed(
     () => this.clause().failureCount >= FAILURE_WARNING_THRESHOLD,
   );
+
+  public farmNodeWarning = computed(() => {
+    const clause = this.clause();
+    return clause.type === 'FarmNode'
+      ? farmNodeActiveWarning(clause.nodeName)
+      : undefined;
+  });
 
   public isEditable = computed(() =>
     EDITABLE_CLAUSE_TYPES.includes(this.clause().type),

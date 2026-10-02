@@ -259,6 +259,14 @@ function defendTownsTargetNode(
   return nearestReachableNode(candidates, clause.riskTolerance);
 }
 
+// Mystical nodes have nothing to fight once cleared, so they only count while their cycle is up.
+function farmNodeTarget(nodeName: string): WorldNodeEntry | undefined {
+  const entry = reachableVisibleNode(nodeName, 'High');
+  if (!entry || !worldNodeEncounterRandom(entry)) return entry;
+
+  return worldNodeExploreRandomIsAvailable(entry) ? entry : undefined;
+}
+
 // The node a clause would travel to if run right now, or undefined if it has
 // no node target (`ReturnToKingdom`) or nothing currently qualifies.
 export function clauseTargetNode(
@@ -270,7 +278,7 @@ export function clauseTargetNode(
         ? reachableVisibleNode(clause.nodeName, 'High')
         : nearestGatherNodeFor(clause.materialId);
     case 'FarmNode':
-      return reachableVisibleNode(clause.nodeName, 'High');
+      return farmNodeTarget(clause.nodeName);
     case 'FinishUnfinishedAreas':
       return nearestUnfinishedExploreNode(clause.riskTolerance);
     case 'LevelUpParty':

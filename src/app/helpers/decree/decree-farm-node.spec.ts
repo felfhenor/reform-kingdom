@@ -17,13 +17,16 @@ vi.mock('@helpers/crafting/recipes', () => ({
 }));
 
 vi.mock('@helpers/world-node/world-node-rewards', () => ({
+  isRewardDiscovered: vi.fn(() => false),
   worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
+  worldNodeCompletionRewards: vi.fn(() => []),
 }));
 
 vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodesOfType: vi.fn(() => []),
 }));
 
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import {
   farmableExploreNodes,
@@ -32,9 +35,14 @@ import {
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
-import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import {
+  isRewardDiscovered,
+  worldNodeCompletionRewardProgress,
+  worldNodeCompletionRewards,
+} from '@helpers/world-node/world-node-rewards';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type {
+  CollectibleId,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
@@ -69,7 +77,9 @@ describe('farmableExploreNodes', () => {
   it('only includes ExploreNodes with at least one obtained reward', () => {
     const beaten = buildNode('Beaten');
     const untouched = buildNode('Untouched');
-    vi.mocked(worldNodesOfType).mockReturnValue([beaten, untouched]);
+    vi.mocked(worldNodesOfType).mockImplementation((type) =>
+      type === 'ExploreNode' ? [beaten, untouched] : [],
+    );
     vi.mocked(worldNodeCompletionRewardProgress).mockImplementation((entry) =>
       entry.nodeName === 'Beaten'
         ? { obtained: 1, total: 2 }
@@ -77,6 +87,28 @@ describe('farmableExploreNodes', () => {
     );
 
     expect(farmableExploreNodes()).toEqual([beaten]);
+  });
+
+  it('only includes mystical nodes whose guaranteed collectible/worker was found', () => {
+    const shared = ensureDroppedReward({
+      itemId: 'flux' as ItemId,
+      chance: 100,
+    });
+    const unique = ensureDroppedReward({
+      collectibleId: 'shrine-relic' as CollectibleId,
+      chance: 100,
+    });
+    const cleared = buildNode('Cleared Shrine');
+    const sharedOnly = buildNode('Flux Shrine');
+    vi.mocked(worldNodesOfType).mockImplementation((type) =>
+      type === 'ExploreRandomNode' ? [cleared, sharedOnly] : [],
+    );
+    vi.mocked(worldNodeCompletionRewards).mockImplementation((entry) =>
+      entry.nodeName === 'Cleared Shrine' ? [shared, unique] : [shared],
+    );
+    vi.mocked(isRewardDiscovered).mockReturnValue(true);
+
+    expect(farmableExploreNodes()).toEqual([cleared]);
   });
 });
 

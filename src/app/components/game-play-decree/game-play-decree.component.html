@@ -257,15 +257,21 @@
               [tp]="'Your party will explore nodes that match the specified difficulty. If they fail enough times, they will go to an easier node. They will do this until they get to the easiest node that still gives them XP. If there are none, this clause will be skipped.'"
             />
           }
+        </div>
 
+        <div class="flex flex-row gap-2">
           @if (!isEditing() && isClauseCapReached()) {
-            <span class="text-xs text-warning">
+            <span class="badge badge-warning">
               The Decree is full. You must remove clauses to add more.
             </span>
           } @else if (isDuplicateDraft()) {
-            <span class="text-xs text-warning">
+            <span class="badge badge-warning">
               The Decree already has a clause like this.
             </span>
+          }
+
+          @if (draftFarmNodeWarning(); as warning) {
+            <span class="badge badge-warning">{{ warning }}</span>
           }
         </div>
       </div>

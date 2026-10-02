@@ -1062,6 +1062,37 @@ describe('clauseTargetNode', () => {
   });
 });
 
+describe('clauseTargetNode - FarmNode on a mystical node', () => {
+  const clause = buildClause({
+    type: 'FarmNode',
+    nodeName: 'Mystical Shrine',
+    reward: { itemId: 'bone' as ItemId },
+    targetQuantity: 10,
+  });
+
+  beforeEach(() => {
+    vi.mocked(worldNodeByName).mockReturnValue(buildNode('Mystical Shrine'));
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(worldNodeEncounterRandom).mockReturnValue(
+      {} as EncounterRandomContent,
+    );
+  });
+
+  it('targets the node while it is active', () => {
+    vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+
+    expect(clauseTargetNode(clause)?.nodeName).toBe('Mystical Shrine');
+    expect(isClauseSatisfiable(clause)).toBe(true);
+  });
+
+  it('has no target while it is inactive, so the clause is skipped', () => {
+    vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(false);
+
+    expect(clauseTargetNode(clause)).toBeUndefined();
+    expect(isClauseSatisfiable(clause)).toBe(false);
+  });
+});
+
 describe('clauseTargetNode - DefendTowns', () => {
   function buildTown(overrides: Partial<TownContent> = {}): TownContent {
     return {

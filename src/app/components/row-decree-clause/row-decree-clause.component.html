@@ -28,6 +28,16 @@
   }
 </span>
 
+@if (farmNodeWarning(); as warning) {
+  <app-icon
+    name="tablerInfoCircle"
+    size="row"
+    class="text-warning shrink-0"
+    [tp]="warning"
+    [tpPlacement]="'top'"
+  />
+}
+
 @if (isFailing()) {
   <app-icon
     name="tablerExclamationCircle"

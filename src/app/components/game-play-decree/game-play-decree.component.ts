@@ -36,6 +36,7 @@ import {
 } from '@helpers/decree/decree';
 import {
   exploreNodeFarmOptions,
+  farmNodeActiveWarning,
   farmNodeRewardOptions,
 } from '@helpers/decree/decree-farm-node.ui';
 import {
@@ -187,6 +188,12 @@ export class GamePlayDecreeComponent {
   });
 
   public exploreNodeOptions = computed(() => exploreNodeFarmOptions());
+  public draftFarmNodeWarning = computed(() => {
+    const nodeName = this.draftNodeName();
+    return this.draftType() === 'FarmNode' && nodeName
+      ? farmNodeActiveWarning(nodeName)
+      : undefined;
+  });
   public gatherNodeOptions = computed(() => gatherNodeFarmOptions());
 
   public draftType = signal<DecreeClauseAction['type']>('GatherMaterial');

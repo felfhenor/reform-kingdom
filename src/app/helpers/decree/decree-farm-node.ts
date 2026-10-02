@@ -1,17 +1,32 @@
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
+import { isClearProofReward } from '@helpers/item/loot';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { isWorkerRescued } from '@helpers/worker/worker-discovery';
-import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import {
+  isRewardDiscovered,
+  worldNodeCompletionRewardProgress,
+  worldNodeCompletionRewards,
+} from '@helpers/world-node/world-node-rewards';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
 import type { RewardIdentity, WorldNodeEntry } from '@interfaces';
 
+// Mystical nodes all share common rewards (e.g. Duskhall Flux, also sold by caravans), so they need a node-unique reward as proof.
+function isExploreRandomNodeCleared(entry: WorldNodeEntry): boolean {
+  return worldNodeCompletionRewards(entry).some(
+    (reward) => isClearProofReward(reward) && isRewardDiscovered(reward),
+  );
+}
+
 // ExploreNodes with at least one completion reward looted - the closest proxy to "already beaten" this game has.
 export function farmableExploreNodes(): WorldNodeEntry[] {
-  return worldNodesOfType('ExploreNode').filter(
-    (entry) => worldNodeCompletionRewardProgress(entry).obtained > 0,
-  );
+  return [
+    ...worldNodesOfType('ExploreNode').filter(
+      (entry) => worldNodeCompletionRewardProgress(entry).obtained > 0,
+    ),
+    ...worldNodesOfType('ExploreRandomNode').filter(isExploreRandomNodeCleared),
+  ];
 }
 
 // Current stock of `reward`, generalized across all reward types. Equipment has no quantity field so it's counted from owned armory entries; recipes read as 1/0 (known or not).

@@ -85,6 +85,14 @@ function resolveDrop(
   }
 }
 
+// Only a guaranteed collectible/worker proves an encounter was cleared; materials can come from elsewhere.
+export function isClearProofReward(drop: DroppedReward): boolean {
+  return (
+    drop.chance >= 100 &&
+    (drop.kind === 'Collectible' || drop.kind === 'Worker')
+  );
+}
+
 // A recipe the player can never personally craft (town-exclusive), or that's
 // below their current tradeskill level for it, isn't usable yet
 export function isRecipeUsable(
