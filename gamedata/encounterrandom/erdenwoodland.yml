@@ -52,3 +52,6 @@
       min: 23000
       max: 25000
       chance: 100
+
+    - workerId: Fiore Jadd
+      chance: 100
