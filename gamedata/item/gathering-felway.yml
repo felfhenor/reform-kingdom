@@ -1,0 +1,27 @@
+- id: 082489a5-c3e3-49f1-8982-6e27d0b8aa83
+  name: Fel Essence
+  description: A flittering orb of energy that gives demons their power.
+  rarity: Uncommon
+
+  sprite: '0079'
+
+- id: 6fcb2ead-849c-415a-bbc9-0aac95b539d4
+  name: Felrock
+  description: A strangely resilient rock mined only in areas of heavy demonic presence.
+  rarity: Common
+
+  sprite: '0077'
+
+- id: d06c46e1-7ac6-42f0-86d3-c56d1f9275e7
+  name: Felwood
+  description: A log of wood from a tree that's absorbed too much fel energy.
+  rarity: Common
+
+  sprite: '0080'
+
+- id: fe01feca-82e5-489f-812d-b096ef58ee73
+  name: Morganite
+  description: A big chunk of morganite, prospected from felrock.
+  rarity: Common
+
+  sprite: '0078'

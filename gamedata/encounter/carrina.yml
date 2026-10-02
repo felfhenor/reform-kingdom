@@ -507,8 +507,8 @@
   description: A waystation that leads to the Felway, the path towards Fel. It's infested with demons and their minions.
 
   levelRange:
-    min: 41
-    max: 44
+    min: 38
+    max: 41
 
   fights:
     - monsters:
@@ -520,19 +520,10 @@
         - monsterId: Lesser Fel Demon
         - monsterId: Lesser Fel Demon
         - monsterId: Red Slime
-    - monsters:
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
-        - monsterId: Green Slime
-        - monsterId: Purple Slime
-    - monsters:
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
 
   completionRewards:
     - collectibleId: Fel Demon Feather
-      chance: 100
+      chance: 10
 
     - itemId: Gold Coin
       min: 2000

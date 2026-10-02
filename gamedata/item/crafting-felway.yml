@@ -1,0 +1,13 @@
+- id: 3caca94b-bd89-4bc8-bdd1-084a2ac63b4c
+  name: Fel Copper Ingot
+  description: An ingot of copper refined with fel energies.
+  rarity: Common
+
+  sprite: '0075'
+
+- id: 61d283a5-eff2-4cbb-8130-12740e3b4a2b
+  name: Fel Fiber
+  description: A fiber of thread shaved off of felwood.
+  rarity: Common
+
+  sprite: '0076'

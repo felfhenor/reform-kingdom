@@ -1,0 +1,221 @@
+- id: a7a131c3-8a37-4abf-96fc-e534715d5a97
+  name: Tainted Woods
+  description: A demonic wooded area, haunted by fel energies that glimmer like ghostlights in the night.
+
+  levelRange:
+    min: 41
+    max: 42
+
+  workerLevelRange:
+    min: 24
+    max: 30
+
+  xpGainedIfInLevelRange: 10
+  gatherTime: 15
+  gatherReductionPerUpgradeLevel: 2
+
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 100000
+
+        - itemId: Felwood
+          required: 50
+
+        - itemId: Copper Ingot
+          required: 25
+
+        - itemId: Fel Essence
+          required: 10
+
+    - costs:
+        - itemId: Gold Coin
+          required: 200000
+
+        - itemId: Felwood
+          required: 75
+
+        - itemId: Fel Copper Ingot
+          required: 75
+
+        - itemId: Fel Fiber
+          required: 50
+
+        - itemId: Fel Essence
+          required: 20
+
+    - costs:
+        - itemId: Gold Coin
+          required: 300000
+
+        - itemId: Felwood
+          required: 125
+
+        - itemId: Fel Copper Ingot
+          required: 100
+
+        - itemId: Fel Fiber
+          required: 75
+
+        - itemId: Fel Essence
+          required: 30
+
+  gatherResults:
+    # level 1
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Felwood
+          quantity: 1
+
+    # level 2
+    - chance: 3
+      levelRequirement: 1
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Felwood
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Fel Essence
+          quantity: 1
+
+    # level 3
+    - chance: 3
+      levelRequirement: 2
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Felwood
+          quantity: 3
+
+    - chance: 3
+      levelRequirement: 2
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Fel Essence
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Artificing, Woodworking]
+      items:
+        - itemId: Felwood
+          quantity: 2
+
+        - itemId: Fel Essence
+          quantity: 1
+
+- id: 9a9e69ab-4115-42e2-ba15-0015e1afb239
+  name: Felrock Quarry
+  description: A corrupted quarry where demons mine felrock, and infuse their fel energies into rock to create more felrock.
+
+  levelRange:
+    min: 40
+    max: 41
+
+  workerLevelRange:
+    min: 23
+    max: 29
+
+  xpGainedIfInLevelRange: 10
+  gatherTime: 15
+  gatherReductionPerUpgradeLevel: 2
+
+  levelCost:
+    - costs:
+        - itemId: Gold Coin
+          required: 100000
+
+        - itemId: Felrock
+          required: 50
+
+        - itemId: Felwood
+          required: 25
+
+        - itemId: Fel Essence
+          required: 10
+
+    - costs:
+        - itemId: Gold Coin
+          required: 200000
+
+        - itemId: Felrock
+          required: 100
+
+        - itemId: Felwood
+          required: 50
+
+        - itemId: Morganite
+          required: 25
+
+        - itemId: Fel Essence
+          required: 20
+
+    - costs:
+        - itemId: Gold Coin
+          required: 300000
+
+        - itemId: Felrock
+          required: 150
+
+        - itemId: Felwood
+          required: 75
+
+        - itemId: Morganite
+          required: 50
+
+        - itemId: Fel Essence
+          required: 30
+
+  gatherResults:
+    # level 1
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Felrock
+          quantity: 1
+
+    # level 2
+    - chance: 3
+      levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Felrock
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Fel Essence
+          quantity: 1
+
+    # level 3
+    - chance: 3
+      levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Felrock
+          quantity: 3
+
+    - chance: 3
+      levelRequirement: 2
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Fel Essence
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Artificing, Blacksmithing]
+      items:
+        - itemId: Felrock
+          quantity: 2
+
+        - itemId: Fel Essence
+          quantity: 1
