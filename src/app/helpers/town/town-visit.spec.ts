@@ -109,6 +109,7 @@ describe('townMarkVisited', () => {
       commissionSlots: [],
       specialtyPriority: [],
       firstVisitedAtTick: 500,
+      lastRaidResolvedAtTick: 500,
     });
   });
 
@@ -158,6 +159,7 @@ describe('townMarkVisited', () => {
       commissionSlots: [],
       specialtyPriority: [],
       firstVisitedAtTick: 500,
+      lastRaidResolvedAtTick: 500,
     });
   });
 
@@ -358,6 +360,27 @@ describe('townMarkVisited', () => {
       existing: 1,
     });
     expect(state.world.towns[townId].workers).toEqual({ materialized: 1 });
+  });
+
+  it('keeps an existing raid cooldown instead of restarting it', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: { towns: {} },
+    } as unknown as GameState);
+    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+    const state = {
+      world: {
+        towns: {
+          [townId]: { lastProcessedTick: {}, lastRaidResolvedAtTick: 42 },
+        },
+      },
+    } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    townMarkVisited(townId);
+
+    expect(state.world.towns[townId].lastRaidResolvedAtTick).toBe(42);
   });
 
   it('completes initial crafts before queueing more on first visit', () => {

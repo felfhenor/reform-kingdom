@@ -97,7 +97,7 @@ export type TownNodeState = {
   raidEngageWindowExpiresAtTick?: number;
   // Rolled once at telegraph time so the Raid tab preview always matches what actually spawns.
   raidTelegraphedAssaulterIds?: MonsterId[];
-  // Gates the once/day/town raid cap - set on every resolution (win, loss, or missed-window).
+  // Gates the once/day/town raid cap - set on every resolution (win, loss, or missed-window) and on first visit.
   lastRaidResolvedAtTick?: number;
   // Raid-loss penalty - consumed as an extra multiplier.
   craftSpeedDebuffExpiresAtTick?: number;

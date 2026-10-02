@@ -36,6 +36,7 @@ export function townMarkVisited(townId: TownId): void {
     const existing = state.world.towns[townId];
     if (existing?.firstVisitedAtTick !== undefined) return state;
 
+    const now = timerTicksElapsed();
     state.world.towns[townId] = {
       lastProcessedTick: existing?.lastProcessedTick ?? {},
       stock: existing?.stock ?? [],
@@ -55,7 +56,9 @@ export function townMarkVisited(townId: TownId): void {
       craftQueue: existing?.craftQueue ?? [],
       commissionSlots: existing?.commissionSlots ?? [],
       specialtyPriority: existing?.specialtyPriority ?? [],
-      firstVisitedAtTick: timerTicksElapsed(),
+      firstVisitedAtTick: now,
+      // Starts the raid cooldown so a town isn't raided the moment it's found.
+      lastRaidResolvedAtTick: existing?.lastRaidResolvedAtTick ?? now,
     };
     if (town) {
       townCompleteInitialCrafts(
