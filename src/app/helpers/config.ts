@@ -211,7 +211,7 @@ export const GATHER_VFX_LIFETIME_MS = 1100;
 export const GATHER_VFX_FLOAT_DISTANCE = 40;
 export const GATHER_VFX_JITTER_RANGE = 30;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
-export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -40;
+export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -50;
 export const NODE_STATUS_ICON_RADIUS = 7;
 
 // How far each trailing party member's screen position lags behind the leader's, in party order (position 2 = 1x, position 3 = 2x, ...).
