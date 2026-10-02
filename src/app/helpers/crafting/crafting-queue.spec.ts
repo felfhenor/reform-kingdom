@@ -79,6 +79,7 @@ import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
+  craftMaxQueueableQuantity,
   craftProcessTick,
   craftQueueStart,
 } from '@helpers/crafting/crafting-queue';
@@ -242,6 +243,26 @@ describe('craftMaxCraftableQuantity', () => {
     expect(craftMaxCraftableQuantity(recipe, 'Blacksmithing')).toBe(3);
   });
 
+  it('reports the real resource count past the batch cap', () => {
+    vi.mocked(getMaterialQuantity).mockReturnValue(500);
+
+    const recipe = buildRecipe({
+      requirements: [{ itemId: 'ore' as ItemId, quantity: 2 }],
+    });
+
+    expect(craftMaxCraftableQuantity(recipe, 'Blacksmithing')).toBe(250);
+  });
+
+  it('treats a 0-quantity requirement as unlimited rather than uncraftable', () => {
+    vi.mocked(getMaterialQuantity).mockReturnValue(0);
+
+    const recipe = buildRecipe({
+      requirements: [{ itemId: 'ore' as ItemId, quantity: 0 }],
+    });
+
+    expect(craftMaxCraftableQuantity(recipe, 'Blacksmithing')).toBe(99);
+  });
+
   it('counts equipment requirements from the armory', () => {
     vi.mocked(armoryGet).mockReturnValue([
       {
@@ -323,6 +344,16 @@ describe('craftMaxCraftableQuantity', () => {
     });
 
     expect(craftMaxCraftableQuantity(recipe, 'Blacksmithing')).toBe(0);
+  });
+});
+
+describe('craftMaxQueueableQuantity', () => {
+  it('caps a single batch at 99', () => {
+    expect(craftMaxQueueableQuantity(250)).toBe(99);
+  });
+
+  it('passes through amounts under the cap', () => {
+    expect(craftMaxQueueableQuantity(5)).toBe(5);
   });
 });
 
@@ -498,6 +529,34 @@ describe('craftQueueStart', () => {
         reservedEquipment: [],
       },
     ]);
+  });
+
+  it('never queues a single new entry past 99 even when resources allow more', () => {
+    mockGetEntry({
+      'recipe-1': buildRecipe({
+        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
+      }),
+    });
+    vi.mocked(getMaterialQuantity).mockReturnValue(500);
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
+      globalEffectSums: { tradeskillQueueSizeBoosts: {} },
+    } as unknown as GameState);
+
+    expect(craftQueueStart('Blacksmithing', 'recipe-1' as RecipeId, 300)).toBe(
+      true,
+    );
+
+    const state: GameState = {
+      materials: { ore: { quantity: 500, foundAt: 1000 } },
+      discoveredMaterials: {},
+      tradeskills: { [BLACKSMITHING_ID]: buildBuilding({ level: 1 }) },
+    } as unknown as GameState;
+    const result = applyUpdateAt(0, state);
+
+    expect(
+      result.tradeskills[BLACKSMITHING_ID].queue.map((e) => e.quantityTotal),
+    ).toEqual([99]);
   });
 
   it('queues only what fits on the existing stack when the queue has no room for an overflow entry', () => {

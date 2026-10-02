@@ -1,6 +1,7 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
+  craftMaxQueueableQuantity,
   requirementAvailable,
 } from '@helpers/crafting/crafting-queue';
 import { backfillReservedEquipment } from '@helpers/crafting/crafting-reserved-equipment';
@@ -107,6 +108,7 @@ export function getCraftableRecipeEntries(
         isRecipeCraftable(recipe.id),
     )
     .map((recipe) => {
+      const maxCraftable = craftMaxCraftableQuantity(recipe, tradeskill);
       const resultContent = recipeResultContent(recipe);
       const resultSpritesheet = recipeResultSpritesheet(recipe);
 
@@ -120,7 +122,8 @@ export function getCraftableRecipeEntries(
         resultChance: recipe.result.chance ?? 100,
         resultQuantity: recipeResultQuantity(recipe),
         backdropSprite,
-        maxCraftable: craftMaxCraftableQuantity(recipe, tradeskill),
+        maxCraftable,
+        maxQueueable: craftMaxQueueableQuantity(maxCraftable),
         ownedQuantity: recipeResultOwnedQuantity(recipe),
         xp: recipe.tradeskillXP,
         xpChance: craftXpChance(recipe, building.level),

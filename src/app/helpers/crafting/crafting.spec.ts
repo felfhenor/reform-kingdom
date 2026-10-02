@@ -1,3 +1,4 @@
+import type * as CraftingQueueHelper from '@helpers/crafting/crafting-queue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/item/collectibles', () => ({
@@ -9,8 +10,11 @@ vi.mock('@helpers/content/content', () => ({
   getEntriesByType: vi.fn(() => []),
 }));
 
-vi.mock('@helpers/crafting/crafting-queue', () => ({
+vi.mock('@helpers/crafting/crafting-queue', async (importOriginal) => ({
   craftMaxCraftableQuantity: vi.fn(() => 1),
+  craftMaxQueueableQuantity: (
+    await importOriginal<typeof CraftingQueueHelper>()
+  ).craftMaxQueueableQuantity,
   requirementAvailable: vi.fn(() => 0),
 }));
 
@@ -158,6 +162,18 @@ describe('getCraftableRecipeEntries', () => {
 
     const entries = getCraftableRecipeEntries('Blacksmithing');
     expect(entries.map((entry) => entry.recipe.id)).toEqual(['low']);
+  });
+
+  it('shows the real craftable count but caps the queueable batch at 99', () => {
+    vi.mocked(craftMaxCraftableQuantity).mockReturnValueOnce(250);
+    vi.mocked(gamestate).mockReturnValue({
+      tradeskills: buildAllTradeskills(buildBuilding({ level: 1 })),
+    } as unknown as GameState);
+    vi.mocked(getEntriesByType).mockReturnValue([buildRecipe()]);
+
+    const [entry] = getCraftableRecipeEntries('Blacksmithing');
+    expect(entry.maxCraftable).toBe(250);
+    expect(entry.maxQueueable).toBe(99);
   });
 
   it('excludes a level-gated recipe that also requires a world drop until discovered', () => {

@@ -122,7 +122,7 @@
 
     <div class="flex-1 flex flex-col gap-2 overflow-y-auto" appListReflow>
       @for (entry of entries; track entry.recipe.id) {
-        @let quantity = displayQuantity(entry.recipe.id, entry.maxCraftable);
+        @let quantity = displayQuantity(entry.recipe.id, entry.maxQueueable);
         @let uncraftable = entry.maxCraftable === 0;
         @let full = isQueueFullForRecipe(entry.recipe.id);
 
@@ -228,7 +228,7 @@
                   class="btn btn-xs btn-secondary"
                   [disabled]="uncraftable || full || quantity === 1"
                   (click)="
-                    stepQuantity(entry.recipe.id, entry.maxCraftable, -10)
+                    stepQuantity(entry.recipe.id, entry.maxQueueable, -10)
                   "
                   appSfx="ui-click"
                   [sfxOffset]="0"
@@ -241,7 +241,7 @@
                   class="btn btn-xs btn-secondary"
                   [disabled]="uncraftable || full || quantity === 1"
                   (click)="
-                    stepQuantity(entry.recipe.id, entry.maxCraftable, -1)
+                    stepQuantity(entry.recipe.id, entry.maxQueueable, -1)
                   "
                   appSfx="ui-click"
                   [sfxOffset]="1"
@@ -255,14 +255,14 @@
                   type="number"
                   class="input input-xs w-16"
                   min="1"
-                  [max]="entry.maxCraftable"
+                  [max]="entry.maxQueueable"
                   [value]="quantity"
                   (input)="
                     onQuantityInput(
                       input,
                       $event,
                       entry.recipe.id,
-                      entry.maxCraftable
+                      entry.maxQueueable
                     )
                   "
                 />
@@ -270,9 +270,9 @@
                 <button
                   class="btn btn-xs btn-secondary"
                   [disabled]="
-                    uncraftable || full || quantity === entry.maxCraftable
+                    uncraftable || full || quantity === entry.maxQueueable
                   "
-                  (click)="stepQuantity(entry.recipe.id, entry.maxCraftable, 1)"
+                  (click)="stepQuantity(entry.recipe.id, entry.maxQueueable, 1)"
                   appSfx="ui-click"
                   [sfxOffset]="2"
                   [sfxTrigger]="['click', 'hover']"
@@ -283,10 +283,10 @@
                 <button
                   class="btn btn-xs btn-secondary"
                   [disabled]="
-                    uncraftable || full || quantity === entry.maxCraftable
+                    uncraftable || full || quantity === entry.maxQueueable
                   "
                   (click)="
-                    stepQuantity(entry.recipe.id, entry.maxCraftable, 10)
+                    stepQuantity(entry.recipe.id, entry.maxQueueable, 10)
                   "
                   appSfx="ui-click"
                   [sfxOffset]="3"
@@ -298,13 +298,13 @@
                 <button
                   class="btn btn-xs btn-secondary"
                   [disabled]="
-                    uncraftable || full || quantity === entry.maxCraftable
+                    uncraftable || full || quantity === entry.maxQueueable
                   "
                   (click)="
                     stepQuantity(
                       entry.recipe.id,
-                      entry.maxCraftable,
-                      entry.maxCraftable
+                      entry.maxQueueable,
+                      entry.maxQueueable
                     )
                   "
                   appSfx="ui-click"
@@ -318,7 +318,7 @@
               <button
                 class="btn btn-xs btn-primary"
                 [disabled]="uncraftable || full"
-                (click)="craft(entry.recipe.id, entry.maxCraftable, recipeIcon)"
+                (click)="craft(entry.recipe.id, entry.maxQueueable, recipeIcon)"
                 appSfx="ui-success"
                 [sfxOffset]="$index"
                 [sfxTrigger]="['click', 'hover']"

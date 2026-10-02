@@ -112,9 +112,9 @@ export function craftMaxCraftableQuantity(
   );
   if (collectibleGateUnmet) return 0;
 
-  const consumedRequirements = recipe.requirements.filter(
-    isConsumedRequirement,
-  );
+  const consumedRequirements = recipe.requirements
+    .filter(isConsumedRequirement)
+    .filter((requirement) => requirementNeeded(requirement) > 0);
 
   const resourcesConsumed =
     Math.min(
@@ -125,16 +125,23 @@ export function craftMaxCraftableQuantity(
       ),
     ) ?? 0;
 
-  const resourceLimit =
-    consumedRequirements.length === 0
+  // Math.min() of nothing is Infinity - nothing limits it, so fall back to the batch cap.
+  const safeResourceLimit =
+    resourcesConsumed === Infinity
       ? MAX_CRAFTABLE_CAP
-      : clamp(resourcesConsumed, 0, MAX_CRAFTABLE_CAP);
-  const safeResourceLimit = Number.isFinite(resourceLimit) ? resourceLimit : 0;
+      : Number.isFinite(resourcesConsumed)
+        ? resourcesConsumed
+        : 0;
 
   if (isUniqueCollectibleResultBlocked(recipe, tradeskill)) return 0;
   if (recipeResultCollectibleId(recipe)) return Math.min(safeResourceLimit, 1);
 
   return safeResourceLimit;
+}
+
+// Resources can exceed what a single queue entry holds.
+export function craftMaxQueueableQuantity(maxCraftable: number): number {
+  return Math.min(maxCraftable, MAX_CRAFTABLE_CAP);
 }
 
 // A recipe can have a later entry with room even if an earlier one is already capped.
@@ -156,7 +163,11 @@ function queueableQuantity(
   quantity: number,
   maxCraftable: number,
 ): number {
-  const requested = clamp(Math.floor(quantity), 1, maxCraftable);
+  const requested = clamp(
+    Math.floor(quantity),
+    1,
+    craftMaxQueueableQuantity(maxCraftable),
+  );
 
   const hasOpenSlot =
     building.queue.length < tradeskillMaxQueueSize(building.level, tradeskill);

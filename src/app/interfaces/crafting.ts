@@ -72,6 +72,7 @@ export type CraftRecipeEntry = {
   resultQuantity: number;
   backdropSprite?: string;
   maxCraftable: number;
+  maxQueueable: number;
   ownedQuantity: number;
   xp: number;
   xpChance: number;

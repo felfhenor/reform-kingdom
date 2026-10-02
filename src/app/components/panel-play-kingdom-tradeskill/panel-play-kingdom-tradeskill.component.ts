@@ -10,16 +10,16 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
-import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
-import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
+import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -222,8 +222,8 @@ export class PanelPlayKingdomTradeskillComponent {
     return this.quantities()[recipeId] ?? 1;
   }
 
-  public displayQuantity(recipeId: RecipeId, maxCraftable: number): number {
-    return clamp(Math.floor(this.quantityFor(recipeId)), 1, maxCraftable);
+  public displayQuantity(recipeId: RecipeId, maxQueueable: number): number {
+    return clamp(Math.floor(this.quantityFor(recipeId)), 1, maxQueueable);
   }
 
   // Steps from the clamped displayed value (not the raw stored one), and
@@ -232,13 +232,13 @@ export class PanelPlayKingdomTradeskillComponent {
   // the stored quantity out of sync with what was visibly shown.
   public stepQuantity(
     recipeId: RecipeId,
-    maxCraftable: number,
+    maxQueueable: number,
     delta: number,
   ): void {
     const next = clamp(
-      this.displayQuantity(recipeId, maxCraftable) + delta,
+      this.displayQuantity(recipeId, maxQueueable) + delta,
       1,
-      maxCraftable,
+      maxQueueable,
     );
 
     this.quantities.update((quantities) => ({
@@ -247,17 +247,15 @@ export class PanelPlayKingdomTradeskillComponent {
     }));
   }
 
-  // Clamps live as the user types (rather than only on Craft) so the field
-  // can never visually sit above what's actually craftable, and resets to 1
-  // if the field is cleared entirely.
+  // Clamps live as the user types so the field never shows more than one batch can queue.
   public onQuantityInput(
     input: HTMLInputElement,
     event: Event,
     recipeId: RecipeId,
-    maxCraftable: number,
+    maxQueueable: number,
   ): void {
     const value = (event.target as HTMLInputElement).valueAsNumber;
-    const clamped = Number.isFinite(value) ? clamp(value, 1, maxCraftable) : 1;
+    const clamped = Number.isFinite(value) ? clamp(value, 1, maxQueueable) : 1;
 
     this.quantities.update((quantities) => ({
       ...quantities,
@@ -283,10 +281,10 @@ export class PanelPlayKingdomTradeskillComponent {
 
   public craft(
     recipeId: RecipeId,
-    maxCraftable: number,
+    maxQueueable: number,
     sourceEl: HTMLElement,
   ): void {
-    const quantity = this.displayQuantity(recipeId, maxCraftable);
+    const quantity = this.displayQuantity(recipeId, maxQueueable);
     const slotIndex = this.queueSlotIndexFor(recipeId);
     if (!craftQueueStart(this.tradeskill(), recipeId, quantity)) return;
 
