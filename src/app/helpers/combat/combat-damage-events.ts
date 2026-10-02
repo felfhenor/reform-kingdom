@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { isPageVisible } from '@helpers/engine/page-visibility';
 import { rngUuid } from '@helpers/rng';
 import type { CombatantDamageEvent, DamageEventVariant } from '@interfaces';
 
@@ -10,6 +11,8 @@ export function combatantDamageEventEmit(
   amount: number,
   variant?: DamageEventVariant,
 ): void {
+  if (!isPageVisible()) return;
+
   combatantDamageEvents.update((events) => [
     ...events,
     { id: rngUuid(), combatantId, amount, variant },

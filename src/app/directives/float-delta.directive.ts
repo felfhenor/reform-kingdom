@@ -7,6 +7,7 @@ import {
   input,
   untracked,
 } from '@angular/core';
+import { isPageVisible } from '@helpers/engine/page-visibility';
 import { AnimationService } from '@services/animation.service';
 import type { JSAnimation } from 'animejs';
 
@@ -39,7 +40,8 @@ export class FloatDeltaDirective {
         }
         const delta = value - this.previous;
         this.previous = value;
-        if (delta === 0 || !this.appFloatDeltaEnabled()) return;
+        if (delta === 0 || !this.appFloatDeltaEnabled() || !isPageVisible())
+          return;
         this.currentAnim = this.anim.floatDelta(this.el.nativeElement, delta);
       });
     });
