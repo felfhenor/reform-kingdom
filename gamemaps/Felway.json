@@ -335,6 +335,19 @@
                  "width":64,
                  "x":1600,
                  "y":128
+                }, 
+                {
+                 "gid":394,
+                 "height":64,
+                 "id":161,
+                 "name":"Felway Outpost",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Outpost",
+                 "visible":true,
+                 "width":64,
+                 "x":1024,
+                 "y":384
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -343,7 +356,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":161,
+ "nextobjectid":162,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
