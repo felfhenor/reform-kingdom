@@ -29,6 +29,7 @@
           <span class="type-hint">{{ row.description }}</span>
           @if (row.progress; as progress) {
             <app-bar-progress
+              class="mt-2"
               [value]="progress.current"
               [max]="progress.target"
             >
