@@ -8,8 +8,8 @@ import type {
   AtlasedImage,
   CollectibleContent,
   Combat,
-  CombatLog,
   Combatant,
+  CombatLog,
   CombatLogIcon,
   DropRarity,
   EquipmentContent,
@@ -20,6 +20,10 @@ import { parseInline } from 'marked';
 import mustache from 'mustache';
 
 export const combatLog = localStorageSignal<CombatLog[]>('combatLog', []);
+
+export function resetCombatLog() {
+  combatLog.set([]);
+}
 
 // While a batch is open, all log entries defer here instead of writing straight to combatLog, preserving chronological order.
 let pendingCombatLogMessages: CombatLog[] | null = null;

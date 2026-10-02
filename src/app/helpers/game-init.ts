@@ -1,3 +1,4 @@
+import { resetCombatLog } from '@helpers/combat/combat-log';
 import { kingdomSubviewClear, setGamePlayView } from '@helpers/engine/ui';
 import { grantStartingGold } from '@helpers/item/materials';
 import { migrateGameState } from '@helpers/migrate';
@@ -36,4 +37,5 @@ export function gameReset(): void {
 
   setGamePlayView('world');
   kingdomSubviewClear();
+  resetCombatLog();
 }
