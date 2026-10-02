@@ -112,10 +112,12 @@ function nearestReachableNode(
   return nearest;
 }
 
-// Random nodes reroll their rewards every cycle, so they're unfinished whenever this cycle's fights are still up.
 function isUnfinishedArea(entry: WorldNodeEntry): boolean {
-  if (worldNodeEncounterRandom(entry)) {
-    return worldNodeExploreRandomIsAvailable(entry);
+  if (
+    worldNodeEncounterRandom(entry) &&
+    !worldNodeExploreRandomIsAvailable(entry)
+  ) {
+    return false;
   }
 
   return worldNodeObtainableMissingRewards(entry).length > 0;

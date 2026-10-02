@@ -169,6 +169,7 @@ beforeEach(() => {
   vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
   vi.mocked(worldNodeEncounterRandom).mockReturnValue(undefined);
   vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(false);
+  vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([]);
   vi.mocked(getMaterialQuantity).mockReturnValue(0);
   vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
@@ -320,11 +321,21 @@ describe('nearestUnfinishedExploreNode', () => {
       return node;
     }
 
-    it('picks one whose fights are still up, even with every reward looted', () => {
+    it('picks one whose fights are still up with rewards missing', () => {
       const node = mockRandomNode();
       vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+        MISSING_REWARD,
+      ]);
 
       expect(nearestUnfinishedExploreNode('High')).toBe(node);
+    });
+
+    it('ignores one whose fights are up but every reward is looted', () => {
+      mockRandomNode();
+      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+
+      expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
     });
 
     it('ignores one already cleared this cycle, even with rewards missing', () => {
@@ -370,6 +381,9 @@ describe('nearestUnfinishedExploreNode', () => {
     it('excludes one outside the given risk tolerance', () => {
       mockRandomNode();
       vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+        MISSING_REWARD,
+      ]);
       vi.mocked(worldNodeEncounterRandom).mockReturnValue({
         levelRange: { min: 30, max: 30 },
       } as EncounterRandomContent);
