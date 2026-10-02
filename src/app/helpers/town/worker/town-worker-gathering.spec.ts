@@ -1,3 +1,4 @@
+import type * as WorldNodeGatheringHelper from '@helpers/world-node/world-node-gathering';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content/content', () => ({
@@ -22,7 +23,8 @@ vi.mock('@helpers/town/worker/town-worker-travel', () => ({
   townWorkerBeginReturnTrip: vi.fn(),
 }));
 
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
+vi.mock('@helpers/world-node/world-node-gathering', async (importOriginal) => ({
+  ...(await importOriginal<typeof WorldNodeGatheringHelper>()),
   gatheringResultsAtLevel: vi.fn(),
 }));
 
@@ -36,6 +38,7 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
 }));
 
 import { getEntry } from '@helpers/content/content';
+import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   townWorkerGatherRate,
@@ -152,9 +155,9 @@ describe('townWorkerGatheringProcessTick', () => {
   beforeEach(() => {
     vi.mocked(getEntry).mockReturnValue({} as WorkerContent);
     vi.mocked(worldNodeByName).mockReturnValue({} as never);
-    vi.mocked(worldNodeGathering).mockReturnValue({
-      gatherTime: 5,
-    } as GatheringContent);
+    vi.mocked(worldNodeGathering).mockReturnValue(
+      ensureGathering({ gatherTime: 5 }),
+    );
     vi.mocked(gatheringResultsAtLevel).mockReturnValue([
       { chance: 10, items: [{ itemId: oreId, quantity: 1 }] },
     ] as never);
@@ -224,6 +227,24 @@ describe('townWorkerGatheringProcessTick', () => {
   it('completes a unit and starts the return trip once at capacity', () => {
     // gatherTime 5 / rate 1 = 5 ticks per unit; capacity 2.
     mockGatheringState(1, 4);
+
+    townWorkerGatheringProcessTick(buildTown(), workerId);
+
+    expect(townWorkerBeginReturnTrip).toHaveBeenCalledWith(
+      townId,
+      expect.anything(),
+      workerId,
+      oreId,
+      2,
+    );
+  });
+
+  it('completes a unit sooner on an upgraded node', () => {
+    // (5 - 1 * 2) / rate 1 = 3 ticks per unit at node level 1.
+    vi.mocked(worldNodeGathering).mockReturnValue(
+      ensureGathering({ gatherTime: 5, gatherReductionPerUpgradeLevel: 2 }),
+    );
+    mockGatheringState(1, 2);
 
     townWorkerGatheringProcessTick(buildTown(), workerId);
 

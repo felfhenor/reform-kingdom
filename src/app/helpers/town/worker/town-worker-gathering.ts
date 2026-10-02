@@ -12,6 +12,7 @@ import {
   workerGatherRate,
   workerGatherTickOutcome,
 } from '@helpers/worker/worker-shared';
+import { gatheringEffectiveGatherTime } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import type {
   GatheringContent,
@@ -91,17 +92,22 @@ export function townWorkerGatheringProcessTick(
   const gathering = workerGatherNodeContent(status.nodeName);
   if (!content || !gathering) return;
 
+  const nodeLevel = worldNodeLevel(status.nodeName);
   const rate = townWorkerGatherRate(
     content,
     worker.level,
     gathering,
     status.itemId,
-    worldNodeLevel(status.nodeName),
+    nodeLevel,
     town.gathering.gatherRateMultiplier,
   );
   if (rate <= 0) return;
 
-  const outcome = workerGatherTickOutcome(status, rate, gathering.gatherTime);
+  const outcome = workerGatherTickOutcome(
+    status,
+    rate,
+    gatheringEffectiveGatherTime(gathering, nodeLevel),
+  );
   if (outcome.kind === 'Progress') {
     updateGamestate((state) => {
       const target = state.world.towns[town.id]?.workers[workerId];

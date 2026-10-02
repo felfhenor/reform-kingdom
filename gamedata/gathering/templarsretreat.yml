@@ -12,6 +12,7 @@
 
   xpGainedIfInLevelRange: 6
   gatherTime: 15
+  gatherReductionPerUpgradeLevel: 2
 
   levelCost:
     - costs:

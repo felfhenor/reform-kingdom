@@ -35,6 +35,9 @@ export type GatheringContent = IsContentItem &
     xpGainedIfInLevelRange: number;
     gatherTime: number;
 
+    // Ticks shaved off gatherTime per node upgrade level (party and workers alike).
+    gatherReductionPerUpgradeLevel: number;
+
     gatherResults: GatherResult[];
 
     // Gates whether a worker gains XP gathering here.

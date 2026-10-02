@@ -1,3 +1,4 @@
+import type * as WorldNodeGatheringHelper from '@helpers/world-node/world-node-gathering';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/content/content', () => ({
@@ -28,7 +29,8 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
+vi.mock('@helpers/world-node/world-node-gathering', async (importOriginal) => ({
+  ...(await importOriginal<typeof WorldNodeGatheringHelper>()),
   gatheringResultsAtLevel: vi.fn((gathering) => gathering.gatherResults),
 }));
 
@@ -149,6 +151,7 @@ describe('workerGatheringProcessTick', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(workerAssignmentIsValid).mockReturnValue(true);
+    vi.mocked(worldNodeLevel).mockReturnValue(0);
     vi.mocked(worldNodeByName).mockReturnValue({} as never);
     vi.mocked(worldNodeGathering).mockReturnValue(
       buildGathering({ gatherTime: 10 }),
@@ -229,6 +232,30 @@ describe('workerGatheringProcessTick', () => {
       spritesheet: 'item',
       quantity: 1,
     });
+  });
+
+  it('completes a unit sooner on an upgraded node', () => {
+    // (10 - 2 * 2) / 1.6 = 3.75 ticks per unit.
+    vi.mocked(worldNodeGathering).mockReturnValue(
+      buildGathering({ gatherTime: 10, gatherReductionPerUpgradeLevel: 2 }),
+    );
+    vi.mocked(worldNodeLevel).mockReturnValue(2);
+    const worker = buildWorker({
+      status: {
+        kind: 'Gathering',
+        nodeName: 'Wergen Woods',
+        itemId: COPPER_ID,
+        itemsGathered: 0,
+        ticksIntoGather: 3,
+      },
+    });
+    vi.mocked(gamestate).mockReturnValue({
+      workers: { [WORKER_ID]: worker },
+    } as unknown as GameState);
+
+    workerGatheringProcessTick(WORKER_ID);
+
+    expect(workerGainXp).toHaveBeenCalledWith(WORKER_ID, 1);
   });
 
   it('begins the return trip once capacity is reached instead of resetting the cycle, and emits the VFX', () => {

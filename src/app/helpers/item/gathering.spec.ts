@@ -1,3 +1,4 @@
+import type * as WorldNodeGatheringHelper from '@helpers/world-node/world-node-gathering';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/hero/character-progress', () => ({
@@ -61,7 +62,8 @@ vi.mock('@helpers/world-node/world-nodes', () => ({
   worldNodeGathering: vi.fn(),
 }));
 
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
+vi.mock('@helpers/world-node/world-node-gathering', async (importOriginal) => ({
+  ...(await importOriginal<typeof WorldNodeGatheringHelper>()),
   gatheringResultsAtLevel: vi.fn((gathering) => gathering.gatherResults),
 }));
 
@@ -72,7 +74,10 @@ vi.mock('@helpers/world-node/world-node-level', () => ({
 import { taskRecordGather } from '@helpers/task/task-progress';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
-import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
+import {
+  ensureGatherResult,
+  ensureGathering,
+} from '@helpers/content/ensure-gathernode';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
@@ -118,17 +123,16 @@ import type {
 function buildGathering(
   overrides: Partial<GatheringContent> = {},
 ): GatheringContent {
-  return {
+  return ensureGathering({
     id: 'gather-1' as GatheringId,
     name: 'Wergen Woods',
-    __type: 'gathering',
     description: 'A dry forest.',
     levelRange: { min: 1, max: 5 },
     xpGainedIfInLevelRange: 3,
     gatherTime: 5,
     gatherResults: [],
     ...overrides,
-  } as GatheringContent;
+  });
 }
 
 function buildCharacter(level: number, luck = 0): Character {
@@ -241,6 +245,7 @@ describe('canEnterGatherNode', () => {
 describe('isGathering / currentGatheringContent / gatheringProgressFraction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(worldNodeLevel).mockReturnValue(0);
   });
 
   it('isGathering reflects the world gathering status', () => {
@@ -264,6 +269,7 @@ describe('isGathering / currentGatheringContent / gatheringProgressFraction', ()
       world: {
         gathering: {
           status: 'Gathering',
+          nodeName: 'Wergen Woods',
           gatheringId: 'gather-1',
           ticksIntoGather: 8,
         },
@@ -274,6 +280,28 @@ describe('isGathering / currentGatheringContent / gatheringProgressFraction', ()
     );
 
     expect(gatheringProgressFraction()).toBe(1);
+  });
+
+  it('gatheringProgressFraction measures against the upgraded gather time', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 2,
+        },
+      },
+    } as unknown as GameState);
+    vi.mocked(getEntry).mockReturnValue(
+      buildGathering({
+        gatherTime: 6,
+        gatherReductionPerUpgradeLevel: 1,
+      }) as never,
+    );
+    vi.mocked(worldNodeLevel).mockReturnValue(2);
+
+    expect(gatheringProgressFraction()).toBe(0.5);
   });
 
   it('currentGatheringContent returns undefined without an active gatheringId', () => {
@@ -303,7 +331,7 @@ describe('gatheringRollResult', () => {
     expect(gatheringResultsAtLevel).toHaveBeenCalledWith(gathering, 2);
 
     const [items, weightFn] = vi.mocked(rngChoiceWeighted).mock.calls[0];
-    expect(items).toBe(results);
+    expect(items).toEqual(results);
     expect(weightFn(results[0])).toBe(40);
   });
 });
@@ -379,6 +407,7 @@ describe('gatheringProcessTick', () => {
     // `vi.clearAllMocks()` doesn't undo a `mockReturnValue` set by an earlier test, so reset these explicitly.
     vi.mocked(partyGatherYieldBonuses).mockReturnValue([]);
     vi.mocked(rngSucceedsChance).mockReturnValue(false);
+    vi.mocked(worldNodeLevel).mockReturnValue(0);
   });
 
   it('does nothing when not gathering', () => {
@@ -413,6 +442,34 @@ describe('gatheringProcessTick', () => {
     } as unknown as GameState);
     expect(result.world.gathering.ticksIntoGather).toBe(3);
     expect(partyGainXp).not.toHaveBeenCalled();
+  });
+
+  it('resolves a cycle sooner on an upgraded node', () => {
+    vi.mocked(gamestate).mockReturnValue({
+      world: {
+        gathering: {
+          status: 'Gathering',
+          nodeName: 'Wergen Woods',
+          gatheringId: 'gather-1',
+          ticksIntoGather: 2,
+        },
+      },
+    } as unknown as GameState);
+    vi.mocked(getEntry).mockReturnValue(
+      buildGathering({
+        gatherTime: 5,
+        gatherReductionPerUpgradeLevel: 1,
+      }) as never,
+    );
+    vi.mocked(worldNodeLevel).mockReturnValue(2);
+
+    gatheringProcessTick();
+
+    expect(partyGainXp).toHaveBeenCalled();
+    const result = applyLastUpdate({
+      world: { gathering: { ticksIntoGather: 2 } },
+    } as unknown as GameState);
+    expect(result.world.gathering.ticksIntoGather).toBe(0);
   });
 
   it('resolves a cycle once gatherTime is reached: grants in-range xp, rolls a result, and resets the counter', () => {

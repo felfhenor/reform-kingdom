@@ -18,7 +18,10 @@ import {
   worldGatheringState,
   worldPartyState,
 } from '@helpers/state-game';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
+import {
+  gatheringEffectiveGatherTime,
+  gatheringResultsAtLevel,
+} from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
   worldNodeByName,
@@ -72,9 +75,13 @@ export function gatheringProgressFraction(): number {
   if (gathering.status !== 'Gathering') return 0;
 
   const content = currentGatheringContent();
-  if (!content || content.gatherTime <= 0) return 0;
+  if (!content || !gathering.nodeName) return 0;
 
-  return clamp(gathering.ticksIntoGather / content.gatherTime, 0, 1);
+  const gatherTime = gatheringEffectiveGatherTime(
+    content,
+    worldNodeLevel(gathering.nodeName),
+  );
+  return clamp(gathering.ticksIntoGather / gatherTime, 0, 1);
 }
 
 export function gatheringRollResult(
@@ -215,8 +222,12 @@ export function gatheringProcessTick(): void {
   if (!content) return;
 
   const ticksIntoGather = gathering.ticksIntoGather + 1;
+  const gatherTime = gatheringEffectiveGatherTime(
+    content,
+    worldNodeLevel(gathering.nodeName),
+  );
 
-  if (ticksIntoGather < content.gatherTime) {
+  if (ticksIntoGather < gatherTime) {
     updateGamestate((state) => {
       state.world.gathering.ticksIntoGather = ticksIntoGather;
       return state;

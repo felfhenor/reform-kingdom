@@ -1,8 +1,12 @@
 import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
-import { ensureGatherResult } from '@helpers/content/ensure-gathernode';
+import {
+  ensureGatherResult,
+  ensureGathering,
+} from '@helpers/content/ensure-gathernode';
 import { setAllMaps } from '@helpers/maps';
 import {
   allGatherableMaterialIds,
+  gatheringEffectiveGatherTime,
   gatheringResultsAtLevel,
 } from '@helpers/world-node/world-node-gathering';
 import type {
@@ -94,6 +98,33 @@ describe('gatheringResultsAtLevel', () => {
     expect(gatheringResultsAtLevel(gathering, 0)).toEqual([levelOne]);
     expect(gatheringResultsAtLevel(gathering, 1)).toEqual([levelTwo]);
     expect(gatheringResultsAtLevel(gathering, 2)).toEqual([]);
+  });
+});
+
+describe('gatheringEffectiveGatherTime', () => {
+  it('reduces gatherTime by the per-upgrade amount for each node level', () => {
+    const gathering = ensureGathering({
+      gatherTime: 10,
+      gatherReductionPerUpgradeLevel: 2,
+    });
+
+    expect(gatheringEffectiveGatherTime(gathering, 0)).toBe(10);
+    expect(gatheringEffectiveGatherTime(gathering, 3)).toBe(4);
+  });
+
+  it('never drops below 1 tick', () => {
+    const gathering = ensureGathering({
+      gatherTime: 5,
+      gatherReductionPerUpgradeLevel: 3,
+    });
+
+    expect(gatheringEffectiveGatherTime(gathering, 4)).toBe(1);
+  });
+
+  it('defaults to no reduction when unset', () => {
+    const gathering = ensureGathering({ gatherTime: 5 });
+
+    expect(gatheringEffectiveGatherTime(gathering, 2)).toBe(5);
   });
 });
 

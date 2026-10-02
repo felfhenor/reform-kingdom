@@ -12,6 +12,7 @@
 
   xpGainedIfInLevelRange: 15
   gatherTime: 25
+  gatherReductionPerUpgradeLevel: 4
 
   levelCost:
     - costs:
@@ -100,6 +101,7 @@
 
   xpGainedIfInLevelRange: 20
   gatherTime: 15
+  gatherReductionPerUpgradeLevel: 2
 
   levelCost:
     - costs:
@@ -230,6 +232,7 @@
 
   xpGainedIfInLevelRange: 15
   gatherTime: 25
+  gatherReductionPerUpgradeLevel: 5
 
   levelCost:
     - costs:

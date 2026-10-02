@@ -31,6 +31,17 @@ export function gatheringResultsAtLevel(
   return results;
 }
 
+// Floors at 1 so an over-reduced node still takes a tick per cycle.
+export function gatheringEffectiveGatherTime(
+  gathering: GatheringContent,
+  level: number,
+): number {
+  return Math.max(
+    1,
+    gathering.gatherTime - gathering.gatherReductionPerUpgradeLevel * level,
+  );
+}
+
 // Ignores discovery/level (unlike `worldNodeGatherMaterialIds`) - lets `pruneInvalidDecreeGatherClauses` tell "not unlocked yet" apart from "no longer exists".
 export function allGatherableMaterialIds(): MaterialId[] {
   const ids = new Set<MaterialId>();

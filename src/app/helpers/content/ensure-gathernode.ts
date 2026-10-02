@@ -40,6 +40,8 @@ export function ensureGathering(
     levelRange: gathering.levelRange ?? { min: 1, max: 1 },
     xpGainedIfInLevelRange: gathering.xpGainedIfInLevelRange ?? 0,
     gatherTime: gathering.gatherTime ?? 1,
+    gatherReductionPerUpgradeLevel:
+      gathering.gatherReductionPerUpgradeLevel ?? 0,
     gatherResults: ensureArray(gathering.gatherResults, ensureGatherResult),
     hidden: gathering.hidden ?? false,
     invisibleUntilCollectibleIdsFound:
