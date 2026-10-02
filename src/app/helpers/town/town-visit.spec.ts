@@ -36,6 +36,11 @@ vi.mock('@helpers/engine/timer', () => ({
   timerTicksElapsed: vi.fn(),
 }));
 
+vi.mock('@helpers/town/crafting/town-craft-queue', () => ({
+  townCompleteInitialCrafts: vi.fn(),
+  townQueueInitialCrafts: vi.fn(),
+}));
+
 vi.mock('@helpers/town/worker/town-worker-roster', () => ({
   townWorkerRosterMaterialize: vi.fn((_town, existing) => existing),
 }));
@@ -53,6 +58,14 @@ import { ensureTown } from '@helpers/content/ensure-town';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
+  TOWN_FIRST_VISIT_CRAFT_COUNT,
+} from '@helpers/config';
+import {
+  townCompleteInitialCrafts,
+  townQueueInitialCrafts,
+} from '@helpers/town/crafting/town-craft-queue';
 import { isPartyAtTown, townMarkVisited } from '@helpers/town/town-visit';
 import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
@@ -347,6 +360,36 @@ describe('townMarkVisited', () => {
     expect(state.world.towns[townId].workers).toEqual({ materialized: 1 });
   });
 
+  it('completes initial crafts before queueing more on first visit', () => {
+    const town = ensureTown({ name: 'Larsia' });
+    vi.mocked(getEntry).mockReturnValue(town);
+    vi.mocked(gamestate).mockReturnValue({
+      world: { towns: {} },
+    } as unknown as GameState);
+    const state = { world: { towns: {} } } as unknown as GameState;
+    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+      fn(state);
+    });
+
+    townMarkVisited(townId);
+
+    expect(townCompleteInitialCrafts).toHaveBeenCalledWith(
+      state,
+      town,
+      TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
+    );
+    expect(townQueueInitialCrafts).toHaveBeenCalledWith(
+      state,
+      town,
+      TOWN_FIRST_VISIT_CRAFT_COUNT,
+    );
+    expect(
+      vi.mocked(townCompleteInitialCrafts).mock.invocationCallOrder[0],
+    ).toBeLessThan(
+      vi.mocked(townQueueInitialCrafts).mock.invocationCallOrder[0],
+    );
+  });
+
   it('is a no-op and fires no analytics if the town was already visited', () => {
     vi.mocked(gamestate).mockReturnValue({
       world: {
@@ -370,6 +413,8 @@ describe('townMarkVisited', () => {
     townMarkVisited(townId);
 
     expect(state.world.towns[townId].firstVisitedAtTick).toBe(100);
+    expect(townQueueInitialCrafts).not.toHaveBeenCalled();
+    expect(townCompleteInitialCrafts).not.toHaveBeenCalled();
     expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
   });
 });

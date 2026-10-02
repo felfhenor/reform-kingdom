@@ -1,3 +1,7 @@
+import {
+  TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
+  TOWN_FIRST_VISIT_CRAFT_COUNT,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -5,6 +9,10 @@ import {
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
+import {
+  townCompleteInitialCrafts,
+  townQueueInitialCrafts,
+} from '@helpers/town/crafting/town-craft-queue';
 import { townTradeskillsMaterialize } from '@helpers/town/crafting/town-craft-tradeskills';
 import { townDefaultMaterials } from '@helpers/town/town-materials';
 import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
@@ -49,6 +57,14 @@ export function townMarkVisited(townId: TownId): void {
       specialtyPriority: existing?.specialtyPriority ?? [],
       firstVisitedAtTick: timerTicksElapsed(),
     };
+    if (town) {
+      townCompleteInitialCrafts(
+        state,
+        town,
+        TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
+      );
+      townQueueInitialCrafts(state, town, TOWN_FIRST_VISIT_CRAFT_COUNT);
+    }
     return state;
   });
 

@@ -56,6 +56,26 @@ function grantCraftedResult(
   }
 }
 
+function isStockFullFor(
+  state: GameState,
+  townId: TownId,
+  recipe: RecipeContent,
+): boolean {
+  return (
+    'equipmentId' in recipe.result &&
+    state.world.towns[townId].stock.length >= townShopItemCap(townId)
+  );
+}
+
+function completeCraft(
+  state: GameState,
+  townId: TownId,
+  recipe: RecipeContent,
+): void {
+  grantCraftedResult(state, townId, recipe);
+  resetTownSpecialtyPriority(state, townId, recipe.id);
+}
+
 // Returns false to signal "hold" - the entry stays in the queue untouched and retries next tick.
 function resolveQueueEntryCompletion(
   state: GameState,
@@ -65,17 +85,9 @@ function resolveQueueEntryCompletion(
 ): boolean {
   const target = state.world.towns[town.id];
   if (!target.tradeskills[entry.tradeskillId]) return true; // orphaned tradeskill - drop the entry defensively
+  if (isStockFullFor(state, town.id, recipe)) return false;
 
-  if (
-    'equipmentId' in recipe.result &&
-    target.stock.length >= townShopItemCap(town.id)
-  ) {
-    return false;
-  }
-
-  grantCraftedResult(state, town.id, recipe);
-  resetTownSpecialtyPriority(state, town.id, recipe.id);
-
+  completeCraft(state, town.id, recipe);
   return true;
 }
 
@@ -125,31 +137,72 @@ function shouldAttemptQueue(town: TownContent, queueLength: number): boolean {
   return rngSucceedsChance(town.crafting.craftingChanceOnTick);
 }
 
-function maybeQueueNewCraft(state: GameState, town: TownContent): void {
-  const queueLength = state.world.towns[town.id].craftQueue.length;
-  if (queueLength >= townCraftQueueSize(town)) return;
-  if (!shouldAttemptQueue(town, queueLength)) return;
-
-  const pick = townPickRecipeToQueue(town);
-  if (!pick) return;
-
-  pick.recipe.requirements.forEach((requirement) => {
+function consumeRecipeRequirements(
+  state: GameState,
+  townId: TownId,
+  recipe: RecipeContent,
+): void {
+  recipe.requirements.forEach((requirement) => {
     if ('itemId' in requirement) {
       applyTownMaterialDelta(
         state,
-        town.id,
+        townId,
         requirement.itemId,
         -requirement.quantity,
       );
     }
   });
+}
 
+// Returns whether a craft was actually queued.
+function queueNewCraft(state: GameState, town: TownContent): boolean {
+  const queueLength = state.world.towns[town.id].craftQueue.length;
+  if (queueLength >= townCraftQueueSize(town)) return false;
+
+  const pick = townPickRecipeToQueue(town);
+  if (!pick) return false;
+
+  consumeRecipeRequirements(state, town.id, pick.recipe);
   state.world.towns[town.id].craftQueue.push({
     id: rngUuid() as CraftQueueEntryId,
     tradeskillId: pick.tradeskillId,
     recipeId: pick.recipe.id,
     ticksIntoCraft: 0,
   });
+  return true;
+}
+
+function maybeQueueNewCraft(state: GameState, town: TownContent): void {
+  const queueLength = state.world.towns[town.id].craftQueue.length;
+  if (!shouldAttemptQueue(town, queueLength)) return;
+
+  queueNewCraft(state, town);
+}
+
+// Skips the per-tick chance roll; stops early once nothing more can be queued.
+export function townQueueInitialCrafts(
+  state: GameState,
+  town: TownContent,
+  count: number,
+): void {
+  for (let i = 0; i < count; i++) {
+    if (!queueNewCraft(state, town)) return;
+  }
+}
+
+// Instantly-finished crafts, so a newly-found town opens with something already made.
+export function townCompleteInitialCrafts(
+  state: GameState,
+  town: TownContent,
+  count: number,
+): void {
+  for (let i = 0; i < count; i++) {
+    const pick = townPickRecipeToQueue(town);
+    if (!pick || isStockFullFor(state, town.id, pick.recipe)) return;
+
+    consumeRecipeRequirements(state, town.id, pick.recipe);
+    completeCraft(state, town.id, pick.recipe);
+  }
 }
 
 function processTownCraftQueue(town: TownContent): void {

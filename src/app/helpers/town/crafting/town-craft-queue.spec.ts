@@ -72,7 +72,11 @@ import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
 } from '@helpers/town/town-tick';
-import { townCraftProcessTick } from '@helpers/town/crafting/town-craft-queue';
+import {
+  townCompleteInitialCrafts,
+  townCraftProcessTick,
+  townQueueInitialCrafts,
+} from '@helpers/town/crafting/town-craft-queue';
 import type {
   GameState,
   ItemId,
@@ -731,5 +735,150 @@ describe('townCraftProcessTick - queueing new crafts', () => {
     expect(townPickRecipeToQueue).toHaveBeenCalledWith(
       expect.objectContaining({ id: townId }),
     );
+  });
+});
+
+describe('townQueueInitialCrafts', () => {
+  const recipe = {
+    id: 'recipe-1' as RecipeId,
+    tradeskillId: blacksmithingId,
+    requirements: [{ itemId: oreId, quantity: 2 }],
+  } as RecipeContent;
+
+  function buildState(): GameState {
+    return {
+      world: { towns: { [townId]: { craftQueue: [] } } },
+    } as unknown as GameState;
+  }
+
+  it('queues the requested count without rolling craftingChanceOnTick', () => {
+    vi.mocked(townPickRecipeToQueue).mockReturnValue({
+      tradeskillId: blacksmithingId,
+      recipe,
+    });
+    const state = buildState();
+
+    townQueueInitialCrafts(state, buildTown({ craftingChanceOnTick: 0 }), 4);
+
+    expect(rngSucceedsChance).not.toHaveBeenCalled();
+    expect(state.world.towns[townId].craftQueue).toHaveLength(4);
+    expect(applyTownMaterialDelta).toHaveBeenCalledTimes(4);
+  });
+
+  it('stops at maxQueueSize', () => {
+    vi.mocked(townPickRecipeToQueue).mockReturnValue({
+      tradeskillId: blacksmithingId,
+      recipe,
+    });
+    const state = buildState();
+
+    townQueueInitialCrafts(
+      state,
+      buildTown({ maxQueueSize: [{ tier: 0, value: 2 }] }),
+      4,
+    );
+
+    expect(state.world.towns[townId].craftQueue).toHaveLength(2);
+  });
+
+  it('stops early once no recipe is eligible', () => {
+    vi.mocked(townPickRecipeToQueue)
+      .mockReturnValueOnce({ tradeskillId: blacksmithingId, recipe })
+      .mockReturnValue(undefined);
+    const state = buildState();
+
+    townQueueInitialCrafts(state, buildTown(), 4);
+
+    expect(state.world.towns[townId].craftQueue).toHaveLength(1);
+    expect(townPickRecipeToQueue).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('townCompleteInitialCrafts', () => {
+  const materialRecipe = {
+    id: 'recipe-1' as RecipeId,
+    tradeskillId: blacksmithingId,
+    requirements: [{ itemId: oreId, quantity: 2 }],
+    result: { itemId: 'ingot' as ItemId, quantity: 1 },
+  } as RecipeContent;
+  const equipmentRecipe = {
+    id: 'recipe-2' as RecipeId,
+    tradeskillId: blacksmithingId,
+    requirements: [],
+    result: { equipmentId: 'sword' },
+  } as unknown as RecipeContent;
+
+  function buildState(stock: unknown[] = []): GameState {
+    return {
+      world: { towns: { [townId]: { stock, craftQueue: [] } } },
+    } as unknown as GameState;
+  }
+
+  it('consumes requirements and grants the result without queueing', () => {
+    vi.mocked(townPickRecipeToQueue).mockReturnValue({
+      tradeskillId: blacksmithingId,
+      recipe: materialRecipe,
+    });
+    const state = buildState();
+
+    townCompleteInitialCrafts(state, buildTown(), 2);
+
+    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
+      state,
+      townId,
+      oreId,
+      -2,
+    );
+    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
+      state,
+      townId,
+      'ingot',
+      1,
+    );
+    expect(applyTownMaterialDelta).toHaveBeenCalledTimes(4);
+    expect(resetTownSpecialtyPriority).toHaveBeenCalledWith(
+      state,
+      townId,
+      'recipe-1',
+    );
+    expect(state.world.towns[townId].craftQueue).toEqual([]);
+  });
+
+  it('puts equipment results into stock', () => {
+    vi.mocked(townPickRecipeToQueue).mockReturnValue({
+      tradeskillId: blacksmithingId,
+      recipe: equipmentRecipe,
+    });
+
+    townCompleteInitialCrafts(buildState(), buildTown(), 1);
+
+    expect(newEquipmentItem).toHaveBeenCalledWith('sword');
+    expect(applyTownStockAdd).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops once the shop stock is full', () => {
+    vi.mocked(townShopItemCap).mockReturnValue(1);
+    vi.mocked(townPickRecipeToQueue).mockReturnValue({
+      tradeskillId: blacksmithingId,
+      recipe: equipmentRecipe,
+    });
+
+    townCompleteInitialCrafts(buildState([{}]), buildTown(), 4);
+
+    expect(applyTownStockAdd).not.toHaveBeenCalled();
+  });
+
+  it('stops early once no recipe is eligible', () => {
+    vi.mocked(townPickRecipeToQueue)
+      .mockReturnValueOnce({
+        tradeskillId: blacksmithingId,
+        recipe: materialRecipe,
+      })
+      .mockReturnValue(undefined);
+
+    townCompleteInitialCrafts(buildState(), buildTown(), 4);
+
+    expect(townPickRecipeToQueue).toHaveBeenCalledTimes(2);
+    expect(resetTownSpecialtyPriority).toHaveBeenCalledTimes(1);
   });
 });
