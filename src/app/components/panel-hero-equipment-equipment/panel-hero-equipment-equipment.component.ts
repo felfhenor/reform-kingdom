@@ -23,13 +23,14 @@ import {
   isSlotAvailableForJob,
 } from '@helpers/item/equipment';
 import { equipmentAvailableForSlot } from '@helpers/item/equipment.ui';
-import type {
-  Character,
-  EquipmentArmoryEntry,
-  EquipmentContent,
-  EquipmentItem,
-  EquipmentItemId,
-  EquipmentSlot,
+import {
+  EquipmentTypeToSlot,
+  type Character,
+  type EquipmentArmoryEntry,
+  type EquipmentContent,
+  type EquipmentItem,
+  type EquipmentItemId,
+  type EquipmentSlot,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -74,8 +75,10 @@ export class PanelHeroEquipmentEquipmentComponent {
 
     const character = this.character();
     return sortBy(
-      equipmentAvailableForSlot(slot).filter((entry) =>
-        canEquipItem(character, entry.content),
+      equipmentAvailableForSlot(slot).filter(
+        (entry) =>
+          canEquipItem(character, entry.content) &&
+          EquipmentTypeToSlot[entry.content.type][0] === slot,
       ),
       [(item) => -item.content.levelRequirement, (item) => item.content.name],
     );
