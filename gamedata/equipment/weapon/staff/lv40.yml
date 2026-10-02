@@ -1,0 +1,11 @@
+- id: 2b73dee6-9d4c-49a4-8bb8-61a63aea718c
+  name: Demonic Staff
+  description: A standard-issue demon staff.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Staff
+  sprite: '0217'
+  slots: 1
+  baseStats:
+    Intelligence: 29.2
+    Vitality: 22.1

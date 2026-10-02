@@ -1,0 +1,12 @@
+- id: 436a65a4-b6af-41bc-8df9-21b2e849451b
+  name: Demonic Whip
+  description: A standard-issue demon whip.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Whip
+  sprite: '0219'
+  slots: 1
+  baseStats:
+    Intelligence: 21.1
+    Resistance: 19.1
+    Strength: 10.1

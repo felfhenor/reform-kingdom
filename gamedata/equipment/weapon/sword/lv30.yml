@@ -24,3 +24,15 @@
 
   monsterTypeDamage:
     Humanoid: 15
+
+- id: 8c966b05-5e13-4a73-9bc6-93b0c343baee
+  name: Fel Infantry Sword
+  description: A simple demonic sword made for simple demons to wield.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Sword
+  sprite: '0211'
+  slots: 1
+  baseStats:
+    Strength: 20.1
+    Vitality: 20.1

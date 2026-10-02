@@ -26,3 +26,15 @@
 
   monsterTypeDamage:
     Humanoid: 10
+
+- id: 4b17b8fb-19f1-4760-be0f-3c029492fb0c
+  name: Fel Villager Armor
+  description: An armor piece commonly worn by those defending demon villages.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0223'
+  slots: 1
+  baseStats:
+    Vitality: 25.3
+    Resistance: 19.5

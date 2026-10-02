@@ -20,3 +20,15 @@
   slots: 1
   baseStats:
     Vitality: 26.3
+
+- id: 86a32b6e-464c-494b-8e57-324498211c00
+  name: Fel Villager Cloak
+  description: A cloak typically made for demon villagers to resist the harsh Felway climate.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0230'
+  slots: 1
+  baseStats:
+    Vitality: 27.3
+    Resistance: 19.3

@@ -1,0 +1,11 @@
+- id: b72e9786-ba36-4d8b-9a71-018337a35c65
+  name: Demonic Shield
+  description: A standard-issue demon shield.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Shield
+  sprite: '0221'
+  slots: 1
+  baseStats:
+    Vitality: 19.1
+    Resistance: 13.6

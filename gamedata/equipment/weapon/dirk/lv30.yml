@@ -23,3 +23,14 @@
 
   monsterTypeDamage:
     Humanoid: 15
+
+- id: d8d19ec2-e31c-4ab2-9989-a4b357bc869c
+  name: Fel Roguish Dirk
+  description: A stealthy dirk given to demonic assassins.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0212'
+  slots: 1
+  baseStats:
+    Strength: 24.3

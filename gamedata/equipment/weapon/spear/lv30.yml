@@ -26,3 +26,14 @@
 
   monsterTypeDamage:
     Humanoid: 15
+
+- id: 2d3e2fc4-0c2b-47ff-a454-ae1e0e7aced7
+  name: Fel Spear
+  description: A simple spear often utilized by demon villagers to chase off or hunt local wildlife.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Spear
+  sprite: '0214'
+  slots: 1
+  baseStats:
+    Strength: 32.2

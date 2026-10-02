@@ -21,3 +21,17 @@
   baseStats:
     Resistance: 9.1
     Energy: 37
+
+- id: 9c4c440e-7c8d-4bc4-9127-6dcd190c9046
+  name: Fel Villager Hat
+  description: A hat typically made for demon villagers to resist the harsh Felway climate.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Hat
+  sprite: '0231'
+  slots: 1
+  baseStats:
+    Resistance: 6.1
+    Vitality: 7.6
+    Health: 45
+    Energy: 21

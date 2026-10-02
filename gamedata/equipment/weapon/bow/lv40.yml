@@ -1,0 +1,11 @@
+- id: 7ef7b0be-159e-427a-a08a-a151616109e7
+  name: Demonic Bow
+  description: A standard-issue demon bow.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Bow
+  sprite: '0220'
+  slots: 1
+  baseStats:
+    Strength: 24.1
+    Agility: 16.9

@@ -1,0 +1,11 @@
+- id: f8530556-cd45-4d6f-b623-317d27ad899f
+  name: Demonic Mace
+  description: A standard-issue demon mace.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Mace
+  sprite: '0218'
+  slots: 1
+  baseStats:
+    Strength: 22.2
+    Intelligence: 19.3

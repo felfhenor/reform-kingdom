@@ -1,0 +1,11 @@
+- id: 981ece26-bff9-4df7-a79c-8baec42e8f26
+  name: Demonic Arrow
+  description: An arrow made from refined fel copper. It's piercing capabilities are incomparable.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Arrow
+  sprite: '0232'
+  slots: 1
+  baseStats:
+    Strength: 19.2
+    Agility: 11.5

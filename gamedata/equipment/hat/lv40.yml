@@ -1,0 +1,12 @@
+- id: 770ef6a2-03e2-4376-bbf1-024e20b286dc
+  name: Demonic Tophat
+  description: Devilish!
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Hat
+  sprite: '0229'
+  slots: 1
+  baseStats:
+    Vitality: 23.5
+    Health: 51
+    Energy: 28

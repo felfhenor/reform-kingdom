@@ -1,0 +1,10 @@
+- id: a46f80cd-7274-4ab1-bc79-7800deffafe5
+  name: Demonic Spear
+  description: A standard-issue demon spear.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Spear
+  sprite: '0222'
+  slots: 1
+  baseStats:
+    Strength: 38.2

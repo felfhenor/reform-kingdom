@@ -1,0 +1,11 @@
+- id: 8784548c-3df5-4ef1-a9de-381ce5b2572e
+  name: Demonic Sword
+  description: A standard-issue demon sword..
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Sword
+  sprite: '0216'
+  slots: 1
+  baseStats:
+    Strength: 23.6
+    Vitality: 23.6

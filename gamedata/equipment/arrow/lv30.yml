@@ -28,3 +28,15 @@
     Humanoid: 5
     Insect: 5
     Spirit: 5
+
+- id: dd5c2cab-d754-4f09-bad7-21be6f3499e3
+  name: Fel Arrow
+  description: An arrow made with fel materiel. It's versatile and usable by the average demon.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Arrow
+  sprite: '0210'
+  slots: 1
+  baseStats:
+    Strength: 15.2
+    Agility: 9.5

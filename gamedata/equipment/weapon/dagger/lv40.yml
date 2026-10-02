@@ -1,0 +1,11 @@
+- id: b55982e1-68da-4667-b8c7-cd4b7929c1f0
+  name: Demonic Dagger
+  description: A standard-issue demon dagger.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0213'
+  slots: 1
+  baseStats:
+    Agility: 24.1
+    Strength: 19.5

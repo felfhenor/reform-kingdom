@@ -1,0 +1,11 @@
+- id: 39ae7592-a7dd-4f6d-baa0-49bc3a6c2a61
+  name: Demonic Platemail
+  description: A standard-issue demon platemail. It protects another critical part of the body.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0225'
+  slots: 1
+  baseStats:
+    Vitality: 29.1
+    Resistance: 22.1

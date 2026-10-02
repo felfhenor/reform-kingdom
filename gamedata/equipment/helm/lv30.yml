@@ -20,3 +20,14 @@
   slots: 2
   baseStats:
     Vitality: 26.9
+
+- id: 1cb9d8c5-5225-47f9-83c2-a169e81321de
+  name: Fel Villager Helm
+  description: A helmet commonly used by demons whilst fighting off creatures from the fields they tend.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Helm
+  sprite: '0224'
+  slots: 1
+  baseStats:
+    Vitality: 29.1

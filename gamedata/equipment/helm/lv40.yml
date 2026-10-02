@@ -1,0 +1,11 @@
+- id: 54ca704b-ea0f-408e-bae5-4f7ff50aad0e
+  name: Demonic Helm
+  description: A standard military-issue demon helm. It protects the most critical part of the body.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Helm
+  sprite: '0227'
+  slots: 1
+  baseStats:
+    Vitality: 31.1
+    Health: 50

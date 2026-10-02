@@ -1,0 +1,11 @@
+- id: 4c4d7aca-9fc8-4120-8208-f826ecec264b
+  name: Demonic Stiletto
+  description: A standard-issue demon stiletto.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0226'
+  slots: 1
+  baseStats:
+    Strength: 28.3
+    Agility: 12.6

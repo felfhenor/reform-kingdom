@@ -1,0 +1,11 @@
+- id: 9161322e-7f33-4893-860f-feed24e237cb
+  name: Demonic Tunic
+  description: A tunic commonly made for demonic soldiers.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0228'
+  slots: 1
+  baseStats:
+    Vitality: 33.1
+    Resistance: 25.8
