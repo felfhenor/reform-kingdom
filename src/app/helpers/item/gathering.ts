@@ -40,7 +40,6 @@ export function partyMinLevel(): number {
   return Math.min(...party.map((character) => character.level));
 }
 
-// Strongest hero represents the party for over-level XP scaling.
 export function partyMaxLevel(party: Character[] = worldPartyState()): number {
   if (party.length === 0) return 1;
 
@@ -126,10 +125,10 @@ export function gatheringStop(): void {
 function grantGatherXpIfInRange(content: GatheringContent): void {
   if (content.xpGainedIfInLevelRange <= 0) return;
 
-  const level = partyMinLevel();
-  if (level < content.levelRange.min || level > content.levelRange.max) return;
-
-  partyGainXp(content.xpGainedIfInLevelRange);
+  const { min, max } = content.levelRange;
+  partyGainXp((level) =>
+    level >= min && level <= max ? content.xpGainedIfInLevelRange : 0,
+  );
 }
 
 // Tradeskills come from the rolled GatherResult, not the node, so a Tailoring bonus can't boost a Woodworking-only roll at a mixed node.

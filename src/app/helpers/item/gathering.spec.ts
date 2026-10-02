@@ -455,7 +455,8 @@ describe('gatheringProcessTick', () => {
     gatheringProcessTick();
 
     expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
-    expect(partyGainXp).toHaveBeenCalledWith(3);
+    const xpAtLevel = vi.mocked(partyGainXp).mock.calls[0][0];
+    expect([0, 1, 5, 6].map(xpAtLevel)).toEqual([0, 3, 3, 0]);
     expect(addMaterial).toHaveBeenCalledWith('wood', 2);
     expect(taskRecordGather).toHaveBeenCalledWith('Wergen Woods', 'wood', 2);
     expect(gatherVfxEmit).toHaveBeenCalledWith({
@@ -750,7 +751,7 @@ describe('gatheringProcessTick', () => {
     expect(addMaterial).toHaveBeenCalledWith('stick', 1);
   });
 
-  it('does not grant xp when the party has outleveled the node', () => {
+  it('grants no xp to a hero who has outleveled the node', () => {
     vi.mocked(gamestate).mockReturnValue({
       world: {
         gathering: {
@@ -774,7 +775,7 @@ describe('gatheringProcessTick', () => {
 
     gatheringProcessTick();
 
-    expect(partyGainXp).not.toHaveBeenCalled();
+    expect(vi.mocked(partyGainXp).mock.calls[0][0](99)).toBe(0);
     expect(addMaterial).not.toHaveBeenCalled();
   });
 

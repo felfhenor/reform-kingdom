@@ -229,7 +229,7 @@ describe('Character Progress Helper Functions', () => {
     it('adds xp without leveling up when below the threshold', () => {
       const jala = createCharacterStub('Jala');
 
-      partyGainXp(30);
+      partyGainXp(() => 30);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
@@ -244,7 +244,7 @@ describe('Character Progress Helper Functions', () => {
     it('levels up and recalculates stats when xp meets the threshold', () => {
       const jala = createCharacterStub('Jala');
 
-      partyGainXp(100);
+      partyGainXp(() => 100);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
@@ -262,7 +262,7 @@ describe('Character Progress Helper Functions', () => {
       const jala = createCharacterStub('Jala');
       const totalXp = characterXpForLevel(1) + characterXpForLevel(2) + 15;
 
-      partyGainXp(totalXp);
+      partyGainXp(() => totalXp);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
@@ -281,7 +281,7 @@ describe('Character Progress Helper Functions', () => {
         xp: { current: 0, maximum: characterXpForLevel(CHARACTER_MAX_LEVEL) },
       };
 
-      partyGainXp(999999);
+      partyGainXp(() => 999999);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
@@ -300,7 +300,7 @@ describe('Character Progress Helper Functions', () => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      partyGainXp(30);
+      partyGainXp(() => 30);
 
       expect(miscellaneousMessageLog).not.toHaveBeenCalled();
     });
@@ -312,10 +312,25 @@ describe('Character Progress Helper Functions', () => {
         fn({ world: { party: [jala, bo] } } as unknown as GameState);
       });
 
-      partyGainXp(30);
+      partyGainXp(() => 30);
 
       expect(combatantDamageEventEmit).toHaveBeenCalledWith(jala.id, 30, 'xp');
       expect(combatantDamageEventEmit).toHaveBeenCalledWith(bo.id, 30, 'xp');
+    });
+
+    it('grants each character the xp for their own level and leaves zero-xp characters untouched', () => {
+      const jala = createCharacterStub('Jala');
+      const bo = { ...createCharacterStub('Bo'), level: 9 };
+
+      partyGainXp((level) => (level > 5 ? 0 : 30));
+
+      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
+      const result = updateFn({
+        world: { party: [jala, bo] },
+      } as unknown as GameState);
+
+      expect(result.world.party[0].xp.current).toBe(30);
+      expect(result.world.party[1]).toBe(bo);
     });
 
     it('skips the xp event for characters already at the max level', () => {
@@ -328,9 +343,28 @@ describe('Character Progress Helper Functions', () => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      partyGainXp(30);
+      partyGainXp(() => 30);
 
       expect(combatantDamageEventEmit).not.toHaveBeenCalled();
+    });
+
+    it('returns what each progressing character gained, leaving out max-level and zero-xp characters', () => {
+      const jala = createCharacterStub('Jala');
+      const bo = { ...createCharacterStub('Bo'), level: 9 };
+      const maxed = {
+        ...createCharacterStub('Max'),
+        level: CHARACTER_MAX_LEVEL,
+        xp: { current: 0, maximum: characterXpForLevel(CHARACTER_MAX_LEVEL) },
+      };
+      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
+        fn({ world: { party: [jala, bo, maxed] } } as unknown as GameState);
+      });
+
+      const gains = partyGainXp((level) => (level === 9 ? 0 : 100));
+
+      expect(gains).toEqual([
+        { characterId: jala.id, xp: 100, leveledUp: true },
+      ]);
     });
 
     it('emits a level-up vfx event only for characters that leveled up', () => {
@@ -339,10 +373,10 @@ describe('Character Progress Helper Functions', () => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      partyGainXp(30);
+      partyGainXp(() => 30);
       expect(heroLevelUpVfxEmit).not.toHaveBeenCalled();
 
-      partyGainXp(100);
+      partyGainXp(() => 100);
       expect(heroLevelUpVfxEmit).toHaveBeenCalledWith(jala.id);
     });
 
@@ -352,7 +386,7 @@ describe('Character Progress Helper Functions', () => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      partyGainXp(100);
+      partyGainXp(() => 100);
 
       expect(miscellaneousMessageLog).toHaveBeenCalledWith(
         '**Jala** reached level 2!',
@@ -383,7 +417,7 @@ describe('Character Progress Helper Functions', () => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      partyGainXp(100);
+      partyGainXp(() => 100);
 
       expect(miscellaneousMessageLog).toHaveBeenCalledWith(
         '**Jala** learned **Attack**!',
@@ -398,7 +432,7 @@ describe('Character Progress Helper Functions', () => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      partyGainXp(100);
+      partyGainXp(() => 100);
 
       expect(miscellaneousMessageLog).toHaveBeenCalledWith(
         '**Jala** reached level 2!',
@@ -406,23 +440,23 @@ describe('Character Progress Helper Functions', () => {
       expect(miscellaneousMessageLog).toHaveBeenCalledTimes(1);
     });
 
-    it('returns true when the gain levels up at least one character', () => {
+    it('fires the level-reached task event when the gain levels up a character', () => {
       const jala = createCharacterStub('Jala');
       vi.mocked(updateGamestate).mockImplementation(async (fn) => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      expect(partyGainXp(100)).toBe(true);
+      partyGainXp(() => 100);
       expect(taskEventLevelReached).toHaveBeenCalledWith(2);
     });
 
-    it('returns false when the gain does not level up any character', () => {
+    it('skips the level-reached task event when nobody levels up', () => {
       const jala = createCharacterStub('Jala');
       vi.mocked(updateGamestate).mockImplementation(async (fn) => {
         fn({ world: { party: [jala] } } as unknown as GameState);
       });
 
-      expect(partyGainXp(30)).toBe(false);
+      partyGainXp(() => 30);
       expect(taskEventLevelReached).not.toHaveBeenCalled();
     });
 
@@ -434,7 +468,7 @@ describe('Character Progress Helper Functions', () => {
 
       const jala = createCharacterStub('Jala');
 
-      partyGainXp(30);
+      partyGainXp(() => 30);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
@@ -452,7 +486,7 @@ describe('Character Progress Helper Functions', () => {
 
       const jala = createCharacterStub('Jala');
 
-      partyGainXp(100);
+      partyGainXp(() => 100);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({
@@ -472,7 +506,7 @@ describe('Character Progress Helper Functions', () => {
 
       const jala = createCharacterStub('Jala');
 
-      partyGainXp(30);
+      partyGainXp(() => 30);
 
       const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
       const result = updateFn({

@@ -41,8 +41,7 @@ vi.mock('@helpers/commission/commission-kill-progress', () => ({
 }));
 
 vi.mock('@helpers/hero/character-progress', () => ({
-  partyGainXp: vi.fn(),
-  partyXpGainAmount: vi.fn((amount: number) => amount),
+  partyGainXp: vi.fn(() => []),
   syncPartyHpFromCombat: vi.fn(),
 }));
 
@@ -56,6 +55,7 @@ vi.mock('@helpers/item/collectibles', () => ({
 
 vi.mock('@helpers/combat/combat-log', () => ({
   collectibleDropHtml: vi.fn(),
+  combatantMessageToken: vi.fn((combatant: Combatant) => `@@${combatant.id}@@`),
   combatMessageLog: vi.fn(),
   equipmentDropHtml: vi.fn(),
   ITEM_ICON_TOKEN: '@@icon@@',
@@ -129,10 +129,7 @@ import {
 } from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import {
-  partyGainXp,
-  partyXpGainAmount,
-} from '@helpers/hero/character-progress';
+import { partyGainXp } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { rollDroppedRewards } from '@helpers/item/loot';
@@ -143,6 +140,7 @@ import {
   raidResolveVictory,
 } from '@helpers/town/raid/town-raid-resolve';
 import type {
+  CharacterId,
   CollectibleContent,
   CollectibleId,
   Combat,
@@ -497,7 +495,7 @@ describe('combatCheckIfOver', () => {
     expect(raidResolveDefeat).not.toHaveBeenCalled();
   });
 
-  it('degrades XP via xpForOverLevel using the encounter max and highest hero level', () => {
+  it("scales XP against each hero's own level, not the strongest hero's", () => {
     const monster = { id: 'monster-1' } as MonsterContent;
     const encounter = {
       fights: [{ monsters: [] }],
@@ -509,7 +507,9 @@ describe('combatCheckIfOver', () => {
       (id) => (id === 'enc-1' ? encounter : monster) as never,
     );
     vi.mocked(monsterXpReward).mockReturnValue(100);
-    vi.mocked(xpForOverLevel).mockReturnValue(50);
+    vi.mocked(xpForOverLevel).mockImplementation((rawXp, heroLevel) =>
+      heroLevel > 5 ? 50 : rawXp,
+    );
 
     const combat = buildCombat({
       encounterId: 'enc-1' as EncounterId,
@@ -531,44 +531,70 @@ describe('combatCheckIfOver', () => {
 
     combatCheckIfOver(combat);
 
-    // Uses the highest hero level (7) against the node's max (5).
-    expect(xpForOverLevel).toHaveBeenCalledWith(100, 7, 5);
-    expect(partyGainXp).toHaveBeenCalledWith(50);
+    const xpAtLevel = vi.mocked(partyGainXp).mock.calls[0][0];
+    expect(xpAtLevel(4)).toBe(100);
+    expect(xpAtLevel(7)).toBe(50);
+    expect(monsterXpReward).toHaveBeenCalledTimes(1);
   });
 
-  it('logs the XP the party actually received after the gain multiplier, not the raw amount', () => {
-    const monster = { id: 'monster-1' } as MonsterContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [],
-      levelRange: { min: 3, max: 5 },
-    } as unknown as EncounterContent;
-
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : monster) as never,
-    );
-    vi.mocked(monsterXpReward).mockReturnValue(100);
-    vi.mocked(xpForOverLevel).mockReturnValue(50);
-    vi.mocked(partyXpGainAmount).mockReturnValueOnce(60);
+  it('logs one line per hero when the heroes gained different amounts', () => {
+    vi.mocked(partyGainXp).mockReturnValueOnce([
+      { characterId: 'hero-1' as CharacterId, xp: 100, leveledUp: false },
+      { characterId: 'hero-2' as CharacterId, xp: 50, leveledUp: false },
+    ]);
 
     const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      heroes: [buildCombatant({ id: 'hero-1', level: 4, hp: 10 })],
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-          level: 5,
-        }),
+      heroes: [
+        buildCombatant({ id: 'hero-1', hp: 10 }),
+        buildCombatant({ id: 'hero-2', hp: 10 }),
       ],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
     });
 
     combatCheckIfOver(combat);
 
-    expect(partyXpGainAmount).toHaveBeenCalledWith(50);
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      combat,
+      '**@@hero-1@@** gained 100 XP!',
+    );
+    expect(combatMessageLog).toHaveBeenCalledWith(
+      combat,
+      '**@@hero-2@@** gained 50 XP!',
+    );
+  });
+
+  it('logs nothing about XP when no hero gained any', () => {
+    vi.mocked(partyGainXp).mockReturnValueOnce([]);
+
+    const combat = buildCombat({
+      heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
+    });
+
+    combatCheckIfOver(combat);
+
+    expect(combatMessageLog).not.toHaveBeenCalledWith(
+      combat,
+      expect.stringContaining('XP'),
+    );
+  });
+
+  it('logs a single party line when every hero gained the same amount', () => {
+    vi.mocked(partyGainXp).mockReturnValueOnce([
+      { characterId: 'hero-1' as CharacterId, xp: 60, leveledUp: false },
+      { characterId: 'hero-2' as CharacterId, xp: 60, leveledUp: false },
+    ]);
+
+    const combat = buildCombat({
+      heroes: [
+        buildCombatant({ id: 'hero-1', hp: 10 }),
+        buildCombatant({ id: 'hero-2', hp: 10 }),
+      ],
+      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
+    });
+
+    combatCheckIfOver(combat);
+
     expect(combatMessageLog).toHaveBeenCalledWith(
       combat,
       'The party gained 60 XP!',
@@ -604,8 +630,8 @@ describe('combatCheckIfOver', () => {
 
     combatCheckIfOver(combat);
 
+    expect(vi.mocked(partyGainXp).mock.calls[0][0](22)).toBe(80);
     expect(xpForOverLevel).toHaveBeenCalledWith(100, 22, 25);
-    expect(partyGainXp).toHaveBeenCalledWith(80);
   });
 
   it('wipes every node failure count when the XP gain levels up the party', () => {
@@ -621,7 +647,9 @@ describe('combatCheckIfOver', () => {
     );
     vi.mocked(monsterXpReward).mockReturnValue(100);
     vi.mocked(xpForOverLevel).mockReturnValue(100);
-    vi.mocked(partyGainXp).mockReturnValue(true);
+    vi.mocked(partyGainXp).mockReturnValueOnce([
+      { characterId: 'combatant-1' as CharacterId, xp: 100, leveledUp: true },
+    ]);
 
     const combat = buildCombat({
       encounterId: 'enc-1' as EncounterId,
@@ -655,7 +683,9 @@ describe('combatCheckIfOver', () => {
     );
     vi.mocked(monsterXpReward).mockReturnValue(100);
     vi.mocked(xpForOverLevel).mockReturnValue(100);
-    vi.mocked(partyGainXp).mockReturnValue(false);
+    vi.mocked(partyGainXp).mockReturnValueOnce([
+      { characterId: 'combatant-1' as CharacterId, xp: 100, leveledUp: false },
+    ]);
 
     const combat = buildCombat({
       encounterId: 'enc-1' as EncounterId,

@@ -551,6 +551,20 @@ describe('mostChallengingExploreNodeForRisk', () => {
     expect(mostChallengingExploreNodeForRisk('High')).toBe(worthwhile);
   });
 
+  it("judges over-level XP by the weakest hero, since each hero's XP is scaled separately", () => {
+    vi.mocked(worldNodesOfType).mockReturnValue([buildNode('Node')]);
+    vi.mocked(worldNodeEncounter).mockReturnValue({
+      levelRange: { min: 5, max: 5 },
+    } as EncounterContent);
+    vi.mocked(travelPathTo).mockReturnValue([]);
+    vi.mocked(partyMinLevel).mockReturnValue(4);
+    vi.mocked(partyMaxLevel).mockReturnValue(20);
+
+    mostChallengingExploreNodeForRisk('High');
+
+    expect(isXpTrivialAtOverLevel).toHaveBeenCalledWith(4, 5);
+  });
+
   it('fails when every reachable node would only give 1 XP', () => {
     const trivial = buildNode('Trivial');
     vi.mocked(worldNodesOfType).mockReturnValue([trivial]);

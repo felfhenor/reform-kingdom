@@ -13,6 +13,7 @@ import { characterStats, characterXpForLevel } from '@helpers/hero/party';
 import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import type {
   Character,
+  CharacterXpGain,
   Combatant,
   EquipmentSkillContent,
   JobContent,
@@ -141,32 +142,45 @@ export function retrofitPartyXp(party: Character[]): Character[] {
   });
 }
 
-// The return value tells callers when to retry nodes previously given up on.
-export function partyGainXp(amount: number): boolean {
-  const boostedAmount = partyXpGainAmount(amount);
+function announceCharacterXpGain(
+  beforeLevel: number,
+  gained: number,
+  after: Character,
+): void {
+  if (beforeLevel < CHARACTER_MAX_LEVEL) {
+    combatantDamageEventEmit(after.id, gained, 'xp');
+  }
+  if (after.level > beforeLevel) {
+    analyticsSendDesignEvent('Hero:LevelUp', after.level);
+    heroLevelUpVfxEmit(after.id);
+  }
+  logCharacterProgress(beforeLevel, after);
+}
+
+// Per character so a weak hero isn't penalised by a stronger partymate; max-level heroes are omitted since they can't progress.
+export function partyGainXp(
+  xpAtLevel: (level: number) => number,
+): CharacterXpGain[] {
   // Only the level is kept from the pre-update character - the character itself is a draft and is revoked after the callback.
-  const progress: { beforeLevel: number; after: Character }[] = [];
+  const progress: { beforeLevel: number; gained: number; after: Character }[] =
+    [];
 
   updateGamestate((state) => {
-    state.world.party = state.world.party.map((character) => {
-      const updated = characterLeveledUp(character, boostedAmount);
-      progress.push({ beforeLevel: character.level, after: updated });
-      return updated;
+    state.world.party.forEach((character, index) => {
+      const gained = partyXpGainAmount(xpAtLevel(character.level));
+      if (gained <= 0) return;
+
+      const updated = characterLeveledUp(character, gained);
+      progress.push({ beforeLevel: character.level, gained, after: updated });
+      state.world.party[index] = updated;
     });
 
     return state;
   });
 
-  progress.forEach(({ beforeLevel, after }) => {
-    if (boostedAmount > 0 && beforeLevel < CHARACTER_MAX_LEVEL) {
-      combatantDamageEventEmit(after.id, boostedAmount, 'xp');
-    }
-    if (after.level > beforeLevel) {
-      analyticsSendDesignEvent('Hero:LevelUp', after.level);
-      heroLevelUpVfxEmit(after.id);
-    }
-    logCharacterProgress(beforeLevel, after);
-  });
+  progress.forEach(({ beforeLevel, gained, after }) =>
+    announceCharacterXpGain(beforeLevel, gained, after),
+  );
 
   const leveledUp = progress.some((p) => p.after.level > p.beforeLevel);
   if (leveledUp) {
@@ -174,5 +188,12 @@ export function partyGainXp(amount: number): boolean {
       Math.max(...progress.map(({ after }) => after.level)),
     );
   }
-  return leveledUp;
+
+  return progress
+    .filter(({ beforeLevel }) => beforeLevel < CHARACTER_MAX_LEVEL)
+    .map(({ beforeLevel, gained, after }) => ({
+      characterId: after.id,
+      xp: gained,
+      leveledUp: after.level > beforeLevel,
+    }));
 }

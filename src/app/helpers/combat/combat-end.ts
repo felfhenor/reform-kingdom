@@ -1,5 +1,8 @@
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
-import { combatMessageLog } from '@helpers/combat/combat-log';
+import {
+  combatantMessageToken,
+  combatMessageLog,
+} from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset } from '@helpers/combat/combat-state';
 import { worldCombatState } from '@helpers/state-game';
@@ -22,7 +25,6 @@ import {
 } from '@helpers/engine/analytics';
 import {
   partyGainXp,
-  partyXpGainAmount,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
@@ -36,6 +38,7 @@ import {
   raidResolveVictory,
 } from '@helpers/town/raid/town-raid-resolve';
 import type {
+  CharacterXpGain,
   Combat,
   EncounterContent,
   EncounterId,
@@ -79,11 +82,6 @@ function defeatedMonsters(combat: Combat): DefeatedMonster[] {
     .filter((entry): entry is DefeatedMonster => !!entry);
 }
 
-// Highest hero level represents the party for over-level XP scaling.
-function partyRepresentativeLevel(combat: Combat): number {
-  return Math.max(...combat.heroes.map((hero) => hero.level), 1);
-}
-
 // Max level for the source encounter, used to cap over-level XP scaling.
 function encounterMaxLevel(combat: Combat): number | undefined {
   if (combat.encounterId) {
@@ -100,29 +98,53 @@ function encounterMaxLevel(combat: Combat): number | undefined {
   return undefined;
 }
 
+// Kills are rolled once, then scaled against each hero's own level.
+function victoryXpAtLevel(
+  combat: Combat,
+  monsters: DefeatedMonster[],
+): (heroLevel: number) => number {
+  const maxLevel = encounterMaxLevel(combat);
+  if (maxLevel === undefined) return () => 0;
+
+  const rawXps = monsters.map(({ monster, level }) =>
+    monsterXpReward(monster, level),
+  );
+  return (heroLevel) =>
+    sumBy(rawXps, (rawXp) => xpForOverLevel(rawXp, heroLevel, maxLevel));
+}
+
+function logVictoryXp(combat: Combat, gains: CharacterXpGain[]): void {
+  if (gains.length === 0) return;
+
+  const amounts = new Set(gains.map(({ xp }) => xp));
+  if (gains.length === combat.heroes.length && amounts.size === 1) {
+    combatMessageLog(combat, `The party gained ${gains[0].xp} XP!`);
+    return;
+  }
+
+  gains.forEach(({ characterId, xp }) => {
+    const hero = combat.heroes.find(({ id }) => id === characterId);
+    if (!hero) return;
+
+    combatMessageLog(
+      combat,
+      `**${combatantMessageToken(hero)}** gained ${xp} XP!`,
+    );
+  });
+}
+
 function grantVictoryRewards(combat: Combat): void {
   const monsters = defeatedMonsters(combat);
-  const maxLevel = encounterMaxLevel(combat);
-  const partyLevel = partyRepresentativeLevel(combat);
 
   monsters.forEach(({ monster, level }) => {
     monsterRecordKill(monster.id, level, combat.locationName);
     commissionRecordMonsterKill(monster.id);
   });
 
-  const totalXp = sumBy(monsters, ({ monster, level }) => {
-    const rawXp = monsterXpReward(monster, level);
-    return maxLevel !== undefined
-      ? xpForOverLevel(rawXp, partyLevel, maxLevel)
-      : 0;
-  });
-  if (totalXp > 0) {
-    const leveledUp = partyGainXp(totalXp);
-    combatMessageLog(
-      combat,
-      `The party gained ${partyXpGainAmount(totalXp)} XP!`,
-    );
-    if (leveledUp) autoModeResetNodeFailureCounts();
+  const gains = partyGainXp(victoryXpAtLevel(combat, monsters));
+  logVictoryXp(combat, gains);
+  if (gains.some(({ leveledUp }) => leveledUp)) {
+    autoModeResetNodeFailureCounts();
   }
 }
 

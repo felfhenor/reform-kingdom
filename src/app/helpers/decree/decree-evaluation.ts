@@ -14,7 +14,7 @@ import { decreeRouteTo } from '@helpers/decree/decree-route';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { isPartyAtFullEnergy, isPartyAtFullHealth } from '@helpers/hero/party';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
-import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
+import { partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
@@ -152,7 +152,8 @@ function leastFailedNodeIn(
 export function mostChallengingExploreNodeForRisk(
   ceiling: DecreeRiskLevel,
 ): WorldNodeEntry | undefined {
-  const partyLevel = partyMaxLevel();
+  // XP is per hero, so a node stays worthwhile until even the weakest hero has outgrown it.
+  const partyLevel = partyMinLevel();
 
   const candidates = worldNodesOfType('ExploreNode')
     .filter((entry) => isWorldNodeVisible(entry))

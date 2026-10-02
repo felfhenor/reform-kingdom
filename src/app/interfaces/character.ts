@@ -47,6 +47,12 @@ export type CharacterStatSource = Pick<
   'jobId' | 'level' | 'equipment' | 'teachings'
 >;
 
+export type CharacterXpGain = {
+  characterId: CharacterId;
+  xp: number;
+  leveledUp: boolean;
+};
+
 // One hero's chosen new job, as batched by the reclass modal so a multi-hero
 // "Reclass All" applies (and prices) every swap within a single state update.
 export type CharacterReclassPick = {
