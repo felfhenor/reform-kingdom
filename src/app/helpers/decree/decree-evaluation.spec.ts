@@ -49,6 +49,10 @@ vi.mock('@helpers/town/town-spawn', () => ({
   isPlayerAtHome: vi.fn(() => false),
 }));
 
+vi.mock('@helpers/world-node/world-node-encounter', () => ({
+  worldNodeExploreRandomIsAvailable: vi.fn(() => false),
+}));
+
 vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
   worldNodeGatherMaterialIds: vi.fn(() => []),
 }));
@@ -98,6 +102,7 @@ import {
 } from '@helpers/pathfinding/pathfinding-travel';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
+import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
 import {
@@ -105,6 +110,7 @@ import {
   worldNodeAt,
   worldNodeByName,
   worldNodeEncounter,
+  worldNodeEncounterRandom,
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
@@ -113,6 +119,7 @@ import type {
   DecreeClause,
   DecreeClauseId,
   EncounterContent,
+  EncounterRandomContent,
   ItemId,
   MaterialId,
   TownContent,
@@ -159,6 +166,9 @@ beforeEach(() => {
   vi.mocked(travelPathThroughNodesTo).mockReturnValue(undefined);
   vi.mocked(worldNodeAt).mockReturnValue(undefined);
   vi.mocked(worldNodeGathering).mockReturnValue(undefined);
+  vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
+  vi.mocked(worldNodeEncounterRandom).mockReturnValue(undefined);
+  vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(false);
   vi.mocked(getMaterialQuantity).mockReturnValue(0);
   vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
   vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
@@ -209,6 +219,14 @@ describe('riskLevelOfExploreNode', () => {
     } as EncounterContent);
 
     expect(riskLevelOfExploreNode(buildNode('A'))).toBe('TooHigh');
+  });
+
+  it('rates a random node by its level range', () => {
+    vi.mocked(worldNodeEncounterRandom).mockReturnValue({
+      levelRange: { min: 8, max: 12 },
+    } as EncounterRandomContent);
+
+    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('Medium');
   });
 
   it('is TooHigh when the node has no encounter content', () => {
@@ -287,6 +305,77 @@ describe('nearestUnfinishedExploreNode', () => {
     vi.mocked(isWorldNodeVisible).mockReturnValue(false);
 
     expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  describe('random nodes', () => {
+    function mockRandomNode(): WorldNodeEntry {
+      const node = buildNode('Ruins');
+      vi.mocked(worldNodesOfType).mockImplementation((type) =>
+        type === 'ExploreRandomNode' ? [node] : [],
+      );
+      vi.mocked(worldNodeEncounterRandom).mockReturnValue({
+        levelRange: { min: 1, max: 1 },
+      } as EncounterRandomContent);
+      vi.mocked(travelPathTo).mockReturnValue([]);
+      return node;
+    }
+
+    it('picks one whose fights are still up, even with every reward looted', () => {
+      const node = mockRandomNode();
+      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+
+      expect(nearestUnfinishedExploreNode('High')).toBe(node);
+    });
+
+    it('ignores one already cleared this cycle, even with rewards missing', () => {
+      mockRandomNode();
+      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+        MISSING_REWARD,
+      ]);
+
+      expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+    });
+
+    it('picks whichever of a static and a random node is nearer', () => {
+      const random = mockRandomNode();
+      const fixed = buildNode('Cave');
+      vi.mocked(worldNodesOfType).mockImplementation((type) =>
+        type === 'ExploreRandomNode' ? [random] : [fixed],
+      );
+      vi.mocked(worldNodeEncounterRandom).mockImplementation((entry) =>
+        entry === random
+          ? ({ levelRange: { min: 1, max: 1 } } as EncounterRandomContent)
+          : undefined,
+      );
+      vi.mocked(worldNodeEncounter).mockReturnValue({
+        levelRange: { min: 1, max: 1 },
+      } as EncounterContent);
+      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
+        MISSING_REWARD,
+      ]);
+      vi.mocked(travelPathTo).mockImplementation((name) =>
+        name === 'Cave' ? [{} as never, {} as never] : [{} as never],
+      );
+
+      expect(nearestUnfinishedExploreNode('High')).toBe(random);
+
+      vi.mocked(travelPathTo).mockImplementation((name) =>
+        name === 'Cave' ? [{} as never] : [{} as never, {} as never],
+      );
+
+      expect(nearestUnfinishedExploreNode('High')).toBe(fixed);
+    });
+
+    it('excludes one outside the given risk tolerance', () => {
+      mockRandomNode();
+      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+      vi.mocked(worldNodeEncounterRandom).mockReturnValue({
+        levelRange: { min: 30, max: 30 },
+      } as EncounterRandomContent);
+
+      expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+    });
   });
 });
 

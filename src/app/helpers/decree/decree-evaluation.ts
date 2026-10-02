@@ -18,6 +18,7 @@ import { partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
+import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
 import {
@@ -48,10 +49,12 @@ const RISK_ORDINAL: Record<DecreeRiskLevel, number> = {
 export function riskLevelOfExploreNode(
   entry: WorldNodeEntry,
 ): ExploreNodeRiskBand {
-  const encounter = worldNodeEncounter(entry);
-  if (!encounter) return 'TooHigh';
+  const levelRange =
+    worldNodeEncounter(entry)?.levelRange ??
+    worldNodeEncounterRandom(entry)?.levelRange;
+  if (!levelRange) return 'TooHigh';
 
-  return riskBandForLevelRange(encounter.levelRange, partyMinLevel());
+  return riskBandForLevelRange(levelRange, partyMinLevel());
 }
 
 export function riskLevelSatisfies(
@@ -109,16 +112,27 @@ function nearestReachableNode(
   return nearest;
 }
 
+// Random nodes reroll their rewards every cycle, so they're unfinished whenever this cycle's fights are still up.
+function isUnfinishedArea(entry: WorldNodeEntry): boolean {
+  if (worldNodeEncounterRandom(entry)) {
+    return worldNodeExploreRandomIsAvailable(entry);
+  }
+
+  return worldNodeObtainableMissingRewards(entry).length > 0;
+}
+
 export function nearestUnfinishedExploreNode(
   riskTolerance: DecreeRiskLevel,
 ): WorldNodeEntry | undefined {
-  const candidates = worldNodesOfType('ExploreNode')
+  const candidates = [
+    ...worldNodesOfType('ExploreNode'),
+    ...worldNodesOfType('ExploreRandomNode'),
+  ]
     .filter(isWorldNodeVisible)
-    .filter((entry) => {
-      if (worldNodeObtainableMissingRewards(entry).length === 0) return false;
-
-      return riskLevelSatisfies(riskLevelOfExploreNode(entry), riskTolerance);
-    });
+    .filter(isUnfinishedArea)
+    .filter((entry) =>
+      riskLevelSatisfies(riskLevelOfExploreNode(entry), riskTolerance),
+    );
 
   return nearestReachableNode(candidates, riskTolerance);
 }
