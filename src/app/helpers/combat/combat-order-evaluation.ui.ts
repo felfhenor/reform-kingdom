@@ -1,6 +1,7 @@
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import type {
   CombatantTargettingType,
+  CombatOrderCondition,
   EquipmentItemType,
   EquipmentSkillContent,
 } from '@interfaces';
@@ -31,6 +32,20 @@ export function isCombatOrderFamilyEquipmentOnly(
   return !jobOnlySkills.some((skill) => skill.family === family);
 }
 
+// Matching* modes target the condition's own matches, so they only make sense with that condition.
+export function isCombatOrderTargetModeAllowedForCondition(
+  targetMode: CombatantTargettingType | undefined,
+  conditionType: CombatOrderCondition['type'],
+): boolean {
+  if (targetMode === 'MatchingAllies') {
+    return conditionType === 'AllyCountHealthPercent';
+  }
+  if (targetMode === 'MatchingEnemies') {
+    return conditionType === 'EnemyCountHealthPercent';
+  }
+  return true;
+}
+
 // Flags a clause that can never resolve a target given its family + target mode.
 export function isCombatOrderTargetModeUsable(
   family: string,
@@ -40,7 +55,8 @@ export function isCombatOrderTargetModeUsable(
   if (
     targetMode !== 'Self' &&
     targetMode !== 'SpecificHero' &&
-    targetMode !== 'MatchingAllies'
+    targetMode !== 'MatchingAllies' &&
+    targetMode !== 'MatchingEnemies'
   ) {
     return true;
   }
@@ -52,8 +68,8 @@ export function isCombatOrderTargetModeUsable(
     return skill.techniques.some((tech) => tech.targetType !== 'Enemies');
   }
 
-  // SpecificHero / MatchingAllies both target a (possibly different) ally.
+  const side = targetMode === 'MatchingEnemies' ? 'Enemies' : 'Allies';
   return skill.techniques.some(
-    (tech) => tech.targetType === 'Allies' || tech.targetType === 'All',
+    (tech) => tech.targetType === side || tech.targetType === 'All',
   );
 }

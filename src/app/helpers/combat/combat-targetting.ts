@@ -79,18 +79,14 @@ function getBaseCombatantTargetListForSkillTechnique(
   combatant: Combatant,
   skill: EquipmentSkill,
   technique: EquipmentSkillContentTechnique,
+  redirected: boolean,
 ): Combatant[] {
   const heroSide = [...combat.heroes, ...combat.helpers];
   const myType = combatant.isEnemy ? 'guardian' : 'hero';
   let allies = myType === 'guardian' ? combat.guardians : heroSide;
   let enemies = myType === 'guardian' ? heroSide : combat.guardians;
 
-  const shouldReverse = combatCombatantCombatStatSucceedsChance(
-    combatant,
-    'redirectionChance',
-  );
-
-  if (shouldReverse) {
+  if (redirected) {
     [allies, enemies] = [enemies, allies];
   }
 
@@ -112,12 +108,14 @@ export function combatGetPossibleCombatantTargetsForSkillTechnique(
   combatant: Combatant,
   skill: EquipmentSkillContent,
   tech: EquipmentSkillContentTechnique,
+  redirected: boolean,
 ): Combatant[] {
   const baseList = getBaseCombatantTargetListForSkillTechnique(
     combat,
     combatant,
     skill,
     tech,
+    redirected,
   );
   return filterCombatantTargetListForSkillTechnique(baseList, tech);
 }
@@ -134,6 +132,7 @@ export function combatGetPossibleCombatantTargetsForSkill(
         combatant,
         skill,
         t,
+        combatCombatantCombatStatSucceedsChance(combatant, 'redirectionChance'),
       ),
     ),
   );
@@ -152,6 +151,10 @@ export function combatGetTargetsFromListBasedOnType(
   const targetsWithoutAgro = combatants.filter(
     (c) => c.combatStats.agroValue <= 0,
   );
+
+  // intersection() keeps the matches' most-relevant-first order while dropping any no longer in the pool.
+  const matchesIn = (pool: Combatant[]) =>
+    intersection(context?.matchingCombatants ?? [], pool);
 
   const targettingActions: Record<CombatantTargettingType, () => Combatant[]> =
     {
@@ -179,12 +182,15 @@ export function combatGetTargetsFromListBasedOnType(
       Self: () => combatants.filter((c) => c === context?.combatant),
       SpecificHero: () =>
         combatants.filter((c) => c.id === context?.targetCharacterId),
-      // intersection() narrows matchingAllies down to combatants still in the pool.
-      MatchingAllies: () =>
-        sampleSize(
-          intersection(context?.matchingAllies ?? [], combatants),
-          select,
-        ),
+      MatchingAllies: () => matchesIn(combatants).slice(0, select),
+      // Enemy taunters still come first; a taunting ally must not pull an enemy-only order onto itself.
+      MatchingEnemies: () =>
+        [
+          ...targetsWithAgro.filter(
+            (c) => c.isEnemy !== context?.combatant.isEnemy,
+          ),
+          ...matchesIn(targetsWithoutAgro),
+        ].slice(0, select),
     };
 
   return targettingActions[type]();
@@ -216,6 +222,7 @@ export function combatGetTargetsFromPriorityList(
 }
 
 // Lets a combat order clause fall through instead of wasting the turn on zero targets.
+// Checks the unconfused pool: confusion is rolled at cast time, which drops the override instead.
 export function combatSkillHasValidTargetsForMode(
   combat: Combat,
   combatant: Combatant,
@@ -229,6 +236,7 @@ export function combatSkillHasValidTargetsForMode(
       combatant,
       skill,
       tech,
+      false,
     );
     return (
       combatGetTargetsFromListBasedOnType(

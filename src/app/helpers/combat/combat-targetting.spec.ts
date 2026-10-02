@@ -180,14 +180,14 @@ describe('combatGetTargetsFromListBasedOnType', () => {
     ).toEqual([]);
   });
 
-  it('MatchingAllies only selects from combatants present in both matchingAllies and the pool', () => {
+  it('MatchingAllies only selects from combatants present in both matchingCombatants and the pool', () => {
     const caster = buildCombatant({ id: 'caster' });
     const critical = buildCombatant({ id: 'critical', hp: 5 });
     const wounded = buildCombatant({ id: 'wounded', hp: 40 });
 
     const context: CombatTargetModeContext = {
       combatant: caster,
-      matchingAllies: [critical, wounded],
+      matchingCombatants: [critical, wounded],
     };
 
     const result = combatGetTargetsFromListBasedOnType(
@@ -207,7 +207,7 @@ describe('combatGetTargetsFromListBasedOnType', () => {
 
     const context: CombatTargetModeContext = {
       combatant: caster,
-      matchingAllies: [noLongerValid, critical],
+      matchingCombatants: [noLongerValid, critical],
     };
 
     expect(
@@ -218,6 +218,84 @@ describe('combatGetTargetsFromListBasedOnType', () => {
         context,
       ),
     ).toEqual([critical]);
+  });
+
+  it('MatchingEnemies selects from the same matched list as MatchingAllies', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const otherEnemy = buildCombatant({ id: 'other', isEnemy: true, hp: 90 });
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [lowEnemy, otherEnemy],
+        'MatchingEnemies',
+        2,
+        { combatant: caster, matchingCombatants: [lowEnemy] },
+      ),
+    ).toEqual([lowEnemy]);
+  });
+
+  it('Matching modes keep the matched order when there are more matches than targets', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const lowest = buildCombatant({ id: 'lowest', hp: 5 });
+    const low = buildCombatant({ id: 'low', hp: 20 });
+    const context = { combatant: caster, matchingCombatants: [lowest, low] };
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [low, lowest],
+        'MatchingAllies',
+        1,
+        context,
+      ),
+    ).toEqual([lowest]);
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [low, lowest],
+        'MatchingEnemies',
+        1,
+        context,
+      ),
+    ).toEqual([lowest]);
+  });
+
+  it('MatchingEnemies still hits a taunting enemy first, even one outside the matches', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const taunter = buildCombatant({
+      id: 'taunter',
+      isEnemy: true,
+      hp: 100,
+      combatStats: { agroValue: 10 } as never,
+    });
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [lowEnemy, taunter],
+        'MatchingEnemies',
+        1,
+        { combatant: caster, matchingCombatants: [lowEnemy] },
+      ),
+    ).toEqual([taunter]);
+  });
+
+  it('MatchingAllies ignores agro so heals stay on the matched allies', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const wounded = buildCombatant({ id: 'wounded', hp: 5 });
+    const tank = buildCombatant({
+      id: 'tank',
+      hp: 100,
+      combatStats: { agroValue: 10 } as never,
+    });
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [wounded, tank],
+        'MatchingAllies',
+        1,
+        { combatant: caster, matchingCombatants: [wounded] },
+      ),
+    ).toEqual([wounded]);
   });
 
   it("always includes an agro'd combatant in a partial AoE selection, even if hp ordering would exclude them", () => {
@@ -424,6 +502,55 @@ describe('combatSkillHasValidTargetsForMode', () => {
 
     expect(
       combatSkillHasValidTargetsForMode(combat, caster, skill, 'Self', context),
+    ).toBe(false);
+  });
+
+  it('ignores confusion, which is handled at cast time instead', () => {
+    const caster = buildCombatant({
+      id: 'caster',
+      combatStats: { agroValue: 0, redirectionChance: 100 } as never,
+    });
+    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const combat = buildCombat({ heroes: [caster], guardians: [lowEnemy] });
+    const skill = buildSkill({
+      techniques: [buildTechnique({ targetType: 'Enemies' })],
+    });
+
+    expect(
+      combatSkillHasValidTargetsForMode(
+        combat,
+        caster,
+        skill,
+        'MatchingEnemies',
+        { combatant: caster, matchingCombatants: [lowEnemy] },
+      ),
+    ).toBe(true);
+  });
+
+  it('MatchingEnemies with an ally-only skill is false even when an ally is taunting', () => {
+    const caster = buildCombatant({ id: 'caster' });
+    const taunter = buildCombatant({
+      id: 'taunter',
+      hp: 50,
+      combatStats: { agroValue: 10 } as never,
+    });
+    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const combat = buildCombat({
+      heroes: [caster, taunter],
+      guardians: [lowEnemy],
+    });
+    const skill = buildSkill({
+      techniques: [buildTechnique({ targetType: 'Allies' })],
+    });
+
+    expect(
+      combatSkillHasValidTargetsForMode(
+        combat,
+        caster,
+        skill,
+        'MatchingEnemies',
+        { combatant: caster, matchingCombatants: [lowEnemy] },
+      ),
     ).toBe(false);
   });
 });

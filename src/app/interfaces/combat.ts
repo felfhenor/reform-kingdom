@@ -95,7 +95,8 @@ export type CombatantTargettingType =
   | 'Weakest'
   | 'Self'
   | 'SpecificHero'
-  | 'MatchingAllies';
+  | 'MatchingAllies'
+  | 'MatchingEnemies';
 
 // One step of a combatant's target priority list - tried in order, first non-empty result wins.
 // jobId, when set, narrows the pool to that job before type's mode picks from it (e.g. Weakest + jobId: Healer -> the weakest healer).
@@ -104,11 +105,11 @@ export type TargettingPriorityEntry = {
   jobId?: JobId;
 };
 
-// Extra context only the Self/SpecificHero/MatchingAllies targeting modes need.
+// Extra context only the Self/SpecificHero/Matching* targeting modes need.
 export type CombatTargetModeContext = {
   combatant: Combatant;
   targetCharacterId?: CharacterId;
-  matchingAllies?: Combatant[];
+  matchingCombatants?: Combatant[];
 };
 
 export type Combatant = HasAnimation & {

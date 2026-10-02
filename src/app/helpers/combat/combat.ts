@@ -129,20 +129,26 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
   const capturedCreatorStats = { ...combatant.totalStats };
 
   chosenSkill.techniques.forEach((tech) => {
+    const redirected = combatCombatantCombatStatSucceedsChance(
+      combatant,
+      'redirectionChance',
+    );
     const baseTargetList = combatGetPossibleCombatantTargetsForSkillTechnique(
       combat,
       combatant,
       chosenSkill,
       tech,
+      redirected,
     );
 
     const numTargets = skillTechniqueNumTargets(chosenSkill, tech);
 
     // A Combat Order's targetMode is an explicit override - it wins outright rather than
-    // joining the combatant's own priority list.
-    const targetPriority = combatOrderPick?.targetMode
-      ? [{ type: combatOrderPick.targetMode }]
-      : combatant.targetting;
+    // joining the combatant's own priority list. Confusion drops it, since it was aimed at the other side.
+    const targetPriority =
+      combatOrderPick?.targetMode && !redirected
+        ? [{ type: combatOrderPick.targetMode }]
+        : combatant.targetting;
 
     const targets = combatGetTargetsFromPriorityList(
       baseTargetList,
@@ -151,7 +157,7 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
       {
         combatant,
         targetCharacterId: combatOrderPick?.targetCharacterId,
-        matchingAllies: combatOrderPick?.matchingAllies,
+        matchingCombatants: combatOrderPick?.matchingCombatants,
       },
     );
 

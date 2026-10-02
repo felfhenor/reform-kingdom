@@ -14,6 +14,14 @@ export type CombatOrderComparator =
 
 export type CombatOrderHealthDirection = 'Above' | 'Below';
 
+export type CombatOrderHealthCountCondition = {
+  type: 'AllyCountHealthPercent' | 'EnemyCountHealthPercent';
+  healthDirection: CombatOrderHealthDirection;
+  healthPercent: number;
+  comparator: CombatOrderComparator;
+  count: number;
+};
+
 export type CombatOrderCondition =
   | { type: 'Always' }
   | {
@@ -26,13 +34,7 @@ export type CombatOrderCondition =
       comparator: CombatOrderComparator;
       value: number;
     }
-  | {
-      type: 'AllyCountHealthPercent';
-      healthDirection: CombatOrderHealthDirection;
-      healthPercent: number;
-      comparator: CombatOrderComparator;
-      count: number;
-    }
+  | CombatOrderHealthCountCondition
   | { type: 'EnemyCount'; comparator: CombatOrderComparator; count: number }
   | {
       type: 'SpecificHeroHealthPercent';
@@ -64,6 +66,6 @@ export type CombatOrderPick = {
   skill: EquipmentSkill;
   targetMode?: CombatantTargettingType;
   targetCharacterId?: CharacterId;
-  // Resolved once at pick time for `MatchingAllies` targeting.
-  matchingAllies?: Combatant[];
+  // Resolved once at pick time for `MatchingAllies`/`MatchingEnemies` targeting.
+  matchingCombatants?: Combatant[];
 };

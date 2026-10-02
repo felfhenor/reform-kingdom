@@ -6,6 +6,7 @@ import type {
   Combatant,
   CombatOrderComparator,
   CombatOrderCondition,
+  CombatOrderHealthCountCondition,
   CombatOrderPick,
   EquipmentSkill,
 } from '@interfaces';
@@ -55,18 +56,21 @@ function livingEnemies(combat: Combat, combatant: Combatant): Combatant[] {
   return pool.filter((c) => !combatantIsDead(c));
 }
 
-function alliesMatchingHealthDirection(
+function combatantsMatchingHealthCount(
   combat: Combat,
   combatant: Combatant,
-  healthDirection: 'Above' | 'Below',
-  healthPercentThreshold: number,
+  condition: CombatOrderHealthCountCondition,
 ): Combatant[] {
-  const matchesDirection = (ally: Combatant) =>
-    healthDirection === 'Above'
-      ? healthPercent(ally) > healthPercentThreshold
-      : healthPercent(ally) < healthPercentThreshold;
+  const pool =
+    condition.type === 'AllyCountHealthPercent'
+      ? livingAllies(combat, combatant)
+      : livingEnemies(combat, combatant);
 
-  return livingAllies(combat, combatant).filter(matchesDirection);
+  return pool.filter((c) =>
+    condition.healthDirection === 'Above'
+      ? healthPercent(c) > condition.healthPercent
+      : healthPercent(c) < condition.healthPercent,
+  );
 }
 
 export function combatOrderConditionMatches(
@@ -89,15 +93,13 @@ export function combatOrderConditionMatches(
         condition.comparator,
         condition.value,
       );
-    case 'AllyCountHealthPercent': {
-      const count = alliesMatchingHealthDirection(
-        combat,
-        combatant,
-        condition.healthDirection,
-        condition.healthPercent,
-      ).length;
-      return compareNumbers(count, condition.comparator, condition.count);
-    }
+    case 'AllyCountHealthPercent':
+    case 'EnemyCountHealthPercent':
+      return compareNumbers(
+        combatantsMatchingHealthCount(combat, combatant, condition).length,
+        condition.comparator,
+        condition.count,
+      );
     case 'EnemyCount':
       return compareNumbers(
         livingEnemies(combat, combatant).length,
@@ -119,23 +121,22 @@ export function combatOrderConditionMatches(
 }
 
 // Sorted most-relevant-first, so a skill with fewer targets than matches still lands on the ones that matter most.
-export function matchingAlliesForCondition(
+export function matchingCombatantsForCondition(
   combat: Combat,
   combatant: Combatant,
   condition: CombatOrderCondition,
 ): Combatant[] | undefined {
-  if (condition.type !== 'AllyCountHealthPercent') return undefined;
+  if (
+    condition.type !== 'AllyCountHealthPercent' &&
+    condition.type !== 'EnemyCountHealthPercent'
+  ) {
+    return undefined;
+  }
 
-  const matches = alliesMatchingHealthDirection(
-    combat,
-    combatant,
-    condition.healthDirection,
-    condition.healthPercent,
-  );
-
+  const matches = combatantsMatchingHealthCount(combat, combatant, condition);
   return condition.healthDirection === 'Below'
-    ? sortBy(matches, (ally) => ally.hp)
-    : sortBy(matches, (ally) => -ally.hp);
+    ? sortBy(matches, (c) => healthPercent(c))
+    : sortBy(matches, (c) => -healthPercent(c));
 }
 
 // Resolves a skill family (stable across tiers/source) to a currently castable skill.
@@ -172,12 +173,13 @@ export function pickSkillFromCombatOrders(
     const needsValidityCheck =
       targetMode === 'Self' ||
       targetMode === 'SpecificHero' ||
-      targetMode === 'MatchingAllies';
+      targetMode === 'MatchingAllies' ||
+      targetMode === 'MatchingEnemies';
 
     // Only the new modes can resolve to zero targets - others are unchanged from before.
     if (!needsValidityCheck) return { skill, targetMode };
 
-    const matchingAllies = matchingAlliesForCondition(
+    const matchingCombatants = matchingCombatantsForCondition(
       combat,
       combatant,
       clause.condition,
@@ -185,7 +187,7 @@ export function pickSkillFromCombatOrders(
     const context = {
       combatant,
       targetCharacterId: clause.action.targetCharacterId,
-      matchingAllies,
+      matchingCombatants,
     };
 
     if (
@@ -204,7 +206,7 @@ export function pickSkillFromCombatOrders(
       skill,
       targetMode,
       targetCharacterId: clause.action.targetCharacterId,
-      matchingAllies,
+      matchingCombatants,
     };
   }
 

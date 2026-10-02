@@ -36,10 +36,13 @@ function conditionSummary(condition: CombatOrderCondition): string {
       return `if my Health ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.value}%`;
     case 'SelfEnergyPercent':
       return `if my Energy ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.value}%`;
-    case 'AllyCountHealthPercent': {
+    case 'AllyCountHealthPercent':
+    case 'EnemyCountHealthPercent': {
+      const side =
+        condition.type === 'AllyCountHealthPercent' ? 'allies' : 'enemies';
       const direction =
         condition.healthDirection === 'Above' ? 'above' : 'below';
-      return `if allies ${direction} ${condition.healthPercent}% HP ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
+      return `if ${side} ${direction} ${condition.healthPercent}% HP ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
     }
     case 'EnemyCount':
       return `if enemy count ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
@@ -69,6 +72,8 @@ function targetModeSuffix(action: CombatOrderAction): string {
         : ' (on specific hero)';
     case 'MatchingAllies':
       return ' (on matching allies)';
+    case 'MatchingEnemies':
+      return ' (on matching enemies)';
     default:
       return ' (default)';
   }

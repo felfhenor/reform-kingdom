@@ -388,6 +388,61 @@ describe('combatantTakeTurn targeting', () => {
     );
   });
 
+  it("drops a Combat Order's targetMode override when confusion redirects the technique", () => {
+    const orderedSkill = buildTargetingSkill();
+
+    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
+      orderedSkill,
+    ]);
+    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
+      skill: orderedSkill,
+      targetMode: 'MatchingEnemies',
+    });
+    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
+      (_combatant, stat) => stat === 'redirectionChance',
+    );
+
+    const baseList = [{ id: 'target' } as never];
+    vi.mocked(
+      combatGetPossibleCombatantTargetsForSkillTechnique,
+    ).mockReturnValue(baseList);
+
+    const priority = [{ type: 'Weakest' as const }];
+    const combatant = buildCombatant({
+      targetting: priority,
+      combatOrders: [
+        {
+          id: 'clause-1' as CombatOrderClauseId,
+          enabled: true,
+          condition: { type: 'Always' },
+          action: { type: 'CastSkillFamily', family: 'Fireball' },
+        },
+      ],
+    });
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
+      () => false,
+    );
+
+    expect(
+      combatGetPossibleCombatantTargetsForSkillTechnique,
+    ).toHaveBeenCalledWith(
+      expect.anything(),
+      combatant,
+      orderedSkill,
+      expect.anything(),
+      true,
+    );
+    expect(combatGetTargetsFromPriorityList).toHaveBeenCalledWith(
+      baseList,
+      priority,
+      1,
+      expect.anything(),
+    );
+  });
+
   it('emits a miss event on the target and skips the technique when the missChance roll succeeds', () => {
     const skill = buildTargetingSkill();
     const target = buildCombatant({ id: 'target-1' });

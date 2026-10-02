@@ -55,8 +55,8 @@
               <span class="type-meta">%</span>
             }
 
-            @if (draftConditionType() === 'AllyCountHealthPercent') {
-              <span class="type-meta">allies</span>
+            @if (draftHealthCountSide(); as side) {
+              <span class="type-meta">{{ side }}</span>
               <ng-select
                 class="w-28"
                 [items]="healthDirectionOptions"

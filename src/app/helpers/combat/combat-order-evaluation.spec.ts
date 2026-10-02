@@ -1,8 +1,10 @@
 import {
   combatOrderConditionMatches,
+  matchingCombatantsForCondition,
   pickSkillFromCombatOrders,
   resolveFamilyToSkill,
 } from '@helpers/combat/combat-order-evaluation';
+import { defaultCombatStats } from '@helpers/defaults';
 import type {
   Combat,
   Combatant,
@@ -50,7 +52,7 @@ function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
       Constitution: 0,
       Spirit: 0,
     },
-    combatStats: {} as never,
+    combatStats: defaultCombatStats(),
     resistance: {} as never,
     affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
     tagResistance: {} as never,
@@ -346,6 +348,104 @@ describe('combatOrderConditionMatches', () => {
       ),
     ).toBe(false);
   });
+
+  it('EnemyCountHealthPercent counts only living enemies on the matching side of the threshold', () => {
+    const hero = buildCombatant({ id: 'hero', hp: 10 });
+    const lowGuardian = buildCombatant({ id: 'g1', isEnemy: true, hp: 20 });
+    const healthyGuardian = buildCombatant({
+      id: 'g2',
+      isEnemy: true,
+      hp: 90,
+    });
+    const deadGuardian = buildCombatant({ id: 'g3', isEnemy: true, hp: 0 });
+
+    const combatWithGuardians = buildCombat({
+      heroes: [hero],
+      guardians: [lowGuardian, healthyGuardian, deadGuardian],
+    });
+    const condition: CombatOrderCondition = {
+      type: 'EnemyCountHealthPercent',
+      healthDirection: 'Below',
+      healthPercent: 50,
+      comparator: 'Equal',
+      count: 1,
+    };
+
+    // The low-HP hero isn't counted: only g1 is a living enemy below 50%.
+    expect(
+      combatOrderConditionMatches(condition, combatWithGuardians, hero),
+    ).toBe(true);
+    expect(
+      combatOrderConditionMatches(
+        { ...condition, healthDirection: 'Above' },
+        combatWithGuardians,
+        hero,
+      ),
+    ).toBe(true);
+    expect(
+      combatOrderConditionMatches(
+        { ...condition, count: 2 },
+        combatWithGuardians,
+        hero,
+      ),
+    ).toBe(false);
+  });
+
+  it('EnemyCountHealthPercent from an enemy caster counts heroes and helpers', () => {
+    const guardian = buildCombatant({ id: 'g1', isEnemy: true, hp: 10 });
+    const lowHero = buildCombatant({ id: 'hero', hp: 20 });
+    const lowHelper = buildCombatant({ id: 'helper', hp: 30 });
+
+    expect(
+      combatOrderConditionMatches(
+        {
+          type: 'EnemyCountHealthPercent',
+          healthDirection: 'Below',
+          healthPercent: 50,
+          comparator: 'Equal',
+          count: 2,
+        },
+        buildCombat({
+          heroes: [lowHero],
+          helpers: [lowHelper],
+          guardians: [guardian],
+        }),
+        guardian,
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('matchingCombatantsForCondition', () => {
+  it('orders matches by HP %, not raw HP', () => {
+    const warrior = buildCombatant({
+      id: 'warrior',
+      hp: 400,
+      totalStats: { ...buildCombatant().totalStats, Health: 1000 },
+    });
+    const mage = buildCombatant({ id: 'mage', hp: 45 });
+    const combat = buildCombat({ heroes: [mage, warrior] });
+
+    expect(
+      matchingCombatantsForCondition(combat, mage, {
+        type: 'AllyCountHealthPercent',
+        healthDirection: 'Below',
+        healthPercent: 50,
+        comparator: 'GreaterThanOrEqual',
+        count: 1,
+      }),
+    ).toEqual([warrior, mage]);
+  });
+
+  it('is undefined for conditions without a matched set', () => {
+    expect(
+      matchingCombatantsForCondition(buildCombat(), buildCombatant(), {
+        type: 'EnemyCount',
+        comparator: 'Equal',
+        count: 1,
+      }),
+    ).toBeUndefined();
+  });
 });
 
 describe('pickSkillFromCombatOrders', () => {
@@ -521,6 +621,79 @@ describe('pickSkillFromCombatOrders', () => {
         fireball,
       ]),
     ).toEqual({ skill: fireball, targetMode: undefined });
+  });
+
+  describe('MatchingEnemies', () => {
+    const lowGuardian = buildCombatant({ id: 'low', isEnemy: true, hp: 20 });
+    const lowerGuardian = buildCombatant({
+      id: 'lower',
+      isEnemy: true,
+      hp: 10,
+    });
+    const healthyGuardian = buildCombatant({
+      id: 'healthy',
+      isEnemy: true,
+      hp: 90,
+    });
+
+    function casterWithFamily(family: string): Combatant {
+      return buildCombatant({
+        id: 'caster',
+        combatOrders: [
+          {
+            id: 'c1' as never,
+            enabled: true,
+            condition: {
+              type: 'EnemyCountHealthPercent',
+              healthDirection: 'Below',
+              healthPercent: 50,
+              comparator: 'GreaterThanOrEqual',
+              count: 1,
+            },
+            action: {
+              type: 'CastSkillFamily',
+              family,
+              targetMode: 'MatchingEnemies',
+            },
+          },
+        ],
+      });
+    }
+
+    it('resolves the matching enemies, lowest HP first', () => {
+      const execute = buildSkill({
+        id: 'execute' as never,
+        family: 'Execute',
+        techniques: [buildTechnique({ targetType: 'Enemies' })],
+      });
+      const caster = casterWithFamily('Execute');
+      const combat = buildCombat({
+        heroes: [caster],
+        guardians: [lowGuardian, healthyGuardian, lowerGuardian],
+      });
+
+      expect(pickSkillFromCombatOrders(combat, caster, [execute])).toEqual({
+        skill: execute,
+        targetMode: 'MatchingEnemies',
+        targetCharacterId: undefined,
+        matchingCombatants: [lowerGuardian, lowGuardian],
+      });
+    });
+
+    it('falls through when the skill cannot target enemies', () => {
+      const cure = buildSkill({
+        id: 'cure' as never,
+        family: 'Cure',
+        techniques: [buildTechnique({ targetType: 'Allies' })],
+      });
+      const caster = casterWithFamily('Cure');
+      const combat = buildCombat({
+        heroes: [caster],
+        guardians: [lowGuardian],
+      });
+
+      expect(pickSkillFromCombatOrders(combat, caster, [cure])).toBeUndefined();
+    });
   });
 
   it('RandomSkill always matches and stops, uniformly picking an available skill', () => {

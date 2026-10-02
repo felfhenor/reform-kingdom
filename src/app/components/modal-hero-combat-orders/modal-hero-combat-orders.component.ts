@@ -30,6 +30,7 @@ import {
   isCombatOrderFamilyEquipmentOnly,
   isCombatOrderFamilyKnown,
   isCombatOrderFamilyUsable,
+  isCombatOrderTargetModeAllowedForCondition,
   isCombatOrderTargetModeUsable,
 } from '@helpers/combat/combat-order-evaluation.ui';
 import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
@@ -76,6 +77,7 @@ const CONDITION_TYPE_OPTIONS: SelectOption<CombatOrderCondition['type']>[] = [
   { value: 'SelfEnergyPercent', label: 'My Energy %' },
   { value: 'AllyCountHealthPercent', label: 'Ally Count vs Health %' },
   { value: 'EnemyCount', label: 'Enemy Count' },
+  { value: 'EnemyCountHealthPercent', label: 'Enemy Count vs Health %' },
   { value: 'SpecificHeroHealthPercent', label: 'Specific Hero Health %' },
 ];
 
@@ -100,6 +102,7 @@ const ALL_TARGET_MODE_OPTIONS: SelectOption<CombatantTargettingType | ''>[] = [
   { value: 'Self', label: 'Self' },
   { value: 'SpecificHero', label: 'Specific Hero' },
   { value: 'MatchingAllies', label: 'Matching Allies' },
+  { value: 'MatchingEnemies', label: 'Matching Enemies' },
 ];
 
 const DEFAULT_DRAFT_COMPARATOR: CombatOrderComparator = 'LessThan';
@@ -227,22 +230,39 @@ export class ModalHeroCombatOrdersComponent {
   );
   public draftTargetCharacterId = signal<CharacterId | undefined>(undefined);
 
-  // "Matching Allies" only means anything for an Ally Count vs Health % condition.
+  public draftHealthCountSide = computed<'allies' | 'enemies' | undefined>(
+    () => {
+      switch (this.draftConditionType()) {
+        case 'AllyCountHealthPercent':
+          return 'allies';
+        case 'EnemyCountHealthPercent':
+          return 'enemies';
+        default:
+          return undefined;
+      }
+    },
+  );
+
   public targetModeOptions = computed<
     SelectOption<CombatantTargettingType | ''>[]
-  >(() =>
-    sortBy(
-      this.draftConditionType() === 'AllyCountHealthPercent'
-        ? ALL_TARGET_MODE_OPTIONS
-        : ALL_TARGET_MODE_OPTIONS.filter((o) => o.value !== 'MatchingAllies'),
+  >(() => {
+    const conditionType = this.draftConditionType();
+    return sortBy(
+      ALL_TARGET_MODE_OPTIONS.filter((o) =>
+        isCombatOrderTargetModeAllowedForCondition(
+          o.value ? o.value : undefined,
+          conditionType,
+        ),
+      ),
       (t) => t.label,
-    ),
-  );
+    );
+  });
 
   public draftCondition = computed<CombatOrderCondition | undefined>(() => {
     const comparator = this.draftComparator();
+    const type = this.draftConditionType();
 
-    switch (this.draftConditionType()) {
+    switch (type) {
       case 'Always':
         return { type: 'Always' };
       case 'SelfHealthPercent':
@@ -258,8 +278,9 @@ export class ModalHeroCombatOrdersComponent {
           value: this.draftValue(),
         };
       case 'AllyCountHealthPercent':
+      case 'EnemyCountHealthPercent':
         return {
-          type: 'AllyCountHealthPercent',
+          type,
           healthDirection: this.draftHealthDirection(),
           healthPercent: this.draftHealthPercent(),
           comparator,
@@ -311,10 +332,9 @@ export class ModalHeroCombatOrdersComponent {
     const next = option?.value ?? 'Always';
     this.draftConditionType.set(next);
 
-    // Clear a stale "Matching Allies" selection rather than saving a mismatched clause.
+    // Clear a stale Matching* selection rather than saving a mismatched clause.
     if (
-      next !== 'AllyCountHealthPercent' &&
-      this.draftTargetMode() === 'MatchingAllies'
+      !isCombatOrderTargetModeAllowedForCondition(this.draftTargetMode(), next)
     ) {
       this.draftTargetMode.set(undefined);
     }
@@ -437,12 +457,12 @@ export class ModalHeroCombatOrdersComponent {
     this.draftFamily.set(clause.action.family);
     this.setDraftFromCondition(clause.condition);
 
-    // Drop a MatchingAllies targetMode if the loaded condition no longer matches it.
-    const targetMode =
-      clause.action.targetMode === 'MatchingAllies' &&
-      clause.condition.type !== 'AllyCountHealthPercent'
-        ? undefined
-        : clause.action.targetMode;
+    const targetMode = isCombatOrderTargetModeAllowedForCondition(
+      clause.action.targetMode,
+      clause.condition.type,
+    )
+      ? clause.action.targetMode
+      : undefined;
     this.draftTargetMode.set(targetMode);
     this.draftTargetCharacterId.set(
       targetMode === 'SpecificHero'
@@ -460,7 +480,10 @@ export class ModalHeroCombatOrdersComponent {
     ) {
       this.draftComparator.set(condition.comparator);
       this.draftValue.set(condition.value);
-    } else if (condition.type === 'AllyCountHealthPercent') {
+    } else if (
+      condition.type === 'AllyCountHealthPercent' ||
+      condition.type === 'EnemyCountHealthPercent'
+    ) {
       this.draftHealthDirection.set(condition.healthDirection);
       this.draftComparator.set(condition.comparator);
       this.draftHealthPercent.set(condition.healthPercent);
