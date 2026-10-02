@@ -1,508 +1,342 @@
+import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat-combatant-hp', () => ({
-  combatantIsDead: vi.fn(() => false),
-  combatCombatantTakeDamage: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-damage', () => ({
-  combatApplySkillToTarget: vi.fn(),
-  techniqueHasAttribute: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/combat/combat-end', () => ({
-  combatCheckIfOver: vi.fn(),
-  combatHandleDefeat: vi.fn(),
-  isCombatOver: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  beginCombatLogCommits: vi.fn(),
-  combatantMessageToken: vi.fn(() => 'token'),
-  combatMessageLog: vi.fn(),
-  endCombatLogCommits: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-order-evaluation', () => ({
-  pickSkillFromCombatOrders: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-statuseffects', () => ({
-  combatCanTakeTurn: vi.fn(() => true),
-  combatExpireCombatantStatusEffects: vi.fn(),
-  combatTickCombatantStatusEffects: vi.fn(),
-  combatUnapplyAllStatusEffects: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-stats', () => ({
-  combatCombatantCombatStatSucceedsChance: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/combat/combat-targetting', () => ({
-  combatAvailableSkillsForCombatant: vi.fn(),
-  combatGetPossibleCombatantTargetsForSkill: vi.fn(() => [{ id: 'target' }]),
-  combatGetPossibleCombatantTargetsForSkillTechnique: vi.fn(() => []),
-  combatGetTargetsFromPriorityList: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/rng', () => ({
+vi.mock('@helpers/combat/combat-combatant-hp');
+vi.mock('@helpers/combat/combat-damage');
+vi.mock('@helpers/combat/combat-end');
+vi.mock('@helpers/combat/combat-order-evaluation');
+vi.mock('@helpers/combat/combat-statuseffects');
+vi.mock('@helpers/combat/combat-stats');
+vi.mock('@helpers/combat/combat-targetting');
+vi.mock('@helpers/rng', async (importOriginal) => ({
+  ...(await importOriginal<typeof RngHelper>()),
   rngChoiceWeighted: vi.fn(),
   rngSucceedsChance: vi.fn(() => false),
-  rngUuid: vi.fn(() => 'uuid'),
-}));
-
-vi.mock('@helpers/hero/skill', () => ({
-  skillEpCost: vi.fn(() => 0),
-  skillTechniqueNumTargets: vi.fn(() => 1),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-  worldCombatState: vi.fn(),
 }));
 
 import {
   combatDoCombatIteration,
   combatantTakeTurn,
 } from '@helpers/combat/combat';
-import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
+import {
+  combatantIsDead,
+  combatCombatantTakeDamage,
+} from '@helpers/combat/combat-combatant-hp';
 import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
-import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
+import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
 import {
   combatCanTakeTurn,
   combatExpireCombatantStatusEffects,
   combatTickCombatantStatusEffects,
+  combatUnapplyAllStatusEffects,
 } from '@helpers/combat/combat-statuseffects';
 import {
   combatAvailableSkillsForCombatant,
+  combatGetPossibleCombatantTargetsForSkill,
   combatGetPossibleCombatantTargetsForSkillTechnique,
   combatGetTargetsFromPriorityList,
 } from '@helpers/combat/combat-targetting';
-import { rngChoiceWeighted } from '@helpers/rng';
-import { updateGamestate, worldCombatState } from '@helpers/state-game';
-import { sortBy } from 'es-toolkit/compat';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureSkill } from '@helpers/content/ensure-skill';
+import { defaultStats } from '@helpers/defaults';
+import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
+import { gamestate, worldCombatState } from '@helpers/state-game';
 import type {
-  Combat,
   Combatant,
+  CombatOrderClause,
   CombatOrderClauseId,
+  CombatStat,
   EquipmentSkill,
-  GameState,
+  EquipmentSkillContentTechnique,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
+import { buildCombat, buildMonsterCombatant } from '@/testing/builders';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-function buildCombat(): Combat {
-  return {
-    id: 'combat-1' as never,
-    locationName: 'Field Ruins',
-    locationPosition: { x: 0, y: 0 },
-    rounds: 1,
-    heroes: [],
-    helpers: [],
-    guardians: [],
-  };
+const target = buildMonsterCombatant(ensureMonster({ name: 'Target' }), {
+  id: 'target-1',
+});
+
+const castFireball: CombatOrderClause = {
+  id: 'clause-1' as CombatOrderClauseId,
+  enabled: true,
+  condition: { type: 'Always' },
+  action: { type: 'CastSkillFamily', family: 'Fireball' },
+};
+
+function skill(id: string, overrides: Partial<EquipmentSkill> = {}) {
+  return ensureSkill({
+    id: id as never,
+    name: id,
+    techniques: [{ targets: 1 } as EquipmentSkillContentTechnique],
+    ...overrides,
+  });
 }
 
-function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
-  return {
-    id: 'combatant-1',
-    name: 'Combatant',
+// Built from a monster: a hero combatant would route through the automocked combat-stats and come out without combatStats.
+function caster(overrides: Partial<Combatant> = {}): Combatant {
+  const monster = ensureMonster({
+    name: 'Caster',
+    baseStats: { ...defaultStats(), Health: 40, Energy: 15 },
+  });
+  return buildMonsterCombatant(monster, {
+    id: 'caster-1',
     isEnemy: false,
-    level: 1,
-    hp: 100,
-    ep: 10,
-    sprite: '0000',
-    frames: 4,
-    targetting: [{ type: 'Random' }],
-    baseStats: {} as never,
-    statBoosts: {} as never,
-    totalStats: { Health: 100, Energy: 10 } as never,
-    combatStats: {} as never,
-    resistance: {} as never,
-    affinity: {} as never,
-    tagResistance: {} as never,
-    skillIds: [],
-    skillRefs: [],
-    skillWeights: {},
-    combatOrders: [],
-    skillUses: {},
-    statusEffects: [],
-    statusEffectData: {},
     ...overrides,
-  };
+  });
 }
 
-function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
-  return {
-    id: 'skill-1' as never,
-    name: 'Test Skill',
-    __type: 'skill',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    epCost: 0,
-    usesPerCombat: -1,
-    statusEffectDurationBoost: {} as never,
-    statusEffectChanceBoost: {} as never,
-    techniques: [],
-    requiredWeaponTypes: [],
-    family: 'Test Skill',
-    ...overrides,
-  };
+function available(...skills: EquipmentSkill[]): void {
+  vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue(skills);
+}
+
+function rollsSucceed(...stats: CombatStat[]): void {
+  vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
+    (_combatant, stat) => stats.includes(stat),
+  );
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(combatantIsDead).mockReturnValue(false);
+  vi.mocked(combatCanTakeTurn).mockReturnValue(true);
+  vi.mocked(rngSucceedsChance).mockReturnValue(false);
+  vi.mocked(combatCombatantCombatStatSucceedsChance).mockReturnValue(false);
+  vi.mocked(combatGetPossibleCombatantTargetsForSkill).mockReturnValue([
+    target,
+  ]);
+  vi.mocked(combatGetPossibleCombatantTargetsForSkillTechnique).mockReturnValue(
+    [target],
+  );
+  vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([]);
+  vi.mocked(pickSkillFromCombatOrders).mockReturnValue(undefined);
+  available();
+  vi.mocked(rngChoiceWeighted).mockImplementation((skills) => skills[0]);
   combatantSkillCastEvents.set([]);
+  combatantDamageEvents.set([]);
 });
 
 describe('combatDoCombatIteration', () => {
-  function commitRound(previous: Combat): Combat | undefined {
-    vi.mocked(worldCombatState).mockReturnValue(previous);
-    combatDoCombatIteration();
+  it('commits the round on a copy, leaving the previous round untouched', () => {
+    const previous = buildCombat({ rounds: 1, heroes: [caster()] });
+    const snapshot = structuredClone(previous);
+    seedGamestate((state) => (state.world.combat = previous));
 
-    const state = { world: { combat: previous } } as unknown as GameState;
-    return vi.mocked(updateGamestate).mock.calls[0][0](state).world.combat;
-  }
+    inTick(combatDoCombatIteration);
 
-  it('commits a new top-level Combat reference each round so worldCombatState consumers update', () => {
-    const previous = buildCombat();
-
-    const committed = commitRound(previous);
-
+    const committed = worldCombatState();
     expect(committed).not.toBe(previous);
     expect(committed?.rounds).toBe(2);
-    expect(previous.rounds).toBe(1);
-  });
-
-  it('plays the round on a copy, leaving the previous round untouched', () => {
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([]);
-    const previous = {
-      ...buildCombat(),
-      heroes: [buildCombatant()],
-    };
-    const snapshot = structuredClone(previous);
-
-    const committed = commitRound(previous);
-
     expect(committed?.heroes[0]).not.toBe(previous.heroes[0]);
     expect(previous).toEqual(snapshot);
   });
 
-  it('does not start a round when there is no combat', () => {
-    vi.mocked(worldCombatState).mockReturnValue(undefined);
+  it('does nothing when there is no combat', () => {
+    const before = seedGamestate();
 
-    combatDoCombatIteration();
+    inTick(combatDoCombatIteration);
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(gamestate()).toBe(before);
+  });
+});
+
+describe('combatantTakeTurn when dead', () => {
+  beforeEach(() => vi.mocked(combatantIsDead).mockReturnValueOnce(true));
+
+  it('skips the turn entirely without a revive', () => {
+    vi.mocked(rngSucceedsChance).mockReturnValue(false);
+
+    expect(combatantTakeTurn(buildCombat(), caster())).toEqual({});
+    expect(combatTickCombatantStatusEffects).not.toHaveBeenCalled();
+  });
+
+  it('revives to full health, clearing status effects, and then takes the turn', () => {
+    vi.mocked(rngSucceedsChance).mockReturnValue(true);
+    const combatant = caster({ hp: 0 });
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatCombatantTakeDamage).toHaveBeenCalledWith(
+      combatant,
+      -combatant.totalStats.Health,
+    );
+    expect(combatUnapplyAllStatusEffects).toHaveBeenCalled();
+    expect(combatTickCombatantStatusEffects).toHaveBeenCalled();
   });
 });
 
 describe('combatantTakeTurn skill selection', () => {
-  it('emits a skill-cast event for the chosen skill', () => {
-    const weightedSkill = buildSkill({
-      id: 'weighted' as never,
-      name: 'Fireball',
-      sprite: '0042',
-    });
-
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
-      weightedSkill,
-    ]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(weightedSkill);
-
-    const combatant = buildCombatant({ id: 'caster-1', combatOrders: [] });
+  it('spends the chosen skill and emits a cast event for it', () => {
+    available(skill('fireball', { name: 'Fireball', sprite: '0042' }));
+    const combatant = caster();
 
     combatantTakeTurn(buildCombat(), combatant);
 
+    expect(combatant.skillUses['fireball' as never]).toBe(1);
     expect(combatantSkillCastEvents()).toMatchObject([
       { combatantId: 'caster-1', skillName: 'Fireball', skillSprite: '0042' },
     ]);
   });
 
   it('uses the Combat Orders pick when the hero has configured orders', () => {
-    const orderedSkill = buildSkill({
-      id: 'ordered' as never,
-      family: 'Fireball',
-    });
-    const weightedSkill = buildSkill({ id: 'weighted' as never });
-
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
-      orderedSkill,
-      weightedSkill,
-    ]);
-    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
-      skill: orderedSkill,
-    });
-    vi.mocked(rngChoiceWeighted).mockReturnValue(weightedSkill);
-
-    const combatant = buildCombatant({
-      combatOrders: [
-        {
-          id: 'clause-1' as CombatOrderClauseId,
-          enabled: true,
-          condition: { type: 'Always' },
-          action: { type: 'CastSkillFamily', family: 'Fireball' },
-        },
-      ],
-    });
+    const ordered = skill('ordered');
+    available(skill('weighted'), ordered);
+    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({ skill: ordered });
+    const combatant = caster({ combatOrders: [castFireball] });
 
     combatantTakeTurn(buildCombat(), combatant);
 
-    expect(combatant.skillUses['ordered' as never]).toBe(1);
-    expect(combatant.skillUses['weighted' as never]).toBeUndefined();
+    expect(combatant.skillUses).toEqual({ ordered: 1 });
   });
 
-  it('falls back to weighted-random and never consults Combat Orders when none are configured', () => {
-    const weightedSkill = buildSkill({ id: 'weighted' as never });
+  it('falls back to weighted-random without consulting orders when none are configured, or for enemies', () => {
+    available(skill('weighted'));
+    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
+      skill: skill('ordered'),
+    });
+    const hero = caster();
+    const enemy = caster({ isEnemy: true, combatOrders: [castFireball] });
 
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
-      weightedSkill,
-    ]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(weightedSkill);
-
-    const combatant = buildCombatant({ combatOrders: [] });
-
-    combatantTakeTurn(buildCombat(), combatant);
+    combatantTakeTurn(buildCombat(), hero);
+    combatantTakeTurn(buildCombat(), enemy);
 
     expect(pickSkillFromCombatOrders).not.toHaveBeenCalled();
-    expect(combatant.skillUses['weighted' as never]).toBe(1);
+    expect(hero.skillUses).toEqual({ weighted: 1 });
+    expect(enemy.skillUses).toEqual({ weighted: 1 });
   });
 
-  it('enemies always use weighted-random, even if combatOrders were somehow populated', () => {
-    const weightedSkill = buildSkill({ id: 'weighted' as never });
-    const orderedSkill = buildSkill({ id: 'ordered' as never });
+  it('only weighs skills that have a possible target', () => {
+    const targetless = skill('targetless');
+    available(targetless, skill('targeted'));
+    vi.mocked(combatGetPossibleCombatantTargetsForSkill).mockImplementation(
+      (_combat, _combatant, candidate) =>
+        candidate.id === targetless.id ? [] : [target],
+    );
 
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
-      weightedSkill,
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(vi.mocked(rngChoiceWeighted).mock.calls[0][0]).toEqual([
+      skill('targeted'),
     ]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(weightedSkill);
-    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
-      skill: orderedSkill,
-    });
-
-    const combatant = buildCombatant({
-      isEnemy: true,
-      combatOrders: [
-        {
-          id: 'clause-1' as CombatOrderClauseId,
-          enabled: true,
-          condition: { type: 'Always' },
-          action: { type: 'RandomSkill' },
-        },
-      ],
-    });
-
-    combatantTakeTurn(buildCombat(), combatant);
-
-    expect(pickSkillFromCombatOrders).not.toHaveBeenCalled();
-    expect(combatant.skillUses['weighted' as never]).toBe(1);
   });
 });
 
 describe('combatantTakeTurn targeting', () => {
-  function buildTargetingSkill() {
-    return buildSkill({
-      id: 'weighted' as never,
-      techniques: [
-        {
-          targets: 1,
-          targetType: 'Enemies',
-          targetBehaviors: [{ behavior: 'Always' }],
-          damageScaling: {} as never,
-          elements: [],
-          attributes: [],
-          statusEffects: [],
-          combatMessage: '',
-        },
-      ],
-    });
+  function targetPriorityUsed() {
+    return vi.mocked(combatGetTargetsFromPriorityList).mock.calls[0][1];
   }
 
-  it('resolves targets from the combatant own targetting priority list when no Combat Order override applies', () => {
-    const weightedSkill = buildTargetingSkill();
-
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
-      weightedSkill,
-    ]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(weightedSkill);
-
-    const baseList = [{ id: 'target' } as never];
-    vi.mocked(
-      combatGetPossibleCombatantTargetsForSkillTechnique,
-    ).mockReturnValue(baseList);
-
+  it("targets by the combatant's own priority list without an order override", () => {
+    available(skill('weighted'));
     const priority = [
       { type: 'Random' as const, jobId: 'healer' as never },
       { type: 'Random' as const },
     ];
-    const combatant = buildCombatant({ targetting: priority });
 
-    combatantTakeTurn(buildCombat(), combatant);
+    combatantTakeTurn(buildCombat(), caster({ targetting: priority }));
 
-    expect(combatGetTargetsFromPriorityList).toHaveBeenCalledWith(
-      baseList,
-      priority,
-      1,
-      expect.anything(),
-    );
+    expect(targetPriorityUsed()).toEqual(priority);
   });
 
-  it("wraps a Combat Order's targetMode override into a single-entry priority list, taking precedence over the combatant's own list", () => {
-    const orderedSkill = buildTargetingSkill();
-
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
-      orderedSkill,
-    ]);
+  it("lets a Combat Order's targetMode override the combatant's own list", () => {
+    const ordered = skill('ordered');
+    available(ordered);
     vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
-      skill: orderedSkill,
+      skill: ordered,
       targetMode: 'Weakest',
     });
 
-    const baseList = [{ id: 'target' } as never];
-    vi.mocked(
-      combatGetPossibleCombatantTargetsForSkillTechnique,
-    ).mockReturnValue(baseList);
-
-    const combatant = buildCombatant({
-      targetting: [{ type: 'Random', jobId: 'healer' as never }],
-      combatOrders: [
-        {
-          id: 'clause-1' as CombatOrderClauseId,
-          enabled: true,
-          condition: { type: 'Always' },
-          action: { type: 'CastSkillFamily', family: 'Fireball' },
-        },
-      ],
-    });
-
-    combatantTakeTurn(buildCombat(), combatant);
-
-    expect(combatGetTargetsFromPriorityList).toHaveBeenCalledWith(
-      baseList,
-      [{ type: 'Weakest' }],
-      1,
-      expect.anything(),
+    combatantTakeTurn(
+      buildCombat(),
+      caster({
+        targetting: [{ type: 'Random' }],
+        combatOrders: [castFireball],
+      }),
     );
+
+    expect(targetPriorityUsed()).toEqual([{ type: 'Weakest' }]);
   });
 
-  it("drops a Combat Order's targetMode override when confusion redirects the technique", () => {
-    const orderedSkill = buildTargetingSkill();
-
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([
-      orderedSkill,
-    ]);
+  it("drops the order's targetMode override when confusion redirects the technique", () => {
+    const ordered = skill('ordered');
+    available(ordered);
     vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
-      skill: orderedSkill,
+      skill: ordered,
       targetMode: 'MatchingEnemies',
     });
-    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
-      (_combatant, stat) => stat === 'redirectionChance',
-    );
-
-    const baseList = [{ id: 'target' } as never];
-    vi.mocked(
-      combatGetPossibleCombatantTargetsForSkillTechnique,
-    ).mockReturnValue(baseList);
-
+    rollsSucceed('redirectionChance');
     const priority = [{ type: 'Weakest' as const }];
-    const combatant = buildCombatant({
+    const combatant = caster({
       targetting: priority,
-      combatOrders: [
-        {
-          id: 'clause-1' as CombatOrderClauseId,
-          enabled: true,
-          condition: { type: 'Always' },
-          action: { type: 'CastSkillFamily', family: 'Fireball' },
-        },
-      ],
+      combatOrders: [castFireball],
     });
 
     combatantTakeTurn(buildCombat(), combatant);
 
-    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
-      () => false,
-    );
-
     expect(
-      combatGetPossibleCombatantTargetsForSkillTechnique,
-    ).toHaveBeenCalledWith(
-      expect.anything(),
-      combatant,
-      orderedSkill,
-      expect.anything(),
-      true,
-    );
-    expect(combatGetTargetsFromPriorityList).toHaveBeenCalledWith(
-      baseList,
-      priority,
-      1,
-      expect.anything(),
-    );
+      vi.mocked(combatGetPossibleCombatantTargetsForSkillTechnique).mock
+        .calls[0][4],
+    ).toBe(true);
+    expect(targetPriorityUsed()).toEqual(priority);
   });
 
-  it('emits a miss event on the target and skips the technique when the missChance roll succeeds', () => {
-    const skill = buildTargetingSkill();
-    const target = buildCombatant({ id: 'target-1' });
+  it('emits a miss on the target instead of applying the technique when the miss roll succeeds', () => {
+    available(skill('weighted'));
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    rollsSucceed('missChance');
 
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([skill]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(skill);
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValueOnce([target]);
-    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
-      (_combatant, stat) => stat === 'missChance',
-    );
-    combatantDamageEvents.set([]);
-
-    combatantTakeTurn(buildCombat(), buildCombatant());
-
-    vi.mocked(combatCombatantCombatStatSucceedsChance).mockImplementation(
-      () => false,
-    );
+    combatantTakeTurn(buildCombat(), caster());
 
     expect(combatApplySkillToTarget).not.toHaveBeenCalled();
     expect(combatantDamageEvents()).toMatchObject([
       { combatantId: 'target-1', amount: 0, variant: 'miss' },
     ]);
   });
+
+  it('applies the technique twice when the strike-again roll succeeds', () => {
+    available(skill('weighted'));
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    rollsSucceed('skillStrikeAgainChance');
+
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(combatApplySkillToTarget).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('combatantTakeTurn status effect timing', () => {
   function callOrder(): string[] {
+    const tick = vi.mocked(combatTickCombatantStatusEffects).mock;
+    const roll = vi.mocked(combatCombatantCombatStatSucceedsChance).mock;
+    const expire = vi.mocked(combatExpireCombatantStatusEffects).mock;
     const calls = [
-      ...vi
-        .mocked(combatTickCombatantStatusEffects)
-        .mock.calls.map((call, i) => ({
-          name: `tick:${call[2]}`,
-          order: vi.mocked(combatTickCombatantStatusEffects).mock
-            .invocationCallOrder[i],
-        })),
-      ...vi
-        .mocked(combatCombatantCombatStatSucceedsChance)
-        .mock.calls.map((call, i) => ({
-          name: `roll:${call[1]}`,
-          order: vi.mocked(combatCombatantCombatStatSucceedsChance).mock
-            .invocationCallOrder[i],
-        })),
-      ...vi
-        .mocked(combatExpireCombatantStatusEffects)
-        .mock.calls.map((_, i) => ({
-          name: 'expire',
-          order: vi.mocked(combatExpireCombatantStatusEffects).mock
-            .invocationCallOrder[i],
-        })),
+      ...tick.calls.map((call, i) => ({
+        name: `tick:${call[2]}`,
+        order: tick.invocationCallOrder[i],
+      })),
+      ...roll.calls.map((call, i) => ({
+        name: `roll:${call[1]}`,
+        order: roll.invocationCallOrder[i],
+      })),
+      ...expire.calls.map((_, i) => ({
+        name: 'expire',
+        order: expire.invocationCallOrder[i],
+      })),
     ];
     return sortBy(calls, (c) => c.order).map((c) => c.name);
   }
 
   it('expires effects only after the stun roll, so a final-turn stun still lands', () => {
-    vi.mocked(combatCombatantCombatStatSucceedsChance).mockReturnValueOnce(
-      true,
-    );
+    available(skill('weighted'));
+    rollsSucceed('stunChance');
+    const combatant = caster();
 
-    combatantTakeTurn(buildCombat(), buildCombatant());
+    combatantTakeTurn(buildCombat(), combatant);
 
+    expect(combatant.skillUses).toEqual({});
     expect(callOrder()).toEqual([
       'tick:TurnStart',
       'roll:stunChance',
@@ -512,19 +346,14 @@ describe('combatantTakeTurn status effect timing', () => {
   });
 
   it('still ticks TurnEnd effects when frozen, without rolling for an extra turn', () => {
-    vi.mocked(combatCanTakeTurn).mockReturnValueOnce(false);
+    vi.mocked(combatCanTakeTurn).mockReturnValue(false);
 
-    const result = combatantTakeTurn(buildCombat(), buildCombatant());
-
+    expect(combatantTakeTurn(buildCombat(), caster())).toEqual({});
     expect(callOrder()).toEqual(['tick:TurnStart', 'tick:TurnEnd', 'expire']);
-    expect(result).toEqual({});
   });
 
   it('still ticks TurnEnd effects when no skill can be chosen', () => {
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
-
-    combatantTakeTurn(buildCombat(), buildCombatant());
+    combatantTakeTurn(buildCombat(), caster());
 
     expect(callOrder()).toEqual([
       'tick:TurnStart',
@@ -539,27 +368,35 @@ describe('combatantTakeTurn status effect timing', () => {
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(true);
 
-    combatantTakeTurn(buildCombat(), buildCombatant());
+    combatantTakeTurn(buildCombat(), caster());
 
     expect(callOrder()).toEqual(['tick:TurnStart']);
   });
 
   it('does not roll for an extra turn when the TurnEnd tick kills the combatant', () => {
-    const skill = buildSkill();
-    vi.mocked(combatAvailableSkillsForCombatant).mockReturnValue([skill]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(skill);
+    available(skill('weighted'));
     vi.mocked(combatantIsDead)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(true);
 
-    combatantTakeTurn(buildCombat(), buildCombatant());
+    combatantTakeTurn(buildCombat(), caster());
 
     expect(callOrder()).toEqual([
       'tick:TurnStart',
       'roll:stunChance',
+      'roll:redirectionChance',
       'tick:TurnEnd',
       'expire',
     ]);
+  });
+
+  it('grants another turn when the repeat-action roll succeeds after acting', () => {
+    available(skill('weighted'));
+    rollsSucceed('repeatActionChance');
+
+    expect(combatantTakeTurn(buildCombat(), caster())).toEqual({
+      takeAnotherTurn: true,
+    });
   });
 });

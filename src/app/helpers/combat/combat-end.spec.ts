@@ -1,125 +1,23 @@
-import type * as AnalyticsHelper from '@helpers/engine/analytics';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/state-game', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  worldCombatState: vi.fn(),
-}));
+vi.mock('@helpers/decree/auto-mode-state');
+vi.mock('@helpers/commission/commission-kill-progress');
+vi.mock('@helpers/hero/character-progress');
+vi.mock('@helpers/encounter/encounter');
+vi.mock('@helpers/encounter/encounter-random-combat');
+vi.mock('@helpers/hero/travel');
+vi.mock('@helpers/town/raid/town-raid-resolve');
+vi.mock('@helpers/task/task-progress');
 
-vi.mock('@helpers/engine/analytics', async (importOriginal) => {
-  const actual = await importOriginal<typeof AnalyticsHelper>();
-  return {
-    ...actual,
-    analyticsSendDesignEvent: vi.fn(),
-  };
-});
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryAdd: vi.fn(),
-}));
-
-vi.mock('@helpers/decree/auto-mode-state', () => ({
-  autoModeRecordClauseFailure: vi.fn(),
-  autoModeRecordClauseSuccess: vi.fn(),
-  autoModeRecordNodeFailure: vi.fn(),
-  autoModeRecordNodeSuccess: vi.fn(),
-  autoModeResetNodeFailureCounts: vi.fn(),
-}));
-
-vi.mock('@helpers/kingdom/bestiary', () => ({
-  monsterRecordKill: vi.fn(),
-}));
-
-vi.mock('@helpers/task/task-progress', () => ({
-  taskRecordCraft: vi.fn(),
-  taskRecordEncounterClear: vi.fn(),
-  taskRecordGather: vi.fn(),
-}));
-
-vi.mock('@helpers/commission/commission-kill-progress', () => ({
-  commissionRecordMonsterKill: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/character-progress', () => ({
-  partyGainXp: vi.fn(() => []),
-  syncPartyHpFromCombat: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-state', () => ({
-  combatReset: vi.fn(),
-}));
-
-vi.mock('@helpers/item/collectibles', () => ({
-  collectiblesAdd: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  collectibleDropHtml: vi.fn(),
-  combatantMessageToken: vi.fn((combatant: Combatant) => `@@${combatant.id}@@`),
-  combatMessageLog: vi.fn(),
-  equipmentDropHtml: vi.fn(),
-  ITEM_ICON_TOKEN: '@@icon@@',
-  itemDropHtml: vi.fn(),
-  recipeDropHtml: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/encounter/encounter', () => ({
-  encounterStartFight: vi.fn(),
-}));
-
-vi.mock('@helpers/item/loot', () => ({
-  combatItemDropRateBoost: vi.fn(() => 0),
-  rollDroppedRewards: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  addMaterial: vi.fn(),
-  goldCoinId: vi.fn(() => 'gold-coin'),
-}));
-
-vi.mock('@helpers/combat/monster', () => ({
-  monsterXpReward: vi.fn(() => 0),
-  xpForOverLevel: vi.fn((rawXp: number) => rawXp),
-}));
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  isRecipeDiscovered: vi.fn(() => false),
-  recipeDiscover: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/gather-vfx', () => ({
-  gatherVfxEmit: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  rewardContentInfo: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/travel', () => ({
-  travelBeginDeathsDoor: vi.fn(),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-resolve', () => ({
-  raidResolveVictory: vi.fn(),
-  raidResolveDefeat: vi.fn(),
-}));
-
+import { combatantMessageToken, combatLog } from '@helpers/combat/combat-log';
 import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
-import {
-  collectibleDropHtml,
-  combatMessageLog,
-  recipeDropHtml,
-} from '@helpers/combat/combat-log';
-import { combatReset } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
-import { taskRecordEncounterClear } from '@helpers/task/task-progress';
-import { getEntry } from '@helpers/content/content';
-import { recipeDiscover } from '@helpers/crafting/recipes';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
   autoModeRecordClauseFailure,
   autoModeRecordClauseSuccess,
@@ -128,640 +26,369 @@ import {
   autoModeResetNodeFailureCounts,
 } from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { partyGainXp } from '@helpers/hero/character-progress';
+import { encounterRandomHandleVictory } from '@helpers/encounter/encounter-random-combat';
+import {
+  partyGainXp,
+  syncPartyHpFromCombat,
+} from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
-import { collectiblesAdd } from '@helpers/item/collectibles';
-import { rollDroppedRewards } from '@helpers/item/loot';
-import { addMaterial } from '@helpers/item/materials';
-import { monsterRecordKill } from '@helpers/kingdom/bestiary';
+import { gamestate } from '@helpers/state-game';
+import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import {
   raidResolveDefeat,
   raidResolveVictory,
 } from '@helpers/town/raid/town-raid-resolve';
 import type {
   CharacterId,
-  CollectibleContent,
-  CollectibleId,
   Combat,
   Combatant,
   EncounterContent,
   EncounterId,
-  MonsterContent,
-  RecipeContent,
-  RecipeId,
+  ItemId,
+  MonsterId,
   TownContent,
   TownId,
 } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCharacter,
+  buildCombat,
+  buildHeroCombatant,
+  buildMonsterCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-function buildCombatant(overrides: Partial<Combatant>): Combatant {
-  return {
-    id: 'combatant-1',
-    name: 'Combatant',
-    isEnemy: false,
-    level: 1,
-    hp: 10,
-    ep: 10,
-    sprite: '0000',
-    frames: 4,
-    targetting: [{ type: 'Random' }],
-    baseStats: {} as never,
-    statBoosts: {} as never,
-    totalStats: {} as never,
-    combatStats: {} as never,
-    resistance: {} as never,
-    affinity: {} as never,
-    tagResistance: {} as never,
-    skillIds: [],
-    skillRefs: [],
-    skillWeights: {},
-    combatOrders: [],
-    skillUses: {},
-    statusEffects: [],
-    statusEffectData: {},
+const goblinId = 'goblin' as MonsterId;
+const encounterId = 'field-ruins' as EncounterId;
+const oreId = 'ore' as ItemId;
+const larsiaId = 'larsia' as TownId;
+
+const goblin = ensureMonster({
+  id: goblinId,
+  name: 'Goblin',
+  xp: { min: 100, max: 100, bonusPerLevel: 0 },
+  drops: [ensureDroppedReward({ itemId: oreId, min: 3, max: 3, chance: 100 })],
+});
+
+const items = [
+  ensureItem({ id: oreId, name: 'Ore' }),
+  ensureItem({ id: 'gold-coin' as ItemId, name: 'Gold Coin' }),
+];
+
+function encounter(overrides: Partial<EncounterContent> = {}) {
+  return ensureEncounter({
+    id: encounterId,
+    name: 'Field Ruins',
+    fights: [{ monsters: [] }],
+    levelRange: { min: 3, max: 5 },
     ...overrides,
-  };
+  });
 }
 
-function buildCombat(overrides: Partial<Combat>): Combat {
-  return {
-    id: 'combat-1' as never,
+function hero(id: string, overrides: Partial<Combatant> = {}): Combatant {
+  return buildHeroCombatant(
+    buildCharacter({ id: id as CharacterId, name: id }),
+    { hp: 10, ...overrides },
+  );
+}
+
+function deadGoblin(level = 5): Combatant {
+  return buildMonsterCombatant(goblin, { hp: 0, level });
+}
+
+function liveGoblin(): Combatant {
+  return buildMonsterCombatant(goblin, { hp: 10 });
+}
+
+function fight(overrides: Partial<Combat> = {}): Combat {
+  return buildCombat({
     locationName: 'Field Ruins',
-    locationPosition: { x: 0, y: 0 },
-    rounds: 1,
-    heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
-    helpers: [],
-    guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
+    heroes: [hero('hero-1')],
+    guardians: [deadGoblin()],
     ...overrides,
-  };
+  });
 }
+
+// Seeds the combat as the live one, so a reset is observable.
+function endFight(combat: Combat): boolean {
+  seedGamestate((state) => (state.world.combat = combat));
+  return inTick(() => combatCheckIfOver(combat));
+}
+
+function logMessages(): string[] {
+  return combatLog().map((entry) => entry.message);
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(partyGainXp).mockReturnValue([]);
+  seedContent([goblin, encounter(), ...items]);
+});
 
 describe('isCombatOver', () => {
-  it('is a loss once every hero is dead, even if a town-guardian helper is still alive', () => {
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
-      helpers: [buildCombatant({ id: 'helper-1', hp: 10 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
-    });
+  it('ends once every hero or every guardian is dead, ignoring helpers', () => {
+    const alive = hero('helper-1');
+    const dead = hero('hero-1', { hp: 0 });
 
-    expect(isCombatOver(combat)).toBe(true);
-  });
-
-  it('is not over while at least one hero and one guardian are alive, regardless of helpers', () => {
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
-      helpers: [buildCombatant({ id: 'helper-1', hp: 0 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
-    });
-
-    expect(isCombatOver(combat)).toBe(false);
+    expect(
+      isCombatOver(
+        fight({ heroes: [dead], helpers: [alive], guardians: [liveGoblin()] }),
+      ),
+    ).toBe(true);
+    expect(
+      isCombatOver(
+        fight({
+          heroes: [hero('hero-1')],
+          helpers: [hero('helper-1', { hp: 0 })],
+          guardians: [liveGoblin()],
+        }),
+      ),
+    ).toBe(false);
   });
 });
 
 describe('combatCheckIfOver', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  it('returns false and leaves the combat alone while both sides stand', () => {
+    const combat = fight({ guardians: [liveGoblin()] });
+
+    expect(endFight(combat)).toBe(false);
+    expect(gamestate().world.combat).toEqual(combat);
   });
 
-  it('starts the next fight and does not reset combat when the encounter has more fights', () => {
-    const encounter = {
-      fights: [{ monsters: [] }, { monsters: [] }],
-    } as unknown as EncounterContent;
-    vi.mocked(getEntry).mockReturnValue(encounter as never);
+  describe('on victory', () => {
+    it('records the win for auto mode, the bestiary and commissions, then resets combat', () => {
+      const events = captureAnalyticsEvents();
+      const combat = fight({ encounterId, fightIndex: 0 });
 
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
+      expect(endFight(combat)).toBe(true);
+
+      expect(syncPartyHpFromCombat).toHaveBeenCalledWith(combat.heroes);
+      expect(autoModeRecordClauseSuccess).toHaveBeenCalled();
+      expect(autoModeRecordNodeSuccess).toHaveBeenCalledWith('Field Ruins');
+      expect(autoModeRecordClauseFailure).not.toHaveBeenCalled();
+      expect(gamestate().bestiary[goblinId]).toMatchObject({
+        kills: 1,
+        minLevelFound: 5,
+        foundAtNodes: ['Field Ruins'],
+      });
+      expect(commissionRecordMonsterKill).toHaveBeenCalledWith(goblinId);
+      expect(events).toContain('Combat:Encounter:Win');
+      expect(gamestate().world.combat).toBeUndefined();
     });
 
-    const result = combatCheckIfOver(combat);
+    it('starts the next fight, granting this fight’s drops first, without resetting combat', () => {
+      seedContent([
+        goblin,
+        encounter({ fights: [{ monsters: [] }, { monsters: [] }] }),
+        ...items,
+      ]);
+      const combat = fight({ encounterId, fightIndex: 0 });
 
-    expect(result).toBe(true);
-    expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 1, 'Field Ruins');
-    expect(combatReset).not.toHaveBeenCalled();
-    // Mid-encounter: no completion rewards roll yet (there are also no
-    // resolvable monsters in this fixture, so no kill-drop roll either).
-    expect(rollDroppedRewards).not.toHaveBeenCalled();
-    expect(taskRecordEncounterClear).not.toHaveBeenCalled();
-  });
+      endFight(combat);
 
-  it('resets combat on victory when there is no next fight', () => {
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [{ itemId: 'gold' }],
-    } as unknown as EncounterContent;
-    vi.mocked(getEntry).mockReturnValue(encounter as never);
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
+      expect(encounterStartFight).toHaveBeenCalledWith(
+        encounterId,
+        1,
+        'Field Ruins',
+      );
+      expect(gamestate().materials[oreId]?.quantity).toBe(3);
+      expect(gamestate().world.combat).toEqual(combat);
+      expect(taskRecordEncounterClear).not.toHaveBeenCalled();
     });
 
-    combatCheckIfOver(combat);
+    it('clears the node after its last fight, granting kill drops and completion rewards together', () => {
+      seedContent([
+        goblin,
+        encounter({
+          completionRewards: [
+            ensureDroppedReward({ itemId: oreId, min: 4, max: 4, chance: 100 }),
+          ],
+        }),
+        ...items,
+      ]);
+      const events = captureAnalyticsEvents();
 
-    expect(encounterStartFight).not.toHaveBeenCalled();
-    expect(combatReset).toHaveBeenCalled();
-    // The node is fully cleared - completion rewards roll exactly once,
-    // scaled to the concluding fight's guardian level.
-    expect(rollDroppedRewards).toHaveBeenCalledTimes(1);
-    expect(rollDroppedRewards).toHaveBeenCalledWith(
-      encounter.completionRewards,
-      1,
-      0,
-    );
-  });
+      endFight(fight({ encounterId, fightIndex: 0 }));
 
-  it('sends a node-completion analytics event with the location name', () => {
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [],
-    } as unknown as EncounterContent;
-    vi.mocked(getEntry).mockReturnValue(encounter as never);
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      locationName: 'Field Ruins',
+      expect(gamestate().materials[oreId]?.quantity).toBe(7);
+      expect(
+        logMessages().filter((message) =>
+          message.startsWith('The party found'),
+        ),
+      ).toHaveLength(1);
+      expect(events).toContain('World:Node:Complete:Field Ruins');
+      expect(taskRecordEncounterClear).toHaveBeenCalledWith('Field Ruins');
+      expect(encounterStartFight).not.toHaveBeenCalled();
     });
 
-    combatCheckIfOver(combat);
+    it('records no node clear for a bare fight with no encounter', () => {
+      endFight(fight());
 
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'World:Node:Complete:Field Ruins',
-    );
-    expect(taskRecordEncounterClear).toHaveBeenCalledWith('Field Ruins');
-  });
-
-  it('grants a rolled collectible completion reward and logs it', () => {
-    const collectible = {
-      id: 'swamp-clam' as CollectibleId,
-      name: 'Swamp Clam',
-    } as CollectibleContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [{ collectibleId: collectible.id }],
-    } as unknown as EncounterContent;
-
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : collectible) as never,
-    );
-    vi.mocked(rollDroppedRewards).mockReturnValue([
-      { kind: 'Collectible', collectibleId: collectible.id },
-    ]);
-    vi.mocked(collectibleDropHtml).mockReturnValue('Swamp Clam');
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
+      expect(taskRecordEncounterClear).not.toHaveBeenCalled();
+      expect(gamestate().world.combat).toBeUndefined();
     });
 
-    combatCheckIfOver(combat);
+    it('hands a random encounter to its own victory handler, keeping combat when it continues', () => {
+      vi.mocked(encounterRandomHandleVictory).mockReturnValue(true);
+      const combat = fight({ encounterRandomId: 'wilds' as never });
 
-    expect(collectiblesAdd).toHaveBeenCalledWith(collectible.id, 1);
-  });
+      endFight(combat);
 
-  it('grants a rolled recipe completion reward and logs it', () => {
-    const recipe = {
-      id: 'equipment-bone-hewn-cloak' as RecipeId,
-      name: 'Equipment: Bone-Hewn Cloak',
-    } as RecipeContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [{ recipeId: recipe.id }],
-    } as unknown as EncounterContent;
+      expect(encounterRandomHandleVictory).toHaveBeenCalledWith(combat, [
+        expect.objectContaining({ itemId: oreId, quantity: 3 }),
+      ]);
+      expect(gamestate().world.combat).toEqual(combat);
 
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : recipe) as never,
-    );
-    vi.mocked(rollDroppedRewards).mockReturnValue([
-      { kind: 'Recipe', recipeId: recipe.id },
-    ]);
-    vi.mocked(recipeDropHtml).mockReturnValue('Equipment: Bone-Hewn Cloak');
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
+      vi.mocked(encounterRandomHandleVictory).mockReturnValue(false);
+      endFight(combat);
+      expect(gamestate().world.combat).toBeUndefined();
     });
 
-    combatCheckIfOver(combat);
+    it('hands a raid win to the raid resolver with the kill drops instead of granting them', () => {
+      const combat = fight({ raidTownId: larsiaId });
 
-    expect(recipeDiscover).toHaveBeenCalledWith(recipe.id);
+      endFight(combat);
+
+      expect(raidResolveVictory).toHaveBeenCalledWith(combat, larsiaId, [
+        expect.objectContaining({ itemId: oreId, quantity: 3 }),
+      ]);
+      expect(gamestate().materials[oreId]).toBeUndefined();
+      expect(gamestate().world.combat).toBeUndefined();
+    });
   });
 
-  it('merges final-fight kill drops with completion rewards into one grant per material', () => {
-    const monster = { id: 'monster-1', drops: [] } as unknown as MonsterContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [],
-    } as unknown as EncounterContent;
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : monster) as never,
-    );
-    vi.mocked(rollDroppedRewards)
-      .mockReturnValueOnce([
-        { kind: 'Item', itemId: 'ore' as never, quantity: 3 },
-      ])
-      .mockReturnValueOnce([
-        { kind: 'Item', itemId: 'ore' as never, quantity: 4 },
+  describe('victory xp', () => {
+    function xpAtLevel(combat: Combat): (level: number) => number {
+      endFight(combat);
+      return vi.mocked(partyGainXp).mock.calls[0][0];
+    }
+
+    it("scales each kill's xp against each hero's own level and the encounter cap", () => {
+      const xp = xpAtLevel(fight({ encounterId, fightIndex: 0 }));
+      const raw = monsterXpReward(goblin, 5);
+
+      expect(xp(4)).toBe(xpForOverLevel(raw, 4, 5));
+      expect(xp(7)).toBe(xpForOverLevel(raw, 7, 5));
+      expect(xp(7)).toBeLessThan(xp(4));
+    });
+
+    it("caps a raid win at the town's assaulter max level", () => {
+      seedContent([
+        goblin,
+        ensureTown({
+          id: larsiaId,
+          defense: {
+            assaulter: { level: { min: 20, max: 25 } },
+          } as TownContent['defense'],
+        }),
       ]);
 
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-        }),
-      ],
+      const xp = xpAtLevel(fight({ raidTownId: larsiaId }));
+
+      expect(xp(28)).toBe(xpForOverLevel(monsterXpReward(goblin, 5), 28, 25));
     });
 
-    combatCheckIfOver(combat);
-
-    expect(addMaterial).toHaveBeenCalledTimes(1);
-    expect(addMaterial).toHaveBeenCalledWith('ore', 7);
-    // Task completion logs after the drops, matching the ExploreRandom path.
-    expect(vi.mocked(addMaterial).mock.invocationCallOrder[0]).toBeLessThan(
-      vi.mocked(taskRecordEncounterClear).mock.invocationCallOrder[0],
-    );
-  });
-
-  it('grants kill drops before starting the next fight mid-encounter', () => {
-    const monster = { id: 'monster-1', drops: [] } as unknown as MonsterContent;
-    const encounter = {
-      fights: [{ monsters: [] }, { monsters: [] }],
-      completionRewards: [],
-    } as unknown as EncounterContent;
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : monster) as never,
-    );
-    vi.mocked(rollDroppedRewards).mockReturnValueOnce([
-      { kind: 'Item', itemId: 'ore' as never, quantity: 3 },
-    ]);
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-        }),
-      ],
+    it('grants no xp for a fight with no source encounter', () => {
+      expect(xpAtLevel(fight())(1)).toBe(0);
     });
 
-    combatCheckIfOver(combat);
+    describe('xp log', () => {
+      const [first, second] = [hero('hero-1'), hero('hero-2')];
+      const gain = (characterId: string, xp: number) => ({
+        characterId: characterId as CharacterId,
+        xp,
+        leveledUp: false,
+      });
+      const xpLines = () => logMessages().filter((line) => line.includes('XP'));
+      const heroLine = (combatant: Combatant, xp: number) =>
+        expect.stringContaining(
+          `**${combatantMessageToken(combatant)}** gained ${xp} XP!`,
+        );
 
-    expect(addMaterial).toHaveBeenCalledWith('ore', 3);
-    expect(vi.mocked(addMaterial).mock.invocationCallOrder[0]).toBeLessThan(
-      vi.mocked(encounterStartFight).mock.invocationCallOrder[0],
-    );
-    expect(rollDroppedRewards).toHaveBeenCalledTimes(1);
-    expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 1, 'Field Ruins');
-  });
+      it('logs a single party line when every hero gained the same amount', () => {
+        vi.mocked(partyGainXp).mockReturnValueOnce([
+          gain('hero-1', 60),
+          gain('hero-2', 60),
+        ]);
 
-  it('resets combat on victory when the combat has no encounter (e.g. a bare fight)', () => {
-    const combat = buildCombat({});
+        endFight(fight({ heroes: [first, second] }));
 
-    combatCheckIfOver(combat);
+        expect(xpLines()).toEqual(['The party gained 60 XP!']);
+      });
 
-    expect(encounterStartFight).not.toHaveBeenCalled();
-    expect(combatReset).toHaveBeenCalled();
-  });
+      it('logs one line per hero for differing amounts', () => {
+        vi.mocked(partyGainXp).mockReturnValueOnce([
+          gain('hero-1', 100),
+          gain('hero-2', 50),
+        ]);
 
-  it('records an Auto Mode clause and node success on victory', () => {
-    const combat = buildCombat({});
+        endFight(fight({ heroes: [first, second] }));
 
-    combatCheckIfOver(combat);
+        expect(xpLines()).toHaveLength(2);
+        expect(xpLines()).toEqual(
+          expect.arrayContaining([heroLine(first, 100), heroLine(second, 50)]),
+        );
+      });
 
-    expect(autoModeRecordClauseSuccess).toHaveBeenCalled();
-    expect(autoModeRecordClauseFailure).not.toHaveBeenCalled();
-    expect(autoModeRecordNodeSuccess).toHaveBeenCalledWith('Field Ruins');
-    expect(autoModeRecordNodeFailure).not.toHaveBeenCalled();
-  });
+      it('logs a per-hero line when only some heroes gained', () => {
+        vi.mocked(partyGainXp).mockReturnValueOnce([gain('hero-1', 60)]);
 
-  it('begins Deaths Door and resets combat on defeat', () => {
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+        endFight(fight({ heroes: [first, second] }));
+
+        expect(xpLines()).toEqual([heroLine(first, 60)]);
+      });
     });
 
-    combatCheckIfOver(combat);
+    it('logs nothing about xp when no hero gained any', () => {
+      endFight(fight());
 
-    expect(travelBeginDeathsDoor).toHaveBeenCalled();
-    expect(encounterStartFight).not.toHaveBeenCalled();
-    expect(combatReset).toHaveBeenCalled();
-    expect(autoModeRecordClauseFailure).toHaveBeenCalled();
-    expect(autoModeRecordNodeFailure).toHaveBeenCalledWith('Field Ruins');
-  });
-
-  it('routes a raid victory to raidResolveVictory instead of the encounter-completion path', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const combat = buildCombat({ raidTownId: 'larsia' });
-
-    const result = combatCheckIfOver(combat);
-
-    expect(result).toBe(true);
-    expect(raidResolveVictory).toHaveBeenCalledWith(combat, 'larsia', []);
-    expect(encounterStartFight).not.toHaveBeenCalled();
-    expect(combatReset).toHaveBeenCalled();
-  });
-
-  it('calls raidResolveDefeat in addition to the normal Deaths Door defeat handling for a raid loss', () => {
-    const combat = buildCombat({
-      raidTownId: 'larsia',
-      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+      expect(logMessages().some((message) => message.includes('XP'))).toBe(
+        false,
+      );
     });
 
-    combatCheckIfOver(combat);
+    it('wipes node failure counts only when someone levels up', () => {
+      endFight(fight());
+      expect(autoModeResetNodeFailureCounts).not.toHaveBeenCalled();
 
-    expect(travelBeginDeathsDoor).toHaveBeenCalled();
-    expect(raidResolveDefeat).toHaveBeenCalledWith('larsia');
+      vi.mocked(partyGainXp).mockReturnValueOnce([
+        { characterId: 'hero-1' as CharacterId, xp: 100, leveledUp: true },
+      ]);
+      endFight(fight());
+      expect(autoModeResetNodeFailureCounts).toHaveBeenCalled();
+    });
   });
 
-  it('does not call raidResolveDefeat for a non-raid loss', () => {
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
+  describe('on defeat', () => {
+    const lost = (overrides: Partial<Combat> = {}) =>
+      fight({
+        heroes: [hero('hero-1', { hp: 0 })],
+        guardians: [liveGoblin()],
+        ...overrides,
+      });
+
+    it('sends the party to Deaths Door, records the failure and resets combat, with no kills', () => {
+      const events = captureAnalyticsEvents();
+      const combat = lost();
+
+      endFight(combat);
+
+      expect(syncPartyHpFromCombat).toHaveBeenCalledWith(combat.heroes);
+      expect(travelBeginDeathsDoor).toHaveBeenCalled();
+      expect(autoModeRecordClauseFailure).toHaveBeenCalled();
+      expect(autoModeRecordNodeFailure).toHaveBeenCalledWith('Field Ruins');
+      expect(events).toContain('Combat:Encounter:Loss');
+      expect(gamestate().bestiary).toEqual({});
+      expect(raidResolveDefeat).not.toHaveBeenCalled();
+      expect(gamestate().world.combat).toBeUndefined();
     });
 
-    combatCheckIfOver(combat);
+    it('also resolves the raid defeat for a raid loss', () => {
+      endFight(lost({ raidTownId: larsiaId }));
 
-    expect(raidResolveDefeat).not.toHaveBeenCalled();
-  });
-
-  it("scales XP against each hero's own level, not the strongest hero's", () => {
-    const monster = { id: 'monster-1' } as MonsterContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [],
-      levelRange: { min: 3, max: 5 },
-    } as unknown as EncounterContent;
-
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : monster) as never,
-    );
-    vi.mocked(monsterXpReward).mockReturnValue(100);
-    vi.mocked(xpForOverLevel).mockImplementation((rawXp, heroLevel) =>
-      heroLevel > 5 ? 50 : rawXp,
-    );
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      heroes: [
-        buildCombatant({ id: 'hero-1', level: 4, hp: 10 }),
-        buildCombatant({ id: 'hero-2', level: 7, hp: 10 }),
-      ],
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-          level: 5,
-        }),
-      ],
+      expect(travelBeginDeathsDoor).toHaveBeenCalled();
+      expect(raidResolveDefeat).toHaveBeenCalledWith(larsiaId);
     });
-
-    combatCheckIfOver(combat);
-
-    const xpAtLevel = vi.mocked(partyGainXp).mock.calls[0][0];
-    expect(xpAtLevel(4)).toBe(100);
-    expect(xpAtLevel(7)).toBe(50);
-    expect(monsterXpReward).toHaveBeenCalledTimes(1);
-  });
-
-  it('logs one line per hero when the heroes gained different amounts', () => {
-    vi.mocked(partyGainXp).mockReturnValueOnce([
-      { characterId: 'hero-1' as CharacterId, xp: 100, leveledUp: false },
-      { characterId: 'hero-2' as CharacterId, xp: 50, leveledUp: false },
-    ]);
-
-    const combat = buildCombat({
-      heroes: [
-        buildCombatant({ id: 'hero-1', hp: 10 }),
-        buildCombatant({ id: 'hero-2', hp: 10 }),
-      ],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      combat,
-      '**@@hero-1@@** gained 100 XP!',
-    );
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      combat,
-      '**@@hero-2@@** gained 50 XP!',
-    );
-  });
-
-  it('logs nothing about XP when no hero gained any', () => {
-    vi.mocked(partyGainXp).mockReturnValueOnce([]);
-
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(combatMessageLog).not.toHaveBeenCalledWith(
-      combat,
-      expect.stringContaining('XP'),
-    );
-  });
-
-  it('logs a single party line when every hero gained the same amount', () => {
-    vi.mocked(partyGainXp).mockReturnValueOnce([
-      { characterId: 'hero-1' as CharacterId, xp: 60, leveledUp: false },
-      { characterId: 'hero-2' as CharacterId, xp: 60, leveledUp: false },
-    ]);
-
-    const combat = buildCombat({
-      heroes: [
-        buildCombatant({ id: 'hero-1', hp: 10 }),
-        buildCombatant({ id: 'hero-2', hp: 10 }),
-      ],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 0 })],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      combat,
-      'The party gained 60 XP!',
-    );
-  });
-
-  it("grants over-level-scaled XP for a raid win, using the town's assaulter max level", () => {
-    const monster = { id: 'monster-1' } as MonsterContent;
-    const town = {
-      id: 'larsia' as TownId,
-      defense: { assaulter: { level: { min: 20, max: 25 } } },
-    } as TownContent;
-
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'larsia' ? town : monster) as never,
-    );
-    vi.mocked(monsterXpReward).mockReturnValue(100);
-    vi.mocked(xpForOverLevel).mockReturnValue(80);
-
-    const combat = buildCombat({
-      raidTownId: 'larsia',
-      heroes: [buildCombatant({ id: 'hero-1', level: 22, hp: 10 })],
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-          level: 25,
-        }),
-      ],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(vi.mocked(partyGainXp).mock.calls[0][0](22)).toBe(80);
-    expect(xpForOverLevel).toHaveBeenCalledWith(100, 22, 25);
-  });
-
-  it('wipes every node failure count when the XP gain levels up the party', () => {
-    const monster = { id: 'monster-1' } as MonsterContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [],
-      levelRange: { min: 1, max: 1 },
-    } as unknown as EncounterContent;
-
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : monster) as never,
-    );
-    vi.mocked(monsterXpReward).mockReturnValue(100);
-    vi.mocked(xpForOverLevel).mockReturnValue(100);
-    vi.mocked(partyGainXp).mockReturnValueOnce([
-      { characterId: 'combatant-1' as CharacterId, xp: 100, leveledUp: true },
-    ]);
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-          level: 1,
-        }),
-      ],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(autoModeResetNodeFailureCounts).toHaveBeenCalled();
-  });
-
-  it('leaves node failure counts alone when the XP gain does not level up the party', () => {
-    const monster = { id: 'monster-1' } as MonsterContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [],
-      levelRange: { min: 1, max: 1 },
-    } as unknown as EncounterContent;
-
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : monster) as never,
-    );
-    vi.mocked(monsterXpReward).mockReturnValue(100);
-    vi.mocked(xpForOverLevel).mockReturnValue(100);
-    vi.mocked(partyGainXp).mockReturnValueOnce([
-      { characterId: 'combatant-1' as CharacterId, xp: 100, leveledUp: false },
-    ]);
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-          level: 1,
-        }),
-      ],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(autoModeResetNodeFailureCounts).not.toHaveBeenCalled();
-  });
-
-  it('records a bestiary kill for each defeated guardian on victory', () => {
-    const monster = { id: 'monster-1' } as MonsterContent;
-    const encounter = {
-      fights: [{ monsters: [] }],
-      completionRewards: [],
-      levelRange: { min: 3, max: 5 },
-    } as unknown as EncounterContent;
-
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'enc-1' ? encounter : monster) as never,
-    );
-
-    const combat = buildCombat({
-      encounterId: 'enc-1' as EncounterId,
-      fightIndex: 0,
-      locationName: 'Field Ruins',
-      guardians: [
-        buildCombatant({
-          id: 'guardian-1',
-          isEnemy: true,
-          hp: 0,
-          monsterId: 'monster-1',
-          level: 5,
-        }),
-      ],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(monsterRecordKill).toHaveBeenCalledWith(
-      'monster-1',
-      5,
-      'Field Ruins',
-    );
-    expect(commissionRecordMonsterKill).toHaveBeenCalledWith('monster-1');
-  });
-
-  it('does not record a bestiary kill on defeat', () => {
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', hp: 0 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
-    });
-
-    combatCheckIfOver(combat);
-
-    expect(monsterRecordKill).not.toHaveBeenCalled();
-    expect(commissionRecordMonsterKill).not.toHaveBeenCalled();
-  });
-
-  it('returns false when combat is not yet over', () => {
-    const combat = buildCombat({
-      heroes: [buildCombatant({ id: 'hero-1', hp: 10 })],
-      guardians: [buildCombatant({ id: 'guardian-1', isEnemy: true, hp: 10 })],
-    });
-
-    expect(combatCheckIfOver(combat)).toBe(false);
-    expect(combatReset).not.toHaveBeenCalled();
   });
 });

@@ -1,64 +1,18 @@
-import type {
-  Character,
-  Combatant,
-  EquipmentSkillContent,
-  EquipmentSkillId,
-  GameState,
-  GlobalEffectSums,
-  IsContentItem,
-  JobContent,
-  JobId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
-vi.mock('@helpers/task/task-events', () => ({
-  taskEventCollectibleGained: vi.fn(),
-  taskEventEquipmentInfused: vi.fn(),
-  taskEventLevelReached: vi.fn(),
-  taskEventMonsterKilled: vi.fn(),
-  taskEventShrineLevel: vi.fn(),
-  taskEventTeachingLearned: vi.fn(),
-  taskEventTownReputationTier: vi.fn(),
-  taskEventTownVisited: vi.fn(),
-  taskEventTradeskillLevel: vi.fn(),
-  taskEventWorkerRescued: vi.fn(),
-}));
+vi.mock('@helpers/task/task-events');
 
-vi.mock('uuid', () => ({
-  v4: vi.fn(() => `mock-uuid-${Math.random()}`),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  miscellaneousMessageLog: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-damage-events', () => ({
-  combatantDamageEventEmit: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/hero-level-up-vfx', () => ({
-  heroLevelUpVfxEmit: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  globalEffectSumsState: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
-
-import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
-import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { CHARACTER_MAX_LEVEL } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
+import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
+import { combatLog } from '@helpers/combat/combat-log';
 import {
-  defaultCombatStats,
-  defaultStats,
-  defaultTagResistances,
-} from '@helpers/defaults';
+  CHARACTER_MAX_LEVEL,
+  HEALING_MINIMUM_SECONDS,
+  HEALING_SECONDS_PER_LEVEL,
+} from '@helpers/config';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkill } from '@helpers/content/ensure-skill';
+import { defaultStats } from '@helpers/defaults';
+import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
 import {
   healingTicksForLevel,
   healPartyToFull,
@@ -67,507 +21,290 @@ import {
   retrofitPartyXp,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
-import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
-import { characterXpForLevel, createCharacter } from '@helpers/hero/party';
-import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
+import { characterStats, characterXpForLevel } from '@helpers/hero/party';
+import { worldPartyState } from '@helpers/state-game';
 import { taskEventLevelReached } from '@helpers/task/task-events';
+import type {
+  Character,
+  CharacterId,
+  EquipmentSkillId,
+  JobContent,
+  JobId,
+} from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { buildCharacter, buildHeroCombatant } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-describe('Character Progress Helper Functions', () => {
-  const mockJob: JobContent = {
-    id: 'job-explorer' as JobId,
-    name: 'Explorer',
-    shorthand: 'EXP',
-    __type: 'job',
-    description: 'A person who seeks out new lands and experiences.',
-    sprite: '0000',
-    frames: 4,
-    baseStats: {
-      Health: 100,
-      Energy: 25,
-      Luck: 5,
-      Intelligence: 5,
-      Strength: 5,
-      Vitality: 5,
-      Resistance: 5,
-      Agility: 10,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    statsPerLevel: {
-      Health: 10,
-      Energy: 5,
-      Luck: 0.01,
-      Intelligence: 0.2,
-      Strength: 0.5,
-      Vitality: 0.3,
-      Resistance: 0.4,
-      Agility: 0.7,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
-    statPriority: [],
-    skillPath: [],
-  };
+const explorerId = 'job-explorer' as JobId;
+const attackId = 'skill-attack' as EquipmentSkillId;
 
-  function mockGetEntry(...entries: IsContentItem[]): void {
-    vi.mocked(getEntry).mockImplementation(
-      (idOrName) =>
-        entries.find(
-          (entry) => entry.id === idOrName || entry.name === idOrName,
-        ) as never,
+function seedJob(overrides: Partial<JobContent> = {}): void {
+  seedContent([
+    ensureJob({
+      id: explorerId,
+      name: 'Explorer',
+      baseStats: { ...defaultStats(), Health: 100, Energy: 25 },
+      statsPerLevel: { ...defaultStats(), Health: 10, Energy: 5 },
+      ...overrides,
+    }),
+    ensureSkill({ id: attackId, name: 'Attack' }),
+  ]);
+}
+
+function hero(name: string, overrides: Partial<Character> = {}): Character {
+  return buildCharacter({
+    id: name as CharacterId,
+    name,
+    jobId: explorerId,
+    ...overrides,
+  });
+}
+
+function maxed(name: string): Character {
+  return hero(name, { level: CHARACTER_MAX_LEVEL });
+}
+
+function seedParty(...party: Character[]): void {
+  seedGamestate((state) => (state.world.party = party));
+}
+
+function gainXp(xpAtLevel: (level: number) => number) {
+  return inTick(() => partyGainXp(xpAtLevel));
+}
+
+function party(): Character[] {
+  return worldPartyState();
+}
+
+function captureLevelUpVfx(): string[] {
+  const ids: string[] = [];
+  const subscription = heroLevelUpVfx$.subscribe((id) => ids.push(id));
+  onTestFinished(() => subscription.unsubscribe());
+  return ids;
+}
+
+function messages(): string[] {
+  return combatLog().map((entry) => entry.message);
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  combatantDamageEvents.set([]);
+  seedJob();
+});
+
+describe('healingTicksForLevel', () => {
+  it('is the minimum plus a per-level amount for the highest member, at least level 1', () => {
+    expect(healingTicksForLevel([{ level: 3 }, { level: 7 }])).toBe(
+      HEALING_MINIMUM_SECONDS + 7 * HEALING_SECONDS_PER_LEVEL,
     );
-  }
-
-  function createCharacterStub(name: string): Character {
-    return createCharacter(name, 'job-explorer' as JobId);
-  }
-
-  function zeroGlobalEffectSums(): GlobalEffectSums {
-    return {
-      stats: defaultStats(),
-      combatStats: defaultCombatStats(),
-      debuffResistanceTags: defaultTagResistances(),
-      debuffResistanceFlat: 0,
-      xpGainMultiplierBonus: 0,
-      goldGainMultiplierBonus: 0,
-      combatItemDropRateBoost: 0,
-      gatheringItemDropRateBoost: 0,
-      armorySizeBoost: 0,
-      tradeskillQueueSizeBoosts: {},
-      offPathTravelSpeedBonus: 0,
-      onPathTravelSpeedBonus: 0,
-      decreeClauseCapBoost: 0,
-    };
-  }
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockGetEntry(mockJob);
-    vi.mocked(globalEffectSumsState).mockReturnValue(zeroGlobalEffectSums());
+    expect(healingTicksForLevel([])).toBe(
+      HEALING_MINIMUM_SECONDS + HEALING_SECONDS_PER_LEVEL,
+    );
   });
+});
 
-  describe('healingTicksForLevel', () => {
-    it('returns a 10 second minimum plus twice the highest member level', () => {
-      expect(
-        healingTicksForLevel([{ level: 3 }, { level: 7 }, { level: 2 }]),
-      ).toBe(24);
-    });
-
-    it('defaults to a minimum level of 1 for an empty party', () => {
-      expect(healingTicksForLevel([])).toBe(12);
-    });
-  });
-
-  describe('retrofitPartyXp', () => {
-    it("rescales a character's xp.maximum to the current curve for their level", () => {
-      const jala = {
-        ...createCharacterStub('Jala'),
-        level: 2,
-        xp: { current: 50, maximum: 283 },
-      };
-
-      const [retrofitted] = retrofitPartyXp([jala]);
-
-      expect(retrofitted.xp).toEqual({
-        current: 50,
-        maximum: characterXpForLevel(2),
-      });
-    });
-
-    it('clamps current xp down without leveling up when it now exceeds the new maximum', () => {
-      const jala = {
-        ...createCharacterStub('Jala'),
-        level: 2,
-        xp: { current: 283, maximum: 283 },
-      };
-
-      const [retrofitted] = retrofitPartyXp([jala]);
-
-      expect(retrofitted.level).toBe(2);
-      expect(retrofitted.xp).toEqual({
-        current: characterXpForLevel(2),
-        maximum: characterXpForLevel(2),
-      });
-    });
-
-    it('rescales jobProgress entries for held-but-inactive jobs using their own level', () => {
-      const jala = {
-        ...createCharacterStub('Jala'),
-        jobProgress: {
-          'job-warrior': { level: 5, xp: { current: 999999, maximum: 999999 } },
+describe('retrofitPartyXp', () => {
+  it('rescales active and held jobs to the current curve, clamping without leveling', () => {
+    const jala = hero('Jala', {
+      level: 2,
+      xp: { current: 999999, maximum: 999999 },
+      jobProgress: {
+        ['job-warrior' as JobId]: {
+          level: 5,
+          xp: { current: 10, maximum: 7 },
         },
-      } as unknown as Character;
+      },
+    });
 
-      const [retrofitted] = retrofitPartyXp([jala]);
+    const [retrofitted] = retrofitPartyXp([jala]);
 
-      expect(retrofitted.jobProgress['job-warrior' as JobId]).toEqual({
-        level: 5,
-        xp: {
-          current: characterXpForLevel(5),
-          maximum: characterXpForLevel(5),
-        },
-      });
+    expect(retrofitted.level).toBe(2);
+    expect(retrofitted.xp).toEqual({
+      current: characterXpForLevel(2),
+      maximum: characterXpForLevel(2),
+    });
+    expect(retrofitted.jobProgress['job-warrior' as JobId]?.xp).toEqual({
+      current: 10,
+      maximum: characterXpForLevel(5),
     });
   });
+});
 
-  describe('partyXpGainAmount', () => {
-    it('returns the raw amount when there is no xp gain bonus', () => {
-      expect(partyXpGainAmount(152)).toBe(152);
+describe('partyXpGainAmount', () => {
+  it('applies the xp gain bonus, rounded', () => {
+    seedGamestate();
+    expect(partyXpGainAmount(152)).toBe(152);
+
+    seedGamestate((state) => {
+      state.globalEffectSums.xpGainMultiplierBonus = 0.0921;
+      state.globalEffectSums.stats.Strength = 5;
     });
+    expect(partyXpGainAmount(152)).toBe(Math.round(152 * 1.0921));
+  });
+});
 
-    it('applies the xp gain multiplier bonus and rounds, matching what partyGainXp grants', () => {
-      vi.mocked(globalEffectSumsState).mockReturnValue({
-        xpGainMultiplierBonus: 0.0921,
-      } as GlobalEffectSums);
+describe('partyGainXp', () => {
+  const toLevel2 = () => characterXpForLevel(1);
+  // Comfortably under the level-1 threshold even after a 50% bonus.
+  const smallGain = () => Math.floor(characterXpForLevel(1) / 4);
 
-      expect(partyXpGainAmount(152)).toBe(166);
+  it('adds xp below the threshold without leveling, logging or announcing', () => {
+    const jala = hero('Jala');
+    seedParty(jala);
+
+    const events = captureAnalyticsEvents();
+    const vfx = captureLevelUpVfx();
+
+    gainXp(smallGain);
+
+    expect(party()[0]).toMatchObject({
+      level: 1,
+      xp: { current: smallGain(), maximum: characterXpForLevel(1) },
+      stats: jala.stats,
     });
+    expect(messages()).toEqual([]);
+    expect(events).toEqual([]);
+    expect(vfx).toEqual([]);
+    expect(taskEventLevelReached).not.toHaveBeenCalled();
   });
 
-  describe('partyGainXp', () => {
-    it('adds xp without leveling up when below the threshold', () => {
-      const jala = createCharacterStub('Jala');
+  it('levels up, carrying remainder xp across several levels and recalculating stats', () => {
+    seedParty(hero('Jala'));
 
-      partyGainXp(() => 30);
+    gainXp(() => characterXpForLevel(1) + characterXpForLevel(2) + 15);
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].xp).toEqual({ current: 30, maximum: 100 });
-      expect(result.world.party[0].level).toBe(1);
-      expect(result.world.party[0].stats).toEqual(jala.stats);
+    const [jala] = party();
+    expect(jala).toMatchObject({
+      level: 3,
+      xp: { current: 15, maximum: characterXpForLevel(3) },
     });
-
-    it('levels up and recalculates stats when xp meets the threshold', () => {
-      const jala = createCharacterStub('Jala');
-
-      partyGainXp(() => 100);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].level).toBe(2);
-      expect(result.world.party[0].xp).toEqual({
-        current: 0,
-        maximum: characterXpForLevel(2),
-      });
-    });
-
-    it('carries over remainder xp and can grant multiple levels from one large gain', () => {
-      const jala = createCharacterStub('Jala');
-      const totalXp = characterXpForLevel(1) + characterXpForLevel(2) + 15;
-
-      partyGainXp(() => totalXp);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].level).toBe(3);
-      expect(result.world.party[0].xp.current).toBe(15);
-      expect(result.world.party[0].xp.maximum).toBe(characterXpForLevel(3));
-    });
-
-    it('stops leveling at the max level and clamps xp to the final threshold', () => {
-      const jala = {
-        ...createCharacterStub('Jala'),
-        level: CHARACTER_MAX_LEVEL,
-        xp: { current: 0, maximum: characterXpForLevel(CHARACTER_MAX_LEVEL) },
-      };
-
-      partyGainXp(() => 999999);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].level).toBe(CHARACTER_MAX_LEVEL);
-      expect(result.world.party[0].xp.current).toBe(
-        result.world.party[0].xp.maximum,
-      );
-    });
-
-    it('does not log anything when the character does not level up', () => {
-      const jala = createCharacterStub('Jala');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 30);
-
-      expect(miscellaneousMessageLog).not.toHaveBeenCalled();
-    });
-
-    it('emits an xp event for each character that gains xp', () => {
-      const jala = createCharacterStub('Jala');
-      const bo = createCharacterStub('Bo');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala, bo] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 30);
-
-      expect(combatantDamageEventEmit).toHaveBeenCalledWith(jala.id, 30, 'xp');
-      expect(combatantDamageEventEmit).toHaveBeenCalledWith(bo.id, 30, 'xp');
-    });
-
-    it('grants each character the xp for their own level and leaves zero-xp characters untouched', () => {
-      const jala = createCharacterStub('Jala');
-      const bo = { ...createCharacterStub('Bo'), level: 9 };
-
-      partyGainXp((level) => (level > 5 ? 0 : 30));
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala, bo] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].xp.current).toBe(30);
-      expect(result.world.party[1]).toBe(bo);
-    });
-
-    it('skips the xp event for characters already at the max level', () => {
-      const jala = {
-        ...createCharacterStub('Jala'),
-        level: CHARACTER_MAX_LEVEL,
-        xp: { current: 0, maximum: characterXpForLevel(CHARACTER_MAX_LEVEL) },
-      };
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 30);
-
-      expect(combatantDamageEventEmit).not.toHaveBeenCalled();
-    });
-
-    it('returns what each progressing character gained, leaving out max-level and zero-xp characters', () => {
-      const jala = createCharacterStub('Jala');
-      const bo = { ...createCharacterStub('Bo'), level: 9 };
-      const maxed = {
-        ...createCharacterStub('Max'),
-        level: CHARACTER_MAX_LEVEL,
-        xp: { current: 0, maximum: characterXpForLevel(CHARACTER_MAX_LEVEL) },
-      };
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala, bo, maxed] } } as unknown as GameState);
-      });
-
-      const gains = partyGainXp((level) => (level === 9 ? 0 : 100));
-
-      expect(gains).toEqual([
-        { characterId: jala.id, xp: 100, leveledUp: true },
-      ]);
-    });
-
-    it('emits a level-up vfx event only for characters that leveled up', () => {
-      const jala = createCharacterStub('Jala');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 30);
-      expect(heroLevelUpVfxEmit).not.toHaveBeenCalled();
-
-      partyGainXp(() => 100);
-      expect(heroLevelUpVfxEmit).toHaveBeenCalledWith(jala.id);
-    });
-
-    it('logs a level-up message when the character levels up', () => {
-      const jala = createCharacterStub('Jala');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 100);
-
-      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
-        '**Jala** reached level 2!',
-      );
-    });
-
-    it('logs a message for each newly learned skill on level-up', () => {
-      const attackSkill: EquipmentSkillContent = {
-        id: 'skill-attack' as EquipmentSkillId,
-        name: 'Attack',
-        __type: 'skill',
-      } as EquipmentSkillContent;
-
-      const jobWithSkills: JobContent = {
-        ...mockJob,
-        skillPath: [
-          {
-            pathName: 'Attack',
-            levels: [{ level: 2, skillId: attackSkill.id }],
-          },
-        ],
-      };
-
-      mockGetEntry(jobWithSkills, attackSkill);
-
-      const jala = createCharacterStub('Jala');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 100);
-
-      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
-        '**Jala** learned **Attack**!',
-      );
-    });
-
-    it('does not log a skill when the job cannot be found', () => {
-      mockGetEntry();
-
-      const jala = createCharacterStub('Jala');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 100);
-
-      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
-        '**Jala** reached level 2!',
-      );
-      expect(miscellaneousMessageLog).toHaveBeenCalledTimes(1);
-    });
-
-    it('fires the level-reached task event when the gain levels up a character', () => {
-      const jala = createCharacterStub('Jala');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 100);
-      expect(taskEventLevelReached).toHaveBeenCalledWith(2);
-    });
-
-    it('skips the level-reached task event when nobody levels up', () => {
-      const jala = createCharacterStub('Jala');
-      vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-        fn({ world: { party: [jala] } } as unknown as GameState);
-      });
-
-      partyGainXp(() => 30);
-      expect(taskEventLevelReached).not.toHaveBeenCalled();
-    });
-
-    it('scales the granted xp by any active GlobalXPGainMultiplier effect(s)', () => {
-      vi.mocked(globalEffectSumsState).mockReturnValue({
-        ...zeroGlobalEffectSums(),
-        xpGainMultiplierBonus: 0.5,
-      });
-
-      const jala = createCharacterStub('Jala');
-
-      partyGainXp(() => 30);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].xp.current).toBe(45);
-    });
-
-    it('sums multiple active GlobalXPGainMultiplier effects together', () => {
-      vi.mocked(globalEffectSumsState).mockReturnValue({
-        ...zeroGlobalEffectSums(),
-        xpGainMultiplierBonus: 0.75,
-      });
-
-      const jala = createCharacterStub('Jala');
-
-      partyGainXp(() => 100);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      // 100 * (1 + 0.5 + 0.25) = 175
-      expect(result.world.party[0].xp.current).toBe(75);
-      expect(result.world.party[0].level).toBe(2);
-    });
-
-    it('ignores active GainStats effects when computing the xp multiplier', () => {
-      vi.mocked(globalEffectSumsState).mockReturnValue({
-        ...zeroGlobalEffectSums(),
-        stats: { ...defaultStats(), Strength: 5 },
-      });
-
-      const jala = createCharacterStub('Jala');
-
-      partyGainXp(() => 30);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].xp.current).toBe(30);
-    });
+    expect(jala.stats).toEqual(characterStats(jala));
+    expect(jala.stats.Health).toBeGreaterThan(hero('Jala').stats.Health);
   });
 
-  describe('syncPartyHpFromCombat', () => {
-    it('syncs hp and ep from the matching combatant, clamped to current max stats', () => {
-      const jala = createCharacterStub('Jala');
-      const combatant = {
-        id: jala.id,
-        hp: jala.stats.Health + 999,
-        ep: jala.stats.Energy + 999,
-      } as unknown as Combatant;
+  it('stops at the max level, clamping xp to the final threshold', () => {
+    seedParty(maxed('Jala'));
 
-      syncPartyHpFromCombat([combatant]);
+    gainXp(() => 999999);
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].hp).toBe(jala.stats.Health);
-      expect(result.world.party[0].ep).toBe(jala.stats.Energy);
-    });
-
-    it('leaves characters with no matching combatant untouched', () => {
-      const jala = createCharacterStub('Jala');
-
-      syncPartyHpFromCombat([]);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0]).toEqual(jala);
-    });
+    expect(party()[0].level).toBe(CHARACTER_MAX_LEVEL);
+    expect(party()[0].xp.current).toBe(party()[0].xp.maximum);
   });
 
-  describe('healPartyToFull', () => {
-    it("restores every character's hp and ep to their current maximums", () => {
-      const jala = {
-        ...createCharacterStub('Jala'),
-        hp: 1,
-        ep: 0,
-      };
+  it('grants each hero the xp for their own level, leaving zero-xp heroes untouched', () => {
+    const bo = hero('Bo', { level: 9 });
+    seedParty(hero('Jala'), bo);
 
-      healPartyToFull();
+    gainXp((level) => (level > 5 ? 0 : smallGain()));
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [jala] },
-      } as unknown as GameState);
+    expect(party()[0].xp.current).toBe(smallGain());
+    expect(party()[1]).toEqual(bo);
+  });
 
-      expect(result.world.party[0].hp).toBe(jala.stats.Health);
-      expect(result.world.party[0].ep).toBe(jala.stats.Energy);
+  it('scales the granted xp by the xp gain bonus', () => {
+    seedGamestate((state) => {
+      state.world.party = [hero('Jala')];
+      state.globalEffectSums.xpGainMultiplierBonus = 0.5;
+    });
+
+    gainXp(smallGain);
+
+    expect(party()[0].xp.current).toBe(Math.round(smallGain() * 1.5));
+  });
+
+  it('returns what each progressing hero gained, leaving out max-level and zero-xp heroes', () => {
+    seedParty(hero('Jala'), hero('Bo', { level: 9 }), maxed('Max'));
+
+    const gains = gainXp((level) => (level === 9 ? 0 : toLevel2()));
+
+    expect(gains).toEqual([
+      { characterId: 'Jala', xp: toLevel2(), leveledUp: true },
+    ]);
+  });
+
+  it('emits an xp event for each hero that can still progress', () => {
+    seedParty(hero('Jala'), maxed('Max'));
+
+    gainXp(smallGain);
+
+    expect(combatantDamageEvents()).toEqual([
+      expect.objectContaining({
+        combatantId: 'Jala',
+        amount: smallGain(),
+        variant: 'xp',
+      }),
+    ]);
+  });
+
+  it('announces a level-up with analytics, vfx, a log line and the task event', () => {
+    seedParty(hero('Jala'));
+    const events = captureAnalyticsEvents();
+    const vfx = captureLevelUpVfx();
+
+    gainXp(toLevel2);
+
+    expect(events).toEqual(['Hero:LevelUp']);
+    expect(vfx).toEqual(['Jala']);
+    expect(messages()).toEqual(['**Jala** reached level 2!']);
+    expect(taskEventLevelReached).toHaveBeenCalledWith(2);
+  });
+
+  it('still levels up and logs a hero whose job content no longer exists', () => {
+    seedParty(hero('Jala', { jobId: 'gone' as JobId }));
+
+    gainXp(toLevel2);
+
+    expect(party()[0].level).toBe(2);
+    expect(messages()).toEqual(['**Jala** reached level 2!']);
+  });
+
+  it('logs each skill newly unlocked by the level-up', () => {
+    seedJob({
+      skillPath: [
+        { pathName: 'Attack', levels: [{ level: 2, skillId: attackId }] },
+      ],
+    });
+    seedParty(hero('Jala'));
+
+    gainXp(toLevel2);
+
+    expect(messages()).toContain('**Jala** learned **Attack**!');
+  });
+});
+
+describe('syncPartyHpFromCombat / healPartyToFull', () => {
+  it("copies each hero's hp and ep back from combat, clamped to their maximums", () => {
+    const jala = hero('Jala');
+    const bo = hero('Bo', { hp: 7, ep: 3 });
+    seedParty(jala, bo);
+
+    inTick(() =>
+      syncPartyHpFromCombat([
+        buildHeroCombatant(jala, {
+          hp: jala.stats.Health + 999,
+          ep: jala.stats.Energy + 999,
+        }),
+      ]),
+    );
+
+    expect(party()[0]).toMatchObject({
+      hp: jala.stats.Health,
+      ep: jala.stats.Energy,
+    });
+    expect(party()[1]).toEqual(bo);
+  });
+
+  it("restores every hero's hp and ep to their maximums", () => {
+    const jala = hero('Jala', { hp: 1, ep: 0 });
+    seedParty(jala);
+
+    inTick(healPartyToFull);
+
+    expect(party()[0]).toMatchObject({
+      hp: jala.stats.Health,
+      ep: jala.stats.Energy,
     });
   });
 });

@@ -1,4 +1,9 @@
 import {
+  combatantFromCharacter,
+  combatantFromMonster,
+  combatCreateForEncounter,
+} from '@helpers/combat/combat-create';
+import {
   characterStatsForLevel,
   characterXpForLevel,
   createCharacter,
@@ -6,11 +11,14 @@ import {
 import { newEquipmentItem } from '@helpers/item/equipment';
 import type {
   Character,
+  Combat,
+  Combatant,
   CraftQueueEntry,
   CraftQueueEntryId,
   EquipmentId,
   EquipmentItem,
   JobId,
+  MonsterContent,
   RecipeId,
   TownNodeState,
 } from '@interfaces';
@@ -55,7 +63,11 @@ export function buildEquipmentItem(
 
 // Stats, pools and xp follow the requested level/job/equipment unless overridden explicitly.
 export function buildCharacter(overrides: Partial<Character> = {}): Character {
-  const base = createCharacter('Hero', overrides.jobId ?? ('UNKNOWN' as JobId));
+  // Not 'UNKNOWN': that's the id/name ensureX() gives unnamed content, so the job lookup could hit it.
+  const base = createCharacter(
+    'Hero',
+    overrides.jobId ?? ('test-job-without-content' as JobId),
+  );
   const level = overrides.level ?? base.level;
   const stats = characterStatsForLevel(
     base.jobId,
@@ -73,4 +85,25 @@ export function buildCharacter(overrides: Partial<Character> = {}): Character {
     xp: { current: 0, maximum: characterXpForLevel(level) },
     ...overrides,
   };
+}
+
+export function buildHeroCombatant(
+  character: Character = buildCharacter(),
+  overrides: Partial<Combatant> = {},
+): Combatant {
+  return { ...combatantFromCharacter(character), ...overrides };
+}
+
+export function buildMonsterCombatant(
+  monster: MonsterContent,
+  overrides: Partial<Combatant> = {},
+): Combatant {
+  return {
+    ...combatantFromMonster(monster, overrides.level ?? 1, 0),
+    ...overrides,
+  };
+}
+
+export function buildCombat(overrides: Partial<Combat> = {}): Combat {
+  return { ...combatCreateForEncounter([], [], 1), ...overrides };
 }
