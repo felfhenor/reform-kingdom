@@ -190,14 +190,17 @@ export function townQueueInitialCrafts(
   }
 }
 
-// Instantly-finished crafts, so a newly-found town opens with something already made.
+// Instantly-finished equipment crafts, so a newly-found town's shop opens stocked.
 export function townCompleteInitialCrafts(
   state: GameState,
   town: TownContent,
   count: number,
 ): void {
   for (let i = 0; i < count; i++) {
-    const pick = townPickRecipeToQueue(town);
+    const pick = townPickRecipeToQueue(
+      town,
+      (recipe) => 'equipmentId' in recipe.result,
+    );
     if (!pick || isStockFullFor(state, town.id, pick.recipe)) return;
 
     consumeRecipeRequirements(state, town.id, pick.recipe);

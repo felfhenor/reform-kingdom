@@ -804,7 +804,7 @@ describe('townCompleteInitialCrafts', () => {
   const equipmentRecipe = {
     id: 'recipe-2' as RecipeId,
     tradeskillId: blacksmithingId,
-    requirements: [],
+    requirements: [{ itemId: oreId, quantity: 2 }],
     result: { equipmentId: 'sword' },
   } as unknown as RecipeContent;
 
@@ -814,10 +814,18 @@ describe('townCompleteInitialCrafts', () => {
     } as unknown as GameState;
   }
 
-  it('consumes requirements and grants the result without queueing', () => {
+  it('only asks the pick for equipment recipes', () => {
+    townCompleteInitialCrafts(buildState(), buildTown(), 1);
+
+    const accept = vi.mocked(townPickRecipeToQueue).mock.calls[0][1]!;
+    expect(accept(equipmentRecipe)).toBe(true);
+    expect(accept(materialRecipe)).toBe(false);
+  });
+
+  it('consumes requirements and puts the result into stock without queueing', () => {
     vi.mocked(townPickRecipeToQueue).mockReturnValue({
       tradeskillId: blacksmithingId,
-      recipe: materialRecipe,
+      recipe: equipmentRecipe,
     });
     const state = buildState();
 
@@ -829,31 +837,14 @@ describe('townCompleteInitialCrafts', () => {
       oreId,
       -2,
     );
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      state,
-      townId,
-      'ingot',
-      1,
-    );
-    expect(applyTownMaterialDelta).toHaveBeenCalledTimes(4);
+    expect(newEquipmentItem).toHaveBeenCalledWith('sword');
+    expect(applyTownStockAdd).toHaveBeenCalledTimes(2);
     expect(resetTownSpecialtyPriority).toHaveBeenCalledWith(
       state,
       townId,
-      'recipe-1',
+      'recipe-2',
     );
     expect(state.world.towns[townId].craftQueue).toEqual([]);
-  });
-
-  it('puts equipment results into stock', () => {
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe: equipmentRecipe,
-    });
-
-    townCompleteInitialCrafts(buildState(), buildTown(), 1);
-
-    expect(newEquipmentItem).toHaveBeenCalledWith('sword');
-    expect(applyTownStockAdd).toHaveBeenCalledTimes(1);
   });
 
   it('stops once the shop stock is full', () => {
@@ -872,7 +863,7 @@ describe('townCompleteInitialCrafts', () => {
     vi.mocked(townPickRecipeToQueue)
       .mockReturnValueOnce({
         tradeskillId: blacksmithingId,
-        recipe: materialRecipe,
+        recipe: equipmentRecipe,
       })
       .mockReturnValue(undefined);
 

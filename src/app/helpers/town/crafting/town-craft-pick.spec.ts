@@ -100,6 +100,20 @@ describe('townPickRecipeToQueue', () => {
     expect(result).toEqual({ tradeskillId: woodworkingId, recipe: eligible });
   });
 
+  it('skips recipes the accept filter rejects', () => {
+    const kept = buildRecipe('b');
+    vi.mocked(getEntriesByType).mockReturnValue([buildRecipe('a'), kept]);
+    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
+    vi.mocked(rngChoiceWeighted).mockImplementation((choices) => choices[0]);
+
+    townPickRecipeToQueue(buildTown(blacksmithingId), (r) => r.id === kept.id);
+
+    expect(rngChoiceWeighted).toHaveBeenCalledWith(
+      [kept],
+      expect.any(Function),
+    );
+  });
+
   it('returns undefined if rngChoiceWeighted has nothing to pick from (zero total weight)', () => {
     vi.mocked(getEntriesByType).mockReturnValue([buildRecipe('a')]);
     vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);

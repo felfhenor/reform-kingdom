@@ -46,11 +46,13 @@ function recipeWeight(
 // Weighted pick over every eligible recipe across ALL tradeskills (one shared queue, not one pick per tradeskill) - favors the town's own specialty.
 export function townPickRecipeToQueue(
   town: TownContent,
+  accept: (recipe: RecipeContent) => boolean = () => true,
 ): TownRecipePick | undefined {
   // Built once for every recipe scanned below, not once per recipe.
   const priorityMap = townItemPriorityMap(townSpecialtyPriority(town.id));
   const eligible = getEntriesByType<RecipeContent>('recipe').filter(
     (recipe) =>
+      accept(recipe) &&
       isRecipeCraftableByTown(recipe, town) &&
       townRecipeRespectsReservationsFromMap(priorityMap, town, recipe),
   );

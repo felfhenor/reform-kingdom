@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { setAllContentById } from '@helpers/content/content';
-import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultGameState } from '@helpers/defaults';
@@ -15,6 +15,7 @@ import {
   townQueueInitialCrafts,
 } from '@helpers/town/crafting/town-craft-queue';
 import type {
+  EquipmentId,
   ItemId,
   RecipeId,
   TownContent,
@@ -26,6 +27,7 @@ const townId = 'larsia' as TownId;
 const tradeskillId = 'jewelcrafting' as TradeskillId;
 const oreId = 'ore' as ItemId;
 const gemId = 'gem' as ItemId;
+const ringId = 'ring' as EquipmentId;
 
 // Real state + eligibility helpers: each pick must see the previous pick's deductions through the draft.
 describe('initial town crafts (unmocked)', () => {
@@ -37,6 +39,9 @@ describe('initial town crafts (unmocked)', () => {
       crafting: {
         maxQueueSize: [{ tier: 0, value: 12 }],
       } as TownContent['crafting'],
+      traders: {
+        sellItemCount: [{ tier: 0, value: 10 }],
+      } as TownContent['traders'],
     });
     const recipe = ensureRecipe({
       id: 'recipe-gem' as RecipeId,
@@ -44,12 +49,20 @@ describe('initial town crafts (unmocked)', () => {
       requirements: [{ itemId: oreId, quantity: 20 }],
       result: { itemId: gemId, quantity: 1 },
     });
+    const ringRecipe = ensureRecipe({
+      id: 'recipe-ring' as RecipeId,
+      tradeskillId,
+      requirements: [{ itemId: oreId, quantity: 20 }],
+      result: { equipmentId: ringId },
+    });
     setAllContentById(
       new Map(
         [
           ensureItem({ id: oreId }),
           ensureItem({ id: gemId }),
+          ensureEquipment({ id: ringId }),
           recipe,
+          ringRecipe,
           town,
         ].map((entry) => [entry.id, entry as never]),
       ),
@@ -81,16 +94,17 @@ describe('initial town crafts (unmocked)', () => {
     expect(worldTownsState()[townId].materials[oreId]).toBe(10);
   });
 
-  it('completes only what the materials cover, granting the result', async () => {
+  it('completes only equipment, as far as the materials cover', async () => {
     await updateGamestate((state) => {
       townCompleteInitialCrafts(state, town, 4);
       return state;
     });
 
-    expect(worldTownsState()[townId].materials).toEqual({
-      [oreId]: 10,
-      [gemId]: 1,
-    });
-    expect(worldTownsState()[townId].craftQueue).toEqual([]);
+    const result = worldTownsState()[townId];
+    expect(
+      result.stock.map((entry) => entry.equipmentItem.equipmentId),
+    ).toEqual([ringId]);
+    expect(result.materials).toEqual({ [oreId]: 10 });
+    expect(result.craftQueue).toEqual([]);
   });
 });

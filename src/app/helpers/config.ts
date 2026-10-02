@@ -251,7 +251,7 @@ export const TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE = 1;
 export const CRAFT_TICK_INTERVAL = 1;
 // Queued up front on first visit so a newly-activated town isn't sitting idle.
 export const TOWN_FIRST_VISIT_CRAFT_COUNT = 4;
-// Completed instantly on first visit, before the queue fills, so the town has already made something on arrival.
+// Equipment crafts completed instantly on first visit, before the queue fills, so the shop isn't empty on arrival.
 export const TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT = 4;
 export const RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER = 2;
 export const RAID_WIN_REPUTATION_AMOUNT = 100;
