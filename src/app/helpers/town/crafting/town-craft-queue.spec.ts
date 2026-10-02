@@ -1,875 +1,538 @@
+import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(),
-}));
-
-vi.mock('@helpers/item/equipment', () => ({
-  newEquipmentItem: vi.fn(),
-}));
-
-vi.mock('@helpers/rng', () => ({
+vi.mock('@helpers/town/crafting/town-craft-pick');
+vi.mock('@helpers/rng', async (importOriginal) => ({
+  ...(await importOriginal<typeof RngHelper>()),
   rngSucceedsChance: vi.fn(() => true),
-  rngUuid: vi.fn(() => 'queue-entry-1'),
 }));
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/crafting/town-craft-pick', () => ({
-  townPickRecipeToQueue: vi.fn(),
-}));
-
-vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
-  resetTownSpecialtyPriority: vi.fn(),
-}));
-
-// Reputation-tier scaling is tested elsewhere - here it just echoes back crafting.maxQueueSize.
-vi.mock('@helpers/town/crafting/town-craft-queue-size', () => ({
-  townCraftQueueSize: vi.fn(
-    (town) => town.crafting.maxQueueSize[0]?.value ?? 0,
-  ),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-state', () => ({
-  isTownCraftDebuffActive: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/town/shop/town-stock', () => ({
-  applyTownStockAdd: vi.fn(),
-}));
-
-vi.mock('@helpers/town/shop/town-shop-access', () => ({
-  townShopItemCap: vi.fn(() => 10),
-}));
-
-vi.mock('@helpers/town/town-materials', () => ({
-  applyTownMaterialDelta: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-tick', () => ({
-  isTownDueForUpdate: vi.fn(() => true),
-  markTownSubsystemProcessed: vi.fn(),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { newEquipmentItem } from '@helpers/item/equipment';
+import { CRAFT_TICK_INTERVAL } from '@helpers/config';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { rngSucceedsChance } from '@helpers/rng';
-import { updateGamestate } from '@helpers/state-game';
-import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
-import { resetTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
-import { applyTownStockAdd } from '@helpers/town/shop/town-stock';
-import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
-import { isTownCraftDebuffActive } from '@helpers/town/raid/town-raid-state';
-import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import {
-  isTownDueForUpdate,
-  markTownSubsystemProcessed,
-} from '@helpers/town/town-tick';
+  gamestate,
+  updateGamestate,
+  worldTownsState,
+} from '@helpers/state-game';
+import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
 import {
   townCompleteInitialCrafts,
   townCraftProcessTick,
   townQueueInitialCrafts,
 } from '@helpers/town/crafting/town-craft-queue';
+import { townCraftTimeFor } from '@helpers/town/crafting/town-craft-time';
 import type {
+  CraftQueueEntryId,
+  EquipmentId,
   GameState,
   ItemId,
   RecipeContent,
   RecipeId,
   TownContent,
+  TownCraftQueueEntry,
   TownId,
+  TownNodeState,
   TradeskillId,
 } from '@interfaces';
+import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
 const blacksmithingId = 'blacksmithing' as TradeskillId;
 const woodworkingId = 'woodworking' as TradeskillId;
 const oreId = 'ore' as ItemId;
+const ingotId = 'ingot' as ItemId;
+const swordId = 'sword' as EquipmentId;
+const SHOP_CAP = 10;
 
-function buildTown(
+const ingotRecipe = ensureRecipe({
+  id: 'recipe-ingot' as RecipeId,
+  tradeskillId: blacksmithingId,
+  requirements: [{ itemId: oreId, quantity: 2 }],
+  result: { itemId: ingotId, quantity: 2 },
+  craftTime: 100,
+});
+const swordRecipe = ensureRecipe({
+  id: 'recipe-sword' as RecipeId,
+  tradeskillId: blacksmithingId,
+  requirements: [{ itemId: oreId, quantity: 2 }],
+  result: { equipmentId: swordId },
+  craftTime: 100,
+});
+
+function seedTown(
   crafting: Partial<TownContent['crafting']> = {},
 ): TownContent {
-  return {
+  const town = ensureTown({
     id: townId,
+    name: 'Larsia',
     crafting: {
       maxQueueSize: [{ tier: 0, value: 12 }],
-      craftingDurationMultiplier: 1,
       craftingChanceOnTick: 100,
       craftingChanceItemThreshold: 4,
       ...crafting,
-    },
-  } as unknown as TownContent;
+    } as TownContent['crafting'],
+    traders: {
+      sellItemCount: [{ tier: 0, value: SHOP_CAP }],
+    } as TownContent['traders'],
+  });
+  seedContent([
+    town,
+    ingotRecipe,
+    swordRecipe,
+    ensureItem({ id: oreId, name: 'Ore' }),
+    ensureItem({ id: ingotId, name: 'Ingot' }),
+    ensureEquipment({ id: swordId, name: 'Sword' }),
+  ]);
+  return town;
 }
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+function seedTownState(
+  townState: Partial<TownNodeState> = {},
+  edit?: (state: GameState) => void,
+): void {
+  seedGamestate((state) => {
+    state.world.towns[townId] = buildTownNodeState({
+      tradeskills: {
+        [blacksmithingId]: { level: 3 },
+        [woodworkingId]: { level: 3 },
+      },
+      materials: { [oreId]: 100 },
+      ...townState,
+    });
+    edit?.(state);
+  });
+}
+
+function queued(
+  overrides: Partial<TownCraftQueueEntry> = {},
+): TownCraftQueueEntry {
+  return {
+    id: 'q1' as CraftQueueEntryId,
+    tradeskillId: blacksmithingId,
+    recipeId: ingotRecipe.id,
+    ticksIntoCraft: 0,
+    ...overrides,
+  };
+}
+
+function fullStock(): TownNodeState['stock'] {
+  return Array.from({ length: SHOP_CAP }, () => ({
+    equipmentItem: buildEquipmentItem(swordId),
+    addedAtTick: 0,
+  }));
+}
+
+function craftTime(recipe: RecipeContent, town: TownContent, level = 3) {
+  return townCraftTimeFor(recipe, town, level);
+}
+
+function town(): TownNodeState {
+  return worldTownsState()[townId];
+}
+
+// Advances the clock first, so a repeated tick is always due whatever the craft interval.
+function processTick(): void {
+  inTick(() => {
+    updateGamestate((state) => {
+      state.clock.numTicks += CRAFT_TICK_INTERVAL;
+      return state;
+    });
+    townCraftProcessTick();
+  });
+}
+
+function pickReturns(recipe: RecipeContent | undefined): void {
+  vi.mocked(townPickRecipeToQueue).mockReturnValue(
+    recipe ? { tradeskillId: recipe.tradeskillId, recipe } : undefined,
+  );
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-  vi.mocked(isTownDueForUpdate).mockReturnValue(true);
-  vi.mocked(townShopItemCap).mockReturnValue(10);
   vi.mocked(rngSucceedsChance).mockReturnValue(true);
-  vi.mocked(townPickRecipeToQueue).mockReturnValue(undefined);
-  vi.mocked(isTownCraftDebuffActive).mockReturnValue(false);
+  pickReturns(undefined);
 });
 
 describe('townCraftProcessTick - due-gate', () => {
-  it('skips a town that is not due for the craft subsystem', () => {
-    vi.mocked(isTownDueForUpdate).mockReturnValue(false);
+  it('skips a town that was processed within the craft interval', () => {
+    seedTown();
+    seedTownState({ craftQueue: [queued()] }, (state) => {
+      state.clock.numTicks = 1000;
+      state.world.towns[townId].lastProcessedTick.craft = 1000;
+    });
 
-    townCraftProcessTick();
+    inTick(townCraftProcessTick);
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(markTownSubsystemProcessed).not.toHaveBeenCalled();
+    expect(town().craftQueue[0].ticksIntoCraft).toBe(0);
   });
 
-  it('marks the subsystem processed for a due town', () => {
-    townCraftProcessTick();
+  it('processes a town once the craft interval has elapsed', () => {
+    seedTown();
+    seedTownState({ craftQueue: [queued()] }, (state) => {
+      state.clock.numTicks = 1000;
+      state.world.towns[townId].lastProcessedTick.craft =
+        1000 - CRAFT_TICK_INTERVAL;
+    });
 
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
-      townId,
-      'craft',
-      expect.any(Number),
-    );
+    inTick(townCraftProcessTick);
+
+    expect(town().craftQueue[0].ticksIntoCraft).toBe(1);
+  });
+
+  it('ignores a town that has never been visited', () => {
+    seedTown();
+    const before = seedGamestate();
+
+    processTick();
+
+    expect(gamestate().world.towns).toBe(before.world.towns);
   });
 });
 
 describe('townCraftProcessTick - advancing the queue', () => {
-  it('advances ticksIntoCraft for an entry below craftTime * craftingDurationMultiplier', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown({ craftingDurationMultiplier: 3 }),
-    ]);
-    vi.mocked(getEntry).mockReturnValue({ craftTime: 5 } as RecipeContent);
+  it('advances every queued entry together in the same tick', () => {
+    seedTown();
+    seedTownState({
+      craftQueue: [
+        queued({ ticksIntoCraft: 1 }),
+        queued({
+          id: 'q2' as CraftQueueEntryId,
+          tradeskillId: woodworkingId,
+          ticksIntoCraft: 4,
+        }),
+      ],
+    });
 
-    townCraftProcessTick();
+    processTick();
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 3 } },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 2,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    // craftTime 5 * multiplier 3 = 15; 2 + 1 = 3, still below - stays queued, advanced by one tick.
-    expect(state.world.towns[townId].craftQueue).toEqual([
-      {
-        id: 'q1',
-        tradeskillId: blacksmithingId,
-        recipeId: 'recipe-1',
-        ticksIntoCraft: 3,
-      },
+    expect(town().craftQueue.map((entry) => entry.ticksIntoCraft)).toEqual([
+      2, 5,
     ]);
   });
 
-  it('doubles craft time while the raid-loss craft debuff is active', () => {
-    vi.mocked(isTownCraftDebuffActive).mockReturnValue(true);
-    vi.mocked(getEntry).mockReturnValue({ craftTime: 5 } as RecipeContent);
+  it('scales craft time by the town duration multiplier', () => {
+    const slowTown = seedTown({ craftingDurationMultiplier: 3 });
+    const normalTime = craftTime(ingotRecipe, {
+      ...slowTown,
+      crafting: { ...slowTown.crafting, craftingDurationMultiplier: 1 },
+    });
+    seedTownState({ craftQueue: [queued({ ticksIntoCraft: normalTime })] });
 
-    townCraftProcessTick();
+    processTick();
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            craftSpeedDebuffExpiresAtTick: 999,
-            tradeskills: { [blacksmithingId]: { level: 3 } },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 8,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    // craftTime 5 * multiplier 1 * debuff 2 = 10; 8 + 1 = 9, still below - stays queued.
-    // Without the debuff, effective craftTime would be 5 and this entry would already be complete.
-    expect(state.world.towns[townId].craftQueue).toEqual([
-      {
-        id: 'q1',
-        tradeskillId: blacksmithingId,
-        recipeId: 'recipe-1',
-        ticksIntoCraft: 9,
-      },
-    ]);
+    expect(town().craftQueue).toHaveLength(1);
   });
 
-  it('advances multiple queue entries together in the same tick, not one at a time', () => {
-    vi.mocked(getEntry).mockReturnValue({ craftTime: 10 } as RecipeContent);
-
-    townCraftProcessTick();
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: {
-              [blacksmithingId]: { level: 3 },
-              [woodworkingId]: { level: 3 },
-            },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'r1',
-                ticksIntoCraft: 1,
-              },
-              {
-                id: 'q2',
-                tradeskillId: woodworkingId,
-                recipeId: 'r2',
-                ticksIntoCraft: 4,
-              },
-            ],
-          },
-        },
+  it('slows crafting while the raid-loss craft debuff is active', () => {
+    const content = seedTown();
+    seedTownState(
+      {
+        craftQueue: [
+          queued({ ticksIntoCraft: craftTime(ingotRecipe, content) }),
+        ],
+        craftSpeedDebuffExpiresAtTick: 999,
       },
-    } as unknown as GameState);
+      (state) => (state.clock.numTicks = 10),
+    );
 
-    expect(
-      state.world.towns[townId].craftQueue.map((e) => e.ticksIntoCraft),
-    ).toEqual([2, 5]);
+    processTick();
+
+    expect(town().craftQueue).toHaveLength(1);
+  });
+
+  it('a higher tradeskill level shortens the effective craft time', () => {
+    const content = seedTown();
+    const ticks = craftTime(ingotRecipe, content, 50) - 1;
+    seedTownState({
+      tradeskills: { [blacksmithingId]: { level: 50 } },
+      craftQueue: [queued({ ticksIntoCraft: ticks })],
+    });
+
+    processTick();
+
+    expect(ticks).toBeLessThan(craftTime(ingotRecipe, content, 1) - 1);
+    expect(town().craftQueue).toEqual([]);
   });
 
   it('drops a queue entry whose recipe no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+    seedTown();
+    seedTownState({
+      craftQueue: [queued({ recipeId: 'gone' as RecipeId })],
+    });
 
-    townCraftProcessTick();
+    processTick();
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: {},
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'gone',
-                ticksIntoCraft: 0,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
+    expect(town().craftQueue).toEqual([]);
+  });
 
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
+  it('drops a finished entry defensively if its tradeskill has no live building', () => {
+    const content = seedTown();
+    seedTownState({
+      tradeskills: {},
+      craftQueue: [
+        queued({ ticksIntoCraft: craftTime(ingotRecipe, content, 1) }),
+      ],
+    });
+
+    processTick();
+
+    expect(town().craftQueue).toEqual([]);
+    expect(town().materials[ingotId]).toBeUndefined();
   });
 });
 
 describe('townCraftProcessTick - completing the queue', () => {
-  it('holds a finished craft rather than dropping it when the shop is at its stock cap', () => {
-    const cappedStock = new Array(10).fill(0).map((_, i) => ({
-      equipmentItem: { equipmentId: `other-${i}` } as never,
-      addedAtTick: 0,
-    }));
-    const queue = [
-      {
-        id: 'q1',
-        tradeskillId: blacksmithingId,
-        recipeId: 'recipe-1',
-        ticksIntoCraft: 4,
-      },
-    ];
-    const recipe = {
-      craftTime: 5,
-      result: { equipmentId: 'sword' },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
+  function finishedEntry(content: TownContent, recipe: RecipeContent) {
+    return queued({
+      recipeId: recipe.id,
+      ticksIntoCraft: craftTime(recipe, content) - 1,
+    });
+  }
 
-    townCraftProcessTick();
+  it('feeds an item result into the town materials, resets its specialty priority, and dequeues', () => {
+    const content = seedTown();
+    seedTownState({
+      craftQueue: [finishedEntry(content, ingotRecipe)],
+      specialtyPriority: [{ recipeId: ingotRecipe.id, failureCount: 3 }],
+    });
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: cappedStock,
-            tradeskills: { [blacksmithingId]: { level: 3 } },
-            craftQueue: queue,
-          },
-        },
-      },
-    } as unknown as GameState);
+    processTick();
 
-    expect(applyTownStockAdd).not.toHaveBeenCalled();
-    expect(state.world.towns[townId].craftQueue).toHaveLength(1);
-    expect(state.world.towns[townId].craftQueue[0].id).toBe('q1');
+    expect(town().materials[ingotId]).toBe(2);
+    expect(town().stock).toEqual([]);
+    expect(town().specialtyPriority).toEqual([]);
+    expect(town().craftQueue).toEqual([]);
   });
 
-  it('completes a craft, feeds an item result into the town materials stash, and dequeues', () => {
-    const recipe = {
-      id: 'recipe-1' as RecipeId,
-      craftTime: 5,
-      result: { itemId: 'ingot' as ItemId, quantity: 2 },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
+  it('puts an equipment result into the shop stock', () => {
+    const content = seedTown();
+    seedTownState({ craftQueue: [finishedEntry(content, swordRecipe)] });
 
-    townCraftProcessTick();
+    processTick();
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 3 } },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 4,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      expect.anything(),
-      townId,
-      'ingot',
-      2,
-    );
-    expect(applyTownStockAdd).not.toHaveBeenCalled();
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
-    expect(resetTownSpecialtyPriority).toHaveBeenCalledWith(
-      expect.anything(),
-      townId,
-      'recipe-1',
-    );
+    expect(
+      town().stock.map((entry) => entry.equipmentItem.equipmentId),
+    ).toEqual([swordId]);
   });
 
-  it('a higher tradeskill level shortens the effective craft time', () => {
-    const recipe = {
-      craftTime: 100,
-      result: { itemId: 'ingot' as ItemId, quantity: 1 },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
+  it('holds a finished equipment craft while the shop is at its stock cap', () => {
+    const content = seedTown();
+    seedTownState({
+      stock: fullStock(),
+      craftQueue: [finishedEntry(content, swordRecipe)],
+    });
 
-    townCraftProcessTick();
+    processTick();
+    processTick();
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 50 } },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 49,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    // craftTime 100 reduced 50% by level 50 = 50; 49 + 1 = 50, no longer below - completes.
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
+    expect(town().stock).toHaveLength(SHOP_CAP);
+    expect(town().craftQueue.map((entry) => entry.id)).toEqual(['q1']);
   });
 
-  it('completes a craft with an equipment result via newEquipmentItem', () => {
-    const rolledItem = { id: 'sword-1', equipmentId: 'sword' } as never;
-    vi.mocked(newEquipmentItem).mockReturnValue(rolledItem);
-    const recipe = {
-      craftTime: 5,
-      result: { equipmentId: 'sword' },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
-
-    townCraftProcessTick();
-
-    applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 3 } },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 4,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(newEquipmentItem).toHaveBeenCalledWith('sword');
-    expect(applyTownStockAdd).toHaveBeenCalledWith(
-      expect.anything(),
-      townId,
-      { equipmentItem: rolledItem },
-      10,
-    );
-  });
-
-  it("always grants the result even when the recipe has a result chance - a town's craft never whiffs, unlike the player's", () => {
-    // Would always fail a 25% roll if one were rolled - proves no roll happens for the result grant.
+  it("always grants the result, ignoring the recipe's result chance", () => {
+    const chanceRecipe = ensureRecipe({
+      ...ingotRecipe,
+      result: { itemId: ingotId, quantity: 1, chance: 25 },
+    });
+    const content = seedTown();
+    seedContent([content, chanceRecipe, ensureItem({ id: ingotId })]);
+    seedTownState({ craftQueue: [finishedEntry(content, chanceRecipe)] });
     vi.mocked(rngSucceedsChance).mockImplementation((chance) => chance !== 25);
-    const recipe = {
-      craftTime: 5,
-      result: { itemId: 'ingot' as ItemId, quantity: 1, chance: 25 },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
 
-    townCraftProcessTick();
+    processTick();
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 3 } },
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 4,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      expect.anything(),
-      townId,
-      'ingot',
-      1,
-    );
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
-  });
-
-  it('drops an entry defensively if its tradeskill has no live building', () => {
-    const recipe = {
-      craftTime: 5,
-      result: { itemId: 'ingot' as ItemId, quantity: 1 },
-    } as RecipeContent;
-    vi.mocked(getEntry).mockReturnValue(recipe);
-
-    townCraftProcessTick();
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: {},
-            craftQueue: [
-              {
-                id: 'q1',
-                tradeskillId: blacksmithingId,
-                recipeId: 'recipe-1',
-                ticksIntoCraft: 4,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
+    expect(town().materials[ingotId]).toBe(1);
   });
 });
 
 describe('townCraftProcessTick - queueing new crafts', () => {
-  it('queues a new craft when the queue is empty, without consulting craftingChanceOnTick', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown({ craftingChanceOnTick: 0, craftingChanceItemThreshold: 4 }),
-    ]);
-    const recipe = {
-      id: 'recipe-1' as RecipeId,
-      tradeskillId: blacksmithingId,
-      requirements: [{ itemId: oreId, quantity: 2 }],
-    } as RecipeContent;
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe,
-    });
-
-    townCraftProcessTick();
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 5 } },
-            craftQueue: [],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(rngSucceedsChance).not.toHaveBeenCalled();
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      expect.anything(),
-      townId,
-      oreId,
-      -2,
+  function existingEntries(count: number): TownCraftQueueEntry[] {
+    return Array.from({ length: count }, (_, i) =>
+      queued({ id: `existing-${i}` as CraftQueueEntryId }),
     );
-    expect(state.world.towns[townId].craftQueue).toEqual([
-      {
-        id: 'queue-entry-1',
+  }
+
+  it('queues the picked recipe into an empty queue, consuming its materials, without rolling', () => {
+    const content = seedTown({
+      craftingChanceOnTick: 0,
+      craftingChanceItemThreshold: 0,
+    });
+    seedTownState();
+    pickReturns(ingotRecipe);
+
+    processTick();
+
+    expect(townPickRecipeToQueue).toHaveBeenCalledWith(content);
+    expect(rngSucceedsChance).not.toHaveBeenCalled();
+    expect(town().materials[oreId]).toBe(98);
+    expect(town().craftQueue).toEqual([
+      expect.objectContaining({
         tradeskillId: blacksmithingId,
-        recipeId: 'recipe-1',
+        recipeId: ingotRecipe.id,
         ticksIntoCraft: 0,
-      },
+      }),
     ]);
   });
 
   it('queues every tick below craftingChanceItemThreshold, not just when empty', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown({ craftingChanceOnTick: 0, craftingChanceItemThreshold: 4 }),
-    ]);
-    vi.mocked(getEntry).mockReturnValue({ craftTime: 999 } as RecipeContent);
-    const recipe = {
-      id: 'recipe-2' as RecipeId,
-      tradeskillId: blacksmithingId,
-      requirements: [],
-    } as unknown as RecipeContent;
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe,
-    });
+    seedTown({ craftingChanceOnTick: 0, craftingChanceItemThreshold: 4 });
+    seedTownState({ craftQueue: existingEntries(1) });
+    pickReturns(swordRecipe);
 
-    townCraftProcessTick();
+    processTick();
 
-    const existingEntry = {
-      id: 'existing',
-      tradeskillId: blacksmithingId,
-      recipeId: 'other-recipe',
-      ticksIntoCraft: 0,
-    };
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 5 } },
-            craftQueue: [existingEntry],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(state.world.towns[townId].craftQueue).toHaveLength(2);
+    expect(rngSucceedsChance).not.toHaveBeenCalled();
+    expect(town().craftQueue).toHaveLength(2);
   });
 
-  it('gates queueing behind craftingChanceOnTick once at/above the threshold, and succeeds on a hit', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown({ craftingChanceOnTick: 42, craftingChanceItemThreshold: 1 }),
-    ]);
-    vi.mocked(getEntry).mockReturnValue({ craftTime: 999 } as RecipeContent);
-    const recipe = {
-      id: 'recipe-3' as RecipeId,
-      tradeskillId: blacksmithingId,
-      requirements: [],
-    } as unknown as RecipeContent;
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe,
-    });
+  it('gates queueing behind craftingChanceOnTick once at/above the threshold', () => {
+    seedTown({ craftingChanceOnTick: 42, craftingChanceItemThreshold: 1 });
+    seedTownState({ craftQueue: existingEntries(1) });
+    pickReturns(swordRecipe);
 
-    townCraftProcessTick();
-
-    const existingEntry = {
-      id: 'existing',
-      tradeskillId: blacksmithingId,
-      recipeId: 'other',
-      ticksIntoCraft: 0,
-    };
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 5 } },
-            craftQueue: [existingEntry],
-          },
-        },
-      },
-    } as unknown as GameState);
-
+    processTick();
     expect(rngSucceedsChance).toHaveBeenCalledWith(42);
-    expect(state.world.towns[townId].craftQueue).toHaveLength(2);
-  });
+    expect(town().craftQueue).toHaveLength(2);
 
-  it('does not queue a new craft when the chance roll fails at/above the threshold', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown({ craftingChanceOnTick: 3, craftingChanceItemThreshold: 1 }),
-    ]);
-    vi.mocked(getEntry).mockReturnValue({ craftTime: 999 } as RecipeContent);
     vi.mocked(rngSucceedsChance).mockReturnValue(false);
+    processTick();
+    expect(town().craftQueue).toHaveLength(2);
+  });
 
-    townCraftProcessTick();
+  it('never queues past the max queue size', () => {
+    seedTown({ maxQueueSize: [{ tier: 0, value: 1 }] });
+    seedTownState({ craftQueue: existingEntries(1) });
+    pickReturns(swordRecipe);
 
-    const existingEntry = {
-      id: 'existing',
-      tradeskillId: blacksmithingId,
-      recipeId: 'other',
-      ticksIntoCraft: 0,
-    };
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 5 } },
-            craftQueue: [existingEntry],
-          },
-        },
-      },
-    } as unknown as GameState);
+    processTick();
 
     expect(townPickRecipeToQueue).not.toHaveBeenCalled();
-    expect(state.world.towns[townId].craftQueue).toHaveLength(1);
-    expect(state.world.towns[townId].craftQueue[0].id).toBe('existing');
+    expect(town().craftQueue).toHaveLength(1);
   });
 
-  it('never queues past maxQueueSize', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown({
-        maxQueueSize: [{ tier: 0, value: 1 }],
-        craftingChanceItemThreshold: 1,
-        craftingChanceOnTick: 100,
-      }),
-    ]);
-    vi.mocked(getEntry).mockReturnValue({ craftTime: 999 } as RecipeContent);
+  it('queues nothing and consumes nothing when no recipe is eligible', () => {
+    seedTown();
+    seedTownState();
 
-    townCraftProcessTick();
+    processTick();
 
-    const existingEntry = {
-      id: 'existing',
-      tradeskillId: blacksmithingId,
-      recipeId: 'other',
-      ticksIntoCraft: 0,
-    };
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            tradeskills: { [blacksmithingId]: { level: 5 } },
-            craftQueue: [existingEntry],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(townPickRecipeToQueue).not.toHaveBeenCalled();
-    expect(state.world.towns[townId].craftQueue).toHaveLength(1);
-    expect(state.world.towns[townId].craftQueue[0].id).toBe('existing');
-  });
-
-  it('does not queue anything when no recipe is eligible', () => {
-    townCraftProcessTick();
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: { stock: [], tradeskills: {}, craftQueue: [] },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(applyTownMaterialDelta).not.toHaveBeenCalled();
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
-  });
-
-  it('calls townPickRecipeToQueue with the whole town content', () => {
-    townCraftProcessTick();
-
-    applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [],
-            craftQueue: [],
-            tradeskills: { [blacksmithingId]: { level: 5 } },
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(townPickRecipeToQueue).toHaveBeenCalledWith(
-      expect.objectContaining({ id: townId }),
-    );
+    expect(town().craftQueue).toEqual([]);
+    expect(town().materials[oreId]).toBe(100);
   });
 });
 
 describe('townQueueInitialCrafts', () => {
-  const recipe = {
-    id: 'recipe-1' as RecipeId,
-    tradeskillId: blacksmithingId,
-    requirements: [{ itemId: oreId, quantity: 2 }],
-  } as RecipeContent;
-
-  function buildState(): GameState {
-    return {
-      world: { towns: { [townId]: { craftQueue: [] } } },
-    } as unknown as GameState;
+  function queueInitial(content: TownContent, count: number): TownNodeState {
+    seedGamestate((state) => {
+      state.world.towns[townId] = buildTownNodeState({
+        materials: { [oreId]: 100 },
+      });
+    });
+    inTick(() =>
+      updateGamestate((state) => {
+        townQueueInitialCrafts(state, content, count);
+        return state;
+      }),
+    );
+    return town();
   }
 
   it('queues the requested count without rolling craftingChanceOnTick', () => {
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe,
-    });
-    const state = buildState();
+    const content = seedTown({ craftingChanceOnTick: 0 });
+    pickReturns(ingotRecipe);
 
-    townQueueInitialCrafts(state, buildTown({ craftingChanceOnTick: 0 }), 4);
+    const result = queueInitial(content, 4);
 
     expect(rngSucceedsChance).not.toHaveBeenCalled();
-    expect(state.world.towns[townId].craftQueue).toHaveLength(4);
-    expect(applyTownMaterialDelta).toHaveBeenCalledTimes(4);
+    expect(result.craftQueue).toHaveLength(4);
+    expect(result.materials[oreId]).toBe(92);
   });
 
-  it('stops at maxQueueSize', () => {
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe,
-    });
-    const state = buildState();
+  it('stops at the max queue size', () => {
+    const content = seedTown({ maxQueueSize: [{ tier: 0, value: 2 }] });
+    pickReturns(ingotRecipe);
 
-    townQueueInitialCrafts(
-      state,
-      buildTown({ maxQueueSize: [{ tier: 0, value: 2 }] }),
-      4,
-    );
-
-    expect(state.world.towns[townId].craftQueue).toHaveLength(2);
+    expect(queueInitial(content, 4).craftQueue).toHaveLength(2);
   });
 
   it('stops early once no recipe is eligible', () => {
+    const content = seedTown();
     vi.mocked(townPickRecipeToQueue)
-      .mockReturnValueOnce({ tradeskillId: blacksmithingId, recipe })
+      .mockReturnValueOnce({
+        tradeskillId: blacksmithingId,
+        recipe: ingotRecipe,
+      })
       .mockReturnValue(undefined);
-    const state = buildState();
 
-    townQueueInitialCrafts(state, buildTown(), 4);
-
-    expect(state.world.towns[townId].craftQueue).toHaveLength(1);
+    expect(queueInitial(content, 4).craftQueue).toHaveLength(1);
     expect(townPickRecipeToQueue).toHaveBeenCalledTimes(2);
   });
 });
 
 describe('townCompleteInitialCrafts', () => {
-  const materialRecipe = {
-    id: 'recipe-1' as RecipeId,
-    tradeskillId: blacksmithingId,
-    requirements: [{ itemId: oreId, quantity: 2 }],
-    result: { itemId: 'ingot' as ItemId, quantity: 1 },
-  } as RecipeContent;
-  const equipmentRecipe = {
-    id: 'recipe-2' as RecipeId,
-    tradeskillId: blacksmithingId,
-    requirements: [{ itemId: oreId, quantity: 2 }],
-    result: { equipmentId: 'sword' },
-  } as unknown as RecipeContent;
-
-  function buildState(stock: unknown[] = []): GameState {
-    return {
-      world: { towns: { [townId]: { stock, craftQueue: [] } } },
-    } as unknown as GameState;
+  function completeInitial(
+    content: TownContent,
+    count: number,
+    stock: TownNodeState['stock'] = [],
+  ): TownNodeState {
+    seedGamestate((state) => {
+      state.world.towns[townId] = buildTownNodeState({
+        materials: { [oreId]: 100 },
+        stock,
+        specialtyPriority: [{ recipeId: swordRecipe.id, failureCount: 2 }],
+      });
+    });
+    inTick(() =>
+      updateGamestate((state) => {
+        townCompleteInitialCrafts(state, content, count);
+        return state;
+      }),
+    );
+    return town();
   }
 
   it('only asks the pick for equipment recipes', () => {
-    townCompleteInitialCrafts(buildState(), buildTown(), 1);
+    completeInitial(seedTown(), 1);
 
     const accept = vi.mocked(townPickRecipeToQueue).mock.calls[0][1]!;
-    expect(accept(equipmentRecipe)).toBe(true);
-    expect(accept(materialRecipe)).toBe(false);
+    expect(accept(swordRecipe)).toBe(true);
+    expect(accept(ingotRecipe)).toBe(false);
   });
 
-  it('consumes requirements and puts the result into stock without queueing', () => {
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe: equipmentRecipe,
-    });
-    const state = buildState();
+  it('consumes requirements and puts the results straight into stock', () => {
+    pickReturns(swordRecipe);
 
-    townCompleteInitialCrafts(state, buildTown(), 2);
+    const result = completeInitial(seedTown(), 2);
 
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      state,
-      townId,
-      oreId,
-      -2,
-    );
-    expect(newEquipmentItem).toHaveBeenCalledWith('sword');
-    expect(applyTownStockAdd).toHaveBeenCalledTimes(2);
-    expect(resetTownSpecialtyPriority).toHaveBeenCalledWith(
-      state,
-      townId,
-      'recipe-2',
-    );
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
+    expect(result.materials[oreId]).toBe(96);
+    expect(result.stock).toHaveLength(2);
+    expect(result.specialtyPriority).toEqual([]);
+    expect(result.craftQueue).toEqual([]);
   });
 
   it('stops once the shop stock is full', () => {
-    vi.mocked(townShopItemCap).mockReturnValue(1);
-    vi.mocked(townPickRecipeToQueue).mockReturnValue({
-      tradeskillId: blacksmithingId,
-      recipe: equipmentRecipe,
-    });
+    pickReturns(swordRecipe);
 
-    townCompleteInitialCrafts(buildState([{}]), buildTown(), 4);
+    const result = completeInitial(seedTown(), 4, fullStock());
 
-    expect(applyTownStockAdd).not.toHaveBeenCalled();
+    expect(result.stock).toHaveLength(SHOP_CAP);
+    expect(result.materials[oreId]).toBe(100);
   });
 
   it('stops early once no recipe is eligible', () => {
     vi.mocked(townPickRecipeToQueue)
       .mockReturnValueOnce({
         tradeskillId: blacksmithingId,
-        recipe: equipmentRecipe,
+        recipe: swordRecipe,
       })
       .mockReturnValue(undefined);
 
-    townCompleteInitialCrafts(buildState(), buildTown(), 4);
-
+    expect(completeInitial(seedTown(), 4).stock).toHaveLength(1);
     expect(townPickRecipeToQueue).toHaveBeenCalledTimes(2);
-    expect(resetTownSpecialtyPriority).toHaveBeenCalledTimes(1);
   });
 });

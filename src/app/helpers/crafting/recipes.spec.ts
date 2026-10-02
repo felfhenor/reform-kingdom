@@ -1,54 +1,16 @@
-import type {
-  CollectibleContent,
-  CollectibleId,
-  EncounterContent,
-  EncounterId,
-  EquipmentContent,
-  EquipmentId,
-  GameState,
-  GameStateDiscoveredRecipes,
-  ItemContent,
-  ItemId,
-  RecipeContent,
-  RecipeId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/kingdom/armory', () => ({
-  getArmoryEntries: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/item/collectibles', () => ({
-  getCollectibleQuantity: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/item/equipment', () => ({
-  equippedItems: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  getMaterialQuantity: vi.fn(() => 0),
-  traderTokenId: vi.fn(() => 'trader-token'),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    discoveredRecipesState: () => gamestate().discoveredRecipes,
-    materialsState: () => gamestate().materials,
-    worldPartyState: vi.fn(() => []),
-  };
-});
-
+import { ensureCaravanTrader } from '@helpers/content/ensure-caravan';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import {
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import {
   applyRecipeDiscovery,
   isRecipeCraftable,
@@ -61,510 +23,281 @@ import {
   recipeResultContent,
   recipeResultOwnedQuantity,
   recipeResultSpritesheet,
+  recipeStylizedName,
   recipeUndiscover,
 } from '@helpers/crafting/recipes';
-import { getCollectibleQuantity } from '@helpers/item/collectibles';
-import { equippedItems } from '@helpers/item/equipment';
-import { getMaterialQuantity } from '@helpers/item/materials';
-import { getArmoryEntries } from '@helpers/kingdom/armory';
-import {
-  gamestate,
-  updateGamestate,
-  worldPartyState,
-} from '@helpers/state-game';
+import { defaultEquipment, defaultGameState } from '@helpers/defaults';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
+import { applyMaterialDelta } from '@helpers/item/materials';
+import { discoveredRecipesState } from '@helpers/state-game';
+import type {
+  CollectibleId,
+  EquipmentId,
+  GameState,
+  IsContentItem,
+  ItemId,
+  RecipeId,
+  TownContent,
+  TradeskillId,
+} from '@interfaces';
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const copperIngot: ItemContent = {
-  id: 'copper-ingot' as ItemId,
-  name: 'Copper Ingot',
-  __type: 'item',
-  description: 'A refined copper ingot.',
-  sprite: '0000',
-  rarity: 'Common',
-};
+const ingotId = 'copper-ingot' as ItemId;
+const scripId = 'trader-scrip' as ItemId;
+const cloakId = 'bone-hewn-cloak' as EquipmentId;
+const effigyId = 'minor-effigy' as CollectibleId;
+const tailoringId = 'tailoring' as TradeskillId;
 
-const boneHewnCloak: EquipmentContent = {
-  id: 'bone-hewn-cloak' as EquipmentId,
-  name: 'Bone-Hewn Cloak',
-  __type: 'equipment',
-  description: 'A cloak made of leather and bone.',
-  sprite: '0017',
-  rarity: 'Uncommon',
-  levelRequirement: 4,
-  baseStats: {} as never,
-  type: 'Cloth Armor',
-  slots: 0,
-  grantedSkillIds: [],
-};
+const ingot = ensureItem({ id: ingotId, name: 'Copper Ingot' });
+const cloak = ensureEquipment({ id: cloakId, name: 'Bone-Hewn Cloak' });
+const effigy = ensureCollectible({ id: effigyId, name: 'Minor Effigy' });
 
-const itemRecipe: RecipeContent = {
+const itemRecipe = ensureRecipe({
   id: 'material-copper-ingot' as RecipeId,
   name: 'Material: Copper Ingot',
-  __type: 'recipe',
-  result: { itemId: copperIngot.id, quantity: 1 },
-  requirements: [],
-  tradeskillId: 'blacksmithing-id' as never,
-  minTradeskillLevel: 1,
-  maxTradeskillLevel: 3,
-  tradeskillXP: 1,
-  craftTime: 60,
-  tokenUnlockCost: 3,
-};
-
-const equipmentRecipe: RecipeContent = {
-  id: 'equipment-bone-hewn-cloak' as RecipeId,
+  result: { itemId: ingotId, quantity: 1 },
+});
+// Gated behind an encounter drop.
+const equipmentRecipe = ensureRecipe({
+  id: 'equipment-cloak' as RecipeId,
   name: 'Equipment: Bone-Hewn Cloak',
-  __type: 'recipe',
-  result: { equipmentId: boneHewnCloak.id },
-  requirements: [],
-  tradeskillId: 'tailoring-id' as never,
-  minTradeskillLevel: 2,
-  maxTradeskillLevel: 5,
-  tradeskillXP: 1,
-  craftTime: 60,
+  tradeskillId: tailoringId,
+  result: { equipmentId: cloakId },
   tokenUnlockCost: 3,
-};
+});
+// Gated behind a caravan trader sale.
+const collectibleRecipe = ensureRecipe({
+  id: 'collectible-effigy' as RecipeId,
+  name: 'Collectible: Minor Effigy',
+  result: { collectibleId: effigyId },
+});
 
-const minorEffigy: CollectibleContent = {
-  id: 'minor-tailoring-effigy' as CollectibleId,
-  name: 'Minor Tailoring Effigy',
-  __type: 'collectible',
-  description:
-    'A small figurine stitched together from scraps of thread and cloth.',
-  sprite: '0000',
-  rarity: 'Uncommon',
-  effects: [],
-};
+const baseContent: IsContentItem[] = [
+  ingot,
+  cloak,
+  effigy,
+  ensureItem({ id: scripId, name: 'Trader Scrip' }),
+  ensureEquipment({ id: 'other' as EquipmentId, name: 'Other' }),
+  ensureTradeskill({ id: tailoringId, name: 'Tailoring' }),
+  itemRecipe,
+  equipmentRecipe,
+  collectibleRecipe,
+  ensureEncounter({
+    id: 'forest-ruins' as never,
+    name: 'Forest Ruins',
+    completionRewards: [
+      ensureDroppedReward({ recipeId: equipmentRecipe.id, chance: 0.25 }),
+    ],
+  }),
+  ensureCaravanTrader({
+    id: 'alekia' as never,
+    name: 'Alekia Figaro',
+    trades: [
+      { type: 'sell', value: 25000, recipeId: collectibleRecipe.id, weight: 1 },
+    ],
+  }),
+];
 
-const collectibleRecipe: RecipeContent = {
-  id: 'collectible-minor-tailoring-effigy' as RecipeId,
-  name: 'Collectible: Minor Tailoring Effigy',
-  __type: 'recipe',
-  result: { collectibleId: minorEffigy.id },
-  requirements: [],
-  tradeskillId: 'tailoring-id' as never,
-  minTradeskillLevel: 5,
-  maxTradeskillLevel: 5,
-  tradeskillXP: 5,
-  craftTime: 1500,
-  tokenUnlockCost: 3,
-};
-
-const forestRuinsEncounter: EncounterContent = {
-  id: 'forest-ruins' as EncounterId,
-  name: 'Forest Ruins',
-  __type: 'encounter',
-  description: 'A dilapidated ruin.',
-  levelRange: { min: 1, max: 3 },
-  fights: [],
-  completionRewards: [
-    ensureDroppedReward({
-      recipeId: equipmentRecipe.id,
-      chance: 0.25,
+function seedTownUnique(recipeId: RecipeId): void {
+  seedContent([
+    ...baseContent,
+    ensureTown({
+      id: 'larsia' as never,
+      name: 'Larsia',
+      crafting: { uniqueRecipeIds: [recipeId] } as TownContent['crafting'],
     }),
-  ],
-};
-
-const alekiaTrader = {
-  id: 'alekia-figaro' as never,
-  name: 'Alekia Figaro',
-  __type: 'caravantrader',
-  description: 'I deal in mystical recipes.',
-  category: 'Carrina',
-  level: 15,
-  trades: [
-    { type: 'sell', value: 25000, recipeId: collectibleRecipe.id, weight: 1 },
-  ],
-  tokenTrades: [],
-} as never;
-
-// getEntriesByType is a single generic mock shared across content types -
-// route each call by the `type` argument instead of one blanket return value.
-function mockEntriesByType(
-  traders: unknown[] = [],
-  encounters: EncounterContent[] = [forestRuinsEncounter],
-  towns: unknown[] = [],
-): void {
-  vi.mocked(getEntriesByType).mockImplementation(((type: string) => {
-    if (type === 'encounter') return encounters;
-    if (type === 'caravantrader') return traders;
-    if (type === 'town') return towns;
-    return [];
-  }) as typeof getEntriesByType);
+  ]);
 }
 
-describe('Recipes Helper Functions', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+function seedDiscovered(...recipeIds: RecipeId[]): void {
+  seedGamestate((state) =>
+    recipeIds.forEach(
+      (id) => (state.discoveredRecipes[id] = { foundAt: 1000 }),
+    ),
+  );
+}
+
+beforeEach(() => {
+  vi.spyOn(Date, 'now').mockReturnValue(5000);
+  seedContent(baseContent);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe('isRecipeDiscovered', () => {
+  it('reads the live slice, or an explicit state when given one', () => {
+    seedDiscovered(equipmentRecipe.id);
+    const explicit = defaultGameState();
+
+    expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(true);
+    expect(isRecipeDiscovered(itemRecipe.id)).toBe(false);
+    expect(isRecipeDiscovered(equipmentRecipe.id, explicit)).toBe(false);
+  });
+});
+
+describe('isRecipeDropGated', () => {
+  it('is true for a recipe dropped by an encounter or sold by a caravan trader', () => {
+    expect(isRecipeDropGated(equipmentRecipe.id)).toBe(true);
+    expect(isRecipeDropGated(collectibleRecipe.id)).toBe(true);
   });
 
-  describe('isRecipeDiscovered', () => {
-    it('returns true when foundAt is set', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000 },
-        },
-      } as unknown as GameState);
+  it('is false for a recipe with no drop source', () => {
+    expect(isRecipeDropGated(itemRecipe.id)).toBe(false);
+  });
+});
 
-      expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(true);
-    });
+describe('isRecipeCraftable', () => {
+  it('is true for an ungated recipe, and for a gated one only once discovered', () => {
+    seedDiscovered();
+    expect(isRecipeCraftable(itemRecipe.id)).toBe(true);
+    expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
 
-    it('returns false when the recipe has never been found', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(isRecipeDiscovered(equipmentRecipe.id)).toBe(false);
-    });
-
-    it('reads an explicit state instead of the live slice', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-      const explicit = {
-        discoveredRecipes: { [equipmentRecipe.id]: { foundAt: 1000 } },
-      } as unknown as GameState;
-
-      expect(isRecipeDiscovered(equipmentRecipe.id, explicit)).toBe(true);
-    });
+    seedDiscovered(equipmentRecipe.id);
+    expect(isRecipeCraftable(equipmentRecipe.id)).toBe(true);
   });
 
-  describe('isRecipeDropGated', () => {
-    it('returns true when the recipe appears as a completion reward', () => {
-      mockEntriesByType();
+  it("is false for a town's unique recipe, even if already discovered", () => {
+    seedTownUnique(equipmentRecipe.id);
+    seedDiscovered(equipmentRecipe.id);
 
-      expect(isRecipeDropGated(equipmentRecipe.id)).toBe(true);
-    });
-
-    it('returns false when the recipe never appears as a completion reward', () => {
-      mockEntriesByType();
-
-      expect(isRecipeDropGated(itemRecipe.id)).toBe(false);
-    });
-
-    it('returns true when a caravan trader sells the recipe', () => {
-      mockEntriesByType([alekiaTrader]);
-
-      expect(isRecipeDropGated(collectibleRecipe.id)).toBe(true);
-    });
-
-    it('returns false when no trader sells the recipe and it has no other drop source', () => {
-      mockEntriesByType([alekiaTrader]);
-
-      expect(isRecipeDropGated(itemRecipe.id)).toBe(false);
-    });
+    expect(isRecipeTownUnique(equipmentRecipe.id)).toBe(true);
+    expect(isRecipeTownUnique(itemRecipe.id)).toBe(false);
+    expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
   });
+});
 
-  describe('isRecipeCraftable', () => {
-    it('is true once a drop-gated recipe has been discovered', () => {
-      mockEntriesByType();
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000 },
-        },
-      } as unknown as GameState);
+describe('recipe discovery', () => {
+  it('stamps a new discovery now and keeps the original on repeat finds', () => {
+    const state = defaultGameState();
+    state.discoveredRecipes[itemRecipe.id] = { foundAt: 1000 };
 
-      expect(isRecipeCraftable(equipmentRecipe.id)).toBe(true);
-    });
+    applyRecipeDiscovery(state, itemRecipe.id);
+    applyRecipeDiscovery(state, equipmentRecipe.id);
 
-    it('is false for a drop-gated recipe that has not been found', () => {
-      mockEntriesByType();
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
-    });
-
-    it('is true for a recipe that never drops from a location', () => {
-      mockEntriesByType();
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(isRecipeCraftable(itemRecipe.id)).toBe(true);
-    });
-
-    it("is false for a recipe listed in any town's uniqueRecipeIds, even if already discovered", () => {
-      mockEntriesByType(
-        [],
-        [forestRuinsEncounter],
-        [{ crafting: { uniqueRecipeIds: [equipmentRecipe.id] } }],
-      );
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000 },
-        },
-      } as unknown as GameState);
-
-      expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
+    expect(state.discoveredRecipes).toEqual({
+      [itemRecipe.id]: { foundAt: 1000 },
+      [equipmentRecipe.id]: { foundAt: 5000 },
     });
   });
 
-  describe('isRecipeTownUnique', () => {
-    it('is false when no town lists the recipe', () => {
-      mockEntriesByType();
+  it('discovers and undiscovers through the committed state', () => {
+    seedDiscovered();
 
-      expect(isRecipeTownUnique(itemRecipe.id)).toBe(false);
+    inTick(() => recipeDiscover(equipmentRecipe.id));
+    expect(discoveredRecipesState()[equipmentRecipe.id]).toEqual({
+      foundAt: 5000,
     });
 
-    it('is true when a town lists the recipe in its uniqueRecipeIds', () => {
-      mockEntriesByType(
-        [],
-        [forestRuinsEncounter],
-        [
-          { crafting: { uniqueRecipeIds: [] } },
-          { crafting: { uniqueRecipeIds: [itemRecipe.id] } },
-        ],
-      );
+    inTick(() => recipeUndiscover(equipmentRecipe.id));
+    expect(discoveredRecipesState()).toEqual({});
+  });
+});
 
-      expect(isRecipeTownUnique(itemRecipe.id)).toBe(true);
+describe('pruneInvalidDiscoveredRecipes', () => {
+  it('drops only the entries that no longer resolve to content', () => {
+    expect(
+      pruneInvalidDiscoveredRecipes({
+        [itemRecipe.id]: { foundAt: 1000 },
+        ['stale' as RecipeId]: { foundAt: 1000 },
+      }),
+    ).toEqual({ [itemRecipe.id]: { foundAt: 1000 } });
+  });
+});
+
+describe('recipe results', () => {
+  it.each([
+    [itemRecipe, 'item', ingot],
+    [equipmentRecipe, 'equipment', cloak],
+    [collectibleRecipe, 'collectible', effigy],
+  ])(
+    'resolves the spritesheet and content for %#',
+    (recipe, sheet, content) => {
+      expect(recipeResultSpritesheet(recipe)).toBe(sheet);
+      expect(recipeResultContent(recipe)).toEqual(content);
+    },
+  );
+
+  it('counts owned materials and collectibles', () => {
+    seedGamestate((state) => {
+      applyMaterialDelta(state, ingotId, 12);
+      applyCollectibleGrant(state, effigyId, 3);
     });
+
+    expect(recipeResultOwnedQuantity(itemRecipe)).toBe(12);
+    expect(recipeResultOwnedQuantity(collectibleRecipe)).toBe(3);
   });
 
-  describe('recipeDiscover', () => {
-    it('adds a new discovery entry with the current timestamp', () => {
-      recipeDiscover(equipmentRecipe.id);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(
-        result.discoveredRecipes[equipmentRecipe.id].foundAt,
-      ).toBeGreaterThan(0);
+  it('sums armory-stored and equipped copies of equipment', () => {
+    seedGamestate((state) => {
+      state.armory = [
+        buildEquipmentItem(cloakId),
+        buildEquipmentItem(cloakId),
+        buildEquipmentItem('other' as EquipmentId),
+      ];
+      state.world.party = [
+        buildCharacter({
+          equipment: {
+            ...defaultEquipment(),
+            Armor: buildEquipmentItem(cloakId),
+          },
+        }),
+        buildCharacter(),
+      ];
     });
 
-    it('preserves the original foundAt on repeat finds', () => {
-      recipeDiscover(equipmentRecipe.id);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000 },
-        },
-      } as unknown as GameState);
-
-      expect(result.discoveredRecipes[equipmentRecipe.id].foundAt).toBe(1000);
-    });
+    expect(recipeResultOwnedQuantity(equipmentRecipe)).toBe(3);
   });
 
-  describe('applyRecipeDiscovery', () => {
-    it('mutates the passed-in state directly, without opening its own updateGamestate', () => {
-      const state = {
-        discoveredRecipes: {},
-      } as unknown as GameState;
+  it('prefixes the stylized name with the tradeskill', () => {
+    expect(recipeStylizedName(equipmentRecipe)).toBe(
+      'Tailoring Recipe: Bone-Hewn Cloak',
+    );
+    expect(recipeStylizedName(itemRecipe)).toBe(itemRecipe.name);
+    expect(
+      recipeStylizedName({ ...equipmentRecipe, name: 'Unprefixed Cloak' }),
+    ).toBe('Tailoring Recipe: Unprefixed Cloak');
+  });
+});
 
-      applyRecipeDiscovery(state, equipmentRecipe.id);
+describe('recipeCanUnlockWithTokens', () => {
+  function withScrip(quantity: number): (state: GameState) => void {
+    return (state) => applyMaterialDelta(state, scripId, quantity);
+  }
 
-      expect(
-        state.discoveredRecipes[equipmentRecipe.id].foundAt,
-      ).toBeGreaterThan(0);
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
+  it('is true for a gated, undiscovered recipe the player can afford', () => {
+    seedGamestate(withScrip(equipmentRecipe.tokenUnlockCost));
 
-    it('preserves the original foundAt on repeat finds', () => {
-      const state = {
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000 },
-        },
-      } as unknown as GameState;
-
-      applyRecipeDiscovery(state, equipmentRecipe.id);
-
-      expect(state.discoveredRecipes[equipmentRecipe.id].foundAt).toBe(1000);
-    });
+    expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(true);
   });
 
-  describe('recipeUndiscover', () => {
-    it('removes an existing discovery entry', () => {
-      recipeUndiscover(equipmentRecipe.id);
+  it('is false when the player cannot afford it', () => {
+    seedGamestate(withScrip(equipmentRecipe.tokenUnlockCost - 1));
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000 },
-        },
-      } as unknown as GameState);
-
-      expect(result.discoveredRecipes[equipmentRecipe.id]).toBeUndefined();
-    });
-
-    it('is a no-op when the recipe was never discovered', () => {
-      recipeUndiscover(equipmentRecipe.id);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(result.discoveredRecipes).toEqual({});
-    });
+    expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);
   });
 
-  describe('pruneInvalidDiscoveredRecipes', () => {
-    it('keeps entries that resolve to real recipe content', () => {
-      vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
-      const discovered: GameStateDiscoveredRecipes = {
-        [equipmentRecipe.id]: { foundAt: 1000 },
-      };
-
-      expect(pruneInvalidDiscoveredRecipes(discovered)).toEqual(discovered);
+  it('is false for an already-discovered or ungated recipe, even when affordable', () => {
+    seedGamestate((state) => {
+      withScrip(100)(state);
+      state.discoveredRecipes[collectibleRecipe.id] = { foundAt: 1000 };
     });
 
-    it('drops entries whose recipeId no longer resolves to real content', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
-      const discovered: GameStateDiscoveredRecipes = {
-        [equipmentRecipe.id]: { foundAt: 1000 },
-      };
-
-      expect(pruneInvalidDiscoveredRecipes(discovered)).toEqual({});
-    });
+    expect(recipeCanUnlockWithTokens(collectibleRecipe.id)).toBe(false);
+    expect(recipeCanUnlockWithTokens(itemRecipe.id)).toBe(false);
   });
 
-  describe('recipeResultSpritesheet', () => {
-    it('returns "item" for a recipe that crafts an item', () => {
-      expect(recipeResultSpritesheet(itemRecipe)).toBe('item');
-    });
+  it('validates against an explicit state instead of the live slices', () => {
+    seedGamestate(withScrip(equipmentRecipe.tokenUnlockCost));
+    const spent = defaultGameState();
+    const unlocked = defaultGameState();
+    withScrip(100)(unlocked);
+    unlocked.discoveredRecipes[equipmentRecipe.id] = { foundAt: 1000 };
 
-    it('returns "equipment" for a recipe that crafts equipment', () => {
-      expect(recipeResultSpritesheet(equipmentRecipe)).toBe('equipment');
-    });
-
-    it('returns "collectible" for a recipe that crafts a collectible', () => {
-      expect(recipeResultSpritesheet(collectibleRecipe)).toBe('collectible');
-    });
-  });
-
-  describe('recipeResultContent', () => {
-    it('resolves the crafted item for an item recipe', () => {
-      vi.mocked(getEntry).mockReturnValue(copperIngot);
-
-      expect(recipeResultContent(itemRecipe)).toBe(copperIngot);
-      expect(getEntry).toHaveBeenCalledWith(copperIngot.id);
-    });
-
-    it('resolves the crafted equipment for an equipment recipe', () => {
-      vi.mocked(getEntry).mockReturnValue(boneHewnCloak);
-
-      expect(recipeResultContent(equipmentRecipe)).toBe(boneHewnCloak);
-      expect(getEntry).toHaveBeenCalledWith(boneHewnCloak.id);
-    });
-
-    it('resolves the crafted collectible for a collectible recipe', () => {
-      vi.mocked(getEntry).mockReturnValue(minorEffigy);
-
-      expect(recipeResultContent(collectibleRecipe)).toBe(minorEffigy);
-      expect(getEntry).toHaveBeenCalledWith(minorEffigy.id);
-    });
-  });
-
-  describe('recipeResultOwnedQuantity', () => {
-    it('returns the material quantity for an item recipe', () => {
-      vi.mocked(getMaterialQuantity).mockReturnValue(12);
-
-      expect(recipeResultOwnedQuantity(itemRecipe)).toBe(12);
-      expect(getMaterialQuantity).toHaveBeenCalledWith(copperIngot.id);
-    });
-
-    it('returns the collectible quantity for a collectible recipe', () => {
-      vi.mocked(getCollectibleQuantity).mockReturnValue(3);
-
-      expect(recipeResultOwnedQuantity(collectibleRecipe)).toBe(3);
-      expect(getCollectibleQuantity).toHaveBeenCalledWith(minorEffigy.id);
-    });
-
-    it('sums armory-stored and equipped copies for an equipment recipe', () => {
-      vi.mocked(getArmoryEntries).mockReturnValue([
-        { content: boneHewnCloak } as never,
-        { content: boneHewnCloak } as never,
-        { content: { ...boneHewnCloak, id: 'other' as EquipmentId } } as never,
-      ]);
-      vi.mocked(worldPartyState).mockReturnValue([
-        { equipment: {} } as never,
-        { equipment: {} } as never,
-      ]);
-      vi.mocked(equippedItems)
-        .mockReturnValueOnce([{ equipmentId: boneHewnCloak.id } as never])
-        .mockReturnValueOnce([]);
-
-      expect(recipeResultOwnedQuantity(equipmentRecipe)).toBe(3);
-    });
-
-    it('returns 0 for equipment with none stored or equipped', () => {
-      vi.mocked(getArmoryEntries).mockReturnValue([]);
-      vi.mocked(worldPartyState).mockReturnValue([]);
-
-      expect(recipeResultOwnedQuantity(equipmentRecipe)).toBe(0);
-    });
-  });
-
-  describe('recipeCanUnlockWithTokens', () => {
-    beforeEach(() => {
-      mockEntriesByType();
-      vi.mocked(getEntry).mockReturnValue(equipmentRecipe);
-    });
-
-    it('is true for a drop-gated, undiscovered recipe the player can afford', () => {
-      vi.mocked(getMaterialQuantity).mockReturnValue(
-        equipmentRecipe.tokenUnlockCost,
-      );
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(true);
-    });
-
-    it('is false once the recipe is already discovered', () => {
-      vi.mocked(getMaterialQuantity).mockReturnValue(
-        equipmentRecipe.tokenUnlockCost,
-      );
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {
-          [equipmentRecipe.id]: { foundAt: 1000 },
-        },
-      } as unknown as GameState);
-
-      expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);
-    });
-
-    it('is false for a recipe that is not drop-gated', () => {
-      vi.mocked(getMaterialQuantity).mockReturnValue(
-        itemRecipe.tokenUnlockCost,
-      );
-      vi.mocked(getEntry).mockReturnValue(itemRecipe);
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(recipeCanUnlockWithTokens(itemRecipe.id)).toBe(false);
-    });
-
-    it('validates against an explicit state instead of the live slices', () => {
-      vi.mocked(getMaterialQuantity).mockReturnValue(
-        equipmentRecipe.tokenUnlockCost,
-      );
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-      const spentState = {
-        discoveredRecipes: {},
-        materials: {},
-      } as unknown as GameState;
-
-      expect(recipeCanUnlockWithTokens(equipmentRecipe.id, spentState)).toBe(
-        false,
-      );
-    });
-
-    it('is false when the player cannot afford the token cost', () => {
-      vi.mocked(getMaterialQuantity).mockReturnValue(0);
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredRecipes: {},
-      } as unknown as GameState);
-
-      expect(recipeCanUnlockWithTokens(equipmentRecipe.id)).toBe(false);
-    });
+    expect(recipeCanUnlockWithTokens(equipmentRecipe.id, spent)).toBe(false);
+    expect(recipeCanUnlockWithTokens(equipmentRecipe.id, unlocked)).toBe(false);
   });
 });

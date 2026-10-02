@@ -1,334 +1,122 @@
-import type * as TownWorkerRosterHelper from '@helpers/town/worker/town-worker-roster';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/worker/town-worker-roster', async (importOriginal) => {
-  const actual = await importOriginal<typeof TownWorkerRosterHelper>();
-  return {
-    ...actual,
-    townWorkerRosterMaterialize: vi.fn((_town, existing) => existing),
-  };
-});
-
-import { getEntry } from '@helpers/content/content';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import { pruneInvalidTowns } from '@helpers/town/town-prune';
-import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import type {
+  EquipmentId,
   GameStateTowns,
   ItemId,
   TownContent,
   TownId,
+  TradeskillId,
   WorkerId,
 } from '@interfaces';
+import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
 const townId = 'larsia' as TownId;
 const darwinId = 'darwin' as WorkerId;
+const newHireId = 'new-hire' as WorkerId;
 const oreId = 'copper-ore' as ItemId;
+const swordId = 'sword' as EquipmentId;
+const blacksmithingId = 'blacksmithing' as TradeskillId;
 
-const town: TownContent = {
-  id: townId,
-  name: 'Larsia',
-  __type: 'town',
-  description: 'A desert town.',
-  hidden: false,
-  invisibleUntilCollectibleIdsFound: [],
-  scaleType: 'City',
-  level: 25,
-  materialThresholds: [],
-  crafting: {
-    maxQueueSize: [{ tier: 0, value: 12 }],
-    specialtyTradeskillId: 'jewelcrafting' as never,
-    craftingDurationMultiplier: 3,
-    craftingChanceOnTick: 3,
-    craftingChanceItemThreshold: 4,
-    tradeskillLevels: [],
-    uniqueRecipeIds: [],
-    bannedRecipeIds: [],
-  },
-  traders: {
-    sellItemCount: [{ tier: 0, value: 10 }],
-    itemExpirationTimer: 0,
-    markupPercentages: { sell: 25, buy: -15 },
-  },
-  gathering: {
-    gatherRateMultiplier: 5,
-    goldGatheredPerMaterial: 5,
-    workers: [{ workerId: darwinId, level: 1 }],
-  },
-  reputation: {
-    buff: { globalEffectId: 'larsian-influence' as never, tiers: [] },
-  },
-  defense: {
-    rewards: [],
-    guardian: {
-      reputationTiers: [
-        {
-          tier: 0,
-          guardians: [{ monsterId: 'Larsian Citizen' as never, quantity: 3 }],
-        },
-      ],
-    },
-    assaulter: { numMonsters: 15, monsterIds: [], level: { min: 20, max: 25 } },
-    quests: { commissions: [] },
-    buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
-  },
-};
+function seedTown(workers: WorkerId[] = [darwinId]): void {
+  seedContent([
+    ensureTown({
+      id: townId,
+      gathering: {
+        workers: workers.map((workerId) => ({ workerId, level: 1 })),
+      } as unknown as TownContent['gathering'],
+    }),
+    ensureItem({ id: oreId }),
+    ensureEquipment({ id: swordId }),
+    ensureTradeskill({ id: blacksmithingId, name: 'Blacksmithing' }),
+  ]);
+}
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+function prunedTown(towns: GameStateTowns) {
+  return pruneInvalidTowns(towns)[townId];
+}
+
+beforeEach(() => seedTown());
 
 describe('pruneInvalidTowns', () => {
-  it('keeps entries that resolve to real content', () => {
-    vi.mocked(getEntry).mockReturnValue(town);
-    const towns: GameStateTowns = {
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {},
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    };
-
-    expect(pruneInvalidTowns(towns)).toEqual(towns);
+  it('drops towns whose id no longer resolves to content', () => {
+    expect(
+      pruneInvalidTowns({ ['gone' as TownId]: buildTownNodeState() }),
+    ).toEqual({});
   });
 
-  it('drops entries whose id no longer resolves to real content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const towns: GameStateTowns = {
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {},
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    };
+  it('keeps existing progress on a valid town', () => {
+    const existing = buildTownNodeState({
+      lastProcessedTick: { worker: 42 },
+      reputation: 350,
+      hiddenGold: 1200,
+      materials: { [oreId]: 8 },
+      stock: [{ equipmentItem: buildEquipmentItem(swordId), addedAtTick: 3 }],
+    });
 
-    expect(pruneInvalidTowns(towns)).toEqual({});
-  });
-
-  it('backfills missing stock/workers/reputation/hiddenGold on a legacy entry', () => {
-    vi.mocked(getEntry).mockReturnValue(town);
-    const towns = {
-      [townId]: { lastProcessedTick: {} },
-    } as unknown as GameStateTowns;
-
-    expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {},
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
+    expect(prunedTown({ [townId]: existing })).toMatchObject({
+      lastProcessedTick: { worker: 42 },
+      reputation: 350,
+      hiddenGold: 1200,
+      materials: { [oreId]: 8 },
+      stock: existing.stock,
     });
   });
 
-  it('backfills a missing lastProcessedTick so the town tick gate does not throw', () => {
-    vi.mocked(getEntry).mockReturnValue(town);
-    const towns = { [townId]: {} } as unknown as GameStateTowns;
+  it('backfills every missing field on a legacy entry', () => {
+    const legacy = { [townId]: {} } as unknown as GameStateTowns;
 
-    expect(pruneInvalidTowns(towns)[townId].lastProcessedTick).toEqual({});
-  });
-
-  it('preserves existing lastProcessedTick progress', () => {
-    vi.mocked(getEntry).mockReturnValue(town);
-    const towns = {
-      [townId]: { lastProcessedTick: { worker: 42 } },
-    } as unknown as GameStateTowns;
-
-    expect(pruneInvalidTowns(towns)[townId].lastProcessedTick).toEqual({
-      worker: 42,
-    });
-  });
-
-  it('preserves existing reputation, hiddenGold, and materials', () => {
-    vi.mocked(getEntry).mockReturnValue(town);
-    const towns: GameStateTowns = {
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {},
-        reputation: 350,
-        hiddenGold: 1200,
-        materials: { [oreId]: 8 },
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    };
-
-    const result = pruneInvalidTowns(towns)[townId];
-    expect(result.reputation).toBe(350);
-    expect(result.hiddenGold).toBe(1200);
-    expect(result.materials).toEqual({ [oreId]: 8 });
-  });
-
-  it('drops material entries whose itemId no longer resolves', () => {
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === townId ? town : undefined,
+    expect(prunedTown(legacy)).toMatchObject(
+      buildTownNodeState({ workers: prunedTown(legacy).workers }),
     );
-    const towns: GameStateTowns = {
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {},
-        reputation: 0,
-        hiddenGold: 0,
-        materials: { [oreId]: 5 },
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    };
-
-    const result = pruneInvalidTowns(towns)[townId];
-    expect(result.materials).toEqual({});
   });
 
-  it('drops stock entries whose referenced equipment no longer resolves', () => {
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === townId ? town : undefined,
-    );
-    const towns: GameStateTowns = {
-      [townId]: {
-        lastProcessedTick: {},
+  it('drops materials and stock that no longer resolve to content', () => {
+    const result = prunedTown({
+      [townId]: buildTownNodeState({
+        materials: { [oreId]: 5, ['gone' as ItemId]: 2 },
         stock: [
+          { equipmentItem: buildEquipmentItem(swordId), addedAtTick: 0 },
           {
-            equipmentItem: { equipmentId: 'removed-equipment' } as never,
+            equipmentItem: buildEquipmentItem('gone' as EquipmentId),
             addedAtTick: 0,
           },
         ],
-        workers: {},
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    };
-
-    expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {},
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
+      }),
     });
+
+    expect(result.materials).toEqual({ [oreId]: 5 });
+    expect(
+      result.stock.map((entry) => entry.equipmentItem.equipmentId),
+    ).toEqual([swordId]);
   });
 
-  it('drops worker state for a WorkerId no longer in the roster', () => {
-    vi.mocked(getEntry).mockReturnValue(town);
-    const removedId = 'removed' as WorkerId;
-    const towns: GameStateTowns = {
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {
-          [darwinId]: { level: 1 } as never,
-          [removedId]: { level: 1 } as never,
-        },
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    };
+  it('drops tradeskills that no longer exist and re-seeds known ones from content', () => {
+    const tradeskills = prunedTown({
+      [townId]: buildTownNodeState({
+        tradeskills: { ['gone' as TradeskillId]: { level: 3 } },
+      }),
+    }).tradeskills;
 
-    expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: { [darwinId]: { level: 1 } },
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    });
+    expect(tradeskills).toEqual({ [blacksmithingId]: { level: 1 } });
   });
 
-  it('materializes any newly-authored roster entries on an already-activated town', () => {
-    vi.mocked(getEntry).mockReturnValue(town);
-    vi.mocked(townWorkerRosterMaterialize).mockReturnValue({
-      [darwinId]: { level: 1 },
-    } as never);
-    const towns: GameStateTowns = {
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: {},
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    };
+  it('drops workers no longer on the roster and adds newly-authored ones', () => {
+    seedTown([darwinId, newHireId]);
+    const darwin = { level: 4 } as never;
 
-    expect(pruneInvalidTowns(towns)).toEqual({
-      [townId]: {
-        lastProcessedTick: {},
-        stock: [],
-        workers: { [darwinId]: { level: 1 } },
-        reputation: 0,
-        hiddenGold: 0,
-        materials: {},
-        tradeskills: {},
-        craftQueue: [],
-        commissionSlots: [],
-        specialtyPriority: [],
-      },
-    });
-    expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {});
+    const workers = prunedTown({
+      [townId]: buildTownNodeState({
+        workers: { [darwinId]: darwin, ['removed' as WorkerId]: darwin },
+      }),
+    }).workers;
+
+    expect(Object.keys(workers).sort()).toEqual([darwinId, newHireId]);
+    expect(workers[darwinId]).toBe(darwin);
   });
 });

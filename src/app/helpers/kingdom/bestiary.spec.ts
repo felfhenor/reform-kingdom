@@ -1,56 +1,12 @@
-import { defaultCombatStats } from '@helpers/defaults';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/task/task-events', () => ({
-  taskEventCollectibleGained: vi.fn(),
-  taskEventEquipmentInfused: vi.fn(),
-  taskEventLevelReached: vi.fn(),
-  taskEventMonsterKilled: vi.fn(),
-  taskEventShrineLevel: vi.fn(),
-  taskEventTeachingLearned: vi.fn(),
-  taskEventTownReputationTier: vi.fn(),
-  taskEventTownVisited: vi.fn(),
-  taskEventTradeskillLevel: vi.fn(),
-  taskEventWorkerRescued: vi.fn(),
-}));
-import type * as AnalyticsHelper from '@helpers/engine/analytics';
-import type {
-  EncounterContent,
-  EncounterId,
-  EncounterRandomContent,
-  EncounterRandomId,
-  GameState,
-  GameStateBestiary,
-  ItemId,
-  MonsterContent,
-  MonsterId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+vi.mock('@helpers/task/task-events');
 
-vi.mock('@helpers/engine/analytics', async (importOriginal) => {
-  const actual = await importOriginal<typeof AnalyticsHelper>();
-  return {
-    ...actual,
-    analyticsSendDesignEvent: vi.fn(),
-  };
-});
-
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(() => Promise.resolve()),
-    bestiaryState: () => gamestate().bestiary,
-  };
-});
-
-import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  ensureEncounter,
+  ensureEncounterRandom,
+} from '@helpers/content/ensure-encounternode';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import {
   getMonsterFoundAtNodes,
   getMonsterKillCount,
@@ -61,501 +17,210 @@ import {
   pruneInvalidBestiaryEntries,
   repairInvalidBestiaryLevels,
 } from '@helpers/kingdom/bestiary';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { bestiaryState } from '@helpers/state-game';
 import { taskEventMonsterKilled } from '@helpers/task/task-events';
+import type { GameStateBestiary, MonsterId } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const goblin: MonsterContent = {
-  id: 'goblin' as MonsterId,
-  name: 'Goblin',
-  __type: 'monster',
-  description: 'A sneaky goblin.',
-  sprite: '0000',
-  frames: 4,
-  rarity: 'Common',
-  baseStats: {
-    Health: 10,
-    Energy: 0,
-    Luck: 0,
-    Intelligence: 0,
-    Strength: 1,
-    Vitality: 0,
-    Resistance: 0,
-    Agility: 1,
-    Constitution: 0,
-    Spirit: 0,
-  },
-  statsPerLevel: {
-    Health: 0,
-    Energy: 0,
-    Luck: 0,
-    Intelligence: 0,
-    Strength: 0,
-    Vitality: 0,
-    Resistance: 0,
-    Agility: 0,
-    Constitution: 0,
-    Spirit: 0,
-  },
-  combatStats: defaultCombatStats(),
-  targetting: [{ type: 'Random' }],
-  xp: { min: 3, max: 5, bonusPerLevel: 1 },
-  drops: [
-    ensureDroppedReward({
-      itemId: 'gold-coin' as ItemId,
-      min: 3,
-      max: 10,
-      bonusPerLevel: 1,
-      chance: 100,
-    }),
-  ],
-  skills: [],
-  types: [],
-};
+const goblinId = 'goblin' as MonsterId;
+const staleId = 'stale' as MonsterId;
 
-const fieldRuinsEncounter: EncounterContent = {
-  id: 'field-ruins' as EncounterId,
-  name: 'Field Ruins',
-  __type: 'encounter',
-  description: 'A ruined field.',
-  levelRange: { min: 1, max: 5 },
-  fights: [{ monsters: [{ monsterId: goblin.id }] }],
-  completionRewards: [],
-};
-
-const swampEncounter: EncounterContent = {
-  id: 'swamp' as EncounterId,
-  name: 'Swamp',
-  __type: 'encounter',
-  description: 'A murky swamp.',
-  levelRange: { min: 4, max: 8 },
-  fights: [{ monsters: [] }],
-  completionRewards: [],
-};
-
-const wildsEncounterRandom: EncounterRandomContent = {
-  id: 'wilds' as EncounterRandomId,
-  name: 'The Wilds',
-  __type: 'encounterrandom',
-  description: 'An untamed wilderness.',
-  resetTime: 100,
-  levelRange: { min: 2, max: 6 },
-  encounterRange: { min: 1, max: 1 },
-  combatantRange: { min: 1, max: 1 },
-  creaturePool: [{ monsterId: goblin.id, weight: 1 }],
-  fights: [],
-  completionRewards: [],
-};
-
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  return calls[calls.length - 1][0](state);
+function entry(
+  overrides: Partial<GameStateBestiary[MonsterId]> = {},
+): GameStateBestiary[MonsterId] {
+  return {
+    foundAt: 1000,
+    kills: 1,
+    minLevelFound: 3,
+    maxLevelFound: 3,
+    foundAtNodes: [],
+    ...overrides,
+  };
 }
 
-describe('Bestiary Helper Functions', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+function seedGoblin(overrides?: Partial<GameStateBestiary[MonsterId]>): void {
+  seedGamestate((state) => {
+    if (overrides) state.bestiary[goblinId] = entry(overrides);
+  });
+}
+
+function recordKill(
+  level: number,
+  node?: string,
+): GameStateBestiary[MonsterId] {
+  inTick(() => monsterRecordKill(goblinId, level, node));
+  return bestiaryState()[goblinId];
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.spyOn(Date, 'now').mockReturnValue(5000);
+  seedContent([ensureMonster({ id: goblinId, name: 'Goblin' })]);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe('reading the bestiary', () => {
+  it('reports discovery, kills, locations and the level range fought at', () => {
+    seedGoblin({
+      kills: 4,
+      minLevelFound: 2,
+      maxLevelFound: 7,
+      foundAtNodes: ['Field Ruins', 'Swamp'],
+    });
+
+    expect(isMonsterDiscovered(goblinId)).toBe(true);
+    expect(getMonsterKillCount(goblinId)).toBe(4);
+    expect(getMonsterFoundAtNodes(goblinId)).toEqual(['Field Ruins', 'Swamp']);
+    expect(getMonsterLevelRangeFound(goblinId)).toEqual({ min: 2, max: 7 });
   });
 
-  describe('isMonsterDiscovered', () => {
-    it('returns true when foundAt is set', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 1,
-            minLevelFound: 1,
-            maxLevelFound: 1,
-            foundAtNodes: [],
-          },
-        },
-      } as unknown as GameState);
+  it('reports nothing for a monster never killed', () => {
+    seedGoblin();
 
-      expect(isMonsterDiscovered(goblin.id)).toBe(true);
-    });
+    expect(isMonsterDiscovered(goblinId)).toBe(false);
+    expect(getMonsterKillCount(goblinId)).toBe(0);
+    expect(getMonsterFoundAtNodes(goblinId)).toEqual([]);
+    expect(getMonsterLevelRangeFound(goblinId)).toBeUndefined();
+  });
+});
 
-    it('returns false when the monster has never been killed', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {},
-      } as unknown as GameState);
+describe('monsterRecordKill', () => {
+  it('creates a new entry on the first kill', () => {
+    seedGoblin();
 
-      expect(isMonsterDiscovered(goblin.id)).toBe(false);
-    });
+    expect(recordKill(3, 'Field Ruins')).toEqual(
+      entry({ foundAt: 5000, foundAtNodes: ['Field Ruins'] }),
+    );
   });
 
-  describe('getMonsterKillCount', () => {
-    it('returns the stored kill count', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 4,
-            minLevelFound: 1,
-            maxLevelFound: 3,
-            foundAtNodes: [],
-          },
-        },
-      } as unknown as GameState);
+  it('increments kills and widens the level range in both directions', () => {
+    seedGoblin({ kills: 2, minLevelFound: 3, maxLevelFound: 5 });
 
-      expect(getMonsterKillCount(goblin.id)).toBe(4);
-    });
+    recordKill(7);
+    const result = recordKill(1);
 
-    it('returns 0 when the monster has never been killed', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {},
-      } as unknown as GameState);
-
-      expect(getMonsterKillCount(goblin.id)).toBe(0);
-    });
-  });
-
-  describe('getMonsterFoundAtNodes', () => {
-    it('returns every place the monster has been killed at', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 2,
-            minLevelFound: 1,
-            maxLevelFound: 2,
-            foundAtNodes: ['Field Ruins', 'Swamp'],
-          },
-        },
-      } as unknown as GameState);
-
-      expect(getMonsterFoundAtNodes(goblin.id)).toEqual([
-        'Field Ruins',
-        'Swamp',
-      ]);
-    });
-
-    it('returns an empty array when the monster has never been killed', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {},
-      } as unknown as GameState);
-
-      expect(getMonsterFoundAtNodes(goblin.id)).toEqual([]);
-    });
-  });
-
-  describe('getMonsterLevelRangeFound', () => {
-    it('returns the min/max level actually fought at', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 3,
-            minLevelFound: 2,
-            maxLevelFound: 7,
-            foundAtNodes: [],
-          },
-        },
-      } as unknown as GameState);
-
-      expect(getMonsterLevelRangeFound(goblin.id)).toEqual({ min: 2, max: 7 });
-    });
-
-    it('returns undefined when the monster has never been killed', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {},
-      } as unknown as GameState);
-
-      expect(getMonsterLevelRangeFound(goblin.id)).toBeUndefined();
-    });
-  });
-
-  describe('monsterRecordKill', () => {
-    beforeEach(() => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {},
-      } as unknown as GameState);
-    });
-
-    it('creates a new entry on the first kill', () => {
-      monsterRecordKill(goblin.id, 3, 'Field Ruins');
-
-      const result = applyLastUpdate({ bestiary: {} } as unknown as GameState);
-
-      expect(result.bestiary[goblin.id]).toEqual({
-        foundAt: expect.any(Number),
-        kills: 1,
-        minLevelFound: 3,
-        maxLevelFound: 3,
-        foundAtNodes: ['Field Ruins'],
-      });
-    });
-
-    it('reports the new lifetime kill total to the task system', () => {
-      vi.mocked(updateGamestate).mockImplementationOnce(async (fn) => {
-        fn({
-          bestiary: {
-            [goblin.id]: {
-              foundAt: 1,
-              kills: 4,
-              minLevelFound: 1,
-              maxLevelFound: 1,
-              foundAtNodes: [],
-            },
-          },
-        } as unknown as GameState);
-      });
-
-      monsterRecordKill(goblin.id, 3);
-
-      expect(taskEventMonsterKilled).toHaveBeenCalledWith(goblin.id, 5);
-    });
-
-    it('waits for a deferred write before reporting the kill total', async () => {
-      let flush: () => void = () => undefined;
-      vi.mocked(updateGamestate).mockImplementationOnce(
-        (fn) =>
-          new Promise<void>((resolve) => {
-            flush = () => {
-              fn({ bestiary: {} } as unknown as GameState);
-              resolve();
-            };
-          }),
-      );
-
-      monsterRecordKill(goblin.id, 3);
-      expect(taskEventMonsterKilled).not.toHaveBeenCalled();
-
-      flush();
-      await Promise.resolve();
-      await Promise.resolve();
-
-      expect(taskEventMonsterKilled).toHaveBeenCalledWith(goblin.id, 1);
-    });
-
-    it('increments kills and expands the min/max level found', () => {
-      monsterRecordKill(goblin.id, 7, 'Swamp');
-
-      const result = applyLastUpdate({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 2,
-            minLevelFound: 3,
-            maxLevelFound: 5,
-            foundAtNodes: ['Field Ruins'],
-          },
-        },
-      } as unknown as GameState);
-
-      expect(result.bestiary[goblin.id]).toEqual({
-        foundAt: 1000,
-        kills: 3,
-        minLevelFound: 3,
-        maxLevelFound: 7,
-        foundAtNodes: ['Field Ruins', 'Swamp'],
-      });
-    });
-
-    it('narrows the min level when killed at a lower level than before', () => {
-      monsterRecordKill(goblin.id, 1);
-
-      const result = applyLastUpdate({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 1,
-            minLevelFound: 5,
-            maxLevelFound: 5,
-            foundAtNodes: [],
-          },
-        },
-      } as unknown as GameState);
-
-      expect(result.bestiary[goblin.id].minLevelFound).toBe(1);
-      expect(result.bestiary[goblin.id].maxLevelFound).toBe(5);
-    });
-
-    it('treats a corrupted (NaN) existing range as unset instead of propagating NaN', () => {
-      monsterRecordKill(goblin.id, 4);
-
-      const result = applyLastUpdate({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 1,
-            minLevelFound: NaN,
-            maxLevelFound: NaN,
-            foundAtNodes: [],
-          },
-        },
-      } as unknown as GameState);
-
-      expect(result.bestiary[goblin.id].minLevelFound).toBe(4);
-      expect(result.bestiary[goblin.id].maxLevelFound).toBe(4);
-    });
-
-    it('treats a pre-level-tracking entry (missing min/max) as unset instead of propagating NaN', () => {
-      monsterRecordKill(goblin.id, 4);
-
-      const result = applyLastUpdate({
-        bestiary: {
-          [goblin.id]: { foundAt: 1000, kills: 1 },
-        },
-      } as unknown as GameState);
-
-      expect(result.bestiary[goblin.id].minLevelFound).toBe(4);
-      expect(result.bestiary[goblin.id].maxLevelFound).toBe(4);
-    });
-
-    it('does not duplicate a location it has already been found at', () => {
-      monsterRecordKill(goblin.id, 3, 'Field Ruins');
-
-      const result = applyLastUpdate({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 1,
-            minLevelFound: 3,
-            maxLevelFound: 3,
-            foundAtNodes: ['Field Ruins'],
-          },
-        },
-      } as unknown as GameState);
-
-      expect(result.bestiary[goblin.id].foundAtNodes).toEqual(['Field Ruins']);
-    });
-
-    it('sends an analytics event with the monster name only on the first kill', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {},
-      } as unknown as GameState);
-      vi.mocked(getEntry).mockReturnValue(goblin);
-
-      monsterRecordKill(goblin.id, 3, 'Field Ruins');
-
-      expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-        'Progress:Bestiary:Unlock:Goblin',
-      );
-    });
-
-    it('does not send an analytics event again on repeat kills', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        bestiary: {
-          [goblin.id]: {
-            foundAt: 1000,
-            kills: 1,
-            minLevelFound: 3,
-            maxLevelFound: 3,
-            foundAtNodes: ['Field Ruins'],
-          },
-        },
-      } as unknown as GameState);
-
-      monsterRecordKill(goblin.id, 3, 'Field Ruins');
-
-      expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('pruneInvalidBestiaryEntries', () => {
-    const entry = {
+    expect(result).toMatchObject({
       foundAt: 1000,
-      kills: 1,
+      kills: 4,
       minLevelFound: 1,
-      maxLevelFound: 1,
-      foundAtNodes: [],
+      maxLevelFound: 7,
+    });
+  });
+
+  it('adds each new location once', () => {
+    seedGoblin({ foundAtNodes: ['Field Ruins'] });
+
+    recordKill(3, 'Field Ruins');
+    const result = recordKill(3, 'Swamp');
+
+    expect(result.foundAtNodes).toEqual(['Field Ruins', 'Swamp']);
+  });
+
+  it('treats a non-finite or missing existing range as unset', () => {
+    seedGoblin({ minLevelFound: NaN, maxLevelFound: undefined as never });
+
+    expect(recordKill(4)).toMatchObject({ minLevelFound: 4, maxLevelFound: 4 });
+  });
+
+  it('reports the new lifetime kill total to the task system', () => {
+    seedGoblin({ kills: 4 });
+
+    recordKill(3);
+
+    expect(taskEventMonsterKilled).toHaveBeenCalledWith(goblinId, 5);
+  });
+
+  it('waits for a deferred write before reporting the kill total', async () => {
+    seedGoblin();
+
+    monsterRecordKill(goblinId, 3);
+    expect(taskEventMonsterKilled).not.toHaveBeenCalled();
+
+    await vi.waitFor(() =>
+      expect(taskEventMonsterKilled).toHaveBeenCalledWith(goblinId, 1),
+    );
+  });
+
+  it('sends the bestiary unlock event only on the first kill', () => {
+    seedGoblin();
+    const events = captureAnalyticsEvents();
+
+    recordKill(3);
+    recordKill(3);
+
+    expect(events).toEqual(['Progress:Bestiary:Unlock:Goblin']);
+  });
+});
+
+describe('pruneInvalidBestiaryEntries', () => {
+  it('drops only the entries that no longer resolve to content', () => {
+    expect(
+      pruneInvalidBestiaryEntries({ [goblinId]: entry(), [staleId]: entry() }),
+    ).toEqual({ [goblinId]: entry() });
+  });
+});
+
+describe('repairInvalidBestiaryLevels', () => {
+  it('leaves an entry with a valid level range untouched', () => {
+    const bestiary = {
+      [goblinId]: entry({ minLevelFound: 2, maxLevelFound: 5 }),
     };
 
-    it('keeps entries that resolve to real monster content', () => {
-      vi.mocked(getEntry).mockReturnValue(goblin);
-      const bestiary: GameStateBestiary = { [goblin.id]: entry };
-
-      expect(pruneInvalidBestiaryEntries(bestiary)).toEqual(bestiary);
-    });
-
-    it('drops entries whose monsterId no longer resolves to real content', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
-      const bestiary: GameStateBestiary = { [goblin.id]: entry };
-
-      expect(pruneInvalidBestiaryEntries(bestiary)).toEqual({});
-    });
+    expect(repairInvalidBestiaryLevels(bestiary)).toEqual(bestiary);
   });
 
-  describe('repairInvalidBestiaryLevels', () => {
-    it('leaves an entry with a valid min/max level range untouched', () => {
-      const bestiary: GameStateBestiary = {
-        [goblin.id]: {
-          foundAt: 1000,
-          kills: 2,
-          minLevelFound: 2,
-          maxLevelFound: 5,
-          foundAtNodes: ['Field Ruins'],
-        },
-      };
-
-      expect(repairInvalidBestiaryLevels(bestiary)).toEqual(bestiary);
+  it('collapses a non-finite or missing range to a single unknown level', () => {
+    const repaired = repairInvalidBestiaryLevels({
+      [goblinId]: entry({ minLevelFound: NaN, maxLevelFound: 5 }),
+      [staleId]: { foundAt: 1000, kills: 2, foundAtNodes: [] } as never,
     });
 
-    it('collapses a NaN range to a single unknown level', () => {
-      const bestiary: GameStateBestiary = {
-        [goblin.id]: {
-          foundAt: 1000,
-          kills: 2,
-          minLevelFound: NaN,
-          maxLevelFound: NaN,
-          foundAtNodes: ['Field Ruins'],
-        },
-      };
-
-      expect(repairInvalidBestiaryLevels(bestiary)).toEqual({
-        [goblin.id]: {
-          foundAt: 1000,
-          kills: 2,
-          minLevelFound: 1,
-          maxLevelFound: 1,
-          foundAtNodes: ['Field Ruins'],
-        },
-      });
+    expect(repaired[goblinId]).toMatchObject({
+      minLevelFound: 1,
+      maxLevelFound: 1,
     });
-
-    it('backfills a pre-level-tracking entry missing min/max entirely', () => {
-      const bestiary = {
-        [goblin.id]: { foundAt: 1000, kills: 2, foundAtNodes: [] },
-      } as unknown as GameStateBestiary;
-
-      expect(repairInvalidBestiaryLevels(bestiary)).toEqual({
-        [goblin.id]: {
-          foundAt: 1000,
-          kills: 2,
-          foundAtNodes: [],
-          minLevelFound: 1,
-          maxLevelFound: 1,
-        },
-      });
+    expect(repaired[staleId]).toMatchObject({
+      kills: 2,
+      minLevelFound: 1,
+      maxLevelFound: 1,
     });
   });
+});
 
-  describe('monsterSourceNodeNames', () => {
-    it('includes static encounters that place the monster in a fight', () => {
-      vi.mocked(getEntriesByType).mockImplementation(
-        (type) =>
-          (type === 'encounter'
-            ? [fieldRuinsEncounter, swampEncounter]
-            : []) as never,
-      );
+describe('monsterSourceNodeNames', () => {
+  it('lists static encounters that fight the monster and random nodes that pool it', () => {
+    seedContent([
+      ensureEncounter({
+        id: 'field-ruins' as never,
+        name: 'Field Ruins',
+        fights: [{ monsters: [{ monsterId: goblinId }] }],
+      }),
+      ensureEncounter({
+        id: 'swamp' as never,
+        name: 'Swamp',
+        fights: [{ monsters: [{ monsterId: staleId }] }],
+      }),
+      ensureEncounterRandom({
+        id: 'wilds' as never,
+        name: 'The Wilds',
+        creaturePool: [{ monsterId: goblinId, weight: 1 }],
+      }),
+    ]);
 
-      expect(monsterSourceNodeNames(goblin.id)).toEqual(['Field Ruins']);
-    });
+    expect(monsterSourceNodeNames(goblinId)).toEqual([
+      'Field Ruins',
+      'The Wilds',
+    ]);
+  });
 
-    it('includes encounter-random nodes whose creature pool has the monster', () => {
-      vi.mocked(getEntriesByType).mockImplementation(
-        (type) =>
-          (type === 'encounterrandom' ? [wildsEncounterRandom] : []) as never,
-      );
+  it('is empty when the monster appears nowhere', () => {
+    seedContent([ensureEncounter({ id: 'swamp' as never, name: 'Swamp' })]);
 
-      expect(monsterSourceNodeNames(goblin.id)).toEqual(['The Wilds']);
-    });
-
-    it('returns an empty array when the monster appears nowhere', () => {
-      vi.mocked(getEntriesByType).mockImplementation(
-        (type) => (type === 'encounter' ? [swampEncounter] : []) as never,
-      );
-
-      expect(monsterSourceNodeNames(goblin.id)).toEqual([]);
-    });
+    expect(monsterSourceNodeNames(goblinId)).toEqual([]);
   });
 });

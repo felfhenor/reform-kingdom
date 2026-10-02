@@ -56,6 +56,7 @@ export async function townReputationGain(
 ): Promise<boolean> {
   if (amount <= 0) return false;
 
+  let applied = false;
   let tierChanged = false;
   let newTier = 0;
 
@@ -65,17 +66,14 @@ export async function townReputationGain(
 
     const reputation = clamp(town.reputation + amount, 0, TOWN_REPUTATION_MAX);
     newTier = townReputationTierForAmount(reputation);
-    tierChanged =
-      townReputationTierForAmount(reputation) !==
-      townReputationTierForAmount(town.reputation);
-
-    const node = state.world.towns[townId];
-    if (!node) return state;
-
-    node.reputation = reputation;
+    tierChanged = newTier !== townReputationTierForAmount(town.reputation);
+    town.reputation = reputation;
+    applied = true;
 
     return state;
   });
+
+  if (!applied) return false;
 
   analyticsSendDesignEvent(`Town:Reputation:${source}`);
   if (tierChanged) void taskEventTownReputationTier(townId, newTier);
@@ -92,6 +90,7 @@ export async function townReputationLose(
 ): Promise<boolean> {
   if (amount <= 0) return false;
 
+  let applied = false;
   let tierChanged = false;
 
   await updateGamestate((state) => {
@@ -102,14 +101,13 @@ export async function townReputationLose(
     tierChanged =
       townReputationTierForAmount(reputation) !==
       townReputationTierForAmount(town.reputation);
-
-    const node = state.world.towns[townId];
-    if (!node) return state;
-
-    node.reputation = reputation;
+    town.reputation = reputation;
+    applied = true;
 
     return state;
   });
+
+  if (!applied) return false;
 
   analyticsSendDesignEvent(`Town:Reputation:Lose:${source}`);
 

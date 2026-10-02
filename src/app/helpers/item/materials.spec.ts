@@ -1,27 +1,8 @@
-import type {
-  GameState,
-  GameStateDiscoveredMaterials,
-  GameStateMaterials,
-  ItemContent,
-  MaterialId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    materialsState: () => gamestate().materials,
-    discoveredMaterialsState: () => gamestate().discoveredMaterials,
-  };
-});
-
-import { getEntry } from '@helpers/content/content';
+import { STARTING_GOLD_AMOUNT } from '@helpers/config';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { defaultGameState } from '@helpers/defaults';
 import {
   addMaterial,
   applyMaterialDelta,
@@ -34,464 +15,174 @@ import {
   pruneInvalidDiscoveredMaterials,
   pruneInvalidMaterials,
   removeMaterial,
-  goldCoinId as resolveGoldCoinId,
-  traderTokenId as resolveTraderTokenId,
   spendGold,
 } from '@helpers/item/materials';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gamestate } from '@helpers/state-game';
+import type { GameState, ItemId } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-describe('Material Helper Functions', () => {
-  const goldCoinId = 'gold-coin' as MaterialId;
+const goldId = 'gold-coin' as ItemId;
+const scripId = 'trader-scrip' as ItemId;
+const oreId = 'ore' as ItemId;
+const staleId = 'stale' as ItemId;
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+beforeEach(() => {
+  seedContent([
+    ensureItem({ id: goldId, name: 'Gold Coin' }),
+    ensureItem({ id: scripId, name: 'Trader Scrip' }),
+    ensureItem({ id: oreId, name: 'Ore' }),
+  ]);
+  vi.spyOn(Date, 'now').mockReturnValue(5000);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+function stateWithOre(quantity: number, foundAt = 1000): GameState {
+  const state = defaultGameState();
+  state.materials[oreId] = { quantity, foundAt };
+  state.discoveredMaterials[oreId] = { foundAt };
+  return state;
+}
+
+describe('applyMaterialDelta', () => {
+  it('adds to an existing quantity, preserving foundAt', () => {
+    const state = stateWithOre(5);
+
+    applyMaterialDelta(state, oreId, 10);
+
+    expect(state.materials[oreId]).toEqual({ quantity: 15, foundAt: 1000 });
   });
 
-  describe('goldCoinId', () => {
-    it("resolves the item id of the 'Gold Coin' content entry", () => {
-      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
+  it('creates a new material stamped now, and records it as discovered', () => {
+    const state = defaultGameState();
 
-      expect(resolveGoldCoinId()).toBe(goldCoinId);
-      expect(getEntry).toHaveBeenCalledWith('Gold Coin');
-    });
+    applyMaterialDelta(state, oreId, 3);
+
+    expect(state.materials[oreId]).toEqual({ quantity: 3, foundAt: 5000 });
+    expect(state.discoveredMaterials[oreId]).toEqual({ foundAt: 5000 });
   });
 
-  describe('traderTokenId', () => {
-    it("resolves the item id of the 'Trader Scrip' content entry", () => {
-      const traderTokenId = 'trader-token' as MaterialId;
-      vi.mocked(getEntry).mockReturnValue({ id: traderTokenId } as ItemContent);
+  it('leaves a remaining positive quantity in place when partially subtracted', () => {
+    const state = stateWithOre(10);
 
-      expect(resolveTraderTokenId()).toBe(traderTokenId);
-      expect(getEntry).toHaveBeenCalledWith('Trader Scrip');
-    });
+    applyMaterialDelta(state, oreId, -4);
+
+    expect(state.materials[oreId]).toEqual({ quantity: 6, foundAt: 1000 });
   });
 
-  describe('hasTraderTokens', () => {
-    const traderTokenId = 'trader-token' as MaterialId;
+  it('clamps at 0 and drops the entry once depleted', () => {
+    const state = stateWithOre(10);
 
-    beforeEach(() => {
-      vi.mocked(getEntry).mockReturnValue({ id: traderTokenId } as ItemContent);
-    });
+    applyMaterialDelta(state, oreId, -100);
 
-    it('returns true when the stored quantity meets the requested amount', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        materials: { [traderTokenId]: { quantity: 5, foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(hasTraderTokens(5)).toBe(true);
-    });
-
-    it('returns false when the stored quantity is short', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        materials: { [traderTokenId]: { quantity: 2, foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(hasTraderTokens(3)).toBe(false);
-    });
+    expect(state.materials[oreId]).toBeUndefined();
   });
 
-  describe('applyMaterialDelta', () => {
-    it('adds a positive delta to an existing quantity, preserving foundAt', () => {
-      const state = {
-        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState;
+  it('keeps the original discovery after the material is depleted and regained', () => {
+    const state = stateWithOre(10);
 
-      applyMaterialDelta(state, goldCoinId, 10);
+    applyMaterialDelta(state, oreId, -10);
+    applyMaterialDelta(state, oreId, 3);
 
-      expect(state.materials[goldCoinId]).toEqual({
-        quantity: 15,
-        foundAt: 1000,
-      });
-    });
-
-    it('creates the entry with a fresh foundAt when the material is new', () => {
-      vi.spyOn(Date, 'now').mockReturnValue(1234);
-      const state = {
-        materials: {},
-        discoveredMaterials: {},
-      } as unknown as GameState;
-
-      applyMaterialDelta(state, goldCoinId, 3);
-
-      expect(state.materials[goldCoinId]).toEqual({
-        quantity: 3,
-        foundAt: 1234,
-      });
-
-      vi.restoreAllMocks();
-    });
-
-    it('subtracts a negative delta, clamping at 0 and dropping the entry', () => {
-      const state = {
-        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState;
-
-      applyMaterialDelta(state, goldCoinId, -100);
-
-      expect(state.materials[goldCoinId]).toBeUndefined();
-    });
-
-    it('leaves a remaining positive quantity in place when partially subtracted', () => {
-      const state = {
-        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState;
-
-      applyMaterialDelta(state, goldCoinId, -4);
-
-      expect(state.materials[goldCoinId]).toEqual({
-        quantity: 6,
-        foundAt: 1000,
-      });
-    });
-
-    it('permanently records a positive delta in discoveredMaterials', () => {
-      vi.spyOn(Date, 'now').mockReturnValue(1234);
-      const state = {
-        materials: {},
-        discoveredMaterials: {},
-      } as unknown as GameState;
-
-      applyMaterialDelta(state, goldCoinId, 3);
-
-      expect(state.discoveredMaterials[goldCoinId]).toEqual({ foundAt: 1234 });
-
-      vi.restoreAllMocks();
-    });
-
-    it('does not overwrite an already-recorded discoveredMaterials entry', () => {
-      const state = {
-        materials: {},
-        discoveredMaterials: { [goldCoinId]: { foundAt: 1000 } },
-      } as unknown as GameState;
-
-      applyMaterialDelta(state, goldCoinId, 3);
-
-      expect(state.discoveredMaterials[goldCoinId]).toEqual({ foundAt: 1000 });
-    });
-
-    it('keeps the original discoveredMaterials foundAt after the material is depleted and regained', () => {
-      vi.spyOn(Date, 'now').mockReturnValue(5000);
-      const state = {
-        materials: {},
-        discoveredMaterials: { [goldCoinId]: { foundAt: 1000 } },
-      } as unknown as GameState;
-
-      applyMaterialDelta(state, goldCoinId, -10);
-      applyMaterialDelta(state, goldCoinId, 3);
-
-      expect(state.materials[goldCoinId]).toEqual({
-        quantity: 3,
-        foundAt: 5000,
-      });
-      expect(state.discoveredMaterials[goldCoinId]).toEqual({ foundAt: 1000 });
-
-      vi.restoreAllMocks();
-    });
-
-    it('does not record discoveredMaterials for a negative delta', () => {
-      const state = {
-        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState;
-
-      applyMaterialDelta(state, goldCoinId, -4);
-
-      expect(state.discoveredMaterials[goldCoinId]).toBeUndefined();
-    });
+    expect(state.materials[oreId]).toEqual({ quantity: 3, foundAt: 5000 });
+    expect(state.discoveredMaterials[oreId]).toEqual({ foundAt: 1000 });
   });
 
-  describe('getGoldQuantity/gainGold/spendGold', () => {
-    beforeEach(() => {
-      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
+  it('does not record a discovery for a negative delta', () => {
+    const state = defaultGameState();
+    state.materials[oreId] = { quantity: 10, foundAt: 1000 };
+
+    applyMaterialDelta(state, oreId, -4);
+
+    expect(state.discoveredMaterials[oreId]).toBeUndefined();
+  });
+});
+
+describe('addMaterial/removeMaterial', () => {
+  it('adds to the committed state', () => {
+    seedGamestate((state) => applyMaterialDelta(state, oreId, 5));
+
+    inTick(() => addMaterial(oreId, 10));
+
+    expect(getMaterialQuantity(oreId)).toBe(15);
+  });
+
+  it('subtracts from the committed state, never going negative', () => {
+    seedGamestate((state) => applyMaterialDelta(state, oreId, 5));
+
+    inTick(() => removeMaterial(oreId, 100));
+
+    expect(gamestate().materials[oreId]).toBeUndefined();
+    expect(getMaterialQuantity(oreId)).toBe(0);
+  });
+});
+
+describe('isMaterialDiscovered', () => {
+  it('stays true after the material is fully depleted from storage', () => {
+    seedGamestate((state) => {
+      applyMaterialDelta(state, oreId, 5);
+      applyMaterialDelta(state, oreId, -5);
     });
 
-    it('getGoldQuantity reads the gold material quantity', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        materials: { [goldCoinId]: { quantity: 42, foundAt: 1000 } },
-      } as unknown as GameState);
+    expect(getMaterialQuantity(oreId)).toBe(0);
+    expect(isMaterialDiscovered(oreId)).toBe(true);
+  });
 
-      expect(getGoldQuantity()).toBe(42);
-    });
+  it('is false for a material that has never been found', () => {
+    seedGamestate();
 
-    it('gainGold adds to the gold quantity in place', () => {
-      const state = {
-        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState;
+    expect(isMaterialDiscovered(oreId)).toBe(false);
+  });
+});
 
+describe('gold and trader scrip', () => {
+  it('reads, gains and spends gold through the Gold Coin item', () => {
+    seedGamestate((state) => {
       gainGold(state, 10);
-
-      expect(state.materials[goldCoinId]).toEqual({
-        quantity: 15,
-        foundAt: 1000,
-      });
+      spendGold(state, 4);
     });
 
-    it('spendGold subtracts from the gold quantity in place, clamping at 0', () => {
-      const state = {
-        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState;
-
-      spendGold(state, 100);
-
-      expect(state.materials[goldCoinId]).toBeUndefined();
-    });
+    expect(getGoldQuantity()).toBe(6);
   });
 
-  describe('grantStartingGold', () => {
-    beforeEach(() => {
-      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
-    });
+  it('grants the starting gold on top of any existing gold', () => {
+    const state = defaultGameState();
+    gainGold(state, 5);
 
-    it('grants 100 gold on a fresh state with no existing gold', () => {
-      vi.spyOn(Date, 'now').mockReturnValue(1234);
-      const state = {
-        materials: {},
-        discoveredMaterials: {},
-      } as unknown as GameState;
+    grantStartingGold(state);
 
-      grantStartingGold(state);
-
-      expect(state.materials[goldCoinId]).toEqual({
-        quantity: 100,
-        foundAt: 1234,
-      });
-
-      vi.restoreAllMocks();
-    });
-
-    it('adds 100 gold on top of any existing gold quantity', () => {
-      const state = {
-        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-        discoveredMaterials: {},
-      } as unknown as GameState;
-
-      grantStartingGold(state);
-
-      expect(state.materials[goldCoinId]).toEqual({
-        quantity: 105,
-        foundAt: 1000,
-      });
-    });
+    expect(state.materials[goldId]?.quantity).toBe(STARTING_GOLD_AMOUNT + 5);
   });
 
-  describe('getMaterialQuantity', () => {
-    it('should return the stored quantity for a known material', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-      } as unknown as GameState);
+  it('checks trader scrip against the requested amount', () => {
+    seedGamestate((state) => applyMaterialDelta(state, scripId, 5));
 
-      expect(getMaterialQuantity(goldCoinId)).toBe(5);
-    });
-
-    it('should return 0 for a material that has never been added', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        materials: {},
-      } as unknown as GameState);
-
-      expect(getMaterialQuantity(goldCoinId)).toBe(0);
-    });
+    expect(hasTraderTokens(5)).toBe(true);
+    expect(hasTraderTokens(6)).toBe(false);
   });
+});
 
-  describe('isMaterialDiscovered', () => {
-    it('should return true for a material recorded in discoveredMaterials', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredMaterials: { [goldCoinId]: { foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(isMaterialDiscovered(goldCoinId)).toBe(true);
-    });
-
-    it('should return false for a material that has never been found', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredMaterials: {},
-      } as unknown as GameState);
-
-      expect(isMaterialDiscovered(goldCoinId)).toBe(false);
-    });
-
-    it('should return true for a material fully depleted from current storage', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        materials: {},
-        discoveredMaterials: { [goldCoinId]: { foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(isMaterialDiscovered(goldCoinId)).toBe(true);
-    });
-  });
-
-  describe('addMaterial', () => {
-    it('should add to an existing quantity', () => {
-      addMaterial(goldCoinId, 10);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-        discoveredMaterials: { [goldCoinId]: { foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(result.materials[goldCoinId]).toEqual({
-        quantity: 15,
-        foundAt: 1000,
-      });
-    });
-
-    it('should preserve the original foundAt when topping up an existing material', () => {
-      vi.spyOn(Date, 'now').mockReturnValue(9999);
-
-      addMaterial(goldCoinId, 10);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 5, foundAt: 1000 } },
-        discoveredMaterials: { [goldCoinId]: { foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(result.materials[goldCoinId].foundAt).toBe(1000);
-
-      vi.restoreAllMocks();
-    });
-
-    it('should create the entry when the material is new', () => {
-      vi.spyOn(Date, 'now').mockReturnValue(1234);
-
-      addMaterial(goldCoinId, 3);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        materials: {},
-        discoveredMaterials: {},
-      } as unknown as GameState);
-
-      expect(result.materials[goldCoinId]).toEqual({
-        quantity: 3,
-        foundAt: 1234,
-      });
-      expect(result.discoveredMaterials[goldCoinId]).toEqual({
-        foundAt: 1234,
-      });
-
-      vi.restoreAllMocks();
-    });
-
-    it('should stamp a fresh foundAt when a fully-depleted material is found again', () => {
-      vi.spyOn(Date, 'now').mockReturnValue(5000);
-
-      addMaterial(goldCoinId, 1);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        materials: {},
-        discoveredMaterials: {},
-      } as unknown as GameState);
-
-      expect(result.materials[goldCoinId]).toEqual({
-        quantity: 1,
-        foundAt: 5000,
-      });
-
-      vi.restoreAllMocks();
-    });
-  });
-
-  describe('pruneInvalidMaterials', () => {
-    it('keeps entries that resolve to real content', () => {
-      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
-      const materials: GameStateMaterials = {
-        [goldCoinId]: { quantity: 5, foundAt: 1000 },
-      };
-
-      expect(pruneInvalidMaterials(materials)).toEqual(materials);
-    });
-
-    it('drops entries whose id no longer resolves to real content', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
-      const materials: GameStateMaterials = {
-        [goldCoinId]: { quantity: 5, foundAt: 1000 },
-      };
-
-      expect(pruneInvalidMaterials(materials)).toEqual({});
-    });
-
-    it('prunes only the invalid entries out of a mixed set', () => {
-      const staleId = 'stale-material' as MaterialId;
-      vi.mocked(getEntry).mockImplementation(
-        (id) => (id === goldCoinId ? { id: goldCoinId } : undefined) as never,
-      );
-      const materials: GameStateMaterials = {
-        [goldCoinId]: { quantity: 5, foundAt: 1000 },
+describe('pruneInvalidMaterials', () => {
+  it('drops only the entries that no longer resolve to content', () => {
+    expect(
+      pruneInvalidMaterials({
+        [oreId]: { quantity: 5, foundAt: 1000 },
         [staleId]: { quantity: 2, foundAt: 2000 },
-      };
-
-      expect(pruneInvalidMaterials(materials)).toEqual({
-        [goldCoinId]: { quantity: 5, foundAt: 1000 },
-      });
-    });
-
-    it('returns an empty object for an empty input', () => {
-      expect(pruneInvalidMaterials({})).toEqual({});
-    });
+      }),
+    ).toEqual({ [oreId]: { quantity: 5, foundAt: 1000 } });
   });
+});
 
-  describe('pruneInvalidDiscoveredMaterials', () => {
-    it('keeps entries that resolve to real content', () => {
-      vi.mocked(getEntry).mockReturnValue({ id: goldCoinId } as ItemContent);
-      const discovered: GameStateDiscoveredMaterials = {
-        [goldCoinId]: { foundAt: 1000 },
-      };
-
-      expect(pruneInvalidDiscoveredMaterials(discovered)).toEqual(discovered);
-    });
-
-    it('drops entries whose id no longer resolves to real content', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
-      const discovered: GameStateDiscoveredMaterials = {
-        [goldCoinId]: { foundAt: 1000 },
-      };
-
-      expect(pruneInvalidDiscoveredMaterials(discovered)).toEqual({});
-    });
-  });
-
-  describe('removeMaterial', () => {
-    it('should subtract from the existing quantity while preserving foundAt', () => {
-      removeMaterial(goldCoinId, 4);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(result.materials[goldCoinId]).toEqual({
-        quantity: 6,
-        foundAt: 1000,
-      });
-    });
-
-    it('should remove the entry entirely once it reaches 0', () => {
-      removeMaterial(goldCoinId, 10);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(result.materials[goldCoinId]).toBeUndefined();
-    });
-
-    it('should not go negative when removing more than is available', () => {
-      removeMaterial(goldCoinId, 100);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        materials: { [goldCoinId]: { quantity: 10, foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(result.materials[goldCoinId]).toBeUndefined();
-    });
+describe('pruneInvalidDiscoveredMaterials', () => {
+  it('drops only the entries that no longer resolve to content', () => {
+    expect(
+      pruneInvalidDiscoveredMaterials({
+        [oreId]: { foundAt: 1000 },
+        [staleId]: { foundAt: 2000 },
+      }),
+    ).toEqual({ [oreId]: { foundAt: 1000 } });
   });
 });

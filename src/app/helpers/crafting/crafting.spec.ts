@@ -1,438 +1,303 @@
-import type * as CraftingQueueHelper from '@helpers/crafting/crafting-queue';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/item/collectibles', () => ({
-  isCollectibleDiscovered: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/crafting/crafting-queue', async (importOriginal) => ({
-  craftMaxCraftableQuantity: vi.fn(() => 1),
-  craftMaxQueueableQuantity: (
-    await importOriginal<typeof CraftingQueueHelper>()
-  ).craftMaxQueueableQuantity,
-  requirementAvailable: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  isRecipeCraftable: vi.fn(() => true),
-  recipeBackdropSprite: vi.fn(() => '0099'),
-  recipeResultContent: vi.fn(),
-  recipeResultOwnedQuantity: vi.fn(() => 0),
-  recipeResultSpritesheet: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    tradeskillsState: () => gamestate().tradeskills,
-  };
-});
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { MAX_CRAFTABLE_CAP } from '@helpers/config';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import {
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import {
   craftQueueOrphanedEquipment,
   craftQueueTicksRemaining,
   getCraftableRecipeEntries,
   pruneInvalidCraftQueues,
 } from '@helpers/crafting/crafting';
-import { craftMaxCraftableQuantity } from '@helpers/crafting/crafting-queue';
-import {
-  isRecipeCraftable,
-  recipeResultContent,
-  recipeResultSpritesheet,
-} from '@helpers/crafting/recipes';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { gamestate } from '@helpers/state-game';
+import { defaultTradeskillBuilding } from '@helpers/defaults';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
+  CollectibleId,
   CraftQueueEntry,
-  CraftQueueEntryId,
   EquipmentId,
-  EquipmentItemId,
   GameState,
   GameStateTradeskills,
+  IsContentItem,
   ItemId,
   RecipeContent,
   RecipeId,
   TradeskillBuildingState,
-  TradeskillContent,
   TradeskillId,
 } from '@interfaces';
+import { buildCraftQueueEntry, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-const ARTIFICING_ID = 'artificing-id' as TradeskillId;
-const BLACKSMITHING_ID = 'blacksmithing-id' as TradeskillId;
-const JEWELCRAFTING_ID = 'jewelcrafting-id' as TradeskillId;
-const TAILORING_ID = 'tailoring-id' as TradeskillId;
-const WOODWORKING_ID = 'woodworking-id' as TradeskillId;
+const BLACKSMITHING_ID = 'blacksmithing' as TradeskillId;
+const oreId = 'ore' as ItemId;
+const hammerId = 'hammer' as EquipmentId;
+const daggerId = 'dagger' as EquipmentId;
+const toolId = 'tool' as CollectibleId;
 
-const blacksmithingContent: TradeskillContent = {
-  id: BLACKSMITHING_ID,
-  name: 'Blacksmithing',
-  __type: 'tradeskill',
-  sprite: '0001',
-  description: 'Forges weapons and armor from raw ore.',
-};
+const baseContent: IsContentItem[] = [
+  ensureTradeskill({ id: BLACKSMITHING_ID, name: 'Blacksmithing' }),
+  ensureItem({ id: oreId, name: 'Ore' }),
+  ensureEquipment({ id: hammerId, name: 'Hammer' }),
+  ensureEquipment({ id: daggerId, name: 'Dagger' }),
+  ensureCollectible({ id: toolId, name: 'Tool' }),
+];
 
-function buildRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
-  return {
-    id: 'recipe-1' as RecipeId,
-    name: 'Material: Copper Ingot',
-    __type: 'recipe',
-    result: { itemId: 'copper-ingot' as ItemId, quantity: 1 },
-    requirements: [],
+function recipe(
+  id: string,
+  overrides: Partial<RecipeContent> = {},
+): RecipeContent {
+  return ensureRecipe({
+    id: id as RecipeId,
+    name: id,
     tradeskillId: BLACKSMITHING_ID,
-    minTradeskillLevel: 1,
-    maxTradeskillLevel: 10,
-    tradeskillXP: 1,
-    craftTime: 5,
-    tokenUnlockCost: 3,
+    result: { itemId: oreId, quantity: 1 },
     ...overrides,
-  };
+  });
 }
 
-function buildBuilding(
-  overrides: Partial<TradeskillBuildingState> = {},
-): TradeskillBuildingState {
-  return {
-    level: 1,
-    xp: { current: 0, maximum: 10 },
-    queue: [],
-    ...overrides,
-  };
+function seedBlacksmithing(
+  level: number,
+  edit?: (state: GameState) => void,
+): void {
+  seedGamestate((state) => {
+    state.tradeskills[BLACKSMITHING_ID] = {
+      ...defaultTradeskillBuilding(),
+      level,
+    };
+    edit?.(state);
+  });
 }
 
-function buildAllTradeskills(
-  blacksmithing: TradeskillBuildingState,
-): GameStateTradeskills {
-  return {
-    [ARTIFICING_ID]: buildBuilding(),
-    [BLACKSMITHING_ID]: blacksmithing,
-    [JEWELCRAFTING_ID]: buildBuilding(),
-    [TAILORING_ID]: buildBuilding(),
-    [WOODWORKING_ID]: buildBuilding(),
-  };
+function craftableIds(): string[] {
+  return getCraftableRecipeEntries('Blacksmithing').map(
+    (entry) => entry.recipe.id,
+  );
 }
 
-function buildQueueEntry(
-  overrides: Partial<CraftQueueEntry> = {},
-): CraftQueueEntry {
-  return {
-    id: 'queue-entry-1' as CraftQueueEntryId,
-    recipeId: 'recipe-1' as RecipeId,
-    quantityTotal: 1,
-    quantityCompleted: 0,
-    ticksIntoCraft: 0,
-    reservedEquipment: [],
-    ...overrides,
-  };
+function building(queue: CraftQueueEntry[]): TradeskillBuildingState {
+  return { ...defaultTradeskillBuilding(), queue };
 }
+
+beforeEach(() => seedContent(baseContent));
 
 describe('getCraftableRecipeEntries', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(recipeResultSpritesheet).mockReturnValue('item');
-    vi.mocked(recipeResultContent).mockReturnValue(undefined);
-    vi.mocked(isRecipeCraftable).mockReturnValue(true);
-    vi.mocked(getEntry).mockImplementation((key: string) =>
-      key === 'Blacksmithing' ? (blacksmithingContent as never) : undefined,
-    );
+  it('only includes recipes for this tradeskill that the building has reached', () => {
+    seedContent([
+      ...baseContent,
+      recipe('low', { minTradeskillLevel: 1 }),
+      recipe('high', { minTradeskillLevel: 3 }),
+      recipe('other-tradeskill', { tradeskillId: 'woodworking' as never }),
+    ]);
+    seedBlacksmithing(2);
+
+    expect(craftableIds()).toEqual(['low']);
   });
 
-  it('only includes recipes the building has actually reached', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 2 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe({
-        id: 'low' as RecipeId,
-        name: 'Low',
-        minTradeskillLevel: 1,
-      }),
-      buildRecipe({
-        id: 'high' as RecipeId,
-        name: 'High',
-        minTradeskillLevel: 3,
+  it('excludes a drop-gated recipe until it is discovered', () => {
+    const gated = recipe('gated');
+    seedContent([
+      ...baseContent,
+      gated,
+      recipe('open'),
+      ensureEncounter({
+        id: 'ruins' as never,
+        completionRewards: [ensureDroppedReward({ recipeId: gated.id })],
       }),
     ]);
+    seedBlacksmithing(5);
+    expect(craftableIds()).toEqual(['open']);
 
-    const entries = getCraftableRecipeEntries('Blacksmithing');
-    expect(entries.map((entry) => entry.recipe.id)).toEqual(['low']);
+    seedBlacksmithing(5, (state) => {
+      state.discoveredRecipes[gated.id] = { foundAt: 1 };
+    });
+    expect(craftableIds()).toEqual(['gated', 'open']);
   });
 
-  it('shows the real craftable count but caps the queueable batch at 99', () => {
-    vi.mocked(craftMaxCraftableQuantity).mockReturnValueOnce(250);
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 1 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([buildRecipe()]);
+  it('shows the real craftable count but caps the queueable batch', () => {
+    seedContent([
+      ...baseContent,
+      recipe('ingot', { requirements: [{ itemId: oreId, quantity: 1 }] }),
+    ]);
+    seedBlacksmithing(1, (state) =>
+      applyMaterialDelta(state, oreId, MAX_CRAFTABLE_CAP + 50),
+    );
 
     const [entry] = getCraftableRecipeEntries('Blacksmithing');
-    expect(entry.maxCraftable).toBe(250);
-    expect(entry.maxQueueable).toBe(99);
+
+    expect(entry.maxCraftable).toBe(MAX_CRAFTABLE_CAP + 50);
+    expect(entry.maxQueueable).toBe(MAX_CRAFTABLE_CAP);
   });
 
-  it('excludes a level-gated recipe that also requires a world drop until discovered', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 5 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe({ id: 'undiscovered' as RecipeId, name: 'Undiscovered' }),
-      buildRecipe({ id: 'discovered' as RecipeId, name: 'Discovered' }),
-    ]);
-    vi.mocked(isRecipeCraftable).mockImplementation(
-      (recipeId) => recipeId !== 'undiscovered',
-    );
-
-    const entries = getCraftableRecipeEntries('Blacksmithing');
-    expect(entries.map((entry) => entry.recipe.id)).toEqual(['discovered']);
-  });
-
-  it('sorts by level regardless of craftability, so order stays stable as craftability changes', () => {
-    vi.mocked(craftMaxCraftableQuantity).mockImplementation((recipe) =>
-      recipe.id === 'unaffordable' ? 0 : 1,
-    );
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 5 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe({
-        id: 'unaffordable' as RecipeId,
-        name: 'A - Unaffordable',
-        minTradeskillLevel: 3,
-        requirements: [{ itemId: 'ore' as ItemId, quantity: 1 }],
-      }),
-      buildRecipe({
-        id: 'free' as RecipeId,
-        name: 'Z - Free',
-        minTradeskillLevel: 1,
-        requirements: [],
-      }),
-    ]);
-
-    const entries = getCraftableRecipeEntries('Blacksmithing');
-    expect(entries.map((entry) => entry.recipe.id)).toEqual([
-      'unaffordable',
-      'free',
-    ]);
-  });
-
-  it('sorts by level descending', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 20 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe({
-        id: 'low' as RecipeId,
-        name: 'Low',
-        minTradeskillLevel: 1,
-      }),
-      buildRecipe({
-        id: 'high' as RecipeId,
-        name: 'High',
+  it("sorts by the recipe's own level descending, then result rarity, then name - never by affordability", () => {
+    const result = (id: string, rarity: 'Common' | 'Rare') =>
+      ensureEquipment({ id: id as EquipmentId, name: id, rarity });
+    seedContent([
+      ...baseContent,
+      result('rare-gear', 'Rare'),
+      result('common-gear', 'Common'),
+      recipe('low', { minTradeskillLevel: 1 }),
+      recipe('unaffordable', {
         minTradeskillLevel: 11,
+        requirements: [{ itemId: oreId, quantity: 1 }],
       }),
-      buildRecipe({
-        id: 'mid' as RecipeId,
-        name: 'Mid',
-        minTradeskillLevel: 5,
+      recipe('a-rare', {
+        minTradeskillLevel: 4,
+        result: { equipmentId: 'rare-gear' as EquipmentId },
+      }),
+      recipe('b-common', {
+        minTradeskillLevel: 4,
+        result: { equipmentId: 'common-gear' as EquipmentId },
+      }),
+      recipe('a-common', {
+        minTradeskillLevel: 4,
+        result: { equipmentId: 'common-gear' as EquipmentId },
       }),
     ]);
+    seedBlacksmithing(20);
 
-    const entries = getCraftableRecipeEntries('Blacksmithing');
-    expect(entries.map((entry) => entry.recipe.id)).toEqual([
-      'high',
-      'mid',
+    expect(craftableIds()).toEqual([
+      'unaffordable',
+      'a-common',
+      'b-common',
+      'a-rare',
       'low',
     ]);
   });
 
-  it("sorts by the recipe's own minTradeskillLevel, ignoring the result item's (possibly different) level requirement", () => {
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 20 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe({
-        id: 'same-tier-high-equip-level' as RecipeId,
-        name: 'Coppersilk Robe',
-        minTradeskillLevel: 4,
-      }),
-      buildRecipe({
-        id: 'same-tier-low-equip-level' as RecipeId,
-        name: 'Bone-Hewn Cloak',
-        minTradeskillLevel: 4,
-      }),
-    ]);
-    vi.mocked(recipeResultContent).mockImplementation(
-      (recipe) =>
-        ({
-          levelRequirement: recipe.id === 'same-tier-high-equip-level' ? 6 : 4,
-          rarity: 'Common',
-        }) as never,
-    );
-
-    const entries = getCraftableRecipeEntries('Blacksmithing');
-    expect(entries.map((entry) => entry.recipe.id)).toEqual([
-      'same-tier-low-equip-level',
-      'same-tier-high-equip-level',
-    ]);
-  });
-
-  it('breaks ties at the same minTradeskillLevel by rarity, then name', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 20 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe({
-        id: 'rare-z' as RecipeId,
-        name: 'Z - Rare',
-        minTradeskillLevel: 4,
-      }),
-      buildRecipe({
-        id: 'common-a' as RecipeId,
-        name: 'A - Common',
-        minTradeskillLevel: 4,
-      }),
-      buildRecipe({
-        id: 'common-b' as RecipeId,
-        name: 'B - Common',
-        minTradeskillLevel: 4,
-      }),
-    ]);
-    vi.mocked(recipeResultContent).mockImplementation(
-      (recipe) =>
-        ({ rarity: recipe.id === 'rare-z' ? 'Rare' : 'Common' }) as never,
-    );
-
-    const entries = getCraftableRecipeEntries('Blacksmithing');
-    expect(entries.map((entry) => entry.recipe.id)).toEqual([
-      'common-a',
-      'common-b',
-      'rare-z',
-    ]);
-  });
-
-  it('orders requirement entries collectible, then equipment, then item', () => {
-    vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(buildBuilding({ level: 5 })),
-    } as unknown as GameState);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe({
-        minTradeskillLevel: 1,
+  it('lists requirements collectible, then equipment, then item, with what the player owns', () => {
+    seedContent([
+      ...baseContent,
+      recipe('forge', {
         requirements: [
-          { itemId: 'ore' as ItemId, quantity: 3 },
-          { equipmentId: 'hammer' as EquipmentId },
-          { collectibleId: 'tool' as never },
+          { itemId: oreId, quantity: 3 },
+          { equipmentId: hammerId },
+          { collectibleId: toolId },
         ],
       }),
     ]);
+    seedBlacksmithing(5, (state) => {
+      applyMaterialDelta(state, oreId, 7);
+      state.armory = [buildEquipmentItem(hammerId)];
+    });
 
-    const entries = getCraftableRecipeEntries('Blacksmithing');
-    expect(entries[0].requirementEntries.map((entry) => entry.kind)).toEqual([
-      'collectible',
-      'equipment',
-      'item',
+    const [entry] = getCraftableRecipeEntries('Blacksmithing');
+
+    expect(
+      entry.requirementEntries.map(({ kind, quantity, owned }) => ({
+        kind,
+        quantity,
+        owned,
+      })),
+    ).toEqual([
+      { kind: 'collectible', quantity: 1, owned: 0 },
+      { kind: 'equipment', quantity: 1, owned: 1 },
+      { kind: 'item', quantity: 3, owned: 7 },
     ]);
   });
 });
 
 describe('craftQueueTicksRemaining', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    // Two batches: 3 ore left in an in-progress batch of 5 (craftTime 10),
-    // plus a fresh batch of 2 rings (craftTime 20) not yet started.
-    vi.mocked(gamestate).mockReturnValue({
-      tradeskills: buildAllTradeskills(
-        buildBuilding({
-          queue: [
-            buildQueueEntry({
-              id: 'entry-ore' as CraftQueueEntryId,
-              recipeId: 'ore-recipe' as RecipeId,
-              quantityTotal: 5,
-              quantityCompleted: 2,
-              ticksIntoCraft: 4,
-            }),
-            buildQueueEntry({
-              id: 'entry-ring' as CraftQueueEntryId,
-              recipeId: 'ring-recipe' as RecipeId,
-              quantityTotal: 2,
-              quantityCompleted: 0,
-              ticksIntoCraft: 0,
-            }),
-          ],
+  it('sums the active unit remainder plus every not-yet-started unit', () => {
+    seedContent([
+      ...baseContent,
+      recipe('ore-recipe', { craftTime: 10 }),
+      recipe('ring-recipe', { craftTime: 20 }),
+    ]);
+    seedGamestate((state) => {
+      state.tradeskills[BLACKSMITHING_ID] = building([
+        buildCraftQueueEntry({
+          recipeId: 'ore-recipe' as RecipeId,
+          quantityTotal: 5,
+          quantityCompleted: 2,
+          ticksIntoCraft: 4,
         }),
-      ),
-    } as unknown as GameState);
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'ore-recipe') return buildRecipe({ craftTime: 10 }) as never;
-      if (id === 'ring-recipe') return buildRecipe({ craftTime: 20 }) as never;
-      if (id === 'Blacksmithing') return blacksmithingContent as never;
-      return undefined;
+        buildCraftQueueEntry({
+          recipeId: 'ring-recipe' as RecipeId,
+          quantityTotal: 2,
+        }),
+        buildCraftQueueEntry({ recipeId: 'gone' as RecipeId }),
+      ]);
     });
-  });
 
-  it('sums remaining ticks: the active unit remainder + every not-yet-started unit', () => {
-    // Ore: (10-4) + (5-2-1)*10 = 6 + 20 = 26. Ring: 2*20 = 40. Total 66.
+    // Ore: (10 - 4) + (5 - 2 - 1) * 10 = 26. Ring: 2 * 20 = 40.
     expect(craftQueueTicksRemaining('Blacksmithing')).toBe(66);
   });
 });
 
 describe('pruneInvalidCraftQueues', () => {
-  it('drops queue entries whose recipeId no longer resolves to real content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    const tradeskills: GameStateTradeskills = {
-      [ARTIFICING_ID]: buildBuilding(),
-      [BLACKSMITHING_ID]: buildBuilding({ queue: [buildQueueEntry()] }),
-      [JEWELCRAFTING_ID]: buildBuilding(),
-      [TAILORING_ID]: buildBuilding(),
-      [WOODWORKING_ID]: buildBuilding(),
-    };
-
-    const result = pruneInvalidCraftQueues(tradeskills);
-    expect(result[BLACKSMITHING_ID].queue).toEqual([]);
-  });
-
-  it('backfills reservedEquipment on entries saved before it existed', () => {
-    vi.mocked(getEntry).mockReturnValue(buildRecipe());
-    const legacyEntry = {
-      ...buildQueueEntry(),
+  it('drops entries whose recipe is gone and backfills reservedEquipment on legacy entries', () => {
+    const kept = recipe('kept');
+    seedContent([...baseContent, kept]);
+    const legacy = {
+      ...buildCraftQueueEntry({ recipeId: kept.id }),
       reservedEquipment: undefined,
     } as unknown as CraftQueueEntry;
 
-    const result = pruneInvalidCraftQueues(
-      buildAllTradeskills(buildBuilding({ queue: [legacyEntry] })),
-    );
+    const result = pruneInvalidCraftQueues({
+      [BLACKSMITHING_ID]: building([
+        legacy,
+        buildCraftQueueEntry({ recipeId: 'gone' as RecipeId }),
+      ]),
+    } as GameStateTradeskills);
 
-    expect(result[BLACKSMITHING_ID].queue[0].reservedEquipment).toEqual([]);
+    expect(result[BLACKSMITHING_ID].queue).toEqual([
+      { ...legacy, reservedEquipment: [] },
+    ]);
+  });
+
+  it('drops reserved gear whose equipment no longer exists', () => {
+    const kept = recipe('kept', { requirements: [{ equipmentId: daggerId }] });
+    seedContent([...baseContent, kept]);
+    const dagger = buildEquipmentItem(daggerId);
+
+    const result = pruneInvalidCraftQueues({
+      [BLACKSMITHING_ID]: building([
+        buildCraftQueueEntry({
+          recipeId: kept.id,
+          reservedEquipment: [
+            dagger,
+            buildEquipmentItem('gone' as EquipmentId),
+          ],
+        }),
+      ]),
+    } as GameStateTradeskills);
+
+    expect(result[BLACKSMITHING_ID].queue[0].reservedEquipment).toEqual([
+      dagger,
+    ]);
   });
 });
 
 describe('craftQueueOrphanedEquipment', () => {
-  it('returns gear reserved by entries whose recipe no longer exists', () => {
-    const dagger = {
-      id: 'dagger-1' as EquipmentItemId,
-      equipmentId: 'dagger' as EquipmentId,
-      infusedItemIds: ['ember' as ItemId],
-      affixIds: [],
-    };
-    vi.mocked(getEntry).mockImplementation((key: string) =>
-      key === 'dagger' ? ({ id: 'dagger' } as never) : (undefined as never),
-    );
+  it('returns still-valid gear reserved by entries whose recipe no longer exists', () => {
+    const kept = recipe('kept');
+    seedContent([...baseContent, kept]);
+    const orphaned = buildEquipmentItem(daggerId, { infusedItemIds: [oreId] });
+    const stillQueued = buildEquipmentItem(hammerId);
 
-    const result = craftQueueOrphanedEquipment(
-      buildAllTradeskills(
-        buildBuilding({
-          queue: [buildQueueEntry({ reservedEquipment: [dagger] })],
+    const result = craftQueueOrphanedEquipment({
+      [BLACKSMITHING_ID]: building([
+        buildCraftQueueEntry({
+          recipeId: 'gone' as RecipeId,
+          reservedEquipment: [
+            orphaned,
+            buildEquipmentItem('gone' as EquipmentId),
+          ],
         }),
-      ),
-    );
+        buildCraftQueueEntry({
+          recipeId: kept.id,
+          reservedEquipment: [stillQueued],
+        }),
+      ]),
+    } as GameStateTradeskills);
 
-    expect(result).toEqual([dagger]);
+    expect(result).toEqual([orphaned]);
   });
 });

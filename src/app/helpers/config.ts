@@ -40,6 +40,9 @@ export const MAX_CRAFTABLE_CAP = 99;
 export const TRADESKILL_MAX_LEVEL = 50;
 export const TRADESKILL_XP_START = 10;
 export const TRADESKILL_XP_END = 5000;
+export const TRADESKILL_QUEUE_BASE_SIZE = 2;
+export const TRADESKILL_QUEUE_LEVELS_PER_SLOT = 5;
+export const TRADESKILL_QUEUE_MAX_SIZE = 16;
 
 // Decree
 

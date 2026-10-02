@@ -202,7 +202,7 @@ export function recipeStylizedName(recipe: RecipeContent): string {
   const tradeskill = getEntry<TradeskillContent>(recipe.tradeskillId);
   if (!tradeskill) return recipe.name;
 
-  const baseName = recipe.name.split(':')[1];
+  const baseName = recipe.name.split(':')[1]?.trim() ?? recipe.name;
 
   return `${tradeskill.name} Recipe: ${baseName}`;
 }

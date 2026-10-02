@@ -1,84 +1,26 @@
-import type * as WorldNodeGatheringHelper from '@helpers/world-node/world-node-gathering';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type * as PartyHelper from '@helpers/hero/party';
+import type * as RngHelper from '@helpers/rng';
+import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
-vi.mock('@helpers/hero/character-progress', () => ({
-  partyGainXp: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  categoryMessageLog: vi.fn(),
-  ITEM_ICON_TOKEN: '@@icon@@',
-  itemDropHtml: vi.fn(
-    (item: { name: string }, quantity: number) =>
-      `${quantity} <colored>${item.name}</colored>`,
-  ),
-}));
-
-vi.mock('@helpers/engine/gather-vfx', () => ({
-  gatherVfxEmit: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/luck', () => ({
-  luckRollSucceeds: vi.fn(),
-  partyMaxLuck: vi.fn(),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  addMaterial: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/party', () => ({
+vi.mock('@helpers/hero/character-progress');
+vi.mock('@helpers/hero/luck');
+vi.mock('@helpers/task/task-progress');
+vi.mock('@helpers/hero/party', async (importOriginal) => ({
+  ...(await importOriginal<typeof PartyHelper>()),
   partyGatherYieldBonuses: vi.fn(() => []),
 }));
-
-vi.mock('@helpers/rng', () => ({
-  rngChoiceWeighted: vi.fn(),
+vi.mock('@helpers/rng', async (importOriginal) => ({
+  ...(await importOriginal<typeof RngHelper>()),
   rngSucceedsChance: vi.fn(() => false),
 }));
 
-vi.mock('@helpers/task/task-progress', () => ({
-  taskRecordCraft: vi.fn(),
-  taskRecordEncounterClear: vi.fn(),
-  taskRecordGather: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    globalEffectSumsState: vi.fn(() => ({ gatheringItemDropRateBoost: 0 })),
-    worldGatheringState: () => gamestate().world.gathering,
-    worldPartyState: vi.fn(),
-  };
-});
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeGathering: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering', async (importOriginal) => ({
-  ...(await importOriginal<typeof WorldNodeGatheringHelper>()),
-  gatheringResultsAtLevel: vi.fn((gathering) => gathering.gatherResults),
-}));
-
-vi.mock('@helpers/world-node/world-node-level', () => ({
-  worldNodeLevel: vi.fn(() => 0),
-}));
-
-import { taskRecordGather } from '@helpers/task/task-progress';
-import { categoryMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content/content';
+import { combatLog, ITEM_ICON_TOKEN } from '@helpers/combat/combat-log';
 import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
-import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
 import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses } from '@helpers/hero/party';
@@ -95,810 +37,409 @@ import {
   partyMaxLevel,
   partyMinLevel,
 } from '@helpers/item/gathering';
-import { addMaterial } from '@helpers/item/materials';
-import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
-import {
-  gamestate,
-  globalEffectSumsState,
-  updateGamestate,
-  worldPartyState,
-} from '@helpers/state-game';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
-import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
+import { rngSucceedsChance } from '@helpers/rng';
+import { gamestate, worldGatheringState } from '@helpers/state-game';
+import { taskRecordGather } from '@helpers/task/task-progress';
 import type {
-  Character,
   GameState,
+  GatherResult,
   GatheringContent,
   GatheringId,
-  GlobalEffectSums,
+  GatherVfxEvent,
   ItemId,
   TradeskillId,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-function buildGathering(
+const nodeName = 'Wergen Woods';
+const gatheringId = 'gather-1' as GatheringId;
+const woodId = 'wood' as ItemId;
+const stickId = 'stick' as ItemId;
+const hideId = 'hide' as ItemId;
+const woodworking = 'woodworking' as TradeskillId;
+const tailoring = 'tailoring' as TradeskillId;
+
+function seedGathering(
   overrides: Partial<GatheringContent> = {},
 ): GatheringContent {
-  return ensureGathering({
-    id: 'gather-1' as GatheringId,
-    name: 'Wergen Woods',
-    description: 'A dry forest.',
+  const gathering = ensureGathering({
+    id: gatheringId,
+    name: nodeName,
     levelRange: { min: 1, max: 5 },
     xpGainedIfInLevelRange: 3,
     gatherTime: 5,
-    gatherResults: [],
     ...overrides,
   });
+  seedContent([
+    gathering,
+    ensureItem({ id: woodId, name: 'Wergen Wood', sprite: 'wood-sprite' }),
+    ensureItem({ id: stickId, name: 'Wergen Stick', sprite: 'stick-sprite' }),
+    ensureItem({ id: hideId, name: 'Hide' }),
+  ]);
+  return gathering;
 }
 
-function buildCharacter(level: number, luck = 0): Character {
-  return {
-    id: `char-${level}`,
-    level,
-    stats: { Luck: luck },
-  } as unknown as Character;
+function result(
+  items: GatherResult['items'],
+  overrides: Partial<GatherResult> = {},
+): GatherResult {
+  return ensureGatherResult({ chance: 100, items, ...overrides });
 }
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+function seedParty(...levels: number[]): void {
+  seedGamestate((state) => {
+    state.world.party = levels.map((level) => buildCharacter({ level }));
+  });
 }
 
-describe('partyMinLevel', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+function seedGatheringAt(
+  ticksIntoGather: number,
+  edit?: (state: GameState) => void,
+): void {
+  seedGamestate((state) => {
+    state.world.party = [buildCharacter({ level: 3 })];
+    state.world.gathering = {
+      status: 'Gathering',
+      nodeName,
+      gatheringId,
+      ticksIntoGather,
+    };
+    edit?.(state);
   });
+}
 
-  it('returns the lowest level among party members', () => {
-    vi.mocked(worldPartyState).mockReturnValue([
-      buildCharacter(5),
-      buildCharacter(2),
-      buildCharacter(9),
-    ]);
+function material(itemId: ItemId): number | undefined {
+  return gamestate().materials[itemId]?.quantity;
+}
 
-    expect(partyMinLevel()).toBe(2);
-  });
-
-  it('defaults to 1 when the party is empty', () => {
-    vi.mocked(worldPartyState).mockReturnValue([]);
-
-    expect(partyMinLevel()).toBe(1);
-  });
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(partyGatherYieldBonuses).mockReturnValue([]);
+  vi.mocked(rngSucceedsChance).mockReturnValue(false);
+  vi.mocked(luckRollSucceeds).mockReturnValue(false);
+  seedWorldNodes([
+    { name: nodeName, type: 'GatherNode' },
+    { name: 'Field Ruins', type: 'ExploreNode' },
+  ]);
 });
 
-describe('partyMaxLevel', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+describe('partyMinLevel / partyMaxLevel', () => {
+  it('reads the lowest and highest party level', () => {
+    seedParty(5, 2, 9);
 
-  it('returns the highest level among party members', () => {
-    vi.mocked(worldPartyState).mockReturnValue([
-      buildCharacter(5),
-      buildCharacter(2),
-      buildCharacter(9),
-    ]);
-
+    expect(partyMinLevel()).toBe(2);
     expect(partyMaxLevel()).toBe(9);
   });
 
-  it('defaults to 1 when the party is empty', () => {
-    vi.mocked(worldPartyState).mockReturnValue([]);
+  it('defaults both to 1 for an empty party', () => {
+    seedParty();
 
+    expect(partyMinLevel()).toBe(1);
     expect(partyMaxLevel()).toBe(1);
   });
 });
 
 describe('canEnterGatherNode', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => seedGathering({ levelRange: { min: 3, max: 5 } }));
 
-  it('allows entry when there is no matching node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+  it('allows entry to a missing node or one that is not a gather node', () => {
+    seedParty(1);
 
     expect(canEnterGatherNode('Nowhere')).toBe(true);
-  });
-
-  it('allows entry when the node is not a gather node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(undefined);
-
     expect(canEnterGatherNode('Field Ruins')).toBe(true);
   });
 
-  it('allows entry when the party meets the minimum level', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({ levelRange: { min: 3, max: 5 } }),
-    );
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
+  it('gates only on the minimum level, not the maximum', () => {
+    seedParty(2);
+    expect(canEnterGatherNode(nodeName)).toBe(false);
 
-    expect(canEnterGatherNode('Wergen Woods')).toBe(true);
+    seedParty(3);
+    expect(canEnterGatherNode(nodeName)).toBe(true);
+
+    seedParty(99);
+    expect(canEnterGatherNode(nodeName)).toBe(true);
   });
 
-  it('blocks entry when the party is below the minimum level', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({ levelRange: { min: 3, max: 5 } }),
-    );
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(2)]);
+  it('gates on the lowest-level hero', () => {
+    seedParty(9, 2);
 
-    expect(canEnterGatherNode('Wergen Woods')).toBe(false);
-  });
-
-  it('allows entry when the party is above the maximum level', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({ levelRange: { min: 3, max: 5 } }),
-    );
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(99)]);
-
-    expect(canEnterGatherNode('Wergen Woods')).toBe(true);
+    expect(canEnterGatherNode(nodeName)).toBe(false);
   });
 });
 
 describe('isGathering / currentGatheringContent / gatheringProgressFraction', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldNodeLevel).mockReturnValue(0);
-  });
+  it('reports nothing while idle', () => {
+    seedGathering();
+    seedGamestate();
 
-  it('isGathering reflects the world gathering status', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { gathering: { status: 'Gathering', ticksIntoGather: 0 } },
-    } as unknown as GameState);
-
-    expect(isGathering()).toBe(true);
-  });
-
-  it('gatheringProgressFraction is 0 when idle', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { gathering: { status: 'Idle', ticksIntoGather: 0 } },
-    } as unknown as GameState);
-
+    expect(isGathering()).toBe(false);
+    expect(currentGatheringContent()).toBeUndefined();
     expect(gatheringProgressFraction()).toBe(0);
   });
 
-  it('gatheringProgressFraction reports ticks elapsed over gatherTime, clamped to 1', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 8,
-        },
-      },
-    } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(
-      buildGathering({ gatherTime: 5 }) as never,
-    );
+  it('reports ticks elapsed over gatherTime, clamped to 1', () => {
+    const gathering = seedGathering({ gatherTime: 5 });
+    seedGatheringAt(8);
 
+    expect(isGathering()).toBe(true);
+    expect(currentGatheringContent()).toEqual(gathering);
     expect(gatheringProgressFraction()).toBe(1);
   });
 
-  it('gatheringProgressFraction measures against the upgraded gather time', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 2,
-        },
-      },
-    } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(
-      buildGathering({
-        gatherTime: 6,
-        gatherReductionPerUpgradeLevel: 1,
-      }) as never,
-    );
-    vi.mocked(worldNodeLevel).mockReturnValue(2);
+  it('measures against the upgraded gather time', () => {
+    seedGathering({ gatherTime: 6, gatherReductionPerUpgradeLevel: 1 });
+    seedGatheringAt(2, (state) => {
+      state.gatherNodeLevels[nodeName] = { level: 2 };
+    });
 
     expect(gatheringProgressFraction()).toBe(0.5);
-  });
-
-  it('currentGatheringContent returns undefined without an active gatheringId', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { gathering: { status: 'Idle', ticksIntoGather: 0 } },
-    } as unknown as GameState);
-
-    expect(currentGatheringContent()).toBeUndefined();
   });
 });
 
 describe('gatheringRollResult', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('only ever picks a result with weight', () => {
+    const picked = result([{ itemId: woodId, quantity: 1 }], { chance: 10 });
+    const gathering = seedGathering({
+      gatherResults: [
+        ...Array.from({ length: 9 }, () => result([], { chance: 0 })),
+        picked,
+      ],
+    });
 
-  it('delegates to rngChoiceWeighted over the results available at the given level', () => {
-    const results = [
-      ensureGatherResult({ chance: 40, items: [] }),
-      ensureGatherResult({ chance: 10, items: [] }),
-    ];
-    vi.mocked(rngChoiceWeighted).mockReturnValue(results[1]);
+    const rolls = Array.from({ length: 10 }, () =>
+      gatheringRollResult(gathering, 0),
+    );
 
-    const gathering = buildGathering({ gatherResults: results });
-    expect(gatheringRollResult(gathering, 2)).toBe(results[1]);
-
-    expect(gatheringResultsAtLevel).toHaveBeenCalledWith(gathering, 2);
-
-    const [items, weightFn] = vi.mocked(rngChoiceWeighted).mock.calls[0];
-    expect(items).toEqual(results);
-    expect(weightFn(results[0])).toBe(40);
+    expect(rolls).toEqual(Array.from({ length: 10 }, () => picked));
   });
 });
 
-describe('gatheringStart', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe('gatheringStart / gatheringStop', () => {
+  beforeEach(() => seedGathering({ levelRange: { min: 5, max: 10 } }));
+
+  it('refuses a missing node, a non-gather node, or an underleveled party', () => {
+    seedParty(1);
+    const before = gamestate();
+
+    inTick(() => {
+      expect(gatheringStart('Nowhere')).toBe(false);
+      expect(gatheringStart('Field Ruins')).toBe(false);
+      expect(gatheringStart(nodeName)).toBe(false);
+    });
+
+    expect(gamestate()).toBe(before);
   });
 
-  it('fails when there is no matching node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+  it('starts gathering, logs it, and stops back to idle', () => {
+    seedParty(5);
 
-    expect(gatheringStart('Nowhere')).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('fails when the node is not a gather node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(undefined);
-
-    expect(gatheringStart('Field Ruins')).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('fails when the party is below the level requirement', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({ levelRange: { min: 5, max: 10 } }),
-    );
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(1)]);
-
-    expect(gatheringStart('Wergen Woods')).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('starts gathering and logs the start', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({
-        id: 'gather-1' as GatheringId,
-        levelRange: { min: 1, max: 5 },
-      }),
-    );
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(1)]);
-
-    expect(gatheringStart('Wergen Woods')).toBe(true);
-
-    const result = applyLastUpdate({ world: {} } as unknown as GameState);
-    expect(result.world.gathering).toEqual({
+    expect(inTick(() => gatheringStart(nodeName))).toBe(true);
+    expect(worldGatheringState()).toEqual({
       status: 'Gathering',
-      nodeName: 'Wergen Woods',
-      gatheringId: 'gather-1',
+      nodeName,
+      gatheringId,
       ticksIntoGather: 0,
     });
-  });
-});
-
-describe('gatheringStop', () => {
-  it('resets gathering state to idle', () => {
-    gatheringStop();
-
-    const result = applyLastUpdate({ world: {} } as unknown as GameState);
-    expect(result.world.gathering).toEqual({
-      status: 'Idle',
-      ticksIntoGather: 0,
+    expect(combatLog()[0]).toMatchObject({
+      kind: 'Gather',
+      locationName: nodeName,
     });
+
+    inTick(gatheringStop);
+    expect(isGathering()).toBe(false);
   });
 });
 
 describe('gatheringProcessTick', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    // `vi.clearAllMocks()` doesn't undo a `mockReturnValue` set by an earlier test, so reset these explicitly.
-    vi.mocked(partyGatherYieldBonuses).mockReturnValue([]);
-    vi.mocked(rngSucceedsChance).mockReturnValue(false);
-    vi.mocked(worldNodeLevel).mockReturnValue(0);
-  });
+  function captureVfx(): GatherVfxEvent[] {
+    const events: GatherVfxEvent[] = [];
+    const subscription = gatherVfx$.subscribe((event) => events.push(event));
+    onTestFinished(() => subscription.unsubscribe());
+    return events;
+  }
 
   it('does nothing when not gathering', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { gathering: { status: 'Idle', ticksIntoGather: 0 } },
-    } as unknown as GameState);
+    seedGathering();
+    const before = seedGamestate();
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(gamestate()).toBe(before);
   });
 
   it('accumulates ticks without resolving until gatherTime is reached', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 2,
-        },
-      },
-    } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(
-      buildGathering({ gatherTime: 5 }) as never,
-    );
+    seedGathering({ gatherTime: 5 });
+    seedGatheringAt(2);
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
-    const result = applyLastUpdate({
-      world: { gathering: { ticksIntoGather: 2 } },
-    } as unknown as GameState);
-    expect(result.world.gathering.ticksIntoGather).toBe(3);
+    expect(worldGatheringState().ticksIntoGather).toBe(3);
     expect(partyGainXp).not.toHaveBeenCalled();
   });
 
   it('resolves a cycle sooner on an upgraded node', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 2,
-        },
-      },
-    } as unknown as GameState);
-    vi.mocked(getEntry).mockReturnValue(
-      buildGathering({
-        gatherTime: 5,
-        gatherReductionPerUpgradeLevel: 1,
-      }) as never,
-    );
-    vi.mocked(worldNodeLevel).mockReturnValue(2);
+    seedGathering({ gatherTime: 5, gatherReductionPerUpgradeLevel: 1 });
+    seedGatheringAt(2, (state) => {
+      state.gatherNodeLevels[nodeName] = { level: 2 };
+    });
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
     expect(partyGainXp).toHaveBeenCalled();
-    const result = applyLastUpdate({
-      world: { gathering: { ticksIntoGather: 2 } },
-    } as unknown as GameState);
-    expect(result.world.gathering.ticksIntoGather).toBe(0);
+    expect(worldGatheringState().ticksIntoGather).toBe(0);
   });
 
-  it('resolves a cycle once gatherTime is reached: grants in-range xp, rolls a result, and resets the counter', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
-      gatherResults: [
-        ensureGatherResult({
-          chance: 100,
-          items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
-        }),
-      ],
+  it('resolves a cycle: grants in-range xp and items, logs them, and resets the counter', () => {
+    seedGathering({
+      gatherResults: [result([{ itemId: woodId, quantity: 2 }])],
     });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      if (id === 'wood')
-        return {
-          name: 'Wergen Wood',
-          sprite: 'wergen-wood',
-          rarity: 'Common',
-        } as never;
-      return undefined;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
-    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+    seedGatheringAt(4);
+    const vfx = captureVfx();
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
-    expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
     const xpAtLevel = vi.mocked(partyGainXp).mock.calls[0][0];
     expect([0, 1, 5, 6].map(xpAtLevel)).toEqual([0, 3, 3, 0]);
-    expect(addMaterial).toHaveBeenCalledWith('wood', 2);
-    expect(taskRecordGather).toHaveBeenCalledWith('Wergen Woods', 'wood', 2);
-    expect(gatherVfxEmit).toHaveBeenCalledWith({
-      nodeName: 'Wergen Woods',
-      name: 'Wergen Wood',
-      sprite: 'wergen-wood',
-      spritesheet: 'item',
-      quantity: 2,
-    });
-    expect(categoryMessageLog).toHaveBeenCalledWith(
-      'Gather',
-      'Wergen Woods',
-      expect.any(String),
-      [{ sprite: 'wergen-wood', spritesheet: 'item' }],
-    );
-
-    const result = applyLastUpdate({
-      world: { gathering: { ticksIntoGather: 4 } },
-    } as unknown as GameState);
-    expect(result.world.gathering.ticksIntoGather).toBe(0);
+    expect(material(woodId)).toBe(2);
+    expect(taskRecordGather).toHaveBeenCalledWith(nodeName, woodId, 2);
+    expect(vfx).toEqual([
+      expect.objectContaining({ nodeName, name: 'Wergen Wood', quantity: 2 }),
+    ]);
+    expect(worldGatheringState().ticksIntoGather).toBe(0);
   });
 
-  it('gives every granted item line its own log icon', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
+  it('logs every granted item line with its own icon', () => {
+    seedGathering({
       gatherResults: [
-        ensureGatherResult({
-          chance: 100,
-          items: [
-            { itemId: 'wood' as ItemId, quantity: 2 },
-            { itemId: 'stick' as ItemId, quantity: 1 },
-          ],
-        }),
+        result([
+          { itemId: woodId, quantity: 2 },
+          { itemId: stickId, quantity: 1 },
+        ]),
       ],
     });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      if (id === 'wood')
-        return { name: 'Wergen Wood', sprite: 'wergen-wood' } as never;
-      if (id === 'stick')
-        return { name: 'Wergen Stick', sprite: 'wergen-stick' } as never;
-      return undefined;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
-    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+    seedGatheringAt(4);
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
-    expect(categoryMessageLog).toHaveBeenCalledWith(
-      'Gather',
-      'Wergen Woods',
-      'The party found @@icon@@2 <colored>Wergen Wood</colored>, @@icon@@1 <colored>Wergen Stick</colored>!',
-      [
-        { sprite: 'wergen-wood', spritesheet: 'item' },
-        { sprite: 'wergen-stick', spritesheet: 'item' },
-      ],
-    );
+    const entry = combatLog()[0];
+    expect(entry.message.split(ITEM_ICON_TOKEN)).toHaveLength(3);
+    expect(entry.itemIcons).toEqual([
+      { sprite: 'wood-sprite', spritesheet: 'item' },
+      { sprite: 'stick-sprite', spritesheet: 'item' },
+    ]);
   });
 
-  it('doubles item quantities on a successful luck roll', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
-      gatherResults: [
-        ensureGatherResult({
-          chance: 100,
-          items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
-        }),
-      ],
+  it('doubles item quantities on a successful luck roll at the party max luck', () => {
+    seedGathering({
+      gatherResults: [result([{ itemId: woodId, quantity: 2 }])],
     });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      if (id === 'wood')
-        return { name: 'Wergen Wood', rarity: 'Common' } as never;
-      return undefined;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
+    seedGatheringAt(4);
     vi.mocked(partyMaxLuck).mockReturnValue(50);
     vi.mocked(luckRollSucceeds).mockReturnValue(true);
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
     expect(luckRollSucceeds).toHaveBeenCalledWith(50);
-    expect(addMaterial).toHaveBeenCalledWith('wood', 4);
-    expect(gatherVfxEmit).toHaveBeenCalledWith(
-      expect.objectContaining({ quantity: 4 }),
-    );
+    expect(material(woodId)).toBe(4);
   });
 
-  it("adds a party-wide GatherYield bonus matching the node's tradeskill", () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
+  it("adds a GatherYield bonus matching any of the rolled result's tradeskills, once per cycle", () => {
+    seedGathering({
       gatherResults: [
-        {
-          chance: 100,
-          tradeskillIds: ['Woodworking' as TradeskillId],
-          items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
-        },
+        result(
+          [
+            { itemId: woodId, quantity: 2 },
+            { itemId: stickId, quantity: 1 },
+          ],
+          { tradeskillIds: [woodworking, tailoring] },
+        ),
       ],
     });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      if (id === 'wood')
-        return { name: 'Wergen Wood', rarity: 'Common' } as never;
-      return undefined;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
-    vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    // partyGatherYieldBonuses already combines base equipment + infusion + affix - gathering itself no longer distinguishes the source.
+    seedGatheringAt(4);
     vi.mocked(partyGatherYieldBonuses).mockReturnValue([
-      { tradeskillId: 'Woodworking' as TradeskillId, value: 3 },
-      // A different tradeskill's bonus must not apply to this result.
-      { tradeskillId: 'Blacksmithing' as TradeskillId, value: 100 },
+      { tradeskillId: tailoring, value: 3 },
+      { tradeskillId: 'blacksmithing' as TradeskillId, value: 100 },
     ]);
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
-    expect(addMaterial).toHaveBeenCalledWith('wood', 5);
+    expect(material(woodId)).toBe(5);
+    expect(material(stickId)).toBe(1);
   });
 
-  it("matches a GatherYield bonus against any of a single result's multiple tradeskills", () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
+  it("ignores a GatherYield bonus for another result at the node that wasn't rolled", () => {
+    seedGathering({
       gatherResults: [
-        {
-          chance: 100,
-          tradeskillIds: [
-            'Woodworking' as TradeskillId,
-            'Tailoring' as TradeskillId,
-          ],
-          items: [{ itemId: 'hide' as ItemId, quantity: 1 }],
-        },
-      ],
-    });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      return { name: id, rarity: 'Common' } as never;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
-    vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    // The result lists Woodworking first, but the bonus targets Tailoring - its second tag - and must still match.
-    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
-      { tradeskillId: 'Tailoring' as TradeskillId, value: 4 },
-    ]);
-
-    gatheringProcessTick();
-
-    expect(addMaterial).toHaveBeenCalledWith('hide', 5);
-  });
-
-  it("does not apply a GatherYield bonus to a rolled result whose own tags don't match, even when a different possible result at the same node would", () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const woodResult = {
-      chance: 50,
-      tradeskillIds: ['Woodworking' as TradeskillId],
-      items: [{ itemId: 'wood' as ItemId, quantity: 2 }],
-    };
-    const hideResult = {
-      chance: 50,
-      tradeskillIds: ['Tailoring' as TradeskillId],
-      items: [{ itemId: 'hide' as ItemId, quantity: 1 }],
-    };
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
-      gatherResults: [woodResult, hideResult],
-    });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      return { name: id, rarity: 'Common' } as never;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    // The Woodworking result is the one that actually rolls this cycle.
-    vi.mocked(rngChoiceWeighted).mockReturnValue(woodResult);
-    vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
-      { tradeskillId: 'Tailoring' as TradeskillId, value: 100 },
-    ]);
-
-    gatheringProcessTick();
-
-    expect(addMaterial).toHaveBeenCalledWith('wood', 2);
-  });
-
-  it('applies the GatherYield bonus once per cycle, not once per item line in the result', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
-      gatherResults: [
-        {
-          chance: 100,
-          tradeskillIds: ['Woodworking' as TradeskillId],
-          items: [
-            { itemId: 'wood' as ItemId, quantity: 2 },
-            { itemId: 'stick' as ItemId, quantity: 1 },
-          ],
-        },
-      ],
-    });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      return { name: id, rarity: 'Common' } as never;
-    });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
-    vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
-      { tradeskillId: 'Woodworking' as TradeskillId, value: 3 },
-    ]);
-
-    gatheringProcessTick();
-
-    expect(addMaterial).toHaveBeenCalledWith('wood', 5);
-    expect(addMaterial).toHaveBeenCalledWith('stick', 1);
-  });
-
-  it('grants no xp to a hero who has outleveled the node', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
-      gatherResults: [],
-    });
-    vi.mocked(getEntry).mockReturnValue(gathering as never);
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(99)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
-
-    gatheringProcessTick();
-
-    expect(vi.mocked(partyGainXp).mock.calls[0][0](99)).toBe(0);
-    expect(addMaterial).not.toHaveBeenCalled();
-  });
-
-  it('grants +1 of the first item line on a successful GlobalGatheringItemDropRateBoost roll', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        gathering: {
-          status: 'Gathering',
-          nodeName: 'Wergen Woods',
-          gatheringId: 'gather-1',
-          ticksIntoGather: 4,
-        },
-      },
-    } as unknown as GameState);
-
-    const gathering = buildGathering({
-      gatherTime: 5,
-      levelRange: { min: 1, max: 5 },
-      xpGainedIfInLevelRange: 3,
-      gatherResults: [
-        ensureGatherResult({
-          chance: 100,
-          items: [
-            { itemId: 'wood' as ItemId, quantity: 2 },
-            { itemId: 'stick' as ItemId, quantity: 1 },
-          ],
+        result([{ itemId: woodId, quantity: 2 }], {
+          tradeskillIds: [woodworking],
+        }),
+        result([{ itemId: hideId, quantity: 1 }], {
+          chance: 0,
+          tradeskillIds: [tailoring],
         }),
       ],
     });
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'gather-1') return gathering as never;
-      return { name: id, rarity: 'Common' } as never;
+    seedGatheringAt(4);
+    vi.mocked(partyGatherYieldBonuses).mockReturnValue([
+      { tradeskillId: tailoring, value: 100 },
+    ]);
+
+    inTick(gatheringProcessTick);
+
+    expect(material(woodId)).toBe(2);
+  });
+
+  it('skips zero-quantity item lines entirely', () => {
+    seedGathering({
+      gatherResults: [
+        result([
+          { itemId: woodId, quantity: 0 },
+          { itemId: stickId, quantity: 1 },
+        ]),
+      ],
     });
-    vi.mocked(worldPartyState).mockReturnValue([buildCharacter(3)]);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(gathering.gatherResults[0]);
-    vi.mocked(luckRollSucceeds).mockReturnValue(false);
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      gatheringItemDropRateBoost: 20,
-    } as GlobalEffectSums);
+    seedGatheringAt(4);
+
+    inTick(gatheringProcessTick);
+
+    expect(material(woodId)).toBeUndefined();
+    expect(combatLog()[0].itemIcons).toEqual([
+      { sprite: 'stick-sprite', spritesheet: 'item' },
+    ]);
+  });
+
+  it('grants no items when nothing rolls', () => {
+    seedGathering({ gatherResults: [] });
+    seedGatheringAt(4);
+
+    inTick(gatheringProcessTick);
+
+    expect(gamestate().materials).toEqual({});
+    expect(worldGatheringState().ticksIntoGather).toBe(0);
+  });
+
+  it('grants +1 of the first item line on a successful drop-rate boost roll', () => {
+    seedGathering({
+      gatherResults: [
+        result([
+          { itemId: woodId, quantity: 2 },
+          { itemId: stickId, quantity: 1 },
+        ]),
+      ],
+    });
+    seedGatheringAt(4, (state) => {
+      state.globalEffectSums.gatheringItemDropRateBoost = 20;
+    });
     vi.mocked(rngSucceedsChance).mockReturnValue(true);
 
-    gatheringProcessTick();
+    inTick(gatheringProcessTick);
 
+    expect(gatheringItemDropRateBoost()).toBe(20);
     expect(rngSucceedsChance).toHaveBeenCalledWith(20);
-    expect(addMaterial).toHaveBeenCalledWith('wood', 3);
-    expect(addMaterial).toHaveBeenCalledWith('stick', 1);
-  });
-});
-
-describe('gatheringItemDropRateBoost', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('returns 0 when nothing is active/owned', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      gatheringItemDropRateBoost: 0,
-    } as GlobalEffectSums);
-    expect(gatheringItemDropRateBoost()).toBe(0);
-  });
-
-  it('reads the flat percent from the global effect sums cache', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      gatheringItemDropRateBoost: 30,
-    } as GlobalEffectSums);
-
-    expect(gatheringItemDropRateBoost()).toBe(30);
+    expect(material(woodId)).toBe(3);
+    expect(material(stickId)).toBe(1);
   });
 });

@@ -1,316 +1,223 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/crafting/town-craft-eligibility', () => ({
-  isRecipeCraftableByTown: vi.fn(),
-  isRecipeResultAtOrAboveThreshold: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/town/town-tick', () => ({
-  isTownDueForUpdate: vi.fn(() => true),
-  markTownSubsystemProcessed: vi.fn(),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL } from '@helpers/config';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { defaultGameState } from '@helpers/defaults';
 import {
   pruneInvalidTownSpecialtyPriority,
   resetTownSpecialtyPriority,
   townSpecialtyPriority,
   townSpecialtyPriorityProcessTick,
 } from '@helpers/town/crafting/town-craft-priority-state';
-import {
-  isRecipeCraftableByTown,
-  isRecipeResultAtOrAboveThreshold,
-} from '@helpers/town/crafting/town-craft-eligibility';
-import {
-  isTownDueForUpdate,
-  markTownSubsystemProcessed,
-} from '@helpers/town/town-tick';
 import type {
-  GameState,
+  CraftQueueEntryId,
+  EquipmentId,
+  ItemId,
   RecipeContent,
   RecipeId,
   TownContent,
   TownId,
   TownNodeState,
   TownSpecialtyPriorityEntry,
-  TradeskillId,
 } from '@interfaces';
+import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
-const specialtyId = 'jewelcrafting' as TradeskillId;
-const ringRecipeId = 'ring-recipe' as RecipeId;
+const gemId = 'gem' as ItemId;
+const dustId = 'dust' as ItemId;
+const ringId = 'larsian-ring' as EquipmentId;
 
-function buildTown(bannedRecipeIds: RecipeId[] = []): TownContent {
-  return {
-    id: townId,
-    crafting: {
-      specialtyTradeskillId: specialtyId,
-      uniqueRecipeIds: [ringRecipeId],
-      bannedRecipeIds,
-    },
-  } as unknown as TownContent;
+const ringRecipe = ensureRecipe({
+  id: 'ring-recipe' as RecipeId,
+  requirements: [{ itemId: gemId, quantity: 2 }],
+  result: { equipmentId: ringId },
+});
+const dustRecipe = ensureRecipe({
+  id: 'dust-recipe' as RecipeId,
+  requirements: [{ itemId: gemId, quantity: 2 }],
+  result: { itemId: dustId, quantity: 1 },
+});
+
+function seedTown(
+  specialty: RecipeContent,
+  crafting: Partial<TownContent['crafting']> = {},
+): void {
+  seedContent([
+    ensureTown({
+      id: townId,
+      crafting: {
+        uniqueRecipeIds: [specialty.id],
+        ...crafting,
+      } as TownContent['crafting'],
+      materialThresholds: [
+        { itemId: dustId, maxQuantity: 10 },
+      ] as TownContent['materialThresholds'],
+    }),
+    ringRecipe,
+    dustRecipe,
+  ]);
 }
 
-function buildRecipe(): RecipeContent {
-  return {
-    id: ringRecipeId,
-    tradeskillId: specialtyId,
-    result: { equipmentId: 'larsian-ring' },
-    requirements: [],
-  } as unknown as RecipeContent;
+function seedTownState(overrides: Partial<TownNodeState> = {}): void {
+  seedGamestate((state) => {
+    state.world.towns[townId] = buildTownNodeState(overrides);
+  });
 }
 
-function buildTarget(overrides: Partial<TownNodeState> = {}): TownNodeState {
-  return {
-    craftQueue: [],
-    stock: [],
-    specialtyPriority: [],
-    ...overrides,
-  } as unknown as TownNodeState;
+function priorityAfterTick(): TownSpecialtyPriorityEntry[] {
+  inTick(townSpecialtyPriorityProcessTick);
+  return townSpecialtyPriority(townId);
 }
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(isTownDueForUpdate).mockReturnValue(true);
-  vi.mocked(isRecipeResultAtOrAboveThreshold).mockReturnValue(false);
+const ringFailure = (failureCount: number) => ({
+  recipeId: ringRecipe.id,
+  failureCount,
 });
 
 describe('townSpecialtyPriority', () => {
-  it('returns the stored priority list', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 2 },
-    ];
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { specialtyPriority: priority } } },
-    } as unknown as GameState);
+  it('reads the stored list, or nothing for a town never visited', () => {
+    seedTownState({ specialtyPriority: [ringFailure(2)] });
 
-    expect(townSpecialtyPriority(townId)).toBe(priority);
-  });
-
-  it('is empty when the town has no state entry', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-
-    expect(townSpecialtyPriority(townId)).toEqual([]);
+    expect(townSpecialtyPriority(townId)).toEqual([ringFailure(2)]);
+    expect(townSpecialtyPriority('other' as TownId)).toEqual([]);
   });
 });
 
-function buildState(target: TownNodeState): GameState {
-  const state = {
-    world: { towns: { [townId]: target } },
-  } as unknown as GameState;
-  return state;
-}
-
 describe('resetTownSpecialtyPriority', () => {
-  it('removes the entry for the given recipe', () => {
-    const state = buildState(
-      buildTarget({
-        specialtyPriority: [
-          { recipeId: ringRecipeId, failureCount: 3 },
-          { recipeId: 'other' as RecipeId, failureCount: 1 },
-        ],
-      }),
-    );
+  it('removes only the given recipe', () => {
+    const state = defaultGameState();
+    state.world.towns[townId] = buildTownNodeState({
+      specialtyPriority: [
+        ringFailure(3),
+        { recipeId: dustRecipe.id, failureCount: 1 },
+      ],
+    });
 
-    resetTownSpecialtyPriority(state, townId, ringRecipeId);
+    resetTownSpecialtyPriority(state, townId, ringRecipe.id);
 
     expect(state.world.towns[townId].specialtyPriority).toEqual([
-      { recipeId: 'other', failureCount: 1 },
+      { recipeId: dustRecipe.id, failureCount: 1 },
     ]);
   });
 
-  it('writes nothing when the recipe has no entry', () => {
-    const state = buildState(buildTarget());
-    const previous = state.world.towns;
+  it('leaves the list untouched when the recipe has no entry', () => {
+    const state = defaultGameState();
+    const priority = [{ recipeId: dustRecipe.id, failureCount: 1 }];
+    state.world.towns[townId] = buildTownNodeState({
+      specialtyPriority: priority,
+    });
 
-    resetTownSpecialtyPriority(state, townId, ringRecipeId);
+    resetTownSpecialtyPriority(state, townId, ringRecipe.id);
 
-    expect(state.world.towns).toBe(previous);
-    expect(state.world.towns[townId].specialtyPriority).toEqual([]);
-  });
-
-  it('does not throw when specialtyPriority is missing on a not-yet-migrated town state', () => {
-    const state = buildState({
-      craftQueue: [],
-      stock: [],
-    } as unknown as TownNodeState);
-
-    expect(() =>
-      resetTownSpecialtyPriority(state, townId, ringRecipeId),
-    ).not.toThrow();
-    expect(state.world.towns[townId].specialtyPriority).toEqual([]);
+    expect(state.world.towns[townId].specialtyPriority).toBe(priority);
   });
 });
 
 describe('townSpecialtyPriorityProcessTick', () => {
-  const town = buildTown();
-  const recipe = buildRecipe();
+  it('records a failure for a specialty the town cannot craft, bumping an existing entry', () => {
+    seedTown(ringRecipe);
+    seedTownState();
 
-  beforeEach(() => {
-    vi.mocked(getEntriesByType).mockImplementation(
-      (type) => (type === 'town' ? [town] : []) as never,
-    );
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === ringRecipeId ? recipe : undefined) as never,
-    );
+    expect(priorityAfterTick()).toEqual([ringFailure(1)]);
+
+    seedTownState({ specialtyPriority: [ringFailure(2)] });
+    expect(priorityAfterTick()).toEqual([ringFailure(3)]);
   });
 
-  function applyTick(target: TownNodeState): TownNodeState {
-    townSpecialtyPriorityProcessTick();
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const state = buildState(target);
-    updateFn(state);
-    return state.world.towns[townId];
-  }
+  it('waits out the tick interval between evaluations', () => {
+    seedTown(ringRecipe);
+    seedGamestate((state) => {
+      state.clock.numTicks = 1000;
+      state.world.towns[townId] = buildTownNodeState({
+        lastProcessedTick: { specialty: 1000 },
+      });
+    });
 
-  it('does nothing when the town is not due for the specialty tick', () => {
-    vi.mocked(isTownDueForUpdate).mockReturnValue(false);
+    expect(priorityAfterTick()).toEqual([]);
 
-    townSpecialtyPriorityProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(markTownSubsystemProcessed).not.toHaveBeenCalled();
+    seedGamestate((state) => {
+      state.clock.numTicks = 1000 + TOWN_SPECIALTY_PRIORITY_TICK_INTERVAL;
+      state.world.towns[townId] = buildTownNodeState({
+        lastProcessedTick: { specialty: 1000 },
+      });
+    });
+    expect(priorityAfterTick()).toEqual([ringFailure(1)]);
   });
 
-  it('increments failureCount for an uncraftable, unqueued, unstocked specialty recipe', () => {
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
+  it('does not count a specialty the town can craft but has not picked yet', () => {
+    seedTown(ringRecipe);
+    seedTownState({ materials: { [gemId]: 2 } });
 
-    const result = applyTick(buildTarget());
-
-    expect(result.specialtyPriority).toEqual([
-      { recipeId: ringRecipeId, failureCount: 1 },
-    ]);
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
-      townId,
-      'specialty',
-      expect.any(Number),
-    );
+    expect(priorityAfterTick()).toEqual([]);
   });
 
-  it('does not throw on a not-yet-migrated town state missing specialtyPriority entirely', () => {
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
-    const target = { craftQueue: [], stock: [] } as unknown as TownNodeState;
+  it('does not count a specialty that is already queued or in stock', () => {
+    seedTown(ringRecipe);
 
-    expect(applyTick(target).specialtyPriority).toEqual([
-      { recipeId: ringRecipeId, failureCount: 1 },
-    ]);
+    seedTownState({
+      craftQueue: [
+        {
+          id: 'q1' as CraftQueueEntryId,
+          tradeskillId: 'jewelcrafting' as never,
+          recipeId: ringRecipe.id,
+          ticksIntoCraft: 0,
+        },
+      ],
+    });
+    expect(priorityAfterTick()).toEqual([]);
+
+    seedTownState({
+      stock: [{ equipmentItem: buildEquipmentItem(ringId), addedAtTick: 0 }],
+    });
+    expect(priorityAfterTick()).toEqual([]);
+
+    seedTownState({
+      stock: [
+        {
+          equipmentItem: buildEquipmentItem('axe' as EquipmentId),
+          addedAtTick: 0,
+        },
+      ],
+    });
+    expect(priorityAfterTick()).toEqual([ringFailure(1)]);
   });
 
-  it('bumps an existing entry rather than duplicating it', () => {
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
+  it('ignores a specialty id whose recipe no longer exists', () => {
+    seedTown(ringRecipe, {
+      uniqueRecipeIds: ['gone' as RecipeId, ringRecipe.id],
+    });
+    seedTownState();
 
-    const result = applyTick(
-      buildTarget({
-        specialtyPriority: [{ recipeId: ringRecipeId, failureCount: 2 }],
-      }),
-    );
-
-    expect(result.specialtyPriority).toEqual([
-      { recipeId: ringRecipeId, failureCount: 3 },
-    ]);
+    expect(priorityAfterTick()).toEqual([ringFailure(1)]);
   });
 
-  it('does not increment while the recipe is already craftable (just unpicked)', () => {
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
+  it('does not count a specialty whose output is capped, since more gathering cannot fix that', () => {
+    seedTown(dustRecipe);
+    seedTownState({ materials: { [dustId]: 10 } });
 
-    const result = applyTick(buildTarget());
-
-    expect(result.specialtyPriority).toEqual([]);
+    expect(priorityAfterTick()).toEqual([]);
   });
 
-  it('does not increment while the recipe is already queued', () => {
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
+  it('does not count a specialty the town also bans', () => {
+    seedTown(ringRecipe, { bannedRecipeIds: [ringRecipe.id] });
+    seedTownState();
 
-    const result = applyTick(
-      buildTarget({
-        craftQueue: [
-          {
-            id: 'q1' as never,
-            tradeskillId: specialtyId,
-            recipeId: ringRecipeId,
-            ticksIntoCraft: 0,
-          },
-        ],
-      }),
-    );
-
-    expect(result.specialtyPriority).toEqual([]);
-  });
-
-  it('does not increment while the recipe result is capped at its material threshold - more gathering cannot fix that', () => {
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
-    vi.mocked(isRecipeResultAtOrAboveThreshold).mockReturnValue(true);
-
-    const result = applyTick(buildTarget());
-
-    expect(result.specialtyPriority).toEqual([]);
-  });
-
-  it('does not increment for a recipe banned by the town, even if also (contradictorily) one of its own specialties', () => {
-    const bannedTown = buildTown([ringRecipeId]);
-    vi.mocked(getEntriesByType).mockImplementation(
-      (type) => (type === 'town' ? [bannedTown] : []) as never,
-    );
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
-
-    const result = applyTick(buildTarget());
-
-    expect(result.specialtyPriority).toEqual([]);
-  });
-
-  it('does not increment while the recipe result is currently in shop stock', () => {
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
-
-    const result = applyTick(
-      buildTarget({
-        stock: [
-          {
-            equipmentItem: { equipmentId: 'larsian-ring' } as never,
-            addedAtTick: 0,
-          },
-        ],
-      }),
-    );
-
-    expect(result.specialtyPriority).toEqual([]);
+    expect(priorityAfterTick()).toEqual([]);
   });
 });
 
 describe('pruneInvalidTownSpecialtyPriority', () => {
-  it('keeps entries whose recipe still resolves', () => {
-    vi.mocked(getEntry).mockReturnValue({} as never);
+  it('drops only the entries whose recipe no longer resolves', () => {
+    seedTown(ringRecipe);
 
     expect(
       pruneInvalidTownSpecialtyPriority([
-        { recipeId: ringRecipeId, failureCount: 1 },
+        ringFailure(1),
+        { recipeId: 'gone' as RecipeId, failureCount: 4 },
       ]),
-    ).toEqual([{ recipeId: ringRecipeId, failureCount: 1 }]);
-  });
-
-  it('drops entries whose recipe no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    expect(
-      pruneInvalidTownSpecialtyPriority([
-        { recipeId: ringRecipeId, failureCount: 1 },
-      ]),
-    ).toEqual([]);
+    ).toEqual([ringFailure(1)]);
   });
 });

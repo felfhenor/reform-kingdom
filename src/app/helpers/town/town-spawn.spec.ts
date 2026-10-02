@@ -1,249 +1,142 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldHomeNodeNameState: () => gamestate().world.homeNodeName,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/reputation/town-reputation', () => ({
-  townReputationTier: vi.fn(),
-}));
-
-vi.mock('@helpers/world', () => ({
-  isPartyAtNode: vi.fn(),
-  worldNodeAtCurrentLocation: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  kingdomNodeGet: vi.fn(),
-  worldNodeByName: vi.fn(),
-  worldNodeOutpost: vi.fn(),
-  worldNodeTown: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-outpost', () => ({
-  isOutpostBuilt: vi.fn(),
-}));
-
-import { gamestate } from '@helpers/state-game';
-import { townReputationTier } from '@helpers/town/reputation/town-reputation';
+import { TOWN_HOME_MIN_REPUTATION_TIER } from '@helpers/config';
+import { ensureOutpost } from '@helpers/content/ensure-outpost';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import {
   canSetHomeNode,
   homeNodeGet,
   isPlayerAtHome,
   pruneInvalidHomeNode,
 } from '@helpers/town/town-spawn';
-import { isPartyAtNode, worldNodeAtCurrentLocation } from '@helpers/world';
-import { isOutpostBuilt } from '@helpers/world-node/world-node-outpost';
-import {
-  kingdomNodeGet,
-  worldNodeByName,
-  worldNodeOutpost,
-  worldNodeTown,
-} from '@helpers/world-node/world-nodes';
-import type {
-  GameState,
-  OutpostContent,
-  TownContent,
-  TownId,
-  WorldNodeEntry,
-} from '@interfaces';
+import type { GameState, TownId, WorldNodeEntry } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const townId = 'larsia' as TownId;
+const HONORED = TOWN_REPUTATION_THRESHOLDS[TOWN_HOME_MIN_REPUTATION_TIER];
 
-function buildNode(overrides: Partial<WorldNodeEntry> = {}): WorldNodeEntry {
-  return {
-    mapName: 'LarsianDesert',
-    x: 5,
-    y: 5,
-    nodeName: 'Larsia',
-    nodeData: {} as WorldNodeEntry['nodeData'],
-    ...overrides,
-  };
-}
+let nodes: Record<string, WorldNodeEntry>;
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  seedContent([
+    ensureTown({ id: townId, name: 'Larsia' }),
+    ensureOutpost({ id: 'carrina-outpost' as never, name: 'Carrina Outpost' }),
+  ]);
+  nodes = seedWorldNodes([
+    { name: 'Duchy', type: 'Kingdom' },
+    { name: 'Larsia', type: 'NonPlayerKingdom' },
+    { name: 'Carrina Outpost', type: 'Outpost' },
+    { name: 'Field Ruins', type: 'ExploreNode' },
+  ]);
 });
 
+const homeAt = (name?: string) => (state: GameState) =>
+  (state.world.homeNodeName = name);
+
 describe('homeNodeGet', () => {
-  it('falls back to the kingdom when no home node is set', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { homeNodeName: undefined },
-    } as unknown as GameState);
-    const kingdom = buildNode({ nodeName: 'Duchy' });
-    vi.mocked(kingdomNodeGet).mockReturnValue(kingdom);
+  it('falls back to the kingdom when no home is set', () => {
+    seedGamestate();
 
-    expect(homeNodeGet()).toBe(kingdom);
+    expect(homeNodeGet()).toEqual(nodes['Duchy']);
   });
 
-  it('resolves the designated home town when it still exists', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { homeNodeName: 'Larsia' },
-    } as unknown as GameState);
-    const townNode = buildNode();
-    vi.mocked(worldNodeByName).mockReturnValue(townNode);
-    vi.mocked(worldNodeTown).mockReturnValue({ id: townId } as TownContent);
+  it('resolves a designated home town or outpost', () => {
+    seedGamestate(homeAt('Larsia'));
+    expect(homeNodeGet()).toEqual(nodes['Larsia']);
 
-    expect(homeNodeGet()).toBe(townNode);
+    seedGamestate(homeAt('Carrina Outpost'));
+    expect(homeNodeGet()).toEqual(nodes['Carrina Outpost']);
   });
 
-  it('resolves a designated home outpost', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { homeNodeName: 'Carrina Outpost' },
-    } as unknown as GameState);
-    const outpostNode = buildNode({ nodeName: 'Carrina Outpost' });
-    vi.mocked(worldNodeByName).mockReturnValue(outpostNode);
-    vi.mocked(worldNodeTown).mockReturnValue(undefined);
-    vi.mocked(worldNodeOutpost).mockReturnValue({} as OutpostContent);
+  it('falls back to the kingdom when the home is missing or no longer a town or outpost', () => {
+    seedGamestate(homeAt('Gone'));
+    expect(homeNodeGet()).toEqual(nodes['Duchy']);
 
-    expect(homeNodeGet()).toBe(outpostNode);
-  });
-
-  it('falls back to the kingdom when the designated home node no longer resolves to a Town', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { homeNodeName: 'Larsia' },
-    } as unknown as GameState);
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-    const kingdom = buildNode({ nodeName: 'Duchy' });
-    vi.mocked(kingdomNodeGet).mockReturnValue(kingdom);
-
-    expect(homeNodeGet()).toBe(kingdom);
+    seedGamestate(homeAt('Field Ruins'));
+    expect(homeNodeGet()).toEqual(nodes['Duchy']);
   });
 });
 
 describe('isPlayerAtHome', () => {
-  it('is true when the current location matches the home node', () => {
-    const node = buildNode();
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(node);
-    vi.mocked(gamestate).mockReturnValue({
-      world: { homeNodeName: 'Larsia' },
-    } as unknown as GameState);
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(worldNodeTown).mockReturnValue({ id: townId } as TownContent);
-
+  it('compares the current location against the home node', () => {
+    seedGamestate((state) => {
+      homeAt('Larsia')(state);
+      state.world.currentLocation = locationOf(nodes['Larsia']);
+    });
     expect(isPlayerAtHome()).toBe(true);
-  });
 
-  it('is false when the current location differs from the home node', () => {
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(
-      buildNode({ nodeName: 'SomewhereElse' }),
-    );
-    vi.mocked(gamestate).mockReturnValue({
-      world: { homeNodeName: undefined },
-    } as unknown as GameState);
-    vi.mocked(kingdomNodeGet).mockReturnValue(buildNode({ nodeName: 'Duchy' }));
-
+    seedGamestate((state) => {
+      state.world.currentLocation = locationOf(nodes['Field Ruins']);
+    });
     expect(isPlayerAtHome()).toBe(false);
   });
 });
 
 describe('canSetHomeNode', () => {
-  describe('for a town', () => {
-    beforeEach(() => {
-      vi.mocked(worldNodeTown).mockReturnValue({ id: townId } as TownContent);
+  function seedTown(
+    firstVisitedAtTick: number | undefined,
+    reputation: number,
+  ) {
+    seedGamestate((state) => {
+      state.world.towns[townId] = buildTownNodeState({
+        firstVisitedAtTick,
+        reputation,
+      });
     });
+  }
 
-    it('is false when the town has never been visited', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { towns: {} },
-      } as unknown as GameState);
+  it('allows a town only once visited and at the home reputation tier', () => {
+    seedTown(undefined, HONORED);
+    expect(canSetHomeNode(nodes['Larsia'])).toBe(false);
 
-      expect(canSetHomeNode(buildNode())).toBe(false);
-    });
+    seedTown(10, HONORED - 1);
+    expect(canSetHomeNode(nodes['Larsia'])).toBe(false);
 
-    it('is false when reputation is below Honored', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { towns: { [townId]: { firstVisitedAtTick: 10 } } },
-      } as unknown as GameState);
-      vi.mocked(townReputationTier).mockReturnValue(1);
-
-      expect(canSetHomeNode(buildNode())).toBe(false);
-    });
-
-    it('is true once visited and at Honored+ reputation', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { towns: { [townId]: { firstVisitedAtTick: 10 } } },
-      } as unknown as GameState);
-      vi.mocked(townReputationTier).mockReturnValue(2);
-
-      expect(canSetHomeNode(buildNode())).toBe(true);
-    });
+    seedTown(10, HONORED);
+    expect(canSetHomeNode(nodes['Larsia'])).toBe(true);
   });
 
-  describe('for an outpost', () => {
-    const outpostNode = buildNode({ nodeName: 'Carrina Outpost' });
+  it('allows an outpost only once built and with the party there', () => {
+    const outpost = nodes['Carrina Outpost'];
+    const seedOutpost = (level: number, at: WorldNodeEntry) =>
+      seedGamestate((state) => {
+        state.outposts['Carrina Outpost'] = { level };
+        state.world.currentLocation = locationOf(at);
+      });
 
-    beforeEach(() => {
-      vi.mocked(worldNodeTown).mockReturnValue(undefined);
-      vi.mocked(worldNodeOutpost).mockReturnValue({} as OutpostContent);
-    });
+    seedOutpost(0, outpost);
+    expect(canSetHomeNode(outpost)).toBe(false);
 
-    it('is false until the outpost is built', () => {
-      vi.mocked(isOutpostBuilt).mockReturnValue(false);
-      vi.mocked(isPartyAtNode).mockReturnValue(true);
+    seedOutpost(1, nodes['Field Ruins']);
+    expect(canSetHomeNode(outpost)).toBe(false);
 
-      expect(canSetHomeNode(outpostNode)).toBe(false);
-    });
-
-    it('is false when the party is elsewhere', () => {
-      vi.mocked(isOutpostBuilt).mockReturnValue(true);
-      vi.mocked(isPartyAtNode).mockReturnValue(false);
-
-      expect(canSetHomeNode(outpostNode)).toBe(false);
-    });
-
-    it('is true once built and the party is there', () => {
-      vi.mocked(isOutpostBuilt).mockReturnValue(true);
-      vi.mocked(isPartyAtNode).mockReturnValue(true);
-
-      expect(canSetHomeNode(outpostNode)).toBe(true);
-    });
+    seedOutpost(1, outpost);
+    expect(canSetHomeNode(outpost)).toBe(true);
   });
 
-  it('is false for any other node type', () => {
-    vi.mocked(worldNodeTown).mockReturnValue(undefined);
-    vi.mocked(worldNodeOutpost).mockReturnValue(undefined);
+  it('never allows any other node type, even with outpost-like state', () => {
+    seedGamestate((state) => {
+      state.outposts['Field Ruins'] = { level: 1 };
+      state.world.currentLocation = locationOf(nodes['Field Ruins']);
+    });
 
-    expect(canSetHomeNode(buildNode())).toBe(false);
+    expect(canSetHomeNode(nodes['Field Ruins'])).toBe(false);
   });
 });
 
 describe('pruneInvalidHomeNode', () => {
-  it('passes through undefined', () => {
+  it('keeps a home that is still a town or outpost', () => {
+    expect(pruneInvalidHomeNode('Larsia')).toBe('Larsia');
+    expect(pruneInvalidHomeNode('Carrina Outpost')).toBe('Carrina Outpost');
+  });
+
+  it('drops a home that no longer exists or is no longer a town or outpost', () => {
     expect(pruneInvalidHomeNode(undefined)).toBeUndefined();
-  });
-
-  it('keeps a home node that still resolves to a Town', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(buildNode());
-    vi.mocked(worldNodeTown).mockReturnValue({ id: townId } as TownContent);
-
-    expect(pruneInvalidHomeNode('Larsia')).toBe('Larsia');
-  });
-
-  it('drops a home node whose content no longer resolves', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-
-    expect(pruneInvalidHomeNode('Larsia')).toBeUndefined();
-  });
-
-  it('keeps a home node that resolves to an Outpost', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(buildNode());
-    vi.mocked(worldNodeTown).mockReturnValue(undefined);
-    vi.mocked(worldNodeOutpost).mockReturnValue({} as OutpostContent);
-
-    expect(pruneInvalidHomeNode('Larsia')).toBe('Larsia');
-  });
-
-  it('drops a home node whose node is no longer a Town or Outpost', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(buildNode());
-    vi.mocked(worldNodeTown).mockReturnValue(undefined);
-    vi.mocked(worldNodeOutpost).mockReturnValue(undefined);
-
-    expect(pruneInvalidHomeNode('Larsia')).toBeUndefined();
+    expect(pruneInvalidHomeNode('Gone')).toBeUndefined();
+    expect(pruneInvalidHomeNode('Field Ruins')).toBeUndefined();
   });
 });

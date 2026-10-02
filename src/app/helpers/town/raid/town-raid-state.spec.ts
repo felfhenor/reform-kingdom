@@ -1,36 +1,7 @@
-import type * as EsToolkitCompat from 'es-toolkit/compat';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-  getEntry: vi.fn(),
-}));
-
-// sample() picks randomly - mocked so raidAssaulterMonsterIds/raidAssaulterPreview stay deterministic to test.
-vi.mock('es-toolkit/compat', async (importOriginal) => {
-  const actual = await importOriginal<typeof EsToolkitCompat>();
-  return { ...actual, sample: vi.fn() };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/town-guardian', () => ({
-  townGuardiansForCurrentReputation: vi.fn(() => []),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate } from '@helpers/state-game';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
   isTownCraftDebuffActive,
   raidAssaulterMonsterIds,
@@ -39,214 +10,127 @@ import {
   telegraphedRaidTownIds,
   townRaidTelegraph,
 } from '@helpers/town/raid/town-raid-state';
-import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
 import type {
-  GameState,
-  MonsterContent,
   MonsterId,
   TownContent,
-  TownDefenseAssaulterConfig,
   TownId,
   TownNodeState,
 } from '@interfaces';
-import { sample } from 'es-toolkit/compat';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
+const otherId = 'other' as TownId;
+const citizenId = 'larsian-citizen' as MonsterId;
+const guardId = 'larsian-guard' as MonsterId;
+const staleId = 'stale' as MonsterId;
 
-function buildTownState(overrides: Partial<TownNodeState> = {}): TownNodeState {
-  return {
-    lastProcessedTick: {},
-    stock: [],
-    workers: {},
-    reputation: 0,
-    hiddenGold: 0,
-    materials: {},
-    tradeskills: {},
-    craftQueue: [],
-    commissionSlots: [],
-    specialtyPriority: [],
-    ...overrides,
-  };
+const citizen = ensureMonster({ id: citizenId, name: 'Larsian Citizen' });
+const guard = ensureMonster({ id: guardId, name: 'Larsian Guard' });
+
+const telegraphed: Partial<TownNodeState> = {
+  raidTelegraphedAtTick: 100,
+  raidEngageWindowExpiresAtTick: 500,
+};
+
+function town(
+  id = townId,
+  defense: Partial<TownContent['defense']> = {},
+): TownContent {
+  return ensureTown({
+    id,
+    name: id,
+    defense: defense as TownContent['defense'],
+  });
+}
+
+function seedTowns(states: Partial<Record<TownId, Partial<TownNodeState>>>) {
+  seedGamestate((state) => {
+    Object.entries(states).forEach(([id, townState]) => {
+      state.world.towns[id as TownId] = buildTownNodeState(townState);
+    });
+  });
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(getEntry).mockReturnValue(undefined);
-  vi.mocked(townGuardiansForCurrentReputation).mockReturnValue([]);
+  seedContent([town(), town(otherId), citizen, guard]);
 });
 
 describe('townRaidTelegraph', () => {
-  it('returns the telegraph window and the assaulter list rolled at telegraph time', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: buildTownState({
-            raidTelegraphedAtTick: 100,
-            raidEngageWindowExpiresAtTick: 500,
-            raidTelegraphedAssaulterIds: ['larsian-citizen' as MonsterId],
-          }),
-        },
-      },
-    } as unknown as GameState);
+  it('returns the telegraph window and the assaulters rolled at telegraph time', () => {
+    seedTowns({
+      [townId]: { ...telegraphed, raidTelegraphedAssaulterIds: [citizenId] },
+    });
 
     expect(townRaidTelegraph(townId)).toEqual({
       telegraphedAtTick: 100,
       engageWindowExpiresAtTick: 500,
-      assaulterMonsterIds: ['larsian-citizen' as MonsterId],
+      assaulterMonsterIds: [citizenId],
     });
   });
 
-  it('defaults the assaulter list to empty when unset (legacy save)', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: buildTownState({
-            raidTelegraphedAtTick: 100,
-            raidEngageWindowExpiresAtTick: 500,
-          }),
-        },
+  it('treats a raid telegraphed on tick 0 as pending, defaulting a legacy save to no assaulters', () => {
+    seedTowns({
+      [townId]: {
+        raidTelegraphedAtTick: 0,
+        raidEngageWindowExpiresAtTick: 300,
       },
-    } as unknown as GameState);
+    });
 
-    expect(townRaidTelegraph(townId)?.assaulterMonsterIds).toEqual([]);
+    expect(townRaidTelegraph(townId)).toEqual({
+      telegraphedAtTick: 0,
+      engageWindowExpiresAtTick: 300,
+      assaulterMonsterIds: [],
+    });
   });
 
-  it('treats a raid telegraphed on tick 0 as pending', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: buildTownState({
-            raidTelegraphedAtTick: 0,
-            raidEngageWindowExpiresAtTick: 300,
-          }),
-        },
-      },
-    } as unknown as GameState);
-
-    expect(townRaidTelegraph(townId)?.telegraphedAtTick).toBe(0);
-  });
-
-  it('is undefined when no raid is telegraphed', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: buildTownState() } },
-    } as unknown as GameState);
+  it('is undefined with no raid pending, a half-set window, or no town state', () => {
+    seedTowns({
+      [townId]: {},
+      [otherId]: { raidTelegraphedAtTick: 100 },
+    });
 
     expect(townRaidTelegraph(townId)).toBeUndefined();
-  });
-
-  it('is undefined when the town has no state at all', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-
-    expect(townRaidTelegraph(townId)).toBeUndefined();
-  });
-});
-
-describe('isTownCraftDebuffActive', () => {
-  it('is true while the debuff has not yet expired', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(100);
-
-    expect(
-      isTownCraftDebuffActive(
-        buildTownState({ craftSpeedDebuffExpiresAtTick: 200 }),
-      ),
-    ).toBe(true);
-  });
-
-  it('is false once the debuff has expired', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(300);
-
-    expect(
-      isTownCraftDebuffActive(
-        buildTownState({ craftSpeedDebuffExpiresAtTick: 200 }),
-      ),
-    ).toBe(false);
-  });
-
-  it('is false when no debuff is set', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(100);
-
-    expect(isTownCraftDebuffActive(buildTownState())).toBe(false);
+    expect(townRaidTelegraph(otherId)).toBeUndefined();
+    expect(townRaidTelegraph('unvisited' as TownId)).toBeUndefined();
   });
 });
 
 describe('telegraphedRaidTownIds', () => {
-  it('returns only towns currently telegraphing a raid', () => {
-    const larsia = { id: 'larsia' as TownId, name: 'Larsia' } as TownContent;
-    const other = { id: 'other' as TownId, name: 'Other' } as TownContent;
-    vi.mocked(getEntriesByType).mockReturnValue([larsia, other] as never);
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          larsia: buildTownState({
-            raidTelegraphedAtTick: 100,
-            raidEngageWindowExpiresAtTick: 500,
-          }),
-          other: buildTownState(),
-        },
-      },
-    } as unknown as GameState);
+  it('lists only towns currently telegraphing a raid', () => {
+    seedTowns({ [townId]: telegraphed, [otherId]: {} });
 
-    expect(telegraphedRaidTownIds()).toEqual(['larsia']);
-  });
-
-  it('returns an empty list when nothing is telegraphed', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      { id: 'larsia' as TownId, name: 'Larsia' } as TownContent,
-    ] as never);
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { larsia: buildTownState() } },
-    } as unknown as GameState);
-
-    expect(telegraphedRaidTownIds()).toEqual([]);
+    expect(telegraphedRaidTownIds()).toEqual([townId]);
   });
 });
 
-const citizenId = 'larsian-citizen' as MonsterId;
-const guardId = 'larsian-guard' as MonsterId;
+describe('isTownCraftDebuffActive', () => {
+  it('is active only until the debuff expires', () => {
+    const debuffed = buildTownNodeState({ craftSpeedDebuffExpiresAtTick: 200 });
 
-const citizen: MonsterContent = {
-  id: citizenId,
-  name: 'Larsian Citizen',
-} as MonsterContent;
-const guard: MonsterContent = {
-  id: guardId,
-  name: 'Larsian Guard',
-} as MonsterContent;
+    seedGamestate((state) => (state.clock.numTicks = 199));
+    expect(isTownCraftDebuffActive(debuffed)).toBe(true);
+    expect(isTownCraftDebuffActive(buildTownNodeState())).toBe(false);
 
-function buildTown(overrides: Partial<TownContent> = {}): TownContent {
-  return {
-    id: townId,
-    name: 'Larsia',
-    level: 25,
-    defense: {
-      rewards: [],
-      guardian: { reputationTiers: [] },
-      assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
-      quests: { commissions: [] },
-    },
-    ...overrides,
-  } as TownContent;
-}
+    seedGamestate((state) => (state.clock.numTicks = 200));
+    expect(isTownCraftDebuffActive(debuffed)).toBe(false);
+  });
+});
 
 describe('raidAssaulterMonsterIds', () => {
-  it('draws numMonsters entries, each sampled from monsterIds', () => {
-    vi.mocked(sample).mockReturnValue(citizenId as never);
-    const assaulter: TownDefenseAssaulterConfig = {
-      numMonsters: 5,
+  it('draws numMonsters random picks from the authored monster ids', () => {
+    const result = raidAssaulterMonsterIds({
+      numMonsters: 20,
       monsterIds: [citizenId, guardId],
       level: { min: 1, max: 1 },
-    };
+    });
 
-    const result = raidAssaulterMonsterIds(assaulter);
-
-    expect(result).toHaveLength(5);
-    expect(sample).toHaveBeenCalledTimes(5);
-    expect(sample).toHaveBeenCalledWith(assaulter.monsterIds);
+    expect(result).toHaveLength(20);
+    expect(new Set(result)).toEqual(new Set([citizenId, guardId]));
   });
 
-  it('returns an empty list when no monster ids are authored', () => {
+  it('returns nothing when no monster ids are authored', () => {
     expect(
       raidAssaulterMonsterIds({
         numMonsters: 5,
@@ -254,81 +138,60 @@ describe('raidAssaulterMonsterIds', () => {
         level: { min: 1, max: 1 },
       }),
     ).toEqual([]);
-    expect(sample).not.toHaveBeenCalled();
   });
 });
 
 describe('raidAssaulterPreview', () => {
-  function mockTelegraphedAssaulters(monsterIds: MonsterId[]) {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: buildTownState({
-            raidTelegraphedAtTick: 100,
-            raidEngageWindowExpiresAtTick: 500,
-            raidTelegraphedAssaulterIds: monsterIds,
-          }),
-        },
+  it('counts each distinct telegraphed monster, skipping ones without content', () => {
+    seedTowns({
+      [townId]: {
+        ...telegraphed,
+        raidTelegraphedAssaulterIds: [
+          citizenId,
+          guardId,
+          citizenId,
+          staleId,
+          guardId,
+          citizenId,
+        ],
       },
-    } as unknown as GameState);
-  }
+    });
 
-  it('counts each distinct monster from the list rolled at telegraph time', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === citizenId ? citizen : guard) as never,
-    );
-    mockTelegraphedAssaulters([
-      citizenId,
-      guardId,
-      citizenId,
-      guardId,
-      citizenId,
-    ]);
-
-    expect(raidAssaulterPreview(buildTown())).toEqual([
+    expect(raidAssaulterPreview(town())).toEqual([
       { monster: citizen, quantity: 3 },
       { monster: guard, quantity: 2 },
     ]);
   });
 
-  it('skips a monster id that no longer resolves to content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    mockTelegraphedAssaulters([citizenId, citizenId]);
+  it('is empty when no raid is telegraphed', () => {
+    seedTowns({ [townId]: {} });
 
-    expect(raidAssaulterPreview(buildTown())).toEqual([]);
-  });
-
-  it('is empty when no raid is currently telegraphed', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: buildTownState() } },
-    } as unknown as GameState);
-
-    expect(raidAssaulterPreview(buildTown())).toEqual([]);
+    expect(raidAssaulterPreview(town())).toEqual([]);
   });
 });
 
 describe('raidDefenderPreview', () => {
-  it("resolves the town's current-reputation guardian entries to monster content", () => {
-    vi.mocked(townGuardiansForCurrentReputation).mockReturnValue([
-      { monsterId: citizenId, quantity: 2 },
-      { monsterId: guardId, quantity: 1 },
-    ]);
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === citizenId ? citizen : guard) as never,
-    );
+  it("resolves the current reputation tier's guardians, skipping ones without content", () => {
+    const defended = town(townId, {
+      guardian: {
+        reputationTiers: [
+          {
+            tier: 0,
+            guardians: [
+              { monsterId: citizenId, quantity: 2 },
+              { monsterId: staleId, quantity: 4 },
+              { monsterId: guardId, quantity: 1 },
+            ],
+          },
+          { tier: 1, guardians: [{ monsterId: guardId, quantity: 9 }] },
+        ],
+      } as TownContent['defense']['guardian'],
+    });
+    seedTowns({ [townId]: { reputation: 0 } });
 
-    expect(raidDefenderPreview(buildTown())).toEqual([
+    expect(raidDefenderPreview(defended)).toEqual([
       { monster: citizen, quantity: 2 },
       { monster: guard, quantity: 1 },
     ]);
-  });
-
-  it('skips a guardian entry whose monster id no longer resolves to content', () => {
-    vi.mocked(townGuardiansForCurrentReputation).mockReturnValue([
-      { monsterId: citizenId, quantity: 2 },
-    ]);
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    expect(raidDefenderPreview(buildTown())).toEqual([]);
   });
 });

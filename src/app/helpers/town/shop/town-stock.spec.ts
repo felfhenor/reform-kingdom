@@ -1,30 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 0),
-  formatDuration: vi.fn((ticks) => `formatted:${ticks}`),
-}));
-
-vi.mock('@helpers/item/item-preview', () => ({
-  resolveRewardDisplay: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-import { getEntry } from '@helpers/content/content';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { resolveRewardDisplay } from '@helpers/item/item-preview';
-import { gamestate } from '@helpers/state-game';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureEquipment } from '@helpers/content/ensure-item';
+import { defaultGameState } from '@helpers/defaults';
 import {
   applyTownStockAdd,
   pruneInvalidTownStock,
@@ -32,158 +10,125 @@ import {
   townStockDisplay,
 } from '@helpers/town/shop/town-stock';
 import type {
-  EquipmentContent,
+  AffixId,
+  EquipmentId,
   GameState,
-  ItemPreviewDisplay,
   TownId,
   TownStockEntry,
 } from '@interfaces';
+import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
+const swordId = 'sword' as EquipmentId;
+const flamingId = 'flaming' as AffixId;
 
-function buildEntry(
-  overrides: Partial<TownStockEntry['equipmentItem']> = {},
+function entry(
+  equipmentId: EquipmentId = swordId,
   addedAtTick = 0,
 ): TownStockEntry {
-  return {
-    equipmentItem: {
-      id: 'item-1' as never,
-      equipmentId: 'sword' as never,
-      infusedItemIds: [],
-      affixIds: [],
-      ...overrides,
-    },
-    addedAtTick,
-  };
+  return { equipmentItem: buildEquipmentItem(equipmentId), addedAtTick };
+}
+
+function stateWithStock(stock: TownStockEntry[]): GameState {
+  const state = defaultGameState();
+  state.world.towns[townId] = buildTownNodeState({ stock });
+  return state;
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  seedContent([
+    ensureEquipment({ id: swordId, name: 'Iron Sword' }),
+    ensureAffix({ id: flamingId, name: 'Flaming', position: 'Prefix' }),
+  ]);
 });
 
 describe('townStock', () => {
-  it("reads the town's stock array", () => {
-    const stock = [buildEntry()];
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { stock } } },
-    } as unknown as GameState);
+  it("reads the town's stock, or nothing for a town never visited", () => {
+    const stock = [entry()];
+    seedGamestate((state) => {
+      state.world.towns[townId] = buildTownNodeState({ stock });
+    });
 
     expect(townStock(townId)).toEqual(stock);
-  });
-
-  it('returns an empty array when the town has no state entry', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-
-    expect(townStock(townId)).toEqual([]);
+    expect(townStock('other' as TownId)).toEqual([]);
   });
 });
 
 describe('townStockDisplay', () => {
-  it('resolves the rolled instance so its affixes shape the display', () => {
-    const display = { name: 'Flaming Iron Sword' } as ItemPreviewDisplay;
-    vi.mocked(resolveRewardDisplay).mockReturnValue(display);
-    const entry = buildEntry({ affixIds: ['flaming' as never] });
+  it('shows the rolled instance, affixes included', () => {
+    const rolled: TownStockEntry = {
+      equipmentItem: buildEquipmentItem(swordId, { affixIds: [flamingId] }),
+      addedAtTick: 0,
+    };
 
-    expect(townStockDisplay(entry)).toBe(display);
-    expect(resolveRewardDisplay).toHaveBeenCalledWith({
-      equipmentId: entry.equipmentItem.equipmentId,
-      equipmentItem: entry.equipmentItem,
-    });
+    expect(townStockDisplay(rolled)?.name).toBe('Flaming Iron Sword');
   });
 
-  it('returns undefined without touching affixes when the base content no longer resolves', () => {
-    vi.mocked(resolveRewardDisplay).mockReturnValue(undefined);
-    const entry = buildEntry({ equipmentId: 'removed' as never });
-
-    expect(townStockDisplay(entry)).toBeUndefined();
+  it('is undefined once the base equipment no longer resolves', () => {
+    expect(townStockDisplay(entry('removed' as EquipmentId))).toBeUndefined();
   });
 });
 
 describe('pruneInvalidTownStock', () => {
-  it('keeps an entry that still resolves to content', () => {
-    vi.mocked(getEntry).mockReturnValue({} as EquipmentContent);
-    const entry = buildEntry({}, 5);
+  it('drops entries whose equipment no longer resolves, or that predate equipmentItem', () => {
+    const kept = entry(swordId, 5);
+    const legacy = { itemId: 'ingot', addedAtTick: 5 } as never;
 
-    expect(pruneInvalidTownStock([entry])).toEqual([entry]);
+    expect(
+      pruneInvalidTownStock([kept, entry('removed' as EquipmentId, 5), legacy]),
+    ).toEqual([kept]);
   });
 
-  it('drops an entry whose equipmentId no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const entry = buildEntry({ equipmentId: 'removed-sword' as never }, 5);
+  it('backfills a missing addedAtTick to the current tick rather than zero', () => {
+    seedGamestate((state) => (state.clock.numTicks = 500));
+    const { equipmentItem } = entry();
 
-    expect(pruneInvalidTownStock([entry])).toEqual([]);
-  });
-
-  it('drops a pre-refactor itemId-shaped entry instead of throwing on the missing equipmentItem', () => {
-    vi.mocked(getEntry).mockReturnValue({} as EquipmentContent);
-    const legacyEntry = {
-      itemId: 'ingot',
-      quantity: 3,
-      addedAtTick: 5,
-    } as unknown as TownStockEntry;
-
-    expect(pruneInvalidTownStock([legacyEntry])).toEqual([]);
-  });
-
-  it('backfills a missing addedAtTick (a legacy save) to the current tick rather than zero', () => {
-    vi.mocked(getEntry).mockReturnValue({} as EquipmentContent);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const { equipmentItem } = buildEntry();
-    const withoutTick = { equipmentItem };
-
-    expect(pruneInvalidTownStock([withoutTick as TownStockEntry])).toEqual([
-      { ...withoutTick, addedAtTick: 500 },
-    ]);
+    expect(
+      pruneInvalidTownStock([{ equipmentItem } as TownStockEntry]),
+    ).toEqual([{ equipmentItem, addedAtTick: 500 }]);
   });
 });
 
 describe('applyTownStockAdd', () => {
-  function buildState(stock: unknown[]): GameState {
-    const state = {
-      world: { towns: { [townId]: { stock } } },
-    } as unknown as GameState;
-    return state;
-  }
-
-  it('always appends as its own new entry, stamped with the current tick', () => {
-    const equipmentItem = { id: 'sword-1' } as never;
-    const state = buildState([]);
-    vi.mocked(timerTicksElapsed).mockReturnValue(42);
+  it('appends as its own new entry, stamped with the current tick', () => {
+    seedGamestate((state) => (state.clock.numTicks = 42));
+    const existing = entry();
+    const state = stateWithStock([existing]);
+    const { equipmentItem } = entry();
 
     applyTownStockAdd(state, townId, { equipmentItem }, 10);
 
     expect(state.world.towns[townId].stock).toEqual([
+      existing,
       { equipmentItem, addedAtTick: 42 },
     ]);
   });
 
-  it('does not append a new entry once at cap', () => {
-    const existing = buildEntry({}, 0);
-    const state = buildState([existing]);
+  it('refuses the addition once at cap', () => {
+    const state = stateWithStock([entry()]);
 
     applyTownStockAdd(
       state,
       townId,
-      { equipmentItem: { id: 'new' } as never },
+      { equipmentItem: entry().equipmentItem },
       1,
     );
 
-    expect(state.world.towns[townId].stock).toEqual([existing]);
+    expect(state.world.towns[townId].stock).toHaveLength(1);
   });
 
-  it('does nothing when the town has no state entry', () => {
-    const state = { world: { towns: {} } } as unknown as GameState;
+  it('does nothing for a town never visited', () => {
+    const state = defaultGameState();
 
-    expect(() =>
-      applyTownStockAdd(
-        state,
-        townId,
-        { equipmentItem: { id: 'new' } as never },
-        10,
-      ),
-    ).not.toThrow();
-    expect(state.world.towns[townId]).toBeUndefined();
+    applyTownStockAdd(
+      state,
+      townId,
+      { equipmentItem: entry().equipmentItem },
+      10,
+    );
+
+    expect(state.world.towns).toEqual({});
   });
 });

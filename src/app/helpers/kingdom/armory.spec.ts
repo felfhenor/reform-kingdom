@@ -1,42 +1,14 @@
-import { defaultStats } from '@helpers/defaults';
-import type {
-  AffixId,
-  EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  EquipmentItemId,
-  GameState,
-  ItemId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/item/infusion', () => ({
-  equipmentItemInfusionBonus: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    armoryState: () => gamestate().armory,
-    globalEffectSumsState: () => gamestate().globalEffectSums,
-    discoveredEquipmentState: () => gamestate().discoveredEquipment,
-  };
-});
-
-import { getEntry } from '@helpers/content/content';
-import { equipmentItemInfusionBonus } from '@helpers/item/infusion';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { defaultGameState, defaultStats } from '@helpers/defaults';
 import {
   addArmoryItems,
   armoryAdd,
   armoryAddWithAffixes,
   armoryCap,
-  armoryGet,
   armoryHasRoom,
   armoryHasRoomFor,
   armoryHasRoomForState,
@@ -46,635 +18,345 @@ import {
   isEquipmentDiscovered,
   pruneInvalidArmoryItems,
   pruneInvalidDiscoveredEquipment,
+  RARITY_SELL_MULTIPLIER,
 } from '@helpers/kingdom/armory';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { armoryState, gamestate } from '@helpers/state-game';
+import type {
+  AffixId,
+  EquipmentContent,
+  EquipmentId,
+  EquipmentItem,
+  EquipmentItemId,
+  GameState,
+  GlobalEffectId,
+  ItemId,
+} from '@interfaces';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const sword: EquipmentContent = {
-  id: 'sword' as EquipmentId,
-  name: 'Sword',
-  __type: 'equipment',
-  description: 'A sharp blade.',
-  sprite: '0000',
-  rarity: 'Common',
-  levelRequirement: 1,
-  baseStats: defaultStats(),
-  type: 'Sword',
-  slots: 1,
-  grantedSkillIds: [],
-};
+const swordId = 'sword' as EquipmentId;
+const shieldId = 'shield' as EquipmentId;
+const staleId = 'stale-gear' as EquipmentId;
+const crystalId = 'crystal' as ItemId;
+const sellAffixId = 'affix-sell' as AffixId;
+const overburdenedId = 'overburdened' as GlobalEffectId;
 
-const shield: EquipmentContent = {
-  ...sword,
-  id: 'shield' as EquipmentId,
+const sword = ensureEquipment({ id: swordId, name: 'Sword' });
+const shield = ensureEquipment({
+  id: shieldId,
   name: 'Shield',
-  description: 'A sturdy protective shield.',
   rarity: 'Rare',
-  type: 'Shield',
-};
+});
 
-function buildArmoryItem(equipmentId: EquipmentId): EquipmentItem {
-  return {
-    id: `${equipmentId}-item` as EquipmentItemId,
-    equipmentId,
-    infusedItemIds: [],
-    affixIds: [],
-  };
+beforeEach(() => {
+  seedContent([
+    sword,
+    shield,
+    ensureItem({
+      id: crystalId,
+      name: 'Crystal',
+      infusionStats: { ...defaultStats(), Strength: 3 },
+    }),
+    ensureAffix({
+      id: sellAffixId,
+      name: 'Of Value',
+      effects: [{ kind: 'SellValue', value: 250 }],
+    }),
+    ensureGlobalEffect({ id: overburdenedId, name: 'Overburdened' }),
+  ]);
+});
+
+function items(equipmentId: EquipmentId, count: number): EquipmentItem[] {
+  return Array.from({ length: count }, () => buildEquipmentItem(equipmentId));
 }
 
-describe('Armory Helper Functions', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
+function stateWithArmory(count: number, armorySizeBoost = 0): GameState {
+  const state = defaultGameState();
+  state.armory = items(shieldId, count);
+  state.globalEffectSums.armorySizeBoost = armorySizeBoost;
+  return state;
+}
+
+describe('armory caps', () => {
+  it('raises both caps by any active armory size boost', () => {
+    seedGamestate();
+    const [cap, overflowCap] = [armoryCap(), armoryOverflowCap()];
+    seedGamestate((state) => (state.globalEffectSums.armorySizeBoost = 15));
+
+    expect(armoryCap()).toBe(cap + 15);
+    expect(armoryOverflowCap()).toBeGreaterThan(overflowCap);
   });
 
-  describe('armoryGet', () => {
-    it('returns the armory list from state', () => {
-      const armory = [{ equipmentId: 'sword' as EquipmentId }];
-      vi.mocked(gamestate).mockReturnValue({ armory } as unknown as GameState);
+  it('lets drops overshoot the strict cap', () => {
+    seedGamestate();
 
-      expect(armoryGet()).toBe(armory);
+    expect(armoryOverflowCap()).toBeGreaterThan(armoryCap());
+  });
+});
+
+describe('armoryHasRoomFor / armoryHasRoom', () => {
+  beforeEach(() => seedGamestate());
+
+  it('has room under the strict cap but not at it', () => {
+    expect(armoryHasRoomFor(armoryCap() - 1)).toBe(true);
+    expect(armoryHasRoomFor(armoryCap())).toBe(false);
+  });
+
+  it('allows overflow up to the overflow cap when requested', () => {
+    expect(armoryHasRoomFor(armoryCap(), 1, true)).toBe(true);
+    expect(armoryHasRoomFor(armoryOverflowCap() - 1, 1, true)).toBe(true);
+    expect(armoryHasRoomFor(armoryOverflowCap(), 1, true)).toBe(false);
+  });
+
+  it('accounts for a multi-item quantity', () => {
+    const count = armoryCap() - 5;
+
+    expect(armoryHasRoomFor(count, 5)).toBe(true);
+    expect(armoryHasRoomFor(count, 6)).toBe(false);
+  });
+
+  it('reads the live armory length', () => {
+    seedGamestate((state) => (state.armory = items(shieldId, armoryCap())));
+
+    expect(armoryHasRoom()).toBe(false);
+    expect(armoryHasRoom(1, true)).toBe(true);
+  });
+});
+
+describe('armoryHasRoomForState', () => {
+  beforeEach(() => seedGamestate());
+
+  it('uses the passed state cap, including a boost applied earlier in the same callback', () => {
+    expect(armoryHasRoomForState(stateWithArmory(armoryCap()), 1)).toBe(false);
+    expect(armoryHasRoomForState(stateWithArmory(armoryCap(), 5), 1)).toBe(
+      true,
+    );
+  });
+
+  it('allows overflow up to the state overflow cap when requested', () => {
+    const overflowCap = armoryOverflowCap();
+
+    expect(
+      armoryHasRoomForState(stateWithArmory(overflowCap - 1), 1, true),
+    ).toBe(true);
+    expect(armoryHasRoomForState(stateWithArmory(overflowCap), 1, true)).toBe(
+      false,
+    );
+  });
+});
+
+describe('armoryAdd', () => {
+  it('appends distinct new instances and marks the equipment discovered', () => {
+    seedGamestate((state) => (state.armory = items(shieldId, 1)));
+
+    inTick(() => armoryAdd(swordId, 3));
+
+    const added = armoryState().filter((item) => item.equipmentId === swordId);
+    expect(armoryState()).toHaveLength(4);
+    expect(new Set(added.map((item) => item.id)).size).toBe(3);
+    expect(isEquipmentDiscovered(swordId)).toBe(true);
+  });
+
+  it('does nothing for a zero or negative quantity', () => {
+    const before = seedGamestate();
+
+    inTick(() => {
+      armoryAdd(swordId, 0);
+      armoryAdd(swordId, -1);
     });
+
+    expect(gamestate()).toBe(before);
   });
 
-  function mockZeroArmoryBoost(): void {
-    vi.mocked(gamestate).mockReturnValue({
-      globalEffectSums: { armorySizeBoost: 0 },
-    } as unknown as GameState);
+  it('preserves the original discovery timestamp on repeat finds', () => {
+    seedGamestate((state) => {
+      state.discoveredEquipment[swordId] = { foundAt: 1000 };
+    });
+
+    inTick(() => armoryAdd(swordId));
+
+    expect(gamestate().discoveredEquipment[swordId]).toEqual({ foundAt: 1000 });
+  });
+
+  it('returns how many were admitted once the strict cap is reached', () => {
+    seedGamestate((state) => (state.armory = items(shieldId, armoryCap())));
+
+    expect(inTick(() => armoryAdd(swordId, 3))).toBe(0);
+    expect(armoryState()).toHaveLength(armoryCap());
+  });
+});
+
+describe('addArmoryItems - cap clamping', () => {
+  beforeEach(() => seedGamestate());
+
+  it('admits only as many as fit under the strict cap', () => {
+    const state = stateWithArmory(armoryCap() - 2);
+
+    const admitted = addArmoryItems(state, swordId, items(swordId, 5));
+
+    expect(admitted).toHaveLength(2);
+    expect(state.armory).toHaveLength(armoryCap());
+  });
+
+  it('admits up to the overflow cap when allowOverflow is set', () => {
+    const state = stateWithArmory(armoryOverflowCap() - 2);
+
+    const admitted = addArmoryItems(state, swordId, items(swordId, 5), true);
+
+    expect(admitted).toHaveLength(2);
+    expect(state.armory).toHaveLength(armoryOverflowCap());
+  });
+
+  it('ignores the cap entirely when bypassCap is set', () => {
+    const state = stateWithArmory(armoryOverflowCap());
+
+    const admitted = addArmoryItems(
+      state,
+      swordId,
+      items(swordId, 5),
+      false,
+      true,
+    );
+
+    expect(admitted).toHaveLength(5);
+  });
+
+  it('does not mark discovery when nothing was admitted', () => {
+    const state = stateWithArmory(armoryCap());
+
+    addArmoryItems(state, swordId, items(swordId, 1));
+
+    expect(state.discoveredEquipment[swordId]).toBeUndefined();
+  });
+
+  it('syncs the armory-fullness global effect when an add reaches the cap', () => {
+    const state = stateWithArmory(armoryCap() - 1);
+
+    addArmoryItems(state, swordId, items(swordId, 1));
+
+    expect(state.globalEffects.map((effect) => effect.id)).toEqual([
+      overburdenedId,
+    ]);
+  });
+});
+
+describe('armoryAddWithAffixes', () => {
+  it('appends one item carrying exactly the given affixes, even past the cap', () => {
+    const affixIds = ['affix-str', 'affix-vit'] as AffixId[];
+    seedGamestate((state) => (state.armory = items(shieldId, armoryCap())));
+
+    inTick(() => armoryAddWithAffixes(swordId, affixIds));
+
+    expect(armoryState().at(-1)).toMatchObject({
+      equipmentId: swordId,
+      affixIds,
+    });
+    expect(isEquipmentDiscovered(swordId)).toBe(true);
+  });
+});
+
+describe('isEquipmentDiscovered', () => {
+  it('stays true after the equipment leaves the armory', () => {
+    seedGamestate((state) => {
+      state.discoveredEquipment[swordId] = { foundAt: 1000 };
+    });
+
+    expect(isEquipmentDiscovered(swordId)).toBe(true);
+    expect(isEquipmentDiscovered(shieldId)).toBe(false);
+  });
+});
+
+describe('pruneInvalidDiscoveredEquipment', () => {
+  it('drops only the entries that no longer resolve to content', () => {
+    expect(
+      pruneInvalidDiscoveredEquipment({
+        [swordId]: { foundAt: 1000 },
+        [staleId]: { foundAt: 1000 },
+      }),
+    ).toEqual({ [swordId]: { foundAt: 1000 } });
+  });
+});
+
+describe('pruneInvalidArmoryItems', () => {
+  it('drops only the items that no longer resolve to content', () => {
+    const kept = buildEquipmentItem(swordId);
+
+    expect(
+      pruneInvalidArmoryItems([kept, buildEquipmentItem(staleId)]),
+    ).toEqual([kept]);
+  });
+});
+
+describe('getArmoryEntries', () => {
+  it('returns one entry per owned item, without merging duplicates, sorted by rarity then name', () => {
+    const swordItem1 = buildEquipmentItem(swordId, {
+      id: 'sword-1' as EquipmentItemId,
+    });
+    const shieldItem = buildEquipmentItem(shieldId);
+    const swordItem2 = buildEquipmentItem(swordId, {
+      id: 'sword-2' as EquipmentItemId,
+    });
+    seedGamestate((state) => {
+      state.armory = [swordItem1, shieldItem, swordItem2, ...items(staleId, 1)];
+    });
+
+    expect(getArmoryEntries()).toEqual([
+      { item: shieldItem, content: shield },
+      { item: swordItem1, content: sword },
+      { item: swordItem2, content: sword },
+    ]);
+  });
+});
+
+describe('equipmentSellValue', () => {
+  function sellValue(
+    content: Partial<EquipmentContent>,
+    item: Partial<EquipmentItem> = {},
+  ): number {
+    return equipmentSellValue({
+      item: buildEquipmentItem(swordId, item),
+      content: ensureEquipment({ ...sword, ...content }),
+    });
   }
 
-  describe('armoryCap / armoryOverflowCap', () => {
-    it('caps the armory at 50 items', () => {
-      mockZeroArmoryBoost();
-      expect(armoryCap()).toBe(50);
-    });
+  const strongSword = {
+    baseStats: { ...defaultStats(), Strength: 5 },
+    levelRequirement: 2,
+  };
 
-    it('allows drops to overshoot the cap by 25%, floored', () => {
-      mockZeroArmoryBoost();
-      expect(armoryOverflowCap()).toBe(62);
-    });
+  it('scales the stat and level value by rarity', () => {
+    const common = sellValue({ ...strongSword, rarity: 'Common' });
+    const rare = sellValue({ ...strongSword, rarity: 'Rare' });
 
-    it('adds any active armory size boost on top of the base cap', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffectSums: { armorySizeBoost: 15 },
-      } as unknown as GameState);
-
-      expect(armoryCap()).toBe(65);
-    });
+    expect(common).toBeGreaterThan(1);
+    expect(rare / common).toBeCloseTo(
+      RARITY_SELL_MULTIPLIER.Rare / RARITY_SELL_MULTIPLIER.Common,
+      1,
+    );
   });
 
-  describe('armoryHasRoomForState', () => {
-    function stateWith(count: number, armorySizeBoost = 0): GameState {
-      return {
-        armory: Array.from({ length: count }),
-        globalEffectSums: { armorySizeBoost },
-      } as unknown as GameState;
-    }
-
-    it('uses the passed state cap, including a boost applied earlier in the same callback', () => {
-      expect(armoryHasRoomForState(stateWith(50), 1)).toBe(false);
-      expect(armoryHasRoomForState(stateWith(50, 5), 1)).toBe(true);
+  it('values infused stats the same as base stats', () => {
+    const infused = sellValue(strongSword, { infusedItemIds: [crystalId] });
+    const equivalentBase = sellValue({
+      ...strongSword,
+      baseStats: { ...defaultStats(), Strength: 8 },
     });
 
-    it('allows overflow up to the state overflow cap when requested', () => {
-      expect(armoryHasRoomForState(stateWith(61), 1, true)).toBe(true);
-      expect(armoryHasRoomForState(stateWith(62), 1, true)).toBe(false);
-    });
-
-    it('accounts for a multi-item quantity', () => {
-      expect(armoryHasRoomForState(stateWith(45), 5)).toBe(true);
-      expect(armoryHasRoomForState(stateWith(45), 6)).toBe(false);
-    });
+    expect(infused).toBe(equivalentBase);
   });
 
-  describe('armoryHasRoomFor / armoryHasRoom', () => {
-    beforeEach(() => {
-      mockZeroArmoryBoost();
-    });
+  it('adds a SellValue affix as a flat amount, unscaled by rarity', () => {
+    const rare = { ...strongSword, rarity: 'Rare' as const };
 
-    it('has room under the strict cap', () => {
-      expect(armoryHasRoomFor(49)).toBe(true);
-    });
-
-    it('has no room at the strict cap', () => {
-      expect(armoryHasRoomFor(50)).toBe(false);
-    });
-
-    it('allows overflow up to the overflow cap when requested', () => {
-      expect(armoryHasRoomFor(50, 1, true)).toBe(true);
-      expect(armoryHasRoomFor(61, 1, true)).toBe(true);
-      expect(armoryHasRoomFor(62, 1, true)).toBe(false);
-    });
-
-    it('accounts for a multi-item quantity', () => {
-      expect(armoryHasRoomFor(45, 5)).toBe(true);
-      expect(armoryHasRoomFor(45, 6)).toBe(false);
-    });
-
-    it('reads the live armory length via armoryHasRoom', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        armory: Array.from({ length: 50 }),
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(armoryHasRoom()).toBe(false);
-      expect(armoryHasRoom(1, true)).toBe(true);
-    });
+    expect(sellValue(rare, { affixIds: [sellAffixId] }) - sellValue(rare)).toBe(
+      250,
+    );
   });
 
-  describe('armoryAdd', () => {
-    it('appends the equipment item to the armory', () => {
-      armoryAdd('sword' as EquipmentId);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [{ equipmentId: 'shield' as EquipmentId }],
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(result.armory).toEqual([
-        { equipmentId: 'shield' },
-        {
-          id: expect.any(String),
-          equipmentId: 'sword',
-          infusedItemIds: [],
-          affixIds: [],
-        },
-      ]);
-    });
-
-    it('appends multiple copies when given a quantity, each its own instance', () => {
-      armoryAdd('sword' as EquipmentId, 3);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [],
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(result.armory).toHaveLength(3);
-      result.armory.forEach((item) => {
-        expect(item).toEqual({
-          id: expect.any(String),
-          equipmentId: 'sword',
-          infusedItemIds: [],
-          affixIds: [],
-        });
-      });
-
-      const ids = new Set(result.armory.map((item) => item.id));
-      expect(ids.size).toBe(3);
-    });
-
-    it('does nothing for a zero or negative quantity', () => {
-      armoryAdd('sword' as EquipmentId, 0);
-      armoryAdd('sword' as EquipmentId, -1);
-
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('marks the equipment as permanently discovered', () => {
-      armoryAdd('sword' as EquipmentId);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [],
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(
-        result.discoveredEquipment['sword' as EquipmentId].foundAt,
-      ).toBeGreaterThan(0);
-    });
-
-    it('preserves the original discovery timestamp on repeat finds', () => {
-      armoryAdd('sword' as EquipmentId);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [],
-        discoveredEquipment: { sword: { foundAt: 1000 } },
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(result.discoveredEquipment['sword' as EquipmentId]).toEqual({
-        foundAt: 1000,
-      });
-    });
-
-    it('rejects everything once the strict cap is already reached', () => {
-      armoryAdd('sword' as EquipmentId, 3);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: Array.from({ length: 50 }, () => ({
-          equipmentId: 'shield' as EquipmentId,
-        })),
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(result.armory).toHaveLength(50);
-    });
-  });
-
-  describe('addArmoryItems - cap clamping', () => {
-    function buildItems(
-      equipmentId: EquipmentId,
-      count: number,
-    ): EquipmentItem[] {
-      return Array.from({ length: count }, () => buildArmoryItem(equipmentId));
-    }
-
-    it('admits only as many as fit under the strict cap', () => {
-      const state = {
-        armory: buildItems('shield' as EquipmentId, 48),
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState;
-
-      const admitted = addArmoryItems(
-        state,
-        'sword' as EquipmentId,
-        buildItems('sword' as EquipmentId, 5),
-      );
-
-      expect(state.armory).toHaveLength(50);
-      expect(admitted).toHaveLength(2);
-    });
-
-    it('rejects everything once the strict cap is already reached', () => {
-      const state = {
-        armory: buildItems('shield' as EquipmentId, 50),
-        discoveredEquipment: {},
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState;
-
-      const admitted = addArmoryItems(
-        state,
-        'sword' as EquipmentId,
-        buildItems('sword' as EquipmentId, 3),
-      );
-
-      expect(state.armory).toHaveLength(50);
-      expect(admitted).toHaveLength(0);
-    });
-
-    it('admits up to the overflow cap when allowOverflow is set', () => {
-      const state = {
-        armory: buildItems('shield' as EquipmentId, 60),
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState;
-
-      const admitted = addArmoryItems(
-        state,
-        'sword' as EquipmentId,
-        buildItems('sword' as EquipmentId, 5),
-        true,
-      );
-
-      expect(state.armory).toHaveLength(62);
-      expect(admitted).toHaveLength(2);
-    });
-
-    it('ignores the cap entirely when bypassCap is set', () => {
-      const state = {
-        armory: buildItems('shield' as EquipmentId, 60),
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState;
-
-      const admitted = addArmoryItems(
-        state,
-        'sword' as EquipmentId,
-        buildItems('sword' as EquipmentId, 5),
-        false,
-        true,
-      );
-
-      expect(state.armory).toHaveLength(65);
-      expect(admitted).toHaveLength(5);
-    });
-
-    it('syncs the armory-fullness global effect when an add crosses a tier boundary', () => {
-      const overburdened = {
-        id: 'armory-overburdened-id' as never,
-        name: 'Overburdened',
-        __type: 'globaleffect',
-        description: 'The armory is full.',
-        sprite: '0000',
-        effects: [],
-      };
-      vi.mocked(getEntry).mockImplementation((key) =>
-        key === 'Overburdened' || key === overburdened.id
-          ? (overburdened as never)
-          : undefined,
-      );
-      vi.mocked(gamestate).mockReturnValue({
-        clock: { numTicks: 500 },
-      } as unknown as GameState);
-
-      const state = {
-        armory: buildItems('shield' as EquipmentId, 49),
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState;
-
-      addArmoryItems(state, 'sword' as EquipmentId, [
-        buildArmoryItem('sword' as EquipmentId),
-      ]);
-
-      expect(state.armory).toHaveLength(50);
-      expect(state.globalEffects.map((e) => e.id)).toEqual([overburdened.id]);
-    });
-  });
-
-  describe('armoryAddWithAffixes', () => {
-    it('appends one item carrying exactly the given affixIds, not a random roll', () => {
-      const affixIds = ['affix-str', 'affix-vit'] as AffixId[];
-
-      armoryAddWithAffixes('sword' as EquipmentId, affixIds);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [{ equipmentId: 'shield' as EquipmentId }],
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(result.armory).toEqual([
-        { equipmentId: 'shield' },
-        {
-          id: expect.any(String),
-          equipmentId: 'sword',
-          infusedItemIds: [],
-          affixIds,
-        },
-      ]);
-    });
-
-    it('marks the equipment as permanently discovered', () => {
-      armoryAddWithAffixes('sword' as EquipmentId, []);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        armory: [],
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-      } as unknown as GameState);
-
-      expect(
-        result.discoveredEquipment['sword' as EquipmentId].foundAt,
-      ).toBeGreaterThan(0);
-    });
-  });
-
-  describe('isEquipmentDiscovered', () => {
-    it('returns true once the equipment has ever been found', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredEquipment: { sword: { foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(true);
-    });
-
-    it('returns true even if the equipment is no longer in the armory', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [],
-        discoveredEquipment: { sword: { foundAt: 1000 } },
-      } as unknown as GameState);
-
-      expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(true);
-    });
-
-    it('returns false when the equipment has never been found', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredEquipment: {},
-      } as unknown as GameState);
-
-      expect(isEquipmentDiscovered('sword' as EquipmentId)).toBe(false);
-    });
-  });
-
-  describe('pruneInvalidDiscoveredEquipment', () => {
-    it('keeps entries that resolve to real equipment content', () => {
-      vi.mocked(getEntry).mockReturnValue({ id: 'sword' } as EquipmentContent);
-      const discovered = { ['sword' as EquipmentId]: { foundAt: 1000 } };
-
-      expect(pruneInvalidDiscoveredEquipment(discovered)).toEqual(discovered);
-    });
-
-    it('drops entries whose equipmentId no longer resolves to real content', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
-      const discovered = {
-        ['stale-gear' as EquipmentId]: { foundAt: 1000 },
-      };
-
-      expect(pruneInvalidDiscoveredEquipment(discovered)).toEqual({});
-    });
-  });
-
-  describe('pruneInvalidArmoryItems', () => {
-    it('keeps entries that resolve to real equipment content', () => {
-      vi.mocked(getEntry).mockReturnValue({ id: 'sword' } as EquipmentContent);
-      const armory = [buildArmoryItem('sword' as EquipmentId)];
-
-      expect(pruneInvalidArmoryItems(armory)).toEqual(armory);
-    });
-
-    it('drops entries whose equipmentId no longer resolves to real content', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
-      const armory = [buildArmoryItem('sword' as EquipmentId)];
-
-      expect(pruneInvalidArmoryItems(armory)).toEqual([]);
-    });
-
-    it('prunes only the invalid entries out of a mixed list', () => {
-      vi.mocked(getEntry).mockImplementation(
-        (id) => (id === 'sword' ? { id: 'sword' } : undefined) as never,
-      );
-      const armory = [
-        buildArmoryItem('sword' as EquipmentId),
-        buildArmoryItem('stale-gear' as EquipmentId),
-      ];
-
-      expect(pruneInvalidArmoryItems(armory)).toEqual([
-        buildArmoryItem('sword' as EquipmentId),
-      ]);
-    });
-
-    it('returns an empty array for an empty input', () => {
-      expect(pruneInvalidArmoryItems([])).toEqual([]);
-    });
-  });
-
-  describe('getArmoryEntries', () => {
-    it('returns one entry per owned item, without merging duplicates, sorted by rarity then name', () => {
-      const swordItem1 = {
-        id: 'sword-1' as EquipmentItemId,
-        equipmentId: sword.id,
-        infusedItemIds: [],
-      };
-      const shieldItem = {
-        id: 'shield-1' as EquipmentItemId,
-        equipmentId: shield.id,
-        infusedItemIds: [],
-      };
-      const swordItem2 = {
-        id: 'sword-2' as EquipmentItemId,
-        equipmentId: sword.id,
-        infusedItemIds: [],
-      };
-
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [swordItem1, shieldItem, swordItem2],
-      } as unknown as GameState);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => (id === sword.id ? sword : shield) as never,
-      );
-
-      expect(getArmoryEntries()).toEqual([
-        { item: shieldItem, content: shield },
-        { item: swordItem1, content: sword },
-        { item: swordItem2, content: sword },
-      ]);
-    });
-
-    it('excludes entries with no matching content entry', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [
-          {
-            id: 'sword-1' as EquipmentItemId,
-            equipmentId: sword.id,
-            infusedItemIds: [],
-          },
-        ],
-      } as unknown as GameState);
-      vi.mocked(getEntry).mockReturnValue(undefined);
-
-      expect(getArmoryEntries()).toEqual([]);
-    });
-
-    it('returns an empty array when the armory is empty', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        armory: [],
-      } as unknown as GameState);
-
-      expect(getArmoryEntries()).toEqual([]);
-    });
-  });
-
-  describe('equipmentSellValue', () => {
-    beforeEach(() => {
-      vi.mocked(equipmentItemInfusionBonus).mockReturnValue(defaultStats());
-    });
-
-    it('prices a bare item from its base stats and level, scaled by rarity', () => {
-      const entry = {
-        item: {
-          id: 'sword-1' as EquipmentItemId,
-          equipmentId: sword.id,
-          infusedItemIds: [],
-          affixIds: [],
-        },
-        content: {
-          ...sword,
-          baseStats: { ...defaultStats(), Strength: 5 },
-          levelRequirement: 2,
-        },
-      };
-
-      expect(equipmentSellValue(entry)).toBe(520);
-    });
-
-    // Base Strength 5 + infusion Strength 3, both weighted x5 (VALUE_MULTIPLIER_PER_STAT.Strength): (5*5 + 3*5)*20 + 2*10 = 820.
-    it('adds infusion bonus stats on top of base stats, weighted the same as base stats', () => {
-      vi.mocked(equipmentItemInfusionBonus).mockReturnValue({
-        ...defaultStats(),
-        Strength: 3,
-      });
-      const entry = {
-        item: {
-          id: 'sword-1' as EquipmentItemId,
-          equipmentId: sword.id,
-          infusedItemIds: ['crystal' as ItemId],
-          affixIds: [],
-        },
-        content: {
-          ...sword,
-          baseStats: { ...defaultStats(), Strength: 5 },
-          levelRequirement: 2,
-        },
-      };
-
-      expect(equipmentSellValue(entry)).toBe(820);
-    });
-
-    it('never returns less than 1 gold', () => {
-      const entry = {
-        item: {
-          id: 'sword-1' as EquipmentItemId,
-          equipmentId: sword.id,
-          infusedItemIds: [],
-          affixIds: [],
-        },
-        content: { ...sword, baseStats: defaultStats(), levelRequirement: 0 },
-      };
-
-      expect(equipmentSellValue(entry)).toBe(1);
-    });
-
-    it('adds a SellValue affix bonus as a flat amount after the rarity multiplier', () => {
-      const sellValueAffix = {
-        id: 'affix-sell' as never,
-        rarity: 'Uncommon',
-        family: 'SellValue',
-        effects: [{ kind: 'SellValue', value: 250 }],
-      };
-      vi.mocked(getEntry).mockImplementation(
-        (id) =>
-          (id === sellValueAffix.id ? sellValueAffix : undefined) as never,
-      );
-
-      const entry = {
-        item: {
-          id: 'sword-1' as EquipmentItemId,
-          equipmentId: sword.id,
-          infusedItemIds: [],
-          affixIds: [sellValueAffix.id],
-        },
-        content: {
-          ...sword,
-          baseStats: { ...defaultStats(), Strength: 5 },
-          levelRequirement: 2,
-        },
-      };
-
-      expect(equipmentSellValue(entry)).toBe(770);
-    });
+  it('never returns less than 1 gold', () => {
+    expect(sellValue({ baseStats: defaultStats(), levelRequirement: 0 })).toBe(
+      1,
+    );
   });
 });

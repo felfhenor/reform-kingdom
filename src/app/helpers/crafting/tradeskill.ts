@@ -1,5 +1,8 @@
 import {
   TRADESKILL_MAX_LEVEL,
+  TRADESKILL_QUEUE_BASE_SIZE,
+  TRADESKILL_QUEUE_LEVELS_PER_SLOT,
+  TRADESKILL_QUEUE_MAX_SIZE,
   TRADESKILL_XP_END,
   TRADESKILL_XP_START,
   XP_CURVE_EASE,
@@ -57,8 +60,7 @@ export function tradeskillXpForLevel(level: number): number {
   return roundToNearest10(xp);
 }
 
-// Default 2 (1 active + 1 queued), +1 every 5 levels, plus any active
-// per-tradeskill collectible/buff boost - still capped at 16 overall.
+// Boosts from collectibles/buffs still count toward the overall cap.
 export function tradeskillMaxQueueSize(
   level: number,
   tradeskill: Tradeskill,
@@ -67,7 +69,12 @@ export function tradeskillMaxQueueSize(
   const boost = tradeskillId
     ? (globalEffectSumsState().tradeskillQueueSizeBoosts[tradeskillId] ?? 0)
     : 0;
-  return Math.min(16, 2 + Math.floor(level / 5) + boost);
+  return Math.min(
+    TRADESKILL_QUEUE_MAX_SIZE,
+    TRADESKILL_QUEUE_BASE_SIZE +
+      Math.floor(level / TRADESKILL_QUEUE_LEVELS_PER_SLOT) +
+      boost,
+  );
 }
 
 export function tradeskillBuilding(

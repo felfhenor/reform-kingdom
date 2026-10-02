@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+// test-setup.ts mocks this module globally; this spec tests the real one.
+vi.unmock('@helpers/engine/signal');
+
 vi.mock('es-toolkit', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   delay: vi.fn(() => Promise.resolve()),

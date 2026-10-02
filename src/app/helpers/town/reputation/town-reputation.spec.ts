@@ -1,34 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/task/task-events', () => ({
-  taskEventCollectibleGained: vi.fn(),
-  taskEventEquipmentInfused: vi.fn(),
-  taskEventLevelReached: vi.fn(),
-  taskEventMonsterKilled: vi.fn(),
-  taskEventShrineLevel: vi.fn(),
-  taskEventTeachingLearned: vi.fn(),
-  taskEventTownReputationTier: vi.fn(),
-  taskEventTownVisited: vi.fn(),
-  taskEventTradeskillLevel: vi.fn(),
-  taskEventWorkerRescued: vi.fn(),
-}));
+vi.mock('@helpers/task/task-events');
 
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { defaultGameState } from '@helpers/defaults';
+import { gamestate } from '@helpers/state-game';
+import { taskEventTownReputationTier } from '@helpers/task/task-events';
 import {
+  TOWN_REPUTATION_MAX,
+  TOWN_REPUTATION_THRESHOLDS,
   townReputation,
   townReputationGain,
   townReputationLose,
@@ -37,263 +16,166 @@ import {
   townReputationTierMultiplier,
   townReputationTierName,
 } from '@helpers/town/reputation/town-reputation';
-import type { GameState, TownId } from '@interfaces';
+import type { TownId } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
+const TIER_1 = TOWN_REPUTATION_THRESHOLDS[1];
+const TIER_2 = TOWN_REPUTATION_THRESHOLDS[2];
+
+function seedReputation(reputation: number): void {
+  seedGamestate((state) => {
+    state.world.towns[townId] = buildTownNodeState({ reputation });
+  });
+}
+
+function reputation(): number {
+  return gamestate().world.towns[townId].reputation;
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe('townReputationTierForAmount', () => {
-  it.each([
-    [0, 0],
-    [99, 0],
-    [100, 1],
-    [599, 1],
-    [600, 2],
-    [2099, 2],
-    [2100, 3],
-    [7099, 3],
-    [7100, 4],
-    [999999, 4],
-  ])('maps %i reputation to tier %i', (reputation, tier) => {
-    expect(townReputationTierForAmount(reputation)).toBe(tier);
+  it('reaches each tier exactly at its threshold', () => {
+    Object.entries(TOWN_REPUTATION_THRESHOLDS).forEach(([tier, threshold]) => {
+      expect(townReputationTierForAmount(threshold)).toBe(Number(tier));
+      if (threshold > 0) {
+        expect(townReputationTierForAmount(threshold - 1)).toBe(
+          Number(tier) - 1,
+        );
+      }
+    });
+  });
+
+  it('stays at the top tier past the max', () => {
+    expect(townReputationTierForAmount(TOWN_REPUTATION_MAX * 10)).toBe(
+      townReputationTierForAmount(TOWN_REPUTATION_MAX),
+    );
   });
 });
 
 describe('townReputationTierName', () => {
-  it('names each tier', () => {
+  it('names tiers, falling back to Neutral out of range', () => {
     expect(townReputationTierName(0)).toBe('Neutral');
     expect(townReputationTierName(1)).toBe('Friendly');
-    expect(townReputationTierName(4)).toBe('Renowned');
-  });
-
-  it('falls back to Neutral for an out-of-range tier', () => {
     expect(townReputationTierName(99)).toBe('Neutral');
   });
 });
 
-describe('townReputation', () => {
-  it("reads the town's live reputation", () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { reputation: 250 } } },
-    } as unknown as GameState);
+describe('townReputation / townReputationTier', () => {
+  it('reads the live reputation, or 0 for a town never visited', () => {
+    seedReputation(TIER_2);
 
-    expect(townReputation(townId)).toBe(250);
+    expect(townReputation(townId)).toBe(TIER_2);
+    expect(townReputationTier(townId)).toBe(2);
+    expect(townReputation('other' as TownId)).toBe(0);
   });
 
-  it('returns 0 when the town has no state entry', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
+  it('reads a passed state instead of the live one', () => {
+    seedReputation(0);
+    const state = defaultGameState();
+    state.world.towns[townId] = buildTownNodeState({ reputation: TIER_2 });
 
-    expect(townReputation(townId)).toBe(0);
-  });
-
-  it('reads the passed state instead of the selector', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { reputation: 250 } } },
-    } as unknown as GameState);
-    const state = {
-      world: { towns: { [townId]: { reputation: 900 } } },
-    } as unknown as GameState;
-
-    expect(townReputation(townId, state)).toBe(900);
+    expect(townReputation(townId, state)).toBe(TIER_2);
     expect(townReputationTier(townId, state)).toBe(2);
   });
 });
 
-describe('townReputationTier', () => {
-  it("resolves the town's current tier from its live reputation", () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { reputation: 1500 } } },
-    } as unknown as GameState);
-
-    expect(townReputationTier(townId)).toBe(2);
-  });
-});
-
 describe('townReputationGain', () => {
-  it("adds the amount to the town's reputation", async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    await townReputationGain(townId, 50, 'Trade');
-
-    expect(state.world.towns[townId].reputation).toBe(150);
-  });
-
-  it('fires an analytics event tagged with the source', async () => {
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn({
-        world: { towns: { [townId]: { reputation: 0 } } },
-      } as unknown as GameState);
-    });
+  it('adds reputation and fires an analytics event tagged with the source', async () => {
+    seedReputation(0);
+    const events = captureAnalyticsEvents();
 
     await townReputationGain(townId, 10, 'RaidDefense');
 
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Town:Reputation:RaidDefense',
-    );
+    expect(reputation()).toBe(10);
+    expect(events).toEqual(['Town:Reputation:RaidDefense']);
   });
 
-  it('is a no-op for a zero or negative amount', async () => {
-    await townReputationGain(townId, 0, 'Trade');
-    await townReputationGain(townId, -5, 'Trade');
+  it('reports a tier crossing, including to the task system', async () => {
+    seedReputation(TIER_1 - 10);
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
+    await expect(townReputationGain(townId, 5, 'Trade')).resolves.toBe(false);
+    expect(taskEventTownReputationTier).not.toHaveBeenCalled();
+
+    await expect(townReputationGain(townId, 5, 'Trade')).resolves.toBe(true);
+    expect(taskEventTownReputationTier).toHaveBeenCalledWith(townId, 1);
   });
 
-  it('does not throw when the town has no state entry', async () => {
-    const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    await expect(
-      townReputationGain(townId, 10, 'Trade'),
-    ).resolves.not.toThrow();
-  });
-
-  it('returns true when the gain crosses a tier threshold', async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 90 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    await expect(townReputationGain(townId, 20, 'Trade')).resolves.toBe(true);
-  });
-
-  it('returns false when the gain stays within the same tier', async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 0 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    await expect(townReputationGain(townId, 20, 'Trade')).resolves.toBe(false);
-  });
-
-  it('clamps at the max tier threshold rather than climbing past it', async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 7050 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  it('clamps at the max rather than climbing past it', async () => {
+    seedReputation(TOWN_REPUTATION_MAX - 50);
 
     await townReputationGain(townId, 500, 'Trade');
 
-    expect(state.world.towns[townId].reputation).toBe(7100);
+    expect(reputation()).toBe(TOWN_REPUTATION_MAX);
+  });
+
+  it('does nothing for a non-positive amount or a town never visited', async () => {
+    const before = seedGamestate();
+    const events = captureAnalyticsEvents();
+
+    await townReputationGain(townId, 0, 'Trade');
+    await townReputationGain(townId, -5, 'Trade');
+    await expect(townReputationGain(townId, 10, 'Trade')).resolves.toBe(false);
+
+    expect(gamestate()).toBe(before);
+    expect(events).toEqual([]);
+    expect(taskEventTownReputationTier).not.toHaveBeenCalled();
   });
 });
 
 describe('townReputationLose', () => {
-  it("subtracts the amount from the town's reputation", async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  it('subtracts reputation and fires a distinct Lose analytics event', async () => {
+    seedReputation(100);
+    const events = captureAnalyticsEvents();
 
     await townReputationLose(townId, 30, 'RaidDefense');
 
-    expect(state.world.towns[townId].reputation).toBe(70);
+    expect(reputation()).toBe(70);
+    expect(events).toEqual(['Town:Reputation:Lose:RaidDefense']);
   });
 
   it('clamps at 0 rather than going negative', async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 20 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+    seedReputation(20);
 
     await townReputationLose(townId, 50, 'RaidDefense');
 
-    expect(state.world.towns[townId].reputation).toBe(0);
+    expect(reputation()).toBe(0);
   });
 
-  it('fires a distinct Lose analytics event tagged with the source', async () => {
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn({
-        world: { towns: { [townId]: { reputation: 100 } } },
-      } as unknown as GameState);
-    });
-
-    await townReputationLose(townId, 10, 'RaidDefense');
-
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Town:Reputation:Lose:RaidDefense',
-    );
-  });
-
-  it('is a no-op for a zero or negative amount', async () => {
-    await townReputationLose(townId, 0, 'RaidDefense');
-    await townReputationLose(townId, -5, 'RaidDefense');
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
-  });
-
-  it('does not throw when the town has no state entry', async () => {
-    const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    await expect(
-      townReputationLose(townId, 10, 'RaidDefense'),
-    ).resolves.not.toThrow();
-  });
-
-  it('returns true when the loss crosses a tier threshold', async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 110 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    await expect(townReputationLose(townId, 20, 'RaidDefense')).resolves.toBe(
-      true,
-    );
-  });
-
-  it('returns false when the loss stays within the same tier', async () => {
-    const state = {
-      world: { towns: { [townId]: { reputation: 110 } } },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  it('reports whether the loss crossed a tier threshold', async () => {
+    seedReputation(TIER_1 + 10);
 
     await expect(townReputationLose(townId, 5, 'RaidDefense')).resolves.toBe(
       false,
     );
+    await expect(townReputationLose(townId, 10, 'RaidDefense')).resolves.toBe(
+      true,
+    );
+  });
+
+  it('does nothing for a non-positive amount or a town never visited', async () => {
+    const before = seedGamestate();
+    const events = captureAnalyticsEvents();
+
+    await townReputationLose(townId, 0, 'RaidDefense');
+    await expect(townReputationLose(townId, 10, 'RaidDefense')).resolves.toBe(
+      false,
+    );
+
+    expect(gamestate()).toBe(before);
+    expect(events).toEqual([]);
   });
 });
 
 describe('townReputationTierMultiplier', () => {
-  it('returns the exact tier entry when defined', () => {
+  it('uses the highest defined tier at or below the current one', () => {
     expect(townReputationTierMultiplier(2, { 2: 0.9 })).toBe(0.9);
-  });
-
-  it('falls back to the highest defined tier below the current one', () => {
     expect(townReputationTierMultiplier(3, { 1: 0.95, 4: 0.5 })).toBe(0.95);
-  });
-
-  it('returns undefined when no tier at or below the current one is defined', () => {
     expect(townReputationTierMultiplier(1, { 4: 0.5 })).toBeUndefined();
   });
 });
