@@ -1,1141 +1,583 @@
+import type * as PathfindingHelper from '@helpers/pathfinding/pathfinding';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/caravan/caravan', () => ({
-  caravanMarkVisited: vi.fn(),
-}));
-
-vi.mock('@helpers/decree/auto-mode-state', () => ({
-  autoModeIsEnabled: vi.fn(() => false),
-  autoModeToggle: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/global-effects', () => ({
-  addGlobalEffect: vi.fn(),
-  isGlobalEffectActive: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/encounter/encounter', () => ({
-  encounterStartFight: vi.fn(),
-}));
-
-vi.mock('@helpers/item/gather-node-discovery', () => ({
-  gatherNodeDiscover: vi.fn(),
-}));
-
-vi.mock('@helpers/item/gathering', () => ({
-  gatheringStart: vi.fn(),
-  gatheringStop: vi.fn(),
-}));
-
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
+vi.mock('@helpers/caravan/caravan');
+vi.mock('@helpers/encounter/encounter');
+vi.mock('@helpers/encounter/encounter-random-combat');
+vi.mock('@helpers/engine/ui');
+vi.mock('@helpers/item/gathering');
+vi.mock('@helpers/pathfinding/pathfinding-travel');
+vi.mock('@helpers/town/reputation/town-reputation-buff');
+vi.mock('@helpers/world-node/world-node-encounter');
+vi.mock('@helpers/pathfinding/pathfinding', async (importOriginal) => ({
+  ...(await importOriginal<typeof PathfindingHelper>()),
   mapHopsBetween: vi.fn(() => 0),
-  tileIsOnPath: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
-  travelPathTo: vi.fn(),
-}));
-
-vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
-  townReputationBuffSync: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-spawn', () => ({
-  homeNodeGet: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    globalEffectSumsState: vi.fn(() => ({
-      offPathTravelSpeedBonus: 0,
-      onPathTravelSpeedBonus: 0,
-    })),
-    worldTravelState: () => gamestate().world.travel,
-    worldCombatState: vi.fn(() => undefined),
-    worldCurrentLocationState: vi.fn(),
-  };
-});
-
-vi.mock('@helpers/world', () => ({
-  currentLocationSet: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-encounter', () => ({
-  worldNodeExploreRandomIsAvailable: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-outpost', () => ({
-  outpostDeathPenaltyMultiplier: vi.fn(() => 1),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  isWorldNodeCollectibleGateMet: vi.fn(() => true),
-  worldNodeAt: vi.fn(() => undefined),
-  worldNodeByName: vi.fn(),
-  worldNodeCaravan: vi.fn(() => undefined),
-  worldNodeEncounter: vi.fn(),
-  worldNodeEncounterRandom: vi.fn(),
-  worldNodeGathering: vi.fn(),
-  worldNodesOfType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/encounter/encounter-random-combat', () => ({
-  encounterRandomStartFight: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/ui', () => ({
-  mapNodeAutoShowOnArrival: vi.fn(),
 }));
 
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
+import { combatLog } from '@helpers/combat/combat-log';
 import {
-  autoModeIsEnabled,
-  autoModeToggle,
-} from '@helpers/decree/auto-mode-state';
+  DEATHS_DOOR_MINIMUM_SECONDS,
+  DEATHS_DOOR_SECONDS_PER_MAP,
+  TICKS_PER_STEP_OFF_PATH,
+  TICKS_PER_STEP_ON_PATH,
+} from '@helpers/config';
+import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureGathering } from '@helpers/content/ensure-gathernode';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
-import {
-  addGlobalEffect,
-  isGlobalEffectActive,
-} from '@helpers/hero/global-effects';
 import {
   canPartyTravel,
   travelBeginDeathsDoor,
   travelEtaSecondsTo,
-  travelPathTotalTicks,
   travelProcessTick,
   travelRelocateTo,
   travelStart,
 } from '@helpers/hero/travel';
-import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
-import { mapHopsBetween, tileIsOnPath } from '@helpers/pathfinding/pathfinding';
+import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import {
   gamestate,
-  globalEffectSumsState,
-  updateGamestate,
-  worldCombatState,
+  worldAutoModeState,
   worldCurrentLocationState,
+  worldTravelState,
 } from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
-import { homeNodeGet } from '@helpers/town/town-spawn';
-import { currentLocationSet } from '@helpers/world';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
-import {
-  isWorldNodeCollectibleGateMet,
-  worldNodeAt,
-  worldNodeByName,
-  worldNodeCaravan,
-  worldNodeEncounter,
-  worldNodeGathering,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
 import type {
-  CaravanContent,
-  CaravanId,
-  EncounterContent,
+  Combat,
+  CurrentLocation,
   GameState,
-  GatheringContent,
+  GlobalEffectId,
   TravelState,
+  TravelStep,
   WorldNodeEntry,
 } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-function stateWithTravel(travel: TravelState): GameState {
-  return { world: { travel } } as unknown as GameState;
+const ORIGIN: CurrentLocation = { mapName: 'Carrina', x: 0, y: 0 };
+const move = (x: number, mapName = 'Carrina'): TravelStep => ({
+  kind: 'Move',
+  mapName,
+  x,
+  y: 0,
+});
+const teleport = (mapName: string): TravelStep => ({
+  kind: 'Teleport',
+  mapName,
+  x: 0,
+  y: 0,
+});
+
+const at = (x: number, mapName = 'Carrina'): CurrentLocation => ({
+  mapName,
+  x,
+  y: 0,
+});
+
+let nodes: Record<string, WorldNodeEntry>;
+
+function seedWorld(pathTiles: { x: number; y: number }[] = []): void {
+  nodes = seedWorldNodes(
+    [
+      { name: 'The Duchy', type: 'Kingdom', mapName: 'Carrina', x: 50, y: 50 },
+      { name: 'Field Ruins', type: 'ExploreNode', mapName: 'Carrina', x: 5 },
+      { name: 'Wergen Woods', type: 'GatherNode', mapName: 'Carrina', x: 6 },
+      { name: 'Caravan', type: 'CaravanNode', mapName: 'Carrina', x: 7 },
+      { name: 'Signpost', type: 'ExploreNode', mapName: 'Carrina', x: 8 },
+      { name: 'Carrina Outpost', type: 'Outpost', mapName: 'Carrina', x: 9 },
+      { name: 'Spider Tower', type: 'ExploreNode', mapName: 'Carrina', x: 10 },
+    ],
+    pathTiles.map((tile) => ({ mapName: 'Carrina', ...tile })),
+  );
 }
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+function seedTravel(
+  travel: Partial<TravelState>,
+  edit?: (state: GameState) => void,
+): void {
+  seedGamestate((state) => {
+    state.world.currentLocation = ORIGIN;
+    state.world.travel = {
+      status: 'Traveling',
+      path: [],
+      ticksIntoStep: 0,
+      ...travel,
+    };
+    edit?.(state);
+  });
+}
+
+function seedIdle(edit?: (state: GameState) => void): void {
+  seedTravel({ status: 'Idle' }, edit);
+}
+
+function activeEffect(state: GameState, name: string): void {
+  state.globalEffects.push({
+    id: name as GlobalEffectId,
+    startTick: 0,
+    expiresAtTick: 999,
+  } as GameState['globalEffects'][number]);
+}
+
+function messages(): string[] {
+  return combatLog().map((entry) => entry.message);
 }
 
 beforeEach(() => {
-  vi.mocked(globalEffectSumsState).mockReturnValue({
-    offPathTravelSpeedBonus: 0,
-    onPathTravelSpeedBonus: 0,
-  } as never);
+  vi.clearAllMocks();
+  vi.mocked(mapHopsBetween).mockReturnValue(0);
+  seedWorld();
+  seedContent([
+    ensureGlobalEffect({ id: 'Deaths Door' as never, name: 'Deaths Door' }),
+    ensureGlobalEffect({ id: 'Healing' as never, name: 'Healing' }),
+    ensureEncounter({ id: 'field-ruins' as never, name: 'Field Ruins' }),
+    ensureEncounter({
+      id: 'spider-tower' as never,
+      name: 'Spider Tower',
+      invisibleUntilCollectibleIdsFound: ['spider-key' as never],
+    }),
+    ensureGathering({ id: 'wergen' as never, name: 'Wergen Woods' }),
+    ensureCaravan({ id: 'duchy-caravan' as never, name: 'Caravan' }),
+    ensureOutpost({ id: 'outpost' as never, name: 'Carrina Outpost' }),
+  ]);
 });
 
 describe('canPartyTravel', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('allows travel when idle or already traveling', () => {
+    seedIdle();
+    expect(canPartyTravel()).toBe(true);
 
-  it('is true when idle and no blocking global effect is active', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
-    );
-    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-
+    seedTravel({ destinationNodeName: 'Field Ruins' });
     expect(canPartyTravel()).toBe(true);
   });
 
-  it('is true while already traveling, so a redirect can be started', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({ status: 'Traveling', path: [], ticksIntoStep: 0 }),
-    );
-    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-
-    expect(canPartyTravel()).toBe(true);
-  });
-
-  it('is false while Deaths Door or Healing is active', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
-    );
-    vi.mocked(isGlobalEffectActive).mockImplementation(
-      (id) => id === 'Deaths Door',
-    );
-
+  it('blocks travel during Deaths Door, Healing or combat', () => {
+    seedIdle((state) => activeEffect(state, 'Deaths Door'));
     expect(canPartyTravel()).toBe(false);
-  });
 
-  it('is false while combat is active', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
-    );
-    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-    vi.mocked(worldCombatState).mockReturnValue({} as never);
+    seedIdle((state) => activeEffect(state, 'Healing'));
+    expect(canPartyTravel()).toBe(false);
 
+    seedIdle((state) => (state.world.combat = {} as Combat));
     expect(canPartyTravel()).toBe(false);
   });
 });
 
 describe('travelEtaSecondsTo', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+  it('is undefined when idle or heading somewhere else', () => {
+    seedIdle();
+    expect(travelEtaSecondsTo('Field Ruins')).toBeUndefined();
+
+    seedTravel({ destinationNodeName: 'Elsewhere', path: [move(1)] });
+    expect(travelEtaSecondsTo('Field Ruins')).toBeUndefined();
+  });
+
+  it('counts the rest of the current step plus every later step', () => {
+    seedTravel({
+      destinationNodeName: 'Field Ruins',
+      path: [move(1), move(2)],
+      ticksIntoStep: 1,
     });
-  });
 
-  it('is undefined when idle', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
+    expect(travelEtaSecondsTo('Field Ruins')).toBe(
+      2 * TICKS_PER_STEP_OFF_PATH - 1,
     );
-
-    expect(
-      travelEtaSecondsTo('Duchy Trading Caravan - Carrina'),
-    ).toBeUndefined();
   });
 
-  it('is undefined when traveling toward a different destination', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Somewhere Else',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 0,
-      }),
-    );
-
-    expect(
-      travelEtaSecondsTo('Duchy Trading Caravan - Carrina'),
-    ).toBeUndefined();
-  });
-
-  it('sums remaining ticks on the current step plus full cost of later steps', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Duchy Trading Caravan - Carrina',
-        path: [
-          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-        ],
+  it('rounds a fractional remainder up to the tick the party arrives on', () => {
+    seedTravel(
+      {
+        destinationNodeName: 'Field Ruins',
+        path: [move(1), move(2)],
         ticksIntoStep: 1,
-      }),
+      },
+      (state) => (state.globalEffectSums.offPathTravelSpeedBonus = 0.1),
     );
 
-    // Off-path Move steps cost 3 ticks each; the first
-    // step already has 1 tick of progress, so 2 remain, plus 3 for the second.
-    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBe(5);
-  });
-
-  it('rounds a fractional remaining time up to the tick the party arrives on', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      offPathTravelSpeedBonus: 0.1,
-      onPathTravelSpeedBonus: 0,
-    } as never);
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Duchy Trading Caravan - Carrina',
-        path: [
-          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-        ],
-        ticksIntoStep: 1,
-      }),
-    );
-
-    // Two 2.7-tick steps with 1 tick banked = 4.4 remaining, arriving on the 5th tick.
-    expect(travelEtaSecondsTo('Duchy Trading Caravan - Carrina')).toBe(5);
-  });
-});
-
-describe('travelPathTotalTicks', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('returns 0 for an empty path', () => {
-    expect(travelPathTotalTicks([], { mapName: 'Carrina', x: 0, y: 0 })).toBe(
-      0,
-    );
-  });
-
-  it('sums off-path move costs, threading each step as the next origin', () => {
-    const path = [
-      { kind: 'Move' as const, mapName: 'Carrina', x: 1, y: 0 },
-      { kind: 'Move' as const, mapName: 'Carrina', x: 2, y: 0 },
-    ];
-
-    // Both steps are plain off-path Moves (worldNodeAt/tileIsOnPath default
-    // to false/undefined), so each costs 3 ticks.
-    expect(travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 })).toBe(
-      6,
-    );
-  });
-
-  it('treats a Teleport step as free', () => {
-    const path = [
-      { kind: 'Teleport' as const, mapName: 'Craggledmire', x: 5, y: 5 },
-      { kind: 'Move' as const, mapName: 'Craggledmire', x: 6, y: 5 },
-    ];
-
-    expect(travelPathTotalTicks(path, { mapName: 'Carrina', x: 0, y: 0 })).toBe(
-      3,
+    expect(travelEtaSecondsTo('Field Ruins')).toBe(
+      Math.ceil(2 * TICKS_PER_STEP_OFF_PATH * 0.9 - 1),
     );
   });
 });
 
 describe('travelStart', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
-    );
-    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-    vi.mocked(worldCombatState).mockReturnValue(undefined);
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    });
-  });
+  const start = (destination: string, isAutoMode = false) =>
+    inTick(() => travelStart(destination, isAutoMode));
 
-  it('refuses to start when the party cannot travel', () => {
-    vi.mocked(isGlobalEffectActive).mockReturnValue(true);
+  beforeEach(() => vi.mocked(travelPathTo).mockReturnValue([move(1)]));
 
-    expect(travelStart('Field Ruins')).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
+  it('starts traveling, stopping any gathering and logging the departure', () => {
+    seedIdle();
+    const events = captureAnalyticsEvents();
 
-  it('refuses to start when the destination is collectible-gated and the gate is unmet', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-      nodeName: 'Spider Tower',
-    } as unknown as WorldNodeEntry);
-    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValueOnce(false);
+    expect(start('Field Ruins')).toBe(true);
 
-    expect(travelStart('Spider Tower')).toBe(false);
-    expect(travelPathTo).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('refuses to start when no path exists', () => {
-    vi.mocked(travelPathTo).mockReturnValue(undefined);
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'Kingdom'
-        ? [{ mapName: 'Carrina', x: 5, y: 5 } as unknown as WorldNodeEntry]
-        : [],
-    );
-
-    expect(travelStart('Field Ruins')).toBe(false);
-  });
-
-  it('recalls the party to the kingdom and logs the error when pathfinding fails entirely', () => {
-    vi.mocked(travelPathTo).mockReturnValue(undefined);
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'CraggledMire',
-      x: 3,
-      y: 7,
-    });
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'Kingdom'
-        ? [{ mapName: 'Carrina', x: 5, y: 5 } as unknown as WorldNodeEntry]
-        : [],
-    );
-
-    expect(travelStart('Field Ruins')).toBe(false);
-
-    expect(currentLocationSet).toHaveBeenCalledWith({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-    });
-    expect(townReputationBuffSync).toHaveBeenCalledWith(
-      'CraggledMire',
-      'Carrina',
-    );
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'CraggledMire', x: 4, y: 7 }],
-        ticksIntoStep: 1,
-      }),
-    );
-    expect(result.world.travel).toEqual({
-      status: 'Idle',
-      path: [],
-      ticksIntoStep: 0,
-    });
-  });
-
-  it('still resets travel state and logs even when no Kingdom node exists', () => {
-    vi.mocked(travelPathTo).mockReturnValue(undefined);
-    vi.mocked(worldNodesOfType).mockReturnValue([]);
-
-    expect(travelStart('Field Ruins')).toBe(false);
-
-    expect(currentLocationSet).not.toHaveBeenCalled();
-    expect(townReputationBuffSync).not.toHaveBeenCalled();
-  });
-
-  it('sets travel state to Traveling and logs departure', () => {
-    const path = [{ kind: 'Move' as const, mapName: 'Carrina', x: 1, y: 0 }];
-    vi.mocked(travelPathTo).mockReturnValue(path);
-
-    expect(travelStart('Field Ruins')).toBe(true);
-
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Idle',
-        path: [],
-        ticksIntoStep: 0,
-      }),
-    );
-    expect(result.world.travel).toEqual({
+    expect(worldTravelState()).toEqual({
       status: 'Traveling',
       destinationNodeName: 'Field Ruins',
-      path,
+      path: [move(1)],
       ticksIntoStep: 0,
     });
     expect(gatheringStop).toHaveBeenCalled();
+    expect(events).toEqual(['World:Travel:Start:Field Ruins']);
+    expect(messages()).toEqual(['The party left for Field Ruins.']);
   });
 
-  it('redirects to a new destination while already traveling', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-    const path = [{ kind: 'Move' as const, mapName: 'Carrina', x: -1, y: 0 }];
-    vi.mocked(travelPathTo).mockReturnValue(path);
+  it('refuses when the party cannot travel, or the destination is collectible-gated', () => {
+    seedIdle((state) => activeEffect(state, 'Deaths Door'));
+    expect(start('Field Ruins')).toBe(false);
 
-    expect(travelStart('Old Town')).toBe(true);
+    seedIdle();
+    const before = gamestate();
+    expect(start('Spider Tower')).toBe(false);
+    expect(gamestate()).toBe(before);
+  });
 
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-    expect(result.world.travel).toEqual({
+  it('redirects mid-travel, but not to the destination already being traveled to', () => {
+    seedTravel({
+      destinationNodeName: 'Field Ruins',
+      path: [move(1)],
+      ticksIntoStep: 2,
+    });
+    expect(start('Field Ruins')).toBe(false);
+
+    vi.mocked(travelPathTo).mockReturnValue([move(-1)]);
+    expect(start('Signpost')).toBe(true);
+    expect(worldTravelState()).toEqual({
       status: 'Traveling',
-      destinationNodeName: 'Old Town',
-      path,
+      destinationNodeName: 'Signpost',
+      path: [move(-1)],
       ticksIntoStep: 0,
     });
+    expect(messages()).toEqual(['The party changed course for Signpost.']);
   });
 
-  it('refuses to redirect to the destination already being traveled to', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-
-    expect(travelStart('Field Ruins')).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('settles as arrived when redirecting back to the tile already stood on, mid-travel', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 1,
-      }),
-    );
+  it('settles as arrived when a redirect targets the tile already stood on', () => {
+    seedTravel({ destinationNodeName: 'Field Ruins', path: [move(1)] });
     vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-      nodeName: 'Old Town',
-      nodeData: {} as never,
-    });
-    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
-    vi.mocked(worldNodeGathering).mockReturnValue(undefined);
 
-    expect(travelStart('Old Town')).toBe(true);
+    expect(start('Signpost')).toBe(true);
 
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 1,
-      }),
-    );
-    expect(result.world.travel).toEqual({
+    expect(worldTravelState()).toEqual({
       status: 'Idle',
       path: [],
       ticksIntoStep: 0,
     });
+    expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(nodes['Signpost']);
   });
 
-  it('still refuses a zero-length path while idle, for a manual travel', () => {
+  it('ignores a manual travel to the current tile, but re-triggers it for auto mode', () => {
     vi.mocked(travelPathTo).mockReturnValue([]);
+    seedIdle();
+    const before = gamestate();
 
-    expect(travelStart('Field Ruins')).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(start('Field Ruins')).toBe(false);
+    expect(gamestate()).toBe(before);
+
+    expect(start('Field Ruins', true)).toBe(true);
+    expect(encounterStartFight).toHaveBeenCalledWith(
+      'field-ruins',
+      0,
+      'Field Ruins',
+    );
   });
 
-  it('re-triggers the node for an auto-mode travel targeting the tile already stood on (regression: the party would otherwise just stop once the nearest eligible node was the one they were already at)', () => {
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-      nodeName: 'Field Ruins',
-      nodeData: {} as never,
-    });
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      id: 'enc-1',
-    } as unknown as EncounterContent);
+  it('recalls the party to the kingdom when no route exists', () => {
+    vi.mocked(travelPathTo).mockReturnValue(undefined);
+    seedTravel({ destinationNodeName: 'Signpost', path: [move(1)] });
 
-    expect(travelStart('Field Ruins', true)).toBe(true);
+    expect(start('Field Ruins')).toBe(false);
 
-    expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 0, 'Field Ruins');
+    expect(worldCurrentLocationState()).toEqual(locationOf(nodes['The Duchy']));
+    expect(worldTravelState().status).toBe('Idle');
+    expect(messages()[0]).toContain('Pathing error');
   });
 
-  it('turns off Auto Mode when a manual travel is started while it is enabled', () => {
-    vi.mocked(autoModeIsEnabled).mockReturnValue(true);
-    vi.mocked(travelPathTo).mockReturnValue([
-      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-    ]);
+  it('just resets travel when no route exists and there is no kingdom to recall to', () => {
+    vi.mocked(travelPathTo).mockReturnValue(undefined);
+    seedWorldNodes([{ name: 'Field Ruins', type: 'ExploreNode' }]);
+    seedTravel({ destinationNodeName: 'Signpost', path: [move(1)] });
 
-    travelStart('Field Ruins');
+    expect(start('Field Ruins')).toBe(false);
 
-    expect(autoModeToggle).toHaveBeenCalledWith(false);
+    expect(worldCurrentLocationState()).toEqual(ORIGIN);
+    expect(worldTravelState().status).toBe('Idle');
   });
 
-  it('does not touch Auto Mode when the travel is auto-mode-initiated', () => {
-    vi.mocked(autoModeIsEnabled).mockReturnValue(true);
-    vi.mocked(travelPathTo).mockReturnValue([
-      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-    ]);
+  it('turns auto mode off for a manual travel, but leaves it alone for an auto-mode one', () => {
+    seedIdle((state) => (state.world.autoMode.enabled = true));
+    start('Field Ruins', true);
+    expect(worldAutoModeState().enabled).toBe(true);
 
-    travelStart('Field Ruins', true);
-
-    expect(autoModeToggle).not.toHaveBeenCalled();
-  });
-
-  it('does not call Auto Mode toggle when Auto Mode is already off', () => {
-    vi.mocked(autoModeIsEnabled).mockReturnValue(false);
-    vi.mocked(travelPathTo).mockReturnValue([
-      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-    ]);
-
-    travelStart('Field Ruins');
-
-    expect(autoModeToggle).not.toHaveBeenCalled();
+    start('Signpost');
+    expect(worldAutoModeState().enabled).toBe(false);
   });
 });
 
 describe('travelRelocateTo', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 1,
-      y: 1,
-    });
-  });
+  it('jumps the party, cancelling travel and gathering, and syncs reputation across maps', () => {
+    seedTravel({ destinationNodeName: 'Somewhere', path: [move(1)] });
 
-  it('moves the party, stops gathering, and syncs reputation across maps', () => {
-    travelRelocateTo({ mapName: 'LarsianDesert', x: 4, y: 7 });
+    inTick(() => travelRelocateTo({ mapName: 'LarsianDesert', x: 4, y: 7 }));
 
-    expect(gatheringStop).toHaveBeenCalled();
-    expect(currentLocationSet).toHaveBeenCalledWith({
+    expect(worldCurrentLocationState()).toEqual({
       mapName: 'LarsianDesert',
       x: 4,
       y: 7,
     });
-    expect(townReputationBuffSync).toHaveBeenCalledWith(
-      'Carrina',
-      'LarsianDesert',
-    );
-  });
-
-  it('cancels any in-progress travel', () => {
-    travelRelocateTo({ mapName: 'LarsianDesert', x: 4, y: 7 });
-
-    const next = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Somewhere',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 1 }],
-        ticksIntoStep: 3,
-      }),
-    );
-
-    expect(next.world.travel).toEqual({
+    expect(worldTravelState()).toEqual({
       status: 'Idle',
       path: [],
       ticksIntoStep: 0,
     });
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(townReputationBuffSync).toHaveBeenCalledWith(
+      'Carrina',
+      'LarsianDesert',
+    );
   });
 });
 
 describe('travelBeginDeathsDoor', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'CraggledMire',
-      x: 3,
-      y: 3,
+  function deathsDoorTicks(): number {
+    const effect = gamestate().globalEffects[0];
+    return effect.expiresAtTick - effect.startTick;
+  }
+
+  function die(edit?: (state: GameState) => void): void {
+    seedGamestate((state) => {
+      state.world.currentLocation = { mapName: 'CraggledMire', x: 3, y: 3 };
+      edit?.(state);
     });
-    vi.mocked(homeNodeGet).mockReturnValue({
-      mapName: 'Carrina',
-      nodeName: 'Carrina Outpost',
-    } as unknown as WorldNodeEntry);
-    vi.mocked(outpostDeathPenaltyMultiplier).mockReturnValue(1);
-  });
+    inTick(travelBeginDeathsDoor);
+  }
 
-  it('scales the duration by the home outpost multiplier, rounding up', () => {
-    vi.mocked(mapHopsBetween).mockReturnValue(0);
-    vi.mocked(outpostDeathPenaltyMultiplier).mockReturnValue(0.25);
-
-    travelBeginDeathsDoor();
-
-    expect(outpostDeathPenaltyMultiplier).toHaveBeenCalledWith(
-      'Carrina Outpost',
-    );
-    expect(addGlobalEffect).toHaveBeenCalledWith('Deaths Door', 3);
-  });
-
-  it('does not touch travel state - it is a pure timer, not a walk home', () => {
-    vi.mocked(mapHopsBetween).mockReturnValue(1);
-
-    travelBeginDeathsDoor();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(currentLocationSet).not.toHaveBeenCalled();
-  });
-
-  it('grants Deaths Door for 10 seconds per map hop to the home node', () => {
+  it('lasts a set time per map hop home, without moving the party', () => {
     vi.mocked(mapHopsBetween).mockReturnValue(2);
 
-    travelBeginDeathsDoor();
+    die();
 
     expect(mapHopsBetween).toHaveBeenCalledWith('CraggledMire', 'Carrina');
-    expect(addGlobalEffect).toHaveBeenCalledWith('Deaths Door', 20);
+    expect(deathsDoorTicks()).toBe(2 * DEATHS_DOOR_SECONDS_PER_MAP);
+    expect(worldCurrentLocationState().mapName).toBe('CraggledMire');
+    expect(messages()).toEqual(['The fallen party awaits recall home.']);
   });
 
-  it('applies a 10 second minimum even when already on the home map', () => {
-    vi.mocked(mapHopsBetween).mockReturnValue(0);
+  it('applies the minimum when already on the home map', () => {
+    die((state) => (state.world.currentLocation = at(3)));
 
-    travelBeginDeathsDoor();
+    expect(mapHopsBetween).toHaveBeenCalledWith('Carrina', 'Carrina');
 
-    expect(addGlobalEffect).toHaveBeenCalledWith('Deaths Door', 10);
-  });
-
-  it('logs that the party is awaiting recall', () => {
-    vi.mocked(mapHopsBetween).mockReturnValue(0);
-
-    travelBeginDeathsDoor();
+    expect(deathsDoorTicks()).toBe(DEATHS_DOOR_MINIMUM_SECONDS);
   });
 
   it('applies the minimum when there is no home node at all', () => {
-    vi.mocked(homeNodeGet).mockReturnValue(undefined);
+    seedWorldNodes([{ name: 'Field Ruins', type: 'ExploreNode' }]);
+    vi.mocked(mapHopsBetween).mockReturnValue(5);
 
-    travelBeginDeathsDoor();
+    die();
 
-    expect(addGlobalEffect).toHaveBeenCalledWith('Deaths Door', 10);
+    expect(deathsDoorTicks()).toBe(DEATHS_DOOR_MINIMUM_SECONDS);
+  });
+
+  it('shortens the timer by a developed home outpost, rounding up', () => {
+    die((state) => {
+      state.world.homeNodeName = 'Carrina Outpost';
+      state.outposts['Carrina Outpost'] = { level: 2 };
+    });
+    const multiplier = outpostDeathPenaltyMultiplier('Carrina Outpost');
+
+    expect(multiplier).toBeLessThan(1);
+    expect(Number.isInteger(DEATHS_DOOR_MINIMUM_SECONDS * multiplier)).toBe(
+      false,
+    );
+    expect(deathsDoorTicks()).toBe(
+      Math.ceil(DEATHS_DOOR_MINIMUM_SECONDS * multiplier),
+    );
   });
 });
 
 describe('travelProcessTick', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    });
-    vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(worldNodeAt).mockReturnValue(undefined);
-  });
+  const tick = () => inTick(travelProcessTick);
 
   it('does nothing when idle', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({ status: 'Idle', path: [], ticksIntoStep: 0 }),
-    );
+    seedIdle();
+    const before = gamestate();
 
-    travelProcessTick();
+    tick();
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(currentLocationSet).not.toHaveBeenCalled();
+    expect(gamestate()).toBe(before);
   });
 
-  it('accumulates ticks without moving until an off-path step cost is reached', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 1,
-      }),
-    );
+  it('accumulates progress without moving until an off-path step is paid for', () => {
+    seedTravel({
+      destinationNodeName: 'Field Ruins',
+      path: [move(1)],
+      ticksIntoStep: TICKS_PER_STEP_OFF_PATH - 2,
+    });
 
-    travelProcessTick();
+    tick();
 
-    expect(currentLocationSet).not.toHaveBeenCalled();
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 1,
-      }),
-    );
-    expect(result.world.travel.ticksIntoStep).toBe(2);
+    expect(worldCurrentLocationState()).toEqual(ORIGIN);
+    expect(worldTravelState().ticksIntoStep).toBe(TICKS_PER_STEP_OFF_PATH - 1);
   });
 
-  it('carries surplus progress into the next step when a boost makes a step cost under a tick', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      offPathTravelSpeedBonus: 0,
-      onPathTravelSpeedBonus: 0.25,
-    } as never);
-    vi.mocked(tileIsOnPath).mockReturnValue(true);
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
+  it('completes an off-path step at its cost, moving on to the next one', () => {
+    seedTravel({
+      destinationNodeName: 'Field Ruins',
+      path: [move(1), move(2)],
+      ticksIntoStep: TICKS_PER_STEP_OFF_PATH - 1,
+    });
+
+    tick();
+
+    expect(worldCurrentLocationState()).toEqual(at(1));
+    expect(worldTravelState()).toEqual({
+      status: 'Traveling',
+      destinationNodeName: 'Field Ruins',
+      path: [move(2)],
+      ticksIntoStep: 0,
+    });
+    expect(townReputationBuffSync).toHaveBeenCalledWith('Carrina', 'Carrina');
+  });
+
+  it('completes an on-path step at the cheaper on-path cost', () => {
+    seedWorld([{ x: 1, y: 0 }]);
+    seedTravel({
+      destinationNodeName: 'Field Ruins',
+      path: [move(1), move(2)],
+      ticksIntoStep: TICKS_PER_STEP_ON_PATH - 1,
+    });
+
+    tick();
+
+    expect(worldCurrentLocationState()).toEqual(at(1));
+  });
+
+  it('charges the on-path cost entering or leaving a node tile, so arrival and departure never stutter', () => {
+    const ruins = nodes['Field Ruins'];
+    seedTravel({ destinationNodeName: 'Field Ruins', path: [move(ruins.x)] });
+    tick();
+    expect(worldCurrentLocationState()).toEqual(locationOf(ruins));
+
+    seedTravel(
+      { destinationNodeName: 'Signpost', path: [move(ruins.x - 1)] },
+      (state) => (state.world.currentLocation = locationOf(ruins)),
+    );
+    tick();
+    expect(worldCurrentLocationState()).toEqual(at(ruins.x - 1));
+  });
+
+  it('still charges the off-path cost leaving an ordinary path tile onto an off-path tile', () => {
+    seedWorld([{ x: 1, y: 0 }]);
+    seedTravel(
+      {
         destinationNodeName: 'Field Ruins',
-        path: [
-          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-        ],
-        ticksIntoStep: 0,
-      }),
+        path: [move(2)],
+        ticksIntoStep: TICKS_PER_STEP_ON_PATH - 1,
+      },
+      (state) => (state.world.currentLocation = at(1)),
     );
 
-    travelProcessTick();
+    tick();
 
-    expect(currentLocationSet).toHaveBeenCalledTimes(1);
-    const result = applyLastUpdate(
-      stateWithTravel({ status: 'Traveling', path: [], ticksIntoStep: 0 }),
-    );
-    expect(result.world.travel.path).toEqual([
-      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
+    expect(worldCurrentLocationState()).toEqual(at(1));
+  });
+
+  it('carries surplus progress into the next step when a boosted step costs under a tick', () => {
+    seedWorld([
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
     ]);
-    expect(result.world.travel.ticksIntoStep).toBeCloseTo(0.25);
+    seedTravel(
+      { destinationNodeName: 'Field Ruins', path: [move(1), move(2)] },
+      (state) => (state.globalEffectSums.onPathTravelSpeedBonus = 0.25),
+    );
+
+    tick();
+
+    expect(worldCurrentLocationState()).toEqual(at(1));
+    expect(worldTravelState().path).toEqual([move(2)]);
+    expect(worldTravelState().ticksIntoStep).toBeCloseTo(
+      1 - TICKS_PER_STEP_ON_PATH * 0.75,
+    );
   });
 
-  it('completes an off-path step at the 3-tick cost, moving to the next tile', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [
-          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-        ],
-        ticksIntoStep: 2,
-      }),
-    );
-
-    travelProcessTick();
-
-    expect(currentLocationSet).toHaveBeenCalledWith({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
+  it('resolves Teleport steps instantly, chaining them into the same tick', () => {
+    seedTravel({
+      destinationNodeName: 'Gateway',
+      path: [move(1), teleport('CraggledMire')],
+      ticksIntoStep: TICKS_PER_STEP_OFF_PATH - 1,
     });
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        path: [],
-        ticksIntoStep: 0,
-      }),
-    );
-    expect(result.world.travel).toEqual({
-      status: 'Traveling',
-      path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
-      ticksIntoStep: 0,
-    });
-  });
 
-  it('syncs the town reputation buff with the map before/after a completed step', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Larsia',
-        path: [
-          { kind: 'Move', mapName: 'LarsianDesert', x: 5, y: 9 },
-          { kind: 'Move', mapName: 'LarsianDesert', x: 6, y: 9 },
-        ],
-        ticksIntoStep: 2,
-      }),
-    );
+    tick();
 
-    travelProcessTick();
-
-    expect(townReputationBuffSync).toHaveBeenCalledWith(
+    expect(worldCurrentLocationState()).toEqual(at(0, 'CraggledMire'));
+    expect(worldTravelState().status).toBe('Idle');
+    expect(townReputationBuffSync).toHaveBeenLastCalledWith(
       'Carrina',
-      'LarsianDesert',
+      'CraggledMire',
     );
+
+    seedTravel({ destinationNodeName: 'Gateway', path: [teleport('Larsia')] });
+    tick();
+    expect(worldCurrentLocationState()).toEqual(at(0, 'Larsia'));
   });
 
-  it('completes an on-path step at the 1-tick cost, moving to the next tile', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(true);
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [
-          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-          { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-        ],
-        ticksIntoStep: 0,
-      }),
-    );
+  describe('arriving at the destination', () => {
+    function arriveAt(name: string): void {
+      const node = nodes[name];
+      seedTravel(
+        { destinationNodeName: name, path: [move(node.x)] },
+        (state) => (state.world.currentLocation = at(node.x - 1)),
+      );
+      tick();
+    }
 
-    travelProcessTick();
+    it('settles idle, logs the arrival and shows the node', () => {
+      arriveAt('Signpost');
 
-    expect(currentLocationSet).toHaveBeenCalledWith({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-    });
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
+      expect(worldTravelState()).toEqual({
+        status: 'Idle',
         path: [],
         ticksIntoStep: 0,
-      }),
-    );
-    expect(result.world.travel).toEqual({
-      status: 'Traveling',
-      path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
-      ticksIntoStep: 0,
-    });
-  });
-
-  it('completes a step onto an off-path node tile at the 1-tick cost, so arrival never stutters', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(worldNodeAt).mockImplementation((_mapName, x, y) =>
-      x === 1 && y === 0
-        ? ({ nodeName: 'Field Ruins' } as unknown as WorldNodeEntry)
-        : undefined,
-    );
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 0,
-      }),
-    );
-
-    travelProcessTick();
-
-    expect(currentLocationSet).toHaveBeenCalledWith({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-    });
-  });
-
-  it('completes a step off of an off-path node tile at the 1-tick cost, so departure never stutters', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(false);
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-    });
-    vi.mocked(worldNodeAt).mockImplementation((_mapName, x, y) =>
-      x === 1 && y === 0
-        ? ({ nodeName: 'Field Ruins' } as unknown as WorldNodeEntry)
-        : undefined,
-    );
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Old Town',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
-        ticksIntoStep: 0,
-      }),
-    );
-
-    travelProcessTick();
-
-    expect(currentLocationSet).toHaveBeenCalledWith({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-    });
-  });
-
-  it('still charges the off-path cost leaving an ordinary (non-node) path tile onto an off-path tile', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-    });
-    // Origin (1,0) is on-path but not a node; destination (2,0) is neither -
-    // the origin's own on-path status must not discount this step, or every
-    // path -> off-path transition would be mispriced as cheap.
-    vi.mocked(tileIsOnPath).mockImplementation(
-      (_mapName, x, y) => x === 1 && y === 0,
-    );
-    vi.mocked(worldNodeAt).mockReturnValue(undefined);
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
-        ticksIntoStep: 1,
-      }),
-    );
-
-    travelProcessTick();
-
-    // With the (buggy) 1-tick cost this would already complete at tick 2;
-    // the off-path 3-tick cost means it shouldn't yet.
-    expect(currentLocationSet).not.toHaveBeenCalled();
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 0 }],
-        ticksIntoStep: 1,
-      }),
-    );
-    expect(result.world.travel.ticksIntoStep).toBe(2);
-  });
-
-  it('resolves a Teleport step instantly, in the same tick as the Move step before it', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'To Craggled Mire',
-        path: [
-          { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-          { kind: 'Teleport', mapName: 'CraggledMire', x: 0, y: 0 },
-        ],
-        ticksIntoStep: 2,
-      }),
-    );
-
-    travelProcessTick();
-
-    expect(currentLocationSet).toHaveBeenNthCalledWith(1, {
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-    });
-    expect(currentLocationSet).toHaveBeenNthCalledWith(2, {
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
+      });
+      expect(messages()).toContain('The party has arrived at Signpost.');
+      expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(nodes['Signpost']);
+      expect(encounterStartFight).not.toHaveBeenCalled();
+      expect(gatheringStart).not.toHaveBeenCalled();
+      expect(caravanMarkVisited).not.toHaveBeenCalled();
     });
 
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        path: [],
-        ticksIntoStep: 0,
-      }),
-    );
-    expect(result.world.travel).toEqual({
-      status: 'Idle',
-      path: [],
-      ticksIntoStep: 0,
+    it('starts the first fight at an encounter node', () => {
+      arriveAt('Field Ruins');
+
+      expect(encounterStartFight).toHaveBeenCalledWith(
+        'field-ruins',
+        0,
+        'Field Ruins',
+      );
     });
-  });
 
-  it('resolves a lone Teleport step immediately without waiting for a tick to accumulate', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'To Craggled Mire',
-        path: [{ kind: 'Teleport', mapName: 'CraggledMire', x: 0, y: 0 }],
-        ticksIntoStep: 0,
-      }),
-    );
+    it('discovers and starts gathering at a gather node', () => {
+      arriveAt('Wergen Woods');
 
-    travelProcessTick();
-
-    expect(currentLocationSet).toHaveBeenCalledWith({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
+      expect(gamestate().discoveredGatherNodes['Wergen Woods']).toBeDefined();
+      expect(gatheringStart).toHaveBeenCalledWith('Wergen Woods');
     });
-  });
 
-  it('on arrival at a node with an encounter, resets travel and starts the first fight', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Field Ruins',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-    const encounter = { id: 'enc-1' } as unknown as EncounterContent;
-    const node = {
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-      nodeName: 'Field Ruins',
-      nodeData: {} as never,
-    };
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(worldNodeEncounter).mockReturnValue(encounter);
+    it('marks a caravan visited', () => {
+      arriveAt('Caravan');
 
-    travelProcessTick();
-
-    const result = applyLastUpdate(
-      stateWithTravel({
-        status: 'Traveling',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-    expect(result.world.travel).toEqual({
-      status: 'Idle',
-      path: [],
-      ticksIntoStep: 0,
+      expect(caravanMarkVisited).toHaveBeenCalledWith('duchy-caravan');
     });
-    expect(encounterStartFight).toHaveBeenCalledWith('enc-1', 0, 'Field Ruins');
-    expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
-  });
-
-  it('on arrival at a node with no encounter, does not start a fight, but still shows the node', () => {
-    const node = {
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-      nodeName: 'Duchy of Carrina',
-      nodeData: {} as never,
-    };
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Duchy of Carrina',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
-
-    travelProcessTick();
-
-    expect(encounterStartFight).not.toHaveBeenCalled();
-    expect(gatheringStart).not.toHaveBeenCalled();
-    // Arrival always surfaces wherever the party ends up, not just when
-    // something (combat/gathering) kicks off there.
-    expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
-    expect(caravanMarkVisited).not.toHaveBeenCalled();
-  });
-
-  it('on arrival at a caravan node, marks the caravan visited', () => {
-    const node = {
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-      nodeName: 'Duchy Trading Caravan - Carrina',
-      nodeData: {} as never,
-    };
-    const caravan = { id: 'duchy-caravan' as CaravanId } as CaravanContent;
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Duchy Trading Caravan - Carrina',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-
-    travelProcessTick();
-
-    expect(caravanMarkVisited).toHaveBeenCalledWith('duchy-caravan');
-  });
-
-  it('on arrival at a node with a gathering site and no encounter, starts gathering and shows the node', () => {
-    const node = {
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-      nodeName: 'Wergen Woods',
-      nodeData: {} as never,
-    };
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithTravel({
-        status: 'Traveling',
-        destinationNodeName: 'Wergen Woods',
-        path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-        ticksIntoStep: 2,
-      }),
-    );
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
-    vi.mocked(worldNodeGathering).mockReturnValue({
-      id: 'gather-1',
-    } as unknown as GatheringContent);
-
-    travelProcessTick();
-
-    expect(encounterStartFight).not.toHaveBeenCalled();
-    expect(gatheringStart).toHaveBeenCalledWith('Wergen Woods');
-    expect(gatherNodeDiscover).toHaveBeenCalledWith('Wergen Woods');
-    expect(mapNodeAutoShowOnArrival).toHaveBeenCalledWith(node);
   });
 });

@@ -1,551 +1,213 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/state-game', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  globalEffectSumsState: vi.fn(),
-  worldCombatState: vi.fn(),
-}));
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryGet: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/combat/combat', () => ({
-  worldCombatState: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/rng', () => ({
-  rngUuid: vi.fn(() => 'rng-id'),
-}));
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
   combatantFromCharacter,
   combatantFromMonster,
   combatantsFromTownGuardians,
+  combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
-import { getEntry } from '@helpers/content/content';
 import { ensureEquipment } from '@helpers/content/ensure-item';
-import { ensureMonsterSkill } from '@helpers/content/ensure-monster';
-import { defaultCombatStats, defaultTagResistances } from '@helpers/defaults';
-import { globalEffectSumsState } from '@helpers/state-game';
+import { ensureJob } from '@helpers/content/ensure-job';
+import {
+  ensureMonster,
+  ensureMonsterSkill,
+} from '@helpers/content/ensure-monster';
+import { ensureSkill } from '@helpers/content/ensure-skill';
+import {
+  defaultCombatStats,
+  defaultEquipment,
+  defaultStats,
+} from '@helpers/defaults';
 import type {
   Character,
-  CharacterId,
-  EquipmentBlock,
   EquipmentContent,
   EquipmentId,
-  EquipmentItemId,
-  EquipmentSkillContent,
   EquipmentSkillId,
-  GlobalEffectSums,
-  JobContent,
+  GameState,
   JobId,
   MonsterContent,
   MonsterId,
-  StatBlock,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-function zeroStats(): StatBlock {
+const rangerId = 'ranger' as JobId;
+const bowId = 'bow' as EquipmentId;
+const attackId = 'attack' as EquipmentSkillId;
+const snipeId = 'snipe' as EquipmentSkillId;
+const citizenId = 'larsian-citizen' as MonsterId;
+const guardId = 'larsian-guard' as MonsterId;
+
+const citizen = ensureMonster({ id: citizenId, name: 'Larsian Citizen' });
+const guard = ensureMonster({ id: guardId, name: 'Larsian Guard' });
+
+function seedRanger(bow: Partial<EquipmentContent> = {}): void {
+  seedContent([
+    ensureJob({
+      id: rangerId,
+      name: 'Ranger',
+      equippableTypes: ['Bow'],
+      skillPath: [
+        { pathName: 'Attack', levels: [{ level: 1, skillId: attackId }] },
+        { pathName: 'Snipe', levels: [{ level: 1, skillId: snipeId }] },
+      ],
+    }),
+    ensureSkill({ id: attackId, name: 'Attack' }),
+    ensureSkill({ id: snipeId, name: 'Snipe', requiredWeaponTypes: ['Bow'] }),
+    ensureEquipment({ id: bowId, name: 'Bow', type: 'Bow', ...bow }),
+    citizen,
+    guard,
+  ]);
+}
+
+function ranger(overrides: Partial<Character> = {}): Character {
+  return buildCharacter({ jobId: rangerId, ...overrides });
+}
+
+function withBow(): Partial<Character> {
   return {
-    Health: 0,
-    Energy: 0,
-    Luck: 0,
-    Intelligence: 0,
-    Strength: 0,
-    Vitality: 0,
-    Resistance: 0,
-    Agility: 0,
-    Constitution: 0,
-    Spirit: 0,
+    equipment: { ...defaultEquipment(), Weapon: buildEquipmentItem(bowId) },
   };
 }
 
-function zeroGlobalEffectSums(): GlobalEffectSums {
-  return {
-    stats: zeroStats(),
-    combatStats: defaultCombatStats(),
-    debuffResistanceTags: defaultTagResistances(),
-    debuffResistanceFlat: 0,
-    xpGainMultiplierBonus: 0,
-    goldGainMultiplierBonus: 0,
-    combatItemDropRateBoost: 0,
-    gatheringItemDropRateBoost: 0,
-    armorySizeBoost: 0,
-    tradeskillQueueSizeBoosts: {},
-    offPathTravelSpeedBonus: 0,
-    onPathTravelSpeedBonus: 0,
-    decreeClauseCapBoost: 0,
-  };
-}
-
-const emptyEquipment: EquipmentBlock = {
-  Armor: undefined,
-  Helmet: undefined,
-  Weapon: undefined,
-  Offhand: undefined,
-  Ring: undefined,
-  Accessory: undefined,
-  Artifact: undefined,
-  Ammo: undefined,
-};
-
-const attackSkill: EquipmentSkillContent = {
-  id: 'attack' as EquipmentSkillId,
-  name: 'Attack',
-  __type: 'skill',
-  description: '',
-  sprite: '0000',
-  rarity: 'Common',
-  epCost: 0,
-  usesPerCombat: -1,
-  statusEffectDurationBoost: {},
-  statusEffectChanceBoost: {},
-  techniques: [],
-  requiredWeaponTypes: [],
-  family: 'Attack',
-};
-
-const snipeSkill: EquipmentSkillContent = {
-  ...attackSkill,
-  id: 'snipe' as EquipmentSkillId,
-  name: 'Snipe',
-  requiredWeaponTypes: ['Bow'],
-};
-
-const bow: EquipmentContent = ensureEquipment({
-  id: 'bow' as EquipmentId,
-  name: 'Bow',
-  description: '',
-  sprite: '0000',
-  rarity: 'Common',
-  levelRequirement: 1,
-  baseStats: zeroStats(),
-  type: 'Bow',
-});
-
-const rangerJob: JobContent = {
-  id: 'ranger' as JobId,
-  name: 'Ranger',
-  shorthand: 'RNG',
-  __type: 'job',
-  description: '',
-  baseStats: zeroStats(),
-  statsPerLevel: zeroStats(),
-  sprite: '0000',
-  frames: 4,
-  equippableTypes: ['Bow'],
-  statPriority: [],
-  skillPath: [
-    {
-      pathName: 'Attack',
-      levels: [{ level: 1, skillId: attackSkill.id }],
-    },
-    {
-      pathName: 'Snipe',
-      levels: [{ level: 1, skillId: snipeSkill.id }],
-    },
-  ],
-};
-
-function buildCharacter(overrides: Partial<Character> = {}): Character {
-  return {
-    id: 'char-1' as CharacterId,
-    name: 'Hero',
-    level: 1,
-    jobId: rangerJob.id,
-    hp: 10,
-    ep: 10,
-    stats: zeroStats(),
-    equipment: emptyEquipment,
-    combatOrders: {},
-    ...overrides,
-  } as Character;
+function withEffects(edit: (sums: GameState['globalEffectSums']) => void) {
+  seedGamestate((state) => edit(state.globalEffectSums));
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(globalEffectSumsState).mockReturnValue(zeroGlobalEffectSums());
+  seedRanger();
+  seedGamestate();
 });
 
 describe('combatantFromCharacter', () => {
-  beforeEach(() => {
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === rangerJob.id) return rangerJob as never;
-      if (id === attackSkill.id) return attackSkill as never;
-      if (id === snipeSkill.id) return snipeSkill as never;
-      if (id === bow.id) return bow as never;
-      return undefined as never;
+  it('fights as a hero with the character’s job, level and pools', () => {
+    const character = ranger({ level: 4, hp: 6, ep: 3 });
+
+    expect(combatantFromCharacter(character)).toMatchObject({
+      id: character.id,
+      isEnemy: false,
+      jobId: rangerId,
+      level: 4,
+      hp: 6,
+      ep: 3,
+      totalStats: character.stats,
     });
   });
 
-  it('excludes a weapon-gated skill when the required weapon is not equipped', () => {
-    const combatant = combatantFromCharacter(buildCharacter());
-
-    expect(combatant.skillIds).toEqual([attackSkill.id]);
+  it('only gets a weapon-gated skill while the required weapon is equipped', () => {
+    expect(combatantFromCharacter(ranger()).skillIds).toEqual([attackId]);
+    expect(sortBy(combatantFromCharacter(ranger(withBow())).skillIds)).toEqual([
+      attackId,
+      snipeId,
+    ]);
   });
 
-  it('includes a weapon-gated skill once the required weapon is equipped', () => {
-    const combatant = combatantFromCharacter(
-      buildCharacter({
-        equipment: {
-          ...emptyEquipment,
-          Weapon: {
-            id: 'bow-1' as EquipmentItemId,
-            equipmentId: bow.id,
-            infusedItemIds: [],
-            affixIds: [],
-          },
-        },
-      }),
-    );
-
-    expect(combatant.skillIds).toEqual(
-      expect.arrayContaining([attackSkill.id, snipeSkill.id]),
-    );
-    expect(combatant.skillIds).toHaveLength(2);
-  });
-
-  it('applies active GainStats global effects to statBoosts and totalStats', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      ...zeroGlobalEffectSums(),
-      stats: { ...zeroStats(), Strength: 5, Vitality: 5 },
-    });
-
-    const combatant = combatantFromCharacter(buildCharacter());
-
-    expect(combatant.statBoosts.Strength).toBe(5);
-    expect(combatant.statBoosts.Vitality).toBe(5);
-    expect(combatant.totalStats.Strength).toBe(5);
-    expect(combatant.totalStats.Vitality).toBe(5);
-  });
-
-  it('tops up current hp/ep by a Health/Energy GainStats bonus, even when not at full health', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      ...zeroGlobalEffectSums(),
-      stats: { ...zeroStats(), Health: 25, Energy: 25 },
-    });
-
-    const combatant = combatantFromCharacter(buildCharacter({ hp: 6, ep: 4 }));
-
-    expect(combatant.hp).toBe(31);
-    expect(combatant.ep).toBe(29);
-    expect(combatant.totalStats.Health).toBe(25);
-    expect(combatant.totalStats.Energy).toBe(25);
-  });
-
-  it('ignores active GlobalXPGainMultiplier effects when applying stat boosts', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      ...zeroGlobalEffectSums(),
-      xpGainMultiplierBonus: 0.1,
-    });
-
-    const combatant = combatantFromCharacter(buildCharacter());
-
-    expect(combatant.statBoosts).toEqual(zeroStats());
-  });
-
-  it('applies active GainCombatStat global effects to combatStats', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      ...zeroGlobalEffectSums(),
-      combatStats: { ...defaultCombatStats(), reviveChance: 2 },
-    });
-
-    const combatant = combatantFromCharacter(buildCharacter());
-
-    expect(combatant.combatStats.reviveChance).toBe(2);
-  });
-
-  it('applies active DebuffResistanceTag global effects to only the targeted tag', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      ...zeroGlobalEffectSums(),
-      debuffResistanceTags: { ...defaultTagResistances(), Accuracy: 5 },
-    });
-
-    const combatant = combatantFromCharacter(buildCharacter());
-
-    expect(combatant.tagResistance.Accuracy).toBe(5);
-    expect(combatant.tagResistance.Stun).toBe(0);
-  });
-
-  it('sets jobId from the character so a monster targetting entry can match it', () => {
-    const combatant = combatantFromCharacter(buildCharacter());
-
-    expect(combatant.jobId).toBe(rangerJob.id);
-  });
-
-  it("adds an equipped item's combatStats bonus on top of the default value", () => {
-    const reflectiveBow: EquipmentContent = {
-      ...bow,
-      combatStats: {
-        repeatActionChance: 0,
-        skillStrikeAgainChance: 0,
-        redirectionChance: 0,
-        missChance: 0,
-        debuffIgnoreChance: 0,
-        damageReflectPercent: 10,
-        healingIgnorePercent: 0,
-        reviveChance: 0,
-        stunChance: 0,
-        agroValue: 0,
-      },
-    };
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === rangerJob.id) return rangerJob as never;
-      if (id === attackSkill.id) return attackSkill as never;
-      if (id === snipeSkill.id) return snipeSkill as never;
-      if (id === bow.id) return reflectiveBow as never;
-      return undefined as never;
-    });
-
-    const combatant = combatantFromCharacter(
-      buildCharacter({
-        equipment: {
-          ...emptyEquipment,
-          Weapon: {
-            id: 'bow-1' as EquipmentItemId,
-            equipmentId: bow.id,
-            infusedItemIds: [],
-            affixIds: [],
-          },
-        },
-      }),
-    );
-
-    expect(combatant.combatStats.damageReflectPercent).toBe(10);
-  });
-
-  it("carries an equipped item's skillStatBonuses onto the combatant", () => {
-    const fireballBow: EquipmentContent = {
-      ...bow,
+  it("carries equipped gear's combat stats and skill stat bonuses", () => {
+    seedRanger({
+      combatStats: { ...defaultCombatStats(), damageReflectPercent: 10 },
       skillStatBonuses: [
         { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
       ],
-    };
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === rangerJob.id) return rangerJob as never;
-      if (id === attackSkill.id) return attackSkill as never;
-      if (id === snipeSkill.id) return snipeSkill as never;
-      if (id === bow.id) return fireballBow as never;
-      return undefined as never;
     });
 
-    const combatant = combatantFromCharacter(
-      buildCharacter({
-        equipment: {
-          ...emptyEquipment,
-          Weapon: {
-            id: 'bow-1' as EquipmentItemId,
-            equipmentId: bow.id,
-            infusedItemIds: [],
-            affixIds: [],
-          },
-        },
-      }),
-    );
+    const combatant = combatantFromCharacter(ranger(withBow()));
 
+    expect(combatant.combatStats.damageReflectPercent).toBe(10);
     expect(combatant.skillStatBonuses).toEqual([
       { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
     ]);
   });
+
+  it('applies active stat buffs, topping up current hp/ep by Health/Energy gains', () => {
+    withEffects((sums) => {
+      sums.stats = { ...defaultStats(), Strength: 5, Health: 25, Energy: 25 };
+      sums.xpGainMultiplierBonus = 0.1;
+    });
+    const character = ranger({ hp: 6, ep: 4 });
+
+    const combatant = combatantFromCharacter(character);
+
+    expect(combatant.statBoosts).toEqual({
+      ...defaultStats(),
+      Strength: 5,
+      Health: 25,
+      Energy: 25,
+    });
+    expect(combatant.totalStats.Strength).toBe(character.stats.Strength + 5);
+    expect(combatant.totalStats.Health).toBe(character.stats.Health + 25);
+    expect(combatant.hp).toBe(6 + 25);
+    expect(combatant.ep).toBe(4 + 25);
+  });
+
+  it('applies active combat-stat and debuff-resistance buffs', () => {
+    withEffects((sums) => {
+      sums.combatStats.reviveChance = 2;
+      sums.debuffResistanceTags.Accuracy = 5;
+      sums.debuffResistanceFlat = 3;
+    });
+
+    const combatant = combatantFromCharacter(ranger());
+
+    expect(combatant.combatStats.reviveChance).toBe(2);
+    expect(combatant.tagResistance.Accuracy).toBe(5 + 3);
+    expect(combatant.tagResistance.Stun).toBe(3);
+  });
 });
 
 describe('combatantFromMonster', () => {
-  it('is unaffected by weapon requirements - monsters keep every listed skill', () => {
-    const monster: MonsterContent = {
-      id: 'goblin' as MonsterId,
-      name: 'Goblin',
-      __type: 'monster',
-      description: '',
-      sprite: '0000',
-      frames: 4,
-      targetting: [{ type: 'Random' }],
-      baseStats: zeroStats(),
-      statsPerLevel: zeroStats(),
-      skills: [ensureMonsterSkill({ skillId: snipeSkill.id })],
-    } as MonsterContent;
-
-    const combatant = combatantFromMonster(monster, 1, 0);
-
-    expect(combatant.skillIds).toEqual([snipeSkill.id]);
-    expect(getEntry).not.toHaveBeenCalled();
-  });
-
-  it('carries each skill weight into skillWeights', () => {
-    const monster: MonsterContent = {
-      id: 'goblin' as MonsterId,
-      name: 'Goblin',
-      __type: 'monster',
-      description: '',
-      sprite: '0000',
-      frames: 4,
-      targetting: [{ type: 'Random' }],
-      baseStats: zeroStats(),
-      statsPerLevel: zeroStats(),
-      skills: [
-        ensureMonsterSkill({ skillId: attackSkill.id }),
-        ensureMonsterSkill({ skillId: snipeSkill.id, weight: 3 }),
-      ],
-    } as MonsterContent;
-
-    const combatant = combatantFromMonster(monster, 1, 0);
-
-    expect(combatant.skillWeights).toEqual({
-      [attackSkill.id]: 1,
-      [snipeSkill.id]: 3,
-    });
-  });
-
-  it('only carries skills whose level range covers the monster level', () => {
-    const monster = {
+  const hawk = (skills: MonsterContent['skills'] = []) =>
+    ensureMonster({
       id: 'hawk' as MonsterId,
       name: 'Hawk',
-      __type: 'monster',
-      description: '',
-      sprite: '0000',
-      frames: 4,
-      targetting: [{ type: 'Random' }],
-      baseStats: zeroStats(),
-      statsPerLevel: zeroStats(),
-      skills: [
-        ensureMonsterSkill({ skillId: attackSkill.id, weight: 5 }),
-        ensureMonsterSkill({ skillId: snipeSkill.id, minLevel: 30 }),
-      ],
-    } as MonsterContent;
-
-    const low = combatantFromMonster(monster, 29, 0);
-    const high = combatantFromMonster(monster, 30, 0);
-
-    const none = combatantFromMonster(
-      {
-        ...monster,
-        skills: [ensureMonsterSkill({ skillId: snipeSkill.id, minLevel: 30 })],
-      },
-      1,
-      0,
-    );
-
-    expect(low.skillIds).toEqual([attackSkill.id]);
-    expect(low.skillWeights).toEqual({ [attackSkill.id]: 5 });
-    expect(high.skillIds).toEqual([attackSkill.id, snipeSkill.id]);
-    expect(none.skillIds).toEqual([]);
-    expect(none.skillWeights).toEqual({});
-  });
-
-  it('is not affected by active GainStats global effects - those only apply to heroes', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      ...zeroGlobalEffectSums(),
-      stats: { ...zeroStats(), Strength: 5 },
+      targetting: [{ type: 'Random', jobId: rangerId }, { type: 'Random' }],
+      skills,
     });
 
-    const monster: MonsterContent = {
-      id: 'goblin' as MonsterId,
-      name: 'Goblin',
-      __type: 'monster',
-      description: '',
-      sprite: '0000',
-      frames: 4,
-      targetting: [{ type: 'Random' }],
-      baseStats: zeroStats(),
-      statsPerLevel: zeroStats(),
-      combatStats: defaultCombatStats(),
-      skills: [ensureMonsterSkill({ skillId: attackSkill.id })],
-    } as MonsterContent;
+  it('fights as an enemy with its targetting, ignoring weapon gates and hero buffs', () => {
+    withEffects((sums) => (sums.stats.Strength = 5));
 
-    const combatant = combatantFromMonster(monster, 1, 0);
+    const monster = hawk([ensureMonsterSkill({ skillId: snipeId })]);
 
-    expect(combatant.statBoosts).toEqual(zeroStats());
+    const combatant = combatantFromMonster(monster, 7, 2);
+
+    expect(combatant).toMatchObject({
+      isEnemy: true,
+      monsterId: 'hawk',
+      name: 'Hawk Lv.7 [C]',
+      level: 7,
+      skillIds: [snipeId],
+      statBoosts: defaultStats(),
+      targetting: monster.targetting,
+    });
+    expect(monster.targetting[0]).toEqual({ type: 'Random', jobId: rangerId });
   });
 
-  it('carries the targetting priority list through from the monster content', () => {
-    const monster: MonsterContent = {
-      id: 'goblin' as MonsterId,
-      name: 'Goblin',
-      __type: 'monster',
-      description: '',
-      sprite: '0000',
-      frames: 4,
-      rarity: 'Common',
-      targetting: [{ type: 'Random', jobId: rangerJob.id }, { type: 'Random' }],
-      xp: { min: 0, max: 0 },
-      drops: [],
-      baseStats: zeroStats(),
-      statsPerLevel: zeroStats(),
-      combatStats: defaultCombatStats(),
-      skills: [],
-      types: [],
-    };
-
-    const combatant = combatantFromMonster(monster, 1, 0);
-
-    expect(combatant.targetting).toEqual([
-      { type: 'Random', jobId: rangerJob.id },
-      { type: 'Random' },
+  it('only carries skills whose level range covers the monster level, with their weights', () => {
+    const monster = hawk([
+      ensureMonsterSkill({ skillId: attackId, weight: 5 }),
+      ensureMonsterSkill({ skillId: snipeId, minLevel: 30, weight: 3 }),
     ]);
+
+    expect(combatantFromMonster(monster, 29, 0)).toMatchObject({
+      skillIds: [attackId],
+      skillWeights: { [attackId]: 5 },
+    });
+    expect(combatantFromMonster(monster, 30, 0)).toMatchObject({
+      skillIds: [attackId, snipeId],
+      skillWeights: { [attackId]: 5, [snipeId]: 3 },
+    });
   });
 });
 
 describe('combatantsFromTownGuardians', () => {
-  const citizen: MonsterContent = {
-    id: 'larsian-citizen' as MonsterId,
-    name: 'Larsian Citizen',
-    __type: 'monster',
-    description: '',
-    sprite: '0000',
-    frames: 4,
-    rarity: 'Common',
-    targetting: [{ type: 'Random' }],
-    baseStats: zeroStats(),
-    statsPerLevel: zeroStats(),
-    combatStats: defaultCombatStats(),
-    skills: [],
-    types: [],
-    xp: { min: 0, max: 0 },
-    drops: [],
-  };
-
-  it('spawns one combatant per entry quantity', () => {
-    vi.mocked(getEntry).mockReturnValue(citizen as never);
-
-    const combatants = combatantsFromTownGuardians(
-      [{ monsterId: citizen.id, quantity: 3 }],
-      25,
-    );
-
-    expect(combatants).toHaveLength(3);
-    expect(combatants.every((c) => c.monsterId === citizen.id)).toBe(true);
-  });
-
-  // A helper fighting for the party must have isEnemy overridden, or targeting/turn-order
-  // treat it as an enemy of the party it's supposed to be defending.
-  it('fights for the party, not the assaulters', () => {
-    vi.mocked(getEntry).mockReturnValue(citizen as never);
-
-    const combatants = combatantsFromTownGuardians(
-      [{ monsterId: citizen.id, quantity: 2 }],
-      25,
-    );
-
-    expect(combatants.every((c) => c.isEnemy === false)).toBe(true);
-  });
-
-  it('assigns a unique letter suffix across entries, not restarted per entry', () => {
-    const guard: MonsterContent = {
-      ...citizen,
-      id: 'larsian-guard' as MonsterId,
-      name: 'Larsian Guard',
-    };
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === citizen.id ? citizen : guard) as never,
-    );
-
+  it('spawns allied combatants per quantity, lettered across entries, skipping missing monsters', () => {
     const combatants = combatantsFromTownGuardians(
       [
-        { monsterId: citizen.id, quantity: 2 },
-        { monsterId: guard.id, quantity: 2 },
+        { monsterId: citizenId, quantity: 2 },
+        { monsterId: 'gone' as MonsterId, quantity: 4 },
+        { monsterId: guardId, quantity: 2 },
       ],
       25,
     );
@@ -556,16 +218,30 @@ describe('combatantsFromTownGuardians', () => {
       'Larsian Guard Lv.25 [C]',
       'Larsian Guard Lv.25 [D]',
     ]);
+    expect(combatants.every((c) => !c.isEnemy && c.level === 25)).toBe(true);
   });
+});
 
-  it('skips an entry whose monster id no longer resolves to content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+describe('combatCreateForEncounter', () => {
+  it('builds a fresh combat with the party as heroes and the monsters as guardians', () => {
+    const party = [ranger({ name: 'Ada' }), ranger({ name: 'Bo' })];
 
-    const combatants = combatantsFromTownGuardians(
-      [{ monsterId: citizen.id, quantity: 3 }],
-      25,
+    const combat = combatCreateForEncounter(
+      party,
+      [citizen, guard],
+      12,
+      'Field Ruins',
     );
 
-    expect(combatants).toEqual([]);
+    expect(combat).toMatchObject({
+      locationName: 'Field Ruins',
+      rounds: 0,
+      helpers: [],
+    });
+    expect(combat.heroes.map((hero) => hero.name)).toEqual(['Ada', 'Bo']);
+    expect(combat.guardians.map((guardian) => guardian.name)).toEqual([
+      'Larsian Citizen Lv.12 [A]',
+      'Larsian Guard Lv.12 [B]',
+    ]);
   });
 });
