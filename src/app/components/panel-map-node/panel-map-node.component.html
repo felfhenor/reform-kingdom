@@ -114,6 +114,7 @@
             [entry]="entry"
             (develop)="developOutpost()"
             (setHome)="setOutpostHome()"
+            (teleport)="openOutpostTeleport()"
           />
         } @else if (isTownNode()) {
           <app-panel-map-node-actions-town (openTown)="openTown()" />

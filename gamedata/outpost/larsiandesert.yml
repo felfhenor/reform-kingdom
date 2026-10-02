@@ -66,3 +66,19 @@
 
         - itemId: Strongreed
           required: 75
+
+    - costs:
+        - itemId: Gold Coin
+          required: 125000
+
+        - itemId: Petrifiwood
+          required: 750
+
+        - itemId: Firmwater
+          required: 650
+
+        - itemId: Timberfuzz
+          required: 300
+
+        - itemId: Strongreed
+          required: 150

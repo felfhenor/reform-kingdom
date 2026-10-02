@@ -54,3 +54,16 @@
 
         - itemId: Ghostwood
           required: 50
+
+    - costs:
+        - itemId: Gold Coin
+          required: 50000
+
+        - itemId: Mirewood
+          required: 1000
+
+        - itemId: Miremetal Ingot
+          required: 300
+
+        - itemId: Ghostwood
+          required: 100

@@ -92,8 +92,11 @@ export const DEATHS_DOOR_SECONDS_PER_MAP = 10;
 export const DEATHS_DOOR_MINIMUM_SECONDS = 10;
 // Per home-outpost level past the build (+1), applied to both Deaths Door and Healing.
 export const OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL = 0.25;
-// Build (+1) plus three upgrades; enforced on content by validate:outposts.
-export const OUTPOST_MAX_LEVEL = 4;
+// Levels past this add no further reduction, so the teleport level can't zero out Deaths Door.
+export const OUTPOST_DEATH_PENALTY_MAX_LEVEL = 4;
+// Build (+1), three death-penalty upgrades, then the teleport unlock; enforced on content by validate:outposts.
+export const OUTPOST_MAX_LEVEL = 5;
+export const OUTPOST_TELEPORT_LEVEL = 5;
 
 // Shared exponent for the house XP-curve shape (start + (end - start) * progress^EASE) used by character,
 // tradeskill, and worker leveling - see patterns.md's "shared XP-curve shape" note.

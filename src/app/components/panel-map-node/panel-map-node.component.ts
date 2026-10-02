@@ -25,6 +25,7 @@ import { notifySuccess } from '@helpers/engine/notify';
 import {
   caravanTradeOpen,
   mapNodeDeselect,
+  outpostTeleportOpen,
   selectedMapNode,
   townOpen,
   trainerVisitOpen,
@@ -362,6 +363,13 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     void outpostLevelUp(entry.nodeName);
+  }
+
+  public openOutpostTeleport(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    outpostTeleportOpen(entry);
   }
 
   public setOutpostHome(): void {

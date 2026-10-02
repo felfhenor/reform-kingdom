@@ -1,0 +1,49 @@
+<app-modal
+  modalId="outpost-teleport"
+  widthClass="max-w-xl"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+>
+  <span title>Teleport</span>
+
+  <p subtitle>
+    Travel instantly between outposts developed to +{{
+      teleportLevel | number
+    }}.
+  </p>
+
+  <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
+    @for (row of rows(); track row.entry.nodeName) {
+      <div class="flex items-center gap-3 p-3 rounded bg-base-200">
+        <app-sprite-node [entry]="row.entry" />
+
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="type-entity-name truncate">
+            {{ row.entry.nodeName }} +{{ row.level | number }}
+          </span>
+
+          <span class="type-meta">
+            @if (row.isCurrent) {
+              You are here
+            } @else if (!row.isUnlocked) {
+              Develop to +{{ teleportLevel | number }} to teleport here
+            }
+          </span>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          [disabled]="!row.canTeleport"
+          (click)="teleport(row)"
+          appSfx="ui-success"
+          [sfxOffset]="$index"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Teleport
+        </button>
+      </div>
+    }
+  </div>
+</app-modal>

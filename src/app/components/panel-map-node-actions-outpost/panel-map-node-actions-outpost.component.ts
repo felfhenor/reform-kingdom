@@ -8,7 +8,10 @@ import {
 } from '@angular/core';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL } from '@helpers/config';
+import {
+  OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL,
+  OUTPOST_TELEPORT_LEVEL,
+} from '@helpers/config';
 import { canSetHomeNode, homeNodeGet } from '@helpers/town/town-spawn';
 import { isPartyAtNode } from '@helpers/world';
 import { worldNodeCanAffordCost } from '@helpers/world-node/world-node-cost';
@@ -18,6 +21,7 @@ import {
 } from '@helpers/world-node/world-node-development';
 import {
   isOutpostBuilt,
+  isOutpostTeleportUnlocked,
   outpostDeathPenaltyMultiplier,
   worldNodeOutpostLevel,
 } from '@helpers/world-node/world-node-outpost';
@@ -36,6 +40,7 @@ export class PanelMapNodeActionsOutpostComponent {
 
   public develop = output<void>();
   public setHome = output<void>();
+  public teleport = output<void>();
 
   private outpost = computed(() => worldNodeOutpost(this.entry()));
 
@@ -63,6 +68,18 @@ export class PanelMapNodeActionsOutpostComponent {
       worldNodeCanAffordCost(this.cost())
     );
   });
+
+  public isTeleportUnlocked = computed(() =>
+    isOutpostTeleportUnlocked(this.entry().nodeName),
+  );
+
+  public nextLevelUnlocksTeleport = computed(
+    () => this.level() === OUTPOST_TELEPORT_LEVEL - 1,
+  );
+
+  public teleportLevel = OUTPOST_TELEPORT_LEVEL;
+
+  public canOpenTeleport = computed(() => isPartyAtNode(this.entry().nodeName));
 
   public isHome = computed(
     () => homeNodeGet()?.nodeName === this.entry().nodeName,

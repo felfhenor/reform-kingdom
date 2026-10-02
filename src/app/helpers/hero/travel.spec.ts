@@ -111,6 +111,7 @@ import {
   travelEtaSecondsTo,
   travelPathTotalTicks,
   travelProcessTick,
+  travelRelocateTo,
   travelStart,
 } from '@helpers/hero/travel';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
@@ -574,6 +575,51 @@ describe('travelStart', () => {
     travelStart('Field Ruins');
 
     expect(autoModeToggle).not.toHaveBeenCalled();
+  });
+});
+
+describe('travelRelocateTo', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(worldCurrentLocationState).mockReturnValue({
+      mapName: 'Carrina',
+      x: 1,
+      y: 1,
+    });
+  });
+
+  it('moves the party, stops gathering, and syncs reputation across maps', () => {
+    travelRelocateTo({ mapName: 'LarsianDesert', x: 4, y: 7 });
+
+    expect(gatheringStop).toHaveBeenCalled();
+    expect(currentLocationSet).toHaveBeenCalledWith({
+      mapName: 'LarsianDesert',
+      x: 4,
+      y: 7,
+    });
+    expect(townReputationBuffSync).toHaveBeenCalledWith(
+      'Carrina',
+      'LarsianDesert',
+    );
+  });
+
+  it('cancels any in-progress travel', () => {
+    travelRelocateTo({ mapName: 'LarsianDesert', x: 4, y: 7 });
+
+    const next = applyLastUpdate(
+      stateWithTravel({
+        status: 'Traveling',
+        destinationNodeName: 'Somewhere',
+        path: [{ kind: 'Move', mapName: 'Carrina', x: 2, y: 1 }],
+        ticksIntoStep: 3,
+      }),
+    );
+
+    expect(next.world.travel).toEqual({
+      status: 'Idle',
+      path: [],
+      ticksIntoStep: 0,
+    });
   });
 });
 

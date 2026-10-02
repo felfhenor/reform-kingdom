@@ -54,3 +54,16 @@
 
         - itemId: Wolf Pelt
           required: 25
+
+    - costs:
+        - itemId: Crimson Lucre
+          required: 7000
+
+        - itemId: Elven Corewood
+          required: 250
+
+        - itemId: Crimson Ingot
+          required: 100
+
+        - itemId: Wolf Pelt
+          required: 50

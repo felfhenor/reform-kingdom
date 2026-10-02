@@ -50,7 +50,7 @@ import {
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
-import type { GlobalEffectId, TravelStep } from '@interfaces';
+import type { CurrentLocation, GlobalEffectId, TravelStep } from '@interfaces';
 
 export {
   travelPathTotalTicks,
@@ -103,18 +103,13 @@ function travelRecoverFromPathingFailure(destinationNodeName: string): void {
   const kingdom = worldNodesOfType('Kingdom')[0];
 
   if (kingdom) {
-    currentLocationSet({
-      mapName: kingdom.mapName,
-      x: kingdom.x,
-      y: kingdom.y,
+    travelRelocateTo(kingdom);
+  } else {
+    updateGamestate((state) => {
+      state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
+      return state;
     });
-    townReputationBuffSync(location.mapName, kingdom.mapName);
   }
-
-  updateGamestate((state) => {
-    state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
-    return state;
-  });
 
   categoryMessageLog(
     'Travel',
@@ -122,6 +117,26 @@ function travelRecoverFromPathingFailure(destinationNodeName: string): void {
     `Pathing error: no route to ${destinationNodeName} could be found from ` +
       `${location.mapName} (${location.x}, ${location.y}). The party was recalled to the kingdom.`,
   );
+}
+
+// Instant jump that skips pathing and arrival side effects (encounters, gathering).
+export function travelRelocateTo(destination: CurrentLocation): void {
+  const previousMapName = worldCurrentLocationState().mapName;
+
+  gatheringStop();
+
+  currentLocationSet({
+    mapName: destination.mapName,
+    x: destination.x,
+    y: destination.y,
+  });
+
+  townReputationBuffSync(previousMapName, destination.mapName);
+
+  updateGamestate((state) => {
+    state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
+    return state;
+  });
 }
 
 // Manual travel fully disables Auto Mode (not just pauses it) - the player has taken the wheel back.

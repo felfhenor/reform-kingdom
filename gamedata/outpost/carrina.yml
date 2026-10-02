@@ -54,3 +54,16 @@
 
         - itemId: Tattered Hide
           required: 150
+
+    - costs:
+        - itemId: Gold Coin
+          required: 30000
+
+        - itemId: Wergen Wood
+          required: 1000
+
+        - itemId: Copper Ingot
+          required: 500
+
+        - itemId: Tattered Hide
+          required: 300

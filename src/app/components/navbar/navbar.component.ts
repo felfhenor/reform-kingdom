@@ -6,6 +6,7 @@ import { ButtonSettingsComponent } from '@components/button-settings/button-sett
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalCaravanTradeComponent } from '@components/modal-caravan-trade/modal-caravan-trade.component';
+import { ModalOutpostTeleportComponent } from '@components/modal-outpost-teleport/modal-outpost-teleport.component';
 import { ModalTasksComponent } from '@components/modal-tasks/modal-tasks.component';
 import { ModalTrainerVisitComponent } from '@components/modal-trainer-visit/modal-trainer-visit.component';
 import { ModalTownMaterialSaleComponent } from '@components/modal-town-material-sale/modal-town-material-sale.component';
@@ -72,6 +73,7 @@ import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/pane
     BarResourceComponent,
     ModalCaravanTradeComponent,
     ModalTasksComponent,
+    ModalOutpostTeleportComponent,
     ModalTrainerVisitComponent,
     ModalTownMaterialSaleComponent,
     PanelDebugButtonsComponent,

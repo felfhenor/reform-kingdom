@@ -11,6 +11,7 @@ vi.mock('@helpers/state-game', () => {
 import { gamestate } from '@helpers/state-game';
 import {
   isOutpostBuilt,
+  isOutpostTeleportUnlocked,
   outpostDeathPenaltyMultiplier,
   worldNodeOutpostLevel,
 } from '@helpers/world-node/world-node-outpost';
@@ -74,15 +75,30 @@ describe('outpostDeathPenaltyMultiplier', () => {
     expect(outpostDeathPenaltyMultiplier('Carrina Outpost')).toBe(multiplier);
   });
 
-  it('never goes negative past the max level', () => {
-    mockOutpostLevel(10);
+  it.each([5, 10])(
+    'stops shrinking past the death penalty cap (level %s)',
+    (level) => {
+      mockOutpostLevel(level);
 
-    expect(outpostDeathPenaltyMultiplier('Carrina Outpost')).toBe(0);
-  });
+      expect(outpostDeathPenaltyMultiplier('Carrina Outpost')).toBe(0.25);
+    },
+  );
 
   it('is 1 for a node that is not an outpost', () => {
     mockOutpostLevel(4);
 
     expect(outpostDeathPenaltyMultiplier('Duchy of Carrina')).toBe(1);
+  });
+});
+
+describe('isOutpostTeleportUnlocked', () => {
+  it.each([
+    [undefined, false],
+    [4, false],
+    [5, true],
+  ])('at level %s is %s', (level, unlocked) => {
+    mockOutpostLevel(level);
+
+    expect(isOutpostTeleportUnlocked('Carrina Outpost')).toBe(unlocked);
   });
 });

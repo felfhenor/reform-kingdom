@@ -134,6 +134,16 @@ export function trainerVisitOpen(entry: WorldNodeEntry): void {
   modalOpen('trainer-visit');
 }
 
+// Not cleared on close - would collapse the modal's DOM mid-transition; overwritten next open instead.
+export const activeOutpostTeleportNode = signal<WorldNodeEntry | undefined>(
+  undefined,
+);
+
+export function outpostTeleportOpen(entry: WorldNodeEntry): void {
+  activeOutpostTeleportNode.set(entry);
+  modalOpen('outpost-teleport');
+}
+
 // Persisted (not just in-memory) so a page reload while on the Town view can restore it.
 export const activeTownNode = localStorageSignal<WorldNodeEntry | undefined>(
   'activeTownNode',

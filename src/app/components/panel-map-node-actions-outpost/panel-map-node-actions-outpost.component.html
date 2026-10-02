@@ -10,25 +10,50 @@
   } @else {
     <p class="text-sm text-lighter italic">
       Each development after building shortens Deaths Door and Healing by
-      {{ reductionPerLevelPercent | number }}% while this is your home.
+      {{ reductionPerLevelPercent }}% while this is your home.
     </p>
   }
 
-  <button
-    type="button"
-    class="btn btn-sm btn-primary"
-    [disabled]="!canDevelop()"
-    (click)="develop.emit()"
-    appSfx="ui-click"
-    [sfxTrigger]="['click', 'hover']"
-  >
-    @if (isMaxLevel()) {
-      This outpost is fully developed
-    } @else {
-      {{ built ? 'Develop' : 'Build' }} for
-      <app-row-currency-cost [costs]="cost()" />
+  @if (isTeleportUnlocked()) {
+    <p class="text-sm italic">
+      You can teleport from here to any other +{{ teleportLevel }}
+      outpost.
+    </p>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      [disabled]="!canOpenTeleport()"
+      (click)="teleport.emit()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Teleport
+    </button>
+  } @else {
+    @if (nextLevelUnlocksTeleport()) {
+      <p class="text-sm text-lighter italic">
+        The next development unlocks teleporting to other +{{ teleportLevel }}
+        outposts.
+      </p>
     }
-  </button>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      [disabled]="!canDevelop()"
+      (click)="develop.emit()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      @if (isMaxLevel()) {
+        This outpost is fully developed
+      } @else {
+        Develop for
+        <app-row-currency-cost [costs]="cost()" />
+      }
+    </button>
+  }
 
   <button
     type="button"
