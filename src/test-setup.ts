@@ -64,38 +64,6 @@ vi.mock('@angular/platform-browser', () => ({
   Title: vi.fn(() => ({})),
 }));
 
-// Mock rxjs to prevent observable issues.
-// Uses `function` expressions (not arrows) for Subject/BehaviorSubject since arrow functions aren't constructable via `new`.
-vi.mock('rxjs', () => ({
-  interval: vi.fn(() => ({
-    subscribe: vi.fn(),
-  })),
-  Observable: vi.fn(),
-  Subject: vi.fn(function () {
-    return {
-      next: vi.fn(),
-      error: vi.fn(),
-      complete: vi.fn(),
-      subscribe: vi.fn(),
-      asObservable: vi.fn(() => ({
-        subscribe: vi.fn(),
-      })),
-    };
-  }),
-  BehaviorSubject: vi.fn(function () {
-    return {
-      next: vi.fn(),
-      error: vi.fn(),
-      complete: vi.fn(),
-      subscribe: vi.fn(),
-      asObservable: vi.fn(() => ({
-        subscribe: vi.fn(),
-      })),
-      getValue: vi.fn(),
-    };
-  }),
-}));
-
 // Mock localStorage for tests
 Object.defineProperty(window, 'localStorage', {
   value: {
@@ -139,7 +107,7 @@ Object.defineProperty(window, 'indexedDB', {
 });
 
 // Mock signal helpers
-vi.mock('@helpers/signal', () => {
+vi.mock('@helpers/engine/signal', () => {
   const mockSignal = (value: unknown) => {
     const signal = () => value;
     signal.set = vi.fn((newValue: unknown) => {

@@ -1,4 +1,7 @@
-import { LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL } from '@helpers/config';
+import {
+  LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL,
+  TRADESKILL_XP_START,
+} from '@helpers/config';
 import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { rngUuid } from '@helpers/rng';
 import type {
@@ -16,6 +19,7 @@ import type {
   MonsterType,
   StatBlock,
   StatusEffectBlock,
+  TradeskillBuildingState,
   TravelState,
   WorkerStatBlock,
 } from '@interfaces';
@@ -80,6 +84,14 @@ export function defaultGameState(): GameState {
 // once content is guaranteed loaded.
 function defaultTradeskills(): GameStateTradeskills {
   return {} as GameStateTradeskills;
+}
+
+export function defaultTradeskillBuilding(): TradeskillBuildingState {
+  return {
+    level: 1,
+    xp: { current: 0, maximum: TRADESKILL_XP_START },
+    queue: [],
+  };
 }
 
 export function defaultTravelState(): TravelState {

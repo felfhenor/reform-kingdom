@@ -1,411 +1,184 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/task/task-events', () => ({
-  taskEventCollectibleGained: vi.fn(),
-  taskEventEquipmentInfused: vi.fn(),
-  taskEventLevelReached: vi.fn(),
-  taskEventMonsterKilled: vi.fn(),
-  taskEventShrineLevel: vi.fn(),
-  taskEventTeachingLearned: vi.fn(),
-  taskEventTownReputationTier: vi.fn(),
-  taskEventTownVisited: vi.fn(),
-  taskEventTradeskillLevel: vi.fn(),
-  taskEventWorkerRescued: vi.fn(),
-}));
+vi.mock('@helpers/town/crafting/town-craft-queue');
+vi.mock('@helpers/task/task-events');
+vi.mock('@helpers/world');
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSafeSegment: vi.fn((s) => s),
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/town/crafting/town-craft-queue', () => ({
-  townCompleteInitialCrafts: vi.fn(),
-  townQueueInitialCrafts: vi.fn(),
-}));
-
-vi.mock('@helpers/town/worker/town-worker-roster', () => ({
-  townWorkerRosterMaterialize: vi.fn((_town, existing) => existing),
-}));
-
-vi.mock('@helpers/world', () => ({
-  worldNodeAtCurrentLocation: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeTown: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
-import { ensureTown } from '@helpers/content/ensure-town';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
   TOWN_FIRST_VISIT_CRAFT_COUNT,
 } from '@helpers/config';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import { worldTownsState } from '@helpers/state-game';
+import { taskEventTownVisited } from '@helpers/task/task-events';
 import {
   townCompleteInitialCrafts,
   townQueueInitialCrafts,
 } from '@helpers/town/crafting/town-craft-queue';
 import { isPartyAtTown, townMarkVisited } from '@helpers/town/town-visit';
-import { townWorkerRosterMaterialize } from '@helpers/town/worker/town-worker-roster';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
-import { worldNodeTown } from '@helpers/world-node/world-nodes';
 import type {
-  GameState,
+  CraftQueueEntryId,
+  EquipmentId,
+  IsContentItem,
+  ItemId,
+  RecipeId,
   TownContent,
   TownId,
+  TownNodeState,
+  TradeskillId,
+  WorkerId,
   WorldNodeEntry,
 } from '@interfaces';
-import { taskEventTownVisited } from '@helpers/task/task-events';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
+const oreId = 'copper-ore' as ItemId;
+
+function seedTown(
+  overrides: Partial<TownContent> = {},
+  otherContent: IsContentItem[] = [],
+): TownContent {
+  const town = ensureTown({ id: townId, name: 'Larsia', ...overrides });
+  seedContent([town, ...otherContent]);
+  return town;
+}
+
+function seedTownState(existing?: Partial<TownNodeState>): void {
+  seedGamestate((state) => {
+    state.clock.numTicks = 500;
+    if (existing) state.world.towns[townId] = buildTownNodeState(existing);
+  });
+}
+
+function visitedTown(): TownNodeState {
+  inTick(() => townMarkVisited(townId));
+  return worldTownsState()[townId];
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
+  seedTown();
 });
 
 describe('townMarkVisited', () => {
-  it('creates a state entry stamped with the current tick on first visit', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  it('activates a fresh town with empty progress, starting the raid cooldown at the current tick', () => {
+    seedTownState();
 
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId]).toEqual({
-      lastProcessedTick: {},
-      stock: [],
-      workers: {},
-      reputation: 0,
-      hiddenGold: 0,
-      materials: {},
-      tradeskills: {},
-      craftQueue: [],
-      commissionSlots: [],
-      specialtyPriority: [],
-      firstVisitedAtTick: 500,
-      lastRaidResolvedAtTick: 500,
-    });
+    expect(visitedTown()).toMatchObject(
+      buildTownNodeState({
+        firstVisitedAtTick: 500,
+        lastRaidResolvedAtTick: 500,
+      }),
+    );
   });
 
-  it('fires the analytics event with the town name on first visit', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn({ world: { towns: {} } } as unknown as GameState);
-    });
-    vi.mocked(getEntry).mockReturnValue(ensureTown({ name: 'Larsia' }));
+  it('fires the visit analytics and task event on first visit', () => {
+    seedTownState();
+    const events = captureAnalyticsEvents();
 
-    townMarkVisited(townId);
+    visitedTown();
 
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith('Town:Visit:Larsia');
+    expect(events).toContain('Town:Visit:Larsia');
     expect(taskEventTownVisited).toHaveBeenCalledWith(townId);
   });
 
-  it('preserves existing lastProcessedTick progress when activating', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: { [townId]: { lastProcessedTick: { worker: 42 } } },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: { [townId]: { lastProcessedTick: { worker: 42 } } },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId]).toEqual({
+  it('keeps progress the town accrued before it was activated', () => {
+    const existing = buildTownNodeState({
       lastProcessedTick: { worker: 42 },
-      stock: [],
-      workers: {},
-      reputation: 0,
-      hiddenGold: 0,
-      materials: {},
-      tradeskills: {},
-      craftQueue: [],
-      commissionSlots: [],
-      specialtyPriority: [],
-      firstVisitedAtTick: 500,
-      lastRaidResolvedAtTick: 500,
-    });
-  });
-
-  it('preserves existing stock when activating', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, stock: [{ quantity: 3 }] },
+      stock: [
+        {
+          equipmentItem: buildEquipmentItem('sword' as EquipmentId),
+          addedAtTick: 10,
         },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, stock: [{ quantity: 3 }] },
+      ],
+      craftQueue: [
+        {
+          id: 'q1' as CraftQueueEntryId,
+          tradeskillId: 'jewelcrafting' as TradeskillId,
+          recipeId: 'ring' as RecipeId,
+          ticksIntoCraft: 3,
         },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
+      ],
+      reputation: 250,
+      hiddenGold: 1200,
+      lastRaidResolvedAtTick: 42,
     });
+    seedTownState(existing);
 
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].stock).toEqual([{ quantity: 3 }]);
+    expect(visitedTown()).toMatchObject(existing);
   });
 
-  it('preserves existing reputation when activating', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, reputation: 250 } },
+  it('sets tradeskill levels from the town content seed', () => {
+    const blacksmithingId = 'blacksmithing' as TradeskillId;
+    seedTown(
+      {
+        crafting: {
+          tradeskillLevels: [{ tradeskillId: blacksmithingId, level: 4 }],
+        } as TownContent['crafting'],
       },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, reputation: 250 } },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
+      [ensureTradeskill({ id: blacksmithingId, name: 'Blacksmithing' })],
+    );
+    seedTownState();
+
+    expect(visitedTown().tradeskills).toEqual({
+      [blacksmithingId]: { level: 4 },
     });
-
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].reputation).toBe(250);
-  });
-
-  it('preserves existing hiddenGold when activating', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, hiddenGold: 1200 } },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, hiddenGold: 1200 } },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].hiddenGold).toBe(1200);
-  });
-
-  it('preserves existing materials when activating', () => {
-    const materials = { 'copper-ore': 8 };
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, materials } },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, materials } },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].materials).toEqual(materials);
   });
 
   it('seeds materials from threshold defaults, letting existing quantities win', () => {
-    vi.mocked(getEntry).mockReturnValue(
-      ensureTown({
-        materialThresholds: [
-          { itemId: 'gold-coin', default: 5000 },
-          { itemId: 'copper-ore', default: 30 },
-          { itemId: 'amber' },
-        ] as TownContent['materialThresholds'],
-      }),
-    );
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, materials: { 'copper-ore': 8 } },
-        },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
+    seedTown({
+      materialThresholds: [
+        { itemId: 'gold-coin', default: 5000 },
+        { itemId: oreId, default: 30 },
+        { itemId: 'amber' },
+      ] as TownContent['materialThresholds'],
     });
+    seedTownState({ materials: { [oreId]: 8 } });
 
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].materials).toEqual({
+    expect(visitedTown().materials).toEqual({
       'gold-coin': 5000,
-      'copper-ore': 8,
+      [oreId]: 8,
     });
   });
 
-  it('preserves existing tradeskills when activating', () => {
-    const tradeskills = { blacksmithing: { level: 3 } };
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, tradeskills } },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, tradeskills } },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
+  it('adds missing roster workers without resetting existing ones', () => {
+    const existingId = 'existing' as WorkerId;
+    const newId = 'new-hire' as WorkerId;
+    seedTown({
+      gathering: {
+        workers: [{ workerId: existingId }, { workerId: newId }],
+      } as TownContent['gathering'],
     });
+    seedTownState();
+    const existingWorker = { ...visitedTown().workers[existingId], level: 9 };
+    seedTownState({ workers: { [existingId]: existingWorker } });
 
-    townMarkVisited(townId);
+    const workers = visitedTown().workers;
 
-    expect(state.world.towns[townId].tradeskills).toEqual(tradeskills);
-  });
-
-  it('preserves existing craftQueue when activating', () => {
-    const craftQueue = [{ id: 'q1', tradeskillId: 'blacksmithing' }];
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, craftQueue } },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: { [townId]: { lastProcessedTick: {}, craftQueue } },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].craftQueue).toEqual(craftQueue);
-  });
-
-  it('materializes the worker roster via townWorkerRosterMaterialize when the town resolves', () => {
-    const town = ensureTown({ name: 'Larsia' });
-    vi.mocked(getEntry).mockReturnValue(town);
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, workers: { existing: 1 } },
-        },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    vi.mocked(townWorkerRosterMaterialize).mockReturnValue({
-      materialized: 1,
-    } as never);
-    const state = {
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, workers: { existing: 1 } },
-        },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townMarkVisited(townId);
-
-    expect(townWorkerRosterMaterialize).toHaveBeenCalledWith(town, {
-      existing: 1,
-    });
-    expect(state.world.towns[townId].workers).toEqual({ materialized: 1 });
-  });
-
-  it('keeps an existing raid cooldown instead of restarting it', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, lastRaidResolvedAtTick: 42 },
-        },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].lastRaidResolvedAtTick).toBe(42);
+    expect(workers[existingId]).toEqual(existingWorker);
+    expect(workers[newId]).toBeDefined();
   });
 
   it('completes initial crafts before queueing more on first visit', () => {
-    const town = ensureTown({ name: 'Larsia' });
-    vi.mocked(getEntry).mockReturnValue(town);
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-    const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+    seedTownState();
 
-    townMarkVisited(townId);
+    visitedTown();
 
-    expect(townCompleteInitialCrafts).toHaveBeenCalledWith(
-      state,
-      town,
-      TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
-    );
-    expect(townQueueInitialCrafts).toHaveBeenCalledWith(
-      state,
-      town,
-      TOWN_FIRST_VISIT_CRAFT_COUNT,
-    );
+    // Only the town and count args: the state arg is an Immer draft, revoked once the update ends.
+    const [, completedTown, completedCount] = vi.mocked(
+      townCompleteInitialCrafts,
+    ).mock.calls[0];
+    const [, queuedTown, queuedCount] = vi.mocked(townQueueInitialCrafts).mock
+      .calls[0];
+    expect(completedTown.id).toBe(townId);
+    expect(completedCount).toBe(TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT);
+    expect(queuedTown.id).toBe(townId);
+    expect(queuedCount).toBe(TOWN_FIRST_VISIT_CRAFT_COUNT);
     expect(
       vi.mocked(townCompleteInitialCrafts).mock.invocationCallOrder[0],
     ).toBeLessThan(
@@ -414,31 +187,13 @@ describe('townMarkVisited', () => {
   });
 
   it('is a no-op and fires no analytics if the town was already visited', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, firstVisitedAtTick: 100 },
-        },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(999);
-    const state = {
-      world: {
-        towns: {
-          [townId]: { lastProcessedTick: {}, firstVisitedAtTick: 100 },
-        },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+    seedTownState({ firstVisitedAtTick: 100 });
+    const events = captureAnalyticsEvents();
 
-    townMarkVisited(townId);
-
-    expect(state.world.towns[townId].firstVisitedAtTick).toBe(100);
+    expect(visitedTown().firstVisitedAtTick).toBe(100);
     expect(townQueueInitialCrafts).not.toHaveBeenCalled();
     expect(townCompleteInitialCrafts).not.toHaveBeenCalled();
-    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
+    expect(events).toEqual([]);
   });
 });
 
@@ -449,20 +204,21 @@ describe('isPartyAtTown', () => {
     expect(isPartyAtTown(townId)).toBe(false);
   });
 
-  it('is false when the current location is not this town', () => {
-    const entry = { nodeName: 'Larsia' } as WorldNodeEntry;
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
-    vi.mocked(worldNodeTown).mockReturnValue({
-      id: 'other-town' as TownId,
-    } as TownContent);
+  it('is false when the current location is a different town', () => {
+    seedTown({}, [
+      ensureTown({ id: 'other-town' as TownId, name: 'Otherton' }),
+    ]);
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
+      nodeName: 'Otherton',
+    } as WorldNodeEntry);
 
     expect(isPartyAtTown(townId)).toBe(false);
   });
 
   it('is true when the current location resolves to this town', () => {
-    const entry = { nodeName: 'Larsia' } as WorldNodeEntry;
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
-    vi.mocked(worldNodeTown).mockReturnValue({ id: townId } as TownContent);
+    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
+      nodeName: 'Larsia',
+    } as WorldNodeEntry);
 
     expect(isPartyAtTown(townId)).toBe(true);
   });

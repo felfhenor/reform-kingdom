@@ -1,7 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('rxjs', async () => await vi.importActual('rxjs'));
-
 vi.mock('@helpers/engine/page-visibility', () => ({
   isPageVisible: vi.fn(),
 }));

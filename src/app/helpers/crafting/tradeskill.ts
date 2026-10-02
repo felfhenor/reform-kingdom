@@ -9,6 +9,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { defaultTradeskillBuilding } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
@@ -30,12 +31,7 @@ import type {
 import { ALL_TRADESKILLS } from '@interfaces';
 import { taskEventTradeskillLevel } from '@helpers/task/task-events';
 
-// `xp.maximum: 10` matches the level-1 curve value, kept as a literal here to avoid an import cycle.
-const DEFAULT_BUILDING: TradeskillBuildingState = {
-  level: 1,
-  xp: { current: 0, maximum: 10 },
-  queue: [],
-};
+const DEFAULT_BUILDING = defaultTradeskillBuilding();
 
 // Never throws - content may not be loaded yet on early renders (e.g. a
 // returning player reopens a tradeskill screen before content finishes its
