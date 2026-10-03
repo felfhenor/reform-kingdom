@@ -16,6 +16,7 @@ import type {
   ItemContent,
   RecipeContent,
 } from '@interfaces';
+import { startCase } from 'es-toolkit';
 import { parseInline } from 'marked';
 import mustache from 'mustache';
 
@@ -120,7 +121,7 @@ export function categoryMessageLog(
     kind: category,
     messageId: rngUuid(),
     timestamp: Date.now(),
-    locationName,
+    locationName: startCase(locationName),
     message,
     itemIcons: logIconList(icons),
   });

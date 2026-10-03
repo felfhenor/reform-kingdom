@@ -1,8 +1,18 @@
 <app-card-page heightProfile="full">
   <span header>Adventure Log</span>
 
+  <div pageactionssecondary>
+    <input
+      type="text"
+      placeholder="Search by tag or message..."
+      class="input input-sm input-bordered search-bar"
+      [value]="searchText()"
+      (input)="onSearchInput($event)"
+    />
+  </div>
+
   <div class="flex flex-col gap-2 p-4 h-full overflow-y-auto">
-    @for (entry of entries(); track entry.messageId) {
+    @for (entry of visibleEntries(); track entry.messageId) {
       <div
         class="flex gap-2 text-sm flex-wrap"
         (animate.enter)="onEnter($event, entry.messageId)"
@@ -14,7 +24,9 @@
         >
           {{ entry.timestamp | timeago }}
         </span>
+
         <span class="text-lighter shrink-0">[{{ entry.locationName }}]</span>
+
         <app-adventure-log-message [entry]="entry" />
       </div>
     } @empty {

@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   inject,
+  signal,
 } from '@angular/core';
 import { AdventureLogMessageComponent } from '@components/adventure-log-message/adventure-log-message.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
@@ -11,8 +12,8 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { combatLog } from '@helpers/combat/combat-log';
 import { adventureLogTimestampTooltip } from '@helpers/combat/combat-log.ui';
 import { TippyDirective } from '@ngneat/helipopper';
-import { TimeagoPipe } from 'ngx-timeago';
 import { AnimationService } from '@services/animation.service';
+import { TimeagoPipe } from 'ngx-timeago';
 
 @Component({
   selector: 'app-play-adventurelog',
@@ -29,6 +30,8 @@ import { AnimationService } from '@services/animation.service';
 export class PlayAdventureLogComponent {
   private anim = inject(AnimationService);
 
+  public searchText = signal<string>('');
+
   // Snapshot of entries already present on open, so loading history doesn't replay hundreds of enter animations at once - only genuinely new entries animate in.
   private initialEntryIds = new Set(
     combatLog()
@@ -40,7 +43,19 @@ export class PlayAdventureLogComponent {
     combatLog().filter((entry) => entry.message.trim() !== ''),
   );
 
+  public visibleEntries = computed(() =>
+    this.entries().filter(
+      (e) =>
+        e.message.toLowerCase().includes(this.searchText()) ||
+        e.locationName.toLowerCase().includes(this.searchText()),
+    ),
+  );
+
   public timestampTooltip = adventureLogTimestampTooltip;
+
+  public onSearchInput(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
 
   public onEnter(event: AnimationCallbackEvent, messageId: string): void {
     if (this.initialEntryIds.has(messageId)) return;
