@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
 import { kingdomSubviewClear } from '@helpers/engine/ui';
@@ -8,7 +9,7 @@ import { HotkeysDirective } from '@ngneat/hotkeys';
 @Component({
   selector: 'app-button-kingdom-back',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TippyDirective, HotkeysDirective, SFXDirective],
+  imports: [TippyDirective, HotkeysDirective, SFXDirective, IconComponent],
   template: `
     <button
       class="btn btn-sm btn-neutral btn-outline text-neutral-content"
@@ -21,7 +22,7 @@ import { HotkeysDirective } from '@ngneat/hotkeys';
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"
     >
-      Back
+      <app-icon name="tablerArrowLeft" class="text-lg" />
     </button>
   `,
 })

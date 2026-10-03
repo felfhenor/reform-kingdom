@@ -9,8 +9,8 @@
   >
     <div class="card-body h-full">
       <h1 class="type-page-title flex justify-between relative min-h-8">
-        <div class="text-sm font-normal pl-4">
-          <ng-content select="[pageactionsleft]"></ng-content>
+        <div class="pl-1">
+          <ng-content select="[pageactions]"></ng-content>
         </div>
 
         <div
@@ -21,8 +21,8 @@
 
         <div></div>
 
-        <div>
-          <ng-content select="[pageactions]"></ng-content>
+        <div class="text-sm font-normal">
+          <ng-content select="[pageactionssecondary]"></ng-content>
         </div>
       </h1>
 
