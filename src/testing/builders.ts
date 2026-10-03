@@ -14,6 +14,7 @@ import type {
   Character,
   Combat,
   Combatant,
+  CommissionNodeState,
   CraftQueueEntry,
   CraftQueueEntryId,
   EquipmentId,
@@ -52,6 +53,17 @@ export function buildCaravanNodeState(
     activeTradeIndices: [],
     tradeCounts: {},
     generatedAtTick: 0,
+    ...overrides,
+  };
+}
+
+export function buildCommissionNodeState(
+  overrides: Partial<CommissionNodeState> = {},
+): CommissionNodeState {
+  return {
+    requirements: [],
+    completed: false,
+    generatedAt: 0,
     ...overrides,
   };
 }

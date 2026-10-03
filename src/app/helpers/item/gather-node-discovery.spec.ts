@@ -1,148 +1,61 @@
-import type * as AnalyticsHelper from '@helpers/engine/analytics';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    discoveredGatherNodesState: () => gamestate().discoveredGatherNodes,
-  };
-});
-
-vi.mock('@helpers/engine/analytics', async (importOriginal) => {
-  const actual = await importOriginal<typeof AnalyticsHelper>();
-  return {
-    ...actual,
-    analyticsSendDesignEvent: vi.fn(),
-  };
-});
-
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import {
   gatherNodeDiscover,
   grandfatherGatherNodeDiscoveries,
   isGatherNodeDiscovered,
   pruneInvalidGatherNodeDiscoveries,
 } from '@helpers/item/gather-node-discovery';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { GameState, GameStateDiscoveredGatherNodes } from '@interfaces';
+import { discoveredGatherNodesState } from '@helpers/state-game';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
-}
-
-describe('isGatherNodeDiscovered', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('is true once the node has a foundAt timestamp', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
-    } as unknown as GameState);
-
-    expect(isGatherNodeDiscovered('Wergen Woods')).toBe(true);
-  });
-
-  it('is false for a node never visited', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredGatherNodes: {},
-    } as unknown as GameState);
-
-    expect(isGatherNodeDiscovered('Wergen Woods')).toBe(false);
-  });
-});
+const woods = 'Wergen Woods';
 
 describe('gatherNodeDiscover', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  it('discovers a node once, keeping its first foundAt and reporting it only then', () => {
+    seedGamestate();
+    const events = captureAnalyticsEvents();
+    expect(isGatherNodeDiscovered(woods)).toBe(false);
+
+    inTick(() => gatherNodeDiscover(woods));
+    const { foundAt } = discoveredGatherNodesState()[woods];
+    inTick(() => gatherNodeDiscover(woods));
+
+    expect(isGatherNodeDiscovered(woods)).toBe(true);
+    expect(discoveredGatherNodesState()[woods].foundAt).toBe(foundAt);
+    expect(events).toEqual([`World:GatherNode:Discover:${woods}`]);
   });
 
-  it('records a foundAt timestamp for a newly-visited node', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredGatherNodes: {},
-    } as unknown as GameState);
+  it('keeps the foundAt of a node discovered before', () => {
+    seedGamestate((state) => {
+      state.discoveredGatherNodes[woods] = { foundAt: 1000 };
+    });
+    const events = captureAnalyticsEvents();
 
-    gatherNodeDiscover('Wergen Woods');
+    inTick(() => gatherNodeDiscover(woods));
 
-    const result = applyLastUpdate({
-      discoveredGatherNodes: {},
-    } as unknown as GameState);
-
-    expect(result.discoveredGatherNodes['Wergen Woods'].foundAt).toEqual(
-      expect.any(Number),
-    );
-  });
-
-  it('preserves the original foundAt on repeat visits', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
-    } as unknown as GameState);
-
-    gatherNodeDiscover('Wergen Woods');
-
-    const result = applyLastUpdate({
-      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
-    } as unknown as GameState);
-
-    expect(result.discoveredGatherNodes['Wergen Woods'].foundAt).toBe(1000);
-  });
-
-  it('sends an analytics event with the node name only the first time it is visited', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredGatherNodes: {},
-    } as unknown as GameState);
-
-    gatherNodeDiscover('Wergen Woods');
-
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'World:GatherNode:Discover:Wergen Woods',
-    );
-  });
-
-  it('does not send an analytics event again on repeat visits', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
-    } as unknown as GameState);
-
-    gatherNodeDiscover('Wergen Woods');
-
-    expect(analyticsSendDesignEvent).not.toHaveBeenCalled();
+    expect(discoveredGatherNodesState()[woods].foundAt).toBe(1000);
+    expect(events).toEqual([]);
   });
 });
 
 describe('pruneInvalidGatherNodeDiscoveries', () => {
-  it('keeps only entries the existence check accepts', () => {
-    const discovered: GameStateDiscoveredGatherNodes = {
-      'Wergen Woods': { foundAt: 1000 },
-      'Removed Node': { foundAt: 2000 },
-    };
-
-    const result = pruneInvalidGatherNodeDiscoveries(
-      discovered,
-      (nodeName) => nodeName === 'Wergen Woods',
-    );
-
-    expect(result).toEqual({ 'Wergen Woods': { foundAt: 1000 } });
+  it('keeps only nodes the existence check accepts', () => {
+    expect(
+      pruneInvalidGatherNodeDiscoveries(
+        { [woods]: { foundAt: 1000 }, Removed: { foundAt: 2000 } },
+        (nodeName) => nodeName === woods,
+      ),
+    ).toEqual({ [woods]: { foundAt: 1000 } });
   });
 });
 
 describe('grandfatherGatherNodeDiscoveries', () => {
-  it('marks every given node name as discovered', () => {
-    const result = grandfatherGatherNodeDiscoveries([
-      'Wergen Woods',
-      'Rocky Outcrop',
-    ]);
-
-    expect(Object.keys(result)).toEqual(['Wergen Woods', 'Rocky Outcrop']);
-    expect(result['Wergen Woods'].foundAt).toEqual(expect.any(Number));
-    expect(result['Rocky Outcrop'].foundAt).toEqual(expect.any(Number));
-  });
-
-  it('returns an empty record for no nodes', () => {
-    expect(grandfatherGatherNodeDiscoveries([])).toEqual({});
+  it('marks every given node discovered', () => {
+    expect(grandfatherGatherNodeDiscoveries([woods, 'Rocky Outcrop'])).toEqual({
+      [woods]: { foundAt: expect.any(Number) },
+      'Rocky Outcrop': { foundAt: expect.any(Number) },
+    });
   });
 });

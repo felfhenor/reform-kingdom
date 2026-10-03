@@ -1,213 +1,149 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { LOOT_FILTER_AUTO_SELL_PERCENT } from '@helpers/config';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { defaultLootFilterSettings, defaultStats } from '@helpers/defaults';
-import type {
-  EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  EquipmentItemId,
-  GameState,
-  LootFilterSettings,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/item/equipment', () => ({
-  newEquipmentItem: vi.fn(),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  gainGold: vi.fn(),
-}));
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  addArmoryItems: vi.fn(),
-  equipmentSellValue: vi.fn(),
-  markEquipmentDiscovered: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  updateGamestate: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
-import { newEquipmentItem } from '@helpers/item/equipment';
-import { gainGold } from '@helpers/item/materials';
+import { getGoldQuantity } from '@helpers/item/materials';
 import {
-  addArmoryItems,
   equipmentSellValue,
-  markEquipmentDiscovered,
+  isEquipmentDiscovered,
 } from '@helpers/kingdom/armory';
+import {
+  armoryCapForState,
+  armoryOverflowCapForState,
+} from '@helpers/kingdom/armory-global-effects';
 import {
   armoryAddLootDrop,
   equipmentPassesLootFilter,
 } from '@helpers/kingdom/loot-filter';
-import { updateGamestate } from '@helpers/state-game';
+import { armoryState, gamestate } from '@helpers/state-game';
+import type {
+  EquipmentId,
+  GameState,
+  ItemId,
+  LootDropOutcome,
+  LootFilterSettings,
+} from '@interfaces';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const SWORD_ID = 'sword' as EquipmentId;
-
-const sword: EquipmentContent = {
-  id: SWORD_ID,
+const sword = ensureEquipment({
+  id: 'sword' as EquipmentId,
   name: 'Sword',
-  __type: 'equipment',
-  description: 'A sharp blade.',
-  sprite: '0000',
+  type: 'Sword',
   rarity: 'Common',
   levelRequirement: 5,
-  baseStats: defaultStats(),
-  type: 'Sword',
-  slots: 1,
-  grantedSkillIds: [],
+  baseStats: { ...defaultStats(), Strength: 10 },
+});
+
+function filtersWith(
+  edit: (filters: LootFilterSettings) => void,
+): LootFilterSettings {
+  const filters = defaultLootFilterSettings();
+  edit(filters);
+  return filters;
+}
+
+const rejectSwords = (state: GameState) => {
+  state.lootFilters.keepEquipmentTypes.Sword = false;
 };
 
-function keepAll(): LootFilterSettings {
-  return defaultLootFilterSettings();
+const fillArmory = (state: GameState) => {
+  state.armory = Array.from({ length: armoryOverflowCapForState(state) }, () =>
+    buildEquipmentItem(sword.id),
+  );
+};
+
+function drop(
+  edit: (state: GameState) => void = () => undefined,
+  equipmentId = sword.id,
+): LootDropOutcome {
+  seedGamestate(edit);
+  return inTick(() => armoryAddLootDrop(equipmentId));
 }
 
-function buildArmoryItem(): EquipmentItem {
-  return {
-    id: 'sword-item' as EquipmentItemId,
-    equipmentId: SWORD_ID,
-    infusedItemIds: [],
-    affixIds: [],
-  };
-}
+beforeEach(() => {
+  seedContent([sword, ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' })]);
+});
 
 describe('equipmentPassesLootFilter', () => {
-  it('passes when rarity, level, and type are all kept', () => {
-    expect(equipmentPassesLootFilter(sword, keepAll())).toBe(true);
-  });
+  it('keeps only drops of a kept rarity and type at or above the minimum level', () => {
+    expect(equipmentPassesLootFilter(sword, defaultLootFilterSettings())).toBe(
+      true,
+    );
+    expect(
+      equipmentPassesLootFilter(
+        sword,
+        filtersWith((f) => (f.minimumItemLevel = sword.levelRequirement)),
+      ),
+    ).toBe(true);
 
-  it('fails when the rarity is unselected', () => {
-    const filters = keepAll();
-    filters.keepRarities.Common = false;
-
-    expect(equipmentPassesLootFilter(sword, filters)).toBe(false);
-  });
-
-  it('fails when the item level is below the minimum', () => {
-    const filters = keepAll();
-    filters.minimumItemLevel = 10;
-
-    expect(equipmentPassesLootFilter(sword, filters)).toBe(false);
-  });
-
-  it('fails when the equipment type is unselected', () => {
-    const filters = keepAll();
-    filters.keepEquipmentTypes.Sword = false;
-
-    expect(equipmentPassesLootFilter(sword, filters)).toBe(false);
+    [
+      filtersWith((f) => (f.keepRarities.Common = false)),
+      filtersWith((f) => (f.minimumItemLevel = sword.levelRequirement + 1)),
+      filtersWith((f) => (f.keepEquipmentTypes.Sword = false)),
+    ].forEach((filters) => {
+      expect(equipmentPassesLootFilter(sword, filters)).toBe(false);
+    });
   });
 });
 
 describe('armoryAddLootDrop', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.mocked(newEquipmentItem).mockReturnValue(buildArmoryItem());
+  it('keeps a drop the filter accepts in the armory', () => {
+    expect(drop()).toEqual({ kind: 'Kept', content: sword });
+
+    expect(armoryState().map((item) => item.equipmentId)).toEqual([sword.id]);
+    expect(isEquipmentDiscovered(sword.id)).toBe(true);
+    expect(getGoldQuantity()).toBe(0);
   });
 
-  function runWith(state: GameState): void {
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state as GameState);
+  it('sells a rejected drop on the spot, even with the armory full, still discovering it', () => {
+    const goldEarned = Math.round(
+      equipmentSellValue({
+        item: buildEquipmentItem(sword.id),
+        content: sword,
+      }) * LOOT_FILTER_AUTO_SELL_PERCENT,
+    );
+
+    const outcome = drop((state) => {
+      rejectSwords(state);
+      fillArmory(state);
     });
-  }
 
-  it('reports NoRoom without touching gold when a kept drop has no space', () => {
-    vi.mocked(getEntry).mockReturnValue(sword);
-    vi.mocked(addArmoryItems).mockReturnValue([]);
-    const state = {
-      armory: [],
-      lootFilters: keepAll(),
-    } as unknown as GameState;
-    runWith(state);
-
-    const outcome = armoryAddLootDrop(SWORD_ID);
-
-    expect(outcome).toEqual({ kind: 'NoRoom' });
-    expect(gainGold).not.toHaveBeenCalled();
+    expect(goldEarned).toBeGreaterThan(0);
+    expect(outcome).toEqual({ kind: 'AutoSold', content: sword, goldEarned });
+    expect(getGoldQuantity()).toBe(goldEarned);
+    expect(armoryState()).toHaveLength(armoryOverflowCapForState(gamestate()));
+    expect(isEquipmentDiscovered(sword.id)).toBe(true);
   });
 
-  it('reports UnknownContent and leaves the item in the armory when content cannot resolve', () => {
-    const item = buildArmoryItem();
-    vi.mocked(addArmoryItems).mockImplementation((state, _id, items) => {
-      (state as GameState).armory = [...state.armory, ...items];
-      return items;
-    });
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const state = {
-      armory: [],
-      lootFilters: keepAll(),
-    } as unknown as GameState;
-    runWith(state);
+  it('lets drops overflow the normal armory cap', () => {
+    const atCap = (state: GameState) => {
+      state.armory = Array.from({ length: armoryCapForState(state) }, () =>
+        buildEquipmentItem(sword.id),
+      );
+    };
 
-    const outcome = armoryAddLootDrop(SWORD_ID);
-
-    expect(outcome).toEqual({ kind: 'UnknownContent' });
-    expect(state.armory).toEqual([item]);
-    expect(gainGold).not.toHaveBeenCalled();
+    expect(armoryCapForState(gamestate())).toBeLessThan(
+      armoryOverflowCapForState(gamestate()),
+    );
+    expect(drop(atCap).kind).toBe('Kept');
+    expect(drop(atCap, 'gone' as EquipmentId).kind).toBe('UnknownContent');
   });
 
-  it('keeps the item when it passes the loot filter', () => {
-    const item = buildArmoryItem();
-    vi.mocked(addArmoryItems).mockImplementation((state, _id, items) => {
-      (state as GameState).armory = [...state.armory, ...items];
-      return items;
-    });
-    vi.mocked(getEntry).mockReturnValue(sword);
-    const state = {
-      armory: [],
-      lootFilters: keepAll(),
-    } as unknown as GameState;
-    runWith(state);
+  it('loses a kept drop once the armory is past its loot overflow', () => {
+    expect(drop(fillArmory)).toEqual({ kind: 'NoRoom' });
 
-    const outcome = armoryAddLootDrop(SWORD_ID);
-
-    expect(outcome).toEqual({ kind: 'Kept', content: sword });
-    expect(state.armory).toEqual([item]);
-    expect(gainGold).not.toHaveBeenCalled();
+    expect(armoryState()).toHaveLength(armoryOverflowCapForState(gamestate()));
   });
 
-  it('sells the item for 80% of its value without ever touching the armory when it fails the loot filter', () => {
-    vi.mocked(getEntry).mockReturnValue(sword);
-    vi.mocked(equipmentSellValue).mockReturnValue(100);
+  it('still stores a drop whose content is gone, unfiltered', () => {
+    const gone = 'gone' as EquipmentId;
 
-    const filters = keepAll();
-    filters.keepRarities.Common = false;
-    const state = { armory: [], lootFilters: filters } as unknown as GameState;
-    runWith(state);
+    expect(drop(rejectSwords, gone)).toEqual({ kind: 'UnknownContent' });
+    expect(armoryState().map((item) => item.equipmentId)).toEqual([gone]);
 
-    const outcome = armoryAddLootDrop(SWORD_ID);
-
-    expect(outcome).toEqual({
-      kind: 'AutoSold',
-      content: sword,
-      goldEarned: 80,
-    });
-    expect(addArmoryItems).not.toHaveBeenCalled();
-    expect(state.armory).toEqual([]);
-    expect(gainGold).toHaveBeenCalledWith(state, 80);
-    expect(markEquipmentDiscovered).toHaveBeenCalledWith(state, SWORD_ID);
-  });
-
-  it('still auto-sells a drop that fails the filter even when the armory has no room', () => {
-    vi.mocked(getEntry).mockReturnValue(sword);
-    vi.mocked(equipmentSellValue).mockReturnValue(100);
-    vi.mocked(addArmoryItems).mockReturnValue([]);
-
-    const filters = keepAll();
-    filters.keepRarities.Common = false;
-    const state = { armory: [], lootFilters: filters } as unknown as GameState;
-    runWith(state);
-
-    const outcome = armoryAddLootDrop(SWORD_ID);
-
-    expect(outcome).toEqual({
-      kind: 'AutoSold',
-      content: sword,
-      goldEarned: 80,
-    });
-    expect(addArmoryItems).not.toHaveBeenCalled();
-    expect(gainGold).toHaveBeenCalledWith(state, 80);
+    expect(drop(fillArmory, gone)).toEqual({ kind: 'NoRoom' });
   });
 });

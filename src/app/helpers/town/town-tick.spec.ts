@@ -1,113 +1,66 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { worldTownsState } from '@helpers/state-game';
 import {
   isTownDueForUpdate,
   markTownSubsystemProcessed,
 } from '@helpers/town/town-tick';
-import type { GameState, TownId } from '@interfaces';
+import type { TownId, TownNodeState } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+function seedTown(
+  numTicks: number,
+  lastProcessedTick?: TownNodeState['lastProcessedTick'],
+): void {
+  seedGamestate((state) => {
+    state.clock.numTicks = numTicks;
+    if (lastProcessedTick) {
+      state.world.towns[townId] = buildTownNodeState({ lastProcessedTick });
+    }
+  });
+}
 
 describe('isTownDueForUpdate', () => {
-  it('is due when the subsystem has never been processed', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { lastProcessedTick: {} } } },
-    } as unknown as GameState);
+  it('is due once the interval has passed since that subsystem last ran', () => {
+    seedTown(1000, { worker: 900 });
 
+    expect(isTownDueForUpdate(townId, 'worker', 101)).toBe(false);
     expect(isTownDueForUpdate(townId, 'worker', 100)).toBe(true);
+    expect(isTownDueForUpdate(townId, 'raid', 1000)).toBe(true);
   });
 
-  it('is due when the interval has elapsed', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { lastProcessedTick: { worker: 100 } } } },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(250);
+  it('is never due for a town never visited', () => {
+    seedTown(1000);
 
-    expect(isTownDueForUpdate(townId, 'worker', 100)).toBe(true);
-  });
-
-  it('is not due when the interval has not elapsed', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { lastProcessedTick: { worker: 100 } } } },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(150);
-
-    expect(isTownDueForUpdate(townId, 'worker', 100)).toBe(false);
-  });
-
-  it('is not due when the town has no state entry (never activated)', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: {} },
-    } as unknown as GameState);
-
-    expect(isTownDueForUpdate(townId, 'worker', 100)).toBe(false);
-  });
-
-  it('gates independently per subsystem', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: { [townId]: { lastProcessedTick: { worker: 900 } } },
-      },
-    } as unknown as GameState);
-    vi.mocked(timerTicksElapsed).mockReturnValue(1000);
-
-    expect(isTownDueForUpdate(townId, 'worker', 500)).toBe(false);
-    expect(isTownDueForUpdate(townId, 'raid', 500)).toBe(true);
+    expect(isTownDueForUpdate(townId, 'worker', 1)).toBe(false);
   });
 });
 
 describe('markTownSubsystemProcessed', () => {
-  it('stamps the current tick for the given subsystem only', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(1234);
-    const state = {
-      world: {
-        towns: { [townId]: { lastProcessedTick: { worker: 1 } } },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  const mark = (interval: number) =>
+    inTick(() => markTownSubsystemProcessed(townId, 'craft', interval));
 
-    markTownSubsystemProcessed(townId, 'craft', 60);
+  it('stamps the current tick on that subsystem alone', () => {
+    seedTown(1234, { worker: 1 });
 
-    expect(state.world.towns[townId].lastProcessedTick).toEqual({
+    mark(60);
+
+    expect(worldTownsState()[townId].lastProcessedTick).toEqual({
       worker: 1,
       craft: 1234,
     });
   });
 
-  it('writes nothing for an every-tick subsystem (interval 1)', () => {
-    markTownSubsystemProcessed(townId, 'craft', 1);
+  it('skips an every-tick subsystem and a town never visited', () => {
+    seedTown(1234, {});
+    mark(1);
+    expect(worldTownsState()[townId].lastProcessedTick).toEqual({});
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('no-ops when the town has no state entry', () => {
-    const state = { world: { towns: {} } } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    expect(() => markTownSubsystemProcessed(townId, 'craft', 60)).not.toThrow();
-    expect(state.world.towns).toEqual({});
+    seedTown(1234);
+    mark(60);
+    expect(worldTownsState()).toEqual({});
   });
 });

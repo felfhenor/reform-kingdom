@@ -1,64 +1,8 @@
-import type * as AnalyticsHelper from '@helpers/engine/analytics';
-
-vi.mock('@helpers/task/task-events', () => ({
-  taskEventCollectibleGained: vi.fn(),
-  taskEventEquipmentInfused: vi.fn(),
-  taskEventLevelReached: vi.fn(),
-  taskEventMonsterKilled: vi.fn(),
-  taskEventShrineLevel: vi.fn(),
-  taskEventTeachingLearned: vi.fn(),
-  taskEventTownReputationTier: vi.fn(),
-  taskEventTownVisited: vi.fn(),
-  taskEventTradeskillLevel: vi.fn(),
-  taskEventWorkerRescued: vi.fn(),
-}));
-
-vi.mock('@helpers/task/task-progress', () => ({
-  taskRecordCommissionFulfilled: vi.fn(),
-}));
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/caravan/caravan', () => ({
-  isPartyAtCaravan: vi.fn(() => true),
-}));
+vi.mock('@helpers/task/task-events');
+vi.mock('@helpers/task/task-progress');
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/analytics', async (importOriginal) => {
-  const actual = await importOriginal<typeof AnalyticsHelper>();
-  return {
-    ...actual,
-    analyticsSendDesignEvent: vi.fn(),
-  };
-});
-
-vi.mock('@helpers/item/materials', () => ({
-  applyMaterialDelta: vi.fn(),
-  getMaterialQuantity: vi.fn(),
-}));
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryGet: vi.fn(() => []),
-}));
-
-// Deterministic drop resolution: the chance check (`rngNumberRange(0, 100) < chance`)
-// and the quantity roll (`rngNumberRange(min, max)`) both resolve to their lower bound.
-vi.mock('@helpers/rng', () => ({
-  rngNumberRange: vi.fn((min: number) => min),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldCommissionsState: () => gamestate().world.commissions,
-  };
-});
-
-import { isPartyAtCaravan } from '@helpers/caravan/caravan';
 import {
   commissionCanFulfill,
   commissionExists,
@@ -66,514 +10,236 @@ import {
   commissionRequirementEntries,
   commissionRewards,
 } from '@helpers/commission/commission-fulfill';
+import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { getEntry } from '@helpers/content/content';
-import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import {
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import {
   applyMaterialDelta,
   getMaterialQuantity,
 } from '@helpers/item/materials';
-import { armoryGet } from '@helpers/kingdom/armory';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { armoryState, worldCommissionsState } from '@helpers/state-game';
+import {
+  taskEventCollectibleGained,
+  taskEventWorkerRescued,
+} from '@helpers/task/task-events';
+import { taskRecordCommissionFulfilled } from '@helpers/task/task-progress';
 import type {
   CaravanId,
-  CommissionOfferContent,
+  CollectibleId,
   CommissionOfferId,
-  EquipmentContent,
+  CommissionRequirement,
   EquipmentId,
+  EquipmentItem,
   GameState,
-  ItemContent,
   ItemId,
-  MonsterContent,
   MonsterId,
-  RecipeId,
+  WorkerId,
 } from '@interfaces';
-import { taskRecordCommissionFulfilled } from '@helpers/task/task-progress';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCommissionNodeState,
+  buildEquipmentItem,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-const caravanId = 'carrina-duchy' as CaravanId;
-
-const offer: CommissionOfferContent = {
-  id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Bundle of Wergen Sticks',
-  __type: 'commissionoffer',
-  description: 'A commission.',
-  requirements: [
-    { itemId: 'wergen-stick' as ItemId, quantityMin: 100, quantityMax: 100 },
-  ],
-  rewards: [
-    ensureDroppedReward({
-      itemId: 'trader-token' as ItemId,
-      chance: 100,
-      min: 2,
-      max: 2,
-    }),
-  ],
-  townReputationReward: 0,
-  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
-  reputationTierMultipliers: [],
-};
-
-const wergenStick: ItemContent = {
+const caravan = ensureCaravan({
+  id: 'carrina-duchy' as CaravanId,
+  name: 'Duchy Trading Caravan - Carrina',
+});
+const stick = ensureItem({
   id: 'wergen-stick' as ItemId,
   name: 'Wergen Stick',
-  __type: 'item',
-  description: 'A stick.',
-  sprite: '0000',
-  rarity: 'Common',
-};
-
-const sword: EquipmentContent = {
-  id: 'sword' as EquipmentId,
-  name: 'Sword',
-  __type: 'equipment',
-  description: 'A sword.',
-  sprite: '0000',
-  rarity: 'Common',
-  levelRequirement: 1,
-  baseStats: {} as never,
-  type: 'Sword',
-  slots: 1,
-  grantedSkillIds: [],
-};
-
-const sandWorm: MonsterContent = {
-  id: 'sand-worm' as MonsterId,
-  name: 'Sand Worm',
-  __type: 'monster',
-  description: 'A worm.',
-  sprite: '0000',
-  frames: 1,
-} as unknown as MonsterContent;
-
-function withCommissionState(state: unknown): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: { commissions: { [caravanId]: state } },
-  } as unknown as GameState);
-}
-
-function updateFnAt(index: number): (state: GameState) => GameState {
-  return vi.mocked(updateGamestate).mock.calls[index][0];
-}
-
-describe('commissionRequirementEntries', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('returns an empty list when no commission exists', () => {
-    withCommissionState(undefined);
-    expect(commissionRequirementEntries(caravanId)).toEqual([]);
-  });
-
-  it('resolves an item requirement with owned quantity', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getEntry).mockReturnValue(wergenStick);
-    vi.mocked(getMaterialQuantity).mockReturnValue(40);
-
-    expect(commissionRequirementEntries(caravanId)).toEqual([
-      {
-        kind: 'item',
-        content: wergenStick,
-        spritesheet: 'item',
-        quantity: 100,
-        owned: 40,
-      },
-    ]);
-  });
-
-  it('resolves an equipment requirement with owned count from the armory', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ equipmentId: sword.id, quantity: 2 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getEntry).mockReturnValue(sword);
-    vi.mocked(armoryGet).mockReturnValue([
-      { equipmentId: sword.id, id: 'a', infusedItemIds: [] },
-      { equipmentId: sword.id, id: 'b', infusedItemIds: [] },
-      { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
-    ] as never);
-
-    expect(commissionRequirementEntries(caravanId)).toEqual([
-      {
-        kind: 'equipment',
-        content: sword,
-        spritesheet: 'equipment',
-        quantity: 2,
-        owned: 2,
-      },
-    ]);
-  });
-
-  it('resolves a monster-kill requirement with its own tracked progress as owned', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 3 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getEntry).mockReturnValue(sandWorm);
-
-    expect(commissionRequirementEntries(caravanId)).toEqual([
-      {
-        kind: 'monster',
-        content: sandWorm,
-        spritesheet: 'monster',
-        quantity: 5,
-        owned: 3,
-      },
-    ]);
-  });
+});
+const token = ensureItem({
+  id: 'trader-token' as ItemId,
+  name: 'Trader Token',
+});
+const sword = ensureEquipment({ id: 'sword' as EquipmentId, name: 'Sword' });
+const worm = ensureMonster({ id: 'sand-worm' as MonsterId, name: 'Sand Worm' });
+const medal = ensureCollectible({
+  id: 'medal' as CollectibleId,
+  name: 'Medal',
+});
+const nell = ensureWorker({ id: 'nell' as WorkerId, name: 'Nell' });
+const offer = ensureCommissionOffer({
+  id: 'offer-a' as CommissionOfferId,
+  name: 'Bundle of Wergen Sticks',
+  rewards: [
+    ensureDroppedReward({ itemId: token.id, chance: 100, min: 2, max: 2 }),
+    ensureDroppedReward({ collectibleId: medal.id, chance: 100 }),
+    ensureDroppedReward({ workerId: nell.id, chance: 100 }),
+  ],
 });
 
-describe('commissionExists / commissionRewards', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+const sticks: CommissionRequirement = { itemId: stick.id, quantity: 100 };
 
-  it('commissionExists is false with no commission generated yet', () => {
-    withCommissionState(undefined);
-    expect(commissionExists(caravanId)).toBe(false);
-  });
-
-  it('commissionExists is true once an offer has been rolled', () => {
-    withCommissionState({
+function seedCommission(
+  requirements: CommissionRequirement[],
+  edit: (state: GameState) => void = () => undefined,
+  atCaravan = true,
+): void {
+  const { [caravan.name]: node, Field: field } = seedWorldNodes([
+    { name: caravan.name, type: 'CaravanNode', x: 1 },
+    { name: 'Field', type: 'ExploreNode', x: 2 },
+  ]);
+  seedGamestate((state) => {
+    state.world.currentLocation = locationOf(atCaravan ? node : field);
+    state.world.commissions[caravan.id] = buildCommissionNodeState({
       commissionOfferId: offer.id,
-      requirements: [],
-      completed: false,
-      generatedAt: 1000,
+      requirements,
     });
-    expect(commissionExists(caravanId)).toBe(true);
+    edit(state);
+  });
+}
+
+const ownSticks =
+  (quantity: number) =>
+  (state: GameState): void =>
+    applyMaterialDelta(state, stick.id, quantity);
+
+function commission() {
+  return worldCommissionsState()[caravan.id];
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  seedContent([caravan, stick, token, sword, worm, medal, nell, offer]);
+});
+
+describe('reading a commission', () => {
+  it('reports nothing for a caravan without a rolled commission', () => {
+    seedGamestate((state) => {
+      state.world.commissions[caravan.id] = buildCommissionNodeState();
+    });
+    expect(commissionExists(caravan.id)).toBe(false);
+    expect(commissionCanFulfill(caravan.id)).toBe(false);
+
+    seedGamestate();
+    expect(commissionExists(caravan.id)).toBe(false);
+    expect(commissionCanFulfill(caravan.id)).toBe(false);
+    expect(commissionRewards(caravan.id)).toEqual([]);
+    expect(commissionRequirementEntries(caravan.id)).toEqual([]);
   });
 
-  it('commissionRewards resolves the offer reward', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getEntry).mockReturnValue(offer);
+  it('lists the offer rewards and each requirement against what the party has', () => {
+    seedCommission([sticks], ownSticks(40));
 
-    expect(commissionRewards(caravanId)).toEqual(offer.rewards);
-  });
-
-  it('commissionRewards is empty with no active commission', () => {
-    withCommissionState(undefined);
-    expect(commissionRewards(caravanId)).toEqual([]);
+    expect(commissionExists(caravan.id)).toBe(true);
+    expect(commissionRewards(caravan.id)).toEqual(offer.rewards);
+    expect(commissionRequirementEntries(caravan.id)).toEqual([
+      expect.objectContaining({ content: stick, quantity: 100, owned: 40 }),
+    ]);
   });
 });
 
 describe('commissionCanFulfill', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('is false when no commission exists', () => {
-    withCommissionState(undefined);
-    expect(commissionCanFulfill(caravanId)).toBe(false);
-  });
-
-  it('is false when already completed', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: true,
-      generatedAt: 1000,
+  it('needs every item, armory piece and kill requirement met', () => {
+    const swords = { equipmentId: sword.id, quantity: 1 };
+    const kills = (progress: number) => ({
+      monsterId: worm.id,
+      quantity: 5,
+      progress,
     });
-    expect(commissionCanFulfill(caravanId)).toBe(false);
+    const withSword = (state: GameState) => {
+      state.armory = [buildEquipmentItem(sword.id)];
+    };
+
+    seedCommission([sticks, swords, kills(5)], (state) => {
+      ownSticks(100)(state);
+      withSword(state);
+    });
+    expect(commissionCanFulfill(caravan.id)).toBe(true);
+
+    seedCommission([sticks], ownSticks(99));
+    expect(commissionCanFulfill(caravan.id)).toBe(false);
+
+    seedCommission([swords]);
+    expect(commissionCanFulfill(caravan.id)).toBe(false);
+
+    seedCommission([kills(4)]);
+    expect(commissionCanFulfill(caravan.id)).toBe(false);
   });
 
-  it('is false when a requirement is short', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
+  it('is never fulfillable twice, but does not care where the party is', () => {
+    seedCommission([sticks], ownSticks(100), false);
+    expect(commissionCanFulfill(caravan.id)).toBe(true);
+
+    seedCommission([sticks], (state) => {
+      ownSticks(100)(state);
+      state.world.commissions[caravan.id].completed = true;
     });
-    vi.mocked(getMaterialQuantity).mockReturnValue(50);
-
-    expect(commissionCanFulfill(caravanId)).toBe(false);
-  });
-
-  it('is true when every requirement is met', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-
-    expect(commissionCanFulfill(caravanId)).toBe(true);
-  });
-
-  it('is true when an equipment requirement is met from the armory', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ equipmentId: sword.id, quantity: 1 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(armoryGet).mockReturnValue([
-      { equipmentId: sword.id, id: 'a', infusedItemIds: [] },
-    ] as never);
-
-    expect(commissionCanFulfill(caravanId)).toBe(true);
-  });
-
-  it('does not require the party to be at the caravan - that only gates the actual turn-in', () => {
-    vi.mocked(isPartyAtCaravan).mockReturnValue(false);
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-
-    expect(commissionCanFulfill(caravanId)).toBe(true);
-  });
-
-  it('is false when a monster-kill requirement has not reached its quantity', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 4 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-
-    expect(commissionCanFulfill(caravanId)).toBe(false);
-  });
-
-  it('is true once a monster-kill requirement reaches its quantity', () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 5 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-
-    expect(commissionCanFulfill(caravanId)).toBe(true);
+    expect(commissionCanFulfill(caravan.id)).toBe(false);
   });
 });
 
 describe('commissionFulfill', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(isPartyAtCaravan).mockReturnValue(true);
-  });
+  it('spends the requirements, grants the rewards and completes the commission', async () => {
+    seedCommission([sticks], ownSticks(100));
+    const events = captureAnalyticsEvents();
 
-  it('returns false and does not mutate state when requirements are unmet', async () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getMaterialQuantity).mockReturnValue(0);
+    expect(await commissionFulfill(caravan.id)).toBe(true);
 
-    expect(await commissionFulfill(caravanId)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('returns false and does not mutate state when the party is not at the caravan', async () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-    vi.mocked(isPartyAtCaravan).mockReturnValue(false);
-
-    expect(await commissionFulfill(caravanId)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('spends every requirement, grants tokens, and flips completed on success', async () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    // updateGamestate is a dumb recorder in this suite (it doesn't actually
-    // invoke the callback), so the resolved success/failure of
-    // commissionFulfill depends on the callback below having already run
-    // before the outer promise is awaited.
-    const resultPromise = commissionFulfill(caravanId);
-
-    const updateFn = updateFnAt(0);
-    const state = {
-      materials: { [wergenStick.id]: { quantity: 100, foundAt: 1 } },
-      armory: [],
-      world: {
-        commissions: {
-          [caravanId]: {
-            commissionOfferId: offer.id,
-            requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-            completed: false,
-            generatedAt: 1000,
-          },
-        },
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(await resultPromise).toBe(true);
+    expect(getMaterialQuantity(stick.id)).toBe(0);
+    expect(getMaterialQuantity(token.id)).toBe(2);
+    expect(commission().completed).toBe(true);
+    expect(events).toContain(
+      'Kingdom:Commission:Fulfill:Bundle of Wergen Sticks',
+    );
     expect(taskRecordCommissionFulfilled).toHaveBeenCalledTimes(1);
-    expect(applyMaterialDelta).toHaveBeenCalledWith(
-      state,
-      wergenStick.id,
-      -100,
-    );
-    expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'trader-token', 2);
-    expect(result.world.commissions[caravanId].completed).toBe(true);
-    expect(analyticsSendDesignEvent).toHaveBeenCalledWith(
-      'Kingdom:Commission:Fulfill:Commission - Bundle of Wergen Sticks',
-    );
+    expect(taskEventCollectibleGained).toHaveBeenCalledWith(medal.id);
+    expect(taskEventWorkerRescued).toHaveBeenCalledWith(nell.id);
   });
 
-  it('consumes equipment requirements from the armory instead of materials', async () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ equipmentId: sword.id, quantity: 2 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(armoryGet).mockReturnValue([
-      { equipmentId: sword.id, id: 'a', infusedItemIds: [] },
-      { equipmentId: sword.id, id: 'b', infusedItemIds: [] },
-      { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
-    ] as never);
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    const resultPromise = commissionFulfill(caravanId);
-
-    const updateFn = updateFnAt(0);
-    const state = {
-      materials: {},
-      armory: [
-        { equipmentId: sword.id, id: 'a', infusedItemIds: [] },
-        { equipmentId: sword.id, id: 'b', infusedItemIds: [] },
-        { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
+  it('hands over only the required armory pieces, and spends nothing for kills', async () => {
+    const [first, second, other]: EquipmentItem[] = [
+      buildEquipmentItem(sword.id),
+      buildEquipmentItem(sword.id),
+      buildEquipmentItem('other' as EquipmentId),
+    ];
+    seedCommission(
+      [
+        { equipmentId: sword.id, quantity: 2 },
+        { monsterId: worm.id, quantity: 5, progress: 5 },
       ],
-      world: {
-        commissions: {
-          [caravanId]: {
-            commissionOfferId: offer.id,
-            requirements: [{ equipmentId: sword.id, quantity: 2 }],
-            completed: false,
-            generatedAt: 1000,
-          },
-        },
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
+      (state) => (state.armory = [first, other, second]),
+    );
 
-    expect(await resultPromise).toBe(true);
-    expect(result.armory).toEqual([
-      { equipmentId: 'other' as EquipmentId, id: 'c', infusedItemIds: [] },
+    expect(await commissionFulfill(caravan.id)).toBe(true);
+
+    expect(armoryState()).toEqual([other]);
+  });
+
+  it('refuses away from the caravan, or with requirements short, changing nothing', async () => {
+    seedCommission([sticks], ownSticks(100), false);
+    expect(await commissionFulfill(caravan.id)).toBe(false);
+
+    seedCommission([sticks], ownSticks(99));
+    expect(await commissionFulfill(caravan.id)).toBe(false);
+
+    expect(getMaterialQuantity(stick.id)).toBe(99);
+    expect(commission().completed).toBe(false);
+    expect(taskRecordCommissionFulfilled).not.toHaveBeenCalled();
+  });
+
+  it('pays out once when two turn-ins race before either commits', async () => {
+    seedCommission([sticks], ownSticks(200));
+
+    const results = await Promise.all([
+      commissionFulfill(caravan.id),
+      commissionFulfill(caravan.id),
     ]);
-  });
 
-  it('completes a monster-kill commission without spending anything for the kill requirement', async () => {
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ monsterId: sandWorm.id, quantity: 5, progress: 5 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    const resultPromise = commissionFulfill(caravanId);
-
-    const updateFn = updateFnAt(0);
-    const state = {
-      materials: {},
-      armory: [],
-      world: {
-        commissions: {
-          [caravanId]: {
-            commissionOfferId: offer.id,
-            requirements: [
-              { monsterId: sandWorm.id, quantity: 5, progress: 5 },
-            ],
-            completed: false,
-            generatedAt: 1000,
-          },
-        },
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(await resultPromise).toBe(true);
-    expect(applyMaterialDelta).toHaveBeenCalledWith(state, 'trader-token', 2);
-    expect(applyMaterialDelta).toHaveBeenCalledTimes(1);
-    expect(result.world.commissions[caravanId].completed).toBe(true);
-  });
-
-  it('does not double-grant tokens when two turn-ins race before either commits', async () => {
-    // Regression test for the rapid-click double-fire bug: updateGamestate
-    // doesn't commit until an async yield later, so commissionCanFulfill's
-    // fast-path check (run synchronously before that yield) can pass twice
-    // against the same stale, pre-commit state if two calls race in before
-    // the first one's callback actually runs.
-    withCommissionState({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-      completed: false,
-      generatedAt: 1000,
-    });
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    const call1 = commissionFulfill(caravanId);
-    const call2 = commissionFulfill(caravanId);
-
-    expect(updateGamestate).toHaveBeenCalledTimes(2);
-    const [updateFn1, updateFn2] = vi
-      .mocked(updateGamestate)
-      .mock.calls.map((call) => call[0]);
-
-    const initialState = {
-      materials: { [wergenStick.id]: { quantity: 100, foundAt: 1 } },
-      armory: [],
-      world: {
-        commissions: {
-          [caravanId]: {
-            commissionOfferId: offer.id,
-            requirements: [{ itemId: wergenStick.id, quantity: 100 }],
-            completed: false,
-            generatedAt: 1000,
-          },
-        },
-      },
-    } as unknown as GameState;
-
-    // Simulates commit ordering: call1's callback commits first; call2's
-    // callback then runs against that already-committed result, as it would
-    // once its own updateGamestate yield resolves.
-    const afterFirst = updateFn1(initialState);
-    const afterSecond = updateFn2(afterFirst);
-
-    const [result1, result2] = await Promise.all([call1, call2]);
-
-    expect(result1).toBe(true);
-    expect(result2).toBe(false);
-    expect(afterSecond).toBe(afterFirst);
-    expect(afterFirst.world.commissions[caravanId].completed).toBe(true);
-    // One spend + one grant from call1; call2 must no-op entirely.
-    expect(applyMaterialDelta).toHaveBeenCalledTimes(2);
+    expect(results).toEqual([true, false]);
+    expect(getMaterialQuantity(stick.id)).toBe(100);
+    expect(getMaterialQuantity(token.id)).toBe(2);
   });
 });
