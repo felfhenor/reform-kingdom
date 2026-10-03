@@ -161,28 +161,46 @@
                 (change)="setDraftNodeName($event.nodeName)"
               >
                 <ng-template ng-option-tmp let-item="item">
-                  <div class="flex items-center gap-2">
-                    <app-sprite-node class="zoom-row" [entry]="item.entry" />
+                  <div class="flex flex-row items-center justify-between gap-2">
+                    <div class="flex-1 flex gap-2">
+                      <app-sprite-node class="zoom-row" [entry]="item.entry" />
+
+                      <div>
+                        <div class="type-label">
+                          {{ item.nodeName }}
+                        </div>
+
+                        <div class="type-meta">
+                          Lv. {{ item.levelRangeLabel }}
+                          @if (item.staminaCost !== undefined) {
+                            · {{ item.staminaCost | number }} stamina
+                          } @else {
+                            · unreachable
+                          }
+                        </div>
+                      </div>
+                    </div>
+
                     <div>
-                      <div class="type-label">
-                        {{ item.nodeName }}
-                      </div>
-                      <div class="type-meta">
-                        Lv. {{ item.levelRangeLabel }}
-                        @if (item.staminaCost !== undefined) {
-                          · {{ item.staminaCost | number }} stamina
-                        } @else {
-                          · unreachable
-                        }
-                      </div>
+                      @if (entry.state.level > item.maxLevel) {
+                        <span class="badge badge-warning text-sm">No XP</span>
+                      }
                     </div>
                   </div>
                 </ng-template>
 
                 <ng-template ng-label-tmp let-item="item">
-                  <div class="flex items-center gap-2">
-                    <app-sprite-node class="zoom-row" [entry]="item.entry" />
-                    {{ item.nodeName }}
+                  <div class="flex flex-row items-center justify-between">
+                    <div class="flex-1 flex items-center gap-2 w-full">
+                      <app-sprite-node class="zoom-row" [entry]="item.entry" />
+                      {{ item.nodeName }} Lv. {{ item.levelRangeLabel }}
+                    </div>
+
+                    <div>
+                      @if (entry.state.level > item.maxLevel) {
+                        <span class="badge badge-warning text-sm">No XP</span>
+                      }
+                    </div>
                   </div>
                 </ng-template>
               </ng-select>

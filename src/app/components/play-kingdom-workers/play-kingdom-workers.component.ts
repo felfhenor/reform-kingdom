@@ -7,10 +7,9 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
-import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -18,6 +17,7 @@ import { OptionRewardComponent } from '@components/option-reward/option-reward.c
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
+import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
@@ -80,6 +80,7 @@ type NodeOption = {
   entry: WorldNodeEntry;
   staminaCost?: number;
   levelRangeLabel: string;
+  maxLevel: number;
   disabled: boolean;
 };
 
@@ -271,6 +272,7 @@ export class PlayKingdomWorkersComponent {
           nodeName: node.nodeName,
           entry: node,
           staminaCost: workerStaminaCostToNode(node.nodeName, allowTeleport),
+          maxLevel: gathering?.workerLevelRange.max ?? WORKER_MAX_LEVEL,
           levelRangeLabel: gathering
             ? worldNodeLevelLabel(gathering.workerLevelRange)
             : '?',
