@@ -1,323 +1,219 @@
-import type * as WorldNodeGatheringHelper from '@helpers/world-node/world-node-gathering';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
+vi.mock('@helpers/engine/gather-vfx');
+vi.mock('@helpers/worker/worker-travel');
 
-vi.mock('@helpers/engine/gather-vfx', () => ({
-  gatherVfxEmit: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
-
-vi.mock('@helpers/worker/worker-travel', () => ({
-  workerAssignmentIsValid: vi.fn(() => true),
-  workerBeginReturnTrip: vi.fn(),
-}));
-
-vi.mock('@helpers/worker/worker-progression', () => ({
-  workerGainXp: vi.fn(),
-  workerStatsForLevel: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeGathering: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering', async (importOriginal) => ({
-  ...(await importOriginal<typeof WorldNodeGatheringHelper>()),
-  gatheringResultsAtLevel: vi.fn((gathering) => gathering.gatherResults),
-}));
-
-vi.mock('@helpers/world-node/world-node-level', () => ({
-  worldNodeLevel: vi.fn(() => 0),
-}));
-
-import { getEntry } from '@helpers/content/content';
 import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
+import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { workersState } from '@helpers/state-game';
 import {
   workerGatherXpGateSatisfied,
   workerGatheringProcessTick,
 } from '@helpers/worker/worker-gathering';
 import {
-  workerGainXp,
+  defaultWorkerState,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import {
   workerAssignmentIsValid,
   workerBeginReturnTrip,
 } from '@helpers/worker/worker-travel';
-import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
 import type {
   GameState,
   GatheringContent,
+  GatheringId,
   ItemId,
-  WorkerContent,
   WorkerId,
   WorkerState,
+  WorkerStatusGathering,
 } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
-}
-
-const WORKER_ID = 'weaver-nell' as WorkerId;
-const COPPER_ID = 'copper-ore' as ItemId;
-const MALACHITE_ID = 'malachite' as ItemId;
-
-const workerContent: WorkerContent = ensureWorker({
-  id: WORKER_ID,
+const nell = ensureWorker({
+  id: 'weaver-nell' as WorkerId,
   name: 'Weaver Nell',
-  description: 'test',
-  sprite: '0000',
-  frames: 4,
-  baseStats: { capacity: 6, gatherSpeed: 2, stamina: 30 },
-  statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
-  canUseTeleports: true,
+  baseStats: { capacity: 3, gatherSpeed: 2, stamina: 30 },
 });
+const copper = ensureItem({
+  id: 'copper-ore' as ItemId,
+  name: 'Copper Ore',
+  sprite: 'copper-sprite',
+});
+const nodeName = 'Wergen Woods';
 
-function buildGathering(
-  overrides: Partial<GatheringContent> = {},
-): GatheringContent {
+function woods(overrides: Partial<GatheringContent> = {}): GatheringContent {
   return ensureGathering({
-    id: 'gathering-1' as never,
-    name: 'Wergen Woods',
-    description: 'test',
-    levelRange: { min: 1, max: 10 },
-    xpGainedIfInLevelRange: 5,
+    id: 'wergen-woods' as GatheringId,
+    name: nodeName,
     gatherTime: 10,
     gatherResults: [
       ensureGatherResult({
-        chance: 80,
-        items: [{ itemId: COPPER_ID, quantity: 1 }],
-      }),
-      ensureGatherResult({
-        chance: 20,
-        items: [{ itemId: MALACHITE_ID, quantity: 1 }],
+        chance: 100,
+        items: [{ itemId: copper.id, quantity: 1 }],
       }),
     ],
-    hidden: false,
-    workerLevelRange: { min: 1, max: 999 },
+    workerLevelRange: { min: 1, max: 99 },
     ...overrides,
   });
 }
 
-describe('workerGatherXpGateSatisfied', () => {
-  it('is true within the workerLevelRange window', () => {
-    const gathering = buildGathering({ workerLevelRange: { min: 5, max: 10 } });
+function seedGatherer(
+  status: Partial<WorkerStatusGathering> = {},
+  edit: (state: GameState) => void = () => undefined,
+): void {
+  seedGamestate((state) => {
+    state.workers[nell.id] = {
+      ...defaultWorkerState(),
+      status: {
+        kind: 'Gathering',
+        nodeName,
+        itemId: copper.id,
+        itemsGathered: 0,
+        ticksIntoGather: 0,
+        ...status,
+      },
+      assignment: { nodeName, itemId: copper.id },
+    };
+    edit(state);
+  });
+}
 
-    expect(workerGatherXpGateSatisfied(gathering, 4)).toBe(false);
-    expect(workerGatherXpGateSatisfied(gathering, 5)).toBe(true);
-    expect(workerGatherXpGateSatisfied(gathering, 10)).toBe(true);
-    expect(workerGatherXpGateSatisfied(gathering, 11)).toBe(false);
+function worker(): WorkerState {
+  return workersState()[nell.id];
+}
+
+function gathered(): number {
+  const { status } = worker();
+  return status.kind === 'Gathering' ? status.itemsGathered : -1;
+}
+
+const tick = () => inTick(() => workerGatheringProcessTick(nell.id));
+
+function tickUntil(done: () => boolean): number {
+  let ticks = 0;
+  while (!done()) {
+    if (ticks >= 1000) throw new Error('condition never reached');
+    tick();
+    ticks += 1;
+  }
+  return ticks;
+}
+
+function ticksForOneUnit(): number {
+  const start = gathered();
+  return tickUntil(() => gathered() !== start);
+}
+
+const tripStarted = () =>
+  vi.mocked(workerBeginReturnTrip).mock.calls.length > 0;
+
+function seedNode(gathering = woods()): void {
+  seedContent([nell, copper, gathering]);
+  seedWorldNodes([{ name: nodeName, type: 'GatherNode' }]);
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(workerAssignmentIsValid).mockReturnValue(true);
+  vi.mocked(workerBeginReturnTrip).mockReturnValue(true);
+  seedNode();
+});
+
+describe('workerGatherXpGateSatisfied', () => {
+  it('holds within the node’s worker level range, inclusive', () => {
+    const gathering = woods({ workerLevelRange: { min: 5, max: 10 } });
+
+    expect(
+      [4, 5, 10, 11].map((level) =>
+        workerGatherXpGateSatisfied(gathering, level),
+      ),
+    ).toEqual([false, true, true, false]);
   });
 });
 
 describe('workerGatheringProcessTick', () => {
-  function buildWorker(overrides: Partial<WorkerState> = {}): WorkerState {
-    return {
-      level: 1,
-      xp: { current: 0, maximum: 10 },
-      location: { mapName: 'Carrina', x: 0, y: 0 },
-      status: {
-        kind: 'Gathering',
-        nodeName: 'Wergen Woods',
-        itemId: COPPER_ID,
-        itemsGathered: 0,
-        ticksIntoGather: 0,
-      },
-      assignment: { nodeName: 'Wergen Woods', itemId: COPPER_ID },
-      ...overrides,
-    };
-  }
+  it('builds up progress, then lands a unit with xp and a VFX, starting the next one fresh', () => {
+    seedGatherer();
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(workerAssignmentIsValid).mockReturnValue(true);
-    vi.mocked(worldNodeLevel).mockReturnValue(0);
-    vi.mocked(worldNodeByName).mockReturnValue({} as never);
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({ gatherTime: 10 }),
-    );
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === WORKER_ID) return workerContent as never;
-      return { name: 'Copper Ore', sprite: 'copper-ore' } as never;
-    });
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 6,
-      gatherSpeed: 2,
-      stamina: 30,
-    });
-  });
-
-  it('accumulates ticksIntoGather without completing a unit early', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildWorker() },
-    } as unknown as GameState);
-
-    workerGatheringProcessTick(WORKER_ID);
-
-    const result = applyLastUpdate({
-      workers: { [WORKER_ID]: buildWorker() },
-    } as unknown as GameState);
-
-    expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
-    expect(result.workers[WORKER_ID].status).toMatchObject({
-      kind: 'Gathering',
+    tick();
+    expect(worker().status).toMatchObject({
       ticksIntoGather: 1,
       itemsGathered: 0,
     });
-    expect(workerGainXp).not.toHaveBeenCalled();
-  });
+    expect(worker().xp.current).toBe(0);
 
-  it('completes a unit, grants xp, and resets ticksIntoGather once the rate threshold is hit', () => {
-    // gatherTime 10 / rate (2 * 80/100 = 1.6) = 6.25 ticks per unit.
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildWorker({
-          status: {
-            kind: 'Gathering',
-            nodeName: 'Wergen Woods',
-            itemId: COPPER_ID,
-            itemsGathered: 0,
-            ticksIntoGather: 6,
-          },
-        }),
-      },
-    } as unknown as GameState);
+    ticksForOneUnit();
 
-    workerGatheringProcessTick(WORKER_ID);
-
-    const result = applyLastUpdate({
-      workers: {
-        [WORKER_ID]: buildWorker({
-          status: {
-            kind: 'Gathering',
-            nodeName: 'Wergen Woods',
-            itemId: COPPER_ID,
-            itemsGathered: 0,
-            ticksIntoGather: 6,
-          },
-        }),
-      },
-    } as unknown as GameState);
-
-    expect(workerGainXp).toHaveBeenCalledWith(WORKER_ID, 1);
-    expect(result.workers[WORKER_ID].status).toMatchObject({
-      kind: 'Gathering',
-      itemsGathered: 1,
+    expect(worker().status).toMatchObject({
       ticksIntoGather: 0,
+      itemsGathered: 1,
     });
+    expect(worker().xp.current).toBe(1);
     expect(gatherVfxEmit).toHaveBeenCalledWith({
-      nodeName: 'Wergen Woods',
-      name: 'Copper Ore',
-      sprite: 'copper-ore',
+      nodeName,
+      name: copper.name,
+      sprite: copper.sprite,
       spritesheet: 'item',
       quantity: 1,
     });
   });
 
-  it('completes a unit sooner on an upgraded node', () => {
-    // (10 - 2 * 2) / 1.6 = 3.75 ticks per unit.
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      buildGathering({ gatherTime: 10, gatherReductionPerUpgradeLevel: 2 }),
+  it('gathers faster on an upgraded node', () => {
+    seedNode(woods({ gatherReductionPerUpgradeLevel: 2 }));
+
+    seedGatherer();
+    const base = ticksForOneUnit();
+    seedGatherer(
+      {},
+      (state) => (state.gatherNodeLevels[nodeName] = { level: 2 }),
     );
-    vi.mocked(worldNodeLevel).mockReturnValue(2);
-    const worker = buildWorker({
-      status: {
-        kind: 'Gathering',
-        nodeName: 'Wergen Woods',
-        itemId: COPPER_ID,
-        itemsGathered: 0,
-        ticksIntoGather: 3,
-      },
-    });
-    vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: worker },
-    } as unknown as GameState);
 
-    workerGatheringProcessTick(WORKER_ID);
-
-    expect(workerGainXp).toHaveBeenCalledWith(WORKER_ID, 1);
+    expect(ticksForOneUnit()).toBeLessThan(base);
   });
 
-  it('begins the return trip once capacity is reached instead of resetting the cycle, and emits the VFX', () => {
-    vi.mocked(workerBeginReturnTrip).mockReturnValue(true);
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildWorker({
-          status: {
-            kind: 'Gathering',
-            nodeName: 'Wergen Woods',
-            itemId: COPPER_ID,
-            itemsGathered: 5,
-            ticksIntoGather: 6,
-          },
-        }),
-      },
-    } as unknown as GameState);
+  it('earns no xp outside the node’s worker level range', () => {
+    seedNode(woods({ workerLevelRange: { min: 5, max: 10 } }));
+    seedGatherer();
 
-    workerGatheringProcessTick(WORKER_ID);
+    ticksForOneUnit();
 
-    expect(workerBeginReturnTrip).toHaveBeenCalledWith(WORKER_ID, COPPER_ID, 6);
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(gatherVfxEmit).toHaveBeenCalledWith(
-      expect.objectContaining({ nodeName: 'Wergen Woods', quantity: 1 }),
-    );
+    expect(worker().xp.current).toBe(0);
   });
 
-  it('does not emit the VFX when the capacity-reached return trip finds no path home', () => {
+  it('heads home with a full load, showing the last unit only if the trip starts', () => {
+    const full = workerStatsForLevel(nell, 1).capacity;
+    seedGatherer({ itemsGathered: full - 1 });
+
+    tickUntil(tripStarted);
+
+    expect(workerBeginReturnTrip).toHaveBeenCalledWith(
+      nell.id,
+      copper.id,
+      full,
+    );
+    expect(gatherVfxEmit).toHaveBeenCalledTimes(1);
+
+    vi.clearAllMocks();
     vi.mocked(workerBeginReturnTrip).mockReturnValue(false);
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildWorker({
-          status: {
-            kind: 'Gathering',
-            nodeName: 'Wergen Woods',
-            itemId: COPPER_ID,
-            itemsGathered: 5,
-            ticksIntoGather: 6,
-          },
-        }),
-      },
-    } as unknown as GameState);
-
-    workerGatheringProcessTick(WORKER_ID);
-
-    expect(workerBeginReturnTrip).toHaveBeenCalledWith(WORKER_ID, COPPER_ID, 6);
+    seedGatherer({ itemsGathered: full - 1 });
+    tickUntil(tripStarted);
     expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
-  it('abandons the gather and parks AtDuchy when the assignment goes stale', () => {
+  it('parks the worker at the Duchy once its assignment goes stale', () => {
     vi.mocked(workerAssignmentIsValid).mockReturnValue(false);
-    vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildWorker() },
-    } as unknown as GameState);
+    seedGatherer();
 
-    workerGatheringProcessTick(WORKER_ID);
+    tick();
 
-    const result = applyLastUpdate({
-      workers: { [WORKER_ID]: buildWorker() },
-    } as unknown as GameState);
-
-    expect(result.workers[WORKER_ID].status).toEqual({ kind: 'AtDuchy' });
-    expect(result.workers[WORKER_ID].assignment).toBeNull();
+    expect(worker().status).toEqual({ kind: 'AtDuchy' });
+    expect(worker().assignment).toBeNull();
   });
 });

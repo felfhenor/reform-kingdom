@@ -1,561 +1,330 @@
-import type {
-  Character,
-  CharacterId,
-  EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  EquipmentItemId,
-  GameState,
-  IsContentItem,
-  ItemId,
-  JobContent,
-  JobId,
-} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// A unique id per call (not a constant) - equipped-item dedup is now keyed
-// by instance id, so two distinct equipped items in the same test must not
-// collide on the same mocked uuid the way a constant mock would cause.
-let mockUuidCounter = 0;
-vi.mock('uuid', () => ({
-  v4: vi.fn(() => `mock-uuid-${mockUuidCounter++}`),
-}));
+vi.mock('@helpers/task/task-events');
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/task/task-events', () => ({
-  taskEventEquipmentInfused: vi.fn(),
-}));
-
-vi.mock('@helpers/item/infusion', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  canInfuseEquipmentItem: vi.fn(() => true),
-  infusionMaterialCost: vi.fn(() => 10),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    armoryState: () => gamestate().armory,
-    globalEffectSumsState: () => gamestate().globalEffectSums,
-    worldPartyState: () => gamestate().world.party,
-    worldCombatState: vi.fn(),
-  };
-});
-
-import { getEntry } from '@helpers/content/content';
-import { ensureItem } from '@helpers/content/ensure-item';
-import { defaultGameState, defaultStats } from '@helpers/defaults';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
   characterEquipFromArmory,
   equipmentInfuse,
   optimizeCharacterEquipment,
   replaceEquippedItemInstance,
 } from '@helpers/hero/character-equipment';
-import { canInfuseEquipmentItem } from '@helpers/item/infusion';
-import { createCharacter } from '@helpers/hero/party';
+import { infusionMaterialCost } from '@helpers/item/infusion';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import {
+  armoryState,
   gamestate,
-  updateGamestate,
-  worldCombatState,
+  materialsState,
+  worldPartyState,
 } from '@helpers/state-game';
+import { taskEventEquipmentInfused } from '@helpers/task/task-events';
+import type {
+  Character,
+  CharacterId,
+  EquipmentBlock,
+  EquipmentContent,
+  EquipmentId,
+  EquipmentItem,
+  EquipmentItemId,
+  GameState,
+  ItemId,
+  JobId,
+} from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCharacter,
+  buildCombat,
+  buildEquipmentItem,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-describe('Character Equipment Helper Functions', () => {
-  const mockJob: JobContent = {
-    id: 'job-explorer' as JobId,
-    name: 'Explorer',
-    shorthand: 'EXP',
-    __type: 'job',
-    description: 'A person who seeks out new lands and experiences.',
-    sprite: '0000',
-    frames: 4,
-    baseStats: {
-      Health: 100,
-      Energy: 25,
-      Luck: 5,
-      Intelligence: 5,
-      Strength: 5,
-      Vitality: 5,
-      Resistance: 5,
-      Agility: 10,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    statsPerLevel: {
-      Health: 10,
-      Energy: 5,
-      Luck: 0.01,
-      Intelligence: 0.2,
-      Strength: 0.5,
-      Vitality: 0.3,
-      Resistance: 0.4,
-      Agility: 0.7,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
-    statPriority: [],
-    skillPath: [],
-  };
+const jobId = 'job-warrior' as JobId;
+const goldId = 'gold-coin' as ItemId;
 
-  const mockCloak: EquipmentContent = {
-    id: 'equip-cloak' as EquipmentId,
-    name: 'Cloak of Adventuring',
-    __type: 'equipment',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    levelRequirement: 1,
-    baseStats: { ...defaultStats(), Agility: 0.2, Resistance: 0.2 },
-    type: 'Cloth Armor',
+function gear(
+  id: string,
+  type: EquipmentContent['type'],
+  overrides: Partial<EquipmentContent> = {},
+): EquipmentContent {
+  return ensureEquipment({
+    id: id as EquipmentId,
+    name: id,
+    type,
     slots: 1,
-    grantedSkillIds: [],
-  };
-
-  const mockHelmet: EquipmentContent = {
-    ...mockCloak,
-    id: 'equip-helmet' as EquipmentId,
-    name: 'Helmet',
-    baseStats: { ...defaultStats(), Vitality: 3 },
-    type: 'Hat',
-  };
-
-  const mockStarterHat: EquipmentContent = {
-    ...mockCloak,
-    id: 'equip-hat-of-adventuring' as EquipmentId,
-    name: 'Hat of Adventuring',
-    baseStats: defaultStats(),
-    type: 'Hat',
-  };
-
-  function mockGetEntry(...entries: IsContentItem[]): void {
-    const known = [mockCloak, mockStarterHat, ...entries];
-    vi.mocked(getEntry).mockImplementation(
-      (idOrName) =>
-        known.find(
-          (entry) => entry.id === idOrName || entry.name === idOrName,
-        ) as never,
-    );
-  }
-
-  beforeEach(() => {
-    mockUuidCounter = 0;
-    vi.clearAllMocks();
-    vi.mocked(worldCombatState).mockReturnValue(undefined);
+    ...overrides,
   });
+}
 
-  function createCharacterStub(name: string): Character {
-    return createCharacter(name, 'job-explorer' as JobId);
-  }
+const helmet = gear('helmet', 'Hat', {
+  baseStats: { ...defaultStats(), Vitality: 3 },
+});
+const oldHat = gear('old-hat', 'Hat');
+const crown = gear('crown', 'Hat', { levelRequirement: 99 });
+const sword = gear('sword', 'Sword', {
+  baseStats: { ...defaultStats(), Strength: 10 },
+});
+const spear = gear('spear', 'Spear', {
+  baseStats: { ...defaultStats(), Strength: 8 },
+});
+const dagger = gear('dagger', 'Sword', {
+  baseStats: { ...defaultStats(), Strength: 1 },
+});
+const shield = gear('shield', 'Shield', {
+  baseStats: { ...defaultStats(), Strength: 4 },
+});
+const bow = gear('bow', 'Bow');
+const gem = ensureItem({
+  id: 'ruby' as ItemId,
+  name: 'Ruby',
+  infusionStats: { ...defaultStats(), Strength: 2 },
+});
 
-  let fixtureItemCounter = 0;
+const heroId = 'jala' as CharacterId;
 
-  function mockEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
-    return {
-      id: `fixture-item-${fixtureItemCounter++}` as EquipmentItemId,
-      equipmentId,
-      infusedItemIds: [],
-      affixIds: [],
-    };
-  }
-
-  describe('characterEquipFromArmory', () => {
-    const mockSpear: EquipmentContent = {
-      ...mockCloak,
-      id: 'equip-spear' as EquipmentId,
-      name: 'Copper Spear',
-      type: 'Spear',
-    };
-
-    it('equips an armory item into its slot and removes it from the armory', () => {
-      mockGetEntry(mockJob, mockHelmet);
-      const jala = createCharacterStub('Jala');
-      const armoryHelmet = mockEquipmentItem(mockHelmet.id);
-      const fakeState = {
-        world: { party: [jala] },
-        armory: [armoryHelmet],
-      } as unknown as GameState;
-      vi.mocked(gamestate).mockReturnValue(fakeState);
-
-      const result = characterEquipFromArmory(jala.id, armoryHelmet.id);
-
-      expect(result).toBe(true);
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const state = updateFn(fakeState);
-
-      expect(state.world.party[0].equipment.Helmet).toEqual(armoryHelmet);
-      expect(state.armory).toEqual([jala.equipment.Helmet]);
-    });
-
-    it('returns the previously equipped item in that slot back to the armory', () => {
-      mockGetEntry(mockJob, mockCloak, mockHelmet);
-      const jala = createCharacterStub('Jala');
-      const oldHelmet = mockEquipmentItem('old-helmet' as EquipmentId);
-      const equippedJala: Character = {
-        ...jala,
-        equipment: { ...jala.equipment, Helmet: oldHelmet },
-      };
-      const armoryHelmet = mockEquipmentItem(mockHelmet.id);
-      const fakeState = {
-        world: { party: [equippedJala] },
-        armory: [armoryHelmet],
-      } as unknown as GameState;
-      vi.mocked(gamestate).mockReturnValue(fakeState);
-
-      characterEquipFromArmory(equippedJala.id, armoryHelmet.id);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const state = updateFn(fakeState);
-
-      expect(state.world.party[0].equipment.Helmet).toEqual(armoryHelmet);
-      expect(state.armory).toEqual([oldHelmet]);
-    });
-
-    it('returns false without mutating state while the party is in combat', () => {
-      mockGetEntry(mockJob, mockHelmet);
-      const jala = createCharacterStub('Jala');
-      vi.mocked(worldCombatState).mockReturnValue({} as never);
-
-      const result = characterEquipFromArmory(
-        jala.id,
-        'irrelevant' as EquipmentItemId,
-      );
-
-      expect(result).toBe(false);
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('returns false without mutating state when the hero is under-level for the item', () => {
-      const highLevelHelmet: EquipmentContent = {
-        ...mockHelmet,
-        levelRequirement: 99,
-      };
-      mockGetEntry(mockJob, highLevelHelmet);
-      const jala = createCharacterStub('Jala');
-      const armoryItem = mockEquipmentItem(highLevelHelmet.id);
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [jala] },
-        armory: [armoryItem],
-      } as unknown as GameState);
-
-      const result = characterEquipFromArmory(jala.id, armoryItem.id);
-
-      expect(result).toBe(false);
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('returns false without mutating state when the item is not in the armory', () => {
-      mockGetEntry(mockJob, mockHelmet);
-      const jala = createCharacterStub('Jala');
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [jala] },
-        armory: [],
-      } as unknown as GameState);
-
-      const result = characterEquipFromArmory(
-        jala.id,
-        'missing-instance' as EquipmentItemId,
-      );
-
-      expect(result).toBe(false);
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('equips a two-handed item into every slot it declares at once', () => {
-      mockGetEntry(mockJob, mockCloak, mockSpear);
-      const jala = createCharacterStub('Jala');
-      const armorySpear = mockEquipmentItem(mockSpear.id);
-      const fakeState = {
-        world: { party: [jala] },
-        armory: [armorySpear],
-      } as unknown as GameState;
-      vi.mocked(gamestate).mockReturnValue(fakeState);
-
-      const result = characterEquipFromArmory(jala.id, armorySpear.id);
-
-      expect(result).toBe(true);
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const state = updateFn(fakeState);
-
-      expect(state.world.party[0].equipment.Weapon).toEqual(armorySpear);
-      expect(state.world.party[0].equipment.Offhand).toEqual(armorySpear);
-    });
-
-    it('only counts a two-handed item once toward stat totals', () => {
-      const spearWithStats: EquipmentContent = {
-        ...mockSpear,
-        baseStats: { ...defaultStats(), Strength: 3 },
-      };
-      mockGetEntry(mockJob, mockCloak, spearWithStats);
-      const jala = createCharacterStub('Jala');
-      const armorySpear = mockEquipmentItem(spearWithStats.id);
-      const fakeState = {
-        world: { party: [jala] },
-        armory: [armorySpear],
-      } as unknown as GameState;
-      vi.mocked(gamestate).mockReturnValue(fakeState);
-
-      characterEquipFromArmory(jala.id, armorySpear.id);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const state = updateFn(fakeState);
-
-      expect(state.world.party[0].stats.Strength).toBe(
-        mockJob.baseStats.Strength + spearWithStats.baseStats.Strength,
-      );
-    });
-
-    it('fully displaces a two-handed item back to the armory (once) when a single-slot item overwrites one of its hands', () => {
-      const mockOffhandItem: EquipmentContent = {
-        ...mockCloak,
-        id: 'equip-shield' as EquipmentId,
-        name: 'Shield',
-        type: 'Shield',
-      };
-      mockGetEntry(mockJob, mockCloak, mockSpear, mockOffhandItem);
-      const jala = createCharacterStub('Jala');
-      const equippedSpear = mockEquipmentItem(mockSpear.id);
-      const spearEquippedJala: Character = {
-        ...jala,
-        equipment: {
-          ...jala.equipment,
-          Weapon: equippedSpear,
-          Offhand: equippedSpear,
-        },
-      };
-      const armoryOffhandItem = mockEquipmentItem(mockOffhandItem.id);
-      const fakeState = {
-        world: { party: [spearEquippedJala] },
-        armory: [armoryOffhandItem],
-      } as unknown as GameState;
-      vi.mocked(gamestate).mockReturnValue(fakeState);
-
-      characterEquipFromArmory(spearEquippedJala.id, armoryOffhandItem.id);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const state = updateFn(fakeState);
-
-      expect(state.world.party[0].equipment.Offhand).toEqual(armoryOffhandItem);
-      expect(state.world.party[0].equipment.Weapon).toBeUndefined();
-      expect(state.armory).toEqual([equippedSpear]);
-    });
+function hero(equipment: Partial<EquipmentBlock> = {}): Character {
+  return buildCharacter({
+    id: heroId,
+    name: 'Jala',
+    jobId,
+    equipment: { ...defaultEquipment(), ...equipment },
   });
+}
 
-  describe('equipmentInfuse', () => {
-    const gemId = 'gem' as ItemId;
-    const goldCoin = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });
-
-    function infuseState(armory: EquipmentItem[], party: Character[] = []) {
-      const state = defaultGameState();
-      state.armory = armory;
-      state.world.party = party;
-      vi.mocked(gamestate).mockReturnValue(state);
-      return state;
-    }
-
-    function applyUpdate(state: GameState): GameState {
-      return vi.mocked(updateGamestate).mock.calls[0][0](state) as GameState;
-    }
-
-    it('infuses an armory item in place', () => {
-      mockGetEntry(mockJob, mockHelmet, goldCoin);
-      const helmet = mockEquipmentItem(mockHelmet.id);
-      const state = infuseState([helmet]);
-
-      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(true);
-      expect(applyUpdate(state).armory[0].infusedItemIds).toEqual([gemId]);
-    });
-
-    it('infuses armory gear even mid-combat', () => {
-      mockGetEntry(mockJob, mockHelmet, goldCoin);
-      const helmet = mockEquipmentItem(mockHelmet.id);
-      infuseState([helmet]);
-      vi.mocked(worldCombatState).mockReturnValue({} as never);
-
-      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(true);
-    });
-
-    it('infuses equipped gear, but not mid-combat', () => {
-      mockGetEntry(mockJob, mockHelmet, goldCoin);
-      const jala = createCharacterStub('Jala');
-      const helmet = mockEquipmentItem(mockHelmet.id);
-      jala.equipment.Helmet = helmet;
-      const state = infuseState([], [jala]);
-
-      vi.mocked(worldCombatState).mockReturnValue({} as never);
-      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(false);
-
-      vi.mocked(worldCombatState).mockReturnValue(undefined);
-      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(true);
-      expect(
-        applyUpdate(state).world.party[0].equipment.Helmet?.infusedItemIds,
-      ).toEqual([gemId]);
-    });
-
-    it('does nothing for an unowned item or an invalid infusion', () => {
-      mockGetEntry(mockJob, mockHelmet, goldCoin);
-      const helmet = mockEquipmentItem(mockHelmet.id);
-      infuseState([helmet]);
-
-      expect(equipmentInfuse('gone' as EquipmentItemId, 0, gemId)).toBe(false);
-      vi.mocked(canInfuseEquipmentItem).mockReturnValueOnce(false);
-      expect(equipmentInfuse(helmet.id, 0, gemId)).toBe(false);
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
+function seedHero(
+  equipment: Partial<EquipmentBlock> = {},
+  armory: EquipmentItem[] = [],
+  edit: (state: GameState) => void = () => undefined,
+): Character {
+  const character = hero(equipment);
+  seedGamestate((state) => {
+    state.world.party = [character];
+    state.armory = armory;
+    edit(state);
   });
+  return character;
+}
 
-  describe('replaceEquippedItemInstance', () => {
-    const mockSpear: EquipmentContent = {
-      ...mockCloak,
-      id: 'equip-spear' as EquipmentId,
-      name: 'Copper Spear',
-      type: 'Spear',
-    };
+const inCombat = (state: GameState) => (state.world.combat = buildCombat());
 
-    it('swaps every slot holding the instance and recalculates stats', () => {
-      const strongSpear = {
-        ...mockSpear,
-        baseStats: { ...defaultStats(), Strength: 4 },
-      };
-      mockGetEntry(mockJob, strongSpear);
-      const jala = createCharacterStub('Jala');
-      const spear = mockEquipmentItem(strongSpear.id);
-      jala.equipment.Weapon = spear;
-      jala.equipment.Offhand = spear;
-      const updatedSpear = { ...spear, affixIds: [] };
+function jala(): Character {
+  return worldPartyState()[0];
+}
 
-      const result = replaceEquippedItemInstance(jala, updatedSpear);
+function equip(item: EquipmentItem): boolean {
+  return inTick(() => characterEquipFromArmory(heroId, item.id));
+}
 
-      expect(result.equipment.Weapon).toBe(updatedSpear);
-      expect(result.equipment.Offhand).toBe(updatedSpear);
-      expect(result.stats.Strength).toBe(jala.stats.Strength + 4);
-    });
-
-    it('leaves other slots alone', () => {
-      mockGetEntry(mockJob, mockHelmet);
-      const jala = createCharacterStub('Jala');
-      const helmet = mockEquipmentItem(mockHelmet.id);
-      const armor = jala.equipment.Armor;
-
-      const result = replaceEquippedItemInstance(jala, helmet);
-
-      expect(result.equipment.Helmet).toBe(jala.equipment.Helmet);
-      expect(result.equipment.Armor).toBe(armor);
-    });
-  });
-
-  describe('optimizeCharacterEquipment', () => {
-    const mockSword: EquipmentContent = {
-      ...mockCloak,
-      id: 'equip-sword' as EquipmentId,
-      name: 'Iron Sword',
-      type: 'Sword',
-      baseStats: { ...defaultStats(), Strength: 10 },
-    };
-
-    const optimizingJob: JobContent = {
-      ...mockJob,
-      equippableTypes: ['Sword'],
+beforeEach(() => {
+  vi.clearAllMocks();
+  seedContent([
+    ensureJob({
+      id: jobId,
+      name: 'Warrior',
+      baseStats: { ...defaultStats(), Strength: 5, Vitality: 5 },
+      equippableTypes: ['Hat', 'Sword', 'Spear', 'Shield'],
       statPriority: [{ stat: 'Strength', multiplier: 1 }],
-    };
+    }),
+    helmet,
+    oldHat,
+    crown,
+    sword,
+    dagger,
+    spear,
+    shield,
+    bow,
+    gem,
+    ensureItem({ id: goldId, name: 'Gold Coin' }),
+  ]);
+});
 
-    function runOptimize(
-      characterId: CharacterId,
-      state: GameState,
-    ): GameState {
-      void optimizeCharacterEquipment(characterId);
-      expect(updateGamestate).toHaveBeenCalledTimes(1);
-      return vi.mocked(updateGamestate).mock.calls[0][0](state);
-    }
+describe('characterEquipFromArmory', () => {
+  it('equips into the slot, sends the old item to the armory and counts the new stats', () => {
+    const worn = buildEquipmentItem(oldHat.id);
+    const fresh = buildEquipmentItem(helmet.id);
+    const before = seedHero({ Helmet: worn }, [fresh]);
+    const events = captureAnalyticsEvents();
 
-    it('equips the best available armory item for each eligible slot', () => {
-      mockGetEntry(optimizingJob, mockSword);
-      const jala = createCharacterStub('Jala');
-      const armorySword = mockEquipmentItem(mockSword.id);
+    expect(equip(fresh)).toBe(true);
 
-      const state = runOptimize(jala.id, {
-        world: { party: [jala] },
-        armory: [armorySword],
-      } as unknown as GameState);
+    expect(jala().equipment.Helmet).toEqual(fresh);
+    expect(armoryState()).toEqual([worn]);
+    expect(jala().stats.Vitality).toBe(before.stats.Vitality + 3);
+    expect(events).toEqual(['Hero:Equip:Item:helmet']);
+  });
 
-      expect(state.world.party[0].equipment.Weapon).toEqual(armorySword);
-      expect(state.armory).toEqual([]);
+  it('fills both hands with a two-hander, counting it once', () => {
+    const item = buildEquipmentItem(spear.id);
+    const before = seedHero({}, [item]);
+
+    equip(item);
+
+    expect(jala().equipment.Weapon).toEqual(item);
+    expect(jala().equipment.Offhand).toEqual(item);
+    expect(jala().stats.Strength).toBe(before.stats.Strength + 8);
+  });
+
+  it('returns a two-hander whole, once, when either hand is replaced', () => {
+    const twoHander = buildEquipmentItem(spear.id);
+    const offhand = buildEquipmentItem(shield.id);
+    seedHero({ Weapon: twoHander, Offhand: twoHander }, [offhand]);
+
+    equip(offhand);
+
+    expect(jala().equipment).toMatchObject({
+      Weapon: undefined,
+      Offhand: offhand,
     });
+    expect(armoryState()).toEqual([twoHander]);
+  });
 
-    it('swaps a two-hander for a one-hander plus offhand without losing or duplicating either', () => {
-      const mockStaff: EquipmentContent = {
-        ...mockSword,
-        id: 'equip-staff' as EquipmentId,
-        type: 'Spear',
-        baseStats: { ...defaultStats(), Strength: 8 },
-      };
-      const mockShield: EquipmentContent = {
-        ...mockSword,
-        id: 'equip-shield' as EquipmentId,
-        type: 'Shield',
-        baseStats: { ...defaultStats(), Strength: 4 },
-      };
-      mockGetEntry(
-        {
-          ...optimizingJob,
-          equippableTypes: ['Sword', 'Spear', 'Shield'],
-        } as JobContent,
-        mockSword,
-        mockStaff,
-        mockShield,
-      );
-      const staff = mockEquipmentItem(mockStaff.id);
-      const sword = mockEquipmentItem(mockSword.id);
-      const shield = mockEquipmentItem(mockShield.id);
-      const jala = createCharacterStub('Jala');
-      jala.equipment = { ...jala.equipment, Weapon: staff, Offhand: staff };
+  it('refuses mid-combat, for gear the hero cannot use, or for an item not in the armory', () => {
+    const tooHigh = buildEquipmentItem(crown.id);
+    const wrongType = buildEquipmentItem(bow.id);
+    seedHero({}, [tooHigh, wrongType]);
+    const before = gamestate();
 
-      const state = runOptimize(jala.id, {
-        world: { party: [jala] },
-        armory: [sword, shield],
-      } as unknown as GameState);
+    expect(equip(tooHigh)).toBe(false);
+    expect(equip(wrongType)).toBe(false);
+    expect(equip(buildEquipmentItem(helmet.id))).toBe(false);
+    expect(
+      inTick(() => characterEquipFromArmory('gone' as CharacterId, tooHigh.id)),
+    ).toBe(false);
+    expect(gamestate()).toBe(before);
 
-      expect(state.world.party[0].equipment.Weapon).toEqual(sword);
-      expect(state.world.party[0].equipment.Offhand).toEqual(shield);
-      expect(state.armory).toEqual([staff]);
+    const ok = buildEquipmentItem(helmet.id);
+    seedHero({}, [ok], inCombat);
+    expect(equip(ok)).toBe(false);
+    expect(armoryState()).toEqual([ok]);
+  });
+});
+
+describe('optimizeCharacterEquipment', () => {
+  const optimize = () => inTick(() => optimizeCharacterEquipment(heroId));
+
+  it('fills each slot with the best armory item for the job’s stat priority', async () => {
+    const weaker = buildEquipmentItem(dagger.id);
+    const best = buildEquipmentItem(sword.id);
+    const offhand = buildEquipmentItem(shield.id);
+    seedHero({}, [weaker, offhand, best]);
+
+    await optimize();
+
+    expect(jala().equipment.Weapon).toEqual(best);
+    expect(jala().equipment.Offhand).toEqual(offhand);
+    expect(armoryState()).toEqual([weaker]);
+  });
+
+  it('swaps a two-hander for a stronger one-hander plus offhand, keeping the two-hander', async () => {
+    const twoHander = buildEquipmentItem(spear.id);
+    const oneHander = buildEquipmentItem(sword.id);
+    const offhand = buildEquipmentItem(shield.id);
+    seedHero({ Weapon: twoHander, Offhand: twoHander }, [oneHander, offhand]);
+
+    await optimize();
+
+    expect(jala().equipment).toMatchObject({
+      Weapon: oneHander,
+      Offhand: offhand,
     });
+    expect(armoryState()).toEqual([twoHander]);
+  });
 
-    it('leaves state untouched when nothing in the armory beats what is already equipped', () => {
-      mockGetEntry(optimizingJob);
-      const jala = createCharacterStub('Jala');
+  it('changes nothing mid-combat, or when the hero’s job is gone', async () => {
+    const item = buildEquipmentItem(sword.id);
+    seedHero({}, [item], inCombat);
+    await optimize();
+    expect(armoryState()).toEqual([item]);
 
-      const state = runOptimize(jala.id, {
-        world: { party: [jala] },
-        armory: [],
-      } as unknown as GameState);
-
-      expect(state.world.party[0]).toBe(jala);
+    seedHero({}, [item], (state) => {
+      state.world.party[0].jobId = 'gone' as JobId;
     });
+    await optimize();
+    expect(armoryState()).toEqual([item]);
+  });
+});
 
-    it('leaves state untouched when the job cannot be found', () => {
-      mockGetEntry(mockSword);
-      const jala = createCharacterStub('Jala');
-      const armorySword = mockEquipmentItem(mockSword.id);
-
-      const state = runOptimize(jala.id, {
-        world: { party: [jala] },
-        armory: [armorySword],
-      } as unknown as GameState);
-
-      expect(state.armory).toEqual([armorySword]);
+describe('replaceEquippedItemInstance', () => {
+  it('swaps every slot holding the instance, recalculating stats', () => {
+    const twoHander = buildEquipmentItem(spear.id);
+    const character = hero({
+      Weapon: twoHander,
+      Offhand: twoHander,
+      Helmet: buildEquipmentItem(helmet.id),
     });
+    const infused = { ...twoHander, infusedItemIds: [gem.id] };
 
-    it('does nothing mid-combat', () => {
-      vi.mocked(worldCombatState).mockReturnValue({} as never);
+    const result = replaceEquippedItemInstance(character, infused);
 
-      void optimizeCharacterEquipment('char' as CharacterId);
-
-      expect(updateGamestate).not.toHaveBeenCalled();
+    expect(result.equipment).toMatchObject({
+      Weapon: infused,
+      Offhand: infused,
+      Helmet: character.equipment.Helmet,
     });
+    expect(result.stats.Strength).toBe(character.stats.Strength + 2);
+  });
+});
+
+describe('equipmentInfuse', () => {
+  const cost = () => infusionMaterialCost(gem.id);
+
+  function seedInfusion(
+    equipment: Partial<EquipmentBlock>,
+    armory: EquipmentItem[],
+    edit: (state: GameState) => void = () => undefined,
+  ): void {
+    seedHero(equipment, armory, (state) => {
+      applyMaterialDelta(state, gem.id, 1);
+      applyMaterialDelta(state, goldId, cost());
+      edit(state);
+    });
+  }
+
+  const infuse = (item: EquipmentItem, slot = 0) =>
+    inTick(() => equipmentInfuse(item.id, slot, gem.id));
+
+  it('infuses an armory item in place, spending the material and its gold cost', () => {
+    const item = buildEquipmentItem(helmet.id);
+    seedInfusion({}, [item]);
+    const events = captureAnalyticsEvents();
+
+    expect(infuse(item)).toBe(true);
+
+    expect(armoryState()[0].infusedItemIds).toEqual([gem.id]);
+    expect(materialsState()[gem.id] ?? 0).toBe(0);
+    expect(materialsState()[goldId] ?? 0).toBe(0);
+    expect(events).toEqual(['Hero:Infuse:Item:Ruby']);
+    expect(taskEventEquipmentInfused).toHaveBeenCalled();
+  });
+
+  it('infuses armory gear mid-combat, but equipped gear only out of combat', () => {
+    const stored = buildEquipmentItem(helmet.id);
+    seedInfusion({}, [stored], inCombat);
+    expect(infuse(stored)).toBe(true);
+
+    const worn = buildEquipmentItem(sword.id);
+    seedInfusion({ Weapon: worn }, [], inCombat);
+    expect(infuse(worn)).toBe(false);
+
+    const before = hero({ Weapon: worn });
+    seedInfusion({ Weapon: worn }, []);
+    expect(infuse(worn)).toBe(true);
+    expect(jala().equipment.Weapon?.infusedItemIds).toEqual([gem.id]);
+    expect(jala().stats.Strength).toBe(before.stats.Strength + 2);
+  });
+
+  it('refuses an unowned item, a slot it does not have, or when the gold falls short', () => {
+    const item = buildEquipmentItem(helmet.id);
+    seedInfusion({}, [item]);
+    expect(
+      inTick(() => equipmentInfuse('gone' as EquipmentItemId, 0, gem.id)),
+    ).toBe(false);
+    expect(infuse(item, 1)).toBe(false);
+
+    seedInfusion({}, [item], (state) => applyMaterialDelta(state, goldId, -1));
+    expect(infuse(item)).toBe(false);
+    expect(armoryState()).toEqual([item]);
   });
 });

@@ -1,302 +1,178 @@
-import type * as MaterialsModule from '@helpers/item/materials';
-import type {
-  AstralProjectorContent,
-  AstralProjectorId,
-  CollectibleId,
-  GameState,
-  GlobalEffectId,
-  ItemId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/item/collectibles', () => ({
-  isCollectibleDiscovered: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  miscellaneousMessageLog: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/item/materials', async () => {
-  const actual = await vi.importActual<typeof MaterialsModule>(
-    '@helpers/item/materials',
-  );
-  return {
-    ...actual,
-    getMaterialQuantity: vi.fn(),
-  };
-});
-
-vi.mock('@helpers/engine/notify', () => ({
-  notifySuccess: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    activeAstralProjectorSpellsState: () =>
-      gamestate().activeAstralProjectorSpells,
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { notifySuccess } from '@helpers/engine/notify';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { getMaterialQuantity } from '@helpers/item/materials';
+import { combatLog } from '@helpers/combat/combat-log';
+import { MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS } from '@helpers/config';
+import { ensureAstralProjector } from '@helpers/content/ensure-astralprojector';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import {
   astralProjectorProcessTick,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
-  isAstralProjectorCollectiblesMet,
   pruneInvalidActiveAstralProjectorSpells,
   pruneInvalidDiscoveredAstralProjectorSpells,
 } from '@helpers/kingdom/astral-projector';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { gamestate } from '@helpers/state-game';
+import type {
+  AstralProjectorId,
+  CollectibleId,
+  GameState,
+  GameStateActiveAstralProjectorSpell,
+  ItemId,
+} from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { captureNotifications } from '@/testing/notify';
 
-describe('Astral Projector Helper Functions', () => {
-  const spellId = 'spell-1' as AstralProjectorId;
-  const otherSpellId = 'spell-2' as AstralProjectorId;
-  const effectId = 'effect-1' as GlobalEffectId;
-  const otherEffectId = 'effect-2' as GlobalEffectId;
-  const collectibleId = 'collectible-1' as CollectibleId;
-  const itemId = 'item-1' as ItemId;
+const orbId = 'star-orb' as CollectibleId;
+const dustId = 'star-dust' as ItemId;
+const now = 100;
 
-  const spellContent: AstralProjectorContent = {
-    id: spellId,
-    name: 'Test Spell',
-    __type: 'astralprojector',
-    globalEffectId: effectId,
-    duration: 60,
-    requiredCollectibles: [{ collectibleId }],
-    requiredMaterials: [{ itemId, quantity: 5 }],
-    rarity: 'Common',
-  };
+const starfall = ensureAstralProjector({
+  id: 'starfall' as AstralProjectorId,
+  name: 'Starfall',
+  requiredCollectibles: [{ collectibleId: orbId }],
+  requiredMaterials: [{ itemId: dustId, quantity: 5 }],
+});
+const moonrise = ensureAstralProjector({
+  id: 'moonrise' as AstralProjectorId,
+  name: 'Moonrise',
+});
 
-  const otherSpellContent: AstralProjectorContent = {
-    id: otherSpellId,
-    name: 'Other Spell',
-    __type: 'astralprojector',
-    globalEffectId: otherEffectId,
-    duration: 30,
-    requiredCollectibles: [],
-    requiredMaterials: [],
-    rarity: 'Common',
-  };
+function cast(
+  astralProjectorId: AstralProjectorId,
+  startedAtTick: number,
+  expiresAtTick = startedAtTick + 60,
+): GameStateActiveAstralProjectorSpell {
+  return { astralProjectorId, startedAtTick, expiresAtTick };
+}
 
-  function mockGetEntry(...entries: AstralProjectorContent[]): void {
-    vi.mocked(getEntry).mockImplementation(
-      (idOrName) =>
-        entries.find(
-          (entry) => entry.id === idOrName || entry.name === idOrName,
-        ) as never,
-    );
-  }
+function seed(edit: (state: GameState) => void = () => undefined): void {
+  seedGamestate((state) => {
+    state.clock.numTicks = now;
+    edit(state);
+  });
+}
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+const tick = () => inTick(astralProjectorProcessTick);
+
+function logMessages(): string[] {
+  return combatLog().map((entry) => entry.message);
+}
+
+beforeEach(() => {
+  seedContent([starfall, moonrise]);
+});
+
+describe('isAstralProjectorCastable', () => {
+  it('needs every required collectible found and enough of every material', () => {
+    seed((state) => applyMaterialDelta(state, dustId, 5));
+    expect(isAstralProjectorCastable(starfall)).toBe(false);
+
+    seed((state) => {
+      applyCollectibleGrant(state, orbId, 1);
+      applyMaterialDelta(state, dustId, 4);
+    });
+    expect(isAstralProjectorCastable(starfall)).toBe(false);
+
+    seed((state) => {
+      applyCollectibleGrant(state, orbId, 1);
+      applyMaterialDelta(state, dustId, 5);
+    });
+    expect(isAstralProjectorCastable(starfall)).toBe(true);
   });
 
-  describe('isAstralProjectorCollectiblesMet', () => {
-    it('is true when every required collectible has been discovered', () => {
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      expect(isAstralProjectorCollectiblesMet(spellContent)).toBe(true);
+  it('is castable with no requirements at all', () => {
+    seed();
+
+    expect(isAstralProjectorCastable(moonrise)).toBe(true);
+  });
+});
+
+describe('astralProjectorSpellToBeOverwritten', () => {
+  const others = Array.from(
+    { length: MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS - 1 },
+    (_, i) => cast(`other-${i}` as AstralProjectorId, 10 + i),
+  );
+
+  it('names the oldest active spell once every slot is taken by others', () => {
+    seed((state) => {
+      state.activeAstralProjectorSpells = [...others, cast(starfall.id, 0)];
     });
 
-    it('is false when any required collectible has not been discovered', () => {
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
-      expect(isAstralProjectorCollectiblesMet(spellContent)).toBe(false);
-    });
-
-    it('is vacuously true for a spell with no required collectibles', () => {
-      expect(isAstralProjectorCollectiblesMet(otherSpellContent)).toBe(true);
-      expect(isCollectibleDiscovered).not.toHaveBeenCalled();
-    });
+    expect(astralProjectorSpellToBeOverwritten(moonrise.id)).toEqual(starfall);
   });
 
-  describe('isAstralProjectorCastable', () => {
-    it('is false when the spell is not unlocked', () => {
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
-      vi.mocked(getMaterialQuantity).mockReturnValue(999);
+  it('evicts nothing while a slot is free, or when recasting the oldest spell', () => {
+    seed((state) => (state.activeAstralProjectorSpells = others.slice(1)));
+    expect(astralProjectorSpellToBeOverwritten(moonrise.id)).toBeUndefined();
 
-      expect(isAstralProjectorCastable(spellContent)).toBe(false);
+    seed((state) => {
+      state.activeAstralProjectorSpells = [...others, cast(starfall.id, 0)];
+    });
+    expect(astralProjectorSpellToBeOverwritten(starfall.id)).toBeUndefined();
+  });
+});
+
+describe('astralProjectorProcessTick', () => {
+  it('unlocks a spell once its collectibles are found, announcing it only once', () => {
+    seed();
+    const notifications = captureNotifications();
+
+    tick();
+    expect(gamestate().discoveredAstralProjectorSpells).toEqual({
+      [moonrise.id]: { foundAt: expect.any(Number) },
     });
 
-    it('is false when a required material is not sufficiently stocked', () => {
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      vi.mocked(getMaterialQuantity).mockReturnValue(4);
-
-      expect(isAstralProjectorCastable(spellContent)).toBe(false);
+    seed((state) => {
+      applyCollectibleGrant(state, orbId, 1);
+      state.discoveredAstralProjectorSpells[moonrise.id] = { foundAt: 1 };
     });
+    tick();
+    tick();
 
-    it('is true when unlocked and every required material is sufficiently stocked', () => {
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      vi.mocked(getMaterialQuantity).mockReturnValue(5);
-
-      expect(isAstralProjectorCastable(spellContent)).toBe(true);
-    });
+    expect(
+      gamestate().discoveredAstralProjectorSpells[starfall.id],
+    ).toBeDefined();
+    expect(notifications.map((n) => n.message)).toEqual([
+      expect.stringContaining('Moonrise'),
+      expect.stringContaining('Starfall'),
+    ]);
   });
 
-  describe('astralProjectorSpellToBeOverwritten', () => {
-    it('returns undefined when there is room for another active spell', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        activeAstralProjectorSpells: [],
-      } as unknown as GameState);
-
-      expect(astralProjectorSpellToBeOverwritten(spellId)).toBeUndefined();
+  it('fades out spells once they reach their expiry, logging it', () => {
+    seed((state) => {
+      state.discoveredAstralProjectorSpells[moonrise.id] = { foundAt: 1 };
+      state.activeAstralProjectorSpells = [
+        cast(starfall.id, 0, now),
+        cast(moonrise.id, 0, now + 1),
+      ];
     });
 
-    it('returns undefined when the only active spell is the one being recast', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        activeAstralProjectorSpells: [
-          { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
-        ],
-      } as unknown as GameState);
+    tick();
 
-      expect(astralProjectorSpellToBeOverwritten(spellId)).toBeUndefined();
-    });
-
-    it('returns the active spell that would be evicted when casting a different one at the cap', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        activeAstralProjectorSpells: [
-          { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
-        ],
-      } as unknown as GameState);
-      mockGetEntry(spellContent);
-
-      expect(astralProjectorSpellToBeOverwritten(otherSpellId)).toEqual(
-        spellContent,
-      );
-    });
+    expect(gamestate().activeAstralProjectorSpells).toEqual([
+      cast(moonrise.id, 0, now + 1),
+    ]);
+    expect(logMessages()).toEqual([expect.stringContaining('Starfall')]);
   });
+});
 
-  describe('astralProjectorProcessTick', () => {
-    it('unlocks a newly-collectible-gated spell, notifying and logging exactly once', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([spellContent]);
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: {},
-        activeAstralProjectorSpells: [],
-      } as unknown as GameState);
-      vi.mocked(timerTicksElapsed).mockReturnValue(0);
+describe('pruning', () => {
+  it('drops discovered and active spells no longer in content', () => {
+    seedContent([starfall]);
 
-      astralProjectorProcessTick();
-
-      expect(notifySuccess).toHaveBeenCalledWith(
-        'New Astral Projector spell unlocked: Test Spell',
-      );
-      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
-        'A new Astral Projector spell has been unlocked: **Test Spell**.',
-      );
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        discoveredAstralProjectorSpells: {},
-      } as unknown as GameState);
-      expect(result.discoveredAstralProjectorSpells[spellId]).toBeDefined();
-    });
-
-    it('does not re-notify a spell that is already in the discovered ledger', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([spellContent]);
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: {
-          [spellId]: { foundAt: 0 },
-        },
-        activeAstralProjectorSpells: [],
-      } as unknown as GameState);
-      vi.mocked(timerTicksElapsed).mockReturnValue(0);
-
-      astralProjectorProcessTick();
-
-      expect(notifySuccess).not.toHaveBeenCalled();
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('expires an active spell past its expiresAtTick and logs a fade message', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([]);
-      mockGetEntry(spellContent);
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: {},
-        activeAstralProjectorSpells: [
-          { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
-        ],
-      } as unknown as GameState);
-      vi.mocked(timerTicksElapsed).mockReturnValue(60);
-
-      astralProjectorProcessTick();
-
-      expect(miscellaneousMessageLog).toHaveBeenCalledWith(
-        '**Test Spell** has faded.',
-      );
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        activeAstralProjectorSpells: [
-          { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
-        ],
-      } as unknown as GameState);
-      expect(result.activeAstralProjectorSpells).toHaveLength(0);
-    });
-
-    it('leaves an active spell alone before it expires', () => {
-      vi.mocked(getEntriesByType).mockReturnValue([]);
-      vi.mocked(gamestate).mockReturnValue({
-        discoveredAstralProjectorSpells: {},
-        activeAstralProjectorSpells: [
-          { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
-        ],
-      } as unknown as GameState);
-      vi.mocked(timerTicksElapsed).mockReturnValue(30);
-
-      astralProjectorProcessTick();
-
-      expect(updateGamestate).not.toHaveBeenCalled();
-      expect(miscellaneousMessageLog).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('pruneInvalidDiscoveredAstralProjectorSpells', () => {
-    it('drops entries whose id no longer resolves to content', () => {
-      mockGetEntry(spellContent);
-
-      const result = pruneInvalidDiscoveredAstralProjectorSpells({
-        [spellId]: { foundAt: 1 },
-        [otherSpellId]: { foundAt: 2 },
-      });
-
-      expect(result).toEqual({ [spellId]: { foundAt: 1 } });
-    });
-  });
-
-  describe('pruneInvalidActiveAstralProjectorSpells', () => {
-    it('drops entries whose id no longer resolves to content', () => {
-      mockGetEntry(spellContent);
-
-      const result = pruneInvalidActiveAstralProjectorSpells([
-        { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
-        {
-          astralProjectorId: otherSpellId,
-          startedAtTick: 0,
-          expiresAtTick: 60,
-        },
-      ]);
-
-      expect(result).toEqual([
-        { astralProjectorId: spellId, startedAtTick: 0, expiresAtTick: 60 },
-      ]);
-    });
+    expect(
+      pruneInvalidDiscoveredAstralProjectorSpells({
+        [starfall.id]: { foundAt: 1 },
+        [moonrise.id]: { foundAt: 2 },
+      }),
+    ).toEqual({ [starfall.id]: { foundAt: 1 } });
+    expect(
+      pruneInvalidActiveAstralProjectorSpells([
+        cast(starfall.id, 0),
+        cast(moonrise.id, 0),
+      ]),
+    ).toEqual([cast(starfall.id, 0)]);
   });
 });

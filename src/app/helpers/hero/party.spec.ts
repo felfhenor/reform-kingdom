@@ -1,41 +1,14 @@
-import type {
-  AffixContent,
-  AffixId,
-  Character,
-  CharacterId,
-  EquipmentBlock,
-  EquipmentContent,
-  EquipmentId,
-  EquipmentItem,
-  EquipmentItemId,
-  GameState,
-  IsContentItem,
-  JobContent,
-  JobId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-let mockUuidCounter = 0;
-vi.mock('uuid', () => ({
-  v4: vi.fn(() => `mock-uuid-${mockUuidCounter++}`),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldPartyState: () => gamestate().world.party,
-  };
-});
-
-import { CHARACTER_MAX_LEVEL } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
+import {
+  CHARACTER_MAX_LEVEL,
+  CHARACTER_XP_END,
+  CHARACTER_XP_START,
+} from '@helpers/config';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureEquipment } from '@helpers/content/ensure-item';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
   characterRecalculateStats,
@@ -43,564 +16,251 @@ import {
   characterStatsForLevel,
   characterXpForLevel,
   createCharacter,
+  isPartyAtFullEnergy,
   isPartyAtFullHealth,
   partyAffixEffects,
   partyGatherYieldBonuses,
   pruneInvalidPartyEquipment,
-  setParty,
 } from '@helpers/hero/party';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import type {
+  AffixId,
+  Character,
+  EquipmentBlock,
+  EquipmentId,
+  JobId,
+  TradeskillId,
+  TrainerTeachingId,
+} from '@interfaces';
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-describe('Party Helper Functions', () => {
-  const mockJob: JobContent = {
-    id: 'job-explorer' as JobId,
-    name: 'Explorer',
-    shorthand: 'EXP',
-    __type: 'job',
-    description: 'A person who seeks out new lands and experiences.',
-    sprite: '0000',
-    frames: 4,
-    baseStats: {
-      Health: 100,
-      Energy: 25,
-      Luck: 5,
-      Intelligence: 5,
-      Strength: 5,
-      Vitality: 5,
-      Resistance: 5,
-      Agility: 10,
-      Constitution: 1,
-      Spirit: 1,
-    },
-    statsPerLevel: {
-      Health: 10,
-      Energy: 5,
-      Luck: 0.01,
-      Intelligence: 0.2,
-      Strength: 0.5,
-      Vitality: 0.3,
-      Resistance: 0.4,
-      Agility: 0.7,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    equippableTypes: ['Cloth Armor', 'Hat', 'Sword', 'Spear', 'Shield'],
-    statPriority: [],
-    skillPath: [],
-  };
+const jobId = 'job-explorer' as JobId;
+const job = ensureJob({
+  id: jobId,
+  name: 'Explorer',
+  baseStats: { ...defaultStats(), Health: 100, Energy: 25, Strength: 5 },
+  statsPerLevel: { ...defaultStats(), Health: 10, Strength: 0.5 },
+});
+const cloak = ensureEquipment({
+  id: 'cloak' as EquipmentId,
+  name: 'Cloak of Adventuring',
+  type: 'Cloth Armor',
+});
+const starterHat = ensureEquipment({
+  id: 'starter-hat' as EquipmentId,
+  name: 'Hat of Adventuring',
+  type: 'Hat',
+});
+const sword = ensureEquipment({
+  id: 'sword' as EquipmentId,
+  name: 'Sword',
+  type: 'Sword',
+  baseStats: { ...defaultStats(), Strength: 5, Health: 50 },
+});
+const cursedRing = ensureEquipment({
+  id: 'cursed-ring' as EquipmentId,
+  name: 'Cursed Ring',
+  type: 'Ring',
+  baseStats: { ...defaultStats(), Strength: -50, Health: -1000 },
+});
+const trinket = ensureEquipment({
+  id: 'trinket' as EquipmentId,
+  name: 'Trinket',
+  type: 'Trinket',
+  gatherYieldBonuses: [
+    { tradeskillId: 'woodworking' as TradeskillId, value: 1 },
+  ],
+});
+const mighty = ensureAffix({
+  id: 'affix-str' as AffixId,
+  name: 'of Strength',
+  effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
+});
 
-  const mockCloak: EquipmentContent = {
-    id: 'equip-cloak' as EquipmentId,
-    name: 'Cloak of Adventuring',
-    __type: 'equipment',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    levelRequirement: 1,
-    baseStats: { ...defaultStats(), Agility: 0.2, Resistance: 0.2 },
-    type: 'Cloth Armor',
-    slots: 1,
-    grantedSkillIds: [],
-  };
+const drill = ensureTrainerTeaching({
+  id: 'drill' as TrainerTeachingId,
+  name: 'Drill',
+  effects: [{ kind: 'Stat', stat: 'Strength', value: 2 }],
+});
 
-  const mockHelmet: EquipmentContent = {
-    ...mockCloak,
-    id: 'equip-helmet' as EquipmentId,
-    name: 'Helmet',
-    baseStats: { ...defaultStats(), Vitality: 3 },
-    type: 'Hat',
-  };
+function withGear(equipment: Partial<EquipmentBlock>): EquipmentBlock {
+  return { ...defaultEquipment(), ...equipment };
+}
 
-  const mockStarterHat: EquipmentContent = {
-    ...mockCloak,
-    id: 'equip-hat-of-adventuring' as EquipmentId,
-    name: 'Hat of Adventuring',
-    baseStats: defaultStats(),
-    type: 'Hat',
-  };
+function hero(overrides: Partial<Character> = {}): Character {
+  return buildCharacter({ jobId, ...overrides });
+}
 
-  // Resolves the starter cloak/hat plus any passed-in items, matching by id or name like the real implementation.
-  function mockGetEntry(...entries: IsContentItem[]): void {
-    const known = [mockCloak, mockStarterHat, ...entries];
-    vi.mocked(getEntry).mockImplementation(
-      (idOrName) =>
-        known.find(
-          (entry) => entry.id === idOrName || entry.name === idOrName,
-        ) as never,
+beforeEach(() => {
+  seedContent([
+    job,
+    cloak,
+    starterHat,
+    sword,
+    cursedRing,
+    trinket,
+    mighty,
+    drill,
+  ]);
+});
+
+describe('characterXpForLevel', () => {
+  it('climbs from the starting to the final requirement, in round tens, faster as it goes', () => {
+    const xp = Array.from({ length: CHARACTER_MAX_LEVEL }, (_, i) =>
+      characterXpForLevel(i + 1),
     );
+    const gaps = xp.slice(1).map((value, i) => value - xp[i]);
+
+    expect(xp[0]).toBe(CHARACTER_XP_START);
+    expect(xp.at(-1)).toBe(CHARACTER_XP_END);
+    expect(xp.every((value) => value % 10 === 0)).toBe(true);
+    expect(gaps.at(-1)).toBeGreaterThan(gaps[0]);
+  });
+});
+
+describe('characterStatsForLevel', () => {
+  it('grows the job stats per level and adds gear flat on top', () => {
+    const stats = characterStatsForLevel(
+      jobId,
+      3,
+      withGear({ Weapon: buildEquipmentItem(sword.id) }),
+      [],
+    );
+
+    expect(stats.Health).toBe(100 + 10 * 2 + 50);
+    expect(stats.Strength).toBe(5 + 0.5 * 2 + 5);
+  });
+
+  it('floors every stat at 1, even with crippling gear or an unknown job', () => {
+    const cursed = characterStatsForLevel(
+      jobId,
+      1,
+      withGear({ Ring: buildEquipmentItem(cursedRing.id) }),
+      [],
+    );
+    expect(cursed.Strength).toBe(1);
+    expect(cursed.Health).toBe(1);
+
+    const unknown = characterStatsForLevel(
+      'gone' as JobId,
+      1,
+      defaultEquipment(),
+      [],
+    );
+    expect(Object.values(unknown).every((value) => value === 1)).toBe(true);
+  });
+
+  it('is what characterStats reports for the hero, teachings from every job included', () => {
+    const jala = hero({
+      teachings: { ['job-other' as JobId]: [drill.id] },
+    });
+
+    expect(characterStats({ ...jala, level: 3 })).toEqual(
+      characterStatsForLevel(jobId, 3, jala.equipment, [drill.id]),
+    );
+    expect(characterStats(jala).Strength).toBe(5 + 2);
+  });
+});
+
+describe('createCharacter', () => {
+  it('starts at level 1 with full pools, wearing the starter cloak and hat', () => {
+    const jala = createCharacter('Jala', jobId);
+
+    expect(jala).toMatchObject({
+      name: 'Jala',
+      jobId,
+      level: 1,
+      xp: { current: 0, maximum: characterXpForLevel(1) },
+      hp: jala.stats.Health,
+      ep: jala.stats.Energy,
+    });
+    expect(jala.stats).toEqual(
+      characterStatsForLevel(jobId, 1, jala.equipment, []),
+    );
+    expect(jala.equipment).toEqual(
+      withGear({
+        Armor: expect.objectContaining({ equipmentId: cloak.id }),
+        Helmet: expect.objectContaining({ equipmentId: starterHat.id }),
+      }),
+    );
+  });
+
+  it('starts empty-handed when the starter gear is not in content', () => {
+    seedContent([job]);
+
+    expect(createCharacter('Jala', jobId).equipment).toEqual(
+      defaultEquipment(),
+    );
+  });
+});
+
+describe('characterRecalculateStats', () => {
+  it('clamps current hp/ep to the recomputed maximums', () => {
+    const recalculated = characterRecalculateStats(
+      hero({ hp: 99_999, ep: 99_999 }),
+    );
+
+    expect(recalculated.hp).toBe(recalculated.stats.Health);
+    expect(recalculated.ep).toBe(recalculated.stats.Energy);
+  });
+});
+
+describe('pruneInvalidPartyEquipment', () => {
+  it('drops gear no longer in content per hero, recomputing stats and clamping hp', () => {
+    const armed = withGear({
+      Weapon: buildEquipmentItem(sword.id),
+      Armor: buildEquipmentItem(cloak.id),
+    });
+    const jala = hero({ equipment: armed });
+    const spoorle = hero({
+      equipment: withGear({ Armor: buildEquipmentItem(cloak.id) }),
+    });
+    seedContent([job, cloak]);
+
+    const [prunedJala, prunedSpoorle] = pruneInvalidPartyEquipment([
+      jala,
+      spoorle,
+    ]);
+
+    expect(prunedJala.equipment).toEqual(withGear({ Armor: armed.Armor }));
+    expect(prunedJala.stats.Health).toBe(jala.stats.Health - 50);
+    expect(prunedJala.hp).toBe(prunedJala.stats.Health);
+    expect(prunedSpoorle.equipment).toEqual(spoorle.equipment);
+  });
+});
+
+describe('party-wide reads', () => {
+  function seedParty(...party: Character[]): void {
+    seedGamestate((state) => (state.world.party = party));
   }
 
-  beforeEach(() => {
-    mockUuidCounter = 0;
-    vi.clearAllMocks();
+  it('is at full health/energy only while every hero is', () => {
+    const full = hero();
+    seedParty(full, full);
+    expect(isPartyAtFullHealth()).toBe(true);
+    expect(isPartyAtFullEnergy()).toBe(true);
+
+    seedParty(full, { ...full, hp: full.hp - 1 });
+    expect(isPartyAtFullHealth()).toBe(false);
+    expect(isPartyAtFullEnergy()).toBe(true);
+
+    seedParty(full, { ...full, ep: full.ep - 1 });
+    expect(isPartyAtFullHealth()).toBe(true);
+    expect(isPartyAtFullEnergy()).toBe(false);
   });
 
-  describe('createCharacter', () => {
-    it('should build a level 1 character using the job baseStats plus starter equipment', () => {
-      mockGetEntry(mockJob);
-
-      const character = createCharacter('Jala', 'job-explorer' as JobId);
-
-      expect(character.id).toBeTruthy();
-      expect(character.name).toBe('Jala');
-      expect(character.level).toBe(1);
-      expect(character.xp).toEqual({ current: 0, maximum: 100 });
-      expect(character.jobId).toBe('job-explorer');
-      expect(character.stats).toEqual(
-        characterStatsForLevel(
-          'job-explorer' as JobId,
-          1,
-          character.equipment,
-          [],
-        ),
-      );
-    });
-
-    it('should equip a Cloak of Adventuring and Hat of Adventuring by default', () => {
-      mockGetEntry(mockJob);
-
-      const character = createCharacter('Jala', 'job-explorer' as JobId);
-
-      expect(character.equipment.Armor).toEqual({
-        id: expect.any(String),
-        equipmentId: mockCloak.id,
-        infusedItemIds: [],
-        affixIds: [],
-      });
-      expect(character.equipment.Helmet).toEqual({
-        id: expect.any(String),
-        equipmentId: mockStarterHat.id,
-        infusedItemIds: [],
-        affixIds: [],
-      });
-      expect(
-        Object.entries(character.equipment)
-          .filter(([slot]) => slot !== 'Armor' && slot !== 'Helmet')
-          .every(([, item]) => item === undefined),
-      ).toBe(true);
-    });
-
-    it('should fall back to default job stats, floored to a minimum of 1, when the job cannot be found', () => {
-      mockGetEntry();
-
-      const character = createCharacter('Spoorle', 'unknown-job' as JobId);
-
-      // All inputs are 0-0.2, below the 1-minimum floor.
-      expect(character.stats).toEqual({
-        Health: 1,
-        Energy: 1,
-        Luck: 1,
-        Intelligence: 1,
-        Strength: 1,
-        Vitality: 1,
-        Resistance: 1,
-        Agility: 1,
-        Constitution: 1,
-        Spirit: 1,
-      });
-    });
-  });
-
-  describe('setParty', () => {
-    it('should update the gamestate world.party with the given party', () => {
-      mockGetEntry(mockJob);
-      const party: Character[] = [
-        createCharacterStub('Jala'),
-        createCharacterStub('Spoorle'),
-      ];
-
-      setParty(party);
-
-      expect(updateGamestate).toHaveBeenCalledTimes(1);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const fakeState = {
-        world: { party: [] },
-      } as unknown as GameState;
-
-      const result = updateFn(fakeState);
-
-      expect(result.world.party).toEqual(party);
-    });
-  });
-
-  describe('isPartyAtFullHealth', () => {
-    function fullHealthCharacter(
-      overrides: Partial<Character> = {},
-    ): Character {
-      mockGetEntry(mockJob);
-      return {
-        ...createCharacterStub('Jala'),
-        hp: 100,
-        stats: { ...defaultStats(), Health: 100 },
-        ...overrides,
-      };
-    }
-
-    it('is true when every hero is at or above their max HP', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [fullHealthCharacter(), fullHealthCharacter()] },
-      } as unknown as GameState);
-
-      expect(isPartyAtFullHealth()).toBe(true);
-    });
-
-    it('is false when any hero is below their max HP', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: {
-          party: [fullHealthCharacter(), fullHealthCharacter({ hp: 50 })],
-        },
-      } as unknown as GameState);
-
-      expect(isPartyAtFullHealth()).toBe(false);
-    });
-
-    it('is true for an empty party', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [] },
-      } as unknown as GameState);
-
-      expect(isPartyAtFullHealth()).toBe(true);
-    });
-  });
-
-  describe('pruneInvalidPartyEquipment', () => {
-    it('leaves equipment untouched when everything still resolves to real content', () => {
-      mockGetEntry(mockJob);
-      const jala = createCharacterStub('Jala');
-
-      const [pruned] = pruneInvalidPartyEquipment([jala]);
-
-      expect(pruned.equipment).toEqual(jala.equipment);
-      expect(pruned.stats).toEqual(jala.stats);
-    });
-
-    it('clears slots whose equipmentId no longer resolves to real content', () => {
-      mockGetEntry(mockJob);
-      const jala = createCharacterStub('Jala');
-      const withStaleGear: Character = {
-        ...jala,
-        equipment: {
-          ...jala.equipment,
-          Helmet: mockEquipmentItem('stale-helmet' as EquipmentId),
-        },
-      };
-
-      const [pruned] = pruneInvalidPartyEquipment([withStaleGear]);
-
-      expect(pruned.equipment.Helmet).toBeUndefined();
-      expect(pruned.equipment.Armor).toEqual(withStaleGear.equipment.Armor);
-      expect(pruned.stats).toEqual(
-        characterStatsForLevel(
-          'job-explorer' as JobId,
-          withStaleGear.level,
-          pruned.equipment,
-          [],
-        ),
-      );
-    });
-
-    it('clamps current hp/ep down when pruning lowers max Health/Energy', () => {
-      mockGetEntry(mockJob, mockHelmet);
-      const jala = createCharacterStub('Jala');
-      const equippedJala: Character = {
-        ...jala,
-        equipment: {
-          ...jala.equipment,
-          Ring: mockEquipmentItem(mockHelmet.id),
-        },
-      };
-      const statsWithHelmet = characterStatsForLevel(
-        'job-explorer' as JobId,
-        equippedJala.level,
-        equippedJala.equipment,
-        [],
-      );
-      const overHealedJala: Character = {
-        ...equippedJala,
-        stats: statsWithHelmet,
-        hp: statsWithHelmet.Health,
-      };
-
-      // simulate the helmet's content being removed from gamedata
-      mockGetEntry(mockJob);
-
-      const [pruned] = pruneInvalidPartyEquipment([overHealedJala]);
-
-      expect(pruned.equipment.Ring).toBeUndefined();
-      expect(pruned.hp).toBe(pruned.stats.Health);
-    });
-
-    it('processes every party member independently', () => {
-      mockGetEntry(mockJob);
-      const jala = createCharacterStub('Jala');
-      const spoorle = {
-        ...createCharacterStub('Spoorle'),
-        id: 'other-uuid' as CharacterId,
-        equipment: {
-          ...createCharacterStub('Spoorle').equipment,
-          Helmet: mockEquipmentItem('stale-helmet' as EquipmentId),
-        },
-      };
-
-      const [prunedJala, prunedSpoorle] = pruneInvalidPartyEquipment([
-        jala,
-        spoorle,
-      ]);
-
-      expect(prunedJala.equipment).toEqual(jala.equipment);
-      expect(prunedSpoorle.equipment.Helmet).toBeUndefined();
-    });
-  });
-
-  describe('characterXpForLevel', () => {
-    it('requires 100 xp to reach level 2 from level 1', () => {
-      expect(characterXpForLevel(1)).toBe(100);
-    });
-
-    it('reaches 1000x the starting requirement at the level cap', () => {
-      expect(characterXpForLevel(CHARACTER_MAX_LEVEL)).toBe(100_000);
-    });
-
-    it('eases in gradually rather than jumping hard on the early levels', () => {
-      expect(characterXpForLevel(2)).toBe(200);
-      expect(characterXpForLevel(10)).toBeGreaterThan(characterXpForLevel(2));
-    });
-
-    it('rounds every value to the nearest 10', () => {
-      for (let level = 1; level <= CHARACTER_MAX_LEVEL; level += 1) {
-        expect(characterXpForLevel(level) % 10).toBe(0);
-      }
-    });
-
-    it('grows by a larger amount per level as level increases (ease-in curve)', () => {
-      const earlyGap = characterXpForLevel(10) - characterXpForLevel(9);
-      const lateGap = characterXpForLevel(90) - characterXpForLevel(89);
-      expect(lateGap).toBeGreaterThan(earlyGap);
-    });
-  });
-
-  describe('characterStats', () => {
-    it('reads job, level and gear off the hero, so an override previews the change', () => {
-      mockGetEntry(mockJob);
-      const jala = createCharacterStub('Jala');
-
-      expect(characterStats({ ...jala, level: 3 })).toEqual(
-        characterStatsForLevel(jala.jobId, 3, jala.equipment, []),
-      );
-    });
-  });
-
-  describe('characterRecalculateStats', () => {
-    it('clamps current hp/ep to the recomputed maximums', () => {
-      mockGetEntry(mockJob);
-      const jala = { ...createCharacterStub('Jala'), hp: 99999, ep: 99999 };
-
-      const recalculated = characterRecalculateStats(jala);
-
-      expect(recalculated.hp).toBe(recalculated.stats.Health);
-      expect(recalculated.ep).toBe(recalculated.stats.Energy);
-    });
-  });
-
-  describe('characterStatsForLevel', () => {
-    it('returns the job baseStats at level 1 with no equipment', () => {
-      mockGetEntry(mockJob);
-
-      const stats = characterStatsForLevel(
-        'job-explorer' as JobId,
-        1,
-        defaultEquipment(),
-        [],
-      );
-
-      expect(stats).toEqual(mockJob.baseStats);
-    });
-
-    it('applies job statsPerLevel scaling for higher levels', () => {
-      mockGetEntry(mockJob);
-
-      const stats = characterStatsForLevel(
-        'job-explorer' as JobId,
-        3,
-        defaultEquipment(),
-        [],
-      );
-
-      expect(stats.Health).toBe(
-        mockJob.baseStats.Health + mockJob.statsPerLevel.Health * 2,
-      );
-      expect(stats.Strength).toBeCloseTo(
-        mockJob.baseStats.Strength + mockJob.statsPerLevel.Strength * 2,
-      );
-    });
-
-    it('adds flat equipment baseStats on top', () => {
-      const sword: EquipmentContent = {
-        id: 'sword' as EquipmentId,
-        name: 'Sword',
-        __type: 'equipment',
-        description: '',
-        sprite: '0000',
-        rarity: 'Common',
-        levelRequirement: 1,
-        baseStats: { ...defaultStats(), Strength: 5 },
-        type: 'Sword',
-        slots: 1,
-        grantedSkillIds: [],
-      };
-
-      mockGetEntry(mockJob, sword);
-
-      const equipment: EquipmentBlock = {
-        ...defaultEquipment(),
-        Weapon: mockEquipmentItem('sword' as EquipmentId),
-      };
-
-      const stats = characterStatsForLevel(
-        'job-explorer' as JobId,
-        5,
-        equipment,
-        [],
-      );
-
-      expect(stats.Strength).toBe(
-        mockJob.baseStats.Strength + mockJob.statsPerLevel.Strength * 4 + 5,
-      );
-    });
-
-    it('floors a stat at 1 when negative equipment stats would otherwise drop it to 0 or below', () => {
-      const cursedRing: EquipmentContent = {
-        id: 'cursed-ring' as EquipmentId,
-        name: 'Cursed Ring',
-        __type: 'equipment',
-        description: '',
-        sprite: '0000',
-        rarity: 'Common',
-        levelRequirement: 1,
-        baseStats: { ...defaultStats(), Vitality: -50, Health: -1000 },
-        type: 'Ring',
-        slots: 1,
-        grantedSkillIds: [],
-      };
-
-      mockGetEntry(mockJob, cursedRing);
-
-      const equipment: EquipmentBlock = {
-        ...defaultEquipment(),
-        Ring: mockEquipmentItem('cursed-ring' as EquipmentId),
-      };
-
-      const stats = characterStatsForLevel(
-        'job-explorer' as JobId,
-        1,
-        equipment,
-        [],
-      );
-
-      expect(stats.Vitality).toBe(1);
-      expect(stats.Health).toBe(1);
-    });
-  });
-
-  function createCharacterStub(name: string): Character {
-    return createCharacter(name, 'job-explorer' as JobId);
-  }
-
-  let fixtureItemCounter = 0;
-
-  // Uses its own counter (not the mocked uuid) so fixtures are independent of how many rngUuid calls the code under test makes.
-  function mockEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
-    return {
-      id: `fixture-item-${fixtureItemCounter++}` as EquipmentItemId,
-      equipmentId,
-      infusedItemIds: [],
-      affixIds: [],
-    };
-  }
-
-  describe('partyAffixEffects', () => {
-    const strengthAffix: AffixContent = {
-      id: 'affix-str' as AffixId,
-      name: 'of Strength',
-      __type: 'affix',
-      levelRequirement: 1,
-      description: '',
-      rarity: 'Common',
-      family: 'Strength',
-      position: 'Suffix',
-      effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
-    };
-
-    it('collects affix effects across every party member', () => {
-      mockGetEntry(mockJob);
-      const hero = createCharacterStub('Jala');
-      hero.equipment = {
-        ...defaultEquipment(),
-        Weapon: {
-          ...mockEquipmentItem('sword' as EquipmentId),
-          affixIds: [strengthAffix.id],
-        },
-      };
-
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [hero] },
-      } as unknown as GameState);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
-      );
-
-      expect(partyAffixEffects()).toEqual(strengthAffix.effects);
-    });
-
-    it('returns an empty array for an empty party', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [] },
-      } as unknown as GameState);
-
-      expect(partyAffixEffects()).toEqual([]);
-    });
-  });
-
-  describe('partyGatherYieldBonuses', () => {
-    const woodworkingTrinket: EquipmentContent = {
-      id: 'trinket' as EquipmentId,
-      name: 'Trinket',
-      __type: 'equipment',
-      description: '',
-      sprite: '0000',
-      rarity: 'Common',
-      levelRequirement: 1,
-      baseStats: defaultStats(),
-      type: 'Trinket',
-      slots: 0,
-      grantedSkillIds: [],
-      gatherYieldBonuses: [{ tradeskillId: 'Woodworking' as never, value: 1 }],
-    };
-
-    it('collects base gatherYieldBonuses across every party member', () => {
-      mockGetEntry(mockJob, woodworkingTrinket);
-      const hero = createCharacterStub('Jala');
-      hero.equipment = {
-        ...defaultEquipment(),
-        Ring: mockEquipmentItem(woodworkingTrinket.id),
-      };
-
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [hero] },
-      } as unknown as GameState);
-
-      expect(partyGatherYieldBonuses()).toEqual(
-        woodworkingTrinket.gatherYieldBonuses,
-      );
-    });
-
-    it('returns an empty array for an empty party', () => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { party: [] },
-      } as unknown as GameState);
-
-      expect(partyGatherYieldBonuses()).toEqual([]);
-    });
+  it('collects affix effects and gather yield bonuses from every hero’s gear', () => {
+    seedParty(
+      hero({
+        equipment: withGear({
+          Weapon: buildEquipmentItem(sword.id, { affixIds: [mighty.id] }),
+        }),
+      }),
+      hero({ equipment: withGear({ Ring: buildEquipmentItem(trinket.id) }) }),
+    );
+
+    expect(partyAffixEffects()).toEqual(mighty.effects);
+    expect(partyGatherYieldBonuses()).toEqual(trinket.gatherYieldBonuses);
   });
 });

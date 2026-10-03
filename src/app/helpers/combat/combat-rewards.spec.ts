@@ -1,403 +1,203 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat-log', () => ({
-  collectibleDropHtml: vi.fn(() => 'collectible-html'),
-  combatMessageLog: vi.fn(),
-  equipmentDropHtml: vi.fn(() => 'equipment-html'),
-  ITEM_ICON_TOKEN: '@@icon@@',
-  itemDropHtml: vi.fn(() => 'item-html'),
-  recipeDropHtml: vi.fn(() => 'recipe-html'),
-}));
+vi.mock('@helpers/engine/gather-vfx');
+vi.mock('@helpers/task/task-events');
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  isRecipeDiscovered: vi.fn(() => false),
-  recipeDiscover: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/gather-vfx', () => ({
-  gatherVfxEmit: vi.fn(),
-}));
-
-vi.mock('@helpers/item/collectibles', () => ({
-  collectiblesAdd: vi.fn(),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  addMaterial: vi.fn(),
-  goldCoinId: vi.fn(() => 'Gold Coin'),
-}));
-
-vi.mock('@helpers/state-game', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  globalEffectSumsState: vi.fn(() => ({ goldGainMultiplierBonus: 0 })),
-}));
-
-vi.mock('@helpers/kingdom/loot-filter', () => ({
-  armoryAddLootDrop: vi.fn(() => ({
-    kind: 'Kept',
-    content: { name: 'Reward' },
-  })),
-}));
-
-vi.mock('@helpers/worker/worker-discovery', () => ({
-  isWorkerRescued: vi.fn(),
-  workerRescue: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  rewardContentInfo: vi.fn(),
-}));
-
-import { combatMessageLog } from '@helpers/combat/combat-log';
+import { combatLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
-import { getEntry } from '@helpers/content/content';
-import { ensureWorker } from '@helpers/content/ensure-worker';
-import { isRecipeDiscovered, recipeDiscover } from '@helpers/crafting/recipes';
-import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
-import { globalEffectSumsState } from '@helpers/state-game';
-import { addMaterial } from '@helpers/item/materials';
-import { armoryAddLootDrop } from '@helpers/kingdom/loot-filter';
 import {
-  isWorkerRescued,
-  workerRescue,
-} from '@helpers/worker/worker-discovery';
-import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureWorker } from '@helpers/content/ensure-worker';
+import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
+import { defaultGameState } from '@helpers/defaults';
+import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
+import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { getMaterialQuantity } from '@helpers/item/materials';
+import { armoryOverflowCapForState } from '@helpers/kingdom/armory-global-effects';
+import { armoryState, discoveredRecipesState } from '@helpers/state-game';
+import { isWorkerRescued } from '@helpers/worker/worker-discovery';
 import type {
+  CollectibleId,
   Combat,
   EncounterId,
-  GlobalEffectSums,
+  EncounterRandomId,
+  EquipmentId,
+  GameState,
   ItemId,
+  RecipeId,
   ResolvedDrop,
-  WorkerContent,
+  TownId,
   WorkerId,
 } from '@interfaces';
+import { buildCombat, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const WORKER_ID = 'weaver-nell' as WorkerId;
-const COMBAT = { locationName: 'Wergen Woods' } as Combat;
-
-const workerContent: WorkerContent = ensureWorker({
-  id: WORKER_ID,
+const sword = ensureEquipment({
+  id: 'iron-sword' as EquipmentId,
+  name: 'Iron Sword',
+  sprite: 'sword-sprite',
+});
+const ore = ensureItem({ id: 'ore' as ItemId, name: 'Copper Ore' });
+const gold = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });
+const coin = ensureCollectible({
+  id: 'old-coin' as CollectibleId,
+  name: 'Old Coin',
+});
+const recipe = ensureRecipe({
+  id: 'recipe-sword' as RecipeId,
+  name: 'Recipe: Iron Sword',
+  result: { equipmentId: sword.id },
+});
+const nell = ensureWorker({
+  id: 'weaver-nell' as WorkerId,
   name: 'Weaver Nell',
-  description: 'test',
-  sprite: '0000',
-  frames: 4,
-  baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
-  statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
-  canUseTeleports: true,
 });
 
-describe('grantResolvedDrops - Worker rewards', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+function fight(overrides: Partial<Combat> = {}): Combat {
+  return buildCombat({ locationName: 'Wergen Woods', ...overrides });
+}
 
-  it('rescues and logs a message the first time a worker drop resolves', () => {
-    vi.mocked(isWorkerRescued).mockReturnValue(false);
-    vi.mocked(getEntry).mockReturnValue(workerContent);
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Weaver Nell',
-      sprite: '0000',
-      spritesheet: 'worker',
-    });
+function grant(
+  drops: ResolvedDrop[],
+  combat = fight(),
+  edit: (state: GameState) => void = () => undefined,
+): void {
+  seedGamestate(edit);
+  inTick(() => grantResolvedDrops(combat, drops));
+}
 
-    const drops: ResolvedDrop[] = [{ kind: 'Worker', workerId: WORKER_ID }];
-    grantResolvedDrops(COMBAT, drops);
+function logMessages(): string[] {
+  return combatLog().map((entry) => entry.message);
+}
 
-    expect(workerRescue).toHaveBeenCalledWith(WORKER_ID);
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      COMBAT,
-      'The party rescued @@icon@@Weaver Nell!',
-      undefined,
-      { name: 'Weaver Nell', sprite: '0000', spritesheet: 'worker' },
-    );
+function vfxQuantities(): number[] {
+  return vi.mocked(gatherVfxEmit).mock.calls.map(([event]) => event.quantity);
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  seedContent([sword, ore, gold, coin, recipe, nell]);
+});
+
+describe('grantResolvedDrops', () => {
+  it('grants equipment to the armory, logging and showing the find', () => {
+    grant([{ kind: 'Equipment', equipmentId: sword.id }]);
+
+    expect(armoryState().map((item) => item.equipmentId)).toEqual([sword.id]);
+    expect(logMessages()).toEqual([expect.stringContaining('Iron Sword')]);
     expect(gatherVfxEmit).toHaveBeenCalledWith({
       nodeName: 'Wergen Woods',
       quantity: 1,
-      name: 'Weaver Nell',
-      sprite: '0000',
-      spritesheet: 'worker',
+      name: sword.name,
+      sprite: sword.sprite,
+      spritesheet: 'equipment',
     });
   });
 
-  it('is a silent no-op when the worker was already rescued', () => {
-    vi.mocked(isWorkerRescued).mockReturnValue(true);
+  it('auto-sells equipment the loot filter rejects, without showing a find', () => {
+    grant([{ kind: 'Equipment', equipmentId: sword.id }], fight(), (state) => {
+      state.lootFilters.minimumItemLevel = sword.levelRequirement + 1;
+    });
 
-    const drops: ResolvedDrop[] = [{ kind: 'Worker', workerId: WORKER_ID }];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(workerRescue).not.toHaveBeenCalled();
-    expect(combatMessageLog).not.toHaveBeenCalled();
+    expect(armoryState()).toEqual([]);
+    expect(logMessages()).toEqual([
+      expect.stringContaining('automatically sold'),
+    ]);
+    expect(getMaterialQuantity(gold.id)).toBeGreaterThan(0);
     expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
-});
 
-describe('grantResolvedDrops - VFX per drop kind', () => {
-  beforeEach(() => {
+  it('loses equipment once the armory is past even its loot overflow, saying so', () => {
+    const full = Array.from(
+      { length: armoryOverflowCapForState(defaultGameState()) },
+      () => buildEquipmentItem(sword.id),
+    );
+
+    grant([{ kind: 'Equipment', equipmentId: sword.id }], fight(), (state) => {
+      state.armory = full;
+    });
+
+    expect(armoryState()).toHaveLength(full.length);
+    expect(logMessages()).toEqual([expect.stringContaining('armory is full')]);
+    expect(gatherVfxEmit).not.toHaveBeenCalled();
+  });
+
+  it('grants a collectible, logging the find', () => {
+    grant([{ kind: 'Collectible', collectibleId: coin.id }]);
+
+    expect(isCollectibleDiscovered(coin.id)).toBe(true);
+    expect(logMessages()).toEqual([expect.stringContaining('Old Coin')]);
+    expect(vfxQuantities()).toEqual([1]);
+  });
+
+  it('discovers a recipe once, staying silent on a repeat', () => {
+    grant([{ kind: 'Recipe', recipeId: recipe.id }]);
+    expect(discoveredRecipesState()[recipe.id]).toBeDefined();
+    expect(logMessages()).toHaveLength(1);
+
     vi.clearAllMocks();
-    vi.mocked(getEntry).mockReturnValue({ name: 'Reward' } as never);
-  });
-
-  it('emits a gather VFX event for an Equipment drop', () => {
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Iron Sword',
-      sprite: 'iron-sword',
-      spritesheet: 'equipment',
-    });
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Equipment', equipmentId: 'iron-sword' as never },
-    ];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(gatherVfxEmit).toHaveBeenCalledWith({
-      nodeName: 'Wergen Woods',
-      quantity: 1,
-      name: 'Iron Sword',
-      sprite: 'iron-sword',
-      spritesheet: 'equipment',
-    });
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      COMBAT,
-      'The party found @@icon@@equipment-html!',
-      undefined,
-      { name: 'Iron Sword', sprite: 'iron-sword', spritesheet: 'equipment' },
+    grant([{ kind: 'Recipe', recipeId: recipe.id }], fight(), (state) =>
+      applyRecipeDiscovery(state, recipe.id),
     );
-  });
-
-  it('logs a lost-item message and skips the found-message/VFX when the armory is full', () => {
-    vi.mocked(armoryAddLootDrop).mockReturnValueOnce({ kind: 'NoRoom' });
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Equipment', equipmentId: 'iron-sword' as never },
-    ];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(armoryAddLootDrop).toHaveBeenCalledWith('iron-sword');
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      COMBAT,
-      'Your armory is full. An item drop was lost.',
-    );
+    expect(logMessages()).toHaveLength(1);
     expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
-  it('logs an auto-sold message and skips the found-message/VFX when the drop fails the loot filter', () => {
-    vi.mocked(armoryAddLootDrop).mockReturnValueOnce({
-      kind: 'AutoSold',
-      content: { name: 'Iron Sword' } as never,
-      goldEarned: 42,
-    });
-    vi.mocked(getEntry).mockReturnValue({ name: 'Gold Coin' } as never);
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Iron Sword',
-      sprite: 'iron-sword',
-      spritesheet: 'equipment',
-    });
+  it('rescues a worker once, staying silent on a repeat', () => {
+    grant([{ kind: 'Worker', workerId: nell.id }]);
+    expect(isWorkerRescued(nell.id)).toBe(true);
+    expect(logMessages()).toEqual([expect.stringContaining('Weaver Nell')]);
 
-    const drops: ResolvedDrop[] = [
-      { kind: 'Equipment', equipmentId: 'iron-sword' as never },
-    ];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      COMBAT,
-      'You automatically sold @@icon@@equipment-html for item-html.',
-      undefined,
-      { name: 'Iron Sword', sprite: 'iron-sword', spritesheet: 'equipment' },
-    );
-    expect(gatherVfxEmit).not.toHaveBeenCalled();
-  });
-
-  it('emits a gather VFX event for a Collectible drop', () => {
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Old Coin',
-      sprite: 'old-coin',
-      spritesheet: 'collectible',
-    });
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Collectible', collectibleId: 'old-coin' as never },
-    ];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(gatherVfxEmit).toHaveBeenCalledWith({
-      nodeName: 'Wergen Woods',
-      quantity: 1,
-      name: 'Old Coin',
-      sprite: 'old-coin',
-      spritesheet: 'collectible',
-    });
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      COMBAT,
-      'The party found @@icon@@collectible-html!',
-      undefined,
-      { name: 'Old Coin', sprite: 'old-coin', spritesheet: 'collectible' },
-    );
-  });
-
-  it('emits a gather VFX event for a Recipe drop', () => {
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Recipe: Iron Sword',
-      sprite: 'iron-sword',
-      spritesheet: 'equipment',
-    });
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Recipe', recipeId: 'recipe-iron-sword' as never },
-    ];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(gatherVfxEmit).toHaveBeenCalledWith({
-      nodeName: 'Wergen Woods',
-      quantity: 1,
-      name: 'Recipe: Iron Sword',
-      sprite: 'iron-sword',
-      spritesheet: 'equipment',
-    });
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      COMBAT,
-      'The party found @@icon@@recipe-html!',
-      undefined,
-      {
-        name: 'Recipe: Iron Sword',
-        sprite: 'iron-sword',
-        spritesheet: 'equipment',
-      },
-    );
-  });
-
-  it('is a silent no-op when the recipe was already discovered', () => {
-    vi.mocked(isRecipeDiscovered).mockReturnValueOnce(true);
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Recipe', recipeId: 'recipe-iron-sword' as never },
-    ];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(recipeDiscover).not.toHaveBeenCalled();
-    expect(combatMessageLog).not.toHaveBeenCalled();
-    expect(gatherVfxEmit).not.toHaveBeenCalled();
-  });
-
-  it('does not emit when rewardContentInfo cannot resolve the drop', () => {
-    vi.mocked(rewardContentInfo).mockReturnValue(undefined);
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Equipment', equipmentId: 'unknown' as never },
-    ];
-    grantResolvedDrops(COMBAT, drops);
-
-    expect(gatherVfxEmit).not.toHaveBeenCalled();
-  });
-});
-
-describe('grantResolvedDrops - Item rewards', () => {
-  beforeEach(() => {
     vi.clearAllMocks();
+    grant([{ kind: 'Worker', workerId: nell.id }], fight(), (state) => {
+      state.discoveredWorkers[nell.id] = { foundAt: 1 };
+    });
+    expect(logMessages()).toHaveLength(1);
+    expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
-  it('aggregates quantities for the same item and grants once', () => {
-    vi.mocked(getEntry).mockReturnValue({ name: 'Copper Ore' } as never);
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Copper Ore',
-      sprite: 'copper-ore',
-      spritesheet: 'item',
+  it('adds up repeated item drops into one grant and one log line', () => {
+    grant([
+      { kind: 'Item', itemId: ore.id, quantity: 2 },
+      { kind: 'Item', itemId: ore.id, quantity: 3 },
+    ]);
+
+    expect(getMaterialQuantity(ore.id)).toBe(5);
+    expect(logMessages()).toEqual([expect.stringContaining('copper ore')]);
+    expect(vfxQuantities()).toEqual([5]);
+  });
+
+  describe('gold gain buffs', () => {
+    const goldDrop: ResolvedDrop[] = [
+      { kind: 'Item', itemId: gold.id, quantity: 100 },
+      { kind: 'Item', itemId: ore.id, quantity: 100 },
+    ];
+    const buffed = (state: GameState) =>
+      (state.globalEffectSums.goldGainMultiplierBonus = 0.2);
+
+    it('boosts gold, and only gold, won exploring', () => {
+      grant(goldDrop, fight({ encounterId: 'field' as EncounterId }), buffed);
+
+      expect(getMaterialQuantity(gold.id)).toBe(120);
+      expect(getMaterialQuantity(ore.id)).toBe(100);
+
+      grant(
+        goldDrop,
+        fight({ encounterRandomId: 'shrine' as EncounterRandomId }),
+        buffed,
+      );
+      expect(getMaterialQuantity(gold.id)).toBe(120);
     });
 
-    const itemId = 'copper-ore' as ItemId;
-    const drops: ResolvedDrop[] = [
-      { kind: 'Item', itemId, quantity: 2 },
-      { kind: 'Item', itemId, quantity: 3 },
-    ];
-    grantResolvedDrops(COMBAT, drops);
+    it('never boosts gold won defending a town', () => {
+      grant(goldDrop, fight({ raidTownId: 'larsia' as TownId }), buffed);
 
-    expect(addMaterial).toHaveBeenCalledTimes(1);
-    expect(addMaterial).toHaveBeenCalledWith(itemId, 5);
-    expect(gatherVfxEmit).toHaveBeenCalledWith({
-      nodeName: 'Wergen Woods',
-      quantity: 5,
-      name: 'Copper Ore',
-      sprite: 'copper-ore',
-      spritesheet: 'item',
+      expect(getMaterialQuantity(gold.id)).toBe(100);
     });
-    expect(combatMessageLog).toHaveBeenCalledWith(
-      COMBAT,
-      'The party found @@icon@@item-html!',
-      undefined,
-      { name: 'Copper Ore', sprite: 'copper-ore', spritesheet: 'item' },
-    );
-  });
-});
-
-describe('grantResolvedDrops - gold gain multiplier', () => {
-  const EXPLORE_COMBAT = {
-    ...COMBAT,
-    encounterId: 'some-encounter' as EncounterId,
-  } as Combat;
-  const RAID_COMBAT = { ...COMBAT, raidTownId: 'larsia' } as Combat;
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(getEntry).mockReturnValue({ name: 'Gold Coin' } as never);
-    vi.mocked(rewardContentInfo).mockReturnValue({
-      name: 'Gold Coin',
-      sprite: 'gold-coin',
-      spritesheet: 'item',
-    });
-  });
-
-  it('boosts Gold Coin quantity from an Explore/ExploreRandom combat when a gold buff is active', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      goldGainMultiplierBonus: 0.2,
-    } as GlobalEffectSums);
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Item', itemId: 'Gold Coin' as ItemId, quantity: 100 },
-    ];
-    grantResolvedDrops(EXPLORE_COMBAT, drops);
-
-    expect(addMaterial).toHaveBeenCalledWith('Gold Coin', 120);
-  });
-
-  it('does not boost Gold Coin quantity from a town raid, even with a gold buff active', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      goldGainMultiplierBonus: 0.2,
-    } as GlobalEffectSums);
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Item', itemId: 'Gold Coin' as ItemId, quantity: 100 },
-    ];
-    grantResolvedDrops(RAID_COMBAT, drops);
-
-    expect(addMaterial).toHaveBeenCalledWith('Gold Coin', 100);
-  });
-
-  it('leaves Gold Coin quantity unchanged from Explore combat when no gold buff is active', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      goldGainMultiplierBonus: 0,
-    } as GlobalEffectSums);
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Item', itemId: 'Gold Coin' as ItemId, quantity: 100 },
-    ];
-    grantResolvedDrops(EXPLORE_COMBAT, drops);
-
-    expect(addMaterial).toHaveBeenCalledWith('Gold Coin', 100);
-  });
-
-  it('never applies the multiplier to a non-Gold-Coin item', () => {
-    vi.mocked(globalEffectSumsState).mockReturnValue({
-      goldGainMultiplierBonus: 0.2,
-    } as GlobalEffectSums);
-
-    const drops: ResolvedDrop[] = [
-      { kind: 'Item', itemId: 'Copper Ore' as ItemId, quantity: 100 },
-    ];
-    grantResolvedDrops(EXPLORE_COMBAT, drops);
-
-    expect(addMaterial).toHaveBeenCalledWith('Copper Ore', 100);
   });
 });

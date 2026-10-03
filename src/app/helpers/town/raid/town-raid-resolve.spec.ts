@@ -221,6 +221,15 @@ describe('raidResolveDefeat', () => {
     expect(logMessages()).toEqual([]);
   });
 
+  it('leaves a town never visited untouched', () => {
+    seedContent([town()]);
+
+    defeat();
+
+    expect(worldTownsState()).toEqual({});
+    expect(logMessages()).toEqual([]);
+  });
+
   it('steals up to its share of the stock cap, logging what was taken', () => {
     const maxStolen = Math.floor(
       shopCap * (RAID_LOSS_STOCK_MAX_STEAL_PERCENT / 100),

@@ -11,6 +11,7 @@ import { updateGamestate } from '@helpers/state-game';
 import type {
   EquipmentContent,
   EquipmentId,
+  LootDropOutcome,
   LootFilterSettings,
 } from '@interfaces';
 
@@ -23,12 +24,6 @@ export function equipmentPassesLootFilter(
   if (!filters.keepEquipmentTypes[content.type]) return false;
   return true;
 }
-
-export type LootDropOutcome =
-  | { kind: 'NoRoom' }
-  | { kind: 'UnknownContent' }
-  | { kind: 'Kept'; content: EquipmentContent }
-  | { kind: 'AutoSold'; content: EquipmentContent; goldEarned: number };
 
 // A drop that fails the filter is sold before it ever reaches the armory,
 // so only a *kept* drop can be lost to a full armory (NoRoom).
