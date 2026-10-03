@@ -1,24 +1,22 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-materials', () => ({
-  townMaterialQuantity: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
-import { townMaterialQuantity } from '@helpers/town/town-materials';
+import {
+  TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT,
+  TOWN_PRIORITY_WEIGHT_PER_FAILURE,
+  TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE,
+  TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD,
+  TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY,
+} from '@helpers/config';
+import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
   townCommissionPriorityWeight,
   townFailureHoldWeight,
   townItemPriorityMap,
   townItemPriorityWeight,
-  townItemPriorityWeightFromMap,
   townRecipeRespectsReservations,
   townReservedMaterialQuantity,
-  townReservedMaterialQuantityFromMap,
 } from '@helpers/town/crafting/town-craft-priority-weight';
 import type {
   CommissionOfferContent,
@@ -30,370 +28,219 @@ import type {
   TownId,
   TownSpecialtyPriorityEntry,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-const townId = 'larsia' as TownId;
-const cactspineId = 'cactspine' as ItemId;
-const petrifiwoodId = 'petrifiwood' as ItemId;
-const ringRecipeId = 'ring-recipe' as RecipeId;
-const otherRecipeId = 'other-recipe' as RecipeId;
+const cactspine = 'cactspine' as ItemId;
+const petrifiwood = 'petrifiwood' as ItemId;
 
-function buildRecipe(
-  id: RecipeId,
-  requirements: { itemId: ItemId; quantity: number }[],
-): RecipeContent {
-  return { id, requirements } as unknown as RecipeContent;
+function recipe(id: string, ...itemIds: ItemId[]): RecipeContent {
+  return ensureRecipe({
+    id: id as RecipeId,
+    name: id,
+    requirements: itemIds.map((itemId) => ({ itemId, quantity: 2 })),
+  });
 }
 
-function buildTown(uniqueRecipeIds: RecipeId[] = []): TownContent {
-  return {
-    id: townId,
+const ring = recipe('ring', cactspine);
+const pendant = recipe('pendant', cactspine);
+const other = recipe('other', cactspine);
+const staff = recipe('staff', petrifiwood);
+const mixed = recipe('mixed', cactspine, petrifiwood);
+
+function town(uniqueRecipeIds: RecipeId[] = []): TownContent {
+  return ensureTown({
+    id: 'larsia' as TownId,
+    name: 'Larsia',
     crafting: { uniqueRecipeIds },
-  } as unknown as TownContent;
+  });
 }
 
-const ringRecipe = buildRecipe(ringRecipeId, [
-  { itemId: cactspineId, quantity: 2 },
-]);
+function struggling(
+  failureCount: number,
+  ...recipes: RecipeContent[]
+): TownSpecialtyPriorityEntry[] {
+  return recipes.map(({ id }) => ({ recipeId: id, failureCount }));
+}
+
+const held = TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD + 1;
+const weightAt = (failures: number) =>
+  1 +
+  TOWN_PRIORITY_WEIGHT_PER_FAILURE *
+    Math.min(failures, TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT);
+
+function seedCactspine(quantity: number): void {
+  seedGamestate((state) => {
+    state.world.towns[town().id] = buildTownNodeState({
+      materials: { [cactspine]: quantity },
+    });
+  });
+}
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(getEntry).mockImplementation((id) =>
-    id === ringRecipeId ? (ringRecipe as never) : undefined,
-  );
-});
-
-describe('townItemPriorityMap', () => {
-  it('builds one weight/reservation entry per requirement, computed once for the whole priority list', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 2 },
-    ];
-
-    const map = townItemPriorityMap(priority);
-
-    expect(getEntry).toHaveBeenCalledTimes(1);
-    expect(townItemPriorityWeightFromMap(map, cactspineId)).toBe(1 + 0.5 * 2);
-    expect(townReservedMaterialQuantityFromMap(map, cactspineId)).toBe(2);
-  });
-
-  it('is empty for an item no active priority entry needs', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 2 },
-    ];
-
-    const map = townItemPriorityMap(priority);
-
-    expect(townItemPriorityWeightFromMap(map, petrifiwoodId)).toBe(1);
-    expect(townReservedMaterialQuantityFromMap(map, petrifiwoodId)).toBe(0);
-  });
-
-  it('excludes a given recipe from its own reservation via the same precomputed map', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 1 },
-    ];
-
-    const map = townItemPriorityMap(priority);
-
-    expect(
-      townReservedMaterialQuantityFromMap(map, cactspineId, ringRecipeId),
-    ).toBe(0);
-  });
-
-  it('does not mark an item held at or below the hold threshold', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 100 },
-    ];
-
-    expect(
-      townItemPriorityMap(priority).heldByItem[cactspineId],
-    ).toBeUndefined();
-  });
-
-  it('marks an item held by its recipe once the recipe passes the hold threshold', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 101 },
-    ];
-
-    expect(townItemPriorityMap(priority).heldByItem[cactspineId]).toEqual([
-      ringRecipeId,
-    ]);
-  });
+  seedContent([ring, pendant, other, staff, mixed]);
 });
 
 describe('townItemPriorityWeight', () => {
-  it('is neutral (1) with no active priority entries', () => {
-    expect(townItemPriorityWeight([], cactspineId)).toBe(1);
+  it('raises the weight of a struggling recipe’s materials with each failure, up to the cap', () => {
+    expect(townItemPriorityWeight(struggling(4, ring), cactspine)).toBe(
+      weightAt(4),
+    );
+    expect(
+      townItemPriorityWeight(
+        struggling(TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT + 50, ring),
+        cactspine,
+      ),
+    ).toBe(weightAt(TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT));
   });
 
-  it('is neutral for a priority entry with a zero failure count', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 0 },
-    ];
-
-    expect(townItemPriorityWeight(priority, cactspineId)).toBe(1);
+  it('stays neutral for unneeded materials, untouched recipes and recipes gone from content', () => {
+    expect(townItemPriorityWeight(struggling(4, ring), petrifiwood)).toBe(1);
+    expect(townItemPriorityWeight(struggling(0, ring), cactspine)).toBe(1);
+    expect(
+      townItemPriorityWeight(
+        [{ recipeId: 'gone' as RecipeId, failureCount: 4 }],
+        cactspine,
+      ),
+    ).toBe(1);
   });
 
-  it('escalates with failureCount for an item the priority recipe needs', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 4 },
-    ];
-
-    expect(townItemPriorityWeight(priority, cactspineId)).toBe(1 + 0.5 * 4);
-  });
-
-  it('is neutral for an item the priority recipe does not need', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 4 },
-    ];
-
-    expect(townItemPriorityWeight(priority, petrifiwoodId)).toBe(1);
-  });
-
-  it('caps the weight past the max-failures ceiling', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 999 },
-    ];
-
-    expect(townItemPriorityWeight(priority, cactspineId)).toBe(1 + 0.5 * 20);
+  it('takes the strongest weight when several recipes need the same material', () => {
+    expect(
+      townItemPriorityWeight(
+        [...struggling(6, pendant), ...struggling(2, ring)],
+        cactspine,
+      ),
+    ).toBe(weightAt(6));
   });
 });
 
 describe('townReservedMaterialQuantity', () => {
-  it('sums the item requirement across active priority entries needing it', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 1 },
-    ];
+  it('reserves what every struggling recipe needs, less the asking recipe’s own share', () => {
+    const priority = struggling(1, ring, pendant);
 
-    expect(townReservedMaterialQuantity(priority, cactspineId)).toBe(2);
-  });
-
-  it('ignores entries with a zero failure count', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 0 },
-    ];
-
-    expect(townReservedMaterialQuantity(priority, cactspineId)).toBe(0);
-  });
-
-  it('excludes the given recipe from its own reservation', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 1 },
-    ];
-
-    expect(
-      townReservedMaterialQuantity(priority, cactspineId, ringRecipeId),
-    ).toBe(0);
+    expect(townReservedMaterialQuantity(priority, cactspine)).toBe(4);
+    expect(townReservedMaterialQuantity(priority, cactspine, ring.id)).toBe(2);
+    expect(townReservedMaterialQuantity(priority, petrifiwood)).toBe(0);
+    expect(townReservedMaterialQuantity(struggling(0, ring), cactspine)).toBe(
+      0,
+    );
   });
 });
 
 describe('townRecipeRespectsReservations', () => {
-  it('is true when nothing is reserved', () => {
-    const otherRecipe = buildRecipe(otherRecipeId, [
-      { itemId: cactspineId, quantity: 2 },
-    ]);
+  it('lets other recipes spend only what is left above the reservation', () => {
+    const priority = struggling(1, ring);
 
-    expect(townRecipeRespectsReservations([], buildTown(), otherRecipe)).toBe(
-      true,
-    );
+    seedCactspine(3);
+    expect(townRecipeRespectsReservations(priority, town(), other)).toBe(false);
+
+    seedCactspine(4);
+    expect(townRecipeRespectsReservations(priority, town(), other)).toBe(true);
+
+    seedCactspine(0);
+    expect(townRecipeRespectsReservations([], town(), other)).toBe(true);
   });
 
-  it('blocks another recipe from dipping below the reserved amount', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 1 },
-    ];
-    const otherRecipe = buildRecipe(otherRecipeId, [
-      { itemId: cactspineId, quantity: 2 },
-    ]);
-    vi.mocked(townMaterialQuantity).mockReturnValue(3);
-
-    expect(
-      townRecipeRespectsReservations(priority, buildTown(), otherRecipe),
-    ).toBe(false);
-  });
-
-  it('does not block the priority recipe itself from using its own reservation', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 1 },
-    ];
-    vi.mocked(townMaterialQuantity).mockReturnValue(2);
-
-    expect(
-      townRecipeRespectsReservations(priority, buildTown(), ringRecipe),
-    ).toBe(true);
-  });
-
-  it('exempts a specialty recipe outright, even when scarce enough that excluding only itself would still fail', () => {
-    // Two specialty recipes both need cactspine; town only has enough for one of them at a time.
-    const otherRingRecipeId = 'other-ring-recipe' as RecipeId;
-    const otherRingRecipe = buildRecipe(otherRingRecipeId, [
-      { itemId: cactspineId, quantity: 2 },
-    ]);
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === ringRecipeId) return ringRecipe as never;
-      if (id === otherRingRecipeId) return otherRingRecipe as never;
-      return undefined;
-    });
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 1 },
-      { recipeId: otherRingRecipeId, failureCount: 1 },
-    ];
-    vi.mocked(townMaterialQuantity).mockReturnValue(2);
+  it('never blocks a struggling or specialty recipe, even on a shared scarce material', () => {
+    const priority = struggling(1, ring, pendant);
+    seedCactspine(2);
 
     expect(
       townRecipeRespectsReservations(
         priority,
-        buildTown([ringRecipeId, otherRingRecipeId]),
-        ringRecipe,
+        town([ring.id, pendant.id]),
+        ring,
       ),
     ).toBe(true);
-  });
-
-  it('still exempts a specialty recipe scarce against its siblings even if dropped from uniqueRecipeIds mid-save', () => {
-    const otherRingRecipeId = 'other-ring-recipe' as RecipeId;
-    const otherRingRecipe = buildRecipe(otherRingRecipeId, [
-      { itemId: cactspineId, quantity: 2 },
-    ]);
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === ringRecipeId) return ringRecipe as never;
-      if (id === otherRingRecipeId) return otherRingRecipe as never;
-      return undefined;
-    });
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 1 },
-      { recipeId: otherRingRecipeId, failureCount: 1 },
-    ];
-    vi.mocked(townMaterialQuantity).mockReturnValue(2);
-
+    expect(townRecipeRespectsReservations(priority, town(), ring)).toBe(true);
     expect(
-      townRecipeRespectsReservations(priority, buildTown(), ringRecipe),
+      townRecipeRespectsReservations(priority, town([other.id]), other),
     ).toBe(true);
   });
 });
 
 describe('townFailureHoldWeight', () => {
-  it('is full weight when nothing is held', () => {
-    const otherRecipe = buildRecipe(otherRecipeId, [
-      { itemId: cactspineId, quantity: 2 },
-    ]);
-
-    expect(townFailureHoldWeight([], buildTown(), otherRecipe)).toBe(1);
-  });
-
-  it('deprioritizes, but does not zero out, a non-specialty recipe needing a held material', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 101 },
-    ];
-    const otherRecipe = buildRecipe(otherRecipeId, [
-      { itemId: cactspineId, quantity: 2 },
-    ]);
-
-    expect(townFailureHoldWeight(priority, buildTown(), otherRecipe)).toBe(0.1);
-  });
-
-  it('never deprioritizes a specialty recipe, even one needing a held material', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 101 },
-    ];
-    const otherRecipe = buildRecipe(otherRecipeId, [
-      { itemId: cactspineId, quantity: 2 },
-    ]);
-
+  it('only marks a material held once its recipe passes the hold threshold', () => {
     expect(
-      townFailureHoldWeight(priority, buildTown([otherRecipeId]), otherRecipe),
-    ).toBe(1);
+      townItemPriorityMap(
+        struggling(TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD, ring),
+      ).heldByItem[cactspine],
+    ).toBeUndefined();
+    expect(
+      townItemPriorityMap(struggling(held, ring)).heldByItem[cactspine],
+    ).toEqual([ring.id]);
   });
 
-  it('does not deprioritize a non-specialty recipe needing a different material', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 101 },
-    ];
-    const otherRecipe = buildRecipe(otherRecipeId, [
-      { itemId: petrifiwoodId, quantity: 1 },
-    ]);
+  it('deprioritizes other recipes needing any held material', () => {
+    const priority = struggling(held, ring);
 
-    expect(townFailureHoldWeight(priority, buildTown(), otherRecipe)).toBe(1);
+    expect(townFailureHoldWeight(priority, town(), other)).toBe(
+      TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY,
+    );
+    expect(townFailureHoldWeight(priority, town(), mixed)).toBe(
+      TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY,
+    );
+    expect(townFailureHoldWeight(priority, town(), staff)).toBe(1);
   });
 
-  it('deprioritizes a recipe needing several materials if even one of them is held', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 101 },
-    ];
-    const otherRecipe = buildRecipe(otherRecipeId, [
-      { itemId: cactspineId, quantity: 1 },
-      { itemId: petrifiwoodId, quantity: 1 },
-    ]);
+  it('never deprioritizes a specialty recipe, or the holder itself', () => {
+    const priority = struggling(held, ring);
 
-    expect(townFailureHoldWeight(priority, buildTown(), otherRecipe)).toBe(0.1);
-  });
-
-  it('never deprioritizes a struggling recipe from its own hold, even if dropped from uniqueRecipeIds mid-save', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 101 },
-    ];
-
-    expect(townFailureHoldWeight(priority, buildTown(), ringRecipe)).toBe(1);
+    expect(townFailureHoldWeight(priority, town([other.id]), other)).toBe(1);
+    expect(townFailureHoldWeight(priority, town(), ring)).toBe(1);
   });
 });
 
 describe('townCommissionPriorityWeight', () => {
-  function buildOffer(
+  function offer(
     specialtyForRecipeId: RecipeId,
-    requirements: { itemId: ItemId }[] = [],
+    ...itemIds: ItemId[]
   ): CommissionOfferContent {
-    return {
+    return ensureCommissionOffer({
       id: 'offer' as CommissionOfferId,
-      requirements,
       specialtyForRecipeId,
-    } as unknown as CommissionOfferContent;
+      requirements: itemIds.map((itemId) => ({
+        itemId,
+        quantityMin: 1,
+        quantityMax: 1,
+      })),
+    });
   }
 
-  it('applies the dedicated, uncapped multiplier when linked to an active priority entry', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 2 },
-    ];
-    const offer = buildOffer(ringRecipeId);
+  it('boosts an offer feeding a struggling recipe without a cap, whatever its own weight', () => {
+    const failures = TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT * 100;
+    const priority = struggling(failures, ring);
+    const linked = offer(ring.id);
+    const dominance =
+      1 + TOWN_SPECIALTY_COMMISSION_WEIGHT_PER_FAILURE * failures;
 
-    expect(townCommissionPriorityWeight(priority, offer, 1)).toBe(1 + 1 * 2);
-  });
-
-  it('never loses to a competing offer with a higher authored weight - not capped at 20 failures like per-item weights', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 10476 },
-    ];
-    const offer = buildOffer(ringRecipeId);
-
-    // Multiplying the result back by the offer's own authored weight (as the real call site does) must cancel it out.
-    const offerWeight = 1;
-    const result =
-      townCommissionPriorityWeight(priority, offer, offerWeight) * offerWeight;
-
-    expect(result).toBe(1 + 1 * 10476);
-  });
-
-  it('divides out the offer authored weight so the final effective weight is weight-independent', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 20 },
-    ];
-    const offer = buildOffer(ringRecipeId);
-
-    expect(townCommissionPriorityWeight(priority, offer, 1) * 1).toBe(
-      townCommissionPriorityWeight(priority, offer, 5) * 5,
+    expect(townCommissionPriorityWeight(priority, linked, 1)).toBe(dominance);
+    expect(townCommissionPriorityWeight(priority, linked, 5) * 5).toBeCloseTo(
+      dominance,
     );
   });
 
-  it('falls back to the per-item weight (capped at 20 failures) when not linked to an active entry', () => {
-    const priority: TownSpecialtyPriorityEntry[] = [
-      { recipeId: ringRecipeId, failureCount: 2 },
-    ];
-    const offer = buildOffer('UNKNOWN' as RecipeId, [{ itemId: cactspineId }]);
+  it('otherwise follows the weight of the materials it asks for', () => {
+    const priority = struggling(2, ring);
 
-    expect(townCommissionPriorityWeight(priority, offer, 1)).toBe(1 + 0.5 * 2);
-  });
-
-  it('is neutral for an offer with no matching link or needed item', () => {
-    const offer = buildOffer('UNKNOWN' as RecipeId, [
-      { itemId: petrifiwoodId },
-    ]);
-
-    expect(townCommissionPriorityWeight([], offer, 1)).toBe(1);
+    expect(
+      townCommissionPriorityWeight(
+        priority,
+        offer('x' as RecipeId, cactspine),
+        1,
+      ),
+    ).toBe(weightAt(2));
+    expect(
+      townCommissionPriorityWeight(
+        priority,
+        offer('x' as RecipeId, petrifiwood),
+        1,
+      ),
+    ).toBe(1);
+    expect(
+      townCommissionPriorityWeight(priority, offer('x' as RecipeId), 1),
+    ).toBe(1);
   });
 });

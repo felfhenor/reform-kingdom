@@ -79,10 +79,10 @@ function seedTown(
       craftingChanceOnTick: 100,
       craftingChanceItemThreshold: 4,
       ...crafting,
-    } as TownContent['crafting'],
+    },
     traders: {
       sellItemCount: [{ tier: 0, value: SHOP_CAP }],
-    } as TownContent['traders'],
+    },
   });
   seedContent([
     town,

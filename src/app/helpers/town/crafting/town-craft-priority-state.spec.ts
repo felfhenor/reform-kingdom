@@ -54,10 +54,8 @@ function seedTown(
       crafting: {
         uniqueRecipeIds: [specialty.id],
         ...crafting,
-      } as TownContent['crafting'],
-      materialThresholds: [
-        { itemId: dustId, maxQuantity: 10 },
-      ] as TownContent['materialThresholds'],
+      },
+      materialThresholds: [{ itemId: dustId, maxQuantity: 10 }],
     }),
     ringRecipe,
     dustRecipe,

@@ -8,7 +8,6 @@ import type {
   EquipmentId,
   GameStateTowns,
   ItemId,
-  TownContent,
   TownId,
   TradeskillId,
   WorkerId,
@@ -29,7 +28,7 @@ function seedTown(workers: WorkerId[] = [darwinId]): void {
       id: townId,
       gathering: {
         workers: workers.map((workerId) => ({ workerId, level: 1 })),
-      } as unknown as TownContent['gathering'],
+      },
     }),
     ensureItem({ id: oreId }),
     ensureEquipment({ id: swordId }),

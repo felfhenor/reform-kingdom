@@ -91,7 +91,16 @@ describe('RNG Helper Functions', () => {
       const result = rngNumberRange(min, max, rngSeeded('test-seed'));
 
       expect(result).toBeGreaterThanOrEqual(min);
-      expect(result).toBeLessThan(max);
+      expect(result).toBeLessThanOrEqual(max);
+    });
+
+    it('can roll either end of the range, and only the one value when they match', () => {
+      expect(rngNumberRange(5, 10, (() => 0) as PRNG)).toBe(5);
+      expect(rngNumberRange(5, 10, (() => 0.9999) as PRNG)).toBe(10);
+      expect(rngNumberRange(7, 7, (() => 0.9999) as PRNG)).toBe(7);
+      expect(rngNumberRange(2.5, 4.5, (() => 0) as PRNG)).toBe(3);
+      expect(rngNumberRange(2.5, 4.5, (() => 0.9999) as PRNG)).toBe(4);
+      expect(rngNumberRange(2.3, 2.7, (() => 0.9999) as PRNG)).toBe(2.3);
     });
   });
 
@@ -109,7 +118,9 @@ describe('RNG Helper Functions', () => {
 
   describe('rngChoiceWeighted', () => {
     it('returns undefined for an empty list', () => {
-      expect(rngChoiceWeighted([], () => 1, rngSeeded('test-seed'))).toBeUndefined();
+      expect(
+        rngChoiceWeighted([], () => 1, rngSeeded('test-seed')),
+      ).toBeUndefined();
     });
 
     it('returns undefined when every weight is zero', () => {

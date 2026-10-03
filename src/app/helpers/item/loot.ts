@@ -62,7 +62,7 @@ function resolveDrop(
   bonusChancePercent: number,
 ): ResolvedDrop | undefined {
   const chance = clamp(drop.chance + bonusChancePercent, 0, 100);
-  const shouldDrop = rngNumberRange(0, 100) < chance;
+  const shouldDrop = rngNumberRange(0, 99) < chance;
   if (!shouldDrop) return undefined;
 
   switch (drop.kind) {

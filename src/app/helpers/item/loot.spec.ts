@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import type * as RngHelper from '@helpers/rng';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 vi.mock('@helpers/item/equipment', () => ({
   newEquipmentItem: vi.fn((equipmentId: string) => ({
@@ -33,8 +34,14 @@ vi.mock('@helpers/hero/global-effect-state', () => ({
   recomputeGlobalEffectSums: vi.fn(),
 }));
 
+vi.mock('@helpers/rng', async (importOriginal) => {
+  const actual = await importOriginal<typeof RngHelper>();
+  return { ...actual, rngNumberRange: vi.fn(actual.rngNumberRange) };
+});
+
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { rngNumberRange } from '@helpers/rng';
 import { globalEffectSumsState } from '@helpers/state-game';
 import {
   applyResolvedDropToState,
@@ -67,6 +74,24 @@ describe('Loot Helper Functions', () => {
   const weaverNellId = 'weaver-nell' as WorkerId;
 
   describe('rollDroppedRewards', () => {
+    it('always drops a 100% reward and rolls the full quantity range, even on the top roll', () => {
+      vi.mocked(rngNumberRange).mockImplementation((_min, max) => max);
+      onTestFinished(() => vi.mocked(rngNumberRange).mockRestore());
+      const rewards: DroppedReward[] = [
+        ensureDroppedReward({
+          itemId: goldCoinId,
+          min: 3,
+          max: 10,
+          chance: 100,
+        }),
+        ensureDroppedReward({ itemId: goldCoinId, min: 3, max: 10, chance: 0 }),
+      ];
+
+      expect(rollDroppedRewards(rewards, 1)).toEqual([
+        { itemId: goldCoinId, quantity: 10, kind: 'Item' },
+      ]);
+    });
+
     it('should roll a quantity within range for an item drop', () => {
       const rewards: DroppedReward[] = [
         ensureDroppedReward({

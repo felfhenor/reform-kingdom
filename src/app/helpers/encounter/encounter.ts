@@ -27,7 +27,7 @@ export function encounterStartFight(
 
   const encounterLevel = rngNumberRange(
     encounter.levelRange.min,
-    encounter.levelRange.max + 1,
+    encounter.levelRange.max,
   );
 
   const combat: Combat = {

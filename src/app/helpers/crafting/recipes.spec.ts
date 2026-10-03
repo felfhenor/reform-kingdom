@@ -37,7 +37,6 @@ import type {
   IsContentItem,
   ItemId,
   RecipeId,
-  TownContent,
   TradeskillId,
 } from '@interfaces';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
@@ -106,7 +105,7 @@ function seedTownUnique(recipeId: RecipeId): void {
     ensureTown({
       id: 'larsia' as never,
       name: 'Larsia',
-      crafting: { uniqueRecipeIds: [recipeId] } as TownContent['crafting'],
+      crafting: { uniqueRecipeIds: [recipeId] },
     }),
   ]);
 }

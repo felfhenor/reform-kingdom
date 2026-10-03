@@ -7,7 +7,7 @@ import {
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
 import { ensureItem } from '@helpers/content/ensure-item';
-import { ensureTown, ensureTownGathering } from '@helpers/content/ensure-town';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { worldTownsState } from '@helpers/state-game';
 import {
@@ -48,7 +48,7 @@ function town(gatherRateMultiplier = 1): TownContent {
   return ensureTown({
     id: 'larsia' as TownId,
     name: 'Larsia',
-    gathering: ensureTownGathering({ gatherRateMultiplier }),
+    gathering: { gatherRateMultiplier },
   });
 }
 

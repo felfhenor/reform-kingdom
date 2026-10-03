@@ -12,6 +12,7 @@ import type {
   ItemId,
   MonsterId,
   TownContent,
+  TownContentInput,
   TownCraftingConfig,
   TownDefenseAssaulterConfig,
   TownDefenseBuyoffConfig,
@@ -53,7 +54,7 @@ export function ensureTownReputationTierValue(
 }
 
 function ensureTownCrafting(
-  crafting: Partial<TownCraftingConfig> = {},
+  crafting: TownContentInput['crafting'] = {},
 ): TownCraftingConfig {
   return {
     maxQueueSize: ensureArray(
@@ -75,7 +76,7 @@ function ensureTownCrafting(
 }
 
 function ensureTownTraders(
-  traders: Partial<TownTradersConfig> = {},
+  traders: TownContentInput['traders'] = {},
 ): TownTradersConfig {
   return {
     sellItemCount: ensureArray(
@@ -96,7 +97,7 @@ function ensureTownGatheringWorker(
   };
 }
 
-export function ensureTownMaterialThreshold(
+function ensureTownMaterialThreshold(
   threshold: Partial<TownMaterialThreshold> = {},
 ): TownMaterialThreshold {
   return {
@@ -108,8 +109,8 @@ export function ensureTownMaterialThreshold(
   };
 }
 
-export function ensureTownGathering(
-  gathering: Partial<TownGatheringConfig> = {},
+function ensureTownGathering(
+  gathering: TownContentInput['gathering'] = {},
 ): TownGatheringConfig {
   return {
     gatherRateMultiplier: gathering.gatherRateMultiplier ?? 1,
@@ -119,7 +120,9 @@ export function ensureTownGathering(
 }
 
 function ensureTownReputationBuffTier(
-  tier: Partial<TownReputationBuffTier> = {},
+  tier: NonNullable<
+    NonNullable<NonNullable<TownContentInput['reputation']>['buff']>['tiers']
+  >[number] = {},
 ): TownReputationBuffTier {
   return {
     tier: tier.tier ?? 0,
@@ -130,7 +133,7 @@ function ensureTownReputationBuffTier(
 }
 
 function ensureTownReputation(
-  reputation: Partial<TownReputationConfig> = {},
+  reputation: TownContentInput['reputation'] = {},
 ): TownReputationConfig {
   return {
     buff: {
@@ -151,7 +154,11 @@ function ensureTownDefenseGuardianEntry(
 }
 
 function ensureTownDefenseGuardianReputationTier(
-  tier: Partial<TownDefenseGuardianReputationTier> = {},
+  tier: NonNullable<
+    NonNullable<
+      NonNullable<TownContentInput['defense']>['guardian']
+    >['reputationTiers']
+  >[number] = {},
 ): TownDefenseGuardianReputationTier {
   return {
     tier: tier.tier ?? 0,
@@ -160,7 +167,7 @@ function ensureTownDefenseGuardianReputationTier(
 }
 
 function ensureTownDefenseGuardian(
-  guardian: Partial<TownDefenseGuardianConfig> = {},
+  guardian: NonNullable<TownContentInput['defense']>['guardian'] = {},
 ): TownDefenseGuardianConfig {
   return {
     reputationTiers: ensureArray(
@@ -192,7 +199,7 @@ function ensureTownCommissionOfferSlot(
 }
 
 function ensureTownDefenseQuests(
-  quests: Partial<TownDefenseQuestsConfig> = {},
+  quests: NonNullable<TownContentInput['defense']>['quests'] = {},
 ): TownDefenseQuestsConfig {
   return {
     commissions: ensureArray(quests.commissions, ensureTownCommissionOfferSlot),
@@ -209,7 +216,7 @@ function ensureTownDefenseFortifyMaterial(
 }
 
 function ensureTownDefenseBuyoff(
-  buyoff: Partial<TownDefenseBuyoffConfig> = {},
+  buyoff: NonNullable<TownContentInput['defense']>['buyoff'] = {},
 ): TownDefenseBuyoffConfig {
   return {
     tributeGoldScalar: buyoff.tributeGoldScalar ?? 0,
@@ -220,8 +227,8 @@ function ensureTownDefenseBuyoff(
   };
 }
 
-export function ensureTownDefense(
-  defense: Partial<TownDefenseConfig> = {},
+function ensureTownDefense(
+  defense: TownContentInput['defense'] = {},
 ): TownDefenseConfig {
   return {
     rewards: ensureArray(defense.rewards, ensureDroppedReward),
@@ -232,7 +239,7 @@ export function ensureTownDefense(
   };
 }
 
-export function ensureTown(town: Partial<TownContent>): Required<TownContent> {
+export function ensureTown(town: TownContentInput): Required<TownContent> {
   return {
     id: town.id ?? ('UNKNOWN' as TownId),
     name: town.name ?? 'UNKNOWN',

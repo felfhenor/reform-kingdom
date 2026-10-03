@@ -28,10 +28,10 @@ function buildTown(
     materialThresholds: thresholds.map((threshold) => ({
       itemId: oreId,
       ...threshold,
-    })) as TownContent['materialThresholds'],
+    })),
     traders: {
       markupPercentages: { sell: sellMarkup, buy: 0 },
-    } as TownContent['traders'],
+    },
   });
 }
 

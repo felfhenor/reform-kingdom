@@ -49,7 +49,7 @@ describe('generateEncounterRandomFights', () => {
     expect(fights).toHaveLength(3);
     expect(rngNumberRange).toHaveBeenCalledWith(
       content.encounterRange.min,
-      content.encounterRange.max + 1,
+      content.encounterRange.max,
     );
   });
 

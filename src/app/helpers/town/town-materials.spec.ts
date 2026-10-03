@@ -22,13 +22,7 @@ import {
   townDefaultMaterials,
   townMaterialQuantity,
 } from '@helpers/town/town-materials';
-import type {
-  EquipmentId,
-  GameState,
-  ItemId,
-  TownContent,
-  TownId,
-} from '@interfaces';
+import type { EquipmentId, GameState, ItemId, TownId } from '@interfaces';
 
 const townId = 'larsia' as TownId;
 const oreId = 'copper-ore' as ItemId;
@@ -136,7 +130,7 @@ describe('townDefaultMaterials', () => {
       materialThresholds: [
         { itemId: oreId, default: 30 },
         { itemId: 'amber' as ItemId },
-      ] as TownContent['materialThresholds'],
+      ],
     });
 
     expect(townDefaultMaterials(town)).toEqual({ [oreId]: 30 });

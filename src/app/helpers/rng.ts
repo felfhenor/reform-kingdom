@@ -50,12 +50,18 @@ export function rngUniform(rng = rngSeeded(rngUuid())): number {
   return rng();
 }
 
+// Inclusive of both ends, so a range shown to players as "min-max" can roll its max.
 export function rngNumberRange(
   min: number,
   max: number,
   rng = rngSeeded(rngUuid()),
 ): number {
-  return Math.floor(min + rng() * (max - min));
+  const low = Math.ceil(min);
+  const high = Math.floor(max);
+  // No whole number fits between fractional bounds, so stay on a bound rather than step outside them.
+  if (high < low) return min;
+
+  return Math.floor(low + rng() * (high - low + 1));
 }
 
 export function rngSucceedsChance(

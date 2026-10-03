@@ -1,25 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldPartyState: () => gamestate().world.party,
-    collectiblesState: () => gamestate().collectibles,
-    discoveredTrainersState: () => gamestate().discoveredTrainers,
-    worldCombatState: vi.fn(),
-  };
-});
-
-vi.mock('@helpers/world', () => ({
-  worldNodeAtCurrentLocation: vi.fn(),
-}));
-
-import { setAllContentById } from '@helpers/content/content';
-import { defaultEquipment, defaultStats } from '@helpers/defaults';
-import { characterStatsForLevel } from '@helpers/hero/party';
-import { gamestate } from '@helpers/state-game';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
+import { ensureJob } from '@helpers/content/ensure-job';
+import {
+  ensureTrainer,
+  ensureTrainerTeaching,
+} from '@helpers/content/ensure-trainer';
+import { defaultStats } from '@helpers/defaults';
 import {
   characterApplyTeaching,
   isPartyAtTrainer,
@@ -29,50 +16,35 @@ import {
   trainerTeachingAvailability,
   trainerTeachingsForJob,
 } from '@helpers/trainer/trainer';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
   Character,
   CharacterId,
   CollectibleId,
-  GameState,
-  IsContentItem,
-  JobContent,
   JobId,
-  TrainerContent,
   TrainerId,
   TrainerTeachingContent,
   TrainerTeachingId,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const WARRIOR = 'job-warrior' as JobId;
 const RANGER = 'job-ranger' as JobId;
 const RUBY = 'Goblin Ruby' as CollectibleId;
 
-const warriorJob = {
+const warriorJob = ensureJob({
   id: WARRIOR,
   name: 'Warrior',
-  __type: 'job',
   baseStats: { ...defaultStats(), Health: 100, Energy: 20 },
-  statsPerLevel: defaultStats(),
-} as JobContent;
+});
+const rangerJob = ensureJob({ id: RANGER, name: 'Ranger' });
 
 function teaching(
   overrides: Partial<TrainerTeachingContent>,
 ): TrainerTeachingContent {
-  return {
-    id: 'teach' as TrainerTeachingId,
-    name: 'Teach',
-    __type: 'trainerteaching',
-    effects: [],
-    requiredLevel: 1,
-    costs: [],
-    jobIds: [WARRIOR],
-    requiredCollectibleIds: [],
-    requiredTrainerTeachingIds: [],
-    ...overrides,
-  };
+  return ensureTrainerTeaching({ jobIds: [WARRIOR], ...overrides });
 }
 
 const basicHealth = teaching({
@@ -93,56 +65,37 @@ const rangerOnly = teaching({
   jobIds: [RANGER],
 });
 
-const trainer = {
+const trainer = ensureTrainer({
   id: 'trainer-reyn' as TrainerId,
   name: 'Reyn Astra',
-  __type: 'trainer',
   trainerTeachingIds: [basicHealth.id, advanced.id, rangerOnly.id],
-} as TrainerContent;
+});
 
 function hero(overrides: Partial<Character> = {}): Character {
-  const base = {
+  return buildCharacter({
     id: 'hero' as CharacterId,
     name: 'Jala',
-    level: 1,
-    xp: { current: 0, maximum: 100 },
     jobId: WARRIOR,
-    jobProgress: {},
-    combatOrders: {},
-    teachings: {},
-    equipment: defaultEquipment(),
     ...overrides,
-  } as Character;
-  const stats = characterStatsForLevel(
-    base.jobId,
-    base.level,
-    base.equipment,
-    characterAllTeachingIds(base),
-  );
-  return { ...base, stats, hp: stats.Health, ep: stats.Energy };
+  });
 }
 
-function setState(
-  party: Character[],
-  collectibles: Partial<GameState['collectibles']> = {},
-): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: { party },
-    collectibles,
-    discoveredTrainers: {},
-  } as unknown as GameState);
+function setState(collectibles: CollectibleId[] = []): void {
+  seedGamestate((state) => {
+    collectibles.forEach((id) => applyCollectibleGrant(state, id, 1));
+  });
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  setAllContentById(
-    new Map<string, IsContentItem>(
-      [warriorJob, basicHealth, advanced, rangerOnly, trainer].map(
-        (content) => [content.id, content],
-      ),
-    ),
-  );
-  setState([]);
+  seedContent([
+    warriorJob,
+    rangerJob,
+    basicHealth,
+    advanced,
+    rangerOnly,
+    trainer,
+  ]);
+  setState();
 });
 
 describe('trainerTeachingAvailability', () => {
@@ -201,7 +154,7 @@ describe('trainerTeachingAvailability', () => {
       'MissingCollectibles',
     );
 
-    setState([], { [RUBY]: { quantity: 1, foundAt: 1 } });
+    setState([RUBY]);
     expect(trainerTeachingAvailability(ready, advanced, WARRIOR)).toBe(
       'Available',
     );
@@ -223,13 +176,20 @@ describe('trainerForTeaching', () => {
 
 describe('isPartyAtTrainer', () => {
   it('matches the trainer at the current node only', () => {
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
-      nodeName: trainer.id,
-    } as unknown as WorldNodeEntry);
+    const nodes = seedWorldNodes([
+      { name: trainer.name, type: 'Trainer', x: 1 },
+      { name: 'Field', type: 'ExploreNode', x: 2 },
+    ]);
+    const standAt = (name: string) =>
+      seedGamestate(
+        (state) => (state.world.currentLocation = locationOf(nodes[name])),
+      );
+
+    standAt(trainer.name);
     expect(isPartyAtTrainer(trainer.id)).toBe(true);
     expect(isPartyAtTrainer('other' as TrainerId)).toBe(false);
 
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
+    standAt('Field');
     expect(isPartyAtTrainer(trainer.id)).toBe(false);
   });
 });
@@ -267,6 +227,13 @@ describe('characterApplyTeaching', () => {
     expect(character.stats.Health).toBe(120);
   });
 
+  it('adds to what the hero already learned under the job', () => {
+    const character = hero({ teachings: { [WARRIOR]: [basicHealth.id] } });
+    characterApplyTeaching(character, advanced);
+
+    expect(character.teachings[WARRIOR]).toEqual([basicHealth.id, advanced.id]);
+  });
+
   it("keeps other jobs' teachings untouched", () => {
     const character = hero({ teachings: { [RANGER]: [rangerOnly.id] } });
     characterApplyTeaching(character, basicHealth);
@@ -280,6 +247,7 @@ describe('pruneInvalidCharacterTeachings', () => {
     const pruned = pruneInvalidCharacterTeachings({
       [WARRIOR]: [basicHealth.id, basicHealth.id, 'gone' as TrainerTeachingId],
       ['job-removed' as JobId]: [basicHealth.id],
+      [RANGER]: ['gone' as TrainerTeachingId],
     });
 
     expect(pruned).toEqual({ [WARRIOR]: [basicHealth.id] });

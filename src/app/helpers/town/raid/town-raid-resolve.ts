@@ -107,7 +107,7 @@ function stealTownStock(
       townShopItemCap(townId) * (RAID_LOSS_STOCK_MAX_STEAL_PERCENT / 100),
     ),
   );
-  const stolenCount = Math.min(stock.length, rngNumberRange(1, maxSlots + 1));
+  const stolenCount = Math.min(stock.length, rngNumberRange(1, maxSlots));
   const stolenEntries = rngShuffle(stock).slice(0, stolenCount);
 
   town.stock = town.stock.filter((entry) => !stolenEntries.includes(entry));

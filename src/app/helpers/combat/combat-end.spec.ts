@@ -46,7 +46,6 @@ import type {
   EncounterId,
   ItemId,
   MonsterId,
-  TownContent,
   TownId,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
@@ -280,7 +279,7 @@ describe('combatCheckIfOver', () => {
           id: larsiaId,
           defense: {
             assaulter: { level: { min: 20, max: 25 } },
-          } as TownContent['defense'],
+          },
         }),
       ]);
 

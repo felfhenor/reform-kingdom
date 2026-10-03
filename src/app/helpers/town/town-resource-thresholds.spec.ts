@@ -1,10 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ensureItem } from '@helpers/content/ensure-item';
-import {
-  ensureTown,
-  ensureTownMaterialThreshold,
-} from '@helpers/content/ensure-town';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
   townGoldThreshold,
   townMaterialAtOrAboveThreshold,
@@ -30,7 +27,7 @@ function town(
   return ensureTown({
     id: id as TownId,
     name: id,
-    materialThresholds: thresholds.map(ensureTownMaterialThreshold),
+    materialThresholds: thresholds,
   });
 }
 

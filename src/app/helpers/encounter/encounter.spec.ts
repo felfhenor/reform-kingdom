@@ -1,10 +1,10 @@
 import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Always rolls the top of a range, so an exclusive upper bound shows up as the max level.
+// Always rolls the top of a range, so the max level must be reachable.
 vi.mock('@helpers/rng', async (importOriginal) => ({
   ...(await importOriginal<typeof RngHelper>()),
-  rngNumberRange: vi.fn((_min: number, max: number) => max - 1),
+  rngNumberRange: vi.fn((_min: number, max: number) => max),
 }));
 
 import { combatLog } from '@helpers/combat/combat-log';

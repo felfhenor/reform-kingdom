@@ -11,7 +11,7 @@ import {
   RAID_WARNING_TICKS_PER_REPUTATION_TIER,
 } from '@helpers/config';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
-import { ensureTown, ensureTownDefense } from '@helpers/content/ensure-town';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { globalEffectsState, worldTownsState } from '@helpers/state-game';
 import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
 import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
@@ -45,13 +45,13 @@ const raidEffect = ensureGlobalEffect({
 const larsia: TownContent = ensureTown({
   id: 'larsia' as TownId,
   name: 'Larsia',
-  defense: ensureTownDefense({
+  defense: {
     assaulter: {
       numMonsters: 2,
       monsterIds: [bloodmoth],
       level: assaulterLevel,
     },
-  }),
+  },
 });
 
 function seedTown(

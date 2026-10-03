@@ -9,6 +9,7 @@ import {
   createCharacter,
 } from '@helpers/hero/party';
 import { newEquipmentItem } from '@helpers/item/equipment';
+import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   CaravanNodeState,
   Character,
@@ -106,7 +107,7 @@ export function buildEquipmentItem(
   return { ...newEquipmentItem(equipmentId, []), ...overrides };
 }
 
-// Stats, pools and xp follow the requested level/job/equipment unless overridden explicitly.
+// Stats, pools and xp follow the requested level/job/equipment/teachings unless overridden explicitly.
 export function buildCharacter(overrides: Partial<Character> = {}): Character {
   // Not 'UNKNOWN': that's the id/name ensureX() gives unnamed content, so the job lookup could hit it.
   const base = createCharacter(
@@ -118,7 +119,7 @@ export function buildCharacter(overrides: Partial<Character> = {}): Character {
     base.jobId,
     level,
     overrides.equipment ?? base.equipment,
-    [],
+    characterAllTeachingIds({ teachings: overrides.teachings ?? {} }),
   );
 
   return {

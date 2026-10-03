@@ -1,24 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  getMaterialQuantity: vi.fn(),
-}));
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryGet: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/rng', () => ({
-  rngNumberRange: vi.fn((min: number) => min),
-}));
-
-vi.mock('@helpers/town/reputation/town-reputation-tier-value', () => ({
-  townReputationTierValueResolve: vi.fn(),
-}));
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
   buildCommissionRequirementEntries,
@@ -28,305 +8,201 @@ import {
   eligibleCommissionOffers,
   rollCommissionRequirements,
 } from '@helpers/commission/commission-requirement';
-import { getEntry } from '@helpers/content/content';
-import { getMaterialQuantity } from '@helpers/item/materials';
-import { armoryGet } from '@helpers/kingdom/armory';
-import { townReputationTierValueResolve } from '@helpers/town/reputation/town-reputation-tier-value';
+import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { defaultGameState } from '@helpers/defaults';
+import { applyMaterialDelta } from '@helpers/item/materials';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import type {
   CommissionOfferContent,
   CommissionOfferId,
-  CommissionOfferSlot,
   CommissionRequirement,
-  EquipmentContent,
   EquipmentId,
   GameState,
-  ItemContent,
   ItemId,
-  MonsterContent,
   MonsterId,
-  RecipeId,
   TownId,
 } from '@interfaces';
+import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-const offer: CommissionOfferContent = {
-  id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Bundle of Wergen Sticks',
-  __type: 'commissionoffer',
-  description: 'A commission.',
-  requirements: [
-    { itemId: 'wergen-stick' as ItemId, quantityMin: 10, quantityMax: 20 },
-  ],
-  rewards: [],
-  townReputationReward: 0,
-  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
-  reputationTierMultipliers: [],
-};
-
-const wergenStick: ItemContent = {
+const townId = 'larsia' as TownId;
+const stick = ensureItem({
   id: 'wergen-stick' as ItemId,
   name: 'Wergen Stick',
-  __type: 'item',
-  description: 'A stick.',
-  sprite: '0000',
-  rarity: 'Common',
-};
+});
+const sword = ensureEquipment({ id: 'sword' as EquipmentId, name: 'Sword' });
+const worm = ensureMonster({ id: 'sand-worm' as MonsterId, name: 'Sand Worm' });
 
-const sword: EquipmentContent = {
-  id: 'sword' as EquipmentId,
-  name: 'Sword',
-  __type: 'equipment',
-  description: 'A sword.',
-  sprite: '0000',
-  rarity: 'Common',
-  levelRequirement: 1,
-  baseStats: {} as never,
-  type: 'Sword',
-  slots: 1,
-  grantedSkillIds: [],
-};
+function offer(
+  overrides: Partial<CommissionOfferContent> = {},
+): CommissionOfferContent {
+  return ensureCommissionOffer({
+    id: 'offer-a' as CommissionOfferId,
+    name: 'Bundle of Wergen Sticks',
+    requirements: [{ itemId: stick.id, quantityMin: 10, quantityMax: 10 }],
+    ...overrides,
+  });
+}
 
-const sandWorm: MonsterContent = {
-  id: 'sand-worm' as MonsterId,
-  name: 'Sand Worm',
-  __type: 'monster',
-  description: 'A worm.',
-  sprite: '0000',
-} as unknown as MonsterContent;
+const sticks: CommissionRequirement = { itemId: stick.id, quantity: 100 };
+const swords: CommissionRequirement = { equipmentId: sword.id, quantity: 1 };
+const kills = (progress: number): CommissionRequirement => ({
+  monsterId: worm.id,
+  quantity: 5,
+  progress,
+});
+
+function seedOwned(stickCount: number, swordCount = 0, reputationTier = 0) {
+  seedGamestate((state) => {
+    applyMaterialDelta(state, stick.id, stickCount);
+    state.armory = Array.from({ length: swordCount }, () =>
+      buildEquipmentItem(sword.id),
+    );
+    state.world.towns[townId] = buildTownNodeState({
+      reputation: TOWN_REPUTATION_THRESHOLDS[reputationTier],
+    });
+  });
+}
+
+beforeEach(() => {
+  seedContent([stick, sword, worm, offer()]);
+});
 
 describe('eligibleCommissionOffers', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('resolves each slot to its offer content and weight', () => {
-    const slots: CommissionOfferSlot[] = [
-      { commissionOfferId: offer.id, weight: 3 },
-    ];
-    vi.mocked(getEntry).mockReturnValue(offer);
-
-    expect(eligibleCommissionOffers(slots)).toEqual([{ offer, weight: 3 }]);
-  });
-
-  it('drops a slot whose offer no longer resolves to real content', () => {
-    const slots: CommissionOfferSlot[] = [
-      { commissionOfferId: offer.id, weight: 3 },
-    ];
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    expect(eligibleCommissionOffers(slots)).toEqual([]);
+  it('pairs each offer still in content with its weight', () => {
+    expect(
+      eligibleCommissionOffers([
+        { commissionOfferId: offer().id, weight: 3 },
+        { commissionOfferId: 'gone' as CommissionOfferId, weight: 1 },
+      ]),
+    ).toEqual([{ offer: offer(), weight: 3 }]);
   });
 });
 
 describe('rollCommissionRequirements', () => {
-  it('rolls an item requirement quantity within its range', () => {
-    const result = rollCommissionRequirements(offer);
-
-    expect(result).toEqual([{ itemId: 'wergen-stick', quantity: 10 }]);
-  });
-
-  it('rolls an equipment requirement without a progress field', () => {
-    const equipmentOffer: CommissionOfferContent = {
-      ...offer,
-      requirements: [{ equipmentId: sword.id, quantityMin: 2, quantityMax: 2 }],
-    };
-
-    expect(rollCommissionRequirements(equipmentOffer)).toEqual([
-      { equipmentId: sword.id, quantity: 2 },
-    ]);
-  });
-
-  it('rolls a monster-kill requirement starting at zero progress', () => {
-    const killOffer: CommissionOfferContent = {
-      ...offer,
+  it('rolls each requirement kind, kills starting with no progress', () => {
+    const mixed = offer({
       requirements: [
-        { monsterId: sandWorm.id, quantityMin: 5, quantityMax: 5 },
+        { itemId: stick.id, quantityMin: 10, quantityMax: 10 },
+        { equipmentId: sword.id, quantityMin: 2, quantityMax: 2 },
+        { monsterId: worm.id, quantityMin: 5, quantityMax: 5 },
       ],
-    };
+    });
 
-    expect(rollCommissionRequirements(killOffer)).toEqual([
-      { monsterId: sandWorm.id, quantity: 5, progress: 0 },
+    expect(rollCommissionRequirements(mixed)).toEqual([
+      { itemId: stick.id, quantity: 10 },
+      { equipmentId: sword.id, quantity: 2 },
+      { monsterId: worm.id, quantity: 5, progress: 0 },
     ]);
   });
 
-  it('ignores reputationTierMultipliers when no townId is given', () => {
-    const scaledOffer: CommissionOfferContent = {
-      ...offer,
-      reputationTierMultipliers: [{ tier: 0, value: 5 }],
-    };
+  it('rolls within the authored range', () => {
+    const ranged = offer({
+      requirements: [{ itemId: stick.id, quantityMin: 10, quantityMax: 20 }],
+    });
 
-    expect(rollCommissionRequirements(scaledOffer)).toEqual([
-      { itemId: 'wergen-stick', quantity: 10 },
-    ]);
-    expect(townReputationTierValueResolve).not.toHaveBeenCalled();
+    for (let i = 0; i < 50; i++) {
+      const [{ quantity }] = rollCommissionRequirements(ranged);
+      expect(quantity).toBeGreaterThanOrEqual(10);
+      expect(quantity).toBeLessThanOrEqual(20);
+    }
   });
 
-  it('scales the rolled quantity by the town reputation tier multiplier', () => {
-    const townId = 'larsia' as TownId;
-    const scaledOffer: CommissionOfferContent = {
-      ...offer,
+  it('scales by the town’s reputation tier, only for a town commission', () => {
+    const scaled = offer({
       reputationTierMultipliers: [
         { tier: 0, value: 1 },
         { tier: 2, value: 15 },
       ],
-    };
-    vi.mocked(townReputationTierValueResolve).mockReturnValue(15);
+    });
+    seedOwned(0, 0, 2);
 
-    expect(rollCommissionRequirements(scaledOffer, townId)).toEqual([
-      { itemId: 'wergen-stick', quantity: 150 },
+    expect(rollCommissionRequirements(scaled, townId)).toEqual([
+      { itemId: stick.id, quantity: 150 },
     ]);
-    expect(townReputationTierValueResolve).toHaveBeenCalledWith(
-      townId,
-      scaledOffer.reputationTierMultipliers,
-      undefined,
-    );
+    expect(rollCommissionRequirements(scaled)).toEqual([
+      { itemId: stick.id, quantity: 10 },
+    ]);
   });
 });
 
 describe('commissionOfferReputationReward', () => {
-  it('returns the base reward when no tier multipliers are authored', () => {
-    const rewardOffer: CommissionOfferContent = {
-      ...offer,
-      townReputationReward: 10,
-    };
-
-    expect(
-      commissionOfferReputationReward(rewardOffer, 'larsia' as TownId),
-    ).toBe(10);
-  });
-
-  it('scales the reward by the resolved tier multiplier', () => {
-    const rewardOffer: CommissionOfferContent = {
-      ...offer,
+  it('scales the reward by tier, falling back to the base reward at an unscaled tier', () => {
+    const scaled = offer({
       townReputationReward: 10,
       reputationTierMultipliers: [{ tier: 1, value: 5 }],
-    };
-    vi.mocked(townReputationTierValueResolve).mockReturnValue(5);
+    });
+
+    seedOwned(0, 0, 1);
+    expect(commissionOfferReputationReward(scaled, townId)).toBe(50);
+
+    const commitState = defaultGameState();
+    commitState.world.towns[townId] = buildTownNodeState({
+      reputation: TOWN_REPUTATION_THRESHOLDS[0],
+    });
+    expect(commissionOfferReputationReward(scaled, townId, commitState)).toBe(
+      10,
+    );
+
+    seedOwned(0, 0, 0);
+    expect(commissionOfferReputationReward(scaled, townId)).toBe(10);
+    expect(
+      commissionOfferReputationReward(
+        offer({ townReputationReward: 10 }),
+        townId,
+      ),
+    ).toBe(10);
+  });
+});
+
+describe('owning what a commission asks for', () => {
+  it('counts stock, armory pieces and kill progress against each requirement', () => {
+    seedOwned(40, 2);
+
+    expect(commissionRequirementOwnedQuantity(sticks)).toBe(40);
+    expect(commissionRequirementOwnedQuantity(swords)).toBe(2);
+    expect(commissionRequirementOwnedQuantity(kills(3))).toBe(3);
+  });
+
+  it('reads an explicit commit-time state over the live one', () => {
+    seedOwned(0);
+    const commitState: GameState = defaultGameState();
+    applyMaterialDelta(commitState, stick.id, 12);
+    commitState.armory = [buildEquipmentItem(sword.id)];
+
+    expect(commissionRequirementOwnedQuantity(sticks, commitState)).toBe(12);
+    expect(commissionRequirementOwnedQuantity(swords, commitState)).toBe(1);
+    expect(commissionRequirementsSatisfied([swords], commitState)).toBe(true);
+    expect(commissionRequirementsSatisfied([swords])).toBe(false);
+  });
+
+  it('is satisfied only when every requirement is fully met', () => {
+    seedOwned(100, 1);
+    expect(commissionRequirementsSatisfied([sticks, swords, kills(5)])).toBe(
+      true,
+    );
+
+    seedOwned(99, 1);
+    expect(commissionRequirementsSatisfied([sticks, swords])).toBe(false);
+    expect(commissionRequirementsSatisfied([kills(4)])).toBe(false);
+  });
+
+  it('lists each requirement with its content, sprite sheet and what is owned', () => {
+    seedOwned(40, 1);
 
     expect(
-      commissionOfferReputationReward(rewardOffer, 'larsia' as TownId),
-    ).toBe(50);
-  });
-});
-
-describe('commissionRequirementOwnedQuantity', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('reads live armory count for an equipment requirement with no state given', () => {
-    vi.mocked(armoryGet).mockReturnValue([
-      { equipmentId: sword.id, id: 'a', infusedItemIds: [] },
-    ] as never);
-    const requirement: CommissionRequirement = {
-      equipmentId: sword.id,
-      quantity: 1,
-    };
-
-    expect(commissionRequirementOwnedQuantity(requirement)).toBe(1);
-  });
-
-  it('reads an explicit commit-time state for an equipment requirement', () => {
-    const state = {
-      armory: [{ equipmentId: sword.id, id: 'a', infusedItemIds: [] }],
-    } as unknown as GameState;
-    const requirement: CommissionRequirement = {
-      equipmentId: sword.id,
-      quantity: 1,
-    };
-
-    expect(commissionRequirementOwnedQuantity(requirement, state)).toBe(1);
-  });
-
-  it('returns a kill requirement progress directly, ignoring state entirely', () => {
-    const requirement: CommissionRequirement = {
-      monsterId: sandWorm.id,
-      quantity: 5,
-      progress: 3,
-    };
-
-    expect(commissionRequirementOwnedQuantity(requirement)).toBe(3);
-  });
-
-  it('reads live material quantity for an item requirement with no state given', () => {
-    vi.mocked(getMaterialQuantity).mockReturnValue(40);
-    const requirement: CommissionRequirement = {
-      itemId: wergenStick.id,
-      quantity: 100,
-    };
-
-    expect(commissionRequirementOwnedQuantity(requirement)).toBe(40);
-  });
-
-  it('reads an explicit commit-time state for an item requirement', () => {
-    const state = {
-      materials: { [wergenStick.id]: { quantity: 12, foundAt: 1 } },
-    } as unknown as GameState;
-    const requirement: CommissionRequirement = {
-      itemId: wergenStick.id,
-      quantity: 100,
-    };
-
-    expect(commissionRequirementOwnedQuantity(requirement, state)).toBe(12);
-  });
-});
-
-describe('commissionRequirementsSatisfied', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('is true when every requirement meets its quantity', () => {
-    vi.mocked(getMaterialQuantity).mockReturnValue(100);
-    const requirements: CommissionRequirement[] = [
-      { itemId: wergenStick.id, quantity: 100 },
-    ];
-
-    expect(commissionRequirementsSatisfied(requirements)).toBe(true);
-  });
-
-  it('is false when any requirement is short', () => {
-    vi.mocked(getMaterialQuantity).mockReturnValue(50);
-    const requirements: CommissionRequirement[] = [
-      { itemId: wergenStick.id, quantity: 100 },
-    ];
-
-    expect(commissionRequirementsSatisfied(requirements)).toBe(false);
-  });
-});
-
-describe('buildCommissionRequirementEntries', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('resolves an item requirement entry', () => {
-    vi.mocked(getEntry).mockReturnValue(wergenStick);
-    vi.mocked(getMaterialQuantity).mockReturnValue(40);
-    const requirements: CommissionRequirement[] = [
-      { itemId: wergenStick.id, quantity: 100 },
-    ];
-
-    expect(buildCommissionRequirementEntries(requirements)).toEqual([
+      buildCommissionRequirementEntries([sticks, swords, kills(2)]),
+    ).toEqual([
       {
         kind: 'item',
-        content: wergenStick,
+        content: stick,
         spritesheet: 'item',
         quantity: 100,
         owned: 40,
       },
-    ]);
-  });
-
-  it('resolves an equipment requirement entry', () => {
-    vi.mocked(getEntry).mockReturnValue(sword);
-    vi.mocked(armoryGet).mockReturnValue([
-      { equipmentId: sword.id, id: 'a', infusedItemIds: [] },
-    ] as never);
-    const requirements: CommissionRequirement[] = [
-      { equipmentId: sword.id, quantity: 1 },
-    ];
-
-    expect(buildCommissionRequirementEntries(requirements)).toEqual([
       {
         kind: 'equipment',
         content: sword,
@@ -334,19 +210,9 @@ describe('buildCommissionRequirementEntries', () => {
         quantity: 1,
         owned: 1,
       },
-    ]);
-  });
-
-  it('resolves a monster-kill requirement entry', () => {
-    vi.mocked(getEntry).mockReturnValue(sandWorm);
-    const requirements: CommissionRequirement[] = [
-      { monsterId: sandWorm.id, quantity: 5, progress: 2 },
-    ];
-
-    expect(buildCommissionRequirementEntries(requirements)).toEqual([
       {
         kind: 'monster',
-        content: sandWorm,
+        content: worm,
         spritesheet: 'monster',
         quantity: 5,
         owned: 2,

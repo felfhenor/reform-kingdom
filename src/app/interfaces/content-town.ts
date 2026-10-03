@@ -162,3 +162,59 @@ export type TownContent = IsContentItem &
     reputation: TownReputationConfig;
     defense: TownDefenseConfig;
   };
+
+// Raw town content as loaded: any nested field may be missing and falls back to its default.
+export type TownContentInput = Partial<
+  Omit<
+    TownContent,
+    | 'materialThresholds'
+    | 'crafting'
+    | 'traders'
+    | 'gathering'
+    | 'reputation'
+    | 'defense'
+  >
+> & {
+  materialThresholds?: Partial<TownMaterialThreshold>[];
+  crafting?: Partial<
+    Omit<TownCraftingConfig, 'maxQueueSize' | 'tradeskillLevels'>
+  > & {
+    maxQueueSize?: Partial<TownReputationTierValue>[];
+    tradeskillLevels?: Partial<TownTradeskillLevelSeed>[];
+  };
+  traders?: Partial<Omit<TownTradersConfig, 'sellItemCount'>> & {
+    sellItemCount?: Partial<TownReputationTierValue>[];
+  };
+  gathering?: Partial<Omit<TownGatheringConfig, 'workers'>> & {
+    workers?: Partial<TownGatheringWorker>[];
+  };
+  reputation?: {
+    buff?: Partial<Omit<TownReputationBuffConfig, 'tiers'>> & {
+      tiers?: (Partial<
+        Omit<
+          TownReputationBuffTier,
+          'stats' | 'combatStats' | 'debuffResistances'
+        >
+      > & {
+        stats?: Partial<StatBlock>;
+        combatStats?: Partial<CombatStatBlock>;
+        debuffResistances?: Partial<StatusEffectBlock>;
+      })[];
+    };
+  };
+  defense?: {
+    rewards?: Partial<DroppedReward>[];
+    guardian?: {
+      reputationTiers?: (Partial<
+        Omit<TownDefenseGuardianReputationTier, 'guardians'>
+      > & {
+        guardians?: Partial<TownDefenseGuardianEntry>[];
+      })[];
+    };
+    assaulter?: Partial<TownDefenseAssaulterConfig>;
+    quests?: { commissions?: Partial<CommissionOfferSlot>[] };
+    buyoff?: Partial<Omit<TownDefenseBuyoffConfig, 'fortifyMaterials'>> & {
+      fortifyMaterials?: Partial<TownDefenseFortifyMaterial>[];
+    };
+  };
+};

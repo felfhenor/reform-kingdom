@@ -38,10 +38,10 @@ describe('initial town crafts (unmocked)', () => {
       id: townId,
       crafting: {
         maxQueueSize: [{ tier: 0, value: 12 }],
-      } as TownContent['crafting'],
+      },
       traders: {
         sellItemCount: [{ tier: 0, value: 10 }],
-      } as TownContent['traders'],
+      },
     });
     const recipe = ensureRecipe({
       id: 'recipe-gem' as RecipeId,

@@ -6,7 +6,7 @@ vi.mock('@helpers/town/reputation/town-reputation-buff');
 vi.mock('@helpers/town/town-commission-generate');
 vi.mock('@helpers/rng', async (importOriginal) => ({
   ...(await importOriginal<typeof RngHelper>()),
-  rngNumberRange: vi.fn((_min: number, max: number) => max - 1),
+  rngNumberRange: vi.fn((_min: number, max: number) => max),
   rngShuffle: vi.fn((items: unknown[]) => items),
 }));
 
@@ -77,10 +77,10 @@ function town(sellItemCount = shopCap): TownContent {
     level: 25,
     traders: {
       sellItemCount: [{ tier: 0, value: sellItemCount }],
-    } as TownContent['traders'],
+    },
     defense: {
       rewards: [{ kind: 'Equipment', equipmentId: trophyId, chance: 100 }],
-    } as TownContent['defense'],
+    },
   });
 }
 

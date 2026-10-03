@@ -31,10 +31,8 @@ const swordId = 'sword' as EquipmentId;
 function town(crafting: Partial<TownContent['crafting']> = {}): TownContent {
   return ensureTown({
     id: townId,
-    crafting: crafting as TownContent['crafting'],
-    materialThresholds: [
-      { itemId: ingotId, maxQuantity: 50 },
-    ] as TownContent['materialThresholds'],
+    crafting: crafting,
+    materialThresholds: [{ itemId: ingotId, maxQuantity: 50 }],
   });
 }
 

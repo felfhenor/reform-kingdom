@@ -27,6 +27,7 @@ import type {
   TownCommissionSlotId,
   TownCommissionSlotState,
   TownContent,
+  TownContentInput,
   TownId,
 } from '@interfaces';
 import { buildTownNodeState } from '@/testing/builders';
@@ -54,7 +55,7 @@ const persistent = offer('offer-persistent');
 
 function town(
   commissions: Partial<CommissionOfferSlot>[],
-  overrides: Partial<TownContent> = {},
+  overrides: TownContentInput = {},
 ): TownContent {
   return ensureTown({
     id: townId,
@@ -67,7 +68,7 @@ function town(
           ...slot,
         })),
       },
-    } as TownContent['defense'],
+    },
     ...overrides,
   });
 }
@@ -206,9 +207,7 @@ describe('townCommissionProcessTick', () => {
         { commissionOfferId: capped.id },
       ],
       {
-        materialThresholds: [
-          { itemId: 'ore', maxQuantity: 10 },
-        ] as TownContent['materialThresholds'],
+        materialThresholds: [{ itemId: 'ore' as ItemId, maxQuantity: 10 }],
       },
     );
     seedContent([content, offerA, offerB, capped]);

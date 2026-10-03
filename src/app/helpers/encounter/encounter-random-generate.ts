@@ -47,7 +47,7 @@ export function generateEncounterRandomFights(
 ): EncounterRandomFight[] {
   const fightCount = rngNumberRange(
     content.encounterRange.min,
-    content.encounterRange.max + 1,
+    content.encounterRange.max,
   );
 
   return Array.from({ length: fightCount }, (_, i) =>

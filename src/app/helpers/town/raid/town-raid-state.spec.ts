@@ -13,6 +13,7 @@ import {
 import type {
   MonsterId,
   TownContent,
+  TownContentInput,
   TownId,
   TownNodeState,
 } from '@interfaces';
@@ -36,12 +37,12 @@ const telegraphed: Partial<TownNodeState> = {
 
 function town(
   id = townId,
-  defense: Partial<TownContent['defense']> = {},
+  defense: TownContentInput['defense'] = {},
 ): TownContent {
   return ensureTown({
     id,
     name: id,
-    defense: defense as TownContent['defense'],
+    defense,
   });
 }
 
@@ -185,7 +186,7 @@ describe('raidDefenderPreview', () => {
           },
           { tier: 1, guardians: [{ monsterId: guardId, quantity: 9 }] },
         ],
-      } as TownContent['defense']['guardian'],
+      },
     });
     seedTowns({ [townId]: { reputation: 0 } });
 

@@ -2,11 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
 import { ensureItem } from '@helpers/content/ensure-item';
-import {
-  ensureTown,
-  ensureTownGathering,
-  ensureTownMaterialThreshold,
-} from '@helpers/content/ensure-town';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { worldTownsState } from '@helpers/state-game';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import {
@@ -35,10 +31,8 @@ const goldCap = 50;
 const larsia: TownContent = ensureTown({
   id: 'larsia' as TownId,
   name: 'Larsia',
-  gathering: ensureTownGathering({ goldGatheredPerMaterial: 5 }),
-  materialThresholds: [
-    ensureTownMaterialThreshold({ itemId: gold.id, maxQuantity: goldCap }),
-  ],
+  gathering: { goldGatheredPerMaterial: 5 },
+  materialThresholds: [{ itemId: gold.id, maxQuantity: goldCap }],
 });
 
 const path: TravelStep[] = [1, 2].map((x) => ({

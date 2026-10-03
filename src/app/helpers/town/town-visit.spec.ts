@@ -24,6 +24,7 @@ import type {
   ItemId,
   RecipeId,
   TownContent,
+  TownContentInput,
   TownId,
   TownNodeState,
   TradeskillId,
@@ -43,7 +44,7 @@ const townId = 'larsia' as TownId;
 const oreId = 'copper-ore' as ItemId;
 
 function seedTown(
-  overrides: Partial<TownContent> = {},
+  overrides: TownContentInput = {},
   otherContent: IsContentItem[] = [],
 ): TownContent {
   const town = ensureTown({ id: townId, name: 'Larsia', ...overrides });
@@ -115,7 +116,7 @@ describe('townMarkVisited', () => {
       {
         crafting: {
           tradeskillLevels: [{ tradeskillId: blacksmithingId, level: 4 }],
-        } as TownContent['crafting'],
+        },
       },
       [ensureTradeskill({ id: blacksmithingId, name: 'Blacksmithing' })],
     );
@@ -129,10 +130,10 @@ describe('townMarkVisited', () => {
   it('seeds materials from threshold defaults, letting existing quantities win', () => {
     seedTown({
       materialThresholds: [
-        { itemId: 'gold-coin', default: 5000 },
+        { itemId: 'gold-coin' as ItemId, default: 5000 },
         { itemId: oreId, default: 30 },
-        { itemId: 'amber' },
-      ] as TownContent['materialThresholds'],
+        { itemId: 'amber' as ItemId },
+      ],
     });
     seedTownState({ materials: { [oreId]: 8 } });
 
@@ -148,7 +149,7 @@ describe('townMarkVisited', () => {
     seedTown({
       gathering: {
         workers: [{ workerId: existingId }, { workerId: newId }],
-      } as TownContent['gathering'],
+      },
     });
     seedTownState();
     const existingWorker = { ...visitedTown().workers[existingId], level: 9 };
