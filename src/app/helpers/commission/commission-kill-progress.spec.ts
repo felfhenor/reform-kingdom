@@ -1,253 +1,102 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
+import { describe, expect, it } from 'vitest';
 
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { worldCommissionsState, worldTownsState } from '@helpers/state-game';
 import type {
   CaravanId,
   CommissionOfferId,
-  CommissionRequirementMonsterKill,
-  GameState,
+  CommissionRequirement,
+  ItemId,
   MonsterId,
   TownCommissionSlotId,
   TownId,
 } from '@interfaces';
+import {
+  buildCommissionNodeState,
+  buildTownNodeState,
+} from '@/testing/builders';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const caravanId = 'carrina-duchy' as CaravanId;
 const townId = 'larsia' as TownId;
-const sandWormId = 'sand-worm' as MonsterId;
+const wormId = 'sand-worm' as MonsterId;
 const offerId = 'offer-a' as CommissionOfferId;
 
-function withState(
-  commissions: Record<string, unknown>,
-  towns: Record<string, unknown> = {},
+const worms = (progress: number, monsterId = wormId) => ({
+  monsterId,
+  quantity: 5,
+  progress,
+});
+
+function seedCommissions(
+  caravan: CommissionRequirement[],
+  town: CommissionRequirement[] = [],
+  completed = false,
 ): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: { commissions, towns },
-  } as unknown as GameState);
+  seedGamestate((state) => {
+    state.world.commissions[caravanId] = buildCommissionNodeState({
+      commissionOfferId: offerId,
+      requirements: caravan,
+      completed,
+    });
+    state.world.towns[townId] = buildTownNodeState({
+      commissionSlots: [
+        {
+          id: 'slot-1' as TownCommissionSlotId,
+          commissionOfferId: offerId,
+          requirements: town,
+          generatedAtTick: 0,
+        },
+      ],
+    });
+  });
 }
 
-function updateFnAt(index: number): (state: GameState) => GameState {
-  return vi.mocked(updateGamestate).mock.calls[index][0];
+const kill = (count?: number) =>
+  inTick(() => commissionRecordMonsterKill(wormId, count));
+
+function caravanRequirements(): CommissionRequirement[] {
+  return worldCommissionsState()[caravanId].requirements;
+}
+
+function townRequirements(): CommissionRequirement[] {
+  return worldTownsState()[townId].commissionSlots[0].requirements;
 }
 
 describe('commissionRecordMonsterKill', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('does nothing when no commission has a kill requirement for this monster', () => {
-    withState({
-      [caravanId]: {
-        commissionOfferId: offerId,
-        requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
-        completed: false,
-        generatedAt: 1000,
-      },
-    });
-
-    commissionRecordMonsterKill(sandWormId);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('does nothing when the matching kill requirement is already fully satisfied', () => {
-    withState({
-      [caravanId]: {
-        commissionOfferId: offerId,
-        requirements: [{ monsterId: sandWormId, quantity: 5, progress: 5 }],
-        completed: false,
-        generatedAt: 1000,
-      },
-    });
-
-    commissionRecordMonsterKill(sandWormId);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('does nothing when the matching commission is already completed', () => {
-    withState({
-      [caravanId]: {
-        commissionOfferId: offerId,
-        requirements: [{ monsterId: sandWormId, quantity: 5, progress: 1 }],
-        completed: true,
-        generatedAt: 1000,
-      },
-    });
-
-    commissionRecordMonsterKill(sandWormId);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('increments progress on a matching, unsatisfied kill requirement', () => {
-    withState({
-      [caravanId]: {
-        commissionOfferId: offerId,
-        requirements: [{ monsterId: sandWormId, quantity: 5, progress: 1 }],
-        completed: false,
-        generatedAt: 1000,
-      },
-    });
-
-    commissionRecordMonsterKill(sandWormId);
-
-    const updateFn = updateFnAt(0);
-    const state = {
-      world: {
-        commissions: {
-          [caravanId]: {
-            commissionOfferId: offerId,
-            requirements: [{ monsterId: sandWormId, quantity: 5, progress: 1 }],
-            completed: false,
-            generatedAt: 1000,
-          },
-        },
-        towns: {},
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(result.world.commissions[caravanId].requirements[0]).toEqual({
-      monsterId: sandWormId,
-      quantity: 5,
-      progress: 2,
-    });
-  });
-
-  it('caps progress at the requirement quantity instead of overflowing', () => {
-    withState({
-      [caravanId]: {
-        commissionOfferId: offerId,
-        requirements: [{ monsterId: sandWormId, quantity: 5, progress: 4 }],
-        completed: false,
-        generatedAt: 1000,
-      },
-    });
-
-    commissionRecordMonsterKill(sandWormId, 10);
-
-    const updateFn = updateFnAt(0);
-    const state = {
-      world: {
-        commissions: {
-          [caravanId]: {
-            commissionOfferId: offerId,
-            requirements: [{ monsterId: sandWormId, quantity: 5, progress: 4 }],
-            completed: false,
-            generatedAt: 1000,
-          },
-        },
-        towns: {},
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(
-      (
-        result.world.commissions[caravanId]
-          .requirements[0] as CommissionRequirementMonsterKill
-      ).progress,
-    ).toBe(5);
-  });
-
-  it('ignores a requirement for a different monster', () => {
-    withState({
-      [caravanId]: {
-        commissionOfferId: offerId,
-        requirements: [
-          { monsterId: 'other-monster' as MonsterId, quantity: 5, progress: 1 },
-        ],
-        completed: false,
-        generatedAt: 1000,
-      },
-    });
-
-    commissionRecordMonsterKill(sandWormId);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('increments progress on a matching town commission slot', () => {
-    const slotId = 'slot-1' as TownCommissionSlotId;
-    withState(
-      {},
-      {
-        [townId]: {
-          commissionSlots: [
-            {
-              id: slotId,
-              commissionOfferId: offerId,
-              requirements: [
-                { monsterId: sandWormId, quantity: 5, progress: 1 },
-              ],
-              generatedAtTick: 0,
-            },
-          ],
-        },
-      },
+  it('counts the kill toward every open caravan and town commission for that monster', () => {
+    const sticks = { itemId: 'stick' as ItemId, quantity: 100 };
+    seedCommissions(
+      [worms(1), sticks, worms(1, 'bat' as MonsterId)],
+      [worms(3)],
     );
 
-    commissionRecordMonsterKill(sandWormId);
+    kill();
 
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = updateFnAt(0);
-    const state = {
-      world: {
-        commissions: {},
-        towns: {
-          [townId]: {
-            commissionSlots: [
-              {
-                id: slotId,
-                commissionOfferId: offerId,
-                requirements: [
-                  { monsterId: sandWormId, quantity: 5, progress: 1 },
-                ],
-                generatedAtTick: 0,
-              },
-            ],
-          },
-        },
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(
-      result.world.towns[townId].commissionSlots[0].requirements[0],
-    ).toEqual({ monsterId: sandWormId, quantity: 5, progress: 2 });
+    expect(caravanRequirements()).toEqual([
+      worms(2),
+      sticks,
+      worms(1, 'bat' as MonsterId),
+    ]);
+    expect(townRequirements()).toEqual([worms(4)]);
   });
 
-  it('does nothing when no town slot has a matching unsatisfied kill requirement', () => {
-    withState(
-      {},
-      {
-        [townId]: {
-          commissionSlots: [
-            {
-              id: 'slot-1' as TownCommissionSlotId,
-              commissionOfferId: offerId,
-              requirements: [
-                { monsterId: sandWormId, quantity: 5, progress: 5 },
-              ],
-              generatedAtTick: 0,
-            },
-          ],
-        },
-      },
-    );
+  it('adds the whole count, never past the required quantity', () => {
+    seedCommissions([worms(1)]);
 
-    commissionRecordMonsterKill(sandWormId);
+    kill(3);
+    expect(caravanRequirements()).toEqual([worms(4)]);
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    kill(10);
+    expect(caravanRequirements()).toEqual([worms(5)]);
+  });
+
+  it('leaves a completed caravan commission alone', () => {
+    seedCommissions([worms(1)], [worms(1)], true);
+
+    kill();
+
+    expect(caravanRequirements()).toEqual([worms(1)]);
+    expect(townRequirements()).toEqual([worms(2)]);
   });
 });

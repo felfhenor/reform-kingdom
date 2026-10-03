@@ -1,178 +1,169 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
+vi.mock('@helpers/worker/worker-travel');
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  categoryMessageLog: vi.fn(),
-  ITEM_ICON_TOKEN: '@@icon@@',
-  itemDropHtml: vi.fn(
-    (item: { name: string }, quantity: number) => `${quantity} ${item.name}`,
-  ),
-}));
-
-vi.mock('@helpers/hero/travel-cost', () => ({
-  travelStepTicksCost: vi.fn(() => 1),
-  travelPathTotalTicks: vi.fn(() => 1),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  addMaterial: vi.fn(),
-}));
-
-vi.mock('@helpers/worker/worker-travel', () => ({
-  workerAssignmentIsValid: vi.fn(() => true),
-  workerBeginOutboundTrip: vi.fn(),
-}));
-
-import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content/content';
+import { combatLog } from '@helpers/combat/combat-log';
+import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureWorker } from '@helpers/content/ensure-worker';
-import { addMaterial } from '@helpers/item/materials';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { getMaterialQuantity } from '@helpers/item/materials';
+import { workersState } from '@helpers/state-game';
+import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import {
   workerAssignmentIsValid,
   workerBeginOutboundTrip,
 } from '@helpers/worker/worker-travel';
 import { workerTravelProcessTick } from '@helpers/worker/worker-travel-tick';
 import type {
-  GameState,
-  ItemContent,
   ItemId,
-  WorkerContent,
+  TravelStep,
   WorkerId,
   WorkerState,
+  WorkerStatus,
 } from '@interfaces';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedContent } from '@/testing/content';
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+const nell = ensureWorker({
+  id: 'weaver-nell' as WorkerId,
+  name: 'Weaver Nell',
+});
+const copper = ensureItem({
+  id: 'copper-ore' as ItemId,
+  name: 'Copper Ore',
+  sprite: 'copper-sprite',
+});
+const assignment = { nodeName: 'Wergen Woods', itemId: copper.id };
+
+const path: TravelStep[] = [1, 2, 3].map((x) => ({
+  kind: 'Move',
+  mapName: 'TestMap',
+  x,
+  y: 0,
+}));
+
+function seedTraveler(
+  status: WorkerStatus,
+  overrides: Partial<WorkerState> = {},
+): void {
+  seedGamestate((state) => {
+    state.workers[nell.id] = {
+      ...defaultWorkerState(),
+      location: { mapName: 'TestMap', x: 0, y: 0 },
+      status,
+      ...overrides,
+    };
+  });
 }
 
-const WORKER_ID = 'weaver-nell' as WorkerId;
-const COPPER_ID = 'copper-ore' as ItemId;
+function worker(): WorkerState {
+  return workersState()[nell.id];
+}
 
-const workerContent: WorkerContent = ensureWorker({
-  id: WORKER_ID,
-  name: 'Weaver Nell',
-  description: 'test',
-  sprite: '0000',
-  frames: 4,
-  baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
-  statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
-  canUseTeleports: true,
+const tick = () => inTick(() => workerTravelProcessTick(nell.id));
+
+function travelUntilArrived(): void {
+  for (let i = 0; worker().status.kind.startsWith('Traveling'); i++) {
+    if (i >= 1000) throw new Error('never arrived');
+    tick();
+  }
+}
+
+type ReturningStatus = Extract<WorkerStatus, { kind: 'TravelingBack' }>;
+
+const returning = (
+  carried: Partial<ReturningStatus> = {},
+): ReturningStatus => ({
+  kind: 'TravelingBack',
+  path,
+  ticksIntoStep: 0,
+  carriedItemId: copper.id,
+  carriedQuantity: 5,
+  ...carried,
 });
 
-const copperContent = {
-  id: COPPER_ID,
-  name: 'Copper Ore',
-  sprite: 'copper-ore-sprite',
-} as ItemContent;
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(workerAssignmentIsValid).mockReturnValue(true);
+  seedContent([nell, copper]);
+});
 
-function buildReturningWorker(
-  overrides: Partial<WorkerState> = {},
-): WorkerState {
-  return {
-    level: 1,
-    xp: { current: 0, maximum: 10 },
-    location: { mapName: 'Carrina', x: 0, y: 0 },
-    status: {
-      kind: 'TravelingBack',
-      path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
+describe('workerTravelProcessTick', () => {
+  it('walks the path step by step, then starts gathering on arrival', () => {
+    seedTraveler({
+      kind: 'TravelingTo',
+      ...assignment,
+      path,
       ticksIntoStep: 0,
-      carriedItemId: COPPER_ID,
-      carriedQuantity: 5,
-    },
-    assignment: null,
-    ...overrides,
-  };
-}
+    });
 
-describe('workerTravelProcessTick - TravelingBack arrival', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(getEntry).mockImplementation((id: unknown) => {
-      if (id === WORKER_ID) return workerContent as never;
-      if (id === COPPER_ID) return copperContent as never;
-      return undefined;
+    tick();
+    expect(worker().status.kind).toBe('TravelingTo');
+
+    travelUntilArrived();
+
+    expect(worker().location).toEqual({ mapName: 'TestMap', x: 3, y: 0 });
+    expect(worker().status).toEqual({
+      kind: 'Gathering',
+      ...assignment,
+      itemsGathered: 0,
+      ticksIntoGather: 0,
     });
   });
 
-  it('grants the carried material and logs a return message on arrival', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildReturningWorker() },
-    } as unknown as GameState);
+  it('drops off its haul at the Duchy, logging the return', () => {
+    seedTraveler(returning());
 
-    workerTravelProcessTick(WORKER_ID);
+    travelUntilArrived();
 
-    expect(addMaterial).toHaveBeenCalledWith(COPPER_ID, 5);
-    expect(itemDropHtml).toHaveBeenCalledWith(copperContent, 5);
-    expect(categoryMessageLog).toHaveBeenCalledWith(
-      'Gather',
-      'Worker Resources',
-      expect.stringContaining('@@icon@@'),
-      { sprite: 'copper-ore-sprite', spritesheet: 'item' },
-    );
-
-    const result = applyLastUpdate({
-      workers: { [WORKER_ID]: buildReturningWorker() },
-    } as unknown as GameState);
-    expect(result.workers[WORKER_ID].status).toEqual({ kind: 'AtDuchy' });
+    expect(worker().status).toEqual({ kind: 'AtDuchy' });
+    expect(getMaterialQuantity(copper.id)).toBe(5);
+    expect(combatLog()).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining('Weaver Nell returned'),
+        itemIcons: [{ sprite: copper.sprite, spritesheet: 'item' }],
+      }),
+    ]);
+    expect(workerBeginOutboundTrip).not.toHaveBeenCalled();
   });
 
-  it('still grants the material but skips the log when the worker/item content no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    vi.mocked(gamestate).mockReturnValue({
-      workers: { [WORKER_ID]: buildReturningWorker() },
-    } as unknown as GameState);
+  it('still drops off a haul whose item left content, without a log line', () => {
+    seedTraveler(returning());
+    seedContent([nell]);
 
-    workerTravelProcessTick(WORKER_ID);
+    travelUntilArrived();
 
-    expect(addMaterial).toHaveBeenCalledWith(COPPER_ID, 5);
+    expect(getMaterialQuantity(copper.id)).toBe(5);
+    expect(combatLog()).toEqual([]);
   });
 
-  it('does not log or grant materials when nothing was carried', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildReturningWorker({
-          status: {
-            kind: 'TravelingBack',
-            path: [{ kind: 'Move', mapName: 'Carrina', x: 1, y: 0 }],
-            ticksIntoStep: 0,
-            carriedItemId: undefined,
-            carriedQuantity: 0,
-          },
-        }),
-      },
-    } as unknown as GameState);
+  it('returns quietly with nothing carried', () => {
+    [
+      returning({ carriedItemId: undefined, carriedQuantity: 0 }),
+      returning({ carriedQuantity: 0 }),
+    ].forEach((status) => {
+      seedTraveler(status);
+      travelUntilArrived();
+    });
 
-    workerTravelProcessTick(WORKER_ID);
-
-    expect(addMaterial).not.toHaveBeenCalled();
+    expect(combatLog()).toEqual([]);
   });
 
-  it('redeploys on a still-valid pending assignment instead of logging a fresh trip', () => {
-    const assignment = { nodeName: 'Wergen Woods', itemId: COPPER_ID };
-    vi.mocked(gamestate).mockReturnValue({
-      workers: {
-        [WORKER_ID]: buildReturningWorker({ assignment }),
-      },
-    } as unknown as GameState);
-
-    workerTravelProcessTick(WORKER_ID);
-
+  it('heads straight back out on a still-valid assignment, else drops it', () => {
+    seedTraveler(returning(), { assignment, level: 7 });
+    travelUntilArrived();
     expect(workerAssignmentIsValid).toHaveBeenCalledWith(
-      WORKER_ID,
-      1,
+      nell.id,
+      7,
       assignment,
     );
-    expect(workerBeginOutboundTrip).toHaveBeenCalledWith(WORKER_ID, assignment);
+    expect(workerBeginOutboundTrip).toHaveBeenCalledWith(nell.id, assignment);
+    expect(worker().assignment).toEqual(assignment);
+
+    vi.clearAllMocks();
+    vi.mocked(workerAssignmentIsValid).mockReturnValue(false);
+    seedTraveler(returning(), { assignment });
+    travelUntilArrived();
+    expect(workerBeginOutboundTrip).not.toHaveBeenCalled();
+    expect(worker().assignment).toBeNull();
   });
 });

@@ -1,31 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/commission/commission-reset', () => ({
-  mostRecentCommissionResetAt: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/rng', () => ({
-  rngChoiceWeighted: vi.fn(),
-  rngNumberRange: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldCommissionsState: () => gamestate().world.commissions,
-  };
-});
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeCaravan: vi.fn(),
-  worldNodesOfType: vi.fn(),
-}));
+import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { mostRecentCommissionResetAt } from '@helpers/commission/commission-reset';
 import {
@@ -33,291 +6,156 @@ import {
   commissionProcessTick,
   pruneInvalidCommissions,
 } from '@helpers/commission/commission-tick';
-import { getEntry } from '@helpers/content/content';
-import { rngChoiceWeighted, rngNumberRange } from '@helpers/rng';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import {
-  worldNodeCaravan,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
+import { worldCommissionsState } from '@helpers/state-game';
 import type {
   CaravanContent,
   CaravanId,
-  CommissionOfferContent,
+  CommissionNodeState,
   CommissionOfferId,
-  GameState,
-  GameStateCommissions,
   ItemId,
-  MonsterId,
-  RecipeId,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCommissionNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-const entry = { nodeName: 'Duchy Trading Caravan - Carrina' } as WorldNodeEntry;
-const caravan: CaravanContent = {
-  id: 'carrina-duchy' as CaravanId,
-  name: 'Duchy Trading Caravan - Carrina',
-  __type: 'caravan',
-  description: 'A caravan.',
-  traderResetTime: 100,
-  level: { min: 1, max: 10 },
-  markupPercentages: { sell: 25, buy: -15 },
-  traderCategories: ['Carrina'],
-  commissionOffers: [
-    { commissionOfferId: 'offer-a' as CommissionOfferId, weight: 1 },
-  ],
-};
+const now = Date.UTC(2026, 9, 2, 18);
+const resetAt = mostRecentCommissionResetAt(now);
 
-const offer: CommissionOfferContent = {
+const offer = ensureCommissionOffer({
   id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Bundle of Wergen Sticks',
-  __type: 'commissionoffer',
-  description: 'A commission.',
+  name: 'Bundle of Wergen Sticks',
   requirements: [
     { itemId: 'wergen-stick' as ItemId, quantityMin: 100, quantityMax: 100 },
   ],
-  rewards: [],
-  townReputationReward: 0,
-  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
-  reputationTierMultipliers: [],
-};
-
-function withCommissionState(commissions: Record<string, unknown>): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: { commissions },
-  } as unknown as GameState);
-}
-
-function updateFnAt(index: number): (state: GameState) => GameState {
-  return vi.mocked(updateGamestate).mock.calls[index][0];
-}
-
-describe('commissionProcessTick', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldNodesOfType).mockReturnValue([entry]);
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-    vi.mocked(mostRecentCommissionResetAt).mockReturnValue(5000);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('does not regenerate when the current commission was generated after the boundary', () => {
-    withCommissionState({
-      [caravan.id]: {
-        generatedAt: 6000,
-        commissionOfferId: offer.id,
-        completed: false,
-      },
-    });
-
-    commissionProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('regenerates on the first tick when no state exists yet', () => {
-    withCommissionState({});
-    vi.mocked(getEntry).mockReturnValue(offer);
-    vi.mocked(rngChoiceWeighted).mockReturnValue({ offer, weight: 1 });
-    vi.mocked(rngNumberRange).mockReturnValue(100);
-    vi.spyOn(Date, 'now').mockReturnValue(9000);
-
-    commissionProcessTick();
-
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { commissions: {} },
-    } as unknown as GameState);
-
-    expect(result.world.commissions[caravan.id]).toEqual({
-      commissionOfferId: offer.id,
-      requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
-      completed: false,
-      generatedAt: 9000,
-    });
-  });
-
-  it('regenerates once the last commission is older than the reset boundary', () => {
-    withCommissionState({
-      [caravan.id]: {
-        generatedAt: 4000,
-        commissionOfferId: offer.id,
-        completed: true,
-      },
-    });
-    vi.mocked(getEntry).mockReturnValue(offer);
-    vi.mocked(rngChoiceWeighted).mockReturnValue({ offer, weight: 1 });
-    vi.mocked(rngNumberRange).mockReturnValue(100);
-
-    commissionProcessTick();
-
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
-  });
-
-  it('leaves state untouched when no offer is eligible, so it retries next tick', () => {
-    withCommissionState({});
-    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
-
-    commissionProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('rolls a monster-kill requirement starting at zero progress', () => {
-    const killOffer: CommissionOfferContent = {
-      ...offer,
-      requirements: [
-        {
-          monsterId: 'sand-worm' as MonsterId,
-          quantityMin: 5,
-          quantityMax: 5,
-        },
-      ],
-    };
-    withCommissionState({});
-    vi.mocked(getEntry).mockReturnValue(killOffer);
-    vi.mocked(rngChoiceWeighted).mockReturnValue({
-      offer: killOffer,
-      weight: 1,
-    });
-    vi.mocked(rngNumberRange).mockReturnValue(5);
-    vi.spyOn(Date, 'now').mockReturnValue(9000);
-
-    commissionProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { commissions: {} },
-    } as unknown as GameState);
-
-    expect(result.world.commissions[caravan.id].requirements).toEqual([
-      { monsterId: 'sand-worm', quantity: 5, progress: 0 },
-    ]);
-  });
 });
 
-describe('pruneInvalidCommissions', () => {
-  // Resolves by id so caravan-key and commissionOfferId validation can be asserted independently.
-  function mockContentLookup(...content: { id: string }[]): void {
-    vi.mocked(getEntry).mockImplementation(
-      (id: string) => content.find((c) => c.id === id) as never,
-    );
-  }
+function caravan(offers = [offer]): CaravanContent {
+  return ensureCaravan({
+    id: 'carrina-duchy' as CaravanId,
+    name: 'Duchy Trading Caravan - Carrina',
+    commissionOffers: offers.map((o) => ({
+      commissionOfferId: o.id,
+      weight: 1,
+    })),
+  });
+}
 
-  it('keeps a commission whose caravan key and commissionOfferId both resolve to real content', () => {
-    mockContentLookup(caravan, offer);
-    const commissions: GameStateCommissions = {
-      [caravan.id]: {
-        commissionOfferId: offer.id,
-        requirements: [],
-        completed: false,
-        generatedAt: 1000,
-      },
-    };
+const freshCommission = {
+  commissionOfferId: offer.id,
+  requirements: [{ itemId: 'wergen-stick' as ItemId, quantity: 100 }],
+  completed: false,
+  generatedAt: now,
+};
 
-    expect(pruneInvalidCommissions(commissions)).toEqual(commissions);
+function seedCaravan(
+  content: CaravanContent,
+  existing?: Partial<CommissionNodeState>,
+): void {
+  seedContent([content, offer]);
+  seedWorldNodes([
+    { name: content.name, type: 'CaravanNode', x: 1 },
+    { name: 'Abandoned Camp', type: 'CaravanNode', x: 2 },
+  ]);
+  seedGamestate((state) => {
+    if (existing) {
+      state.world.commissions[content.id] = buildCommissionNodeState(existing);
+    }
+  });
+}
+
+function commission(): CommissionNodeState | undefined {
+  return worldCommissionsState()[caravan().id];
+}
+
+beforeEach(() => {
+  const clock = vi.spyOn(Date, 'now').mockReturnValue(now);
+  onTestFinished(() => clock.mockRestore());
+});
+
+describe('commissionProcessTick', () => {
+  const tick = () => inTick(commissionProcessTick);
+
+  it('rolls a fresh commission for a caravan that never had one', () => {
+    seedCaravan(caravan());
+
+    tick();
+
+    expect(commission()).toEqual(freshCommission);
   });
 
-  it('drops a commission whose commissionOfferId no longer resolves to real content', () => {
-    mockContentLookup(caravan);
-    const commissions: GameStateCommissions = {
-      [caravan.id]: {
-        commissionOfferId: offer.id,
-        requirements: [],
-        completed: false,
-        generatedAt: 1000,
-      },
-    };
+  it('rerolls only once the daily reset has passed since the last roll', () => {
+    const kept = { commissionOfferId: offer.id, generatedAt: resetAt };
+    seedCaravan(caravan(), kept);
+    tick();
+    expect(commission()).toMatchObject(kept);
 
-    expect(pruneInvalidCommissions(commissions)).toEqual({});
+    seedCaravan(caravan(), {
+      commissionOfferId: offer.id,
+      generatedAt: resetAt - 1,
+      completed: true,
+    });
+    tick();
+    expect(commission()).toEqual(freshCommission);
   });
 
-  it('drops a commission keyed by a caravan that no longer resolves to real content', () => {
-    mockContentLookup(offer);
-    const commissions: GameStateCommissions = {
-      [caravan.id]: {
-        commissionOfferId: offer.id,
-        requirements: [],
-        completed: false,
-        generatedAt: 1000,
-      },
-    };
+  it('writes nothing when no offer resolves, so the next tick retries', () => {
+    seedCaravan(caravan([]));
 
-    expect(pruneInvalidCommissions(commissions)).toEqual({});
-  });
+    tick();
 
-  it('keeps a commission with no commissionOfferId (never successfully generated), as long as the caravan resolves', () => {
-    mockContentLookup(caravan);
-    const commissions: GameStateCommissions = {
-      [caravan.id]: {
-        commissionOfferId: undefined,
-        requirements: [],
-        completed: false,
-        generatedAt: 1000,
-      },
-    };
-
-    expect(pruneInvalidCommissions(commissions)).toEqual(commissions);
+    expect(commission()).toBeUndefined();
   });
 });
 
 describe('commissionGenerateIfMissing', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  const generate = () =>
+    inTick(() => commissionGenerateIfMissing(caravan().id));
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
+  it('rolls a commission for a caravan without one, leaving even a stale one alone', () => {
+    seedCaravan(caravan());
+    generate();
+    expect(commission()).toEqual(freshCommission);
 
-  it('does nothing when a commission already exists, even a stale one', () => {
-    withCommissionState({
-      [caravan.id]: {
-        commissionOfferId: offer.id,
-        requirements: [],
-        completed: true,
-        generatedAt: 1,
-      },
-    });
-
-    commissionGenerateIfMissing(caravan.id);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('does nothing when the caravan id no longer resolves to real content', () => {
-    withCommissionState({});
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    commissionGenerateIfMissing(caravan.id);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('generates immediately when no commission exists yet for the caravan', () => {
-    withCommissionState({});
-    vi.mocked(getEntry).mockReturnValue(caravan);
-    vi.mocked(rngChoiceWeighted).mockReturnValue({ offer, weight: 1 });
-    vi.mocked(rngNumberRange).mockReturnValue(100);
-    vi.spyOn(Date, 'now').mockReturnValue(9000);
-
-    commissionGenerateIfMissing(caravan.id);
-
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { commissions: {} },
-    } as unknown as GameState);
-
-    expect(result.world.commissions[caravan.id]).toEqual({
+    const stale = {
       commissionOfferId: offer.id,
-      requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
-      completed: false,
-      generatedAt: 9000,
+      generatedAt: 1,
+      completed: true,
+    };
+    seedCaravan(caravan(), stale);
+    generate();
+    expect(commission()).toMatchObject(stale);
+  });
+
+  it('does nothing for a caravan no longer in content', () => {
+    seedGamestate();
+
+    generate();
+
+    expect(commission()).toBeUndefined();
+  });
+});
+
+describe('pruneInvalidCommissions', () => {
+  it('drops commissions whose caravan or offer left content, keeping offer-less ones', () => {
+    const content = caravan();
+    seedContent([content, offer]);
+    const valid = buildCommissionNodeState({ commissionOfferId: offer.id });
+    const unrolled = buildCommissionNodeState();
+
+    expect(
+      pruneInvalidCommissions({
+        [content.id]: valid,
+        ['removed-caravan' as CaravanId]: valid,
+      }),
+    ).toEqual({ [content.id]: valid });
+    expect(pruneInvalidCommissions({ [content.id]: unrolled })).toEqual({
+      [content.id]: unrolled,
     });
+
+    seedContent([content]);
+    expect(pruneInvalidCommissions({ [content.id]: valid })).toEqual({});
   });
 });

@@ -1,267 +1,146 @@
-import type {
-  Character,
-  CharacterId,
-  GameState,
-  GlobalEffectContent,
-  GlobalEffectId,
-  JobId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/item/gathering', () => ({
-  isGathering: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/hero/global-effects', () => ({
-  addGlobalEffect: vi.fn(),
-  isGlobalEffectActive: vi.fn(() => false),
-  removeGlobalEffect: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTravelState: () => gamestate().world.travel,
-    worldCombatState: vi.fn(() => undefined),
-  };
-});
-
-import { getEntry } from '@helpers/content/content';
-import {
-  addGlobalEffect,
-  isGlobalEffectActive,
-  removeGlobalEffect,
-} from '@helpers/hero/global-effects';
+import { RESTING_REGEN_PERCENT } from '@helpers/config';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { defaultStats } from '@helpers/defaults';
+import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { isPartyResting, restingProcessTick } from '@helpers/hero/resting';
-import { isGathering } from '@helpers/item/gathering';
-import {
-  gamestate,
-  updateGamestate,
-  worldCombatState,
-} from '@helpers/state-game';
+import { globalEffectsState, worldPartyState } from '@helpers/state-game';
+import type { Character, GameState, GlobalEffectId } from '@interfaces';
+import { buildCharacter, buildCombat } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const idleId = 'idle-1' as GlobalEffectId;
-const idleContent: GlobalEffectContent = {
-  id: idleId,
-  name: 'Idle',
-  __type: 'globaleffect',
-  description: 'Heroes are idle and resting.',
-  sprite: '0000',
-  effects: [],
-};
+const [idle, healing, deathsDoor] = ['Idle', 'Healing', 'Deaths Door'].map(
+  (name) => ensureGlobalEffect({ id: `${name}-id` as GlobalEffectId, name }),
+);
 
-function buildCharacter(overrides: Partial<Character> = {}): Character {
-  return {
-    id: 'char-1' as CharacterId,
-    name: 'Hero',
-    level: 1,
-    xp: { current: 0, maximum: 100 },
-    jobId: 'job-1' as JobId,
-    jobProgress: {},
+function hero(overrides: Partial<Character> = {}): Character {
+  return buildCharacter({
+    stats: { ...defaultStats(), Health: 100, Energy: 40 },
     hp: 50,
     ep: 20,
-    stats: { Health: 100, Energy: 40 } as Character['stats'],
-    equipment: {} as Character['equipment'],
-    traitIds: [],
     ...overrides,
-  } as Character;
+  });
 }
 
-function mockState(
+function seedParty(
   party: Character[],
-  travelStatus: 'Idle' | 'Traveling' = 'Idle',
+  edit: (state: GameState) => void = () => undefined,
 ): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: {
-      travel: { status: travelStatus, path: [], ticksIntoStep: 0 },
-      party,
-    },
-  } as unknown as GameState);
-}
-
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  return calls[calls.length - 1][0](state);
-}
-
-describe('Resting Helper Functions', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldCombatState).mockReturnValue(undefined);
-    vi.mocked(isGathering).mockReturnValue(false);
-    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-    vi.mocked(getEntry).mockReturnValue(idleContent);
+  seedGamestate((state) => {
+    state.world.party = party;
+    edit(state);
   });
+}
 
-  describe('isPartyResting', () => {
-    it('is true when idle, not gathering, not in combat, and no blocking global effect', () => {
-      mockState([]);
+function withEffect(id: GlobalEffectId) {
+  return (state: GameState) => applyGlobalEffectAdd(state, id, 100, 0);
+}
 
-      expect(isPartyResting()).toBe(true);
-    });
+const tick = () => inTick(restingProcessTick);
 
-    it('is false while traveling', () => {
-      mockState([], 'Traveling');
+function idleEffects(): number {
+  return globalEffectsState().filter(({ id }) => id === idle.id).length;
+}
 
-      expect(isPartyResting()).toBe(false);
-    });
+// The regen formula, so tests read in terms of a tick's worth of rest.
+function rested(current: number, max: number, boost = 0): number {
+  return Math.min(
+    max,
+    current +
+      Math.floor(boost) +
+      Math.max(1, Math.round(max * RESTING_REGEN_PERCENT)),
+  );
+}
 
-    it('is false while gathering', () => {
-      mockState([]);
-      vi.mocked(isGathering).mockReturnValue(true);
+beforeEach(() => {
+  seedContent([idle, healing, deathsDoor]);
+});
 
-      expect(isPartyResting()).toBe(false);
-    });
+describe('isPartyResting', () => {
+  it('rests only with nothing else going on', () => {
+    seedParty([]);
+    expect(isPartyResting()).toBe(true);
 
-    it('is false while in combat', () => {
-      mockState([]);
-      vi.mocked(worldCombatState).mockReturnValue(
-        {} as ReturnType<typeof worldCombatState>,
-      );
-
-      expect(isPartyResting()).toBe(false);
-    });
-
-    it('is false while Deaths Door or Healing is active', () => {
-      mockState([]);
-      vi.mocked(isGlobalEffectActive).mockReturnValue(true);
-
+    [
+      (state: GameState) => (state.world.travel.status = 'Traveling'),
+      (state: GameState) => (state.world.gathering.status = 'Gathering'),
+      (state: GameState) => (state.world.combat = buildCombat()),
+      withEffect(healing.id),
+      withEffect(deathsDoor.id),
+    ].forEach((busy) => {
+      seedParty([], busy);
       expect(isPartyResting()).toBe(false);
     });
   });
+});
 
-  describe('restingProcessTick', () => {
-    it('grants the Idle global effect when resting begins', () => {
-      mockState([buildCharacter()]);
-      vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-
-      restingProcessTick();
-
-      expect(addGlobalEffect).toHaveBeenCalledWith('Idle', expect.any(Number));
-      expect(removeGlobalEffect).not.toHaveBeenCalled();
-    });
-
-    it('does not re-grant the Idle effect on every tick once it is active', () => {
-      mockState([buildCharacter()]);
-      vi.mocked(isGlobalEffectActive).mockImplementation((id) => id === 'Idle');
-
-      restingProcessTick();
-
-      expect(addGlobalEffect).not.toHaveBeenCalled();
-    });
-
-    it('revokes the Idle global effect once the party stops resting', () => {
-      mockState([buildCharacter()], 'Traveling');
-      vi.mocked(isGlobalEffectActive).mockImplementation((id) => id === 'Idle');
-
-      restingProcessTick();
-
-      expect(removeGlobalEffect).toHaveBeenCalledWith(idleId);
-    });
-
-    it('does nothing to HP/EP when the party is not resting', () => {
-      mockState([buildCharacter()], 'Traveling');
-
-      restingProcessTick();
-
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-
-    it('regenerates hp/ep by at least 1% of max, minimum 1', () => {
-      mockState([buildCharacter({ hp: 50, ep: 20 })]);
-
-      restingProcessTick();
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [buildCharacter({ hp: 50, ep: 20 })] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].hp).toBe(51);
-      expect(result.world.party[0].ep).toBe(21);
-    });
-
-    it('reassigns the party and only the characters that regenerated', () => {
-      const rested = buildCharacter({
-        id: 'a' as CharacterId,
-        hp: 100,
-        ep: 40,
-      });
-      const hurt = buildCharacter({ id: 'b' as CharacterId, hp: 50, ep: 20 });
-      mockState([rested, hurt]);
-
-      restingProcessTick();
-
-      const state = {
-        world: { party: [rested, hurt] },
-      } as unknown as GameState;
-      const previousParty = state.world.party;
-      const result = applyLastUpdate(state);
-
-      expect(result.world.party).not.toBe(previousParty);
-      expect(result.world.party[0]).toBe(rested);
-      expect(result.world.party[1]).not.toBe(hurt);
-    });
-
-    it('leaves the party reference untouched when nobody has anything to regenerate', () => {
-      const rested = buildCharacter({ hp: 100, ep: 40 });
-      mockState([rested]);
-
-      restingProcessTick();
-
-      const state = { world: { party: [rested] } } as unknown as GameState;
-      const previousParty = state.world.party;
-      const result = applyLastUpdate(state);
-
-      expect(result.world.party).toBe(previousParty);
-    });
-
-    it('regen never exceeds the stat maximum', () => {
-      mockState([buildCharacter({ hp: 100, ep: 40 })]);
-
-      restingProcessTick();
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: { party: [buildCharacter({ hp: 100, ep: 40 })] },
-      } as unknown as GameState);
-
-      expect(result.world.party[0].hp).toBe(100);
-      expect(result.world.party[0].ep).toBe(40);
-    });
-
-    it('enforces a minimum of 1 point even when 1% rounds to 0', () => {
-      mockState([
-        buildCharacter({
-          hp: 1,
-          ep: 1,
-          stats: { Health: 10, Energy: 10 } as Character['stats'],
-        }),
-      ]);
-
-      restingProcessTick();
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        world: {
-          party: [
-            buildCharacter({
-              hp: 1,
-              ep: 1,
-              stats: { Health: 10, Energy: 10 } as Character['stats'],
-            }),
-          ],
+describe('restingProcessTick', () => {
+  it('regenerates hp/ep by a share of max, plus Constitution/Spirit', () => {
+    seedParty([
+      hero({
+        stats: {
+          ...defaultStats(),
+          Health: 100,
+          Energy: 40,
+          Constitution: 2.5,
+          Spirit: 1,
         },
-      } as unknown as GameState);
+      }),
+    ]);
 
-      expect(result.world.party[0].hp).toBe(2);
-      expect(result.world.party[0].ep).toBe(2);
+    tick();
+
+    expect(worldPartyState()[0]).toMatchObject({
+      hp: rested(50, 100, 2.5),
+      ep: rested(20, 40, 1),
     });
+  });
+
+  it('always regenerates at least 1, never past max, and leaves an over-max pool alone', () => {
+    // Small enough that its regen share rounds to 0, whatever the configured percent.
+    const tinyMax = Math.max(2, Math.floor(0.49 / RESTING_REGEN_PERCENT));
+    seedParty([
+      hero({
+        stats: { ...defaultStats(), Health: tinyMax, Energy: 10, Spirit: 5 },
+        hp: 1,
+        ep: 9,
+      }),
+      hero({ stats: { ...defaultStats(), Health: 10, Energy: 10 }, hp: 12 }),
+    ]);
+
+    tick();
+
+    expect(worldPartyState()[0]).toMatchObject({ hp: 2, ep: 10 });
+    expect(worldPartyState()[1].hp).toBe(12);
+  });
+
+  it('leaves the party slice untouched once everyone is fully rested', () => {
+    const full = hero({ hp: 100, ep: 40 });
+    seedParty([full]);
+    tick();
+    const party = worldPartyState();
+
+    tick();
+
+    expect(worldPartyState()).toBe(party);
+  });
+
+  it('keeps one Idle effect while resting, dropping it once the party is busy', () => {
+    seedParty([hero()]);
+
+    tick();
+    tick();
+    expect(idleEffects()).toBe(1);
+
+    seedParty([hero()], (state) => {
+      withEffect(idle.id)(state);
+      state.world.travel.status = 'Traveling';
+    });
+    tick();
+
+    expect(idleEffects()).toBe(0);
+    expect(worldPartyState()[0].hp).toBe(50);
   });
 });
