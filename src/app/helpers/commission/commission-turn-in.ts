@@ -3,6 +3,7 @@ import {
   rollDroppedRewards,
 } from '@helpers/item/loot';
 import { applyMaterialDelta } from '@helpers/item/materials';
+import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
 import type {
   CommissionOfferContent,
   CommissionRequirement,
@@ -41,6 +42,8 @@ export function spendCommissionRequirements(
 
     applyMaterialDelta(state, requirement.itemId, -requirement.quantity);
   });
+
+  syncArmoryGlobalEffects(state);
 }
 
 // Returns the drops so callers can react to them once the callback has committed.
