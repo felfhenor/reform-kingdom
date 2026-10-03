@@ -26,7 +26,7 @@
       quantity: 3
 
     - itemId: Red Slime Core
-      quantity: 5
+      quantity: 2
 
   tradeskillId: Woodworking
   minTradeskillLevel: 6
@@ -47,7 +47,7 @@
       quantity: 3
 
     - itemId: Red Slime Core
-      quantity: 5
+      quantity: 2
 
   tradeskillId: Woodworking
   minTradeskillLevel: 7
@@ -68,7 +68,7 @@
       quantity: 3
 
     - itemId: Red Slime Core
-      quantity: 5
+      quantity: 2
 
   tradeskillId: Woodworking
   minTradeskillLevel: 8
