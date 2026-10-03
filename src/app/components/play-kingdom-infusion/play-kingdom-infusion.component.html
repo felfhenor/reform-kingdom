@@ -12,6 +12,30 @@
 
   <app-button-kingdom-back pageactions />
 
+  <div pageactionssecondary>
+    @let selected = selectedInfusion();
+
+    <app-slot-button-container
+      [disabled]="!modifiable || !selected"
+      [helpText]="'Equipped gear cannot be infused in combat.'"
+    >
+      <button
+        class="btn btn-primary btn-sm"
+        [disabled]="!selected || !canAffordMaterial(selected.item.id)"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+        (click)="$event.shiftKey || requestInfuse(selected, $event)"
+        (click.shift)="requestInfuse(selected, $event, true)"
+      >
+        Reforge
+
+        @if (selected) {
+          <app-row-currency-cost [costs]="selectedInfusionCost()" />
+        }
+      </button>
+    </app-slot-button-container>
+  </div>
+
   <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0">
     <app-panel-equipment-picker
       [(source)]="selectedSource"
@@ -67,70 +91,58 @@
                     @let cost = materialCost(entry.item.id);
                     @let affordable = canAffordMaterial(entry.item.id);
 
-                    <app-slot-button-container
-                      [disabled]="!modifiable"
-                      [helpText]="'This cannot be done in combat.'"
+                    <button
+                      appListRow
+                      [disabled]="!affordable || !modifiable"
+                      [class.bg-base-300]="selectedInfusion() === entry"
+                      appSfx="ui-click"
+                      [sfxOffset]="$index"
+                      [sfxTrigger]="['click', 'hover']"
+                      (click)="selectedInfusion.set(entry)"
                     >
-                      <button
-                        appListRow
-                        [disabled]="!affordable || !modifiable"
-                        (click)="
-                          $event.shiftKey ||
-                            requestInfuse(entry.item.id, $event)
-                        "
-                        (click.shift)="
-                          requestInfuse(entry.item.id, $event, true)
-                        "
-                        appSfx="ui-click"
-                        [sfxOffset]="$index"
-                        [sfxTrigger]="['click', 'hover']"
-                      >
-                        <app-slot-rarity-outline
-                          class="shrink-0"
-                          [entry]="entry.item"
-                          spritesheet="item"
-                        ></app-slot-rarity-outline>
+                      <app-slot-rarity-outline
+                        class="shrink-0"
+                        [entry]="entry.item"
+                        spritesheet="item"
+                      ></app-slot-rarity-outline>
 
-                        <div class="flex flex-col gap-2 min-w-0">
-                          <span
-                            class="type-entity-name truncate text-{{
-                              entry.item.rarity
-                            }}"
-                          >
-                            {{ entry.item.name }} (x{{ entry.quantity }})
-                          </span>
+                      <div class="flex flex-col gap-2 min-w-0">
+                        <span
+                          class="type-entity-name truncate text-{{
+                            entry.item.rarity
+                          }}"
+                        >
+                          {{ entry.item.name }} (x{{ entry.quantity }})
+                        </span>
 
-                          <div>
-                            <app-row-stat-summary
-                              [stats]="entry.item.infusionStats!"
-                              [resistances]="
-                                entry.item.infusionDebuffResistances
-                              "
-                              [combatStats]="entry.item.infusionCombatStats"
-                              [monsterTypeDamage]="
-                                entry.item.infusionMonsterTypeDamage
-                              "
-                              [layout]="'row'"
-                              [maxDecimals]="1"
-                            />
+                        <div>
+                          <app-row-stat-summary
+                            [stats]="entry.item.infusionStats!"
+                            [resistances]="entry.item.infusionDebuffResistances"
+                            [combatStats]="entry.item.infusionCombatStats"
+                            [monsterTypeDamage]="
+                              entry.item.infusionMonsterTypeDamage
+                            "
+                            [layout]="'row'"
+                            [maxDecimals]="1"
+                          />
 
-                            <app-row-gather-yield-bonuses
-                              [bonuses]="materialGatherYieldBonuses(entry.item)"
-                            />
+                          <app-row-gather-yield-bonuses
+                            [bonuses]="materialGatherYieldBonuses(entry.item)"
+                          />
 
-                            <app-row-skill-stat-bonuses
-                              [bonuses]="materialSkillStatBonuses(entry.item)"
-                            />
-                          </div>
+                          <app-row-skill-stat-bonuses
+                            [bonuses]="materialSkillStatBonuses(entry.item)"
+                          />
                         </div>
+                      </div>
 
-                        <app-currency-cost
-                          [type]="goldCoinItemId"
-                          [amount]="cost"
-                          class="ml-auto mr-2 shrink-0"
-                        />
-                      </button>
-                    </app-slot-button-container>
+                      <app-currency-cost
+                        [type]="goldCoinItemId"
+                        [amount]="cost"
+                        class="ml-auto mr-2 shrink-0"
+                      />
+                    </button>
                   }
                 </div>
               } @else {

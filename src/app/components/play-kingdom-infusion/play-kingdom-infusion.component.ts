@@ -12,14 +12,15 @@ import { BlankSlateComponent } from '@components/blank-slate/blank-slate.compone
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
+import { PanelEquipmentPickerComponent } from '@components/panel-equipment-picker/panel-equipment-picker.component';
+import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
-import { PanelEquipmentPickerComponent } from '@components/panel-equipment-picker/panel-equipment-picker.component';
-import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -76,6 +77,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ListRowDirective,
     SFXDirective,
     TutorialTargetDirective,
+    RowCurrencyCostComponent,
   ],
   templateUrl: './play-kingdom-infusion.component.html',
   styleUrl: './play-kingdom-infusion.component.scss',
@@ -122,6 +124,18 @@ export class PlayKingdomInfusionComponent {
   );
 
   public goldCoinQuantity = computed(() => getGoldQuantity());
+
+  public selectedInfusion = signal<StorageMaterialEntry | undefined>(undefined);
+
+  public selectedInfusionCost = computed(() => {
+    const selected = this.selectedInfusion();
+
+    if (!selected) return [];
+
+    return [
+      { itemId: goldCoinId(), required: this.materialCost(selected.item.id) },
+    ];
+  });
 
   public filledSlotCount(item: EquipmentItem): number {
     return item.infusedItemIds.filter(Boolean).length;
@@ -190,10 +204,13 @@ export class PlayKingdomInfusionComponent {
   }
 
   public requestInfuse(
-    materialItemId: ItemId,
+    entry: StorageMaterialEntry | undefined,
     event: Event,
     skipConfirm = false,
   ): void {
+    if (!entry) return;
+
+    const materialItemId = entry.item.id;
     this.pendingMaterialId.set(materialItemId);
     this.pendingSourceEl =
       (event.currentTarget as HTMLElement).querySelector('img') ?? undefined;
