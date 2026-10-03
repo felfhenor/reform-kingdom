@@ -1,59 +1,12 @@
-import type {
-  GameState,
-  GlobalEffectContent,
-  GlobalEffectId,
-  WorldNodeEntry,
-} from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/hero/character-progress', () => ({
-  healingTicksForLevel: vi.fn(() => 4),
-  healPartyToFull: vi.fn(),
-}));
+vi.mock('@helpers/town/reputation/town-reputation-buff');
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    globalEffectsState: () => gamestate().globalEffects,
-    globalEffectSumsState: () => gamestate().globalEffectSums,
-    worldPartyState: vi.fn(() => []),
-    worldCurrentLocationState: vi.fn(() => ({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    })),
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
-  townReputationBuffSync: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-spawn', () => ({
-  homeNodeGet: vi.fn(),
-}));
-
-vi.mock('@helpers/world', () => ({
-  currentLocationSet: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-outpost', () => ({
-  outpostDeathPenaltyMultiplier: vi.fn(() => 1),
-}));
-
-import { getEntry } from '@helpers/content/content';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { healPartyToFull } from '@helpers/hero/character-progress';
+import { combatLog } from '@helpers/combat/combat-log';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { ensureOutpost } from '@helpers/content/ensure-outpost';
+import { healingTicksForLevel } from '@helpers/hero/character-progress';
+import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import {
   activeGlobalEffects,
   addGlobalEffect,
@@ -63,322 +16,232 @@ import {
   removeGlobalEffect,
 } from '@helpers/hero/global-effects';
 import {
-  gamestate,
-  updateGamestate,
+  globalEffectsState,
   worldCurrentLocationState,
+  worldPartyState,
 } from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
-import { homeNodeGet } from '@helpers/town/town-spawn';
-import { currentLocationSet } from '@helpers/world';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
+import type {
+  GameState,
+  GlobalEffect,
+  GlobalEffectId,
+  OutpostId,
+} from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-describe('Global Effect Helper Functions', () => {
-  const healingId = 'healing-1' as GlobalEffectId;
+const healing = ensureGlobalEffect({
+  id: 'healing-1' as GlobalEffectId,
+  name: 'Healing',
+});
+const deathsDoor = ensureGlobalEffect({
+  id: 'deaths-door-1' as GlobalEffectId,
+  name: 'Deaths Door',
+});
+const blessing = ensureGlobalEffect({
+  id: 'blessing' as GlobalEffectId,
+  name: 'Blessing',
+});
+const outpost = ensureOutpost({
+  id: 'carrina-outpost' as OutpostId,
+  name: 'Carrina Outpost',
+});
+const now = 100;
 
-  const healingContent: GlobalEffectContent = {
-    id: healingId,
-    name: 'Healing',
-    __type: 'globaleffect',
-    description: 'The party is recovering.',
-    sprite: '0000',
-    effects: [],
-  };
+function seedEffects(
+  effects: { id: GlobalEffectId; expiresAtTick: number }[],
+  edit: (state: GameState) => void = () => undefined,
+): void {
+  seedGamestate((state) => {
+    effects.forEach(({ id, expiresAtTick }) =>
+      applyGlobalEffectAdd(state, id, expiresAtTick, 0),
+    );
+    state.clock.numTicks = now;
+    edit(state);
+  });
+}
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+function effectIds(): GlobalEffectId[] {
+  return globalEffectsState().map((effect) => effect.id);
+}
+
+function grantedHealingTicks(): number | undefined {
+  const effect = globalEffectsState().find(({ id }) => id === healing.id);
+  return effect ? effect.expiresAtTick - effect.startTick : undefined;
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  seedContent([healing, deathsDoor, blessing, outpost]);
+});
+
+describe('activeGlobalEffects / isGlobalEffectActive', () => {
+  it('only counts effects that have not yet expired', () => {
+    seedEffects([
+      { id: healing.id, expiresAtTick: now + 1 },
+      { id: blessing.id, expiresAtTick: now },
+    ]);
+
+    expect(activeGlobalEffects().map(({ id }) => id)).toEqual([healing.id]);
+    expect(isGlobalEffectActive(healing.id)).toBe(true);
+    expect(isGlobalEffectActive(blessing.id)).toBe(false);
   });
 
-  describe('activeGlobalEffects', () => {
-    it('should only return effects that have not yet expired', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(10);
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [
-          { ...healingContent, startTick: 0, expiresAtTick: 20 },
-          {
-            ...healingContent,
-            id: 'expired' as GlobalEffectId,
-            name: 'Expired',
-            startTick: 0,
-            expiresAtTick: 5,
-          },
-        ],
-      } as unknown as GameState);
+  it('resolves the effect by name, and is never active for unknown content', () => {
+    seedEffects([{ id: healing.id, expiresAtTick: now + 1 }]);
 
-      const active = activeGlobalEffects();
+    expect(isGlobalEffectActive('Healing' as GlobalEffectId)).toBe(true);
+    expect(isGlobalEffectActive('Unknown' as GlobalEffectId)).toBe(false);
+  });
+});
 
-      expect(active).toHaveLength(1);
-      expect(active[0].name).toBe('Healing');
-    });
+describe('addGlobalEffect / removeGlobalEffect', () => {
+  it('starts the effect now for the given duration, by id', () => {
+    seedEffects([]);
+
+    inTick(() => addGlobalEffect('Healing' as GlobalEffectId, 30));
+
+    expect(globalEffectsState()).toEqual([
+      expect.objectContaining({
+        id: healing.id,
+        startTick: now,
+        expiresAtTick: now + 30,
+      }),
+    ]);
   });
 
-  describe('isGlobalEffectActive', () => {
-    it('should return true when a matching active effect exists', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(10);
-      vi.mocked(getEntry).mockReturnValue(healingContent);
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [{ ...healingContent, startTick: 0, expiresAtTick: 20 }],
-      } as unknown as GameState);
+  it('adds nothing for unknown content', () => {
+    seedEffects([]);
 
-      expect(isGlobalEffectActive(healingId)).toBe(true);
-    });
+    inTick(() => addGlobalEffect('Unknown' as GlobalEffectId, 30));
 
-    it('should return false when the id/name cannot be resolved to content', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
-
-      expect(isGlobalEffectActive('unknown' as GlobalEffectId)).toBe(false);
-    });
-
-    it('should return false when the resolved content has no active effect in state', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(10);
-      vi.mocked(getEntry).mockReturnValue(healingContent);
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [],
-      } as unknown as GameState);
-
-      expect(isGlobalEffectActive(healingId)).toBe(false);
-    });
+    expect(globalEffectsState()).toEqual([]);
   });
 
-  describe('addGlobalEffect', () => {
-    it('should push a new effect built from content, using the content id', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(10);
-      vi.mocked(getEntry).mockReturnValue(healingContent);
+  it('removes only the matching effect', () => {
+    seedEffects([
+      { id: healing.id, expiresAtTick: now + 1 },
+      { id: blessing.id, expiresAtTick: now + 1 },
+    ]);
 
-      addGlobalEffect(healingId, 30);
+    inTick(() => removeGlobalEffect(healing.id));
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        globalEffects: [],
-        collectibles: {},
-      } as unknown as GameState);
+    expect(effectIds()).toEqual([blessing.id]);
+  });
+});
 
-      expect(result.globalEffects).toEqual([
-        {
-          ...healingContent,
-          startTick: 10,
-          expiresAtTick: 40,
-        },
+describe('globalEffectsProcessTick', () => {
+  const tick = () => inTick(globalEffectsProcessTick);
+
+  it('sweeps out expired effects, leaving active ones', () => {
+    seedEffects([
+      { id: blessing.id, expiresAtTick: now },
+      { id: healing.id, expiresAtTick: now + 1 },
+    ]);
+
+    tick();
+
+    expect(effectIds()).toEqual([healing.id]);
+  });
+
+  it('heals the party to full once Healing expires', () => {
+    const hero = buildCharacter({ name: 'Ada' });
+    seedEffects([{ id: healing.id, expiresAtTick: now }], (state) => {
+      state.world.party = [{ ...hero, hp: 0, ep: 0 }];
+    });
+
+    tick();
+
+    expect(worldPartyState()[0]).toMatchObject({
+      hp: hero.stats.Health,
+      ep: hero.stats.Energy,
+    });
+    expect(effectIds()).toEqual([]);
+    expect(combatLog()[0].message).toContain('finished healing');
+  });
+
+  describe('when Deaths Door expires', () => {
+    function seedDeath(edit: (state: GameState) => void = () => undefined) {
+      seedEffects([{ id: deathsDoor.id, expiresAtTick: now }], (state) => {
+        state.world.party = [buildCharacter({ level: 12 })];
+        state.world.currentLocation = { mapName: 'CraggledMire', x: 3, y: 3 };
+        edit(state);
+      });
+    }
+
+    it('recalls the party to the Duchy by default and starts Healing there', () => {
+      const { Duchy } = seedWorldNodes([
+        { name: 'Duchy', type: 'Kingdom', mapName: 'Carrina', x: 24, y: 24 },
       ]);
-    });
+      seedDeath();
 
-    it('should do nothing when the referenced content cannot be found', () => {
-      vi.mocked(getEntry).mockReturnValue(undefined);
+      tick();
 
-      addGlobalEffect(healingId, 30);
-
-      expect(updateGamestate).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('removeGlobalEffect', () => {
-    it('should remove the effect matching the given id', () => {
-      removeGlobalEffect(healingId);
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        globalEffects: [
-          { ...healingContent, startTick: 0, expiresAtTick: 20 },
-          {
-            ...healingContent,
-            id: 'other' as GlobalEffectId,
-            name: 'Other',
-            startTick: 0,
-            expiresAtTick: 20,
-          },
-        ],
-        collectibles: {},
-      } as unknown as GameState);
-
-      expect(result.globalEffects).toHaveLength(1);
-      expect(result.globalEffects[0].id).toBe('other');
-    });
-  });
-
-  describe('globalEffectsProcessTick', () => {
-    const deathsDoorId = 'deaths-door-1' as GlobalEffectId;
-    const deathsDoorContent: GlobalEffectContent = {
-      id: deathsDoorId,
-      name: 'Deaths Door',
-      __type: 'globaleffect',
-      description: 'The fallen party awaits recall.',
-      sprite: '0000',
-      effects: [],
-    };
-
-    function mockContentLookup(): void {
-      vi.mocked(getEntry).mockImplementation((idOrName) => {
-        if (idOrName === healingId || idOrName === 'Healing')
-          return healingContent;
-        if (idOrName === deathsDoorId || idOrName === 'Deaths Door') {
-          return deathsDoorContent;
-        }
-        return undefined;
-      });
-    }
-
-    // These are real functions (not mocked), so their effect is only observable via the `updateGamestate` updaters they pass along.
-    function grantedHealingTicks(): number | undefined {
-      for (const [updateFn] of vi.mocked(updateGamestate).mock.calls) {
-        const result = updateFn({
-          globalEffects: [],
-          collectibles: {},
-        } as unknown as GameState);
-        const healing = result.globalEffects.find(
-          (effect) => effect.id === healingId,
-        );
-        if (healing) return healing.expiresAtTick - healing.startTick;
-      }
-      return undefined;
-    }
-
-    function healingWasGranted(): boolean {
-      return grantedHealingTicks() !== undefined;
-    }
-
-    it('heals the party to full and removes the effect when Healing expires', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(20);
-      mockContentLookup();
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [{ ...healingContent, startTick: 0, expiresAtTick: 20 }],
-      } as unknown as GameState);
-
-      globalEffectsProcessTick();
-
-      expect(healPartyToFull).toHaveBeenCalled();
-
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const result = updateFn({
-        globalEffects: [{ ...healingContent, startTick: 0, expiresAtTick: 20 }],
-        collectibles: {},
-      } as unknown as GameState);
-      expect(result.globalEffects).toHaveLength(0);
-    });
-
-    it('teleports the party home, resyncs the regional buff, and grants Healing when Deaths Door expires', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(20);
-      mockContentLookup();
-      vi.mocked(worldCurrentLocationState).mockReturnValue({
-        mapName: 'CraggledMire',
-        x: 3,
-        y: 3,
-      });
-      vi.mocked(homeNodeGet).mockReturnValue({
-        mapName: 'Carrina',
-        x: 24,
-        y: 24,
-      } as unknown as WorldNodeEntry);
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [
-          { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
-        ],
-      } as unknown as GameState);
-
-      globalEffectsProcessTick();
-
-      expect(currentLocationSet).toHaveBeenCalledWith({
-        mapName: 'Carrina',
-        x: 24,
-        y: 24,
-      });
+      expect(worldCurrentLocationState()).toEqual(locationOf(Duchy));
       expect(townReputationBuffSync).toHaveBeenCalledWith(
         'CraggledMire',
         'Carrina',
       );
-      expect(healingWasGranted()).toBe(true);
-      expect(healPartyToFull).not.toHaveBeenCalled();
-    });
-
-    it('shortens Healing by the home outpost multiplier, rounding up', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(20);
-      mockContentLookup();
-      vi.mocked(homeNodeGet).mockReturnValue({
-        mapName: 'Carrina',
-        nodeName: 'Carrina Outpost',
-        x: 24,
-        y: 24,
-      } as unknown as WorldNodeEntry);
-      vi.mocked(outpostDeathPenaltyMultiplier).mockReturnValue(0.5);
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [
-          { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
-        ],
-      } as unknown as GameState);
-
-      globalEffectsProcessTick();
-
-      expect(outpostDeathPenaltyMultiplier).toHaveBeenCalledWith(
-        'Carrina Outpost',
+      expect(effectIds()).toEqual([healing.id]);
+      expect(grantedHealingTicks()).toBe(
+        healingTicksForLevel(worldPartyState()),
       );
-      expect(grantedHealingTicks()).toBe(2);
     });
 
-    it('does not touch the current location or resync buffs when there is no home node at all', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(20);
-      mockContentLookup();
-      vi.mocked(homeNodeGet).mockReturnValue(undefined);
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [
-          { ...deathsDoorContent, startTick: 0, expiresAtTick: 20 },
-        ],
-      } as unknown as GameState);
+    it('recalls to a developed home outpost, which shortens the Healing', () => {
+      const nodes = seedWorldNodes([
+        { name: 'Duchy', type: 'Kingdom', x: 1 },
+        { name: outpost.name, type: 'Outpost', mapName: 'Carrina', x: 2 },
+      ]);
+      seedDeath((state) => {
+        state.world.homeNodeName = outpost.name;
+        state.outposts[outpost.name] = { level: 2 };
+      });
+      const multiplier = outpostDeathPenaltyMultiplier(outpost.name);
 
-      globalEffectsProcessTick();
+      tick();
 
-      expect(currentLocationSet).not.toHaveBeenCalled();
+      expect(multiplier).toBeLessThan(1);
+      expect(worldCurrentLocationState()).toEqual(
+        locationOf(nodes[outpost.name]),
+      );
+      expect(grantedHealingTicks()).toBe(
+        Math.ceil(healingTicksForLevel(worldPartyState()) * multiplier),
+      );
+    });
+
+    it('still starts Healing in place when there is no home at all', () => {
+      seedWorldNodes([]);
+      seedDeath();
+
+      tick();
+
+      expect(worldCurrentLocationState().mapName).toBe('CraggledMire');
       expect(townReputationBuffSync).not.toHaveBeenCalled();
-      expect(healingWasGranted()).toBe(true);
-    });
-
-    it('does nothing when no effects have expired', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(5);
-      vi.mocked(gamestate).mockReturnValue({
-        globalEffects: [{ ...healingContent, startTick: 0, expiresAtTick: 20 }],
-      } as unknown as GameState);
-
-      globalEffectsProcessTick();
-
-      expect(healPartyToFull).not.toHaveBeenCalled();
-      expect(updateGamestate).not.toHaveBeenCalled();
+      expect(grantedHealingTicks()).toBe(
+        healingTicksForLevel(worldPartyState()),
+      );
     });
   });
+});
 
-  describe('globalEffectDurationLabel', () => {
-    it('formats remaining ticks as seconds, minutes, or hours', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(0);
+describe('globalEffectDurationLabel', () => {
+  const endingIn = (ticks: number): GlobalEffect => ({
+    ...healing,
+    startTick: 0,
+    expiresAtTick: now + ticks,
+  });
 
-      expect(
-        globalEffectDurationLabel({
-          ...healingContent,
-          startTick: 0,
-          expiresAtTick: 30,
-        }),
-      ).toBe('30s');
-      expect(
-        globalEffectDurationLabel({
-          ...healingContent,
-          startTick: 0,
-          expiresAtTick: 900,
-        }),
-      ).toBe('15m');
-      expect(
-        globalEffectDurationLabel({
-          ...healingContent,
-          startTick: 0,
-          expiresAtTick: 3600,
-        }),
-      ).toBe('1h');
-    });
+  it('shows the time left in the largest whole unit, never negative', () => {
+    seedEffects([]);
 
-    it('never returns a negative duration for an already-expired effect', () => {
-      vi.mocked(timerTicksElapsed).mockReturnValue(100);
-
-      expect(
-        globalEffectDurationLabel({
-          ...healingContent,
-          startTick: 0,
-          expiresAtTick: 50,
-        }),
-      ).toBe('0s');
-    });
+    expect(globalEffectDurationLabel(endingIn(30))).toBe('30s');
+    expect(globalEffectDurationLabel(endingIn(60))).toBe('1m');
+    expect(globalEffectDurationLabel(endingIn(900))).toBe('15m');
+    expect(globalEffectDurationLabel(endingIn(3600))).toBe('1h');
+    expect(globalEffectDurationLabel(endingIn(-50))).toBe('0s');
   });
 });

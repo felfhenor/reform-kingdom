@@ -16,7 +16,11 @@ import type {
   TownNodeState,
   TownStockEntry,
 } from '@interfaces';
-import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import {
+  buildTownCraftQueueEntry,
+  buildTownNodeState,
+  buildTownStockEntry,
+} from '@/testing/builders';
 import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
@@ -59,19 +63,13 @@ function seedTown(overrides: Partial<TownNodeState> = {}): void {
 }
 
 function stockedSwords(count: number): TownStockEntry[] {
-  return Array.from({ length: count }, () => ({
-    equipmentItem: buildEquipmentItem(swordId),
-    addedAtTick: 0,
-  }));
+  return Array.from({ length: count }, () => buildTownStockEntry(swordId));
 }
 
 function queued(recipeId: RecipeId, count: number): TownCraftQueueEntry[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `q${i}` as CraftQueueEntryId,
-    tradeskillId: 'blacksmithing' as never,
-    recipeId,
-    ticksIntoCraft: 0,
-  }));
+  return Array.from({ length: count }, (_, i) =>
+    buildTownCraftQueueEntry({ id: `q${i}` as CraftQueueEntryId, recipeId }),
+  );
 }
 
 describe('isRecipeCraftableByTown', () => {
@@ -139,10 +137,7 @@ describe('isRecipeCraftableByTown', () => {
     seedTown({
       stock: [
         ...stockedSwords(TOWN_RECIPE_OUTPUT_DUPLICATE_CAP - 2),
-        {
-          equipmentItem: buildEquipmentItem('axe' as EquipmentId),
-          addedAtTick: 0,
-        },
+        buildTownStockEntry('axe' as EquipmentId),
       ],
       craftQueue: [
         ...queued(swordRecipe.id, 1),

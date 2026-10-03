@@ -1,44 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
-vi.mock('@helpers/commission/commission-tick', () => ({
-  commissionGenerateIfMissing: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    discoveredCaravansState: () => gamestate().discoveredCaravans,
-    worldCaravansState: () => gamestate().world.caravans,
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  formatDuration: vi.fn(),
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/world', () => ({
-  worldNodeAtCurrentLocation: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeCaravan: vi.fn(),
-}));
+vi.mock('@helpers/commission/commission-tick');
 
 import {
   caravanBrandName,
   caravanBusyTraderIds,
   caravanEligibleTraders,
-  caravanMarkDiscovered,
   caravanMarkVisited,
-  caravanState,
   caravanTicksUntilReset,
   caravanTimerLabel,
   caravanTimerUrgency,
@@ -47,405 +15,199 @@ import {
   pruneInvalidDiscoveredCaravans,
 } from '@helpers/caravan/caravan';
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
-import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
+import {
+  URGENCY_SAFE_MIN_TICKS,
+  URGENCY_WARNING_MIN_TICKS,
+} from '@helpers/config';
+import {
+  ensureCaravan,
+  ensureCaravanTrader,
+} from '@helpers/content/ensure-caravan';
+import { formatDuration } from '@helpers/engine/timer';
+import { gamestate, worldCaravansState } from '@helpers/state-game';
 import type {
-  CaravanContent,
   CaravanId,
+  CaravanNodeState,
   CaravanTraderContent,
   CaravanTraderId,
-  GameState,
-  GameStateDiscoveredCaravans,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCaravanNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-const caravan: CaravanContent = {
+const caravan = ensureCaravan({
   id: 'carrina-duchy' as CaravanId,
   name: 'Duchy Trading Caravan - Carrina',
-  __type: 'caravan',
-  description: 'A caravan.',
   traderResetTime: 100,
   level: { min: 3, max: 7 },
-  markupPercentages: { sell: 25, buy: -15 },
   traderCategories: ['Carrina'],
-  commissionOffers: [],
-};
+});
+const otherCaravan = ensureCaravan({
+  id: 'elfheim-duchy' as CaravanId,
+  name: 'Duchy Trading Caravan - Elfheim',
+});
+const traderA = 'trader-a' as CaravanTraderId;
+const traderB = 'trader-b' as CaravanTraderId;
 
 function trader(
-  overrides: Partial<CaravanTraderContent> = {},
+  overrides: Partial<CaravanTraderContent>,
 ): CaravanTraderContent {
-  return {
-    id: 'trader' as CaravanTraderId,
-    name: 'Trader',
-    __type: 'caravantrader',
-    description: 'A trader.',
-    category: 'Carrina',
-    level: 5,
-    trades: [],
-    tokenTrades: [],
-    ...overrides,
-  };
+  return ensureCaravanTrader({ category: 'Carrina', level: 5, ...overrides });
 }
 
-describe('caravanState', () => {
-  it('returns the caravan node state from gamestate', () => {
-    const state = { traderId: 'trader' as CaravanTraderId };
-    vi.mocked(gamestate).mockReturnValue({
-      world: { caravans: { [caravan.id]: state } },
-    } as unknown as GameState);
-
-    expect(caravanState(caravan.id)).toBe(state);
+function seedCaravans(
+  caravans: Partial<Record<CaravanId, CaravanNodeState>>,
+  numTicks = 0,
+): void {
+  seedGamestate((state) => {
+    state.clock.numTicks = numTicks;
+    Object.assign(state.world.caravans, caravans);
   });
+}
 
-  it('returns undefined for a caravan with no state yet', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(caravanState(caravan.id)).toBeUndefined();
-  });
+beforeEach(() => {
+  vi.clearAllMocks();
+  seedContent([caravan, otherCaravan]);
 });
 
 describe('caravanEligibleTraders', () => {
-  it('includes a trader matching category and within the level range', () => {
-    const eligible = trader({ id: 'a' as CaravanTraderId, level: 5 });
-    vi.mocked(getEntriesByType).mockReturnValue([eligible]);
+  it('keeps traders of a matching category within the level range, inclusive', () => {
+    const atMin = trader({ id: 'min' as CaravanTraderId, level: 3 });
+    const atMax = trader({ id: 'max' as CaravanTraderId, level: 7 });
+    seedContent([
+      atMin,
+      atMax,
+      trader({ id: 'other' as CaravanTraderId, category: 'Elfheim' }),
+      trader({ id: 'low' as CaravanTraderId, level: 2 }),
+      trader({ id: 'high' as CaravanTraderId, level: 8 }),
+    ]);
 
-    expect(caravanEligibleTraders(caravan)).toEqual([eligible]);
-  });
-
-  it('excludes a trader in a different category', () => {
-    const other = trader({ category: 'Elfheim' });
-    vi.mocked(getEntriesByType).mockReturnValue([other]);
-
-    expect(caravanEligibleTraders(caravan)).toEqual([]);
-  });
-
-  it('excludes a trader below the caravan level range', () => {
-    const tooLow = trader({ level: 1 });
-    vi.mocked(getEntriesByType).mockReturnValue([tooLow]);
-
-    expect(caravanEligibleTraders(caravan)).toEqual([]);
-  });
-
-  it('excludes a trader above the caravan level range', () => {
-    const tooHigh = trader({ level: 20 });
-    vi.mocked(getEntriesByType).mockReturnValue([tooHigh]);
-
-    expect(caravanEligibleTraders(caravan)).toEqual([]);
+    expect(caravanEligibleTraders(caravan)).toEqual([atMin, atMax]);
   });
 });
 
 describe('caravanBusyTraderIds', () => {
-  it('collects trader ids staffing other caravans', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        caravans: {
-          [caravan.id]: { traderId: 'trader-a' as CaravanTraderId },
-          'other-caravan': { traderId: 'trader-b' as CaravanTraderId },
-        },
-      },
-    } as unknown as GameState);
+  it('collects traders staffing every other caravan, skipping unstaffed ones', () => {
+    seedCaravans({
+      [caravan.id]: buildCaravanNodeState({ traderId: traderA }),
+      [otherCaravan.id]: buildCaravanNodeState({ traderId: traderB }),
+      ['empty' as CaravanId]: buildCaravanNodeState(),
+    });
 
-    expect(caravanBusyTraderIds('some-other-id' as CaravanId)).toEqual(
-      new Set(['trader-a', 'trader-b']),
+    expect(caravanBusyTraderIds(caravan.id)).toEqual(new Set([traderB]));
+  });
+});
+
+describe('caravanTicksUntilReset / caravanTimerLabel', () => {
+  it('counts down from the reset time since the trader was generated, never below 0', () => {
+    const generated = buildCaravanNodeState({ generatedAtTick: 1000 });
+
+    seedCaravans({}, 1040);
+    expect(caravanTicksUntilReset(caravan, generated)).toBe(60);
+    expect(caravanTimerLabel(caravan, generated)).toBe(formatDuration(60));
+
+    seedCaravans({}, 1000 + caravan.traderResetTime + 1);
+    expect(caravanTicksUntilReset(caravan, generated)).toBe(0);
+  });
+
+  it('is the full reset time before the caravan was ever generated', () => {
+    expect(caravanTicksUntilReset(caravan, undefined)).toBe(
+      caravan.traderResetTime,
     );
-  });
-
-  it('excludes the given caravan itself from the busy set', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        caravans: {
-          [caravan.id]: { traderId: 'trader-a' as CaravanTraderId },
-          'other-caravan': { traderId: 'trader-b' as CaravanTraderId },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(caravanBusyTraderIds(caravan.id)).toEqual(new Set(['trader-b']));
-  });
-
-  it('ignores caravans with no trader currently assigned', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        caravans: {
-          'other-caravan': { traderId: undefined },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(caravanBusyTraderIds(caravan.id)).toEqual(new Set());
-  });
-});
-
-describe('caravanTicksUntilReset', () => {
-  it('returns the full resetTime when no state exists yet', () => {
-    expect(caravanTicksUntilReset(caravan, undefined)).toBe(100);
-  });
-
-  it('returns the remaining ticks since the last generation', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(1050);
-
-    expect(
-      caravanTicksUntilReset(caravan, {
-        traderId: undefined,
-        activeTradeIndices: [],
-        tradeCounts: {},
-        generatedAtTick: 1000,
-      }),
-    ).toBe(50);
-  });
-
-  it('clamps to 0 once past due', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(2000);
-
-    expect(
-      caravanTicksUntilReset(caravan, {
-        traderId: undefined,
-        activeTradeIndices: [],
-        tradeCounts: {},
-        generatedAtTick: 1000,
-      }),
-    ).toBe(0);
-  });
-});
-
-describe('caravanTimerLabel', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('formats the ticks-until-reset value', () => {
-    vi.mocked(formatDuration).mockReturnValue('01:40');
-
-    expect(caravanTimerLabel(caravan, undefined)).toBe('01:40');
-    expect(formatDuration).toHaveBeenCalledWith(100);
   });
 });
 
 describe('caravanTimerUrgency', () => {
-  it('is safe with 30+ minutes remaining', () => {
-    expect(caravanTimerUrgency(1800)).toBe('safe');
-    expect(caravanTimerUrgency(3600)).toBe('safe');
-  });
-
-  it('is a warning under 30 minutes but at least 5', () => {
-    expect(caravanTimerUrgency(1799)).toBe('warning');
-    expect(caravanTimerUrgency(300)).toBe('warning');
-  });
-
-  it('is a danger under 5 minutes', () => {
-    expect(caravanTimerUrgency(299)).toBe('danger');
-    expect(caravanTimerUrgency(0)).toBe('danger');
+  it('escalates from safe to warning to danger at the configured thresholds', () => {
+    expect(caravanTimerUrgency(URGENCY_SAFE_MIN_TICKS)).toBe('safe');
+    expect(caravanTimerUrgency(URGENCY_SAFE_MIN_TICKS - 1)).toBe('warning');
+    expect(caravanTimerUrgency(URGENCY_WARNING_MIN_TICKS)).toBe('warning');
+    expect(caravanTimerUrgency(URGENCY_WARNING_MIN_TICKS - 1)).toBe('danger');
   });
 });
 
 describe('caravanBrandName', () => {
-  it('drops the branch suffix after the dash', () => {
-    expect(caravanBrandName('Goblin Group Company - Carrina')).toBe(
-      'Goblin Group Company',
-    );
-  });
-
-  it('returns the name unchanged when there is no dash', () => {
-    expect(caravanBrandName('Goblin Group Company')).toBe(
-      'Goblin Group Company',
-    );
-  });
-});
-
-describe('isCaravanDiscovered', () => {
-  it('is true once a foundAt is recorded', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: { [caravan.id]: { foundAt: 1000 } },
-    } as unknown as GameState);
-
-    expect(isCaravanDiscovered(caravan.id)).toBe(true);
-  });
-
-  it('is false when never visited', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: {},
-    } as unknown as GameState);
-
-    expect(isCaravanDiscovered(caravan.id)).toBe(false);
+  it('drops the branch suffix, if any', () => {
+    expect(caravanBrandName(caravan.name)).toBe('Duchy Trading Caravan');
+    expect(caravanBrandName('Goblin Group')).toBe('Goblin Group');
   });
 });
 
 describe('isPartyAtCaravan', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  const nodes = () =>
+    seedWorldNodes([
+      { name: caravan.name, type: 'CaravanNode', x: 1 },
+      { name: otherCaravan.name, type: 'CaravanNode', x: 2 },
+      { name: 'Field', type: 'ExploreNode', x: 3 },
+    ]);
 
-  it('is false when the party is not on any world node', () => {
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
+  it('is true only while standing on that caravan’s node', () => {
+    const entries = nodes();
+    const standOn = (name: string) =>
+      seedGamestate(
+        (state) => (state.world.currentLocation = locationOf(entries[name])),
+      );
 
-    expect(isPartyAtCaravan(caravan.id)).toBe(false);
-  });
-
-  it('is false when the current node is a different caravan', () => {
-    const entry = {} as WorldNodeEntry;
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
-    vi.mocked(worldNodeCaravan).mockReturnValue({
-      ...caravan,
-      id: 'other-caravan' as CaravanId,
-    });
-
-    expect(isPartyAtCaravan(caravan.id)).toBe(false);
-  });
-
-  it('is true when standing on this caravan node', () => {
-    const entry = {} as WorldNodeEntry;
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(entry);
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-
+    standOn(caravan.name);
     expect(isPartyAtCaravan(caravan.id)).toBe(true);
-  });
-});
 
-describe('caravanMarkDiscovered', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+    standOn(otherCaravan.name);
+    expect(isPartyAtCaravan(caravan.id)).toBe(false);
 
-  it('does nothing when already discovered', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: { [caravan.id]: { foundAt: 1000 } },
-    } as unknown as GameState);
+    standOn('Field');
+    expect(isPartyAtCaravan(caravan.id)).toBe(false);
 
-    caravanMarkDiscovered(caravan.id);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('records a fresh foundAt when visited for the first time', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: {},
-    } as unknown as GameState);
-    vi.spyOn(Date, 'now').mockReturnValue(5000);
-
-    caravanMarkDiscovered(caravan.id);
-
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const result = updateFn({
-      discoveredCaravans: {},
-    } as unknown as GameState);
-
-    expect(result.discoveredCaravans[caravan.id]).toEqual({ foundAt: 5000 });
-
-    vi.restoreAllMocks();
-  });
-});
-
-describe('pruneInvalidDiscoveredCaravans', () => {
-  it('keeps entries that resolve to real content', () => {
-    vi.mocked(getEntry).mockReturnValue(caravan);
-    const discovered: GameStateDiscoveredCaravans = {
-      [caravan.id]: { foundAt: 1000 },
-    };
-
-    expect(pruneInvalidDiscoveredCaravans(discovered)).toEqual(discovered);
-  });
-
-  it('drops entries whose id no longer resolves to real content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const discovered: GameStateDiscoveredCaravans = {
-      [caravan.id]: { foundAt: 1000 },
-    };
-
-    expect(pruneInvalidDiscoveredCaravans(discovered)).toEqual({});
+    seedGamestate(
+      (state) =>
+        (state.world.currentLocation = {
+          ...locationOf(entries['Field']),
+          x: 50,
+        }),
+    );
+    expect(isPartyAtCaravan(caravan.id)).toBe(false);
   });
 });
 
 describe('caravanMarkVisited', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('marks discovered and backfills the commission', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: {},
-    } as unknown as GameState);
-
-    caravanMarkVisited(caravan.id);
-
-    expect(updateGamestate).toHaveBeenCalled();
-    expect(commissionGenerateIfMissing).toHaveBeenCalledWith(caravan.id);
-  });
-
-  it('records the current trader as visited', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: {},
-    } as unknown as GameState);
-
-    caravanMarkVisited(caravan.id);
-
-    const state = {
-      world: {
-        caravans: {
-          [caravan.id]: {
-            traderId: 'trader-a' as CaravanTraderId,
-            activeTradeIndices: [],
-            tradeCounts: {},
-            generatedAtTick: 1000,
-          },
-        },
-      },
-    } as unknown as GameState;
-    const mutate = vi.mocked(updateGamestate).mock.calls.at(-1)![0];
-    mutate(state);
-
-    expect(state.world.caravans[caravan.id].visitedTraderId).toBe('trader-a');
-  });
-
-  it('leaves the visit record alone when the trader was already recorded as visited', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: {},
-    } as unknown as GameState);
-
-    caravanMarkVisited(caravan.id);
-
-    const state = {
-      world: {
-        caravans: {
-          [caravan.id]: {
-            traderId: 'trader-a' as CaravanTraderId,
-            visitedTraderId: 'trader-a' as CaravanTraderId,
-            activeTradeIndices: [],
-            tradeCounts: {},
-            generatedAtTick: 1000,
-          },
-        },
-      },
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mock.calls.at(-1)![0](state);
-
-    expect(state.world.caravans[caravan.id]).toEqual({
-      traderId: 'trader-a',
-      visitedTraderId: 'trader-a',
-      activeTradeIndices: [],
-      tradeCounts: {},
-      generatedAtTick: 1000,
+  it('discovers the caravan once, backfills its commission and records the trader as visited', () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(5000);
+    onTestFinished(() => now.mockRestore());
+    seedCaravans({
+      [caravan.id]: buildCaravanNodeState({ traderId: traderA }),
     });
+
+    inTick(() => caravanMarkVisited(caravan.id));
+    now.mockReturnValue(9000);
+    inTick(() => caravanMarkVisited(caravan.id));
+
+    expect(isCaravanDiscovered(caravan.id)).toBe(true);
+    expect(gamestate().discoveredCaravans[caravan.id]).toEqual({
+      foundAt: 5000,
+    });
+    expect(commissionGenerateIfMissing).toHaveBeenCalledWith(caravan.id);
+    expect(worldCaravansState()[caravan.id].visitedTraderId).toBe(traderA);
   });
 
-  it('does nothing when the caravan has no state yet', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      discoveredCaravans: {},
-    } as unknown as GameState);
+  it('still discovers a caravan with no trader state yet', () => {
+    seedCaravans({});
 
-    caravanMarkVisited(caravan.id);
+    inTick(() => caravanMarkVisited(caravan.id));
 
-    const state = {
-      world: { caravans: {} },
-    } as unknown as GameState;
+    expect(isCaravanDiscovered(caravan.id)).toBe(true);
+    expect(worldCaravansState()).toEqual({});
+  });
+});
 
-    const mutate = vi.mocked(updateGamestate).mock.calls.at(-1)![0];
+describe('pruneInvalidDiscoveredCaravans', () => {
+  it('drops discoveries of caravans no longer in content', () => {
+    const discovered = {
+      [caravan.id]: { foundAt: 1000 },
+      ['removed' as CaravanId]: { foundAt: 1000 },
+    };
 
-    expect(() => mutate(state)).not.toThrow();
-    expect(state.world.caravans[caravan.id]).toBeUndefined();
+    expect(pruneInvalidDiscoveredCaravans(discovered)).toEqual({
+      [caravan.id]: { foundAt: 1000 },
+    });
   });
 });

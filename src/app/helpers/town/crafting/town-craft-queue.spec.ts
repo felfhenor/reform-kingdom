@@ -37,7 +37,11 @@ import type {
   TownNodeState,
   TradeskillId,
 } from '@interfaces';
-import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import {
+  buildTownCraftQueueEntry,
+  buildTownNodeState,
+  buildTownStockEntry,
+} from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
@@ -111,20 +115,16 @@ function seedTownState(
 function queued(
   overrides: Partial<TownCraftQueueEntry> = {},
 ): TownCraftQueueEntry {
-  return {
+  return buildTownCraftQueueEntry({
     id: 'q1' as CraftQueueEntryId,
     tradeskillId: blacksmithingId,
     recipeId: ingotRecipe.id,
-    ticksIntoCraft: 0,
     ...overrides,
-  };
+  });
 }
 
 function fullStock(): TownNodeState['stock'] {
-  return Array.from({ length: SHOP_CAP }, () => ({
-    equipmentItem: buildEquipmentItem(swordId),
-    addedAtTick: 0,
-  }));
+  return Array.from({ length: SHOP_CAP }, () => buildTownStockEntry(swordId));
 }
 
 function craftTime(recipe: RecipeContent, town: TownContent, level = 3) {

@@ -10,6 +10,7 @@ import {
 } from '@helpers/hero/party';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import type {
+  CaravanNodeState,
   Character,
   Combat,
   Combatant,
@@ -20,7 +21,10 @@ import type {
   JobId,
   MonsterContent,
   RecipeId,
+  TownCraftQueueEntry,
   TownNodeState,
+  TownStockEntry,
+  TradeskillId,
 } from '@interfaces';
 
 export function buildTownNodeState(
@@ -41,6 +45,17 @@ export function buildTownNodeState(
   };
 }
 
+export function buildCaravanNodeState(
+  overrides: Partial<CaravanNodeState> = {},
+): CaravanNodeState {
+  return {
+    activeTradeIndices: [],
+    tradeCounts: {},
+    generatedAtTick: 0,
+    ...overrides,
+  };
+}
+
 export function buildCraftQueueEntry(
   overrides: Partial<CraftQueueEntry> & { recipeId: RecipeId },
 ): CraftQueueEntry {
@@ -52,6 +67,24 @@ export function buildCraftQueueEntry(
     reservedEquipment: [],
     ...overrides,
   };
+}
+
+export function buildTownCraftQueueEntry(
+  overrides: Partial<TownCraftQueueEntry> & { recipeId: RecipeId },
+): TownCraftQueueEntry {
+  return {
+    id: `town-queue-${overrides.recipeId}` as CraftQueueEntryId,
+    tradeskillId: 'test-tradeskill' as TradeskillId,
+    ticksIntoCraft: 0,
+    ...overrides,
+  };
+}
+
+export function buildTownStockEntry(
+  equipmentId: EquipmentId,
+  addedAtTick = 0,
+): TownStockEntry {
+  return { equipmentItem: buildEquipmentItem(equipmentId), addedAtTick };
 }
 
 export function buildEquipmentItem(

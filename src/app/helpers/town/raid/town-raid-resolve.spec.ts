@@ -1,415 +1,296 @@
+import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat-log', () => ({
-  categoryMessageLog: vi.fn(),
-  ITEM_ICON_TOKEN: '@@icon@@',
-  itemDropHtml: vi.fn(
-    (item: { name: string }, quantity: number) => `${quantity}x ${item.name}`,
-  ),
-  rarityNameHtml: vi.fn((name: string, rarity: string) => `[${rarity}]${name}`),
-}));
-
-vi.mock('@helpers/combat/combat-rewards', () => ({
-  grantResolvedDrops: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSafeSegment: vi.fn((name: string) => name),
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 1000),
-  formatDuration: vi.fn(() => '1h'),
-}));
-
-vi.mock('@helpers/item/item-preview', () => ({
-  resolveRewardDisplay: vi.fn(),
-}));
-
-vi.mock('@helpers/item/loot', () => ({
-  combatItemDropRateBoost: vi.fn(() => 0),
-  rollDroppedRewards: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/rng', () => ({
-  rngNumberRange: vi.fn(() => 2),
+vi.mock('@helpers/combat/combat-rewards');
+vi.mock('@helpers/town/reputation/town-reputation-buff');
+vi.mock('@helpers/town/town-commission-generate');
+vi.mock('@helpers/rng', async (importOriginal) => ({
+  ...(await importOriginal<typeof RngHelper>()),
+  rngNumberRange: vi.fn((_min: number, max: number) => max - 1),
   rngShuffle: vi.fn((items: unknown[]) => items),
 }));
 
-vi.mock('@helpers/state-game', () => ({
-  updateGamestate: vi.fn(),
-  worldCurrentLocationState: vi.fn(() => ({ mapName: 'LarsianDesert' })),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-defense', () => ({
-  raidTelegraphClear: vi.fn(),
-}));
-
-vi.mock('@helpers/town/reputation/town-reputation', () => ({
-  townReputationGain: vi.fn(),
-  townReputationLose: vi.fn(),
-  townReputationTier: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/town/reputation/town-reputation-buff', () => ({
-  townReputationBuffRefresh: vi.fn(),
-}));
-
-vi.mock('@helpers/town/shop/town-shop-access', () => ({
-  townShopItemCap: vi.fn(() => 10),
-}));
-
-vi.mock('@helpers/town/shop/town-stock', () => ({
-  townStockDisplay: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-materials', () => ({
-  applyTownMaterialDelta: vi.fn(),
-}));
-
-import { categoryMessageLog, itemDropHtml } from '@helpers/combat/combat-log';
+import { combatLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
-import { getEntry } from '@helpers/content/content';
-import { formatDuration } from '@helpers/engine/timer';
-import { resolveRewardDisplay } from '@helpers/item/item-preview';
-import { rollDroppedRewards } from '@helpers/item/loot';
-import { updateGamestate } from '@helpers/state-game';
-import { raidTelegraphClear } from '@helpers/town/raid/town-raid-defense';
+import {
+  RAID_LOSS_CRAFT_DEBUFF_TICKS,
+  RAID_LOSS_MATERIAL_STEAL_PERCENT,
+  RAID_LOSS_REPUTATION_AMOUNT,
+  RAID_LOSS_STOCK_MAX_STEAL_PERCENT,
+  RAID_WIN_REPUTATION_AMOUNT,
+} from '@helpers/config';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { worldTownsState } from '@helpers/state-game';
 import {
   raidResolveDefeat,
   raidResolveVictory,
 } from '@helpers/town/raid/town-raid-resolve';
-import {
-  townReputationGain,
-  townReputationLose,
-  townReputationTier,
-} from '@helpers/town/reputation/town-reputation';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { townReputationBuffRefresh } from '@helpers/town/reputation/town-reputation-buff';
-import { townStockDisplay } from '@helpers/town/shop/town-stock';
-import { applyTownMaterialDelta } from '@helpers/town/town-materials';
+import { townCommissionRefreshTierScaledSlots } from '@helpers/town/town-commission-generate';
 import type {
-  Combat,
-  GameState,
+  EquipmentId,
+  ItemId,
+  MonsterId,
+  RecipeId,
+  ResolvedDrop,
   TownContent,
   TownId,
   TownNodeState,
 } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCombat,
+  buildTownCraftQueueEntry,
+  buildTownNodeState,
+  buildTownStockEntry,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
+const trophyId = 'raid-trophy' as EquipmentId;
+const now = 1000;
 
-function buildTown(overrides: Partial<TownContent> = {}): TownContent {
-  return {
+const shopCap = 4;
+// One more than the shop can ever hold, so any steal percent leaves a survivor.
+const equipment = Array.from({ length: shopCap + 1 }, (_, i) =>
+  ensureEquipment({ id: `gear-${i}` as EquipmentId, name: `Gear ${i}` }),
+);
+const ore = ensureItem({
+  id: 'ore' as ItemId,
+  name: 'Ore',
+  sprite: 'ore-sprite',
+});
+const wood = ensureItem({
+  id: 'wood' as ItemId,
+  name: 'Wood',
+  sprite: 'wood-sprite',
+});
+
+function town(sellItemCount = shopCap): TownContent {
+  return ensureTown({
     id: townId,
     name: 'Larsia',
     level: 25,
+    traders: {
+      sellItemCount: [{ tier: 0, value: sellItemCount }],
+    } as TownContent['traders'],
     defense: {
-      rewards: [{ itemId: 'gold-coin' as never, chance: 100 }],
-      guardian: { reputationTiers: [] },
-      assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
-      quests: { commissions: [] },
-    },
-    ...overrides,
-  } as TownContent;
-}
-
-// Only the fields raidResolveDefeat's loss mechanics touch - the rest of TownNodeState is irrelevant to these tests.
-function buildTownNodeState(
-  overrides: Partial<TownNodeState> = {},
-): TownNodeState {
-  return {
-    stock: [],
-    craftQueue: [],
-    materials: {},
-    ...overrides,
-  } as TownNodeState;
-}
-
-// raidResolveDefeat relies on updateGamestate running its callback synchronously (true in-tick) -
-// tests that need the post-update loss messages must make the mock do the same against a state fixture.
-function mockUpdateGamestateWith(state: GameState): void {
-  vi.mocked(updateGamestate).mockImplementation((fn) => {
-    fn(state);
-    return Promise.resolve();
+      rewards: [{ kind: 'Equipment', equipmentId: trophyId, chance: 100 }],
+    } as TownContent['defense'],
   });
+}
+
+function seedTown(
+  overrides: Partial<TownNodeState> = {},
+  content = town(),
+): void {
+  seedContent([
+    content,
+    ...equipment,
+    ensureEquipment({ id: trophyId, name: 'Raid Trophy' }),
+    ore,
+    wood,
+  ]);
+  seedGamestate((state) => {
+    state.clock.numTicks = now;
+    state.world.currentLocation.mapName = 'LarsianDesert';
+    state.world.towns[townId] = buildTownNodeState(overrides);
+  });
+}
+
+function townState(): TownNodeState {
+  return worldTownsState()[townId];
+}
+
+function logMessages(): string[] {
+  return combatLog().map((entry) => entry.message);
+}
+
+function stockOf(count: number): TownNodeState['stock'] {
+  return equipment.slice(0, count).map((item) => buildTownStockEntry(item.id));
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(getEntry).mockReturnValue(buildTown() as never);
 });
 
-function updateFnAt(index: number): (state: GameState) => GameState {
-  return vi.mocked(updateGamestate).mock.calls[index][0];
-}
-
 describe('raidResolveVictory', () => {
-  it('grants the town raid reward table and gains reputation', () => {
-    const combat = { locationName: 'Larsia' } as Combat;
-    const drops = [{ itemId: 'gold-coin' as never, quantity: 500 }];
-    vi.mocked(rollDroppedRewards).mockReturnValue(drops as never);
+  const killDrops: ResolvedDrop[] = [
+    { kind: 'Item', itemId: ore.id, quantity: 20 },
+  ];
 
-    const killDrops = [{ itemId: 'gold-coin' as never, quantity: 20 }];
+  it('grants the kill drops plus the town raid rewards, and gains reputation', () => {
+    seedTown();
+    const combat = buildCombat();
+    const events = captureAnalyticsEvents();
 
-    raidResolveVictory(combat, townId, killDrops as never);
+    inTick(() => raidResolveVictory(combat, townId, killDrops));
 
-    expect(rollDroppedRewards).toHaveBeenCalledWith(
-      buildTown().defense.rewards,
-      25,
-      0,
-    );
-    expect(grantResolvedDrops).toHaveBeenCalledTimes(1);
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, [
       ...killDrops,
-      ...drops,
+      { kind: 'Equipment', equipmentId: trophyId },
     ]);
-    expect(townReputationGain).toHaveBeenCalledWith(townId, 100, 'RaidDefense');
+    expect(townState().reputation).toBe(RAID_WIN_REPUTATION_AMOUNT);
+    expect(townState().lastRaidResolvedAtTick).toBe(now);
+    expect(events).toContain('Town:Raid:Win:Larsia');
   });
 
-  it('re-syncs the town buff immediately when the reputation gain crosses a tier', () => {
-    vi.mocked(townReputationTier).mockReturnValueOnce(0).mockReturnValueOnce(1);
-
-    raidResolveVictory({} as Combat, townId, []);
-
-    expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
-  });
-
-  it('does not re-sync the town buff when the reputation gain stays within a tier', () => {
-    vi.mocked(townReputationTier).mockReturnValue(0);
-
-    raidResolveVictory({} as Combat, townId, []);
-
+  it('re-syncs the town buff and commissions only when the gain crosses a tier', () => {
+    seedTown({
+      reputation:
+        TOWN_REPUTATION_THRESHOLDS[2] - RAID_WIN_REPUTATION_AMOUNT - 1,
+    });
+    inTick(() => raidResolveVictory(buildCombat(), townId, []));
     expect(townReputationBuffRefresh).not.toHaveBeenCalled();
+
+    seedTown({
+      reputation: TOWN_REPUTATION_THRESHOLDS[1] - RAID_WIN_REPUTATION_AMOUNT,
+    });
+    inTick(() => raidResolveVictory(buildCombat(), townId, []));
+    expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
+    expect(townCommissionRefreshTierScaledSlots).toHaveBeenCalledWith(townId);
   });
 
-  it('sets lastRaidResolvedAtTick', () => {
-    raidResolveVictory({} as Combat, townId, []);
+  it('only grants the kill drops when the town no longer resolves', () => {
+    seedGamestate();
+    const combat = buildCombat();
 
-    const updateFn = updateFnAt(0);
-    const state = {
-      world: { towns: { [townId]: { lastRaidResolvedAtTick: undefined } } },
-    } as unknown as GameState;
-    const result = updateFn(state);
+    inTick(() => raidResolveVictory(combat, townId, killDrops));
 
-    expect(result.world.towns[townId].lastRaidResolvedAtTick).toBe(1000);
-  });
-
-  it('only grants kill drops when the town no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const combat = {} as Combat;
-    const killDrops = [{ itemId: 'gold-coin', quantity: 20 }] as never;
-
-    raidResolveVictory(combat, townId, killDrops);
-
-    expect(rollDroppedRewards).not.toHaveBeenCalled();
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
-    expect(townReputationGain).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(worldTownsState()).toEqual({});
   });
 });
 
 describe('raidResolveDefeat', () => {
-  it('loses reputation and applies the craft-speed debuff', () => {
-    raidResolveDefeat(townId);
+  const defeat = () => inTick(() => raidResolveDefeat(townId));
 
-    expect(townReputationLose).toHaveBeenCalledWith(townId, 50, 'RaidDefense');
-    // Must run from inside the updateGamestate callback, not after it - updateGamestate is a bare
-    // mock here, so nothing else could have called it yet.
-    expect(raidTelegraphClear).not.toHaveBeenCalled();
+  it('loses reputation, slows crafting and clears the raid telegraph', () => {
+    seedTown({
+      reputation: TOWN_REPUTATION_THRESHOLDS[2],
+      raidTelegraphedAtTick: 900,
+      raidEngageWindowExpiresAtTick: 1200,
+      raidTelegraphedAssaulterIds: ['bloodmoth' as MonsterId],
+    });
+    const events = captureAnalyticsEvents();
+
+    defeat();
+
+    expect(townState()).toMatchObject({
+      reputation: TOWN_REPUTATION_THRESHOLDS[2] - RAID_LOSS_REPUTATION_AMOUNT,
+      lastRaidResolvedAtTick: now,
+      craftSpeedDebuffExpiresAtTick: now + RAID_LOSS_CRAFT_DEBUFF_TICKS,
+      raidTelegraphedAtTick: undefined,
+      raidEngageWindowExpiresAtTick: undefined,
+      raidTelegraphedAssaulterIds: undefined,
+    });
+    expect(events).toContain('Town:Raid:Loss:Larsia');
+    expect(logMessages()).toEqual([
+      expect.stringContaining('crafting is slowed'),
+    ]);
   });
 
-  it('re-syncs the town buff immediately when the reputation loss crosses a tier', () => {
-    vi.mocked(townReputationTier).mockReturnValueOnce(1).mockReturnValueOnce(0);
-
-    raidResolveDefeat(townId);
-
-    expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
-  });
-
-  it('does not re-sync the town buff when the reputation loss stays within a tier', () => {
-    vi.mocked(townReputationTier).mockReturnValue(1);
-
-    raidResolveDefeat(townId);
-
+  it('re-syncs the town buff and commissions only when the loss crosses a tier', () => {
+    seedTown({
+      reputation: TOWN_REPUTATION_THRESHOLDS[2] + RAID_LOSS_REPUTATION_AMOUNT,
+    });
+    defeat();
     expect(townReputationBuffRefresh).not.toHaveBeenCalled();
-  });
 
-  it('applies the raid-loss state updates', () => {
-    raidResolveDefeat(townId);
-
-    const updateFn = updateFnAt(0);
-    const state = {
-      world: {
-        towns: {
-          [townId]: buildTownNodeState({
-            lastRaidResolvedAtTick: undefined,
-            craftSpeedDebuffExpiresAtTick: undefined,
-            raidTelegraphedAtTick: 900,
-            raidEngageWindowExpiresAtTick: 1200,
-            raidTelegraphedAssaulterIds: ['Bloodmoth' as never],
-          }),
-        },
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(raidTelegraphClear).toHaveBeenCalledWith(state, townId, 1000);
-    expect(result.world.towns[townId].lastRaidResolvedAtTick).toBe(1000);
-    expect(result.world.towns[townId].craftSpeedDebuffExpiresAtTick).toBe(4600);
+    seedTown({
+      reputation:
+        TOWN_REPUTATION_THRESHOLDS[2] + RAID_LOSS_REPUTATION_AMOUNT - 1,
+    });
+    defeat();
+    expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
+    expect(townCommissionRefreshTierScaledSlots).toHaveBeenCalledWith(townId);
   });
 
   it('does nothing when the town no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+    seedGamestate();
+    const events = captureAnalyticsEvents();
 
-    raidResolveDefeat(townId);
+    defeat();
 
-    expect(townReputationLose).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(worldTownsState()).toEqual({});
+    expect(events).toEqual([]);
+    expect(logMessages()).toEqual([]);
   });
 
-  it('steals a random subset of stock capped at the rolled amount, and logs their names', () => {
-    const stock = [
-      { equipmentItem: { equipmentId: 'sword-1' }, addedAtTick: 0 },
-      { equipmentItem: { equipmentId: 'shield-1' }, addedAtTick: 0 },
-      { equipmentItem: { equipmentId: 'bow-1' }, addedAtTick: 0 },
-    ] as TownNodeState['stock'];
-    vi.mocked(townStockDisplay).mockImplementation(
-      (entry) =>
-        ({ name: entry.equipmentItem.equipmentId, rarity: 'Rare' }) as never,
+  it('steals up to its share of the stock cap, logging what was taken', () => {
+    const maxStolen = Math.floor(
+      shopCap * (RAID_LOSS_STOCK_MAX_STEAL_PERCENT / 100),
     );
-    const state = {
-      world: { towns: { [townId]: buildTownNodeState({ stock }) } },
-    } as unknown as GameState;
-    mockUpdateGamestateWith(state);
+    const stock = stockOf(maxStolen + 1);
+    seedTown({ stock });
 
-    raidResolveDefeat(townId);
+    defeat();
 
-    // rngNumberRange is mocked to 2 and rngShuffle is identity, so the first 2 (in order) are stolen.
-    expect(state.world.towns[townId].stock).toEqual([stock[2]]);
-    expect(categoryMessageLog).toHaveBeenCalledWith(
-      'Raid',
-      'Larsia',
-      'Larsia lost the following items: [Rare]sword-1, [Rare]shield-1',
+    expect(townState().stock).toEqual(stock.slice(maxStolen));
+    const lostItems = logMessages().find((m) =>
+      m.includes('lost the following items'),
     );
+    equipment.slice(0, maxStolen).forEach(({ name }) => {
+      expect(lostItems).toContain(name);
+    });
+    expect(lostItems).not.toContain(equipment[maxStolen].name);
   });
 
-  it('does not log a stolen-items message when stock is empty', () => {
-    const state = {
-      world: { towns: { [townId]: buildTownNodeState() } },
-    } as unknown as GameState;
-    mockUpdateGamestateWith(state);
+  it('always steals at least one item, however small the stock cap', () => {
+    seedTown({ stock: stockOf(2) }, town(1));
 
-    raidResolveDefeat(townId);
+    defeat();
 
-    expect(categoryMessageLog).not.toHaveBeenCalledWith(
-      'Raid',
-      'Larsia',
-      expect.stringContaining('lost the following items'),
-    );
+    expect(townState().stock).toHaveLength(1);
   });
 
-  it('cancels the entire craft queue and logs what was being crafted', () => {
-    const craftQueue = [
-      {
-        id: 'q1',
-        tradeskillId: 'blacksmithing',
-        recipeId: 'recipe-sword',
-        ticksIntoCraft: 5,
-      },
-      {
-        id: 'q2',
-        tradeskillId: 'blacksmithing',
-        recipeId: 'recipe-shield',
-        ticksIntoCraft: 2,
-      },
-    ] as TownNodeState['craftQueue'];
-    vi.mocked(getEntry).mockImplementation(
-      (id) =>
-        (id === townId
-          ? buildTown()
-          : { id, result: { equipmentId: id } }) as never,
+  it('scraps the whole craft queue, logging what was being crafted', () => {
+    const recipes = equipment.slice(0, 2).map((item) =>
+      ensureRecipe({
+        id: `recipe-${item.id}` as RecipeId,
+        name: item.name,
+        result: { equipmentId: item.id },
+      }),
     );
-    vi.mocked(resolveRewardDisplay).mockImplementation(
-      (reward) =>
-        ({
-          name: `Crafted ${reward.equipmentId}`,
-          rarity: 'Uncommon',
-        }) as never,
-    );
-    const state = {
-      world: { towns: { [townId]: buildTownNodeState({ craftQueue }) } },
-    } as unknown as GameState;
-    mockUpdateGamestateWith(state);
+    seedTown({
+      craftQueue: recipes.map((recipe) =>
+        buildTownCraftQueueEntry({ recipeId: recipe.id }),
+      ),
+    });
+    seedContent([town(), ...equipment, ...recipes]);
 
-    raidResolveDefeat(townId);
+    defeat();
 
-    expect(state.world.towns[townId].craftQueue).toEqual([]);
-    expect(categoryMessageLog).toHaveBeenCalledWith(
-      'Raid',
-      'Larsia',
-      'Larsia lost the following in-progress crafts: [Uncommon]Crafted recipe-sword, [Uncommon]Crafted recipe-shield',
+    expect(townState().craftQueue).toEqual([]);
+    const lostCrafts = logMessages().find((m) =>
+      m.includes('in-progress crafts'),
     );
+    expect(lostCrafts).toContain(equipment[0].name);
+    expect(lostCrafts).toContain(equipment[1].name);
   });
 
-  it('takes 50% of every material stack and logs the loss', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) =>
-        (id === townId
-          ? buildTown()
-          : { id, name: id, sprite: `${id}-sprite` }) as never,
-    );
-    const state = {
-      world: {
-        towns: {
-          [townId]: buildTownNodeState({
-            materials: { 'iron-ore': 10, wood: 3 } as never,
-          }),
-        },
-      },
-    } as unknown as GameState;
-    mockUpdateGamestateWith(state);
+  it('takes a share of every material stack, logging each loss with its icon', () => {
+    // The largest stack that still rounds down to nothing stolen.
+    const tooSmallToLose =
+      Math.ceil(100 / RAID_LOSS_MATERIAL_STEAL_PERCENT) - 1;
+    seedTown({ materials: { [ore.id]: 10, [wood.id]: tooSmallToLose } });
 
-    raidResolveDefeat(townId);
+    defeat();
 
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      state,
-      townId,
-      'iron-ore',
-      -5,
-    );
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      state,
-      townId,
-      'wood',
-      -1,
-    );
-    expect(itemDropHtml).toHaveBeenCalledWith(
-      { id: 'iron-ore', name: 'iron-ore', sprite: 'iron-ore-sprite' },
-      5,
-    );
-    expect(categoryMessageLog).toHaveBeenCalledWith(
-      'Raid',
-      'Larsia',
-      'Larsia lost the following resources: @@icon@@5x iron-ore, @@icon@@1x wood',
-      [
-        { sprite: 'iron-ore-sprite', spritesheet: 'item' },
-        { sprite: 'wood-sprite', spritesheet: 'item' },
-      ],
-    );
-  });
-
-  it('always logs the craft-speed debuff duration', () => {
-    const state = {
-      world: { towns: { [townId]: buildTownNodeState() } },
-    } as unknown as GameState;
-    mockUpdateGamestateWith(state);
-
-    raidResolveDefeat(townId);
-
-    expect(formatDuration).toHaveBeenCalledWith(3600);
+    const stolen = Math.floor(10 * (RAID_LOSS_MATERIAL_STEAL_PERCENT / 100));
+    expect(townState().materials).toEqual({
+      [ore.id]: 10 - stolen,
+      [wood.id]: tooSmallToLose,
+    });
+    const entry = combatLog().find((e) => e.message.includes('resources'));
+    expect(entry?.message).toContain('ore');
+    expect(entry?.message).not.toContain('wood');
+    expect(entry?.itemIcons).toEqual([
+      { sprite: ore.sprite, spritesheet: 'item' },
+    ]);
   });
 });

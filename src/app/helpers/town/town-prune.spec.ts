@@ -13,7 +13,7 @@ import type {
   TradeskillId,
   WorkerId,
 } from '@interfaces';
-import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { buildTownNodeState, buildTownStockEntry } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 
 const townId = 'larsia' as TownId;
@@ -56,7 +56,7 @@ describe('pruneInvalidTowns', () => {
       reputation: 350,
       hiddenGold: 1200,
       materials: { [oreId]: 8 },
-      stock: [{ equipmentItem: buildEquipmentItem(swordId), addedAtTick: 3 }],
+      stock: [buildTownStockEntry(swordId, 3)],
     });
 
     expect(prunedTown({ [townId]: existing })).toMatchObject({
@@ -81,11 +81,8 @@ describe('pruneInvalidTowns', () => {
       [townId]: buildTownNodeState({
         materials: { [oreId]: 5, ['gone' as ItemId]: 2 },
         stock: [
-          { equipmentItem: buildEquipmentItem(swordId), addedAtTick: 0 },
-          {
-            equipmentItem: buildEquipmentItem('gone' as EquipmentId),
-            addedAtTick: 0,
-          },
+          buildTownStockEntry(swordId),
+          buildTownStockEntry('gone' as EquipmentId),
         ],
       }),
     });

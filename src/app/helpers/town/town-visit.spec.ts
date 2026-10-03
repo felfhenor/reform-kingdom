@@ -19,7 +19,6 @@ import {
 import { isPartyAtTown, townMarkVisited } from '@helpers/town/town-visit';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
-  CraftQueueEntryId,
   EquipmentId,
   IsContentItem,
   ItemId,
@@ -32,7 +31,11 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
-import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import {
+  buildTownCraftQueueEntry,
+  buildTownNodeState,
+  buildTownStockEntry,
+} from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
@@ -90,19 +93,12 @@ describe('townMarkVisited', () => {
   it('keeps progress the town accrued before it was activated', () => {
     const existing = buildTownNodeState({
       lastProcessedTick: { worker: 42 },
-      stock: [
-        {
-          equipmentItem: buildEquipmentItem('sword' as EquipmentId),
-          addedAtTick: 10,
-        },
-      ],
+      stock: [buildTownStockEntry('sword' as EquipmentId, 10)],
       craftQueue: [
-        {
-          id: 'q1' as CraftQueueEntryId,
-          tradeskillId: 'jewelcrafting' as TradeskillId,
+        buildTownCraftQueueEntry({
           recipeId: 'ring' as RecipeId,
           ticksIntoCraft: 3,
-        },
+        }),
       ],
       reputation: 250,
       hiddenGold: 1200,

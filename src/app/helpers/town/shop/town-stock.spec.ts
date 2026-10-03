@@ -16,20 +16,17 @@ import type {
   TownId,
   TownStockEntry,
 } from '@interfaces';
-import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import {
+  buildEquipmentItem,
+  buildTownNodeState,
+  buildTownStockEntry,
+} from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
 const swordId = 'sword' as EquipmentId;
 const flamingId = 'flaming' as AffixId;
-
-function entry(
-  equipmentId: EquipmentId = swordId,
-  addedAtTick = 0,
-): TownStockEntry {
-  return { equipmentItem: buildEquipmentItem(equipmentId), addedAtTick };
-}
 
 function stateWithStock(stock: TownStockEntry[]): GameState {
   const state = defaultGameState();
@@ -46,7 +43,7 @@ beforeEach(() => {
 
 describe('townStock', () => {
   it("reads the town's stock, or nothing for a town never visited", () => {
-    const stock = [entry()];
+    const stock = [buildTownStockEntry(swordId)];
     seedGamestate((state) => {
       state.world.towns[townId] = buildTownNodeState({ stock });
     });
@@ -67,23 +64,29 @@ describe('townStockDisplay', () => {
   });
 
   it('is undefined once the base equipment no longer resolves', () => {
-    expect(townStockDisplay(entry('removed' as EquipmentId))).toBeUndefined();
+    expect(
+      townStockDisplay(buildTownStockEntry('removed' as EquipmentId)),
+    ).toBeUndefined();
   });
 });
 
 describe('pruneInvalidTownStock', () => {
   it('drops entries whose equipment no longer resolves, or that predate equipmentItem', () => {
-    const kept = entry(swordId, 5);
+    const kept = buildTownStockEntry(swordId, 5);
     const legacy = { itemId: 'ingot', addedAtTick: 5 } as never;
 
     expect(
-      pruneInvalidTownStock([kept, entry('removed' as EquipmentId, 5), legacy]),
+      pruneInvalidTownStock([
+        kept,
+        buildTownStockEntry('removed' as EquipmentId, 5),
+        legacy,
+      ]),
     ).toEqual([kept]);
   });
 
   it('backfills a missing addedAtTick to the current tick rather than zero', () => {
     seedGamestate((state) => (state.clock.numTicks = 500));
-    const { equipmentItem } = entry();
+    const { equipmentItem } = buildTownStockEntry(swordId);
 
     expect(
       pruneInvalidTownStock([{ equipmentItem } as TownStockEntry]),
@@ -94,9 +97,9 @@ describe('pruneInvalidTownStock', () => {
 describe('applyTownStockAdd', () => {
   it('appends as its own new entry, stamped with the current tick', () => {
     seedGamestate((state) => (state.clock.numTicks = 42));
-    const existing = entry();
+    const existing = buildTownStockEntry(swordId);
     const state = stateWithStock([existing]);
-    const { equipmentItem } = entry();
+    const { equipmentItem } = buildTownStockEntry(swordId);
 
     applyTownStockAdd(state, townId, { equipmentItem }, 10);
 
@@ -107,12 +110,12 @@ describe('applyTownStockAdd', () => {
   });
 
   it('refuses the addition once at cap', () => {
-    const state = stateWithStock([entry()]);
+    const state = stateWithStock([buildTownStockEntry(swordId)]);
 
     applyTownStockAdd(
       state,
       townId,
-      { equipmentItem: entry().equipmentItem },
+      { equipmentItem: buildEquipmentItem(swordId) },
       1,
     );
 
@@ -125,7 +128,7 @@ describe('applyTownStockAdd', () => {
     applyTownStockAdd(
       state,
       townId,
-      { equipmentItem: entry().equipmentItem },
+      { equipmentItem: buildEquipmentItem(swordId) },
       10,
     );
 

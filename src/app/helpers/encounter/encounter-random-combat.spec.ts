@@ -1,273 +1,209 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/combat/combat-create', () => ({
-  combatCreateForEncounter: vi.fn(),
-}));
+vi.mock('@helpers/combat/combat-rewards');
+vi.mock('@helpers/task/task-progress');
 
-vi.mock('@helpers/combat/combat-log', () => ({
-  combatMessageLog: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-rewards', () => ({
-  grantResolvedDrops: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/encounter/encounter-random', () => ({
-  encounterRandomState: vi.fn(),
-}));
-
-vi.mock('@helpers/item/loot', () => ({
-  combatItemDropRateBoost: vi.fn(() => 0),
-  rollDroppedRewards: vi.fn(),
-}));
-
-vi.mock('@helpers/task/task-progress', () => ({
-  taskRecordCraft: vi.fn(),
-  taskRecordEncounterClear: vi.fn(),
-  taskRecordGather: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  updateGamestate: vi.fn(),
-  worldPartyState: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeEncounterRandom: vi.fn(),
-}));
-
-import { combatCreateForEncounter } from '@helpers/combat/combat-create';
+import { combatLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
-import { getEntry } from '@helpers/content/content';
-import { encounterRandomState } from '@helpers/encounter/encounter-random';
+import { ensureEncounterRandom } from '@helpers/content/ensure-encounternode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import {
   encounterRandomHandleVictory,
   encounterRandomStartFight,
 } from '@helpers/encounter/encounter-random-combat';
-import { rollDroppedRewards } from '@helpers/item/loot';
-import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import { worldCombatState, worldExploreRandomState } from '@helpers/state-game';
 import { taskRecordEncounterClear } from '@helpers/task/task-progress';
-import {
-  worldNodeByName,
-  worldNodeEncounterRandom,
-} from '@helpers/world-node/world-nodes';
 import type {
-  Character,
+  CollectibleId,
   Combat,
-  CombatId,
-  EncounterRandomContent,
+  EncounterRandomFight,
   EncounterRandomId,
-  EncounterRandomNodeState,
-  GameState,
-  MonsterContent,
+  MonsterId,
+  ResolvedDrop,
   WorldNodeEntry,
 } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCharacter,
+  buildCombat,
+  buildMonsterCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-const entry = { nodeName: 'Mystical Gobslime Shrine' } as WorldNodeEntry;
-const content = {
-  id: 'gobslime-shrine' as EncounterRandomId,
+const encounterId = 'gobslime-shrine' as EncounterRandomId;
+const flowerId = 'gobslime-flower' as CollectibleId;
+const levelFlowerId = 'level-flower' as CollectibleId;
+const goblin = ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' });
+const slime = ensureMonster({ id: 'slime' as MonsterId, name: 'Slime' });
+const killDrops: ResolvedDrop[] = [
+  { kind: 'Item', itemId: 'ore' as never, quantity: 2 },
+];
+
+const encounter = ensureEncounterRandom({
+  id: encounterId,
   name: 'Gobslime Shrine',
-  completionRewards: [{ collectibleId: 'gobslime-flower', chance: 100 }],
-} as unknown as EncounterRandomContent;
+  completionRewards: [
+    ensureDroppedReward({ collectibleId: flowerId, chance: 100 }),
+    // Only drops at exactly the last fight's level, proving which level rolled the rewards.
+    ensureDroppedReward({
+      collectibleId: levelFlowerId,
+      chance: 100,
+      minLevel: 18,
+      maxLevel: 18,
+    }),
+  ],
+});
+
+let node: WorldNodeEntry;
+
+function fight(
+  level: number,
+  ...monsterIds: MonsterId[]
+): EncounterRandomFight {
+  return { level, monsters: monsterIds.map((monsterId) => ({ monsterId })) };
+}
+
+function seedFights(...fights: EncounterRandomFight[]): void {
+  seedGamestate((state) => {
+    state.world.party = [buildCharacter({ name: 'Ada' })];
+    state.world.exploreRandom[encounterId] = {
+      fights,
+      generatedAtTick: 0,
+      completedThisCycle: false,
+    };
+  });
+}
+
+function wonFight(fightIndex: number, level = 12): Combat {
+  return buildCombat({
+    locationName: node.nodeName,
+    encounterRandomId: encounterId,
+    fightIndex,
+    guardians: [buildMonsterCombatant(goblin, { level })],
+  });
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  seedContent([encounter, goblin, slime]);
+  node = seedWorldNodes([{ name: encounter.name, type: 'ExploreRandomNode' }])[
+    encounter.name
+  ];
+});
 
 describe('encounterRandomStartFight', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('starts the generated fight at its level, tagged so a victory can find the next one', () => {
+    seedFights(fight(12, goblin.id), fight(18, slime.id, goblin.id));
+    const events = captureAnalyticsEvents();
 
-  it('builds and stores a Combat from the generated fight, tagged with the encounterRandomId/fightIndex', () => {
-    vi.mocked(worldNodeEncounterRandom).mockReturnValue(content);
-    const goblin = { id: 'Goblin' } as unknown as MonsterContent;
-    vi.mocked(getEntry).mockReturnValue(goblin as never);
-    vi.mocked(encounterRandomState).mockReturnValue({
-      fights: [
-        { level: 12, monsters: [{ monsterId: 'Goblin' }] },
-        { level: 18, monsters: [{ monsterId: 'Goblin' }] },
-      ],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState);
-    const party: Character[] = [];
-    vi.mocked(worldPartyState).mockReturnValue(party);
+    inTick(() => encounterRandomStartFight(node, 1));
 
-    const builtCombat = {
-      id: 'combat-1' as CombatId,
-      locationName: entry.nodeName,
-      locationPosition: { x: 0, y: 0 },
-      rounds: 0,
-      heroes: [],
-      helpers: [],
-      guardians: [],
-    } as unknown as Combat;
-    vi.mocked(combatCreateForEncounter).mockReturnValue(builtCombat);
-
-    encounterRandomStartFight(entry, 1);
-
-    expect(combatCreateForEncounter).toHaveBeenCalledWith(
-      party,
-      [goblin],
-      18,
-      entry.nodeName,
-    );
-
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const result = updateFn({ world: {} } as unknown as GameState);
-    expect(result.world.combat).toEqual({
-      ...builtCombat,
-      encounterRandomId: 'gobslime-shrine',
+    const combat = worldCombatState();
+    expect(combat).toMatchObject({
+      locationName: node.nodeName,
+      encounterRandomId: encounterId,
       fightIndex: 1,
     });
+    expect(combat?.heroes.map((hero) => hero.name)).toEqual(['Ada']);
+    expect(
+      combat?.guardians.map(({ monsterId, level }) => ({ monsterId, level })),
+    ).toEqual([
+      { monsterId: slime.id, level: 18 },
+      { monsterId: goblin.id, level: 18 },
+    ]);
+    expect(combatLog()[0].message).toContain('#2');
+    expect(events).toEqual(['Combat:Encounter:Random']);
   });
 
-  it('does nothing when there is no content for the node', () => {
-    vi.mocked(worldNodeEncounterRandom).mockReturnValue(undefined);
+  it('skips monsters no longer in content', () => {
+    seedFights(fight(12, 'gone' as MonsterId, goblin.id));
 
-    encounterRandomStartFight(entry, 0);
+    inTick(() => encounterRandomStartFight(node, 0));
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(worldCombatState()?.guardians).toHaveLength(1);
   });
 
-  it('does nothing when the requested fight index is out of range', () => {
-    vi.mocked(worldNodeEncounterRandom).mockReturnValue(content);
-    vi.mocked(encounterRandomState).mockReturnValue({
-      fights: [{ level: 1, monsters: [] }],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState);
+  it('starts nothing for a node without an encounter, or a fight never generated', () => {
+    seedFights(fight(12, goblin.id));
 
-    encounterRandomStartFight(entry, 5);
+    inTick(() => encounterRandomStartFight(node, 1));
+    seedContent([goblin]);
+    inTick(() => encounterRandomStartFight(node, 0));
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(worldCombatState()).toBeUndefined();
   });
 });
 
 describe('encounterRandomHandleVictory', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('returns false when the combat has no encounterRandomId', () => {
-    const combat = {} as Combat;
-    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }] as never;
+  it('only grants the kill drops for a fight outside any random encounter', () => {
+    const combat = buildCombat();
 
     expect(encounterRandomHandleVictory(combat, killDrops)).toBe(false);
-    expect(updateGamestate).not.toHaveBeenCalled();
+
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
+    expect(taskRecordEncounterClear).not.toHaveBeenCalled();
   });
 
-  it('still grants kill drops when the last fight is won but the content no longer resolves', () => {
-    vi.mocked(encounterRandomState).mockReturnValue({
-      fights: [{ level: 1, monsters: [] }],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState);
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const combat = {
-      encounterRandomId: 'gobslime-shrine' as EncounterRandomId,
-      fightIndex: 0,
-      locationName: entry.nodeName,
-      guardians: [{ level: 16 }],
-    } as unknown as Combat;
-    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }] as never;
+  it('grants the kill drops and moves straight on to the next fight', () => {
+    seedFights(fight(12, goblin.id), fight(18, slime.id));
+    const combat = wonFight(0);
 
-    expect(encounterRandomHandleVictory(combat, killDrops)).toBe(false);
-    expect(rollDroppedRewards).not.toHaveBeenCalled();
+    expect(inTick(() => encounterRandomHandleVictory(combat, killDrops))).toBe(
+      true,
+    );
+
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
+    expect(worldCombatState()).toMatchObject({ fightIndex: 1 });
+    expect(worldExploreRandomState()[encounterId].completedThisCycle).toBe(
+      false,
+    );
   });
 
-  it('starts the next generated fight when one remains', () => {
-    vi.mocked(encounterRandomState).mockReturnValue({
-      fights: [
-        { level: 1, monsters: [] },
-        { level: 2, monsters: [{ monsterId: 'Goblin' }] },
-      ],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState);
-    vi.mocked(worldNodeByName).mockReturnValue(entry);
-    vi.mocked(worldNodeEncounterRandom).mockReturnValue(content);
-    vi.mocked(getEntry).mockReturnValue({ id: 'Goblin' } as never);
-    vi.mocked(worldPartyState).mockReturnValue([]);
-    vi.mocked(combatCreateForEncounter).mockReturnValue({
-      id: 'combat-2' as CombatId,
-      locationName: entry.nodeName,
-      locationPosition: { x: 0, y: 0 },
-      rounds: 0,
-      heroes: [],
-      helpers: [],
-      guardians: [],
-    } as unknown as Combat);
+  it('lets combat end if the node vanished before the next fight', () => {
+    seedFights(fight(12, goblin.id), fight(18, slime.id));
+    seedWorldNodes([]);
 
-    const combat = {
-      encounterRandomId: 'gobslime-shrine' as EncounterRandomId,
-      fightIndex: 0,
-      locationName: entry.nodeName,
-      guardians: [{ level: 12 }],
-    } as unknown as Combat;
-
-    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }] as never;
-    expect(encounterRandomHandleVictory(combat, killDrops)).toBe(true);
-    expect(rollDroppedRewards).not.toHaveBeenCalled();
-    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
+    expect(
+      inTick(() => encounterRandomHandleVictory(wonFight(0), killDrops)),
+    ).toBe(false);
+    expect(worldCombatState()).toBeUndefined();
   });
 
-  it('grants completion rewards and marks the cycle completed once the last fight is won', () => {
-    vi.mocked(encounterRandomState).mockReturnValue({
-      fights: [{ level: 1, monsters: [] }],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState);
-    vi.mocked(getEntry).mockReturnValue(content as never);
-    vi.mocked(rollDroppedRewards).mockReturnValue([
-      { collectibleId: 'gobslime-flower' },
-    ] as never);
+  it('grants completion rewards at the fight level and completes the cycle after the last fight', () => {
+    seedFights(fight(12, goblin.id), fight(18, slime.id));
+    const combat = wonFight(1, 18);
+    const events = captureAnalyticsEvents();
 
-    const combat = {
-      encounterRandomId: 'gobslime-shrine' as EncounterRandomId,
-      fightIndex: 0,
-      locationName: entry.nodeName,
-      guardians: [{ level: 16 }],
-    } as unknown as Combat;
-
-    const killDrops = [{ kind: 'Item', itemId: 'ore', quantity: 2 }];
-    expect(encounterRandomHandleVictory(combat, killDrops as never)).toBe(
+    expect(inTick(() => encounterRandomHandleVictory(combat, killDrops))).toBe(
       false,
     );
 
-    expect(taskRecordEncounterClear).toHaveBeenCalledWith(entry.nodeName);
-    expect(rollDroppedRewards).toHaveBeenCalledWith(
-      content.completionRewards,
-      16,
-      0,
-    );
     expect(grantResolvedDrops).toHaveBeenCalledTimes(1);
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, [
       ...killDrops,
-      { collectibleId: 'gobslime-flower' },
+      { kind: 'Collectible', collectibleId: flowerId },
+      { kind: 'Collectible', collectibleId: levelFlowerId },
     ]);
+    expect(worldExploreRandomState()[encounterId].completedThisCycle).toBe(
+      true,
+    );
+    expect(taskRecordEncounterClear).toHaveBeenCalledWith(node.nodeName);
+    expect(events).toContain('World:Event:Complete:Gobslime Shrine');
+  });
 
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const state = {
-      world: {
-        exploreRandom: {
-          'gobslime-shrine': {
-            fights: [],
-            generatedAtTick: 0,
-            completedThisCycle: false,
-          },
-        },
-      },
-    } as unknown as GameState;
-    const result = updateFn(state);
-    expect(
-      result.world.exploreRandom['gobslime-shrine' as EncounterRandomId]
-        .completedThisCycle,
-    ).toBe(true);
+  it('still grants the kill drops when the encounter left content mid-cycle', () => {
+    seedFights(fight(12, goblin.id));
+    seedContent([goblin]);
+    const combat = wonFight(0);
+
+    inTick(() => encounterRandomHandleVictory(combat, killDrops));
+
+    expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
+    expect(worldExploreRandomState()[encounterId].completedThisCycle).toBe(
+      false,
+    );
   });
 });

@@ -11,7 +11,6 @@ import {
   townSpecialtyPriorityProcessTick,
 } from '@helpers/town/crafting/town-craft-priority-state';
 import type {
-  CraftQueueEntryId,
   EquipmentId,
   ItemId,
   RecipeContent,
@@ -21,7 +20,11 @@ import type {
   TownNodeState,
   TownSpecialtyPriorityEntry,
 } from '@interfaces';
-import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import {
+  buildTownCraftQueueEntry,
+  buildTownNodeState,
+  buildTownStockEntry,
+} from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
@@ -158,29 +161,17 @@ describe('townSpecialtyPriorityProcessTick', () => {
     seedTown(ringRecipe);
 
     seedTownState({
-      craftQueue: [
-        {
-          id: 'q1' as CraftQueueEntryId,
-          tradeskillId: 'jewelcrafting' as never,
-          recipeId: ringRecipe.id,
-          ticksIntoCraft: 0,
-        },
-      ],
+      craftQueue: [buildTownCraftQueueEntry({ recipeId: ringRecipe.id })],
     });
     expect(priorityAfterTick()).toEqual([]);
 
     seedTownState({
-      stock: [{ equipmentItem: buildEquipmentItem(ringId), addedAtTick: 0 }],
+      stock: [buildTownStockEntry(ringId)],
     });
     expect(priorityAfterTick()).toEqual([]);
 
     seedTownState({
-      stock: [
-        {
-          equipmentItem: buildEquipmentItem('axe' as EquipmentId),
-          addedAtTick: 0,
-        },
-      ],
+      stock: [buildTownStockEntry('axe' as EquipmentId)],
     });
     expect(priorityAfterTick()).toEqual([ringFailure(1)]);
   });

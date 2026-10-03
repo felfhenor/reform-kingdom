@@ -1,64 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/caravan/caravan', () => ({
-  caravanBusyTraderIds: vi.fn(),
-  caravanEligibleTraders: vi.fn(),
-}));
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  isRecipeDiscovered: vi.fn(),
-}));
-
-vi.mock('@helpers/item/collectibles', () => ({
-  isCollectibleDiscovered: vi.fn(),
-}));
-
-vi.mock('@helpers/item/equipment', () => ({
-  newEquipmentItem: vi.fn((equipmentId: string) => ({
-    id: 'rolled-equipment-item',
-    equipmentId,
-    infusedItemIds: [],
-    affixIds: ['some-affix'],
-  })),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldCaravansState: () => gamestate().world.caravans,
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeCaravan: vi.fn(),
-  worldNodesOfType: vi.fn(),
-}));
-
-import {
-  caravanBusyTraderIds,
-  caravanEligibleTraders,
-} from '@helpers/caravan/caravan';
 import {
   caravanProcessTick,
   caravanWeightedSample,
 } from '@helpers/caravan/caravan-tick';
-import { isRecipeDiscovered } from '@helpers/crafting/recipes';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import { ACTIVE_TRADE_COUNT } from '@helpers/config';
+import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
 import {
-  worldNodeCaravan,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+  ensureCaravan,
+  ensureCaravanTrader,
+} from '@helpers/content/ensure-caravan';
+import { ensureEquipment } from '@helpers/content/ensure-item';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
+import { worldCaravansState } from '@helpers/state-game';
 import type {
-  CaravanContent,
   CaravanId,
+  CaravanNodeState,
+  CaravanTrade,
   CaravanTraderContent,
   CaravanTraderId,
   CollectibleId,
@@ -66,374 +24,223 @@ import type {
   GameState,
   ItemId,
   RecipeId,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCaravanNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-function updateFnAt(index: number): (state: GameState) => GameState {
-  return vi.mocked(updateGamestate).mock.calls[index][0];
+const caravan = ensureCaravan({
+  id: 'carrina-duchy' as CaravanId,
+  name: 'Duchy Trading Caravan - Carrina',
+  traderResetTime: 100,
+  level: { min: 1, max: 10 },
+  traderCategories: ['Carrina'],
+});
+const otherCaravan = ensureCaravan({
+  id: 'elfheim-duchy' as CaravanId,
+  name: 'Duchy Trading Caravan - Elfheim',
+  traderCategories: ['Carrina'],
+  level: { min: 1, max: 10 },
+});
+const traderA = 'trader-a' as CaravanTraderId;
+const traderB = 'trader-b' as CaravanTraderId;
+const helmId = 'copper-helm' as EquipmentId;
+const now = 1000;
+
+function trader(
+  id: CaravanTraderId,
+  trades: Partial<CaravanTrade>[] = [],
+): CaravanTraderContent {
+  return ensureCaravanTrader({
+    id,
+    name: id,
+    category: 'Carrina',
+    level: 5,
+    trades: trades as CaravanTrade[],
+  });
 }
 
-describe('caravanWeightedSample', () => {
-  it('returns every item when count exceeds the pool size', () => {
-    const items = [{ weight: 1 }, { weight: 1 }];
-    expect(caravanWeightedSample(items, 5)).toHaveLength(2);
-  });
+const oreTrade = { type: 'sell', itemId: 'ore' as ItemId } as const;
 
-  it('returns exactly `count` items without duplicates from a larger pool', () => {
-    const items = [
-      { id: 1, weight: 1 },
-      { id: 2, weight: 1 },
-      { id: 3, weight: 1 },
-      { id: 4, weight: 1 },
-    ];
+function seedTraders(...traders: CaravanTraderContent[]): void {
+  seedContent([
+    caravan,
+    otherCaravan,
+    ensureEquipment({ id: helmId, name: 'Copper Helm' }),
+    ...traders,
+  ]);
+}
+
+function seedCaravans(
+  caravans: Partial<Record<CaravanId, CaravanNodeState>> = {},
+  edit: (state: GameState) => void = () => undefined,
+): void {
+  seedGamestate((state) => {
+    state.clock.numTicks = now;
+    Object.assign(state.world.caravans, caravans);
+    edit(state);
+  });
+}
+
+function expired(overrides: Partial<CaravanNodeState> = {}): CaravanNodeState {
+  return buildCaravanNodeState({
+    generatedAtTick: now - caravan.traderResetTime,
+    ...overrides,
+  });
+}
+
+function rerolled(): CaravanNodeState {
+  inTick(caravanProcessTick);
+  return worldCaravansState()[caravan.id];
+}
+
+afterEach(() => vi.restoreAllMocks());
+
+beforeEach(() => {
+  vi.spyOn(Math, 'random').mockReturnValue(0);
+  seedWorldNodes([
+    { name: caravan.name, type: 'CaravanNode', x: 1 },
+    { name: 'Nowhere Caravan', type: 'CaravanNode', x: 2 },
+  ]);
+});
+
+describe('caravanWeightedSample', () => {
+  it('picks up to `count` distinct items, stopping when nothing has weight', () => {
+    vi.mocked(Math.random).mockRestore();
+    const items = [1, 2, 3, 4].map((id) => ({ id, weight: 1 }));
 
     const picked = caravanWeightedSample(items, 2);
-
-    expect(picked).toHaveLength(2);
     expect(new Set(picked.map((p) => p.id)).size).toBe(2);
-  });
 
-  it('returns an empty array for a count of 0', () => {
-    expect(caravanWeightedSample([{ weight: 1 }], 0)).toEqual([]);
-  });
-
-  it('returns an empty array when every weight is 0', () => {
+    expect(caravanWeightedSample(items, 5)).toHaveLength(4);
     expect(caravanWeightedSample([{ weight: 0 }, { weight: 0 }], 2)).toEqual(
       [],
     );
   });
 });
 
-const entry = { nodeName: 'Duchy Trading Caravan - Carrina' } as WorldNodeEntry;
-const caravan: CaravanContent = {
-  id: 'carrina-duchy' as CaravanId,
-  name: 'Duchy Trading Caravan - Carrina',
-  __type: 'caravan',
-  description: 'A caravan.',
-  traderResetTime: 100,
-  level: { min: 1, max: 10 },
-  markupPercentages: { sell: 25, buy: -15 },
-  traderCategories: ['Carrina'],
-  commissionOffers: [],
-};
-
-function trader(
-  overrides: Partial<CaravanTraderContent> = {},
-): CaravanTraderContent {
-  return {
-    id: 'trader-a' as CaravanTraderId,
-    name: 'Trader A',
-    __type: 'caravantrader',
-    description: 'A trader.',
-    category: 'Carrina',
-    level: 5,
-    trades: [],
-    tokenTrades: [],
-    ...overrides,
-  };
-}
-
-function withCaravanState(caravans: Record<string, unknown>): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: { caravans },
-  } as unknown as GameState);
-}
-
 describe('caravanProcessTick', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldNodesOfType).mockReturnValue([entry]);
-    vi.mocked(worldNodeCaravan).mockReturnValue(caravan);
-    vi.mocked(timerTicksElapsed).mockReturnValue(1000);
-    vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
-    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
-    vi.mocked(caravanBusyTraderIds).mockReturnValue(new Set());
+  it('waits out the reset time before rerolling', () => {
+    seedTraders(trader(traderA));
+    const fresh = buildCaravanNodeState({ generatedAtTick: now - 1 });
+    seedCaravans({ [caravan.id]: fresh });
+
+    expect(rerolled()).toEqual(fresh);
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
+  it('staffs a caravan seen for the first time, with a fresh trade cycle', () => {
+    seedTraders(trader(traderA, [oreTrade]));
+    seedCaravans();
 
-  it('does not regenerate before traderResetTime has elapsed', () => {
-    withCaravanState({
-      [caravan.id]: { generatedAtTick: 950, traderId: undefined },
-    });
-
-    caravanProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('regenerates on the first tick when no state exists yet', () => {
-    withCaravanState({});
-    vi.mocked(caravanEligibleTraders).mockReturnValue([trader()]);
-
-    caravanProcessTick();
-
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id]).toEqual({
-      traderId: 'trader-a',
-      activeTradeIndices: [],
+    expect(rerolled()).toEqual({
+      traderId: traderA,
+      visitedTraderId: undefined,
+      activeTradeIndices: [0],
       rolledEquipment: {},
       tradeCounts: {},
-      generatedAtTick: 1000,
+      generatedAtTick: now,
     });
   });
 
-  it('assigns no trader when none are eligible', () => {
-    withCaravanState({
-      [caravan.id]: { generatedAtTick: 800, traderId: 'trader-a' },
+  it('leaves the caravan unstaffed when no trader is eligible', () => {
+    seedTraders(ensureCaravanTrader({ id: traderA, category: 'Elfheim' }));
+    seedCaravans({ [caravan.id]: expired({ traderId: traderA }) });
+
+    expect(rerolled()).toMatchObject({
+      traderId: undefined,
+      activeTradeIndices: [],
     });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([]);
-
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].traderId).toBeUndefined();
-    expect(result.world.caravans[caravan.id].activeTradeIndices).toEqual([]);
   });
 
-  it('reuses the only eligible trader even if it was the previous one', () => {
-    withCaravanState({
-      [caravan.id]: { generatedAtTick: 800, traderId: 'trader-a' },
+  it('swaps in a different trader when it can, forgetting the visit and past sales', () => {
+    seedTraders(trader(traderA), trader(traderB));
+    seedCaravans({
+      [caravan.id]: expired({
+        traderId: traderA,
+        visitedTraderId: traderA,
+        tradeCounts: { 0: 3 },
+      }),
     });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([trader()]);
 
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].traderId).toBe('trader-a');
+    const caravanState = rerolled();
+    expect(caravanState).toMatchObject({
+      traderId: traderB,
+      visitedTraderId: undefined,
+    });
+    expect(caravanState.tradeCounts).toEqual({});
   });
 
-  it('keeps the visit record when the same trader is reassigned', () => {
-    withCaravanState({
-      [caravan.id]: {
-        generatedAtTick: 800,
-        traderId: 'trader-a',
-        visitedTraderId: 'trader-a',
-      },
+  it('reuses the only eligible trader, keeping the visit', () => {
+    seedTraders(trader(traderA));
+    seedCaravans({
+      [caravan.id]: expired({ traderId: traderA, visitedTraderId: traderA }),
     });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([trader()]);
 
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].visitedTraderId).toBe('trader-a');
+    expect(rerolled()).toMatchObject({
+      traderId: traderA,
+      visitedTraderId: traderA,
+    });
   });
 
-  it('clears the visit record when a different trader is assigned', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    withCaravanState({
-      [caravan.id]: {
-        generatedAtTick: 800,
-        traderId: 'trader-a',
-        visitedTraderId: 'trader-a',
-      },
+  it('never stations a trader already staffing another camp', () => {
+    seedTraders(trader(traderA), trader(traderB));
+    const busyB = buildCaravanNodeState({
+      traderId: traderB,
+      generatedAtTick: now,
     });
-    const traderA = trader({ id: 'trader-a' as CaravanTraderId });
-    const traderB = trader({ id: 'trader-b' as CaravanTraderId });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([traderA, traderB]);
+    seedCaravans({
+      [caravan.id]: expired({ traderId: traderA }),
+      [otherCaravan.id]: busyB,
+    });
+    expect(rerolled().traderId).toBe(traderA);
 
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].traderId).toBe('trader-b');
-    expect(result.world.caravans[caravan.id].visitedTraderId).toBeUndefined();
+    seedTraders(trader(traderB));
+    seedCaravans({ [caravan.id]: expired(), [otherCaravan.id]: busyB });
+    expect(rerolled().traderId).toBeUndefined();
   });
 
-  it('picks a different trader than last cycle when more than one is eligible', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    withCaravanState({
-      [caravan.id]: { generatedAtTick: 800, traderId: 'trader-a' },
-    });
-    const traderA = trader({ id: 'trader-a' as CaravanTraderId });
-    const traderB = trader({ id: 'trader-b' as CaravanTraderId });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([traderA, traderB]);
-
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].traderId).toBe('trader-b');
-  });
-
-  it('does not pick a trader who is already staffing another camp', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    withCaravanState({
-      [caravan.id]: { generatedAtTick: 800, traderId: 'trader-a' },
-    });
-    const traderA = trader({ id: 'trader-a' as CaravanTraderId });
-    const traderB = trader({ id: 'trader-b' as CaravanTraderId });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([traderA, traderB]);
-    vi.mocked(caravanBusyTraderIds).mockReturnValue(
-      new Set(['trader-b' as CaravanTraderId]),
+  it('retires unique collectible and recipe sells the party already owns', () => {
+    const collectibleId = 'unique-thing' as CollectibleId;
+    const recipeId = 'recipe-a' as RecipeId;
+    seedTraders(
+      trader(traderA, [
+        { type: 'sell', collectibleId, weight: 5 },
+        { type: 'sell', recipeId, weight: 5 },
+        oreTrade,
+      ]),
     );
+    seedCaravans({}, (state) => {
+      applyCollectibleGrant(state, collectibleId, 1);
+      applyRecipeDiscovery(state, recipeId);
+    });
 
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].traderId).toBe('trader-a');
+    expect(rerolled().activeTradeIndices).toEqual([2]);
   });
 
-  it('leaves the caravan unstaffed when every eligible trader is busy elsewhere', () => {
-    withCaravanState({
-      [caravan.id]: { generatedAtTick: 800, traderId: 'trader-a' },
-    });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([trader()]);
-    vi.mocked(caravanBusyTraderIds).mockReturnValue(
-      new Set(['trader-a' as CaravanTraderId]),
+  it(`stocks at most ${ACTIVE_TRADE_COUNT} trades a cycle`, () => {
+    const trades = Array.from(
+      { length: ACTIVE_TRADE_COUNT + 1 },
+      () => oreTrade,
     );
+    seedTraders(trader(traderA, trades));
+    seedCaravans();
 
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].traderId).toBeUndefined();
+    expect(rerolled().activeTradeIndices).toHaveLength(ACTIVE_TRADE_COUNT);
   });
 
-  it('excludes an already-discovered unique collectible sell from the active trades', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    withCaravanState({});
+  it('pre-rolls an instance for each active equipment sell, not for buys', () => {
+    seedTraders(
+      trader(traderA, [
+        { type: 'buy', equipmentId: helmId },
+        { type: 'sell', equipmentId: helmId },
+      ]),
+    );
+    seedCaravans();
 
-    const withCollectible = trader({
-      trades: [
-        {
-          type: 'sell',
-          value: 100,
-          collectibleId: 'unique-thing' as CollectibleId,
-          weight: 5,
-        },
-        { type: 'sell', value: 10, itemId: 'ore' as ItemId, weight: 1 },
-      ],
-    });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([withCollectible]);
-    vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+    const { rolledEquipment } = rerolled();
 
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].activeTradeIndices).toEqual([1]);
-  });
-
-  it('excludes an already-discovered recipe sell from the active trades', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    withCaravanState({});
-
-    const withRecipe = trader({
-      trades: [
-        {
-          type: 'sell',
-          value: 25000,
-          recipeId: 'recipe-a' as RecipeId,
-          weight: 5,
-        },
-        { type: 'sell', value: 10, itemId: 'ore' as ItemId, weight: 1 },
-      ],
-    });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([withRecipe]);
-    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
-
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].activeTradeIndices).toEqual([1]);
-  });
-
-  it('pre-rolls an equipment instance for an active equipment-sell trade', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    withCaravanState({});
-
-    const withEquipment = trader({
-      trades: [
-        {
-          type: 'sell',
-          value: 500,
-          equipmentId: 'copper-helm' as EquipmentId,
-          weight: 1,
-        },
-      ],
-    });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([withEquipment]);
-
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].rolledEquipment).toEqual({
-      0: {
-        id: 'rolled-equipment-item',
-        equipmentId: 'copper-helm',
-        infusedItemIds: [],
-        affixIds: ['some-affix'],
-      },
-    });
-  });
-
-  it('does not pre-roll equipment for a buy trade', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    withCaravanState({});
-
-    const withEquipment = trader({
-      trades: [
-        {
-          type: 'buy',
-          value: 50,
-          equipmentId: 'copper-helm' as EquipmentId,
-          weight: 1,
-        },
-      ],
-    });
-    vi.mocked(caravanEligibleTraders).mockReturnValue([withEquipment]);
-
-    caravanProcessTick();
-
-    const updateFn = updateFnAt(0);
-    const result = updateFn({
-      world: { caravans: {} },
-    } as unknown as GameState);
-
-    expect(result.world.caravans[caravan.id].rolledEquipment).toEqual({});
+    expect(Object.keys(rolledEquipment ?? {})).toEqual(['1']);
+    expect(rolledEquipment?.[1]?.equipmentId).toBe(helmId);
   });
 });
