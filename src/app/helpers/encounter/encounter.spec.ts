@@ -1,118 +1,83 @@
+import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
+// Always rolls the top of a range, so an exclusive upper bound shows up as the max level.
+vi.mock('@helpers/rng', async (importOriginal) => ({
+  ...(await importOriginal<typeof RngHelper>()),
+  rngNumberRange: vi.fn((_min: number, max: number) => max - 1),
 }));
 
-vi.mock('@helpers/combat/combat-create', () => ({
-  combatCreateForEncounter: vi.fn(),
-}));
-
-vi.mock('@helpers/rng', () => ({
-  rngNumberRange: vi.fn(),
-  rngUuid: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  updateGamestate: vi.fn(),
-  worldPartyState: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 0),
-}));
-
-import { combatCreateForEncounter } from '@helpers/combat/combat-create';
-import { getEntry } from '@helpers/content/content';
+import { combatLog } from '@helpers/combat/combat-log';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { rngNumberRange } from '@helpers/rng';
-import { updateGamestate, worldPartyState } from '@helpers/state-game';
-import type {
-  Character,
-  Combat,
-  CombatId,
-  EncounterContent,
-  EncounterId,
-  GameState,
-  MonsterContent,
-} from '@interfaces';
+import { worldCombatState } from '@helpers/state-game';
+import type { EncounterId, MonsterId } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+
+const goblin = ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' });
+const slime = ensureMonster({ id: 'slime' as MonsterId, name: 'Slime' });
+const ruins = ensureEncounter({
+  id: 'field-ruins' as EncounterId,
+  name: 'Field Ruins',
+  levelRange: { min: 1, max: 3 },
+  fights: [
+    { monsters: [{ monsterId: goblin.id }] },
+    {
+      monsters: [
+        { monsterId: slime.id },
+        { monsterId: 'gone' as MonsterId },
+        { monsterId: goblin.id },
+      ],
+    },
+  ],
+});
+
+const start = (fightIndex: number, encounterId = ruins.id) =>
+  inTick(() => encounterStartFight(encounterId, fightIndex, 'Field Ruins'));
+
+beforeEach(() => {
+  seedContent([ruins, goblin, slime]);
+  seedGamestate(
+    (state) => (state.world.party = [buildCharacter({ name: 'Ada' })]),
+  );
+});
 
 describe('encounterStartFight', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('starts the requested fight within the level range, tagged for the victory handler', () => {
+    start(1);
 
-  it('builds and stores a Combat for the requested fight, tagged with the encounter/fight index', () => {
-    const encounter = {
-      id: 'enc-1' as EncounterId,
-      levelRange: { min: 1, max: 3 },
-      fights: [
-        { monsters: [{ monsterId: 'Goblin' }] },
-        { monsters: [{ monsterId: 'Goblin' }, { monsterId: 'Goblin' }] },
-      ],
-    } as unknown as EncounterContent;
-
-    const goblin = { id: 'Goblin' } as unknown as MonsterContent;
-    const party: Character[] = [];
-
-    vi.mocked(getEntry).mockImplementation((id: string) => {
-      if (id === 'enc-1') return encounter as never;
-      if (id === 'Goblin') return goblin as never;
-      return undefined;
-    });
-    vi.mocked(worldPartyState).mockReturnValue(party);
-    vi.mocked(rngNumberRange).mockReturnValue(2);
-
-    const builtCombat = {
-      id: 'combat-1' as CombatId,
+    const combat = worldCombatState();
+    expect(combat).toMatchObject({
       locationName: 'Field Ruins',
-      locationPosition: { x: 0, y: 0 },
-      rounds: 0,
-      heroes: [],
-      helpers: [],
-      guardians: [],
-      elementalModifiers: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
-    } as unknown as Combat;
-    vi.mocked(combatCreateForEncounter).mockReturnValue(builtCombat);
-
-    encounterStartFight('enc-1' as EncounterId, 1, 'Field Ruins');
-
-    expect(combatCreateForEncounter).toHaveBeenCalledWith(
-      party,
-      [goblin, goblin],
-      2,
-      'Field Ruins',
-    );
-
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const result = updateFn({ world: {} } as unknown as GameState);
-    expect(result.world.combat).toEqual({
-      ...builtCombat,
-      encounterId: 'enc-1',
+      encounterId: ruins.id,
       fightIndex: 1,
     });
+    expect(combat?.heroes.map((hero) => hero.name)).toEqual(['Ada']);
+    expect(
+      combat?.guardians.map(({ monsterId, level }) => ({ monsterId, level })),
+    ).toEqual([
+      { monsterId: slime.id, level: ruins.levelRange.max },
+      { monsterId: goblin.id, level: ruins.levelRange.max },
+    ]);
+    expect(combatLog()[0].message).toContain('#2');
   });
 
-  it('does nothing when the encounter does not exist', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+  it('can roll as low as the bottom of the level range', () => {
+    vi.mocked(rngNumberRange).mockImplementationOnce((min) => min);
 
-    encounterStartFight('missing' as EncounterId, 0, 'Nowhere');
+    start(0);
 
-    expect(combatCreateForEncounter).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(worldCombatState()?.guardians[0].level).toBe(ruins.levelRange.min);
   });
 
-  it('does nothing when the requested fight index is out of range', () => {
-    const encounter = {
-      id: 'enc-1' as EncounterId,
-      levelRange: { min: 1, max: 1 },
-      fights: [{ monsters: [{ monsterId: 'Goblin' }] }],
-    } as unknown as EncounterContent;
-    vi.mocked(getEntry).mockReturnValue(encounter as never);
+  it('starts nothing for an unknown encounter or a fight it does not have', () => {
+    start(0, 'gone' as EncounterId);
+    start(ruins.fights.length);
 
-    encounterStartFight('enc-1' as EncounterId, 5, 'Field Ruins');
-
-    expect(combatCreateForEncounter).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(worldCombatState()).toBeUndefined();
   });
 });

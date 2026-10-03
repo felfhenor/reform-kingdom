@@ -1,149 +1,103 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/encounter/encounter-random-generate', () => ({
-  generateEncounterRandomFights: vi.fn(),
-}));
+vi.mock('@helpers/encounter/encounter-random-generate');
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldCombatState: () => gamestate().world.combat,
-    worldExploreRandomState: () => gamestate().world.exploreRandom,
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeEncounterRandom: vi.fn(),
-  worldNodesOfType: vi.fn(),
-}));
-
+import { ensureEncounterRandom } from '@helpers/content/ensure-encounternode';
 import { generateEncounterRandomFights } from '@helpers/encounter/encounter-random-generate';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import {
-  worldNodeEncounterRandom,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+import { worldExploreRandomState } from '@helpers/state-game';
 import type {
-  Combat,
-  EncounterRandomContent,
+  EncounterRandomFight,
   EncounterRandomId,
+  EncounterRandomNodeState,
   GameState,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCombat } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-const entry = { nodeName: 'Mystical Gobslime Shrine' } as WorldNodeEntry;
-const content = {
+const shrine = ensureEncounterRandom({
   id: 'gobslime-shrine' as EncounterRandomId,
+  name: 'Gobslime Shrine',
   resetTime: 100,
-} as unknown as EncounterRandomContent;
+});
+const now = 1000;
+const oldFights: EncounterRandomFight[] = [{ level: 1, monsters: [] }];
+const newFights: EncounterRandomFight[] = [{ level: 5, monsters: [] }];
 
-function withState(
-  exploreRandom: Record<string, unknown>,
-  combat?: Partial<Combat>,
+function seedShrine(
+  generatedAtTick?: number,
+  edit: (state: GameState) => void = () => undefined,
 ): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: { exploreRandom, combat },
-  } as unknown as GameState);
+  seedGamestate((state) => {
+    state.clock.numTicks = now;
+    if (generatedAtTick !== undefined) {
+      state.world.exploreRandom[shrine.id] = {
+        fights: oldFights,
+        generatedAtTick,
+        completedThisCycle: true,
+      };
+    }
+    edit(state);
+  });
 }
 
+function shrineState(): EncounterRandomNodeState | undefined {
+  return worldExploreRandomState()[shrine.id];
+}
+
+const tick = () => inTick(encounterRandomProcessTick);
+
+beforeEach(() => {
+  vi.mocked(generateEncounterRandomFights).mockReturnValue(newFights);
+  seedContent([shrine]);
+  seedWorldNodes([
+    { name: shrine.name, type: 'ExploreRandomNode', x: 1 },
+    { name: 'Forgotten Shrine', type: 'ExploreRandomNode', x: 2 },
+  ]);
+});
+
 describe('encounterRandomProcessTick', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldNodesOfType).mockReturnValue([entry]);
-    vi.mocked(worldNodeEncounterRandom).mockReturnValue(content);
-    vi.mocked(timerTicksElapsed).mockReturnValue(1000);
+  const fresh = {
+    fights: newFights,
+    generatedAtTick: now,
+    completedThisCycle: false,
+  };
+
+  it('generates fights for a node seen for the first time', () => {
+    seedShrine();
+
+    tick();
+
+    expect(shrineState()).toEqual(fresh);
   });
 
-  it('generates fights on the first tick when no state exists yet', () => {
-    withState({});
-    vi.mocked(generateEncounterRandomFights).mockReturnValue([]);
+  it('regenerates once the reset time has passed, reopening the cycle', () => {
+    seedShrine(now - shrine.resetTime + 1);
+    tick();
+    expect(shrineState()?.fights).toEqual(oldFights);
 
-    encounterRandomProcessTick();
+    seedShrine(now - shrine.resetTime);
+    tick();
+    expect(shrineState()).toEqual(fresh);
+  });
 
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
-    const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const state = { world: { exploreRandom: {} } } as unknown as GameState;
-    const result = updateFn(state);
-    expect(
-      result.world.exploreRandom['gobslime-shrine' as EncounterRandomId],
-    ).toEqual({
-      fights: [],
-      generatedAtTick: 1000,
-      completedThisCycle: false,
+  it('holds off while a fight there is under way, but not one elsewhere', () => {
+    const dueAt = now - shrine.resetTime;
+
+    seedShrine(dueAt, (state) => {
+      state.world.combat = buildCombat({ encounterRandomId: shrine.id });
     });
-  });
+    tick();
+    expect(shrineState()?.fights).toEqual(oldFights);
 
-  it('does not regenerate before resetTime has elapsed', () => {
-    withState({
-      'gobslime-shrine': {
-        fights: [{ level: 1, monsters: [] }],
-        generatedAtTick: 950,
-        completedThisCycle: false,
-      },
+    seedShrine(dueAt, (state) => {
+      state.world.combat = buildCombat({
+        encounterRandomId: 'elsewhere' as EncounterRandomId,
+      });
     });
-
-    encounterRandomProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('regenerates once resetTime has elapsed', () => {
-    withState({
-      'gobslime-shrine': {
-        fights: [{ level: 1, monsters: [] }],
-        generatedAtTick: 800,
-        completedThisCycle: true,
-      },
-    });
-    vi.mocked(generateEncounterRandomFights).mockReturnValue([
-      { level: 5, monsters: [] },
-    ]);
-
-    encounterRandomProcessTick();
-
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not regenerate while this node has an active combat', () => {
-    withState(
-      {
-        'gobslime-shrine': {
-          fights: [{ level: 1, monsters: [] }],
-          generatedAtTick: 800,
-          completedThisCycle: false,
-        },
-      },
-      { encounterRandomId: 'gobslime-shrine' as EncounterRandomId },
-    );
-
-    encounterRandomProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('regenerates again once the active combat belongs to a different node', () => {
-    withState(
-      {
-        'gobslime-shrine': {
-          fights: [{ level: 1, monsters: [] }],
-          generatedAtTick: 800,
-          completedThisCycle: false,
-        },
-      },
-      { encounterRandomId: 'some-other-node' as EncounterRandomId },
-    );
-    vi.mocked(generateEncounterRandomFights).mockReturnValue([]);
-
-    encounterRandomProcessTick();
-
-    expect(updateGamestate).toHaveBeenCalledTimes(1);
+    tick();
+    expect(shrineState()).toEqual(fresh);
   });
 });

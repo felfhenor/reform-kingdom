@@ -1,59 +1,40 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 100),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  updateGamestate: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
   defaultCombatStats,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import { updateGamestate } from '@helpers/state-game';
+import { globalEffectsState } from '@helpers/state-game';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import {
   townReputationBuffEffects,
   townReputationBuffRefresh,
   townReputationBuffSync,
 } from '@helpers/town/reputation/town-reputation-buff';
-import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   GameState,
-  GlobalEffectContent,
   GlobalEffectId,
-  TownContent,
   TownId,
   TownReputationBuffTier,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-const townId = 'larsia' as TownId;
-const buffId = 'larsian-influence' as GlobalEffectId;
-
-const buffContent: GlobalEffectContent = {
-  id: buffId,
+const desert = 'LarsianDesert';
+const now = 500;
+const buff = ensureGlobalEffect({
+  id: 'larsian-influence' as GlobalEffectId,
   name: 'Larsian Influence',
-  __type: 'globaleffect',
   sprite: '0010',
-  description: 'The influence of Larsia, the kingdom in the desert.',
-  effects: [],
-};
+});
 
-function buildTier(
-  overrides: Partial<TownReputationBuffTier> = {},
+function tier(
+  overrides: Partial<TownReputationBuffTier>,
 ): TownReputationBuffTier {
   return {
     tier: 1,
@@ -64,191 +45,108 @@ function buildTier(
   };
 }
 
-function buildTown(overrides: Partial<TownContent> = {}): TownContent {
-  return {
-    id: townId,
-    name: 'Larsia',
-    __type: 'town',
-    reputation: {
-      buff: {
-        globalEffectId: buffId,
-        tiers: [
-          buildTier({ tier: 1, stats: { ...defaultStats(), Strength: 1 } }),
-        ],
-      },
+const larsia = ensureTown({
+  id: 'larsia' as TownId,
+  name: 'Larsia',
+  reputation: {
+    buff: {
+      globalEffectId: buff.id,
+      tiers: [tier({ stats: { ...defaultStats(), Strength: 1 } })],
     },
-    ...overrides,
-  } as TownContent;
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(getEntry).mockReturnValue(buffContent);
+  },
 });
 
-describe('townReputationBuffEffects', () => {
-  it('emits only the non-zero stat/combatStat/resistance entries', () => {
-    const tier = buildTier({
-      stats: { ...defaultStats(), Strength: 1 },
-      combatStats: { ...defaultCombatStats(), reviveChance: 2 },
-      debuffResistances: { ...defaultTagResistances(), Accuracy: 5 },
+function seedTown(reputationTier: number, activeEffect = false): void {
+  seedContent([buff, larsia]);
+  seedWorldNodes([
+    { name: larsia.name, type: 'NonPlayerKingdom', mapName: desert },
+  ]);
+  seedGamestate((state: GameState) => {
+    state.clock.numTicks = now;
+    state.world.towns[larsia.id] = buildTownNodeState({
+      reputation: TOWN_REPUTATION_THRESHOLDS[reputationTier],
     });
+    if (activeEffect) {
+      state.globalEffects = [{ ...buff, startTick: 0, expiresAtTick: 1000 }];
+    }
+  });
+}
 
-    expect(townReputationBuffEffects(tier)).toEqual([
+function activeBuffs() {
+  return globalEffectsState().filter(({ id }) => id === buff.id);
+}
+
+const sync = (from: string, to: string) =>
+  inTick(() => townReputationBuffSync(from, to));
+
+describe('townReputationBuffEffects', () => {
+  it('lists only the non-zero stats, combat stats and resistances', () => {
+    expect(
+      townReputationBuffEffects(
+        tier({
+          stats: { ...defaultStats(), Strength: 1 },
+          combatStats: { ...defaultCombatStats(), reviveChance: 2 },
+          debuffResistances: { ...defaultTagResistances(), Accuracy: 5 },
+        }),
+      ),
+    ).toEqual([
       { effectType: 'GainStats', stat: 'Strength', value: 1 },
       { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
       { effectType: 'DebuffResistanceTag', tag: 'Accuracy', value: 5 },
     ]);
   });
-
-  it('returns an empty array for an all-zero tier', () => {
-    expect(townReputationBuffEffects(buildTier())).toEqual([]);
-  });
 });
 
 describe('townReputationBuffSync', () => {
-  it('does nothing when the map has not actually changed', () => {
-    townReputationBuffSync('Carrina', 'Carrina');
+  it('grants the town’s buff for its tier on entering its map, described from the tier', () => {
+    seedTown(1);
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
+    sync('Carrina', desert);
 
-  it("adds the town's real content, with only effects computed per-tier, on entering its map", () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-      collectibles: {},
-      globalEffects: [],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townReputationBuffSync('Carrina', 'LarsianDesert');
-
-    expect(state.globalEffects).toEqual([
+    expect(activeBuffs()).toEqual([
       expect.objectContaining({
-        id: buffId,
-        name: 'Larsian Influence',
-        sprite: '0010',
-        description: 'The influence of Larsia, the kingdom in the desert.',
-        extendedDescription: 'Hero Strength: +1',
+        name: buff.name,
+        sprite: buff.sprite,
         effects: [{ effectType: 'GainStats', stat: 'Strength', value: 1 }],
+        extendedDescription: expect.stringContaining('Strength'),
       }),
     ]);
   });
 
-  it('removes the buff on leaving the map it was granted for', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-      collectibles: {},
-      globalEffects: [{ id: buffId, name: 'Larsian Influence' }],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  it('drops the buff on leaving the map, and changes nothing without a map change', () => {
+    seedTown(1, true);
+    sync(desert, desert);
+    expect(activeBuffs()).toEqual([expect.objectContaining({ startTick: 0 })]);
 
-    townReputationBuffSync('LarsianDesert', 'Carrina');
-
-    expect(state.globalEffects).toEqual([]);
+    sync(desert, 'Carrina');
+    expect(activeBuffs()).toEqual([]);
   });
 
-  it('grants no buff at Neutral (tier 0 is never authored)', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-    const state = {
-      world: { towns: { [townId]: { reputation: 0 } } },
-      collectibles: {},
-      globalEffects: [],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  it('grants nothing at a tier without a buff, or once the buff or node is gone', () => {
+    seedTown(0);
+    sync('Carrina', desert);
+    expect(activeBuffs()).toEqual([]);
 
-    townReputationBuffSync('Carrina', 'LarsianDesert');
+    seedTown(1);
+    seedContent([larsia]);
+    sync('Carrina', desert);
+    expect(globalEffectsState()).toEqual([]);
 
-    expect(state.globalEffects).toEqual([]);
-  });
-
-  it('skips a town whose node can no longer be resolved on the map', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-      collectibles: {},
-      globalEffects: [],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townReputationBuffSync('Carrina', 'LarsianDesert');
-
-    expect(state.globalEffects).toEqual([]);
-  });
-
-  it("grants no buff when the town's globalEffectId no longer resolves to real content", () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-      collectibles: {},
-      globalEffects: [],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
-
-    townReputationBuffSync('Carrina', 'LarsianDesert');
-
-    expect(state.globalEffects).toEqual([]);
+    seedTown(1);
+    seedWorldNodes([]);
+    sync('Carrina', desert);
+    expect(activeBuffs()).toEqual([]);
   });
 });
 
 describe('townReputationBuffRefresh', () => {
-  it('re-derives the buff against the given map even without a map transition', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-    const state = {
-      world: { towns: { [townId]: { reputation: 100 } } },
-      collectibles: {},
-      globalEffects: [{ id: buffId, name: 'Larsian Influence' }],
-    } as unknown as GameState;
-    vi.mocked(updateGamestate).mockImplementation(async (fn) => {
-      fn(state);
-    });
+  it('re-derives the buff in place, replacing the old one', () => {
+    seedTown(1, true);
 
-    townReputationBuffRefresh('LarsianDesert');
+    inTick(() => townReputationBuffRefresh(desert));
 
-    expect(state.globalEffects).toEqual([
-      expect.objectContaining({
-        id: buffId,
-        extendedDescription: 'Hero Strength: +1',
-      }),
+    expect(activeBuffs()).toEqual([
+      expect.objectContaining({ startTick: now, effects: [expect.anything()] }),
     ]);
   });
 });

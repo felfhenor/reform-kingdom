@@ -96,7 +96,7 @@ function ensureTownGatheringWorker(
   };
 }
 
-function ensureTownMaterialThreshold(
+export function ensureTownMaterialThreshold(
   threshold: Partial<TownMaterialThreshold> = {},
 ): TownMaterialThreshold {
   return {

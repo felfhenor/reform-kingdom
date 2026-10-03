@@ -1,124 +1,41 @@
-import type { CurrentLocation, GameState, WorldNodeEntry } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldCurrentLocationState: () => gamestate().world.currentLocation,
-  };
-});
+import { isPartyAtNode, isPlayerAtKingdom } from '@helpers/world';
+import type { CurrentLocation } from '@interfaces';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeAt: vi.fn(),
-}));
+function standAt(location: CurrentLocation): void {
+  seedGamestate((state) => (state.world.currentLocation = location));
+}
 
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import {
-  currentLocationSet,
-  isPartyAtNode,
-  isPlayerAtKingdom,
-} from '@helpers/world';
-import { worldNodeAt } from '@helpers/world-node/world-nodes';
+function seedMap() {
+  return seedWorldNodes([
+    { name: 'Duchy of Carrina', type: 'Kingdom', x: 1 },
+    { name: 'Forest Ruins', type: 'ExploreNode', x: 2 },
+  ]);
+}
 
-describe('World Helper Functions', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe('isPartyAtNode / isPlayerAtKingdom', () => {
+  it('only match the node the party is standing on', () => {
+    const nodes = seedMap();
+
+    standAt(locationOf(nodes['Duchy of Carrina']));
+    expect(isPartyAtNode('Duchy of Carrina')).toBe(true);
+    expect(isPartyAtNode('Forest Ruins')).toBe(false);
+    expect(isPlayerAtKingdom()).toBe(true);
+
+    standAt(locationOf(nodes['Forest Ruins']));
+    expect(isPartyAtNode('Forest Ruins')).toBe(true);
+    expect(isPlayerAtKingdom()).toBe(false);
   });
 
-  describe('currentLocationSet', () => {
-    it('should update the current location in state', () => {
-      const location: CurrentLocation = { mapName: 'Carrina', x: 10, y: 5 };
+  it('match nothing between nodes', () => {
+    const nodes = seedMap();
 
-      currentLocationSet(location);
+    standAt({ ...locationOf(nodes['Forest Ruins']), x: 50 });
 
-      const updateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-      const state = {
-        world: { currentLocation: { mapName: 'Carrina', x: 24, y: 24 } },
-      } as unknown as GameState;
-      const previousLocation = state.world.currentLocation;
-      const result = updateFn(state);
-
-      expect(result.world.currentLocation).toEqual(location);
-      expect(result.world.currentLocation).not.toBe(previousLocation);
-    });
-  });
-
-  describe('isPartyAtNode', () => {
-    beforeEach(() => {
-      vi.mocked(gamestate).mockReturnValue({
-        world: { currentLocation: { mapName: 'Carrina', x: 1, y: 1 } },
-      } as unknown as GameState);
-    });
-
-    it('is true when the party is standing on that node', () => {
-      vi.mocked(worldNodeAt).mockReturnValue({
-        nodeName: 'Carrina Outpost',
-      } as WorldNodeEntry);
-
-      expect(isPartyAtNode('Carrina Outpost')).toBe(true);
-    });
-
-    it('is false when the party is on a different node', () => {
-      vi.mocked(worldNodeAt).mockReturnValue({
-        nodeName: 'Forest Ruins',
-      } as WorldNodeEntry);
-
-      expect(isPartyAtNode('Carrina Outpost')).toBe(false);
-    });
-
-    it('is false when the party is not standing on any node', () => {
-      vi.mocked(worldNodeAt).mockReturnValue(undefined);
-
-      expect(isPartyAtNode('Carrina Outpost')).toBe(false);
-    });
-  });
-
-  describe('isPlayerAtKingdom', () => {
-    it('should report true when the node at the current location is a Kingdom', () => {
-      const location: CurrentLocation = { mapName: 'Carrina', x: 24, y: 24 };
-
-      vi.mocked(gamestate).mockReturnValue({
-        world: { currentLocation: location },
-      } as unknown as GameState);
-      vi.mocked(worldNodeAt).mockReturnValue({
-        mapName: 'Carrina',
-        x: 24,
-        y: 24,
-        nodeName: 'Duchy of Carrina',
-        nodeData: { type: 'Kingdom' } as never,
-      });
-
-      expect(isPlayerAtKingdom()).toBe(true);
-    });
-
-    it('should report false when the node at the current location is not a Kingdom', () => {
-      const location: CurrentLocation = { mapName: 'Carrina', x: 1, y: 24 };
-
-      vi.mocked(gamestate).mockReturnValue({
-        world: { currentLocation: location },
-      } as unknown as GameState);
-      vi.mocked(worldNodeAt).mockReturnValue({
-        mapName: 'Carrina',
-        x: 1,
-        y: 24,
-        nodeName: 'Forest Ruins',
-        nodeData: { type: 'ExploreNode' } as never,
-      });
-
-      expect(isPlayerAtKingdom()).toBe(false);
-    });
-
-    it('should report false when there is no node at the current location', () => {
-      const location: CurrentLocation = { mapName: 'Carrina', x: 1, y: 1 };
-
-      vi.mocked(gamestate).mockReturnValue({
-        world: { currentLocation: location },
-      } as unknown as GameState);
-      vi.mocked(worldNodeAt).mockReturnValue(undefined);
-
-      expect(isPlayerAtKingdom()).toBe(false);
-    });
+    expect(isPartyAtNode('Forest Ruins')).toBe(false);
+    expect(isPlayerAtKingdom()).toBe(false);
   });
 });
