@@ -89,7 +89,7 @@
   duration: 1800
 
   requiredCollectibles:
-    - collectibleId: Hawk Feathers
+    - collectibleId: Trained Hawk Feathers
 
   requiredMaterials:
     - itemId: Gold Coin

@@ -488,7 +488,7 @@
         - monsterId: Elf Captain
 
   completionRewards:
-    - collectibleId: Hawk Feathers
+    - collectibleId: Trained Hawk Feathers
       chance: 100
 
     - equipmentId: Elvenwood Sword
