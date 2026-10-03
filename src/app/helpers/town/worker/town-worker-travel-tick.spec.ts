@@ -1,296 +1,161 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/hero/travel-cost', () => ({
-  travelStepTicksCost: vi.fn(() => 5),
-  travelPathTotalTicks: vi.fn(() => 5),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/town-gold', () => ({
-  applyTownAccrueHiddenGold: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-materials', () => ({
-  applyTownMaterialDelta: vi.fn(),
-}));
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { TOWN_WORKER_REST_TICKS } from '@helpers/config';
-import { travelStepTicksCost } from '@helpers/hero/travel-cost';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
-import { applyTownMaterialDelta } from '@helpers/town/town-materials';
+import { ensureItem } from '@helpers/content/ensure-item';
+import {
+  ensureTown,
+  ensureTownGathering,
+  ensureTownMaterialThreshold,
+} from '@helpers/content/ensure-town';
+import { worldTownsState } from '@helpers/state-game';
+import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import {
   townWorkerRestProcessTick,
   townWorkerTravelProcessTick,
 } from '@helpers/town/worker/town-worker-travel-tick';
 import type {
-  GameState,
   ItemId,
   TownContent,
   TownId,
+  TownWorkerState,
+  TownWorkerStatus,
+  TravelStep,
   WorkerId,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const townId = 'larsia' as TownId;
 const workerId = 'darwin' as WorkerId;
 const oreId = 'copper-ore' as ItemId;
+const gold = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });
+const assignment = { nodeName: 'Wergen Woods', itemId: oreId };
+const goldCap = 50;
 
-function buildTown(): TownContent {
-  return {
-    id: townId,
-    name: 'Larsia',
-    gathering: { goldGatheredPerMaterial: 5 },
-  } as unknown as TownContent;
+const larsia: TownContent = ensureTown({
+  id: 'larsia' as TownId,
+  name: 'Larsia',
+  gathering: ensureTownGathering({ goldGatheredPerMaterial: 5 }),
+  materialThresholds: [
+    ensureTownMaterialThreshold({ itemId: gold.id, maxQuantity: goldCap }),
+  ],
+});
+
+const path: TravelStep[] = [1, 2].map((x) => ({
+  kind: 'Move',
+  mapName: 'TestMap',
+  x,
+  y: 0,
+}));
+
+function seedWorker(
+  status: TownWorkerStatus,
+  overrides: Partial<TownWorkerState> = {},
+): void {
+  seedGamestate((state) => {
+    state.world.towns[larsia.id] = buildTownNodeState({
+      workers: {
+        [workerId]: {
+          ...defaultTownWorkerState(larsia, 1),
+          location: { mapName: 'TestMap', x: 0, y: 0 },
+          status,
+          ...overrides,
+        },
+      },
+    });
+  });
 }
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+function worker(): TownWorkerState {
+  return worldTownsState()[larsia.id].workers[workerId];
 }
+
+const travelTick = () =>
+  inTick(() => townWorkerTravelProcessTick(larsia, workerId));
+
+function travelUntilArrived(): void {
+  for (let i = 0; worker().status.kind.startsWith('Traveling'); i++) {
+    if (i >= 1000) throw new Error('never arrived');
+    travelTick();
+  }
+}
+
+const returning = (carriedQuantity: number): TownWorkerStatus => ({
+  kind: 'TravelingBack',
+  path,
+  ticksIntoStep: 0,
+  carriedItemId: oreId,
+  carriedQuantity,
+});
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  seedContent([larsia, gold]);
 });
 
 describe('townWorkerTravelProcessTick', () => {
-  it('transitions TravelingTo to Gathering on arrival (single-step path)', () => {
-    vi.mocked(travelStepTicksCost).mockReturnValue(1);
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                location: { mapName: 'Carrina', x: 5, y: 5 },
-                status: {
-                  kind: 'TravelingTo',
-                  nodeName: 'Wergen Woods',
-                  itemId: oreId,
-                  path: [{ kind: 'Move', mapName: 'Carrina', x: 6, y: 5 }],
-                  ticksIntoStep: 0,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
+  it('walks out step by step, then starts gathering on arrival', () => {
+    seedWorker({ kind: 'TravelingTo', ...assignment, path, ticksIntoStep: 0 });
 
-    townWorkerTravelProcessTick(buildTown(), workerId);
+    travelTick();
+    expect(worker().status.kind).toBe('TravelingTo');
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: {
-                  kind: 'TravelingTo',
-                  path: [],
-                  ticksIntoStep: 0,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toMatchObject({
+    travelUntilArrived();
+
+    expect(worker().location).toMatchObject({ x: 2 });
+    expect(worker().status).toEqual({
       kind: 'Gathering',
-      nodeName: 'Wergen Woods',
-      itemId: oreId,
+      ...assignment,
       itemsGathered: 0,
+      ticksIntoGather: 0,
     });
   });
 
-  it('does not advance to Gathering mid-step', () => {
-    vi.mocked(travelStepTicksCost).mockReturnValue(5);
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                location: { mapName: 'Carrina', x: 5, y: 5 },
-                status: {
-                  kind: 'TravelingTo',
-                  nodeName: 'Wergen Woods',
-                  itemId: oreId,
-                  path: [{ kind: 'Move', mapName: 'Carrina', x: 6, y: 5 }],
-                  ticksIntoStep: 0,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
+  it('stocks the haul at the town, banking gold per material, then rests unassigned', () => {
+    seedWorker(returning(4), { assignment });
 
-    townWorkerTravelProcessTick(buildTown(), workerId);
+    travelTick();
+    expect(worker().status.kind).toBe('TravelingBack');
+    expect(worldTownsState()[larsia.id].materials).toEqual({});
 
-    const calls = vi.mocked(updateGamestate).mock.calls;
-    const state = calls[calls.length - 1][0]({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: {
-                  kind: 'TravelingTo',
-                  path: [{ kind: 'Move', mapName: 'Carrina', x: 6, y: 5 }],
-                  ticksIntoStep: 0,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status.kind).toBe(
-      'TravelingTo',
-    );
+    travelUntilArrived();
+
+    const town = worldTownsState()[larsia.id];
+    expect(town.materials[oreId]).toBe(4);
+    expect(town.hiddenGold).toBe(4 * larsia.gathering.goldGatheredPerMaterial);
+    expect(worker()).toMatchObject({
+      status: { kind: 'Resting', ticksIntoRest: 0 },
+      assignment: null,
+    });
   });
 
-  it('accrues hidden gold and rests on TravelingBack arrival', () => {
-    vi.mocked(travelStepTicksCost).mockReturnValue(1);
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                location: { mapName: 'Carrina', x: 6, y: 5 },
-                status: {
-                  kind: 'TravelingBack',
-                  path: [{ kind: 'Move', mapName: 'Carrina', x: 5, y: 5 }],
-                  ticksIntoStep: 0,
-                  carriedItemId: oreId,
-                  carriedQuantity: 4,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
+  it('banks no more hidden gold than the town’s gold cap, and still rests the worker after an empty haul', () => {
+    seedWorker(returning(goldCap));
+    travelUntilArrived();
+    expect(worldTownsState()[larsia.id].hiddenGold).toBe(goldCap);
 
-    townWorkerTravelProcessTick(buildTown(), workerId);
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: { kind: 'TravelingBack', path: [], ticksIntoStep: 0 },
-                assignment: { nodeName: 'Wergen Woods', itemId: oreId },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(applyTownAccrueHiddenGold).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      townId,
-      20,
-    );
-    expect(applyTownMaterialDelta).toHaveBeenCalledWith(
-      expect.anything(),
-      townId,
-      oreId,
-      4,
-    );
-    expect(state.world.towns[townId].workers[workerId].status).toEqual({
-      kind: 'Resting',
-      ticksIntoRest: 0,
+    seedWorker(returning(0), { assignment });
+    travelUntilArrived();
+    expect(worker()).toMatchObject({
+      status: { kind: 'Resting', ticksIntoRest: 0 },
+      assignment: null,
     });
-    expect(state.world.towns[townId].workers[workerId].assignment).toBe(null);
   });
 });
 
 describe('townWorkerRestProcessTick', () => {
-  it('increments ticksIntoRest while under the rest duration', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: { status: { kind: 'Resting', ticksIntoRest: 0 } },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
+  const restTick = () =>
+    inTick(() => townWorkerRestProcessTick(larsia, workerId));
 
-    townWorkerRestProcessTick(buildTown(), workerId);
+  it('rests for the configured ticks, then is back at town', () => {
+    seedWorker({ kind: 'Resting', ticksIntoRest: 0 });
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: { status: { kind: 'Resting', ticksIntoRest: 0 } },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toEqual({
-      kind: 'Resting',
-      ticksIntoRest: 1,
-    });
-  });
+    restTick();
+    expect(worker().status).toEqual({ kind: 'Resting', ticksIntoRest: 1 });
 
-  it('transitions to AtTown once the rest duration elapses', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: {
-                  kind: 'Resting',
-                  ticksIntoRest: TOWN_WORKER_REST_TICKS - 1,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    townWorkerRestProcessTick(buildTown(), workerId);
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: {
-                  kind: 'Resting',
-                  ticksIntoRest: TOWN_WORKER_REST_TICKS - 1,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toEqual({
-      kind: 'AtTown',
-    });
+    seedWorker({ kind: 'Resting', ticksIntoRest: TOWN_WORKER_REST_TICKS - 2 });
+    restTick();
+    expect(worker().status.kind).toBe('Resting');
+    restTick();
+    expect(worker().status).toEqual({ kind: 'AtTown' });
   });
 });

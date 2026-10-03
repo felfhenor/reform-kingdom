@@ -1,289 +1,212 @@
-import type * as WorldNodeGatheringHelper from '@helpers/world-node/world-node-gathering';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
+vi.mock('@helpers/town/worker/town-worker-travel');
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/worker/worker-progression', () => ({
-  workerStatsForLevel: vi.fn(),
-}));
-
-vi.mock('@helpers/town/worker/town-worker-travel', () => ({
-  townWorkerAssignmentIsValid: vi.fn(() => true),
-  townWorkerBeginReturnTrip: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering', async (importOriginal) => ({
-  ...(await importOriginal<typeof WorldNodeGatheringHelper>()),
-  gatheringResultsAtLevel: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-level', () => ({
-  worldNodeLevel: vi.fn(() => 1),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeGathering: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
-import { ensureGathering } from '@helpers/content/ensure-gathernode';
-import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  ensureGatherResult,
+  ensureGathering,
+} from '@helpers/content/ensure-gathernode';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureTown, ensureTownGathering } from '@helpers/content/ensure-town';
+import { ensureWorker } from '@helpers/content/ensure-worker';
+import { worldTownsState } from '@helpers/state-game';
 import {
   townWorkerGatherRate,
   townWorkerGatheringProcessTick,
 } from '@helpers/town/worker/town-worker-gathering';
-import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import {
   townWorkerAssignmentIsValid,
   townWorkerBeginReturnTrip,
 } from '@helpers/town/worker/town-worker-travel';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
+import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
+import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import type {
   GameState,
   GatheringContent,
+  GatheringId,
   ItemId,
   TownContent,
   TownId,
+  TownWorkerState,
   TownWorkerStatusGathering,
-  WorkerContent,
   WorkerId,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-const townId = 'larsia' as TownId;
-const workerId = 'darwin' as WorkerId;
-const oreId = 'copper-ore' as ItemId;
+const darwin = ensureWorker({
+  id: 'darwin' as WorkerId,
+  name: 'Darwin',
+  baseStats: { capacity: 2, gatherSpeed: 1, stamina: 20 },
+});
+const ore = ensureItem({ id: 'copper-ore' as ItemId, name: 'Copper Ore' });
+const nodeName = 'Wergen Woods';
 
-function buildTown(gatherRateMultiplier = 1): TownContent {
-  return {
-    id: townId,
-    gathering: { gatherRateMultiplier },
-  } as unknown as TownContent;
+function town(gatherRateMultiplier = 1): TownContent {
+  return ensureTown({
+    id: 'larsia' as TownId,
+    name: 'Larsia',
+    gathering: ensureTownGathering({ gatherRateMultiplier }),
+  });
 }
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+function woods(overrides: Partial<GatheringContent> = {}): GatheringContent {
+  return ensureGathering({
+    id: 'wergen-woods' as GatheringId,
+    name: nodeName,
+    gatherTime: 10,
+    gatherResults: [
+      ensureGatherResult({
+        chance: 100,
+        items: [{ itemId: ore.id, quantity: 1 }],
+      }),
+    ],
+    ...overrides,
+  });
+}
+
+function seedGatherer(
+  content: TownContent,
+  status: Partial<TownWorkerStatusGathering> = {},
+  edit: (state: GameState) => void = () => undefined,
+): void {
+  seedGamestate((state) => {
+    state.world.towns[content.id] = buildTownNodeState({
+      workers: {
+        [darwin.id]: {
+          ...defaultTownWorkerState(content, 1),
+          status: {
+            kind: 'Gathering',
+            nodeName,
+            itemId: ore.id,
+            itemsGathered: 0,
+            ticksIntoGather: 0,
+            ...status,
+          },
+          assignment: { nodeName, itemId: ore.id },
+        },
+      },
+    });
+    edit(state);
+  });
+}
+
+function worker(content: TownContent): TownWorkerState {
+  return worldTownsState()[content.id].workers[darwin.id];
+}
+
+function gathered(content: TownContent): number {
+  const { status } = worker(content);
+  if (status.kind !== 'Gathering') throw new Error(`stopped ${status.kind}`);
+  return status.itemsGathered;
+}
+
+function ticksForOneUnit(content: TownContent): number {
+  const start = gathered(content);
+  let ticks = 0;
+  while (gathered(content) === start) {
+    if (ticks >= 1000) throw new Error('never gathered');
+    inTick(() => townWorkerGatheringProcessTick(content, darwin.id));
+    ticks += 1;
+  }
+  return ticks;
+}
+
+function seedNode(gathering = woods()): void {
+  seedContent([darwin, ore, gathering]);
+  seedWorldNodes([{ name: nodeName, type: 'GatherNode' }]);
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(townWorkerAssignmentIsValid).mockReturnValue(true);
+  seedNode();
 });
 
 describe('townWorkerGatherRate', () => {
-  it("scales the base rate by the town's gatherRateMultiplier", () => {
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 5,
-      gatherSpeed: 2,
-      stamina: 20,
-    });
-    vi.mocked(gatheringResultsAtLevel).mockReturnValue([
-      { chance: 10, items: [{ itemId: oreId, quantity: 1 }] },
-    ] as never);
+  it('scales the worker’s base rate by the town’s multiplier', () => {
+    const rate = (multiplier: number) =>
+      townWorkerGatherRate(darwin, 1, woods(), ore.id, 0, multiplier);
 
-    const rate = townWorkerGatherRate(
-      {} as WorkerContent,
-      1,
-      {} as GatheringContent,
-      oreId,
-      1,
-      3,
-    );
-
-    expect(rate).toBe(6);
-  });
-
-  it('returns 0 when the node does not gather the item', () => {
-    vi.mocked(gatheringResultsAtLevel).mockReturnValue([
-      { chance: 10, items: [{ itemId: 'iron-ore' as ItemId, quantity: 1 }] },
-    ] as never);
-
+    expect(rate(1)).toBeGreaterThan(0);
+    expect(rate(3)).toBeCloseTo(rate(1) * 3);
     expect(
-      townWorkerGatherRate(
-        {} as WorkerContent,
-        1,
-        {} as GatheringContent,
-        oreId,
-        1,
-        1,
-      ),
+      townWorkerGatherRate(darwin, 1, woods(), 'iron' as ItemId, 0, 1),
     ).toBe(0);
   });
 });
 
 describe('townWorkerGatheringProcessTick', () => {
-  function mockGatheringState(itemsGathered: number, ticksIntoGather: number) {
-    vi.mocked(gamestate).mockReturnValue({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                level: 1,
-                status: {
-                  kind: 'Gathering',
-                  nodeName: 'Wergen Woods',
-                  itemId: oreId,
-                  itemsGathered,
-                  ticksIntoGather,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-  }
+  it('builds up progress, then lands a unit and starts the next one fresh', () => {
+    const larsia = town();
+    seedGatherer(larsia);
 
-  beforeEach(() => {
-    vi.mocked(getEntry).mockReturnValue({} as WorkerContent);
-    vi.mocked(worldNodeByName).mockReturnValue({} as never);
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      ensureGathering({ gatherTime: 5 }),
-    );
-    vi.mocked(gatheringResultsAtLevel).mockReturnValue([
-      { chance: 10, items: [{ itemId: oreId, quantity: 1 }] },
-    ] as never);
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 2,
-      gatherSpeed: 1,
-      stamina: 20,
+    inTick(() => townWorkerGatheringProcessTick(larsia, darwin.id));
+    expect(worker(larsia).status).toMatchObject({
+      ticksIntoGather: 1,
+      itemsGathered: 0,
     });
-  });
 
-  it('abandons the gather when the assignment is no longer valid', () => {
-    vi.mocked(townWorkerAssignmentIsValid).mockReturnValue(false);
-    mockGatheringState(0, 0);
+    ticksForOneUnit(larsia);
 
-    townWorkerGatheringProcessTick(buildTown(), workerId);
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: { kind: 'Gathering' },
-                assignment: { nodeName: 'x', itemId: oreId },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toEqual({
-      kind: 'AtTown',
-    });
-    expect(state.world.towns[townId].workers[workerId].assignment).toBe(null);
-  });
-
-  it('increments ticksIntoGather when a unit is not yet complete', () => {
-    mockGatheringState(0, 0);
-
-    townWorkerGatheringProcessTick(buildTown(), workerId);
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: {
-                  kind: 'Gathering',
-                  itemsGathered: 0,
-                  ticksIntoGather: 0,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-    expect(
-      (
-        state.world.towns[townId].workers[workerId]
-          .status as TownWorkerStatusGathering
-      ).ticksIntoGather,
-    ).toBe(1);
-  });
-
-  it('completes a unit and starts the return trip once at capacity', () => {
-    // gatherTime 5 / rate 1 = 5 ticks per unit; capacity 2.
-    mockGatheringState(1, 4);
-
-    townWorkerGatheringProcessTick(buildTown(), workerId);
-
-    expect(townWorkerBeginReturnTrip).toHaveBeenCalledWith(
-      townId,
-      expect.anything(),
-      workerId,
-      oreId,
-      2,
-    );
-  });
-
-  it('completes a unit sooner on an upgraded node', () => {
-    // (5 - 1 * 2) / rate 1 = 3 ticks per unit at node level 1.
-    vi.mocked(worldNodeGathering).mockReturnValue(
-      ensureGathering({ gatherTime: 5, gatherReductionPerUpgradeLevel: 2 }),
-    );
-    mockGatheringState(1, 2);
-
-    townWorkerGatheringProcessTick(buildTown(), workerId);
-
-    expect(townWorkerBeginReturnTrip).toHaveBeenCalledWith(
-      townId,
-      expect.anything(),
-      workerId,
-      oreId,
-      2,
-    );
-  });
-
-  it('completes a unit and stays Gathering when under capacity', () => {
-    mockGatheringState(0, 4);
-
-    townWorkerGatheringProcessTick(buildTown(), workerId);
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: {
-                status: {
-                  kind: 'Gathering',
-                  itemsGathered: 0,
-                  ticksIntoGather: 4,
-                },
-              },
-            },
-          },
-        },
-      },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toMatchObject({
-      kind: 'Gathering',
-      itemsGathered: 1,
+    expect(worker(larsia).status).toMatchObject({
       ticksIntoGather: 0,
+      itemsGathered: 1,
     });
     expect(townWorkerBeginReturnTrip).not.toHaveBeenCalled();
+  });
+
+  it('gathers faster in a busier town and on an upgraded node', () => {
+    const base = town();
+    seedGatherer(base);
+    const baseTicks = ticksForOneUnit(base);
+
+    const busy = town(2);
+    seedGatherer(busy);
+    expect(ticksForOneUnit(busy)).toBeLessThan(baseTicks);
+
+    seedNode(woods({ gatherReductionPerUpgradeLevel: 2 }));
+    seedGatherer(base, {}, (state) => {
+      state.gatherNodeLevels[nodeName] = { level: 2 };
+    });
+    expect(ticksForOneUnit(base)).toBeLessThan(baseTicks);
+  });
+
+  it('heads home with a full load', () => {
+    const larsia = town();
+    const full = workerStatsForLevel(darwin, 1).capacity;
+    seedGatherer(larsia, { itemsGathered: full - 1 });
+
+    for (
+      let i = 0;
+      vi.mocked(townWorkerBeginReturnTrip).mock.calls.length === 0;
+      i++
+    ) {
+      if (i >= 1000) throw new Error('never headed home');
+      inTick(() => townWorkerGatheringProcessTick(larsia, darwin.id));
+    }
+
+    expect(townWorkerBeginReturnTrip).toHaveBeenCalledWith(
+      larsia.id,
+      larsia,
+      darwin.id,
+      ore.id,
+      full,
+    );
+  });
+
+  it('parks the worker at town once its assignment goes stale', () => {
+    const larsia = town();
+    vi.mocked(townWorkerAssignmentIsValid).mockReturnValue(false);
+    seedGatherer(larsia);
+
+    inTick(() => townWorkerGatheringProcessTick(larsia, darwin.id));
+
+    expect(worker(larsia)).toMatchObject({
+      status: { kind: 'AtTown' },
+      assignment: null,
+    });
   });
 });

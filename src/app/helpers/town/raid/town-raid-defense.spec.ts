@@ -1,218 +1,126 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(() => []),
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/global-effect-state', () => ({
-  applyGlobalEffectPush: vi.fn((state, effect) => {
-    state.globalEffects.push(effect);
-  }),
-  applyGlobalEffectRemove: vi.fn(),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { applyGlobalEffectRemove } from '@helpers/hero/global-effect-state';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { defaultGameState } from '@helpers/defaults';
 import {
   raidDefenseGlobalEffectApply,
   raidTelegraphClear,
 } from '@helpers/town/raid/town-raid-defense';
 import type {
   GameState,
-  GlobalEffectContent,
   GlobalEffectId,
-  TownContent,
+  MonsterId,
   TownId,
   TownNodeState,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
-const larsiaId = 'larsia' as TownId;
-const otherId = 'other' as TownId;
+const now = 1000;
+// Looked up by name, so the stored id differs on purpose.
+const raidEffect = ensureGlobalEffect({
+  id: 'raid-defense-requested' as GlobalEffectId,
+  name: 'Raid Defense Requested',
+});
+const larsia = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
+const vesper = ensureTown({ id: 'vesper' as TownId, name: 'Vesper' });
 
-function buildTown(id: TownId, name: string): TownContent {
-  return { id, name } as TownContent;
+const telegraphed: Partial<TownNodeState> = {
+  raidTelegraphedAtTick: 900,
+  raidEngageWindowExpiresAtTick: 2000,
+  raidTelegraphedAssaulterIds: ['bloodmoth' as MonsterId],
+};
+
+function stateWith(
+  towns: Partial<Record<TownId, Partial<TownNodeState>>>,
+  existingEffect = false,
+): GameState {
+  const state = defaultGameState();
+  Object.entries(towns).forEach(([id, town]) => {
+    state.world.towns[id as TownId] = buildTownNodeState(town);
+  });
+  if (existingEffect) {
+    state.globalEffects = [{ ...raidEffect, startTick: 0, expiresAtTick: 10 }];
+  }
+  return state;
 }
 
-function buildTownState(overrides: Partial<TownNodeState> = {}): TownNodeState {
-  return {
-    lastProcessedTick: {},
-    stock: [],
-    workers: {},
-    reputation: 0,
-    hiddenGold: 0,
-    materials: {},
-    tradeskills: {},
-    craftQueue: [],
-    commissionSlots: [],
-    specialtyPriority: [],
-    ...overrides,
-  };
+function raidEffects(state: GameState) {
+  return state.globalEffects.filter(({ id }) => id === raidEffect.id);
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(getEntriesByType).mockReturnValue([]);
-  vi.mocked(getEntry).mockReturnValue(undefined);
+  seedContent([raidEffect, larsia, vesper]);
 });
 
 describe('raidDefenseGlobalEffectApply', () => {
-  const effectContent = {
-    id: 'raid-defense-requested' as GlobalEffectId,
-    __type: 'globaleffect',
-    name: 'Raid Defense Requested',
-    sprite: '0011',
-    description: 'desc',
-    effects: [],
-  } as GlobalEffectContent;
-
-  function buildState(towns: Record<string, TownNodeState>): GameState {
-    return {
-      world: { towns },
-      globalEffects: [],
-    } as unknown as GameState;
-  }
-
-  it('removes the effect by its real content id (not the lookup name) and adds nothing when no town is telegraphed', () => {
-    vi.mocked(getEntry).mockReturnValue(effectContent as never);
-    const state = buildState({ [larsiaId]: buildTownState() });
-
-    raidDefenseGlobalEffectApply(state, 1000);
-
-    // The lookup name is not the id stored on a pushed effect -
-    // removal must use the resolved content's real id or it silently never matches.
-    expect(applyGlobalEffectRemove).toHaveBeenCalledWith(
-      state,
-      effectContent.id,
+  it('replaces the effect with one listing every telegraphed town', () => {
+    const state = stateWith(
+      { [larsia.id]: telegraphed, [vesper.id]: telegraphed },
+      true,
     );
-    expect(applyGlobalEffectRemove).not.toHaveBeenCalledWith(
-      state,
-      'Raid Defense Requested',
-    );
-    expect(state.globalEffects).toEqual([]);
+
+    raidDefenseGlobalEffectApply(state, now);
+
+    expect(raidEffects(state)).toEqual([
+      expect.objectContaining({
+        extendedDescription: 'Larsia, Vesper',
+        startTick: now,
+      }),
+    ]);
   });
 
-  it('adds a fresh effect listing every telegraphed town by name, comma-joined', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown(larsiaId, 'Larsia'),
-      buildTown(otherId, 'Other'),
-    ] as never);
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === larsiaId) return buildTown(larsiaId, 'Larsia') as never;
-      if (id === otherId) return buildTown(otherId, 'Other') as never;
-      return effectContent as never;
-    });
-    const state = buildState({
-      [larsiaId]: buildTownState({
-        raidTelegraphedAtTick: 900,
-        raidEngageWindowExpiresAtTick: 2000,
-      }),
-      [otherId]: buildTownState({
-        raidTelegraphedAtTick: 900,
-        raidEngageWindowExpiresAtTick: 1200,
-      }),
-    });
-
-    raidDefenseGlobalEffectApply(state, 1000);
-
-    expect(applyGlobalEffectRemove).toHaveBeenCalledWith(
-      state,
-      effectContent.id,
+  it('drops the effect once no town is telegraphed, ignoring towns gone from content', () => {
+    const state = stateWith(
+      { [larsia.id]: {}, ['gone' as TownId]: telegraphed },
+      true,
     );
-    expect(state.globalEffects).toHaveLength(1);
-    expect(state.globalEffects[0]).toMatchObject({
-      id: effectContent.id,
-      extendedDescription: 'Larsia, Other',
-      startTick: 1000,
-    });
+
+    raidDefenseGlobalEffectApply(state, now);
+
+    expect(raidEffects(state)).toEqual([]);
   });
 
-  it('ignores a town with content but no telegraph, and skips one telegraphed but no longer resolving to content', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown(larsiaId, 'Larsia'),
-      buildTown(otherId, 'Other'),
-    ] as never);
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === larsiaId) return buildTown(larsiaId, 'Larsia') as never;
-      if (id === otherId) return undefined;
-      return effectContent as never;
-    });
-    const state = buildState({
-      [larsiaId]: buildTownState({
-        raidTelegraphedAtTick: 900,
-        raidEngageWindowExpiresAtTick: 2000,
-      }),
-      [otherId]: buildTownState({
-        raidTelegraphedAtTick: 900,
-        raidEngageWindowExpiresAtTick: 1200,
-      }),
-    });
+  it('does nothing without the effect content', () => {
+    seedContent([larsia]);
+    const state = stateWith({ [larsia.id]: telegraphed });
 
-    raidDefenseGlobalEffectApply(state, 1000);
+    raidDefenseGlobalEffectApply(state, now);
 
-    expect(state.globalEffects[0].extendedDescription).toBe('Larsia');
-  });
-
-  it('adds nothing when a town is telegraphed but the effect content itself is missing', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildTown(larsiaId, 'Larsia'),
-    ] as never);
-    vi.mocked(getEntry).mockImplementation(
-      (id) =>
-        (id === larsiaId ? buildTown(larsiaId, 'Larsia') : undefined) as never,
-    );
-    const state = buildState({
-      [larsiaId]: buildTownState({
-        raidTelegraphedAtTick: 900,
-        raidEngageWindowExpiresAtTick: 2000,
-      }),
-    });
-
-    raidDefenseGlobalEffectApply(state, 1000);
-
-    expect(applyGlobalEffectRemove).not.toHaveBeenCalled();
     expect(state.globalEffects).toEqual([]);
   });
 });
 
 describe('raidTelegraphClear', () => {
-  it('clears all three telegraph fields and re-syncs the global effect', () => {
-    vi.mocked(getEntry).mockReturnValue({
-      id: 'raid-defense-requested',
-    } as never);
-    const state = {
-      world: {
-        towns: {
-          [larsiaId]: buildTownState({
-            raidTelegraphedAtTick: 100,
-            raidEngageWindowExpiresAtTick: 500,
-            raidTelegraphedAssaulterIds: ['Bloodmoth' as never],
-            lastRaidResolvedAtTick: 50,
-          }),
-        },
+  it('clears the town’s telegraph, keeps its raid history and re-syncs the effect', () => {
+    const state = stateWith(
+      {
+        [larsia.id]: { ...telegraphed, lastRaidResolvedAtTick: 50 },
+        [vesper.id]: telegraphed,
       },
-      globalEffects: [],
-    } as unknown as GameState;
-
-    raidTelegraphClear(state, larsiaId, 1000);
-
-    const town = state.world.towns[larsiaId];
-    expect(town.raidTelegraphedAtTick).toBeUndefined();
-    expect(town.raidEngageWindowExpiresAtTick).toBeUndefined();
-    expect(town.raidTelegraphedAssaulterIds).toBeUndefined();
-    expect(town.lastRaidResolvedAtTick).toBe(50);
-    expect(applyGlobalEffectRemove).toHaveBeenCalledWith(
-      state,
-      'raid-defense-requested',
+      true,
     );
+
+    raidTelegraphClear(state, larsia.id, now);
+
+    expect(state.world.towns[larsia.id]).toMatchObject({
+      raidTelegraphedAtTick: undefined,
+      raidEngageWindowExpiresAtTick: undefined,
+      raidTelegraphedAssaulterIds: undefined,
+      lastRaidResolvedAtTick: 50,
+    });
+    expect(raidEffects(state)).toEqual([
+      expect.objectContaining({ extendedDescription: 'Vesper' }),
+    ]);
   });
 
-  it('tolerates a town with no state', () => {
-    const state = {
-      world: { towns: {} },
-      globalEffects: [],
-    } as unknown as GameState;
+  it('still re-syncs the effect for a town never visited', () => {
+    const state = stateWith({}, true);
 
-    expect(() => raidTelegraphClear(state, larsiaId, 1000)).not.toThrow();
+    raidTelegraphClear(state, larsia.id, now);
+
+    expect(state.world.towns).toEqual({});
+    expect(raidEffects(state)).toEqual([]);
   });
 });

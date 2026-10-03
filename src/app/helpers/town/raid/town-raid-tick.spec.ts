@@ -1,272 +1,220 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-}));
+vi.mock('@helpers/town/raid/town-raid-resolve');
 
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSafeSegment: vi.fn((name: string) => name),
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/notify', () => ({
-  notifyError: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/risk-band', () => ({
-  riskBandForLevelRange: vi.fn(() => 'Medium'),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/item/gathering', () => ({
-  partyMinLevel: vi.fn(() => 10),
-}));
-
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
-  mapHopsBetween: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldCombatState: () => gamestate().world.combat,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/reputation/town-reputation', () => ({
-  townReputationTier: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-defense', () => ({
-  raidDefenseGlobalEffectApply: vi.fn(),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-resolve', () => ({
-  raidResolveDefeat: vi.fn(),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-state', () => ({
-  raidAssaulterMonsterIds: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/town/town-tick', () => ({
-  isTownDueForUpdate: vi.fn(() => true),
-  markTownSubsystemProcessed: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodesOfType: vi.fn(() => []),
-}));
-
-import { RAID_COOLDOWN_TICKS } from '@helpers/config';
-import { getEntriesByType } from '@helpers/content/content';
-import { ensureTown } from '@helpers/content/ensure-town';
-import { notifyError } from '@helpers/engine/notify';
-import { riskBandForLevelRange } from '@helpers/engine/risk-band';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { raidDefenseGlobalEffectApply } from '@helpers/town/raid/town-raid-defense';
-import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
-import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
-import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
 import {
-  isTownDueForUpdate,
-  markTownSubsystemProcessed,
-} from '@helpers/town/town-tick';
+  HIGH_RISK_LEVELS_ABOVE_PARTY,
+  RAID_BASE_WARNING_TICKS,
+  RAID_CHECK_INTERVAL_TICKS,
+  RAID_COOLDOWN_TICKS,
+  RAID_WARNING_TICKS_PER_MAP_HOP,
+  RAID_WARNING_TICKS_PER_REPUTATION_TIER,
+} from '@helpers/config';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { ensureTown, ensureTownDefense } from '@helpers/content/ensure-town';
+import { globalEffectsState, worldTownsState } from '@helpers/state-game';
+import { raidResolveDefeat } from '@helpers/town/raid/town-raid-resolve';
+import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import type {
   GameState,
+  GlobalEffectId,
   MonsterId,
   TownContent,
   TownId,
   TownNodeState,
 } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCharacter,
+  buildCombat,
+  buildTownNodeState,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { captureNotifications } from '@/testing/notify';
+import { seedWorldNodes } from '@/testing/world';
 
-const townId = 'larsia' as TownId;
-
-function buildTown(): TownContent {
-  return ensureTown({
-    id: townId,
-    name: 'Larsia',
-    level: 25,
-    defense: {
-      rewards: [],
-      guardian: { reputationTiers: [] },
-      assaulter: {
-        numMonsters: 1,
-        monsterIds: [],
-        level: { min: 20, max: 25 },
-      },
-      quests: { commissions: [] },
-      buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
+const now = 10_000;
+const bloodmoth = 'bloodmoth' as MonsterId;
+const assaulterLevel = { min: 20, max: 25 };
+const raidEffect = ensureGlobalEffect({
+  id: 'raid-defense' as GlobalEffectId,
+  name: 'Raid Defense Requested',
+});
+const larsia: TownContent = ensureTown({
+  id: 'larsia' as TownId,
+  name: 'Larsia',
+  defense: ensureTownDefense({
+    assaulter: {
+      numMonsters: 2,
+      monsterIds: [bloodmoth],
+      level: assaulterLevel,
     },
+  }),
+});
+
+function seedTown(
+  town: Partial<TownNodeState> = {},
+  edit: (state: GameState) => void = () => undefined,
+  partyLevel = assaulterLevel.max,
+): void {
+  seedGamestate((state) => {
+    state.clock.numTicks = now;
+    state.world.party = [buildCharacter({ level: partyLevel })];
+    state.world.towns[larsia.id] = buildTownNodeState({
+      firstVisitedAtTick: 0,
+      ...town,
+    });
+    edit(state);
   });
 }
 
-function buildTownState(overrides: Partial<TownNodeState> = {}): TownNodeState {
-  return {
-    lastProcessedTick: {},
-    stock: [],
-    workers: {},
-    reputation: 0,
-    hiddenGold: 0,
-    materials: {},
-    tradeskills: {},
-    craftQueue: [],
-    firstVisitedAtTick: 0,
-    commissionSlots: [],
-    specialtyPriority: [],
-    ...overrides,
-  };
+function townState(): TownNodeState {
+  return worldTownsState()[larsia.id];
 }
 
-function mockGamestate(
-  townState: TownNodeState | undefined,
-  combatRaidTownId?: string,
-) {
-  vi.mocked(gamestate).mockReturnValue({
-    world: {
-      combat: combatRaidTownId
-        ? ({ raidTownId: combatRaidTownId } as never)
-        : undefined,
-      towns: townState ? { [townId]: townState } : {},
-    },
-  } as unknown as GameState);
-}
+const tick = () => inTick(townRaidProcessTick);
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(getEntriesByType).mockReturnValue([buildTown()] as never);
-  vi.mocked(isTownDueForUpdate).mockReturnValue(true);
-  vi.mocked(timerTicksElapsed).mockReturnValue(1000);
-  // mockReturnValue persists across tests (vi.clearAllMocks doesn't reset it) - pin the default explicitly.
-  vi.mocked(riskBandForLevelRange).mockReturnValue('Medium');
-  vi.mocked(raidAssaulterMonsterIds).mockReturnValue([]);
+  seedContent([larsia, raidEffect]);
 });
 
-function updateFnAt(index: number): (state: GameState) => GameState {
-  return vi.mocked(updateGamestate).mock.calls[index][0];
-}
-
 describe('townRaidProcessTick', () => {
-  it('skips a town not due for update', () => {
-    vi.mocked(isTownDueForUpdate).mockReturnValue(false);
-    mockGamestate(buildTownState());
+  it('telegraphs a raid with its rolled assaulters and a warning window, requesting defense', () => {
+    seedTown();
+    const events = captureAnalyticsEvents();
 
-    townRaidProcessTick();
+    tick();
 
-    expect(markTownSubsystemProcessed).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('does nothing for a town that has never been visited', () => {
-    mockGamestate(buildTownState({ firstVisitedAtTick: undefined }));
-
-    townRaidProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(raidResolveDefeat).not.toHaveBeenCalled();
-  });
-
-  it('skips a town whose raid combat is currently being fought', () => {
-    mockGamestate(buildTownState({ raidTelegraphedAtTick: 900 }), townId);
-
-    townRaidProcessTick();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(raidResolveDefeat).not.toHaveBeenCalled();
-  });
-
-  it('auto-resolves as a defeat once the engage window has passed', () => {
-    mockGamestate(
-      buildTownState({
-        raidTelegraphedAtTick: 500,
-        raidEngageWindowExpiresAtTick: 999,
+    expect(townState()).toMatchObject({
+      raidTelegraphedAtTick: now,
+      raidEngageWindowExpiresAtTick: now + RAID_BASE_WARNING_TICKS,
+      raidTelegraphedAssaulterIds: [bloodmoth, bloodmoth],
+      lastProcessedTick: { raid: now },
+    });
+    expect(globalEffectsState()).toEqual([
+      expect.objectContaining({
+        id: raidEffect.id,
+        extendedDescription: 'Larsia',
       }),
-    );
+    ]);
+    expect(events).toContain('Town:Raid:Telegraph:Larsia');
+  });
 
-    townRaidProcessTick();
+  it('gives a more trusted town a longer warning', () => {
+    seedTown({ reputation: TOWN_REPUTATION_THRESHOLDS[1] });
 
-    expect(notifyError).toHaveBeenCalled();
-    expect(raidResolveDefeat).toHaveBeenCalledWith(townId);
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
-      townId,
-      'raid',
-      expect.any(Number),
+    tick();
+
+    expect(townState().raidEngageWindowExpiresAtTick).toBe(
+      now + RAID_BASE_WARNING_TICKS + RAID_WARNING_TICKS_PER_REPUTATION_TIER,
     );
   });
 
-  it('does nothing while telegraphed but still within the engage window', () => {
-    mockGamestate(
-      buildTownState({
-        raidTelegraphedAtTick: 500,
-        raidEngageWindowExpiresAtTick: 1500,
-      }),
+  it('gives a town further from the Duchy a longer warning', () => {
+    seedWorldNodes([
+      { name: 'Duchy', type: 'Kingdom', mapName: 'Carrina', x: 1 },
+      {
+        name: 'To the Desert',
+        type: 'TeleportNode',
+        mapName: 'Carrina',
+        x: 2,
+        properties: [{ name: 'toTag', type: 'string', value: 'desert' }],
+      },
+      {
+        name: 'From Carrina',
+        type: 'TeleportNode',
+        mapName: 'LarsianDesert',
+        x: 1,
+        properties: [{ name: 'tag', type: 'string', value: 'desert' }],
+      },
+      {
+        name: larsia.name,
+        type: 'NonPlayerKingdom',
+        mapName: 'LarsianDesert',
+        x: 5,
+      },
+    ]);
+    seedTown();
+
+    tick();
+
+    expect(townState().raidEngageWindowExpiresAtTick).toBe(
+      now + RAID_BASE_WARNING_TICKS + RAID_WARNING_TICKS_PER_MAP_HOP,
     );
+  });
 
-    townRaidProcessTick();
-
+  it('loses an undefended raid once its warning runs out, and not before', () => {
+    const notifications = captureNotifications();
+    seedTown({
+      raidTelegraphedAtTick: 1,
+      raidEngageWindowExpiresAtTick: now + 1,
+    });
+    tick();
     expect(raidResolveDefeat).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(townState()).toMatchObject({
+      raidTelegraphedAtTick: 1,
+      raidEngageWindowExpiresAtTick: now + 1,
+    });
+
+    seedTown({ raidTelegraphedAtTick: 1, raidEngageWindowExpiresAtTick: now });
+    tick();
+    expect(raidResolveDefeat).toHaveBeenCalledWith(larsia.id);
+    expect(notifications).toEqual([
+      expect.objectContaining({ message: expect.stringContaining('Larsia') }),
+    ]);
   });
 
-  it('does not telegraph while still within the once/day cooldown', () => {
-    mockGamestate(
-      buildTownState({
-        lastRaidResolvedAtTick: 1000 - RAID_COOLDOWN_TICKS + 1,
-      }),
-    );
+  it.each([
+    [
+      'during cooldown',
+      () => seedTown({ lastRaidResolvedAtTick: now - RAID_COOLDOWN_TICKS + 1 }),
+    ],
+    [
+      'mid-fight',
+      () =>
+        seedTown({}, (state) => {
+          state.world.combat = buildCombat({ raidTownId: larsia.id });
+        }),
+    ],
+    [
+      'when too dangerous for the party',
+      () =>
+        seedTown(
+          {},
+          () => undefined,
+          assaulterLevel.min - HIGH_RISK_LEVELS_ABOVE_PARTY - 1,
+        ),
+    ],
+    [
+      'before the town is visited',
+      () => seedTown({ firstVisitedAtTick: undefined }),
+    ],
+  ])('never raids a town %s', (_, seed) => {
+    seed();
 
-    townRaidProcessTick();
+    tick();
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(townState().raidTelegraphedAtTick).toBeUndefined();
   });
 
-  it('does not telegraph when the assaulter is too high-risk for the party', () => {
-    vi.mocked(riskBandForLevelRange).mockReturnValue('TooHigh');
-    mockGamestate(buildTownState());
+  it('raids again once the cooldown has passed', () => {
+    seedTown({ lastRaidResolvedAtTick: now - RAID_COOLDOWN_TICKS });
 
-    townRaidProcessTick();
+    tick();
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(townState().raidTelegraphedAtTick).toBe(now);
   });
 
-  it('telegraphs a raid once eligible, rolling and storing the assaulter list once', () => {
-    const rolledIds = ['Bloodmoth' as MonsterId, 'Bloodmoth' as MonsterId];
-    vi.mocked(raidAssaulterMonsterIds).mockReturnValue(rolledIds);
-    mockGamestate(buildTownState());
+  it('only checks once per interval', () => {
+    seedTown({
+      lastProcessedTick: { raid: now - RAID_CHECK_INTERVAL_TICKS + 1 },
+    });
 
-    townRaidProcessTick();
+    tick();
 
-    expect(raidAssaulterMonsterIds).toHaveBeenCalledTimes(1);
-    expect(updateGamestate).toHaveBeenCalled();
-    // Must run from inside the updateGamestate callback (against the mutation-in-progress state),
-    // not after it - updateGamestate is a bare mock here, so nothing else could have called it yet.
-    expect(raidDefenseGlobalEffectApply).not.toHaveBeenCalled();
-    const updateFn = updateFnAt(0);
-    const state = {
-      world: { towns: { [townId]: buildTownState() } },
-    } as unknown as GameState;
-    const result = updateFn(state);
-
-    expect(raidDefenseGlobalEffectApply).toHaveBeenCalledWith(state, 1000);
-    expect(result.world.towns[townId].raidTelegraphedAtTick).toBe(1000);
-    expect(
-      result.world.towns[townId].raidEngageWindowExpiresAtTick,
-    ).toBeGreaterThan(1000);
-    expect(result.world.towns[townId].raidTelegraphedAssaulterIds).toBe(
-      rolledIds,
-    );
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
-      townId,
-      'raid',
-      expect.any(Number),
-    );
+    expect(townState().raidTelegraphedAtTick).toBeUndefined();
   });
 });

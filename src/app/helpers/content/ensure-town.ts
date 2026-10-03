@@ -108,7 +108,7 @@ export function ensureTownMaterialThreshold(
   };
 }
 
-function ensureTownGathering(
+export function ensureTownGathering(
   gathering: Partial<TownGatheringConfig> = {},
 ): TownGatheringConfig {
   return {
@@ -220,7 +220,7 @@ function ensureTownDefenseBuyoff(
   };
 }
 
-function ensureTownDefense(
+export function ensureTownDefense(
   defense: Partial<TownDefenseConfig> = {},
 ): TownDefenseConfig {
   return {
