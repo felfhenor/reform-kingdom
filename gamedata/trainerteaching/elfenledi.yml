@@ -144,7 +144,7 @@
       required: 2500
 
     - itemId: Wooden Scales
-      required: 5
+      required: 1
 
   jobIds:
     - Warrior
@@ -196,7 +196,7 @@
       required: 2500
 
     - itemId: Woodwolf Teeth
-      required: 5
+      required: 1
 
   jobIds:
     - Ranger
