@@ -29,7 +29,7 @@
 
         <span class="type-meta">
           Lv. {{ levelMin() }}-{{ levelMax() }}
-          {{ e.monster.types.join('/') }} · {{ e.kills }} killed
+          {{ e.monster.types.join('/') }} · {{ e.kills | number }} killed
         </span>
         @if (e.foundAtNodes.length > 0) {
           <span class="type-meta">

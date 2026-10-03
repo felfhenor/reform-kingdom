@@ -28,7 +28,7 @@
               [listRowSelected]="entry.monster.id === selected?.monster.id"
               (click)="selectMonster(entry.monster.id)"
               appSfx="ui-click"
-              [sfxOffset]="$index"
+              [sfxOffset]="$index / 5"
               [sfxTrigger]="['click', 'hover']"
             >
               <app-slot-icon-blank>

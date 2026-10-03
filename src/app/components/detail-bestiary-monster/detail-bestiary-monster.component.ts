@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -52,6 +53,7 @@ type LevelOption = { value: number; label: string };
     IconUnknownComponent,
     RowStatSummaryComponent,
     NgSelectComponent,
+    DecimalPipe,
   ],
   templateUrl: './detail-bestiary-monster.component.html',
   styleUrl: './detail-bestiary-monster.component.scss',
