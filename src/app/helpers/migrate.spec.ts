@@ -1,720 +1,434 @@
+import { describe, expect, it } from 'vitest';
+
+import {
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
+import {
+  ensureGatherResult,
+  ensureGathering,
+} from '@helpers/content/ensure-gathernode';
+import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTask } from '@helpers/content/ensure-task';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import {
+  ensureTrainer,
+  ensureTrainerTeaching,
+} from '@helpers/content/ensure-trainer';
+import { tradeskillXpForLevel } from '@helpers/crafting/tradeskill';
+import { defaultGameState, defaultTradeskillBuilding } from '@helpers/defaults';
+import { characterXpForLevel } from '@helpers/hero/party';
+import { migrateGameState } from '@helpers/migrate';
+import { gamestate } from '@helpers/state-game';
 import type {
+  AutoModeState,
+  CaravanId,
   Character,
   CollectibleId,
-  EquipmentId,
-  EquipmentItemId,
-  GameState,
-  MaterialId,
-  RecipeId,
   DecreeClause,
   DecreeClauseId,
-  WorldNodeEntry,
+  EquipmentId,
+  GameState,
+  GatheringId,
+  ItemId,
+  JobId,
+  RecipeId,
+  TaskId,
+  TownId,
+  TradeskillId,
+  TrainerId,
+  TrainerTeachingId,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/caravan/caravan', () => ({
-  pruneInvalidDiscoveredCaravans: vi.fn((discovered) => discovered),
-}));
-
-vi.mock('@helpers/commission/commission-tick', () => ({
-  pruneInvalidCommissions: vi.fn((commissions) => commissions),
-}));
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  pruneInvalidArmoryItems: vi.fn((armory) => armory),
-  pruneInvalidDiscoveredEquipment: vi.fn((discovered) => discovered),
-}));
-
-vi.mock('@helpers/kingdom/astral-projector', () => ({
-  pruneInvalidDiscoveredAstralProjectorSpells: vi.fn(
-    (discovered) => discovered,
-  ),
-  pruneInvalidActiveAstralProjectorSpells: vi.fn((active) => active),
-}));
-
-vi.mock('@helpers/kingdom/bestiary', () => ({
-  pruneInvalidBestiaryEntries: vi.fn((bestiary) => bestiary),
-  repairInvalidBestiaryLevels: vi.fn((bestiary) => bestiary),
-}));
-
-vi.mock('@helpers/item/collectibles', () => ({
-  grantFoundingStoneIfMissing: vi.fn((collectibles) => collectibles),
-  pruneInvalidCollectibles: vi.fn((collectibles) => collectibles),
-}));
-
-vi.mock('@helpers/hero/character-progress', () => ({
-  retrofitPartyXp: vi.fn((party) => party),
-}));
-
-vi.mock('@helpers/hero/global-effect-state', () => ({
-  recomputeGlobalEffectSums: vi.fn(),
-}));
-
-vi.mock('@helpers/crafting/crafting', () => ({
-  craftQueueOrphanedEquipment: vi.fn(() => []),
-  pruneInvalidCraftQueues: vi.fn((tradeskills) => tradeskills),
-}));
-
-vi.mock('@helpers/decree/decree', () => ({
-  backfillDecreeClauseRiskTolerance: vi.fn((clauses) => clauses),
-  pruneInvalidDecreeGatherClauses: vi.fn((clauses) => clauses),
-}));
-
-vi.mock('@helpers/item/equipment', () => ({
-  backfillEquipmentItem: vi.fn((item) => item),
-  backfillEquipmentBlock: vi.fn((equipment) => equipment),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  pruneInvalidMaterials: vi.fn((materials) => materials),
-  pruneInvalidDiscoveredMaterials: vi.fn((discovered) => discovered),
-}));
-
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
-  repairUnwalkableCurrentLocation: vi.fn((location) => location),
-}));
-
-vi.mock('@helpers/hero/party', () => ({
-  pruneInvalidPartyEquipment: vi.fn((party) => party),
-}));
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  pruneInvalidDiscoveredRecipes: vi.fn((discovered) => discovered),
-}));
-
-vi.mock('@helpers/crafting/tradeskill', () => ({
-  migrateTradeskillStateKeys: vi.fn((tradeskills) => tradeskills),
-  retrofitTradeskillXp: vi.fn((tradeskills) => tradeskills),
-}));
-
-vi.mock('@helpers/town/town-prune', () => ({
-  pruneInvalidTowns: vi.fn((towns) => towns),
-}));
-
-vi.mock('@helpers/town/town-spawn', () => ({
-  pruneInvalidHomeNode: vi.fn((homeNodeName) => homeNodeName),
-}));
-
-vi.mock('@helpers/defaults', () => ({
-  defaultGameState: vi.fn(() => ({
-    armory: [],
-    materials: {},
-    discoveredMaterials: {},
-    collectibles: {},
-    discoveredEquipment: {},
-    discoveredCaravans: {},
-    discoveredRecipes: {},
-    discoveredGatherNodes: {},
-    gatherNodeLevels: {},
-    shrines: {},
-    outposts: {},
-    worldDiscoveries: {},
-    bestiary: {},
-    workers: {},
-    discoveredWorkers: {},
-    discoveredAstralProjectorSpells: {},
-    activeAstralProjectorSpells: [],
-    tutorials: {},
-    world: { party: [], autoMode: { clauses: [] }, commissions: {} },
-  })),
-}));
-
-vi.mock('@helpers/tutorial/tutorial-catalog', () => ({
-  TUTORIAL_CATALOG: [],
-}));
-
-vi.mock('@helpers/task/task-migrate', () => ({
-  pruneInvalidTasks: vi.fn((tasks) => tasks),
-  retrofitTasks: vi.fn((state) => state.tasks),
-}));
-
-vi.mock('@helpers/tutorial/tutorial-seen', () => ({
-  pruneInvalidTutorials: vi.fn((tutorials) => tutorials),
-}));
-
-vi.mock('@helpers/item/gather-node-discovery', () => ({
-  pruneInvalidGatherNodeDiscoveries: vi.fn((discovered) => discovered),
-  grandfatherGatherNodeDiscoveries: vi.fn(() => ({})),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeGathering: vi.fn(),
-  worldNodeOutpost: vi.fn(),
-  worldNodeShrine: vi.fn(),
-  worldNodesOfType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/world-node/world-node-discovery', () => ({
-  pruneInvalidWorldDiscoveries: vi.fn((discovered) => discovered),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
-  allGatherableMaterialIds: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/world-node/world-node-level', () => ({
-  pruneInvalidGatherNodeLevels: vi.fn((levels) => levels),
-}));
-
-vi.mock('@helpers/world-node/world-node-development', () => ({
-  pruneInvalidWorldNodeDevelopmentLevels: vi.fn((levels) => levels),
-}));
-
-vi.mock('@helpers/trainer/trainer', () => ({
-  pruneInvalidCharacterTeachings: vi.fn((teachings) => teachings),
-  pruneInvalidDiscoveredTrainers: vi.fn((discovered) => discovered),
-}));
-
-vi.mock('@helpers/worker/worker-discovery', () => ({
-  isWorkerContentKnown: vi.fn(() => true),
-  pruneInvalidDiscoveredWorkers: vi.fn((discovered) => discovered),
-  pruneInvalidWorkerStates: vi.fn((workers) => workers),
-}));
-
-vi.mock('@helpers/worker/worker-travel', () => ({
-  workerAssignmentIsValid: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  gamestateTickStart: vi.fn(),
-  gamestateTickEnd: vi.fn(),
-  saveGameState: vi.fn(),
-  setGameState: vi.fn(),
-}));
-
-vi.mock('@helpers/state-options', () => ({
-  defaultOptions: vi.fn(() => ({})),
-  options: vi.fn(() => ({})),
-  setOptions: vi.fn(),
-}));
-
 import {
-  craftQueueOrphanedEquipment,
-  pruneInvalidCraftQueues,
-} from '@helpers/crafting/crafting';
-import { pruneInvalidDiscoveredRecipes } from '@helpers/crafting/recipes';
-import {
-  migrateTradeskillStateKeys,
-  retrofitTradeskillXp,
-} from '@helpers/crafting/tradeskill';
-import {
-  backfillDecreeClauseRiskTolerance,
-  pruneInvalidDecreeGatherClauses,
-} from '@helpers/decree/decree';
-import { retrofitPartyXp } from '@helpers/hero/character-progress';
-import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
-import {
-  grantFoundingStoneIfMissing,
-  pruneInvalidCollectibles,
-} from '@helpers/item/collectibles';
-import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
-import {
-  pruneInvalidDiscoveredMaterials,
-  pruneInvalidMaterials,
-} from '@helpers/item/materials';
-import {
-  pruneInvalidArmoryItems,
-  pruneInvalidDiscoveredEquipment,
-} from '@helpers/kingdom/armory';
-import { migrateGameState } from '@helpers/migrate';
-import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
-import { gamestate, saveGameState, setGameState } from '@helpers/state-game';
-import {
-  pruneInvalidCharacterTeachings,
-  pruneInvalidDiscoveredTrainers,
-} from '@helpers/trainer/trainer';
-import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
-import { worldNodesOfType } from '@helpers/world-node/world-nodes';
+  buildCharacter,
+  buildCommissionNodeState,
+  buildCraftQueueEntry,
+  buildEquipmentItem,
+  buildTownNodeState,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
+
+const sword = ensureEquipment({
+  id: 'sword' as EquipmentId,
+  name: 'Sword',
+  type: 'Sword',
+});
+const ore = ensureItem({ id: 'ore' as ItemId, name: 'Ore' });
+const ruby = ensureCollectible({ id: 'ruby' as CollectibleId, name: 'Ruby' });
+const foundingStone = ensureCollectible({
+  id: 'founding-stone' as CollectibleId,
+  name: 'Founding Stone',
+});
+const cloak = ensureRecipe({ id: 'cloak' as RecipeId, name: 'Cloak' });
+const smithing = ensureTradeskill({
+  id: 'smithing' as TradeskillId,
+  name: 'Smithing',
+});
+const warrior = ensureJob({ id: 'warrior' as JobId, name: 'Warrior' });
+const lunge = ensureTrainerTeaching({
+  id: 'lunge' as TrainerTeachingId,
+  name: 'Lunge',
+});
+const trainer = ensureTrainer({ id: 'trainer' as TrainerId, name: 'Trainer' });
+const content = [sword, ore, ruby, cloak, smithing, warrior, lunge, trainer];
+
+const gone = <T extends string>(id: string) => `gone-${id}` as T;
+
+// Runs the real migration over a save seeded from defaults, as a loaded save would be.
+function migrate(edit: (save: GameState) => void): GameState {
+  seedGamestate(edit);
+  migrateGameState();
+  return gamestate();
+}
 
 describe('migrateGameState', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  it('drops save entries whose content no longer exists, keeping the rest', () => {
+    seedContent(content);
+
+    const migrated = migrate((save) => {
+      save.armory = [
+        buildEquipmentItem(sword.id),
+        buildEquipmentItem(gone('gear')),
+      ];
+      save.materials = {
+        [ore.id]: { quantity: 5, foundAt: 1 },
+        [gone<ItemId>('ore')]: { quantity: 2, foundAt: 1 },
+      };
+      save.discoveredEquipment = {
+        [sword.id]: { foundAt: 1 },
+        [gone<EquipmentId>('gear')]: { foundAt: 1 },
+      };
+      save.collectibles = {
+        [ruby.id]: { quantity: 1, foundAt: 1 },
+        [gone<CollectibleId>('ruby')]: { quantity: 1, foundAt: 1 },
+      };
+      save.discoveredRecipes = {
+        [cloak.id]: { foundAt: 1 },
+        [gone<RecipeId>('recipe')]: { foundAt: 1 },
+      };
+      save.discoveredTrainers = {
+        [trainer.id]: { foundAt: 1 },
+        [gone<TrainerId>('trainer')]: { foundAt: 1 },
+      };
+      save.world.party = [
+        buildCharacter({
+          equipment: {
+            ...buildCharacter().equipment,
+            Weapon: buildEquipmentItem(sword.id),
+            Armor: buildEquipmentItem(gone('gear')),
+          },
+          teachings: {
+            [warrior.id]: [lunge.id, gone<TrainerTeachingId>('teaching')],
+          },
+        }),
+      ];
+    });
+
+    expect(migrated.armory.map((item) => item.equipmentId)).toEqual([sword.id]);
+    expect(Object.keys(migrated.materials)).toEqual([ore.id]);
+    expect(Object.keys(migrated.discoveredEquipment)).toEqual([sword.id]);
+    expect(Object.keys(migrated.collectibles)).toEqual([ruby.id]);
+    expect(Object.keys(migrated.discoveredRecipes)).toEqual([cloak.id]);
+    expect(Object.keys(migrated.discoveredTrainers)).toEqual([trainer.id]);
+
+    const [hero] = migrated.world.party;
+    expect(hero.equipment.Weapon?.equipmentId).toBe(sword.id);
+    expect(hero.equipment.Armor).toBeUndefined();
+    expect(hero.teachings).toEqual({ [warrior.id]: [lunge.id] });
   });
 
-  it('prunes invalid armory and material entries before committing the migrated state', () => {
-    const staleArmory = [
-      { equipmentId: 'sword' as EquipmentId },
-      { equipmentId: 'stale-gear' as EquipmentId },
-    ];
-    const staleMaterials = {
-      ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
-      ['stale-material' as MaterialId]: { quantity: 2, foundAt: 2000 },
-    };
+  it('fills in whatever an older save is missing from the current defaults', () => {
+    const migrated = migrate((save) => {
+      const legacy = save as Partial<GameState>;
+      delete legacy.discoveredTrainers;
+      delete legacy.workers;
+      delete (save.world as Partial<GameState['world']>).autoMode;
+    });
 
-    vi.mocked(gamestate).mockReturnValue({
-      armory: staleArmory,
-      materials: staleMaterials,
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      world: { party: [] },
-    } as unknown as GameState);
-
-    const prunedArmory = [
-      {
-        id: 'sword-1' as EquipmentItemId,
-        equipmentId: 'sword' as EquipmentId,
-        infusedItemIds: [],
-        affixIds: [],
-      },
-    ];
-    const prunedMaterials = {
-      ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
-    };
-    vi.mocked(pruneInvalidArmoryItems).mockReturnValue(prunedArmory);
-    vi.mocked(pruneInvalidMaterials).mockReturnValue(prunedMaterials);
-
-    migrateGameState();
-
-    expect(pruneInvalidArmoryItems).toHaveBeenCalledWith(staleArmory);
-    expect(pruneInvalidMaterials).toHaveBeenCalledWith(staleMaterials);
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.armory).toEqual(prunedArmory);
-    expect(committed.materials).toEqual(prunedMaterials);
-    expect(saveGameState).toHaveBeenCalled();
+    const defaults = defaultGameState();
+    expect(migrated.discoveredTrainers).toEqual(defaults.discoveredTrainers);
+    expect(migrated.workers).toEqual(defaults.workers);
+    expect(migrated.world.autoMode).toEqual(defaults.world.autoMode);
   });
 
-  it('prunes discovered equipment and collectibles, then grants a missing founding stone', () => {
-    const staleDiscovered = {
-      ['sword' as EquipmentId]: { foundAt: 1000 },
-      ['stale-gear' as EquipmentId]: { foundAt: 2000 },
-    };
-    const staleCollectibles = {
-      ['goblin-ruby' as CollectibleId]: { quantity: 1, foundAt: 1000 },
-      ['stale-collectible' as CollectibleId]: { quantity: 1, foundAt: 2000 },
-    };
+  it('grants the Founding Stone once, without touching one already owned', () => {
+    seedContent([foundingStone]);
 
-    const staleDiscoveredRecipes = {
-      ['equipment-bone-hewn-cloak' as RecipeId]: { foundAt: 1000 },
-      ['stale-recipe' as RecipeId]: { foundAt: 2000 },
-    };
+    expect(migrate(() => {}).collectibles[foundingStone.id]).toEqual({
+      quantity: 1,
+      foundAt: expect.any(Number),
+    });
 
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: staleCollectibles,
-      discoveredEquipment: staleDiscovered,
-      discoveredRecipes: staleDiscoveredRecipes,
-      world: { party: [] },
-    } as unknown as GameState);
-
-    const prunedDiscovered = { ['sword' as EquipmentId]: { foundAt: 1000 } };
-    const prunedCollectibles = {
-      ['goblin-ruby' as CollectibleId]: { quantity: 1, foundAt: 1000 },
-    };
-    const collectiblesWithFoundingStone = {
-      ...prunedCollectibles,
-      ['founding-stone' as CollectibleId]: { quantity: 1, foundAt: 3000 },
-    };
-
-    const prunedDiscoveredRecipes = {
-      ['equipment-bone-hewn-cloak' as RecipeId]: { foundAt: 1000 },
-    };
-
-    vi.mocked(pruneInvalidDiscoveredEquipment).mockReturnValue(
-      prunedDiscovered,
-    );
-    vi.mocked(pruneInvalidCollectibles).mockReturnValue(prunedCollectibles);
-    vi.mocked(grantFoundingStoneIfMissing).mockReturnValue(
-      collectiblesWithFoundingStone,
-    );
-    vi.mocked(pruneInvalidDiscoveredRecipes).mockReturnValue(
-      prunedDiscoveredRecipes,
-    );
-
-    migrateGameState();
-
-    expect(pruneInvalidDiscoveredEquipment).toHaveBeenCalledWith(
-      staleDiscovered,
-    );
-    expect(pruneInvalidCollectibles).toHaveBeenCalledWith(staleCollectibles);
-    expect(grantFoundingStoneIfMissing).toHaveBeenCalledWith(
-      prunedCollectibles,
-    );
-    expect(pruneInvalidDiscoveredRecipes).toHaveBeenCalledWith(
-      staleDiscoveredRecipes,
-    );
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.discoveredEquipment).toEqual(prunedDiscovered);
-    expect(committed.collectibles).toEqual(collectiblesWithFoundingStone);
-    expect(committed.discoveredRecipes).toEqual(prunedDiscoveredRecipes);
-  });
-
-  it('prunes invalid equipment off party members before committing the migrated state', () => {
-    const staleParty = [{ id: 'jala', combatOrders: {} } as Character];
-
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      world: { party: staleParty },
-    } as unknown as GameState);
-
-    const prunedParty = [{ id: 'jala', equipment: {} } as unknown as Character];
-    vi.mocked(pruneInvalidPartyEquipment).mockReturnValue(prunedParty);
-
-    migrateGameState();
-
-    expect(pruneInvalidPartyEquipment).toHaveBeenCalledWith(staleParty);
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.world.party).toEqual(prunedParty);
-  });
-
-  it('prunes party teachings and discovered trainers before committing', () => {
-    const staleTeachings = { ['job-warrior']: ['gone'] };
-    const staleDiscovered = { ['trainer-gone']: { foundAt: 1 } };
-
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredTrainers: staleDiscovered,
-      world: {
-        party: [{ id: 'jala', combatOrders: {}, teachings: staleTeachings }],
-      },
-    } as unknown as GameState);
-    vi.mocked(pruneInvalidCharacterTeachings).mockReturnValueOnce({});
-    vi.mocked(pruneInvalidDiscoveredTrainers).mockReturnValueOnce({});
-
-    migrateGameState();
-
-    expect(pruneInvalidCharacterTeachings).toHaveBeenCalledWith(staleTeachings);
-    expect(pruneInvalidDiscoveredTrainers).toHaveBeenCalledWith(
-      staleDiscovered,
-    );
-
-    const partyAfterBackfill = vi.mocked(pruneInvalidPartyEquipment).mock
-      .calls[0][0];
-    expect(partyAfterBackfill[0].teachings).toEqual({});
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.discoveredTrainers).toEqual({});
-  });
-
-  it('retrofits party and tradeskill xp to the current curve before committing', () => {
-    // Reassert identity impl - vi.clearAllMocks() doesn't clear an earlier test's mockReturnValue.
-    vi.mocked(pruneInvalidPartyEquipment).mockImplementation((party) => party);
-
-    const staleParty = [{ id: 'jala', combatOrders: {} } as Character];
-    const staleTradeskills = { Blacksmithing: { level: 1 } };
-
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      world: { party: staleParty },
-      tradeskills: staleTradeskills,
-    } as unknown as GameState);
-
-    const retrofittedParty = [{ id: 'jala', xp: 'retrofitted' } as never];
-    const retrofittedTradeskills = {
-      Blacksmithing: { level: 1, xp: 'retrofitted' },
-    };
-    vi.mocked(retrofitPartyXp).mockReturnValue(retrofittedParty);
-    vi.mocked(retrofitTradeskillXp).mockReturnValue(
-      retrofittedTradeskills as never,
-    );
-
-    migrateGameState();
-
-    expect(retrofitPartyXp).toHaveBeenCalledWith(staleParty);
-    expect(migrateTradeskillStateKeys).toHaveBeenCalledWith(staleTradeskills);
-    expect(retrofitTradeskillXp).toHaveBeenCalledWith(staleTradeskills);
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.world.party).toEqual(retrofittedParty);
-    expect(committed.tradeskills).toEqual(retrofittedTradeskills);
-  });
-
-  it('returns gear held by pruned craft entries to the armory before the entries are dropped', () => {
-    vi.mocked(pruneInvalidArmoryItems).mockImplementation((armory) => armory);
-    const orphan = {
-      id: 'dagger-1' as EquipmentItemId,
-      equipmentId: 'dagger' as EquipmentId,
-      infusedItemIds: [],
-      affixIds: [],
-    };
-    vi.mocked(craftQueueOrphanedEquipment).mockReturnValueOnce([orphan]);
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      world: { party: [] },
-    } as unknown as GameState);
-
-    migrateGameState();
-
+    const owned = { quantity: 3, foundAt: 1 };
     expect(
-      vi.mocked(craftQueueOrphanedEquipment).mock.invocationCallOrder[0],
-    ).toBeLessThan(
-      vi.mocked(pruneInvalidCraftQueues).mock.invocationCallOrder[0],
-    );
-    expect(vi.mocked(setGameState).mock.calls[0][0].armory).toEqual([orphan]);
+      migrate((save) => (save.collectibles[foundingStone.id] = owned))
+        .collectibles[foundingStone.id],
+    ).toEqual(owned);
   });
 
-  it('grandfathers gather-node discoveries for a save with material progress but no recorded visits', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {
-        ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
-      },
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: {},
-      world: { party: [] },
-    } as unknown as GameState);
+  it('rescales hero and tradeskill xp to the current curve, never past it', () => {
+    seedContent([smithing]);
 
-    const gatherNodes = [
-      { nodeName: 'Wergen Woods' } as WorldNodeEntry,
-      { nodeName: 'Rocky Outcrop' } as WorldNodeEntry,
-    ];
-    vi.mocked(worldNodesOfType).mockReturnValue(gatherNodes);
+    const migrated = migrate((save) => {
+      save.world.party = [
+        { ...buildCharacter({ level: 5 }), xp: { current: 10, maximum: 1 } },
+        { ...buildCharacter({ level: 5 }), xp: { current: 1e9, maximum: 1 } },
+      ];
+      save.tradeskills[smithing.id] = {
+        ...defaultTradeskillBuilding(),
+        level: 3,
+        xp: { current: 1e9, maximum: 1 },
+      };
+    });
 
-    const grandfathered = {
-      'Wergen Woods': { foundAt: 5000 },
-      'Rocky Outcrop': { foundAt: 5000 },
-    };
-    vi.mocked(grandfatherGatherNodeDiscoveries).mockReturnValue(grandfathered);
-
-    migrateGameState();
-
-    expect(grandfatherGatherNodeDiscoveries).toHaveBeenCalledWith([
-      'Wergen Woods',
-      'Rocky Outcrop',
+    const heroMax = characterXpForLevel(5);
+    expect(migrated.world.party.map((hero) => hero.xp)).toEqual([
+      { current: 10, maximum: heroMax },
+      { current: heroMax, maximum: heroMax },
     ]);
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.discoveredGatherNodes).toEqual(grandfathered);
-  });
-
-  it('does not grandfather a genuinely fresh save with no materials', () => {
-    // Same mock-leak caveat as the xp-retrofit test above.
-    vi.mocked(pruneInvalidMaterials).mockImplementation(
-      (materials) => materials,
-    );
-
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: {},
-      world: { party: [] },
-    } as unknown as GameState);
-
-    migrateGameState();
-
-    expect(grandfatherGatherNodeDiscoveries).not.toHaveBeenCalled();
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.discoveredGatherNodes).toEqual({});
-  });
-
-  it('does not re-grandfather a save that already has recorded visits', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {
-        ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
-      },
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: { 'Wergen Woods': { foundAt: 1000 } },
-      world: { party: [] },
-    } as unknown as GameState);
-
-    migrateGameState();
-
-    expect(grandfatherGatherNodeDiscoveries).not.toHaveBeenCalled();
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.discoveredGatherNodes).toEqual({
-      'Wergen Woods': { foundAt: 1000 },
+    const smithingMax = tradeskillXpForLevel(3);
+    expect(migrated.tradeskills[smithing.id].xp).toEqual({
+      current: smithingMax,
+      maximum: smithingMax,
     });
   });
 
-  it('prunes decree GatherMaterial clauses no GatherNode can satisfy anymore', () => {
-    const staleClauses = [
-      {
-        id: 'clause-1' as DecreeClauseId,
-        type: 'GatherMaterial',
-        materialId: 'wergen-stick' as MaterialId,
-        targetQuantity: 1000,
-        enabled: true,
-        failureCount: 0,
-      } as DecreeClause,
-    ];
+  it('returns gear reserved by a craft for a removed recipe to the armory', () => {
+    seedContent([sword, smithing]);
+    const reserved = buildEquipmentItem(sword.id);
 
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: {},
-      world: { party: [], autoMode: { clauses: staleClauses } },
-    } as unknown as GameState);
+    const migrated = migrate((save) => {
+      save.tradeskills[smithing.id] = {
+        ...defaultTradeskillBuilding(),
+        queue: [
+          buildCraftQueueEntry({
+            recipeId: gone('recipe'),
+            reservedEquipment: [reserved],
+          }),
+        ],
+      };
+    });
 
-    vi.mocked(allGatherableMaterialIds).mockReturnValue([]);
-    vi.mocked(pruneInvalidDecreeGatherClauses).mockReturnValue([]);
-
-    migrateGameState();
-
-    expect(pruneInvalidDecreeGatherClauses).toHaveBeenCalledWith(
-      staleClauses,
-      [],
-    );
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.world.autoMode.clauses).toEqual([]);
+    expect(migrated.tradeskills[smithing.id].queue).toEqual([]);
+    expect(migrated.armory).toEqual([reserved]);
   });
 
-  it('backfills the legacy global risk tolerance onto risk-aware clauses', () => {
-    const clauses = [
-      {
-        id: 'clause-1' as DecreeClauseId,
-        type: 'LevelUpParty',
-      } as DecreeClause,
-    ];
+  describe('gather-node discoveries', () => {
+    const groves = ['Wergen Woods', 'Rocky Outcrop'];
+    function seedGroves(): void {
+      seedContent([ore]);
+      seedWorldNodes(groves.map((name) => ({ name, type: 'GatherNode' })));
+    }
 
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: {},
-      world: {
-        party: [],
-        autoMode: { clauses, riskTolerance: 'High' },
-      },
-    } as unknown as GameState);
+    it('are granted for every node to a save with material progress from before visits were tracked', () => {
+      seedGroves();
 
-    vi.mocked(pruneInvalidDecreeGatherClauses).mockReturnValue(clauses);
-    const backfilled = [
-      { ...clauses[0], riskTolerance: 'High' } as DecreeClause,
-    ];
-    vi.mocked(backfillDecreeClauseRiskTolerance).mockReturnValue(backfilled);
+      const migrated = migrate(
+        (save) => (save.materials[ore.id] = { quantity: 5, foundAt: 1 }),
+      );
 
-    migrateGameState();
+      expect(Object.keys(migrated.discoveredGatherNodes)).toEqual(groves);
+    });
 
-    expect(backfillDecreeClauseRiskTolerance).toHaveBeenCalledWith(
-      clauses,
-      'High',
-    );
+    it('are left alone for a fresh save or one that already records visits', () => {
+      seedGroves();
+      expect(migrate(() => {}).discoveredGatherNodes).toEqual({});
 
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.world.autoMode.clauses).toEqual(backfilled);
-  });
-
-  it('defaults the legacy risk tolerance to Medium when no save had it', () => {
-    const clauses = [
-      {
-        id: 'clause-1' as DecreeClauseId,
-        type: 'LevelUpParty',
-      } as DecreeClause,
-    ];
-
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: {},
-      world: { party: [], autoMode: { clauses } },
-    } as unknown as GameState);
-
-    vi.mocked(pruneInvalidDecreeGatherClauses).mockReturnValue(clauses);
-
-    migrateGameState();
-
-    expect(backfillDecreeClauseRiskTolerance).toHaveBeenCalledWith(
-      clauses,
-      'Medium',
-    );
-  });
-
-  it('prunes stale discoveredMaterials entries and backfills from current stock', () => {
-    const staleDiscovered = {
-      ['gold-coin' as MaterialId]: { foundAt: 1000 },
-      ['stale-material' as MaterialId]: { foundAt: 2000 },
-    };
-    // gold-coin's foundAt (500) deliberately differs from its current-stock foundAt (1000), so an
-    // errant backfill overwrite (instead of preserving the pruned entry) would be caught below.
-    const currentMaterials = {
-      ['gold-coin' as MaterialId]: { quantity: 5, foundAt: 1000 },
-      ['copper-ore' as MaterialId]: { quantity: 3, foundAt: 3000 },
-    };
-
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: currentMaterials,
-      discoveredMaterials: staleDiscovered,
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: {},
-      world: { party: [] },
-    } as unknown as GameState);
-
-    const prunedDiscovered = { ['gold-coin' as MaterialId]: { foundAt: 500 } };
-    vi.mocked(pruneInvalidMaterials).mockReturnValue(currentMaterials);
-    vi.mocked(pruneInvalidDiscoveredMaterials).mockReturnValue(
-      prunedDiscovered,
-    );
-
-    migrateGameState();
-
-    expect(pruneInvalidDiscoveredMaterials).toHaveBeenCalledWith(
-      staleDiscovered,
-    );
-
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.discoveredMaterials).toEqual({
-      ['gold-coin' as MaterialId]: { foundAt: 500 },
-      ['copper-ore' as MaterialId]: { foundAt: 3000 },
+      const visited = { 'Wergen Woods': { foundAt: 1 } };
+      expect(
+        migrate((save) => {
+          save.materials[ore.id] = { quantity: 5, foundAt: 1 };
+          save.discoveredGatherNodes = visited;
+        }).discoveredGatherNodes,
+      ).toEqual(visited);
     });
   });
 
-  it('relocates the party off an unwalkable current location before committing', () => {
-    const staleLocation = { mapName: 'Carrina', x: 1, y: 1 };
+  it('drops GatherMaterial clauses no gather node can satisfy anymore', () => {
+    const grove = ensureGathering({
+      id: 'woods' as GatheringId,
+      name: 'Wergen Woods',
+      gatherResults: [
+        ensureGatherResult({ items: [{ itemId: ore.id, quantity: 1 }] }),
+      ],
+    });
+    seedContent([ore, grove]);
+    seedWorldNodes([{ name: grove.name, type: 'GatherNode' }]);
+    const gather = (id: string, materialId: ItemId): DecreeClause => ({
+      id: id as DecreeClauseId,
+      type: 'GatherMaterial',
+      materialId,
+      targetQuantity: 10,
+      enabled: true,
+      failureCount: 0,
+    });
 
-    vi.mocked(gamestate).mockReturnValue({
-      armory: [],
-      materials: {},
-      collectibles: {},
-      discoveredEquipment: {},
-      discoveredRecipes: {},
-      discoveredGatherNodes: {},
-      world: { party: [], currentLocation: staleLocation },
-    } as unknown as GameState);
-
-    const repairedLocation = { mapName: 'Carrina', x: 26, y: 24 };
-    vi.mocked(repairUnwalkableCurrentLocation).mockReturnValue(
-      repairedLocation,
+    const migrated = migrate(
+      (save) =>
+        (save.world.autoMode.clauses = [
+          gather('kept', ore.id),
+          gather('dropped', gone('ore')),
+        ]),
     );
 
-    migrateGameState();
+    expect(migrated.world.autoMode.clauses.map((clause) => clause.id)).toEqual([
+      'kept',
+    ]);
+  });
 
-    expect(repairUnwalkableCurrentLocation).toHaveBeenCalledWith(staleLocation);
+  describe('the legacy save-wide risk tolerance', () => {
+    const levelUp = {
+      id: 'level' as DecreeClauseId,
+      type: 'LevelUpParty',
+      enabled: true,
+      failureCount: 0,
+    } as DecreeClause;
 
-    const committed = vi.mocked(setGameState).mock.calls[0][0];
-    expect(committed.world.currentLocation).toEqual(repairedLocation);
+    function migrateWith(riskTolerance?: string): AutoModeState {
+      return migrate((save) => {
+        save.world.autoMode.clauses = [levelUp];
+        if (riskTolerance) {
+          Object.assign(save.world.autoMode, { riskTolerance });
+        }
+      }).world.autoMode;
+    }
+
+    it('moves onto each risk-aware clause and off Auto Mode itself', () => {
+      const autoMode = migrateWith('High');
+
+      expect(autoMode.clauses).toEqual([{ ...levelUp, riskTolerance: 'High' }]);
+      expect(autoMode).not.toHaveProperty('riskTolerance');
+    });
+
+    it('defaults to Medium for a save without one', () => {
+      expect(migrateWith().clauses).toEqual([
+        { ...levelUp, riskTolerance: 'Medium' },
+      ]);
+    });
+  });
+
+  it('backfills discovered materials from current stock, keeping known discovery times', () => {
+    const copper = ensureItem({ id: 'copper' as ItemId, name: 'Copper' });
+    seedContent([ore, copper]);
+
+    const migrated = migrate((save) => {
+      save.discoveredMaterials = {
+        [ore.id]: { foundAt: 500 },
+        [gone<ItemId>('ore')]: { foundAt: 1 },
+      };
+      save.materials = {
+        [ore.id]: { quantity: 5, foundAt: 1000 },
+        [copper.id]: { quantity: 3, foundAt: 3000 },
+        [gone<ItemId>('stock')]: { quantity: 1, foundAt: 1 },
+      };
+    });
+
+    expect(migrated.discoveredMaterials).toEqual({
+      [ore.id]: { foundAt: 500 },
+      [copper.id]: { foundAt: 3000 },
+    });
+  });
+
+  it('moves a party stranded on an unwalkable tile to the kingdom', () => {
+    const { Kingdom } = seedWorldNodes([{ name: 'Kingdom', type: 'Kingdom' }]);
+
+    const migrated = migrate(
+      (save) =>
+        (save.world.currentLocation = { mapName: 'Gone Map', x: 1, y: 1 }),
+    );
+
+    expect(migrated.world.currentLocation).toEqual({
+      mapName: Kingdom.mapName,
+      x: Kingdom.x,
+      y: Kingdom.y,
+    });
+  });
+
+  it('re-keys tradeskills saved under their old names', () => {
+    const blacksmithing = ensureTradeskill({
+      id: 'blacksmithing-id' as TradeskillId,
+      name: 'Blacksmithing',
+    });
+    seedContent([blacksmithing]);
+
+    const migrated = migrate(
+      (save) =>
+        (save.tradeskills = {
+          [blacksmithing.name as TradeskillId]: {
+            ...defaultTradeskillBuilding(),
+            level: 7,
+          },
+        }),
+    );
+
+    expect(Object.keys(migrated.tradeskills)).toEqual([blacksmithing.id]);
+    expect(migrated.tradeskills[blacksmithing.id].level).toBe(7);
+  });
+
+  it('gives heroes from older saves an empty set of combat orders', () => {
+    const migrated = migrate((save) => {
+      const hero: Partial<Character> = buildCharacter();
+      delete hero.combatOrders;
+      save.world.party = [hero as Character];
+    });
+
+    expect(migrated.world.party[0].combatOrders).toEqual({});
+  });
+
+  it('recomputes global effect sums from what the save still owns', () => {
+    const charm = ensureCollectible({
+      id: 'charm' as CollectibleId,
+      name: 'Charm',
+      effects: [{ effectType: 'GlobalCombatItemDropRateBoost', value: 5 }],
+    });
+    seedContent([charm]);
+
+    const migrated = migrate((save) => {
+      save.collectibles = {
+        [charm.id]: { quantity: 1, foundAt: 1 },
+        [gone<CollectibleId>('charm')]: { quantity: 1, foundAt: 1 },
+      };
+      save.globalEffectSums.combatItemDropRateBoost = 50;
+    });
+
+    expect(migrated.globalEffectSums.combatItemDropRateBoost).toBe(5);
+  });
+
+  it('drops world state tied to content that no longer exists', () => {
+    const caravan = ensureCaravan({
+      id: 'caravan' as CaravanId,
+      name: 'Caravan',
+    });
+    const task = ensureTask({ id: 'task' as TaskId, name: 'Task' });
+    const larsia = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
+    seedContent([caravan, task, larsia]);
+    seedWorldNodes([{ name: larsia.name, type: 'NonPlayerKingdom' }]);
+
+    const migrated = migrate((save) => {
+      save.world.commissions = {
+        [caravan.id]: buildCommissionNodeState(),
+        [gone<CaravanId>('caravan')]: buildCommissionNodeState(),
+      };
+      save.tasks = {
+        [task.id]: { progress: 0 },
+        [gone<TaskId>('task')]: { progress: 0 },
+      };
+      save.world.towns = {
+        [larsia.id]: buildTownNodeState(),
+        [gone<TownId>('town')]: buildTownNodeState(),
+      };
+      save.world.homeNodeName = 'Gone Town';
+    });
+
+    expect(Object.keys(migrated.world.commissions)).toEqual([caravan.id]);
+    expect(Object.keys(migrated.tasks)).toEqual([task.id]);
+    expect(Object.keys(migrated.world.towns)).toEqual([larsia.id]);
+    expect(migrated.world.homeNodeName).toBeUndefined();
   });
 });

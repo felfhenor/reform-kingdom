@@ -1,194 +1,219 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from 'vitest';
 
-vi.mock('@helpers/caravan/caravan-tick', () => ({
-  caravanProcessTick: vi.fn(),
-}));
+vi.mock('@helpers/caravan/caravan-tick');
+vi.mock('@helpers/combat/combat');
+vi.mock('@helpers/commission/commission-tick');
+vi.mock('@helpers/crafting/crafting-queue');
+vi.mock('@helpers/decree/auto-mode');
+vi.mock('@helpers/encounter/encounter-random-tick');
+vi.mock('@helpers/engine/discord');
+vi.mock('@helpers/engine/logging');
+vi.mock('@helpers/engine/scheduler');
+vi.mock('@helpers/hero/global-effects');
+vi.mock('@helpers/hero/resting');
+vi.mock('@helpers/hero/travel');
+vi.mock('@helpers/item/gathering');
+vi.mock('@helpers/kingdom/astral-projector');
+vi.mock('@helpers/town/crafting/town-craft-priority-state');
+vi.mock('@helpers/town/crafting/town-craft-queue');
+vi.mock('@helpers/town/raid/town-raid-tick');
+vi.mock('@helpers/town/shop/town-shop-tick');
+vi.mock('@helpers/town/town-commission-generate');
+vi.mock('@helpers/town/worker/town-worker-tick');
+vi.mock('@helpers/worker/worker-tick');
 
-vi.mock('@helpers/combat/combat', () => ({
-  combatDoCombatIteration: vi.fn(),
-}));
-
-vi.mock('@helpers/commission/commission-tick', () => ({
-  commissionProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/crafting/crafting-queue', () => ({
-  craftProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/decree/auto-mode', () => ({
-  autoModeProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/discord', () => ({
-  discordUpdateStatus: vi.fn(),
-}));
-
-vi.mock('@helpers/encounter/encounter-random-tick', () => ({
-  encounterRandomProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/logging', () => ({
-  debug: vi.fn(),
-  error: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/scheduler', () => ({
-  schedulerYield: vi.fn(() => Promise.resolve()),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerLastSaveTick: vi.fn(() => 0),
-  timerTicksElapsed: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/hero/global-effects', () => ({
-  globalEffectsProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/resting', () => ({
-  restingProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/hero/travel', () => ({
-  travelProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/item/gathering', () => ({
-  gatheringProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/kingdom/astral-projector', () => ({
-  astralProjectorProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/setup', () => ({
-  isSetup: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestateTickEnd: vi.fn(),
-  gamestateTickStart: vi.fn(),
-  isGameStateReady: vi.fn(() => true),
-  saveGameState: vi.fn(),
-  updateGamestate: vi.fn(),
-  worldCombatState: vi.fn(() => undefined),
-}));
-
-vi.mock('@helpers/state-options', () => ({
-  getOption: vi.fn(),
-}));
-
-vi.mock('@helpers/worker/worker-tick', () => ({
-  workersProcessTick: vi.fn(),
-}));
-
+import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
+import { combatDoCombatIteration } from '@helpers/combat/combat';
+import { commissionProcessTick } from '@helpers/commission/commission-tick';
+import { TICKS_PER_YIELD } from '@helpers/config';
+import { craftProcessTick } from '@helpers/crafting/crafting-queue';
+import { autoModeProcessTick } from '@helpers/decree/auto-mode';
+import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
 import { error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { gameloop } from '@helpers/gameloop';
+import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
+import { restingProcessTick } from '@helpers/hero/resting';
 import { travelProcessTick } from '@helpers/hero/travel';
-import {
-  gamestateTickEnd,
-  gamestateTickStart,
-  saveGameState,
-  updateGamestate,
-} from '@helpers/state-game';
-import { getOption } from '@helpers/state-options';
-import type { GameState } from '@interfaces';
+import { gatheringProcessTick } from '@helpers/item/gathering';
+import { astralProjectorProcessTick } from '@helpers/kingdom/astral-projector';
+import { gamestate, isGameStateReady } from '@helpers/state-game';
+import { defaultOptions, setOptions } from '@helpers/state-options';
+import { townSpecialtyPriorityProcessTick } from '@helpers/town/crafting/town-craft-priority-state';
+import { townCraftProcessTick } from '@helpers/town/crafting/town-craft-queue';
+import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
+import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
+import { townCommissionProcessTick } from '@helpers/town/town-commission-generate';
+import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
+import { workersProcessTick } from '@helpers/worker/worker-tick';
+import type { GameOptions } from '@interfaces';
+import { buildCombat } from '@/testing/builders';
+import { seedGamestate } from '@/testing/gamestate';
+
+const subsystems: Mock[] = [
+  travelProcessTick,
+  globalEffectsProcessTick,
+  astralProjectorProcessTick,
+  gatheringProcessTick,
+  encounterRandomProcessTick,
+  caravanProcessTick,
+  commissionProcessTick,
+  autoModeProcessTick,
+  craftProcessTick,
+  restingProcessTick,
+  workersProcessTick,
+  townWorkerProcessTick,
+  townSpecialtyPriorityProcessTick,
+  townCraftProcessTick,
+  townShopProcessTick,
+  townRaidProcessTick,
+  townCommissionProcessTick,
+].map((fn) => vi.mocked(fn));
+
+const numTicks = () => gamestate().clock.numTicks;
+const lastSaveTick = () => gamestate().clock.lastSaveTick;
+
+function useOptions(overrides: Partial<GameOptions> = {}): void {
+  setOptions({
+    ...defaultOptions(),
+    gameloopPaused: false,
+    debugTickMultiplier: 1,
+    debugSaveInterval: 999_999,
+    ...overrides,
+  });
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  window.history.pushState({}, '', '/game');
+  isGameStateReady.set(true);
+  useOptions();
+  seedGamestate((state) => (state.meta.isSetup = true));
+});
+
+afterEach(() => {
+  window.history.pushState({}, '', '/');
+  isGameStateReady.set(false);
+  setOptions(defaultOptions());
+});
 
 describe('gameloop', () => {
-  let mockClockState: { clock: { numTicks: number; lastSaveTick: number } };
+  it('advances the clock once per tick, running every subsystem each tick', async () => {
+    await gameloop(3);
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    window.history.pushState({}, '', '/game');
+    expect(numTicks()).toBe(3);
+    subsystems.forEach((fn) => expect(fn).toHaveBeenCalledTimes(3));
+  });
 
-    mockClockState = { clock: { numTicks: 0, lastSaveTick: 0 } };
-    vi.mocked(updateGamestate).mockImplementation(async (func) => {
-      func(mockClockState as unknown as GameState);
+  it('runs a combat iteration only on ticks spent in combat', async () => {
+    await gameloop(2);
+    expect(combatDoCombatIteration).not.toHaveBeenCalled();
+
+    seedGamestate((state) => {
+      state.meta.isSetup = true;
+      state.world.combat = buildCombat();
     });
-
-    vi.mocked(getOption).mockImplementation(((key: string) => {
-      const options: Record<string, unknown> = {
-        gameloopPaused: false,
-        debugTickMultiplier: 1,
-        debugGameloopTimerUpdates: false,
-        debugSaveInterval: 999999,
-      };
-      return options[key];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any);
+    await gameloop(2);
+    expect(combatDoCombatIteration).toHaveBeenCalledTimes(2);
   });
 
-  afterEach(() => {
-    window.history.pushState({}, '', '/');
+  it('scales the batch by the tick multiplier, between 1 and 3600 ticks', async () => {
+    useOptions({ debugTickMultiplier: 3 });
+    await gameloop(2);
+    expect(numTicks()).toBe(6);
+
+    useOptions();
+    await gameloop(0);
+    expect(numTicks()).toBe(7);
+
+    useOptions({ debugTickMultiplier: 1000 });
+    await gameloop(10);
+    expect(numTicks()).toBe(7 + 3600);
   });
 
-  it('does not yield for a batch below the yield threshold', async () => {
-    await gameloop(99);
-    expect(mockClockState.clock.numTicks).toBe(99);
-    expect(schedulerYield).not.toHaveBeenCalled();
-  });
-
-  it('yields exactly once right at the yield threshold', async () => {
-    await gameloop(100);
-    expect(mockClockState.clock.numTicks).toBe(100);
-    expect(schedulerYield).toHaveBeenCalledTimes(1);
-  });
-
-  it('yields once just past the threshold, not twice', async () => {
-    await gameloop(101);
-    expect(mockClockState.clock.numTicks).toBe(101);
-    expect(schedulerYield).toHaveBeenCalledTimes(1);
-  });
-
-  it('processes a full 3600-tick catch-up batch without losing or duplicating ticks', async () => {
-    await gameloop(3600);
-    expect(mockClockState.clock.numTicks).toBe(3600);
-    expect(schedulerYield).toHaveBeenCalledTimes(36);
-  });
-
-  it('ignores a reentrant call while a batch is already suspended at a yield point', async () => {
-    // Only the first schedulerYield call pauses (tick 100); later calls, including gameloop(200)'s own second yield at tick 200, resolve immediately.
-    let releaseFirstYield: () => void = () => {};
-    let yieldCalls = 0;
-    vi.mocked(schedulerYield).mockImplementation(() => {
-      yieldCalls += 1;
-      if (yieldCalls > 1) return Promise.resolve();
-      return new Promise<void>((resolve) => (releaseFirstYield = resolve));
-    });
-
-    const firstRun = gameloop(200);
-    await Promise.resolve();
-    expect(mockClockState.clock.numTicks).toBe(100);
-
-    // A second call while the first is suspended mid-batch must no-op, not clobber the in-flight tick draft.
+  it('does nothing before setup, before the save is ready, off the game page, or while paused', async () => {
+    seedGamestate();
     await gameloop(1);
-    expect(mockClockState.clock.numTicks).toBe(100);
+
+    seedGamestate((state) => (state.meta.isSetup = true));
+    isGameStateReady.set(false);
+    await gameloop(1);
+
+    isGameStateReady.set(true);
+    window.history.pushState({}, '', '/');
+    await gameloop(1);
+
+    window.history.pushState({}, '', '/game');
+    useOptions({ gameloopPaused: true });
+    await gameloop(1);
+
+    expect(numTicks()).toBe(0);
+    expect(travelProcessTick).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [TICKS_PER_YIELD - 1, 0],
+    [TICKS_PER_YIELD, 1],
+    [TICKS_PER_YIELD + 1, 1],
+    [3600, 3600 / TICKS_PER_YIELD],
+  ])('over %i ticks, yields to the browser %i times', async (ticks, yields) => {
+    await gameloop(ticks);
+
+    expect(numTicks()).toBe(ticks);
+    expect(schedulerYield).toHaveBeenCalledTimes(yields);
+  });
+
+  it('saves once the save interval has passed, and not before', async () => {
+    useOptions({ debugSaveInterval: 5 });
+
+    await gameloop(4);
+    expect(lastSaveTick()).toBe(0);
+
+    await gameloop(1);
+    expect(lastSaveTick()).toBe(5);
+  });
+
+  it('ignores a call landing while a batch is suspended at a yield', async () => {
+    let releaseFirstYield = () => {};
+    vi.mocked(schedulerYield).mockImplementationOnce(
+      () => new Promise<void>((resolve) => (releaseFirstYield = resolve)),
+    );
+    // A failed assertion mid-batch would otherwise leave the loop stuck for every later test.
+    onTestFinished(() => releaseFirstYield());
+
+    const firstRun = gameloop(TICKS_PER_YIELD * 2);
+    await Promise.resolve();
+    expect(numTicks()).toBe(TICKS_PER_YIELD);
+
+    await gameloop(1);
+    expect(numTicks()).toBe(TICKS_PER_YIELD);
 
     releaseFirstYield();
     await firstRun;
-    expect(mockClockState.clock.numTicks).toBe(200);
+    expect(numTicks()).toBe(TICKS_PER_YIELD * 2);
   });
 
   describe('when a tick subsystem throws', () => {
     const failure = new Error('boom');
 
     beforeEach(() => {
-      vi.mocked(travelProcessTick).mockImplementation(() => {
+      vi.mocked(travelProcessTick).mockImplementationOnce(() => {
         throw failure;
       });
     });
 
-    afterEach(() => {
-      vi.mocked(travelProcessTick).mockReset();
-    });
+    it('resolves, logging the error', async () => {
+      await expect(gameloop(1)).resolves.toBeUndefined();
 
-    it('closes the tick draft so gamestate() is not left stuck, and logs the error', async () => {
-      await gameloop(1);
-
-      expect(gamestateTickStart).toHaveBeenCalledTimes(1);
-      expect(gamestateTickEnd).toHaveBeenCalledTimes(1);
       expect(error).toHaveBeenCalledWith(
         'Gameloop:Tick',
         expect.any(String),
@@ -196,35 +221,22 @@ describe('gameloop', () => {
       );
     });
 
-    it('resolves rather than rejecting so the caller still repaints', async () => {
-      await expect(gameloop(1)).resolves.toBeUndefined();
+    it('commits progress up to the failure and lets the next batch run on from it', async () => {
+      await gameloop(1);
+      expect(numTicks()).toBe(1);
+
+      await gameloop(1);
+      expect(numTicks()).toBe(2);
     });
 
-    it('skips the save for the failed tick', async () => {
-      vi.mocked(getOption).mockImplementation(((key: string) =>
-        key === 'debugSaveInterval'
-          ? 0
-          : key === 'debugTickMultiplier'
-            ? 1
-            : false) as never);
+    it('skips the save for the failed batch', async () => {
+      useOptions({ debugSaveInterval: 0 });
 
       await gameloop(1);
-      expect(saveGameState).not.toHaveBeenCalled();
-
-      // Control: with the interval at 0, a healthy tick does save.
-      vi.mocked(travelProcessTick).mockReset();
-      await gameloop(1);
-      expect(saveGameState).toHaveBeenCalledTimes(1);
-    });
-
-    it('releases the reentrancy guard so the next call runs', async () => {
-      await gameloop(1);
-      vi.mocked(travelProcessTick).mockReset();
+      expect(lastSaveTick()).toBe(0);
 
       await gameloop(1);
-
-      expect(gamestateTickStart).toHaveBeenCalledTimes(2);
-      expect(gamestateTickEnd).toHaveBeenCalledTimes(2);
+      expect(lastSaveTick()).toBe(2);
     });
   });
 });

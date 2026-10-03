@@ -1,38 +1,5 @@
 import type * as RngHelper from '@helpers/rng';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
-
-vi.mock('@helpers/item/equipment', () => ({
-  newEquipmentItem: vi.fn((equipmentId: string) => ({
-    id: 'rolled-equipment-item',
-    equipmentId,
-    infusedItemIds: [],
-    affixIds: [],
-  })),
-}));
-
-vi.mock('@helpers/worker/worker-progression', () => ({
-  defaultWorkerState: vi.fn(() => ({
-    level: 1,
-    xp: { current: 0, maximum: 10 },
-    location: { mapName: '', x: 0, y: 0 },
-    status: { kind: 'AtDuchy' },
-    assignment: null,
-  })),
-}));
-
-vi.mock('@helpers/state-game', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  globalEffectSumsState: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/hero/global-effect-state', () => ({
-  recomputeGlobalEffectSums: vi.fn(),
-}));
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/rng', async (importOriginal) => {
   const actual = await importOriginal<typeof RngHelper>();
@@ -40,9 +7,9 @@ vi.mock('@helpers/rng', async (importOriginal) => {
 });
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { rngNumberRange } from '@helpers/rng';
-import { globalEffectSumsState } from '@helpers/state-game';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { defaultGameState, defaultTradeskillBuilding } from '@helpers/defaults';
 import {
   applyResolvedDropToState,
   combatItemDropRateBoost,
@@ -50,487 +17,313 @@ import {
   rewardDisplayOrder,
   rollDroppedRewards,
 } from '@helpers/item/loot';
+import { armoryOverflowCap } from '@helpers/kingdom/armory';
+import { rngNumberRange } from '@helpers/rng';
+import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   CollectibleId,
-  DroppedReward,
+  DroppedItemReward,
   EquipmentId,
-  EquipmentItemId,
   GameState,
-  GlobalEffectSums,
   ItemId,
-  RecipeContent,
   RecipeId,
-  ResolvedDrop,
+  TownId,
   TradeskillId,
   WorkerId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-describe('Loot Helper Functions', () => {
-  const goldCoinId = 'gold-coin' as ItemId;
-  const cloakId = 'cloak' as EquipmentId;
-  const swampClamId = 'swamp-clam' as CollectibleId;
-  const boneHewnCloakRecipeId = 'bone-hewn-cloak-recipe' as RecipeId;
-  const weaverNellId = 'weaver-nell' as WorkerId;
+const goldCoinId = 'gold-coin' as ItemId;
+const cloakId = 'cloak' as EquipmentId;
+const swampClamId = 'swamp-clam' as CollectibleId;
+const cloakRecipeId = 'cloak-recipe' as RecipeId;
+const weaverNellId = 'weaver-nell' as WorkerId;
+const artificing = 'artificing' as TradeskillId;
 
-  describe('rollDroppedRewards', () => {
-    it('always drops a 100% reward and rolls the full quantity range, even on the top roll', () => {
-      vi.mocked(rngNumberRange).mockImplementation((_min, max) => max);
-      onTestFinished(() => vi.mocked(rngNumberRange).mockRestore());
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          itemId: goldCoinId,
-          min: 3,
-          max: 10,
-          chance: 100,
-        }),
-        ensureDroppedReward({ itemId: goldCoinId, min: 3, max: 10, chance: 0 }),
-      ];
+const gold = (overrides: Omit<Partial<DroppedItemReward>, 'kind'> = {}) =>
+  ensureDroppedReward({
+    itemId: goldCoinId,
+    min: 3,
+    max: 10,
+    chance: 100,
+    ...overrides,
+  });
+const guaranteed = {
+  equipment: ensureDroppedReward({ equipmentId: cloakId, chance: 100 }),
+  collectible: ensureDroppedReward({ collectibleId: swampClamId, chance: 100 }),
+  recipe: ensureDroppedReward({ recipeId: cloakRecipeId, chance: 100 }),
+  worker: ensureDroppedReward({ workerId: weaverNellId, chance: 100 }),
+};
 
-      expect(rollDroppedRewards(rewards, 1)).toEqual([
-        { itemId: goldCoinId, quantity: 10, kind: 'Item' },
+// Every roll lands on the bottom or top of its range.
+function forceRolls(edge: 'lowest' | 'highest'): void {
+  vi.mocked(rngNumberRange).mockImplementation((min, max) =>
+    edge === 'lowest' ? min : max,
+  );
+}
+
+beforeEach(() => {
+  vi.mocked(rngNumberRange).mockRestore();
+});
+
+describe('rollDroppedRewards', () => {
+  it('drops a guaranteed reward even on the highest roll, and a 0% one never', () => {
+    for (const edge of ['lowest', 'highest'] as const) {
+      forceRolls(edge);
+
+      expect(
+        rollDroppedRewards(
+          [
+            ...Object.values(guaranteed),
+            gold({ chance: 0 }),
+            ensureDroppedReward({ equipmentId: cloakId, chance: 0 }),
+          ],
+          1,
+        ),
+      ).toEqual([
+        { equipmentId: cloakId, kind: 'Equipment' },
+        { collectibleId: swampClamId, kind: 'Collectible' },
+        { recipeId: cloakRecipeId, kind: 'Recipe' },
+        { workerId: weaverNellId, kind: 'Worker' },
       ]);
-    });
-
-    it('should roll a quantity within range for an item drop', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          itemId: goldCoinId,
-          min: 3,
-          max: 10,
-          chance: 100,
-        }),
-      ];
-
-      for (let i = 0; i < 50; i++) {
-        const drops = rollDroppedRewards(rewards, 1);
-        expect(drops).toHaveLength(1);
-        expect(drops[0]).toMatchObject({ itemId: goldCoinId, kind: 'Item' });
-        const quantity = (drops[0] as { quantity: number }).quantity;
-        expect(quantity).toBeGreaterThanOrEqual(3);
-        expect(quantity).toBeLessThanOrEqual(10);
-      }
-    });
-
-    it('should scale the item drop range by level * bonusPerLevel', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          itemId: goldCoinId,
-          min: 3,
-          max: 10,
-          bonusPerLevel: 1,
-          chance: 100,
-        }),
-      ];
-
-      for (let i = 0; i < 50; i++) {
-        const drops = rollDroppedRewards(rewards, 3);
-        const quantity = (drops[0] as { quantity: number }).quantity;
-        expect(quantity).toBeGreaterThanOrEqual(6);
-        expect(quantity).toBeLessThanOrEqual(13);
-      }
-    });
-
-    it('should always return an equipment drop with no quantity when chance hits', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          equipmentId: cloakId,
-          chance: 100,
-        }),
-      ];
-
-      for (let i = 0; i < 50; i++) {
-        const drops = rollDroppedRewards(rewards, 5);
-        expect(drops).toEqual([{ equipmentId: cloakId, kind: 'Equipment' }]);
-      }
-    });
-
-    it('should always return a collectible drop with no quantity when chance hits', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          collectibleId: swampClamId,
-          chance: 100,
-        }),
-      ];
-
-      for (let i = 0; i < 50; i++) {
-        const drops = rollDroppedRewards(rewards, 5);
-        expect(drops).toEqual([
-          { collectibleId: swampClamId, kind: 'Collectible' },
-        ]);
-      }
-    });
-
-    it('should always return a recipe drop with no quantity when chance hits', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          recipeId: boneHewnCloakRecipeId,
-          chance: 100,
-        }),
-      ];
-
-      for (let i = 0; i < 50; i++) {
-        const drops = rollDroppedRewards(rewards, 5);
-        expect(drops).toEqual([
-          { recipeId: boneHewnCloakRecipeId, kind: 'Recipe' },
-        ]);
-      }
-    });
-
-    it('should still allow a recipe drop when its content cannot be resolved', () => {
-      vi.mocked(getEntry).mockReturnValueOnce(undefined);
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
-      ];
-
-      const drops = rollDroppedRewards(rewards, 5, 0, {} as GameState);
-
-      expect(drops).toEqual([
-        { recipeId: boneHewnCloakRecipeId, kind: 'Recipe' },
-      ]);
-    });
-
-    it('should filter out a recipe drop that is exclusively sold by a town', () => {
-      vi.mocked(getEntriesByType).mockReturnValueOnce([
-        { crafting: { uniqueRecipeIds: [boneHewnCloakRecipeId] } },
-      ] as never);
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
-      ];
-
-      const drops = rollDroppedRewards(rewards, 5, 0, {} as GameState);
-
-      expect(drops).toEqual([]);
-    });
-
-    it('should filter out a recipe drop when the tradeskill level requirement is not met', () => {
-      const tradeskillId = 'artificing' as TradeskillId;
-      vi.mocked(getEntry).mockReturnValueOnce({
-        tradeskillId,
-        minTradeskillLevel: 5,
-      } as RecipeContent);
-      const state = {
-        tradeskills: { [tradeskillId]: { level: 4 } },
-      } as unknown as GameState;
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
-      ];
-
-      const drops = rollDroppedRewards(rewards, 5, 0, state);
-
-      expect(drops).toEqual([]);
-    });
-
-    it('should allow a recipe drop once the tradeskill level requirement is met', () => {
-      const tradeskillId = 'artificing' as TradeskillId;
-      vi.mocked(getEntry).mockReturnValueOnce({
-        tradeskillId,
-        minTradeskillLevel: 5,
-      } as RecipeContent);
-      const state = {
-        tradeskills: { [tradeskillId]: { level: 5 } },
-      } as unknown as GameState;
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({ recipeId: boneHewnCloakRecipeId, chance: 100 }),
-      ];
-
-      const drops = rollDroppedRewards(rewards, 5, 0, state);
-
-      expect(drops).toEqual([
-        { recipeId: boneHewnCloakRecipeId, kind: 'Recipe' },
-      ]);
-    });
-
-    it('should always return a worker drop with no quantity when chance hits', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          workerId: weaverNellId,
-          chance: 100,
-        }),
-      ];
-
-      for (let i = 0; i < 50; i++) {
-        const drops = rollDroppedRewards(rewards, 5);
-        expect(drops).toEqual([{ workerId: weaverNellId, kind: 'Worker' }]);
-      }
-    });
-
-    it('should never drop when chance is 0', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          itemId: goldCoinId,
-          min: 3,
-          max: 10,
-          chance: 0,
-        }),
-        ensureDroppedReward({
-          equipmentId: cloakId,
-          chance: 0,
-        }),
-        ensureDroppedReward({
-          collectibleId: swampClamId,
-          chance: 0,
-        }),
-        ensureDroppedReward({
-          recipeId: boneHewnCloakRecipeId,
-          chance: 0,
-        }),
-        ensureDroppedReward({
-          workerId: weaverNellId,
-          chance: 0,
-        }),
-      ];
-
-      const drops = rollDroppedRewards(rewards, 1);
-      expect(drops).toEqual([]);
-    });
-
-    it('should return an empty array for an empty reward list', () => {
-      expect(rollDroppedRewards([], 1)).toEqual([]);
-    });
-
-    it('should add bonusChancePercent to the drop chance before rolling', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          equipmentId: cloakId,
-          chance: 0,
-        }),
-      ];
-
-      const drops = rollDroppedRewards(rewards, 5, 100);
-      expect(drops).toEqual([{ equipmentId: cloakId, kind: 'Equipment' }]);
-    });
-
-    it('should clamp a boosted chance at 100', () => {
-      const rewards: DroppedReward[] = [
-        ensureDroppedReward({
-          equipmentId: cloakId,
-          chance: 50,
-        }),
-      ];
-
-      for (let i = 0; i < 50; i++) {
-        const drops = rollDroppedRewards(rewards, 5, 500);
-        expect(drops).toEqual([{ equipmentId: cloakId, kind: 'Equipment' }]);
-      }
-    });
+    }
   });
 
-  describe('combatItemDropRateBoost', () => {
-    it('reads the flat percent from the global effect sums cache', () => {
-      vi.mocked(globalEffectSumsState).mockReturnValue({
-        combatItemDropRateBoost: 9,
-      } as GlobalEffectSums);
+  it('rolls an item quantity across its whole range, both ends included', () => {
+    forceRolls('lowest');
+    expect(rollDroppedRewards([gold()], 1)).toEqual([
+      { itemId: goldCoinId, quantity: 3, kind: 'Item' },
+    ]);
 
-      expect(combatItemDropRateBoost()).toBe(9);
-    });
-
-    it('returns 0 when nothing is active/owned', () => {
-      vi.mocked(globalEffectSumsState).mockReturnValue({
-        combatItemDropRateBoost: 0,
-      } as GlobalEffectSums);
-
-      expect(combatItemDropRateBoost()).toBe(0);
-    });
+    forceRolls('highest');
+    expect(rollDroppedRewards([gold()], 1)).toEqual([
+      { itemId: goldCoinId, quantity: 10, kind: 'Item' },
+    ]);
   });
 
-  describe('rewardDisplayOrder', () => {
-    it('should order workers before collectibles, equipment, recipes, then items', () => {
-      const item: DroppedReward = ensureDroppedReward({
-        itemId: goldCoinId,
-        min: 1,
-        max: 1,
-        chance: 100,
-      });
-      const equipment: DroppedReward = ensureDroppedReward({
-        equipmentId: cloakId,
-        chance: 100,
-      });
-      const collectible: DroppedReward = ensureDroppedReward({
-        collectibleId: swampClamId,
-        chance: 100,
-      });
-      const recipe: DroppedReward = ensureDroppedReward({
-        recipeId: boneHewnCloakRecipeId,
-        chance: 100,
-      });
-      const worker: DroppedReward = ensureDroppedReward({
-        workerId: weaverNellId,
-        chance: 100,
-      });
+  it('shifts the item range up by bonusPerLevel per level', () => {
+    forceRolls('lowest');
 
-      const sorted = sortBy(
-        [item, equipment, collectible, recipe, worker],
-        [rewardDisplayOrder],
+    expect(rollDroppedRewards([gold({ bonusPerLevel: 1 })], 3)).toEqual([
+      { itemId: goldCoinId, quantity: 6, kind: 'Item' },
+    ]);
+  });
+
+  it('drops nothing for an item that rolls a quantity of 0', () => {
+    forceRolls('highest');
+
+    expect(rollDroppedRewards([gold({ min: 0, max: 0 })], 1)).toEqual([]);
+  });
+
+  it('only rolls rewards within their level bounds', () => {
+    forceRolls('highest');
+    const bounded = gold({ minLevel: 5, maxLevel: 10 });
+
+    expect(rollDroppedRewards([bounded], 4)).toEqual([]);
+    expect(rollDroppedRewards([bounded], 5)).toHaveLength(1);
+    expect(rollDroppedRewards([bounded], 10)).toHaveLength(1);
+    expect(rollDroppedRewards([bounded], 11)).toEqual([]);
+  });
+
+  it('adds the bonus chance before rolling', () => {
+    forceRolls('highest');
+    const unlikely = ensureDroppedReward({ equipmentId: cloakId, chance: 0 });
+
+    expect(rollDroppedRewards([unlikely], 5, 99)).toEqual([]);
+    expect(rollDroppedRewards([unlikely], 5, 100)).toEqual([
+      { equipmentId: cloakId, kind: 'Equipment' },
+    ]);
+  });
+
+  it('returns nothing for no rewards', () => {
+    expect(rollDroppedRewards([], 1)).toEqual([]);
+  });
+
+  describe('recipe drops', () => {
+    function seedRecipe(townUnique: boolean, tradeskillLevel = 1): GameState {
+      seedContent([
+        ensureRecipe({
+          id: cloakRecipeId,
+          tradeskillId: artificing,
+          minTradeskillLevel: 5,
+        }),
+        ensureTown({
+          id: 'larsia' as TownId,
+          crafting: { uniqueRecipeIds: townUnique ? [cloakRecipeId] : [] },
+        }),
+      ]);
+      return seedGamestate(
+        (state) =>
+          (state.tradeskills[artificing] = {
+            ...defaultTradeskillBuilding(),
+            level: tradeskillLevel,
+          }),
       );
-
-      expect(sorted).toEqual([worker, collectible, equipment, recipe, item]);
-    });
-  });
-
-  describe('applyResolvedDropToState', () => {
-    function fakeState(): GameState {
-      return {
-        materials: {},
-        discoveredMaterials: {},
-        armory: [],
-        discoveredEquipment: {},
-        collectibles: {},
-        globalEffects: [],
-        globalEffectSums: { armorySizeBoost: 0 },
-        discoveredRecipes: {},
-        discoveredWorkers: {},
-        workers: {},
-      } as unknown as GameState;
     }
 
-    it('adds an item drop as a material delta', () => {
-      const state = fakeState();
-      const drop: ResolvedDrop = {
-        kind: 'Item',
-        itemId: goldCoinId,
-        quantity: 5,
-      };
-
-      applyResolvedDropToState(state, drop);
-
-      expect(state.materials[goldCoinId]?.quantity).toBe(5);
-    });
-
-    it('adds an equipment drop to the armory and marks it discovered', () => {
-      const state = fakeState();
-      const drop: ResolvedDrop = { kind: 'Equipment', equipmentId: cloakId };
-
-      applyResolvedDropToState(state, drop);
-
-      expect(state.armory).toEqual([
-        {
-          id: 'rolled-equipment-item',
-          equipmentId: cloakId,
-          infusedItemIds: [],
-          affixIds: [],
-        },
-      ]);
-      expect(state.discoveredEquipment[cloakId]?.foundAt).toBeDefined();
-    });
-
-    it("preserves an equipment drop's original discovery date on a repeat find", () => {
-      const state = fakeState();
-      state.discoveredEquipment[cloakId] = { foundAt: 1000 };
-      const drop: ResolvedDrop = { kind: 'Equipment', equipmentId: cloakId };
-
-      applyResolvedDropToState(state, drop);
-
-      expect(state.discoveredEquipment[cloakId]?.foundAt).toBe(1000);
-    });
-
-    it('still admits an equipment drop past the strict 50-item cap, up to the 125% overflow allowance', () => {
-      const state = fakeState();
-      state.armory = Array.from({ length: 55 }, () => ({
-        id: 'existing-item' as EquipmentItemId,
-        equipmentId: 'shield' as EquipmentId,
-        infusedItemIds: [],
-        affixIds: [],
-      }));
-      const drop: ResolvedDrop = { kind: 'Equipment', equipmentId: cloakId };
-
-      applyResolvedDropToState(state, drop);
-
-      expect(state.armory).toHaveLength(56);
-    });
-
-    it('rejects an equipment drop once the 125% overflow allowance is exhausted', () => {
-      const state = fakeState();
-      state.armory = Array.from({ length: 62 }, () => ({
-        id: 'existing-item' as EquipmentItemId,
-        equipmentId: 'shield' as EquipmentId,
-        infusedItemIds: [],
-        affixIds: [],
-      }));
-      const drop: ResolvedDrop = { kind: 'Equipment', equipmentId: cloakId };
-
-      applyResolvedDropToState(state, drop);
-
-      expect(state.armory).toHaveLength(62);
-    });
-
-    it('increments an existing collectible quantity and keeps its discovery date', () => {
-      const state = fakeState();
-      state.collectibles[swampClamId] = { quantity: 2, foundAt: 1000 };
-      const drop: ResolvedDrop = {
-        kind: 'Collectible',
-        collectibleId: swampClamId,
-      };
-
-      applyResolvedDropToState(state, drop);
-
-      expect(state.collectibles[swampClamId]).toEqual({
-        quantity: 3,
-        foundAt: 1000,
-      });
-    });
-
-    it('discovers a recipe', () => {
-      const state = fakeState();
-      const drop: ResolvedDrop = {
-        kind: 'Recipe',
-        recipeId: boneHewnCloakRecipeId,
-      };
-
-      applyResolvedDropToState(state, drop);
-
+    it('drop once the player can craft them', () => {
       expect(
-        state.discoveredRecipes[boneHewnCloakRecipeId]?.foundAt,
-      ).toBeDefined();
+        rollDroppedRewards([guaranteed.recipe], 5, 0, seedRecipe(false, 5)),
+      ).toHaveLength(1);
+      expect(rollDroppedRewards([guaranteed.recipe], 5)).toHaveLength(1);
     });
 
-    it('rescues a worker and seeds its default state', () => {
-      const state = fakeState();
-      const drop: ResolvedDrop = { kind: 'Worker', workerId: weaverNellId };
+    it('don’t drop below their tradeskill level, or when only a town crafts them', () => {
+      expect(
+        rollDroppedRewards([guaranteed.recipe], 5, 0, seedRecipe(false, 4)),
+      ).toEqual([]);
+      expect(
+        rollDroppedRewards([guaranteed.recipe], 5, 0, seedRecipe(true, 5)),
+      ).toEqual([]);
+    });
 
-      applyResolvedDropToState(state, drop);
+    it('still drop when the recipe content is missing', () => {
+      seedContent([]);
 
-      expect(state.discoveredWorkers[weaverNellId]?.foundAt).toBeDefined();
-      expect(state.workers[weaverNellId]).toEqual({
-        level: 1,
-        xp: { current: 0, maximum: 10 },
-        location: { mapName: '', x: 0, y: 0 },
-        status: { kind: 'AtDuchy' },
-        assignment: null,
+      expect(rollDroppedRewards([guaranteed.recipe], 5)).toHaveLength(1);
+    });
+  });
+});
+
+describe('combatItemDropRateBoost', () => {
+  it('reads the cached global effect sum', () => {
+    seedGamestate(
+      (state) => (state.globalEffectSums.combatItemDropRateBoost = 9),
+    );
+
+    expect(combatItemDropRateBoost()).toBe(9);
+  });
+});
+
+describe('rewardDisplayOrder', () => {
+  it('orders workers, collectibles, equipment, recipes, then items', () => {
+    const { worker, collectible, equipment, recipe } = guaranteed;
+
+    expect(
+      sortBy(
+        [gold(), equipment, collectible, recipe, worker],
+        [rewardDisplayOrder],
+      ),
+    ).toEqual([worker, collectible, equipment, recipe, gold()]);
+  });
+});
+
+describe('applyResolvedDropToState', () => {
+  it('adds an item drop to stock', () => {
+    const state = defaultGameState();
+
+    applyResolvedDropToState(state, {
+      kind: 'Item',
+      itemId: goldCoinId,
+      quantity: 5,
+    });
+
+    expect(state.materials[goldCoinId]?.quantity).toBe(5);
+  });
+
+  it('adds an equipment drop to the armory, keeping its first discovery date', () => {
+    const state = defaultGameState();
+    state.discoveredEquipment[cloakId] = { foundAt: 1000 };
+
+    applyResolvedDropToState(state, {
+      kind: 'Equipment',
+      equipmentId: cloakId,
+    });
+
+    expect(state.armory).toEqual([
+      expect.objectContaining({ equipmentId: cloakId }),
+    ]);
+    expect(state.discoveredEquipment[cloakId]).toEqual({ foundAt: 1000 });
+  });
+
+  it('marks first-found equipment discovered', () => {
+    const state = defaultGameState();
+
+    applyResolvedDropToState(state, {
+      kind: 'Equipment',
+      equipmentId: cloakId,
+    });
+
+    expect(state.discoveredEquipment[cloakId]?.foundAt).toEqual(
+      expect.any(Number),
+    );
+  });
+
+  it('lets equipment drops overflow the armory cap up to the overflow allowance', () => {
+    const cap = armoryOverflowCap();
+    const withArmory = (count: number) => {
+      const state = defaultGameState();
+      state.armory = Array.from({ length: count }, () =>
+        buildEquipmentItem('shield' as EquipmentId),
+      );
+      applyResolvedDropToState(state, {
+        kind: 'Equipment',
+        equipmentId: cloakId,
       });
+      return state.armory.length;
+    };
+
+    expect(withArmory(cap - 1)).toBe(cap);
+    expect(withArmory(cap)).toBe(cap);
+  });
+
+  it('adds a collectible drop to an existing stack, keeping its discovery date', () => {
+    const state = defaultGameState();
+    state.collectibles[swampClamId] = { quantity: 2, foundAt: 1000 };
+
+    applyResolvedDropToState(state, {
+      kind: 'Collectible',
+      collectibleId: swampClamId,
     });
 
-    it('does not re-rescue an already-discovered worker', () => {
-      const state = fakeState();
-      state.discoveredWorkers[weaverNellId] = { foundAt: 1000 };
-      state.workers[weaverNellId] = 'already-progressed' as never;
-      const drop: ResolvedDrop = { kind: 'Worker', workerId: weaverNellId };
-
-      applyResolvedDropToState(state, drop);
-
-      expect(state.workers[weaverNellId]).toBe('already-progressed');
+    expect(state.collectibles[swampClamId]).toEqual({
+      quantity: 3,
+      foundAt: 1000,
     });
   });
 
-  describe('isClearProofReward', () => {
-    it('accepts guaranteed collectibles and workers only', () => {
-      const collectibleId = 'relic' as CollectibleId;
-      const workerId = 'nell' as WorkerId;
+  it('discovers a recipe drop', () => {
+    const state = defaultGameState();
 
-      expect(
-        isClearProofReward(ensureDroppedReward({ collectibleId, chance: 100 })),
-      ).toBe(true);
-      expect(
-        isClearProofReward(ensureDroppedReward({ workerId, chance: 100 })),
-      ).toBe(true);
-      expect(
-        isClearProofReward(ensureDroppedReward({ collectibleId, chance: 50 })),
-      ).toBe(false);
-      expect(
-        isClearProofReward(
-          ensureDroppedReward({ itemId: 'flux' as ItemId, chance: 100 }),
-        ),
-      ).toBe(false);
+    applyResolvedDropToState(state, {
+      kind: 'Recipe',
+      recipeId: cloakRecipeId,
     });
+
+    expect(state.discoveredRecipes[cloakRecipeId]?.foundAt).toEqual(
+      expect.any(Number),
+    );
+  });
+
+  it('rescues a worker drop once, leaving an already-rescued worker’s progress alone', () => {
+    const state = defaultGameState();
+
+    applyResolvedDropToState(state, { kind: 'Worker', workerId: weaverNellId });
+    expect(state.discoveredWorkers[weaverNellId]?.foundAt).toEqual(
+      expect.any(Number),
+    );
+    expect(state.workers[weaverNellId]).toEqual(defaultWorkerState());
+
+    const progressed = { ...defaultWorkerState(), level: 7 };
+    state.workers[weaverNellId] = progressed;
+    applyResolvedDropToState(state, { kind: 'Worker', workerId: weaverNellId });
+    expect(state.workers[weaverNellId]).toBe(progressed);
+  });
+});
+
+describe('isClearProofReward', () => {
+  it('accepts guaranteed collectibles and workers only', () => {
+    expect(isClearProofReward(guaranteed.collectible)).toBe(true);
+    expect(isClearProofReward(guaranteed.worker)).toBe(true);
+    expect(
+      isClearProofReward(
+        ensureDroppedReward({ collectibleId: swampClamId, chance: 50 }),
+      ),
+    ).toBe(false);
+    expect(isClearProofReward(guaranteed.equipment)).toBe(false);
+    expect(isClearProofReward(gold())).toBe(false);
   });
 });
