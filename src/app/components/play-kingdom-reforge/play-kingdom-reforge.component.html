@@ -10,6 +10,27 @@
 
   <app-button-kingdom-back pageactions />
 
+  <div pageactionssecondary>
+    <app-slot-button-container
+      [disabled]="!canModify"
+      [helpText]="'Equipped gear cannot be reforged in combat.'"
+    >
+      <button
+        class="btn btn-primary btn-sm"
+        [disabled]="!canReforge()"
+        (click)="$event.shiftKey || requestReforge()"
+        (click.shift)="requestReforge(true)"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Reforge
+        @if (reforgeCost.length > 0) {
+          <app-row-currency-cost [costs]="reforgeCost" />
+        }
+      </button>
+    </app-slot-button-container>
+  </div>
+
   <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0">
     <app-panel-equipment-picker
       [(source)]="selectedSource"
@@ -74,25 +95,6 @@
         @if (item && !affordable) {
           <span class="type-hint">You cannot afford this reforge.</span>
         }
-
-        <app-slot-button-container
-          [disabled]="!canModify"
-          [helpText]="'Equipped gear cannot be reforged in combat.'"
-        >
-          <button
-            class="btn btn-primary btn-sm"
-            [disabled]="!canReforge()"
-            (click)="$event.shiftKey || requestReforge()"
-            (click.shift)="requestReforge(true)"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
-          >
-            Reforge
-            @if (reforgeCost.length > 0) {
-              <app-row-currency-cost [costs]="reforgeCost" />
-            }
-          </button>
-        </app-slot-button-container>
       </div>
     </div>
   </div>
