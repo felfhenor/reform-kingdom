@@ -5,20 +5,24 @@
 
   <app-button-kingdom-back pageactions />
 
+  @if (showToolbar()) {
+    <div pageactionssecondary>
+      <input
+        type="text"
+        [placeholder]="searchPlaceholder()"
+        class="input input-sm input-bordered search-bar"
+        [value]="searchText()"
+        (input)="onSearchInput($event)"
+      />
+    </div>
+  }
+
   <div class="paged-grid-page">
     <ng-content select="[before-toolbar]" />
 
     @if (showToolbar()) {
       <div class="paged-grid-toolbar">
         <div class="paged-grid-toolbar-search">
-          <input
-            type="text"
-            [placeholder]="searchPlaceholder()"
-            class="input input-sm input-bordered w-full max-w-xs"
-            [value]="searchText()"
-            (input)="onSearchInput($event)"
-          />
-
           <ng-content select="[toolbar-actions]" />
         </div>
 

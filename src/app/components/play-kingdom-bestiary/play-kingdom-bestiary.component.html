@@ -8,17 +8,19 @@
 
   <app-button-kingdom-back pageactions />
 
+  <div pageactionssecondary>
+    <input
+      type="text"
+      placeholder="Search by name, drop, or location..."
+      class="input input-sm input-bordered search-bar"
+      [value]="searchText()"
+      (input)="onSearchInput($event)"
+    />
+  </div>
+
   <div class="bestiary-page">
     <div class="bestiary-layout">
       <div class="bestiary-list">
-        <input
-          type="text"
-          placeholder="Search by name, drop, or location..."
-          class="input input-sm input-bordered w-full"
-          [value]="searchText()"
-          (input)="onSearchInput($event)"
-        />
-
         <div class="bestiary-list-scroll" appListReflow>
           @let selected = selectedEntry();
 
