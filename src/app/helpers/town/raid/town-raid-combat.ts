@@ -17,13 +17,8 @@ import {
 } from '@helpers/state-game';
 import { raidTelegraphClear } from '@helpers/town/raid/town-raid-defense';
 import { townGuardiansForCurrentReputation } from '@helpers/town/town-guardian';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
+import { isPartyAtNode } from '@helpers/world';
 import type { Combat, MonsterContent, TownContent, TownId } from '@interfaces';
-
-// Mirrors how every other standing-at-a-node action (shop, craft, workers) is gated in the UI.
-function partyIsAtTown(town: TownContent): boolean {
-  return worldNodeAtCurrentLocation()?.nodeName === town.name;
-}
 
 // Real engage path (manual button or DefendTowns).
 export function raidEngageCombat(townId: TownId): boolean {
@@ -33,7 +28,7 @@ export function raidEngageCombat(townId: TownId): boolean {
 
   const state = worldTownsState()[townId];
   if (state?.raidTelegraphedAtTick === undefined) return false;
-  if (!partyIsAtTown(town)) return false;
+  if (!isPartyAtNode(town.name)) return false;
 
   // The list rolled at telegraph time - must match what the Raid tab preview showed.
   const enemies = (state.raidTelegraphedAssaulterIds ?? [])

@@ -1,212 +1,183 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/combat/combat-create', () => ({
-  combatantsFromTownGuardians: vi.fn(() => []),
-  combatCreateForEncounter: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  combatMessageLog: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSafeSegment: vi.fn((name: string) => name),
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 1000),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldPartyState: vi.fn(() => []),
-    worldCombatState: vi.fn(),
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/raid/town-raid-defense', () => ({
-  raidTelegraphClear: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-guardian', () => ({
-  townGuardiansForCurrentReputation: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/world', () => ({
-  worldNodeAtCurrentLocation: vi.fn(),
-}));
-
-import {
-  combatantsFromTownGuardians,
-  combatCreateForEncounter,
-} from '@helpers/combat/combat-create';
-import { combatMessageLog } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content/content';
+import { combatLog } from '@helpers/combat/combat-log';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
   gamestate,
-  updateGamestate,
   worldCombatState,
+  worldTownsState,
 } from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
-import { raidTelegraphClear } from '@helpers/town/raid/town-raid-defense';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
-  Combat,
   GameState,
-  MonsterContent,
+  GlobalEffectId,
   MonsterId,
-  TownContent,
   TownId,
+  TownNodeState,
 } from '@interfaces';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCharacter,
+  buildCombat,
+  buildTownNodeState,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const townId = 'larsia' as TownId;
+const mothId = 'bloodmoth' as MonsterId;
+const guardId = 'larsian-guard' as MonsterId;
 
-function buildTown(overrides: Partial<TownContent> = {}): TownContent {
-  return {
-    id: townId,
-    name: 'Larsia',
-    level: 25,
-    defense: {
-      rewards: [],
-      guardian: { reputationTiers: [] },
-      assaulter: {
-        numMonsters: 2,
-        monsterIds: ['Bloodmoth' as MonsterId],
-        level: { min: 20, max: 25 },
-      },
-      quests: { commissions: [] },
+const moth = ensureMonster({ id: mothId, name: 'Bloodmoth' });
+const guard = ensureMonster({ id: guardId, name: 'Larsian Guard' });
+const town = ensureTown({
+  id: townId,
+  name: 'Larsia',
+  level: 25,
+  defense: {
+    assaulter: {
+      numMonsters: 2,
+      monsterIds: [mothId],
+      level: { min: 20, max: 22 },
     },
-    ...overrides,
-  } as TownContent;
-}
+    guardian: {
+      reputationTiers: [
+        { tier: 0, guardians: [{ monsterId: guardId, quantity: 1 }] },
+      ],
+    },
+  },
+});
 
-function mockTownState(
-  raidTelegraphedAtTick: number | undefined,
-  raidTelegraphedAssaulterIds: MonsterId[] = [],
-) {
-  vi.mocked(gamestate).mockReturnValue({
-    world: {
-      towns: {
-        [townId]: { raidTelegraphedAtTick, raidTelegraphedAssaulterIds },
-      },
-    },
-  } as unknown as GameState);
+const otherTown = ensureTown({ id: 'vesper' as TownId, name: 'Vesper' });
+// Looked up by name, so the stored id differs on purpose.
+const raidEffect = ensureGlobalEffect({
+  id: 'raid-defense-requested' as GlobalEffectId,
+  name: 'Raid Defense Requested',
+});
+
+const telegraphed: Partial<TownNodeState> = {
+  raidTelegraphedAtTick: 100,
+  raidEngageWindowExpiresAtTick: 500,
+  raidTelegraphedAssaulterIds: [mothId, mothId],
+};
+
+function seedRaid(
+  townState: Partial<TownNodeState> = telegraphed,
+  {
+    standingAt = town.name,
+    edit,
+  }: { standingAt?: string; edit?: (state: GameState) => void } = {},
+): void {
+  const nodes = seedWorldNodes([
+    { name: town.name, type: 'NonPlayerKingdom' },
+    { name: 'Field', type: 'ExploreNode' },
+  ]);
+  seedGamestate((state) => {
+    state.world.currentLocation = locationOf(nodes[standingAt]);
+    state.world.towns[townId] = buildTownNodeState(townState);
+    edit?.(state);
+  });
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(worldCombatState).mockReturnValue(undefined);
-  vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
-    nodeName: 'Larsia',
-  } as never);
-  vi.mocked(combatCreateForEncounter).mockReturnValue({
-    id: 'combat-1',
-    heroes: [],
-    helpers: [],
-    guardians: [],
-  } as unknown as Combat);
+  seedContent([town, moth, guard]);
 });
 
-function updateFnAt(index: number): (state: GameState) => GameState {
-  return vi.mocked(updateGamestate).mock.calls[index][0];
-}
-
 describe('raidEngageCombat', () => {
-  it('returns false when the town does not resolve', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+  it('starts combat against the assaulters rolled at telegraph time, with the guardians helping', () => {
+    const hero = buildCharacter();
+    seedRaid(telegraphed, { edit: (state) => (state.world.party = [hero]) });
+    const events = captureAnalyticsEvents();
 
-    expect(raidEngageCombat(townId)).toBe(false);
-  });
+    expect(inTick(() => raidEngageCombat(townId))).toBe(true);
 
-  it('returns false when combat is already in progress', () => {
-    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    vi.mocked(worldCombatState).mockReturnValue({} as Combat);
-
-    expect(raidEngageCombat(townId)).toBe(false);
-  });
-
-  it('returns false when no raid is telegraphed', () => {
-    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    mockTownState(undefined);
-
-    expect(raidEngageCombat(townId)).toBe(false);
-  });
-
-  it('returns false when the party is not standing at the town', () => {
-    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    mockTownState(100);
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue({
-      nodeName: 'Somewhere Else',
-    } as never);
-
-    expect(raidEngageCombat(townId)).toBe(false);
-  });
-
-  it('returns false when the telegraphed assaulter list is empty', () => {
-    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    mockTownState(100, []);
-
-    expect(raidEngageCombat(townId)).toBe(false);
-  });
-
-  it('returns false when every telegraphed monster id fails to resolve to content', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === townId ? buildTown() : undefined) as never,
+    const combat = worldCombatState()!;
+    expect(combat.raidTownId).toBe(townId);
+    expect(combat.locationName).toBe('Larsia');
+    expect(combat.heroes.map((c) => c.name)).toEqual([hero.name]);
+    expect(combat.guardians.map((c) => [c.monsterId, c.level])).toEqual([
+      [mothId, 22],
+      [mothId, 22],
+    ]);
+    expect(
+      combat.helpers.map((c) => [c.monsterId, c.level, c.isEnemy]),
+    ).toEqual([[guardId, 25, false]]);
+    expect(combatLog().map((entry) => entry.message)).toContain(
+      'The raid on Larsia begins!',
     );
-    mockTownState(100, ['Bloodmoth' as MonsterId]);
-
-    expect(raidEngageCombat(townId)).toBe(false);
+    expect(events).toContain('Town:Raid:Engage:Larsia');
   });
 
-  it('starts the raid combat using the list rolled at telegraph time, and clears the telegraph on success', () => {
-    const monster = { id: 'Bloodmoth' as MonsterId } as MonsterContent;
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === townId) return buildTown() as never;
-      return monster as never;
-    });
-    mockTownState(100, ['Bloodmoth' as MonsterId, 'Bloodmoth' as MonsterId]);
-
-    expect(raidEngageCombat(townId)).toBe(true);
-
-    expect(combatCreateForEncounter).toHaveBeenCalledWith(
-      [],
-      [monster, monster],
-      25,
-      'Larsia',
-      [],
-    );
-    expect(combatantsFromTownGuardians).toHaveBeenCalled();
-    expect(combatMessageLog).toHaveBeenCalled();
-    // raidEngageCombat runs from a UI click, never a game tick - the sync must happen inside the
-    // updateGamestate callback (against the mutation-in-progress state), not after it, or the
-    // deferred outside-tick commit leaves it reading stale gamestate.
-    expect(raidTelegraphClear).not.toHaveBeenCalled();
-
-    const updateFn = updateFnAt(0);
-    const state = {
-      world: {
-        combat: undefined,
-        towns: {
-          [townId]: {
-            raidTelegraphedAtTick: 100,
-            raidEngageWindowExpiresAtTick: 500,
-            raidTelegraphedAssaulterIds: ['Bloodmoth' as MonsterId],
-          },
-        },
+  it('clears the telegraph once engaged, leaving the defense request to other raided towns', () => {
+    seedContent([town, otherTown, raidEffect, moth, guard]);
+    seedRaid(telegraphed, {
+      edit: (state) => {
+        state.clock.numTicks = 1000;
+        state.world.towns[otherTown.id] = buildTownNodeState(telegraphed);
       },
-    } as unknown as GameState;
-    const result = updateFn(state);
+    });
 
-    expect(raidTelegraphClear).toHaveBeenCalledWith(state, townId, 1000);
-    expect(result.world.combat?.raidTownId).toBe(townId);
+    inTick(() => raidEngageCombat(townId));
+
+    expect(worldTownsState()[townId]).toMatchObject({
+      raidTelegraphedAtTick: undefined,
+      raidEngageWindowExpiresAtTick: undefined,
+      raidTelegraphedAssaulterIds: undefined,
+    });
+    expect(gamestate().globalEffects).toEqual([
+      expect.objectContaining({
+        id: raidEffect.id,
+        extendedDescription: otherTown.name,
+        startTick: 1000,
+      }),
+    ]);
+  });
+
+  it('skips assaulters gone from content', () => {
+    seedRaid({
+      ...telegraphed,
+      raidTelegraphedAssaulterIds: [mothId, 'gone' as MonsterId],
+    });
+
+    inTick(() => raidEngageCombat(townId));
+
+    expect(worldCombatState()!.guardians).toHaveLength(1);
+  });
+
+  it.each([
+    ['no raid is telegraphed', { raidTelegraphedAssaulterIds: [mothId] }],
+    [
+      'the telegraph rolled no assaulters',
+      { ...telegraphed, raidTelegraphedAssaulterIds: [] },
+    ],
+    [
+      'no telegraphed assaulter has content',
+      { ...telegraphed, raidTelegraphedAssaulterIds: ['gone' as MonsterId] },
+    ],
+  ])('refuses when %s', (_, townState: Partial<TownNodeState>) => {
+    seedRaid(townState);
+
+    expect(inTick(() => raidEngageCombat(townId))).toBe(false);
+    expect(worldCombatState()).toBeUndefined();
+  });
+
+  it('refuses away from the town, mid-combat, or for a town without content', () => {
+    seedRaid(telegraphed, { standingAt: 'Field' });
+    expect(inTick(() => raidEngageCombat(townId))).toBe(false);
+
+    const existing = buildCombat();
+    seedRaid(telegraphed, {
+      edit: (state) => (state.world.combat = existing),
+    });
+    expect(inTick(() => raidEngageCombat(townId))).toBe(false);
+    expect(worldCombatState()).toEqual(existing);
+
+    seedContent([moth, guard]);
+    seedRaid();
+    expect(inTick(() => raidEngageCombat(townId))).toBe(false);
+    expect(worldCombatState()).toBeUndefined();
   });
 });

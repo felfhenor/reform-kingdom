@@ -1,180 +1,113 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { TRADESKILL_MAX_LEVEL } from '@helpers/config';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import {
   pruneInvalidTownCraftQueue,
   pruneInvalidTownTradeskills,
   townTradeskillsMaterialize,
 } from '@helpers/town/crafting/town-craft-tradeskills';
-import type {
-  RecipeContent,
-  TownContent,
-  TownId,
-  TownTradeskillState,
-  TradeskillContent,
-  TradeskillId,
-} from '@interfaces';
+import type { RecipeId, TownId, TradeskillId } from '@interfaces';
+import { buildTownCraftQueueEntry } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
 const townId = 'larsia' as TownId;
-const blacksmithingId = 'blacksmithing' as TradeskillId;
-const woodworkingId = 'woodworking' as TradeskillId;
-
-function buildTown(
-  tradeskillLevels: { tradeskillId: TradeskillId; level: number }[] = [],
-): TownContent {
-  return {
-    id: townId,
-    crafting: { tradeskillLevels },
-  } as unknown as TownContent;
-}
-
-function mockContentFor(town: TownContent | undefined): void {
-  vi.mocked(getEntry).mockImplementation((id: unknown) =>
-    id === townId ? town : undefined,
-  );
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
+const smithing = ensureTradeskill({
+  id: 'blacksmithing' as TradeskillId,
+  name: 'Blacksmithing',
 });
+const woodworking = ensureTradeskill({
+  id: 'woodworking' as TradeskillId,
+  name: 'Woodworking',
+});
+const recipe = ensureRecipe({ id: 'ingot' as RecipeId, name: 'Ingot' });
+
+function seedTown(levels: { tradeskillId: TradeskillId; level: number }[]) {
+  seedContent([
+    ensureTown({
+      id: townId,
+      name: 'Larsia',
+      crafting: { tradeskillLevels: levels },
+    }),
+    smithing,
+    woodworking,
+    recipe,
+  ]);
+}
 
 describe('townTradeskillsMaterialize', () => {
-  it('returns existing unchanged when the town content no longer resolves', () => {
-    mockContentFor(undefined);
-    const existing = { [blacksmithingId]: { level: 5 } };
+  it('syncs every tradeskill to the town’s seed level, defaulting to 1 and capping at the max', () => {
+    seedTown([{ tradeskillId: smithing.id, level: 12 }]);
+    expect(townTradeskillsMaterialize(townId, {})).toEqual({
+      [smithing.id]: { level: 12 },
+      [woodworking.id]: { level: 1 },
+    });
+
+    seedTown([{ tradeskillId: smithing.id, level: TRADESKILL_MAX_LEVEL + 1 }]);
+    expect(townTradeskillsMaterialize(townId, {})[smithing.id]).toEqual({
+      level: TRADESKILL_MAX_LEVEL,
+    });
+  });
+
+  it('overwrites a saved level that drifted from the seed, in either direction', () => {
+    seedTown([{ tradeskillId: smithing.id, level: 12 }]);
+
+    for (const saved of [3, 40]) {
+      expect(
+        townTradeskillsMaterialize(townId, { [smithing.id]: { level: saved } })[
+          smithing.id
+        ],
+      ).toEqual({ level: 12 });
+    }
+  });
+
+  it('keeps saved tradeskills gone from content, leaving them to pruning', () => {
+    seedTown([]);
+    const removed = 'removed' as TradeskillId;
+
+    expect(
+      townTradeskillsMaterialize(townId, { [removed]: { level: 7 } })[removed],
+    ).toEqual({ level: 7 });
+  });
+
+  it('leaves the saved levels alone for a town gone from content', () => {
+    seedContent([smithing]);
+    const existing = { [smithing.id]: { level: 5 } };
 
     expect(townTradeskillsMaterialize(townId, existing)).toBe(existing);
-  });
-
-  it('defaults to level 1 for every tradeskill the town has no seed for', () => {
-    mockContentFor(buildTown());
-    vi.mocked(getEntriesByType).mockReturnValue([
-      { id: blacksmithingId } as TradeskillContent,
-      { id: woodworkingId } as TradeskillContent,
-    ]);
-
-    const result = townTradeskillsMaterialize(townId, {});
-
-    expect(result[blacksmithingId]).toEqual({ level: 1 });
-    expect(result[woodworkingId]).toEqual({ level: 1 });
-  });
-
-  it('syncs a tradeskill to its town-authored seed level', () => {
-    mockContentFor(buildTown([{ tradeskillId: blacksmithingId, level: 12 }]));
-    vi.mocked(getEntriesByType).mockReturnValue([
-      { id: blacksmithingId } as TradeskillContent,
-    ]);
-
-    const result = townTradeskillsMaterialize(townId, {});
-
-    expect(result[blacksmithingId]).toEqual({ level: 12 });
-  });
-
-  it('overwrites an existing level that no longer matches the authored seed, in either direction', () => {
-    mockContentFor(buildTown([{ tradeskillId: blacksmithingId, level: 12 }]));
-    vi.mocked(getEntriesByType).mockReturnValue([
-      { id: blacksmithingId } as TradeskillContent,
-    ]);
-
-    const raised = townTradeskillsMaterialize(townId, {
-      [blacksmithingId]: { level: 3 },
-    });
-    expect(raised[blacksmithingId]).toEqual({ level: 12 });
-
-    const lowered = townTradeskillsMaterialize(townId, {
-      [blacksmithingId]: { level: 40 },
-    });
-    expect(lowered[blacksmithingId]).toEqual({ level: 12 });
-  });
-
-  it('clamps a seed level above TRADESKILL_MAX_LEVEL down to the cap', () => {
-    mockContentFor(buildTown([{ tradeskillId: blacksmithingId, level: 999 }]));
-    vi.mocked(getEntriesByType).mockReturnValue([
-      { id: blacksmithingId } as TradeskillContent,
-    ]);
-
-    const result = townTradeskillsMaterialize(townId, {});
-
-    expect(result[blacksmithingId]).toEqual({ level: 50 });
   });
 });
 
 describe('pruneInvalidTownTradeskills', () => {
-  it('drops entries whose tradeskillId no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+  it('drops tradeskills gone from content', () => {
+    seedTown([]);
+    const kept = { level: 4 };
 
-    const result = pruneInvalidTownTradeskills({
-      [blacksmithingId]: { level: 1 },
-    });
-
-    expect(result).toEqual({});
-  });
-
-  it('keeps entries whose tradeskillId still resolves', () => {
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === blacksmithingId ? ({ id } as TradeskillContent) : undefined,
-    );
-    const state: TownTradeskillState = { level: 4 };
-
-    const result = pruneInvalidTownTradeskills({ [blacksmithingId]: state });
-
-    expect(result[blacksmithingId]).toBe(state);
+    expect(
+      pruneInvalidTownTradeskills({
+        [smithing.id]: kept,
+        ['removed' as TradeskillId]: { level: 1 },
+      }),
+    ).toEqual({ [smithing.id]: kept });
   });
 });
 
 describe('pruneInvalidTownCraftQueue', () => {
-  it('drops entries whose tradeskillId no longer resolves', () => {
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === 'real-recipe' ? ({ id } as RecipeContent) : undefined,
-    );
+  it('drops entries whose tradeskill or recipe is gone from content', () => {
+    seedTown([]);
+    const valid = buildTownCraftQueueEntry({
+      tradeskillId: smithing.id,
+      recipeId: recipe.id,
+    });
 
-    const result = pruneInvalidTownCraftQueue([
-      {
-        id: 'q1' as never,
-        tradeskillId: 'removed' as never,
-        recipeId: 'real-recipe' as never,
-        ticksIntoCraft: 0,
-      },
-    ]);
-
-    expect(result).toEqual([]);
-  });
-
-  it('drops entries whose recipeId no longer resolves', () => {
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === blacksmithingId ? ({ id } as TradeskillContent) : undefined,
-    );
-
-    const result = pruneInvalidTownCraftQueue([
-      {
-        id: 'q1' as never,
-        tradeskillId: blacksmithingId,
-        recipeId: 'removed-recipe' as never,
-        ticksIntoCraft: 0,
-      },
-    ]);
-
-    expect(result).toEqual([]);
-  });
-
-  it('keeps an entry whose tradeskillId and recipeId both resolve', () => {
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === blacksmithingId || id === 'real-recipe'
-        ? ({ id } as TradeskillContent)
-        : undefined,
-    );
-    const entry = {
-      id: 'q1' as never,
-      tradeskillId: blacksmithingId,
-      recipeId: 'real-recipe' as never,
-      ticksIntoCraft: 3,
-    };
-
-    expect(pruneInvalidTownCraftQueue([entry])).toEqual([entry]);
+    expect(
+      pruneInvalidTownCraftQueue([
+        valid,
+        { ...valid, tradeskillId: 'removed' as TradeskillId },
+        { ...valid, recipeId: 'removed' as RecipeId },
+      ]),
+    ).toEqual([valid]);
   });
 });

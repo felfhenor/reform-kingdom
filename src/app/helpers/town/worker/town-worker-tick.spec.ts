@@ -1,144 +1,120 @@
+import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-}));
+vi.mock('@helpers/town/worker/town-worker-auto-assign');
+vi.mock('@helpers/town/worker/town-worker-gathering');
+vi.mock('@helpers/town/worker/town-worker-travel-tick');
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-vi.mock('@helpers/town/town-tick', () => ({
-  isTownDueForUpdate: vi.fn(),
-  markTownSubsystemProcessed: vi.fn(),
-}));
-
-vi.mock('@helpers/town/worker/town-worker-auto-assign', () => ({
-  townWorkerAutoAssign: vi.fn(),
-}));
-
-vi.mock('@helpers/town/worker/town-worker-gathering', () => ({
-  townWorkerGatheringProcessTick: vi.fn(),
-}));
-
-vi.mock('@helpers/town/worker/town-worker-travel-tick', () => ({
-  townWorkerRestProcessTick: vi.fn(),
-  townWorkerTravelProcessTick: vi.fn(),
-}));
-
-import { getEntriesByType } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
-import {
-  isTownDueForUpdate,
-  markTownSubsystemProcessed,
-} from '@helpers/town/town-tick';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { uniq } from 'es-toolkit/compat';
 import { townWorkerAutoAssign } from '@helpers/town/worker/town-worker-auto-assign';
 import { townWorkerGatheringProcessTick } from '@helpers/town/worker/town-worker-gathering';
+import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
 import {
   townWorkerRestProcessTick,
   townWorkerTravelProcessTick,
 } from '@helpers/town/worker/town-worker-travel-tick';
-import type { GameState, TownContent, TownId, WorkerId } from '@interfaces';
+import type {
+  ItemId,
+  TownId,
+  TownNodeState,
+  TownWorkerState,
+  TownWorkerStatus,
+  WorkerId,
+} from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-const townId = 'larsia' as TownId;
 const workerId = 'darwin' as WorkerId;
+const town = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
+const assignment = { nodeName: 'Copper Mine', itemId: 'ore' as ItemId };
 
-function buildTown(): TownContent {
-  return { id: townId, name: 'Larsia' } as TownContent;
-}
-
-function mockWorkerStatus(kind: string, assignment: unknown = null): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: {
-      towns: {
-        [townId]: {
-          workers: { [workerId]: { status: { kind }, assignment } },
-        },
+function seedWorker(
+  overrides: Partial<TownWorkerState> = {},
+  townState: Partial<TownNodeState> = {},
+): void {
+  seedGamestate((state) => {
+    state.world.towns[town.id] = buildTownNodeState({
+      ...townState,
+      workers: {
+        [workerId]: { ...defaultTownWorkerState(town, 3), ...overrides },
       },
-    },
-  } as unknown as GameState);
+    });
+  });
 }
+
+const travel = { path: [], ticksIntoStep: 0 };
+const statuses: { status: TownWorkerStatus; processor: Mock }[] = [
+  {
+    status: { kind: 'TravelingTo', ...travel, ...assignment },
+    processor: vi.mocked(townWorkerTravelProcessTick),
+  },
+  {
+    status: { kind: 'TravelingBack', ...travel, carriedQuantity: 0 },
+    processor: vi.mocked(townWorkerTravelProcessTick),
+  },
+  {
+    status: {
+      kind: 'Gathering',
+      ...assignment,
+      itemsGathered: 0,
+      ticksIntoGather: 0,
+    },
+    processor: vi.mocked(townWorkerGatheringProcessTick),
+  },
+  {
+    status: { kind: 'Resting', ticksIntoRest: 0 },
+    processor: vi.mocked(townWorkerRestProcessTick),
+  },
+];
+
+const processors = () => uniq(statuses.map((s) => s.processor));
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(getEntriesByType).mockReturnValue([buildTown()]);
-  vi.mocked(isTownDueForUpdate).mockReturnValue(true);
+  seedContent([town]);
 });
 
 describe('townWorkerProcessTick', () => {
-  it('skips a town that is not due for the worker subsystem', () => {
-    vi.mocked(isTownDueForUpdate).mockReturnValue(false);
-    mockWorkerStatus('AtTown');
+  it('auto-assigns an idle worker at its own level', () => {
+    seedWorker();
 
     townWorkerProcessTick();
 
-    expect(markTownSubsystemProcessed).not.toHaveBeenCalled();
-    expect(townWorkerAutoAssign).not.toHaveBeenCalled();
+    expect(townWorkerAutoAssign).toHaveBeenCalledWith(town, workerId, 3);
   });
 
-  it('auto-assigns an idle AtTown worker with no assignment', () => {
-    mockWorkerStatus('AtTown', null);
+  it('leaves an idle worker that already has an assignment alone', () => {
+    seedWorker({ assignment });
 
     townWorkerProcessTick();
 
-    expect(townWorkerAutoAssign).toHaveBeenCalledWith(
-      buildTown(),
-      workerId,
-      undefined,
-    );
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
-      townId,
-      'worker',
-      expect.any(Number),
+    [townWorkerAutoAssign, ...statuses.map((s) => s.processor)].forEach((fn) =>
+      expect(fn).not.toHaveBeenCalled(),
     );
   });
 
-  it('does not auto-assign an AtTown worker that already has an assignment', () => {
-    mockWorkerStatus('AtTown', { nodeName: 'x', itemId: 'y' });
-
-    townWorkerProcessTick();
-
-    expect(townWorkerAutoAssign).not.toHaveBeenCalled();
-  });
-
-  it.each(['TravelingTo', 'TravelingBack'])(
-    'dispatches %s workers to townWorkerTravelProcessTick',
-    (kind) => {
-      mockWorkerStatus(kind);
+  it.each(statuses)(
+    'advances a $status.kind worker',
+    ({ status, processor }) => {
+      seedWorker({ status, assignment });
 
       townWorkerProcessTick();
 
-      expect(townWorkerTravelProcessTick).toHaveBeenCalledWith(
-        buildTown(),
-        workerId,
-      );
+      expect(processor).toHaveBeenCalledExactlyOnceWith(town, workerId);
+      [townWorkerAutoAssign, ...processors()]
+        .filter((fn) => fn !== processor)
+        .forEach((fn) => expect(fn).not.toHaveBeenCalled());
     },
   );
 
-  it('dispatches Gathering workers to townWorkerGatheringProcessTick', () => {
-    mockWorkerStatus('Gathering');
+  it('skips a town already processed this tick', () => {
+    seedWorker({}, { lastProcessedTick: { worker: 0 } });
 
     townWorkerProcessTick();
 
-    expect(townWorkerGatheringProcessTick).toHaveBeenCalledWith(
-      buildTown(),
-      workerId,
-    );
-  });
-
-  it('dispatches Resting workers to townWorkerRestProcessTick', () => {
-    mockWorkerStatus('Resting');
-
-    townWorkerProcessTick();
-
-    expect(townWorkerRestProcessTick).toHaveBeenCalledWith(
-      buildTown(),
-      workerId,
-    );
+    expect(townWorkerAutoAssign).not.toHaveBeenCalled();
   });
 });
