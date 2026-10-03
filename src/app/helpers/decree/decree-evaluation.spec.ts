@@ -1,84 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/decree/decree', () => ({
-  decreeNodeFailureCount: vi.fn(() => 0),
-  decreeWaitForFullHealthBeforeCombat: vi.fn(() => false),
-  decreeWaitForFullEnergyBeforeCombat: vi.fn(() => false),
-}));
+vi.mock('@helpers/decree/decree-route');
 
-vi.mock('@helpers/decree/decree-farm-node', () => ({
-  farmNodeRewardQuantity: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/item/gather-node-discovery', () => ({
-  isGatherNodeDiscovered: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/item/gathering', () => ({
-  partyMaxLevel: vi.fn(() => 10),
-  partyMinLevel: vi.fn(() => 10),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  getMaterialQuantity: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/combat/monster', () => ({
-  isXpTrivialAtOverLevel: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-state', () => ({
-  telegraphedRaidTownIds: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/hero/party', () => ({
-  isPartyAtFullHealth: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
-  travelPathThroughNodesTo: vi.fn(),
-  travelPathTo: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-spawn', () => ({
-  homeNodeGet: vi.fn(),
-  isPlayerAtHome: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/world-node/world-node-encounter', () => ({
-  worldNodeExploreRandomIsAvailable: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
-  worldNodeGatherMaterialIds: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  worldNodeObtainableMissingRewards: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  isWorldNodeVisible: vi.fn(() => true),
-  worldNodeAt: vi.fn(),
-  worldNodeByName: vi.fn(),
-  worldNodeEncounter: vi.fn(),
-  worldNodeEncounterRandom: vi.fn(),
-  worldNodeGathering: vi.fn(),
-  worldNodesOfType: vi.fn(() => []),
-}));
-
-import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
-import { LEVEL_UP_NODE_FAILURE_LIMIT } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
-import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
-  decreeNodeFailureCount,
-  decreeWaitForFullHealthBeforeCombat,
-} from '@helpers/decree/decree';
+  CHARACTER_MAX_LEVEL,
+  LEVEL_UP_NODE_FAILURE_LIMIT,
+  OVERLEVEL_XP_HARD_CAP_LEVELS,
+} from '@helpers/config';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   clauseTargetNode,
   clauseTravelNode,
@@ -91,1307 +20,746 @@ import {
   riskLevelOfExploreNode,
   riskLevelSatisfies,
 } from '@helpers/decree/decree-evaluation';
-import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
-import { isPartyAtFullHealth } from '@helpers/hero/party';
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
-import { partyMaxLevel, partyMinLevel } from '@helpers/item/gathering';
-import { getMaterialQuantity } from '@helpers/item/materials';
-import {
-  travelPathThroughNodesTo,
-  travelPathTo,
-} from '@helpers/pathfinding/pathfinding-travel';
-import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
-import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
-import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
-import {
-  isWorldNodeVisible,
-  worldNodeAt,
-  worldNodeByName,
-  worldNodeEncounter,
-  worldNodeEncounterRandom,
-  worldNodeGathering,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import type {
   CollectibleId,
-  DecreeClause,
   DecreeClauseId,
-  EncounterContent,
-  EncounterRandomContent,
+  GameState,
   ItemId,
-  MaterialId,
-  TownContent,
-  TownId,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
+import {
+  decreeClause,
+  explore,
+  grove,
+  hurtAndWaiting,
+  mystical,
+  mysticalUp,
+  nodeFailures,
+  partyAt,
+  raidOn,
+  seedDecreeWorld,
+  standingAt,
+  stocked,
+  town,
+  useStubDecreeRoutes,
+  withEdits,
+} from '@/testing/decree';
 
-const MISSING_REWARD = ensureDroppedReward({
-  collectibleId: 'lotus' as CollectibleId,
-  chance: 1,
+useStubDecreeRoutes();
+
+const wood = 'wood' as ItemId;
+const stone = 'stone' as ItemId;
+const bone = 'bone' as ItemId;
+
+const found = 'found-gem' as CollectibleId;
+const looted = (state: GameState) => applyCollectibleGrant(state, found, 1);
+
+const finish = decreeClause({
+  type: 'FinishUnfinishedAreas',
+  riskTolerance: 'Medium',
 });
-
-function buildNode(nodeName: string): WorldNodeEntry {
-  return {
-    mapName: 'Carrina',
-    x: 0,
-    y: 0,
+const levelUp = decreeClause({ type: 'LevelUpParty', riskTolerance: 'High' });
+const goHome = decreeClause({ type: 'ReturnToKingdom' });
+const farm = (nodeName = 'Forest Ruins') =>
+  decreeClause({
+    type: 'FarmNode',
     nodeName,
-    nodeData: { type: 'ExploreNode' } as never,
-  };
-}
-
-function buildClause(overrides: Partial<DecreeClause> = {}): DecreeClause {
-  return {
-    id: 'clause-1' as DecreeClauseId,
-    type: 'FinishUnfinishedAreas',
-    enabled: true,
-    failureCount: 0,
-    riskTolerance: 'Medium',
-    ...overrides,
-  } as DecreeClause;
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(partyMinLevel).mockReturnValue(10);
-  vi.mocked(partyMaxLevel).mockReturnValue(10);
-  vi.mocked(isXpTrivialAtOverLevel).mockReturnValue(false);
-  vi.mocked(worldNodesOfType).mockReturnValue([]);
-  vi.mocked(worldNodeByName).mockReturnValue(undefined);
-  vi.mocked(isWorldNodeVisible).mockReturnValue(true);
-  vi.mocked(travelPathTo).mockReturnValue(undefined);
-  vi.mocked(isPlayerAtHome).mockReturnValue(false);
-  vi.mocked(travelPathThroughNodesTo).mockReturnValue(undefined);
-  vi.mocked(worldNodeAt).mockReturnValue(undefined);
-  vi.mocked(worldNodeGathering).mockReturnValue(undefined);
-  vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
-  vi.mocked(worldNodeEncounterRandom).mockReturnValue(undefined);
-  vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(false);
-  vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([]);
-  vi.mocked(getMaterialQuantity).mockReturnValue(0);
-  vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
-  vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
-  vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
-  vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
-  vi.mocked(decreeNodeFailureCount).mockReturnValue(0);
-  vi.mocked(getEntry).mockReturnValue(undefined);
-  vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
-});
+    reward: { itemId: bone },
+    targetQuantity: 5,
+  });
 
 describe('riskLevelOfExploreNode', () => {
-  it('is Low when the node is at or below the party level', () => {
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 5, max: 10 },
-    } as EncounterContent);
+  it('rates a node by its level range against the weakest hero', () => {
+    const { Cave, Ruins } = seedDecreeWorld(
+      [{ content: explore('Cave', 8, 12) }, { content: mystical('Ruins', 9) }],
+      partyAt(10, 30),
+    );
 
-    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('Low');
+    expect(riskLevelOfExploreNode(Cave)).toBe('Medium');
+    expect(riskLevelOfExploreNode(Ruins)).toBe('Low');
   });
 
-  it('is Medium when the party can already clear the floor but not the ceiling', () => {
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 8, max: 12 },
-    } as EncounterContent);
+  it('is TooHigh for a node with no encounter content', () => {
+    const { Signpost } = seedDecreeWorld([
+      { name: 'Signpost', type: 'ExploreNode' },
+    ]);
 
-    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('Medium');
-  });
-
-  it('is High when the floor itself is above the party, within the hard cap', () => {
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 16, max: 18 },
-    } as EncounterContent);
-
-    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('High');
-  });
-
-  it('is High rather than Medium when the floor is only slightly above the party', () => {
-    // A near floor alone isn't enough for Medium; the party must clear the floor outright.
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 13, max: 16 },
-    } as EncounterContent);
-
-    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('High');
-  });
-
-  it('is TooHigh beyond 7 levels above the party', () => {
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 18, max: 20 },
-    } as EncounterContent);
-
-    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('TooHigh');
-  });
-
-  it('rates a random node by its level range', () => {
-    vi.mocked(worldNodeEncounterRandom).mockReturnValue({
-      levelRange: { min: 8, max: 12 },
-    } as EncounterRandomContent);
-
-    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('Medium');
-  });
-
-  it('is TooHigh when the node has no encounter content', () => {
-    vi.mocked(worldNodeEncounter).mockReturnValue(undefined);
-
-    expect(riskLevelOfExploreNode(buildNode('A'))).toBe('TooHigh');
+    expect(riskLevelOfExploreNode(Signpost)).toBe('TooHigh');
   });
 });
 
 describe('riskLevelSatisfies', () => {
-  it('accepts a band at or below the ceiling', () => {
+  it('accepts a band at or below the ceiling, never TooHigh', () => {
     expect(riskLevelSatisfies('Low', 'High')).toBe(true);
     expect(riskLevelSatisfies('Medium', 'Medium')).toBe(true);
-  });
-
-  it('rejects a band above the ceiling', () => {
     expect(riskLevelSatisfies('High', 'Medium')).toBe(false);
-  });
-
-  it('always rejects TooHigh regardless of ceiling', () => {
     expect(riskLevelSatisfies('TooHigh', 'High')).toBe(false);
   });
 });
 
 describe('nearestUnfinishedExploreNode', () => {
   it('picks the reachable unfinished node with the shortest path', () => {
-    const near = buildNode('Near');
-    const far = buildNode('Far');
-    vi.mocked(worldNodesOfType).mockReturnValue([far, near]);
-    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-      MISSING_REWARD,
+    const { Near } = seedDecreeWorld([
+      { content: explore('Far', 1), steps: 2 },
+      { content: explore('Near', 1), steps: 1 },
+      { content: explore('Unreachable', 1) },
     ]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 1, max: 1 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockImplementation((name) =>
-      name === 'Near' ? [{} as never] : [{} as never, {} as never],
+
+    expect(nearestUnfinishedExploreNode('High')).toEqual(Near);
+  });
+
+  it('keeps the first of equally near nodes', () => {
+    const nodes = seedDecreeWorld([
+      { content: explore('First', 1), steps: 2 },
+      { content: explore('Second', 1), steps: 2 },
+    ]);
+
+    expect(nearestUnfinishedExploreNode('High')).toEqual(nodes['First']);
+  });
+
+  it('skips nodes fully looted, too risky, or hidden and undiscovered', () => {
+    seedDecreeWorld(
+      [
+        { content: explore('Done', 1, 1, { completionRewards: [] }), steps: 1 },
+        {
+          content: explore('Looted', 1, 1, {
+            completionRewards: [
+              ensureDroppedReward({ collectibleId: found, chance: 1 }),
+            ],
+          }),
+          steps: 1,
+        },
+        { content: explore('Risky', 30), steps: 1 },
+        { content: explore('Hidden', 1, 1, { hidden: true }), steps: 1 },
+      ],
+      looted,
+    );
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  it('includes a hidden node once discovered', () => {
+    const { Hidden } = seedDecreeWorld(
+      [{ content: explore('Hidden', 1, 1, { hidden: true }), steps: 1 }],
+      (state) => (state.worldDiscoveries['Hidden'] = { foundAt: 1 }),
     );
 
-    expect(nearestUnfinishedExploreNode('High')).toBe(near);
+    expect(nearestUnfinishedExploreNode('High')).toEqual(Hidden);
   });
 
-  it('ignores fully-looted nodes', () => {
-    const node = buildNode('Done');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([]);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
-  });
-
-  it('excludes candidates outside the given risk tolerance', () => {
-    const node = buildNode('TooRisky');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-      MISSING_REWARD,
-    ]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 30, max: 30 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
-  });
-
-  it('excludes a hidden node that has not been discovered', () => {
-    const node = buildNode('Hidden');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-      MISSING_REWARD,
-    ]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 1, max: 1 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
-
-    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
-  });
-
-  describe('random nodes', () => {
-    function mockRandomNode(): WorldNodeEntry {
-      const node = buildNode('Ruins');
-      vi.mocked(worldNodesOfType).mockImplementation((type) =>
-        type === 'ExploreRandomNode' ? [node] : [],
+  describe('mystical nodes', () => {
+    it('picks one whose fights are up with rewards missing', () => {
+      const { Ruins } = seedDecreeWorld(
+        [{ content: mystical('Ruins', 1), steps: 1 }],
+        mysticalUp('Ruins'),
       );
-      vi.mocked(worldNodeEncounterRandom).mockReturnValue({
-        levelRange: { min: 1, max: 1 },
-      } as EncounterRandomContent);
-      vi.mocked(travelPathTo).mockReturnValue([]);
-      return node;
-    }
 
-    it('picks one whose fights are still up with rewards missing', () => {
-      const node = mockRandomNode();
-      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
-      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-        MISSING_REWARD,
-      ]);
-
-      expect(nearestUnfinishedExploreNode('High')).toBe(node);
+      expect(nearestUnfinishedExploreNode('High')).toEqual(Ruins);
     });
 
-    it('ignores one whose fights are up but every reward is looted', () => {
-      mockRandomNode();
-      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+    it('skips one fully looted, cleared this cycle, not yet rolled, or too risky', () => {
+      seedDecreeWorld(
+        [
+          {
+            content: mystical('Looted', 1, { completionRewards: [] }),
+            steps: 1,
+          },
+          { content: mystical('Cleared', 1), steps: 1 },
+          { content: mystical('Unrolled', 1), steps: 1 },
+          { content: mystical('Risky', 30), steps: 1 },
+        ],
+        withEdits(
+          mysticalUp('Looted'),
+          mysticalUp('Cleared', true),
+          mysticalUp('Risky'),
+        ),
+      );
 
       expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
     });
 
-    it('ignores one already cleared this cycle, even with rewards missing', () => {
-      mockRandomNode();
-      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-        MISSING_REWARD,
-      ]);
-
-      expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
-    });
-
-    it('picks whichever of a static and a random node is nearer', () => {
-      const random = mockRandomNode();
-      const fixed = buildNode('Cave');
-      vi.mocked(worldNodesOfType).mockImplementation((type) =>
-        type === 'ExploreRandomNode' ? [random] : [fixed],
+    it('competes with fixed nodes on distance', () => {
+      const nearer = seedDecreeWorld(
+        [
+          { content: explore('Cave', 1), steps: 2 },
+          { content: mystical('Ruins', 1), steps: 1 },
+        ],
+        mysticalUp('Ruins'),
       );
-      vi.mocked(worldNodeEncounterRandom).mockImplementation((entry) =>
-        entry === random
-          ? ({ levelRange: { min: 1, max: 1 } } as EncounterRandomContent)
-          : undefined,
+      expect(nearestUnfinishedExploreNode('High')).toEqual(nearer['Ruins']);
+
+      const farther = seedDecreeWorld(
+        [
+          { content: explore('Cave', 1), steps: 2 },
+          { content: mystical('Ruins', 1), steps: 3 },
+        ],
+        mysticalUp('Ruins'),
       );
-      vi.mocked(worldNodeEncounter).mockReturnValue({
-        levelRange: { min: 1, max: 1 },
-      } as EncounterContent);
-      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
-      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-        MISSING_REWARD,
-      ]);
-      vi.mocked(travelPathTo).mockImplementation((name) =>
-        name === 'Cave' ? [{} as never, {} as never] : [{} as never],
-      );
-
-      expect(nearestUnfinishedExploreNode('High')).toBe(random);
-
-      vi.mocked(travelPathTo).mockImplementation((name) =>
-        name === 'Cave' ? [{} as never] : [{} as never, {} as never],
-      );
-
-      expect(nearestUnfinishedExploreNode('High')).toBe(fixed);
-    });
-
-    it('excludes one outside the given risk tolerance', () => {
-      mockRandomNode();
-      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
-      vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-        MISSING_REWARD,
-      ]);
-      vi.mocked(worldNodeEncounterRandom).mockReturnValue({
-        levelRange: { min: 30, max: 30 },
-      } as EncounterRandomContent);
-
-      expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+      expect(nearestUnfinishedExploreNode('High')).toEqual(farther['Cave']);
     });
   });
 });
 
-// Spider Tower is only reachable by walking through the Slimed Waystation tile.
-function mockWalledInTower(gatewayMaxLevel: number): {
-  tower: WorldNodeEntry;
-  gateway: WorldNodeEntry;
-} {
-  const tower = buildNode('Spider Tower');
-  const gateway = buildNode('Slimed Waystation');
-  vi.mocked(worldNodesOfType).mockReturnValue([tower]);
-  vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-    MISSING_REWARD,
-  ]);
-  vi.mocked(worldNodeEncounter).mockImplementation((entry) => {
-    const max = entry === gateway ? gatewayMaxLevel : 10;
-    return { levelRange: { min: max, max } } as EncounterContent;
-  });
-  vi.mocked(travelPathThroughNodesTo).mockReturnValue([
-    { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-    { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-    { kind: 'Move', mapName: 'Carrina', x: 3, y: 0 },
-  ]);
-  vi.mocked(worldNodeAt).mockImplementation((_, x) =>
-    x === 2 ? gateway : undefined,
-  );
-  return { tower, gateway };
-}
+type Place = Parameters<typeof seedDecreeWorld>[0][number];
 
-describe('decree routing to a node walled in behind another node', () => {
-  it('still picks the walled-in node as an unfinished area', () => {
-    const { tower } = mockWalledInTower(10);
-
-    expect(nearestUnfinishedExploreNode('Medium')).toBe(tower);
-  });
-
-  it('heads for the gateway node first', () => {
-    const { gateway } = mockWalledInTower(10);
-
-    expect(
-      clauseTravelNode(buildClause({ type: 'FinishUnfinishedAreas' })),
-    ).toBe(gateway);
-  });
-
-  it('skips the node when the gateway fight exceeds the risk tolerance', () => {
-    mockWalledInTower(30);
-
-    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
-  });
-
-  it('skips the node when the gateway would start a gather', () => {
-    mockWalledInTower(10);
-    vi.mocked(worldNodeGathering).mockReturnValue({} as never);
-
-    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
-  });
-
-  it('skips the node when the gateway is still hidden', () => {
-    const { gateway } = mockWalledInTower(10);
-    vi.mocked(isWorldNodeVisible).mockImplementation(
-      (entry) => entry !== gateway,
+describe('a node walled in behind another node', () => {
+  function walledIn(gateway: Place, edit?: (state: GameState) => void) {
+    return seedDecreeWorld(
+      [
+        {
+          content: explore('Spider Tower', 10),
+          steps: 3,
+          via: 'Slimed Waystation',
+        },
+        { name: 'Slimed Waystation', ...gateway },
+      ],
+      edit,
     );
+  }
+  const fightingGateway = (min: number): Place => ({
+    content: explore('Slimed Waystation', min, min, { completionRewards: [] }),
+  });
+
+  it('is still an unfinished area, reached by heading to the gateway first', () => {
+    const nodes = walledIn(fightingGateway(10));
+
+    expect(nearestUnfinishedExploreNode('Medium')).toEqual(
+      nodes['Spider Tower'],
+    );
+    expect(clauseTravelNode(finish)).toEqual(nodes['Slimed Waystation']);
+  });
+
+  it('is skipped when the gateway fight exceeds the risk tolerance', () => {
+    const nodes = walledIn(fightingGateway(15));
+    expect(nearestUnfinishedExploreNode('Medium')).toBeUndefined();
+    expect(nearestUnfinishedExploreNode('High')).toEqual(nodes['Spider Tower']);
+
+    walledIn(fightingGateway(30));
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  it('is gathered or farmed past a high-risk gateway', () => {
+    const nodes = seedDecreeWorld([
+      {
+        content: grove('Spider Tower', [wood]),
+        steps: 3,
+        via: 'Slimed Waystation',
+      },
+      {
+        content: explore('Forest Ruins', 1),
+        steps: 3,
+        via: 'Slimed Waystation',
+      },
+      { name: 'Slimed Waystation', ...fightingGateway(15) },
+    ]);
+
+    expect(nearestGatherNodeFor(wood)).toEqual(nodes['Spider Tower']);
+    expect(clauseTargetNode(farm())).toEqual(nodes['Forest Ruins']);
+  });
+
+  it('is skipped when stopping at the gateway would start a gather or a mystical fight', () => {
+    walledIn({ content: grove('Slimed Waystation', [wood]) });
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+
+    walledIn({ content: mystical('Slimed Waystation', 1) });
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  it('is skipped while the gateway is hidden', () => {
+    walledIn({
+      content: explore('Slimed Waystation', 10, 10, {
+        completionRewards: [],
+        hidden: true,
+      }),
+    });
 
     expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
   });
 
-  it('lets LevelUpParty reach the walled-in node too', () => {
-    const { tower, gateway } = mockWalledInTower(10);
+  it('is reached past a gateway with nothing to fight at any risk tolerance', () => {
+    const nodes = walledIn({ type: 'ExploreNode' });
 
-    expect(mostChallengingExploreNodeForRisk('High')).toBe(tower);
+    expect(nearestUnfinishedExploreNode('Low')).toEqual(nodes['Spider Tower']);
+  });
+
+  it('is reached by LevelUpParty too', () => {
+    const nodes = walledIn(fightingGateway(10));
+
+    expect(mostChallengingExploreNodeForRisk('High')).toEqual(
+      nodes['Spider Tower'],
+    );
+    expect(clauseTravelNode(levelUp)).toEqual(nodes['Slimed Waystation']);
+  });
+
+  it('is left through the gateway when home is inside it', () => {
+    const nodes = seedDecreeWorld([
+      { name: 'Kingdom', type: 'Kingdom', steps: 3, via: 'Slimed Waystation' },
+      { name: 'Slimed Waystation', ...fightingGateway(10) },
+    ]);
+
+    expect(clauseTravelNode(goHome)).toEqual(nodes['Slimed Waystation']);
+  });
+
+  it('lets a clause with no risk setting fight through a high-risk gateway', () => {
+    const nodes = seedDecreeWorld([
+      {
+        content: grove('Spider Tower', [wood]),
+        steps: 3,
+        via: 'Slimed Waystation',
+      },
+      { name: 'Slimed Waystation', ...fightingGateway(15) },
+    ]);
+
     expect(
       clauseTravelNode(
-        buildClause({ type: 'LevelUpParty', riskTolerance: 'High' }),
-      ),
-    ).toBe(gateway);
-  });
-
-  it('leaves through the gateway when returning home from inside', () => {
-    const { tower: home, gateway } = mockWalledInTower(10);
-    vi.mocked(homeNodeGet).mockReturnValue(home);
-
-    expect(clauseTravelNode(buildClause({ type: 'ReturnToKingdom' }))).toBe(
-      gateway,
-    );
-  });
-
-  it('lets a clause with no risk setting fight through the gateway', () => {
-    const { tower, gateway } = mockWalledInTower(10);
-    vi.mocked(worldNodeByName).mockReturnValue(tower);
-
-    expect(
-      clauseTravelNode(
-        buildClause({
+        decreeClause({
           type: 'GatherMaterial',
-          materialId: 'Ore' as MaterialId,
+          materialId: wood,
           nodeName: 'Spider Tower',
           targetQuantity: 5,
         }),
       ),
-    ).toBe(gateway);
+    ).toEqual(nodes['Slimed Waystation']);
   });
 
-  it('counts gateway losses against the walled-in node for LevelUpParty', () => {
-    const { tower, gateway } = mockWalledInTower(10);
-    const other = buildNode('Open Field');
-    vi.mocked(worldNodesOfType).mockReturnValue([tower, other]);
-    vi.mocked(travelPathTo).mockImplementation((name) =>
-      name === 'Open Field' ? [] : undefined,
-    );
-    vi.mocked(worldNodeEncounter).mockImplementation((entry) => {
-      const max = entry === other ? 5 : 10;
-      return { levelRange: { min: max, max } } as EncounterContent;
-    });
-    vi.mocked(decreeNodeFailureCount).mockImplementation((name) =>
-      name === gateway.nodeName ? LEVEL_UP_NODE_FAILURE_LIMIT : 0,
+  it('counts gateway losses against it for LevelUpParty', () => {
+    const nodes = seedDecreeWorld(
+      [
+        {
+          content: explore('Spider Tower', 10),
+          steps: 3,
+          via: 'Slimed Waystation',
+        },
+        { name: 'Slimed Waystation', ...fightingGateway(10) },
+        { content: explore('Open Field', 9), steps: 1 },
+      ],
+      nodeFailures({ 'Slimed Waystation': LEVEL_UP_NODE_FAILURE_LIMIT }),
     );
 
-    expect(mostChallengingExploreNodeForRisk('High')).toBe(other);
+    expect(mostChallengingExploreNodeForRisk('High')).toEqual(
+      nodes['Open Field'],
+    );
   });
 
-  it('travels straight to a directly reachable target', () => {
-    const { tower } = mockWalledInTower(10);
-    vi.mocked(travelPathTo).mockReturnValue([]);
+  it('is traveled to directly once reachable', () => {
+    const nodes = seedDecreeWorld([
+      { content: explore('Spider Tower', 10), steps: 3 },
+    ]);
 
-    expect(
-      clauseTravelNode(buildClause({ type: 'FinishUnfinishedAreas' })),
-    ).toBe(tower);
+    expect(clauseTravelNode(finish)).toEqual(nodes['Spider Tower']);
   });
 });
 
 describe('mostChallengingExploreNodeForRisk', () => {
-  it('accepts a node at or below the given risk tolerance', () => {
-    const node = buildNode('Safe');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 5, max: 5 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
+  it('prefers the most challenging reachable node within the risk tolerance, regardless of distance', () => {
+    const nodes = seedDecreeWorld([
+      { content: explore('Near', 7), steps: 1 },
+      { content: explore('Far', 10), steps: 3 },
+      { content: explore('Unreachable', 9, 11) },
+      { content: explore('Risky', 16), steps: 1 },
+      { content: explore('Hidden', 9, 11, { hidden: true }), steps: 1 },
+    ]);
 
-    expect(mostChallengingExploreNodeForRisk('Low')).toBe(node);
+    expect(mostChallengingExploreNodeForRisk('Medium')).toEqual(nodes['Far']);
+    expect(mostChallengingExploreNodeForRisk('Low')).toEqual(nodes['Far']);
   });
 
-  it('excludes a node above the given risk tolerance', () => {
-    const node = buildNode('TooRisky');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 16, max: 16 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
+  it('ranks by the toughest fight a node can throw', () => {
+    const nodes = seedDecreeWorld([
+      { content: explore('Steady', 10), steps: 1 },
+      { content: explore('Swingy', 5, 12), steps: 1 },
+    ]);
 
-    expect(mostChallengingExploreNodeForRisk('Medium')).toBeUndefined();
+    expect(mostChallengingExploreNodeForRisk('Medium')).toEqual(
+      nodes['Swingy'],
+    );
   });
 
-  it('prefers the more challenging reachable node over a nearer, easier one', () => {
-    const near = buildNode('Near');
-    const far = buildNode('Far');
-    vi.mocked(worldNodesOfType).mockReturnValue([near, far]);
-    vi.mocked(worldNodeEncounter).mockImplementation(
-      (entry) =>
-        ({
-          Near: { levelRange: { min: 1, max: 1 } },
-          Far: { levelRange: { min: 10, max: 10 } },
-        })[entry.nodeName] as EncounterContent,
+  it('ignores mystical nodes', () => {
+    seedDecreeWorld(
+      [{ content: mystical('Ruins', 10), steps: 1 }],
+      mysticalUp('Ruins'),
     );
-    // Near is one hop away, Far is much further - distance shouldn't matter.
-    vi.mocked(travelPathTo).mockImplementation((name) =>
-      name === 'Near' ? [{} as never] : [{} as never, {} as never, {} as never],
-    );
-
-    expect(mostChallengingExploreNodeForRisk('Medium')).toBe(far);
-  });
-
-  it('falls back to an easier node when the toughest one is unreachable', () => {
-    const near = buildNode('Near');
-    const unreachable = buildNode('Unreachable');
-    vi.mocked(worldNodesOfType).mockReturnValue([near, unreachable]);
-    vi.mocked(worldNodeEncounter).mockImplementation(
-      (entry) =>
-        ({
-          Near: { levelRange: { min: 1, max: 1 } },
-          Unreachable: { levelRange: { min: 10, max: 10 } },
-        })[entry.nodeName] as EncounterContent,
-    );
-    vi.mocked(travelPathTo).mockImplementation((name) =>
-      name === 'Near' ? [] : undefined,
-    );
-
-    expect(mostChallengingExploreNodeForRisk('Medium')).toBe(near);
-  });
-
-  it('prefers a comparable (same-tier) node with fewer failures over one that keeps losing', () => {
-    const losing = buildNode('Losing');
-    const comparable = buildNode('Comparable');
-    vi.mocked(worldNodesOfType).mockReturnValue([losing, comparable]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 10, max: 10 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
-      nodeName === 'Losing' ? 2 : 0,
-    );
-
-    expect(mostChallengingExploreNodeForRisk('High')).toBe(comparable);
-  });
-
-  it('steps down a tier once every node in it has hit the failure limit', () => {
-    const hard = buildNode('Hard');
-    const easy = buildNode('Easy');
-    vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
-    vi.mocked(worldNodeEncounter).mockImplementation(
-      (entry) =>
-        ({
-          Hard: { levelRange: { min: 10, max: 10 } },
-          Easy: { levelRange: { min: 1, max: 1 } },
-        })[entry.nodeName] as EncounterContent,
-    );
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
-      nodeName === 'Hard' ? LEVEL_UP_NODE_FAILURE_LIMIT : 0,
-    );
-
-    expect(mostChallengingExploreNodeForRisk('High')).toBe(easy);
-  });
-
-  it('falls back to the least-failed node overall once every tier has hit the limit', () => {
-    const hard = buildNode('Hard');
-    const easy = buildNode('Easy');
-    vi.mocked(worldNodesOfType).mockReturnValue([hard, easy]);
-    vi.mocked(worldNodeEncounter).mockImplementation(
-      (entry) =>
-        ({
-          Hard: { levelRange: { min: 10, max: 10 } },
-          Easy: { levelRange: { min: 1, max: 1 } },
-        })[entry.nodeName] as EncounterContent,
-    );
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeNodeFailureCount).mockImplementation((nodeName) =>
-      nodeName === 'Hard'
-        ? LEVEL_UP_NODE_FAILURE_LIMIT + 3
-        : LEVEL_UP_NODE_FAILURE_LIMIT,
-    );
-
-    expect(mostChallengingExploreNodeForRisk('High')).toBe(easy);
-  });
-
-  it('excludes a node that would only give 1 XP due to over-level', () => {
-    const trivial = buildNode('Trivial');
-    const worthwhile = buildNode('Worthwhile');
-    vi.mocked(worldNodesOfType).mockReturnValue([trivial, worthwhile]);
-    vi.mocked(worldNodeEncounter).mockImplementation(
-      (entry) =>
-        ({
-          Trivial: { levelRange: { min: 1, max: 1 } },
-          Worthwhile: { levelRange: { min: 10, max: 10 } },
-        })[entry.nodeName] as EncounterContent,
-    );
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isXpTrivialAtOverLevel).mockImplementation(
-      (_partyLevel, nodeMaxLevel) => nodeMaxLevel === 1,
-    );
-
-    expect(mostChallengingExploreNodeForRisk('High')).toBe(worthwhile);
-  });
-
-  it("judges over-level XP by the weakest hero, since each hero's XP is scaled separately", () => {
-    vi.mocked(worldNodesOfType).mockReturnValue([buildNode('Node')]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 5, max: 5 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(partyMinLevel).mockReturnValue(4);
-    vi.mocked(partyMaxLevel).mockReturnValue(20);
-
-    mostChallengingExploreNodeForRisk('High');
-
-    expect(isXpTrivialAtOverLevel).toHaveBeenCalledWith(4, 5);
-  });
-
-  it('fails when every reachable node would only give 1 XP', () => {
-    const trivial = buildNode('Trivial');
-    vi.mocked(worldNodesOfType).mockReturnValue([trivial]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 1, max: 1 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isXpTrivialAtOverLevel).mockReturnValue(true);
 
     expect(mostChallengingExploreNodeForRisk('High')).toBeUndefined();
   });
 
-  it('excludes a hidden node that has not been discovered', () => {
-    const node = buildNode('Hidden');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 5, max: 5 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
+  it('prefers a same-tier node with fewer failures over one that keeps losing', () => {
+    const nodes = seedDecreeWorld(
+      [
+        { content: explore('Losing', 10), steps: 1 },
+        { content: explore('Comparable', 10), steps: 1 },
+      ],
+      nodeFailures({ Losing: 2 }),
+    );
 
+    expect(mostChallengingExploreNodeForRisk('High')).toEqual(
+      nodes['Comparable'],
+    );
+  });
+
+  it('steps down a tier once every node in it has hit the failure limit', () => {
+    const nodes = seedDecreeWorld(
+      [
+        { content: explore('Hard', 10), steps: 1 },
+        { content: explore('Middling', 8), steps: 1 },
+        { content: explore('Easy', 7), steps: 1 },
+      ],
+      nodeFailures({
+        Hard: LEVEL_UP_NODE_FAILURE_LIMIT,
+        Middling: LEVEL_UP_NODE_FAILURE_LIMIT - 1,
+      }),
+    );
+
+    expect(mostChallengingExploreNodeForRisk('High')).toEqual(
+      nodes['Middling'],
+    );
+  });
+
+  it('falls back to the least-failed node overall once every tier has hit the limit', () => {
+    const nodes = seedDecreeWorld(
+      [
+        { content: explore('Hard', 10), steps: 1 },
+        { content: explore('Easy', 8), steps: 1 },
+      ],
+      nodeFailures({
+        Hard: LEVEL_UP_NODE_FAILURE_LIMIT + 3,
+        Easy: LEVEL_UP_NODE_FAILURE_LIMIT,
+      }),
+    );
+
+    expect(mostChallengingExploreNodeForRisk('High')).toEqual(nodes['Easy']);
+  });
+
+  it('excludes nodes the weakest hero has outgrown, and only those', () => {
+    const weakest = 1 + OVERLEVEL_XP_HARD_CAP_LEVELS;
+    const nodes = seedDecreeWorld(
+      [
+        { content: explore('Trivial', 1), steps: 1 },
+        { content: explore('Worthwhile', 2), steps: 2 },
+      ],
+      partyAt(weakest, weakest + 20),
+    );
+
+    expect(mostChallengingExploreNodeForRisk('High')).toEqual(
+      nodes['Worthwhile'],
+    );
+
+    seedDecreeWorld(
+      [{ content: explore('Trivial', 1), steps: 1 }],
+      partyAt(weakest),
+    );
     expect(mostChallengingExploreNodeForRisk('High')).toBeUndefined();
   });
 });
 
 describe('nearestGatherNodeFor', () => {
-  it('is unaffected by risk tolerance', () => {
-    const node = buildNode('Grove');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'wood' as MaterialId,
-    ]);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(nearestGatherNodeFor('wood' as MaterialId)).toBe(node);
-  });
-
-  it('only considers nodes that yield the requested material', () => {
-    const node = buildNode('StoneQuarry');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'stone' as MaterialId,
-    ]);
-
-    expect(nearestGatherNodeFor('wood' as MaterialId)).toBeUndefined();
-  });
-
-  it('excludes nodes the player has not discovered yet', () => {
-    const node = buildNode('Grove');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'wood' as MaterialId,
-    ]);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(false);
-
-    expect(nearestGatherNodeFor('wood' as MaterialId)).toBeUndefined();
-  });
-
-  it('excludes a hidden node that has not been discovered, even if visited', () => {
-    const node = buildNode('Grove');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'wood' as MaterialId,
-    ]);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isGatherNodeDiscovered).mockReturnValue(true);
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
-
-    expect(nearestGatherNodeFor('wood' as MaterialId)).toBeUndefined();
-  });
-});
-
-describe('clauseTargetNode - GatherMaterial with a pinned location', () => {
-  it('targets its stored node when reachable, without consulting worldNodeGatherMaterialIds', () => {
-    const node = buildNode('Grove');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          nodeName: 'Grove',
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBe(node);
-    expect(worldNodeGatherMaterialIds).not.toHaveBeenCalled();
-  });
-
-  it('has no target when its pinned node no longer exists', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          nodeName: 'Gone',
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBeUndefined();
-  });
-
-  it('has no target when its pinned node is unreachable', () => {
-    const node = buildNode('Grove');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue(undefined);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          nodeName: 'Grove',
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBeUndefined();
-  });
-
-  it('has no target when its pinned node is hidden and undiscovered', () => {
-    const node = buildNode('Grove');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          nodeName: 'Grove',
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBeUndefined();
-  });
-
-  it('falls back to the nearest reachable node when no location is pinned (legacy clause)', () => {
-    const node = buildNode('Grove');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'wood' as MaterialId,
-    ]);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBe(node);
-  });
-});
-
-describe('isClauseSatisfiable', () => {
-  it('is always false for a disabled clause', () => {
-    expect(
-      isClauseSatisfiable(
-        buildClause({ type: 'ReturnToKingdom', enabled: false }),
-      ),
-    ).toBe(false);
-  });
-
-  it('GatherMaterial is satisfiable when stock is short and a node is reachable', () => {
-    vi.mocked(getMaterialQuantity).mockReturnValue(2);
-    const node = buildNode('Grove');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'wood' as MaterialId,
-    ]);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(
-      isClauseSatisfiable(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(true);
-  });
-
-  it('GatherMaterial is unsatisfiable once the target quantity is already met', () => {
-    vi.mocked(getMaterialQuantity).mockReturnValue(5);
-
-    expect(
-      isClauseSatisfiable(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(false);
-  });
-
-  it('LevelUpParty is unsatisfiable once the party is max level', () => {
-    vi.mocked(partyMinLevel).mockReturnValue(99);
-    const node = buildNode('Anywhere');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 99, max: 99 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(isClauseSatisfiable(buildClause({ type: 'LevelUpParty' }))).toBe(
-      false,
+  it('picks the nearest discovered, visible node yielding the material', () => {
+    const nodes = seedDecreeWorld(
+      [
+        { content: grove('Far Grove', [wood]), steps: 3 },
+        { content: grove('Grove', [wood]), steps: 2 },
+        { content: grove('Quarry', [stone]), steps: 1 },
+        { content: grove('Undiscovered', [wood]), steps: 1 },
+        { content: grove('Hidden', [wood], { hidden: true }), steps: 1 },
+      ],
+      (state) => delete state.discoveredGatherNodes['Undiscovered'],
     );
-  });
 
-  it('ReturnToKingdom is unsatisfiable once already at the kingdom', () => {
-    vi.mocked(isPlayerAtHome).mockReturnValue(true);
-
-    expect(isClauseSatisfiable(buildClause({ type: 'ReturnToKingdom' }))).toBe(
-      false,
-    );
-  });
-
-  it('FinishUnfinishedAreas is blocked while waiting for full health', () => {
-    const node = buildNode('Anywhere');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-      MISSING_REWARD,
-    ]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 1, max: 1 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-
-    expect(
-      isClauseSatisfiable(buildClause({ type: 'FinishUnfinishedAreas' })),
-    ).toBe(false);
-  });
-
-  it('LevelUpParty is blocked while waiting for full health', () => {
-    const node = buildNode('Anywhere');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 1, max: 1 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-
-    expect(isClauseSatisfiable(buildClause({ type: 'LevelUpParty' }))).toBe(
-      false,
-    );
-  });
-
-  it('the health wait does not block GatherMaterial or ReturnToKingdom', () => {
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-    vi.mocked(getMaterialQuantity).mockReturnValue(2);
-    const node = buildNode('Grove');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'wood' as MaterialId,
-    ]);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(
-      isClauseSatisfiable(
-        buildClause({
-          type: 'GatherMaterial',
-          materialId: 'wood' as MaterialId,
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(true);
-    expect(isClauseSatisfiable(buildClause({ type: 'ReturnToKingdom' }))).toBe(
-      true,
-    );
-  });
-
-  it('a healthy party is unaffected by the wait-for-health setting', () => {
-    const node = buildNode('Anywhere');
-    vi.mocked(worldNodesOfType).mockReturnValue([node]);
-    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-      MISSING_REWARD,
-    ]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 1, max: 1 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
-
-    expect(
-      isClauseSatisfiable(buildClause({ type: 'FinishUnfinishedAreas' })),
-    ).toBe(true);
-  });
-});
-
-describe('pickTopPriorityClause', () => {
-  it('returns the first satisfiable clause in priority order', () => {
-    vi.mocked(isPlayerAtHome).mockReturnValue(true); // ReturnToKingdom unsatisfiable
-
-    const clauses = [
-      buildClause({ id: 'a' as DecreeClauseId, type: 'ReturnToKingdom' }),
-      buildClause({ id: 'b' as DecreeClauseId, type: 'FinishUnfinishedAreas' }),
-    ];
-    vi.mocked(worldNodesOfType).mockReturnValue([buildNode('Somewhere')]);
-    vi.mocked(worldNodeObtainableMissingRewards).mockReturnValue([
-      MISSING_REWARD,
-    ]);
-    vi.mocked(worldNodeEncounter).mockReturnValue({
-      levelRange: { min: 1, max: 1 },
-    } as EncounterContent);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(pickTopPriorityClause(clauses)?.id).toBe('b');
-  });
-
-  it('returns undefined when nothing is satisfiable', () => {
-    vi.mocked(isPlayerAtHome).mockReturnValue(true);
-
-    expect(
-      pickTopPriorityClause([buildClause({ type: 'ReturnToKingdom' })]),
-    ).toBeUndefined();
+    expect(nearestGatherNodeFor(wood)).toEqual(nodes['Grove']);
+    expect(nearestGatherNodeFor(bone)).toBeUndefined();
   });
 });
 
 describe('clauseTargetNode', () => {
-  it('has no node target for ReturnToKingdom', () => {
-    expect(
-      clauseTargetNode(buildClause({ type: 'ReturnToKingdom' })),
-    ).toBeUndefined();
-  });
+  const gatherAt = (nodeName?: string) =>
+    decreeClause({
+      type: 'GatherMaterial',
+      materialId: wood,
+      nodeName,
+      targetQuantity: 10,
+    });
 
-  it('FarmNode targets its stored node when reachable', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBe(node);
-  });
-
-  it('FarmNode has no target when its node no longer exists', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Gone',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBeUndefined();
-  });
-
-  it('FarmNode has no target when its node is unreachable', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue(undefined);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBeUndefined();
-  });
-
-  it('FarmNode has no target when its node is hidden and undiscovered', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 10,
-        }),
-      ),
-    ).toBeUndefined();
-  });
-});
-
-describe('clauseTargetNode - FarmNode on a mystical node', () => {
-  const clause = buildClause({
-    type: 'FarmNode',
-    nodeName: 'Mystical Shrine',
-    reward: { itemId: 'bone' as ItemId },
-    targetQuantity: 10,
-  });
-
-  beforeEach(() => {
-    vi.mocked(worldNodeByName).mockReturnValue(buildNode('Mystical Shrine'));
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(worldNodeEncounterRandom).mockReturnValue(
-      {} as EncounterRandomContent,
-    );
-  });
-
-  it('targets the node while it is active', () => {
-    vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
-
-    expect(clauseTargetNode(clause)?.nodeName).toBe('Mystical Shrine');
-    expect(isClauseSatisfiable(clause)).toBe(true);
-  });
-
-  it('has no target while it is inactive, so the clause is skipped', () => {
-    vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(false);
-
-    expect(clauseTargetNode(clause)).toBeUndefined();
-    expect(isClauseSatisfiable(clause)).toBe(false);
-  });
-});
-
-describe('clauseTargetNode - DefendTowns', () => {
-  function buildTown(overrides: Partial<TownContent> = {}): TownContent {
-    return {
-      id: 'larsia' as TownId,
-      name: 'Larsia',
-      defense: { assaulter: { level: { min: 20, max: 25 } } },
-      ...overrides,
-    } as TownContent;
-  }
-
-  it('targets the fixed town when telegraphed, reachable, and within risk tolerance', () => {
-    const node = buildNode('Larsia');
-    vi.mocked(telegraphedRaidTownIds).mockReturnValue(['larsia' as TownId]);
-    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(partyMinLevel).mockReturnValue(25); // clears the assaulter's max (25) outright - Low risk
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'DefendTowns',
-          riskTolerance: 'Low',
-          townName: 'Larsia',
-        }),
-      ),
-    ).toBe(node);
-  });
-
-  it('has no target for a fixed town that is not currently telegraphing a raid', () => {
-    vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'DefendTowns',
-          riskTolerance: 'High',
-          townName: 'Larsia',
-        }),
-      ),
-    ).toBeUndefined();
-  });
-
-  it('has no target for a fixed town outside the risk tolerance', () => {
-    vi.mocked(telegraphedRaidTownIds).mockReturnValue(['larsia' as TownId]);
-    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    vi.mocked(partyMinLevel).mockReturnValue(1); // 19+ levels below the assaulter floor
-
-    expect(
-      clauseTargetNode(
-        buildClause({
-          type: 'DefendTowns',
-          riskTolerance: 'High',
-          townName: 'Larsia',
-        }),
-      ),
-    ).toBeUndefined();
-  });
-
-  it('picks the nearest reachable telegraphed town when untargeted', () => {
-    const near = buildTown({ id: 'near' as TownId, name: 'Near' });
-    const far = buildTown({ id: 'far' as TownId, name: 'Far' });
-    const nearNode = buildNode('Near');
-    const farNode = buildNode('Far');
-
-    vi.mocked(telegraphedRaidTownIds).mockReturnValue([
-      'near' as TownId,
-      'far' as TownId,
+  it('targets a GatherMaterial clause’s pinned node, whatever it yields', () => {
+    const nodes = seedDecreeWorld([
+      { content: grove('Quarry', [stone]), steps: 2 },
+      { content: grove('Grove', [wood]), steps: 1 },
     ]);
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === 'near' ? near : far) as never,
-    );
-    vi.mocked(worldNodeByName).mockImplementation((name) =>
-      name === 'Near' ? nearNode : farNode,
-    );
-    vi.mocked(partyMinLevel).mockReturnValue(25); // clears the assaulter's max (25) outright - Low risk
-    vi.mocked(travelPathTo).mockImplementation((name) =>
-      name === 'Near' ? [{} as never] : [{} as never, {} as never],
-    );
 
-    expect(
-      clauseTargetNode(
-        buildClause({ type: 'DefendTowns', riskTolerance: 'Low' }),
-      ),
-    ).toBe(nearNode);
+    expect(clauseTargetNode(gatherAt('Quarry'))).toEqual(nodes['Quarry']);
   });
 
-  it('has no target when nothing is telegraphed', () => {
-    vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
+  it('falls back to the nearest node for a GatherMaterial clause saved without a pinned node', () => {
+    const nodes = seedDecreeWorld([
+      { content: grove('Grove', [wood]), steps: 1 },
+    ]);
 
-    expect(
-      clauseTargetNode(
-        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
-      ),
-    ).toBeUndefined();
-  });
-});
-
-describe('isClauseSatisfiable/isClauseBlockedOnlyByHealth - DefendTowns', () => {
-  function buildTown(): TownContent {
-    return {
-      id: 'larsia' as TownId,
-      name: 'Larsia',
-      defense: { assaulter: { level: { min: 1, max: 1 } } },
-    } as TownContent;
-  }
-
-  beforeEach(() => {
-    vi.mocked(telegraphedRaidTownIds).mockReturnValue(['larsia' as TownId]);
-    vi.mocked(getEntry).mockReturnValue(buildTown() as never);
-    vi.mocked(worldNodeByName).mockReturnValue(buildNode('Larsia'));
-    vi.mocked(travelPathTo).mockReturnValue([]);
+    expect(clauseTargetNode(gatherAt())).toEqual(nodes['Grove']);
   });
 
-  it('is satisfiable when a telegraphed town is reachable and the party is healthy', () => {
-    expect(
-      isClauseSatisfiable(
-        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
-      ),
-    ).toBe(true);
+  it('has no target for a pinned node that is gone, unreachable, or hidden', () => {
+    seedDecreeWorld([
+      { content: grove('Unreachable', [wood]) },
+      { content: grove('Hidden', [wood], { hidden: true }), steps: 1 },
+    ]);
+
+    for (const name of ['Gone', 'Unreachable', 'Hidden']) {
+      expect(clauseTargetNode(gatherAt(name))).toBeUndefined();
+      expect(clauseTargetNode(farm(name))).toBeUndefined();
+    }
   });
 
-  it('is blocked while waiting for full health', () => {
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+  it('targets a FarmNode clause’s node', () => {
+    const nodes = seedDecreeWorld([
+      {
+        content: explore('Forest Ruins', 1, 1, { completionRewards: [] }),
+        steps: 1,
+      },
+    ]);
 
-    expect(
-      isClauseSatisfiable(
-        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
-      ),
-    ).toBe(false);
-    expect(
-      isClauseBlockedOnlyByHealth(
-        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
-      ),
-    ).toBe(true);
+    expect(clauseTargetNode(farm())).toEqual(nodes['Forest Ruins']);
   });
 
-  it('is unsatisfiable when nothing is telegraphed', () => {
-    vi.mocked(telegraphedRaidTownIds).mockReturnValue([]);
+  it('targets a mystical FarmNode only while its fights are up', () => {
+    const places = [{ content: mystical('Forest Ruins', 1), steps: 1 }];
 
-    expect(
-      isClauseSatisfiable(
-        buildClause({ type: 'DefendTowns', riskTolerance: 'High' }),
-      ),
-    ).toBe(false);
-  });
-});
+    const nodes = seedDecreeWorld(places, mysticalUp('Forest Ruins'));
+    expect(clauseTargetNode(farm())).toEqual(nodes['Forest Ruins']);
+    expect(isClauseSatisfiable(farm())).toBe(true);
 
-describe('isClauseSatisfiable - FarmNode', () => {
-  it('is satisfiable when the reward is short of target and the node is reachable', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(2);
-
-    expect(
-      isClauseSatisfiable(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(true);
+    seedDecreeWorld(places, mysticalUp('Forest Ruins', true));
+    expect(clauseTargetNode(farm())).toBeUndefined();
+    expect(isClauseSatisfiable(farm())).toBe(false);
   });
 
-  it('is unsatisfiable once the target quantity is already met', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(5);
+  it('has no node target for ReturnToKingdom', () => {
+    seedDecreeWorld([{ name: 'Kingdom', type: 'Kingdom', steps: 1 }]);
 
-    expect(
-      isClauseSatisfiable(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(false);
+    expect(clauseTargetNode(goHome)).toBeUndefined();
   });
 
-  it('is blocked while waiting for full health', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+  describe('DefendTowns', () => {
+    const defend = (riskTolerance: 'Low' | 'High', townName?: string) =>
+      decreeClause({ type: 'DefendTowns', riskTolerance, townName });
 
-    expect(
-      isClauseSatisfiable(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(false);
+    it('targets a named town while it is raided, reachable and within the risk tolerance', () => {
+      const places = [{ content: town('Larsia', 20, 25), steps: 1 }];
+
+      const nodes = seedDecreeWorld(
+        places,
+        withEdits(raidOn('Larsia'), partyAt(25)),
+      );
+      expect(clauseTargetNode(defend('Low', 'Larsia'))).toEqual(
+        nodes['Larsia'],
+      );
+
+      seedDecreeWorld(places, partyAt(25));
+      expect(clauseTargetNode(defend('Low', 'Larsia'))).toBeUndefined();
+
+      seedDecreeWorld(places, withEdits(raidOn('Larsia'), partyAt(1)));
+      expect(clauseTargetNode(defend('High', 'Larsia'))).toBeUndefined();
+
+      seedDecreeWorld(
+        [{ content: town('Larsia', 20, 25) }],
+        withEdits(raidOn('Larsia'), partyAt(25)),
+      );
+      expect(clauseTargetNode(defend('Low', 'Larsia'))).toBeUndefined();
+    });
+
+    it('otherwise picks the nearest reachable raided town within the risk tolerance', () => {
+      const nodes = seedDecreeWorld(
+        [
+          { content: town('Far', 20, 25), steps: 2 },
+          { content: town('Near', 20, 25), steps: 1 },
+          { content: town('Nearest', 20, 25) },
+          { content: town('Risky', 26), steps: 1 },
+          { content: town('Calm', 20, 25), steps: 1 },
+          {
+            content: town('Hidden', 20, 25, { hidden: true }),
+            steps: 0,
+          },
+        ],
+        withEdits(
+          raidOn('Far', 'Near', 'Nearest', 'Risky', 'Hidden'),
+          partyAt(25),
+        ),
+      );
+
+      expect(clauseTargetNode(defend('Low'))).toEqual(nodes['Near']);
+    });
+
+    it('has no target with no raid anywhere', () => {
+      seedDecreeWorld([{ content: town('Larsia', 1), steps: 1 }]);
+
+      expect(clauseTargetNode(defend('High'))).toBeUndefined();
+    });
   });
 });
 
-describe('isClauseBlockedOnlyByHealth - FarmNode', () => {
-  it('is true when short of target, reachable, and only blocked by health', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-
-    expect(
-      isClauseBlockedOnlyByHealth(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(true);
-  });
-
-  it('is false once the target quantity is already met', () => {
-    const node = buildNode('Forest Ruins');
-    vi.mocked(worldNodeByName).mockReturnValue(node);
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(5);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-
-    expect(
-      isClauseBlockedOnlyByHealth(
-        buildClause({
-          type: 'FarmNode',
-          nodeName: 'Forest Ruins',
-          reward: { itemId: 'bone' as ItemId },
-          targetQuantity: 5,
-        }),
-      ),
-    ).toBe(false);
-  });
-});
-
-describe('pickTopPriorityClause - health gate', () => {
-  const farmClause = buildClause({
-    id: 'farm' as DecreeClauseId,
-    type: 'FarmNode',
-    nodeName: 'Forest Ruins',
-    reward: { itemId: 'bone' as ItemId },
+describe('isClauseSatisfiable', () => {
+  const gather = decreeClause({
+    type: 'GatherMaterial',
+    materialId: wood,
     targetQuantity: 5,
   });
-  const gatherClause = buildClause({
-    id: 'gather' as DecreeClauseId,
-    type: 'GatherMaterial',
-    materialId: 'copper-ore' as MaterialId,
-    nodeName: 'Forest Ruins',
-    targetQuantity: 50,
+  const grovePlaces = [{ content: grove('Grove', [wood]), steps: 1 }];
+  const ruinsPlaces = [
+    { content: explore('Forest Ruins', 10), steps: 1 },
+    { content: town('Larsia', 1), steps: 1 },
+    { name: 'Kingdom', type: 'Kingdom' as const, steps: 1 },
+  ];
+  const fighting = [
+    finish,
+    levelUp,
+    farm(),
+    decreeClause({ type: 'DefendTowns', riskTolerance: 'High' }),
+  ];
+
+  it('is false for a disabled clause', () => {
+    seedDecreeWorld(grovePlaces);
+
+    expect(isClauseSatisfiable({ ...gather, enabled: false })).toBe(false);
+    expect(isClauseSatisfiable(gather)).toBe(true);
   });
 
-  beforeEach(() => {
-    vi.mocked(worldNodeByName).mockReturnValue(buildNode('Forest Ruins'));
-    vi.mocked(travelPathTo).mockReturnValue([]);
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(0);
-    vi.mocked(getMaterialQuantity).mockReturnValue(0);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
+  it('gathers until stock reaches the target', () => {
+    seedDecreeWorld(grovePlaces, stocked(wood, 4));
+    expect(isClauseSatisfiable(gather)).toBe(true);
+
+    seedDecreeWorld(grovePlaces, stocked(wood, 5));
+    expect(isClauseSatisfiable(gather)).toBe(false);
+
+    seedDecreeWorld([{ content: grove('Grove', [wood]) }]);
+    expect(isClauseSatisfiable(gather)).toBe(false);
   });
 
-  it('keeps a health-blocked clause ahead of a satisfiable lower one', () => {
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
+  it('farms until the reward reaches the target', () => {
+    seedDecreeWorld(ruinsPlaces, stocked(bone, 4));
+    expect(isClauseSatisfiable(farm())).toBe(true);
 
-    expect(pickTopPriorityClause([farmClause, gatherClause])?.id).toBe('farm');
+    seedDecreeWorld(ruinsPlaces, stocked(bone, 5));
+    expect(isClauseSatisfiable(farm())).toBe(false);
   });
 
-  it('skips a clause that is unsatisfiable for reasons other than health', () => {
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-    vi.mocked(farmNodeRewardQuantity).mockReturnValue(5);
+  it('levels the party until the weakest hero hits the level cap', () => {
+    const places = [
+      { content: explore('Peak', CHARACTER_MAX_LEVEL), steps: 1 },
+    ];
 
-    expect(pickTopPriorityClause([farmClause, gatherClause])?.id).toBe(
-      'gather',
+    seedDecreeWorld(
+      places,
+      partyAt(CHARACTER_MAX_LEVEL - 1, CHARACTER_MAX_LEVEL),
     );
+    expect(isClauseSatisfiable(levelUp)).toBe(true);
+
+    seedDecreeWorld(places, partyAt(CHARACTER_MAX_LEVEL));
+    expect(isClauseSatisfiable(levelUp)).toBe(false);
+  });
+
+  it('returns home only while away from it', () => {
+    const places = [
+      { name: 'Kingdom', type: 'Kingdom' as const },
+      { name: 'Field', type: 'ExploreNode' as const },
+    ];
+
+    seedDecreeWorld(places, standingAt('Field'));
+    expect(isClauseSatisfiable(goHome)).toBe(true);
+
+    seedDecreeWorld(places, standingAt('Kingdom'));
+    expect(isClauseSatisfiable(goHome)).toBe(false);
+  });
+
+  it('holds back every fighting clause, and only those, while waiting to heal', () => {
+    seedDecreeWorld(
+      [...ruinsPlaces, ...grovePlaces],
+      withEdits(raidOn('Larsia'), hurtAndWaiting),
+    );
+
+    fighting.forEach((c) => {
+      expect(isClauseSatisfiable(c)).toBe(false);
+      expect(isClauseBlockedOnlyByHealth(c)).toBe(true);
+    });
+    [gather, goHome].forEach((c) => {
+      expect(isClauseSatisfiable(c)).toBe(true);
+      expect(isClauseBlockedOnlyByHealth(c)).toBe(false);
+    });
+    expect(isClauseBlockedOnlyByHealth({ ...finish, enabled: false })).toBe(
+      false,
+    );
+  });
+
+  it('waits on energy the same way', () => {
+    seedDecreeWorld(ruinsPlaces, (state) => {
+      state.world.party = [{ ...buildCharacter({ level: 10 }), ep: 0 }];
+      state.world.autoMode.waitForFullEnergyBeforeCombat = true;
+    });
+
+    expect(isClauseSatisfiable(finish)).toBe(false);
+    expect(isClauseBlockedOnlyByHealth(finish)).toBe(true);
+  });
+
+  it('ignores an unhealthy party when not set to wait, and the setting for a healthy party', () => {
+    seedDecreeWorld(ruinsPlaces, (state) => {
+      state.world.party = [{ ...buildCharacter({ level: 10 }), hp: 0, ep: 0 }];
+    });
+    expect(isClauseSatisfiable(finish)).toBe(true);
+    expect(isClauseBlockedOnlyByHealth(finish)).toBe(false);
+
+    seedDecreeWorld(ruinsPlaces, (state) => {
+      state.world.autoMode.waitForFullHealthBeforeCombat = true;
+      state.world.autoMode.waitForFullEnergyBeforeCombat = true;
+    });
+    expect(isClauseSatisfiable(finish)).toBe(true);
+  });
+
+  it('is not merely waiting to heal when there is nothing to do anyway', () => {
+    seedDecreeWorld(
+      [{ content: town('Larsia', 1), steps: 1 }],
+      withEdits(hurtAndWaiting, stocked(bone, 5)),
+    );
+
+    fighting.forEach((c) => expect(isClauseBlockedOnlyByHealth(c)).toBe(false));
+  });
+
+  it('is not merely waiting to heal once the party is at the level cap', () => {
+    seedDecreeWorld(
+      [{ content: explore('Peak', CHARACTER_MAX_LEVEL), steps: 1 }],
+      withEdits(partyAt(CHARACTER_MAX_LEVEL), hurtAndWaiting),
+    );
+
+    expect(isClauseBlockedOnlyByHealth(levelUp)).toBe(false);
+  });
+});
+
+describe('pickTopPriorityClause', () => {
+  const gather = decreeClause(
+    {
+      type: 'GatherMaterial',
+      materialId: wood,
+      nodeName: 'Grove',
+      targetQuantity: 50,
+    },
+    { id: 'gather' as DecreeClauseId },
+  );
+  const farmFirst = { ...farm(), id: 'farm' as DecreeClauseId };
+  const places = [
+    { content: explore('Forest Ruins', 10), steps: 1 },
+    { content: grove('Grove', [wood]), steps: 1 },
+    { name: 'Kingdom', type: 'Kingdom' as const },
+  ];
+
+  it('returns the first satisfiable clause in priority order', () => {
+    seedDecreeWorld(places, standingAt('Kingdom'));
+
+    expect(pickTopPriorityClause([goHome, gather])?.id).toBe('gather');
+    expect(pickTopPriorityClause([goHome])).toBeUndefined();
+  });
+
+  it('keeps a clause waiting to heal ahead of a satisfiable lower one', () => {
+    seedDecreeWorld(places, hurtAndWaiting);
+    expect(pickTopPriorityClause([farmFirst, gather])?.id).toBe('farm');
+
+    seedDecreeWorld(places, withEdits(hurtAndWaiting, stocked(bone, 5)));
+    expect(pickTopPriorityClause([farmFirst, gather])?.id).toBe('gather');
   });
 });

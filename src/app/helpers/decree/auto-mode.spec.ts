@@ -1,1135 +1,645 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
+vi.mock('@helpers/decree/decree-route');
+vi.mock('@helpers/hero/travel');
+vi.mock('@helpers/town/raid/town-raid-combat');
 
-vi.mock('@helpers/decree/decree', () => ({
-  decreeClauses: vi.fn(() => []),
-  decreeWaitForFullHealthBeforeCombat: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/decree/decree-evaluation', () => ({
-  clauseTargetNode: vi.fn(),
-  clauseTravelNode: vi.fn(),
-  decreeTravelHopTo: vi.fn(),
-  isClauseSatisfiable: vi.fn(() => true),
-  pickTopPriorityClause: vi.fn(),
-}));
-
-vi.mock('@helpers/item/gathering', () => ({
-  gatheringStop: vi.fn(),
-  isGathering: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/hero/global-effects', () => ({
-  addGlobalEffect: vi.fn(),
-  isGlobalEffectActive: vi.fn(() => false),
-  removeGlobalEffect: vi.fn(),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  getMaterialQuantity: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/hero/party', () => ({
-  isPartyAtFullHealth: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldAutoModeState: () => gamestate().world.autoMode,
-    worldGatheringState: () => gamestate().world.gathering,
-    worldTravelState: () => gamestate().world.travel,
-    worldCombatState: vi.fn(() => undefined),
-  };
-});
-
-vi.mock('@helpers/hero/travel', () => ({
-  travelStart: vi.fn(),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-combat', () => ({
-  raidEngageCombat: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/town/town-spawn', () => ({
-  homeNodeGet: vi.fn(() => undefined),
-  isPlayerAtHome: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/world', () => ({
-  worldNodeAtCurrentLocation: vi.fn(() => undefined),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering-discovery', () => ({
-  worldNodeGatherMaterialIds: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeTown: vi.fn(() => undefined),
-}));
-
-import { getEntry } from '@helpers/content/content';
-import { timerTicksElapsed } from '@helpers/engine/timer';
+import { DECREE_PRIORITY_RECHECK_INTERVAL_TICKS } from '@helpers/config';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
-import {
-  decreeClauses,
-  decreeWaitForFullHealthBeforeCombat,
-} from '@helpers/decree/decree';
-import {
-  clauseTargetNode,
-  clauseTravelNode,
-  decreeTravelHopTo,
-  isClauseSatisfiable,
-  pickTopPriorityClause,
-} from '@helpers/decree/decree-evaluation';
-import {
-  addGlobalEffect,
-  isGlobalEffectActive,
-  removeGlobalEffect,
-} from '@helpers/hero/global-effects';
-import { isPartyAtFullHealth } from '@helpers/hero/party';
+import { isGlobalEffectActive } from '@helpers/hero/global-effects';
+import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { travelStart } from '@helpers/hero/travel';
-import { gatheringStop, isGathering } from '@helpers/item/gathering';
-import { getMaterialQuantity } from '@helpers/item/materials';
-import {
-  gamestate,
-  updateGamestate,
-  worldCombatState,
-} from '@helpers/state-game';
+import { applyMaterialDelta } from '@helpers/item/materials';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
-import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import {
-  worldNodeByName,
-  worldNodeTown,
-} from '@helpers/world-node/world-nodes';
 import type {
   DecreeClause,
   DecreeClauseId,
   GameState,
-  ItemContent,
+  GatheringId,
+  GlobalEffectId,
   ItemId,
-  MaterialId,
-  TownContent,
-  TownId,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildCombat } from '@/testing/builders';
+import {
+  decreeClause,
+  explore,
+  grove,
+  hurtAndWaiting,
+  raidOn,
+  seedDecreeWorld,
+  setDecreeRoute,
+  standingAt,
+  stocked,
+  town,
+  townIdOf,
+  useStubDecreeRoutes,
+  withEdits,
+} from '@/testing/decree';
+import { inTick } from '@/testing/gamestate';
 
-function buildClause(overrides: Partial<DecreeClause> = {}): DecreeClause {
-  return {
-    id: 'clause-1' as DecreeClauseId,
-    type: 'FinishUnfinishedAreas',
-    enabled: true,
-    failureCount: 0,
-    riskTolerance: 'Medium',
-    ...overrides,
-  } as DecreeClause;
-}
+useStubDecreeRoutes();
 
-function buildState(overrides: {
-  enabled?: boolean;
-  clauses?: DecreeClause[];
-  activeClauseId?: DecreeClauseId;
-  travelStatus?: 'Idle' | 'Traveling';
-  travelDestinationNodeName?: string;
-  gatheringStatus?: 'Idle' | 'Gathering';
-  gatheringNodeName?: string;
-}): GameState {
-  return {
-    world: {
-      travel: {
-        status: overrides.travelStatus ?? 'Idle',
-        destinationNodeName: overrides.travelDestinationNodeName,
-        path: [],
-        ticksIntoStep: 0,
-      },
-      gathering: {
-        status: overrides.gatheringStatus ?? 'Idle',
-        ticksIntoGather: 0,
-        nodeName: overrides.gatheringNodeName,
-      },
-      autoMode: {
-        enabled: overrides.enabled ?? true,
-        clauses: overrides.clauses ?? [],
-        activeClauseId: overrides.activeClauseId,
-        nodeFailureCounts: {},
-      },
+const wood = 'wood' as ItemId;
+const stick = 'stick' as ItemId;
+const ore = 'copper-ore' as ItemId;
+const bone = 'bone' as ItemId;
+
+// Looked up by name, so the stored id differs on purpose.
+const autoModeEffect = ensureGlobalEffect({
+  id: 'auto-mode-effect' as GlobalEffectId,
+  name: 'Auto Mode',
+});
+
+type Place = Parameters<typeof seedDecreeWorld>[0][number];
+
+const world: Place[] = [
+  { name: 'Kingdom', type: 'Kingdom', steps: 9 },
+  { content: explore('Old Ruins', 10), steps: 2 },
+  {
+    content: explore('Jelly Fields', 10, 10, { completionRewards: [] }),
+    steps: 3,
+  },
+  { content: grove('Wergen Woods', [wood, stick]), steps: 1 },
+  { content: grove('Copper Mines', [ore]), steps: 4 },
+  { content: town('Larsia', 1), steps: 5 },
+  { content: town('Vesper', 1) },
+  { content: grove('Deep Mine', [ore]) },
+];
+
+const gatherWood = decreeClause(
+  { type: 'GatherMaterial', materialId: wood, targetQuantity: 50 },
+  { id: 'wood' as DecreeClauseId },
+);
+const gatherStick = decreeClause(
+  { type: 'GatherMaterial', materialId: stick, targetQuantity: 50 },
+  { id: 'stick' as DecreeClauseId },
+);
+const gatherOre = decreeClause(
+  { type: 'GatherMaterial', materialId: ore, targetQuantity: 30 },
+  { id: 'ore' as DecreeClauseId },
+);
+const farm = (nodeName: string) =>
+  decreeClause(
+    {
+      type: 'FarmNode',
+      nodeName,
+      reward: { itemId: bone },
+      targetQuantity: 10,
     },
-  } as unknown as GameState;
+    { id: 'farm' as DecreeClauseId },
+  );
+const farmJelly = farm('Jelly Fields');
+const finishAreas = decreeClause(
+  { type: 'FinishUnfinishedAreas', riskTolerance: 'High' },
+  { id: 'finish' as DecreeClauseId },
+);
+const defendTowns = decreeClause(
+  { type: 'DefendTowns', riskTolerance: 'High' },
+  { id: 'defend' as DecreeClauseId },
+);
+
+const atTick = (numTicks: number) => (state: GameState) =>
+  (state.clock.numTicks = numTicks);
+
+// Off the recheck interval, so a first tick only reacts to the decree edit it sees.
+const offInterval = atTick(1);
+
+function seedAutoMode(
+  clauses: DecreeClause[],
+  {
+    active,
+    gatheringAt,
+    travelingTo,
+    edit,
+    places = world,
+  }: {
+    active?: DecreeClause;
+    gatheringAt?: string;
+    travelingTo?: string;
+    edit?: (state: GameState) => void;
+    places?: Place[];
+  } = {},
+): void {
+  seedDecreeWorld(
+    places,
+    (state) => {
+      offInterval(state);
+      state.world.autoMode.enabled = true;
+      state.world.autoMode.clauses = clauses;
+      state.world.autoMode.activeClauseId = active?.id;
+      if (gatheringAt) {
+        state.world.gathering = {
+          status: 'Gathering',
+          nodeName: gatheringAt,
+          gatheringId: gatheringAt as GatheringId,
+          ticksIntoGather: 0,
+        };
+      }
+      if (travelingTo) {
+        state.world.travel = {
+          status: 'Traveling',
+          destinationNodeName: travelingTo,
+          path: [],
+          ticksIntoStep: 0,
+        };
+      }
+      edit?.(state);
+    },
+    [autoModeEffect],
+  );
 }
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+const tick = () => inTick(() => autoModeProcessTick());
+const autoMode = () => gamestate().world.autoMode;
+const gathering = () => gamestate().world.gathering;
+
+// Changes state without replacing the clause list, so the tick doesn't see a decree edit.
+function nudge(edit: (state: GameState) => void): void {
+  inTick(() =>
+    updateGamestate((state) => {
+      edit(state);
+      return state;
+    }),
+  );
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(clauseTravelNode).mockImplementation((clause) =>
-    clause.type === 'ReturnToKingdom'
-      ? homeNodeGet()
-      : clauseTargetNode(clause),
-  );
-  vi.mocked(decreeTravelHopTo).mockImplementation((target) => target);
-  vi.mocked(worldCombatState).mockReturnValue(undefined);
-  vi.mocked(isGathering).mockReturnValue(false);
-  vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-  vi.mocked(isPlayerAtHome).mockReturnValue(false);
-  vi.mocked(homeNodeGet).mockReturnValue(undefined);
-  vi.mocked(pickTopPriorityClause).mockReturnValue(undefined);
-  vi.mocked(isClauseSatisfiable).mockReturnValue(true);
-  vi.mocked(worldNodeByName).mockReturnValue(undefined);
-  vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([]);
-  vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(false);
-  vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
-  vi.mocked(raidEngageCombat).mockReturnValue(false);
-  vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
-  vi.mocked(worldNodeTown).mockReturnValue(undefined);
-  vi.mocked(clauseTargetNode).mockReturnValue(undefined);
-  vi.mocked(timerTicksElapsed).mockReturnValue(0);
+  vi.mocked(travelStart).mockClear();
+  vi.mocked(raidEngageCombat).mockReset();
 });
 
-describe('autoModeProcessTick', () => {
-  it('does nothing when disabled beyond removing a stale effect', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: false }));
-    vi.mocked(isGlobalEffectActive).mockReturnValue(true);
-    vi.mocked(getEntry).mockReturnValue({
-      id: 'auto-mode-effect',
-    } as ItemContent);
+describe('the Auto Mode global effect', () => {
+  it('is granted once enabled and kept without stacking', () => {
+    seedAutoMode([]);
 
-    autoModeProcessTick();
+    tick();
+    tick();
 
-    expect(removeGlobalEffect).toHaveBeenCalledWith('auto-mode-effect');
-    expect(travelStart).not.toHaveBeenCalled();
-    expect(gatheringStop).not.toHaveBeenCalled();
-  });
-
-  it('grants the Auto Mode effect once when first enabled', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(isGlobalEffectActive).mockReturnValue(false);
-
-    autoModeProcessTick();
-
-    expect(addGlobalEffect).toHaveBeenCalledWith(
-      'Auto Mode',
-      expect.any(Number),
+    expect(isGlobalEffectActive(autoModeEffect.name as GlobalEffectId)).toBe(
+      true,
     );
+    expect(gamestate().globalEffects).toHaveLength(1);
   });
 
-  it('does not re-grant the effect on every tick once active', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(isGlobalEffectActive).mockReturnValue(true);
-
-    autoModeProcessTick();
-
-    expect(addGlobalEffect).not.toHaveBeenCalled();
-  });
-
-  it('does not act while the party is mid-combat', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(worldCombatState).mockReturnValue(
-      {} as ReturnType<typeof worldCombatState>,
-    );
-
-    autoModeProcessTick();
-
-    expect(travelStart).not.toHaveBeenCalled();
-  });
-
-  it('travels to the picked clause target when idle', () => {
-    const clause = buildClause({ type: 'FinishUnfinishedAreas' });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ enabled: true, clauses: [clause] }),
-    );
-    vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Old Ruins',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(travelStart).toHaveBeenCalledWith('Old Ruins', true);
-  });
-
-  it('travels to the gateway node when the target is walled in behind it', () => {
-    const clause = buildClause({ type: 'FinishUnfinishedAreas' });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ enabled: true, clauses: [clause] }),
-    );
-    vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Spider Tower',
-    } as WorldNodeEntry);
-    vi.mocked(clauseTravelNode).mockReturnValue({
-      nodeName: 'Slimed Waystation',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(travelStart).toHaveBeenCalledWith('Slimed Waystation', true);
-  });
-
-  it('engages the raid instead of re-dispatching travel when idle at the DefendTowns target', () => {
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'DefendTowns',
-      riskTolerance: 'High',
+  it('is removed once disabled, with nothing else done', () => {
+    seedAutoMode([finishAreas], {
+      gatheringAt: 'Wergen Woods',
+      edit: (state) => {
+        state.world.autoMode.enabled = false;
+        applyGlobalEffectAdd(state, autoModeEffect.id, 100, 0);
+      },
     });
-    const town = { id: 'larsia' as TownId, name: 'Larsia' } as TownContent;
-    const node = { nodeName: 'Larsia' } as WorldNodeEntry;
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-      }),
-    );
-    vi.mocked(clauseTargetNode).mockReturnValue(node);
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(node);
-    vi.mocked(worldNodeTown).mockReturnValue(town);
+
+    tick();
+
+    expect(gamestate().globalEffects).toEqual([]);
+    expect(gathering().status).toBe('Gathering');
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+});
+
+describe('picking a clause while idle', () => {
+  it('travels to the top clause’s target and tracks it as active', () => {
+    seedAutoMode([gatherOre, finishAreas], {
+      edit: stocked(ore, gatherOre.targetQuantity),
+    });
+
+    tick();
+
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Old Ruins', true);
+    expect(autoMode().activeClauseId).toBe(finishAreas.id);
+  });
+
+  it('heads for the gateway of a target walled in behind it', () => {
+    seedAutoMode([finishAreas], {
+      places: [
+        { content: explore('Spider Tower', 10), steps: 3, via: 'Waystation' },
+        { content: explore('Waystation', 10, 10, { completionRewards: [] }) },
+      ],
+    });
+
+    tick();
+
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Waystation', true);
+  });
+
+  it('does nothing mid-combat', () => {
+    seedAutoMode([finishAreas], {
+      edit: (state) => (state.world.combat = buildCombat()),
+    });
+
+    tick();
+
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('heads home when nothing is left to do, unless already there', () => {
+    seedAutoMode([gatherOre], { edit: stocked(ore, gatherOre.targetQuantity) });
+    tick();
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Kingdom', true);
+
+    vi.mocked(travelStart).mockClear();
+    seedAutoMode([gatherOre], {
+      edit: withEdits(
+        stocked(ore, gatherOre.targetQuantity),
+        standingAt('Kingdom'),
+      ),
+    });
+    tick();
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('heads home through the gateway it is walled in behind', () => {
+    seedAutoMode([], {
+      places: [
+        { name: 'Kingdom', type: 'Kingdom', steps: 3, via: 'Waystation' },
+        { content: explore('Waystation', 10, 10, { completionRewards: [] }) },
+      ],
+    });
+
+    tick();
+
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Waystation', true);
+  });
+
+  it('stays put to heal when the top clause is only waiting on health', () => {
+    seedAutoMode([finishAreas, gatherOre], {
+      active: finishAreas,
+      edit: hurtAndWaiting,
+    });
+
+    tick();
+
+    expect(travelStart).not.toHaveBeenCalled();
+    expect(autoMode().activeClauseId).toBeUndefined();
+  });
+});
+
+describe('DefendTowns', () => {
+  const defendFrom = (nodeName: string, clause: DecreeClause = defendTowns) =>
+    seedAutoMode([clause], {
+      active: clause,
+      edit: withEdits(raidOn('Larsia', 'Vesper'), standingAt(nodeName)),
+    });
+
+  it('engages the raid once standing at the target town', () => {
     vi.mocked(raidEngageCombat).mockReturnValue(true);
+    defendFrom('Larsia');
 
-    autoModeProcessTick();
+    tick();
 
-    expect(raidEngageCombat).toHaveBeenCalledWith('larsia');
+    expect(raidEngageCombat).toHaveBeenCalledExactlyOnceWith(
+      townIdOf('Larsia'),
+    );
     expect(travelStart).not.toHaveBeenCalled();
   });
 
-  it('falls through to normal dispatch when not yet standing at the DefendTowns target', () => {
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'DefendTowns',
-      riskTolerance: 'High',
-    });
-    const node = { nodeName: 'Larsia' } as WorldNodeEntry;
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-      }),
-    );
-    vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
-    vi.mocked(clauseTargetNode).mockReturnValue(node);
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
+  it('travels to the target first, even from another raided town', () => {
+    defendFrom('Vesper');
 
-    autoModeProcessTick();
+    tick();
 
     expect(raidEngageCombat).not.toHaveBeenCalled();
-    expect(travelStart).toHaveBeenCalledWith('Larsia', true);
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Larsia', true);
   });
 
-  it('does not attempt to engage for a non-DefendTowns active clause', () => {
-    const clause = buildClause({
-      id: 'a' as DecreeClauseId,
-      type: 'FinishUnfinishedAreas',
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-      }),
-    );
-    vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
+  it('carries on with normal dispatch when the engage is refused', () => {
+    defendFrom('Larsia');
 
-    autoModeProcessTick();
+    tick();
+
+    expect(raidEngageCombat).toHaveBeenCalled();
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Larsia', true);
+  });
+
+  it('never engages for another clause targeting a raided town', () => {
+    defendFrom('Larsia', farm('Larsia'));
+
+    tick();
 
     expect(raidEngageCombat).not.toHaveBeenCalled();
   });
+});
 
-  it('falls back home when no clause is satisfiable and not already there', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(pickTopPriorityClause).mockReturnValue(undefined);
-    vi.mocked(isPlayerAtHome).mockReturnValue(false);
-    vi.mocked(homeNodeGet).mockReturnValue({
-      nodeName: 'Kingdom',
-    } as WorldNodeEntry);
+describe('gathering for a GatherMaterial clause', () => {
+  it('stops once the target is reached, and only then', () => {
+    seedAutoMode([gatherWood], {
+      active: gatherWood,
+      gatheringAt: 'Wergen Woods',
+      edit: stocked(wood, gatherWood.targetQuantity - 1),
+    });
+    tick();
+    expect(gathering().status).toBe('Gathering');
 
-    autoModeProcessTick();
-
-    expect(travelStart).toHaveBeenCalledWith('Kingdom', true);
+    nudge(stocked(wood, 1));
+    tick();
+    expect(gathering().status).toBe('Idle');
   });
 
-  it('does not travel when the fallback is already satisfied at home', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
-    vi.mocked(pickTopPriorityClause).mockReturnValue(undefined);
-    vi.mocked(isPlayerAtHome).mockReturnValue(true);
+  it('only ends a gather that is actually running', () => {
+    seedAutoMode([gatherWood], {
+      active: gatherWood,
+      travelingTo: 'Wergen Woods',
+      edit: stocked(wood, gatherWood.targetQuantity),
+    });
 
-    autoModeProcessTick();
+    tick();
 
+    expect(autoMode().activeClauseId).toBe(gatherWood.id);
+  });
+
+  it('adopts an untracked gather that an enabled clause wants, so it still stops at the target', () => {
+    seedAutoMode([gatherWood], {
+      gatheringAt: 'Wergen Woods',
+      edit: stocked(wood, gatherWood.targetQuantity - 1),
+    });
+    tick();
+    expect(autoMode().activeClauseId).toBe(gatherWood.id);
+    expect(gathering().status).toBe('Gathering');
+
+    nudge(stocked(wood, 1));
+    tick();
+    expect(gathering().status).toBe('Idle');
+  });
+
+  it('adopts a clause pinned to the node being gathered, but not one pinned elsewhere', () => {
+    const pinned = (nodeName: string) => ({ ...gatherWood, nodeName });
+
+    seedAutoMode([pinned('Wergen Woods')], { gatheringAt: 'Wergen Woods' });
+    tick();
+    expect(autoMode().activeClauseId).toBe(gatherWood.id);
+    expect(gathering().status).toBe('Gathering');
+
+    seedAutoMode([pinned('Other Woods')], { gatheringAt: 'Wergen Woods' });
+    tick();
+    expect(autoMode().activeClauseId).toBeUndefined();
+    expect(gathering().status).toBe('Idle');
+  });
+
+  it('never adopts a clause for a material the node doesn’t yield, even pinned there', () => {
+    seedAutoMode([{ ...gatherOre, nodeName: 'Wergen Woods' }], {
+      gatheringAt: 'Wergen Woods',
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Idle');
+  });
+
+  it('keeps tracking its own clause rather than re-adopting a higher one at the same node', () => {
+    seedAutoMode([gatherWood, gatherStick], {
+      active: gatherStick,
+      gatheringAt: 'Wergen Woods',
+      edit: stocked(wood, gatherWood.targetQuantity),
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Gathering');
+    expect(autoMode().activeClauseId).toBe(gatherStick.id);
+  });
+
+  it('leaves a tracked gather short of its target alone, even while hurt and waiting', () => {
+    seedAutoMode([gatherWood], {
+      active: gatherWood,
+      gatheringAt: 'Wergen Woods',
+      edit: hurtAndWaiting,
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Gathering');
     expect(travelStart).not.toHaveBeenCalled();
   });
+});
 
-  it('stays put instead of falling back home while blocked only by health', () => {
-    const clause = buildClause({ type: 'LevelUpParty' });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ enabled: true, clauses: [clause] }),
-    );
-    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
-    vi.mocked(isClauseSatisfiable).mockReturnValue(false);
-    vi.mocked(isPlayerAtHome).mockReturnValue(false);
+describe('an orphaned gather', () => {
+  it('is stopped when the only clause wanting it is disabled, or none wants it', () => {
+    for (const clauses of [[{ ...gatherWood, enabled: false }], [gatherOre]]) {
+      seedAutoMode(clauses, { gatheringAt: 'Wergen Woods' });
 
-    autoModeProcessTick();
+      tick();
 
-    expect(travelStart).not.toHaveBeenCalled();
-  });
-
-  it('stops gathering once a GatherMaterial target is reached', () => {
-    const clause = buildClause({
-      type: 'GatherMaterial',
-      materialId: 'wood' as MaterialId,
-      targetQuantity: 5,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-        gatheringStatus: 'Gathering',
-      }),
-    );
-    vi.mocked(getMaterialQuantity).mockReturnValue(5);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).toHaveBeenCalled();
-  });
-
-  it('leaves gathering alone while the target is still short', () => {
-    const clause = buildClause({
-      type: 'GatherMaterial',
-      materialId: 'wood' as MaterialId,
-      targetQuantity: 5,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-        gatheringStatus: 'Gathering',
-      }),
-    );
-    vi.mocked(getMaterialQuantity).mockReturnValue(2);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).not.toHaveBeenCalled();
-  });
-
-  it('adopts an in-progress gather that matches an enabled clause, when no clause is currently tracked as active (regression: the party would otherwise gather a matched material forever, past its target, since the stop-check never had a clause to check against)', () => {
-    const clause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 1000,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Carrina Copper Mines',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'copper-ore' as MaterialId,
-    ]);
-
-    autoModeProcessTick();
-
-    // `gamestate()` is a static mock, so adoption and the target-reached stop can't both be observed in one tick - this only proves adoption fires (the first update sets the matched clause active).
-    const firstUpdateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const result = firstUpdateFn(buildState({ activeClauseId: undefined }));
-    expect(result.world.autoMode.activeClauseId).toBe('copper-clause');
-  });
-
-  it('does not adopt a clause pinned to a different location, even if the current node yields the same material', () => {
-    const pinnedElsewhere = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      nodeName: 'Other Copper Mines',
-      targetQuantity: 1000,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [pinnedElsewhere],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Carrina Copper Mines',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'copper-ore' as MaterialId,
-    ]);
-
-    autoModeProcessTick();
-
-    // No matching clause to adopt, so it's treated as orphaned and stopped instead.
-    expect(gatheringStop).toHaveBeenCalled();
-  });
-
-  it('adopts a clause pinned to the exact node currently being gathered', () => {
-    const pinnedHere = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      nodeName: 'Carrina Copper Mines',
-      targetQuantity: 1000,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [pinnedHere],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Carrina Copper Mines',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'copper-ore' as MaterialId,
-    ]);
-
-    autoModeProcessTick();
-
-    const firstUpdateFn = vi.mocked(updateGamestate).mock.calls[0][0];
-    const result = firstUpdateFn(buildState({ activeClauseId: undefined }));
-    expect(result.world.autoMode.activeClauseId).toBe('copper-clause');
-  });
-
-  it('stops an in-progress gather with no matching enabled clause instead of leaving it stuck forever', () => {
-    const disabledClause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 1000,
-      enabled: false,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [disabledClause],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Carrina Copper Mines',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'copper-ore' as MaterialId,
-    ]);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).toHaveBeenCalled();
-  });
-
-  it('breaks off an orphaned gather and heads home when hurt and waiting for full health', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-    vi.mocked(isPlayerAtHome).mockReturnValue(false);
-    vi.mocked(homeNodeGet).mockReturnValue({
-      nodeName: 'Kingdom',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).toHaveBeenCalled();
-    expect(travelStart).toHaveBeenCalledWith('Kingdom', true);
-  });
-
-  it('stops a gather whose active clause was disabled mid-session and moves on to the next enabled clause in the same tick, even though it is still tracked as active and short of its target', () => {
-    const disabledClause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 1000,
-      enabled: false,
-    });
-    const farmClause = buildClause({
-      id: 'jelly-clause' as DecreeClauseId,
-      type: 'FarmNode',
-      nodeName: 'Jelly Fields',
-      reward: { itemId: 'jelly' as ItemId },
-      targetQuantity: 10,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [disabledClause, farmClause],
-        activeClauseId: disabledClause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Carrina Copper Mines',
-      }),
-    );
-    vi.mocked(isGathering).mockImplementation(
-      () => vi.mocked(gatheringStop).mock.calls.length === 0,
-    );
-    vi.mocked(getMaterialQuantity).mockReturnValue(2);
-    vi.mocked(decreeClauses).mockReturnValue([disabledClause, farmClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Jelly Fields',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    // A disabled clause shouldn't keep holding the party at its node.
-    expect(gatheringStop).toHaveBeenCalled();
-    expect(travelStart).toHaveBeenCalledWith('Jelly Fields', true);
-  });
-
-  it('stops an orphaned gather without forcing a trip home when at full health', () => {
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
-
-    autoModeProcessTick();
-
-    // Full health means no reason to route home, but the orphaned gather still ends so per-tick evaluation can take back over.
-    expect(gatheringStop).toHaveBeenCalled();
-  });
-
-  it('actually falls through to evaluating the next clause once an orphaned gather is stopped at full health, rather than just canceling it', () => {
-    const clause = buildClause({ type: 'FinishUnfinishedAreas' });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    // Makes `isGathering` reflect `gatheringStop()` mid-tick, so this proves Auto Mode picks back up afterward (not just that the gather was canceled).
-    vi.mocked(isGathering).mockImplementation(
-      () => vi.mocked(gatheringStop).mock.calls.length === 0,
-    );
-    vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Old Ruins',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).toHaveBeenCalled();
-    expect(travelStart).toHaveBeenCalledWith('Old Ruins', true);
-  });
-
-  it('does not touch a clause-tracked gather that is still short of its target, even when hurt and waiting for full health', () => {
-    const clause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 1000,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Carrina Copper Mines',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(getMaterialQuantity).mockReturnValue(2);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(true);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).not.toHaveBeenCalled();
-    expect(travelStart).not.toHaveBeenCalled();
-  });
-
-  it('leaves a clause-tracked gather alone even while hurt and waiting for full health', () => {
-    const clause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 1000,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Carrina Copper Mines',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(getMaterialQuantity).mockReturnValue(2);
-    vi.mocked(decreeWaitForFullHealthBeforeCombat).mockReturnValue(true);
-    vi.mocked(isPartyAtFullHealth).mockReturnValue(false);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).not.toHaveBeenCalled();
-    expect(travelStart).not.toHaveBeenCalled();
-  });
-
-  it('abandons an in-progress gather immediately when reordering makes a different clause top priority', () => {
-    const woodClause = buildClause({
-      id: 'wood-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wergen-wood' as MaterialId,
-      targetQuantity: 50,
-    });
-    const copperClause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 30,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [copperClause, woodClause],
-        activeClauseId: woodClause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(getMaterialQuantity).mockReturnValue(10);
-    vi.mocked(decreeClauses).mockReturnValue([copperClause, woodClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(copperClause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).toHaveBeenCalled();
-    expect(travelStart).toHaveBeenCalledWith('Carrina Copper Mines', true);
-  });
-
-  it('hands active-clause tracking to the new top-priority clause without restarting the action when both target the same node', () => {
-    const oldClause = buildClause({
-      id: 'old-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wergen-wood' as MaterialId,
-      targetQuantity: 50,
-    });
-    const newClause = buildClause({
-      id: 'new-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wergen-stick' as MaterialId,
-      targetQuantity: 20,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [newClause, oldClause],
-        activeClauseId: oldClause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(getMaterialQuantity).mockReturnValue(5);
-    vi.mocked(decreeClauses).mockReturnValue([newClause, oldClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(newClause);
-    // Both clauses are gatherable at the same node - a multi-material GatherNode.
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Wergen Woods',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).not.toHaveBeenCalled();
-    expect(travelStart).not.toHaveBeenCalled();
-
-    const result = applyLastUpdate(
-      buildState({ activeClauseId: oldClause.id }),
-    );
-    expect(result.world.autoMode.activeClauseId).toBe('new-clause');
-  });
-
-  it('abandons an in-progress gather when the active clause is edited in place (same id, new material), not just reordered', () => {
-    const clause = buildClause({
-      id: 'top-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wergen-wood' as MaterialId,
-      targetQuantity: 50,
-    });
-    const editedClause = { ...clause, materialId: 'copper-ore' as MaterialId };
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [editedClause],
-        activeClauseId: clause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(getMaterialQuantity).mockReturnValue(10);
-    vi.mocked(decreeClauses).mockReturnValue([editedClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(editedClause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).toHaveBeenCalled();
-    expect(travelStart).toHaveBeenCalledWith('Carrina Copper Mines', true);
-  });
-
-  it('redirects mid-travel immediately when a reorder/edit changes the top priority target', () => {
-    const oldClause = buildClause({
-      id: 'farm-clause' as DecreeClauseId,
-      type: 'FarmNode',
-      nodeName: 'Old Ruins',
-      reward: { itemId: 'bone' as ItemId },
-      targetQuantity: 10,
-    });
-    const newClause = buildClause({
-      id: 'gather-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 30,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [newClause, oldClause],
-        activeClauseId: oldClause.id,
-        travelStatus: 'Traveling',
-        travelDestinationNodeName: 'Old Ruins',
-      }),
-    );
-    vi.mocked(decreeClauses).mockReturnValue([newClause, oldClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(newClause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Carrina Copper Mines',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).not.toHaveBeenCalled();
-    expect(travelStart).toHaveBeenCalledWith('Carrina Copper Mines', true);
-  });
-
-  it('does not re-dispatch when the active clause is still top priority after a tick', () => {
-    const clause = buildClause({
-      id: 'wood-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wergen-wood' as MaterialId,
-      targetQuantity: 50,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: clause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(getMaterialQuantity).mockReturnValue(10);
-    vi.mocked(decreeClauses).mockReturnValue([clause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(clause);
-    vi.mocked(clauseTargetNode).mockReturnValue({
-      nodeName: 'Wergen Woods',
-    } as WorldNodeEntry);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).not.toHaveBeenCalled();
-    expect(travelStart).not.toHaveBeenCalled();
-  });
-
-  it('never interrupts mid-combat even if a reorder would otherwise change priority', () => {
-    const woodClause = buildClause({
-      id: 'wood-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'wergen-wood' as MaterialId,
-      targetQuantity: 50,
-    });
-    const copperClause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 30,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [copperClause, woodClause],
-        activeClauseId: woodClause.id,
-      }),
-    );
-    vi.mocked(worldCombatState).mockReturnValue(
-      {} as ReturnType<typeof worldCombatState>,
-    );
-    vi.mocked(decreeClauses).mockReturnValue([copperClause, woodClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(copperClause);
-
-    autoModeProcessTick();
-
-    expect(gatheringStop).not.toHaveBeenCalled();
-    expect(travelStart).not.toHaveBeenCalled();
-  });
-
-  it('stops gathering when the gathering node has no matching material at all, rather than leaving it orphaned and stuck forever', () => {
-    const clause = buildClause({
-      id: 'copper-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'copper-ore' as MaterialId,
-      targetQuantity: 1000,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        enabled: true,
-        clauses: [clause],
-        activeClauseId: undefined,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Wergen Woods',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      nodeName: 'Wergen Woods',
-    } as WorldNodeEntry);
-    vi.mocked(worldNodeGatherMaterialIds).mockReturnValue([
-      'wergen-wood' as MaterialId,
-    ]);
-
-    autoModeProcessTick();
-
-    // No enabled clause targets this material, so it's orphaned.
-    expect(gatheringStop).toHaveBeenCalled();
-  });
-  describe('priority recheck without a decree edit', () => {
-    const gatherClause = buildClause({
-      id: 'gather-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'mirewood' as MaterialId,
-      targetQuantity: 500,
-    });
-    const farmClause = buildClause({
-      id: 'farm-clause' as DecreeClauseId,
-      type: 'FarmNode',
-      nodeName: 'Jelly Fields',
-      reward: { itemId: 'red-slime-core' as ItemId },
-      targetQuantity: 100,
-    });
-
-    function setupGathering(clauses: DecreeClause[]): void {
-      vi.mocked(gamestate).mockReturnValue(
-        buildState({
-          clauses,
-          activeClauseId: gatherClause.id,
-          gatheringStatus: 'Gathering',
-          gatheringNodeName: 'Swampfields',
-        }),
-      );
-      vi.mocked(isGathering).mockReturnValue(true);
-      vi.mocked(getMaterialQuantity).mockReturnValue(131);
-      vi.mocked(decreeClauses).mockReturnValue(clauses);
+      expect(gathering().status).toBe('Idle');
     }
-
-    // First tick consumes the "decree edited" check, so later ticks exercise the periodic recheck alone.
-    function tickOnceUnchanged(): void {
-      vi.mocked(pickTopPriorityClause).mockReturnValueOnce(gatherClause);
-      vi.mocked(clauseTargetNode).mockReturnValueOnce({
-        nodeName: 'Swampfields',
-      } as WorldNodeEntry);
-      autoModeProcessTick();
-      vi.clearAllMocks();
-      vi.mocked(isClauseSatisfiable).mockReturnValue(true);
-      vi.mocked(isGathering).mockReturnValue(true);
-    }
-
-    it('abandons a gather once a higher clause becomes actionable', () => {
-      const clauses = [farmClause, gatherClause];
-      setupGathering(clauses);
-      tickOnceUnchanged();
-
-      vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
-      vi.mocked(clauseTargetNode).mockReturnValue({
-        nodeName: 'Jelly Fields',
-      } as WorldNodeEntry);
-      autoModeProcessTick();
-
-      expect(gatheringStop).toHaveBeenCalled();
-      expect(travelStart).toHaveBeenCalledWith('Jelly Fields', true);
-    });
-
-    it('skips the recheck between intervals', () => {
-      const clauses = [farmClause, gatherClause];
-      setupGathering(clauses);
-      tickOnceUnchanged();
-
-      vi.mocked(timerTicksElapsed).mockReturnValue(1);
-      vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
-      autoModeProcessTick();
-
-      expect(pickTopPriorityClause).not.toHaveBeenCalled();
-      expect(gatheringStop).not.toHaveBeenCalled();
-    });
-
-    it('skips the recheck while traveling', () => {
-      const clauses = [farmClause, gatherClause];
-      setupGathering(clauses);
-      tickOnceUnchanged();
-
-      vi.mocked(gamestate).mockReturnValue(
-        buildState({
-          clauses,
-          activeClauseId: gatherClause.id,
-          travelStatus: 'Traveling',
-          travelDestinationNodeName: 'Swampfields',
-        }),
-      );
-      vi.mocked(isGathering).mockReturnValue(false);
-      vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
-      autoModeProcessTick();
-
-      expect(pickTopPriorityClause).not.toHaveBeenCalled();
-      expect(travelStart).not.toHaveBeenCalled();
-    });
-
-    it('ignores the active clause re-resolving to a different target', () => {
-      const clauses = [gatherClause];
-      setupGathering(clauses);
-      tickOnceUnchanged();
-
-      vi.mocked(pickTopPriorityClause).mockReturnValue(gatherClause);
-      vi.mocked(clauseTargetNode).mockReturnValue({
-        nodeName: 'Other Swamp',
-      } as WorldNodeEntry);
-      autoModeProcessTick();
-
-      expect(gatheringStop).not.toHaveBeenCalled();
-      expect(travelStart).not.toHaveBeenCalled();
-    });
   });
 
-  it('stops gathering to heal in place when a higher clause is blocked only by health', () => {
-    const gatherClause = buildClause({
-      id: 'gather-clause' as DecreeClauseId,
-      type: 'GatherMaterial',
-      materialId: 'mirewood' as MaterialId,
-      targetQuantity: 500,
-    });
-    const farmClause = buildClause({
-      id: 'farm-clause' as DecreeClauseId,
-      type: 'FarmNode',
-      nodeName: 'Jelly Fields',
-      reward: { itemId: 'red-slime-core' as ItemId },
-      targetQuantity: 100,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        clauses: [farmClause, gatherClause],
-        activeClauseId: gatherClause.id,
-        gatheringStatus: 'Gathering',
-        gatheringNodeName: 'Swampfields',
-      }),
-    );
-    vi.mocked(isGathering).mockReturnValue(true);
-    vi.mocked(getMaterialQuantity).mockReturnValue(131);
-    vi.mocked(decreeClauses).mockReturnValue([farmClause, gatherClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
-    vi.mocked(isClauseSatisfiable).mockReturnValue(false);
+  it('is stopped and replaced by the next clause in the same tick', () => {
+    seedAutoMode([finishAreas], { gatheringAt: 'Wergen Woods' });
 
-    autoModeProcessTick();
+    tick();
 
-    expect(gatheringStop).toHaveBeenCalled();
-    expect(travelStart).not.toHaveBeenCalled();
-    const result = applyLastUpdate(
-      buildState({ activeClauseId: gatherClause.id }),
-    );
-    expect(result.world.autoMode.activeClauseId).toBeUndefined();
+    expect(gathering().status).toBe('Idle');
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Old Ruins', true);
   });
 
-  it('keeps traveling when a higher clause is blocked only by health', () => {
-    const levelClause = buildClause({
-      id: 'level-clause' as DecreeClauseId,
-      type: 'LevelUpParty',
+  it('is stopped for a heal trip home when hurt and waiting, even with other work to do', () => {
+    seedAutoMode([gatherOre], {
+      gatheringAt: 'Wergen Woods',
+      edit: hurtAndWaiting,
     });
-    const farmClause = buildClause({
-      id: 'farm-clause' as DecreeClauseId,
-      type: 'FarmNode',
-      nodeName: 'Jelly Fields',
-      reward: { itemId: 'red-slime-core' as ItemId },
-      targetQuantity: 100,
-    });
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({
-        clauses: [farmClause, levelClause],
-        activeClauseId: levelClause.id,
-        travelStatus: 'Traveling',
-        travelDestinationNodeName: 'Old Ruins',
-      }),
-    );
-    vi.mocked(decreeClauses).mockReturnValue([farmClause, levelClause]);
-    vi.mocked(pickTopPriorityClause).mockReturnValue(farmClause);
-    vi.mocked(isClauseSatisfiable).mockReturnValue(false);
 
-    autoModeProcessTick();
+    tick();
+
+    expect(gathering().status).toBe('Idle');
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Kingdom', true);
+  });
+
+  it('is not a reason to go home for a hurt party that isn’t set to wait', () => {
+    seedAutoMode([finishAreas], {
+      gatheringAt: 'Wergen Woods',
+      edit: (state) => state.world.party.forEach((hero) => (hero.hp = 0)),
+    });
+
+    tick();
+
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Old Ruins', true);
+  });
+
+  it('includes one whose active clause was disabled mid-session', () => {
+    const disabled = { ...gatherWood, enabled: false };
+    seedAutoMode([disabled], { active: disabled, gatheringAt: 'Wergen Woods' });
+
+    tick();
+
+    expect(gathering().status).toBe('Idle');
+  });
+});
+
+describe('a decree edit mid-action', () => {
+  it('abandons a gather when a reorder puts a clause with another target on top', () => {
+    seedAutoMode([gatherOre, gatherWood], {
+      active: gatherWood,
+      gatheringAt: 'Wergen Woods',
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Idle');
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Copper Mines', true);
+    expect(autoMode().activeClauseId).toBe(gatherOre.id);
+  });
+
+  it('abandons a gather when the active clause is edited in place to want something else', () => {
+    seedAutoMode([{ ...gatherWood, materialId: ore }], {
+      active: gatherWood,
+      gatheringAt: 'Wergen Woods',
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Idle');
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Copper Mines', true);
+  });
+
+  it('hands tracking to a new top clause at the same node without restarting the gather', () => {
+    seedAutoMode([gatherStick, gatherWood], {
+      active: gatherWood,
+      gatheringAt: 'Wergen Woods',
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Gathering');
+    expect(travelStart).not.toHaveBeenCalled();
+    expect(autoMode().activeClauseId).toBe(gatherStick.id);
+  });
+
+  it('redirects travel already underway', () => {
+    seedAutoMode([gatherOre, farmJelly], {
+      active: farmJelly,
+      travelingTo: 'Jelly Fields',
+    });
+
+    tick();
+
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Copper Mines', true);
+  });
+
+  it('lets an untracked trip home finish first', () => {
+    seedAutoMode([finishAreas], { travelingTo: 'Kingdom' });
+
+    tick();
 
     expect(travelStart).not.toHaveBeenCalled();
-    expect(updateGamestate).not.toHaveBeenCalled();
+  });
+
+  it('changes nothing while the active clause stays on top with the same target', () => {
+    seedAutoMode([gatherWood], {
+      active: gatherWood,
+      gatheringAt: 'Wergen Woods',
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Gathering');
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('never interrupts combat', () => {
+    seedAutoMode([gatherOre, gatherWood], {
+      active: gatherWood,
+      travelingTo: 'Wergen Woods',
+      edit: (state) => (state.world.combat = buildCombat()),
+    });
+
+    tick();
+
+    expect(travelStart).not.toHaveBeenCalled();
+    expect(autoMode().activeClauseId).toBe(gatherWood.id);
+  });
+
+  it('pauses a gather to heal for a higher clause only waiting on health', () => {
+    seedAutoMode([finishAreas, gatherWood], {
+      active: gatherWood,
+      gatheringAt: 'Wergen Woods',
+      edit: hurtAndWaiting,
+    });
+
+    tick();
+
+    expect(gathering().status).toBe('Idle');
+    expect(travelStart).not.toHaveBeenCalled();
+    expect(autoMode().activeClauseId).toBeUndefined();
+  });
+
+  it('keeps traveling for a higher clause only waiting on health', () => {
+    seedAutoMode([finishAreas, gatherWood], {
+      active: gatherWood,
+      travelingTo: 'Wergen Woods',
+      edit: hurtAndWaiting,
+    });
+
+    tick();
+
+    expect(travelStart).not.toHaveBeenCalled();
+    expect(autoMode().activeClauseId).toBe(gatherWood.id);
+  });
+});
+
+describe('the periodic priority recheck while gathering', () => {
+  // The farm clause has nothing to do until its reward stock drops below target.
+  function seedFarmBlocked(travelingTo?: string): void {
+    seedAutoMode([farmJelly, gatherWood], {
+      active: gatherWood,
+      gatheringAt: travelingTo ? undefined : 'Wergen Woods',
+      travelingTo,
+      edit: stocked(bone, farmJelly.targetQuantity),
+    });
+    tick();
+  }
+  const farmNeeded = (state: GameState) =>
+    applyMaterialDelta(state, bone, -farmJelly.targetQuantity);
+
+  it('abandons the gather once a higher clause becomes actionable', () => {
+    seedFarmBlocked();
+
+    nudge(
+      withEdits(farmNeeded, atTick(DECREE_PRIORITY_RECHECK_INTERVAL_TICKS)),
+    );
+    tick();
+
+    expect(gathering().status).toBe('Idle');
+    expect(travelStart).toHaveBeenCalledExactlyOnceWith('Jelly Fields', true);
+  });
+
+  it('waits for the next interval', () => {
+    seedFarmBlocked();
+
+    nudge(
+      withEdits(farmNeeded, atTick(DECREE_PRIORITY_RECHECK_INTERVAL_TICKS + 1)),
+    );
+    tick();
+
+    expect(gathering().status).toBe('Gathering');
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('skips travel, which re-resolves on arrival anyway', () => {
+    seedFarmBlocked('Wergen Woods');
+
+    nudge(
+      withEdits(farmNeeded, atTick(DECREE_PRIORITY_RECHECK_INTERVAL_TICKS)),
+    );
+    tick();
+
+    expect(travelStart).not.toHaveBeenCalled();
+  });
+
+  it('ignores the active clause’s own target moving as the party moves', () => {
+    seedAutoMode([gatherOre], {
+      active: gatherOre,
+      gatheringAt: 'Copper Mines',
+    });
+    tick();
+    setDecreeRoute('Deep Mine', 1);
+
+    nudge(atTick(DECREE_PRIORITY_RECHECK_INTERVAL_TICKS));
+    tick();
+
+    expect(gathering().status).toBe('Gathering');
+    expect(travelStart).not.toHaveBeenCalled();
   });
 });
