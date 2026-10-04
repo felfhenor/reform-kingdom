@@ -238,3 +238,144 @@
   maxTradeskillLevel: 25
   tradeskillXP: 20
   craftTime: 20
+
+- id: 95291a28-a554-44d8-ac90-fa3a8ad9247a
+  name: 'Weapon: Fel Infantry Sword'
+  result:
+    equipmentId: Fel Infantry Sword
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 4
+
+    - itemId: Felwood Rod
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: f6f7dec6-5eba-4f2f-9f59-2fcac28a386f
+  name: 'Offhand: Fel Roguish Dirk'
+  result:
+    equipmentId: Fel Roguish Dirk
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 4
+
+    - itemId: Felwood Rod
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: bc933d20-981e-44ec-88df-187023a2f0d5
+  name: 'Offhand: Demonic Stiletto'
+  result:
+    equipmentId: Demonic Stiletto
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Felwood Rod
+      quantity: 2
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 4b8e80af-dcae-4fe8-a190-20ef4bde8f86
+  name: 'Weapon: Demonic Sword'
+  result:
+    equipmentId: Demonic Sword
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 5
+
+    - itemId: Felwood Rod
+      quantity: 3
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 2552dde7-272d-4d51-99b8-94efc29d62d5
+  name: 'Weapon: Demonic Dagger'
+  result:
+    equipmentId: Demonic Dagger
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Felwood Rod
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: abe87a7f-556a-49c6-ba9b-4b8a7593c8f3
+  name: 'Headgear: Demonic Helm'
+  result:
+    equipmentId: Demonic Helm
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Fel Fiber
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: a9067456d-8912-40f5-bb7e-d49efcc8e2cc
+  name: 'Armor: Demonic Platemail'
+  result:
+    equipmentId: Demonic Platemail
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 6
+
+    - itemId: Fel Fiber
+      quantity: 2
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450

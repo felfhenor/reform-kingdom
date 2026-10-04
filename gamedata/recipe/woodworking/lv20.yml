@@ -201,3 +201,123 @@
   maxTradeskillLevel: 25
   tradeskillXP: 20
   craftTime: 20
+
+- id: 7f8113c0-ad55-4375-ad39-74f78387e333
+  name: 'Ammo: Fel Arrow'
+  result:
+    equipmentId: Fel Arrow
+
+  requirements:
+    - itemId: Felwood Rod
+      quantity: 2
+
+    - itemId: Fel Copper Ingot
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: 929cb505-4cf6-4b11-b678-a94f907469fa
+  name: 'Weapon: Fel Spear'
+  result:
+    equipmentId: Fel Spear
+
+  requirements:
+    - itemId: Felwood Rod
+      quantity: 4
+
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: c086ca3d-ddf2-477a-820e-c20c769d0d18
+  name: 'Ammo: Demonic Arrow'
+  result:
+    equipmentId: Demonic Arrow
+
+  requirements:
+    - itemId: Felwood Rod
+      quantity: 4
+
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 692b4b29-38ee-4cc3-a9c3-678ba021ee5f
+  name: 'Weapon: Demonic Bow'
+  result:
+    equipmentId: Demonic Bow
+
+  requirements:
+    - itemId: Felwood Rod
+      quantity: 4
+
+    - itemId: Fel Fiber
+      quantity: 2
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: b79d513b-3bb6-423c-8851-425169da2916
+  name: 'Weapon: Demonic Spear'
+  result:
+    equipmentId: Demonic Spear
+
+  requirements:
+    - itemId: Felwood Rod
+      quantity: 4
+
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 3cd8ac24-709a-459d-b4af-be12ad657f96
+  name: 'Offhand: Demonic Shield'
+  result:
+    equipmentId: Demonic Shield
+
+  requirements:
+    - itemId: Felwood
+      quantity: 6
+
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450

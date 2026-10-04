@@ -190,3 +190,129 @@
   maxTradeskillLevel: 25
   tradeskillXP: 20
   craftTime: 20
+
+- id: 9b57802b-28fd-4c9a-966d-137b9b71ce8f
+  name: 'Armor: Fel Villager Cloak'
+  result:
+    equipmentId: Fel Villager Cloak
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 4
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: 97dfa950-ca6a-413e-98c7-2419f9fb9464
+  name: 'Headgear: Fel Villager Hat'
+  result:
+    equipmentId: Fel Villager Hat
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: 77a29a2f-6a77-4882-8f7b-b3e7282b2ff6
+  name: 'Armor: Fel Villager Armor'
+  result:
+    equipmentId: Fel Villager Armor
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 4
+
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: c1fef029-0df0-4e7d-a0d0-a3855e193125
+  name: 'Headgear: Fel Villager Helm'
+  result:
+    equipmentId: Fel Villager Helm
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 2
+
+    - itemId: Fel Copper Ingot
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: 5c5cb3cf-64f6-4064-b6fc-8738b91092e9
+  name: 'Armor: Demonic Tunic'
+  result:
+    equipmentId: Demonic Tunic
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 4
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 3449d8e2-f79f-4201-b1dd-1926648a3acf
+  name: 'Headgear: Demonic Tophat'
+  result:
+    equipmentId: Demonic Tophat
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 3
+
+    - itemId: Morganite
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 08a43472-4dde-4868-9acd-2c7f9f1d7698
+  name: 'Weapon: Demonic Whip'
+  result:
+    equipmentId: Demonic Whip
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 8
+
+    - itemId: Felwood Rod
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
