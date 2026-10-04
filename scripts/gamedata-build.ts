@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { isArray, isString, isObject, sortBy } from 'es-toolkit/compat';
-import * as yaml from 'js-yaml';
+import { isArray, isObject, isString, sortBy } from 'es-toolkit/compat';
 import fs from 'fs-extra';
+import * as yaml from 'js-yaml';
 import rec from 'recursive-readdir';
 
 fs.ensureDirSync('./public/json');
@@ -53,12 +53,16 @@ const processFiles = async () => {
             idToName[folder][entry.name] = entry.id;
           });
 
-          console.log(`Loaded ${folder}/${file} - ${doc.length} entries...`);
+          // console.log(`Loaded ${folder}/${file} - ${doc.length} entries...`);
         } catch (e) {
           console.error(e);
         }
       });
     }),
+  );
+
+  console.log(
+    `Loaded ${allFiles.length} files - ${Object.keys(trackedIds).length} entries...`,
   );
 };
 
