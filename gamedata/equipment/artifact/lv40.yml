@@ -1,0 +1,11 @@
+- id: 3a61e3ca-3f78-4e39-94ce-0beb4a34bb0a
+  name: Fel Puzzle Box
+  description: An ancient puzzle box, imbued with fel energies. It guides the user forward in an enigmatic fashion.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Artifact
+  sprite: '0233'
+  slots: 1
+  baseStats:
+    Intelligence: 16.4
+    Resistance: 7.1

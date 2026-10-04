@@ -1,0 +1,12 @@
+- id: 7b9c49bf-b22d-4efb-9867-19e1a9937e79
+  name: Fel Morganite Brooch
+  description: A brooch, set with fel-infused morganite. It increases the resilience of the wearer.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Charm
+  sprite: '0238'
+  slots: 1
+  baseStats:
+    Vitality: 12.1
+    Resistance: 14.2
+    Health: 30

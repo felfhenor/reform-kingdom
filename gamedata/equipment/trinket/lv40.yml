@@ -1,0 +1,16 @@
+- id: b27ba265-7122-4a07-a676-bd9266439206
+  name: Fel Luckgem
+  description: A gem that grants great luck to those who hold it.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Trinket
+  sprite: '0239'
+  slots: 1
+  baseStats:
+    Luck: 9.7
+
+  gatherYieldBonuses:
+    - tradeskillId: Woodworking
+      value: 1
+    - tradeskillId: Tailoring
+      value: 1

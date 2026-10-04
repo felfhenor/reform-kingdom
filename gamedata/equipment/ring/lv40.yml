@@ -1,0 +1,10 @@
+- id: c8c7e48f-0609-4eef-9457-975f5b01bdd5
+  name: Fel Energy Loop
+  description: A ring infused with swirling fel energies. It increases the energy levels of the wearer substantially.
+  levelRequirement: 42
+  rarity: Uncommon
+  type: Ring
+  sprite: '0237'
+  slots: 1
+  baseStats:
+    Energy: 50

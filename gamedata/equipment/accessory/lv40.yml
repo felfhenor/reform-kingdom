@@ -1,0 +1,21 @@
+- id: 2b1c1d80-a918-4cd2-9d1f-47b369afeda8
+  name: Fel Taming Chain
+  description: A chain carried by demon villagers to help tame the local wildlife.
+  rarity: Uncommon
+  levelRequirement: 42
+  type: Accessory
+  sprite: '0234'
+  slots: 1
+  baseStats:
+    Strength: 7.3
+
+- id: bde54738-2a5c-4402-9f11-9a1319b1dea1
+  name: Fel Earrings
+  description: A pair of earrings that absorb magic from the air around them.
+  rarity: Uncommon
+  levelRequirement: 43
+  type: Accessory
+  sprite: '0240'
+  slots: 1
+  baseStats:
+    Resistance: 9.1

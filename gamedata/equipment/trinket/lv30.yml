@@ -32,3 +32,14 @@
       value: 1
     - tradeskillId: Tailoring
       value: 1
+
+- id: d63f6ce9-a3b8-4668-9b69-c7ad1c359808
+  name: Fel Speedboots
+  description: A pair of boots worn by demon scouts, which allows them to run extremely fast.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Trinket
+  sprite: '0235'
+  slots: 1
+  baseStats:
+    Agility: 26.1

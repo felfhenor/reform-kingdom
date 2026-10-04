@@ -23,3 +23,15 @@
 
   debuffResistances:
     Stun: 25
+
+- id: 2f5529e5-3ec0-4bc4-9555-467c34ab1b2b
+  name: Fel Casting Gloves
+  description: A pair of gloves worn by demon casters to improve their aim and output.
+  levelRequirement: 38
+  rarity: Uncommon
+  type: Charm
+  sprite: '0236'
+  slots: 1
+  baseStats:
+    Intelligence: 10.8
+    Vitality: 4.3
