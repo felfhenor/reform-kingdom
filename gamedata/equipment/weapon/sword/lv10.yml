@@ -27,6 +27,9 @@
     Vitality: 4.6
     Agility: 2.3
 
+  elementalResistances:
+    Earth: 5
+
 - id: 0c452080-ee10-4d91-82c2-49ce5fe61dff
   name: Miremetal Cutlass
   description: A sword forged from miremetal, curved for quick, slashing strikes.
@@ -40,3 +43,6 @@
     Agility: 7.3
   debuffResistances:
     StatDown: 3
+
+  elementalResistances:
+    Earth: 5

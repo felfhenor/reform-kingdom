@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import {
+  defaultAffinities,
   defaultCombatStats,
   defaultMonsterTypeDamageBonus,
   defaultStats,
@@ -16,6 +17,7 @@ import type {
   EquipmentBonusDimension,
   EquipmentContent,
   EquipmentItem,
+  GameElement,
   GatherYieldBonus,
   ItemContent,
   ItemId,
@@ -66,6 +68,30 @@ export const MONSTER_TYPE_DAMAGE_BONUS: EquipmentBonusDimension<MonsterType> = {
       affixEffects,
       'MonsterTypeDamage',
       (effect) => effect.monsterType === key,
+    ),
+};
+
+export const ELEMENT_RESISTANCE_BONUS: EquipmentBonusDimension<GameElement> = {
+  defaultBlock: defaultAffinities,
+  equipmentBlock: (content) => content.elementalResistances,
+  infusionBlock: (content) => content.infusionElementalResistances,
+  affixBonusFor: (affixEffects, key) =>
+    affixEffectSum(
+      affixEffects,
+      'ElementalResistance',
+      (effect) => effect.element === key,
+    ),
+};
+
+export const ELEMENT_BOON_BONUS: EquipmentBonusDimension<GameElement> = {
+  defaultBlock: defaultAffinities,
+  equipmentBlock: (content) => content.elementalBoons,
+  infusionBlock: (content) => content.infusionElementalBoons,
+  affixBonusFor: (affixEffects, key) =>
+    affixEffectSum(
+      affixEffects,
+      'ElementalBoon',
+      (effect) => effect.element === key,
     ),
 };
 

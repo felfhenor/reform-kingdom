@@ -1,5 +1,9 @@
 import { combatCombatantTakeDamage } from '@helpers/combat/combat-combatant-hp';
 import {
+  elementalDamageText,
+  elementalResistMultiplier,
+} from '@helpers/combat/combat-element';
+import {
   combatantMessageToken,
   combatFormatMessage,
   combatMessageLog,
@@ -178,6 +182,7 @@ function combatHandleStatusEffectBehaviors(
     damage: 0,
     healing: 0,
     absdamage: 0,
+    damageText: elementalDamageText(0, effect.elements),
     combatant,
   };
 
@@ -195,9 +200,13 @@ function combatHandleStatusEffectBehaviors(
       combatCombatantTakeDamage(combatant, -healing);
     },
     TakeDamage: () => {
-      const damage = statusEffectDamage(effect);
+      const damage = Math.floor(
+        statusEffectDamage(effect) *
+          elementalResistMultiplier(combatant, effect.elements),
+      );
       templateData.damage = damage;
       templateData.absdamage = Math.abs(damage);
+      templateData.damageText = elementalDamageText(damage, effect.elements);
 
       combatCombatantTakeDamage(combatant, damage);
     },

@@ -3,6 +3,9 @@
   description: A lesser demon, often found serving Fel's commander.
 
   types: [Demon]
+  elementalResistances:
+    Fire: 50
+    Water: -25
 
   sprite: '0088'
   frames: 4

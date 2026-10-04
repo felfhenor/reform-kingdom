@@ -9,3 +9,6 @@
   baseStats:
     Intelligence: 16.4
     Resistance: 7.1
+
+  elementalResistances:
+    Fire: 5

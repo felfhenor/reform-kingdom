@@ -26,3 +26,6 @@
     Strength: 5.6
     Agility: 4.2
     Vitality: 1.8
+
+  elementalResistances:
+    Earth: 5

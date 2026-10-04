@@ -12,7 +12,7 @@ import type {
   StatusEffect,
   StatusEffectBlock,
 } from '@interfaces/content-statuseffect';
-import type { ElementBlock } from '@interfaces/element';
+import type { ElementBlock, GameElement } from '@interfaces/element';
 import type { Branded } from '@interfaces/identifiable';
 import type { SkillStatBonus, StatBlock } from '@interfaces/stat';
 import type { StatDisplayDimension } from '@interfaces/stat-display';
@@ -144,7 +144,10 @@ export type Combatant = HasAnimation & {
   combatStats: CombatStatBlock;
 
   resistance: ElementBlock;
+  // Elemental boon.
   affinity: ElementBlock;
+  // Elements given to non-elemental damaging techniques by gear. Optional so mid-combat saves still load.
+  gearElements?: GameElement[];
   tagResistance: StatusEffectBlock;
 
   skillIds: EquipmentSkillId[];

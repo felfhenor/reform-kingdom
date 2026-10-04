@@ -14,6 +14,9 @@
     Agility: 8.3
     Vitality: -1.2
 
+  elementalResistances:
+    Water: 5
+
 - id: 802585c2-a264-4123-b04a-d96c5a2669f5
   name: Cimmerian Bow
   description: An ancient style of bow that helps the wearer resist dark magic.
@@ -28,3 +31,6 @@
 
   debuffResistances:
     Accuracy: 5
+
+  elementalResistances:
+    Water: 5

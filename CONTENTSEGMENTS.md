@@ -42,17 +42,17 @@ Hero skills are anything pertaining to hero skills. This would include gaining s
 
 ## Combat Stats
 
-Combat stats includes anything that is not a pure stat, that is to say, things like skill repeat chance, monster type slayers, debuff resistances, etc.
+Combat stats includes anything that is not a pure stat, that is to say, things like skill repeat chance, monster type slayers, debuff resistances, elemental resistances/weaknesses, elemental boons, elemental conversion, etc.
 
 # Segmentation
 
-|                  | Duchy Upgrades | Combat Stats | Economy | Hero Exploration | Hero Stats | Hero Skills |
-| ---------------- | -------------- | ------------ | ------- | ---------------- | ---------- | ----------- |
-| Affixes          |                | x            |         | x                | x          | x           |
-| Astral Projector |                | x            |         |                  | x          |             |
-| Collectibles     | x              | x            | x       | x                | x          |             |
-| Equipment        |                | x            |         | x                | x          | x           |
-| Infusions        |                | x            |         | x                | x          |             |
-| Shrines          |                |              | x       | x                |            |             |
-| Town Buffs       |                | x            |         |                  | x          |             |
-| Trainers         |                | x            |         |                  | x          |             |
+|                  | Duchy Upgrades | Combat Stats | Economy | Hero Exploration | Hero Stats | Hero Skills | Elemental |
+| ---------------- | -------------- | ------------ | ------- | ---------------- | ---------- | ----------- | --------- |
+| Affixes          |                | x            |         | x                | x          | x           |           |
+| Astral Projector |                | x            |         |                  | x          |             |           |
+| Collectibles     | x              | x            | x       | x                | x          |             |           |
+| Equipment        |                | x            |         | x                | x          | x           | x         |
+| Infusions        |                | x            |         | x                | x          |             | x         |
+| Shrines          |                |              | x       | x                |            |             |           |
+| Town Buffs       |                | x            |         |                  | x          |             |           |
+| Trainers         |                | x            |         |                  | x          |             | x         |

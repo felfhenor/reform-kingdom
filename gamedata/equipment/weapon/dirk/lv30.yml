@@ -10,6 +10,9 @@
     Agility: 5.2
     Strength: 14.3
 
+  elementalResistances:
+    Air: 5
+
 - id: 9a778b55-eb75-4f72-a823-ca6e1d582164
   name: Demongold Stiletto
   description: A stiletto emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -34,3 +37,6 @@
   slots: 1
   baseStats:
     Strength: 24.3
+
+  elementalResistances:
+    Fire: 5

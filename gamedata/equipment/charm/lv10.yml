@@ -20,3 +20,6 @@
   baseStats:
     Intelligence: 4.5
     Resistance: 2.3
+
+  elementalResistances:
+    Earth: 5

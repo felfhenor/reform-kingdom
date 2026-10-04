@@ -1,3 +1,4 @@
+import { elementalResistanceClamp } from '@helpers/combat/combat-element';
 import { combatStatsForCharacter } from '@helpers/combat/combat-stats';
 import {
   combatApplyCombatStatNumberDeltaToCombatant,
@@ -21,6 +22,11 @@ import {
   equipmentMonsterTypeDamageTotals,
   equippedItemTypes,
 } from '@helpers/item/equipment';
+import {
+  characterElementalBoons,
+  characterElementalResistances,
+  equipmentGearElements,
+} from '@helpers/item/equipment-element';
 import { equipmentSkillStatBonuses } from '@helpers/item/equipment-skill-bonus';
 import { rngUuid } from '@helpers/rng';
 import type {
@@ -136,8 +142,9 @@ export function combatantFromCharacter(character: Character): Combatant {
     ),
     skillStatBonuses: equipmentSkillStatBonuses(character.equipment),
 
-    affinity: defaultAffinities(),
-    resistance: defaultAffinities(),
+    affinity: characterElementalBoons(character),
+    resistance: characterElementalResistances(character),
+    gearElements: equipmentGearElements(character.equipment),
     tagResistance: characterTagResistances(character),
 
     skillUses: {},
@@ -189,7 +196,10 @@ export function combatantFromMonster(
     combatStats: structuredClone(monster.combatStats),
 
     affinity: defaultAffinities(),
-    resistance: defaultAffinities(),
+    resistance: elementalResistanceClamp({
+      ...defaultAffinities(),
+      ...monster.elementalResistances,
+    }),
     tagResistance: defaultTagResistances(),
 
     skillUses: {},

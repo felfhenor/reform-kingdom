@@ -10,6 +10,9 @@
     Strength: 8.3
     Agility: 7.2
 
+  elementalResistances:
+    Air: 5
+
 - id: f5e375c6-b81c-4deb-8155-1f9c6490bf8c
   name: Slayer's Arrow
   description: An arrow made with a tip that pierces all manner of armor, flesh, scales, and even the ethereal.
@@ -29,6 +32,10 @@
     Insect: 5
     Spirit: 5
 
+  elementalResistances:
+    Earth: 5
+    Air: 5
+
 - id: dd5c2cab-d754-4f09-bad7-21be6f3499e3
   name: Fel Arrow
   description: An arrow made with fel materiel. It's versatile and usable by the average demon.
@@ -40,3 +47,6 @@
   baseStats:
     Strength: 15.2
     Agility: 9.5
+
+  elementalResistances:
+    Fire: 5

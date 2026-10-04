@@ -5,6 +5,7 @@ import type { MonsterType } from '@interfaces/content-monster';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
+import type { ElementBlock, GameElement } from '@interfaces/element';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { SkillStatBonus, StatBlock } from '@interfaces/stat';
@@ -28,6 +29,11 @@ export type EquipmentContent = IsContentItem &
     gatherYieldBonuses?: GatherYieldBonus[];
     // extra damageScaling on every technique of a skill family, same as the SkillStatBonus affix
     skillStatBonuses?: SkillStatBonus[];
+    // percent per element, same as the ElementalResistance/ElementalBoon affixes
+    elementalResistances?: ElementBlock;
+    elementalBoons?: ElementBlock;
+    // given to the wearer's non-elemental damaging techniques, same as the ElementConversion affix
+    elements?: GameElement[];
     type: EquipmentItemType;
     slots: number;
 

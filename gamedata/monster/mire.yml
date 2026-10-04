@@ -3,6 +3,9 @@
   description: An angry spirit that refuses to leave the mortal plane, instead preferring to cause mayhem near where it died.
 
   types: [Spirit]
+  elementalResistances:
+    Water: 25
+    Fire: -15
 
   sprite: '0068'
   frames: 4
@@ -57,6 +60,9 @@
   description: An elder spirit that has refined it's screech to a point of causing terror in a large radius around itself.
 
   types: [Spirit]
+  elementalResistances:
+    Water: 25
+    Fire: -15
 
   sprite: '0072'
   frames: 4
@@ -112,6 +118,10 @@
   description: A small green frog known for it's venomous spit that stings like a dart.
 
   types: [Beast]
+  elementalResistances:
+    Water: 15
+    Earth: 15
+    Air: -15
 
   sprite: '0076'
   frames: 4
@@ -166,6 +176,10 @@
   description: A large orange toad, known worldwide for its extremely toxic breath.
 
   types: [Beast]
+  elementalResistances:
+    Water: 15
+    Earth: 15
+    Air: -15
 
   sprite: '0080'
   frames: 4

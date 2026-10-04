@@ -31,6 +31,8 @@ import type { AffixDisplay } from '@interfaces';
           [resistances]="entry.resistances"
           [combatStats]="entry.combatStats"
           [monsterTypeDamage]="entry.monsterTypeDamage"
+          [elementalResistances]="entry.elementalResistances"
+          [elementalBoons]="entry.elementalBoons"
           [layout]="'row'"
           [maxDecimals]="1"
         />

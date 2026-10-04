@@ -14,6 +14,7 @@ import {
 } from '@helpers/content/ensure-monster';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import {
+  defaultAffinities,
   defaultCombatStats,
   defaultEquipment,
   defaultStats,
@@ -197,6 +198,19 @@ describe('combatantFromMonster', () => {
     expect(combatantFromMonster(monster, 30, 0)).toMatchObject({
       skillIds: [attackId, snipeId],
       skillWeights: { [attackId]: 5, [snipeId]: 3 },
+    });
+  });
+
+  it('carries its elemental resistances, clamped to the cap', () => {
+    const monster = ensureMonster({
+      id: 'demon' as MonsterId,
+      elementalResistances: { ...defaultAffinities(), Fire: 90, Water: -25 },
+    });
+
+    expect(combatantFromMonster(monster, 1, 0).resistance).toEqual({
+      ...defaultAffinities(),
+      Fire: 75,
+      Water: -25,
     });
   });
 });

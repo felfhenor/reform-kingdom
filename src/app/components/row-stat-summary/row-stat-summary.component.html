@@ -44,3 +44,27 @@
     [layout]="layout()"
   />
 }
+
+@if (hasAnyElementalResistances()) {
+  <app-row-labeled-values
+    class="block text-xs"
+    [class.mt-2]="layout() === 'column'"
+    [dimension]="elementalResistanceDimension"
+    [values]="elementalResistances()"
+    [bonusValues]="bonusElementalResistances()"
+    [comparisonValues]="comparisonElementalResistances()"
+    [layout]="layout()"
+  />
+}
+
+@if (hasAnyElementalBoons()) {
+  <app-row-labeled-values
+    class="block text-xs"
+    [class.mt-2]="layout() === 'column'"
+    [dimension]="elementalBoonDimension"
+    [values]="elementalBoons()"
+    [bonusValues]="bonusElementalBoons()"
+    [comparisonValues]="comparisonElementalBoons()"
+    [layout]="layout()"
+  />
+}

@@ -14,6 +14,9 @@
     - tradeskillId: Artificing
       value: 1
 
+  elementalResistances:
+    Earth: 5
+
 - id: 8955ed40-6956-4682-9c90-2a47e5af1f3d
   name: Miremetal Bracer
   description: A bracer made of miremetal. It's often seen as a good luck charm by those who live in the Craggled Mire.
@@ -29,3 +32,6 @@
   gatherYieldBonuses:
     - tradeskillId: Blacksmithing
       value: 1
+
+  elementalResistances:
+    Earth: 5

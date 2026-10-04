@@ -181,7 +181,7 @@ export function equippedItemTypes(
 
 // Sums one dimension's total (base content + infusion + affix) across every
 // equipped item, counting a two-hander once even though it fills two slots.
-function equipmentDimensionTotals<K extends string>(
+export function equipmentDimensionTotals<K extends string>(
   equipment: EquipmentBlock,
   dimension: EquipmentBonusDimension<K>,
 ): Record<K, number> {

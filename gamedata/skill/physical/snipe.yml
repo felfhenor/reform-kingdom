@@ -24,7 +24,7 @@
       damageScaling:
         Strength: 3
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 27939410-0682-4367-983a-d515e282a00f
   name: Snipe II
@@ -52,7 +52,7 @@
       damageScaling:
         Strength: 4
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 2f35b6d3-693c-4af9-8c37-0ea34367f785
   name: Snipe III
@@ -80,4 +80,4 @@
       damageScaling:
         Strength: 5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

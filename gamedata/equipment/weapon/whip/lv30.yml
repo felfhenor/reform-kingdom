@@ -11,6 +11,9 @@
     Resistance: 9.3
     Strength: 10.3
 
+  elementalResistances:
+    Air: 5
+
 - id: 07507fae-4ef8-4e24-b9a5-e181eb545294
   name: Demongold Chainscythe
   description: A chainscythe emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -42,3 +45,6 @@
     - skillFamily: Earthshake
       stat: Intelligence
       value: 0.5
+
+  elementalResistances:
+    Air: 5

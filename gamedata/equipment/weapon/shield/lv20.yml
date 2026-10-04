@@ -13,6 +13,9 @@
     Vitality: 10.3
     Resistance: 3.8
 
+  elementalResistances:
+    Water: 5
+
 - id: 98731fca-4409-4199-9380-b492067b2954
   name: Crimson Shield
   description: A simple protective shield made of crimson.
@@ -27,3 +30,6 @@
 
   debuffResistances:
     Bleed: 5
+
+  elementalResistances:
+    Air: 5

@@ -8,6 +8,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import {
   type CombatStatBlock,
+  type ElementBlock,
   type ItemPreviewDisplay,
   type MonsterType,
   type StatBlock,
@@ -43,6 +44,8 @@ export class DetailItemPreviewComponent {
   public comparisonResistances = input<StatusEffectBlock>();
   public comparisonCombatStats = input<CombatStatBlock>();
   public comparisonMonsterTypeDamage = input<Record<MonsterType, number>>();
+  public comparisonElementalResistances = input<ElementBlock>();
+  public comparisonElementalBoons = input<ElementBlock>();
 
   public showEquippableBy = input<boolean>(true);
   public showDescription = input<boolean>(true);

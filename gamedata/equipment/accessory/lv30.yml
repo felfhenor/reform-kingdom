@@ -13,6 +13,9 @@
   debuffResistances:
     Bleed: 45
 
+  elementalResistances:
+    Air: 5
+
 - id: c68a0ecb-0473-4c11-a629-2fa98404a57a
   name: Crimgold Gauntlets
   description: A pair of gauntlets that help regulate blood flow and give the wearer strength and circulation.
@@ -28,6 +31,9 @@
   debuffResistances:
     Bleed: 3
 
+  elementalResistances:
+    Air: 5
+
 - id: cfbef018-d4b4-43a5-ba8a-903f87917c49
   name: Angelf Earrings
   description: A pair of earrings that absorbs magical energy from the air and condenses it for the wearer's use.
@@ -40,3 +46,6 @@
     Luck: 2.3
     Intelligence: 2.1
     Resistance: 1.3
+
+  elementalResistances:
+    Air: 5

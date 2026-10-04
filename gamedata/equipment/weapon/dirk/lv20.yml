@@ -24,6 +24,9 @@
   baseStats:
     Agility: 15.2
 
+  elementalResistances:
+    Water: 5
+
 - id: 2dbe1f4d-c52c-4f2b-a15d-4b001cca45eb
   name: Crimson Dirk
   description: A simple dirk made of crimson.
@@ -35,3 +38,6 @@
   baseStats:
     Agility: 11.2
     Vitality: 6.8
+
+  elementalResistances:
+    Air: 5

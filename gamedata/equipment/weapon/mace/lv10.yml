@@ -25,6 +25,9 @@
     Strength: 5.2
     Intelligence: 7.3
 
+  elementalResistances:
+    Earth: 5
+
 - id: 15c4b338-6fd2-4a5a-8503-7be418bd666d
   name: Orcish Mace
   description: A mace with a very sharp side. The orc who made this clearly knew what they were doing.

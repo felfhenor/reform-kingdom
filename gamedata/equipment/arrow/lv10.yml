@@ -22,6 +22,9 @@
   baseStats:
     Agility: 6.5
 
+  elementalResistances:
+    Earth: 5
+
 - id: cb35e344-761b-43f5-b06f-cd4c2fba2de1
   name: Mirewood Arrow
   description: An arrow made from mirewood, carrying the mire's stench wherever it lands.
@@ -35,6 +38,9 @@
     Agility: 2.2
     Energy: 3
 
+  elementalResistances:
+    Earth: 5
+
 - id: 3296eea5-9d27-49bb-b7db-dd0a6ec673c1
   name: Ghostwood Arrow
   description: An arrow made from mirewood, dripping with ghostly ooze.
@@ -46,3 +52,6 @@
   baseStats:
     Strength: 4.3
     Resistance: 4.9
+
+  elementalResistances:
+    Earth: 5

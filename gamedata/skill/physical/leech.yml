@@ -24,7 +24,7 @@
         Agility: 1
         Strength: 1
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** bites **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** bites **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [BypassDefense, NeverMisses, HealsTarget]
       elements: []

@@ -13,6 +13,9 @@
   debuffResistances:
     Burn: 5
 
+  elementalResistances:
+    Water: 5
+
 - id: 852f6203-63bc-4a63-8506-635486803d35
   name: Crimson Breastplate
   description: A breastplate made of crimson. It does a good job of keeping the wearers blood on the inside!
@@ -26,3 +29,6 @@
 
   debuffResistances:
     Bleed: 25
+
+  elementalResistances:
+    Air: 5

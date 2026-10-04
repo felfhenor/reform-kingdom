@@ -10,3 +10,6 @@
     Intelligence: 21.1
     Resistance: 19.1
     Strength: 10.1
+
+  elementalResistances:
+    Fire: 5

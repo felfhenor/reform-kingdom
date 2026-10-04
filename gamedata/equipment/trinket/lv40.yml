@@ -14,3 +14,6 @@
       value: 1
     - tradeskillId: Tailoring
       value: 1
+
+  elementalResistances:
+    Fire: 5

@@ -9,3 +9,6 @@
   baseStats:
     Vitality: 19.1
     Resistance: 13.6
+
+  elementalResistances:
+    Fire: 10

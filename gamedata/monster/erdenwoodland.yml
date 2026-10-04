@@ -3,6 +3,8 @@
   description: An intrepid spider that is usually found hitchhiking with Woodwolves. They cast a wide web and are particularly dangerous when fighting together.
 
   types: [Insect]
+  elementalResistances:
+    Fire: -25
 
   sprite: '0124'
   frames: 4
@@ -62,6 +64,9 @@
   description: A highly intelligent species of bat often utilized by elves for it's survivability and offensive capabilities.
 
   types: [Beast]
+  elementalResistances:
+    Air: 25
+    Earth: -15
 
   sprite: '0120'
   frames: 4
@@ -164,6 +169,9 @@
   description: An elf that has been corrupted by dark, demonic magic. They're beyond saving.
 
   types: [Humanoid, Demon]
+  elementalResistances:
+    Fire: 25
+    Water: -15
 
   sprite: '0132'
   frames: 4

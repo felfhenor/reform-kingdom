@@ -32,4 +32,4 @@
           chance: 50
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

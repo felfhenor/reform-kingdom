@@ -10,6 +10,9 @@
     Vitality: 7.1
     Health: 28
 
+  elementalResistances:
+    Air: 5
+
 - id: 2cc05e7d-87d8-4968-b199-4d9b12683649
   name: Crimsilk Cap
   description: A magically-infused cap made of crimson and elfsilk. It increases the magical prowess of the wearer.
@@ -21,6 +24,9 @@
   baseStats:
     Resistance: 9.1
     Energy: 37
+
+  elementalResistances:
+    Air: 5
 
 - id: 9c4c440e-7c8d-4bc4-9127-6dcd190c9046
   name: Fel Villager Hat
@@ -35,3 +41,6 @@
     Vitality: 7.6
     Health: 45
     Energy: 21
+
+  elementalResistances:
+    Fire: 5

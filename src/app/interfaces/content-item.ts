@@ -4,6 +4,7 @@ import type { GatherYieldBonus } from '@interfaces/content-affix';
 import type { MonsterType } from '@interfaces/content-monster';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
+import type { ElementBlock } from '@interfaces/element';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { SkillStatBonus, StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
@@ -26,6 +27,8 @@ export type ItemContent = IsContentItem &
     infusionCombatStats?: CombatStatBlock;
 
     infusionMonsterTypeDamage?: Record<MonsterType, number>;
+    infusionElementalResistances?: ElementBlock;
+    infusionElementalBoons?: ElementBlock;
     infusionGatherYieldBonuses?: GatherYieldBonus[];
     infusionSkillStatBonuses?: SkillStatBonus[];
 

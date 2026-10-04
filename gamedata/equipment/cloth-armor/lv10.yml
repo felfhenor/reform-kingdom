@@ -26,6 +26,9 @@
     Health: 20
     Energy: 14
 
+  elementalResistances:
+    Earth: 5
+
 - id: e11fda67-ea1d-4b48-9a31-a371eb5a3f0e
   name: Oozemire Tunic
   description: A tunic made of mirethread and ooze, somehow holding together.
@@ -38,3 +41,6 @@
     Resistance: 7.1
     Agility: 3.2
     Vitality: 5.5
+
+  elementalResistances:
+    Earth: 5

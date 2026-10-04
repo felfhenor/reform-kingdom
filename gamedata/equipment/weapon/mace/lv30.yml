@@ -18,6 +18,9 @@
       stat: Strength
       value: 0.5
 
+  elementalResistances:
+    Air: 5
+
 - id: d9131796-ac15-4c0b-9369-c2c2782baaca
   name: Demongold Hammer
   description: A hammer emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -48,3 +51,6 @@
     - skillFamily: Holy Smite
       stat: Strength
       value: 0.5
+
+  elementalResistances:
+    Air: 5

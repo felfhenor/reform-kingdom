@@ -1,0 +1,291 @@
+# Elemental resistance prefixes. Common +10% and Rare +20% tiers share a family per element, so an item rolls at most one.
+
+- id: c832ba07-8f43-4e4a-99ba-741d4a6a08c4
+  name: Flameward
+  description: Grants 10% resistance to Fire damage.
+  rarity: Common
+  family: FireResist
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Fire
+      value: 10
+
+- id: 9b21af4d-8564-410d-8e71-375a88f48163
+  name: Flameproof
+  description: Grants 20% resistance to Fire damage.
+  rarity: Rare
+  family: FireResist
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalResistance
+      element: Fire
+      value: 20
+
+- id: 021323f1-9dfc-4155-95d6-103cad256b29
+  name: Tideward
+  description: Grants 10% resistance to Water damage.
+  rarity: Common
+  family: WaterResist
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Water
+      value: 10
+
+- id: 1807f61f-07b9-4e0e-a001-eeaaa455a844
+  name: Tideproof
+  description: Grants 20% resistance to Water damage.
+  rarity: Rare
+  family: WaterResist
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalResistance
+      element: Water
+      value: 20
+
+- id: 5385c31a-df14-4780-b469-ed523a24f4d4
+  name: Stoneward
+  description: Grants 10% resistance to Earth damage.
+  rarity: Common
+  family: EarthResist
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Earth
+      value: 10
+
+- id: 7fed1124-d2ff-43c3-8429-ff7bc9ae502b
+  name: Stoneproof
+  description: Grants 20% resistance to Earth damage.
+  rarity: Rare
+  family: EarthResist
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalResistance
+      element: Earth
+      value: 20
+
+- id: eff1ea95-5e60-4af8-8592-4cfe3cf4c54c
+  name: Galeward
+  description: Grants 10% resistance to Air damage.
+  rarity: Common
+  family: AirResist
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Air
+      value: 10
+
+- id: cc6f1c63-7c70-48e4-a9be-24fb9797e5f0
+  name: Galeproof
+  description: Grants 20% resistance to Air damage.
+  rarity: Rare
+  family: AirResist
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalResistance
+      element: Air
+      value: 20
+
+# Elemental weaknesses share the Curse family, so an item carries at most one curse.
+
+- id: 38481073-244a-44d8-87db-a9db3e164cbd
+  name: Flammable
+  description: Leaves its wielder 10% weaker to Fire damage.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Fire
+      value: -10
+
+- id: c3784383-33fb-4925-8244-fddd82b3cbd4
+  name: Waterlogged
+  description: Leaves its wielder 10% weaker to Water damage.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Water
+      value: -10
+
+- id: 54d6aea8-9332-4bc3-adf0-fb01d731cd70
+  name: Crumbling
+  description: Leaves its wielder 10% weaker to Earth damage.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Earth
+      value: -10
+
+- id: c9ac9e5f-45c4-49f0-94bf-0b9e16baee8f
+  name: Windblown
+  description: Leaves its wielder 10% weaker to Air damage.
+  rarity: Common
+  family: Curse
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalResistance
+      element: Air
+      value: -10
+
+# Elemental boons boost damage dealt with that element.
+
+- id: d0c52d98-3e6c-4f93-969b-f176f67dd667
+  name: Searing
+  description: Increases Fire damage dealt by 10%.
+  rarity: Common
+  family: FireBoon
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalBoon
+      element: Fire
+      value: 10
+
+- id: 82a53916-a90b-4b39-9b87-90653f8a956f
+  name: Blazing
+  description: Increases Fire damage dealt by 20%.
+  rarity: Rare
+  family: FireBoon
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalBoon
+      element: Fire
+      value: 20
+
+- id: 27076980-bd04-4c71-a2fa-7b083a22b115
+  name: Drenching
+  description: Increases Water damage dealt by 10%.
+  rarity: Common
+  family: WaterBoon
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalBoon
+      element: Water
+      value: 10
+
+- id: c01ccb0c-bc2e-4cb9-b67a-7f141a7c6b59
+  name: Tidal
+  description: Increases Water damage dealt by 20%.
+  rarity: Rare
+  family: WaterBoon
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalBoon
+      element: Water
+      value: 20
+
+- id: 18707a49-723d-4355-acf0-7ce239bea515
+  name: Tremoring
+  description: Increases Earth damage dealt by 10%.
+  rarity: Common
+  family: EarthBoon
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalBoon
+      element: Earth
+      value: 10
+
+- id: 9fef81e6-311e-4ae4-a34e-93f1ac961b6e
+  name: Seismic
+  description: Increases Earth damage dealt by 20%.
+  rarity: Rare
+  family: EarthBoon
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalBoon
+      element: Earth
+      value: 20
+
+- id: 8eedd02f-511f-48c8-ac4e-73096352e57a
+  name: Gusting
+  description: Increases Air damage dealt by 10%.
+  rarity: Common
+  family: AirBoon
+  position: Prefix
+  levelRequirement: 15
+  effects:
+    - kind: ElementalBoon
+      element: Air
+      value: 10
+
+- id: ca00bdf8-efa1-4117-9c14-3df3a8214c4d
+  name: Tempestuous
+  description: Increases Air damage dealt by 20%.
+  rarity: Rare
+  family: AirBoon
+  position: Prefix
+  levelRequirement: 20
+  effects:
+    - kind: ElementalBoon
+      element: Air
+      value: 20
+
+# Conversion gives non-elemental attacks this element; one per item.
+
+- id: 26abc3f2-cc5f-4de2-b174-3433a2e12edd
+  name: of Flame
+  description: Non-elemental attacks deal Fire damage.
+  rarity: Rare
+  family: ElementConversion
+  position: Suffix
+  levelRequirement: 20
+  effects:
+    - kind: ElementConversion
+      element: Fire
+
+- id: 4ea936be-ee62-410c-9e22-e4fb212d5be0
+  name: of the Tide
+  description: Non-elemental attacks deal Water damage.
+  rarity: Rare
+  family: ElementConversion
+  position: Suffix
+  levelRequirement: 20
+  effects:
+    - kind: ElementConversion
+      element: Water
+
+- id: 7b540aea-d7c3-4ded-af85-9aea1598cbda
+  name: of Stone
+  description: Non-elemental attacks deal Earth damage.
+  rarity: Rare
+  family: ElementConversion
+  position: Suffix
+  levelRequirement: 20
+  effects:
+    - kind: ElementConversion
+      element: Earth
+
+- id: b1c534b4-b640-48b6-87a1-ac20b4f7e38f
+  name: of the Gale
+  description: Non-elemental attacks deal Air damage.
+  rarity: Rare
+  family: ElementConversion
+  position: Suffix
+  levelRequirement: 20
+  effects:
+    - kind: ElementConversion
+      element: Air

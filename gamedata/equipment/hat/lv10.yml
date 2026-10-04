@@ -12,6 +12,9 @@
     Agility: 3.1
     Luck: 2.1
 
+  elementalResistances:
+    Earth: 5
+
 - id: 3cc3ada3-7e43-4db0-afef-6961ab00ec06
   name: Miresewn Hat
   description: A hat made of mirethread, woven tight enough to keep out the mire's damp chill.
@@ -24,6 +27,9 @@
     Health: 15
     Vitality: 4.5
     Resistance: 3.2
+
+  elementalResistances:
+    Earth: 5
 
 - id: b9e91a4b-deb5-4a25-ae15-65084f48094f
   name: Oozemire Hat
@@ -38,3 +44,6 @@
     Resistance: 6.2
   debuffResistances:
     Poison: 5
+
+  elementalResistances:
+    Earth: 5

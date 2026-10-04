@@ -9,6 +9,9 @@
   baseStats:
     Strength: 7.3
 
+  elementalResistances:
+    Fire: 5
+
 - id: bde54738-2a5c-4402-9f11-9a1319b1dea1
   name: Fel Earrings
   description: A pair of earrings that absorb magic from the air around them.
@@ -19,3 +22,6 @@
   slots: 1
   baseStats:
     Resistance: 9.1
+
+  elementalResistances:
+    Fire: 5

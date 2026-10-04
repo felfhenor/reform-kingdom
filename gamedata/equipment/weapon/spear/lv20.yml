@@ -26,6 +26,9 @@
     Strength: 8.4
     Agility: 4.2
 
+  elementalResistances:
+    Water: 5
+
 - id: 660c6dc2-a44e-49f2-9d23-e645173b1879
   name: Angelf Pike
   description: A pike made of the finest elven wood, tipped with refined crimson.
@@ -40,3 +43,6 @@
 
   monsterTypeDamage:
     Demon: 10
+
+  elementalResistances:
+    Air: 5

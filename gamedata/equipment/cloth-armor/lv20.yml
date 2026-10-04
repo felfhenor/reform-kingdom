@@ -14,6 +14,9 @@
   debuffResistances:
     Burn: 5
 
+  elementalResistances:
+    Water: 5
+
 - id: 4094575a-2ef9-4844-b86f-816f58f913b2
   name: Cimmerian Cloak
   description: A style of cloak nearly lost to time. It's a rare find in modern society.
@@ -27,3 +30,6 @@
 
   debuffResistances:
     Accuracy: 5
+
+  elementalResistances:
+    Water: 5

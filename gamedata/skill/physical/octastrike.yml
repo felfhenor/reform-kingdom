@@ -22,7 +22,7 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -33,7 +33,7 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -44,7 +44,7 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -55,7 +55,7 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -66,7 +66,7 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -77,7 +77,7 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -88,7 +88,7 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -99,4 +99,4 @@
       damageScaling:
         Strength: 0.2
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -25,7 +25,7 @@
         Strength: 0.5
         Agility: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -37,7 +37,7 @@
         Strength: 0.25
         Agility: 0.25
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 9d674f44-9924-438e-b233-675e10562c05
   name: Arrow Rain II
@@ -66,7 +66,7 @@
         Strength: 0.75
         Agility: 0.75
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -78,7 +78,7 @@
         Strength: 0.5
         Agility: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
       elements: []
@@ -90,4 +90,4 @@
         Strength: 0.25
         Agility: 0.25
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

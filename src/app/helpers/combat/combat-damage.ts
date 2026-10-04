@@ -5,6 +5,11 @@ import {
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitigation';
 import {
+  combatTechniqueElements,
+  elementalDamageMultiplier,
+  elementalDamageText,
+} from '@helpers/combat/combat-element';
+import {
   combatantMessageToken,
   combatFormatMessage,
   combatMessageLog,
@@ -30,6 +35,7 @@ import type {
   EquipmentSkill,
   EquipmentSkillAttribute,
   EquipmentSkillContentTechnique,
+  GameElement,
   GameStat,
   MonsterContent,
   StatBlock,
@@ -70,6 +76,16 @@ function targetDefenseValue(
   );
 }
 
+export function combatDamageElements(
+  attacker: Combatant,
+  technique: EquipmentSkillContentTechnique,
+): GameElement[] {
+  const dealsDamage =
+    techniqueHasAttribute(technique, 'DamagesTarget') &&
+    !techniqueHasAttribute(technique, 'HealsTarget');
+  return dealsDamage ? combatTechniqueElements(attacker, technique) : [];
+}
+
 export function getCombatantBaseStatDamageForTechnique(
   combatant: Combatant,
   skill: EquipmentSkill,
@@ -85,16 +101,7 @@ export function getCombatantBaseStatDamageForTechnique(
     stat,
   );
 
-  const affinityElementBoostMultiplier = sumBy(
-    technique.elements,
-    (el) => combatant.affinity[el],
-  );
-
-  const baseStatWithoutMultiplier = combatant.totalStats[stat];
-
-  const totalMultiplier = baseMultiplier + affinityElementBoostMultiplier;
-
-  return baseStatWithoutMultiplier * totalMultiplier;
+  return combatant.totalStats[stat] * baseMultiplier;
 }
 
 // Defense weighting stays on the base technique, so a bonus adds damage without changing which defense applies.
@@ -164,6 +171,8 @@ export function combatApplySkillToTarget(
     technique,
   );
 
+  const elements = combatDamageElements(combatant, technique);
+
   const templateData = {
     combat,
     combatant,
@@ -172,6 +181,7 @@ export function combatApplySkillToTarget(
     technique,
     damage: 0,
     absdamage: 0,
+    damageText: elementalDamageText(0, elements),
   };
 
   let retaliationDamage = 0;
@@ -209,6 +219,9 @@ export function combatApplySkillToTarget(
       );
       effectiveDamage = Math.max(0, effectiveDamage - rolledDefense);
     }
+
+    // Before plink, so plink still guarantees 1 through heavy resistance.
+    effectiveDamage *= elementalDamageMultiplier(combatant, target, elements);
 
     if (techniqueHasAttribute(technique, 'AllowPlink')) {
       effectiveDamage = Math.max(baseDamage > 0 ? 1 : 0, effectiveDamage);
@@ -254,6 +267,7 @@ export function combatApplySkillToTarget(
 
     templateData.damage = effectiveDamage;
     templateData.absdamage = Math.abs(effectiveDamage);
+    templateData.damageText = elementalDamageText(effectiveDamage, elements);
 
     const damageReflectPercent = combatCombatantCombatStatValue(
       target,

@@ -13,6 +13,9 @@
   debuffResistances:
     Bleed: 25
 
+  elementalResistances:
+    Air: 5
+
 - id: b22b9526-f5b4-4dba-ba76-c0ecc0e3ae1b
   name: Demongold Plate
   description: A breastplate emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -38,3 +41,6 @@
   baseStats:
     Vitality: 25.3
     Resistance: 19.5
+
+  elementalResistances:
+    Fire: 10

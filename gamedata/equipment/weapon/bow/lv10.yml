@@ -26,6 +26,9 @@
     Strength: 5.3
     Resistance: 5.6
 
+  elementalResistances:
+    Earth: 5
+
 - id: 4b9d7e65-bcd4-424a-b363-c71803e26a4b
   name: Ghostwood Bow
   description: An ethereal bow made of finely-crafted ghostwood, said to hum with the whispers of the departed.
@@ -37,3 +40,6 @@
   baseStats:
     Strength: 7.4
     Agility: 7.3
+
+  elementalResistances:
+    Earth: 5

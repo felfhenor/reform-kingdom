@@ -2,6 +2,7 @@ import {
   VALID_AFFIX_POSITIONS,
   VALID_COMBAT_STATS,
   VALID_GAME_STATS,
+  VALID_GAME_ELEMENTS,
   VALID_MONSTER_TYPES,
   VALID_STATUS_EFFECT_TAGS,
 } from '@helpers/content/ensure-helpers-constants';
@@ -76,6 +77,26 @@ export function ensureAffixEffect(
           'Humanoid',
         ),
         value,
+      };
+    case 'ElementalResistance':
+    case 'ElementalBoon':
+      return {
+        kind,
+        element: ensureEnumValue(
+          effect['element'],
+          VALID_GAME_ELEMENTS,
+          'Fire',
+        ),
+        value,
+      };
+    case 'ElementConversion':
+      return {
+        kind: 'ElementConversion',
+        element: ensureEnumValue(
+          effect['element'],
+          VALID_GAME_ELEMENTS,
+          'Fire',
+        ),
       };
     case 'SkillStatBonus':
       return { kind: 'SkillStatBonus', ...ensureSkillStatBonus(effect) };

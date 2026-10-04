@@ -27,6 +27,9 @@
     Resistance: 2.1
     Strength: 2.3
 
+  elementalResistances:
+    Earth: 5
+
 - id: 8bf52fce-570a-445f-804d-868c685561f3
   name: Orcish Whip
   description: A "whip" made of miremetal. It can be thrown, but... that's not how whips work.

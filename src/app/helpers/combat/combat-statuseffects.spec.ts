@@ -12,7 +12,11 @@ import {
   statusEffectTagResistance,
 } from '@helpers/combat/combat-statuseffects';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
-import { defaultStats, defaultTagResistances } from '@helpers/defaults';
+import {
+  defaultAffinities,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
 import type {
   Combatant,
   StatusEffect,
@@ -91,6 +95,41 @@ describe('combatApplyStatusEffectToTarget combat message rendering', () => {
     expect(combatLog()[0].message).toBe(
       `@@icon-combatant-1@@**${combatantMessageToken(combatant)}** is burning for 10 damage (90/100 HP remaining).`,
     );
+  });
+});
+
+describe('elemental damage-over-time', () => {
+  beforeEach(() => {
+    combatLogReset();
+  });
+
+  it("reduces an elemental tick by the target's resistance, floored, and names the element", () => {
+    const combatant = buildCombatant({
+      resistance: { ...defaultAffinities(), Fire: 25 },
+    });
+    const statusEffect: StatusEffect = {
+      ...ensureStatusEffect({
+        id: 'burn' as StatusEffectId,
+        name: 'Burn',
+        effectType: 'Debuff',
+        elements: ['Fire'],
+        onApply: [{ type: 'TakeDamage', combatMessage: '{{ damageText }}' }],
+        statScaling: { ...defaultStats(), Strength: 1 },
+      }),
+      duration: 1,
+      creatorStats: { ...defaultStats(), Strength: 9 },
+      targetStats: defaultStats(),
+    };
+
+    combatApplyStatusEffectToTarget(
+      buildCombat({ heroes: [combatant] }),
+      combatant,
+      statusEffect,
+    );
+
+    // 9 * 0.75 = 6.75 -> 6.
+    expect(combatant.hp).toBe(94);
+    expect(combatLog()[0].message).toBe('6 Fire damage');
   });
 });
 

@@ -1,4 +1,5 @@
 import {
+  defaultAffinities,
   defaultCombatStats,
   defaultMonsterTypeDamageBonus,
   defaultStats,
@@ -8,6 +9,8 @@ import { affixEffectsOfKind, equipmentItemAffixes } from '@helpers/item/affix';
 import {
   affixEffectsAddToBlock,
   COMBAT_STAT_BONUS,
+  ELEMENT_BOON_BONUS,
+  ELEMENT_RESISTANCE_BONUS,
   MONSTER_TYPE_DAMAGE_BONUS,
   RESISTANCE_BONUS,
   STAT_BONUS,
@@ -28,6 +31,8 @@ const AFFIX_KINDS_IN_STAT_SUMMARY = new Set<AffixEffect['kind']>([
   'CombatStat',
   'Resistance',
   'MonsterTypeDamage',
+  'ElementalResistance',
+  'ElementalBoon',
 ]);
 
 const AFFIX_KINDS_WITH_STAT_ROW = new Set<AffixEffect['kind']>([
@@ -62,6 +67,16 @@ export function affixDisplay(affix: AffixContent): AffixDisplay {
       defaultMonsterTypeDamageBonus(),
       effects,
       MONSTER_TYPE_DAMAGE_BONUS,
+    ),
+    elementalResistances: affixEffectsAddToBlock(
+      defaultAffinities(),
+      effects,
+      ELEMENT_RESISTANCE_BONUS,
+    ),
+    elementalBoons: affixEffectsAddToBlock(
+      defaultAffinities(),
+      effects,
+      ELEMENT_BOON_BONUS,
     ),
     hasStatRow: effects.some(
       (effect) =>

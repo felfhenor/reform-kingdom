@@ -29,6 +29,9 @@
     Resistance: 2.5
     Strength: 1.1
 
+  elementalResistances:
+    Earth: 5
+
 - id: 931df41a-c230-40af-a2a3-5e63effeab6f
   name: Ghostwood Shield
   description: A shield made solely of ghostwood, strangely light for its size.
@@ -40,6 +43,9 @@
   baseStats:
     Vitality: 9.2
     Resistance: 3.1
+
+  elementalResistances:
+    Earth: 5
 
 - id: a4097535-fbe0-43c2-89b0-91f86f4e903a
   name: Miremirror Shield
@@ -54,3 +60,6 @@
     Resistance: 5.5
   debuffResistances:
     Stun: 6
+
+  elementalResistances:
+    Earth: 5

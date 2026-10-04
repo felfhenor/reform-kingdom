@@ -13,6 +13,9 @@
   monsterTypeDamage:
     Demon: 10
 
+  elementalResistances:
+    Air: 5
+
 - id: 66642e56-b702-437d-a30d-4f1666698181
   name: Animalistic Conglomeration
   description: A conglomeration of animal parts, increasing effectiveness against all manner of foes.
@@ -32,6 +35,10 @@
     Insect: 5
     Spirit: 5
 
+  elementalResistances:
+    Earth: 5
+    Air: 5
+
 - id: 2512c853-9bac-455c-9dbf-8cf5f13c6368
   name: Ancestral Aimer
   description: An aimer made by the original elves, whose production method is highly classified. It fluctuates in temperature.
@@ -48,3 +55,6 @@
     - skillFamily: Frostfire Bolt
       stat: Resistance
       value: 0.25
+
+  elementalResistances:
+    Air: 5

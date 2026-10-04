@@ -13,6 +13,9 @@
     Intelligence: 15.2
     Vitality: 7.1
 
+  elementalResistances:
+    Water: 5
+
 - id: 87e8d1c7-55d5-4de9-b95e-1f89aa23c7b5
   name: Crimson Staff
   description: A staff made purely of crimson.
@@ -24,3 +27,6 @@
   baseStats:
     Intelligence: 19.5
     Vitality: 10.3
+
+  elementalResistances:
+    Air: 5

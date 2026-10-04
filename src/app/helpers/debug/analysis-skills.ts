@@ -2,7 +2,10 @@
 
 import { getEntriesByType } from '@helpers/content/content';
 import { buildMonsterSpawnRanges } from '@helpers/debug/analysis-item-sources';
-import { techniqueIssues } from '@helpers/debug/analysis-skills-technique';
+import {
+  statusEffectDamageTextIssues,
+  techniqueIssues,
+} from '@helpers/debug/analysis-skills-technique';
 import {
   familyIssues,
   skillFamilyNameIssues,
@@ -22,6 +25,7 @@ import {
   analysisWarn,
 } from '@helpers/debug/analysis-utils';
 import type {
+  StatusEffectContent,
   AffixContent,
   AnalysisCheck,
   AnalysisIssue,
@@ -171,6 +175,14 @@ export function runSkillsAnalysis(
         `Monster ${monster.name}`,
         monsterIssues(monster, spawnRanges.get(monster.id)),
         'Skill list is valid and affordable.',
+      ),
+    ),
+    ...getEntriesByType<StatusEffectContent>('statuseffect').flatMap((effect) =>
+      analysisIssueChecks(
+        `statuseffect:${effect.id}`,
+        `Status effect ${effect.name}`,
+        statusEffectDamageTextIssues(effect),
+        'Damage messages name the element.',
       ),
     ),
     ...unresolvedReferenceIssues(references).map(({ label, issue }, i) =>

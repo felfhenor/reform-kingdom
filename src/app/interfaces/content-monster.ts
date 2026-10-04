@@ -7,6 +7,7 @@ import type {
   HasRarity,
   LeveledRange,
 } from '@interfaces/droppable';
+import type { ElementBlock } from '@interfaces/element';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
 import type { StatDisplayDimension } from '@interfaces/stat-display';
@@ -52,6 +53,9 @@ export type MonsterContent = IsContentItem &
     combatStats: Record<CombatStat, number>;
 
     types: MonsterType[];
+
+    // Negative = weakness.
+    elementalResistances?: ElementBlock;
 
     // Priority list of targeting modes, tried in order.
     targetting: TargettingPriorityEntry[];

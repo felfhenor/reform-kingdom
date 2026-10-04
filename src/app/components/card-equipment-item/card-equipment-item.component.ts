@@ -16,6 +16,8 @@ import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import {
   itemPreviewTotalCombatStats,
+  itemPreviewTotalElementalBoons,
+  itemPreviewTotalElementalResistances,
   itemPreviewTotalMonsterTypeDamage,
   itemPreviewTotalResistances,
   itemPreviewTotalStats,
@@ -84,6 +86,18 @@ export class CardEquipmentItemComponent {
     return equipped ? itemPreviewTotalMonsterTypeDamage(equipped) : undefined;
   });
 
+  public thisItemComparisonElementalResistances = computed(() => {
+    const equipped = this.equippedDisplay();
+    return equipped
+      ? itemPreviewTotalElementalResistances(equipped)
+      : undefined;
+  });
+
+  public thisItemComparisonElementalBoons = computed(() => {
+    const equipped = this.equippedDisplay();
+    return equipped ? itemPreviewTotalElementalBoons(equipped) : undefined;
+  });
+
   public equippedComparisonStats = computed(() =>
     this.equippedDisplay() ? itemPreviewTotalStats(this.display()) : undefined,
   );
@@ -103,6 +117,18 @@ export class CardEquipmentItemComponent {
   public equippedComparisonMonsterTypeDamage = computed(() =>
     this.equippedDisplay()
       ? itemPreviewTotalMonsterTypeDamage(this.display())
+      : undefined,
+  );
+
+  public equippedComparisonElementalResistances = computed(() =>
+    this.equippedDisplay()
+      ? itemPreviewTotalElementalResistances(this.display())
+      : undefined,
+  );
+
+  public equippedComparisonElementalBoons = computed(() =>
+    this.equippedDisplay()
+      ? itemPreviewTotalElementalBoons(this.display())
       : undefined,
   );
 

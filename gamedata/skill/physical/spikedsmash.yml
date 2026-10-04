@@ -29,4 +29,4 @@
           chance: 25
           duration: 1
 
-      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

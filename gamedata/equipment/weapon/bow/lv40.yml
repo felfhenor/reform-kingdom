@@ -9,3 +9,6 @@
   baseStats:
     Strength: 24.1
     Agility: 16.9
+
+  elementalResistances:
+    Fire: 5

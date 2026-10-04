@@ -15,6 +15,9 @@
   debuffResistances:
     Bleed: 5
 
+  elementalResistances:
+    Air: 5
+
 - id: 4deb4bed-3397-4f47-88ee-7c9265a3bcb2
   name: Ruby Ring
   description: A crimson ring set with a blood-red ruby. It could almost be used as a weapon.
@@ -30,6 +33,9 @@
   debuffResistances:
     Bleed: 10
 
+  elementalResistances:
+    Air: 5
+
 - id: 69493205-4781-4bac-a268-e8e2eb9961bc
   name: Ruby Ruby Ring
   description: A ring made of ruby, set with 3 rubies. A feat that only elves could accomplish easily.
@@ -43,3 +49,6 @@
 
   debuffResistances:
     Bleed: 15
+
+  elementalResistances:
+    Air: 5

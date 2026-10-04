@@ -1,6 +1,7 @@
 import { VALID_GAME_STATS } from '@helpers/content/ensure-helpers-constants';
 import { ensureEnumValue } from '@helpers/content/ensure-helpers-core';
 import {
+  defaultAffinities,
   defaultCombatStats,
   defaultMonsterTypeDamageBonus,
   defaultStats,
@@ -8,6 +9,7 @@ import {
 } from '@helpers/defaults';
 import type {
   CombatStatBlock,
+  ElementBlock,
   MonsterType,
   SkillStatBonus,
   StatBlock,
@@ -36,6 +38,12 @@ export function ensureMonsterTypeDamage(
   bonus: Partial<Record<MonsterType, number>> = {},
 ): Record<MonsterType, number> {
   return Object.assign({}, defaultMonsterTypeDamageBonus(), bonus);
+}
+
+export function ensureElementBlock(
+  block: Partial<ElementBlock> = {},
+): ElementBlock {
+  return Object.assign({}, defaultAffinities(), block);
 }
 
 export function ensureSkillStatBonus(

@@ -24,3 +24,6 @@
     Resistance: 2.3
   combatStats:
     debuffIgnoreChance: 8
+
+  elementalResistances:
+    Earth: 5

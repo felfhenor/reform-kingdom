@@ -5,6 +5,7 @@ import { ICON_SIZE_VALUES } from '@helpers/engine/icons';
 import type { BaseStat, Icon, IconSize } from '@interfaces';
 import {
   CombatStatDimension,
+  ElementResistanceDimension,
   MonsterTypeDimension,
   StatOrder,
   StatusEffectTagDimension,
@@ -51,6 +52,13 @@ export class IconsComponent {
       entries: StatusEffectTagDimension.order.map((key) => ({
         name: StatusEffectTagDimension.label[key],
         icon: StatusEffectTagDimension.icon[key],
+      })),
+    },
+    {
+      title: 'Elements',
+      entries: ElementResistanceDimension.order.map((key) => ({
+        name: key,
+        icon: ElementResistanceDimension.icon[key],
       })),
     },
     {

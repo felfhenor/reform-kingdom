@@ -1,11 +1,14 @@
 import {
   GOLD_PER_COMBAT_STAT_POINT,
+  GOLD_PER_ELEMENT_BOON_POINT,
+  GOLD_PER_ELEMENT_RESIST_POINT,
   GOLD_PER_GATHER_YIELD_POINT,
   GOLD_PER_MONSTER_TYPE_DAMAGE_POINT,
   GOLD_PER_RESISTANCE_POINT,
   GOLD_PER_SKILL_STAT_BONUS_POINT,
   GOLD_PER_STAT_POINT,
   VALUE_MULTIPLIER_PER_COMBAT_STAT,
+  VALUE_MULTIPLIER_PER_ELEMENT,
   VALUE_MULTIPLIER_PER_MONSTER_TYPE,
   VALUE_MULTIPLIER_PER_RESISTANCE,
   VALUE_MULTIPLIER_PER_STAT,
@@ -14,6 +17,8 @@ import { getEntry } from '@helpers/content/content';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import {
   COMBAT_STAT_BONUS,
+  ELEMENT_BOON_BONUS,
+  ELEMENT_RESISTANCE_BONUS,
   equipmentItemInfusionTotals,
   MONSTER_TYPE_DAMAGE_BONUS,
   RESISTANCE_BONUS,
@@ -69,6 +74,8 @@ const INFUSION_BLOCKS: ((
   RESISTANCE_BONUS.infusionBlock,
   COMBAT_STAT_BONUS.infusionBlock,
   MONSTER_TYPE_DAMAGE_BONUS.infusionBlock,
+  ELEMENT_RESISTANCE_BONUS.infusionBlock,
+  ELEMENT_BOON_BONUS.infusionBlock,
 ];
 
 export function isInfusionMaterial(item: ItemContent): boolean {
@@ -114,6 +121,18 @@ export function infusionMaterialCost(itemId: ItemId): number {
       MONSTER_TYPE_DAMAGE_BONUS.infusionBlock(content),
       VALUE_MULTIPLIER_PER_MONSTER_TYPE,
     );
+  const elementResistCost =
+    GOLD_PER_ELEMENT_RESIST_POINT *
+    weightedBlockTotal(
+      ELEMENT_RESISTANCE_BONUS.infusionBlock(content),
+      VALUE_MULTIPLIER_PER_ELEMENT,
+    );
+  const elementBoonCost =
+    GOLD_PER_ELEMENT_BOON_POINT *
+    weightedBlockTotal(
+      ELEMENT_BOON_BONUS.infusionBlock(content),
+      VALUE_MULTIPLIER_PER_ELEMENT,
+    );
   // No per-tradeskill weighting - just a flat rate per point of value across every tradeskill it targets.
   const gatherYieldCost =
     GOLD_PER_GATHER_YIELD_POINT *
@@ -131,6 +150,8 @@ export function infusionMaterialCost(itemId: ItemId): number {
       resistanceCost +
       combatStatCost +
       monsterTypeDamageCost +
+      elementResistCost +
+      elementBoonCost +
       gatherYieldCost +
       skillStatBonusCost,
   );

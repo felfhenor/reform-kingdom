@@ -10,6 +10,9 @@
     Agility: 12.2
     Strength: 13.1
 
+  elementalResistances:
+    Air: 5
+
 - id: 51c5a826-1715-4677-b01d-94eee9d20129
   name: Demongold Cleaver
   description: A cleaver emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -37,3 +40,6 @@
     - skillFamily: Double Strike
       stat: Agility
       value: 0.5
+
+  elementalResistances:
+    Air: 5

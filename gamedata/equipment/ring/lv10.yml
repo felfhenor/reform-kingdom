@@ -39,6 +39,9 @@
     Vitality: 3.4
     Health: 25
 
+  elementalResistances:
+    Earth: 5
+
 - id: a63ac9fe-29f3-4cf9-9b80-12c288803f57
   name: Golden Miremetal Ghost Peridot Ring
   description: A ring forged from miremetal, and alchemized to be golden. Set with a ghost peridot that represents magical prowess.
@@ -51,6 +54,9 @@
     Intelligence: 3.1
     Resistance: 3.6
     Energy: 20
+
+  elementalResistances:
+    Earth: 5
 
 - id: d06ff7bc-49a3-4780-b99e-98d188edc16a
   name: Golden Miremetal Pristine Ring
@@ -65,3 +71,6 @@
     Strength: 3.9
   debuffResistances:
     Stun: 4
+
+  elementalResistances:
+    Earth: 5

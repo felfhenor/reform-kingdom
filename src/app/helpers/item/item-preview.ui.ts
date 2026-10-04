@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import {
+  defaultAffinities,
   defaultCombatStats,
   defaultMonsterTypeDamageBonus,
   defaultStats,
@@ -8,6 +9,7 @@ import {
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import type {
   CombatStatBlock,
+  ElementBlock,
   EquipmentContent,
   EquipmentItem,
   ItemPreviewDisplay,
@@ -57,6 +59,24 @@ export function itemPreviewTotalMonsterTypeDamage(
   return mergeBlock(
     display.monsterTypeDamage ?? defaultMonsterTypeDamageBonus(),
     display.bonusMonsterTypeDamage,
+  );
+}
+
+export function itemPreviewTotalElementalResistances(
+  display: ItemPreviewDisplay,
+): ElementBlock {
+  return mergeBlock(
+    display.elementalResistances ?? defaultAffinities(),
+    display.bonusElementalResistances,
+  );
+}
+
+export function itemPreviewTotalElementalBoons(
+  display: ItemPreviewDisplay,
+): ElementBlock {
+  return mergeBlock(
+    display.elementalBoons ?? defaultAffinities(),
+    display.bonusElementalBoons,
   );
 }
 

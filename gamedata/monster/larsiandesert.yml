@@ -3,6 +3,9 @@
   description: A lizard magician that specializes in burning its victims alive.
 
   types: [Humanoid]
+  elementalResistances:
+    Fire: 25
+    Water: -15
 
   sprite: '0096'
   frames: 4
@@ -62,6 +65,9 @@
   description: A lizard warrior that specializes in distracting its victims to allow its allies to have a bigger window of opportunity to strike.
 
   types: [Humanoid]
+  elementalResistances:
+    Earth: 25
+    Air: -15
 
   sprite: '0100'
   frames: 4
@@ -191,6 +197,9 @@
   description: A magical wisp that lights up the night with it's blinding bright glow.
 
   types: [Spirit]
+  elementalResistances:
+    Air: 50
+    Earth: -25
 
   sprite: '0104'
   frames: 4
@@ -252,6 +261,8 @@
   description: A moth bathed in the blood of the desert battlefields. It's intricate patterns attract the ire of its foes.
 
   types: [Insect]
+  elementalResistances:
+    Fire: -25
 
   sprite: '0108'
   frames: 4

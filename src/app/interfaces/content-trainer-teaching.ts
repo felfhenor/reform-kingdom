@@ -1,5 +1,7 @@
 import type {
   AffixEffectCombatStat,
+  AffixEffectElementalBoon,
+  AffixEffectElementalResistance,
   AffixEffectGrantSkill,
   AffixEffectResistance,
   AffixEffectStat,
@@ -16,12 +18,16 @@ export type TrainerTeachingEffect =
   | AffixEffectStat
   | AffixEffectCombatStat
   | AffixEffectResistance
+  | AffixEffectElementalResistance
+  | AffixEffectElementalBoon
   | AffixEffectGrantSkill;
 
 export const TrainerTeachingEffectKinds: TrainerTeachingEffect['kind'][] = [
   'Stat',
   'CombatStat',
   'Resistance',
+  'ElementalResistance',
+  'ElementalBoon',
   'GrantSkill',
 ];
 

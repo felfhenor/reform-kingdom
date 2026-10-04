@@ -13,6 +13,9 @@
     Health: 20
     Energy: 9
 
+  elementalResistances:
+    Earth: 5
+
 - id: c9aa435b-cb74-4767-8ee6-f1519c493308
   name: Oozemire Plate
   description: A breastplate made of miremetal and ooze, reeking but nearly impenetrable.
@@ -26,3 +29,6 @@
     Resistance: 10.1
   debuffResistances:
     Poison: 6
+
+  elementalResistances:
+    Earth: 5

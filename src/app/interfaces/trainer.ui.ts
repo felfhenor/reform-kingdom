@@ -4,6 +4,7 @@ import type {
   CollectibleId,
 } from '@interfaces/content-collectible';
 import type { JobContent } from '@interfaces/content-job';
+import type { ElementBlock } from '@interfaces/element';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { TrainerTeachingContent } from '@interfaces/content-trainer-teaching';
@@ -39,6 +40,8 @@ export type TrainerTeachingRow = {
   stats: StatBlock;
   combatStats: CombatStatBlock;
   resistances: StatusEffectBlock;
+  elementalResistances: ElementBlock;
+  elementalBoons: ElementBlock;
   grantedSkills: EquipmentSkillContent[];
 };
 

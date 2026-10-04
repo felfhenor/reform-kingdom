@@ -10,6 +10,9 @@
     Energy: 25
     Intelligence: 8.1
 
+  elementalResistances:
+    Air: 5
+
 - id: ad44fc7e-ad54-480d-8405-466852132602
   name: Crimson Bangle
   description: A bangle made of crimson that ensures the wearer is more alert.
@@ -24,6 +27,9 @@
   debuffResistances:
     Stun: 25
 
+  elementalResistances:
+    Air: 5
+
 - id: 2f5529e5-3ec0-4bc4-9555-467c34ab1b2b
   name: Fel Casting Gloves
   description: A pair of gloves worn by demon casters to improve their aim and output.
@@ -35,3 +41,6 @@
   baseStats:
     Intelligence: 10.8
     Vitality: 4.3
+
+  elementalResistances:
+    Fire: 5

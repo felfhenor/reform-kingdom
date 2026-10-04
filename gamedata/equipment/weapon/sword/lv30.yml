@@ -11,6 +11,9 @@
     Vitality: 15.4
     Resistance: 4.5
 
+  elementalResistances:
+    Air: 5
+
 - id: 1f027164-4dc3-482f-a278-df06a00a52c8
   name: Demongold Flyssa
   description: A flyssa emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -36,3 +39,6 @@
   baseStats:
     Strength: 20.1
     Vitality: 20.1
+
+  elementalResistances:
+    Fire: 5

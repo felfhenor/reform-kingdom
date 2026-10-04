@@ -7,6 +7,7 @@ import {
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   ensureCombatStats,
+  ensureElementBlock,
   ensureStats,
 } from '@helpers/content/ensure-helpers-stats';
 import type {
@@ -61,5 +62,6 @@ export function ensureMonster(
     drops: ensureArray(monster.drops, ensureDroppedReward),
     skills: ensureArray(monster.skills, ensureMonsterSkill),
     types: ensureEnumArray(monster.types, VALID_MONSTER_TYPES),
+    elementalResistances: ensureElementBlock(monster.elementalResistances),
   };
 }

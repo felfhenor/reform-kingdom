@@ -75,6 +75,8 @@ Adding a new job requires adding:
 
 Skills are self-contained. They can be attached to gear or affixes.
 
+Damaging techniques should write `{{ damageText }}` (e.g. "12 Fire damage") in their `combatMessage` rather than `{{ damage }} damage`, so the log names the element - including elements given by gear. `npm run validate` flags the old form.
+
 ## Equipment
 
 Equipment is fairly self-explanatory, but there are a lot of knobs that can be twisted for equipment. They can have some of the following options:
@@ -82,3 +84,5 @@ Equipment is fairly self-explanatory, but there are a lot of knobs that can be t
 - [ ] Stats (including negative stats)
 - [ ] Infusion Slots
 - [ ] Skills learned on equip
+- [ ] Elemental resistances (negative = weakness) and boons
+- [ ] Elements given to non-elemental attacks

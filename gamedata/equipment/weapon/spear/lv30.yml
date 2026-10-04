@@ -13,6 +13,9 @@
   monsterTypeDamage:
     Demon: 10
 
+  elementalResistances:
+    Air: 5
+
 - id: 779a96ad-9365-452e-8d72-be56551b493a
   name: Demongold Trident
   description: A trident emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -37,3 +40,6 @@
   slots: 1
   baseStats:
     Strength: 32.2
+
+  elementalResistances:
+    Fire: 5

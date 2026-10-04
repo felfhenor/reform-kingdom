@@ -14,6 +14,9 @@
     Agility: 3
     Luck: 3
 
+  elementalResistances:
+    Water: 5
+
 - id: 323a760e-a3fc-41a3-b4d9-9bfa84eb1937
   name: Desert Ring
   description: A ring style popularized in the Larsian desert. Larsians treat it as a status symbol.
@@ -24,6 +27,9 @@
   slots: 1
   baseStats:
     Luck: 4.2
+
+  elementalResistances:
+    Water: 5
 
 - id: 6fbb85ba-8029-48ea-8774-d44f15111696
   name: Cimmerian Ring
@@ -38,3 +44,6 @@
 
   debuffResistances:
     Accuracy: 5
+
+  elementalResistances:
+    Water: 5

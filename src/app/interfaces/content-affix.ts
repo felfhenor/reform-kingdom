@@ -4,6 +4,7 @@ import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { DropRarity, HasRarity } from '@interfaces/droppable';
+import type { GameElement } from '@interfaces/element';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { BaseStat, SkillStatBonus } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
@@ -67,6 +68,24 @@ export type AffixEffectMonsterTypeDamage = {
   value: number; // percent damage bonus against monsters of this type
 };
 
+export type AffixEffectElementalResistance = {
+  kind: 'ElementalResistance';
+  element: GameElement;
+  value: number; // negative = weakness
+};
+
+export type AffixEffectElementalBoon = {
+  kind: 'ElementalBoon';
+  element: GameElement;
+  value: number;
+};
+
+// Gives the wearer's non-elemental damaging techniques this element.
+export type AffixEffectElementConversion = {
+  kind: 'ElementConversion';
+  element: GameElement;
+};
+
 export type AffixEffectSkillStatBonus = SkillStatBonus & {
   kind: 'SkillStatBonus';
 };
@@ -82,7 +101,10 @@ export type AffixEffect =
   | AffixEffectCaravanBuyDiscount
   | AffixEffectCaravanSellBonus
   | AffixEffectMonsterTypeDamage
-  | AffixEffectSkillStatBonus;
+  | AffixEffectSkillStatBonus
+  | AffixEffectElementalResistance
+  | AffixEffectElementalBoon
+  | AffixEffectElementConversion;
 
 // Where this affix's name sits relative to the base item name when composing a display name, e.g. "Weakening" (Prefix) Copper Ring vs Copper Ring "of Strength" (Suffix).
 export type AffixPosition = 'Prefix' | 'Suffix';

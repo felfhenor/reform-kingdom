@@ -12,6 +12,9 @@
   debuffResistances:
     Burn: 5
 
+  elementalResistances:
+    Water: 5
+
 - id: 082063f9-59d0-4a57-8e29-e14a195def01
   name: Cimmerian Bracer
   description: A bracer made in the Cimmerian style. It helps the wearer resist the darkest of magic.
@@ -26,3 +29,6 @@
 
   debuffResistances:
     Accuracy: 5
+
+  elementalResistances:
+    Water: 5

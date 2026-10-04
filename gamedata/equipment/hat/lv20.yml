@@ -13,6 +13,9 @@
   debuffResistances:
     Burn: 5
 
+  elementalResistances:
+    Water: 5
+
 - id: 670438a0-0d5b-4c63-b7c7-5f6d65127eb8
   name: Cimmerian Darkhat
   description: A hat nearly lost to time. It protects the wearer from the darkest of magic.
@@ -28,3 +31,6 @@
 
   debuffResistances:
     Accuracy: 5
+
+  elementalResistances:
+    Water: 5

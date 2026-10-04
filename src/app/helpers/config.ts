@@ -7,6 +7,7 @@
 import type {
   BaseStat,
   CombatStat,
+  GameElement,
   MonsterType,
   StatusEffectTag,
 } from '@interfaces';
@@ -21,6 +22,10 @@ export const URGENCY_WARNING_MIN_TICKS = 300; // 5 minutes
 
 export const COMBAT_ORDER_ROW_CAP = 10;
 export const SKILL_MAX_ALLY_TARGETS = 4;
+
+// Resistance can't reach immunity; a weakness can at most double incoming damage.
+export const ELEMENT_RESISTANCE_MAX = 75;
+export const ELEMENT_RESISTANCE_MIN = -100;
 
 // XP degrades once the party out-levels a node's max, bottoming out at a flat 1 XP - keeps overleveled parties from farming trivial nodes.
 export const OVERLEVEL_XP_DEGRADE_PER_LEVEL = 0.25;
@@ -152,12 +157,21 @@ export const VALUE_MULTIPLIER_PER_COMBAT_STAT: Record<CombatStat, number> = {
 
 export const GOLD_PER_MONSTER_TYPE_DAMAGE_POINT = 50;
 export const VALUE_MULTIPLIER_PER_MONSTER_TYPE: Record<MonsterType, number> = {
-  Humanoid: 5,
-  Demon: 5,
-  Amalgamation: 5,
-  Insect: 5,
+  Humanoid: 3,
+  Demon: 10,
+  Amalgamation: 11,
+  Insect: 7,
   Beast: 5,
-  Spirit: 5,
+  Spirit: 15,
+};
+
+export const GOLD_PER_ELEMENT_RESIST_POINT = 50;
+export const GOLD_PER_ELEMENT_BOON_POINT = 50;
+export const VALUE_MULTIPLIER_PER_ELEMENT: Record<GameElement, number> = {
+  Fire: 5,
+  Water: 5,
+  Earth: 5,
+  Air: 5,
 };
 
 export const GOLD_PER_GATHER_YIELD_POINT = 200;

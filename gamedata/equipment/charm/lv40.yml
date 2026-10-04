@@ -10,3 +10,6 @@
     Vitality: 12.1
     Resistance: 14.2
     Health: 30
+
+  elementalResistances:
+    Fire: 5

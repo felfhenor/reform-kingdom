@@ -9,6 +9,7 @@ import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { WorkerContent } from '@interfaces/content-worker';
 import type { DropRarity } from '@interfaces/droppable';
+import type { ElementBlock, GameElement } from '@interfaces/element';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { GameStat, StatBlock } from '@interfaces/stat';
 
@@ -41,11 +42,17 @@ export type ItemPreviewDisplay = {
   resistances?: StatusEffectBlock;
   combatStats?: CombatStatBlock;
   monsterTypeDamage?: Record<MonsterType, number>;
+  elementalResistances?: ElementBlock;
+  elementalBoons?: ElementBlock;
   // Affix + infusion bonus on top of `stats`/`resistances`/`combatStats` - set only when previewing a specific rolled instance.
   bonusStats?: StatBlock;
   bonusResistances?: StatusEffectBlock;
   bonusCombatStats?: CombatStatBlock;
   bonusMonsterTypeDamage?: Record<MonsterType, number>;
+  bonusElementalResistances?: ElementBlock;
+  bonusElementalBoons?: ElementBlock;
+  // Equipment only - base content `elements`.
+  elements?: GameElement[];
   // Equipment only - base content plus any rolled GatherYield affix, merged by tradeskill and resolved to a display name/icon.
   gatherYieldBonuses?: {
     tradeskillName: string;
@@ -77,6 +84,8 @@ export type AffixDisplay = {
   resistances: StatusEffectBlock;
   combatStats: CombatStatBlock;
   monsterTypeDamage: Record<MonsterType, number>;
+  elementalResistances: ElementBlock;
+  elementalBoons: ElementBlock;
   hasStatRow: boolean;
   gatherYieldBonuses: NonNullable<ItemPreviewDisplay['gatherYieldBonuses']>;
   skillStatBonuses: SkillStatBonusDisplay[];

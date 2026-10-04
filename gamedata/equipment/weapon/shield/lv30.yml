@@ -10,6 +10,9 @@
     Vitality: 8.1
     Resistance: 6.6
 
+  elementalResistances:
+    Air: 5
+
 - id: db841c8a-da28-41bd-990f-298c39fbae9a
   name: Demongold Defender
   description: A shield emitting demonic and crimson energies. It seems to be made of corrupted crimson.
@@ -40,3 +43,6 @@
     - skillFamily: Smashing Board
       stat: Vitality
       value: 0.5
+
+  elementalResistances:
+    Air: 5

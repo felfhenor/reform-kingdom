@@ -11,6 +11,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   GOLD_PER_SKILL_STAT_BONUS_POINT,
   VALUE_MULTIPLIER_PER_STAT,
+  GOLD_PER_ELEMENT_RESIST_POINT,
+  VALUE_MULTIPLIER_PER_ELEMENT,
 } from '@helpers/config';
 import {
   canInfuseEquipmentItem,
@@ -28,6 +30,7 @@ import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import {
+  defaultAffinities,
   defaultStats,
   defaultCombatStats,
   defaultTagResistances,
@@ -315,6 +318,21 @@ describe('Infusion Helper Functions', () => {
       expect(isInfusionMaterial(woodShard)).toBe(true);
     });
 
+    it('is true when only an elemental block has a nonzero value', () => {
+      expect(
+        isInfusionMaterial({
+          ...plainMaterial,
+          infusionElementalResistances: { ...defaultAffinities(), Fire: 5 },
+        }),
+      ).toBe(true);
+      expect(
+        isInfusionMaterial({
+          ...plainMaterial,
+          infusionElementalBoons: { ...defaultAffinities(), Air: 5 },
+        }),
+      ).toBe(true);
+    });
+
     it('is true when only infusionSkillStatBonuses has a nonzero value', () => {
       expect(
         isInfusionMaterial({
@@ -392,6 +410,19 @@ describe('Infusion Helper Functions', () => {
         GOLD_PER_SKILL_STAT_BONUS_POINT *
           0.5 *
           VALUE_MULTIPLIER_PER_STAT.Vitality,
+      );
+    });
+
+    it('costs elemental resistance per point, weighted by element', () => {
+      seedContent([
+        ensureItem({
+          ...plainMaterial,
+          infusionElementalResistances: { ...defaultAffinities(), Fire: 5 },
+        }),
+      ]);
+
+      expect(infusionMaterialCost(plainMaterial.id)).toBe(
+        GOLD_PER_ELEMENT_RESIST_POINT * 5 * VALUE_MULTIPLIER_PER_ELEMENT.Fire,
       );
     });
 

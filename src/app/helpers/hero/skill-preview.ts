@@ -1,7 +1,9 @@
 import {
+  combatDamageElements,
   getCombatantBaseDamageForTechnique,
   techniqueHasAttribute,
 } from '@helpers/combat/combat-damage';
+import { elementalBoonMultiplier } from '@helpers/combat/combat-element';
 import { combatFormatMessage } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
@@ -31,7 +33,12 @@ export function skillTechniquePreviewValue(
   skill: EquipmentSkillContent,
   technique: EquipmentSkillContentTechnique,
 ): number {
-  const total = getCombatantBaseDamageForTechnique(combatant, skill, technique);
+  const total =
+    getCombatantBaseDamageForTechnique(combatant, skill, technique) *
+    elementalBoonMultiplier(
+      combatant,
+      combatDamageElements(combatant, technique),
+    );
 
   return Math.max(0, Math.floor(total));
 }
@@ -108,6 +115,7 @@ function skillTechniquePreview(
   technique: EquipmentSkillContentTechnique,
 ): SkillTechniquePreview {
   const kind = skillTechniqueKind(technique);
+  const damageElements = combatDamageElements(combatant, technique);
   const hasAmount = kind === 'Damage' || kind === 'Heal';
 
   return {
@@ -124,7 +132,7 @@ function skillTechniquePreview(
         combatant.skillStatBonuses,
       ),
     ),
-    elements: technique.elements,
+    elements: damageElements.length > 0 ? damageElements : technique.elements,
     statusEffects: skillTechniqueStatusPreviews(skill, technique),
   };
 }

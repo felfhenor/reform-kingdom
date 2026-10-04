@@ -7,16 +7,26 @@ import {
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
 import {
-  type CombatStat,
   type CombatStatBlock,
   CombatStatDimension,
+  type ElementBlock,
+  ElementBoonDimension,
+  ElementResistanceDimension,
   type MonsterType,
   MonsterTypeDimension,
   type StatBlock,
   type StatusEffectBlock,
-  type StatusEffectTag,
   StatusEffectTagDimension,
 } from '@interfaces';
+
+function hasAnyNonzero(
+  base: Partial<Record<string, number>> | undefined,
+  bonus: Partial<Record<string, number>> | undefined,
+): boolean {
+  return [...Object.values(base ?? {}), ...Object.values(bonus ?? {})].some(
+    (value) => (value ?? 0) !== 0,
+  );
+}
 
 @Component({
   selector: 'app-row-stat-summary',
@@ -42,6 +52,14 @@ export class RowStatSummaryComponent {
   public bonusMonsterTypeDamage = input<Record<MonsterType, number>>();
   public comparisonMonsterTypeDamage = input<Record<MonsterType, number>>();
 
+  public elementalResistances = input<ElementBlock>();
+  public bonusElementalResistances = input<ElementBlock>();
+  public comparisonElementalResistances = input<ElementBlock>();
+
+  public elementalBoons = input<ElementBlock>();
+  public bonusElementalBoons = input<ElementBlock>();
+  public comparisonElementalBoons = input<ElementBlock>();
+
   // 'column' (default) for tooltips/detail panels; 'row' for compact,
   // space-constrained lists (e.g. a picker row) - mirrors the underlying rows.
   public layout = input<'column' | 'row'>('column');
@@ -51,40 +69,32 @@ export class RowStatSummaryComponent {
   // Bonus-only values (e.g. a combat-stat/resistance affix on an item with
   // no base value in that dimension) must still trigger the row - checking
   // only the base block hides them entirely.
-  public hasAnyResistances = computed(() => {
-    const resistances = this.resistances() ?? ({} as StatusEffectBlock);
-    const bonus = this.bonusResistances() ?? ({} as StatusEffectBlock);
-    return [...Object.keys(resistances), ...Object.keys(bonus)].some(
-      (k) =>
-        (resistances[k as StatusEffectTag] ?? 0) !== 0 ||
-        (bonus[k as StatusEffectTag] ?? 0) !== 0,
-    );
-  });
+  public hasAnyResistances = computed(() =>
+    hasAnyNonzero(this.resistances(), this.bonusResistances()),
+  );
 
-  public hasAnyCombatStats = computed(() => {
-    const combatStats =
-      this.combatStats() ?? ({} as Record<CombatStat, number>);
-    const bonus = this.bonusCombatStats() ?? ({} as Record<CombatStat, number>);
-    return [...Object.keys(combatStats), ...Object.keys(bonus)].some(
-      (k) =>
-        (combatStats[k as CombatStat] ?? 0) !== 0 ||
-        (bonus[k as CombatStat] ?? 0) !== 0,
-    );
-  });
+  public hasAnyCombatStats = computed(() =>
+    hasAnyNonzero(this.combatStats(), this.bonusCombatStats()),
+  );
 
-  public hasAnyMonsterTypeDamage = computed(() => {
-    const monsterTypeDamage =
-      this.monsterTypeDamage() ?? ({} as Record<MonsterType, number>);
-    const bonus =
-      this.bonusMonsterTypeDamage() ?? ({} as Record<MonsterType, number>);
-    return [...Object.keys(monsterTypeDamage), ...Object.keys(bonus)].some(
-      (k) =>
-        (monsterTypeDamage[k as MonsterType] ?? 0) !== 0 ||
-        (bonus[k as MonsterType] ?? 0) !== 0,
-    );
-  });
+  public hasAnyMonsterTypeDamage = computed(() =>
+    hasAnyNonzero(this.monsterTypeDamage(), this.bonusMonsterTypeDamage()),
+  );
+
+  public hasAnyElementalResistances = computed(() =>
+    hasAnyNonzero(
+      this.elementalResistances(),
+      this.bonusElementalResistances(),
+    ),
+  );
+
+  public hasAnyElementalBoons = computed(() =>
+    hasAnyNonzero(this.elementalBoons(), this.bonusElementalBoons()),
+  );
 
   public resistanceDimension = StatusEffectTagDimension;
   public combatStatDimension = CombatStatDimension;
   public monsterTypeDamageDimension = MonsterTypeDimension;
+  public elementalResistanceDimension = ElementResistanceDimension;
+  public elementalBoonDimension = ElementBoonDimension;
 }

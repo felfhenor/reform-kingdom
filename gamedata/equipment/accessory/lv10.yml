@@ -23,6 +23,9 @@
     Energy: 9
     Resistance: 1.1
 
+  elementalResistances:
+    Earth: 5
+
 - id: 568c362d-c361-4797-b727-dc76bd5229f1
   name: Mirewood Clogs
   description: A pair of clogs that boosts the wearer's speed, though they clatter loudly with every step, leaving the wearer exposed.
@@ -34,6 +37,9 @@
   baseStats:
     Agility: 3.1
     Vitality: -1.5
+
+  elementalResistances:
+    Earth: 5
 
 - id: 9df4d947-91d4-4a3e-af9a-128447b8b5d9
   name: Miresewn Gloves
@@ -47,6 +53,9 @@
     Vitality: 1.7
     Resistance: 2.1
 
+  elementalResistances:
+    Earth: 5
+
 - id: 45b0a60b-ffcd-44ed-bb63-c33b3d1737b4
   name: Miremetal Brooch
   description: A brooch set with a peridot that enhances the user's physical capabilities, favored by mire militia.
@@ -59,3 +68,6 @@
     Strength: 2.1
     Health: 10
     Vitality: 1.7
+
+  elementalResistances:
+    Earth: 5

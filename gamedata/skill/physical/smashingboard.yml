@@ -30,7 +30,7 @@
           chance: 100
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 2f1f280a-1e89-4a84-89d0-c1ac547ba3dd
   name: Smashing Board II
@@ -64,7 +64,7 @@
           chance: 100
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 06d268f8-d333-4a35-9ebd-c7243eaaec90
   name: Smashing Board III
@@ -98,4 +98,4 @@
           chance: 100
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** smashes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

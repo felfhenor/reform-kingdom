@@ -1,6 +1,6 @@
 import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
-import { defaultStats } from '@helpers/defaults';
+import { defaultAffinities, defaultStats } from '@helpers/defaults';
 import {
   skillDescriptionWithPreview,
   skillTechniqueKind,
@@ -61,6 +61,27 @@ describe('skillTechniquePreviewValue', () => {
 
     // Intelligence(100)*0.5 = 50; Vitality(40)*0.25 = 10.
     expect(skillTechniquePreviewValue(combatant, skill, technique)).toBe(60);
+  });
+
+  it('applies the attacker boon for the element the hit will carry', () => {
+    const combatant = buildCombatant({
+      totalStats: { ...defaultStats(), Health: 100, Strength: 100 },
+      affinity: { ...defaultAffinities(), Fire: 20 },
+      gearElements: ['Fire'],
+    });
+    const technique = buildTechnique({
+      damageScaling: { ...defaultStats(), Strength: 1 },
+    });
+
+    expect(skillTechniquePreviewValue(combatant, buildSkill(), technique)).toBe(
+      120,
+    );
+    expect(
+      skillTechniquePreviews(
+        combatant,
+        buildSkill({ techniques: [technique] }),
+      )[0].elements,
+    ).toEqual(['Fire']);
   });
 
   it('floors a fractional result', () => {

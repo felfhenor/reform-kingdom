@@ -38,6 +38,9 @@
     - tradeskillId: Jewelcrafting
       value: 1
 
+  elementalResistances:
+    Water: 5
+
 - id: fbad43f1-7966-4674-9eb3-92d66ba4b371
   name: Crimson Bracer
   description: A bracer that, when worn, makes it easier to chop wood.
@@ -57,3 +60,6 @@
   gatherYieldBonuses:
     - tradeskillId: Woodworking
       value: 1
+
+  elementalResistances:
+    Air: 5

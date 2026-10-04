@@ -50,4 +50,53 @@
       </span>
     </div>
   }
+
+  @if (hasElementalSection()) {
+    <div class="mt-2">
+      <span class="type-section-title">Elemental</span>
+    </div>
+  }
+
+  @if (gearElements().length > 0) {
+    <div class="flex items-center gap-2">
+      <span class="text-base">Attacks deal</span>
+      <span class="ml-auto font-semibold text-lg">
+        {{ gearElements().join('/') }}
+      </span>
+    </div>
+  }
+
+  @for (element of elementalResistanceRows(); track element) {
+    @let value = tweenedElementalResistanceValue(element);
+
+    <div class="flex items-center gap-2">
+      <app-icon
+        [name]="elementalResistanceDimension.icon[element]"
+        size="stat"
+      />
+      <span class="text-base">
+        {{ elementalResistanceDimension.label[element] }}
+      </span>
+      <span
+        class="ml-auto font-semibold text-lg tabular-nums"
+        [class.text-value-negative]="elementalResistances()[element] < 0"
+      >
+        {{ value | number: '1.0-0' }}%
+      </span>
+    </div>
+  }
+
+  @for (element of elementalBoonRows(); track element) {
+    @let value = tweenedElementalBoonValue(element);
+
+    <div class="flex items-center gap-2">
+      <app-icon [name]="elementalBoonDimension.icon[element]" size="stat" />
+      <span class="text-base">
+        {{ elementalBoonDimension.label[element] }}
+      </span>
+      <span class="ml-auto font-semibold text-lg tabular-nums">
+        {{ value | number: '1.0-0' }}%
+      </span>
+    </div>
+  }
 </div>

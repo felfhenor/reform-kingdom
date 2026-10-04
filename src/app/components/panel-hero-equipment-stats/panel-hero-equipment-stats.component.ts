@@ -13,7 +13,14 @@ import {
   characterTagResistances,
 } from '@helpers/item/equipment';
 import {
+  characterElementalBoons,
+  characterElementalResistances,
+  equipmentGearElements,
+} from '@helpers/item/equipment-element';
+import {
   CombatStatDimension,
+  ElementBoonDimension,
+  ElementResistanceDimension,
   StatInformation,
   StatOrder,
   StatShorthand,
@@ -21,6 +28,7 @@ import {
   type BaseStat,
   type Character,
   type CombatStat,
+  type GameElement,
   type StatDisplayDimension,
   type StatusEffectTag,
 } from '@interfaces';
@@ -44,6 +52,8 @@ export class PanelHeroEquipmentStatsComponent {
   public statInformation = StatInformation;
   public resistanceDimension = StatusEffectTagDimension;
   public combatStatDimension = CombatStatDimension;
+  public elementalResistanceDimension = ElementResistanceDimension;
+  public elementalBoonDimension = ElementBoonDimension;
 
   // Gear + teachings, same as the stats above - the temporary Astral Projector
   // buff is combat-time only and intentionally not reflected here.
@@ -53,6 +63,36 @@ export class PanelHeroEquipmentStatsComponent {
 
   public combatStats = computed(() =>
     characterCombatStatBonusTotals(this.character()),
+  );
+
+  public elementalResistances = computed(() =>
+    characterElementalResistances(this.character()),
+  );
+
+  public elementalBoons = computed(() =>
+    characterElementalBoons(this.character()),
+  );
+
+  public gearElements = computed(() =>
+    equipmentGearElements(this.character().equipment),
+  );
+
+  public elementalResistanceRows = computed(() =>
+    this.nonzeroRows(
+      this.elementalResistanceDimension,
+      this.elementalResistances(),
+    ),
+  );
+
+  public elementalBoonRows = computed(() =>
+    this.nonzeroRows(this.elementalBoonDimension, this.elementalBoons()),
+  );
+
+  public hasElementalSection = computed(
+    () =>
+      this.elementalResistanceRows().length > 0 ||
+      this.elementalBoonRows().length > 0 ||
+      this.gearElements().length > 0,
   );
 
   public resistanceRows = computed(() =>
@@ -86,6 +126,20 @@ export class PanelHeroEquipmentStatsComponent {
     ]),
   ) as Record<StatusEffectTag, Signal<number>>;
 
+  private tweenedElementalResistances = Object.fromEntries(
+    ElementResistanceDimension.order.map((element) => [
+      element,
+      injectTweenedNumber(() => this.elementalResistances()[element]),
+    ]),
+  ) as Record<GameElement, Signal<number>>;
+
+  private tweenedElementalBoons = Object.fromEntries(
+    ElementBoonDimension.order.map((element) => [
+      element,
+      injectTweenedNumber(() => this.elementalBoons()[element]),
+    ]),
+  ) as Record<GameElement, Signal<number>>;
+
   public tweenedStatValue(stat: BaseStat): number {
     return this.tweenedStats[stat]();
   }
@@ -96,6 +150,14 @@ export class PanelHeroEquipmentStatsComponent {
 
   public tweenedResistanceValue(stat: StatusEffectTag): number {
     return this.tweenedResistances[stat]();
+  }
+
+  public tweenedElementalResistanceValue(element: GameElement): number {
+    return this.tweenedElementalResistances[element]();
+  }
+
+  public tweenedElementalBoonValue(element: GameElement): number {
+    return this.tweenedElementalBoons[element]();
   }
 
   public suffix(dimension: StatDisplayDimension, key: string): string {

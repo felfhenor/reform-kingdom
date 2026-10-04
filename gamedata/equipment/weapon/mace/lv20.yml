@@ -16,6 +16,9 @@
   grantedSkillIds:
     - Spiked Smash I
 
+  elementalResistances:
+    Water: 5
+
 - id: b30a480c-7ee0-4c6b-8c99-3e9099152ce7
   name: Crimgold Greatmace
   description: An oversized mace made of crimson. It hurts!
@@ -27,3 +30,6 @@
   baseStats:
     Strength: 13.6
     Intelligence: 12.1
+
+  elementalResistances:
+    Air: 5

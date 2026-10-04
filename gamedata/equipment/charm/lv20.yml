@@ -31,6 +31,9 @@
   debuffResistances:
     Burn: 5
 
+  elementalResistances:
+    Water: 5
+
 - id: dcd28145-2664-46a8-a784-f70076bd89ca
   name: Cimmerian Bangle
   description: A bangle worn by the ancient Cimmerians. It helps the wearer resist the darkest of magic.
@@ -46,3 +49,6 @@
 
   debuffResistances:
     Accuracy: 5
+
+  elementalResistances:
+    Water: 5

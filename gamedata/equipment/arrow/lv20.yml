@@ -11,6 +11,9 @@
     Agility: 3.2
     Energy: 8
 
+  elementalResistances:
+    Water: 5
+
 - id: b52ff635-1add-4efd-a97d-e970317cfae3
   name: Crimson-tipped Arrow
   description: An arrow made of the finest elven wood and tipped with crimson. The intensity and sharpness is hardly felt with how effective it is.
@@ -23,3 +26,6 @@
     Strength: 7.3
     Agility: 5.2
     Vitality: 2.5
+
+  elementalResistances:
+    Air: 5

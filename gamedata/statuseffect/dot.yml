@@ -17,7 +17,7 @@
 
   onTick:
     - type: TakeDamage
-      combatMessage: '**{{ combatant.name }}** is burning for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** is burning for {{ damageText }} ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
 
 - id: 3b675904-61f4-4102-a642-58a7981e6e46
   name: Venom I
@@ -40,7 +40,7 @@
 
   onTick:
     - type: TakeDamage
-      combatMessage: '**{{ combatant.name }}** is suffering from venom for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** is suffering from venom for {{ damageText }} ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
 
 - id: 7fa166e2-9fb2-4f00-990b-fdff7aa7a3f1
   name: Venom II
@@ -63,7 +63,7 @@
 
   onTick:
     - type: TakeDamage
-      combatMessage: '**{{ combatant.name }}** is suffering from venom for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** is suffering from venom for {{ damageText }} ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
 
 - id: 15f98906-5f1b-402c-94cd-4bf1c2d14874
   name: Bleeding
@@ -84,4 +84,4 @@
 
   onTick:
     - type: TakeDamage
-      combatMessage: '**{{ combatant.name }}** takes {{ damage }} damage from bleeding ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** takes {{ damageText }} from bleeding ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).'

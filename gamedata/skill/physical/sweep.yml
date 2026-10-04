@@ -22,7 +22,7 @@
       damageScaling:
         Strength: 0.4
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: 7fe3f97b-a5a9-440c-a92e-97b584a27a67
   name: Sweep II
@@ -48,7 +48,7 @@
       damageScaling:
         Strength: 0.75
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
 - id: e7ffe0fa-4790-48fa-8257-9d7dbab01dda
   name: Sweep III
@@ -74,4 +74,4 @@
       damageScaling:
         Strength: 1.1
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

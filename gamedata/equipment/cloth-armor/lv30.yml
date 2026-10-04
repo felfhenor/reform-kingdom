@@ -10,6 +10,9 @@
     Vitality: 12.1
     Resistance: 16.2
 
+  elementalResistances:
+    Air: 5
+
 - id: 54c6d5bc-c4f3-4d88-a27c-c97f982ab2f4
   name: Crimsilk Shroud
   description: A shroud spun of the finest elfsilk and crimson. It protects the wearer from harsh elements, increasing their vitality.
@@ -20,6 +23,9 @@
   slots: 1
   baseStats:
     Vitality: 26.3
+
+  elementalResistances:
+    Air: 5
 
 - id: 86a32b6e-464c-494b-8e57-324498211c00
   name: Fel Villager Cloak
@@ -32,3 +38,6 @@
   baseStats:
     Vitality: 27.3
     Resistance: 19.3
+
+  elementalResistances:
+    Fire: 10

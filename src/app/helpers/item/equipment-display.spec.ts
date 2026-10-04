@@ -2,6 +2,8 @@ import { seedContent } from '@/testing/content';
 import { buildEquipmentItem } from '@/testing/builders';
 import {
   equipmentItemBonusCombatStats,
+  equipmentItemBonusElementalBoons,
+  equipmentItemBonusElementalResistances,
   equipmentItemBonusMonsterTypeDamage,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
@@ -179,6 +181,24 @@ describe('equipmentItemBonusMonsterTypeDamage', () => {
       buildItem({ affixIds: [demonSlayingAffix.id] }),
     );
     expect(bonus.Demon).toBe(20);
+  });
+});
+
+describe('equipmentItemBonusElementalResistances / equipmentItemBonusElementalBoons', () => {
+  const flamewardAffix = ensureAffix({
+    id: 'flameward' as AffixId,
+    effects: [
+      { kind: 'ElementalResistance', element: 'Fire', value: 10 },
+      { kind: 'ElementalBoon', element: 'Air', value: 20 },
+    ],
+  });
+
+  it('includes affix elemental bonuses', () => {
+    seedContent([flamewardAffix]);
+    const item = buildItem({ affixIds: [flamewardAffix.id] });
+
+    expect(equipmentItemBonusElementalResistances(item).Fire).toBe(10);
+    expect(equipmentItemBonusElementalBoons(item).Air).toBe(20);
   });
 });
 

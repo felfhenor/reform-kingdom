@@ -9,6 +9,7 @@ import type {
 } from '@interfaces';
 
 const DAMAGE_TOKEN = /\{\{\s*damage\s*\}\}/;
+const PLAIN_DAMAGE_TEXT = /\{\{\s*damage\s*\}\}\s+damage/;
 const EFFECT_TYPES = ['Buff', 'Debuff'] as const;
 
 function hasAttr(t: Technique, attribute: EquipmentSkillAttribute): boolean {
@@ -231,7 +232,34 @@ function combatMessageIssues(t: Technique): AnalysisIssue[] {
     ];
   }
 
+  if (hasAttr(t, 'DamagesTarget') && PLAIN_DAMAGE_TEXT.test(t.combatMessage)) {
+    return [
+      analysisFail(
+        'combatMessage uses "{{ damage }} damage"; use {{ damageText }} so the log names the element.',
+      ),
+    ];
+  }
+
   return [];
+}
+
+export function statusEffectDamageTextIssues(
+  effect: StatusEffectContent,
+): AnalysisIssue[] {
+  const behaviors = [...effect.onApply, ...effect.onTick, ...effect.onUnapply];
+  const plain = behaviors.some(
+    (behavior) =>
+      behavior.type === 'TakeDamage' &&
+      PLAIN_DAMAGE_TEXT.test(behavior.combatMessage ?? ''),
+  );
+
+  return plain
+    ? [
+        analysisFail(
+          'TakeDamage combatMessage uses "{{ damage }} damage"; use {{ damageText }} so the log names the element.',
+        ),
+      ]
+    : [];
 }
 
 export function techniqueIssues(t: Technique): AnalysisIssue[] {

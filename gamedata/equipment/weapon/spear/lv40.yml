@@ -8,3 +8,6 @@
   slots: 1
   baseStats:
     Strength: 38.2
+
+  elementalResistances:
+    Fire: 5

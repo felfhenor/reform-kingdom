@@ -15,6 +15,8 @@ import {
 } from '@helpers/item/equipment-bonus';
 import {
   equipmentItemBonusCombatStats,
+  equipmentItemBonusElementalBoons,
+  equipmentItemBonusElementalResistances,
   equipmentItemBonusMonsterTypeDamage,
   equipmentItemBonusResistances,
   equipmentItemBonusStats,
@@ -137,6 +139,9 @@ export function itemPreviewDisplay(
       resistances: eqContent.debuffResistances,
       combatStats: eqContent.combatStats,
       monsterTypeDamage: eqContent.monsterTypeDamage,
+      elementalResistances: eqContent.elementalResistances,
+      elementalBoons: eqContent.elementalBoons,
+      elements: eqContent.elements,
       gatherYieldBonuses: gatherYieldBonusDisplay(eqContent, instance),
       skillStatBonuses: skillStatBonusDisplay(eqContent, instance),
       levelRequirement: eqContent.levelRequirement,
@@ -148,6 +153,9 @@ export function itemPreviewDisplay(
             bonusCombatStats: equipmentItemBonusCombatStats(instance),
             bonusMonsterTypeDamage:
               equipmentItemBonusMonsterTypeDamage(instance),
+            bonusElementalResistances:
+              equipmentItemBonusElementalResistances(instance),
+            bonusElementalBoons: equipmentItemBonusElementalBoons(instance),
             miscAffixDescriptions: equipmentItemMiscAffixDescriptions(instance),
           }
         : {}),
@@ -169,6 +177,8 @@ export function itemPreviewDisplay(
       resistances: content.infusionDebuffResistances,
       combatStats: content.infusionCombatStats,
       monsterTypeDamage: content.infusionMonsterTypeDamage,
+      elementalResistances: content.infusionElementalResistances,
+      elementalBoons: content.infusionElementalBoons,
       gatherYieldBonuses:
         infusionGatherYieldBonuses.length > 0
           ? infusionGatherYieldBonuses

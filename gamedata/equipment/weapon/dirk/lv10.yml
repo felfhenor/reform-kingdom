@@ -27,3 +27,6 @@
     Vitality: 2.1
   combatStats:
     damageReflectPercent: 4
+
+  elementalResistances:
+    Earth: 5

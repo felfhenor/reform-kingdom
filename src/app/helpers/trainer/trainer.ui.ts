@@ -11,6 +11,8 @@ import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
   affixEffectsBlock,
   COMBAT_STAT_BONUS,
+  ELEMENT_BOON_BONUS,
+  ELEMENT_RESISTANCE_BONUS,
   RESISTANCE_BONUS,
   STAT_BONUS,
 } from '@helpers/item/equipment-bonus';
@@ -132,6 +134,11 @@ export function trainerTeachingRow(
     stats: affixEffectsBlock(teaching.effects, STAT_BONUS),
     combatStats: affixEffectsBlock(teaching.effects, COMBAT_STAT_BONUS),
     resistances: affixEffectsBlock(teaching.effects, RESISTANCE_BONUS),
+    elementalResistances: affixEffectsBlock(
+      teaching.effects,
+      ELEMENT_RESISTANCE_BONUS,
+    ),
+    elementalBoons: affixEffectsBlock(teaching.effects, ELEMENT_BOON_BONUS),
     grantedSkills: teachingGrantedSkills(teaching),
   };
 }

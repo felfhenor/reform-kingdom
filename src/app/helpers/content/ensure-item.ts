@@ -1,6 +1,11 @@
-import { ensureArray } from '@helpers/content/ensure-helpers-core';
+import { VALID_GAME_ELEMENTS } from '@helpers/content/ensure-helpers-constants';
+import {
+  ensureArray,
+  ensureEnumArray,
+} from '@helpers/content/ensure-helpers-core';
 import {
   ensureCombatStats,
+  ensureElementBlock,
   ensureMonsterTypeDamage,
   ensureSkillStatBonus,
   ensureStats,
@@ -57,6 +62,9 @@ export function ensureEquipment(
     debuffResistances: ensureTagResistances(equipment.debuffResistances),
     combatStats: ensureCombatStats(equipment.combatStats),
     monsterTypeDamage: ensureMonsterTypeDamage(equipment.monsterTypeDamage),
+    elementalResistances: ensureElementBlock(equipment.elementalResistances),
+    elementalBoons: ensureElementBlock(equipment.elementalBoons),
+    elements: ensureEnumArray(equipment.elements, VALID_GAME_ELEMENTS),
     gatherYieldBonuses: ensureArray(
       equipment.gatherYieldBonuses,
       ensureGatherYieldBonus,
@@ -92,6 +100,10 @@ export function ensureItem(item: Partial<ItemContent>): Required<ItemContent> {
     infusionMonsterTypeDamage: ensureMonsterTypeDamage(
       item.infusionMonsterTypeDamage,
     ),
+    infusionElementalResistances: ensureElementBlock(
+      item.infusionElementalResistances,
+    ),
+    infusionElementalBoons: ensureElementBlock(item.infusionElementalBoons),
     infusionGatherYieldBonuses: ensureArray(
       item.infusionGatherYieldBonuses,
       ensureGatherYieldBonus,

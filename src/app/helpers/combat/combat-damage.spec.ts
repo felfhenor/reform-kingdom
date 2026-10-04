@@ -30,6 +30,7 @@ import {
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
 import {
+  defaultAffinities,
   defaultCombatStats,
   defaultStats,
   defaultTagResistances,
@@ -695,5 +696,118 @@ describe('combatApplySkillToTarget skill stat bonuses', () => {
 
     // baseDamage 200; the technique is Intelligence-only, so defense is Resistance(50), not a Vitality blend.
     expect(target.hp).toBe(1000 - 150);
+  });
+});
+
+describe('combatApplySkillToTarget elemental damage', () => {
+  const zeroStats = defaultStats();
+
+  beforeEach(() => {
+    combatLogReset();
+  });
+
+  function hit(
+    attackerOverrides: Partial<Combatant>,
+    targetOverrides: Partial<Combatant>,
+    techniqueOverrides: Partial<EquipmentSkillContentTechnique>,
+  ): Combatant {
+    const attacker = buildCombatant({
+      id: 'attacker',
+      totalStats: { ...zeroStats, Strength: 100 },
+      ...attackerOverrides,
+    });
+    const target = buildCombatant({
+      id: 'target',
+      hp: 1000,
+      totalStats: { ...zeroStats, Health: 1000 },
+      ...targetOverrides,
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill(),
+      buildTechnique({
+        damageScaling: { ...zeroStats, Strength: 1 },
+        attributes: ['DamagesTarget', 'BypassDefense'],
+        combatMessage: '{{ damageText }}',
+        ...techniqueOverrides,
+      }),
+    );
+
+    return target;
+  }
+
+  it("reduces a Fire hit by the target's Fire resistance and names the element", () => {
+    const target = hit(
+      {},
+      { resistance: { ...defaultAffinities(), Fire: 50 } },
+      { elements: ['Fire'] },
+    );
+
+    expect(target.hp).toBe(1000 - 50);
+    expect(combatLog()[0].message).toBe('50 Fire damage');
+  });
+
+  it('amplifies a hit against a weakness and applies the attacker boon', () => {
+    const target = hit(
+      { affinity: { ...defaultAffinities(), Water: 20 } },
+      { resistance: { ...defaultAffinities(), Water: -50 } },
+      { elements: ['Water'] },
+    );
+
+    // 100 * 1.2 boon * 1.5 weakness.
+    expect(target.hp).toBe(1000 - 180);
+  });
+
+  it('gives a non-elemental technique the attacker gear element', () => {
+    const target = hit(
+      { gearElements: ['Fire'] },
+      { resistance: { ...defaultAffinities(), Fire: 50 } },
+      { elements: [] },
+    );
+
+    expect(target.hp).toBe(1000 - 50);
+    expect(combatLog()[0].message).toBe('50 Fire damage');
+  });
+
+  it('still plinks 1 damage through heavy resistance', () => {
+    const target = hit(
+      { totalStats: { ...zeroStats, Strength: 1 } },
+      { resistance: { ...defaultAffinities(), Fire: 75 } },
+      {
+        elements: ['Fire'],
+        attributes: ['DamagesTarget', 'BypassDefense', 'AllowPlink'],
+      },
+    );
+
+    expect(target.hp).toBe(1000 - 1);
+  });
+
+  it('leaves heals untouched by elemental boon/resistance', () => {
+    const target = hit(
+      { affinity: { ...defaultAffinities(), Water: 100 } },
+      {
+        hp: 500,
+        resistance: { ...defaultAffinities(), Water: 75 },
+      },
+      {
+        elements: ['Water'],
+        attributes: ['HealsTarget', 'BypassDefense'],
+      },
+    );
+
+    expect(target.hp).toBe(600);
+  });
+
+  it('renders damageText for a fully-blocked hit', () => {
+    hit(
+      {},
+      { totalStats: { ...zeroStats, Health: 1000, Vitality: 1000 } },
+      { elements: ['Fire'], attributes: ['DamagesTarget'] },
+    );
+
+    expect(combatLog()[0].message).toBe('0 Fire damage');
   });
 });

@@ -26,6 +26,9 @@
     Intelligence: 8.3
     Resistance: 8.3
 
+  elementalResistances:
+    Earth: 5
+
 - id: 9d086cef-5cce-4eb3-aa24-5cc9da7d3b6f
   name: Oozemire Rod
   description: A rod made with ghostwood and mire oozeflesh, tied together with ghostly energy.
@@ -40,3 +43,6 @@
     Resistance: 2.1
   debuffResistances:
     Poison: 4
+
+  elementalResistances:
+    Earth: 5

@@ -59,7 +59,19 @@
         bonusMonsterTypeDamage() ?? item.bonusMonsterTypeDamage
       "
       [comparisonMonsterTypeDamage]="comparisonMonsterTypeDamage()"
+      [elementalResistances]="item.elementalResistances"
+      [bonusElementalResistances]="item.bonusElementalResistances"
+      [comparisonElementalResistances]="comparisonElementalResistances()"
+      [elementalBoons]="item.elementalBoons"
+      [bonusElementalBoons]="item.bonusElementalBoons"
+      [comparisonElementalBoons]="comparisonElementalBoons()"
     />
+
+    @if (item.elements?.length) {
+      <div class="type-hint my-2">
+        Attacks deal {{ item.elements!.join('/') }} damage
+      </div>
+    }
 
     <app-row-gather-yield-bonuses [bonuses]="item.gatherYieldBonuses" />
 
