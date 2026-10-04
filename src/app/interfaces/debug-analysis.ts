@@ -67,7 +67,7 @@ export type AnalysisScriptDefinition = {
 
 export type AnalysisLevelWindow = { start: number; end: number };
 
-export type AnalysisItemSource = { level: number };
+export type AnalysisItemSource = { level: number; description: string };
 
 export type MaterialUtilizationStats = {
   name: string;
@@ -145,12 +145,6 @@ export type TeleportNodeCheckRef = {
   nodeName: string;
   tag?: string;
   toTag?: string;
-};
-
-export type RecipeItemProducer = {
-  name: string;
-  tradeskillId: string;
-  minTradeskillLevel: number;
 };
 
 export type EquipmentResultRecipeCheck = {

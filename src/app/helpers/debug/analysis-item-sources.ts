@@ -18,7 +18,7 @@ import type {
   RecipeContent,
   TownContent,
 } from '@interfaces';
-import { max, min } from 'es-toolkit/compat';
+import { max, min, minBy } from 'es-toolkit/compat';
 
 function noteSpawn(
   spawns: Map<string, LevelRange[]>,
@@ -93,13 +93,14 @@ export function buildMonsterLevels(
 
 function addSource(
   itemSources: Map<string, AnalysisItemSource[]>,
+  description: string,
   itemId?: string,
   level?: number,
 ): void {
   if (!itemId || level === undefined || !Number.isFinite(level)) return;
 
   const list = itemSources.get(itemId) ?? [];
-  list.push({ level });
+  list.push({ level, description });
   itemSources.set(itemId, list);
 }
 
@@ -119,14 +120,21 @@ export function buildItemSources(
   monsters.forEach((monster) => {
     const level = monsterLevels.get(monster.id)?.min;
     monster.drops.forEach((drop) => {
-      if ('itemId' in drop) addSource(itemSources, drop.itemId, level);
+      if ('itemId' in drop) {
+        addSource(itemSources, `monster "${monster.name}"`, drop.itemId, level);
+      }
     });
   });
 
   [...encounters, ...encounterRandoms].forEach((encounter) => {
     encounter.completionRewards.forEach((reward) => {
       if ('itemId' in reward) {
-        addSource(itemSources, reward.itemId, encounter.levelRange?.min);
+        addSource(
+          itemSources,
+          `encounter "${encounter.name}"`,
+          reward.itemId,
+          encounter.levelRange?.min,
+        );
       }
     });
   });
@@ -134,7 +142,12 @@ export function buildItemSources(
   towns.forEach((town) => {
     town.defense.rewards.forEach((reward) => {
       if ('itemId' in reward) {
-        addSource(itemSources, reward.itemId, town.defense.assaulter.level.min);
+        addSource(
+          itemSources,
+          `town defense "${town.name}"`,
+          reward.itemId,
+          town.defense.assaulter.level.min,
+        );
       }
     });
   });
@@ -142,14 +155,24 @@ export function buildItemSources(
   gatherings.forEach((gathering) => {
     gathering.gatherResults.forEach((result) => {
       result.items.forEach((resultItem) =>
-        addSource(itemSources, resultItem.itemId, gathering.levelRange?.min),
+        addSource(
+          itemSources,
+          `gathering node "${gathering.name}"`,
+          resultItem.itemId,
+          gathering.levelRange?.min,
+        ),
       );
     });
   });
 
   recipes.forEach((recipe) => {
     if ('itemId' in recipe.result) {
-      addSource(itemSources, recipe.result.itemId, recipe.minTradeskillLevel);
+      addSource(
+        itemSources,
+        `recipe "${recipe.name}"`,
+        recipe.result.itemId,
+        recipe.minTradeskillLevel,
+      );
     }
   });
 
@@ -159,7 +182,12 @@ export function buildItemSources(
       const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
       offer?.rewards.forEach((reward) => {
         if ('itemId' in reward) {
-          addSource(itemSources, reward.itemId, caravan.level.min);
+          addSource(
+            itemSources,
+            `commission "${offer.name}"`,
+            reward.itemId,
+            caravan.level.min,
+          );
         }
       });
     });
@@ -176,7 +204,12 @@ export function buildItemSources(
     trader.trades.forEach((trade) => {
       if (trade.type !== 'sell' || !trade.itemId) return;
       eligibleCaravans.forEach((caravan) =>
-        addSource(itemSources, trade.itemId, caravan.level.min),
+        addSource(
+          itemSources,
+          `caravan trader "${trader.name}"`,
+          trade.itemId,
+          caravan.level.min,
+        ),
       );
     });
   });
@@ -184,11 +217,16 @@ export function buildItemSources(
   return itemSources;
 }
 
+export function earliestSource(
+  itemSources: Map<string, AnalysisItemSource[]>,
+  itemId: string,
+): AnalysisItemSource | undefined {
+  return minBy(itemSources.get(itemId) ?? [], (s) => s.level);
+}
+
 export function earliestLevel(
   itemSources: Map<string, AnalysisItemSource[]>,
   itemId: string,
 ): number | undefined {
-  const sources = itemSources.get(itemId);
-  if (!sources || sources.length === 0) return undefined;
-  return Math.min(...sources.map((s) => s.level));
+  return earliestSource(itemSources, itemId)?.level;
 }

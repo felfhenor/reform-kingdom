@@ -1,66 +1,61 @@
 /**
- * Validates two ascending-order properties of crafting recipes: (1) an
- * ingredient recipe must unlock at or before the recipe that consumes it,
- * and (2) within a tradeskill+equipment-type group, `levelRequirement` must
+ * Validates two ascending-order properties of crafting recipes: (1) a
+ * craftable ingredient's earliest source must be available at or before the
+ * recipe that consumes it, and
+ * (2) within a tradeskill+equipment-type group, `levelRequirement` must
  * ascend with `minTradeskillLevel`.
  */
 
 import { getEntriesByType } from '@helpers/content/content';
+import {
+  buildItemSources,
+  buildMonsterLevels,
+  earliestSource,
+} from '@helpers/debug/analysis-item-sources';
 import type {
   AnalysisCheck,
+  AnalysisItemSource,
   AnalysisRunResult,
+  CaravanContent,
+  CaravanTraderContent,
+  EncounterContent,
+  EncounterRandomContent,
   EquipmentContent,
   EquipmentResultRecipeCheck,
+  GatheringContent,
+  ItemContent,
+  MonsterContent,
   RecipeContent,
-  RecipeItemProducer,
+  TownContent,
   TradeskillContent,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-function buildItemProducerIndex(
-  recipes: RecipeContent[],
-): Map<string, RecipeItemProducer[]> {
-  const index = new Map<string, RecipeItemProducer[]>();
-
-  recipes.forEach((recipe) => {
-    if (!('itemId' in recipe.result)) return;
-
-    const producers = index.get(recipe.result.itemId) ?? [];
-    producers.push({
-      name: recipe.name,
-      tradeskillId: recipe.tradeskillId,
-      minTradeskillLevel: recipe.minTradeskillLevel,
-    });
-    index.set(recipe.result.itemId, producers);
-  });
-
-  return index;
-}
-
 function checkRecipe(
   recipe: RecipeContent,
-  itemProducers: Map<string, RecipeItemProducer[]>,
+  craftableItemIds: Set<string>,
+  itemSources: Map<string, AnalysisItemSource[]>,
   tradeskillNameById: Map<string, string>,
+  itemNameById: Map<string, string>,
 ): AnalysisCheck[] {
   const checks: AnalysisCheck[] = [];
   const recipeTradeskillName =
     tradeskillNameById.get(recipe.tradeskillId) ?? recipe.tradeskillId;
 
   recipe.requirements.forEach((requirement) => {
+    // Non-recipe source levels are player levels, so they only lower a craftable item's earliest level.
     if (!('itemId' in requirement)) return;
+    if (!craftableItemIds.has(requirement.itemId)) return;
 
-    const producers = itemProducers.get(requirement.itemId) ?? [];
-    producers.forEach((producer) => {
-      if (producer.minTradeskillLevel <= recipe.minTradeskillLevel) return;
+    const earliest = earliestSource(itemSources, requirement.itemId);
+    if (!earliest || earliest.level <= recipe.minTradeskillLevel) return;
 
-      const producerTradeskillName =
-        tradeskillNameById.get(producer.tradeskillId) ?? producer.tradeskillId;
-      checks.push({
-        id: `ingredient-order:${recipe.id}:${producer.name}`,
-        label: recipe.name,
-        status: 'fail',
-        message: `${recipeTradeskillName} recipe "${recipe.name}" (minTradeskillLevel ${recipe.minTradeskillLevel}) requires an item only craftable via ${producerTradeskillName} recipe "${producer.name}" at minTradeskillLevel ${producer.minTradeskillLevel} - an ingredient recipe can't require a higher tradeskill level than the recipe that consumes it.`,
-      });
+    const itemName = itemNameById.get(requirement.itemId) ?? requirement.itemId;
+    checks.push({
+      id: `ingredient-order:${recipe.id}:${requirement.itemId}`,
+      label: recipe.name,
+      status: 'fail',
+      message: `${recipeTradeskillName} recipe "${recipe.name}" (minTradeskillLevel ${recipe.minTradeskillLevel}) requires "${itemName}", whose earliest source is ${earliest.description} at level ${earliest.level} - an ingredient can't first become available at a higher level than the recipe that consumes it.`,
     });
   });
 
@@ -126,13 +121,40 @@ export function runRecipeIngredientOrderAnalysis(): AnalysisRunResult {
       t.name,
     ]),
   );
+  const itemNameById = new Map(
+    getEntriesByType<ItemContent>('item').map((i) => [i.id, i.name]),
+  );
   const equipmentById = new Map(equipment.map((e) => [e.id, e]));
 
-  const itemProducers = buildItemProducerIndex(recipes);
+  const encounters = getEntriesByType<EncounterContent>('encounter');
+  const encounterRandoms =
+    getEntriesByType<EncounterRandomContent>('encounterrandom');
+  const itemSources = buildItemSources(
+    getEntriesByType<MonsterContent>('monster'),
+    encounters,
+    encounterRandoms,
+    getEntriesByType<GatheringContent>('gathering'),
+    recipes,
+    getEntriesByType<CaravanContent>('caravan'),
+    getEntriesByType<CaravanTraderContent>('caravantrader'),
+    buildMonsterLevels(encounters, encounterRandoms),
+    getEntriesByType<TownContent>('town'),
+  );
+  const craftableItemIds = new Set(
+    recipes.flatMap((r) => ('itemId' in r.result ? [r.result.itemId] : [])),
+  );
   const checks: AnalysisCheck[] = [];
 
   recipes.forEach((recipe) => {
-    checks.push(...checkRecipe(recipe, itemProducers, tradeskillNameById));
+    checks.push(
+      ...checkRecipe(
+        recipe,
+        craftableItemIds,
+        itemSources,
+        tradeskillNameById,
+        itemNameById,
+      ),
+    );
   });
 
   const levelRequirementGroups = new Map<
@@ -176,7 +198,7 @@ export function runRecipeIngredientOrderAnalysis(): AnalysisRunResult {
     checks,
     summary:
       failures === 0
-        ? "Every recipe's item requirements are craftable at or below its own tradeskill level, and equipment level requirements ascend correctly."
+        ? "Every recipe's item requirements are available at or below its own tradeskill level, and equipment level requirements ascend correctly."
         : `${failures} problem(s) found.`,
   };
 }
